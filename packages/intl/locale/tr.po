@@ -3132,6 +3132,10 @@ msgstr "Düzenli ifadeleri etkinleştir"
 msgid "Enable spell checker"
 msgstr "Yazım denetimini etkinleştir"
 
+#: src/strings.ts:3281
+msgid "Enable two factor authentication"
+msgstr ""
+
 #: src/strings.ts:447
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "Hesabınıza ek bir güvenlik katmanı eklemek için iki faktörlü kimlik doğrulamayı etkinleştirin."
@@ -8160,6 +8164,10 @@ msgstr "Bu not herkese açık bir adreste yayımlanacak."
 #: src/strings.ts:1898
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Bu kullanıcı adı, güvenlik anahtarınızdaki farklı kimlik bilgilerini ayırt etmek için kullanılacak. Benzersiz olduğundan emin olun."
+
+#: src/strings.ts:3280
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr ""
 
 #: src/strings.ts:3160
 msgid "thoughts"

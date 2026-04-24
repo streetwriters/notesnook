@@ -3275,5 +3275,8 @@ Continue without attachments?`,
   waitForPreviousDownloadToFinish: () =>
     t`Please wait for the previous download to finish or cancel it.`,
   checkingAttachmentsProgress: (current: number, total: number) =>
-    t`Checking attachments (${current}/${total})`
+    t`Checking attachments (${current}/${total})`,
+  twoFactorDisableWarning: () =>
+    t`This will reset your current two-factor authentication setup. Do you want to proceed?`,
+  twoFactorEnable: () => t`Enable two factor authentication`
 };

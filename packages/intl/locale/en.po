@@ -1,6 +1,7 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-16 12:53+0500\n"
+"POT-Creation-Date: 2026-04-24 10:46+0500\n"
+"POT-Creation-Date: 2026-04-24 10:46+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3132,6 +3133,10 @@ msgstr "Enable regex"
 #: src/strings.ts:1931
 msgid "Enable spell checker"
 msgstr "Enable spell checker"
+
+#: src/strings.ts:3281
+msgid "Enable two factor authentication"
+msgstr "Enable two factor authentication"
 
 #: src/strings.ts:447
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
@@ -8162,6 +8167,10 @@ msgstr "This note will be published to a public URL."
 #: src/strings.ts:1898
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
+
+#: src/strings.ts:3280
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr "This will reset your current two-factor authentication setup. Do you want to proceed?"
 
 #: src/strings.ts:3160
 msgid "thoughts"

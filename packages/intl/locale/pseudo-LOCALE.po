@@ -1,6 +1,7 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-16 12:53+0500\n"
+"POT-Creation-Date: 2026-04-24 10:46+0500\n"
+"POT-Creation-Date: 2026-04-24 10:46+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,7 +16,7 @@ msgstr ""
 
 #: src/strings.ts:134
 msgid " Unlock with password once to enable biometric access."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:754
 msgid "— not just the"
@@ -46,7 +47,7 @@ msgstr "{0} downloaded"
 #. placeholder {0}: version ? `v${version} ` : "New version"
 #: src/strings.ts:481
 msgid "{0} Highlights 🎉"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #. placeholder {0}: platform === "ios" ? "Apple" : "Google"
 #: src/strings.ts:2347
@@ -518,7 +519,7 @@ msgstr "{count, plural, one {Version deleted} other {# versions deleted}}"
 
 #: src/strings.ts:2273
 msgid "{count} characters"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3172
 msgid "{count} stars"
@@ -582,7 +583,7 @@ msgstr ""
 
 #: src/strings.ts:546
 msgid "{mode, select, repeat {Repeat} once {Once} permanent {Permanent} other {Unknown mode}}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1799
 msgid "{n} {added, plural, one {added to 1 notebook} other {added to # notebooks}} and {removed, plural, one {removed from 1 notebook} other {removed from # notebooks}}."
@@ -614,7 +615,7 @@ msgstr ""
 
 #: src/strings.ts:423
 msgid "{notes, plural, one {Export note} other {Export # notes}}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1581
 msgid "{percentage}% updating..."
@@ -630,7 +631,7 @@ msgstr "[{planTitle} ƥŀȧƞ]"
 
 #: src/strings.ts:677
 msgid "{platform, select, android {{name} saved to selected path} other {{name} saved to File Manager/Notesnook/downloads}}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1237
 msgid "{platform, select, android {Backup file saved in \"Notesnook backups\" folder on your phone.} other {Backup file is saved in File Manager/Notesnook folder}}"
@@ -654,7 +655,7 @@ msgstr ""
 
 #: src/strings.ts:714
 msgid "{type} does not match"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3214
 msgid "{used} of {total}"
@@ -694,7 +695,7 @@ msgstr ""
 
 #: src/strings.ts:1650
 msgid "#notesnook"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:3268
 msgid "✨ Highlights ✨"
@@ -706,7 +707,7 @@ msgstr "[🎉 Ẇřȧƥƥēƌ {year}]"
 
 #: src/strings.ts:2445
 msgid "1 day"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2447
 msgid "1 month"
@@ -770,7 +771,7 @@ msgstr "5 year"
 
 #: src/strings.ts:2365
 msgid "5 year plan (One time purchase)"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1692
 msgid "6 digit code"
@@ -794,7 +795,7 @@ msgstr ""
 
 #: src/strings.ts:609
 msgid "Abc"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1191
 msgid "About"
@@ -826,7 +827,7 @@ msgstr ""
 
 #: src/strings.ts:2232
 msgid "Actions for tag: {title}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1855
 msgid "Activate"
@@ -842,7 +843,7 @@ msgstr "Active reminders"
 
 #: src/strings.ts:478
 msgid "Add"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3185
 msgid "Add #{tag}"
@@ -870,7 +871,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:507
 msgid "Add color"
-msgstr "Add color"
+msgstr ""
 
 #: src/strings.ts:2852
 msgid "Add discount"
@@ -898,7 +899,7 @@ msgstr "Add shortcut"
 
 #: src/strings.ts:522
 msgid "Add tag"
-msgstr "Add tag"
+msgstr ""
 
 #: src/strings.ts:857
 msgid "Add tags"
@@ -918,7 +919,7 @@ msgstr "Add to home"
 
 #: src/strings.ts:2253
 msgid "Add to notebook"
-msgstr "Add to notebook"
+msgstr ""
 
 #: src/strings.ts:3071
 msgid "Add your documents, PDFs, images and videos, and keep them safe and organized."
@@ -926,7 +927,7 @@ msgstr "Add your documents, PDFs, images and videos, and keep them safe and orga
 
 #: src/strings.ts:887
 msgid "Add your first note"
-msgstr "Add your first note"
+msgstr ""
 
 #: src/strings.ts:2400
 msgid "Adjust the line height of the editor"
@@ -974,11 +975,11 @@ msgstr ""
 
 #: src/strings.ts:701
 msgid "All fields are required"
-msgstr "All fields are required<<<<<<< HEAD"
+msgstr "All fields are required<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:3076
 msgid "All file types supported"
-msgstr "All file types supported"
+msgstr "All file types supported======="
 
 #: src/strings.ts:688
 msgid "All files"
@@ -986,7 +987,7 @@ msgstr "All files"
 
 #: src/strings.ts:2539
 msgid "All items deleted"
-msgstr "All items deleted"
+msgstr "All items deleted<<<<<<< HEAD"
 
 #: src/strings.ts:1076
 msgid "All locked notes will be re-encrypted with the new password."
@@ -998,7 +999,7 @@ msgstr "All logs are local only and are not sent to any server. You can share th
 
 #: src/strings.ts:1519
 msgid "All server urls are required."
-msgstr "All server urls are required."
+msgstr "All server urls are required.======="
 
 #: src/strings.ts:2763
 msgid "All the core features, minus the fluff."
@@ -1273,12 +1274,12 @@ msgstr "Attachment settings"
 
 #: src/strings.ts:273
 msgid "attachments"
-msgstr "attachments"
+msgstr "attachments<<<<<<< HEAD"
 
 #: src/strings.ts:282
 #: src/strings.ts:829
 msgid "Attachments"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream======="
 
 #: src/strings.ts:1728
 msgid "Attachments cache cleared!"
@@ -1286,19 +1287,19 @@ msgstr ""
 
 #: src/strings.ts:2195
 msgid "Attachments recheck complete"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:694
 msgid "Audios"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream======="
 
 #: src/strings.ts:1508
 msgid "Auth server"
-msgstr "<<<<<<< HEAD"
+msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2461
 msgid "Authenticate"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream======="
 
 #: src/strings.ts:2458
 msgid "Authenticate to view API key"
@@ -1314,7 +1315,7 @@ msgstr ""
 
 #: src/strings.ts:1742
 msgid "Authenticating user"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1938
 msgid "Authentication"
@@ -1346,7 +1347,7 @@ msgstr ""
 
 #: src/strings.ts:1543
 msgid "Auto save: off"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1915
 msgid "Auto start on system startup"
@@ -1382,7 +1383,7 @@ msgstr "Automatic monthly, weekly & daily backups"
 
 #: src/strings.ts:1911
 msgid "Automatic updates"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1043
 msgid "Automatically clear trash after a certain period of time"
@@ -1414,11 +1415,11 @@ msgstr ""
 
 #: src/strings.ts:2100
 msgid "Background color"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream======="
 
 #: src/strings.ts:998
 msgid "Background sync (experimental)"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1907
 msgid "Backup"
@@ -1430,7 +1431,7 @@ msgstr ""
 
 #: src/strings.ts:3117
 msgid "Backup & keep your notes safe"
-msgstr "Backup & keep your notes safe"
+msgstr "Backup & keep your notes safe<<<<<<< HEAD"
 
 #: src/strings.ts:1112
 msgid "Backup & restore"
@@ -1438,7 +1439,7 @@ msgstr ""
 
 #: src/strings.ts:1235
 msgid "Backup complete"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2990
 msgid "Backup Directory Migration Failed"
@@ -1458,7 +1459,7 @@ msgstr "Backup in progress..."
 
 #: src/strings.ts:806
 msgid "Backup is encrypted"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream======="
 
 #: src/strings.ts:1496
 msgid "Backup is encrypted, decrypting..."
@@ -1734,7 +1735,7 @@ msgstr ""
 
 #: src/strings.ts:2149
 msgid "Change language"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1155
 msgid "Change notification sound"
@@ -1746,7 +1747,7 @@ msgstr "Change password<<<<<<< HEAD"
 
 #: src/strings.ts:2369
 msgid "Change plan"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1671
 msgid "Change profile picture"
@@ -1782,7 +1783,7 @@ msgstr "Change your subscription plan."
 
 #: src/strings.ts:994
 msgid "Changes from other devices won't be updated in the editor in real-time."
-msgstr "Changes from other devices won't be updated in the editor in real-time.<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2477
 msgid "Changing Inbox PGP keys will delete all your unsynced inbox items."
@@ -1794,7 +1795,7 @@ msgstr "Changing password is an irreversible process. You will be logged out fro
 
 #: src/strings.ts:2972
 msgid "Changing release track"
-msgstr "<<<<<<< HEAD"
+msgstr ">>>>>>> 51d5a7a12 (mobile: add 2fa disable in settings)"
 
 #: src/strings.ts:2875
 msgid "Changing subscription plan"
@@ -1802,7 +1803,7 @@ msgstr ""
 
 #: src/strings.ts:2266
 msgid "Characters"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1198
 msgid "Check for new version of Notesnook"
@@ -1866,7 +1867,7 @@ msgstr "Checklists"
 
 #: src/strings.ts:2126
 msgid "Choose a block to insert"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1656
 msgid "Choose a recovery method"
@@ -1878,7 +1879,7 @@ msgstr ""
 
 #: src/strings.ts:2162
 msgid "Choose custom color"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1023
 msgid "Choose from pre-built themes or create your own"
@@ -1890,7 +1891,7 @@ msgstr ""
 
 #: src/strings.ts:2403
 msgid "Choose how day is displayed in the app"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1063
 msgid "Choose how the new note titles are formatted"
@@ -1906,7 +1907,7 @@ msgstr "Choose how you want to set up your Inbox PGP keys:<<<<<<< HEAD"
 
 #: src/strings.ts:2408
 msgid "Choose what day to display as the first day of the week"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1130
 msgid "Choose where to save your backups"
@@ -1930,7 +1931,7 @@ msgstr "Clear all cached attachments. Current cache size: {cacheSize}<<<<<<< HEA
 
 #: src/strings.ts:2067
 msgid "Clear all formatting"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1715
 msgid "Clear attachments cache?"
@@ -1942,7 +1943,7 @@ msgstr "Clear cache<<<<<<< HEAD"
 
 #: src/strings.ts:2160
 msgid "Clear completed tasks"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3266
 msgid "Clear current line"
@@ -2033,7 +2034,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2824
 msgid "Clip Mode:"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1283
 msgid "Close"
@@ -2053,7 +2054,7 @@ msgstr "Close all tabs<<<<<<< HEAD"
 
 #: src/strings.ts:2227
 msgid "Close current tab"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1835
 msgid "Close others"
@@ -2105,7 +2106,7 @@ msgstr "Color<<<<<<< HEAD"
 
 #: src/strings.ts:716
 msgid "Color #{color} already exists"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1902
 msgid "Color scheme"
@@ -2141,7 +2142,7 @@ msgstr "Columns"
 
 #: src/strings.ts:2219
 msgid "Command palette"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1173
 msgid "Community"
@@ -2201,7 +2202,7 @@ msgstr "Confirm email<<<<<<< HEAD"
 
 #: src/strings.ts:826
 msgid "Confirm email to publish note"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1375
 msgid "Confirm password"
@@ -2221,7 +2222,7 @@ msgstr ""
 
 #: src/strings.ts:2422
 msgid "Confirmation email sent"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2708
 msgid "Conflicted"
@@ -2245,7 +2246,7 @@ msgstr ""
 
 #: src/strings.ts:494
 msgid "Continue"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1150
 msgid "Controls whether this device should receive reminder notifications."
@@ -2266,11 +2267,11 @@ msgstr ""
 
 #: src/strings.ts:625
 msgid "Copy codes"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:834
 msgid "Copy ID"
-msgstr "=======>>>>>>> Stashed changes"
+msgstr ""
 
 #: src/strings.ts:2045
 msgid "Copy image"
@@ -2294,7 +2295,7 @@ msgstr ""
 
 #: src/strings.ts:539
 msgid "Copy to clipboard"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1501
 msgid "Copying backup files to cache"
@@ -2354,11 +2355,11 @@ msgstr "Create \"{name}\" tag"
 
 #: src/strings.ts:665
 msgid "Create a group"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:862
 msgid "Create a new note"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2997
 msgid "Create a new notebook"
@@ -2374,15 +2375,15 @@ msgstr ""
 
 #: src/strings.ts:523
 msgid "Create a tag to group related notes together."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1696
 msgid "Create account"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2436
 msgid "Create API Key"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2453
 msgid "Create Key"
@@ -2390,7 +2391,7 @@ msgstr ""
 
 #: src/strings.ts:530
 msgid "Create link"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< Updated upstream======="
 
 #: src/strings.ts:3011
 msgid "Create note from notification drawer"
@@ -3122,6 +3123,10 @@ msgstr "Enable regex"
 msgid "Enable spell checker"
 msgstr "Enable spell checker"
 
+#: src/strings.ts:3281
+msgid "Enable two factor authentication"
+msgstr ""
+
 #: src/strings.ts:447
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "Enable two-factor authentication to add an extra layer of security to your account."
@@ -3610,7 +3615,7 @@ msgstr "Fallback method for 2FA enabled"
 
 #: src/strings.ts:2329
 msgid "FAQs"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1850
 msgid "Favorite"
@@ -3647,7 +3652,7 @@ msgstr ""
 
 #: src/strings.ts:730
 msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2550
 msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
@@ -3695,7 +3700,7 @@ msgstr "[Ƒīƞȧŀ şŧēƥ, ḿȧķē ŧħē ƥȧẏḿēƞŧ.]"
 
 #: src/strings.ts:2388
 msgid "Finish your purchase in the browser."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1550
 msgid "Fix it"
@@ -3755,7 +3760,7 @@ msgstr ""
 
 #: src/strings.ts:2297
 msgid "For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2939
 msgid "For example, {examples}"
@@ -3763,7 +3768,7 @@ msgstr ""
 
 #: src/strings.ts:2308
 msgid "for locking your notes as soon as app enters background"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1996
 msgid "Force logout from all your other logged in devices."
@@ -3833,7 +3838,7 @@ msgstr ""
 
 #: src/strings.ts:2165
 msgid "From URL"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1818
 msgid "Full name updated"
@@ -3849,7 +3854,7 @@ msgstr "Full quality images"
 
 #: src/strings.ts:2120
 msgid "Full screen"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2846
 msgid "Fun facts of the year"
@@ -3893,7 +3898,7 @@ msgstr "Get started without compromise."
 
 #: src/strings.ts:2305
 msgid "Get this and so much more:"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:357
 msgid "Getting 2FA backup codes"
@@ -3905,7 +3910,7 @@ msgstr ""
 
 #: src/strings.ts:355
 msgid "Getting information"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2981
 msgid "Getting invoice"
@@ -3925,7 +3930,7 @@ msgstr "Go back<<<<<<< HEAD"
 
 #: src/strings.ts:2224
 msgid "Go back in tab"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2957
 msgid "Go back to app"
@@ -3933,7 +3938,7 @@ msgstr ""
 
 #: src/strings.ts:2223
 msgid "Go forward in tab"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1667
 msgid "Go to #{tag}"
@@ -3985,7 +3990,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:686
 msgid "Hash copied"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2010
 msgid "Having problems with sync?"
@@ -4009,11 +4014,11 @@ msgstr ""
 
 #: src/strings.ts:2181
 msgid "Height"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1158
 msgid "Help and support"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1277
 msgid "Hide"
@@ -4041,7 +4046,7 @@ msgstr "Hint"
 
 #: src/strings.ts:831
 msgid "History"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2596
 msgid "Hold Ctrl/Cmd & click on multiple items to select them."
@@ -4058,7 +4063,7 @@ msgstr ""
 
 #: src/strings.ts:2127
 msgid "Horizontal rule"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1657
 msgid "How do you want to recover your account?"
@@ -4106,11 +4111,11 @@ msgstr "I don't have access to my phone<<<<<<< HEAD"
 
 #: src/strings.ts:119
 msgid "I have a 2FA backup code"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1730
 msgid "I have saved my key"
-msgstr "I have saved my key<<<<<<< HEAD"
+msgstr "I have saved my key<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2011
 msgid "I understand"
@@ -4156,7 +4161,7 @@ msgstr "If you can't scan the QR code above, enter this text instead (spaces don
 msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "            working,"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:206
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
@@ -4168,7 +4173,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2132
 msgid "Image"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1031
 msgid "Image Compression"
@@ -4180,7 +4185,7 @@ msgstr "Image properties<<<<<<< HEAD"
 
 #: src/strings.ts:2105
 msgid "Image settings"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:689
 msgid "Images"
@@ -4208,7 +4213,7 @@ msgstr "Import completed<<<<<<< HEAD"
 
 #: src/strings.ts:2417
 msgid "Import CSV"
-msgstr "<<<<<<< Updated upstream"
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:3020
 msgid "Import CSV to table"
@@ -4240,7 +4245,7 @@ msgstr "Inbox API"
 
 #: src/strings.ts:2523
 msgid "Inbox keys generated"
-msgstr "<<<<<<< HEAD"
+msgstr "<<<<<<< HEAD======="
 
 #: src/strings.ts:2482
 msgid "Inbox keys saved"
@@ -4364,7 +4369,7 @@ msgstr "Insert row above<<<<<<< HEAD"
 
 #: src/strings.ts:2094
 msgid "Insert row below"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3230
 msgid "Insert time"
@@ -4384,11 +4389,11 @@ msgstr "Instant syncing"
 
 #: src/strings.ts:682
 msgid "Invalid {type}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3203
 msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1811
 msgid "Invalid CORS proxy url"
@@ -4396,7 +4401,7 @@ msgstr "Invalid CORS proxy url"
 
 #: src/strings.ts:2527
 msgid "Invalid JSON"
-msgstr "<<<<<<< HEAD"
+msgstr "<<<<<<< HEAD======="
 
 #: src/strings.ts:3274
 msgid "Invalid key for attachment."
@@ -4404,7 +4409,7 @@ msgstr "Invalid key for attachment."
 
 #: src/strings.ts:2462
 msgid "Invalid password"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2481
 msgid "Invalid PGP key pair. Please check your keys and try again."
@@ -4412,7 +4417,7 @@ msgstr "Invalid PGP key pair. Please check your keys and try again.<<<<<<< HEAD"
 
 #: src/strings.ts:2488
 msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA backup code."
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2980
 msgid "Invoice"
@@ -4732,11 +4737,11 @@ msgstr "Locked notes cannot be pinned"
 
 #: src/strings.ts:827
 msgid "Locked notes cannot be published"
-msgstr "Locked notes cannot be published"
+msgstr ""
 
 #: src/strings.ts:1994
 msgid "Log out from all other devices"
-msgstr "Log out from all other devices"
+msgstr "Log out from all other devices<<<<<<< HEAD"
 
 #: src/strings.ts:979
 msgid "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out."
@@ -4744,7 +4749,7 @@ msgstr "Logging out will clear all data stored on THIS DEVICE. Make sure you hav
 
 #: src/strings.ts:358
 msgid "Logging out. Please wait..."
-msgstr "Logging out. Please wait..."
+msgstr ""
 
 #: src/strings.ts:1642
 msgid "Logging you in"
@@ -4768,7 +4773,7 @@ msgstr ""
 
 #: src/strings.ts:708
 msgid "Login successful"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1267
 msgid "Login to encrypt and sync notes"
@@ -4792,7 +4797,7 @@ msgstr ""
 
 #: src/strings.ts:505
 msgid "Logout from this device"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2929
 msgid "Logs"
@@ -4820,7 +4825,7 @@ msgstr "Lower Roman"
 
 #: src/strings.ts:2158
 msgid "Make task list readonly"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:943
 msgid "Manage account"
@@ -4832,7 +4837,7 @@ msgstr ""
 
 #: src/strings.ts:776
 msgid "Manage tags"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:944
 msgid "Manage your account related settings here"
@@ -4885,7 +4890,7 @@ msgstr "Math (inline)<<<<<<< HEAD"
 
 #: src/strings.ts:2130
 msgid "Math & formulas"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1858
 msgid "Maximize"
@@ -4893,11 +4898,11 @@ msgstr "Maximize<<<<<<< HEAD"
 
 #: src/strings.ts:2749
 msgid "Maximum file size"
-msgstr "Maximum file size"
+msgstr "Maximum file size<<<<<<< HEAD"
 
 #: src/strings.ts:2559
 msgid "Maximum reminder date is {maxDate}"
-msgstr "Maximum reminder date is {maxDate}"
+msgstr "Maximum reminder date is {maxDate}======="
 
 #: src/strings.ts:1639
 msgid "Member since {date}"
@@ -4935,7 +4940,7 @@ msgstr "Migration failed<<<<<<< HEAD"
 
 #: src/strings.ts:803
 msgid "min"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1828
 msgid "Minimal"
@@ -4960,7 +4965,7 @@ msgstr "Mon<<<<<<< HEAD"
 #: src/strings.ts:562
 #: src/strings.ts:2966
 msgid "Monday"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1513
 msgid "Monograph server"
@@ -5030,11 +5035,11 @@ msgstr "Move column left<<<<<<< HEAD"
 
 #: src/strings.ts:2089
 msgid "Move column right"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3263
 msgid "Move line down"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:3262
 msgid "Move line up"
@@ -5054,15 +5059,15 @@ msgstr ""
 
 #: src/strings.ts:2096
 msgid "Move row down"
-msgstr "Move row down"
+msgstr "Move row down<<<<<<< HEAD"
 
 #: src/strings.ts:2095
 msgid "Move row up"
-msgstr "Move row up<<<<<<< HEAD"
+msgstr "Move row up<<<<<<< HEAD======="
 
 #: src/strings.ts:533
 msgid "Move to top"
-msgstr "Move to top"
+msgstr "Move to top<<<<<<< HEAD"
 
 #: src/strings.ts:780
 msgid "Move to trash"
@@ -5070,7 +5075,7 @@ msgstr "Move to trash"
 
 #: src/strings.ts:1074
 msgid "Multi-layer encryption to most important notes"
-msgstr "Multi-layer encryption to most important notes"
+msgstr "Multi-layer encryption to most important notes======="
 
 #: src/strings.ts:811
 msgid "Name"
@@ -5086,11 +5091,11 @@ msgstr "Navigate"
 
 #: src/strings.ts:3215
 msgid "Navigation"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:347
 msgid "Never"
-msgstr "Never"
+msgstr "Never======="
 
 #: src/strings.ts:1242
 msgid "Never ask again"
@@ -5190,11 +5195,11 @@ msgstr "Next tab"
 
 #: src/strings.ts:2859
 msgid "Next year"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:498
 msgid "No"
-msgstr "No"
+msgstr "No======="
 
 #: src/strings.ts:2811
 msgid "No active subscription found"
@@ -5418,7 +5423,7 @@ msgstr "Notesnook Circle<<<<<<< HEAD"
 
 #: src/strings.ts:2383
 msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2989
 msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
@@ -5476,7 +5481,7 @@ msgstr "Notifications disabled<<<<<<< HEAD"
 
 #: src/strings.ts:2072
 msgid "Numbered list"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1593
 msgid "of"
@@ -5488,7 +5493,7 @@ msgstr "Off"
 
 #: src/strings.ts:352
 msgid "Offline"
-msgstr "Offline<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2584
 msgid "Offline mode"
@@ -5496,7 +5501,7 @@ msgstr "Offline mode"
 
 #: src/strings.ts:2454
 msgid "OK"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2026
 msgid "Okay"
@@ -5504,7 +5509,7 @@ msgstr ""
 
 #: src/strings.ts:588
 msgid "Old - new"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2707
 msgid "Older"
@@ -5532,7 +5537,7 @@ msgstr "One subscription for a lifetime of notes."
 
 #: src/strings.ts:2341
 msgid "One time purchase, no auto-renewal"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3083
 msgid "One-time reminders"
@@ -5564,7 +5569,7 @@ msgstr "Open in new tab<<<<<<< HEAD"
 
 #: src/strings.ts:2062
 msgid "Open link"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1707
 msgid "Open note"
@@ -5584,7 +5589,7 @@ msgstr "Open settings<<<<<<< HEAD"
 
 #: src/strings.ts:2122
 msgid "Open source"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1190
 msgid "Open source libraries used in Notesnook"
@@ -5596,7 +5601,7 @@ msgstr "Open source licenses<<<<<<< HEAD"
 
 #: src/strings.ts:745
 msgid "Open source."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:895
 msgid "Open the two-factor authentication (TOTP) app to view your authentication code."
@@ -5616,7 +5621,7 @@ msgstr ""
 
 #: src/strings.ts:228
 msgid "or email us at"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1840
 msgid "Order by"
@@ -5637,7 +5642,7 @@ msgstr "Organize yourself in the best way"
 #: src/strings.ts:692
 #: src/strings.ts:696
 msgid "Orphaned"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1948
 msgid "Other"
@@ -5653,7 +5658,7 @@ msgstr ""
 
 #: src/strings.ts:2267
 msgid "Paragraphs"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:44
 msgid "Partially refunded"
@@ -5697,7 +5702,7 @@ msgstr "Password required"
 
 #: src/strings.ts:735
 msgid "Password updated"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1888
 msgid "Password/pin"
@@ -5729,7 +5734,7 @@ msgstr ""
 
 #: src/strings.ts:2342
 msgid "Pay once and use for 5 years"
-msgstr "Pay once and use for 5 years"
+msgstr ""
 
 #: src/strings.ts:2000
 msgid "Payment method"
@@ -5737,7 +5742,7 @@ msgstr "Payment method"
 
 #: src/strings.ts:717
 msgid "PDF is password protected"
-msgstr "PDF is password protected"
+msgstr ""
 
 #: src/strings.ts:3123
 msgid "Personalize & make Notesnook your own"
@@ -5761,7 +5766,7 @@ msgstr "Phone number not entered"
 
 #: src/strings.ts:823
 msgid "Pin"
-msgstr "Pin"
+msgstr ""
 
 #: src/strings.ts:3009
 msgid "Pin note in notification"
@@ -5793,7 +5798,7 @@ msgstr "Plan limits"
 
 #: src/strings.ts:2320
 msgid "Plans"
-msgstr "Plans"
+msgstr ""
 
 #: src/strings.ts:1203
 msgid "Platform"
@@ -5826,11 +5831,11 @@ msgstr "Please confirm your identity by entering the authentication code sent to
 
 #: src/strings.ts:1826
 msgid "Please enable automatic backups to avoid losing important data."
-msgstr "Please enable automatic backups to avoid losing important data."
+msgstr ""
 
 #: src/strings.ts:2440
 msgid "Please enter a key name"
-msgstr "Please enter a key name"
+msgstr ""
 
 #: src/strings.ts:1402
 #: src/strings.ts:2496
@@ -5859,7 +5864,7 @@ msgstr "Please enter the password to decrypt and restore this backup."
 
 #: src/strings.ts:719
 msgid "Please enter the password to unlock the PDF and view the content."
-msgstr "Please enter the password to unlock the PDF and view the content."
+msgstr ""
 
 #: src/strings.ts:1709
 msgid "Please enter the password to unlock this note"
@@ -5867,7 +5872,7 @@ msgstr "Please enter the password to unlock this note"
 
 #: src/strings.ts:1706
 msgid "Please enter the password to view this version"
-msgstr "Please enter the password to view this version"
+msgstr ""
 
 #: src/strings.ts:2460
 msgid "Please enter your account password to view this API key."
@@ -5883,7 +5888,7 @@ msgstr "Please enter your app lock pin to continue"
 
 #: src/strings.ts:928
 msgid "Please enter your password to continue"
-msgstr "Please enter your password to continue"
+msgstr ""
 
 #: src/strings.ts:1768
 msgid "Please enter your vault password to continue"
@@ -5935,7 +5940,7 @@ msgstr "please send us an email from your registered email address"
 
 #: src/strings.ts:2188
 msgid "Please set a table size"
-msgstr "Please set a table size"
+msgstr ""
 
 #: src/strings.ts:56
 msgid "Please verify it's you"
@@ -5943,7 +5948,7 @@ msgstr "Please verify it's you"
 
 #: src/strings.ts:235
 msgid "Please wait"
-msgstr "Please wait"
+msgstr ""
 
 #: src/strings.ts:918
 msgid "Please wait before requesting a new code"
@@ -5972,7 +5977,7 @@ msgstr "Please wait while we export your not."
 
 #: src/strings.ts:193
 msgid "Please wait while we export your notes."
-msgstr "Please wait while we export your notes."
+msgstr ""
 
 #: src/strings.ts:1738
 msgid "Please wait while we finalize your account."
@@ -5984,7 +5989,7 @@ msgstr "Please wait while we load your subscription"
 
 #: src/strings.ts:359
 msgid "Please wait while we log you out."
-msgstr "Please wait while we log you out."
+msgstr ""
 
 #: src/strings.ts:2743
 msgid "Please wait while we migrate your data"
@@ -6008,7 +6013,7 @@ msgstr ""
 
 #: src/strings.ts:233
 msgid "Please wait while we sync all your data."
-msgstr "Please wait while we sync all your data."
+msgstr ""
 
 #: src/strings.ts:976
 msgid "Please wait while we verify your subscription"
@@ -6021,11 +6026,11 @@ msgstr "Please wait while you are authenticated."
 
 #: src/strings.ts:1746
 msgid "Please wait while your data is downloaded & decrypted."
-msgstr "Please wait while your data is downloaded & decrypted."
+msgstr "Please wait while your data is downloaded & decrypted.<<<<<<< HEAD"
 
 #: src/strings.ts:2728
 msgid "Preparing backup..."
-msgstr "Preparing backup..."
+msgstr "Preparing backup...======="
 
 #: src/strings.ts:1497
 msgid "Preparing to restore backup file..."
@@ -6037,7 +6042,7 @@ msgstr ""
 
 #: src/strings.ts:383
 msgid "PRESETS"
-msgstr "PRESETS"
+msgstr ""
 
 #: src/strings.ts:1923
 msgid "Pressing \"—\" will hide the app in your system tray."
@@ -6069,7 +6074,7 @@ msgstr ""
 
 #: src/strings.ts:2222
 msgid "Previous tab"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1852
 msgid "Print"
@@ -6089,7 +6094,7 @@ msgstr ""
 
 #: src/strings.ts:753
 msgid "Privacy for everyone"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1082
 msgid "Privacy mode"
@@ -6097,7 +6102,7 @@ msgstr ""
 
 #: src/strings.ts:2358
 msgid "privacy policy"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1187
 msgid "Privacy policy"
@@ -6105,7 +6110,7 @@ msgstr ""
 
 #: src/strings.ts:90
 msgid "Privacy Policy. "
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2521
 msgid "Private Key"
@@ -6133,7 +6138,7 @@ msgstr ""
 
 #: src/strings.ts:755
 msgid "privileged few"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1596
 #: src/strings.ts:2882
@@ -6146,7 +6151,7 @@ msgstr ""
 
 #: src/strings.ts:2247
 msgid "Pro plan"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1865
 msgid "Processing {collection}..."
@@ -6174,15 +6179,15 @@ msgstr ""
 
 #: src/strings.ts:1710
 msgid "Properties"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2518
 msgid "Provide your own keys"
-msgstr "Provide your own keys"
+msgstr "Provide your own keys======="
 
 #: src/strings.ts:1982
 msgid "Proxy"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2520
 msgid "Public Key"
@@ -6210,7 +6215,7 @@ msgstr ""
 
 #: src/strings.ts:440
 msgid "Publish your note to share it with others. You can set a password to protect it."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:850
 msgid "Published"
@@ -6238,7 +6243,7 @@ msgstr "Publishing is nothing new but we offer fully encrypted, anonymous publis
 
 #: src/strings.ts:2351
 msgid "Purchase"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2996
 msgid "Quick actions"
@@ -6254,7 +6259,7 @@ msgstr ""
 
 #: src/strings.ts:2218
 msgid "Quick open"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1145
 msgid "Quickly create a note from the notification"
@@ -6266,7 +6271,7 @@ msgstr ""
 
 #: src/strings.ts:2129
 msgid "Quote"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1262
 msgid "Rate Notesnook on App Store"
@@ -6282,7 +6287,7 @@ msgstr ""
 
 #: src/strings.ts:344
 msgid "Read full release notes on Github"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:836
 msgid "Read only"
@@ -6306,7 +6311,7 @@ msgstr ""
 
 #: src/strings.ts:2322
 msgid "Ready to take the next step on your private note taking journey?"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3055
 msgid "Real-time editor sync"
@@ -6330,7 +6335,7 @@ msgstr ""
 
 #: src/strings.ts:2233
 msgid "Recents"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1820
 msgid "Rechecking failed"
@@ -6346,7 +6351,7 @@ msgstr ""
 
 #: src/strings.ts:390
 msgid "Recover your account"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:80
 msgid "Recovery email has been sent to your email address. Please check your inbox and follow the instructions to recover your account."
@@ -6370,7 +6375,7 @@ msgstr ""
 
 #: src/strings.ts:800
 msgid "Recovery key text file saved"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3008
 msgid "Recurring reminders"
@@ -6398,7 +6403,7 @@ msgstr ""
 
 #: src/strings.ts:332
 msgid "Referenced in"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:859
 msgid "References"
@@ -6410,7 +6415,7 @@ msgstr "Refund subscription"
 
 #: src/strings.ts:469
 msgid "Regenerate"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1894
 msgid "Register"
@@ -6426,7 +6431,7 @@ msgstr ""
 
 #: src/strings.ts:604
 msgid "Relevance"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1551
 msgid "Reload app"
@@ -6454,7 +6459,7 @@ msgstr ""
 
 #: src/strings.ts:331
 msgid "Remind me in"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1396
 msgid "Remind me of..."
@@ -6462,7 +6467,7 @@ msgstr ""
 
 #: src/strings.ts:261
 msgid "reminder"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1148
 msgid "Reminder notifications"
@@ -6492,7 +6497,7 @@ msgstr ""
 
 #: src/strings.ts:711
 msgid "Remove"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1077
 msgid "Remove all notes from the vault."
@@ -6516,7 +6521,7 @@ msgstr ""
 
 #: src/strings.ts:820
 msgid "Remove as default"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:3244
 msgid "Remove formatting in selection"
@@ -6532,7 +6537,7 @@ msgstr ""
 
 #: src/strings.ts:2234
 msgid "Remove from recents"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:949
 msgid "Remove full name"
@@ -6540,7 +6545,7 @@ msgstr ""
 
 #: src/strings.ts:2061
 msgid "Remove link"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:945
 msgid "Remove profile picture"
@@ -6576,7 +6581,7 @@ msgstr ""
 
 #: src/strings.ts:2174
 msgid "Replace all"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1967
 msgid "Report"
@@ -6617,7 +6622,7 @@ msgstr ""
 #. placeholder {0}: seconds ? ` in ${seconds}` : ""
 #: src/strings.ts:623
 msgid "Resend code{0}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1297
 msgid "Resend email"
@@ -6633,7 +6638,7 @@ msgstr ""
 
 #: src/strings.ts:2259
 msgid "Reset homepage"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1674
 msgid "Reset selection"
@@ -6677,7 +6682,7 @@ msgstr ""
 
 #: src/strings.ts:518
 msgid "Restore"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1137
 msgid "Restore backup"
@@ -6689,7 +6694,7 @@ msgstr ""
 
 #: src/strings.ts:814
 msgid "Restore failed"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1492
 msgid "Restore from files"
@@ -6713,7 +6718,7 @@ msgstr ""
 
 #: src/strings.ts:335
 msgid "Restoring {collection}..."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2745
 msgid "Restoring attachments ({current}/{total})"
@@ -6721,7 +6726,7 @@ msgstr "Restoring attachments ({current}/{total})"
 
 #: src/strings.ts:1494
 msgid "Restoring backup..."
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2451
 msgid "Retry"
@@ -6729,7 +6734,7 @@ msgstr ""
 
 #: src/strings.ts:462
 msgid "Reupload"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1839
 msgid "Reveal in list"
@@ -6737,19 +6742,19 @@ msgstr ""
 
 #: src/strings.ts:138
 msgid "Revoke"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1081
 msgid "Revoke biometric unlocking"
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2465
 msgid "Revoke Inbox API Key - {name}"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:3100
 msgid "Rich tools for rich editing"
-msgstr "Rich tools for rich editing"
+msgstr "Rich tools for rich editing======="
 
 #: src/strings.ts:1195
 msgid "Roadmap"
@@ -6773,7 +6778,7 @@ msgstr "Rows"
 
 #: src/strings.ts:496
 msgid "Run file check"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3086
 msgid "Safe publishing to the Internet"
@@ -6821,7 +6826,7 @@ msgstr ""
 
 #: src/strings.ts:532
 msgid "Save and continue"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:953
 msgid "Save data recovery key"
@@ -6845,7 +6850,7 @@ msgstr ""
 
 #: src/strings.ts:541
 msgid "Save to text file"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:450
 msgid "Save your 2FA backup codes in a safe place. You will need them to log into your account in case you lose access to your two-factor authentication methods."
@@ -6857,11 +6862,11 @@ msgstr ""
 
 #: src/strings.ts:443
 msgid "Save your account recovery key in a safe place. You will need it to recover your account in case you forget your password."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:955
 msgid "Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password."
-msgstr ">>>>>>> Stashed changes"
+msgstr ""
 
 #: src/strings.ts:2192
 msgid "Saved"
@@ -6869,7 +6874,7 @@ msgstr ""
 
 #: src/strings.ts:2193
 msgid "Saving"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3039
 msgid "Saving attachment: {path}"
@@ -6893,7 +6898,7 @@ msgstr ""
 
 #: src/strings.ts:725
 msgid "Saving zip file. Please wait..."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1597
 msgid "Scan the QR code with your authenticator app"
@@ -6909,7 +6914,7 @@ msgstr "Scroll to bottom<<<<<<< HEAD"
 
 #: src/strings.ts:2269
 msgid "Scroll to top"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3053
 msgid "Seamlessly work from anywhere. Every change is synced instantly everywhere."
@@ -6945,7 +6950,7 @@ msgstr "Search for notes"
 
 #: src/strings.ts:2215
 msgid "Search for notes, notebooks, and tags..."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1425
 msgid "Search in {routeName}"
@@ -7009,7 +7014,7 @@ msgstr "Search in Trash<<<<<<< HEAD"
 
 #: src/strings.ts:2155
 msgid "Search languages"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1382
 msgid "Search notebooks"
@@ -7025,11 +7030,11 @@ msgstr "Search themes<<<<<<< HEAD"
 
 #: src/strings.ts:1398
 msgid "Searching for {query}..."
-msgstr "Searching for {query}...<<<<<<< HEAD"
+msgstr "Searching for {query}...<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:3048
 msgid "Secure app lock for all"
-msgstr "Secure app lock for all"
+msgstr "Secure app lock for all======="
 
 #: src/strings.ts:1890
 msgid "Security key"
@@ -7061,7 +7066,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2264
 msgid "Select a notebook to move this notebook into, or unselect to move it to the root level."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2917
 msgid "Select a notes app to import from"
@@ -7105,7 +7110,7 @@ msgstr "Select how you would like to receive the code<<<<<<< HEAD"
 
 #: src/strings.ts:2150
 msgid "Select language"
-msgstr ""
+msgstr "<<<<<<< HEAD======="
 
 #: src/strings.ts:97
 msgid "Select method for two-factor authentication"
@@ -7257,7 +7262,7 @@ msgstr "Set as homepage<<<<<<< HEAD"
 
 #: src/strings.ts:661
 msgid "Set as light theme"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1233
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
@@ -7269,7 +7274,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2413
 msgid "Set expiry"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1210
 msgid "Set full name"
@@ -7347,7 +7352,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:627
 msgid "Setup secondary 2FA method"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:890
 msgid "Setup using an Authenticator app"
@@ -7375,7 +7380,7 @@ msgstr ""
 
 #: src/strings.ts:1647
 msgid "Share Notesnook with friends!"
-msgstr "Share Notesnook with friends!<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2425
 msgid "Share things to Notesnook from anywhere using the Inbox API"
@@ -7395,7 +7400,7 @@ msgstr ""
 
 #: src/strings.ts:265
 msgid "shortcut"
-msgstr "shortcut<<<<<<< HEAD"
+msgstr "shortcut<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:1819
 msgid "Shortcut removed"
@@ -7432,15 +7437,15 @@ msgstr "Silent<<<<<<< HEAD"
 #: src/strings.ts:2124
 #: src/strings.ts:3226
 msgid "Sink list item"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1859
 msgid "Size"
-msgstr "Size<<<<<<< HEAD"
+msgstr "Size<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:619
 msgid "Skip introduction"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3066
 msgid "SMS"
@@ -7468,7 +7473,7 @@ msgstr "Sort<<<<<<< HEAD"
 
 #: src/strings.ts:484
 msgid "Sort by"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:664
 msgid "Source"
@@ -7484,7 +7489,7 @@ msgstr "Spaces<<<<<<< HEAD"
 
 #: src/strings.ts:2373
 msgid "Special Offer"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1930
 msgid "Spell check"
@@ -7504,7 +7509,7 @@ msgstr "Square"
 
 #: src/strings.ts:2237
 msgid "Stable"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1017
 msgid "Start"
@@ -7556,7 +7561,7 @@ msgstr "Stay updated on all your upcoming tasks with reminders."
 
 #: src/strings.ts:2250
 msgid "Storage"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1435
 msgid "Streaming not supported"
@@ -7564,7 +7569,7 @@ msgstr "Streaming not supported<<<<<<< HEAD"
 
 #: src/strings.ts:2057
 msgid "Strikethrough"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2816
 msgid "Sub notebooks"
@@ -7592,7 +7597,7 @@ msgstr "Subscribe<<<<<<< HEAD"
 
 #: src/strings.ts:2353
 msgid "Subscribe and start free trial"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:643
 msgid "Subscribed on Android"
@@ -7600,7 +7605,7 @@ msgstr "Subscribed on Android<<<<<<< HEAD"
 
 #: src/strings.ts:638
 msgid "Subscribed on iOS"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:648
 msgid "Subscribed on Web"
@@ -7616,7 +7621,7 @@ msgstr "Subscript<<<<<<< HEAD"
 
 #: src/strings.ts:633
 msgid "Subscription awarded from Streetwriters"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2879
 msgid "Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app."
@@ -7649,7 +7654,7 @@ msgstr "Sunday<<<<<<< HEAD"
 
 #: src/strings.ts:2069
 msgid "Superscript"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2766
 msgid "Support the mission - unlock everything."
@@ -7795,7 +7800,7 @@ msgstr "Take a partial backup of your data that does not include attachments<<<<
 
 #: src/strings.ts:2135
 msgid "Take a photo using camera"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1275
 msgid "Take note"
@@ -7807,7 +7812,7 @@ msgstr "Take notes privately.<<<<<<< HEAD"
 
 #: src/strings.ts:620
 msgid "Taking too long? Reload editor"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1350
 msgid "Tap here to change sorting"
@@ -7835,11 +7840,11 @@ msgstr "Tap to apply again"
 
 #: src/strings.ts:211
 msgid "Tap to deselect"
-msgstr "Tap to deselect"
+msgstr "Tap to deselect<<<<<<< HEAD"
 
 #: src/strings.ts:2821
 msgid "Tap to remove an attachment."
-msgstr "<<<<<<< HEAD"
+msgstr "<<<<<<< HEAD======="
 
 #: src/strings.ts:1258
 msgid "Tap to try again"
@@ -7851,7 +7856,7 @@ msgstr "Tap twice to confirm you have saved the recovery key.<<<<<<< HEAD"
 
 #: src/strings.ts:2141
 msgid "Task list"
-msgstr "Task list<<<<<<< HEAD"
+msgstr "Task list<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:1385
 msgid ""
@@ -7878,7 +7883,7 @@ msgstr "Terms of Service <<<<<<< HEAD"
 
 #: src/strings.ts:2360
 msgid "terms of use."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1504
 msgid "Test connection"
@@ -7910,7 +7915,7 @@ msgstr ""
 
 #: src/strings.ts:2078
 msgid "Text direction"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1646
 msgid "Thank you for choosing end-to-end encrypted note taking. Now you can sync your notes to unlimited devices."
@@ -7934,7 +7939,7 @@ msgstr ""
 
 #: src/strings.ts:431
 msgid "Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1868
 msgid "Thank you for your feedback!"
@@ -7982,7 +7987,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2387
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2572
 msgid "The password for decrypting the Colornote backup file."
@@ -8008,7 +8013,7 @@ msgstr ""
 
 #: src/strings.ts:300
 msgid "The reminder will repeat every year on {date}."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1587
 msgid "The reminder will start on {date} at {time}."
@@ -8032,7 +8037,7 @@ msgstr "There are no blocks in this note."
 
 #: src/strings.ts:2035
 msgid "These items will be **kept in your Trash for {interval} days** after which they will be permanently deleted."
-msgstr "These items will be **kept in your Trash for {interval} days** after which they will be permanently deleted.<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:1756
 msgid "This action is IRREVERSIBLE."
@@ -8040,7 +8045,7 @@ msgstr "This action is IRREVERSIBLE."
 
 #: src/strings.ts:155
 msgid "This device"
-msgstr "This device"
+msgstr ""
 
 #: src/strings.ts:1564
 msgid "This error can be fixed by rebuilding the search index. This action won't result in any kind of data loss."
@@ -8064,7 +8069,7 @@ msgstr "This error usually means the database file is either corrupt or it could
 
 #: src/strings.ts:1562
 msgid "This error usually means the search index is corrupted."
-msgstr "This error usually means the search index is corrupted."
+msgstr ""
 
 #: src/strings.ts:2489
 msgid "This feature is not available on this plan."
@@ -8076,7 +8081,7 @@ msgstr "This image cannot be previewed"
 
 #: src/strings.ts:2354
 msgid "This is a one time purchase, no subscription."
-msgstr "This is a one time purchase, no subscription."
+msgstr ""
 
 #: src/strings.ts:3148
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
@@ -8101,7 +8106,7 @@ msgstr "This must only be used for troubleshooting. Using this regularly for syn
 
 #: src/strings.ts:2418
 msgid "This note is empty"
-msgstr "This note is empty"
+msgstr ""
 
 #: src/strings.ts:1476
 msgid "This note is locked"
@@ -8121,15 +8126,19 @@ msgstr "This note is not referenced in other notes."
 
 #: src/strings.ts:237
 msgid "This note will be published to a public URL."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1898
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr ""
 
+#: src/strings.ts:3280
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr ""
+
 #: src/strings.ts:3160
 msgid "thoughts"
-msgstr "[ťħǿǿŭŭģħťş]"
+msgstr "[ťħǿǿŭŭģħťş]<<<<<<< HEAD"
 
 #: src/strings.ts:574
 msgid "Thu"
@@ -8137,7 +8146,7 @@ msgstr ""
 
 #: src/strings.ts:565
 msgid "Thursday"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1689
 msgid "Time"
@@ -8154,7 +8163,7 @@ msgstr ""
 #: src/strings.ts:596
 #: src/strings.ts:601
 msgid "Title"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1062
 msgid "Title format"
@@ -8266,7 +8275,7 @@ msgstr ""
 
 #: src/strings.ts:2229
 msgid "Toggle theme"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3204
 msgid "Token expired, try logging in again"
@@ -8315,7 +8324,7 @@ msgstr ""
 
 #: src/strings.ts:2318
 msgid "Try {plan} for free"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1358
 msgid "Try compact mode to fit more items on screen"
@@ -8331,7 +8340,7 @@ msgstr ""
 
 #: src/strings.ts:563
 msgid "Tuesday"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:991
 msgid "Turn off automatic syncing. Changes from this client will be synced only when you run sync manually."
@@ -8343,7 +8352,7 @@ msgstr ""
 
 #: src/strings.ts:817
 msgid "Turn on reminder"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:997
 msgid "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device."
@@ -8363,7 +8372,7 @@ msgstr ""
 
 #: src/strings.ts:454
 msgid "Two-factor authentication enabled"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1392
 msgid "Type # to search for headings"
@@ -8403,7 +8412,7 @@ msgstr ""
 
 #: src/strings.ts:2364
 msgid "Unlimited"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3094
 msgid "Unlimited notebooks*"
@@ -8427,7 +8436,7 @@ msgstr "Unlock<<<<<<< HEAD"
 
 #: src/strings.ts:2410
 msgid "Unlock incoming note"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:408
 #: src/strings.ts:508
@@ -8436,11 +8445,11 @@ msgstr "Unlock note<<<<<<< HEAD"
 
 #: src/strings.ts:812
 msgid "Unlock note to delete it"
-msgstr "Unlock note to delete it<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2421
 msgid "Unlock note to merge conflicts"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3200
 msgid "Unlock note to open it in editor."
@@ -8464,7 +8473,7 @@ msgstr "Unlock vault<<<<<<< HEAD"
 
 #: src/strings.ts:495
 msgid "Unlock with biometrics"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1675
 msgid "Unlock with security key"
@@ -8492,7 +8501,7 @@ msgstr "Unlocks essential features for personal use"
 
 #: src/strings.ts:822
 msgid "Unpin"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:851
 msgid "Unpin notification"
@@ -8500,7 +8509,7 @@ msgstr "Unpin notification<<<<<<< HEAD"
 
 #: src/strings.ts:535
 msgid "Unpublish"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1370
 msgid "Unpublish notes to delete them"
@@ -8540,7 +8549,7 @@ msgstr "Update now<<<<<<< HEAD"
 
 #: src/strings.ts:2276
 msgid "Upgrade"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2774
 msgid "Upgrade now"
@@ -8552,7 +8561,7 @@ msgstr "Upgrade plan<<<<<<< HEAD"
 
 #: src/strings.ts:2301
 msgid "Upgrade plan to {plan} to use this feature."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2303
 msgid "Upgrade to {plan} {price}"
@@ -8568,7 +8577,7 @@ msgstr "Upgrade to redeem<<<<<<< HEAD"
 
 #: src/strings.ts:2134
 msgid "Upload from disk"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:461
 #: src/strings.ts:1533
@@ -8601,7 +8610,7 @@ msgstr "Urgent<<<<<<< HEAD"
 
 #: src/strings.ts:2184
 msgid "URL"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1649
 msgid "Use"
@@ -8621,7 +8630,7 @@ msgstr "Use account password<<<<<<< HEAD"
 
 #: src/strings.ts:2310
 msgid "Use advanced note taking features like"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:891
 msgid "Use an authenticator app to generate 2FA codes."
@@ -8686,7 +8695,7 @@ msgstr "Use this if changes made on this device are not appearing on other devic
 
 #: src/strings.ts:2251
 msgid "used"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:929
 msgid "User verification failed"
@@ -8702,11 +8711,11 @@ msgstr "[Úšîñĝ Ñöţéšñöök wîţhöúţ áñ áççöúñţ wîłł *
 
 #: src/strings.ts:2050
 msgid "Using official Notesnook instance"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1584
 msgid "v{version} available"
-msgstr "<<<<<<< HEAD<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2528
 msgid "Validation failed"
@@ -8726,11 +8735,11 @@ msgstr "Vault cleared<<<<<<< HEAD"
 
 #: src/strings.ts:739
 msgid "Vault created"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1813
 msgid "Vault deleted"
-msgstr "Vault deleted<<<<<<< HEAD"
+msgstr "Vault deleted<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:1766
 msgid "Vault locked"
@@ -8746,7 +8755,7 @@ msgstr "Verification email sent<<<<<<< HEAD"
 
 #: src/strings.ts:525
 msgid "Verify"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:974
 msgid "Verify subscription"
@@ -8782,11 +8791,11 @@ msgstr "Videos<<<<<<< HEAD"
 
 #: src/strings.ts:965
 msgid "View 2FA backup codes"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2245
 msgid "View all limits"
-msgstr "View all limits"
+msgstr "View all limits======="
 
 #: src/strings.ts:520
 msgid "View all linked notebooks"
@@ -8794,7 +8803,7 @@ msgstr "View all linked notebooks<<<<<<< HEAD"
 
 #: src/strings.ts:2430
 msgid "View and edit your inbox public/private key pair"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2435
 msgid "View and manage inbox API keys"
@@ -8826,7 +8835,7 @@ msgstr "Views"
 
 #: src/strings.ts:371
 msgid "Visit homepage"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1534
 msgid "Waiting for upload"
@@ -8842,7 +8851,7 @@ msgstr ""
 
 #: src/strings.ts:426
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2561
 msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
@@ -8870,7 +8879,7 @@ msgstr "We offer multiple ways to keep you organized. The only limit is your ima
 
 #: src/strings.ts:2287
 msgid "We require credit card details to fight abuse and to make it seamless for you to upgrade. Your credit card is NOT charged until your free trial ends and your subscription starts. You will be notified via email of the upcoming charge before your trial ends."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2645
 msgid "We value your feedback so join us on Discord and share your experiences and ideas."
@@ -8894,7 +8903,7 @@ msgstr ""
 
 #: src/strings.ts:2119
 msgid "Web clip settings"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1847
 msgid "Website"
@@ -8923,7 +8932,7 @@ msgstr ""
 
 #: src/strings.ts:709
 msgid "Welcome back, {email}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1732
 msgid "Welcome back!"
@@ -8931,7 +8940,7 @@ msgstr ""
 
 #: src/strings.ts:2367
 msgid "Welcome to Notesnook {plan}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:3267
 msgid "Welcome to Notesnook Beta!"
@@ -8955,7 +8964,7 @@ msgstr ""
 
 #: src/strings.ts:2295
 msgid "What is your refund policy?"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1548
 msgid "What went wrong?"
@@ -8991,7 +9000,7 @@ msgstr ""
 
 #: src/strings.ts:749
 msgid "Write notes with freedom, no spying, no tracking."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1276
 msgid "Write something..."
@@ -9056,7 +9065,7 @@ msgstr ""
 
 #: src/strings.ts:2037
 msgid "You are editing \"{notebookTitle}\"."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1861
 msgid "You are editing #{tag}"
@@ -9092,7 +9101,7 @@ msgstr "You can adjust how long items live in your trash from Settings -> Trash 
 
 #: src/strings.ts:416
 msgid "You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2938
 msgid "You can also select .zip files containing {extensions} files."
@@ -9100,7 +9109,7 @@ msgstr ""
 
 #: src/strings.ts:2375
 msgid "You can change your subscription plan from the web app"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1329
 msgid "You can multi-select notes and move them to a notebook at once"
@@ -9139,7 +9148,7 @@ msgstr ""
 "\n"
 "Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
 "\n"
-"If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.<<<<<<< HEAD"
+"If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:1882
 msgid ""
@@ -9331,7 +9340,7 @@ msgstr ""
 
 #: src/strings.ts:2261
 msgid "Your archive is empty"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1764
 msgid "Your backup is ready to download"
@@ -9351,7 +9360,7 @@ msgstr ""
 
 #: src/strings.ts:2378
 msgid "Your current subscription does not allow changing plans"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1660
 msgid "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."
@@ -9363,7 +9372,7 @@ msgstr ""
 
 #: src/strings.ts:2281
 msgid "Your data remains 100% accessible regardless of what plan you are on. That includes your notes, notebooks, attachments, and anything else you might have created."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1644
 msgid "Your email has been confirmed."
@@ -9375,7 +9384,7 @@ msgstr ""
 
 #: src/strings.ts:700
 msgid "Your email is not confirmed. Please confirm your email address to change account password."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:2843
 msgid "Your favorite day to write was"
@@ -9391,7 +9400,7 @@ msgstr "Your free trial is on-going. Your subscription will start on {date}."
 
 #: src/strings.ts:2405
 msgid "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:1638
 msgid "Your full name"
@@ -9423,7 +9432,7 @@ msgstr ""
 
 #: src/strings.ts:511
 msgid "Your note will be unencrypted and removed from the vault."
-msgstr "<<<<<<< Updated upstream"
+msgstr ""
 
 #: src/strings.ts:872
 msgid "Your notes"
@@ -9439,7 +9448,7 @@ msgstr ""
 
 #: src/strings.ts:758
 msgid "Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again."
-msgstr "Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again."
+msgstr ""
 
 #: src/strings.ts:1209
 msgid "Your profile pictrure is stored 100% end-to-end encrypted and only visible to you."
@@ -9455,7 +9464,7 @@ msgstr "Your reminders"
 
 #: src/strings.ts:85
 msgid "Your session has expired. Please enter password for {obfuscatedEmail} to continue."
-msgstr "Your session has expired. Please enter password for {obfuscatedEmail} to continue."
+msgstr ""
 
 #: src/strings.ts:940
 msgid "Your subscription ends on {date}"
@@ -9499,7 +9508,7 @@ msgstr "Zero ads & zero trackers"
 
 #: src/strings.ts:2239
 msgid "Zoom"
-msgstr "Zoom"
+msgstr ""
 
 #: src/strings.ts:1900
 msgid "Zoom factor"

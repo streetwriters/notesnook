@@ -3132,6 +3132,10 @@ msgstr "Увімкнути регулярні вирази"
 msgid "Enable spell checker"
 msgstr "Увімкнути перевірку правопису"
 
+#: src/strings.ts:3281
+msgid "Enable two factor authentication"
+msgstr ""
+
 #: src/strings.ts:447
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "Увімкніть двофакторну автентифікацію, щоб додати додатковий рівень захисту облікового запису."
@@ -8160,6 +8164,10 @@ msgstr "Цю нотатку буде опубліковано за публіч�
 #: src/strings.ts:1898
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Це ім'я користувача використовуватиметься для розрізнення облікових даних у вашому ключі безпеки. Переконайтеся, що воно унікальне."
+
+#: src/strings.ts:3280
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr ""
 
 #: src/strings.ts:3160
 msgid "thoughts"
