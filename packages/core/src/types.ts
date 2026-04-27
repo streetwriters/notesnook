@@ -588,7 +588,8 @@ export enum SubscriptionProvider {
   STREETWRITERS = 0,
   APPLE = 1,
   GOOGLE = 2,
-  PADDLE = 3
+  PADDLE = 3,
+  GIFT_CARD = 4
 }
 
 export type User = {

@@ -32,6 +32,7 @@ import {
   getFeaturesUsage,
   usePromise
 } from "@notesnook/common";
+import { SubscriptionProvider } from "@notesnook/core";
 
 export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
@@ -44,6 +45,8 @@ export function SubscriptionStatus() {
       ? ""
       : trial
       ? `Your free trial is on-going. Your subscription will start on ${trialExpiryDate}.`
+      : user?.subscription.provider === SubscriptionProvider.GIFT_CARD
+      ? `Your subscription will expire on ${expiryDate}.`
       : autoRenew
       ? `Your subscription will auto renew on ${expiryDate}.`
       : expiryDate
