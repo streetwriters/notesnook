@@ -215,7 +215,10 @@ function DesktopAppContents() {
                 zIndex: 3
               }}
             >
-              <NavigationMenu onExpand={() => navPane.current?.reset(0)} />
+              <NavigationMenu
+                onExpand={() => navPane.current?.reset(0)}
+                canExpand={!isTablet}
+              />
             </Pane>
           )}
           {isFocusMode ? null : (

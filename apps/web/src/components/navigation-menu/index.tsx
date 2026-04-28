@@ -228,7 +228,13 @@ const tabs: NavigationTabItem[] = [
   }
 ] as const;
 
-function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
+function NavigationMenu({
+  onExpand,
+  canExpand
+}: {
+  onExpand?: () => void;
+  canExpand: boolean;
+}) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const navigationTab = useAppStore((store) => store.navigationTab);
   const setNavigationTab = useAppStore((store) => store.setNavigationTab);
@@ -352,6 +358,7 @@ function NavigationMenu({ onExpand }: { onExpand?: () => void }) {
                 sx={{ p: 1, bg: "transparent" }}
                 onClick={onExpand}
                 title={strings.expandSidebar()}
+                disabled={!canExpand}
               >
                 <ExpandSidebar size={13} color="icon" />
               </Button>
