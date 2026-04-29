@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PAGE_VISIBILITY_CHANGE } from "./page-visibility";
+import { updateStatus, removeStatus } from "../hooks/use-status";
+import { strings } from "@notesnook/intl";
 
 type FilePickerOptions = { acceptedFileTypes: string; multiple?: boolean };
 
@@ -32,10 +34,13 @@ export function showFilePicker({
     input.setAttribute("multiple", `${multiple || false}`);
     input.setAttribute("accept", acceptedFileTypes);
     input.dispatchEvent(new MouseEvent("click"));
+    updateStatus({ key: "processingFiles", status: strings.processing() });
     input.oncancel = async function () {
+      removeStatus("processingFiles");
       resolve([]);
     };
     input.onchange = async function () {
+      removeStatus("processingFiles");
       if (!input.files) return resolve([]);
       resolve(Array.from(input.files));
     };
