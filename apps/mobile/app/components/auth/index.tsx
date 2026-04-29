@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { NavigationProps } from "../../services/navigation";
 import { Toast } from "../toast";
 import { AuthMode, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
-import { useThemeColors } from "@notesnook/theme";
-import { NavigationProps } from "../../services/navigation";
 
 const Auth = ({ navigation, route }: NavigationProps<"Auth">) => {
   const [currentAuthMode, setCurrentAuthMode] = useState(

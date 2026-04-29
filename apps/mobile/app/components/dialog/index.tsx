@@ -40,6 +40,7 @@ import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
 import { DialogInfo } from "./functions";
+import { Spacing } from "../../common/design/spacing";
 
 export const Dialog = ({ context = "global" }: { context?: string }) => {
   const { colors } = useThemeColors();
@@ -122,7 +123,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
     maxHeight: 450,
     borderRadius: defaultBorderRadius,
     backgroundColor: colors.primary.background,
-    paddingTop: 12,
+    gap: Spacing.LEVEL_4,
     ...getContainerBorder(colors.primary.border, 0.5),
     overflow: "hidden"
   };
@@ -137,9 +138,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
       bounce={!dialogInfo.input}
       closeOnTouch={!dialogInfo.disableBackdropClosing}
       background={dialogInfo.background}
-      transparent={
-        dialogInfo.transparent === undefined ? true : dialogInfo.transparent
-      }
+      transparent={dialogInfo.transparent}
       onShow={async () => {
         if (dialogInfo.input) {
           inputRef.current?.setNativeProps({
@@ -157,25 +156,33 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
         : dialogInfo.component}
 
       {dialogInfo.component ? null : (
-        <View style={style}>
-          <DialogHeader
-            title={dialogInfo.title}
-            icon={dialogInfo.icon}
-            paragraph={dialogInfo.paragraph}
-            paragraphColor={dialogInfo.paragraphColor}
-            padding={12}
-            style={{
-              minHeight: 0
-            }}
-          />
-          <Seperator half />
-
-          {dialogInfo.input ? (
-            <View
+        <View
+          style={[
+            {
+              paddingVertical: Spacing.LEVEL_4
+            },
+            style
+          ]}
+        >
+          <View
+            style={[
+              {
+                paddingHorizontal: Spacing.LEVEL_3,
+                gap: Spacing.LEVEL_4
+              }
+            ]}
+          >
+            <DialogHeader
+              title={dialogInfo.title}
+              icon={dialogInfo.icon}
+              paragraph={dialogInfo.paragraph}
+              paragraphColor={dialogInfo.paragraphColor}
               style={{
-                paddingHorizontal: DefaultAppStyles.GAP
+                minHeight: 0
               }}
-            >
+            />
+
+            {dialogInfo.input ? (
               <Input
                 fwdRef={inputRef}
                 autoCapitalize="none"
@@ -184,6 +191,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                 }}
                 testID="input-value"
                 secureTextEntry={dialogInfo.secureTextEntry}
+                label={dialogInfo.inputLabel}
                 //defaultValue={dialogInfo.defaultValue}
                 onSubmit={() => {
                   onPressPositive();
@@ -193,48 +201,47 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                 keyboardType={dialogInfo.keyboardType || "default"}
                 placeholder={dialogInfo.inputPlaceholder}
               />
-            </View>
-          ) : null}
+            ) : null}
 
-          {dialogInfo?.notice ? (
-            <View
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
-              <Notice
-                type={dialogInfo.notice.type || "information"}
-                text={dialogInfo.notice.text}
-              />
-            </View>
-          ) : null}
-
-          {dialogInfo.check ? (
-            <>
-              <Button
-                onPress={() => {
-                  setChecked(!checked);
-                }}
-                icon={
-                  checked
-                    ? "check-circle-outline"
-                    : "checkbox-blank-circle-outline"
-                }
-                iconColor={
-                  checked ? colors.secondary.icon : colors.primary.icon
-                }
+            {dialogInfo?.notice ? (
+              <View
                 style={{
-                  justifyContent: "flex-start"
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
-                height={35}
-                iconSize={20}
-                width="100%"
-                title={dialogInfo.check.info}
-                type={checked ? dialogInfo.check.type || "plain" : "plain"}
-              />
-            </>
-          ) : null}
+              >
+                <Notice
+                  type={dialogInfo.notice.type || "information"}
+                  text={dialogInfo.notice.text}
+                />
+              </View>
+            ) : null}
 
+            {dialogInfo.check ? (
+              <>
+                <Button
+                  onPress={() => {
+                    setChecked(!checked);
+                  }}
+                  icon={
+                    checked
+                      ? "check-circle-outline"
+                      : "checkbox-blank-circle-outline"
+                  }
+                  iconColor={
+                    checked ? colors.secondary.icon : colors.primary.icon
+                  }
+                  style={{
+                    justifyContent: "flex-start"
+                  }}
+                  height={35}
+                  iconSize={20}
+                  width="100%"
+                  title={dialogInfo.check.info}
+                  type={checked ? dialogInfo.check.type || "plain" : "plain"}
+                />
+              </>
+            ) : null}
+          </View>
           <DialogButtons
             onPressNegative={onNegativePress}
             onPressPositive={dialogInfo.positivePress && onPressPositive}

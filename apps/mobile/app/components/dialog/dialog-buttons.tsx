@@ -28,6 +28,7 @@ import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Button, ButtonProps } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
+import { Spacing } from "../../common/design/spacing";
 
 const DialogButtons = ({
   onPressPositive,
@@ -51,21 +52,14 @@ const DialogButtons = ({
   return (
     <View
       style={[
-        styles.container,
         {
-          backgroundColor: colors.secondary.background,
-          height: 60,
-          paddingHorizontal: DefaultAppStyles.GAP,
-          borderTopWidth: 0.7,
-          borderTopColor: getColorLinearShade(
-            colors.secondary.background,
-            0.05,
-            isDark
-          )
+          flexDirection: "row",
+          gap: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_4
         }
       ]}
     >
-      {doneText ? (
+      {/* {doneText ? (
         <View
           style={{
             flexDirection: "row",
@@ -81,37 +75,32 @@ const DialogButtons = ({
         </View>
       ) : (
         <View />
-      )}
+      )} */}
 
-      <View
+      <Button
+        onPress={onPressNegative}
+        fontSize={AppFontSize.sm}
+        testID={notesnook.ids.default.dialog.no}
+        type="plain-outline"
         style={{
-          flexDirection: "row",
-          alignItems: "center"
+          width: "48.5%"
         }}
-      >
+        title={negativeTitle}
+      />
+      {onPressPositive ? (
         <Button
-          onPress={onPressNegative}
+          onPress={onPressPositive}
           fontSize={AppFontSize.sm}
-          testID={notesnook.ids.default.dialog.no}
-          type="plain"
+          testID={notesnook.ids.default.dialog.yes}
+          style={{
+            width: "48.5%"
+          }}
+          loading={loading}
           bold
-          title={negativeTitle}
+          type={positiveType || "accent"}
+          title={positiveTitle}
         />
-        {onPressPositive ? (
-          <Button
-            onPress={onPressPositive}
-            fontSize={AppFontSize.sm}
-            testID={notesnook.ids.default.dialog.yes}
-            style={{
-              marginLeft: 10
-            }}
-            loading={loading}
-            bold
-            type={positiveType || "transparent"}
-            title={positiveTitle}
-          />
-        ) : null}
-      </View>
+      ) : null}
     </View>
   );
 };

@@ -40,6 +40,10 @@ import { ProgressPills } from "../intro/progress-pills";
 import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
+import {
+  ErrorContainer,
+  InputErrorProvider
+} from "../ui/input/input-error-context";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
@@ -133,222 +137,222 @@ export const Login = ({
         enableAutomaticScroll={true}
         keyboardShouldPersistTaps="handled"
       >
-        {step === LoginSteps.emailAuth ? (
-          <View
-            style={{
-              borderRadius: DDS.isTab ? 5 : 0,
-              backgroundColor: colors.primary.background,
-              zIndex: 10,
-              width: "100%",
-              alignSelf: "center",
-              height: "100%",
-              paddingHorizontal: Spacing.LEVEL_3,
-              paddingTop: Spacing.LEVEL_6
-            }}
-          >
-            <Heading
-              style={{
-                paddingBottom: Spacing.LEVEL_4
-              }}
-              fontSize="XL"
-            >
-              {strings.loginToYourAccount()}
-            </Heading>
+        <InputErrorProvider>
+          {step === LoginSteps.emailAuth ? (
             <View
               style={{
-                width: DDS.isTab
-                  ? focused
-                    ? "50%"
-                    : "49.99%"
-                  : focused
-                    ? "100%"
-                    : "99.9%",
+                borderRadius: DDS.isTab ? 5 : 0,
                 backgroundColor: colors.primary.background,
+                zIndex: 10,
+                width: "100%",
                 alignSelf: "center",
-                gap: Spacing.LEVEL_2
+                height: "100%",
+                paddingHorizontal: Spacing.LEVEL_3,
+                paddingTop: Spacing.LEVEL_6
               }}
             >
-              <Input
-                fwdRef={emailInputRef}
-                onChangeText={(value) => {
-                  email.current = value;
-                }}
-                label="Email"
-                testID="input.email"
-                onErrorCheck={(e) => setError(e)}
-                returnKeyLabel="Next"
-                returnKeyType="next"
-                autoComplete="email"
-                validationType="email"
-                autoCorrect={false}
-                autoCapitalize="none"
-                errorMessage={strings.emailInvalid()}
-                placeholder="you@example.com"
-                defaultValue={email.current}
-                editable={step === LoginSteps.emailAuth && !loading}
-                onSubmit={() => {
-                  if (step === LoginSteps.emailAuth) {
-                    login();
-                  } else {
-                    passwordInputRef.current?.focus();
-                  }
-                }}
-              />
-
-              <Input
-                fwdRef={passwordInputRef}
-                onChangeText={(value) => {
-                  password.current = value;
-                }}
-                label="Password"
-                testID="input.password"
-                returnKeyLabel={strings.done()}
-                returnKeyType="done"
-                secureTextEntry
-                autoComplete="password"
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder={"•••••••••"}
-                editable={!loading}
-                defaultValue={password.current}
-                onSubmit={() => {
-                  login();
-                }}
-              />
-              <Button
-                title={strings.forgotPassword()}
+              <Heading
                 style={{
-                  alignSelf: "flex-end",
-                  paddingVertical: 0,
-                  paddingHorizontal: 0
+                  paddingBottom: Spacing.LEVEL_4
                 }}
-                onPress={() => {
-                  if (loading || !email.current) return;
-                  presentSheet({
-                    component: <ForgotPassword userEmail={email.current} />
-                  });
-                }}
-                fontFamily="REGULAR"
-                fontSize={AppFontSize.sm}
-                type="plain"
-              />
-
+                fontSize="XL"
+              >
+                {strings.loginToYourAccount()}
+              </Heading>
               <View
                 style={{
-                  marginTop: Spacing.LEVEL_1,
+                  width: DDS.isTab
+                    ? focused
+                      ? "50%"
+                      : "49.99%"
+                    : focused
+                      ? "100%"
+                      : "99.9%",
+                  backgroundColor: colors.primary.background,
+                  alignSelf: "center",
                   gap: Spacing.LEVEL_2
                 }}
               >
-                <Button
-                  loading={loading}
-                  onPress={() => {
-                    if (loading) return;
+                <Input
+                  fwdRef={emailInputRef}
+                  onChangeText={(value) => {
+                    email.current = value;
+                  }}
+                  label="Email"
+                  testID="input.email"
+                  onErrorCheck={(e) => setError(e)}
+                  returnKeyLabel="Next"
+                  returnKeyType="next"
+                  autoComplete="email"
+                  validationType="email"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  errorMessage={strings.emailInvalid()}
+                  placeholder="you@example.com"
+                  defaultValue={email.current}
+                  editable={step === LoginSteps.emailAuth && !loading}
+                  onSubmit={() => {
+                    if (step === LoginSteps.emailAuth) {
+                      login();
+                    } else {
+                      passwordInputRef.current?.focus();
+                    }
+                  }}
+                />
+
+                <Input
+                  fwdRef={passwordInputRef}
+                  onChangeText={(value) => {
+                    password.current = value;
+                  }}
+                  label="Password"
+                  testID="input.password"
+                  returnKeyLabel={strings.done()}
+                  returnKeyType="done"
+                  secureTextEntry
+                  autoComplete="password"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  placeholder={"•••••••••"}
+                  editable={!loading}
+                  defaultValue={password.current}
+                  onSubmit={() => {
                     login();
                   }}
-                  style={{
-                    width: "100%"
-                  }}
-                  type="accent"
-                  title={!loading ? strings.continue() : null}
-                  fontSize={AppFontSize.sm}
                 />
-
-                {/* {step === LoginSteps.passwordAuth && (
                 <Button
-                  title={strings.cancelLogin()}
+                  title={strings.forgotPassword()}
                   style={{
-                    alignSelf: "center",
-                    width: "100%"
+                    alignSelf: "flex-end",
+                    paddingVertical: 0,
+                    paddingHorizontal: 0
                   }}
                   onPress={() => {
-                    if (loading) return;
-                    setStep(LoginSteps.emailAuth);
-                    setLoading(false);
+                    if (loading || !email.current) return;
+                    presentSheet({
+                      component: <ForgotPassword userEmail={email.current} />
+                    });
                   }}
-                  type="secondaryAccented"
+                  fontFamily="REGULAR"
+                  fontSize={AppFontSize.sm}
+                  type="plain"
                 />
-              )} */}
 
-                {!loading ? (
-                  <TouchableOpacity
+                <View
+                  style={{
+                    marginTop: Spacing.LEVEL_1,
+                    gap: Spacing.LEVEL_2
+                  }}
+                >
+                  <Button
+                    loading={loading}
                     onPress={() => {
                       if (loading) return;
-                      changeMode(1);
+                      login();
                     }}
-                    activeOpacity={0.8}
                     style={{
-                      alignSelf: "center",
-                      paddingVertical: 0
+                      width: "100%"
                     }}
-                  >
-                    <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
-                      {strings.dontHaveAccount()}{" "}
+                    type="accent"
+                    title={!loading ? strings.continue() : null}
+                    fontSize={AppFontSize.sm}
+                  />
+
+                  {!loading ? (
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (loading) return;
+                        changeMode(1);
+                      }}
+                      activeOpacity={0.8}
+                      style={{
+                        alignSelf: "center",
+                        paddingVertical: 0
+                      }}
+                    >
                       <Paragraph
                         fontSize="SM"
-                        style={{ color: colors.primary.accent }}
-                        fontFamily="SEMI_BOLD"
+                        color={colors.secondary.paragraph}
                       >
-                        {strings.signUp()}
+                        {strings.dontHaveAccount()}{" "}
+                        <Paragraph
+                          fontSize="SM"
+                          style={{ color: colors.primary.accent }}
+                          fontFamily="SEMI_BOLD"
+                        >
+                          {strings.signUp()}
+                        </Paragraph>
                       </Paragraph>
-                    </Paragraph>
-                  </TouchableOpacity>
-                ) : null}
+                    </TouchableOpacity>
+                  ) : null}
+
+                  <View
+                    style={{
+                      marginTop: Spacing.LEVEL_3,
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <ErrorContainer inputRef={emailInputRef} />
+                    <ErrorContainer inputRef={passwordInputRef} />
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
-        ) : (
-          <View
-            style={{
-              borderRadius: DDS.isTab ? 5 : 0,
-              backgroundColor: colors.primary.background,
-              zIndex: 10,
-              width: "100%",
-              alignSelf: "center",
-              height: "100%",
-              paddingHorizontal: Spacing.LEVEL_3,
-              paddingTop: Spacing.LEVEL_6
-            }}
-          >
-            <TwoFactorVerification
-              onMfaLogin={async (
-                mfa: any,
-                callback: (success: boolean) => void
-              ) => {
-                try {
-                  const success = await db.user.authenticateMultiFactorCode(
-                    mfa.code,
-                    mfa.method
-                  );
+          ) : (
+            <View
+              style={{
+                borderRadius: DDS.isTab ? 5 : 0,
+                backgroundColor: colors.primary.background,
+                zIndex: 10,
+                width: "100%",
+                alignSelf: "center",
+                height: "100%",
+                paddingHorizontal: Spacing.LEVEL_3,
+                paddingTop: Spacing.LEVEL_6
+              }}
+            >
+              <TwoFactorVerification
+                onMfaLogin={async (
+                  mfa: any,
+                  callback: (success: boolean) => void
+                ) => {
+                  try {
+                    const success = await db.user.authenticateMultiFactorCode(
+                      mfa.code,
+                      mfa.method
+                    );
 
-                  await login();
+                    await login();
 
-                  if (success) {
-                    setLoading(false);
-                    callback && callback(true);
+                    if (success) {
+                      setLoading(false);
+                      callback && callback(true);
+                    }
+                    callback && callback(false);
+                  } catch (e) {
+                    callback && callback(false);
+                    if ((e as Error).message === "invalid_grant") {
+                      setLoading(false);
+                      setStep(LoginSteps.emailAuth);
+                    }
                   }
-                  callback && callback(false);
-                } catch (e) {
-                  callback && callback(false);
-                  if ((e as Error).message === "invalid_grant") {
-                    setLoading(false);
-                    setStep(LoginSteps.emailAuth);
+                }}
+                mfaInfo={
+                  mfaData.current || {
+                    primaryMethod: "email",
+                    secondaryMethod: "sms",
+                    token: ""
                   }
                 }
-              }}
-              mfaInfo={
-                mfaData.current || {
-                  primaryMethod: "email",
-                  secondaryMethod: "sms",
-                  token: ""
-                }
-              }
-              onCancel={() => {
-                setLoading(false);
-                setStep(LoginSteps.emailAuth);
-              }}
-            />
-          </View>
-        )}
+                onCancel={() => {
+                  setLoading(false);
+                  setStep(LoginSteps.emailAuth);
+                }}
+              />
+            </View>
+          )}
+        </InputErrorProvider>
       </KeyboardAwareScrollView>
     </>
   );

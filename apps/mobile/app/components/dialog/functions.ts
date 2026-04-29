@@ -44,6 +44,7 @@ export type DialogInfo = {
   icon?: string;
   paragraphColor: string;
   input: boolean;
+  inputLabel?: string;
   inputPlaceholder: string;
   defaultValue: string;
   // eslint-disable-next-line @typescript-eslint/ban-types

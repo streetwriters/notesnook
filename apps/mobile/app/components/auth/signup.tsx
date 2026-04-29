@@ -28,28 +28,30 @@ import {
   useWindowDimensions
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import { DDS } from "../../services/device-detection";
 import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import Navigation from "../../services/navigation";
+import SettingsService from "../../services/settings";
+import { RouteParams } from "../../stores/use-navigation-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { openLinkInBrowser } from "../../utils/functions";
-import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { ProgressPills } from "../intro/progress-pills";
 import { Loading } from "../loading";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
+import {
+  ErrorContainer,
+  InputErrorProvider
+} from "../ui/input/input-error-context";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
-import { RouteParams } from "../../stores/use-navigation-store";
-import SettingsService from "../../services/settings";
-import { Spacing } from "../../common/design/spacing";
-import { SvgView } from "../ui/svg";
-import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
-import { ProgressPills } from "../intro/progress-pills";
 
 const SignupSteps = {
   signup: 0,
@@ -148,195 +150,209 @@ export const Signup = ({
             nestedScrollEnabled
             keyboardShouldPersistTaps="handled"
           >
-            <View
-              style={{
-                borderRadius: DDS.isTab ? 5 : 0,
-                backgroundColor: colors.primary.background,
-                zIndex: 10,
-                width: "100%",
-                alignSelf: "center",
-                height: "100%",
-                paddingHorizontal: Spacing.LEVEL_3,
-                paddingTop: Spacing.LEVEL_6
-              }}
-            >
-              <Heading
-                style={{
-                  paddingBottom: Spacing.LEVEL_4
-                }}
-                fontSize="XL"
-              >
-                {strings.createAccount()}
-              </Heading>
-
+            <InputErrorProvider>
               <View
                 style={{
-                  gap: Spacing.LEVEL_2,
-                  paddingBottom: Spacing.LEVEL_4
-                }}
-              >
-                <Input
-                  fwdRef={emailInputRef}
-                  onChangeText={(value) => {
-                    email.current = value;
-                  }}
-                  defaultValue={email.current}
-                  label={strings.email()}
-                  testID="input.email"
-                  onErrorCheck={(e) => setError(e)}
-                  returnKeyLabel="Next"
-                  returnKeyType="next"
-                  autoComplete="email"
-                  validationType="email"
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  errorMessage={strings.emailInvalid()}
-                  placeholder="you@example.com"
-                  blurOnSubmit={false}
-                  onSubmit={() => {
-                    if (!email.current) return;
-                    passwordInputRef.current?.focus();
-                  }}
-                />
-
-                <Input
-                  fwdRef={passwordInputRef}
-                  onChangeText={(value) => {
-                    password.current = value;
-                  }}
-                  defaultValue={password.current}
-                  testID="input.password"
-                  onErrorCheck={(e) => setError(e)}
-                  returnKeyLabel="Next"
-                  returnKeyType="next"
-                  secureTextEntry
-                  autoComplete="password"
-                  autoCapitalize="none"
-                  blurOnSubmit={false}
-                  validationType="password"
-                  autoCorrect={false}
-                  label={strings.password()}
-                  placeholder="•••••••••"
-                  onSubmit={() => {
-                    if (!password.current) return;
-                    confirmPasswordInputRef.current?.focus();
-                  }}
-                />
-
-                <Input
-                  fwdRef={confirmPasswordInputRef}
-                  onChangeText={(value) => {
-                    confirmPassword.current = value;
-                  }}
-                  defaultValue={confirmPassword.current}
-                  testID="input.confirmPassword"
-                  onErrorCheck={(e) => setError(e)}
-                  returnKeyLabel="Signup"
-                  returnKeyType="done"
-                  secureTextEntry
-                  autoComplete="password"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  blurOnSubmit={false}
-                  validationType="confirmPassword"
-                  customValidator={() => password.current!}
-                  label={strings.confirmPassword()}
-                  placeholder="•••••••••"
-                  onSubmit={() => {
-                    signup();
-                  }}
-                />
-              </View>
-
-              <View
-                style={{
-                  width: DDS.isTab ? "50%" : "100%",
+                  borderRadius: DDS.isTab ? 5 : 0,
                   backgroundColor: colors.primary.background,
-                  flexGrow: 1,
+                  zIndex: 10,
+                  width: "100%",
                   alignSelf: "center",
-                  gap: Spacing.LEVEL_2
+                  height: "100%",
+                  paddingHorizontal: Spacing.LEVEL_3,
+                  paddingTop: Spacing.LEVEL_6
                 }}
               >
-                <Button
-                  title={!loading ? "Continue" : null}
-                  type="accent"
-                  loading={loading}
-                  onPress={() => {
-                    signup();
-                  }}
-                  width="100%"
-                />
-
-                <TouchableOpacity
-                  onPress={() => {
-                    if (loading) return;
-                    changeMode(0);
-                  }}
-                  activeOpacity={0.8}
+                <Heading
                   style={{
+                    paddingBottom: Spacing.LEVEL_4
+                  }}
+                  fontSize="XL"
+                >
+                  {strings.createAccount()}
+                </Heading>
+
+                <View
+                  style={{
+                    gap: Spacing.LEVEL_2,
+                    paddingBottom: Spacing.LEVEL_4
+                  }}
+                >
+                  <Input
+                    fwdRef={emailInputRef}
+                    onChangeText={(value) => {
+                      email.current = value;
+                    }}
+                    defaultValue={email.current}
+                    label={strings.email()}
+                    testID="input.email"
+                    onErrorCheck={(e) => setError(e)}
+                    returnKeyLabel="Next"
+                    returnKeyType="next"
+                    autoComplete="email"
+                    validationType="email"
+                    autoCorrect={false}
+                    autoCapitalize="none"
+                    errorMessage={strings.emailInvalid()}
+                    placeholder="you@example.com"
+                    blurOnSubmit={false}
+                    onSubmit={() => {
+                      if (!email.current) return;
+                      passwordInputRef.current?.focus();
+                    }}
+                  />
+
+                  <Input
+                    fwdRef={passwordInputRef}
+                    onChangeText={(value) => {
+                      password.current = value;
+                    }}
+                    defaultValue={password.current}
+                    testID="input.password"
+                    onErrorCheck={(e) => setError(e)}
+                    returnKeyLabel="Next"
+                    returnKeyType="next"
+                    secureTextEntry
+                    autoComplete="password"
+                    autoCapitalize="none"
+                    blurOnSubmit={false}
+                    validationType="password"
+                    autoCorrect={false}
+                    label={strings.password()}
+                    placeholder="•••••••••"
+                    onSubmit={() => {
+                      if (!password.current) return;
+                      confirmPasswordInputRef.current?.focus();
+                    }}
+                  />
+
+                  <Input
+                    fwdRef={confirmPasswordInputRef}
+                    onChangeText={(value) => {
+                      confirmPassword.current = value;
+                    }}
+                    defaultValue={confirmPassword.current}
+                    testID="input.confirmPassword"
+                    onErrorCheck={(e) => setError(e)}
+                    returnKeyLabel="Signup"
+                    returnKeyType="done"
+                    secureTextEntry
+                    autoComplete="password"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    blurOnSubmit={false}
+                    validationType="confirmPassword"
+                    customValidator={() => password.current || ""}
+                    errorMessage={strings.passwordNotMatched()}
+                    label={strings.confirmPassword()}
+                    placeholder="•••••••••"
+                    onSubmit={() => {
+                      signup();
+                    }}
+                  />
+                </View>
+
+                <View
+                  style={{
+                    width: DDS.isTab ? "50%" : "100%",
+                    backgroundColor: colors.primary.background,
+                    flexGrow: 1,
+                    alignSelf: "center",
+                    gap: Spacing.LEVEL_2
+                  }}
+                >
+                  <Button
+                    title={!loading ? "Continue" : null}
+                    type="accent"
+                    loading={loading}
+                    onPress={() => {
+                      signup();
+                    }}
+                    width="100%"
+                  />
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (loading) return;
+                      changeMode(0);
+                    }}
+                    activeOpacity={0.8}
+                    style={{
+                      alignSelf: "center"
+                    }}
+                  >
+                    <Paragraph fontSize="SM" color={colors.primary.paragraph}>
+                      {strings.alreadyHaveAccount()}{" "}
+                      <Paragraph
+                        fontSize="SM"
+                        fontFamily="SEMI_BOLD"
+                        style={{ color: colors.primary.accent }}
+                      >
+                        {strings.login()}
+                      </Paragraph>
+                    </Paragraph>
+                  </TouchableOpacity>
+
+                  <View
+                    style={{
+                      marginTop: Spacing.LEVEL_3,
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <ErrorContainer inputRef={emailInputRef} />
+                    <ErrorContainer inputRef={confirmPasswordInputRef} />
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    paddingHorizontal: DefaultAppStyles.GAP,
+                    width: DDS.isTab ? "50%" : "100%",
                     alignSelf: "center"
                   }}
                 >
-                  <Paragraph fontSize="SM" color={colors.primary.paragraph}>
-                    {strings.alreadyHaveAccount()}{" "}
+                  <Paragraph
+                    style={{
+                      marginBottom: 25,
+                      textAlign: "center"
+                    }}
+                    fontSize="XS"
+                    color={colors.primary.paragraph}
+                  >
+                    {strings.signupAgreement[0]()}
                     <Paragraph
-                      fontSize="SM"
-                      fontFamily="SEMI_BOLD"
-                      style={{ color: colors.primary.accent }}
+                      fontSize="XS"
+                      onPress={() => {
+                        openLinkInBrowser("https://notesnook.com/tos");
+                      }}
+                      style={{
+                        textDecorationLine: "underline"
+                      }}
+                      color={colors.primary.accent}
                     >
-                      {strings.login()}
-                    </Paragraph>
+                      {" "}
+                      {strings.signupAgreement[1]()}
+                    </Paragraph>{" "}
+                    {strings.signupAgreement[2]()}
+                    <Paragraph
+                      fontSize="XS"
+                      onPress={() => {
+                        openLinkInBrowser("https://notesnook.com/privacy");
+                      }}
+                      style={{
+                        textDecorationLine: "underline"
+                      }}
+                      color={colors.primary.accent}
+                    >
+                      {" "}
+                      {strings.signupAgreement[3]()}
+                    </Paragraph>{" "}
+                    {strings.signupAgreement[4]()}
                   </Paragraph>
-                </TouchableOpacity>
+                </View>
               </View>
-
-              <View
-                style={{
-                  paddingHorizontal: DefaultAppStyles.GAP,
-                  width: DDS.isTab ? "50%" : "100%",
-                  alignSelf: "center"
-                }}
-              >
-                <Paragraph
-                  style={{
-                    marginBottom: 25,
-                    textAlign: "center"
-                  }}
-                  fontSize="XS"
-                  color={colors.primary.paragraph}
-                >
-                  {strings.signupAgreement[0]()}
-                  <Paragraph
-                    fontSize="XS"
-                    onPress={() => {
-                      openLinkInBrowser("https://notesnook.com/tos");
-                    }}
-                    style={{
-                      textDecorationLine: "underline"
-                    }}
-                    color={colors.primary.accent}
-                  >
-                    {" "}
-                    {strings.signupAgreement[1]()}
-                  </Paragraph>{" "}
-                  {strings.signupAgreement[2]()}
-                  <Paragraph
-                    fontSize="XS"
-                    onPress={() => {
-                      openLinkInBrowser("https://notesnook.com/privacy");
-                    }}
-                    style={{
-                      textDecorationLine: "underline"
-                    }}
-                    color={colors.primary.accent}
-                  >
-                    {" "}
-                    {strings.signupAgreement[3]()}
-                  </Paragraph>{" "}
-                  {strings.signupAgreement[4]()}
-                </Paragraph>
-              </View>
-            </View>
+            </InputErrorProvider>
           </KeyboardAwareScrollView>
         </>
       ) : (

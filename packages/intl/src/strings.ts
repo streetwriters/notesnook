@@ -108,7 +108,7 @@ export const strings = {
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
   "2fa": () => t`Two Factor Authentication`,
-  select2faMethod: () => t`Select method for two-factor authentication`,
+  select2faMethod: () => t`Choose 2FA Method`,
   select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
   "2faCodeHelpText": {
     email: () =>
@@ -1492,6 +1492,8 @@ $day$: Current day (eg. Monday)`,
   someNotesPublished: () => t`Some notes are published`,
   unpublishToDelete: () => t`Unpublish notes to delete them`,
   filterAttachments: () => t`Filter attachments by filename, type or hash`,
+  filterNotebooks: () => t`Filter notebooks...`,
+  filterTags: () => t`Filter tags...`,
   oldPassword: () => t`Old password`,
   newPassword: () => t`New password`,
   email: () => t`Email`,
@@ -1525,6 +1527,9 @@ For example:
   typeAKeyword: () => t`Type a keyword`,
   search: () => t`Search`,
   enterEmailAddress: () => t`Enter email address`,
+  noNotebooksYet: () => t`No notebooks yet`,
+  notebooksEmptyBody: () => t`Start organizing your ideas, notes and thoughts`,
+  createNotebook: () => t`Create notebook`,
   enterValidEmail: () => t`Please enter a valid email address`,
   enterValidPhone: () => t`Please enter a valid phone number with country code`,
   errorGettingCodes: () => t`Error getting codes`,
@@ -2746,5 +2751,10 @@ Use this if changes from other devices are not appearing on this device. This wi
   },
   nextBillingDate: () => t`Next Billing Date`,
   freeTrialIncludes: (duration: number) =>
-    t`${duration} days free trial includes all features`
+    t`${duration} days free trial includes all features`,
+  noTagsYet: () => t`No tags yet`,
+  tagsEmptyBody: () =>
+    t`Create your first tag to start organizing your workspace.`,
+  newestFirst: () => t`Newest First`,
+  oldestFirst: () => t`Oldest First`
 };

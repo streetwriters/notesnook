@@ -42,15 +42,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
 import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
-import { eSendEvent } from "../../services/event-manager";
 import { RouteName } from "../../stores/use-navigation-store";
-import { eOpenJumpToDialog } from "../../utils/events";
 import { SectionHeader } from "../list-items/headers/section-header";
 import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
-import TagItem from "../list-items/tag";
 import { SearchResult } from "../list-items/search-result";
+import TagItem from "../list-items/tag";
 
 type ListItemWrapperProps<TItem = Item> = {
   group?: GroupingKey;
@@ -184,12 +182,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
-              onOpenJumpToDialog={() => {
-                eSendEvent(eOpenJumpToDialog, {
-                  ref: props.scrollRef,
-                  data: items
-                });
-              }}
+              ref={props.scrollRef}
+              data={items}
             />
           ) : null}
 
@@ -199,6 +193,9 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
             color={color.current}
             notebooks={notebooks.current}
             reminder={reminder.current}
+            hasGroupHeader={
+              groupHeader && previousIndex.current === index && !isSheet
+            }
             attachmentsCount={attachmentsCount.current}
             date={getDate(item as Note, group)}
             isRenderedInActionSheet={isSheet}
@@ -220,12 +217,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
-              onOpenJumpToDialog={() => {
-                eSendEvent(eOpenJumpToDialog, {
-                  ref: props.scrollRef,
-                  data: items
-                });
-              }}
+              ref={props.scrollRef}
+              data={items}
             />
           ) : null}
           <NotebookWrapper
@@ -248,12 +241,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
-              onOpenJumpToDialog={() => {
-                eSendEvent(eOpenJumpToDialog, {
-                  ref: props.scrollRef,
-                  data: items
-                });
-              }}
+              ref={props.scrollRef}
+              data={items}
             />
           ) : null}
           <ReminderItem
@@ -274,12 +263,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
-              onOpenJumpToDialog={() => {
-                eSendEvent(eOpenJumpToDialog, {
-                  ref: props.scrollRef,
-                  data: items
-                });
-              }}
+              ref={props.scrollRef}
+              data={items}
             />
           ) : null}
           <TagItem
@@ -300,12 +285,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
-              onOpenJumpToDialog={() => {
-                eSendEvent(eOpenJumpToDialog, {
-                  ref: props.scrollRef,
-                  data: items
-                });
-              }}
+              ref={props.scrollRef}
+              data={items}
             />
           ) : null}
           <SearchResult item={item as HighlightedResult} />

@@ -23,26 +23,9 @@ import React, { PropsWithChildren, useRef } from "react";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import { DefaultAppStyles } from "../../../utils/styles";
 import { Pressable } from "../../ui/pressable";
 import { View } from "react-native";
-
-export function selectItem(item: Item) {
-  if (useSelectionStore.getState().selectionMode === item.type) {
-    const { selectionMode, clearSelection, setSelectedItem } =
-      useSelectionStore.getState();
-
-    if (selectionMode === item.type) {
-      setSelectedItem(item.id);
-    }
-
-    if (useSelectionStore.getState().selectedItemsList.length === 0) {
-      clearSelection();
-    }
-    return true;
-  }
-  return false;
-}
+import { Spacing } from "../../../common/design/spacing";
 
 type SelectionWrapperProps = PropsWithChildren<{
   item: Item;
@@ -51,6 +34,7 @@ type SelectionWrapperProps = PropsWithChildren<{
   isSheet?: boolean;
   color?: string;
   index?: number;
+  hasGroupHeader?: boolean;
 }>;
 
 const SelectionWrapper = ({
@@ -60,6 +44,7 @@ const SelectionWrapper = ({
   isSheet,
   children,
   color,
+  hasGroupHeader,
   index = 0
 }: SelectionWrapperProps) => {
   const itemId = useRef(item.id);
@@ -86,47 +71,37 @@ const SelectionWrapper = ({
   };
 
   return (
-    <Pressable
-      customColor={
-        isEditingNote
-          ? colors.selected.background
-          : isSheet
-          ? colors.primary.hover
-          : "transparent"
-      }
-      testID={testID}
-      onLongPress={onLongPress}
-      onPress={onPress}
-      customSelectedColor={colors.primary.hover}
-      customAlpha={!isDark ? -0.02 : 0.02}
-      customOpacity={1}
+    <View
       style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        width: "100%",
-        alignSelf: "center",
-        overflow: "hidden",
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingVertical: compactMode ? 4 : DefaultAppStyles.GAP_VERTICAL,
-        borderRadius: isSheet ? 10 : 0,
-        marginBottom: isSheet ? DefaultAppStyles.GAP_VERTICAL : undefined
+        paddingHorizontal: Spacing.LEVEL_3,
+        backgroundColor: isEditingNote ? colors.selected.background : undefined
       }}
     >
-      {isEditingNote ? (
-        <View
-          style={{
-            backgroundColor: color || colors.selected.accent,
-            position: "absolute",
-            bottom: 0,
-            top: 0,
-            left: 0,
-            width: 5
-          }}
-        />
-      ) : null}
-      {children}
-    </Pressable>
+      <Pressable
+        customColor={isSheet ? colors.primary.hover : "transparent"}
+        testID={testID}
+        onLongPress={onLongPress}
+        onPress={onPress}
+        customSelectedColor={colors.primary.hover}
+        customAlpha={!isDark ? -0.02 : 0.02}
+        customOpacity={1}
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          alignSelf: "center",
+          overflow: "hidden",
+          borderRadius: 0,
+          marginTop: hasGroupHeader ? 0 : Spacing.LEVEL_3,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.primary.border,
+          alignItems: "flex-start",
+          paddingVertical: Spacing.LEVEL_2,
+          paddingTop: hasGroupHeader ? 0 : Spacing.LEVEL_2
+        }}
+      >
+        {children}
+      </Pressable>
+    </View>
   );
 };
 

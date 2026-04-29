@@ -22,19 +22,18 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { db } from "../../common/database/index";
+import { Radius, Spacing } from "../../common/design/spacing";
 import useTimer from "../../hooks/use-timer";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
-import { eCloseSimpleDialog } from "../../utils/events";
+import { ToastManager } from "../../services/event-manager";
+import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
 import { AppFontSize } from "../../utils/size";
+import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import PinInput from "../ui/pin-input/index";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../utils/styles";
-import { presentDialog } from "../dialog/functions";
-import { Radius, Spacing } from "../../common/design/spacing";
 
 type MFAInfo = {
   primaryMethod: string;
@@ -103,12 +102,14 @@ const TwoFactorVerification = ({
     {
       id: "sms",
       title: strings.sendCodeSms(),
-      icon: "message-plus-outline"
+      icon: "chat",
+      iconFamily: "notesnook"
     },
     {
       id: "email",
       title: strings.sendCodeEmail(),
-      icon: "email-outline"
+      icon: "envelope-simple",
+      iconFamily: "notesnook"
     },
     {
       id: "app",
@@ -118,7 +119,8 @@ const TwoFactorVerification = ({
     {
       id: "recoveryCode",
       title: strings.recoveryCode(),
-      icon: "key"
+      icon: "lock-simple",
+      iconFamily: "notesnook"
     }
   ];
 
@@ -163,47 +165,54 @@ const TwoFactorVerification = ({
         }, 500);
       }}
       style={{
-        alignItems: "center"
+        alignItems: "center",
+        gap: Spacing.LEVEL_3
       }}
     >
-      <IconButton
+      <View
         style={{
-          width: 50,
-          height: 50,
-          backgroundColor: colors.primary.shade,
-          borderRadius: Radius.XS,
-          marginBottom: Spacing.LEVEL_7
-        }}
-        size={25}
-        name="key"
-        color={colors.primary.accent}
-      />
-      <Heading
-        style={{
-          textAlign: "center",
-          marginBottom: Spacing.LEVEL_1
+          paddingHorizontal: Spacing.LEVEL_3,
+          width: "100%"
         }}
       >
-        {currentMethod.method ? strings["2fa"]() : strings.select2faMethod()}
-      </Heading>
-      <Paragraph
-        style={{
-          width: "80%",
-          textAlign: "center"
-        }}
-      >
-        {currentMethod.method
-          ? strings["2faCodeHelpText"][
-              currentMethod.method as keyof (typeof strings)["2faCodeHelpText"]
-            ]?.() || strings.select2faCodeHelpText()
-          : strings.select2faCodeHelpText()}
-      </Paragraph>
+        <IconButton
+          style={{
+            width: 50,
+            height: 50,
+            backgroundColor: colors.primary.shade,
+            borderRadius: Radius.XS,
+            marginBottom: Spacing.LEVEL_7
+          }}
+          size={25}
+          iconFamily="notesnook"
+          name="shield-check"
+          color={colors.primary.accent}
+        />
+        <Heading
+          style={{
+            textAlign: "center",
+            marginBottom: Spacing.LEVEL_1
+          }}
+        >
+          {currentMethod.method ? strings["2fa"]() : strings.select2faMethod()}
+        </Heading>
+        <Paragraph
+          style={{
+            textAlign: "center"
+          }}
+        >
+          {currentMethod.method
+            ? strings["2faCodeHelpText"][
+                currentMethod.method as keyof (typeof strings)["2faCodeHelpText"]
+              ]?.() || strings.select2faCodeHelpText()
+            : strings.select2faCodeHelpText()}
+        </Paragraph>
+      </View>
 
       {currentMethod.method ? (
         <>
           <View
             style={{
-              marginTop: Spacing.LEVEL_4,
               borderRadius: Radius.S,
               borderWidth: 1,
               borderColor: colors.primary.border,
@@ -265,7 +274,7 @@ const TwoFactorVerification = ({
             currentMethod.method === "email" ? (
               <Button
                 onPress={onSendCode}
-                type={seconds ? "secondary" : "transparent"}
+                type={"plain"}
                 disabled={!seconds}
                 title={
                   sending
@@ -278,6 +287,7 @@ const TwoFactorVerification = ({
                 }
                 loading={sending}
                 fontSize={AppFontSize.sm}
+                fontFamily="REGULAR"
                 style={{
                   paddingVertical: 0,
                   alignSelf: "flex-start",
@@ -297,7 +307,12 @@ const TwoFactorVerification = ({
           />
         </>
       ) : (
-        <>
+        <View
+          style={{
+            gap: Spacing.LEVEL_2,
+            width: "100%"
+          }}
+        >
           {getMethods().map((item) => (
             <Pressable
               key={item.title}
@@ -308,35 +323,42 @@ const TwoFactorVerification = ({
                 });
               }}
               style={{
-                paddingHorizontal: DefaultAppStyles.GAP,
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-                marginTop: 0,
+                padding: Spacing.LEVEL_2,
+                backgroundColor: colors.secondary.background,
                 flexDirection: "row",
-                borderRadius: 0,
+                borderRadius: Radius.S,
                 alignItems: "center",
                 width: "100%",
-                justifyContent: "flex-start"
+                justifyContent: "flex-start",
+                gap: Spacing.LEVEL_1
               }}
             >
               <IconButton
-                type="secondaryAccented"
                 style={{
-                  marginRight: 10
+                  borderRadius: Radius.XS,
+                  padding: Spacing.LEVEL_1,
+                  width: undefined,
+                  height: undefined,
+                  backgroundColor: RGB_Linear_Shade(
+                    0.04,
+                    hexToRGBA(colors.secondary.background)
+                  )
                 }}
-                size={15}
-                color={colors.primary.accent}
+                size={17}
+                color={colors.primary.icon}
                 name={item.icon}
+                iconFamily={item.iconFamily as "notesnook"}
               />
               <View
                 style={{
                   flexShrink: 1
                 }}
               >
-                <Paragraph size={AppFontSize.md}>{item.title}</Paragraph>
+                <Paragraph size={AppFontSize.sm}>{item.title}</Paragraph>
               </View>
             </Pressable>
           ))}
-        </>
+        </View>
       )}
     </View>
   );

@@ -2085,6 +2085,34 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - react-native-nano-icons (0.1.8):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
   - react-native-notification-sounds (0.5.5):
@@ -3543,6 +3571,7 @@ DEPENDENCIES:
   - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
+  - react-native-nano-icons (from `../node_modules/react-native-nano-icons`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-notification-sounds (from `../node_modules/react-native-notification-sounds`)
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
@@ -3752,6 +3781,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
     :path: "../node_modules/react-native-mmkv-storage"
+  react-native-nano-icons:
+    :path: "../node_modules/react-native-nano-icons"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-notification-sounds:
@@ -3968,6 +3999,7 @@ SPEC CHECKSUMS:
   react-native-in-app-review: 1516ba69d60d58053b7eb3aaaf8d2a5a74af8b57
   react-native-keep-awake: a351e6f67006b47f316ae2b17ee8ee69386167f4
   react-native-mmkv-storage: e84980084e371a9c2230bbde071536a7e1539406
+  react-native-nano-icons: 118c99a62175c3f4737ff21e85252c90158816fb
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
