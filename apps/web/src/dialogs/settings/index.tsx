@@ -347,7 +347,13 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                 if (!settings.length) continue;
                 groups.push({ ...group, settings });
               }
-              onNavigate(groups);
+              onNavigate(
+                groups.filter((g) => {
+                  const section = findSection(g.section);
+                  if (section?.isHidden?.()) return false;
+                  return !g.isHidden?.();
+                })
+              );
             }}
           />
           {sectionGroups.map((group) => (
@@ -716,4 +722,12 @@ function NumberInput({
       )}
     </Flex>
   );
+}
+
+function findSection(key: SectionKeys) {
+  for (const group of sectionGroups) {
+    const section = group.sections.find((s) => s.key === key);
+    if (section) return section;
+  }
+  return null;
 }
