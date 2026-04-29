@@ -17,41 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import { IconButton, IconButtonProps } from "../ui/icon-button";
+import { View } from "react-native";
+import { useThemeColors } from "@notesnook/theme";
+import { Spacing } from "../../../common/design/spacing";
 
-export const RightMenus = ({
-  rightButton
-}: {
-  rightButton?: IconButtonProps;
-}) => {
+const LineSeparator = ({ padding }: { padding: keyof typeof Spacing }) => {
   const { colors } = useThemeColors();
-
   return (
-    <View style={styles.rightBtnContainer}>
-      {rightButton ? (
-        <IconButton {...rightButton} color={colors.primary.icon} />
-      ) : (
-        <View
-          style={{
-            width: 40,
-            height: 40
-          }}
-        />
-      )}
-    </View>
+    <View
+      style={{
+        width: "100%",
+        height: 1,
+        backgroundColor: colors.primary.border
+        // marginVertical: Spacing[padding]
+      }}
+    />
   );
 };
 
-const styles = StyleSheet.create({
-  rightBtnContainer: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  rightBtn: {
-    justifyContent: "center",
-    alignItems: "center"
-  }
-});
+export default LineSeparator;

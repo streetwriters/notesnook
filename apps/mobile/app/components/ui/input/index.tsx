@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { RefObject, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import phone from "phone";
+import React, { RefObject, useRef, useState } from "react";
 import {
   ColorValue,
+  findNodeHandle,
   NativeSyntheticEvent,
   TextInput,
   TextInputProps,
@@ -28,22 +31,17 @@ import {
   View,
   ViewStyle
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import isURL from "validator/lib/isURL";
+import { Spacing } from "../../../common/design/spacing";
 import {
-  ERRORS_LIST,
   validateEmail,
   validatePass,
   validateUsername
 } from "../../../services/validation";
-import { useThemeColors } from "@notesnook/theme";
-import { getElevationStyle } from "../../../utils/elevation";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
-import phone from "phone";
-import isURL from "validator/lib/isURL";
-import { DefaultAppStyles } from "../../../utils/styles";
-import { Spacing } from "../../../common/design/spacing";
+import { useInputError } from "./input-error-context";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput | null>;
@@ -113,6 +111,9 @@ const Input = ({
   ...restProps
 }: InputProps) => {
   const { colors, isDark } = useThemeColors();
+  const errorCtx = useInputError();
+  const internalRef = useRef<TextInput>(null);
+  const activeRef = fwdRef ?? internalRef;
   const [error, setError] = useState(false);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
@@ -121,6 +122,12 @@ const Input = ({
     SHORT_PASS: false
   });
   type ErrorKey = keyof typeof errorList;
+
+  const reportError = (message: string | null) => {
+    if (!errorCtx) return;
+    const nativeId = findNodeHandle(activeRef.current);
+    if (nativeId !== null) errorCtx.setError(nativeId, message);
+  };
   const color = error
     ? colors.error.border
     : focus
@@ -137,34 +144,30 @@ const Input = ({
       });
       return;
     }
-    let isError:
-      | boolean
-      | string
-      | { SHORT_PASS?: boolean; isValid?: boolean }
-      | undefined = undefined;
+    let isValid: boolean | string | undefined = undefined;
 
     switch (validationType) {
       case "password":
-        isError = validatePass(value);
+        isValid = validatePass(value);
         break;
       case "email":
-        isError = validateEmail(value);
+        isValid = validateEmail(value);
         break;
       case "username":
-        isError = validateUsername(value);
+        isValid = validateUsername(value);
         break;
       case "confirmPassword":
-        isError = customValidator && value === customValidator();
+        isValid = customValidator && value === customValidator();
         break;
       case "url":
-        isError = isURL(value, { allow_underscores: true });
+        isValid = isURL(value, { allow_underscores: true });
         break;
       case "phonenumber": {
         const result = phone(value, {
           strictDetection: true,
           validateMobilePrefix: true
         });
-        isError = result.isValid;
+        isValid = result.isValid;
         if (result.isValid) {
           onChangeText && onChangeText(result.phoneNumber);
         }
@@ -173,23 +176,10 @@ const Input = ({
       }
     }
 
-    if (validationType === "password") {
-      let hasError = false;
-
-      const errors = isError as { [name: string]: boolean };
-      Object.keys(errors).forEach((e) => {
-        //ts-ignore
-        if (errors[e] === true) {
-          hasError = true;
-        }
-      });
-      setError(hasError);
-      onErrorCheck && onErrorCheck(hasError);
-      setErrorList(errors as { SHORT_PASS: boolean });
-    } else {
-      setError(!isError);
-      onErrorCheck && onErrorCheck(!isError);
-    }
+    const hasError = !isValid;
+    setError(hasError);
+    onErrorCheck && onErrorCheck(hasError);
+    reportError(hasError ? (errorMessage ?? null) : null);
   };
 
   const onChange = (value: string) => {
@@ -201,6 +191,7 @@ const Input = ({
       setErrorList({
         SHORT_PASS: false
       });
+      reportError(null);
     }
   };
 
@@ -221,7 +212,7 @@ const Input = ({
   const style: ViewStyle = {
     borderWidth: 1,
     borderRadius: defaultBorderRadius,
-    borderColor: color,
+    borderColor: error ? colors.static.red : color,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -277,10 +268,8 @@ const Input = ({
 
           <TextInput
             {...restProps}
-            ref={fwdRef}
-            onLayout={(e) => {
-              console.log(e.nativeEvent.layout);
-            }}
+            ref={activeRef}
+            onLayout={restProps.onLayout}
             editable={!loading && restProps.editable}
             onChangeText={onChange}
             onBlur={onBlur}
@@ -343,86 +332,9 @@ const Input = ({
                 }}
               />
             )}
-
-            {error && (
-              <IconButton
-                name="alert-circle-outline"
-                top={10}
-                bottom={10}
-                onPress={() => {
-                  setShowError(!showError);
-                }}
-                size={20}
-                style={{
-                  width: 25,
-                  marginLeft: 5
-                }}
-                color={colors.error.icon}
-              />
-            )}
           </View>
-
-          {error && showError && errorMessage ? (
-            <View
-              style={{
-                position: "absolute",
-                backgroundColor: colors.secondary.background,
-                paddingVertical: 3,
-                paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
-                borderRadius: 2.5,
-                ...getElevationStyle(2),
-                top: 0
-              }}
-            >
-              <Paragraph
-                size={AppFontSize.xs}
-                style={{
-                  textAlign: "right",
-                  textAlignVertical: "bottom"
-                }}
-              >
-                <Icon
-                  name="alert-circle-outline"
-                  size={AppFontSize.xs}
-                  color={colors.error.icon}
-                />{" "}
-                {errorMessage}
-              </Paragraph>
-            </View>
-          ) : null}
         </TouchableOpacity>
       </View>
-
-      {validationType === "password" &&
-      focus &&
-      Object.keys(errorList).filter((k) => errorList[k as ErrorKey] === true)
-        .length !== 0 ? (
-        <View
-          style={{
-            marginTop: -5,
-            marginBottom: 5
-          }}
-        >
-          {Object.keys(ERRORS_LIST).map((error) => (
-            <View
-              key={ERRORS_LIST[error as ErrorKey]}
-              style={{
-                flexDirection: "row",
-                alignItems: "center"
-              }}
-            >
-              <Icon
-                name={errorList[error as ErrorKey] ? "close" : "check"}
-                color={errorList[error as ErrorKey] ? "red" : "green"}
-              />
-
-              <Paragraph style={{ marginLeft: 5 }} fontSize="XS">
-                {ERRORS_LIST[error as ErrorKey]}
-              </Paragraph>
-            </View>
-          ))}
-        </View>
-      ) : null}
     </>
   );
 };

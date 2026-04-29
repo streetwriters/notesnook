@@ -30,6 +30,7 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
+import LineSeparator from "../../components/ui/seperator/line-separator";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -65,6 +66,8 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         id={route.name}
         onPressDefaultRightButton={openEditor}
       />
+
+      <LineSeparator padding="LEVEL_3" />
 
       <DelayLayout wait={loading}>
         <List
