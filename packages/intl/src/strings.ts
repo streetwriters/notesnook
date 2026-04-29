@@ -2813,8 +2813,6 @@ Continue without attachments?`,
   expiryDateRemoved: () => t`Expiry date removed`,
   selectPlan: () => t`Select plan`,
   frequentlyAskedQuestions: () => t`Frequently asked questions`,
-  selectPlan: () => t`Select Plan`,
-  frequentlyAskedQuestions: () => t`Frequently Asked Questions`,
   testimonials: () => t`Testimonials`,
   billingType: {
     annual: () => t`Billed annually`,

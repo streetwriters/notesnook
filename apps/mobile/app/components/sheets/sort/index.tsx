@@ -160,6 +160,41 @@ const Sort = ({
     close();
   };
 
+  useEffect(() => {
+    data?.groups?.().then((groups) => {
+      setGroups(groups);
+      offsets.current = [];
+      groups.map((item, index) => {
+        let offset = 35 * index;
+        let groupIndex = item.index;
+        const messageState = useMessageStore.getState().message;
+        const msgOffset = messageState?.visible ? 60 : 10;
+
+        groupIndex = groupIndex + 1;
+        groupIndex = groupIndex - (index + 1);
+        offset = offset + groupIndex * 100 + msgOffset;
+        offsets.current.push(offset);
+      });
+
+      const index = offsets.current?.findIndex((o, i) => {
+        return (
+          o <= currentScrollPosition.current + 100 &&
+          offsets.current[i + 1] - 100 > currentScrollPosition.current
+        );
+      });
+
+      setCurrentIndex(index < 0 ? 0 : index);
+    });
+  }, [data]);
+
+  const onPress = (item: { index: number; group: GroupHeader }) => {
+    scrollRef.current?.current?.scrollToIndex({
+      index: item.index,
+      animated: true
+    });
+    close();
+  };
+
   return (
     <View
       style={{
