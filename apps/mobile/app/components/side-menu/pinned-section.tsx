@@ -70,7 +70,7 @@ export const PinnedSection = React.memo(
         menuPins.map((item) => ({
           id: item.id,
           title: item.title,
-          icon: item.type === "notebook" ? "notebook-outline" : "pound",
+          icon: item.type === "notebook" ? "bookmark" : "shopping-mode",
           dataType: item.type,
           data: item,
           onPress: onPress,

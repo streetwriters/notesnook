@@ -57,7 +57,6 @@ const DialogHeader = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          minHeight: 50,
           paddingHorizontal: padding,
           ...style
         }}
@@ -76,7 +75,7 @@ const DialogHeader = ({
           >
             <Heading
               style={{ textAlign: centered ? "center" : "left" }}
-              size={AppFontSize.lg}
+              fontSize="XL"
             >
               {title}{" "}
               {titlePart ? (

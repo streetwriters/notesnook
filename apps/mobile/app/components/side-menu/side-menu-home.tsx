@@ -38,6 +38,7 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
+import { Spacing } from "../../common/design/spacing";
 
 const pro = {
   title: strings.upgradePlan(),
@@ -71,8 +72,7 @@ export function SideMenuHome() {
         height: "100%",
         width: "100%",
         backgroundColor: colors.primary.background,
-        gap: DefaultAppStyles.GAP,
-        paddingTop: DefaultAppStyles.GAP_VERTICAL
+        paddingTop: Spacing.LEVEL_1
       }}
     >
       <SideMenuHeader />
@@ -129,7 +129,8 @@ export function SideMenuHome() {
               </>
             )}
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP
+              paddingHorizontal: DefaultAppStyles.GAP,
+              marginTop: Spacing.LEVEL_3
             }}
             nestedScrollEnabled={false}
           />

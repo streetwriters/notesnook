@@ -19,19 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   GroupingByIdKey,
+  GroupHeader,
   GroupingKey,
   GroupOptions,
+  Item,
   ItemType,
-  SortOptions
+  SortOptions,
+  VirtualizedGrouping
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useState } from "react";
-import { View } from "react-native";
 import {
   getGroupOptions,
   setGroupOptionsById
 } from "../../../hooks/use-group-options";
+import React, { RefObject, useEffect, useRef, useState } from "react";
+import { FlatList, View } from "react-native";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { RouteName } from "../../../stores/use-navigation-store";
@@ -46,13 +49,20 @@ import { Button } from "../../ui/button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { Radius, Spacing } from "../../../common/design/spacing";
+import { getElevationStyle } from "../../../utils/elevation";
+import { useMessageStore } from "../../../stores/use-message-store";
+
 const Sort = ({
   dataType,
   screen,
   hideGroupOptions,
   group: groupType,
   groupId,
-  type
+  type,
+  hideJumpToSection,
+  ref,
+  data
 }: {
   dataType: ItemType;
   type?: GroupingByIdKey;
@@ -60,29 +70,42 @@ const Sort = ({
   group: GroupingKey;
   hideGroupOptions?: boolean;
   groupId?: string;
+  hideJumpToSection?: boolean;
+  data?: VirtualizedGrouping<Item>;
+  ref?: RefObject<FlatList>;
 }) => {
   const { colors } = useThemeColors();
+  const [groups, setGroups] = useState<
+    {
+      index: number;
+      group: GroupHeader;
+    }[]
+  >();
+  const offsets = useRef<number[]>([]);
+  const scrollRef = useRef<RefObject<FlatList>>(undefined);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentScrollPosition = useRef(0);
 
   const [groupOptions, setGroupOptions] = useState(
     getGroupOptions(groupType, groupId, type)
   );
 
-  const getSortButtonTitle = () => {
-    const { sortDirection, groupBy, sortBy } = groupOptions || {};
+  const getSortButtonTitle = (type: "asc" | "desc") => {
+    const { groupBy, sortBy } = groupOptions || {};
     const isAlphabetical = groupBy === "abc" || sortBy === "title";
     const isDueDate = sortBy === "dueDate";
     const isRelevance = sortBy === "relevance";
 
-    if (sortDirection === "asc") {
+    if (type === "asc") {
       if (isAlphabetical) return strings.aToZ();
       if (isDueDate) return strings.earliestFirst();
       if (isRelevance) return strings.leastRelevantFirst();
-      return strings.oldNew();
+      return strings.oldestFirst();
     } else {
       if (isAlphabetical) return strings.zToA();
       if (isDueDate) return strings.latestFirst();
       if (isRelevance) return strings.mostRelevantFirst();
-      return strings.newOld();
+      return strings.newestFirst();
     }
   };
 
@@ -111,13 +134,49 @@ const Sort = ({
     await updateGroupOptions(_groupOptions);
   };
 
+  useEffect(() => {
+    data?.groups?.().then((groups) => {
+      setGroups(groups);
+      offsets.current = [];
+      groups.map((item, index) => {
+        let offset = 35 * index;
+        let groupIndex = item.index;
+        const messageState = useMessageStore.getState().message;
+        const msgOffset = messageState?.visible ? 60 : 10;
+
+        groupIndex = groupIndex + 1;
+        groupIndex = groupIndex - (index + 1);
+        offset = offset + groupIndex * 100 + msgOffset;
+        offsets.current.push(offset);
+      });
+
+      const index = offsets.current?.findIndex((o, i) => {
+        return (
+          o <= currentScrollPosition.current + 100 &&
+          offsets.current[i + 1] - 100 > currentScrollPosition.current
+        );
+      });
+
+      setCurrentIndex(index < 0 ? 0 : index);
+    });
+  }, [data]);
+
+  const onPress = (item: { index: number; group: GroupHeader }) => {
+    scrollRef.current?.current?.scrollToIndex({
+      index: item.index,
+      animated: true
+    });
+    close();
+  };
+
   return (
     <View
       style={{
         width: "100%",
         backgroundColor: colors.primary.background,
         justifyContent: "space-between",
-        gap: DefaultAppStyles.GAP_SMALL
+        gap: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_3
       }}
     >
       <View
@@ -128,9 +187,9 @@ const Sort = ({
           paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
-        <Heading size={AppFontSize.lg}>{strings.sortBy()}</Heading>
+        <Heading fontSize="LG">{strings.sortBy()}</Heading>
 
-        <Button
+        {/* <Button
           title={getSortButtonTitle()}
           icon={
             groupOptions?.sortDirection === "asc"
@@ -145,14 +204,16 @@ const Sort = ({
             paddingHorizontal: DefaultAppStyles.GAP_SMALL
           }}
           onPress={setOrderBy}
-        />
+        /> */}
       </View>
 
       <View
         style={{
           flexDirection: "column",
           justifyContent: "flex-start",
-          borderBottomColor: colors.primary.border
+          borderBottomColor: colors.primary.border,
+          paddingHorizontal: Spacing.LEVEL_3,
+          gap: Spacing.LEVEL_3
         }}
       >
         {Object.keys(SORT).map((item) => {
@@ -178,40 +239,92 @@ const Sort = ({
           }
 
           return (
-            <Pressable
+            <View
               key={item}
-              type={groupOptions?.sortBy === item ? "selected" : "plain"}
-              noborder
               style={{
-                width: "100%",
-                justifyContent: "space-between",
-                flexDirection: "row",
-                borderRadius: 0,
-                paddingHorizontal: DefaultAppStyles.GAP,
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL
-              }}
-              onPress={async () => {
-                const _groupOptions: GroupOptions = {
-                  ...groupOptions,
-                  sortBy: item as SortOptions["sortBy"]
-                };
-                await updateGroupOptions(_groupOptions);
+                gap: Spacing.LEVEL_2
               }}
             >
-              <Paragraph>
-                {strings.sortByStrings[
-                  item as keyof typeof strings.sortByStrings
-                ]()}
-              </Paragraph>
+              <Pressable
+                type={
+                  groupOptions?.sortBy === item ? "selected" : "plain-outline"
+                }
+                style={{
+                  width: "100%",
+                  justifyContent: "space-between",
+                  flexDirection: "row",
+                  borderRadius: Radius.XS,
+                  paddingHorizontal: Spacing.LEVEL_2,
+                  paddingVertical: Spacing.LEVEL_2
+                }}
+                onPress={async () => {
+                  const _groupOptions: GroupOptions = {
+                    ...groupOptions,
+                    sortBy: item as SortOptions["sortBy"]
+                  };
+                  await updateGroupOptions(_groupOptions);
+                }}
+              >
+                <Paragraph>
+                  {strings.sortByStrings[
+                    item as keyof typeof strings.sortByStrings
+                  ]()}
+                </Paragraph>
 
-              {groupOptions?.sortBy === item ? (
-                <AppIcon
-                  size={AppFontSize.lg}
-                  name="check"
-                  color={colors.selected.accent}
-                />
+                {groupOptions?.sortBy === item ? (
+                  <AppIcon
+                    size={AppFontSize.lg}
+                    name="checkbox"
+                    iconFamily="notesnook"
+                    color={[colors.selected.accent, "white"]}
+                  />
+                ) : null}
+              </Pressable>
+
+              {groupOptions.sortBy === item ? (
+                <View
+                  style={{
+                    backgroundColor: colors.secondary.background,
+                    borderRadius: Radius.S,
+                    padding: Spacing.LEVEL_1,
+                    flexDirection: "row",
+                    gap: Spacing.LEVEL_2
+                  }}
+                >
+                  <Button
+                    style={{
+                      flexGrow: 1,
+                      borderRadius: Radius.XS,
+                      ...(groupOptions?.sortDirection === "desc"
+                        ? getElevationStyle(10)
+                        : {})
+                    }}
+                    type={
+                      groupOptions?.sortDirection === "desc"
+                        ? "accent-background"
+                        : "plain"
+                    }
+                    title={getSortButtonTitle("desc")}
+                  />
+
+                  <Button
+                    style={{
+                      flexGrow: 1,
+                      borderRadius: Radius.XS,
+                      ...(groupOptions?.sortDirection === "asc"
+                        ? getElevationStyle(10)
+                        : {})
+                    }}
+                    type={
+                      groupOptions?.sortDirection === "asc"
+                        ? "accent-background"
+                        : "plain"
+                    }
+                    title={getSortButtonTitle("asc")}
+                  />
+                </View>
               ) : null}
-            </Pressable>
+            </View>
           );
         })}
       </View>
@@ -223,18 +336,19 @@ const Sort = ({
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              paddingHorizontal: Spacing.LEVEL_3,
+              paddingBottom: Spacing.LEVEL_3
             }}
           >
-            <Heading size={AppFontSize.lg}>{strings.groupBy()}</Heading>
+            <Heading fontSize="LG">{strings.groupBy()}</Heading>
           </View>
 
           <View
             style={{
-              borderRadius: 0,
               flexDirection: "row",
-              flexWrap: "wrap"
+              flexWrap: "wrap",
+              paddingHorizontal: Spacing.LEVEL_3,
+              gap: Spacing.LEVEL_2
             }}
           >
             {Object.keys(GROUP).map((item) => (
@@ -243,16 +357,14 @@ const Sort = ({
                 type={
                   groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
                     ? "selected"
-                    : "plain"
+                    : "plain-outline"
                 }
-                noborder
                 style={{
-                  width: "100%",
-                  justifyContent: "space-between",
                   flexDirection: "row",
-                  borderRadius: 0,
-                  paddingHorizontal: DefaultAppStyles.GAP,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL
+                  width: "auto",
+                  borderRadius: 100,
+                  paddingHorizontal: Spacing.LEVEL_3,
+                  paddingVertical: Spacing.LEVEL_1
                 }}
                 onPress={async () => {
                   const _groupOptions: GroupOptions = {
@@ -262,21 +374,79 @@ const Sort = ({
                   await updateGroupOptions(_groupOptions);
                 }}
               >
-                <Paragraph>
+                <Paragraph
+                  fontFamily={
+                    groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
+                      ? "SEMI_BOLD"
+                      : "REGULAR"
+                  }
+                  color={
+                    groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
+                      ? colors.primary.paragraph
+                      : colors.secondary.paragraph
+                  }
+                >
                   {strings.groupByStrings[
                     item as keyof typeof strings.groupByStrings
                   ]()}
                 </Paragraph>
-
-                {groupOptions.groupBy === item ? (
-                  <AppIcon
-                    size={AppFontSize.lg}
-                    name="check"
-                    color={colors.selected.accent}
-                  />
-                ) : null}
               </Pressable>
             ))}
+          </View>
+        </>
+      ) : null}
+
+      {!hideJumpToSection && groups ? (
+        <>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: Spacing.LEVEL_3,
+              paddingBottom: Spacing.LEVEL_3
+            }}
+          >
+            <Heading fontSize="LG">{strings.jumpToGroup()}</Heading>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              paddingHorizontal: Spacing.LEVEL_3,
+              gap: Spacing.LEVEL_2
+            }}
+          >
+            {groups?.map((item, index) => {
+              return (
+                <Pressable
+                  key={item.group.id}
+                  onPress={() => onPress(item)}
+                  type={currentIndex === index ? "selected" : "plain-outline"}
+                  style={{
+                    minWidth: "20%",
+                    width: null,
+                    borderRadius: 100,
+                    paddingHorizontal: Spacing.LEVEL_3,
+                    paddingVertical: Spacing.LEVEL_1
+                  }}
+                >
+                  <Paragraph
+                    size={AppFontSize.sm}
+                    fontFamily={
+                      currentIndex === index ? "SEMI_BOLD" : "REGULAR"
+                    }
+                    color={colors.primary.paragraph}
+                    style={{
+                      textAlign: "center"
+                    }}
+                  >
+                    {item.group.title}
+                  </Paragraph>
+                </Pressable>
+              );
+            })}
           </View>
         </>
       ) : null}

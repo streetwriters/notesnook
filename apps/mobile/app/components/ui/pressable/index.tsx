@@ -50,6 +50,8 @@ export interface PressableProps extends RNPressableProps {
 
 type ButtonTypes =
   | "plain"
+  | "plain-outline"
+  | "accent-background"
   | "transparent"
   | "accent"
   | "shade"
@@ -61,7 +63,8 @@ type ButtonTypes =
   | "error"
   | "errorShade"
   | "warn"
-  | "selected";
+  | "selected"
+  | "accent-outline";
 
 type ButtonVariant = {
   primary: string;
@@ -91,6 +94,14 @@ const buttonTypes = (
       0.05,
       isDark
     )
+  },
+  "plain-outline": {
+    primary: "transparent",
+    text: colors.primary.paragraph,
+    selected: colors.primary.hover,
+    borderWidth: 1,
+    borderColor: colors.primary.border,
+    borderSelectedColor: colors.primary.border
   },
   transparent: {
     primary: "transparent",
@@ -166,6 +177,20 @@ const buttonTypes = (
       0.3,
       false
     )
+  },
+  "accent-background": {
+    primary: colors.primary.background,
+    text: colors.primary.accent,
+    selected: colors.primary.background,
+    borderWidth: 0
+  },
+  "accent-outline": {
+    primary: "transparent",
+    text: colors.primary.accent,
+    selected: accent || colors.primary.accent,
+    borderWidth: 1,
+    borderColor: accent || colors.primary.accent,
+    borderSelectedColor: accent || colors.primary.accent
   },
   inverted: {
     primary: colors.primary.background,
