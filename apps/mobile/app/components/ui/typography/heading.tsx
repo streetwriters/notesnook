@@ -24,7 +24,8 @@ import { AppFontSize } from "../../../utils/size";
 import {
   FontFamily,
   FontSizes,
-  getLineHeight
+  getLineHeight,
+  LineHeightVariants
 } from "../../../common/design/font";
 
 interface HeadingProps extends TextProps {
@@ -36,7 +37,7 @@ interface HeadingProps extends TextProps {
   extraBold?: boolean;
   fontSize?: keyof typeof FontSizes;
   fontFamily?: keyof typeof FontFamily;
-  lineHeight?: "100%" | "150%";
+  lineHeight?: LineHeightVariants;
 }
 
 const extraBoldStyle = {
@@ -68,7 +69,7 @@ const Heading = ({
           color: color || colors.primary.heading,
           lineHeight:
             fontSize && lineHeight
-              ? getLineHeight(fontSize, lineHeight === "100%" ? 1 : 2)
+              ? getLineHeight(fontSize, lineHeight)
               : undefined
         },
         fontFamily

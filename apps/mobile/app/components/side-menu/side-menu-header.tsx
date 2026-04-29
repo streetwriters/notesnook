@@ -30,6 +30,7 @@ import { Pressable } from "../ui/pressable";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import { useSideBarDraggingStore } from "./dragging-store";
+import { Radius, Spacing } from "../../common/design/spacing";
 
 const SettingsIcon = () => {
   const { colors } = useThemeColors();
@@ -77,31 +78,31 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        borderBottomWidth: 1,
-        borderBottomColor: colors.primary.border,
-        paddingBottom: DefaultAppStyles.GAP,
         paddingHorizontal: DefaultAppStyles.GAP
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          gap: DefaultAppStyles.GAP_SMALL,
+          gap: Spacing.LEVEL_1,
           alignItems: "center"
         }}
       >
         <View
           style={{
             backgroundColor: "black",
-            width: 28,
-            height: 28,
-            borderRadius: 10
+            width: 26,
+            height: 26,
+            borderRadius: Radius.XS,
+            overflow: "hidden"
           }}
         >
-          <SvgView width={28} height={28} src={NOTESNOOK_LOGO_SVG} />
+          <SvgView width={26} height={26} src={NOTESNOOK_LOGO_SVG} />
         </View>
 
-        <Heading size={AppFontSize.lg}>Notesnook</Heading>
+        <Heading lineHeight="120%" fontSize="XL">
+          Notesnook
+        </Heading>
       </View>
 
       <View

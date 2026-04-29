@@ -36,10 +36,10 @@ export const STORE_LINK =
 export const GROUP = {
   default: "default",
   none: "none",
-  abc: "abc",
   year: "year",
+  month: "month",
   week: "week",
-  month: "month"
+  abc: "abc"
 };
 
 export const SORT = {

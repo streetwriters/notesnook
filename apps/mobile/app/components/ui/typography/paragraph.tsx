@@ -24,7 +24,8 @@ import { AppFontSize } from "../../../utils/size";
 import {
   FontFamily,
   FontSizes,
-  getLineHeight
+  getLineHeight,
+  LineHeightVariants
 } from "../../../common/design/font";
 
 interface ParagraphProps extends TextProps {
@@ -35,7 +36,7 @@ interface ParagraphProps extends TextProps {
   size?: number;
   fontSize?: keyof typeof FontSizes;
   fontFamily?: keyof typeof FontFamily;
-  lineHeight?: "100%" | "150%";
+  lineHeight?: LineHeightVariants;
 }
 const Paragraph = ({
   color,
@@ -43,7 +44,7 @@ const Paragraph = ({
   style,
   fontSize,
   fontFamily,
-  lineHeight = "100%",
+  lineHeight,
   ...restProps
 }: ParagraphProps) => {
   const { colors } = useThemeColors();
@@ -59,7 +60,7 @@ const Paragraph = ({
           fontFamily: fontFamily ? FontFamily[fontFamily] : FontFamily.REGULAR,
           lineHeight:
             fontSize && lineHeight
-              ? getLineHeight(fontSize, lineHeight === "100%" ? 1 : 2)
+              ? getLineHeight(fontSize, lineHeight)
               : undefined
         },
         style

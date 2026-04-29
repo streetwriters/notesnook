@@ -19,13 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { isReminderActive } from "@notesnook/core";
 import React from "react";
 import { ViewStyle } from "react-native";
-
 import { useThemeColors } from "@notesnook/theme";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize } from "../../../utils/size";
 import { Button, ButtonProps } from "../button";
 import { getFormattedReminderTime } from "@notesnook/common";
 import { Reminder } from "@notesnook/core";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { Radius } from "../../../common/design/spacing";
 
 export const ReminderTime = ({
   checkIsActive = true,
@@ -55,8 +55,9 @@ export const ReminderTime = ({
       title={time}
       key={reminder.id}
       icon="bell"
+      iconFamily="notesnook"
       fontSize={AppFontSize.xs}
-      iconSize={AppFontSize.sm}
+      iconSize={12}
       type="secondary"
       buttonType={
         isTodayOrTomorrow
@@ -70,7 +71,7 @@ export const ReminderTime = ({
       }}
       style={{
         height: "auto",
-        borderRadius: defaultBorderRadius,
+        borderRadius: Radius.XXS,
         borderColor: colors.primary.border,
         paddingHorizontal: DefaultAppStyles.GAP_SMALL,
         ...(style as ViewStyle)
