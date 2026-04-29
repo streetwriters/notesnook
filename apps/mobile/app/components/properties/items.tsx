@@ -27,7 +27,7 @@ import { Action, ActionId, useActions } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
