@@ -107,11 +107,9 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
     if (!response || "error" in response) return;
     switch (response.type) {
       case "email": {
-        const email = useUserStore.getState().user?.email;
         return {
           title: strings.yourSupportRequestHasBeenForwarded(),
-          message: strings.supportEmailMessage(email ?? ""),
-          email
+          message: strings.supportEmailMessage()
         };
       }
       case "discussion": {

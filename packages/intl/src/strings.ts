@@ -2058,8 +2058,8 @@ All attachments will be downloaded & cached again on access.
 Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**
 
 If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.`,
-  supportEmailMessage: (email: string) =>
-    t`Your support request has been forwarded to our support team. We will get back to you via email at ${email}. If this email is not reachable or incorrect, please send us an email directly at support@notesnook.com.`,
+  supportEmailMessage: () =>
+    t`Your support request has been forwarded to our support team. We will get back to you via email as soon as possible. If you don't receive an email from us within 24-48 hours, please send us an email directly at support@notesnook.com.`,
   featureRequestMessage: (
     url: string
   ) => t`You can track your feature request at [${url}](${url}).

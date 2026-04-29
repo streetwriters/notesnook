@@ -163,10 +163,9 @@ function showIssueReportedDialog(response: IssueReportResponse) {
 
   switch (response.type) {
     case "email": {
-      const email = userstore.get().user?.email;
       return ConfirmDialog.show({
         title: strings.yourSupportRequestHasBeenForwarded(),
-        message: strings.supportEmailMessage(email ?? "")
+        message: strings.supportEmailMessage()
       });
     }
     case "discussion": {
