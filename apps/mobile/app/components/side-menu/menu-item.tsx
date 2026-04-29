@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTotalNotes } from "../../hooks/use-db-item";
 
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
 import {
   eSubscribeEvent,
   subscribeToItemUpdate
@@ -32,14 +32,14 @@ import Navigation from "../../services/navigation";
 import useNavigationStore, {
   RouteParams
 } from "../../stores/use-navigation-store";
+import { useRelationStore } from "../../stores/use-relation-store";
 import { eAfterSync, eMenuItemUpdate } from "../../utils/events";
 import { SideMenuItem } from "../../utils/menu-items";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
+import { AppFontSize } from "../../utils/size";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
 import { useSideBarDraggingStore } from "./dragging-store";
-import { useRelationStore } from "../../stores/use-relation-store";
+import AppIcon from "../ui/AppIcon";
 
 export function MenuItem({
   item,
@@ -144,29 +144,31 @@ export function MenuItem({
       style={{
         width: "100%",
         alignSelf: "center",
-        borderRadius: defaultBorderRadius,
+        borderRadius: Radius.XS,
         flexDirection: "row",
-        paddingHorizontal: DefaultAppStyles.GAP_SMALL,
+        paddingHorizontal: Spacing.LEVEL_1,
         justifyContent: "space-between",
         alignItems: "center",
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+        paddingVertical: Spacing.LEVEL_1,
+        marginBottom: Spacing.LEVEL_0
       }}
     >
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: DefaultAppStyles.GAP_SMALL
+          gap: Spacing.LEVEL_1
         }}
       >
         {renderIcon ? (
           renderIcon(item, AppFontSize.md)
         ) : (
-          <Icon
+          <AppIcon
             style={{
               textAlignVertical: "center",
               textAlign: "left"
             }}
+            iconFamily="notesnook"
             allowFontScaling
             name={item.icon}
             color={
@@ -184,14 +186,15 @@ export function MenuItem({
           color={
             isFocused ? colors.selected.paragraph : colors.primary.paragraph
           }
-          size={AppFontSize.sm}
+          fontFamily={isFocused ? "MEDIUM" : "REGULAR"}
+          fontSize="SM"
         >
           {item.title}
         </Paragraph>
       </View>
 
       <Paragraph
-        size={AppFontSize.xxs}
+        fontSize="XS"
         color={
           isFocused ? colors.primary.paragraph : colors.secondary.paragraph
         }

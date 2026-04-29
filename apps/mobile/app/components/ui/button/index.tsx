@@ -26,7 +26,6 @@ import {
   ViewStyle,
   useWindowDimensions
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import NativeTooltip from "../../../utils/tooltip";
@@ -35,6 +34,7 @@ import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 import { Spacing } from "../../../common/design/spacing";
 import { FontFamily } from "../../../common/design/font";
+import AppIcon, { IconProps } from "../AppIcon";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
@@ -57,6 +57,7 @@ export interface ButtonProps extends PressableProps {
   bold?: boolean;
   iconColor?: ColorValue;
   iconStyle?: TextStyle;
+  iconFamily?: IconProps["iconFamily"];
   proTag?: boolean;
   allowFontScaling?: boolean;
 }
@@ -84,6 +85,7 @@ export const Button = ({
   fwdRef,
   proTag,
   iconStyle,
+  iconFamily,
   allowFontScaling = true,
   ...restProps
 }: ButtonProps) => {
@@ -142,8 +144,9 @@ export const Button = ({
         <ActivityIndicator color={textColor} size={fontSize + 4} />
       ) : null}
       {icon && !loading && iconPosition === "left" ? (
-        <Icon
+        <AppIcon
           name={icon}
+          iconFamily={iconFamily}
           allowFontScaling={allowFontScaling}
           style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
@@ -177,8 +180,9 @@ export const Button = ({
       )}
 
       {icon && !loading && iconPosition === "right" ? (
-        <Icon
+        <AppIcon
           name={icon}
+          iconFamily={iconFamily}
           allowFontScaling
           style={[iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}

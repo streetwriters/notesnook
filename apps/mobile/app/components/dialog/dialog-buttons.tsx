@@ -20,14 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
-import { getColorLinearShade } from "../../utils/colors";
+import { Spacing } from "../../common/design/spacing";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import { Button, ButtonProps } from "../ui/button";
-import Paragraph from "../ui/typography/paragraph";
 
 const DialogButtons = ({
   onPressPositive,
@@ -51,82 +48,39 @@ const DialogButtons = ({
   return (
     <View
       style={[
-        styles.container,
         {
-          backgroundColor: colors.secondary.background,
-          height: 60,
-          paddingHorizontal: DefaultAppStyles.GAP,
-          borderTopWidth: 0.7,
-          borderTopColor: getColorLinearShade(
-            colors.secondary.background,
-            0.05,
-            isDark
-          )
+          flexDirection: "row",
+          gap: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_4
         }
       ]}
     >
-      {doneText ? (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center"
-          }}
-        >
-          <Icon
-            color={colors.primary.accent}
-            name="check-circle-outline"
-            size={AppFontSize.md}
-          />
-          <Paragraph color={colors.primary.accent}>{" " + doneText}</Paragraph>
-        </View>
-      ) : loading ? (
-        <ActivityIndicator
-          size={AppFontSize.lg}
-          color={colors.primary.accent}
-        />
-      ) : (
-        <View />
-      )}
-
-      <View
+      <Button
+        onPress={onPressNegative}
+        fontSize={AppFontSize.sm}
+        testID={notesnook.ids.default.dialog.no}
+        type="plain-outline"
         style={{
-          flexDirection: "row",
-          alignItems: "center"
+          width: "48.5%"
         }}
-      >
+        title={negativeTitle}
+      />
+      {onPressPositive ? (
         <Button
-          onPress={onPressNegative}
+          onPress={onPressPositive}
           fontSize={AppFontSize.sm}
-          testID={notesnook.ids.default.dialog.no}
-          type="plain"
+          testID={notesnook.ids.default.dialog.yes}
+          style={{
+            width: "48.5%"
+          }}
+          loading={loading}
           bold
-          title={negativeTitle}
+          type={positiveType || "accent"}
+          title={positiveTitle}
         />
-        {onPressPositive ? (
-          <Button
-            onPress={onPressPositive}
-            fontSize={AppFontSize.sm}
-            testID={notesnook.ids.default.dialog.yes}
-            style={{
-              marginLeft: 10
-            }}
-            bold
-            type={positiveType || "transparent"}
-            title={positiveTitle}
-          />
-        ) : null}
-      </View>
+      ) : null}
     </View>
   );
 };
 
 export default DialogButtons;
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    flexDirection: "row",
-    marginTop: DefaultAppStyles.GAP_VERTICAL
-  }
-});
