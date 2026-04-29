@@ -40,6 +40,7 @@ import { getElevationStyle } from "../../../utils/elevation";
 import { defaultBorderRadius } from "../../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
 import { getContainerBorder } from "../../../utils/colors";
+import { Radius, Spacing } from "../../../common/design/spacing";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -127,53 +128,63 @@ export const AddNotebookSheet = ({
         ...getElevationStyle(5),
         width: DDS.isTab ? 400 : "85%",
         maxHeight: 450,
-        borderRadius: defaultBorderRadius,
+        borderRadius: Radius.LG,
         backgroundColor: colors.primary.background,
-        paddingTop: 12,
+        gap: Spacing.LEVEL_4,
+        paddingVertical: Spacing.LEVEL_4,
         ...getContainerBorder(colors.primary.border, 0.5),
         overflow: "hidden"
       }}
     >
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: Spacing.LEVEL_3,
+          gap: Spacing.LEVEL_4
         }}
       >
         <DialogHeader
           title={notebook ? strings.editNotebook() : strings.newNotebook()}
         />
 
-        <Input
-          fwdRef={titleInput}
-          testID={notesnook.ids.dialogs.notebook.inputs.title}
-          onChangeText={(value) => {
-            title.current = value;
+        <View
+          style={{
+            gap: Spacing.LEVEL_2
           }}
-          onLayout={() => {
-            setTimeout(() => {
-              titleInput?.current?.focus();
-            }, 300);
-          }}
-          placeholder={strings.enterNotebookTitle()}
-          onSubmit={() => {
-            descriptionInput.current?.focus();
-          }}
-          returnKeyLabel="Next"
-          returnKeyType="next"
-          defaultValue={notebook ? notebook.title : title.current}
-        />
+        >
+          <Input
+            fwdRef={titleInput}
+            testID={notesnook.ids.dialogs.notebook.inputs.title}
+            onChangeText={(value) => {
+              title.current = value;
+            }}
+            onLayout={() => {
+              setTimeout(() => {
+                titleInput?.current?.focus();
+              }, 300);
+            }}
+            placeholder={"eg. My Notebook"}
+            onSubmit={() => {
+              descriptionInput.current?.focus();
+            }}
+            label={strings.enterNotebookTitle()}
+            returnKeyLabel="Next"
+            returnKeyType="next"
+            defaultValue={notebook ? notebook.title : title.current}
+          />
 
-        <Input
-          fwdRef={descriptionInput}
-          testID={notesnook.ids.dialogs.notebook.inputs.description}
-          onChangeText={(value) => {
-            description.current = value;
-          }}
-          placeholder={strings.enterNotebookDescription()}
-          returnKeyLabel={strings.next()}
-          returnKeyType="next"
-          defaultValue={notebook ? notebook.description : ""}
-        />
+          <Input
+            fwdRef={descriptionInput}
+            testID={notesnook.ids.dialogs.notebook.inputs.description}
+            onChangeText={(value) => {
+              description.current = value;
+            }}
+            label={strings.enterNotebookDescription()}
+            placeholder={"eg. This is My Notebook"}
+            returnKeyLabel={strings.next()}
+            returnKeyType="next"
+            defaultValue={notebook ? notebook.description : ""}
+          />
+        </View>
       </View>
       <DialogButtons
         onPressNegative={() => {

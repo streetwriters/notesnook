@@ -29,6 +29,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { db } from "../../common/database";
 import { Item, Note } from "@notesnook/core";
 import AppIcon from "../ui/AppIcon";
+import { Radius, Spacing } from "../../common/design/spacing";
 export const DateMeta = ({ item }: { item: Item }) => {
   const { colors, isDark } = useThemeColors();
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -50,44 +51,52 @@ export const DateMeta = ({ item }: { item: Item }) => {
         key={key}
         style={{
           flexDirection: "row",
+          width: "48.5%",
           justifyContent: "space-between",
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2
+          backgroundColor: colors.secondary.background,
+          borderRadius: Radius.XS,
+          padding: Spacing.LEVEL_2,
+          gap: Spacing.LEVEL_1,
+          alignItems: "center"
         }}
       >
-        <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-          {strings.dateDescFromKey(
-            key as
-              | "dateDeleted"
-              | "dateEdited"
-              | "dateModified"
-              | "dateCreated"
-              | "dateUploaded"
-          )}
-        </Paragraph>
-        <Paragraph
-          size={AppFontSize.xs}
-          color={colors.secondary.paragraph}
-          onPress={
-            item.type !== "note"
-              ? undefined
-              : () => {
-                  setIsDatePickerVisible(true);
-                }
-          }
-        >
-          {getFormattedDate(
-            key === "dateCreated"
-              ? dateCreated
-              : (item[key as keyof Item] as string),
-            "date-time"
-          )}
-          {key === "dateCreated" && item.type === "note" ? (
-            <>
-              {" "}
-              <AppIcon name="pencil" size={AppFontSize.md} />
-            </>
-          ) : null}
-        </Paragraph>
+        <View>
+          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
+            {strings.dateDescFromKey(
+              key as
+                | "dateDeleted"
+                | "dateEdited"
+                | "dateModified"
+                | "dateCreated"
+                | "dateUploaded"
+            )}
+          </Paragraph>
+          <Paragraph
+            size={AppFontSize.xs}
+            color={colors.primary.paragraph}
+            fontFamily="MEDIUM"
+            onPress={
+              item.type !== "note"
+                ? undefined
+                : () => {
+                    setIsDatePickerVisible(true);
+                  }
+            }
+          >
+            {getFormattedDate(
+              key === "dateCreated"
+                ? dateCreated
+                : (item[key as keyof Item] as string),
+              "date-time"
+            )}
+          </Paragraph>
+        </View>
+
+        {key === "dateCreated" && item.type === "note" ? (
+          <>
+            <AppIcon name="edit-pencil" size={10} iconFamily="notesnook" />
+          </>
+        ) : null}
       </View>
     );
 
@@ -118,9 +127,10 @@ export const DateMeta = ({ item }: { item: Item }) => {
       <View
         style={{
           borderTopWidth: 1,
-          borderTopColor: colors.primary.border,
-          paddingHorizontal: DefaultAppStyles.GAP,
-          paddingTop: DefaultAppStyles.GAP_VERTICAL_SMALL
+          borderColor: colors.primary.border,
+          paddingVertical: Spacing.LEVEL_2,
+          flexDirection: "row",
+          gap: Spacing.LEVEL_2
         }}
       >
         {getDateMeta().map(renderItem)}
