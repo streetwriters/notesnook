@@ -36,7 +36,8 @@ import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
 import { RouteParams } from "../../../stores/use-navigation-store";
 import NotePreview from "../../note-history/preview";
-import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import SelectionWrapper from "../selection-wrapper";
+import { selectItem } from "../../../stores/use-selection-store";
 
 export const openNote = async (
   item: Note,
@@ -94,6 +95,7 @@ type NoteWrapperProps = {
   isRenderedInActionSheet: boolean;
   locked?: boolean;
   renderedInRoute?: keyof RouteParams;
+  hasGroupHeader?: boolean;
 };
 
 export const NoteWrapper = React.memo<
@@ -103,6 +105,7 @@ export const NoteWrapper = React.memo<
     item,
     index,
     isRenderedInActionSheet,
+    hasGroupHeader,
     ...restProps
   }: NoteWrapperProps) {
     const isTrash = item.type === "trash";
@@ -113,6 +116,7 @@ export const NoteWrapper = React.memo<
         onPress={() => openNote(item as Note, isTrash, isRenderedInActionSheet)}
         isSheet={isRenderedInActionSheet}
         item={item}
+        hasGroupHeader={hasGroupHeader}
         index={index}
         color={restProps.color?.colorCode}
       >

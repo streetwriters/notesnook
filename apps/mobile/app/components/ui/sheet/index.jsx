@@ -28,6 +28,8 @@ import { getContainerBorder } from "../../../utils/colors";
 import { NotesnookModule } from "../../../utils/notesnook-module";
 import { Toast } from "../../toast";
 import { useReduceMotion } from "../../../hooks/use-reduce-motion";
+import { Spacing } from "../../../common/design/spacing";
+
 /**
  *
  * @param {any} param0
@@ -71,8 +73,9 @@ const SheetWrapper = ({
       width: largeTablet || smallTablet ? width : "100%",
       backgroundColor: colors.primary.background,
       zIndex: 10,
-      borderTopRightRadius: 15,
-      borderTopLeftRadius: 15,
+      borderTopRightRadius: 35,
+      paddingTop: Spacing.LEVEL_4,
+      borderTopLeftRadius: 35,
       alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0,

@@ -58,6 +58,7 @@ export type DialogInfo = {
     onFormSubmit?: (form: FormRef) => Promise<boolean>;
   };
   input: boolean;
+  inputLabel?: string;
   inputPlaceholder: string;
   defaultValue: string;
   // eslint-disable-next-line @typescript-eslint/ban-types
