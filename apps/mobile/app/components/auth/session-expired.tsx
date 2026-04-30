@@ -45,7 +45,7 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { LoginSteps, useLogin } from "./use-login";
+import { useLogin } from "./use-login";
 import { strings } from "@notesnook/intl";
 import { getObfuscatedEmail } from "../../utils/functions";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -195,24 +195,22 @@ export const SessionExpired = () => {
             </Paragraph>
           </View>
 
-          {step === LoginSteps.passwordAuth ? (
-            <FormInput
-              fwdRef={passwordInputRef}
-              formRef={formRef}
-              name="password"
-              validators={[validators.required(strings.passwordRequired())]}
-              returnKeyLabel={strings.done()}
-              returnKeyType="next"
-              secureTextEntry
-              autoComplete="password"
-              autoCapitalize="none"
-              autoCorrect={false}
-              placeholder={strings.password()}
-              onSubmitEditing={() => {
-                login();
-              }}
-            />
-          ) : null}
+          <FormInput
+            fwdRef={passwordInputRef}
+            formRef={formRef}
+            name="password"
+            validators={[validators.required(strings.passwordRequired())]}
+            returnKeyLabel={strings.done()}
+            returnKeyType="next"
+            secureTextEntry
+            autoComplete="password"
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder={strings.password()}
+            onSubmitEditing={() => {
+              login();
+            }}
+          />
 
           <Button
             style={{
