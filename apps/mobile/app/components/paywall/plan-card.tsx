@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SKUResponse } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   Text,
@@ -29,6 +28,7 @@ import {
 } from "react-native";
 import * as RNIap from "react-native-iap";
 //@ts-ignore
+import { Radius, Spacing } from "../../common/design/spacing";
 import usePricingPlans, {
   PlanOverView,
   PricingPlan
@@ -36,12 +36,11 @@ import usePricingPlans, {
 import PremiumService from "../../services/premium";
 import { getElevationStyle } from "../../utils/elevation";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import AppIcon from "../ui/AppIcon";
+import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Steps } from "./common";
-import { Radius, Spacing } from "../../common/design/spacing";
-import AppIcon from "../ui/AppIcon";
-import { Button } from "../ui/button";
 
 export const PricingPlanCard = ({
   plan,
@@ -55,7 +54,10 @@ export const PricingPlanCard = ({
   setStep: (step: number) => void;
 }) => {
   const { colors } = useThemeColors();
-  const [regionalDiscount, setRegionaDiscount] = useState<SKUResponse>();
+  const regionalDiscount =
+    plan.id === "pro" && annualBilling
+      ? pricingPlans?.regionalDiscount
+      : undefined;
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
 
@@ -77,26 +79,6 @@ export const PricingPlanCard = ({
     pricingPlans.hasTrialOffer(plan.id, product?.productId) ? 1 : 0,
     annualBilling
   );
-
-  useEffect(() => {
-    if (pricingPlans?.isGithubRelease || !annualBilling) return;
-    pricingPlans
-      ?.getRegionalDiscount(
-        plan.id,
-        pricingPlans.isGithubRelease
-          ? (WebPlan?.period as string)
-          : `notesnook.${plan.id}.${annualBilling ? "yearly" : "monthly"}`
-      )
-      .then((value) => {
-        setRegionaDiscount(value);
-      });
-  }, [WebPlan?.period, annualBilling, plan.id, pricingPlans]);
-
-  useEffect(() => {
-    if (!annualBilling) {
-      setRegionaDiscount(undefined);
-    }
-  }, [annualBilling]);
 
   const isSubscribed =
     product?.productId &&
