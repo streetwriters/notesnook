@@ -948,6 +948,10 @@ msgstr ""
 msgid "Are you sure you want to logout from this device? Any unsynced changes will be lost."
 msgstr ""
 
+#: src/strings.ts:2680
+msgid "Are you sure you want to open this file: {filePath}?"
+msgstr ""
+
 #: src/strings.ts:1046
 msgid "Are you sure you want to remove your name?"
 msgstr ""
@@ -2922,6 +2926,10 @@ msgstr ""
 msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
 msgstr ""
 
+#: src/strings.ts:2682
+msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
+msgstr ""
+
 #: src/strings.ts:949
 msgid "File mismatch"
 msgstr ""
@@ -4489,6 +4497,10 @@ msgstr ""
 
 #: src/strings.ts:983
 msgid "Open the two-factor authentication (TOTP) app to view your authentication code."
+msgstr ""
+
+#: src/strings.ts:2678
+msgid "Opening local file"
 msgstr ""
 
 #: src/strings.ts:1857

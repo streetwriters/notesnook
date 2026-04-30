@@ -948,6 +948,10 @@ msgstr "Are you sure you want to logout and clear all data stored on THIS DEVICE
 msgid "Are you sure you want to logout from this device? Any unsynced changes will be lost."
 msgstr "Are you sure you want to logout from this device? Any unsynced changes will be lost."
 
+#: src/strings.ts:2680
+msgid "Are you sure you want to open this file: {filePath}?"
+msgstr "Are you sure you want to open this file: {filePath}?"
+
 #: src/strings.ts:1046
 msgid "Are you sure you want to remove your name?"
 msgstr "Are you sure you want to remove your name?"
@@ -2933,6 +2937,10 @@ msgstr "File length is 0. Please upload this file again from the attachment mana
 msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
 msgstr "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
 
+#: src/strings.ts:2682
+msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
+msgstr "File links cannot be opened in browsers. Please use the Notesnook desktop app."
+
 #: src/strings.ts:949
 msgid "File mismatch"
 msgstr "File mismatch"
@@ -4516,6 +4524,10 @@ msgstr "Open source."
 #: src/strings.ts:983
 msgid "Open the two-factor authentication (TOTP) app to view your authentication code."
 msgstr "Open the two-factor authentication (TOTP) app to view your authentication code."
+
+#: src/strings.ts:2678
+msgid "Opening local file"
+msgstr "Opening local file"
 
 #: src/strings.ts:1857
 msgid "Optional"
