@@ -2667,5 +2667,10 @@ Use this if changes from other devices are not appearing on this device. This wi
   attachmentDeleted: () => t`Attachment deleted`,
   titleIsRequired: () => t`Title is required`,
   nameIsRequired: () => t`Name is required.`,
-  currentPasswordRequired: () => t`Current password required`
+  currentPasswordRequired: () => t`Current password required`,
+  loginToRestoreAttachments: () => t`Login required to restore attachments`,
+  loginToRestoreAttachmentsDesc: () =>
+    t`You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).
+  
+Continue without attachments?`
 };

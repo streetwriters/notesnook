@@ -3789,6 +3789,10 @@ msgstr "Login failed"
 msgid "Login required"
 msgstr "Login required"
 
+#: src/strings.ts:2671
+msgid "Login required to restore attachments"
+msgstr "Login required to restore attachments"
+
 #: src/strings.ts:779
 msgid "Login successful"
 msgstr "Login successful"
@@ -7489,6 +7493,16 @@ msgstr "You have unsynced notes. Take a backup or sync your notes to avoid losin
 #: src/strings.ts:1634
 msgid "You must log out in order to change/reset server URLs."
 msgstr "You must log out in order to change/reset server URLs."
+
+#: src/strings.ts:2673
+msgid ""
+"You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
+"  \n"
+"Continue without attachments?"
+msgstr ""
+"You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
+"  \n"
+"Continue without attachments?"
 
 #: src/strings.ts:836
 msgid "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source"

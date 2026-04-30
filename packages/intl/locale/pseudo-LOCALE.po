@@ -3769,6 +3769,10 @@ msgstr ""
 msgid "Login required"
 msgstr ""
 
+#: src/strings.ts:2671
+msgid "Login required to restore attachments"
+msgstr ""
+
 #: src/strings.ts:779
 msgid "Login successful"
 msgstr ""
@@ -7430,6 +7434,13 @@ msgstr ""
 
 #: src/strings.ts:1634
 msgid "You must log out in order to change/reset server URLs."
+msgstr ""
+
+#: src/strings.ts:2673
+msgid ""
+"You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
+"  \n"
+"Continue without attachments?"
 msgstr ""
 
 #: src/strings.ts:836
