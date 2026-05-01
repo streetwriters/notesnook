@@ -28,7 +28,8 @@ import { Icon } from "@notesnook/ui";
 import { useIsMobile } from "../stores/toolbar-store.js";
 
 export type ToolButtonProps = ButtonProps & {
-  icon: IconNames;
+  icon?: IconNames;
+  text?: string;
   iconColor?: SchemeColors;
   iconSize?: keyof Theme["iconSizes"] | number;
   toggled?: boolean;
@@ -40,6 +41,7 @@ export const ToolButton = React.memo(
     const {
       id,
       icon,
+      text,
       iconSize,
       iconColor,
       toggled,
@@ -81,11 +83,15 @@ export const ToolButton = React.memo(
         }}
         {...buttonProps}
       >
-        <Icon
-          path={Icons[icon]}
-          color={iconColor || (toggled ? "icon-selected" : "icon")}
-          size={iconSize || (variant === "small" ? "medium" : "big")}
-        />
+        {icon ? (
+          <Icon
+            path={Icons[icon]}
+            color={iconColor || (toggled ? "icon-selected" : "icon")}
+            size={iconSize || (variant === "small" ? "medium" : "big")}
+          />
+        ) : (
+          text
+        )}
       </Button>
     );
   },

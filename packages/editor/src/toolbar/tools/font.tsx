@@ -29,6 +29,11 @@ import { getFont, getFontById, getFonts } from "../../utils/font.js";
 import { CodeBlock } from "../../extensions/code-block/index.js";
 import { strings } from "@notesnook/intl";
 
+const FONT_SIZES = [
+  8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 42, 48, 56, 64, 72, 80,
+  96, 120
+];
+
 export function FontSize(props: ToolProps) {
   const { editor } = props;
   const defaultFontSize = useToolbarStore((store) => store.fontSize);
@@ -45,6 +50,30 @@ export function FontSize(props: ToolProps) {
     return Math.min(120, fontSizeAsNumber.current + 1);
   }, [fontSizeAsNumber]);
 
+  const currentSize = fontSize
+    ? parseInt(fontSize.replace("px", "")) || defaultFontSize
+    : defaultFontSize;
+
+  const menuItems: MenuItem[] = useMemo(
+    () => [
+      {
+        key: "default",
+        type: "button" as const,
+        title: strings.default(),
+        onClick: () =>
+          editor.chain().focus().setFontSize(`${defaultFontSize}px`).run()
+      },
+      ...FONT_SIZES.map((size) => ({
+        key: String(size),
+        type: "button" as const,
+        title: `${size}px`,
+        isChecked: currentSize === size,
+        onClick: () => editor.chain().focus().setFontSize(`${size}px`).run()
+      }))
+    ],
+    [editor, currentSize, defaultFontSize]
+  );
+
   return (
     <Counter
       title={strings.fontSize()}
@@ -59,6 +88,7 @@ export function FontSize(props: ToolProps) {
         editor.chain().focus().setFontSize(`${defaultFontSize}px`).run()
       }
       value={fontSize || `${defaultFontSize}px`}
+      menuItems={menuItems}
     />
   );
 }

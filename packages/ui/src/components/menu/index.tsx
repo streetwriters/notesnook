@@ -226,7 +226,12 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      <ScrollContainer suppressScrollX>{children}</ScrollContainer>
+      <ScrollContainer
+        suppressScrollX
+        onWheel={(e) => e.stopPropagation()}
+      >
+        {children}
+      </ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}
     </Box>
   );
