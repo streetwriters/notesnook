@@ -18,33 +18,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PAGE_VISIBILITY_CHANGE } from "./page-visibility";
-import { updateStatus, removeStatus } from "../hooks/use-status";
 import { strings } from "@notesnook/intl";
+import { TaskManager } from "../common/task-manager";
 
 type FilePickerOptions = { acceptedFileTypes: string; multiple?: boolean };
 
-export function showFilePicker({
+export async function showFilePicker({
   acceptedFileTypes,
   multiple
 }: FilePickerOptions): Promise<File[]> {
-  return new Promise((resolve) => {
-    PAGE_VISIBILITY_CHANGE.ignore = true;
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("multiple", `${multiple || false}`);
-    input.setAttribute("accept", acceptedFileTypes);
-    input.dispatchEvent(new MouseEvent("click"));
-    updateStatus({ key: "processingFiles", status: strings.processing() });
-    input.oncancel = async function () {
-      removeStatus("processingFiles");
-      resolve([]);
-    };
-    input.onchange = async function () {
-      removeStatus("processingFiles");
-      if (!input.files) return resolve([]);
-      resolve(Array.from(input.files));
-    };
+  PAGE_VISIBILITY_CHANGE.ignore = true;
+  const input = document.createElement("input");
+  input.setAttribute("type", "file");
+  input.setAttribute("multiple", `${multiple || false}`);
+  input.setAttribute("accept", acceptedFileTypes);
+  input.dispatchEvent(new MouseEvent("click"));
+  const result = await TaskManager.startTask<File[]>({
+    type: "modal",
+    title: strings.processing(),
+    subtitle: strings.pleaseWait(),
+    action: () =>
+      new Promise((resolve) => {
+        input.oncancel = async function () {
+          resolve([]);
+        };
+        input.onchange = async function () {
+          if (!input.files) return resolve([]);
+          resolve(Array.from(input.files));
+        };
+      })
   });
+  return result instanceof Error ? [] : result;
 }
 
 export async function readFile(file: File): Promise<string> {
