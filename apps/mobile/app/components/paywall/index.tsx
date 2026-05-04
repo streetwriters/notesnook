@@ -31,7 +31,17 @@ import {
 import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { TRUST_BAR_SVG } from "../../assets/images/assets";
+import {
+  ANDROID_POLICE_SVG,
+  APPLE_INSIDER,
+  FREEDOM_PRESS_SVG,
+  NESS_LABS,
+  PRIVACY_GUIDES_SVG,
+  TECHLORE_SVG,
+  THE_VERGE_SVG,
+  TRUST_BAR_SVG,
+  XDA_SVG
+} from "../../assets/images/assets";
 import { db } from "../../common/database";
 import { Radius, Spacing } from "../../common/design/spacing";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
@@ -55,6 +65,57 @@ import { ComparePlans } from "./compare-plans";
 import { FAQItem } from "./faq-item";
 import { PricingPlanCard } from "./plan-card";
 import { ReviewItem } from "./review-item";
+
+const PRESS_LOGOS = [
+  {
+    id: "android-police",
+    src: ANDROID_POLICE_SVG,
+    width: 120,
+    height: 14
+  },
+  {
+    id: "the-verge",
+    src: THE_VERGE_SVG,
+    width: 67,
+    height: 14
+  },
+  {
+    id: "freedom-press",
+    src: FREEDOM_PRESS_SVG,
+    width: 80,
+    height: 12
+  },
+  {
+    id: "privacy-guides",
+    src: PRIVACY_GUIDES_SVG,
+    width: 110,
+    height: 16
+  },
+  {
+    id: "techlore",
+    src: TECHLORE_SVG,
+    width: 72,
+    height: 14
+  },
+  {
+    id: "apple-insider",
+    src: APPLE_INSIDER,
+    width: 76,
+    height: 13
+  },
+  {
+    id: "xda",
+    src: XDA_SVG,
+    width: 40,
+    height: 12
+  },
+  {
+    id: "ness-labs",
+    src: NESS_LABS,
+    width: 39,
+    height: 23
+  }
+];
 
 const PayWall = (props: NavigationProps<"PayWall">) => {
   const isGithubRelease = Config.GITHUB_RELEASE === "true";
@@ -149,45 +210,66 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
             height: 50,
             justifyContent: "flex-end",
             alignItems: "flex-end",
-            width: "100%",
             flexDirection: "row",
             paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           <IconButton
             name="close"
+            iconFamily="notesnook"
             testID="paywall-close"
             color={colors.primary.icon}
-            size={25}
+            size={18}
             onPress={() => {
               Navigation.navigate("FluidPanelsView", {});
             }}
           />
         </View>
       ) : (
-        <Header
-          canGoBack={true}
-          onLeftMenuButtonPress={() => {
-            if (step === Steps.buy) {
-              setStep(Steps.select);
-              return;
-            }
-            if (routeParams.context === "signup") {
-              Navigation.navigate("FluidPanelsView", {});
-            } else {
-              Navigation.goBack();
-            }
+        <View
+          style={{
+            height: 50,
+            justifyContent: "flex-start",
+            flexShrink: 1,
+            flexGrow: 1,
+            flexDirection: "row",
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
-          title={
-            step === Steps.buy || step === Steps.buyWeb
-              ? pricingPlans.userCanRequestTrial
-                ? strings.tryPlanForFree(
-                    pricingPlans.currentPlan?.name as string
-                  )
-                : strings.plan(pricingPlans.currentPlan?.name as string)
-              : ""
-          }
-        />
+        >
+          <IconButton
+            name="arrow-back"
+            iconFamily="notesnook"
+            testID="paywall-close"
+            color={colors.primary.icon}
+            size={18}
+            onPress={() => {
+              Navigation.navigate("FluidPanelsView", {});
+            }}
+          />
+        </View>
+        // <Header
+        //   canGoBack={true}
+        //   onLeftMenuButtonPress={() => {
+        //     if (step === Steps.buy) {
+        //       setStep(Steps.select);
+        //       return;
+        //     }
+        //     if (routeParams.context === "signup") {
+        //       Navigation.navigate("FluidPanelsView", {});
+        //     } else {
+        //       Navigation.goBack();
+        //     }
+        //   }}
+        //   title={
+        //     step === Steps.buy || step === Steps.buyWeb
+        //       ? pricingPlans.userCanRequestTrial
+        //         ? strings.tryPlanForFree(
+        //             pricingPlans.currentPlan?.name as string
+        //           )
+        //         : strings.plan(pricingPlans.currentPlan?.name as string)
+        //       : ""
+        //   }
+        // />
       )}
 
       {step === Steps.select ? (
@@ -303,7 +385,9 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                       padding: Spacing.LEVEL_0
                     }}
                   >
-                    <Paragraph>-20%</Paragraph>
+                    <Paragraph color={colors.primary.accentForeground}>
+                      -20%
+                    </Paragraph>
                   </View>
                 </Pressable>
               </View>
@@ -395,17 +479,35 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
 
             <View
               style={{
-                width: "100%"
+                width: "100%",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: Spacing.LEVEL_1,
+                paddingVertical: Spacing.LEVEL_7
               }}
             >
-              <SvgView
-                src={TRUST_BAR_SVG}
-                style={{
-                  height: 230,
-                  width: undefined,
-                  paddingVertical: Spacing.LEVEL_7
-                }}
-              />
+              {PRESS_LOGOS.map((item) => (
+                <View
+                  key={item.id}
+                  style={{
+                    backgroundColor: colors.secondary.background,
+                    paddingVertical: Spacing.LEVEL_3,
+                    paddingHorizontal: Spacing.LEVEL_2,
+                    borderRadius: Radius.XS,
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <SvgView
+                    src={item.src}
+                    style={{
+                      width: item.width,
+                      height: item.height
+                    }}
+                  />
+                </View>
+              ))}
             </View>
 
             <View>
