@@ -98,9 +98,9 @@ export const IconButton = ({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: 100,
-        width: 40 * growFactor,
-        height: 40 * growFactor,
+        // borderRadius: 100,
+        width: size,
+        height: size,
         ...style
       }}
     >

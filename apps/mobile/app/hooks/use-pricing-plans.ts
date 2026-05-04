@@ -759,7 +759,10 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
     },
     regionalDiscount: regionalDiscount.result,
     isGithubRelease: isGithubRelease,
-    isSubscribed: () => user?.subscription?.plan !== SubscriptionPlan.FREE,
+    isSubscribed: () =>
+      user &&
+      user.subscription &&
+      user?.subscription?.plan !== SubscriptionPlan.FREE,
     finish: () => options?.onBuy?.()
   };
 };
