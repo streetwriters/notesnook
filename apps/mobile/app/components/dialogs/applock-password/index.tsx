@@ -201,12 +201,14 @@ export const AppLockPassword = () => {
               accountPass
                 ? strings.enterAccountPassword()
                 : mode === "change"
-                ? keyboardType === "pin"
-                  ? strings.newPin()
-                  : strings.newPassword()
-                : `${
-                    keyboardType === "pin" ? strings.pin() : strings.password()
-                  }`
+                  ? keyboardType === "pin"
+                    ? strings.newPin()
+                    : strings.newPassword()
+                  : `${
+                      keyboardType === "pin"
+                        ? strings.pin()
+                        : strings.password()
+                    }`
             }
           />
 
@@ -364,7 +366,9 @@ export const AppLockPassword = () => {
                 SettingsService.getProperty("biometricsAuthEnabled") === false
               ) {
                 SettingsService.setProperty("appLockEnabled", false);
-                SettingsService.setPrivacyScreen(SettingsService.get());
+                SettingsService.setPrivacyScreen(
+                  SettingsService.getProperty("privacyScreen")
+                );
                 ToastManager.show({
                   message: strings.applockDisabled(),
                   type: "success"
@@ -383,8 +387,8 @@ export const AppLockPassword = () => {
             mode === "remove"
               ? strings.remove()
               : mode === "change"
-              ? strings.change()
-              : strings.save()
+                ? strings.change()
+                : strings.save()
           }
           negativeTitle={strings.cancel()}
           positiveType="transparent"

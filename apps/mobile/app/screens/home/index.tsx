@@ -70,6 +70,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         <List
           data={notes}
           dataType="note"
+          groupType="home"
           renderedInRoute={route.name}
           loading={loading || !isFocused}
           headerTitle={strings.routes[route.name]()}

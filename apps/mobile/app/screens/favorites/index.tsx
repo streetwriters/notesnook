@@ -70,6 +70,7 @@ export const Favorites = ({
         <List
           data={favorites}
           dataType="note"
+          groupType="favorites"
           onRefresh={() => {
             refresh();
           }}

@@ -185,6 +185,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         <List
           data={notes}
           dataType="note"
+          groupType="notes"
           onRefresh={() => {
             onRequestUpdate();
           }}

@@ -213,7 +213,7 @@ export function normalizeToHtmlBody(input: string) {
   return `<html><body>${source}</body></html>`;
 }
 
-export function extractHeadline(html: string) {
+export function extractHeadline(html: string, characterLimit: number) {
   let text = "";
   let start = false;
   const parser = new Parser(
@@ -229,7 +229,14 @@ export function extractHeadline(html: string) {
         }
       },
       ontext: (data) => {
-        if (start) text += data;
+        if (start) {
+          text += data;
+          if (text.length > characterLimit) {
+            text = text.slice(0, characterLimit);
+            parser.pause();
+            parser.end();
+          }
+        }
       }
     },
     {

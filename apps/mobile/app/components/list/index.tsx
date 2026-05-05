@@ -53,6 +53,7 @@ type ListProps = {
   isRenderedInActionSheet?: boolean;
   CustomListComponent?: React.JSX.ElementType;
   placeholder?: PlaceholderData;
+  groupType: GroupingKey;
   id?: string;
 };
 
@@ -73,16 +74,7 @@ export default function List(props: ListProps) {
     props.dataType === "notebook" ||
     notebooksListMode === "compact";
 
-  const groupType =
-    props.renderedInRoute === "Notes"
-      ? "home"
-      : props.renderedInRoute === "Favorites"
-        ? "favorites"
-        : props.renderedInRoute === "Trash" || props.dataType === "trash"
-          ? "trash"
-          : `${props.dataType}s`;
-
-  const groupOptions = useGroupOptions(groupType);
+  const groupOptions = useGroupOptions(props.groupType);
 
   const _onRefresh = async () => {
     Sync.run("global", false, "full", () => {
@@ -105,7 +97,7 @@ export default function List(props: ListProps) {
           isSheet={props.isRenderedInActionSheet || false}
           items={props.data}
           groupOptions={groupOptions}
-          group={groupType as GroupingKey}
+          group={props.groupType as GroupingKey}
           renderedInRoute={props.renderedInRoute}
           customAccentColor={props.customAccentColor}
           dataType={props.dataType}
@@ -115,7 +107,7 @@ export default function List(props: ListProps) {
     },
     [
       groupOptions,
-      groupType,
+      props.groupType,
       props.customAccentColor,
       props.data,
       props.dataType,

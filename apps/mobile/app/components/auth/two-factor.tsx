@@ -27,14 +27,15 @@ import useTimer from "../../hooks/use-timer";
 import { eSendEvent, ToastManager } from "../../services/event-manager";
 import { eCloseSimpleDialog } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
+import { presentDialog } from "../dialog/functions";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../utils/styles";
-import { presentDialog } from "../dialog/functions";
 
 type MFAInfo = {
   primaryMethod: string;
@@ -52,7 +53,8 @@ const TwoFactorVerification = ({
       method: string;
       code: string;
     },
-    callback: (result: any) => void
+    callback: (result: any) => void,
+    onerror: (e: Error) => void
   ) => Promise<void>;
   mfaInfo: MFAInfo;
   onCancel: () => void;
@@ -66,15 +68,26 @@ const TwoFactorVerification = ({
     method: mfaInfo?.primaryMethod,
     isPrimary: true
   });
-  const { seconds, start, reset } = useTimer(currentMethod.method!);
+  const { seconds, start, reset, secondsRef } = useTimer(currentMethod.method!);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
 
   const onNext = async () => {
-    if (!code.current || code.current.length < 6 || !currentMethod.method)
+    if (!code.current || code.current.length < 6) {
+      setError(
+        new Error("Please provide a valid multi-factor authentication code.")
+      );
       return;
+    }
+
+    if (!currentMethod.method) {
+      return;
+    }
+
     setLoading(true);
+    setError(undefined);
     inputRef.current?.blur();
     await onMfaLogin(
       {
@@ -86,6 +99,9 @@ const TwoFactorVerification = ({
           eSendEvent(eCloseSimpleDialog, "two_factor_verify");
         }
         setLoading(false);
+      },
+      (e) => {
+        setError(e);
       }
     );
     setLoading(false);
@@ -131,7 +147,7 @@ const TwoFactorVerification = ({
   };
 
   const onSendCode = useCallback(async () => {
-    if (seconds || sending) return;
+    if (secondsRef.current || sending) return;
     setSending(true);
     try {
       await db.mfa.sendCode(currentMethod.method as "sms" | "email");
@@ -139,15 +155,18 @@ const TwoFactorVerification = ({
       setSending(false);
     } catch (e) {
       setSending(false);
-      ToastManager.error(e as Error, "Error sending 2FA Code", "local");
+      setError(
+        new Error(`Error sending 2FA Code. Tap "Send code" to try again `)
+      );
     }
-  }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
+  }, [currentMethod.method, secondsRef, sending, start]);
 
   useEffect(() => {
     if (currentMethod.method === "sms" || currentMethod.method === "email") {
       onSendCode();
     }
-  }, [currentMethod.method, onSendCode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMethod.method]);
 
   return (
     <ScrollView
@@ -234,6 +253,7 @@ const TwoFactorVerification = ({
               fwdRef={inputRef}
               textAlign="center"
               onChangeText={(value) => {
+                setError(undefined);
                 code.current = value;
               }}
               cursorColor={colors.selected.accent}
@@ -241,6 +261,7 @@ const TwoFactorVerification = ({
               selectionColor={colors.selected.accent}
               onSubmitEditing={onNext}
               height={60}
+              marginBottom={0}
               inputStyle={{
                 fontSize: AppFontSize.lg,
                 textAlign: "center",
@@ -254,10 +275,26 @@ const TwoFactorVerification = ({
               containerStyle={{
                 minWidth: "50%"
               }}
-              wrapperStyle={{
-                height: 60
-              }}
             />
+            {error ? (
+              <Paragraph
+                numberOfLines={4}
+                onPress={() => {}}
+                color={colors.error.accent}
+                style={{
+                  textAlign: "center",
+                  marginVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  maxWidth: 250
+                }}
+              >
+                <AppIcon
+                  color={colors.error.accent}
+                  name="alert-circle-outline"
+                  size={AppFontSize.sm - 1}
+                />{" "}
+                {error?.message}
+              </Paragraph>
+            ) : null}
 
             <Button
               title={loading ? null : strings.next()}
@@ -338,7 +375,8 @@ TwoFactorVerification.present = (
       method: string;
       code: string;
     },
-    callback: (result: any) => void
+    callback: (result: any) => void,
+    onerror: (e: Error) => void
   ) => Promise<void>,
   data: MFAInfo,
   onCancel: () => void,

@@ -31,6 +31,7 @@ import { eSendEvent } from "../../../services/event-manager";
 import { eOnLoadNote } from "../../../utils/events";
 import { IconButton } from "../../ui/icon-button";
 import { fluidTabsRef } from "../../../utils/global-refs";
+import { useSettingStore } from "../../../stores/use-setting-store";
 type SearchResultProps = {
   item: HighlightedResult;
 };
@@ -38,6 +39,9 @@ type SearchResultProps = {
 export const SearchResult = (props: SearchResultProps) => {
   const [expanded, setExpanded] = React.useState(true);
   const { colors } = useThemeColors();
+  const compactMode = useSettingStore(
+    (state) => state.settings.searchListMode === "compact"
+  );
 
   const openNote = async (index?: number) => {
     const note = await db.notes.note(props.item.id);
@@ -87,7 +91,7 @@ export const SearchResult = (props: SearchResultProps) => {
             flexShrink: 1
           }}
         >
-          {props.item.content?.length ? (
+          {props.item.content?.length && !compactMode ? (
             <IconButton
               name={!expanded ? "chevron-right" : "chevron-down"}
               onPress={() => setExpanded((prev) => !prev)}
@@ -130,6 +134,7 @@ export const SearchResult = (props: SearchResultProps) => {
       </View>
 
       {expanded &&
+        !compactMode &&
         props.item.content.map((content, index) => (
           <Pressable
             key={props.item.id + index}

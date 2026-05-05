@@ -58,6 +58,7 @@ export type Settings = {
   appLockMode?: "none" | "background" | "launch";
   notebooksListMode?: "normal" | "compact";
   notesListMode?: "normal" | "compact";
+  searchListMode?: "normal" | "compact";
   devMode?: boolean;
   notifNotes?: boolean;
   pitchBlack?: boolean;
@@ -175,6 +176,7 @@ export const defaultSettings: SettingStore["settings"] = {
   appLockMode: "none",
   notebooksListMode: "normal",
   notesListMode: "normal",
+  searchListMode: "normal",
   devMode: false,
   notifNotes: false,
   pitchBlack: false,

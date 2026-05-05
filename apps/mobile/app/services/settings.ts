@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { NativeModules, Platform } from "react-native";
-//@ts-ignore
-import { enabled } from "react-native-privacy-snapshot";
+import { Platform } from "react-native";
 import { MMKV } from "../common/database/mmkv";
 import {
   SettingStore,
@@ -31,6 +29,7 @@ import { scale, updateSize } from "../utils/size";
 import { DatabaseLogger } from "../common/database";
 import { useUserStore } from "../stores/use-user-store";
 import ScreenGuardModule from "react-native-screenguard";
+ScreenGuardModule.initSettings();
 
 function reset() {
   const settings = get();
@@ -54,11 +53,10 @@ function resetSettings() {
     defaultSnoozeTime: get().defaultSnoozeTime,
     defaultFontFamily: get().defaultFontFamily,
     defaultFontSize: get().defaultFontSize,
-    privacyScreen: get().privacyScreen,
     corsProxy: get().corsProxy,
     showBackupCompleteSheet: get().showBackupCompleteSheet
   };
-
+  setPrivacyScreen(false);
   MMKV.setString("appSettings", JSON.stringify(settings));
   set(settings);
   init();
@@ -101,6 +99,7 @@ function migrateSettings(settings: SettingStore["settings"]) {
     settings.privacyScreen = settings.appLockEnabled
       ? true
       : settings.privacyScreen;
+    setPrivacyScreen(settings.privacyScreen);
     MMKV.setString("appSettings", JSON.stringify(settings));
   }
 }
@@ -126,28 +125,21 @@ function init() {
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
   migrateAppLock();
-  setPrivacyScreen(settings);
 }
 
-function setPrivacyScreen(settings: SettingStore["settings"]) {
-  if (settings.privacyScreen) {
+function setPrivacyScreen(enabled?: boolean) {
+  if (enabled) {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(true);
+      ScreenGuardModule.registerWithoutEffect();
     } else {
-      enabled(true);
-      if (NativeModules.ScreenGuard) {
-        ScreenGuardModule.register({ backgroundColor: "#000000" });
-      }
+      ScreenGuardModule.register({ backgroundColor: "#000000" });
     }
   } else {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(false);
-    } else {
-      enabled(false);
-      if (NativeModules.ScreenGuard) {
-        ScreenGuardModule.unregister();
-      }
     }
+    ScreenGuardModule.unregister();
   }
 }
 

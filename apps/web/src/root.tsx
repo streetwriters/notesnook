@@ -34,6 +34,7 @@ import AppLock from "./views/app-lock";
 import { Text } from "@theme-ui/components";
 import { EV, EVENTS } from "@notesnook/core";
 import { useEffect, useState } from "react";
+import { isAuthRoute } from "./navigation/auth-routes";
 
 export async function startApp(children?: React.ReactNode) {
   const rootElement = document.getElementById("root");
@@ -57,7 +58,7 @@ export async function startApp(children?: React.ReactNode) {
 
     root.render(
       <>
-        <TitleBar />
+        <TitleBar force={isAuthRoute()} />
         <ErrorBoundary>
           <GlobalErrorHandler>
             <BaseThemeProvider

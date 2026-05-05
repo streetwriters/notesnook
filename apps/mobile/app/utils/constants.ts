@@ -48,7 +48,8 @@ export const SORT = {
   dateCreated: "Date created",
   title: "Title",
   dueDate: "Due date",
-  relevance: "Relevance"
+  relevance: "Relevance",
+  dateDeleted: "Date deleted"
 };
 
 export const itemSkus = [

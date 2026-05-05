@@ -252,7 +252,6 @@ export const Signup = ({
                   autoComplete="password"
                   autoCapitalize="none"
                   blurOnSubmit={false}
-                  validationType="password"
                   autoCorrect={false}
                   placeholder={strings.password()}
                   onSubmit={() => {
@@ -277,7 +276,7 @@ export const Signup = ({
                   autoCorrect={false}
                   blurOnSubmit={false}
                   validationType="confirmPassword"
-                  customValidator={() => password.current!}
+                  customValidator={() => password.current || ""}
                   placeholder={strings.confirmPassword()}
                   marginBottom={12}
                   onSubmit={() => {

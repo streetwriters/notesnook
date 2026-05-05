@@ -90,7 +90,7 @@ export class Tiptap {
   }
 
   toHeadline() {
-    return extractHeadline(this.data);
+    return extractHeadline(this.data, 350);
   }
 
   toTitle() {

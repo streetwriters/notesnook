@@ -60,6 +60,7 @@ function PublishView(props: PublishViewProps) {
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const [monograph, setMonograph] = useState(props.monograph);
+  const [copied, setCopied] = useState(false);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
   const metadata = usePromise(async () => {
     if (!monograph) return { publishUrl: "", analytics: { totalViews: 0 } };
@@ -115,15 +116,16 @@ function PublishView(props: PublishViewProps) {
           <Button
             variant="secondary"
             className="copyPublishLink"
-            sx={{ flexShrink: 0, m: 0 }}
-            disabled={metadata.status !== "fulfilled"}
+            sx={{ flexShrink: 0, m: 0, color: copied ? "accent" : "initial" }}
             onClick={() => {
               if (metadata.status !== "fulfilled") return;
-
               writeText(metadata.value.publishUrl);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
             }}
+            disabled={copied}
           >
-            {strings.copy()}
+            {copied ? strings.copied() : strings.copy()}
           </Button>
         </Flex>
       ) : null}

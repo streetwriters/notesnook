@@ -53,7 +53,7 @@ import TagItem from "../list-items/tag";
 import { SearchResult } from "../list-items/search-result";
 
 type ListItemWrapperProps<TItem = Item> = {
-  group?: GroupingKey;
+  group: GroupingKey;
   items: VirtualizedGrouping<TItem> | undefined;
   isSheet: boolean;
   index: number;
@@ -182,6 +182,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               item={groupHeader}
               index={index}
               dataType={item.type}
+              group={group}
               color={props.customAccentColor}
               groupOptions={groupOptions}
               onOpenJumpToDialog={() => {
@@ -218,6 +219,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               item={groupHeader}
               index={index}
               dataType={item.type}
+              group={group}
               color={props.customAccentColor}
               groupOptions={groupOptions}
               onOpenJumpToDialog={() => {
@@ -245,6 +247,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               screen={props.renderedInRoute}
               item={groupHeader}
               index={index}
+              group={group}
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
@@ -271,6 +274,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               screen={props.renderedInRoute}
               item={groupHeader}
               index={index}
+              group={group}
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
@@ -297,9 +301,11 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               screen={props.renderedInRoute}
               item={groupHeader}
               index={index}
+              group={group}
               dataType={item.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
+              itemCount={items?.placeholders.length}
               onOpenJumpToDialog={() => {
                 eSendEvent(eOpenJumpToDialog, {
                   ref: props.scrollRef,
@@ -317,6 +323,7 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
 }
 
 function getDate(item: Notebook | Note, groupType?: GroupingKey): number {
+  console.log(groupType);
   return (
     getSortValue(
       groupType

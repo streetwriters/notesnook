@@ -68,13 +68,23 @@ export function getWindowControls(
   ];
 }
 export const TITLE_BAR_HEIGHT = 37;
-export function TitleBar({ isUnderlay = isMac() }: { isUnderlay?: boolean }) {
+export function TitleBar({
+  isUnderlay = isMac(),
+  force = false
+}: {
+  isUnderlay?: boolean;
+  force?: boolean;
+}) {
   const { isFullscreen, hasNativeWindowControls, isMaximized } =
     useWindowControls();
   const isTablet = useTablet();
   const isMobile = useMobile();
-  if ((!isMac() && !isMobile && !isTablet) || (isFullscreen && isMac()))
+  if (
+    !force &&
+    ((!isMac() && !isMobile && !isTablet) || (isFullscreen && isMac()))
+  ) {
     return null;
+  }
 
   const tools = getWindowControls(
     hasNativeWindowControls,

@@ -66,6 +66,9 @@ const App = (props: { configureMode: "note-preview" }) => {
   useEffect(() => {
     SettingsService.onFirstLaunch();
     changeSystemBarColors();
+    SettingsService.setPrivacyScreen(
+      SettingsService.getProperty("privacyScreen")
+    );
     setTimeout(async () => {
       await Notifications.get();
       if (SettingsService.get().notifNotes) {

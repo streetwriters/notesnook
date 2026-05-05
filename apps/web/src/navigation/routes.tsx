@@ -23,7 +23,6 @@ import Notes from "../views/notes";
 import { NotebookHeader } from "../components/notebook-header";
 import Trash from "../views/trash";
 import { useStore as useNoteStore } from "../stores/note-store";
-import { useStore as useAppStore } from "../stores/app-store";
 import Reminders from "../views/reminders";
 import { RouteResult, defineRoutes } from "./types";
 import { CREATE_BUTTON_MAP } from "../common";

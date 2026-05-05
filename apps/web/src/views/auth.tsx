@@ -44,6 +44,11 @@ import { showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
 import { ScrollContainer } from "@notesnook/ui";
+import {
+  authRoutes,
+  AuthRoutes,
+  isUnauthorizedRoute
+} from "../navigation/auth-routes";
 
 type EmailFormData = {
   email: string;
@@ -112,14 +117,7 @@ type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
   navigate: NavigateFunction;
   formData?: AuthFormData[TRoute];
 };
-type AuthRoutes =
-  | "sessionExpiry"
-  | "login:email"
-  | "login:password"
-  | "signup"
-  | "recover"
-  | "mfa:code"
-  | "mfa:select";
+
 export type AuthProps = {
   route: AuthRoutes;
   isolated?: boolean;
@@ -153,25 +151,6 @@ function getRouteComponent<TRoute extends AuthRoutes>(
   return undefined;
 }
 
-const routePaths: Record<AuthRoutes, string> = {
-  "login:email": "/login",
-  "login:password": "/login/password",
-  "mfa:code": "/login/mfa/code",
-  "mfa:select": "/login/mfa/select",
-  recover: "/recover",
-  sessionExpiry: "/sessionexpired",
-  signup: "/signup"
-};
-
-const authorizedRoutes: AuthRoutes[] = [
-  "login:email",
-  "login:password",
-  "signup",
-  "mfa:code",
-  "mfa:select",
-  "recover"
-];
-
 function Auth(props: AuthProps) {
   return (
     <AuthContainer>
@@ -191,12 +170,12 @@ export function HeadlessAuth(props: AuthProps) {
   const Route = useMemo(() => getRouteComponent(route), [route]);
   useEffect(() => {
     if (isolated) return;
-    window.history.replaceState({}, "", makeURL(routePaths[route]));
+    window.history.replaceState({}, "", makeURL(authRoutes[route]));
   }, [route, isolated]);
 
   useEffect(() => {
     db.user.getUser().then((user) => {
-      if (user && authorizedRoutes.includes(route) && !isSessionExpired())
+      if (user && isUnauthorizedRoute(route) && !isSessionExpired())
         return openURL("/", { authenticated: true });
       performance.mark("load:auth");
       setIsReady(true);

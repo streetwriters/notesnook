@@ -98,6 +98,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         <List
           data={trash}
           dataType="trash"
+          groupType="trash"
           renderedInRoute="Trash"
           loading={!isFocused}
           placeholder={PLACEHOLDER_DATA(db.settings.getTrashCleanupInterval())}

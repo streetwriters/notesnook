@@ -19,20 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import hosts from "../utils/constants.js";
 
+export type IssueReportResponse =
+  | { error: string }
+  | { url: string; type: "issue" | "discussion" }
+  | { type: "email" };
 export class Debug {
   static async report(reportData: {
     title: string;
     body: string;
     userId?: string;
-  }): Promise<string | undefined> {
+  }): Promise<IssueReportResponse | undefined> {
     const { title, body, userId } = reportData;
     const response = await fetch(`${hosts.ISSUES_HOST}/create/notesnook`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, body, userId })
     });
-    if (!response.ok) return;
     const json = await response.json();
-    return json.url;
+    if (!response.ok) return json;
+    return json;
   }
 }

@@ -433,7 +433,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                       name="plus"
                       testID="sidebar-add-button"
                       size={AppFontSize.lg - 2}
-                       top={10}
+                      top={10}
                       color={colors.primary.icon}
                       onPress={async () => {
                         if (props.navigationState.index === 1) {
@@ -497,6 +497,11 @@ const TabBar = (props: SimpleTabBarProps) => {
                                 props.navigationState.index === 1
                                   ? "notebook"
                                   : "tag"
+                              }
+                              group={
+                                props.navigationState.index === 1
+                                  ? "notebooks"
+                                  : "tags"
                               }
                               hideGroupOptions
                             />

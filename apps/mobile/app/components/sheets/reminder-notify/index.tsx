@@ -181,6 +181,7 @@ export default function ReminderNotify({
             data={references}
             loading={false}
             dataType="note"
+            groupType="notes"
             isRenderedInActionSheet={true}
           />
         </View>

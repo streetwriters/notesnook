@@ -2050,13 +2050,23 @@ All attachments will be downloaded & cached again on access.
   root: () => t`Root`,
   credientials: () => t`Credentials`,
   thankYouForReporting: () => t`Thank you for reporting!`,
+  thankYouForFeedback: () => t`Thank you for your feedback!`,
+  yourSupportRequestHasBeenForwarded: () =>
+    t`Your support request has been forwarded`,
   bugReportMessage: (
     url: string
   ) => t`You can track your bug report at [${url}](${url}).
 
-Please note that we will respond to your bug report on the link above. **We recommended that you save the above link for later reference.**
+Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**
 
-If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://discord.com/invite/zQBK97EE22) for one-to-one support.`,
+If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.`,
+  supportEmailMessage: () =>
+    t`Your support request has been forwarded to our support team. We will get back to you via email as soon as possible. If you don't receive an email from us within 24-48 hours, please send us an email directly at support@notesnook.com.`,
+  featureRequestMessage: (
+    url: string
+  ) => t`You can track your feature request at [${url}](${url}).
+
+Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**`,
 
   safeEncryptedNotes: () => t`Safe & encrypted notes`,
   writeWithFreedom: () =>

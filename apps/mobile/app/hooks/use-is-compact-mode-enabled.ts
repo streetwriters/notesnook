@@ -20,14 +20,27 @@ import { ItemType } from "@notesnook/core";
 import { useSettingStore } from "../stores/use-setting-store";
 
 export function useIsCompactModeEnabled(dataType: ItemType) {
-  const [notebooksListMode, notesListMode] = useSettingStore((state) => [
-    state.settings.notebooksListMode,
-    state.settings.notesListMode
-  ]);
+  const [notebooksListMode, notesListMode, searchListMode] = useSettingStore(
+    (state) => [
+      state.settings.notebooksListMode,
+      state.settings.notesListMode,
+      state.settings.searchListMode
+    ]
+  );
 
-  if (dataType !== "note" && dataType !== "notebook") return false;
+  if (
+    dataType !== "note" &&
+    dataType !== "notebook" &&
+    dataType !== "searchResult"
+  )
+    return false;
 
-  const listMode = dataType === "notebook" ? notebooksListMode : notesListMode;
+  const listMode =
+    dataType === "notebook"
+      ? notebooksListMode
+      : dataType === "searchResult"
+        ? searchListMode
+        : notesListMode;
 
   return listMode === "compact";
 }

@@ -81,7 +81,7 @@ export const useLogin = (
 
           if (mfaInfo) {
             TwoFactorVerification.present(
-              async (mfa: any, callback: (success: boolean) => void) => {
+              async (mfa: any, callback: (success: boolean) => void, onerror: (e: Error) => void) => {
                 try {
                   const success = await db.user.authenticateMultiFactorCode(
                     mfa.code,
@@ -103,6 +103,9 @@ export const useLogin = (
                     eSendEvent(eCloseSimpleDialog, "two_factor_verify");
                     setLoading(false);
                     setStep(LoginSteps.emailAuth);
+                    ToastManager.error(new Error("Token expired, try logging in again"));
+                  } else {
+                    onerror(e as Error);
                   }
                 }
               },

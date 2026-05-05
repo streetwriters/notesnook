@@ -32,8 +32,6 @@ import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
-//@ts-ignore
-import { enabled } from "react-native-privacy-snapshot";
 import ScreenGuardModule from "react-native-screenguard";
 import { DatabaseLogger, db } from "../../common/database";
 import filesystem from "../../common/filesystem";
@@ -207,15 +205,15 @@ export const settingsGroups: SettingSection[] = [
             return status === SubscriptionStatus.TRIAL
               ? strings.trialOnGoing(trialEndDate)
               : status === SubscriptionStatus.ACTIVE
-              ? strings.subRenewOn(expiryDate)
-              : status === SubscriptionStatus.CANCELED ||
-                status === SubscriptionStatus.PAUSED
-              ? strings.subEndsOn(expiryDate)
-              : status === SubscriptionStatus.EXPIRED
-              ? subscriptionDaysLeft.time < -3
-                ? strings.subEnded()
-                : strings.accountDowngradedIn(3)
-              : strings.neverHesitate();
+                ? strings.subRenewOn(expiryDate)
+                : status === SubscriptionStatus.CANCELED ||
+                    status === SubscriptionStatus.PAUSED
+                  ? strings.subEndsOn(expiryDate)
+                  : status === SubscriptionStatus.EXPIRED
+                    ? subscriptionDaysLeft.time < -3
+                      ? strings.subEnded()
+                      : strings.accountDowngradedIn(3)
+                    : strings.neverHesitate();
           }
 
           return strings.neverHesitate();
@@ -1130,19 +1128,7 @@ export const settingsGroups: SettingSection[] = [
         description: strings.privacyModeDesc(),
         modifer: () => {
           const settings = SettingsService.get();
-          if (Platform.OS === "ios") {
-            enabled(!settings.privacyScreen);
-            if (settings.privacyScreen) {
-              ScreenGuardModule.unregister();
-            } else {
-              ScreenGuardModule.register({
-                backgroundColor: "#000000"
-              });
-            }
-          } else {
-            NotesnookModule.setSecureMode(!settings.privacyScreen);
-          }
-
+          SettingsService.setPrivacyScreen(!settings.privacyScreen);
           SettingsService.set({ privacyScreen: !settings.privacyScreen });
         },
         property: "privacyScreen"
@@ -1163,11 +1149,13 @@ export const settingsGroups: SettingSection[] = [
             type: "switch",
             property: "appLockEnabled",
             featureId: "appLock",
-            onChange: () => {
-              SettingsService.set({
-                privacyScreen: true
-              });
-              SettingsService.setPrivacyScreen(SettingsService.get());
+            onChange: (property) => {
+              if (property) {
+                SettingsService.set({
+                  privacyScreen: true
+                });
+                SettingsService.setPrivacyScreen(true);
+              }
             },
             onVerify: async () => {
               const verified = await verifyUserWithApplock();

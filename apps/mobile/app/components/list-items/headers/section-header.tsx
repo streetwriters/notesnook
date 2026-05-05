@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GroupHeader, GroupOptions, ItemType } from "@notesnook/core";
+import {
+  GroupHeader,
+  GroupingKey,
+  GroupOptions,
+  ItemType
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
@@ -40,7 +45,9 @@ type SectionHeaderProps = {
   color?: string;
   screen?: RouteName;
   groupOptions: GroupOptions;
+  group: GroupingKey;
   onOpenJumpToDialog: () => void;
+  itemCount?: number;
 };
 
 export const SectionHeader = React.memo<
@@ -53,12 +60,16 @@ export const SectionHeader = React.memo<
     color,
     screen,
     groupOptions,
-    onOpenJumpToDialog
+    group,
+    onOpenJumpToDialog,
+    itemCount
   }: SectionHeaderProps) {
     const { colors } = useThemeColors();
     const isCompactModeEnabled = useIsCompactModeEnabled(
-      dataType as "note" | "notebook"
+      dataType as "note" | "notebook" | "searchResult"
     );
+
+    console.log(item);
 
     return (
       <View
@@ -104,7 +115,9 @@ export const SectionHeader = React.memo<
               color={color || colors.primary.accent}
             >
               {!item.title || item.title === ""
-                ? strings.pinned().toUpperCase()
+                ? screen === "Search"
+                  ? strings.results(itemCount || 0)
+                  : strings.pinned().toUpperCase()
                 : item.title.toUpperCase()}
             </Heading>
           </Pressable>
@@ -133,6 +146,7 @@ export const SectionHeader = React.memo<
                         <Sort
                           screen={screen}
                           type={dataType}
+                          group={group}
                           hideGroupOptions={
                             screen === "Reminders" || screen === "Search"
                           }
@@ -150,7 +164,8 @@ export const SectionHeader = React.memo<
                   hidden={
                     dataType !== "note" &&
                     dataType !== "notebook" &&
-                    screen !== "Notes"
+                    screen !== "Notes" &&
+                    screen !== "Search"
                   }
                   style={{
                     width: 25,
@@ -163,9 +178,11 @@ export const SectionHeader = React.memo<
                   }
                   onPress={() => {
                     SettingsService.set({
-                      [dataType !== "notebook"
-                        ? "notesListMode"
-                        : "notebooksListMode"]: !isCompactModeEnabled
+                      [dataType === "notebook"
+                        ? "notebooksListMode"
+                        : dataType === "searchResult"
+                          ? "searchListMode"
+                          : "notesListMode"]: !isCompactModeEnabled
                         ? "compact"
                         : "normal"
                     });
@@ -191,6 +208,7 @@ export const SectionHeader = React.memo<
   },
   (prev, next) => {
     if (prev.item.title !== next.item.title) return false;
+    if (prev.itemCount !== next.itemCount) return false;
     if (prev.groupOptions?.groupBy !== next.groupOptions.groupBy) return false;
     if (prev.groupOptions?.sortDirection !== next.groupOptions.sortDirection)
       return false;

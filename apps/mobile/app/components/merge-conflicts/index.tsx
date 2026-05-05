@@ -76,7 +76,9 @@ const MergeConflicts = () => {
   const applyChanges = async () => {
     const contentToSave = selectedContent;
     if (!contentToSave) return;
-    const note = await db.notes.note(contentToSave.noteId);
+    const note = await db.notes.note(
+      (content.current as UnencryptedContentItem).noteId
+    );
     if (!note) return;
     await db.notes.add({
       id: note.id,

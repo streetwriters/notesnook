@@ -25,7 +25,7 @@ import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
 import { ErrorText } from "../components/error-text";
-import { Debug } from "@notesnook/core";
+import { Debug, IssueReportResponse } from "@notesnook/core";
 import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
@@ -76,15 +76,16 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
 
             if (!requestData.title.trim() || !requestData.body.trim()) return;
             requestData.body = BODY_TEMPLATE(requestData.body);
-            const url = await Debug.report({
+            const response = await Debug.report({
               title: requestData.title,
               body: requestData.body,
               userId: userstore.get().user?.id
             });
-            if (!url) throw new Error("Could not submit bug report.");
+            if (!response) throw new Error("Could not submit bug report.");
+            if ("error" in response) throw new Error(response.error);
 
             props.onClose(true);
-            await showIssueReportedDialog({ url });
+            await showIssueReportedDialog(response);
           } catch (e) {
             if (e instanceof Error) setError(e.message);
           } finally {
@@ -157,14 +158,37 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
   );
 });
 
-function showIssueReportedDialog({ url }: { url: string }) {
-  return ConfirmDialog.show({
-    title: strings.thankYouForReporting(),
-    positiveButtonText: strings.copyLink(),
-    message: strings.bugReportMessage(url)
-  }).then((result) => {
-    result && writeText(url);
-  });
+function showIssueReportedDialog(response: IssueReportResponse) {
+  if ("error" in response) return;
+
+  switch (response.type) {
+    case "email": {
+      return ConfirmDialog.show({
+        title: strings.yourSupportRequestHasBeenForwarded(),
+        message: strings.supportEmailMessage()
+      });
+    }
+    case "discussion": {
+      const url = response.url;
+      return ConfirmDialog.show({
+        title: strings.thankYouForFeedback(),
+        positiveButtonText: strings.copyLink(),
+        message: strings.featureRequestMessage(url)
+      }).then((result) => {
+        result && writeText(url);
+      });
+    }
+    case "issue": {
+      const url = response.url;
+      return ConfirmDialog.show({
+        title: strings.thankYouForReporting(),
+        positiveButtonText: strings.copyLink(),
+        message: strings.bugReportMessage(url)
+      }).then((result) => {
+        result && writeText(url);
+      });
+    }
+  }
 }
 
 const BODY_TEMPLATE = (body: string) => {

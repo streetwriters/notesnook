@@ -32,6 +32,8 @@ const useTimer = (initialId?: string) => {
   const [id, setId] = useState(initialId);
   const [seconds, setSeconds] = useState(getSecondsLeft(id));
   const interval = useRef<NodeJS.Timeout>(undefined);
+  const secondsRef = useRef(seconds);
+  secondsRef.current = seconds;
 
   const start = (sec: number, currentId = id) => {
     if (!currentId) return;
@@ -59,7 +61,7 @@ const useTimer = (initialId?: string) => {
     }
   };
 
-  return { seconds, setId, start, reset };
+  return { seconds, setId, start, reset, secondsRef: secondsRef };
 };
 
 export default useTimer;

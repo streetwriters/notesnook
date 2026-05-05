@@ -58,7 +58,6 @@ export const Quirks = Extension.create<QuirksOptions>({
       Backspace: ({ editor }) => {
         const { empty, $anchor } = editor.state.selection;
 
-        const nextNode = editor.state.doc.nodeAt($anchor.pos + 1);
         const node = findFromParentNode(
           editor.state,
           this.options.irremovableNodesOnBackspace
@@ -76,14 +75,15 @@ export const Quirks = Extension.create<QuirksOptions>({
         // manually handle this case.
         else if (
           isAndroid &&
-          nextNode &&
+          $anchor.nodeAfter &&
           this.options.irremovableNodesOnBackspace.includes(
-            nextNode.type.name
+            $anchor.nodeAfter.type.name
           ) &&
-          !nextNode.textContent.length
+          !$anchor.nodeAfter.textContent.length
         ) {
+          const node = $anchor.nodeAfter;
           return this.editor.commands.command(({ tr }) => {
-            tr.delete($anchor.pos + 1, $anchor.pos + 1 + nextNode.nodeSize);
+            tr.delete($anchor.pos, $anchor.pos + node.nodeSize);
             return true;
           });
         }

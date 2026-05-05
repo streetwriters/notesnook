@@ -90,6 +90,7 @@ export const Reminders = ({
         <List
           data={reminders}
           dataType="reminder"
+          groupType="reminders"
           headerTitle={strings.routes[route.name]()}
           renderedInRoute="Reminders"
           loading={loading}
@@ -98,9 +99,8 @@ export const Reminders = ({
             paragraph: strings.remindersEmpty(),
             button: strings.setReminder(),
             action: async () => {
-              const reminderFeature = await isFeatureAvailable(
-                "activeReminders"
-              );
+              const reminderFeature =
+                await isFeatureAvailable("activeReminders");
               if (!reminderFeature.isAllowed) {
                 ToastManager.show({
                   type: "info",

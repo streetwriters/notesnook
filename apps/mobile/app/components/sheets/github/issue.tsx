@@ -17,18 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Debug } from "@notesnook/core";
+import { Debug, IssueReportResponse } from "@notesnook/core";
 import { getModel, getBrand, getSystemVersion } from "react-native-device-info";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
 import { getVersion } from "react-native-device-info";
 import { useStoredRef } from "../../../hooks/use-stored-ref";
-import { ToastManager } from "../../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { defaultBorderRadius, AppFontSize } from "../../../utils/size/index";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -37,17 +37,26 @@ import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
 import Config from "react-native-config";
+import { eCloseSheet } from "../../../utils/events";
 
-export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
+export const Issue = ({
+  defaultTitle,
+  defaultBody,
+  issueTitle
+}: {
+  defaultTitle?: string;
+  defaultBody?: string;
+  issueTitle?: string;
+}) => {
   const { colors } = useThemeColors();
-  const body = useStoredRef("issueBody");
+  const body = useStoredRef("issueBody", "");
   const title = useStoredRef("issueTitle", defaultTitle);
   const [done, setDone] = useState(false);
   const user = useUserStore((state) => state.user);
   const [loading, setLoading] = useState(false);
-  const bodyRef = useRef();
+  const bodyRef = useRef<TextInput>(null);
   const initialLayout = useRef(false);
-  const issueUrl = useRef();
+  const issueReportResponse = useRef<IssueReportResponse>(undefined);
 
   const onPress = async () => {
     if (loading) return;
@@ -57,7 +66,7 @@ export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
 
     try {
       setLoading(true);
-      issueUrl.current = await Debug.report({
+      issueReportResponse.current = await Debug.report({
         title: title.current,
         body:
           body.current +
@@ -72,7 +81,7 @@ Logged in: ${user ? "yes" : "no"}
 Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
         userId: user?.id
       });
-      if (!issueUrl.current) {
+      if (!issueReportResponse.current) {
         setLoading(false);
         ToastManager.show({
           heading: "Failed to report issue on github",
@@ -88,11 +97,45 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
     } catch (e) {
       setLoading(false);
       ToastManager.show({
-        heading: e.message,
+        heading: (e as Error).message,
         type: "error"
       });
     }
   };
+
+  function getResponseInfo(response?: IssueReportResponse) {
+    if (!response || "error" in response) return;
+    switch (response.type) {
+      case "email": {
+        return {
+          title: strings.yourSupportRequestHasBeenForwarded(),
+          message: strings.supportEmailMessage()
+        };
+      }
+      case "discussion": {
+        const url = response.url;
+        return {
+          title: strings.thankYouForFeedback(),
+          positiveButtonText: strings.copyLink(),
+          message: strings.featureRequestMessage(url),
+          url: url
+        };
+      }
+      case "issue": {
+        const url = response.url;
+        return {
+          title: strings.thankYouForReporting(),
+          positiveButtonText: strings.copyLink(),
+          message: strings.bugReportMessage(url),
+          url: url
+        };
+      }
+    }
+  }
+
+  const responseInfo = getResponseInfo(issueReportResponse.current);
+
+  console.log(responseInfo, issueReportResponse.current);
 
   return (
     <View
@@ -105,38 +148,28 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
         <>
           <View
             style={{
-              height: 250,
               justifyContent: "center",
               alignItems: "center",
               gap: 10
             }}
           >
-            <Heading>{strings.issueCreatedHeading()}</Heading>
+            <Heading>{responseInfo?.title}</Heading>
             <Paragraph
               style={{
                 textAlign: "center"
               }}
               selectable={true}
             >
-              {strings.issueCreatedDesc[0]()}
-              <Paragraph
-                style={{
-                  textDecorationLine: "underline",
-                  color: colors.primary.accent
-                }}
-                onPress={() => {
-                  Linking.openURL(issueUrl.current);
-                }}
-              >
-                {issueUrl.current}
-              </Paragraph>
-              . {strings.issueCreatedDesc[1]()}
+              {responseInfo?.message}
             </Paragraph>
 
             <Button
-              title={strings.openIssue()}
+              title={responseInfo?.positiveButtonText || "Done"}
               onPress={() => {
-                Linking.openURL(issueUrl.current);
+                if (responseInfo?.url) {
+                  Linking.openURL(responseInfo?.url);
+                }
+                eSendEvent(eCloseSheet);
               }}
               type="accent"
               width="100%"
@@ -248,10 +281,7 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
               }}
               onPress={async () => {
                 try {
-                  await openLinkInBrowser(
-                    "https://discord.gg/zQBK97EE22",
-                    colors
-                  );
+                  await openLinkInBrowser("https://discord.gg/zQBK97EE22");
                 } catch (e) {
                   console.error(e);
                 }

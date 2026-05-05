@@ -234,6 +234,18 @@ test("note should get headline from first paragraph in content", () =>
     expect(note?.headline).toBe("This is a very colorful existence.");
   }));
 
+test("note headline should be capped at 350 characters", () =>
+  noteTest({
+    content: {
+      type: TEST_NOTE.content.type,
+      data: `<p>${"a".repeat(400)}</p>`
+    }
+  }).then(async ({ db, id }) => {
+    const note = await db.notes.note(id);
+    expect(note?.headline).toHaveLength(350);
+    expect(note?.headline).toBe("a".repeat(350));
+  }));
+
 test("note should not get headline if there is no p tag", () =>
   noteTest({
     ...TEST_NOTE,

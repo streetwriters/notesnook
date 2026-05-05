@@ -121,6 +121,17 @@ export const RelationsList = ({
         <List
           data={items}
           loading={false}
+          groupType={
+            referenceType === "note"
+              ? "notes"
+              : referenceType === "tag"
+                ? "tags"
+                : referenceType === "notebook"
+                  ? "notebooks"
+                  : referenceType === "reminder"
+                    ? "reminders"
+                    : "notes"
+          }
           dataType={referenceType as any}
           isRenderedInActionSheet={true}
         />

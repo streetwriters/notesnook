@@ -154,6 +154,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         data={results}
         dataType={route.params?.type}
         renderedInRoute={route.name}
+        groupType="search"
         loading={loading}
         placeholder={{
           title: route.name,

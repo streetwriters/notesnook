@@ -70,6 +70,7 @@ export const Archive = ({ navigation, route }: NavigationProps<"Archive">) => {
           onRefresh={() => {
             refresh();
           }}
+          groupType="archive"
           renderedInRoute="Archive"
           loading={loading}
           placeholder={{
