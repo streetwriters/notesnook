@@ -63,7 +63,10 @@ export function Menu(props: MenuProps) {
         const item = items[focusIndex];
         if (item && item.type === "button") onAction(e, item);
       },
-      () => onClose()
+      () => onClose(),
+      (item) => {
+        if (item.type === "button") item.onKeyboardFocus?.();
+      }
     );
   const focusedItem = items[focusIndex];
 

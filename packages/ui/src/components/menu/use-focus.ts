@@ -23,7 +23,8 @@ import { MenuButtonItem, MenuItem } from "./types.js";
 export function useFocus(
   items: MenuItem[],
   onAction: (event: KeyboardEvent) => void,
-  onClose: (event: KeyboardEvent) => void
+  onClose: (event: KeyboardEvent) => void,
+  onKeyboardFocus?: (item: MenuItem) => void
 ) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
@@ -93,12 +94,16 @@ export function useFocus(
           default:
             break;
         }
-        if (nextIndex !== i) moveItemIntoView(nextIndex);
+        if (nextIndex !== i) {
+          moveItemIntoView(nextIndex);
+          const focusedItem = items[nextIndex];
+          if (focusedItem) onKeyboardFocus?.(focusedItem);
+        }
 
         return nextIndex;
       });
     },
-    [items, moveItemIntoView, isSubmenuOpen, onAction, onClose]
+    [items, moveItemIntoView, isSubmenuOpen, onAction, onClose, onKeyboardFocus]
   );
 
   useEffect(() => {

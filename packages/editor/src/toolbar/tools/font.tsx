@@ -21,38 +21,79 @@ import { ToolProps } from "../types.js";
 import { Editor } from "../../types.js";
 import { Dropdown } from "../components/dropdown.js";
 import { MenuItem } from "@notesnook/ui";
-import { useCallback, useMemo } from "react";
-import { Counter } from "../components/counter.js";
-import { useRefValue } from "../../hooks/use-ref-value.js";
-import { useToolbarStore } from "../stores/toolbar-store.js";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useToolbarStore,
+  useToolbarLocation
+} from "../stores/toolbar-store.js";
 import { getFont, getFontById, getFonts } from "../../utils/font.js";
 import { CodeBlock } from "../../extensions/code-block/index.js";
 import { strings } from "@notesnook/intl";
+import { Flex, Input } from "@theme-ui/components";
+import { ToolButton } from "../components/tool-button.js";
+import { ResponsivePresenter } from "../../components/responsive/index.js";
 
 const FONT_SIZES = [
   8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 42, 48, 56, 64, 72, 80,
   96, 120
 ];
 
+const FONT_SIZE_BOUNDS = {
+  MIN: 8,
+  MAX: 120
+};
+
 export function FontSize(props: ToolProps) {
   const { editor } = props;
   const defaultFontSize = useToolbarStore((store) => store.fontSize);
   const { fontSize } = editor.getAttributes("textStyle");
-  const fontSizeAsNumber = useRefValue(
-    fontSize ? parseInt(fontSize.replace("px", "")) || 14 : defaultFontSize
-  );
-
-  const decreaseFontSize = useCallback(() => {
-    return Math.max(8, fontSizeAsNumber.current - 1);
-  }, [fontSizeAsNumber]);
-
-  const increaseFontSize = useCallback(() => {
-    return Math.min(120, fontSizeAsNumber.current + 1);
-  }, [fontSizeAsNumber]);
-
   const currentSize = fontSize
     ? parseInt(fontSize.replace("px", "")) || defaultFontSize
     : defaultFontSize;
+  const disabled = editor.isActive(CodeBlock.name);
+  const toolbarLocation = useToolbarLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const applyInputValue = useCallback(() => {
+    if (!inputRef.current) return;
+
+    const inputValue = inputRef.current.value.trim();
+    const parsedValue = Number(inputValue);
+    if (inputValue === "" || isNaN(parsedValue)) {
+      inputRef.current.value = String(currentSize);
+      return;
+    }
+    const clamped = Math.min(
+      FONT_SIZE_BOUNDS.MAX,
+      Math.max(FONT_SIZE_BOUNDS.MIN, parsedValue)
+    );
+    editor.chain().focus().setFontSize(`${clamped}px`).run();
+  }, [editor, currentSize]);
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+    inputRef.current.value = String(currentSize);
+  }, [currentSize]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    function handleMouseDown(e: MouseEvent) {
+      const target = e.target as Node;
+      /**
+       * close menu when clicking outside both the container and the popup
+       */
+      if (containerRef.current?.contains(target)) return;
+      if ((target as HTMLElement).closest?.(".popup-presenter")) return;
+
+      setIsMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [isMenuOpen]);
 
   const menuItems: MenuItem[] = useMemo(
     () => [
@@ -60,36 +101,152 @@ export function FontSize(props: ToolProps) {
         key: "default",
         type: "button" as const,
         title: strings.default(),
-        onClick: () =>
-          editor.chain().focus().setFontSize(`${defaultFontSize}px`).run()
+        onClick: () => {
+          editor.chain().focus().setFontSize(`${defaultFontSize}px`).run();
+        },
+        onKeyboardFocus: () => {
+          if (!inputRef.current) return;
+          inputRef.current.value = String(defaultFontSize);
+        }
       },
       ...FONT_SIZES.map((size) => ({
         key: String(size),
         type: "button" as const,
         title: `${size}px`,
-        isChecked: currentSize === size,
-        onClick: () => editor.chain().focus().setFontSize(`${size}px`).run()
+        onClick: () => {
+          editor.chain().focus().setFontSize(`${size}px`).run();
+        },
+        onKeyboardFocus: () => {
+          if (!inputRef.current) return;
+          inputRef.current.value = String(size);
+        }
       }))
     ],
-    [editor, currentSize, defaultFontSize]
+    [editor, defaultFontSize]
   );
 
   return (
-    <Counter
-      title={strings.fontSize()}
-      disabled={editor.isActive(CodeBlock.name)}
-      onDecrease={() =>
-        editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
-      }
-      onIncrease={() => {
-        editor.chain().focus().setFontSize(`${increaseFontSize()}px`).run();
-      }}
-      onReset={() =>
-        editor.chain().focus().setFontSize(`${defaultFontSize}px`).run()
-      }
-      value={fontSize || `${defaultFontSize}px`}
-      menuItems={menuItems}
-    />
+    <>
+      <Flex
+        ref={containerRef}
+        sx={{
+          alignItems: "stretch",
+          borderRadius: "default",
+          overflow: "hidden",
+          height: "100%"
+        }}
+      >
+        <ToolButton
+          toggled={false}
+          title={strings.decrease(strings.fontSize())}
+          icon="minus"
+          variant="small"
+          disabled={disabled}
+          onClick={
+            disabled
+              ? undefined
+              : (e) => {
+                  e.stopPropagation();
+                  const current =
+                    parseInt(inputRef.current?.value ?? "") || currentSize;
+                  const newSize = Math.max(FONT_SIZE_BOUNDS.MIN, current - 1);
+                  editor.chain().focus().setFontSize(`${newSize}px`).run();
+                }
+          }
+        />
+
+        <Input
+          ref={inputRef}
+          type="number"
+          defaultValue={currentSize}
+          disabled={disabled}
+          title={disabled ? "" : strings.fontSize()}
+          sx={{
+            width: 40,
+            fontSize: "subBody",
+            fontFamily: "body",
+            bg: "transparent",
+            border: "none",
+            outline: "none",
+            textAlign: "center",
+            color: "paragraph",
+            marginTop: "2px",
+            marginBottom: "2px",
+            padding: 0,
+            cursor: disabled ? "not-allowed" : "text",
+            "::-moz-appearance": "textfield",
+            "::-webkit-inner-spin-button": {
+              "-webkit-appearance": "none"
+            },
+            "::-webkit-outer-spin-button": {
+              "-webkit-appearance": "none"
+            }
+          }}
+          onClick={() => setIsMenuOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+              return;
+            }
+
+            if (!inputRef.current) return;
+
+            if (e.key === "Enter") {
+              applyInputValue();
+              setIsMenuOpen(false);
+            } else if (e.key === "Escape") {
+              inputRef.current.value = String(currentSize);
+              setIsMenuOpen(false);
+            }
+          }}
+          onBlur={(e) => {
+            if (
+              (e.relatedTarget as HTMLElement)?.closest?.(".popup-presenter")
+            ) {
+              return;
+            }
+
+            applyInputValue();
+            setIsMenuOpen(false);
+          }}
+        />
+
+        <ToolButton
+          toggled={false}
+          title={strings.increase(strings.fontSize())}
+          icon="plus"
+          variant="small"
+          disabled={disabled}
+          onClick={
+            disabled
+              ? undefined
+              : (e) => {
+                  e.stopPropagation();
+                  const current =
+                    parseInt(inputRef.current?.value ?? "") || currentSize;
+                  const newSize = Math.min(FONT_SIZE_BOUNDS.MAX, current + 1);
+                  editor.chain().focus().setFontSize(`${newSize}px`).run();
+                }
+          }
+        />
+      </Flex>
+      <ResponsivePresenter
+        desktop="menu"
+        mobile="sheet"
+        title={strings.fontSize()}
+        isOpen={isMenuOpen}
+        items={menuItems}
+        onClose={() => setIsMenuOpen(false)}
+        focusOnRender={false}
+        blocking={false}
+        position={{
+          target: containerRef.current || undefined,
+          isTargetAbsolute: true,
+          location: toolbarLocation === "bottom" ? "top" : "below",
+          yOffset: 5
+        }}
+      />
+    </>
   );
 }
 
