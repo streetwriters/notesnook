@@ -34,7 +34,6 @@ import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
 import Dialog from "../../../components/dialog";
 import { usePromise } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
-import { PromptDialog } from "../../prompt";
 import { showPasswordDialog } from "../../password-dialog";
 import { strings } from "@notesnook/intl";
 
@@ -74,10 +73,12 @@ export function InboxApiKeys() {
             variant="accent"
             onClick={() => {
               if (apiKeys.length >= 10) {
-                PromptDialog.show({
+                ConfirmDialog.show({
                   title: "API Keys Limit Reached",
-                  description:
-                    "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones."
+                  subtitle:
+                    "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones.",
+                  positiveButtonText:
+                    strings.ok()
                 });
               } else {
                 AddApiKeyDialog.show({
