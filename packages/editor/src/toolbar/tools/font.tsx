@@ -32,16 +32,12 @@ import { strings } from "@notesnook/intl";
 import { Flex, Input } from "@theme-ui/components";
 import { ToolButton } from "../components/tool-button.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
+import { FONT_SIZE_BOUNDS } from "@notesnook/common";
 
 const FONT_SIZES = [
   8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 42, 48, 56, 64, 72, 80,
   96, 120
 ];
-
-const FONT_SIZE_BOUNDS = {
-  MIN: 8,
-  MAX: 120
-};
 
 export function FontSize(props: ToolProps) {
   const { editor } = props;
@@ -65,6 +61,7 @@ export function FontSize(props: ToolProps) {
       inputRef.current.value = String(currentSize);
       return;
     }
+
     const clamped = Math.min(
       FONT_SIZE_BOUNDS.MAX,
       Math.max(FONT_SIZE_BOUNDS.MIN, parsedValue)
