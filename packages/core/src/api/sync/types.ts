@@ -45,7 +45,8 @@ export const SYNC_COLLECTIONS_MAP = {
   tag: "tags",
   color: "colors",
   note: "notes",
-  vault: "vaults"
+  vault: "vaults",
+  inboxitemhistory: "inboxItemsHistory"
 } as const;
 
 export const SYNC_ITEM_TYPES = Object.keys(

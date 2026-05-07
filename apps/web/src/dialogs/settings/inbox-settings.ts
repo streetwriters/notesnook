@@ -24,6 +24,7 @@ import { InboxPGPKeysDialog } from "../inbox-pgp-keys-dialog";
 import { db } from "../../common/db";
 import { showPasswordDialog } from "../password-dialog";
 import { strings } from "@notesnook/intl";
+import { InboxHistoryDialog } from "../InboxHistoryDialog";
 
 export const InboxSettings: SettingsGroup[] = [
   {
@@ -77,6 +78,25 @@ export const InboxSettings: SettingsGroup[] = [
               InboxPGPKeysDialog.show({
                 keys: await db.user.getInboxKeys()
               });
+            }
+          }
+        ]
+      },
+      {
+        key: "failed-inbox-items",
+        title: strings.failedInboxItems(),
+        description: strings.failedInboxItemsDesc(),
+        keywords: ["inbox", "failed", "items"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
+        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        components: [
+          {
+            type: "button",
+            title: strings.show(),
+            variant: "secondary",
+            action: () => {
+              InboxHistoryDialog.show({});
             }
           }
         ]

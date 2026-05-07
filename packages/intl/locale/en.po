@@ -2154,6 +2154,10 @@ msgstr "Date format"
 msgid "Date modified"
 msgstr "Date modified"
 
+#: src/strings.ts:2747
+msgid "Date synced"
+msgstr "Date synced"
+
 #: src/strings.ts:2044
 msgid "Date uploaded"
 msgstr "Date uploaded"
@@ -2306,6 +2310,10 @@ msgstr "Desktop app"
 #: src/strings.ts:2122
 msgid "Desktop integration"
 msgstr "Desktop integration"
+
+#: src/strings.ts:2746
+msgid "Details"
+msgstr "Details"
 
 #: src/strings.ts:871
 msgid "Did you save recovery key?"
@@ -2910,6 +2918,10 @@ msgstr "Faced an issue or have a suggestion? Click here to create a bug report"
 #: src/strings.ts:2416
 msgid "Failed"
 msgstr "Failed"
+
+#: src/strings.ts:2748
+msgid "Failed inbox items"
+msgstr "Failed inbox items"
 
 #: src/strings.ts:2653
 msgid "Failed to attach file"
@@ -4359,6 +4371,10 @@ msgstr "No downloads in progress."
 #: src/strings.ts:1986
 msgid "No encryption key found"
 msgstr "No encryption key found"
+
+#: src/strings.ts:2750
+msgid "No failed inbox items"
+msgstr "No failed inbox items"
 
 #: src/strings.ts:1667
 msgid "No headings found"
@@ -6281,6 +6297,10 @@ msgstr "shortcuts"
 msgid "Shortcuts"
 msgstr "Shortcuts"
 
+#: src/strings.ts:2751
+msgid "Show"
+msgstr "Show"
+
 #: src/strings.ts:96
 msgid "Sign up"
 msgstr "Sign up"
@@ -7404,6 +7424,10 @@ msgstr "View and manage inbox API keys"
 #: src/strings.ts:1272
 msgid "View and share debug logs"
 msgstr "View and share debug logs"
+
+#: src/strings.ts:2749
+msgid "View failed inbox items and error contexts"
+msgstr "View failed inbox items and error contexts"
 
 #: src/strings.ts:1749
 msgid "View receipt"

@@ -2143,6 +2143,10 @@ msgstr ""
 msgid "Date modified"
 msgstr ""
 
+#: src/strings.ts:2747
+msgid "Date synced"
+msgstr ""
+
 #: src/strings.ts:2044
 msgid "Date uploaded"
 msgstr ""
@@ -2294,6 +2298,10 @@ msgstr ""
 
 #: src/strings.ts:2122
 msgid "Desktop integration"
+msgstr ""
+
+#: src/strings.ts:2746
+msgid "Details"
 msgstr ""
 
 #: src/strings.ts:871
@@ -2898,6 +2906,10 @@ msgstr ""
 
 #: src/strings.ts:2416
 msgid "Failed"
+msgstr ""
+
+#: src/strings.ts:2748
+msgid "Failed inbox items"
 msgstr ""
 
 #: src/strings.ts:2653
@@ -4338,6 +4350,10 @@ msgstr ""
 
 #: src/strings.ts:1986
 msgid "No encryption key found"
+msgstr ""
+
+#: src/strings.ts:2750
+msgid "No failed inbox items"
 msgstr ""
 
 #: src/strings.ts:1667
@@ -6247,6 +6263,10 @@ msgstr ""
 msgid "Shortcuts"
 msgstr ""
 
+#: src/strings.ts:2751
+msgid "Show"
+msgstr ""
+
 #: src/strings.ts:96
 msgid "Sign up"
 msgstr ""
@@ -7353,6 +7373,10 @@ msgstr ""
 
 #: src/strings.ts:1272
 msgid "View and share debug logs"
+msgstr ""
+
+#: src/strings.ts:2749
+msgid "View failed inbox items and error contexts"
 msgstr ""
 
 #: src/strings.ts:1749
