@@ -445,7 +445,10 @@ function TipTap(props: TipTapProps) {
           });
           if (!ok) return;
 
-          desktop?.integration.openPath.query({ type: "path", link: path });
+          desktop?.integration.openPath.query({
+            type: "path",
+            link: decodeURIComponent(path)
+          });
         } else window.open(url, "_blank");
       }
     };
