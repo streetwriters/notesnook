@@ -4714,6 +4714,10 @@ msgstr ""
 msgid "Please grant notifications permission to add new reminders."
 msgstr ""
 
+#: src/strings.ts:2666
+msgid "Please login to download attachments."
+msgstr ""
+
 #: src/strings.ts:873
 msgid "Please make sure you have saved the recovery key. Tap one more time to confirm."
 msgstr ""

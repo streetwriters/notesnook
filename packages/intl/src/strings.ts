@@ -2672,5 +2672,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   loginToRestoreAttachmentsDesc: () =>
     t`You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).
   
-Continue without attachments?`
+Continue without attachments?`,
+  pleaseLoginToDownloadAttachments: () =>
+    t`Please login to download attachments.`
 };

@@ -49,6 +49,7 @@ import {
 } from "@notesnook/core";
 import { logger } from "../utils/logger";
 import { newQueue } from "@henrygd/queue";
+import { strings } from "@notesnook/intl";
 
 export const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -499,12 +500,20 @@ async function downloadFile(
       { type: "download", hash: filename }
     );
 
-    const signedUrl = (
-      await axios.get(url, {
-        headers,
-        responseType: "text"
-      })
-    ).data;
+    const signedUrlResponse = await axios
+      .get(url, { headers, responseType: "text" })
+      .catch((e) => {
+        if (e.response?.status === 401) {
+          showToast("error", strings.pleaseLoginToDownloadAttachments());
+          return null;
+        }
+        throw e;
+      });
+    if (!signedUrlResponse) {
+      reportProgress(undefined, { type: "download", hash: filename });
+      return false;
+    }
+    const signedUrl = signedUrlResponse.data;
 
     logger.debug("Got attachment signed url", { filename });
 
