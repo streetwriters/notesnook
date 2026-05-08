@@ -364,6 +364,8 @@ export async function restoreBackupFile(backupFile: File) {
     if (error) {
       console.error(error);
       showToast("error", `${strings.restoreFailed()}: ${error.message}`);
+    } else {
+      showToast("success", strings.backupRestored());
     }
   }
 }
