@@ -203,7 +203,7 @@ export function FontSize(props: ToolProps) {
               return;
             }
 
-            applyInputValue();
+            if (inputRef.current) inputRef.current.value = String(currentSize);
             setIsMenuOpen(false);
           }}
         />
