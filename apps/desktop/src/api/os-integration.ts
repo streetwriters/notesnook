@@ -193,17 +193,13 @@ export const osIntegrationRouter = t.router({
   openPath: t.procedure
     .input(z.object({ type: z.literal("path"), link: z.string() }))
     .query(async ({ input }) => {
+      if (isFlatpak()) return;
+
       const { type, link } = input;
       if (type !== "path") return;
 
       const resolvedPath = resolvePath(link);
-
-      /**
-       * On Flatpak, NN might not have access to the file
-       * resulting in existsSync returning false.
-       * Skip the check to avoid false negatives.
-       */
-      if (!isFlatpak() && !existsSync(resolvedPath)) {
+      if (!existsSync(resolvedPath)) {
         if (globalThis.window) {
           await dialog.showMessageBox(globalThis.window, {
             type: "error",
