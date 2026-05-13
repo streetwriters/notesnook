@@ -204,7 +204,7 @@ export const osIntegrationRouter = t.router({
           await dialog.showMessageBox(globalThis.window, {
             type: "error",
             title: "Path not found",
-            message: `The path does not exist: ${resolvedPath}`
+            message: `The path does not exist:\n${wrapPath(resolvedPath)}`
           });
         }
         return;
@@ -314,4 +314,8 @@ function toMenuItem(
       });
     }
   }
+}
+
+function wrapPath(path: string, maxLineLength = 100): string {
+  return path.replace(new RegExp(`(.{${maxLineLength}})`, "g"), "$1\n");
 }
