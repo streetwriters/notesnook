@@ -445,7 +445,7 @@ function TipTap(props: TipTapProps) {
           });
           if (!ok) return;
 
-          desktop?.integration.openPath.query({
+          await desktop?.integration.openPath.query({
             type: "path",
             link: decodeURIComponent(path)
           });

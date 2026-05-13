@@ -33,7 +33,7 @@ import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
 import { getTheme, setTheme, Theme } from "../utils/theme";
-import { mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
@@ -192,9 +192,29 @@ export const osIntegrationRouter = t.router({
     }),
   openPath: t.procedure
     .input(z.object({ type: z.literal("path"), link: z.string() }))
-    .query(({ input }) => {
+    .query(async ({ input }) => {
       const { type, link } = input;
-      if (type === "path") return shell.openPath(resolvePath(link));
+      if (type !== "path") return;
+
+      const resolvedPath = resolvePath(link);
+
+      /**
+       * On Flatpak, NN might not have access to the file
+       * resulting in existsSync returning false.
+       * Skip the check to avoid false negatives.
+       */
+      if (!isFlatpak() && !existsSync(resolvedPath)) {
+        if (globalThis.window) {
+          await dialog.showMessageBox(globalThis.window, {
+            type: "error",
+            title: "Path not found",
+            message: `The path does not exist: ${resolvedPath}`
+          });
+        }
+        return;
+      }
+
+      await shell.openPath(resolvedPath);
     }),
   bringToFront: t.procedure.query(() => bringToFront()),
   changeTheme: t.procedure
