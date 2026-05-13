@@ -104,6 +104,7 @@ import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
+import { withFeatureCheck } from "../../common";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -665,11 +666,11 @@ export const noteMenuItems: (
           title: strings.setExpiry(),
           icon: Destruct.path,
           premium: !features.expiringNotes.isAllowed,
-          onClick: async () => {
+          onClick: withFeatureCheck(features.expiringNotes, async () => {
             await NoteExpiryDateDialog.show({
               noteId: note.id
             });
-          }
+          })
         },
     {
       type: "button",
