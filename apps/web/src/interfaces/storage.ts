@@ -34,6 +34,7 @@ import { isFeatureSupported } from "../utils/feature-check";
 import { IKeyStore } from "./key-store";
 import { User } from "@notesnook/core";
 import * as openpgp from "openpgp";
+import { strings } from "@notesnook/intl";
 
 type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
 export type DatabasePersistence = "memory" | "db";
@@ -140,8 +141,21 @@ export class NNStorage implements IStorage {
     return { publicKey: keys.publicKey, privateKey: keys.privateKey };
   }
 
-  async validatePGPKeyPair(keys: SerializedKeyPair): Promise<boolean> {
+  async validatePGPKeyPair(keys: SerializedKeyPair): Promise<{
+    isValid: boolean;
+    message: string;
+  }> {
     try {
+      const privateKey = await openpgp.readPrivateKey({
+        armoredKey: keys.privateKey
+      });
+      if (!privateKey.isDecrypted()) {
+        return {
+          isValid: false,
+          message: strings.pgpPrivateKeyProtected()
+        };
+      }
+
       const dummyData = JSON.stringify({
         favorite: true,
         title: "Hello world"
@@ -149,27 +163,27 @@ export class NNStorage implements IStorage {
 
       const publicKey = await openpgp.readKey({ armoredKey: keys.publicKey });
       const encrypted = await openpgp.encrypt({
-        message: await openpgp.createMessage({
-          text: dummyData
-        }),
+        message: await openpgp.createMessage({ text: dummyData }),
         encryptionKeys: publicKey
       });
 
-      const message = await openpgp.readMessage({
-        armoredMessage: encrypted
-      });
-      const privateKey = await openpgp.readPrivateKey({
-        armoredKey: keys.privateKey
-      });
+      const message = await openpgp.readMessage({ armoredMessage: encrypted });
       const decrypted = await openpgp.decrypt({
         message,
         decryptionKeys: privateKey
       });
 
-      return decrypted.data === dummyData;
+      const isValid = decrypted.data === dummyData;
+      return {
+        isValid,
+        message: isValid ? "" : strings.invalidPgpKeyPair()
+      };
     } catch (e) {
       console.error("PGP key pair validation error:", e);
-      return false;
+      return {
+        isValid: false,
+        message: strings.invalidPgpKeyPair()
+      };
     }
   }
 

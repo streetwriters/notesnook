@@ -75,7 +75,10 @@ export interface IStorage {
     privateKeyArmored: string,
     encryptedMessage: string
   ): Promise<string>;
-  validatePGPKeyPair(keys: SerializedKeyPair): Promise<boolean>;
+  validatePGPKeyPair(keys: SerializedKeyPair): Promise<{
+    isValid: boolean;
+    message: string;
+  }>;
 
   generateCryptoKeyFallback(
     password: string,

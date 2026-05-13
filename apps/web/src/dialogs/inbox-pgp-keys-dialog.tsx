@@ -69,15 +69,12 @@ export const InboxPGPKeysDialog = DialogManager.register(
 
       try {
         setIsLoading(true);
-        const isValid = await db.storage().validatePGPKeyPair({
+        const result = await db.storage().validatePGPKeyPair({
           publicKey: trimmedPublicKey,
           privateKey: trimmedPrivateKey
         });
-        if (!isValid) {
-          showToast(
-            "error",
-            "Invalid PGP key pair. Please check your keys and try again."
-          );
+        if (!result.isValid) {
+          showToast("error", result.message);
           return;
         }
 
