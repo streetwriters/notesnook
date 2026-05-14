@@ -24,6 +24,7 @@ import type { AppUpdaterEvents } from "electron-updater/out/AppUpdater";
 import { z } from "zod";
 import { config } from "../utils/config";
 import { app } from "electron";
+import { isFlatpak, isPortable, isSnap } from "../utils";
 
 type UpdateInfo = { version: string };
 type Progress = { percent: number };
@@ -31,13 +32,15 @@ type Progress = { percent: number };
 const t = initTRPC.create();
 let cancellationToken: CancellationToken | undefined = undefined;
 let downloadTimeout: NodeJS.Timeout | undefined = undefined;
-
+const updatesSupported = !isFlatpak() && !isSnap() && !isPortable();
 export const updaterRouter = t.router({
-  autoUpdates: t.procedure.query(() => config.automaticUpdates),
+  autoUpdates: t.procedure.query(
+    () => updatesSupported && config.automaticUpdates
+  ),
   releaseTrack: t.procedure.query(() => config.releaseTrack),
   install: t.procedure.query(() => autoUpdater.quitAndInstall()),
   download: t.procedure.query(async () => {
-    if (cancellationToken) return;
+    if (!updatesSupported || cancellationToken) return;
     clearTimeout(downloadTimeout);
     await new Promise<string[]>((resolve, reject) => {
       downloadTimeout = setTimeout(async () => {
@@ -52,7 +55,7 @@ export const updaterRouter = t.router({
     });
   }),
   check: t.procedure.query(async () => {
-    if (cancellationToken) return;
+    if (!updatesSupported || cancellationToken) return;
     clearTimeout(downloadTimeout);
     await new Promise<void>((resolve) => {
       downloadTimeout = setTimeout(async () => {
