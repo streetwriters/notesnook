@@ -38,7 +38,7 @@ import { dirname } from "path";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
-import { isFlatpak, isSnap } from "../utils";
+import { isFlatpak, isPortable, isSnap } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
 import { rm } from "fs/promises";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
@@ -60,6 +60,7 @@ const NotificationOptions = z.object({
 export const osIntegrationRouter = t.router({
   isFlatpak: t.procedure.query(() => isFlatpak()),
   isSnap: t.procedure.query(() => isSnap()),
+  isPortable: t.procedure.query(() => isPortable()),
 
   zoomFactor: t.procedure.query(() => config.zoomFactor),
   setZoomFactor: t.procedure.input(z.number()).mutation(({ input: factor }) => {

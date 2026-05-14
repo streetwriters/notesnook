@@ -82,7 +82,8 @@ export const AboutSettings: SettingsGroup[] = [
         description: strings.releaseTrackDesc(),
         isHidden: () =>
           useSettingStore.getState().isFlatpak ||
-          useSettingStore.getState().isSnap,
+          useSettingStore.getState().isSnap ||
+          useSettingStore.getState().isPortable,
         components: [
           {
             type: "dropdown",
