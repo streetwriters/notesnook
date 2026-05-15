@@ -22,7 +22,7 @@ import { Attachment, Note, VirtualizedGrouping } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { RefObject, useEffect, useState } from "react";
-import { View } from "react-native";
+import { TextInput, View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
@@ -59,6 +59,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";
 import Navigation from "../../services/navigation";
+import { createFormRef, validators } from "../ui/input/form-input";
 
 const Actions = ({
   attachment,
@@ -153,50 +154,100 @@ const Actions = ({
     {
       name: strings.rename(),
       onPress: () => {
-        presentDialog({
-          input: true,
-          title: strings.renameFile(),
-          defaultValue: attachment.filename,
-          positivePress: async (value) => {
-            if (value && value.length > 0) {
-              await db.attachments.add({
-                hash: attachment.hash,
-                filename: value
-              });
-              setFilename(value);
-              setAttachments();
-              eSendEvent(eDBItemUpdate, attachment.id);
-            }
-            return true;
-          },
-          positiveText: strings.rename()
-        });
+        close?.();
+        setTimeout(() => {
+          presentDialog({
+            title: strings.renameFile(),
+            form: {
+              formRef: createFormRef({
+                name: attachment.filename
+              }),
+              items: [
+                {
+                  name: "name",
+                  defaultValue: attachment.filename,
+                  placeholder: strings.enterTitle(),
+                  ref: React.createRef<TextInput | null>(),
+                  validators: [validators.required(strings.nameIsRequired())]
+                }
+              ],
+              onFormSubmit: async (form) => {
+                try {
+                  const value = form.getValue("name");
+                  await db.attachments.add({
+                    hash: attachment.hash,
+                    filename: value
+                  });
+                  setFilename(value);
+                  setAttachments();
+                  eSendEvent(eDBItemUpdate, attachment.id);
+                  ToastManager.show({
+                    message: `Attachment renamed to ${value}`,
+                    type: "success"
+                  });
+
+                  return true;
+                } catch (e) {
+                  form.setError("name", (e as Error).message);
+                  return false;
+                }
+              }
+            },
+            positiveText: strings.rename()
+          });
+        }, 500);
       },
       icon: "form-textbox"
     },
     {
       name: strings.delete(),
       onPress: async () => {
-        const relations = await db.relations.to(attachment, "note").get();
-        await db.attachments.remove(attachment.hash, false);
-        setAttachments();
-        eSendEvent(eDBItemUpdate, attachment.id);
-        relations
-          .map((relation) => relation.fromId)
-          .forEach(async (id) => {
-            useTabStore.getState().forEachNoteTab(id, async (tab) => {
-              const isFocused = useTabStore.getState().currentTab === tab.id;
-              if (isFocused) {
-                eSendEvent(eOnLoadNote, {
-                  item: await db.notes.note(id),
-                  forced: true
-                });
-              } else {
-                editorController.current.commands.setLoading(true, tab.id);
-              }
-            });
-          });
         close?.();
+        setTimeout(() => {
+          presentDialog({
+            title: strings.deleteAttachment(),
+            paragraph: strings.deleteAttachmentConfirm(),
+            positiveText: strings.yes(),
+            negativeText: strings.no(),
+            positiveType: "errorShade",
+            positivePress: async () => {
+              try {
+                const relations = await db.relations
+                  .to(attachment, "note")
+                  .get();
+                await db.attachments.remove(attachment.hash, false);
+                ToastManager.show({
+                  type: "success",
+                  message: strings.attachmentDeleted()
+                });
+                setAttachments();
+                eSendEvent(eDBItemUpdate, attachment.id);
+                relations
+                  .map((relation) => relation.fromId)
+                  .forEach(async (id) => {
+                    useTabStore.getState().forEachNoteTab(id, async (tab) => {
+                      const isFocused =
+                        useTabStore.getState().currentTab === tab.id;
+                      if (isFocused) {
+                        eSendEvent(eOnLoadNote, {
+                          item: await db.notes.note(id),
+                          forced: true
+                        });
+                      } else {
+                        editorController.current.commands.setLoading(
+                          true,
+                          tab.id
+                        );
+                      }
+                    });
+                  });
+                return true;
+              } catch (e) {
+                return false;
+              }
+            }
+          });
+        }, 500);
       },
       icon: "delete-outline"
     }

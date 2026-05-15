@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
@@ -26,42 +27,44 @@ import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
 import { eOpenRecoveryKeyDialog } from "../../utils/events";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Dialog } from "../dialog";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
-import Input from "../ui/input";
+import FormInput, { createFormRef, validators } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
+import Paragraph from "../ui/typography/paragraph";
 import { TextInput } from "react-native-gesture-handler";
 
 export const ChangePassword = () => {
-  const passwordInputRef = useRef<TextInput>(null);
-  const password = useRef<string>(undefined);
+  const { colors } = useThemeColors();
+  const formRef = useRef(
+    createFormRef({
+      oldPassword: "",
+      password: ""
+    })
+  );
   const oldPasswordInputRef = useRef<TextInput>(null);
-  const oldPassword = useRef<string>(undefined);
-
-  const [error, setError] = useState(false);
+  const passwordInputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>();
   const user = useUserStore((state) => state.user);
 
   const changePassword = async () => {
+    setError(undefined);
+    formRef.current.clearErrors();
+
     if (!user?.isEmailConfirmed) {
-      ToastManager.show({
-        heading: strings.emailNotConfirmed(),
-        message: strings.emailNotConfirmedDesc(),
-        type: "error",
-        context: "local"
-      });
+      setError(strings.emailNotConfirmedDesc());
       return;
     }
-    if (error || !oldPassword.current || !password.current) {
-      ToastManager.show({
-        heading: strings.allFieldsRequired(),
-        message: strings.allFieldsRequiredDesc(),
-        type: "error",
-        context: "local"
-      });
+    if (!formRef.current.validate()) {
       return;
     }
+
+    const values = formRef.current.getValues();
+
     setLoading(true);
     try {
       const result = await BackupService.run(
@@ -74,8 +77,8 @@ export const ChangePassword = () => {
       }
 
       const passwordChanged = await db.user.changePassword(
-        oldPassword.current,
-        password.current
+        values.oldPassword,
+        values.password
       );
 
       if (!passwordChanged) {
@@ -91,15 +94,15 @@ export const ChangePassword = () => {
       Navigation.goBack();
       eSendEvent(eOpenRecoveryKeyDialog);
     } catch (e) {
+      const message = (e as Error).message;
       setLoading(false);
-      ToastManager.show({
-        heading: strings.passwordChangeFailed(),
-        message: (e as Error).message,
-        type: "error",
-        context: "local"
-      });
+
+      if (/old password/i.test(message)) {
+        formRef.current.setError("oldPassword", message);
+      } else {
+        setError(message);
+      }
     }
-    setLoading(false);
   };
 
   return (
@@ -110,35 +113,60 @@ export const ChangePassword = () => {
       }}
     >
       <Dialog context="change-password-dialog" />
-      <Input
+      <FormInput
+        name="oldPassword"
+        formRef={formRef}
         fwdRef={oldPasswordInputRef}
-        onChangeText={(value) => {
-          oldPassword.current = value;
-        }}
+        loading={loading}
+        validators={[validators.required(strings.currentPasswordRequired())]}
         returnKeyLabel="Next"
         returnKeyType="next"
         secureTextEntry
         autoComplete="password"
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder={strings.oldPassword()}
+        placeholder={strings.currentPassword()}
+        onSubmitEditing={() => {
+          passwordInputRef.current?.focus();
+        }}
       />
 
-      <Input
+      <FormInput
+        name="password"
+        formRef={formRef}
         fwdRef={passwordInputRef}
-        onChangeText={(value) => {
-          password.current = value;
-        }}
-        onErrorCheck={(e) => setError(e)}
+        loading={loading}
+        validators={[validators.required(strings.passwordRequired())]}
         returnKeyLabel={strings.next()}
         returnKeyType="next"
         secureTextEntry
-        validationType="password"
         autoComplete="password"
         autoCapitalize="none"
         autoCorrect={false}
         placeholder={strings.newPassword()}
+        onSubmitEditing={() => {
+          changePassword();
+        }}
       />
+
+      {error ? (
+        <Paragraph
+          numberOfLines={4}
+          onPress={() => {}}
+          color={colors.error.accent}
+          style={{
+            textAlign: "center",
+            marginTop: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
+          <AppIcon
+            color={colors.error.accent}
+            name="alert-circle-outline"
+            size={AppFontSize.sm - 1}
+          />{" "}
+          {error}
+        </Paragraph>
+      ) : null}
 
       <Notice text={strings.changePasswordNotice()} type="alert" />
 

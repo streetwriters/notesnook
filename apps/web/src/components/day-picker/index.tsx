@@ -93,6 +93,7 @@ export function DayPicker(props: DayPickerProps) {
                 key={month.month + year}
                 value={month.month}
                 data-date={month.$date.toDateString()}
+                disabled={month.disabled}
               >
                 {month.month}
               </option>
@@ -121,6 +122,7 @@ export function DayPicker(props: DayPickerProps) {
                 key={year.year}
                 value={year.year}
                 data-date={year.$date.toDateString()}
+                disabled={year.disabled}
               >
                 {year.year}
               </option>

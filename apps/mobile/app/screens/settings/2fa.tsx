@@ -21,6 +21,7 @@ import { sanitizeFilename, useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
+import isMobilePhone from "validator/lib/isMobilePhone";
 import React, {
   Dispatch,
   SetStateAction,
@@ -28,7 +29,13 @@ import React, {
   useRef,
   useState
 } from "react";
-import { ActivityIndicator, Linking, Platform, View } from "react-native";
+import {
+  ActivityIndicator,
+  Linking,
+  Platform,
+  TextInput,
+  View
+} from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
@@ -37,7 +44,10 @@ import filesystem from "../../common/filesystem";
 import DialogHeader from "../../components/dialog/dialog-header";
 import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
-import Input from "../../components/ui/input";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
 import { Pressable } from "../../components/ui/pressable";
 import Seperator from "../../components/ui/seperator";
 import { SvgView } from "../../components/ui/svg";
@@ -183,27 +193,60 @@ export const MFASetup = ({
 }: MFAStepProps) => {
   const { colors } = useThemeColors();
   const user = useUserStore((state) => state.user);
+  const methodId = method?.id;
+  const formRef = useRef(
+    createFormRef({
+      target: "",
+      code: ""
+    })
+  );
+  const targetInputRef = useRef<TextInput>(null);
+  const codeInputRef = useRef<TextInput>(null);
   const [authenticatorDetails, setAuthenticatorDetails] = useState({
     sharedKey: null,
     authenticatorUri: null
   });
-  const code = useRef<string>(undefined);
-  const phoneNumber = useRef<string>(undefined);
   const { seconds, setId, start } = useTimer(method?.id);
 
   const [loading, setLoading] = useState(method?.id === "app" ? true : false);
   const [enabling, setEnabling] = useState(false);
   const [sending, setSending] = useState(false);
-  const [error, setError] = useState(false);
+  const [generalError, setGeneralError] = useState<string>();
 
   useEffect(() => {
-    if (method?.id === "app") {
-      db.mfa?.setup("app").then((data) => {
-        setAuthenticatorDetails(data);
-        setLoading(false);
-      });
+    if (methodId === "app") {
+      setLoading(true);
+      db.mfa
+        ?.setup("app")
+        .then((data) => {
+          setAuthenticatorDetails(data);
+          setLoading(false);
+        })
+        .catch((error: Error) => {
+          setLoading(false);
+          setGeneralError(error.message);
+        });
+      return;
     }
-  }, [method?.id]);
+
+    setLoading(false);
+  }, [methodId]);
+
+  useEffect(() => {
+    if (!methodId) return;
+
+    formRef.current.clearErrors();
+    formRef.current.setValue(
+      "target",
+      methodId === "email"
+        ? user?.email || ""
+        : methodId === "app"
+          ? authenticatorDetails.sharedKey || ""
+          : formRef.current.getValue("target")
+    );
+    formRef.current.setValue("code", "");
+    setGeneralError(undefined);
+  }, [authenticatorDetails.sharedKey, methodId, user?.email]);
 
   const codeHelpText = {
     app: "After putting the above code in authenticator app, the app will display a code that you can enter below.",
@@ -212,15 +255,43 @@ export const MFASetup = ({
       "You will receive a 2FA code on your email address which you can enter below"
   };
 
+  const targetValidators =
+    method?.id === "sms"
+      ? [
+          validators.required(strings.phoneNumberNotEntered()),
+          (value: string) =>
+            isMobilePhone(value, "any", {
+              strictMode: true
+            })
+              ? undefined
+              : strings.enterValidPhone()
+        ]
+      : method?.id === "email"
+        ? [
+            validators.required(strings.emailRequired()),
+            validators.email(strings.enterValidEmail())
+          ]
+        : [];
+
+  const codeValidators = [
+    validators.required(strings.enterSixDigitCode()),
+    (value: string) =>
+      /^\d{6}$/.test(value.trim()) ? undefined : strings.enterSixDigitCode()
+  ];
+
   const onNext = async () => {
-    if (!code.current || code.current.length !== 6) return;
+    if (formRef.current.validateField("code")) return;
+
     try {
       if (!method) return;
+      const code = formRef.current.getValue("code").trim();
+
+      setGeneralError(undefined);
       setEnabling(true);
       if (recovery) {
-        await db.mfa.enableFallback(method.id, code.current);
+        await db.mfa.enableFallback(method.id, code);
       } else {
-        await db.mfa.enable(method.id, code.current);
+        await db.mfa.enable(method.id, code);
       }
 
       const user = await db.user.fetchUser();
@@ -229,14 +300,18 @@ export const MFASetup = ({
       setEnabling(false);
     } catch (e) {
       const error = e as Error;
-      ToastManager.error(error, "Error submitting 2fa code");
+      formRef.current.setError("code", error.message);
       setEnabling(false);
     }
   };
 
   const onSendCode = async () => {
-    if (error) return;
     if (!method || sending) return;
+
+    if (method.id !== "app" && formRef.current.validateField("target")) {
+      return;
+    }
+
     if (method.id === "app" && authenticatorDetails.sharedKey) {
       Clipboard.setString(authenticatorDetails.sharedKey);
       if (authenticatorDetails.authenticatorUri) {
@@ -254,30 +329,37 @@ export const MFASetup = ({
     }
 
     try {
-      if (seconds) throw new Error(strings.resendCodeWait());
-      if (method.id === "sms" && !phoneNumber.current)
-        throw new Error(strings.phoneNumberNotEntered());
+      const target = formRef.current.getValue("target").trim();
+
+      setGeneralError(undefined);
+      if (seconds) {
+        setGeneralError(strings.resendCodeWait());
+        return;
+      }
+
       setSending(true);
-      await db.mfa.setup(method?.id, phoneNumber.current);
+      await db.mfa.setup(method.id, method.id === "sms" ? target : undefined);
 
       if (method.id === "sms") {
-        setId(method.id + phoneNumber.current);
+        setId(method.id + target);
       }
       await sleep(300);
-      start(
-        60,
-        method.id === "sms" ? method.id + phoneNumber.current : method.id
-      );
+      start(60, method.id === "sms" ? method.id + target : method.id);
       setSending(false);
       ToastManager.show({
         heading: strings["2faCodeSentVia"](method.id),
         type: "success",
         context: "local"
       });
+      codeInputRef.current?.focus();
     } catch (e) {
       setSending(false);
       const error = e as Error;
-      ToastManager.error(error, strings.errorSend2fa());
+      if (method.id === "sms" || method.id === "email") {
+        formRef.current.setError("target", error.message);
+      } else {
+        setGeneralError(error.message);
+      }
     }
   };
 
@@ -316,55 +398,54 @@ export const MFASetup = ({
           </View>
         ) : (
           <>
-            <Input
-              loading={method?.id !== "sms" ? true : false}
-              value={
-                method?.id === "email"
-                  ? user?.email
-                  : method?.id === "app"
-                  ? authenticatorDetails?.sharedKey || ""
-                  : undefined
+            <FormInput
+              key={`${method.id}-${authenticatorDetails.sharedKey || user?.email || ""}`}
+              name="target"
+              formRef={formRef}
+              fwdRef={targetInputRef}
+              loading={method?.id !== "sms"}
+              editable={method.id === "sms"}
+              defaultValue={
+                method.id === "email"
+                  ? user?.email || ""
+                  : method.id === "app"
+                    ? authenticatorDetails.sharedKey || ""
+                    : undefined
               }
               multiline={method.id === "app"}
-              onChangeText={(value) => {
-                phoneNumber.current = value;
+              onChangeText={() => {
+                setGeneralError(undefined);
               }}
               placeholder={
-                method?.id === "email"
+                method.id === "email"
                   ? strings.enterEmailAddress()
                   : "+1234567890"
               }
-              onSubmit={() => {
-                onSendCode();
-              }}
-              onErrorCheck={(e) => setError(e)}
-              validationType={method?.id === "email" ? "email" : "phonenumber"}
+              onSubmitEditing={onSendCode}
+              validators={targetValidators}
               keyboardType={
-                method.id == "email" ? "email-address" : "phone-pad"
-              }
-              errorMessage={
-                method?.id === "email"
-                  ? strings.enterValidEmail()
-                  : strings.enterValidPhone()
+                method.id === "email" ? "email-address" : "phone-pad"
               }
               buttons={
-                error ? null : (
-                  <Button
-                    onPress={onSendCode}
-                    loading={sending}
-                    title={
-                      sending
-                        ? null
-                        : method.id === "app"
+                <Button
+                  onPress={onSendCode}
+                  loading={sending}
+                  style={{
+                    paddingVertical: 0,
+                    paddingHorizontal: 0
+                  }}
+                  title={
+                    sending
+                      ? null
+                      : method.id === "app"
                         ? strings.copy()
                         : `${
                             seconds
                               ? strings.resendCode(seconds as number)
                               : strings.sendCode()
                           }`
-                    }
-                  />
-                )
+                  }
+                />
               }
             />
 
@@ -373,13 +454,22 @@ export const MFASetup = ({
             </Heading>
             <Paragraph>{codeHelpText[method?.id]}</Paragraph>
             <Seperator />
-            <Input
+            <FormInput
+              name="code"
+              formRef={formRef}
+              fwdRef={codeInputRef}
               placeholder="xxxxxx"
               maxLength={6}
               loading={loading}
               textAlign="center"
               keyboardType="numeric"
-              onChangeText={(value) => (code.current = value)}
+              onChangeText={() => {
+                setGeneralError(undefined);
+              }}
+              onSubmitEditing={onNext}
+              returnKeyLabel={strings.next()}
+              returnKeyType="done"
+              validators={codeValidators}
               inputStyle={{
                 fontSize: AppFontSize.lg,
                 height: 60,
@@ -392,7 +482,25 @@ export const MFASetup = ({
                 borderWidth: 0,
                 width: undefined
               }}
+              errorStyle={{
+                textAlign: "center"
+              }}
             />
+
+            {generalError ? (
+              <Paragraph
+                size={AppFontSize.sm}
+                style={{
+                  color: colors.error.icon,
+                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
+                  textAlign: "center",
+                  width: "100%"
+                }}
+              >
+                {generalError}
+              </Paragraph>
+            ) : null}
+
             <Seperator />
             <Button
               title={enabling ? null : strings.next()}
@@ -517,7 +625,7 @@ export const MFARecoveryCodes = ({
                 ToastManager.show({
                   heading: strings.codesCopied(),
                   type: "success",
-                  context: "global"
+                  context: "local"
                 });
               }}
               style={{

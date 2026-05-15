@@ -37,8 +37,9 @@ import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import { Progress } from "../sheets/progress";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
-import Input from "../ui/input";
+import FormInput, { validators } from "../ui/input/form-input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { hideAuth } from "./common";
@@ -63,14 +64,13 @@ export const Login = ({
   const {
     step,
     setStep,
-    password,
-    email,
     emailInputRef,
     passwordInputRef,
     loading,
     setLoading,
-    setError,
-    login
+    login,
+    error,
+    formRef
   } = useLogin(async () => {
     eSendEvent(eUserLoggedIn, true);
     await sleep(500);
@@ -93,6 +93,11 @@ export const Login = ({
   });
   const { width, height } = useWindowDimensions();
   const isTablet = width > 600;
+
+  const onContinue = () => {
+    login();
+  };
+
   useEffect(() => {
     async () => {
       setStep(LoginSteps.emailAuth);
@@ -198,27 +203,27 @@ export const Login = ({
               gap: DefaultAppStyles.GAP_VERTICAL
             }}
           >
-            <Input
+            <FormInput
+              name="email"
+              formRef={formRef}
               fwdRef={emailInputRef}
-              onChangeText={(value) => {
-                email.current = value;
-              }}
               testID="input.email"
-              onErrorCheck={(e) => setError(e)}
               returnKeyLabel="Next"
               returnKeyType="next"
               autoComplete="email"
-              validationType="email"
+              keyboardType="email-address"
               marginBottom={0}
               autoCorrect={false}
               autoCapitalize="none"
-              errorMessage={strings.emailInvalid()}
               placeholder={strings.email()}
-              defaultValue={email.current}
               editable={step === LoginSteps.emailAuth && !loading}
-              onSubmit={() => {
+              validators={[
+                validators.required(strings.emailRequired()),
+                validators.email(strings.enterAValidEmailAddress())
+              ]}
+              onSubmitEditing={() => {
                 if (step === LoginSteps.emailAuth) {
-                  login();
+                  onContinue();
                 } else {
                   passwordInputRef.current?.focus();
                 }
@@ -227,11 +232,10 @@ export const Login = ({
 
             {step === LoginSteps.passwordAuth && (
               <>
-                <Input
+                <FormInput
+                  name="password"
+                  formRef={formRef}
                   fwdRef={passwordInputRef}
-                  onChangeText={(value) => {
-                    password.current = value;
-                  }}
                   testID="input.password"
                   returnKeyLabel={strings.done()}
                   returnKeyType="done"
@@ -242,9 +246,9 @@ export const Login = ({
                   placeholder={strings.password()}
                   marginBottom={0}
                   editable={!loading}
-                  defaultValue={password.current}
-                  onSubmit={() => {
-                    login();
+                  validators={[validators.required(strings.passwordRequired())]}
+                  onSubmitEditing={() => {
+                    onContinue();
                   }}
                 />
                 <Button
@@ -255,9 +259,13 @@ export const Login = ({
                     paddingHorizontal: 0
                   }}
                   onPress={() => {
-                    if (loading || !email.current) return;
+                    if (loading) return;
                     presentSheet({
-                      component: <ForgotPassword userEmail={email.current} />
+                      component: (
+                        <ForgotPassword
+                          userEmail={formRef.current.getValue("email")}
+                        />
+                      )
                     });
                   }}
                   textStyle={{
@@ -273,8 +281,7 @@ export const Login = ({
               <Button
                 loading={loading}
                 onPress={() => {
-                  if (loading) return;
-                  login();
+                  onContinue();
                 }}
                 style={{
                   width: "100%"
@@ -327,6 +334,25 @@ export const Login = ({
                     </Paragraph>
                   </Paragraph>
                 </TouchableOpacity>
+              ) : null}
+
+              {error ? (
+                <Paragraph
+                  numberOfLines={4}
+                  onPress={() => {}}
+                  color={colors.error.accent}
+                  style={{
+                    textAlign: "center",
+                    marginTop: DefaultAppStyles.GAP_VERTICAL
+                  }}
+                >
+                  <AppIcon
+                    color={colors.error.accent}
+                    name="alert-circle-outline"
+                    size={AppFontSize.sm - 1}
+                  />{" "}
+                  {error.message}
+                </Paragraph>
               ) : null}
             </View>
           </View>

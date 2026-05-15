@@ -35,7 +35,6 @@ import { db } from "../../common/database";
 import { Dialog } from "../../components/dialog";
 import { Header } from "../../components/header";
 import { Button } from "../../components/ui/button";
-import Input from "../../components/ui/input";
 import { ReminderTime } from "../../components/ui/reminder-time";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { DDS } from "../../services/device-detection";
@@ -59,6 +58,11 @@ import { TimeSince } from "../../components/ui/time-since";
 import Heading from "../../components/ui/typography/heading";
 import { eOnLoadNote } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
+import AppIcon from "../../components/ui/AppIcon";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -113,7 +117,12 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const referencedItem = reference ? (reference as Note) : null;
   const recurringReminderFeature = useIsFeatureAvailable("recurringReminders");
-
+  const formRef = useRef(
+    createFormRef({
+      title: reminder?.title || referencedItem?.title || "",
+      description: reminder?.description || referencedItem?.headline || ""
+    })
+  );
   const title = useRef<string | undefined>(
     !reminder ? referencedItem?.title : reminder?.title
   );
@@ -132,6 +141,8 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         : null,
     [reminder?.id]
   );
+  const [dateError, setDateError] = useState<string>();
+  const [selectDayError, setSelectDayError] = useState<string>();
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -143,6 +154,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
 
   const handleConfirm = (date: Date) => {
     timer.current = setTimeout(() => {
+      setDateError(undefined);
       hideDatePicker();
       setDate(date);
     }, 10);
@@ -172,25 +184,26 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
 
   async function saveReminder() {
     try {
-      if (!(await Notifications.checkAndRequestPermissions(true)))
-        throw new Error(strings.noNotificationPermission());
-      if (!date && reminderMode !== ReminderModes.Permanent) return;
+      if (!formRef.current.validate()) return;
+      if (date.getTime() < Date.now() && reminderMode === "once") {
+        setDateError(strings.dateError());
+        return;
+      }
+
       if (
         reminderMode === ReminderModes.Repeat &&
         recurringMode !== "day" &&
         recurringMode !== "year" &&
         selectedDays.length === 0
-      )
-        throw new Error(strings.selectDayError());
-
-      if (!title.current) throw new Error(strings.setTitleError());
-      if (
-        date.getTime() < Date.now() &&
-        reminderMode === "once" &&
-        !props.route.params.reminder
       ) {
-        throw new Error(strings.dateError());
+        setSelectDayError(strings.selectDayError());
+        return;
       }
+
+      if (!date && reminderMode !== ReminderModes.Permanent) return;
+
+      if (!(await Notifications.checkAndRequestPermissions(true)))
+        throw new Error(strings.noNotificationPermission());
 
       date.setSeconds(0, 0);
 
@@ -261,7 +274,10 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
         >
-          <Input
+          <FormInput
+            name="title"
+            validators={[validators.required(strings.titleIsRequired())]}
+            formRef={formRef}
             fwdRef={titleRef}
             defaultValue={reminder?.title || referencedItem?.title}
             placeholder={strings.remindeMeOf()}
@@ -270,12 +286,15 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             wrapperStyle={{
               marginTop: DefaultAppStyles.GAP_VERTICAL
             }}
-            onSubmit={() => {
+            onSubmitEditing={() => {
               descriptionRef.current?.focus();
             }}
           />
 
-          <Input
+          <FormInput
+            name="description"
+            validators={[]}
+            formRef={formRef}
             defaultValue={
               reminder ? reminder?.description : referencedItem?.headline
             }
@@ -461,6 +480,22 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                         />
                       ))}
               </ScrollView>
+              {selectDayError ? (
+                <Paragraph
+                  size={AppFontSize.xs}
+                  style={{
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
+                    color: colors.error.icon
+                  }}
+                >
+                  <AppIcon
+                    color={colors.error.accent}
+                    name="alert-circle-outline"
+                    size={AppFontSize.sm - 1}
+                  />{" "}
+                  {selectDayError}
+                </Paragraph>
+              ) : null}
             </View>
           ) : null}
 
@@ -476,16 +511,23 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
               <DateTimePickerModal
                 isVisible={isDatePickerVisible}
                 mode="datetime"
+                minimumDate={
+                  reminderMode === "once" ? dayjs().toDate() : new Date(0)
+                }
                 onConfirm={handleConfirm}
                 onCancel={hideDatePicker}
                 isDarkModeEnabled={isDark}
                 firstDayOfWeek={weekFormat === "Mon" ? 1 : 0}
                 is24Hour={db.settings.getTimeFormat() === "24-hour"}
                 date={date || new Date(Date.now())}
+                themeVariant={isDark ? "dark" : "light"}
               />
 
               <DatePicker
                 date={date}
+                minimumDate={
+                  reminderMode === "once" ? dayjs().toDate() : new Date(0)
+                }
                 maximumDate={dayjs(date).add(3, "months").toDate()}
                 onDateChange={handleConfirm}
                 theme={isDark ? "dark" : "light"}
@@ -519,6 +561,23 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                   }}
                 />
               )}
+
+              {dateError ? (
+                <Paragraph
+                  size={AppFontSize.xs}
+                  style={{
+                    marginTop: DefaultAppStyles.GAP_VERTICAL,
+                    color: colors.error.icon
+                  }}
+                >
+                  <AppIcon
+                    color={colors.error.accent}
+                    name="alert-circle-outline"
+                    size={AppFontSize.sm - 1}
+                  />{" "}
+                  {dateError}
+                </Paragraph>
+              ) : null}
             </View>
           )}
 

@@ -231,15 +231,40 @@ export async function restoreBackupFile(backupFile: File) {
     }
     await db.initCollections();
   } else {
+    const { createUnzipIterator } = await import(
+      "../utils/streams/unzip-stream"
+    );
+
+    let skipAttachments = false;
+    if (!useUserStore.getState().isLoggedIn) {
+      let hasAttachments = false;
+      for await (const entry of createUnzipIterator(backupFile)) {
+        if (
+          entry.name.startsWith("attachments/") &&
+          entry.name !== "attachments/.attachments_key"
+        ) {
+          hasAttachments = true;
+          break;
+        }
+      }
+
+      if (hasAttachments) {
+        const result = await ConfirmDialog.show({
+          title: strings.loginToRestoreAttachments(),
+          message: strings.loginToRestoreAttachmentsDesc(),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
+        });
+        if (!result) return;
+        skipAttachments = true;
+      }
+    }
+
     const error = await TaskManager.startTask<Error | void>({
       title: strings.restoringBackup(),
       subtitle: strings.restoringBackupDesc(),
       type: "modal",
       action: async (report) => {
-        const { createUnzipIterator } = await import(
-          "../utils/streams/unzip-stream"
-        );
-
         let cachedPassword: string | undefined = undefined;
         let cachedKey: string | undefined = undefined;
         // const { read, totalFiles } = await Reader(backupFile);
@@ -254,13 +279,13 @@ export async function restoreBackupFile(backupFile: File) {
             isValid = true;
             continue;
           }
-          if (entry.name === "attachments/.attachments_key")
+          if (!skipAttachments && entry.name === "attachments/.attachments_key")
             attachmentsKey = JSON.parse(await entry.text()) as
               | SerializedKey
               | Cipher<"base64">;
-          else if (entry.name.startsWith("attachments/"))
+          else if (!skipAttachments && entry.name.startsWith("attachments/"))
             attachments.push(entry);
-          else entries.push(entry);
+          else if (!entry.name.startsWith("attachments/")) entries.push(entry);
         }
         if (!isValid)
           console.warn(
@@ -339,6 +364,8 @@ export async function restoreBackupFile(backupFile: File) {
     if (error) {
       console.error(error);
       showToast("error", `${strings.restoreFailed()}: ${error.message}`);
+    } else {
+      showToast("success", strings.backupRestored());
     }
   }
 }

@@ -564,18 +564,24 @@ class UserManager {
 
     const email = newEmail.toLowerCase();
 
-    await http.patch(
-      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
-      {
-        type: "change_email",
-        new_email: newEmail,
-        password: await this.db.storage().hash(password, email, {
-          usesFallback: await this.usesFallbackPWHash(password)
-        }),
-        verification_code: code
-      },
-      token
-    );
+    try {
+      await http.patch(
+        `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
+        {
+          type: "change_email",
+          new_email: newEmail,
+          password: await this.db.storage().hash(password, email, {
+            usesFallback: await this.usesFallbackPWHash(password)
+          }),
+          verification_code: code
+        },
+        token
+      );
+    } catch (e) {
+      const error = e as Error;
+      if (error.message === "Invalid token.") throw new Error("Invalid code.");
+      throw error;
+    }
   }
 
   recoverAccount(email: string) {

@@ -1,6 +1,7 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-04-20 11:33+0500\n"
+"POT-Creation-Date: 2026-05-11 12:10+0500\n"
+"POT-Creation-Date: 2026-05-11 12:10+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -973,6 +974,10 @@ msgstr ""
 
 #: src/strings.ts:1326
 msgid "Are you sure you want to clear trash?"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2734
+msgid "Are you sure you want to delete this attachment?"
 msgstr ""
 
 #: src/strings.ts:1544
@@ -1030,6 +1035,10 @@ msgstr ""
 #: src/strings.ts:300
 #: src/strings.ts:2356
 msgid "Attachment"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2735
+msgid "Attachment deleted"
 msgstr ""
 
 #: src/strings.ts:2460
@@ -1817,6 +1826,10 @@ msgstr ""
 
 #: src/strings.ts:1485
 msgid "Confirm password"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2729
+msgid "Confirm password required"
 msgstr ""
 
 #: src/strings.ts:1489
@@ -2027,10 +2040,15 @@ msgstr ""
 
 #: src/strings.ts:1838
 msgid "Current note"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
+#: src/strings.ts:1481
 #: src/strings.ts:1487
 msgid "Current password"
+msgstr ""
+
+#: src/strings.ts:2738
+msgid "Current password required"
 msgstr ""
 
 #: src/strings.ts:1231
@@ -2209,6 +2227,10 @@ msgstr ""
 
 #: src/strings.ts:1078
 msgid "Delete account"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2732
+msgid "Delete attachment"
 msgstr ""
 
 #: src/strings.ts:1321
@@ -3210,7 +3232,11 @@ msgstr ""
 
 #: src/strings.ts:400
 msgid "Getting recovery codes"
-msgstr "<<<<<<< HEAD"
+msgstr "<<<<<<< HEAD<<<<<<< HEAD"
+
+#: src/strings.ts:2731
+msgid "Gift code required"
+msgstr ""
 
 #: src/strings.ts:2174
 msgid "GNU GENERAL PUBLIC LICENSE Version 3"
@@ -3917,6 +3943,10 @@ msgstr ""
 msgid "Login required"
 msgstr ""
 
+#: src/strings.ts:2739
+msgid "Login required to restore attachments"
+msgstr ""
+
 #: src/strings.ts:779
 msgid "Login successful"
 msgstr ""
@@ -4165,6 +4195,10 @@ msgstr ""
 
 #: src/strings.ts:887
 msgid "Name"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2737
+msgid "Name is required."
 msgstr ""
 
 #: src/strings.ts:1690
@@ -4540,11 +4574,7 @@ msgstr ""
 
 #: src/strings.ts:641
 msgid "Old - new"
-msgstr ""
-
-#: src/strings.ts:1481
-msgid "Old password"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1837
 msgid "Older version"
@@ -4699,6 +4729,10 @@ msgstr ""
 msgid "Password protection"
 msgstr ""
 
+#: src/strings.ts:2728
+msgid "Password required"
+msgstr ""
+
 #: src/strings.ts:809
 msgid "Password updated"
 msgstr "<<<<<<< HEAD"
@@ -4807,9 +4841,10 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2674
 msgid "Please enter a key name"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1514
+#: src/strings.ts:2730
 msgid "Please enter a valid email address"
 msgstr ""
 
@@ -4871,6 +4906,10 @@ msgstr ""
 
 #: src/strings.ts:1558
 msgid "Please grant notifications permission to add new reminders."
+msgstr ""
+
+#: src/strings.ts:2745
+msgid "Please login to download attachments."
 msgstr ""
 
 #: src/strings.ts:873
@@ -6813,6 +6852,10 @@ msgstr ""
 
 #: src/strings.ts:1159
 msgid "Title format"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2736
+msgid "Title is required"
 msgstr ""
 
 #: src/strings.ts:1190
@@ -7623,6 +7666,13 @@ msgstr ""
 msgid "You must log out in order to change/reset server URLs."
 msgstr ""
 
+#: src/strings.ts:2741
+msgid ""
+"You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
+"  \n"
+"Continue without attachments?"
+msgstr ""
+
 #: src/strings.ts:836
 msgid "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source"
 msgstr ""
@@ -7826,7 +7876,7 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2055
 msgid "Your support request has been forwarded"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2064
 msgid "Your support request has been forwarded to our support team. We will get back to you via email as soon as possible. If you don't receive an email from us within 24-48 hours, please send us an email directly at support@notesnook.com."

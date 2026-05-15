@@ -2263,14 +2263,35 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - react-native-screenguard (1.0.0):
+  - react-native-screenguard (2.0.0-beta5):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
     - RCT-Folly
+    - RCT-Folly/Fabric
     - RCTRequired
     - RCTTypeSafety
-    - React-Codegen
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - SDWebImage (~> 5.11.1)
+    - SDWebImage (~> 5.11)
+    - SocketRocket
+    - Yoga
   - react-native-share-extension (2.9.5):
     - React
   - react-native-sodium (1.6.8):
@@ -3125,8 +3146,6 @@ PODS:
     - RNNotifee/NotifeeCore (= 7.4.12)
   - RNNotifee/NotifeeCore (7.4.12):
     - React-Core
-  - RNPrivacySnapshot (1.0.0):
-    - React-Core
   - RNReanimated (4.2.0):
     - boost
     - DoubleConversion
@@ -3602,7 +3621,6 @@ DEPENDENCIES:
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - "RNNotifee (from `../node_modules/@ammarahmed/notifee-react-native`)"
-  - RNPrivacySnapshot (from `../node_modules/react-native-privacy-snapshot`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSecureRandom (from `../node_modules/react-native-securerandom`)
@@ -3870,8 +3888,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-keychain"
   RNNotifee:
     :path: "../node_modules/@ammarahmed/notifee-react-native"
-  RNPrivacySnapshot:
-    :path: "../node_modules/react-native-privacy-snapshot"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -3974,7 +3990,7 @@ SPEC CHECKSUMS:
   react-native-pdf: edc236298f13f1609e42d41e45b8b6ea88ed10f9
   react-native-quick-sqlite: 1ed8d3db1e22a8604d006be69f06053382e93bb0
   react-native-safe-area-context: c6e2edd1c1da07bdce287fa9d9e60c5f7b514616
-  react-native-screenguard: 9fc3b4ad5b97783fc0832638fae0dce51272c661
+  react-native-screenguard: 975d4612dce0c348b19b08a48aa23e9b68584d98
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
   react-native-sodium: 066f76e46c9be13e9260521e3fa994937c4cdab4
   react-native-theme-switch-animation: 449d6db7a760f55740505e7403ae8061debc9a7e
@@ -4027,7 +4043,6 @@ SPEC CHECKSUMS:
   RNImageCropPicker: 5fd4ceaead64d8c53c787e4e559004f97bc76df7
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
   RNNotifee: dea82c9ec44684eeeac9da85deb5eeb8ebe5937f
-  RNPrivacySnapshot: ccad3a548338c2f526bb7b1789af3fb0618b7d1d
   RNReanimated: f1868b36f4b2b52a0ed00062cfda69506f75eaee
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
   RNSecureRandom: b64d263529492a6897e236a22a2c4249aa1b53dc

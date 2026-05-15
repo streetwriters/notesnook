@@ -26,7 +26,6 @@ import {
 } from "../stores/use-setting-store";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
-import { DatabaseLogger } from "../common/database";
 import { useUserStore } from "../stores/use-user-store";
 import ScreenGuardModule from "react-native-screenguard";
 ScreenGuardModule.initSettings();
@@ -89,7 +88,6 @@ function migrateAppLock() {
       biometricsAuthEnabled: true
     });
   }
-  DatabaseLogger.debug("App lock Migrated");
 }
 
 function migrateSettings(settings: SettingStore["settings"]) {

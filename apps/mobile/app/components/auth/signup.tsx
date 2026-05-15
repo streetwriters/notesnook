@@ -30,7 +30,6 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { ToastManager } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
@@ -39,13 +38,14 @@ import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Loading } from "../loading";
 import { Button } from "../ui/button";
-import Input from "../ui/input";
+import FormInput, { createFormRef, validators } from "../ui/input/form-input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AuthHeader } from "./header";
 import { SignupContext } from "./signup-context";
 import { RouteParams } from "../../stores/use-navigation-store";
 import SettingsService from "../../services/settings";
+import AppIcon from "../ui/AppIcon";
 
 const SignupSteps = {
   signup: 0,
@@ -62,13 +62,17 @@ export const Signup = ({
 }) => {
   const [currentStep, setCurrentStep] = useState(SignupSteps.signup);
   const { colors } = useThemeColors();
-  const email = useRef<string>(undefined);
+  const formRef = useRef(
+    createFormRef({
+      email: "",
+      password: "",
+      confirmPassword: ""
+    })
+  );
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
-  const password = useRef<string>(undefined);
   const confirmPasswordInputRef = useRef<TextInput>(null);
-  const confirmPassword = useRef<string>(undefined);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>();
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
@@ -76,29 +80,17 @@ export const Signup = ({
   const isTablet = width > 600;
   const route = useRoute<RouteProp<RouteParams, "Auth">>();
 
-  const validateInfo = () => {
-    if (!password.current || !email.current || !confirmPassword.current) {
-      ToastManager.show({
-        heading: strings.allFieldsRequired(),
-        message: strings.allFieldsRequiredDesc(),
-        type: "error",
-        context: "local"
-      });
-
-      return false;
-    }
-
-    return true;
-  };
-
   const signup = async () => {
-    if (!validateInfo() || error) return;
+    setErrorMessage(undefined);
+    if (!formRef.current.validate()) return;
     if (loading) return;
+
+    const values = formRef.current.getValues();
 
     setLoading(true);
     try {
       setCurrentStep(SignupSteps.createAccount);
-      await db.user.signup(email.current!.toLowerCase(), password.current!);
+      await db.user.signup(values.email.toLowerCase(), values.password);
       const user = await db.user.getUser();
       setUser(user);
       setLastSynced(await db.lastSynced());
@@ -115,12 +107,14 @@ export const Signup = ({
     } catch (e) {
       setCurrentStep(SignupSteps.signup);
       setLoading(false);
-      ToastManager.show({
-        heading: strings.signupFailed(),
-        message: (e as Error).message,
-        type: "error",
-        context: "local"
-      });
+      if (
+        (e as Error).message === "Unable to create an account on this email."
+      ) {
+        formRef.current.setError("email", (e as Error).message);
+      } else {
+        setErrorMessage((e as Error).message);
+      }
+
       return false;
     }
   };
@@ -215,37 +209,35 @@ export const Signup = ({
                   alignSelf: "center"
                 }}
               >
-                <Input
+                <FormInput
+                  name="email"
+                  formRef={formRef}
                   fwdRef={emailInputRef}
-                  onChangeText={(value) => {
-                    email.current = value;
-                  }}
-                  defaultValue={email.current}
+                  loading={loading}
                   testID="input.email"
-                  onErrorCheck={(e) => setError(e)}
                   returnKeyLabel="Next"
                   returnKeyType="next"
                   autoComplete="email"
-                  validationType="email"
+                  keyboardType="email-address"
                   autoCorrect={false}
                   autoCapitalize="none"
-                  errorMessage={strings.emailInvalid()}
                   placeholder={strings.email()}
                   blurOnSubmit={false}
-                  onSubmit={() => {
-                    if (!email.current) return;
+                  validators={[
+                    validators.required(strings.emailRequired()),
+                    validators.email(strings.enterAValidEmailAddress())
+                  ]}
+                  onSubmitEditing={() => {
                     passwordInputRef.current?.focus();
                   }}
                 />
 
-                <Input
+                <FormInput
+                  name="password"
+                  formRef={formRef}
                   fwdRef={passwordInputRef}
-                  onChangeText={(value) => {
-                    password.current = value;
-                  }}
-                  defaultValue={password.current}
+                  loading={loading}
                   testID="input.password"
-                  onErrorCheck={(e) => setError(e)}
                   returnKeyLabel="Next"
                   returnKeyType="next"
                   secureTextEntry
@@ -254,20 +246,18 @@ export const Signup = ({
                   blurOnSubmit={false}
                   autoCorrect={false}
                   placeholder={strings.password()}
-                  onSubmit={() => {
-                    if (!password.current) return;
+                  validators={[validators.required(strings.passwordRequired())]}
+                  onSubmitEditing={() => {
                     confirmPasswordInputRef.current?.focus();
                   }}
                 />
 
-                <Input
+                <FormInput
+                  name="confirmPassword"
+                  formRef={formRef}
                   fwdRef={confirmPasswordInputRef}
-                  onChangeText={(value) => {
-                    confirmPassword.current = value;
-                  }}
-                  defaultValue={confirmPassword.current}
+                  loading={loading}
                   testID="input.confirmPassword"
-                  onErrorCheck={(e) => setError(e)}
                   returnKeyLabel="Signup"
                   returnKeyType="done"
                   secureTextEntry
@@ -275,17 +265,22 @@ export const Signup = ({
                   autoCapitalize="none"
                   autoCorrect={false}
                   blurOnSubmit={false}
-                  validationType="confirmPassword"
-                  customValidator={() => password.current || ""}
                   placeholder={strings.confirmPassword()}
                   marginBottom={12}
-                  onSubmit={() => {
+                  validators={[
+                    validators.required(strings.confirmPasswordRequired()),
+                    validators.matchField(
+                      "password",
+                      strings.passwordNotMatched()
+                    )
+                  ]}
+                  onSubmitEditing={() => {
                     signup();
                   }}
                 />
 
                 <Button
-                  title={!loading ? "Continue" : null}
+                  title={!loading ? strings.continue() : null}
                   type="accent"
                   loading={loading}
                   onPress={() => {
@@ -319,6 +314,25 @@ export const Signup = ({
                     </Paragraph>
                   </Paragraph>
                 </TouchableOpacity>
+
+                {errorMessage ? (
+                  <Paragraph
+                    numberOfLines={4}
+                    onPress={() => {}}
+                    color={colors.error.accent}
+                    style={{
+                      textAlign: "center",
+                      marginTop: DefaultAppStyles.GAP_VERTICAL
+                    }}
+                  >
+                    <AppIcon
+                      color={colors.error.accent}
+                      name="alert-circle-outline"
+                      size={AppFontSize.sm - 1}
+                    />{" "}
+                    {errorMessage}
+                  </Paragraph>
+                ) : null}
               </View>
 
               <View

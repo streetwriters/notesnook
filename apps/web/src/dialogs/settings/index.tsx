@@ -47,6 +47,7 @@ import { FlexScrollContainer } from "../../components/scroll-container";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DropdownSettingComponent,
+  Section,
   SectionGroup,
   SectionKeys,
   Setting,
@@ -254,9 +255,15 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
             overflow: "auto"
           }}
         >
-          {activeSettings.map((group) => (
-            <SettingsGroupComponent item={group} />
-          ))}
+          {activeSettings.length > 0 ? (
+            activeSettings.map((group) => (
+              <SettingsGroupComponent item={group} />
+            ))
+          ) : (
+            <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+              {strings.noResultsFound()}
+            </Text>
+          )}
         </FlexScrollContainer>
       </Flex>
     </Dialog>
@@ -317,12 +324,17 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                   SettingsGroups.filter((g) => g.section === route)
                 );
 
-              const groups: SettingsGroup[] = [];
+              let groups: SettingsGroup[] = [];
               for (const group of SettingsGroups) {
+                const section = findSection(group.section);
+                if (section?.isHidden?.() || group.isHidden?.()) continue;
+
                 const isTitleMatch =
                   typeof group.header === "string" &&
                   group.header.toLowerCase().includes(query);
-                const isSectionMatch = group.section.includes(query);
+                const isSectionMatch = group.section
+                  .toLowerCase()
+                  .includes(query);
 
                 if (isTitleMatch || isSectionMatch) {
                   groups.push(group);
@@ -346,6 +358,18 @@ function SettingsSideBar(props: SettingsSideBarProps) {
                 });
                 if (!settings.length) continue;
                 groups.push({ ...group, settings });
+              }
+              const matchedSections = findSections(query);
+              if (matchedSections.length > 0) {
+                const matchedGroups = SettingsGroups.filter((g) =>
+                  matchedSections.some((s) => s.key === g.section)
+                );
+                // remove groups whose sections were matched to avoid duplicate
+                // entries.
+                groups = groups.filter(
+                  (g) => !matchedGroups.some((mg) => mg.section === g.section)
+                );
+                groups.push(...matchedGroups);
               }
               onNavigate(groups);
             }}
@@ -716,4 +740,23 @@ function NumberInput({
       )}
     </Flex>
   );
+}
+
+function findSection(key: SectionKeys) {
+  for (const group of sectionGroups) {
+    const section = group.sections.find((s) => s.key === key);
+    if (section) return section;
+  }
+  return null;
+}
+
+function findSections(query: string) {
+  const sections: Section[] = [];
+  for (const group of sectionGroups) {
+    for (const section of group.sections) {
+      if (section.isHidden?.()) continue;
+      if (section.title.toLowerCase().includes(query)) sections.push(section);
+    }
+  }
+  return sections;
 }

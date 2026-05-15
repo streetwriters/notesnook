@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Plan, SubscriptionPlan } from "@notesnook/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Platform } from "react-native";
 import Config from "react-native-config";
@@ -181,6 +181,8 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
   const [cancelPromo, setCancelPromo] = useState(false);
   const [userCanRequestTrial, setUserCanRequestTrial] = useState(false);
   const [webPricingPlans, setWebPricingPlans] = useState<Plan[]>([]);
+  const plansRef = useRef(plans);
+  plansRef.current = plans;
 
   const getProduct = React.useCallback(
     (planId: string, skuId: string) => {
@@ -190,11 +192,11 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
         );
 
       return (
-        plans.find((p) => p.id === planId)?.subscriptions?.[skuId] ||
-        plans.find((p) => p.id === planId)?.products?.[skuId]
+        plansRef.current.find((p) => p.id === planId)?.subscriptions?.[skuId] ||
+        plansRef.current.find((p) => p.id === planId)?.products?.[skuId]
       );
     },
-    [plans, webPricingPlans]
+    [webPricingPlans]
   );
 
   const getProductAndroid = (planId: string, skuId: string) => {
@@ -253,35 +255,41 @@ const usePricingPlans = (options?: PricingPlansOptions) => {
 
   useEffect(() => {
     const loadPlans = async () => {
-      const items = await PremiumService.loadProductsAndSubs();
-      pricingPlans.forEach((plan) => {
-        plan.subscriptions = {};
-        plan.products = {};
-        plan.subscriptionSkuList.forEach((sku) => {
-          if (!plan.subscriptions) plan.subscriptions = {};
-          plan.subscriptions[sku] = items.subs.find((p) => p.productId === sku);
+      try {
+        const items = await PremiumService.loadProductsAndSubs();
+        pricingPlans.forEach((plan) => {
+          plan.subscriptions = {};
+          plan.products = {};
+          plan.subscriptionSkuList.forEach((sku) => {
+            if (!plan.subscriptions) plan.subscriptions = {};
+            plan.subscriptions[sku] = items.subs.find(
+              (p) => p.productId === sku
+            );
+          });
+          plan.productSkuList.forEach((sku) => {
+            if (!plan.products) plan.products = {};
+            plan.products[sku] = items.products.find(
+              (p) => p.productId === sku
+            );
+          });
         });
-        plan.productSkuList.forEach((sku) => {
-          if (!plan.products) plan.products = {};
-          plan.products[sku] = items.products.find((p) => p.productId === sku);
-        });
-      });
-      setPlans([...pricingPlans]);
-      setUserCanRequestTrial(hasTrialOffer());
-      if (
-        Config.GITHUB_RELEASE === "true" &&
-        !SettingsService.getProperty("serverUrls")
-      ) {
-        try {
-          const products = WebPlanCache || (await db.pricing.products());
-          WebPlanCache = products;
-          setWebPricingPlans(products);
-        } catch (e) {
-          /**
+        setPlans([...pricingPlans]);
+        setUserCanRequestTrial(hasTrialOffer());
+        if (
+          Config.GITHUB_RELEASE === "true" &&
+          !SettingsService.getProperty("serverUrls")
+        ) {
+          try {
+            const products = WebPlanCache || (await db.pricing.products());
+            WebPlanCache = products;
+            setWebPricingPlans(products);
+          } catch (e) {
+            /**
           empty */
+          }
         }
-      }
-      setLoadingPlans(false);
+        setLoadingPlans(false);
+      } catch (e) {}
     };
     loadPlans();
   }, [options?.promoOffer, cancelPromo, hasTrialOffer]);

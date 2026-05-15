@@ -1478,7 +1478,7 @@ $day$: Current day (eg. Monday)`,
   someNotesPublished: () => t`Some notes are published`,
   unpublishToDelete: () => t`Unpublish notes to delete them`,
   filterAttachments: () => t`Filter attachments by filename, type or hash`,
-  oldPassword: () => t`Old password`,
+  oldPassword: () => t`Current password`,
   newPassword: () => t`New password`,
   email: () => t`Email`,
   emailInvalid: () => t`Invalid email`,
@@ -2724,5 +2724,23 @@ Use this if changes from other devices are not appearing on this device. This wi
   valueMustBeBetween: (min: number, max: number) =>
     t`Value must be between ${min} and ${max}`,
   pgpPrivateKeyProtected: () =>
-    t`Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase.`
+    t`Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase.`,
+  passwordRequired: () => t`Password required`,
+  confirmPasswordRequired: () => t`Confirm password required`,
+  enterAValidEmailAddress: () => t`Please enter a valid email address`,
+  giftCodeRequired: () => t`Gift code required`,
+  deleteAttachment: () => t`Delete attachment`,
+  deleteAttachmentConfirm: () =>
+    t`Are you sure you want to delete this attachment?`,
+  attachmentDeleted: () => t`Attachment deleted`,
+  titleIsRequired: () => t`Title is required`,
+  nameIsRequired: () => t`Name is required.`,
+  currentPasswordRequired: () => t`Current password required`,
+  loginToRestoreAttachments: () => t`Login required to restore attachments`,
+  loginToRestoreAttachmentsDesc: () =>
+    t`You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).
+  
+Continue without attachments?`,
+  pleaseLoginToDownloadAttachments: () =>
+    t`Please login to download attachments.`
 };

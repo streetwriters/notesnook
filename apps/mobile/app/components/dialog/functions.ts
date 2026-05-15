@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { KeyboardTypeOptions } from "react-native";
+import { KeyboardTypeOptions, TextInput } from "react-native";
 import { eSendEvent } from "../../services/event-manager";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 import { ButtonProps } from "../ui/button";
+import { FieldValidator, FormRef } from "../ui/input/form-input";
+import { RefObject } from "react";
 
 export type DialogInfo = {
   title?: string;
@@ -43,6 +45,18 @@ export type DialogInfo = {
     | "errorShade";
   icon?: string;
   paragraphColor: string;
+  form?: {
+    formRef: FormRef;
+    items: {
+      name: string;
+      placeholder: string;
+      label?: string;
+      validators: FieldValidator[];
+      defaultValue?: string;
+      ref: RefObject<TextInput | null>;
+    }[];
+    onFormSubmit?: (form: FormRef) => Promise<boolean>;
+  };
   input: boolean;
   inputPlaceholder: string;
   defaultValue: string;

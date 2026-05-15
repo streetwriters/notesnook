@@ -27,7 +27,7 @@ import { useThemeColors } from "@notesnook/theme";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
-import Input from "../ui/input";
+import FormInput, { createFormRef, validators } from "../ui/input/form-input";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -36,21 +36,22 @@ import { DefaultAppStyles } from "../../utils/styles";
 
 export const ForgotPassword = ({ userEmail }: { userEmail: string }) => {
   const { colors } = useThemeColors("sheet");
-  const email = useRef<string>(userEmail);
+  const formRef = useRef(
+    createFormRef({
+      email: userEmail || ""
+    })
+  );
   const emailInputRef = useRef<TextInput>(null);
-  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
   const sendRecoveryEmail = async () => {
-    if (!email.current || error) {
-      ToastManager.show({
-        heading: strings.emailRequired(),
-        type: "error",
-        context: "local"
-      });
+    if (formRef.current.validateField("email")) {
       return;
     }
+
+    const values = formRef.current.getValues();
+
     setLoading(true);
     try {
       const lastRecoveryEmailTime = SettingsService.get().lastRecoveryEmailTime;
@@ -60,7 +61,7 @@ export const ForgotPassword = ({ userEmail }: { userEmail: string }) => {
       ) {
         throw new Error(strings.pleaseWaitBeforeSendEmail());
       }
-      await db.user.recoverAccount(email.current.toLowerCase());
+      await db.user.recoverAccount(values.email.toLowerCase());
       SettingsService.set({
         lastRecoveryEmailTime: Date.now()
       });
@@ -75,12 +76,7 @@ export const ForgotPassword = ({ userEmail }: { userEmail: string }) => {
       setSent(true);
     } catch (e) {
       setLoading(false);
-      ToastManager.show({
-        heading: strings.recoveryEmailFailed(),
-        message: (e as Error).message,
-        type: "error",
-        context: "local"
-      });
+      formRef.current.setError("email", (e as Error).message);
     }
   };
 
@@ -126,22 +122,25 @@ export const ForgotPassword = ({ userEmail }: { userEmail: string }) => {
           <DialogHeader title={strings.accountRecovery()} />
           <Seperator />
 
-          <Input
+          <FormInput
+            name="email"
+            formRef={formRef}
             fwdRef={emailInputRef}
-            onChangeText={(value) => {
-              email.current = value;
-            }}
-            defaultValue={email.current}
-            onErrorCheck={(e) => setError(e)}
+            loading={loading}
             returnKeyLabel={strings.next()}
             returnKeyType="next"
             autoComplete="email"
-            validationType="email"
+            keyboardType="email-address"
             autoCorrect={false}
             autoCapitalize="none"
-            errorMessage={strings.emailInvalid()}
             placeholder={strings.email()}
-            onSubmit={() => {}}
+            validators={[
+              validators.required(strings.emailRequired()),
+              validators.email(strings.enterAValidEmailAddress())
+            ]}
+            onSubmitEditing={() => {
+              sendRecoveryEmail();
+            }}
           />
 
           <Button

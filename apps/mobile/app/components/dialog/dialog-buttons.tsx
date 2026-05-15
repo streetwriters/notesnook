@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { getColorLinearShade } from "../../utils/colors";
@@ -79,6 +79,11 @@ const DialogButtons = ({
           />
           <Paragraph color={colors.primary.accent}>{" " + doneText}</Paragraph>
         </View>
+      ) : loading ? (
+        <ActivityIndicator
+          size={AppFontSize.lg}
+          color={colors.primary.accent}
+        />
       ) : (
         <View />
       )}
@@ -105,7 +110,6 @@ const DialogButtons = ({
             style={{
               marginLeft: 10
             }}
-            loading={loading}
             bold
             type={positiveType || "transparent"}
             title={positiveTitle}

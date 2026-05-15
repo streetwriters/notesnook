@@ -65,6 +65,14 @@ export async function unlockVault({
             paragraph: paragraph,
             inputPlaceholder: strings.enterPassword(),
             positivePress: async (value) => {
+              if (!value || !value.trim()) {
+                ToastManager.error(
+                  new Error(strings.passwordNotEntered()),
+                  undefined,
+                  "local"
+                );
+                return;
+              }
               const unlocked = await db.vault.unlock(value);
               if (!unlocked) {
                 ToastManager.show({

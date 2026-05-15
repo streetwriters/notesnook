@@ -69,8 +69,6 @@ export const SectionHeader = React.memo<
       dataType as "note" | "notebook" | "searchResult"
     );
 
-    console.log(item);
-
     return (
       <View
         style={{

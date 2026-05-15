@@ -370,7 +370,14 @@ export const useActions = ({
       inputPlaceholder: strings.name(),
       defaultValue: item.title,
       positivePress: async (value) => {
-        if (!value || value.trim().length === 0) return;
+        if (!value || value.trim().length === 0) {
+          ToastManager.error(
+            new Error(strings.nameIsRequired()),
+            undefined,
+            "local"
+          );
+          return;
+        }
         await db.colors.add({
           id: item.id,
           title: value

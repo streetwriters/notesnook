@@ -43,29 +43,26 @@ import SheetProvider from "../sheet-provider";
 import { Toast } from "../toast";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
-import Input from "../ui/input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
 import { strings } from "@notesnook/intl";
 import { getObfuscatedEmail } from "../../utils/functions";
 import { DefaultAppStyles } from "../../utils/styles";
+import FormInput, { validators } from "../ui/input/form-input";
 
 export const SessionExpired = () => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
-  const { step, password, email, passwordInputRef, loading, login } = useLogin(
-    () => {
-      eSendEvent(eUserLoggedIn, true);
-      setVisible(false);
-      setFocused(false);
-      useUserStore.setState({
-        disableAppLockRequests: false
-      });
-    },
-    true
-  );
+  const { step, passwordInputRef, loading, login, formRef } = useLogin(() => {
+    eSendEvent(eUserLoggedIn, true);
+    setVisible(false);
+    setFocused(false);
+    useUserStore.setState({
+      disableAppLockRequests: false
+    });
+  }, true);
 
   const logout = async () => {
     try {
@@ -104,7 +101,7 @@ export const SessionExpired = () => {
         if (!complete) {
           const user = await db.user.getUser();
           if (!user) return;
-          email.current = user.email;
+          formRef.current.setValue("email", user.email);
           setVisible(true);
           setFocused(false);
           return;
@@ -117,14 +114,14 @@ export const SessionExpired = () => {
     } catch (e) {
       const user = await db.user.getUser();
       if (!user) return;
-      email.current = user.email;
+      formRef.current.setValue("email", user.email);
       setFocused(false);
       setVisible(true);
       useUserStore.setState({
         disableAppLockRequests: true
       });
     }
-  }, [email]);
+  }, [formRef]);
 
   useEffect(() => {
     const sub = eSubscribeEvent(eLoginSessionExpired, open);
@@ -155,6 +152,7 @@ export const SessionExpired = () => {
         enableSheetKeyboardHandler={true}
         visible={true}
       >
+        <Dialog context="two_factor_verify" />
         <View
           style={{
             width: focused ? "100%" : "99.9%",
@@ -192,17 +190,17 @@ export const SessionExpired = () => {
               }}
             >
               {strings.sessionExpiredDesc(
-                getObfuscatedEmail(email.current as string)
+                getObfuscatedEmail(formRef.current.getValue("email") as string)
               )}
             </Paragraph>
           </View>
 
           {step === LoginSteps.passwordAuth ? (
-            <Input
+            <FormInput
               fwdRef={passwordInputRef}
-              onChangeText={(value) => {
-                password.current = value;
-              }}
+              formRef={formRef}
+              name="password"
+              validators={[validators.required(strings.passwordRequired())]}
               returnKeyLabel={strings.done()}
               returnKeyType="next"
               secureTextEntry
@@ -210,7 +208,7 @@ export const SessionExpired = () => {
               autoCapitalize="none"
               autoCorrect={false}
               placeholder={strings.password()}
-              onSubmit={() => {
+              onSubmitEditing={() => {
                 login();
               }}
             />

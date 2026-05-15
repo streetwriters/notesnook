@@ -29,6 +29,10 @@ import ImagePicker from "react-native-image-crop-picker";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { presentDialog } from "../../components/dialog/functions";
+import {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
 import { PlanLimits } from "../../components/sheets/plan-limits";
 import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
@@ -197,19 +201,34 @@ const SettingsUserSection = ({ item }) => {
                         title: strings.setFullName(),
                         paragraph: strings.setFullNameDesc(),
                         positiveText: strings.save(),
-                        input: true,
-                        inputPlaceholder: strings.enterFullName(),
-                        defaultValue: userProfile?.fullName,
-                        positivePress: async (value) => {
-                          db.settings
-                            .setProfile({
-                              fullName: value
-                            })
-                            .then(async () => {
+                        form: {
+                          formRef: createFormRef({
+                            fullName: userProfile?.fullName || ""
+                          }),
+                          items: [
+                            {
+                              name: "fullName",
+                              placeholder: strings.enterFullName(),
+                              defaultValue: userProfile?.fullName,
+                              validators: [
+                                validators.required(strings.nameIsRequired())
+                              ]
+                            }
+                          ],
+                          onFormSubmit: async (form) => {
+                            try {
+                              await db.settings.setProfile({
+                                fullName: form.getValue("fullName")
+                              });
                               useUserStore.setState({
                                 profile: db.settings.getProfile()
                               });
-                            });
+                              return true;
+                            } catch (e) {
+                              form.setError("fullName", e.message);
+                              return false;
+                            }
+                          }
                         }
                       });
                     }}

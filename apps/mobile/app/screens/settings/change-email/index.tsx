@@ -16,15 +16,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { db } from "../../../common/database";
-import { eSendEvent, ToastManager } from "../../../services/event-manager";
-import { eUserLoggedIn } from "../../../utils/events";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
-import Input from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../../components/ui/input/form-input";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { eUserLoggedIn } from "../../../utils/events";
+import { DefaultAppStyles } from "../../../utils/styles";
 
 enum EmailChangeSteps {
   verify,
@@ -32,14 +37,16 @@ enum EmailChangeSteps {
 }
 
 export const ChangeEmail = () => {
+  const { colors } = useThemeColors();
   const [step, setStep] = useState(EmailChangeSteps.verify);
-  const emailChangeData = useRef<{
-    email?: string;
-    password?: string;
-    code?: string;
-  }>({});
+  const formRef = useRef(
+    createFormRef({
+      email: "",
+      password: "",
+      code: ""
+    })
+  );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const emailInputRef = useRef<TextInput>(null);
   const passInputRef = useRef<TextInput>(null);
   const codeInputRef = useRef<TextInput>(null);
@@ -47,44 +54,52 @@ export const ChangeEmail = () => {
   const onSubmit = async () => {
     try {
       if (step === EmailChangeSteps.verify) {
-        if (
-          !emailChangeData.current.email ||
-          !emailChangeData.current.password ||
-          error
-        )
-          return;
+        const hasEmailError = formRef.current.validateField("email");
+        const hasPasswordError = formRef.current.validateField("password");
+        if (hasEmailError || hasPasswordError) return;
+
+        const { email, password } = formRef.current.getValues();
+
         setLoading(true);
-        const verified = await db.user?.verifyPassword(
-          emailChangeData.current.password
-        );
+        const verified = await db.user?.verifyPassword(password);
         if (!verified) throw new Error(strings.passwordIncorrect());
-        await db.user?.sendVerificationEmail(emailChangeData.current.email);
+        await db.user?.sendVerificationEmail(email);
         setStep(EmailChangeSteps.changeEmail);
+        formRef.current.clearErrors();
+        formRef.current.setValue("code", "");
         setLoading(false);
       } else {
-        if (
-          !emailChangeData.current.email ||
-          !emailChangeData.current.password ||
-          error ||
-          !emailChangeData.current.code
-        )
-          return;
-        await db.user?.changeEmail(
-          emailChangeData.current.email,
-          emailChangeData.current.password,
-          emailChangeData.current.code
-        );
+        const hasCodeError = formRef.current.validateField("code");
+        if (hasCodeError) return;
+
+        const { email, password, code } = formRef.current.getValues();
+
+        setLoading(true);
+        await db.user?.changeEmail(email, password, code);
         eSendEvent(eUserLoggedIn);
-        close?.();
         ToastManager.show({
-          heading: strings.emailUpdated(emailChangeData.current.email),
+          heading: strings.emailUpdated(email),
           type: "success",
           context: "global"
         });
+        Navigation.goBack();
+        setLoading(false);
       }
     } catch (e) {
       setLoading(false);
-      ToastManager.error(e as Error);
+      const error = e as Error;
+
+      if (step === EmailChangeSteps.verify) {
+        if (error.message === strings.passwordIncorrect()) {
+          formRef.current.setError("password", error.message);
+        } else {
+          formRef.current.setError("email", error.message);
+        }
+        return;
+      } else {
+        formRef.current.setError("code", error.message);
+        return;
+      }
     }
   };
 
@@ -97,34 +112,54 @@ export const ChangeEmail = () => {
       >
         {step === EmailChangeSteps.verify ? (
           <>
-            <Input
+            <FormInput
+              name="email"
+              formRef={formRef}
               fwdRef={emailInputRef}
               placeholder={strings.enterNewEmail()}
-              validationType="email"
-              onErrorCheck={(e) => setError(e)}
-              onChangeText={(email) => {
-                emailChangeData.current.email = email;
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              validators={[
+                validators.required(strings.emailRequired()),
+                validators.email(strings.enterValidEmail())
+              ]}
+              onSubmitEditing={() => {
+                passInputRef.current?.focus();
               }}
             />
-            <Input
+            <FormInput
+              name="password"
+              formRef={formRef}
               fwdRef={passInputRef}
               placeholder={strings.enterAccountPassword()}
               secureTextEntry
-              onChangeText={(pass) => {
-                emailChangeData.current.password = pass;
-              }}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="password"
+              validators={[validators.required(strings.passwordRequired())]}
+              onSubmitEditing={onSubmit}
             />
           </>
         ) : (
           <>
-            <Input
-              key="code-input"
+            <FormInput
+              name="code"
+              formRef={formRef}
               fwdRef={codeInputRef}
               placeholder={strings.code()}
-              defaultValue=""
-              onChangeText={(code) => {
-                emailChangeData.current.code = code;
-              }}
+              keyboardType="number-pad"
+              autoCapitalize="none"
+              autoCorrect={false}
+              maxLength={6}
+              validators={[
+                validators.required(strings.enterSixDigitCode()),
+                (value: string) =>
+                  /^\d{6}$/.test(value.trim())
+                    ? undefined
+                    : strings.enterSixDigitCode()
+              ]}
+              onSubmitEditing={onSubmit}
             />
           </>
         )}
@@ -135,8 +170,8 @@ export const ChangeEmail = () => {
           loading
             ? undefined
             : step === EmailChangeSteps.verify
-            ? strings.verify()
-            : strings.changeEmail()
+              ? strings.verify()
+              : strings.changeEmail()
         }
         type="accent"
         style={{

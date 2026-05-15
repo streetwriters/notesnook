@@ -31,8 +31,8 @@ import dayjs from "dayjs";
 import React from "react";
 import { Appearance, Linking, Platform } from "react-native";
 import { getVersion } from "react-native-device-info";
+import { TextInput } from "react-native-gesture-handler";
 import * as RNIap from "react-native-iap";
-import ScreenGuardModule from "react-native-screenguard";
 import { DatabaseLogger, db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import { presentDialog } from "../../components/dialog/functions";
@@ -42,43 +42,46 @@ import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
+import {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
 import { VaultStatusType, useVaultStatus } from "../../hooks/use-vault-status";
 import { BackgroundSync } from "../../services/background-sync";
 import BackupService from "../../services/backup";
 import BiometricService from "../../services/biometrics";
 import {
   ToastManager,
+  VaultRequestType,
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet,
-  VaultRequestType
+  presentSheet
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import Notifications from "../../services/notifications";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
+import { clearAllStores } from "../../stores";
+import { refreshAllStores } from "../../stores/create-db-collection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
+import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
 import {
   eAfterSync,
   eCloseSheet,
   eOpenRecoveryKeyDialog
 } from "../../utils/events";
-import { NotesnookModule } from "../../utils/notesnook-module";
 import { sleep } from "../../utils/time";
+import { resetTabStore } from "../editor/tiptap/use-tab-store";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
 import { MMKV } from "../../common/database/mmkv";
-import { resetTabStore } from "../editor/tiptap/use-tab-store";
-import { clearAllStores } from "../../stores";
-import { refreshAllStores } from "../../stores/create-db-collection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 
 export const settingsGroups: SettingSection[] = [
@@ -235,18 +238,29 @@ export const settingsGroups: SettingSection[] = [
           presentDialog({
             title: strings.redeemGiftCode(),
             paragraph: strings.redeemGiftCodeDesc(),
-            input: true,
-            inputPlaceholder: strings.code(),
-            positiveText: strings.redeem(),
-            positivePress: async (value) => {
-              db.subscriptions.redeemCode(value).catch((e) => {
-                ToastManager.show({
-                  heading: "Error redeeming code",
-                  message: (e as Error).message,
-                  type: "error"
-                });
-              });
-            }
+            form: {
+              formRef: createFormRef({
+                code: ""
+              }),
+              items: [
+                {
+                  name: "code",
+                  placeholder: strings.code(),
+                  ref: React.createRef<TextInput | null>(),
+                  validators: [validators.required(strings.giftCodeRequired())]
+                }
+              ],
+              onFormSubmit: async (form) => {
+                try {
+                  await db.subscriptions.redeemCode(form.getValue("code"));
+                  return true;
+                } catch (e) {
+                  form.setError("code", (e as Error).message);
+                  return false;
+                }
+              }
+            },
+            positiveText: strings.redeem()
           });
         }
       },
@@ -516,6 +530,14 @@ export const settingsGroups: SettingSection[] = [
                 positiveText: strings.delete(),
                 positivePress: async (value) => {
                   try {
+                    if (!value || !value.trim()) {
+                      ToastManager.error(
+                        new Error(strings.passwordNotEntered()),
+                        undefined,
+                        "local"
+                      );
+                      return;
+                    }
                     const verified = await db.user?.verifyPassword(value);
                     if (verified) {
                       setTimeout(async () => {

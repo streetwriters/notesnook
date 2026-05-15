@@ -18,7 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  RefObject
+} from "react";
 import { TextInput, View, ViewStyle } from "react-native";
 import { DDS } from "../../services/device-detection";
 import {
@@ -34,6 +40,7 @@ import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
+import { FormInput, type FormRef } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
 import Seperator from "../ui/seperator";
 import BaseDialog from "./base-dialog";
@@ -53,15 +60,38 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
   });
   const inputRef = useRef<TextInput>(null);
   const [dialogInfo, setDialogInfo] = useState<DialogInfo>();
+  const formRef = useRef(dialogInfo?.form?.formRef);
+  formRef.current = dialogInfo?.form?.formRef;
 
   const onPressPositive = async () => {
-    if (dialogInfo?.positivePress) {
+    // Handle form submission if form is available
+    if (dialogInfo?.form && formRef.current) {
+      inputRef.current?.blur();
+      try {
+        const isValid = await formRef.current.validate();
+        if (!isValid) {
+          return;
+        }
+        if (dialogInfo.form.onFormSubmit) {
+          setLoading(true);
+          const result = await dialogInfo.form.onFormSubmit(formRef.current);
+          if (result === false) {
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        /** Empty */
+      }
+      setLoading(false);
+    } else if (dialogInfo?.positivePress) {
+      // Handle old input-based submission
       inputRef.current?.blur();
       setLoading(true);
       let result = false;
       try {
         result = await dialogInfo.positivePress(
-          values.current.inputValue || dialogInfo.defaultValue,
+          values.current.inputValue,
           checked
         );
       } catch (e) {
@@ -76,6 +106,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
 
     setChecked(false);
     values.current.inputValue = undefined;
+    formRef.current = undefined;
     setVisible(false);
   };
 
@@ -85,6 +116,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
       if (data.context !== context) return;
       setDialogInfo(data);
       setChecked(data.check?.defaultValue);
+      formRef.current = data?.form?.formRef;
       values.current.inputValue = data.defaultValue;
       setVisible(true);
     },
@@ -94,6 +126,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
   const hide = React.useCallback(() => {
     setChecked(false);
     values.current.inputValue = undefined;
+    formRef.current = undefined;
     setVisible(false);
     setDialogInfo(undefined);
     dialogInfo?.onClose?.();
@@ -134,19 +167,30 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
           ? false
           : dialogInfo.statusBarTranslucent
       }
-      bounce={!dialogInfo.input}
+      bounce={!dialogInfo.input && !dialogInfo.form}
       closeOnTouch={!dialogInfo.disableBackdropClosing}
       background={dialogInfo.background}
       transparent={
-        dialogInfo.transparent === undefined ? true : dialogInfo.transparent
+        dialogInfo.transparent === undefined ? false : dialogInfo.transparent
       }
       onShow={async () => {
-        if (dialogInfo.input) {
+        if (dialogInfo.input && !dialogInfo.form) {
           inputRef.current?.setNativeProps({
             text: dialogInfo.defaultValue
           });
           await sleep(300);
           inputRef.current?.focus();
+        } else if (dialogInfo.form) {
+          const items = dialogInfo.form?.items;
+          const firstItem = items[0];
+          for (const item of items) {
+            if (item.defaultValue) {
+              item.ref.current?.setNativeProps({
+                text: dialogInfo.defaultValue
+              });
+            }
+          }
+          firstItem?.ref?.current?.focus();
         }
       }}
       visible={true}
@@ -170,7 +214,36 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
           />
           <Seperator half />
 
-          {dialogInfo.input ? (
+          {dialogInfo.form ? (
+            <View
+              style={{
+                paddingHorizontal: DefaultAppStyles.GAP,
+                gap: DefaultAppStyles.GAP / 2
+              }}
+            >
+              {dialogInfo.form.items.map((item, index) => (
+                <FormInput
+                  key={item.name}
+                  fwdRef={item.ref}
+                  name={item.name}
+                  autoFocus={index === 0}
+                  placeholder={item.placeholder}
+                  formRef={formRef as RefObject<FormRef>}
+                  validators={item.validators}
+                  defaultValue={item.defaultValue}
+                  secureTextEntry={dialogInfo.secureTextEntry}
+                  onSubmitEditing={() => {
+                    const nextItem = dialogInfo?.form?.items?.[index + 1];
+                    if (nextItem) {
+                      nextItem?.ref.current?.focus();
+                    } else {
+                      onPressPositive();
+                    }
+                  }}
+                />
+              ))}
+            </View>
+          ) : dialogInfo.input ? (
             <View
               style={{
                 paddingHorizontal: DefaultAppStyles.GAP
@@ -184,7 +257,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                 }}
                 testID="input-value"
                 secureTextEntry={dialogInfo.secureTextEntry}
-                //defaultValue={dialogInfo.defaultValue}
+                defaultValue={dialogInfo.defaultValue}
                 onSubmit={() => {
                   onPressPositive();
                 }}
@@ -237,7 +310,10 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
 
           <DialogButtons
             onPressNegative={onNegativePress}
-            onPressPositive={dialogInfo.positivePress && onPressPositive}
+            onPressPositive={
+              (dialogInfo.positivePress || dialogInfo.form?.onFormSubmit) &&
+              onPressPositive
+            }
             loading={loading}
             positiveTitle={dialogInfo.positiveText}
             negativeTitle={dialogInfo.negativeText}

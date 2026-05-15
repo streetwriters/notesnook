@@ -47,6 +47,14 @@ export async function verifyUser(
     negativeText: closeText || strings.cancel(),
     positivePress: async (value) => {
       try {
+        if (!value || !value.trim()) {
+          ToastManager.error(
+            new Error(strings.passwordNotEntered()),
+            undefined,
+            "local"
+          );
+          return;
+        }
         const user = await db.user.getUser();
         let verified = !user ? true : await db.user.verifyPassword(value);
         if (verified) {
@@ -95,6 +103,14 @@ export async function verifyUserWithApplock() {
         keyboardType: keyboardType,
         positivePress: async (value) => {
           try {
+            if (!value || !value.trim()) {
+              ToastManager.error(
+                new Error(strings.passwordNotEntered()),
+                undefined,
+                "local"
+              );
+              return;
+            }
             const verified = await validateAppLockPassword(value);
             if (!verified) {
               ToastManager.show({

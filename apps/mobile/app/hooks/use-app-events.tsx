@@ -97,6 +97,7 @@ import { BETA } from "../utils/constants";
 import {
   eAfterSync,
   eCloseSheet,
+  eCloseSimpleDialog,
   eEditorReset,
   eLoginSessionExpired,
   eOnLoadNote,
@@ -300,7 +301,10 @@ const onUserSubscriptionStatusChanged = async (
         subscription: subscription
       }
     });
-    Walkthrough.present("prouser", false, true);
+    eSendEvent(eCloseSimpleDialog);
+    setTimeout(() => {
+      Walkthrough.present("prouser", false, true);
+    }, 500);
   }
   await PremiumService.setPremiumStatus();
   useMessageStore.getState().setAnnouncement();
