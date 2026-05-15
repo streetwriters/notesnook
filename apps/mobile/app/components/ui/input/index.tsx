@@ -131,7 +131,7 @@ const Input = ({
   const color = error
     ? colors.error.border
     : focus
-      ? customColor || colors.selected.border
+      ? customColor || colors.secondary.border
       : colors.primary.border;
 
   const validate = async (value: string) => {
@@ -298,7 +298,8 @@ const Input = ({
           >
             {secureTextEntry && (
               <IconButton
-                name="eye"
+                name={secureEntry ? "eye-closed" : "eye-open"}
+                iconFamily="notesnook"
                 size={20}
                 top={10}
                 bottom={10}
@@ -310,9 +311,7 @@ const Input = ({
                   width: 25,
                   marginLeft: 5
                 }}
-                color={
-                  secureEntry ? colors.secondary.icon : colors.primary.accent
-                }
+                color={colors.secondary.icon}
               />
             )}
 

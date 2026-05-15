@@ -273,8 +273,15 @@ export const Signup = ({
                     alignSelf: "center"
                   }}
                 >
-                  <Paragraph fontSize="SM" color={colors.primary.paragraph}>
-                    {strings.alreadyHaveAccount()}{" "}
+                  <Paragraph
+                    style={{
+                      marginBottom: 25,
+                      textAlign: "center"
+                    }}
+                    fontSize="XS"
+                    color={colors.secondary.paragraph}
+                  >
+                    {strings.signupAgreement[0]()}
                     <Paragraph
                       fontSize="SM"
                       fontFamily="SEMI_BOLD"
