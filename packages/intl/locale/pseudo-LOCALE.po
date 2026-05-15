@@ -5055,6 +5055,10 @@ msgstr ""
 msgid "private analytics and bug reports."
 msgstr "<<<<<<< HEAD"
 
+#: src/strings.ts:2727
+msgid "Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase."
+msgstr ""
+
 #: src/strings.ts:2713
 msgid "Private Key:"
 msgstr ""
