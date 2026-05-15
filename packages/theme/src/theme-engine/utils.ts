@@ -106,7 +106,9 @@ export function buildVariants(
       themeScope[variant]?.[color] ||
       theme.scopes.base[variant]?.[color] ||
       defaultThemeScope[variant]?.[color] ||
-      defaultThemeBase[variant]?.[color]
+      defaultThemeBase[variant]?.[color] ||
+      themeScope.primary?.[color] ||
+      defaultThemeBase.primary?.[color]
     );
   }
 

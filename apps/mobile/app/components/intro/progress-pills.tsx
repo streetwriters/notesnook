@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
-import { useThemeColors } from "@notesnook/theme";
-import { Radius, Spacing } from "../../common/design/spacing";
+import { Spacing } from "../../common/design/spacing";
 
 export const ProgressPills = (props: {
   activePillIndex: number;
@@ -36,6 +36,7 @@ export const ProgressPills = (props: {
     >
       {new Array(props.count || 3).fill(0).map((item, index) => (
         <View
+          key={`${item}-progress-pill-${props.count}`}
           style={{
             width: props.activePillIndex === index ? 26 : 14,
             height: 5,
