@@ -127,6 +127,13 @@ export function buildVariants(
       ...themeScope.secondary,
       shade: deriveShadeColor(getColor("secondary", "accent"))
     },
+    tertiary: {
+      ...defaultThemeBase.tertiary,
+      ...defaultThemeScope.tertiary,
+      ...theme.scopes.base.tertiary,
+      ...themeScope.tertiary,
+      shade: deriveShadeColor(getColor("tertiary", "accent"))
+    },
     disabled: {
       ...defaultThemeBase.disabled,
       ...defaultThemeScope.disabled,
