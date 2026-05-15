@@ -538,10 +538,11 @@ class UserManager {
         public: keys.publicKey,
         private: await this.db
           .storage()
-          .encrypt(userEncryptionKey, JSON.stringify(keys.privateKey))
+          .encrypt(userEncryptionKey, keys.privateKey)
       }
     };
     await this.updateUser(updatePayload);
+    this.keyManager.clearCache();
   }
 
   async sendVerificationEmail(newEmail?: string) {
