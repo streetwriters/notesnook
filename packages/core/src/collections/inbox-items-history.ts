@@ -71,6 +71,11 @@ export class InboxItemsHistory implements ICollection {
     await this.collection.softDelete([id]);
   }
 
+  async deleteFailed() {
+    const ids = await this.failed.ids();
+    await this.collection.softDelete(ids);
+  }
+
   exists(id: string) {
     return this.collection.exists(id);
   }

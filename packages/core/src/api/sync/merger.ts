@@ -266,7 +266,7 @@ export async function handleInboxItems(
           errorContext: JSON.stringify({
             message: "Validation failed",
             description: validation.error.issues
-              .map((i) => i.message)
+              .map((i) => `${i.path.join(".")}: ${i.message}`)
               .join("; "),
             inboxItem: { id: item.id, v: item.v, alg: item.alg },
             parsedItem: parsedWithoutContent

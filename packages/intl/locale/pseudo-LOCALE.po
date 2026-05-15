@@ -3656,6 +3656,10 @@ msgstr ""
 msgid "Item"
 msgstr ""
 
+#: src/strings.ts:2734
+msgid "Item deleted"
+msgstr ""
+
 #: src/strings.ts:311
 #: src/strings.ts:1705
 msgid "items"

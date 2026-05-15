@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { usePromise } from "@notesnook/common";
-import { formatDate, InboxItemsHistoryErrorContext } from "@notesnook/core";
+import { getFormattedDate, usePromise } from "@notesnook/common";
+import { InboxItemsHistoryErrorContext } from "@notesnook/core";
 import { Box, Button, Text } from "@theme-ui/components";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -30,6 +30,7 @@ import ScrollContainer, {
 } from "../components/scroll-container";
 import { strings } from "@notesnook/intl";
 import { writeText } from "clipboard-polyfill";
+import { showToast } from "../utils/toast";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
@@ -152,6 +153,7 @@ export const InboxHistoryDialog = DialogManager.register(
 
     async function deleteItem(id: string) {
       await db.inboxItemsHistory.delete(id);
+      showToast("success", strings.itemDeleted());
       if (result.status !== "pending") {
         result.refresh();
       }
@@ -218,7 +220,7 @@ export const InboxHistoryDialog = DialogManager.register(
                       <Box as="tr" key={item.id}>
                         <Box as="td">
                           <Text variant="body" sx={{ whiteSpace: "nowrap" }}>
-                            {formatDate(item.dateSynced)}
+                            {getFormattedDate(item.dateSynced)}
                           </Text>
                         </Box>
                         <Box as="td">
