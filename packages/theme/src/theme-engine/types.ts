@@ -282,7 +282,7 @@ export type PreviewColors = {
 };
 
 export const StaticColors = {
-  red: "#f44336",
+  red: "#F44336",
   orange: "#FF9800",
   yellow: "#FFD600",
   green: "#4CAF50",
