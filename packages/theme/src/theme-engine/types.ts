@@ -167,6 +167,7 @@ export type PartialOrFullColors<TRequired extends boolean = false> =
 export type Variants<TRequired extends boolean = false> = {
   primary: PartialOrFullColors<TRequired>;
   secondary: PartialOrFullColors<TRequired>;
+  tertiary: PartialOrFullColors<TRequired>;
   disabled: PartialOrFullColors<TRequired>;
   selected: PartialOrFullColors<TRequired>;
   error: PartialOrFullColors<TRequired>;
@@ -242,6 +243,11 @@ export type Colors = {
    * @deprecated true
    */
   textSelection: string;
+  /**
+   * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
+   * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
+   */
+  buttonForeground: string;
 };
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =
@@ -312,7 +318,8 @@ export const COLORS: readonly (keyof Colors)[] = [
   "placeholder",
   "hover",
   "accentForeground",
-  "backdrop"
+  "backdrop",
+  "buttonForeground"
 ];
 
 export const ALPHA_COLORS: readonly (keyof Colors)[] = [
@@ -327,6 +334,7 @@ export const ALPHA_COLORS: readonly (keyof Colors)[] = [
 export const Variants: readonly (keyof Variants)[] = [
   "primary",
   "secondary",
+  "tertiary",
   "disabled",
   "selected",
   "error",
