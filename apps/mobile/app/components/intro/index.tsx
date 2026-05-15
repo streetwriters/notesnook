@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Linking, Platform, useWindowDimensions, View } from "react-native";
+import { Platform, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Spacing } from "../../common/design/spacing";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useRotator from "../../hooks/use-rotator";
 import Navigation from "../../services/navigation";
 import SettingsService from "../../services/settings";
@@ -33,13 +34,12 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { IntroIllustration } from "./illustration";
 import { ProgressPills } from "./progress-pills";
-import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 
 const Intro = () => {
   const { colors } = useThemeColors();
   const { width } = useWindowDimensions();
   const isTablet = width > 600;
-  const rotator = useRotator([0, 1, 2], 10000, true);
+  const rotator = useRotator([0], 10000, true);
   const insets = useGlobalSafeAreaInsets();
 
   const renderItem = React.useCallback(
@@ -62,14 +62,12 @@ const Intro = () => {
                 key={heading.value()}
                 fontFamily="SEMI_BOLD"
                 fontSize="XXL"
-                style={{
-                  marginTop: index !== 0 ? -5 : undefined
-                }}
               >
                 {heading.value()}
               </Heading>
             ) : (
               <Paragraph
+                key={heading.value()}
                 style={{
                   marginTop: index !== 0 ? -5 : undefined
                 }}
@@ -88,7 +86,7 @@ const Intro = () => {
           ) : null}
 
           {item.body ? (
-            <Paragraph color={colors.secondary.paragraph} fontSize="SM">
+            <Paragraph color={colors.primary.paragraph} fontSize="SM">
               {item.body()}
             </Paragraph>
           ) : null}
@@ -107,7 +105,7 @@ const Intro = () => {
         </View>
       </Animated.View>
     ),
-    [colors.primary.accent, colors.secondary.background, isTablet, width]
+    [colors.primary.paragraph, colors.secondary.paragraph]
   );
 
   return (

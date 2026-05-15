@@ -50,15 +50,12 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
           <ProgressPills activePillIndex={1} />
         ) : (
           <IconButton
-            name="arrow-left"
+            name="arrow-back"
+            iconFamily="notesnook"
             onPress={() => {
               hideAuth((route.params as AuthParams)?.context);
             }}
-            style={{
-              width: 30,
-              height: 30
-            }}
-            size={26}
+            size={24}
             color={colors.primary.paragraph}
           />
         )}
