@@ -86,7 +86,7 @@ const buttonTypes = (
 } => ({
   plain: {
     primary: "transparent",
-    text: colors.primary.paragraph,
+    text: colors.primary.buttonForeground,
     selected: colors.primary.hover,
     borderWidth: 0.8,
     borderSelectedColor: getColorLinearShade(
@@ -97,7 +97,7 @@ const buttonTypes = (
   },
   "plain-outline": {
     primary: "transparent",
-    text: colors.primary.paragraph,
+    text: colors.primary.buttonForeground,
     selected: colors.primary.hover,
     borderWidth: 1,
     borderColor: colors.primary.border,
@@ -116,7 +116,7 @@ const buttonTypes = (
   },
   secondary: {
     primary: colors.secondary.background,
-    text: colors.primary.paragraph,
+    text: colors.primary.buttonForeground,
     selected: colors.secondary.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
@@ -128,7 +128,7 @@ const buttonTypes = (
   },
   selected: {
     primary: colors.selected.background,
-    text: colors.selected.paragraph,
+    text: colors.selected.buttonForeground,
     selected: colors.selected.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.selected.background, 0.05, isDark),
@@ -225,7 +225,7 @@ const buttonTypes = (
   },
   errorShade: {
     primary: "transparent",
-    text: colors.error.paragraph,
+    text: colors.error.buttonForeground,
     selected: colors.error.background,
     borderWidth: 0.8,
     borderSelectedColor: getColorLinearShade(

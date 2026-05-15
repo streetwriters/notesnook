@@ -717,6 +717,7 @@ export const useEditorEvents = (
           break;
         }
         case EditorEvents.error: {
+          console.log(editorMessage.value.stack);
           presentSheet({
             component: (
               <Issue
