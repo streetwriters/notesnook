@@ -774,6 +774,10 @@ msgstr "Add to notebook"
 msgid "Add your first note"
 msgstr "Add your first note"
 
+#: src/strings.ts:2794
+msgid "Add Your First Note"
+msgstr "Add Your First Note"
+
 #: src/strings.ts:991
 msgid "Add your first notebook"
 msgstr "Add your first notebook"
@@ -1899,6 +1903,10 @@ msgstr "Confirm password required"
 #: src/strings.ts:1505
 msgid "Confirm pin"
 msgstr "Confirm pin"
+
+#: src/strings.ts:1380
+msgid "Confirm your email to sync notes"
+msgstr "Confirm your email to sync notes"
 
 #: src/strings.ts:2674
 msgid "Confirmation email sent"
@@ -4546,6 +4554,10 @@ msgstr "No notebooks selected to move"
 msgid "No notebooks yet"
 msgstr "No notebooks yet"
 
+#: src/strings.ts:2791
+msgid "No notes yet"
+msgstr "No notes yet"
+
 #: src/strings.ts:202
 msgid "No one can view this {type} except you."
 msgstr "No one can view this {type} except you."
@@ -5027,10 +5039,6 @@ msgstr "Plan limits"
 #: src/strings.ts:2574
 msgid "Plans"
 msgstr "Plans"
-
-#: src/strings.ts:1380
-msgid "Please confirm your email to sync notes"
-msgstr "Please confirm your email to sync notes"
 
 #: src/strings.ts:1018
 msgid "Please confirm your identity by entering a recovery code."
@@ -8191,6 +8199,10 @@ msgstr "Your support request has been forwarded to our support team. We will get
 #: src/strings.ts:972
 msgid "Your tags"
 msgstr "Your tags"
+
+#: src/strings.ts:2793
+msgid "Your thoughts deserve a home. Create your first note and start organizing your life today."
+msgstr "Your thoughts deserve a home. Create your first note and start organizing your life today."
 
 #: src/strings.ts:690
 msgid "yr"

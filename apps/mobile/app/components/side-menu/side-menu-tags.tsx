@@ -322,7 +322,7 @@ export const SideMenuTags = () => {
                 placeholder={strings.filterTags()}
                 style={{
                   fontFamily: "Inter-Regular",
-                  fontSize: AppFontSize.xs,
+                  fontSize: AppFontSize.sm,
                   paddingTop: 0,
                   paddingBottom: 0
                 }}
@@ -338,7 +338,7 @@ export const SideMenuTags = () => {
                     }
                   }, 100);
                 }}
-                placeholderTextColor={colors.primary.placeholder}
+                placeholderTextColor={colors.secondary.placeholder}
               />
 
               <AppIcon name="funnel" size={14} iconFamily="notesnook" />
