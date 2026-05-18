@@ -152,7 +152,7 @@ const NoteItem = ({
     {
       condition: item.favorite,
       testID: "star-filled",
-      name: "star-outline",
+      name: "star-filled",
       color: "orange"
     }
   ];
@@ -163,7 +163,7 @@ const NoteItem = ({
         style={{
           flexGrow: 1,
           flexShrink: 1,
-          gap: Spacing.LEVEL_1
+          gap: compactMode ? undefined : Spacing.LEVEL_1
         }}
       >
         {compactMode ? null : (
@@ -219,13 +219,10 @@ const NoteItem = ({
                     <AppIcon
                       name="link"
                       iconFamily="notesnook"
-                      size={AppFontSize.sm}
-                      color={primaryColors.icon}
+                      size={12}
+                      color={colors.secondary.icon}
                     />
-                    <Paragraph
-                      color={colors.secondary.paragraph}
-                      size={AppFontSize.xxs}
-                    >
+                    <Paragraph color={colors.secondary.paragraph} fontSize="XS">
                       {attachmentsCount}
                     </Paragraph>
                   </View>
@@ -362,7 +359,7 @@ const NoteItem = ({
             gap: Spacing.LEVEL_1
           }}
         >
-          {color ? (
+          {color && !compactMode ? (
             <View
               style={{
                 width: 8,
@@ -392,21 +389,83 @@ const NoteItem = ({
               {item.title}
             </Heading>
 
-            <IconButton
-              testID={notesnook.listitem.menu}
-              color={colors.secondary.icon}
-              name="dots-three"
-              iconFamily="notesnook"
-              size={20}
-              onPress={() => !noOpen && Properties.present(item)}
+            <View
               style={{
-                justifyContent: "center",
-                height: undefined,
-                width: undefined,
-                borderRadius: 100,
-                alignItems: "center"
+                flexDirection: "row",
+                alignItems: "center",
+                gap: Spacing.LEVEL_1
               }}
-            />
+            >
+              {color ? (
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 100,
+                    backgroundColor: color?.colorCode
+                  }}
+                />
+              ) : null}
+
+              {compactMode ? (
+                <>
+                  {item.conflicted ? (
+                    <AppIcon
+                      name="warning-circle"
+                      size={12}
+                      iconFamily="notesnook"
+                      color={colors.error.accent}
+                    />
+                  ) : null}
+
+                  {locked ? (
+                    <AppIcon
+                      name="lock"
+                      testID="lock"
+                      iconFamily="notesnook"
+                      size={12}
+                      color={primaryColors.icon}
+                    />
+                  ) : null}
+
+                  {item.favorite ? (
+                    <AppIcon
+                      testID="icon-star"
+                      name="star-filled"
+                      iconFamily="notesnook"
+                      size={12}
+                      color={colors.static.orange}
+                    />
+                  ) : null}
+
+                  <TimeSince
+                    style={{
+                      fontSize: AppFontSize.xs,
+                      color: colors.secondary.paragraph,
+                      marginRight: 6
+                    }}
+                    time={date}
+                    updateFrequency={Date.now() - date < 60000 ? 2000 : 60000}
+                  />
+                </>
+              ) : null}
+
+              <IconButton
+                testID={notesnook.listitem.menu}
+                color={colors.secondary.icon}
+                name="dots-three"
+                iconFamily="notesnook"
+                size={20}
+                onPress={() => !noOpen && Properties.present(item)}
+                style={{
+                  justifyContent: "center",
+                  height: undefined,
+                  width: undefined,
+                  borderRadius: 100,
+                  alignItems: "center"
+                }}
+              />
+            </View>
           </View>
         </View>
 
@@ -433,11 +492,16 @@ const NoteItem = ({
           {compactMode ? null : (
             <View
               style={{
-                gap: Spacing.LEVEL_0,
+                gap: Spacing.LEVEL_0 + 2,
                 flexDirection: "row"
               }}
             >
-              <AppIcon size={13} name="calendar" iconFamily="notesnook" />
+              <AppIcon
+                color={colors.secondary.icon}
+                size={13}
+                name="calendar"
+                iconFamily="notesnook"
+              />
               <Paragraph
                 style={{
                   fontSize: AppFontSize.xs,
@@ -495,55 +559,6 @@ const NoteItem = ({
           alignItems: "center"
         }}
       >
-        {compactMode ? (
-          <>
-            {item.conflicted ? (
-              <AppIcon
-                name="alert-circle"
-                style={{
-                  marginRight: 6
-                }}
-                size={AppFontSize.sm}
-                color={colors.error.accent}
-              />
-            ) : null}
-
-            {locked ? (
-              <AppIcon
-                name="lock"
-                testID="note-locked-icon"
-                size={AppFontSize.sm}
-                style={{
-                  marginRight: 6
-                }}
-                color={primaryColors.icon}
-              />
-            ) : null}
-
-            {item.favorite ? (
-              <AppIcon
-                testID="icon-star"
-                name="star-outline"
-                size={AppFontSize.sm}
-                style={{
-                  marginRight: 6
-                }}
-                color={colors.static.orange}
-              />
-            ) : null}
-
-            <TimeSince
-              style={{
-                fontSize: AppFontSize.xxs,
-                color: colors.secondary.paragraph,
-                marginRight: 6
-              }}
-              time={date}
-              updateFrequency={Date.now() - date < 60000 ? 2000 : 60000}
-            />
-          </>
-        ) : null}
-
         {selectionMode === "note" || selectionMode === "trash" ? (
           <>
             <View

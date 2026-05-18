@@ -57,7 +57,7 @@ const DialogButtons = ({
     >
       <Button
         onPress={onPressNegative}
-        fontSize={AppFontSize.sm}
+        fontSize={AppFontSize.md}
         testID={notesnook.ids.default.dialog.no}
         type="plain-outline"
         style={{
@@ -68,7 +68,7 @@ const DialogButtons = ({
       {onPressPositive ? (
         <Button
           onPress={onPressPositive}
-          fontSize={AppFontSize.sm}
+          fontSize={AppFontSize.md}
           testID={notesnook.ids.default.dialog.yes}
           style={{
             width: "48.5%"

@@ -96,13 +96,17 @@ export const TabBarButton = ({
         <AppIcon
           name={icon}
           iconFamily="notesnook"
-          color={isActive ? colors.selected.icon : colors.primary.icon}
+          color={isActive ? colors.primary.icon : colors.secondary.icon}
           size={16}
         />
       </Animated.View>
 
       {label && (
-        <Paragraph fontFamily={isActive ? "MEDIUM" : "REGULAR"} fontSize={"XS"}>
+        <Paragraph
+          color={isActive ? colors.primary.heading : colors.secondary.heading}
+          fontFamily={isActive ? "MEDIUM" : "REGULAR"}
+          fontSize={"XS"}
+        >
           {label}
         </Paragraph>
       )}

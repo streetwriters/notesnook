@@ -28,6 +28,7 @@ import { NotesnookModule } from "../utils/notesnook-module";
 import { scale } from "../utils/size";
 import { useUserStore } from "../stores/use-user-store";
 import ScreenGuardModule from "react-native-screenguard";
+import { THEME_DARK, THEME_LIGHT } from "../common/design/theme";
 
 let isScreenGuardModuleReady = false;
 async function callScreenGuard(callback: () => void) {
@@ -123,7 +124,9 @@ function init() {
     migrateSettings(settingsParsed);
     settings = {
       ...settings,
-      ...settingsParsed
+      ...settingsParsed,
+      darkTheme: THEME_DARK,
+      lighTheme: THEME_LIGHT
     };
   }
   if (settings.fontScale) {

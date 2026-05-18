@@ -125,15 +125,6 @@ const Sort = ({
     }, 1);
   };
 
-  const setOrderBy = async () => {
-    const _groupOptions: GroupOptions = {
-      ...groupOptions,
-      sortDirection: groupOptions?.sortDirection === "asc" ? "desc" : "asc"
-    };
-
-    await updateGroupOptions(_groupOptions);
-  };
-
   useEffect(() => {
     data?.groups?.().then((groups) => {
       setGroups(groups);
@@ -305,6 +296,13 @@ const Sort = ({
                         : "plain"
                     }
                     title={getSortButtonTitle("desc")}
+                    onPress={() => {
+                      const _groupOptions: GroupOptions = {
+                        ...groupOptions,
+                        sortDirection: "desc"
+                      };
+                      updateGroupOptions(_groupOptions);
+                    }}
                   />
 
                   <Button
@@ -321,6 +319,13 @@ const Sort = ({
                         : "plain"
                     }
                     title={getSortButtonTitle("asc")}
+                    onPress={() => {
+                      const _groupOptions: GroupOptions = {
+                        ...groupOptions,
+                        sortDirection: "asc"
+                      };
+                      updateGroupOptions(_groupOptions);
+                    }}
                   />
                 </View>
               ) : null}
