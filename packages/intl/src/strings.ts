@@ -1377,7 +1377,7 @@ $day$: Current day (eg. Monday)`,
   loginMessage: () => t`You are not logged in`,
   loginMessageActionText: () => t`Login to encrypt and sync notes`,
   syncDisabled: () => t`Sync is disabled`,
-  syncDisabledActionText: () => t`Please confirm your email to sync notes`,
+  syncDisabledActionText: () => t`Confirm your email to sync notes`,
   autoBackupsOffMessage: () => t`Automatic backups are off`,
   autoBackupsOffActionText: () =>
     t`Get Notesnook Pro to enable automatic backups`,
@@ -2835,5 +2835,11 @@ Continue without attachments?`,
   tagsEmptyBody: () =>
     t`Create your first tag to start organizing your workspace.`,
   newestFirst: () => t`Newest First`,
-  oldestFirst: () => t`Oldest First`
+  oldestFirst: () => t`Oldest First`,
+  notePlaceholder: {
+    title: () => t`No notes yet`,
+    description: () =>
+      t`Your thoughts deserve a home. Create your first note and start organizing your life today.`,
+    button: () => t`Add Your First Note`
+  }
 };

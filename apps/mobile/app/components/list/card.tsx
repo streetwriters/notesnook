@@ -96,7 +96,8 @@ export const Card = ({
 
           <View
             style={{
-              gap: Spacing.LEVEL_0
+              gap: Spacing.LEVEL_0,
+              flexShrink: 1
             }}
           >
             <Heading

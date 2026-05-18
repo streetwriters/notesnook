@@ -158,6 +158,7 @@ const TwoFactorVerification = ({
       setSending(false);
     } catch (e) {
       setSending(false);
+      console.log("error e");
       setError(
         new Error(`Error sending 2FA Code. Tap "Send code" to try again `)
       );
@@ -268,7 +269,9 @@ const TwoFactorVerification = ({
                 style={{
                   textAlign: "center",
                   marginVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  maxWidth: 250
+                  maxWidth: 250,
+                  alignSelf: "center",
+                  marginTop: -10
                 }}
               >
                 <AppIcon

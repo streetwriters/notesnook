@@ -189,7 +189,7 @@ export const SideMenuNotebooks = () => {
                 placeholder={strings.filterNotebooks()}
                 style={{
                   fontFamily: "Inter-Regular",
-                  fontSize: AppFontSize.xs,
+                  fontSize: AppFontSize.sm,
                   paddingTop: 0,
                   paddingBottom: 0
                 }}

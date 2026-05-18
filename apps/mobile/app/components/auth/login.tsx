@@ -238,6 +238,9 @@ export const Login = ({
                 fontFamily="REGULAR"
                 fontSize={AppFontSize.sm}
                 type="plain"
+                textStyle={{
+                  color: colors.secondary.paragraph
+                }}
               />
 
               <View
@@ -322,7 +325,8 @@ export const Login = ({
             <TwoFactorVerification
               onMfaLogin={async (
                 mfa: any,
-                callback: (success: boolean) => void
+                callback: (success: boolean) => void,
+                onerror: (error: Error) => void
               ) => {
                 try {
                   const success = await db.user.authenticateMultiFactorCode(
@@ -342,6 +346,8 @@ export const Login = ({
                   if ((e as Error).message === "invalid_grant") {
                     setLoading(false);
                     setStep(LoginSteps.emailAuth);
+                  } else {
+                    onerror(e as Error);
                   }
                 }
               }}

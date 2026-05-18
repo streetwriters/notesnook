@@ -30,6 +30,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Steps } from "./common";
+import { Spacing } from "../../common/design/spacing";
 
 export const ComparePlans = React.memo(
   (props: {
@@ -44,7 +45,8 @@ export const ComparePlans = React.memo(
       <ScrollView
         horizontal
         style={{
-          width: isTablet ? "100%" : undefined
+          width: isTablet ? "100%" : undefined,
+          paddingLeft: Spacing.LEVEL_3
         }}
         contentContainerStyle={{
           flexDirection: "column"
@@ -124,11 +126,9 @@ export const ComparePlans = React.memo(
                               name="check"
                             />
                           ) : (
-                            <Icon
-                              size={AppFontSize.sm}
-                              color={colors.static.red}
-                              name="close"
-                            />
+                            <Paragraph color={colors.secondary.paragraph}>
+                              -
+                            </Paragraph>
                           )}
                         </>
                       ) : null}

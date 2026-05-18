@@ -49,7 +49,7 @@ export const THEME_LIGHT: ThemeDefinition = {
         heading: "#181818",
         icon: "#181818",
         separator: "#F0F0F0",
-        placeholder: "#a9a9a9",
+        placeholder: "#858585",
         hover: "#eee",
         backdrop: "#0000001a",
         buttonForeground: "#FFFFFF"
@@ -63,7 +63,7 @@ export const THEME_LIGHT: ThemeDefinition = {
         heading: "#4B4B4B",
         icon: "#666666",
         separator: "#E8E8E8",
-        placeholder: "#a9a9a9",
+        placeholder: "#999999",
         hover: "#dbdbdb",
         backdrop: "#0000001a",
         buttonForeground: "#181818"
@@ -101,7 +101,7 @@ export const THEME_LIGHT: ThemeDefinition = {
         background: "#00883610",
         border: "#008836",
         heading: "#212121",
-        icon: "#FFFFFF",
+        icon: "#181818",
         separator: "#E8E8E8",
         placeholder: "#a9a9a9",
         hover: "#eee",
@@ -146,13 +146,18 @@ export const THEME_LIGHT: ThemeDefinition = {
       },
       secondary: { background: "#EEEEEE" },
       selected: {
-        background: "#ddd",
+        background: "#00883610",
         hover: "#eee"
       }
     },
     contextMenu: { primary: { background: "#f7f7f7" } },
     editor: { selected: { background: "#e1e1e1" } },
-    sheet: { selected: { paragraph: "#008836" } }
+    sheet: { selected: { paragraph: "#008836" } },
+    list: {
+      secondary: {
+        heading: "#A6A6A6"
+      }
+    }
   }
 };
 

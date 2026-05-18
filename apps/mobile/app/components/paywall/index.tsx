@@ -229,11 +229,11 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
         <View
           style={{
             height: 50,
-            justifyContent: "flex-start",
-            flexShrink: 1,
-            flexGrow: 1,
+            justifyContent: "space-between",
             flexDirection: "row",
-            paddingHorizontal: DefaultAppStyles.GAP
+            paddingHorizontal: DefaultAppStyles.GAP,
+            width: "100%",
+            alignItems: "center"
           }}
         >
           <IconButton
@@ -243,33 +243,35 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
             color={colors.primary.icon}
             size={18}
             onPress={() => {
-              Navigation.navigate("FluidPanelsView", {});
+              if (step === Steps.buy) {
+                setStep(Steps.select);
+                return;
+              }
+              if (routeParams.context === "signup") {
+                Navigation.navigate("FluidPanelsView", {});
+              } else {
+                Navigation.goBack();
+              }
+            }}
+          />
+
+          <Heading size={AppFontSize.xl}>
+            {step === Steps.buy || step === Steps.buyWeb
+              ? pricingPlans.userCanRequestTrial
+                ? strings.tryPlanForFree(
+                    pricingPlans.currentPlan?.name as string
+                  )
+                : strings.plan(pricingPlans.currentPlan?.name as string)
+              : ""}
+          </Heading>
+
+          <View
+            style={{
+              width: 18,
+              height: 18
             }}
           />
         </View>
-        // <Header
-        //   canGoBack={true}
-        //   onLeftMenuButtonPress={() => {
-        //     if (step === Steps.buy) {
-        //       setStep(Steps.select);
-        //       return;
-        //     }
-        //     if (routeParams.context === "signup") {
-        //       Navigation.navigate("FluidPanelsView", {});
-        //     } else {
-        //       Navigation.goBack();
-        //     }
-        //   }}
-        //   title={
-        //     step === Steps.buy || step === Steps.buyWeb
-        //       ? pricingPlans.userCanRequestTrial
-        //         ? strings.tryPlanForFree(
-        //             pricingPlans.currentPlan?.name as string
-        //           )
-        //         : strings.plan(pricingPlans.currentPlan?.name as string)
-        //       : ""
-        //   }
-        // />
       )}
 
       {step === Steps.select ? (
@@ -298,13 +300,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                   alignItems: "center"
                 }}
               >
-                <Heading
-                  key="heading"
-                  size={AppFontSize.xl}
-                  style={{
-                    alignSelf: "center"
-                  }}
-                >
+                <Heading key="heading" fontSize="XL" lineHeight="100%">
                   {pricingPlans.isSubscribed()
                     ? strings.changePlan()
                     : strings.notesnookPlans[0]() + " "}
@@ -314,7 +310,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                 </Heading>
               </View>
 
-              <Paragraph key="description" size={AppFontSize.md}>
+              <Paragraph key="description" fontSize="SM">
                 {strings.readyToTakeNextStep()}
               </Paragraph>
             </View>
@@ -381,7 +377,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                   <View
                     style={{
                       borderRadius: 100,
-                      backgroundColor: colors.primary.accent,
+                      backgroundColor: colors.secondary.accent,
                       padding: Spacing.LEVEL_0
                     }}
                   >
@@ -496,7 +492,8 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                     paddingHorizontal: Spacing.LEVEL_2,
                     borderRadius: Radius.XS,
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    minWidth: 100
                   }}
                 >
                   <SvgView
@@ -527,6 +524,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                 contentContainerStyle={{
                   gap: Spacing.LEVEL_3
                 }}
+                showsHorizontalScrollIndicator={false}
                 horizontal
                 pagingEnabled
                 snapToOffsets={[0, width - 50, width * 2 - 100]}
