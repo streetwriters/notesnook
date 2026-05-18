@@ -31,10 +31,10 @@ import isEmail from "validator/lib/isEmail";
 import isURL from "validator/lib/isURL";
 import { useThemeColors } from "@notesnook/theme";
 import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 import AppIcon from "../AppIcon";
+import { Spacing } from "../../../common/design/spacing";
 
 export type FormValues = Record<string, string>;
 export type FormErrors = Partial<Record<string, string>>;
@@ -222,6 +222,7 @@ interface FormInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   wrapperStyle?: ViewStyle;
   errorStyle?: TextStyle;
+  label?: string;
 }
 
 export function FormInput({
@@ -233,7 +234,7 @@ export function FormInput({
   error,
   secureTextEntry,
   customColor,
-  marginBottom = 10,
+  marginBottom = 0,
   marginRight,
   button,
   buttonLeft,
@@ -248,6 +249,7 @@ export function FormInput({
   onPress,
   onChangeText,
   errorStyle,
+  label,
   ...restProps
 }: FormInputProps) {
   const { colors, isDark } = useThemeColors();
@@ -273,7 +275,7 @@ export function FormInput({
   const fieldError = error || formRef.current.getError(name);
 
   const borderColor = useMemo(() => {
-    if (fieldError) return colors.error.accent;
+    if (fieldError) return colors.error.border;
     if (focused) return customColor || colors.selected.border;
     return colors.primary.border;
   }, [colors, customColor, fieldError, focused]);
@@ -281,23 +283,27 @@ export function FormInput({
   const style: ViewStyle = {
     borderWidth: 1,
     borderRadius: defaultBorderRadius,
-    borderColor,
+    borderColor: borderColor,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: DefaultAppStyles.GAP,
+    paddingHorizontal: Spacing.LEVEL_2,
+    paddingRight:
+      buttons || button || secureTextEntry || error
+        ? Spacing.LEVEL_3
+        : Spacing.LEVEL_3,
     ...containerStyle
   };
 
   const textStyle: TextInputProps["style"] = {
     paddingHorizontal: 0,
-    fontSize,
+    fontSize: fontSize,
     color:
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
+    paddingTop: Spacing.LEVEL_3,
+    paddingBottom: Spacing.LEVEL_3,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL,
     fontFamily: "Inter-Regular",
     ...(inputStyle as ViewStyle)
   };
@@ -316,6 +322,17 @@ export function FormInput({
         ...wrapperStyle
       }}
     >
+      {label ? (
+        <Paragraph
+          style={{
+            marginBottom: Spacing.LEVEL_1
+          }}
+          color={colors.primary.paragraph}
+          fontSize="XS"
+        >
+          {label}
+        </Paragraph>
+      ) : undefined}
       <TouchableOpacity
         disabled={!loading}
         onPress={onPress}
