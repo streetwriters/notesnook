@@ -165,7 +165,7 @@ const TwoFactorVerification = ({
       setSending(false);
     } catch (e) {
       setSending(false);
-      setError(new Error(strings.unableToSend2faCode()));
+      setError(new Error(strings.errorSending2faCodeTryAgain()));
     }
   }, [currentMethod.method, secondsRef, sending, start]);
 
@@ -273,7 +273,9 @@ const TwoFactorVerification = ({
                 style={{
                   textAlign: "center",
                   marginVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  maxWidth: 250
+                  maxWidth: 250,
+                  alignSelf: "center",
+                  marginTop: -10
                 }}
               >
                 <AppIcon

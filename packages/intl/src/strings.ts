@@ -1279,7 +1279,10 @@ $day$: Current day (eg. Monday)`,
   loginMessage: () => t`You are not logged in`,
   loginMessageActionText: () => t`Login to encrypt and sync notes`,
   syncDisabled: () => t`Sync is disabled`,
-  syncDisabledActionText: () => t`Please confirm your email to sync notes`,
+  syncDisabledActionText: () => t`Confirm your email to sync notes`,
+  autoBackupsOffMessage: () => t`Automatic backups are off`,
+  autoBackupsOffActionText: () =>
+    t`Get Notesnook Pro to enable automatic backups`,
   newUpdateMessage: () => t`New update available`,
   newUpdateActionText: () => t`Tap here to update to the latest version`,
   updateNow: () => t`Update now`,
@@ -1454,6 +1457,8 @@ For example:
   pleaseWaitBeforeSendEmail: () =>
     t`Please wait before requesting another email`,
   unableToSend2faCode: () => t`Unable to send 2FA code`,
+  errorSending2faCodeTryAgain: () =>
+    t`Error sending 2FA code. Tap "Send code" to try again`,
   emailOrPasswordIncorrect: () => t`Email or password incorrect`,
   noNotificationPermission: () =>
     t`Please grant notifications permission to receive reminder notifications.`,
@@ -3325,5 +3330,11 @@ Continue without attachments?`,
   tagsEmptyBody: () =>
     t`Create your first tag to start organizing your workspace.`,
   newestFirst: () => t`Newest First`,
-  oldestFirst: () => t`Oldest First`
+  oldestFirst: () => t`Oldest First`,
+  notePlaceholder: {
+    title: () => t`No notes yet`,
+    description: () =>
+      t`Your thoughts deserve a home. Create your first note and start organizing your life today.`,
+    button: () => t`Add Your First Note`
+  }
 };

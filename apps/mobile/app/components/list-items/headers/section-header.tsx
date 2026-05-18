@@ -72,7 +72,7 @@ export const SectionHeader = React.memo<
     data,
     ref
   }: SectionHeaderProps) {
-    const { colors } = useThemeColors();
+    const { colors } = useThemeColors("list");
     const isCompactModeEnabled = useIsCompactModeEnabled(
       dataType as "note" | "notebook" | "searchResult"
     );
@@ -101,13 +101,13 @@ export const SectionHeader = React.memo<
               alignSelf: "center",
               textAlignVertical: "center"
             }}
-            color={colors.secondary.paragraph}
+            color={colors.secondary.heading}
           >
             {!item.title || item.title === ""
               ? screen === "Search"
                 ? strings.results(itemCount || 0)
-                : strings.pinned().toUpperCase()
-              : item.title.toUpperCase()}
+                : strings.pinned()
+              : item.title}
           </Paragraph>
 
           <View

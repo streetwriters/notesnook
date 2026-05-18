@@ -47,7 +47,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
       <View
         style={{
           backgroundColor: colors.primary.background,
-          paddingTop: DefaultAppStyles.GAP_VERTICAL
+          paddingTop: Spacing.LEVEL_1
         }}
       >
         <SideMenuHeader />
@@ -88,7 +88,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
               gap: Spacing.LEVEL_1
             }}
           >
-            <Heading size={AppFontSize.md} color={colors.secondary.paragraph}>
+            <Heading size={AppFontSize.md} color={colors.primary.heading}>
               {props.placeholderTitle}
             </Heading>
             <Paragraph
@@ -97,7 +97,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
                 maxWidth: "60%"
               }}
               fontSize="SM"
-              color={colors.secondary.paragraph}
+              color={colors.primary.paragraph}
             >
               {props.placeholderBody}
             </Paragraph>
@@ -111,8 +111,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
                 paddingVertical: Spacing.LEVEL_2,
                 paddingHorizontal: Spacing.LEVEL_2
               }}
-              type="accent-outline"
-              icon="plus"
+              type="accent"
             />
           </View>
         )}

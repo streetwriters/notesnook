@@ -56,6 +56,7 @@ type ButtonTypes =
   | "accent"
   | "shade"
   | "secondary"
+  | "tertiary"
   | "selectedAccent"
   | "secondaryAccented"
   | "inverted"
@@ -86,7 +87,7 @@ const buttonTypes = (
 } => ({
   plain: {
     primary: "transparent",
-    text: colors.primary.buttonForeground,
+    text: colors.secondary.buttonForeground,
     selected: colors.primary.hover,
     borderWidth: 0.8,
     borderSelectedColor: getColorLinearShade(
@@ -97,7 +98,7 @@ const buttonTypes = (
   },
   "plain-outline": {
     primary: "transparent",
-    text: colors.primary.buttonForeground,
+    text: colors.secondary.buttonForeground,
     selected: colors.primary.hover,
     borderWidth: 1,
     borderColor: colors.primary.border,
@@ -116,7 +117,19 @@ const buttonTypes = (
   },
   secondary: {
     primary: colors.secondary.background,
-    text: colors.primary.buttonForeground,
+    text: colors.secondary.buttonForeground,
+    selected: colors.secondary.background,
+    borderWidth: 0.8,
+    borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
+    borderSelectedColor: getColorLinearShade(
+      colors.selected.background,
+      0.05,
+      isDark
+    )
+  },
+  tertiary: {
+    primary: colors.tertiary.background,
+    text: colors.secondary.buttonForeground,
     selected: colors.secondary.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),

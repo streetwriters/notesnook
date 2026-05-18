@@ -111,6 +111,9 @@ export const BuyPlan = (props: {
         contentContainerStyle={{
           paddingVertical: Spacing.LEVEL_4
         }}
+        style={{
+          flex: 1
+        }}
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
       >
@@ -151,7 +154,7 @@ export const BuyPlan = (props: {
           <Paragraph
             fontFamily="MEDIUM"
             fontSize="MD"
-            color={colors.secondary.paragraph}
+            color={colors.secondary.heading}
           >
             {strings.paymentSummary()}
           </Paragraph>
@@ -257,7 +260,7 @@ export const BuyPlan = (props: {
           <Paragraph
             fontFamily="MEDIUM"
             fontSize="MD"
-            color={colors.secondary.paragraph}
+            color={colors.secondary.heading}
           >
             {strings.whatsIncluded()}
           </Paragraph>
@@ -270,7 +273,8 @@ export const BuyPlan = (props: {
               padding: Spacing.LEVEL_3,
               borderRadius: Radius.S,
               backgroundColor: colors.secondary.background,
-              marginBottom: 27
+              marginBottom: 27,
+              flex: 1
             }}
           >
             {[

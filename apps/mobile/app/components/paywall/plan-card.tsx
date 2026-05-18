@@ -162,7 +162,7 @@ export const PricingPlanCard = ({
                 {plan.recommended ? (
                   <View
                     style={{
-                      backgroundColor: colors.static.orange,
+                      backgroundColor: colors.static.red,
                       borderRadius: 100,
                       padding: Spacing.LEVEL_0,
                       paddingHorizontal: Spacing.LEVEL_1
@@ -170,7 +170,7 @@ export const PricingPlanCard = ({
                   >
                     <Text
                       style={{
-                        color: colors.static.black,
+                        color: colors.static.white,
                         fontSize: AppFontSize.xxs
                       }}
                     >
@@ -257,6 +257,7 @@ export const PricingPlanCard = ({
                           ? "file"
                           : "image-outline"
                     }
+                    iconFamily="notesnook"
                     size={AppFontSize.lg}
                   />
                   <Paragraph size={AppFontSize.sm}>
@@ -278,7 +279,7 @@ export const PricingPlanCard = ({
 
         <Button
           title={strings.selectPlan()}
-          type={plan.id === "pro" ? "accent" : "secondary"}
+          type={plan.id === "pro" ? "accent" : "tertiary"}
           style={{
             width: "100%"
           }}

@@ -501,7 +501,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                       <TabBarButton
                         icon={isDark ? "dark-mode-outline" : "sun"}
                         testID="sidebar-theme-button"
-                        label={isDark ? "Dark" : "Light"}
+                        label={isDark ? "Dark Mode" : "Light Mode"}
                         onPress={() => {
                           SettingsService.set({
                             useSystemTheme: false
