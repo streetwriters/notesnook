@@ -47,7 +47,6 @@ import { RouteParams } from "../../stores/use-navigation-store";
 import SettingsService from "../../services/settings";
 import AppIcon from "../ui/AppIcon";
 import { Spacing } from "../../common/design/spacing";
-import { SvgView } from "../ui/svg";
 import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
 import { ProgressPills } from "../intro/progress-pills";
 
@@ -182,7 +181,6 @@ export const Signup = ({
                   keyboardType="email-address"
                   autoCorrect={false}
                   autoCapitalize="none"
-                  placeholder={strings.email()}
                   placeholder="you@example.com"
                   blurOnSubmit={false}
                   validators={[
@@ -278,10 +276,10 @@ export const Signup = ({
                       marginBottom: 25,
                       textAlign: "center"
                     }}
-                    fontSize="XS"
+                    fontSize="SM"
                     color={colors.secondary.paragraph}
                   >
-                    {strings.signupAgreement[0]()}
+                    {strings.dontHaveAccount()}{" "}
                     <Paragraph
                       fontSize="SM"
                       fontFamily="SEMI_BOLD"
@@ -325,7 +323,7 @@ export const Signup = ({
                     textAlign: "center"
                   }}
                   fontSize="XS"
-                  color={colors.primary.paragraph}
+                  color={colors.secondary.paragraph}
                 >
                   {strings.signupAgreement[0]()}
                   <Paragraph
