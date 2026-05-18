@@ -229,7 +229,11 @@ export const NotebookItem = ({
                 name={selected ? "checkbox" : "box-empty"}
                 iconFamily="notesnook"
                 size={AppFontSize.md}
-                color={selected ? colors.selected.icon : colors.primary.icon}
+                color={
+                  selected
+                    ? [colors.selected.accent, colors.selected.accentForeground]
+                    : colors.primary.icon
+                }
               />
             </View>
           ) : (

@@ -277,12 +277,13 @@ export function FormInput({
   const borderColor = useMemo(() => {
     if (fieldError) return colors.error.border;
     if (focused) return customColor || colors.selected.border;
-    return colors.primary.border;
+    return "transparent";
   }, [colors, customColor, fieldError, focused]);
 
   const style: ViewStyle = {
     borderWidth: 1,
     borderRadius: defaultBorderRadius,
+    backgroundColor: colors.secondary.background,
     borderColor: borderColor,
     flexDirection: "row",
     justifyContent: "space-between",

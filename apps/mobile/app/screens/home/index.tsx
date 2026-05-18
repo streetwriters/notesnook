@@ -78,9 +78,9 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           loading={loading || !isFocused}
           headerTitle={strings.routes[route.name]()}
           placeholder={{
-            title: route.name?.toLowerCase(),
-            paragraph: strings.notesEmpty(),
-            button: strings.createNewNote(),
+            title: strings.notePlaceholder.title(),
+            paragraph: strings.notePlaceholder.description(),
+            button: strings.notePlaceholder.button(),
             action: openEditor,
             loading: strings.loadingNotes()
           }}
