@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ThemeDefinition } from "@notesnook/theme";
 
-export const THEME_LIGHT: ThemeDefinition = {
+export const THEME_LIGHT: any = {
   $schema:
     "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json",
   name: "Notesnook Light",
@@ -161,7 +161,7 @@ export const THEME_LIGHT: ThemeDefinition = {
   }
 };
 
-export const THEME_DARK: ThemeDefinition = {
+export const THEME_DARK: any = {
   name: "Notesnook Dark",
   id: "default-dark",
   version: 2.1,
