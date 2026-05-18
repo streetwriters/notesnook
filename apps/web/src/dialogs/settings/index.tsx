@@ -438,7 +438,8 @@ function SettingsGroupComponent(props: { item: SettingsGroup }) {
   }, [onStateChange]);
 
   const allHidden = item.settings.every((s) => s.isHidden?.());
-  if (item.isHidden?.() || allHidden) return null;
+  const hasComponentHeader = typeof item.header !== "string";
+  if (item.isHidden?.() || (allHidden && !hasComponentHeader)) return null;
 
   return (
     <Flex
