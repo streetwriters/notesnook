@@ -179,7 +179,7 @@ const RawInboxItemSchema = z.object({
   notebookIds: z.array(z.string()).optional(),
   tagIds: z.array(z.string()).optional(),
   type: z.enum(["note"]),
-  source: z.string(),
+  source: z.string().min(1, "Source is required"),
   version: z.literal(1),
   content: z
     .object({
