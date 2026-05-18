@@ -247,7 +247,7 @@ export const THEME_DARK: ThemeDefinition = {
         accentForeground: "#ffffff",
         paragraph: "#f54b42",
         background: "#250b0a",
-        border: "#383838",
+        border: "#F7999D",
         heading: "#f54b42",
         icon: "#f54b42",
         separator: "#383838",
