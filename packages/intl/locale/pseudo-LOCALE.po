@@ -792,7 +792,7 @@ msgstr ""
 msgid "Add your first note"
 msgstr ""
 
-#: src/strings.ts:2794
+#: src/strings.ts:2843
 msgid "Add Your First Note"
 msgstr ""
 
@@ -4568,7 +4568,7 @@ msgstr ""
 msgid "No notebooks yet"
 msgstr ""
 
-#: src/strings.ts:2791
+#: src/strings.ts:2840
 msgid "No notes yet"
 msgstr ""
 
@@ -8189,7 +8189,7 @@ msgstr ""
 msgid "Your tags"
 msgstr ""
 
-#: src/strings.ts:2793
+#: src/strings.ts:2842
 msgid "Your thoughts deserve a home. Create your first note and start organizing your life today."
 msgstr ""
 
