@@ -73,7 +73,7 @@ const SelectionWrapper = ({
   return (
     <View
       style={{
-        paddingHorizontal: Spacing.LEVEL_3,
+        // paddingHorizontal: Spacing.LEVEL_3,
         backgroundColor: isEditingNote ? colors.selected.background : undefined
       }}
     >
@@ -83,23 +83,36 @@ const SelectionWrapper = ({
         onLongPress={onLongPress}
         onPress={onPress}
         customSelectedColor={colors.primary.hover}
+        noborder
         customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={1}
         style={{
-          flexDirection: "row",
           width: "100%",
           alignSelf: "center",
           overflow: "hidden",
+          paddingHorizontal: Spacing.LEVEL_3,
           borderRadius: 0,
-          marginTop: hasGroupHeader ? 0 : Spacing.LEVEL_3,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border,
           alignItems: "flex-start",
-          paddingVertical: Spacing.LEVEL_2,
-          paddingTop: hasGroupHeader ? 0 : Spacing.LEVEL_2
+          // paddingVertical: Spacing.LEVEL_2,
+          paddingTop: Spacing.LEVEL_2
         }}
       >
-        {children}
+        <View
+          style={{
+            width: "100%",
+            flexDirection: "row"
+          }}
+        >
+          {children}
+        </View>
+        <View
+          style={{
+            marginTop: Spacing.LEVEL_2,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.primary.border,
+            width: "100%"
+          }}
+        />
       </Pressable>
     </View>
   );
