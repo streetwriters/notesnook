@@ -43,6 +43,7 @@ import { setupDesktopIntegration } from "../utils/desktop-integration";
 import { rm } from "fs/promises";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 import type { MenuItem as NNMenuItem } from "@notesnook/ui";
+import { platform } from "os";
 
 const t = initTRPC.create();
 
@@ -198,7 +199,10 @@ export const osIntegrationRouter = t.router({
       const { type, link } = input;
       if (type !== "path") return;
 
-      const resolvedPath = resolvePath(link);
+      const resolvedPath = resolvePath(
+        // remove leading slash from path on windows
+        platform() === "win32" ? link.slice(1) : link
+      );
       if (!existsSync(resolvedPath)) {
         if (globalThis.window) {
           await dialog.showMessageBox(globalThis.window, {
