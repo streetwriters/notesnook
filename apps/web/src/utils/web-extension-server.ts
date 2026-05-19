@@ -88,7 +88,11 @@ export class WebExtensionServer implements Server {
         }
       );
 
-      const attachment = (await attachFiles([clippedFile]))?.at(0);
+      let attachment;
+      for await (const message of attachFiles([clippedFile], [false])) {
+        if (message.type === "done") attachment = message.attachment;
+        else if (message.type === "error") return;
+      }
       if (!attachment) return;
 
       clipContent += h("iframe", [], {

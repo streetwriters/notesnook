@@ -2674,5 +2674,12 @@ Use this if changes from other devices are not appearing on this device. This wi
   
 Continue without attachments?`,
   pleaseLoginToDownloadAttachments: () =>
-    t`Please login to download attachments.`
+    t`Please login to download attachments.`,
+  attachingFiles: () => t`Attaching files`,
+  closeCountdown: (seconds: number) => t`Close (${seconds})`,
+  compressing: () => t`Compressing`,
+  encrypting: () => t`Encrypting`,
+  fileSizeLimitExceededPleaseUpgrade: () =>
+    t`File size limit exceeded. Please upgrade your plan.`,
+  compressionFailed: () => t`Compression failed`
 };

@@ -984,6 +984,10 @@ msgstr ""
 msgid "Attached files"
 msgstr ""
 
+#: src/strings.ts:2678
+msgid "Attaching files"
+msgstr ""
+
 #: src/strings.ts:290
 msgid "attachment"
 msgstr ""
@@ -1635,6 +1639,10 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#: src/strings.ts:2679
+msgid "Close ({seconds})"
+msgstr ""
+
 #: src/strings.ts:2019
 msgid "Close all"
 msgstr ""
@@ -1742,6 +1750,14 @@ msgstr ""
 
 #: src/strings.ts:144
 msgid "Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2680
+msgid "Compressing"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2684
+msgid "Compression failed"
 msgstr ""
 
 #: src/strings.ts:2262
@@ -2536,6 +2552,10 @@ msgstr ""
 msgid "Encrypted, private, secure."
 msgstr ""
 
+#: src/strings.ts:2681
+msgid "Encrypting"
+msgstr ""
+
 #: src/strings.ts:940
 msgid "Encrypting attachment"
 msgstr ""
@@ -2904,6 +2924,10 @@ msgstr ""
 
 #: src/strings.ts:949
 msgid "File mismatch"
+msgstr ""
+
+#: src/strings.ts:2683
+msgid "File size limit exceeded. Please upgrade your plan."
 msgstr ""
 
 #: src/strings.ts:945
