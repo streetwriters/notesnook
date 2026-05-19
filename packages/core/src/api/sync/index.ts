@@ -237,16 +237,16 @@ export class Sync {
     await this.checkConnection();
 
     try {
-      await this.connection?.invoke("RequestFetchV3", deviceId);
+      await this.connection?.invoke("RequestFetchV4", deviceId);
     } catch (error) {
       if (
         error instanceof Error &&
         error.message.includes("HubException: Method does not exist")
       ) {
         this.logger.warn(
-          "RequestFetchV3 failed, falling back to RequestFetchV2"
+          "RequestFetchV4 failed, falling back to RequestFetchV3"
         );
-        await this.connection?.invoke("RequestFetchV2", deviceId);
+        await this.connection?.invoke("RequestFetchV3", deviceId);
       } else throw error;
     }
 
