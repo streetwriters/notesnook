@@ -33,7 +33,7 @@ import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
 import { getTheme, setTheme, Theme } from "../utils/theme";
-import { mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
@@ -43,6 +43,7 @@ import { setupDesktopIntegration } from "../utils/desktop-integration";
 import { rm } from "fs/promises";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 import type { MenuItem as NNMenuItem } from "@notesnook/ui";
+import { platform } from "os";
 
 const t = initTRPC.create();
 
@@ -192,9 +193,28 @@ export const osIntegrationRouter = t.router({
     }),
   openPath: t.procedure
     .input(z.object({ type: z.literal("path"), link: z.string() }))
-    .query(({ input }) => {
+    .query(async ({ input }) => {
+      if (isFlatpak()) return;
+
       const { type, link } = input;
-      if (type === "path") return shell.openPath(resolvePath(link));
+      if (type !== "path") return;
+
+      const resolvedPath = resolvePath(
+        // remove leading slash from path on windows
+        platform() === "win32" ? link.slice(1) : link
+      );
+      if (!existsSync(resolvedPath)) {
+        if (globalThis.window) {
+          await dialog.showMessageBox(globalThis.window, {
+            type: "error",
+            title: "Path not found",
+            message: `The path does not exist:\n${wrapPath(resolvedPath)}`
+          });
+        }
+        return;
+      }
+
+      await shell.openPath(resolvedPath);
     }),
   bringToFront: t.procedure.query(() => bringToFront()),
   changeTheme: t.procedure
@@ -298,4 +318,8 @@ function toMenuItem(
       });
     }
   }
+}
+
+function wrapPath(path: string, maxLineLength = 100): string {
+  return path.replace(new RegExp(`(.{${maxLineLength}})`, "g"), "$1\n");
 }

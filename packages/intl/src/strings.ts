@@ -2681,5 +2681,10 @@ Continue without attachments?`,
   encrypting: () => t`Encrypting`,
   fileSizeLimitExceededPleaseUpgrade: () =>
     t`File size limit exceeded. Please upgrade your plan.`,
-  compressionFailed: () => t`Compression failed`
+  compressionFailed: () => t`Compression failed`,
+  openingLocalFile: () => t`Opening local file`,
+  openingLocalFileDesc: (filePath: string) =>
+    t`Are you sure you want to open this file: ${filePath}?`,
+  cantOpenFileLinksInBrowsers: () =>
+    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`
 };
