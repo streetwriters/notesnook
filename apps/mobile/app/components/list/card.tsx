@@ -21,10 +21,11 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { Message, useMessageStore } from "../../stores/use-message-store";
-import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon from "../ui/AppIcon";
 import { Pressable } from "../ui/pressable";
+import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 export const Card = ({
@@ -47,15 +48,19 @@ export const Card = ({
     <View
       style={{
         width: "100%",
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL
+        paddingHorizontal: Spacing.LEVEL_3,
+        marginBottom: Spacing.LEVEL_4,
+        marginTop: Spacing.LEVEL_3
       }}
     >
       <Pressable
         onPress={messageBoardState.onPress}
         type="plain"
         style={{
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+          paddingVertical: Spacing.LEVEL_3,
+          paddingHorizontal: Spacing.LEVEL_2,
+          backgroundColor: colors.primary.shade,
+          borderRadius: Radius.S,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
@@ -66,23 +71,24 @@ export const Card = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            width: "100%"
+            width: "100%",
+            flexShrink: 1,
+            gap: Spacing.LEVEL_1
           }}
         >
           <View
             style={{
-              width: 40 * fontScale,
-              height: 40 * fontScale,
-              borderRadius: 100,
+              width: 34,
+              height: 34,
+              borderRadius: Radius.XXS,
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
+              backgroundColor: colors.secondary.background
             }}
           >
             <Icon
-              size={AppFontSize.xxxl}
-              color={
-                messageBoardState.type === "error" ? colors.error.icon : color
-              }
+              size={16}
+              color={colors.primary.icon}
               allowFontScaling
               name={messageBoardState.icon}
             />
@@ -90,25 +96,27 @@ export const Card = ({
 
           <View
             style={{
-              marginLeft: 10,
-              marginRight: 10
+              gap: Spacing.LEVEL_0,
+              flexShrink: 1
             }}
           >
-            <Paragraph
+            <Heading
               style={{
                 flexWrap: "nowrap",
                 flexShrink: 1
               }}
-              size={AppFontSize.sm}
+              fontSize="MD"
               color={colors.primary.heading}
             >
               {messageBoardState.actionText}
-            </Paragraph>
-            <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
+            </Heading>
+            <Paragraph color={colors.secondary.paragraph} fontSize="SM">
               {messageBoardState.message}
             </Paragraph>
           </View>
         </View>
+
+        <AppIcon size={24} name="chevron-right" color={colors.primary.icon} />
       </Pressable>
     </View>
   );

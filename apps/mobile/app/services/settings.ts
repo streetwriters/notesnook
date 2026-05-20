@@ -25,9 +25,10 @@ import {
   useSettingStore
 } from "../stores/use-setting-store";
 import { NotesnookModule } from "../utils/notesnook-module";
-import { scale, updateSize } from "../utils/size";
+import { scale } from "../utils/size";
 import { useUserStore } from "../stores/use-user-store";
 import ScreenGuardModule from "react-native-screenguard";
+import { THEME_DARK, THEME_LIGHT } from "../common/design/theme";
 ScreenGuardModule.initSettings();
 
 function reset() {
@@ -113,14 +114,15 @@ function init() {
     migrateSettings(settingsParsed);
     settings = {
       ...settings,
-      ...settingsParsed
+      ...settingsParsed,
+      darkTheme: THEME_DARK,
+      lighTheme: THEME_LIGHT
     };
   }
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
 
-  updateSize();
   useSettingStore.getState().setSettings({ ...settings });
   migrateAppLock();
 }

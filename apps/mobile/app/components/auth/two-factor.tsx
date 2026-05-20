@@ -21,18 +21,17 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
-import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database/index";
+import { Radius, Spacing } from "../../common/design/spacing";
 import useTimer from "../../hooks/use-timer";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
-import { eCloseSimpleDialog } from "../../utils/events";
+import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { presentDialog } from "../dialog/functions";
 import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
-import Input from "../ui/input";
+import PinInput from "../ui/pin-input/index";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -73,6 +72,10 @@ const TwoFactorVerification = ({
   const inputRef = useRef<TextInput>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
+  const [codeInput, setCodeInput] = useState("");
+
+  const isRecoveryCode = currentMethod.method === "recoveryCode";
+  const codeLength = isRecoveryCode ? 10 : 6;
 
   const onNext = async () => {
     if (!code.current || code.current.length < 6) {
@@ -94,10 +97,7 @@ const TwoFactorVerification = ({
         method: currentMethod.method,
         code: code.current
       },
-      (result) => {
-        if (result) {
-          eSendEvent(eCloseSimpleDialog, "two_factor_verify");
-        }
+      () => {
         setLoading(false);
       },
       (e) => {
@@ -118,12 +118,14 @@ const TwoFactorVerification = ({
     {
       id: "sms",
       title: strings.sendCodeSms(),
-      icon: "message-plus-outline"
+      icon: "chat",
+      iconFamily: "notesnook"
     },
     {
       id: "email",
       title: strings.sendCodeEmail(),
-      icon: "email-outline"
+      icon: "envelope-simple",
+      iconFamily: "notesnook"
     },
     {
       id: "app",
@@ -133,7 +135,8 @@ const TwoFactorVerification = ({
     {
       id: "recoveryCode",
       title: strings.recoveryCode(),
-      icon: "key"
+      icon: "lock-simple",
+      iconFamily: "notesnook"
     }
   ];
 
@@ -155,6 +158,7 @@ const TwoFactorVerification = ({
       setSending(false);
     } catch (e) {
       setSending(false);
+      console.log("error e");
       setError(
         new Error(`Error sending 2FA Code. Tap "Send code" to try again `)
       );
@@ -168,48 +172,52 @@ const TwoFactorVerification = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMethod.method]);
 
+  useEffect(() => {
+    setCodeInput("");
+    code.current = "";
+  }, [currentMethod.method]);
+
   return (
-    <ScrollView
-      keyboardShouldPersistTaps="handled"
-      keyboardDismissMode="interactive"
-      style={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: colors.primary.background,
-        paddingTop: 60
-      }}
+    <View
       onLayout={() => {
         setTimeout(() => {
           inputRef.current?.focus();
         }, 500);
       }}
+      style={{
+        alignItems: "center",
+        gap: Spacing.LEVEL_3
+      }}
     >
       <View
         style={{
-          alignItems: "center",
-          paddingHorizontal: currentMethod.method ? 12 : 0,
-          gap: 12
+          paddingHorizontal: Spacing.LEVEL_3,
+          width: "100%"
         }}
       >
         <IconButton
           style={{
-            width: 70,
-            height: 70
+            width: 50,
+            height: 50,
+            backgroundColor: colors.primary.shade,
+            borderRadius: Radius.XS,
+            marginBottom: Spacing.LEVEL_7
           }}
-          size={50}
-          name="key"
+          size={25}
+          iconFamily="notesnook"
+          name="shield-check"
           color={colors.primary.accent}
         />
         <Heading
           style={{
-            textAlign: "center"
+            textAlign: "center",
+            marginBottom: Spacing.LEVEL_1
           }}
         >
           {currentMethod.method ? strings["2fa"]() : strings.select2faMethod()}
         </Heading>
         <Paragraph
           style={{
-            width: "80%",
             textAlign: "center"
           }}
         >
@@ -219,61 +227,38 @@ const TwoFactorVerification = ({
               ]?.() || strings.select2faCodeHelpText()
             : strings.select2faCodeHelpText()}
         </Paragraph>
+      </View>
 
-        {currentMethod.method === "sms" || currentMethod.method === "email" ? (
-          <Button
-            onPress={onSendCode}
-            type={seconds ? "plain" : "transparent"}
-            title={
-              sending
-                ? ""
-                : `${
-                    seconds
-                      ? strings.resend2faCode(`${seconds}`)
-                      : strings.sendCode()
-                  }`
-            }
-            loading={sending}
-            height={30}
-          />
-        ) : null}
-
-        {currentMethod.method ? (
-          <>
-            <Input
-              placeholder={
-                currentMethod.method === "recoveryCode"
-                  ? "xxxxx-xxxxx"
-                  : "xxxxxx"
-              }
+      {currentMethod.method ? (
+        <>
+          <View
+            style={{
+              borderRadius: Radius.S,
+              borderWidth: 1,
+              borderColor: colors.primary.border,
+              paddingVertical: Spacing.LEVEL_4,
+              paddingHorizontal: Spacing.LEVEL_3,
+              width: "100%",
+              gap: Spacing.LEVEL_4
+            }}
+          >
+            <PinInput
               testID={"input.totp"}
-              maxLength={
-                currentMethod.method === "recoveryCode" ? undefined : 6
-              }
-              fwdRef={inputRef}
-              textAlign="center"
-              onChangeText={(value) => {
-                setError(undefined);
+              inputRef={inputRef}
+              length={codeLength}
+              value={codeInput}
+              onChangeText={(value: string) => {
+                setCodeInput(value);
                 code.current = value;
               }}
-              cursorColor={colors.selected.accent}
-              selectionHandleColor={colors.selected.accent}
-              selectionColor={colors.selected.accent}
               onSubmitEditing={onNext}
-              height={60}
-              marginBottom={0}
-              inputStyle={{
-                fontSize: AppFontSize.lg,
-                textAlign: "center",
-                letterSpacing: 7,
-                width: 250
-              }}
-              keyboardType={
-                currentMethod.method === "recoveryCode" ? "default" : "numeric"
-              }
-              enablesReturnKeyAutomatically
-              containerStyle={{
-                minWidth: "50%"
+              keyboardType={isRecoveryCode ? "default" : "number-pad"}
+              sanitize={(value: string) => {
+                if (isRecoveryCode) {
+                  return value.replace(/[^0-9a-zA-Z]/g, "").toUpperCase();
+                }
+
+                return value.replace(/[^0-9]/g, "");
               }}
             />
             {error ? (
@@ -284,7 +269,9 @@ const TwoFactorVerification = ({
                 style={{
                   textAlign: "center",
                   marginVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  maxWidth: 250
+                  maxWidth: 250,
+                  alignSelf: "center",
+                  marginTop: -10
                 }}
               >
                 <AppIcon
@@ -296,76 +283,125 @@ const TwoFactorVerification = ({
               </Paragraph>
             ) : null}
 
-            <Button
-              title={loading ? null : strings.next()}
-              type="accent"
-              width={250}
-              loading={loading}
-              onPress={onNext}
-            />
-            <Button
-              title={strings.cancel()}
-              type="secondaryAccented"
-              onPress={() => {
-                reset();
-                onCancel();
+            <View
+              style={{
+                flexDirection: "row",
+                gap: Spacing.LEVEL_2
               }}
-              width={250}
-            />
-
-            <Button
-              title={strings["2faCodeSecondaryMethodText"][
-                currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
-              ]()}
-              type="plain"
-              onPress={onRequestSecondaryMethod}
-              height={30}
-            />
-          </>
-        ) : (
-          <>
-            {getMethods().map((item) => (
-              <Pressable
-                key={item.title}
+            >
+              <Button
+                title={strings.cancel()}
+                type="secondary"
                 onPress={() => {
-                  setCurrentMethod({
-                    method: item.id,
-                    isPrimary: false
-                  });
+                  reset();
+                  onCancel();
                 }}
                 style={{
-                  paddingHorizontal: DefaultAppStyles.GAP,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-                  marginTop: 0,
-                  flexDirection: "row",
-                  borderRadius: 0,
-                  alignItems: "center",
-                  width: "100%",
-                  justifyContent: "flex-start"
+                  width: "48%"
+                }}
+              />
+              <Button
+                title={loading ? null : strings.continue()}
+                type="accent"
+                loading={loading}
+                onPress={onNext}
+                style={{
+                  width: "48%"
+                }}
+              />
+            </View>
+
+            {currentMethod.method === "sms" ||
+            currentMethod.method === "email" ? (
+              <Button
+                onPress={onSendCode}
+                type={"plain"}
+                disabled={!seconds}
+                title={
+                  sending
+                    ? ""
+                    : `${
+                        seconds
+                          ? strings.resend2faCode(`${seconds}`)
+                          : strings.resendCode()
+                      }`
+                }
+                loading={sending}
+                fontSize={AppFontSize.sm}
+                fontFamily="REGULAR"
+                style={{
+                  paddingVertical: 0,
+                  alignSelf: "flex-start",
+                  paddingHorizontal: 0
+                }}
+              />
+            ) : null}
+          </View>
+
+          <Button
+            title={strings["2faCodeSecondaryMethodText"][
+              currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
+            ]()}
+            type="plain"
+            onPress={onRequestSecondaryMethod}
+            height={30}
+          />
+        </>
+      ) : (
+        <View
+          style={{
+            gap: Spacing.LEVEL_2,
+            width: "100%"
+          }}
+        >
+          {getMethods().map((item) => (
+            <Pressable
+              key={item.title}
+              onPress={() => {
+                setCurrentMethod({
+                  method: item.id,
+                  isPrimary: false
+                });
+              }}
+              style={{
+                padding: Spacing.LEVEL_2,
+                backgroundColor: colors.secondary.background,
+                flexDirection: "row",
+                borderRadius: Radius.S,
+                alignItems: "center",
+                width: "100%",
+                justifyContent: "flex-start",
+                gap: Spacing.LEVEL_1
+              }}
+            >
+              <IconButton
+                style={{
+                  borderRadius: Radius.XS,
+                  padding: Spacing.LEVEL_1,
+                  width: undefined,
+                  height: undefined,
+                  backgroundColor: RGB_Linear_Shade(
+                    0.04,
+                    hexToRGBA(colors.secondary.background)
+                  )
+                }}
+                size={17}
+                color={colors.primary.icon}
+                name={item.icon}
+                iconFamily={item.iconFamily as "notesnook"}
+              />
+              <View
+                style={{
+                  flexShrink: 1
                 }}
               >
-                <IconButton
-                  type="secondaryAccented"
-                  style={{
-                    marginRight: 10
-                  }}
-                  size={15}
-                  color={colors.primary.accent}
-                  name={item.icon}
-                />
-                <View
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  <Paragraph size={AppFontSize.md}>{item.title}</Paragraph>
-                </View>
-              </Pressable>
-            ))}
-          </>
-        )}
-      </View>
-    </ScrollView>
+                <Paragraph size={AppFontSize.sm}>{item.title}</Paragraph>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
   );
 };
 

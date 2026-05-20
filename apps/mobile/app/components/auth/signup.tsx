@@ -46,6 +46,9 @@ import { SignupContext } from "./signup-context";
 import { RouteParams } from "../../stores/use-navigation-store";
 import SettingsService from "../../services/settings";
 import AppIcon from "../ui/AppIcon";
+import { Spacing } from "../../common/design/spacing";
+import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
+import { ProgressPills } from "../intro/progress-pills";
 
 const SignupSteps = {
   signup: 0,
@@ -133,7 +136,7 @@ export const Signup = ({
               width: "100%"
             }}
             contentContainerStyle={{
-              minHeight: "90%"
+              minHeight: "99%"
             }}
             nestedScrollEnabled
             keyboardShouldPersistTaps="handled"
@@ -145,68 +148,24 @@ export const Signup = ({
                 zIndex: 10,
                 width: "100%",
                 alignSelf: "center",
-                height: "100%"
+                height: "100%",
+                paddingHorizontal: Spacing.LEVEL_3,
+                paddingTop: Spacing.LEVEL_6
               }}
             >
-              <View
+              <Heading
                 style={{
-                  justifyContent: "flex-end",
-                  paddingHorizontal: 16,
-                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                  borderBottomWidth: 0.8,
-                  borderBottomColor: colors.primary.border,
-                  alignSelf: isTablet ? "center" : undefined,
-                  borderWidth: isTablet ? 1 : undefined,
-                  borderColor: isTablet ? colors.primary.border : undefined,
-                  borderRadius: isTablet ? 20 : undefined,
-                  marginTop: isTablet ? 50 : undefined,
-                  width: !isTablet ? undefined : "50%",
-                  minHeight: height * 0.25
+                  paddingBottom: Spacing.LEVEL_4
                 }}
+                fontSize="XL"
               >
-                <View
-                  style={{
-                    flexDirection: "row"
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 100,
-                      height: 5,
-                      backgroundColor: colors.primary.accent,
-                      borderRadius: 2,
-                      marginRight: 7
-                    }}
-                  />
-
-                  <View
-                    style={{
-                      width: 20,
-                      height: 5,
-                      backgroundColor: colors.secondary.background,
-                      borderRadius: 2
-                    }}
-                  />
-                </View>
-                <Heading
-                  extraBold
-                  style={{
-                    marginBottom: 25,
-                    marginTop: 10
-                  }}
-                  size={AppFontSize.xxl}
-                >
-                  {strings.createAccount()}
-                </Heading>
-              </View>
+                {strings.createAccount()}
+              </Heading>
 
               <View
                 style={{
-                  width: DDS.isTab ? "50%" : "100%",
-                  paddingHorizontal: DDS.isTab ? 0 : 16,
-                  backgroundColor: colors.primary.background,
-                  flexGrow: 1,
-                  alignSelf: "center"
+                  gap: Spacing.LEVEL_2,
+                  paddingBottom: Spacing.LEVEL_4
                 }}
               >
                 <FormInput
@@ -214,6 +173,7 @@ export const Signup = ({
                   formRef={formRef}
                   fwdRef={emailInputRef}
                   loading={loading}
+                  label={strings.email()}
                   testID="input.email"
                   returnKeyLabel="Next"
                   returnKeyType="next"
@@ -221,7 +181,7 @@ export const Signup = ({
                   keyboardType="email-address"
                   autoCorrect={false}
                   autoCapitalize="none"
-                  placeholder={strings.email()}
+                  placeholder="you@example.com"
                   blurOnSubmit={false}
                   validators={[
                     validators.required(strings.emailRequired()),
@@ -245,9 +205,11 @@ export const Signup = ({
                   autoCapitalize="none"
                   blurOnSubmit={false}
                   autoCorrect={false}
-                  placeholder={strings.password()}
+                  label={strings.password()}
+                  placeholder="•••••••••"
                   validators={[validators.required(strings.passwordRequired())]}
                   onSubmitEditing={() => {
+                    if (formRef.current.validateField("password")) return;
                     confirmPasswordInputRef.current?.focus();
                   }}
                 />
@@ -265,8 +227,8 @@ export const Signup = ({
                   autoCapitalize="none"
                   autoCorrect={false}
                   blurOnSubmit={false}
-                  placeholder={strings.confirmPassword()}
-                  marginBottom={12}
+                  label={strings.confirmPassword()}
+                  placeholder="•••••••••"
                   validators={[
                     validators.required(strings.confirmPasswordRequired()),
                     validators.matchField(
@@ -278,7 +240,17 @@ export const Signup = ({
                     signup();
                   }}
                 />
+              </View>
 
+              <View
+                style={{
+                  width: DDS.isTab ? "50%" : "100%",
+                  backgroundColor: colors.primary.background,
+                  flexGrow: 1,
+                  alignSelf: "center",
+                  gap: Spacing.LEVEL_2
+                }}
+              >
                 <Button
                   title={!loading ? strings.continue() : null}
                   type="accent"
@@ -296,18 +268,21 @@ export const Signup = ({
                   }}
                   activeOpacity={0.8}
                   style={{
-                    alignSelf: "center",
-                    marginTop: 12,
-                    paddingVertical: 12
+                    alignSelf: "center"
                   }}
                 >
                   <Paragraph
-                    size={AppFontSize.xs + 1}
+                    style={{
+                      marginBottom: 25,
+                      textAlign: "center"
+                    }}
+                    fontSize="SM"
                     color={colors.secondary.paragraph}
                   >
-                    {strings.alreadyHaveAccount()}{" "}
+                    {strings.dontHaveAccount()}{" "}
                     <Paragraph
-                      size={AppFontSize.xs + 1}
+                      fontSize="SM"
+                      fontFamily="SEMI_BOLD"
                       style={{ color: colors.primary.accent }}
                     >
                       {strings.login()}
@@ -347,12 +322,12 @@ export const Signup = ({
                     marginBottom: 25,
                     textAlign: "center"
                   }}
-                  size={AppFontSize.xxs}
+                  fontSize="XS"
                   color={colors.secondary.paragraph}
                 >
                   {strings.signupAgreement[0]()}
                   <Paragraph
-                    size={AppFontSize.xxs}
+                    fontSize="XS"
                     onPress={() => {
                       openLinkInBrowser("https://notesnook.com/tos");
                     }}
@@ -366,7 +341,7 @@ export const Signup = ({
                   </Paragraph>{" "}
                   {strings.signupAgreement[2]()}
                   <Paragraph
-                    size={AppFontSize.xxs}
+                    fontSize="XS"
                     onPress={() => {
                       openLinkInBrowser("https://notesnook.com/privacy");
                     }}
@@ -385,12 +360,22 @@ export const Signup = ({
           </KeyboardAwareScrollView>
         </>
       ) : (
-        <>
+        <View
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3
+          }}
+        >
+          <ProgressPills activePillIndex={2} />
           <Loading
             title={"Setting up your account..."}
+            svgSrc={SETTING_ACCOUNT_SVG}
             description="Your account is almost ready, please wait..."
+            style={{
+              height: undefined,
+              marginTop: Spacing.LEVEL_6
+            }}
           />
-        </>
+        </View>
       )}
     </SignupContext.Provider>
   );

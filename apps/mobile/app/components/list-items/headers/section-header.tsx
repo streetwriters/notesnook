@@ -21,22 +21,22 @@ import {
   GroupHeader,
   GroupingKey,
   GroupOptions,
-  ItemType
+  ItemType,
+  Item,
+  VirtualizedGrouping
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
-import { View } from "react-native";
+import React, { RefObject } from "react";
+import { FlatList, View } from "react-native";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import { presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { RouteName } from "../../../stores/use-navigation-store";
-import { AppFontSize } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import Sort from "../../sheets/sort";
 import { IconButton } from "../../ui/icon-button";
-import { Pressable } from "../../ui/pressable";
-import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 type SectionHeaderProps = {
   item: GroupHeader;
@@ -46,8 +46,10 @@ type SectionHeaderProps = {
   screen?: RouteName;
   groupOptions: GroupOptions;
   group: GroupingKey;
-  onOpenJumpToDialog: () => void;
   itemCount?: number;
+  // onOpenJumpToDialog: () => void;
+  data?: VirtualizedGrouping<Item>;
+  ref?: RefObject<FlatList>;
 };
 
 export const SectionHeader = React.memo<
@@ -61,10 +63,11 @@ export const SectionHeader = React.memo<
     screen,
     groupOptions,
     group,
-    onOpenJumpToDialog,
-    itemCount
+    itemCount,
+    data,
+    ref
   }: SectionHeaderProps) {
-    const { colors } = useThemeColors();
+    const { colors } = useThemeColors("list");
     const isCompactModeEnabled = useIsCompactModeEnabled(
       dataType as "note" | "notebook" | "searchResult"
     );
@@ -73,8 +76,9 @@ export const SectionHeader = React.memo<
       <View
         style={{
           width: "100%",
-          paddingHorizontal: DefaultAppStyles.GAP,
-          marginBottom: DefaultAppStyles.GAP_VERTICAL
+          paddingHorizontal: Spacing.LEVEL_3,
+          marginBottom: Spacing.LEVEL_3,
+          marginTop: Spacing.LEVEL_3
         }}
       >
         <View
@@ -83,58 +87,36 @@ export const SectionHeader = React.memo<
             alignItems: "center",
             width: "100%",
             alignSelf: "center",
-            justifyContent: "space-between",
-            borderBottomWidth: 1,
-            borderColor: colors.primary.border,
-            paddingBottom: 1,
-            paddingTop:
-              index === 0
-                ? DefaultAppStyles.GAP_VERTICAL
-                : DefaultAppStyles.GAP_VERTICAL_SMALL
+            justifyContent: "space-between"
           }}
         >
-          <Pressable
-            onPress={() => {
-              onOpenJumpToDialog();
-            }}
-            hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
+          <Paragraph
+            fontSize="MD"
             style={{
-              justifyContent: "flex-start",
-              flexDirection: "row",
-              width: "auto"
+              alignSelf: "center",
+              textAlignVertical: "center"
             }}
+            color={colors.secondary.heading}
           >
-            <Heading
-              size={AppFontSize.xxs}
-              style={{
-                alignSelf: "center",
-                textAlignVertical: "center"
-              }}
-              color={color || colors.primary.accent}
-            >
-              {!item.title || item.title === ""
-                ? screen === "Search"
-                  ? strings.results(itemCount || 0)
-                  : strings.pinned().toUpperCase()
-                : item.title.toUpperCase()}
-            </Heading>
-          </Pressable>
+            {!item.title || item.title === ""
+              ? screen === "Search"
+                ? strings.results(itemCount || 0)
+                : strings.pinned()
+              : item.title}
+          </Paragraph>
 
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: DefaultAppStyles.GAP_SMALL
+              gap: Spacing.LEVEL_1
             }}
           >
             {index === 0 ? (
               <>
                 <IconButton
-                  name={
-                    groupOptions.sortDirection === "asc"
-                      ? "sort-ascending"
-                      : "sort-descending"
-                  }
+                  name={"sliders"}
+                  iconFamily="notesnook"
                   color={colors.secondary.icon}
                   testID="icon-sort"
                   onPress={() => {
@@ -148,15 +130,20 @@ export const SectionHeader = React.memo<
                           hideGroupOptions={
                             screen === "Reminders" || screen === "Search"
                           }
+                          data={data}
+                          ref={ref}
                         />
                       )
                     });
                   }}
                   style={{
-                    width: 25,
-                    height: 25
+                    width: 30,
+                    height: 30,
+                    borderWidth: 1,
+                    borderRadius: Radius.XS,
+                    borderColor: colors.secondary.border
                   }}
-                  size={AppFontSize.lg - 2}
+                  size={16}
                 />
                 <IconButton
                   hidden={
@@ -166,14 +153,16 @@ export const SectionHeader = React.memo<
                     screen !== "Search"
                   }
                   style={{
-                    width: 25,
-                    height: 25
+                    width: 30,
+                    height: 30,
+                    borderWidth: 1,
+                    borderRadius: Radius.XXS,
+                    borderColor: colors.secondary.border
                   }}
                   testID="icon-compact-mode"
                   color={colors.secondary.icon}
-                  name={
-                    isCompactModeEnabled ? "view-list" : "view-list-outline"
-                  }
+                  name={"view-list"}
+                  iconFamily="notesnook"
                   onPress={() => {
                     SettingsService.set({
                       [dataType === "notebook"
@@ -185,20 +174,10 @@ export const SectionHeader = React.memo<
                         : "normal"
                     });
                   }}
-                  size={AppFontSize.lg - 2}
+                  size={16}
                 />
               </>
             ) : null}
-
-            {/* <IconButton
-              style={{
-                width: 25,
-                height: 25
-              }}
-              color={colors.secondary.icon}
-              name={"chevron-down"}
-              size={SIZE.lg - 2}
-            /> */}
           </View>
         </View>
       </View>

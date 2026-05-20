@@ -153,10 +153,16 @@ export const Storage: IStorage = {
       const encrypted = await OpenPGP.encrypt(dummyData, keys.publicKey);
       const decrypted = await OpenPGP.decrypt(encrypted, keys.privateKey, "");
 
-      return decrypted === dummyData;
+      return {
+        isValid: decrypted === dummyData,
+        message: ""
+      };
     } catch (e) {
       console.error("PGP key pair validation error:", e);
-      return false;
+      return {
+        isValid: false,
+        message: (e as Error).message
+      };
     }
   },
   async decryptPGPMessage(privateKeyArmored, encryptedMessage) {

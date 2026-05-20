@@ -18,14 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
-import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { eOnLoadNote } from "../../utils/events";
+import {
+  eSendEvent,
+  presentSheet,
+  sendItemUpdateEvent,
+  ToastManager
+} from "../../services/event-manager";
+import { eOnLoadNote, refreshNotesPage } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -37,27 +41,43 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DateMeta } from "./date-meta";
 import { Items } from "./items";
-import Notebooks from "./notebooks";
-import { TagStrip, Tags } from "./tags";
+import { Tags } from "./tags";
 import { Dialog } from "../dialog";
-
-const Line = ({ top = 6, bottom = 6 }) => {
-  const { colors } = useThemeColors();
-  return (
-    <View
-      style={{
-        height: 1,
-        backgroundColor: colors.primary.border,
-        width: "100%",
-        marginTop: top,
-        marginBottom: bottom
-      }}
-    />
-  );
-};
+import AppIcon from "../ui/AppIcon";
+import { Spacing } from "../../common/design/spacing";
+import { Button } from "../ui/button";
+import ManageTags from "../../screens/manage-tags";
+import ColorPicker from "../dialogs/color-picker";
+import { useRelationStore } from "../../stores/use-relation-store";
+import { useMenuStore } from "../../stores/use-menu-store";
+import Navigation from "../../services/navigation";
+import { useIsFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../sheets/paywall";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   const { colors } = useThemeColors();
+  const colorFeature = useIsFeatureAvailable("colors");
+  const [noteNotebooks, setNoteNotebooks] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const colorNotes = useMenuStore((state) => state.colorNotes);
+  useEffect(() => {
+    async function getNotebooks() {
+      let filteredNotebooks = await db.relations.to(item, "notebook").resolve();
+      return filteredNotebooks || [];
+    }
+    if (item.type === "note") {
+      getNotebooks().then((notebooks) => setNoteNotebooks(notebooks));
+      db.relations
+        .to(item, "tag")
+        .resolve()
+        .then((tags) => {
+          setTags(tags);
+        });
+    }
+  }, [item]);
+
   if (!item || !item.id) {
     return (
       <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
@@ -74,7 +94,8 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
         backgroundColor: colors.primary.background,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
-        maxHeight: "100%"
+        maxHeight: "100%",
+        paddingTop: Spacing.LEVEL_3
       }}
       nestedScrollEnabled
       bounces={false}
@@ -83,111 +104,240 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
       renderItem={() => (
         <View
           style={{
-            gap: DefaultAppStyles.GAP_VERTICAL
+            gap: Spacing.LEVEL_1
           }}
         >
+          {item.type === "note" ? (
+            <ColorPicker
+              visible={visible}
+              setVisible={setVisible}
+              onColorAdded={async (color) => {
+                await db.relations.to(item, "color").unlink();
+                await db.relations.add(color, item);
+                useRelationStore.getState().update();
+                useMenuStore.getState().setColorNotes();
+                Navigation.queueRoutesForUpdate();
+                sendItemUpdateEvent(color.id, "color");
+                eSendEvent(refreshNotesPage);
+              }}
+            />
+          ) : null}
           <View
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP
+              paddingHorizontal: Spacing.LEVEL_3
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between"
-              }}
-            >
+            <View>
               <View
                 style={{
                   flexDirection: "row",
-                  alignItems: "center",
-                  flexShrink: 1,
-                  gap: 5
+                  gap: Spacing.LEVEL_1
                 }}
               >
-                {item.type === "color" ? (
-                  <Pressable
-                    type="accent"
-                    accentColor={item.colorCode}
-                    accentText={colors.static.white}
+                {noteNotebooks?.map((item) => (
+                  <View
+                    key={item.id}
                     style={{
-                      width: 30,
-                      height: 30,
                       borderRadius: 100,
-                      marginRight: 10
+                      paddingHorizontal: Spacing.LEVEL_1,
+                      paddingVertical: 2,
+                      backgroundColor: colors.secondary.background,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: Spacing.LEVEL_0
                     }}
-                  />
-                ) : item.type === "tag" ? (
-                  <Icon
-                    name="pound"
-                    size={AppFontSize.lg}
-                    color={colors.primary.icon}
-                  />
-                ) : null}
+                  >
+                    <AppIcon
+                      name="bookmark"
+                      iconFamily="notesnook"
+                      size={AppFontSize.xs}
+                      color={colors.secondary.icon}
+                    />
+                    <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                      {item.title}
+                    </Paragraph>
+                  </View>
+                ))}
 
-                <Heading size={AppFontSize.lg}>{item.title}</Heading>
+                {tags?.map((item) =>
+                  item.id ? (
+                    <View
+                      key={item.id}
+                      style={{
+                        borderRadius: 100,
+                        paddingHorizontal: Spacing.LEVEL_1,
+                        paddingVertical: 2,
+                        backgroundColor: colors.secondary.background,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: Spacing.LEVEL_0
+                      }}
+                    >
+                      <Paragraph
+                        size={AppFontSize.xs}
+                        color={colors.secondary.paragraph}
+                      >
+                        {item.title}
+                      </Paragraph>
+                    </View>
+                  ) : null
+                )}
               </View>
 
-              {item.type === "note" ? (
-                <IconButton
-                  name="open-in-new"
-                  type="plain"
-                  color={colors.primary.icon}
-                  size={AppFontSize.lg}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between"
+                }}
+              >
+                <View
                   style={{
-                    alignSelf: "flex-start"
+                    flexDirection: "row",
+                    alignItems: "center",
+                    flexShrink: 1,
+                    gap: Spacing.LEVEL_1
                   }}
-                  onPress={() => {
-                    close();
-                    eSendEvent(eOnLoadNote, {
-                      item: item,
-                      newTab: true
-                    });
-                    if (!DDS.isTab) {
-                      fluidTabsRef.current?.goToPage("editor");
-                    }
+                >
+                  {item.type === "color" ? (
+                    <Pressable
+                      type="accent"
+                      accentColor={item.colorCode}
+                      accentText={colors.static.white}
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 100
+                      }}
+                    />
+                  ) : item.type === "tag" ? (
+                    <AppIcon
+                      name="shopping-mode"
+                      iconFamily="evilicons"
+                      size={AppFontSize.lg}
+                      color={colors.primary.icon}
+                    />
+                  ) : null}
+
+                  <Heading size={AppFontSize.xl}>{item.title}</Heading>
+                </View>
+
+                {item.type === "note" ? (
+                  <IconButton
+                    name="square-out"
+                    iconFamily="notesnook"
+                    type="plain"
+                    color={colors.primary.icon}
+                    size={AppFontSize.lg}
+                    style={{
+                      alignSelf: "flex-start"
+                    }}
+                    onPress={() => {
+                      close();
+                      eSendEvent(eOnLoadNote, {
+                        item: item,
+                        newTab: true
+                      });
+                      if (!DDS.isTab) {
+                        fluidTabsRef.current?.goToPage("editor");
+                      }
+                    }}
+                  />
+                ) : null}
+              </View>
+
+              {(item.type === "notebook" || item.type === "reminder") &&
+              item.description ? (
+                <Paragraph>{item.description}</Paragraph>
+              ) : null}
+
+              {item.type === "reminder" ? (
+                <ReminderTime
+                  reminder={item}
+                  style={{
+                    justifyContent: "flex-start",
+                    borderWidth: 0,
+                    alignSelf: "flex-start",
+                    backgroundColor: "transparent",
+                    paddingHorizontal: 0,
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
                   }}
+                  fontSize={AppFontSize.xs}
                 />
               ) : null}
             </View>
 
-            {(item.type === "notebook" || item.type === "reminder") &&
-            item.description ? (
-              <Paragraph>{item.description}</Paragraph>
+            <DateMeta item={item} />
+
+            {item.type === "note" && colorNotes.length > 0 ? (
+              <Tags close={close} item={item} />
             ) : null}
 
-            {item.type === "note" ? (
-              <TagStrip close={close} item={item} />
-            ) : null}
-
-            {item.type === "reminder" ? (
-              <ReminderTime
-                reminder={item}
-                style={{
-                  justifyContent: "flex-start",
-                  borderWidth: 0,
-                  alignSelf: "flex-start",
-                  backgroundColor: "transparent",
-                  paddingHorizontal: 0,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+            <View
+              style={{
+                flexDirection: "row",
+                borderBottomWidth: 1,
+                borderTopWidth: colorNotes.length > 0 ? 1 : 0,
+                borderColor: colors.primary.border,
+                paddingVertical: Spacing.LEVEL_2,
+                paddingTop: colorNotes.length > 0 ? Spacing.LEVEL_2 : 0,
+                gap: Spacing.LEVEL_2
+              }}
+            >
+              <Button
+                onPress={async () => {
+                  ManageTags.present([item.id]);
+                  close();
                 }}
-                fontSize={AppFontSize.xs}
+                buttonType={{
+                  text: colors.primary.paragraph
+                }}
+                title={strings.addTag()}
+                type={colorNotes?.length ? "accent-outline" : "shade"}
+                icon="plus"
+                iconFamily="notesnook"
+                style={{
+                  paddingHorizontal: Spacing.LEVEL_3,
+                  paddingVertical: Spacing.LEVEL_2,
+                  width: colorNotes?.length > 0 ? "100%" : "48.5%"
+                }}
               />
-            ) : null}
+
+              {colorNotes.length > 0 ? null : (
+                <Button
+                  onPress={() => {
+                    if (colorFeature && !colorFeature.isAllowed) {
+                      ToastManager.show({
+                        message: colorFeature.error,
+                        type: "info",
+                        context: "local",
+                        actionText: strings.upgrade(),
+                        func: () => {
+                          PaywallSheet.present(colorFeature);
+                          ToastManager.hide();
+                        }
+                      });
+                      return;
+                    }
+                    useSettingStore.getState().setSheetKeyboardHandler(false);
+                    setVisible(true);
+                  }}
+                  title={strings.addColor()}
+                  type="secondaryAccented"
+                  icon="plus"
+                  iconFamily="notesnook"
+                  style={{
+                    width: "48.5%",
+                    paddingHorizontal: Spacing.LEVEL_3,
+                    paddingVertical: Spacing.LEVEL_2
+                  }}
+                />
+              )}
+            </View>
           </View>
 
-          <DateMeta item={item} />
-          <Line bottom={0} top={0} />
-
-          {item.type === "note" ? (
-            <>
-              <Tags close={close} item={item} />
-              <Line bottom={0} top={0} />
-            </>
-          ) : null}
-          {item.type === "note" ? (
+          {/* {item.type === "note" ? (
             <Notebooks note={item} close={close} />
-          ) : null}
+          ) : null} */}
           <Items
             item={item}
             buttons={buttons}

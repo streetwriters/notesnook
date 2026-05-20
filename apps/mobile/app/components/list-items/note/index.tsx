@@ -28,7 +28,6 @@ import { useThemeColors } from "@notesnook/theme";
 import { EntityLevel, decode } from "entities";
 import React from "react";
 import { View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enabled";
 import useNavigationStore, {
   RouteParams
@@ -55,6 +54,9 @@ import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import dayjs from "dayjs";
+import { Radius, Spacing } from "../../../common/design/spacing";
+import { create } from "zustand";
+import { FontFamily } from "../../../common/design/font";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -70,6 +72,24 @@ type NoteItemProps = {
   locked?: boolean;
   renderedInRoute?: keyof RouteParams;
 };
+
+const useShowMoreStore = create<{
+  showMoreStatus: Record<string, boolean>;
+  show: (id: string) => void;
+  hide: (id: string) => void;
+}>((set) => ({
+  showMoreStatus: {},
+  show(id) {
+    set((state) => ({
+      showMoreStatus: { ...state.showMoreStatus, [id]: true }
+    }));
+  },
+  hide(id) {
+    set((state) => ({
+      showMoreStatus: { ...state.showMoreStatus, [id]: false }
+    }));
+  }
+}));
 
 const NoteItem = ({
   item,
@@ -97,68 +117,54 @@ const NoteItem = ({
   const primaryColors = isEditingNote ? colors.selected : colors.primary;
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const [selected] = useIsSelected(item);
+  const showMore = useShowMoreStore((state) => state.showMoreStatus[item.id]);
+  const statusIcons = [
+    {
+      condition: item.conflicted,
+      name: "alert-circle",
+      color: colors.error.accent
+    },
+    {
+      condition: item.localOnly,
+      testID: "sync-off",
+      name: "sync-off",
+      color: primaryColors.icon
+    },
+    {
+      condition: item.readonly,
+      testID: "pencil-lock",
+      name: "pencil-lock",
+      color: primaryColors.icon
+    },
+    {
+      condition: item.pinned,
+      testID: "icon-pinned",
+      name: "pin",
+      color: primaryColors.icon
+    },
+    {
+      condition: !!locked,
+      testID: "lock",
+      name: "lock",
+      color: primaryColors.icon
+    },
+    {
+      condition: item.favorite,
+      testID: "star-filled",
+      name: "star-filled",
+      color: "orange"
+    }
+  ];
+
   return (
     <>
       <View
         style={{
           flexGrow: 1,
-          flexShrink: 1
+          flexShrink: 1,
+          gap: compactMode ? undefined : Spacing.LEVEL_1
         }}
       >
-        {compactMode ? null : (
-          <Paragraph
-            style={{
-              fontSize: AppFontSize.xxxs,
-              color: colors.secondary.paragraph
-            }}
-          >
-            {getFormattedDate(
-              date,
-              dayjs(date).isBefore(dayjs().subtract(1, "day").hour(23))
-                ? "date"
-                : "time"
-            )}
-          </Paragraph>
-        )}
-
-        {compactMode ? (
-          <Paragraph
-            numberOfLines={1}
-            color={color?.colorCode || primaryColors.heading}
-            size={AppFontSize.sm}
-            style={{
-              paddingRight: 10
-            }}
-          >
-            {item.title}
-          </Paragraph>
-        ) : (
-          <Heading
-            numberOfLines={1}
-            color={color?.colorCode || primaryColors.heading}
-            size={AppFontSize.sm}
-            style={{
-              paddingRight: 10
-            }}
-          >
-            {item.title}
-          </Heading>
-        )}
-
-        {item.headline && !compactMode ? (
-          <Paragraph
-            style={{
-              flexWrap: "wrap"
-            }}
-            color={primaryColors.paragraph}
-            numberOfLines={2}
-          >
-            {decode(item.headline, {
-              level: EntityLevel.HTML
-            })}
-          </Paragraph>
-        ) : null}
-
         {compactMode ? null : (
           <View
             style={{
@@ -166,104 +172,59 @@ const NoteItem = ({
               justifyContent: "flex-start",
               alignItems: "center",
               width: "100%",
-              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
-              columnGap: 8,
-              rowGap: 4,
+              columnGap: Spacing.LEVEL_0,
+              rowGap: Spacing.LEVEL_0,
               flexWrap: "wrap"
             }}
           >
             {!isTrash ? (
               <>
-                {item.conflicted ? (
-                  <Icon
-                    name="alert-circle"
-                    size={AppFontSize.sm}
-                    color={colors.error.accent}
-                  />
-                ) : null}
+                {statusIcons
+                  .filter((statusIcon) => statusIcon.condition)
+                  .map((statusIcon) => (
+                    <View
+                      key={statusIcon.testID || statusIcon.name}
+                      style={{
+                        borderRadius: Radius.XXS,
+                        paddingHorizontal: 3,
+                        paddingVertical: 3,
+                        // borderWidth: 1,
+                        // borderColor: primaryColors.border,
+                        flexDirection: "row",
+                        alignItems: "center"
+                      }}
+                    >
+                      <AppIcon
+                        testID={statusIcon.testID}
+                        name={statusIcon.name}
+                        size={12}
+                        iconFamily="notesnook"
+                        color={statusIcon.color}
+                      />
+                    </View>
+                  ))}
 
-                {item.localOnly ? (
-                  <Icon
-                    testID="sync-off"
-                    name="sync-off"
-                    size={AppFontSize.sm}
-                    color={primaryColors.icon}
-                  />
-                ) : null}
-
-                {item.readonly ? (
-                  <Icon
-                    testID="pencil-lock"
-                    name="pencil-lock"
-                    size={AppFontSize.sm}
-                    color={primaryColors.icon}
-                  />
-                ) : null}
-
-                {attachmentsCount > 0 ? (
+                {attachmentsCount !== 0 ? (
                   <View
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
-                      gap: 2
+                      borderRadius: Radius.XXS,
+                      paddingHorizontal: 3,
+                      paddingVertical: 3,
+                      gap: Spacing.LEVEL_0
                     }}
                   >
-                    <Icon
-                      name="attachment"
-                      size={AppFontSize.sm}
-                      color={primaryColors.icon}
+                    <AppIcon
+                      name="link"
+                      iconFamily="notesnook"
+                      size={12}
+                      color={colors.secondary.icon}
                     />
-                    <Paragraph
-                      color={colors.secondary.paragraph}
-                      size={AppFontSize.xxs}
-                    >
+                    <Paragraph color={colors.secondary.paragraph} fontSize="XS">
                       {attachmentsCount}
                     </Paragraph>
                   </View>
-                ) : null}
-
-                {item.pinned ? (
-                  <Icon
-                    testID="icon-pinned"
-                    name="pin-outline"
-                    size={AppFontSize.sm}
-                    color={color?.colorCode || primaryColors.accent}
-                  />
-                ) : null}
-
-                {locked ? (
-                  <Icon
-                    name="lock"
-                    testID="note-locked-icon"
-                    size={AppFontSize.sm}
-                    color={primaryColors.icon}
-                  />
-                ) : null}
-
-                {item.favorite ? (
-                  <Icon
-                    testID="icon-star"
-                    name="star-outline"
-                    size={AppFontSize.sm}
-                    color="orange"
-                  />
-                ) : null}
-
-                {reminder ? (
-                  <ReminderTime
-                    reminder={reminder}
-                    color={color?.colorCode}
-                    textStyle={{
-                      fontSize: AppFontSize.xxs
-                    }}
-                    short
-                    iconSize={AppFontSize.xxs}
-                    style={{
-                      justifyContent: "flex-start",
-                      paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
-                      alignSelf: "flex-start"
-                    }}
-                  />
                 ) : null}
 
                 {notebooks?.items
@@ -272,28 +233,28 @@ const NoteItem = ({
                       renderedInRoute !== "Notebook" ||
                       item.id !== useNavigationStore.getState().focusedRouteId
                   )
+                  .filter((_, index) => showMore || index < 1)
                   .map((item) => (
                     <View
                       key={item.id}
                       style={{
-                        borderRadius: 4,
+                        borderRadius: 100,
+                        paddingHorizontal: Spacing.LEVEL_1,
+                        paddingVertical: 2,
                         backgroundColor: colors.secondary.background,
-                        paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
-                        borderWidth: 0.5,
-                        borderColor: primaryColors.border,
-                        paddingVertical: 1,
                         flexDirection: "row",
                         alignItems: "center",
-                        gap: DefaultAppStyles.GAP_SMALL / 2
+                        gap: Spacing.LEVEL_0
                       }}
                     >
                       <AppIcon
-                        name="book-outline"
-                        size={AppFontSize.xxxs}
+                        name="bookmark"
+                        iconFamily="notesnook"
+                        size={AppFontSize.xs}
                         color={colors.secondary.icon}
                       />
                       <Paragraph
-                        size={AppFontSize.xxxs}
+                        fontSize="XS"
                         color={colors.secondary.paragraph}
                       >
                         {item.title}
@@ -301,31 +262,64 @@ const NoteItem = ({
                     </View>
                   ))}
 
-                {!isTrash && !compactMode && tags
-                  ? tags.items?.map((item) =>
-                      item.id ? (
-                        <View
-                          key={item.id}
-                          style={{
-                            borderRadius: 4,
-                            backgroundColor: colors.secondary.background,
-                            paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
-                            borderWidth: 0.5,
-                            borderColor:
-                              color?.colorCode || primaryColors.border,
-                            paddingVertical: 1
-                          }}
+                {tags?.items
+                  ?.filter((_, index) => showMore || index < 1)
+                  .map((item) =>
+                    item.id ? (
+                      <View
+                        key={item.id}
+                        style={{
+                          borderRadius: 100,
+                          paddingHorizontal: Spacing.LEVEL_1,
+                          paddingVertical: 2,
+                          backgroundColor: colors.secondary.background,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: Spacing.LEVEL_0
+                        }}
+                      >
+                        <Paragraph
+                          size={AppFontSize.xs}
+                          color={colors.secondary.paragraph}
                         >
-                          <Paragraph
-                            size={AppFontSize.xxxs}
-                            color={colors.secondary.paragraph}
-                          >
-                            #{item.title}
-                          </Paragraph>
-                        </View>
-                      ) : null
-                    )
-                  : null}
+                          {item.title}
+                        </Paragraph>
+                      </View>
+                    ) : null
+                  )}
+
+                {(() => {
+                  const filteredNotebooks = (notebooks?.items || []).filter(
+                    (nb) =>
+                      renderedInRoute !== "Notebook" ||
+                      nb.id !== useNavigationStore.getState().focusedRouteId
+                  );
+                  const filteredTags = (tags?.items || []).filter((t) => t.id);
+                  const totalNotebooks = filteredNotebooks.length;
+                  const totalTags = filteredTags.length;
+                  const hasMore = totalNotebooks > 1 || totalTags > 1;
+                  if (!hasMore) return null;
+                  const hiddenCount =
+                    (totalNotebooks > 1 ? totalNotebooks - 1 : 0) +
+                    (totalTags > 1 ? totalTags - 1 : 0);
+                  return (
+                    <Heading
+                      size={AppFontSize.xs}
+                      color={colors.primary.accent}
+                      onPress={() => {
+                        if (showMore) {
+                          useShowMoreStore.getState().hide(item.id);
+                        } else {
+                          useShowMoreStore.getState().show(item.id);
+                        }
+                      }}
+                    >
+                      {showMore
+                        ? "Show less"
+                        : `+${hiddenCount} ${strings.more()}`}
+                    </Heading>
+                  );
+                })()}
               </>
             ) : (
               <>
@@ -356,6 +350,192 @@ const NoteItem = ({
             )}
           </View>
         )}
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: Spacing.LEVEL_1
+          }}
+        >
+          {color && !compactMode ? (
+            <View
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 100,
+                backgroundColor: color?.colorCode
+              }}
+            />
+          ) : null}
+
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              flexGrow: 1,
+              alignItems: "center"
+            }}
+          >
+            <Heading
+              numberOfLines={1}
+              color={primaryColors.heading}
+              size={AppFontSize.sm}
+              style={{
+                flexShrink: 1
+              }}
+            >
+              {item.title}
+            </Heading>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: Spacing.LEVEL_1
+              }}
+            >
+              {color ? (
+                <View
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 100,
+                    backgroundColor: color?.colorCode
+                  }}
+                />
+              ) : null}
+
+              {compactMode ? (
+                <>
+                  {item.conflicted ? (
+                    <AppIcon
+                      name="warning-circle"
+                      size={12}
+                      iconFamily="notesnook"
+                      color={colors.error.accent}
+                    />
+                  ) : null}
+
+                  {locked ? (
+                    <AppIcon
+                      name="lock"
+                      testID="lock"
+                      iconFamily="notesnook"
+                      size={12}
+                      color={primaryColors.icon}
+                    />
+                  ) : null}
+
+                  {item.favorite ? (
+                    <AppIcon
+                      testID="icon-star"
+                      name="star-filled"
+                      iconFamily="notesnook"
+                      size={12}
+                      color={colors.static.orange}
+                    />
+                  ) : null}
+
+                  <TimeSince
+                    style={{
+                      fontSize: AppFontSize.xs,
+                      color: colors.secondary.paragraph,
+                      marginRight: 6
+                    }}
+                    time={date}
+                    updateFrequency={Date.now() - date < 60000 ? 2000 : 60000}
+                  />
+                </>
+              ) : null}
+
+              <IconButton
+                testID={notesnook.listitem.menu}
+                color={colors.secondary.icon}
+                name="dots-three"
+                iconFamily="notesnook"
+                size={20}
+                onPress={() => !noOpen && Properties.present(item)}
+                style={{
+                  justifyContent: "center",
+                  height: undefined,
+                  width: undefined,
+                  borderRadius: 100,
+                  alignItems: "center"
+                }}
+              />
+            </View>
+          </View>
+        </View>
+
+        {item.headline && !compactMode ? (
+          <Paragraph
+            style={{
+              flexWrap: "wrap"
+            }}
+            color={primaryColors.paragraph}
+            numberOfLines={2}
+          >
+            {decode(item.headline, {
+              level: EntityLevel.HTML
+            })}
+          </Paragraph>
+        ) : null}
+
+        <View
+          style={{
+            flexDirection: "row",
+            gap: Spacing.LEVEL_1
+          }}
+        >
+          {compactMode ? null : (
+            <View
+              style={{
+                gap: Spacing.LEVEL_0 + 2,
+                flexDirection: "row"
+              }}
+            >
+              <AppIcon
+                color={colors.secondary.icon}
+                size={13}
+                name="calendar"
+                iconFamily="notesnook"
+              />
+              <Paragraph
+                style={{
+                  fontSize: AppFontSize.xs,
+                  color: colors.secondary.paragraph
+                }}
+              >
+                {getFormattedDate(
+                  date,
+                  dayjs(date).isBefore(dayjs().subtract(1, "day").hour(23))
+                    ? "date"
+                    : "time"
+                )}
+              </Paragraph>
+            </View>
+          )}
+
+          {reminder ? (
+            <ReminderTime
+              reminder={reminder}
+              color={color?.colorCode}
+              textStyle={{
+                fontSize: AppFontSize.xs,
+                fontFamily: FontFamily.REGULAR
+              }}
+              short
+              iconSize={AppFontSize.xxs}
+              style={{
+                justifyContent: "flex-start",
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
+                alignSelf: "flex-start",
+                backgroundColor: colors.primary.shade
+              }}
+            />
+          ) : null}
+        </View>
       </View>
       <View
         style={{
@@ -363,55 +543,6 @@ const NoteItem = ({
           alignItems: "center"
         }}
       >
-        {compactMode ? (
-          <>
-            {item.conflicted ? (
-              <Icon
-                name="alert-circle"
-                style={{
-                  marginRight: 6
-                }}
-                size={AppFontSize.sm}
-                color={colors.error.accent}
-              />
-            ) : null}
-
-            {locked ? (
-              <Icon
-                name="lock"
-                testID="note-locked-icon"
-                size={AppFontSize.sm}
-                style={{
-                  marginRight: 6
-                }}
-                color={primaryColors.icon}
-              />
-            ) : null}
-
-            {item.favorite ? (
-              <Icon
-                testID="icon-star"
-                name="star-outline"
-                size={AppFontSize.sm}
-                style={{
-                  marginRight: 6
-                }}
-                color={colors.static.orange}
-              />
-            ) : null}
-
-            <TimeSince
-              style={{
-                fontSize: AppFontSize.xxs,
-                color: colors.secondary.paragraph,
-                marginRight: 6
-              }}
-              time={date}
-              updateFrequency={Date.now() - date < 60000 ? 2000 : 60000}
-            />
-          </>
-        ) : null}
-
         {selectionMode === "note" || selectionMode === "trash" ? (
           <>
             <View
@@ -429,22 +560,7 @@ const NoteItem = ({
               />
             </View>
           </>
-        ) : (
-          <IconButton
-            testID={notesnook.listitem.menu}
-            color={colors.secondary.icon}
-            name="dots-horizontal"
-            size={AppFontSize.lg}
-            onPress={() => !noOpen && Properties.present(item)}
-            style={{
-              justifyContent: "center",
-              height: 35,
-              width: 35,
-              borderRadius: 100,
-              alignItems: "center"
-            }}
-          />
-        )}
+        ) : null}
       </View>
     </>
   );

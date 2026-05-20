@@ -107,8 +107,8 @@ export const strings = {
   },
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
-  "2fa": () => t`Two factor authentication`,
-  select2faMethod: () => t`Select method for two-factor authentication`,
+  "2fa": () => t`Two Factor Authentication`,
+  select2faMethod: () => t`Choose 2FA Method`,
   select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
   "2faCodeHelpText": {
     email: () =>
@@ -816,17 +816,31 @@ $day$: Current day (eg. Monday)`,
   introData: [
     {
       headings: [
-        () => t`Open source.`,
-        () => t`End to end encrypted.`,
-        () => t`Private.`
+        {
+          bold: false,
+          value: () => t`Open source.`
+        },
+        {
+          bold: true,
+          value: () => t`End-to-end encrypted.`
+        },
+        {
+          bold: false,
+          value: () => t`Private.`
+        }
       ],
       body: () => t`Write notes with freedom, no spying, no tracking.`
     },
     {
       headings: [
-        () => t`Privacy for everyone`,
-        () => t`— not just the`,
-        () => t`privileged few`
+        {
+          bold: true,
+          value: () => t`Privacy for everyone`
+        },
+        {
+          bold: false,
+          value: () => t`— not just the privileged few`
+        }
       ],
       body: () =>
         t`Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again.`
@@ -1363,7 +1377,7 @@ $day$: Current day (eg. Monday)`,
   loginMessage: () => t`You are not logged in`,
   loginMessageActionText: () => t`Login to encrypt and sync notes`,
   syncDisabled: () => t`Sync is disabled`,
-  syncDisabledActionText: () => t`Please confirm your email to sync notes`,
+  syncDisabledActionText: () => t`Confirm your email to sync notes`,
   autoBackupsOffMessage: () => t`Automatic backups are off`,
   autoBackupsOffActionText: () =>
     t`Get Notesnook Pro to enable automatic backups`,
@@ -1479,6 +1493,8 @@ $day$: Current day (eg. Monday)`,
   unpublishToDelete: () => t`Unpublish notes to delete them`,
   filterAttachments: () => t`Filter attachments by filename, type or hash`,
   oldPassword: () => t`Current password`,
+  filterNotebooks: () => t`Filter notebooks...`,
+  filterTags: () => t`Filter tags...`,
   newPassword: () => t`New password`,
   email: () => t`Email`,
   emailInvalid: () => t`Invalid email`,
@@ -1511,6 +1527,9 @@ For example:
   typeAKeyword: () => t`Type a keyword`,
   search: () => t`Search`,
   enterEmailAddress: () => t`Enter email address`,
+  noNotebooksYet: () => t`No notebooks yet`,
+  notebooksEmptyBody: () => t`Start organizing your ideas, notes and thoughts`,
+  createNotebook: () => t`Create notebook`,
   enterValidEmail: () => t`Please enter a valid email address`,
   enterValidPhone: () => t`Please enter a valid phone number with country code`,
   errorGettingCodes: () => t`Error getting codes`,
@@ -1772,7 +1791,7 @@ For example:
   dragAndDropFiles: () => t`Drag & drop files here, or click to select files`,
   onlyZipSupported: () => t`Only .zip files are supported.`,
   clickToRemove: () => t`Click to remove`,
-  currentPlan: () => t`CURRENT PLAN`,
+  currentPlan: () => t`Current Plan`,
   appWillReloadIn: (sec: number) => t`App will reload in ${sec} seconds`,
   changesReflectOnStart: () =>
     t`Your changes have been saved and will be reflected after the app has refreshed.`,
@@ -1848,7 +1867,7 @@ For example:
   newEmail: () => t`New Email`,
   accountPassword: () => t`Account password`,
   phoneNumber: () => t`Phone number`,
-  createAccount: () => t`Create account`,
+  createAccount: () => t`Create Account`,
   accountRecoverHelpText: () =>
     t`You will receive instructions on how to recover your account on this email`,
   enterRecoveryKey: () => t`Enter account recovery key`,
@@ -2563,7 +2582,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   thankYouForSubscribing: () => t`Thank you for subscribing`,
   settingUpPlan: () =>
     t`We’re setting up your plan right now. We’ll notify you as soon as everything is ready.`,
-  hdImages: () => t`hdImages`,
+  hdImages: () => t`HD Images`,
   billedAnnually: (price: string) => t`billed annually at ${price}`,
   billedMonthly: (price: string) => t`billed monthly at ${price}`,
   dueToday: () => t`Due today`,
@@ -2594,7 +2613,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   bestValue: () => t`Best value`,
   planLimits: () => t`Plan limits`,
   unlimited: () => t`Unlimited`,
-  fiveYearPlan: () => t`5 year plan (One time purchase)`,
+  fiveYearPlan: () => t`5 year plan`,
   educationPlan: () => t`Education plan`,
   welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
   thankYouForPurchase: () => t`Thank you for the purchase`,
@@ -2742,5 +2761,36 @@ Use this if changes from other devices are not appearing on this device. This wi
   
 Continue without attachments?`,
   pleaseLoginToDownloadAttachments: () =>
-    t`Please login to download attachments.`
+    t`Please login to download attachments.`,
+  selectPlan: () => t`Select Plan`,
+  frequentlyAskedQuestions: () => t`Frequently Asked Questions`,
+  testimonials: () => t`Testimonials`,
+  billingType: {
+    annual: () => t`Billed annually`,
+    monthly: () => t`Billed monthly`,
+    oneTime: () => t`One time purchase`
+  },
+  whatsIncluded: () => t`What's included`,
+  paymentSummary: () => t`Payment summary`,
+  planWhatsIncluded: {
+    unlimitedNotes: () => t`Unlimited notes and attachments`,
+    endToEnd: () => t`End-to-end encryption (XChaCha20)`,
+    allDevices: () => t`Access on all devices`,
+    freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
+    remind: () => t`Remind before your trial ends`
+  },
+  nextBillingDate: () => t`Next Billing Date`,
+  freeTrialIncludes: (duration: number) =>
+    t`${duration} days free trial includes all features`,
+  noTagsYet: () => t`No tags yet`,
+  tagsEmptyBody: () =>
+    t`Create your first tag to start organizing your workspace.`,
+  newestFirst: () => t`Newest First`,
+  oldestFirst: () => t`Oldest First`,
+  notePlaceholder: {
+    title: () => t`No notes yet`,
+    description: () =>
+      t`Your thoughts deserve a home. Create your first note and start organizing your life today.`,
+    button: () => t`Add Your First Note`
+  }
 };

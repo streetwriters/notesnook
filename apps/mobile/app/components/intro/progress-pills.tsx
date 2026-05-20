@@ -19,39 +19,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import { IconButton, IconButtonProps } from "../ui/icon-button";
+import { View } from "react-native";
+import { Spacing } from "../../common/design/spacing";
 
-export const RightMenus = ({
-  rightButton
-}: {
-  rightButton?: IconButtonProps;
+export const ProgressPills = (props: {
+  activePillIndex: number;
+  count?: number;
 }) => {
   const { colors } = useThemeColors();
-
   return (
-    <View style={styles.rightBtnContainer}>
-      {rightButton ? (
-        <IconButton {...rightButton} color={colors.primary.icon} />
-      ) : (
+    <View
+      style={{
+        flexDirection: "row",
+        gap: Spacing.LEVEL_1
+      }}
+    >
+      {new Array(props.count || 3).fill(0).map((item, index) => (
         <View
+          key={`${item}-progress-pill-${props.count}`}
           style={{
-            width: 40,
-            height: 40
+            width: props.activePillIndex === index ? 26 : 14,
+            height: 5,
+            backgroundColor:
+              props.activePillIndex === index
+                ? colors.primary.accent
+                : colors.secondary.background,
+            borderRadius: 2
           }}
         />
-      )}
+      ))}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  rightBtnContainer: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  rightBtn: {
-    justifyContent: "center",
-    alignItems: "center"
-  }
-});
