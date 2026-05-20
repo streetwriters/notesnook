@@ -1,3 +1,22 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+import React from "react";
 import { usePromise } from "@notesnook/common";
 import { db } from "../../common/database";
 import { ActivityIndicator, ScrollView, View } from "react-native";
@@ -6,6 +25,10 @@ import { strings } from "@notesnook/intl";
 import Input from "../../components/ui/input";
 import { useEffect, useRef, useState } from "react";
 import { SerializedKeyPair } from "@notesnook/crypto";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
 import { ToastManager } from "../../services/event-manager";
@@ -25,11 +48,22 @@ import AddApiKeySheet from "../../components/sheets/add-api-key";
 
 const ManageInboxKeys = () => {
   const keys = usePromise(() => db.user.getInboxKeys());
-  const keysEdited = useRef<SerializedKeyPair>(undefined);
+  const inboxKeys = keys.status === "fulfilled" ? keys.value : undefined;
+  const formRef = useRef(
+    createFormRef({
+      publicKey: "",
+      privateKey: ""
+    })
+  );
+  const [formVersion, setFormVersion] = useState(0);
 
-  if (keys.status === "fulfilled" && keys.value && !keysEdited.current) {
-    keysEdited.current = keys.value;
-  }
+  useEffect(() => {
+    if (!inboxKeys) return;
+
+    formRef.current.setValue("publicKey", inboxKeys.publicKey || "");
+    formRef.current.setValue("privateKey", inboxKeys.privateKey || "");
+    setFormVersion((prev) => prev + 1);
+  }, [inboxKeys]);
 
   return (
     <ScrollView
@@ -42,36 +76,26 @@ const ManageInboxKeys = () => {
       <Notice type="alert" text={strings.changingInboxPgpKeysNotice()} />
 
       <Paragraph>{strings.publicKey()}</Paragraph>
-      <Input
-        defaultValue={keysEdited.current?.publicKey}
+      <FormInput
+        key={`public-key-${formVersion}`}
+        name="publicKey"
+        formRef={formRef}
+        validators={[validators.required(strings.publicKeyRequired())]}
         multiline
-        onChangeText={(value) => {
-          if (keysEdited.current) {
-            keysEdited.current.publicKey = value;
-          }
-        }}
-        style={{
-          height: 150
-        }}
-        wrapperStyle={{
-          height: 150
-        }}
+        containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
+        inputStyle={{ height: 140, textAlignVertical: "top" }}
+        wrapperStyle={{ minHeight: 150 }}
       />
       <Paragraph>{strings.privateKey()}</Paragraph>
-      <Input
-        defaultValue={keysEdited.current?.privateKey}
+      <FormInput
+        key={`private-key-${formVersion}`}
+        name="privateKey"
+        formRef={formRef}
+        validators={[validators.required(strings.privateKeyRequired())]}
         multiline
-        onChangeText={(value) => {
-          if (keysEdited.current) {
-            keysEdited.current.privateKey = value;
-          }
-        }}
-        style={{
-          height: 150
-        }}
-        wrapperStyle={{
-          height: 150
-        }}
+        containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
+        inputStyle={{ height: 140, textAlignVertical: "top" }}
+        wrapperStyle={{ minHeight: 150 }}
       />
       <Button
         title={strings.save()}
@@ -79,35 +103,35 @@ const ManageInboxKeys = () => {
         width={"100%"}
         onPress={async () => {
           try {
-            if (keysEdited.current) {
-              const valid = await Storage.validatePGPKeyPair(
-                keysEdited.current
-              );
+            if (!formRef.current.validate()) return;
 
-              if (!valid) {
-                ToastManager.show({
-                  message: strings.invalidPgpKeyPair(),
-                  type: "error"
-                });
-                return;
-              }
+            const keysEdited: SerializedKeyPair = {
+              publicKey: formRef.current.getValue("publicKey"),
+              privateKey: formRef.current.getValue("privateKey")
+            };
 
-              presentDialog({
-                title: strings.areYouSure(),
-                paragraph: strings.changingInboxPgpKeysNotice(),
-                positiveText: strings.yes(),
-                negativeText: strings.no(),
-                positivePress: async () => {
-                  db.user?.saveInboxKeys(keysEdited.current!);
-                  ToastManager.show({
-                    message: strings.inboxKeysSaved(),
-                    type: "success"
-                  });
-                  Navigation.goBack();
-                  return true;
-                }
-              });
+            const result = await Storage.validatePGPKeyPair(keysEdited);
+
+            if (!result.isValid) {
+              formRef.current.setError("privateKey", result.message);
+              return;
             }
+
+            presentDialog({
+              title: strings.areYouSure(),
+              paragraph: strings.changingInboxPgpKeysNotice(),
+              positiveText: strings.yes(),
+              negativeText: strings.no(),
+              positivePress: async () => {
+                await db.user?.saveInboxKeys(keysEdited);
+                ToastManager.show({
+                  message: strings.inboxKeysSaved(),
+                  type: "success"
+                });
+                Navigation.goBack();
+                return true;
+              }
+            });
           } catch (e) {
             ToastManager.error(e as Error);
           }

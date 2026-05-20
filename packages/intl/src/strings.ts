@@ -2742,5 +2742,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   
 Continue without attachments?`,
   pleaseLoginToDownloadAttachments: () =>
-    t`Please login to download attachments.`
+    t`Please login to download attachments.`,
+  publicKeyRequired: () => t`Public key required`,
+  privateKeyRequired: () => t`Private key required`
 };

@@ -32,6 +32,7 @@ import {
 } from "./encryption";
 import { MMKV } from "./mmkv";
 import OpenPGP from "react-native-fast-openpgp";
+import { strings } from "@notesnook/intl";
 
 export class KV {
   storage: MMKVInstance;
@@ -144,7 +145,10 @@ export const Storage: IStorage = {
     });
     return { publicKey: keys.publicKey, privateKey: keys.privateKey };
   },
-  async validatePGPKeyPair(keys) {
+  async validatePGPKeyPair(keys): Promise<{
+    isValid: boolean;
+    message: string;
+  }> {
     try {
       const dummyData = JSON.stringify({
         favorite: true,
@@ -153,10 +157,18 @@ export const Storage: IStorage = {
       const encrypted = await OpenPGP.encrypt(dummyData, keys.publicKey);
       const decrypted = await OpenPGP.decrypt(encrypted, keys.privateKey, "");
 
-      return decrypted === dummyData;
+      const isValid = decrypted === dummyData;
+
+      return {
+        isValid,
+        message: isValid ? "" : strings.invalidPgpKeyPair()
+      };
     } catch (e) {
       console.error("PGP key pair validation error:", e);
-      return false;
+      return {
+        isValid: false,
+        message: strings.invalidPgpKeyPair()
+      };
     }
   },
   async decryptPGPMessage(privateKeyArmored, encryptedMessage) {
