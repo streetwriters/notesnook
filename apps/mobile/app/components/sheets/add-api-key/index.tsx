@@ -21,7 +21,10 @@ import { View, ScrollView } from "react-native";
 import { strings } from "@notesnook/intl";
 import { db } from "../../../common/database";
 import { Button } from "../../ui/button";
-import Input from "../../ui/input";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../ui/input/form-input";
 import Paragraph from "../../ui/typography/paragraph";
 import Heading from "../../ui/typography/heading";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -45,7 +48,11 @@ type AddApiKeySheetProps = {
 
 export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
   const { colors } = useThemeColors();
-  const keyNameRef = useRef<string>("");
+  const formRef = useRef(
+    createFormRef({
+      keyName: ""
+    })
+  );
   const [selectedExpiry, setSelectedExpiry] = useState(
     getExpiryOptions()[2].value
   );
@@ -53,16 +60,14 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
 
   const handleCreate = async () => {
     try {
-      if (!keyNameRef.current || !keyNameRef.current.trim()) {
-        ToastManager.show({
-          message: strings.enterKeyName(),
-          type: "error"
-        });
+      if (formRef.current.validateField("keyName")) {
         return;
       }
 
+      const keyName = formRef.current.getValue("keyName").trim();
+
       setIsCreating(true);
-      await db.inboxApiKeys.create(keyNameRef.current, selectedExpiry);
+      await db.inboxApiKeys.create(keyName, selectedExpiry);
       ToastManager.show({
         message: strings.apiKeyCreatedSuccessfully(),
         type: "success"
@@ -75,6 +80,10 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
         message: strings.failedToCreateApiKey(message),
         type: "error"
       });
+      formRef.current.setError(
+        "keyName",
+        message || strings.failedToCreateApiKey("")
+      );
     } finally {
       setIsCreating(false);
     }
@@ -101,11 +110,15 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
 
       <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
         <Paragraph size={AppFontSize.sm}>{strings.keyName()}</Paragraph>
-        <Input
+        <FormInput
+          name="keyName"
+          formRef={formRef}
           placeholder={strings.exampleKeyName()}
-          onChangeText={(text) => {
-            keyNameRef.current = text;
+          validators={[validators.required(strings.enterKeyName())]}
+          onChangeText={() => {
+            formRef.current.setError("keyName", undefined);
           }}
+          onSubmitEditing={handleCreate}
         />
       </View>
 
@@ -162,7 +175,7 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
 
 AddApiKeySheet.present = (onAdd: () => void) => {
   presentSheet({
-    component: (ref, close, update) => (
+    component: (ref, close, _update) => (
       <AddApiKeySheet close={close} onAdd={onAdd} />
     )
   });
