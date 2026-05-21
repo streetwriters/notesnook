@@ -157,7 +157,8 @@ class RecoveryKeySheet extends React.Component {
     if (Platform.OS === "android" && !(await hasAndroidPermission())) {
       ToastManager.show({
         message: strings.permissionRequiredToSaveQRCode(),
-        type: "info"
+        type: "info",
+        context: "local"
       });
       return;
     }
