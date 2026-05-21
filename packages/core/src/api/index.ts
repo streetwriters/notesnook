@@ -50,6 +50,7 @@ import { Shortcuts } from "../collections/shortcuts.js";
 import { Reminders } from "../collections/reminders.js";
 import { Relations } from "../collections/relations.js";
 import Subscriptions from "./subscriptions.js";
+import { InboxItemsHistory } from "../collections/inbox-items-history.js";
 import {
   CompressorAccessor,
   ConfigStorageAccessor,
@@ -228,6 +229,7 @@ class Database {
   settings = new Settings(this);
 
   inboxApiKeys = new InboxApiKeys(this, this.tokenManager);
+  inboxItemsHistory = new InboxItemsHistory(this);
 
   wrapped = new Wrapped(this);
 
@@ -349,6 +351,8 @@ class Database {
     await this.notes.init();
     await this.vaults.init();
     await this.monographsCollection.init();
+
+    await this.inboxItemsHistory.init();
 
     await this.trash.init();
 

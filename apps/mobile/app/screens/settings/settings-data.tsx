@@ -762,6 +762,14 @@ export const settingsGroups: SettingSection[] = [
             description: strings.viewAPIKeysDesc(),
             type: "screen",
             component: "inbox-keys"
+          },
+          {
+            id: "failed-inbox-items",
+            name: strings.failedInboxItems(),
+            description: strings.failedInboxItemsDesc(),
+            type: "screen",
+            component: "failed-inbox-items",
+            hideHeader: true
           }
         ]
       }

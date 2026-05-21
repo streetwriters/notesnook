@@ -49,6 +49,7 @@ import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
 import { NotesnookCircle } from "./notesnook-circle";
 import { ManageInboxKeys, InboxKeysList } from "./manage-inbox-keys";
+import { FailedInboxItems } from "./failed-inbox-items";
 
 export const components: { [name: string]: ReactElement } = {
   homeselector: <HomePicker />,
@@ -82,5 +83,6 @@ export const components: { [name: string]: ReactElement } = {
   "change-email": <ChangeEmail />,
   "notesnook-circle": <NotesnookCircle />,
   "manage-inbox-keys": <ManageInboxKeys />,
-  "inbox-keys": <InboxKeysList />
+  "inbox-keys": <InboxKeysList />,
+  "failed-inbox-items": <FailedInboxItems />
 };

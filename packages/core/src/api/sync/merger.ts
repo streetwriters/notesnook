@@ -29,6 +29,7 @@ import {
   isDeleted
 } from "../../types.js";
 import { SyncInboxItem } from "./types.js";
+import { InboxItemsHistoryErrorContext } from "../../types.js";
 import { z } from "zod";
 import { sanitizeHtml } from "../../utils/html-parser.js";
 
@@ -201,23 +202,75 @@ export async function handleInboxItems(
 
   for (const item of inboxItems) {
     try {
-      if (await db.notes.exists(item.id)) {
-        logger.info("Inbox item already exists, skipping.", {
+      if (await db.inboxItemsHistory.exists(item.id)) {
+        logger.info("Inbox item already processed, skipping.", {
           inboxItemId: item.id
         });
         continue;
       }
 
-      const decryptedItem = await db
-        .storage()
-        .decryptPGPMessage(inboxKeys.privateKey, item.cipher);
-      const validation = RawInboxItemSchema.safeParse(
-        JSON.parse(decryptedItem)
-      );
+      let decryptedItem: string;
+      try {
+        decryptedItem = await db
+          .storage()
+          .decryptPGPMessage(inboxKeys.privateKey, item.cipher);
+      } catch (e) {
+        logger.error(e, "Failed to decrypt inbox item.", {
+          inboxItemId: item.id
+        });
+        await db.inboxItemsHistory.add({
+          id: item.id,
+          status: "failed",
+          errorContext: JSON.stringify({
+            message: "Decryption failed",
+            description: (e as Error).message,
+            inboxItem: { id: item.id, v: item.v, alg: item.alg }
+          } satisfies InboxItemsHistoryErrorContext)
+        });
+        continue;
+      }
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(decryptedItem);
+      } catch (e) {
+        logger.error(e, "Failed to parse inbox item JSON.", {
+          inboxItemId: item.id
+        });
+        await db.inboxItemsHistory.add({
+          id: item.id,
+          status: "failed",
+          errorContext: JSON.stringify({
+            message: "Invalid JSON",
+            description: (e as Error).message,
+            inboxItem: { id: item.id, v: item.v, alg: item.alg },
+            decryptedItem
+          } satisfies InboxItemsHistoryErrorContext)
+        });
+        continue;
+      }
+
+      const validation = RawInboxItemSchema.safeParse(parsed);
       if (!validation.success) {
         logger.warn("Failed to validate inbox item.", {
           inboxItem: item,
           errors: validation.error.issues
+        });
+        const { content: _content, ...parsedWithoutContent } = parsed as Record<
+          string,
+          unknown
+        >;
+        await db.inboxItemsHistory.add({
+          id: item.id,
+          status: "failed",
+          errorContext: JSON.stringify({
+            message: "Validation failed",
+            description: validation.error.issues
+              .map((i) => `${i.path.join(".")}: ${i.message}`)
+              .join("; "),
+            inboxItem: { id: item.id, v: item.v, alg: item.alg },
+            parsedItem: parsedWithoutContent
+          } satisfies InboxItemsHistoryErrorContext)
         });
         continue;
       }
@@ -248,11 +301,19 @@ export async function handleInboxItems(
           { type: "note", id: item.id }
         );
       }
+      await db.inboxItemsHistory.add({
+        id: item.id,
+        status: "success",
+        source: data.source
+      });
+      await db.relations.add(
+        { type: "inboxitemhistory", id: item.id },
+        { type: "note", id: item.id }
+      );
     } catch (e) {
       logger.error(e, "Failed to process inbox item.", {
         inboxItem: item
       });
-      continue;
     }
   }
 }

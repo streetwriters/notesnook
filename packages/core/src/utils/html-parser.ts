@@ -30,7 +30,12 @@ export const parseHTML = (input: string) =>
     : null;
 
 export const sanitizeHtml = (html: string): string => {
+  if (!isHtmlValid(html)) {
+    return wrapInCodeBlock(html);
+  }
+
   const inputHtml = normalizeToHtmlBody(html);
+
   return getDomPurify().sanitize(inputHtml, {
     RETURN_DOM: false,
     ADD_TAGS: ["iframe"]

@@ -305,6 +305,7 @@ class SettingStore extends BaseStore<SettingStore> {
         });
         if (!ok) return;
 
+        await db.inboxItemsHistory.deleteFailed();
         await db.user.discardInboxKeys();
         this.set({ isInboxEnabled: false });
 

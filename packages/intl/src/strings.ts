@@ -2744,5 +2744,16 @@ Continue without attachments?`,
   pleaseLoginToDownloadAttachments: () =>
     t`Please login to download attachments.`,
   publicKeyRequired: () => t`Public key required`,
-  privateKeyRequired: () => t`Private key required`
+  privateKeyRequired: () => t`Private key required`,
+  details: () => t`Details`,
+  dateSynced: () => t`Date synced`,
+  failedInboxItems: () => t`Failed inbox items`,
+  failedInboxItemsDesc: () => t`View failed inbox items and error contexts`,
+  noFailedInboxItems: () => t`No failed inbox items`,
+  show: () => t`Show`,
+  itemDeleted: () => t`Item deleted`,
+  deleteAll: () => t`Delete all`,
+  deleteAllFailedItemsDesc: () =>
+    t`Are you sure you want to delete all failed inbox items?`,
+  allItemsDeleted: () => t`All items deleted`
 };

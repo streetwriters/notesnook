@@ -441,6 +441,19 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("spellcheck", "boolean", (c) => c.defaultTo(true))
             .execute();
         }
+      },
+      "a-2026-05-07": {
+        async up(db) {
+          await db.schema
+            .createTable("inboxitemshistory")
+            .modifyEnd(sql`without rowid`)
+            .$call(addBaseColumns)
+            .addColumn("dateSynced", "integer")
+            .addColumn("status", "text")
+            .addColumn("source", "text")
+            .addColumn("errorContext", "text")
+            .execute();
+        }
       }
     };
   }

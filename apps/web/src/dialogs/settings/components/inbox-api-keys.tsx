@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState, useEffect } from "react";
 import { Box, Button, Flex, Input, Text, Select } from "@theme-ui/components";
-import { formatDate, InboxApiKey } from "@notesnook/core";
+import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
 import {
@@ -32,7 +32,7 @@ import {
 import Field from "../../../components/field";
 import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
 import Dialog from "../../../components/dialog";
-import { usePromise } from "@notesnook/common";
+import { getFormattedDate, usePromise } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
 import { showPasswordDialog } from "../../password-dialog";
 import { strings } from "@notesnook/intl";
@@ -233,17 +233,17 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           <Flex sx={{ mb: 1, flexDirection: "column" }}>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
               {apiKey.lastUsedAt
-                ? `Last used on ${formatDate(apiKey.lastUsedAt)}`
+                ? `Last used on ${getFormattedDate(apiKey.lastUsedAt)}`
                 : "Never used"}
             </Text>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-              Created on {formatDate(apiKey.dateCreated)}
+              Created on {getFormattedDate(apiKey.dateCreated)}
             </Text>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
               {apiKey.expiryDate === -1
                 ? "Never expires"
                 : `${isApiKeyExpired ? "Expired" : "Expires"} on
-              ${formatDate(apiKey.expiryDate)}`}
+              ${getFormattedDate(apiKey.expiryDate)}`}
             </Text>
           </Flex>
         </Box>

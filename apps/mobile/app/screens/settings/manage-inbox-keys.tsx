@@ -195,6 +195,8 @@ const InboxKeysList = () => {
 
   const apiKeys = apiKeysPromise.value || [];
 
+  console.log(apiKeys);
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -202,24 +204,43 @@ const InboxKeysList = () => {
         paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         width: "100%",
         paddingHorizontal: DefaultAppStyles.GAP,
-        paddingBottom: 50
+        paddingBottom: 50,
+        minHeight: "100%"
       }}
     >
       {apiKeys.length === 0 ? (
         <View
           style={{
             padding: DefaultAppStyles.GAP * 2,
-            borderWidth: 1,
-            borderStyle: "dashed",
-            borderColor: colors.secondary.border,
-            borderRadius: 5,
-            backgroundColor: colors.secondary.background,
-            alignItems: "center"
+            alignItems: "center",
+            gap: DefaultAppStyles.GAP_VERTICAL,
+            flex: 1,
+            justifyContent: "center"
           }}
         >
           <Paragraph color={colors.secondary.paragraph}>
             {strings.createFirstApiKey()}
           </Paragraph>
+
+          <Button
+            title={strings.createKey()}
+            type="accent"
+            style={{
+              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+              width: "100%"
+            }}
+            onPress={() => {
+              if (apiKeys.length >= 10) {
+                presentDialog({
+                  title: strings.apiKeysLimitReached(),
+                  paragraph: strings.apiKeysLimitReachedMessage(),
+                  positiveText: strings.ok()
+                });
+              } else {
+                AddApiKeySheet.present(() => apiKeysPromise.refresh());
+              }
+            }}
+          />
         </View>
       ) : (
         <View style={{ gap: 0 }}>
