@@ -2751,5 +2751,8 @@ Continue without attachments?`,
   failedInboxItemsDesc: () => t`View failed inbox items and error contexts`,
   noFailedInboxItems: () => t`No failed inbox items`,
   show: () => t`Show`,
-  itemDeleted: () => t`Item deleted`
+  itemDeleted: () => t`Item deleted`,
+  deleteAll: () => t`Delete all`,
+  deleteAllFailedItemsDesc: () =>
+    t`Are you sure you want to delete all failed inbox items?`
 };
