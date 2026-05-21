@@ -364,7 +364,8 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
     }
   }, [viewing]);
 
-  const isApiKeyExpired = Date.now() > apiKey.expiryDate;
+  const isApiKeyExpired =
+    apiKey.expiryDate !== -1 && Date.now() > apiKey.expiryDate;
 
   return (
     <View
