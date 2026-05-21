@@ -195,26 +195,30 @@ export const FailedInboxItems = () => {
         title={strings.failedInboxItems()}
         canGoBack={true}
         id="Settings"
-        rightButton={{
-          name: "delete",
-          color: colors.primary.icon,
-          onPress: async () => {
-            presentDialog({
-              title: strings.deleteAll(),
-              paragraph: strings.deleteAllFailedItemsDesc(),
-              positiveText: strings.delete(),
-              positiveType: "errorShade",
-              positivePress: async () => {
-                if (result.status !== "pending") {
-                  await db.inboxItemsHistory.deleteFailed();
-                  result.refresh();
-                }
+        rightButton={
+          items?.length > 0
+            ? {
+                name: "delete",
+                color: colors.primary.icon,
+                onPress: async () => {
+                  presentDialog({
+                    title: strings.deleteAll(),
+                    paragraph: strings.deleteAllFailedItemsDesc(),
+                    positiveText: strings.delete(),
+                    positiveType: "errorShade",
+                    positivePress: async () => {
+                      if (result.status !== "pending") {
+                        await db.inboxItemsHistory.deleteFailed();
+                        result.refresh();
+                      }
 
-                return true;
+                      return true;
+                    }
+                  });
+                }
               }
-            });
-          }
-        }}
+            : undefined
+        }
       />
 
       {result.status === "pending" ? (
