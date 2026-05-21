@@ -296,13 +296,10 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             )
           );
 
-          expandCollapsedParents(tr, from);
-
           this.storage.selectedIndex = nextIndex;
           tr.setMeta("selectedIndex", nextIndex);
           if (dispatch) updateView(state, dispatch);
 
-          scrollIntoView(this.editor.view, from);
           return true;
         },
       moveToPreviousResult:
@@ -324,13 +321,10 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             )
           );
 
-          expandCollapsedParents(tr, from);
-
           this.storage.selectedIndex = prevIndex;
           tr.setMeta("selectedIndex", prevIndex);
           if (dispatch) updateView(state, dispatch);
 
-          scrollIntoView(this.editor.view, from);
           return true;
         },
       replace:
@@ -472,6 +466,18 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           decorations(state) {
             return key.getState(state).results;
           }
+        },
+        appendTransaction: (transactions, oldState, newState) => {
+          const { isSearching } = key.getState(newState);
+          const selectedResult =
+            this.storage.results?.[this.storage.selectedIndex];
+          if (!isSearching || !selectedResult) return;
+
+          const tr = newState.tr;
+          if (expandCollapsedParents(tr, selectedResult.from)) {
+            scrollIntoView(this.editor.view, selectedResult.from);
+            return tr;
+          }
         }
       })
     ];
@@ -482,63 +488,57 @@ function expandCollapsedParents(tr: Transaction, pos: number) {
   try {
     let changed = false;
 
-    let expandedSomething = true;
-    while (expandedSomething) {
-      const $pos = tr.doc.resolve(pos);
-      expandedSomething = false;
+    const $pos = tr.doc.resolve(pos);
 
-      for (let depth = 1; depth <= $pos.depth; depth++) {
-        const node = $pos.node(depth);
-        const nodePos = $pos.before(depth);
+    for (let depth = 1; depth <= $pos.depth; depth++) {
+      const node = $pos.node(depth);
+      const nodePos = $pos.before(depth);
 
-        if (
-          (node.type.name === "callout" ||
-            node.type.name === "outlineListItem") &&
-          node.attrs.collapsed
-        ) {
-          tr.setNodeAttribute(nodePos, "collapsed", false);
-          changed = true;
-          expandedSomething = true;
-        }
+      if (
+        (node.type.name === "callout" ||
+          node.type.name === "outlineListItem") &&
+        node.attrs.collapsed
+      ) {
+        tr.setNodeAttribute(nodePos, "collapsed", false);
+        changed = true;
+      }
 
-        // expand collapsed heading that hid this node via hidden attribute
-        if (node.attrs.hidden) {
-          const parentNode = $pos.node(depth - 1);
-          const parentContentStart =
-            depth === 1 ? 0 : $pos.before(depth - 1) + 1;
+      // expand collapsed heading that hid this node via hidden attribute
+      if (node.attrs.hidden) {
+        const parentNode = $pos.node(depth - 1);
+        const parentContentStart = depth === 1 ? 0 : $pos.before(depth - 1) + 1;
 
-          let collapsedHeadingPos = -1;
-          let collapsedHeadingLevel = -1;
+        let collapsedHeadingPos = -1;
+        let collapsedHeadingLevel = -1;
 
-          parentNode.forEach((child, offset) => {
-            const childAbsPos = parentContentStart + offset;
-            if (childAbsPos >= nodePos) return;
-            if (
-              child.type.name === "heading" &&
-              child.attrs.collapsed &&
-              !child.attrs.hidden
-            ) {
-              collapsedHeadingPos = childAbsPos;
-              collapsedHeadingLevel = child.attrs.level;
-            }
-          });
-
-          if (collapsedHeadingPos !== -1) {
-            tr.setNodeAttribute(collapsedHeadingPos, "collapsed", false);
-            toggleNodesUnderPos(
-              tr,
-              collapsedHeadingPos,
-              collapsedHeadingLevel,
-              false
-            );
-            changed = true;
-            expandedSomething = true;
+        parentNode.forEach((child, offset) => {
+          const childAbsPos = parentContentStart + offset;
+          if (childAbsPos >= nodePos) return;
+          if (
+            child.type.name === "heading" &&
+            child.attrs.collapsed &&
+            !child.attrs.hidden
+          ) {
+            collapsedHeadingPos = childAbsPos;
+            collapsedHeadingLevel = child.attrs.level;
           }
+        });
+
+        if (collapsedHeadingPos !== -1) {
+          tr.setNodeAttribute(collapsedHeadingPos, "collapsed", false);
+          toggleNodesUnderPos(
+            tr,
+            collapsedHeadingPos,
+            collapsedHeadingLevel,
+            false
+          );
+          changed = true;
         }
       }
     }
 
     if (changed) tr.setMeta("preventSave", true);
+    return changed;
   } catch (e) {
     console.error("Error expanding collapsed parents: ", e);
   }
