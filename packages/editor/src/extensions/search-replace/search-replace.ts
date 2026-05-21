@@ -297,6 +297,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           );
 
           this.storage.selectedIndex = nextIndex;
+          tr.setMeta("isSearching", true);
           tr.setMeta("selectedIndex", nextIndex);
           if (dispatch) updateView(state, dispatch);
 
@@ -322,6 +323,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           );
 
           this.storage.selectedIndex = prevIndex;
+          tr.setMeta("isSearching", true);
           tr.setMeta("selectedIndex", prevIndex);
           if (dispatch) updateView(state, dispatch);
 
@@ -468,10 +470,12 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           }
         },
         appendTransaction: (transactions, oldState, newState) => {
-          const { isSearching } = key.getState(newState);
+          const isSearchTransaction = transactions.find((t) =>
+            t.getMeta("isSearching")
+          );
           const selectedResult =
             this.storage.results?.[this.storage.selectedIndex];
-          if (!isSearching || !selectedResult) return;
+          if (!isSearchTransaction || !selectedResult) return;
 
           const tr = newState.tr;
           if (expandCollapsedParents(tr, selectedResult.from)) {
