@@ -400,6 +400,16 @@ export class Sync {
     }
 
     const collectionType = SYNC_COLLECTIONS_MAP[itemType];
+
+    if (!collectionType) {
+      this.logger.error(
+        new Error(
+          `Unknown collection type for item type ${itemType}. Skipping chunk.`
+        )
+      );
+      return;
+    }
+
     const collection = this.db[collectionType].collection;
     const localItems = await collection.records(chunk.items.map((i) => i.id));
     let items: (MaybeDeletedItem<Item> | undefined)[] = [];

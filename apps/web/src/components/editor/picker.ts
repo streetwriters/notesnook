@@ -18,86 +18,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SerializedKey } from "@notesnook/crypto";
-import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
-import { TaskManager } from "../../common/task-manager";
 import { showToast } from "../../utils/toast";
 import { showFilePicker } from "../../utils/file-picker";
 import { Attachment } from "@notesnook/editor";
-import { ImagePickerDialog } from "../../dialogs/image-picker-dialog";
-import { strings } from "@notesnook/intl";
 import {
   getUploadedFileSize,
   hashStream,
   writeEncryptedFile
 } from "../../interfaces/fs";
-import Config from "../../utils/config";
 import { compressImage, FileWithURI } from "../../utils/image-compressor";
-import { ImageCompressionOptions } from "../../stores/setting-store";
 import { checkFeature } from "../../common";
+import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
+import { strings } from "@notesnook/intl";
 
-export async function insertAttachments(type = "*/*") {
+export async function insertAttachments(
+  type: string,
+  onDone: (attachments: Attachment[]) => void
+): Promise<void> {
   const files = await showFilePicker({
     acceptedFileTypes: type || "*/*",
     multiple: true
   });
-  if (!files) return;
-  return await attachFiles(files, type === "*/*");
-}
+  if (!files || files.length === 0) return;
 
-export async function attachFiles(
-  files: File[],
-  skipSpecialImageHandling = false
-) {
-  let images = files.filter((f) => f.type.startsWith("image/"));
-  const imageCompressionConfig = Config.get<ImageCompressionOptions>(
-    "imageCompression",
-    ImageCompressionOptions.ASK_EVERY_TIME
-  );
-
-  switch (imageCompressionConfig) {
-    case ImageCompressionOptions.ENABLE: {
-      const compressedImages: FileWithURI[] = [];
-      for (const image of images) {
-        const compressed = await compressImage(image, {
-          maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
-          width: (naturalWidth) => naturalWidth,
-          height: (_, naturalHeight) => naturalHeight,
-          resize: "contain",
-          quality: 0.7
-        });
-        compressedImages.push(
-          new FileWithURI([compressed], image.name, {
-            lastModified: image.lastModified,
-            type: image.type
-          })
-        );
-      }
-      images = compressedImages;
-      break;
-    }
-    case ImageCompressionOptions.DISABLE:
-      break;
-    default:
-      images =
-        images.length > 0
-          ? (await ImagePickerDialog.show({
-              images
-            })) || []
-          : [];
-  }
-
-  const documents = files.filter((f) => !f.type.startsWith("image/"));
-  const attachments: Attachment[] = [];
-  for (const file of [...images, ...documents]) {
-    const attachment =
-      !skipSpecialImageHandling && file.type.startsWith("image/")
-        ? await pickImage(file)
-        : await pickFile(file);
-    if (!attachment) continue;
-    attachments.push(attachment);
-  }
-  return attachments;
+  await AttachFilesDialog.show({
+    files,
+    skipSpecialImageHandling: type === "*/*",
+    onDone
+  });
 }
 
 export async function reuploadAttachment(
@@ -109,9 +58,16 @@ export async function reuploadAttachment(
   });
   if (!selectedFile) return;
 
+  if (
+    !(await checkFeature("fileSize", {
+      value: selectedFile.size
+    }))
+  ) {
+    return;
+  }
+
   const options: AddAttachmentOptions = {
     expectedFileHash,
-    showProgress: false,
     forceWrite: true
   };
 
@@ -124,6 +80,72 @@ export async function reuploadAttachment(
   }
 }
 
+type AttachFilesMessage =
+  | { type: "compressing"; index: number }
+  | { type: "encrypting"; index: number }
+  | {
+      type: "done";
+      index: number;
+      attachment: Attachment | undefined;
+    }
+  | { type: "error"; index: number; error: string };
+
+export async function* attachFiles(
+  files: File[],
+  shouldCompress: boolean[],
+  skipSpecialImageHandling = false
+): AsyncGenerator<AttachFilesMessage> {
+  for (let i = 0; i < files.length; i++) {
+    let file = files[i];
+    const shouldCompressFile = shouldCompress[i];
+
+    if (shouldCompressFile) {
+      yield { type: "compressing", index: i };
+      try {
+        const compressed = await compressImage(file, {
+          maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
+          width: (naturalWidth) => naturalWidth,
+          height: (_, naturalHeight) => naturalHeight,
+          resize: "contain",
+          quality: 0.7
+        });
+        file = new FileWithURI([compressed], file.name, {
+          lastModified: file.lastModified,
+          type: file.type
+        });
+      } catch (e) {
+        yield {
+          type: "error",
+          index: i,
+          error: (e as Error).message || strings.compressionFailed()
+        };
+        continue;
+      }
+    }
+
+    yield { type: "encrypting", index: i };
+
+    try {
+      const allowed = await checkFeature("fileSize", {
+        value: file.size,
+        type: "toast"
+      });
+      if (!allowed) {
+        throw new Error(strings.fileSizeLimitExceededPleaseUpgrade());
+      }
+
+      const attachment =
+        !skipSpecialImageHandling && file.type.startsWith("image/")
+          ? await pickImage(file)
+          : await pickFile(file);
+
+      yield { type: "done", index: i, attachment: attachment || undefined };
+    } catch (e) {
+      yield { type: "error", index: i, error: (e as Error).message };
+    }
+  }
+}
+
 /**
  * @param {File} file
  * @returns
@@ -133,8 +155,6 @@ async function pickFile(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (!(await checkFeature("fileSize", { value: file.size }))) return;
-
     const hash = await addAttachment(file, options);
     return {
       type: "file",
@@ -158,8 +178,6 @@ async function pickImage(
   options?: AddAttachmentOptions
 ): Promise<Attachment | undefined> {
   try {
-    if (!(await checkFeature("fileSize", { value: file.size }))) return;
-
     const hash = await addAttachment(file, options);
     const dimensions = await getImageDimensions(file);
     return {
@@ -171,6 +189,7 @@ async function pickImage(
       ...dimensions
     };
   } catch (e) {
+    console.error(e);
     showToast("error", (e as Error).message);
   }
 }
@@ -190,7 +209,6 @@ export type AttachmentProgress = {
 
 type AddAttachmentOptions = {
   expectedFileHash?: string;
-  showProgress?: boolean;
   forceWrite?: boolean;
 };
 
@@ -198,80 +216,46 @@ async function addAttachment(
   file: File,
   options: AddAttachmentOptions = {}
 ): Promise<string> {
-  const { expectedFileHash, showProgress = true } = options;
+  const { expectedFileHash } = options;
   let forceWrite = options.forceWrite;
 
-  const action = async () => {
-    const reader = file.stream().getReader();
-    const { hash, type: hashType } = await hashStream(reader);
-    reader.releaseLock();
+  const reader = file.stream().getReader();
+  const { hash, type: hashType } = await hashStream(reader);
+  reader.releaseLock();
 
-    if (expectedFileHash && hash !== expectedFileHash)
-      throw new Error(
-        `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
-      );
+  if (expectedFileHash && hash !== expectedFileHash)
+    throw new Error(
+      `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
+    );
 
-    const exists = await db.attachments.attachment(hash);
-    if (!forceWrite && exists) {
-      forceWrite = (await getUploadedFileSize(hash)) === 0;
+  const exists = await db.attachments.attachment(hash);
+  if (!forceWrite && exists) {
+    forceWrite = (await getUploadedFileSize(hash)) === 0;
+  }
+
+  if (forceWrite || !exists) {
+    if (forceWrite && exists) {
+      if (!(await db.fs().deleteFile(hash, false)))
+        throw new Error("Failed to delete attachment from server.");
+      await db.attachments.reset(exists.id);
     }
 
-    if (forceWrite || !exists) {
-      if (forceWrite && exists) {
-        if (!(await db.fs().deleteFile(hash, false)))
-          throw new Error("Failed to delete attachment from server.");
-        await db.attachments.reset(exists.id);
-      }
+    const key: SerializedKey = await getEncryptionKey();
 
-      const key: SerializedKey = await getEncryptionKey();
+    const output = await writeEncryptedFile(file, key, hash);
+    if (!output) throw new Error("Could not encrypt file.");
 
-      const output = await writeEncryptedFile(file, key, hash);
-      if (!output) throw new Error("Could not encrypt file.");
+    await db.attachments.add({
+      ...output,
+      hash,
+      hashType,
+      filename: exists?.filename || file.name,
+      mimeType: exists?.type || file.type,
+      key
+    });
+  }
 
-      await db.attachments.add({
-        ...output,
-        hash,
-        hashType,
-        filename: exists?.filename || file.name,
-        mimeType: exists?.type || file.type,
-        key
-      });
-    }
-
-    return hash;
-  };
-
-  const result = showProgress
-    ? await withProgress(file, action)
-    : await action();
-
-  if (result instanceof Error) throw result;
-  return result;
-}
-
-function withProgress<T>(
-  file: File,
-  action: () => Promise<T>
-): Promise<T | Error> {
-  return TaskManager.startTask({
-    type: "modal",
-    title: strings.encryptingAttachment(),
-    subtitle: strings.encryptingAttachmentDesc(),
-    action: (report) => {
-      const event = AppEventManager.subscribe(
-        AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-        ({ type, total, loaded }: AttachmentProgress) => {
-          if (type !== "encrypt") return;
-          report({
-            current: Math.round((loaded / total) * 100),
-            total: 100,
-            text: file.name
-          });
-        }
-      );
-      return action().finally(() => event.unsubscribe());
-    }
-  });
+  return hash;
 }
 
 function getImageDimensions(file: File) {

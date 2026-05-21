@@ -2755,5 +2755,17 @@ Continue without attachments?`,
   deleteAll: () => t`Delete all`,
   deleteAllFailedItemsDesc: () =>
     t`Are you sure you want to delete all failed inbox items?`,
-  allItemsDeleted: () => t`All items deleted`
+  allItemsDeleted: () => t`All items deleted`,
+  attachingFiles: () => t`Attaching files`,
+  closeCountdown: (seconds: number) => t`Close (${seconds})`,
+  compressing: () => t`Compressing`,
+  encrypting: () => t`Encrypting`,
+  fileSizeLimitExceededPleaseUpgrade: () =>
+    t`File size limit exceeded. Please upgrade your plan.`,
+  compressionFailed: () => t`Compression failed`,
+  openingLocalFile: () => t`Opening local file`,
+  openingLocalFileDesc: (filePath: string) =>
+    t`Are you sure you want to open this file: ${filePath}?`,
+  cantOpenFileLinksInBrowsers: () =>
+    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`
 };

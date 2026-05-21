@@ -230,7 +230,8 @@ import {
   mdiInbox,
   mdiConsoleLine,
   mdiSpellcheck,
-  mdiDeleteSweepOutline
+  mdiDeleteSweepOutline,
+  mdiCloseCircle
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -588,3 +589,4 @@ export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
 export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
+export const CloseCircle = createIcon(mdiCloseCircle);

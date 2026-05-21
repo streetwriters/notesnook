@@ -821,7 +821,7 @@ msgstr ""
 msgid "All files"
 msgstr ""
 
-#: src/strings.ts:2756
+#: src/strings.ts:2758
 msgid "All items deleted"
 msgstr ""
 
@@ -994,6 +994,10 @@ msgstr ""
 
 #: src/strings.ts:775
 msgid "Are you sure you want to logout from this device? Any unsynced changes will be lost."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2768
+msgid "Are you sure you want to open this file: {filePath}?"
 msgstr ""
 
 #: src/strings.ts:1048
@@ -1034,6 +1038,10 @@ msgstr ""
 
 #: src/strings.ts:908
 msgid "Attached files"
+msgstr ""
+
+#: src/strings.ts:2759
+msgid "Attaching files"
 msgstr ""
 
 #: src/strings.ts:290
@@ -1701,6 +1709,10 @@ msgstr ""
 
 #: src/strings.ts:1383
 msgid "Close"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2760
+msgid "Close ({seconds})"
 msgstr ""
 
 #: src/strings.ts:2021
@@ -1810,6 +1822,14 @@ msgstr ""
 
 #: src/strings.ts:144
 msgid "Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2761
+msgid "Compressing"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2765
+msgid "Compression failed"
 msgstr ""
 
 #: src/strings.ts:2264
@@ -2658,6 +2678,10 @@ msgstr ""
 
 #: src/strings.ts:1659
 msgid "Encrypted, private, secure."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2762
+msgid "Encrypting"
 msgstr ""
 
 #: src/strings.ts:942
@@ -3057,10 +3081,18 @@ msgstr ""
 
 #: src/strings.ts:803
 msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2770
+msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
 msgstr ""
 
 #: src/strings.ts:951
 msgid "File mismatch"
+msgstr ""
+
+#: src/strings.ts:2764
+msgid "File size limit exceeded. Please upgrade your plan."
 msgstr ""
 
 #: src/strings.ts:947
@@ -4682,6 +4714,10 @@ msgstr ""
 
 #: src/strings.ts:985
 msgid "Open the two-factor authentication (TOTP) app to view your authentication code."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2766
+msgid "Opening local file"
 msgstr ""
 
 #: src/strings.ts:1859

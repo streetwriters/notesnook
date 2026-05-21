@@ -240,7 +240,8 @@ export const BehaviourSettings: SettingsGroup[] = [
           useSettingStore.subscribe((s) => s.autoUpdates, listener),
         isHidden: () =>
           useSettingStore.getState().isFlatpak ||
-          useSettingStore.getState().isSnap,
+          useSettingStore.getState().isSnap ||
+          useSettingStore.getState().isPortable,
         components: [
           {
             type: "toggle",

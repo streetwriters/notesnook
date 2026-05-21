@@ -92,6 +92,7 @@ class SettingStore extends BaseStore<SettingStore> {
   autoUpdates = false;
   isFlatpak = false;
   isSnap = false;
+  isPortable = false;
   proxyRules?: string;
   isInboxEnabled = false;
 
@@ -106,6 +107,7 @@ class SettingStore extends BaseStore<SettingStore> {
       profile: db.settings.getProfile(),
       isFlatpak: await desktop?.integration.isFlatpak.query(),
       isSnap: await desktop?.integration.isSnap.query(),
+      isPortable: await desktop?.integration.isPortable.query(),
       desktopIntegrationSettings:
         await desktop?.integration.desktopIntegration.query(),
       privacyMode: await desktop?.integration.privacyMode.query(),

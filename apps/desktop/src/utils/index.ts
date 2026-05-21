@@ -33,3 +33,7 @@ export function isFlatpak() {
 export function isSnap() {
   return process.env.SNAP !== undefined;
 }
+
+export function isPortable() {
+  return process.env.PORTABLE_EXECUTABLE_DIR !== undefined;
+}

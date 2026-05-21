@@ -58,6 +58,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { useEditorStore } from "../../stores/editor-store";
 import { DayFormat, parseInternalLink } from "@notesnook/core";
+import { desktop } from "../../common/desktop-bridge";
 import Skeleton from "react-loading-skeleton";
 import useMobile from "../../hooks/use-mobile";
 import useTablet from "../../hooks/use-tablet";
@@ -70,6 +71,7 @@ import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
 import { handleInternalLink } from "../../common";
 import { db } from "../../common/db";
+import { showToast } from "../../utils/toast";
 
 export type OnChangeHandler = (
   content: () => string,
@@ -424,7 +426,7 @@ function TipTap(props: TipTapProps) {
       previewAttachment: onPreviewAttachment,
       createInternalLink: onInsertInternalLink,
       getAttachmentData: onGetAttachmentData,
-      openLink: (url, openInNewTab) => {
+      openLink: async (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link) handleInternalLink(url, openInNewTab);
         else window.open(url, "_blank");

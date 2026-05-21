@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { SettingsGroup } from "./types";
+import { SettingComponent, SettingsGroup } from "./types";
 import { appVersion } from "../../utils/version";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
@@ -50,6 +50,23 @@ export const AboutSettings: SettingsGroup[] = [
           useAutoUpdateStore.subscribe((s) => s.status, listener),
         components: () => {
           const status = useAutoUpdateStore.getState().status;
+          const copyVersionButton: SettingComponent = {
+            type: "button",
+            action: async () => {
+              await writeText(appVersion.formatted);
+              showToast("info", strings.copied());
+            },
+            title: strings.copy(),
+            variant: "secondary"
+          };
+          if (
+            useSettingStore.getState().isFlatpak ||
+            useSettingStore.getState().isSnap ||
+            useSettingStore.getState().isPortable
+          ) {
+            return [copyVersionButton];
+          }
+
           return [
             status?.type === "available"
               ? {
@@ -64,15 +81,7 @@ export const AboutSettings: SettingsGroup[] = [
                   title: strings.checkForUpdates(),
                   variant: "secondary"
                 },
-            {
-              type: "button",
-              action: async () => {
-                await writeText(appVersion.formatted);
-                showToast("info", strings.copied());
-              },
-              title: strings.copy(),
-              variant: "secondary"
-            }
+            copyVersionButton
           ];
         }
       },
@@ -82,7 +91,8 @@ export const AboutSettings: SettingsGroup[] = [
         description: strings.releaseTrackDesc(),
         isHidden: () =>
           useSettingStore.getState().isFlatpak ||
-          useSettingStore.getState().isSnap,
+          useSettingStore.getState().isSnap ||
+          useSettingStore.getState().isPortable,
         components: [
           {
             type: "dropdown",

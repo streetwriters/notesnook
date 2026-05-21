@@ -123,6 +123,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
           <Text
             as="div"
             variant="body"
+            sx={{ overflowWrap: "break-word" }}
             dangerouslySetInnerHTML={{ __html: mdToHtml(message) }}
           />
         ) : null}
