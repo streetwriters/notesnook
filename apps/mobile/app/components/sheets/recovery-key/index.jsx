@@ -21,7 +21,7 @@ import { sanitizeFilename } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { createRef } from "react";
-import { Platform, View } from "react-native";
+import { PermissionsAndroid, Platform, View } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
@@ -45,6 +45,54 @@ import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+
+async function hasAndroidPermission() {
+  const getCheckPermissionPromise = () => {
+    if (Platform.Version >= 33) {
+      return Promise.all([
+        PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+        ),
+        PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO
+        )
+      ]).then(
+        ([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) =>
+          hasReadMediaImagesPermission && hasReadMediaVideoPermission
+      );
+    } else {
+      return PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+      );
+    }
+  };
+
+  const hasPermission = await getCheckPermissionPromise();
+  if (hasPermission) {
+    return true;
+  }
+  const getRequestPermissionPromise = () => {
+    if (Platform.Version >= 33) {
+      return PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+        PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO
+      ]).then(
+        (statuses) =>
+          statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ===
+            PermissionsAndroid.RESULTS.GRANTED &&
+          statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ===
+            PermissionsAndroid.RESULTS.GRANTED
+      );
+    } else {
+      return PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+      ).then((status) => status === PermissionsAndroid.RESULTS.GRANTED);
+    }
+  };
+
+  return await getRequestPermissionPromise();
+}
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -106,24 +154,25 @@ class RecoveryKeySheet extends React.Component {
   }
 
   saveQRCODE = async () => {
+    if (Platform.OS === "android" && !(await hasAndroidPermission())) {
+      ToastManager.show({
+        message: strings.permissionRequiredToSaveQRCode(),
+        type: "info"
+      });
+      return;
+    }
+
     this.svg.current?.toDataURL(async (data) => {
       try {
-        let path;
         let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
         fileName = sanitizeFilename(fileName, { replacement: "_" });
         fileName = fileName + ".png";
 
-        if (Platform.OS === "android") {
-          await ScopedStorage.createDocument(
-            fileName,
-            "image/png",
-            data,
-            "base64"
-          );
-        } else {
-          path = await filesystem.checkAndCreateDir("/");
-          await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
-        }
+        const path = RNFetchBlob.fs.dirs.CacheDir + fileName;
+        await RNFetchBlob.fs.writeFile(path, data, "base64");
+
+        await CameraRoll.saveToCameraRoll(`file://` + path);
+
         ToastManager.show({
           heading: strings.recoveryKeyQRCodeSaved(),
           type: "success",

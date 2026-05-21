@@ -1857,7 +1857,7 @@ msgstr ""
 msgid "Copy link text"
 msgstr ""
 
-#: src/strings.ts:2694
+#: src/strings.ts:2703
 msgid "Copy logs"
 msgstr ""
 
@@ -4652,6 +4652,10 @@ msgstr ""
 msgid "PDF is password protected"
 msgstr ""
 
+#: src/strings.ts:2705
+msgid "Permission required to save QR-Code to Gallery"
+msgstr ""
+
 #: src/strings.ts:1729
 msgid "phone number"
 msgstr ""
@@ -7231,7 +7235,7 @@ msgstr "<<<<<<< HEAD"
 msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
 msgstr ""
 
-#: src/strings.ts:2693
+#: src/strings.ts:2702
 msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 msgstr ""
 
