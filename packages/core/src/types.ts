@@ -486,6 +486,10 @@ export type SettingItemMap = {
   defaultTag: string | undefined;
   profile: Profile | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
+  Record<
+    `groupOptions:notes:notebooks` | `groupOptions:notes:tags`,
+    Record<string, GroupOptions>
+  > &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
   Record<`sideBarOrder:${SideBarSection}`, string[]> &
   Record<`sideBarHiddenItems:${SideBarHideableSection}`, string[]>;

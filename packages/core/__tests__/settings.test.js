@@ -47,3 +47,45 @@ test("save trash cleanup interval", () =>
     await db.settings.setTrashCleanupInterval(interval);
     expect(db.settings.getTrashCleanupInterval()).toBe(interval);
   }));
+
+test("get notebook group options", () =>
+  databaseTest().then(async (db) => {
+    const notebookId = "test-notebook-id";
+    const groupOptions = {
+      groupBy: "year",
+      sortBy: "title",
+      sortDirection: "asc"
+    };
+    await db.settings.setNotebookGroupOptions(notebookId, groupOptions);
+    expect(db.settings.getNotebookGroupOptions(notebookId)).toMatchObject(
+      groupOptions
+    );
+  }));
+
+test("get notebook group options fallback to notes options", () =>
+  databaseTest().then(async (db) => {
+    const notebookId = "non-existent-notebook-id";
+    const defaultNotesOptions = db.settings.getGroupOptions("notes");
+    const result = db.settings.getNotebookGroupOptions(notebookId);
+    expect(result).toMatchObject(defaultNotesOptions);
+  }));
+
+test("get tag group options", () =>
+  databaseTest().then(async (db) => {
+    const tagId = "test-tag-id";
+    const groupOptions = {
+      groupBy: "year",
+      sortBy: "title",
+      sortDirection: "asc"
+    };
+    await db.settings.setTagGroupOptions(tagId, groupOptions);
+    expect(db.settings.getTagGroupOptions(tagId)).toMatchObject(groupOptions);
+  }));
+
+test("get tag group options fallback to notes options", () =>
+  databaseTest().then(async (db) => {
+    const tagId = "non-existent-tag-id";
+    const defaultTagsOptions = db.settings.getGroupOptions("notes");
+    const result = db.settings.getTagGroupOptions(tagId);
+    expect(result).toMatchObject(defaultTagsOptions);
+  }));

@@ -64,6 +64,8 @@ const defaultSettings: SettingItemMap = {
   trashCleanupInterval: 7,
   profile: undefined,
 
+  "groupOptions:notes:notebooks": {},
+  "groupOptions:notes:tags": {},
   "groupOptions:trash": DEFAULT_GROUP_OPTIONS("trash"),
   "groupOptions:tags": DEFAULT_GROUP_OPTIONS("tags"),
   "groupOptions:notes": DEFAULT_GROUP_OPTIONS("notes"),
@@ -148,6 +150,31 @@ export class Settings implements ICollection {
 
   setGroupOptions(key: GroupingKey, groupOptions: GroupOptions) {
     return this.set(`groupOptions:${key}`, groupOptions);
+  }
+
+  getNotebookGroupOptions(notebookId: string) {
+    const notebookOptions = this.get("groupOptions:notes:notebooks");
+    return notebookOptions[notebookId] || this.get("groupOptions:notes");
+  }
+
+  async setNotebookGroupOptions(
+    notebookId: string,
+    groupOptions: GroupOptions
+  ) {
+    const notebookOptions = this.get("groupOptions:notes:notebooks");
+    notebookOptions[notebookId] = groupOptions;
+    return this.set("groupOptions:notes:notebooks", notebookOptions);
+  }
+
+  getTagGroupOptions(tagId: string) {
+    const tagOptions = this.get("groupOptions:notes:tags");
+    return tagOptions[tagId] || this.get("groupOptions:notes");
+  }
+
+  async setTagGroupOptions(tagId: string, groupOptions: GroupOptions) {
+    const tagOptions = this.get("groupOptions:notes:tags");
+    tagOptions[tagId] = groupOptions;
+    return this.set("groupOptions:notes:tags", tagOptions);
   }
 
   setToolbarConfig(platform: ToolbarConfigPlatforms, config: ToolbarConfig) {

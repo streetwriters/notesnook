@@ -57,18 +57,23 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   setContext = async (context?: Context) => {
+    const groupOptions =
+      context?.type === "notebook"
+        ? db.settings.getNotebookGroupOptions(context.id)
+        : context?.type === "tag"
+        ? db.settings.getTagGroupOptions(context.id)
+        : db.settings.getGroupOptions(
+            context?.type === "favorite"
+              ? "favorites"
+              : context?.type === "archive"
+              ? "archive"
+              : "notes"
+          );
+
     this.set({
       context,
       contextNotes: context
-        ? await notesFromContext(context).grouped(
-            db.settings.getGroupOptions(
-              context.type === "favorite"
-                ? "favorites"
-                : context.type === "archive"
-                ? "archive"
-                : "notes"
-            )
-          )
+        ? await notesFromContext(context).grouped(groupOptions)
         : undefined
     });
   };
