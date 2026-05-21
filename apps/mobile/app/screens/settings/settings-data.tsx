@@ -777,6 +777,8 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "manage-inbox-keys",
             name: strings.manageInboxKeys(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
             description: strings.manageInboxKeysDesc(),
             type: "screen",
             component: "manage-inbox-keys"
@@ -785,6 +787,8 @@ export const settingsGroups: SettingSection[] = [
             id: "inbox-keys",
             name: strings.viewAPIKeys(),
             description: strings.viewAPIKeysDesc(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
             type: "screen",
             component: "inbox-keys"
           },
@@ -792,6 +796,8 @@ export const settingsGroups: SettingSection[] = [
             id: "failed-inbox-items",
             name: strings.failedInboxItems(),
             description: strings.failedInboxItemsDesc(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
             type: "screen",
             component: "failed-inbox-items",
             hideHeader: true
