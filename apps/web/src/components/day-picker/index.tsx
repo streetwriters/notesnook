@@ -54,6 +54,24 @@ export function DayPicker(props: DayPickerProps) {
 
   const { month, year, days } = calendars[0];
 
+  const currentMonthDate = months.find((m) => m.month === month)?.$date;
+  const isNextMonthBeyondMax =
+    maxDate && currentMonthDate
+      ? new Date(
+          currentMonthDate.getFullYear(),
+          currentMonthDate.getMonth() + 1,
+          1
+        ) > stripTime(maxDate)
+      : false;
+  const isPrevMonthBeforeMin =
+    minDate && currentMonthDate
+      ? new Date(
+          currentMonthDate.getFullYear(),
+          currentMonthDate.getMonth(),
+          1
+        ) <= stripTime(minDate)
+      : false;
+
   return (
     <Flex
       sx={{
@@ -68,7 +86,7 @@ export function DayPicker(props: DayPickerProps) {
           <Button
             variant="icon"
             sx={{ p: 0 }}
-            {...subtractOffset({ months: 1 })}
+            {...subtractOffset({ months: 1 }, { disabled: isPrevMonthBeforeMin })}
           >
             <ChevronLeft />
           </Button>
@@ -137,7 +155,16 @@ export function DayPicker(props: DayPickerProps) {
             ))}
           </select>
         </Flex>
-        <Button variant="icon" sx={{ p: 0 }} {...addOffset({ months: 1 })}>
+        <Button
+          variant="icon"
+          sx={{ p: 0 }}
+          {...addOffset(
+            { months: 1 },
+            {
+              disabled: isNextMonthBeyondMax
+            }
+          )}
+        >
           <ChevronRight />
         </Button>
       </Flex>
