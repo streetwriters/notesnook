@@ -77,8 +77,7 @@ export function InboxApiKeys() {
                   title: "API Keys Limit Reached",
                   subtitle:
                     "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones.",
-                  positiveButtonText:
-                    strings.ok()
+                  positiveButtonText: strings.ok()
                 });
               } else {
                 AddApiKeyDialog.show({
@@ -191,7 +190,8 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
     }
   }, [viewing]);
 
-  const isApiKeyExpired = Date.now() > apiKey.expiryDate;
+  const isApiKeyExpired =
+    apiKey.expiryDate === -1 ? false : Date.now() > apiKey.expiryDate;
 
   return (
     <Box
