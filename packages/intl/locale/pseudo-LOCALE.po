@@ -6314,7 +6314,7 @@ msgid "Share Notesnook with friends!"
 msgstr ""
 
 #: src/strings.ts:2658
-msgid "Share things to Notesbook from anywhere using the Inbox API"
+msgid "Share things to Notesnook from anywhere using the Inbox API"
 msgstr ""
 
 #: src/strings.ts:594

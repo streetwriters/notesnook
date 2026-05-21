@@ -2655,7 +2655,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   confirmationEmailSent: () => t`Confirmation email sent`,
   inboxAPI: () => t`Inbox API`,
   inboxAPIDesc: () =>
-    t`Share things to Notesbook from anywhere using the Inbox API`,
+    t`Share things to Notesnook from anywhere using the Inbox API`,
   enableInboxAPI: () => t`Enable Inbox API`,
   enableInboxAPIDesc: () => t`Enable/Disable Inbox API`,
   manageInboxKeys: () => t`Inbox Keys`,
