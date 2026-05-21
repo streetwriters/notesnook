@@ -821,6 +821,10 @@ msgstr "All fields are required"
 msgid "All files"
 msgstr "All files"
 
+#: src/strings.ts:2756
+msgid "All items deleted"
+msgstr "All items deleted"
+
 #: src/strings.ts:1176
 msgid "All locked notes will be re-encrypted with the new password."
 msgstr "All locked notes will be re-encrypted with the new password."

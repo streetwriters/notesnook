@@ -24,7 +24,7 @@ import { InboxPGPKeysDialog } from "../inbox-pgp-keys-dialog";
 import { db } from "../../common/db";
 import { showPasswordDialog } from "../password-dialog";
 import { strings } from "@notesnook/intl";
-import { InboxHistoryDialog } from "../InboxHistoryDialog";
+import { InboxHistoryDialog } from "../inbox-history-dialog";
 
 export const InboxSettings: SettingsGroup[] = [
   {

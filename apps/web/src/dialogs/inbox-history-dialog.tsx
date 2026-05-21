@@ -159,10 +159,26 @@ export const InboxHistoryDialog = DialogManager.register(
       }
     }
 
+    async function deleteAll() {
+      await db.inboxItemsHistory.deleteFailed();
+      showToast("success", strings.allItemsDeleted());
+      if (result.status !== "pending") {
+        result.refresh();
+      }
+    }
+
     return (
       <Dialog
         isOpen={true}
         title={strings.failedInboxItems()}
+        titleAction={
+          result.status === "fulfilled" &&
+          result.value.length > 0 && (
+            <Button variant="errorSecondary" onClick={deleteAll}>
+              {strings.deleteAll()}
+            </Button>
+          )
+        }
         onClose={() => props.onClose(false)}
         negativeButton={{
           text: strings.close(),

@@ -2754,5 +2754,6 @@ Continue without attachments?`,
   itemDeleted: () => t`Item deleted`,
   deleteAll: () => t`Delete all`,
   deleteAllFailedItemsDesc: () =>
-    t`Are you sure you want to delete all failed inbox items?`
+    t`Are you sure you want to delete all failed inbox items?`,
+  allItemsDeleted: () => t`All items deleted`
 };
