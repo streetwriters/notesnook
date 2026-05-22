@@ -478,8 +478,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           if (!isSearchTransaction || !selectedResult) return;
 
           const tr = newState.tr;
+
+          scrollIntoView(this.editor.view, selectedResult.from);
           if (expandCollapsedParents(tr, selectedResult.from)) {
-            scrollIntoView(this.editor.view, selectedResult.from);
             return tr;
           }
         }
