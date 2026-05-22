@@ -813,6 +813,7 @@ $day$: Current day (eg. Monday)`,
   vaultCreated: () => t`Vault created`,
   noteUnlocked: () => t`Note unlocked`,
   noteCopied: () => t`Note copied to clipboard`,
+  noteDuplicated: () => t`Note duplicated`,
   introData: [
     {
       headings: [
