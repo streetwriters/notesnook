@@ -108,16 +108,24 @@ const PublishNoteSheet = ({
 
     try {
       if (note?.id) {
-        if (isLocked && !passwordValue.current) return;
+        if (isLocked && !passwordValue.current?.trim()) {
+          ToastManager.show({
+            heading: strings.passwordRequired(),
+            message: strings.enterPassword(),
+            type: "error",
+            context: "local"
+          });
+          return;
+        }
+
         await db.monographs.publish(note.id, customTitle.current, {
-          selfDestruct: selfDestruct,
+          selfDestruct,
           password: isLocked ? passwordValue.current : undefined
         });
 
         await monographData.execute();
         Navigation.queueRoutesForUpdate();
         eSendEvent(eMenuItemUpdate);
-        setPublishLoading(false);
       }
       requestInAppReview();
     } catch (e) {
@@ -127,9 +135,9 @@ const PublishNoteSheet = ({
         type: "error",
         context: "local"
       });
+    } finally {
+      setPublishLoading(false);
     }
-
-    setPublishLoading(false);
   };
   const setPublishLoading = (value: boolean) => {
     setPublishing(value);
