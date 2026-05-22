@@ -441,7 +441,17 @@ function ThemeSelector() {
                   ReactNativeBlobUtil.fs
                     .unlink(themeJsonCopiedPath)
                     .catch(() => {});
-                  const json = JSON.parse(themeJson);
+                  let json;
+                  try {
+                    json = JSON.parse(themeJson);
+                  } catch (e) {
+                    ToastManager.show({
+                      heading: strings.invalidThemeFileFormat(),
+                      type: "error",
+                      context: "global"
+                    });
+                    return;
+                  }
                   const result = validateTheme(json);
                   if (result.error) {
                     ToastManager.error(new Error(result.error));

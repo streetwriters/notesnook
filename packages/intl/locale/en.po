@@ -7273,6 +7273,10 @@ msgstr "We are creating a backup of your data. Please wait..."
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 msgstr "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 
+#: src/strings.ts:2700
+msgid "We couldn't load this theme. Please make sure the file is a valid theme export."
+msgstr "We couldn't load this theme. Please make sure the file is a valid theme export."
+
 #: src/strings.ts:1390
 msgid "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."
 msgstr "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."
