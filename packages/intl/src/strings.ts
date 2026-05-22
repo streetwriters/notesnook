@@ -2745,6 +2745,10 @@ Continue without attachments?`,
     t`Please login to download attachments.`,
   publicKeyRequired: () => t`Public key required`,
   privateKeyRequired: () => t`Private key required`,
+  setupInboxPgpKeysDescription: () =>
+    t`Choose how you want to set up your Inbox PGP keys:`,
+  autoGenerateKeys: () => t`Auto-generate keys`,
+  provideOwnKeys: () => t`Provide your own keys`,
   details: () => t`Details`,
   dateSynced: () => t`Date synced`,
   failedInboxItems: () => t`Failed inbox items`,
@@ -2783,5 +2787,8 @@ Continue without attachments?`,
     t`We couldn't load this theme. The file appears to be incomplete or missing required theme properties.`,
   copyLogs: () => t`Copy logs`,
   permissionRequiredToSaveQRCode: () =>
-    t`Permission required to save QR-Code to Gallery`
+    t`Permission required to save QR-Code to Gallery`,
+  setupInboxKeys: () => t`Setup inbox keys`,
+  enterPgpPublicKey: () => t`Enter your PGP public key`,
+  enterPgpPrivateKey: () => t`Enter your PGP private key`
 };

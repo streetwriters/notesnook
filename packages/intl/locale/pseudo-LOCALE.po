@@ -814,7 +814,7 @@ msgstr ""
 msgid "All files"
 msgstr ""
 
-#: src/strings.ts:2758
+#: src/strings.ts:2762
 msgid "All items deleted"
 msgstr ""
 
@@ -973,7 +973,7 @@ msgstr ""
 msgid "Are you sure you want to clear trash?"
 msgstr ""
 
-#: src/strings.ts:2757
+#: src/strings.ts:2761
 msgid "Are you sure you want to delete all failed inbox items?"
 msgstr ""
 
@@ -989,7 +989,7 @@ msgstr ""
 msgid "Are you sure you want to logout from this device? Any unsynced changes will be lost."
 msgstr ""
 
-#: src/strings.ts:2768
+#: src/strings.ts:2772
 msgid "Are you sure you want to open this file: {filePath}?"
 msgstr ""
 
@@ -1033,7 +1033,7 @@ msgstr ""
 msgid "Attached files"
 msgstr ""
 
-#: src/strings.ts:2759
+#: src/strings.ts:2763
 msgid "Attaching files"
 msgstr ""
 
@@ -1133,6 +1133,10 @@ msgstr ""
 
 #: src/strings.ts:2123
 msgid "Auto start on system startup"
+msgstr ""
+
+#: src/strings.ts:2750
+msgid "Auto-generate keys"
 msgstr ""
 
 #: src/strings.ts:1220
@@ -1585,6 +1589,10 @@ msgstr ""
 msgid "Choose how you want to secure your notes locally."
 msgstr ""
 
+#: src/strings.ts:2749
+msgid "Choose how you want to set up your Inbox PGP keys:"
+msgstr ""
+
 #: src/strings.ts:2641
 msgid "Choose what day to display as the first day of the week"
 msgstr ""
@@ -1704,7 +1712,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/strings.ts:2760
+#: src/strings.ts:2764
 msgid "Close ({seconds})"
 msgstr ""
 
@@ -1817,11 +1825,11 @@ msgstr ""
 msgid "Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
 msgstr ""
 
-#: src/strings.ts:2761
+#: src/strings.ts:2765
 msgid "Compressing"
 msgstr ""
 
-#: src/strings.ts:2765
+#: src/strings.ts:2769
 msgid "Compression failed"
 msgstr ""
 
@@ -2173,7 +2181,7 @@ msgstr ""
 msgid "Date modified"
 msgstr ""
 
-#: src/strings.ts:2749
+#: src/strings.ts:2753
 msgid "Date synced"
 msgstr ""
 
@@ -2262,7 +2270,7 @@ msgstr ""
 msgid "Delete account"
 msgstr ""
 
-#: src/strings.ts:2755
+#: src/strings.ts:2759
 msgid "Delete all"
 msgstr ""
 
@@ -2334,7 +2342,7 @@ msgstr ""
 msgid "Desktop integration"
 msgstr ""
 
-#: src/strings.ts:2748
+#: src/strings.ts:2752
 msgid "Details"
 msgstr ""
 
@@ -2681,7 +2689,7 @@ msgstr ""
 msgid "Encrypted, private, secure."
 msgstr ""
 
-#: src/strings.ts:2762
+#: src/strings.ts:2766
 msgid "Encrypting"
 msgstr ""
 
@@ -2791,6 +2799,14 @@ msgstr ""
 
 #: src/strings.ts:1494
 msgid "Enter your new email"
+msgstr ""
+
+#: src/strings.ts:2777
+msgid "Enter your PGP private key"
+msgstr ""
+
+#: src/strings.ts:2776
+msgid "Enter your PGP public key"
 msgstr ""
 
 #: src/strings.ts:2101
@@ -2958,7 +2974,7 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: src/strings.ts:2750
+#: src/strings.ts:2754
 msgid "Failed inbox items"
 msgstr ""
 
@@ -3096,7 +3112,7 @@ msgstr ""
 msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
 msgstr ""
 
-#: src/strings.ts:2770
+#: src/strings.ts:2774
 msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
 msgstr ""
 
@@ -3104,7 +3120,7 @@ msgstr ""
 msgid "File mismatch"
 msgstr ""
 
-#: src/strings.ts:2764
+#: src/strings.ts:2768
 msgid "File size limit exceeded. Please upgrade your plan."
 msgstr ""
 
@@ -3714,7 +3730,7 @@ msgstr ""
 msgid "Item"
 msgstr ""
 
-#: src/strings.ts:2754
+#: src/strings.ts:2758
 msgid "Item deleted"
 msgstr ""
 
@@ -4418,7 +4434,7 @@ msgstr ""
 msgid "No encryption key found"
 msgstr ""
 
-#: src/strings.ts:2752
+#: src/strings.ts:2756
 msgid "No failed inbox items"
 msgstr ""
 
@@ -4737,7 +4753,7 @@ msgstr ""
 msgid "Open the two-factor authentication (TOTP) app to view your authentication code."
 msgstr ""
 
-#: src/strings.ts:2766
+#: src/strings.ts:2770
 msgid "Opening local file"
 msgstr ""
 
@@ -5241,6 +5257,10 @@ msgstr ""
 
 #: src/strings.ts:401
 msgid "Protect your notes"
+msgstr ""
+
+#: src/strings.ts:2751
+msgid "Provide your own keys"
 msgstr ""
 
 #: src/strings.ts:2193
@@ -6277,6 +6297,10 @@ msgstr ""
 msgid "Setup app lock pin"
 msgstr ""
 
+#: src/strings.ts:2775
+msgid "Setup inbox keys"
+msgstr ""
+
 #: src/strings.ts:681
 msgid "Setup secondary 2FA method"
 msgstr ""
@@ -6341,7 +6365,7 @@ msgstr ""
 msgid "Shortcuts"
 msgstr ""
 
-#: src/strings.ts:2753
+#: src/strings.ts:2757
 msgid "Show"
 msgstr ""
 
@@ -7453,7 +7477,7 @@ msgstr ""
 msgid "View and share debug logs"
 msgstr ""
 
-#: src/strings.ts:2751
+#: src/strings.ts:2755
 msgid "View failed inbox items and error contexts"
 msgstr ""
 
