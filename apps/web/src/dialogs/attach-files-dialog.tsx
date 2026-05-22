@@ -208,7 +208,8 @@ export const AttachFilesDialog = DialogManager.register(
           style={{
             maxHeight: 350,
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            position: "relative"
           }}
         >
           {fileStates.map((state, index) => (
