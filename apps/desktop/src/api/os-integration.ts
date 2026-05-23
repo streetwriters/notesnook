@@ -164,10 +164,12 @@ export const osIntegrationRouter = t.router({
       const { type, link } = input;
       if (type !== "path") return;
 
+      const path = decodeURIComponent(new URL(link).pathname);
       const resolvedPath = resolvePath(
         // remove leading slash from path on windows
-        platform() === "win32" ? link.slice(1) : link
+        platform() === "win32" ? path.slice(1) : path
       );
+
       if (!existsSync(resolvedPath)) {
         if (globalThis.window) {
           await dialog.showMessageBox(globalThis.window, {
@@ -179,7 +181,15 @@ export const osIntegrationRouter = t.router({
         return;
       }
 
-      await shell.openPath(resolvedPath);
+      const result = await dialog.showMessageBox(globalThis.window!, {
+        message: strings.openingLocalFileDesc(resolvedPath),
+        title: strings.openingLocalFile(),
+        buttons: [strings.cancel(), strings.open()],
+        defaultId: 1,
+        cancelId: 0,
+        type: "question"
+      });
+      result.response === 1 && (await shell.openPath(resolvedPath));
     }),
   bringToFront: t.procedure.query(() => bringToFront()),
   changeTheme: t.procedure

@@ -435,18 +435,9 @@ function TipTap(props: TipTapProps) {
             return;
           }
 
-          const path = new URL(url).pathname;
-          const ok = await ConfirmDialog.show({
-            title: strings.openingLocalFile(),
-            message: strings.openingLocalFileDesc(path),
-            positiveButtonText: strings.open(),
-            negativeButtonText: strings.cancel()
-          });
-          if (!ok) return;
-
           await desktop?.integration.openPath.query({
             type: "path",
-            link: decodeURIComponent(path)
+            link: url
           });
         } else window.open(url, "_blank");
       },
