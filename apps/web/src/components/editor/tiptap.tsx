@@ -429,7 +429,26 @@ function TipTap(props: TipTapProps) {
       openLink: async (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link) handleInternalLink(url, openInNewTab);
-        else window.open(url, "_blank");
+        else if (url.startsWith("file:")) {
+          if (!IS_DESKTOP_APP) {
+            showToast("error", strings.cantOpenFileLinksInBrowsers());
+            return;
+          }
+
+          const path = new URL(url).pathname;
+          const ok = await ConfirmDialog.show({
+            title: strings.openingLocalFile(),
+            message: strings.openingLocalFileDesc(path),
+            positiveButtonText: strings.open(),
+            negativeButtonText: strings.cancel()
+          });
+          if (!ok) return;
+
+          await desktop?.integration.openPath.query({
+            type: "path",
+            link: decodeURIComponent(path)
+          });
+        } else window.open(url, "_blank");
       },
       getLinkData: async (url) => {
         const link = parseInternalLink(url);
