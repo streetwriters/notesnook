@@ -45,12 +45,15 @@ import { DefaultAppStyles } from "../../../utils/styles";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
-import Input from "../../ui/input";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { useAsync } from "react-async-hook";
 import { eMenuItemUpdate } from "../../../utils/events";
 import { useIsFeatureAvailable } from "@notesnook/common";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../ui/input/form-input";
 
 async function fetchMonographData(noteId: string) {
   const monographId = db.monographs.monograph(noteId);
@@ -76,26 +79,31 @@ const PublishNoteSheet = ({
   const isFeatureAvailable = useIsFeatureAvailable("monographAnalytics");
   const [isLocked, setIsLocked] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const customTitle = useRef<string>("");
   const pwdInput = useRef<TextInput>(null);
   const titleInput = useRef<TextInput>(null);
-  const passwordValue = useRef<string>(undefined);
   const monographData = useAsync(async () => {
     return fetchMonographData(note?.id);
   }, []);
   const monograph = monographData.result?.monograph;
-  customTitle.current = monograph?.title || note.title || "";
   const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
   const isPublished = db.monographs.monograph(note?.id);
+
+  const formRef = useRef(
+    createFormRef({
+      title: monograph?.title || note.title || "",
+      password: ""
+    })
+  );
 
   useEffect(() => {
     (async () => {
       if (monograph) {
         setSelfDestruct(!!monograph?.selfDestruct);
         if (monograph.password) {
-          passwordValue.current = await db.monographs.decryptPassword(
+          const password = await db.monographs.decryptPassword(
             monograph?.password
           );
+          formRef.current.setValue("password", password);
           setIsLocked(!!monograph?.password);
         }
       }
@@ -104,25 +112,20 @@ const PublishNoteSheet = ({
 
   const publishNote = async () => {
     if (publishing) return;
+    formRef.current.clearErrors();
+
+    if (!formRef.current.validate()) return;
+
+    const values = formRef.current.getValues();
+
     setPublishLoading(true);
 
     try {
       if (note?.id) {
-        if (isLocked && !passwordValue.current?.trim()) {
-          ToastManager.show({
-            heading: strings.passwordRequired(),
-            message: strings.enterPassword(),
-            type: "error",
-            context: "local"
-          });
-          return;
-        }
-
-        await db.monographs.publish(note.id, customTitle.current, {
+        await db.monographs.publish(note.id, values.title, {
           selfDestruct,
-          password: isLocked ? passwordValue.current : undefined
+          password: isLocked ? values.password : undefined
         });
-
         await monographData.execute();
         Navigation.queueRoutesForUpdate();
         eSendEvent(eMenuItemUpdate);
@@ -255,11 +258,12 @@ const PublishNoteSheet = ({
             </TouchableOpacity>
           ) : null}
 
-          <Input
+          <FormInput
+            name="title"
+            formRef={formRef}
             fwdRef={titleInput}
-            onChangeText={(value) => (customTitle.current = value)}
-            defaultValue={customTitle.current}
             placeholder={strings.noteTitle()}
+            validators={[validators.required(strings.titleIsRequired())]}
           />
 
           <TouchableOpacity
@@ -306,13 +310,18 @@ const PublishNoteSheet = ({
 
               {isLocked ? (
                 <>
-                  <Input
+                  <FormInput
+                    name="password"
+                    formRef={formRef}
                     fwdRef={pwdInput}
-                    onChangeText={(value) => (passwordValue.current = value)}
                     blurOnSubmit
                     secureTextEntry
-                    defaultValue={passwordValue.current}
                     placeholder={strings.enterPassword()}
+                    validators={
+                      isLocked
+                        ? [validators.required(strings.passwordRequired())]
+                        : []
+                    }
                     containerStyle={{
                       marginTop: DefaultAppStyles.GAP_VERTICAL
                     }}
