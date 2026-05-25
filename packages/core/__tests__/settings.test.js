@@ -48,44 +48,28 @@ test("save trash cleanup interval", () =>
     expect(db.settings.getTrashCleanupInterval()).toBe(interval);
   }));
 
-test("get notebook group options", () =>
-  databaseTest().then(async (db) => {
-    const notebookId = "test-notebook-id";
-    const groupOptions = {
-      groupBy: "year",
-      sortBy: "title",
-      sortDirection: "asc"
-    };
-    await db.settings.setNotebookGroupOptions(notebookId, groupOptions);
-    expect(db.settings.getNotebookGroupOptions(notebookId)).toMatchObject(
-      groupOptions
-    );
-  }));
+const GROUP_OPTIONS_BY_ID_TESTS = ["notebook", "tag", "color"];
 
-test("get notebook group options fallback to notes options", () =>
-  databaseTest().then(async (db) => {
-    const notebookId = "non-existent-notebook-id";
-    const defaultNotesOptions = db.settings.getGroupOptions("notes");
-    const result = db.settings.getNotebookGroupOptions(notebookId);
-    expect(result).toMatchObject(defaultNotesOptions);
-  }));
+for (const type of GROUP_OPTIONS_BY_ID_TESTS) {
+  test(`get ${type} id group options`, () =>
+    databaseTest().then(async (db) => {
+      const id = `test-${type}-id`;
+      const groupOptions = {
+        groupBy: "year",
+        sortBy: "title",
+        sortDirection: "asc"
+      };
+      await db.settings.setGroupOptionsById(id, type, groupOptions);
+      expect(db.settings.getGroupOptionsById(id, type)).toMatchObject(
+        groupOptions
+      );
+    }));
 
-test("get tag group options", () =>
-  databaseTest().then(async (db) => {
-    const tagId = "test-tag-id";
-    const groupOptions = {
-      groupBy: "year",
-      sortBy: "title",
-      sortDirection: "asc"
-    };
-    await db.settings.setTagGroupOptions(tagId, groupOptions);
-    expect(db.settings.getTagGroupOptions(tagId)).toMatchObject(groupOptions);
-  }));
-
-test("get tag group options fallback to notes options", () =>
-  databaseTest().then(async (db) => {
-    const tagId = "non-existent-tag-id";
-    const defaultTagsOptions = db.settings.getGroupOptions("notes");
-    const result = db.settings.getTagGroupOptions(tagId);
-    expect(result).toMatchObject(defaultTagsOptions);
-  }));
+  test(`get ${type} id group options fallback to notes group options`, () =>
+    databaseTest().then(async (db) => {
+      const id = `non-existent-${type}-id`;
+      const defaultOptions = db.settings.getGroupOptions("notes");
+      const result = db.settings.getGroupOptionsById(id, type);
+      expect(result).toMatchObject(defaultOptions);
+    }));
+}
