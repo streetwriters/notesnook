@@ -41,7 +41,6 @@ jobs:
       - name: Setup iOS Platform
         run: |
           xcodebuild -downloadPlatform iOS -exportPath ~/Downloads
-          iphonesimulator_26.1_23B86.dmg
           xcodebuild -importplatform ~/Downloads/iphonesimulator_26.1_23B86.dmg
 
       - name: Install node modules
