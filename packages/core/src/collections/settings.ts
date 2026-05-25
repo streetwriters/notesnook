@@ -32,7 +32,8 @@ import {
   TrashCleanupInterval,
   TimeFormat,
   DayFormat,
-  WeekFormat
+  WeekFormat,
+  GroupingByIdKey
 } from "../types.js";
 import { ICollection } from "./collection.js";
 import { SQLCachedCollection } from "../database/sql-cached-collection.js";
@@ -66,6 +67,7 @@ const defaultSettings: SettingItemMap = {
 
   "groupOptions:notes:notebooks": {},
   "groupOptions:notes:tags": {},
+  "groupOptions:notes:colors": {},
   "groupOptions:trash": DEFAULT_GROUP_OPTIONS("trash"),
   "groupOptions:tags": DEFAULT_GROUP_OPTIONS("tags"),
   "groupOptions:notes": DEFAULT_GROUP_OPTIONS("notes"),
@@ -152,29 +154,32 @@ export class Settings implements ICollection {
     return this.set(`groupOptions:${key}`, groupOptions);
   }
 
-  getNotebookGroupOptions(notebookId: string) {
-    const notebookOptions = this.get("groupOptions:notes:notebooks");
-    return notebookOptions[notebookId] || this.get("groupOptions:notes");
-  }
-
-  async setNotebookGroupOptions(
-    notebookId: string,
+  async setGroupOptionsById(
+    id: string,
+    type: GroupingByIdKey,
     groupOptions: GroupOptions
   ) {
-    const notebookOptions = this.get("groupOptions:notes:notebooks");
-    notebookOptions[notebookId] = groupOptions;
-    return this.set("groupOptions:notes:notebooks", notebookOptions);
+    const groupOptionsKey =
+      type === "notebook"
+        ? "groupOptions:notes:notebooks"
+        : type === "tag"
+        ? "groupOptions:notes:tags"
+        : "groupOptions:notes:colors";
+
+    const groupOptionsMap = this.get(groupOptionsKey);
+    groupOptionsMap[id] = groupOptions;
+    return this.set(groupOptionsKey, groupOptionsMap);
   }
 
-  getTagGroupOptions(tagId: string) {
-    const tagOptions = this.get("groupOptions:notes:tags");
-    return tagOptions[tagId] || this.get("groupOptions:notes");
-  }
-
-  async setTagGroupOptions(tagId: string, groupOptions: GroupOptions) {
-    const tagOptions = this.get("groupOptions:notes:tags");
-    tagOptions[tagId] = groupOptions;
-    return this.set("groupOptions:notes:tags", tagOptions);
+  getGroupOptionsById(id: string, type: GroupingByIdKey) {
+    const groupOptions = this.get(
+      type === "notebook"
+        ? "groupOptions:notes:notebooks"
+        : type === "tag"
+        ? "groupOptions:notes:tags"
+        : "groupOptions:notes:colors"
+    );
+    return groupOptions[id] || this.get("groupOptions:notes");
   }
 
   setToolbarConfig(platform: ToolbarConfigPlatforms, config: ToolbarConfig) {

@@ -57,6 +57,7 @@ export const GroupingKey = [
   "search"
 ] as const;
 export type GroupingKey = (typeof GroupingKey)[number];
+export type GroupingByIdKey = "notebook" | "tag" | "color";
 
 export type ValueOf<T> = T[keyof T];
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
@@ -487,7 +488,9 @@ export type SettingItemMap = {
   profile: Profile | undefined;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<
-    `groupOptions:notes:notebooks` | `groupOptions:notes:tags`,
+    | `groupOptions:notes:notebooks`
+    | `groupOptions:notes:tags`
+    | `groupOptions:notes:colors`,
     Record<string, GroupOptions>
   > &
   Record<`toolbarConfig:${ToolbarConfigPlatforms}`, ToolbarConfig | undefined> &
