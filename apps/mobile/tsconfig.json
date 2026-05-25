@@ -24,5 +24,13 @@
       ]
     }
   },
-  "exclude": ["e2e", "android", "ios", "node_modules", "patches", "fonts"]
+  "exclude": [
+    "e2e",
+    "android",
+    "ios",
+    "node_modules",
+    "patches",
+    "fonts",
+    "./worker.js"
+  ]
 }
