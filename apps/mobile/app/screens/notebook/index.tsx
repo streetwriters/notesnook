@@ -41,6 +41,7 @@ import { View } from "react-native";
 import { Notebooks } from "../../components/sheets/notebooks";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { rootNavigatorRef } from "../../utils/global-refs";
+import { getGroupOptions } from "../../hooks/use-group-options";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -120,7 +121,9 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
           params.current.id = notebook.id;
           const notes = await db.relations
             .from(notebook, "note")
-            .selector.grouped(db.settings.getGroupOptions("notes"));
+            .selector.grouped(
+              getGroupOptions("notes", notebook.id, "notebook")
+            );
           setNotes(notes);
           await notes.item(0, resolveItems);
           syncWithNavigation();
@@ -190,6 +193,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
             onRequestUpdate();
           }}
           id={params.current?.id}
+          type="notebook"
           renderedInRoute="Notebook"
           headerTitle={notebook?.title}
           loading={loading}

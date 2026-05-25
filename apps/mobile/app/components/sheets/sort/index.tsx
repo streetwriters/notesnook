@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  GroupingByIdKey,
   GroupingKey,
   GroupOptions,
   ItemType,
@@ -27,7 +28,10 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
 import { View } from "react-native";
-import { db } from "../../../common/database";
+import {
+  getGroupOptions,
+  setGroupOptionsById
+} from "../../../hooks/use-group-options";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { RouteName } from "../../../stores/use-navigation-store";
@@ -43,20 +47,24 @@ import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 const Sort = ({
-  type,
+  dataType,
   screen,
   hideGroupOptions,
-  group: groupType
+  group: groupType,
+  groupId,
+  type
 }: {
-  type: ItemType;
+  dataType: ItemType;
+  type?: GroupingByIdKey;
   screen?: RouteName;
   group: GroupingKey;
   hideGroupOptions?: boolean;
+  groupId?: string;
 }) => {
   const { colors } = useThemeColors();
 
   const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(groupType)
+    getGroupOptions(groupType, groupId, type)
   );
 
   const getSortButtonTitle = () => {
@@ -79,16 +87,17 @@ const Sort = ({
   };
 
   const updateGroupOptions = async (_groupOptions: GroupOptions) => {
-    await db.settings.setGroupOptions(groupType, _groupOptions);
+    console.log(groupId, type);
+    setGroupOptionsById(groupType, _groupOptions, groupId, type);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen) Navigation.queueRoutesForUpdate(screen);
-      if (type === "notebook") {
+      if (dataType === "notebook") {
         useNotebookStore.getState().refresh();
-      } else if (type === "tag") {
+      } else if (dataType === "tag") {
         useTagStore.getState().refresh();
       }
-      eSendEvent(eGroupOptionsUpdated, groupType);
+      eSendEvent(eGroupOptionsUpdated, groupType, groupId, type);
       eSendEvent(refreshNotesPage);
     }, 1);
   };

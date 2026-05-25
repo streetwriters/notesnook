@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   GroupHeader,
+  GroupingByIdKey,
   GroupingKey,
   GroupOptions,
   ItemType
@@ -46,6 +47,8 @@ type SectionHeaderProps = {
   screen?: RouteName;
   groupOptions: GroupOptions;
   group: GroupingKey;
+  groupId?: string;
+  type?: GroupingByIdKey;
   onOpenJumpToDialog: () => void;
   itemCount?: number;
 };
@@ -62,7 +65,9 @@ export const SectionHeader = React.memo<
     groupOptions,
     group,
     onOpenJumpToDialog,
-    itemCount
+    itemCount,
+    groupId,
+    type
   }: SectionHeaderProps) {
     const { colors } = useThemeColors();
     const isCompactModeEnabled = useIsCompactModeEnabled(
@@ -143,8 +148,10 @@ export const SectionHeader = React.memo<
                       component: (
                         <Sort
                           screen={screen}
-                          type={dataType}
+                          dataType={dataType}
+                          type={type}
                           group={group}
+                          groupId={groupId}
                           hideGroupOptions={
                             screen === "Reminders" || screen === "Search"
                           }
