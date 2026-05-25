@@ -201,10 +201,10 @@ function getGroupOptions(
 ): GroupOptions {
   return isSearching
     ? db.settings.getGroupOptions("search")
-    : context?.type === "notebook"
-    ? db.settings.getNotebookGroupOptions(context.id)
-    : context?.type === "tag"
-    ? db.settings.getTagGroupOptions(context.id)
+    : context?.type === "notebook" ||
+      context?.type === "tag" ||
+      context?.type === "color"
+    ? db.settings.getGroupOptionsById(context.id, context.type)
     : db.settings.getGroupOptions(groupingKey);
 }
 
@@ -212,10 +212,16 @@ async function setGroupOptions(
   options: GroupingMenuOptions,
   groupOptions: GroupOptions
 ) {
-  if (options.context?.type === "notebook") {
-    await db.settings.setNotebookGroupOptions(options.context.id, groupOptions);
-  } else if (options.context?.type === "tag") {
-    await db.settings.setTagGroupOptions(options.context.id, groupOptions);
+  if (
+    options.context?.type === "notebook" ||
+    options.context?.type === "tag" ||
+    options.context?.type === "color"
+  ) {
+    await db.settings.setGroupOptionsById(
+      options.context.id,
+      options.context.type,
+      groupOptions
+    );
   } else {
     await db.settings.setGroupOptions(options.groupingKey, groupOptions);
   }

@@ -58,10 +58,10 @@ class NoteStore extends BaseStore<NoteStore> {
 
   setContext = async (context?: Context) => {
     const groupOptions =
-      context?.type === "notebook"
-        ? db.settings.getNotebookGroupOptions(context.id)
-        : context?.type === "tag"
-        ? db.settings.getTagGroupOptions(context.id)
+      context?.type === "notebook" ||
+      context?.type === "tag" ||
+      context?.type === "color"
+        ? db.settings.getGroupOptionsById(context.id, context.type)
         : db.settings.getGroupOptions(
             context?.type === "favorite"
               ? "favorites"
