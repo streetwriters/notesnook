@@ -317,11 +317,9 @@ const PublishNoteSheet = ({
                     blurOnSubmit
                     secureTextEntry
                     placeholder={strings.enterPassword()}
-                    validators={
-                      isLocked
-                        ? [validators.required(strings.passwordRequired())]
-                        : []
-                    }
+                    validators={[
+                      validators.required(strings.passwordRequired())
+                    ]}
                     containerStyle={{
                       marginTop: DefaultAppStyles.GAP_VERTICAL
                     }}
