@@ -37,7 +37,7 @@ test("ask for image compression during image upload when 'Image Compression' set
   await notes.createNote(NOTE);
   await notes.editor.attachImage();
 
-  await expect(page.getByText("Enable compression")).toBeVisible();
+  await expect(page.getByText("Image Compression")).toBeVisible();
 });
 
 test("do not ask for image compression during image upload when 'Image Compression' setting is 'Enable (Recommended)'", async ({

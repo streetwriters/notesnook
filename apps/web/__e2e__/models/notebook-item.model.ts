@@ -72,19 +72,25 @@ export class NotebookItemModel extends BaseItemModel {
 
   async pin() {
     await this.contextMenu.open(this.locator);
-    await new ToggleModel(this.page, "menu-button-pin").on();
+    await new ToggleModel(
+      this.page,
+      this.page.locator(getTestId("menu-button-pin"))
+    ).on();
   }
 
   async unpin() {
     await this.contextMenu.open(this.locator);
-    await new ToggleModel(this.page, "menu-button-pin").off();
+    await new ToggleModel(
+      this.page,
+      this.page.locator(getTestId("menu-button-pin"))
+    ).off();
   }
 
   async isPinned() {
     await this.contextMenu.open(this.locator);
     const state = await new ToggleModel(
       this.page,
-      "menu-button-pin"
+      this.page.locator(getTestId("menu-button-pin"))
     ).isToggled();
     await this.contextMenu.close();
     return state;
@@ -111,7 +117,10 @@ export class NotebookItemModel extends BaseItemModel {
 
   async setAsDefault() {
     await this.contextMenu.open(this.locator);
-    await new ToggleModel(this.page, "menu-button-set-as-default").on();
+    await new ToggleModel(
+      this.page,
+      this.page.locator(getTestId("menu-button-set-as-default"))
+    ).on();
   }
 
   async isMoveToTopVisible() {

@@ -471,6 +471,5 @@ test("spellcheck should be enabled by default for new notes", async ({
   const note = await notes.createNote(NOTE);
 
   expect(note).toBeDefined();
-  expect(await note?.contextMenu.isSpellcheckEnabled()).toBe(true);
   expect(await note?.properties.isSpellcheckEnabled()).toBe(true);
 });

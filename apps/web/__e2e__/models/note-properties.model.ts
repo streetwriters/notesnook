@@ -49,11 +49,26 @@ abstract class BaseProperties {
     private readonly itemPrefix: string
   ) {
     this.page = page;
-    this.pinToggle = new ToggleModel(page, `${itemPrefix}-pin`);
-    this.lockToggle = new ToggleModel(page, `${itemPrefix}-lock`);
-    this.favoriteToggle = new ToggleModel(page, `${itemPrefix}-favorite`);
-    this.archiveToggle = new ToggleModel(page, `${itemPrefix}-archive`);
-    this.spellcheckToggle = new ToggleModel(page, `${itemPrefix}-spellcheck`);
+    this.pinToggle = new ToggleModel(
+      page,
+      page.locator(getTestId(`${itemPrefix}-pin`))
+    );
+    this.lockToggle = new ToggleModel(
+      page,
+      page.locator(getTestId(`${itemPrefix}-lock`))
+    );
+    this.favoriteToggle = new ToggleModel(
+      page,
+      page.locator(getTestId(`${itemPrefix}-favorite`))
+    );
+    this.archiveToggle = new ToggleModel(
+      page,
+      page.locator(getTestId(`${itemPrefix}-archive`))
+    );
+    this.spellcheckToggle = new ToggleModel(
+      page,
+      page.locator(getTestId(`${itemPrefix}-spellcheck`))
+    );
   }
 
   async isPinned() {
@@ -175,7 +190,10 @@ export class NotePropertiesModel extends BaseProperties {
     super(page, noteLocator, "properties");
     this.propertiesButton = page.locator(getTestId("Properties"));
     this.generalSection = page.locator(getTestId("general-section"));
-    this.readonlyToggle = new ToggleModel(page, `properties-readonly`);
+    this.readonlyToggle = new ToggleModel(
+      page,
+      page.locator(getTestId(`properties-readonly`))
+    );
     this.sessionItems = page.locator(getTestId("session-item"));
   }
 
@@ -183,7 +201,7 @@ export class NotePropertiesModel extends BaseProperties {
     await this.open();
     const state = await new ToggleModel(
       this.page,
-      `properties-${color}`
+      this.page.locator(getTestId(`properties-${color}`))
     ).isToggled();
     await this.close();
     return state;
@@ -191,7 +209,10 @@ export class NotePropertiesModel extends BaseProperties {
 
   async color(color: string) {
     await this.open();
-    await new ToggleModel(this.page, `properties-${color}`).on();
+    await new ToggleModel(
+      this.page,
+      this.page.locator(getTestId(`properties-${color}`))
+    ).on();
     await this.close();
   }
 
@@ -288,7 +309,7 @@ export class NoteContextMenuModel extends BaseProperties {
     await this.menu.clickOnItem("colors");
     const state = await new ToggleModel(
       this.page,
-      `menu-button-${color}`
+      this.menu.getItemByText(color)
     ).isToggled();
     await this.close();
     return state;
@@ -297,21 +318,25 @@ export class NoteContextMenuModel extends BaseProperties {
   async color(color: string) {
     await this.open();
     await this.menu.clickOnItem("colors");
-    await new ToggleModel(this.page, `menu-button-${color}`).on();
+    await new ToggleModel(this.page, this.menu.getItemByText(color)).on();
     await this.close();
   }
 
   async uncolor(color: string) {
     await this.open();
     await this.menu.clickOnItem("colors");
-    await new ToggleModel(this.page, `menu-button-${color}`).off();
+    await new ToggleModel(this.page, this.menu.getItemByText(color)).off();
     await this.close();
   }
 
   async newColor(color: Color) {
     await this.open();
     await this.menu.clickOnItem("colors");
-    await new ToggleModel(this.page, `menu-button-new-color`).on();
+    // await new ToggleModel(
+    //   this.page,
+    //   this.page.locator(getTestId(`menu-button-new-color`))
+    // ).on();
+    await this.menu.getItemByText("add color").click();
     await fillColorDialog(this.page, color);
   }
 
