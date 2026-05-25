@@ -36,7 +36,13 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "26.4.1"
+          xcode-version: "26.1.1"
+
+      - name: Setup iOS Platform
+        run: |
+          xcodebuild -downloadPlatform iOS -exportPath ~/Downloads
+          iphonesimulator_26.1_23B86.dmg
+          xcodebuild -importplatform ~/Downloads/iphonesimulator_26.1_23B86.dmg
 
       - name: Install node modules
         run: |
