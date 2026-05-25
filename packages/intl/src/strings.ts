@@ -2697,5 +2697,5 @@ Continue without attachments?`,
   maximumReminderDate: (maxDate: string) =>
     t`Maximum reminder date is ${maxDate}`,
   invalidThemeFileFormat: () =>
-    t`We couldn't load this theme. Please make sure the file is a valid theme export.`
+    t`We couldn't load this theme. Please make sure the file is a valid JSON theme file.`
 };

@@ -63,6 +63,7 @@ import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/menu-items";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { openLinkInBrowser } from "../../utils/functions";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -448,7 +449,13 @@ function ThemeSelector() {
                     ToastManager.show({
                       heading: strings.invalidThemeFileFormat(),
                       type: "error",
-                      context: "global"
+                      context: "global",
+                      actionText: strings.learnMore(),
+                      func: () => {
+                        openLinkInBrowser(
+                          "https://help.notesnook.com/custom-themes/introduction"
+                        );
+                      }
                     });
                     return;
                   }
