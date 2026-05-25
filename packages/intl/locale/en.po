@@ -2767,6 +2767,18 @@ msgstr "Experience the next level of private note taking\""
 msgid "Expiry date"
 msgstr "Expiry date"
 
+#: src/strings.ts:2692
+msgid "Expiry date cannot be more than 1 year in the future"
+msgstr "Expiry date cannot be more than 1 year in the future"
+
+#: src/strings.ts:2690
+msgid "Expiry date must be in the future"
+msgstr "Expiry date must be in the future"
+
+#: src/strings.ts:2693
+msgid "Expiry date set"
+msgstr "Expiry date set"
+
 #: src/strings.ts:2550
 msgid "Explore all plans"
 msgstr "Explore all plans"
