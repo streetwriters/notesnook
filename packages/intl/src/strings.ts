@@ -813,7 +813,6 @@ $day$: Current day (eg. Monday)`,
   vaultCreated: () => t`Vault created`,
   noteUnlocked: () => t`Note unlocked`,
   noteCopied: () => t`Note copied to clipboard`,
-  noteDuplicated: () => t`Note duplicated`,
   introData: [
     {
       headings: [
@@ -2693,5 +2692,6 @@ Continue without attachments?`,
     t`Expiry date cannot be more than 1 year in the future`,
   expiryDateSet: () => t`Expiry date set`,
   creationDateCannotBeAfterLastEditedDate: () =>
-    t`Creation date cannot be after last edited date`
+    t`Creation date cannot be after last edited date`,
+  noteDuplicated: () => t`Note duplicated`
 };
