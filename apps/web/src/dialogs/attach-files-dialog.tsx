@@ -36,6 +36,7 @@ import {
   File as FileIcon,
   CloseCircle
 } from "../components/icons";
+import { compressImage } from "../utils/image-compressor";
 
 type FileStatus = "pending" | "compressing" | "encrypting" | "done" | "error";
 
@@ -45,6 +46,7 @@ type FileState = {
   progress: number;
   error?: string;
   compress: boolean;
+  compressedFile?: File;
 };
 
 type AttachFilesDialogProps = BaseDialogProps<false> & {
@@ -79,7 +81,57 @@ export const AttachFilesDialog = DialogManager.register(
       hasImages &&
         imageCompressionConfig === ImageCompressionOptions.ASK_EVERY_TIME
     );
+    const [isCompressionComplete, setIsCompresionComplete] = useState(false);
     const processingRef = useRef(false);
+
+    async function compress(index: number, state: FileState) {
+      if (state.compressedFile) return;
+      if (!state.compress) return;
+
+      setFileStates((prev) =>
+        prev.map((s, idx) =>
+          idx === index ? { ...s, status: "compressing" } : s
+        )
+      );
+
+      try {
+        const compressed = await compressImage(state.file, {
+          maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
+          width: (naturalWidth) => naturalWidth,
+          height: (_, naturalHeight) => naturalHeight,
+          resize: "contain",
+          quality: 0.7
+        });
+        const compressedFile = new File([compressed], state.file.name, {
+          lastModified: state.file.lastModified,
+          type: state.file.type
+        });
+        setFileStates((prev) =>
+          prev.map((s, idx) =>
+            idx === index
+              ? {
+                  ...s,
+                  status: "pending",
+                  compressedFile
+                }
+              : s
+          )
+        );
+      } catch (e) {
+        const error = (e as Error).message || strings.compressionFailed();
+        setFileStates((prev) =>
+          prev.map((s, idx) =>
+            idx === index
+              ? {
+                  ...s,
+                  status: "error",
+                  error
+                }
+              : s
+          )
+        );
+      }
+    }
 
     useEffect(() => {
       const event = AppEventManager.subscribe(
@@ -108,32 +160,46 @@ export const AttachFilesDialog = DialogManager.register(
     }, []);
 
     useEffect(() => {
-      if (showCompressionPrompt || processingRef.current) return;
+      (async () => {
+        await Promise.all(
+          fileStates.map(async (state, index) => {
+            await compress(index, state);
+          })
+        );
+        setIsCompresionComplete(true);
+      })();
+    }, []);
+
+    useEffect(() => {
+      if (
+        !isCompressionComplete ||
+        showCompressionPrompt ||
+        processingRef.current
+      ) {
+        return;
+      }
 
       processingRef.current = true;
 
-      const shouldCompress: boolean[] = fileStates.map((s) => !!s.compress);
-
       (async () => {
         const attachments: Attachment[] = [];
-        let hasError = false;
+        let hasError = fileStates.some((s) => s.status === "error");
+        const validIndices = fileStates
+          .map((s, i) => (s.status === "error" ? -1 : i))
+          .filter((i) => i !== -1);
+        const filesToAttach = validIndices.map((i) => {
+          const state = fileStates[i];
+          return state.compress && state.compressedFile
+            ? state.compressedFile
+            : state.file;
+        });
 
         for await (const message of attachFiles(
-          files,
-          shouldCompress,
+          filesToAttach,
           skipSpecialImageHandling
         )) {
-          const { index } = message;
+          const index = validIndices[message.index];
           switch (message.type) {
-            case "compressing":
-              setFileStates((prev) =>
-                prev.map((s, i) =>
-                  i === index
-                    ? { ...s, status: "compressing" as FileStatus }
-                    : s
-                )
-              );
-              break;
             case "encrypting":
               setFileStates((prev) =>
                 prev.map((s, i) =>
@@ -176,7 +242,7 @@ export const AttachFilesDialog = DialogManager.register(
         onDone(attachments);
         if (files.length === 1 && !hasError) onClose(false);
       })();
-    }, [showCompressionPrompt]);
+    }, [showCompressionPrompt, isCompressionComplete]);
 
     return (
       <Dialog
@@ -250,11 +316,12 @@ function FileRow({
   showCompressionToggle?: boolean;
   onToggleCompress?: () => void;
 }) {
-  const { file, status, progress, error, compress } = state;
+  const { file, status, progress, error, compress, compressedFile } = state;
   const isImage = file.type.startsWith("image/");
+  const activeFile = compress && compressedFile ? compressedFile : file;
   const thumbnail = useMemo(
-    () => (isImage ? URL.createObjectURL(file) : undefined),
-    [file, isImage]
+    () => (isImage ? URL.createObjectURL(activeFile) : undefined),
+    [activeFile, isImage]
   );
 
   useEffect(() => {
@@ -309,10 +376,10 @@ function FileRow({
             whiteSpace: "nowrap"
           }}
         >
-          {file.name}
+          {activeFile.name}
         </Text>
         <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-          {formatBytes(file.size)}
+          {formatBytes(activeFile.size)}
           {status === "compressing"
             ? ` — ${strings.compressing()}...`
             : status === "encrypting"
@@ -324,7 +391,9 @@ function FileRow({
       </Flex>
 
       <Flex sx={{ flexShrink: 0, alignItems: "center" }}>
-        {showCompressionToggle && isImage ? (
+        {status === "error" ? (
+          <CloseCircle size={20} color="accent-error" />
+        ) : showCompressionToggle && isImage ? (
           <Switch
             sx={{
               m: 0,
@@ -334,6 +403,7 @@ function FileRow({
             }}
             checked={compress}
             onChange={onToggleCompress}
+            disabled={status === "compressing"}
           />
         ) : showCompressionToggle && !isImage ? (
           <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
@@ -341,8 +411,6 @@ function FileRow({
           </Text>
         ) : status === "done" ? (
           <CheckCircle size={20} color="accent" />
-        ) : status === "error" ? (
-          <CloseCircle size={20} color="accent-error" />
         ) : status === "encrypting" || status === "compressing" ? (
           <Flex sx={{ alignItems: "center", gap: 1 }}>
             <Box
