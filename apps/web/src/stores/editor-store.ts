@@ -837,6 +837,12 @@ class EditorStore extends BaseStore<EditorStore> {
             options
           );
         } else {
+          const currentSession = getSession(sessionId, ["default", "new"]);
+          console.log("session.content.data in openSession", {
+            rawContent: options.rawContent,
+            contentDb: content,
+            sessionContent: currentSession?.content?.data
+          });
           this.addSession(
             {
               type: "default",
@@ -850,7 +856,8 @@ class EditorStore extends BaseStore<EditorStore> {
               content:
                 options.rawContent && content
                   ? { ...content, data: options.rawContent }
-                  : content,
+                  : // : content,
+                    currentSession?.content || content,
               activeBlockId: options.activeBlockId,
               activeSearchResultId: options.activeSearchResultId,
               tabId
