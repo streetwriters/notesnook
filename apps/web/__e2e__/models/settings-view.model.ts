@@ -132,7 +132,6 @@ export class SettingsViewModel {
         .locator("select");
       await backupData.selectOption({ value: "partial", label: "Backup" });
       if (password) await fillPasswordDialog(this.page, password);
-      await waitForDialog(this.page, "Creating a backup");
     };
 
     if (IS_DESKTOP_TESTS) {
