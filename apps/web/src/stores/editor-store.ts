@@ -286,7 +286,8 @@ class EditorStore extends BaseStore<EditorStore> {
         const clearIds: string[] = [];
         for (const session of sessions) {
           if (session.type === "new") continue;
-          if (session.note.id !== item.id && session.note.contentId !== item.id) continue;
+          if (session.note.id !== item.id && session.note.contentId !== item.id)
+            continue;
           if (isDeleted(item) || isTrashItem(item))
             clearIds.push(session.tabId);
           // if a note becomes conflicted, reopen the session
@@ -329,6 +330,13 @@ class EditorStore extends BaseStore<EditorStore> {
             session.type === "readonly" &&
             item.type === "note" &&
             !item.readonly
+          )
+            openSession(session.note.id, { force: true, silent: true });
+          // if a note is made readonly, reopen the session
+          else if (
+            session.type !== "readonly" &&
+            item.type === "note" &&
+            item.readonly
           )
             openSession(session.note.id, { force: true, silent: true });
           // update the note in all sessions

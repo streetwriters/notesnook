@@ -25,6 +25,7 @@ import { ToolButton } from "../components/tool-button.js";
 import { Editor } from "../../types.js";
 import { useEditorSearchStore } from "../stores/search-store.js";
 import { strings } from "@notesnook/intl";
+import { inlineDebounce } from "@notesnook/common";
 
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {
@@ -94,7 +95,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               sx={{ p: 0, fontFamily: "monospace" }}
               value={searchTerm}
               onChange={(e) => {
-                search(e.target.value);
+                inlineDebounce("search", () => search(e.target.value), 100);
                 useEditorSearchStore.setState({ searchTerm: e.target.value });
               }}
               onKeyDown={(e) => {

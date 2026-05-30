@@ -404,7 +404,9 @@ class UserManager {
     const masterKey = await this.getMasterKey();
     if (!masterKey) return;
 
-    const dataEncryptionKey = await this.keyManager.get("dataEncryptionKey");
+    const dataEncryptionKey = await this.keyManager.get("dataEncryptionKey", {
+      refetchUser: false
+    });
     if (!dataEncryptionKey)
       return [
         {
@@ -415,7 +417,10 @@ class UserManager {
     const keys: { version: KeyVersion; key: SerializedKey }[] = [];
 
     const legacyDataEncryptionKey = await this.keyManager.get(
-      "legacyDataEncryptionKey"
+      "legacyDataEncryptionKey",
+      {
+        refetchUser: false
+      }
     );
     if (legacyDataEncryptionKey)
       keys.push({
