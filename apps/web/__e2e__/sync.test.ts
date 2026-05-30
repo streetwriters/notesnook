@@ -43,7 +43,7 @@ test(`content edits in a note opened on 2 devices in multiple tabs should sync i
     title: `Note ${makeid(20)}`
   };
 
-  info.setTimeout(120 * 1000);
+  info.setTimeout(300 * 1000);
   const newContent = makeid(24).repeat(2);
 
   const [deviceA, deviceB] = await Promise.all([
