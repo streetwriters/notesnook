@@ -45,11 +45,11 @@ import ExportNotesSheet from "../components/sheets/export-notes";
 import PaywallSheet from "../components/sheets/paywall";
 import PublishNoteSheet from "../components/sheets/publish-note";
 import { ReferencesList } from "../components/sheets/references";
-import { RelationsList } from "../components/sheets/relations-list/index";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
 import AddReminder from "../screens/add-reminder";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
+import RelationsList from "../screens/relations-list";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -1047,8 +1047,9 @@ export const useActions = ({
         title: strings.dataTypesPluralCamelCase.reminder(),
         icon: "clock-outline",
         onPress: async () => {
+          close();
           RelationsList.present({
-            reference: item,
+            item,
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
@@ -1065,26 +1066,6 @@ export const useActions = ({
               }
               AddReminder.present(undefined, item);
               close();
-            },
-            button: {
-              type: "plain",
-              onPress: async () => {
-                if (features && !features.activeReminders.isAllowed) {
-                  ToastManager.show({
-                    type: "info",
-                    message: features.activeReminders.error,
-                    actionText: strings.upgrade(),
-                    func: () => {
-                      PaywallSheet.present(features.activeReminders);
-                    }
-                  });
-                  return;
-                }
-                AddReminder.present(undefined, item);
-                close();
-              },
-              icon: "plus",
-              iconSize: 20
             }
           });
         },

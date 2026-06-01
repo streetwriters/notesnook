@@ -46,7 +46,6 @@ import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
 import LinkNote from "../../../components/sheets/link-note";
 import PaywallSheet from "../../../components/sheets/paywall";
-import { RelationsList } from "../../../components/sheets/relations-list";
 import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
 import {
@@ -80,6 +79,7 @@ import { fluidTabsRef } from "../../../utils/global-refs";
 import { sleep } from "../../../utils/time";
 import AddReminder from "../../add-reminder";
 import ManageTags from "../../manage-tags";
+import RelationsList from "../../relations-list";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
@@ -466,7 +466,7 @@ export const useEditorEvents = (
           const note = await db.notes.note(noteId);
           if (!note) return;
           RelationsList.present({
-            reference: note as any,
+            item: note as any,
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
