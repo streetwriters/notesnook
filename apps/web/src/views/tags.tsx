@@ -23,22 +23,30 @@ import Placeholder from "../components/placeholders";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { Flex, Input } from "@theme-ui/components";
-import { forwardRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
-import ScrollContainer from "../components/scroll-container";
-import { ScrollerProps } from "react-virtuoso";
 import { SidebarScroller } from "../components/sidebar-scroller";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
   const refresh = useStore((store) => store.refresh);
   const [filteredTags, setFilteredTags] = useState<VirtualizedGrouping<Tag>>();
+  const inputRef = useRef<HTMLInputElement>(null);
   const items = filteredTags || tags;
 
   useEffect(() => {
     store.refresh();
   }, []);
+
+  useEffect(() => {
+    const query = inputRef.current?.value.trim();
+    if (!query) return;
+
+    (async () => {
+      setFilteredTags(await db.lookup.tags(query).sorted());
+    })();
+  }, [tags]);
 
   if (!items) return <ListLoader />;
   return (
@@ -62,6 +70,7 @@ function Tags() {
         Scroller={SidebarScroller}
       />
       <Input
+        ref={inputRef}
         variant="clean"
         placeholder="Filter tags..."
         sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
