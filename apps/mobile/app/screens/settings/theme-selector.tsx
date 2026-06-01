@@ -466,6 +466,9 @@ function ThemeSelector() {
                   }
                   select(json, true);
                 } catch (e) {
+                  if ((e as Error).message.includes("Code=3072")) {
+                    return;
+                  }
                   ToastManager.error(e as Error);
                 }
               }}
