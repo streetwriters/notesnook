@@ -1183,7 +1183,7 @@ export const useActions = ({
         title: item.expiryDate?.value
           ? strings.unsetExpiry()
           : strings.setExpiry(),
-        icon: item.expiryDate.value ? "bomb-off" : "bomb",
+        icon: item.expiryDate?.value ? "bomb-off" : "bomb",
         locked: !features?.expiringNotes?.isAllowed,
         onPress: async () => {
           if (item.expiryDate?.value) {
