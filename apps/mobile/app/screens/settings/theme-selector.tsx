@@ -361,12 +361,14 @@ function ThemeSelector() {
           >
             <View
               style={{
-                flexDirection: "row"
+                flexDirection: "row",
+                gap: DefaultAppStyles.GAP_SMALL
               }}
             >
               <Button
                 style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 type={
                   colorScheme === "" || !colorScheme ? "accent" : "secondary"
@@ -379,7 +381,8 @@ function ThemeSelector() {
               />
               <Button
                 style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
                 title={strings.dark()}
@@ -390,7 +393,8 @@ function ThemeSelector() {
               />
               <Button
                 style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 fontSize={AppFontSize.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
@@ -404,7 +408,8 @@ function ThemeSelector() {
             <Button
               title={strings.loadFromFile()}
               style={{
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                paddingHorizontal: DefaultAppStyles.GAP_SMALL
               }}
               type={"secondaryAccented"}
               icon="folder"
