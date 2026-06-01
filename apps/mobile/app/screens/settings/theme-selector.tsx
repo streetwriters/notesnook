@@ -31,7 +31,11 @@ import type {
   ThemesRouter
 } from "@notesnook/themes-server";
 import { keepLocalCopy, pick } from "@react-native-documents/picker";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  notifyManager,
+  QueryClient,
+  QueryClientProvider
+} from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import React, { useState } from "react";
@@ -69,7 +73,8 @@ export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
     })
   ]
 });
-
+notifyManager.setBatchNotifyFunction((cb) => cb());
+notifyManager.setNotifyFunction((cb) => cb());
 function ThemeSelector() {
   const [darkTheme, lightTheme] = useThemeStore((state) => [
     state.darkTheme,
@@ -80,30 +85,20 @@ function ThemeSelector() {
   const themeColors = colors;
   const [searchQuery, setSearchQuery] = useState<string>();
   const [colorScheme, setColorScheme] = useState<string>();
+
+  const filters = [];
+  if (searchQuery) filters.push({ type: "term" as const, value: searchQuery });
+  if (colorScheme)
+    filters.push({ type: "colorScheme" as const, value: colorScheme });
+
   const themes = trpc.themes.useInfiniteQuery(
     {
       limit: 10,
       compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-      filters: [
-        ...(searchQuery && searchQuery !== ""
-          ? [
-              {
-                type: "term" as const,
-                value: searchQuery
-              }
-            ]
-          : []),
-        ...(colorScheme && colorScheme !== ""
-          ? [
-              {
-                type: "colorScheme" as const,
-                value: colorScheme
-              }
-            ]
-          : [])
-      ]
+      filters
     },
     {
+      keepPreviousData: true,
       getNextPageParam: (lastPage) => lastPage.nextCursor
     }
   );
