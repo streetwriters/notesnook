@@ -139,6 +139,7 @@ function Header({
 }): JSX.Element {
   const tab = useTabContext();
   const editor = editors[tab.id];
+  const tableOfContents = editorControllers[tab.id]?.getTableOfContents?.();
   const insets = useSafeArea();
   const openedTabsCount = useTabStore((state) => state.tabs.length);
   const [isOpen, setOpen] = useState(false);
@@ -147,6 +148,8 @@ function Header({
     state.canGoBack,
     state.canGoForward
   ]);
+
+  console.log(tableOfContents?.length);
 
   return (
     <div
@@ -496,26 +499,29 @@ function Header({
                 </span>
               </MenuItem>
 
-              <MenuItem
-                value="toc"
-                style={{
-                  display: "flex",
-                  gap: 10,
-                  alignItems: "center"
-                }}
-              >
-                <TableOfContentsIcon
-                  size={20 * settings.fontScale}
-                  color="var(--nn_primary_icon)"
-                />
-                <span
+              {tableOfContents?.length ? (
+                <MenuItem
+                  value="toc"
                   style={{
-                    color: "var(--nn_primary_paragraph)"
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "center"
                   }}
                 >
-                  {strings.toc()}
-                </span>
-              </MenuItem>
+                  <TableOfContentsIcon
+                    size={20 * settings.fontScale}
+                    color="var(--nn_primary_icon)"
+                  />
+                  <span
+                    style={{
+                      color: "var(--nn_primary_paragraph)"
+                    }}
+                  >
+                    {strings.toc()}
+                  </span>
+                </MenuItem>
+              ) : null}
+
               <MenuItem
                 value="scroll-top"
                 style={{
