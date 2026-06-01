@@ -432,33 +432,42 @@ export const settingsGroups: SettingSection[] = [
             hidden: () => Platform.OS !== "ios",
             modifer: async () => {
               if (Platform.OS === "android") return;
-              presentSheet({
-                title: strings.loadingSubscription(),
-                paragraph: strings.loadingSubscriptionDesc()
-              });
-              const subscriptions = await RNIap.getPurchaseHistory();
-              subscriptions.sort(
-                (a, b) => b.transactionDate - a.transactionDate
-              );
-              const currentSubscription = subscriptions[0];
-              presentSheet({
-                title: strings.notesnookPro(),
-                paragraph: strings.subscribedOnVerify(
-                  new Date(currentSubscription.transactionDate).toLocaleString()
-                ),
-                action: async () => {
-                  presentSheet({
-                    title: strings.verifySubscription(),
-                    paragraph: strings.subscriptionVerifyWait()
-                  });
-                  await PremiumService.subscriptions.verify(
-                    currentSubscription
-                  );
-                  eSendEvent(eCloseSheet);
-                },
-                icon: "information-outline",
-                actionText: strings.verify()
-              });
+              try {
+                presentSheet({
+                  title: strings.loadingSubscription(),
+                  paragraph: strings.loadingSubscriptionDesc(),
+                  progress: true
+                });
+                const subscriptions = await RNIap.getPurchaseHistory();
+                subscriptions.sort(
+                  (a, b) => b.transactionDate - a.transactionDate
+                );
+                const currentSubscription = subscriptions[0];
+                if (!currentSubscription)
+                  throw new Error("No subscription found.");
+                presentSheet({
+                  title: strings.notesnookPro(),
+                  paragraph: strings.subscribedOnVerify(
+                    new Date(
+                      currentSubscription.transactionDate
+                    ).toLocaleString()
+                  ),
+                  action: async () => {
+                    presentSheet({
+                      title: strings.verifySubscription(),
+                      paragraph: strings.subscriptionVerifyWait()
+                    });
+                    await PremiumService.subscriptions.verify(
+                      currentSubscription
+                    );
+                    eSendEvent(eCloseSheet);
+                  },
+                  icon: "information-outline",
+                  actionText: strings.verify()
+                });
+              } catch (e) {
+                eSendEvent(eCloseSheet);
+              }
             },
             description: strings.verifySubDesc()
           },
