@@ -429,7 +429,10 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "subscription-not-active",
             name: strings.subscriptionNotActivated(),
-            hidden: () => Platform.OS !== "ios",
+            useHook: () => useUserStore((state) => state.user),
+            hidden: (user) =>
+              Platform.OS !== "ios" ||
+              (user as User)?.subscription?.plan !== SubscriptionPlan.FREE,
             modifer: async () => {
               if (Platform.OS === "android") return;
               try {
@@ -443,8 +446,21 @@ export const settingsGroups: SettingSection[] = [
                   (a, b) => b.transactionDate - a.transactionDate
                 );
                 const currentSubscription = subscriptions[0];
-                if (!currentSubscription)
-                  throw new Error("No subscription found.");
+
+                if (
+                  !currentSubscription ||
+                  dayjs(currentSubscription.transactionDate).isBefore(
+                    dayjs().subtract(30, "day")
+                  )
+                ) {
+                  ToastManager.show({
+                    message: "No active subscription found",
+                    type: "info"
+                  });
+                  eSendEvent(eCloseSheet);
+                  return;
+                }
+
                 presentSheet({
                   title: strings.notesnookPro(),
                   paragraph: strings.subscribedOnVerify(
