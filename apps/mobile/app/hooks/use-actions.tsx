@@ -1128,8 +1128,9 @@ export const useActions = ({
         id: "add-reminder",
         title: strings.remindMe(),
         icon: "clock-plus-outline",
-        onPress: () => {
+        onPress: async () => {
           close();
+          await sleep(100);
           AddReminder.present(undefined, item);
         }
       },
