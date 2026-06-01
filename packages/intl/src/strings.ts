@@ -2690,5 +2690,7 @@ Continue without attachments?`,
   expiryDateMustBeInTheFuture: () => t`Expiry date must be in the future`,
   expiryDateCannotBeMoreThan1YearInTheFuture: () =>
     t`Expiry date cannot be more than 1 year in the future`,
-  expiryDateSet: () => t`Expiry date set`
+  expiryDateSet: () => t`Expiry date set`,
+  creationDateCannotBeAfterLastEditedDate: () =>
+    t`Creation date cannot be after last edited date`
 };

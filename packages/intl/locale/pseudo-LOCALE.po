@@ -1962,6 +1962,10 @@ msgstr ""
 msgid "Creating a{0} backup"
 msgstr ""
 
+#: src/strings.ts:2695
+msgid "Creation date cannot be after last edited date"
+msgstr ""
+
 #: src/strings.ts:2049
 msgid "Credentials"
 msgstr ""

@@ -1973,6 +1973,10 @@ msgstr "Created at"
 msgid "Creating a{0} backup"
 msgstr "Creating a{0} backup"
 
+#: src/strings.ts:2695
+msgid "Creation date cannot be after last edited date"
+msgstr "Creation date cannot be after last edited date"
+
 #: src/strings.ts:2049
 msgid "Credentials"
 msgstr "Credentials"
