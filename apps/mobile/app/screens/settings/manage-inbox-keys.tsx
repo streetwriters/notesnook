@@ -539,7 +539,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
               }}
             >
               <Paragraph
-                color={colors.static.white}
+                color={colors.static.red}
                 size={AppFontSize.xxs}
                 style={{ fontWeight: "bold" }}
               >
