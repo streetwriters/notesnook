@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { convertUrlToEmbedUrl } from "@social-embed/lib";
+import { convertUrlToEmbedUrl, isValidUrl } from "@social-embed/lib";
 import { Flex, Input, Text, Textarea } from "@theme-ui/components";
 import { useCallback, useState } from "react";
 import { InlineInput } from "../../components/inline-input/index.js";
@@ -97,8 +97,18 @@ export function EmbedPopup(props: EmbedPopupProps) {
             if (heightValue && !isNaN(parseInt(heightValue)))
               _height = parseInt(heightValue);
           }
+
+          if (!isValidUrl(src)) {
+            return setError("Please provide a valid url.");
+          }
+
           const convertedUrl = convertUrlToEmbedUrl(_src);
+          if (!convertedUrl && embedSource === "url") {
+            return setError("Please provide a valid embed url.");
+          }
+
           if (convertedUrl) _src = convertedUrl;
+
           if (_src.startsWith("javascript:")) {
             return setError("Embedding javascript code is not supported.");
           }
