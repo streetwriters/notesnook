@@ -77,7 +77,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
           text: strings.save(),
           onClick: async () => {
             try {
-              if (dateEdited && date.isAfter(dayjs(dateEdited))) {
+              if (dateEdited && date.isAfter(dayjs(dateEdited), "minute")) {
                 showToast(
                   "error",
                   strings.creationDateCannotBeAfterLastEditedDate()
