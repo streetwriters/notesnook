@@ -246,6 +246,7 @@ const ManageInboxKeys = () => {
             const result = await Storage.validatePGPKeyPair(keysEdited);
 
             if (!result.isValid) {
+              formRef.current.setError("publicKey", result.message);
               formRef.current.setError("privateKey", result.message);
               return;
             }
