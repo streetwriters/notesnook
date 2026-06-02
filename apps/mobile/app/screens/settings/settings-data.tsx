@@ -751,28 +751,35 @@ export const settingsGroups: SettingSection[] = [
             getter: (current) => current,
             modifer: async (current) => {
               if (current) {
-                presentDialog({
-                  title: strings.disableInboxAPI(),
-                  paragraph: strings.disableInboxAPIDesc(),
-                  positiveText: strings.disable(),
-                  positivePress: async () => {
-                    try {
-                      await db.inboxItemsHistory.deleteFailed();
-                      await db.user.discardInboxKeys();
-                      useSettingStore.setState({
-                        inboxEnabled: false
-                      });
-                      return true;
-                    } catch (e) {
-                      ToastManager.show({
-                        message: (e as Error).message,
-                        context: "local"
-                      });
-                      DatabaseLogger.error(e);
-                      return false;
+                return new Promise((resolve) => {
+                  presentDialog({
+                    title: strings.disableInboxAPI(),
+                    paragraph: strings.disableInboxAPIDesc(),
+                    positiveText: strings.disable(),
+                    onClose: () => {
+                      resolve();
+                    },
+                    positivePress: async () => {
+                      try {
+                        await db.inboxItemsHistory.deleteFailed();
+                        await db.user.discardInboxKeys();
+                        useSettingStore.setState({
+                          inboxEnabled: false
+                        });
+                        resolve();
+                        return true;
+                      } catch (e) {
+                        ToastManager.show({
+                          message: (e as Error).message,
+                          context: "local"
+                        });
+                        DatabaseLogger.error(e);
+                        return false;
+                      }
                     }
-                  }
+                  });
                 });
+
                 return;
               }
 
