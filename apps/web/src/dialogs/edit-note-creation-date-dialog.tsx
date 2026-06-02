@@ -65,6 +65,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
           onClose(false);
         }}
         title={strings.editCreationDate()}
+        description={`${strings.note()}: ${strings.creationDateCannotBeAfterLastEditedDate()}`}
         negativeButton={{
           text: strings.cancel(),
           onClick: () => {
@@ -76,14 +77,10 @@ export const EditNoteCreationDateDialog = DialogManager.register(
           text: strings.save(),
           onClick: async () => {
             try {
-              if (date.isAfter(dayjs())) {
-                showToast("error", "Creation date cannot be in the future");
-                return;
-              }
-              if (dateEdited && date.isAfter(dayjs(dateEdited))) {
+              if (dateEdited && date.isAfter(dayjs(dateEdited), "minute")) {
                 showToast(
                   "error",
-                  "Creation date cannot be after last edited date"
+                  strings.creationDateCannotBeAfterLastEditedDate()
                 );
                 return;
               }
@@ -140,7 +137,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
                 width: 300
               }}
               selected={dayjs(date).toDate()}
-              maxDate={new Date()}
+              maxDate={new Date(dateEdited)}
               onSelect={(day) => {
                 if (!day) return;
                 const date = getFormattedDate(day, "date");
