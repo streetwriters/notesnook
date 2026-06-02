@@ -1868,6 +1868,10 @@ msgstr "Copy link"
 msgid "Copy link text"
 msgstr "Copy link text"
 
+#: src/strings.ts:2694
+msgid "Copy logs"
+msgstr "Copy logs"
+
 #: src/strings.ts:454
 msgid "Copy note"
 msgstr "Copy note"

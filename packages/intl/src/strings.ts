@@ -2699,5 +2699,6 @@ Continue without attachments?`,
   invalidThemeFileFormat: () =>
     t`We couldn't load this theme. Please make sure the file is a valid JSON theme file.`,
   themeMissingRequiredFields: () =>
-    t`We couldn't load this theme. The file appears to be incomplete or missing required theme properties.`
+    t`We couldn't load this theme. The file appears to be incomplete or missing required theme properties.`,
+  copyLogs: () => t`Copy logs`
 };

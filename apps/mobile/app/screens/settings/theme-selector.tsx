@@ -64,6 +64,7 @@ import { MenuItemsList } from "../../utils/menu-items";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { openLinkInBrowser } from "../../utils/functions";
+import Clipboard from "@react-native-clipboard/clipboard";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -470,11 +471,14 @@ function ThemeSelector() {
                         heading: strings.themeMissingRequiredFields(),
                         type: "error",
                         context: "global",
-                        actionText: strings.learnMore(),
+                        actionText: strings.copyLogs(),
                         func: () => {
-                          openLinkInBrowser(
-                            "https://help.notesnook.com/custom-themes/introduction"
-                          );
+                          Clipboard.setString(result.error || "");
+                          ToastManager.show({
+                            heading: strings.logsCopied(),
+                            type: "success",
+                            context: "global"
+                          });
                         }
                       });
                     } else {
