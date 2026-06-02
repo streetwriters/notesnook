@@ -460,8 +460,27 @@ function ThemeSelector() {
                     return;
                   }
                   const result = validateTheme(json);
+
                   if (result.error) {
-                    ToastManager.error(new Error(result.error));
+                    if (
+                      typeof result.error === "string" &&
+                      result.error.includes("missing from the theme")
+                    ) {
+                      ToastManager.show({
+                        heading: strings.themeMissingRequiredFields(),
+                        type: "error",
+                        context: "global",
+                        actionText: strings.learnMore(),
+                        func: () => {
+                          openLinkInBrowser(
+                            "https://help.notesnook.com/custom-themes/introduction"
+                          );
+                        }
+                      });
+                    } else {
+                      ToastManager.error(new Error(result.error));
+                    }
+
                     return;
                   }
                   select(json, true);
