@@ -2658,7 +2658,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Share things to Notesnook from anywhere using the Inbox API`,
   enableInboxAPI: () => t`Enable Inbox API`,
   enableInboxAPIDesc: () => t`Enable/Disable Inbox API`,
-  manageInboxKeys: () => t`Inbox Keys`,
+  manageInboxKeys: () => t`Inbox PGP Keys`,
   manageInboxKeysDesc: () =>
     t`View and edit your inbox public/private key pair`,
   disableInboxAPI: () => t`Disable Inbox API`,

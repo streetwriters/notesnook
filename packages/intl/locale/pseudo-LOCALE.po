@@ -3601,12 +3601,12 @@ msgstr ""
 msgid "Inbox API"
 msgstr ""
 
-#: src/strings.ts:2661
-msgid "Inbox Keys"
-msgstr ""
-
 #: src/strings.ts:2716
 msgid "Inbox keys saved"
+msgstr ""
+
+#: src/strings.ts:2661
+msgid "Inbox PGP Keys"
 msgstr ""
 
 #: src/strings.ts:174

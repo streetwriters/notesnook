@@ -3621,13 +3621,13 @@ msgstr "import guide"
 msgid "Inbox API"
 msgstr "Inbox API"
 
-#: src/strings.ts:2661
-msgid "Inbox Keys"
-msgstr "Inbox Keys"
-
 #: src/strings.ts:2716
 msgid "Inbox keys saved"
 msgstr "Inbox keys saved"
+
+#: src/strings.ts:2661
+msgid "Inbox PGP Keys"
+msgstr "Inbox PGP Keys"
 
 #: src/strings.ts:174
 msgid "Incoming"
