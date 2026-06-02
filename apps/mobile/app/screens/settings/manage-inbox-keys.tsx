@@ -77,11 +77,7 @@ export const SetupInboxKeys = () => {
 
   const handleSave = async () => {
     try {
-      console.log("validated...");
       if (!formRef.current.validate()) return;
-
-      console.log("validated...");
-
       const keysEdited: SerializedKeyPair = {
         publicKey: formRef.current.getValue("publicKey"),
         privateKey: formRef.current.getValue("privateKey")
@@ -99,6 +95,10 @@ export const SetupInboxKeys = () => {
         inboxEnabled: true
       });
       Navigation.goBack();
+      ToastManager.show({
+        message: strings.inboxKeysSaved(),
+        type: "success"
+      });
     } catch (e) {
       DatabaseLogger.error(e);
       ToastManager.error(e as Error);
