@@ -99,7 +99,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               _height = parseInt(heightValue);
           }
 
-          if (!isValidUrl(src)) {
+          if (embedSource === "url" && !isValidUrl(src)) {
             return setError("Please provide a valid url.");
           }
 
