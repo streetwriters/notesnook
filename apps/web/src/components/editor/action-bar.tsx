@@ -27,7 +27,6 @@ import {
   Lock,
   NewTab,
   Note,
-  NoteAdd,
   NoteRemove,
   Pin,
   Plus,
@@ -98,7 +97,6 @@ type ToolButton = {
 export function EditorActionBar() {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
   const activeTab = useEditorStore((store) => store.getActiveTab());
   const activeSession = useEditorStore((store) =>
     activeTab ? store.getSession(activeTab.sessionId) : undefined
@@ -187,8 +185,7 @@ export function EditorActionBar() {
         activeSession &&
         activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
-        activeSession.type !== "conflicted" &&
-        !isFocusMode,
+        activeSession.type !== "conflicted",
       onClick: () => useEditorStore.getState().toggleProperties(),
       toggled: arePropertiesVisible
     },
