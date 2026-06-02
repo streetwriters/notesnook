@@ -76,6 +76,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
           let _src = src;
           let _width = size.width;
           let _height = size.height;
+
           if (embedSource === "code") {
             const document = new DOMParser().parseFromString(src, "text/html");
             if (document.getElementsByTagName("iframe").length <= 0)
@@ -103,11 +104,12 @@ export function EmbedPopup(props: EmbedPopupProps) {
           }
 
           const convertedUrl = convertUrlToEmbedUrl(_src);
-          if (!convertedUrl && embedSource === "url") {
-            return setError("Please provide a valid embed url.");
-          }
 
           if (convertedUrl) _src = convertedUrl;
+
+          if (!_src && embedSource === "url") {
+            return setError("Please provide a valid embed url.");
+          }
 
           if (_src.startsWith("javascript:")) {
             return setError("Embedding javascript code is not supported.");
