@@ -145,7 +145,6 @@ function DetailsBlock({ value }: { value: string }) {
       </View>
 
       <ScrollView
-        horizontal
         style={{ maxHeight: 120 }}
         contentContainerStyle={{
           padding: DefaultAppStyles.GAP_SMALL
