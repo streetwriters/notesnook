@@ -168,6 +168,14 @@ const PublishNoteSheet = ({
     setPublishLoading(false);
   };
 
+  const analytics = useAsync(async () => {
+    if (!isFeatureAvailable?.isAllowed || !monograph) {
+      return { totalViews: 0 };
+    }
+
+    return await db.monographs.analytics(monograph.id);
+  }, [monograph?.id, isFeatureAvailable?.isAllowed]);
+
   return (
     <View
       style={{
@@ -396,6 +404,10 @@ const PublishNoteSheet = ({
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
+
+                  <Paragraph size={AppFontSize.sm}>
+                    {analytics.result?.totalViews}
+                  </Paragraph>
                 </View>
               </View>
             </View>
