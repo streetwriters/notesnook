@@ -44,9 +44,12 @@ import Navigation from "../../services/navigation";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon from "../../components/ui/AppIcon";
 
 export const SetupInboxKeys = () => {
   const [mode, setMode] = useState<"choose" | "edit">("choose");
+  const [error, setError] = useState("");
+  const { colors } = useThemeColors();
   const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef(
     createFormRef({
@@ -86,8 +89,7 @@ export const SetupInboxKeys = () => {
       const result = await Storage.validatePGPKeyPair(keysEdited);
 
       if (!result.isValid) {
-        formRef.current.setError("publicKey", result.message);
-        formRef.current.setError("privateKey", result.message);
+        setError(result.message);
         return;
       }
       await db.user?.saveInboxKeys(keysEdited);
@@ -167,6 +169,24 @@ export const SetupInboxKeys = () => {
             wrapperStyle={{ minHeight: 150 }}
           />
 
+          {error ? (
+            <Paragraph
+              numberOfLines={4}
+              onPress={() => {}}
+              color={colors.error.accent}
+              style={{
+                textAlign: "center"
+              }}
+            >
+              <AppIcon
+                color={colors.error.accent}
+                name="alert-circle-outline"
+                size={AppFontSize.sm - 1}
+              />{" "}
+              {error}
+            </Paragraph>
+          ) : null}
+
           <Button
             title={strings.save()}
             type="accent"
@@ -180,6 +200,7 @@ export const SetupInboxKeys = () => {
 };
 
 const ManageInboxKeys = () => {
+  const { colors } = useThemeColors();
   const keys = usePromise(() => db.user.getInboxKeys());
   const inboxKeys = keys.status === "fulfilled" ? keys.value : undefined;
   const formRef = useRef(
@@ -190,6 +211,7 @@ const ManageInboxKeys = () => {
   );
   const [formVersion, setFormVersion] = useState(0);
   const [hasChanged, setHasChanged] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!inboxKeys) return;
@@ -210,9 +232,10 @@ const ManageInboxKeys = () => {
       } else {
         setHasChanged(false);
       }
+      setError("");
     });
     return unsub;
-  });
+  }, [inboxKeys?.privateKey, inboxKeys?.publicKey]);
 
   return (
     <ScrollView
@@ -246,6 +269,25 @@ const ManageInboxKeys = () => {
         inputStyle={{ height: 140, textAlignVertical: "top" }}
         wrapperStyle={{ minHeight: 150 }}
       />
+
+      {error ? (
+        <Paragraph
+          numberOfLines={4}
+          onPress={() => {}}
+          color={colors.error.accent}
+          style={{
+            textAlign: "center"
+          }}
+        >
+          <AppIcon
+            color={colors.error.accent}
+            name="alert-circle-outline"
+            size={AppFontSize.sm - 1}
+          />{" "}
+          {error}
+        </Paragraph>
+      ) : null}
+
       <Button
         title={strings.save()}
         disabled={!hasChanged}
@@ -265,8 +307,7 @@ const ManageInboxKeys = () => {
             const result = await Storage.validatePGPKeyPair(keysEdited);
 
             if (!result.isValid) {
-              formRef.current.setError("publicKey", result.message);
-              formRef.current.setError("privateKey", result.message);
+              setError(result.message);
               return;
             }
 
