@@ -779,8 +779,6 @@ export const settingsGroups: SettingSection[] = [
                     }
                   });
                 });
-
-                return;
               }
 
               try {
@@ -801,6 +799,18 @@ export const settingsGroups: SettingSection[] = [
             useHook: () => useSettingStore((state) => state.inboxEnabled),
             hidden: (current) => !current,
             description: strings.manageInboxKeysDesc(),
+            onVerify: async () => {
+              return new Promise((resolve) => {
+                verifyUser(
+                  "global",
+                  () => {
+                    resolve(true);
+                  },
+                  false,
+                  () => resolve(false)
+                );
+              });
+            },
             type: "screen",
             component: "manage-inbox-keys"
           },
