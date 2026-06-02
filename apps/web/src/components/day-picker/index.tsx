@@ -46,7 +46,21 @@ export function DayPicker(props: DayPickerProps) {
       maxDate,
       minDate
     },
-    years: { numberOfYears: 99 },
+    years: {
+      /**
+       * When minDate and maxDate are provided, we switch to "fluid" mode and calculate the number of years in a way that all valid years are visible.
+       *
+       * When not provided, use default mode and numberOfYears.
+       */
+      numberOfYears:
+        minDate && maxDate
+          ? Math.max(
+              Math.abs(maxDate.getFullYear() - selected.getFullYear()),
+              Math.abs(selected.getFullYear() - minDate.getFullYear())
+            ) * 2
+          : 99,
+      mode: minDate && maxDate ? "fluid" : "decade"
+    },
     calendar: {
       startDay: 0
     }
@@ -86,7 +100,10 @@ export function DayPicker(props: DayPickerProps) {
           <Button
             variant="icon"
             sx={{ p: 0 }}
-            {...subtractOffset({ months: 1 }, { disabled: isPrevMonthBeforeMin })}
+            {...subtractOffset(
+              { months: 1 },
+              { disabled: isPrevMonthBeforeMin }
+            )}
           >
             <ChevronLeft />
           </Button>
