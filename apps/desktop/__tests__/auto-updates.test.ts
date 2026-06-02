@@ -17,155 +17,92 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { testCleanup, test } from "./test-override.js";
-import { writeFile } from "fs/promises";
-import { Page } from "playwright";
+import { test } from "@nn/test";
 import { gt, lt } from "semver";
-import { describe } from "vitest";
+import { AppModel } from "../../web/__e2e__/models/app.model.js";
+import { expect } from "playwright/test";
 
-test("update starts downloading if version is outdated", async ({
-  ctx: { page },
-  expect,
-  onTestFinished
-}) => {
-  onTestFinished(testCleanup);
+test.extend({ options: { version: "3.0.0" } })(
+  "update starts downloading if version is outdated",
+  async ({ page }) => {
+    await page.waitForSelector(".ProseMirror");
 
-  await page.waitForSelector("#authForm");
-  expect(
-    await page.getByRole("button", { name: "Create account" }).isVisible()
-  ).toBe(true);
+    await page
+      .locator(".theme-scope-statusBar")
+      .getByRole("button", { name: /updating/i })
+      .waitFor({ state: "attached" });
+  }
+);
 
-  await page
-    .getByRole("button", { name: "Skip & go directly to the app" })
-    .click();
-
-  await skipDialog(page);
-
-  await page.waitForSelector(".ProseMirror");
-
-  await page
-    .locator(".theme-scope-statusBar")
-    .getByRole("button", { name: /updating/i })
-    .waitFor({ state: "attached" });
-});
-
-test("update is only shown if version is outdated and auto updates are disabled", async ({
-  ctx,
-  expect,
-  onTestFinished
-}) => {
-  onTestFinished(testCleanup);
-
-  await ctx.app.close();
-  await writeFile(
-    ctx.configPath,
-    JSON.stringify({
+test.extend({
+  options: {
+    version: "3.0.0",
+    config: {
       automaticUpdates: false
-    })
-  );
+    }
+  }
+})(
+  "update is only shown if version is outdated and auto updates are disabled",
+  async ({ page }) => {
+    await page.waitForSelector(".ProseMirror");
 
-  await ctx.relaunch();
+    const app = new AppModel(page);
+    const settings = await app.goToSettings();
 
-  const { page } = ctx;
+    await settings.checkForUpdates();
+    await settings.close();
 
-  await page.waitForSelector("#authForm");
+    await page
+      .locator(".theme-scope-statusBar")
+      .getByRole("button", { name: /available/i })
+      .waitFor({ state: "attached" });
+  }
+);
 
-  expect(
-    await page.getByRole("button", { name: "Create account" }).isVisible()
-  ).toBe(true);
-
-  await page
-    .getByRole("button", { name: "Skip & go directly to the app" })
-    .click();
-
-  await skipDialog(page);
-
+test.extend({
+  options: {
+    version: "3.0.0-beta.0",
+    config: {
+      automaticUpdates: false,
+      releaseTrack: "beta"
+    }
+  }
+})("update to stable if it is newer", async ({ page }) => {
   await page.waitForSelector(".ProseMirror");
 
-  await page
+  const app = new AppModel(page);
+  const settings = await app.goToSettings();
+
+  await settings.checkForUpdates();
+  await settings.close();
+
+  const updateButton = page
     .locator(".theme-scope-statusBar")
-    .getByRole("button", { name: /available/i })
-    .waitFor({ state: "attached" });
+    .getByRole("button", { name: /available/i });
+  await updateButton.waitFor({ state: "visible" });
+  const content = await updateButton.textContent();
+  const version = content?.split(" ")?.[0] || "";
+  expect(gt(version, "3.0.0-beta.0")).toBe(true);
 });
 
-describe("update to stable if it is newer", () => {
-  test.scoped({ options: { version: "3.0.0-beta.0" } });
-  test("test", async ({ ctx, expect, onTestFinished }) => {
-    onTestFinished(testCleanup);
-
-    await ctx.app.close();
-    await writeFile(
-      ctx.configPath,
-      JSON.stringify({
-        automaticUpdates: false,
-        releaseTrack: "beta"
-      })
-    );
-
-    await ctx.relaunch();
-
-    const { page } = ctx;
-
-    await page.waitForSelector("#authForm");
-
-    expect(
-      await page.getByRole("button", { name: "Create account" }).isVisible()
-    ).toBe(true);
-
-    await page
-      .getByRole("button", { name: "Skip & go directly to the app" })
-      .click();
-
-    await skipDialog(page);
-
+test.extend({
+  options: {
+    version: "99.0.0-beta.0",
+    config: {
+      automaticUpdates: false,
+      releaseTrack: "beta"
+    }
+  }
+})(
+  "update is not available if it latest stable version is older",
+  async ({ page }) => {
     await page.waitForSelector(".ProseMirror");
 
-    const updateButton = page
-      .locator(".theme-scope-statusBar")
-      .getByRole("button", { name: /available/i });
-    await updateButton.waitFor({ state: "visible" });
-    const content = await updateButton.textContent();
-    const version = content?.split(" ")?.[0] || "";
-    expect(gt(version, "3.0.0-beta.0")).toBe(true);
-  });
-});
+    const app = new AppModel(page);
+    const settings = await app.goToSettings();
 
-describe("update is not available if it latest stable version is older", () => {
-  test.scoped({ options: { version: "99.0.0-beta.0" } });
-  test("test", async ({ ctx, expect, onTestFinished }) => {
-    onTestFinished(testCleanup);
-
-    await ctx.app.close();
-    await writeFile(
-      ctx.configPath,
-      JSON.stringify({
-        automaticUpdates: false,
-        releaseTrack: "beta"
-      })
-    );
-
-    await ctx.relaunch();
-
-    const { page } = ctx;
-
-    await page.waitForSelector("#authForm");
-
-    expect(
-      await page.getByRole("button", { name: "Create account" }).isVisible()
-    ).toBe(true);
-
-    await page
-      .getByRole("button", { name: "Skip & go directly to the app" })
-      .click();
-
-    await skipDialog(page);
-
-    await page.waitForSelector(".ProseMirror");
-
-    await page
-      .locator(".theme-scope-statusBar")
-      .getByRole("button", { name: /checking for updates/i })
-      .waitFor({ state: "hidden" });
+    await settings.checkForUpdates();
+    await settings.close();
 
     expect(
       await page
@@ -173,45 +110,24 @@ describe("update is not available if it latest stable version is older", () => {
         .getByRole("button", { name: /available/i })
         .isHidden()
     ).toBe(true);
-  });
-});
+  }
+);
 
-describe("downgrade to stable on switching to stable release track", () => {
-  test.scoped({ options: { version: "99.0.0-beta.0" } });
-  test("test", async ({ ctx, expect, onTestFinished }) => {
-    onTestFinished(testCleanup);
-
-    await ctx.app.close();
-    await writeFile(
-      ctx.configPath,
-      JSON.stringify({
-        automaticUpdates: false,
-        releaseTrack: "stable"
-      })
-    );
-
-    await ctx.relaunch();
-
-    const { page } = ctx;
-
-    await page.waitForSelector("#authForm");
-
-    expect(
-      await page.getByRole("button", { name: "Create account" }).isVisible()
-    ).toBe(true);
-
-    await page
-      .getByRole("button", { name: "Skip & go directly to the app" })
-      .click();
-
-    await skipDialog(page);
-
+test.extend({
+  options: {
+    version: "99.0.0-beta.0",
+    config: { automaticUpdates: false, releaseTrack: "stable" }
+  }
+})(
+  "downgrade to stable on switching to stable release track",
+  async ({ page }) => {
     await page.waitForSelector(".ProseMirror");
 
-    await page
-      .locator(".theme-scope-statusBar")
-      .getByRole("button", { name: /checking for updates/i })
-      .waitFor({ state: "hidden" });
+    const app = new AppModel(page);
+    const settings = await app.goToSettings();
+
+    await settings.checkForUpdates();
+    await settings.close();
 
     const updateButton = page
       .locator(".theme-scope-statusBar")
@@ -220,23 +136,5 @@ describe("downgrade to stable on switching to stable release track", () => {
     const content = await updateButton.textContent();
     const version = content?.split(" ")?.[0] || "";
     expect(lt(version, "99.0.0-beta.0")).toBe(true);
-  });
-});
-
-async function skipDialog(page: Page) {
-  try {
-    const dialog = page.locator(".ReactModal__Content");
-    const positiveButton = dialog.locator(
-      "button[data-role='positive-button']"
-    );
-    const negativeButton = dialog.locator(
-      "button[data-role='negative-button']"
-    );
-    if (await positiveButton.isVisible())
-      await positiveButton.click({ timeout: 1000 });
-    else if (await negativeButton.isVisible())
-      await negativeButton.click({ timeout: 1000 });
-  } catch (e) {
-    // ignore error
   }
-}
+);

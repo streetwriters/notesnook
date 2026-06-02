@@ -1,0 +1,24 @@
+diff --git a/node_modules/playwright-core/lib/protocol/validator.js b/node_modules/playwright-core/lib/protocol/validator.js
+index b36c979..9e8ca15 100644
+--- a/node_modules/playwright-core/lib/protocol/validator.js
++++ b/node_modules/playwright-core/lib/protocol/validator.js
+@@ -2536,6 +2536,7 @@ import_validatorPrimitives.scheme.ElectronLaunchParams = (0, import_validatorPri
+   executablePath: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
+   args: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tArray)(import_validatorPrimitives.tString)),
+   cwd: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
++  baseURL: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
+   env: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tArray)((0, import_validatorPrimitives.tType)("NameValue"))),
+   timeout: import_validatorPrimitives.tFloat,
+   acceptDownloads: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["accept", "deny", "internal-browser-default"])),
+diff --git a/node_modules/playwright-core/types/types.d.ts b/node_modules/playwright-core/types/types.d.ts
+index f6e6165..4efd4d4 100644
+--- a/node_modules/playwright-core/types/types.d.ts
++++ b/node_modules/playwright-core/types/types.d.ts
+@@ -19233,6 +19233,7 @@ export interface Electron {
+      * Additional arguments to pass to the application when launching. You typically pass the main script name here.
+      */
+     args?: Array<string>;
++    baseURL?: string;
+ 
+     /**
+      * Toggles bypassing page's Content-Security-Policy. Defaults to `false`.

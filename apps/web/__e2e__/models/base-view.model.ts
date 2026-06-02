@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { iterateList } from "./utils";
 import { ContextMenuModel } from "./context-menu.model";
@@ -73,8 +73,10 @@ export class BaseViewModel {
     return undefined;
   }
 
-  async waitForItem(title: string) {
-    await this.list.locator(getTestId("title"), { hasText: title }).waitFor();
+  async waitForItem(title: string, timeout = 10000) {
+    await this.list
+      .locator(getTestId("title"), { hasText: title })
+      .waitFor({ timeout });
   }
 
   async waitForList() {

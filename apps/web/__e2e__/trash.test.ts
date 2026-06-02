@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { AppModel } from "./models/app.model";
-import { expect, NOTE, test } from "./utils";
+import { NOTE } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("clear trash", async ({ page }) => {
   const app = new AppModel(page);

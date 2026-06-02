@@ -24,7 +24,6 @@ import {
   dialog,
   Menu,
   MenuItem,
-  nativeImage,
   nativeTheme,
   Notification,
   shell
@@ -33,17 +32,16 @@ import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
 import { getTheme, setTheme, Theme } from "../utils/theme";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { dirname } from "path";
+import { existsSync } from "fs";
 import { resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak, isPortable, isSnap } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
-import { rm } from "fs/promises";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 import type { MenuItem as NNMenuItem } from "@notesnook/ui";
 import { platform } from "os";
+import { strings } from "@notesnook/intl";
 
 const t = initTRPC.create();
 
@@ -62,6 +60,7 @@ export const osIntegrationRouter = t.router({
   isFlatpak: t.procedure.query(() => isFlatpak()),
   isSnap: t.procedure.query(() => isSnap()),
   isPortable: t.procedure.query(() => isPortable()),
+  backupDirectory: t.procedure.query(() => config.backupDirectory),
 
   zoomFactor: t.procedure.query(() => config.zoomFactor),
   setZoomFactor: t.procedure.input(z.number()).mutation(({ input: factor }) => {
@@ -118,53 +117,19 @@ export const osIntegrationRouter = t.router({
       setupDesktopIntegration(settings);
     }),
 
-  selectDirectory: t.procedure
-    .input(
-      z.object({
-        title: z.string().optional(),
-        buttonLabel: z.string().optional(),
-        defaultPath: z.string().optional()
-      })
-    )
-    .query(async ({ input }) => {
-      if (!globalThis.window) return undefined;
+  selectBackupDirectory: t.procedure.input(z.undefined()).query(async () => {
+    if (!globalThis.window) return undefined;
 
-      const { title, buttonLabel, defaultPath } = input;
+    const result = await dialog.showOpenDialog(globalThis.window, {
+      title: strings.selectBackupDir(),
+      buttonLabel: strings.select(),
+      properties: ["openDirectory"],
+      defaultPath: config.backupDirectory && resolvePath(config.backupDirectory)
+    });
+    if (result.canceled) return undefined;
 
-      const result = await dialog.showOpenDialog(globalThis.window, {
-        title,
-        buttonLabel,
-        properties: ["openDirectory"],
-        defaultPath: defaultPath && resolvePath(defaultPath)
-      });
-      if (result.canceled) return undefined;
-
-      return result.filePaths[0];
-    }),
-
-  saveFile: t.procedure
-    .input(z.object({ data: z.string(), filePath: z.string() }))
-    .query(({ input }) => {
-      const { data, filePath } = input;
-      if (!data || !filePath) return;
-
-      const resolvedPath = resolvePath(filePath);
-
-      mkdirSync(dirname(resolvedPath), { recursive: true });
-      writeFileSync(resolvedPath, data);
-    }),
-
-  resolvePath: t.procedure
-    .input(z.object({ filePath: z.string() }))
-    .query(({ input }) => {
-      const { filePath } = input;
-      return resolvePath(filePath);
-    }),
-
-  deleteFile: t.procedure.input(z.string()).query(async ({ input }) => {
-    await rm(input);
+    config.backupDirectory = result.filePaths[0];
   }),
-
   restart: t.procedure.query(() => {
     app.relaunch();
     app.exit();
@@ -199,10 +164,12 @@ export const osIntegrationRouter = t.router({
       const { type, link } = input;
       if (type !== "path") return;
 
+      const path = decodeURIComponent(new URL(link).pathname);
       const resolvedPath = resolvePath(
         // remove leading slash from path on windows
-        platform() === "win32" ? link.slice(1) : link
+        platform() === "win32" ? path.slice(1) : path
       );
+
       if (!existsSync(resolvedPath)) {
         if (globalThis.window) {
           await dialog.showMessageBox(globalThis.window, {
@@ -214,7 +181,15 @@ export const osIntegrationRouter = t.router({
         return;
       }
 
-      await shell.openPath(resolvedPath);
+      const result = await dialog.showMessageBox(globalThis.window!, {
+        message: strings.openingLocalFileDesc(resolvedPath),
+        title: strings.openingLocalFile(),
+        buttons: [strings.cancel(), strings.open()],
+        defaultId: 1,
+        cancelId: 0,
+        type: "question"
+      });
+      result.response === 1 && (await shell.openPath(resolvedPath));
     }),
   bringToFront: t.procedure.query(() => bringToFront()),
   changeTheme: t.procedure

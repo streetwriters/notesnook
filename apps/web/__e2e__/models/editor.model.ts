@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { TabItemModel } from "./tab-item.model";
 import { iterateList } from "./utils";
@@ -110,7 +110,7 @@ export class EditorModel {
     await this.wordCountText.waitFor();
   }
 
-  async waitForContent(text: string) {
+  async waitForContent(text: string, timeout = 10000) {
     await this.page.waitForFunction(
       ({ expected }) => {
         const contentElement = document.querySelector(
@@ -122,7 +122,27 @@ export class EditorModel {
             .includes(expected.replace(/\s+/g, ""));
         return false;
       },
-      { expected: text }
+      { expected: text },
+      { timeout }
+    );
+  }
+
+  async waitForTitle(title: string, timeout = 10000) {
+    await this.page.waitForFunction(
+      ({ expected }) => {
+        const titleInput = document.querySelector(
+          `.active [data-test-id="editor-title"]`
+        ) as HTMLInputElement | null;
+        if (titleInput)
+          return expected !== undefined
+            ? titleInput.value === expected
+            : titleInput.value.length > 0;
+        return false;
+      },
+      { expected: title },
+      {
+        timeout
+      }
     );
   }
 

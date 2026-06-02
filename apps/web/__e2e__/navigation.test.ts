@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /* eslint-disable no-undef */
-import { test, expect } from "./utils";
+import { test, expect } from "@nn/test";
 import { AppModel } from "./models/app.model";
 
 function createRoute(key: string, header: string) {

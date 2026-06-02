@@ -429,7 +429,17 @@ function TipTap(props: TipTapProps) {
       openLink: async (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link) handleInternalLink(url, openInNewTab);
-        else window.open(url, "_blank");
+        else if (url.startsWith("file:")) {
+          if (!IS_DESKTOP_APP) {
+            showToast("error", strings.cantOpenFileLinksInBrowsers());
+            return;
+          }
+
+          await desktop?.integration.openPath.query({
+            type: "path",
+            link: url
+          });
+        } else window.open(url, "_blank");
       },
       getLinkData: async (url) => {
         const link = parseInternalLink(url);

@@ -17,24 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { testCleanup, test } from "./test-override.js";
-
-test("make sure app loads", async ({
-  ctx: { page },
-  expect,
-  onTestFinished
-}) => {
-  onTestFinished(testCleanup);
-
-  await page.waitForSelector("#authForm");
-
-  expect(
-    await page.getByRole("button", { name: "Create account" }).isVisible()
-  ).toBe(true);
-
-  await page
-    .getByRole("button", { name: "Skip & go directly to the app" })
-    .click();
-
+import { test } from "@nn/test";
+test("make sure app loads", async ({ page }) => {
   await page.waitForSelector(".ProseMirror");
 });
