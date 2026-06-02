@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-10 17:36+0500\n"
+"POT-Creation-Date: 2026-06-11 09:27+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1941,7 +1941,7 @@ msgstr "Copy link"
 msgid "Copy link text"
 msgstr "Copy link text"
 
-#: src/strings.ts:2784
+#: src/strings.ts:2788
 msgid "Copy logs"
 msgstr "Copy logs"
 
@@ -2070,7 +2070,7 @@ msgstr "Creating a{0} backup"
 msgid "Creating..."
 msgstr "Creating..."
 
-#: src/strings.ts:2776
+#: src/strings.ts:2780
 msgid "Creation date cannot be after last edited date"
 msgstr "Creation date cannot be after last edited date"
 
@@ -2812,11 +2812,11 @@ msgstr "Enter verification code sent to your new email"
 msgid "Enter your new email"
 msgstr "Enter your new email"
 
-#: src/strings.ts:2777
+#: src/strings.ts:2793
 msgid "Enter your PGP private key"
 msgstr "Enter your PGP private key"
 
-#: src/strings.ts:2776
+#: src/strings.ts:2792
 msgid "Enter your PGP public key"
 msgstr "Enter your PGP public key"
 
@@ -2920,15 +2920,15 @@ msgstr "Expires on"
 msgid "Expiry date"
 msgstr "Expiry date"
 
-#: src/strings.ts:2773
+#: src/strings.ts:2777
 msgid "Expiry date cannot be more than 1 year in the future"
 msgstr "Expiry date cannot be more than 1 year in the future"
 
-#: src/strings.ts:2771
+#: src/strings.ts:2775
 msgid "Expiry date must be in the future"
 msgstr "Expiry date must be in the future"
 
-#: src/strings.ts:2774
+#: src/strings.ts:2778
 msgid "Expiry date set"
 msgstr "Expiry date set"
 
@@ -4160,7 +4160,7 @@ msgstr "Math & formulas"
 msgid "Maximize"
 msgstr "Maximize"
 
-#: src/strings.ts:2779
+#: src/strings.ts:2783
 msgid "Maximum reminder date is {maxDate}"
 msgstr "Maximum reminder date is {maxDate}"
 
@@ -4539,7 +4539,7 @@ msgstr "Note copied to clipboard"
 msgid "Note does not exist"
 msgstr "Note does not exist"
 
-#: src/strings.ts:2777
+#: src/strings.ts:2781
 msgid "Note duplicated"
 msgstr "Note duplicated"
 
@@ -4904,7 +4904,7 @@ msgstr "Payment method"
 msgid "PDF is password protected"
 msgstr "PDF is password protected"
 
-#: src/strings.ts:2786
+#: src/strings.ts:2790
 msgid "Permission required to save QR-Code to Gallery"
 msgstr "Permission required to save QR-Code to Gallery"
 
@@ -6331,7 +6331,7 @@ msgstr "Setup app lock password"
 msgid "Setup app lock pin"
 msgstr "Setup app lock pin"
 
-#: src/strings.ts:2775
+#: src/strings.ts:2791
 msgid "Setup inbox keys"
 msgstr "Setup inbox keys"
 
@@ -7571,11 +7571,11 @@ msgstr "We are creating a backup of your data. Please wait..."
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 msgstr "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 
-#: src/strings.ts:2781
+#: src/strings.ts:2785
 msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
 msgstr "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
 
-#: src/strings.ts:2783
+#: src/strings.ts:2787
 msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 msgstr "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 

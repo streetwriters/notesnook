@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-10 17:36+0500\n"
+"POT-Creation-Date: 2026-06-11 09:27+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1930,7 +1930,7 @@ msgstr ""
 msgid "Copy link text"
 msgstr ""
 
-#: src/strings.ts:2784
+#: src/strings.ts:2788
 msgid "Copy logs"
 msgstr ""
 
@@ -2059,7 +2059,7 @@ msgstr ""
 msgid "Creating..."
 msgstr ""
 
-#: src/strings.ts:2776
+#: src/strings.ts:2780
 msgid "Creation date cannot be after last edited date"
 msgstr ""
 
@@ -2801,11 +2801,11 @@ msgstr ""
 msgid "Enter your new email"
 msgstr ""
 
-#: src/strings.ts:2777
+#: src/strings.ts:2793
 msgid "Enter your PGP private key"
 msgstr ""
 
-#: src/strings.ts:2776
+#: src/strings.ts:2792
 msgid "Enter your PGP public key"
 msgstr ""
 
@@ -2909,15 +2909,15 @@ msgstr ""
 msgid "Expiry date"
 msgstr ""
 
-#: src/strings.ts:2773
+#: src/strings.ts:2777
 msgid "Expiry date cannot be more than 1 year in the future"
 msgstr ""
 
-#: src/strings.ts:2771
+#: src/strings.ts:2775
 msgid "Expiry date must be in the future"
 msgstr ""
 
-#: src/strings.ts:2774
+#: src/strings.ts:2778
 msgid "Expiry date set"
 msgstr ""
 
@@ -4140,7 +4140,7 @@ msgstr ""
 msgid "Maximize"
 msgstr ""
 
-#: src/strings.ts:2779
+#: src/strings.ts:2783
 msgid "Maximum reminder date is {maxDate}"
 msgstr ""
 
@@ -4519,7 +4519,7 @@ msgstr ""
 msgid "Note does not exist"
 msgstr ""
 
-#: src/strings.ts:2777
+#: src/strings.ts:2781
 msgid "Note duplicated"
 msgstr ""
 
@@ -4878,7 +4878,7 @@ msgstr ""
 msgid "PDF is password protected"
 msgstr ""
 
-#: src/strings.ts:2786
+#: src/strings.ts:2790
 msgid "Permission required to save QR-Code to Gallery"
 msgstr ""
 
@@ -6297,7 +6297,7 @@ msgstr ""
 msgid "Setup app lock pin"
 msgstr ""
 
-#: src/strings.ts:2775
+#: src/strings.ts:2791
 msgid "Setup inbox keys"
 msgstr ""
 
@@ -7521,11 +7521,11 @@ msgstr ""
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 msgstr ""
 
-#: src/strings.ts:2781
+#: src/strings.ts:2785
 msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
 msgstr ""
 
-#: src/strings.ts:2783
+#: src/strings.ts:2787
 msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 msgstr ""
 
