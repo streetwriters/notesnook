@@ -17,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
-import { useCallback, useState } from "react";
-import { Popup } from "../components/popup.js";
-import { Input, Textarea } from "@theme-ui/components";
-import { Embed, EmbedSizeOptions } from "../../extensions/embed/index.js";
-import { convertUrlToEmbedUrl } from "@social-embed/lib";
-import { InlineInput } from "../../components/inline-input/index.js";
-import { Tabs, Tab } from "../../components/tabs/index.js";
 import { strings } from "@notesnook/intl";
+import { convertUrlToEmbedUrl } from "@social-embed/lib";
+import { Flex, Input, Text, Textarea } from "@theme-ui/components";
+import { useCallback, useState } from "react";
+import { InlineInput } from "../../components/inline-input/index.js";
+import { Tab, Tabs } from "../../components/tabs/index.js";
+import { Embed, EmbedSizeOptions } from "../../extensions/embed/index.js";
+import { Popup } from "../components/popup.js";
 
 type EmbedSource = "url" | "code";
+
 export type EmbedPopupProps = {
   onClose: (embed?: Embed) => void;
   title: string;
@@ -38,33 +38,30 @@ export type EmbedPopupProps = {
 
 export function EmbedPopup(props: EmbedPopupProps) {
   const { onClose, onSizeChanged, title, embed } = props;
-  const [width, setWidth] = useState(embed?.width || 300);
-  const [height, setHeight] = useState(embed?.height || 150);
   const [src, setSrc] = useState(embed?.src || "");
   const [embedSource, setEmbedSource] = useState<EmbedSource>("url");
   const [error, setError] = useState<string | null>(null);
+  const [size, setSize] = useState<EmbedSizeOptions>({
+    width: 300,
+    height: 150
+  });
 
   const onSizeChange = useCallback(
     (newWidth?: number, newHeight?: number) => {
-      const size: EmbedSizeOptions = newWidth
-        ? {
-            width: newWidth,
-            height: newWidth * (height / width)
-          }
-        : newHeight
-        ? {
-            width: newHeight * (width / height),
-            height: newHeight
-          }
-        : {
-            width: 0,
-            height: 0
-          };
-      setWidth(size.width);
-      setHeight(size.height);
-      if (onSizeChanged) onSizeChanged(size);
+      const hasNewWidth = Number.isFinite(newWidth);
+      const hasNewHeight = Number.isFinite(newHeight);
+
+      if (!hasNewWidth && !hasNewHeight) return;
+      setSize((size) => {
+        const newSize = {
+          width: hasNewWidth ? ((newWidth || 0) as number) : size.width,
+          height: hasNewHeight ? ((newHeight || 0) as number) : size.height
+        };
+        if (onSizeChanged) onSizeChanged(newSize);
+        return newSize;
+      });
     },
-    [height, width, onSizeChanged]
+    [onSizeChanged]
   );
 
   return (
@@ -77,8 +74,8 @@ export function EmbedPopup(props: EmbedPopupProps) {
         onClick: () => {
           setError(null);
           let _src = src;
-          let _width = width;
-          let _height = height;
+          let _width = size.width;
+          let _height = size.height;
           if (embedSource === "code") {
             const document = new DOMParser().parseFromString(src, "text/html");
             if (document.getElementsByTagName("iframe").length <= 0)
@@ -147,7 +144,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 label="width"
                 type="number"
                 placeholder={strings.width()}
-                value={width}
+                value={size.width}
                 sx={{
                   mr: 1,
                   fontSize: "body"
@@ -158,7 +155,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 label="height"
                 type="number"
                 placeholder={strings.height()}
-                value={height}
+                value={size.height}
                 sx={{ fontSize: "body" }}
                 onChange={(e) =>
                   onSizeChange(undefined, e.target.valueAsNumber)
