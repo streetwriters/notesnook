@@ -38,6 +38,7 @@ export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
   const [filteredNotebooks, setFilteredNotebooks] =
     useState<VirtualizedGrouping<NotebookType>>();
+  const inputRef = useRef<HTMLInputElement>(null);
   const treeRef =
     useRef<
       VirtualizedTreeHandle<{ notebook: NotebookType; totalNotes: number }>
@@ -61,6 +62,13 @@ export function Notebooks() {
 
   useEffect(() => {
     treeRef.current?.refresh();
+
+    const query = inputRef.current?.value.trim();
+    if (!query) return;
+
+    (async () => {
+      setFilteredNotebooks(await db.lookup.notebooks(query).sorted());
+    })();
   }, [roots]);
 
   return (
@@ -165,6 +173,7 @@ export function Notebooks() {
         )}
       </Box>
       <Input
+        ref={inputRef}
         variant="clean"
         placeholder="Filter notebooks..."
         sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
