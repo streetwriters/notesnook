@@ -2756,6 +2756,18 @@ msgstr ""
 msgid "Expiry date"
 msgstr ""
 
+#: src/strings.ts:2692
+msgid "Expiry date cannot be more than 1 year in the future"
+msgstr ""
+
+#: src/strings.ts:2690
+msgid "Expiry date must be in the future"
+msgstr ""
+
+#: src/strings.ts:2693
+msgid "Expiry date set"
+msgstr ""
+
 #: src/strings.ts:2550
 msgid "Explore all plans"
 msgstr ""

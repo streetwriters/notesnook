@@ -2686,5 +2686,9 @@ Continue without attachments?`,
   openingLocalFileDesc: (filePath: string) =>
     t`Are you sure you want to open this file: ${filePath}?`,
   cantOpenFileLinksInBrowsers: () =>
-    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`
+    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`,
+  expiryDateMustBeInTheFuture: () => t`Expiry date must be in the future`,
+  expiryDateCannotBeMoreThan1YearInTheFuture: () =>
+    t`Expiry date cannot be more than 1 year in the future`,
+  expiryDateSet: () => t`Expiry date set`
 };

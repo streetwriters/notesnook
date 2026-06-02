@@ -54,19 +54,26 @@ export const NoteExpiryDateDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title={"Set Custom Expiry Date"}
+        title={strings.setExpiry()}
         onClose={() => onClose(false)}
         width={400}
         positiveButton={{
           text: strings.done(),
           onClick: async () => {
             if (date.isBefore(dayjs())) {
-              showToast("error", "Expiry date must be in the future");
+              showToast("error", strings.expiryDateMustBeInTheFuture());
+              return;
+            }
+            if (date.isAfter(dayjs().add(1, "year"))) {
+              showToast(
+                "error",
+                strings.expiryDateCannotBeMoreThan1YearInTheFuture()
+              );
               return;
             }
             await db.notes.setExpiryDate(date.valueOf(), noteId);
             store.refresh();
-            showToast("success", "Expiry date set");
+            showToast("success", strings.expiryDateSet());
             onClose(true);
           }
         }}
