@@ -268,8 +268,8 @@ export const Pressable = ({
   const opacity = customOpacity
     ? customOpacity
     : type === "accent"
-    ? 1
-    : colorOpacity;
+      ? 1
+      : colorOpacity;
   const alpha = customAlpha ? customAlpha : isDark ? 0.03 : -0.03;
   const { fontScale } = useWindowDimensions();
   const growFactor = 1 + (fontScale - 1) / 8;
@@ -325,7 +325,10 @@ export const Pressable = ({
       ref={fwdRef}
       disabled={disabled}
       hitSlop={hitSlop}
-      onPress={onPress}
+      onPress={(e) => {
+        if (disabled) return;
+        onPress?.(e);
+      }}
       onLongPress={onLongPress}
       style={getStyle}
     >

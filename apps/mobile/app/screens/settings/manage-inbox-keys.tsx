@@ -189,6 +189,7 @@ const ManageInboxKeys = () => {
     })
   );
   const [formVersion, setFormVersion] = useState(0);
+  const [hasChanged, setHasChanged] = useState(false);
 
   useEffect(() => {
     if (!inboxKeys) return;
@@ -197,6 +198,21 @@ const ManageInboxKeys = () => {
     formRef.current.setValue("privateKey", inboxKeys.privateKey || "");
     setFormVersion((prev) => prev + 1);
   }, [inboxKeys]);
+
+  useEffect(() => {
+    const unsub = formRef.current?.subscribeChange(() => {
+      const values = formRef.current?.getValues();
+      if (
+        inboxKeys?.publicKey !== values.publicKey ||
+        inboxKeys.privateKey !== values.privateKey
+      ) {
+        setHasChanged(true);
+      } else {
+        setHasChanged(false);
+      }
+    });
+    return unsub;
+  });
 
   return (
     <ScrollView
@@ -232,16 +248,19 @@ const ManageInboxKeys = () => {
       />
       <Button
         title={strings.save()}
+        disabled={!hasChanged}
         type="accent"
         width={"100%"}
         onPress={async () => {
           try {
-            if (!formRef.current.validate()) return;
-
             const keysEdited: SerializedKeyPair = {
               publicKey: formRef.current.getValue("publicKey"),
               privateKey: formRef.current.getValue("privateKey")
             };
+
+            if (!keysEdited.privateKey || !keysEdited.publicKey) {
+              if (!formRef.current.validate()) return;
+            }
 
             const result = await Storage.validatePGPKeyPair(keysEdited);
 
