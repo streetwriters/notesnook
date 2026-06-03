@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { resolveItems } from "@notesnook/common";
-import { Tag, VirtualizedGrouping } from "@notesnook/core";
-import { Color, Note } from "@notesnook/core";
+import { Color, Note, Tag, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
@@ -39,10 +39,9 @@ import useNavigationStore, {
   NotesScreenParams,
   RouteName
 } from "../../stores/use-navigation-store";
-import { setOnFirstSave } from "./common";
-import { strings } from "@notesnook/intl";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { rootNavigatorRef } from "../../utils/global-refs";
+import { setOnFirstSave } from "./common";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (

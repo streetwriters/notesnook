@@ -108,6 +108,13 @@ export interface RouteParams extends ParamListBase {
     reminder?: Reminder;
     reference?: Note;
   };
+  RelationsList: {
+    item: Item;
+    referenceType: "notebook" | "tag" | "reminder" | "note";
+    relationType: "to" | "from";
+    title: string;
+    onAdd?: () => void;
+  };
   Intro: GenericRouteParam;
   PayWall: {
     canGoBack?: boolean;
