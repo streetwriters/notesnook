@@ -26,6 +26,7 @@ import {
   Color,
   GroupHeader,
   GroupOptions,
+  GroupingByIdKey,
   GroupingKey,
   HighlightedResult,
   Item,
@@ -40,7 +41,7 @@ import {
 } from "@notesnook/core";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { db } from "../../common/database";
+import { getGroupOptions } from "../../hooks/use-group-options";
 import { useIsCompactModeEnabled } from "../../hooks/use-is-compact-mode-enabled";
 import { eSendEvent } from "../../services/event-manager";
 import { RouteName } from "../../stores/use-navigation-store";
@@ -49,8 +50,8 @@ import { SectionHeader } from "../list-items/headers/section-header";
 import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import ReminderItem from "../list-items/reminder";
-import TagItem from "../list-items/tag";
 import { SearchResult } from "../list-items/search-result";
+import TagItem from "../list-items/tag";
 
 type ListItemWrapperProps<TItem = Item> = {
   group: GroupingKey;
@@ -62,6 +63,8 @@ type ListItemWrapperProps<TItem = Item> = {
   dataType: string;
   scrollRef: any;
   groupOptions: GroupOptions;
+  groupId?: string;
+  type?: GroupingByIdKey;
 };
 
 export function ListItemWrapper(props: ListItemWrapperProps) {
@@ -183,6 +186,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               index={index}
               dataType={item.type}
               group={group}
+              groupId={props.groupId}
+              type={props.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
               onOpenJumpToDialog={() => {
@@ -220,6 +225,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               index={index}
               dataType={item.type}
               group={group}
+              groupId={props.groupId}
+              type={props.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
               onOpenJumpToDialog={() => {
@@ -250,6 +257,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               group={group}
               dataType={item.type}
               color={props.customAccentColor}
+              type={props.type}
+              groupId={props.groupId}
               groupOptions={groupOptions}
               onOpenJumpToDialog={() => {
                 eSendEvent(eOpenJumpToDialog, {
@@ -276,6 +285,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               index={index}
               group={group}
               dataType={item.type}
+              groupId={props.groupId}
+              type={props.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
               onOpenJumpToDialog={() => {
@@ -303,6 +314,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
               index={index}
               group={group}
               dataType={item.type}
+              groupId={props.groupId}
+              type={props.type}
               color={props.customAccentColor}
               groupOptions={groupOptions}
               itemCount={items?.placeholders.length}
@@ -322,11 +335,16 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
   }
 }
 
-function getDate(item: Notebook | Note, groupType?: GroupingKey): number {
+function getDate(
+  item: Notebook | Note,
+  groupType?: GroupingKey,
+  id?: string,
+  type?: GroupingByIdKey
+): number {
   return (
     getSortValue(
       groupType
-        ? db.settings.getGroupOptions(groupType)
+        ? getGroupOptions(groupType, id, type)
         : {
             sortBy: "dateEdited",
             sortDirection: "desc"

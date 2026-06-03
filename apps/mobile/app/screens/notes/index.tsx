@@ -172,7 +172,7 @@ const NotesPage = ({
     if (loadingNotes) {
       onRequestUpdate(params.current);
     }
-  }, [loadingNotes, get, isAppLoading]);
+  }, [loadingNotes, get, isAppLoading, onRequestUpdate]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);
@@ -222,6 +222,7 @@ const NotesPage = ({
           loading={false}
           renderedInRoute={route.name}
           id={params.current?.id}
+          type={params.current?.item?.type}
           headerTitle={title || "Monographs"}
           customAccentColor={accentColor}
           placeholder={placeholder}

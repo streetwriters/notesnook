@@ -47,3 +47,29 @@ test("save trash cleanup interval", () =>
     await db.settings.setTrashCleanupInterval(interval);
     expect(db.settings.getTrashCleanupInterval()).toBe(interval);
   }));
+
+const GROUP_OPTIONS_BY_ID_TESTS = ["notebook", "tag", "color"];
+
+for (const type of GROUP_OPTIONS_BY_ID_TESTS) {
+  test(`get ${type} id group options`, () =>
+    databaseTest().then(async (db) => {
+      const id = `test-${type}-id`;
+      const groupOptions = {
+        groupBy: "year",
+        sortBy: "title",
+        sortDirection: "asc"
+      };
+      await db.settings.setGroupOptionsById(id, type, groupOptions);
+      expect(db.settings.getGroupOptionsById(id, type)).toMatchObject(
+        groupOptions
+      );
+    }));
+
+  test(`get ${type} id group options fallback to notes group options`, () =>
+    databaseTest().then(async (db) => {
+      const id = `non-existent-${type}-id`;
+      const defaultOptions = db.settings.getGroupOptions("notes");
+      const result = db.settings.getGroupOptionsById(id, type);
+      expect(result).toMatchObject(defaultOptions);
+    }));
+}

@@ -26,6 +26,7 @@ import useNavigationStore, {
   NotesScreenParams
 } from "../../stores/use-navigation-store";
 import { PLACEHOLDER_DATA, openEditor } from "./common";
+import { getGroupOptions } from "../../hooks/use-group-options";
 export const ColoredNotes = ({
   navigation,
   route
@@ -52,7 +53,7 @@ ColoredNotes.get = async (params: NotesScreenParams, grouped = true) => {
 
   return await db.relations
     .from({ id: params.id, type: "color" }, "note")
-    .selector.grouped(db.settings.getGroupOptions("notes"));
+    .selector.grouped(getGroupOptions("notes", params.id, "color"));
 };
 
 ColoredNotes.navigate = (item: Color, canGoBack: boolean) => {
