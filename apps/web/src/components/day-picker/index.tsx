@@ -55,8 +55,8 @@ export function DayPicker(props: DayPickerProps) {
       numberOfYears:
         minDate && maxDate
           ? Math.max(
-              Math.abs(maxDate.getFullYear() - selected.getFullYear()),
-              Math.abs(selected.getFullYear() - minDate.getFullYear())
+              Math.abs(maxDate.getFullYear() - selected.getFullYear()) + 1,
+              Math.abs(selected.getFullYear() - minDate.getFullYear()) + 1
             ) * 2
           : 99,
       mode: minDate && maxDate ? "fluid" : "decade"
