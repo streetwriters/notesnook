@@ -429,36 +429,61 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "subscription-not-active",
             name: strings.subscriptionNotActivated(),
-            hidden: () => Platform.OS !== "ios",
+            useHook: () => useUserStore((state) => state.user),
+            hidden: (user) =>
+              Platform.OS !== "ios" ||
+              (user as User)?.subscription?.plan !== SubscriptionPlan.FREE,
             modifer: async () => {
               if (Platform.OS === "android") return;
-              presentSheet({
-                title: strings.loadingSubscription(),
-                paragraph: strings.loadingSubscriptionDesc()
-              });
-              const subscriptions = await RNIap.getPurchaseHistory();
-              subscriptions.sort(
-                (a, b) => b.transactionDate - a.transactionDate
-              );
-              const currentSubscription = subscriptions[0];
-              presentSheet({
-                title: strings.notesnookPro(),
-                paragraph: strings.subscribedOnVerify(
-                  new Date(currentSubscription.transactionDate).toLocaleString()
-                ),
-                action: async () => {
-                  presentSheet({
-                    title: strings.verifySubscription(),
-                    paragraph: strings.subscriptionVerifyWait()
+              try {
+                presentSheet({
+                  title: strings.loadingSubscription(),
+                  paragraph: strings.loadingSubscriptionDesc(),
+                  progress: true
+                });
+                const subscriptions = await RNIap.getPurchaseHistory();
+                subscriptions.sort(
+                  (a, b) => b.transactionDate - a.transactionDate
+                );
+                const currentSubscription = subscriptions[0];
+
+                if (
+                  !currentSubscription ||
+                  dayjs(currentSubscription.transactionDate).isBefore(
+                    dayjs().subtract(30, "day")
+                  )
+                ) {
+                  ToastManager.show({
+                    message: "No active subscription found",
+                    type: "info"
                   });
-                  await PremiumService.subscriptions.verify(
-                    currentSubscription
-                  );
                   eSendEvent(eCloseSheet);
-                },
-                icon: "information-outline",
-                actionText: strings.verify()
-              });
+                  return;
+                }
+
+                presentSheet({
+                  title: strings.notesnookPro(),
+                  paragraph: strings.subscribedOnVerify(
+                    new Date(
+                      currentSubscription.transactionDate
+                    ).toLocaleString()
+                  ),
+                  action: async () => {
+                    presentSheet({
+                      title: strings.verifySubscription(),
+                      paragraph: strings.subscriptionVerifyWait()
+                    });
+                    await PremiumService.subscriptions.verify(
+                      currentSubscription
+                    );
+                    eSendEvent(eCloseSheet);
+                  },
+                  icon: "information-outline",
+                  actionText: strings.verify()
+                });
+              } catch (e) {
+                eSendEvent(eCloseSheet);
+              }
             },
             description: strings.verifySubDesc()
           },
