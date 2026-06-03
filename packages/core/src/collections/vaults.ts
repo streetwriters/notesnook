@@ -87,4 +87,11 @@ export class Vaults implements ICollection {
   async itemExists(reference: ItemReference) {
     return (await this.db.relations.to(reference, "vault").count()) > 0;
   }
+
+  async removeAll() {
+    const vaults = await this.all.items();
+    for (const vault of vaults) {
+      await this.remove(vault.id);
+    }
+  }
 }
