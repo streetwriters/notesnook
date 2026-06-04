@@ -4309,6 +4309,10 @@ msgstr "Note copied to clipboard"
 msgid "Note does not exist"
 msgstr "Note does not exist"
 
+#: src/strings.ts:2696
+msgid "Note duplicated"
+msgstr "Note duplicated"
+
 #: src/strings.ts:458
 msgid "Note history"
 msgstr "Note history"

@@ -784,6 +784,12 @@ export const useActions = ({
     const duplicateNote = async () => {
       await db.notes.duplicate(item.id);
       Navigation.queueRoutesForUpdate();
+      ToastManager.show({
+        heading: strings.noteDuplicated(),
+        type: "success",
+        context: "local"
+      });
+      await sleep(500);
       close();
     };
 
