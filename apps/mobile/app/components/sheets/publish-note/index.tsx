@@ -79,10 +79,6 @@ const PublishNoteSheet = ({
   const isFeatureAvailable = useIsFeatureAvailable("monographAnalytics");
   const [isLocked, setIsLocked] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [titleValue, setTitleValue] = useState(note.title || "");
-  const [titleSelection, setTitleSelection] = useState<
-    { start: number; end: number } | undefined
-  >({ start: 0, end: 0 });
   const customTitle = useRef<string>("");
   const pwdInput = useRef<TextInput>(null);
   const titleInput = useRef<TextInput>(null);
@@ -101,13 +97,20 @@ const PublishNoteSheet = ({
   );
 
   useEffect(() => {
-    if (monographData.result) {
-      const title = monograph?.title || note.title || "";
-      customTitle.current = title; // only set once on load
-      setTitleValue(customTitle.current);
-      setTitleSelection({ start: 0, end: 0 });
-      setTimeout(() => setTitleSelection(undefined), 50);
-    }
+    if (!monographData.result) return;
+
+    const title = monograph?.title || note.title || "";
+    customTitle.current = title;
+
+    setTimeout(() => {
+      titleInput.current?.setNativeProps({
+        text: title,
+        selection: {
+          start: 0,
+          end: 0
+        }
+      });
+    }, 50);
   }, [monographData.result]);
 
   useEffect(() => {
@@ -279,11 +282,8 @@ const PublishNoteSheet = ({
             fwdRef={titleInput}
             onChangeText={(value) => {
               customTitle.current = value;
-              setTitleValue(value);
             }}
-            value={titleValue}
-            selection={titleSelection}
-            onFocus={() => setTitleSelection(undefined)}
+            defaultValue={note.title}
             placeholder={strings.noteTitle()}
             validators={[validators.required(strings.titleIsRequired())]}
           />
