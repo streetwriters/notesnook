@@ -17,22 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types.js";
-import { Editor } from "../../types.js";
-import { Dropdown } from "../components/dropdown.js";
-import { MenuItem } from "@notesnook/ui";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  useToolbarStore,
-  useToolbarLocation
-} from "../stores/toolbar-store.js";
-import { getFont, getFontById, getFonts } from "../../utils/font.js";
-import { CodeBlock } from "../../extensions/code-block/index.js";
+import { FONT_SIZE_BOUNDS, toTitleCase } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Flex, Input } from "@theme-ui/components";
-import { ToolButton } from "../components/tool-button.js";
+import { MenuItem } from "@notesnook/ui";
+import { Flex, Input, Text } from "@theme-ui/components";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "../../components/button.js";
+import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
-import { FONT_SIZE_BOUNDS } from "@notesnook/common";
+import { CodeBlock } from "../../extensions/code-block/index.js";
+import { Editor } from "../../types.js";
+import { getFont, getFontById, getFonts } from "../../utils/font.js";
+import { Dropdown } from "../components/dropdown.js";
+import { ToolButton } from "../components/tool-button.js";
+import {
+  useIsMobile,
+  usePopupManager,
+  useToolbarLocation,
+  useToolbarStore
+} from "../stores/toolbar-store.js";
+import { ToolProps } from "../types.js";
+import { getToolbarElement } from "../utils/dom.js";
 
 const FONT_SIZES = [
   8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 42, 48, 56, 64, 72, 80,
@@ -51,6 +56,11 @@ export function FontSize(props: ToolProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
+  const { open, close } = usePopupManager({
+    id: "fontSizeItems",
+    group: "font"
+  });
 
   const applyInputValue = useCallback(() => {
     if (!inputRef.current) return;
@@ -91,6 +101,17 @@ export function FontSize(props: ToolProps) {
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (isMobile) {
+      if (isMenuOpen) {
+        open();
+      } else {
+        close();
+      }
+      return;
+    }
+  }, [isMobile, isMenuOpen, open, close]);
 
   const menuItems: MenuItem[] = useMemo(
     () => [
@@ -227,22 +248,94 @@ export function FontSize(props: ToolProps) {
           }
         />
       </Flex>
-      <ResponsivePresenter
-        desktop="menu"
-        mobile="sheet"
-        title={strings.fontSize()}
-        isOpen={isMenuOpen}
-        items={menuItems}
-        onClose={() => setIsMenuOpen(false)}
-        focusOnRender={false}
-        blocking={false}
-        position={{
-          target: containerRef.current || undefined,
-          isTargetAbsolute: true,
-          location: toolbarLocation === "bottom" ? "top" : "below",
-          yOffset: 5
-        }}
-      />
+      {isMobile ? (
+        <PopupWrapper
+          scope="editorToolbar"
+          group="font"
+          id="fontSizeItems"
+          autoCloseOnUnmount
+          position={{
+            isTargetAbsolute: true,
+            target: getToolbarElement(),
+            align: "center",
+            location: "top",
+            yOffset: 10
+          }}
+          sx={{
+            display: "flex",
+            boxShadow: "menu",
+            bg: "background",
+            gap: [0, 0, "small"],
+            p: ["4px", "4px", "small"],
+            flex: 1,
+            borderRadius: "default",
+            overflowX: "auto",
+            maxWidth: "95vw"
+          }}
+          focusOnRender={false}
+          blocking={false}
+        >
+          {menuItems.map((item) => (
+            <Button
+              key={item.key}
+              variant="secondary"
+              tabIndex={-1}
+              id={`tool-${item.key}`}
+              sx={{
+                height: "unset",
+                flexShrink: 0,
+                p: "small",
+                borderRadius: "default",
+                minWidth: 40,
+                minHeight: 40,
+                m: 0,
+                bg:
+                  currentSize === parseInt(item.key)
+                    ? "background-selected"
+                    : "transparent",
+                mr: 1,
+                ":last-of-type": {
+                  mr: 0
+                }
+              }}
+              onClick={() => {
+                if (item.type === "button") {
+                  item.onClick?.();
+                }
+              }}
+              onMouseDown={(e) => {
+                if (globalThis.keyboardShown) {
+                  e.preventDefault();
+                }
+              }}
+            >
+              <Text
+                sx={{
+                  fontSize: "subBody"
+                }}
+              >
+                {toTitleCase(item.key)}
+              </Text>
+            </Button>
+          ))}
+        </PopupWrapper>
+      ) : (
+        <ResponsivePresenter
+          desktop="menu"
+          title={strings.fontSize()}
+          isOpen={isMenuOpen}
+          items={menuItems}
+          onClose={() => setIsMenuOpen(false)}
+          focusOnRender={false}
+          blocking={false}
+          position={{
+            target: containerRef.current || undefined,
+            isTargetAbsolute: true,
+            location: "below",
+            yOffset: 5
+          }}
+        />
+      )}
     </>
   );
 }
