@@ -264,6 +264,9 @@ const PublishNoteSheet = ({
             fwdRef={titleInput}
             multiline
             scrollEnabled
+            containerStyle={{
+              maxHeight: 100
+            }}
             placeholder={strings.noteTitle()}
             validators={[validators.required(strings.titleIsRequired())]}
           />
