@@ -66,12 +66,14 @@ import {
   VAULT_ERRORS
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
+import { useUserStore } from "../../../stores/use-user-store";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
 
   // UI State
   const [visible, setVisible] = useState(false);
+  const isUserLoggedIn = useUserStore((state) => !!state.user);
   const [loading, setLoading] = useState(false);
   const [deleteAll, setDeleteAll] = useState(false);
   const [biometricUnlock, setBiometricUnlock] = useState(false);
@@ -196,9 +198,12 @@ export const VaultDialog: React.FC = () => {
         }
         eSendEvent("vaultUpdated");
         setLoading(false);
-        setTimeout(() => {
-          close();
-        }, 100);
+        close();
+        ToastManager.show({
+          message: strings.vaultDeleted(),
+          type: "success",
+          context: "global"
+        });
       } else {
         setLoading(false);
         formRef.current.setError("password", strings.passwordIncorrect());
@@ -489,6 +494,13 @@ export const VaultDialog: React.FC = () => {
 
     const { password, newPassword } = formRef.current.getValues();
 
+    if (requestType === VaultRequestType.DeleteVault && !isUserLoggedIn) {
+      setLoading(true);
+      await deleteVault();
+      setLoading(false);
+      return;
+    }
+
     if (requestType === VaultRequestType.CreateVault) {
       createVault();
     } else if (requestType === VaultRequestType.ChangePassword) {
@@ -700,7 +712,6 @@ export const VaultDialog: React.FC = () => {
           icon="shield"
           padding={12}
         />
-        <Seperator half />
 
         <View
           style={{
@@ -709,8 +720,7 @@ export const VaultDialog: React.FC = () => {
         >
           {(isChangePassword ||
             isClearVault ||
-            !isCreateVault ||
-            isDeleteVault ||
+            (isDeleteVault && isUserLoggedIn) ||
             isCustomAction) &&
           !isRevokeFingerprint ? (
             <>
