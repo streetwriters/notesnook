@@ -202,7 +202,7 @@ export const AddReminderDialog = DialogManager.register(
               return;
             }
 
-            if (date.isAfter(MAX_DATE)) {
+            if (mode !== Modes.REPEAT && date.isAfter(MAX_DATE)) {
               showToast(
                 "error",
                 strings.maximumReminderDate(getFormattedDate(MAX_DATE, "date"))
