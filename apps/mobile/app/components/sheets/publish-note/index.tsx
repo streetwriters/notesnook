@@ -262,6 +262,8 @@ const PublishNoteSheet = ({
             name="title"
             formRef={formRef}
             fwdRef={titleInput}
+            multiline
+            scrollEnabled
             placeholder={strings.noteTitle()}
             validators={[validators.required(strings.titleIsRequired())]}
           />
