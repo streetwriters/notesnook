@@ -84,7 +84,7 @@ const LANGUAGES: Record<string, string> = {
 
 type Language = { code: string; name: string };
 
-const BROKEN_SPANISH_TO_WORKING: Record<string, string> = {
+const LANGUAGE_REDIRECT_MAP: Record<string, string> = {
   es: "es-MX",
   "es-419": "es-MX",
   "es-ES": "es-AR"
@@ -100,7 +100,7 @@ export const spellCheckerRouter = t.router({
     return <Language[]>available
       .map((code) => ({
         code,
-        name: LANGUAGES[code] || `Unknown (${code})`
+        name: LANGUAGES[code] || code
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }),
@@ -112,17 +112,13 @@ export const spellCheckerRouter = t.router({
       globalThis.window?.webContents.session.availableSpellCheckerLanguages ||
       [];
 
-    const resolved = enabled.map((code) => {
-      if (BROKEN_SPANISH_TO_WORKING[code]) {
-        const working = BROKEN_SPANISH_TO_WORKING[code];
-        return available.includes(working) ? working : code;
-      }
-      return available.includes(code) ? code : code.split("-")[0];
-    });
+    const resolved = enabled
+      .map((code) => resolveLanguage(code, available))
+      .filter(Boolean) as string[];
 
     return <Language[]>resolved.map((code) => ({
       code,
-      name: LANGUAGES[code] || `Unknown (${code})`
+      name: LANGUAGES[code] || code
     }));
   }),
 
@@ -131,13 +127,9 @@ export const spellCheckerRouter = t.router({
       globalThis.window?.webContents.session.availableSpellCheckerLanguages ||
       [];
 
-    const resolved = input.map((code) => {
-      if (BROKEN_SPANISH_TO_WORKING[code]) {
-        const working = BROKEN_SPANISH_TO_WORKING[code];
-        return available.includes(working) ? working : code;
-      }
-      return available.includes(code) ? code : code.split("-")[0];
-    });
+    const resolved = input
+      .map((code) => resolveLanguage(code, available))
+      .filter(Boolean) as string[];
 
     globalThis.window?.webContents.session.setSpellCheckerLanguages(resolved);
   }),
@@ -156,3 +148,16 @@ export const spellCheckerRouter = t.router({
     );
   })
 });
+
+function resolveLanguage(code: string, available: string[]) {
+  if (LANGUAGE_REDIRECT_MAP[code]) {
+    const working = LANGUAGE_REDIRECT_MAP[code];
+    return available.includes(working) ? working : code;
+  }
+  const fallback = code.split("-")[0];
+  return available.includes(code)
+    ? code
+    : available.includes(fallback)
+    ? fallback
+    : undefined;
+}
