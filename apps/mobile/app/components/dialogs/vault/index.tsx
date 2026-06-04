@@ -839,7 +839,6 @@ export const VaultDialog: React.FC = () => {
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwdAlt}
                 secureTextEntry
-                validationType="confirmPassword"
                 autoComplete="password"
                 returnKeyLabel="Create"
                 returnKeyType="done"
