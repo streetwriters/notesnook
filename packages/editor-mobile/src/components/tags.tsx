@@ -113,13 +113,19 @@ function Tags(props: { settings: Settings; loading?: boolean }) {
             backgroundColor:
               index !== 0 ? "transparent" : "var(--nn_secondary_background)",
             borderRadius: 6,
-            padding: "0px 4px",
-            height: "24px",
+            padding: "2px 4px",
+            height: "25px",
             fontFamily: "Inter",
             fontSize: 12,
             color: "var(--nn_primary_icon)",
             userSelect: "none",
-            WebkitUserSelect: "none"
+            WebkitUserSelect: "none",
+            textAlign: "left",
+            maxWidth: 150,
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            wordWrap: "break-word",
+            whiteSpace: "nowrap"
           }}
           onClick={(e) => {
             e.preventDefault();
