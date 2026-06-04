@@ -2693,5 +2693,7 @@ Continue without attachments?`,
   expiryDateSet: () => t`Expiry date set`,
   creationDateCannotBeAfterLastEditedDate: () =>
     t`Creation date cannot be after last edited date`,
-  noteDuplicated: () => t`Note duplicated`
+  noteDuplicated: () => t`Note duplicated`,
+  maximumReminderDate: (maxDate: string) =>
+    t`Maximum reminder date is ${maxDate}`
 };

@@ -3926,6 +3926,10 @@ msgstr ""
 msgid "Maximize"
 msgstr ""
 
+#: src/strings.ts:2698
+msgid "Maximum reminder date is {maxDate}"
+msgstr ""
+
 #: src/strings.ts:2080
 msgid "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
 msgstr ""
