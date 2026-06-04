@@ -42,8 +42,8 @@ export function EmbedPopup(props: EmbedPopupProps) {
   const [embedSource, setEmbedSource] = useState<EmbedSource>("url");
   const [error, setError] = useState<string | null>(null);
   const [size, setSize] = useState<EmbedSizeOptions>({
-    width: 300,
-    height: 150
+    width: embed?.width || 300,
+    height: embed?.height || 150
   });
 
   const onSizeChange = useCallback(
@@ -156,7 +156,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 label="width"
                 type="number"
                 placeholder={strings.width()}
-                value={size.width}
+                defaultValue={size.width}
                 sx={{
                   mr: 1,
                   fontSize: "body"
@@ -167,7 +167,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 label="height"
                 type="number"
                 placeholder={strings.height()}
-                value={size.height}
+                defaultValue={size.height}
                 sx={{ fontSize: "body" }}
                 onChange={(e) =>
                   onSizeChange(undefined, e.target.valueAsNumber)
