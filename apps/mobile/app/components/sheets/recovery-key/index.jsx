@@ -47,53 +47,6 @@ import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
-async function hasAndroidPermission() {
-  const getCheckPermissionPromise = () => {
-    if (Platform.Version >= 33) {
-      return Promise.all([
-        PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-        ),
-        PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO
-        )
-      ]).then(
-        ([hasReadMediaImagesPermission, hasReadMediaVideoPermission]) =>
-          hasReadMediaImagesPermission && hasReadMediaVideoPermission
-      );
-    } else {
-      return PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
-      );
-    }
-  };
-
-  const hasPermission = await getCheckPermissionPromise();
-  if (hasPermission) {
-    return true;
-  }
-  const getRequestPermissionPromise = () => {
-    if (Platform.Version >= 33) {
-      return PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-        PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO
-      ]).then(
-        (statuses) =>
-          statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ===
-            PermissionsAndroid.RESULTS.GRANTED &&
-          statuses[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ===
-            PermissionsAndroid.RESULTS.GRANTED
-      );
-    } else {
-      return PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
-      ).then((status) => status === PermissionsAndroid.RESULTS.GRANTED);
-    }
-  };
-
-  return await getRequestPermissionPromise();
-}
-
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
     super(props);
@@ -154,26 +107,16 @@ class RecoveryKeySheet extends React.Component {
   }
 
   saveQRCODE = async () => {
-    if (Platform.OS === "android" && !(await hasAndroidPermission())) {
-      ToastManager.show({
-        message: strings.permissionRequiredToSaveQRCode(),
-        type: "info",
-        context: "local"
-      });
-      return;
-    }
-
     this.svg.current?.toDataURL(async (data) => {
       try {
-        let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
+        let fileName =
+          "nn_" + this.user.email + "_recovery_key_qrcode" + "_" + Date.now();
         fileName = sanitizeFilename(fileName, { replacement: "_" });
         fileName = fileName + ".png";
 
         const path = RNFetchBlob.fs.dirs.CacheDir + fileName;
         await RNFetchBlob.fs.writeFile(path, data, "base64");
-
         await CameraRoll.saveToCameraRoll(`file://` + path);
-
         ToastManager.show({
           heading: strings.recoveryKeyQRCodeSaved(),
           type: "success",
