@@ -138,7 +138,8 @@ async function createWindow() {
   mainWindow.setMenuBarVisibility(false);
   mainWindowState.manage(mainWindow);
 
-  if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
+  if (cliOptions.hidden && !(config.desktopSettings.minimizeToSystemTray
+    || config.desktopSettings.closeToSystemTray))
     mainWindow.minimize();
 
   await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
