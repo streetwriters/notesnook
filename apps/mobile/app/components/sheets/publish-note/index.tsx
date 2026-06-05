@@ -172,21 +172,25 @@ const PublishNoteSheet = ({
   };
 
   const analytics = useAsync(async () => {
-    if (!isFeatureAvailable?.isAllowed || !monograph) {
-      return { totalViews: 0 };
-    }
-
+    if (!isFeatureAvailable?.isAllowed || !monograph?.id || selfDestruct)
+      return null;
     return await db.monographs.analytics(monograph.id);
-  }, [monograph?.id, isFeatureAvailable?.isAllowed]);
+  }, [monograph?.id, isFeatureAvailable?.isAllowed, selfDestruct]);
 
   useEffect(() => {
     const prevState = previousAppState.current;
     previousAppState.current = appState;
 
-    if (appState === "active" && prevState !== "active" && monograph?.id) {
+    if (
+      appState === "active" &&
+      prevState !== "active" &&
+      isFeatureAvailable?.isAllowed &&
+      monograph?.id &&
+      !selfDestruct
+    ) {
       analytics.execute();
     }
-  }, [appState, monograph?.id]);
+  }, [appState, monograph?.id, selfDestruct, isFeatureAvailable?.isAllowed]);
 
   return (
     <View
@@ -392,7 +396,10 @@ const PublishNoteSheet = ({
             </View>
           </TouchableOpacity>
 
-          {isFeatureAvailable?.isAllowed ? (
+          {isFeatureAvailable?.isAllowed &&
+          !selfDestruct &&
+          analytics?.result &&
+          analytics?.result?.totalViews > 0 ? (
             <View
               style={{
                 flexDirection: "row",
