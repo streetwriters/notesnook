@@ -2783,6 +2783,10 @@ msgstr "Expiry date cannot be more than 1 year in the future"
 msgid "Expiry date must be in the future"
 msgstr "Expiry date must be in the future"
 
+#: src/strings.ts:2706
+msgid "Expiry date removed"
+msgstr "Expiry date removed"
+
 #: src/strings.ts:2693
 msgid "Expiry date set"
 msgstr "Expiry date set"

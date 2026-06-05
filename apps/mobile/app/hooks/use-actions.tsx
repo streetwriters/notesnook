@@ -1188,6 +1188,13 @@ export const useActions = ({
         onPress: async () => {
           if (item.expiryDate?.value) {
             await db.notes.setExpiryDate(null, item.id);
+
+            ToastManager.show({
+              message: strings.expiryDateRemoved(),
+              type: "success",
+              context: "local"
+            });
+
             setItem((await db.notes.note(item.id)) as Item);
           } else {
             if (features && !features?.expiringNotes.isAllowed) {
@@ -1211,6 +1218,13 @@ export const useActions = ({
                   onConfirm={async (date) => {
                     close?.();
                     await db.notes.setExpiryDate(date.getTime(), item.id);
+
+                    ToastManager.show({
+                      message: strings.expiryDateSet(),
+                      type: "success",
+                      context: "local"
+                    });
+
                     setItem((await db.notes.note(item.id)) as Item);
                   }}
                 />

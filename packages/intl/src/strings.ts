@@ -2702,5 +2702,6 @@ Continue without attachments?`,
     t`We couldn't load this theme. The file appears to be incomplete or missing required theme properties.`,
   copyLogs: () => t`Copy logs`,
   permissionRequiredToSaveQRCode: () =>
-    t`Permission required to save QR-Code to Gallery`
+    t`Permission required to save QR-Code to Gallery`,
+  expiryDateRemoved: () => t`Expiry date removed`
 };
