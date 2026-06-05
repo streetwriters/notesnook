@@ -56,7 +56,7 @@ const TagItem = (props: {
   const totalNotes = useTotalNotes("tag");
   const totalNotesRef = React.useRef(totalNotes);
   totalNotesRef.current = totalNotes;
-  const updater = useRelationStore(state => state.updater);
+  const updater = useRelationStore((state) => state.updater);
 
   useEffect(() => {
     if (item?.id) {
@@ -123,7 +123,8 @@ const TagItem = (props: {
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              flexShrink: 1
             }}
           >
             <View
@@ -146,6 +147,9 @@ const TagItem = (props: {
                 isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
               size={AppFontSize.sm}
+              style={{
+                flexShrink: 1
+              }}
             >
               {item?.title}
             </Paragraph>
