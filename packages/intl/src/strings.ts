@@ -2695,5 +2695,6 @@ Continue without attachments?`,
     t`Creation date cannot be after last edited date`,
   noteDuplicated: () => t`Note duplicated`,
   maximumReminderDate: (maxDate: string) =>
-    t`Maximum reminder date is ${maxDate}`
+    t`Maximum reminder date is ${maxDate}`,
+  expiryDateRemoved: () => t`Expiry date removed`
 };
