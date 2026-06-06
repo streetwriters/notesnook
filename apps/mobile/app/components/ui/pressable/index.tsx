@@ -87,7 +87,7 @@ const buttonTypes = (
 } => ({
   plain: {
     primary: "transparent",
-    text: colors.secondary.buttonForeground,
+    text: colors.primary.buttonForeground,
     selected: colors.primary.hover,
     borderWidth: 0.8,
     borderSelectedColor: getColorLinearShade(

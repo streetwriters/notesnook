@@ -342,7 +342,7 @@ export function FormInput({
           style={{
             marginBottom: Spacing.LEVEL_1
           }}
-          color={colors.primary.paragraph}
+          color={colors.secondary.paragraph}
           fontSize="XS"
         >
           {label}
