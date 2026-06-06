@@ -136,8 +136,9 @@ export const Signup = ({
               width: "100%"
             }}
             contentContainerStyle={{
-              minHeight: "99%"
+              flex: 1
             }}
+            bounces={false}
             nestedScrollEnabled
             keyboardShouldPersistTaps="handled"
           >
@@ -331,9 +332,7 @@ export const Signup = ({
                     onPress={() => {
                       openLinkInBrowser("https://notesnook.com/tos");
                     }}
-                    style={{
-                      textDecorationLine: "underline"
-                    }}
+                    fontFamily="SEMI_BOLD"
                     color={colors.primary.accent}
                   >
                     {" "}
@@ -345,15 +344,12 @@ export const Signup = ({
                     onPress={() => {
                       openLinkInBrowser("https://notesnook.com/privacy");
                     }}
-                    style={{
-                      textDecorationLine: "underline"
-                    }}
+                    fontFamily="SEMI_BOLD"
                     color={colors.primary.accent}
                   >
                     {" "}
                     {strings.signupAgreement[3]()}
-                  </Paragraph>{" "}
-                  {strings.signupAgreement[4]()}
+                  </Paragraph>
                 </Paragraph>
               </View>
             </View>
