@@ -6,12 +6,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Plural-Forms: \n"
 
 #: src/strings.ts:2442
 msgid " \"Notebook > Notes\""
@@ -780,7 +774,7 @@ msgstr ""
 msgid "Add your first note"
 msgstr ""
 
-#: src/strings.ts:2843
+#: src/strings.ts:2847
 msgid "Add Your First Note"
 msgstr ""
 
@@ -1888,7 +1882,7 @@ msgid "Confirm new password"
 msgstr ""
 
 #: src/strings.ts:1501
-msgid "Confirm password"
+msgid "Confirm Password"
 msgstr ""
 
 #: src/strings.ts:2748
@@ -4540,7 +4534,7 @@ msgstr ""
 msgid "No notebooks yet"
 msgstr ""
 
-#: src/strings.ts:2840
+#: src/strings.ts:2844
 msgid "No notes yet"
 msgstr ""
 
@@ -8145,7 +8139,7 @@ msgstr ""
 msgid "Your tags"
 msgstr ""
 
-#: src/strings.ts:2842
+#: src/strings.ts:2846
 msgid "Your thoughts deserve a home. Create your first note and start organizing your life today."
 msgstr ""
 
