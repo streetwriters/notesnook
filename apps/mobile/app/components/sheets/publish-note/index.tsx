@@ -90,10 +90,19 @@ const PublishNoteSheet = ({
 
   const formRef = useRef(
     createFormRef({
-      title: monograph?.title || note.title || "",
+      title: note.title || "",
       password: ""
     })
   );
+
+  useEffect(() => {
+    if (!monographData.result) return;
+    const title = monograph?.title || note.title || "";
+    formRef.current.setValue("title", title);
+    setTimeout(() => {
+      titleInput.current?.setNativeProps({ text: title });
+    }, 50);
+  }, [monographData.result, monograph]);
 
   useEffect(() => {
     (async () => {
