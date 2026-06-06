@@ -79,6 +79,7 @@ const PublishNoteSheet = ({
   const isFeatureAvailable = useIsFeatureAvailable("monographAnalytics");
   const [isLocked, setIsLocked] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const customTitle = useRef<string>("");
   const pwdInput = useRef<TextInput>(null);
   const titleInput = useRef<TextInput>(null);
   const monographData = useAsync(async () => {
@@ -94,6 +95,23 @@ const PublishNoteSheet = ({
       password: ""
     })
   );
+
+  useEffect(() => {
+    if (!monographData.result) return;
+
+    const title = monograph?.title || note.title || "";
+    customTitle.current = title;
+
+    setTimeout(() => {
+      titleInput.current?.setNativeProps({
+        text: title,
+        selection: {
+          start: 0,
+          end: 0
+        }
+      });
+    }, 50);
+  }, [monographData.result]);
 
   useEffect(() => {
     (async () => {
@@ -262,6 +280,10 @@ const PublishNoteSheet = ({
             name="title"
             formRef={formRef}
             fwdRef={titleInput}
+            onChangeText={(value) => {
+              customTitle.current = value;
+            }}
+            defaultValue={note.title}
             placeholder={strings.noteTitle()}
             validators={[validators.required(strings.titleIsRequired())]}
           />
