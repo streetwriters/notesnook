@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { useThemeColors } from "@notesnook/theme";
 import { useRef } from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import DatePicker from "react-native-date-picker";
@@ -33,6 +33,9 @@ export default function DatePickerComponent(props: {
 }) {
   const { colors, isDark } = useThemeColors();
   const dateRef = useRef<Date>(dayjs().add(1, "day").toDate());
+
+  const { width } = useWindowDimensions();
+
   return (
     <View
       style={{
@@ -46,6 +49,9 @@ export default function DatePickerComponent(props: {
       }}
     >
       <DatePicker
+        style={{
+          width: width * 0.8 - DefaultAppStyles.GAP * 2
+        }}
         theme={isDark ? "dark" : "light"}
         mode="date"
         minimumDate={dayjs().add(1, "day").toDate()}
