@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2442
 msgid " \"Notebook > Notes\""
@@ -1890,8 +1896,8 @@ msgid "Confirm new password"
 msgstr "Confirm new password"
 
 #: src/strings.ts:1501
-msgid "Confirm password"
-msgstr "Confirm password"
+msgid "Confirm Password"
+msgstr "Confirm Password"
 
 #: src/strings.ts:2748
 msgid "Confirm password required"
