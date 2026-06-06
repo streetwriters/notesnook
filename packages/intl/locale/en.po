@@ -1860,8 +1860,8 @@ msgid "Confirm new password"
 msgstr "Confirm new password"
 
 #: src/strings.ts:1501
-msgid "Confirm password"
-msgstr "Confirm password"
+msgid "Confirm Password"
+msgstr "Confirm Password"
 
 #: src/strings.ts:2748
 msgid "Confirm password required"

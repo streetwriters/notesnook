@@ -1849,8 +1849,8 @@ msgid "Confirm new password"
 msgstr ""
 
 #: src/strings.ts:1501
-msgid "Confirm password"
-msgstr "<<<<<<< HEAD"
+msgid "Confirm Password"
+msgstr ""
 
 #: src/strings.ts:2748
 msgid "Confirm password required"
