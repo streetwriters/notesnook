@@ -386,7 +386,8 @@ export function FormInput({
         >
           {secureTextEntry && (
             <IconButton
-              name="eye"
+              name={secureEntry ? "eye-closed" : "eye-open"}
+              iconFamily="notesnook"
               size={20}
               top={10}
               bottom={10}
@@ -398,9 +399,7 @@ export function FormInput({
                 width: 25,
                 marginLeft: 5
               }}
-              color={
-                secureEntry ? colors.secondary.icon : colors.primary.accent
-              }
+              color={colors.primary.icon}
             />
           )}
 
