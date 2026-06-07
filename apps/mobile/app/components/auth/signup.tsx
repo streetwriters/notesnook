@@ -278,9 +278,9 @@ export const Signup = ({
                       textAlign: "center"
                     }}
                     fontSize="SM"
-                    color={colors.secondary.paragraph}
+                    color={colors.primary.paragraph}
                   >
-                    {strings.dontHaveAccount()}{" "}
+                    {strings.alreadyHaveAccount()}{" "}
                     <Paragraph
                       fontSize="SM"
                       fontFamily="SEMI_BOLD"
