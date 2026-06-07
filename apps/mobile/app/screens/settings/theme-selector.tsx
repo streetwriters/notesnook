@@ -754,7 +754,7 @@ const ThemeSetter = ({
               size={AppFontSize.xs}
               color={themeColors.colors.secondary.paragraph}
             >
-              ${strings.version()} {theme.version}
+              {strings.version()} {theme.version}
             </Paragraph>
 
             <Paragraph
