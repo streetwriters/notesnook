@@ -361,7 +361,7 @@ export const Signup = ({
             paddingHorizontal: Spacing.LEVEL_3
           }}
         >
-          <ProgressPills activePillIndex={2} />
+          {welcome ? <ProgressPills activePillIndex={2} /> : null}
           <Loading
             title={strings.settingUpAccount()}
             svgSrc={SETTING_ACCOUNT_SVG}
