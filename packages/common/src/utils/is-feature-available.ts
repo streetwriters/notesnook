@@ -133,7 +133,7 @@ const features = {
   }),
   fileSize: createFeature({
     id: "fileSize",
-    title: "Maximum file size",
+    title: "Maximum File Size",
     error: (limit) =>
       `You cannot upload files larger than ${limit.caption} on this plan.`,
     availability: {
@@ -146,7 +146,7 @@ const features = {
   }),
   fullQualityImages: createFeature({
     id: "fullQualityImages",
-    title: "Full quality images",
+    title: "Full Quality Images",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -157,7 +157,7 @@ const features = {
   }),
   blockLinking: createFeature({
     id: "blockLinking",
-    title: "Block-level note links",
+    title: "Block-Level Note Links",
     error: () => `Block-level note links are not available on this plan.`,
     availability: {
       free: createLimit(false),
@@ -169,7 +169,7 @@ const features = {
   }),
   taskList: createFeature({
     id: "taskList",
-    title: "Task list",
+    title: "Task List",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -180,7 +180,7 @@ const features = {
   }),
   outlineList: createFeature({
     id: "outlineList",
-    title: "Outline list",
+    title: "Outline List",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -238,7 +238,7 @@ const features = {
   }),
   activeReminders: createFeature({
     id: "activeReminders",
-    title: "Active reminders",
+    title: "Active Reminders",
     used: () => db.reminders.active.count(),
     availability: {
       free: createLimit(10),
@@ -262,7 +262,7 @@ const features = {
   }),
   defaultNotebookAndTag: createFeature({
     id: "defaultNotebookAndTag",
-    title: "Default notebook & tag",
+    title: "Default Notebook & Tag",
     error: () => `You cannot set a default notebook or tag on this plan.`,
     availability: {
       free: createLimit(false),
@@ -274,7 +274,7 @@ const features = {
   }),
   recurringReminders: createFeature({
     id: "recurringReminders",
-    title: "Recurring reminders",
+    title: "Recurring Reminders",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -285,7 +285,7 @@ const features = {
   }),
   pinNoteInNotification: createFeature({
     id: "pinNoteInNotification",
-    title: "Pin note in notification",
+    title: "Pin Note Notification",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -296,7 +296,7 @@ const features = {
   }),
   createNoteFromNotificationDrawer: createFeature({
     id: "createNoteFromNotificationDrawer",
-    title: "Create note from notification drawer",
+    title: "Pin Note Notifications",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -307,7 +307,7 @@ const features = {
   }),
   defaultSidebarTab: createFeature({
     id: "defaultSidebarTab",
-    title: "Default sidebar tab",
+    title: "Default Sidebar Tab",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -318,7 +318,7 @@ const features = {
   }),
   customHomepage: createFeature({
     id: "customHomepage",
-    title: "Custom homepage",
+    title: "Custom Homepage",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -329,7 +329,7 @@ const features = {
   }),
   markdownShortcuts: createFeature({
     id: "markdownShortcuts",
-    title: "Markdown shortcuts",
+    title: "Markdown Shortcuts",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -340,7 +340,7 @@ const features = {
   }),
   fontLigatures: createFeature({
     id: "fontLigatures",
-    title: "Font ligatures",
+    title: "Font Ligatures",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -351,7 +351,7 @@ const features = {
   }),
   customToolbarPreset: createFeature({
     id: "customToolbarPreset",
-    title: "Custom toolbar preset",
+    title: "Custom Toolbar Preset",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -362,7 +362,7 @@ const features = {
   }),
   customizableSidebar: createFeature({
     id: "customizableSidebar",
-    title: "Customizable sidebar",
+    title: "Customizable Sidebar",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -373,7 +373,7 @@ const features = {
   }),
   disableTrashCleanup: createFeature({
     id: "disableTrashCleanup",
-    title: "Disable trash cleanup",
+    title: "Disable Trash Cleanup",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -384,7 +384,7 @@ const features = {
   }),
   appLock: createFeature({
     id: "appLock",
-    title: "App lock",
+    title: "App Lock",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -395,7 +395,7 @@ const features = {
   }),
   maxNoteVersions: createFeature({
     id: "maxNoteVersions",
-    title: "Maximum note versions",
+    title: "Maximum Note Versions",
     availability: {
       free: createLimit(100),
       essential: createLimit(1000),
@@ -406,7 +406,7 @@ const features = {
   }),
   fullOfflineMode: createFeature({
     id: "fullOfflineMode",
-    title: "Full offline mode",
+    title: "Full Offline Mode",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -417,7 +417,7 @@ const features = {
   }),
   syncControls: createFeature({
     id: "syncControls",
-    title: "Sync controls",
+    title: "Sync Controls",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -428,7 +428,7 @@ const features = {
   }),
   monographLinksAndEmbeds: createFeature({
     id: "monographLinksAndEmbeds",
-    title: "Links & embeds in monographs",
+    title: "Links & Embeds in Monographs",
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -439,7 +439,7 @@ const features = {
   }),
   monographAnalytics: createFeature({
     id: "monographAnalytics",
-    title: "Monographs analytics",
+    title: "Monographs Analytics",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -483,7 +483,7 @@ const features = {
   }),
   expiringNotes: createFeature({
     id: "expiringNotes",
-    title: "Expiring notes",
+    title: "Expiring Notes",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -494,7 +494,7 @@ const features = {
   }),
   exportTableAsCsv: createFeature({
     id: "exportTableAsCsv",
-    title: "Export table as CSV",
+    title: "Export Table as CSV",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -505,7 +505,7 @@ const features = {
   }),
   importCsvToTable: createFeature({
     id: "importCsvToTable",
-    title: "Import CSV to table",
+    title: "Import CSV to Table",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
