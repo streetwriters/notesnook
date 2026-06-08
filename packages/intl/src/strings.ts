@@ -112,12 +112,12 @@ export const strings = {
   select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
   "2faCodeHelpText": {
     email: () =>
-      t`Enter the 6 digit code sent to your email to continue logging in`,
+      t`Enter the 6 digit code sent to your email to continue logging in.`,
     sms: () =>
-      t`Enter the 6 digit code sent to your phone number to continue logging in`,
+      t`Enter the 6 digit code sent to your phone number to continue logging in.`,
     app: () =>
-      t`Enter the 6 digit code from your authenticator app to continue logging in`,
-    recoveryCode: () => t`Enter the recovery code to continue logging in`
+      t`Enter the 6 digit code from your authenticator app to continue logging in.`,
+    recoveryCode: () => t`Enter your recovery code.`
   },
   "2faCodeSecondaryMethodText": {
     email: () => t`I don't have access to email`,
@@ -2601,14 +2601,14 @@ Use this if changes from other devices are not appearing on this device. This wi
   ],
   purchase: () => t`Purchase`,
   subscribe: () => t`Subscribe`,
-  subscribeAndStartTrial: () => t`Subscribe and start free trial`,
+  subscribeAndStartTrial: () => t`Subscribe & Start Your Free Trial`,
   oneTimePurchase: () => t`This is a one time purchase, no subscription.`,
-  cancelAnytimeAlt: () => t`Cancel anytime, subscription auto-renews.`,
+  cancelAnytimeAlt: () => t`Cancel anytime, Subscription auto-renews.`,
   subTerms: [
     () => t`By joining you agree to our`,
-    () => t`privacy policy`,
+    () => t`Terms of Service`,
     () => t`and`,
-    () => t`terms of use.`
+    () => t`Privacy Policy.`
   ],
   bestValue: () => t`Best value`,
   planLimits: () => t`Plan limits`,
@@ -2770,12 +2770,12 @@ Continue without attachments?`,
     monthly: () => t`Billed monthly`,
     oneTime: () => t`One time purchase`
   },
-  whatsIncluded: () => t`What's included`,
-  paymentSummary: () => t`Payment summary`,
+  whatsIncluded: () => t`What's Included`,
+  paymentSummary: () => t`Payment Summary`,
   planWhatsIncluded: {
     unlimitedNotes: () => t`Unlimited notes and attachments`,
     endToEnd: () => t`End-to-end encryption (XChaCha20)`,
-    allDevices: () => t`Access on all devices`,
+    allDevices: () => t`Access on all your devices`,
     freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
     remind: () => t`Remind before your trial ends`
   },
@@ -2794,5 +2794,10 @@ Continue without attachments?`,
     button: () => t`Add Your First Note`
   },
   settingUpYourAccount: () => t`Setting up your account...`,
-  accountAlmostReady: () => t`Your account is almost ready, please wait.`
+  accountAlmostReady: () => t`Your account is almost ready, please wait.`,
+  recoveryCodeTitle: () => t`Recovery Code`,
+  provideValidMultiFactorAuthRecoveryCode: () =>
+    t`Please provide a valid multi factor authentication recovery code.`,
+  provideValidMultiFactorAuthCode: () =>
+    t`Please provide a valid multi factor authentication code.`
 };
