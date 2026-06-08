@@ -35,22 +35,22 @@ function numberWithCommas(x: string) {
 
 export const PlanOverView = {
   free: {
-    storage: `50 MB/mo`,
+    storage: `50 MB`,
     fileSize: `1 MB`,
     hdImages: "No"
   },
   essential: {
     storage: `1 GB`,
-    fileSize: `100 MB/mo`,
+    fileSize: `100 MB`,
     hdImages: "No"
   },
   pro: {
-    storage: `10 GB/mo`,
+    storage: `10 GB`,
     fileSize: `1 GB`,
     hdImages: "Yes"
   },
   believer: {
-    storage: `25 GB/mo`,
+    storage: `25 GB`,
     fileSize: `5 GB`,
     hdImages: "Yes"
   }
