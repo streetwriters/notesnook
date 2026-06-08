@@ -671,8 +671,8 @@ msgid "About"
 msgstr "About"
 
 #: src/strings.ts:2831
-msgid "Access on all devices"
-msgstr "Access on all devices"
+msgid "Access on all your devices"
+msgstr "Access on all your devices"
 
 #: src/strings.ts:1040
 msgid "Account"
@@ -1385,8 +1385,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/strings.ts:2606
-msgid "Cancel anytime, subscription auto-renews."
-msgstr "Cancel anytime, subscription auto-renews."
+msgid "Cancel anytime, Subscription auto-renews."
+msgstr "Cancel anytime, Subscription auto-renews."
 
 #: src/strings.ts:2568
 msgid "Cancel anytime."
@@ -2825,24 +2825,20 @@ msgid "Enter recovery code"
 msgstr "Enter recovery code"
 
 #: src/strings.ts:119
-msgid "Enter the 6 digit code from your authenticator app to continue logging in"
-msgstr "Enter the 6 digit code from your authenticator app to continue logging in"
+msgid "Enter the 6 digit code from your authenticator app to continue logging in."
+msgstr "Enter the 6 digit code from your authenticator app to continue logging in."
 
 #: src/strings.ts:115
-msgid "Enter the 6 digit code sent to your email to continue logging in"
-msgstr "Enter the 6 digit code sent to your email to continue logging in"
+msgid "Enter the 6 digit code sent to your email to continue logging in."
+msgstr "Enter the 6 digit code sent to your email to continue logging in."
 
 #: src/strings.ts:117
-msgid "Enter the 6 digit code sent to your phone number to continue logging in"
-msgstr "Enter the 6 digit code sent to your phone number to continue logging in"
+msgid "Enter the 6 digit code sent to your phone number to continue logging in."
+msgstr "Enter the 6 digit code sent to your phone number to continue logging in."
 
 #: src/strings.ts:2465
 msgid "Enter the gift code to redeem your subscription."
 msgstr "Enter the gift code to redeem your subscription."
-
-#: src/strings.ts:120
-msgid "Enter the recovery code to continue logging in"
-msgstr "Enter the recovery code to continue logging in"
 
 #: src/strings.ts:2653
 msgid "Enter title"
@@ -2863,6 +2859,10 @@ msgstr "Enter your PGP private key"
 #: src/strings.ts:2811
 msgid "Enter your PGP public key"
 msgstr "Enter your PGP public key"
+
+#: src/strings.ts:120
+msgid "Enter your recovery code."
+msgstr "Enter your recovery code."
 
 #: src/strings.ts:2120
 msgid "Enter your username"
@@ -4993,8 +4993,8 @@ msgid "Payment method"
 msgstr "Payment method"
 
 #: src/strings.ts:2827
-msgid "Payment summary"
-msgstr "Payment summary"
+msgid "Payment Summary"
+msgstr "Payment Summary"
 
 #: src/strings.ts:788
 msgid "PDF is password protected"
@@ -5146,6 +5146,14 @@ msgstr "Please make sure you have saved the recovery key. Tap one more time to c
 #: src/strings.ts:228
 msgid "Please note that we will respond to your issue on the given link. We recommend that you save it."
 msgstr "Please note that we will respond to your issue on the given link. We recommend that you save it."
+
+#: src/strings.ts:2855
+msgid "Please provide a valid multi factor authentication code."
+msgstr "Please provide a valid multi factor authentication code."
+
+#: src/strings.ts:2853
+msgid "Please provide a valid multi factor authentication recovery code."
+msgstr "Please provide a valid multi factor authentication recovery code."
 
 #: src/strings.ts:1786
 msgid "Please refer to the"
@@ -5305,13 +5313,13 @@ msgstr "Privacy for everyone"
 msgid "Privacy mode"
 msgstr "Privacy mode"
 
-#: src/strings.ts:2609
-msgid "privacy policy"
-msgstr "privacy policy"
-
 #: src/strings.ts:1301
 msgid "Privacy policy"
 msgstr "Privacy policy"
+
+#: src/strings.ts:2611
+msgid "Privacy Policy."
+msgstr "Privacy Policy."
 
 #: src/strings.ts:104
 msgid "Privacy Policy. "
@@ -5524,6 +5532,10 @@ msgstr "Recommended by Privacy Guides"
 #: src/strings.ts:435
 msgid "Recover your account"
 msgstr "Recover your account"
+
+#: src/strings.ts:2851
+msgid "Recovery Code"
+msgstr "Recovery Code"
 
 #: src/strings.ts:1021
 msgid "Recovery codes copied!"
@@ -6377,7 +6389,7 @@ msgstr "Set the interval to create a partial backup (without attachments) automa
 msgid "Set your name"
 msgstr "Set your name"
 
-#: src/strings.ts:2845
+#: src/strings.ts:2849
 msgid "Setting up your account..."
 msgstr "Setting up your account..."
 
@@ -6652,8 +6664,8 @@ msgid "Subscribe"
 msgstr "Subscribe"
 
 #: src/strings.ts:2604
-msgid "Subscribe and start free trial"
-msgstr "Subscribe and start free trial"
+msgid "Subscribe & Start Your Free Trial"
+msgstr "Subscribe & Start Your Free Trial"
 
 #: src/strings.ts:1041
 msgid "Subscribe to Pro"
@@ -6906,13 +6918,13 @@ msgstr "Tell us what happened"
 msgid "Terms of service"
 msgstr "Terms of service"
 
+#: src/strings.ts:2609
+msgid "Terms of Service"
+msgstr "Terms of Service"
+
 #: src/strings.ts:102
 msgid "Terms of Service "
 msgstr "Terms of Service "
-
-#: src/strings.ts:2611
-msgid "terms of use."
-msgstr "terms of use."
 
 #: src/strings.ts:1643
 msgid "Test connection"
@@ -7777,8 +7789,8 @@ msgid "What went wrong?"
 msgstr "What went wrong?"
 
 #: src/strings.ts:2826
-msgid "What's included"
-msgstr "What's included"
+msgid "What's Included"
+msgstr "What's Included"
 
 #: src/strings.ts:2541
 msgid "Why do you need my credit card details for a free trial?"
@@ -8035,7 +8047,7 @@ msgstr "Your account email will be changed without affecting your subscription o
 msgid "Your account has been recovered."
 msgstr "Your account has been recovered."
 
-#: src/strings.ts:2846
+#: src/strings.ts:2850
 msgid "Your account is almost ready, please wait."
 msgstr "Your account is almost ready, please wait."
 
