@@ -6222,6 +6222,10 @@ msgstr ""
 msgid "Set your name"
 msgstr ""
 
+#: src/strings.ts:2796
+msgid "Setting up your account..."
+msgstr ""
+
 #: src/strings.ts:387
 #: src/strings.ts:1545
 msgid "Settings"
@@ -7815,6 +7819,10 @@ msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:1938
 msgid "Your account has been recovered."
+msgstr ""
+
+#: src/strings.ts:2797
+msgid "Your account is almost ready, please wait."
 msgstr ""
 
 #: src/strings.ts:502
