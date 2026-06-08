@@ -4117,7 +4117,7 @@ msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/
 msgstr ""
 
 #: src/strings.ts:542
-msgid "Login to your account"
+msgid "Login to your Account"
 msgstr ""
 
 #: src/strings.ts:776
