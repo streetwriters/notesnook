@@ -3187,8 +3187,8 @@ msgid ""
 msgstr ""
 
 #: src/strings.ts:553
-msgid "Forgot password?"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgid "Forgot Password?"
+msgstr ""
 
 #: src/strings.ts:2779
 msgid "Free {days} days trial, cancel anytime"
@@ -4016,7 +4016,7 @@ msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/
 msgstr ""
 
 #: src/strings.ts:542
-msgid "Login to your account"
+msgid "Login to your Account"
 msgstr ""
 
 #: src/strings.ts:776
@@ -5455,7 +5455,7 @@ msgid "Reload app"
 msgstr ""
 
 #: src/strings.ts:1849
-msgid "Relogin to your account"
+msgid "Relogin to your Account"
 msgstr ""
 
 #: src/strings.ts:1817
