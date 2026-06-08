@@ -115,6 +115,10 @@ export const FileSizeResult = {
   Error: -1
 };
 
+function getFileSizeFromHeaders(headers: Headers) {
+  return headers.get("x-object-size") || headers.get("content-length");
+}
+
 export async function getUploadedFileSize(hash: string, retry = 0) {
   try {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
@@ -124,24 +128,21 @@ export async function getUploadedFileSize(hash: string, retry = 0) {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    if (
-      !attachmentInfo.ok ||
-      attachmentInfo.headers?.get("content-length") === null
-    ) {
+    const fileSize = getFileSizeFromHeaders(attachmentInfo.headers);
+
+    if (!attachmentInfo.ok || fileSize === null) {
       if (retry < 3) {
         DatabaseLogger.log(`Retrying file size check: ${hash}, ${retry}`);
         return getUploadedFileSize(hash, retry + 1);
       }
       throw new Error(
-        `File size check failed: ${hash}, ${
-          attachmentInfo.status
-        }, ${attachmentInfo.headers?.get("content-length")}`
+        `File size check failed: ${hash}, ${attachmentInfo.status}, ${fileSize}`
       );
     }
 
-    const contentLength = parseInt(
-      attachmentInfo.headers?.get("content-length") as string
-    );
+    console.log(attachmentInfo.headers);
+
+    const contentLength = parseInt(fileSize as string);
     return isNaN(contentLength) ? FileSizeResult.Empty : contentLength;
   } catch (e) {
     DatabaseLogger.error(e);
@@ -161,10 +162,10 @@ export async function checkUpload(
     size === 0
       ? `File size is 0.`
       : size === -1
-      ? `File verification check failed.`
-      : expectedSize !== decryptedLength
-      ? `File size mismatch. Expected ${size} bytes but got ${decryptedLength} bytes.`
-      : undefined;
+        ? `File verification check failed.`
+        : expectedSize !== decryptedLength
+          ? `File size mismatch. Expected ${size} bytes but got ${decryptedLength} bytes.`
+          : undefined;
   if (error) throw new Error(error);
 }
 
