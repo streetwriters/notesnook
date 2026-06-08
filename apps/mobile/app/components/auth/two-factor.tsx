@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
+import { TextInput, TouchableOpacity, View } from "react-native";
 import { db } from "../../common/database/index";
 import { Radius, Spacing } from "../../common/design/spacing";
 import useTimer from "../../hooks/use-timer";
@@ -316,7 +316,7 @@ const TwoFactorVerification = ({
               <Button
                 onPress={onSendCode}
                 type={"plain"}
-                disabled={!seconds}
+                disabled={parseInt(`${seconds}`) !== 0}
                 title={
                   sending
                     ? ""
@@ -338,14 +338,20 @@ const TwoFactorVerification = ({
             ) : null}
           </View>
 
-          <Button
-            title={strings["2faCodeSecondaryMethodText"][
-              currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
-            ]()}
-            type="plain"
+          <TouchableOpacity
             onPress={onRequestSecondaryMethod}
-            height={30}
-          />
+            activeOpacity={0.8}
+            style={{
+              alignSelf: "center",
+              paddingVertical: 0
+            }}
+          >
+            <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+              {strings["2faCodeSecondaryMethodText"][
+                currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
+              ]()}
+            </Paragraph>
+          </TouchableOpacity>
         </>
       ) : (
         <View
