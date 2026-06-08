@@ -21,12 +21,7 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import React, { useRef, useState } from "react";
-import {
-  TextInput,
-  TouchableOpacity,
-  View,
-  useWindowDimensions
-} from "react-native";
+import { TextInput, TouchableOpacity, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
@@ -51,6 +46,24 @@ import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
 import { ProgressPills } from "../intro/progress-pills";
 import { sleep } from "../../utils/time";
 
+const getSettingAccountSvg = (dark: boolean) => {
+  if (dark) return SETTING_ACCOUNT_SVG;
+
+  return SETTING_ACCOUNT_SVG.replace('stroke="#1F2722"', 'stroke="#E8F4ED"')
+    .replace(
+      'fill="#008836" fill-opacity="0.09" stroke="#233C2D"',
+      'fill="#008836" fill-opacity="0.04" stroke="#E3F1E8"'
+    )
+    .replace(
+      'fill="#008836" fill-opacity="0.09" stroke="#233C2D"',
+      'fill="#008836" fill-opacity="0.05" stroke="#E8F0EC"'
+    )
+    .replace(
+      'fill="#008836" fill-opacity="0.08" stroke="#233C2D"',
+      'fill="#008836" fill-opacity="0.06" stroke="#D3E8DB"'
+    );
+};
+
 const SignupSteps = {
   signup: 0,
   selectPlan: 1,
@@ -65,7 +78,7 @@ export const Signup = ({
   welcome: boolean;
 }) => {
   const [currentStep, setCurrentStep] = useState(SignupSteps.signup);
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const formRef = useRef(
     createFormRef({
       email: "",
@@ -80,8 +93,6 @@ export const Signup = ({
   const [loading, setLoading] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const setLastSynced = useUserStore((state) => state.setLastSynced);
-  const { width, height } = useWindowDimensions();
-  const isTablet = width > 600;
   const route = useRoute<RouteProp<RouteParams, "Auth">>();
 
   const signup = async () => {
@@ -366,7 +377,7 @@ export const Signup = ({
           {welcome ? <ProgressPills activePillIndex={2} /> : null}
           <Loading
             title={strings.settingUpYourAccount()}
-            svgSrc={SETTING_ACCOUNT_SVG}
+            svgSrc={getSettingAccountSvg(isDark)}
             description={strings.accountAlmostReady()}
             style={{
               height: undefined,
