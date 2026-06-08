@@ -6373,6 +6373,10 @@ msgstr "Set the interval to create a partial backup (without attachments) automa
 msgid "Set your name"
 msgstr "Set your name"
 
+#: src/strings.ts:2796
+msgid "Setting up your account..."
+msgstr "Setting up your account..."
+
 #: src/strings.ts:387
 #: src/strings.ts:1545
 msgid "Settings"
@@ -8022,6 +8026,10 @@ msgstr "Your account email will be changed without affecting your subscription o
 #: src/strings.ts:1938
 msgid "Your account has been recovered."
 msgstr "Your account has been recovered."
+
+#: src/strings.ts:2797
+msgid "Your account is almost ready, please wait."
+msgstr "Your account is almost ready, please wait."
 
 #: src/strings.ts:502
 #: src/strings.ts:1749
