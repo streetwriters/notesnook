@@ -1834,7 +1834,7 @@ msgid "Community"
 msgstr ""
 
 #: src/strings.ts:2580
-msgid "Compare plans"
+msgid "Compare Plans"
 msgstr ""
 
 #: src/strings.ts:42
