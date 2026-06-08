@@ -2845,5 +2845,7 @@ Continue without attachments?`,
     description: () =>
       t`Your thoughts deserve a home. Create your first note and start organizing your life today.`,
     button: () => t`Add Your First Note`
-  }
+  },
+  settingUpYourAccount: () => t`Setting up your account...`,
+  accountAlmostReady: () => t`Your account is almost ready, please wait.`
 };
