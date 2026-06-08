@@ -30,7 +30,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Steps } from "./common";
-import { Spacing } from "../../common/design/spacing";
+import { Radius, Spacing } from "../../common/design/spacing";
 
 export const ComparePlans = React.memo(
   (props: {
@@ -66,8 +66,8 @@ export const ComparePlans = React.memo(
                 key={plan}
                 style={{
                   width: index === 0 ? 150 : 120,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
+                  paddingHorizontal: Spacing.LEVEL_1,
+                  paddingVertical: Spacing.LEVEL_2,
                   backgroundColor:
                     index === 0 ? colors.secondary.background : undefined,
                   borderBottomWidth: index === 0 ? 1 : undefined,
@@ -95,8 +95,8 @@ export const ComparePlans = React.memo(
                 <View
                   style={{
                     width: index === 0 ? 150 : 120,
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
+                    paddingHorizontal: Spacing.LEVEL_1,
+                    paddingVertical: Spacing.LEVEL_2,
                     backgroundColor:
                       index === 0 ? colors.secondary.background : undefined,
                     borderBottomWidth: index === 0 ? 1 : undefined,
@@ -154,8 +154,7 @@ export const ComparePlans = React.memo(
                 key={plan + "btn"}
                 style={{
                   width: index === 0 ? 150 : 120,
-                  paddingHorizontal: 16,
-                  paddingVertical: 8
+                  paddingHorizontal: Spacing.LEVEL_1
                 }}
               >
                 {plan !== "free" && plan !== "features" ? (
@@ -163,6 +162,11 @@ export const ComparePlans = React.memo(
                     title={strings.select()}
                     type="accent"
                     fontSize={AppFontSize.xs}
+                    style={{
+                      paddingVertical: Spacing.LEVEL_1,
+                      borderRadius: Radius.XS,
+                      alignSelf: "flex-start"
+                    }}
                     onPress={() => {
                       props.pricingPlans?.selectPlan(plan);
                       props.setStep(Steps.buy);
