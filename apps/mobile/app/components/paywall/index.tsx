@@ -39,7 +39,6 @@ import {
   PRIVACY_GUIDES_SVG,
   TECHLORE_SVG,
   THE_VERGE_SVG,
-  TRUST_BAR_SVG,
   XDA_SVG
 } from "../../assets/images/assets";
 import { db } from "../../common/database";
@@ -50,7 +49,6 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { AuthMode } from "../auth/common";
-import { Header } from "../header";
 import { BuyPlan } from "../sheets/buy-plan";
 import { Toast } from "../toast";
 import AppIcon from "../ui/AppIcon";
@@ -66,34 +64,34 @@ import { FAQItem } from "./faq-item";
 import { PricingPlanCard } from "./plan-card";
 import { ReviewItem } from "./review-item";
 
-const PRESS_LOGOS = [
+const PRESS_LOGOS = (dark?: boolean) => [
   {
     id: "android-police",
-    src: ANDROID_POLICE_SVG,
+    src: ANDROID_POLICE_SVG.replace(/white/g, dark ? "white" : "black"),
     width: 120,
     height: 14
   },
   {
     id: "the-verge",
-    src: THE_VERGE_SVG,
+    src: THE_VERGE_SVG.replace(/#F0F0F0/gi, dark ? "#F0F0F0" : "#111827"),
     width: 67,
     height: 14
   },
   {
     id: "freedom-press",
-    src: FREEDOM_PRESS_SVG,
+    src: FREEDOM_PRESS_SVG.replace(/white/g, dark ? "white" : "#1F2937"),
     width: 80,
     height: 12
   },
   {
     id: "privacy-guides",
-    src: PRIVACY_GUIDES_SVG,
+    src: PRIVACY_GUIDES_SVG.replace(/white/g, dark ? "white" : "#1F2937"),
     width: 110,
     height: 16
   },
   {
     id: "techlore",
-    src: TECHLORE_SVG,
+    src: TECHLORE_SVG.replace(/white/g, dark ? "white" : "#1F2937"),
     width: 72,
     height: 14
   },
@@ -105,7 +103,7 @@ const PRESS_LOGOS = [
   },
   {
     id: "xda",
-    src: XDA_SVG,
+    src: XDA_SVG.replace(/#C9C9C9/gi, dark ? "#C9C9C9" : "#4B5563"),
     width: 40,
     height: 12
   },
@@ -124,7 +122,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
   const [planPageIndex, setPlanPageIndex] = useState(1);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const isTablet = width > 600;
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
   const pricingPlans = usePricingPlans({
     planId: routeParams.state?.planId,
     productId: routeParams.state?.productId,
@@ -483,7 +481,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                 paddingVertical: Spacing.LEVEL_7
               }}
             >
-              {PRESS_LOGOS.map((item) => (
+              {PRESS_LOGOS(isDark).map((item) => (
                 <View
                   key={item.id}
                   style={{
@@ -615,7 +613,7 @@ After trying all the privacy security oriented note taking apps, for the price a
                 paddingVertical: Spacing.LEVEL_4
               }}
             >
-              <Heading fontSize="XL">
+              <Heading fontSize="XL" lineHeight={undefined}>
                 {strings.frequentlyAskedQuestions()}
               </Heading>
             </View>
