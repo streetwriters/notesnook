@@ -324,7 +324,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                   flexDirection: "row",
                   gap: Spacing.LEVEL_1,
                   alignSelf: "center",
-                  marginBottom: Spacing.LEVEL_4
+                  marginBottom: Spacing.LEVEL_3
                 }}
               >
                 <Button
@@ -393,6 +393,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                 contentContainerStyle={{
                   gap: Spacing.LEVEL_3
                 }}
+                showsHorizontalScrollIndicator={false}
                 horizontal
                 pagingEnabled
                 snapToOffsets={[310, 650]}
@@ -412,7 +413,8 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                       style={{
                         width: 320,
                         marginLeft: index === 1 ? Spacing.LEVEL_3 : 0,
-                        marginRight: index === 3 ? Spacing.LEVEL_3 : 0
+                        marginRight: index === 3 ? Spacing.LEVEL_3 : 0,
+                        paddingVertical: Spacing.LEVEL_1
                       }}
                     >
                       <PricingPlanCard
