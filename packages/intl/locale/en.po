@@ -1868,6 +1868,10 @@ msgstr "Copy link"
 msgid "Copy link text"
 msgstr "Copy link text"
 
+#: src/strings.ts:2694
+msgid "Copy logs"
+msgstr "Copy logs"
+
 #: src/strings.ts:454
 msgid "Copy note"
 msgstr "Copy note"
@@ -7272,6 +7276,14 @@ msgstr "We are creating a backup of your data. Please wait..."
 #: src/strings.ts:474
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 msgstr "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
+
+#: src/strings.ts:2700
+msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
+msgstr "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
+
+#: src/strings.ts:2693
+msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
+msgstr "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 
 #: src/strings.ts:1390
 msgid "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."

@@ -63,6 +63,8 @@ import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/menu-items";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { openLinkInBrowser } from "../../utils/functions";
+import Clipboard from "@react-native-clipboard/clipboard";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -441,14 +443,55 @@ function ThemeSelector() {
                   ReactNativeBlobUtil.fs
                     .unlink(themeJsonCopiedPath)
                     .catch(() => {});
-                  const json = JSON.parse(themeJson);
+                  let json;
+                  try {
+                    json = JSON.parse(themeJson);
+                  } catch (e) {
+                    ToastManager.show({
+                      heading: strings.invalidThemeFileFormat(),
+                      type: "error",
+                      context: "global",
+                      actionText: strings.learnMore(),
+                      func: () => {
+                        openLinkInBrowser(
+                          "https://help.notesnook.com/custom-themes/introduction"
+                        );
+                      }
+                    });
+                    return;
+                  }
                   const result = validateTheme(json);
+
                   if (result.error) {
-                    ToastManager.error(new Error(result.error));
+                    if (
+                      typeof result.error === "string" &&
+                      result.error.includes("missing from the theme")
+                    ) {
+                      ToastManager.show({
+                        heading: strings.themeMissingRequiredFields(),
+                        type: "error",
+                        context: "global",
+                        actionText: strings.copyLogs(),
+                        func: () => {
+                          Clipboard.setString(result.error || "");
+                          ToastManager.show({
+                            heading: strings.logsCopied(),
+                            type: "success",
+                            context: "global"
+                          });
+                        }
+                      });
+                    } else {
+                      ToastManager.error(new Error(result.error));
+                    }
+
                     return;
                   }
                   select(json, true);
                 } catch (e) {
+                  if ((e as Error).message.includes("Code=3072")) {
+                    return;
+                  }
                   ToastManager.error(e as Error);
                 }
               }}

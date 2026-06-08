@@ -2695,5 +2695,10 @@ Continue without attachments?`,
     t`Creation date cannot be after last edited date`,
   noteDuplicated: () => t`Note duplicated`,
   maximumReminderDate: (maxDate: string) =>
-    t`Maximum reminder date is ${maxDate}`
+    t`Maximum reminder date is ${maxDate}`,
+  invalidThemeFileFormat: () =>
+    t`We couldn't load this theme. Please make sure the file is a valid JSON theme file.`,
+  themeMissingRequiredFields: () =>
+    t`We couldn't load this theme. The file appears to be incomplete or missing required theme properties.`,
+  copyLogs: () => t`Copy logs`
 };

@@ -192,7 +192,8 @@ export async function checkAndCreateDir(path: string) {
 }
 
 export const santizeUri = (uri: string) => {
-  return Platform.OS === "ios" ? decodeURI(uri).replace("file:///", "/") : uri;
+  const decoded = decodeURI(uri);
+  return Platform.OS === "ios" ? decoded.replace("file:///", "/") : decoded;
 };
 
 export function isSuccessStatusCode(statusCode: number) {
