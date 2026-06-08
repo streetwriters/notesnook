@@ -55,6 +55,7 @@
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/theme": "file:../../packages/theme",
     "@notesnook/themes-server": "file:../../servers/themes",
+    "@react-native-camera-roll/camera-roll": "^7.10.2",
     "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/checkbox": "^0.5.20",
     "@react-native-community/datetimepicker": "^8.4.5",
