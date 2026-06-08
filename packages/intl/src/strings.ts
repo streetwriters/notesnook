@@ -2819,8 +2819,8 @@ Continue without attachments?`,
     monthly: () => t`Billed monthly`,
     oneTime: () => t`One time purchase`
   },
-  whatsIncluded: () => t`What's included`,
-  paymentSummary: () => t`Payment summary`,
+  whatsIncluded: () => t`What's Included`,
+  paymentSummary: () => t`Payment Summary`,
   planWhatsIncluded: {
     unlimitedNotes: () => t`Unlimited notes and attachments`,
     endToEnd: () => t`End-to-end encryption (XChaCha20)`,
