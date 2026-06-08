@@ -80,7 +80,11 @@ const TwoFactorVerification = ({
   const onNext = async () => {
     if (!code.current || code.current.length < 6) {
       setError(
-        new Error("Please provide a valid multi-factor authentication code.")
+        new Error(
+          currentMethod.method === "recoveryCode"
+            ? strings.provideValidMultiFactorAuthRecoveryCode()
+            : strings.provideValidMultiFactorAuthCode()
+        )
       );
       return;
     }
@@ -214,7 +218,11 @@ const TwoFactorVerification = ({
             marginBottom: Spacing.LEVEL_1
           }}
         >
-          {currentMethod.method ? strings["2fa"]() : strings.select2faMethod()}
+          {currentMethod.method === "recoveryCode"
+            ? strings.recoveryCodeTitle()
+            : currentMethod.method
+              ? strings["2fa"]()
+              : strings.select2faMethod()}
         </Heading>
         <Paragraph
           style={{
@@ -234,10 +242,6 @@ const TwoFactorVerification = ({
           <View
             style={{
               borderRadius: Radius.S,
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              paddingVertical: Spacing.LEVEL_4,
-              paddingHorizontal: Spacing.LEVEL_3,
               width: "100%",
               gap: Spacing.LEVEL_4
             }}
@@ -343,7 +347,8 @@ const TwoFactorVerification = ({
             activeOpacity={0.8}
             style={{
               alignSelf: "center",
-              paddingVertical: 0
+              paddingVertical: 0,
+              marginTop: Spacing.LEVEL_3
             }}
           >
             <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
