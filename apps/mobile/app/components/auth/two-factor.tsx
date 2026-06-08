@@ -256,7 +256,8 @@ const TwoFactorVerification = ({
                 code.current = value;
               }}
               onSubmitEditing={onNext}
-              keyboardType={isRecoveryCode ? "default" : "number-pad"}
+              keyboardType={isRecoveryCode ? "web-search" : "number-pad"}
+              showDashAfterDigit={isRecoveryCode ? 5 : undefined}
               sanitize={(value: string) => {
                 if (isRecoveryCode) {
                   return value.replace(/[^0-9a-zA-Z]/g, "").toUpperCase();
