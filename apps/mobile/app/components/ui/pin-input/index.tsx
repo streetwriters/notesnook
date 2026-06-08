@@ -32,6 +32,7 @@ import {
 } from "react-native";
 import { Radius, Spacing } from "../../../common/design/spacing";
 import { AppFontSize } from "../../../utils/size";
+import Paragraph from "../typography/paragraph";
 
 type PinInputProps = {
   value: string;
@@ -43,6 +44,7 @@ type PinInputProps = {
   onSubmitEditing?: TextInputProps["onSubmitEditing"];
   onChangeText: (value: string) => void;
   sanitize?: (value: string) => string;
+  showDashAfterDigit?: number;
 };
 
 const defaultSanitizer = (value: string) => value;
@@ -56,7 +58,8 @@ const PinInput = ({
   keyboardType = "number-pad",
   onSubmitEditing,
   onChangeText,
-  sanitize = defaultSanitizer
+  sanitize = defaultSanitizer,
+  showDashAfterDigit
 }: PinInputProps) => {
   const { colors } = useThemeColors();
   const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -257,63 +260,68 @@ const PinInput = ({
           const isActive = focusedIndex === index;
 
           return (
-            <TouchableOpacity
-              key={`${index}`}
-              activeOpacity={0.9}
-              onPress={() => focusCell(index)}
-            >
-              <View
-                style={{
-                  width: 16,
-                  height: 16,
-                  borderBottomWidth: 2,
-                  borderBottomColor: isActive
-                    ? colors.selected.accent
-                    : colors.primary.shade,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
+            <>
+              <TouchableOpacity
+                key={`${index}`}
+                activeOpacity={0.9}
+                onPress={() => focusCell(index)}
               >
-                <TextInput
-                  ref={(ref) => {
-                    inputRefs.current[index] = ref;
-                    if (index === 0 && inputRef) {
-                      inputRef.current = ref;
-                    }
-                  }}
-                  disableFullscreenUI={true}
-                  value={char}
-                  maxLength={1}
-                  keyboardType={keyboardType}
-                  onChangeText={(text) => onCellChange(index, text)}
-                  onKeyPress={(event) => onCellKeyPress(index, event)}
-                  onFocus={() => setFocusedIndex(index)}
-                  onBlur={() => {
-                    setFocusedIndex((current) =>
-                      current === index ? null : current
-                    );
-                  }}
-                  autoCorrect={false}
-                  autoComplete="off"
-                  textContentType="oneTimeCode"
-                  inputMode="numeric"
-                  importantForAutofill="yes"
-                  selectionColor={colors.selected.accent}
+                <View
                   style={{
-                    width: "100%",
-                    height: "100%",
-                    textAlign: "center",
-                    fontSize: AppFontSize.sm,
-                    color: colors.primary.paragraph,
-                    padding: 0,
-                    margin: 0
+                    width: 16,
+                    height: 16,
+                    borderBottomWidth: 2,
+                    borderBottomColor: isActive
+                      ? colors.selected.accent
+                      : colors.primary.shade,
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
-                  onSubmitEditing={onSubmitEditing}
-                  blurOnSubmit={index === length - 1}
-                  returnKeyType={index === length - 1 ? "done" : "next"}
-                />
-              </View>
-            </TouchableOpacity>
+                >
+                  <TextInput
+                    ref={(ref) => {
+                      inputRefs.current[index] = ref;
+                      if (index === 0 && inputRef) {
+                        inputRef.current = ref;
+                      }
+                    }}
+                    contextMenuHidden={true}
+                    disableFullscreenUI={true}
+                    value={char}
+                    maxLength={1}
+                    keyboardType={keyboardType}
+                    onChangeText={(text) => onCellChange(index, text)}
+                    onKeyPress={(event) => onCellKeyPress(index, event)}
+                    onFocus={() => setFocusedIndex(index)}
+                    onBlur={() => {
+                      setFocusedIndex((current) =>
+                        current === index ? null : current
+                      );
+                    }}
+                    autoCorrect={false}
+                    autoComplete="off"
+                    textContentType="oneTimeCode"
+                    importantForAutofill="yes"
+                    selectionColor={colors.selected.accent}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      textAlign: "center",
+                      fontSize: AppFontSize.sm,
+                      color: colors.primary.paragraph,
+                      padding: 0,
+                      margin: 0
+                    }}
+                    onSubmitEditing={onSubmitEditing}
+                    blurOnSubmit={index === length - 1}
+                    returnKeyType={index === length - 1 ? "done" : "next"}
+                  />
+                </View>
+              </TouchableOpacity>
+              {showDashAfterDigit === index + 1 ? (
+                <Paragraph>-</Paragraph>
+              ) : null}
+            </>
           );
         })}
       </View>
