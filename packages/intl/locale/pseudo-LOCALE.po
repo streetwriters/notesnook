@@ -3280,7 +3280,7 @@ msgid ""
 msgstr ""
 
 #: src/strings.ts:553
-msgid "Forgot password?"
+msgid "Forgot Password?"
 msgstr ""
 
 #: src/strings.ts:2832
@@ -4113,7 +4113,7 @@ msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/
 msgstr ""
 
 #: src/strings.ts:542
-msgid "Login to your account"
+msgid "Login to your Account"
 msgstr ""
 
 #: src/strings.ts:776
@@ -5584,7 +5584,7 @@ msgid "Reload app"
 msgstr ""
 
 #: src/strings.ts:1849
-msgid "Relogin to your account"
+msgid "Relogin to your Account"
 msgstr ""
 
 #: src/strings.ts:1817
@@ -6351,7 +6351,7 @@ msgstr ""
 msgid "Set your name"
 msgstr ""
 
-#: src/strings.ts:2796
+#: src/strings.ts:2845
 msgid "Setting up your account..."
 msgstr ""
 
@@ -7974,7 +7974,7 @@ msgstr ""
 msgid "Your account has been recovered."
 msgstr ""
 
-#: src/strings.ts:2797
+#: src/strings.ts:2846
 msgid "Your account is almost ready, please wait."
 msgstr ""
 

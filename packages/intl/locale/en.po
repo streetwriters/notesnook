@@ -3298,8 +3298,8 @@ msgstr ""
 "**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**"
 
 #: src/strings.ts:553
-msgid "Forgot password?"
-msgstr "Forgot password?"
+msgid "Forgot Password?"
+msgstr "Forgot Password?"
 
 #: src/strings.ts:2832
 msgid "Free {days} days trial, cancel anytime"
@@ -4133,8 +4133,8 @@ msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/
 msgstr "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
 
 #: src/strings.ts:542
-msgid "Login to your account"
-msgstr "Login to your account"
+msgid "Login to your Account"
+msgstr "Login to your Account"
 
 #: src/strings.ts:776
 msgid "Logout"
@@ -5610,8 +5610,8 @@ msgid "Reload app"
 msgstr "Reload app"
 
 #: src/strings.ts:1849
-msgid "Relogin to your account"
-msgstr "Relogin to your account"
+msgid "Relogin to your Account"
+msgstr "Relogin to your Account"
 
 #: src/strings.ts:1817
 msgid "Remembered your password?"
@@ -6377,7 +6377,7 @@ msgstr "Set the interval to create a partial backup (without attachments) automa
 msgid "Set your name"
 msgstr "Set your name"
 
-#: src/strings.ts:2796
+#: src/strings.ts:2845
 msgid "Setting up your account..."
 msgstr "Setting up your account..."
 
@@ -8035,7 +8035,7 @@ msgstr "Your account email will be changed without affecting your subscription o
 msgid "Your account has been recovered."
 msgstr "Your account has been recovered."
 
-#: src/strings.ts:2797
+#: src/strings.ts:2846
 msgid "Your account is almost ready, please wait."
 msgstr "Your account is almost ready, please wait."
 
