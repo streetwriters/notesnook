@@ -55,7 +55,7 @@ export const THEME_LIGHT: any = {
         buttonForeground: "#FFFFFF"
       },
       secondary: {
-        accent: "#7FC39A",
+        accent: "#0D9E46",
         accentForeground: "#ffffff",
         paragraph: "#858585",
         background: "#F7F7F7",
