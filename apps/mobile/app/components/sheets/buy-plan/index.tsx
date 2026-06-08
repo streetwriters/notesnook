@@ -601,7 +601,14 @@ const ProductItem = (props: {
             : null}
         </Heading>
 
-        <Paragraph size={AppFontSize.xs}>/month</Paragraph>
+        <Paragraph
+          style={{
+            alignSelf: "flex-end"
+          }}
+          size={AppFontSize.xs}
+        >
+          /month
+        </Paragraph>
       </View>
     </TouchableOpacity>
   );
