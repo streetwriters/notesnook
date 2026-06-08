@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2442
 msgid " \"Notebook > Notes\""
@@ -680,10 +686,10 @@ msgstr ""
 
 #: src/strings.ts:1305
 msgid "About"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2845
-msgid "Access on all devices"
+msgid "Access on all your devices"
 msgstr ""
 
 #: src/strings.ts:1040
@@ -786,7 +792,7 @@ msgstr ""
 msgid "Add your first note"
 msgstr ""
 
-#: src/strings.ts:2847
+#: src/strings.ts:2861
 msgid "Add Your First Note"
 msgstr ""
 
@@ -1397,7 +1403,7 @@ msgid "Cancel"
 msgstr ""
 
 #: src/strings.ts:2606
-msgid "Cancel anytime, subscription auto-renews."
+msgid "Cancel anytime, Subscription auto-renews."
 msgstr ""
 
 #: src/strings.ts:2568
@@ -2838,23 +2844,19 @@ msgid "Enter recovery code"
 msgstr ""
 
 #: src/strings.ts:119
-msgid "Enter the 6 digit code from your authenticator app to continue logging in"
+msgid "Enter the 6 digit code from your authenticator app to continue logging in."
 msgstr ""
 
 #: src/strings.ts:115
-msgid "Enter the 6 digit code sent to your email to continue logging in"
+msgid "Enter the 6 digit code sent to your email to continue logging in."
 msgstr ""
 
 #: src/strings.ts:117
-msgid "Enter the 6 digit code sent to your phone number to continue logging in"
+msgid "Enter the 6 digit code sent to your phone number to continue logging in."
 msgstr ""
 
 #: src/strings.ts:2465
 msgid "Enter the gift code to redeem your subscription."
-msgstr ""
-
-#: src/strings.ts:120
-msgid "Enter the recovery code to continue logging in"
 msgstr ""
 
 #: src/strings.ts:2653
@@ -2875,6 +2877,10 @@ msgstr ""
 
 #: src/strings.ts:2811
 msgid "Enter your PGP public key"
+msgstr ""
+
+#: src/strings.ts:120
+msgid "Enter your recovery code."
 msgstr ""
 
 #: src/strings.ts:2120
@@ -4562,7 +4568,7 @@ msgstr ""
 msgid "No notebooks yet"
 msgstr ""
 
-#: src/strings.ts:2844
+#: src/strings.ts:2858
 msgid "No notes yet"
 msgstr ""
 
@@ -4996,10 +5002,10 @@ msgstr ""
 
 #: src/strings.ts:2230
 msgid "Payment method"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2841
-msgid "Payment summary"
+msgid "Payment Summary"
 msgstr ""
 
 #: src/strings.ts:788
@@ -5151,6 +5157,14 @@ msgstr ""
 
 #: src/strings.ts:228
 msgid "Please note that we will respond to your issue on the given link. We recommend that you save it."
+msgstr ""
+
+#: src/strings.ts:2869
+msgid "Please provide a valid multi factor authentication code."
+msgstr ""
+
+#: src/strings.ts:2867
+msgid "Please provide a valid multi factor authentication recovery code."
 msgstr ""
 
 #: src/strings.ts:1786
@@ -5315,12 +5329,12 @@ msgstr ""
 msgid "Privacy mode"
 msgstr ""
 
-#: src/strings.ts:2609
-msgid "privacy policy"
-msgstr ""
-
 #: src/strings.ts:1301
 msgid "Privacy policy"
+msgstr ""
+
+#: src/strings.ts:2611
+msgid "Privacy Policy."
 msgstr ""
 
 #: src/strings.ts:104
@@ -5535,6 +5549,10 @@ msgstr ""
 msgid "Recover your account"
 msgstr ""
 
+#: src/strings.ts:2865
+msgid "Recovery Code"
+msgstr ""
+
 #: src/strings.ts:1021
 msgid "Recovery codes copied!"
 msgstr ""
@@ -5620,7 +5638,7 @@ msgid "Reload app"
 msgstr ""
 
 #: src/strings.ts:1849
-msgid "Relogin to your Account"
+msgid "Relogin to your account"
 msgstr ""
 
 #: src/strings.ts:1817
@@ -6387,7 +6405,7 @@ msgstr ""
 msgid "Set your name"
 msgstr ""
 
-#: src/strings.ts:2845
+#: src/strings.ts:2863
 msgid "Setting up your account..."
 msgstr ""
 
@@ -6650,7 +6668,7 @@ msgid "Subscribe"
 msgstr ""
 
 #: src/strings.ts:2604
-msgid "Subscribe and start free trial"
+msgid "Subscribe & Start Your Free Trial"
 msgstr ""
 
 #: src/strings.ts:1041
@@ -6897,12 +6915,12 @@ msgstr ""
 msgid "Terms of service"
 msgstr ""
 
-#: src/strings.ts:102
-msgid "Terms of Service "
+#: src/strings.ts:2609
+msgid "Terms of Service"
 msgstr ""
 
-#: src/strings.ts:2611
-msgid "terms of use."
+#: src/strings.ts:102
+msgid "Terms of Service "
 msgstr ""
 
 #: src/strings.ts:1643
@@ -7768,10 +7786,10 @@ msgstr ""
 
 #: src/strings.ts:1688
 msgid "What went wrong?"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
 #: src/strings.ts:2840
-msgid "What's included"
+msgid "What's Included"
 msgstr ""
 
 #: src/strings.ts:2541
@@ -8018,7 +8036,7 @@ msgstr ""
 msgid "Your account has been recovered."
 msgstr ""
 
-#: src/strings.ts:2846
+#: src/strings.ts:2864
 msgid "Your account is almost ready, please wait."
 msgstr ""
 
@@ -8191,7 +8209,7 @@ msgstr ""
 msgid "Your tags"
 msgstr ""
 
-#: src/strings.ts:2846
+#: src/strings.ts:2860
 msgid "Your thoughts deserve a home. Create your first note and start organizing your life today."
 msgstr ""
 
