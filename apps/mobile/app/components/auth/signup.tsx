@@ -49,6 +49,7 @@ import AppIcon from "../ui/AppIcon";
 import { Spacing } from "../../common/design/spacing";
 import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
 import { ProgressPills } from "../intro/progress-pills";
+import { sleep } from "../../utils/time";
 
 const SignupSteps = {
   signup: 0,
@@ -92,8 +93,9 @@ export const Signup = ({
 
     setLoading(true);
     try {
-      setCurrentStep(SignupSteps.createAccount);
       await db.user.signup(values.email.toLowerCase(), values.password);
+      await sleep(1000);
+      setCurrentStep(SignupSteps.createAccount);
       const user = await db.user.getUser();
       setUser(user);
       setLastSynced(await db.lastSynced());
