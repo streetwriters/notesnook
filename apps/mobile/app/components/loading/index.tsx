@@ -41,7 +41,7 @@ export const Loading = (props: {
         backgroundColor: colors.primary.background,
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 16,
+        paddingHorizontal: Spacing.LEVEL_3,
         ...props.style
       }}
     >
