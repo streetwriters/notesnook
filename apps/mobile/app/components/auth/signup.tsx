@@ -363,9 +363,9 @@ export const Signup = ({
         >
           {welcome ? <ProgressPills activePillIndex={2} /> : null}
           <Loading
-            title={"Setting up your account..."}
+            title={strings.settingUpYourAccount()}
             svgSrc={SETTING_ACCOUNT_SVG}
-            description="Your account is almost ready, please wait..."
+            description={strings.accountAlmostReady()}
             style={{
               height: undefined,
               marginTop: Spacing.LEVEL_6
