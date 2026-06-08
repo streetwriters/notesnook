@@ -196,7 +196,7 @@ export const BuyPlan = (props: {
                 </Paragraph>
               </View>
 
-              <Heading color={colors.primary.paragraph} fontSize="SM">
+              <Heading color={colors.primary.accent} fontSize="SM">
                 {hasTrialOffer
                   ? "Free"
                   : pricingPlans.getStandardPrice(
@@ -238,7 +238,7 @@ export const BuyPlan = (props: {
                       {dayjs()
                         .add(billingDuration?.duration || 0, "day")
                         .format("DD MMMM,YYYY")}{" "}
-                      *{" "}
+                      •{" "}
                       {isAnnual
                         ? strings.billingType.annual()
                         : is5YearPlanSelected
@@ -343,7 +343,7 @@ export const BuyPlan = (props: {
                 color: colors.primary.accent
               }}
               onPress={() => {
-                openLinkInBrowser("https://notesnook.com/privacy");
+                openLinkInBrowser("https://notesnook.com/tos");
               }}
             >
               {strings.subTerms[1]()}
@@ -354,7 +354,7 @@ export const BuyPlan = (props: {
                 color: colors.primary.accent
               }}
               onPress={() => {
-                openLinkInBrowser("https://notesnook.com/tos");
+                openLinkInBrowser("https://notesnook.com/privacy");
               }}
             >
               {strings.subTerms[3]()}

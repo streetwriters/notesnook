@@ -244,7 +244,10 @@ const PinInput = ({
           rowGap: Spacing.LEVEL_1,
           columnGap: Spacing.LEVEL_1,
           borderWidth: 1,
-          borderColor: colors.primary.border,
+          borderColor:
+            focusedIndex !== null
+              ? colors.selected.accent
+              : colors.primary.border,
           borderRadius: Radius.S,
           paddingVertical: Spacing.LEVEL_3,
           paddingHorizontal: Spacing.LEVEL_2
