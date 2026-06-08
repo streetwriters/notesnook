@@ -58,7 +58,7 @@ export const useLogin = (
       setLoading(true);
       switch (step) {
         case LoginSteps.emailAuth: {
-          if (formRef.current.validateField("email")) {
+          if (!formRef.current.validate()) {
             setLoading(false);
             return;
           }
