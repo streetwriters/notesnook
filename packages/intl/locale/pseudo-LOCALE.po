@@ -1809,7 +1809,7 @@ msgid "Community"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2580
-msgid "Compare plans"
+msgid "Compare Plans"
 msgstr ""
 
 #: src/strings.ts:42

@@ -2577,7 +2577,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   percentOff: (discount: string) => `${discount}% off`,
   recommendedByPrivacyGuides: () => t`Recommended by Privacy Guides`,
   featuredOn: () => t`Featured on`,
-  comparePlans: () => t`Compare plans`,
+  comparePlans: () => t`Compare Plans`,
   faqs: () => t`FAQs`,
   thankYouForSubscribing: () => t`Thank you for subscribing`,
   settingUpPlan: () =>
