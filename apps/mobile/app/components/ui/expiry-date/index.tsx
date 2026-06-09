@@ -42,22 +42,10 @@ export const ExpiryDate = ({
   short?: boolean;
 } & ButtonProps) => {
   const { colors } = useThemeColors();
-
   const expiryValue = note?.expiryDate?.value;
   if (!expiryValue) return null;
 
-  const expiryDate = dayjs(expiryValue);
-  const now = dayjs();
-  const isToday = expiryDate.isSame(now, "day");
-  const isTomorrow = expiryDate.isSame(now.add(1, "day"), "day");
-
-  const formattedDate = isToday
-    ? "Today"
-    : isTomorrow
-      ? "Tomorrow"
-      : expiryDate.format("DD MMM YYYY");
-
-  const isUrgent = isToday || isTomorrow;
+  const formattedDate = dayjs(expiryValue).format("DD MMM YYYY");
 
   return (
     <Button
@@ -66,9 +54,6 @@ export const ExpiryDate = ({
       fontSize={textStyle?.fontSize || AppFontSize.xs}
       iconSize={iconSize || AppFontSize.sm}
       type="secondary"
-      buttonType={
-        isUrgent ? { text: color || colors.primary.accent } : undefined
-      }
       textStyle={{
         marginRight: 0,
         ...textStyle
