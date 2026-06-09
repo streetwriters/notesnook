@@ -256,12 +256,7 @@ export const VaultDialog: React.FC = () => {
         });
         close();
       } catch (e) {
-        close();
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
+        formRef.current.setError("password", strings.passwordIncorrect());
         setLoading(false);
       }
     },
@@ -501,10 +496,12 @@ export const VaultDialog: React.FC = () => {
 
       db.vault
         .changePassword(password, newPassword)
-        .then(() => {
+        .then(async () => {
           setLoading(false);
           if (biometricUnlock) {
             enrollFingerprint(newPassword);
+          } else {
+            await BiometricService.resetCredentials();
           }
           ToastManager.show({
             heading: strings.passwordUpdated(),
