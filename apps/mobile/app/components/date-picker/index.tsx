@@ -32,7 +32,7 @@ export default function DatePickerComponent(props: {
   onCancel: () => void;
 }) {
   const { colors, isDark } = useThemeColors();
-  const dateRef = useRef<Date>(dayjs().add(1, "day").toDate());
+  const dateRef = useRef<Date>(dayjs().add(1, "week").toDate());
 
   const { width } = useWindowDimensions();
 
