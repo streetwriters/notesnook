@@ -65,6 +65,7 @@ const Tiptap = ({
   const tab = useTabContext();
   const isFocused = useTabStore((state) => state.currentTab === tab?.id);
   const [tick, setTick] = useState(0);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const noteStateUpdateTimer = useRef<NodeJS.Timeout>();
   const tabRef = useRef<TabItem>(tab);
@@ -660,15 +661,31 @@ const Tiptap = ({
                   </p>
 
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={async (e) => {
                       e.preventDefault();
                       const data = new FormData(e.currentTarget);
                       const password = data.get("password");
+                      if (!password) {
+                        setPasswordError(strings.enterPassword());
+                        return;
+                      }
+
+                      setPasswordError(null);
                       const biometrics = data.get("enrollBiometrics");
-                      post("editor-events:unlock", {
-                        password,
-                        biometrics: biometrics === "on" ? true : false
-                      });
+
+                      const result = await postAsyncWithTimeout(
+                        EditorEvents.unlock,
+                        {
+                          password,
+                          biometrics: biometrics === "on"
+                        }
+                      );
+
+                      if (result && !result.success) {
+                        setPasswordError(
+                          result.error || strings.passwordIncorrect()
+                        );
+                      }
                     }}
                     style={{
                       display: "flex",
@@ -683,7 +700,9 @@ const Tiptap = ({
                       ref={controller.passwordInputRef}
                       name="password"
                       type="password"
-                      required
+                      onChange={() => {
+                        if (passwordError) setPasswordError(null);
+                      }}
                       style={{
                         boxSizing: "border-box",
                         width: 300,
@@ -698,6 +717,19 @@ const Tiptap = ({
                         color: colors.primary.paragraph
                       }}
                     />
+                    {passwordError ? (
+                      <p
+                        style={{
+                          color: colors.error.paragraph,
+                          fontSize: "0.8rem",
+                          margin: 0,
+                          width: 300,
+                          userSelect: "none"
+                        }}
+                      >
+                        {passwordError}
+                      </p>
+                    ) : null}
 
                     <button
                       className="unlock-note"
