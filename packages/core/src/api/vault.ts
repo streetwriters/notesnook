@@ -202,7 +202,9 @@ export default class Vault {
     );
 
     if (password) {
-      await this.unlock(password).catch(() => {});
+      try {
+        await this.unlock(password);
+      } catch {}
     }
 
     return { ...note, content };
