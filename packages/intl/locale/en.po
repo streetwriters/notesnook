@@ -778,12 +778,9 @@ msgid "Add to notebook"
 msgstr "Add to notebook"
 
 #: src/strings.ts:990
+#: src/strings.ts:2794
 msgid "Add your first note"
 msgstr "Add your first note"
-
-#: src/strings.ts:2794
-msgid "Add Your First Note"
-msgstr "Add Your First Note"
 
 #: src/strings.ts:991
 msgid "Add your first notebook"
@@ -1860,8 +1857,8 @@ msgid "Confirm new password"
 msgstr "Confirm new password"
 
 #: src/strings.ts:1501
-msgid "Confirm Password"
-msgstr "Confirm Password"
+msgid "Confirm password"
+msgstr "Confirm password"
 
 #: src/strings.ts:2748
 msgid "Confirm password required"
@@ -2005,8 +2002,8 @@ msgid "Create a tag to group related notes together."
 msgstr "Create a tag to group related notes together."
 
 #: src/strings.ts:1870
-msgid "Create Account"
-msgstr "Create Account"
+msgid "Create account"
+msgstr "Create account"
 
 #: src/strings.ts:2689
 msgid "Create API Key"
@@ -3221,8 +3218,8 @@ msgid "Free plan"
 msgstr "Free plan"
 
 #: src/strings.ts:2766
-msgid "Frequently Asked Questions"
-msgstr "Frequently Asked Questions"
+msgid "Frequently asked questions"
+msgstr "Frequently asked questions"
 
 #: src/strings.ts:627
 msgid "Fri"
@@ -4036,8 +4033,8 @@ msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/
 msgstr "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
 
 #: src/strings.ts:542
-msgid "Login to your Account"
-msgstr "Login to your Account"
+msgid "Login to your account"
+msgstr "Login to your account"
 
 #: src/strings.ts:776
 msgid "Logout"
@@ -4366,8 +4363,8 @@ msgid "Newest - oldest"
 msgstr "Newest - oldest"
 
 #: src/strings.ts:2788
-msgid "Newest First"
-msgstr "Newest First"
+msgid "Newest first"
+msgstr "Newest first"
 
 #: src/strings.ts:1156
 msgid "Newly created notes will be uncategorized"
@@ -4378,8 +4375,8 @@ msgid "Next"
 msgstr "Next"
 
 #: src/strings.ts:2782
-msgid "Next Billing Date"
-msgstr "Next Billing Date"
+msgid "Next billing date"
+msgstr "Next billing date"
 
 #: src/strings.ts:2410
 msgid "Next match"
@@ -4687,8 +4684,8 @@ msgid "Oldest - newest"
 msgstr "Oldest - newest"
 
 #: src/strings.ts:2789
-msgid "Oldest First"
-msgstr "Oldest First"
+msgid "Oldest first"
+msgstr "Oldest first"
 
 #: src/strings.ts:736
 msgid "Once your password is changed, please make sure to save the new account recovery key"
@@ -4880,8 +4877,8 @@ msgid "Payment method"
 msgstr "Payment method"
 
 #: src/strings.ts:2774
-msgid "Payment Summary"
-msgstr "Payment Summary"
+msgid "Payment summary"
+msgstr "Payment summary"
 
 #: src/strings.ts:788
 msgid "PDF is password protected"
@@ -5217,8 +5214,8 @@ msgid "Private key is passphrase-protected. Please provide the decrypted key or 
 msgstr "Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase."
 
 #: src/strings.ts:2732
-msgid "Private Key:"
-msgstr "Private Key:"
+msgid "Private key:"
+msgstr "Private key:"
 
 #: src/strings.ts:829
 msgid "Private."
@@ -5265,8 +5262,8 @@ msgid "Proxy"
 msgstr "Proxy"
 
 #: src/strings.ts:2731
-msgid "Public Key:"
-msgstr "Public Key:"
+msgid "Public key:"
+msgstr "Public key:"
 
 #: src/strings.ts:486
 msgid "Publish"
@@ -5405,8 +5402,8 @@ msgid "Recover your account"
 msgstr "Recover your account"
 
 #: src/strings.ts:2798
-msgid "Recovery Code"
-msgstr "Recovery Code"
+msgid "Recovery code"
+msgstr "Recovery code"
 
 #: src/strings.ts:1021
 msgid "Recovery codes copied!"
@@ -6109,8 +6106,8 @@ msgid "Select nth day of the month to repeat the reminder."
 msgstr "Select nth day of the month to repeat the reminder."
 
 #: src/strings.ts:2765
-msgid "Select Plan"
-msgstr "Select Plan"
+msgid "Select plan"
+msgstr "Select plan"
 
 #: src/strings.ts:1838
 msgid "Select profile picture"
@@ -7097,8 +7094,8 @@ msgid "Turns off syncing completely on this device. Any changes made will remain
 msgstr "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device."
 
 #: src/strings.ts:110
-msgid "Two Factor Authentication"
-msgstr "Two Factor Authentication"
+msgid "Two factor authentication"
+msgstr "Two factor authentication"
 
 #: src/strings.ts:494
 msgid "Two-factor authentication"
@@ -7636,8 +7633,8 @@ msgid "What went wrong?"
 msgstr "What went wrong?"
 
 #: src/strings.ts:2773
-msgid "What's Included"
-msgstr "What's Included"
+msgid "What's included"
+msgstr "What's included"
 
 #: src/strings.ts:2541
 msgid "Why do you need my credit card details for a free trial?"
