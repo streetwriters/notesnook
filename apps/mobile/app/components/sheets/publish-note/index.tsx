@@ -171,11 +171,19 @@ const PublishNoteSheet = ({
     setPublishLoading(false);
   };
 
+  const lastAnalyticsResult = useRef<Awaited<
+    ReturnType<typeof db.monographs.analytics>
+  > | null>(null);
+
   const analytics = useAsync(async () => {
     if (!isFeatureAvailable?.isAllowed || !monograph?.id || selfDestruct)
       return null;
-    return await db.monographs.analytics(monograph.id);
+    const result = await db.monographs.analytics(monograph.id);
+    if (result) lastAnalyticsResult.current = result;
+    return result;
   }, [monograph?.id, isFeatureAvailable?.isAllowed, selfDestruct]);
+
+  const analyticsData = analytics.result ?? lastAnalyticsResult.current;
 
   useEffect(() => {
     const prevState = previousAppState.current;
@@ -398,8 +406,8 @@ const PublishNoteSheet = ({
 
           {isFeatureAvailable?.isAllowed &&
           !selfDestruct &&
-          analytics?.result &&
-          analytics?.result?.totalViews > 0 ? (
+          analyticsData &&
+          analyticsData?.totalViews > 0 ? (
             <View
               style={{
                 flexDirection: "row",
@@ -425,7 +433,7 @@ const PublishNoteSheet = ({
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
 
                   <Paragraph size={AppFontSize.sm}>
-                    {analytics.result?.totalViews}
+                    {analyticsData?.totalViews}
                   </Paragraph>
                 </View>
               </View>
