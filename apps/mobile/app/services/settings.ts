@@ -133,6 +133,8 @@ function init() {
     scale.fontScale = settings.fontScale;
   }
 
+  settings.introCompleted = false;
+
   useSettingStore.getState().setSettings({ ...settings });
   migrateAppLock();
 }

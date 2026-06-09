@@ -43,10 +43,10 @@ export const ReviewItem = (props: {
       }}
       style={{
         width: "100%",
-        padding: Spacing.LEVEL_4,
+        padding: Spacing.LEVEL_2,
         borderWidth: 1,
         backgroundColor: colors.secondary.background,
-        borderRadius: Radius.LG,
+        borderRadius: Radius.S,
         borderColor: colors.primary.border
       }}
     >
@@ -54,8 +54,8 @@ export const ReviewItem = (props: {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: 10,
-          paddingBottom: Spacing.LEVEL_4
+          gap: Spacing.LEVEL_1,
+          paddingBottom: Spacing.LEVEL_1
         }}
       >
         {props.userImage ? (
