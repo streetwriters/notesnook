@@ -197,14 +197,14 @@ export const PricingPlanCard = ({
               <Heading size={24}>
                 {price ||
                   `${WebPlan?.price?.currency} ${WebPlan?.price?.gross}`}{" "}
-                <Paragraph color={colors.primary.paragraph} fontSize="SM">
+                <Paragraph color={colors.secondary.heading} fontSize="SM">
                   /{strings.month()}
                 </Paragraph>
               </Heading>
 
               {!product && !WebPlan ? null : (
                 <Paragraph
-                  color={colors.secondary.paragraph}
+                  color={colors.primary.paragraph}
                   size={AppFontSize.xs}
                 >
                   {annualBilling
