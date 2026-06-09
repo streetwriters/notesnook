@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-07-23 08:49+0500\n"
+"POT-Creation-Date: 2026-07-23 08:50+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -771,11 +771,8 @@ msgid "Add to notebook"
 msgstr ""
 
 #: src/strings.ts:990
-msgid "Add your first note"
-msgstr ""
-
 #: src/strings.ts:2847
-msgid "Add Your First Note"
+msgid "Add your first note"
 msgstr ""
 
 #: src/strings.ts:991
@@ -1882,7 +1879,7 @@ msgid "Confirm new password"
 msgstr ""
 
 #: src/strings.ts:1501
-msgid "Confirm Password"
+msgid "Confirm password"
 msgstr ""
 
 #: src/strings.ts:2748
@@ -2031,7 +2028,7 @@ msgid "Create a tag to group related notes together."
 msgstr ""
 
 #: src/strings.ts:1870
-msgid "Create Account"
+msgid "Create account"
 msgstr ""
 
 #: src/strings.ts:2689
@@ -3296,7 +3293,7 @@ msgid "Free plan"
 msgstr ""
 
 #: src/strings.ts:2819
-msgid "Frequently Asked Questions"
+msgid "Frequently asked questions"
 msgstr ""
 
 #: src/strings.ts:627
@@ -4113,7 +4110,7 @@ msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/
 msgstr ""
 
 #: src/strings.ts:542
-msgid "Login to your Account"
+msgid "Login to your account"
 msgstr ""
 
 #: src/strings.ts:776
@@ -4447,7 +4444,7 @@ msgid "Newest - oldest"
 msgstr ""
 
 #: src/strings.ts:2841
-msgid "Newest First"
+msgid "Newest first"
 msgstr ""
 
 #: src/strings.ts:1156
@@ -4459,7 +4456,7 @@ msgid "Next"
 msgstr ""
 
 #: src/strings.ts:2835
-msgid "Next Billing Date"
+msgid "Next billing date"
 msgstr ""
 
 #: src/strings.ts:2410
@@ -4770,7 +4767,7 @@ msgid "Oldest - newest"
 msgstr ""
 
 #: src/strings.ts:2842
-msgid "Oldest First"
+msgid "Oldest first"
 msgstr ""
 
 #: src/strings.ts:736
@@ -4967,7 +4964,7 @@ msgid "Payment method"
 msgstr ""
 
 #: src/strings.ts:2827
-msgid "Payment Summary"
+msgid "Payment summary"
 msgstr ""
 
 #: src/strings.ts:788
@@ -5312,7 +5309,7 @@ msgid "Private key required"
 msgstr ""
 
 #: src/strings.ts:2732
-msgid "Private Key:"
+msgid "Private key:"
 msgstr ""
 
 #: src/strings.ts:829
@@ -5368,7 +5365,7 @@ msgid "Public key required"
 msgstr ""
 
 #: src/strings.ts:2731
-msgid "Public Key:"
+msgid "Public key:"
 msgstr ""
 
 #: src/strings.ts:486
@@ -5508,7 +5505,7 @@ msgid "Recover your account"
 msgstr ""
 
 #: src/strings.ts:2851
-msgid "Recovery Code"
+msgid "Recovery code"
 msgstr ""
 
 #: src/strings.ts:1021
@@ -6212,7 +6209,7 @@ msgid "Select nth day of the month to repeat the reminder."
 msgstr ""
 
 #: src/strings.ts:2818
-msgid "Select Plan"
+msgid "Select plan"
 msgstr ""
 
 #: src/strings.ts:1838
@@ -7197,7 +7194,7 @@ msgid "Turns off syncing completely on this device. Any changes made will remain
 msgstr ""
 
 #: src/strings.ts:110
-msgid "Two Factor Authentication"
+msgid "Two factor authentication"
 msgstr ""
 
 #: src/strings.ts:494
@@ -7739,7 +7736,7 @@ msgid "What went wrong?"
 msgstr ""
 
 #: src/strings.ts:2826
-msgid "What's Included"
+msgid "What's included"
 msgstr ""
 
 #: src/strings.ts:2541

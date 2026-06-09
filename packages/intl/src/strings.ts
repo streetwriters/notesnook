@@ -107,7 +107,7 @@ export const strings = {
   },
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
-  "2fa": () => t`Two Factor Authentication`,
+  "2fa": () => t`Two factor authentication`,
   select2faMethod: () => t`Choose 2FA Method`,
   select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
   "2faCodeHelpText": {
@@ -539,7 +539,7 @@ $day$: Current day (eg. Monday)`,
   appliedDark: () => t`Applied as dark theme`,
   appliedLight: () => t`Applied as light theme`,
   basic: () => t`Basic`,
-  loginToYourAccount: () => t`Login to your Account`,
+  loginToYourAccount: () => t`Login to your account`,
   continue: () => t`Continue`,
   unlockWithBiometrics: () => t`Unlock with biometrics`,
   fileCheck: () => t`Run file check`,
@@ -1498,7 +1498,7 @@ $day$: Current day (eg. Monday)`,
   newPassword: () => t`New password`,
   email: () => t`Email`,
   emailInvalid: () => t`Invalid email`,
-  confirmPassword: () => t`Confirm Password`,
+  confirmPassword: () => t`Confirm password`,
   currentPin: () => t`Current pin`,
   currentPassword: () => t`Current password`,
   newPin: () => t`New pin`,
@@ -1867,7 +1867,7 @@ For example:
   newEmail: () => t`New Email`,
   accountPassword: () => t`Account password`,
   phoneNumber: () => t`Phone number`,
-  createAccount: () => t`Create Account`,
+  createAccount: () => t`Create account`,
   accountRecoverHelpText: () =>
     t`You will receive instructions on how to recover your account on this email`,
   enterRecoveryKey: () => t`Enter account recovery key`,
@@ -2728,8 +2728,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiresOn: () => t`Expires on`,
   changingInboxPgpKeysNotice: () =>
     t`Changing Inbox PGP keys will delete all your unsynced inbox items.`,
-  publicKey: () => t`Public Key:`,
-  privateKey: () => t`Private Key:`,
+  publicKey: () => t`Public key:`,
+  privateKey: () => t`Private key:`,
   invalidPgpKeyPair: () =>
     t`Invalid PGP key pair. Please check your keys and try again.`,
   inboxKeysSaved: () => t`Inbox keys saved`,
@@ -2815,16 +2815,16 @@ Continue without attachments?`,
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
     t`The password for decrypting the Colornote backup file.`,
-  selectPlan: () => t`Select Plan`,
-  frequentlyAskedQuestions: () => t`Frequently Asked Questions`,
+  selectPlan: () => t`Select plan`,
+  frequentlyAskedQuestions: () => t`Frequently asked questions`,
   testimonials: () => t`Testimonials`,
   billingType: {
     annual: () => t`Billed annually`,
     monthly: () => t`Billed monthly`,
     oneTime: () => t`One time purchase`
   },
-  whatsIncluded: () => t`What's Included`,
-  paymentSummary: () => t`Payment Summary`,
+  whatsIncluded: () => t`What's included`,
+  paymentSummary: () => t`Payment summary`,
   planWhatsIncluded: {
     unlimitedNotes: () => t`Unlimited notes and attachments`,
     endToEnd: () => t`End-to-end encryption (XChaCha20)`,
@@ -2832,23 +2832,23 @@ Continue without attachments?`,
     freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
     remind: () => t`Remind before your trial ends`
   },
-  nextBillingDate: () => t`Next Billing Date`,
+  nextBillingDate: () => t`Next billing date`,
   freeTrialIncludes: (duration: number) =>
     t`${duration} days free trial includes all features`,
   noTagsYet: () => t`No tags yet`,
   tagsEmptyBody: () =>
     t`Create your first tag to start organizing your workspace.`,
-  newestFirst: () => t`Newest First`,
-  oldestFirst: () => t`Oldest First`,
+  newestFirst: () => t`Newest first`,
+  oldestFirst: () => t`Oldest first`,
   notePlaceholder: {
     title: () => t`No notes yet`,
     description: () =>
       t`Your thoughts deserve a home. Create your first note and start organizing your life today.`,
-    button: () => t`Add Your First Note`
+    button: () => t`Add your first note`
   },
   settingUpYourAccount: () => t`Setting up your account...`,
   accountAlmostReady: () => t`Your account is almost ready, please wait.`,
-  recoveryCodeTitle: () => t`Recovery Code`,
+  recoveryCodeTitle: () => t`Recovery code`,
   provideValidMultiFactorAuthRecoveryCode: () =>
     t`Please provide a valid multi factor authentication recovery code.`,
   provideValidMultiFactorAuthCode: () =>
