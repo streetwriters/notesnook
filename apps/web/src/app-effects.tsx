@@ -50,6 +50,7 @@ export default function AppEffects() {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const initUser = useUserStore((store) => store.init);
   const initStore = useStore((store) => store.init);
+  const initSettingStore = useSettingStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const initEditorStore = useEditorStore((store) => store.init);
   const dialogAnnouncements = useAnnouncementStore(
@@ -59,6 +60,7 @@ export default function AppEffects() {
   useEffect(
     function initializeApp() {
       initStore();
+      initSettingStore();
 
       (async function () {
         await initEditorStore();

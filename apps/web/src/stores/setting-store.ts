@@ -23,7 +23,7 @@ import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
-import { TimeFormat, DayFormat, WeekFormat } from "@notesnook/core";
+import { TimeFormat, DayFormat, WeekFormat, EVENTS } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
@@ -92,6 +92,14 @@ class SettingStore extends BaseStore<SettingStore> {
   isPortable = false;
   proxyRules?: string;
   isInboxEnabled = false;
+
+  init = () => {
+    db.eventManager.subscribe(EVENTS.userFetched, async () => {
+      this.set({
+        isInboxEnabled: await db.user.hasInboxKeys()
+      });
+    });
+  };
 
   refresh = async () => {
     this.set({
