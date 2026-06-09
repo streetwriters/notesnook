@@ -1,0 +1,90 @@
+import java.security.MessageDigest
+
+def hasReleaseNativeSoInIntermediates = {
+  !fileTree(dir: "$buildDir/intermediates", include: ["**/release/**/*.so", "**/*Release*/**/*.so"]).isEmpty()
+}
+
+def releasePackageJsonFile = file("$buildDir/../../package.json")
+def releaseNativeFingerprintFile = file("$buildDir/intermediates/release-native-build/package-json.sha256")
+
+def sha256ForFile = { targetFile ->
+  def digest = MessageDigest.getInstance("SHA-256")
+  targetFile.withInputStream { stream ->
+    byte[] buffer = new byte[8192]
+    int bytesRead
+    while ((bytesRead = stream.read(buffer)) != -1) {
+      digest.update(buffer, 0, bytesRead)
+    }
+  }
+  digest.digest().encodeHex().toString()
+}
+
+def hasValidReleaseNativeSoInIntermediates = {
+  if (!hasReleaseNativeSoInIntermediates()) {
+        logger.lifecycle("No release .so artifacts found in $buildDir/intermediates; release native build will run.")
+    return false
+  }
+
+    if (!releasePackageJsonFile.exists()) {
+        logger.lifecycle("package.json not found at ${releasePackageJsonFile.absolutePath}; release native build will run.")
+        return false
+    }
+
+    if (!releaseNativeFingerprintFile.exists()) {
+        logger.lifecycle("No existing package.json fingerprint found at ${releaseNativeFingerprintFile.absolutePath}; release native build will run and create it.")
+    return false
+  }
+
+    def storedFingerprint = releaseNativeFingerprintFile.text.trim()
+    def currentFingerprint = sha256ForFile(releasePackageJsonFile)
+
+    if (storedFingerprint != currentFingerprint) {
+        logger.lifecycle("package.json fingerprint changed; release native build will run and refresh cached artifacts.")
+        return false
+    }
+
+    logger.lifecycle("package.json fingerprint matches existing release .so artifacts.")
+    return true
+}
+
+def isReleaseBuildRequested = gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }
+
+def verifyReleaseNativeSoOutputsTask = tasks.register("verifyReleaseNativeSoOutputs") {
+  group = "verification"
+  description = "Checks whether release native .so artifacts exist in build/intermediates after native build tasks."
+  doLast {
+    if (hasReleaseNativeSoInIntermediates()) {
+      logger.lifecycle("[optimize-build] Release native .so artifacts exist in $buildDir/intermediates")
+    } else {
+      logger.lifecycle("[optimize-build] Release native .so artifacts do NOT exist in $buildDir/intermediates")
+    }
+  }
+}
+
+if (isReleaseBuildRequested) {
+  tasks.configureEach { task ->
+    // Skip release CMake/native tasks when release libs are already present in intermediates.
+    if ((task.name.toLowerCase().contains("cmake") || task.name.startsWith("externalNativeBuild"))) {
+      onlyIf {
+        def shouldRun = !hasValidReleaseNativeSoInIntermediates()
+        if (!shouldRun) {
+          logger.lifecycle("Skipping ${task.path}: found matching release .so artifacts and package.json fingerprint in $buildDir/intermediates")
+        }
+        return shouldRun
+      }
+
+      doLast {
+        if (releasePackageJsonFile.exists()) {
+                    def fingerprintAlreadyExists = releaseNativeFingerprintFile.exists()
+          releaseNativeFingerprintFile.parentFile.mkdirs()
+          releaseNativeFingerprintFile.text = sha256ForFile(releasePackageJsonFile)
+                    logger.lifecycle("${fingerprintAlreadyExists ? "Updated" : "Created"} package.json fingerprint at ${releaseNativeFingerprintFile.absolutePath}")
+        }
+      }
+    }
+
+    if (task.name.contains("mergeReleaseJniLibFolders")) {
+      finalizedBy(verifyReleaseNativeSoOutputsTask)
+    }
+  }
+}
