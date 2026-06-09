@@ -16,13 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { usePromise } from "@notesnook/common";
+import { getFormattedDate, usePromise } from "@notesnook/common";
 import { InboxApiKey } from "@notesnook/core";
 import { SerializedKeyPair } from "@notesnook/crypto";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
-import dayjs from "dayjs";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
@@ -612,17 +611,17 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
         <View style={{ gap: 4 }}>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {apiKey.lastUsedAt
-              ? `${strings.lastUsedOn()} ${dayjs(apiKey.lastUsedAt).format("MMM DD, YYYY")}`
+              ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt, "date-time")}`
               : strings.neverUsed()}
           </Paragraph>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {strings.createdOn()}{" "}
-            {dayjs(apiKey.dateCreated).format("MMM DD, YYYY")}
+            {getFormattedDate(apiKey.dateCreated, "date-time")}
           </Paragraph>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {apiKey.expiryDate === -1
               ? strings.neverExpires()
-              : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${dayjs(apiKey.expiryDate).format("MMM DD, YYYY")}`}
+              : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${getFormattedDate(apiKey.expiryDate, "date-time")}`}
           </Paragraph>
         </View>
 
