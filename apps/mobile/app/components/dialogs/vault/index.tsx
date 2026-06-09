@@ -180,6 +180,7 @@ export const VaultDialog: React.FC = () => {
           noteIds = relations.map((item) => item.toId);
         }
         await db.vault.delete(deleteAll);
+        await BiometricService.resetCredentials();
 
         if (deleteAll) {
           noteIds.forEach((id) => {
