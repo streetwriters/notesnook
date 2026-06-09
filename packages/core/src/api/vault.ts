@@ -182,7 +182,6 @@ export default class Vault {
   async remove(noteId: string, password: string) {
     await this.unlockNote(noteId, password, true);
 
-    if (!(await this.exists())) await this.create(password);
     await this.db.relations.to({ id: noteId, type: "note" }, "vault").unlink();
   }
 
@@ -203,9 +202,9 @@ export default class Vault {
     );
 
     if (password) {
-      this.password = password;
-      if (!(await this.exists())) await this.create(password);
+      await this.unlock(password).catch(() => {});
     }
+
     return { ...note, content };
   }
 
