@@ -85,6 +85,9 @@ const Tiptap = ({
     undo,
     redo
   };
+  useEffect(() => {
+    setPasswordError(null);
+  }, [tab.session?.noteId]);
 
   logger("info", tabRef.current.id, "rendering");
 
