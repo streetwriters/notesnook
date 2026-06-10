@@ -64,6 +64,7 @@ import { strings } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import { useVaultStatus } from "../../hooks/use-vault-status";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 
 const style: ViewStyle = {
   height: "100%",
@@ -268,17 +269,22 @@ const useLockedNoteHandler = () => {
 
     const onSubmit = async ({
       password,
-      biometrics: enrollBiometrics
+      biometrics: enrollBiometrics,
+      resolverId
     }: {
       password: string;
       biometrics?: boolean;
+      resolverId?: string;
     }) => {
       if (!tabRef.current?.session?.noteId || !tabRef.current) return;
+
       if (!password || password.trim().length === 0) {
-        ToastManager.show({
-          heading: strings.passwordNotEntered(),
-          type: "error"
-        });
+        if (resolverId) {
+          editorController.current?.postMessage(NativeEvents.resolve, {
+            resolverId,
+            data: { success: false, error: strings.passwordNotEntered() }
+          });
+        }
         return;
       }
 
@@ -287,6 +293,7 @@ const useLockedNoteHandler = () => {
           tabRef.current?.session?.noteId,
           password
         );
+
         if (enrollBiometrics && note) {
           try {
             const unlocked = await db.vault.unlock(password);
@@ -298,7 +305,6 @@ const useLockedNoteHandler = () => {
               type: "success",
               context: "global"
             });
-
             const biometry = await BiometricService.isBiometryAvailable();
             const fingerprint = await BiometricService.hasInternetCredentials();
             useTabStore.setState({
@@ -306,22 +312,24 @@ const useLockedNoteHandler = () => {
               biometryEnrolled: !!fingerprint
             });
             syncTabs();
-          } catch (e) {
-            ToastManager.show({
-              heading: strings.passwordIncorrect(),
-              type: "error"
-            });
-          }
+          } catch (e) {}
         }
-        eSendEvent(eOnLoadNote, {
-          item: note,
-          refresh: true
-        });
+
+        if (resolverId) {
+          editorController.current?.postMessage(NativeEvents.resolve, {
+            resolverId,
+            data: { success: true }
+          });
+        }
+
+        eSendEvent(eOnLoadNote, { item: note, refresh: true });
       } catch (e) {
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error"
-        });
+        if (resolverId) {
+          editorController.current?.postMessage(NativeEvents.resolve, {
+            resolverId,
+            data: { success: false, error: strings.passwordIncorrect() }
+          });
+        }
       }
     };
 
