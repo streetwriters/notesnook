@@ -117,7 +117,7 @@ const buttonTypes = (
   },
   secondary: {
     primary: colors.secondary.background,
-    text: colors.primary.buttonForeground,
+    text: colors.primary.paragraph,
     selected: colors.secondary.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
