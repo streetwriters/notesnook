@@ -293,6 +293,7 @@ let MoveNotes: any = null;
 let Settings: any = null;
 let ManageTags: any = null;
 let AddReminder: any = null;
+let RelationsList: any = null;
 let PayWall: any = null;
 let Wrapped: any = null;
 export const RootNavigation = () => {
@@ -397,6 +398,15 @@ export const RootNavigation = () => {
             AddReminder =
               AddReminder || require("../screens/add-reminder").default;
             return AddReminder;
+          }}
+        />
+
+        <RootStack.Screen
+          name="RelationsList"
+          getComponent={() => {
+            RelationsList =
+              RelationsList || require("../screens/relations-list").default;
+            return RelationsList;
           }}
         />
         <RootStack.Screen

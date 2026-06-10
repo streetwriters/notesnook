@@ -26,6 +26,7 @@ import useNavigationStore, {
   NotesScreenParams
 } from "../../stores/use-navigation-store";
 import { PLACEHOLDER_DATA, openEditor } from "./common";
+import { getGroupOptions } from "../../hooks/use-group-options";
 
 export const TaggedNotes = ({
   navigation,
@@ -53,7 +54,7 @@ TaggedNotes.get = async (params: NotesScreenParams, grouped = true) => {
 
   return await db.relations
     .from({ id: params.id, type: "tag" }, "note")
-    .selector.grouped(db.settings.getGroupOptions("notes"));
+    .selector.grouped(getGroupOptions("notes", params.id, "tag"));
 };
 
 TaggedNotes.navigate = (item: Tag, canGoBack?: boolean) => {

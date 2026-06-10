@@ -116,6 +116,7 @@ jobs:
           api-private-key: ${{ secrets.API_KEY }}
 
       - name: Upload Notesnook.ipa to Github
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Notesnook.zip

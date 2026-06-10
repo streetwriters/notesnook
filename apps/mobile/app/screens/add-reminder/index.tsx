@@ -95,7 +95,17 @@ const ReminderNotificationModes = {
 
 export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const { reminder, reference } = props.route.params;
-  useNavigationFocus(props.navigation, { focusOnInit: true });
+  useNavigationFocus(props.navigation, {
+    focusOnInit: true,
+    onFocus: () => {
+      if (!props.route.params?.reminder) {
+        setTimeout(() => {
+          titleRef.current?.focus();
+        }, 200);
+      }
+      return false;
+    }
+  });
   const { colors, isDark } = useThemeColors();
   const weekFormat = useSettingStore((state) => state.weekFormat);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
@@ -282,7 +292,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             defaultValue={reminder?.title || referencedItem?.title}
             placeholder={strings.remindeMeOf()}
             onChangeText={(text) => (title.current = text)}
-            autoFocus
             wrapperStyle={{
               marginTop: DefaultAppStyles.GAP_VERTICAL
             }}

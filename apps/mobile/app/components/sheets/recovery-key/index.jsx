@@ -21,7 +21,7 @@ import { sanitizeFilename } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { createRef } from "react";
-import { Platform, View } from "react-native";
+import { PermissionsAndroid, Platform, View } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import FileViewer from "react-native-file-viewer";
 import * as ScopedStorage from "react-native-scoped-storage";
@@ -45,6 +45,7 @@ import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 class RecoveryKeySheet extends React.Component {
   constructor(props) {
@@ -108,22 +109,14 @@ class RecoveryKeySheet extends React.Component {
   saveQRCODE = async () => {
     this.svg.current?.toDataURL(async (data) => {
       try {
-        let path;
-        let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
+        let fileName =
+          "nn_" + this.user.email + "_recovery_key_qrcode" + "_" + Date.now();
         fileName = sanitizeFilename(fileName, { replacement: "_" });
         fileName = fileName + ".png";
 
-        if (Platform.OS === "android") {
-          await ScopedStorage.createDocument(
-            fileName,
-            "image/png",
-            data,
-            "base64"
-          );
-        } else {
-          path = await filesystem.checkAndCreateDir("/");
-          await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
-        }
+        const path = RNFetchBlob.fs.dirs.CacheDir + fileName;
+        await RNFetchBlob.fs.writeFile(path, data, "base64");
+        await CameraRoll.saveToCameraRoll(`file://` + path);
         ToastManager.show({
           heading: strings.recoveryKeyQRCodeSaved(),
           type: "success",

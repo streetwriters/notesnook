@@ -96,19 +96,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            icon: File,
-            title: "Improved attachments UX",
-            subtitle:
-              "We've improved the UI/UX of attaching multiple files into the editor. The entire process is now handled in a unified dialog."
-          },
-          {
-            icon: InternalLink,
-            title: "Opening file links on desktop",
-            subtitle: "The NN Desktop app can now open file links (file:///)."
-          }
-        ],
+      : [],
     cta: {
       title: strings.gotIt(),
       icon: Checkmark,

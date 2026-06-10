@@ -48,6 +48,8 @@ import Skeleton from "react-loading-skeleton";
 
 dayjs.extend(customParseFormat);
 
+const MAX_DATE = dayjs().add(99, "year").endOf("year").toDate();
+
 export type AddReminderDialogProps = BaseDialogProps<boolean> & {
   reminder?: Reminder;
   note?: Note;
@@ -197,6 +199,14 @@ export const AddReminderDialog = DialogManager.register(
 
             if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
               showToast("error", strings.dateError());
+              return;
+            }
+
+            if (mode !== Modes.REPEAT && date.isAfter(MAX_DATE)) {
+              showToast(
+                "error",
+                strings.maximumReminderDate(getFormattedDate(MAX_DATE, "date"))
+              );
               return;
             }
 
@@ -431,7 +441,7 @@ export const AddReminderDialog = DialogManager.register(
                   }}
                   selected={dayjs(date).toDate()}
                   minDate={new Date()}
-                  maxDate={new Date(new Date().getFullYear() + 99, 11, 31)}
+                  maxDate={MAX_DATE}
                   onSelect={(day) => {
                     if (!day) return;
                     const date = getFormattedDate(day, "date");

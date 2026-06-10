@@ -2767,5 +2767,21 @@ Continue without attachments?`,
   openingLocalFileDesc: (filePath: string) =>
     t`Are you sure you want to open this file: ${filePath}?`,
   cantOpenFileLinksInBrowsers: () =>
-    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`
+    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`,
+  expiryDateMustBeInTheFuture: () => t`Expiry date must be in the future`,
+  expiryDateCannotBeMoreThan1YearInTheFuture: () =>
+    t`Expiry date cannot be more than 1 year in the future`,
+  expiryDateSet: () => t`Expiry date set`,
+  creationDateCannotBeAfterLastEditedDate: () =>
+    t`Creation date cannot be after last edited date`,
+  noteDuplicated: () => t`Note duplicated`,
+  maximumReminderDate: (maxDate: string) =>
+    t`Maximum reminder date is ${maxDate}`,
+  invalidThemeFileFormat: () =>
+    t`We couldn't load this theme. Please make sure the file is a valid JSON theme file.`,
+  themeMissingRequiredFields: () =>
+    t`We couldn't load this theme. The file appears to be incomplete or missing required theme properties.`,
+  copyLogs: () => t`Copy logs`,
+  permissionRequiredToSaveQRCode: () =>
+    t`Permission required to save QR-Code to Gallery`
 };

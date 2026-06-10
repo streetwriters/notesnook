@@ -31,7 +31,11 @@ import type {
   ThemesRouter
 } from "@notesnook/themes-server";
 import { keepLocalCopy, pick } from "@react-native-documents/picker";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  notifyManager,
+  QueryClient,
+  QueryClientProvider
+} from "@tanstack/react-query";
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import React, { useState } from "react";
@@ -59,6 +63,8 @@ import { getElevationStyle } from "../../utils/elevation";
 import { MenuItemsList } from "../../utils/menu-items";
 import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { openLinkInBrowser } from "../../utils/functions";
+import Clipboard from "@react-native-clipboard/clipboard";
 
 const THEME_SERVER_URL = "https://themes-api.notesnook.com";
 //@ts-ignore
@@ -69,7 +75,8 @@ export const themeTrpcClient = createTRPCProxyClient<ThemesRouter>({
     })
   ]
 });
-
+notifyManager.setBatchNotifyFunction((cb) => cb());
+notifyManager.setNotifyFunction((cb) => cb());
 function ThemeSelector() {
   const [darkTheme, lightTheme] = useThemeStore((state) => [
     state.darkTheme,
@@ -79,34 +86,34 @@ function ThemeSelector() {
   const { colors } = useThemeColors();
   const themeColors = colors;
   const [searchQuery, setSearchQuery] = useState<string>();
-  const [colorScheme, setColorScheme] = useState<string>();
+  const [colorScheme, setColorScheme] = useState<"all" | "dark" | "light">(
+    "all"
+  );
+
+  const filters = [];
+  if (searchQuery) filters.push({ type: "term" as const, value: searchQuery });
+  if (colorScheme !== "all")
+    filters.push({ type: "colorScheme" as const, value: colorScheme });
+
   const themes = trpc.themes.useInfiniteQuery(
     {
       limit: 10,
       compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-      filters: [
-        ...(searchQuery && searchQuery !== ""
-          ? [
-              {
-                type: "term" as const,
-                value: searchQuery
-              }
-            ]
-          : []),
-        ...(colorScheme && colorScheme !== ""
-          ? [
-              {
-                type: "colorScheme" as const,
-                value: colorScheme
-              }
-            ]
-          : [])
-      ]
+      filters
     },
     {
+      keepPreviousData: true,
       getNextPageParam: (lastPage) => lastPage.nextCursor
     }
   );
+
+  if (themes?.isError) {
+    DatabaseLogger.error(
+      new Error(themes.error.message),
+      "themes loading error",
+      themes.error?.data || undefined
+    );
+  }
 
   const select = (item: Partial<ThemeMetadata>, fromFile?: boolean) => {
     presentSheet({
@@ -117,204 +124,209 @@ function ThemeSelector() {
     });
   };
 
-  const renderItem = ({
-    item,
-    index
-  }: {
-    item: ThemeMetadata;
-    index: number;
-  }) => {
-    const colors =
-      item.previewColors ||
-      getPreviewColors(item as unknown as ThemeDefinition);
+  const renderItem = React.useCallback(
+    ({ item, index }: { item: ThemeMetadata; index: number }) => {
+      const colors =
+        item.previewColors ||
+        getPreviewColors(item as unknown as ThemeDefinition);
 
-    return (
-      <>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          style={{
-            borderRadius: 10,
-            padding: DefaultAppStyles.GAP_SMALL,
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
-            flexShrink: 1,
-            marginHorizontal: 10
-          }}
-          onPress={() => select(item)}
-        >
-          <View
+      return (
+        <>
+          <TouchableOpacity
+            activeOpacity={0.9}
             style={{
-              backgroundColor: colors?.background,
-              height: 200,
-              width: "100%",
               borderRadius: 10,
+              padding: DefaultAppStyles.GAP_SMALL,
               marginBottom: DefaultAppStyles.GAP_VERTICAL,
-              overflow: "hidden",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              ...getElevationStyle(3)
+              flexShrink: 1,
+              marginHorizontal: 10
             }}
+            onPress={() => select(item)}
           >
             <View
               style={{
-                height: "100%",
-                width: "49.5%",
-                backgroundColor: colors.navigationMenu.background,
-                padding: DefaultAppStyles.GAP_SMALL,
-                paddingVertical: 3,
-                borderRadius: defaultBorderRadius
-              }}
-            >
-              {MenuItemsList.map((item, index) => (
-                <View
-                  key={item.id}
-                  style={{
-                    height: 12,
-                    width: "100%",
-                    backgroundColor:
-                      index === 0
-                        ? colors.navigationMenu.accent + 40
-                        : colors.navigationMenu.background,
-                    borderRadius: 2,
-                    paddingHorizontal: 3,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 4
-                  }}
-                >
-                  <Icon
-                    size={8}
-                    name={item.icon}
-                    color={
-                      index === 0
-                        ? colors.navigationMenu.accent
-                        : colors.navigationMenu.icon
-                    }
-                  />
-
-                  <View
-                    style={{
-                      height: 3,
-                      width: "40%",
-                      backgroundColor:
-                        index === 0
-                          ? colors.navigationMenu.accent
-                          : colors.paragraph,
-                      borderRadius: 2,
-                      marginLeft: 3
-                    }}
-                  ></View>
-                </View>
-              ))}
-            </View>
-
-            <View
-              style={{
-                height: "100%",
-                width: "49.5%",
-                backgroundColor: colors.list.background,
-                borderRadius: defaultBorderRadius,
-                paddingHorizontal: 2,
-                paddingRight: 6
+                backgroundColor: colors?.background,
+                height: 200,
+                width: "100%",
+                borderRadius: 10,
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
+                overflow: "hidden",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                ...getElevationStyle(3)
               }}
             >
               <View
                 style={{
-                  height: 12,
-                  width: "100%",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginTop: 3
+                  height: "100%",
+                  width: "49.5%",
+                  backgroundColor: colors.navigationMenu.background,
+                  padding: DefaultAppStyles.GAP_SMALL,
+                  paddingVertical: 3,
+                  borderRadius: defaultBorderRadius
+                }}
+              >
+                {MenuItemsList.map((item, index) => (
+                  <View
+                    key={item.id}
+                    style={{
+                      height: 12,
+                      width: "100%",
+                      backgroundColor:
+                        index === 0
+                          ? colors.navigationMenu.accent + 40
+                          : colors.navigationMenu.background,
+                      borderRadius: 2,
+                      paddingHorizontal: 3,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 4
+                    }}
+                  >
+                    <Icon
+                      size={8}
+                      name={item.icon}
+                      color={
+                        index === 0
+                          ? colors.navigationMenu.accent
+                          : colors.navigationMenu.icon
+                      }
+                    />
+
+                    <View
+                      style={{
+                        height: 3,
+                        width: "40%",
+                        backgroundColor:
+                          index === 0
+                            ? colors.navigationMenu.accent
+                            : colors.paragraph,
+                        borderRadius: 2,
+                        marginLeft: 3
+                      }}
+                    ></View>
+                  </View>
+                ))}
+              </View>
+
+              <View
+                style={{
+                  height: "100%",
+                  width: "49.5%",
+                  backgroundColor: colors.list.background,
+                  borderRadius: defaultBorderRadius,
+                  paddingHorizontal: 2,
+                  paddingRight: 6
                 }}
               >
                 <View
                   style={{
+                    height: 12,
+                    width: "100%",
                     flexDirection: "row",
-                    alignItems: "center"
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 3
                   }}
                 >
-                  <Icon size={8} color={colors.list.heading} name="menu" />
-                  <Heading
+                  <View
                     style={{
-                      marginLeft: 3
+                      flexDirection: "row",
+                      alignItems: "center"
                     }}
-                    color={colors.list.heading}
-                    size={7}
                   >
-                    {strings.dataTypesPluralCamelCase.note()}
-                  </Heading>
-                </View>
+                    <Icon size={8} color={colors.list.heading} name="menu" />
+                    <Heading
+                      style={{
+                        marginLeft: 3
+                      }}
+                      color={colors.list.heading}
+                      size={7}
+                    >
+                      {strings.dataTypesPluralCamelCase.note()}
+                    </Heading>
+                  </View>
 
-                <Icon name="magnify" color={colors.list.heading} size={7} />
+                  <Icon name="magnify" color={colors.list.heading} size={7} />
+                </View>
+              </View>
+
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end",
+                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  position: "absolute",
+                  bottom: 6,
+                  right: 6,
+                  flexDirection: "row",
+                  gap: 10
+                }}
+              >
+                {darkTheme.id === item.id || lightTheme.id === item.id ? (
+                  <IconButton
+                    name="check"
+                    type="plain"
+                    style={{
+                      borderRadius: 100,
+                      paddingHorizontal: 6,
+                      alignSelf: "flex-end",
+                      width: 25,
+                      height: 25
+                    }}
+                    color={colors.accent}
+                    size={16}
+                  />
+                ) : null}
+
+                <Button
+                  title={
+                    item.colorScheme === "dark"
+                      ? strings.dark()
+                      : strings.light()
+                  }
+                  type="secondaryAccented"
+                  height={25}
+                  buttonType={{
+                    color: item.colorScheme === "dark" ? "black" : "#f0f0f060",
+                    text: colors.accent
+                  }}
+                  style={{
+                    borderRadius: 100,
+                    paddingHorizontal: DefaultAppStyles.GAP,
+                    alignSelf: "flex-end",
+                    borderColor:
+                      item.colorScheme === "dark"
+                        ? getColorLinearShade("#000000", 0.1, true)
+                        : getColorLinearShade("#f0f0f0", 0.1, true)
+                  }}
+                  fontSize={AppFontSize.xxs}
+                />
               </View>
             </View>
 
-            <View
-              style={{
-                width: "100%",
-                alignItems: "flex-end",
-                justifyContent: "flex-end",
-                marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                position: "absolute",
-                bottom: 6,
-                right: 6,
-                flexDirection: "row",
-                gap: 10
-              }}
+            <Heading size={AppFontSize.sm} color={themeColors.primary.heading}>
+              {item.name}
+            </Heading>
+            <Paragraph
+              size={AppFontSize.xs}
+              color={themeColors.secondary?.paragraph}
             >
-              {darkTheme.id === item.id || lightTheme.id === item.id ? (
-                <IconButton
-                  name="check"
-                  type="plain"
-                  style={{
-                    borderRadius: 100,
-                    paddingHorizontal: 6,
-                    alignSelf: "flex-end",
-                    width: 25,
-                    height: 25
-                  }}
-                  color={colors.accent}
-                  size={16}
-                />
-              ) : null}
+              {strings.by()} {item.authors?.[0].name}
+            </Paragraph>
+          </TouchableOpacity>
+        </>
+      );
+    },
+    [
+      darkTheme.id,
+      lightTheme.id,
+      themeColors.primary.heading,
+      themeColors.secondary?.paragraph
+    ]
+  );
 
-              <Button
-                title={
-                  item.colorScheme === "dark" ? strings.dark() : strings.light()
-                }
-                type="secondaryAccented"
-                height={25}
-                buttonType={{
-                  color: item.colorScheme === "dark" ? "black" : "#f0f0f060",
-                  text: colors.accent
-                }}
-                style={{
-                  borderRadius: 100,
-                  paddingHorizontal: DefaultAppStyles.GAP,
-                  alignSelf: "flex-end",
-                  borderColor:
-                    item.colorScheme === "dark"
-                      ? getColorLinearShade("#000000", 0.1, true)
-                      : getColorLinearShade("#f0f0f0", 0.1, true)
-                }}
-                fontSize={AppFontSize.xxs}
-              />
-            </View>
-          </View>
-
-          <Heading size={AppFontSize.sm} color={themeColors.primary.heading}>
-            {item.name}
-          </Heading>
-          <Paragraph
-            size={AppFontSize.xs}
-            color={themeColors.secondary?.paragraph}
-          >
-            {strings.by()} {item.authors?.[0].name}
-          </Paragraph>
-        </TouchableOpacity>
-      </>
-    );
-  };
   let resetTimer: NodeJS.Timeout;
   const onSearch = (text: string) => {
     clearTimeout(resetTimer as NodeJS.Timeout);
@@ -334,11 +346,14 @@ function ThemeSelector() {
         .flat()
         .filter((theme) =>
           searchQuery && searchQuery !== ""
-            ? true
-            : darkTheme.id !== theme.id && lightTheme.id !== theme.id
+            ? colorScheme === "all" || colorScheme === theme.colorScheme
+            : darkTheme.id !== theme.id &&
+              lightTheme.id !== theme.id &&
+              (colorScheme === "all" || colorScheme === theme.colorScheme)
         ) || []
     );
   }
+
   return (
     <>
       <SheetProvider context="theme-details" />
@@ -366,25 +381,28 @@ function ThemeSelector() {
           >
             <View
               style={{
-                flexDirection: "row"
+                flexDirection: "row",
+                gap: DefaultAppStyles.GAP_SMALL
               }}
             >
               <Button
                 style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 type={
-                  colorScheme === "" || !colorScheme ? "accent" : "secondary"
+                  colorScheme === "all" || !colorScheme ? "accent" : "secondary"
                 }
                 title={strings.all()}
                 fontSize={AppFontSize.xs}
                 onPress={() => {
-                  setColorScheme("");
+                  setColorScheme("all");
                 }}
               />
               <Button
                 style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 type={colorScheme === "dark" ? "accent" : "secondary"}
                 title={strings.dark()}
@@ -395,7 +413,8 @@ function ThemeSelector() {
               />
               <Button
                 style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                  paddingHorizontal: DefaultAppStyles.GAP_SMALL
                 }}
                 fontSize={AppFontSize.xs}
                 type={colorScheme === "light" ? "accent" : "secondary"}
@@ -409,7 +428,8 @@ function ThemeSelector() {
             <Button
               title={strings.loadFromFile()}
               style={{
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                paddingHorizontal: DefaultAppStyles.GAP_SMALL
               }}
               type={"secondaryAccented"}
               icon="folder"
@@ -441,14 +461,55 @@ function ThemeSelector() {
                   ReactNativeBlobUtil.fs
                     .unlink(themeJsonCopiedPath)
                     .catch(() => {});
-                  const json = JSON.parse(themeJson);
+                  let json;
+                  try {
+                    json = JSON.parse(themeJson);
+                  } catch (e) {
+                    ToastManager.show({
+                      heading: strings.invalidThemeFileFormat(),
+                      type: "error",
+                      context: "global",
+                      actionText: strings.learnMore(),
+                      func: () => {
+                        openLinkInBrowser(
+                          "https://help.notesnook.com/custom-themes/introduction"
+                        );
+                      }
+                    });
+                    return;
+                  }
                   const result = validateTheme(json);
+
                   if (result.error) {
-                    ToastManager.error(new Error(result.error));
+                    if (
+                      typeof result.error === "string" &&
+                      result.error.includes("missing from the theme")
+                    ) {
+                      ToastManager.show({
+                        heading: strings.themeMissingRequiredFields(),
+                        type: "error",
+                        context: "global",
+                        actionText: strings.copyLogs(),
+                        func: () => {
+                          Clipboard.setString(result.error || "");
+                          ToastManager.show({
+                            heading: strings.logsCopied(),
+                            type: "success",
+                            context: "global"
+                          });
+                        }
+                      });
+                    } else {
+                      ToastManager.error(new Error(result.error));
+                    }
+
                     return;
                   }
                   select(json, true);
                 } catch (e) {
+                  if ((e as Error).message.includes("Code=3072")) {
+                    return;
+                  }
                   ToastManager.error(e as Error);
                 }
               }}
@@ -458,15 +519,21 @@ function ThemeSelector() {
 
         <LegendList
           numColumns={2}
-          data={[
-            ...(colorScheme === "dark" || (searchQuery && searchQuery !== "")
+          data={
+            themes.isLoading || themes.isError
               ? []
-              : [lightTheme as unknown as ThemeMetadata]),
-            ...(colorScheme === "light" || (searchQuery && searchQuery !== "")
-              ? []
-              : [darkTheme as unknown as ThemeMetadata]),
-            ...getThemes()
-          ]}
+              : [
+                  ...(colorScheme === "dark" ||
+                  (searchQuery && searchQuery !== "")
+                    ? []
+                    : [lightTheme as unknown as ThemeMetadata]),
+                  ...(colorScheme === "light" ||
+                  (searchQuery && searchQuery !== "")
+                    ? []
+                    : [darkTheme as unknown as ThemeMetadata]),
+                  ...getThemes()
+                ]
+          }
           ListEmptyComponent={
             <View
               style={{
@@ -488,20 +555,23 @@ function ThemeSelector() {
             </View>
           }
           ListFooterComponent={
-            themes.isError ? (
-              <View
-                style={{
-                  height: 100,
-                  width: "100%",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
+            <View
+              style={{
+                height: 100,
+                width: "100%",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              {themes.isError ? (
                 <Paragraph color={colors.error.paragraph}>
                   {strings.errorLoadingThemes()}. {themes.error.message}.
                 </Paragraph>
-              </View>
-            ) : null
+              ) : (themes.isLoading || themes.isFetching) &&
+                getThemes().length ? (
+                <ActivityIndicator color={colors.primary.accent} />
+              ) : null}
+            </View>
           }
           estimatedItemSize={200}
           renderItem={renderItem}

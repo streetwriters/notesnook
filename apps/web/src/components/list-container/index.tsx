@@ -370,6 +370,7 @@ function ItemRenderer({
           title={resolvedItem.group.title}
           isFocused={index === focusedGroupIndex}
           index={index}
+          context={itemContext}
           onSelectGroup={async () => {
             if (!items.groups) return;
 

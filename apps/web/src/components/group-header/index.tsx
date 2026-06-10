@@ -45,6 +45,7 @@ import {
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useStore as useSearchStore } from "../../stores/search-store";
+import type { Context } from "../list-container/types";
 
 const groupByToTitleMap = {
   none: "None",
@@ -61,6 +62,7 @@ type GroupingMenuOptions = {
   groupingKey: GroupingKey;
   refresh: () => void;
   isSearching?: boolean;
+  context?: Context;
 };
 
 const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
@@ -192,6 +194,39 @@ export function showSortMenu(groupingKey: GroupingKey, refresh: () => void) {
   );
 }
 
+function getGroupOptions(
+  context: Context | undefined,
+  isSearching: boolean | undefined,
+  groupingKey: GroupingKey
+): GroupOptions {
+  return isSearching
+    ? db.settings.getGroupOptions("search")
+    : context?.type === "notebook" ||
+      context?.type === "tag" ||
+      context?.type === "color"
+    ? db.settings.getGroupOptionsById(context.id, context.type)
+    : db.settings.getGroupOptions(groupingKey);
+}
+
+async function setGroupOptions(
+  options: GroupingMenuOptions,
+  groupOptions: GroupOptions
+) {
+  if (
+    options.context?.type === "notebook" ||
+    options.context?.type === "tag" ||
+    options.context?.type === "color"
+  ) {
+    await db.settings.setGroupOptionsById(
+      options.context.id,
+      options.context.type,
+      groupOptions
+    );
+  } else {
+    await db.settings.setGroupOptions(options.groupingKey, groupOptions);
+  }
+}
+
 async function changeGroupOptions(
   options: GroupingMenuOptions,
   item: Omit<MenuButtonItem, "type">
@@ -207,7 +242,9 @@ async function changeGroupOptions(
         ? "dateModified"
         : groupOptions.sortBy;
   }
-  await db.settings.setGroupOptions(options.groupingKey, groupOptions);
+
+  await setGroupOptions(options, groupOptions);
+
   if (options.groupingKey === "search")
     useSearchStore.setState({ sortOptions: groupOptions });
   options.refresh();
@@ -235,6 +272,7 @@ type GroupHeaderProps = {
   onSelectGroup: () => void;
   isFocused: boolean;
   isSearching?: boolean;
+  context?: Context;
 };
 function GroupHeader(props: GroupHeaderProps) {
   const {
@@ -246,10 +284,12 @@ function GroupHeader(props: GroupHeaderProps) {
     refresh,
     onSelectGroup,
     isFocused,
-    isSearching
+    isSearching,
+    context
   } = props;
+
   const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(isSearching ? "search" : groupingKey)
+    getGroupOptions(context, isSearching, groupingKey)
   );
   const groupHeaderRef = useRef<HTMLDivElement>(null);
   const { openMenu, target } = useMenuTrigger();
@@ -359,8 +399,10 @@ function GroupHeader(props: GroupHeaderProps) {
                 groupByToTitleMap[groupOptions.groupBy || "default"]
               }`}
               onClick={() => {
-                const groupOptions = db.settings.getGroupOptions(
-                  isSearching ? "search" : groupingKey
+                const groupOptions = getGroupOptions(
+                  context,
+                  isSearching,
+                  groupingKey
                 );
                 setGroupOptions(groupOptions);
 
@@ -368,7 +410,8 @@ function GroupHeader(props: GroupHeaderProps) {
                   groupingKey: isSearching ? "search" : groupingKey,
                   groupOptions,
                   refresh,
-                  isSearching
+                  isSearching,
+                  context
                 };
                 const groupBy = groupByMenu({
                   ...menuOptions,

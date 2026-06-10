@@ -42,7 +42,6 @@ import {
   DefaultEditorSession
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
-import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
@@ -119,7 +118,6 @@ type EditorPropertiesProps = {
 function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
   useSpellChecker((store) => store.enabled);
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const timeFormat = useSettingStore((store) => store.timeFormat);
   const metadataItems = [
@@ -150,7 +148,8 @@ function EditorProperties(props: EditorPropertiesProps) {
       "diff"
     ])
   );
-  if (isFocusMode || !session) return null;
+  if (!session) return null;
+
   return (
     <Flex
       sx={{

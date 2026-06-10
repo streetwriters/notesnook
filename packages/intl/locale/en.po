@@ -1,18 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-05-21 08:29+0500\n"
-"POT-Creation-Date: 2026-05-21 08:29+0500\n"
+"POT-Creation-Date: 2026-06-10 17:36+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Plural-Forms: \n"
 
 #: src/strings.ts:2423
 msgid " \"Notebook > Notes\""
@@ -1940,6 +1933,10 @@ msgstr "Copy link"
 msgid "Copy link text"
 msgstr "Copy link text"
 
+#: src/strings.ts:2784
+msgid "Copy logs"
+msgstr "Copy logs"
+
 #: src/strings.ts:454
 msgid "Copy note"
 msgstr "Copy note"
@@ -2064,6 +2061,10 @@ msgstr "Creating a{0} backup"
 #: src/strings.ts:2678
 msgid "Creating..."
 msgstr "Creating..."
+
+#: src/strings.ts:2776
+msgid "Creation date cannot be after last edited date"
+msgstr "Creation date cannot be after last edited date"
 
 #: src/strings.ts:2051
 msgid "Credentials"
@@ -2902,6 +2903,18 @@ msgstr "Expires on"
 #: src/strings.ts:2648
 msgid "Expiry date"
 msgstr "Expiry date"
+
+#: src/strings.ts:2773
+msgid "Expiry date cannot be more than 1 year in the future"
+msgstr "Expiry date cannot be more than 1 year in the future"
+
+#: src/strings.ts:2771
+msgid "Expiry date must be in the future"
+msgstr "Expiry date must be in the future"
+
+#: src/strings.ts:2774
+msgid "Expiry date set"
+msgstr "Expiry date set"
 
 #: src/strings.ts:2552
 msgid "Explore all plans"
@@ -4131,6 +4144,10 @@ msgstr "Math & formulas"
 msgid "Maximize"
 msgstr "Maximize"
 
+#: src/strings.ts:2779
+msgid "Maximum reminder date is {maxDate}"
+msgstr "Maximum reminder date is {maxDate}"
+
 #: src/strings.ts:2082
 msgid "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
 msgstr "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions."
@@ -4506,6 +4523,10 @@ msgstr "Note copied to clipboard"
 msgid "Note does not exist"
 msgstr "Note does not exist"
 
+#: src/strings.ts:2777
+msgid "Note duplicated"
+msgstr "Note duplicated"
+
 #: src/strings.ts:458
 msgid "Note history"
 msgstr "Note history"
@@ -4866,6 +4887,10 @@ msgstr "Payment method"
 #: src/strings.ts:788
 msgid "PDF is password protected"
 msgstr "PDF is password protected"
+
+#: src/strings.ts:2786
+msgid "Permission required to save QR-Code to Gallery"
+msgstr "Permission required to save QR-Code to Gallery"
 
 #: src/strings.ts:1731
 msgid "phone number"
@@ -7521,6 +7546,14 @@ msgstr "We are creating a backup of your data. Please wait..."
 #: src/strings.ts:474
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 msgstr "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
+
+#: src/strings.ts:2781
+msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
+msgstr "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
+
+#: src/strings.ts:2783
+msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
+msgstr "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 
 #: src/strings.ts:1392
 msgid "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."

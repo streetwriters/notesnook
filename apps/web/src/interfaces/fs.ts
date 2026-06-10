@@ -714,7 +714,10 @@ export async function getUploadedFileSize(filename: string) {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    const contentLength = parseInt(attachmentInfo.headers["content-length"]);
+    const contentLength = parseInt(
+      attachmentInfo.headers["x-object-size"] ??
+        attachmentInfo.headers["content-length"]
+    );
     return isNaN(contentLength) ? 0 : contentLength;
   } catch (e) {
     logger.error(e, "Failed to get uploaded file size.", { filename });

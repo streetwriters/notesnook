@@ -16,28 +16,61 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../common/database";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import { eGroupOptionsUpdated } from "../utils/events";
 import { useSettingStore } from "../stores/use-setting-store";
+import { GroupingByIdKey, GroupingKey, GroupOptions } from "@notesnook/core";
 
-export function useGroupOptions(type: any) {
+export function getGroupOptions(
+  groupingKey: GroupingKey,
+  id?: string,
+  type?: GroupingByIdKey
+) {
+  return id && type
+    ? db.settings?.getGroupOptionsById(id, type)
+    : db.settings?.getGroupOptions(groupingKey);
+}
+
+export function setGroupOptionsById(
+  groupingKey: GroupingKey,
+  groupOptions: GroupOptions,
+  id?: string,
+  type?: GroupingByIdKey
+) {
+  return id && type
+    ? db.settings?.setGroupOptionsById(id, type, groupOptions)
+    : db.settings?.setGroupOptions(groupingKey, groupOptions);
+}
+
+export function useGroupOptions(
+  groupingKey: GroupingKey,
+  id?: string,
+  type?: GroupingByIdKey
+) {
   const appLoading = useSettingStore((state) => state.isAppLoading);
   const [groupOptions, setGroupOptions] = useState(
-    db.settings?.getGroupOptions(type)
+    getGroupOptions(groupingKey, id, type)
   );
+  console.log(groupingKey, id, type, groupOptions, "options");
+  const groupOptionsRef = useRef(groupOptions);
+  groupOptionsRef.current = groupOptions;
+
   useEffect(() => {
-    const onUpdate = (groupType: string) => {
-      if (groupType !== type) return;
-      const options = db.settings?.getGroupOptions(type) as any;
+    const onUpdate = (_groupingKey: string, _id?: string, _type?: string) => {
+      if (_groupingKey !== groupingKey) return;
+      if (_id && _type && _id !== id && _type !== type) return;
+
+      const options = getGroupOptions(groupingKey, id, type);
       if (!options) return;
       if (
-        groupOptions?.groupBy !== options.groupBy ||
-        groupOptions?.sortBy !== options.sortBy ||
-        groupOptions?.sortDirection !== groupOptions?.sortDirection
+        groupOptionsRef.current?.groupBy !== options.groupBy ||
+        groupOptionsRef.current?.sortBy !== options.sortBy ||
+        groupOptionsRef.current?.sortDirection !== options?.sortDirection
       ) {
+        console.log("onUpdate", _id, _type);
         setGroupOptions({ ...options });
         Navigation.queueRoutesForUpdate();
       }
@@ -46,13 +79,13 @@ export function useGroupOptions(type: any) {
     eSubscribeEvent(eGroupOptionsUpdated, onUpdate);
 
     if (!appLoading) {
-      onUpdate(type);
+      onUpdate(groupingKey);
     }
 
     return () => {
       eUnSubscribeEvent(eGroupOptionsUpdated, onUpdate);
     };
-  }, [type, groupOptions, appLoading]);
+  }, [groupingKey, appLoading, id, type]);
 
   return groupOptions;
 }

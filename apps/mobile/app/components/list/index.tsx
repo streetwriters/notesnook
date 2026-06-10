@@ -17,7 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { GroupingKey, Item, VirtualizedGrouping } from "@notesnook/core";
+import {
+  GroupingByIdKey,
+  GroupingKey,
+  Item,
+  VirtualizedGrouping
+} from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 import React, { useEffect, useRef } from "react";
@@ -55,6 +60,7 @@ type ListProps = {
   placeholder?: PlaceholderData;
   groupType: GroupingKey;
   id?: string;
+  type?: GroupingByIdKey;
 };
 
 const onMomentumScrollEnd = () => {
@@ -74,7 +80,7 @@ export default function List(props: ListProps) {
     props.dataType === "notebook" ||
     notebooksListMode === "compact";
 
-  const groupOptions = useGroupOptions(props.groupType);
+  const groupOptions = useGroupOptions(props.groupType, props.id, props.type);
 
   const _onRefresh = async () => {
     Sync.run("global", false, "full", () => {
@@ -96,23 +102,27 @@ export default function List(props: ListProps) {
           index={itemProps.index}
           isSheet={props.isRenderedInActionSheet || false}
           items={props.data}
+          groupId={props.id}
           groupOptions={groupOptions}
           group={props.groupType as GroupingKey}
           renderedInRoute={props.renderedInRoute}
           customAccentColor={props.customAccentColor}
           dataType={props.dataType}
+          type={props.type}
           scrollRef={scrollRef}
         />
       );
     },
     [
-      groupOptions,
-      props.groupType,
-      props.customAccentColor,
-      props.data,
-      props.dataType,
       props.isRenderedInActionSheet,
-      props.renderedInRoute
+      props.data,
+      props.id,
+      props.groupType,
+      props.renderedInRoute,
+      props.customAccentColor,
+      props.dataType,
+      groupOptions,
+      props.type
     ]
   );
 
