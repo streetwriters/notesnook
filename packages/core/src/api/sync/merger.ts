@@ -33,7 +33,6 @@ import { InboxItemsHistoryErrorContext } from "../../types.js";
 import { z } from "zod";
 import { sanitizeHtml } from "../../utils/html-parser.js";
 
-const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
   logger = logger.scope("Merger");
   constructor(private readonly db: Database) {}
@@ -93,7 +92,7 @@ class Merger {
       // we can just replace the conflicted content
       const conflicted = localItem.conflicted
         ? "conflict"
-        : isContentConflicted(localItem, remoteItem, THRESHOLD);
+        : isContentConflicted(localItem, remoteItem);
 
       if (conflicted === "merge") return remoteItem;
       else if (!conflicted) return;
@@ -137,8 +136,7 @@ export default Merger;
 
 export function isContentConflicted(
   localItem: ContentItem,
-  remoteItem: ContentItem,
-  conflictThreshold: number
+  remoteItem: ContentItem
 ) {
   const isResolved =
     localItem.dateResolved &&
@@ -148,21 +146,8 @@ export function isContentConflicted(
     // the local item is edited if it wasn't synced yet.
     !localItem.synced;
   if (isEdited && !isResolved) {
-    // If time difference between local item's edits & remote item's edits
-    // is less than threshold, we shouldn't trigger a merge conflict; instead
-    // we will keep the most recently changed item.
-    const timeDiff =
-      Math.max(remoteItem.dateEdited, localItem.dateEdited) -
-      Math.min(remoteItem.dateEdited, localItem.dateEdited);
-
-    if (
-      timeDiff < conflictThreshold ||
-      isHTMLEqual(localItem.data, remoteItem.data)
-    ) {
-      if (remoteItem.dateModified > localItem.dateModified) {
-        return "merge";
-      }
-      return;
+    if (isHTMLEqual(localItem.data, remoteItem.data)) {
+      return remoteItem.dateEdited > localItem.dateEdited ? "merge" : undefined;
     }
 
     return "conflict";
