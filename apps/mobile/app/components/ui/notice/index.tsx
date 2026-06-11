@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View, ViewStyle } from "react-native";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { getContainerBorder } from "../../../utils/colors";
 import { AppFontSize } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import AppIcon from "../AppIcon";
 import Paragraph from "../typography/paragraph";
 
@@ -47,25 +47,40 @@ export const Notice = ({
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+        padding: Spacing.LEVEL_2,
         flexDirection: "row",
-        backgroundColor: colors.secondary.background,
-        borderRadius: isSmall ? 5 : 10,
+        backgroundColor:
+          type === "information"
+            ? colors.primary.shade
+            : colors.secondary.background,
+        borderRadius: Radius.S,
         alignItems: "flex-start",
-        gap: 5,
+        gap: Spacing.LEVEL_1,
         ...getContainerBorder(colors.secondary.background),
         ...style
       }}
     >
-      <AppIcon
-        size={isSmall ? AppFontSize.md + 2 : AppFontSize.xxl}
-        name={type}
-        color={type === "alert" ? colors.error.icon : colors.primary.accent}
+      <View
         style={{
-          marginTop: isSmall ? 3 : 5
+          borderRadius: 100,
+          backgroundColor: colors.primary.accent,
+          width: 20,
+          height: 20,
+          justifyContent: "center",
+          alignItems: "center"
         }}
-      />
+      >
+        <AppIcon
+          size={isSmall ? 12 : AppFontSize.xxl}
+          name={type === "information" ? "warning-circle" : type}
+          iconFamily="notesnook"
+          color={
+            type === "alert"
+              ? colors.error.icon
+              : colors.primary.accentForeground
+          }
+        />
+      </View>
       <Paragraph
         style={{
           flexShrink: 1

@@ -31,7 +31,6 @@ import ImagePreview from "../image-preview";
 import MergeConflicts from "../merge-conflicts";
 import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
-import RecoveryKeySheet from "../sheets/recovery-key";
 import Progress from "../dialogs/progress";
 import { useSettingStore } from "../../stores/use-setting-store";
 
@@ -51,7 +50,6 @@ const DialogProvider = () => {
       {isAppLoading ? null : (
         <>
           <MergeConflicts />
-          <RecoveryKeySheet colors={colors} />
           <VaultDialog colors={colors} />
           <RateAppSheet />
           <ImagePreview />

@@ -236,6 +236,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                     key={item.name}
                     fwdRef={item.ref}
                     name={item.name}
+                    label={item.label}
                     autoFocus={index === 0}
                     placeholder={item.placeholder}
                     formRef={formRef as RefObject<FormRef>}
