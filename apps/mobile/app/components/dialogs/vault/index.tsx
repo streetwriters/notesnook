@@ -699,16 +699,22 @@ export const VaultDialog: React.FC = () => {
       // Auto-unlock with fingerprint if applicable
       const canAutoUnlock =
         fingerprint &&
+        available &&
         data.requestType !== VaultRequestType.EnableFingerprint &&
         data.requestType !== VaultRequestType.RevokeFingerprint &&
         data.requestType !== VaultRequestType.ChangePassword &&
         data.requestType !== VaultRequestType.ClearVault &&
         data.requestType !== VaultRequestType.DeleteVault &&
         data.requestType !== VaultRequestType.CustomAction &&
-        data.requestType !== VaultRequestType.PermanentUnlock;
+        data.requestType !== VaultRequestType.PermanentUnlock &&
+        data.requestType !== VaultRequestType.CreateVault;
 
-      if (canAutoUnlock) {
-        await onPressFingerprintAuth(data.title, data.description);
+      if (canAutoUnlock && available) {
+        try {
+          await onPressFingerprintAuth(data.title, data.description);
+        } catch (e) {
+          setVisible(true);
+        }
       } else {
         setVisible(true);
       }
