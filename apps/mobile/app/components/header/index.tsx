@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
 import { Radius, Spacing } from "../../common/design/spacing";
 import {
@@ -44,7 +44,8 @@ export const Header = ({
   canGoBack,
   hasSearch,
   onSearch,
-  rightButton
+  rightButton,
+  style
 }: {
   onLeftMenuButtonPress?: () => void;
   renderedInRoute?: RouteName;
@@ -55,6 +56,7 @@ export const Header = ({
   hasSearch?: boolean;
   onSearch?: () => void;
   rightButton?: IconButtonProps;
+  style?: ViewStyle;
 }) => {
   const { colors } = useThemeColors();
   const [borderHidden, setBorderHidden] = useState(true);
@@ -109,15 +111,18 @@ export const Header = ({
       }}
     >
       <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          borderRadius: Radius.S,
-          paddingHorizontal: Spacing.LEVEL_2,
-          paddingVertical: Spacing.LEVEL_3,
-          backgroundColor: colors.secondary.background,
-          alignItems: "center"
-        }}
+        style={[
+          {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            borderRadius: Radius.S,
+            paddingHorizontal: Spacing.LEVEL_2,
+            paddingVertical: Spacing.LEVEL_3,
+            backgroundColor: colors.secondary.background,
+            alignItems: "center"
+          },
+          style
+        ]}
         testID="search-header"
       >
         {isTablet && !canGoBack ? null : (
@@ -134,7 +139,7 @@ export const Header = ({
               height: 20
             }}
             size={20}
-            name={canGoBack ? "arrow-left" : "menu"}
+            name={canGoBack ? "arrow-back" : "menu"}
             iconFamily="notesnook"
             color={colors.primary.icon}
           />

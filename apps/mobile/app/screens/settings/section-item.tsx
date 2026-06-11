@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
 import { useThemeColors } from "@notesnook/theme";
 import {
   NavigationProp,
@@ -25,9 +26,7 @@ import {
 } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
-import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
-//@ts-ignore
-import ToggleSwitch from "toggle-switch-react-native";
+import { Radius, Spacing } from "../../common/design/spacing";
 import PaywallSheet from "../../components/sheets/paywall";
 import AppIcon from "../../components/ui/AppIcon";
 import { IconButton } from "../../components/ui/icon-button";
@@ -41,7 +40,7 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
-import { components } from "./components";
+import { components } from "./components/components";
 import { RouteParams, SettingSection } from "./types";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
@@ -93,13 +92,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     });
   };
 
-  const styles =
-    item.type === "danger"
-      ? {
-          backgroundColor: colors.error.background
-        }
-      : {};
-
   const updateInput = (value: any) => {
     inputRef?.current?.setNativeProps({
       text: value + ""
@@ -138,19 +130,24 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     return true;
   }, [isFeatureAvailable]);
 
+  const isOn = item.getter
+    ? item.getter(item.property || current)
+    : settings[item?.property as never];
+
   return isHidden ? null : (
     <Pressable
       disabled={item.type === "component"}
       style={{
         width: "100%",
         alignItems: "center",
-        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: DefaultAppStyles.GAP,
-        borderRadius: 0,
-        overflow: "hidden",
-        ...styles
+        paddingHorizontal: Spacing.LEVEL_2,
+        paddingVertical: Spacing.LEVEL_1,
+        borderRadius: Radius.S,
+        backgroundColor: colors.primary.background,
+        marginBottom: Spacing.LEVEL_0,
+        overflow: "hidden"
       }}
       onPress={async () => {
         if (!checkIsFeatureAvailable()) return;
@@ -201,33 +198,35 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
       <View
         style={{
           flexDirection: "row",
-          flexShrink: 1
+          flexShrink: 1,
+          flex: 1,
+          alignItems: "center",
+          gap: Spacing.LEVEL_2
         }}
       >
         <View
           style={{
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             justifyContent: "center",
             alignItems: "center",
-            marginRight: 12,
             backgroundColor:
               item.component === "colorpicker"
                 ? colors.primary.accent
-                : undefined,
-            borderRadius: 100
+                : colors.secondary.background,
+            borderRadius: Radius.XS
           }}
         >
           {!!item.icon && (
             <AppIcon
               color={
                 item.type === "danger"
-                  ? colors.error.icon
-                  : colors.secondary.icon
+                  ? colors.error.accent
+                  : colors.primary.icon
               }
               iconFamily={item.iconFamily}
               name={item.icon}
-              size={item.iconSize || 30}
+              size={item.iconSize || 16}
             />
           )}
         </View>
@@ -235,18 +234,16 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         <View
           style={{
             flexShrink: 1,
-            paddingRight: item.type === "switch" ? 10 : 0,
-            flex: item.type === "component" ? 1 : 0
+            paddingRight: item.type === "switch" ? Spacing.LEVEL_1 : 0,
+            flex: 1,
+            gap: Spacing.LEVEL_1
           }}
         >
           {item.name ? (
             <Heading
-              color={
-                item.type === "danger"
-                  ? colors.error.paragraph
-                  : colors.primary.heading
-              }
-              size={AppFontSize.sm}
+              color={colors.primary.heading}
+              fontSize="MD"
+              lineHeight="100%"
             >
               {typeof item.name === "function" ? item.name(current) : item.name}
             </Heading>
@@ -254,12 +251,9 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
           {!!item.description && (
             <Paragraph
-              color={
-                item.type === "danger"
-                  ? colors.error.paragraph
-                  : colors.primary.paragraph
-              }
-              size={AppFontSize.sm}
+              color={colors.primary.paragraph}
+              fontSize="SM"
+              lineHeight="100%"
             >
               {typeof item.description === "function"
                 ? item.description(current)
@@ -290,7 +284,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 });
                 item.inputProperties?.onSubmitEditing?.(text as any);
               }}
-              containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL }}
+              containerStyle={{
+                marginTop: DefaultAppStyles.GAP_VERTICAL,
+                backgroundColor: colors.secondary.background,
+                borderWidth: 0
+              }}
+              fontSize={AppFontSize.sm}
               fwdRef={inputRef}
               onLayout={() => {
                 inputRef?.current?.setNativeProps({
@@ -394,7 +393,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         </View>
       </View>
 
-      {item.type === "switch" && !loading && (
+      {/* {item.type === "switch" && !loading && (
         <ToggleSwitch
           isOn={
             item.getter
@@ -407,13 +406,32 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           animationSpeed={150}
           onToggle={onChangeSettings}
         />
+      )} */}
+
+      {item.type === "switch" && !loading && (
+        <AppIcon
+          name={isOn ? "toggle-on" : "toggle-off"}
+          iconFamily="notesnook"
+          size={16}
+          color={
+            isOn
+              ? [colors.primary.accent, colors.primary.background]
+              : [colors.disabled.icon, colors.primary.background]
+          }
+        />
       )}
 
-      {loading ? (
-        <ActivityIndicator
-          size={AppFontSize.xxl}
-          color={colors.primary.accent}
+      {item.type === "screen" || item.isNavigation ? (
+        <AppIcon
+          name="chevron-right"
+          iconFamily="notesnook"
+          size={16}
+          color={colors.secondary.paragraph}
         />
+      ) : null}
+
+      {loading ? (
+        <ActivityIndicator size={16} color={colors.primary.accent} />
       ) : null}
     </Pressable>
   );

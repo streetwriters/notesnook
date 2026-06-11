@@ -1618,8 +1618,8 @@ msgid "Clear"
 msgstr "Clear"
 
 #: src/strings.ts:1891
-msgid "Clear all cached attachments. Current cache size: {cacheSize}"
-msgstr "Clear all cached attachments. Current cache size: {cacheSize}"
+msgid "Clear all cached attachments. Size: {cacheSize}"
+msgstr "Clear all cached attachments. Size: {cacheSize}"
 
 #: src/strings.ts:2301
 msgid "Clear all formatting"
@@ -2661,8 +2661,8 @@ msgid "Enable spell checker"
 msgstr "Enable spell checker"
 
 #: src/strings.ts:496
-msgid "Enable two-factor authentication to add an extra layer of security to your account."
-msgstr "Enable two-factor authentication to add an extra layer of security to your account."
+msgid "Enable two-factor authentication to secure your account."
+msgstr "Enable two-factor authentication to secure your account."
 
 #: src/strings.ts:2679
 msgid "Enable/Disable Inbox API"
@@ -3992,10 +3992,6 @@ msgstr "Log out from all other devices"
 msgid "Logged in as {email}"
 msgstr "Logged in as {email}"
 
-#: src/strings.ts:1090
-msgid "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out."
-msgstr "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out."
-
 #: src/strings.ts:403
 msgid "Logging out. Please wait..."
 msgstr "Logging out. Please wait..."
@@ -4598,10 +4594,6 @@ msgstr "Notesnook"
 #: src/strings.ts:2632
 msgid "Notesnook Circle"
 msgstr "Notesnook Circle"
-
-#: src/strings.ts:2634
-msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
-msgstr "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 
 #: src/strings.ts:2098
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
@@ -5425,6 +5417,10 @@ msgstr "Recovery email sent!"
 msgid "Recovery key copied"
 msgstr "Recovery key copied"
 
+#: src/strings.ts:1066
+msgid "Recovery key helps you recover your data if you forget your password."
+msgstr "Recovery key helps you recover your data if you forget your password."
+
 #: src/strings.ts:888
 msgid "Recovery key QR code saved"
 msgstr "Recovery key QR code saved"
@@ -5879,10 +5875,6 @@ msgstr "Save your account recovery key"
 #: src/strings.ts:492
 msgid "Save your account recovery key in a safe place. You will need it to recover your account in case you forget your password."
 msgstr "Save your account recovery key in a safe place. You will need it to recover your account in case you forget your password."
-
-#: src/strings.ts:1066
-msgid "Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password."
-msgstr "Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password."
 
 #: src/strings.ts:499
 msgid "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
@@ -6971,6 +6963,10 @@ msgstr "This username will be used to distinguish between different credentials 
 msgid "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."
 msgstr "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."
 
+#: src/strings.ts:1090
+msgid "This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out."
+msgstr "This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out."
+
 #: src/strings.ts:626
 msgid "Thu"
 msgstr "Thu"
@@ -7052,6 +7048,10 @@ msgstr "Trash gets automatically cleaned up after {days} days"
 #: src/strings.ts:1345
 msgid "Trash gets automatically cleaned up daily"
 msgstr "Trash gets automatically cleaned up daily"
+
+#: src/strings.ts:2634
+msgid "Trusted partners who share our commitment to privacy, transparency, and user freedom."
+msgstr "Trusted partners who share our commitment to privacy, transparency, and user freedom."
 
 #: src/strings.ts:2572
 msgid "Try {plan} for free"
@@ -7909,8 +7909,8 @@ msgid "Your account will be downgraded in {days} days"
 msgstr "Your account will be downgraded in {days} days"
 
 #: src/strings.ts:1094
-msgid "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding."
-msgstr "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding."
+msgid "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure to save a backup of your notes before proceeding."
+msgstr "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure to save a backup of your notes before proceeding."
 
 #: src/strings.ts:976
 msgid "Your archive"

@@ -1447,7 +1447,7 @@ msgstr ""
 
 #: src/strings.ts:1141
 msgid "Change how the app behaves in different situations"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2384
 msgid "Change language"
@@ -1618,8 +1618,8 @@ msgid "Clear"
 msgstr ""
 
 #: src/strings.ts:1891
-msgid "Clear all cached attachments. Current cache size: {cacheSize}"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgid "Clear all cached attachments. Size: {cacheSize}"
+msgstr ""
 
 #: src/strings.ts:2301
 msgid "Clear all formatting"
@@ -2650,8 +2650,8 @@ msgid "Enable spell checker"
 msgstr ""
 
 #: src/strings.ts:496
-msgid "Enable two-factor authentication to add an extra layer of security to your account."
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgid "Enable two-factor authentication to secure your account."
+msgstr ""
 
 #: src/strings.ts:2679
 msgid "Enable/Disable Inbox API"
@@ -2932,7 +2932,7 @@ msgstr ""
 
 #: src/strings.ts:1275
 msgid "Faced an issue or have a suggestion? Click here to create a bug report"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2435
 msgid "Failed"
@@ -3130,7 +3130,7 @@ msgstr ""
 
 #: src/strings.ts:1295
 msgid "Follow us on X for updates and news about Notesnook"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2308
 msgid "Font family"
@@ -3241,7 +3241,7 @@ msgstr ""
 
 #: src/strings.ts:1308
 msgid "Get Notesnook app on your desktop and access all notes"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2188
 msgid "Get Notesnook app on your iPhone and access all your notes on the go."
@@ -3393,7 +3393,7 @@ msgstr ""
 
 #: src/strings.ts:1198
 msgid "Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2199
 msgid "Hide note title"
@@ -3729,7 +3729,7 @@ msgstr ""
 
 #: src/strings.ts:1290
 msgid "Join our Telegram group to chat with other users and the team"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2099
 msgid "Join the cause"
@@ -3971,10 +3971,6 @@ msgstr ""
 #: src/strings.ts:389
 msgid "Logged in as {email}"
 msgstr "<<<<<<< HEAD"
-
-#: src/strings.ts:1090
-msgid "Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out."
-msgstr ""
 
 #: src/strings.ts:403
 msgid "Logging out. Please wait..."
@@ -4577,10 +4573,6 @@ msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2632
 msgid "Notesnook Circle"
-msgstr ""
-
-#: src/strings.ts:2634
-msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 msgstr ""
 
 #: src/strings.ts:2098
@@ -5293,7 +5285,7 @@ msgstr ""
 
 #: src/strings.ts:1259
 msgid "Quickly create a note from the notification"
-msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:2364
 msgid "Quote"
@@ -5397,6 +5389,10 @@ msgstr ""
 
 #: src/strings.ts:890
 msgid "Recovery key copied"
+msgstr ""
+
+#: src/strings.ts:1066
+msgid "Recovery key helps you recover your data if you forget your password."
 msgstr ""
 
 #: src/strings.ts:888
@@ -5853,10 +5849,6 @@ msgstr ""
 #: src/strings.ts:492
 msgid "Save your account recovery key in a safe place. You will need it to recover your account in case you forget your password."
 msgstr "<<<<<<< HEAD"
-
-#: src/strings.ts:1066
-msgid "Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password."
-msgstr ""
 
 #: src/strings.ts:499
 msgid "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
@@ -6930,6 +6922,10 @@ msgstr ""
 msgid "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase."
 msgstr ""
 
+#: src/strings.ts:1090
+msgid "This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out."
+msgstr ""
+
 #: src/strings.ts:626
 msgid "Thu"
 msgstr ""
@@ -7011,6 +7007,10 @@ msgstr ""
 #: src/strings.ts:1345
 msgid "Trash gets automatically cleaned up daily"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+
+#: src/strings.ts:2634
+msgid "Trusted partners who share our commitment to privacy, transparency, and user freedom."
+msgstr ""
 
 #: src/strings.ts:2572
 msgid "Try {plan} for free"
@@ -7848,7 +7848,7 @@ msgid "Your account will be downgraded in {days} days"
 msgstr ""
 
 #: src/strings.ts:1094
-msgid "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding."
+msgid "Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure to save a backup of your notes before proceeding."
 msgstr ""
 
 #: src/strings.ts:976

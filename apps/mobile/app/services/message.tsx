@@ -20,7 +20,7 @@ import React from "react";
 import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import { AuthMode } from "../components/auth/common";
-import { verifyUser } from "../screens/settings/functions";
+import { verifyUser } from "../screens/settings/verify-user";
 import {
   Message,
   MessageId,
