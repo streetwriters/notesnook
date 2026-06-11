@@ -31,11 +31,13 @@ export type SettingSection = {
     | "danger"
     | "input"
     | "input-selector"
-    | "dropdown-selector";
+    | "dropdown-selector"
+    | "group";
   name?: string | ((current?: unknown) => string);
   description?: string | ((current: unknown) => string);
   icon?: string;
   iconFamily?: IconProps["iconFamily"];
+  isNavigation?: boolean;
   iconSize?: number;
   property?: keyof Settings;
   sections?: SettingSection[];

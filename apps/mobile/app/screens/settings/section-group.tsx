@@ -17,14 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { View } from "react-native";
+import { Spacing } from "../../common/design/spacing";
 import Heading from "../../components/ui/typography/heading";
-import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { SettingSection } from "./types";
-import { DefaultAppStyles } from "../../utils/styles";
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
   const current = item.useHook && item.useHook();
@@ -38,18 +38,39 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
       {item.name && item.sections ? (
         <Heading
           style={{
-            paddingHorizontal: DefaultAppStyles.GAP
+            paddingHorizontal: Spacing.LEVEL_3,
+            marginBottom: Spacing.LEVEL_2
           }}
-          color={colors.primary.accent}
-          size={AppFontSize.xs}
+          color={colors.secondary.heading}
+          size={AppFontSize.sm}
+          fontFamily="MEDIUM"
         >
-          {(item.name as string).toUpperCase()}
+          {item.name as string}
         </Heading>
       ) : null}
 
-      {item.sections?.map((item) => (
-        <SectionItem key={item.name as string} item={item} />
-      ))}
+      {item.sections?.map((item) =>
+        item.type === "group" ? (
+          <SectionGroup key={item.id} item={item} />
+        ) : (
+          <SectionItem key={item.id as string} item={item} />
+        )
+      )}
+
+      <View
+        style={{
+          paddingHorizontal: Spacing.LEVEL_3,
+          width: "100%"
+        }}
+      >
+        <View
+          style={{
+            height: 1,
+            width: "100%",
+            backgroundColor: colors.primary.border
+          }}
+        />
+      </View>
     </View>
   );
 };

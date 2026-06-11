@@ -493,7 +493,7 @@ $day$: Current day (eg. Monday)`,
   backups: () => t`Backups`,
   twoFactorAuth: () => t`Two-factor authentication`,
   twoFactorAuthDesc: () =>
-    t`Enable two-factor authentication to add an extra layer of security to your account.`,
+    t`Enable two-factor authentication to secure your account.`,
   saveRecoveryCodes: () => t`Save recovery codes`,
   saveRecoveryCodesDesc: () =>
     t`Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods.`,
@@ -1063,7 +1063,7 @@ $day$: Current day (eg. Monday)`,
   removeFullNameDesc: () => t`Remove your full name from profile`,
   saveDataRecoveryKey: () => t`Save data recovery key`,
   saveDataRecoveryKeyDesc: () =>
-    t`Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password.`,
+    t`Recovery key helps you recover your data if you forget your password.`,
   manageAttachments: () => t`Manage attachments`,
   manageAttachmentsDesc: () => t`Manage your attachments in one place`,
   changePasswordDesc: () => t`Change your account password`,
@@ -1087,11 +1087,11 @@ $day$: Current day (eg. Monday)`,
     t`Please wait while we verify your subscription`,
   verifySubDesc: () => t`Verify your subscription to Notesnook Pro`,
   logoutWarnin: () =>
-    t`Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.`,
+    t`This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out.`,
   logoutError: () => t`Error logging out`,
   deleteAccount: () => t`Delete account`,
   deleteAccountDesc: () =>
-    t`Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding.`,
+    t`Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure to save a backup of your notes before proceeding.`,
   enterAccountPassword: () => t`Enter account password`,
   enterAccountPasswordDesc: () => t`Enter account password to proceed.`,
   failedToDeleteAccount: () => t`Failed to delete account`,
@@ -1888,7 +1888,7 @@ For example:
   clickToPreview: () => t`Click to preview`,
   clearCache: () => t`Clear cache`,
   clearCacheDesc: (cacheSize: number) =>
-    t`Clear all cached attachments. Current cache size: ${cacheSize}`,
+    t`Clear all cached attachments. Size: ${cacheSize}`,
   clearCacheConfirm: () => t`Clear attachments cache?`,
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
@@ -2631,7 +2631,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   redeemCode: () => t`Redeem code`,
   notesnookCircle: () => t`Notesnook Circle`,
   notesnookCircleDesc: () =>
-    t`Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.`,
+    t`Trusted partners who share our commitment to privacy, transparency, and user freedom.`,
   trialUserCircleNotice: () =>
     `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
   freeUserCircleNotice: () =>
