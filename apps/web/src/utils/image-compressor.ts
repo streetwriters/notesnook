@@ -72,7 +72,7 @@ export function compressImage(file: File, options: Partial<CompressorOptions>) {
         naturalHeight: image.naturalHeight,
         naturalWidth: image.naturalWidth
       });
-      resolve(compressed);
+      resolve(compressed.size > file.size ? file : compressed);
       URL.revokeObjectURL(image.src);
     };
     image.onabort = () => {
