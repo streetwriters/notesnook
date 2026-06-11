@@ -431,6 +431,18 @@ class Database {
               this.eventManager.publish(EVENTS.userEmailConfirmed);
               break;
             }
+            case "triggerSync": {
+              this.eventManager.publish(
+                EVENTS.databaseSyncRequested,
+                true,
+                false
+              );
+              break;
+            }
+            case "inboxUpdated": {
+              await this.user.fetchUser();
+              break;
+            }
           }
         } catch (e) {
           logger.error("SSE: Unsupported message. Message = ", event.data);
