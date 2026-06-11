@@ -89,7 +89,7 @@ export class WebExtensionServer implements Server {
       );
 
       let attachment;
-      for await (const message of attachFiles([clippedFile], [false])) {
+      for await (const message of attachFiles([clippedFile])) {
         if (message.type === "done") attachment = message.attachment;
         else if (message.type === "error") return;
       }

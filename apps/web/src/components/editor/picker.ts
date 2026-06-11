@@ -27,7 +27,6 @@ import {
   hashStream,
   writeEncryptedFile
 } from "../../interfaces/fs";
-import { compressImage, FileWithURI } from "../../utils/image-compressor";
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { strings } from "@notesnook/intl";
@@ -81,7 +80,6 @@ export async function reuploadAttachment(
 }
 
 type AttachFilesMessage =
-  | { type: "compressing"; index: number }
   | { type: "encrypting"; index: number }
   | {
       type: "done";
@@ -92,36 +90,10 @@ type AttachFilesMessage =
 
 export async function* attachFiles(
   files: File[],
-  shouldCompress: boolean[],
   skipSpecialImageHandling = false
 ): AsyncGenerator<AttachFilesMessage> {
   for (let i = 0; i < files.length; i++) {
-    let file = files[i];
-    const shouldCompressFile = shouldCompress[i];
-
-    if (shouldCompressFile) {
-      yield { type: "compressing", index: i };
-      try {
-        const compressed = await compressImage(file, {
-          maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
-          width: (naturalWidth) => naturalWidth,
-          height: (_, naturalHeight) => naturalHeight,
-          resize: "contain",
-          quality: 0.7
-        });
-        file = new FileWithURI([compressed], file.name, {
-          lastModified: file.lastModified,
-          type: file.type
-        });
-      } catch (e) {
-        yield {
-          type: "error",
-          index: i,
-          error: (e as Error).message || strings.compressionFailed()
-        };
-        continue;
-      }
-    }
+    const file = files[i];
 
     yield { type: "encrypting", index: i };
 
