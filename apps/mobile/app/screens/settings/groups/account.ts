@@ -51,11 +51,12 @@ import {
   eSubscribeEvent,
   presentSheet
 } from "../../../services/event-manager";
-import { eCloseSheet, eOpenRecoveryKeyDialog } from "../../../utils/events";
+import { eCloseSheet } from "../../../utils/events";
 import { MFARecoveryCodes, MFASheet } from "../components/2fa";
 import { verifyUser } from "../verify-user";
 import { logoutUser } from "../logout";
 import { SettingSection } from "../types";
+import RecoveryKeySheet from "../../../components/sheets/recovery-key";
 
 export const accountGroup: SettingSection = {
   id: "account",
@@ -420,10 +421,10 @@ export const accountGroup: SettingSection = {
               iconFamily: "notesnook",
               isNavigation: true,
               modifer: async () => {
-                verifyUser(null, async () => {
-                  await sleep(300);
-                  eSendEvent(eOpenRecoveryKeyDialog);
-                });
+                // if (await verifyUser()) {
+
+                // }
+                RecoveryKeySheet.present();
               },
               description: strings.saveDataRecoveryKeyDesc(),
               icon: "key"
@@ -594,110 +595,141 @@ export const accountGroup: SettingSection = {
       component: "offline-mode-progress",
       sections: [
         {
-          id: "offline-mode",
-          icon: "download-multiple",
-          name: strings.fullOfflineMode(),
-          description: strings.fullOfflineModeDesc(),
-          type: "switch",
-          property: "offlineMode",
-          featureId: "fullOfflineMode",
-          modifer: () => {
-            const current = SettingsService.get().offlineMode;
-            if (current) {
-              SettingsService.setProperty("offlineMode", false);
-              db.fs().cancel("offline-mode");
-              return;
-            }
-            SettingsService.setProperty("offlineMode", true);
-            db.attachments.cacheAttachments().catch(() => {
-              /* empty */
-            });
-          }
-        },
-        {
-          id: "auto-sync",
-          name: strings.disableAutoSync(),
-          description: strings.disableAutoSyncDesc(),
-          type: "switch",
-          property: "disableAutoSync",
-          featureId: "syncControls",
-          icon: "sync-off"
-        },
-        {
-          id: "disable-realtime-sync",
-          name: strings.disableRealtimeSync(),
-          description: strings.disableRealtimeSyncDesc(),
-          type: "switch",
-          property: "disableRealtimeSync",
-          featureId: "syncControls"
-        },
-        {
-          id: "disable-sync",
-          name: strings.disableSync(),
-          description: strings.disableSyncDesc(),
-          type: "switch",
-          property: "disableSync",
-          featureId: "syncControls",
-          icon: "cloud-off-outline"
-        },
-        {
-          id: "background-sync",
-          name: strings.backgroundSync(),
-          description: strings.backgroundSyncDesc(),
-          type: "switch",
-          property: "backgroundSync",
-          icon: "cloud-upload-outline",
-          onChange: (value) => {
-            if (value) {
-              BackgroundSync.start();
-            } else {
-              BackgroundSync.stop();
-            }
-          }
-        },
-        {
-          id: "pull-sync",
-          name: strings.forcePullChanges(),
-          description: strings.forcePullChangesDesc(),
-          icon: "download",
-          modifer: () => {
-            presentDialog({
-              title: strings.forcePullChanges(),
-              paragraph: strings.forceSyncNotice(),
-              negativeText: strings.cancel(),
-              positiveText: strings.start(),
-              positivePress: async () => {
-                eSendEvent(eCloseSheet);
-                await sleep(300);
-                Progress.present();
-                Sync.run("global", true, "fetch", () => {
-                  eSendEvent(eCloseSheet);
+          id: "sync-behavior-sub-section",
+          type: "group",
+          name: strings.syncBehavior(),
+          sections: [
+            {
+              id: "auto-sync",
+              name: strings.autoSync(),
+              description: strings.autoSyncDesc(),
+              type: "switch",
+              property: "disableAutoSync",
+              featureId: "syncControls",
+              icon: "arrows-clockwise",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "disable-realtime-sync",
+              name: strings.realtimeSync(),
+              description: strings.realtimeSyncDesc(),
+              type: "switch",
+              property: "disableRealtimeSync",
+              featureId: "syncControls",
+              icon: "cloud-check",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "offline-mode",
+              icon: "wifi-slash",
+              iconFamily: "notesnook",
+              name: strings.fullOfflineMode(),
+              description: strings.fullOfflineModeDesc(),
+              type: "switch",
+              property: "offlineMode",
+              featureId: "fullOfflineMode",
+              modifer: () => {
+                const current = SettingsService.get().offlineMode;
+                if (current) {
+                  SettingsService.setProperty("offlineMode", false);
+                  db.fs().cancel("offline-mode");
+                  return;
+                }
+                SettingsService.setProperty("offlineMode", true);
+                db.attachments.cacheAttachments().catch(() => {
+                  /* empty */
                 });
               }
-            });
-          }
+            }
+          ]
         },
         {
-          id: "push-sync",
-          name: strings.forcePushChanges(),
-          description: strings.forcePushChangesDesc(),
-          icon: "upload",
-          modifer: () => {
-            presentDialog({
-              title: strings.forcePushChanges(),
-              paragraph: strings.forceSyncNotice(),
-              negativeText: strings.cancel(),
-              positiveText: strings.start(),
-              positivePress: async () => {
-                eSendEvent(eCloseSheet);
-                await sleep(300);
-                Progress.present();
-                Sync.run("global", true, "send", () => {
-                  eSendEvent(eCloseSheet);
+          id: "advanced-sync-sub-section",
+          type: "group",
+          name: strings.advancedSettings(),
+          sections: [
+            {
+              id: "background-sync",
+              name: strings.backgroundSync(),
+              description: strings.backgroundSyncDesc(),
+              type: "switch",
+              property: "backgroundSync",
+              icon: "arrow-u-up-left",
+              iconFamily: "notesnook",
+              onChange: (value) => {
+                if (value) {
+                  BackgroundSync.start();
+                } else {
+                  BackgroundSync.stop();
+                }
+              }
+            }
+          ]
+        },
+        {
+          id: "sync-troubleshooting-sub-section",
+          type: "group",
+          name: strings.troubleshooting(),
+          sections: [
+            {
+              id: "disable-sync",
+              name: strings.pauseSync(),
+              description: strings.pauseSyncDesc(),
+              type: "switch",
+              property: "disableSync",
+              featureId: "syncControls",
+              icon: "pause",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "pull-sync",
+              name: strings.forcePullChanges(),
+              description: strings.forcePullChangesDesc(),
+              icon: "git-pull-request",
+              isNavigation: true,
+              iconFamily: "notesnook",
+              modifer: () => {
+                presentDialog({
+                  title: strings.forcePullChanges(),
+                  paragraph: strings.forceSyncNotice(),
+                  negativeText: strings.cancel(),
+                  positiveText: strings.start(),
+                  positivePress: async () => {
+                    eSendEvent(eCloseSheet);
+                    await sleep(300);
+                    Progress.present();
+                    Sync.run("global", true, "fetch", () => {
+                      eSendEvent(eCloseSheet);
+                    });
+                  }
                 });
               }
-            });
-          }
+            },
+            {
+              id: "push-sync",
+              name: strings.forcePushChanges(),
+              description: strings.forcePushChangesDesc(),
+              icon: "arrow-fat-up",
+              iconFamily: "notesnook",
+              isNavigation: true,
+              modifer: () => {
+                presentDialog({
+                  title: strings.forcePushChanges(),
+                  paragraph: strings.forceSyncNotice(),
+                  negativeText: strings.cancel(),
+                  positiveText: strings.start(),
+                  positivePress: async () => {
+                    eSendEvent(eCloseSheet);
+                    await sleep(300);
+                    Progress.present();
+                    Sync.run("global", true, "send", () => {
+                      eSendEvent(eCloseSheet);
+                    });
+                  }
+                });
+              }
+            }
+          ]
         }
       ]
     },

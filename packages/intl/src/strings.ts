@@ -731,7 +731,7 @@ $day$: Current day (eg. Monday)`,
   fileCheckFailed: (reason: string) =>
     t`File check failed: ${reason} Try reuploading the file to fix the issue.`,
   changePasswordNotice: () =>
-    t`Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection.`,
+    t`Changing your password is irreversible process. Once your password is changed please make sure to save the new account recovery key.`,
   changePasswordNotice2: () =>
     t`Once your password is changed, please make sure to save the new account recovery key`,
   sideMenuNotice: () => t`Add shortcuts for notebooks and tags here.`,
@@ -1097,14 +1097,16 @@ $day$: Current day (eg. Monday)`,
   failedToDeleteAccount: () => t`Failed to delete account`,
   syncSettings: () => t`Sync settings`,
   syncSettingsDesc: () => t`Manage your sync settings here`,
-  disableAutoSync: () => t`Disable auto sync`,
-  disableAutoSyncDesc: () =>
-    t`Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.`,
-  disableRealtimeSync: () => t`Disable realtime sync`,
-  disableRealtimeSyncDesc: () =>
-    t`Changes from other devices won't be updated in the editor in real-time.`,
-  disableSync: () => t`Disable sync`,
-  disableSyncDesc: () =>
+  syncBehavior: () => t`Sync behavior`,
+  offlineAndStorage: () => t`Offline & storage`,
+  advancedSettings: () => t`Advanced settings`,
+  troubleshooting: () => t`Troubleshooting`,
+  autoSync: () => t`Auto sync`,
+  autoSyncDesc: () => t`Keep your notes updated automatically`,
+  realtimeSync: () => t`Real-time sync`,
+  realtimeSyncDesc: () => t`See changes in editor instantly across devices.`,
+  pauseSync: () => t`Pause sync`,
+  pauseSyncDesc: () =>
     t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`,
   backgroundSync: () => t`Background sync (experimental)`,
   backgroundSyncDesc: () =>
@@ -2851,5 +2853,8 @@ Continue without attachments?`,
     t`Please provide a valid multi factor authentication code.`,
   allDevices: () => t`Access on all devices`,
   freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
-  remind: () => t`Remind before your trial ends`
+  remind: () => t`Remind before your trial ends`,
+  yourSecurityIsPriority: () => `Your security is our priority`,
+  enterYourPassword: () => t`Enter your password`,
+  yourRecoveryKey: () => t`Your recovery key`
 };

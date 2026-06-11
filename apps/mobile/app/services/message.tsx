@@ -26,7 +26,7 @@ import {
   MessageId,
   useMessageStore
 } from "../stores/use-message-store";
-import { eOpenRateDialog, eOpenRecoveryKeyDialog } from "../utils/events";
+import { eOpenRateDialog } from "../utils/events";
 import { eSendEvent, presentSheet } from "./event-manager";
 import Navigation from "./navigation";
 import PremiumService from "./premium";
@@ -34,6 +34,7 @@ import SettingsService from "./settings";
 import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
+import RecoveryKeySheet from "../components/sheets/recovery-key";
 
 const APP_MESSAGES: Message[] = [
   {
@@ -56,7 +57,7 @@ const APP_MESSAGES: Message[] = [
       verifyUser(
         null,
         () => {
-          eSendEvent(eOpenRecoveryKeyDialog);
+          RecoveryKeySheet.present();
         },
         false,
         async () => {

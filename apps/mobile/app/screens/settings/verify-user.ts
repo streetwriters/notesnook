@@ -26,59 +26,69 @@ import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { sleep } from "../../utils/time";
+import {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
+import React from "react";
 
 export async function verifyUser(
-  context,
-  onsuccess,
-  disableBackdropClosing,
-  onclose,
-  closeText
+  context?: string,
+  onsuccess?: () => void,
+  disableBackdropClosing?: boolean,
+  onclose?: () => void,
+  closeText?: string
 ) {
-  presentDialog({
-    context: context,
-    title: strings.verifyItsYou(),
-    input: true,
-    inputPlaceholder: strings.enterPassword(),
-    paragraph: strings.enterPasswordDesc(),
-    positiveText: strings.verify(),
-    secureTextEntry: true,
-    disableBackdropClosing: disableBackdropClosing,
-    onClose: onclose,
-    negativeText: closeText || strings.cancel(),
-    positivePress: async (value) => {
-      try {
-        if (!value || !value.trim()) {
-          ToastManager.error(
-            new Error(strings.passwordNotEntered()),
-            undefined,
-            "local"
-          );
-          return;
+  return new Promise((resolve) => {
+    presentDialog({
+      context: context || "global",
+      title: strings.verifyItsYou(),
+      form: {
+        formRef: createFormRef({
+          password: ""
+        }),
+        items: [
+          {
+            label: strings.enterYourPassword(),
+            name: "password",
+            placeholder: "•••••••••",
+            ref: React.createRef(),
+            validators: [validators.required(strings.passwordRequired())]
+          }
+        ],
+        onFormSubmit: async (form) => {
+          try {
+            if (!form.validate()) return false;
+            const user = await db.user.getUser();
+            const verified = !user
+              ? true
+              : await db.user.verifyPassword(form.getValue("password"));
+
+            if (!verified) {
+              form.setError("password", strings.passwordIncorrect());
+              return false;
+            }
+
+            sleep(300).then(async () => {
+              resolve(true);
+              onsuccess?.();
+            });
+            return true;
+          } catch (e) {
+            form.setError("password", (e as Error).message);
+            return false;
+          }
         }
-        const user = await db.user.getUser();
-        let verified = !user ? true : await db.user.verifyPassword(value);
-        if (verified) {
-          sleep(300).then(async () => {
-            await onsuccess();
-          });
-        } else {
-          ToastManager.show({
-            heading: strings.passwordIncorrect(),
-            type: "error",
-            context: "global"
-          });
-          return false;
-        }
-      } catch (e) {
-        ToastManager.show({
-          heading: strings.verifyFailed(),
-          message: e.message,
-          type: "error",
-          context: "global"
-        });
-        return false;
-      }
-    }
+      },
+      positiveText: strings.verify(),
+      secureTextEntry: true,
+      disableBackdropClosing: disableBackdropClosing,
+      onClose: () => {
+        resolve(false);
+        onclose?.();
+      },
+      negativeText: closeText || strings.cancel()
+    });
   });
 }
 
@@ -139,9 +149,9 @@ export async function verifyUserWithApplock() {
             }
           );
         } else if (useUserStore.getState().user) {
-          let verified = false;
+          const verified = false;
           verifyUser(
-            null,
+            undefined,
             () => {
               resolve(true);
             },
