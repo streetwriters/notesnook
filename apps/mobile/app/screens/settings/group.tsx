@@ -47,9 +47,15 @@ const Group = ({
       return false;
     }
   });
-  const renderItem = ({ item }: { item: SettingSection; index: number }) =>
+  const renderItem = ({
+    item,
+    index
+  }: {
+    item: SettingSection;
+    index: number;
+  }) =>
     item.type === "group" ? (
-      <SectionGroup item={item} />
+      <SectionGroup item={item} isLast={!route.params.sections?.[index + 1]} />
     ) : (
       <SectionItem item={item} />
     );

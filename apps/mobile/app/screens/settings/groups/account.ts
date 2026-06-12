@@ -292,7 +292,6 @@ export const accountGroup: SettingSection = {
               name: strings.subscriptionNotActivated(),
               icon: "warning-circle",
               iconFamily: "notesnook",
-              isNavigation: true,
               hidden: () => Platform.OS !== "ios",
               modifer: async () => {
                 if (Platform.OS === "android") return;
@@ -355,63 +354,77 @@ export const accountGroup: SettingSection = {
               iconFamily: "notesnook",
               sections: [
                 {
-                  id: "enable-2fa",
-                  name: strings.change2faMethod(),
-                  modifer: () => {
-                    verifyUser("global", async () => {
-                      MFASheet.present();
-                    });
-                  },
-                  useHook: () => useUserStore((state) => state.user),
-                  description: strings.change2faMethodDesc()
-                },
-                {
-                  id: "2fa-fallback",
-                  name: strings.addFallback2faMethod(),
-                  useHook: () => useUserStore((state) => state.user),
-                  hidden: (user) => {
-                    return (
-                      !!(user as User)?.mfa?.secondaryMethod ||
-                      !(user as User)?.mfa?.isEnabled
-                    );
-                  },
-                  modifer: () => {
-                    verifyUser("global", async () => {
-                      MFASheet.present(true);
-                    });
-                  },
-                  description: strings.addFallback2faMethodDesc()
-                },
-                {
-                  id: "change-2fa-method",
-                  name: strings.change2faFallbackMethod(),
-                  useHook: () => useUserStore((state) => state.user),
-                  hidden: (user) => {
-                    return (
-                      !(user as User)?.mfa?.secondaryMethod ||
-                      !(user as User)?.mfa?.isEnabled
-                    );
-                  },
-                  modifer: () => {
-                    verifyUser("global", async () => {
-                      MFASheet.present(true);
-                    });
-                  },
-                  description: strings.change2faFallbackMethod()
-                },
-                {
-                  id: "view-2fa-codes",
-                  name: strings.viewRecoveryCodes(),
-                  modifer: () => {
-                    verifyUser("global", async () => {
-                      MFARecoveryCodes.present("sms");
-                    });
-                  },
-                  useHook: () => useUserStore((state) => state.user),
-                  hidden: (user) => {
-                    return !(user as User)?.mfa?.isEnabled;
-                  },
-                  description: strings.viewRecoveryCodesDesc()
+                  id: "2fa-settings-group",
+                  name: strings.twoFactorAuth(),
+                  type: "group",
+                  sections: [
+                    {
+                      id: "enable-2fa",
+                      name: strings.change2faMethod(),
+                      icon: "shield-check",
+                      iconFamily: "notesnook",
+                      modifer: () => {
+                        verifyUser("global", async () => {
+                          MFASheet.present();
+                        });
+                      },
+                      useHook: () => useUserStore((state) => state.user),
+                      description: strings.change2faMethodDesc()
+                    },
+                    {
+                      id: "2fa-fallback",
+                      name: strings.addFallback2faMethod(),
+                      icon: "shield-plus",
+                      iconFamily: "notesnook",
+                      useHook: () => useUserStore((state) => state.user),
+                      hidden: (user) => {
+                        return (
+                          !!(user as User)?.mfa?.secondaryMethod ||
+                          !(user as User)?.mfa?.isEnabled
+                        );
+                      },
+                      modifer: () => {
+                        verifyUser("global", async () => {
+                          MFASheet.present(true);
+                        });
+                      },
+                      description: strings.addFallback2faMethodDesc()
+                    },
+                    {
+                      id: "change-2fa-method",
+                      name: strings.change2faFallbackMethod(),
+                      icon: "shield-plus",
+                      useHook: () => useUserStore((state) => state.user),
+                      hidden: (user) => {
+                        return (
+                          !(user as User)?.mfa?.secondaryMethod ||
+                          !(user as User)?.mfa?.isEnabled
+                        );
+                      },
+                      modifer: () => {
+                        verifyUser("global", async () => {
+                          MFASheet.present(true);
+                        });
+                      },
+                      description: strings.change2faFallbackMethod()
+                    },
+                    {
+                      id: "view-2fa-codes",
+                      name: strings.viewRecoveryCodes(),
+                      modifer: () => {
+                        verifyUser("global", async () => {
+                          MFARecoveryCodes.present("sms");
+                        });
+                      },
+                      icon: "numpad",
+                      iconFamily: "notesnook",
+                      useHook: () => useUserStore((state) => state.user),
+                      hidden: (user) => {
+                        return !(user as User)?.mfa?.isEnabled;
+                      },
+                      description: strings.viewRecoveryCodesDesc()
+                    }
+                  ]
                 }
               ]
             },
@@ -419,7 +432,6 @@ export const accountGroup: SettingSection = {
               id: "recovery-key",
               name: strings.saveDataRecoveryKey(),
               iconFamily: "notesnook",
-              isNavigation: true,
               modifer: async () => {
                 // if (await verifyUser()) {
 
@@ -686,7 +698,6 @@ export const accountGroup: SettingSection = {
               name: strings.forcePullChanges(),
               description: strings.forcePullChangesDesc(),
               icon: "git-pull-request",
-              isNavigation: true,
               iconFamily: "notesnook",
               modifer: () => {
                 presentDialog({
@@ -711,7 +722,6 @@ export const accountGroup: SettingSection = {
               description: strings.forcePushChangesDesc(),
               icon: "arrow-fat-up",
               iconFamily: "notesnook",
-              isNavigation: true,
               modifer: () => {
                 presentDialog({
                   title: strings.forcePushChanges(),

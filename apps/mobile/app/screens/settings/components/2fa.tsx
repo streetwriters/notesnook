@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { sanitizeFilename, useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { useThemeColors, VariantsWithStaticColors } from "@notesnook/theme";
+import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import isMobilePhone from "validator/lib/isMobilePhone";
 import React, {
@@ -37,20 +37,20 @@ import {
   View
 } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
-import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import DialogHeader from "../../../components/dialog/dialog-header";
+import AppIcon from "../../../components/ui/AppIcon";
 import { Button } from "../../../components/ui/button";
-import { IconButton } from "../../../components/ui/icon-button";
 import FormInput, {
   createFormRef,
   validators
 } from "../../../components/ui/input/form-input";
+import PinInput from "../../../components/ui/pin-input";
 import { Pressable } from "../../../components/ui/pressable";
 import Seperator from "../../../components/ui/seperator";
-import { SvgView } from "../../../components/ui/svg";
 import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import useTimer from "../../../hooks/use-timer";
@@ -63,27 +63,25 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
-import { DefaultAppStyles } from "../../../utils/styles";
 import PaywallSheet from "../../../components/sheets/paywall";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
     title: strings.mfaAuthAppTitle(),
     body: strings.mfaAuthAppDesc(),
-    icon: "cellphone-key",
-    recommended: true
+    icon: "device-mobile-camera"
   },
   {
     id: "sms",
     title: strings.mfaSmsTitle(),
     body: strings.mfaSmsDesc(),
-    icon: "message-plus-outline"
+    icon: "chat"
   },
   {
     id: "email",
     title: strings.mfaEmailTitle(),
     body: strings.mfaEmailDesc(),
-    icon: "email-outline"
+    icon: "envelope-simple"
   }
 ];
 type MFAMethod = {
@@ -116,67 +114,78 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
     return mfaMethods.filter((m) => m.id !== user?.mfa?.primaryMethod);
   };
 
+  const onMethodPress = (item: MFAMethod) => {
+    if (item.id === "sms" && featureAvailable && !featureAvailable?.isAllowed) {
+      ToastManager.show({
+        message: featureAvailable?.error,
+        type: "info",
+        context: "local",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(featureAvailable);
+        }
+      });
+      return;
+    }
+
+    onSuccess && onSuccess(item);
+  };
+
   return (
     <>
       <DialogHeader
         title={strings.twoFactorAuth()}
         paragraph={strings.twoFactorAuthDesc()}
-        padding={12}
+        style={{
+          paddingTop: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
       />
       <Seperator />
-      {getMethods().map((item) => (
+      {getMethods().map((item, index, methods) => (
         <Pressable
           key={item.title}
-          onPress={() => {
-            if (
-              item.id === "sms" &&
-              featureAvailable &&
-              !featureAvailable?.isAllowed
-            ) {
-              ToastManager.show({
-                message: featureAvailable?.error,
-                type: "info",
-                context: "local",
-                actionText: strings.upgrade(),
-                func: () => {
-                  PaywallSheet.present(featureAvailable);
-                }
-              });
-              return;
-            }
-            onSuccess && onSuccess(item);
-          }}
+          onPress={() => onMethodPress(item)}
           style={{
-            paddingHorizontal: DefaultAppStyles.GAP,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-            marginTop: 0,
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: Spacing.LEVEL_3,
+            paddingVertical: Spacing.LEVEL_1,
+            marginBottom: index === methods.length - 1 ? 0 : Spacing.LEVEL_0,
             flexDirection: "row",
-            borderRadius: 0,
-            alignItems: "flex-start"
+            borderRadius: Radius.S,
+            alignItems: "center",
+            backgroundColor: colors.primary.background
           }}
         >
           {item.icon && (
-            <IconButton
-              type="secondary"
+            <View
               style={{
-                width: 50,
-                height: 50,
-                marginRight: 10
+                width: Spacing.LEVEL_7,
+                height: Spacing.LEVEL_7,
+                borderRadius: Radius.XS,
+                marginRight: Spacing.LEVEL_1,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: colors.secondary.background
               }}
-              size={20}
-              color={
-                item.recommended ? colors.primary.accent : colors.primary.icon
-              }
-              name={item.icon}
-            />
+            >
+              <AppIcon
+                size={16}
+                iconFamily="notesnook"
+                color={colors.primary.icon}
+                name={item.icon}
+              />
+            </View>
           )}
           <View
             style={{
-              flexShrink: 1
+              flex: 1,
+              flexShrink: 1,
+              gap: Spacing.LEVEL_1
             }}
           >
-            <Heading size={AppFontSize.md}>{item.title}</Heading>
+            <Heading size={AppFontSize.md} lineHeight="100%">
+              {item.title}
+            </Heading>
             <Paragraph size={AppFontSize.sm}>{item.body}</Paragraph>
           </View>
         </Pressable>
@@ -211,6 +220,7 @@ export const MFASetup = ({
   const [loading, setLoading] = useState(method?.id === "app" ? true : false);
   const [enabling, setEnabling] = useState(false);
   const [sending, setSending] = useState(false);
+  const [codeValue, setCodeValue] = useState("");
   const [generalError, setGeneralError] = useState<string>();
 
   useEffect(() => {
@@ -245,6 +255,7 @@ export const MFASetup = ({
           : formRef.current.getValue("target")
     );
     formRef.current.setValue("code", "");
+    setCodeValue("");
     setGeneralError(undefined);
   }, [authenticatorDetails.sharedKey, methodId, user?.email]);
 
@@ -280,11 +291,18 @@ export const MFASetup = ({
   ];
 
   const onNext = async () => {
-    if (formRef.current.validateField("code")) return;
+    const code = codeValue.trim();
+    const codeValidationError = codeValidators
+      .map((validator) => validator(code))
+      .find(Boolean);
+
+    if (codeValidationError) {
+      setGeneralError(codeValidationError);
+      return;
+    }
 
     try {
       if (!method) return;
-      const code = formRef.current.getValue("code").trim();
 
       setGeneralError(undefined);
       setEnabling(true);
@@ -300,7 +318,7 @@ export const MFASetup = ({
       setEnabling(false);
     } catch (e) {
       const error = e as Error;
-      formRef.current.setError("code", error.message);
+      setGeneralError(error.message);
       setEnabling(false);
     }
   };
@@ -363,18 +381,34 @@ export const MFASetup = ({
     }
   };
 
+  const onChangeMethodPress = () => {
+    setStep &&
+      setStep({
+        id: "mfapick",
+        props: {
+          recovery: recovery
+        }
+      });
+  };
+
   return !method ? null : (
-    <View>
+    <View
+      style={{
+        gap: Spacing.LEVEL_3
+      }}
+    >
       <DialogHeader
         title={method?.title}
         paragraph={method?.body}
-        padding={12}
+        style={{
+          paddingTop: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
       />
-      <Seperator />
 
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: Spacing.LEVEL_3
         }}
       >
         {loading ? (
@@ -423,16 +457,27 @@ export const MFASetup = ({
               }
               onSubmitEditing={onSendCode}
               validators={targetValidators}
+              containerStyle={{
+                borderWidth: 0,
+                borderRadius: Radius.XS
+              }}
               keyboardType={
                 method.id === "email" ? "email-address" : "phone-pad"
               }
               buttons={
                 <Button
                   onPress={onSendCode}
+                  type="transparent"
+                  fontFamily="MEDIUM"
+                  fontSize={AppFontSize.sm}
+                  buttonType={{
+                    text: colors.primary.accent
+                  }}
                   loading={sending}
                   style={{
                     paddingVertical: 0,
-                    paddingHorizontal: 0
+                    paddingHorizontal: 0,
+                    marginLeft: Spacing.LEVEL_1
                   }}
                   title={
                     sending
@@ -449,42 +494,67 @@ export const MFASetup = ({
               }
             />
 
-            <Heading size={AppFontSize.md}>
-              {strings.enterSixDigitCode()}
-            </Heading>
-            <Paragraph>{codeHelpText[method?.id]}</Paragraph>
-            <Seperator />
-            <FormInput
-              name="code"
-              formRef={formRef}
-              fwdRef={codeInputRef}
-              placeholder="xxxxxx"
-              maxLength={6}
-              loading={loading}
-              textAlign="center"
-              keyboardType="numeric"
-              onChangeText={() => {
+            <View
+              style={{
+                height: 1,
+                marginVertical: Spacing.LEVEL_3,
+                backgroundColor: colors.primary.border
+              }}
+            />
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-start",
+                gap: Spacing.LEVEL_1,
+                paddingVertical: Spacing.LEVEL_1,
+                marginBottom: Spacing.LEVEL_3
+              }}
+            >
+              <View
+                style={{
+                  width: Spacing.LEVEL_7,
+                  height: Spacing.LEVEL_7,
+                  borderRadius: Radius.XS,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: colors.secondary.background
+                }}
+              >
+                <AppIcon
+                  size={16}
+                  iconFamily="notesnook"
+                  color={colors.primary.icon}
+                  name="device-mobile-camera"
+                />
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                <Heading size={AppFontSize.md} lineHeight="100%">
+                  {strings.enterSixDigitCode()}
+                </Heading>
+                <Paragraph size={AppFontSize.sm}>
+                  {codeHelpText[method?.id]}
+                </Paragraph>
+              </View>
+            </View>
+
+            <PinInput
+              value={codeValue}
+              length={6}
+              inputRef={codeInputRef}
+              onSubmitEditing={onNext}
+              onChangeText={(value) => {
+                formRef.current.setValue("code", value);
+                setCodeValue(value);
                 setGeneralError(undefined);
               }}
-              onSubmitEditing={onNext}
-              returnKeyLabel={strings.next()}
-              returnKeyType="done"
-              validators={codeValidators}
-              inputStyle={{
-                fontSize: AppFontSize.lg,
-                height: 60,
-                textAlign: "center",
-                letterSpacing: 10,
-                width: undefined
-              }}
-              containerStyle={{
-                height: 60,
-                borderWidth: 0,
-                width: undefined
-              }}
-              errorStyle={{
-                textAlign: "center"
-              }}
+              sanitize={(value) => value.replace(/\D/g, "")}
             />
 
             {generalError ? (
@@ -492,7 +562,7 @@ export const MFASetup = ({
                 size={AppFontSize.sm}
                 style={{
                   color: colors.error.icon,
-                  marginBottom: DefaultAppStyles.GAP_VERTICAL,
+                  marginBottom: Spacing.LEVEL_2,
                   textAlign: "center",
                   width: "100%"
                 }}
@@ -501,33 +571,30 @@ export const MFASetup = ({
               </Paragraph>
             ) : null}
 
-            <Seperator />
-            <Button
-              title={enabling ? null : strings.next()}
-              type="accent"
-              width={250}
-              onPress={onNext}
-              loading={enabling}
+            <View
               style={{
-                borderRadius: 100,
-                marginBottom: DefaultAppStyles.GAP_VERTICAL
+                gap: Spacing.LEVEL_2,
+                marginTop: Spacing.LEVEL_4
               }}
-            />
+            >
+              <Button
+                title={enabling ? null : strings.next()}
+                type="accent"
+                width="100%"
+                onPress={onNext}
+                loading={enabling}
+                style={{
+                  borderRadius: Radius.S
+                }}
+              />
 
-            <Button
-              title={strings.change2faMethod()}
-              type="plain"
-              height={25}
-              onPress={() => {
-                setStep &&
-                  setStep({
-                    id: "mfapick",
-                    props: {
-                      recovery: recovery
-                    }
-                  });
-              }}
-            />
+              <Button
+                title={strings.change2faMethod()}
+                type="plain-outline"
+                width="100%"
+                onPress={onChangeMethodPress}
+              />
+            </View>
           </>
         )}
       </View>
@@ -544,6 +611,11 @@ export const MFARecoveryCodes = ({
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const codeRows = [] as string[][];
+  for (let i = 0; i < codes.length; i += 3) {
+    codeRows.push(codes.slice(i, i + 3));
+  }
+
   useEffect(() => {
     (async () => {
       try {
@@ -558,140 +630,208 @@ export const MFARecoveryCodes = ({
     })();
   }, []);
 
+  const onCopyCodesPress = () => {
+    const codeString = codes.join("\n");
+    Clipboard.setString(codeString);
+    ToastManager.show({
+      heading: strings.codesCopied(),
+      type: "success",
+      context: "local"
+    });
+  };
+
+  const onSaveToFilePress = async () => {
+    try {
+      let path;
+      let fileName = "notesnook_recoverycodes";
+      fileName = sanitizeFilename(fileName, {
+        replacement: "_"
+      });
+      fileName = fileName + ".txt";
+      const codeString = codes.join("\n");
+      if (Platform.OS === "android") {
+        const file = await ScopedStorage.createDocument(
+          fileName,
+          "text/plain",
+          codeString,
+          "utf8"
+        );
+        if (!file) return;
+        path = file.uri;
+      } else {
+        path = await filesystem.checkAndCreateDir("/");
+        await RNFetchBlob.fs.writeFile(path + fileName, codeString, "utf8");
+        path = path + fileName;
+      }
+
+      ToastManager.show({
+        heading: strings.codesSaved(),
+        type: "success",
+        context: "local"
+      });
+      return path;
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onCompletePress = () => {
+    if (isSetup) {
+      onSuccess && onSuccess(method);
+    } else {
+      eSendEvent(eCloseSheet);
+    }
+  };
+
   return (
-    <View>
+    <View
+      style={{
+        gap: Spacing.LEVEL_3
+      }}
+    >
       <DialogHeader
-        centered={true}
         title={strings.saveRecoveryCodes()}
         paragraph={strings.saveRecoveryCodesDesc()}
-        padding={12}
+        style={{
+          paddingTop: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
       />
-      <Seperator />
 
-      {loading ? (
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            marginBottom: 50
-          }}
-        >
-          <ActivityIndicator
-            color={colors.primary.accent}
-            style={{
-              height: 50
-            }}
-          />
-          <Paragraph>
-            {strings.gettingRecoveryCodes()}... {strings.pleaseWait()}
-          </Paragraph>
-        </View>
-      ) : (
-        <>
-          <FlatList
-            data={codes}
-            contentContainerStyle={{
-              alignItems: "center"
-            }}
-            numColumns={2}
-            renderItem={({ item }) => (
-              <Heading
-                style={{
-                  marginHorizontal: 15,
-                  marginVertical: 5,
-                  fontFamily: "monospace"
-                }}
-                size={AppFontSize.lg}
-              >
-                {item}
-              </Heading>
-            )}
-          />
-          <Seperator />
-
+      <View
+        style={{
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
+      >
+        {loading ? (
           <View
             style={{
-              flexDirection: "row",
               justifyContent: "center",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
+              alignItems: "center",
+              width: "100%",
+              marginBottom: 50
             }}
           >
-            <Button
-              title={strings.copyCodes()}
-              onPress={() => {
-                const codeString = codes.join("\n");
-                Clipboard.setString(codeString);
-                ToastManager.show({
-                  heading: strings.codesCopied(),
-                  type: "success",
-                  context: "local"
-                });
-              }}
+            <ActivityIndicator
+              color={colors.primary.accent}
               style={{
-                marginRight: 10
+                height: 50
               }}
             />
+            <Paragraph>
+              {strings.gettingRecoveryCodes()}... {strings.pleaseWait()}
+            </Paragraph>
+          </View>
+        ) : (
+          <>
+            <View
+              style={{
+                backgroundColor: colors.secondary.background,
+                borderRadius: Radius.S,
+                paddingHorizontal: Spacing.LEVEL_2,
+                paddingVertical: Spacing.LEVEL_3,
+                gap: Spacing.LEVEL_1
+              }}
+            >
+              {codeRows.map((row, rowIndex) => (
+                <View
+                  key={`row-${rowIndex}`}
+                  style={{
+                    flexDirection: "row",
+                    gap: Spacing.LEVEL_2
+                  }}
+                >
+                  {row.map((code, colIndex) => (
+                    <Paragraph
+                      key={`${rowIndex}-${colIndex}`}
+                      size={AppFontSize.xs}
+                      style={{
+                        flex: 1,
+                        color: colors.primary.heading
+                      }}
+                    >
+                      {code}
+                    </Paragraph>
+                  ))}
+                  {row.length < 3
+                    ? Array.from({ length: 3 - row.length }).map((_, idx) => (
+                        <View
+                          key={`empty-${rowIndex}-${idx}`}
+                          style={{ flex: 1 }}
+                        />
+                      ))
+                    : null}
+                </View>
+              ))}
+
+              <View
+                style={{
+                  height: 1,
+                  marginTop: Spacing.LEVEL_1,
+                  backgroundColor: colors.primary.border
+                }}
+              />
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: Spacing.LEVEL_2,
+                  marginTop: Spacing.LEVEL_1
+                }}
+              >
+                <Button
+                  title={strings.copyCodes()}
+                  type="transparent"
+                  fontFamily="SEMI_BOLD"
+                  fontSize={AppFontSize.xs}
+                  icon="content-copy"
+                  iconSize={14}
+                  iconColor={colors.primary.accent}
+                  buttonType={{ text: colors.primary.accent }}
+                  onPress={onCopyCodesPress}
+                  style={{
+                    flex: 1,
+                    borderRadius: Radius.S,
+                    paddingVertical: Spacing.LEVEL_1,
+                    paddingHorizontal: Spacing.LEVEL_1
+                  }}
+                />
+
+                <Button
+                  title={strings.saveToFile()}
+                  type="transparent"
+                  fontFamily="SEMI_BOLD"
+                  fontSize={AppFontSize.xs}
+                  icon="download-simple"
+                  iconFamily="notesnook"
+                  iconSize={14}
+                  iconColor={colors.primary.accent}
+                  buttonType={{ text: colors.primary.accent }}
+                  onPress={onSaveToFilePress}
+                  style={{
+                    flex: 1,
+                    paddingVertical: Spacing.LEVEL_1,
+                    paddingHorizontal: Spacing.LEVEL_1,
+                    borderRadius: Radius.S
+                  }}
+                />
+              </View>
+            </View>
 
             <Button
-              title={strings.saveToFile()}
-              onPress={async () => {
-                try {
-                  let path;
-                  let fileName = "notesnook_recoverycodes";
-                  fileName = sanitizeFilename(fileName, { replacement: "_" });
-                  fileName = fileName + ".txt";
-                  const codeString = codes.join("\n");
-                  if (Platform.OS === "android") {
-                    const file = await ScopedStorage.createDocument(
-                      fileName,
-                      "text/plain",
-                      codeString,
-                      "utf8"
-                    );
-                    if (!file) return;
-                    path = file.uri;
-                  } else {
-                    path = await filesystem.checkAndCreateDir("/");
-                    await RNFetchBlob.fs.writeFile(
-                      path + fileName,
-                      codeString,
-                      "utf8"
-                    );
-                    path = path + fileName;
-                  }
-
-                  ToastManager.show({
-                    heading: strings.codesSaved(),
-                    type: "success",
-                    context: "local"
-                  });
-                  return path;
-                } catch (e) {
-                  console.error(e);
-                }
+              title={isSetup ? strings.next() : strings.done()}
+              type="accent"
+              width="100%"
+              onPress={onCompletePress}
+              style={{
+                borderRadius: Radius.S,
+                marginTop: Spacing.LEVEL_2,
+                marginBottom: Spacing.LEVEL_2
               }}
             />
-          </View>
-
-          <Button
-            title={isSetup ? strings.next() : strings.done()}
-            type="accent"
-            width={250}
-            onPress={() => {
-              if (isSetup) {
-                onSuccess && onSuccess(method);
-              } else {
-                eSendEvent(eCloseSheet);
-              }
-            }}
-            style={{
-              borderRadius: 100,
-              marginBottom: DefaultAppStyles.GAP_VERTICAL
-            }}
-          />
-        </>
-      )}
+          </>
+        )}
+      </View>
     </View>
   );
 };
@@ -702,61 +842,120 @@ MFARecoveryCodes.present = (methodId: MFAMethod["id"]) => {
   });
 };
 
-const mfaSvg = (
-  colors: VariantsWithStaticColors
-) => `<svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 382.94 405.93">
-<path fill="${colors.primary.paragraph}" d="M192.58 405.92a75.19 75.19 0 0 1-18.64-2.41l-1.2-.33-1.12-.56c-40.24-20.18-74.19-46.83-100.9-79.21a299.86 299.86 0 0 1-50.95-90.47A348.21 348.21 0 0 1 .07 110.27l.04-2.02c0-20.29 11.26-38.09 28.7-45.35C42.13 57.34 163.24 7.6 172 4c16.48-8.26 34.06-1.36 36.87-.16 6.31 2.58 118.28 48.38 142.47 59.9 24.94 11.87 31.6 33.2 31.6 43.93 0 48.6-8.43 94-25.02 134.97a312.52 312.52 0 0 1-56.16 90.51c-45.85 51.6-91.7 69.89-92.15 70.05a50.11 50.11 0 0 1-17.04 2.72zm-10.79-26.71c3.98.89 13.13 2.22 19.1.05 7.58-2.77 45.96-22.67 81.83-63.03 49.55-55.77 74.7-125.88 74.74-208.38-.1-1.67-1.28-13.59-17.07-21.1-23.72-11.3-140.1-58.89-141.27-59.37l-.32-.14c-2.44-1.02-10.2-3.17-15.55-.37l-1.08.5c-1.3.54-129.86 53.34-143.57 59.05-9.6 4-13 13.9-13 21.83 0 .58-.02 1.43-.05 2.52-1.1 56.44 11.97 195.34 156.24 268.44z"/>
-<path fill="${colors.secondary.background}" d="M177.33 15.59S47.61 68.87 33.71 74.66c-13.9 5.79-20.85 19.7-20.85 33.6 0 13.9-10.45 195.26 164.47 282.96 0 0 15.88 4.39 27.92 0 12.04-4.39 164.96-78.52 164.96-283.55 0 0 0-20.85-24.33-32.43C321.55 63.66 203.94 15.6 203.94 15.6s-14.44-6.37-26.6 0z"/>
-<path d="M191.23 57.29v284.25S60.34 278.53 61.51 112.89z" opacity=".2"/>
-<path fill="${colors.primary.icon}" d="m192.94 261.58-41.69-53.61 24.24-18.86 19.75 25.38 66.7-70.4 22.3 21.13z"/>
-</svg>`;
-
 const MFASuccess = ({ recovery }: MFAStepProps) => {
-  const { colors } = useThemeColors();
+  const { colors, isDark } = useThemeColors();
+
+  const onDonePress = () => {
+    eSendEvent(eCloseSheet);
+  };
+
+  const onSecondaryMethodPress = () => {
+    MFASheet.present(true);
+  };
+
   return (
     <View
       style={{
-        alignItems: "center"
+        gap: Spacing.LEVEL_4
       }}
     >
-      <Seperator />
-      <SvgView width={150} height={150} src={mfaSvg(colors)} />
-      <Seperator />
-      <DialogHeader
-        centered={true}
-        title={
-          recovery
-            ? strings.fallbackMethodEnabled()
-            : strings.twoFactorAuthEnabled()
-        }
-        paragraph={strings.accountIsSecure()}
-        padding={12}
-      />
-      <Seperator />
-
-      <Button
-        title={strings.done()}
-        type="accent"
-        width={250}
-        onPress={() => {
-          eSendEvent(eCloseSheet);
-        }}
+      <View
         style={{
-          borderRadius: 100,
-          marginBottom: DefaultAppStyles.GAP_VERTICAL
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: Spacing.LEVEL_4
         }}
-      />
+      >
+        <View
+          style={{
+            width: 93,
+            height: 93,
+            borderRadius: 46.5,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: isDark ? "#0A572920" : "#00883614"
+          }}
+        >
+          <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: isDark ? "#0A572930" : "#0088361F"
+            }}
+          >
+            <View
+              style={{
+                width: 47,
+                height: 47,
+                borderRadius: 23.5,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: colors.primary.accent
+              }}
+            >
+              <AppIcon
+                name="check"
+                size={20}
+                color={colors.primary.accentForeground}
+              />
+            </View>
+          </View>
+        </View>
+      </View>
 
-      {!recovery ? (
+      <View
+        style={{
+          alignItems: "center",
+          gap: Spacing.LEVEL_1,
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
+      >
+        <Heading
+          size={AppFontSize.xl}
+          lineHeight="100%"
+          style={{ textAlign: "center" }}
+        >
+          {recovery
+            ? strings.fallbackMethodEnabled()
+            : strings.twoFactorAuthEnabled()}
+        </Heading>
+        <Paragraph size={AppFontSize.xs} style={{ textAlign: "center" }}>
+          {strings.accountIsSecure()}
+        </Paragraph>
+      </View>
+
+      <View
+        style={{
+          width: "100%",
+          gap: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
+      >
         <Button
-          title={strings.secondary2faMethod()}
-          type="plain"
-          height={25}
-          onPress={() => {
-            MFASheet.present(true);
+          title={strings.done()}
+          type="accent"
+          width="100%"
+          onPress={onDonePress}
+          style={{
+            borderRadius: Radius.S
           }}
         />
-      ) : null}
+
+        {!recovery ? (
+          <Button
+            title={strings.secondary2faMethod()}
+            type="plain-outline"
+            width="100%"
+            onPress={onSecondaryMethodPress}
+            style={{
+              borderRadius: Radius.S
+            }}
+          />
+        ) : null}
+      </View>
     </View>
   );
 };
