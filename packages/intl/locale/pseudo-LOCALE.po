@@ -3160,8 +3160,16 @@ msgstr ""
 msgid "Force logout from all your other logged in devices."
 msgstr ""
 
+#: src/strings.ts:2808
+msgid "Force Pull"
+msgstr ""
+
 #: src/strings.ts:1114
 msgid "Force pull changes"
+msgstr ""
+
+#: src/strings.ts:2809
+msgid "Force Push"
 msgstr ""
 
 #: src/strings.ts:1123
@@ -3355,6 +3363,10 @@ msgstr ""
 msgid "Hash copied"
 msgstr ""
 
+#: src/strings.ts:2816
+msgid "Having issues? Contact"
+msgstr ""
+
 #: src/strings.ts:2242
 msgid "Having problems with sync?"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD"
@@ -3465,6 +3477,10 @@ msgstr ""
 
 #: src/strings.ts:2243
 msgid "I understand"
+msgstr ""
+
+#: src/strings.ts:2817
+msgid "I understand the risks"
 msgstr ""
 
 #: src/strings.ts:551
@@ -6946,6 +6962,14 @@ msgstr ""
 msgid "This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out."
 msgstr ""
 
+#: src/strings.ts:2813
+msgid "This will overwrite all data on the server with the data from this device."
+msgstr ""
+
+#: src/strings.ts:2811
+msgid "This will overwrite all data on this device with the data from the server."
+msgstr ""
+
 #: src/strings.ts:626
 msgid "Thu"
 msgstr ""
@@ -7372,6 +7396,10 @@ msgstr ""
 #: src/strings.ts:1126
 msgid "Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device."
 msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
+
+#: src/strings.ts:2815
+msgid "Use this only for troubleshooting sync issues. Regular use may lead to data loss or conflicts."
+msgstr ""
 
 #: src/strings.ts:2507
 msgid "used"

@@ -31,16 +31,14 @@ import {
   endProgress,
   startProgress
 } from "../../../components/dialogs/progress";
-import { Progress } from "../../../components/sheets/progress";
+import ForceSyncSheet from "../../../components/sheets/force-sync";
 import { BackgroundSync } from "../../../services/background-sync";
 import BiometricService from "../../../services/biometrics";
 import Navigation from "../../../services/navigation";
 import PremiumService from "../../../services/premium";
 import SettingsService from "../../../services/settings";
-import Sync from "../../../services/sync";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { sleep } from "../../../utils/time";
 import {
   createFormRef,
   validators
@@ -700,20 +698,7 @@ export const accountGroup: SettingSection = {
               icon: "git-pull-request",
               iconFamily: "notesnook",
               modifer: () => {
-                presentDialog({
-                  title: strings.forcePullChanges(),
-                  paragraph: strings.forceSyncNotice(),
-                  negativeText: strings.cancel(),
-                  positiveText: strings.start(),
-                  positivePress: async () => {
-                    eSendEvent(eCloseSheet);
-                    await sleep(300);
-                    Progress.present();
-                    Sync.run("global", true, "fetch", () => {
-                      eSendEvent(eCloseSheet);
-                    });
-                  }
-                });
+                ForceSyncSheet.present("fetch");
               }
             },
             {
@@ -723,20 +708,7 @@ export const accountGroup: SettingSection = {
               icon: "arrow-fat-up",
               iconFamily: "notesnook",
               modifer: () => {
-                presentDialog({
-                  title: strings.forcePushChanges(),
-                  paragraph: strings.forceSyncNotice(),
-                  negativeText: strings.cancel(),
-                  positiveText: strings.start(),
-                  positivePress: async () => {
-                    eSendEvent(eCloseSheet);
-                    await sleep(300);
-                    Progress.present();
-                    Sync.run("global", true, "send", () => {
-                      eSendEvent(eCloseSheet);
-                    });
-                  }
-                });
+                ForceSyncSheet.present("send");
               }
             }
           ]
