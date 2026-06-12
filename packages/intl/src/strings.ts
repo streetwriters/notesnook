@@ -2814,5 +2814,8 @@ Continue without attachments?`,
   forceSyncWarningShort: () =>
     t`Use this only for troubleshooting sync issues. Regular use may lead to data loss or conflicts.`,
   forceSyncNeedHelpContact: () => t`Having issues? Contact`,
-  forceSyncRiskAcknowledgement: () => t`I understand the risks`
+  forceSyncRiskAcknowledgement: () => t`I understand the risks`,
+  editProfileDesc: () => t`Change profile picture, full name and email`,
+  dataAndStorage: () => t`Data and storage`,
+  accountActions: () => t`Account actions`
 };
