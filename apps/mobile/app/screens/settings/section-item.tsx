@@ -421,7 +421,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         />
       )}
 
-      {item.type === "screen" || item.isNavigation ? (
+      {item.type === "screen" ? (
         <AppIcon
           name="chevron-right"
           iconFamily="notesnook"

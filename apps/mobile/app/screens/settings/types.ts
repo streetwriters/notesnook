@@ -37,7 +37,6 @@ export type SettingSection = {
   description?: string | ((current: unknown) => string);
   icon?: string;
   iconFamily?: IconProps["iconFamily"];
-  isNavigation?: boolean;
   iconSize?: number;
   property?: keyof Settings;
   sections?: SettingSection[];

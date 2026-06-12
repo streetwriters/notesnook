@@ -25,7 +25,13 @@ import Heading from "../../components/ui/typography/heading";
 import { AppFontSize } from "../../utils/size";
 import { SectionItem } from "./section-item";
 import { SettingSection } from "./types";
-export const SectionGroup = ({ item }: { item: SettingSection }) => {
+export const SectionGroup = ({
+  item,
+  isLast
+}: {
+  item: SettingSection;
+  isLast?: boolean;
+}) => {
   const { colors } = useThemeColors();
   const current = item.useHook && item.useHook();
   const isHidden = item.hidden && item.hidden(current);
@@ -49,28 +55,34 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
         </Heading>
       ) : null}
 
-      {item.sections?.map((item) =>
-        item.type === "group" ? (
-          <SectionGroup key={item.id} item={item} />
+      {item.sections?.map((sectionItem, index) =>
+        sectionItem.type === "group" ? (
+          <SectionGroup
+            key={sectionItem.id}
+            item={sectionItem}
+            isLast={!item.sections?.[index + 1]}
+          />
         ) : (
-          <SectionItem key={item.id as string} item={item} />
+          <SectionItem key={sectionItem.id as string} item={sectionItem} />
         )
       )}
 
-      <View
-        style={{
-          paddingHorizontal: Spacing.LEVEL_3,
-          width: "100%"
-        }}
-      >
+      {isLast ? null : (
         <View
           style={{
-            height: 1,
-            width: "100%",
-            backgroundColor: colors.primary.border
+            paddingHorizontal: Spacing.LEVEL_3,
+            width: "100%"
           }}
-        />
-      </View>
+        >
+          <View
+            style={{
+              height: 1,
+              width: "100%",
+              backgroundColor: colors.primary.border
+            }}
+          />
+        </View>
+      )}
     </View>
   );
 };

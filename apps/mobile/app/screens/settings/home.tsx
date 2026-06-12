@@ -46,11 +46,17 @@ const Home = ({
     focusOnInit: true
   });
 
-  const renderItem = ({ item }: { item: SettingSection; index: number }) =>
+  const renderItem = ({
+    item,
+    index
+  }: {
+    item: SettingSection;
+    index: number;
+  }) =>
     item.id === "account" ? (
       <SettingsUserSection item={item} />
     ) : (
-      <SectionGroup item={item} />
+      <SectionGroup item={item} isLast={!settingsGroups[index + 1]} />
     );
 
   return (
