@@ -49,7 +49,7 @@ export interface IEditor {
   redo: () => void;
   updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
-  sendAttachmentProgress: (hash: string, progress: number) => void;
+  updateAttachment: (hash: string, attributes: Partial<Attachment>) => void;
   startSearch: () => void;
   getContent: () => string;
   getSelection: () => { from: number; to: number };

@@ -39,6 +39,7 @@ export const EditorEvents = {
   previewAttachment: "editor-event:preview-attachment",
   copyToClipboard: "editor-events:copy-to-clipboard",
   getAttachmentData: "editor-events:get-attachment-data",
+  getAttachmentMetaData: "editor-events:get-attachment-metadata",
   tabsChanged: "editor-events:tabs-changed",
   showTabs: "editor-events:show-tabs",
   tabFocused: "editor-events:tab-focused",

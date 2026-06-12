@@ -181,6 +181,24 @@ const Actions = ({
                   setFilename(value);
                   setAttachments();
                   eSendEvent(eDBItemUpdate, attachment.id);
+
+                  const relations = await db.relations
+                    .to(attachment, "note")
+                    .get();
+                  relations
+                    .map((relation) => relation.fromId)
+                    .forEach(async (id) => {
+                      useTabStore.getState().forEachNoteTab(id, async (tab) => {
+                        editorController.current?.commands.updateAttachment(
+                          {
+                            hash: attachment.hash,
+                            filename: value
+                          },
+                          tab.id
+                        );
+                      });
+                    });
+
                   ToastManager.show({
                     message: `Attachment renamed to ${value}`,
                     type: "success"

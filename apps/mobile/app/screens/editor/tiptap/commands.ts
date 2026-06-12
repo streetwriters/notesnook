@@ -183,11 +183,11 @@ class Commands {
     await this.sendCommand("insertAttachment", attachment, tabId);
   };
 
-  setAttachmentProgress = async (
-    attachmentProgress: Partial<Attachment>,
+  updateAttachment = async (
+    attachmentAttributes: Partial<Attachment>,
     tabId: string
   ) => {
-    await this.sendCommand("setAttachmentProgress", attachmentProgress, tabId);
+    await this.sendCommand("updateAttachment", attachmentAttributes, tabId);
   };
 
   insertImage = async (

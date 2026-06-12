@@ -578,6 +578,21 @@ export const useEditorEvents = (
           break;
         }
 
+        case EditorEvents.getAttachmentMetaData: {
+          const { hash } = editorMessage.value as Pick<Attachment, "hash">;
+          const attachment = await db
+            .sql()
+            .selectFrom("attachments")
+            .where("hash", "=", hash)
+            .select("filename")
+            .executeTakeFirst();
+          editor.postMessage(NativeEvents.resolve, {
+            resolverId: editorMessage.resolverId,
+            data: attachment ? { filename: attachment.filename } : undefined
+          });
+          break;
+        }
+
         case EditorEvents.pro:
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;

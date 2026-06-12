@@ -93,6 +93,9 @@ export type EditorController = {
   countWords: (ms: number) => void;
   copyToClipboard: (text: string) => void;
   getAttachmentData: (attachment: Partial<Attachment>) => Promise<string>;
+  getAttachmentMetaData: (
+    hash: string
+  ) => Promise<{ filename: string } | undefined>;
   updateTab: () => void;
   loading: boolean;
   setLoading: (value: boolean) => void;
@@ -454,6 +457,15 @@ export function useEditorController({
     });
   };
 
+  const getAttachmentMetaData = (hash: string) => {
+    return postAsyncWithTimeout<{ filename: string } | undefined>(
+      EditorEvents.getAttachmentMetaData,
+      {
+        hash
+      }
+    );
+  };
+
   const scrollToSearchResult = useCallback((index: number) => {
     const marks = document.getElementsByTagName("nn-search-result");
     if (marks.length > index) {
@@ -490,6 +502,7 @@ export function useEditorController({
     countWords,
     copyToClipboard,
     getAttachmentData,
+    getAttachmentMetaData,
     getContentDiv,
     updateTab: () => {
       // When the tab is focused, we apply any updates to content that were recieved when

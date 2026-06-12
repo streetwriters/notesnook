@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Box, Text } from "@theme-ui/components";
 import { FileAttachment } from "./types.js";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/index.js";
@@ -28,10 +28,20 @@ import { DesktopOnly } from "../../components/responsive/index.js";
 import { formatBytes } from "@notesnook/common";
 
 export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {
-  const { editor, node, selected } = props;
-  const { filename, size, progress } = node.attrs;
+  const { editor, node, selected, updateAttributes } = props;
+  const { filename, size, progress, hash } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
   const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    if (!hash) return;
+
+    editor.storage.getAttachmentMetaData?.(hash).then((meta) => {
+      if (meta?.filename && meta.filename !== filename) {
+        updateAttributes({ filename: meta.filename });
+      }
+    });
+  }, [hash, filename]);
 
   return (
     <Box
