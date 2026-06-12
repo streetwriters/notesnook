@@ -2856,5 +2856,15 @@ Continue without attachments?`,
   remind: () => t`Remind before your trial ends`,
   yourSecurityIsPriority: () => `Your security is our priority`,
   enterYourPassword: () => t`Enter your password`,
-  yourRecoveryKey: () => t`Your recovery key`
+  yourRecoveryKey: () => t`Your recovery key`,
+  forcePullAction: () => t`Force Pull`,
+  forcePushAction: () => t`Force Push`,
+  forceSyncPullSheetDesc: () =>
+    t`This will overwrite all data on this device with the data from the server.`,
+  forceSyncPushSheetDesc: () =>
+    t`This will overwrite all data on the server with the data from this device.`,
+  forceSyncWarningShort: () =>
+    t`Use this only for troubleshooting sync issues. Regular use may lead to data loss or conflicts.`,
+  forceSyncNeedHelpContact: () => t`Having issues? Contact`,
+  forceSyncRiskAcknowledgement: () => t`I understand the risks`
 };

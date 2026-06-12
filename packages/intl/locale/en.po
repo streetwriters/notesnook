@@ -3264,9 +3264,17 @@ msgstr "for locking your notes as soon as app enters background"
 msgid "Force logout from all your other logged in devices."
 msgstr "Force logout from all your other logged in devices."
 
+#: src/strings.ts:2808
+msgid "Force Pull"
+msgstr "Force Pull"
+
 #: src/strings.ts:1114
 msgid "Force pull changes"
 msgstr "Force pull changes"
+
+#: src/strings.ts:2809
+msgid "Force Push"
+msgstr "Force Push"
 
 #: src/strings.ts:1123
 msgid "Force push changes"
@@ -3467,6 +3475,10 @@ msgstr "Group by"
 msgid "Hash copied"
 msgstr "Hash copied"
 
+#: src/strings.ts:2816
+msgid "Having issues? Contact"
+msgstr "Having issues? Contact"
+
 #: src/strings.ts:2242
 msgid "Having problems with sync?"
 msgstr "Having problems with sync?"
@@ -3578,6 +3590,10 @@ msgstr "I love cooking and collecting recipes."
 #: src/strings.ts:2243
 msgid "I understand"
 msgstr "I understand"
+
+#: src/strings.ts:2817
+msgid "I understand the risks"
+msgstr "I understand the risks"
 
 #: src/strings.ts:551
 msgid "I understand, change my password"
@@ -7126,6 +7142,14 @@ msgstr "This version of Notesnook app does not support in-app purchases. Kindly 
 msgid "This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out."
 msgstr "This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out."
 
+#: src/strings.ts:2813
+msgid "This will overwrite all data on the server with the data from this device."
+msgstr "This will overwrite all data on the server with the data from this device."
+
+#: src/strings.ts:2811
+msgid "This will overwrite all data on this device with the data from the server."
+msgstr "This will overwrite all data on this device with the data from the server."
+
 #: src/strings.ts:626
 msgid "Thu"
 msgstr "Thu"
@@ -7561,6 +7585,10 @@ msgstr "Use this if changes from other devices are not appearing on this device.
 #: src/strings.ts:1126
 msgid "Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device."
 msgstr "Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device."
+
+#: src/strings.ts:2815
+msgid "Use this only for troubleshooting sync issues. Regular use may lead to data loss or conflicts."
+msgstr "Use this only for troubleshooting sync issues. Regular use may lead to data loss or conflicts."
 
 #: src/strings.ts:2507
 msgid "used"
