@@ -682,6 +682,10 @@ msgstr "Access on all your devices"
 msgid "Account"
 msgstr "Account"
 
+#: src/strings.ts:2820
+msgid "Account actions"
+msgstr "Account actions"
+
 #: src/strings.ts:1870
 msgid "Account password"
 msgstr "Account password"
@@ -1494,6 +1498,10 @@ msgstr "Change plan"
 msgid "Change profile picture"
 msgstr "Change profile picture"
 
+#: src/strings.ts:2818
+msgid "Change profile picture, full name and email"
+msgstr "Change profile picture, full name and email"
+
 #: src/strings.ts:2213
 msgid "Change proxy"
 msgstr "Change proxy"
@@ -2200,6 +2208,10 @@ msgstr "Dark mode"
 #: src/strings.ts:2129
 msgid "Dark or light, we won't judge."
 msgstr "Dark or light, we won't judge."
+
+#: src/strings.ts:2819
+msgid "Data and storage"
+msgstr "Data and storage"
 
 #: src/strings.ts:1570
 msgid "Database setup failed, could not get database key"

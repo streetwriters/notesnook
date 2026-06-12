@@ -682,6 +682,10 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
+#: src/strings.ts:2820
+msgid "Account actions"
+msgstr ""
+
 #: src/strings.ts:1870
 msgid "Account password"
 msgstr ""
@@ -1494,6 +1498,10 @@ msgstr ""
 msgid "Change profile picture"
 msgstr ""
 
+#: src/strings.ts:2818
+msgid "Change profile picture, full name and email"
+msgstr ""
+
 #: src/strings.ts:2213
 msgid "Change proxy"
 msgstr ""
@@ -2188,6 +2196,10 @@ msgstr ""
 
 #: src/strings.ts:2129
 msgid "Dark or light, we won't judge."
+msgstr ""
+
+#: src/strings.ts:2819
+msgid "Data and storage"
 msgstr ""
 
 #: src/strings.ts:1570

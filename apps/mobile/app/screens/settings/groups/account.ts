@@ -210,7 +210,6 @@ export const accountGroup: SettingSection = {
           id: "account-sub-section",
           type: "group",
           name: strings.account(),
-          description: "Profile details and subscription options",
           icon: "user",
           iconFamily: "notesnook",
           sections: [
@@ -218,7 +217,7 @@ export const accountGroup: SettingSection = {
               id: "edit-profile",
               type: "screen",
               name: strings.editProfile(),
-              description: "Change profile picture, full name and email",
+              description: strings.editProfileDesc(),
               icon: "user",
               iconFamily: "notesnook",
               sections: [
@@ -331,7 +330,6 @@ export const accountGroup: SettingSection = {
           id: "security-sub-section",
           type: "group",
           name: strings.privacyAndSecurity(),
-          description: "Password, 2FA and account recovery",
           icon: "two-factor-authentication",
           sections: [
             {
@@ -444,8 +442,7 @@ export const accountGroup: SettingSection = {
         {
           id: "data-storage-sub-section",
           type: "group",
-          name: "Data & Storage",
-          description: "Manage attachments and local cache",
+          name: strings.dataAndStorage(),
           icon: "paperclip",
           iconFamily: "notesnook",
           sections: [
@@ -506,8 +503,7 @@ export const accountGroup: SettingSection = {
         {
           id: "account-actions-sub-section",
           type: "group",
-          name: "Account actions",
-          description: "Log out or permanently delete your account",
+          name: strings.accountActions(),
           icon: "user-sheet-logout",
           iconFamily: "notesnook",
           sections: [
