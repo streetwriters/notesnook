@@ -47,6 +47,11 @@ class Merger {
     localItem: MaybeDeletedItem<Item> | undefined
   ) {
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
+      this.logger.debug(`Remote item is newer. Using remote item.`, {
+        id: remoteItem.id,
+        remoteDateModified: remoteItem.dateModified,
+        localDateModified: localItem?.dateModified
+      });
       return remoteItem;
     }
 
@@ -67,6 +72,14 @@ class Merger {
         (localItem as unknown as Note).dateDeleted = null;
         (localItem as unknown as Note).itemType = null;
 
+        this.logger.debug(
+          `Remote note has newer expiry date. Restoring expired note.`,
+          {
+            id: remoteItem.id,
+            remoteExpiryDateModified: remoteItem.expiryDate.dateModified,
+            localExpiryDateModified: localItem.expiryDate.dateModified
+          }
+        );
         return localItem;
       }
     }
@@ -76,7 +89,16 @@ class Merger {
     remoteItem: MaybeDeletedItem<Item>,
     localItem: MaybeDeletedItem<Item> | undefined
   ) {
-    if (localItem && "localOnly" in localItem && localItem.localOnly) return;
+    if (localItem && "localOnly" in localItem && localItem.localOnly) {
+      this.logger.debug(
+        `Local item is marked as localOnly. Skipping merge and keeping local item.`,
+        {
+          id: localItem.id,
+          localOnly: localItem.localOnly
+        }
+      );
+      return;
+    }
 
     if (
       !localItem ||
@@ -95,6 +117,15 @@ class Merger {
         ? "conflict"
         : isContentConflicted(localItem, remoteItem, THRESHOLD);
 
+      this.logger.debug(`Content conflict check result: ${conflicted}`, {
+        id: localItem.id,
+        localDateModified: localItem.dateModified,
+        remoteDateModified: remoteItem.dateModified,
+        localDateResolved: localItem.dateResolved,
+        timeDifference:
+          Math.max(remoteItem.dateEdited, localItem.dateEdited) -
+          Math.min(remoteItem.dateEdited, localItem.dateEdited)
+      });
       if (conflicted === "merge") return remoteItem;
       else if (!conflicted) return;
 
