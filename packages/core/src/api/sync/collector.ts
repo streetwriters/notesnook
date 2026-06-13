@@ -69,7 +69,10 @@ class Collector {
           .storage()
           .encryptMulti(key.key, syncableItems);
         const items = toSyncItem(ids, ciphers, key.version);
-        if (!items.length) continue;
+        this.logger.debug(
+          `Collected ${items.length} items for type ${itemType}`,
+          { ids }
+        );
         yield { items, type: itemType, count: items.length };
 
         await this.db

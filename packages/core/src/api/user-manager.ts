@@ -336,6 +336,8 @@ class UserManager {
   }
 
   async fetchUser(): Promise<User | undefined> {
+    this.keyManager.clearCache();
+
     const oldUser = await this.getUser();
     try {
       const token = await this.tokenManager.getAccessToken();

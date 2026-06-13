@@ -34,6 +34,7 @@ import { getVersion } from "react-native-device-info";
 import { TextInput } from "react-native-gesture-handler";
 import * as RNIap from "react-native-iap";
 import { DatabaseLogger, db } from "../../common/database";
+import { MMKV } from "../../common/database/mmkv";
 import filesystem from "../../common/filesystem";
 import { presentDialog } from "../../components/dialog/functions";
 import { AppLockPassword } from "../../components/dialogs/applock-password";
@@ -65,6 +66,7 @@ import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
 import { refreshAllStores } from "../../stores/create-db-collection-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
@@ -81,8 +83,6 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { MMKV } from "../../common/database/mmkv";
-import { useSettingStore } from "../../stores/use-setting-store";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -745,30 +745,49 @@ export const settingsGroups: SettingSection[] = [
             name: strings.enableInboxAPI(),
             description: strings.enableInboxAPIDesc(),
             type: "switch",
-            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            useHook: () => {
+              return useSettingStore((state) => state.inboxEnabled);
+            },
             getter: (current) => current,
             modifer: async (current) => {
               if (current) {
-                presentDialog({
-                  title: strings.disableInboxAPI(),
-                  paragraph: strings.disableInboxAPIDesc(),
-                  positiveText: strings.disable(),
-                  positivePress: async () => {
-                    await db.user.discardInboxKeys();
-                    useSettingStore.setState({
-                      inboxEnabled: false
-                    });
-                    return true;
-                  }
+                return new Promise((resolve) => {
+                  presentDialog({
+                    title: strings.disableInboxAPI(),
+                    paragraph: strings.disableInboxAPIDesc(),
+                    positiveText: strings.disable(),
+                    onClose: () => {
+                      resolve();
+                    },
+                    positivePress: async () => {
+                      try {
+                        await db.inboxItemsHistory.deleteFailed();
+                        await db.user.discardInboxKeys();
+                        useSettingStore.setState({
+                          inboxEnabled: false
+                        });
+                        resolve();
+                        return true;
+                      } catch (e) {
+                        ToastManager.show({
+                          message: (e as Error).message,
+                          context: "local"
+                        });
+                        DatabaseLogger.error(e);
+                        return false;
+                      }
+                    }
+                  });
                 });
-                return;
               }
 
               try {
-                await db.user.getInboxKeys();
-                useSettingStore.setState({
-                  inboxEnabled: true
-                });
+                Navigation.push("SettingsGroup", {
+                  id: "setup-inbox-keys",
+                  name: strings.setupInboxKeys(),
+                  type: "screen",
+                  component: "setup-inbox-keys"
+                } as any);
               } catch (e) {
                 console.log(e);
               }
@@ -777,7 +796,21 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "manage-inbox-keys",
             name: strings.manageInboxKeys(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
             description: strings.manageInboxKeysDesc(),
+            onVerify: async () => {
+              return new Promise((resolve) => {
+                verifyUser(
+                  "global",
+                  () => {
+                    resolve(true);
+                  },
+                  false,
+                  () => resolve(false)
+                );
+              });
+            },
             type: "screen",
             component: "manage-inbox-keys"
           },
@@ -785,6 +818,8 @@ export const settingsGroups: SettingSection[] = [
             id: "inbox-keys",
             name: strings.viewAPIKeys(),
             description: strings.viewAPIKeysDesc(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
             type: "screen",
             component: "inbox-keys"
           },
@@ -792,6 +827,8 @@ export const settingsGroups: SettingSection[] = [
             id: "failed-inbox-items",
             name: strings.failedInboxItems(),
             description: strings.failedInboxItemsDesc(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
             type: "screen",
             component: "failed-inbox-items",
             hideHeader: true

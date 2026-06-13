@@ -1,11 +1,17 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2026-06-10 17:36+0500\n"
+"POT-Creation-Date: 2026-06-11 09:27+0500\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2423
 msgid " \"Notebook > Notes\""
@@ -814,7 +820,7 @@ msgstr ""
 msgid "All files"
 msgstr ""
 
-#: src/strings.ts:2758
+#: src/strings.ts:2762
 msgid "All items deleted"
 msgstr ""
 
@@ -973,7 +979,7 @@ msgstr ""
 msgid "Are you sure you want to clear trash?"
 msgstr ""
 
-#: src/strings.ts:2757
+#: src/strings.ts:2761
 msgid "Are you sure you want to delete all failed inbox items?"
 msgstr ""
 
@@ -989,7 +995,7 @@ msgstr ""
 msgid "Are you sure you want to logout from this device? Any unsynced changes will be lost."
 msgstr ""
 
-#: src/strings.ts:2768
+#: src/strings.ts:2772
 msgid "Are you sure you want to open this file: {filePath}?"
 msgstr ""
 
@@ -1033,7 +1039,7 @@ msgstr ""
 msgid "Attached files"
 msgstr ""
 
-#: src/strings.ts:2759
+#: src/strings.ts:2763
 msgid "Attaching files"
 msgstr ""
 
@@ -1133,6 +1139,10 @@ msgstr ""
 
 #: src/strings.ts:2123
 msgid "Auto start on system startup"
+msgstr ""
+
+#: src/strings.ts:2750
+msgid "Auto-generate keys"
 msgstr ""
 
 #: src/strings.ts:1220
@@ -1585,6 +1595,10 @@ msgstr ""
 msgid "Choose how you want to secure your notes locally."
 msgstr ""
 
+#: src/strings.ts:2749
+msgid "Choose how you want to set up your Inbox PGP keys:"
+msgstr ""
+
 #: src/strings.ts:2641
 msgid "Choose what day to display as the first day of the week"
 msgstr ""
@@ -1704,7 +1718,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/strings.ts:2760
+#: src/strings.ts:2764
 msgid "Close ({seconds})"
 msgstr ""
 
@@ -1817,11 +1831,11 @@ msgstr ""
 msgid "Compressed images are uploaded in Full HD resolution and usually are good enough for most use cases."
 msgstr ""
 
-#: src/strings.ts:2761
+#: src/strings.ts:2765
 msgid "Compressing"
 msgstr ""
 
-#: src/strings.ts:2765
+#: src/strings.ts:2769
 msgid "Compression failed"
 msgstr ""
 
@@ -1922,7 +1936,7 @@ msgstr ""
 msgid "Copy link text"
 msgstr ""
 
-#: src/strings.ts:2784
+#: src/strings.ts:2788
 msgid "Copy logs"
 msgstr ""
 
@@ -2051,7 +2065,7 @@ msgstr ""
 msgid "Creating..."
 msgstr ""
 
-#: src/strings.ts:2776
+#: src/strings.ts:2780
 msgid "Creation date cannot be after last edited date"
 msgstr ""
 
@@ -2173,7 +2187,7 @@ msgstr ""
 msgid "Date modified"
 msgstr ""
 
-#: src/strings.ts:2749
+#: src/strings.ts:2753
 msgid "Date synced"
 msgstr ""
 
@@ -2262,7 +2276,7 @@ msgstr ""
 msgid "Delete account"
 msgstr ""
 
-#: src/strings.ts:2755
+#: src/strings.ts:2759
 msgid "Delete all"
 msgstr ""
 
@@ -2334,7 +2348,7 @@ msgstr ""
 msgid "Desktop integration"
 msgstr ""
 
-#: src/strings.ts:2748
+#: src/strings.ts:2752
 msgid "Details"
 msgstr ""
 
@@ -2681,7 +2695,7 @@ msgstr ""
 msgid "Encrypted, private, secure."
 msgstr ""
 
-#: src/strings.ts:2762
+#: src/strings.ts:2766
 msgid "Encrypting"
 msgstr ""
 
@@ -2793,6 +2807,14 @@ msgstr ""
 msgid "Enter your new email"
 msgstr ""
 
+#: src/strings.ts:2793
+msgid "Enter your PGP private key"
+msgstr ""
+
+#: src/strings.ts:2792
+msgid "Enter your PGP public key"
+msgstr ""
+
 #: src/strings.ts:2101
 msgid "Enter your username"
 msgstr ""
@@ -2893,15 +2915,15 @@ msgstr ""
 msgid "Expiry date"
 msgstr ""
 
-#: src/strings.ts:2773
+#: src/strings.ts:2777
 msgid "Expiry date cannot be more than 1 year in the future"
 msgstr ""
 
-#: src/strings.ts:2771
+#: src/strings.ts:2775
 msgid "Expiry date must be in the future"
 msgstr ""
 
-#: src/strings.ts:2774
+#: src/strings.ts:2778
 msgid "Expiry date set"
 msgstr ""
 
@@ -2958,7 +2980,7 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: src/strings.ts:2750
+#: src/strings.ts:2754
 msgid "Failed inbox items"
 msgstr ""
 
@@ -3096,7 +3118,7 @@ msgstr ""
 msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes. Please upload this file again from the attachment manager."
 msgstr ""
 
-#: src/strings.ts:2770
+#: src/strings.ts:2774
 msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
 msgstr ""
 
@@ -3104,7 +3126,7 @@ msgstr ""
 msgid "File mismatch"
 msgstr ""
 
-#: src/strings.ts:2764
+#: src/strings.ts:2768
 msgid "File size limit exceeded. Please upgrade your plan."
 msgstr ""
 
@@ -3585,12 +3607,12 @@ msgstr ""
 msgid "Inbox API"
 msgstr ""
 
-#: src/strings.ts:2661
-msgid "Inbox Keys"
-msgstr ""
-
 #: src/strings.ts:2716
 msgid "Inbox keys saved"
+msgstr ""
+
+#: src/strings.ts:2661
+msgid "Inbox PGP Keys"
 msgstr ""
 
 #: src/strings.ts:174
@@ -3714,7 +3736,7 @@ msgstr ""
 msgid "Item"
 msgstr ""
 
-#: src/strings.ts:2754
+#: src/strings.ts:2758
 msgid "Item deleted"
 msgstr ""
 
@@ -4124,7 +4146,7 @@ msgstr ""
 msgid "Maximize"
 msgstr ""
 
-#: src/strings.ts:2779
+#: src/strings.ts:2783
 msgid "Maximum reminder date is {maxDate}"
 msgstr ""
 
@@ -4418,7 +4440,7 @@ msgstr ""
 msgid "No encryption key found"
 msgstr ""
 
-#: src/strings.ts:2752
+#: src/strings.ts:2756
 msgid "No failed inbox items"
 msgstr ""
 
@@ -4503,7 +4525,7 @@ msgstr ""
 msgid "Note does not exist"
 msgstr ""
 
-#: src/strings.ts:2777
+#: src/strings.ts:2781
 msgid "Note duplicated"
 msgstr ""
 
@@ -4737,7 +4759,7 @@ msgstr ""
 msgid "Open the two-factor authentication (TOTP) app to view your authentication code."
 msgstr ""
 
-#: src/strings.ts:2766
+#: src/strings.ts:2770
 msgid "Opening local file"
 msgstr ""
 
@@ -4862,7 +4884,7 @@ msgstr ""
 msgid "PDF is password protected"
 msgstr ""
 
-#: src/strings.ts:2786
+#: src/strings.ts:2790
 msgid "Permission required to save QR-Code to Gallery"
 msgstr ""
 
@@ -5241,6 +5263,10 @@ msgstr ""
 
 #: src/strings.ts:401
 msgid "Protect your notes"
+msgstr ""
+
+#: src/strings.ts:2751
+msgid "Provide your own keys"
 msgstr ""
 
 #: src/strings.ts:2193
@@ -6277,6 +6303,10 @@ msgstr ""
 msgid "Setup app lock pin"
 msgstr ""
 
+#: src/strings.ts:2791
+msgid "Setup inbox keys"
+msgstr ""
+
 #: src/strings.ts:681
 msgid "Setup secondary 2FA method"
 msgstr ""
@@ -6314,7 +6344,7 @@ msgid "Share Notesnook with friends!"
 msgstr ""
 
 #: src/strings.ts:2658
-msgid "Share things to Notesbook from anywhere using the Inbox API"
+msgid "Share things to Notesnook from anywhere using the Inbox API"
 msgstr ""
 
 #: src/strings.ts:594
@@ -6341,7 +6371,7 @@ msgstr ""
 msgid "Shortcuts"
 msgstr ""
 
-#: src/strings.ts:2753
+#: src/strings.ts:2757
 msgid "Show"
 msgstr ""
 
@@ -7453,7 +7483,7 @@ msgstr ""
 msgid "View and share debug logs"
 msgstr ""
 
-#: src/strings.ts:2751
+#: src/strings.ts:2755
 msgid "View failed inbox items and error contexts"
 msgstr ""
 
@@ -7497,11 +7527,11 @@ msgstr ""
 msgid "We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap."
 msgstr ""
 
-#: src/strings.ts:2781
+#: src/strings.ts:2785
 msgid "We couldn't load this theme. Please make sure the file is a valid JSON theme file."
 msgstr ""
 
-#: src/strings.ts:2783
+#: src/strings.ts:2787
 msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 msgstr ""
 

@@ -31,6 +31,7 @@ import { useNotebookStore } from "./use-notebook-store";
 import { useNoteStore } from "./use-notes-store";
 import { useRelationStore } from "./use-relation-store";
 import { useReminderStore } from "./use-reminder-store";
+import { useSettingStore } from "./use-setting-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
 import { useUserStore } from "./use-user-store";
@@ -121,6 +122,7 @@ export function initAfterSync(type: "full" | "send" = "send") {
     useUserStore.setState({
       profile: db.settings.getProfile()
     });
+    useSettingStore.getState().refresh();
   }
 
   Notifications.setupReminders(true);

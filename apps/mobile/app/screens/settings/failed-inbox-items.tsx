@@ -145,7 +145,6 @@ function DetailsBlock({ value }: { value: string }) {
       </View>
 
       <ScrollView
-        horizontal
         style={{ maxHeight: 120 }}
         contentContainerStyle={{
           padding: DefaultAppStyles.GAP_SMALL
@@ -332,7 +331,8 @@ export const FailedInboxItems = () => {
                 <View
                   style={{
                     flexDirection: "row",
-                    gap: DefaultAppStyles.GAP_SMALL
+                    gap: DefaultAppStyles.GAP_SMALL,
+                    alignItems: "flex-start"
                   }}
                 >
                   <View
@@ -340,12 +340,20 @@ export const FailedInboxItems = () => {
                       backgroundColor: colors.error.background,
                       padding: 3,
                       paddingHorizontal: 6,
-                      borderRadius: 4
+                      borderRadius: 4,
+                      alignItems: "center",
+                      flexWrap: "wrap"
                     }}
                   >
                     <Paragraph color={colors.error.paragraph}>Error</Paragraph>
                   </View>
-                  <Paragraph> {(description as string) || "N/A"}</Paragraph>
+                  <Paragraph
+                    style={{
+                      flexShrink: 1
+                    }}
+                  >
+                    {(description as string) || "N/A"}
+                  </Paragraph>
                 </View>
 
                 {details ? (

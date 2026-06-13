@@ -16,37 +16,190 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from "react";
-import { usePromise } from "@notesnook/common";
-import { db } from "../../common/database";
-import { ActivityIndicator, ScrollView, View } from "react-native";
-import { Button } from "../../components/ui/button";
-import { strings } from "@notesnook/intl";
-import Input from "../../components/ui/input";
-import { useEffect, useRef, useState } from "react";
+import { getFormattedDate, usePromise } from "@notesnook/common";
+import { InboxApiKey } from "@notesnook/core";
 import { SerializedKeyPair } from "@notesnook/crypto";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import Clipboard from "@react-native-clipboard/clipboard";
+import React, { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, ScrollView, View } from "react-native";
+import { DatabaseLogger, db } from "../../common/database";
+import { Storage } from "../../common/database/storage";
+import { presentDialog } from "../../components/dialog/functions";
+import AddApiKeySheet from "../../components/sheets/add-api-key";
+import { Button } from "../../components/ui/button";
+import { IconButton } from "../../components/ui/icon-button";
+import Input from "../../components/ui/input";
 import FormInput, {
   createFormRef,
   validators
 } from "../../components/ui/input/form-input";
+import { Notice } from "../../components/ui/notice";
+import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { DefaultAppStyles } from "../../utils/styles";
 import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import { Storage } from "../../common/database/storage";
-import { Notice } from "../../components/ui/notice";
-import { presentDialog } from "../../components/dialog/functions";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { InboxApiKey } from "@notesnook/core";
-import { IconButton } from "../../components/ui/icon-button";
-import Clipboard from "@react-native-clipboard/clipboard";
-import { useThemeColors } from "@notesnook/theme";
-import dayjs from "dayjs";
-import Heading from "../../components/ui/typography/heading";
 import { AppFontSize } from "../../utils/size";
-import AddApiKeySheet from "../../components/sheets/add-api-key";
+import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon from "../../components/ui/AppIcon";
+
+export const SetupInboxKeys = () => {
+  const [mode, setMode] = useState<"choose" | "edit">("choose");
+  const [error, setError] = useState("");
+  const { colors } = useThemeColors();
+  const [isLoading, setIsLoading] = useState(false);
+  const formRef = useRef(
+    createFormRef({
+      publicKey: "",
+      privateKey: ""
+    })
+  );
+
+  const handleAutoGenerate = async () => {
+    try {
+      setIsLoading(true);
+      await db.user.getInboxKeys();
+      ToastManager.show({
+        message: strings.inboxKeysSaved(),
+        type: "success"
+      });
+      useSettingStore.setState({
+        inboxEnabled: true
+      });
+      Navigation.goBack();
+    } catch (error) {
+      DatabaseLogger.error(error as Error);
+      ToastManager.error(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      if (!formRef.current.validate()) return;
+      const keysEdited: SerializedKeyPair = {
+        publicKey: formRef.current.getValue("publicKey"),
+        privateKey: formRef.current.getValue("privateKey")
+      };
+
+      const result = await Storage.validatePGPKeyPair(keysEdited);
+
+      if (!result.isValid) {
+        setError(result.message);
+        return;
+      }
+      await db.user?.saveInboxKeys(keysEdited);
+      useSettingStore.setState({
+        inboxEnabled: true
+      });
+      Navigation.goBack();
+      ToastManager.show({
+        message: strings.inboxKeysSaved(),
+        type: "success"
+      });
+    } catch (e) {
+      DatabaseLogger.error(e);
+      ToastManager.error(e as Error);
+    }
+  };
+
+  return (
+    <View>
+      {mode === "choose" ? (
+        <>
+          <View
+            style={{
+              paddingHorizontal: DefaultAppStyles.GAP,
+              gap: DefaultAppStyles.GAP_VERTICAL
+            }}
+          >
+            <Paragraph>{strings.setupInboxPgpKeysDescription()}</Paragraph>
+            <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
+              <Button
+                title={strings.autoGenerateKeys()}
+                type="accent"
+                width="100%"
+                onPress={handleAutoGenerate}
+                disabled={isLoading}
+              />
+              <Button
+                title={strings.provideOwnKeys()}
+                type="secondary"
+                width="100%"
+                onPress={() => setMode("edit")}
+                disabled={isLoading}
+              />
+            </View>
+          </View>
+        </>
+      ) : (
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: DefaultAppStyles.GAP,
+            gap: DefaultAppStyles.GAP_VERTICAL,
+            marginTop: DefaultAppStyles.GAP_VERTICAL
+          }}
+        >
+          <Paragraph>{strings.publicKey()}</Paragraph>
+          <FormInput
+            name="publicKey"
+            formRef={formRef}
+            numberOfLines={5}
+            validators={[validators.required(strings.publicKeyRequired())]}
+            placeholder={strings.enterPgpPublicKey()}
+            multiline
+            containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
+            inputStyle={{ minHeight: 150, textAlignVertical: "top" }}
+            wrapperStyle={{ minHeight: 150 }}
+          />
+          <Paragraph>{strings.privateKey()}</Paragraph>
+          <FormInput
+            name="privateKey"
+            formRef={formRef}
+            numberOfLines={5}
+            placeholder={strings.enterPgpPrivateKey()}
+            validators={[validators.required(strings.privateKeyRequired())]}
+            multiline
+            containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
+            inputStyle={{ minHeight: 150, textAlignVertical: "top" }}
+            wrapperStyle={{ minHeight: 150 }}
+          />
+
+          {error ? (
+            <Paragraph
+              numberOfLines={4}
+              onPress={() => {}}
+              color={colors.error.accent}
+              style={{
+                textAlign: "center"
+              }}
+            >
+              <AppIcon
+                color={colors.error.accent}
+                name="alert-circle-outline"
+                size={AppFontSize.sm - 1}
+              />{" "}
+              {error}
+            </Paragraph>
+          ) : null}
+
+          <Button
+            title={strings.save()}
+            type="accent"
+            width={"100%"}
+            onPress={handleSave}
+          />
+        </ScrollView>
+      )}
+    </View>
+  );
+};
 
 const ManageInboxKeys = () => {
+  const { colors } = useThemeColors();
   const keys = usePromise(() => db.user.getInboxKeys());
   const inboxKeys = keys.status === "fulfilled" ? keys.value : undefined;
   const formRef = useRef(
@@ -56,6 +209,8 @@ const ManageInboxKeys = () => {
     })
   );
   const [formVersion, setFormVersion] = useState(0);
+  const [hasChanged, setHasChanged] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!inboxKeys) return;
@@ -64,6 +219,22 @@ const ManageInboxKeys = () => {
     formRef.current.setValue("privateKey", inboxKeys.privateKey || "");
     setFormVersion((prev) => prev + 1);
   }, [inboxKeys]);
+
+  useEffect(() => {
+    const unsub = formRef.current?.subscribeChange(() => {
+      const values = formRef.current?.getValues();
+      if (
+        inboxKeys?.publicKey !== values.publicKey ||
+        inboxKeys.privateKey !== values.privateKey
+      ) {
+        setHasChanged(true);
+      } else {
+        setHasChanged(false);
+      }
+      setError("");
+    });
+    return unsub;
+  }, [inboxKeys?.privateKey, inboxKeys?.publicKey]);
 
   return (
     <ScrollView
@@ -97,23 +268,45 @@ const ManageInboxKeys = () => {
         inputStyle={{ height: 140, textAlignVertical: "top" }}
         wrapperStyle={{ minHeight: 150 }}
       />
+
+      {error ? (
+        <Paragraph
+          numberOfLines={4}
+          onPress={() => {}}
+          color={colors.error.accent}
+          style={{
+            textAlign: "center"
+          }}
+        >
+          <AppIcon
+            color={colors.error.accent}
+            name="alert-circle-outline"
+            size={AppFontSize.sm - 1}
+          />{" "}
+          {error}
+        </Paragraph>
+      ) : null}
+
       <Button
         title={strings.save()}
+        disabled={!hasChanged}
         type="accent"
         width={"100%"}
         onPress={async () => {
           try {
-            if (!formRef.current.validate()) return;
-
             const keysEdited: SerializedKeyPair = {
               publicKey: formRef.current.getValue("publicKey"),
               privateKey: formRef.current.getValue("privateKey")
             };
 
+            if (!keysEdited.privateKey || !keysEdited.publicKey) {
+              if (!formRef.current.validate()) return;
+            }
+
             const result = await Storage.validatePGPKeyPair(keysEdited);
 
             if (!result.isValid) {
-              formRef.current.setError("privateKey", result.message);
+              setError(result.message);
               return;
             }
 
@@ -123,16 +316,23 @@ const ManageInboxKeys = () => {
               positiveText: strings.yes(),
               negativeText: strings.no(),
               positivePress: async () => {
-                await db.user?.saveInboxKeys(keysEdited);
-                ToastManager.show({
-                  message: strings.inboxKeysSaved(),
-                  type: "success"
-                });
-                Navigation.goBack();
-                return true;
+                try {
+                  await db.user?.saveInboxKeys(keysEdited);
+                  ToastManager.show({
+                    message: strings.inboxKeysSaved(),
+                    type: "success"
+                  });
+                  Navigation.goBack();
+                  return true;
+                } catch (e) {
+                  ToastManager.error(e as Error);
+                  DatabaseLogger.error(e);
+                  return false;
+                }
               }
             });
           } catch (e) {
+            DatabaseLogger.error(e);
             ToastManager.error(e as Error);
           }
         }}
@@ -170,6 +370,7 @@ const InboxKeysList = () => {
   }
 
   if (apiKeysPromise.status === "rejected") {
+    DatabaseLogger.log(apiKeysPromise.reason);
     return (
       <View
         style={{
@@ -194,8 +395,6 @@ const InboxKeysList = () => {
   }
 
   const apiKeys = apiKeysPromise.value || [];
-
-  console.log(apiKeys);
 
   return (
     <ScrollView
@@ -364,7 +563,8 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
     }
   }, [viewing]);
 
-  const isApiKeyExpired = Date.now() > apiKey.expiryDate;
+  const isApiKeyExpired =
+    apiKey.expiryDate !== -1 && Date.now() > apiKey.expiryDate;
 
   return (
     <View
@@ -398,7 +598,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
               }}
             >
               <Paragraph
-                color={colors.static.white}
+                color={colors.static.red}
                 size={AppFontSize.xxs}
                 style={{ fontWeight: "bold" }}
               >
@@ -411,17 +611,17 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
         <View style={{ gap: 4 }}>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {apiKey.lastUsedAt
-              ? `${strings.lastUsedOn()} ${dayjs(apiKey.lastUsedAt).format("MMM DD, YYYY")}`
+              ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt, "date-time")}`
               : strings.neverUsed()}
           </Paragraph>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {strings.createdOn()}{" "}
-            {dayjs(apiKey.dateCreated).format("MMM DD, YYYY")}
+            {getFormattedDate(apiKey.dateCreated, "date-time")}
           </Paragraph>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {apiKey.expiryDate === -1
               ? strings.neverExpires()
-              : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${dayjs(apiKey.expiryDate).format("MMM DD, YYYY")}`}
+              : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${getFormattedDate(apiKey.expiryDate, "date-time")}`}
           </Paragraph>
         </View>
 
@@ -516,4 +716,4 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
   );
 }
 
-export { ManageInboxKeys, InboxKeysList };
+export { InboxKeysList, ManageInboxKeys };

@@ -728,6 +728,10 @@ export const useAppEvents = () => {
   useEffect(() => {
     const subscriptions = [
       db.eventManager.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
+      db.eventManager.subscribe(EVENTS.userFetched, async () => {
+        const inboxEnabled = await db.user.hasInboxKeys();
+        useSettingStore.getState().setInboxEnabled(inboxEnabled);
+      }),
       db.eventManager.subscribe(EVENTS.syncAborted, onSyncAborted),
       db.eventManager.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
       db.eventManager.subscribe(EVENTS.userLoggedOut, onLogout),

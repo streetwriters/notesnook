@@ -147,6 +147,7 @@ export interface SettingStore {
   initialUrl: string | null;
   refresh: () => void;
   inboxEnabled: boolean;
+  setInboxEnabled: (inboxEnabled: boolean) => void;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -265,5 +266,6 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
       inboxEnabled: await db.user.hasInboxKeys()
     });
   },
-  inboxEnabled: false
+  inboxEnabled: false,
+  setInboxEnabled: (inboxEnabled) => set({ inboxEnabled })
 }));
