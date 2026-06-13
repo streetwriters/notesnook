@@ -40,43 +40,56 @@ export const customizeGroup: SettingSection = {
       iconFamily: "notesnook",
       sections: [
         {
-          id: "theme-picker",
-          type: "screen",
-          name: strings.themes(),
-          description: strings.themesDesc(),
-          component: "theme-selector",
-          icon: "shape"
-        },
-        {
-          id: "use-system-theme",
-          type: "switch",
-          name: strings.useSystemTheme(),
-          description: strings.useSystemThemeDesc(),
-          property: "useSystemTheme",
-          icon: "circle-half",
-          modifer: () => {
-            const current = SettingsService.get().useSystemTheme;
-            SettingsService.set({
-              useSystemTheme: !current
-            });
-            if (!current) {
-              useThemeStore
-                .getState()
-                .setColorScheme(Appearance.getColorScheme() as any);
+          id: "appearance-group",
+          type: "group",
+          name: strings.appearance(),
+          sections: [
+            {
+              id: "theme-picker",
+              type: "screen",
+              name: strings.themes(),
+              description: strings.themesDesc(),
+              component: "theme-selector",
+              icon: "paint-roller",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "use-system-theme",
+              type: "switch",
+              name: strings.useSystemTheme(),
+              description: strings.useSystemThemeDesc(),
+              property: "useSystemTheme",
+              icon: "swatches",
+              iconFamily: "notesnook",
+              modifer: () => {
+                const current = SettingsService.get().useSystemTheme;
+                SettingsService.set({
+                  useSystemTheme: !current
+                });
+                if (!current) {
+                  const systemColorScheme = Appearance.getColorScheme();
+                  useThemeStore
+                    .getState()
+                    .setColorScheme(
+                      systemColorScheme === "dark" ? "dark" : "light"
+                    );
+                }
+              }
+            },
+            {
+              id: "enable-dark-mode",
+              type: "switch",
+              name: strings.darkMode(),
+              description: strings.darkModeDesc(),
+              property: "colorScheme",
+              icon: "moon",
+              iconFamily: "notesnook",
+              modifer: () => {
+                useThemeStore.getState().setColorScheme();
+              },
+              getter: () => useThemeStore.getState().colorScheme === "dark"
             }
-          }
-        },
-        {
-          id: "enable-dark-mode",
-          type: "switch",
-          name: strings.darkMode(),
-          description: strings.darkModeDesc(),
-          property: "colorScheme",
-          icon: "brightness-6",
-          modifer: () => {
-            useThemeStore.getState().setColorScheme();
-          },
-          getter: () => useThemeStore.getState().colorScheme === "dark"
+          ]
         }
       ]
     },

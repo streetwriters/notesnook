@@ -1717,6 +1717,10 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr ""
 
+#: src/strings.ts:2823
+msgid "Click here"
+msgstr ""
+
 #: src/strings.ts:2644
 msgid "Click here to directly claim the promotion."
 msgstr ""
@@ -4713,6 +4717,10 @@ msgstr ""
 msgid "Notesnook Circle"
 msgstr ""
 
+#: src/strings.ts:2640
+msgid "Notesnook Circle is exclusively available to subscribed users."
+msgstr ""
+
 #: src/strings.ts:2100
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
 msgstr ""
@@ -6708,6 +6716,10 @@ msgstr ""
 msgid "Subscription not activated?"
 msgstr ""
 
+#: src/strings.ts:2821
+msgid "Subscription required"
+msgstr ""
+
 #: src/strings.ts:622
 msgid "Sun"
 msgstr ""
@@ -6984,10 +6996,6 @@ msgstr ""
 msgid "The information above will be publically available at"
 msgstr ""
 
-#: src/strings.ts:2640
-msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
-msgstr ""
-
 #: src/strings.ts:2115
 msgid "The password/pin for unlocking the app."
 msgstr ""
@@ -7152,6 +7160,10 @@ msgstr ""
 
 #: src/strings.ts:2757
 msgid "Title is required"
+msgstr ""
+
+#: src/strings.ts:2824
+msgid "to claim the promotion directly."
 msgstr ""
 
 #: src/strings.ts:1206

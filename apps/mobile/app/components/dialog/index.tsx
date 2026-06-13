@@ -143,9 +143,6 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
   }, [hide, show]);
 
   const onNegativePress = async () => {
-    if (dialogInfo?.onClose) {
-      await dialogInfo.onClose();
-    }
     hide();
   };
 
@@ -218,6 +215,9 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
             <DialogHeader
               title={dialogInfo.title}
               icon={dialogInfo.icon}
+              iconFamily={dialogInfo.iconFamily}
+              iconType={dialogInfo.iconType}
+              centered={dialogInfo.centered}
               paragraph={dialogInfo.paragraph}
               paragraphColor={dialogInfo.paragraphColor}
               style={{

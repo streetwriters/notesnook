@@ -113,43 +113,45 @@ const SheetProvider = ({ context = "global" }) => {
           : data.enableGesturesInScrollView
       }
     >
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom:
-            !data.progress && !data.icon && !data.title && !data.paragraph
-              ? 0
-              : 10,
-          paddingHorizontal: DefaultAppStyles.GAP
-        }}
-      >
-        {data?.progress ? (
-          <ActivityIndicator
-            style={{
-              marginTop: DefaultAppStyles.GAP
-            }}
-            size={50}
-            color={colors.primary.accent}
-          />
-        ) : null}
+      {data?.progress || data?.icon || data?.paragraph ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom:
+              !data.progress && !data.icon && !data.title && !data.paragraph
+                ? 0
+                : 10,
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          {data?.progress ? (
+            <ActivityIndicator
+              style={{
+                marginTop: DefaultAppStyles.GAP
+              }}
+              size={50}
+              color={colors.primary.accent}
+            />
+          ) : null}
 
-        {data?.icon ? (
-          <Icon
-            color={colors[data.iconColor] || colors.primary.accent}
-            name={data.icon}
-            size={50}
-          />
-        ) : null}
+          {data?.icon ? (
+            <Icon
+              color={colors[data.iconColor] || colors.primary.accent}
+              name={data.icon}
+              size={50}
+            />
+          ) : null}
 
-        {data?.title ? <Heading> {data?.title}</Heading> : null}
+          {data?.title ? <Heading> {data?.title}</Heading> : null}
 
-        {data?.paragraph ? (
-          <Paragraph style={{ textAlign: "center" }}>
-            {data?.paragraph}
-          </Paragraph>
-        ) : null}
-      </View>
+          {data?.paragraph ? (
+            <Paragraph style={{ textAlign: "center" }}>
+              {data?.paragraph}
+            </Paragraph>
+          ) : null}
+        </View>
+      ) : null}
 
       {typeof data.component === "function"
         ? data.component(

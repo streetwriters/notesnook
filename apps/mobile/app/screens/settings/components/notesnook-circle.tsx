@@ -16,51 +16,91 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from "react";
 import { CirclePartner, SubscriptionStatus } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAsync } from "react-async-hook";
-import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { ActivityIndicator, Image, ScrollView, View } from "react-native";
 import { db } from "../../../common/database";
-import AppIcon from "../../../components/ui/AppIcon";
+import { Radius, Spacing } from "../../../common/design/spacing";
+import { presentDialog } from "../../../components/dialog/functions";
 import { Button } from "../../../components/ui/button";
 import { Notice } from "../../../components/ui/notice";
 import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { ToastManager } from "../../../services/event-manager";
+import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
-import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
+import { eCloseSimpleDialog } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { Pressable } from "../../../components/ui/pressable";
-
+import { AppFontSize } from "../../../utils/size";
+import { sleep } from "../../../utils/time";
+let p: any;
 export const NotesnookCircle = () => {
   const user = useUserStore((state) => state.user);
   const isOnTrial =
     PremiumService.get() &&
     user?.subscription?.status === SubscriptionStatus.TRIAL;
   const isFree = !PremiumService.get();
-  const partners = useAsync(db.circle.partners, []);
+  const partners = useAsync(db.circle.partners, [], {
+    initialState: () => p
+  });
+  p = partners.result;
+
+  useEffect(() => {
+    if (isFree || isOnTrial) {
+      presentDialog({
+        icon: "warning-circle",
+        centered: true,
+        iconFamily: "notesnook",
+        iconType: "error",
+        title: strings.subscriptionRequired(),
+        paragraph: isFree
+          ? strings.freeUserCircleNotice()
+          : strings.trialUserCircleNotice(),
+        positiveText: isFree ? strings.upgradeNow() : strings.close(),
+        positivePress: async () => {
+          if (!isFree) {
+            Navigation.goBack();
+            return;
+          }
+          eSendEvent(eCloseSimpleDialog);
+          await sleep(300);
+          Navigation.navigate("PayWall", {
+            context: "logged-in"
+          });
+          return true;
+        },
+        onClose: () => {
+          Navigation.goBack();
+        }
+      });
+    }
+  }, []);
 
   return (
     <ScrollView
       contentContainerStyle={{
-        gap: DefaultAppStyles.GAP_VERTICAL,
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingTop: DefaultAppStyles.GAP_VERTICAL
+        gap: Spacing.LEVEL_3,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_0
       }}
     >
+      <View
+        style={{
+          gap: Spacing.LEVEL_0
+        }}
+      >
+        <Heading fontSize="XL">Partner offers</Heading>
+        <Paragraph>
+          Get exclusive discounts from our trusted partners who share our
+          commitment to privacy and user freedom.
+        </Paragraph>
+      </View>
+
       {!isFree && !isOnTrial ? null : (
         <View>
           <Paragraph>
@@ -69,7 +109,7 @@ export const NotesnookCircle = () => {
               : strings.trialUserCircleNotice()}
           </Paragraph>
 
-          {!isOnTrial ? null : (
+          {isOnTrial ? null : (
             <Button
               title={strings.upgradePlan()}
               onPress={() => {
@@ -115,48 +155,55 @@ const Partner = ({
   return (
     <View
       style={{
-        borderRadius: defaultBorderRadius,
-        borderWidth: 1,
-        borderColor: colors.primary.border,
-        padding: DefaultAppStyles.GAP,
-        gap: DefaultAppStyles.GAP_VERTICAL
+        borderRadius: Radius.MD,
+        backgroundColor: colors.secondary.background,
+        padding: Spacing.LEVEL_3,
+        gap: Spacing.LEVEL_1
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center"
+          justifyContent: "flex-start",
+          alignItems: "center",
+          gap: Spacing.LEVEL_1
         }}
       >
-        <Heading>{item.name}</Heading>
         <Image
           src={item.logoBase64}
           style={{
-            width: 40,
-            height: 40
+            width: 24,
+            height: 24
           }}
         />
+        <Heading>{item.name}</Heading>
       </View>
 
-      <Paragraph style={{ textAlign: "justify" }}>
-        {item.longDescription.trim()}
-      </Paragraph>
+      <Paragraph fontSize="XS">{item.longDescription.trim()}</Paragraph>
 
-      <Paragraph
+      <View
         style={{
-          alignSelf: "center"
+          width: "100%",
+          borderRadius: Radius.XS,
+          backgroundColor: colors.primary.shade,
+          paddingVertical: 4,
+          paddingHorizontal: 8
         }}
-        color={colors.primary.accent}
       >
-        {item.offerDescription}
-      </Paragraph>
+        <Paragraph fontSize="XS" color={colors.primary.accent}>
+          {item.offerDescription}
+        </Paragraph>
+      </View>
 
       {available ? (
         <>
           {!code ? (
             <Button
-              type="accent"
+              type="tertiary"
+              style={{
+                borderWidth: 1,
+                borderColor: colors.primary.border
+              }}
               title={strings.redeemCode()}
               width="100%"
               onPress={() => {
@@ -178,35 +225,58 @@ const Partner = ({
             />
           ) : (
             <>
-              <TouchableOpacity
+              <View
                 style={{
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: defaultBorderRadius,
                   alignItems: "center",
-                  justifyContent: "center",
-                  padding: DefaultAppStyles.GAP_SMALL,
-                  borderWidth: 0.5,
-                  borderColor: colors.secondary.border,
                   flexDirection: "row",
-                  gap: DefaultAppStyles.GAP_SMALL
-                }}
-                activeOpacity={0.9}
-                onPress={() => {
-                  Clipboard.setString(code);
+                  gap: Spacing.LEVEL_2
                 }}
               >
-                <Paragraph
-                  size={AppFontSize.lg}
-                  color={colors.secondary.paragraph}
+                <View
+                  style={{
+                    backgroundColor: colors.tertiary.background,
+                    borderRadius: Radius.XS,
+                    paddingVertical: Spacing.LEVEL_1,
+                    paddingHorizontal: Spacing.LEVEL_2,
+                    flexGrow: 1
+                  }}
                 >
-                  {code}
-                </Paragraph>
+                  <Paragraph
+                    color={colors.secondary.paragraph}
+                    size={AppFontSize.xs}
+                  >
+                    Discount code
+                  </Paragraph>
+                  <Paragraph
+                    size={AppFontSize.xxs}
+                    color={colors.primary.heading}
+                    fontFamily="SEMI_BOLD"
+                  >
+                    {code}
+                  </Paragraph>
+                </View>
 
-                <AppIcon name="content-copy" />
-              </TouchableOpacity>
+                <Button
+                  title={strings.copy()}
+                  type="accent"
+                  style={{
+                    paddingVertical: 0,
+                    height: "100%"
+                  }}
+                  onPress={() => {
+                    Clipboard.setString(code);
+                  }}
+                />
+              </View>
 
               {item.codeRedeemUrl ? (
-                <Pressable
+                <Paragraph
+                  fontSize="XS"
+                  color={colors.primary.accent}
+                  fontFamily="MEDIUM"
+                  style={{
+                    textDecorationLine: "underline"
+                  }}
                   onPress={() => {
                     if (item.codeRedeemUrl) {
                       openLinkInBrowser(
@@ -215,13 +285,11 @@ const Partner = ({
                     }
                   }}
                 >
-                  <Paragraph
-                    color={colors.secondary.paragraph}
-                    size={AppFontSize.xxs}
-                  >
-                    {strings.clickToDirectlyClaimPromo()}
+                  {strings.claimPromotion.clickHere()}{" "}
+                  <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                    {strings.claimPromotion.toClaim()}
                   </Paragraph>
-                </Pressable>
+                </Paragraph>
               ) : null}
             </>
           )}

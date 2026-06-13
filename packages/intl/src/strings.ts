@@ -2635,9 +2635,9 @@ Use this if changes from other devices are not appearing on this device. This wi
   notesnookCircleDesc: () =>
     t`Trusted partners who share our commitment to privacy, transparency, and user freedom.`,
   trialUserCircleNotice: () =>
-    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
+    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial ends and subscription starts.`,
   freeUserCircleNotice: () =>
-    t`The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits.`,
+    t`Notesnook Circle is exclusively available to subscribed users.`,
   finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
   goBack: () => t`Go back`,
   clickToDirectlyClaimPromo: () =>
@@ -2869,5 +2869,10 @@ Continue without attachments?`,
   forceSyncRiskAcknowledgement: () => t`I understand the risks`,
   editProfileDesc: () => t`Change profile picture, full name and email`,
   dataAndStorage: () => t`Data and storage`,
-  accountActions: () => t`Account actions`
+  accountActions: () => t`Account actions`,
+  subscriptionRequired: () => t`Subscription required`,
+  claimPromotion: {
+    clickHere: () => t`Click here`,
+    toClaim: () => t`to claim the promotion directly.`
+  }
 };

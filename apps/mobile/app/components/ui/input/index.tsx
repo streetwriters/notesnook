@@ -42,6 +42,7 @@ import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 import { useInputError } from "./input-error-context";
+import { IconProps } from "../AppIcon";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput | null>;
@@ -63,6 +64,7 @@ interface InputProps extends TextInputProps {
   marginBottom?: number;
   button?: {
     icon: string;
+    iconFamily: IconProps["iconFamily"];
     color: ColorValue;
     onPress: () => void;
     testID?: string;
@@ -217,10 +219,7 @@ const Input = ({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: Spacing.LEVEL_2,
-    paddingRight:
-      buttons || button || secureTextEntry || error
-        ? Spacing.LEVEL_3
-        : Spacing.LEVEL_3,
+    paddingRight: Spacing.LEVEL_3,
     ...containerStyle
   };
 
@@ -321,14 +320,12 @@ const Input = ({
               <IconButton
                 testID={button.testID}
                 name={button.icon}
-                size={AppFontSize.xl}
+                iconFamily={button.iconFamily}
+                size={button.size || AppFontSize.xl}
                 top={10}
                 bottom={10}
                 onPress={button.onPress}
                 color={button.color}
-                style={{
-                  marginRight: -8
-                }}
               />
             )}
           </View>

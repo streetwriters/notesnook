@@ -17,17 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Text, View, ViewStyle } from "react-native";
-import { useThemeColors } from "@notesnook/theme";
-import { AppFontSize } from "../../utils/size";
+import { Radius, Spacing } from "../../common/design/spacing";
+import { DefaultAppStyles } from "../../utils/styles";
+import AppIcon, { IconProps } from "../ui/AppIcon";
 import { Button, ButtonProps } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../utils/styles";
 
 type DialogHeaderProps = {
   icon?: string;
+  iconFamily?: IconProps["iconFamily"];
+  iconType?: "error" | "normal";
   title?: string;
   paragraph?: string;
   button?: ButtonProps;
@@ -46,7 +49,10 @@ const DialogHeader = ({
   padding,
   centered,
   titlePart,
-  style
+  style,
+  icon,
+  iconFamily,
+  iconType
 }: DialogHeaderProps) => {
   const { colors } = useThemeColors();
 
@@ -63,54 +69,83 @@ const DialogHeader = ({
       >
         <View
           style={{
-            width: "100%"
+            width: "100%",
+            gap: Spacing.LEVEL_4
           }}
         >
+          {icon ? (
+            <View
+              style={{
+                alignSelf: centered ? "center" : "flex-start",
+                width: 40,
+                height: 40,
+                backgroundColor: colors.error.shade,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: Radius.XS
+              }}
+            >
+              <AppIcon
+                name={icon}
+                iconFamily={iconFamily}
+                color={
+                  iconType == "error" ? colors.static.red : colors.primary.icon
+                }
+              />
+            </View>
+          ) : null}
+
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: centered ? "center" : "space-between",
-              alignItems: "center"
+              gap: Spacing.LEVEL_1
             }}
           >
-            <Heading
-              style={{ textAlign: centered ? "center" : "left" }}
-              fontSize="XL"
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: centered ? "center" : "space-between",
+                alignItems: "center"
+              }}
             >
-              {title}{" "}
-              {titlePart ? (
-                <Text style={{ color: colors.primary.accent }}>
-                  {titlePart}
-                </Text>
-              ) : null}
-            </Heading>
+              <Heading
+                style={{ textAlign: centered ? "center" : "left" }}
+                fontSize="XL"
+              >
+                {title}{" "}
+                {titlePart ? (
+                  <Text style={{ color: colors.primary.accent }}>
+                    {titlePart}
+                  </Text>
+                ) : null}
+              </Heading>
 
-            {button ? (
-              <Button
+              {button ? (
+                <Button
+                  style={{
+                    borderRadius: 100,
+                    paddingHorizontal: DefaultAppStyles.GAP
+                  }}
+                  fontSize={13}
+                  type={button.type || "secondary"}
+                  height={30}
+                  {...button}
+                />
+              ) : null}
+            </View>
+
+            {paragraph ? (
+              <Paragraph
                 style={{
-                  borderRadius: 100,
-                  paddingHorizontal: DefaultAppStyles.GAP
+                  textAlign: centered ? "center" : "left",
+                  maxWidth: centered ? "90%" : "100%",
+                  alignSelf: centered ? "center" : "flex-start"
                 }}
-                fontSize={13}
-                type={button.type || "secondary"}
-                height={30}
-                {...button}
-              />
+                color={paragraphColor || colors.secondary.paragraph}
+              >
+                {paragraph}
+              </Paragraph>
             ) : null}
           </View>
-
-          {paragraph ? (
-            <Paragraph
-              style={{
-                textAlign: centered ? "center" : "left",
-                maxWidth: centered ? "90%" : "100%",
-                alignSelf: centered ? "center" : "flex-start"
-              }}
-              color={paragraphColor || colors.secondary.paragraph}
-            >
-              {paragraph}
-            </Paragraph>
-          ) : null}
         </View>
       </View>
     </>

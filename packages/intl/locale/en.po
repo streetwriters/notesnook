@@ -1728,6 +1728,10 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 
+#: src/strings.ts:2823
+msgid "Click here"
+msgstr "Click here"
+
 #: src/strings.ts:2644
 msgid "Click here to directly claim the promotion."
 msgstr "Click here to directly claim the promotion."
@@ -4733,6 +4737,10 @@ msgstr "Notesnook"
 msgid "Notesnook Circle"
 msgstr "Notesnook Circle"
 
+#: src/strings.ts:2640
+msgid "Notesnook Circle is exclusively available to subscribed users."
+msgstr "Notesnook Circle is exclusively available to subscribed users."
+
 #: src/strings.ts:2100
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
 msgstr "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
@@ -6742,6 +6750,10 @@ msgstr "Subscription details"
 msgid "Subscription not activated?"
 msgstr "Subscription not activated?"
 
+#: src/strings.ts:2821
+msgid "Subscription required"
+msgstr "Subscription required"
+
 #: src/strings.ts:622
 msgid "Sun"
 msgstr "Sun"
@@ -7025,10 +7037,6 @@ msgstr "The incoming note could not be unlocked with the provided password. Ente
 msgid "The information above will be publically available at"
 msgstr "The information above will be publically available at"
 
-#: src/strings.ts:2640
-msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
-msgstr "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
-
 #: src/strings.ts:2115
 msgid "The password/pin for unlocking the app."
 msgstr "The password/pin for unlocking the app."
@@ -7194,6 +7202,10 @@ msgstr "Title format"
 #: src/strings.ts:2757
 msgid "Title is required"
 msgstr "Title is required"
+
+#: src/strings.ts:2824
+msgid "to claim the promotion directly."
+msgstr "to claim the promotion directly."
 
 #: src/strings.ts:1206
 msgid "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone."
