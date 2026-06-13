@@ -1839,7 +1839,7 @@ export const settingsGroups: SettingSection[] = [
             console.error(e);
           }
         },
-        description: Platform.OS === "ios" ? "3.3.27" : getVersion()
+        description: Platform.OS === "ios" ? "3.4.0-beta.1" : getVersion()
       }
     ]
   }
