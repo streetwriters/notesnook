@@ -132,7 +132,10 @@ const SheetWrapper = ({
         }}
         indicatorStyle={{
           width: 100,
-          backgroundColor: colors.secondary.background
+          height: 5,
+          backgroundColor: colors.secondary.background,
+          marginBottom: 0,
+          marginTop: 0
         }}
         statusBarTranslucent
         drawUnderStatusBar={true}

@@ -47,7 +47,7 @@ export const SectionGroup = ({
             paddingHorizontal: Spacing.LEVEL_3,
             marginBottom: Spacing.LEVEL_2
           }}
-          color={colors.secondary.heading}
+          color={colors.secondary.paragraph}
           size={AppFontSize.sm}
           fontFamily="MEDIUM"
         >
