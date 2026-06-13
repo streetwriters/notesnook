@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/web-clipper",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
