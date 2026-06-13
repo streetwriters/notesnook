@@ -144,3 +144,34 @@ test("converting collapsed heading to lower level should unhide higher level hea
 
   expect(editor.getHTML()).toMatchSnapshot();
 });
+
+test("ctrl+space should collapse/expand heading", async () => {
+  const el = h("div", [h("h1", ["Heading"]), h("p", ["Paragraph"])]);
+  const { editor } = createEditor({
+    extensions: {
+      heading: Heading.configure({ levels: [1, 2, 3, 4, 5, 6] })
+    },
+    initialContent: el.outerHTML
+  });
+
+  editor.commands.setTextSelection(3);
+  const collapseEvent = new KeyboardEvent("keydown", {
+    key: " ",
+    code: "Space",
+    ctrlKey: true,
+    bubbles: true
+  });
+  editor.view.dom.dispatchEvent(collapseEvent);
+
+  expect(editor.getHTML()).toMatchSnapshot();
+
+  const expandEvent = new KeyboardEvent("keydown", {
+    key: " ",
+    code: "Space",
+    ctrlKey: true,
+    bubbles: true
+  });
+  editor.view.dom.dispatchEvent(expandEvent);
+
+  expect(editor.getHTML()).toMatchSnapshot();
+});
