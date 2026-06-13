@@ -63,12 +63,14 @@ import {
   VAULT_ERRORS
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
+import { useUserStore } from "../../../stores/use-user-store";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
 
   // UI State
   const [visible, setVisible] = useState(false);
+  const isUserLoggedIn = useUserStore((state) => !!state.user);
   const [loading, setLoading] = useState(false);
   const [wrongPassword, setWrongPassword] = useState(false);
   const [passwordsDontMatch, setPasswordsDontMatch] = useState(false);
@@ -190,9 +192,12 @@ export const VaultDialog: React.FC = () => {
         }
         eSendEvent("vaultUpdated");
         setLoading(false);
-        setTimeout(() => {
-          close();
-        }, 100);
+        close();
+        ToastManager.show({
+          message: strings.vaultDeleted(),
+          type: "success",
+          context: "global"
+        });
       } else {
         setLoading(false);
         ToastManager.show({
@@ -504,6 +509,13 @@ export const VaultDialog: React.FC = () => {
 
     if (loading) return;
 
+    if (requestType === VaultRequestType.DeleteVault && !isUserLoggedIn) {
+      setLoading(true);
+      await deleteVault();
+      setLoading(false);
+      return;
+    }
+
     if (!passwordRef.current) {
       ToastManager.show({
         heading: strings.passwordNotEntered(),
@@ -687,16 +699,22 @@ export const VaultDialog: React.FC = () => {
       // Auto-unlock with fingerprint if applicable
       const canAutoUnlock =
         fingerprint &&
+        available &&
         data.requestType !== VaultRequestType.EnableFingerprint &&
         data.requestType !== VaultRequestType.RevokeFingerprint &&
         data.requestType !== VaultRequestType.ChangePassword &&
         data.requestType !== VaultRequestType.ClearVault &&
         data.requestType !== VaultRequestType.DeleteVault &&
         data.requestType !== VaultRequestType.CustomAction &&
-        data.requestType !== VaultRequestType.PermanentUnlock;
+        data.requestType !== VaultRequestType.PermanentUnlock &&
+        data.requestType !== VaultRequestType.CreateVault;
 
-      if (canAutoUnlock) {
-        await onPressFingerprintAuth(data.title, data.description);
+      if (canAutoUnlock && available) {
+        try {
+          await onPressFingerprintAuth(data.title, data.description);
+        } catch (e) {
+          setVisible(true);
+        }
       } else {
         setVisible(true);
       }
@@ -758,7 +776,6 @@ export const VaultDialog: React.FC = () => {
           icon="shield"
           padding={12}
         />
-        <Seperator half />
 
         <View
           style={{
@@ -767,8 +784,7 @@ export const VaultDialog: React.FC = () => {
         >
           {(isChangePassword ||
             isClearVault ||
-            !isCreateVault ||
-            isDeleteVault ||
+            (isDeleteVault && isUserLoggedIn) ||
             isCustomAction) &&
           !isRevokeFingerprint ? (
             <>

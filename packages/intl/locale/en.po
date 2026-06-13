@@ -2209,8 +2209,8 @@ msgid "Delete mode"
 msgstr "Delete mode"
 
 #: src/strings.ts:562
-msgid "Delete notes in this vault"
-msgstr "Delete notes in this vault"
+msgid "Delete notes in this vault permanently"
+msgstr "Delete notes in this vault permanently"
 
 #: src/strings.ts:569
 msgid "Delete permanently"

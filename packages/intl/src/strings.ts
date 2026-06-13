@@ -559,7 +559,7 @@ $day$: Current day (eg. Monday)`,
   couldNotUnlock: () => t`Could not unlock`,
   unlockNoteDesc: () =>
     t`Your note will be unencrypted and removed from the vault.`,
-  deleteAllNotes: () => t`Delete notes in this vault`,
+  deleteAllNotes: () => t`Delete notes in this vault permanently`,
   getStarted: () => t`Get started`,
   saveACopy: () => t`Save a copy`,
   discard: () => t`Discard`,
