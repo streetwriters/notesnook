@@ -102,6 +102,21 @@ const Tiptap = ({
           });
         });
       },
+      getAttachmentMetaData(hash) {
+        return new Promise<{ filename: string } | undefined>(
+          (resolve, reject) => {
+            const resolverId = randId("get_attachment_metadata");
+            pendingResolvers[resolverId] = (data) => {
+              delete pendingResolvers[resolverId];
+              resolve(data);
+            };
+            post(EditorEvents.getAttachmentMetaData, {
+              hash,
+              resolverId: resolverId
+            });
+          }
+        );
+      },
       element: getContentDiv(),
       editable: false,
       editorProps: {

@@ -135,15 +135,15 @@ globalThis.commands = {
     }
   },
 
-  setAttachmentProgress: (
-    attachmentProgress: Partial<Attachment>,
+  updateAttachment: (
+    attachmentAttributes: Partial<Attachment>,
     tabId: number
   ) => {
     const editor = editors[tabId];
     if (editor) {
-      editor.commands.updateAttachment(attachmentProgress, {
+      editor.commands.updateAttachment(attachmentAttributes, {
         preventUpdate: true,
-        query: (attachment) => attachment.hash === attachmentProgress.hash
+        query: (attachment) => attachment.hash === attachmentAttributes.hash
       });
     }
   },

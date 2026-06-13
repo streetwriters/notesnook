@@ -36,12 +36,22 @@ const SAMPLE_AUDIO = toBlobURL(
 );
 
 export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
-  const { editor, node, selected } = props;
+  const { editor, node, selected, updateAttributes } = props;
   const { filename, size, progress, mime, hash } = node.attrs;
   const elementRef = useRef<HTMLDivElement>();
   const [isDragging, setIsDragging] = useState(false);
   const isLoading = useRef(false);
   const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    if (!hash) return;
+
+    editor.storage.getAttachmentMetaData?.(hash).then((meta) => {
+      if (meta?.filename && meta.filename !== filename) {
+        updateAttributes({ filename: meta.filename });
+      }
+    });
+  }, [hash, filename]);
 
   useEffect(() => {
     return () => {
