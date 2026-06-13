@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { useRef, useState } from "react";
-import { View, ScrollView } from "react-native";
+import { View } from "react-native";
 import { strings } from "@notesnook/intl";
 import { db } from "../../../common/database";
 import { Button } from "../../ui/button";
@@ -32,6 +32,7 @@ import { AppFontSize } from "../../../utils/size";
 import { ToastManager, presentSheet } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { Pressable } from "../../ui/pressable";
+import { ScrollView } from "react-native-actions-sheet";
 
 const getExpiryOptions = () => [
   { label: strings.expiryOneDay(), value: 24 * 60 * 60 * 1000 },
