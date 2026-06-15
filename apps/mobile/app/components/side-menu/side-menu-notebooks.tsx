@@ -102,7 +102,7 @@ export const SideMenuNotebooks = () => {
         const allSelected = allNotebooks.every((notebook) => {
           return (
             useSideMenuNotebookSelectionStore.getState().selection[
-              notebook.id
+            notebook.id
             ] === "selected"
           );
         });
