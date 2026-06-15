@@ -30,9 +30,11 @@ import { xxhash64 } from "hash-wasm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { importNote } from "../../../utils/importer";
+import { PromptDialog } from "../../../dialogs/prompt";
 import Accordion from "../../accordion";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
+import { strings } from "@notesnook/intl";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -53,9 +55,6 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
   });
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
-  const [colornotePassword, setColornotePassword] = useState<
-    string | undefined
-  >(undefined);
   const logs = useRef<string[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -108,7 +107,15 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         setTotalNoteCount(++totalNotes);
       },
       options: {
-        colornote: { password: colornotePassword }
+        colornote: {
+          getPassword: async (filename: string) => {
+            const password = await PromptDialog.show({
+              title: strings.colorNotePasswordFor(filename),
+              description: strings.colorNotPasswordForDesc()
+            });
+            return password || undefined;
+          }
+        }
       }
     };
 
@@ -230,24 +237,6 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           </Text>
         </Text>
       </Flex>
-
-      {files.length > 0 && provider.id === "colornote" && (
-        <Flex
-          sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            mt: 1
-          }}
-        >
-          <Text variant="body">Colornote password</Text>
-          <Input
-            placeholder="Backup password e.g '0000'"
-            type={"text"}
-            sx={{ width: 200, padding: 2, height: 25 }}
-            onChange={(e) => setColornotePassword(e.target.value)}
-          />
-        </Flex>
-      )}
 
       {files.length > 0 ? (
         <Accordion

@@ -2790,5 +2790,9 @@ Continue without attachments?`,
     t`Permission required to save QR-Code to Gallery`,
   setupInboxKeys: () => t`Setup inbox keys`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
-  enterPgpPrivateKey: () => t`Enter your PGP private key`
+  enterPgpPrivateKey: () => t`Enter your PGP private key`,
+  colorNotePasswordFor: (filename: string) =>
+    t`Colornote password for ${filename}`,
+  colorNotPasswordForDesc: () =>
+    t`The password for decrypting the Colornote backup file.`
 };

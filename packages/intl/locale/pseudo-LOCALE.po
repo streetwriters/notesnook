@@ -1791,6 +1791,10 @@ msgstr ""
 msgid "Color title"
 msgstr ""
 
+#: src/strings.ts:2795
+msgid "Colornote password for {filename}"
+msgstr ""
+
 #: src/strings.ts:309
 msgid "colors"
 msgstr ""
@@ -6837,6 +6841,10 @@ msgstr ""
 
 #: src/strings.ts:2619
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+msgstr ""
+
+#: src/strings.ts:2797
+msgid "The password for decrypting the Colornote backup file."
 msgstr ""
 
 #: src/strings.ts:2094
