@@ -175,7 +175,9 @@ function Recovery(props: RecoveryProps) {
                 sx={{
                   display: "flex",
                   alignSelf: "center",
-                  alignItems: "center"
+                  alignItems: "center",
+                  wordWrap: "break-word",
+                  wordBreak: "break-all"
                 }}
                 variant={"body"}
               >
