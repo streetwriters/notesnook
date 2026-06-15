@@ -108,8 +108,8 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
               fontSize={AppFontSize.sm}
               style={{
                 marginTop: Spacing.LEVEL_2,
-                paddingVertical: Spacing.LEVEL_2,
-                paddingHorizontal: Spacing.LEVEL_2
+                paddingVertical: Spacing.LEVEL_3,
+                paddingHorizontal: Spacing.LEVEL_3
               }}
               type="accent"
             />

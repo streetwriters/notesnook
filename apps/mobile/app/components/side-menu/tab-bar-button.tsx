@@ -74,8 +74,7 @@ export const TabBarButton = ({
       testID={testID}
       onPress={handlePress}
       style={{
-        borderRadius: 10,
-        paddingVertical: 2,
+        borderRadius: 0,
         width: undefined,
         gap: label ? Spacing.LEVEL_1 : 0,
         backgroundColor: "transparent",
@@ -87,7 +86,7 @@ export const TabBarButton = ({
         style={[
           {
             backgroundColor: isActive ? colors.primary.shade : undefined,
-            borderRadius: Radius.XS,
+            borderRadius: Radius.XXS,
             padding: Spacing.LEVEL_1
           },
           animatedIconStyle

@@ -45,8 +45,10 @@ const SettingsIcon = () => {
       }}
       testID="sidemenu-settings-icon"
       style={{
-        width: 40,
-        height: 40
+        width: 32,
+        height: 32,
+        borderRadius: 100,
+        overflow: "hidden"
       }}
     >
       {userProfile?.profilePicture ? (
@@ -55,16 +57,15 @@ const SettingsIcon = () => {
             uri: userProfile?.profilePicture
           }}
           style={{
-            width: 25,
-            height: 25,
-            borderRadius: 100
+            width: "100%",
+            height: "100%"
           }}
         />
       ) : (
         <AppIcon
           name="cog-outline"
           color={colors.primary.icon}
-          size={AppFontSize.lg}
+          size={AppFontSize.xl}
         />
       )}
     </Pressable>
@@ -79,7 +80,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: DefaultAppStyles.GAP
+        paddingHorizontal: Spacing.LEVEL_3,
       }}
     >
       <View
@@ -91,10 +92,8 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
       >
         <View
           style={{
-            backgroundColor: "black",
             width: 26,
             height: 26,
-            borderRadius: Radius.XS,
             overflow: "hidden"
           }}
         >

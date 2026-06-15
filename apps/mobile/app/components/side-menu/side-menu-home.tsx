@@ -54,6 +54,9 @@ export function SideMenuHome() {
     (state) => state.user?.subscription?.plan
   );
   const user = useUserStore.getState().user;
+  const colorNotes = useMenuStore((state) => state.colorNotes);
+  const menuPins = useMenuStore((state) => state.menuPins);
+
 
   return (
     <View
@@ -89,7 +92,7 @@ export function SideMenuHome() {
                   alwaysBounceVertical={false}
                   data={MenuItemsList}
                   style={{
-                    width: "100%"
+                    width: "100%",
                   }}
                   disableDefaultDrag
                   showsVerticalScrollIndicator={false}
@@ -113,13 +116,29 @@ export function SideMenuHome() {
                     );
                   }}
                 />
+                {colorNotes.length > 0 && (
+                  <View style={{
+                    marginTop: Spacing.LEVEL_2,
+                    borderTopWidth: 1,
+                    borderTopColor: colors.primary.separator,
+                    marginBottom: Spacing.LEVEL_2
+                  }} />
+                )}
                 <ColorSection />
-                <PinnedSection />
+                {menuPins.length > 0 && (
+                  <View style={{
+                    marginTop: Spacing.LEVEL_2,
+                    borderTopWidth: 1,
+                    borderTopColor: colors.primary.separator,
+                    marginBottom: Spacing.LEVEL_2
+                  }} />
+                )}
+                {menuPins.length > 0 && <PinnedSection />}
               </>
             )}
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP,
-              marginTop: Spacing.LEVEL_3
+              paddingHorizontal: Spacing.LEVEL_3,
+              marginTop: Spacing.LEVEL_4
             }}
             nestedScrollEnabled={false}
           />
@@ -128,8 +147,8 @@ export function SideMenuHome() {
 
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL
+          paddingHorizontal: Spacing.LEVEL_3,
+          paddingVertical: Spacing.LEVEL_4
         }}
       >
         {dayjs().month() !== 11 ? (
@@ -137,7 +156,7 @@ export function SideMenuHome() {
             {(subscriptionType === SubscriptionPlan.FREE ||
               !subscriptionType ||
               !user) &&
-            !SettingsService.getProperty("serverUrls") ? (
+              !SettingsService.getProperty("serverUrls") ? (
               <Button
                 title={strings.upgradePlan()}
                 style={{

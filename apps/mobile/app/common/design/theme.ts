@@ -97,7 +97,7 @@ export const THEME_LIGHT: any = {
       selected: {
         accent: "#008836",
         accentForeground: "#ffffff",
-        paragraph: "#212121",
+        paragraph: "#181818",
         background: "#00883610",
         border: "#008836",
         heading: "#212121",

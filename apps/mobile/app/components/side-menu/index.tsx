@@ -191,8 +191,8 @@ export const SideMenu = React.memo(
         style={{
           flex: 1,
           backgroundColor: colors.primary.background,
-          paddingTop: insets.top,
-          paddingBottom: insets.bottom
+          paddingTop: Math.max(insets.top, Spacing.LEVEL_4),
+          paddingBottom: Math.max(insets.bottom, Spacing.LEVEL_4) + Spacing.LEVEL_1
         }}
       >
         <SimpleTabView
@@ -248,7 +248,7 @@ const TabBar = (props: SimpleTabBarProps) => {
           justifyContent: "space-between",
           backgroundColor: colors.primary.background,
           borderTopWidth: 1,
-          borderTopColor: colors.primary.border,
+          borderTopColor: colors.primary.separator,
           paddingTop: Spacing.LEVEL_2
         }}
       >
