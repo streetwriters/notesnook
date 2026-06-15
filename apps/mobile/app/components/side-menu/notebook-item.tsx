@@ -172,8 +172,6 @@ export const NotebookItem = ({
           paddingHorizontal: Spacing.LEVEL_1,
           marginBottom:
             expanded && item.hasChildren ? Spacing.LEVEL_0 : undefined
-          // borderLeftWidth: item.depth > 0 ? 1 : undefined,
-          // borderLeftColor: colors.primary.border
         }}
       >
         <View
@@ -202,7 +200,7 @@ export const NotebookItem = ({
 
           <Paragraph
             color={
-              isFocused ? colors.selected.paragraph : colors.primary.paragraph
+              isFocused ? colors.selected.paragraph : colors.secondary.heading
             }
             size={AppFontSize.sm}
           >
