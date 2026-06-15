@@ -29,6 +29,10 @@ import { getColorLinearShade } from "../../../../utils/colors";
 import { AppFontSize, defaultBorderRadius } from "../../../../utils/size";
 import { DefaultAppStyles } from "../../../../utils/styles";
 import { verifyUser } from "../../verify-user";
+import { Button } from "../../../../components/ui/button";
+import { Radius, Spacing } from "../../../../common/design/spacing";
+
+type PickerType = "menu" | "buttons";
 
 interface PickerOptions<T, B = any> {
   getValue: () => B;
@@ -41,6 +45,7 @@ interface PickerOptions<T, B = any> {
   isOptionAvailable: (item: T) => Promise<boolean>;
   requiresVerification?: () => boolean;
   onVerify?: () => Promise<boolean>;
+  pickerType?: PickerType;
 }
 
 export function SettingsPicker<T>({
@@ -53,7 +58,8 @@ export function SettingsPicker<T>({
   isFeatureAvailable,
   isOptionAvailable,
   requiresVerification = () => false,
-  onVerify
+  onVerify,
+  pickerType = "buttons"
 }: PickerOptions<T>) {
   const { colors, isDark } = useThemeColors("contextMenu");
   const menuRef = useRef<any>(null);
@@ -82,88 +88,123 @@ export function SettingsPicker<T>({
         width: "100%"
       }}
     >
-      <Menu
-        ref={menuRef}
-        animationDuration={200}
-        style={{
-          borderRadius: defaultBorderRadius,
-          backgroundColor: colors.primary.background,
-          width: width,
-          marginTop: 60,
-          overflow: "hidden",
-          borderWidth: 0.7,
-          borderColor: getColorLinearShade(
-            colors.primary.background,
-            0.07,
-            isDark
-          )
-        }}
-        onRequestClose={() => {
-          menuRef.current?.hide();
-        }}
-        anchor={
-          <Pressable
-            onPress={async () => {
-              if (
-                (onVerify && !(await onVerify())) ||
-                !(await isFeatureAvailable())
-              )
-                return;
-              menuRef.current?.show();
-            }}
-            type="secondary"
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              width: "100%",
-              justifyContent: "space-between",
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-              paddingHorizontal: DefaultAppStyles.GAP
-            }}
-          >
-            <Paragraph>{formatValue(currentValue)}</Paragraph>
-            <Icon
-              color={colors.primary.icon}
-              name="menu-down"
-              size={AppFontSize.md}
-            />
-          </Pressable>
-        }
-      >
-        <Dialog context="local" />
-
-        {options.map((item) => (
-          <MenuItem
-            key={getItemKey(item)}
-            onPress={async () => {
-              if (requiresVerification?.()) {
-                verifyUser("local", () => {
-                  onChange(item);
-                });
-              } else {
-                onChange(item);
+      {pickerType === "buttons" ? (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: Spacing.LEVEL_1
+          }}
+        >
+          {options.map((item) => (
+            <Button
+              key={`option-${item}`}
+              title={formatValue(item)}
+              fontSize={AppFontSize.sm}
+              fontFamily="REGULAR"
+              type={
+                compareValue(currentValue, item)
+                  ? "shade-plain"
+                  : "secondary-outline"
               }
-            }}
-            pressColor={colors.primary.hover}
-            style={{
-              backgroundColor: compareValue(currentValue, item)
-                ? colors.selected.background
-                : "transparent",
-              width: "100%",
-              maxWidth: width
-            }}
-            textStyle={{
-              fontSize: AppFontSize.sm,
-              fontFamily: "Inter-Regular",
-              color: compareValue(currentValue, item)
-                ? colors.primary.accent
-                : colors.primary.paragraph
-            }}
-          >
-            {formatValue(item)}
-          </MenuItem>
-        ))}
-      </Menu>
+              onPress={() => {
+                onChange(item);
+              }}
+              style={{
+                paddingVertical: Spacing.LEVEL_1,
+                paddingHorizontal: Spacing.LEVEL_1,
+                borderRadius: Radius.XS
+              }}
+            />
+          ))}
+        </View>
+      ) : null}
+
+      {pickerType === "menu" ? (
+        <Menu
+          ref={menuRef}
+          animationDuration={200}
+          style={{
+            borderRadius: defaultBorderRadius,
+            backgroundColor: colors.primary.background,
+            width: width,
+            marginTop: 60,
+            overflow: "hidden",
+            borderWidth: 0.7,
+            borderColor: getColorLinearShade(
+              colors.primary.background,
+              0.07,
+              isDark
+            )
+          }}
+          onRequestClose={() => {
+            menuRef.current?.hide();
+          }}
+          anchor={
+            <Pressable
+              onPress={async () => {
+                if (
+                  (onVerify && !(await onVerify())) ||
+                  !(await isFeatureAvailable())
+                )
+                  return;
+                menuRef.current?.show();
+              }}
+              type="secondary"
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
+                justifyContent: "space-between",
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+                paddingHorizontal: DefaultAppStyles.GAP
+              }}
+            >
+              <Paragraph>{formatValue(currentValue)}</Paragraph>
+              <Icon
+                color={colors.primary.icon}
+                name="menu-down"
+                size={AppFontSize.md}
+              />
+            </Pressable>
+          }
+        >
+          <Dialog context="local" />
+
+          {options.map((item) => (
+            <MenuItem
+              key={getItemKey(item)}
+              onPress={async () => {
+                if (requiresVerification?.()) {
+                  verifyUser("local", () => {
+                    onChange(item);
+                  });
+                } else {
+                  onChange(item);
+                }
+              }}
+              pressColor={colors.primary.hover}
+              style={{
+                backgroundColor: compareValue(currentValue, item)
+                  ? colors.selected.background
+                  : "transparent",
+                width: "100%",
+                maxWidth: width
+              }}
+              textStyle={{
+                fontSize: AppFontSize.sm,
+                fontFamily: "Inter-Regular",
+                color: compareValue(currentValue, item)
+                  ? colors.primary.accent
+                  : colors.primary.paragraph
+              }}
+            >
+              {formatValue(item)}
+            </MenuItem>
+          ))}
+        </Menu>
+      ) : null}
     </View>
   );
 }

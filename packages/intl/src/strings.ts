@@ -2874,5 +2874,11 @@ Continue without attachments?`,
   claimPromotion: {
     clickHere: () => t`Click here`,
     toClaim: () => t`to claim the promotion directly.`
-  }
+  },
+  navigation: () => t`Navigation`,
+  storageAndCleanup: () => t`Storage & cleanup`,
+  alwaysAsk: () => t`Always ask`,
+  updates: () => t`Updates`,
+  organization: () => t`Organization`,
+  miscellaneous: () => t`Miscellaneous`
 };

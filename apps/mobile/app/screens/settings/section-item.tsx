@@ -32,7 +32,6 @@ import AppIcon from "../../components/ui/AppIcon";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
 import { Pressable } from "../../components/ui/pressable";
-import Seperator from "../../components/ui/seperator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
@@ -195,77 +194,122 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           />
         </View>
       ) : null}
+
       <View
         style={{
-          flexDirection: "row",
-          flexShrink: 1,
-          flex: 1,
-          alignItems: "center",
-          gap: Spacing.LEVEL_2
+          flexDirection: "column",
+          width: "100%"
         }}
       >
         <View
           style={{
-            width: 32,
-            height: 32,
-            justifyContent: "center",
+            flexDirection: "row",
             alignItems: "center",
-            backgroundColor:
-              item.component === "colorpicker"
-                ? colors.primary.accent
-                : colors.secondary.background,
-            borderRadius: Radius.XS
+            gap: Spacing.LEVEL_2,
+            width: "100%"
           }}
         >
-          {!!item.icon && (
+          <View
+            style={{
+              width: 32,
+              height: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor:
+                item.component === "colorpicker"
+                  ? colors.primary.accent
+                  : colors.secondary.background,
+              borderRadius: Radius.XS
+            }}
+          >
+            {!!item.icon && (
+              <AppIcon
+                color={
+                  item.type === "danger"
+                    ? colors.error.accent
+                    : colors.primary.icon
+                }
+                iconFamily={item.iconFamily}
+                name={item.icon}
+                size={item.iconSize || 16}
+              />
+            )}
+          </View>
+
+          <View
+            style={{
+              paddingRight: item.type === "switch" ? Spacing.LEVEL_1 : 0,
+              gap: Spacing.LEVEL_1,
+              flexShrink: 1,
+              flex: 1
+            }}
+          >
+            {item.name ? (
+              <Heading
+                color={colors.primary.heading}
+                fontSize="MD"
+                lineHeight="100%"
+              >
+                {typeof item.name === "function"
+                  ? item.name(current)
+                  : item.name}
+              </Heading>
+            ) : null}
+            {!!item.description && (
+              <Paragraph
+                color={colors.primary.paragraph}
+                fontSize="SM"
+                lineHeight="100%"
+              >
+                {typeof item.description === "function"
+                  ? item.description(current)
+                  : item.description}
+              </Paragraph>
+            )}
+          </View>
+
+          {item.type === "switch" && !loading && (
             <AppIcon
+              name={isOn ? "toggle-on" : "toggle-off"}
+              iconFamily="notesnook"
+              size={16}
               color={
-                item.type === "danger"
-                  ? colors.error.accent
-                  : colors.primary.icon
+                isOn
+                  ? [colors.primary.accent, colors.primary.background]
+                  : [colors.disabled.icon, colors.primary.background]
               }
-              iconFamily={item.iconFamily}
-              name={item.icon}
-              size={item.iconSize || 16}
             />
           )}
+
+          {item.type === "screen" ? (
+            <AppIcon
+              name="chevron-right"
+              iconFamily="notesnook"
+              size={16}
+              color={colors.secondary.paragraph}
+            />
+          ) : null}
+
+          {loading ? (
+            <ActivityIndicator size={16} color={colors.primary.accent} />
+          ) : null}
         </View>
 
         <View
           style={{
-            flexShrink: 1,
-            paddingRight: item.type === "switch" ? Spacing.LEVEL_1 : 0,
-            flex: 1,
-            gap: Spacing.LEVEL_1
+            gap: Spacing.LEVEL_1,
+            paddingLeft: Spacing.LEVEL_2 + 32
           }}
         >
-          {item.name ? (
-            <Heading
-              color={colors.primary.heading}
-              fontSize="MD"
-              lineHeight="100%"
-            >
-              {typeof item.name === "function" ? item.name(current) : item.name}
-            </Heading>
-          ) : null}
-
-          {!!item.description && (
-            <Paragraph
-              color={colors.primary.paragraph}
-              fontSize="SM"
-              lineHeight="100%"
-            >
-              {typeof item.description === "function"
-                ? item.description(current)
-                : item.description}
-            </Paragraph>
-          )}
-
           {!!item.component && item.type !== "screen" && (
-            <>
-              <Seperator half />
+            <View
+              style={{
+                width: "100%",
+                paddingTop: Spacing.LEVEL_2
+              }}
+            >
               {components[item.component]}
-            </>
+            </View>
           )}
 
           {item.type === "input" && (
@@ -285,7 +329,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 item.inputProperties?.onSubmitEditing?.(text as any);
               }}
               containerStyle={{
-                marginTop: DefaultAppStyles.GAP_VERTICAL,
+                marginTop: Spacing.LEVEL_2,
                 backgroundColor: colors.secondary.background,
                 borderWidth: 0
               }}
@@ -308,7 +352,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: DefaultAppStyles.GAP_VERTICAL
+                marginTop: Spacing.LEVEL_2
               }}
             >
               <IconButton
@@ -407,32 +451,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           onToggle={onChangeSettings}
         />
       )} */}
-
-      {item.type === "switch" && !loading && (
-        <AppIcon
-          name={isOn ? "toggle-on" : "toggle-off"}
-          iconFamily="notesnook"
-          size={16}
-          color={
-            isOn
-              ? [colors.primary.accent, colors.primary.background]
-              : [colors.disabled.icon, colors.primary.background]
-          }
-        />
-      )}
-
-      {item.type === "screen" ? (
-        <AppIcon
-          name="chevron-right"
-          iconFamily="notesnook"
-          size={16}
-          color={colors.secondary.paragraph}
-        />
-      ) : null}
-
-      {loading ? (
-        <ActivityIndicator size={16} color={colors.primary.accent} />
-      ) : null}
     </Pressable>
   );
 };

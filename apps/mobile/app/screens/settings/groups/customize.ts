@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { Appearance } from "react-native";
 import { db } from "../../../common/database";
+import DateFormat from "../../../components/sheets/date-format";
+import TrashInterval from "../../../components/sheets/trash-interval";
 import SettingsService from "../../../services/settings";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { EDITOR_LINE_HEIGHT } from "../../../utils/constants";
@@ -102,81 +104,114 @@ export const customizeGroup: SettingSection = {
       description: strings.behaviorDesc(),
       sections: [
         {
-          id: "default-sidebar-view",
-          type: "component",
-          name: strings.defaultSidebarTab(),
-          description: strings.defaultSidebarTabDesc(),
-          component: "sidebar-tab-selector"
+          id: "navigation-group",
+          type: "group",
+          name: strings.navigation(),
+          sections: [
+            {
+              id: "default-sidebar-view",
+              type: "component",
+              name: strings.defaultSidebarTab(),
+              description: strings.defaultSidebarTabDesc(),
+              component: "sidebar-tab-selector",
+              icon: "table",
+              iconFamily: "notesnook"
+            }
+          ]
         },
         {
-          id: "date-format",
-          name: strings.dateFormat(),
-          description: strings.dateFormatDesc(),
-          type: "component",
-          component: "date-format-selector",
-          icon: "calendar-blank"
+          id: "date-time-group",
+          name: strings.dateAndTime(),
+          type: "group",
+          sections: [
+            {
+              id: "date-format",
+              name: strings.dateFormat(),
+              description: strings.dateFormatDesc(),
+              icon: "calendar",
+              iconFamily: "notesnook",
+              modifer: () => {
+                DateFormat.present();
+              }
+            },
+            {
+              id: "day-format",
+              name: strings.dayFormat(),
+              description: strings.dayFormatDesc(),
+              type: "component",
+              component: "day-format-selector",
+              icon: "calendar-check",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "week-format",
+              name: strings.weekFormat(),
+              description: strings.weekFormatDesc(),
+              type: "component",
+              component: "week-format-selector",
+              icon: "calendar-dots",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "time-format",
+              name: strings.timeFormat(),
+              description: strings.timeFormatDesc(),
+              type: "component",
+              component: "time-format-selector",
+              icon: "clock",
+              iconFamily: "notesnook"
+            }
+          ]
         },
         {
-          id: "day-format",
-          name: strings.dayFormat(),
-          description: strings.dayFormatDesc(),
-          type: "component",
-          component: "day-format-selector",
-          icon: "calendar-today"
-        },
-        {
-          id: "week-format",
-          name: strings.weekFormat(),
-          description: strings.weekFormatDesc(),
-          type: "component",
-          component: "week-format-selector",
-          icon: "calendar"
-        },
-        {
-          id: "time-format",
-          name: strings.timeFormat(),
-          description: strings.timeFormatDesc(),
-          type: "component",
-          component: "time-format-selector",
-          icon: "clock-digital"
-        },
-        {
-          id: "clear-trash-interval",
-          type: "component",
-          name: strings.clearTrashInterval(),
-          description: strings.clearTrashIntervalDesc(),
-          component: "trash-interval-selector",
-          icon: "delete"
-        },
-        {
-          id: "default-notebook",
-          name: strings.clearDefaultNotebook(),
-          description: strings.clearDefaultNotebookDesc(),
-          modifer: () => {
-            db.settings.setDefaultNotebook(undefined);
-            ToastManager.show({
-              heading: strings.defaultNotebookCleared(),
-              type: "success"
-            });
-          },
-          disabled: () => !db.settings.getDefaultNotebook(),
-          icon: "notebook-minus"
-        },
-        {
-          id: "disable-update-check",
-          type: "switch",
-          name: strings.autoUpdateCheck(),
-          description: strings.autoUpdateCheckDesc(),
-          property: "checkForUpdates",
-          icon: "update"
-        },
-        {
-          id: "image-compression",
-          type: "component",
-          name: strings.imageCompression(),
-          description: strings.imageCompressionDesc(),
-          component: "image-compression-picker",
-          icon: "image-area"
+          id: "miscellaneous-group",
+          type: "group",
+          name: strings.miscellaneous(),
+          sections: [
+            {
+              id: "clear-trash-interval",
+              name: strings.clearTrashInterval(),
+              description: strings.clearTrashIntervalDesc(),
+              icon: "trash",
+              iconFamily: "notesnook",
+              modifer: () => {
+                TrashInterval.present();
+              }
+            },
+            {
+              id: "image-compression",
+              type: "component",
+              name: strings.imageCompression(),
+              description: strings.imageCompressionDesc(),
+              component: "image-compression-picker",
+              icon: "arrows-clockwise",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "default-notebook",
+              name: strings.clearDefaultNotebook(),
+              description: strings.clearDefaultNotebookDesc(),
+              modifer: () => {
+                db.settings.setDefaultNotebook(undefined);
+                ToastManager.show({
+                  heading: strings.defaultNotebookCleared(),
+                  type: "success"
+                });
+              },
+              hidden: () => !db.settings.getDefaultNotebook(),
+              icon: "bookmark",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "disable-update-check",
+              type: "switch",
+              name: strings.autoUpdateCheck(),
+              description: strings.autoUpdateCheckDesc(),
+              property: "checkForUpdates",
+              icon: "arrow-clockwise",
+              iconFamily: "notesnook"
+            }
+          ]
         }
       ]
     },

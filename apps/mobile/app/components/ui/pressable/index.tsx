@@ -55,6 +55,7 @@ type ButtonTypes =
   | "transparent"
   | "accent"
   | "shade"
+  | "shade-plain"
   | "secondary"
   | "tertiary"
   | "selectedAccent"
@@ -65,7 +66,8 @@ type ButtonTypes =
   | "errorShade"
   | "warn"
   | "selected"
-  | "accent-outline";
+  | "accent-outline"
+  | "secondary-outline";
 
 type ButtonVariant = {
   primary: string;
@@ -99,6 +101,14 @@ const buttonTypes = (
   "plain-outline": {
     primary: "transparent",
     text: colors.secondary.buttonForeground,
+    selected: colors.primary.hover,
+    borderWidth: 1,
+    borderColor: colors.primary.border,
+    borderSelectedColor: colors.primary.border
+  },
+  "secondary-outline": {
+    primary: "transparent",
+    text: colors.secondary.paragraph,
     selected: colors.primary.hover,
     borderWidth: 1,
     borderColor: colors.primary.border,
@@ -218,6 +228,15 @@ const buttonTypes = (
   shade: {
     primary: colors.primary.shade,
     text: colors.primary.accent,
+    selected: colors.primary.accent,
+    colorOpacity: 0.12,
+    borderWidth: 0.8,
+    borderColor: getColorLinearShade(colors.primary.shade, 0.3, isDark),
+    borderSelectedColor: getColorLinearShade(colors.primary.shade, 0.3, isDark)
+  },
+  "shade-plain": {
+    primary: colors.primary.shade,
+    text: colors.primary.heading,
     selected: colors.primary.accent,
     colorOpacity: 0.12,
     borderWidth: 0.8,

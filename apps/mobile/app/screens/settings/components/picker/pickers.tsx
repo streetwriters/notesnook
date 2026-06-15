@@ -18,11 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  DATE_FORMATS,
   DayFormat,
   TIME_FORMATS,
   TimeFormat,
-  TrashCleanupInterval,
   WeekFormat
 } from "@notesnook/core";
 import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
@@ -128,56 +126,6 @@ export const SidebarTabPicker = createSettingsPicker({
     }
     return result.isAllowed;
   },
-  isOptionAvailable: async () => true
-});
-
-export const TrashIntervalPicker = createSettingsPicker({
-  getValue: () => db.settings.getTrashCleanupInterval(),
-  updateValue: async (item) => {
-    db.settings.setTrashCleanupInterval(item);
-  },
-  formatValue: (item) => {
-    return item === -1
-      ? strings.never()
-      : item === 1
-        ? strings.reminderRecurringMode.day()
-        : strings.days(item);
-  },
-  getItemKey: (item) => item.toString(),
-  options: [-1, 1, 7, 30, 365] as TrashCleanupInterval[],
-  compareValue: (current, item) => current === item,
-  isFeatureAvailable: async () => true,
-  isOptionAvailable: async () => {
-    const disableTrashFeature = await isFeatureAvailable("disableTrashCleanup");
-    if (!disableTrashFeature.isAllowed) {
-      ToastManager.show({
-        message: disableTrashFeature.error,
-        type: "info",
-        actionText: strings.upgrade(),
-        func: () => {
-          PaywallSheet.present(disableTrashFeature);
-        }
-      });
-    }
-    return disableTrashFeature.isAllowed;
-  }
-});
-
-export const DateFormatPicker = createSettingsPicker({
-  getValue: () => db.settings.getDateFormat(),
-  updateValue: async (item) => {
-    db.settings.setDateFormat(item);
-    useSettingStore.setState({
-      dateFormat: item
-    });
-  },
-  formatValue: (item) => {
-    return `${item} (${dayjs().format(item)})`;
-  },
-  getItemKey: (item) => item,
-  options: DATE_FORMATS,
-  compareValue: (current, item) => current === item,
-  isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true
 });
 
@@ -350,9 +298,9 @@ export const ImageCompressionPicker = createSettingsPicker({
   },
   formatValue: (item) => {
     return item === "ask-every-time"
-      ? strings.askEveryTime()
+      ? strings.alwaysAsk()
       : item === "enabled"
-        ? strings.enableRecommended()
+        ? strings.enable()
         : strings.disable();
   },
   getItemKey: (item) => item,

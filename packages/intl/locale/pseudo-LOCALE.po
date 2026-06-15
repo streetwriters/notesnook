@@ -879,6 +879,10 @@ msgstr ""
 msgid "Already have an account?"
 msgstr ""
 
+#: src/strings.ts:2828
+msgid "Always ask"
+msgstr ""
+
 #: src/strings.ts:2254
 msgid "Amount"
 msgstr ""
@@ -4276,6 +4280,10 @@ msgstr ""
 msgid "Minimize to system tray"
 msgstr ""
 
+#: src/strings.ts:2831
+msgid "Miscellaneous"
+msgstr ""
+
 #: src/strings.ts:689
 msgid "mo"
 msgstr ""
@@ -4390,6 +4398,10 @@ msgstr ""
 
 #: src/strings.ts:2476
 msgid "Navigate"
+msgstr ""
+
+#: src/strings.ts:2826
+msgid "Navigation"
 msgstr ""
 
 #: src/strings.ts:390
@@ -4893,6 +4905,10 @@ msgstr ""
 
 #: src/strings.ts:2253
 msgid "Order ID"
+msgstr ""
+
+#: src/strings.ts:2830
+msgid "Organization"
 msgstr ""
 
 #: src/strings.ts:758
@@ -6648,6 +6664,10 @@ msgstr ""
 msgid "Storage"
 msgstr ""
 
+#: src/strings.ts:2827
+msgid "Storage & cleanup"
+msgstr ""
+
 #: src/strings.ts:1571
 msgid "Streaming not supported"
 msgstr ""
@@ -7411,6 +7431,10 @@ msgstr ""
 
 #: src/strings.ts:1388
 msgid "Update now"
+msgstr ""
+
+#: src/strings.ts:2829
+msgid "Updates"
 msgstr ""
 
 #: src/strings.ts:2534

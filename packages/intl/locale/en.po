@@ -879,6 +879,10 @@ msgstr "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder
 msgid "Already have an account?"
 msgstr "Already have an account?"
 
+#: src/strings.ts:2828
+msgid "Always ask"
+msgstr "Always ask"
+
 #: src/strings.ts:2254
 msgid "Amount"
 msgstr "Amount"
@@ -4296,6 +4300,10 @@ msgstr "Minimize"
 msgid "Minimize to system tray"
 msgstr "Minimize to system tray"
 
+#: src/strings.ts:2831
+msgid "Miscellaneous"
+msgstr "Miscellaneous"
+
 #: src/strings.ts:689
 msgid "mo"
 msgstr "mo"
@@ -4411,6 +4419,10 @@ msgstr "Native high-performance encryption"
 #: src/strings.ts:2476
 msgid "Navigate"
 msgstr "Navigate"
+
+#: src/strings.ts:2826
+msgid "Navigation"
+msgstr "Navigation"
 
 #: src/strings.ts:390
 msgid "Never"
@@ -4920,6 +4932,10 @@ msgstr "Order by"
 #: src/strings.ts:2253
 msgid "Order ID"
 msgstr "Order ID"
+
+#: src/strings.ts:2830
+msgid "Organization"
+msgstr "Organization"
 
 #: src/strings.ts:758
 #: src/strings.ts:762
@@ -6682,6 +6698,10 @@ msgstr "Status"
 msgid "Storage"
 msgstr "Storage"
 
+#: src/strings.ts:2827
+msgid "Storage & cleanup"
+msgstr "Storage & cleanup"
+
 #: src/strings.ts:1571
 msgid "Streaming not supported"
 msgstr "Streaming not supported"
@@ -7453,6 +7473,10 @@ msgstr "Update available"
 #: src/strings.ts:1388
 msgid "Update now"
 msgstr "Update now"
+
+#: src/strings.ts:2829
+msgid "Updates"
+msgstr "Updates"
 
 #: src/strings.ts:2534
 msgid "Upgrade"

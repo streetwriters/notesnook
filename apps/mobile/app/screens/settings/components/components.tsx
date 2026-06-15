@@ -31,7 +31,6 @@ import {
   ApplockTimerPicker,
   BackupReminderPicker,
   BackupWithAttachmentsReminderPicker,
-  DateFormatPicker,
   DayFormatPicker,
   WeekFormatPicker,
   FontPicker,
@@ -39,7 +38,6 @@ import {
   ImageCompressionPicker,
   SidebarTabPicker,
   TimeFormatPicker,
-  TrashIntervalPicker,
   VaultLockTimerPicker
 } from "./picker/pickers";
 import { RestoreBackup } from "../restore-backup";
@@ -63,10 +61,8 @@ export const components: { [name: string]: ReactElement } = {
   "debug-logs": <DebugLogs />,
   "sound-picker": <SoundPicker />,
   licenses: <Licenses />,
-  "trash-interval-selector": <TrashIntervalPicker />,
   "font-selector": <FontPicker />,
   "title-format": <TitleFormat />,
-  "date-format-selector": <DateFormatPicker />,
   "time-format-selector": <TimeFormatPicker />,
   "day-format-selector": <DayFormatPicker />,
   "week-format-selector": <WeekFormatPicker />,
