@@ -86,18 +86,14 @@ export const PinnedSection = React.memo(
     return (
       <View
         style={{
-          flexGrow: 1,
-          borderTopWidth: 1,
-          borderTopColor: colors.primary.separator,
-          marginTop: DefaultAppStyles.GAP_SMALL,
-          paddingTop: DefaultAppStyles.GAP_SMALL
+          flexGrow: 1
         }}
       >
         <ReorderableList
           onListOrderChanged={(data) => {
             db.settings.setSideBarOrder("shortcuts", data);
           }}
-          onHiddenItemsChanged={() => {}}
+          onHiddenItemsChanged={() => { }}
           canHideItems={false}
           itemOrder={order}
           hiddenItems={[]}
