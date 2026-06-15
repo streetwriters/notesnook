@@ -1716,6 +1716,10 @@ msgstr ""
 msgid "Color title"
 msgstr ""
 
+#: src/strings.ts:2711
+msgid "Colornote password for {filename}"
+msgstr ""
+
 #: src/strings.ts:309
 msgid "colors"
 msgstr ""
@@ -2674,6 +2678,14 @@ msgstr ""
 
 #: src/strings.ts:1492
 msgid "Enter your new email"
+msgstr ""
+
+#: src/strings.ts:2709
+msgid "Enter your PGP private key"
+msgstr ""
+
+#: src/strings.ts:2708
+msgid "Enter your PGP public key"
 msgstr ""
 
 #: src/strings.ts:2099
@@ -6035,6 +6047,10 @@ msgstr ""
 msgid "Setup app lock pin"
 msgstr ""
 
+#: src/strings.ts:2707
+msgid "Setup inbox keys"
+msgstr ""
+
 #: src/strings.ts:681
 msgid "Setup secondary 2FA method"
 msgstr ""
@@ -6557,6 +6573,10 @@ msgstr ""
 
 #: src/strings.ts:2617
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+msgstr ""
+
+#: src/strings.ts:2713
+msgid "The password for decrypting the Colornote backup file."
 msgstr ""
 
 #: src/strings.ts:2092

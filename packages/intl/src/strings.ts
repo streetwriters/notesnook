@@ -2703,5 +2703,12 @@ Continue without attachments?`,
   copyLogs: () => t`Copy logs`,
   permissionRequiredToSaveQRCode: () =>
     t`Permission required to save QR-Code to Gallery`,
-  expiryDateRemoved: () => t`Expiry date removed`
+  expiryDateRemoved: () => t`Expiry date removed`,
+  setupInboxKeys: () => t`Setup inbox keys`,
+  enterPgpPublicKey: () => t`Enter your PGP public key`,
+  enterPgpPrivateKey: () => t`Enter your PGP private key`,
+  colorNotePasswordFor: (filename: string) =>
+    t`Colornote password for ${filename}`,
+  colorNotPasswordForDesc: () =>
+    t`The password for decrypting the Colornote backup file.`
 };
