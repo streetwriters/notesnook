@@ -64,7 +64,7 @@ interface InputProps extends TextInputProps {
   marginBottom?: number;
   button?: {
     icon: string;
-    iconFamily: IconProps["iconFamily"];
+    iconFamily?: IconProps["iconFamily"];
     color: ColorValue;
     onPress: () => void;
     testID?: string;

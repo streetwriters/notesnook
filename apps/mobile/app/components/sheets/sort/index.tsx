@@ -187,14 +187,6 @@ const Sort = ({
     });
   }, [data]);
 
-  const onPress = (item: { index: number; group: GroupHeader }) => {
-    scrollRef.current?.current?.scrollToIndex({
-      index: item.index,
-      animated: true
-    });
-    close();
-  };
-
   return (
     <View
       style={{

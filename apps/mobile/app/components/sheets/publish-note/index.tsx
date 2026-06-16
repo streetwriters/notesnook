@@ -198,7 +198,7 @@ const PublishNoteSheet = ({
   };
 
   const monographMetadata =
-    monographData.result ?? lastMonographDataResult.current;
+    monographData.result?.metadata ?? lastMonographDataResult.current;
 
   useEffect(() => {
     const prevState = previousAppState.current;
@@ -290,7 +290,7 @@ const PublishNoteSheet = ({
                   {strings.publishedAt()}:
                 </Heading>
                 <Paragraph size={AppFontSize.sm} numberOfLines={1}>
-                  {publishUrl}
+                  {monographMetadata?.publishUrl}
                 </Paragraph>
               </View>
 
@@ -432,7 +432,7 @@ const PublishNoteSheet = ({
           {isFeatureAvailable?.isAllowed &&
           !selfDestruct &&
           monographMetadata &&
-          monographMetadata?.totalViews > 0 ? (
+          monographMetadata?.analytics.totalViews > 0 ? (
             <View
               style={{
                 flexDirection: "row",
@@ -456,7 +456,9 @@ const PublishNoteSheet = ({
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
-                  <Paragraph>{monographMetadata?.totalViews || 0}</Paragraph>
+                  <Paragraph>
+                    {monographMetadata?.analytics.totalViews || 0}
+                  </Paragraph>
                 </View>
               </View>
             </View>
