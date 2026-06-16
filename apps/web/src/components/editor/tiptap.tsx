@@ -329,7 +329,8 @@ function TipTap(props: TipTapProps) {
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
-        if (preventSave || !editor.isEditable || !onChange) return;
+        if (ignoreEdit || preventSave || !editor.isEditable || !onChange)
+          return;
 
         if (!autoSave.current) return;
 
