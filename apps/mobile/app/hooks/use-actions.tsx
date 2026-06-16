@@ -69,7 +69,11 @@ import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eCloseSheet, eUpdateNoteInEditor } from "../utils/events";
+import {
+  eCloseSheet,
+  eMenuItemUpdate,
+  eUpdateNoteInEditor
+} from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
@@ -1190,12 +1194,22 @@ export const useActions = ({
       },
       {
         id: "expiry-date",
-        title: item.expiryDate ? strings.unsetExpiry() : strings.setExpiry(),
-        icon: item.expiryDate ? "bomb-off" : "bomb",
+        title: item.expiryDate?.value
+          ? strings.unsetExpiry()
+          : strings.setExpiry(),
+        icon: item.expiryDate?.value ? "bomb-off" : "bomb",
         locked: !features?.expiringNotes?.isAllowed,
         onPress: async () => {
-          if (item.expiryDate) {
+          if (item.expiryDate?.value) {
             await db.notes.setExpiryDate(null, item.id);
+            Navigation.queueRoutesForUpdate();
+            eSendEvent(eMenuItemUpdate);
+            ToastManager.show({
+              message: strings.expiryDateRemoved(),
+              type: "success",
+              context: "local"
+            });
+
             setItem((await db.notes.note(item.id)) as Item);
           } else {
             if (features && !features?.expiringNotes.isAllowed) {
@@ -1219,6 +1233,14 @@ export const useActions = ({
                   onConfirm={async (date) => {
                     close?.();
                     await db.notes.setExpiryDate(date.getTime(), item.id);
+                    Navigation.queueRoutesForUpdate();
+                    eSendEvent(eMenuItemUpdate);
+                    ToastManager.show({
+                      message: strings.expiryDateSet(),
+                      type: "success",
+                      context: "local"
+                    });
+
                     setItem((await db.notes.note(item.id)) as Item);
                   }}
                 />

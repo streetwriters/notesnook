@@ -773,7 +773,10 @@ export const useEditorEvents = (
         }
 
         case EditorEvents.unlock: {
-          eSendEvent(eUnlockWithPassword, editorMessage.value);
+          eSendEvent(eUnlockWithPassword, {
+            ...editorMessage.value,
+            resolverId: editorMessage.resolverId
+          });
           break;
         }
 

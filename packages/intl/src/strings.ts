@@ -2790,5 +2790,6 @@ Continue without attachments?`,
     t`Permission required to save QR-Code to Gallery`,
   setupInboxKeys: () => t`Setup inbox keys`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
-  enterPgpPrivateKey: () => t`Enter your PGP private key`
+  enterPgpPrivateKey: () => t`Enter your PGP private key`,
+  expiryDateRemoved: () => t`Expiry date removed`
 };

@@ -174,8 +174,10 @@ function Recovery(props: RecoveryProps) {
               <Text
                 sx={{
                   display: "flex",
-                  alignSelf: "end",
-                  alignItems: "center"
+                  alignSelf: "center",
+                  alignItems: "center",
+                  wordWrap: "break-word",
+                  wordBreak: "break-all"
                 }}
                 variant={"body"}
               >
@@ -187,7 +189,9 @@ function Recovery(props: RecoveryProps) {
                   mt: 0,
                   ml: 2,
                   alignSelf: "start",
-                  alignItems: "center"
+                  alignItems: "center",
+                  textWrap: "wrap",
+                  textAlign: "right"
                 }}
                 variant={"secondary"}
                 onClick={() => openURL("/login")}

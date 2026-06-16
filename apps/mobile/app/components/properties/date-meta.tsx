@@ -110,6 +110,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
           }}
           maximumDate={new Date((item as Note).dateEdited)}
           isDarkModeEnabled={isDark}
+          themeVariant={isDark ? "dark" : "light"}
           is24Hour={db.settings.getTimeFormat() === "24-hour"}
           date={new Date(dateCreated)}
         />

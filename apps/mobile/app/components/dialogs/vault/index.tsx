@@ -51,7 +51,10 @@ import DialogButtons from "../../dialog/dialog-buttons";
 import DialogHeader from "../../dialog/dialog-header";
 import { Toast } from "../../toast";
 import { Button } from "../../ui/button";
-import Input from "../../ui/input";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../ui/input/form-input";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
@@ -70,8 +73,6 @@ export const VaultDialog: React.FC = () => {
   // UI State
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [wrongPassword, setWrongPassword] = useState(false);
-  const [passwordsDontMatch, setPasswordsDontMatch] = useState(false);
   const [deleteAll, setDeleteAll] = useState(false);
   const [biometricUnlock, setBiometricUnlock] = useState(false);
   const [isBiometryAvailable, setIsBiometryAvailable] = useState(false);
@@ -100,15 +101,19 @@ export const VaultDialog: React.FC = () => {
     | undefined
   >(undefined);
 
+  // Form ref
+  const formRef = useRef(
+    createFormRef({
+      password: "",
+      confirmPassword: "",
+      newPassword: ""
+    })
+  );
+
   // Input refs
   const passInputRef = useRef<TextInput>(null);
   const confirmPassRef = useRef<TextInput>(null);
-  const changePassInputRef = useRef<TextInput>(null);
-
-  // Password refs
-  const passwordRef = useRef<string | null>(null);
-  const confirmPasswordRef = useRef<string | null>(null);
-  const newPasswordRef = useRef<string | null>(null);
+  const newPassInputRef = useRef<TextInput>(null);
 
   const close = useCallback(() => {
     if (loading) {
@@ -123,10 +128,11 @@ export const VaultDialog: React.FC = () => {
 
     Navigation.queueRoutesForUpdate();
 
-    // Reset password refs
-    passwordRef.current = null;
-    confirmPasswordRef.current = null;
-    newPasswordRef.current = null;
+    // Reset form values and errors
+    formRef.current.setValue("password", "");
+    formRef.current.setValue("confirmPassword", "");
+    formRef.current.setValue("newPassword", "");
+    formRef.current.clearErrors();
 
     // Reset refs
     requestTypeRef.current = null;
@@ -144,8 +150,6 @@ export const VaultDialog: React.FC = () => {
     // Reset UI state
     setVisible(false);
     setLoading(false);
-    setWrongPassword(false);
-    setPasswordsDontMatch(false);
     setDeleteAll(false);
     setBiometricUnlock(false);
     setIsBiometryAvailable(false);
@@ -155,9 +159,10 @@ export const VaultDialog: React.FC = () => {
   const deleteVault = useCallback(async () => {
     setLoading(true);
     try {
+      const { password } = formRef.current.getValues();
       let verified = true;
       if (await db.user.getUser()) {
-        verified = await db.user.verifyPassword(passwordRef.current || "");
+        verified = await db.user.verifyPassword(password);
       }
       if (verified) {
         let noteIds: string[] = [];
@@ -175,6 +180,7 @@ export const VaultDialog: React.FC = () => {
           noteIds = relations.map((item) => item.toId);
         }
         await db.vault.delete(deleteAll);
+        await BiometricService.resetCredentials();
 
         if (deleteAll) {
           noteIds.forEach((id) => {
@@ -195,11 +201,7 @@ export const VaultDialog: React.FC = () => {
         }, 100);
       } else {
         setLoading(false);
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
+        formRef.current.setError("password", strings.passwordIncorrect());
       }
     } catch (e) {
       console.error(e);
@@ -209,11 +211,12 @@ export const VaultDialog: React.FC = () => {
   const clearVault = useCallback(async () => {
     setLoading(true);
     try {
+      const { password } = formRef.current.getValues();
       const vault = await db.vaults.default();
       const relations = await db.relations.from(vault!, "note").get();
       const noteIds = relations.map((item) => item.toId);
 
-      await db.vault.clear(passwordRef.current || "");
+      await db.vault.clear(password);
 
       noteIds.forEach((id) => {
         eSendEvent(
@@ -233,11 +236,7 @@ export const VaultDialog: React.FC = () => {
         type: "success"
       });
     } catch (e) {
-      ToastManager.show({
-        heading: strings.passwordIncorrect(),
-        type: "error",
-        context: "local"
-      });
+      formRef.current.setError("password", strings.passwordIncorrect());
     }
     setLoading(false);
   }, [close]);
@@ -257,12 +256,7 @@ export const VaultDialog: React.FC = () => {
         });
         close();
       } catch (e) {
-        close();
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
+        formRef.current.setError("password", strings.passwordIncorrect());
         setLoading(false);
       }
     },
@@ -270,24 +264,14 @@ export const VaultDialog: React.FC = () => {
   );
 
   const takeErrorAction = useCallback(() => {
-    setWrongPassword(true);
+    formRef.current.setError("password", strings.passwordIncorrect());
     setVisible(true);
-    setTimeout(() => {
-      ToastManager.show({
-        heading: strings.passwordIncorrect(),
-        type: "error",
-        context: "local"
-      });
-    }, 500);
   }, []);
 
   const lockNote = useCallback(async () => {
-    if (!passwordRef.current || passwordRef.current.trim() === "") {
-      ToastManager.show({
-        heading: strings.passwordIncorrect(),
-        type: "error",
-        context: "local"
-      });
+    const { password } = formRef.current.getValues();
+    if (!password || password.trim() === "") {
+      formRef.current.setError("password", strings.passwordIncorrect());
       return;
     } else {
       await db.vault.add(noteRef.current!.id);
@@ -305,8 +289,9 @@ export const VaultDialog: React.FC = () => {
   }, [close]);
 
   const permanantUnlock = useCallback(() => {
+    const { password } = formRef.current.getValues();
     db.vault
-      .remove(noteRef.current!.id, passwordRef.current || "")
+      .remove(noteRef.current!.id, password)
       .then(async () => {
         ToastManager.show({
           heading: strings.noteUnlocked(),
@@ -315,7 +300,7 @@ export const VaultDialog: React.FC = () => {
         });
         eSendEvent(eUpdateNoteInEditor, noteRef.current, true);
         if (biometricUnlock && !isBiometryEnrolled) {
-          await enrollFingerprint(passwordRef.current || "");
+          await enrollFingerprint(password);
         }
         close();
       })
@@ -375,8 +360,9 @@ export const VaultDialog: React.FC = () => {
   );
 
   const deleteNote = useCallback(async () => {
+    const { password } = formRef.current.getValues();
     try {
-      await db.vault.remove(noteRef.current!.id, passwordRef.current || "");
+      await db.vault.remove(noteRef.current!.id, password);
       await deleteItems("note", [noteRef.current!.id]);
       close();
     } catch (e) {
@@ -385,16 +371,14 @@ export const VaultDialog: React.FC = () => {
   }, [close, takeErrorAction]);
 
   const openNote = useCallback(async () => {
+    const { password } = formRef.current.getValues();
     try {
-      if (!passwordRef.current) throw new Error("Invalid password");
+      if (!password) throw new Error("Invalid password");
 
-      const note = await db.vault.open(
-        noteRef.current!.id,
-        passwordRef.current
-      );
+      const note = await db.vault.open(noteRef.current!.id, password);
       if (!note) throw new Error("Failed to unlock note.");
       if (biometricUnlock && !isBiometryEnrolled) {
-        await enrollFingerprint(passwordRef.current || "");
+        await enrollFingerprint(password);
       }
 
       const requestType = requestTypeRef.current;
@@ -411,7 +395,6 @@ export const VaultDialog: React.FC = () => {
         requestType === VaultRequestType.CustomAction &&
         onUnlockRef.current
       ) {
-        const password = passwordRef.current;
         const unlock = onUnlockRef.current;
         close();
         await sleep(500);
@@ -433,12 +416,9 @@ export const VaultDialog: React.FC = () => {
   ]);
 
   const unlockNote = useCallback(async () => {
-    if (!passwordRef.current || passwordRef.current.trim() === "") {
-      ToastManager.show({
-        heading: strings.passwordIncorrect(),
-        type: "error",
-        context: "local"
-      });
+    const { password } = formRef.current.getValues();
+    if (!password || password.trim() === "") {
+      formRef.current.setError("password", strings.passwordIncorrect());
       return;
     }
     if (requestTypeRef.current === VaultRequestType.PermanentUnlock) {
@@ -449,10 +429,11 @@ export const VaultDialog: React.FC = () => {
   }, [permanantUnlock, openNote]);
 
   const createVault = useCallback(async () => {
-    await db.vault.create(passwordRef.current || "");
+    const { password } = formRef.current.getValues();
+    await db.vault.create(password);
 
     if (biometricUnlock) {
-      await enrollFingerprint(passwordRef.current || "");
+      await enrollFingerprint(password);
     }
     if (noteRef.current?.id) {
       await db.vault.add(noteRef.current.id);
@@ -504,36 +485,23 @@ export const VaultDialog: React.FC = () => {
 
     if (loading) return;
 
-    if (!passwordRef.current) {
-      ToastManager.show({
-        heading: strings.passwordNotEntered(),
-        type: "error",
-        context: "local"
-      });
-      return;
-    }
+    if (!formRef.current.validate()) return;
+
+    const { password, newPassword } = formRef.current.getValues();
 
     if (requestType === VaultRequestType.CreateVault) {
-      if (passwordRef.current !== confirmPasswordRef.current) {
-        ToastManager.show({
-          heading: strings.passwordNotMatched(),
-          type: "error",
-          context: "local"
-        });
-        setPasswordsDontMatch(true);
-        return;
-      }
-
       createVault();
     } else if (requestType === VaultRequestType.ChangePassword) {
       setLoading(true);
 
       db.vault
-        .changePassword(passwordRef.current, newPasswordRef.current || "")
-        .then(() => {
+        .changePassword(password, newPassword)
+        .then(async () => {
           setLoading(false);
           if (biometricUnlock) {
-            enrollFingerprint(newPasswordRef.current || "");
+            enrollFingerprint(newPassword);
+          } else {
+            await BiometricService.resetCredentials();
           }
           ToastManager.show({
             heading: strings.passwordUpdated(),
@@ -545,37 +513,23 @@ export const VaultDialog: React.FC = () => {
         .catch((e) => {
           setLoading(false);
           if (e.message === VAULT_ERRORS.wrongPassword) {
-            ToastManager.show({
-              heading: strings.passwordIncorrect(),
-              type: "error",
-              context: "local"
-            });
+            formRef.current.setError("password", strings.passwordIncorrect());
           } else {
-            ToastManager.error(e);
+            console.error(e);
           }
         });
     } else if (requestType === VaultRequestType.LockNote) {
-      if (!passwordRef.current || passwordRef.current.trim() === "") {
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
-        setWrongPassword(true);
-        return;
-      }
       db.vault
-        .unlock(passwordRef.current)
+        .unlock(password)
         .then(async (unlocked) => {
           if (unlocked) {
-            setWrongPassword(false);
             await lockNote();
           } else {
-            takeErrorAction();
+            formRef.current.setError("password", strings.passwordIncorrect());
           }
         })
         .catch((e) => {
-          takeErrorAction();
+          formRef.current.setError("password", strings.passwordIncorrect());
         });
     } else if (
       requestType === VaultRequestType.UnlockNote ||
@@ -586,22 +540,13 @@ export const VaultDialog: React.FC = () => {
       requestType === VaultRequestType.DeleteNote ||
       requestType === VaultRequestType.CustomAction
     ) {
-      if (!passwordRef.current || passwordRef.current.trim() === "") {
-        ToastManager.show({
-          heading: strings.passwordIncorrect(),
-          type: "error",
-          context: "local"
-        });
-        setWrongPassword(true);
-        return;
-      }
       if (noteLockedRef.current) {
         await unlockNote();
       } else {
         console.log("Error: Note should be locked for this operation");
       }
     } else if (requestType === VaultRequestType.EnableFingerprint) {
-      enrollFingerprint(passwordRef.current);
+      enrollFingerprint(password);
     } else if (requestType === VaultRequestType.ClearVault) {
       await clearVault();
     } else if (requestType === VaultRequestType.DeleteVault) {
@@ -616,7 +561,6 @@ export const VaultDialog: React.FC = () => {
     enrollFingerprint,
     unlockNote,
     lockNote,
-    takeErrorAction,
     clearVault,
     deleteVault
   ]);
@@ -632,7 +576,7 @@ export const VaultDialog: React.FC = () => {
         if (!credentials) throw new Error("Failed to get user credentials");
 
         if (credentials?.password) {
-          passwordRef.current = credentials.password;
+          formRef.current.setValue("password", credentials.password);
           onPress();
         } else {
           eSendEvent(eCloseActionSheet);
@@ -679,8 +623,6 @@ export const VaultDialog: React.FC = () => {
       setIsBiometryAvailable(available);
       setIsBiometryEnrolled(fingerprint);
       setBiometricUnlock(fingerprint);
-      setWrongPassword(false);
-      setPasswordsDontMatch(false);
       setDeleteAll(false);
       setLoading(false);
 
@@ -772,14 +714,14 @@ export const VaultDialog: React.FC = () => {
             isCustomAction) &&
           !isRevokeFingerprint ? (
             <>
-              <Input
+              <FormInput
+                name="password"
+                formRef={formRef}
                 fwdRef={passInputRef}
                 editable={!loading}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwd}
-                onChangeText={(value) => {
-                  passwordRef.current = value;
-                }}
+                autoComplete="password"
                 marginBottom={
                   !biometricUnlock ||
                   !isBiometryEnrolled ||
@@ -789,14 +731,13 @@ export const VaultDialog: React.FC = () => {
                     ? 0
                     : 10
                 }
-                onSubmit={() => {
+                onSubmitEditing={() => {
                   if (isChangePassword) {
-                    confirmPassRef.current?.focus();
+                    newPassInputRef.current?.focus();
                   } else {
                     onPress();
                   }
                 }}
-                autoComplete="password"
                 returnKeyLabel={
                   isChangePassword ? strings.next() : titleRef.current
                 }
@@ -807,6 +748,7 @@ export const VaultDialog: React.FC = () => {
                     ? strings.currentPassword()
                     : strings.password()
                 }
+                validators={[validators.required(strings.passwordRequired())]}
               />
 
               {!biometricUnlock ||
@@ -849,70 +791,67 @@ export const VaultDialog: React.FC = () => {
           {isChangePassword ? (
             <>
               <Seperator half />
-              <Input
-                fwdRef={confirmPassRef}
+              <FormInput
+                name="newPassword"
+                formRef={formRef}
+                fwdRef={newPassInputRef}
                 editable={!loading}
                 testID={notesnook.ids.dialogs.vault.changePwd}
                 autoCapitalize="none"
-                onChangeText={(value) => {
-                  newPasswordRef.current = value;
-                }}
                 autoComplete="password"
-                onSubmit={() => {
+                onSubmitEditing={() => {
                   onPress();
                 }}
                 returnKeyLabel="Change"
                 returnKeyType="done"
                 secureTextEntry
                 placeholder={strings.newPassword()}
+                validators={[validators.required(strings.passwordRequired())]}
               />
             </>
           ) : null}
 
           {isCreateVault ? (
             <View>
-              <Input
+              <FormInput
+                name="password"
+                formRef={formRef}
                 fwdRef={passInputRef}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwd}
-                onChangeText={(value) => {
-                  passwordRef.current = value;
-                }}
                 autoComplete="password"
                 returnKeyLabel={strings.next()}
                 returnKeyType="next"
                 secureTextEntry
-                onSubmit={() => {
+                onSubmitEditing={() => {
                   confirmPassRef.current?.focus();
                 }}
                 placeholder={strings.password()}
+                validators={[validators.required(strings.passwordRequired())]}
               />
 
-              <Input
+              <FormInput
+                name="confirmPassword"
+                formRef={formRef}
                 fwdRef={confirmPassRef}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwdAlt}
                 secureTextEntry
-                validationType="confirmPassword"
-                customValidator={() => passwordRef.current || ""}
-                errorMessage="Passwords do not match."
-                onErrorCheck={() => null}
-                marginBottom={0}
                 autoComplete="password"
                 returnKeyLabel="Create"
                 returnKeyType="done"
-                onChangeText={(value) => {
-                  confirmPasswordRef.current = value;
-                  if (value !== passwordRef.current) {
-                    setPasswordsDontMatch(true);
-                  } else {
-                    setPasswordsDontMatch(false);
-                  }
-                }}
-                onSubmit={() => {
+                marginBottom={0}
+                onSubmitEditing={() => {
                   onPress();
                 }}
                 placeholder={strings.confirmPassword()}
+                validators={[
+                  validators.required(strings.confirmPasswordRequired()),
+                  validators.matchField(
+                    "password",
+                    strings.passwordNotMatched()
+                  )
+                ]}
               />
             </View>
           ) : null}

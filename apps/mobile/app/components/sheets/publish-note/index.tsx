@@ -54,6 +54,7 @@ import FormInput, {
   createFormRef,
   validators
 } from "../../ui/input/form-input";
+import { useAppState } from "../../../../app/hooks/use-app-state";
 
 async function fetchMonographData(noteId: string) {
   const monographId = db.monographs.monograph(noteId);
@@ -86,20 +87,42 @@ const PublishNoteSheet = ({
   const [publishing, setPublishing] = useState(false);
   const pwdInput = useRef<TextInput>(null);
   const titleInput = useRef<TextInput>(null);
-  const monographData = useAsync(async () => {
-    return fetchMonographData(note?.id);
-  }, []);
+  const lastMonographDataResult = useRef<Awaited<
+    ReturnType<typeof db.monographs.metadata>
+  > | null>(null);
+  const monographData = useAsync(
+    async () => {
+      return fetchMonographData(note?.id);
+    },
+    [],
+    {
+      onSuccess: (r) => {
+        lastMonographDataResult.current = r.metadata;
+      }
+    }
+  );
   const monograph = monographData.result?.monograph;
   const metadata = monographData.result?.metadata;
   const publishUrl = metadata?.publishUrl || monograph?.publishUrl || "";
   const isPublished = db.monographs.monograph(note?.id);
+  const appState = useAppState();
+  const previousAppState = useRef(appState);
 
   const formRef = useRef(
     createFormRef({
-      title: monograph?.title || note.title || "",
+      title: note.title || "",
       password: ""
     })
   );
+
+  useEffect(() => {
+    if (!monographData.result) return;
+    const title = monograph?.title || note.title || "";
+    formRef.current.setValue("title", title);
+    setTimeout(() => {
+      titleInput.current?.setNativeProps({ text: title });
+    }, 50);
+  }, [monographData.result, monograph]);
 
   useEffect(() => {
     (async () => {
@@ -173,6 +196,29 @@ const PublishNoteSheet = ({
     }
     setPublishLoading(false);
   };
+
+  const monographMetadata =
+    monographData.result ?? lastMonographDataResult.current;
+
+  useEffect(() => {
+    const prevState = previousAppState.current;
+    previousAppState.current = appState;
+
+    if (
+      appState === "active" &&
+      prevState !== "active" &&
+      monograph?.id &&
+      !selfDestruct
+    ) {
+      monographData.execute();
+    }
+  }, [
+    appState,
+    monograph?.id,
+    selfDestruct,
+    isFeatureAvailable?.isAllowed,
+    monographData
+  ]);
 
   return (
     <View
@@ -383,7 +429,10 @@ const PublishNoteSheet = ({
             </View>
           </TouchableOpacity>
 
-          {isFeatureAvailable?.isAllowed ? (
+          {isFeatureAvailable?.isAllowed &&
+          !selfDestruct &&
+          monographMetadata &&
+          monographMetadata?.totalViews > 0 ? (
             <View
               style={{
                 flexDirection: "row",
@@ -407,10 +456,7 @@ const PublishNoteSheet = ({
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
-                  <Paragraph>
-                    {monographData?.result?.metadata?.analytics?.totalViews ||
-                      0}
-                  </Paragraph>
+                  <Paragraph>{monographMetadata?.totalViews || 0}</Paragraph>
                 </View>
               </View>
             </View>
