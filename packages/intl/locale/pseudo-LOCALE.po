@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: pseudo-LOCALE\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2423
 msgid " \"Notebook > Notes\""
@@ -1783,6 +1789,10 @@ msgstr ""
 
 #: src/strings.ts:1491
 msgid "Color title"
+msgstr ""
+
+#: src/strings.ts:2796
+msgid "Colornote password for {filename}"
 msgstr ""
 
 #: src/strings.ts:309
@@ -6835,6 +6845,10 @@ msgstr ""
 
 #: src/strings.ts:2619
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:2798
+msgid "The password for decrypting the Colornote backup file."
 msgstr ""
 
 #: src/strings.ts:2094
