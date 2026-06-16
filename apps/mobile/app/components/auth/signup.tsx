@@ -45,6 +45,7 @@ import { Spacing } from "../../common/design/spacing";
 import { SETTING_ACCOUNT_SVG } from "../../assets/images/assets";
 import { ProgressPills } from "../intro/progress-pills";
 import { sleep } from "../../utils/time";
+import { PASSWORD_PLACEHOLDER } from "../../utils/constants";
 
 const getSettingAccountSvg = (dark: boolean) => {
   if (dark) return SETTING_ACCOUNT_SVG;
@@ -220,7 +221,7 @@ export const Signup = ({
                   blurOnSubmit={false}
                   autoCorrect={false}
                   label={strings.password()}
-                  placeholder="•••••••••"
+                  placeholder={PASSWORD_PLACEHOLDER}
                   validators={[validators.required(strings.passwordRequired())]}
                   onSubmitEditing={() => {
                     if (formRef.current.validateField("password")) return;
@@ -242,7 +243,7 @@ export const Signup = ({
                   autoCorrect={false}
                   blurOnSubmit={false}
                   label={strings.confirmPassword()}
-                  placeholder="•••••••••"
+                  placeholder={PASSWORD_PLACEHOLDER}
                   validators={[
                     validators.required(strings.confirmPasswordRequired()),
                     validators.matchField(

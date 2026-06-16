@@ -48,6 +48,7 @@ import TwoFactorVerification from "./two-factor";
 import { useLogin } from "./use-login";
 import FormInput, { validators } from "../ui/input/form-input";
 import AppIcon from "../ui/AppIcon";
+import { PASSWORD_PLACEHOLDER } from "../../utils/constants";
 
 const LoginSteps = {
   emailAuth: 1,
@@ -209,7 +210,7 @@ export const Login = ({
                 autoComplete="password"
                 autoCapitalize="none"
                 autoCorrect={false}
-                placeholder={strings.password()}
+                placeholder={PASSWORD_PLACEHOLDER}
                 marginBottom={0}
                 editable={!loading}
                 validators={[validators.required(strings.passwordRequired())]}
