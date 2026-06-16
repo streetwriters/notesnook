@@ -55,6 +55,7 @@ import { TimeSince } from "../../ui/time-since";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import dayjs from "dayjs";
+import { ExpiryDate } from "../../ui/expiry-date";
 
 type NoteItemProps = {
   item: Note | BaseTrashItem<Note>;
@@ -256,6 +257,21 @@ const NoteItem = ({
                     textStyle={{
                       fontSize: AppFontSize.xxs
                     }}
+                    short
+                    iconSize={AppFontSize.xxs}
+                    style={{
+                      justifyContent: "flex-start",
+                      paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
+                      alignSelf: "flex-start"
+                    }}
+                  />
+                ) : null}
+
+                {item.expiryDate?.value ? (
+                  <ExpiryDate
+                    note={item as Note}
+                    color={color?.colorCode}
+                    textStyle={{ fontSize: AppFontSize.xxs }}
                     short
                     iconSize={AppFontSize.xxs}
                     style={{
