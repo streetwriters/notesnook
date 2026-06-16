@@ -177,6 +177,9 @@ const TagItem = (props: {
                 <Paragraph
                   size={AppFontSize.xxs}
                   color={colors.secondary.paragraph}
+                  style={{
+                    marginLeft: DefaultAppStyles.GAP_SMALL
+                  }}
                 >
                   {totalNotes.totalNotes(item?.id)}
                 </Paragraph>
