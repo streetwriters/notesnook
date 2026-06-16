@@ -2791,5 +2791,9 @@ Continue without attachments?`,
   setupInboxKeys: () => t`Setup inbox keys`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
   enterPgpPrivateKey: () => t`Enter your PGP private key`,
-  expiryDateRemoved: () => t`Expiry date removed`
+  expiryDateRemoved: () => t`Expiry date removed`,
+  colorNotePasswordFor: (filename: string) =>
+    t`Colornote password for ${filename}`,
+  colorNotPasswordForDesc: () =>
+    t`The password for decrypting the Colornote backup file.`
 };

@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2423
 msgid " \"Notebook > Notes\""
@@ -1795,6 +1801,10 @@ msgstr "Color scheme"
 #: src/strings.ts:1491
 msgid "Color title"
 msgstr "Color title"
+
+#: src/strings.ts:2796
+msgid "Colornote password for {filename}"
+msgstr "Colornote password for {filename}"
 
 #: src/strings.ts:309
 msgid "colors"
@@ -6877,6 +6887,10 @@ msgstr "The information above will be publically available at"
 #: src/strings.ts:2619
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
 msgstr "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
+
+#: src/strings.ts:2798
+msgid "The password for decrypting the Colornote backup file."
+msgstr "The password for decrypting the Colornote backup file."
 
 #: src/strings.ts:2094
 msgid "The password/pin for unlocking the app."

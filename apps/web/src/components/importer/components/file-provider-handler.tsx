@@ -30,9 +30,11 @@ import { xxhash64 } from "hash-wasm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { importNote } from "../../../utils/importer";
+import { PromptDialog } from "../../../dialogs/prompt";
 import Accordion from "../../accordion";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
+import { strings } from "@notesnook/intl";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -103,6 +105,17 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       },
       reporter: () => {
         setTotalNoteCount(++totalNotes);
+      },
+      options: {
+        colornote: {
+          getPassword: async (filename: string) => {
+            const password = await PromptDialog.show({
+              title: strings.colorNotePasswordFor(filename),
+              description: strings.colorNotPasswordForDesc()
+            });
+            return password || undefined;
+          }
+        }
       }
     };
 
@@ -224,6 +237,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           </Text>
         </Text>
       </Flex>
+
       {files.length > 0 ? (
         <Accordion
           isClosed
