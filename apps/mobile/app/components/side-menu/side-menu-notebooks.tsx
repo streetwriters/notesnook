@@ -44,6 +44,7 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { AddNotebookSheet } from "../sheets/add-notebook";
 import { Spacing } from "../../common/design/spacing";
 import AppIcon from "../ui/AppIcon";
+import { KeyboardAvoidingView, Platform } from "react-native";
 useSideMenuNotebookSelectionStore.setState({
   multiSelect: true
 });
@@ -130,12 +131,11 @@ export const SideMenuNotebooks = () => {
     },
     []
   );
-
   return (
-    <View
-      style={{
-        height: "100%"
-      }}
+    <KeyboardAvoidingView
+      style={{ height: "100%" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? 64 : 0}
     >
       {!notebooks || notebooks.placeholders.length === 0 ? (
         <SideMenuListEmpty
@@ -150,8 +150,10 @@ export const SideMenuNotebooks = () => {
       ) : (
         <>
           <LegendList
+            style={{ flex: 1 }}
             data={tree}
             bounces={false}
+            keyboardShouldPersistTaps="handled"
             bouncesZoom={false}
             overScrollMode="never"
             estimatedItemSize={30}
@@ -169,11 +171,7 @@ export const SideMenuNotebooks = () => {
             renderItem={renderItem}
           />
 
-          <View
-            style={{
-              paddingHorizontal: Spacing.LEVEL_3
-            }}
-          >
+          <View style={{ paddingHorizontal: Spacing.LEVEL_3 }}>
             <View
               style={{
                 width: "100%",
@@ -203,13 +201,12 @@ export const SideMenuNotebooks = () => {
                 }}
                 placeholderTextColor={colors.primary.placeholder}
               />
-
               <AppIcon name="funnel" size={14} iconFamily="notesnook" />
             </View>
           </View>
         </>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
