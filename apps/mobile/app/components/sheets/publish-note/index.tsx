@@ -54,6 +54,7 @@ import FormInput, {
   createFormRef,
   validators
 } from "../../ui/input/form-input";
+import { useAppState } from "../../../../app/hooks/use-app-state";
 
 async function fetchMonographData(noteId: string) {
   const monographId = db.monographs.monograph(noteId);
@@ -87,6 +88,8 @@ const PublishNoteSheet = ({
   const monograph = monographData.result?.monograph;
   const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
   const isPublished = db.monographs.monograph(note?.id);
+  const appState = useAppState();
+  const previousAppState = useRef(appState);
 
   const formRef = useRef(
     createFormRef({
@@ -167,6 +170,35 @@ const PublishNoteSheet = ({
     }
     setPublishLoading(false);
   };
+
+  const lastAnalyticsResult = useRef<Awaited<
+    ReturnType<typeof db.monographs.analytics>
+  > | null>(null);
+
+  const analytics = useAsync(async () => {
+    if (!isFeatureAvailable?.isAllowed || !monograph?.id || selfDestruct)
+      return null;
+    const result = await db.monographs.analytics(monograph.id);
+    if (result) lastAnalyticsResult.current = result;
+    return result;
+  }, [monograph?.id, isFeatureAvailable?.isAllowed, selfDestruct]);
+
+  const analyticsData = analytics.result ?? lastAnalyticsResult.current;
+
+  useEffect(() => {
+    const prevState = previousAppState.current;
+    previousAppState.current = appState;
+
+    if (
+      appState === "active" &&
+      prevState !== "active" &&
+      isFeatureAvailable?.isAllowed &&
+      monograph?.id &&
+      !selfDestruct
+    ) {
+      analytics.execute();
+    }
+  }, [appState, monograph?.id, selfDestruct, isFeatureAvailable?.isAllowed]);
 
   return (
     <View
@@ -377,7 +409,10 @@ const PublishNoteSheet = ({
             </View>
           </TouchableOpacity>
 
-          {isFeatureAvailable?.isAllowed ? (
+          {isFeatureAvailable?.isAllowed &&
+          !selfDestruct &&
+          analyticsData &&
+          analyticsData?.totalViews > 0 ? (
             <View
               style={{
                 flexDirection: "row",
@@ -401,6 +436,10 @@ const PublishNoteSheet = ({
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
+
+                  <Paragraph size={AppFontSize.sm}>
+                    {analyticsData?.totalViews}
+                  </Paragraph>
                 </View>
               </View>
             </View>
