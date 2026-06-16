@@ -59,60 +59,71 @@ export const productivityGroup: SettingSection = {
       description: strings.remindersDesc(),
       sections: [
         {
-          id: "enable-reminders",
-          property: "reminderNotifications",
-          type: "switch",
-          name: strings.reminderNotification(),
-          icon: "bell-outline",
-          onChange: (property) => {
-            if (property) {
-              Notifications.setupReminders();
-            } else {
-              Notifications.clearAllTriggers();
+          id: "reminder-notifications",
+          type: "group",
+          name: strings.notifications(),
+          sections: [
+            {
+              id: "enable-reminders",
+              property: "reminderNotifications",
+              type: "switch",
+              name: strings.reminderNotification(),
+              icon: "bell-outline",
+              onChange: (property) => {
+                if (property) {
+                  Notifications.setupReminders();
+                } else {
+                  Notifications.clearAllTriggers();
+                }
+              },
+              description: strings.reminderNotificationDesc()
+            },
+            {
+              id: "snooze-time",
+              property: "defaultSnoozeTime",
+              type: "input",
+              icon: "bell-z",
+              iconFamily: "notesnook",
+              name: strings.defaultSnoozeTime(),
+              description: strings.defaultSnoozeTimeDesc(),
+              inputProperties: {
+                keyboardType: "decimal-pad",
+                defaultValue: 5 + "",
+                placeholder: strings.setSnoozeTimePlaceholder(),
+                onSubmitEditing: () => {
+                  Notifications.setupReminders();
+                }
+              }
+            },
+            {
+              id: "reminder-sound-ios",
+              type: "screen",
+              name: strings.changeNotificationSound(),
+              description: strings.changeNotificationSoundDesc(),
+              component: "sound-picker",
+              icon: "speaker-high",
+              iconFamily: "notesnook",
+              hidden: () =>
+                Platform.OS === "ios" ||
+                (Platform.OS === "android" && Platform.Version > 25)
+            },
+            {
+              id: "reminder-sound-android",
+              name: strings.changeNotificationSound(),
+              description: strings.changeNotificationSoundDesc(),
+              icon: "speaker-high",
+              iconFamily: "notesnook",
+              hidden: () =>
+                Platform.OS === "ios" ||
+                (Platform.OS === "android" && Platform.Version < 26),
+              modifer: async () => {
+                const id = await Notifications.getChannelId("urgent");
+                if (id) {
+                  await notifee.openNotificationSettings(id);
+                }
+              }
             }
-          },
-          description: strings.reminderNotificationDesc()
-        },
-        {
-          id: "snooze-time",
-          property: "defaultSnoozeTime",
-          type: "input",
-          name: strings.defaultSnoozeTime(),
-          description: strings.defaultSnoozeTimeDesc(),
-          inputProperties: {
-            keyboardType: "decimal-pad",
-            defaultValue: 5 + "",
-            placeholder: strings.setSnoozeTimePlaceholder(),
-            onSubmitEditing: () => {
-              Notifications.setupReminders();
-            }
-          }
-        },
-        {
-          id: "reminder-sound-ios",
-          type: "screen",
-          name: strings.changeNotificationSound(),
-          description: strings.changeNotificationSoundDesc(),
-          component: "sound-picker",
-          icon: "bell-ring",
-          hidden: () =>
-            Platform.OS === "ios" ||
-            (Platform.OS === "android" && Platform.Version > 25)
-        },
-        {
-          id: "reminder-sound-android",
-          name: strings.changeNotificationSound(),
-          description: strings.changeNotificationSoundDesc(),
-          icon: "bell-ring",
-          hidden: () =>
-            Platform.OS === "ios" ||
-            (Platform.OS === "android" && Platform.Version < 26),
-          modifer: async () => {
-            const id = await Notifications.getChannelId("urgent");
-            if (id) {
-              await notifee.openNotificationSettings(id);
-            }
-          }
+          ]
         }
       ]
     }

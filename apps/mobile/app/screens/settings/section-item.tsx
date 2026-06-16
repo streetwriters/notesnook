@@ -26,6 +26,7 @@ import {
 } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
+import { FontFamily } from "../../common/design/font";
 import { Radius, Spacing } from "../../common/design/spacing";
 import PaywallSheet from "../../components/sheets/paywall";
 import AppIcon from "../../components/ui/AppIcon";
@@ -38,7 +39,6 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import { components } from "./components/components";
 import { RouteParams, SettingSection } from "./types";
 
@@ -65,6 +65,15 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   );
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
+  const [inputSelectorValue, setInputSelectorValue] = useState(() =>
+    item.property
+      ? `${
+          SettingsService.get()[
+            item.property as keyof SettingStore["settings"]
+          ] ?? ""
+        }`
+      : ""
+  );
 
   const onChangeSettings = async () => {
     if (isDisabled) return;
@@ -92,23 +101,36 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   };
 
   const updateInput = (value: any) => {
-    inputRef?.current?.setNativeProps({
-      text: value + ""
-    });
+    setInputSelectorValue(`${value}`);
   };
 
-  const onChangeInputSelectorValue = (text: any) => {
-    if (text) {
-      const min = item.minInputValue || 0;
-      const max = item.maxInputValue || 0;
-      const value = parseInt(text);
-      text =
-        Number.isNaN(value) || value < min ? min : value > max ? max : text;
-
-      SettingsService.set({
-        [item.property as string]: `${text}`
-      });
+  const onChangeInputSelectorValue = (text: any, commit?: boolean) => {
+    // While typing (commit === false) an empty field is allowed so the user can
+    // clear and retype; on commit (submit/blur) an empty field falls back to min.
+    if (!text && !commit) {
+      setInputSelectorValue("");
+      return;
     }
+
+    const min = item.minInputValue || 0;
+    const max = item.maxInputValue || 0;
+    const value = parseInt(text);
+
+    // Always cap the upper bound. Only enforce the lower bound on commit so that
+    // partial entries (e.g. typing "5" on the way to "50" when min is 8) aren't
+    // snapped up prematurely.
+    let clamped: number;
+    if (Number.isNaN(value)) clamped = min;
+    else if (value > max) clamped = max;
+    else if (commit && value < min) clamped = min;
+    else clamped = value;
+
+    // The input is controlled via `value`, so the clamped result is reflected in
+    // the field directly and can never display a value outside the range.
+    setInputSelectorValue(`${clamped}`);
+    SettingsService.set({
+      [item.property as string]: `${clamped}`
+    });
   };
 
   useEffect(() => {
@@ -141,8 +163,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingHorizontal: Spacing.LEVEL_2,
-        paddingVertical: Spacing.LEVEL_1,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingVertical: item.component && !item.name ? 0 : Spacing.LEVEL_1,
         borderRadius: Radius.S,
         backgroundColor: colors.primary.background,
         marginBottom: Spacing.LEVEL_0,
@@ -209,20 +231,20 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             width: "100%"
           }}
         >
-          <View
-            style={{
-              width: 32,
-              height: 32,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor:
-                item.component === "colorpicker"
-                  ? colors.primary.accent
-                  : colors.secondary.background,
-              borderRadius: Radius.XS
-            }}
-          >
-            {!!item.icon && (
+          {item.icon ? (
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor:
+                  item.component === "colorpicker"
+                    ? colors.primary.accent
+                    : colors.secondary.background,
+                borderRadius: Radius.XS
+              }}
+            >
               <AppIcon
                 color={
                   item.type === "danger"
@@ -233,8 +255,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 name={item.icon}
                 size={item.iconSize || 16}
               />
-            )}
-          </View>
+            </View>
+          ) : null}
 
           <View
             style={{
@@ -255,7 +277,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   : item.name}
               </Heading>
             ) : null}
-            {!!item.description && (
+            {item.description ? (
               <Paragraph
                 color={colors.primary.paragraph}
                 fontSize="SM"
@@ -265,7 +287,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                   ? item.description(current)
                   : item.description}
               </Paragraph>
-            )}
+            ) : null}
           </View>
 
           {item.type === "switch" && !loading && (
@@ -298,14 +320,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         <View
           style={{
             gap: Spacing.LEVEL_1,
-            paddingLeft: Spacing.LEVEL_2 + 32
+            paddingLeft: item.name ? Spacing.LEVEL_2 + 32 : undefined
           }}
         >
           {!!item.component && item.type !== "screen" && (
             <View
               style={{
                 width: "100%",
-                paddingTop: Spacing.LEVEL_2
+                paddingTop: item.icon ? Spacing.LEVEL_2 : 0
               }}
             >
               {components[item.component]}
@@ -333,6 +355,9 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 backgroundColor: colors.secondary.background,
                 borderWidth: 0
               }}
+              inputStyle={{
+                color: colors.primary.heading
+              }}
               fontSize={AppFontSize.sm}
               fwdRef={inputRef}
               onLayout={() => {
@@ -352,11 +377,111 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: Spacing.LEVEL_2
+                marginTop: Spacing.LEVEL_2,
+                backgroundColor: colors.secondary.background,
+                alignSelf: "flex-start",
+                padding: Spacing.LEVEL_2,
+                gap: Spacing.LEVEL_1,
+                borderRadius: Radius.S
               }}
             >
               <IconButton
+                name="plus"
+                color={colors.primary.icon}
+                iconFamily="notesnook"
+                onPress={() => {
+                  if (!checkIsFeatureAvailable()) return;
+                  if (isDisabled) return;
+                  const rawValue = SettingsService.get()[
+                    item.property as keyof SettingStore["settings"]
+                  ] as string;
+                  if (rawValue) {
+                    const currentValue = parseInt(rawValue);
+                    const max = item.maxInputValue || 0;
+                    if (currentValue >= max) return;
+                    const nextValue = currentValue + 1;
+                    SettingsService.set({
+                      [item.property as string]: nextValue
+                    });
+                    updateInput(nextValue);
+                  }
+                }}
+                size={16}
+                type="tertiary"
+                style={{
+                  borderRadius: Radius.XXS,
+                  padding: Spacing.LEVEL_0,
+                  width: undefined,
+                  height: undefined
+                }}
+              />
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                  gap: 1
+                }}
+              >
+                <Input
+                  {...item.inputProperties}
+                  onSubmit={(e) => {
+                    onChangeInputSelectorValue(e.nativeEvent.text, true);
+                    item.inputProperties?.onSubmitEditing?.(e);
+                  }}
+                  editable={!isDisabled}
+                  value={inputSelectorValue}
+                  onChangeText={(text) => {
+                    onChangeInputSelectorValue(text);
+                    item.inputProperties?.onSubmitEditing?.(text as any);
+                  }}
+                  keyboardType="decimal-pad"
+                  containerStyle={{
+                    borderWidth: 0,
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                    height: 25,
+                    borderRadius: 0,
+                    minWidth: 25
+                  }}
+                  fontSize={AppFontSize.sm}
+                  inputStyle={{
+                    textAlign: "center",
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    paddingLeft: 0,
+                    paddingRight: 0,
+                    fontFamily: FontFamily.SEMI_BOLD,
+                    color: colors.primary.heading
+                  }}
+                  wrapperStyle={{
+                    flexGrow: 0,
+                    marginBottom: 0,
+                    paddingLeft: 0,
+                    paddingRight: 0
+                  }}
+                  buttons={
+                    <>
+                      {item.inputBadgeValue ? (
+                        <Paragraph
+                          fontSize="XXS"
+                          style={{
+                            marginLeft: 1,
+                            marginTop: 2,
+                            color: colors.primary.heading
+                          }}
+                          color={colors.primary.paragraph}
+                        >
+                          px
+                        </Paragraph>
+                      ) : null}
+                    </>
+                  }
+                />
+              </View>
+
+              <IconButton
                 name="minus"
+                iconFamily="notesnook"
                 color={colors.primary.icon}
                 onPress={() => {
                   if (!checkIsFeatureAvailable()) return;
@@ -375,62 +500,14 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                     updateInput(nextValue);
                   }
                 }}
-                size={AppFontSize.xl}
-              />
-              <Input
-                {...item.inputProperties}
-                onSubmit={(e) => {
-                  onChangeInputSelectorValue(e.nativeEvent.text);
-                  item.inputProperties?.onSubmitEditing?.(e);
+                size={16}
+                type="tertiary"
+                style={{
+                  borderRadius: Radius.XXS,
+                  padding: Spacing.LEVEL_0,
+                  width: undefined,
+                  height: undefined
                 }}
-                editable={!isDisabled}
-                onChangeText={(text) => {
-                  onChangeInputSelectorValue(text);
-                  item.inputProperties?.onSubmitEditing?.(text as any);
-                }}
-                keyboardType="decimal-pad"
-                containerStyle={{
-                  width: 60
-                }}
-                inputStyle={{
-                  width: 60,
-                  textAlign: "center"
-                }}
-                wrapperStyle={{
-                  maxWidth: 60,
-                  flexGrow: 0,
-                  marginBottom: 0,
-                  marginHorizontal: DefaultAppStyles.GAP_SMALL
-                }}
-                fwdRef={inputRef}
-                onLayout={() => {
-                  if (item.property) {
-                    updateInput(SettingsService.get()[item.property]);
-                  }
-                }}
-                defaultValue={item.inputProperties?.defaultValue}
-              />
-              <IconButton
-                name="plus"
-                color={colors.primary.icon}
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
-                    const max = item.maxInputValue || 0;
-                    if (currentValue >= max) return;
-                    const nextValue = currentValue + 1;
-                    SettingsService.set({
-                      [item.property as string]: nextValue
-                    });
-                    updateInput(nextValue);
-                  }
-                }}
-                size={AppFontSize.xl}
               />
             </View>
           )}

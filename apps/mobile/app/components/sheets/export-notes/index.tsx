@@ -19,18 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { Fragment, useState } from "react";
-import {
-  ActivityIndicator,
-  Linking,
-  Platform,
-  StyleSheet,
-  View
-} from "react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, Linking, Platform, View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { db } from "../../../common/database";
 import { requestInAppReview } from "../../../services/app-review";
 import {
@@ -40,16 +34,11 @@ import {
 } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import { useSettingStore } from "../../../stores/use-setting-store";
-import { getElevationStyle } from "../../../utils/elevation";
-import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
-import DialogHeader from "../../dialog/dialog-header";
+import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
-import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
-import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
@@ -117,7 +106,7 @@ const ExportNotesSheet = ({
       func: async () => {
         await exportNoteAs("pdf");
       },
-      icon: "file-pdf-box",
+      icon: "file-pdf",
       id: notesnook.ids.dialogs.export.pdf
     },
     {
@@ -125,7 +114,7 @@ const ExportNotesSheet = ({
       func: async () => {
         await exportNoteAs("md");
       },
-      icon: "language-markdown",
+      icon: "markdown",
       id: notesnook.ids.dialogs.export.md
     },
     {
@@ -133,7 +122,7 @@ const ExportNotesSheet = ({
       func: async () => {
         await exportNoteAs("md-frontmatter");
       },
-      icon: "language-markdown",
+      icon: "markdown",
       id: notesnook.ids.dialogs.export.md
     },
     {
@@ -141,7 +130,7 @@ const ExportNotesSheet = ({
       func: async () => {
         await exportNoteAs("txt");
       },
-      icon: "card-text",
+      icon: "file-text",
       id: notesnook.ids.dialogs.export.text
     },
     {
@@ -149,215 +138,219 @@ const ExportNotesSheet = ({
       func: async () => {
         await exportNoteAs("html");
       },
-      icon: "language-html5",
+      icon: "file-html",
       id: notesnook.ids.dialogs.export.html
     }
   ];
 
   return (
-    <View>
+    <View
+      style={{
+        width: "100%",
+        backgroundColor: colors.primary.background,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_2,
+        gap: Spacing.LEVEL_3
+      }}
+    >
+      <Dialog context="export-notes" />
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "flex-start",
+          gap: Spacing.LEVEL_1
+        }}
+      >
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: Radius.XS,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: colors.secondary.background
+          }}
+        >
+          <AppIcon
+            name="export"
+            iconFamily="notesnook"
+            size={16}
+            color={colors.primary.icon}
+          />
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            gap: Spacing.LEVEL_1
+          }}
+        >
+          <Heading fontSize="XL" lineHeight="100%">
+            {complete
+              ? strings.exportSuccessHeading(ids.length)
+              : strings.exportNotes(ids.length)}
+          </Heading>
+          <Paragraph>
+            {complete
+              ? strings.exportSuccessDesc(result?.fileName as string)
+              : strings.exportAllNotesDesc()}
+          </Paragraph>
+        </View>
+      </View>
+
+      <View
+        style={{
+          height: 1,
+          backgroundColor: colors.primary.border
+        }}
+      />
+
       {!complete && !exporting ? (
         <>
           <View
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP
+              gap: Spacing.LEVEL_0
             }}
           >
-            <DialogHeader
-              icon="export"
-              title={strings.exportNotes(ids.length)}
-            />
-          </View>
-
-          <Seperator half />
-        </>
-      ) : null}
-
-      <Dialog context="export-notes" />
-
-      <View style={styles.buttonContainer}>
-        {!exporting && !complete ? (
-          actions.map((item) => (
-            <Fragment key={item.title}>
-              <Seperator half />
+            {actions.map((item) => (
               <Pressable
+                key={item.title}
+                testID={item.id}
+                type="transparent"
                 onPress={item.func}
                 style={{
                   width: "100%",
-                  alignItems: "center",
                   flexDirection: "row",
-                  paddingRight: 12,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+                  alignItems: "center",
                   justifyContent: "flex-start",
-                  borderRadius: 0,
-                  paddingHorizontal: DefaultAppStyles.GAP
+                  gap: Spacing.LEVEL_2,
+                  paddingVertical: Spacing.LEVEL_1,
+                  borderRadius: Radius.S
                 }}
               >
                 <View
                   style={{
-                    backgroundColor: colors.primary.shade,
-                    borderRadius: defaultBorderRadius,
-                    height: 60,
-                    width: 60,
+                    width: 32,
+                    height: 32,
+                    borderRadius: Radius.XS,
+                    alignItems: "center",
                     justifyContent: "center",
-                    alignItems: "center"
+                    backgroundColor: colors.secondary.background
                   }}
                 >
-                  <Icon
+                  <AppIcon
                     name={item.icon}
+                    iconFamily="notesnook"
+                    size={16}
                     color={colors.primary.icon}
-                    size={AppFontSize.xxxl + 10}
                   />
                 </View>
-                <View
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  <Heading style={{ marginLeft: 10 }} size={AppFontSize.md}>
-                    {item.title}
-                  </Heading>
-                  {/* <Paragraph
-                    style={{ marginLeft: 10 }}
-                    size={SIZE.sm}
-                    color={colors.secondary.paragraph}
-                  >
-                    {item.desc}
-                  </Paragraph> */}
-                </View>
-              </Pressable>
-            </Fragment>
-          ))
-        ) : (
-          <View
-            style={{
-              minHeight: 150,
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            {!complete ? (
-              <>
-                <ActivityIndicator />
-                <Paragraph>
-                  {strings.exportingNotes(status) +
-                    "..." +
-                    " " +
-                    strings.pleaseWait()}
-                </Paragraph>
-              </>
-            ) : (
-              <>
-                <IconButton
-                  name="export"
-                  color={colors.primary.icon}
-                  size={50}
-                  style={{
-                    width: 70,
-                    height: 70
-                  }}
-                />
-                <Heading
-                  style={{
-                    textAlign: "center",
-                    marginTop: DefaultAppStyles.GAP_VERTICAL
-                  }}
-                  color={colors.secondary.heading}
-                >
-                  {strings.exportSuccessHeading(ids.length)}
+                <Heading fontSize="MD" lineHeight="100%">
+                  {item.title}
                 </Heading>
-                <Paragraph
-                  style={{
-                    textAlign: "center"
-                  }}
-                >
-                  {strings.exportSuccessDesc(result?.fileName as string)}
-                </Paragraph>
-                <Button
-                  title={
-                    Platform.OS === "android"
-                      ? strings.openFileLocation()
-                      : strings.open()
-                  }
-                  type="accent"
-                  width={250}
-                  style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL
-                  }}
-                  onPress={async () => {
-                    if (!result?.filePath) return;
-                    close?.();
-                    if (Platform.OS === "android") {
-                      Linking.openURL(result.fileDir).catch((e) => {
-                        ToastManager.error(e as Error);
-                      });
-                    } else {
-                      await sleep(500);
-                      FileViewer.open(result?.filePath, {
-                        showOpenWithDialog: true,
-                        showAppsSuggestions: true
-                      }).catch((e) => {
-                        ToastManager.show({
-                          heading: strings.noApplicationFound(result.name),
-                          type: "success",
-                          context: "local"
-                        });
-                      });
-                    }
-                  }}
-                />
-                <Button
-                  title={strings.share()}
-                  type="secondaryAccented"
-                  width={250}
-                  style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL
-                  }}
-                  onPress={async () => {
-                    if (!result) return;
-                    close?.();
-                    useSettingStore
-                      .getState()
-                      .setAppDidEnterBackgroundForAction(true);
-                    if (Platform.OS === "ios") {
-                      await sleep(500);
-                      Share.open({
-                        url: result?.fileDir + result.fileName
-                      }).catch(() => {
-                        /* empty */
-                      });
-                    } else {
-                      FileViewer.open(result.filePath, {
-                        showOpenWithDialog: true,
-                        showAppsSuggestions: true,
-                        shareFile: true
-                      } as any).catch(() => {
-                        /* empty */
-                      });
-                    }
-                  }}
-                />
-                <Button
-                  title={strings.exportAgain()}
-                  type="secondaryAccented"
-                  width={250}
-                  style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL
-                  }}
-                  onPress={async () => {
-                    setComplete(false);
-                    setResult(undefined);
-                    setExporting(false);
-                  }}
-                />
-              </>
-            )}
+              </Pressable>
+            ))}
           </View>
-        )}
-      </View>
+        </>
+      ) : (
+        <View
+          style={{
+            minHeight: 150,
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            paddingVertical: Spacing.LEVEL_3,
+            gap: Spacing.LEVEL_2
+          }}
+        >
+          {!complete ? (
+            <>
+              <ActivityIndicator color={colors.primary.accent} />
+              <Paragraph>
+                {strings.exportingNotes(status) +
+                  "..." +
+                  " " +
+                  strings.pleaseWait()}
+              </Paragraph>
+            </>
+          ) : (
+            <>
+              <Button
+                title={
+                  Platform.OS === "android"
+                    ? strings.openFileLocation()
+                    : strings.open()
+                }
+                type="accent"
+                width={"100%"}
+                onPress={async () => {
+                  if (!result?.filePath) return;
+                  close?.();
+                  if (Platform.OS === "android") {
+                    Linking.openURL(result.fileDir).catch((e) => {
+                      ToastManager.error(e as Error);
+                    });
+                  } else {
+                    await sleep(500);
+                    FileViewer.open(result?.filePath, {
+                      showOpenWithDialog: true,
+                      showAppsSuggestions: true
+                    }).catch(() => {
+                      ToastManager.show({
+                        heading: strings.noApplicationFound(result.name),
+                        type: "success",
+                        context: "local"
+                      });
+                    });
+                  }
+                }}
+              />
+              <Button
+                title={strings.share()}
+                type="secondary-simple"
+                width={"100%"}
+                onPress={async () => {
+                  if (!result) return;
+                  close?.();
+                  useSettingStore
+                    .getState()
+                    .setAppDidEnterBackgroundForAction(true);
+                  if (Platform.OS === "ios") {
+                    await sleep(500);
+                    Share.open({
+                      url: result?.fileDir + result.fileName
+                    }).catch(() => {
+                      /* empty */
+                    });
+                  } else {
+                    FileViewer.open(result.filePath, {
+                      showOpenWithDialog: true,
+                      showAppsSuggestions: true,
+                      shareFile: true
+                    } as any).catch(() => {
+                      /* empty */
+                    });
+                  }
+                }}
+              />
+              <Button
+                title={strings.exportAgain()}
+                type="plain-outline"
+                width={"100%"}
+                onPress={async () => {
+                  setComplete(false);
+                  setResult(undefined);
+                  setExporting(false);
+                }}
+              />
+            </>
+          )}
+        </View>
+      )}
     </View>
   );
 };
@@ -371,39 +364,5 @@ ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
     keyboardHandlerDisabled: true
   });
 };
-
-const styles = StyleSheet.create({
-  container: {
-    ...getElevationStyle(5),
-    borderRadius: defaultBorderRadius,
-    paddingVertical: DefaultAppStyles.GAP_VERTICAL
-  },
-  buttonContainer: {
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  button: {
-    paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-    paddingHorizontal: DefaultAppStyles.GAP,
-    marginTop: DefaultAppStyles.GAP_VERTICAL,
-    borderRadius: defaultBorderRadius,
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    flexDirection: "row"
-  },
-  buttonText: {
-    //fontFamily: "sans-serif",
-    color: "white",
-    fontSize: AppFontSize.sm,
-    marginLeft: 5
-  },
-  overlay: {
-    width: "100%",
-    height: "100%",
-    position: "absolute"
-  }
-});
 
 export default ExportNotesSheet;

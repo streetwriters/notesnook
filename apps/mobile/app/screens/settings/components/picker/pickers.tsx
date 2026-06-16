@@ -200,7 +200,7 @@ export const BackupReminderPicker = createSettingsPicker<
     return item === "useroff" ? strings.off() : strings[item]?.();
   },
   getItemKey: (item) => item,
-  options: ["useroff", "daily", "weekly", "monthly"],
+  options: ["daily", "weekly", "monthly", "useroff"],
   compareValue: (current, item) => current === item,
   requiresVerification: () => {
     return (
@@ -224,7 +224,7 @@ export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
       : item.slice(0, 1).toUpperCase() + item.slice(1);
   },
   getItemKey: (item) => item,
-  options: ["never", "weekly", "monthly"] as Settings["fullBackupReminder"][],
+  options: ["weekly", "monthly", "never"] as Settings["fullBackupReminder"][],
   compareValue: (current, item) => current === item,
   requiresVerification: () => {
     return (
@@ -256,37 +256,6 @@ export const ApplockTimerPicker = createSettingsPicker({
   onVerify: () => {
     return verifyUserWithApplock();
   },
-  isFeatureAvailable: async () => true,
-  isOptionAvailable: async () => true
-});
-
-export const VaultLockTimerPicker = createSettingsPicker({
-  getValue: () => useSettingStore.getState().vaultLockAfter,
-  updateValue: async (item) => {
-    await db.settings.setVaultLockAfter(item);
-    useSettingStore.setState({
-      vaultLockAfter: item
-    });
-  },
-  formatValue: (item) => {
-    return item === -1
-      ? strings.never()
-      : item < 1000 * 60 * 60
-        ? strings.minutes(item / (1000 * 60))
-        : strings.hours(item / (1000 * 60 * 60));
-  },
-  getItemKey: (item) => item.toString(),
-  options: [
-    1000 * 60 * 1,
-    1000 * 60 * 5,
-    1000 * 60 * 10,
-    1000 * 60 * 15,
-    1000 * 60 * 30,
-    1000 * 60 * 45,
-    1000 * 60 * 60,
-    -1
-  ],
-  compareValue: (current, item) => current === item,
   isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true
 });

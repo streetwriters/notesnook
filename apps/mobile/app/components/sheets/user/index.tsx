@@ -107,10 +107,17 @@ export const UserSheet = () => {
         ToastManager.show({
           heading: strings.emailCopied(),
           type: "success",
-          icon: "content-copy"
+          icon: "content-copy",
+          context: "local"
         });
         setTimeout(() => {
-          Linking.openURL("mailto:support@streetwriters.co");
+          Linking.openURL("mailto:support@streetwriters.co").catch((e) => {
+            ToastManager.show({
+              message: "Could not open email app",
+              type: "error",
+              context: "local"
+            });
+          });
         }, 1000);
       }
     },

@@ -22,9 +22,8 @@ import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { LegacyBackupFile } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { keepLocalCopy, pick } from "@react-native-documents/picker";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 import RNFetchBlob, { ReactNativeBlobUtilStat } from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { unzip } from "react-native-zip-archive";
@@ -39,16 +38,15 @@ import {
   updateProgress
 } from "../../../components/dialogs/progress";
 import { Button } from "../../../components/ui/button";
-import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { SectionItem } from "../../../screens/settings/section-item";
 import { ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import SettingsService from "../../../services/settings";
 import { refreshAllStores } from "../../../stores/create-db-collection-store";
-import { useUserStore } from "../../../stores/use-user-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
+import Heading from "../../../components/ui/typography/heading";
+import { Spacing } from "../../../common/design/spacing";
 
 type PasswordOrKey = { password?: string; encryptionKey?: string };
 
@@ -84,7 +82,7 @@ const withPassword = () => {
   });
 };
 
-const restoreBackup = async (options: {
+export const restoreBackup = async (options: {
   uri: string;
   deleteFile?: boolean;
 }) => {
@@ -103,6 +101,7 @@ const restoreBackup = async (options: {
     startProgress({
       title: strings.restoring(),
       paragraph: strings.preparingBackupRestore(),
+      icon: "arrows-clockwise",
       canHideProgress: false
     });
 
@@ -292,8 +291,9 @@ export const RestoreBackup = () => {
       BACKUP_FILES_CACHE
     );
   const [loading, setLoading] = useState(true);
-  const [backupDirectoryAndroid, setBackupDirectoryAndroid] =
-    useState<ScopedStorage.FileType>();
+  const backupDirectoryAndroid = useSettingStore(
+    (state) => state.settings.backupDirectoryAndroid
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -305,10 +305,8 @@ export const RestoreBackup = () => {
     try {
       let files: (ReactNativeBlobUtilStat | ScopedStorage.FileType)[] = [];
       if (Platform.OS === "android") {
-        const backupDirectory = SettingsService.get().backupDirectoryAndroid;
-        if (backupDirectory) {
-          setBackupDirectoryAndroid(backupDirectory);
-          files = await ScopedStorage.listFiles(backupDirectory.uri);
+        if (backupDirectoryAndroid) {
+          files = await ScopedStorage.listFiles(backupDirectoryAndroid.uri);
         } else {
           setLoading(false);
           return;
@@ -355,148 +353,72 @@ export const RestoreBackup = () => {
 
   return (
     <>
-      <ScrollView
+      <LegendList
+        ListHeaderComponent={
+          <Heading
+            style={{
+              marginBottom: Spacing.LEVEL_2
+            }}
+            color={colors.secondary.paragraph}
+            size={AppFontSize.sm}
+            fontFamily="MEDIUM"
+          >
+            {strings.recentBackups()}
+          </Heading>
+        }
+        ListEmptyComponent={
+          loading ? (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                height: 300,
+                paddingHorizontal: 50
+              }}
+            >
+              <ActivityIndicator
+                color={colors.primary.accent}
+                size={AppFontSize.lg}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 12,
+                height: 300,
+                paddingHorizontal: 50
+              }}
+            >
+              <Paragraph
+                style={{
+                  textAlign: "center"
+                }}
+                color={colors.secondary.paragraph}
+              >
+                {strings.noBackupsFound()}.
+              </Paragraph>
+            </View>
+          )
+        }
+        keyExtractor={(item) =>
+          (item as ScopedStorage.FileType).name ||
+          (item as ReactNativeBlobUtilStat).filename
+        }
+        ListFooterComponent={
+          <View
+            style={{
+              height: 200
+            }}
+          />
+        }
         style={{
           width: "100%"
         }}
-      >
-        <SectionItem
-          item={{
-            id: "restore-from-files",
-            name: strings.restoreFromFiles(),
-            icon: "folder",
-            modifer: async () => {
-              useUserStore.setState({
-                disableAppLockRequests: true
-              });
-              const file = await pick();
-              const fileCopy = await keepLocalCopy({
-                destination: "cachesDirectory",
-                files: [
-                  {
-                    uri: file[0].uri,
-                    fileName: file[0].name ?? `backup_restore_${Date.now()}`
-                  }
-                ]
-              });
-
-              if (fileCopy[0].status === "error") {
-                ToastManager.error(new Error("File copy error"));
-                return;
-              }
-
-              setTimeout(() => {
-                useUserStore.setState({
-                  disableAppLockRequests: false
-                });
-              }, 1000);
-
-              restoreBackup({
-                uri: fileCopy[0].localUri,
-                deleteFile: true
-              });
-            },
-            description: strings.selectBackupFileDesc()
-          }}
-        />
-
-        {Platform.OS === "android" ? (
-          <SectionItem
-            item={{
-              id: "select-backup-folder",
-              name: strings.selectBackupFolder(),
-              icon: "folder",
-              modifer: async () => {
-                const folder = await ScopedStorage.openDocumentTree(true);
-                let subfolder;
-                if (folder.name !== "Notesnook backups") {
-                  subfolder = await ScopedStorage.createDirectory(
-                    folder.uri,
-                    "Notesnook backups"
-                  );
-                } else {
-                  subfolder = folder;
-                }
-                SettingsService.set({
-                  backupDirectoryAndroid: subfolder
-                });
-                setBackupDirectoryAndroid(subfolder);
-                setLoading(true);
-                checkBackups();
-              },
-              description: strings.selectFolderForBackupFilesDesc()
-            }}
-          />
-        ) : null}
-
-        <LegendList
-          ListHeaderComponent={
-            <View
-              style={{
-                backgroundColor: colors.primary.background,
-                marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
-              <Heading color={colors.primary.accent} size={AppFontSize.xs}>
-                {strings.recentBackups()}
-              </Heading>
-            </View>
-          }
-          ListEmptyComponent={
-            loading ? (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: 300,
-                  paddingHorizontal: 50
-                }}
-              >
-                <ActivityIndicator
-                  color={colors.primary.accent}
-                  size={AppFontSize.lg}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 12,
-                  height: 300,
-                  paddingHorizontal: 50
-                }}
-              >
-                <Paragraph
-                  style={{
-                    textAlign: "center"
-                  }}
-                  color={colors.secondary.paragraph}
-                >
-                  {strings.noBackupsFound()}.
-                </Paragraph>
-              </View>
-            )
-          }
-          keyExtractor={(item) =>
-            (item as ScopedStorage.FileType).name ||
-            (item as ReactNativeBlobUtilStat).filename
-          }
-          ListFooterComponent={
-            <View
-              style={{
-                height: 200
-              }}
-            />
-          }
-          style={{
-            width: "100%"
-          }}
-          data={files}
-          renderItem={renderItem}
-        />
-      </ScrollView>
+        data={files}
+        renderItem={renderItem}
+      />
     </>
   );
 };
@@ -528,35 +450,36 @@ const BackupItem = ({
         width: "100%",
         borderRadius: 0,
         flexDirection: "row",
-        borderBottomWidth: 0.5,
-        borderBottomColor: colors.primary.border,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-        paddingHorizontal: DefaultAppStyles.GAP,
-        gap: DefaultAppStyles.GAP_SMALL
+        gap: DefaultAppStyles.GAP_SMALL,
+        paddingVertical: Spacing.LEVEL_2,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.primary.separator
       }}
     >
       <View
         style={{
-          flexShrink: 1
+          flexShrink: 1,
+          gap: Spacing.LEVEL_1
         }}
       >
-        <Paragraph size={AppFontSize.sm}>{itemName}</Paragraph>
+        <Heading size={AppFontSize.md}>{itemName}</Heading>
+
         <Paragraph
           size={AppFontSize.xs}
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >
-          Created on {getFormattedDate(item?.lastModified, "date-time")}
-          {isLegacyBackup ? "(Legacy backup)" : ""} (
-          {formatBytes((item as ReactNativeBlobUtilStat).size)})
+          Created: {getFormattedDate(item?.lastModified, "date-time")}
+          {" • "}
+          {formatBytes((item as ReactNativeBlobUtilStat).size)}
         </Paragraph>
       </View>
       <Button
         title="Restore"
-        type="secondaryAccented"
+        type="plain-outline"
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+          paddingHorizontal: Spacing.LEVEL_2,
+          paddingVertical: Spacing.LEVEL_1
         }}
         onPress={() => {
           presentDialog({

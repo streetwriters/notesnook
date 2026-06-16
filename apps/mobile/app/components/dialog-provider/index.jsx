@@ -31,7 +31,7 @@ import ImagePreview from "../image-preview";
 import MergeConflicts from "../merge-conflicts";
 import SheetProvider from "../sheet-provider";
 import RateAppSheet from "../sheets/rate-app";
-import Progress from "../dialogs/progress";
+import Progress from "../dialogs/progress/progress";
 import { useSettingStore } from "../../stores/use-setting-store";
 
 const DialogProvider = () => {

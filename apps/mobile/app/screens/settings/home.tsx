@@ -30,6 +30,7 @@ import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./components/user-section";
 import { LegendList } from "@legendapp/list";
 import { useThemeColors } from "@notesnook/theme";
+import { Spacing } from "../../common/design/spacing";
 
 const keyExtractor = (item: SettingSection) => item.id;
 
@@ -80,6 +81,9 @@ const Home = ({
           data={settingsGroups}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          contentContainerStyle={{
+            gap: Spacing.LEVEL_2
+          }}
         />
       </DelayLayout>
     </>

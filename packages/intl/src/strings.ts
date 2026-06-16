@@ -228,10 +228,9 @@ export const strings = {
       t`Please note that we will respond to your issue on the given link. We recommend that you save it.`
   },
   issueNotice: {
-    0: () => t`The information above will be publically available at`,
-    1: () =>
-      t`If you want to ask something in general or need some assistance, we would suggest that you`,
-    2: () => t`join our community on Discord.`
+    0: () => t`Issues reported here are public on`,
+    1: () => t`For support or questions, chat with our community on`,
+    2: () => t`Discord.`
   },
   linkNoteEmptyBlock: () => t`(empty block)`,
   linkNoteSelectedNote: () => t`SELECTED NOTE`,
@@ -377,6 +376,7 @@ export const strings = {
   restoringCollection: (collection: string) => t`Restoring ${collection}...`,
   checkNewVersion: () => t`Checking for new version`,
   noUpdates: () => t`No updates available`,
+  noUpdatesDesc: () => t`There are no new updates at the moment.`,
   updateAvailable: () => t`Update available`,
   versionReleased: (version: string, type: "github" | "store") =>
     select(type, {
@@ -472,8 +472,7 @@ $day$: Current day (eg. Monday)`,
   issueTitle: () => t`Report issue`,
   issueDesc: () =>
     t`We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap.`,
-  issueDesc2: () =>
-    t`Let us know if you have faced any issue/bug while using Notesnook. We will try to fix it as soon as possible.`,
+  issueDesc2: () => t`Help us make Notesnook better for everyone.`,
   migrationSaveBackup: () => t`Save a backup of your notes`,
   migrationSaveBackupDesc: () =>
     t`Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience.`,
@@ -1241,13 +1240,13 @@ $day$: Current day (eg. Monday)`,
     t`Set the interval to create a backup (with attachments) automatically.`,
     t`NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`
   ],
-  selectBackupDir: () => t`Select backup directory`,
+  selectBackupDir: () => t`Backup location`,
   selectBackupDirDesc: (path: string) => [
     t`Choose where to save your backups`,
     t`Current path: ${path}`
   ],
   noDirectorySelected: () => t`No directory selected`,
-  changeBackupDir: () => t`Change backup directory`,
+  changeBackupDir: () => t`Change backup location`,
   backupEncryption: () => t`Backup encryption`,
   backupEncryptionDesc: () => t`Encrypt your backups for added security`,
   restoreBackup: () => t`Restore backup`,
@@ -1631,7 +1630,7 @@ For example:
   selectBackupFileDesc: () =>
     t`Select a backup file from your device to restore backup`,
   restoreFromFiles: () => t`Restore from files`,
-  recentBackups: () => t`RECENT BACKUPS`,
+  recentBackups: () => t`Recent backups`,
   restoringBackup: () => t`Restoring backup...`,
   restoringBackupDesc: () => t`Please wait while we restore your backup...`,
   decryptingBackup: () => t`Backup is encrypted, decrypting...`,
@@ -2735,7 +2734,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   invalidPgpKeyPair: () =>
     t`Invalid PGP key pair. Please check your keys and try again.`,
   inboxKeysSaved: () => t`Inbox keys saved`,
-  lockVaultAfter: () => t`Lock vault after`,
+  lockVaultAfter: () => t`Lock vault timer`,
   lockVaultAfterDesc: () =>
     `How long should the vault stay unlocked before automatically locking?`,
   back: () => t`Back`,
@@ -2880,5 +2879,21 @@ Continue without attachments?`,
   alwaysAsk: () => t`Always ask`,
   updates: () => t`Updates`,
   organization: () => t`Organization`,
-  miscellaneous: () => t`Miscellaneous`
+  miscellaneous: () => t`Miscellaneous`,
+  typography: () => t`Typography`,
+  formatting: () => t`Formatting`,
+  newNoteTitle: () => t`New note title`,
+  titleFormatCurrentDate: () => t`Current date`,
+  titleFormatCurrentTime: () => t`Current time`,
+  titleFormatCurrentDay: () => t`Current day`,
+  titleFormatTimestamp: () => t`Timestamp`,
+  titleFormatNoteCount: () => t`Note count`,
+  titleFormatHeadline: () => t`Headline`,
+  backupActions: () => t`Backup actions`,
+  storageAndLocation: () => t`Storage & location`,
+  fullBackup: () => t`Full backup`,
+  automaticFullBackup: () => t`Automatic full backup`,
+  security: () => t`Security`,
+  restoreActions: () => t`Restore actions`,
+  issueSummary: () => t`Issue summary`
 };

@@ -31,6 +31,7 @@ import { SectionItem } from "./section-item";
 import { RouteParams, SettingSection } from "./types";
 import { useThemeColors } from "@notesnook/theme";
 import { SectionGroup } from "./section-group";
+import { Spacing } from "../../common/design/spacing";
 const keyExtractor = (item: SettingSection) => item.id;
 const AnimatedKeyboardAvoidingFlatList = Animated.createAnimatedComponent(
   KeyboardAwareFlatList
@@ -94,6 +95,9 @@ const Group = ({
                   ? components[route.params.component]
                   : null
               }
+              contentContainerStyle={{
+                gap: Spacing.LEVEL_2
+              }}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
               enableOnAndroid

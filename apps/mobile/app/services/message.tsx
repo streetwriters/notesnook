@@ -55,7 +55,7 @@ const APP_MESSAGES: Message[] = [
     actionText: strings.recoveryKeyMessageActionText(),
     onPress: () => {
       verifyUser(
-        null,
+        undefined,
         () => {
           RecoveryKeySheet.present();
         },

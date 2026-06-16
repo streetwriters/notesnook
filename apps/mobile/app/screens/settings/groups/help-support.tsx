@@ -72,20 +72,12 @@ export const helpSupportGroup: SettingSection = {
     },
     {
       id: "debugging",
-      name: strings.debugging(),
-      description: strings.debuggingDesc(),
+      name: strings.debugLogs(),
+      description: strings.debugLogsDesc(),
       type: "screen",
       icon: "bug-droid",
       iconFamily: "notesnook",
-      sections: [
-        {
-          id: "debug-logs",
-          type: "screen",
-          name: strings.debugLogs(),
-          description: strings.debugLogsDesc(),
-          component: "debug-logs"
-        }
-      ]
+      component: "debug-logs"
     }
   ]
 };

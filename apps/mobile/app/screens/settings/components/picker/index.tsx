@@ -99,7 +99,7 @@ export function SettingsPicker<T>({
         >
           {options.map((item) => (
             <Button
-              key={`option-${item}`}
+              key={`option-${getItemKey(item)}`}
               title={formatValue(item)}
               fontSize={AppFontSize.sm}
               fontFamily="REGULAR"

@@ -50,6 +50,7 @@ export type SettingSection = {
   options?: any[];
   minInputValue?: number;
   maxInputValue?: number;
+  inputBadgeValue?: string;
   onVerify?: () => Promise<boolean>;
   hideHeader?: boolean;
   disabled?: (current: unknown) => boolean;

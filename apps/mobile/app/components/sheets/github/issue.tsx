@@ -18,26 +18,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Debug, IssueReportResponse } from "@notesnook/core";
-import { getModel, getBrand, getSystemVersion } from "react-native-device-info";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
-import { Linking, Platform, Text, TextInput, View } from "react-native";
-import { getVersion } from "react-native-device-info";
+import { Linking, Platform, View } from "react-native";
+import Config from "react-native-config";
+import {
+  getBrand,
+  getModel,
+  getSystemVersion,
+  getVersion
+} from "react-native-device-info";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { useStoredRef } from "../../../hooks/use-stored-ref";
 import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
+import { eCloseSheet } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size/index";
-import DialogHeader from "../../dialog/dialog-header";
+import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
-import Seperator from "../../ui/seperator";
+import {
+  createFormRef,
+  FormInput,
+  validators
+} from "../../ui/input/form-input";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
-import Config from "react-native-config";
-import { eCloseSheet } from "../../../utils/events";
 
 export const Issue = ({
   defaultTitle,
@@ -54,22 +61,27 @@ export const Issue = ({
   const [done, setDone] = useState(false);
   const user = useUserStore((state) => state.user);
   const [loading, setLoading] = useState(false);
-  const bodyRef = useRef<TextInput>(null);
-  const initialLayout = useRef(false);
+  const formRef = useRef(
+    createFormRef({
+      title: title.current || "",
+      body: body.current || ""
+    })
+  );
   const issueReportResponse = useRef<IssueReportResponse>(undefined);
 
   const onPress = async () => {
     if (loading) return;
-    if (!title.current || !body.current) return;
-    if (title.current?.trim() === "" || body.current?.trim().length === 0)
-      return;
+    if (!formRef.current.validate()) return;
+
+    const titleValue = formRef.current.getValue("title").trim();
+    const bodyValue = formRef.current.getValue("body").trim();
 
     try {
       setLoading(true);
       issueReportResponse.current = await Debug.report({
-        title: title.current,
+        title: titleValue,
         body:
-          body.current +
+          bodyValue +
           `\n${defaultBody || ""}` +
           `\n_______________
 **Device information:**
@@ -93,6 +105,8 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
       setLoading(false);
       body.reset();
       title.reset();
+      formRef.current.setValue("title", "");
+      formRef.current.setValue("body", "");
       setDone(true);
     } catch (e) {
       setLoading(false);
@@ -135,161 +149,195 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
 
   const responseInfo = getResponseInfo(issueReportResponse.current);
 
-  console.log(responseInfo, issueReportResponse.current);
-
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        width: "100%"
+        width: "100%",
+        backgroundColor: colors.primary.background,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_2,
+        gap: Spacing.LEVEL_3
       }}
     >
       {done ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            gap: Spacing.LEVEL_2,
+            paddingVertical: Spacing.LEVEL_3
+          }}
+        >
+          <Heading>{responseInfo?.title}</Heading>
+          <Paragraph
+            style={{
+              textAlign: "center"
+            }}
+            selectable={true}
+          >
+            {responseInfo?.message}
+          </Paragraph>
+
+          <Button
+            title={responseInfo?.positiveButtonText || strings.done()}
+            onPress={() => {
+              if (responseInfo?.url) {
+                Linking.openURL(responseInfo?.url);
+              }
+              eSendEvent(eCloseSheet);
+            }}
+            type="accent"
+            width="100%"
+          />
+        </View>
+      ) : (
         <>
           <View
             style={{
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 10
+              flexDirection: "row",
+              alignItems: "flex-start",
+              gap: Spacing.LEVEL_1
             }}
           >
-            <Heading>{responseInfo?.title}</Heading>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: Radius.XS,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: colors.error.background
+              }}
+            >
+              <AppIcon
+                name="warning-circle"
+                iconFamily="notesnook"
+                size={16}
+                color={colors.error.accent}
+              />
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                gap: Spacing.LEVEL_1
+              }}
+            >
+              <Heading fontSize="XL" lineHeight="100%">
+                {issueTitle || strings.issueTitle()}
+              </Heading>
+              <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+                {issueTitle ? strings.issueDesc() : strings.issueDesc2()}
+              </Paragraph>
+            </View>
+          </View>
+
+          <View
+            style={{
+              height: 1,
+              backgroundColor: colors.primary.border
+            }}
+          />
+
+          <View
+            style={{
+              gap: Spacing.LEVEL_3
+            }}
+          >
+            <View
+              style={{
+                gap: Spacing.LEVEL_2
+              }}
+            >
+              <FormInput
+                name="title"
+                formRef={formRef}
+                label={strings.issueSummary()}
+                placeholder={strings.issueTitlePlaceholder()}
+                defaultValue={title.current}
+                validators={[validators.required(strings.allFieldsRequired())]}
+                onChangeText={(v) => (title.current = v)}
+                containerStyle={{
+                  borderRadius: Radius.XS
+                }}
+              />
+
+              <FormInput
+                name="body"
+                formRef={formRef}
+                label={strings.details()}
+                placeholder={strings.issuePlaceholder()}
+                multiline
+                numberOfLines={5}
+                textAlignVertical="top"
+                validators={[validators.required(strings.allFieldsRequired())]}
+                onChangeText={(v) => (body.current = v)}
+                containerStyle={{
+                  borderRadius: Radius.XS,
+                  alignItems: "flex-start"
+                }}
+                inputStyle={{
+                  minHeight: 100
+                }}
+              />
+            </View>
+
+            <Button
+              onPress={onPress}
+              title={loading ? null : strings.submit()}
+              loading={loading}
+              width="100%"
+              type="error"
+              style={{
+                borderRadius: Radius.S,
+                borderColor: colors.error.border
+              }}
+            />
+
             <Paragraph
+              color={colors.secondary.paragraph}
+              fontSize="XS"
               style={{
                 textAlign: "center"
               }}
-              selectable={true}
             >
-              {responseInfo?.message}
-            </Paragraph>
-
-            <Button
-              title={responseInfo?.positiveButtonText || "Done"}
-              onPress={() => {
-                if (responseInfo?.url) {
-                  Linking.openURL(responseInfo?.url);
-                }
-                eSendEvent(eCloseSheet);
-              }}
-              type="accent"
-              width="100%"
-            />
-          </View>
-        </>
-      ) : (
-        <>
-          <DialogHeader
-            title={issueTitle || strings.issueTitle()}
-            paragraph={issueTitle ? strings.issueDesc() : strings.issueDesc2()}
-          />
-
-          <Seperator half />
-
-          <TextInput
-            placeholder={strings.title()}
-            onChangeText={(v) => (title.current = v)}
-            defaultValue={title.current}
-            style={{
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              borderRadius: defaultBorderRadius,
-              padding: DefaultAppStyles.GAP,
-              fontFamily: "Inter-Regular",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL,
-              fontSize: AppFontSize.md,
-              color: colors.primary.heading
-            }}
-            placeholderTextColor={colors.primary.placeholder}
-          />
-
-          <TextInput
-            ref={bodyRef}
-            multiline
-            placeholder={strings.issuePlaceholder()}
-            numberOfLines={5}
-            textAlignVertical="top"
-            onChangeText={(v) => (body.current = v)}
-            onLayout={() => {
-              if (initialLayout.current) return;
-              initialLayout.current = true;
-              if (body.current) {
-                bodyRef.current?.setNativeProps({
-                  text: body.current,
-                  selection: {
-                    start: 0,
-                    end: 0
+              {strings.issueNotice[0]()}{" "}
+              <Paragraph
+                onPress={() => {
+                  Linking.openURL(
+                    "https://github.com/streetwriters/notesnook/issues"
+                  );
+                }}
+                fontSize="XS"
+                fontFamily="MEDIUM"
+                style={{
+                  color: colors.primary.accent
+                }}
+              >
+                Github.
+              </Paragraph>{" "}
+              {strings.issueNotice[1]()}{" "}
+              <Paragraph
+                style={{
+                  color: colors.primary.accent
+                }}
+                fontSize="XS"
+                fontFamily="MEDIUM"
+                onPress={async () => {
+                  try {
+                    await openLinkInBrowser("https://discord.gg/zQBK97EE22");
+                  } catch (e) {
+                    console.error(e);
                   }
-                });
-              }
-            }}
-            style={{
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              borderRadius: defaultBorderRadius,
-              padding: DefaultAppStyles.GAP,
-              fontFamily: "Inter-Regular",
-              maxHeight: 200,
-              fontSize: AppFontSize.sm,
-              marginBottom: 2.5,
-              color: colors.primary.paragraph
-            }}
-            placeholderTextColor={colors.primary.placeholder}
-          />
-          <Paragraph
-            size={AppFontSize.xs}
-            color={colors.secondary.paragraph}
-          >{`App version: ${getVersion()} Platform: ${
-            Platform.OS
-          } Model: ${getBrand()}-${getModel()}-${getSystemVersion()}`}</Paragraph>
-
-          <Seperator />
-          <Button
-            onPress={onPress}
-            title={loading ? null : strings.submit()}
-            loading={loading}
-            width="100%"
-            type="accent"
-          />
-
-          <Paragraph
-            color={colors.secondary.paragraph}
-            size={AppFontSize.xs}
-            style={{
-              marginTop: DefaultAppStyles.GAP_VERTICAL,
-              textAlign: "center"
-            }}
-          >
-            {strings.issueNotice[0]()}{" "}
-            <Text
-              onPress={() => {
-                Linking.openURL(
-                  "https://github.com/streetwriters/notesnook/issues"
-                );
-              }}
-              style={{
-                textDecorationLine: "underline",
-                color: colors.primary.accent
-              }}
-            >
-              github.com/streetwriters/notesnook.
-            </Text>{" "}
-            {strings.issueNotice[1]()}{" "}
-            <Text
-              style={{
-                textDecorationLine: "underline",
-                color: colors.primary.accent
-              }}
-              onPress={async () => {
-                try {
-                  await openLinkInBrowser("https://discord.gg/zQBK97EE22");
-                } catch (e) {
-                  console.error(e);
-                }
-              }}
-            >
-              {strings.issueNotice[2]()}
-            </Text>
-          </Paragraph>
+                }}
+              >
+                {strings.issueNotice[2]()}
+              </Paragraph>
+            </Paragraph>
+          </View>
         </>
       )}
     </View>

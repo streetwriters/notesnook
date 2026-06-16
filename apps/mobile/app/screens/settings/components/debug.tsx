@@ -27,21 +27,22 @@ import React, { useEffect, useRef, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import filesystem from "../../../common/filesystem";
 import { presentDialog } from "../../../components/dialog/functions";
+import AppIcon from "../../../components/ui/AppIcon";
 import { IconButton } from "../../../components/ui/icon-button";
 import { Notice } from "../../../components/ui/notice";
+import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import useTimer from "../../../hooks/use-timer";
 import { ToastManager } from "../../../services/event-manager";
 import { hexToRGBA } from "../../../utils/colors";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 export default function DebugLogs() {
   const { colors } = useThemeColors();
   const { seconds, start } = useTimer("debug_logs_timer");
   const listRef = useRef<FlatList>(null);
-  const currentOffset = useRef(0);
   const [logs, setLogs] = useState<
     {
       key: string;
@@ -69,25 +70,27 @@ export default function DebugLogs() {
     })();
   }, [currentLog, seconds, start]);
 
+  const currentIndex = currentLog
+    ? logs.findIndex((l) => l.key === currentLog.key)
+    : -1;
+
   const renderItem = React.useCallback(
     ({ item }: { item: LogMessage; index: number }) => {
-      const background =
-        item.level === LogLevel.Error || item.level === LogLevel.Fatal
-          ? hexToRGBA(colors.error.paragraph, 0.2)
-          : item.level === LogLevel.Warn
-            ? hexToRGBA(colors.static.orange, 0.2)
-            : "transparent";
+      const isError =
+        item.level === LogLevel.Error || item.level === LogLevel.Fatal;
+      const isWarn = item.level === LogLevel.Warn;
 
-      const color =
-        item.level === LogLevel.Error || item.level === LogLevel.Fatal
-          ? colors.error.paragraph
-          : item.level === LogLevel.Warn
-            ? colors.static.black
-            : colors.primary.paragraph;
+      const background = "transparent";
+
+      const color = isError
+        ? colors.error.paragraph
+        : isWarn
+          ? colors.static.black
+          : colors.primary.paragraph;
 
       return !item ? null : (
         <TouchableOpacity
-          activeOpacity={1}
+          activeOpacity={0.6}
           onLongPress={() => {
             Clipboard.setString(format(item));
             ToastManager.show({
@@ -97,8 +100,7 @@ export default function DebugLogs() {
             });
           }}
           style={{
-            paddingHorizontal: DefaultAppStyles.GAP,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+            paddingVertical: Spacing.LEVEL_2,
             backgroundColor: background,
             flexShrink: 1,
             borderBottomWidth: 1,
@@ -123,7 +125,6 @@ export default function DebugLogs() {
       colors.primary.paragraph,
       colors.error.paragraph,
       colors.static.black,
-      colors.static.orange,
       colors.primary.border
     ]
   );
@@ -212,7 +213,8 @@ export default function DebugLogs() {
     >
       <View
         style={{
-          padding: DefaultAppStyles.GAP
+          paddingHorizontal: Spacing.LEVEL_3,
+          paddingBottom: Spacing.LEVEL_4
         }}
       >
         <Notice text={strings.debugNotice()} type="information" />
@@ -224,97 +226,143 @@ export default function DebugLogs() {
           ListHeaderComponent={
             <View
               style={{
-                paddingHorizontal: DefaultAppStyles.GAP,
-                marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                flexDirection: "row",
-                alignItems: "center",
+                paddingBottom: Spacing.LEVEL_2,
+                gap: Spacing.LEVEL_2,
                 backgroundColor: colors.primary.background,
-                justifyContent: "space-between"
+                borderBottomWidth: 1,
+                borderBottomColor: colors.primary.border
               }}
             >
               <View
                 style={{
                   flexDirection: "row",
-                  alignItems: "center"
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: Spacing.LEVEL_2
                 }}
               >
-                <Paragraph>{currentLog.key}</Paragraph>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: Spacing.LEVEL_2,
+                    flexShrink: 1
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: Radius.XS,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: colors.secondary.background
+                    }}
+                  >
+                    <AppIcon
+                      name="file-text"
+                      iconFamily="notesnook"
+                      size={18}
+                      color={colors.primary.icon}
+                    />
+                  </View>
 
-                <IconButton
-                  style={{
-                    width: 30,
-                    height: 30,
-                    marginHorizontal: 5
-                  }}
-                  onPress={() => {
-                    const index = logs.findIndex(
-                      (l) => l.key === currentLog.key
-                    );
-                    if (index === 0) return;
-                    setCurrentLog(logs[index - 1]);
-                  }}
-                  size={20}
-                  name="chevron-left"
-                  color={colors.primary.icon}
-                />
+                  <View
+                    style={{
+                      flexShrink: 1,
+                      gap: Spacing.LEVEL_0
+                    }}
+                  >
+                    <Heading fontSize="SM" lineHeight="100%" numberOfLines={1}>
+                      {currentLog.key}
+                    </Heading>
+                    <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                      {`${currentIndex + 1} / ${logs.length}`}
+                    </Paragraph>
+                  </View>
+                </View>
 
-                <IconButton
+                <View
                   style={{
-                    width: 30,
-                    height: 30
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: Spacing.LEVEL_0
                   }}
-                  onPress={() => {
-                    const index = logs.findIndex(
-                      (l) => l.key === currentLog.key
-                    );
-                    if (index === logs.length - 1) return;
-                    setCurrentLog(logs[index + 1]);
-                  }}
-                  size={20}
-                  name="chevron-right"
-                  color={colors.primary.icon}
-                />
-              </View>
+                >
+                  <IconButton
+                    onPress={() => {
+                      if (currentIndex <= 0) return;
+                      setCurrentLog(logs[currentIndex - 1]);
+                    }}
+                    disabled={currentIndex <= 0}
+                    size={16}
+                    name="chevron-right"
+                    iconFamily="notesnook"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      transform: [{ rotate: "180deg" }]
+                    }}
+                    color={
+                      currentIndex <= 0
+                        ? colors.disabled.icon
+                        : colors.primary.icon
+                    }
+                  />
+                  <IconButton
+                    onPress={() => {
+                      if (currentIndex === logs.length - 1) return;
+                      setCurrentLog(logs[currentIndex + 1]);
+                    }}
+                    disabled={currentIndex === logs.length - 1}
+                    size={16}
+                    name="chevron-right"
+                    iconFamily="notesnook"
+                    style={{
+                      width: 36,
+                      height: 36
+                    }}
+                    color={
+                      currentIndex === logs.length - 1
+                        ? colors.disabled.icon
+                        : colors.primary.icon
+                    }
+                  />
 
-              <View
-                style={{
-                  flexDirection: "row"
-                }}
-              >
-                <IconButton
-                  onPress={copyLogs}
-                  size={20}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    marginRight: 5
-                  }}
-                  name="content-copy"
-                  color={colors.secondary.paragraph}
-                />
-                <IconButton
-                  onPress={downloadLogs}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    marginRight: 5
-                  }}
-                  size={20}
-                  name="download"
-                  color={colors.secondary.paragraph}
-                />
-
-                <IconButton
-                  onPress={clearLogs}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    marginRight: 5
-                  }}
-                  size={20}
-                  name="delete"
-                  color={colors.secondary.paragraph}
-                />
+                  <IconButton
+                    onPress={copyLogs}
+                    size={16}
+                    name="recovery-key-copy"
+                    iconFamily="notesnook"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: Radius.XS
+                    }}
+                    color={colors.primary.icon}
+                  />
+                  <IconButton
+                    onPress={downloadLogs}
+                    size={16}
+                    name="download-simple"
+                    iconFamily="notesnook"
+                    style={{
+                      width: 36,
+                      height: 36
+                    }}
+                    color={colors.primary.icon}
+                  />
+                  <IconButton
+                    onPress={clearLogs}
+                    size={16}
+                    name="trash"
+                    iconFamily="notesnook"
+                    style={{
+                      width: 36,
+                      height: 36
+                    }}
+                    color={colors.error.accent}
+                  />
+                </View>
               </View>
             </View>
           }
@@ -323,6 +371,9 @@ export default function DebugLogs() {
             width: "100%"
           }}
           stickyHeaderIndices={[0]}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.LEVEL_3
+          }}
           ListFooterComponent={
             <View
               style={{

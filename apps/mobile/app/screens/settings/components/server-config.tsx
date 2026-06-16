@@ -32,6 +32,7 @@ import SettingsService from "../../../services/settings";
 import { HostId, HostIds } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { Spacing } from "../../../common/design/spacing";
 
 export const ServerIds = [
   "notesnook-sync",
@@ -100,139 +101,147 @@ export function ServersConfiguration() {
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        gap: 12,
-        marginTop: DefaultAppStyles.GAP_VERTICAL
+        gap: Spacing.LEVEL_2
       }}
     >
       {isLoggedIn ? (
-        <Notice text={strings.logoutToChangeServerUrls()} type="alert" />
+        <Notice text={strings.logoutToChangeServerUrls()} type="information" />
       ) : null}
 
-      <View style={{ flexDirection: "column" }}>
-        {SERVERS.map((server) => (
-          <Input
-            key={server.id}
-            editable={!isLoggedIn}
-            placeholder={`${server.id} e.g. ${server.example}`}
-            validationType="url"
-            defaultValue={urls[server.host]}
-            errorMessage={strings.enterValidUrl()}
-            onChangeText={(value) =>
-              setUrls((s) => {
-                s[server.host] = value;
-                return s;
-              })
-            }
-          />
-        ))}
+      {!isLoggedIn ? (
+        <View style={{ flexDirection: "column", gap: Spacing.LEVEL_2 }}>
+          {SERVERS.map((server) => (
+            <Input
+              key={server.id}
+              editable={!isLoggedIn}
+              containerStyle={{
+                borderWidth: 0,
+                backgroundColor: colors.secondary.background
+              }}
+              placeholder={`${server.id} e.g. ${server.example}`}
+              validationType="url"
+              defaultValue={urls[server.host]}
+              errorMessage={strings.enterValidUrl()}
+              onChangeText={(value) =>
+                setUrls((s) => {
+                  s[server.host] = value;
+                  return s;
+                })
+              }
+            />
+          ))}
 
-        {error ? (
-          <Paragraph
-            style={{
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-            color={colors.error.paragraph}
-          >
-            {error}
-          </Paragraph>
-        ) : null}
+          {error ? (
+            <Paragraph
+              style={{
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              }}
+              color={colors.error.paragraph}
+            >
+              {error}
+            </Paragraph>
+          ) : null}
 
-        {success === true ? (
-          <Paragraph
+          {success === true ? (
+            <Paragraph
+              style={{
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              }}
+              color={colors.success.paragraph}
+            >
+              {strings.connectedToServer()}
+            </Paragraph>
+          ) : null}
+
+          <View
             style={{
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              marginTop: 1,
+              justifyContent: "flex-end",
+              gap: Spacing.LEVEL_2
             }}
-            color={colors.success.paragraph}
           >
-            {strings.connectedToServer()}
-          </Paragraph>
-        ) : null}
-        <View
-          style={{
-            marginTop: 1,
-            justifyContent: "flex-end",
-            gap: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <Button
-            disabled={isLoggedIn}
-            type="secondary"
-            width="100%"
-            onPress={async () => {
-              setError(undefined);
-              try {
-                for (const host of HostIds) {
-                  const url = urls[host];
-                  const server = SERVERS.find((s) => s.host === host)!;
-                  if (!server) throw new Error(strings.serverNotFound(host));
-                  if (!url) throw new Error(strings.allServerUrlsRequired());
-                  const version = await fetch(`${url}${server.versionEndpoint}`)
-                    .then((r) => r.json() as Promise<VersionResponse>)
-                    .catch(() => undefined);
-                  if (!version)
-                    throw new Error(
-                      `${strings.couldNotConnectTo(server.title)}`
-                    );
-                  if (version.id !== server.id)
-                    throw new Error(
-                      `${strings.incorrectServerUrl(url, server.title)}.`
-                    );
-                  if (!isServerCompatible(version.version)) {
-                    throw new Error(
-                      strings.serverVersionMismatch(server.title, url)
-                    );
+            <Button
+              disabled={isLoggedIn}
+              type="secondary"
+              width="100%"
+              onPress={async () => {
+                setError(undefined);
+                try {
+                  for (const host of HostIds) {
+                    const url = urls[host];
+                    const server = SERVERS.find((s) => s.host === host)!;
+                    if (!server) throw new Error(strings.serverNotFound(host));
+                    if (!url) throw new Error(strings.allServerUrlsRequired());
+                    const version = await fetch(
+                      `${url}${server.versionEndpoint}`
+                    )
+                      .then((r) => r.json() as Promise<VersionResponse>)
+                      .catch(() => undefined);
+                    if (!version)
+                      throw new Error(
+                        `${strings.couldNotConnectTo(server.title)}`
+                      );
+                    if (version.id !== server.id)
+                      throw new Error(
+                        `${strings.incorrectServerUrl(url, server.title)}.`
+                      );
+                    if (!isServerCompatible(version.version)) {
+                      throw new Error(
+                        strings.serverVersionMismatch(server.title, url)
+                      );
+                    }
                   }
+                  setSuccess(true);
+                } catch (e) {
+                  setError((e as Error).message);
                 }
-                setSuccess(true);
-              } catch (e) {
-                setError((e as Error).message);
-              }
-            }}
-            title={strings.testConnection()}
-          />
+              }}
+              title={strings.testConnection()}
+            />
 
-          <Button
-            type="accent"
-            disabled={isLoggedIn}
-            width="100%"
-            onPress={async () => {
-              if (!success) {
-                ToastManager.show({
-                  heading: strings.testConnectionBeforeSave()
+            <Button
+              type="accent"
+              disabled={isLoggedIn}
+              width="100%"
+              onPress={async () => {
+                if (!success) {
+                  ToastManager.show({
+                    heading: strings.testConnectionBeforeSave()
+                  });
+                  return;
+                }
+                SettingsService.setProperty(
+                  "serverUrls",
+                  urls as Record<HostId, string>
+                );
+
+                presentDialog({
+                  title: strings.serverUrlChanged(),
+                  paragraph: strings.restartAppToTakeEffect(),
+                  negativeText: strings.done()
                 });
-                return;
-              }
-              SettingsService.setProperty(
-                "serverUrls",
-                urls as Record<HostId, string>
-              );
+              }}
+              title={strings.save()}
+            />
 
-              presentDialog({
-                title: strings.serverUrlChanged(),
-                paragraph: strings.restartAppToTakeEffect(),
-                negativeText: strings.done()
-              });
-            }}
-            title={strings.save()}
-          />
-
-          <Button
-            disabled={isLoggedIn}
-            type="error"
-            width="100%"
-            title={strings.resetServerUrls()}
-            onPress={async () => {
-              if (isLoggedIn) return;
-              SettingsService.setProperty("serverUrls", undefined);
-              presentDialog({
-                title: strings.serverUrlsReset(),
-                paragraph: strings.restartAppToTakeEffect(),
-                negativeText: strings.done()
-              });
-            }}
-          />
+            <Button
+              disabled={isLoggedIn}
+              type="error"
+              width="100%"
+              title={strings.resetServerUrls()}
+              onPress={async () => {
+                if (isLoggedIn) return;
+                SettingsService.setProperty("serverUrls", undefined);
+                presentDialog({
+                  title: strings.serverUrlsReset(),
+                  paragraph: strings.restartAppToTakeEffect(),
+                  negativeText: strings.done()
+                });
+              }}
+            />
+          </View>
         </View>
-      </View>
+      ) : null}
     </View>
   );
 }

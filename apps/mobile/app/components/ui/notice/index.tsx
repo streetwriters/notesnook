@@ -71,7 +71,7 @@ export const Notice = ({
         }}
       >
         <AppIcon
-          size={isSmall ? 12 : AppFontSize.xxl}
+          size={12}
           name={type === "information" ? "warning-circle" : type}
           iconFamily="notesnook"
           color={

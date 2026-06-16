@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { db } from "../../../common/database";
 import { AppLockPassword } from "../../../components/dialogs/applock-password";
+import LockVaultTimer from "../../../components/sheets/lock-vault-timer";
 import {
   VaultStatusType,
   useVaultStatus
@@ -84,98 +85,115 @@ export const privacySecurityGroup: SettingSection = {
       iconFamily: "notesnook",
       sections: [
         {
-          id: "create-vault",
-          name: strings.createVault(),
-          description: strings.createVaultDesc(),
-          icon: "key",
-          useHook: useVaultStatus,
-          hidden: (current) => (current as VaultStatusType)?.exists,
-          modifer: () => {
-            openVault({
-              requestType: VaultRequestType.CreateVault,
-              title: strings.createVault(),
-              buttonTitle: strings.create()
-            });
-          }
-        },
-        {
-          id: "lock-vault-after",
-          type: "component",
-          useHook: useVaultStatus,
-          name: strings.lockVaultAfter(),
-          description: strings.lockVaultAfterDesc(),
-          hidden: (current) => !(current as VaultStatusType)?.exists,
-          component: "vault-lock-timer",
-          icon: "clock-outline"
-        },
-        {
-          id: "change-vault-password",
-          useHook: useVaultStatus,
-          name: strings.changeVaultPassword(),
-          description: strings.changeVaultPasswordDesc(),
-          hidden: (current) => !(current as VaultStatusType)?.exists,
-          modifer: () =>
-            openVault({
-              requestType: VaultRequestType.ChangePassword,
-              title: strings.changeVaultPassword(),
-              buttonTitle: strings.change()
-            })
-        },
-        {
-          id: "clear-vault",
-          useHook: useVaultStatus,
-          description: strings.clearVaultDesc(),
-          name: strings.clearVault(),
-          hidden: (current) => !(current as VaultStatusType)?.exists,
-          modifer: () => {
-            openVault({
-              requestType: VaultRequestType.ClearVault,
-              title: strings.clearVault() + "?",
-              buttonTitle: strings.clear(),
-              positiveButtonType: "errorShade"
-            });
-          }
-        },
-        {
-          id: "delete-vault",
-          name: strings.deleteVault(),
-          description: strings.deleteVaultDesc(),
-          useHook: useVaultStatus,
-          hidden: (current) => !(current as VaultStatusType)?.exists,
-          modifer: () => {
-            openVault({
-              requestType: VaultRequestType.DeleteVault,
-              title: strings.deleteVault() + "?",
-              buttonTitle: strings.delete(),
-              positiveButtonType: "errorShade"
-            });
-          }
-        },
-        {
-          id: "biometric-unlock",
-          type: "switch",
-          name: strings.biometricUnlock(),
-          icon: "fingerprint",
-          useHook: useVaultStatus,
-          description: strings.biometricUnlockDesc(),
-          hidden: (current) => {
-            const _current = current as VaultStatusType;
-            return !_current?.exists || !_current?.isBiometryAvailable;
-          },
-          getter: (current) => (current as VaultStatusType)?.biometryEnrolled,
-          modifer: (current) => {
-            const _current = current as VaultStatusType;
-            const isRevoking = _current.biometryEnrolled;
-            openVault({
-              requestType: isRevoking
-                ? VaultRequestType.RevokeFingerprint
-                : VaultRequestType.EnableFingerprint,
-              title: isRevoking
-                ? strings.revokeBiometricUnlock()
-                : strings.vaultEnableBiometrics(),
-              buttonTitle: isRevoking ? strings.revoke() : strings.enable()
-            });
-          }
+          id: "vault-group",
+          name: strings.vault(),
+          type: "group",
+          sections: [
+            {
+              id: "create-vault",
+              name: strings.createVault(),
+              description: strings.createVaultDesc(),
+              icon: "key",
+              iconFamily: "notesnook",
+              useHook: useVaultStatus,
+              hidden: (current) => (current as VaultStatusType)?.exists,
+              modifer: () => {
+                openVault({
+                  requestType: VaultRequestType.CreateVault,
+                  title: strings.createVault(),
+                  buttonTitle: strings.create()
+                });
+              }
+            },
+            {
+              id: "biometric-unlock",
+              type: "switch",
+              name: strings.biometricUnlock(),
+              icon: "fingerprint-simple",
+              iconFamily: "notesnook",
+              useHook: useVaultStatus,
+              description: strings.biometricUnlockDesc(),
+              hidden: (current) => {
+                const _current = current as VaultStatusType;
+                return !_current?.exists || !_current?.isBiometryAvailable;
+              },
+              getter: (current) =>
+                (current as VaultStatusType)?.biometryEnrolled,
+              modifer: (current) => {
+                const _current = current as VaultStatusType;
+                const isRevoking = _current.biometryEnrolled;
+                openVault({
+                  requestType: isRevoking
+                    ? VaultRequestType.RevokeFingerprint
+                    : VaultRequestType.EnableFingerprint,
+                  title: isRevoking
+                    ? strings.revokeBiometricUnlock()
+                    : strings.vaultEnableBiometrics(),
+                  buttonTitle: isRevoking ? strings.revoke() : strings.enable()
+                });
+              }
+            },
+            {
+              id: "change-vault-password",
+              useHook: useVaultStatus,
+              name: strings.changeVaultPassword(),
+              icon: "pencil-simple",
+              iconFamily: "notesnook",
+              description: strings.changeVaultPasswordDesc(),
+              hidden: (current) => !(current as VaultStatusType)?.exists,
+              modifer: () =>
+                openVault({
+                  requestType: VaultRequestType.ChangePassword,
+                  title: strings.changeVaultPassword(),
+                  buttonTitle: strings.change()
+                })
+            },
+
+            {
+              id: "lock-vault-after",
+              useHook: useVaultStatus,
+              name: strings.lockVaultAfter(),
+              description: strings.lockVaultAfterDesc(),
+              hidden: (current) => !(current as VaultStatusType)?.exists,
+              icon: "clock-outline",
+              iconFamily: "notesnook",
+              modifer: () => {
+                LockVaultTimer.present();
+              }
+            },
+            {
+              id: "clear-vault",
+              useHook: useVaultStatus,
+              description: strings.clearVaultDesc(),
+              name: strings.clearVault(),
+              hidden: (current) => !(current as VaultStatusType)?.exists,
+              modifer: () => {
+                openVault({
+                  requestType: VaultRequestType.ClearVault,
+                  title: strings.clearVault() + "?",
+                  buttonTitle: strings.clear(),
+                  positiveButtonType: "errorShade"
+                });
+              }
+            },
+            {
+              id: "delete-vault",
+              name: strings.deleteVault(),
+              description: strings.deleteVaultDesc(),
+              icon: "trash",
+              iconFamily: "notesnook",
+              useHook: useVaultStatus,
+              hidden: (current) => !(current as VaultStatusType)?.exists,
+              modifer: () => {
+                openVault({
+                  requestType: VaultRequestType.DeleteVault,
+                  title: strings.deleteVault() + "?",
+                  buttonTitle: strings.delete(),
+                  positiveButtonType: "errorShade"
+                });
+              }
+            }
+          ]
         }
       ]
     },
@@ -219,7 +237,7 @@ export const privacySecurityGroup: SettingSection = {
             }
           },
           onVerify: async () => {
-            const verified = await verifyUserWithApplock();
+            const verified = (await verifyUserWithApplock()) as boolean;
             if (!verified) return false;
 
             if (!SettingsService.getProperty("appLockEnabled")) {

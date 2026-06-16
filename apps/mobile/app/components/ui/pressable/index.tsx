@@ -67,7 +67,8 @@ type ButtonTypes =
   | "warn"
   | "selected"
   | "accent-outline"
-  | "secondary-outline";
+  | "secondary-outline"
+  | "secondary-simple";
 
 type ButtonVariant = {
   primary: string;
@@ -127,7 +128,7 @@ const buttonTypes = (
   },
   secondary: {
     primary: colors.secondary.background,
-    text: colors.primary.paragraph,
+    text: colors.primary.heading,
     selected: colors.secondary.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
@@ -136,6 +137,12 @@ const buttonTypes = (
       0.05,
       isDark
     )
+  },
+  "secondary-simple": {
+    primary: colors.secondary.background,
+    text: colors.primary.heading,
+    selected: colors.secondary.background,
+    borderWidth: 0
   },
   tertiary: {
     primary: colors.tertiary.background,

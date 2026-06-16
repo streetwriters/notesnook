@@ -94,7 +94,7 @@ export async function verifyUser(
 
 export async function verifyUserWithApplock() {
   const keyboardType = SettingsService.getProperty("applockKeyboardType");
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
       presentDialog({
         title: strings.verifyItsYou(),
@@ -119,7 +119,7 @@ export async function verifyUserWithApplock() {
                 undefined,
                 "local"
               );
-              return;
+              return false;
             }
             const verified = await validateAppLockPassword(value);
             if (!verified) {

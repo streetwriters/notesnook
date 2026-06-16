@@ -224,81 +224,111 @@ export const customizeGroup: SettingSection = {
       description: strings.editorDesc(),
       sections: [
         {
-          id: "configure-toolbar",
-          type: "screen",
-          name: strings.customizeToolbar(),
-          description: strings.customizeToolbarDesc(),
-          component: "configuretoolbar"
+          id: "toolbar-group",
+          name: strings.toolbar(),
+          type: "group",
+          sections: [
+            {
+              id: "configure-toolbar",
+              type: "screen",
+              name: strings.customizeToolbar(),
+              description: strings.customizeToolbarDesc(),
+              component: "configuretoolbar"
+            },
+            {
+              id: "reset-toolbar",
+              name: strings.resetToolbar(),
+              description: strings.resetToolbarDesc(),
+              modifer: () => {
+                useDragState.getState().setPreset("default");
+                ToastManager.show({
+                  heading: strings.toolbarReset(),
+                  type: "success"
+                });
+              }
+            }
+          ]
         },
         {
-          id: "reset-toolbar",
-          name: strings.resetToolbar(),
-          description: strings.resetToolbarDesc(),
-          modifer: () => {
-            useDragState.getState().setPreset("default");
-            ToastManager.show({
-              heading: strings.toolbarReset(),
-              type: "success"
-            });
-          }
+          id: "typography-group",
+          name: strings.typography(),
+          type: "group",
+          sections: [
+            {
+              id: "default-font-family",
+              name: strings.defaultFontFamily(),
+              description: strings.defaultFontFamilyDesc(),
+              type: "component",
+              icon: "format-font",
+              property: "defaultFontFamily",
+              component: "font-selector"
+            },
+            {
+              id: "default-font-size",
+              name: strings.defaultFontSize(),
+              description: strings.defaultFontSizeDesc(),
+              type: "input-selector",
+              minInputValue: 8,
+              maxInputValue: 120,
+              inputBadgeValue: "px",
+              icon: "format-size",
+              property: "defaultFontSize"
+            },
+            {
+              id: "default-line-height",
+              name: strings.lineHeight(),
+              description: strings.lineHeightDesc(),
+              type: "input-selector",
+              property: "defaultLineHeight",
+              icon: "format-line-spacing",
+              minInputValue: EDITOR_LINE_HEIGHT.MIN,
+              maxInputValue: EDITOR_LINE_HEIGHT.MAX
+            }
+          ]
         },
         {
-          id: "double-spaced-lines",
-          name: strings.doubleSpacedLines(),
-          description: strings.doubleSpacedLinesDesc(),
-          type: "switch",
-          property: "doubleSpacedLines",
-          icon: "format-line-spacing",
-          onChange: () => {
-            ToastManager.show({
-              heading: strings.lineSpacingChanged(),
-              type: "success"
-            });
-          }
+          id: "formatting-group",
+          name: strings.formatting(),
+          type: "group",
+          sections: [
+            {
+              id: "double-spaced-lines",
+              name: strings.doubleSpacedLines(),
+              description: strings.doubleSpacedLinesDesc(),
+              type: "switch",
+              property: "doubleSpacedLines",
+              icon: "format-line-spacing",
+              onChange: () => {
+                ToastManager.show({
+                  heading: strings.lineSpacingChanged(),
+                  type: "success"
+                });
+              }
+            },
+
+            {
+              id: "toggle-markdown",
+              name: strings.mardownShortcuts(),
+              property: "markdownShortcuts",
+              description: strings.mardownShortcutsDesc(),
+              type: "switch",
+              featureId: "markdownShortcuts"
+            }
+          ]
         },
         {
-          id: "default-font-size",
-          name: strings.defaultFontSize(),
-          description: strings.defaultFontSizeDesc(),
-          type: "input-selector",
-          minInputValue: 8,
-          maxInputValue: 120,
-          icon: "format-size",
-          property: "defaultFontSize"
-        },
-        {
-          id: "default-font-family",
-          name: strings.defaultFontFamily(),
-          description: strings.defaultFontFamilyDesc(),
-          type: "component",
-          icon: "format-font",
-          property: "defaultFontFamily",
-          component: "font-selector"
-        },
-        {
-          id: "default-line-height",
-          name: strings.lineHeight(),
-          description: strings.lineHeightDesc(),
-          type: "input-selector",
-          property: "defaultLineHeight",
-          icon: "format-line-spacing",
-          minInputValue: EDITOR_LINE_HEIGHT.MIN,
-          maxInputValue: EDITOR_LINE_HEIGHT.MAX
-        },
-        {
-          id: "title-format",
-          name: strings.titleFormat(),
-          component: "title-format",
-          description: strings.titleFormatDesc(),
-          type: "component"
-        },
-        {
-          id: "toggle-markdown",
-          name: strings.mardownShortcuts(),
-          property: "markdownShortcuts",
-          description: strings.mardownShortcutsDesc(),
-          type: "switch",
-          featureId: "markdownShortcuts"
+          id: "note-title-group",
+          type: "group",
+          name: strings.newNoteTitle(),
+          sections: [
+            {
+              id: "title-format",
+              name: strings.titleFormat(),
+              component: "title-format",
+              description: strings.titleFormatDesc(),
+              type: "component"
+            }
+          ]
         }
       ]
     },

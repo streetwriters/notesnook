@@ -120,6 +120,16 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
     actionText: strings.shareBackup(),
     actionsArray: [
       {
+        action: async () => {
+          eSendEvent(eCloseSheet);
+          SettingsService.set({
+            showBackupCompleteSheet: false
+          });
+        },
+        actionText: strings.neverAskAgain(),
+        type: "plain-outline"
+      },
+      {
         action: () => {
           if (Platform.OS === "ios") {
             Share.open({
@@ -139,16 +149,6 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
           }
         },
         actionText: strings.share()
-      },
-      {
-        action: async () => {
-          eSendEvent(eCloseSheet);
-          SettingsService.set({
-            showBackupCompleteSheet: false
-          });
-        },
-        actionText: strings.neverAskAgain(),
-        type: "secondary"
       }
     ]
   });

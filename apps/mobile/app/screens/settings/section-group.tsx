@@ -36,11 +36,7 @@ export const SectionGroup = ({
   const current = item.useHook && item.useHook();
   const isHidden = item.hidden && item.hidden(current);
   return isHidden ? null : (
-    <View
-      style={{
-        marginVertical: item.sections ? 10 : 0
-      }}
-    >
+    <View>
       {item.name && item.sections ? (
         <Heading
           style={{
