@@ -103,7 +103,7 @@ export const SideMenuNotebooks = () => {
         const allSelected = allNotebooks.every((notebook) => {
           return (
             useSideMenuNotebookSelectionStore.getState().selection[
-            notebook.id
+              notebook.id
             ] === "selected"
           );
         });
@@ -176,9 +176,9 @@ export const SideMenuNotebooks = () => {
               style={{
                 width: "100%",
                 backgroundColor: colors.primary.background,
-                borderTopColor: colors.primary.border,
+                borderTopColor: colors.primary.separator,
                 borderTopWidth: 1,
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+                paddingVertical: Spacing.LEVEL_2,
                 flexDirection: "row",
                 justifyContent: "space-between"
               }}
@@ -189,7 +189,8 @@ export const SideMenuNotebooks = () => {
                   fontFamily: "Inter-Regular",
                   fontSize: AppFontSize.sm,
                   paddingTop: 0,
-                  paddingBottom: 0
+                  paddingBottom: 0,
+                  color: colors.secondary.paragraph
                 }}
                 cursorColor={colors.primary.accent}
                 onChangeText={async (value: string) => {
