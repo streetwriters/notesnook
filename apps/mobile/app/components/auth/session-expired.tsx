@@ -50,6 +50,7 @@ import { strings } from "@notesnook/intl";
 import { getObfuscatedEmail } from "../../utils/functions";
 import { DefaultAppStyles } from "../../utils/styles";
 import FormInput, { validators } from "../ui/input/form-input";
+import { PASSWORD_PLACEHOLDER } from "../../utils/constants";
 
 export const SessionExpired = () => {
   const { colors } = useThemeColors();
@@ -206,7 +207,7 @@ export const SessionExpired = () => {
             autoComplete="password"
             autoCapitalize="none"
             autoCorrect={false}
-            placeholder={strings.password()}
+            placeholder={PASSWORD_PLACEHOLDER}
             onSubmitEditing={() => {
               login();
             }}
