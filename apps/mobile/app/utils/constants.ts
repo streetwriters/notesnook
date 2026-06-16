@@ -26,6 +26,8 @@ export const IOS_APPGROUPID = "group.org.streetwriters.notesnook";
 export const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 export const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
+export const PASSWORD_PLACEHOLDER = "•••••••••";
+
 export const BETA = getVersion().includes("beta");
 
 export const STORE_LINK =
