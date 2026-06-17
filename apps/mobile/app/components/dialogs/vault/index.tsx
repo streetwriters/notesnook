@@ -67,6 +67,9 @@ import {
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
+import { AppFontSize } from "../../../utils/size";
+import { Pressable } from "../../ui/pressable";
+import AppIcon from "../../ui/AppIcon";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
@@ -788,20 +791,30 @@ export const VaultDialog: React.FC = () => {
           ) : null}
 
           {isDeleteVault && (
-            <Button
+            <Pressable
               onPress={() => setDeleteAll(!deleteAll)}
-              icon={
-                deleteAll
-                  ? "check-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
               style={{
-                marginTop: DefaultAppStyles.GAP_VERTICAL
+                paddingHorizontal: 10,
+                paddingVertical: 0,
+                flexDirection: "row",
+                gap: DefaultAppStyles.GAP_SMALL,
+                marginTop: isUserLoggedIn ? DefaultAppStyles.GAP_SMALL : 0
               }}
-              width="100%"
-              title={strings.deleteAllNotes()}
-              type="errorShade"
-            />
+            >
+              <AppIcon
+                name={
+                  deleteAll
+                    ? "check-circle-outline"
+                    : "checkbox-blank-circle-outline"
+                }
+                color={colors.error.accent}
+                size={AppFontSize.md}
+              />
+
+              <Paragraph color={colors.error.accent} size={AppFontSize.sm}>
+                {strings.deleteAllNotes()}
+              </Paragraph>
+            </Pressable>
           )}
 
           {isChangePassword ? (
