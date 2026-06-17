@@ -23,7 +23,7 @@ import {
   ProviderSettings,
   transform
 } from "@notesnook-importer/core";
-import { formatBytes } from "@notesnook/common";
+import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
 import { Button, Flex, Input, Text } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
@@ -46,6 +46,12 @@ type Progress = {
   done: number;
 };
 
+type LogMessage = {
+  type: "info" | "error";
+  text: string;
+  date: number;
+};
+
 export function FileProviderHandler(props: FileProviderHandlerProps) {
   const { provider, onTransformFinished } = props;
   const [files, setFiles] = useState<File[]>([]);
@@ -55,7 +61,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
   });
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
-  const logs = useRef<string[]>([]);
+  const logs = useRef<LogMessage[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles((files) => {
@@ -85,22 +91,31 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         clear: async () => undefined,
         get: async () => [],
         write: async (data) => {
-          logs.current.push(
-            `[${new Date().toLocaleString()}] Pushing ${
-              data.title
-            } into database`
-          );
+          logs.current.push({
+            type: "info",
+            date: Date.now(),
+            text: `Pushing ${data.title} into database`
+          });
 
-          await importNote(data);
+          const errors = await importNote(data);
+          errors.forEach((error) =>
+            logs.current.push({
+              type: "error",
+              date: Date.now(),
+              text: `Error importing ${data.title}: ${error}`
+            })
+          );
         },
         iterate: async function* () {
           return null;
         }
       },
       log: (message) => {
-        logs.current.push(
-          `[${new Date(message.date).toLocaleString()}] ${message.text}`
-        );
+        logs.current.push({
+          type: "info",
+          date: message.date,
+          text: message.text
+        });
         setCounter((s) => ++s);
       },
       reporter: () => {
@@ -176,7 +191,17 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
               >
                 {logs.current.map((c, index) => (
                   <>
-                    <span key={index.toString()}>{c}</span>
+                    <span
+                      key={index.toString()}
+                      style={{
+                        color:
+                          c.type === "error"
+                            ? "var(--paragraph-error)"
+                            : "inherit"
+                      }}
+                    >
+                      [{getFormattedDate(c.date, "date-time")}] {c.text}
+                    </span>
                     <br />
                   </>
                 ))}

@@ -48,11 +48,18 @@ const colorMap: Record<string, string | undefined> = {
   yellow: "#FFC107"
 };
 
-export async function importNote(note: Note) {
+export async function importNote(note: Note): Promise<string[]> {
+  const errors: string[] = [];
   const encryptedAttachmentFieldsMap = await processAttachments(
     note.attachments
-  );
-  await processNote(note, encryptedAttachmentFieldsMap);
+  ).catch((e) => {
+    errors.push(e.message);
+    return {};
+  });
+  await processNote(note, encryptedAttachmentFieldsMap).catch((e) => {
+    errors.push(e.message);
+  });
+  return errors;
 }
 
 async function processAttachments(attachments: Note["attachments"]) {
