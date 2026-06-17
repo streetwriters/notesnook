@@ -69,6 +69,8 @@ import { SessionHistory } from "./session-history";
 import { EditorState, SavePayload } from "./types";
 import { TabSessionItem, syncTabs, useTabStore } from "./use-tab-store";
 import { defaultState, isContentInvalid, isEditorLoaded, post } from "./utils";
+import { presentDialog } from "../../../components/dialog/functions";
+import { confirmationDialog } from "../../../utils/functions";
 
 const loadNoteMutex = new Mutex();
 
@@ -311,6 +313,31 @@ export const useEditor = (
           noteData.dateEdited = note?.dateEdited;
         }
 
+        if (noteData?.id) {
+          const dbNote = await db.notes.all
+            .fields(["notes.id", "notes.dateEdited"])
+            .find((e) => e("notes.id", "==", noteData.id!));
+          if (
+            dbNote &&
+            dbNote?.dateEdited !== currentNotes.current[noteData.id]?.dateEdited
+          ) {
+            if (
+              !(await confirmationDialog({
+                title: strings.conflictDetected(),
+                paragraph: strings.conflictDetectedDesc(),
+                positiveText: strings.overwrite()
+              }))
+            ) {
+              useTabStore.getState().updateTab(tabId, {
+                session: {
+                  hasUnsavedChanges: true
+                }
+              });
+              return;
+            }
+          }
+        }
+
         if (data) {
           noteData.content = {
             data: data,
@@ -458,9 +485,19 @@ export const useEditor = (
           NotePreviewWidget.updateNote(id, note);
         }, 500);
 
+        useTabStore.getState().updateTab(tabId, {
+          session: {
+            hasUnsavedChanges: false
+          }
+        });
+
         return id;
       } catch (e) {
-        console.error(e);
+        useTabStore.getState().updateTab(tabId, {
+          session: {
+            hasUnsavedChanges: true
+          }
+        });
         DatabaseLogger.error(e as Error);
       }
     },
@@ -525,10 +562,33 @@ export const useEditor = (
         ) {
           return;
         }
+        DatabaseLogger.log(
+          `Loading note: ${event.item?.id || "new-note"}, block: ${
+            event.blockId
+          }`
+        );
         if (event.blockId) {
           blockIdRef.current = event.blockId;
         }
         state.current.currentlyEditing = true;
+
+        if (
+          useTabStore
+            .getState()
+            .getTab(event.tabId || useTabStore.getState().currentTab)?.session
+            ?.hasUnsavedChanges &&
+          !(await confirmationDialog({
+            title: strings.unsavedChanges(),
+            paragraph: strings.unsavedNoteDesc(),
+            positiveText: "Yes",
+            negativeText: "No"
+          }))
+        ) {
+          console.log("hide overlay");
+          commands.setLoading(false);
+          overlay(false);
+          return;
+        }
 
         if (
           !state.current.ready &&
@@ -703,6 +763,10 @@ export const useEditor = (
           await postMessage(NativeEvents.title, item.title, tabId);
           overlay(false);
 
+          DatabaseLogger.log(
+            `"Loading content length: ${currentContents.current[item.id]?.data}`
+          );
+
           await postMessage(
             NativeEvents.html,
             {
@@ -715,26 +779,28 @@ export const useEditor = (
             10000
           );
 
-          setTimeout(() => {
-            if (event.searchResultIndex !== undefined) {
-              commands.scrollToSearchResult(event.searchResultIndex);
-            }
-            if (blockIdRef.current) {
-              commands.scrollIntoViewById(blockIdRef.current);
-              blockIdRef.current = undefined;
-            }
-          }, 300);
+          await sleep(300);
+          if (event.searchResultIndex !== undefined) {
+            commands.scrollToSearchResult(event.searchResultIndex);
+          }
+          if (blockIdRef.current) {
+            commands.scrollIntoViewById(blockIdRef.current);
+            blockIdRef.current = undefined;
+          }
 
           await commands.setTags(item);
           commands.setSettings();
-          setTimeout(() => {
-            if (currentLoadingNoteId.current === event.item?.id) {
-              currentLoadingNoteId.current = undefined;
-            }
-          }, 300);
+          await sleep(300);
+          if (currentLoadingNoteId.current === event.item?.id) {
+            currentLoadingNoteId.current = undefined;
+          }
         }
         postMessage(NativeEvents.theme, theme);
-        console.log("load finished", event.item?.id);
+        DatabaseLogger.log(
+          `Loaded note: ${event.item?.id || "new-note"}, block: ${
+            event.blockId
+          }`
+        );
       });
     },
     [
@@ -763,6 +829,12 @@ export const useEditor = (
             await commands.clearContent(tabId);
             useTabStore.getState().removeTab(tabId);
           }
+
+          DatabaseLogger.log(
+            `Realtime sync item skipped: item deleted${isDeleted(
+              data
+            )} trash:${isTrashItem(data)}`
+          );
           return;
         }
 
@@ -870,6 +942,10 @@ export const useEditor = (
                   commands.setLoading(true, tabId);
                 }
               } else {
+                DatabaseLogger.log(
+                  `Realtime sync content update: ${note.id}, locked: true`
+                );
+
                 await postMessage(
                   NativeEvents.updatehtml,
                   {
@@ -891,6 +967,9 @@ export const useEditor = (
               }
 
               lastContentChangeTime.current[note.id] = note.dateEdited;
+              DatabaseLogger.log(
+                `Realtime sync content update: ${note.id}, locked: false`
+              );
               await postMessage(
                 NativeEvents.updatehtml,
                 {
@@ -908,7 +987,10 @@ export const useEditor = (
           }
         });
       } catch (e) {
-        DatabaseLogger.error(e as Error, "Error when applying sync changes");
+        DatabaseLogger.error(
+          e as Error,
+          "Error when applying realtime sync changes in editor"
+        );
       } finally {
         lock.current = false;
       }
@@ -946,7 +1028,7 @@ export const useEditor = (
       pendingChanges?: boolean;
     }) => {
       DatabaseLogger.log(
-        `saveContent... title: ${!!title}, content: ${!!content}, noteId: ${noteId}`
+        `Save content: ${!!title}, content: ${!!content}, noteId: ${noteId}, pendingChanges: ${pendingChanges}, tabId: ${tabId}`
       );
       if (
         lock.current ||
@@ -1016,7 +1098,7 @@ export const useEditor = (
             saveNote(params);
           }
         },
-        ignoreEdit ? 0 : 150
+        150
       );
     },
     [editorSessionHistory, withTimer, onChange, saveNote]

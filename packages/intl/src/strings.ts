@@ -2790,5 +2790,7 @@ Continue without attachments?`,
     t`Permission required to save QR-Code to Gallery`,
   setupInboxKeys: () => t`Setup inbox keys`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
-  enterPgpPrivateKey: () => t`Enter your PGP private key`
+  unsavedChanges: () => t`Unsaved changes`,
+  unsavedNoteDesc: () =>
+    t`This note has unsaved changes. Are you sure you want to close it?`
 };

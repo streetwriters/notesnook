@@ -21,7 +21,7 @@ import { ItemType } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Linking } from "react-native";
 import { db } from "../common/database";
-import { presentDialog } from "../components/dialog/functions";
+import { DialogInfo, presentDialog } from "../components/dialog/functions";
 import {
   useSideMenuNotebookSelectionStore,
   useSideMenuTagsSelectionStore
@@ -219,3 +219,28 @@ export const deleteItems = async (
 export const openLinkInBrowser = async (link: string) => {
   Linking.openURL(link);
 };
+
+export async function confirmationDialog(options: {
+  title: string;
+  paragraph: string;
+  positiveText: string;
+  negativeText?: string;
+  positiveType?: DialogInfo["positiveType"];
+  context?: string;
+}) {
+  return new Promise<boolean>((resolve) => {
+    presentDialog({
+      context: options.context || "global",
+      title: options.title,
+      paragraph: options.paragraph,
+      positiveText: options.positiveText,
+      negativeText: options.negativeText,
+      positiveType: options.positiveType,
+      onClose: () => resolve(false),
+      positivePress: async () => {
+        resolve(true);
+        return true;
+      }
+    });
+  });
+}

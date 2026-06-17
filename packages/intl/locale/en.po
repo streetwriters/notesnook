@@ -2818,10 +2818,6 @@ msgstr "Enter verification code sent to your new email"
 msgid "Enter your new email"
 msgstr "Enter your new email"
 
-#: src/strings.ts:2793
-msgid "Enter your PGP private key"
-msgstr "Enter your PGP private key"
-
 #: src/strings.ts:2792
 msgid "Enter your PGP public key"
 msgstr "Enter your PGP public key"
@@ -6969,6 +6965,10 @@ msgstr "This may take a while"
 msgid "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 msgstr "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 
+#: src/strings.ts:2795
+msgid "This note has unsaved changes. Are you sure you want to close it?"
+msgstr "This note has unsaved changes. Are you sure you want to close it?"
+
 #: src/strings.ts:2651
 msgid "This note is empty"
 msgstr "This note is empty"
@@ -7251,6 +7251,10 @@ msgstr "Unpublish notes to delete them"
 #: src/strings.ts:2098
 msgid "Unregister"
 msgstr "Unregister"
+
+#: src/strings.ts:2793
+msgid "Unsaved changes"
+msgstr "Unsaved changes"
 
 #: src/strings.ts:2647
 msgid "Unset expiry"

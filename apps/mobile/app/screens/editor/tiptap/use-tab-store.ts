@@ -29,6 +29,8 @@ import { MMKV } from "../../../common/database/mmkv";
 import { eSendEvent } from "../../../services/event-manager";
 import { eOnLoadNote } from "../../../utils/events";
 import { editorController } from "./utils";
+import { confirmationDialog } from "../../../utils/functions";
+import { strings } from "@notesnook/intl";
 
 class TabHistory {
   history: string[];
@@ -87,6 +89,7 @@ export type TabSessionItem = {
   locked?: boolean;
   readonly?: boolean;
   spellCheckDisabled: boolean;
+  hasUnsavedChanges?: boolean;
 };
 
 const TabSessionStorageKV = new MMKVLoader()
@@ -188,7 +191,7 @@ export type TabStore = {
   focusEmptyTab: () => void;
   getCurrentNoteId: () => string | undefined;
   getTab: (tabId: string) => TabItem | undefined;
-  clearAllTabs: () => void;
+  clearAllTabs: () => Promise<void>;
   newTabSession: (
     id: string,
     options?: Omit<Partial<TabSessionItem>, "id">
@@ -258,7 +261,7 @@ export const useTabStore = create<TabStore, any>(
 
         const sessionId =
           oldSessionId &&
-            tabSessionHistory.currentSessionId(tabId) === oldSessionId
+          tabSessionHistory.currentSessionId(tabId) === oldSessionId
             ? oldSessionId
             : tabSessionHistory.add(tabId, oldSessionId);
 
@@ -389,7 +392,7 @@ export const useTabStore = create<TabStore, any>(
       focusPreviewTab: (
         noteId: string,
         options: Omit<Partial<TabItem>, "id" | "noteId">
-      ) => { },
+      ) => {},
 
       removeTab: (id: string) => {
         const index = get().tabs.findIndex((t) => t.id === id);
@@ -486,23 +489,48 @@ export const useTabStore = create<TabStore, any>(
       getTab: (tabId) => {
         return get().tabs.find((t) => t.id === tabId);
       },
-      clearAllTabs: () => {
-        const tabs = get().tabs;
-        tabs.forEach((tab) => {
+      clearAllTabs: async () => {
+        const tabs = get().tabs.slice();
+
+        for (let i = 0; i < tabs.length; i++) {
+          const tab = tabs[i];
+          if (
+            tab.session?.hasUnsavedChanges &&
+            !(await confirmationDialog({
+              title: strings.unsavedChanges(),
+              paragraph: strings.unsavedNoteDesc(),
+              positiveText: "Yes",
+              negativeText: "No",
+              context: "local"
+            }))
+          ) {
+            continue;
+          }
           const tabSessions = tabSessionHistory.getTabHistory(tab.id);
           tabSessions.back.forEach((id) => TabSessionStorage.remove(id));
           tabSessions.forward.forEach((id) => TabSessionStorage.remove(id));
           tabSessionHistory.clearStackForTab(tab.id);
-        });
+          tabs.splice(i, 1);
+          history.remove(tab.id);
+        }
 
-        const id = getId();
-        set({
-          tabs: [{ id: id }],
-          currentTab: id
-        });
-        history.history = [id];
-        get().newTabSession(id);
-        get().focusTab(id);
+        if (tabs.length === 0) {
+          const id = getId();
+          set({
+            tabs: [{ id: id }],
+            currentTab: id
+          });
+
+          history.history = [id];
+          get().newTabSession(id);
+          get().focusTab(id);
+        } else {
+          set({
+            tabs: tabs,
+            currentTab: tabs[0].id
+          });
+          get().focusTab(tabs[0].id);
+        }
         syncTabs();
       }
     }),

@@ -38,6 +38,8 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { confirmationDialog } from "../../../utils/functions";
+import { Dialog } from "../../dialog";
 
 const TabItemComponent = (props: {
   tab: TabItem;
@@ -163,7 +165,21 @@ const TabItemComponent = (props: {
             name="close"
             size={AppFontSize.lg}
             color={colors.primary.icon}
-            onPress={() => {
+            onPress={async () => {
+              if (
+                useTabStore.getState().getTab(props.tab.id)?.session
+                  ?.hasUnsavedChanges &&
+                !(await confirmationDialog({
+                  title: strings.unsavedChanges(),
+                  paragraph: strings.unsavedNoteDesc(),
+                  positiveText: "Yes",
+                  negativeText: "No",
+                  context: "local"
+                }))
+              ) {
+                return;
+              }
+
               const isLastTab = useTabStore.getState().tabs.length === 1;
               useTabStore.getState().removeTab(props.tab.id);
               // The last tab is not actually removed, it is just cleaned up.
@@ -216,6 +232,7 @@ export default function EditorTabs({
         maxHeight: "100%"
       }}
     >
+      <Dialog context="local" />
       <View
         style={{
           flexDirection: "row",
@@ -227,8 +244,8 @@ export default function EditorTabs({
         <Heading size={AppFontSize.lg}>{strings.tabs()}</Heading>
         <View style={{ flexDirection: "row", gap: DefaultAppStyles.GAP_SMALL }}>
           <IconButton
-            onPress={() => {
-              useTabStore.getState().clearAllTabs();
+            onPress={async () => {
+              await useTabStore.getState().clearAllTabs();
               close?.();
             }}
             name="close-box-multiple-outline"
