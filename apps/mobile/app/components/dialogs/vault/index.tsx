@@ -794,11 +794,13 @@ export const VaultDialog: React.FC = () => {
             <Pressable
               onPress={() => setDeleteAll(!deleteAll)}
               style={{
-                paddingHorizontal: 10,
                 paddingVertical: 0,
                 flexDirection: "row",
                 gap: DefaultAppStyles.GAP_SMALL,
-                marginTop: isUserLoggedIn ? DefaultAppStyles.GAP_SMALL : 0
+                marginTop: isUserLoggedIn
+                  ? DefaultAppStyles.GAP_VERTICAL_SMALL
+                  : 0,
+                justifyContent: "flex-start"
               }}
             >
               <AppIcon
