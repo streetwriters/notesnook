@@ -40,14 +40,13 @@ import {
   useNoteStatistics
 } from "./manager";
 import { getFormattedDate } from "@notesnook/common";
-import { MAX_AUTO_SAVEABLE_WORDS, NoteStatistics } from "./types";
+import { NoteStatistics } from "./types";
 import { strings } from "@notesnook/intl";
-import { EDITOR_ZOOM } from "./common";
+import { EDITOR_ZOOM, saveContent } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
 import { exitFullscreen } from "../../utils/fullscreen";
 import { useRef, useState } from "react";
 import { PopupPresenter } from "@notesnook/ui";
-import { saveContent } from "./index";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -174,15 +173,6 @@ function EditorFooter() {
           <Plus size={13} />
         </Button>
       </Flex>
-      {statistics.words.total > MAX_AUTO_SAVEABLE_WORDS ? (
-        <Text
-          className="selectable"
-          variant="subBody"
-          sx={{ color: "paragraph" }}
-        >
-          {strings.autoSaveOff()}
-        </Text>
-      ) : null}
       <Button
         className="selectable"
         data-test-id="editor-word-count"
@@ -292,12 +282,12 @@ function EditorFooter() {
             }
           }}
           onClick={() => {
-            if (saveState === SaveState.NotSaved) {
-              const { activeEditorId, getEditor } = useEditorManager.getState();
-              const editor = getEditor(activeEditorId || "")?.editor;
-              if (!editor) return;
-              saveContent(session.id, false, editor.getContent());
-            }
+            const { activeEditorId, getEditor } = useEditorManager.getState();
+            const editor = getEditor(activeEditorId || "")?.editor;
+            if (!editor) return;
+            saveContent(session.id, {
+              content: { type: "tiptap", data: editor.getContent() }
+            });
           }}
         />
       )}

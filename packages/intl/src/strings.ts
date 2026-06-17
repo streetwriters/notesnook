@@ -2790,7 +2790,13 @@ Continue without attachments?`,
     t`Permission required to save QR-Code to Gallery`,
   setupInboxKeys: () => t`Setup inbox keys`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
-  unsavedChanges: () => t`Unsaved changes`,
-  unsavedNoteDesc: () =>
-    t`This note has unsaved changes. Are you sure you want to close it?`
+  enterPgpPrivateKey: () => t`Enter your PGP private key`,
+  conflictDetected: () => t`Conflict detected`,
+  conflictDetectedDesc: () =>
+    `The note has been modified since you opened it. Do you want to overwrite the changes?`,
+  overwrite: () => t`Overwrite`,
+  saveConflictError: () => t`Could not save due to conflict.`,
+  discardChanges: () => t`Discard changes`,
+  discardChangesDesc: () =>
+    t`Closing this note will discard all unsaved changes. Are you sure you want to proceed?`
 };

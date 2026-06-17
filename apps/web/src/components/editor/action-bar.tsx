@@ -82,7 +82,7 @@ import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { getDragData } from "../../utils/data-transfer";
-import { saveContent } from "./index";
+import { closeTabs, saveContent } from "./common";
 
 type ToolButton = {
   title: string;
@@ -408,47 +408,24 @@ const TabStrip = React.memo(function TabStrip() {
                       useEditorManager.getState();
                     const editor = getEditor(activeEditorId || "")?.editor;
                     if (!editor) return;
-                    saveContent(session.id, false, editor.getContent());
+                    saveContent(session.id, {
+                      content: { type: "tiptap", data: editor.getContent() }
+                    });
                   }}
                   onFocus={() => {
-                    if (tab.id !== currentTab) {
-                      useEditorStore.getState().activateSession(tab.sessionId);
-                    }
+                    if (tab.id === currentTab) return;
+                    useEditorStore.getState().activateSession(tab.sessionId);
                   }}
-                  onClose={() => useEditorStore.getState().closeTabs(tab.id)}
-                  onCloseAll={() =>
-                    useEditorStore
-                      .getState()
-                      .closeTabs(
-                        ...tabs.filter((s) => !s.pinned).map((s) => s.id)
-                      )
+                  onClose={async () => await closeTabs([tab])}
+                  onCloseAll={async () => await closeTabs(tabs)}
+                  onCloseOthers={async () =>
+                    await closeTabs(tabs.filter((s) => s.id !== tab.id))
                   }
-                  onCloseOthers={() =>
-                    useEditorStore
-                      .getState()
-                      .closeTabs(
-                        ...tabs
-                          .filter((s) => s.id !== tab.id && !s.pinned)
-                          .map((s) => s.id)
-                      )
+                  onCloseToTheRight={async () =>
+                    await closeTabs(tabs.filter((s, index) => index > i))
                   }
-                  onCloseToTheRight={() =>
-                    useEditorStore
-                      .getState()
-                      .closeTabs(
-                        ...tabs
-                          .filter((s, index) => index > i && !s.pinned)
-                          .map((s) => s.id)
-                      )
-                  }
-                  onCloseToTheLeft={() =>
-                    useEditorStore
-                      .getState()
-                      .closeTabs(
-                        ...tabs
-                          .filter((s, index) => index < i && !s.pinned)
-                          .map((s) => s.id)
-                      )
+                  onCloseToTheLeft={async () =>
+                    await closeTabs(tabs.filter((s, index) => index < i))
                   }
                   onRevealInList={
                     "note" in session

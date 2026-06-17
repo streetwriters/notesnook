@@ -1750,6 +1750,10 @@ msgstr ""
 msgid "Close to the right"
 msgstr ""
 
+#: src/strings.ts:2801
+msgid "Closing this note will discard all unsaved changes. Are you sure you want to proceed?"
+msgstr ""
+
 #: src/strings.ts:2541
 msgid "cloud storage space for storing images and files."
 msgstr ""
@@ -1875,6 +1879,10 @@ msgstr ""
 msgid "Confirmation email sent"
 msgstr ""
 
+#: src/strings.ts:2794
+msgid "Conflict detected"
+msgstr ""
+
 #: src/strings.ts:2092
 msgid "Congratulations!"
 msgstr ""
@@ -1974,6 +1982,10 @@ msgstr ""
 
 #: src/strings.ts:769
 msgid "Could not create backup"
+msgstr ""
+
+#: src/strings.ts:2798
+msgid "Could not save due to conflict."
 msgstr ""
 
 #: src/strings.ts:559
@@ -2392,6 +2404,10 @@ msgstr ""
 msgid "Discard"
 msgstr ""
 
+#: src/strings.ts:2799
+msgid "Discard changes"
+msgstr ""
+
 #: src/strings.ts:1599
 msgid "Dismiss"
 msgstr ""
@@ -2805,6 +2821,10 @@ msgstr ""
 
 #: src/strings.ts:1494
 msgid "Enter your new email"
+msgstr ""
+
+#: src/strings.ts:2793
+msgid "Enter your PGP private key"
 msgstr ""
 
 #: src/strings.ts:2792
@@ -4786,6 +4806,10 @@ msgstr ""
 
 #: src/strings.ts:2358
 msgid "Outline list"
+msgstr ""
+
+#: src/strings.ts:2797
+msgid "Overwrite"
 msgstr ""
 
 #: src/strings.ts:2361
@@ -6922,11 +6946,7 @@ msgstr ""
 #: src/strings.ts:1103
 #: src/strings.ts:1112
 msgid "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
-msgstr ""
-
-#: src/strings.ts:2795
-msgid "This note has unsaved changes. Are you sure you want to close it?"
-msgstr ""
+msgstr "<<<<<<< Updated upstream"
 
 #: src/strings.ts:2651
 msgid "This note is empty"
@@ -7209,11 +7229,7 @@ msgstr ""
 
 #: src/strings.ts:2098
 msgid "Unregister"
-msgstr ""
-
-#: src/strings.ts:2793
-msgid "Unsaved changes"
-msgstr ""
+msgstr "<<<<<<< Updated upstream"
 
 #: src/strings.ts:2647
 msgid "Unset expiry"

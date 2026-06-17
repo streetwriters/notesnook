@@ -48,7 +48,7 @@ import {
   useMemo,
   useRef
 } from "react";
-import { IEditor, MAX_AUTO_SAVEABLE_WORDS } from "./types";
+import { IEditor } from "./types";
 import { useEditorConfig, useToolbarConfig, useEditorManager } from "./manager";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -56,7 +56,6 @@ import { debounce, useAreFeaturesAvailable } from "@notesnook/common";
 import { ScopedThemeProvider } from "../theme-provider";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { writeToClipboard } from "../../utils/clipboard";
-import { useEditorStore } from "../../stores/editor-store";
 import { DayFormat, parseInternalLink } from "@notesnook/core";
 import { desktop } from "../../common/desktop-bridge";
 import Skeleton from "react-loading-skeleton";
@@ -73,10 +72,7 @@ import { handleInternalLink } from "../../common";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
 
-export type OnChangeHandler = (
-  content: () => string,
-  ignoreEdit: boolean
-) => void;
+export type OnChangeHandler = (content: () => string) => void;
 type TipTapProps = {
   id: string;
   editorContainer: () => HTMLElement | undefined;
@@ -98,7 +94,6 @@ type TipTapProps = {
   ) => Promise<LinkAttributes | undefined>;
   onAttachFile?: (file: File) => void;
   onFocus?: () => void;
-  onAutoSaveDisabled: () => void;
   content?: () => string | undefined;
   readonly?: boolean;
   spellcheck?: boolean;
@@ -177,7 +172,6 @@ function TipTap(props: TipTapProps) {
     onInsertInternalLink,
     onContentChange,
     onFocus = () => {},
-    onAutoSaveDisabled,
     content,
     editorContainer,
     readonly,
@@ -193,7 +187,6 @@ function TipTap(props: TipTapProps) {
     fontLigatures
   } = props;
 
-  const autoSave = useRef(true);
   const { toolbarConfig } = useToolbarConfig();
   const features = useAreFeaturesAvailable([
     "callout",
@@ -243,10 +236,8 @@ function TipTap(props: TipTapProps) {
         handleKeyDown(_, event) {
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
-            onChange?.(
-              () =>
-                getHTMLFromFragment(editor.state.doc.content, editor.schema),
-              false
+            onChange?.(() =>
+              getHTMLFromFragment(editor.state.doc.content, editor.schema)
             );
           }
         },
@@ -331,11 +322,8 @@ function TipTap(props: TipTapProps) {
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
         if (preventSave || !editor.isEditable || !onChange) return;
 
-        if (!autoSave.current) return;
-
-        onChange(
-          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
-          ignoreEdit
+        onChange(() =>
+          getHTMLFromFragment(editor.state.doc.content, editor.schema)
         );
       },
       onDestroy: () => {
@@ -522,21 +510,6 @@ function TipTap(props: TipTapProps) {
       editor.view.dom.removeEventListener("click", onClick);
     };
   }, [editor]);
-
-  useEffect(() => {
-    const unsubscribe = useEditorManager.subscribe(
-      (s) => s.editors[id]?.statistics?.words.total,
-      (totalWords) => {
-        autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
-        if (!autoSave.current) {
-          onAutoSaveDisabled();
-        }
-      }
-    );
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   return (
     <>

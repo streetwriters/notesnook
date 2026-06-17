@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Textarea } from "@theme-ui/components";
-import { SaveState, useEditorStore } from "../../stores/editor-store";
+import { useEditorStore } from "../../stores/editor-store";
 import { debounceWithId } from "@notesnook/common";
 import { useEditorConfig, useEditorManager } from "./manager";
 import { getFontById } from "@notesnook/editor";
@@ -28,6 +28,7 @@ import { useStore as useSettingsStore } from "../../stores/setting-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { strings } from "@notesnook/intl";
 import { NEWLINE_STRIP_REGEX } from "@notesnook/core";
+import { saveContent } from "./common";
 
 type TitleBoxProps = {
   id: string;
@@ -172,11 +173,11 @@ export function resizeTextarea(input: HTMLTextAreaElement) {
 }
 
 async function onTitleChange(
-  noteId: string,
+  sessionId: string,
   title: string,
   pendingChanges: React.MutableRefObject<boolean>
 ) {
-  await useEditorStore.getState().setTitle(noteId, title);
+  await saveContent(sessionId, { title });
   pendingChanges.current = false;
 }
 

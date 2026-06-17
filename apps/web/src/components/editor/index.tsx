@@ -76,51 +76,14 @@ import { EditorActionBar } from "./action-bar";
 import { logger } from "../../utils/logger";
 import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { strings } from "@notesnook/intl";
-import { onPageVisibilityChanged } from "../../utils/page-visibility";
 import { Pane, SplitPane } from "../split-pane";
 import { TITLE_BAR_HEIGHT } from "../title-bar";
 import { isMobile } from "../../hooks/use-mobile";
 import { ConfirmDialog } from "../../dialogs/confirm";
+import { saveContent } from "./common";
 
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
-const autoSaveToast = { show: true, hide: () => {} };
-
-export async function saveContent(
-  noteId: string,
-  ignoreEdit: boolean,
-  content: string
-) {
-  logger.debug("saving content", {
-    noteId,
-    ignoreEdit,
-    length: content.length
-  });
-  await Promise.race([
-    useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
-      type: "tiptap",
-      data: content
-    }),
-    new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error(strings.savingNoteTakingTooLong())),
-        30 * 1000
-      )
-    )
-  ]).catch((e) => {
-    const { hide } = showToast(
-      "error",
-      (e as Error).message,
-      [
-        {
-          text: strings.dismiss(),
-          onClick: () => hide()
-        }
-      ],
-      0
-    );
-  });
-}
 const deferredSave = debounceWithId(saveContent, 100);
 
 export default function TabsView() {
@@ -376,7 +339,7 @@ function EditorView({
         }
         onContentChange={() => (lastChangedTime.current = Date.now())}
         onSelectionChange={() => root.current?.classList.remove("searching")}
-        onSave={(content, ignoreEdit) => {
+        onSave={(content) => {
           const currentSession = useEditorStore
             .getState()
             .getSession(session.id);
@@ -411,7 +374,9 @@ function EditorView({
             id: session.id,
             length: data.length
           });
-          deferredSave(session.id, session.id, ignoreEdit, data);
+          deferredSave(session.id, session.id, {
+            content: { type: "tiptap", data: data }
+          });
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
@@ -514,18 +479,10 @@ export function Editor(props: EditorProps) {
     focusMode: false,
     spellcheck: false
   };
-  const saveSessionContentIfNotSaved = useEditorStore(
-    (store) => store.saveSessionContentIfNotSaved
-  );
-  const setEditorSaveState = useEditorStore((store) => store.setSaveState);
   useScrollToBlock(session);
   useScrollToSearchResult(session);
 
   useEffect(() => {
-    if (!autoSaveToast.show) {
-      autoSaveToast.hide();
-    }
-
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
@@ -541,15 +498,6 @@ export function Editor(props: EditorProps) {
       event.unsubscribe();
     };
   }, [id]);
-
-  useEffect(() => {
-    const unsub = onPageVisibilityChanged((_, hidden) => {
-      if (hidden) {
-        saveSessionContentIfNotSaved(id);
-      }
-    });
-    return () => unsub();
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -669,25 +617,6 @@ export function Editor(props: EditorProps) {
         onInsertInternalLink={async (attributes) => {
           const link = await NoteLinkingDialog.show({ attributes });
           return link || undefined;
-        }}
-        onAutoSaveDisabled={() => {
-          setEditorSaveState(id, SaveState.NotSaved);
-          if (autoSaveToast.show === false) return;
-          const { hide } = showToast(
-            "error",
-            "Auto-save is disabled for large notes. Press Ctrl + S to save.",
-            [
-              {
-                text: "Dismiss",
-                onClick: () => {
-                  hide();
-                }
-              }
-            ],
-            Infinity
-          );
-          autoSaveToast.show = false;
-          autoSaveToast.hide = hide;
         }}
       >
         {headless ? null : (

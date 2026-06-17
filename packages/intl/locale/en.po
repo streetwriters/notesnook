@@ -1761,6 +1761,10 @@ msgstr "Close to the left"
 msgid "Close to the right"
 msgstr "Close to the right"
 
+#: src/strings.ts:2801
+msgid "Closing this note will discard all unsaved changes. Are you sure you want to proceed?"
+msgstr "Closing this note will discard all unsaved changes. Are you sure you want to proceed?"
+
 #: src/strings.ts:2541
 msgid "cloud storage space for storing images and files."
 msgstr "cloud storage space for storing images and files."
@@ -1886,6 +1890,10 @@ msgstr "Confirm pin"
 msgid "Confirmation email sent"
 msgstr "Confirmation email sent"
 
+#: src/strings.ts:2794
+msgid "Conflict detected"
+msgstr "Conflict detected"
+
 #: src/strings.ts:2092
 msgid "Congratulations!"
 msgstr "Congratulations!"
@@ -1986,6 +1994,10 @@ msgstr "Could not convert note to {format}."
 #: src/strings.ts:769
 msgid "Could not create backup"
 msgstr "Could not create backup"
+
+#: src/strings.ts:2798
+msgid "Could not save due to conflict."
+msgstr "Could not save due to conflict."
 
 #: src/strings.ts:559
 msgid "Could not unlock"
@@ -2403,6 +2415,10 @@ msgstr "Disabling will delete all your unsynced inbox items. Additionally, disab
 msgid "Discard"
 msgstr "Discard"
 
+#: src/strings.ts:2799
+msgid "Discard changes"
+msgstr "Discard changes"
+
 #: src/strings.ts:1599
 msgid "Dismiss"
 msgstr "Dismiss"
@@ -2817,6 +2833,10 @@ msgstr "Enter verification code sent to your new email"
 #: src/strings.ts:1494
 msgid "Enter your new email"
 msgstr "Enter your new email"
+
+#: src/strings.ts:2793
+msgid "Enter your PGP private key"
+msgstr "Enter your PGP private key"
 
 #: src/strings.ts:2792
 msgid "Enter your PGP public key"
@@ -4813,6 +4833,10 @@ msgstr "Other"
 #: src/strings.ts:2358
 msgid "Outline list"
 msgstr "Outline list"
+
+#: src/strings.ts:2797
+msgid "Overwrite"
+msgstr "Overwrite"
 
 #: src/strings.ts:2361
 msgid "Paragraph"
@@ -6965,10 +6989,6 @@ msgstr "This may take a while"
 msgid "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 msgstr "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 
-#: src/strings.ts:2795
-msgid "This note has unsaved changes. Are you sure you want to close it?"
-msgstr "This note has unsaved changes. Are you sure you want to close it?"
-
 #: src/strings.ts:2651
 msgid "This note is empty"
 msgstr "This note is empty"
@@ -7251,10 +7271,6 @@ msgstr "Unpublish notes to delete them"
 #: src/strings.ts:2098
 msgid "Unregister"
 msgstr "Unregister"
-
-#: src/strings.ts:2793
-msgid "Unsaved changes"
-msgstr "Unsaved changes"
 
 #: src/strings.ts:2647
 msgid "Unset expiry"

@@ -52,8 +52,8 @@ import { isCipher } from "@notesnook/core";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
-import { useEditorManager } from "../components/editor/manager";
 import { Context } from "../components/list-container/types";
+import { warnIfSessionNotSaved } from "../components/editor/common";
 
 export enum SaveState {
   NotSaved = -1,
@@ -585,11 +585,6 @@ class EditorStore extends BaseStore<EditorStore> {
     const session = this.get().sessions.find((s) => s.id === id);
     if (!session) id = undefined;
 
-    const activeSession = this.getActiveSession();
-    if (activeSession) {
-      this.saveSessionContentIfNotSaved(activeSession.id);
-    }
-
     if (
       id &&
       !useSettingStore.getState().hideNoteTitle &&
@@ -717,6 +712,9 @@ class EditorStore extends BaseStore<EditorStore> {
 
     const tab = tabs.find((t) => t.id === tabId);
     const activeSession = tab && getSession(tab.sessionId);
+    if (tab?.sessionId && !(await warnIfSessionNotSaved(tab?.sessionId)))
+      return;
+
     const noteAlreadyOpened =
       activeSession &&
       "note" in activeSession &&
@@ -982,125 +980,99 @@ class EditorStore extends BaseStore<EditorStore> {
 
   saveSession = async (
     id: string,
-    partial: Partial<Omit<DefaultEditorSession, "note">> & {
-      note?: Partial<Note>;
-      ignoreEdit?: boolean;
-    }
+    partial: { content: NoteContent<false> } | { title: string }
   ) => {
-    const session = this.getSession(id, ["new", "default"]);
-    if (!session) return;
-
-    // do not allow saving of readonly session
-    if (partial.note?.readonly) return;
-
     await saveMutex.runExclusive(async () => {
-      this.setSaveState(id, 0);
+      const session = this.getSession(id, ["new", "default"]);
+      if (!session) return;
+
+      this.setSaveState(id, SaveState.Saving);
+      const editSessionId = getEditSessionId(session);
+
       try {
-        // Get session again as it might have changed to default.
-        const currentSession =
-          session.type === "new"
-            ? this.getSession(id, ["new", "default"])
-            : session;
-
-        if (!currentSession) return;
-        const sessionId = getSessionId(currentSession);
-        let noteId =
-          "note" in currentSession ? currentSession.note.id : partial.note?.id;
-
-        if (isLockedSession(currentSession) && partial.content) {
-          if (!noteId) return;
-          logger.debug("Saving locked content", { noteId });
-
-          noteId = await db.vault.save({
-            content: partial.content,
-            sessionId,
-            id: noteId
+        if (session.type === "new") {
+          const noteId = await db.notes.add({
+            sessionId: editSessionId,
+            ...partial
           });
-        } else {
-          if (partial.content)
-            logger.debug("Saving content", {
-              noteId,
-              length: partial.content.data.length
-            });
-          noteId = await db.notes.add({
-            ...partial.note,
-            dateEdited:
-              partial.ignoreEdit && currentSession.type === "default"
-                ? currentSession.note.dateEdited
-                : undefined,
-            contentId:
-              currentSession.type === "default"
-                ? currentSession.note.contentId
-                : undefined,
-            content: partial.content,
-            sessionId,
-            id: noteId
-          });
-        }
 
-        const note = noteId && (await db.notes.note(noteId));
-        if (!note) throw new Error("Note not saved.");
+          const note = await db.notes.note(noteId);
+          if (!note) throw new Error("Note not saved.");
 
-        if (currentSession.type === "new") {
           const context = useNoteStore.getState().context;
           await addNotebook(note, context);
           await addTag(note, context);
           await addColor(note, context);
-        }
 
-        const attachmentsLength = await db.attachments
-          .ofNote(note.id, "all")
-          .count();
-        const shouldRefreshNotes =
-          currentSession.type === "new" ||
-          note.title !== currentSession.note?.title ||
-          note.headline !== currentSession.note?.headline ||
-          attachmentsLength !== currentSession.attachmentsLength;
-        if (shouldRefreshNotes) useNoteStore.getState().refresh();
-
-        if (currentSession.type === "new") {
+          useNoteStore.getState().refresh();
           await this.openSession(note, { force: true });
         } else {
-          // update any conflicted session that has the same content opened
-          if (partial.content) {
-            this.set((state) => {
-              const session = state.sessions.find(
-                (s): s is ConflictedEditorSession =>
-                  (s.type === "diff" || s.type === "conflicted") &&
-                  !!s.content?.conflicted &&
-                  s.content.conflicted.id === currentSession.note.contentId &&
-                  s.content.conflicted.dateEdited ===
-                    currentSession.note.dateEdited
-              );
-              if (!session || !session.content?.conflicted) return;
-              session.content.conflicted.data = partial.content!.data;
-              session.content.conflicted.dateEdited = note.dateEdited;
+          if (isLockedSession(session) && "content" in partial) {
+            await db.vault.save({
+              content: partial.content,
+              sessionId: editSessionId,
+              id: session.note.id
+            });
+          } else {
+            await db.notes.add({
+              dateEdited: session.note.dateEdited,
+              contentId: session.note.contentId,
+              sessionId: editSessionId,
+              id: session.note.id,
+              ...partial
             });
           }
 
+          const note = await db.notes.note(session.note.id);
+          if (!note) throw new Error("Note not saved.");
+
+          // update any conflicted session that has the same content opened
+          if ("content" in partial) {
+            this.set((state) => {
+              const conflictedSession = state.sessions.find(
+                (s): s is ConflictedEditorSession =>
+                  (s.type === "diff" || s.type === "conflicted") &&
+                  !!s.content?.conflicted &&
+                  s.content.conflicted.id === session.note.contentId &&
+                  s.content.conflicted.dateEdited === session.note.dateEdited
+              );
+              if (!conflictedSession || !conflictedSession.content?.conflicted)
+                return;
+              conflictedSession.content.conflicted.data = partial.content.data;
+              conflictedSession.content.conflicted.dateEdited = note.dateEdited;
+            });
+          }
+
+          if ("title" in partial) {
+            const { sessions } = this.get();
+            for (const session of sessions) {
+              if ("note" in session && session.note.id === note.id) {
+                this.updateSession(session.id, undefined, {
+                  note,
+                  title: note.title
+                });
+              }
+            }
+          }
+
+          const attachmentsLength = await db.attachments
+            .ofNote(note.id, "all")
+            .count();
           this.updateSession(id, ["default"], {
             attachmentsLength: attachmentsLength,
             note,
-            sessionId
+            sessionId: editSessionId,
+            saveState: SaveState.Saved
           });
+          const shouldRefreshNotes =
+            note.title !== session.note?.title ||
+            note.headline !== session.note?.headline ||
+            attachmentsLength !== session.attachmentsLength;
+          if (shouldRefreshNotes) useNoteStore.getState().refresh();
+          setDocumentTitle(
+            useSettingStore.getState().hideNoteTitle ? undefined : note.title
+          );
         }
-
-        if (partial.note?.title !== undefined) {
-          const { sessions } = this.get();
-          for (const session of sessions) {
-            if ("note" in session && session.note.id === note.id) {
-              this.updateSession(session.id, undefined, {
-                note,
-                title: note.title
-              });
-            }
-          }
-        }
-
-        setDocumentTitle(
-          useSettingStore.getState().hideNoteTitle ? undefined : note.title
-        );
-        this.setSaveState(id, SaveState.Saved);
       } catch (err) {
         showToast(
           "error",
@@ -1116,25 +1088,6 @@ class EditorStore extends BaseStore<EditorStore> {
         }
       }
     });
-  };
-
-  saveSessionContentIfNotSaved = (sessionId: string) => {
-    const sessionSaveState = this.getSession(sessionId, ["default"])?.saveState;
-    if (sessionSaveState === SaveState.NotSaved) {
-      const editor = useEditorManager.getState().getEditor(sessionId);
-      const content = editor?.editor?.getContent();
-      this.saveSession(
-        sessionId,
-        content
-          ? {
-              content: {
-                data: content,
-                type: "tiptap"
-              }
-            }
-          : {}
-      );
-    }
   };
 
   newSession = () => {
@@ -1186,8 +1139,6 @@ class EditorStore extends BaseStore<EditorStore> {
           continue;
         }
 
-        this.saveSessionContentIfNotSaved(tab.sessionId);
-
         db.fs().cancel(tab.sessionId).catch(console.error);
         if (state.history.includes(tab.id))
           state.history.splice(state.history.indexOf(tab.id), 1);
@@ -1209,30 +1160,10 @@ class EditorStore extends BaseStore<EditorStore> {
     if (tabs.length === 0) this.addTab();
   };
 
-  setTitle = (id: string, title: string) => {
-    return this.saveSession(id, { note: { title } });
-  };
-
-  toggle = (
-    id: string,
-    name: "favorite" | "pinned" | "readonly" | "localOnly" | "color",
-    value: boolean | string
-  ) => {
-    if (name === "color" && typeof value === "string")
-      return this.updateSession(id, ["readonly", "default"], { color: value });
-    return this.saveSession(id, { note: { [name]: value } });
-  };
-
-  saveSessionContent = (
-    id: string,
-    ignoreEdit: boolean,
-    content: NoteContent<false>
-  ) => {
-    return this.saveSession(id, { content, ignoreEdit });
-  };
-
   setSaveState = (id: string, saveState: SaveState) => {
-    this.updateSession(id, ["default", "new"], { saveState: saveState });
+    this.updateSession(id, ["default", "new"], {
+      saveState: saveState
+    });
   };
 
   toggleProperties = (toggleState?: boolean) => {
@@ -1390,7 +1321,7 @@ export { useEditorStore, SESSION_STATES };
 
 const MILLISECONDS_IN_A_MINUTE = 60 * 1000;
 const SESSION_DURATION = MILLISECONDS_IN_A_MINUTE * 5;
-function getSessionId(session: DefaultEditorSession | NewEditorSession) {
+function getEditSessionId(session: DefaultEditorSession | NewEditorSession) {
   const sessionId =
     "sessionId" in session ? parseInt(session.sessionId) : Date.now();
   if (sessionId + SESSION_DURATION < Date.now()) return `${Date.now()}`;
