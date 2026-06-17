@@ -38,6 +38,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .createTable("kv")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .addColumn("key", "text", (c) => c.primaryKey().unique().notNull())
             .addColumn("value", "text")
@@ -46,6 +47,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("notes")
+            .ifNotExists()
             // .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .$call(addTrashColumns)
@@ -68,6 +70,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("content")
+            .ifNotExists()
             // .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("noteId", "text")
@@ -88,6 +91,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("notehistory")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("noteId", "text")
@@ -98,6 +102,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("sessioncontent")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("data", "text")
@@ -109,6 +114,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("notebooks")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .$call(addTrashColumns)
@@ -120,6 +126,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("tags")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("title", "text", COLLATE_NOCASE)
@@ -127,6 +134,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("colors")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("title", "text", COLLATE_NOCASE)
@@ -135,6 +143,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("vaults")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("title", "text", COLLATE_NOCASE)
@@ -143,6 +152,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("relations")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("fromType", "text")
@@ -153,6 +163,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("shortcuts")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("sortIndex", "integer")
@@ -162,6 +173,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("reminders")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("title", "text", COLLATE_NOCASE)
@@ -178,6 +190,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("attachments")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("iv", "text")
@@ -197,6 +210,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createTable("settings")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("key", "text", (c) => c.unique())
@@ -205,12 +219,14 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createIndex("notehistory_noteid")
+            .ifNotExists()
             .on("notehistory")
             .column("noteId")
             .execute();
 
           await db.schema
             .createIndex("relation_from_general")
+            .ifNotExists()
             .on("relations")
             .columns(["fromType", "toType", "fromId"])
             .where("toType", "!=", "note")
@@ -219,6 +235,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createIndex("relation_to_general")
+            .ifNotExists()
             .on("relations")
             .columns(["fromType", "toType", "toId"])
             .where("fromType", "!=", "note")
@@ -227,6 +244,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createIndex("relation_from_note_notebook")
+            .ifNotExists()
             .on("relations")
             .columns(["fromType", "toType", "fromId", "toId"])
             .where((eb) =>
@@ -239,6 +257,7 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createIndex("relation_to_note_notebook")
+            .ifNotExists()
             .on("relations")
             .columns(["fromType", "toType", "toId", "fromId"])
             .where((eb) =>
@@ -251,36 +270,42 @@ export class NNMigrationProvider implements MigrationProvider {
 
           await db.schema
             .createIndex("note_type")
+            .ifNotExists()
             .on("notes")
             .columns(["type"])
             .execute();
 
           await db.schema
             .createIndex("note_deleted")
+            .ifNotExists()
             .on("notes")
             .columns(["deleted"])
             .execute();
 
           await db.schema
             .createIndex("note_date_deleted")
+            .ifNotExists()
             .on("notes")
             .columns(["dateDeleted"])
             .execute();
 
           await db.schema
             .createIndex("notebook_type")
+            .ifNotExists()
             .on("notebooks")
             .columns(["type"])
             .execute();
 
           await db.schema
             .createIndex("attachment_hash")
+            .ifNotExists()
             .on("attachments")
             .column("hash")
             .execute();
 
           await db.schema
             .createIndex("content_noteId")
+            .ifNotExists()
             .on("content")
             .columns(["noteId"])
             .execute();
@@ -316,6 +341,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .createTable("config")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .addColumn("name", "text", (c) => c.primaryKey().unique().notNull())
             .addColumn("value", "text")
@@ -397,6 +423,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .createTable("monographs")
+            .ifNotExists()
             .$call(addBaseColumns)
             .addColumn("datePublished", "integer")
             .addColumn("title", "text", COLLATE_NOCASE)
@@ -413,6 +440,7 @@ export class NNMigrationProvider implements MigrationProvider {
             .execute();
           await db.schema
             .createIndex("note_expiry_date")
+            .ifNotExists()
             .on("notes")
             .expression(sql`expiryDate ->> '$.value'`)
             .execute();
@@ -485,7 +513,9 @@ function createFTS5Table(
     sql.join(_options.map((o) => sql.raw(o)))
   ]);
 
-  return sql`CREATE VIRTUAL TABLE ${sql.raw(name)} USING fts5(${args})`;
+  return sql`CREATE VIRTUAL TABLE IF NOT EXISTS ${sql.raw(
+    name
+  )} USING fts5(${args})`;
 }
 
 async function runFTSTablesMigrations(db: Kysely<any>) {
