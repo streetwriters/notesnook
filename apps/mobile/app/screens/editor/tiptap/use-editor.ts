@@ -949,6 +949,7 @@ export const useEditor = (
         `saveContent... title: ${!!title}, content: ${!!content}, noteId: ${noteId}`
       );
       if (
+        ignoreEdit ||
         lock.current ||
         (currentLoadingNoteId.current &&
           currentLoadingNoteId.current === noteId)
@@ -957,6 +958,7 @@ export const useEditor = (
 
           lock.current: ${lock.current}
           currentLoadingNoteId.current: ${currentLoadingNoteId.current}
+          ignoreEdit: ${ignoreEdit}
         `);
         if (lock.current) {
           setTimeout(() => {
