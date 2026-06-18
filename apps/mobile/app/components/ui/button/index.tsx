@@ -54,7 +54,7 @@ export interface ButtonProps extends PressableProps {
     alpha?: number;
   };
   bold?: boolean;
-  iconColor?: ColorValue;
+  iconColor?: ColorValue | ColorValue[];
   iconStyle?: TextStyle;
   iconFamily?: IconProps["iconFamily"];
   proTag?: boolean;

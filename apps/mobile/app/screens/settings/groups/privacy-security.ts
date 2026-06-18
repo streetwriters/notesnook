@@ -267,11 +267,7 @@ export const privacySecurityGroup: SettingSection = {
                     !(await BiometricService.isBiometryAvailable()) &&
                     !SettingsService.getProperty("appLockHasPasswordSecurity")
                   ) {
-                    ToastManager.show({
-                      heading: strings.biometricsNotEnrolled(),
-                      type: "error",
-                      message: strings.biometricsNotEnrolledDesc()
-                    });
+                    AppLockPassword.present("create", true);
                     return false;
                   }
                 }
@@ -292,18 +288,11 @@ export const privacySecurityGroup: SettingSection = {
               }
             },
             {
-              id: "app-lock-pin",
+              id: "app-lock-pass-setup",
               icon: "numpad",
               iconFamily: "notesnook",
-              name: () =>
-                SettingsService.getProperty("applockKeyboardType") === "numeric"
-                  ? strings.setupAppLockPin()
-                  : strings.setupAppLockPassword(),
-
-              description: () =>
-                SettingsService.getProperty("applockKeyboardType") === "numeric"
-                  ? strings.setupAppLockPinDesc()
-                  : strings.setupAppLockPasswordDesc(),
+              name: strings.setupAppLockPassword(),
+              description: strings.setupAppLockPasswordDesc(),
               hidden: () => {
                 return !!SettingsService.getProperty(
                   "appLockHasPasswordSecurity"
@@ -318,17 +307,11 @@ export const privacySecurityGroup: SettingSection = {
               }
             },
             {
-              id: "app-lock-pin-change",
+              id: "app-lock-pass-change",
               icon: "numpad",
               iconFamily: "notesnook",
-              name: () =>
-                SettingsService.getProperty("applockKeyboardType") === "numeric"
-                  ? strings.changeAppLockPin()
-                  : strings.changeAppLockPassword(),
-              description: () =>
-                SettingsService.getProperty("applockKeyboardType") === "numeric"
-                  ? strings.changeAppLockPinDesc()
-                  : strings.changeAppLockPasswordDesc(),
+              name: strings.changeAppLockPassword(),
+              description: strings.changeAppLockPasswordDesc(),
               hidden: () => {
                 return !SettingsService.getProperty(
                   "appLockHasPasswordSecurity"
@@ -340,20 +323,16 @@ export const privacySecurityGroup: SettingSection = {
               }
             },
             {
-              id: "app-lock-pin-remove",
-              name: () =>
-                SettingsService.getProperty("applockKeyboardType") === "numeric"
-                  ? strings.removeAppLockPin()
-                  : strings.removeAppLockPassword(),
-              description: () =>
-                SettingsService.getProperty("applockKeyboardType") === "numeric"
-                  ? strings.removeAppLockPinDesc()
-                  : strings.removeAppLockPasswordDesc(),
+              id: "app-lock-pass-remove",
+              name: strings.removeAppLockPassword(),
+              description: strings.removeAppLockPasswordDesc(),
               hidden: () => {
                 return !SettingsService.getProperty(
                   "appLockHasPasswordSecurity"
                 );
               },
+              icon: "backspace",
+              iconFamily: "notesnook",
               property: "appLockHasPasswordSecurity",
               modifer: () => {
                 AppLockPassword.present("remove");

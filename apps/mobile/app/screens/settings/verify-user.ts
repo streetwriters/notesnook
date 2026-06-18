@@ -92,25 +92,18 @@ export async function verifyUser(
 }
 
 export async function verifyUserWithApplock() {
-  const keyboardType = SettingsService.getProperty("applockKeyboardType");
   return new Promise<boolean>((resolve) => {
     if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
       presentDialog({
         title: strings.verifyItsYou(),
-        paragraph:
-          keyboardType == "numeric"
-            ? strings.enterApplockPinDesc()
-            : strings.enterApplockPasswordDesc(),
+        paragraph: strings.enterApplockPasswordDesc(),
         form: {
           formRef: createFormRef({
             password: ""
           }),
           items: [
             {
-              label:
-                keyboardType == "numeric"
-                  ? strings.enterApplockPin()
-                  : strings.enterApplockPassword(),
+              label: strings.enterApplockPassword(),
               name: "password",
               placeholder: "•••••••••",
               ref: React.createRef(),
@@ -124,12 +117,7 @@ export async function verifyUserWithApplock() {
                 form.getValue("password")
               );
               if (!verified) {
-                form.setError(
-                  "password",
-                  strings.invalid(
-                    keyboardType === "numeric" ? "pin" : "password"
-                  )
-                );
+                form.setError("password", strings.invalid("password"));
                 return false;
               }
               resolve(verified);
