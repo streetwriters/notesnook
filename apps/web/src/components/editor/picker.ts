@@ -222,7 +222,7 @@ async function addAttachment(
       hash,
       hashType,
       filename: exists?.filename || file.name,
-      mimeType: exists?.type || file.type,
+      mimeType: exists?.mimeType || file.type,
       key
     });
   }

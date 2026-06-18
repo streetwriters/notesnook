@@ -589,7 +589,7 @@ export function Editor(props: EditorProps) {
             const attachment = await db.attachments.attachment(hash);
             if (!attachment)
               throw new Error("No attachment found with hash: " + hash);
-            if (attachment.mimeType.startsWith("image/")) {
+            if (attachment.mimeType.startsWith("image/") || type === "image") {
               await previewImageAttachment(attachment);
             } else if (
               onPreviewDocument &&

@@ -82,8 +82,9 @@ export const AttachFilesDialog = DialogManager.register(
       hasImages &&
       imageCompressionConfig === ImageCompressionOptions.ASK_EVERY_TIME;
     const isProcessing = fileStates.some(
-      (f) => f.status !== "done" && f.status !== "error"
+      (f) => f.status === "compressing" || f.status === "encrypting"
     );
+    const isDone = fileStates.every((f) => f.status === "done");
 
     useEffect(() => {
       const event = AppEventManager.subscribe(
@@ -212,12 +213,15 @@ export const AttachFilesDialog = DialogManager.register(
           await compressFiles();
           if (!isCompressionOptional) await processFiles();
         }}
-        onClose={() => onClose(false)}
+        onClose={() => {
+          if (isProcessing) return;
+          onClose(false);
+        }}
         width={500}
         positiveButton={
-          isCompressionOptional
+          isCompressionOptional && !isDone
             ? {
-                text: strings.done(),
+                text: strings.insert(),
                 disabled: isProcessing,
                 onClick: async () => {
                   await processFiles();
@@ -227,6 +231,7 @@ export const AttachFilesDialog = DialogManager.register(
         }
         negativeButton={{
           text: strings.close(),
+          disabled: isProcessing,
           onClick: () => onClose(false)
         }}
       >
@@ -342,22 +347,6 @@ function FileRow({
       <Flex sx={{ flexShrink: 0, alignItems: "center" }}>
         {status === "error" ? (
           <CloseCircle size={20} color="accent-error" />
-        ) : showCompressionToggle && isImage ? (
-          <Switch
-            sx={{
-              m: 0,
-              bg: compress ? "accent" : "icon-secondary",
-              flexShrink: 0,
-              scale: 0.75
-            }}
-            checked={compress}
-            onChange={onToggleCompress}
-            disabled={status === "compressing"}
-          />
-        ) : showCompressionToggle && !isImage ? (
-          <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-            N/A
-          </Text>
         ) : status === "done" ? (
           <CheckCircle size={20} color="accent" />
         ) : status === "encrypting" || status === "compressing" ? (
@@ -381,6 +370,21 @@ function FileRow({
               />
             </Box>
           </Flex>
+        ) : showCompressionToggle && isImage ? (
+          <Switch
+            sx={{
+              m: 0,
+              bg: compress ? "accent" : "icon-secondary",
+              flexShrink: 0,
+              scale: 0.75
+            }}
+            checked={compress}
+            onChange={onToggleCompress}
+          />
+        ) : showCompressionToggle && !isImage ? (
+          <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
+            N/A
+          </Text>
         ) : (
           <Loading size={16} color="icon" />
         )}
