@@ -26,27 +26,40 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
 import { Storage } from "../../common/database/storage";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { presentDialog } from "../../components/dialog/functions";
 import AddApiKeySheet from "../../components/sheets/add-api-key";
+import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
+import CirclesBackground from "../../components/ui/circles-background";
 import { IconButton } from "../../components/ui/icon-button";
-import Input from "../../components/ui/input";
 import FormInput, {
   createFormRef,
   validators
 } from "../../components/ui/input/form-input";
 import { Notice } from "../../components/ui/notice";
+import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import AppIcon from "../../components/ui/AppIcon";
+
+type InboxKeysOption = "auto" | "own";
+type SetupStep = "choose" | "edit" | "create-key" | "success";
+
+const getExpiryOptions = () => [
+  { label: strings.expiryOneDay(), value: 24 * 60 * 60 * 1000 },
+  { label: strings.expiryOneWeek(), value: 7 * 24 * 60 * 60 * 1000 },
+  { label: strings.expiryOneMonth(), value: 30 * 24 * 60 * 60 * 1000 },
+  { label: strings.expiryOneYear(), value: 365 * 24 * 60 * 60 * 1000 },
+  { label: strings.never(), value: -1 }
+];
 
 export const SetupInboxKeys = () => {
-  const [mode, setMode] = useState<"choose" | "edit">("choose");
+  const [mode, setMode] = useState<SetupStep>("choose");
+  const [option, setOption] = useState<InboxKeysOption>("auto");
   const [error, setError] = useState("");
   const { colors } = useThemeColors();
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +69,23 @@ export const SetupInboxKeys = () => {
       privateKey: ""
     })
   );
+  const keyFormRef = useRef(
+    createFormRef({
+      keyName: ""
+    })
+  );
+  const [selectedExpiry, setSelectedExpiry] = useState(
+    getExpiryOptions()[2].value
+  );
+  const [isCreatingKey, setIsCreatingKey] = useState(false);
+  const [createdKey, setCreatedKey] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(timer);
+  }, [copied]);
 
   const handleAutoGenerate = async () => {
     try {
@@ -68,12 +98,20 @@ export const SetupInboxKeys = () => {
       useSettingStore.setState({
         inboxEnabled: true
       });
-      Navigation.goBack();
+      setMode("create-key");
     } catch (error) {
       DatabaseLogger.error(error as Error);
       ToastManager.error(error as Error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleContinue = () => {
+    if (option === "auto") {
+      handleAutoGenerate();
+    } else {
+      setMode("edit");
     }
   };
 
@@ -95,78 +133,208 @@ export const SetupInboxKeys = () => {
       useSettingStore.setState({
         inboxEnabled: true
       });
-      Navigation.goBack();
       ToastManager.show({
         message: strings.inboxKeysSaved(),
         type: "success"
       });
+      setMode("create-key");
     } catch (e) {
       DatabaseLogger.error(e);
       ToastManager.error(e as Error);
     }
   };
 
+  const pasteInto = async (name: "publicKey" | "privateKey") => {
+    const value = await Clipboard.getString();
+    if (!value) return;
+    formRef.current.setValue(name, value.trim());
+  };
+
+  const handleCreateKey = async () => {
+    if (keyFormRef.current.validateField("keyName")) return;
+    const keyName = keyFormRef.current.getValue("keyName").trim();
+    try {
+      setIsCreatingKey(true);
+      await db.inboxApiKeys.create(keyName, selectedExpiry);
+      const keys = await db.inboxApiKeys.get();
+      const created = keys
+        ?.slice()
+        .sort((a, b) => b.dateCreated - a.dateCreated)[0];
+      setCreatedKey(created?.key || "");
+      setMode("success");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "";
+      DatabaseLogger.error(e);
+      ToastManager.show({
+        message: strings.failedToCreateApiKey(message),
+        type: "error"
+      });
+      keyFormRef.current.setError(
+        "keyName",
+        message || strings.failedToCreateApiKey("")
+      );
+    } finally {
+      setIsCreatingKey(false);
+    }
+  };
+
+  const handleCopyKey = () => {
+    if (!createdKey) return;
+    Clipboard.setString(createdKey);
+    setCopied(true);
+    ToastManager.show({
+      message: strings.apiKeyCopiedToClipboard(),
+      type: "success"
+    });
+  };
+
   return (
     <View>
       {mode === "choose" ? (
-        <>
-          <View
-            style={{
-              paddingHorizontal: DefaultAppStyles.GAP,
-              gap: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <Paragraph>{strings.setupInboxPgpKeysDescription()}</Paragraph>
-            <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
-              <Button
-                title={strings.autoGenerateKeys()}
-                type="accent"
-                width="100%"
-                onPress={handleAutoGenerate}
-                disabled={isLoading}
-              />
-              <Button
-                title={strings.provideOwnKeys()}
-                type="secondary"
-                width="100%"
-                onPress={() => setMode("edit")}
-                disabled={isLoading}
-              />
-            </View>
-          </View>
-        </>
-      ) : (
-        <ScrollView
-          contentContainerStyle={{
-            paddingHorizontal: DefaultAppStyles.GAP,
-            gap: DefaultAppStyles.GAP_VERTICAL,
-            marginTop: DefaultAppStyles.GAP_VERTICAL
+        <View
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3,
+            alignItems: "center"
           }}
         >
-          <Paragraph>{strings.publicKey()}</Paragraph>
-          <FormInput
-            name="publicKey"
-            formRef={formRef}
-            numberOfLines={5}
-            validators={[validators.required(strings.publicKeyRequired())]}
-            placeholder={strings.enterPgpPublicKey()}
-            multiline
-            containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
-            inputStyle={{ minHeight: 150, textAlignVertical: "top" }}
-            wrapperStyle={{ minHeight: 150 }}
-          />
-          <Paragraph>{strings.privateKey()}</Paragraph>
-          <FormInput
-            name="privateKey"
-            formRef={formRef}
-            numberOfLines={5}
-            placeholder={strings.enterPgpPrivateKey()}
-            validators={[validators.required(strings.privateKeyRequired())]}
-            multiline
-            containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
-            inputStyle={{ minHeight: 150, textAlignVertical: "top" }}
-            wrapperStyle={{ minHeight: 150 }}
-          />
+          <CirclesBackground
+            style={{
+              marginBottom: Spacing.LEVEL_6
+            }}
+            size={120}
+          >
+            <AppIcon
+              name="shield-check"
+              iconFamily="notesnook"
+              size={22}
+              color={colors.static.white}
+            />
+          </CirclesBackground>
+
+          <View style={{ gap: Spacing.LEVEL_3, width: "100%" }}>
+            <View style={{ gap: Spacing.LEVEL_1 }}>
+              <Heading
+                fontSize="XL"
+                lineHeight="100%"
+                style={{ textAlign: "center" }}
+              >
+                {strings.setupInboxKeys()}
+              </Heading>
+              <Paragraph
+                color={colors.secondary.paragraph}
+                style={{ textAlign: "center" }}
+              >
+                {strings.setupInboxKeysDesc()}
+              </Paragraph>
+            </View>
+
+            <View style={{ gap: Spacing.LEVEL_2 }}>
+              <InboxKeysOptionCard
+                title={strings.autoGenerateKeys()}
+                description={strings.autoGenerateKeysDesc()}
+                selected={option === "auto"}
+                onPress={() => setOption("auto")}
+              />
+              <InboxKeysOptionCard
+                title={strings.provideOwnKeys()}
+                description={strings.provideOwnKeysDesc()}
+                selected={option === "own"}
+                onPress={() => setOption("own")}
+              />
+            </View>
+
+            <Button
+              title={strings.continue()}
+              type="accent"
+              width="100%"
+              onPress={handleContinue}
+              loading={isLoading}
+              disabled={isLoading}
+            />
+          </View>
+        </View>
+      ) : null}
+
+      {mode === "edit" ? (
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.LEVEL_3,
+            gap: Spacing.LEVEL_4
+          }}
+        >
+          <View style={{ gap: Spacing.LEVEL_1 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                {strings.publicKey()}
+              </Paragraph>
+              <Paragraph
+                fontSize="XS"
+                color={colors.primary.accent}
+                fontFamily="SEMI_BOLD"
+                onPress={() => pasteInto("publicKey")}
+              >
+                {strings.paste()}
+              </Paragraph>
+            </View>
+            <FormInput
+              name="publicKey"
+              formRef={formRef}
+              numberOfLines={5}
+              validators={[validators.required(strings.publicKeyRequired())]}
+              placeholder={strings.enterPgpPublicKey()}
+              multiline
+              containerStyle={{
+                minHeight: 150,
+                alignItems: "flex-start",
+                borderRadius: Radius.XS
+              }}
+              inputStyle={{ minHeight: 150, textAlignVertical: "top" }}
+              wrapperStyle={{ minHeight: 150 }}
+            />
+          </View>
+
+          <View style={{ gap: Spacing.LEVEL_1 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                {strings.privateKey()}
+              </Paragraph>
+              <Paragraph
+                fontSize="XS"
+                color={colors.primary.accent}
+                onPress={() => pasteInto("privateKey")}
+                fontFamily="SEMI_BOLD"
+              >
+                {strings.paste()}
+              </Paragraph>
+            </View>
+            <FormInput
+              name="privateKey"
+              formRef={formRef}
+              numberOfLines={5}
+              placeholder={strings.enterPgpPrivateKey()}
+              validators={[validators.required(strings.privateKeyRequired())]}
+              multiline
+              containerStyle={{
+                minHeight: 150,
+                alignItems: "flex-start",
+                borderRadius: Radius.XS
+              }}
+              inputStyle={{ minHeight: 150, textAlignVertical: "top" }}
+              wrapperStyle={{ minHeight: 150 }}
+            />
+          </View>
 
           {error ? (
             <Paragraph
@@ -193,10 +361,217 @@ export const SetupInboxKeys = () => {
             onPress={handleSave}
           />
         </ScrollView>
-      )}
+      ) : null}
+
+      {mode === "create-key" ? (
+        <ScrollView
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.LEVEL_3,
+            gap: Spacing.LEVEL_4
+          }}
+        >
+          <View style={{ gap: Spacing.LEVEL_1 }}>
+            <Heading fontSize="XL" lineHeight="100%">
+              {strings.createApiKey()}
+            </Heading>
+            <Paragraph color={colors.secondary.paragraph}>
+              {strings.createApiKeyDesc()}
+            </Paragraph>
+          </View>
+
+          <FormInput
+            name="keyName"
+            formRef={keyFormRef}
+            label={strings.keyName()}
+            placeholder={strings.exampleKeyName()}
+            validators={[validators.required(strings.enterKeyName())]}
+            containerStyle={{ borderRadius: Radius.XS }}
+            onChangeText={() =>
+              keyFormRef.current.setError("keyName", undefined)
+            }
+            onSubmitEditing={handleCreateKey}
+          />
+
+          <View style={{ gap: Spacing.LEVEL_2 }}>
+            <Heading fontSize="MD" lineHeight="100%">
+              {strings.expiresIn()}
+            </Heading>
+            <View style={{ gap: Spacing.LEVEL_2 }}>
+              {getExpiryOptions().map((expiryOption) => {
+                const selected = selectedExpiry === expiryOption.value;
+                return (
+                  <Pressable
+                    key={expiryOption.label}
+                    onPress={() => setSelectedExpiry(expiryOption.value)}
+                    type={selected ? "selected" : "transparent"}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: Spacing.LEVEL_2,
+                      borderRadius: Radius.XS,
+                      borderWidth: selected ? 0 : 1,
+                      borderColor: colors.secondary.border
+                    }}
+                  >
+                    <Heading
+                      fontFamily="MEDIUM"
+                      fontSize="SM"
+                      lineHeight="100%"
+                      color={
+                        selected
+                          ? colors.selected.heading
+                          : colors.secondary.heading
+                      }
+                    >
+                      {expiryOption.label}
+                    </Heading>
+                    <AppIcon
+                      name={selected ? "radiobox-marked" : "radiobox-blank"}
+                      size={16}
+                      color={
+                        selected
+                          ? colors.selected.accent
+                          : colors.secondary.icon
+                      }
+                    />
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
+          <Button
+            title={isCreatingKey ? strings.creating() : strings.create()}
+            type="accent"
+            width="100%"
+            loading={isCreatingKey}
+            disabled={isCreatingKey}
+            onPress={handleCreateKey}
+          />
+        </ScrollView>
+      ) : null}
+
+      {mode === "success" ? (
+        <View
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3,
+            alignItems: "center"
+          }}
+        >
+          <CirclesBackground
+            style={{
+              marginBottom: Spacing.LEVEL_6
+            }}
+            size={120}
+          >
+            <AppIcon name="check" size={20} color={colors.static.white} />
+          </CirclesBackground>
+
+          <View style={{ gap: Spacing.LEVEL_4, width: "100%" }}>
+            <View style={{ gap: Spacing.LEVEL_1 }}>
+              <Heading
+                fontSize="XL"
+                lineHeight="100%"
+                style={{ textAlign: "center" }}
+              >
+                {strings.apiKeyCreatedSuccessfully()}
+              </Heading>
+              <Paragraph
+                color={colors.secondary.paragraph}
+                style={{ textAlign: "center" }}
+              >
+                {strings.apiKeyCreatedDesc()}
+              </Paragraph>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: Spacing.LEVEL_1,
+                paddingHorizontal: Spacing.LEVEL_2,
+                paddingVertical: Spacing.LEVEL_1,
+                backgroundColor: colors.secondary.background,
+                borderRadius: Radius.XS
+              }}
+            >
+              <Paragraph
+                numberOfLines={1}
+                style={{ flex: 1, fontFamily: "monospace" }}
+                fontSize="SM"
+                color={colors.primary.paragraph}
+              >
+                {createdKey}
+              </Paragraph>
+              <IconButton
+                name={copied ? "check" : "content-copy"}
+                size={AppFontSize.md}
+                color={colors.primary.icon}
+                onPress={handleCopyKey}
+              />
+            </View>
+
+            <Button
+              title={strings.done()}
+              type="accent"
+              width="100%"
+              onPress={() => Navigation.goBack()}
+            />
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 };
+
+type InboxKeysOptionCardProps = {
+  title: string;
+  description: string;
+  selected: boolean;
+  onPress: () => void;
+};
+
+function InboxKeysOptionCard({
+  title,
+  description,
+  selected,
+  onPress
+}: InboxKeysOptionCardProps) {
+  const { colors } = useThemeColors();
+  return (
+    <Pressable
+      type="transparent"
+      onPress={onPress}
+      style={{
+        flexDirection: "row",
+        alignItems: "flex-start",
+        gap: Spacing.LEVEL_1,
+        padding: Spacing.LEVEL_2,
+        borderRadius: Radius.XS,
+        borderWidth: 1,
+        borderColor: selected ? colors.primary.accent : colors.primary.border,
+        backgroundColor: selected ? colors.selected.background : "transparent"
+      }}
+    >
+      <AppIcon
+        name={selected ? "radiobox-marked" : "radiobox-blank"}
+        size={AppFontSize.md}
+        color={selected ? colors.primary.accent : colors.secondary.icon}
+        style={{ marginTop: 1 }}
+      />
+      <View style={{ flex: 1, gap: Spacing.LEVEL_1 }}>
+        <Heading fontSize="SM" lineHeight="100%">
+          {title}
+        </Heading>
+        <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+          {description}
+        </Paragraph>
+      </View>
+    </Pressable>
+  );
+}
 
 const ManageInboxKeys = () => {
   const { colors } = useThemeColors();
@@ -211,6 +586,13 @@ const ManageInboxKeys = () => {
   const [formVersion, setFormVersion] = useState(0);
   const [hasChanged, setHasChanged] = useState(false);
   const [error, setError] = useState("");
+
+  const pasteInto = async (name: "publicKey" | "privateKey") => {
+    const value = await Clipboard.getString();
+    if (!value) return;
+    formRef.current.setValue(name, value.trim());
+    setFormVersion((prev) => prev + 1);
+  };
 
   useEffect(() => {
     if (!inboxKeys) return;
@@ -239,35 +621,83 @@ const ManageInboxKeys = () => {
   return (
     <ScrollView
       contentContainerStyle={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        gap: DefaultAppStyles.GAP_VERTICAL,
-        marginTop: DefaultAppStyles.GAP_VERTICAL
+        paddingHorizontal: Spacing.LEVEL_3,
+        gap: Spacing.LEVEL_4
       }}
     >
       <Notice type="alert" text={strings.changingInboxPgpKeysNotice()} />
 
-      <Paragraph>{strings.publicKey()}</Paragraph>
-      <FormInput
-        key={`public-key-${formVersion}`}
-        name="publicKey"
-        formRef={formRef}
-        validators={[validators.required(strings.publicKeyRequired())]}
-        multiline
-        containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
-        inputStyle={{ height: 140, textAlignVertical: "top" }}
-        wrapperStyle={{ minHeight: 150 }}
-      />
-      <Paragraph>{strings.privateKey()}</Paragraph>
-      <FormInput
-        key={`private-key-${formVersion}`}
-        name="privateKey"
-        formRef={formRef}
-        validators={[validators.required(strings.privateKeyRequired())]}
-        multiline
-        containerStyle={{ minHeight: 150, alignItems: "flex-start" }}
-        inputStyle={{ height: 140, textAlignVertical: "top" }}
-        wrapperStyle={{ minHeight: 150 }}
-      />
+      <View style={{ gap: Spacing.LEVEL_1 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
+        >
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+            {strings.publicKey()}
+          </Paragraph>
+          <Paragraph
+            fontSize="XS"
+            color={colors.primary.accent}
+            fontFamily="SEMI_BOLD"
+            onPress={() => pasteInto("publicKey")}
+          >
+            {strings.paste()}
+          </Paragraph>
+        </View>
+        <FormInput
+          key={`public-key-${formVersion}`}
+          name="publicKey"
+          formRef={formRef}
+          validators={[validators.required(strings.publicKeyRequired())]}
+          multiline
+          containerStyle={{
+            minHeight: 150,
+            alignItems: "flex-start",
+            borderRadius: Radius.XS
+          }}
+          inputStyle={{ height: 140, textAlignVertical: "top" }}
+          wrapperStyle={{ minHeight: 150 }}
+        />
+      </View>
+
+      <View style={{ gap: Spacing.LEVEL_1 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
+        >
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+            {strings.privateKey()}
+          </Paragraph>
+          <Paragraph
+            fontSize="XS"
+            color={colors.primary.accent}
+            fontFamily="SEMI_BOLD"
+            onPress={() => pasteInto("privateKey")}
+          >
+            {strings.paste()}
+          </Paragraph>
+        </View>
+        <FormInput
+          key={`private-key-${formVersion}`}
+          name="privateKey"
+          formRef={formRef}
+          validators={[validators.required(strings.privateKeyRequired())]}
+          multiline
+          containerStyle={{
+            minHeight: 150,
+            alignItems: "flex-start",
+            borderRadius: Radius.XS
+          }}
+          inputStyle={{ height: 140, textAlignVertical: "top" }}
+          wrapperStyle={{ minHeight: 150 }}
+        />
+      </View>
 
       {error ? (
         <Paragraph
@@ -356,8 +786,8 @@ const InboxKeysList = () => {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: DefaultAppStyles.GAP,
-          gap: DefaultAppStyles.GAP_VERTICAL,
+          paddingHorizontal: Spacing.LEVEL_3,
+          gap: Spacing.LEVEL_2,
           width: "100%"
         }}
       >
@@ -377,8 +807,8 @@ const InboxKeysList = () => {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: DefaultAppStyles.GAP,
-          gap: DefaultAppStyles.GAP_VERTICAL,
+          paddingHorizontal: Spacing.LEVEL_3,
+          gap: Spacing.LEVEL_2,
           width: "100%"
         }}
       >
@@ -399,50 +829,65 @@ const InboxKeysList = () => {
   return (
     <ScrollView
       contentContainerStyle={{
-        gap: DefaultAppStyles.GAP_VERTICAL,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         width: "100%",
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingBottom: 50,
+        paddingHorizontal: Spacing.LEVEL_3,
         minHeight: "100%"
       }}
     >
       {apiKeys.length === 0 ? (
         <View
           style={{
-            padding: DefaultAppStyles.GAP * 2,
             alignItems: "center",
-            gap: DefaultAppStyles.GAP_VERTICAL,
-            flex: 1,
-            justifyContent: "center"
+            gap: Spacing.LEVEL_6,
+            flex: 1
           }}
         >
-          <Paragraph color={colors.secondary.paragraph}>
-            {strings.createFirstApiKey()}
-          </Paragraph>
+          <CirclesBackground size={130}>
+            <AppIcon
+              name="key"
+              iconFamily="notesnook"
+              size={22}
+              color={colors.static.white}
+            />
+          </CirclesBackground>
 
-          <Button
-            title={strings.createKey()}
-            type="accent"
-            style={{
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-              width: "100%"
-            }}
-            onPress={() => {
-              if (apiKeys.length >= 10) {
-                presentDialog({
-                  title: strings.apiKeysLimitReached(),
-                  paragraph: strings.apiKeysLimitReachedMessage(),
-                  positiveText: strings.ok()
-                });
-              } else {
+          <View style={{ alignItems: "center", gap: Spacing.LEVEL_4 }}>
+            <View
+              style={{
+                alignItems: "center",
+                gap: Spacing.LEVEL_1
+              }}
+            >
+              <Heading
+                fontSize="XL"
+                lineHeight="100%"
+                style={{ textAlign: "center" }}
+              >
+                {strings.createKey()}
+              </Heading>
+              <Paragraph
+                color={colors.secondary.paragraph}
+                style={{ textAlign: "center" }}
+              >
+                {strings.createFirstApiKey()}
+              </Paragraph>
+            </View>
+
+            <Button
+              title={strings.continue()}
+              type="accent"
+              style={{
+                paddingHorizontal: Spacing.LEVEL_3,
+                width: 157
+              }}
+              onPress={() => {
                 AddApiKeySheet.present(() => apiKeysPromise.refresh());
-              }
-            }}
-          />
+              }}
+            />
+          </View>
         </View>
       ) : (
-        <View style={{ gap: 0 }}>
+        <View style={{ gap: Spacing.LEVEL_3 }}>
           {apiKeys.map((key, i) => (
             <ApiKeyItem
               key={key.key}
@@ -456,7 +901,6 @@ const InboxKeysList = () => {
             title={strings.createKey()}
             type="accent"
             style={{
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
               width: "100%"
             }}
             onPress={() => {
@@ -566,151 +1010,182 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
   const isApiKeyExpired =
     apiKey.expiryDate !== -1 && Date.now() > apiKey.expiryDate;
 
+  const revokeKey = () => {
+    presentDialog({
+      title: strings.revokeInboxApiKey(apiKey.name),
+      paragraph: strings.revokeApiKeyConfirmation(apiKey.name),
+      positiveText: strings.revoke(),
+      negativeText: strings.cancel(),
+      positiveType: "error",
+      positivePress: async () => {
+        try {
+          setIsRevoking(true);
+          await db.inboxApiKeys.revoke(apiKey.key);
+          onRevoke();
+          ToastManager.show({
+            message: strings.apiKeyRevoked(),
+            type: "success"
+          });
+          return true;
+        } catch (error) {
+          ToastManager.show({
+            message: strings.failedToRevokeApiKey(),
+            type: "error"
+          });
+          return false;
+        } finally {
+          setIsRevoking(false);
+        }
+      }
+    });
+  };
+
   return (
     <View
       style={{
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
         borderBottomWidth: isAtEnd ? 0 : 1,
         borderBottomColor: colors.secondary.border
       }}
     >
+      <View style={{ gap: Spacing.LEVEL_1 }}>
+        <Heading fontSize="MD" lineHeight="100%">
+          {apiKey.name}
+        </Heading>
+
+        <View style={{ gap: Spacing.LEVEL_0 }}>
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+            {strings.status()}:{" "}
+            <Paragraph
+              fontSize="XS"
+              fontFamily="SEMI_BOLD"
+              color={
+                isApiKeyExpired ? colors.error.accent : colors.primary.accent
+              }
+            >
+              {apiKey.lastUsedAt
+                ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt, "date")}`
+                : strings.neverUsed()}
+            </Paragraph>
+          </Paragraph>
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+            {strings.created()}:{" "}
+            <Paragraph
+              fontSize="XS"
+              fontFamily="SEMI_BOLD"
+              color={colors.primary.paragraph}
+            >
+              {getFormattedDate(apiKey.dateCreated, "date")}
+            </Paragraph>
+          </Paragraph>
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+            {strings.expires()}:{" "}
+            <Paragraph
+              fontSize="XS"
+              fontFamily="SEMI_BOLD"
+              color={
+                isApiKeyExpired ? colors.error.accent : colors.primary.paragraph
+              }
+            >
+              {apiKey.expiryDate === -1
+                ? strings.never()
+                : getFormattedDate(apiKey.expiryDate, "date")}
+            </Paragraph>
+          </Paragraph>
+        </View>
+      </View>
+
       <View
         style={{
-          flexDirection: "column",
-          gap: DefaultAppStyles.GAP_VERTICAL
+          width: "100%",
+          height: 1,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.primary.border,
+          marginVertical: Spacing.LEVEL_3
+        }}
+      />
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: Spacing.LEVEL_1
         }}
       >
         <View
           style={{
+            flex: 1,
             flexDirection: "row",
             alignItems: "center",
-            gap: DefaultAppStyles.GAP_SMALL
+            justifyContent: "space-between",
+            gap: Spacing.LEVEL_1,
+            paddingHorizontal: Spacing.LEVEL_2,
+            paddingVertical: Spacing.LEVEL_1,
+            backgroundColor: colors.secondary.background,
+            borderRadius: Radius.XS
           }}
         >
-          <Heading size={AppFontSize.md}>{apiKey.name}</Heading>
-          {isApiKeyExpired && (
+          <Paragraph
+            numberOfLines={1}
+            style={{ flex: 1, fontFamily: "monospace" }}
+            fontSize="SM"
+            color={colors.primary.paragraph}
+          >
+            {viewing
+              ? apiKey.key
+              : `${apiKey.key.slice(0, 10)}${"*".repeat(
+                  Math.max(apiKey.key.length - 10, 0)
+                )}`}
+          </Paragraph>
+
+          {viewing ? (
             <View
               style={{
-                paddingVertical: 4,
-                paddingHorizontal: 8,
-                backgroundColor: colors.error.background,
-                borderRadius: 5
+                flexDirection: "row",
+                alignItems: "center",
+                gap: Spacing.LEVEL_1
               }}
             >
               <Paragraph
-                color={colors.static.red}
-                size={AppFontSize.xxs}
-                style={{ fontWeight: "bold" }}
-              >
-                EXPIRED
-              </Paragraph>
-            </View>
-          )}
-        </View>
-
-        <View style={{ gap: 4 }}>
-          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-            {apiKey.lastUsedAt
-              ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt, "date-time")}`
-              : strings.neverUsed()}
-          </Paragraph>
-          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-            {strings.createdOn()}{" "}
-            {getFormattedDate(apiKey.dateCreated, "date-time")}
-          </Paragraph>
-          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-            {apiKey.expiryDate === -1
-              ? strings.neverExpires()
-              : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${getFormattedDate(apiKey.expiryDate, "date-time")}`}
-          </Paragraph>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: DefaultAppStyles.GAP_SMALL
-          }}
-        >
-          <Input
-            editable={false}
-            value={
-              viewing
-                ? apiKey.key
-                : `${apiKey.key.slice(0, 10)}${"*".repeat(
-                    apiKey.key.length - 10
-                  )}`
-            }
-            style={{
-              flex: 1,
-              fontFamily: "monospace",
-              fontSize: AppFontSize.xs
-            }}
-            wrapperStyle={{
-              flex: 1
-            }}
-          />
-          {!viewing && (
-            <IconButton
-              name="eye-off-outline"
-              color={colors.primary.icon}
-              onPress={() => viewKey()}
-            />
-          )}
-          {viewing && (
-            <>
-              <Paragraph
-                style={{
-                  fontFamily: "monospace",
-                  minWidth: 35,
-                  textAlign: "center"
-                }}
+                style={{ fontFamily: "monospace", width: 25 }}
+                fontSize="XS"
                 color={colors.primary.accent}
               >
                 {secondsLeft}s
               </Paragraph>
               <IconButton
                 name={copied ? "check" : "content-copy"}
+                size={AppFontSize.md}
                 color={colors.primary.icon}
                 onPress={() => copyToClipboard()}
               />
-            </>
+            </View>
+          ) : (
+            <IconButton
+              name="eye-off-outline"
+              size={AppFontSize.md}
+              color={colors.primary.icon}
+              onPress={() => viewKey()}
+            />
           )}
-          <IconButton
-            name="delete-outline"
-            color={colors.error.icon}
-            disabled={isRevoking}
-            onPress={async () => {
-              presentDialog({
-                title: strings.revokeInboxApiKey(apiKey.name),
-                paragraph: strings.revokeApiKeyConfirmation(apiKey.name),
-                positiveText: strings.revoke(),
-                negativeText: strings.cancel(),
-                positiveType: "error",
-                positivePress: async () => {
-                  try {
-                    setIsRevoking(true);
-                    await db.inboxApiKeys.revoke(apiKey.key);
-                    onRevoke();
-                    ToastManager.show({
-                      message: strings.apiKeyRevoked(),
-                      type: "success"
-                    });
-                    return true;
-                  } catch (error) {
-                    ToastManager.show({
-                      message: strings.failedToRevokeApiKey(),
-                      type: "error"
-                    });
-                    return false;
-                  } finally {
-                    setIsRevoking(false);
-                  }
-                }
-              });
-            }}
-          />
         </View>
+
+        <Pressable
+          type="secondary"
+          disabled={isRevoking}
+          onPress={revokeKey}
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: Radius.XS
+          }}
+        >
+          <AppIcon
+            name="trash"
+            iconFamily="notesnook"
+            size={AppFontSize.md}
+            color={colors.error.icon}
+          />
+        </Pressable>
       </View>
     </View>
   );

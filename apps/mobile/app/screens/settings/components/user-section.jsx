@@ -165,7 +165,7 @@ const SettingsUserSection = ({ item }) => {
                   fontSize={AppFontSize.sm}
                   style={{
                     alignSelf: "flex-start",
-                    paddingHorizontal: Spacing.LEVEL_3,
+                    paddingHorizontal: Spacing.LEVEL_2,
                     paddingVertical: Spacing.LEVEL_2,
                     borderRadius: Radius.XS
                   }}
@@ -282,7 +282,7 @@ const SettingsUserSection = ({ item }) => {
               paddingHorizontal: Spacing.LEVEL_3,
               marginBottom: Spacing.LEVEL_2
             }}
-            color={colors.secondary.heading}
+            color={colors.secondary.paragraph}
             size={AppFontSize.sm}
             fontFamily="MEDIUM"
           >

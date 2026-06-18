@@ -728,97 +728,112 @@ export const accountGroup: SettingSection = {
       description: strings.inboxAPIDesc(),
       sections: [
         {
-          id: "toggle-inbox-api",
-          name: strings.enableInboxAPI(),
-          description: strings.enableInboxAPIDesc(),
-          type: "switch",
-          useHook: () => {
-            return useSettingStore((state) => state.inboxEnabled);
-          },
-          getter: (current) => current,
-          modifer: async (current) => {
-            if (current) {
-              return new Promise((resolve) => {
-                presentDialog({
-                  title: strings.disableInboxAPI(),
-                  paragraph: strings.disableInboxAPIDesc(),
-                  positiveText: strings.disable(),
-                  onClose: () => {
-                    resolve();
-                  },
-                  positivePress: async () => {
-                    try {
-                      await db.inboxItemsHistory.deleteFailed();
-                      await db.user.discardInboxKeys();
-                      useSettingStore.setState({
-                        inboxEnabled: false
-                      });
-                      resolve();
-                      return true;
-                    } catch (e) {
-                      ToastManager.show({
-                        message: (e as Error).message,
-                        context: "local"
-                      });
-                      DatabaseLogger.error(e);
-                      return false;
-                    }
-                  }
-                });
-              });
-            }
+          id: "inbox-api-group",
+          name: strings.inboxAPI(),
+          type: "group",
+          sections: [
+            {
+              id: "toggle-inbox-api",
+              name: strings.enableInboxAPI(),
+              description: strings.enableInboxAPIDesc(),
+              type: "switch",
+              icon: "file-cloud",
+              iconFamily: "notesnook",
+              useHook: () => {
+                return useSettingStore((state) => state.inboxEnabled);
+              },
+              getter: (current) => current,
+              modifer: async (current) => {
+                if (current) {
+                  return new Promise((resolve) => {
+                    presentDialog({
+                      title: strings.disableInboxAPI(),
+                      paragraph: strings.disableInboxAPIDesc(),
+                      positiveText: strings.disable(),
+                      onClose: () => {
+                        resolve();
+                      },
+                      positivePress: async () => {
+                        try {
+                          await db.inboxItemsHistory.deleteFailed();
+                          await db.user.discardInboxKeys();
+                          useSettingStore.setState({
+                            inboxEnabled: false
+                          });
+                          resolve();
+                          return true;
+                        } catch (e) {
+                          ToastManager.show({
+                            message: (e as Error).message,
+                            context: "local"
+                          });
+                          DatabaseLogger.error(e);
+                          return false;
+                        }
+                      }
+                    });
+                  });
+                }
 
-            try {
-              Navigation.push("SettingsGroup", {
-                id: "setup-inbox-keys",
-                name: strings.setupInboxKeys(),
-                type: "screen",
-                component: "setup-inbox-keys"
-              } as any);
-            } catch (e) {
-              console.log(e);
+                try {
+                  Navigation.push("SettingsGroup", {
+                    id: "setup-inbox-keys",
+                    name: strings.setupInboxKeys(),
+                    type: "screen",
+                    component: "setup-inbox-keys"
+                  } as any);
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+            },
+            {
+              id: "manage-inbox-keys",
+              name: strings.manageInboxKeys(),
+              icon: "tray-arrow-down",
+              iconFamily: "notesnook",
+              useHook: () => useSettingStore((state) => state.inboxEnabled),
+              hidden: (current) => !current,
+              description: strings.manageInboxKeysDesc(),
+              onVerify: async () => {
+                return new Promise((resolve) => {
+                  verifyUser(
+                    "global",
+                    () => {
+                      resolve(true);
+                    },
+                    false,
+                    () => resolve(false)
+                  );
+                });
+              },
+              type: "screen",
+              component: "manage-inbox-keys"
+            },
+            {
+              id: "inbox-keys",
+              name: strings.viewAPIKeys(),
+              description: strings.viewAPIKeysDesc(),
+              useHook: () => useSettingStore((state) => state.inboxEnabled),
+              hidden: (current) => !current,
+              type: "screen",
+              component: "inbox-keys",
+              icon: "key",
+              iconFamily: "notesnook"
+            },
+            {
+              id: "failed-inbox-items",
+              name: strings.failedInboxItems(),
+              description: strings.failedInboxItemsDesc(),
+              useHook: () => useSettingStore((state) => state.inboxEnabled),
+              hidden: (current) => !current,
+              type: "screen",
+              component: "failed-inbox-items",
+              icon: "warning-circle",
+              iconFamily: "notesnook",
+              hideHeader: true
             }
-          }
-        },
-        {
-          id: "manage-inbox-keys",
-          name: strings.manageInboxKeys(),
-          useHook: () => useSettingStore((state) => state.inboxEnabled),
-          hidden: (current) => !current,
-          description: strings.manageInboxKeysDesc(),
-          onVerify: async () => {
-            return new Promise((resolve) => {
-              verifyUser(
-                "global",
-                () => {
-                  resolve(true);
-                },
-                false,
-                () => resolve(false)
-              );
-            });
-          },
-          type: "screen",
-          component: "manage-inbox-keys"
-        },
-        {
-          id: "inbox-keys",
-          name: strings.viewAPIKeys(),
-          description: strings.viewAPIKeysDesc(),
-          useHook: () => useSettingStore((state) => state.inboxEnabled),
-          hidden: (current) => !current,
-          type: "screen",
-          component: "inbox-keys"
-        },
-        {
-          id: "failed-inbox-items",
-          name: strings.failedInboxItems(),
-          description: strings.failedInboxItemsDesc(),
-          useHook: () => useSettingStore((state) => state.inboxEnabled),
-          hidden: (current) => !current,
-          type: "screen",
-          component: "failed-inbox-items",
-          hideHeader: true
+          ]
         }
       ]
     }
