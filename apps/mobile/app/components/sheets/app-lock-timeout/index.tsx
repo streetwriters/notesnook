@@ -23,49 +23,39 @@ import React, { useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
 import { Radius, Spacing } from "../../../common/design/spacing";
-import { db } from "../../../common/database";
 import { presentSheet } from "../../../services/event-manager";
+import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import AppIcon from "../../ui/AppIcon";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-const OPTIONS = [
-  1000 * 60 * 1,
-  1000 * 60 * 5,
-  1000 * 60 * 10,
-  1000 * 60 * 15,
-  1000 * 60 * 30,
-  1000 * 60 * 45,
-  1000 * 60 * 60,
-  -1
-];
+const OPTIONS = [-1, 0, 1, 5, 15, 30];
 
 const formatValue = (item: number) => {
   return item === -1
     ? strings.never()
-    : item < 1000 * 60 * 60
-      ? strings.minutes(item / (1000 * 60))
-      : strings.hours(item / (1000 * 60 * 60));
+    : item === 0
+      ? strings.immediately()
+      : item === 1
+        ? strings.minutes(1)
+        : strings.minutes(item);
 };
 
-type LockVaultTimerProps = {
+type AppLockTimeoutProps = {
   close?: (ctx?: string) => void;
 };
 
-function LockVaultTimer({ close }: LockVaultTimerProps) {
+function AppLockTimeout({ close }: AppLockTimeoutProps) {
   const { colors } = useThemeColors();
   const { height } = useWindowDimensions();
   const [currentValue, setCurrentValue] = useState(
-    useSettingStore.getState().vaultLockAfter
+    useSettingStore.getState().settings.appLockTimer
   );
 
   const onChange = async (item: number) => {
-    await db.settings.setVaultLockAfter(item);
-    useSettingStore.setState({
-      vaultLockAfter: item
-    });
+    SettingsService.set({ appLockTimer: item });
     setCurrentValue(item);
     close?.();
   };
@@ -114,10 +104,10 @@ function LockVaultTimer({ close }: LockVaultTimerProps) {
             }}
           >
             <Heading fontSize="XL" lineHeight="100%">
-              {strings.lockVaultAfter()}
+              {strings.appLockTimeout()}
             </Heading>
             <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
-              {strings.lockVaultAfterDesc()}
+              {strings.appLockTimeoutDesc()}
             </Paragraph>
           </View>
         </View>
@@ -179,10 +169,10 @@ function LockVaultTimer({ close }: LockVaultTimerProps) {
   );
 }
 
-LockVaultTimer.present = () => {
+AppLockTimeout.present = () => {
   presentSheet({
-    component: (_ref, close) => <LockVaultTimer close={close} />
+    component: (_ref, close) => <AppLockTimeout close={close} />
   });
 };
 
-export default LockVaultTimer;
+export default AppLockTimeout;

@@ -183,15 +183,15 @@ export const Update = ({ version: appVersion }: UpdateProps) => {
         <>
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "flex-start",
-              gap: Spacing.LEVEL_1
+              flexDirection: "column",
+              alignItems: "center",
+              gap: Spacing.LEVEL_2,
+              justifyContent: "center"
             }}
           >
             <IconTile colors={colors} name="download-simple" />
             <View
               style={{
-                flex: 1,
                 justifyContent: "center",
                 gap: Spacing.LEVEL_1
               }}
@@ -282,7 +282,6 @@ export const Update = ({ version: appVersion }: UpdateProps) => {
             fontSize="XS"
             color={colors.secondary.paragraph}
             style={{
-              textDecorationLine: "underline",
               textAlign: "center"
             }}
             onPress={() => {
@@ -291,7 +290,14 @@ export const Update = ({ version: appVersion }: UpdateProps) => {
               });
             }}
           >
-            {strings.readReleaseNotes()}
+            {strings.readReleaseNotes[1]()}
+            <Paragraph
+              color={colors.primary.accent}
+              fontFamily="MEDIUM"
+              fontSize="XS"
+            >
+              {strings.readReleaseNotes[2]()}
+            </Paragraph>
           </Paragraph>
         </>
       )}

@@ -28,7 +28,6 @@ import DebugLogs from "./debug";
 import { ConfigureToolbar } from "./editor/configure-toolbar";
 import { Licenses } from "./licenses";
 import {
-  ApplockTimerPicker,
   BackupReminderPicker,
   BackupWithAttachmentsReminderPicker,
   DayFormatPicker,
@@ -67,7 +66,6 @@ export const components: { [name: string]: ReactElement } = {
   "week-format-selector": <WeekFormatPicker />,
   "image-compression-picker": <ImageCompressionPicker />,
   "theme-selector": <ThemeSelector />,
-  "applock-timer": <ApplockTimerPicker />,
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
   backuprestore: <RestoreBackup />,
   "server-config": <ServersConfiguration />,

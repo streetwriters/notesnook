@@ -42,6 +42,7 @@ import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { User } from "@notesnook/core";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 type RecoveryKeySheetProps = {
   close?: (ctx?: string) => void;
@@ -152,6 +153,7 @@ function RecoveryKeySheet({ close }: RecoveryKeySheetProps) {
     if (!path) return;
 
     try {
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
       if (Platform.OS === "ios") {
         Share.open({
           url: path,

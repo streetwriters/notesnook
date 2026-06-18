@@ -163,7 +163,7 @@ function TrashInterval({ close }: TrashIntervalProps) {
               </Heading>
 
               <AppIcon
-                name={selected ? "checkbox" : "box-empty"}
+                name={selected ? "radio-button" : "ellipse"}
                 iconFamily="notesnook"
                 size={16}
                 color={

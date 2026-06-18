@@ -383,7 +383,10 @@ export const strings = {
       github: `v${version} has been released on GitHub`,
       other: `v${version} has been released`
     }),
-  readReleaseNotes: () => t`Read full release notes on Github`,
+  readReleaseNotes: {
+    1: () => t`Read full release notes on `,
+    2: () => t`Github`
+  },
   settings: () => t`Settings`,
   notLoggedIn: () => t`Not logged in`,
   loggedInAs: (email: string) => t`Logged in as ${email}`,
@@ -2895,5 +2898,21 @@ Continue without attachments?`,
   automaticFullBackup: () => t`Automatic full backup`,
   security: () => t`Security`,
   restoreActions: () => t`Restore actions`,
-  issueSummary: () => t`Issue summary`
+  issueSummary: () => t`Issue summary`,
+  enableBiometricUnlock: () => t`Enable biometric unlock`,
+  downloadDebugLogs: () => t`Download debug logs`,
+  downloadDebugLogsDesc: () => t`Download and share debug logs from the app`,
+  preparingLogs: () => t`Preparing logs..`,
+  preparingLogsChooseLocation: () => t`Choosing storage location...`,
+  preparingLogsCollect: () => t`Consolidating network sync logs...`,
+  preparingLogsCompress: () => t`Compressing logs into an archive...`,
+  preparingLogsSave: () => t`Saving logs to your storage...`,
+  debugLogsDownloaded: () => t`Debug logs downloaded!`,
+  debugLogsDownloadedDesc: () =>
+    t`The encrypted archive is available in your default local storage structure and can be safely sent to the Notesnook customer care team.`,
+  downloadLogsFailed: () => t`Couldn't download logs`,
+  downloadLogsFailedDesc: () =>
+    t`Something went wrong while preparing your debug logs. This can happen if no storage location was selected.`,
+  shareZip: () => t`Share ZIP`,
+  tryDownloadLogsAgain: () => t`Try again`
 };

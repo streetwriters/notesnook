@@ -21,10 +21,10 @@ import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React from "react";
 import { Linking } from "react-native";
+import DownloadLogs from "../../../components/sheets/download-logs";
 import { Issue } from "../../../components/sheets/github/issue";
 import { ToastManager, presentSheet } from "../../../services/event-manager";
 import { SettingSection } from "../types";
-
 export const helpSupportGroup: SettingSection = {
   id: "help-support",
   name: strings.helpAndSupport(),
@@ -72,12 +72,13 @@ export const helpSupportGroup: SettingSection = {
     },
     {
       id: "debugging",
-      name: strings.debugLogs(),
-      description: strings.debugLogsDesc(),
-      type: "screen",
+      name: strings.downloadDebugLogs(),
+      description: strings.downloadDebugLogsDesc(),
       icon: "bug-droid",
       iconFamily: "notesnook",
-      component: "debug-logs"
+      modifer: () => {
+        DownloadLogs.present();
+      }
     }
   ]
 };

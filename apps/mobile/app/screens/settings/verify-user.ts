@@ -22,7 +22,6 @@ import { db } from "../../common/database";
 import { validateAppLockPassword } from "../../common/database/encryption";
 import { presentDialog } from "../../components/dialog/functions";
 import BiometricService from "../../services/biometrics";
-import { ToastManager } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { sleep } from "../../utils/time";
@@ -98,46 +97,55 @@ export async function verifyUserWithApplock() {
     if (SettingsService.getProperty("appLockHasPasswordSecurity")) {
       presentDialog({
         title: strings.verifyItsYou(),
-        input: true,
-        inputPlaceholder:
-          keyboardType == "numeric"
-            ? strings.enterApplockPin()
-            : strings.enterApplockPassword(),
         paragraph:
           keyboardType == "numeric"
             ? strings.enterApplockPinDesc()
             : strings.enterApplockPasswordDesc(),
+        form: {
+          formRef: createFormRef({
+            password: ""
+          }),
+          items: [
+            {
+              label:
+                keyboardType == "numeric"
+                  ? strings.enterApplockPin()
+                  : strings.enterApplockPassword(),
+              name: "password",
+              placeholder: "•••••••••",
+              ref: React.createRef(),
+              validators: [validators.required(strings.passwordNotEntered())]
+            }
+          ],
+          onFormSubmit: async (form) => {
+            try {
+              if (!form.validate()) return false;
+              const verified = await validateAppLockPassword(
+                form.getValue("password")
+              );
+              if (!verified) {
+                form.setError(
+                  "password",
+                  strings.invalid(
+                    keyboardType === "numeric" ? "pin" : "password"
+                  )
+                );
+                return false;
+              }
+              resolve(verified);
+              return true;
+            } catch (e) {
+              resolve(false);
+              return false;
+            }
+          }
+        },
         positiveText: strings.verify(),
+        positiveType: "accent",
         secureTextEntry: true,
         negativeText: strings.cancel(),
-        keyboardType: keyboardType,
-        positivePress: async (value) => {
-          try {
-            if (!value || !value.trim()) {
-              ToastManager.error(
-                new Error(strings.passwordNotEntered()),
-                undefined,
-                "local"
-              );
-              return false;
-            }
-            const verified = await validateAppLockPassword(value);
-            if (!verified) {
-              ToastManager.show({
-                heading: strings.invalid(
-                  keyboardType === "numeric" ? "pin" : "password"
-                ),
-                type: "error",
-                context: "local"
-              });
-              return false;
-            }
-            resolve(verified);
-          } catch (e) {
-            resolve(false);
-            return false;
-          }
-          return true;
+        onClose: () => {
+          resolve(false);
         }
       });
     } else {

@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { db } from "../../../common/database";
 import { AppLockPassword } from "../../../components/dialogs/applock-password";
+import AppLockTimeout from "../../../components/sheets/app-lock-timeout";
 import LockVaultTimer from "../../../components/sheets/lock-vault-timer";
 import {
   VaultStatusType,
@@ -75,7 +76,6 @@ export const privacySecurityGroup: SettingSection = {
       icon: "network",
       iconFamily: "notesnook"
     },
-
     {
       id: "vault",
       type: "screen",
@@ -101,7 +101,8 @@ export const privacySecurityGroup: SettingSection = {
                 openVault({
                   requestType: VaultRequestType.CreateVault,
                   title: strings.createVault(),
-                  buttonTitle: strings.create()
+                  buttonTitle: strings.create(),
+                  positiveButtonType: "accent"
                 });
               }
             },
@@ -128,8 +129,9 @@ export const privacySecurityGroup: SettingSection = {
                     : VaultRequestType.EnableFingerprint,
                   title: isRevoking
                     ? strings.revokeBiometricUnlock()
-                    : strings.vaultEnableBiometrics(),
-                  buttonTitle: isRevoking ? strings.revoke() : strings.enable()
+                    : strings.enableBiometricUnlock(),
+                  buttonTitle: isRevoking ? strings.revoke() : strings.enable(),
+                  positiveButtonType: "accent"
                 });
               }
             },
@@ -145,17 +147,17 @@ export const privacySecurityGroup: SettingSection = {
                 openVault({
                   requestType: VaultRequestType.ChangePassword,
                   title: strings.changeVaultPassword(),
-                  buttonTitle: strings.change()
+                  buttonTitle: strings.change(),
+                  positiveButtonType: "accent"
                 })
             },
-
             {
               id: "lock-vault-after",
               useHook: useVaultStatus,
               name: strings.lockVaultAfter(),
               description: strings.lockVaultAfterDesc(),
               hidden: (current) => !(current as VaultStatusType)?.exists,
-              icon: "clock-outline",
+              icon: "clock",
               iconFamily: "notesnook",
               modifer: () => {
                 LockVaultTimer.present();
@@ -166,13 +168,16 @@ export const privacySecurityGroup: SettingSection = {
               useHook: useVaultStatus,
               description: strings.clearVaultDesc(),
               name: strings.clearVault(),
+              icon: "paint-brush-household",
+              iconFamily: "notesnook",
               hidden: (current) => !(current as VaultStatusType)?.exists,
               modifer: () => {
                 openVault({
                   requestType: VaultRequestType.ClearVault,
                   title: strings.clearVault() + "?",
                   buttonTitle: strings.clear(),
-                  positiveButtonType: "errorShade"
+                  positiveButtonType: "accent",
+                  icon: "warning-circle"
                 });
               }
             },
@@ -182,6 +187,7 @@ export const privacySecurityGroup: SettingSection = {
               description: strings.deleteVaultDesc(),
               icon: "trash",
               iconFamily: "notesnook",
+              type: "danger",
               useHook: useVaultStatus,
               hidden: (current) => !(current as VaultStatusType)?.exists,
               modifer: () => {
@@ -189,7 +195,8 @@ export const privacySecurityGroup: SettingSection = {
                   requestType: VaultRequestType.DeleteVault,
                   title: strings.deleteVault() + "?",
                   buttonTitle: strings.delete(),
-                  positiveButtonType: "errorShade"
+                  positiveButtonType: "accent",
+                  icon: "warning-circle"
                 });
               }
             }
@@ -221,137 +228,166 @@ export const privacySecurityGroup: SettingSection = {
       featureId: "appLock",
       sections: [
         {
-          id: "app-lock-mode",
-          name: strings.enableAppLock(),
-          description: strings.appLockDesc(),
-          icon: "lock",
-          type: "switch",
-          property: "appLockEnabled",
-          featureId: "appLock",
-          onChange: (property) => {
-            if (property) {
-              SettingsService.set({
-                privacyScreen: true
-              });
-              SettingsService.setPrivacyScreen(true);
-            }
-          },
-          onVerify: async () => {
-            const verified = (await verifyUserWithApplock()) as boolean;
-            if (!verified) return false;
+          id: "app-lock-group",
+          type: "group",
+          name: strings.appLock(),
+          sections: [
+            {
+              id: "app-lock-mode",
+              name: strings.enableAppLock(),
+              description: strings.appLockDesc(),
+              icon: "lock",
+              iconFamily: "notesnook",
+              type: "switch",
+              property: "appLockEnabled",
+              featureId: "appLock",
+              onChange: (property) => {
+                if (property) {
+                  SettingsService.set({
+                    privacyScreen: true
+                  });
+                  SettingsService.setPrivacyScreen(true);
+                }
+              },
+              onVerify: async () => {
+                const verified = (await verifyUserWithApplock()) as boolean;
+                if (!verified) return false;
 
-            if (!SettingsService.getProperty("appLockEnabled")) {
-              if (
-                !SettingsService.getProperty("appLockHasPasswordSecurity") &&
-                (await BiometricService.isBiometryAvailable())
-              ) {
-                SettingsService.setProperty("biometricsAuthEnabled", true);
+                if (!SettingsService.getProperty("appLockEnabled")) {
+                  if (
+                    !SettingsService.getProperty(
+                      "appLockHasPasswordSecurity"
+                    ) &&
+                    (await BiometricService.isBiometryAvailable())
+                  ) {
+                    SettingsService.setProperty("biometricsAuthEnabled", true);
+                  }
+
+                  if (
+                    !(await BiometricService.isBiometryAvailable()) &&
+                    !SettingsService.getProperty("appLockHasPasswordSecurity")
+                  ) {
+                    ToastManager.show({
+                      heading: strings.biometricsNotEnrolled(),
+                      type: "error",
+                      message: strings.biometricsNotEnrolledDesc()
+                    });
+                    return false;
+                  }
+                }
+
+                return verified;
               }
-
-              if (
-                !(await BiometricService.isBiometryAvailable()) &&
-                !SettingsService.getProperty("appLockHasPasswordSecurity")
-              ) {
-                ToastManager.show({
-                  heading: strings.biometricsNotEnrolled(),
-                  type: "error",
-                  message: strings.biometricsNotEnrolledDesc()
-                });
-                return false;
+            },
+            {
+              id: "app-lock-timer",
+              name: strings.appLockTimeout(),
+              description: strings.appLockTimeoutDesc(),
+              icon: "clock",
+              iconFamily: "notesnook",
+              modifer: async () => {
+                if (await verifyUserWithApplock()) {
+                  AppLockTimeout.present();
+                }
               }
-            }
+            },
+            {
+              id: "app-lock-pin",
+              icon: "numpad",
+              iconFamily: "notesnook",
+              name: () =>
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? strings.setupAppLockPin()
+                  : strings.setupAppLockPassword(),
 
-            return verified;
-          }
-        },
-        {
-          id: "app-lock-timer",
-          name: strings.appLockTimeout(),
-          description: strings.appLockTimeoutDesc(),
-          type: "component",
-          component: "applock-timer"
-        },
-        {
-          id: "app-lock-pin",
-          name: () =>
-            SettingsService.getProperty("applockKeyboardType") === "numeric"
-              ? strings.setupAppLockPin()
-              : strings.setupAppLockPassword(),
-
-          description: () =>
-            SettingsService.getProperty("applockKeyboardType") === "numeric"
-              ? strings.setupAppLockPinDesc()
-              : strings.setupAppLockPasswordDesc(),
-          hidden: () => {
-            return !!SettingsService.getProperty("appLockHasPasswordSecurity");
-          },
-          onVerify: () => {
-            return verifyUserWithApplock();
-          },
-          property: "appLockHasPasswordSecurity",
-          modifer: () => {
-            AppLockPassword.present("create");
-          }
-        },
-        {
-          id: "app-lock-pin-change",
-          name: () =>
-            SettingsService.getProperty("applockKeyboardType") === "numeric"
-              ? strings.changeAppLockPin()
-              : strings.changeAppLockPassword(),
-          description: () =>
-            SettingsService.getProperty("applockKeyboardType") === "numeric"
-              ? strings.changeAppLockPinDesc()
-              : strings.changeAppLockPasswordDesc(),
-          hidden: () => {
-            return !SettingsService.getProperty("appLockHasPasswordSecurity");
-          },
-          property: "appLockHasPasswordSecurity",
-          modifer: () => {
-            AppLockPassword.present("change");
-          }
-        },
-        {
-          id: "app-lock-pin-remove",
-          name: () =>
-            SettingsService.getProperty("applockKeyboardType") === "numeric"
-              ? strings.removeAppLockPin()
-              : strings.removeAppLockPassword(),
-          description: () =>
-            SettingsService.getProperty("applockKeyboardType") === "numeric"
-              ? strings.removeAppLockPinDesc()
-              : strings.removeAppLockPasswordDesc(),
-          hidden: () => {
-            return !SettingsService.getProperty("appLockHasPasswordSecurity");
-          },
-          property: "appLockHasPasswordSecurity",
-          modifer: () => {
-            AppLockPassword.present("remove");
-          }
-        },
-        {
-          id: "app-lock-fingerprint",
-          name: strings.unlockWithBiometrics(),
-          description: strings.unlockWithBiometricsDesc(),
-          type: "switch",
-          property: "biometricsAuthEnabled",
-          onVerify: async () => {
-            const verified = await verifyUserWithApplock();
-            if (!verified) return false;
-
-            if (SettingsService.getProperty("biometricsAuthEnabled")) {
-              if (!SettingsService.getProperty("appLockHasPasswordSecurity")) {
-                SettingsService.setProperty("appLockEnabled", false);
-                ToastManager.show({
-                  heading: strings.appLockDisabled(),
-                  type: "success"
-                });
+              description: () =>
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? strings.setupAppLockPinDesc()
+                  : strings.setupAppLockPasswordDesc(),
+              hidden: () => {
+                return !!SettingsService.getProperty(
+                  "appLockHasPasswordSecurity"
+                );
+              },
+              onVerify: () => {
+                return verifyUserWithApplock();
+              },
+              property: "appLockHasPasswordSecurity",
+              modifer: () => {
+                AppLockPassword.present("create");
               }
-            }
+            },
+            {
+              id: "app-lock-pin-change",
+              icon: "numpad",
+              iconFamily: "notesnook",
+              name: () =>
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? strings.changeAppLockPin()
+                  : strings.changeAppLockPassword(),
+              description: () =>
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? strings.changeAppLockPinDesc()
+                  : strings.changeAppLockPasswordDesc(),
+              hidden: () => {
+                return !SettingsService.getProperty(
+                  "appLockHasPasswordSecurity"
+                );
+              },
+              property: "appLockHasPasswordSecurity",
+              modifer: () => {
+                AppLockPassword.present("change");
+              }
+            },
+            {
+              id: "app-lock-pin-remove",
+              name: () =>
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? strings.removeAppLockPin()
+                  : strings.removeAppLockPassword(),
+              description: () =>
+                SettingsService.getProperty("applockKeyboardType") === "numeric"
+                  ? strings.removeAppLockPinDesc()
+                  : strings.removeAppLockPasswordDesc(),
+              hidden: () => {
+                return !SettingsService.getProperty(
+                  "appLockHasPasswordSecurity"
+                );
+              },
+              property: "appLockHasPasswordSecurity",
+              modifer: () => {
+                AppLockPassword.present("remove");
+              }
+            },
+            {
+              id: "app-lock-fingerprint",
+              name: strings.unlockWithBiometrics(),
+              description: strings.unlockWithBiometricsDesc(),
+              type: "switch",
 
-            return verified;
-          },
-          icon: "fingerprint"
+              property: "biometricsAuthEnabled",
+              onVerify: async () => {
+                const verified = await verifyUserWithApplock();
+                if (!verified) return false;
+
+                if (SettingsService.getProperty("biometricsAuthEnabled")) {
+                  if (
+                    !SettingsService.getProperty("appLockHasPasswordSecurity")
+                  ) {
+                    SettingsService.setProperty("appLockEnabled", false);
+                    ToastManager.show({
+                      heading: strings.appLockDisabled(),
+                      type: "success"
+                    });
+                  }
+                }
+
+                return verified;
+              },
+              icon: "fingerprint-simple",
+              iconFamily: "notesnook"
+            }
+          ]
         }
       ]
     }

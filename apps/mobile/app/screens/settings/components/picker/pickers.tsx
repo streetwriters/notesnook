@@ -35,7 +35,6 @@ import {
 } from "../../../../stores/use-setting-store";
 import { useUserStore } from "../../../../stores/use-user-store";
 import { MenuItemsList } from "../../../../utils/menu-items";
-import { verifyUserWithApplock } from "../../verify-user";
 import { strings } from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../../../../components/sheets/paywall";
@@ -231,30 +230,6 @@ export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
       !useSettingStore.getState().settings.encryptedBackup &&
       !!useUserStore.getState().user
     );
-  },
-  isFeatureAvailable: async () => true,
-  isOptionAvailable: async () => true
-});
-
-export const ApplockTimerPicker = createSettingsPicker({
-  getValue: () => useSettingStore.getState().settings.appLockTimer,
-  updateValue: async (item) => {
-    SettingsService.set({ appLockTimer: item });
-  },
-  formatValue: (item) => {
-    return item === -1
-      ? strings.never()
-      : item === 0 || item === undefined
-        ? strings.immediately()
-        : item === 1
-          ? strings.minutes(1)
-          : strings.minutes(item);
-  },
-  getItemKey: (item) => item.toString(),
-  options: [-1, 0, 1, 5, 15, 30],
-  compareValue: (current, item) => current === item,
-  onVerify: () => {
-    return verifyUserWithApplock();
   },
   isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true

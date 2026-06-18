@@ -27,7 +27,6 @@ import {
   useWindowDimensions
 } from "react-native";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import NativeTooltip from "../../../utils/tooltip";
 import { Pressable, PressableProps, useButton } from "../pressable";
 import Heading from "../typography/heading";
@@ -124,13 +123,12 @@ export const Button = ({
       customOpacity={buttonType?.opacity}
       customAlpha={buttonType?.alpha}
       style={{
-        // height: typeof height === "number" ? height * growFactor : height,
         width:
           typeof width === "number"
             ? width * growFactor
             : (width as DimensionValue) || undefined,
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingVertical: Spacing.LEVEL_2,
         borderRadius: defaultBorderRadius,
         alignSelf: "center",
         justifyContent: "center",

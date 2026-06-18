@@ -40,6 +40,7 @@ import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
 import { getCachePathForFile } from "../common/filesystem/io";
+import { useSettingStore } from "../stores/use-setting-store";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -131,6 +132,7 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
       },
       {
         action: () => {
+          useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
           if (Platform.OS === "ios") {
             Share.open({
               url: backupFilePath,

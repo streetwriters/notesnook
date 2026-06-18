@@ -292,7 +292,7 @@ const Sort = ({
                 {groupOptions?.sortBy === item ? (
                   <AppIcon
                     size={AppFontSize.lg}
-                    name="checkbox"
+                    name="radio-button"
                     iconFamily="notesnook"
                     color={[colors.selected.accent, "white"]}
                   />

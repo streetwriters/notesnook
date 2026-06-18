@@ -290,6 +290,9 @@ const ExportNotesSheet = ({
                 onPress={async () => {
                   if (!result?.filePath) return;
                   close?.();
+                  useSettingStore
+                    .getState()
+                    .setAppDidEnterBackgroundForAction(true);
                   if (Platform.OS === "android") {
                     Linking.openURL(result.fileDir).catch((e) => {
                       ToastManager.error(e as Error);
