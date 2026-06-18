@@ -58,6 +58,7 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
       title={props.title}
       description={props.subtitle}
       onClose={() => {}}
+      width={500}
     >
       <Flex sx={{ flexDirection: "column" }}>
         <Text variant="body">{text}</Text>
