@@ -68,6 +68,24 @@ export const itemSkus = [
   "notesnook.believer.5year"
 ];
 
+export function planToDisplayNameShort(plan: SubscriptionPlan): string {
+  switch (plan) {
+    case SubscriptionPlan.FREE:
+      return "Free";
+    case SubscriptionPlan.ESSENTIAL:
+      return "Essential";
+    case SubscriptionPlan.LEGACY_PRO:
+    case SubscriptionPlan.PRO:
+      return "Pro";
+    case SubscriptionPlan.BELIEVER:
+      return "Believer";
+    case SubscriptionPlan.EDUCATION:
+      return "Education";
+    default:
+      return "Free";
+  }
+}
+
 export function planToDisplayName(plan: SubscriptionPlan): string {
   switch (plan) {
     case SubscriptionPlan.FREE:

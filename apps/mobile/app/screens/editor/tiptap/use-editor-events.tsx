@@ -80,7 +80,7 @@ import { sleep } from "../../../utils/time";
 import AddReminder from "../../add-reminder";
 import ManageTags from "../../manage-tags";
 import RelationsList from "../../relations-list";
-import { useDragState } from "../../settings/editor/state";
+import { useDragState } from "../../settings/components/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { useTabStore } from "./use-tab-store";
 import { editorState, openInternalLink } from "./utils";
