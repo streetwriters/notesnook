@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex } from "@theme-ui/components";
+import { Text, Flex, Link } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
@@ -27,8 +27,9 @@ import {
   Checkmark,
   Icon,
   Warn,
-  File,
-  InternalLink
+  Inbox,
+  LinkedTo,
+  Plus
 } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
@@ -96,7 +97,34 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [],
+      : [
+          {
+            icon: Inbox,
+            title: "Inbox API",
+            subtitle: "A new API to send data to Notesnook from other apps."
+          },
+          {
+            icon: LinkedTo,
+            title: "Deep links on Desktop",
+            subtitle: "Reference Notesnook notes from other apps."
+          },
+          {
+            icon: Plus,
+            title: "More features, bug fixes, and security improvments",
+            subtitle: (
+              <>
+                This release contains much much more.{" "}
+                <Link
+                  href="https://blog.notesnook.com/notesnook-desktop-v3.4.0"
+                  target="_blank"
+                  title="Read the full release notes"
+                >
+                  Read the full release notes
+                </Link>
+              </>
+            )
+          }
+        ],
     cta: {
       title: strings.gotIt(),
       icon: Checkmark,
