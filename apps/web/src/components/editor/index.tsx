@@ -662,7 +662,7 @@ export function Editor(props: EditorProps) {
             onDone: (attachments) => {
               const editor = useEditorManager.getState().getEditor(id)?.editor;
               if (!editor) return;
-              attachments.forEach((a) => editor?.attachFile(a));
+              editor?.attachFiles(...attachments);
             }
           });
         }}
@@ -825,7 +825,7 @@ function DropZone(props: DropZoneProps) {
                 .getState()
                 .getEditor(activeEditorId)?.editor;
               if (!editor) return;
-              attachments.forEach((a) => editor?.attachFile(a));
+              editor?.attachFiles(...attachments);
             }
           });
         } catch (e) {

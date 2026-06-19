@@ -786,10 +786,8 @@ function toIEditor(editor: Editor): IEditor {
         })
         .run();
     },
-    attachFile: (file: Attachment) =>
-      file.type === "image"
-        ? editor.commands.insertImage(file)
-        : editor.commands.insertAttachment(file),
+    attachFiles: async (...files: Attachment[]) =>
+      editor.commands.insertAttachment(...files),
     sendAttachmentProgress: (hash, progress) =>
       editor.commands.updateAttachment(
         {

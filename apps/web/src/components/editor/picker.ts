@@ -30,6 +30,7 @@ import {
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { strings } from "@notesnook/intl";
+import Queue from "p-queue";
 
 export async function insertAttachments(
   type: string,
@@ -88,34 +89,39 @@ type AttachFilesMessage =
     }
   | { type: "error"; index: number; error: string };
 
-export async function* attachFiles(
+export async function attachFiles(
   files: File[],
+  report: (progress: AttachFilesMessage) => void,
   skipSpecialImageHandling = false
-): AsyncGenerator<AttachFilesMessage> {
+) {
+  const queue = new Queue({ concurrency: 8 });
   for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+    queue.add(async () => {
+      const file = files[i];
 
-    yield { type: "encrypting", index: i };
+      report({ type: "encrypting", index: i });
 
-    try {
-      const allowed = await checkFeature("fileSize", {
-        value: file.size,
-        type: "toast"
-      });
-      if (!allowed) {
-        throw new Error(strings.fileSizeLimitExceededPleaseUpgrade());
+      try {
+        const allowed = await checkFeature("fileSize", {
+          value: file.size,
+          type: "toast"
+        });
+        if (!allowed) {
+          throw new Error(strings.fileSizeLimitExceededPleaseUpgrade());
+        }
+
+        const attachment =
+          !skipSpecialImageHandling && file.type.startsWith("image/")
+            ? await pickImage(file)
+            : await pickFile(file);
+
+        report({ type: "done", index: i, attachment: attachment || undefined });
+      } catch (e) {
+        report({ type: "error", index: i, error: (e as Error).message });
       }
-
-      const attachment =
-        !skipSpecialImageHandling && file.type.startsWith("image/")
-          ? await pickImage(file)
-          : await pickFile(file);
-
-      yield { type: "done", index: i, attachment: attachment || undefined };
-    } catch (e) {
-      yield { type: "error", index: i, error: (e as Error).message };
-    }
+    });
   }
+  await queue.onIdle();
 }
 
 /**
@@ -177,6 +183,7 @@ export type AttachmentProgress = {
   type: "encrypt" | "download" | "upload";
   total: number;
   loaded: number;
+  file?: File;
 };
 
 type AddAttachmentOptions = {
