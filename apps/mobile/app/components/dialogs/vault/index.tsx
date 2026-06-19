@@ -55,7 +55,6 @@ import FormInput, {
   createFormRef,
   validators
 } from "../../ui/input/form-input";
-import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -67,9 +66,12 @@ import {
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
-import { AppFontSize } from "../../../utils/size";
 import { Pressable } from "../../ui/pressable";
 import AppIcon from "../../ui/AppIcon";
+import { Radius, Spacing } from "../../../common/design/spacing";
+import { PASSWORD_PLACEHOLDER } from "../../../utils/constants";
+import { AppFontSize } from "../../../utils/size";
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
@@ -91,7 +93,7 @@ export const VaultDialog: React.FC = () => {
   const paragraphRef = useRef<string | null>(null);
   const buttonTitleRef = useRef<string | null>(null);
   const positiveButtonTypeRef = useRef<"errorShade" | "transparent" | "accent">(
-    "transparent"
+    "accent"
   );
   const customActionTitleRef = useRef<string | null>(null);
   const customActionParagraphRef = useRef<string | null>(null);
@@ -119,6 +121,7 @@ export const VaultDialog: React.FC = () => {
   const passInputRef = useRef<TextInput>(null);
   const confirmPassRef = useRef<TextInput>(null);
   const newPassInputRef = useRef<TextInput>(null);
+  const [icon, setIcon] = useState<string>();
 
   const close = useCallback(() => {
     if (loading) {
@@ -146,7 +149,7 @@ export const VaultDialog: React.FC = () => {
     descriptionRef.current = null;
     paragraphRef.current = null;
     buttonTitleRef.current = null;
-    positiveButtonTypeRef.current = "transparent";
+    positiveButtonTypeRef.current = "accent";
     customActionTitleRef.current = null;
     customActionParagraphRef.current = null;
     noteLockedRef.current = false;
@@ -355,6 +358,7 @@ export const VaultDialog: React.FC = () => {
     async (note: Note & { content?: NoteContent<false> }) => {
       close();
       try {
+        useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
         await Share.open({
           title: note.title,
           failOnCancel: false,
@@ -638,6 +642,7 @@ export const VaultDialog: React.FC = () => {
       setIsBiometryAvailable(available);
       setIsBiometryEnrolled(fingerprint);
       setBiometricUnlock(fingerprint);
+      setIcon(data.icon);
       setDeleteAll(false);
       setLoading(false);
 
@@ -707,9 +712,9 @@ export const VaultDialog: React.FC = () => {
         style={{
           ...getElevationStyle(5),
           width: DDS.isTab ? 350 : "85%",
-          borderRadius: 10,
+          borderRadius: Radius.MD,
           backgroundColor: colors.primary.background,
-          paddingTop: 12,
+          paddingVertical: Spacing.LEVEL_4,
           overflow: "hidden"
         }}
       >
@@ -718,13 +723,21 @@ export const VaultDialog: React.FC = () => {
           paragraph={
             paragraphRef.current || customActionParagraphRef.current || ""
           }
-          icon="shield"
-          padding={12}
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3
+          }}
+          centered={!!icon}
+          icon={icon}
+          iconType="error"
+          iconFamily="notesnook"
         />
 
         <View
           style={{
-            paddingHorizontal: DefaultAppStyles.GAP
+            paddingHorizontal: Spacing.LEVEL_3,
+            gap: isDeleteVault ? 0 : Spacing.LEVEL_4,
+            marginTop: Spacing.LEVEL_4,
+            marginBottom: Spacing.LEVEL_1
           }}
         >
           {(isChangePassword ||
@@ -736,20 +749,16 @@ export const VaultDialog: React.FC = () => {
               <FormInput
                 name="password"
                 formRef={formRef}
+                label={
+                  isChangePassword
+                    ? strings.currentPassword()
+                    : strings.password()
+                }
                 fwdRef={passInputRef}
                 editable={!loading}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwd}
                 autoComplete="password"
-                marginBottom={
-                  !biometricUnlock ||
-                  !isBiometryEnrolled ||
-                  isCreateVault ||
-                  isChangePassword ||
-                  isCustomAction
-                    ? 0
-                    : 10
-                }
                 onSubmitEditing={() => {
                   if (isChangePassword) {
                     newPassInputRef.current?.focus();
@@ -762,11 +771,7 @@ export const VaultDialog: React.FC = () => {
                 }
                 returnKeyType={isChangePassword ? "next" : "done"}
                 secureTextEntry
-                placeholder={
-                  isChangePassword
-                    ? strings.currentPassword()
-                    : strings.password()
-                }
+                placeholder={PASSWORD_PLACEHOLDER}
                 validators={[validators.required(strings.passwordRequired())]}
               />
 
@@ -793,37 +798,30 @@ export const VaultDialog: React.FC = () => {
           {isDeleteVault && (
             <Pressable
               onPress={() => setDeleteAll(!deleteAll)}
+              icon={deleteAll ? "checkbox" : "box-empty"}
+              iconFamily="notesnook"
+              fontFamily="MEDIUM"
+              iconSize={14}
+              fontSize={AppFontSize.sm}
+              width="100%"
               style={{
-                paddingVertical: 0,
-                flexDirection: "row",
-                gap: DefaultAppStyles.GAP_SMALL,
-                marginTop: isUserLoggedIn
-                  ? DefaultAppStyles.GAP_VERTICAL_SMALL
-                  : 0,
-                justifyContent: "flex-start"
+                justifyContent: "flex-start",
+                paddingHorizontal: 0
               }}
-            >
-              <AppIcon
-                name={
-                  deleteAll
-                    ? "check-circle-outline"
-                    : "checkbox-blank-circle-outline"
-                }
-                color={colors.error.accent}
-                size={AppFontSize.md}
-              />
-
-              <Paragraph color={colors.error.accent} size={AppFontSize.sm}>
-                {strings.deleteAllNotes()}
-              </Paragraph>
-            </Pressable>
+              title={strings.deleteAllNotes()}
+              type="transparent"
+              iconColor={colors.error.accent}
+              textStyle={{
+                color: colors.error.accent
+              }}
+            />
           )}
 
           {isChangePassword ? (
             <>
-              <Seperator half />
               <FormInput
                 name="newPassword"
+                label={strings.newPassword()}
                 formRef={formRef}
                 fwdRef={newPassInputRef}
                 editable={!loading}
@@ -836,7 +834,7 @@ export const VaultDialog: React.FC = () => {
                 returnKeyLabel="Change"
                 returnKeyType="done"
                 secureTextEntry
-                placeholder={strings.newPassword()}
+                placeholder={PASSWORD_PLACEHOLDER}
                 validators={[validators.required(strings.passwordRequired())]}
               />
             </>
@@ -857,12 +855,13 @@ export const VaultDialog: React.FC = () => {
                 onSubmitEditing={() => {
                   confirmPassRef.current?.focus();
                 }}
-                placeholder={strings.password()}
+                placeholder={PASSWORD_PLACEHOLDER}
                 validators={[validators.required(strings.passwordRequired())]}
               />
 
               <FormInput
                 name="confirmPassword"
+                label={strings.confirmPassword()}
                 formRef={formRef}
                 fwdRef={confirmPassRef}
                 autoCapitalize="none"
@@ -875,7 +874,7 @@ export const VaultDialog: React.FC = () => {
                 onSubmitEditing={() => {
                   onPress();
                 }}
-                placeholder={strings.confirmPassword()}
+                placeholder={PASSWORD_PLACEHOLDER}
                 validators={[
                   validators.required(strings.confirmPasswordRequired()),
                   validators.matchField(

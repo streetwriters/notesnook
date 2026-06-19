@@ -26,10 +26,12 @@ import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { components } from "./components";
+import { components } from "./components/components";
 import { SectionItem } from "./section-item";
 import { RouteParams, SettingSection } from "./types";
-
+import { useThemeColors } from "@notesnook/theme";
+import { SectionGroup } from "./section-group";
+import { Spacing } from "../../common/design/spacing";
 const keyExtractor = (item: SettingSection) => item.id;
 const AnimatedKeyboardAvoidingFlatList = Animated.createAnimatedComponent(
   KeyboardAwareFlatList
@@ -39,15 +41,25 @@ const Group = ({
   navigation,
   route
 }: NativeStackScreenProps<RouteParams, "SettingsGroup">) => {
+  const { colors } = useThemeColors();
   useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().setFocusedRouteId("Settings");
       return false;
     }
   });
-  const renderItem = ({ item }: { item: SettingSection; index: number }) => (
-    <SectionItem item={item} />
-  );
+  const renderItem = ({
+    item,
+    index
+  }: {
+    item: SettingSection;
+    index: number;
+  }) =>
+    item.type === "group" ? (
+      <SectionGroup item={item} isLast={!route.params.sections?.[index + 1]} />
+    ) : (
+      <SectionItem item={item} />
+    );
 
   return (
     <>
@@ -56,6 +68,12 @@ const Group = ({
           renderedInRoute="Settings"
           title={route.params.name as string}
           canGoBack={true}
+          style={{
+            backgroundColor: "transparent",
+            borderRadius: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.primary.border
+          }}
           id="Settings"
         />
       )}
@@ -65,10 +83,21 @@ const Group = ({
             flex: 1
           }}
         >
-          {route.params.component ? components[route.params.component] : null}
+          {!route.params.sections && route.params.component
+            ? components[route.params.component]
+            : null}
+
           {route.params.sections ? (
             <AnimatedKeyboardAvoidingFlatList
               data={route.params.sections}
+              ListHeaderComponent={
+                route.params.component
+                  ? components[route.params.component]
+                  : null
+              }
+              contentContainerStyle={{
+                gap: Spacing.LEVEL_2
+              }}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
               enableOnAndroid
