@@ -65,6 +65,7 @@ export type Vault = {
   positiveButtonType?: "errorShade" | "transparent" | "accent";
   customActionTitle?: string;
   customActionParagraph?: string;
+  icon?: string;
   onUnlock?: (
     item: Note & {
       content?: NoteContent<false>;

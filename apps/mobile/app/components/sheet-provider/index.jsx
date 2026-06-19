@@ -34,6 +34,8 @@ import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../utils/styles";
+import { Radius, Spacing } from "../../common/design/spacing";
+import AppIcon from "../ui/AppIcon";
 const SheetProvider = ({ context = "global" }) => {
   const { colors } = useThemeColors();
   const [visible, setVisible] = useState(false);
@@ -113,43 +115,78 @@ const SheetProvider = ({ context = "global" }) => {
           : data.enableGesturesInScrollView
       }
     >
-      <View
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom:
-            !data.progress && !data.icon && !data.title && !data.paragraph
-              ? 0
-              : 10,
-          paddingHorizontal: DefaultAppStyles.GAP
-        }}
-      >
-        {data?.progress ? (
-          <ActivityIndicator
+      {data?.progress || data?.icon || data?.paragraph ? (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom:
+              !data.progress && !data.icon && !data.title && !data.paragraph
+                ? 0
+                : 10,
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          <View
             style={{
-              marginTop: DefaultAppStyles.GAP
+              flexDirection: "row",
+              alignItems: "flex-start",
+              gap: Spacing.LEVEL_1,
+              paddingTop: Spacing.LEVEL_2
             }}
-            size={50}
-            color={colors.primary.accent}
-          />
-        ) : null}
+          >
+            {data?.icon || data?.progress ? (
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: Radius.XS,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: colors.secondary.background
+                }}
+              >
+                {data.icon ? (
+                  <AppIcon
+                    name="clock"
+                    iconFamily="notesnook"
+                    size={16}
+                    color={colors.primary.icon}
+                  />
+                ) : (
+                  <ActivityIndicator
+                    style={{
+                      marginTop: DefaultAppStyles.GAP
+                    }}
+                    size={50}
+                    color={colors.primary.accent}
+                  />
+                )}
+              </View>
+            ) : null}
 
-        {data?.icon ? (
-          <Icon
-            color={colors[data.iconColor] || colors.primary.accent}
-            name={data.icon}
-            size={50}
-          />
-        ) : null}
-
-        {data?.title ? <Heading> {data?.title}</Heading> : null}
-
-        {data?.paragraph ? (
-          <Paragraph style={{ textAlign: "center" }}>
-            {data?.paragraph}
-          </Paragraph>
-        ) : null}
-      </View>
+            {data?.title || data?.paragraph ? (
+              <View
+                style={{
+                  flex: 1,
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                {data.title ? (
+                  <Heading fontSize="XL" lineHeight="100%">
+                    {data.title}
+                  </Heading>
+                ) : null}
+                {data.paragraph ? (
+                  <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+                    {data.paragraph}
+                  </Paragraph>
+                ) : null}
+              </View>
+            ) : null}
+          </View>
+        </View>
+      ) : null}
 
       {typeof data.component === "function"
         ? data.component(
@@ -212,20 +249,27 @@ const SheetProvider = ({ context = "global" }) => {
           />
         ) : null}
 
-        {data?.actionsArray &&
-          data?.actionsArray.map((item) => (
-            <Button
-              onPress={item.action}
-              key={item.accentText}
-              title={item.actionText}
-              icon={item.icon && item.icon}
-              type={item.type || "accent"}
-              style={{
-                marginBottom: DefaultAppStyles.GAP_VERTICAL
-              }}
-              width="100%"
-            />
-          ))}
+        <View
+          style={{
+            flexDirection: "row",
+            gap: Spacing.LEVEL_2
+          }}
+        >
+          {data?.actionsArray &&
+            data?.actionsArray.map((item) => (
+              <Button
+                onPress={item.action}
+                key={item.accentText}
+                title={item.actionText}
+                icon={item.icon && item.icon}
+                type={item.type || "accent"}
+                style={{
+                  flex: 1,
+                  flexShrink: 1
+                }}
+              />
+            ))}
+        </View>
 
         {data?.learnMore ? (
           <Paragraph

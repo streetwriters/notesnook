@@ -215,6 +215,9 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
             <DialogHeader
               title={dialogInfo.title}
               icon={dialogInfo.icon}
+              iconFamily={dialogInfo.iconFamily}
+              iconType={dialogInfo.iconType}
+              centered={dialogInfo.centered}
               paragraph={dialogInfo.paragraph}
               paragraphColor={dialogInfo.paragraphColor}
               style={{
@@ -233,6 +236,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                     key={item.name}
                     fwdRef={item.ref}
                     name={item.name}
+                    label={item.label}
                     autoFocus={index === 0}
                     placeholder={item.placeholder}
                     formRef={formRef as RefObject<FormRef>}

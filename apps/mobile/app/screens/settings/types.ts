@@ -31,7 +31,8 @@ export type SettingSection = {
     | "danger"
     | "input"
     | "input-selector"
-    | "dropdown-selector";
+    | "dropdown-selector"
+    | "group";
   name?: string | ((current?: unknown) => string);
   description?: string | ((current: unknown) => string);
   icon?: string;
@@ -49,6 +50,7 @@ export type SettingSection = {
   options?: any[];
   minInputValue?: number;
   maxInputValue?: number;
+  inputBadgeValue?: string;
   onVerify?: () => Promise<boolean>;
   hideHeader?: boolean;
   disabled?: (current: unknown) => boolean;

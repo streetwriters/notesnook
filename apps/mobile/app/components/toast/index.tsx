@@ -35,6 +35,7 @@ import Animated, {
 } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
+import { Radius, Spacing } from "../../common/design/spacing";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import {
@@ -44,8 +45,7 @@ import {
 } from "../../services/event-manager";
 import { getElevationStyle } from "../../utils/elevation";
 import { eHideToast, eShowToast } from "../../utils/events";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
+import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -231,14 +231,14 @@ export const Toast = ({
           ...getElevationStyle(5),
           backgroundColor: isDark ? colors.static.black : colors.static.white,
           alignSelf: "center",
-          borderRadius: defaultBorderRadius * 2,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-          paddingHorizontal: DefaultAppStyles.GAP,
+          borderRadius: Radius.MD,
+          paddingVertical: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_2,
           justifyContent: "space-between",
           flexDirection: "row",
           alignItems: "center",
           maxWidth: "90%",
-          gap: DefaultAppStyles.GAP_SMALL,
+          gap: Spacing.LEVEL_1,
           flexShrink: 1
         }}
       >
@@ -246,7 +246,7 @@ export const Toast = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: DefaultAppStyles.GAP_SMALL,
+            gap: Spacing.LEVEL_1,
             flexShrink: 1
           }}
         >

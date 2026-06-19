@@ -482,6 +482,11 @@ const TabBar = (props: SimpleTabBarProps) => {
                                     ? "notebook"
                                     : "tag"
                                 }
+                                type={
+                                  props.navigationState.index === 1
+                                    ? "notebook"
+                                    : "tag"
+                                }
                                 group={
                                   props.navigationState.index === 1
                                     ? "notebooks"
