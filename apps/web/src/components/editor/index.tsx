@@ -633,7 +633,7 @@ export function Editor(props: EditorProps) {
           await insertAttachments(mime, (attachments) => {
             const editor = useEditorManager.getState().getEditor(id)?.editor;
             if (!editor) return;
-            attachments.forEach((a) => editor?.attachFile(a));
+            editor?.attachFiles(...attachments);
           });
         }}
         onGetAttachmentData={async (attachment) => {
