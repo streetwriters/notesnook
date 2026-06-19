@@ -519,10 +519,9 @@ export function Editor(props: EditorProps) {
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total }: AttachmentProgress) => {
         const editor = useEditorManager.getState().getEditor(id)?.editor;
-        editor?.sendAttachmentProgress(
-          hash,
-          Math.round((loaded / total) * 100)
-        );
+        editor?.updateAttachment(hash, {
+          progress: Math.round((loaded / total) * 100)
+        });
       }
     );
 
@@ -643,6 +642,17 @@ export function Editor(props: EditorProps) {
             });
 
           return result;
+        }}
+        onGetAttachmentMetaData={async (hash) => {
+          const result = await db
+            .sql()
+            .selectFrom("attachments")
+            .where("hash", "=", hash)
+            .select("filename")
+            .executeTakeFirst();
+          if (!result || !result.filename) return undefined;
+
+          return { filename: result.filename };
         }}
         onAttachFiles={async (files) => {
           await AttachFilesDialog.show({

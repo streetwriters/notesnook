@@ -101,7 +101,9 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   addNodeView() {
     return createNodeView(AttachmentComponent, {
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
-        return prev.progress !== next.progress;
+        return (
+          prev.progress !== next.progress || prev.filename !== next.filename
+        );
       },
       forceEnableSelection: true
     });

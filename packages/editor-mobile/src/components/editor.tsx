@@ -166,6 +166,11 @@ const Tiptap = ({
           attachment
         ) as Promise<string | undefined>;
       },
+      async getAttachmentMetaData(hash) {
+        return globalThis.editorControllers[tab.id]?.getAttachmentMetaData(
+          hash
+        );
+      },
       createInternalLink(attributes) {
         return postAsyncWithTimeout(EditorEvents.createInternalLink, {
           attributes

@@ -107,6 +107,9 @@ interface TiptapStorage {
         attachment: Pick<Attachment, "hash" | "type">
       ) => Promise<string | undefined>)
     | undefined;
+  getAttachmentMetaData?: (
+    hash: string
+  ) => Promise<Pick<Attachment, "filename"> | undefined>;
 }
 
 declare module "@tiptap/core" {
@@ -144,6 +147,7 @@ const useTiptap = (
 ) => {
   const {
     getAttachmentData,
+    getAttachmentMetaData,
     downloadAttachment,
     openAttachmentPicker,
     previewAttachment,
@@ -395,6 +399,7 @@ const useTiptap = (
         editor.storage.createInternalLink = createInternalLink;
         editor.storage.getAttachmentData = getAttachmentData;
         editor.storage.downloadCsvTable = downloadCsvTable;
+        editor.storage.getAttachmentMetaData = getAttachmentMetaData;
 
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
@@ -413,7 +418,8 @@ const useTiptap = (
       timeFormat,
       editorProps,
       copyToClipboard,
-      createInternalLink
+      createInternalLink,
+      getAttachmentMetaData
     ]
   );
 

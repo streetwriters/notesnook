@@ -68,7 +68,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   remove: (hash) => {
     const progress = get().progress;
     if (!progress) return;
-    editorController.current?.commands.setAttachmentProgress(
+    editorController.current?.commands.updateAttachment(
       {
         hash: hash,
         progress: 100
@@ -85,7 +85,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     const progressPercentage =
       type === "upload" ? sent / total : recieved / total;
 
-    editorController.current?.commands.setAttachmentProgress(
+    editorController.current?.commands.updateAttachment(
       {
         hash: hash,
         //@ts-ignore

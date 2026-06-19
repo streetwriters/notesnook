@@ -29,6 +29,7 @@ import { createWriteStream } from "../utils/stream-saver";
 import { Attachment } from "@notesnook/core";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
+import { useEditorManager } from "../components/editor/manager";
 
 let abortController: AbortController | undefined = undefined;
 class AttachmentStore extends BaseStore<AttachmentStore> {
@@ -116,11 +117,31 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
   };
 
   rename = async (hash: string, newName: string) => {
-    await db.attachments.add({
+    const attachmentId = await db.attachments.add({
       hash,
       filename: newName
     });
     await this.get().refresh();
+
+    if (!attachmentId) return;
+
+    const linkedNotes = (
+      await db.relations
+        .to({ id: attachmentId, type: "attachment" }, "note")
+        .get()
+    ).map((l) => l.fromId);
+    const sessions = useEditorStore.getState().sessions;
+    for (const session of sessions) {
+      if (!("note" in session) || !session.note.id || !session.note.contentId) {
+        continue;
+      }
+      if (!linkedNotes.includes(session.note.id)) {
+        continue;
+      }
+
+      const editor = useEditorManager.getState().getEditor(session.id)?.editor;
+      editor?.updateAttachment(hash, { filename: newName });
+    }
   };
 
   permanentDelete = async (attachment: Attachment) => {

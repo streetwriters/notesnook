@@ -90,6 +90,9 @@ type TipTapProps = {
         attachment: Pick<Attachment, "hash" | "type">
       ) => Promise<string | undefined>)
     | undefined;
+  onGetAttachmentMetaData?: (
+    hash: string
+  ) => Promise<Pick<Attachment, "filename"> | undefined>;
   onAttachFiles?: (files: File[]) => void;
   onInsertInternalLink?: (
     attributes?: LinkAttributes
@@ -170,6 +173,7 @@ function TipTap(props: TipTapProps) {
     onDownloadAttachment,
     onPreviewAttachment,
     onGetAttachmentData,
+    onGetAttachmentMetaData,
     onAttachFiles,
     onInsertInternalLink,
     onContentChange,
@@ -423,6 +427,7 @@ function TipTap(props: TipTapProps) {
       previewAttachment: onPreviewAttachment,
       createInternalLink: onInsertInternalLink,
       getAttachmentData: onGetAttachmentData,
+      getAttachmentMetaData: onGetAttachmentMetaData,
       openLink: async (url, openInNewTab) => {
         const link = parseInternalLink(url);
         if (link && link.type === "note") {
@@ -750,13 +755,11 @@ function toIEditor(editor: Editor): IEditor {
       file.type === "image"
         ? editor.commands.insertImage(file)
         : editor.commands.insertAttachment(file),
-    sendAttachmentProgress: (hash, progress) =>
-      editor.commands.updateAttachment(
-        {
-          progress
-        },
-        { query: (a) => a.hash === hash, preventUpdate: true }
-      ),
+    updateAttachment: (hash, attributes) =>
+      editor.commands.updateAttachment(attributes, {
+        query: (a) => a.hash === hash,
+        preventUpdate: true
+      }),
     startSearch: () => editor.commands.startSearch(),
     getContent: () =>
       getHTMLFromFragment(editor.state.doc.content, editor.schema),
