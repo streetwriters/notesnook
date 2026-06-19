@@ -25,7 +25,8 @@ import {
   FeatureId,
   FeatureResult,
   isFeatureAvailable,
-  sanitizeFilename
+  sanitizeFilename,
+  formatBytes
 } from "@notesnook/common";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useAppStore } from "../stores/app-store";
@@ -39,6 +40,7 @@ import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop";
 import { TaskManager } from "./task-manager";
+import { AppEventManager, AppEvents } from "./app-events";
 import { EVENTS } from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
@@ -142,46 +144,77 @@ export async function createBackup(
     action: async (report) => {
       const { createZipStream } = await import("../utils/streams/zip-stream");
       const writeStream = await createWritableStream(filePath);
-      await new ReadableStream<ZipFile>({
-        start() {},
-        async pull(controller) {
-          for await (const output of db.backup!.export({
-            type: "web",
-            encrypt: encryptedBackups,
-            mode
-          })) {
-            if (output.type === "file") {
-              const file = output;
-              report({
-                text: background
-                  ? `Creating backup (${file.path})`
-                  : `Saving file ${file.path}`
-              });
-              controller.enqueue({
-                path: file.path,
-                data: encoder.encode(file.data)
-              });
-            } else if (output.type === "attachment") {
-              report({
-                text: background
-                  ? `Creating backup (${output.hash})`
-                  : `Saving attachment ${output.hash}`,
-                total: output.total,
-                current: output.current
-              });
-              const handle = await streamablefs.readFile(output.hash);
-              if (!handle) continue;
-              controller.enqueue({
-                path: output.path,
-                data: handle.readable
-              });
-            }
+
+      let currentAttachmentIndex = 0;
+      const totalAttachments =
+        mode === "full" ? await db.attachments.all.count() : 0;
+      const updateAttachmentProgressEvent = AppEventManager.subscribe(
+        AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+        (ev: any) => {
+          if (ev.type === "download" || ev.type === "encrypt") {
+            const percent = Math.round((ev.loaded / ev.total) * 100);
+            report({
+              text: background
+                ? `Creating backup (${ev.hash} ${percent}%)`
+                : `${
+                    ev.type === "download"
+                      ? strings.downloading()
+                      : strings.encrypting()
+                  } attachment ${ev.hash} | ${percent}% ${`(${formatBytes(
+                    ev.loaded
+                  )} / ${formatBytes(ev.total)})`}`,
+              total: totalAttachments,
+              current: currentAttachmentIndex + 1
+            });
           }
-          controller.close();
         }
-      })
-        .pipeThrough(createZipStream())
-        .pipeTo(writeStream);
+      );
+
+      try {
+        await new ReadableStream<ZipFile>({
+          start() {},
+          async pull(controller) {
+            for await (const output of db.backup!.export({
+              type: "web",
+              encrypt: encryptedBackups,
+              mode
+            })) {
+              if (output.type === "file") {
+                const file = output;
+                report({
+                  text: background
+                    ? `Creating backup (${file.path})`
+                    : `Saving file ${file.path}`
+                });
+                controller.enqueue({
+                  path: file.path,
+                  data: encoder.encode(file.data)
+                });
+              } else if (output.type === "attachment") {
+                currentAttachmentIndex = output.current;
+                report({
+                  text: background
+                    ? `Creating backup (${output.hash})`
+                    : `Saving attachment ${output.hash}`,
+                  total: output.total,
+                  current: output.current
+                });
+                const handle = await streamablefs.readFile(output.hash);
+                if (!handle) continue;
+                controller.enqueue({
+                  path: output.path,
+                  data: handle.readable
+                });
+              }
+            }
+            controller.close();
+          }
+        })
+          .pipeThrough(createZipStream())
+          .pipeTo(writeStream);
+      } finally {
+        updateAttachmentProgressEvent.unsubscribe();
+      }
     }
   });
   if (error) {
