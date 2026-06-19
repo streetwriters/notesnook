@@ -28,7 +28,7 @@ import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
+import { ActivityIndicator, TextInput, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { db } from "../../../common/database";
 import { useDBItem } from "../../../hooks/use-db-item";
@@ -118,8 +118,8 @@ const ListBlockItem = ({
           {item?.content.length > 200
             ? item?.content.slice(0, 200) + "..."
             : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
+              ? strings.linkNoteEmptyBlock()
+              : item.content}
         </Paragraph>
 
         <View
@@ -158,6 +158,7 @@ export default function LinkNote(props: {
 
   const [selectedNote, setSelectedNote] = useState<Note>();
   const [selectedNodeId, setSelectedNodeId] = useState<string>();
+  const [blocksLoading, setBlocksLoading] = useState(false);
 
   useEffect(() => {
     db.notes.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
@@ -206,10 +207,12 @@ export default function LinkNote(props: {
 
   const onSelectNote = async (note: Note) => {
     setSelectedNote(note);
+    setBlocksLoading(true);
     inputRef.current?.clear();
     setTimeout(async () => {
       nodesRef.current = await db.notes.contentBlocks(note.id);
       setNodes(nodesRef.current);
+      setBlocksLoading(false);
     });
     // Fetch and set note's nodes.
   };
@@ -330,28 +333,32 @@ export default function LinkNote(props: {
           windowSize={3}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
-            <View
-              style={{
-                gap: DefaultAppStyles.GAP_VERTICAL,
-                backgroundColor: colors.secondary.background,
-                padding: DefaultAppStyles.GAP,
-                borderRadius: defaultBorderRadius,
-                borderWidth: 0.5,
-                borderColor: colors.secondary.border,
-                alignItems: "center"
-              }}
-            >
-              <Paragraph color={colors.secondary.paragraph}>
-                {blockLinking?.error}
-              </Paragraph>
-              <Button
-                title={strings.upgradePlan()}
+            !blockLinking || blocksLoading ? (
+              <ActivityIndicator size={25} color={colors.primary.accent} />
+            ) : !blockLinking.isAllowed ? (
+              <View
                 style={{
-                  width: "100%"
+                  gap: DefaultAppStyles.GAP_VERTICAL,
+                  backgroundColor: colors.secondary.background,
+                  padding: DefaultAppStyles.GAP,
+                  borderRadius: defaultBorderRadius,
+                  borderWidth: 0.5,
+                  borderColor: colors.secondary.border,
+                  alignItems: "center"
                 }}
-                type="accent"
-              />
-            </View>
+              >
+                <Paragraph color={colors.secondary.paragraph}>
+                  {blockLinking?.error}
+                </Paragraph>
+                <Button
+                  title={strings.upgradePlan()}
+                  style={{
+                    width: "100%"
+                  }}
+                  type="accent"
+                />
+              </View>
+            ) : null
           }
           data={blockLinking?.isAllowed ? nodes : []}
         />
