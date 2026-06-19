@@ -48,6 +48,9 @@ export const useVaultStatus = () => {
         biometryEnrolled: fingerprint,
         isBiometryAvailable: available ? true : false
       });
+      VaultStatusDefaults.biometryEnrolled = fingerprint;
+      VaultStatusDefaults.exists = exists;
+      VaultStatusDefaults.isBiometryAvailable = available ? true : false;
     });
   }, []);
 

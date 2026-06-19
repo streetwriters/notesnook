@@ -464,6 +464,11 @@ const TabBar = (props: SimpleTabBarProps) => {
                           presentSheet({
                             component: (
                               <Sort
+                                dataType={
+                                  props.navigationState.index === 1
+                                    ? "notebook"
+                                    : "tag"
+                                }
                                 type={
                                   props.navigationState.index === 1
                                     ? "notebook"
