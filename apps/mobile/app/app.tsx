@@ -35,7 +35,7 @@ import { Toast } from "./components/toast";
 import { useAppEvents } from "./hooks/use-app-events";
 import { NotePreviewConfigure } from "./screens/note-preview-configure";
 import { RootNavigation } from "./navigation/navigation-stack";
-import { themeTrpcClient } from "./screens/settings/theme-selector";
+import { themeTrpcClient } from "./screens/settings/components/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";

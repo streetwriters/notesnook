@@ -386,7 +386,7 @@ export function FormInput({
         >
           {secureTextEntry && (
             <IconButton
-              name={secureEntry ? "eye-closed" : "eye-open"}
+              name={!secureEntry ? "eye-closed" : "eye-open"}
               iconFamily="notesnook"
               size={20}
               top={10}

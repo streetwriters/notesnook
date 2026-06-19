@@ -51,7 +51,7 @@ const DialogButtons = ({
         {
           flexDirection: "row",
           gap: Spacing.LEVEL_2,
-          paddingHorizontal: Spacing.LEVEL_4
+          paddingHorizontal: Spacing.LEVEL_3
         }
       ]}
     >
@@ -61,7 +61,8 @@ const DialogButtons = ({
         testID={notesnook.ids.default.dialog.no}
         type="plain-outline"
         style={{
-          width: "48.5%"
+          flexGrow: 1,
+          flexShrink: 1
         }}
         title={negativeTitle}
       />
@@ -71,7 +72,8 @@ const DialogButtons = ({
           fontSize={AppFontSize.md}
           testID={notesnook.ids.default.dialog.yes}
           style={{
-            width: "48.5%"
+            flexGrow: 1,
+            flexShrink: 1
           }}
           loading={loading}
           bold

@@ -25,16 +25,21 @@ import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SectionGroup } from "./section-group";
-import { settingsGroups } from "./settings-data";
+import { useSettingsData } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
-import SettingsUserSection from "./user-section";
+import SettingsUserSection from "./components/user-section";
 import { LegendList } from "@legendapp/list";
+import { useThemeColors } from "@notesnook/theme";
+import { Spacing } from "../../common/design/spacing";
+import { View } from "react-native";
 
 const keyExtractor = (item: SettingSection) => item.id;
 
 const Home = ({
   navigation
 }: NativeStackScreenProps<RouteParams, "SettingsHome">) => {
+  const { colors } = useThemeColors();
+  const settingsGroups = useSettingsData();
   useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().setFocusedRouteId("Settings");
@@ -43,20 +48,32 @@ const Home = ({
     focusOnInit: true
   });
 
-  const renderItem = ({ item }: { item: SettingSection; index: number }) =>
+  const renderItem = ({
+    item,
+    index
+  }: {
+    item: SettingSection;
+    index: number;
+  }) =>
     item.id === "account" ? (
       <SettingsUserSection item={item} />
     ) : (
-      <SectionGroup item={item} />
+      <SectionGroup item={item} isLast={!settingsGroups[index + 1]} />
     );
 
   return (
-    <>
+    <View>
       <Header
         renderedInRoute="Settings"
         title={strings.routes.Settings()}
         canGoBack={true}
         hasSearch={false}
+        style={{
+          backgroundColor: "transparent",
+          borderRadius: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.primary.border
+        }}
         id="Settings"
       />
       <DelayLayout type="settings">
@@ -65,9 +82,12 @@ const Home = ({
           data={settingsGroups}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
+          contentContainerStyle={{
+            gap: Spacing.LEVEL_2
+          }}
         />
       </DelayLayout>
-    </>
+    </View>
   );
 };
 

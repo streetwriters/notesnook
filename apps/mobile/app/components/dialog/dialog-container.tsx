@@ -47,7 +47,8 @@ const DialogContainer = ({
           maxHeight: height || 450,
           borderRadius: Radius.LG,
           backgroundColor: colors.primary.background,
-          paddingTop: 12
+          paddingTop: 12,
+          marginTop: -300
         },
         restProps?.noBorder
           ? {}
