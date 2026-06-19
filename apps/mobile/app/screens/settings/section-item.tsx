@@ -41,6 +41,7 @@ import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
 import { components } from "./components/components";
 import { RouteParams, SettingSection } from "./types";
+import { planToDisplayNameShort } from "../../utils/constants";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
@@ -195,28 +196,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         }
       }}
     >
-      {!isFeatureAvailable?.isAllowed ? (
-        <View
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 100,
-            backgroundColor: colors.primary.accent,
-            justifyContent: "center",
-            alignItems: "center",
-            position: "absolute",
-            bottom: -8,
-            right: -8
-          }}
-        >
-          <AppIcon
-            color={colors.static.orange}
-            size={AppFontSize.md}
-            name="crown"
-          />
-        </View>
-      ) : null}
-
       <View
         style={{
           flexDirection: "column",
@@ -266,17 +245,56 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               flex: 1
             }}
           >
-            {item.name ? (
-              <Heading
-                color={colors.primary.heading}
-                fontSize="MD"
-                lineHeight="100%"
-              >
-                {typeof item.name === "function"
-                  ? item.name(current)
-                  : item.name}
-              </Heading>
-            ) : null}
+            <View
+              style={{
+                flexDirection: "row",
+                gap: Spacing.LEVEL_1,
+                alignItems: "center"
+              }}
+            >
+              {item.name ? (
+                <Heading
+                  color={colors.primary.heading}
+                  fontSize="MD"
+                  lineHeight="100%"
+                >
+                  {typeof item.name === "function"
+                    ? item.name(current)
+                    : item.name}
+                </Heading>
+              ) : null}
+
+              {!isFeatureAvailable?.isAllowed ? (
+                <View
+                  style={{
+                    paddingVertical: Spacing.LEVEL_0 / 2,
+                    paddingHorizontal: Spacing.LEVEL_1,
+                    borderRadius: 100,
+                    backgroundColor: colors.primary.accent,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    gap: Spacing.LEVEL_0
+                  }}
+                >
+                  <AppIcon
+                    color={colors.static.orange}
+                    size={AppFontSize.md}
+                    name="crown"
+                  />
+                  {isFeatureAvailable?.availableOn ? (
+                    <Paragraph
+                      style={{ color: colors.primary.accentForeground }}
+                      fontSize="XXS"
+                      fontFamily="MEDIUM"
+                    >
+                      {planToDisplayNameShort(isFeatureAvailable?.availableOn)}
+                    </Paragraph>
+                  ) : null}
+                </View>
+              ) : null}
+            </View>
+
             {item.description ? (
               <Paragraph
                 color={colors.primary.paragraph}

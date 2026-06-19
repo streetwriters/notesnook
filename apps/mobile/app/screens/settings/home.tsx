@@ -31,6 +31,7 @@ import SettingsUserSection from "./components/user-section";
 import { LegendList } from "@legendapp/list";
 import { useThemeColors } from "@notesnook/theme";
 import { Spacing } from "../../common/design/spacing";
+import { View } from "react-native";
 
 const keyExtractor = (item: SettingSection) => item.id;
 
@@ -61,7 +62,7 @@ const Home = ({
     );
 
   return (
-    <>
+    <View>
       <Header
         renderedInRoute="Settings"
         title={strings.routes.Settings()}
@@ -86,7 +87,7 @@ const Home = ({
           }}
         />
       </DelayLayout>
-    </>
+    </View>
   );
 };
 

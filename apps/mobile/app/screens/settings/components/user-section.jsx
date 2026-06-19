@@ -114,8 +114,8 @@ const SettingsUserSection = ({ item }) => {
           <View
             style={{
               paddingHorizontal: Spacing.LEVEL_3,
-              paddingTop: Spacing.LEVEL_0,
-              marginBottom: Spacing.LEVEL_2
+              marginBottom: Spacing.LEVEL_2,
+              marginTop: -Spacing.LEVEL_2
             }}
           >
             <View

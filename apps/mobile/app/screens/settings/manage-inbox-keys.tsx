@@ -888,33 +888,56 @@ const InboxKeysList = () => {
         </View>
       ) : (
         <View style={{ gap: Spacing.LEVEL_3 }}>
-          {apiKeys.map((key, i) => (
-            <ApiKeyItem
-              key={key.key}
-              apiKey={key}
-              onRevoke={() => apiKeysPromise.refresh()}
-              isAtEnd={i === apiKeys.length - 1}
-            />
-          ))}
-
-          <Button
-            title={strings.createKey()}
-            type="accent"
+          <View
             style={{
-              width: "100%"
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center"
             }}
-            onPress={() => {
-              if (apiKeys.length >= 10) {
-                presentDialog({
-                  title: strings.apiKeysLimitReached(),
-                  paragraph: strings.apiKeysLimitReachedMessage(),
-                  positiveText: strings.ok()
-                });
-              } else {
-                AddApiKeySheet.present(() => apiKeysPromise.refresh());
-              }
-            }}
-          />
+          >
+            <Heading fontSize="LG">{strings.viewAPIKeys()}</Heading>
+
+            <Button
+              title={strings.createKey()}
+              type="accent"
+              style={{
+                paddingHorizontal: Spacing.LEVEL_2,
+                paddingVertical: Spacing.LEVEL_1
+              }}
+              onPress={() => {
+                if (apiKeys.length >= 10) {
+                  presentDialog({
+                    title: strings.apiKeysLimitReached(),
+                    paragraph: strings.apiKeysLimitReachedMessage(),
+                    positiveText: strings.ok()
+                  });
+                } else {
+                  AddApiKeySheet.present(() => apiKeysPromise.refresh());
+                }
+              }}
+            />
+          </View>
+
+          {apiKeys.map((key, i) => (
+            <>
+              <ApiKeyItem
+                key={key.key}
+                apiKey={key}
+                onRevoke={() => apiKeysPromise.refresh()}
+                isAtEnd={i === apiKeys.length - 1}
+              />
+
+              {apiKeys[i + 1] ? (
+                <View
+                  style={{
+                    width: "100%",
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.primary.separator
+                  }}
+                />
+              ) : null}
+            </>
+          ))}
         </View>
       )}
     </ScrollView>
@@ -1043,8 +1066,9 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
   return (
     <View
       style={{
-        borderBottomWidth: isAtEnd ? 0 : 1,
-        borderBottomColor: colors.secondary.border
+        backgroundColor: colors.secondary.background,
+        borderRadius: Radius.S,
+        padding: Spacing.LEVEL_2
       }}
     >
       <View style={{ gap: Spacing.LEVEL_1 }}>
@@ -1099,7 +1123,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           width: "100%",
           height: 1,
           borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border,
+          borderBottomColor: colors.primary.separator,
           marginVertical: Spacing.LEVEL_3
         }}
       />
@@ -1120,7 +1144,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
             gap: Spacing.LEVEL_1,
             paddingHorizontal: Spacing.LEVEL_2,
             paddingVertical: Spacing.LEVEL_1,
-            backgroundColor: colors.secondary.background,
+            backgroundColor: colors.tertiary.background,
             borderRadius: Radius.XS
           }}
         >
@@ -1170,7 +1194,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
         </View>
 
         <Pressable
-          type="secondary"
+          type="tertiary"
           disabled={isRevoking}
           onPress={revokeKey}
           style={{

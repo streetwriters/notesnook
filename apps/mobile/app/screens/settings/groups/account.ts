@@ -167,6 +167,7 @@ export const accountGroup: SettingSection = {
           (state) => state.user?.subscription?.plan === SubscriptionPlan.FREE
         ),
       icon: "gift",
+      iconFamily: "notesnook",
       modifer: () => {
         presentDialog({
           title: strings.redeemGiftCode(),
