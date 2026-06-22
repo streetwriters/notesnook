@@ -316,48 +316,56 @@ const TwoFactorVerification = ({
               />
             </View>
 
-            {currentMethod.method === "sms" ||
-            currentMethod.method === "email" ? (
-              <Button
-                onPress={onSendCode}
-                type={"plain"}
-                disabled={parseInt(`${seconds}`) !== 0}
-                title={
-                  sending
-                    ? ""
-                    : `${
-                        seconds
-                          ? strings.resend2faCode(`${seconds}`)
-                          : strings.resendCode()
-                      }`
-                }
-                loading={sending}
-                fontSize={AppFontSize.sm}
-                fontFamily="REGULAR"
+            <View
+              style={{
+                gap: Spacing.LEVEL_1,
+                marginTop: -Spacing.LEVEL_0
+              }}
+            >
+              {currentMethod.method === "sms" ||
+              currentMethod.method === "email" ? (
+                <Button
+                  onPress={onSendCode}
+                  type={"plain"}
+                  disabled={parseInt(`${seconds}`) !== 0}
+                  title={
+                    sending
+                      ? ""
+                      : `${
+                          seconds
+                            ? strings.resend2faCode(`${seconds}`)
+                            : strings.resendCode()
+                        }`
+                  }
+                  loading={sending}
+                  fontSize={AppFontSize.sm}
+                  fontFamily="REGULAR"
+                  style={{
+                    paddingVertical: 0,
+                    alignSelf: "flex-start",
+                    paddingHorizontal: 0
+                  }}
+                />
+              ) : null}
+              <TouchableOpacity
+                onPress={onRequestSecondaryMethod}
+                activeOpacity={0.8}
                 style={{
-                  paddingVertical: 0,
-                  alignSelf: "flex-start",
-                  paddingHorizontal: 0
+                  alignSelf: "flex-start"
                 }}
-              />
-            ) : null}
+              >
+                <Paragraph
+                  fontFamily="SEMI_BOLD"
+                  fontSize="SM"
+                  color={colors.primary.accent}
+                >
+                  {strings["2faCodeSecondaryMethodText"][
+                    currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
+                  ]()}
+                </Paragraph>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <TouchableOpacity
-            onPress={onRequestSecondaryMethod}
-            activeOpacity={0.8}
-            style={{
-              alignSelf: "center",
-              paddingVertical: 0,
-              marginTop: Spacing.LEVEL_3
-            }}
-          >
-            <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
-              {strings["2faCodeSecondaryMethodText"][
-                currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
-              ]()}
-            </Paragraph>
-          </TouchableOpacity>
         </>
       ) : (
         <View
