@@ -152,7 +152,7 @@ export const InboxHistoryDialog = DialogManager.register(
     const result = usePromise(() => db.inboxItemsHistory.failed.items());
 
     async function deleteItem(id: string) {
-      await db.inboxItemsHistory.delete(id);
+      await db.inboxItemsHistory.delete([id]);
       showToast("success", strings.itemDeleted());
       if (result.status !== "pending") {
         result.refresh();
