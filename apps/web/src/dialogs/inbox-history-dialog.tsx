@@ -105,6 +105,7 @@ function DetailsCell({ value }: { value: string }) {
         <Box
           as="pre"
           sx={{
+            color: "paragraph",
             m: 0,
             fontSize: "0.72em",
             whiteSpace: "pre-wrap",

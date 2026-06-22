@@ -401,10 +401,14 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
               setSelectedExpiry(Number(value));
             }}
             sx={{
+              color: "var(--paragraph)",
               bg: "background-secondary",
               border: "1px solid",
               borderColor: "border",
-              padding: "5px"
+              padding: "5px",
+              "& + svg": {
+                fill: "var(--paragraph)"
+              }
             }}
           >
             {EXPIRY_OPTIONS.map((option) => (
