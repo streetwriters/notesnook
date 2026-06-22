@@ -171,7 +171,7 @@ function PublishView(props: PublishViewProps) {
             </Text>
           </Flex>
         ) : null}
-        {monograph?.id ? (
+        {monograph?.id && !selfDestruct ? (
           <Flex
             sx={{
               alignItems: "center",
