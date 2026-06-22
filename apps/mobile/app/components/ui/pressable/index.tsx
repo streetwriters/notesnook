@@ -50,10 +50,14 @@ export interface PressableProps extends RNPressableProps {
 
 type ButtonTypes =
   | "plain"
+  | "plain-outline"
+  | "accent-background"
   | "transparent"
   | "accent"
   | "shade"
+  | "shade-plain"
   | "secondary"
+  | "tertiary"
   | "selectedAccent"
   | "secondaryAccented"
   | "inverted"
@@ -61,7 +65,10 @@ type ButtonTypes =
   | "error"
   | "errorShade"
   | "warn"
-  | "selected";
+  | "selected"
+  | "accent-outline"
+  | "secondary-outline"
+  | "secondary-simple";
 
 type ButtonVariant = {
   primary: string;
@@ -83,7 +90,7 @@ const buttonTypes = (
 } => ({
   plain: {
     primary: "transparent",
-    text: colors.primary.paragraph,
+    text: colors.secondary.buttonForeground,
     selected: colors.primary.hover,
     borderWidth: 0.8,
     borderSelectedColor: getColorLinearShade(
@@ -91,6 +98,22 @@ const buttonTypes = (
       0.05,
       isDark
     )
+  },
+  "plain-outline": {
+    primary: "transparent",
+    text: colors.secondary.buttonForeground,
+    selected: colors.primary.hover,
+    borderWidth: 1,
+    borderColor: colors.primary.border,
+    borderSelectedColor: colors.primary.border
+  },
+  "secondary-outline": {
+    primary: "transparent",
+    text: colors.secondary.paragraph,
+    selected: colors.primary.hover,
+    borderWidth: 1,
+    borderColor: colors.primary.border,
+    borderSelectedColor: colors.primary.border
   },
   transparent: {
     primary: "transparent",
@@ -105,7 +128,25 @@ const buttonTypes = (
   },
   secondary: {
     primary: colors.secondary.background,
-    text: colors.secondary.paragraph,
+    text: colors.primary.heading,
+    selected: colors.secondary.background,
+    borderWidth: 0.8,
+    borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
+    borderSelectedColor: getColorLinearShade(
+      colors.selected.background,
+      0.05,
+      isDark
+    )
+  },
+  "secondary-simple": {
+    primary: colors.secondary.background,
+    text: colors.primary.heading,
+    selected: colors.secondary.background,
+    borderWidth: 0
+  },
+  tertiary: {
+    primary: colors.tertiary.background,
+    text: colors.secondary.buttonForeground,
     selected: colors.secondary.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.secondary.background, 0.05, isDark),
@@ -117,7 +158,7 @@ const buttonTypes = (
   },
   selected: {
     primary: colors.selected.background,
-    text: colors.selected.paragraph,
+    text: colors.selected.buttonForeground,
     selected: colors.selected.background,
     borderWidth: 0.8,
     borderColor: getColorLinearShade(colors.selected.background, 0.05, isDark),
@@ -167,6 +208,20 @@ const buttonTypes = (
       false
     )
   },
+  "accent-background": {
+    primary: colors.primary.background,
+    text: colors.primary.accent,
+    selected: colors.primary.background,
+    borderWidth: 0
+  },
+  "accent-outline": {
+    primary: "transparent",
+    text: colors.primary.accent,
+    selected: accent || colors.primary.accent,
+    borderWidth: 1,
+    borderColor: accent || colors.primary.accent,
+    borderSelectedColor: accent || colors.primary.accent
+  },
   inverted: {
     primary: colors.primary.background,
     text: colors.primary.accent,
@@ -180,6 +235,15 @@ const buttonTypes = (
   shade: {
     primary: colors.primary.shade,
     text: colors.primary.accent,
+    selected: colors.primary.accent,
+    colorOpacity: 0.12,
+    borderWidth: 0.8,
+    borderColor: getColorLinearShade(colors.primary.shade, 0.3, isDark),
+    borderSelectedColor: getColorLinearShade(colors.primary.shade, 0.3, isDark)
+  },
+  "shade-plain": {
+    primary: colors.primary.shade,
+    text: colors.primary.heading,
     selected: colors.primary.accent,
     colorOpacity: 0.12,
     borderWidth: 0.8,
@@ -200,7 +264,7 @@ const buttonTypes = (
   },
   errorShade: {
     primary: "transparent",
-    text: colors.error.paragraph,
+    text: colors.error.buttonForeground,
     selected: colors.error.background,
     borderWidth: 0.8,
     borderSelectedColor: getColorLinearShade(

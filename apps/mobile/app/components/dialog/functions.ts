@@ -23,10 +23,12 @@ import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 import { ButtonProps } from "../ui/button";
 import { FieldValidator, FormRef } from "../ui/input/form-input";
 import { RefObject } from "react";
+import { IconProps } from "../ui/AppIcon";
 
 export type DialogInfo = {
   title?: string;
   paragraph?: string;
+  centered?: boolean;
   positiveText: string;
   negativeText: string;
   background?: string;
@@ -44,6 +46,8 @@ export type DialogInfo = {
     | "error"
     | "errorShade";
   icon?: string;
+  iconFamily?: IconProps["iconFamily"];
+  iconType?: "error" | "normal";
   paragraphColor: string;
   form?: {
     formRef: FormRef;
@@ -58,6 +62,7 @@ export type DialogInfo = {
     onFormSubmit?: (form: FormRef) => Promise<boolean>;
   };
   input: boolean;
+  inputLabel?: string;
   inputPlaceholder: string;
   defaultValue: string;
   // eslint-disable-next-line @typescript-eslint/ban-types

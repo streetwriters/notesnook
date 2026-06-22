@@ -108,16 +108,16 @@ export const strings = {
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
   "2fa": () => t`Two factor authentication`,
-  select2faMethod: () => t`Select method for two-factor authentication`,
+  select2faMethod: () => t`Choose 2FA Method`,
   select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
   "2faCodeHelpText": {
     email: () =>
-      t`Enter the 6 digit code sent to your email to continue logging in`,
+      t`Enter the 6 digit code sent to your email to continue logging in.`,
     sms: () =>
-      t`Enter the 6 digit code sent to your phone number to continue logging in`,
+      t`Enter the 6 digit code sent to your phone number to continue logging in.`,
     app: () =>
-      t`Enter the 6 digit code from your authenticator app to continue logging in`,
-    recoveryCode: () => t`Enter the recovery code to continue logging in`
+      t`Enter the 6 digit code from your authenticator app to continue logging in.`,
+    recoveryCode: () => t`Enter your recovery code.`
   },
   "2faCodeSecondaryMethodText": {
     email: () => t`I don't have access to email`,
@@ -125,7 +125,7 @@ export const strings = {
     app: () => t`I don't have access to authenticator app`,
     recoveryCode: () => t`I don't have recovery codes`
   },
-  resend2faCode: (seconds: string) => t`Resend code in (${seconds})`,
+  resend2faCode: (seconds: string) => t`Resend code in ${seconds}s`,
   sendCode: () => t`Send code`,
   sendCodeSms: () => t`Send code via SMS`,
   sendCodeEmail: () => t`Send code via email`,
@@ -228,10 +228,9 @@ export const strings = {
       t`Please note that we will respond to your issue on the given link. We recommend that you save it.`
   },
   issueNotice: {
-    0: () => t`The information above will be publically available at`,
-    1: () =>
-      t`If you want to ask something in general or need some assistance, we would suggest that you`,
-    2: () => t`join our community on Discord.`
+    0: () => t`Issues reported here are public on`,
+    1: () => t`For support or questions, chat with our community on`,
+    2: () => t`Discord.`
   },
   linkNoteEmptyBlock: () => t`(empty block)`,
   linkNoteSelectedNote: () => t`SELECTED NOTE`,
@@ -377,13 +376,17 @@ export const strings = {
   restoringCollection: (collection: string) => t`Restoring ${collection}...`,
   checkNewVersion: () => t`Checking for new version`,
   noUpdates: () => t`No updates available`,
+  noUpdatesDesc: () => t`There are no new updates at the moment.`,
   updateAvailable: () => t`Update available`,
   versionReleased: (version: string, type: "github" | "store") =>
     select(type, {
       github: `v${version} has been released on GitHub`,
       other: `v${version} has been released`
     }),
-  readReleaseNotes: () => t`Read full release notes on Github`,
+  readReleaseNotes: {
+    1: () => t`Read full release notes on `,
+    2: () => t`Github`
+  },
   settings: () => t`Settings`,
   notLoggedIn: () => t`Not logged in`,
   loggedInAs: (email: string) => t`Logged in as ${email}`,
@@ -472,8 +475,7 @@ $day$: Current day (eg. Monday)`,
   issueTitle: () => t`Report issue`,
   issueDesc: () =>
     t`We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap.`,
-  issueDesc2: () =>
-    t`Let us know if you have faced any issue/bug while using Notesnook. We will try to fix it as soon as possible.`,
+  issueDesc2: () => t`Help us make Notesnook better for everyone.`,
   migrationSaveBackup: () => t`Save a backup of your notes`,
   migrationSaveBackupDesc: () =>
     t`Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience.`,
@@ -493,7 +495,7 @@ $day$: Current day (eg. Monday)`,
   backups: () => t`Backups`,
   twoFactorAuth: () => t`Two-factor authentication`,
   twoFactorAuthDesc: () =>
-    t`Enable two-factor authentication to add an extra layer of security to your account.`,
+    t`Enable two-factor authentication to secure your account.`,
   saveRecoveryCodes: () => t`Save recovery codes`,
   saveRecoveryCodesDesc: () =>
     t`Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods.`,
@@ -550,7 +552,7 @@ $day$: Current day (eg. Monday)`,
   skip: () => t`Skip`,
   changePasswordConfirm: () => t`I understand, change my password`,
   next: () => t`Next`,
-  forgotPassword: () => t`Forgot password?`,
+  forgotPassword: () => t`Forgot Password?`,
   cancelLogin: () => t`Cancel login`,
   logoutFromDevice: () => t`Logout from this device`,
   useAccountPassword: () => t`Use account password`,
@@ -731,7 +733,7 @@ $day$: Current day (eg. Monday)`,
   fileCheckFailed: (reason: string) =>
     t`File check failed: ${reason} Try reuploading the file to fix the issue.`,
   changePasswordNotice: () =>
-    t`Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection.`,
+    t`Changing your password is irreversible process. Once your password is changed please make sure to save the new account recovery key.`,
   changePasswordNotice2: () =>
     t`Once your password is changed, please make sure to save the new account recovery key`,
   sideMenuNotice: () => t`Add shortcuts for notebooks and tags here.`,
@@ -816,17 +818,31 @@ $day$: Current day (eg. Monday)`,
   introData: [
     {
       headings: [
-        () => t`Open source.`,
-        () => t`End to end encrypted.`,
-        () => t`Private.`
+        {
+          bold: false,
+          value: () => t`Open source.`
+        },
+        {
+          bold: true,
+          value: () => t`End-to-end encrypted.`
+        },
+        {
+          bold: false,
+          value: () => t`Private.`
+        }
       ],
       body: () => t`Write notes with freedom, no spying, no tracking.`
     },
     {
       headings: [
-        () => t`Privacy for everyone`,
-        () => t`— not just the`,
-        () => t`privileged few`
+        {
+          bold: true,
+          value: () => t`Privacy for everyone`
+        },
+        {
+          bold: false,
+          value: () => t`— not just the privileged few`
+        }
       ],
       body: () =>
         t`Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again.`
@@ -1049,7 +1065,7 @@ $day$: Current day (eg. Monday)`,
   removeFullNameDesc: () => t`Remove your full name from profile`,
   saveDataRecoveryKey: () => t`Save data recovery key`,
   saveDataRecoveryKeyDesc: () =>
-    t`Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password.`,
+    t`Recovery key helps you recover your data if you forget your password.`,
   manageAttachments: () => t`Manage attachments`,
   manageAttachmentsDesc: () => t`Manage your attachments in one place`,
   changePasswordDesc: () => t`Change your account password`,
@@ -1073,24 +1089,26 @@ $day$: Current day (eg. Monday)`,
     t`Please wait while we verify your subscription`,
   verifySubDesc: () => t`Verify your subscription to Notesnook Pro`,
   logoutWarnin: () =>
-    t`Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.`,
+    t`This will clear all data stored on THIS DEVICE. Make sure to run sync before logging out.`,
   logoutError: () => t`Error logging out`,
   deleteAccount: () => t`Delete account`,
   deleteAccountDesc: () =>
-    t`Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure you have saved a backup of your notes before proceeding.`,
+    t`Your account will be permanently deleted along with all your data, login credentials, and subscription information. This action is IRREVERSIBLE. Make sure to save a backup of your notes before proceeding.`,
   enterAccountPassword: () => t`Enter account password`,
   enterAccountPasswordDesc: () => t`Enter account password to proceed.`,
   failedToDeleteAccount: () => t`Failed to delete account`,
   syncSettings: () => t`Sync settings`,
   syncSettingsDesc: () => t`Manage your sync settings here`,
-  disableAutoSync: () => t`Disable auto sync`,
-  disableAutoSyncDesc: () =>
-    t`Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.`,
-  disableRealtimeSync: () => t`Disable realtime sync`,
-  disableRealtimeSyncDesc: () =>
-    t`Changes from other devices won't be updated in the editor in real-time.`,
-  disableSync: () => t`Disable sync`,
-  disableSyncDesc: () =>
+  syncBehavior: () => t`Sync behavior`,
+  offlineAndStorage: () => t`Offline & storage`,
+  advancedSettings: () => t`Advanced settings`,
+  troubleshooting: () => t`Troubleshooting`,
+  autoSync: () => t`Auto sync`,
+  autoSyncDesc: () => t`Keep your notes updated automatically`,
+  realtimeSync: () => t`Real-time sync`,
+  realtimeSyncDesc: () => t`See changes in editor instantly across devices.`,
+  pauseSync: () => t`Pause sync`,
+  pauseSyncDesc: () =>
     t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`,
   backgroundSync: () => t`Background sync (experimental)`,
   backgroundSyncDesc: () =>
@@ -1225,13 +1243,13 @@ $day$: Current day (eg. Monday)`,
     t`Set the interval to create a backup (with attachments) automatically.`,
     t`NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions.`
   ],
-  selectBackupDir: () => t`Select backup directory`,
+  selectBackupDir: () => t`Backup location`,
   selectBackupDirDesc: (path: string) => [
     t`Choose where to save your backups`,
     t`Current path: ${path}`
   ],
   noDirectorySelected: () => t`No directory selected`,
-  changeBackupDir: () => t`Change backup directory`,
+  changeBackupDir: () => t`Change backup location`,
   backupEncryption: () => t`Backup encryption`,
   backupEncryptionDesc: () => t`Encrypt your backups for added security`,
   restoreBackup: () => t`Restore backup`,
@@ -1363,7 +1381,7 @@ $day$: Current day (eg. Monday)`,
   loginMessage: () => t`You are not logged in`,
   loginMessageActionText: () => t`Login to encrypt and sync notes`,
   syncDisabled: () => t`Sync is disabled`,
-  syncDisabledActionText: () => t`Please confirm your email to sync notes`,
+  syncDisabledActionText: () => t`Confirm your email to sync notes`,
   autoBackupsOffMessage: () => t`Automatic backups are off`,
   autoBackupsOffActionText: () =>
     t`Get Notesnook Pro to enable automatic backups`,
@@ -1479,6 +1497,8 @@ $day$: Current day (eg. Monday)`,
   unpublishToDelete: () => t`Unpublish notes to delete them`,
   filterAttachments: () => t`Filter attachments by filename, type or hash`,
   oldPassword: () => t`Current password`,
+  filterNotebooks: () => t`Filter notebooks...`,
+  filterTags: () => t`Filter tags...`,
   newPassword: () => t`New password`,
   email: () => t`Email`,
   emailInvalid: () => t`Invalid email`,
@@ -1511,6 +1531,9 @@ For example:
   typeAKeyword: () => t`Type a keyword`,
   search: () => t`Search`,
   enterEmailAddress: () => t`Enter email address`,
+  noNotebooksYet: () => t`No notebooks yet`,
+  notebooksEmptyBody: () => t`Start organizing your ideas, notes and thoughts`,
+  createNotebook: () => t`Create notebook`,
   enterValidEmail: () => t`Please enter a valid email address`,
   enterValidPhone: () => t`Please enter a valid phone number with country code`,
   errorGettingCodes: () => t`Error getting codes`,
@@ -1610,7 +1633,7 @@ For example:
   selectBackupFileDesc: () =>
     t`Select a backup file from your device to restore backup`,
   restoreFromFiles: () => t`Restore from files`,
-  recentBackups: () => t`RECENT BACKUPS`,
+  recentBackups: () => t`Recent backups`,
   restoringBackup: () => t`Restoring backup...`,
   restoringBackupDesc: () => t`Please wait while we restore your backup...`,
   decryptingBackup: () => t`Backup is encrypted, decrypting...`,
@@ -1772,7 +1795,7 @@ For example:
   dragAndDropFiles: () => t`Drag & drop files here, or click to select files`,
   onlyZipSupported: () => t`Only .zip files are supported.`,
   clickToRemove: () => t`Click to remove`,
-  currentPlan: () => t`CURRENT PLAN`,
+  currentPlan: () => t`Current Plan`,
   appWillReloadIn: (sec: number) => t`App will reload in ${sec} seconds`,
   changesReflectOnStart: () =>
     t`Your changes have been saved and will be reflected after the app has refreshed.`,
@@ -1827,7 +1850,7 @@ For example:
   startImport: () => t`Start import`,
   cancelSub: () => t`Cancel subscription`,
   unlockWithSecurityKey: () => t`Unlock with security key`,
-  reloginToYourAccount: () => t`Relogin to your account`,
+  reloginToYourAccount: () => t`Relogin to your Account`,
   skipAndGoToApp: () => t`Skip & go directly to the app`,
   startAccountRecovery: () => t`Start account recovery`,
   dontHaveRecoveryKey: () => t`Don't have your account recovery key?`,
@@ -1869,7 +1892,7 @@ For example:
   clickToPreview: () => t`Click to preview`,
   clearCache: () => t`Clear cache`,
   clearCacheDesc: (cacheSize: number) =>
-    t`Clear all cached attachments. Current cache size: ${cacheSize}`,
+    t`Clear all cached attachments. Size: ${cacheSize}`,
   clearCacheConfirm: () => t`Clear attachments cache?`,
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
@@ -2547,9 +2570,19 @@ Use this if changes from other devices are not appearing on this device. This wi
     () => t`and much more.`
   ],
   cancelAnytime: () => t`Cancel anytime.`,
+  cancelAnytimeShort: () => t`Cancel anytime`,
   googleReminderTrial: () =>
     t`Google will remind you 2 days before your trial ends.`,
   exploreAllPlans: () => t`Explore all plans`,
+  viewPlans: () => t`View plans`,
+  unlockPremiumFeatures: () => t`Unlock premium features and extra storage`,
+  cloudStorage: () => t`cloud storage`,
+  cloudStorageBenefit: () => t`Secure backup space for files and images.`,
+  appLockSecurity: () => t`App lock & security`,
+  appLockSecurityBenefit: () => t`Protect notes with app-level security`,
+  advancedNoteElements: () => t`Advanced note elements`,
+  advancedNoteElementsBenefit: () => t`Outlines, note linking, and more`,
+  sevenDayFreeTrial: () => t`7-day free trial`,
   tryPlanForFree: (plan: string) => t`Try ${plan} for free`,
   plan: (plan: string) => t`${plan} plan`,
   notesnookPlans: [() => t`Notesnook`, () => t`Plans`],
@@ -2558,12 +2591,12 @@ Use this if changes from other devices are not appearing on this device. This wi
   percentOff: (discount: string) => `${discount}% off`,
   recommendedByPrivacyGuides: () => t`Recommended by Privacy Guides`,
   featuredOn: () => t`Featured on`,
-  comparePlans: () => t`Compare plans`,
+  comparePlans: () => t`Compare Plans`,
   faqs: () => t`FAQs`,
   thankYouForSubscribing: () => t`Thank you for subscribing`,
   settingUpPlan: () =>
     t`We’re setting up your plan right now. We’ll notify you as soon as everything is ready.`,
-  hdImages: () => t`hdImages`,
+  hdImages: () => t`HD Images`,
   billedAnnually: (price: string) => t`billed annually at ${price}`,
   billedMonthly: (price: string) => t`billed monthly at ${price}`,
   dueToday: () => t`Due today`,
@@ -2582,19 +2615,21 @@ Use this if changes from other devices are not appearing on this device. This wi
   ],
   purchase: () => t`Purchase`,
   subscribe: () => t`Subscribe`,
-  subscribeAndStartTrial: () => t`Subscribe and start free trial`,
+  subscribeAndStartTrial: () => t`Subscribe & Start Your Free Trial`,
   oneTimePurchase: () => t`This is a one time purchase, no subscription.`,
-  cancelAnytimeAlt: () => t`Cancel anytime, subscription auto-renews.`,
+  cancelAnytimeAlt: () => t`Cancel anytime, Subscription auto-renews.`,
   subTerms: [
     () => t`By joining you agree to our`,
-    () => t`privacy policy`,
+    () => t`Terms of Service`,
     () => t`and`,
-    () => t`terms of use.`
+    () => t`Privacy Policy.`
   ],
   bestValue: () => t`Best value`,
   planLimits: () => t`Plan limits`,
+  planLimitsDesc: () =>
+    t`Review your current limits and unlock more with premium`,
   unlimited: () => t`Unlimited`,
-  fiveYearPlan: () => t`5 year plan (One time purchase)`,
+  fiveYearPlan: () => t`5 year plan`,
   educationPlan: () => t`Education plan`,
   welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
   thankYouForPurchase: () => t`Thank you for the purchase`,
@@ -2612,11 +2647,11 @@ Use this if changes from other devices are not appearing on this device. This wi
   redeemCode: () => t`Redeem code`,
   notesnookCircle: () => t`Notesnook Circle`,
   notesnookCircleDesc: () =>
-    t`Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.`,
+    t`Trusted partners who share our commitment to privacy, transparency, and user freedom.`,
   trialUserCircleNotice: () =>
-    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
+    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial ends and subscription starts.`,
   freeUserCircleNotice: () =>
-    t`The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits.`,
+    t`Notesnook Circle is exclusively available to subscribed users.`,
   finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
   goBack: () => t`Go back`,
   clickToDirectlyClaimPromo: () =>
@@ -2668,11 +2703,13 @@ Use this if changes from other devices are not appearing on this device. This wi
   viewAPIKeys: () => t`API Keys`,
   viewAPIKeysDesc: () => t`View and manage inbox API keys`,
   createApiKey: () => t`Create API Key`,
+  createApiKeyDesc: () => t`Create your API key`,
   keyName: () => t`Key name`,
   exampleKeyName: () => t`e.g., Todo integration`,
   expiresIn: () => t`Expires in`,
   enterKeyName: () => t`Please enter a key name`,
   apiKeyCreatedSuccessfully: () => t`API key created successfully`,
+  apiKeyCreatedDesc: () => t`Copy your API key and store it somewhere safe.`,
   failedToCreateApiKey: (message: string) =>
     t`Failed to create API key${message ? `: ${message}` : ""}`,
   creating: () => t`Creating...`,
@@ -2684,7 +2721,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   failedToLoadApiKeys: () => t`Failed to load API keys. Please try again.`,
   retry: () => t`Retry`,
   createFirstApiKey: () => t`Create your first api key to get started.`,
-  createKey: () => t`Create Key`,
+  createKey: () => t`Create new key`,
   ok: () => t`OK`,
   apiKeysLimitReached: () => t`API Keys Limit Reached`,
   apiKeysLimitReachedMessage: () =>
@@ -2704,17 +2741,19 @@ Use this if changes from other devices are not appearing on this device. This wi
   lastUsedOn: () => t`Last used on`,
   neverUsed: () => t`Never used`,
   createdOn: () => t`Created on`,
+  created: () => t`Created`,
+  expires: () => t`Expires`,
   neverExpires: () => t`Never expires`,
   expired: () => t`Expired`,
   expiresOn: () => t`Expires on`,
   changingInboxPgpKeysNotice: () =>
     t`Changing Inbox PGP keys will delete all your unsynced inbox items.`,
-  publicKey: () => t`Public Key:`,
-  privateKey: () => t`Private Key:`,
+  publicKey: () => t`Public key:`,
+  privateKey: () => t`Private key:`,
   invalidPgpKeyPair: () =>
     t`Invalid PGP key pair. Please check your keys and try again.`,
   inboxKeysSaved: () => t`Inbox keys saved`,
-  lockVaultAfter: () => t`Lock vault after`,
+  lockVaultAfter: () => t`Lock vault timer`,
   lockVaultAfterDesc: () =>
     `How long should the vault stay unlocked before automatically locking?`,
   back: () => t`Back`,
@@ -2748,11 +2787,16 @@ Continue without attachments?`,
   setupInboxPgpKeysDescription: () =>
     t`Choose how you want to set up your Inbox PGP keys:`,
   autoGenerateKeys: () => t`Auto-generate keys`,
+  autoGenerateKeysDesc: () => t`We'll create secure keys for you automatically`,
   provideOwnKeys: () => t`Provide your own keys`,
+  provideOwnKeysDesc: () => t`Use existing PGP keys if you already have them`,
+  setupInboxKeysDesc: () =>
+    t`Protect incoming messages so only you can read them`,
   details: () => t`Details`,
   dateSynced: () => t`Date synced`,
   failedInboxItems: () => t`Failed inbox items`,
   failedInboxItemsDesc: () => t`View failed inbox items and error contexts`,
+  payloadData: () => t`Payload data`,
   noFailedInboxItems: () => t`No failed inbox items`,
   show: () => t`Show`,
   itemDeleted: () => t`Item deleted`,
@@ -2791,5 +2835,105 @@ Continue without attachments?`,
   setupInboxKeys: () => t`Setup inbox keys`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
   enterPgpPrivateKey: () => t`Enter your PGP private key`,
-  expiryDateRemoved: () => t`Expiry date removed`
+  expiryDateRemoved: () => t`Expiry date removed`,
+  selectPlan: () => t`Select plan`,
+  frequentlyAskedQuestions: () => t`Frequently asked questions`,
+  testimonials: () => t`Testimonials`,
+  billingType: {
+    annual: () => t`Billed annually`,
+    monthly: () => t`Billed monthly`,
+    oneTime: () => t`One time purchase`
+  },
+  whatsIncluded: () => t`What's included`,
+  paymentSummary: () => t`Payment summary`,
+  planWhatsIncluded: {
+    unlimitedNotes: () => t`Unlimited notes and attachments`,
+    endToEnd: () => t`End-to-end encryption (XChaCha20)`,
+    allDevices: () => t`Access on all your devices`,
+    freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
+    remind: () => t`Remind before your trial ends`
+  },
+  nextBillingDate: () => t`Next billing date`,
+  freeTrialIncludes: (duration: number) =>
+    t`${duration} days free trial includes all features`,
+  noTagsYet: () => t`No tags yet`,
+  tagsEmptyBody: () =>
+    t`Create your first tag to start organizing your workspace.`,
+  newestFirst: () => t`Newest first`,
+  oldestFirst: () => t`Oldest first`,
+  notePlaceholder: {
+    title: () => t`No notes yet`,
+    description: () =>
+      t`Your thoughts deserve a home. Create your first note and start organizing your life today.`,
+    button: () => t`Add your first note`
+  },
+  settingUpYourAccount: () => t`Setting up your account...`,
+  accountAlmostReady: () => t`Your account is almost ready, please wait.`,
+  recoveryCodeTitle: () => t`Recovery code`,
+  provideValidMultiFactorAuthRecoveryCode: () =>
+    t`Please provide a valid multi factor authentication recovery code.`,
+  provideValidMultiFactorAuthCode: () =>
+    t`Please provide a valid multi factor authentication code.`,
+  allDevices: () => t`Access on all devices`,
+  freeTrial: (days: number) => t`Free ${days} days trial, cancel anytime`,
+  remind: () => t`Remind before your trial ends`,
+  yourSecurityIsPriority: () => `Your security is our priority`,
+  enterYourPassword: () => t`Enter your password`,
+  yourRecoveryKey: () => t`Your recovery key`,
+  forcePullAction: () => t`Force Pull`,
+  forcePushAction: () => t`Force Push`,
+  forceSyncPullSheetDesc: () =>
+    t`This will overwrite all data on this device with the data from the server.`,
+  forceSyncPushSheetDesc: () =>
+    t`This will overwrite all data on the server with the data from this device.`,
+  forceSyncWarningShort: () =>
+    t`Use this only for troubleshooting sync issues. Regular use may lead to data loss or conflicts.`,
+  forceSyncNeedHelpContact: () => t`Having issues? Contact`,
+  forceSyncRiskAcknowledgement: () => t`I understand the risks`,
+  editProfileDesc: () => t`Change profile picture, full name and email`,
+  dataAndStorage: () => t`Data and storage`,
+  accountActions: () => t`Account actions`,
+  subscriptionRequired: () => t`Subscription required`,
+  claimPromotion: {
+    clickHere: () => t`Click here`,
+    toClaim: () => t`to claim the promotion directly.`
+  },
+  navigation: () => t`Navigation`,
+  storageAndCleanup: () => t`Storage & cleanup`,
+  alwaysAsk: () => t`Always ask`,
+  updates: () => t`Updates`,
+  organization: () => t`Organization`,
+  miscellaneous: () => t`Miscellaneous`,
+  typography: () => t`Typography`,
+  formatting: () => t`Formatting`,
+  newNoteTitle: () => t`New note title`,
+  titleFormatCurrentDate: () => t`Current date`,
+  titleFormatCurrentTime: () => t`Current time`,
+  titleFormatCurrentDay: () => t`Current day`,
+  titleFormatTimestamp: () => t`Timestamp`,
+  titleFormatNoteCount: () => t`Note count`,
+  titleFormatHeadline: () => t`Headline`,
+  backupActions: () => t`Backup actions`,
+  storageAndLocation: () => t`Storage & location`,
+  fullBackup: () => t`Full backup`,
+  automaticFullBackup: () => t`Automatic full backup`,
+  security: () => t`Security`,
+  restoreActions: () => t`Restore actions`,
+  issueSummary: () => t`Issue summary`,
+  enableBiometricUnlock: () => t`Enable biometric unlock`,
+  downloadDebugLogs: () => t`Download debug logs`,
+  downloadDebugLogsDesc: () => t`Download and share debug logs from the app`,
+  preparingLogs: () => t`Preparing logs..`,
+  preparingLogsChooseLocation: () => t`Choosing storage location...`,
+  preparingLogsCollect: () => t`Consolidating network sync logs...`,
+  preparingLogsCompress: () => t`Compressing logs into an archive...`,
+  preparingLogsSave: () => t`Saving logs to your storage...`,
+  debugLogsDownloaded: () => t`Debug logs downloaded!`,
+  debugLogsDownloadedDesc: () =>
+    t`The encrypted archive is available in your default local storage structure and can be safely sent to the Notesnook customer care team.`,
+  downloadLogsFailed: () => t`Couldn't download logs`,
+  downloadLogsFailedDesc: () =>
+    t`Something went wrong while preparing your debug logs. This can happen if no storage location was selected.`,
+  shareZip: () => t`Share ZIP`,
+  tryDownloadLogsAgain: () => t`Try again`
 };

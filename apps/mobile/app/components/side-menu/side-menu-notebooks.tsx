@@ -41,6 +41,9 @@ import {
 } from "./stores";
 import { LegendList } from "@legendapp/list";
 import { useRelationStore } from "../../stores/use-relation-store";
+import { AddNotebookSheet } from "../sheets/add-notebook";
+import { Spacing } from "../../common/design/spacing";
+import AppIcon from "../ui/AppIcon";
 useSideMenuNotebookSelectionStore.setState({
   multiSelect: true
 });
@@ -53,7 +56,7 @@ export const SideMenuNotebooks = () => {
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
   const lastQuery = React.useRef<string>(undefined);
-  const updater = useRelationStore(state => state.updater);
+  const updater = useRelationStore((state) => state.updater);
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];
@@ -81,7 +84,7 @@ export const SideMenuNotebooks = () => {
 
   useEffect(() => {
     updateNotebooks();
-  }, [updateNotebooks,updater]);
+  }, [updateNotebooks, updater]);
 
   useEffect(() => {
     (async () => {
@@ -136,7 +139,12 @@ export const SideMenuNotebooks = () => {
     >
       {!notebooks || notebooks.placeholders.length === 0 ? (
         <SideMenuListEmpty
-          placeholder={strings.emptyPlaceholders("notebook")}
+          placeholderTitle={strings.noNotebooksYet()}
+          placeholderBody={strings.notebooksEmptyBody()}
+          placeholderButtonTitle={strings.createNotebook()}
+          onPressPlaceholderButton={() => {
+            AddNotebookSheet.present();
+          }}
           isLoading={isLoading}
         />
       ) : (
@@ -151,7 +159,8 @@ export const SideMenuNotebooks = () => {
               <View
                 style={{
                   backgroundColor: colors.primary.background,
-                  paddingTop: DefaultAppStyles.GAP_VERTICAL
+                  paddingTop: Spacing.LEVEL_1,
+                  paddingBottom: Spacing.LEVEL_3
                 }}
               >
                 <SideMenuHeader />
@@ -159,34 +168,44 @@ export const SideMenuNotebooks = () => {
             }
             renderItem={renderItem}
           />
+
           <View
             style={{
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              backgroundColor: colors.primary.background,
-              borderTopColor: colors.primary.border,
-              borderTopWidth: 1,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              paddingHorizontal: Spacing.LEVEL_3
             }}
           >
-            <TextInput
-              placeholder="Filter notebooks..."
+            <View
               style={{
-                fontFamily: "Inter-Regular",
-                fontSize: AppFontSize.xs,
-                paddingTop: 0,
-                paddingBottom: 0
+                width: "100%",
+                backgroundColor: colors.primary.background,
+                borderTopColor: colors.primary.border,
+                borderTopWidth: 1,
+                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+                flexDirection: "row",
+                justifyContent: "space-between"
               }}
-              cursorColor={colors.primary.accent}
-              onChangeText={async (value: string) => {
-                searchTimer.current && clearTimeout(searchTimer.current);
-                searchTimer.current = setTimeout(async () => {
-                  lastQuery.current = value;
-                  updateNotebooks();
-                }, 500);
-              }}
-              placeholderTextColor={colors.primary.placeholder}
-            />
+            >
+              <TextInput
+                placeholder={strings.filterNotebooks()}
+                style={{
+                  fontFamily: "Inter-Regular",
+                  fontSize: AppFontSize.sm,
+                  paddingTop: 0,
+                  paddingBottom: 0
+                }}
+                cursorColor={colors.primary.accent}
+                onChangeText={async (value: string) => {
+                  searchTimer.current && clearTimeout(searchTimer.current);
+                  searchTimer.current = setTimeout(async () => {
+                    lastQuery.current = value;
+                    updateNotebooks();
+                  }, 500);
+                }}
+                placeholderTextColor={colors.primary.placeholder}
+              />
+
+              <AppIcon name="funnel" size={14} iconFamily="notesnook" />
+            </View>
           </View>
         </>
       )}
@@ -235,8 +254,7 @@ const NotebookItemWrapper = React.memo(
     return (
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          marginTop: index === 0 ? DefaultAppStyles.GAP_VERTICAL : 0
+          paddingHorizontal: Spacing.LEVEL_3
         }}
       >
         <NotebookItem

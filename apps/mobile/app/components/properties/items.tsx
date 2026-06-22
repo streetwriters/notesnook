@@ -27,12 +27,13 @@ import { Action, ActionId, useActions } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { Radius, Spacing } from "../../common/design/spacing";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -152,7 +153,7 @@ export const Items = ({
         key={item.id}
         style={{
           alignItems: "center",
-          width: columnItemWidth - 8,
+          width: columnItemWidth - 10,
           opacity: item.locked ? 0.5 : 1
         }}
       >
@@ -161,12 +162,12 @@ export const Items = ({
           type={item.checked ? "shade" : "secondary"}
           testID={"icon-" + item.id}
           style={{
-            height: columnItemWidth / 1.5,
-            width: columnItemWidth - 8,
+            width: columnItemWidth - 10,
+            paddingVertical: Spacing.LEVEL_2,
             borderRadius: 10,
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: DDS.isTab ? 7 : 3.5
+            marginBottom: 6
           }}
         >
           <Icon
@@ -253,7 +254,7 @@ export const Items = ({
           key={item.id}
           testID={"icon-" + item.id}
           style={{
-            width: columnItemWidth - 8,
+            width: columnItemWidth - 10,
             alignSelf: "flex-start",
             gap: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
@@ -261,24 +262,25 @@ export const Items = ({
           <View
             style={{
               height: columnItemWidth / 2,
-              width: columnItemWidth - DefaultAppStyles.GAP_SMALL,
+              width: 65,
               justifyContent: "center",
               alignItems: "center",
-              borderWidth: 1,
-              borderRadius: defaultBorderRadius,
-              borderColor: item.checked
-                ? item.activeColor || colors.primary.accent
-                : colors.primary.border,
-              overflow: "hidden"
+              backgroundColor: item.checked
+                ? colors.primary.shade
+                : colors.secondary.background,
+              borderRadius: Radius.XS,
+              overflow: "hidden",
+              paddingVertical: Spacing.LEVEL_2,
+              paddingHorizontal: Spacing.LEVEL_2
             }}
           >
             <Icon
               name={item.icon}
               allowFontScaling
-              size={DDS.isTab ? AppFontSize.xxl : AppFontSize.md + 4}
+              size={16}
               color={
                 item.checked
-                  ? item.activeColor || colors.primary.accent
+                  ? colors.primary.icon
                   : item.id === "delete" || item.id === "trash"
                     ? colors.error.icon
                     : colors.secondary.icon
@@ -310,7 +312,13 @@ export const Items = ({
 
           <Paragraph
             textBreakStrategy="simple"
-            size={AppFontSize.xxs}
+            fontSize="XXS"
+            fontFamily="MEDIUM"
+            color={
+              item.checked
+                ? colors.primary.paragraph
+                : colors.secondary.paragraph
+            }
             style={{ textAlign: "center" }}
           >
             {item.title}
@@ -321,8 +329,12 @@ export const Items = ({
     [
       colors.error.icon,
       colors.primary.accent,
-      colors.primary.border,
+      colors.primary.icon,
+      colors.primary.paragraph,
+      colors.primary.shade,
+      colors.secondary.background,
       colors.secondary.icon,
+      colors.secondary.paragraph,
       colors.static.orange,
       columnItemWidth,
       topBarSorting
@@ -352,16 +364,18 @@ export const Items = ({
               autoplay={false}
               showPagination
               paginationStyleItemActive={{
-                borderRadius: 2,
-                backgroundColor: colors.selected.background,
-                height: 6,
-                marginHorizontal: 2
+                borderRadius: 6,
+                backgroundColor: colors.selected.accent,
+                height: 5,
+                width: 20,
+                marginHorizontal: 3
               }}
               paginationStyleItemInactive={{
-                borderRadius: 2,
+                borderRadius: 6,
                 backgroundColor: colors.secondary.background,
-                height: 6,
-                marginHorizontal: 2
+                height: 5,
+                width: 14,
+                marginHorizontal: 3
               }}
               paginationStyle={{
                 position: "relative",
@@ -380,7 +394,7 @@ export const Items = ({
                   style={{
                     flexDirection: "row",
                     paddingHorizontal: DefaultAppStyles.GAP,
-                    gap: 5,
+                    gap: Spacing.LEVEL_2,
                     width: width
                   }}
                 >
@@ -394,7 +408,7 @@ export const Items = ({
             style={{
               flexDirection: "row",
               flexWrap: "wrap",
-              gap: 5,
+              gap: Spacing.LEVEL_1,
               paddingHorizontal: DefaultAppStyles.GAP
             }}
           >

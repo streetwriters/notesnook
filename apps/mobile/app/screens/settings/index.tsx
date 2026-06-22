@@ -42,7 +42,7 @@ export const Settings = () => {
         paddingRight: insets.right
       }}
     >
-      <ScopedThemeProvider value="list">
+      <ScopedThemeProvider value="base">
         <SettingsStack.Navigator
           initialRouteName="SettingsHome"
           screenListeners={{

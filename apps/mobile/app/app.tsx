@@ -35,7 +35,7 @@ import { Toast } from "./components/toast";
 import { useAppEvents } from "./hooks/use-app-events";
 import { NotePreviewConfigure } from "./screens/note-preview-configure";
 import { RootNavigation } from "./navigation/navigation-stack";
-import { themeTrpcClient } from "./screens/settings/theme-selector";
+import { themeTrpcClient } from "./screens/settings/components/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
@@ -44,6 +44,7 @@ import { useUserStore } from "./stores/use-user-store";
 import RNBootSplash from "react-native-bootsplash";
 import AppLocked from "./components/app-lock";
 import { useSettingStore } from "./stores/use-setting-store";
+import { THEME_DARK, THEME_LIGHT } from "./common/design/theme";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
@@ -120,30 +121,30 @@ export const withTheme = (
     ]);
 
     useEffect(() => {
-      setTimeout(() => {
-        const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
-        if (!currentTheme) return;
-        themeTrpcClient.updateTheme
-          .query({
-            version: currentTheme.version,
-            compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-            id: currentTheme.id
-          })
-          .then((theme) => {
-            if (theme) {
-              theme.colorScheme === "dark"
-                ? useThemeStore.setState({
-                    darkTheme: theme
-                  })
-                : useThemeStore.setState({
-                    lightTheme: theme
-                  });
-            }
-          })
-          .catch(() => {
-            /* empty */
-          });
-      }, 1000);
+      // setTimeout(() => {
+      //   const currentTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+      //   if (!currentTheme) return;
+      //   themeTrpcClient.updateTheme
+      //     .query({
+      //       version: currentTheme.version,
+      //       compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+      //       id: currentTheme.id
+      //     })
+      //     .then((theme) => {
+      //       if (theme) {
+      //         theme.colorScheme === "dark"
+      //           ? useThemeStore.setState({
+      //               darkTheme: theme
+      //             })
+      //           : useThemeStore.setState({
+      //               lightTheme: theme
+      //             });
+      //       }
+      //     })
+      //     .catch(() => {
+      //       /* empty */
+      //     });
+      // }, 1000);
 
       const listener = Appearance.addChangeListener(({ colorScheme }) => {
         if (colorScheme && SettingsService.getProperty("useSystemTheme")) {
@@ -159,11 +160,11 @@ export const withTheme = (
     }, []);
 
     useEffect(() => {
-      const nextTheme = colorScheme === "dark" ? darkTheme : lightTheme;
+      const nextTheme = colorScheme === "dark" ? THEME_DARK : THEME_LIGHT;
       if (JSON.stringify(nextTheme) !== JSON.stringify(currTheme)) {
         useThemeEngineStore
           .getState()
-          .setTheme(colorScheme === "dark" ? darkTheme : lightTheme);
+          .setTheme(colorScheme === "dark" ? THEME_DARK : THEME_LIGHT);
         currTheme = nextTheme;
       }
     }, [colorScheme, darkTheme, lightTheme]);

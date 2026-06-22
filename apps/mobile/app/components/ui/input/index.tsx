@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { RefObject, useState } from "react";
+import { useThemeColors } from "@notesnook/theme";
+import phone from "phone";
+import React, { RefObject, useRef, useState } from "react";
 import {
   ColorValue,
+  findNodeHandle,
   NativeSyntheticEvent,
   TextInput,
   TextInputProps,
@@ -28,21 +31,18 @@ import {
   View,
   ViewStyle
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import isURL from "validator/lib/isURL";
+import { Spacing } from "../../../common/design/spacing";
 import {
-  ERRORS_LIST,
   validateEmail,
   validatePass,
   validateUsername
 } from "../../../services/validation";
-import { useThemeColors } from "@notesnook/theme";
-import { getElevationStyle } from "../../../utils/elevation";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
-import phone from "phone";
-import isURL from "validator/lib/isURL";
-import { DefaultAppStyles } from "../../../utils/styles";
+import { useInputError } from "./input-error-context";
+import { IconProps } from "../AppIcon";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput | null>;
@@ -64,6 +64,7 @@ interface InputProps extends TextInputProps {
   marginBottom?: number;
   button?: {
     icon: string;
+    iconFamily?: IconProps["iconFamily"];
     color: ColorValue;
     onPress: () => void;
     testID?: string;
@@ -80,6 +81,7 @@ interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   wrapperStyle?: ViewStyle;
   flexGrow?: number;
+  label?: string;
 }
 
 const Input = ({
@@ -93,7 +95,7 @@ const Input = ({
   secureTextEntry,
   customColor,
   customValidator,
-  marginBottom = 10,
+  marginBottom = 0,
   button,
   onBlurInput,
   onPress,
@@ -103,6 +105,7 @@ const Input = ({
   buttons,
   marginRight,
   buttonLeft,
+  label,
   flexGrow = 1,
   inputStyle = {},
   containerStyle = {},
@@ -110,6 +113,9 @@ const Input = ({
   ...restProps
 }: InputProps) => {
   const { colors, isDark } = useThemeColors();
+  const errorCtx = useInputError();
+  const internalRef = useRef<TextInput>(null);
+  const activeRef = fwdRef ?? internalRef;
   const [error, setError] = useState(false);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
@@ -118,10 +124,16 @@ const Input = ({
     SHORT_PASS: false
   });
   type ErrorKey = keyof typeof errorList;
+
+  const reportError = (message: string | null) => {
+    if (!errorCtx) return;
+    const nativeId = findNodeHandle(activeRef.current);
+    if (nativeId !== null) errorCtx.setError(nativeId, message);
+  };
   const color = error
     ? colors.error.border
     : focus
-      ? customColor || colors.selected.border
+      ? customColor || colors.secondary.border
       : colors.primary.border;
 
   const validate = async (value: string) => {
@@ -134,34 +146,30 @@ const Input = ({
       });
       return;
     }
-    let isError:
-      | boolean
-      | string
-      | { SHORT_PASS?: boolean; isValid?: boolean }
-      | undefined = undefined;
+    let isValid: boolean | string | undefined = undefined;
 
     switch (validationType) {
       case "password":
-        isError = validatePass(value);
+        isValid = validatePass(value);
         break;
       case "email":
-        isError = validateEmail(value);
+        isValid = validateEmail(value);
         break;
       case "username":
-        isError = validateUsername(value);
+        isValid = validateUsername(value);
         break;
       case "confirmPassword":
-        isError = customValidator && value === customValidator();
+        isValid = customValidator && value === customValidator();
         break;
       case "url":
-        isError = isURL(value, { allow_underscores: true });
+        isValid = isURL(value, { allow_underscores: true });
         break;
       case "phonenumber": {
         const result = phone(value, {
           strictDetection: true,
           validateMobilePrefix: true
         });
-        isError = result.isValid;
+        isValid = result.isValid;
         if (result.isValid) {
           onChangeText && onChangeText(result.phoneNumber);
         }
@@ -170,23 +178,10 @@ const Input = ({
       }
     }
 
-    if (validationType === "password") {
-      let hasError = false;
-
-      const errors = isError as { [name: string]: boolean };
-      Object.keys(errors).forEach((e) => {
-        //ts-ignore
-        if (errors[e] === true) {
-          hasError = true;
-        }
-      });
-      setError(hasError);
-      onErrorCheck && onErrorCheck(hasError);
-      setErrorList(errors as { SHORT_PASS: boolean });
-    } else {
-      setError(!isError);
-      onErrorCheck && onErrorCheck(!isError);
-    }
+    const hasError = !isValid;
+    setError(hasError);
+    onErrorCheck && onErrorCheck(hasError);
+    reportError(hasError ? (errorMessage ?? null) : null);
   };
 
   const onChange = (value: string) => {
@@ -198,6 +193,7 @@ const Input = ({
       setErrorList({
         SHORT_PASS: false
       });
+      reportError(null);
     }
   };
 
@@ -218,15 +214,12 @@ const Input = ({
   const style: ViewStyle = {
     borderWidth: 1,
     borderRadius: defaultBorderRadius,
-    borderColor: color,
+    borderColor: error ? colors.static.red : color,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: DefaultAppStyles.GAP,
-    paddingRight:
-      buttons || button || secureTextEntry || error
-        ? DefaultAppStyles.GAP
-        : DefaultAppStyles.GAP,
+    paddingHorizontal: Spacing.LEVEL_2,
+    paddingRight: Spacing.LEVEL_3,
     ...containerStyle
   };
 
@@ -235,10 +228,10 @@ const Input = ({
     fontSize: fontSize,
     color:
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
+    paddingTop: Spacing.LEVEL_3,
+    paddingBottom: Spacing.LEVEL_3,
     flexGrow: 1,
     flexShrink: 1,
-    paddingBottom: DefaultAppStyles.GAP_VERTICAL,
-    paddingTop: DefaultAppStyles.GAP_VERTICAL,
     fontFamily: "Inter-Regular",
     ...(inputStyle as ViewStyle)
   };
@@ -253,6 +246,17 @@ const Input = ({
           ...wrapperStyle
         }}
       >
+        {label ? (
+          <Paragraph
+            style={{
+              marginBottom: Spacing.LEVEL_1
+            }}
+            color={colors.primary.paragraph}
+            fontSize="XS"
+          >
+            {label}
+          </Paragraph>
+        ) : undefined}
         <TouchableOpacity
           disabled={!loading}
           onPress={onPress}
@@ -263,7 +267,8 @@ const Input = ({
 
           <TextInput
             {...restProps}
-            ref={fwdRef}
+            ref={activeRef}
+            onLayout={restProps.onLayout}
             editable={!loading && restProps.editable}
             onChangeText={onChange}
             onBlur={onBlur}
@@ -292,7 +297,8 @@ const Input = ({
           >
             {secureTextEntry && (
               <IconButton
-                name="eye"
+                name={secureEntry ? "eye-closed" : "eye-open"}
+                iconFamily="notesnook"
                 size={20}
                 top={10}
                 bottom={10}
@@ -304,9 +310,7 @@ const Input = ({
                   width: 25,
                   marginLeft: 5
                 }}
-                color={
-                  secureEntry ? colors.secondary.icon : colors.primary.accent
-                }
+                color={colors.secondary.icon}
               />
             )}
 
@@ -316,97 +320,17 @@ const Input = ({
               <IconButton
                 testID={button.testID}
                 name={button.icon}
-                size={AppFontSize.xl}
+                iconFamily={button.iconFamily}
+                size={button.size || AppFontSize.xl}
                 top={10}
                 bottom={10}
                 onPress={button.onPress}
                 color={button.color}
-                style={{
-                  marginRight: -8
-                }}
-              />
-            )}
-
-            {error && (
-              <IconButton
-                name="alert-circle-outline"
-                top={10}
-                bottom={10}
-                onPress={() => {
-                  setShowError(!showError);
-                }}
-                size={20}
-                style={{
-                  width: 25,
-                  marginLeft: 5
-                }}
-                color={colors.error.icon}
               />
             )}
           </View>
-
-          {error && showError && errorMessage ? (
-            <View
-              style={{
-                position: "absolute",
-                backgroundColor: colors.secondary.background,
-                paddingVertical: 3,
-                paddingHorizontal: DefaultAppStyles.GAP_SMALL / 2,
-                borderRadius: 2.5,
-                ...getElevationStyle(2),
-                top: 0
-              }}
-            >
-              <Paragraph
-                size={AppFontSize.xs}
-                style={{
-                  textAlign: "right",
-                  textAlignVertical: "bottom"
-                }}
-              >
-                <Icon
-                  name="alert-circle-outline"
-                  size={AppFontSize.xs}
-                  color={colors.error.icon}
-                />{" "}
-                {errorMessage}
-              </Paragraph>
-            </View>
-          ) : null}
         </TouchableOpacity>
       </View>
-
-      {validationType === "password" && focus && (
-        <View
-          style={{
-            marginTop: -5,
-            marginBottom: 5
-          }}
-        >
-          {Object.keys(errorList).filter(
-            (k) => errorList[k as ErrorKey] === true
-          ).length !== 0
-            ? Object.keys(ERRORS_LIST).map((error) => (
-                <View
-                  key={ERRORS_LIST[error as ErrorKey]}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center"
-                  }}
-                >
-                  <Icon
-                    name={errorList[error as ErrorKey] ? "close" : "check"}
-                    color={errorList[error as ErrorKey] ? "red" : "green"}
-                  />
-
-                  <Paragraph style={{ marginLeft: 5 }} size={AppFontSize.xs}>
-                    {ERRORS_LIST[error as ErrorKey]}
-                  </Paragraph>
-                </View>
-              ))
-            : null}
-        </View>
-      )}
     </>
   );
 };

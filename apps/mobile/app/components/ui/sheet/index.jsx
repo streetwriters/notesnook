@@ -27,6 +27,7 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { getContainerBorder } from "../../../utils/colors";
 import { NotesnookModule } from "../../../utils/notesnook-module";
 import { Toast } from "../../toast";
+import { Spacing } from "../../../common/design/spacing";
 
 /**
  *
@@ -68,8 +69,9 @@ const SheetWrapper = ({
       width: largeTablet || smallTablet ? width : "100%",
       backgroundColor: colors.primary.background,
       zIndex: 10,
-      borderTopRightRadius: 15,
-      borderTopLeftRadius: 15,
+      borderTopRightRadius: 35,
+      paddingTop: Spacing.LEVEL_4,
+      borderTopLeftRadius: 35,
       alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0,
@@ -130,7 +132,10 @@ const SheetWrapper = ({
         }}
         indicatorStyle={{
           width: 100,
-          backgroundColor: colors.secondary.background
+          height: 5,
+          backgroundColor: colors.secondary.background,
+          marginBottom: 0,
+          marginTop: 0
         }}
         statusBarTranslucent
         drawUnderStatusBar={true}

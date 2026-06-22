@@ -17,25 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
+import { notesnook } from "../../../e2e/test.ids";
+import { Radius, Spacing } from "../../common/design/spacing";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import { RouteName } from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { eScrollEvent } from "../../utils/events";
-import { AppFontSize } from "../../utils/size";
+import { fluidTabsRef } from "../../utils/global-refs";
 import { DefaultAppStyles } from "../../utils/styles";
-import { IconButtonProps } from "../ui/icon-button";
-import { Pressable } from "../ui/pressable";
+import { IconButton, IconButtonProps } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
-import { LeftMenus } from "./left-menus";
-import { RightMenus } from "./right-menus";
 
 export const Header = ({
   renderedInRoute,
@@ -45,7 +44,8 @@ export const Header = ({
   canGoBack,
   hasSearch,
   onSearch,
-  rightButton
+  rightButton,
+  style
 }: {
   onLeftMenuButtonPress?: () => void;
   renderedInRoute?: RouteName;
@@ -56,6 +56,7 @@ export const Header = ({
   hasSearch?: boolean;
   onSearch?: () => void;
   rightButton?: IconButtonProps;
+  style?: ViewStyle;
 }) => {
   const { colors } = useThemeColors();
   const [borderHidden, setBorderHidden] = useState(true);
@@ -63,6 +64,9 @@ export const Header = ({
     state.selectedItemsList,
     state.selectionMode
   ]);
+
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const isTablet = deviceMode === "tablet";
 
   const onScroll = useCallback(
     (data: { x: number; y: number; id?: string; route: string }) => {
@@ -85,34 +89,61 @@ export const Header = ({
     };
   }, [borderHidden, onScroll]);
 
-  const HeaderWrapper = hasSearch ? Pressable : View;
+  const _onLeftButtonPress = () => {
+    if (onLeftMenuButtonPress) return onLeftMenuButtonPress();
+
+    if (!canGoBack) {
+      if (fluidTabsRef.current?.isDrawerOpen()) {
+        Navigation.closeDrawer();
+      } else {
+        Navigation.openDrawer();
+      }
+      return;
+    }
+    Navigation.goBack();
+  };
 
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP
+        paddingHorizontal: DefaultAppStyles.GAP,
+        marginBottom: Spacing.LEVEL_3
       }}
     >
-      <HeaderWrapper
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          borderRadius: 10,
-          paddingVertical: 3,
-          borderWidth: hasSearch ? 1 : 0,
-          borderColor: colors.primary.border,
-          paddingHorizontal: !hasSearch ? 0 : DefaultAppStyles.GAP_SMALL,
-          alignItems: "center"
-        }}
+      <View
+        style={[
+          {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            borderRadius: Radius.S,
+            paddingHorizontal: Spacing.LEVEL_2,
+            paddingVertical: Spacing.LEVEL_3,
+            backgroundColor: colors.secondary.background,
+            alignItems: "center"
+          },
+          style
+        ]}
         testID="search-header"
-        onPress={() => {
-          onSearch?.();
-        }}
       >
-        <LeftMenus
-          canGoBack={canGoBack}
-          onLeftButtonPress={onLeftMenuButtonPress}
-        />
+        {isTablet && !canGoBack ? null : (
+          <IconButton
+            testID={notesnook.ids.default.header.buttons.left}
+            left={40}
+            top={40}
+            onPress={_onLeftButtonPress}
+            onLongPress={() => {
+              Navigation.popToTop();
+            }}
+            style={{
+              width: 20,
+              height: 20
+            }}
+            size={20}
+            name={canGoBack ? "arrow-back" : "menu"}
+            iconFamily="notesnook"
+            color={colors.primary.icon}
+          />
+        )}
 
         {!title ? (
           <View
@@ -123,18 +154,39 @@ export const Header = ({
               borderRadius: 100
             }}
           />
-        ) : hasSearch ? (
-          <Paragraph>
-            {selectionMode
-              ? `${selectedItemsList.length} selected`
-              : strings.searchInRoute(title)}
-          </Paragraph>
         ) : (
-          <Heading size={AppFontSize.lg}>{title}</Heading>
+          <Heading fontSize="XL">
+            {selectionMode ? `${selectedItemsList.length} selected` : title}
+          </Heading>
         )}
 
-        <RightMenus rightButton={rightButton} />
-      </HeaderWrapper>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center"
+          }}
+        >
+          {rightButton ? (
+            <IconButton {...rightButton} color={colors.primary.icon} />
+          ) : null}
+
+          {hasSearch ? (
+            <IconButton
+              color={colors.primary.icon}
+              size={20}
+              onPress={() => {
+                onSearch?.();
+              }}
+              style={{
+                width: 20,
+                height: 20
+              }}
+              iconFamily="notesnook"
+              name="search"
+            />
+          ) : null}
+        </View>
+      </View>
     </View>
   );
 };

@@ -21,19 +21,16 @@ import { strings } from "@notesnook/intl";
 import { useRef, useState } from "react";
 import { TextInput } from "react-native";
 import { db } from "../../common/database";
-import { ToastManager, eSendEvent } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import { clearMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
-import { eCloseSimpleDialog } from "../../utils/events";
-import TwoFactorVerification from "./two-factor";
 import { createFormRef } from "../ui/input/form-input";
 
 export const LoginSteps = {
   emailAuth: 1,
-  mfaAuth: 2,
-  passwordAuth: 3
+  mfaAuth: 2
 };
 
 export const useLogin = (
@@ -46,6 +43,7 @@ export const useLogin = (
   const [step, setStep] = useState(LoginSteps.emailAuth);
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
+  const mfaData = useRef<any>(undefined);
   const formRef = useRef(
     createFormRef({
       email: "",
@@ -60,57 +58,23 @@ export const useLogin = (
       setLoading(true);
       switch (step) {
         case LoginSteps.emailAuth: {
-          if (formRef.current.validateField("email")) {
+          if (!formRef.current.validate()) {
             setLoading(false);
             return;
           }
           const mfaInfo = await db.user.authenticateEmail(
             formRef.current.getValue("email")
           );
-
           if (mfaInfo) {
-            TwoFactorVerification.present(
-              async (mfa: any, callback: (success: boolean) => void, onerror: (e: Error) => void) => {
-                try {
-                  const success = await db.user.authenticateMultiFactorCode(
-                    mfa.code,
-                    mfa.method
-                  );
-
-                  if (success) {
-                    setStep(LoginSteps.passwordAuth);
-                    setLoading(false);
-                    setTimeout(() => {
-                      passwordInputRef.current?.focus();
-                    }, 500);
-                    callback && callback(true);
-                  }
-                  callback && callback(false);
-                } catch (e) {
-                  callback && callback(false);
-                  if ((e as Error).message === "invalid_grant") {
-                    eSendEvent(eCloseSimpleDialog, "two_factor_verify");
-                    setLoading(false);
-                    setStep(LoginSteps.emailAuth);
-                    ToastManager.error(new Error("Token expired, try logging in again"));
-                  } else {
-                    onerror(e as Error);
-                  }
-                }
-              },
-              mfaInfo,
-              () => {
-                eSendEvent(eCloseSimpleDialog, "two_factor_verify");
-                setLoading(false);
-                setStep(LoginSteps.emailAuth);
-              }
-            );
+            mfaData.current = mfaInfo;
+            setStep(LoginSteps.mfaAuth);
+            setLoading(false);
           } else {
             finishWithError(new Error(strings.unableToSend2faCode()));
           }
           break;
         }
-        case LoginSteps.passwordAuth: {
+        case LoginSteps.mfaAuth: {
           if (!formRef.current.validate()) {
             setLoading(false);
             return;
@@ -172,6 +136,7 @@ export const useLogin = (
     setLoading,
     error,
     setError,
-    formRef
+    formRef,
+    mfaData
   };
 };

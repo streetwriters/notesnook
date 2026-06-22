@@ -18,23 +18,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { DimensionValue, View } from "react-native";
+import { DimensionValue, View, ViewStyle } from "react-native";
 import { SvgXml } from "./lazy";
+import SvgImage from "react-native-svg/lib/typescript/elements/Image";
 export const SvgView = ({
   width = 250,
   height = 250,
-  src
+  src,
+  style
 }: {
   width?: DimensionValue;
   height?: DimensionValue;
   src?: string;
+  style?: ViewStyle;
 }) => {
   if (!src) return null;
   return (
     <View
       style={{
         height: width || 250,
-        width: height || 250
+        width: height || 250,
+        ...style
       }}
     >
       <SvgXml xml={src} width="100%" height="100%" />
