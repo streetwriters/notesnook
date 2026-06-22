@@ -5963,7 +5963,7 @@ msgid "Report issue"
 msgstr ""
 
 #: src/strings.ts:128
-msgid "Resend code in ({seconds})"
+msgid "Resend code in {seconds}s"
 msgstr ""
 
 #. placeholder {0}: seconds ? ` in ${seconds}` : ""

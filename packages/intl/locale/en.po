@@ -5989,8 +5989,8 @@ msgid "Report issue"
 msgstr "Report issue"
 
 #: src/strings.ts:128
-msgid "Resend code in ({seconds})"
-msgstr "Resend code in ({seconds})"
+msgid "Resend code in {seconds}s"
+msgstr "Resend code in {seconds}s"
 
 #. placeholder {0}: seconds ? ` in ${seconds}` : ""
 #: src/strings.ts:679

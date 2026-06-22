@@ -125,7 +125,7 @@ export const strings = {
     app: () => t`I don't have access to authenticator app`,
     recoveryCode: () => t`I don't have recovery codes`
   },
-  resend2faCode: (seconds: string) => t`Resend code in (${seconds})`,
+  resend2faCode: (seconds: string) => t`Resend code in ${seconds}s`,
   sendCode: () => t`Send code`,
   sendCodeSms: () => t`Send code via SMS`,
   sendCodeEmail: () => t`Send code via email`,
