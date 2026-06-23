@@ -45,7 +45,8 @@ const POSTINSTALL_WHITELIST = [
   "esbuild",
   "@swc/core",
   "better-sqlite3-multiple-ciphers",
-  "better-sqlite3"
+  "better-sqlite3",
+  "node-gyp-build"
 ];
 
 if (args.scope && !scopes[args.scope])
