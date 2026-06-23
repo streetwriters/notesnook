@@ -82,6 +82,29 @@ function PublishView(props: PublishViewProps) {
     };
   }, [note.id]);
 
+  useEffect(() => {
+    const monographsUpdatedEvent = db.eventManager.subscribe(
+      EVENTS.monographsUpdated,
+      async (ids?: string[]) => {
+        if (ids && ids.length > 0 && !ids.includes(note.id)) return;
+
+        const m = await resolveMonograph(note.id);
+        setMonograph(m);
+
+        // if monograph has been unpublished, reset all the fields
+        if (!m) {
+          setSelfDestruct(false);
+          if (titleInput.current) titleInput.current.value = note.title;
+          if (passwordInput.current) passwordInput.current.value = "";
+        }
+      }
+    );
+
+    return () => {
+      monographsUpdatedEvent.unsubscribe();
+    };
+  }, [note.id]);
+
   return (
     <>
       {monograph?.id ? (

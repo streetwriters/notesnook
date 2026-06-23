@@ -560,15 +560,18 @@ export class Sync {
       return true;
     });
 
-    this.connection.on("SendMonographs", async (monographs) => {
+    this.connection.on("SendMonographs", async (monographs: Monograph[]) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
-      this.db.monographsCollection.collection.put(
-        monographs.map((m: Monograph) => ({
+      const ids = monographs.map((m) => m.id);
+      await this.db.monographsCollection.collection.put(
+        monographs.map((m) => ({
           ...m,
           type: "monograph"
         }))
       );
+      await this.db.monographs.refresh().catch(this.logger.error);
+      this.db.eventManager.publish(EVENTS.monographsUpdated, ids);
 
       return true;
     });
