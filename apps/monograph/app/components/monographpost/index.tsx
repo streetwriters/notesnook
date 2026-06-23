@@ -384,10 +384,14 @@ function MonographLockscreen({
 }) {
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState<boolean>();
-  const password = useRef<string>();
+  const password = useRef<string>("");
 
   const unlock = useCallback(async () => {
-    if (!password.current) return;
+    if (!password.current) {
+      setError("Password is required.");
+      return;
+    }
+
     setError(undefined);
     setLoading(true);
     try {
@@ -467,7 +471,9 @@ function MonographLockscreen({
             }}
             autoFocus={true}
             autofillBackgroundColor="background-secondary"
-            onChange={(event) => (password.current = event.target.value)}
+            onChange={(event) => {
+              password.current = event.target.value;
+            }}
             onKeyUp={(e) => (e.key === "Enter" ? unlock() : null)}
             type="password"
             placeholder="Enter password to continue"
@@ -477,6 +483,7 @@ function MonographLockscreen({
             title="Unlock"
             sx={{ borderRadius: 100, px: 50, mt: 1 }}
             onClick={() => unlock()}
+            disabled={loading}
           >
             Unlock
           </Button>

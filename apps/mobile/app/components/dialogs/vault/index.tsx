@@ -66,12 +66,17 @@ import {
   VAULT_ERRORS
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
+import { useUserStore } from "../../../stores/use-user-store";
+import { AppFontSize } from "../../../utils/size";
+import { Pressable } from "../../ui/pressable";
+import AppIcon from "../../ui/AppIcon";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
 
   // UI State
   const [visible, setVisible] = useState(false);
+  const isUserLoggedIn = useUserStore((state) => !!state.user);
   const [loading, setLoading] = useState(false);
   const [deleteAll, setDeleteAll] = useState(false);
   const [biometricUnlock, setBiometricUnlock] = useState(false);
@@ -196,9 +201,12 @@ export const VaultDialog: React.FC = () => {
         }
         eSendEvent("vaultUpdated");
         setLoading(false);
-        setTimeout(() => {
-          close();
-        }, 100);
+        close();
+        ToastManager.show({
+          message: strings.vaultDeleted(),
+          type: "success",
+          context: "global"
+        });
       } else {
         setLoading(false);
         formRef.current.setError("password", strings.passwordIncorrect());
@@ -489,6 +497,13 @@ export const VaultDialog: React.FC = () => {
 
     const { password, newPassword } = formRef.current.getValues();
 
+    if (requestType === VaultRequestType.DeleteVault && !isUserLoggedIn) {
+      setLoading(true);
+      await deleteVault();
+      setLoading(false);
+      return;
+    }
+
     if (requestType === VaultRequestType.CreateVault) {
       createVault();
     } else if (requestType === VaultRequestType.ChangePassword) {
@@ -629,16 +644,22 @@ export const VaultDialog: React.FC = () => {
       // Auto-unlock with fingerprint if applicable
       const canAutoUnlock =
         fingerprint &&
+        available &&
         data.requestType !== VaultRequestType.EnableFingerprint &&
         data.requestType !== VaultRequestType.RevokeFingerprint &&
         data.requestType !== VaultRequestType.ChangePassword &&
         data.requestType !== VaultRequestType.ClearVault &&
         data.requestType !== VaultRequestType.DeleteVault &&
         data.requestType !== VaultRequestType.CustomAction &&
-        data.requestType !== VaultRequestType.PermanentUnlock;
+        data.requestType !== VaultRequestType.PermanentUnlock &&
+        data.requestType !== VaultRequestType.CreateVault;
 
-      if (canAutoUnlock) {
-        await onPressFingerprintAuth(data.title, data.description);
+      if (canAutoUnlock && available) {
+        try {
+          await onPressFingerprintAuth(data.title, data.description);
+        } catch (e) {
+          setVisible(true);
+        }
       } else {
         setVisible(true);
       }
@@ -700,7 +721,6 @@ export const VaultDialog: React.FC = () => {
           icon="shield"
           padding={12}
         />
-        <Seperator half />
 
         <View
           style={{
@@ -709,8 +729,7 @@ export const VaultDialog: React.FC = () => {
         >
           {(isChangePassword ||
             isClearVault ||
-            !isCreateVault ||
-            isDeleteVault ||
+            (isDeleteVault && isUserLoggedIn) ||
             isCustomAction) &&
           !isRevokeFingerprint ? (
             <>
@@ -772,20 +791,32 @@ export const VaultDialog: React.FC = () => {
           ) : null}
 
           {isDeleteVault && (
-            <Button
+            <Pressable
               onPress={() => setDeleteAll(!deleteAll)}
-              icon={
-                deleteAll
-                  ? "check-circle-outline"
-                  : "checkbox-blank-circle-outline"
-              }
               style={{
-                marginTop: DefaultAppStyles.GAP_VERTICAL
+                paddingVertical: 0,
+                flexDirection: "row",
+                gap: DefaultAppStyles.GAP_SMALL,
+                marginTop: isUserLoggedIn
+                  ? DefaultAppStyles.GAP_VERTICAL_SMALL
+                  : 0,
+                justifyContent: "flex-start"
               }}
-              width="100%"
-              title={strings.deleteAllNotes()}
-              type="errorShade"
-            />
+            >
+              <AppIcon
+                name={
+                  deleteAll
+                    ? "check-circle-outline"
+                    : "checkbox-blank-circle-outline"
+                }
+                color={colors.error.accent}
+                size={AppFontSize.md}
+              />
+
+              <Paragraph color={colors.error.accent} size={AppFontSize.sm}>
+                {strings.deleteAllNotes()}
+              </Paragraph>
+            </Pressable>
           )}
 
           {isChangePassword ? (
