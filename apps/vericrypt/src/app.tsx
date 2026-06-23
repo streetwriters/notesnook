@@ -153,6 +153,7 @@ function App() {
                   setPassword(undefined);
                   setKey(undefined);
                   setData(undefined);
+                  setAccountDataKey(undefined);
                 }}
               />
             </>
