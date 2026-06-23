@@ -41,7 +41,12 @@ const scopes = {
   themebuilder: "apps/theme-builder"
 };
 // packages that we should run npm rebuild for
-const POSTINSTALL_WHITELIST = ["esbuild", "@swc/core"];
+const POSTINSTALL_WHITELIST = [
+  "esbuild",
+  "@swc/core",
+  "better-sqlite3-multiple-ciphers",
+  "better-sqlite3"
+];
 
 if (args.scope && !scopes[args.scope])
   throw new Error(`Scope must be one of ${Object.keys(scopes).join(", ")}`);
