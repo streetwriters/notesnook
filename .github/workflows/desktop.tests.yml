@@ -180,7 +180,7 @@ jobs:
   test-windows:
     name: Test for Windows
     needs: build
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Check out Git repository

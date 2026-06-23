@@ -210,7 +210,7 @@ jobs:
   build-windows:
     name: Build for Windows
     needs: build
-    runs-on: windows-latest
+    runs-on: windows-2022
     outputs:
       windows-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
     steps:
