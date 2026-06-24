@@ -40,14 +40,17 @@ export default class Vault {
   }
 
   private set password(value) {
-    this.vaultPassword = value;
+    if (this.vaultPassword !== value) {
+      this.vaultPassword = value;
+      if (value) this.db.eventManager.publish(EVENTS.vaultUnlocked);
+    }
+
     if (value) {
       this.startEraser();
     }
   }
 
   private startEraser() {
-    this.db.eventManager.publish(EVENTS.vaultUnlocked);
     clearTimeout(this.erasureTimeout);
 
     const lockAfter = this.db.settings.getVaultLockAfter();
