@@ -766,6 +766,26 @@ export const useAppEvents = () => {
       db.eventManager.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
       }),
+      db.eventManager.subscribeMulti(
+        [EVENTS.vaultAutoLocked, EVENTS.vaultLocked],
+        () => {
+          setTimeout(() => {
+            ToastManager.show({
+              message: strings.vaultLocked(),
+              type: "info"
+            });
+          }, 300);
+        },
+        undefined
+      ),
+      db.eventManager.subscribe(EVENTS.vaultUnlocked, () => {
+        setTimeout(() => {
+          ToastManager.show({
+            message: strings.vaultUnlocked(),
+            type: "info"
+          });
+        }, 300);
+      }),
       EV.subscribe(EVENTS.migrationStarted, (name) => {
         if (
           name !== "notesnook" ||
