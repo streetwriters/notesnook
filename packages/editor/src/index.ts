@@ -291,8 +291,7 @@ const useTiptap = (
           linkOnPaste: true,
           protocols: [
             {
-              scheme: "nn",
-              optionalSlashes: true
+              scheme: "nn"
             }
           ]
         }),
