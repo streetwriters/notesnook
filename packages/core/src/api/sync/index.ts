@@ -300,6 +300,7 @@ export class Sync {
       throw new Error(
         `Failed to send all items. Sent ${done} out of ${total}.`
       );
+    if (total === 0) return false;
     await this.connection?.send("PushCompletedV2", deviceId);
     return true;
   }
