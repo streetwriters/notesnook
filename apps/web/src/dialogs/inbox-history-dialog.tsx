@@ -31,6 +31,7 @@ import ScrollContainer, {
 import { strings } from "@notesnook/intl";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../utils/toast";
+import { ConfirmDialog } from "./confirm";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
@@ -161,6 +162,14 @@ export const InboxHistoryDialog = DialogManager.register(
     }
 
     async function deleteAll() {
+      const ok = await ConfirmDialog.show({
+        title: strings.deleteAll(),
+        subtitle: strings.deleteAllFailedItemsDesc(),
+        positiveButtonText: strings.yes(),
+        negativeButtonText: strings.no()
+      });
+      if (!ok) return;
+
       await db.inboxItemsHistory.deleteFailed();
       showToast("success", strings.allItemsDeleted());
       if (result.status !== "pending") {
@@ -266,7 +275,17 @@ export const InboxHistoryDialog = DialogManager.register(
                           <Button
                             variant="icon"
                             title={strings.delete()}
-                            onClick={() => deleteItem(item.id)}
+                            onClick={async () => {
+                              const ok = await ConfirmDialog.show({
+                                title: strings.deleteItem(),
+                                subtitle: strings.areYouSure(),
+                                positiveButtonText: strings.yes(),
+                                negativeButtonText: strings.no()
+                              });
+                              if (!ok) return;
+
+                              deleteItem(item.id);
+                            }}
                             sx={{ color: "accent-error", p: "2px" }}
                           >
                             <Trash size={16} />

@@ -2315,6 +2315,10 @@ msgstr "Delete data"
 msgid "Delete group"
 msgstr "Delete group"
 
+#: src/strings.ts:2799
+msgid "Delete item"
+msgstr "Delete item"
+
 #: src/strings.ts:2379
 msgid "Delete mode"
 msgstr "Delete mode"

@@ -2795,5 +2795,6 @@ Continue without attachments?`,
   colorNotePasswordFor: (filename: string) =>
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
-    t`The password for decrypting the Colornote backup file.`
+    t`The password for decrypting the Colornote backup file.`,
+  deleteItem: () => t`Delete item`
 };
