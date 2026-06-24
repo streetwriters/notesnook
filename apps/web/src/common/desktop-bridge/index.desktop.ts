@@ -64,6 +64,11 @@ function attachListeners() {
     attachListener(AppEvents.updateError)
   );
 
+  desktop.bridge.onOpenLink.subscribe(
+    undefined,
+    attachListener(AppEvents.onOpenLink)
+  );
+
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate(settingStore.get().autoUpdates);
   });
