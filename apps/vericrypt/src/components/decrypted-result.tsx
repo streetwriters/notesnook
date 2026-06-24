@@ -160,7 +160,7 @@ export function DecryptedResult(props: DecryptedResultProps) {
             support@streetwriters.co
           </Link>{" "}
           or{" "}
-          <Link href="https://discord.gg/notesnook-796015620436787241">join our Discord community</Link>.
+          <Link href="https://go.notesnook.com/discord">join our Discord community</Link>.
           We&apos;ll do our best to alleviate all your worries.
         </Text>
       </Accordion>
