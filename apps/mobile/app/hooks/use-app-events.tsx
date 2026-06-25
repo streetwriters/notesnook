@@ -840,7 +840,13 @@ export const useAppEvents = () => {
 
     return () => {
       emitterSubscriptions.forEach((sub) => sub?.remove?.());
-      subscriptions.forEach((sub) => sub?.unsubscribe?.());
+      subscriptions.forEach((sub) => {
+        if (Array.isArray(sub)) {
+          sub.forEach((s) => s.unsubscribe());
+        } else {
+          sub?.unsubscribe?.();
+        }
+      });
     };
   }, [onSyncComplete, onUserUpdated]);
 
