@@ -696,7 +696,9 @@ class UserManager {
       `${constants.API_HOST}/users/password/${type}`,
       {
         oldPassword: oldPassword,
-        newPassword: await this.db.storage().hash(new_password, email),
+        newPassword: await this.db
+          .storage()
+          .hash(new_password, email.toLowerCase()),
         userKeys: updateUserPayload
       },
       token
