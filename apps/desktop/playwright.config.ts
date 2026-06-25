@@ -46,7 +46,7 @@ const config: Config<PlaywrightWorkerOptions & PlaywrightTestOptions> = {
   globalTimeout: 5400000,
   workers: process.env.CI ? 1 : undefined,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 3 : 0,
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI
     ? [["dot"], ["json", { outputFile: path.join(outputDir, "report.json") }]]
     : "line",
