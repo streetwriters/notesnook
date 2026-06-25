@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
 import { Radius, Spacing } from "../../common/design/spacing";
 import {
@@ -107,7 +107,8 @@ export const Header = ({
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        marginBottom: Spacing.LEVEL_3
+        marginBottom: Spacing.LEVEL_3,
+        marginTop: Platform.OS === "android" ? 5 : 0
       }}
     >
       <View
