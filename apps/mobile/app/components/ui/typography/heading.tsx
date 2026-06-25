@@ -37,7 +37,7 @@ interface HeadingProps extends TextProps {
   extraBold?: boolean;
   fontSize?: keyof typeof FontSizes;
   fontFamily?: keyof typeof FontFamily;
-  lineHeight?: LineHeightVariants;
+  lineHeight?: LineHeightVariants | null;
 }
 
 const extraBoldStyle = {
