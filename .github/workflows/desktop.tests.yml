@@ -33,6 +33,8 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
+          npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
 
       - name: Run tests x64
         run: npm run test
@@ -61,6 +63,8 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu arm64 sqlite3-fts5-html
 
       - name: Run tests arm64
         run: npm run test
@@ -89,6 +93,8 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
+          npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
 
       - name: Run tests
         run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test
@@ -117,6 +123,8 @@ jobs:
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
+          npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
 
       - name: Run tests
         run: npm run test
