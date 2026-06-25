@@ -41,13 +41,7 @@ This process is repeated every time you sign in.
 
 ### 2. Key generation
 
-After you are signed in, the app requests your user data which includes, among other things, your salt.
-
-> info Salt generation
->
-> When you create an account, the server generates a cryptographically secure random salt for you. This salt is used for key generation.
-
-You password & salt is then used to derive a strong irreversible key using Argon2 as the password key derivation function (PKDF).
+When you first sign up for an account, your client generates a unique data encryption key that encrypts all your notes. When you change your password, your client will protect this data encryption key with a predictable key that is derived from your password and predictable salt.
 
 ### 3. Encryption key storage
 
@@ -55,7 +49,7 @@ You password & salt is then used to derive a strong irreversible key using Argon
 
 Instead of storing the key as plain text (and allowing anyone to copy/move it), we use browser's `IndexedDB` to store the key as a `CryptoKey`.
 
-`CryptoKey` is stored securely by the browser and cannot be exported, viewed, copied except by the app & browser.
+`CryptoKey` is stored securely by the browser and cannot be exported, viewed, or copied except by the app & browser.
 
 # [Mobile](#/tab/mobile)
 
@@ -70,7 +64,7 @@ Encryption only takes place when you sync. Each item in the database is encrypte
 #### How it works
 
 1. The item is read from the database as JSON object and stringified (i.e. converted to a string).
-2. The string is encrypted using the encryption key generated earlier.
+2. The string is encrypted using the data encryption key generated earlier.
 3. The result is a JSON object which contains:
    1. A base64 encoded `cipher`
    2. A 192-bit nonce (`iv`)
