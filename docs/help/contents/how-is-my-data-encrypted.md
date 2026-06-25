@@ -41,7 +41,7 @@ This process is repeated every time you sign in.
 
 ### 2. Key generation
 
-When you first sign up for an account, your client generates two encryption keys. One is a unique data encryption key that encrypts all your notes and other data. The second is your master encryption key, this is derived by your password and predictable salt. This key protects all your encryption keys, like the aforementioned data encryption key. When you change your password, your client will encrypt your encryption keys with a the predictable master key.
+When you first sign up for an account, your client generates two encryption keys. One is a unique data encryption key that encrypts all your notes and other data. The second is your master encryption key, this is derived by your password and predictable salt. This key protects all your encryption keys, like the aforementioned data encryption key. When you change your password, your client will encrypt your encryption keys with the predictable master key.
 
 ### 3. Encryption key storage
 
