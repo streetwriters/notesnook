@@ -52,7 +52,8 @@ import { PASSWORD_PLACEHOLDER } from "../../utils/constants";
 
 const LoginSteps = {
   emailAuth: 1,
-  mfaAuth: 2
+  mfaAuth: 2,
+  passwordAuth: 3
 };
 
 export const Login = ({
@@ -139,7 +140,7 @@ export const Login = ({
         enableAutomaticScroll={true}
         keyboardShouldPersistTaps="handled"
       >
-        {step === LoginSteps.emailAuth ? (
+        {step === LoginSteps.emailAuth || step === LoginSteps.passwordAuth ? (
           <View
             style={{
               borderRadius: DDS.isTab ? 5 : 0,

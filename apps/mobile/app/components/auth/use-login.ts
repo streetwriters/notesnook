@@ -30,7 +30,8 @@ import { createFormRef } from "../ui/input/form-input";
 
 export const LoginSteps = {
   emailAuth: 1,
-  mfaAuth: 2
+  mfaAuth: 2,
+  passwordAuth: 3
 };
 
 export const useLogin = (
@@ -74,19 +75,27 @@ export const useLogin = (
           }
           break;
         }
+        case LoginSteps.passwordAuth:
         case LoginSteps.mfaAuth: {
           if (!formRef.current.validate()) {
             setLoading(false);
             return;
           }
           const values = formRef.current.getValues();
-          await db.user.authenticatePassword(
+          try {
+            await db.user.authenticatePassword(
             values.email,
             values.password,
             undefined,
             sessionExpired
           );
-          finishLogin();
+            finishLogin();
+          } catch(e) {
+            formRef.current.setError("password", (e as Error).message);
+            setLoading(false);
+            setStep(LoginSteps.passwordAuth);
+          }
+     
           break;
         }
       }
