@@ -41,7 +41,7 @@ This process is repeated every time you sign in.
 
 ### 2. Key generation
 
-When you first sign up for an account, your client generates a unique data encryption key that encrypts all your notes. When you change your password, your client will protect this data encryption key with a predictable key that is derived from your password and predictable salt.
+When you first sign up for an account, your client generates two encryption keys. One is a unique data encryption key that encrypts all your notes and other data. The second is your master encryption key, this is derived by your password and predictable salt. This key protects all your encryption keys, like the aforementioned data encryption key. When you change your password, your client will encrypt your encryption keys with a the predictable master key.
 
 ### 3. Encryption key storage
 
@@ -77,3 +77,9 @@ Encryption only takes place when you sync. Each item in the database is encrypte
 > See the whole process in action [here.](https://vericrypt.notesnook.com/)
 
 This object is then sent to the server for storage. The server performs no further operation on this data (because it can't).
+
+## Faqs
+
+### I am an old user of Notesnook, I don't have a data encryption key.
+
+Your key will be created when you change your password.
