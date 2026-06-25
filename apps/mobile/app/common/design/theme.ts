@@ -52,7 +52,7 @@ export const THEME_LIGHT: any = {
         placeholder: "#858585",
         hover: "#eee",
         backdrop: "#0000001a",
-        buttonForeground: "#FFFFFF"
+        buttonForeground: "#181818"
       },
       secondary: {
         accent: "#0D9E46",
