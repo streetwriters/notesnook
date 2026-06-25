@@ -616,7 +616,7 @@ After trying all the privacy security oriented note taking apps, for the price a
                 paddingVertical: Spacing.LEVEL_4
               }}
             >
-              <Heading fontSize="XL" lineHeight={undefined}>
+              <Heading fontSize="XL" lineHeight={null}>
                 {strings.frequentlyAskedQuestions()}
               </Heading>
             </View>
