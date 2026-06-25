@@ -296,7 +296,7 @@ const features = {
   }),
   createNoteFromNotificationDrawer: createFeature({
     id: "createNoteFromNotificationDrawer",
-    title: "Pin Note Notifications",
+    title: "Create Note from Notifications",
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
