@@ -20,7 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { execSync } from "child_process";
 import { cp } from "fs/promises";
 import path, { join, resolve } from "path";
-import { _electron as electron, ElectronApplication, Page } from "playwright";
+import {
+  _electron as electron,
+  ElectronApplication,
+  Page
+} from "@playwright/test";
 import { existsSync } from "fs";
 import { mkdir, writeFile } from "node:fs/promises";
 
@@ -30,7 +34,7 @@ const root = path.resolve(__dirname, "..", "..");
 const SOURCE_DIR = resolve(root, "output", productName);
 
 export interface AppContext {
-  app: import("playwright").ElectronApplication;
+  app: ElectronApplication;
   userDataDir: string;
   outputDir: string;
   relaunch: () => Promise<void>;
