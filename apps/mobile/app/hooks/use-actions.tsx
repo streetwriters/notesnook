@@ -1333,7 +1333,7 @@ export const useActions = ({
       icon: "link",
       onPress: () => {
         const link = createInternalLink(item.type, item.id);
-        Clipboard.setString(link);
+        Clipboard.setHTML(`<a href="${link}" >${item.title}</a>`, link);
         ToastManager.show({
           heading: strings.linkCopied(),
           message: link,
