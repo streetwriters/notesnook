@@ -434,6 +434,7 @@ export class Notes implements ICollection {
       const duplicateId = await this.db.notes.add({
         ...clone(note),
         id: undefined,
+        pinned: false,
         isGeneratedTitle: false,
         contentId: undefined,
         title: note.title + " (Copy)",
