@@ -67,6 +67,7 @@ import { valueLimiter } from "../utils/functions";
 import { fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
 import type { PaneWidths } from "../screens/editor/wrapper";
+import AddReminder from "../screens/add-reminder";
 
 const MOBILE_SIDEBAR_SIZE = 0.85;
 
@@ -130,6 +131,11 @@ export const FluidPanelsView = React.memo(
             () => fluidTabsRef.current?.goToPage("editor", false),
             300
           );
+        }
+        if (item?.type === "notesnook.action.newreminder") {
+          setTimeout(() => {
+            AddReminder.present();
+          }, 1000);
         }
       }
     });
