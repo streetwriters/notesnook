@@ -62,6 +62,7 @@ const Intro = () => {
                 key={heading.value()}
                 fontFamily="SEMI_BOLD"
                 fontSize="XXL"
+                lineHeight="120%"
               >
                 {heading.value()}
               </Heading>

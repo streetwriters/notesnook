@@ -28,12 +28,13 @@ import {
 } from "react-native";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
-import { Pressable, PressableProps, useButton } from "../pressable";
+import { Pressable, PressableProps } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 import { Spacing } from "../../../common/design/spacing";
 import { FontFamily } from "../../../common/design/font";
 import AppIcon, { IconProps } from "../AppIcon";
+import { useButton } from "../pressable/use-button";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;

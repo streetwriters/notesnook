@@ -241,7 +241,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
             color={colors.primary.icon}
             size={18}
             onPress={() => {
-              if (step === Steps.buy) {
+              if (step === Steps.buy && !routeParams.state) {
                 setStep(Steps.select);
                 return;
               }
