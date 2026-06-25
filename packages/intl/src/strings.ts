@@ -3066,7 +3066,7 @@ Continue without attachments?`,
   recurringReminders: () => t`Recurring Reminders`,
   pinNoteInNotification: () => t`Pin Note in Notification`,
   createNoteFromNotificationDrawer: () =>
-    t`Create Note from Notification Drawer`,
+    t`Create Note from Notifications`,
   customHomepage: () => t`Custom Homepage`,
   customToolbarPreset: () => t`Custom Toolbar Preset`,
   disableTrashCleanup: () => t`Disable Trash Cleanup`,
