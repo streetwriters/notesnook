@@ -183,8 +183,9 @@ export const SideMenu = React.memo(
           flex: 1,
           backgroundColor: colors.primary.background,
           paddingTop: Math.max(insets.top, Spacing.LEVEL_4),
-          paddingBottom: Math.max(insets.bottom, Spacing.LEVEL_4) + Spacing.LEVEL_1,
-          paddingLeft: insets.left,
+          paddingBottom:
+            Math.max(insets.bottom, Spacing.LEVEL_4) + Spacing.LEVEL_1,
+          paddingLeft: insets.left
         }}
       >
         <SimpleTabView
@@ -238,6 +239,7 @@ const TabBar = (props: SimpleTabBarProps) => {
           flexDirection: "row",
           width: "100%",
           justifyContent: "space-between",
+          paddingHorizontal: isSelectionEnabled ? Spacing.LEVEL_5 : 0,
           backgroundColor: colors.primary.background,
           borderTopWidth: 1,
           borderTopColor: colors.primary.separator,
@@ -439,7 +441,11 @@ const TabBar = (props: SimpleTabBarProps) => {
                                     name: "title",
                                     placeholder: "eg. journal",
                                     ref: React.createRef(),
-                                    validators: [validators.required(strings.allFieldsRequired())]
+                                    validators: [
+                                      validators.required(
+                                        strings.allFieldsRequired()
+                                      )
+                                    ]
                                   }
                                 ],
                                 onFormSubmit: async (form) => {
@@ -451,7 +457,10 @@ const TabBar = (props: SimpleTabBarProps) => {
                                     useTagStore.getState().refresh();
                                     return true;
                                   } catch (e) {
-                                    form.setError("title", (e as Error).message);
+                                    form.setError(
+                                      "title",
+                                      (e as Error).message
+                                    );
                                     return false;
                                   }
                                 }

@@ -381,7 +381,7 @@ const NoteItem = ({
             <Heading
               numberOfLines={1}
               color={primaryColors.heading}
-              size={AppFontSize.sm}
+              fontSize="MD"
               style={{
                 flexShrink: 1
               }}
@@ -475,6 +475,7 @@ const NoteItem = ({
               flexWrap: "wrap"
             }}
             color={primaryColors.paragraph}
+            fontSize="SM"
             numberOfLines={2}
           >
             {decode(item.headline, {
@@ -492,21 +493,24 @@ const NoteItem = ({
           {compactMode ? null : (
             <View
               style={{
-                gap: Spacing.LEVEL_0 + 2,
+                gap: Spacing.LEVEL_0,
                 flexDirection: "row"
               }}
             >
               <AppIcon
                 color={colors.secondary.icon}
-                size={13}
+                size={12}
+                style={{
+                  marginTop: 1
+                }}
                 name="calendar"
                 iconFamily="notesnook"
               />
               <Paragraph
                 style={{
-                  fontSize: AppFontSize.xs,
                   color: colors.secondary.paragraph
                 }}
+                fontSize="XS"
               >
                 {getFormattedDate(
                   date,

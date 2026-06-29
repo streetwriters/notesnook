@@ -32,6 +32,7 @@ import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
 import { db } from "../../common/database";
 import LineSeparator from "../../components/ui/seperator/line-separator";
+import { Spacing } from "../../common/design/spacing";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -69,7 +70,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         onPressDefaultRightButton={openEditor}
       />
 
-      <LineSeparator />
+      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
 
       <DelayLayout wait={loading}>
         <List
