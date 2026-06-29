@@ -632,7 +632,10 @@ class UserManager {
       throw new Error("Incorrect old password.");
 
     const oldPassword = old_password
-      ? await this.db.storage().hash(old_password, email, {
+      ? // we don't lowercase email here to allow user accounts with
+        // mixed cased emails to change their passwords. Once that is done,
+        // we will lowercase the email in the backend.
+        await this.db.storage().hash(old_password, email, {
           usesFallback: await this.usesFallbackPWHash(old_password)
         })
       : null;
