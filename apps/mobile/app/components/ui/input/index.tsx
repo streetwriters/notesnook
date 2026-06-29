@@ -219,7 +219,6 @@ const Input = ({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: Spacing.LEVEL_2,
-    paddingRight: Spacing.LEVEL_3,
     ...containerStyle
   };
 
@@ -230,6 +229,7 @@ const Input = ({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     paddingTop: Spacing.LEVEL_3,
     paddingBottom: Spacing.LEVEL_3,
+    lineHeight: fontSize + fontSize * 0.3,
     flexGrow: 1,
     flexShrink: 1,
     fontFamily: "Inter-Regular",

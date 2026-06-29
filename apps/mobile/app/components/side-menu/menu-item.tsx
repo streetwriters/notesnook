@@ -176,7 +176,7 @@ export function MenuItem({
               item.icon === "crown"
                 ? colors.static.yellow
                 : isFocused
-                  ? colors.primary.icon
+                  ? colors.selected.icon
                   : colors.secondary.icon
             }
             size={AppFontSize.md}
@@ -198,7 +198,7 @@ export function MenuItem({
       <Paragraph
         fontSize="XS"
         color={
-          isFocused ? colors.primary.paragraph : colors.secondary.paragraph
+          isFocused ? colors.selected.paragraph : colors.secondary.paragraph
         }
         style={{
           marginLeft: Spacing.LEVEL_1

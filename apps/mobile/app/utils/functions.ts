@@ -59,9 +59,14 @@ function confirmDeleteAllNotes(
 ) {
   return new Promise<{ delete: boolean; deleteNotes: boolean }>((resolve) => {
     presentDialog({
-      title: strings.doActions.delete.notebook(items.length),
+      title: strings.moveToTrash() + "?",
+      paragraph: `The selected notebook${items.length > 1 ? `s` : ``} will be moved to trash. You can restore them later.`,
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
+      icon: "warning-circle",
+      iconType: "error",
+      iconFamily: "notesnook",
+      centered: true,
       positivePress: async (_inputValue, value) => {
         setTimeout(() => {
           resolve({ delete: true, deleteNotes: value });

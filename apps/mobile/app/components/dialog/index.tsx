@@ -39,7 +39,7 @@ import { defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
-import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import Input from "../ui/input";
 import { FormInput, type FormRef } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
@@ -233,6 +233,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
               >
                 {dialogInfo.form.items.map((item, index) => (
                   <FormInput
+                    {...item.inputProps}
                     key={item.name}
                     fwdRef={item.ref}
                     name={item.name}
@@ -289,29 +290,16 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
             ) : null}
 
             {dialogInfo.check ? (
-              <>
-                <Button
-                  onPress={() => {
-                    setChecked(!checked);
-                  }}
-                  icon={
-                    checked
-                      ? "check-circle-outline"
-                      : "checkbox-blank-circle-outline"
-                  }
-                  iconColor={
-                    checked ? colors.secondary.icon : colors.primary.icon
-                  }
-                  style={{
-                    justifyContent: "flex-start"
-                  }}
-                  height={35}
-                  iconSize={20}
-                  width="100%"
-                  title={dialogInfo.check.info}
-                  type={checked ? dialogInfo.check.type || "plain" : "plain"}
-                />
-              </>
+              <Checkbox
+                checked={checked}
+                onPress={() => {
+                  setChecked(!checked);
+                }}
+                title={dialogInfo.check.info}
+                style={{
+                  marginTop: -Spacing.LEVEL_1
+                }}
+              />
             ) : null}
           </View>
           <DialogButtons
