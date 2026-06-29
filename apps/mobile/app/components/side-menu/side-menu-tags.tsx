@@ -76,7 +76,7 @@ const TagItem = (props: {
     >
       {item ? (
         <Pressable
-          type={isSelected || isFocused ? "selected" : "transparent"}
+          type={isFocused ? "selected" : "transparent"}
           onLongPress={() => {
             Properties.present(item, false, [
               {
@@ -147,21 +147,16 @@ const TagItem = (props: {
           </View>
 
           {enabled ? (
-            <View
-              style={{
-                width: 22,
-                height: 22,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <AppIcon
-                name={
-                  isSelected ? "checkbox-outline" : "checkbox-blank-outline"
-                }
-                color={isSelected ? colors.selected.icon : colors.primary.icon}
-              />
-            </View>
+            <AppIcon
+              name={isSelected ? "checkbox" : "box-empty"}
+              iconFamily="notesnook"
+              size={16}
+              color={
+                isSelected
+                  ? [colors.primary.accent, colors.primary.accentForeground]
+                  : colors.primary.icon
+              }
+            />
           ) : (
             <>
               {item?.id && totalNotes.totalNotes?.(item?.id) !== undefined ? (
@@ -322,9 +317,9 @@ export const SideMenuTags = () => {
               style={{
                 width: "100%",
                 backgroundColor: colors.primary.background,
-                borderTopColor: colors.primary.border,
+                borderTopColor: colors.primary.separator,
                 borderTopWidth: 1,
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+                paddingVertical: Spacing.LEVEL_2,
                 flexDirection: "row",
                 justifyContent: "space-between"
               }}

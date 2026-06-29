@@ -416,6 +416,10 @@ export const useActions = ({
       presentDialog({
         title: strings.doActions.delete.unknown(item.type, 1),
         paragraph: strings.actionConfirmations.delete.unknown(item.type, 1),
+        icon: "warning-circle",
+        centered: true,
+        iconFamily: "notesnook",
+        iconType: "error",
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
@@ -434,7 +438,7 @@ export const useActions = ({
           });
         },
         positiveText: strings.delete(),
-        positiveType: "errorShade"
+        positiveType: "accent"
       });
       return;
     }

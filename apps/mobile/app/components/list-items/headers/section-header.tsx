@@ -82,7 +82,7 @@ export const SectionHeader = React.memo<
           width: "100%",
           paddingHorizontal: Spacing.LEVEL_3,
           marginBottom: Spacing.LEVEL_3,
-          marginTop: Spacing.LEVEL_3
+          marginTop: index === 0 ? 0 : Spacing.LEVEL_3
         }}
       >
         <View
@@ -95,12 +95,13 @@ export const SectionHeader = React.memo<
           }}
         >
           <Paragraph
-            fontSize="MD"
+            fontSize="SM"
+            fontFamily="MEDIUM"
             style={{
               alignSelf: "center",
               textAlignVertical: "center"
             }}
-            color={colors.secondary.heading}
+            color={colors.secondary.paragraph}
           >
             {!item.title || item.title === ""
               ? screen === "Search"
@@ -180,6 +181,7 @@ export const SectionHeader = React.memo<
                         : "normal"
                     });
                   }}
+                  type={isCompactModeEnabled ? "shade" : undefined}
                   size={16}
                 />
               </>
