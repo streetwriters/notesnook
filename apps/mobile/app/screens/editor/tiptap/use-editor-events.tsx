@@ -139,6 +139,7 @@ const showActionsheet = async () => {
     .getNoteIdForTab(useTabStore.getState().currentTab!);
   if (noteId) {
     const note = await db.notes?.note(noteId);
+    if (!note) return;
     Properties.present(note, false);
   } else {
     ToastManager.show({

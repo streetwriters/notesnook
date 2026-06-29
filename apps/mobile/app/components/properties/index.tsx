@@ -20,7 +20,7 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { FlatList } from "react-native-actions-sheet";
+import { ScrollView } from "react-native-actions-sheet";
 import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import {
@@ -54,17 +54,53 @@ import Navigation from "../../services/navigation";
 import { useIsFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { Action, useActions } from "../../hooks/use-actions";
+import {
+  Color,
+  Note,
+  Notebook,
+  Reminder,
+  Tag,
+  TrashItem
+} from "@notesnook/core";
 
-export const Properties = ({ close = () => {}, item, buttons = [] }) => {
+export type PropertiesItem =
+  | Note
+  | Notebook
+  | Tag
+  | Color
+  | Reminder
+  | TrashItem;
+
+export const Properties = ({
+  close,
+  item,
+  buttons = []
+}: {
+  close?: (ctx?: string | undefined) => void;
+  item: PropertiesItem;
+  buttons: Action[];
+}) => {
   const { colors } = useThemeColors();
   const colorFeature = useIsFeatureAvailable("colors");
-  const [noteNotebooks, setNoteNotebooks] = useState([]);
-  const [tags, setTags] = useState([]);
+  const [noteNotebooks, setNoteNotebooks] = useState<Notebook[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [visible, setVisible] = useState(false);
   const colorNotes = useMenuStore((state) => state.colorNotes);
+  const actions = useActions({
+    item,
+    close: () => {
+      close?.();
+    }
+  });
+  const editAction = actions.find(
+    (action) => action.id === "edit-notebook" || action.id === "rename-tag"
+  );
   useEffect(() => {
     async function getNotebooks() {
-      let filteredNotebooks = await db.relations.to(item, "notebook").resolve();
+      const filteredNotebooks = await db.relations
+        .to(item, "notebook")
+        .resolve();
       return filteredNotebooks || [];
     }
     if (item.type === "note") {
@@ -87,7 +123,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
   }
 
   return (
-    <FlatList
+    <ScrollView
       keyboardShouldPersistTaps="always"
       keyboardDismissMode="none"
       style={{
@@ -95,39 +131,39 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%",
-        paddingTop: Spacing.LEVEL_3
+        paddingTop: Spacing.LEVEL_2
       }}
       nestedScrollEnabled
       bounces={false}
-      data={[0]}
-      keyExtractor={() => "properties-scroll-item"}
-      renderItem={() => (
+    >
+      <View>
+        {item.type === "note" ? (
+          <ColorPicker
+            visible={visible}
+            setVisible={setVisible}
+            onColorAdded={async (color) => {
+              await db.relations.to(item, "color").unlink();
+              await db.relations.add(color, item);
+              useRelationStore.getState().update();
+              useMenuStore.getState().setColorNotes();
+              Navigation.queueRoutesForUpdate();
+              sendItemUpdateEvent(color.id, "color");
+              eSendEvent(refreshNotesPage);
+            }}
+          />
+        ) : null}
         <View
           style={{
-            gap: Spacing.LEVEL_1
+            paddingHorizontal: Spacing.LEVEL_3
           }}
         >
-          {item.type === "note" ? (
-            <ColorPicker
-              visible={visible}
-              setVisible={setVisible}
-              onColorAdded={async (color) => {
-                await db.relations.to(item, "color").unlink();
-                await db.relations.add(color, item);
-                useRelationStore.getState().update();
-                useMenuStore.getState().setColorNotes();
-                Navigation.queueRoutesForUpdate();
-                sendItemUpdateEvent(color.id, "color");
-                eSendEvent(refreshNotesPage);
-              }}
-            />
-          ) : null}
           <View
             style={{
-              paddingHorizontal: Spacing.LEVEL_3
+              gap: Spacing.LEVEL_1,
+              paddingBottom: Spacing.LEVEL_3
             }}
           >
-            <View>
+            {item.type === "note" && (noteNotebooks.length || tags.length) ? (
               <View
                 style={{
                   flexDirection: "row",
@@ -183,95 +219,101 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                   ) : null
                 )}
               </View>
+            ) : null}
 
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between"
+              }}
+            >
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "space-between"
+                  alignItems: "center",
+                  flexShrink: 1,
+                  gap: Spacing.LEVEL_1
                 }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    flexShrink: 1,
-                    gap: Spacing.LEVEL_1
-                  }}
-                >
-                  {item.type === "color" ? (
-                    <Pressable
-                      type="accent"
-                      accentColor={item.colorCode}
-                      accentText={colors.static.white}
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 100
-                      }}
-                    />
-                  ) : item.type === "tag" ? (
-                    <AppIcon
-                      name="shopping-mode"
-                      iconFamily="evilicons"
-                      size={AppFontSize.lg}
-                      color={colors.primary.icon}
-                    />
-                  ) : null}
+                {item.type === "color" ? (
+                  <Pressable
+                    type="accent"
+                    accentColor={item.colorCode}
+                    accentText={colors.static.white}
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 100
+                    }}
+                  />
+                ) : null}
 
-                  <Heading size={AppFontSize.xl}>{item.title}</Heading>
-                </View>
+                <Heading size={AppFontSize.xl}>{item.title}</Heading>
 
-                {item.type === "note" ? (
+                {editAction ? (
                   <IconButton
-                    name="square-out"
+                    name="edit-pencil"
                     iconFamily="notesnook"
                     type="plain"
                     color={colors.primary.icon}
-                    size={AppFontSize.lg}
-                    style={{
-                      alignSelf: "flex-start"
-                    }}
-                    onPress={() => {
-                      close();
-                      eSendEvent(eOnLoadNote, {
-                        item: item,
-                        newTab: true
-                      });
-                      if (!DDS.isTab) {
-                        fluidTabsRef.current?.goToPage("editor");
-                      }
-                    }}
+                    size={AppFontSize.md}
+                    onPress={editAction.onPress}
                   />
                 ) : null}
               </View>
 
-              {(item.type === "notebook" || item.type === "reminder") &&
-              item.description ? (
-                <Paragraph>{item.description}</Paragraph>
-              ) : null}
-
-              {item.type === "reminder" ? (
-                <ReminderTime
-                  reminder={item}
+              {item.type === "note" ? (
+                <IconButton
+                  name="square-out"
+                  iconFamily="notesnook"
+                  type="plain"
+                  color={colors.primary.icon}
+                  size={AppFontSize.lg}
                   style={{
-                    justifyContent: "flex-start",
-                    borderWidth: 0,
-                    alignSelf: "flex-start",
-                    backgroundColor: "transparent",
-                    paddingHorizontal: 0,
-                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                    alignSelf: "flex-start"
                   }}
-                  fontSize={AppFontSize.xs}
+                  onPress={() => {
+                    close?.();
+                    eSendEvent(eOnLoadNote, {
+                      item: item,
+                      newTab: true
+                    });
+                    if (!DDS.isTab) {
+                      fluidTabsRef.current?.goToPage("editor");
+                    }
+                  }}
                 />
               ) : null}
             </View>
 
-            <DateMeta item={item} />
-
-            {item.type === "note" && colorNotes.length > 0 ? (
-              <Tags close={close} item={item} />
+            {(item.type === "notebook" || item.type === "reminder") &&
+            item.description ? (
+              <Paragraph>{item.description}</Paragraph>
             ) : null}
 
+            {item.type === "reminder" ? (
+              <ReminderTime
+                reminder={item}
+                style={{
+                  justifyContent: "flex-start",
+                  borderWidth: 0,
+                  alignSelf: "flex-start",
+                  backgroundColor: "transparent",
+                  paddingHorizontal: 0,
+                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
+                fontSize={AppFontSize.xs}
+              />
+            ) : null}
+          </View>
+
+          <DateMeta item={item} />
+
+          {item.type === "note" && colorNotes.length > 0 ? (
+            <Tags close={close} item={item} />
+          ) : null}
+
+          {item.type === "note" ? (
             <View
               style={{
                 flexDirection: "row",
@@ -286,7 +328,7 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
               <Button
                 onPress={async () => {
                   ManageTags.present([item.id]);
-                  close();
+                  close?.();
                 }}
                 buttonType={{
                   text: colors.primary.paragraph
@@ -333,37 +375,54 @@ export const Properties = ({ close = () => {}, item, buttons = [] }) => {
                 />
               )}
             </View>
-          </View>
+          ) : null}
+        </View>
 
-          {/* {item.type === "note" ? (
-            <Notebooks note={item} close={close} />
-          ) : null} */}
-          <Items
-            item={item}
-            buttons={buttons}
-            close={() => {
-              close();
+        <View
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3
+          }}
+        >
+          <View
+            style={{
+              marginVertical: Spacing.LEVEL_3,
+              width: "100%",
+              borderBottomWidth: 1,
+              borderColor: colors.primary.separator
             }}
           />
-
-          {DDS.isTab ? (
-            <View
-              style={{
-                height: 20
-              }}
-            />
-          ) : null}
-          <SheetProvider context="properties" />
-          <Dialog context="properties" />
         </View>
-      )}
-    />
+
+        <Items
+          item={item}
+          buttons={buttons}
+          actions={actions}
+          close={() => {
+            close?.();
+          }}
+        />
+
+        {DDS.isTab ? (
+          <View
+            style={{
+              height: 20
+            }}
+          />
+        ) : null}
+        <SheetProvider context="properties" />
+        <Dialog context="properties" />
+      </View>
+    </ScrollView>
   );
 };
 
-Properties.present = async (item, isSheet, buttons = []) => {
+Properties.present = async (
+  item: PropertiesItem,
+  isSheet: boolean = false,
+  buttons: Action[] = []
+) => {
   if (!item) return;
-  let type = item?.type;
+  const type = item?.type;
   let dbItem;
   switch (type) {
     case "trash":
@@ -387,15 +446,12 @@ Properties.present = async (item, isSheet, buttons = []) => {
     }
   }
 
+  if (!dbItem) return;
+
   presentSheet({
     context: isSheet ? "local" : undefined,
     component: (ref, close) => (
-      <Properties
-        close={close}
-        actionSheetRef={ref}
-        item={dbItem}
-        buttons={buttons}
-      />
+      <Properties close={close} item={dbItem} buttons={buttons} />
     )
   });
 };

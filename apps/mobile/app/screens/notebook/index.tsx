@@ -166,6 +166,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         rightButton={{
           name: "dots-vertical",
           onPress: () => {
+            if (!notebook) return;
             Properties.present(notebook);
           }
         }}

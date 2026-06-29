@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { KeyboardTypeOptions, TextInput } from "react-native";
+import { KeyboardTypeOptions, TextInput, TextInputProps } from "react-native";
 import { eSendEvent } from "../../services/event-manager";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 import { ButtonProps } from "../ui/button";
@@ -58,6 +58,7 @@ export type DialogInfo = {
       validators: FieldValidator[];
       defaultValue?: string;
       ref: RefObject<TextInput | null>;
+      inputProps?: TextInputProps;
     }[];
     onFormSubmit?: (form: FormRef) => Promise<boolean>;
   };

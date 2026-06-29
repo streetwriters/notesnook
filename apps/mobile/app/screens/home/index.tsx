@@ -67,7 +67,7 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         onPressDefaultRightButton={openEditor}
       />
 
-      <LineSeparator padding="LEVEL_3" />
+      <LineSeparator />
 
       <DelayLayout wait={loading}>
         <List
