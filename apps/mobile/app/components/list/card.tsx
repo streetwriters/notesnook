@@ -54,8 +54,7 @@ export const Card = ({
       style={{
         width: "100%",
         paddingHorizontal: Spacing.LEVEL_3,
-        marginBottom: Spacing.LEVEL_4,
-        marginTop: Spacing.LEVEL_3
+        marginBottom: Spacing.LEVEL_4
       }}
     >
       <Pressable
@@ -85,7 +84,7 @@ export const Card = ({
             style={{
               width: 34,
               height: 34,
-              borderRadius: Radius.XXS,
+              borderRadius: Radius.XS,
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: colors.secondary.background
