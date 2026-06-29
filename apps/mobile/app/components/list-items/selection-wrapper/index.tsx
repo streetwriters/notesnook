@@ -73,7 +73,6 @@ const SelectionWrapper = ({
   return (
     <View
       style={{
-        // paddingHorizontal: Spacing.LEVEL_3,
         backgroundColor: isEditingNote ? colors.selected.background : undefined
       }}
     >
@@ -87,16 +86,19 @@ const SelectionWrapper = ({
         customAlpha={!isDark ? -0.02 : 0.02}
         customOpacity={1}
         style={{
-          width: "100%",
-          alignSelf: "center",
-          overflow: "hidden",
-          paddingHorizontal: Spacing.LEVEL_3,
-          borderRadius: 0,
-          alignItems: "flex-start",
-          // paddingVertical: Spacing.LEVEL_2,
-          paddingTop: Spacing.LEVEL_2
+          paddingHorizontal: Spacing.LEVEL_3
         }}
       >
+        {hasGroupHeader ? null : (
+          <View
+            style={{
+              marginVertical: Spacing.LEVEL_2,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.primary.separator,
+              width: "100%"
+            }}
+          />
+        )}
         <View
           style={{
             width: "100%",
@@ -105,14 +107,6 @@ const SelectionWrapper = ({
         >
           {children}
         </View>
-        <View
-          style={{
-            marginTop: Spacing.LEVEL_2,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.primary.border,
-            width: "100%"
-          }}
-        />
       </Pressable>
     </View>
   );
