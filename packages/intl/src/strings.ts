@@ -1132,6 +1132,8 @@ $day$: Current day (eg. Monday)`,
   start: () => t`Start`,
   customization: () => t`Customization`,
   appearance: () => t`Appearance`,
+  preferences: () => t`Preferences`,
+  actionsHeading: () => t`Actions`,
   appearanceDesc: () =>
     t`Customize the appearance of the app with custom themes`,
   themes: () => t`Themes`,
@@ -2513,10 +2515,10 @@ Use this if changes from other devices are not appearing on this device. This wi
   addToNotebook: () => t`Add to notebook`,
   notebookAdded: () => t`Notebook added`,
   addNotes: () => t`Add notes`,
-  setAsHomepage: () => t`Set as homepage`,
+  setAsHomepage: () => t`Set as home`,
   defaultSidebarTab: () => t`Default sidebar tab`,
   defaultSidebarTabDesc: () => t`Select the default sidebar tab`,
-  unsetAsHomepage: () => t`Reset homepage`,
+  unsetAsHomepage: () => t`Reset home`,
   archive: () => t`Archive`,
   yourArchiveIsEmpty: () => t`Your archive is empty`,
   unarchive: () => t`Unarchive`,
@@ -2939,5 +2941,6 @@ Continue without attachments?`,
   downloadLogsFailedDesc: () =>
     t`Something went wrong while preparing your debug logs. This can happen if no storage location was selected.`,
   shareZip: () => t`Share ZIP`,
-  tryDownloadLogsAgain: () => t`Try again`
+  tryDownloadLogsAgain: () => t`Try again`,
+  createSubnotebook: () => t`Create sub-notebook`
 };

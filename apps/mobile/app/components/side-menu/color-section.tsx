@@ -31,7 +31,7 @@ import { Properties } from "../properties";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
 import { Default_Drag_Action } from "../../hooks/use-actions";
-import { Spacing } from "../../common/design/spacing";
+
 
 export const ColorSection = React.memo(
   function ColorSection() {

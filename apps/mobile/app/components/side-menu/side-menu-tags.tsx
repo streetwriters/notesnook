@@ -27,7 +27,6 @@ import { useDBItem, useTotalNotes } from "../../hooks/use-db-item";
 import { TaggedNotes } from "../../screens/notes/tagged";
 import { presentDialog } from "../dialog/functions";
 import Navigation from "../../services/navigation";
-import { ToastManager } from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useTags, useTagStore } from "../../stores/use-tag-store";
 import { AppFontSize } from "../../utils/size";
@@ -42,6 +41,7 @@ import { useSideMenuTagsSelectionStore } from "./stores";
 import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { Radius, Spacing } from "../../common/design/spacing";
+import { createFormRef, validators } from "../ui/input/form-input";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -81,8 +81,8 @@ const TagItem = (props: {
             Properties.present(item, false, [
               {
                 id: "select",
-                title: strings.select() + " " + strings.dataTypes["tag"](),
-                icon: "checkbox-outline",
+                title: strings.select(),
+                icon: "check-square",
                 onPress: () => {
                   const store = useSideMenuTagsSelectionStore;
                   store.setState({
@@ -230,26 +230,37 @@ export const SideMenuTags = () => {
   const onPressAddTag = React.useCallback(() => {
     presentDialog({
       title: strings.addTag(),
-      // paragraph: strings.addTagDesc(),
-      input: true,
-      inputLabel: "Enter title",
-      inputPlaceholder: "eg. journal",
-      positiveText: strings.add(),
-      positivePress: async (tag) => {
-        if (tag) {
-          await db.tags.add({
-            title: tag
-          });
-          useTagStore.getState().refresh();
-          return true;
+      form: {
+        formRef: createFormRef({
+          title: ""
+        }),
+        items: [
+          {
+            label: strings.enterTitle(),
+            name: "title",
+            placeholder: "eg. journal",
+            ref: React.createRef(),
+            validators: [validators.required(strings.allFieldsRequired())],
+            inputProps: {
+              autoCapitalize: "none"
+            }
+          }
+        ],
+        onFormSubmit: async (form) => {
+          try {
+            if (!form.validate()) return false;
+            await db.tags.add({
+              title: form.getValue("title").trim()
+            });
+            useTagStore.getState().refresh();
+            return true;
+          } catch (e) {
+            form.setError("title", (e as Error).message);
+            return false;
+          }
         }
-        ToastManager.show({
-          context: "local",
-          type: "error",
-          message: strings.allFieldsRequired()
-        });
-        return false;
-      }
+      },
+      positiveText: strings.add()
     });
   }, []);
 

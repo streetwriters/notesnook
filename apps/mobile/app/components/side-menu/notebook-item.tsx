@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { StoreApi, UseBoundStore } from "zustand";
 import { useTotalNotes } from "../../hooks/use-db-item";
 import {
@@ -38,6 +38,7 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { Radius, Spacing } from "../../common/design/spacing";
 import Heading from "../ui/typography/heading";
 import { AddNotebookSheet } from "../sheets/add-notebook";
+import { strings } from "@notesnook/intl";
 
 export const NotebookItem = ({
   index,
@@ -53,7 +54,10 @@ export const NotebookItem = ({
   onLongPress,
   onAddNotebook,
   canDisableSelectionMode,
-  disableExpand
+  disableExpand,
+  hideNoteCount,
+  style,
+  subNotebookButtonStyle
 }: {
   index: number;
   item: TreeItem;
@@ -69,6 +73,9 @@ export const NotebookItem = ({
   onAddNotebook?: () => void;
   canDisableSelectionMode?: boolean;
   disableExpand?: boolean;
+  hideNoteCount?: boolean;
+  style?: ViewStyle;
+  subNotebookButtonStyle?: ViewStyle;
 }) => {
   const notebook = item.notebook;
   const isFocused = focused;
@@ -96,207 +103,222 @@ export const NotebookItem = ({
   }, [item.notebook.id, notebook.id, onItemUpdate]);
 
   const itemPadding =
-    item.depth === 0 ? undefined : item.depth < 6 ? 15 * item.depth : 15 * 5;
+    item.depth === 0
+      ? undefined
+      : item.depth < 6
+        ? Spacing.LEVEL_2 * item.depth
+        : Spacing.LEVEL_2 * 5;
 
   return (
     <View
       style={{
         paddingLeft: itemPadding,
         width: "100%",
-        opacity: item.disabled ? 0.5 : 1,
-        paddingBottom: Spacing.LEVEL_0
+        opacity: item.disabled ? 0.5 : 1
       }}
     >
-      {item.depth > 0 ? (
-        <View
-          style={{
-            height: "100%",
-            width: 1,
-            backgroundColor: colors.primary.border,
-            top: 0,
-            bottom: 0,
-            position: "absolute",
-            left: itemPadding
-          }}
-        />
-      ) : null}
-      <Pressable
-        type={isFocused || selected ? "selected" : "transparent"}
-        onLongPress={onLongPress}
-        testID={`notebook-item-${item.depth}-${index}`}
-        onPress={async () => {
-          if (selectionEnabled) {
-            const state = selectionStore.getState();
-
-            if (selected) {
-              state.markAs(item.notebook, "deselected");
-              return;
-            }
-
-            if (!state.multiSelect) {
-              const keys = Object.keys(state.selection);
-              const nextState: any = {};
-              for (const key in keys) {
-                nextState[key] = !state.initialState[key]
-                  ? undefined
-                  : "deselected";
-              }
-
-              state.setSelection({
-                [item.notebook.id]: "selected",
-                ...nextState
-              });
-            } else {
-              state.markAs(item.notebook, "selected");
-            }
-
-            if (
-              selectionStore.getState().getSelectedItemIds().length === 0 &&
-              canDisableSelectionMode
-            ) {
-              selectionStore.setState({
-                enabled: false
-              });
-            }
-          } else {
-            onPress?.();
-          }
-        }}
+      <View
         style={{
-          justifyContent: "space-between",
-          width: "100%",
-          alignItems: "center",
-          flexDirection: "row",
-          borderRadius: Radius.XS,
-          paddingVertical: Spacing.LEVEL_1,
-          paddingHorizontal: Spacing.LEVEL_1,
-          marginBottom:
-            expanded && item.hasChildren ? Spacing.LEVEL_0 : undefined
+          flexDirection: "row"
         }}
       >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: Spacing.LEVEL_1
-          }}
-        >
-          {item.depth === 0 ? (
-            <AppIcon
-              size={AppFontSize.md}
-              color={
-                selected || isFocused
-                  ? colors.selected.icon
-                  : colors.primary.icon
+        {item.depth > 0 ? (
+          <View
+            style={{
+              height: "100%",
+              width: 1,
+              backgroundColor: colors.primary.border,
+              marginRight: Spacing.LEVEL_1
+            }}
+          />
+        ) : null}
+        <Pressable
+          type={isFocused || selected ? "selected" : "transparent"}
+          onLongPress={onLongPress}
+          testID={`notebook-item-${item.depth}-${index}`}
+          onPress={async () => {
+            if (selectionEnabled) {
+              const state = selectionStore.getState();
+
+              if (selected) {
+                state.markAs(item.notebook, "deselected");
+                return;
               }
-              testID={item.hasChildren ? `expand-notebook-${index}` : ""}
-              style={{
-                borderRadius: defaultBorderRadius
-              }}
-              iconFamily="notesnook"
-              name={"bookmark"}
-            />
-          ) : null}
 
-          <Paragraph
-            color={
-              isFocused ? colors.selected.paragraph : colors.secondary.heading
+              if (!state.multiSelect) {
+                const keys = Object.keys(state.selection);
+                const nextState: any = {};
+                for (const key in keys) {
+                  nextState[key] = !state.initialState[key]
+                    ? undefined
+                    : "deselected";
+                }
+
+                state.setSelection({
+                  [item.notebook.id]: "selected",
+                  ...nextState
+                });
+              } else {
+                state.markAs(item.notebook, "selected");
+              }
+
+              if (
+                selectionStore.getState().getSelectedItemIds().length === 0 &&
+                canDisableSelectionMode
+              ) {
+                selectionStore.setState({
+                  enabled: false
+                });
+              }
+            } else {
+              onPress?.();
             }
-            size={AppFontSize.sm}
-          >
-            {notebook?.title}
-          </Paragraph>
-        </View>
-
-        <View
+          }}
           style={{
-            gap: Spacing.LEVEL_1,
-            flexDirection: "row",
+            justifyContent: "space-between",
+            flexShrink: 1,
             alignItems: "center",
-            justifyContent: "center"
+            flexDirection: "row",
+            borderRadius: Radius.XS,
+            paddingVertical: Spacing.LEVEL_1,
+            paddingHorizontal: Spacing.LEVEL_1,
+            marginBottom:
+              expanded && item.hasChildren ? Spacing.LEVEL_0 : undefined,
+            ...style
           }}
         >
-          {selectionEnabled ? (
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: Spacing.LEVEL_1
+            }}
+          >
+            {item.depth === 0 ? (
               <AppIcon
-                name={selected ? "checkbox" : "box-empty"}
-                iconFamily="notesnook"
                 size={AppFontSize.md}
                 color={
-                  selected
-                    ? [colors.selected.accent, colors.selected.accentForeground]
+                  selected || isFocused
+                    ? colors.selected.icon
                     : colors.primary.icon
                 }
+                testID={item.hasChildren ? `expand-notebook-${index}` : ""}
+                style={{
+                  borderRadius: defaultBorderRadius
+                }}
+                iconFamily="notesnook"
+                name={"bookmark"}
               />
-            </View>
-          ) : (
-            <>
-              <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
-                {totalNotes?.(notebook?.id) || 0}
-              </Paragraph>
-            </>
-          )}
+            ) : null}
 
-          {onAddNotebook ? (
-            <IconButton
-              name="plus"
-              size={AppFontSize.md}
-              testID={`add-notebook-${index}`}
-              color={colors.primary.icon}
-              top={0}
-              left={0}
-              bottom={0}
-              right={40}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: defaultBorderRadius
-              }}
-              onPress={() => {
-                onAddNotebook();
-              }}
-            />
-          ) : null}
-
-          {item.hasChildren ? (
-            <IconButton
-              size={12}
+            <Paragraph
               color={
-                selected || isFocused
-                  ? colors.selected.icon
-                  : colors.primary.icon
+                isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
-              testID={item.hasChildren ? `expand-notebook-${index}` : ""}
-              onPress={() => {
-                if (item.hasChildren && !disableExpand) {
-                  onToggleExpanded?.();
+              size={AppFontSize.sm}
+            >
+              {notebook?.title}
+            </Paragraph>
+          </View>
+
+          <View
+            style={{
+              gap: Spacing.LEVEL_1,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            {selectionEnabled ? (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <AppIcon
+                  name={selected ? "checkbox" : "box-empty"}
+                  iconFamily="notesnook"
+                  size={AppFontSize.md}
+                  color={
+                    selected
+                      ? [
+                          colors.selected.accent,
+                          colors.selected.accentForeground
+                        ]
+                      : colors.primary.icon
+                  }
+                />
+              </View>
+            ) : (
+              <>
+                {item.hasChildren || hideNoteCount ? null : (
+                  <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+                    {totalNotes?.(notebook?.id) || 0}
+                  </Paragraph>
+                )}
+              </>
+            )}
+
+            {onAddNotebook ? (
+              <IconButton
+                name="plus"
+                iconFamily="notesnook"
+                size={AppFontSize.md}
+                testID={`add-notebook-${index}`}
+                color={colors.primary.icon}
+                top={0}
+                left={0}
+                bottom={0}
+                right={40}
+                style={{
+                  width: undefined,
+                  height: undefined,
+                  borderRadius: defaultBorderRadius
+                }}
+                onPress={() => {
+                  onAddNotebook();
+                }}
+              />
+            ) : null}
+
+            {item.hasChildren ? (
+              <IconButton
+                size={12}
+                color={
+                  selected || isFocused
+                    ? colors.selected.icon
+                    : colors.primary.icon
                 }
-              }}
-              top={0}
-              left={20}
-              bottom={0}
-              right={20}
-              style={{
-                borderRadius: defaultBorderRadius,
-                width: undefined,
-                height: undefined
-              }}
-              iconFamily="notesnook"
-              name={expanded ? "chevron-up" : "chevron-down"}
-            />
-          ) : null}
-        </View>
-      </Pressable>
+                testID={item.hasChildren ? `expand-notebook-${index}` : ""}
+                onPress={() => {
+                  if (item.hasChildren && !disableExpand) {
+                    onToggleExpanded?.();
+                  }
+                }}
+                top={0}
+                bottom={0}
+                right={0}
+                left={0}
+                style={{
+                  borderRadius: defaultBorderRadius,
+                  width: undefined,
+                  height: undefined
+                }}
+                iconFamily="notesnook"
+                name={expanded ? "chevron-up" : "chevron-down"}
+              />
+            ) : null}
+          </View>
+        </Pressable>
+      </View>
+
       {expanded && item.hasChildren && !selectionEnabled ? (
         <View
           style={{
             width: "100%",
-            paddingLeft: (item.depth + 1) * 15
+            flexDirection: "row",
+            paddingLeft: (item.depth + 1) * Spacing.LEVEL_2
           }}
         >
           <View
@@ -304,22 +326,18 @@ export const NotebookItem = ({
               height: "100%",
               width: 1,
               backgroundColor: colors.primary.border,
-              top: 0,
-              bottom: 0,
-              position: "absolute",
-              left: (item.depth + 1) * 15
+              marginRight: Spacing.LEVEL_1
             }}
           />
           <Pressable
             style={{
-              // borderLeftWidth: 1,
-              // borderLeftColor: colors.primary.border,
               flexDirection: "row",
               gap: Spacing.LEVEL_1,
               justifyContent: "flex-start",
               paddingVertical: Spacing.LEVEL_1,
               paddingHorizontal: Spacing.LEVEL_1,
-              alignItems: "center"
+              alignItems: "center",
+              ...subNotebookButtonStyle
             }}
             onPress={() => {
               AddNotebookSheet.present(undefined, item.notebook);
@@ -333,8 +351,8 @@ export const NotebookItem = ({
               }}
               iconFamily="notesnook"
             />
-            <Heading fontSize="SM">Create sub-notebook</Heading>
-          </Pressable>{" "}
+            <Heading fontSize="SM">{strings.createSubnotebook()}</Heading>
+          </Pressable>
         </View>
       ) : null}
     </View>
