@@ -172,6 +172,10 @@ export const deleteItems = async (
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
       paragraph: strings.actionConfirmations.delete.tag(2),
+      icon: "warning-circle",
+      centered: true,
+      iconFamily: "notesnook",
+      iconType: "error",
       positivePress: async () => {
         await db.tags.remove(...itemIds);
         useTagStore.getState().refresh();
