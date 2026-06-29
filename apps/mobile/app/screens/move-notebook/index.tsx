@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { isFeatureAvailable } from "@notesnook/common";
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
@@ -24,9 +25,11 @@ import { Text, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { presentDialog } from "../../components/dialog/functions";
 import { Header } from "../../components/header";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
+import PaywallSheet from "../../components/sheets/paywall";
 import { NotebookItem } from "../../components/side-menu/notebook-item";
 import {
   useSideMenuNotebookExpandedStore,
@@ -34,6 +37,9 @@ import {
 } from "../../components/side-menu/stores";
 import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   createNotebookTreeStores,
@@ -43,20 +49,13 @@ import {
   useNotebooks,
   useNotebookStore
 } from "../../stores/use-notebook-store";
+import { eUpdateNotebookRoute } from "../../utils/events";
 import {
   checkParentSelected,
   findRootNotebookId,
   getAllNotebookChildren,
   getParentNotebookId
 } from "../../utils/notebooks";
-import { DefaultAppStyles } from "../../utils/styles";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
-import { eUpdateNotebookRoute } from "../../utils/events";
-import { isFeatureAvailable } from "@notesnook/common";
-import PaywallSheet from "../../components/sheets/paywall";
-import { Radius, Spacing } from "../../common/design/spacing";
-import LineSeparator from "../../components/ui/seperator/line-separator";
 
 const {
   useNotebookExpandedStore,
