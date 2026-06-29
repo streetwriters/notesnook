@@ -491,7 +491,7 @@ export const useActions = ({
     actions.push({
       id: "rename-tag",
       title: strings.rename(),
-      icon: "square-edit-outline",
+      icon: "mode-edit",
       onPress: renameTag
     });
   }
@@ -500,7 +500,7 @@ export const useActions = ({
     actions.push({
       id: "rename-color",
       title: strings.rename(),
-      icon: "square-edit-outline",
+      icon: "mode-edit",
       onPress: renameColor
     });
   }
@@ -547,7 +547,7 @@ export const useActions = ({
       {
         id: "delete",
         title: strings.delete(),
-        icon: "delete",
+        icon: "trash-alt",
         onPress: deleteTrashItem
       }
     );
@@ -560,7 +560,7 @@ export const useActions = ({
         title: isPinnedToMenu
           ? strings.removeShortcut()
           : strings.addShortcut(),
-        icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
+        icon: "arrow-square-out",
         onPress: createMenuShortcut,
         isToggle: true,
         checked: isPinnedToMenu,
@@ -573,7 +573,7 @@ export const useActions = ({
             ? strings.removeAsDefault()
             : strings.setAsDefault(),
         hidden: item.type !== "tag",
-        icon: "pound",
+        icon: "check",
         onPress: async () => {
           if (defaultTag === item.id) {
             await db.settings.setDefaultTag(undefined);
@@ -608,7 +608,7 @@ export const useActions = ({
       {
         id: "add-notebook",
         title: strings.addNotebook(),
-        icon: "plus",
+        icon: "bookmark",
         onPress: async () => {
           if (features && !features.notebooks.isAllowed) {
             ToastManager.show({
@@ -629,16 +629,16 @@ export const useActions = ({
         },
         locked: !features?.notebooks.isAllowed
       },
-      {
-        id: "edit-notebook",
-        title: strings.editNotebook(),
-        icon: "square-edit-outline",
-        onPress: async () => {
-          close();
-          await sleep(300);
-          AddNotebookSheet.present(item);
-        }
-      },
+      // {
+      //   id: "edit-notebook",
+      //   title: strings.editNotebook(),
+      //   icon: "square-edit-outline",
+      //   onPress: async () => {
+      //     close();
+      //     await sleep(300);
+      //     AddNotebookSheet.present(item);
+      //   }
+      // },
       {
         id: "default-notebook",
         title:
@@ -646,7 +646,7 @@ export const useActions = ({
             ? strings.removeAsDefault()
             : strings.setAsDefault(),
         hidden: item.type !== "notebook",
-        icon: "notebook",
+        icon: "check",
         onPress: async () => {
           if (defaultNotebook === item.id) {
             await db.settings.setDefaultNotebook(undefined);
@@ -681,7 +681,7 @@ export const useActions = ({
         id: "move-notes",
         title: strings.addNotes(),
         hidden: item.type !== "notebook",
-        icon: "text",
+        icon: "file-text",
         onPress: () => {
           close();
           Navigation.navigate("MoveNotes", {
@@ -692,7 +692,7 @@ export const useActions = ({
       {
         id: "move-notebook",
         title: strings.moveNotebookFix(),
-        icon: "arrow-right-bold-box-outline",
+        icon: "drive-file-move",
         onPress: () => {
           close();
           Navigation.navigate("MoveNotebook", {
@@ -707,7 +707,7 @@ export const useActions = ({
     actions.push({
       id: "pin",
       title: item.pinned ? strings.unpin() : strings.pin(),
-      icon: item.pinned ? "pin-off-outline" : "pin-outline",
+      icon: "pin",
       onPress: pinItem,
       isToggle: true,
       checked: item.pinned,
@@ -723,7 +723,7 @@ export const useActions = ({
     actions.push({
       id: "default-homepage",
       title: isHomepage ? strings.unsetAsHomepage() : strings.setAsHomepage(),
-      icon: "home-outline",
+      icon: "house",
       isToggle: true,
       checked: isHomepage,
       onPress: async () => {
@@ -1017,7 +1017,7 @@ export const useActions = ({
       {
         id: "favorite",
         title: !item.favorite ? strings.favorite() : strings.unfavorite(),
-        icon: item.favorite ? "star-off" : "star-outline",
+        icon: "star",
         onPress: addToFavorites,
         isToggle: true,
         checked: item.favorite,
@@ -1056,19 +1056,19 @@ export const useActions = ({
       {
         id: "attachments",
         title: strings.attachedFiles(),
-        icon: "attachment",
+        icon: "paperclip",
         onPress: showAttachments
       },
       {
         id: "history",
         title: strings.history(),
-        icon: "history",
+        icon: "clock-counter-clockwise",
         onPress: openHistory
       },
       {
         id: "reminders",
         title: strings.dataTypesPluralCamelCase.reminder(),
-        icon: "clock-outline",
+        icon: "clock",
         onPress: async () => {
           close();
           RelationsList.present({
@@ -1098,40 +1098,40 @@ export const useActions = ({
       {
         id: "copy",
         title: strings.copy(),
-        icon: "content-copy",
+        icon: "copy",
         onPress: copyContent
       },
       {
         id: "share",
         title: strings.share(),
-        icon: "share-variant",
+        icon: "share",
         onPress: shareNote
       },
       {
         id: "read-only",
         title: strings.readOnly(),
-        icon: "pencil-lock",
+        icon: "pencil-simple-slash",
         onPress: toggleReadyOnlyMode,
         checked: item.readonly
       },
       {
         id: "local-only",
         title: strings.syncOff(),
-        icon: "sync-off",
+        icon: "sync-disabled",
         onPress: toggleLocalOnly,
         checked: item.localOnly
       },
       {
         id: "duplicate",
         title: strings.duplicate(),
-        icon: "content-duplicate",
+        icon: "duplicate",
         onPress: duplicateNote
       },
 
       {
         id: "add-reminder",
         title: strings.remindMe(),
-        icon: "clock-plus-outline",
+        icon: "bell",
         onPress: async () => {
           close();
           await sleep(100);
@@ -1141,7 +1141,7 @@ export const useActions = ({
       {
         id: "lock-unlock",
         title: locked ? strings.unlock() : strings.lock(),
-        icon: locked ? "lock-open-outline" : "key-outline",
+        icon: "lock",
         onPress: addToVault,
         checked: locked
       },
@@ -1166,16 +1166,16 @@ export const useActions = ({
         icon: "book-outline",
         onPress: addTo
       },
-      {
-        id: "add-tag",
-        title: strings.addTags(),
-        icon: "pound",
-        onPress: addTo
-      },
+      // {
+      //   id: "add-tag",
+      //   title: strings.addTags(),
+      //   icon: "pound",
+      //   onPress: addTo
+      // },
       {
         id: "references",
         title: strings.references(),
-        icon: "vector-link",
+        icon: "link-alt",
         onPress: () => {
           ReferencesList.present({
             reference: item as ItemReference
@@ -1276,7 +1276,7 @@ export const useActions = ({
         item.type !== "notebook" && item.type !== "note"
           ? strings.doActions.delete.unknown(item.type, 1)
           : strings.moveToTrash(),
-      icon: "delete-outline",
+      icon: "trash-alt",
       type: "error",
       onPress: deleteItem,
       locked: isPublished
@@ -1293,7 +1293,7 @@ export const useActions = ({
     actions.push({
       id: "launcher-shortcut",
       title: strings.addToHome(),
-      icon: "cellphone-arrow-down",
+      icon: "home",
       locked: !features?.androidLauncherShortcuts.isAllowed,
       onPress: async () => {
         if (features && !features?.androidLauncherShortcuts.isAllowed) {

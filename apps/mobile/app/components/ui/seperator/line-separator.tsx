@@ -18,21 +18,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React from "react";
-import { View } from "react-native";
+import { DimensionValue, View, ViewStyle } from "react-native";
 import { useThemeColors } from "@notesnook/theme";
-import { Spacing } from "../../../common/design/spacing";
 
-const LineSeparator = ({ padding }: { padding: keyof typeof Spacing }) => {
+const LineSeparator = ({
+  style,
+  paddingHorizontal,
+  paddingVertical,
+  stroke = 1
+}: {
+  style?: ViewStyle;
+  paddingHorizontal?: DimensionValue;
+  paddingVertical?: DimensionValue;
+  stroke?: number;
+}) => {
   const { colors } = useThemeColors();
   return (
     <View
-      style={{
-        width: "100%",
-        height: 1,
-        backgroundColor: colors.primary.border
-        // marginVertical: Spacing[padding]
-      }}
-    />
+      style={[
+        style,
+        {
+          paddingHorizontal,
+          paddingVertical
+        }
+      ]}
+    >
+      <View
+        style={{
+          width: "100%",
+          height: stroke,
+          backgroundColor: colors.primary.separator
+        }}
+      />
+    </View>
   );
 };
 

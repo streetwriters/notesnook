@@ -80,6 +80,7 @@ export const SearchResult = (props: SearchResultProps) => {
         }}
         onLongPress={async () => {
           const note = await db.notes.note(props.item.id);
+          if (!note) return;
           Properties.present(note);
         }}
         onPress={async () => openNote()}
@@ -152,6 +153,7 @@ export const SearchResult = (props: SearchResultProps) => {
             }}
             onLongPress={async () => {
               const note = await db.notes.note(props.item.id);
+              if (!note) return;
               Properties.present(note);
             }}
             onPress={() => {

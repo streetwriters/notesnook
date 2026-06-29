@@ -50,6 +50,7 @@ import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../sheets/paywall";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { Spacing } from "../../common/design/spacing";
+import { createFormRef, validators } from "../ui/input/form-input";
 
 /**
  * Simple Tab View Implementation for the Side bar
@@ -441,25 +442,34 @@ const TabBar = (props: SimpleTabBarProps) => {
                             }
                             presentDialog({
                               title: strings.addTag(),
-                              inputLabel: "Enter title",
-                              inputPlaceholder: "eg. journal",
-                              input: true,
-                              positiveText: strings.add(),
-                              positivePress: async (tag) => {
-                                if (tag) {
-                                  await db.tags.add({
-                                    title: tag
-                                  });
-                                  useTagStore.getState().refresh();
-                                  return true;
+                              form: {
+                                formRef: createFormRef({
+                                  title: ""
+                                }),
+                                items: [
+                                  {
+                                    label: strings.enterTitle(),
+                                    name: "title",
+                                    placeholder: "eg. journal",
+                                    ref: React.createRef(),
+                                    validators: [validators.required(strings.allFieldsRequired())]
+                                  }
+                                ],
+                                onFormSubmit: async (form) => {
+                                  try {
+                                    if (!form.validate()) return false;
+                                    await db.tags.add({
+                                      title: form.getValue("title").trim()
+                                    });
+                                    useTagStore.getState().refresh();
+                                    return true;
+                                  } catch (e) {
+                                    form.setError("title", (e as Error).message);
+                                    return false;
+                                  }
                                 }
-                                ToastManager.show({
-                                  context: "local",
-                                  type: "error",
-                                  message: strings.allFieldsRequired()
-                                });
-                                return false;
-                              }
+                              },
+                              positiveText: strings.add()
                             });
                           }
                         }}

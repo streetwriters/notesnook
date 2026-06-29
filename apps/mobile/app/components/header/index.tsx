@@ -107,7 +107,6 @@ export const Header = ({
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        marginBottom: Spacing.LEVEL_3,
         marginTop: Platform.OS === "android" ? 5 : 0
       }}
     >

@@ -24,7 +24,6 @@ import { AppFontSize } from "../../utils/size";
 import Paragraph from "../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { db } from "../../common/database";
 import { Item, Note } from "@notesnook/core";
@@ -60,7 +59,11 @@ export const DateMeta = ({ item }: { item: Item }) => {
           alignItems: "center"
         }}
       >
-        <View>
+        <View
+          style={{
+            gap: Spacing.LEVEL_0
+          }}
+        >
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {strings.dateDescFromKey(
               key as
@@ -73,7 +76,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
           </Paragraph>
           <Paragraph
             size={AppFontSize.xs}
-            color={colors.primary.paragraph}
+            color={colors.primary.heading}
             fontFamily="MEDIUM"
             onPress={
               item.type !== "note"
@@ -127,9 +130,6 @@ export const DateMeta = ({ item }: { item: Item }) => {
 
       <View
         style={{
-          borderTopWidth: 1,
-          borderColor: colors.primary.border,
-          paddingVertical: Spacing.LEVEL_2,
           flexDirection: "row",
           gap: Spacing.LEVEL_2
         }}
