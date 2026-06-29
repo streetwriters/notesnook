@@ -80,13 +80,13 @@ export const TabBarButton = ({
         backgroundColor: "transparent",
         borderWidth: 0
       }}
-      type={"plain"}
+      type={"plain"} 
     >
       <Animated.View
         style={[
           {
             backgroundColor: isActive ? colors.primary.shade : undefined,
-            borderRadius: Radius.XXS,
+            borderRadius: Radius.XS,
             padding: Spacing.LEVEL_1
           },
           animatedIconStyle
@@ -95,7 +95,7 @@ export const TabBarButton = ({
         <AppIcon
           name={icon}
           iconFamily="notesnook"
-          color={isActive ? colors.primary.icon : colors.secondary.icon}
+          color={isActive ? colors.selected.icon : colors.secondary.icon}
           size={16}
         />
       </Animated.View>

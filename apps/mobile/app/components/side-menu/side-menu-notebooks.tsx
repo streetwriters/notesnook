@@ -29,7 +29,6 @@ import { TreeItem } from "../../stores/create-notebook-tree-stores";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebooks } from "../../stores/use-notebook-store";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import { Properties } from "../properties";
 import { NotebookItem } from "./notebook-item";
 import { SideMenuHeader } from "./side-menu-header";
@@ -291,8 +290,8 @@ const NotebookItemWrapper = React.memo(
             Properties.present(item.notebook, false, [
               {
                 id: "select",
-                title: strings.select() + " " + strings.dataTypes["notebook"](),
-                icon: "checkbox-outline",
+                title: strings.select(),
+                icon: "check-square",
                 onPress: () => {
                   const store = useSideMenuNotebookSelectionStore;
                   store.setState({

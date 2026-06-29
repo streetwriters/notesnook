@@ -105,7 +105,6 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
             <Button
               title={props.placeholderButtonTitle}
               onPress={props.onPressPlaceholderButton}
-              fontSize={AppFontSize.sm}
               style={{
                 marginTop: Spacing.LEVEL_2,
                 paddingVertical: Spacing.LEVEL_3,
