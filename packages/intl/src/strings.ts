@@ -2796,5 +2796,6 @@ Continue without attachments?`,
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
     t`The password for decrypting the Colornote backup file.`,
-  deleteItem: () => t`Delete item`
+  deleteItem: () => t`Delete item`,
+  createNewReminder: () => t`Create a new reminder`
 };

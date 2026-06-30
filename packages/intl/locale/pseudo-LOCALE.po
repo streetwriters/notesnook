@@ -1996,6 +1996,10 @@ msgstr ""
 msgid "Create a new note"
 msgstr ""
 
+#: src/strings.ts:2800
+msgid "Create a new reminder"
+msgstr ""
+
 #: src/strings.ts:953
 msgid "Create a note first"
 msgstr ""

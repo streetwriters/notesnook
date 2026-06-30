@@ -2007,6 +2007,10 @@ msgstr "Create a group"
 msgid "Create a new note"
 msgstr "Create a new note"
 
+#: src/strings.ts:2800
+msgid "Create a new reminder"
+msgstr "Create a new reminder"
+
 #: src/strings.ts:953
 msgid "Create a note first"
 msgstr "Create a note first"

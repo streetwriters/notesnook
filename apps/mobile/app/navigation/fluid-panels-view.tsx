@@ -72,6 +72,7 @@ const MOBILE_SIDEBAR_SIZE = 0.85;
 
 let SideMenu: any = null;
 let EditorWrapper: any = null;
+let AddReminder: any = null;
 
 export const FluidPanelsView = React.memo(
   () => {
@@ -130,6 +131,16 @@ export const FluidPanelsView = React.memo(
             () => fluidTabsRef.current?.goToPage("editor", false),
             300
           );
+        }
+
+        if (item?.type === "notesnook.action.newreminder") {
+          AddReminder =
+            AddReminder || require("../screens/add-reminder").default;
+          if (!fluidTabsRef.current) {
+            setTimeout(() => AddReminder.present(), 1000);
+            return;
+          }
+          AddReminder.present();
         }
       }
     });
