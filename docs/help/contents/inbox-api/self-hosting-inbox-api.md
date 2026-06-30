@@ -3,10 +3,6 @@ title: Self-Hosting Inbox API
 description: Learn about self-hosting Notesnook's Inbox API.
 ---
 
-> warn Beta feature
->
-> Inbox API is still in beta so expect things to change and/or break. If you find any issues, kindly open an issue on our [GitHub repo](https://github.com/streetwriters/notesnook).
-
 # Self-Hosting Inbox API
 
 If you prefer not to send data through Notesnook's hosted inbox instance, you have two options:
