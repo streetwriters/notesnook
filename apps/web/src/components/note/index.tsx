@@ -495,6 +495,7 @@ export const noteMenuItems: (
                     "text/html": `<a href="${url}">${note.title}</a>`,
                     "text/markdown": `[${note.title}](${url})`
                   });
+                  showToast("success", strings.linkCopied());
                 }
               },
               {
@@ -593,6 +594,7 @@ export const noteMenuItems: (
           "text/html": `<a href="${link}">${note.title}</a>`,
           "text/markdown": `[${note.title}](${link})`
         });
+        showToast("success", strings.linkCopied());
       }
     },
     {
