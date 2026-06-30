@@ -589,7 +589,7 @@ export function Editor(props: EditorProps) {
             const attachment = await db.attachments.attachment(hash);
             if (!attachment)
               throw new Error("No attachment found with hash: " + hash);
-            if (attachment.mimeType.startsWith("image/")) {
+            if (attachment.mimeType.startsWith("image/") || type === "image") {
               await previewImageAttachment(attachment);
             } else if (
               onPreviewDocument &&
@@ -633,7 +633,7 @@ export function Editor(props: EditorProps) {
           await insertAttachments(mime, (attachments) => {
             const editor = useEditorManager.getState().getEditor(id)?.editor;
             if (!editor) return;
-            attachments.forEach((a) => editor?.attachFile(a));
+            editor?.attachFiles(...attachments);
           });
         }}
         onGetAttachmentData={async (attachment) => {
@@ -662,7 +662,7 @@ export function Editor(props: EditorProps) {
             onDone: (attachments) => {
               const editor = useEditorManager.getState().getEditor(id)?.editor;
               if (!editor) return;
-              attachments.forEach((a) => editor?.attachFile(a));
+              editor?.attachFiles(...attachments);
             }
           });
         }}
@@ -825,7 +825,7 @@ function DropZone(props: DropZoneProps) {
                 .getState()
                 .getEditor(activeEditorId)?.editor;
               if (!editor) return;
-              attachments.forEach((a) => editor?.attachFile(a));
+              editor?.attachFiles(...attachments);
             }
           });
         } catch (e) {

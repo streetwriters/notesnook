@@ -17,18 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export class FileWithURI extends File {
-  uri: string;
-  constructor(
-    fileBits: BlobPart[],
-    fileName: string,
-    options?: FilePropertyBag
-  ) {
-    super(fileBits, fileName, options);
-    this.uri = URL.createObjectURL(this);
-  }
-}
-
 type DeriveDimension = (naturalWidth: number, naturalHeight: number) => number;
 
 interface CompressorOptions {
@@ -84,7 +72,7 @@ export function compressImage(file: File, options: Partial<CompressorOptions>) {
         naturalHeight: image.naturalHeight,
         naturalWidth: image.naturalWidth
       });
-      resolve(compressed);
+      resolve(compressed.size > file.size ? file : compressed);
       URL.revokeObjectURL(image.src);
     };
     image.onabort = () => {

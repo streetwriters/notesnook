@@ -265,8 +265,7 @@ function PublishView(props: PublishViewProps) {
             sx={{
               m: 0,
               bg: selfDestruct ? "accent" : "icon-secondary",
-              flexShrink: 0,
-              scale: 0.75
+              flexShrink: 0
             }}
             checked={selfDestruct}
             onClick={(e) => e.stopPropagation()}

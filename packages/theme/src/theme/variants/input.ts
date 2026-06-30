@@ -95,6 +95,18 @@ const radio: ThemeUIStyleObject = {
 };
 
 export const inputVariants = {
+  switch: {
+    width: 34,
+    height: 18,
+    "& > div": {
+      width: 14,
+      height: 14
+    },
+    p: "2px !important",
+    "input:checked ~ & > div": {
+      transform: "translateX(115%)"
+    }
+  },
   input: defaultVariant,
   borderless,
   error,

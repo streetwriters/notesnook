@@ -103,7 +103,7 @@ export async function writeEncryptedFile(
             total: file.size,
             loaded: done ? file.size : totalRead
           },
-          { type: "encrypt", hash }
+          { type: "encrypt", hash, file }
         )
       )
     )
@@ -470,11 +470,12 @@ export async function checkUpload(
 
 function reportProgress(
   ev: { total?: number; loaded?: number } | undefined,
-  { type, hash }: { type: string; hash: string }
+  { type, hash, file }: { type: string; hash: string; file?: File }
 ) {
   AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
     type,
     hash,
+    file,
     total: ev?.total || 1,
     loaded: ev?.loaded || 1
   });

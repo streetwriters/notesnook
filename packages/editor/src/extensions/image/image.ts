@@ -31,7 +31,6 @@ import { createNodeView } from "../react/index.js";
 import { TextDirections } from "../text-direction/index.js";
 import { ImageComponent } from "./component.js";
 import { tiptapKeys } from "@notesnook/common";
-import { hasPermission } from "../../types.js";
 import { toBlob } from "../../utils/downloader.js";
 
 export interface ImageOptions {
@@ -55,7 +54,7 @@ declare module "@tiptap/core" {
       /**
        * Add an image
        */
-      insertImage: (options: Partial<ImageAttributes>) => ReturnType;
+      insertImage: (...options: Partial<ImageAttributes>[]) => ReturnType;
       setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
       setImageSize: (size: ImageSize) => ReturnType;
     };
@@ -161,25 +160,9 @@ export const ImageNode = Node.create<ImageOptions>({
   addCommands() {
     return {
       insertImage:
-        (options) =>
-        ({ commands, state }) => {
-          if (!hasPermission("insertAttachment")) {
-            return false;
-          }
-
-          const { $from } = state.selection;
-          const maybeImageNode = state.doc.nodeAt($from.pos);
-          if (maybeImageNode?.type === this.type) {
-            return commands.insertContentAt($from.pos + 1, {
-              type: this.name,
-              attrs: options
-            });
-          }
-
-          return commands.insertContent({
-            type: this.name,
-            attrs: options
-          });
+        (...images) =>
+        ({ commands }) => {
+          return commands.insertAttachment(...(images as ImageAttachment[]));
         },
       setImageAlignment:
         (options) =>
