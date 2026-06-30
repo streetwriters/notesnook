@@ -363,7 +363,7 @@ jobs:
     name: Build for Windows
     needs: build
     if: inputs.build-windows
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Check out Git repository
