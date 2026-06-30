@@ -702,7 +702,8 @@ const VALID_SORT_OPTIONS: Record<
   settings: [],
   shortcuts: [],
   vaults: [],
-  monographs: []
+  monographs: [],
+  inboxitemshistory: []
 };
 
 function sanitizeSortOptions(type: keyof DatabaseSchema, options: SortOptions) {

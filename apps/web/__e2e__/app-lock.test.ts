@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { AppModel } from "./models/app.model";
-import { test, expect, APP_LOCK_PASSWORD, USER } from "./utils";
+import { APP_LOCK_PASSWORD, USER } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("don't show status bar lock app button to unauthenticated user", async ({
   page

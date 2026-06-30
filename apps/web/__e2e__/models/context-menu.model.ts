@@ -17,14 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Page, Locator } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 import { getTestId } from "../utils";
+import { iterateList } from "./utils";
 
 export class ContextMenuModel {
   readonly menuContainer: Locator;
   readonly titleText: Locator;
   constructor(private readonly page: Page) {
-    this.menuContainer = this.page.locator(getTestId(`menu-container`));
+    this.menuContainer = this.page.locator(`[role="menu"]`);
     this.titleText = this.page.locator(getTestId(`menu-title`));
   }
 
@@ -39,6 +40,18 @@ export class ContextMenuModel {
   ) {
     await locator.click({ button });
     await this.menuContainer.waitFor();
+  }
+
+  getItemByText(query: string) {
+    // for await (const item of iterateList(
+    //   this.menuContainer.getByRole("menuitem")
+    // )) {
+    //   const text = await item.textContent();
+    //   if (query === text?.trim()) return item;
+    // }
+    return this.menuContainer.locator(`[role="menuitem"]`, {
+      hasText: new RegExp(`^${query}$`, "i")
+    });
   }
 
   async clickOnItem(id: string) {

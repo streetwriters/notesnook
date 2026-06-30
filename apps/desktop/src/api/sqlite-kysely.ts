@@ -19,6 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { Database, Statement } from "better-sqlite3-multiple-ciphers";
 import type { QueryResult } from "@streetwriters/kysely";
+import { app } from "electron";
+import path from "node:path";
+import { initTRPC } from "@trpc/server";
 
 type SQLiteCompatibleType =
   | number
@@ -28,25 +31,32 @@ type SQLiteCompatibleType =
   | bigint
   | null;
 
-export class SQLite {
+class SQLite {
   sqlite?: Database;
   initialized = false;
   preparedStatements: Map<string, Statement<unknown[]>> = new Map();
   retryCounter: Record<string, number> = {};
   extensionsLoaded = false;
+  private filePath?: string;
 
   constructor() {
     console.log("new sqlite worker");
   }
 
-  async open(filePath: string) {
+  async open(filename: string) {
     if (this.sqlite) {
       console.error("Database is already initialized");
       return;
     }
 
+    this.filePath =
+      filename === ":memory:"
+        ? filename
+        : path.join(app.getPath("userData"), filename) + ".sql";
+    if (!isPathAllowed(this.filePath))
+      throw new Error("Database path is not allowed: " + this.filePath);
     this.sqlite = require("better-sqlite3-multiple-ciphers")(
-      filePath
+      this.filePath
     ).unsafeMode(true);
   }
 
@@ -155,9 +165,11 @@ export class SQLite {
     this.sqlite = undefined;
   }
 
-  async delete(filePath: string) {
+  async delete() {
+    if (!this.filePath) return;
+
     await this.close();
-    await require("fs/promises").rm(filePath, {
+    await require("node:fs/promises").rm(this.filePath, {
       force: true,
       maxRetries: 5,
       retryDelay: 500
@@ -221,3 +233,67 @@ function rewriteError(e: Error, message: string) {
   error.cause = e.cause;
   return error;
 }
+
+function isPathAllowed(databasePath: string) {
+  if (databasePath === ":memory:") return true;
+  const base = app.getPath("userData");
+  const resolved = path.resolve(databasePath);
+  return resolved.startsWith(base + path.sep);
+}
+
+const t = initTRPC.create();
+
+const databases: Record<string, SQLite> = {};
+
+export const sqliteRouter = t.router({
+  open: t.procedure
+    .input((v) => v)
+    .mutation(async ({ input }) => {
+      const { filePath } = input as { filePath: string };
+      if (databases[filePath]) return filePath;
+      const sqlite = new SQLite();
+      await sqlite.open(filePath);
+      databases[filePath] = sqlite;
+      return filePath;
+    }),
+  run: t.procedure
+    .input((v) => v)
+    .mutation(async ({ input }) => {
+      const { id, sql, parameters } = input as {
+        id: string;
+        sql: string;
+        parameters?: SQLiteCompatibleType[];
+      };
+      const sqlite = databases[id];
+      if (!sqlite) throw new Error("Database not found for id: " + id);
+      return await sqlite.run(sql, parameters);
+    }),
+  close: t.procedure
+    .input((v) => v)
+    .mutation(async ({ input }) => {
+      const { id } = input as { id: string };
+      const sqlite = databases[id];
+      if (!sqlite) throw new Error("Database not found for id: " + id);
+      await sqlite.close();
+      delete databases[id];
+    }),
+  delete: t.procedure
+    .input((v) => v)
+    .mutation(async ({ input }) => {
+      const { id } = input as { id: string };
+      const sqlite = databases[id];
+      if (!sqlite) throw new Error("Database not found for id: " + id);
+      await sqlite.delete();
+      delete databases[id];
+    })
+});
+
+app.on("before-quit", async () => {
+  for (const db of Object.values(databases)) {
+    try {
+      await db.close();
+    } catch (e) {
+      console.error("Error closing database:", e);
+    }
+  }
+});

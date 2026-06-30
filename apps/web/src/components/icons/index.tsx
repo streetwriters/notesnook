@@ -229,6 +229,7 @@ import {
   mdiArrowUp,
   mdiInbox,
   mdiConsoleLine,
+  mdiSpellcheck,
   mdiDeleteSweepOutline,
   mdiCloseCircle
 } from "@mdi/js";
@@ -586,5 +587,6 @@ export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
 export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
+export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
 export const CloseCircle = createIcon(mdiCloseCircle);

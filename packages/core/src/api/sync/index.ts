@@ -237,16 +237,16 @@ export class Sync {
     await this.checkConnection();
 
     try {
-      await this.connection?.invoke("RequestFetchV3", deviceId);
+      await this.connection?.invoke("RequestFetchV4", deviceId);
     } catch (error) {
       if (
         error instanceof Error &&
         error.message.includes("HubException: Method does not exist")
       ) {
         this.logger.warn(
-          "RequestFetchV3 failed, falling back to RequestFetchV2"
+          "RequestFetchV4 failed, falling back to RequestFetchV3"
         );
-        await this.connection?.invoke("RequestFetchV2", deviceId);
+        await this.connection?.invoke("RequestFetchV3", deviceId);
       } else throw error;
     }
 
@@ -274,20 +274,34 @@ export class Sync {
     await this.uploadAttachments();
 
     let done = 0;
+    let total = 0;
     for await (const item of this.collector.collect(100, isForceSync)) {
+      total += item.items.length;
       const result = await this.pushItem(deviceId, item);
+      this.logger.info(`Batch sent for type ${item.type}`, {
+        result,
+        length: item.items.length,
+        type: item.type
+      });
       if (result) {
         done += item.items.length;
         sendSyncProgressEvent(this.db.eventManager, "upload", done);
-
-        this.logger.info(`Batch sent (${done})`);
       } else {
         this.logger.error(
           new Error(`Failed to send batch. Server returned falsy response.`)
         );
       }
     }
-    if (done > 0) await this.connection?.send("PushCompletedV2", deviceId);
+    this.logger.info(
+      `Sync send completed. Sent ${done} out of ${total} items.`,
+      { done, total }
+    );
+    if (done !== total)
+      throw new Error(
+        `Failed to send all items. Sent ${done} out of ${total}.`
+      );
+    if (total === 0) return false;
+    await this.connection?.send("PushCompletedV2", deviceId);
     return true;
   }
 
@@ -451,6 +465,9 @@ export class Sync {
             chunkSize: item.chunkSize
           });
 
+    this.logger.debug(`Merged ${items.length} items for type ${itemType}`, {
+      ids: items.map((i) => i?.id)
+    });
     await collection.put(items as any);
   }
 
@@ -531,6 +548,12 @@ export class Sync {
         this.db.eventManager.publish(EVENTS.userSessionExpired);
         return false;
       }
+      this.logger.info(
+        `Received chunk for type ${chunk.type} with ${chunk.items.length} items.`,
+        {
+          ids: chunk.items.map((i: any) => i.id)
+        }
+      );
       await this.processChunk(chunk, keys, options);
 
       sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
@@ -538,15 +561,18 @@ export class Sync {
       return true;
     });
 
-    this.connection.on("SendMonographs", async (monographs) => {
+    this.connection.on("SendMonographs", async (monographs: Monograph[]) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
-      this.db.monographsCollection.collection.put(
-        monographs.map((m: Monograph) => ({
+      const ids = monographs.map((m) => m.id);
+      await this.db.monographsCollection.collection.put(
+        monographs.map((m) => ({
           ...m,
           type: "monograph"
         }))
       );
+      await this.db.monographs.refresh().catch(this.logger.error);
+      this.db.eventManager.publish(EVENTS.monographsUpdated, ids);
 
       return true;
     });

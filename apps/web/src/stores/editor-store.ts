@@ -240,7 +240,7 @@ class EditorStore extends BaseStore<EditorStore> {
     );
   };
 
-  init = () => {
+  init = async () => {
     useSettingStore.subscribe(
       (s) => s.hideNoteTitle,
       (state) => {
@@ -411,6 +411,8 @@ class EditorStore extends BaseStore<EditorStore> {
                     event.item.dateCreated ?? session.note.dateCreated;
                   session.note.dateEdited =
                     event.item.dateEdited ?? session.note.dateEdited;
+                  session.note.spellcheck =
+                    event.item.spellcheck ?? session.note.spellcheck;
                 });
               }
             }
@@ -534,11 +536,11 @@ class EditorStore extends BaseStore<EditorStore> {
     if (activeTabId) {
       const tab = this.get().tabs.find((t) => t.id === activeTabId);
       if (!tab) return;
-      rehydrateSession(tab.sessionId);
+      await rehydrateSession(tab.sessionId);
     } else newSession();
   };
 
-  private rehydrateSession = (sessionId: string) => {
+  private rehydrateSession = async (sessionId: string) => {
     const { openSession, openDiffSession, getSession, activateSession } =
       this.get();
 
@@ -550,9 +552,9 @@ class EditorStore extends BaseStore<EditorStore> {
     if (!session || !session.needsHydration) return;
 
     if (session.type === "diff")
-      openDiffSession(session.note.id, session.historySessionId);
+      return openDiffSession(session.note.id, session.historySessionId);
     else
-      openSession(session.note.id, {
+      return openSession(session.note.id, {
         force: true
       });
   };
@@ -1333,6 +1335,20 @@ class EditorStore extends BaseStore<EditorStore> {
 
     sessionId = sessionId || tab?.sessionId;
     if (sessionId) this.rehydrateSession(sessionId);
+  };
+
+  refreshSessionWithNoteIds = (noteIds: string[]) => {
+    this.set((state) => {
+      state.sessions = state.sessions.map((session) => {
+        if ("note" in session && noteIds.includes(session.note.id)) {
+          return {
+            ...session,
+            nonce: (session.nonce || 0) + 1
+          };
+        }
+        return session;
+      });
+    });
   };
 }
 

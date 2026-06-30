@@ -40,7 +40,7 @@ setTimeout(() => {
       globalThis.logger("info", ...arguments);
     };
   }
-}, 100);
+}, 1000);
 let appLoaded = false;
 function loadApp() {
   if (appLoaded) return;

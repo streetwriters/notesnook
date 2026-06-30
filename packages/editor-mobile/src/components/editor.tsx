@@ -166,6 +166,11 @@ const Tiptap = ({
           attachment
         ) as Promise<string | undefined>;
       },
+      getLinkData: (url: string) => {
+        return postAsyncWithTimeout(EditorEvents.getLinkData, {
+          url: url
+        });
+      },
       createInternalLink(attributes) {
         return postAsyncWithTimeout(EditorEvents.createInternalLink, {
           attributes
@@ -463,6 +468,7 @@ const Tiptap = ({
           flexDirection: "column",
           maxWidth: "100vw"
         }}
+        spellCheck={!tab.session?.spellCheckDisabled}
         ref={editorRoot}
         onDoubleClick={onClickEmptyArea}
       >

@@ -427,6 +427,6 @@ async function switchReleaseTrack(track: string) {
   if (!registration) return;
   await registration.unregister();
   for (const key of await caches.keys()) await caches.delete(key);
-  document.cookie = `release-track=${track}; Secure; Path=/`;
+  document.cookie = `release-track=${track}; Secure; Path=/; max-age=2147483647`;
   window.location.reload();
 }

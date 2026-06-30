@@ -2002,6 +2002,34 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - react-native-fast-openpgp (2.9.3):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - react-native-fingerprint-scanner (5.0.1):
     - React-Core
   - react-native-get-random-values (1.11.0):
@@ -3554,6 +3582,7 @@ DEPENDENCIES:
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
+  - react-native-fast-openpgp (from `../node_modules/react-native-fast-openpgp`)
   - "react-native-fingerprint-scanner (from `../node_modules/@ammarahmed/react-native-fingerprint-scanner`)"
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-gzip (from `../node_modules/react-native-gzip`)
@@ -3754,6 +3783,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-date-picker"
   react-native-document-picker:
     :path: "../node_modules/@react-native-documents/picker"
+  react-native-fast-openpgp:
+    :path: "../node_modules/react-native-fast-openpgp"
   react-native-fingerprint-scanner:
     :path: "../node_modules/@ammarahmed/react-native-fingerprint-scanner"
   react-native-get-random-values:
@@ -3976,6 +4007,7 @@ SPEC CHECKSUMS:
   react-native-config: 963b5efabc864cf69412e54b5de49b6a23e4af03
   react-native-date-picker: 4f4f40f6e65798038bb4b1bff47890c2be69c2e6
   react-native-document-picker: d624d3d9bd9311da87f6f7b64aa44f69927d8543
+  react-native-fast-openpgp: 42a99ddfafbd132457cb7964062431fbaf666484
   react-native-fingerprint-scanner: d5e143a361f3f01858e9c45141ddcabc4fd57055
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-gzip: 794e0e964a0d9e1dfd1773fee938adb4d4310e26

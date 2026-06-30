@@ -1,0 +1,11 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ESNext"],
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@nn/test": ["./electron-test/index.ts"]
+    }
+  }
+}

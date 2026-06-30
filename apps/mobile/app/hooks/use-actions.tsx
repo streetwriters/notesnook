@@ -112,6 +112,7 @@ export type ActionId =
   | "attachments"
   | "history"
   | "copy-link"
+  | "copy-id"
   | "reminders"
   | "lock-unlock"
   | "publish"
@@ -126,7 +127,8 @@ export type ActionId =
   | "default-homepage"
   | "default-tag"
   | "launcher-shortcut"
-  | "expiry-date";
+  | "expiry-date"
+  | "spell-check";
 
 export type Action = {
   id: ActionId;
@@ -1020,6 +1022,28 @@ export const useActions = ({
         activeColor: "orange"
       },
       {
+        id: "spell-check",
+        title: strings.spellCheck(),
+        icon: "spellcheck",
+        isToggle: true,
+        checked: item.spellcheck,
+        onPress: async () => {
+          db.notes.spellcheck(!item.spellcheck, item.id);
+          const note = await db.notes.note(item.id);
+          if (note) {
+            setItem(note);
+            const tabs = useTabStore.getState().getTabsForNote(note.id);
+            tabs.forEach((tab) => {
+              useTabStore.getState().updateTab(tab.id, {
+                session: {
+                  spellCheckDisabled: !note.spellcheck
+                }
+              });
+            });
+          }
+        }
+      },
+      {
         id: "remove-from-notebook",
         title: strings.removeFromNotebook(),
         hidden: noteInCurrentNotebook,
@@ -1037,20 +1061,6 @@ export const useActions = ({
         title: strings.history(),
         icon: "history",
         onPress: openHistory
-      },
-      {
-        id: "copy-link",
-        title: strings.copyLink(),
-        icon: "link",
-        onPress: () => {
-          Clipboard.setString(createInternalLink("note", item.id));
-          ToastManager.show({
-            heading: strings.linkCopied(),
-            message: createInternalLink("note", item.id),
-            context: "local",
-            type: "success"
-          });
-        }
       },
       {
         id: "reminders",
@@ -1307,6 +1317,46 @@ export const useActions = ({
           /**
           empty */
         }
+      }
+    });
+  }
+
+  if (
+    item.type === "tag" ||
+    item.type === "note" ||
+    item.type === "notebook" ||
+    item.type === "color"
+  ) {
+    actions.push({
+      id: "copy-link",
+      title: strings.copyLink(),
+      icon: "link",
+      onPress: () => {
+        const link = createInternalLink(item.type, item.id);
+        Clipboard.setHTML(`<a href="${link}" >${item.title}</a>`, link);
+        ToastManager.show({
+          heading: strings.linkCopied(),
+          message: link,
+          context: "local",
+          type: "success"
+        });
+      }
+    });
+  }
+
+  if (item.type === "notebook" || item.type === "tag") {
+    actions.push({
+      id: "copy-id",
+      title: strings.copyId(),
+      icon: "identifier",
+      onPress: () => {
+        Clipboard.setString(item.id);
+        ToastManager.show({
+          heading: strings.idCopied(),
+          message: item.id,
+          context: "local",
+          type: "success"
+        });
       }
     });
   }

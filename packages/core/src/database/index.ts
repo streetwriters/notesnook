@@ -42,6 +42,7 @@ import {
   Color,
   ContentItem,
   HistorySession,
+  InboxItemHistory,
   ItemReference,
   ItemReferences,
   ItemType,
@@ -92,6 +93,7 @@ export interface DatabaseSchema {
   shortcuts: SQLiteItem<Shortcut>;
   vaults: SQLiteItem<Vault>;
   monographs: SQLiteItem<Monograph>;
+  inboxitemshistory: SQLiteItem<InboxItemHistory>;
 }
 
 export type RawDatabaseSchema = DatabaseSchema & {
@@ -236,7 +238,8 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "synced",
   "isGeneratedTitle",
   "archived",
-  "selfDestruct"
+  "selfDestruct",
+  "spellcheck"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {

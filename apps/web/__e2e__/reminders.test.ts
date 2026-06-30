@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Reminder } from "@notesnook/core";
 import { AppModel } from "./models/app.model";
-import { test, expect, getTestId } from "./utils";
+import { getTestId } from "./utils";
+import { test, expect } from "@nn/test";
 
 const ONE_TIME_REMINDER: Partial<Reminder> = {
   title: "Test reminder 1",
@@ -41,7 +42,7 @@ test("add a one-time reminder", async ({ page }, info) => {
   expect(reminder).toBeDefined();
 
   page.on("dialog", (dialog) => dialog.accept());
-  await page.waitForEvent("dialog");
+  await page.waitForEvent("dialog", { timeout: 0 });
 });
 
 test("adding a one-time reminder before current time should not be possible", async ({

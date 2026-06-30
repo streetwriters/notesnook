@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hosts, Note } from "@notesnook/core";
+import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -61,9 +61,14 @@ async function fetchMonographData(noteId: string) {
   const monograph = monographId
     ? await db.monographs.get(monographId)
     : undefined;
+
+  const metadata = monographId
+    ? await db.monographs.metadata(monographId)
+    : { publishUrl: "", analytics: { totalViews: 0 } };
   return {
     monograph,
-    monographId
+    monographId,
+    metadata
   };
 }
 
@@ -82,11 +87,23 @@ const PublishNoteSheet = ({
   const [publishing, setPublishing] = useState(false);
   const pwdInput = useRef<TextInput>(null);
   const titleInput = useRef<TextInput>(null);
-  const monographData = useAsync(async () => {
-    return fetchMonographData(note?.id);
-  }, []);
+  const lastMonographDataResult = useRef<Awaited<
+    ReturnType<typeof db.monographs.metadata>
+  > | null>(null);
+  const monographData = useAsync(
+    async () => {
+      return fetchMonographData(note?.id);
+    },
+    [],
+    {
+      onSuccess: (r) => {
+        lastMonographDataResult.current = r.metadata;
+      }
+    }
+  );
   const monograph = monographData.result?.monograph;
-  const publishUrl = monograph && `${hosts.MONOGRAPH_HOST}/${monograph?.id}`;
+  const metadata = monographData.result?.metadata;
+  const publishUrl = metadata?.publishUrl || monograph?.publishUrl || "";
   const isPublished = db.monographs.monograph(note?.id);
   const appState = useAppState();
   const previousAppState = useRef(appState);
@@ -180,19 +197,8 @@ const PublishNoteSheet = ({
     setPublishLoading(false);
   };
 
-  const lastAnalyticsResult = useRef<Awaited<
-    ReturnType<typeof db.monographs.analytics>
-  > | null>(null);
-
-  const analytics = useAsync(async () => {
-    if (!isFeatureAvailable?.isAllowed || !monograph?.id || selfDestruct)
-      return null;
-    const result = await db.monographs.analytics(monograph.id);
-    if (result) lastAnalyticsResult.current = result;
-    return result;
-  }, [monograph?.id, isFeatureAvailable?.isAllowed, selfDestruct]);
-
-  const analyticsData = analytics.result ?? lastAnalyticsResult.current;
+  const monographMetadata =
+    monographData.result?.metadata ?? lastMonographDataResult.current;
 
   useEffect(() => {
     const prevState = previousAppState.current;
@@ -201,13 +207,18 @@ const PublishNoteSheet = ({
     if (
       appState === "active" &&
       prevState !== "active" &&
-      isFeatureAvailable?.isAllowed &&
       monograph?.id &&
       !selfDestruct
     ) {
-      analytics.execute();
+      monographData.execute();
     }
-  }, [appState, monograph?.id, selfDestruct, isFeatureAvailable?.isAllowed]);
+  }, [
+    appState,
+    monograph?.id,
+    selfDestruct,
+    isFeatureAvailable?.isAllowed,
+    monographData
+  ]);
 
   return (
     <View
@@ -420,8 +431,8 @@ const PublishNoteSheet = ({
 
           {isFeatureAvailable?.isAllowed &&
           !selfDestruct &&
-          analyticsData &&
-          analyticsData?.totalViews > 0 ? (
+          monographMetadata &&
+          monographMetadata?.analytics?.totalViews > 0 ? (
             <View
               style={{
                 flexDirection: "row",
@@ -445,9 +456,8 @@ const PublishNoteSheet = ({
                   }}
                 >
                   <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
-
-                  <Paragraph size={AppFontSize.sm}>
-                    {analyticsData?.totalViews}
+                  <Paragraph>
+                    {monographMetadata?.analytics?.totalViews || 0}
                   </Paragraph>
                 </View>
               </View>

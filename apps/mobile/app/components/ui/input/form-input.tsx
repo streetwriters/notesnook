@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useMemo, useState } from "react";
 import {
   ColorValue,
@@ -29,12 +30,11 @@ import {
 } from "react-native";
 import isEmail from "validator/lib/isEmail";
 import isURL from "validator/lib/isURL";
-import { useThemeColors } from "@notesnook/theme";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
+import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
+import AppIcon from "../AppIcon";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
-import AppIcon from "../AppIcon";
 
 export type FormValues = Record<string, string>;
 export type FormErrors = Partial<Record<string, string>>;
@@ -58,16 +58,22 @@ export interface FormRef {
   validateField: (name: string) => string | undefined;
   validate: () => boolean;
   subscribe: (listener: () => void) => () => void;
+  subscribeChange: (listener: () => void) => () => void;
 }
 
 export function createFormRef(initialValues: FormValues = {}): FormRef {
   const listeners = new Set<() => void>();
+  const changeListeners = new Set<() => void>();
   const values: FormValues = { ...initialValues };
   const errors: FormErrors = {};
   const schema: ValidationSchema = {};
 
   const notify = () => {
     listeners.forEach((listener) => listener());
+  };
+
+  const notifyChange = () => {
+    changeListeners.forEach((listener) => listener());
   };
 
   return {
@@ -79,6 +85,7 @@ export function createFormRef(initialValues: FormValues = {}): FormRef {
         delete errors[name];
         notify();
       }
+      notifyChange();
     },
     getValue(name) {
       return values[name] ?? "";
@@ -100,6 +107,7 @@ export function createFormRef(initialValues: FormValues = {}): FormRef {
     clearErrors() {
       Object.keys(errors).forEach((key) => delete errors[key]);
       notify();
+      notifyChange();
     },
     registerField(name, validators = []) {
       schema[name] = validators;
@@ -138,6 +146,12 @@ export function createFormRef(initialValues: FormValues = {}): FormRef {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
+      };
+    },
+    subscribeChange(listener) {
+      changeListeners.add(listener);
+      return () => {
+        changeListeners.delete(listener);
       };
     }
   };

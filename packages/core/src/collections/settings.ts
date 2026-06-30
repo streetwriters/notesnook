@@ -64,6 +64,7 @@ const defaultSettings: SettingItemMap = {
   defaultTag: undefined,
   trashCleanupInterval: 7,
   profile: undefined,
+  "vault:lockAfter": 1000 * 60 * 30,
 
   "groupOptions:notes:notebooks": {},
   "groupOptions:notes:tags": {},
@@ -279,5 +280,13 @@ export class Settings implements ICollection {
   setProfile(partial: Partial<Profile> | undefined) {
     const profile = !partial ? undefined : { ...this.getProfile(), ...partial };
     return this.set("profile", profile);
+  }
+
+  getVaultLockAfter() {
+    return this.get("vault:lockAfter");
+  }
+
+  setVaultLockAfter(ms: number) {
+    return this.set("vault:lockAfter", ms);
   }
 }

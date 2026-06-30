@@ -25,7 +25,9 @@ import {
   SYNC_CHECK_IDS,
   SubscriptionPlan,
   SyncStatusEvent,
-  User
+  User,
+  isInternalLink,
+  parseInternalLink
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
@@ -165,6 +167,8 @@ const onAppOpenedFromURL = async (event: {
 }) => {
   const url = event.url;
 
+  const parsedLink = isInternalLink(url) ? parseInternalLink(url) : undefined;
+
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
@@ -173,8 +177,12 @@ const onAppOpenedFromURL = async (event: {
       eSendEvent(eOnLoadNote, { newNote: true });
       fluidTabsRef.current?.goToPage("editor", false);
       return;
-    } else if (url.startsWith("https://app.notesnook.com/open_note?")) {
-      const id = new URL(url).searchParams.get("id");
+    } else if (
+      parsedLink?.type === "note" ||
+      url.startsWith("https://app.notesnook.com/open_note?")
+    ) {
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
+
       if (id) {
         const note = await db.notes.note(id);
         if (note) {
@@ -186,13 +194,15 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      url.startsWith("https://app.notesnook.com/open_notebook?") &&
+      (parsedLink?.type === "notebook" ||
+        url.startsWith("https://app.notesnook.com/open_notebook?")) &&
       !event.isInitialUrl
     ) {
-      const id = new URL(url).searchParams.get("id");
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
       if (id) {
         const notebook = await db.notebooks.notebook(id);
         if (notebook) {
+          fluidTabsRef.current?.goToPage("home");
           Navigation.navigate("Notebook", {
             id: notebook.id,
             canGoBack: true,
@@ -201,13 +211,15 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      url.startsWith("https://app.notesnook.com/open_tag?") &&
+      (parsedLink?.type === "tag" ||
+        url.startsWith("https://app.notesnook.com/open_tag?")) &&
       !event.isInitialUrl
     ) {
-      const id = new URL(url).searchParams.get("id");
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
       if (id) {
         const tag = await db.tags.tag(id);
         if (tag) {
+          fluidTabsRef.current?.goToPage("home");
           Navigation.navigate("TaggedNotes", {
             type: "tag",
             id: tag.id,
@@ -217,13 +229,15 @@ const onAppOpenedFromURL = async (event: {
         }
       }
     } else if (
-      url.startsWith("https://app.notesnook.com/open_color?") &&
+      (parsedLink?.type === "color" ||
+        url.startsWith("https://app.notesnook.com/open_color?")) &&
       !event.isInitialUrl
     ) {
-      const id = new URL(url).searchParams.get("id");
+      const id = parsedLink?.id || new URL(url).searchParams.get("id");
       if (id) {
         const color = await db.colors.color(id);
         if (color) {
+          fluidTabsRef.current?.goToPage("home");
           Navigation.navigate("ColoredNotes", {
             type: "color",
             id: color.id,
@@ -714,6 +728,10 @@ export const useAppEvents = () => {
   useEffect(() => {
     const subscriptions = [
       db.eventManager.subscribe(EVENTS.syncCheckStatus, onCheckSyncStatus),
+      db.eventManager.subscribe(EVENTS.userFetched, async () => {
+        const inboxEnabled = await db.user.hasInboxKeys();
+        useSettingStore.getState().setInboxEnabled(inboxEnabled);
+      }),
       db.eventManager.subscribe(EVENTS.syncAborted, onSyncAborted),
       db.eventManager.subscribe(EVENTS.appRefreshRequested, onSyncComplete),
       db.eventManager.subscribe(EVENTS.userLoggedOut, onLogout),
@@ -747,6 +765,26 @@ export const useAppEvents = () => {
       }),
       db.eventManager.subscribe(EVENTS.uploadCanceled, (data) => {
         useAttachmentStore.getState().setUploading(data);
+      }),
+      db.eventManager.subscribeMulti(
+        [EVENTS.vaultAutoLocked, EVENTS.vaultLocked],
+        () => {
+          setTimeout(() => {
+            ToastManager.show({
+              message: strings.vaultLocked(),
+              type: "info"
+            });
+          }, 300);
+        },
+        undefined
+      ),
+      db.eventManager.subscribe(EVENTS.vaultUnlocked, () => {
+        setTimeout(() => {
+          ToastManager.show({
+            message: strings.vaultUnlocked(),
+            type: "info"
+          });
+        }, 300);
       }),
       EV.subscribe(EVENTS.migrationStarted, (name) => {
         if (
@@ -802,7 +840,13 @@ export const useAppEvents = () => {
 
     return () => {
       emitterSubscriptions.forEach((sub) => sub?.remove?.());
-      subscriptions.forEach((sub) => sub?.unsubscribe?.());
+      subscriptions.forEach((sub) => {
+        if (Array.isArray(sub)) {
+          sub.forEach((s) => s.unsubscribe());
+        } else {
+          sub?.unsubscribe?.();
+        }
+      });
     };
   }, [onSyncComplete, onUserUpdated]);
 

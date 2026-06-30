@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { AppModel } from "./models/app.model";
-import { test, expect, NOTE } from "./utils";
+import { NOTE } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("ask for image compression during image upload when 'Image Compression' setting is 'Ask every time'", async ({
   page
@@ -36,7 +37,7 @@ test("ask for image compression during image upload when 'Image Compression' set
   await notes.createNote(NOTE);
   await notes.editor.attachImage();
 
-  await expect(page.getByText("Enable compression")).toBeVisible();
+  await expect(page.getByText("Image Compression")).toBeVisible();
 });
 
 test("do not ask for image compression during image upload when 'Image Compression' setting is 'Enable (Recommended)'", async ({

@@ -17,16 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const InternalLinkTypes = ["note"] as const;
-type InternalLinkType = (typeof InternalLinkTypes)[number];
-export type InternalLink<T extends InternalLinkType = InternalLinkType> = {
+const InternalLinkTypes = ["note", "notebook", "tag", "color"] as const;
+export type InternalLinkType = (typeof InternalLinkTypes)[number];
+export type NoteLink = BaseInternalLink<"note">;
+export type NotebookLink = BaseInternalLink<"notebook">;
+export type TagLink = BaseInternalLink<"tag">;
+export type ColorLink = BaseInternalLink<"color">;
+type BaseInternalLink<
+  T extends InternalLinkType = InternalLinkType,
+  TParams extends InternalLinkParams[T] = InternalLinkParams[T]
+> = {
   type: T;
   id: string;
-  params?: Partial<InternalLinkParams[T]>;
+  params?: Partial<TParams>;
 };
+export type InternalLink = NoteLink | NotebookLink | TagLink | ColorLink;
 export type InternalLinkWithOffset<
   T extends InternalLinkType = InternalLinkType
-> = InternalLink<T> & {
+> = BaseInternalLink<T> & {
   start: number;
   end: number;
   text: string;
@@ -34,6 +42,9 @@ export type InternalLinkWithOffset<
 
 type InternalLinkParams = {
   note: { blockId: string };
+  notebook: {};
+  tag: {};
+  color: {};
 };
 export function createInternalLink<T extends InternalLinkType>(
   type: T,
@@ -71,7 +82,11 @@ export function parseInternalLink(link: string): InternalLink | undefined {
 }
 
 export function isInternalLink(link: string) {
-  return link && link.startsWith("nn://");
+  return link ? link.startsWith("nn://") : false;
+}
+
+export function isNoteLink(link: string) {
+  return link ? link.startsWith("nn://note/") : false;
 }
 
 function isValidInternalType(type: string): type is InternalLinkType {

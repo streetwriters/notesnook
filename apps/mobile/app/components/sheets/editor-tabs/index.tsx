@@ -33,11 +33,11 @@ import { editorController } from "../../../screens/editor/tiptap/utils";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import { eUnlockNote } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
+import { DefaultAppStyles } from "../../../utils/styles";
 import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { DefaultAppStyles } from "../../../utils/styles";
 
 const TabItemComponent = (props: {
   tab: TabItem;
@@ -225,14 +225,24 @@ export default function EditorTabs({
         }}
       >
         <Heading size={AppFontSize.lg}>{strings.tabs()}</Heading>
-        <IconButton
-          onPress={() => {
-            useTabStore.getState().newTab();
-            close?.();
-          }}
-          name="plus"
-          color={colors.primary.accent}
-        />
+        <View style={{ flexDirection: "row", gap: DefaultAppStyles.GAP_SMALL }}>
+          <IconButton
+            onPress={() => {
+              useTabStore.getState().clearAllTabs();
+              close?.();
+            }}
+            name="close-box-multiple-outline"
+            color={colors.primary.icon}
+          />
+          <IconButton
+            onPress={() => {
+              useTabStore.getState().newTab();
+              close?.();
+            }}
+            name="plus"
+            color={colors.primary.accent}
+          />
+        </View>
       </View>
 
       <FlatList

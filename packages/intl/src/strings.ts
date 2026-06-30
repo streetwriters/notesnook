@@ -909,6 +909,8 @@ $day$: Current day (eg. Monday)`,
   history: () => t`History`,
   copyLink: () => t`Copy link`,
   linkCopied: () => t`Link copied`,
+  copyId: () => t`Copy ID`,
+  idCopied: () => t`ID copied`,
   readOnly: () => t`Read only`,
   syncOff: () => t`Sync off`,
   syncOffConfirm: (count: number) =>
@@ -2651,12 +2653,78 @@ Use this if changes from other devices are not appearing on this device. This wi
   failedToAttachFile: () => t`Failed to attach file`,
   unlockNoteToMergeConflicts: () => t`Unlock note to merge conflicts`,
   confirmationEmailSent: () => t`Confirmation email sent`,
+  inboxAPI: () => t`Inbox API`,
+  inboxAPIDesc: () =>
+    t`Share things to Notesnook from anywhere using the Inbox API`,
+  enableInboxAPI: () => t`Enable Inbox API`,
+  enableInboxAPIDesc: () => t`Enable/Disable Inbox API`,
+  manageInboxKeys: () => t`Inbox PGP Keys`,
+  manageInboxKeysDesc: () =>
+    t`View and edit your inbox public/private key pair`,
+  disableInboxAPI: () => t`Disable Inbox API`,
+  disableInboxAPIDesc: () =>
+    t`Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?`,
+  addKey: () => t`Add key`,
+  viewAPIKeys: () => t`API Keys`,
+  viewAPIKeysDesc: () => t`View and manage inbox API keys`,
+  createApiKey: () => t`Create API Key`,
+  keyName: () => t`Key name`,
+  exampleKeyName: () => t`e.g., Todo integration`,
+  expiresIn: () => t`Expires in`,
+  enterKeyName: () => t`Please enter a key name`,
+  apiKeyCreatedSuccessfully: () => t`API key created successfully`,
+  failedToCreateApiKey: (message: string) =>
+    t`Failed to create API key${message ? `: ${message}` : ""}`,
+  creating: () => t`Creating...`,
+  expiryOneDay: () => t`1 day`,
+  expiryOneWeek: () => t`1 week`,
+  expiryOneMonth: () => t`1 month`,
+  expiryOneYear: () => t`1 year`,
+  loadingApiKeys: () => t`Loading API keys...`,
+  failedToLoadApiKeys: () => t`Failed to load API keys. Please try again.`,
+  retry: () => t`Retry`,
+  createFirstApiKey: () => t`Create your first api key to get started.`,
+  createKey: () => t`Create Key`,
+  ok: () => t`OK`,
+  apiKeysLimitReached: () => t`API Keys Limit Reached`,
+  apiKeysLimitReachedMessage: () =>
+    t`Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones.`,
+  authenticateToViewApiKey: () => t`Authenticate to view API key`,
+  enterPasswordToViewApiKey: () =>
+    t`Please enter your account password to view this API key.`,
+  authenticate: () => t`Authenticate`,
+  invalidPassword: () => t`Invalid password`,
+  apiKeyCopiedToClipboard: () => t`API key copied to clipboard`,
+  failedToCopyToClipboard: () => t`Failed to copy to clipboard`,
+  revokeInboxApiKey: (name: string) => t`Revoke Inbox API Key - ${name}`,
+  revokeApiKeyConfirmation: (name: string) =>
+    t`Are you sure you want to revoke the key "${name}"? All inbox actions using this key will stop working immediately.`,
+  apiKeyRevoked: () => t`API key revoked`,
+  failedToRevokeApiKey: () => t`Failed to revoke API key`,
+  lastUsedOn: () => t`Last used on`,
+  neverUsed: () => t`Never used`,
+  createdOn: () => t`Created on`,
+  neverExpires: () => t`Never expires`,
+  expired: () => t`Expired`,
+  expiresOn: () => t`Expires on`,
+  changingInboxPgpKeysNotice: () =>
+    t`Changing Inbox PGP keys will delete all your unsynced inbox items.`,
+  publicKey: () => t`Public Key:`,
+  privateKey: () => t`Private Key:`,
+  invalidPgpKeyPair: () =>
+    t`Invalid PGP key pair. Please check your keys and try again.`,
+  inboxKeysSaved: () => t`Inbox keys saved`,
+  lockVaultAfter: () => t`Lock vault after`,
+  lockVaultAfterDesc: () =>
+    `How long should the vault stay unlocked before automatically locking?`,
   back: () => t`Back`,
   invalidRecoveryKey: () =>
     t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`,
   featureNotAvailable: () => t`This feature is not available on this plan.`,
   valueMustBeBetween: (min: number, max: number) =>
     t`Value must be between ${min} and ${max}`,
+  pgpPrivateKeyProtected: () =>
+    t`Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase.`,
   passwordRequired: () => t`Password required`,
   confirmPasswordRequired: () => t`Confirm password required`,
   enterAValidEmailAddress: () => t`Please enter a valid email address`,
@@ -2675,6 +2743,23 @@ Use this if changes from other devices are not appearing on this device. This wi
 Continue without attachments?`,
   pleaseLoginToDownloadAttachments: () =>
     t`Please login to download attachments.`,
+  publicKeyRequired: () => t`Public key required`,
+  privateKeyRequired: () => t`Private key required`,
+  setupInboxPgpKeysDescription: () =>
+    t`Choose how you want to set up your Inbox PGP keys:`,
+  autoGenerateKeys: () => t`Auto-generate keys`,
+  provideOwnKeys: () => t`Provide your own keys`,
+  details: () => t`Details`,
+  dateSynced: () => t`Date synced`,
+  failedInboxItems: () => t`Failed inbox items`,
+  failedInboxItemsDesc: () => t`View failed inbox items and error contexts`,
+  noFailedInboxItems: () => t`No failed inbox items`,
+  show: () => t`Show`,
+  itemDeleted: () => t`Item deleted`,
+  deleteAll: () => t`Delete all`,
+  deleteAllFailedItemsDesc: () =>
+    t`Are you sure you want to delete all failed inbox items?`,
+  allItemsDeleted: () => t`All items deleted`,
   attachingFiles: () => t`Attaching files`,
   closeCountdown: (seconds: number) => t`Close (${seconds})`,
   compressing: () => t`Compressing`,
@@ -2703,5 +2788,13 @@ Continue without attachments?`,
   copyLogs: () => t`Copy logs`,
   permissionRequiredToSaveQRCode: () =>
     t`Permission required to save QR-Code to Gallery`,
-  expiryDateRemoved: () => t`Expiry date removed`
+  setupInboxKeys: () => t`Setup inbox keys`,
+  enterPgpPublicKey: () => t`Enter your PGP public key`,
+  enterPgpPrivateKey: () => t`Enter your PGP private key`,
+  expiryDateRemoved: () => t`Expiry date removed`,
+  colorNotePasswordFor: (filename: string) =>
+    t`Colornote password for ${filename}`,
+  colorNotPasswordForDesc: () =>
+    t`The password for decrypting the Colornote backup file.`,
+  deleteItem: () => t`Delete item`
 };

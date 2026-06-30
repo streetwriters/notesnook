@@ -30,11 +30,11 @@ import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { verifyUser } from "../functions";
 
-interface PickerOptions<T> {
-  getValue: () => T;
+interface PickerOptions<T, B = any> {
+  getValue: () => B;
   updateValue: (item: T) => Promise<void>;
   formatValue: (item: T) => any;
-  compareValue: (current: T, item: T) => boolean;
+  compareValue: (current: B, item: T) => boolean;
   getItemKey: (item: T) => string;
   options: T[];
   isFeatureAvailable: () => Promise<boolean>;
@@ -168,7 +168,7 @@ export function SettingsPicker<T>({
   );
 }
 
-export function createSettingsPicker<T>(props: PickerOptions<T>) {
+export function createSettingsPicker<T, B>(props: PickerOptions<T, B>) {
   const Selector = () => {
     return <SettingsPicker {...props} />;
   };

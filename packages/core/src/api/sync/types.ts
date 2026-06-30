@@ -45,7 +45,8 @@ export const SYNC_COLLECTIONS_MAP = {
   tag: "tags",
   color: "colors",
   note: "notes",
-  vault: "vaults"
+  vault: "vaults",
+  inboxitemhistory: "inboxItemsHistory"
 } as const;
 
 export const SYNC_ITEM_TYPES = Object.keys(
@@ -58,23 +59,9 @@ export type SyncTransferItem = {
   count: number;
 };
 
-export type SyncInboxItem = Omit<SyncItem, "format"> & {
-  key: Omit<Cipher<"base64">, "format" | "salt" | "iv">;
-};
-
-export type ParsedInboxItem = {
-  title: string;
-  pinned?: boolean;
-  favorite?: boolean;
-  readonly?: boolean;
-  archived?: boolean;
-  notebookIds?: string[];
-  tagIds?: string[];
-  type: "note";
-  source: string;
-  version: 1;
-  content?: {
-    type: "html";
-    data: string;
-  };
+export type SyncInboxItem = {
+  id: string;
+  v: number;
+  cipher: string;
+  alg: string;
 };

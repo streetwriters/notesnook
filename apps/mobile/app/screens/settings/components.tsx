@@ -36,9 +36,11 @@ import {
   WeekFormatPicker,
   FontPicker,
   HomePicker,
+  ImageCompressionPicker,
   SidebarTabPicker,
   TimeFormatPicker,
-  TrashIntervalPicker
+  TrashIntervalPicker,
+  VaultLockTimerPicker
 } from "./picker/pickers";
 import { RestoreBackup } from "./restore-backup";
 import { ServersConfiguration } from "./server-config";
@@ -46,6 +48,12 @@ import SoundPicker from "./sound-picker";
 import ThemeSelector from "./theme-selector";
 import { TitleFormat } from "./title-format";
 import { NotesnookCircle } from "./notesnook-circle";
+import {
+  ManageInboxKeys,
+  InboxKeysList,
+  SetupInboxKeys
+} from "./manage-inbox-keys";
+import { FailedInboxItems } from "./failed-inbox-items";
 
 export const components: { [name: string]: ReactElement } = {
   homeselector: <HomePicker />,
@@ -61,8 +69,10 @@ export const components: { [name: string]: ReactElement } = {
   "time-format-selector": <TimeFormatPicker />,
   "day-format-selector": <DayFormatPicker />,
   "week-format-selector": <WeekFormatPicker />,
+  "image-compression-picker": <ImageCompressionPicker />,
   "theme-selector": <ThemeSelector />,
   "applock-timer": <ApplockTimerPicker />,
+  "vault-lock-timer": <VaultLockTimerPicker />,
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
   backuprestore: <RestoreBackup />,
   "server-config": <ServersConfiguration />,
@@ -75,5 +85,9 @@ export const components: { [name: string]: ReactElement } = {
   "sidebar-tab-selector": <SidebarTabPicker />,
   "change-password": <ChangePassword />,
   "change-email": <ChangeEmail />,
-  "notesnook-circle": <NotesnookCircle />
+  "notesnook-circle": <NotesnookCircle />,
+  "manage-inbox-keys": <ManageInboxKeys />,
+  "inbox-keys": <InboxKeysList />,
+  "failed-inbox-items": <FailedInboxItems />,
+  "setup-inbox-keys": <SetupInboxKeys />
 };

@@ -28,24 +28,20 @@ import {
   Driver
 } from "@streetwriters/kysely";
 import { desktop } from "../desktop-bridge";
-import Worker from "./sqlite.worker.desktop.ts?worker";
-import type { SQLiteWorker } from "./sqlite.worker.desktop";
-import { wrap, Remote } from "comlink";
 import { Mutex } from "async-mutex";
 import { DialectOptions } from ".";
 
 class SqliteDriver implements Driver {
   connection?: DatabaseConnection;
   private connectionMutex = new Mutex();
-  worker: Remote<SQLiteWorker> = wrap<SQLiteWorker>(new Worker());
+  private handle?: string;
   constructor(private readonly config: { name: string }) {}
 
   async init(): Promise<void> {
-    const path = await desktop!.integration.resolvePath.query({
-      filePath: `userData/${this.config.name}.sql`
+    this.handle = await desktop!.sqlite.open.mutate({
+      filePath: this.config.name
     });
-    await this.worker.open(path);
-    this.connection = new SqliteWorkerConnection(this.worker);
+    this.connection = new SqliteWorkerConnection(this.handle);
   }
 
   async acquireConnection(): Promise<DatabaseConnection> {
@@ -75,19 +71,18 @@ class SqliteDriver implements Driver {
   }
 
   async destroy(): Promise<void> {
-    await this.worker.close();
+    if (!this.handle) return;
+    await desktop!.sqlite.close.mutate({ id: this.handle });
   }
 
   async delete() {
-    const path = await desktop!.integration.resolvePath.query({
-      filePath: `userData/${this.config.name}.sql`
-    });
-    await this.worker.delete(path);
+    if (!this.handle) return;
+    await desktop!.sqlite.delete.mutate({ id: this.handle });
   }
 }
 
 class SqliteWorkerConnection implements DatabaseConnection {
-  constructor(private readonly worker: Remote<SQLiteWorker>) {}
+  constructor(private readonly handle: string) {}
 
   streamQuery<R>(): AsyncIterableIterator<QueryResult<R>> {
     throw new Error("wasqlite driver doesn't support streaming");
@@ -97,7 +92,11 @@ class SqliteWorkerConnection implements DatabaseConnection {
     compiledQuery: CompiledQuery<unknown>
   ): Promise<QueryResult<R>> {
     const { parameters, sql } = compiledQuery;
-    return this.worker.run(sql, parameters as any) as unknown as QueryResult<R>;
+    return (await desktop!.sqlite.run.mutate({
+      id: this.handle,
+      sql,
+      parameters: parameters as any
+    })) as unknown as QueryResult<R>;
   }
 }
 

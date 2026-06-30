@@ -52,6 +52,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>ShareMedia</string>
+				<string>nn</string>
 			</array>
 		</dict>
 		<dict>

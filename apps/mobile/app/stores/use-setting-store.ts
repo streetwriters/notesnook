@@ -103,6 +103,7 @@ export type Settings = {
   defaultSidebarTab: number;
   checkForUpdates?: boolean;
   defaultLineHeight: number;
+  imageCompression: "ask-every-time" | "enabled" | "disabled";
 };
 
 type DimensionsType = {
@@ -140,10 +141,13 @@ export interface SettingStore {
   dateFormat: string;
   dayFormat: DayFormat;
   weekFormat: WeekFormat;
+  vaultLockAfter: number;
   dbPassword?: string;
   isOldAppLock: () => boolean;
   initialUrl: string | null;
   refresh: () => void;
+  inboxEnabled: boolean;
+  setInboxEnabled: (inboxEnabled: boolean) => void;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -208,7 +212,8 @@ export const defaultSettings: SettingStore["settings"] = {
   fullBackupReminder: "never",
   lastFullBackupDate: 0,
   checkForUpdates: true,
-  defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT
+  defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT,
+  imageCompression: "ask-every-time"
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
@@ -233,6 +238,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   dateFormat: "DD-MM-YYYY",
   dayFormat: "short",
   weekFormat: "Sun",
+  vaultLockAfter: 1000 * 60 * 30,
   setAppDidEnterBackgroundForAction: (value: boolean) => {
     set({
       appDidEnterBackgroundForAction: value
@@ -250,12 +256,16 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     ? initialWindowMetrics.insets
     : { top: 0, right: 0, left: 0, bottom: 0 },
   initialUrl: null,
-  refresh: () => {
+  refresh: async () => {
     set({
       dayFormat: db.settings.getDayFormat(),
       timeFormat: db.settings.getTimeFormat(),
       dateFormat: db.settings?.getTimeFormat(),
-      weekFormat: db.settings.getWeekFormat()
+      weekFormat: db.settings.getWeekFormat(),
+      vaultLockAfter: db.settings.getVaultLockAfter(),
+      inboxEnabled: await db.user.hasInboxKeys()
     });
-  }
+  },
+  inboxEnabled: false,
+  setInboxEnabled: (inboxEnabled) => set({ inboxEnabled })
 }));

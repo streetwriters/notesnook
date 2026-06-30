@@ -142,7 +142,7 @@ export function isContentInvalid(content: string | undefined) {
 
 export async function openInternalLink(url: string) {
   const data = parseInternalLink(url);
-  if (!data?.id) return false;
+  if (!data?.id || data.type !== "note") return false;
   if (
     data.id ===
     useTabStore.getState().getNoteIdForTab(useTabStore.getState().currentTab!)

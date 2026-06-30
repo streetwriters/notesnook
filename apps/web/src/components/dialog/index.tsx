@@ -49,6 +49,7 @@ type DialogProps = SxProp & {
   textAlignment?: "left" | "right" | "center";
   buttonsAlignment?: "start" | "center" | "end";
   title?: string;
+  titleAction?: React.ReactNode;
   description?: string;
   positiveButton?: DialogButtonProps | null;
   negativeButton?: DialogButtonProps | null;
@@ -140,19 +141,30 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
         {props.title || props.description ? (
           <Flex sx={{ flexDirection: "column" }} p={4} pb={0}>
             {props.title && (
-              <Text
-                variant="heading"
-                data-test-id="dialog-title"
+              <Flex
                 sx={{
-                  fontSize: "subheading",
-                  textAlign: props.textAlignment || "left",
-                  color: "paragraph",
-                  overflowWrap: "anywhere",
-                  wordSpacing: "wrap"
+                  alignItems: "center",
+                  justifyContent:
+                    props.textAlignment === "center"
+                      ? "center"
+                      : "space-between"
                 }}
               >
-                {props.title}
-              </Text>
+                <Text
+                  variant="heading"
+                  data-test-id="dialog-title"
+                  sx={{
+                    fontSize: "subheading",
+                    textAlign: props.textAlignment || "left",
+                    color: "paragraph",
+                    overflowWrap: "anywhere",
+                    wordSpacing: "wrap"
+                  }}
+                >
+                  {props.title}
+                </Text>
+                {props.titleAction}
+              </Flex>
             )}
             {props.description && (
               <Text

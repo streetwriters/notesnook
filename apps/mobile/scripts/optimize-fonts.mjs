@@ -35,6 +35,7 @@ const EXTRA_ICON_NAMES = [
   "star-off",
   "star-outline",
   "link-variant-remove",
+  "spellcheck",
   "link-variant",
   "link-variant-off",
   "bell",
@@ -61,6 +62,7 @@ const EXTRA_ICON_NAMES = [
   "checkbox-marked",
   "checkbox-blank-outline",
   "unfold-less-horizontal",
+  "close-box-multiple-outline",
   "minus-circle",
   "vibrate",
   "volume-high",
@@ -122,6 +124,10 @@ const EXTRA_ICON_NAMES = [
   "bomb",
   "bomb-off",
   "cancel",
+  "inbox",
+  "identifier",
+  "image-area",
+  "clock-outline",
   "delete-sweep-outline"
 ];
 

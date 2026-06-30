@@ -19,20 +19,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
 import { LinkPopup } from "../popups/link-popup.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
-import { Flex, Link } from "@theme-ui/components";
+import { Flex, Link, Text } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image/index.js";
 import { Link as LinkNode } from "../../extensions/link/index.js";
 import { getMarkAttributes } from "@tiptap/core";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 import { strings } from "@notesnook/intl";
 import { find } from "linkifyjs";
+import { Icons } from "../icons.js";
+import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
+import { Icon } from "@notesnook/ui";
+import { LinkData } from "../../types.js";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -204,36 +208,62 @@ export function OpenLink(props: ToolProps) {
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  if (!link) return null;
-  const href = link?.attrs.href;
-  if (!href) return null;
+  const href = link?.attrs.href ?? null;
+  const [loading, setLoading] = useState(false);
+  const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
+
+  useEffect(() => {
+    if (!href) return;
+
+    (async () => {
+      try {
+        setLoading(true);
+        const result = await editor.storage.getLinkData?.(href);
+        setLinkData(result);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+      }
+    })();
+  }, [href]);
+
+  if (!link || !href) return null;
+
+  const title = linkData?.title || href;
 
   return (
     <Flex sx={{ alignItems: "center" }}>
-      <Link
-        href={href}
-        onClick={(e) => {
-          e.preventDefault();
-          editor.storage.openLink?.(href);
-          hide();
-        }}
-        target="_blank"
-        variant="body"
-        sx={{
-          fontSize: "subBody",
-          fontFamily: "body",
-          mr: 1,
-          color: "accent",
-          maxWidth: [150, 250],
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          ":visited": { color: "accent" },
-          ":hover": { color: "accent", opacity: 0.8 }
-        }}
-      >
-        {href}
-      </Link>
+      {linkData?.type && (
+        <LinkTypeIcon type={linkData.type} metadata={linkData.metadata} />
+      )}
+      {loading ? (
+        <Text sx={{ fontSize: "subBody" }}>{strings.loading()}</Text>
+      ) : (
+        <Link
+          href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.storage.openLink?.(href);
+            hide();
+          }}
+          target="_blank"
+          variant="body"
+          sx={{
+            fontSize: "subBody",
+            fontFamily: "body",
+            mr: 4,
+            color: "accent",
+            maxWidth: [150, 250],
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            ":visited": { color: "accent" },
+            ":hover": { color: "accent", opacity: 0.8 }
+          }}
+        >
+          {title}
+        </Link>
+      )}
       <ToolButton
         icon={props.icon}
         title={props.title}
@@ -263,8 +293,16 @@ export function CopyLink(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={false}
-      onClick={() => {
-        editor.storage.copyToClipboard?.(href);
+      onClick={async () => {
+        const linkData = await editor.storage.getLinkData?.(href);
+        if (linkData?.title) {
+          editor.storage.copyToClipboard?.(
+            href,
+            `<a href="${href}">${linkData.title}</a>`
+          );
+        } else {
+          editor.storage.copyToClipboard?.(href);
+        }
         hide();
       }}
     />
@@ -333,6 +371,31 @@ function LinkTool(props: LinkToolProps) {
       </ResponsivePresenter>
     </>
   );
+}
+
+const LINK_TYPE_ICONS: Record<LinkData["type"], string> = {
+  note: mdiNoteOutline,
+  notebook: mdiBookOutline,
+  tag: mdiPound,
+  color: Icons.circle
+};
+
+function LinkTypeIcon({
+  type,
+  metadata
+}: {
+  type: LinkData["type"];
+  metadata?: LinkData["metadata"];
+}) {
+  const path = LINK_TYPE_ICONS[type];
+  if (!path) return null;
+
+  const color =
+    type === "color" && metadata?.colorCode
+      ? metadata.colorCode
+      : "icon-secondary";
+
+  return <Icon path={path} color={color} size={13} sx={{ mr: 1 }} />;
 }
 
 export function isInternalLink(href?: string | null) {
