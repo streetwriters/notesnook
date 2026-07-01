@@ -164,6 +164,14 @@ async function createWindow() {
   );
   mainWindow.webContents.session.setProxy({ proxyRules: config.proxyRules });
 
+  mainWindow.on("show", () =>
+    /**
+     * We may set `skipTaskbar` to true at startup.
+     * This also removes the window from the Alt-Tab switcher.
+     * To fix that, whenever the app is shown, we set `skipTaskbar` to false.
+     */
+    mainWindow.setSkipTaskbar(false)
+  );
   mainWindow.once("closed", () => {
     globalThis.window = null;
   });
