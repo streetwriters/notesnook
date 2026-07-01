@@ -17,10 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { VariantsWithStaticColors, useThemeColors } from "@notesnook/theme";
-import {
-    getColorLinearShade
-} from "../../../utils/colors";
-
+import { getColorLinearShade } from "../../../utils/colors";
 
 export type ButtonTypes =
   | "plain"
@@ -86,8 +83,8 @@ const buttonTypes = (
     text: colors.secondary.paragraph,
     selected: colors.primary.hover,
     borderWidth: 1,
-    borderColor: colors.primary.border,
-    borderSelectedColor: colors.primary.border
+    borderColor: colors.secondary.border,
+    borderSelectedColor: colors.secondary.border
   },
   transparent: {
     primary: "transparent",
