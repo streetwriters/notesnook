@@ -57,7 +57,8 @@ export const NotebookItem = ({
   disableExpand,
   hideNoteCount,
   style,
-  subNotebookButtonStyle
+  subNotebookButtonStyle,
+  selectionCheckboxLocation = "right"
 }: {
   index: number;
   item: TreeItem;
@@ -76,6 +77,7 @@ export const NotebookItem = ({
   hideNoteCount?: boolean;
   style?: ViewStyle;
   subNotebookButtonStyle?: ViewStyle;
+  selectionCheckboxLocation?: "left" | "right";
 }) => {
   const notebook = item.notebook;
   const isFocused = focused;
@@ -194,7 +196,8 @@ export const NotebookItem = ({
               gap: Spacing.LEVEL_1
             }}
           >
-            {item.depth === 0 ? (
+            {item.depth === 0 &&
+            (!selectionEnabled || selectionCheckboxLocation === "right") ? (
               <AppIcon
                 size={AppFontSize.md}
                 color={
@@ -211,11 +214,34 @@ export const NotebookItem = ({
               />
             ) : null}
 
+            {selectionEnabled && selectionCheckboxLocation === "left" ? (
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <AppIcon
+                  name={selected ? "checkbox" : "box-empty"}
+                  iconFamily="notesnook"
+                  size={16}
+                  color={
+                    selected
+                      ? [
+                          colors.selected.accent,
+                          colors.selected.accentForeground
+                        ]
+                      : colors.primary.icon
+                  }
+                />
+              </View>
+            ) : null}
+
             <Paragraph
               color={
                 isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
-              size={AppFontSize.sm}
+              fontSize="SM"
             >
               {notebook?.title}
             </Paragraph>
@@ -229,7 +255,7 @@ export const NotebookItem = ({
               justifyContent: "center"
             }}
           >
-            {selectionEnabled ? (
+            {selectionEnabled && selectionCheckboxLocation === "right" ? (
               <View
                 style={{
                   justifyContent: "center",
@@ -239,7 +265,7 @@ export const NotebookItem = ({
                 <AppIcon
                   name={selected ? "checkbox" : "box-empty"}
                   iconFamily="notesnook"
-                  size={AppFontSize.md}
+                  size={16}
                   color={
                     selected
                       ? [
@@ -250,17 +276,15 @@ export const NotebookItem = ({
                   }
                 />
               </View>
-            ) : (
-              <>
-                {item.hasChildren || hideNoteCount ? null : (
-                  <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
-                    {totalNotes?.(notebook?.id) || 0}
-                  </Paragraph>
-                )}
-              </>
+            ) : null}
+
+            {item.hasChildren || hideNoteCount || selectionEnabled ? null : (
+              <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+                {totalNotes?.(notebook?.id) || 0}
+              </Paragraph>
             )}
 
-            {onAddNotebook ? (
+            {onAddNotebook && !item.hasChildren ? (
               <IconButton
                 name="plus"
                 iconFamily="notesnook"
@@ -303,7 +327,8 @@ export const NotebookItem = ({
                 style={{
                   borderRadius: defaultBorderRadius,
                   width: undefined,
-                  height: undefined
+                  height: undefined,
+                  marginRight: 1.5
                 }}
                 iconFamily="notesnook"
                 name={expanded ? "chevron-up" : "chevron-down"}
@@ -313,7 +338,7 @@ export const NotebookItem = ({
         </Pressable>
       </View>
 
-      {expanded && item.hasChildren && !selectionEnabled ? (
+      {expanded && item.hasChildren ? (
         <View
           style={{
             width: "100%",

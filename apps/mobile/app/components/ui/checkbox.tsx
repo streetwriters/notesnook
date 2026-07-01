@@ -77,7 +77,7 @@ export const Checkbox = ({
       style={{
         width: width || undefined,
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "flex-start",
         flexShrink: 1,
         gap: Spacing.LEVEL_1,
@@ -92,6 +92,9 @@ export const Checkbox = ({
         name={checked ? "checkbox" : "box-empty"}
         iconFamily="notesnook"
         size={iconSize}
+        style={{
+          marginTop: 1.5
+        }}
         color={
           iconColor ||
           (checked
@@ -102,7 +105,7 @@ export const Checkbox = ({
 
       {title ? (
         <Paragraph
-          numberOfLines={1}
+          numberOfLines={2}
           size={fontSize}
           fontFamily={fontFamily}
           color={colors.primary.paragraph}
