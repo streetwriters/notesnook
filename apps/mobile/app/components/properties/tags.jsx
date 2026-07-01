@@ -36,10 +36,7 @@ export const Tags = ({ item, close }) => {
     <View
       style={{
         flexDirection: "row",
-        width: "100%",
-        borderTopWidth: 1,
-        borderColor: colors.primary.border,
-        paddingVertical: Spacing.LEVEL_3
+        width: "100%"
       }}
     >
       <ColorTags item={item} />

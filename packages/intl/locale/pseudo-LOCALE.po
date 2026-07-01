@@ -6183,6 +6183,10 @@ msgstr ""
 msgid "Save and continue"
 msgstr ""
 
+#: src/strings.ts:2942
+msgid "Save changes"
+msgstr ""
+
 #: src/strings.ts:1066
 msgid "Save data recovery key"
 msgstr ""

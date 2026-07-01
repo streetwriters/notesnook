@@ -6209,6 +6209,10 @@ msgstr "Save account recovery key"
 msgid "Save and continue"
 msgstr "Save and continue"
 
+#: src/strings.ts:2942
+msgid "Save changes"
+msgstr "Save changes"
+
 #: src/strings.ts:1066
 msgid "Save data recovery key"
 msgstr "Save data recovery key"

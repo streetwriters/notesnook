@@ -285,7 +285,16 @@ const Sort = ({
                   await updateGroupOptions(_groupOptions);
                 }}
               >
-                <Paragraph>
+                <Paragraph
+                  color={
+                    groupOptions?.sortBy === item
+                      ? colors.primary.heading
+                      : colors.primary.paragraph
+                  }
+                  fontFamily={
+                    groupOptions?.sortBy === item ? "MEDIUM" : "REGULAR"
+                  }
+                >
                   {strings.sortByStrings[
                     item as keyof typeof strings.sortByStrings
                   ]()}
