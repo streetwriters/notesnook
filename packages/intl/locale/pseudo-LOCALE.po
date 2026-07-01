@@ -1647,6 +1647,10 @@ msgstr ""
 msgid "Clear default notebook"
 msgstr ""
 
+#: src/strings.ts:2800
+msgid "Clear history"
+msgstr ""
+
 #: src/strings.ts:1015
 msgid "Clear logs"
 msgstr ""
@@ -2282,6 +2286,14 @@ msgstr ""
 
 #: src/strings.ts:2759
 msgid "Delete all"
+msgstr ""
+
+#: src/strings.ts:2805
+msgid "Delete all version history for {count} selected notes?"
+msgstr ""
+
+#: src/strings.ts:2804
+msgid "Delete all version history for this note?"
 msgstr ""
 
 #: src/strings.ts:2732
@@ -7473,6 +7485,10 @@ msgstr ""
 
 #: src/strings.ts:415
 msgid "Version"
+msgstr ""
+
+#: src/strings.ts:2801
+msgid "Version history cleared"
 msgstr ""
 
 #: src/strings.ts:50
