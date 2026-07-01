@@ -2799,5 +2799,11 @@ Continue without attachments?`,
   deleteItem: () => t`Delete item`,
   keepScreenOn: () => t`Keep screen on`,
   keepScreenOnDesc: () =>
-    t`Prevent the screen from turning off while the editor is focused.`
+    t`Prevent the screen from turning off while the editor is focused.`,
+  clearHistory: () => t`Clear history`,
+  historyCleared: () => t`Version history cleared`,
+  clearHistoryConfirmation: (count: number) =>
+    count === 1
+      ? t`Delete all version history for this note?`
+      : t`Delete all version history for ${count} selected notes?`
 };

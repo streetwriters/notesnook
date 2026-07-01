@@ -1647,6 +1647,10 @@ msgstr "Clear data & reset account"
 msgid "Clear default notebook"
 msgstr "Clear default notebook"
 
+#: src/strings.ts:2800
+msgid "Clear history"
+msgstr "Clear history"
+
 #: src/strings.ts:1015
 msgid "Clear logs"
 msgstr "Clear logs"
@@ -2294,6 +2298,14 @@ msgstr "Delete account"
 #: src/strings.ts:2759
 msgid "Delete all"
 msgstr "Delete all"
+
+#: src/strings.ts:2805
+msgid "Delete all version history for {count} selected notes?"
+msgstr "Delete all version history for {count} selected notes?"
+
+#: src/strings.ts:2804
+msgid "Delete all version history for this note?"
+msgstr "Delete all version history for this note?"
 
 #: src/strings.ts:2732
 msgid "Delete attachment"
@@ -7532,6 +7544,10 @@ msgstr "Verifying your email"
 #: src/strings.ts:415
 msgid "Version"
 msgstr "Version"
+
+#: src/strings.ts:2801
+msgid "Version history cleared"
+msgstr "Version history cleared"
 
 #: src/strings.ts:50
 msgid "Vibrate"

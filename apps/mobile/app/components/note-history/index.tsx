@@ -29,7 +29,7 @@ import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useDBItem } from "../../hooks/use-db-item";
-import { presentSheet } from "../../services/event-manager";
+import { presentSheet, ToastManager } from "../../services/event-manager";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -39,6 +39,7 @@ import { Pressable } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
+import { presentDialog } from "../dialog/functions";
 
 const HistoryItem = ({
   index,
@@ -58,9 +59,8 @@ const HistoryItem = ({
     const _start_time = getFormattedDate(start, "time");
     const _end_time = getFormattedDate(end + 60000, "time");
 
-    return `${_start_date} ${_start_time} - ${
-      _end_date === _start_date ? " " : _end_date + " "
-    }${_end_time}`;
+    return `${_start_date} ${_start_time} - ${_end_date === _start_date ? " " : _end_date + " "
+      }${_end_time}`;
   };
 
   const preview = useCallback(
@@ -112,7 +112,8 @@ const HistoryItem = ({
 };
 
 export default function NoteHistory({
-  note
+  note,
+  fwdRef
 }: {
   note: Note;
   fwdRef: RefObject<ActionSheetRef>;
@@ -147,7 +148,35 @@ export default function NoteHistory({
   return (
     <View>
       <SheetProvider context="note_history" />
-      <DialogHeader title={strings.noteHistory()} padding={12} />
+      <DialogHeader
+        title={strings.noteHistory()}
+        padding={12}
+        button={
+          history?.placeholders.length
+            ? {
+              title: strings.clearHistory(),
+              type: "secondary",
+              onPress: () => {
+                presentDialog({
+                  title: strings.clearHistory(),
+                  paragraph: strings.clearHistoryConfirmation(1),
+                  positiveText: strings.clear(),
+                  negativeText: strings.cancel(),
+                  positiveType: "errorShade",
+                  positivePress: async () => {
+                    await db.noteHistory.clearSessions(note.id);
+                    fwdRef.current?.hide();
+                    ToastManager.show({
+                      heading: strings.historyCleared(),
+                      type: "success"
+                    });
+                  }
+                });
+              }
+            }
+            : undefined
+        }
+      />
 
       <Seperator />
 
