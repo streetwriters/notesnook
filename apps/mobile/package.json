@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.4.3",
+  "version": "3.4.4",
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -18,7 +18,7 @@
     "e2e-android": "detox test --configuration android.emu.release --detectOpenHandles",
     "e2e-android-debug": "detox test --configuration android.emu.debug --detectOpenHandles",
     "e2e-ios": "detox test -c ios.sim.release --detectOpenHandles",
-    "bump": "npx react-native bump-version --skip-semver-for android",
+    "bump": "node ./scripts/bump-version.mjs",
     "release-android": "cd android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew assembleRelease --no-daemon",
     "release-android-bundle": "cd android && ./gradlew bundleRelease --no-daemon",
     "lint": "eslint --ext .js,.jsx,.tsx,.ts ./app"
