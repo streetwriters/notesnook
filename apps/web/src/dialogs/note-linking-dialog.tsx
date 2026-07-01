@@ -34,8 +34,9 @@ import {
   ResolvedItem,
   useIsFeatureAvailable
 } from "@notesnook/common";
-import { Lock } from "../components/icons";
+import { Lock, Plus } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
+import { store as noteStore } from "../stores/note-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { Virtuoso } from "react-virtuoso";
@@ -51,6 +52,8 @@ export const NoteLinkingDialog = DialogManager.register(
   function NoteLinkingDialog(props: NoteLinkingDialogProps) {
     const { attributes } = props;
     const [notes, setNotes] = useState<VirtualizedGrouping<NoteType>>();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [hasExactMatch, setHasExactMatch] = useState(false);
     const [selectedNote, setSelectedNote] = useState<NoteType>();
     const [isNoteLocked, setIsNoteLocked] = useState(false);
     const [blocks, setBlocks] = useState<ContentBlock[]>([]);
@@ -126,6 +129,8 @@ export const NoteLinkingDialog = DialogManager.register(
                   setIsNoteLocked(false);
                   setFilteredBlocks(undefined);
                   setBlocks([]);
+                  setSearchQuery("");
+                  setHasExactMatch(false);
                 }}
               >
                 {strings.linkNoteSelectedNote()}: {selectedNote.title} (
@@ -225,6 +230,7 @@ export const NoteLinkingDialog = DialogManager.register(
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
                   const query = e.target.value.trim();
+                  setSearchQuery(query);
                   setNotes(
                     query
                       ? await db.lookup.notes(e.target.value).sorted()
@@ -232,8 +238,51 @@ export const NoteLinkingDialog = DialogManager.register(
                           db.settings.getGroupOptions("home")
                         )
                   );
+                  if (!query) return setHasExactMatch(false);
+                  // "no note matches" = no non-trashed note with this exact title.
+                  // lookup above is fuzzy full-text, so it can't answer this on its own.
+                  // LIKE (no wildcards) is a case-insensitive full-string match in SQLite.
+                  const existing = await db
+                    .sql()
+                    .selectFrom("notes")
+                    .select("id")
+                    .where("type", "!=", "trash")
+                    .where("title", "like", query)
+                    .limit(1)
+                    .execute();
+                  setHasExactMatch(existing.length > 0);
                 }}
               />
+              {searchQuery.length > 0 && !hasExactMatch ? (
+                <Button
+                  variant="menuitem"
+                  sx={{
+                    p: 1,
+                    mt: 1,
+                    width: "100%",
+                    textAlign: "left",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexShrink: 0,
+                    color: "accent",
+                    borderBottom: "1px solid var(--border)"
+                  }}
+                  onClick={async () => {
+                    const id = await db.notes.add({ title: searchQuery });
+                    await noteStore.refresh();
+                    props.onClose({
+                      title: searchQuery,
+                      href: createInternalLink("note", id)
+                    });
+                  }}
+                >
+                  <Plus size={14} color="accent" />
+                  <Text variant="body">
+                    {strings.createNoteToLink(searchQuery)}
+                  </Text>
+                </Button>
+              ) : null}
               {notes && (
                 <Virtuoso
                   data={notes.placeholders}
