@@ -188,7 +188,7 @@ const buttonTypes = (
   "accent-outline": {
     primary: "transparent",
     text: colors.primary.accent,
-    selected: accent || colors.primary.accent,
+    selected: "transparent",
     borderWidth: 1,
     borderColor: accent || colors.primary.accent,
     borderSelectedColor: accent || colors.primary.accent
@@ -217,9 +217,9 @@ const buttonTypes = (
     text: colors.primary.heading,
     selected: colors.primary.accent,
     colorOpacity: 0.12,
-    borderWidth: 0.8,
-    borderColor: getColorLinearShade(colors.primary.shade, 0.3, isDark),
-    borderSelectedColor: getColorLinearShade(colors.primary.shade, 0.3, isDark)
+    borderWidth: 0
+    // borderColor: getColorLinearShade(colors.primary.shade, 0.3, isDark),
+    // borderSelectedColor: getColorLinearShade(colors.primary.shade, 0.3, isDark)
   },
   error: {
     primary: colors.error.background,
