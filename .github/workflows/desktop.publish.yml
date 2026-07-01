@@ -182,7 +182,9 @@ jobs:
       - name: Install sqlite-better-trigram for all arch
         run: |
           npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu arm64 sqlite3-fts5-html
           npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Install provisioning profile
@@ -264,6 +266,7 @@ jobs:
       - name: Install sqlite-better-trigram for all arch
         run: |
           npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
@@ -331,6 +334,7 @@ jobs:
       - name: Install sqlite-better-trigram for all arch
         run: |
           npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu arm64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Build Electron wrapper
@@ -363,7 +367,7 @@ jobs:
     name: Build for Windows
     needs: build
     if: inputs.build-windows
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Check out Git repository

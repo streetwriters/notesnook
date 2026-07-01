@@ -25,6 +25,12 @@ export type PermissionRequestEvent = CustomEvent<{
   silent: boolean;
 }>;
 
+export type LinkData = {
+  type: "note" | "notebook" | "color" | "tag";
+  title?: string;
+  metadata?: Record<string, string | undefined>;
+};
+
 export class Editor extends TiptapEditor {
   private mutex: Mutex = new Mutex();
 

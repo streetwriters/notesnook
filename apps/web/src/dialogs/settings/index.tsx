@@ -123,7 +123,7 @@ const sectionGroups: SectionGroup[] = [
         key: "inbox",
         title: "Inbox",
         icon: Inbox,
-        isHidden: () => true // hidden until complete
+        isHidden: () => !useUserStore.getState().isLoggedIn
       }
     ]
   },

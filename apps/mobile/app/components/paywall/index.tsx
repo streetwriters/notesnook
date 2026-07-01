@@ -176,6 +176,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
         >
           <IconButton
             name="close"
+            testID="paywall-close"
             color={colors.primary.icon}
             onPress={() => {
               Navigation.navigate("FluidPanelsView", {});

@@ -45,7 +45,7 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
       try {
         props.onClose(await props.action(setProgress));
       } catch (e) {
-        console.error(e);
+        console.error("FAILED:", e);
         props.onClose(e as Error);
       }
     })();

@@ -48,6 +48,7 @@ import {
   Plus,
   SortBy,
   Tag as TagIcon,
+  InternalLink,
   ClearTrash
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
@@ -90,7 +91,7 @@ import {
 } from "@dnd-kit/sortable";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
-import { Color, Notebook, Tag } from "@notesnook/core";
+import { Color, createInternalLink, Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { Menu, useMenuStore, useMenuTrigger } from "../../hooks/use-menu";
 import { RenameColorDialog } from "../../dialogs/item-dialog";
@@ -120,6 +121,7 @@ import {
 } from "@notesnook/common";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { shouldShowWrapped } from "../../utils/should-show-wrapped";
+import { writeToClipboard } from "../../utils/clipboard";
 
 type Route = {
   id: "notes" | "favorites" | "reminders" | "monographs" | "trash" | "archive";
@@ -686,8 +688,22 @@ function ColorItem({
           icon: Trash.path
         },
         {
+          type: "button",
+          key: "copy-link",
+          title: strings.copyLink(),
+          icon: InternalLink.path,
+          onClick: () => {
+            const link = createInternalLink("color", color.id);
+            writeToClipboard({
+              "text/plain": link,
+              "text/html": `<a href="${link}">${color.title}</a>`,
+              "text/markdown": `[${color.title}](${link})`
+            });
+          }
+        },
+        {
           type: "lazy-loader",
-          key: "sidebar-items-loader",
+          key: "sidebar-items-loader2",
           items: async () => [
             createSetDefaultHomepageMenuItem(
               color.id,

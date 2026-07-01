@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect, createHistorySession, PASSWORD } from "./utils";
+import { createHistorySession, PASSWORD } from "./utils";
+import { test, expect } from "@nn/test";
 
 test.setTimeout(60 * 1000);
 

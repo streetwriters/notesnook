@@ -28,7 +28,10 @@ import {
   Note,
   isDeleted
 } from "../../types.js";
-import { ParsedInboxItem, SyncInboxItem } from "./types.js";
+import { SyncInboxItem } from "./types.js";
+import { InboxItemsHistoryErrorContext } from "../../types.js";
+import { z } from "zod";
+import { sanitizeHtml } from "../../utils/html-parser.js";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
@@ -44,6 +47,11 @@ class Merger {
     localItem: MaybeDeletedItem<Item> | undefined
   ) {
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
+      this.logger.debug(`Remote item is newer. Using remote item.`, {
+        id: remoteItem.id,
+        remoteDateModified: remoteItem.dateModified,
+        localDateModified: localItem?.dateModified
+      });
       return remoteItem;
     }
 
@@ -64,6 +72,14 @@ class Merger {
         (localItem as unknown as Note).dateDeleted = null;
         (localItem as unknown as Note).itemType = null;
 
+        this.logger.debug(
+          `Remote note has newer expiry date. Restoring expired note.`,
+          {
+            id: remoteItem.id,
+            remoteExpiryDateModified: remoteItem.expiryDate.dateModified,
+            localExpiryDateModified: localItem.expiryDate.dateModified
+          }
+        );
         return localItem;
       }
     }
@@ -73,7 +89,16 @@ class Merger {
     remoteItem: MaybeDeletedItem<Item>,
     localItem: MaybeDeletedItem<Item> | undefined
   ) {
-    if (localItem && "localOnly" in localItem && localItem.localOnly) return;
+    if (localItem && "localOnly" in localItem && localItem.localOnly) {
+      this.logger.debug(
+        `Local item is marked as localOnly. Skipping merge and keeping local item.`,
+        {
+          id: localItem.id,
+          localOnly: localItem.localOnly
+        }
+      );
+      return;
+    }
 
     if (
       !localItem ||
@@ -92,6 +117,15 @@ class Merger {
         ? "conflict"
         : isContentConflicted(localItem, remoteItem, THRESHOLD);
 
+      this.logger.debug(`Content conflict check result: ${conflicted}`, {
+        id: localItem.id,
+        localDateModified: localItem.dateModified,
+        remoteDateModified: remoteItem.dateModified,
+        localDateResolved: localItem.dateResolved,
+        timeDifference:
+          Math.max(remoteItem.dateEdited, localItem.dateEdited) -
+          Math.min(remoteItem.dateEdited, localItem.dateEdited)
+      });
       if (conflicted === "merge") return remoteItem;
       else if (!conflicted) return;
 
@@ -168,6 +202,25 @@ export function isContentConflicted(
   }
 }
 
+const RawInboxItemSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  pinned: z.boolean().optional(),
+  favorite: z.boolean().optional(),
+  readonly: z.boolean().optional(),
+  archived: z.boolean().optional(),
+  notebookIds: z.array(z.string()).optional(),
+  tagIds: z.array(z.string()).optional(),
+  type: z.enum(["note"]),
+  source: z.string().min(1, "Source is required"),
+  version: z.literal(1),
+  content: z
+    .object({
+      type: z.enum(["html"]),
+      data: z.string()
+    })
+    .optional()
+});
+
 export async function handleInboxItems(
   inboxItems: SyncInboxItem[],
   db: Database
@@ -180,68 +233,118 @@ export async function handleInboxItems(
 
   for (const item of inboxItems) {
     try {
-      if (await db.notes.exists(item.id)) {
-        logger.info("Inbox item already exists, skipping.", {
+      if (await db.inboxItemsHistory.exists(item.id)) {
+        logger.info("Inbox item already processed, skipping.", {
           inboxItemId: item.id
         });
         continue;
       }
 
-      const decryptedKey = await db.storage().decryptAsymmetric(inboxKeys, {
-        alg: item.key.alg,
-        cipher: item.key.cipher,
-        format: "base64",
-        length: item.key.length
-      });
-      const decryptedItem = await db.storage().decrypt(
-        { key: decryptedKey },
-        {
-          alg: item.alg,
-          iv: item.iv,
-          cipher: item.cipher,
-          format: "base64",
-          length: item.length,
-          salt: item.salt
-        }
-      );
-      const parsed = JSON.parse(decryptedItem) as ParsedInboxItem;
-      if (parsed.type !== "note") {
-        continue;
-      }
-      if (parsed.version !== 1) {
+      let decryptedItem: string;
+      try {
+        decryptedItem = await db
+          .storage()
+          .decryptPGPMessage(inboxKeys.privateKey, item.cipher);
+      } catch (e) {
+        logger.error(e, "Failed to decrypt inbox item.", {
+          inboxItemId: item.id
+        });
+        await db.inboxItemsHistory.add({
+          id: item.id,
+          status: "failed",
+          errorContext: JSON.stringify({
+            message: "Decryption failed",
+            description: (e as Error).message,
+            inboxItem: { id: item.id, v: item.v, alg: item.alg }
+          } satisfies InboxItemsHistoryErrorContext)
+        });
         continue;
       }
 
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(decryptedItem);
+      } catch (e) {
+        logger.error(e, "Failed to parse inbox item JSON.", {
+          inboxItemId: item.id
+        });
+        await db.inboxItemsHistory.add({
+          id: item.id,
+          status: "failed",
+          errorContext: JSON.stringify({
+            message: "Invalid JSON",
+            description: (e as Error).message,
+            inboxItem: { id: item.id, v: item.v, alg: item.alg },
+            decryptedItem
+          } satisfies InboxItemsHistoryErrorContext)
+        });
+        continue;
+      }
+
+      const validation = RawInboxItemSchema.safeParse(parsed);
+      if (!validation.success) {
+        logger.warn("Failed to validate inbox item.", {
+          inboxItem: item,
+          errors: validation.error.issues
+        });
+        const { content: _content, ...parsedWithoutContent } = parsed as Record<
+          string,
+          unknown
+        >;
+        await db.inboxItemsHistory.add({
+          id: item.id,
+          status: "failed",
+          errorContext: JSON.stringify({
+            message: "Validation failed",
+            description: validation.error.issues
+              .map((i) => `${i.path.join(".")}: ${i.message}`)
+              .join("; "),
+            inboxItem: { id: item.id, v: item.v, alg: item.alg },
+            parsedItem: parsedWithoutContent
+          } satisfies InboxItemsHistoryErrorContext)
+        });
+        continue;
+      }
+
+      const data = validation.data;
       await db.notes.add({
         id: item.id,
-        title: parsed.title,
-        favorite: parsed.favorite,
-        pinned: parsed.pinned,
-        readonly: parsed.readonly,
+        title: data.title,
+        favorite: data.favorite,
+        pinned: data.pinned,
+        readonly: data.readonly,
         content: {
-          data: parsed?.content?.data ?? "",
+          data: sanitizeHtml(data?.content?.data ?? ""),
           type: "tiptap"
         }
       });
-      if (parsed.archived !== undefined) {
-        await db.notes.archive(parsed.archived, item.id);
+      if (data.archived !== undefined) {
+        await db.notes.archive(data.archived, item.id);
       }
-      for (const notebookId of parsed.notebookIds || []) {
+      for (const notebookId of data.notebookIds || []) {
         if (!(await db.notebooks.exists(notebookId))) continue;
         await db.notes.addToNotebook(notebookId, item.id);
       }
-      for (const tagId of parsed.tagIds || []) {
+      for (const tagId of data.tagIds || []) {
         if (!(await db.tags.exists(tagId))) continue;
         await db.relations.add(
           { type: "tag", id: tagId },
           { type: "note", id: item.id }
         );
       }
+      await db.inboxItemsHistory.add({
+        id: item.id,
+        status: "success",
+        source: data.source
+      });
+      await db.relations.add(
+        { type: "inboxitemhistory", id: item.id },
+        { type: "note", id: item.id }
+      );
     } catch (e) {
       logger.error(e, "Failed to process inbox item.", {
         inboxItem: item
       });
-      continue;
     }
   }
 }

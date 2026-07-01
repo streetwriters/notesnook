@@ -20,14 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import dayjs from "dayjs";
 import { AppModel } from "./models/app.model";
 import {
-  test,
-  expect,
   groupByOptions,
   NOTE,
   orderByOptions,
   PASSWORD,
   sortByOptions
 } from "./utils";
+import { test, expect } from "@nn/test";
 
 test("create a note", async ({ page }) => {
   const app = new AppModel(page);
@@ -460,4 +459,17 @@ test("edit note creation date in properties panel", async ({ page }) => {
 
   const dateCreated = await note?.properties.getDateCreated();
   expect(date.format("DD-MM-YYYY hh:mm A")).toBe(dateCreated);
+});
+
+test("spellcheck should be enabled by default for new notes", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+
+  const note = await notes.createNote(NOTE);
+
+  expect(note).toBeDefined();
+  expect(await note?.properties.isSpellcheckEnabled()).toBe(true);
 });

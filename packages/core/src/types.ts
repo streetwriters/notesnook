@@ -84,6 +84,7 @@ export type Collections = {
   settingsv2: "settingitem";
   vaults: "vault";
   monographs: "monograph";
+  inboxitemshistory: "inboxitemhistory";
 
   /**
    * @deprecated only kept here for migration purposes
@@ -115,6 +116,7 @@ export type GroupableItem = ValueOf<
     | "settingitem"
     | "vault"
     | "monograph"
+    | "inboxitemhistory"
   >
 >;
 
@@ -137,6 +139,7 @@ export type ItemMap = {
   vault: Vault;
   searchResult: HighlightedResult;
   monograph: Monograph;
+  inboxitemhistory: InboxItemHistory;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -215,6 +218,7 @@ export interface Note extends BaseItem<"note"> {
     dateModified: number;
     value: number | null;
   };
+  spellcheck?: boolean;
 }
 
 export interface Notebook extends BaseItem<"notebook"> {
@@ -486,6 +490,7 @@ export type SettingItemMap = {
   defaultNotebook: string | undefined;
   defaultTag: string | undefined;
   profile: Profile | undefined;
+  "vault:lockAfter": number;
 } & Record<`groupOptions:${GroupingKey}`, GroupOptions> &
   Record<
     | `groupOptions:notes:notebooks`
@@ -514,6 +519,32 @@ export interface Monograph extends BaseItem<"monograph"> {
   datePublished: number;
   selfDestruct: boolean;
   password?: Cipher<"base64">;
+  publishUrl?: string;
+}
+
+type InboxItemHistoryErrorContextBase = {
+  description: string;
+  inboxItem: { id: string; v: number; alg: string };
+};
+
+export type InboxItemsHistoryErrorContext =
+  | (InboxItemHistoryErrorContextBase & {
+      message: "Decryption failed";
+    })
+  | (InboxItemHistoryErrorContextBase & {
+      message: "Invalid JSON";
+      decryptedItem: string;
+    })
+  | (InboxItemHistoryErrorContextBase & {
+      message: "Validation failed";
+      parsedItem: Record<string, unknown>;
+    });
+
+export interface InboxItemHistory extends BaseItem<"inboxitemhistory"> {
+  dateSynced: number;
+  status: "failed" | "success";
+  source?: string;
+  errorContext?: string;
 }
 
 export type Match = {

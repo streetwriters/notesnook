@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 
 export enum TOGGLE_STATES {
@@ -26,10 +26,7 @@ export enum TOGGLE_STATES {
 }
 
 export class ToggleModel {
-  private readonly toggle: Locator;
-  constructor(private readonly page: Page, private readonly id: string) {
-    this.toggle = page.locator(getTestId(id));
-  }
+  constructor(private readonly page: Page, private readonly toggle: Locator) {}
 
   async on(wait = true) {
     if (!(await this.isToggled())) {
@@ -46,13 +43,19 @@ export class ToggleModel {
   }
 
   async isToggled() {
-    return await this.getToggleState(this.toggle, TOGGLE_STATES.ON).isVisible();
+    return await this.getToggleState(this.toggle, TOGGLE_STATES.ON)
+      .waitFor({
+        state: "visible",
+        timeout: 1000
+      })
+      .then(() => true)
+      .catch(() => false);
   }
 
   private async waitUntilToggleState(locator: Locator, state: TOGGLE_STATES) {
-    if (this.id.startsWith("menu-button")) await this.page.waitForTimeout(200);
-    else
+    if (await this.toggle.isVisible())
       await this.getToggleState(locator, state).waitFor({ state: "visible" });
+    else await this.page.waitForTimeout(200);
   }
 
   private getToggleState(locator: Locator, state: TOGGLE_STATES) {

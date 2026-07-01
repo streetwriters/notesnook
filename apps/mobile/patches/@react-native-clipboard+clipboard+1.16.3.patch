@@ -1,0 +1,230 @@
+diff --git a/node_modules/@react-native-clipboard/clipboard/android/.settings/org.eclipse.buildship.core.prefs b/node_modules/@react-native-clipboard/clipboard/android/.settings/org.eclipse.buildship.core.prefs
+deleted file mode 100644
+index 1c6d50d..0000000
+--- a/node_modules/@react-native-clipboard/clipboard/android/.settings/org.eclipse.buildship.core.prefs
++++ /dev/null
+@@ -1,13 +0,0 @@
+-arguments=
+-auto.sync=false
+-build.scans.enabled=false
+-connection.gradle.distribution=GRADLE_DISTRIBUTION(VERSION(7.4.2))
+-connection.project.dir=../example/android
+-eclipse.preferences.version=1
+-gradle.user.home=
+-java.home=/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home
+-jvm.arguments=
+-offline.mode=false
+-override.workspace.settings=true
+-show.console.view=true
+-show.executions.view=true
+diff --git a/node_modules/@react-native-clipboard/clipboard/android/gradle/.settings/org.eclipse.buildship.core.prefs b/node_modules/@react-native-clipboard/clipboard/android/gradle/.settings/org.eclipse.buildship.core.prefs
+deleted file mode 100644
+index e889521..0000000
+--- a/node_modules/@react-native-clipboard/clipboard/android/gradle/.settings/org.eclipse.buildship.core.prefs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-connection.project.dir=
+-eclipse.preferences.version=1
+diff --git a/node_modules/@react-native-clipboard/clipboard/android/src/main/java/com/reactnativecommunity/clipboard/ClipboardModule.java b/node_modules/@react-native-clipboard/clipboard/android/src/main/java/com/reactnativecommunity/clipboard/ClipboardModule.java
+index b68b858..324b293 100644
+--- a/node_modules/@react-native-clipboard/clipboard/android/src/main/java/com/reactnativecommunity/clipboard/ClipboardModule.java
++++ b/node_modules/@react-native-clipboard/clipboard/android/src/main/java/com/reactnativecommunity/clipboard/ClipboardModule.java
+@@ -202,6 +202,37 @@ public class ClipboardModule extends NativeClipboardModuleSpec {
+     }
+   }
+ 
++  @ReactMethod
++  public void setHTML(String html, String text) {
++    try {
++      ClipData clipdata = ClipData.newHtmlText(null, text, html);
++      ClipboardManager clipboard = getClipboardService();
++      clipboard.setPrimaryClip(clipdata);
++    } catch (Exception e) {
++      e.printStackTrace();
++    }
++  }
++
++  @ReactMethod
++  public void getHTML(Promise promise) {
++    try {
++      ClipboardManager clipboard = getClipboardService();
++      ClipData clipData = clipboard.getPrimaryClip();
++
++      if (clipData == null
++              || clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)
++              || clipData.getItemCount() < 1) {
++        promise.resolve("");
++        return;
++      }
++      ClipData.Item item = clipData.getItemAt(0);
++      promise.resolve(item.getHtmlText());
++
++    } catch (Exception e) {
++      promise.reject(e);
++    }
++  }
++
+   @ReactMethod
+   public void setListener() {
+     try {
+diff --git a/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.d.ts b/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.d.ts
+index 6c85195..afe3a5d 100644
+--- a/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.d.ts
++++ b/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.d.ts
+@@ -22,6 +22,9 @@ export declare const Clipboard: {
+      * ```
+      */
+     getStrings(): Promise<string[]>;
++
++    getHTML(): Promise<string>;
++    setHTML(html: string, content: string): void;
+     /**
+      * Get clipboard image as PNG in base64, this method returns a `Promise`, so you can use following code to get clipboard content
+      * ```javascript
+diff --git a/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.js b/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.js
+index ccdf309..03e7a42 100644
+--- a/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.js
++++ b/node_modules/@react-native-clipboard/clipboard/dist/Clipboard.js
+@@ -30,6 +30,12 @@ const NativeClipboardModule_1 = __importStar(require("./NativeClipboardModule"))
+  * `Clipboard` gives you an interface for setting and getting content from Clipboard on both iOS and Android
+  */
+ exports.Clipboard = {
++    getHTML() {
++		return  NativeClipboardModule_1.default.getHTML();
++	},
++    setHTML(html, text) {
++        return  NativeClipboardModule_1.default.setHTML(html, text);
++    },
+     /**
+      * Get content of string type, this method returns a `Promise`, so you can use following code to get clipboard content
+      * ```javascript
+diff --git a/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboard.d.ts b/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboard.d.ts
+index 5440157..75f346c 100644
+--- a/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboard.d.ts
++++ b/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboard.d.ts
+@@ -2,6 +2,8 @@ import type { EmitterSubscription } from 'react-native';
+ import type { TurboModule } from 'react-native';
+ export interface Spec extends TurboModule {
+     getConstants: () => {};
++    setHTML(html: string, content: string): void;
++	getHTML(): Promise<string>;
+     getString: () => Promise<string>;
+     getStrings: () => Promise<string[]>;
+     setString: (content: string) => void;
+diff --git a/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboardModule.d.ts b/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboardModule.d.ts
+index 0b2111e..b395af2 100644
+--- a/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboardModule.d.ts
++++ b/node_modules/@react-native-clipboard/clipboard/dist/NativeClipboardModule.d.ts
+@@ -20,6 +20,8 @@ export interface Spec extends TurboModule {
+      * ```
+      */
+     getStrings(): Promise<string[]>;
++    setHTML(html: string, content: string): void;
++	getHTML(): Promise<string>;
+     /**
+      * Get clipboard image as PNG in base64, this method returns a `Promise`, so you can use following code to get clipboard content
+      * ```javascript
+diff --git a/node_modules/@react-native-clipboard/clipboard/ios/RNCClipboard.mm b/node_modules/@react-native-clipboard/clipboard/ios/RNCClipboard.mm
+index 4e38fd2..5dea6a7 100644
+--- a/node_modules/@react-native-clipboard/clipboard/ios/RNCClipboard.mm
++++ b/node_modules/@react-native-clipboard/clipboard/ios/RNCClipboard.mm
+@@ -87,6 +87,29 @@ - (void) listener:(NSNotification *) notification
+   resolve((clipboard.strings ? : @[]));
+ }
+ 
++RCT_EXPORT_METHOD(setHTML:(nonnull NSString *)html
++    content:(nonnull NSString*)content
++) {
++    UIPasteboard *clipboard = [UIPasteboard generalPasteboard];
++    NSDictionary *htmlDict = [NSDictionary dictionaryWithObjectsAndKeys:html, (NSString*)kUTTypeHTML, nil];
++    NSDictionary *textDict = [NSDictionary dictionaryWithObjectsAndKeys:content, (NSString*)kUTTypePlainText, nil];
++    clipboard.items = [NSArray arrayWithObjects:htmlDict, textDict, nil];
++}
++
++RCT_EXPORT_METHOD(getHTML:(RCTPromiseResolveBlock)resolve
++                  reject:(__unused RCTPromiseRejectBlock)reject)
++{
++  UIPasteboard *clipboard = [UIPasteboard generalPasteboard];
++  id value = [clipboard valueForPasteboardType:(NSString*)kUTTypeHTML];
++  NSString *html = nil;
++  if ([value isKindOfClass:[NSString class]]) {
++    html = (NSString *)value;
++  } else if ([value isKindOfClass:[NSData class]]) {
++    html = [[NSString alloc] initWithData:(NSData *)value encoding:NSUTF8StringEncoding];
++  }
++  resolve((html ? : @""));
++}
++
+ RCT_EXPORT_METHOD(setImage:(NSString *)content
+     resolve:(RCTPromiseResolveBlock) resolve
+     reject:(RCTPromiseRejectBlock) reject
+@@ -238,10 +261,11 @@ - (void) listener:(NSNotification *) notification
+   // Keep: Required for RN built in Event Emitter Calls.
+ }
+ 
+-RCT_EXPORT_METHOD(removeListeners : (double)count) {
++RCT_EXPORT_METHOD(removeListeners : (long)count) {
+   // Keep: Required for RN built in Event Emitter Calls.
+ }
+ 
++
+ #if RCT_NEW_ARCH_ENABLED
+ - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+     (const facebook::react::ObjCTurboModule::InitParams &)params
+diff --git a/node_modules/@react-native-clipboard/clipboard/src/Clipboard.ts b/node_modules/@react-native-clipboard/clipboard/src/Clipboard.ts
+index d5e61fc..b010a22 100644
+--- a/node_modules/@react-native-clipboard/clipboard/src/Clipboard.ts
++++ b/node_modules/@react-native-clipboard/clipboard/src/Clipboard.ts
+@@ -31,6 +31,18 @@ export const Clipboard = {
+ 	getStrings(): Promise<string[]> {
+ 		return NativeClipboard.getStrings();
+ 	},
++
++	/**
++	 * Get content of HTML type, this method returns a `Promise`, so you can use following code to get clipboard content
++	 * ```javascript
++	 * async _getContent() {
++	 *   var content = await Clipboard.getHTML();
++	 * }
++	 * ```
++	 */
++	getHTML(): Promise<string> {
++		return NativeClipboard.getHTML();
++	},
+ 	/**
+ 	 * Get clipboard image as PNG in base64, this method returns a `Promise`, so you can use following code to get clipboard content
+ 	 * ```javascript
+@@ -106,6 +118,19 @@ export const Clipboard = {
+ 	setStrings(content: string[]) {
+ 		NativeClipboard.setStrings(content);
+ 	},
++	/**
++	 * Set content of HTML type. You can use following code to set clipboard content
++	 * ```javascript
++	 * _setContent() {
++	 *   Clipboard.setHTML('<b>hello world</b>', 'hello world');
++	 * }
++	 * ```
++	 * @param {string} content the HTML to be stored in the clipboard.
++	 * @param {string} text text to be used inplace of HTML be stored in the clipboard.
++	 */
++	setHTML(content: string, text: string) {
++		NativeClipboard.setHTML(content, text);
++	},
+ 	/**
+ 	 * Returns whether the clipboard has content or is empty.
+ 	 * This method returns a `Promise`, so you can use following code to get clipboard content
+diff --git a/node_modules/@react-native-clipboard/clipboard/src/NativeClipboardModule.ts b/node_modules/@react-native-clipboard/clipboard/src/NativeClipboardModule.ts
+index 2373747..a094285 100644
+--- a/node_modules/@react-native-clipboard/clipboard/src/NativeClipboardModule.ts
++++ b/node_modules/@react-native-clipboard/clipboard/src/NativeClipboardModule.ts
+@@ -78,6 +78,9 @@ export interface Spec extends TurboModule {
+ 	 * @param the content to be stored in the clipboard.
+ 	 */
+ 	setString(content: string): void;
++
++	setHTML(html: string, content: string): void;
++	getHTML(): Promise<string>;
+ 	/**
+ 	 * Set content of string array type. You can use following code to set clipboard content
+ 	 * ```javascript

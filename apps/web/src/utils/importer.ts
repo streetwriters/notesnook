@@ -48,11 +48,18 @@ const colorMap: Record<string, string | undefined> = {
   yellow: "#FFC107"
 };
 
-export async function importNote(note: Note) {
+export async function importNote(note: Note): Promise<string[]> {
+  const errors: string[] = [];
   const encryptedAttachmentFieldsMap = await processAttachments(
     note.attachments
-  );
-  await processNote(note, encryptedAttachmentFieldsMap);
+  ).catch((e) => {
+    errors.push(e.message);
+    return {};
+  });
+  await processNote(note, encryptedAttachmentFieldsMap).catch((e) => {
+    errors.push(e.message);
+  });
+  return errors;
 }
 
 async function processAttachments(attachments: Note["attachments"]) {
@@ -114,6 +121,10 @@ async function processNote(
 
   if (!noteId) return;
 
+  if (note.archived) {
+    await db.notes.archive(true, noteId);
+  }
+
   for (const tag of note.tags || []) {
     const tagId =
       (await db.tags.find(tag))?.id ||
@@ -161,6 +172,24 @@ async function processNote(
     if (!notebookIds) continue;
     for (const notebookId of notebookIds)
       await db.notes.addToNotebook(notebookId, noteId);
+  }
+
+  if (note.reminder) {
+    const reminderId = await db.reminders.add({
+      recurringMode: note.reminder.recurringMode,
+      mode: note.reminder.mode,
+      selectedDays: note.reminder.selectedDays,
+      date: note.reminder.date,
+      title: note.reminder.title,
+      description: note.reminder.description
+    });
+
+    if (reminderId) {
+      await db.relations.add(
+        { id: noteId, type: "note" },
+        { id: reminderId, type: "reminder" }
+      );
+    }
   }
 }
 

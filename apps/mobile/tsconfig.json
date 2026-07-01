@@ -18,8 +18,19 @@
       ],
       "@notesnook/editor/dist/cjs/toolbar/icons": [
         "../../packages/editor/dist/cjs/toolbar/icons.js"
+      ],
+      "@notesnook/editor/dist/cjs/utils/font": [
+        "../../packages/editor/dist/cjs/utils/font.js"
       ]
     }
   },
-  "exclude": ["e2e", "android", "ios", "node_modules", "patches", "fonts"]
+  "exclude": [
+    "e2e",
+    "android",
+    "ios",
+    "node_modules",
+    "patches",
+    "fonts",
+    "./worker.js"
+  ]
 }

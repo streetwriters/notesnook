@@ -262,6 +262,13 @@ const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
     );
   }
 
+  if ("note" in prev.session && "note" in next.session) {
+    return (
+      baseConditions &&
+      prev.session.note.spellcheck === next.session.note.spellcheck
+    );
+  }
+
   return baseConditions;
 });
 function EditorView({
@@ -408,7 +415,9 @@ function EditorView({
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
-          focusMode: isFocusMode
+          focusMode: isFocusMode,
+          spellcheck:
+            "note" in session ? session.note.spellcheck : session.type === "new"
         }}
       />
     </Flex>
@@ -473,6 +482,7 @@ type EditorOptions = {
   headless?: boolean;
   readonly?: boolean;
   focusMode?: boolean;
+  spellcheck?: boolean;
   onRequestFocus?: () => void;
 };
 type EditorProps = {
@@ -498,10 +508,11 @@ export function Editor(props: EditorProps) {
     onContentChange,
     onPreviewDocument
   } = props;
-  const { readonly, headless } = options || {
+  const { readonly, headless, spellcheck } = options || {
     headless: false,
     readonly: false,
-    focusMode: false
+    focusMode: false,
+    spellcheck: false
   };
   const saveSessionContentIfNotSaved = useEditorStore(
     (store) => store.saveSessionContentIfNotSaved
@@ -555,6 +566,7 @@ export function Editor(props: EditorProps) {
         isHydrating={!!session.needsHydration}
         nonce={nonce}
         readonly={readonly}
+        spellcheck={spellcheck}
         content={content}
         downloadOptions={{
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
@@ -577,7 +589,7 @@ export function Editor(props: EditorProps) {
             const attachment = await db.attachments.attachment(hash);
             if (!attachment)
               throw new Error("No attachment found with hash: " + hash);
-            if (attachment.mimeType.startsWith("image/")) {
+            if (attachment.mimeType.startsWith("image/") || type === "image") {
               await previewImageAttachment(attachment);
             } else if (
               onPreviewDocument &&
@@ -621,7 +633,7 @@ export function Editor(props: EditorProps) {
           await insertAttachments(mime, (attachments) => {
             const editor = useEditorManager.getState().getEditor(id)?.editor;
             if (!editor) return;
-            attachments.forEach((a) => editor?.attachFile(a));
+            editor?.attachFiles(...attachments);
           });
         }}
         onGetAttachmentData={async (attachment) => {
@@ -650,7 +662,7 @@ export function Editor(props: EditorProps) {
             onDone: (attachments) => {
               const editor = useEditorManager.getState().getEditor(id)?.editor;
               if (!editor) return;
-              attachments.forEach((a) => editor?.attachFile(a));
+              editor?.attachFiles(...attachments);
             }
           });
         }}
@@ -813,7 +825,7 @@ function DropZone(props: DropZoneProps) {
                 .getState()
                 .getEditor(activeEditorId)?.editor;
               if (!editor) return;
-              attachments.forEach((a) => editor?.attachFile(a));
+              editor?.attachFiles(...attachments);
             }
           });
         } catch (e) {

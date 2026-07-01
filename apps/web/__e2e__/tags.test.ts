@@ -19,14 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { AppModel } from "./models/app.model";
 import { Item } from "./models/types";
-import {
-  test,
-  expect,
-  getTestId,
-  NOTE,
-  orderByOptions,
-  sortByOptions
-} from "./utils";
+import { getTestId, NOTE, orderByOptions, sortByOptions } from "./utils";
+import { test, expect } from "@nn/test";
 
 const TAG: Item = { title: "hello-world" };
 const EDITED_TAG: Item = { title: "hello-world-2" };

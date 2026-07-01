@@ -69,6 +69,8 @@ import { showFeatureNotAllowedToast } from "../../common/toasts";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
+import { handleInternalLink } from "../../common";
+import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
 
 export type OnChangeHandler = (
@@ -99,6 +101,7 @@ type TipTapProps = {
   onAutoSaveDisabled: () => void;
   content?: () => string | undefined;
   readonly?: boolean;
+  spellcheck?: boolean;
   nonce?: number;
   isMobile?: boolean;
   isTablet?: boolean;
@@ -326,7 +329,8 @@ function TipTap(props: TipTapProps) {
 
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const ignoreEdit = transaction.getMeta("ignoreEdit") as boolean;
-        if (preventSave || !editor.isEditable || !onChange) return;
+        if (ignoreEdit || preventSave || !editor.isEditable || !onChange)
+          return;
 
         if (!autoSave.current) return;
 
@@ -425,31 +429,60 @@ function TipTap(props: TipTapProps) {
       getAttachmentData: onGetAttachmentData,
       openLink: async (url, openInNewTab) => {
         const link = parseInternalLink(url);
-        if (link && link.type === "note") {
-          useEditorStore.getState().openSession(link.id, {
-            activeBlockId: link.params?.blockId || undefined,
-            openInNewTab: openInNewTab
-          });
-        } else if (url.startsWith("file:")) {
+        if (link) handleInternalLink(url, openInNewTab);
+        else if (url.startsWith("file:")) {
           if (!IS_DESKTOP_APP) {
             showToast("error", strings.cantOpenFileLinksInBrowsers());
             return;
           }
 
-          const path = new URL(url).pathname;
-          const ok = await ConfirmDialog.show({
-            title: strings.openingLocalFile(),
-            message: strings.openingLocalFileDesc(path),
-            positiveButtonText: strings.open(),
-            negativeButtonText: strings.cancel()
-          });
-          if (!ok) return;
-
           await desktop?.integration.openPath.query({
             type: "path",
-            link: decodeURIComponent(path)
+            link: url
           });
         } else window.open(url, "_blank");
+      },
+      getLinkData: async (url) => {
+        const link = parseInternalLink(url);
+        if (!link) return;
+
+        switch (link.type) {
+          case "note":
+          case "notebook":
+          case "tag": {
+            const table =
+              link.type === "note"
+                ? "notes"
+                : link.type === "notebook"
+                ? "notebooks"
+                : "tags";
+            const item = await db
+              .sql()
+              .selectFrom(table)
+              .where("id", "=", link.id)
+              .select("title")
+              .executeTakeFirst();
+            return {
+              type: link.type,
+              title: item?.title || ""
+            };
+          }
+          case "color": {
+            const color = await db
+              .sql()
+              .selectFrom("colors")
+              .where("id", "=", link.id)
+              .select(["title", "colorCode"])
+              .executeTakeFirst();
+            return {
+              type: "color",
+              title: color?.title || "",
+              metadata: {
+                colorCode: color?.colorCode || ""
+              }
+            };
+          }
+        }
       }
     };
   }, [
@@ -645,6 +678,12 @@ function TiptapWrapper(
     };
   }, [editorConfig.zoom]);
 
+  useEffect(() => {
+    if (editorContainerRef.current) {
+      editorContainerRef.current.spellcheck = props.spellcheck === true;
+    }
+  }, [props.spellcheck]);
+
   return (
     <Flex
       ref={containerRef}
@@ -692,6 +731,7 @@ function TiptapWrapper(
           editorContainer.style.fontFamily =
             getFontById(editorConfig.fontFamily)?.font || "sans-serif";
           editorContainer.tabIndex = -1;
+          editorContainer.spellcheck = props.spellcheck === true;
           editorContainerRef.current = editorContainer;
           return editorContainer;
         }}
@@ -746,10 +786,8 @@ function toIEditor(editor: Editor): IEditor {
         })
         .run();
     },
-    attachFile: (file: Attachment) =>
-      file.type === "image"
-        ? editor.commands.insertImage(file)
-        : editor.commands.insertAttachment(file),
+    attachFiles: async (...files: Attachment[]) =>
+      editor.commands.insertAttachment(...files),
     sendAttachmentProgress: (hash, progress) =>
       editor.commands.updateAttachment(
         {

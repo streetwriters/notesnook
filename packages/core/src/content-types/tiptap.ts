@@ -38,7 +38,7 @@ import { HTMLRewriter } from "../utils/html-rewriter.js";
 import { ContentBlock } from "../types.js";
 import {
   InternalLink,
-  isInternalLink,
+  isNoteLink,
   parseInternalLink
 } from "../utils/internal-link.js";
 import { Element } from "domhandler";
@@ -215,7 +215,8 @@ export class Tiptap {
               (node) =>
                 isTag(node) &&
                 node.tagName === "a" &&
-                isInternalLink(node.attribs.href)
+                isNoteLink(node.attribs.href) &&
+                parseInternalLink(node.attribs.href)?.type === "note"
             )
           );
         }, document.childNodes).map((element) => {
@@ -250,9 +251,7 @@ export class Tiptap {
       result.internalLinks.push(
         ...findAll(
           (e) =>
-            e.tagName === "a" &&
-            !!e.attribs.href &&
-            e.attribs.href.startsWith("nn://"),
+            e.tagName === "a" && !!e.attribs.href && isNoteLink(e.attribs.href),
           document.childNodes
         )
           .map((e) => parseInternalLink(e.attribs.href))

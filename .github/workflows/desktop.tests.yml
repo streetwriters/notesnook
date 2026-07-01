@@ -18,11 +18,12 @@ on:
       - ".github/workflows/desktop.tests.yml"
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-22.04
+  test-macos-x64:
+    name: Test macOS x64
+    runs-on: macos-15-intel
+
     steps:
-      - name: Checkout
+      - name: Check out Git repository
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -33,44 +34,10 @@ jobs:
           npm ci --ignore-scripts --prefer-offline --no-audit
           npm run bootstrap -- --scope=web
 
-      - name: Generate desktop build
-        run: npm run tx @notesnook/web:build:desktop
-
-      - name: Archive build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: apps/web/build/**/*
-
-  test-macos-x64:
-    name: Test macOS x64
-    needs: build
-    runs-on: macos-15-intel
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: ./.github/actions/setup-node-with-cache
-
-      - name: Download build
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: ./apps/web/build
-
-      - name: Install packages
+      - name: Install sqlite-better-trigram for all arch
         run: |
-          npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
-
-      - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
-
-      - name: Build app
-        run: |
-          yarn electron-builder --config=electron-builder.config.js --mac --dir --x64
+          npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Run tests x64
@@ -87,7 +54,6 @@ jobs:
 
   test-macos:
     name: Test macOS
-    needs: build
     runs-on: macos-latest
 
     steps:
@@ -97,23 +63,15 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      - name: Download build
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: ./apps/web/build
-
       - name: Install packages
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          npm run bootstrap -- --scope=web
 
-      - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
-
-      - name: Build app
+      - name: Install sqlite-better-trigram for all arch
         run: |
-          yarn electron-builder --config=electron-builder.config.js --mac --dir --arm64
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu arm64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Run tests arm64
@@ -130,7 +88,6 @@ jobs:
 
   test-linux:
     name: Test for Linux
-    needs: build
     runs-on: ubuntu-22.04
 
     steps:
@@ -140,29 +97,15 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      - name: Download build
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: ./apps/web/build
-
       - name: Install packages
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          npm run bootstrap -- --scope=web
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
-        working-directory: ./apps/desktop
-
-      - name: Build Electron wrapper
-        run: npm run tx @notesnook/desktop:release
-
-      - name: Build app
-        run: |
-          yarn electron-builder --config=electron-builder.config.js --linux --dir --arm64 --x64
+          npm i --cpu x64 sqlite3-fts5-html
         working-directory: ./apps/desktop
 
       - name: Run tests
@@ -179,8 +122,7 @@ jobs:
 
   test-windows:
     name: Test for Windows
-    needs: build
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
       - name: Check out Git repository
@@ -189,32 +131,15 @@ jobs:
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
 
-      - name: Download build
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: ./apps/web/build
-
       - name: Install packages
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=desktop
+          npm run bootstrap -- --scope=web
 
       - name: Install sqlite-better-trigram for all arch
         run: |
-          npm i --cpu arm64 sqlite-better-trigram
           npm i --cpu x64 sqlite-better-trigram
-
-          npm i --cpu arm64 sqlite3-fts5-html
           npm i --cpu x64 sqlite3-fts5-html
-        working-directory: ./apps/desktop
-
-      - name: Build Electron wrapper
-        run: node scripts/execute.mjs @notesnook/desktop:release
-
-      - name: Build app
-        run: |
-          npx cross-env NOTESNOOK_STAGING=true yarn electron-builder --config=electron-builder.config.js --win --dir --arm64 --x64
         working-directory: ./apps/desktop
 
       - name: Run tests

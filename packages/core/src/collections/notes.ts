@@ -369,6 +369,9 @@ export class Notes implements ICollection {
       await this.db.content.updateByNoteId({ localOnly: state }, ...ids);
     });
   }
+  spellcheck(state: boolean, ...ids: string[]) {
+    return this.collection.update(ids, { spellcheck: state });
+  }
 
   async export(id: string, options: ExportOptions): Promise<false | string>;
   async export(note: Note, options: ExportOptions): Promise<false | string>;
@@ -486,6 +489,7 @@ export class Notes implements ICollection {
         await this.db.relations.unlinkOfType("note", ids);
         await this.collection.softDelete(ids);
         await this.db.content.removeByNoteId(...ids);
+        await this.db.inboxItemsHistory.delete(ids);
       });
     }
 

@@ -25,6 +25,8 @@ import { updaterRouter } from "./updater";
 import { bridgeRouter } from "./bridge";
 import { safeStorageRouter } from "./safe-storage";
 import { windowRouter } from "./window";
+import { sqliteRouter } from "./sqlite-kysely";
+import { backupsRouter } from "./backups";
 
 const t = initTRPC.create();
 
@@ -35,10 +37,13 @@ export const router = t.router({
   updater: updaterRouter,
   bridge: bridgeRouter,
   safeStorage: safeStorageRouter,
-  window: windowRouter
+  window: windowRouter,
+  sqlite: sqliteRouter,
+  backups: backupsRouter
 });
 
-export const api = router.createCaller({});
+const createCaller = t.createCallerFactory(router);
+export const api = createCaller({});
 
 // Export type router type signature,
 // NOT the router itself.

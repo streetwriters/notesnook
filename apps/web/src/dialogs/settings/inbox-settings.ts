@@ -20,6 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { InboxApiKeys } from "./components/inbox-api-keys";
+import { InboxPGPKeysDialog } from "../inbox-pgp-keys-dialog";
+import { db } from "../../common/db";
+import { showPasswordDialog } from "../password-dialog";
+import { strings } from "@notesnook/intl";
+import { InboxHistoryDialog } from "../inbox-history-dialog";
 
 export const InboxSettings: SettingsGroup[] = [
   {
@@ -39,6 +44,60 @@ export const InboxSettings: SettingsGroup[] = [
             type: "toggle",
             isToggled: () => useSettingStore.getState().isInboxEnabled,
             toggle: () => useSettingStore.getState().toggleInbox()
+          }
+        ]
+      },
+      {
+        key: "show-inbox-pgp-keys",
+        title: "Inbox PGP Keys",
+        description: "View/edit your Inbox PGP keys",
+        keywords: ["inbox", "pgp", "keys"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
+        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        components: [
+          {
+            type: "button",
+            title: "Show",
+            variant: "secondary",
+            action: async () => {
+              const ok = await showPasswordDialog({
+                title: "Authenticate to view/edit Inbox PGP keys",
+                inputs: {
+                  password: {
+                    label: strings.accountPassword(),
+                    autoComplete: "current-password"
+                  }
+                },
+                validate: ({ password }) => {
+                  return db.user.verifyPassword(password);
+                }
+              });
+              if (!ok) return;
+
+              InboxPGPKeysDialog.show({
+                keys: await db.user.getInboxKeys()
+              });
+            }
+          }
+        ]
+      },
+      {
+        key: "failed-inbox-items",
+        title: strings.failedInboxItems(),
+        description: strings.failedInboxItemsDesc(),
+        keywords: ["inbox", "failed", "items"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
+        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        components: [
+          {
+            type: "button",
+            title: strings.show(),
+            variant: "secondary",
+            action: () => {
+              InboxHistoryDialog.show({});
+            }
           }
         ]
       },

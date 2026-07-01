@@ -336,6 +336,8 @@ class UserManager {
   }
 
   async fetchUser(): Promise<User | undefined> {
+    this.keyManager.clearCache();
+
     const oldUser = await this.getUser();
     try {
       const token = await this.tokenManager.getAccessToken();
@@ -506,7 +508,7 @@ class UserManager {
 
   async getInboxKeys() {
     return this.getUserKey("inboxKeys", {
-      generateKey: () => this.db.crypto().generateCryptoKeyPair(),
+      generateKey: () => this.db.crypto().generatePGPKeyPair(),
       errorContext: "inbox encryption keys"
     });
   }
@@ -532,6 +534,22 @@ class UserManager {
     );
 
     await this.setUser({ ...user, inboxKeys: undefined });
+  }
+
+  async saveInboxKeys(keys: SerializedKeyPair) {
+    const userEncryptionKey = await this.getMasterKey();
+    if (!userEncryptionKey) return;
+
+    const updatePayload = {
+      inboxKeys: {
+        public: keys.publicKey,
+        private: await this.db
+          .storage()
+          .encrypt(userEncryptionKey, keys.privateKey)
+      }
+    };
+    await this.updateUser(updatePayload);
+    this.keyManager.clearCache();
   }
 
   async sendVerificationEmail(newEmail?: string) {
@@ -614,7 +632,10 @@ class UserManager {
       throw new Error("Incorrect old password.");
 
     const oldPassword = old_password
-      ? await this.db.storage().hash(old_password, email, {
+      ? // we don't lowercase email here to allow user accounts with
+        // mixed cased emails to change their passwords. Once that is done,
+        // we will lowercase the email in the backend.
+        await this.db.storage().hash(old_password, email, {
           usesFallback: await this.usesFallbackPWHash(old_password)
         })
       : null;
@@ -678,7 +699,9 @@ class UserManager {
       `${constants.API_HOST}/users/password/${type}`,
       {
         oldPassword: oldPassword,
-        newPassword: await this.db.storage().hash(new_password, email),
+        newPassword: await this.db
+          .storage()
+          .hash(new_password, email.toLowerCase()),
         userKeys: updateUserPayload
       },
       token

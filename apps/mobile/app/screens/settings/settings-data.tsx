@@ -66,6 +66,7 @@ import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
 import { refreshAllStores } from "../../stores/create-db-collection-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
@@ -731,6 +732,108 @@ export const settingsGroups: SettingSection[] = [
         type: "screen",
         description: strings.notesnookCircleDesc(),
         component: "notesnook-circle"
+      },
+      {
+        id: "inbox-api",
+        name: strings.inboxAPI(),
+        icon: "inbox",
+        type: "screen",
+        description: strings.inboxAPIDesc(),
+        sections: [
+          {
+            id: "toggle-inbox-api",
+            name: strings.enableInboxAPI(),
+            description: strings.enableInboxAPIDesc(),
+            type: "switch",
+            useHook: () => {
+              return useSettingStore((state) => state.inboxEnabled);
+            },
+            getter: (current) => current,
+            modifer: async (current) => {
+              if (current) {
+                return new Promise((resolve) => {
+                  presentDialog({
+                    title: strings.disableInboxAPI(),
+                    paragraph: strings.disableInboxAPIDesc(),
+                    positiveText: strings.disable(),
+                    onClose: () => {
+                      resolve();
+                    },
+                    positivePress: async () => {
+                      try {
+                        await db.inboxItemsHistory.deleteFailed();
+                        await db.user.discardInboxKeys();
+                        useSettingStore.setState({
+                          inboxEnabled: false
+                        });
+                        resolve();
+                        return true;
+                      } catch (e) {
+                        ToastManager.show({
+                          message: (e as Error).message,
+                          context: "local"
+                        });
+                        DatabaseLogger.error(e);
+                        return false;
+                      }
+                    }
+                  });
+                });
+              }
+
+              try {
+                Navigation.push("SettingsGroup", {
+                  id: "setup-inbox-keys",
+                  name: strings.setupInboxKeys(),
+                  type: "screen",
+                  component: "setup-inbox-keys"
+                } as any);
+              } catch (e) {
+                console.log(e);
+              }
+            }
+          },
+          {
+            id: "manage-inbox-keys",
+            name: strings.manageInboxKeys(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
+            description: strings.manageInboxKeysDesc(),
+            onVerify: async () => {
+              return new Promise((resolve) => {
+                verifyUser(
+                  "global",
+                  () => {
+                    resolve(true);
+                  },
+                  false,
+                  () => resolve(false)
+                );
+              });
+            },
+            type: "screen",
+            component: "manage-inbox-keys"
+          },
+          {
+            id: "inbox-keys",
+            name: strings.viewAPIKeys(),
+            description: strings.viewAPIKeysDesc(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
+            type: "screen",
+            component: "inbox-keys"
+          },
+          {
+            id: "failed-inbox-items",
+            name: strings.failedInboxItems(),
+            description: strings.failedInboxItemsDesc(),
+            useHook: () => useSettingStore((state) => state.inboxEnabled),
+            hidden: (current) => !current,
+            type: "screen",
+            component: "failed-inbox-items",
+            hideHeader: true
+          }
+        ]
       }
     ]
   },
@@ -861,6 +964,14 @@ export const settingsGroups: SettingSection[] = [
             description: strings.autoUpdateCheckDesc(),
             property: "checkForUpdates",
             icon: "update"
+          },
+          {
+            id: "image-compression",
+            type: "component",
+            name: strings.imageCompression(),
+            description: strings.imageCompressionDesc(),
+            component: "image-compression-picker",
+            icon: "image-area"
           }
         ]
       },
@@ -1019,6 +1130,16 @@ export const settingsGroups: SettingSection[] = [
                 buttonTitle: strings.create()
               });
             }
+          },
+          {
+            id: "lock-vault-after",
+            type: "component",
+            useHook: useVaultStatus,
+            name: strings.lockVaultAfter(),
+            description: strings.lockVaultAfterDesc(),
+            hidden: (current) => !(current as VaultStatusType)?.exists,
+            component: "vault-lock-timer",
+            icon: "clock-outline"
           },
           {
             id: "change-vault-password",
@@ -1718,7 +1839,7 @@ export const settingsGroups: SettingSection[] = [
             console.error(e);
           }
         },
-        description: Platform.OS === "ios" ? "3.3.27" : getVersion()
+        description: getVersion()
       }
     ]
   }

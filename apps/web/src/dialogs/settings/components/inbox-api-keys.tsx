@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useRef, useState, useEffect } from "react";
 import { Box, Button, Flex, Input, Text, Select } from "@theme-ui/components";
-import { formatDate, InboxApiKey } from "@notesnook/core";
+import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
 import {
@@ -32,9 +32,8 @@ import {
 import Field from "../../../components/field";
 import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
 import Dialog from "../../../components/dialog";
-import { usePromise } from "@notesnook/common";
+import { getFormattedDate, usePromise } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
-import { PromptDialog } from "../../prompt";
 import { showPasswordDialog } from "../../password-dialog";
 import { strings } from "@notesnook/intl";
 
@@ -74,10 +73,11 @@ export function InboxApiKeys() {
             variant="accent"
             onClick={() => {
               if (apiKeys.length >= 10) {
-                PromptDialog.show({
+                ConfirmDialog.show({
                   title: "API Keys Limit Reached",
-                  description:
-                    "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones."
+                  subtitle:
+                    "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones.",
+                  positiveButtonText: strings.ok()
                 });
               } else {
                 AddApiKeyDialog.show({
@@ -190,7 +190,8 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
     }
   }, [viewing]);
 
-  const isApiKeyExpired = Date.now() > apiKey.expiryDate;
+  const isApiKeyExpired =
+    apiKey.expiryDate === -1 ? false : Date.now() > apiKey.expiryDate;
 
   return (
     <Box
@@ -232,17 +233,17 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           <Flex sx={{ mb: 1, flexDirection: "column" }}>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
               {apiKey.lastUsedAt
-                ? `Last used on ${formatDate(apiKey.lastUsedAt)}`
+                ? `Last used on ${getFormattedDate(apiKey.lastUsedAt)}`
                 : "Never used"}
             </Text>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-              Created on {formatDate(apiKey.dateCreated)}
+              Created on {getFormattedDate(apiKey.dateCreated)}
             </Text>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
               {apiKey.expiryDate === -1
                 ? "Never expires"
                 : `${isApiKeyExpired ? "Expired" : "Expires"} on
-              ${formatDate(apiKey.expiryDate)}`}
+              ${getFormattedDate(apiKey.expiryDate)}`}
             </Text>
           </Flex>
         </Box>
@@ -400,10 +401,14 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
               setSelectedExpiry(Number(value));
             }}
             sx={{
+              color: "var(--paragraph)",
               bg: "background-secondary",
               border: "1px solid",
               borderColor: "border",
-              padding: "5px"
+              padding: "5px",
+              "& + svg": {
+                fill: "var(--paragraph)"
+              }
             }}
           >
             {EXPIRY_OPTIONS.map((option) => (

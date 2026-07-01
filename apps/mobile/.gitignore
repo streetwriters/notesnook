@@ -1,4 +1,5 @@
 .yarnrc.yml
+tsconfig.tsbuildinfo
 artifacts/
 # OSX
 #

@@ -21,10 +21,18 @@ import ListItem from "../list-item";
 import { navigate } from "../../navigation";
 import { Flex, Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
+import { store as settingStore } from "../../stores/setting-store";
 import { db } from "../../common/db";
-import { Edit, Shortcut, DeleteForver, Tag as TagIcon } from "../icons";
+import {
+  Edit,
+  Shortcut,
+  DeleteForver,
+  Tag as TagIcon,
+  Copy,
+  InternalLink
+} from "../icons";
 import { MenuItem } from "@notesnook/ui";
-import { Tag as TagType } from "@notesnook/core";
+import { createInternalLink, Tag as TagType } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
 import { EditTagDialog } from "../../dialogs/item-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
@@ -36,6 +44,8 @@ import {
   withFeatureCheck
 } from "../../common";
 import { areFeaturesAvailable } from "@notesnook/common";
+import { showToast } from "../../utils/toast";
+import { writeToClipboard } from "../../utils/clipboard";
 
 type TagProps = { item: TagType; totalNotes: number };
 function Tag(props: TagProps) {
@@ -149,6 +159,20 @@ export const tagMenuItems: (
         appStore.addToShortcuts(tag)
       )
     },
+    {
+      type: "button",
+      key: "copy-link",
+      title: strings.copyLink(),
+      icon: InternalLink.path,
+      onClick: () => {
+        const link = createInternalLink("tag", tag.id);
+        writeToClipboard({
+          "text/plain": link,
+          "text/html": `<a href="${link}">${tag.title}</a>`,
+          "text/markdown": `[${tag.title}](${link})`
+        });
+      }
+    },
     { key: "sep", type: "separator" },
     {
       type: "button",
@@ -160,6 +184,24 @@ export const tagMenuItems: (
         await Multiselect.deleteTags(ids);
       },
       multiSelect: true
+    },
+    {
+      type: "button",
+      key: "copyid",
+      title: "Copy ID",
+      icon: Copy.path,
+      onClick: async () => {
+        try {
+          await writeToClipboard({
+            "text/plain": tag.id
+          });
+          showToast("success", "Tag ID copied to clipboard");
+        } catch (e) {
+          console.error(e);
+          showToast("error", "Failed to copy Tag ID");
+        }
+      },
+      isHidden: !settingStore.get().isInboxEnabled
     }
   ];
 };

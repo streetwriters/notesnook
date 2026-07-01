@@ -41,5 +41,8 @@ export const AppEvents = {
   revealItemInList: "list:revealItem",
 
   toggleSideMenu: "app:openSideMenu",
-  toggleEditor: "app:toggleEditor"
+  toggleEditor: "app:toggleEditor",
+
+  onOpenLink: "onOpenLink",
+  onCreateItem: "onCreateItem"
 };

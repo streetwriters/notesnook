@@ -55,5 +55,6 @@ export const EditorEvents = {
   goForward: "editor-events:go-forward",
   saveScroll: "editor-events:save-scroll",
   newNote: "editor-events:new-note",
-  downloadCsv: "editor-events:download-csv"
+  downloadCsv: "editor-events:download-csv",
+  getLinkData: "editor-events:get-link-data"
 } as const;
