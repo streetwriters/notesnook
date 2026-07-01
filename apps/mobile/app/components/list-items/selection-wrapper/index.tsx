@@ -71,44 +71,53 @@ const SelectionWrapper = ({
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: isEditingNote ? colors.selected.background : undefined
-      }}
-    >
-      <Pressable
-        customColor={isSheet ? colors.primary.hover : "transparent"}
-        testID={testID}
-        onLongPress={onLongPress}
-        onPress={onPress}
-        customSelectedColor={colors.primary.hover}
-        noborder
-        customAlpha={!isDark ? -0.02 : 0.02}
-        customOpacity={1}
-        style={{
-          paddingHorizontal: Spacing.LEVEL_3
-        }}
-      >
-        {hasGroupHeader ? null : (
+    <>
+      {hasGroupHeader ? null : (
+        <View
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3
+          }}
+        >
           <View
             style={{
-              marginVertical: Spacing.LEVEL_2,
               borderBottomWidth: 1,
               borderBottomColor: colors.primary.separator,
               width: "100%"
             }}
           />
-        )}
-        <View
+        </View>
+      )}
+      <View
+        style={{
+          backgroundColor: undefined
+        }}
+      >
+        <Pressable
+          customColor={isSheet ? colors.primary.hover : "transparent"}
+          testID={testID}
+          onLongPress={onLongPress}
+          onPress={onPress}
+          customSelectedColor={colors.primary.hover}
+          noborder
+          customAlpha={!isDark ? -0.02 : 0.02}
+          customOpacity={1}
           style={{
-            width: "100%",
-            flexDirection: "row"
+            paddingHorizontal: Spacing.LEVEL_3,
+            paddingBottom: Spacing.LEVEL_2,
+            paddingTop: hasGroupHeader ? 0 : Spacing.LEVEL_2
           }}
         >
-          {children}
-        </View>
-      </Pressable>
-    </View>
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row"
+            }}
+          >
+            {children}
+          </View>
+        </Pressable>
+      </View>
+    </>
   );
 };
 
