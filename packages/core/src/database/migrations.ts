@@ -474,6 +474,7 @@ export class NNMigrationProvider implements MigrationProvider {
         async up(db) {
           await db.schema
             .createTable("inboxitemshistory")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("dateSynced", "integer")
