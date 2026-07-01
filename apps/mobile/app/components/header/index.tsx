@@ -32,7 +32,6 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eScrollEvent } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
-import { DefaultAppStyles } from "../../utils/styles";
 import { IconButton, IconButtonProps } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 
@@ -106,7 +105,7 @@ export const Header = ({
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
+        paddingHorizontal: Spacing.LEVEL_3,
         marginTop: Platform.OS === "android" ? 5 : 0
       }}
     >
@@ -116,7 +115,6 @@ export const Header = ({
             flexDirection: "row",
             justifyContent: "space-between",
             borderRadius: Radius.S,
-            paddingHorizontal: Spacing.LEVEL_2,
             paddingVertical: Spacing.LEVEL_3,
             backgroundColor: colors.secondary.background,
             alignItems: "center"

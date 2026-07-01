@@ -89,7 +89,9 @@ const SelectionWrapper = ({
       )}
       <View
         style={{
-          backgroundColor: undefined
+          backgroundColor: isEditingNote
+            ? colors.selected.background
+            : undefined
         }}
       >
         <Pressable
