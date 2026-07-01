@@ -185,13 +185,13 @@ export function hasFormErrors(errors: FormErrors) {
 export const validators = {
   required:
     (message = "This field is required") =>
-      (value: string) =>
-        value?.trim() ? undefined : message,
+    (value: string) =>
+      value?.trim() ? undefined : message,
 
   email:
     (message = "Please enter a valid email") =>
-      (value: string) =>
-        !value?.trim() || isEmail(value.trim()) ? undefined : message,
+    (value: string) =>
+      !value?.trim() || isEmail(value.trim()) ? undefined : message,
 
   minLength: (length: number, message?: string) => (value: string) =>
     !value || value.length >= length
@@ -200,15 +200,15 @@ export const validators = {
 
   url:
     (message = "Please enter a valid URL") =>
-      (value: string) =>
-        !value?.trim() || isURL(value.trim(), { allow_underscores: true })
-          ? undefined
-          : message,
+    (value: string) =>
+      !value?.trim() || isURL(value.trim(), { allow_underscores: true })
+        ? undefined
+        : message,
 
   matchField:
     (fieldName: string, message = "Values do not match") =>
-      (value: string, values: FormValues) =>
-        value === values[fieldName] ? undefined : message
+    (value: string, values: FormValues) =>
+      value === values[fieldName] ? undefined : message
 };
 
 interface FormInputProps extends TextInputProps {
@@ -388,7 +388,7 @@ export function FormInput({
             <IconButton
               name={!secureEntry ? "eye-closed" : "eye-open"}
               iconFamily="notesnook"
-              size={20}
+              size={16}
               top={10}
               bottom={10}
               onPress={() => {
@@ -409,7 +409,7 @@ export function FormInput({
             <IconButton
               testID={button.testID}
               name={button.icon}
-              size={button.size || AppFontSize.xl}
+              size={button.size || 16}
               top={10}
               bottom={10}
               onPress={button.onPress}

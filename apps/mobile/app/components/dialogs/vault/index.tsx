@@ -55,9 +55,7 @@ import FormInput, {
   createFormRef,
   validators
 } from "../../ui/input/form-input";
-import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
 import {
   isEncryptedContent,
   Note,
@@ -72,6 +70,7 @@ import { Radius, Spacing } from "../../../common/design/spacing";
 import { PASSWORD_PLACEHOLDER } from "../../../utils/constants";
 import { AppFontSize } from "../../../utils/size";
 import { useSettingStore } from "../../../stores/use-setting-store";
+import { Checkbox } from "../../ui/checkbox";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
@@ -632,7 +631,7 @@ export const VaultDialog: React.FC = () => {
       descriptionRef.current = data.description || null;
       paragraphRef.current = data.paragraph || null;
       buttonTitleRef.current = data.buttonTitle || null;
-      positiveButtonTypeRef.current = data.positiveButtonType || "transparent";
+      positiveButtonTypeRef.current = data.positiveButtonType || "accent";
       customActionTitleRef.current = data.customActionTitle || null;
       customActionParagraphRef.current = data.customActionParagraph || null;
       onUnlockRef.current = data.onUnlock;
@@ -641,7 +640,7 @@ export const VaultDialog: React.FC = () => {
       // Set UI state
       setIsBiometryAvailable(available);
       setIsBiometryEnrolled(fingerprint);
-      setBiometricUnlock(fingerprint);
+      // setBiometricUnlock(fingerprint);
       setIcon(data.icon);
       setDeleteAll(false);
       setLoading(false);
@@ -719,7 +718,11 @@ export const VaultDialog: React.FC = () => {
         }}
       >
         <DialogHeader
-          title={titleRef.current}
+          title={
+            requestType === VaultRequestType.PermanentUnlock
+              ? noteRef.current?.title
+              : titleRef.current
+          }
           paragraph={
             paragraphRef.current || customActionParagraphRef.current || ""
           }
@@ -737,7 +740,7 @@ export const VaultDialog: React.FC = () => {
             paddingHorizontal: Spacing.LEVEL_3,
             gap: isDeleteVault ? 0 : Spacing.LEVEL_4,
             marginTop: Spacing.LEVEL_4,
-            marginBottom: Spacing.LEVEL_1
+            marginBottom: Spacing.LEVEL_4
           }}
         >
           {(isChangePassword ||
@@ -841,9 +844,14 @@ export const VaultDialog: React.FC = () => {
           ) : null}
 
           {isCreateVault ? (
-            <View>
+            <View
+              style={{
+                gap: Spacing.LEVEL_2
+              }}
+            >
               <FormInput
                 name="password"
+                label={strings.password()}
                 formRef={formRef}
                 fwdRef={passInputRef}
                 autoCapitalize="none"
@@ -886,12 +894,7 @@ export const VaultDialog: React.FC = () => {
             </View>
           ) : null}
 
-          {biometricUnlock && !isBiometryEnrolled && !isCreateVault ? (
-            <Paragraph>{strings.vaultEnableBiometrics()}</Paragraph>
-          ) : null}
-
-          {!biometricUnlock &&
-          !isBiometryEnrolled &&
+          {!isBiometryEnrolled &&
           isBiometryAvailable &&
           (requestType === VaultRequestType.CopyNote ||
             requestType === VaultRequestType.DeleteNote ||
@@ -900,20 +903,16 @@ export const VaultDialog: React.FC = () => {
             requestType === VaultRequestType.GoToEditor ||
             requestType === VaultRequestType.PermanentUnlock ||
             requestType === VaultRequestType.LockNote) ? (
-            <Button
+            <Checkbox
+              title={strings.vaultEnableBiometrics()}
+              checked={biometricUnlock}
+              iconSize={12}
+              style={{
+                marginTop: -Spacing.LEVEL_1
+              }}
               onPress={() => {
                 setBiometricUnlock(!biometricUnlock);
               }}
-              style={{
-                marginTop: DefaultAppStyles.GAP_VERTICAL
-              }}
-              icon="fingerprint"
-              width="100%"
-              title={strings.unlockWithBiometrics()}
-              iconColor={
-                biometricUnlock ? colors.selected.accent : colors.primary.icon
-              }
-              type={biometricUnlock ? "transparent" : "plain"}
             />
           ) : null}
         </View>
