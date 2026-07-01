@@ -2942,5 +2942,6 @@ Continue without attachments?`,
     t`Something went wrong while preparing your debug logs. This can happen if no storage location was selected.`,
   shareZip: () => t`Share ZIP`,
   tryDownloadLogsAgain: () => t`Try again`,
-  createSubnotebook: () => t`Create sub-notebook`
+  createSubnotebook: () => t`Create sub-notebook`,
+  saveChanges: () => t`Save changes`
 };

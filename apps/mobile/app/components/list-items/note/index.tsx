@@ -162,9 +162,9 @@ const NoteItem = ({
   );
 
   const canShowTopStatusBar =
-    attachmentsCount > 0 &&
-    activeStatusIcons.length > 0 &&
-    notebooks?.items?.length &&
+    attachmentsCount > 0 ||
+    activeStatusIcons.length > 0 ||
+    notebooks?.items?.length ||
     tags?.items.length;
 
   return (
@@ -369,7 +369,7 @@ const NoteItem = ({
                 gap: Spacing.LEVEL_1
               }}
             >
-              {color ? (
+              {color && compactMode ? (
                 <View
                   style={{
                     width: 8,
