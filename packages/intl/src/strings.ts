@@ -2796,5 +2796,8 @@ Continue without attachments?`,
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
     t`The password for decrypting the Colornote backup file.`,
-  deleteItem: () => t`Delete item`
+  deleteItem: () => t`Delete item`,
+  keepScreenOn: () => t`Keep screen on`,
+  keepScreenOnDesc: () =>
+    t`Prevent the screen from turning off while using Notesnook.`
 };

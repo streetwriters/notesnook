@@ -210,7 +210,7 @@ export const settingsGroups: SettingSection[] = [
               : status === SubscriptionStatus.ACTIVE
                 ? strings.subRenewOn(expiryDate)
                 : status === SubscriptionStatus.CANCELED ||
-                    status === SubscriptionStatus.PAUSED
+                  status === SubscriptionStatus.PAUSED
                   ? strings.subEndsOn(expiryDate)
                   : status === SubscriptionStatus.EXPIRED
                     ? subscriptionDaysLeft.time < -3
@@ -964,6 +964,14 @@ export const settingsGroups: SettingSection[] = [
             description: strings.autoUpdateCheckDesc(),
             property: "checkForUpdates",
             icon: "update"
+          },
+          {
+            id: "keep-screen-on",
+            type: "switch",
+            name: strings.keepScreenOn(),
+            description: strings.keepScreenOnDesc(),
+            property: "keepScreenOn",
+            icon: "cellphone-screenshot",
           },
           {
             id: "image-compression",

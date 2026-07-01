@@ -3801,6 +3801,10 @@ msgstr ""
 msgid "Keep open"
 msgstr ""
 
+#: src/strings.ts:2800
+msgid "Keep screen on"
+msgstr ""
+
 #: src/strings.ts:1361
 msgid "Keep your data safe"
 msgstr ""
@@ -5163,6 +5167,10 @@ msgstr ""
 
 #: src/strings.ts:2182
 msgid "Prevent note title from appearing in tab/window title."
+msgstr ""
+
+#: src/strings.ts:2802
+msgid "Prevent the screen from turning off while using Notesnook."
 msgstr ""
 
 #: src/strings.ts:2325
