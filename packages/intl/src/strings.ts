@@ -2796,5 +2796,11 @@ Continue without attachments?`,
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
     t`The password for decrypting the Colornote backup file.`,
-  deleteItem: () => t`Delete item`
+  deleteItem: () => t`Delete item`,
+  clearHistory: () => t`Clear history`,
+  historyCleared: () => t`Version history cleared`,
+  clearHistoryConfirmation: (count: number) =>
+    count === 1
+      ? t`Delete all version history for this note?`
+      : t`Delete all version history for ${count} selected notes?`
 };
