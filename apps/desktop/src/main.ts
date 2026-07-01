@@ -40,6 +40,7 @@ import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 import { Messages, setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import { PATHS } from "./constants";
+import { normalizePathString } from "./utils/resolve-path";
 
 const locale =
   process.env.NODE_ENV === "development"
@@ -294,7 +295,7 @@ async function migrateBackupDirectory() {
       `localStorage.getItem("backupStorageLocation")`
     );
     if (!oldPath || oldPath === PATHS.backupsDirectory) return;
-    config.backupDirectory = oldPath;
+    config.backupDirectory = normalizePathString(oldPath);
   } catch (e) {
     console.error("Failed to migrate backup directory", e);
     const pressedButton = dialog.showMessageBoxSync(globalThis.window, {

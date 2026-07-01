@@ -33,7 +33,7 @@ import { config, DesktopIntegration } from "../utils/config";
 import { bringToFront } from "../utils/bring-to-front";
 import { getTheme, setTheme, Theme } from "../utils/theme";
 import { existsSync } from "fs";
-import { resolvePath } from "../utils/resolve-path";
+import { normalizePathString, resolvePath } from "../utils/resolve-path";
 import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak, isPortable, isSnap } from "../utils";
@@ -60,7 +60,13 @@ export const osIntegrationRouter = t.router({
   isFlatpak: t.procedure.query(() => isFlatpak()),
   isSnap: t.procedure.query(() => isSnap()),
   isPortable: t.procedure.query(() => isPortable()),
-  backupDirectory: t.procedure.query(() => config.backupDirectory),
+  backupDirectory: t.procedure.query(() => {
+    const backupDirectory = normalizePathString(config.backupDirectory);
+    if (backupDirectory !== config.backupDirectory) {
+      config.backupDirectory = backupDirectory;
+    }
+    return backupDirectory;
+  }),
 
   zoomFactor: t.procedure.query(() => config.zoomFactor),
   setZoomFactor: t.procedure.input(z.number()).mutation(({ input: factor }) => {

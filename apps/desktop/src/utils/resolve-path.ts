@@ -20,11 +20,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { app } from "electron";
 import { isAbsolute, join } from "path";
 
+export function normalizePathString(_path: string) {
+  let normalizedPath = _path.trim();
+
+  try {
+    const parsedPath = JSON.parse(normalizedPath);
+    if (typeof parsedPath === "string") normalizedPath = parsedPath;
+  } catch {
+    // ignore invalid JSON and keep the original path string
+  }
+
+  if (normalizedPath === "~") return app.getPath("home");
+  if (/^~[\\/]/.test(normalizedPath)) {
+    return join(app.getPath("home"), normalizedPath.slice(2));
+  }
+
+  return normalizedPath;
+}
+
 export function resolvePath(_path: string) {
-  if (isAbsolute(_path)) return _path;
+  const normalizedPath = normalizePathString(_path);
+  if (isAbsolute(normalizedPath)) return normalizedPath;
 
   return join(
-    ..._path.split("/").map((segment) => {
+    ...normalizedPath.split("/").map((segment) => {
       let resolved = segment;
       try {
         resolved = app.getPath(resolved as any);
