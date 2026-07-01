@@ -97,7 +97,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
 
         {key === "dateCreated" && item.type === "note" ? (
           <>
-            <AppIcon name="edit-pencil" size={10} iconFamily="notesnook" />
+            <AppIcon name="edit-pencil" size={16} iconFamily="notesnook" />
           </>
         ) : null}
       </View>

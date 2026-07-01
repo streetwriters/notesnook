@@ -27,6 +27,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import {
   eSendEvent,
   sendItemUpdateEvent,
@@ -38,13 +39,10 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import ColorPicker from "../dialogs/color-picker";
 import PaywallSheet from "../sheets/paywall";
-import { Button } from "../ui/button";
-import { Pressable } from "../ui/pressable";
-import { Spacing } from "../../common/design/spacing";
 import AppIcon from "../ui/AppIcon";
+import { Pressable } from "../ui/pressable";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
   const { colors } = useThemeColors();
@@ -86,15 +84,17 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
         height: 40,
         borderRadius: 100,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        borderWidth: 0
       }}
     >
       {isLinked ? (
-        <Icon
+        <AppIcon
           testID="icon-check"
-          name="check"
-          color="white"
-          size={AppFontSize.lg}
+          name="check-small"
+          iconFamily="notesnook"
+          color={colors.static.black}
+          size={15}
         />
       ) : null}
     </Pressable>

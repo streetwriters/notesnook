@@ -63,6 +63,7 @@ import {
   Tag,
   TrashItem
 } from "@notesnook/core";
+import LineSeparator from "../ui/seperator/line-separator";
 
 export type PropertiesItem =
   | Note
@@ -131,7 +132,7 @@ export const Properties = ({
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
         maxHeight: "100%",
-        paddingTop: Spacing.LEVEL_2
+        paddingTop: Spacing.LEVEL_3
       }}
       nestedScrollEnabled
       bounces={false}
@@ -159,8 +160,7 @@ export const Properties = ({
         >
           <View
             style={{
-              gap: Spacing.LEVEL_1,
-              paddingBottom: Spacing.LEVEL_3
+              gap: Spacing.LEVEL_1
             }}
           >
             {item.type === "note" && (noteNotebooks.length || tags.length) ? (
@@ -248,7 +248,7 @@ export const Properties = ({
                   />
                 ) : null}
 
-                <Heading size={AppFontSize.xl}>{item.title}</Heading>
+                <Heading fontSize="XL">{item.title}</Heading>
 
                 {editAction ? (
                   <IconButton
@@ -306,92 +306,95 @@ export const Properties = ({
               />
             ) : null}
           </View>
-
-          <DateMeta item={item} />
-
-          {item.type === "note" && colorNotes.length > 0 ? (
-            <Tags close={close} item={item} />
-          ) : null}
-
           {item.type === "note" ? (
-            <View
-              style={{
-                flexDirection: "row",
-                borderBottomWidth: 1,
-                borderTopWidth: colorNotes.length > 0 ? 1 : 0,
-                borderColor: colors.primary.border,
-                paddingVertical: Spacing.LEVEL_2,
-                paddingTop: colorNotes.length > 0 ? Spacing.LEVEL_2 : 0,
-                gap: Spacing.LEVEL_2
-              }}
-            >
-              <Button
-                onPress={async () => {
-                  ManageTags.present([item.id]);
-                  close?.();
-                }}
-                buttonType={{
-                  text: colors.primary.paragraph
-                }}
-                title={strings.addTag()}
-                type={colorNotes?.length ? "accent-outline" : "shade"}
-                icon="plus"
-                iconFamily="notesnook"
+            <LineSeparator paddingVertical={Spacing.LEVEL_3} />
+          ) : null}
+          <DateMeta item={item} />.
+          {item.type === "note" && colorNotes.length > 0 ? (
+            <View>
+              <LineSeparator
+                paddingVertical={Spacing.LEVEL_3}
                 style={{
-                  paddingHorizontal: Spacing.LEVEL_3,
-                  paddingVertical: Spacing.LEVEL_2,
-                  width: colorNotes?.length > 0 ? "100%" : "48.5%"
+                  paddingTop: Spacing.LEVEL_2
                 }}
               />
-
-              {colorNotes.length > 0 ? null : (
+              <Tags close={close} item={item} />
+              <LineSeparator
+                paddingVertical={Spacing.LEVEL_3}
+                style={{
+                  paddingBottom: 0
+                }}
+              />
+            </View>
+          ) : null}
+          {item.type === "note" ? (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: Spacing.LEVEL_2,
+                  marginTop: Spacing.LEVEL_2
+                }}
+              >
                 <Button
-                  onPress={() => {
-                    if (colorFeature && !colorFeature.isAllowed) {
-                      ToastManager.show({
-                        message: colorFeature.error,
-                        type: "info",
-                        context: "local",
-                        actionText: strings.upgrade(),
-                        func: () => {
-                          PaywallSheet.present(colorFeature);
-                          ToastManager.hide();
-                        }
-                      });
-                      return;
-                    }
-                    useSettingStore.getState().setSheetKeyboardHandler(false);
-                    setVisible(true);
+                  onPress={async () => {
+                    ManageTags.present([item.id]);
+                    close?.();
                   }}
-                  title={strings.addColor()}
-                  type="secondaryAccented"
+                  title={
+                    colorNotes?.length
+                      ? strings.addTag()
+                      : strings.dataTypesCamelCase.tag()
+                  }
+                  type={colorNotes?.length ? "accent-outline" : "shade-plain"}
                   icon="plus"
                   iconFamily="notesnook"
                   style={{
-                    width: "48.5%",
                     paddingHorizontal: Spacing.LEVEL_3,
-                    paddingVertical: Spacing.LEVEL_2
+                    paddingVertical: Spacing.LEVEL_2,
+                    width: colorNotes?.length > 0 ? "100%" : "48.5%"
                   }}
                 />
-              )}
-            </View>
+
+                {colorNotes.length > 0 ? null : (
+                  <Button
+                    onPress={() => {
+                      if (colorFeature && !colorFeature.isAllowed) {
+                        ToastManager.show({
+                          message: colorFeature.error,
+                          type: "info",
+                          context: "local",
+                          actionText: strings.upgrade(),
+                          func: () => {
+                            PaywallSheet.present(colorFeature);
+                            ToastManager.hide();
+                          }
+                        });
+                        return;
+                      }
+                      useSettingStore.getState().setSheetKeyboardHandler(false);
+                      setVisible(true);
+                    }}
+                    title={strings.dataTypesCamelCase.color()}
+                    type="shade-plain"
+                    icon="plus"
+                    iconFamily="notesnook"
+                    style={{
+                      width: "48.5%",
+                      paddingHorizontal: Spacing.LEVEL_3,
+                      paddingVertical: Spacing.LEVEL_2
+                    }}
+                  />
+                )}
+              </View>
+            </>
           ) : null}
         </View>
 
-        <View
-          style={{
-            paddingHorizontal: Spacing.LEVEL_3
-          }}
-        >
-          <View
-            style={{
-              marginVertical: Spacing.LEVEL_3,
-              width: "100%",
-              borderBottomWidth: 1,
-              borderColor: colors.primary.separator
-            }}
-          />
-        </View>
+        <LineSeparator
+          paddingVertical={Spacing.LEVEL_2}
+          paddingHorizontal={Spacing.LEVEL_3}
+        />
 
         <Items
           item={item}
