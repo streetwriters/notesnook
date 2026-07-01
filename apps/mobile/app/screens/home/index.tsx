@@ -67,6 +67,9 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
           });
         }}
         id={route.name}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
         onPressDefaultRightButton={openEditor}
       />
 

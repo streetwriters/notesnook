@@ -944,6 +944,7 @@ export const useActions = ({
           requestType: VaultRequestType.PermanentUnlock,
           item: item,
           title: strings.unlockNote(),
+          paragraph: strings.thisNoteLocked(),
           buttonTitle: strings.unlock()
         });
         return;
@@ -965,7 +966,8 @@ export const useActions = ({
               requestType: VaultRequestType.CreateVault,
               item: item,
               title: strings.createVault(),
-              buttonTitle: strings.lock()
+              buttonTitle: strings.lock(),
+              positiveButtonType: "accent"
             });
             break;
           case VAULT_ERRORS.vaultLocked:
@@ -973,7 +975,8 @@ export const useActions = ({
               requestType: VaultRequestType.LockNote,
               item: item,
               title: strings.lockNote(),
-              buttonTitle: strings.lock()
+              buttonTitle: strings.lock(),
+              positiveButtonType: "accent"
             });
             break;
         }
