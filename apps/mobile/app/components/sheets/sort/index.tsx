@@ -265,7 +265,9 @@ const Sort = ({
             >
               <Pressable
                 type={
-                  groupOptions?.sortBy === item ? "selected" : "plain-outline"
+                  groupOptions?.sortBy === item
+                    ? "selected"
+                    : "secondary-outline"
                 }
                 style={{
                   width: "100%",
@@ -389,7 +391,7 @@ const Sort = ({
                 type={
                   groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
                     ? "selected"
-                    : "plain-outline"
+                    : "secondary-outline"
                 }
                 style={{
                   flexDirection: "row",
@@ -409,12 +411,12 @@ const Sort = ({
                 <Paragraph
                   fontFamily={
                     groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
-                      ? "SEMI_BOLD"
+                      ? "MEDIUM"
                       : "REGULAR"
                   }
                   color={
                     groupOptions?.groupBy === GROUP[item as keyof typeof GROUP]
-                      ? colors.primary.paragraph
+                      ? colors.primary.heading
                       : colors.secondary.paragraph
                   }
                 >
@@ -455,7 +457,9 @@ const Sort = ({
                 <Pressable
                   key={item.group.id}
                   onPress={() => onPress(item)}
-                  type={currentIndex === index ? "selected" : "plain-outline"}
+                  type={
+                    currentIndex === index ? "selected" : "secondary-outline"
+                  }
                   style={{
                     minWidth: "20%",
                     width: null,
@@ -466,10 +470,12 @@ const Sort = ({
                 >
                   <Paragraph
                     size={AppFontSize.sm}
-                    fontFamily={
-                      currentIndex === index ? "SEMI_BOLD" : "REGULAR"
+                    fontFamily={currentIndex === index ? "MEDIUM" : "REGULAR"}
+                    color={
+                      currentIndex === index
+                        ? colors.primary.heading
+                        : colors.secondary.paragraph
                     }
-                    color={colors.primary.paragraph}
                     style={{
                       textAlign: "center"
                     }}
