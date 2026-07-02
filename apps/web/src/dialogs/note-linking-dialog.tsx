@@ -65,6 +65,7 @@ export const NoteLinkingDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
+        testId="note-linking-dialog"
         title={
           attributes ? strings.editInternalLink() : strings.newInternalLink()
         }
@@ -226,6 +227,7 @@ export const NoteLinkingDialog = DialogManager.register(
             <>
               <Field
                 autoFocus
+                data-test-id="link-note-search"
                 placeholder={strings.searchNoteToLinkPlaceholder()}
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
@@ -256,6 +258,7 @@ export const NoteLinkingDialog = DialogManager.register(
               {searchQuery.length > 0 && !hasExactMatch ? (
                 <Button
                   variant="menuitem"
+                  data-test-id="create-linked-note"
                   sx={{
                     p: 1,
                     mt: 1,
