@@ -159,7 +159,7 @@ export default function NoteHistory({
               onPress: () => {
                 presentDialog({
                   title: strings.clearHistory(),
-                  paragraph: strings.clearHistoryConfirmation(1),
+                  paragraph: strings.clearHistoryConfirmation(),
                   positiveText: strings.clear(),
                   negativeText: strings.cancel(),
                   positiveType: "errorShade",

@@ -2288,11 +2288,7 @@ msgstr ""
 msgid "Delete all"
 msgstr ""
 
-#: src/strings.ts:2805
-msgid "Delete all version history for {count} selected notes?"
-msgstr ""
-
-#: src/strings.ts:2804
+#: src/strings.ts:2802
 msgid "Delete all version history for this note?"
 msgstr ""
 

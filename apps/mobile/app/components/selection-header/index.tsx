@@ -212,32 +212,6 @@ export const SelectionHeader = React.memo(
                   icon: "export"
                 },
                 {
-                  title: strings.clearHistory(),
-                  onPress: async () => {
-                    presentDialog({
-                      title: strings.clearHistory(),
-                      paragraph: strings.clearHistoryConfirmation(
-                        selectedItemsList.length
-                      ),
-                      positiveText: strings.clear(),
-                      negativeText: strings.cancel(),
-                      positiveType: "errorShade",
-                      positivePress: async () => {
-                        await db.noteHistory.clearSessions(...selectedItemsList);
-                        Navigation.queueRoutesForUpdate();
-                        clearSelection();
-
-                        ToastManager.show({
-                          heading: strings.historyCleared(),
-                          type: "success"
-                        });
-                      }
-                    });
-                  },
-                  visible: type === "note",
-                  icon: "history"
-                },
-                {
                   title: strings.addToNotebook(),
                   onPress: async () => {
                     Navigation.navigate("LinkNotebooks", {

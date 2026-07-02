@@ -2299,11 +2299,7 @@ msgstr "Delete account"
 msgid "Delete all"
 msgstr "Delete all"
 
-#: src/strings.ts:2805
-msgid "Delete all version history for {count} selected notes?"
-msgstr "Delete all version history for {count} selected notes?"
-
-#: src/strings.ts:2804
+#: src/strings.ts:2802
 msgid "Delete all version history for this note?"
 msgstr "Delete all version history for this note?"
 
