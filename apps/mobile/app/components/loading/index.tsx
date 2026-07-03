@@ -72,7 +72,7 @@ export const Loading = (props: {
             marginBottom: Spacing.LEVEL_1
           }}
           fontSize="XL"
-          lineHeight={undefined}
+          lineHeight={null}
         >
           {props.title}
         </Heading>
