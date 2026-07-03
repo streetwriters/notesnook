@@ -355,9 +355,13 @@ const TwoFactorVerification = ({
                 }}
               >
                 <Paragraph
-                  fontFamily="SEMI_BOLD"
+                  fontFamily={isRecoveryCode ? "REGULAR" : "SEMI_BOLD"}
                   fontSize="SM"
-                  color={colors.primary.accent}
+                  color={
+                    isRecoveryCode
+                      ? colors.primary.paragraph
+                      : colors.primary.accent
+                  }
                 >
                   {strings["2faCodeSecondaryMethodText"][
                     currentMethod.method as keyof (typeof strings)["2faCodeSecondaryMethodText"]
