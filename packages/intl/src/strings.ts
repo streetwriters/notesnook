@@ -525,7 +525,6 @@ $day$: Current day (eg. Monday)`,
   newNotebook: () => t`New notebook`,
   newInternalLink: () => t`Link to note`,
   editInternalLink: () => t`Edit internal link`,
-  createNoteToLink: (title: string) => t`Create note "${title}"`,
   newColor: () => t`New color`,
   tabs: () => t`Tabs`,
   add: () => t`Add`,
@@ -2797,5 +2796,6 @@ Continue without attachments?`,
     t`Colornote password for ${filename}`,
   colorNotPasswordForDesc: () =>
     t`The password for decrypting the Colornote backup file.`,
-  deleteItem: () => t`Delete item`
+  deleteItem: () => t`Delete item`,
+  createNoteToLink: (title: string) => t`Create note "${title}"`
 };

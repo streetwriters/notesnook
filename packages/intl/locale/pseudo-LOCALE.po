@@ -2024,6 +2024,10 @@ msgstr ""
 msgid "Create link"
 msgstr ""
 
+#: src/strings.ts:2800
+msgid "Create note \"{title}\""
+msgstr ""
+
 #: src/strings.ts:1475
 msgid "Create shortcut of this notebook in side menu"
 msgstr ""
