@@ -215,7 +215,7 @@ export const defaultSettings: SettingStore["settings"] = {
   checkForUpdates: true,
   defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT,
   imageCompression: "ask-every-time",
-  keepScreenOn: false
+  keepScreenOn: true
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

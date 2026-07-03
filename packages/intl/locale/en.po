@@ -5196,8 +5196,8 @@ msgid "Prevent note title from appearing in tab/window title."
 msgstr "Prevent note title from appearing in tab/window title."
 
 #: src/strings.ts:2802
-msgid "Prevent the screen from turning off while using Notesnook."
-msgstr "Prevent the screen from turning off while using Notesnook."
+msgid "Prevent the screen from turning off while the editor is focused."
+msgstr "Prevent the screen from turning off while the editor is focused."
 
 #: src/strings.ts:2325
 msgid "Preview attachment"

@@ -2799,5 +2799,5 @@ Continue without attachments?`,
   deleteItem: () => t`Delete item`,
   keepScreenOn: () => t`Keep screen on`,
   keepScreenOnDesc: () =>
-    t`Prevent the screen from turning off while using Notesnook.`
+    t`Prevent the screen from turning off while the editor is focused.`
 };
