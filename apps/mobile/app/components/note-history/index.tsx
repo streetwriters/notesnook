@@ -40,6 +40,7 @@ import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
 import { presentDialog } from "../dialog/functions";
+import { Dialog } from "../dialog";
 
 const HistoryItem = ({
   index,
@@ -148,6 +149,7 @@ export default function NoteHistory({
   return (
     <View>
       <SheetProvider context="note_history" />
+      <Dialog context="local" />
       <DialogHeader
         title={strings.noteHistory()}
         padding={12}
