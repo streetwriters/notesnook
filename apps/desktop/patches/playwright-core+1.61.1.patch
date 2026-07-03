@@ -1,7 +1,7 @@
-diff --git a/node_modules/@playwright/test/node_modules/playwright-core/lib/coreBundle.js b/node_modules/@playwright/test/node_modules/playwright-core/lib/coreBundle.js
+diff --git a/node_modules/playwright-core/lib/coreBundle.js b/node_modules/playwright-core/lib/coreBundle.js
 index 7d8468f..ab252ef 100644
---- a/node_modules/@playwright/test/node_modules/playwright-core/lib/coreBundle.js
-+++ b/node_modules/@playwright/test/node_modules/playwright-core/lib/coreBundle.js
+--- a/node_modules/playwright-core/lib/coreBundle.js
++++ b/node_modules/playwright-core/lib/coreBundle.js
 @@ -16010,6 +16010,7 @@ var init_validator = __esm({
        args: tOptional(tArray(tString)),
        chromiumSandbox: tOptional(tBoolean),
@@ -10,10 +10,10 @@ index 7d8468f..ab252ef 100644
        env: tOptional(tArray(tType("NameValue"))),
        timeout: tFloat,
        acceptDownloads: tOptional(tEnum(["accept", "deny", "internal-browser-default"])),
-diff --git a/node_modules/@playwright/test/node_modules/playwright-core/types/types.d.ts b/node_modules/@playwright/test/node_modules/playwright-core/types/types.d.ts
+diff --git a/node_modules/playwright-core/types/types.d.ts b/node_modules/playwright-core/types/types.d.ts
 index 0bff9d3..d195697 100644
---- a/node_modules/@playwright/test/node_modules/playwright-core/types/types.d.ts
-+++ b/node_modules/@playwright/test/node_modules/playwright-core/types/types.d.ts
+--- a/node_modules/playwright-core/types/types.d.ts
++++ b/node_modules/playwright-core/types/types.d.ts
 @@ -21813,6 +21813,7 @@ export interface Electron {
       * Additional arguments to pass to the application when launching. You typically pass the main script name here.
       */
