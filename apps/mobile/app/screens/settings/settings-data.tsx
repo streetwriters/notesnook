@@ -206,7 +206,7 @@ export const settingsGroups: SettingSection[] = [
               : status === SubscriptionStatus.ACTIVE
                 ? strings.subRenewOn(expiryDate)
                 : status === SubscriptionStatus.CANCELED ||
-                    status === SubscriptionStatus.PAUSED
+                  status === SubscriptionStatus.PAUSED
                   ? strings.subEndsOn(expiryDate)
                   : status === SubscriptionStatus.EXPIRED
                     ? subscriptionDaysLeft.time < -3
@@ -862,8 +862,8 @@ export const settingsGroups: SettingSection[] = [
             name: strings.defaultFontSize(),
             description: strings.defaultFontSizeDesc(),
             type: "input-selector",
-            minInputValue: 8,
-            maxInputValue: 120,
+            minInputValue: 1,
+            maxInputValue: 400,
             icon: "format-size",
             property: "defaultFontSize"
           },
