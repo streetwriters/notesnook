@@ -107,7 +107,7 @@ jobs:
           target_commitish: ${{ github.ref }}
 
       - name: Generate flatpak sources
-        if: inputs.publish-github && inputs.build-linux
+        if: inputs.build-linux
         run: |
           sudo apt-get update
           sudo apt-get install -y --quiet flatpak flatpak-builder pipx
@@ -126,6 +126,13 @@ jobs:
           tag_name: v${{ steps.app_metadata.outputs.app_version }}
           files: ./generated-sources.json
           prerelease: ${{ endsWith(steps.app_metadata.outputs.app_version, '-beta') }}
+
+      - name: Upload generated-sources.json as artifact
+        uses: actions/upload-artifact@v4
+        if: inputs.build-linux
+        with:
+          name: generated-sources
+          path: ./generated-sources.json
 
   build-macos:
     name: Build for macOS
