@@ -58,6 +58,7 @@ import {
   IFileStorage,
   IStorage,
   KVStorageAccessor,
+  PendingSyncItemsAccessor,
   StorageAccessor
 } from "../interfaces.js";
 import TokenManager from "./token-manager.js";
@@ -89,6 +90,7 @@ import { LazyPromise } from "../utils/lazy-promise.js";
 import { InboxApiKeys } from "./inbox-api-keys.js";
 import { Circle } from "./circle.js";
 import { Wrapped } from "./wrapped.js";
+import { PendingSyncItems } from "../database/pending-sync-items.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -185,6 +187,8 @@ class Database {
     assertOutsideTransaction();
     return this._kv;
   };
+  private _pendingSyncItems = new PendingSyncItems(this.databaseReady.promise);
+  pendingSyncItems: PendingSyncItemsAccessor = () => this._pendingSyncItems;
   private _config: ConfigStorage = new ConfigStorage(
     this.databaseReady.promise
   );

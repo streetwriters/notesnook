@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import { isCipher } from "./utils/index.js";
+import { SyncableItemType } from "./api/sync/types.js";
 
 export type TimeFormat = "12-hour" | "24-hour";
 export type DayFormat = "short" | "long";
@@ -545,6 +546,13 @@ export interface InboxItemHistory extends BaseItem<"inboxitemhistory"> {
   status: "failed" | "success";
   source?: string;
   errorContext?: string;
+}
+
+export interface PendingSyncItem {
+  id: string;
+  type: SyncableItemType | "inbox-item";
+  data: string;
+  dateCreated: number;
 }
 
 export type Match = {

@@ -50,6 +50,7 @@ import {
   Monograph,
   Note,
   Notebook,
+  PendingSyncItem,
   Relation,
   Reminder,
   SessionContentItem,
@@ -97,6 +98,7 @@ export interface DatabaseSchema {
 }
 
 export type RawDatabaseSchema = DatabaseSchema & {
+  pendingsyncitems: PendingSyncItem;
   kv: {
     key: string;
     value?: string | null;

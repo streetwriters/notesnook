@@ -524,6 +524,18 @@ export class NNMigrationProvider implements MigrationProvider {
               .execute();
           }
         }
+      },
+      "a-2026-11-23": {
+        async up(db) {
+          await db.schema
+            .createTable("pendingsyncitems")
+            .ifNotExists()
+            .addColumn("id", "text", (c) => c.primaryKey().unique().notNull())
+            .addColumn("type", "text")
+            .addColumn("data", "text")
+            .addColumn("dateCreated", "integer")
+            .execute();
+        }
       }
     };
   }
