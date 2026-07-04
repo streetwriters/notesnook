@@ -67,6 +67,8 @@ const TagItem = (props: {
   return (
     <View
       style={{
+        minHeight: 35,
+        justifyContent: "center",
         paddingHorizontal: DefaultAppStyles.GAP,
         marginTop:
           (props.id as number) === 0 ? DefaultAppStyles.GAP_VERTICAL : 2
