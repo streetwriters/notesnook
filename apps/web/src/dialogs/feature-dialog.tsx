@@ -97,34 +97,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            icon: Inbox,
-            title: "Inbox API",
-            subtitle: "A new API to send data to Notesnook from other apps."
-          },
-          {
-            icon: LinkedTo,
-            title: "Deep links on Desktop",
-            subtitle: "Reference Notesnook notes from other apps."
-          },
-          {
-            icon: Plus,
-            title: "More features, bug fixes, and security improvments",
-            subtitle: (
-              <>
-                This release contains much much more.{" "}
-                <Link
-                  href="https://blog.notesnook.com/notesnook-desktop-v3.4.0"
-                  target="_blank"
-                  title="Read the full release notes"
-                >
-                  Read the full release notes
-                </Link>
-              </>
-            )
-          }
-        ],
+      : [],
     cta: {
       title: strings.gotIt(),
       icon: Checkmark,
