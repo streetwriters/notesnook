@@ -165,6 +165,7 @@ export default function NoteHistory({
                   positiveText: strings.clear(),
                   negativeText: strings.cancel(),
                   positiveType: "errorShade",
+                  context: "local",
                   positivePress: async () => {
                     await db.noteHistory.clearSessions(note.id);
                     fwdRef.current?.hide();
