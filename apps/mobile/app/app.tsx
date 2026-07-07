@@ -44,9 +44,15 @@ import { useUserStore } from "./stores/use-user-store";
 import RNBootSplash from "react-native-bootsplash";
 import AppLocked from "./components/app-lock";
 import { useSettingStore } from "./stores/use-setting-store";
+import { registerAppShortcuts } from "./hooks/use-shortcut-manager";
+import Shortcuts, { ShortcutItem } from "react-native-actions-shortcuts";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
+declare global {
+  var __pendingShortcut: ShortcutItem | null | undefined;
+}
+
 const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
@@ -59,10 +65,23 @@ Linking.getInitialURL().then((url) => {
     initialUrl: url
   });
 });
+Shortcuts.getInitialShortcut().then((shortcut) => {
+  globalThis.__pendingShortcut = shortcut;
+});
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
+  const introCompleted = useSettingStore(
+    (state) => state.settings.introCompleted
+  );
+
+  useEffect(() => {
+    if (introCompleted) {
+      registerAppShortcuts();
+    }
+  }, [introCompleted]);
+
   useEffect(() => {
     SettingsService.onFirstLaunch();
     changeSystemBarColors();

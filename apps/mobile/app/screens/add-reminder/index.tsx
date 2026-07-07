@@ -94,7 +94,7 @@ const ReminderNotificationModes = {
 };
 
 export default function AddReminder(props: NavigationProps<"AddReminder">) {
-  const { reminder, reference } = props.route.params;
+  const { reminder, reference } = props.route.params ?? {};
   useNavigationFocus(props.navigation, {
     focusOnInit: true,
     onFocus: () => {

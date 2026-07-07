@@ -45,26 +45,12 @@ const defaultShortcuts: ShortcutItem[] = [
   }
 ];
 export const useShortcutManager = ({
-  onShortcutPressed,
-  shortcuts = defaultShortcuts
+  onShortcutPressed
 }: {
   onShortcutPressed: (shortcut: ShortcutItem | null) => void;
-  shortcuts?: ShortcutItem[];
 }) => {
-  const initialShortcutRecieved = useRef(false);
-
   useEffect(() => {
     if (!isSupported()) return;
-    Shortcuts.setShortcuts(shortcuts);
-  }, [shortcuts]);
-
-  useEffect(() => {
-    if (!isSupported()) return;
-    Shortcuts.getInitialShortcut().then((shortcut) => {
-      if (initialShortcutRecieved.current || !shortcut) return;
-      onShortcutPressed(shortcut);
-      initialShortcutRecieved.current = true;
-    });
     const subscription = ShortcutsEmitter.addListener(
       "onShortcutItemPressed",
       onShortcutPressed
@@ -73,4 +59,9 @@ export const useShortcutManager = ({
       subscription?.remove();
     };
   }, [onShortcutPressed]);
+};
+
+export const registerAppShortcuts = () => {
+  if (!isSupported()) return;
+  Shortcuts.setShortcuts(defaultShortcuts);
 };
