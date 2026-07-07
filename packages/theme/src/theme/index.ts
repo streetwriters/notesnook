@@ -27,7 +27,22 @@ export { createButtonVariant } from "./variants/button.js";
 export { getFontConfig } from "./font/index.js";
 export type Theme = {
   breakpoints: string[];
-  space: (number | string)[] & { small?: number | string };
+  space: (number | string)[] & {
+    small?: number | string;
+    spacing1: number;
+    spacing2: number;
+    spacing3: number;
+    spacing4: number;
+    spacing5: number;
+    spacing6: number;
+    spacing7: number;
+    spacing8: number;
+    spacing9: number;
+    spacing10: number;
+    spacing11: number;
+    spacing12: number;
+    spacing13: number;
+  };
   sizes: { full: "100%"; half: "50%" };
   radii: {
     none: number;
@@ -35,6 +50,15 @@ export type Theme = {
     dialog: number;
     large: number;
     small: number;
+    radius1: number;
+    radius2: number;
+    radius3: number;
+    radius4: number;
+    radius5: number;
+    radius6: number;
+    radius7: number;
+    radius8: number;
+    radius9: number;
   };
   shadows: { menu: string };
   colors: Record<ThemeColor, string>;
@@ -51,9 +75,38 @@ export class ThemeFactory {
   static construct(config: ThemeConfig): Theme {
     const theme: Theme = {
       breakpoints: ["480px", "1000px", "1000px"],
-      space: [0, "6px", 10, 15, 20, 25, 30, 35],
+      space: Object.assign([0, "6px", 10, 15, 20, 25, 30, 35], {
+        spacing1: 3,
+        spacing2: 5,
+        spacing3: 7,
+        spacing4: 10,
+        spacing5: 13,
+        spacing6: 15,
+        spacing7: 20,
+        spacing8: 25,
+        spacing9: 30,
+        spacing10: 35,
+        spacing11: 40,
+        spacing12: 45,
+        spacing13: 50
+      }),
       sizes: { full: "100%", half: "50%" },
-      radii: { none: 0, default: 5, large: 7, dialog: 10, small: 2.5 },
+      radii: {
+        none: 0,
+        default: 5,
+        large: 7,
+        dialog: 10,
+        small: 2.5,
+        radius1: 5,
+        radius2: 10,
+        radius3: 15,
+        radius4: 20,
+        radius5: 25,
+        radius6: 30,
+        radius7: 35,
+        radius8: 40,
+        radius9: 45
+      },
       iconSizes: { big: 16, medium: 14, small: 12 },
       colors: flattenVariants(config.scope),
       shadows:
