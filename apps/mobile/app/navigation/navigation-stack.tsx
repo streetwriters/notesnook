@@ -316,8 +316,23 @@ export const RootNavigation = () => {
     [clearSelection]
   );
 
+  const onNavigationReady = React.useCallback(() => {
+    const pending = globalThis.__pendingShortcut;
+    if (pending?.type === "notesnook.action.newreminder") {
+      rootNavigatorRef.current?.navigate("AddReminder", {
+        reminder: undefined,
+        reference: undefined
+      });
+      globalThis.__pendingShortcut = null;
+    }
+  }, []);
+
   return (
-    <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
+    <NavigationContainer
+      onStateChange={onStateChange}
+      onReady={onNavigationReady}
+      ref={rootNavigatorRef}
+    >
       <RootStack.Navigator
         screenOptions={{
           headerShown: false

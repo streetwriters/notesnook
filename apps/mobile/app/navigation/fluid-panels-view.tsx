@@ -68,6 +68,8 @@ import { fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
 import type { PaneWidths } from "../screens/editor/wrapper";
 import AddReminder from "../screens/add-reminder";
+import Navigation from "../services/navigation";
+import { ShortcutItem } from "react-native-actions-shortcuts";
 
 const MOBILE_SIDEBAR_SIZE = 0.85;
 
@@ -112,33 +114,37 @@ export const FluidPanelsView = React.memo(
       }
     }, [appLoading]);
 
-    useShortcutManager({
-      onShortcutPressed: async (item) => {
-        if (!item) return;
+    useEffect(() => {
+      const pending = globalThis.__pendingShortcut;
+      if (
+        pending?.type === "notesnook.action.newnote" &&
+        fluidTabsRef.current &&
+        !appLoading
+      ) {
+        eSendEvent(eOnLoadNote, { newNote: true });
+        editorState().movedAway = false;
+        fluidTabsRef.current.goToPage("editor", false);
+        globalThis.__pendingShortcut = null;
+      }
+    }, [deviceMode, appLoading]);
 
-        if (item?.type === "notesnook.action.newnote") {
-          if (!fluidTabsRef.current) {
-            setTimeout(() => {
-              eSendEvent(eOnLoadNote, { newNote: true });
-              editorState().movedAway = false;
-              fluidTabsRef.current?.goToPage("editor", false);
-            }, 1000);
-            return;
-          }
+    const onShortcutPressed = useCallback(async (item: ShortcutItem | null) => {
+      if (!item) return;
+
+      if (item?.type === "notesnook.action.newnote") {
+        Navigation.navigate("FluidPanelsView");
+        requestAnimationFrame(() => {
           eSendEvent(eOnLoadNote, { newNote: true });
           editorState().movedAway = false;
-          setTimeout(
-            () => fluidTabsRef.current?.goToPage("editor", false),
-            300
-          );
-        }
-        if (item?.type === "notesnook.action.newreminder") {
-          setTimeout(() => {
-            AddReminder.present();
-          }, 1000);
-        }
+          fluidTabsRef.current?.goToPage("editor", false);
+        });
       }
-    });
+      if (item?.type === "notesnook.action.newreminder") {
+        AddReminder.present();
+      }
+    }, []);
+
+    useShortcutManager({ onShortcutPressed });
 
     const showFullScreenEditor = useCallback(() => {
       setFullscreen(true);
