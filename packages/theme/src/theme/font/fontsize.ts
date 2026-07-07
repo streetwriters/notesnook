@@ -51,8 +51,8 @@ export type FontSizes = {
   menu: string;
   subBody: string;
   code: string;
+  xxxs: string;
   xxs: string;
-  xxs2: string;
   xs: string;
   sm: string;
   md: string;
