@@ -229,6 +229,7 @@ export default function LinkNote(props: {
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
+        paddingBottom: DefaultAppStyles.GAP,
         minHeight: "100%",
         maxHeight: "100%"
       }}
