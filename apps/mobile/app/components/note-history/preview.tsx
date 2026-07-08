@@ -107,14 +107,18 @@ export default function NotePreview({
   }, [note]);
 
   const deleteNote = async () => {
+    const isSession = !!session;
+
     presentDialog({
-      title: strings.deleteNote(),
-      paragraph: strings.deleteNoteConfirmation(),
+      title: isSession ? strings.deleteVersion() : strings.deleteNote(),
+      paragraph: isSession
+        ? strings.deleteVersionConfirmation()
+        : strings.deleteNoteConfirmation(),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
       context: "preview",
       positivePress: async () => {
-        if (session) {
+        if (isSession) {
           await db.noteHistory.remove(session.id);
           eSendEvent(eCloseSheet, "note_history");
           Navigation.queueRoutesForUpdate();
@@ -124,7 +128,7 @@ export default function NotePreview({
           useSelectionStore.getState().setSelectionMode();
         }
         ToastManager.show({
-          heading: strings.noteDeleted(),
+          heading: isSession ? strings.versionDeleted() : strings.noteDeleted(),
           type: "success"
         });
 

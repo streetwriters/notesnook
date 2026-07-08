@@ -2802,5 +2802,9 @@ Continue without attachments?`,
     t`Prevent the screen from turning off while the editor is focused.`,
   clearHistory: () => t`Clear history`,
   historyCleared: () => t`Version history cleared`,
-  clearHistoryConfirmation: () => t`Delete all version history for this note?`
+  clearHistoryConfirmation: () => t`Delete all version history for this note?`,
+  deleteVersion: () => doActions.delete.version(1),
+  deleteVersionConfirmation: () =>
+    actionConfirmations.permanentlyDelete.version(1),
+  versionDeleted: () => actions.deleted.version(1)
 };
