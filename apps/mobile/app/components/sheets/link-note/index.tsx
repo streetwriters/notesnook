@@ -40,6 +40,8 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import Navigation from "../../../services/navigation";
+import { useUserStore } from "../../../stores/use-user-store";
 
 const ListNoteItem = ({
   id,
@@ -356,6 +358,16 @@ export default function LinkNote(props: {
                     width: "100%"
                   }}
                   type="accent"
+                  onPress={() => {
+                    Navigation.navigate("PayWall", {
+                      context: useUserStore.getState().user
+                        ? "logged-in"
+                        : "logged-out",
+                      canGoBack: true
+                    });
+
+                    props.close?.();
+                  }}
                 />
               </View>
             ) : null
