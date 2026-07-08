@@ -27,32 +27,32 @@ import {
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, View } from "react-native";
-import { ScrollView } from "react-native-actions-sheet";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ActivityIndicator, FlatList, ScrollView, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import create from "zustand";
 import { db } from "../../common/database";
+import { FontSizes } from "../../common/design/font";
+import { Radius, Spacing } from "../../common/design/spacing";
 import filesystem from "../../common/filesystem";
 import { downloadAttachments } from "../../common/filesystem/download-attachment";
-import { AttachmentGroupProgress } from "../../screens/settings/components/attachment-group-progress";
-import { presentSheet, ToastManager } from "../../services/event-manager";
+import { AttachmentItem } from "../../components/attachments/attachment-item";
+import { presentDialog } from "../../components/dialog/functions";
+import { Header } from "../../components/header";
+import AppIcon from "../../components/ui/AppIcon";
+import { Button } from "../../components/ui/button";
+import { IconButton } from "../../components/ui/icon-button";
+import Input from "../../components/ui/input";
+import { Pressable } from "../../components/ui/pressable";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import Heading from "../../components/ui/typography/heading";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { ToastManager } from "../../services/event-manager";
+import { NavigationProps } from "../../services/navigation";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import { Dialog } from "../dialog";
-import { presentDialog } from "../dialog/functions";
-import { Header } from "../header";
-import SheetProvider from "../sheet-provider";
-import { Button } from "../ui/button";
-import { IconButton } from "../ui/icon-button";
-import Input from "../ui/input";
-import Seperator from "../ui/seperator";
-import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
-import { AttachmentItem } from "./attachment-item";
+import { AttachmentGroupProgress } from "../settings/components/attachment-group-progress";
 
 const DEFAULT_SORTING: SortOptions = {
-  sortBy: "dateEdited",
+  sortBy: "dateModified",
   sortDirection: "desc"
 };
 
@@ -124,17 +124,13 @@ const attachmentTypes = [
   }
 ];
 
-export const AttachmentDialog = ({
-  note,
-  isSheet
-}: {
-  note?: Note;
-  isSheet: boolean;
-}) => {
+const Attachments = (props: NavigationProps<"Attachments">) => {
+  const note = props.route.params?.note;
   const { colors } = useThemeColors();
   const [attachments, setAttachments] =
     useState<VirtualizedGrouping<Attachment>>();
   const attachmentSearchValue = useRef<string>(undefined);
+  const [searchVisible, setSearchVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const searchTimer = useRef<NodeJS.Timeout>(undefined);
   const [currentFilter, setCurrentFilter] = useState("all");
@@ -154,24 +150,16 @@ export const AttachmentDialog = ({
     if (note) {
       db.attachments
         .ofNote(note.id, "all")
-        .sorted({
-          ...DEFAULT_SORTING,
-          sortBy: "dateModified"
-        })
+        .sorted(DEFAULT_SORTING)
         .then((attachments) => {
           setLoading(false);
           setAttachments(attachments);
         });
     } else {
-      db.attachments.all
-        .sorted({
-          ...DEFAULT_SORTING,
-          sortBy: "dateModified"
-        })
-        .then((attachments) => {
-          setAttachments(attachments);
-          setLoading(false);
-        });
+      db.attachments.all.sorted(DEFAULT_SORTING).then((attachments) => {
+        setAttachments(attachments);
+        setLoading(false);
+      });
     }
   }, [note]);
 
@@ -206,7 +194,7 @@ export const AttachmentDialog = ({
       errorOnly={currentFilter === "errors"}
       attachments={attachments}
       id={index}
-      context={!isSheet ? "global" : "attachments-list"}
+      context="global"
     />
   );
 
@@ -237,7 +225,7 @@ export const AttachmentDialog = ({
         ToastManager.show({
           message: strings.attachmentRecheckCancelled(),
           type: "info",
-          context: isSheet ? "local" : "global"
+          context: "global"
         });
         return;
       }
@@ -283,7 +271,7 @@ export const AttachmentDialog = ({
           : db.attachments.images;
         break;
       case "video":
-        items = items = note
+        items = note
           ? db.attachments.ofNote(note.id, "videos")
           : db.attachments.videos;
         break;
@@ -301,198 +289,99 @@ export const AttachmentDialog = ({
         items = db.attachments.orphaned;
         break;
       case "errors":
-        items = items = note
+        items = note
           ? db.attachments.ofNote(note.id, "all")
           : db.attachments.all;
     }
 
-    return await items.sorted({
-      ...DEFAULT_SORTING,
-      sortBy: "dateModified"
+    return await items.sorted(DEFAULT_SORTING);
+  };
+
+  const downloadAll = () => {
+    if (!attachments) return;
+    presentDialog({
+      title: strings.doActions.download.attachment(
+        attachments.placeholders.length
+      ),
+      positiveText: strings.network.download(),
+      positivePress: async () => {
+        downloadAttachments(await attachments.ids());
+      },
+      negativeText: strings.cancel()
     });
   };
 
-  db.attachments.orphaned.items().then((r) => {
-    console.log(r);
-  });
+  const currentType = attachmentTypes.find(
+    (item) => item.filterBy === currentFilter
+  );
+  const sectionTitle =
+    currentFilter === "all"
+      ? strings.allAttachments()
+      : currentType?.title || strings.allAttachments();
 
   return (
-    <>
-      {isSheet ? (
-        <>
-          <SheetProvider context="attachments-list" />
-          <Dialog context="local" />
-        </>
-      ) : null}
-      {!isSheet ? (
-        <Header
-          title={strings.manageAttachments()}
-          renderedInRoute="SettingsGroup"
-          canGoBack
-        />
-      ) : (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingHorizontal: DefaultAppStyles.GAP
-          }}
-        >
-          <Heading>{strings.dataTypesPluralCamelCase.attachment()}</Heading>
-
-          <View
-            style={{
-              flexDirection: "row"
-            }}
-          >
-            <IconButton
-              name="check-all"
-              style={{
-                marginRight: 10
-              }}
-              color={colors.primary.paragraph}
-              size={AppFontSize.lg}
-              onPress={onCheck}
-            />
-
-            <IconButton
-              name="download"
-              color={colors.primary.paragraph}
-              onPress={() => {
-                if (!attachments) return;
-                presentDialog({
-                  title: strings.doActions.download.attachment(
-                    attachments.placeholders.length
-                  ),
-                  positiveText: strings.network.download(),
-                  positivePress: async () => {
-                    downloadAttachments(await attachments.ids());
-                  },
-                  negativeText: strings.cancel()
-                });
-              }}
-              size={AppFontSize.lg}
-            />
-          </View>
-        </View>
-      )}
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.primary.background }}
+    >
+      <Header
+        renderedInRoute="Attachments"
+        id="Attachments"
+        title={strings.dataTypesPluralCamelCase.attachment()}
+        canGoBack
+        style={{
+          backgroundColor: colors.primary.background
+        }}
+      />
 
       <View
         style={{
-          width: "100%",
-          alignSelf: "center",
-          paddingHorizontal: DefaultAppStyles.GAP,
-          height: "100%"
+          flex: 1,
+          paddingHorizontal: Spacing.LEVEL_3,
+          gap: Spacing.LEVEL_3
         }}
       >
-        <Seperator />
         <Input
           placeholder={strings.filterAttachments()}
           onChangeText={onChangeText}
+          containerStyle={{
+            borderWidth: 0,
+            backgroundColor: colors.secondary.background
+          }}
           onSubmit={() => {
             onChangeText(attachmentSearchValue.current as string);
           }}
+          button={{
+            icon: "search",
+            iconFamily: "notesnook",
+            color: colors.primary.icon,
+            size: 16,
+            onPress: () => {}
+          }}
         />
 
-        {rechecker.shown ? (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              width: "100%",
-              borderRadius: 10,
-              padding: DefaultAppStyles.GAP_SMALL,
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              gap: 12,
-              justifyContent: "space-between"
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 12,
-                alignItems: "center"
-              }}
-            >
-              {rechecker.isWorking ? (
-                <ActivityIndicator color={colors.primary.accent} />
-              ) : (
-                <Icon
-                  name="file-check"
-                  size={30}
-                  color={colors.primary.accent}
-                />
-              )}
-
-              <View>
-                <Paragraph>
-                  {rechecker.isWorking
-                    ? note
-                      ? strings.checkingNoteAttachments()
-                      : strings.checkingAllAttachments()
-                    : strings.attachmentRecheckComplete()}
-                </Paragraph>
-                <Paragraph>
-                  {`${
-                    rechecker.isWorking ? `${strings.pleaseWait()} ` : ""
-                  }${strings.passed()}: ${
-                    rechecker.passed
-                  }, ${strings.failed()}: ${rechecker.failed}`}
-                </Paragraph>
-              </View>
-            </View>
-
-            <IconButton
-              type={rechecker.isWorking ? "errorShade" : "plain"}
-              name={rechecker.isWorking ? "close" : "check"}
-              size={AppFontSize.lg}
-              color={
-                rechecker.isWorking ? colors.error.icon : colors.primary.accent
-              }
-              onPress={() => {
-                useRechecker.getState().setProgress(note?.id || "all", {
-                  ...useRechecker.getState().progress[note?.id || "all"],
-                  shown: false,
-                  isWorking: false
-                });
-              }}
-            />
-          </View>
-        ) : null}
+        <LineSeparator
+          paddingHorizontal={Spacing.LEVEL_3}
+          style={{
+            marginBottom: -Spacing.LEVEL_1
+          }}
+        />
 
         <View>
           <ScrollView
-            style={{
-              backgroundColor: colors.primary.background,
-              flexWrap: "wrap",
-              flexDirection: "row",
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-            contentContainerStyle={{
-              alignItems: "center"
-            }}
             horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              gap: Spacing.LEVEL_1
+            }}
           >
             {attachmentTypes.map((item) =>
               item.filterBy === "orphaned" && note ? null : (
-                <Button
+                <Pressable
+                  key={item.filterBy}
                   type={
-                    currentFilter === item.filterBy
-                      ? "secondaryAccented"
-                      : "plain"
+                    currentFilter === item.filterBy ? "selected" : "transparent"
                   }
-                  key={item.title}
-                  title={item.title}
-                  fontSize={AppFontSize.sm}
-                  style={{
-                    borderRadius: 100,
-                    paddingHorizontal: DefaultAppStyles.GAP,
-                    height: 40,
-                    minWidth: 80
-                  }}
-                  onPress={async () => {
+                  onPress={() => {
                     const filterBy = item.filterBy;
                     setCurrentFilter(filterBy);
                     setLoading(true);
@@ -506,52 +395,168 @@ export const AttachmentDialog = ({
                         /* empty */
                       });
                   }}
-                />
+                  style={{
+                    borderRadius: Radius.XXL,
+                    borderWidth: currentFilter === item.filterBy ? 0 : 1,
+                    borderColor: colors.primary.border,
+                    paddingHorizontal: Spacing.LEVEL_3,
+                    paddingVertical: Spacing.LEVEL_1,
+                    width: "auto"
+                  }}
+                >
+                  <Paragraph
+                    fontFamily="MEDIUM"
+                    fontSize="SM"
+                    color={
+                      currentFilter === item.filterBy
+                        ? colors.primary.heading
+                        : colors.secondary.paragraph
+                    }
+                  >
+                    {item.title}
+                  </Paragraph>
+                </Pressable>
               )
             )}
           </ScrollView>
         </View>
 
+        {rechecker.shown ? (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              width: "100%",
+              borderRadius: Radius.S,
+              padding: Spacing.LEVEL_2,
+              gap: Spacing.LEVEL_2,
+              justifyContent: "space-between",
+              backgroundColor: colors.primary.shade
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                gap: Spacing.LEVEL_2,
+                alignItems: "center",
+                flexShrink: 1
+              }}
+            >
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: colors.secondary.background,
+                  borderRadius: Radius.XS,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <AppIcon
+                  name="check-circle"
+                  iconFamily="notesnook"
+                  size={20}
+                  color={colors.primary.icon}
+                />
+              </View>
+
+              <View style={{ flexShrink: 1, gap: Spacing.LEVEL_0 }}>
+                <Heading color={colors.primary.heading} fontSize="SM">
+                  {rechecker.isWorking
+                    ? note
+                      ? strings.checkingNoteAttachments()
+                      : strings.checkingAllAttachments()
+                    : strings.attachmentRecheckComplete()}
+                </Heading>
+                <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                  {`${
+                    rechecker.isWorking ? `${strings.pleaseWait()} ` : ""
+                  }${strings.passed()}: ${
+                    rechecker.passed
+                  }, ${strings.failed()}: ${rechecker.failed}`}
+                </Paragraph>
+              </View>
+            </View>
+
+            <IconButton
+              type={rechecker.isWorking ? "errorShade" : "plain"}
+              name={"close"}
+              iconFamily="notesnook"
+              size={12}
+              color={colors.secondary.icon}
+              onPress={() => {
+                useRechecker.getState().setProgress(note?.id || "all", {
+                  ...useRechecker.getState().progress[note?.id || "all"],
+                  shown: false,
+                  isWorking: false
+                });
+              }}
+            />
+          </View>
+        ) : null}
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
+        >
+          <Heading fontSize="LG">{sectionTitle}</Heading>
+
+          <Button
+            title={strings.verifyFiles()}
+            icon="shield-check"
+            iconFamily="notesnook"
+            type="accent"
+            fontSize={FontSizes.XS}
+            loading={rechecker.isWorking}
+            style={{
+              paddingVertical: Spacing.LEVEL_2,
+              paddingHorizontal: Spacing.LEVEL_2
+            }}
+            onPress={onCheck}
+          />
+        </View>
+
         <FlatList
-          renderScrollComponent={(props) => <ScrollView {...props} />}
+          style={{ flex: 1 }}
           keyboardDismissMode="none"
           keyboardShouldPersistTaps="always"
           ListEmptyComponent={
             <View
               style={{
-                height: "100%",
+                height: 250,
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                gap: Spacing.LEVEL_2
               }}
             >
               {loading ? (
                 <ActivityIndicator size={40} color={colors.primary.accent} />
               ) : (
                 <>
-                  <Icon
-                    name="attachment"
-                    size={60}
+                  <AppIcon
+                    name="paperclip"
+                    iconFamily="notesnook"
+                    size={50}
                     color={colors.secondary.icon}
                   />
-                  <Paragraph>{strings.noAttachments()}</Paragraph>
+                  <Paragraph color={colors.secondary.paragraph}>
+                    {strings.noAttachments()}
+                  </Paragraph>
                 </>
               )}
             </View>
           }
           ListHeaderComponent={<AllProgress note={note} />}
-          ListFooterComponent={
-            <View
-              style={{
-                height: 350
-              }}
-            />
-          }
+          ListFooterComponent={<View style={{ height: 350 }} />}
           data={loading ? [] : attachments?.placeholders || []}
           extraData={attachments}
           renderItem={renderItem}
         />
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 
@@ -572,7 +577,7 @@ const AllProgress = ({ note }: { note?: Note }) => {
   return (
     <View
       style={{
-        gap: 10,
+        gap: Spacing.LEVEL_2,
         width: "100%"
       }}
     >
@@ -587,9 +592,4 @@ const AllProgress = ({ note }: { note?: Note }) => {
   );
 };
 
-AttachmentDialog.present = (note?: Note) => {
-  presentSheet({
-    component: () => <AttachmentDialog note={note} isSheet={true} />,
-    keyboardHandlerDisabled: true
-  });
-};
+export default Attachments;

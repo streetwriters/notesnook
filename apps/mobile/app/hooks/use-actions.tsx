@@ -36,15 +36,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
-import { AttachmentDialog } from "../components/attachments";
 import { AuthMode } from "../components/auth/common";
 import { presentDialog } from "../components/dialog/functions";
-import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import ExportNotesSheet from "../components/sheets/export-notes";
 import PaywallSheet from "../components/sheets/paywall";
 import PublishNoteSheet from "../components/sheets/publish-note";
-import { ReferencesList } from "../components/sheets/references";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
 import AddReminder from "../screens/add-reminder";
@@ -54,7 +51,6 @@ import {
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet,
   ToastManager,
   VaultRequestType
 } from "../services/event-manager";
@@ -756,13 +752,11 @@ export const useActions = ({
 
   if (item.type === "note") {
     async function openHistory() {
-      presentSheet({
-        component: (ref) => <NoteHistory fwdRef={ref} note={item as Note} />
-      });
+      Navigation.navigate("NoteHistory", { note: item as Note });
     }
 
     async function showAttachments() {
-      AttachmentDialog.present(item as Note);
+      Navigation.navigate("Attachments", { note: item as Note });
     }
 
     async function exportNote() {
@@ -1080,6 +1074,8 @@ export const useActions = ({
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
+            listEmptyTitle: strings.noRemindersFound(),
+            listEmptyParagraph: strings.reminderPlaceholder(),
             onAdd: async () => {
               if (features && !features.activeReminders.isAllowed) {
                 ToastManager.show({
@@ -1152,7 +1148,7 @@ export const useActions = ({
       {
         id: "publish",
         title: isPublished ? strings.published() : strings.publish(),
-        icon: "cloud-upload-outline",
+        icon: "cloud-upload",
         checked: isPublished,
         onPress: publishNote
       },
@@ -1167,7 +1163,7 @@ export const useActions = ({
       {
         id: "notebooks",
         title: strings.addToNotebook(),
-        icon: "book-outline",
+        icon: "bookmark",
         onPress: addTo
       },
       // {
@@ -1181,7 +1177,7 @@ export const useActions = ({
         title: strings.references(),
         icon: "link-alt",
         onPress: () => {
-          ReferencesList.present({
+          Navigation.navigate("References", {
             reference: item as ItemReference
           });
         }

@@ -296,6 +296,10 @@ let AddReminder: any = null;
 let RelationsList: any = null;
 let PayWall: any = null;
 let Wrapped: any = null;
+let Attachments: any = null;
+let References: any = null;
+let NoteHistory: any = null;
+let NotePreview: any = null;
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -422,6 +426,41 @@ export const RootNavigation = () => {
           getComponent={() => {
             Wrapped = Wrapped || require("../screens/wrapped").default;
             return Wrapped;
+          }}
+        />
+
+        <RootStack.Screen
+          name="Attachments"
+          getComponent={() => {
+            Attachments =
+              Attachments || require("../screens/attachments").default;
+            return Attachments;
+          }}
+        />
+
+        <RootStack.Screen
+          name="References"
+          getComponent={() => {
+            References = References || require("../screens/references").default;
+            return References;
+          }}
+        />
+
+        <RootStack.Screen
+          name="NoteHistory"
+          getComponent={() => {
+            NoteHistory =
+              NoteHistory || require("../screens/note-history").default;
+            return NoteHistory;
+          }}
+        />
+
+        <RootStack.Screen
+          name="NotePreview"
+          getComponent={() => {
+            NotePreview =
+              NotePreview || require("../screens/note-preview").default;
+            return NotePreview;
           }}
         />
       </RootStack.Navigator>

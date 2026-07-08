@@ -23,19 +23,15 @@ import NoteItem from ".";
 import { notesnook } from "../../../../e2e/test.ids";
 import { db } from "../../../common/database";
 import { DDS } from "../../../services/device-detection";
-import {
-  eSendEvent,
-  hideSheet,
-  presentSheet
-} from "../../../services/event-manager";
+import { eSendEvent, hideSheet } from "../../../services/event-manager";
 import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { fluidTabsRef } from "../../../utils/global-refs";
 
 import { NotebooksWithDateEdited, TagsWithDateEdited } from "@notesnook/common";
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../../screens/editor/tiptap/utils";
+import Navigation from "../../../services/navigation";
 import { RouteParams } from "../../../stores/use-navigation-store";
-import NotePreview from "../../note-history/preview";
 import SelectionWrapper from "../selection-wrapper";
 import { selectItem } from "../../../stores/use-selection-store";
 
@@ -60,11 +56,7 @@ export const openNote = async (
 
   if (isTrash) {
     if (!note.contentId) return;
-
-    const content = await db.content.get(note.contentId as string);
-    presentSheet({
-      component: <NotePreview note={item} content={content} />
-    });
+    Navigation.navigate("NotePreview", { note: item });
   } else {
     if (!useTabStore.getState().hasTabForNote(note.id!)) {
       editorController.current.commands.setLoading(
