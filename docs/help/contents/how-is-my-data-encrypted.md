@@ -82,4 +82,4 @@ This object is then sent to the server for storage. The server performs no furth
 
 ### I am an old user of Notesnook, I don't have a data encryption key.
 
-Your key will be created when you change your password.
+Your data encryption key will be created when you change your password.
