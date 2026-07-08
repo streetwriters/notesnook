@@ -21,7 +21,7 @@ On all three platforms we use the same exact library for all cryptographic funct
 
 > info Fun story
 >
-> When we first added encryption, we used AES-GCM-256 across platforms but the cross-platform compatbility was abyssmal. That is when I found out about the great libsodium. Written in C, wrappers available for all platforms...what more could I want?
+> When we first added encryption, we used AES-GCM-256 across platforms but the cross-platform compatibility was abyssmal. That is when I found out about the great libsodium. Written in C, wrappers available for all platforms...what more could I want?
 
 ## Process
 
@@ -65,7 +65,7 @@ On iOS and Android, the encryption key is stored in the phone's keychain.
 
 ### 4. Data encryption
 
-Encryption only takes place when you sync. Each item in the database is encrypted seperately using XChaCha-Poly1305-IETF.
+Encryption only takes place when you sync. Each item in the database is encrypted separately using XChaCha-Poly1305-IETF.
 
 #### How it works
 
