@@ -17,5 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./position.js";
-export * from "./types.js";
+import React from "react";
+import {
+  Button as ThemeUIButton,
+  ButtonProps as ThemeUIButtonProps
+} from "@theme-ui/components";
+import { Theme } from "@notesnook/theme";
+import { RestrictedSpaceProps, RestrictedSxProp } from "../utils/types.js";
+
+export interface ButtonProps
+  extends Omit<
+      ThemeUIButtonProps,
+      "variant" | "sx" | keyof RestrictedSpaceProps
+    >,
+    RestrictedSpaceProps {
+  variant?: keyof Theme["buttons"];
+  sx?: RestrictedSxProp;
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (props, ref) => {
+    return <ThemeUIButton ref={ref} {...props} />;
+  }
+);
