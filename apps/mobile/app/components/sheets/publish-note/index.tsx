@@ -22,14 +22,8 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
-//@ts-ignore
-import ToggleSwitch from "toggle-switch-react-native";
+import { ActivityIndicator, TextInput, View } from "react-native";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { db } from "../../../common/database";
 import { requestInAppReview } from "../../../services/app-review";
 import {
@@ -40,12 +34,11 @@ import {
 import Navigation from "../../../services/navigation";
 import { useAttachmentStore } from "../../../stores/use-attachment-store";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import DialogHeader from "../../dialog/dialog-header";
+import { presentDialog } from "../../dialog/functions";
+import AppIcon, { IconProps } from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
-import { IconButton } from "../../ui/icon-button";
-import Heading from "../../ui/typography/heading";
+import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { useAsync } from "react-async-hook";
 import { eMenuItemUpdate } from "../../../utils/events";
@@ -55,6 +48,70 @@ import FormInput, {
   validators
 } from "../../ui/input/form-input";
 import { useAppState } from "../../../../app/hooks/use-app-state";
+import Heading from "../../ui/typography/heading";
+import { FontSizes } from "../../../common/design/font";
+import { Dialog } from "../../dialog";
+import LineSeparator from "../../ui/seperator/line-separator";
+
+const OptionRow = ({
+  icon,
+  iconFamily = "notesnook",
+  title,
+  description,
+  right,
+  onPress,
+  disabled
+}: {
+  icon: string;
+  iconFamily?: IconProps["iconFamily"];
+  title: string;
+  description: string;
+  right: React.ReactNode;
+  onPress?: () => void;
+  disabled?: boolean;
+}) => {
+  const { colors } = useThemeColors();
+  return (
+    <Pressable
+      type="transparent"
+      disabled={disabled || !onPress}
+      onPress={onPress}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Spacing.LEVEL_2,
+        width: "100%"
+      }}
+    >
+      <View
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: Radius.XS,
+          backgroundColor: colors.secondary.background,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <AppIcon
+          name={icon}
+          iconFamily={iconFamily}
+          size={16}
+          color={colors.primary.icon}
+        />
+      </View>
+      <View style={{ flex: 1, gap: Spacing.LEVEL_0 }}>
+        <Paragraph fontFamily="MEDIUM" fontSize="SM">
+          {title}
+        </Paragraph>
+        <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+          {description}
+        </Paragraph>
+      </View>
+      {right}
+    </Pressable>
+  );
+};
 
 async function fetchMonographData(noteId: string) {
   const monographId = db.monographs.monograph(noteId);
@@ -73,7 +130,8 @@ async function fetchMonographData(noteId: string) {
 }
 
 const PublishNoteSheet = ({
-  note
+  note,
+  close
 }: {
   note: Note;
   close?: (ctx?: string) => void;
@@ -153,7 +211,7 @@ const PublishNoteSheet = ({
       if (note?.id) {
         await db.monographs.publish(note.id, values.title, {
           selfDestruct,
-          password: isLocked ? values.password : undefined
+          password: values.password || undefined
         });
         await monographData.execute();
         Navigation.queueRoutesForUpdate();
@@ -175,16 +233,22 @@ const PublishNoteSheet = ({
     setPublishing(value);
   };
 
-  const deletePublishedNote = async () => {
+  const unpublishNote = async () => {
     if (publishing) return;
     setPublishLoading(true);
     try {
       if (note?.id) {
         await db.monographs.unpublish(note.id);
-        monographData.execute();
+        close?.();
+        // monographData.execute();
         Navigation.queueRoutesForUpdate();
         eSendEvent(eMenuItemUpdate);
         setPublishLoading(false);
+        ToastManager.show({
+          message: strings.noteUnpublished(),
+          type: "success",
+          context: "global"
+        });
       }
     } catch (e) {
       ToastManager.show({
@@ -195,6 +259,20 @@ const PublishNoteSheet = ({
       });
     }
     setPublishLoading(false);
+  };
+
+  const confirmUnpublishNote = () => {
+    presentDialog({
+      title: strings.unpublish() + "?",
+      paragraph: strings.unpublishNoteConfirm(),
+      icon: "warning-circle",
+      iconFamily: "notesnook",
+      iconType: "error",
+      centered: true,
+      positiveText: strings.yes(),
+      positivePress: unpublishNote,
+      context: "local"
+    });
   };
 
   const monographMetadata =
@@ -225,17 +303,18 @@ const PublishNoteSheet = ({
       style={{
         width: "100%",
         alignSelf: "center",
-        paddingHorizontal: DefaultAppStyles.GAP,
-        gap: DefaultAppStyles.GAP_VERTICAL
+        paddingHorizontal: Spacing.LEVEL_3,
+        gap: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_3
       }}
     >
-      {isPublished &&
-      (monographData?.result?.monograph || monographData?.loading) ? null : (
-        <DialogHeader
-          title={strings.publishNote()}
-          paragraph={strings.publishNoteDesc()}
-        />
-      )}
+      <Dialog context="local" />
+      <DialogHeader
+        title={
+          isPublished ? strings.editPublishedMonograph() : strings.publishNote()
+        }
+        paragraph={isPublished ? undefined : strings.publishNoteDesc()}
+      />
 
       {publishing || monographData.loading ? (
         <View
@@ -263,38 +342,50 @@ const PublishNoteSheet = ({
       ) : (
         <>
           {isPublished && publishUrl ? (
-            <TouchableOpacity
-              onPress={async () => {
-                try {
-                  await openLinkInBrowser(publishUrl);
-                } catch (e) {
-                  console.error(e);
-                }
-              }}
+            <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: DefaultAppStyles.GAP_VERTICAL,
-                backgroundColor: colors.secondary.background,
-                padding: DefaultAppStyles.GAP,
-                borderRadius: defaultBorderRadius
+                gap: Spacing.LEVEL_0,
+                backgroundColor: colors.selected.background,
+                padding: Spacing.LEVEL_2,
+                borderRadius: Radius.S,
+                flexDirection: "row"
               }}
             >
               <View
                 style={{
-                  width: "100%",
-                  flexShrink: 1
+                  gap: Spacing.LEVEL_0,
+                  flexGrow: 1
                 }}
               >
-                <Heading size={AppFontSize.md}>
-                  {strings.publishedAt()}:
+                <Heading fontFamily="MEDIUM" fontSize="SM">
+                  {strings.publishedNoteLink()}
                 </Heading>
-                <Paragraph size={AppFontSize.sm} numberOfLines={1}>
+                <Paragraph
+                  fontSize="SM"
+                  color={colors.secondary.paragraph}
+                  onPress={async () => {
+                    try {
+                      await openLinkInBrowser(publishUrl);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                >
                   {monographMetadata?.publishUrl}
                 </Paragraph>
               </View>
 
-              <IconButton
+              <Button
+                type="accent"
+                icon="copy"
+                iconFamily="notesnook"
+                fontFamily="SEMI_BOLD"
+                style={{
+                  paddingHorizontal: Spacing.LEVEL_1,
+                  paddingVertical: Spacing.LEVEL_0
+                }}
+                fontSize={FontSizes.XS}
+                title={strings.copy()}
                 onPress={() => {
                   Clipboard.setString(publishUrl as string);
                   ToastManager.show({
@@ -303,208 +394,114 @@ const PublishNoteSheet = ({
                     context: "local"
                   });
                 }}
-                color={colors.primary.accent}
-                size={AppFontSize.lg}
-                name="content-copy"
               />
-            </TouchableOpacity>
-          ) : null}
-
-          <FormInput
-            name="title"
-            formRef={formRef}
-            fwdRef={titleInput}
-            multiline
-            scrollEnabled
-            containerStyle={{
-              maxHeight: 100
-            }}
-            placeholder={strings.noteTitle()}
-            validators={[validators.required(strings.titleIsRequired())]}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              if (publishing) return;
-              setIsLocked(!isLocked);
-            }}
-            activeOpacity={0.9}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: colors.secondary.background,
-              borderRadius: defaultBorderRadius,
-              paddingHorizontal: DefaultAppStyles.GAP,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexShrink: 1
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between"
-                }}
-              >
-                <Paragraph size={AppFontSize.sm}>
-                  {strings.monographPassHeading()}
-                </Paragraph>
-                <ToggleSwitch
-                  isOn={isLocked}
-                  onColor={colors.primary.accent}
-                  offColor={colors.primary.icon}
-                  size="small"
-                  animationSpeed={150}
-                  onToggle={() => setIsLocked(!isLocked)}
-                />
-              </View>
-
-              {/* <Paragraph>{strings.monographPassDesc()}</Paragraph> */}
-
-              {isLocked ? (
-                <>
-                  <FormInput
-                    name="password"
-                    formRef={formRef}
-                    fwdRef={pwdInput}
-                    blurOnSubmit
-                    secureTextEntry
-                    placeholder={strings.enterPassword()}
-                    validators={[
-                      validators.required(strings.passwordRequired())
-                    ]}
-                    containerStyle={{
-                      marginTop: DefaultAppStyles.GAP_VERTICAL
-                    }}
-                  />
-                </>
-              ) : null}
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              setSelfDestruct(!selfDestruct);
-            }}
-            activeOpacity={0.9}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: colors.secondary.background,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-              borderRadius: defaultBorderRadius,
-              paddingHorizontal: DefaultAppStyles.GAP
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexShrink: 1
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between"
-                }}
-              >
-                <Paragraph size={AppFontSize.sm}>
-                  {strings.monographSelfDestructHeading()}
-                </Paragraph>
-                <ToggleSwitch
-                  isOn={selfDestruct}
-                  onColor={colors.primary.accent}
-                  offColor={colors.primary.icon}
-                  size="small"
-                  animationSpeed={150}
-                  onToggle={() => setSelfDestruct(!selfDestruct)}
-                />
-              </View>
-
-              {/* <Paragraph>{strings.monographSelfDestructDesc()}</Paragraph> */}
-            </View>
-          </TouchableOpacity>
-
-          {isFeatureAvailable?.isAllowed &&
-          !selfDestruct &&
-          monographMetadata &&
-          monographMetadata?.analytics.totalViews > 0 ? (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: colors.secondary.background,
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-                borderRadius: defaultBorderRadius,
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
-              <View
-                style={{
-                  width: "100%",
-                  flexShrink: 1
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  <Paragraph size={AppFontSize.sm}>{strings.views()}</Paragraph>
-                  <Paragraph>
-                    {monographMetadata?.analytics.totalViews || 0}
-                  </Paragraph>
-                </View>
-              </View>
             </View>
           ) : null}
 
           <View
             style={{
-              width: "100%",
-              justifyContent: "center",
-              gap: DefaultAppStyles.GAP_VERTICAL
+              gap: Spacing.LEVEL_2
             }}
           >
+            <FormInput
+              name="title"
+              formRef={formRef}
+              label={strings.title()}
+              fwdRef={titleInput}
+              multiline
+              scrollEnabled
+              containerStyle={{
+                maxHeight: 100
+              }}
+              placeholder={strings.noteTitle()}
+              validators={[validators.required(strings.titleIsRequired())]}
+            />
+
+            <FormInput
+              name="password"
+              formRef={formRef}
+              label={strings.passwordProtection()}
+              fwdRef={pwdInput}
+              blurOnSubmit
+              secureTextEntry
+              placeholder={
+                isPublished
+                  ? strings.enterNewPassword()
+                  : strings.enterPassword()
+              }
+            />
+          </View>
+
+          <LineSeparator />
+
+          <View style={{ width: "100%", gap: Spacing.LEVEL_2 }}>
+            <OptionRow
+              icon="clock-counter-clockwise"
+              title={strings.monographSelfDestructHeading()}
+              description={strings.deleteAfterViewing()}
+              onPress={() => setSelfDestruct(!selfDestruct)}
+              right={
+                <AppIcon
+                  name={selfDestruct ? "toggle-on" : "toggle-off"}
+                  iconFamily="notesnook"
+                  size={16}
+                  color={
+                    selfDestruct
+                      ? [colors.primary.accent, colors.primary.background]
+                      : [colors.disabled.icon, colors.primary.background]
+                  }
+                />
+              }
+            />
+
+            {isFeatureAvailable?.isAllowed &&
+            !selfDestruct &&
+            monographMetadata &&
+            isPublished ? (
+              <OptionRow
+                icon="eye-open"
+                title={strings.totalViews()}
+                description={strings.viewsOnPublishedNote()}
+                right={
+                  <Paragraph fontFamily="MEDIUM" fontSize="SM">
+                    {monographMetadata?.analytics.totalViews || 0}
+                  </Paragraph>
+                }
+              />
+            ) : null}
+          </View>
+
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              gap: Spacing.LEVEL_2
+            }}
+          >
+            {isPublished ? (
+              <Button
+                onPress={confirmUnpublishNote}
+                style={{ flex: 1 }}
+                type="error-outline"
+                title={strings.unpublish()}
+              />
+            ) : null}
+
             <Button
               onPress={publishNote}
-              style={{
-                width: "100%",
-                borderRadius: defaultBorderRadius
-              }}
+              style={{ flex: 1 }}
               type="accent"
               title={isPublished ? strings.update() : strings.publish()}
             />
-
-            {isPublished && (
-              <>
-                <Button
-                  onPress={deletePublishedNote}
-                  type="error"
-                  title={strings.unpublish()}
-                  style={{
-                    width: "100%",
-                    borderRadius: defaultBorderRadius
-                  }}
-                />
-              </>
-            )}
           </View>
         </>
       )}
 
       <Paragraph
         color={colors.secondary.paragraph}
-        size={AppFontSize.xs}
+        fontSize="XS"
         style={{
-          textAlign: "center",
-          marginTop: DefaultAppStyles.GAP_VERTICAL,
-          textDecorationLine: "underline"
+          textAlign: "center"
         }}
         onPress={async () => {
           try {
@@ -516,7 +513,14 @@ const PublishNoteSheet = ({
           }
         }}
       >
-        {strings.monographLearnMore()}
+        {strings.monographLearnMore[0]()}{" "}
+        <Paragraph
+          fontSize="XS"
+          fontFamily="MEDIUM"
+          color={colors.primary.accent}
+        >
+          {strings.monographLearnMore[1]()}
+        </Paragraph>
       </Paragraph>
     </View>
   );

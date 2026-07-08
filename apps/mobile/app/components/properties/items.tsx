@@ -438,8 +438,8 @@ export const Items = ({
               paginationStyle={{
                 position: "relative",
                 marginHorizontal: 2,
-                marginBottom: -10,
-                marginTop: 10
+                marginBottom: Spacing.LEVEL_0,
+                marginTop: Spacing.LEVEL_2
               }}
               contentContainerStyle={{
                 justifyContent: "flex-start",
