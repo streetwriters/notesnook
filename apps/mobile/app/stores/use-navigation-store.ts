@@ -148,6 +148,9 @@ export interface RouteParams extends ParamListBase {
     note: TrashOrItem<Note>;
     session?: HistorySession & { session: string };
   };
+  AddReference: {
+    resolverId: string;
+  };
 }
 
 export type RouteName = keyof RouteParams;
