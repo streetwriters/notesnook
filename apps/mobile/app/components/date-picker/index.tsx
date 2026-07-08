@@ -78,7 +78,7 @@ export default function DatePickerComponent(props: {
 
       <Button
         title={strings.cancel()}
-        type="secondary"
+        type="plain-outline"
         style={{
           width: "100%"
         }}

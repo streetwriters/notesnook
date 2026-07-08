@@ -29,6 +29,8 @@ import { useFavorites } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { db } from "../../common/database";
 import { strings } from "@notesnook/intl";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import { Spacing } from "../../common/design/spacing";
 
 export const Favorites = ({
   navigation,
@@ -56,6 +58,9 @@ export const Favorites = ({
         canGoBack={false}
         hasSearch={true}
         id={route.name}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
         onSearch={() => {
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(route.name),
@@ -66,6 +71,9 @@ export const Favorites = ({
           });
         }}
       />
+
+      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
+
       <DelayLayout wait={loading}>
         <List
           data={favorites}
