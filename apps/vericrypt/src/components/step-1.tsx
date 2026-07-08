@@ -38,11 +38,6 @@ export function LoginToNotesnook() {
     >
       <Text variant="title">Welcome to Vericrypt</Text>
       <Text as="p" variant="body" sx={{ mt: 1 }}>
-        <del>
-          Trust is a huge problem in closed source end-to-end encrypted
-          applications. How can you be sure that the app is actually encrypting
-          your data?
-        </del>
       </Text>
       <Text as="p" variant="body" sx={{ mt: 1 }}>
         The only way to earn a user&apos;s trust is by allowing them to see how
@@ -56,9 +51,10 @@ export function LoginToNotesnook() {
         </Link>
       </Text>
       <Text as="p" variant="body" sx={{ mt: 1 }}>
-        Yes, that&apos;s right. Notesnook is now 100% open source under the
-        GPLv3 license. That includes the app, the encryption library, the
-        backend server, and everything else.
+        Yes, that&apos;s right. Notesnook is 100% open source under the
+        GPLv3 license. That includes the app, the encryption library, and
+        everything else. We&apos;ve even open sourced the server, available under the
+        AGPLv3 license.
       </Text>
       <Text as="p" variant="body" sx={{ mt: 1 }}>
         However, even with an open source app, how can you be sure that the app
@@ -86,7 +82,7 @@ export function LoginToNotesnook() {
         sx={{ alignSelf: "center", mt: 2 }}
         onClick={() => window.open("https://app.notesnook.com/login", "_blank")}
       >
-        Login to Notesnook
+        Get Started by Logging in
       </Button>
     </StepContainer>
   );
