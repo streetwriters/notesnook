@@ -263,12 +263,26 @@ export const strings = {
   monographDesc: () => t`This note will be published to a public URL.`,
   openInBrowser: () => t`Open in browser`,
   monographPassHeading: () => t`Password protection`,
+  monographPassHeadingOptional: () => t`Password protection (optional)`,
   monographPassDesc: () =>
     t`Published note can only be viewed by someone with the password.`,
+  secureYourNote: () => t`Secure your note`,
   monographSelfDestructHeading: () => t`Self destruct`,
+  deleteAfterViewing: () => t`Delete after viewing`,
   monographSelfDestructDesc: () =>
     t`Published note link will be automatically deleted once it is viewed by someone.`,
-  monographLearnMore: () => t`Learn more about Notesnook Monograph`,
+  monographLearnMore: {
+    0: () => t`Learn more about Notesnook`,
+    1: () => t`Monographs`
+  },
+  editPublishedMonograph: () => t`Edit published monograph`,
+  publishedNoteLink: () => t`Published note link`,
+  totalViews: () => t`Total views`,
+  viewsOnPublishedNote: () => t`Views on your published note`,
+  enterNewPassword: () => t`Enter new password`,
+  unpublishNoteConfirm: () =>
+    t`Are you sure you want to unpublish this note? It will no longer be accessible via the public link.`,
+  yesUnpublish: () => t`Yes, Unpublish`,
   rateAppHeading: () => t`Do you enjoy using Notesnook?`,
   rateAppDesc: () =>
     t`It took us a year to bring Notesnook to life. Share your experience and suggestions to help us improve it.`,
@@ -276,8 +290,8 @@ export const strings = {
     t`Tap twice to confirm you have saved the recovery key.`,
   noBlocksLinked: () => t`No blocks linked`,
   noReferencesFound: () => t`No references found of this note`,
-  notReferenced: () => t`This note is not referenced in other notes.`,
-  notLinked: () => t`This note is not linked to any other note.`,
+  notReferenced: () => t`No references yet`,
+  notLinked: () => t`No links found`,
   noLinksFound: () => t`No links found`,
   noBlocksOnNote: () => t`There are no blocks in this note.`,
   dataTypes: {
@@ -369,6 +383,9 @@ export const strings = {
   },
   remindMeIn: () => t`Remind me in`,
   referencedIn: () => t`Referenced in`,
+  usedIn: () => t`Used in`,
+  linked: () => t`Linked`,
+  jumpToReference: () => t`Jump to Reference`,
   restoreSelectFolder: () =>
     t`Select the folder that includes your backup files to list them here.`,
   noBackupsFound: () => t`No backups found`,
@@ -459,6 +476,11 @@ $day$: Current day (eg. Monday)`,
   lockNote: () => t`Lock note`,
   applyChanges: () => t`Apply changes`,
   noteHistory: () => t`Note history`,
+  recentHistory: () => t`Recent history`,
+  historyDetail: () => t`History detail`,
+  noteContent: () => t`Note content`,
+  deletedVersionsCannotBeRecovered: () =>
+    t`Note: Deleted versions cannot be recovered.`,
   selectNotebooks: () => t`Select notebooks`,
   selectNotebooksDesc: () => t`Select notebooks you want to add note(s) to.`,
   selectNotebooksDesktopDesc: (keyboardShortcut: string) =>
@@ -1068,6 +1090,8 @@ $day$: Current day (eg. Monday)`,
     t`Recovery key helps you recover your data if you forget your password.`,
   manageAttachments: () => t`Manage attachments`,
   manageAttachmentsDesc: () => t`Manage your attachments in one place`,
+  allAttachments: () => t`All attachments`,
+  verifyFiles: () => t`Verify Files`,
   changePasswordDesc: () => t`Change your account password`,
   change2faMethodDesc: () =>
     t`Change your primary two-factor authentication method`,
@@ -2939,5 +2963,11 @@ Continue without attachments?`,
   shareZip: () => t`Share ZIP`,
   tryDownloadLogsAgain: () => t`Try again`,
   createSubnotebook: () => t`Create sub-notebook`,
-  saveChanges: () => t`Save changes`
+  saveChanges: () => t`Save changes`,
+  noteUnpublished: () => t`Note unpublished`,
+  noRemindersFound: () => t`No reminders found`,
+  reminderPlaceholder: () => t`Never miss a task. Set your first reminder now.`,
+  emptyLinkedNotes: () => t`Links of notes that are references in this note.`,
+  emptyReferences: () => t`Links of notes where this note is referenced.`,
+  passwordProtection: () => t`Password protection (optional)`
 };

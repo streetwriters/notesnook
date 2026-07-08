@@ -303,10 +303,6 @@ export function FormInput({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: Spacing.LEVEL_2,
-    paddingRight:
-      buttons || button || secureTextEntry || error
-        ? Spacing.LEVEL_3
-        : Spacing.LEVEL_3,
     ...containerStyle
   };
 
@@ -317,6 +313,7 @@ export function FormInput({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     paddingTop: Spacing.LEVEL_3,
     paddingBottom: Spacing.LEVEL_3,
+    lineHeight: fontSize + fontSize * 0.3,
     flexGrow: 1,
     flexShrink: 1,
     fontFamily: "Inter-Regular",
@@ -388,7 +385,7 @@ export function FormInput({
             <IconButton
               name={!secureEntry ? "eye-closed" : "eye-open"}
               iconFamily="notesnook"
-              size={16}
+              size={18}
               top={10}
               bottom={10}
               onPress={() => {
@@ -396,7 +393,6 @@ export function FormInput({
                 setSecureEntry(!secureEntry);
               }}
               style={{
-                width: 25,
                 marginLeft: 5
               }}
               color={colors.primary.icon}

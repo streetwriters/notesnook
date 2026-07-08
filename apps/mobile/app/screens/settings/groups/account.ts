@@ -452,10 +452,10 @@ export const accountGroup: SettingSection = {
               name: strings.manageAttachments(),
               icon: "paperclip",
               iconFamily: "notesnook",
-              type: "screen",
-              component: "attachments-manager",
               description: strings.manageAttachmentsDesc(),
-              hideHeader: true
+              modifer: () => {
+                Navigation.navigate("Attachments");
+              }
             },
             {
               id: "clear-cache",
