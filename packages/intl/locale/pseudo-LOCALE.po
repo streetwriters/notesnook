@@ -748,6 +748,10 @@ msgstr ""
 msgid "Add key"
 msgstr ""
 
+#: src/strings.ts:2983
+msgid "Add Link"
+msgstr ""
+
 #: src/strings.ts:933
 msgid "Add notebook"
 msgstr ""
@@ -2996,6 +3000,10 @@ msgstr ""
 msgid "Enter your username"
 msgstr ""
 
+#: src/strings.ts:2974
+msgid "Entire Note"
+msgstr ""
+
 #: src/strings.ts:2487
 msgid "Error"
 msgstr ""
@@ -4127,8 +4135,20 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
+#: src/strings.ts:2984
+msgid "Link added"
+msgstr ""
+
 #: src/strings.ts:949
 msgid "Link copied"
+msgstr ""
+
+#: src/strings.ts:2979
+msgid "Link entire note"
+msgstr ""
+
+#: src/strings.ts:2973
+msgid "Link note"
 msgstr ""
 
 #: src/strings.ts:969
@@ -4137,6 +4157,10 @@ msgstr ""
 
 #: src/strings.ts:2537
 msgid "Link notes"
+msgstr ""
+
+#: src/strings.ts:2975
+msgid "Link options"
 msgstr ""
 
 #: src/strings.ts:2328
@@ -4165,6 +4189,10 @@ msgstr ""
 
 #: src/strings.ts:619
 msgid "Linked notes"
+msgstr ""
+
+#: src/strings.ts:2981
+msgid "Linked References"
 msgstr ""
 
 #: src/strings.ts:1647
@@ -6535,6 +6563,10 @@ msgstr ""
 msgid "Select nth day of the month to repeat the reminder."
 msgstr ""
 
+#: src/strings.ts:2982
+msgid "Select paragraphs"
+msgstr ""
+
 #: src/strings.ts:2865
 msgid "Select plan"
 msgstr ""
@@ -6557,6 +6589,10 @@ msgstr ""
 
 #: src/strings.ts:2520
 msgid "Select the release track for Notesnook."
+msgstr ""
+
+#: src/strings.ts:2976
+msgid "Selected note"
 msgstr ""
 
 #: src/strings.ts:236
@@ -6875,6 +6911,10 @@ msgstr ""
 
 #: src/strings.ts:2666
 msgid "Special Offer"
+msgstr ""
+
+#: src/strings.ts:2980
+msgid "Specify paragraphs"
 msgstr ""
 
 #: src/strings.ts:2187
@@ -8249,6 +8289,10 @@ msgstr ""
 
 #: src/strings.ts:2140
 msgid "You can import your notes from most other note taking apps."
+msgstr ""
+
+#: src/strings.ts:2978
+msgid "You can link the entire note or specific parts like paragraphs."
 msgstr ""
 
 #: src/strings.ts:1482

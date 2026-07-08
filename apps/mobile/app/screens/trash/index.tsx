@@ -32,6 +32,8 @@ import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrash, useTrashStore } from "../../stores/use-trash-store";
 import SelectionHeader from "../../components/selection-header";
 import { strings } from "@notesnook/intl";
+import { Spacing } from "../../common/design/spacing";
+import LineSeparator from "../../components/ui/seperator/line-separator";
 
 const onPressFloatingButton = () => {
   presentDialog({
@@ -85,6 +87,9 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         id={route.name}
         canGoBack={false}
         hasSearch={true}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
         onSearch={() => {
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(route.name),
@@ -94,6 +99,7 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
           });
         }}
       />
+      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
       <DelayLayout wait={loading}>
         <List
           data={trash}

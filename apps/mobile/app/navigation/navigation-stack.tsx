@@ -300,6 +300,7 @@ let Attachments: any = null;
 let References: any = null;
 let NoteHistory: any = null;
 let NotePreview: any = null;
+let AddReference: any = null;
 export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -461,6 +462,15 @@ export const RootNavigation = () => {
             NotePreview =
               NotePreview || require("../screens/note-preview").default;
             return NotePreview;
+          }}
+        />
+
+        <RootStack.Screen
+          name="AddReference"
+          getComponent={() => {
+            AddReference =
+              AddReference || require("../screens/add-reference").default;
+            return AddReference;
           }}
         />
       </RootStack.Navigator>

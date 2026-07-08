@@ -748,6 +748,10 @@ msgstr "Add color"
 msgid "Add key"
 msgstr "Add key"
 
+#: src/strings.ts:2983
+msgid "Add Link"
+msgstr "Add Link"
+
 #: src/strings.ts:933
 msgid "Add notebook"
 msgstr "Add notebook"
@@ -3007,6 +3011,10 @@ msgstr "Enter your recovery code."
 msgid "Enter your username"
 msgstr "Enter your username"
 
+#: src/strings.ts:2974
+msgid "Entire Note"
+msgstr "Entire Note"
+
 #: src/strings.ts:2487
 msgid "Error"
 msgstr "Error"
@@ -4147,9 +4155,21 @@ msgstr "Line spacing changed"
 msgid "Link"
 msgstr "Link"
 
+#: src/strings.ts:2984
+msgid "Link added"
+msgstr "Link added"
+
 #: src/strings.ts:949
 msgid "Link copied"
 msgstr "Link copied"
+
+#: src/strings.ts:2979
+msgid "Link entire note"
+msgstr "Link entire note"
+
+#: src/strings.ts:2973
+msgid "Link note"
+msgstr "Link note"
 
 #: src/strings.ts:969
 msgid "Link notebooks"
@@ -4158,6 +4178,10 @@ msgstr "Link notebooks"
 #: src/strings.ts:2537
 msgid "Link notes"
 msgstr "Link notes"
+
+#: src/strings.ts:2975
+msgid "Link options"
+msgstr "Link options"
 
 #: src/strings.ts:2328
 msgid "Link settings"
@@ -4186,6 +4210,10 @@ msgstr "Linked"
 #: src/strings.ts:619
 msgid "Linked notes"
 msgstr "Linked notes"
+
+#: src/strings.ts:2981
+msgid "Linked References"
+msgstr "Linked References"
 
 #: src/strings.ts:1647
 msgid "Linking to a specific block is not available for locked notes."
@@ -6561,6 +6589,10 @@ msgstr "Select notes to link to \"{title}\""
 msgid "Select nth day of the month to repeat the reminder."
 msgstr "Select nth day of the month to repeat the reminder."
 
+#: src/strings.ts:2982
+msgid "Select paragraphs"
+msgstr "Select paragraphs"
+
 #: src/strings.ts:2865
 msgid "Select plan"
 msgstr "Select plan"
@@ -6584,6 +6616,10 @@ msgstr "Select the languages the spell checker should check in."
 #: src/strings.ts:2520
 msgid "Select the release track for Notesnook."
 msgstr "Select the release track for Notesnook."
+
+#: src/strings.ts:2976
+msgid "Selected note"
+msgstr "Selected note"
 
 #: src/strings.ts:236
 msgid "SELECTED NOTE"
@@ -6910,6 +6946,10 @@ msgstr "Spaces"
 #: src/strings.ts:2666
 msgid "Special Offer"
 msgstr "Special Offer"
+
+#: src/strings.ts:2980
+msgid "Specify paragraphs"
+msgstr "Specify paragraphs"
 
 #: src/strings.ts:2187
 msgid "Spell check"
@@ -8300,6 +8340,10 @@ msgstr "You can create shortcuts of frequently accessed notebooks in the side me
 #: src/strings.ts:2140
 msgid "You can import your notes from most other note taking apps."
 msgstr "You can import your notes from most other note taking apps."
+
+#: src/strings.ts:2978
+msgid "You can link the entire note or specific parts like paragraphs."
+msgstr "You can link the entire note or specific parts like paragraphs."
 
 #: src/strings.ts:1482
 msgid "You can multi-select notes and move them to a notebook at once"

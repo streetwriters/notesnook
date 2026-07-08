@@ -77,7 +77,8 @@ const routeNames = {
   Attachments: "Attachments",
   References: "References",
   NoteHistory: "NoteHistory",
-  NotePreview: "NotePreview"
+  NotePreview: "NotePreview",
+  AddReference: "AddReference"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
