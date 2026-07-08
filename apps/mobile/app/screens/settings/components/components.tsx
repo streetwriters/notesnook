@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { ReactElement } from "react";
 import { View } from "react-native";
-import { AttachmentDialog } from "../../../components/attachments";
 import { ChangePassword } from "../../../components/auth/change-password";
 import { DefaultAppStyles } from "../../../utils/styles";
 import { AttachmentGroupProgress } from "./attachment-group-progress";
@@ -69,7 +68,6 @@ export const components: { [name: string]: ReactElement } = {
   autobackupsattachments: <BackupWithAttachmentsReminderPicker />,
   backuprestore: <RestoreBackup />,
   "server-config": <ServersConfiguration />,
-  "attachments-manager": <AttachmentDialog note={undefined} isSheet={false} />,
   "offline-mode-progress": (
     <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
       <AttachmentGroupProgress groupId="offline-mode" />

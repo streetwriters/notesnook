@@ -35,6 +35,7 @@ export type ButtonTypes =
   | "white"
   | "error"
   | "errorShade"
+  | "error-outline"
   | "warn"
   | "selected"
   | "accent-outline"
@@ -232,6 +233,14 @@ const buttonTypes = (
       0.07,
       isDark
     )
+  },
+  "error-outline": {
+    primary: "transparent",
+    text: colors.error.paragraph,
+    selected: "transparent",
+    borderWidth: 0.8,
+    borderColor: colors.error.border,
+    borderSelectedColor: getColorLinearShade(colors.error.border, 0.07, isDark)
   },
   errorShade: {
     primary: "transparent",
