@@ -64,7 +64,7 @@ export const helpSupportGroup: SettingSection = {
       id: "docs-link",
       name: strings.documentation(),
       modifer: async () => {
-        Linking.openURL("https://help.notesnook.com/");
+        Linking.openURL("https://notesnook.com/help/");
       },
       description: strings.documentationDesc(),
       icon: "file-text",
