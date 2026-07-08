@@ -2973,5 +2973,17 @@ Continue without attachments?`,
   reminderPlaceholder: () => t`Never miss a task. Set your first reminder now.`,
   emptyLinkedNotes: () => t`Links of notes that are references in this note.`,
   emptyReferences: () => t`Links of notes where this note is referenced.`,
-  passwordProtection: () => t`Password protection (optional)`
+  passwordProtection: () => t`Password protection (optional)`,
+  linkNote: () => t`Link note`,
+  entireNote: () => t`Entire Note`,
+  linkOptions: () => t`Link options`,
+  selectedNoteLabel: () => t`Selected note`,
+  linkOptionsDesc: () =>
+    t`You can link the entire note or specific parts like paragraphs.`,
+  linkEntireNote: () => t`Link entire note`,
+  specifyParagraphs: () => t`Specify paragraphs`,
+  linkedReferences: () => t`Linked References`,
+  selectParagraphs: () => t`Select paragraphs`,
+  addLink: () => t`Add Link`,
+  linkAdded: () => t`Link added`
 };

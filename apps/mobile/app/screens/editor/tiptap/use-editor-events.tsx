@@ -44,7 +44,6 @@ import { AuthMode } from "../../../components/auth/common";
 import { Properties } from "../../../components/properties";
 import EditorTabs from "../../../components/sheets/editor-tabs";
 import { Issue } from "../../../components/sheets/github/issue";
-import LinkNote from "../../../components/sheets/link-note";
 import PaywallSheet from "../../../components/sheets/paywall";
 import TableOfContents from "../../../components/sheets/toc";
 import { DDS } from "../../../services/device-detection";
@@ -297,7 +296,8 @@ export const useEditorEvents = (
       if (
         useNavigationStore.getState().currentRoute === "ManageTags" ||
         useNavigationStore.getState().currentRoute === "LinkNotebooks" ||
-        useNavigationStore.getState().currentRoute === "AddReminder"
+        useNavigationStore.getState().currentRoute === "AddReminder" ||
+        useNavigationStore.getState().currentRoute === "AddReference"
       ) {
         Navigation.goBack();
       } else {
@@ -767,10 +767,9 @@ export const useEditorEvents = (
           break;
         }
         case EditorEvents.createInternalLink: {
-          LinkNote.present(
-            editorMessage.value.attributes,
-            editorMessage.resolverId as string
-          );
+          Navigation.navigate("AddReference", {
+            resolverId: editorMessage.resolverId as string
+          });
           break;
         }
 

@@ -166,6 +166,13 @@ export const Header = ({
         >
           {rightButton ? (
             <IconButton {...rightButton} color={colors.primary.icon} />
+          ) : !hasSearch ? (
+            <View
+              style={{
+                width: 20,
+                height: 20
+              }}
+            />
           ) : null}
 
           {hasSearch ? (

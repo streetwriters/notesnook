@@ -1177,6 +1177,7 @@ export const useActions = ({
         title: strings.references(),
         icon: "link-alt",
         onPress: () => {
+          close();
           Navigation.navigate("References", {
             reference: item as ItemReference
           });
