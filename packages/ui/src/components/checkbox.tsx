@@ -17,22 +17,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./icon/index.js";
-export * from "./menu/index.js";
-export * from "./popup-presenter/index.js";
-export * from "./scroll-container/index.js";
-export * from "./button.js";
-export * from "./box.js";
-export * from "./flex.js";
-export * from "./slider.js";
-export * from "./text.js";
-export * from "./label.js";
-export * from "./textarea.js";
-export * from "./input.js";
-export * from "./image.js";
-export * from "./switch.js";
-export * from "./checkbox.js";
-export * from "./link.js";
-export * from "./grid.js";
-export * from "./progress.js";
-export * from "./radio.js";
+import React from "react";
+import {
+  Checkbox as ThemeUICheckbox,
+  CheckboxProps as ThemeUICheckboxProps
+} from "@theme-ui/components";
+import { Theme } from "@notesnook/theme";
+import {
+  RestrictedColorProps,
+  RestrictedSpaceProps,
+  RestrictedSxProp
+} from "../utils/types.js";
+
+export interface CheckboxProps
+  extends Omit<
+      ThemeUICheckboxProps,
+      "variant" | "sx" | keyof RestrictedSpaceProps | keyof RestrictedColorProps
+    >,
+    RestrictedSpaceProps,
+    RestrictedColorProps {
+  variant?: keyof Theme["forms"];
+  sx?: RestrictedSxProp;
+}
+
+export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+  (props, ref) => {
+    return <ThemeUICheckbox ref={ref} {...(props as any)} />;
+  }
+);
