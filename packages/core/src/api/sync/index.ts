@@ -307,17 +307,17 @@ export class Sync {
   }
 
   async stop(options: SyncOptions) {
-    const pendingInboxItems = await this.db
-      .pendingSyncItems()
-      .getByType("inbox-item");
+    const pendingInboxItems = await this.db.pendingSyncItems.getByType(
+      "inbox-item"
+    );
     if (pendingInboxItems.length > 0) {
       const items = pendingInboxItems.map(
         (item) => JSON.parse(item.data) as SyncInboxItem
       );
       await handleInboxItems(items, this.db);
-      await this.db
-        .pendingSyncItems()
-        .remove(pendingInboxItems.map((item) => item.id));
+      await this.db.pendingSyncItems.remove(
+        pendingInboxItems.map((item) => item.id)
+      );
     }
 
     if (
@@ -614,7 +614,7 @@ export class Sync {
          * TODO: do this for other items as well
          */
         for (const item of inboxItems) {
-          await this.db.pendingSyncItems().add({
+          await this.db.pendingSyncItems.add({
             id: item.id,
             type: "inbox-item",
             data: JSON.stringify(item),

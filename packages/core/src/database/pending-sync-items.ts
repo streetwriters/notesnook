@@ -17,37 +17,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { LazyDatabaseAccessor, RawDatabaseSchema } from "./index.js";
+import { DatabaseAccessor, RawDatabaseSchema } from "./index.js";
 import { PendingSyncItem } from "../types.js";
 
 export class PendingSyncItems {
-  private readonly db: LazyDatabaseAccessor<RawDatabaseSchema>;
-  constructor(db: LazyDatabaseAccessor) {
-    this.db = db as unknown as LazyDatabaseAccessor<RawDatabaseSchema>;
-  }
+  constructor(private readonly db: DatabaseAccessor<RawDatabaseSchema>) {}
 
   async add(item: PendingSyncItem) {
-    await this.db.then((db) =>
-      db.replaceInto("pendingsyncitems").values(item).execute()
-    );
+    await this.db().replaceInto("pendingsyncitems").values(item).execute();
   }
 
   async getByType(type: PendingSyncItem["type"]) {
-    const result = await this.db.then((db) =>
-      db
-        .selectFrom("pendingsyncitems")
-        .where("type", "==", type)
-        .selectAll()
-        .execute()
-    );
+    const result = await this.db()
+      .selectFrom("pendingsyncitems")
+      .where("type", "==", type)
+      .selectAll()
+      .execute();
     return result as PendingSyncItem[];
   }
 
   async remove(ids: string[]) {
     if (ids.length === 0) return;
 
-    await this.db.then((db) =>
-      db.deleteFrom("pendingsyncitems").where("id", "in", ids).execute()
-    );
+    await this.db()
+      .deleteFrom("pendingsyncitems")
+      .where("id", "in", ids)
+      .execute();
   }
 }
