@@ -465,8 +465,8 @@ const NoteItem = ({
         >
           {isTrash ? (
             <Paragraph
-              color={primaryColors.accent}
-              fontSize="XXS"
+              color={colors.secondary.paragraph}
+              fontSize="XS"
               style={{
                 marginRight: 6
               }}
@@ -488,7 +488,7 @@ const NoteItem = ({
                 style={{
                   marginTop: 1
                 }}
-                name="calendar"
+                name="trash-alt"
                 iconFamily="notesnook"
               />
               <Paragraph
