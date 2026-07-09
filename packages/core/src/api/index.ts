@@ -58,7 +58,6 @@ import {
   IFileStorage,
   IStorage,
   KVStorageAccessor,
-  PendingSyncItemsAccessor,
   StorageAccessor
 } from "../interfaces.js";
 import TokenManager from "./token-manager.js";
@@ -166,8 +165,9 @@ class Database {
 
   private _kv = new KVStorage(this.databaseReady.promise);
   kv: KVStorageAccessor = () => this._kv;
-  private _pendingSyncItems = new PendingSyncItems(this.databaseReady.promise);
-  pendingSyncItems: PendingSyncItemsAccessor = () => this._pendingSyncItems;
+  pendingSyncItems = new PendingSyncItems(
+    this.sql as unknown as DatabaseAccessor<RawDatabaseSchema>
+  );
   private _config: ConfigStorage = new ConfigStorage(
     this.databaseReady.promise
   );

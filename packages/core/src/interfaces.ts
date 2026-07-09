@@ -25,7 +25,6 @@ import {
 } from "@notesnook/crypto";
 import { KVStorage } from "./database/kv.js";
 import { ConfigStorage } from "./database/config.js";
-import { PendingSyncItems } from "./database/pending-sync-items.js";
 
 export type Output<TOutputFormat extends DataFormat> =
   TOutputFormat extends "uint8array" ? Uint8Array : string;
@@ -146,5 +145,4 @@ export interface IFileStorage {
 export type StorageAccessor = () => IStorage;
 export type KVStorageAccessor = () => KVStorage;
 export type ConfigStorageAccessor = () => ConfigStorage;
-export type PendingSyncItemsAccessor = () => PendingSyncItems;
 export type CompressorAccessor = () => Promise<ICompressor>;
