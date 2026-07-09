@@ -42,6 +42,8 @@ import useNavigationStore, {
 import { useSettingStore } from "../../stores/use-setting-store";
 import { rootNavigatorRef } from "../../utils/global-refs";
 import { setOnFirstSave } from "./common";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import { Spacing } from "../../common/design/spacing";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -210,7 +212,11 @@ const NotesPage = ({
           });
         }}
         onPressDefaultRightButton={onPressFloatingButton}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
       />
+      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
 
       <DelayLayout color={accentColor} wait={loadingNotes}>
         <List
