@@ -359,12 +359,7 @@ const Attachments = (props: NavigationProps<"Attachments">) => {
           }}
         />
 
-        <LineSeparator
-          paddingHorizontal={Spacing.LEVEL_3}
-          style={{
-            marginBottom: -Spacing.LEVEL_1
-          }}
-        />
+        <LineSeparator />
 
         <View>
           <ScrollView

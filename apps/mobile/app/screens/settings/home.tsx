@@ -32,6 +32,7 @@ import { LegendList } from "@legendapp/list";
 import { useThemeColors } from "@notesnook/theme";
 import { Spacing } from "../../common/design/spacing";
 import { View } from "react-native";
+import LineSeparator from "../../components/ui/seperator/line-separator";
 
 const keyExtractor = (item: SettingSection) => item.id;
 
@@ -69,13 +70,13 @@ const Home = ({
         canGoBack={true}
         hasSearch={false}
         style={{
-          backgroundColor: "transparent",
-          borderRadius: 0,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border
+          backgroundColor: "transparent"
         }}
         id="Settings"
       />
+
+      <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
+
       <DelayLayout type="settings">
         <LegendList
           testID="settings-list"
@@ -83,7 +84,8 @@ const Home = ({
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           contentContainerStyle={{
-            gap: Spacing.LEVEL_2
+            gap: Spacing.LEVEL_2,
+            marginTop: Spacing.LEVEL_4
           }}
         />
       </DelayLayout>

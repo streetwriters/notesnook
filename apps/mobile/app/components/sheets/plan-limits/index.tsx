@@ -117,7 +117,9 @@ export function PlanLimits() {
           </View>
         </View>
 
-        <View style={{ height: 1, backgroundColor: colors.primary.border }} />
+        <View
+          style={{ height: 1, backgroundColor: colors.primary.separator }}
+        />
 
         <View style={{ gap: Spacing.LEVEL_2, width: "100%" }}>
           {featureUsage?.map((item) => (

@@ -224,6 +224,8 @@ export const accountGroup: SettingSection = {
               sections: [
                 {
                   id: "remove-profile-picture",
+                  icon: "trash",
+                  iconFamily: "notesnook",
                   name: strings.removeProfilePicture(),
                   description: strings.removeProfilePictureDesc(),
                   useHook: () =>
@@ -251,6 +253,8 @@ export const accountGroup: SettingSection = {
                 },
                 {
                   id: "remove-name",
+                  icon: "trash",
+                  iconFamily: "notesnook",
                   name: strings.removeFullName(),
                   description: strings.removeFullNameDesc(),
                   useHook: () =>
@@ -281,7 +285,8 @@ export const accountGroup: SettingSection = {
                   type: "screen",
                   component: "change-email",
                   description: strings.changeEmailDesc(),
-                  icon: "at"
+                  icon: "at",
+                  headerBottomBorder: true
                 }
               ]
             },
@@ -340,7 +345,8 @@ export const accountGroup: SettingSection = {
               description: strings.changePasswordDesc(),
               component: "change-password",
               icon: "pencil-simple-line",
-              iconFamily: "notesnook"
+              iconFamily: "notesnook",
+              headerBottomBorder: true
             },
             {
               id: "2fa-settings",
@@ -781,6 +787,7 @@ export const accountGroup: SettingSection = {
                     id: "setup-inbox-keys",
                     name: strings.setupInboxKeys(),
                     type: "screen",
+                    headerBottomBorder: true,
                     component: "setup-inbox-keys"
                   } as any);
                 } catch (e) {
@@ -809,6 +816,7 @@ export const accountGroup: SettingSection = {
                 });
               },
               type: "screen",
+              headerBottomBorder: true,
               component: "manage-inbox-keys"
             },
             {
@@ -819,6 +827,7 @@ export const accountGroup: SettingSection = {
               hidden: (current) => !current,
               type: "screen",
               component: "inbox-keys",
+              headerBottomBorder: true,
               icon: "key",
               iconFamily: "notesnook"
             },

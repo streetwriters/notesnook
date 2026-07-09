@@ -278,7 +278,7 @@ function RecoveryKeySheet({ close }: RecoveryKeySheetProps) {
           <View
             style={{
               height: 1,
-              backgroundColor: colors.primary.border,
+              backgroundColor: colors.primary.separator,
               width: "100%",
               marginVertical: Spacing.LEVEL_2
             }}

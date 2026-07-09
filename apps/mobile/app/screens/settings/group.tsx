@@ -32,6 +32,7 @@ import { RouteParams, SettingSection } from "./types";
 import { useThemeColors } from "@notesnook/theme";
 import { SectionGroup } from "./section-group";
 import { Spacing } from "../../common/design/spacing";
+import LineSeparator from "../../components/ui/seperator/line-separator";
 const keyExtractor = (item: SettingSection) => item.id;
 const AnimatedKeyboardAvoidingFlatList = Animated.createAnimatedComponent(
   KeyboardAwareFlatList
@@ -69,14 +70,16 @@ const Group = ({
           title={route.params.name as string}
           canGoBack={true}
           style={{
-            backgroundColor: "transparent",
-            borderRadius: 0,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.primary.border
+            backgroundColor: "transparent"
           }}
           id="Settings"
         />
       )}
+
+      {route.params?.component && !route.params.headerBottomBorder ? null : (
+        <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
+      )}
+
       <DelayLayout type="settings">
         <View
           style={{
@@ -96,7 +99,8 @@ const Group = ({
                   : null
               }
               contentContainerStyle={{
-                gap: Spacing.LEVEL_2
+                gap: Spacing.LEVEL_2,
+                marginTop: Spacing.LEVEL_4
               }}
               keyExtractor={keyExtractor}
               renderItem={renderItem}

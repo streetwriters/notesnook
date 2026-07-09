@@ -101,7 +101,8 @@ export function ServersConfiguration() {
     <View
       style={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        gap: Spacing.LEVEL_2
+        gap: Spacing.LEVEL_2,
+        paddingTop: Spacing.LEVEL_4
       }}
     >
       {isLoggedIn ? (
