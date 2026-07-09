@@ -23,14 +23,19 @@ import {
   ButtonProps as ThemeUIButtonProps
 } from "@theme-ui/components";
 import { Theme } from "@notesnook/theme";
-import { RestrictedSpaceProps, RestrictedSxProp } from "../utils/types.js";
+import {
+  RestrictedColorProps,
+  RestrictedSpaceProps,
+  RestrictedSxProp
+} from "../utils/types.js";
 
 export interface ButtonProps
   extends Omit<
       ThemeUIButtonProps,
-      "variant" | "sx" | keyof RestrictedSpaceProps
+      "variant" | "sx" | keyof RestrictedSpaceProps | keyof RestrictedColorProps
     >,
-    RestrictedSpaceProps {
+    RestrictedSpaceProps,
+    RestrictedColorProps {
   variant?: keyof Theme["buttons"];
   sx?: RestrictedSxProp;
 }
