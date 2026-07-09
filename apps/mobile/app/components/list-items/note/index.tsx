@@ -488,7 +488,7 @@ const NoteItem = ({
                 style={{
                   marginTop: 1
                 }}
-                name="trash-alt"
+                name={isTrash ? "trash-alt" : "calendar"}
                 iconFamily="notesnook"
               />
               <Paragraph

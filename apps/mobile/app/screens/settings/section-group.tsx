@@ -43,7 +43,7 @@ export const SectionGroup = ({
             paddingHorizontal: Spacing.LEVEL_3,
             marginBottom: Spacing.LEVEL_2
           }}
-          color={colors.secondary.paragraph}
+          color={colors.primary.accent}
           size={AppFontSize.sm}
           fontFamily="MEDIUM"
         >
@@ -74,7 +74,7 @@ export const SectionGroup = ({
             style={{
               height: 1,
               width: "100%",
-              backgroundColor: colors.primary.border
+              backgroundColor: colors.primary.separator
             }}
           />
         </View>

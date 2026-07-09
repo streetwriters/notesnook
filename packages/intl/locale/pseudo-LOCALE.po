@@ -5604,16 +5604,16 @@ msgstr ""
 msgid "private analytics and bug reports."
 msgstr ""
 
+#: src/strings.ts:2778
+msgid "Private key"
+msgstr ""
+
 #: src/strings.ts:2792
 msgid "Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase."
 msgstr ""
 
 #: src/strings.ts:2812
 msgid "Private key required"
-msgstr ""
-
-#: src/strings.ts:2778
-msgid "Private key:"
 msgstr ""
 
 #: src/strings.ts:853
@@ -5672,12 +5672,12 @@ msgstr ""
 msgid "Proxy"
 msgstr ""
 
-#: src/strings.ts:2811
-msgid "Public key required"
+#: src/strings.ts:2777
+msgid "Public key"
 msgstr ""
 
-#: src/strings.ts:2777
-msgid "Public key:"
+#: src/strings.ts:2811
+msgid "Public key required"
 msgstr ""
 
 #: src/strings.ts:510

@@ -2774,8 +2774,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   expiresOn: () => t`Expires on`,
   changingInboxPgpKeysNotice: () =>
     t`Changing Inbox PGP keys will delete all your unsynced inbox items.`,
-  publicKey: () => t`Public key:`,
-  privateKey: () => t`Private key:`,
+  publicKey: () => t`Public key`,
+  privateKey: () => t`Private key`,
   invalidPgpKeyPair: () =>
     t`Invalid PGP key pair. Please check your keys and try again.`,
   inboxKeysSaved: () => t`Inbox keys saved`,

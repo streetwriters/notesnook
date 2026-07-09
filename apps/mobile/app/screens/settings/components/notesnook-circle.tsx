@@ -38,6 +38,7 @@ import { eCloseSimpleDialog } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
+import LineSeparator from "../../../components/ui/seperator/line-separator";
 let p: any;
 export const NotesnookCircle = () => {
   const user = useUserStore((state) => state.user);
@@ -82,63 +83,71 @@ export const NotesnookCircle = () => {
   }, []);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        gap: Spacing.LEVEL_3,
-        paddingHorizontal: Spacing.LEVEL_3,
-        paddingTop: Spacing.LEVEL_0
-      }}
-    >
-      <View
-        style={{
-          gap: Spacing.LEVEL_0
+    <View>
+      <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
+
+      <ScrollView
+        contentContainerStyle={{
+          gap: Spacing.LEVEL_3,
+          paddingHorizontal: Spacing.LEVEL_3,
+          paddingTop: Spacing.LEVEL_4
         }}
       >
-        <Heading fontSize="XL">Partner offers</Heading>
-        <Paragraph>
-          Get exclusive discounts from our trusted partners who share our
-          commitment to privacy and user freedom.
-        </Paragraph>
-      </View>
-
-      {!isFree && !isOnTrial ? null : (
-        <View>
+        <View
+          style={{
+            gap: Spacing.LEVEL_0
+          }}
+        >
+          <Heading fontSize="XL">Partner offers</Heading>
           <Paragraph>
-            {isFree
-              ? strings.freeUserCircleNotice()
-              : strings.trialUserCircleNotice()}
+            Get exclusive discounts from our trusted partners who share our
+            commitment to privacy and user freedom.
           </Paragraph>
-
-          {isOnTrial ? null : (
-            <Button
-              title={strings.upgradePlan()}
-              onPress={() => {
-                Navigation.navigate("PayWall", {
-                  canGoBack: true,
-                  context: useUserStore.getState().user
-                    ? "logged-in"
-                    : "logged-out"
-                });
-              }}
-              style={{
-                alignSelf: "flex-start",
-                paddingHorizontal: 0
-              }}
-            />
-          )}
         </View>
-      )}
 
-      {partners.loading ? <ActivityIndicator /> : null}
+        {!isFree && !isOnTrial ? null : (
+          <View>
+            <Paragraph>
+              {isFree
+                ? strings.freeUserCircleNotice()
+                : strings.trialUserCircleNotice()}
+            </Paragraph>
 
-      {partners.error ? (
-        <Notice type="alert" text={partners.error.message} />
-      ) : null}
+            {isOnTrial ? null : (
+              <Button
+                title={strings.upgradePlan()}
+                onPress={() => {
+                  Navigation.navigate("PayWall", {
+                    canGoBack: true,
+                    context: useUserStore.getState().user
+                      ? "logged-in"
+                      : "logged-out"
+                  });
+                }}
+                style={{
+                  alignSelf: "flex-start",
+                  paddingHorizontal: 0
+                }}
+              />
+            )}
+          </View>
+        )}
 
-      {partners.result?.map((item) => (
-        <Partner key={item.id} item={item} available={!isFree && !isOnTrial} />
-      ))}
-    </ScrollView>
+        {partners.loading ? <ActivityIndicator /> : null}
+
+        {partners.error ? (
+          <Notice type="alert" text={partners.error.message} />
+        ) : null}
+
+        {partners.result?.map((item) => (
+          <Partner
+            key={item.id}
+            item={item}
+            available={!isFree && !isOnTrial}
+          />
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
@@ -187,7 +196,8 @@ const Partner = ({
           borderRadius: Radius.XS,
           backgroundColor: colors.primary.shade,
           paddingVertical: 4,
-          paddingHorizontal: 8
+          paddingHorizontal: 8,
+          marginBottom: Spacing.LEVEL_1
         }}
       >
         <Paragraph fontSize="XS" color={colors.primary.accent}>
