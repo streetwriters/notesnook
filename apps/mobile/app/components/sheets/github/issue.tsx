@@ -238,7 +238,7 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
           <View
             style={{
               height: 1,
-              backgroundColor: colors.primary.border
+              backgroundColor: colors.primary.separator
             }}
           />
 

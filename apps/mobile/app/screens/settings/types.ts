@@ -33,6 +33,7 @@ export type SettingSection = {
     | "input-selector"
     | "dropdown-selector"
     | "group";
+  headerBottomBorder?: boolean;
   name?: string | ((current?: unknown) => string);
   description?: string | ((current: unknown) => string);
   icon?: string;

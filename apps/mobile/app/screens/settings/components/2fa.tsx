@@ -498,7 +498,7 @@ export const MFASetup = ({
               style={{
                 height: 1,
                 marginVertical: Spacing.LEVEL_3,
-                backgroundColor: colors.primary.border
+                backgroundColor: colors.primary.separator
               }}
             />
 
@@ -768,7 +768,7 @@ export const MFARecoveryCodes = ({
                 style={{
                   height: 1,
                   marginTop: Spacing.LEVEL_1,
-                  backgroundColor: colors.primary.border
+                  backgroundColor: colors.primary.separator
                 }}
               />
 

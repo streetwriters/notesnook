@@ -51,7 +51,7 @@ export const Licenses = () => {
           alignSelf: "flex-start",
           padding: DefaultAppStyles.GAP,
           borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border,
+          borderBottomColor: colors.primary.separator,
           borderRadius: 0
         }}
         onPress={() => {
