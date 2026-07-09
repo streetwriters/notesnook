@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Theme } from "@notesnook/theme";
+import { Theme, ThemeColor } from "@notesnook/theme";
 import { ThemeUIStyleObject } from "@theme-ui/core";
 
 type ThemeSpace = Theme["space"];
@@ -26,6 +26,12 @@ type ValidSpaceValues =
   | Exclude<keyof ThemeSpace, keyof Array<any> | "small">
   | "small"
   | number;
+
+export type RestrictedColorProps = {
+  color?: ThemeColor;
+  bg?: ThemeColor | (ThemeColor | null)[];
+  backgroundColor?: ThemeColor | (ThemeColor | null)[];
+};
 
 export type RestrictedSpaceProps = {
   [K in
@@ -61,6 +67,7 @@ export type RestrictedSpaceProps = {
 
 export type RestrictedSxProp = Omit<
   ThemeUIStyleObject,
-  keyof RestrictedSpaceProps
+  keyof RestrictedSpaceProps | keyof RestrictedColorProps
 > &
-  RestrictedSpaceProps;
+  RestrictedSpaceProps &
+  RestrictedColorProps;
