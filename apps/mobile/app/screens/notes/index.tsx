@@ -22,6 +22,7 @@ import { Color, Note, Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
@@ -42,8 +43,6 @@ import useNavigationStore, {
 import { useSettingStore } from "../../stores/use-setting-store";
 import { rootNavigatorRef } from "../../utils/global-refs";
 import { setOnFirstSave } from "./common";
-import LineSeparator from "../../components/ui/seperator/line-separator";
-import { Spacing } from "../../common/design/spacing";
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (
@@ -216,7 +215,6 @@ const NotesPage = ({
           paddingHorizontal: Spacing.LEVEL_2
         }}
       />
-      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
 
       <DelayLayout color={accentColor} wait={loadingNotes}>
         <List

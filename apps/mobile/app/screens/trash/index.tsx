@@ -17,23 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { presentDialog } from "../../components/dialog/functions";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrash, useTrashStore } from "../../stores/use-trash-store";
-import SelectionHeader from "../../components/selection-header";
-import { strings } from "@notesnook/intl";
-import { Spacing } from "../../common/design/spacing";
-import LineSeparator from "../../components/ui/seperator/line-separator";
 
 const onPressFloatingButton = () => {
   presentDialog({
@@ -103,7 +102,6 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
           });
         }}
       />
-      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
       <DelayLayout wait={loading}>
         <List
           data={trash}
