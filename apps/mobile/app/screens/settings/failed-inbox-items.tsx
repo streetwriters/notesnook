@@ -34,6 +34,7 @@ import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager } from "../../services/event-manager";
+import LineSeparator from "../../components/ui/seperator/line-separator";
 
 type FailedInboxItem = {
   id: string;
@@ -129,7 +130,7 @@ function PayloadDataBlock({ value }: { value: string }) {
         </Pressable>
       </View>
 
-      <View style={{ height: 1, backgroundColor: colors.primary.border }} />
+      <View style={{ height: 1, backgroundColor: colors.primary.separator }} />
 
       <View
         style={{
@@ -187,6 +188,9 @@ export const FailedInboxItems = () => {
         title={strings.failedInboxItems()}
         canGoBack={true}
         id="Settings"
+        style={{
+          backgroundColor: "transparent"
+        }}
         rightButton={
           items?.length > 0
             ? {
@@ -214,6 +218,8 @@ export const FailedInboxItems = () => {
             : undefined
         }
       />
+
+      <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
 
       {result.status === "pending" ? (
         <View
@@ -274,7 +280,8 @@ export const FailedInboxItems = () => {
             gap: Spacing.LEVEL_4,
             paddingHorizontal: Spacing.LEVEL_3,
             paddingVertical: Spacing.LEVEL_4,
-            paddingBottom: 50
+            paddingBottom: 50,
+            paddingTop: Spacing.LEVEL_3
           }}
         >
           {items.map((item) => {

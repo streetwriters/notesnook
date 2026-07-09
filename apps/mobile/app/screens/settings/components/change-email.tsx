@@ -30,6 +30,8 @@ import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { eUserLoggedIn } from "../../../utils/events";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { Spacing } from "../../../common/design/spacing";
+import { PASSWORD_PLACEHOLDER } from "../../../utils/constants";
 
 enum EmailChangeSteps {
   verify,
@@ -104,10 +106,16 @@ export const ChangeEmail = () => {
   };
 
   return (
-    <View style={{ paddingHorizontal: DefaultAppStyles.GAP }}>
+    <View
+      style={{
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_4,
+        gap: Spacing.LEVEL_4
+      }}
+    >
       <View
         style={{
-          marginTop: DefaultAppStyles.GAP_VERTICAL
+          gap: Spacing.LEVEL_2
         }}
       >
         {step === EmailChangeSteps.verify ? (
@@ -115,8 +123,9 @@ export const ChangeEmail = () => {
             <FormInput
               name="email"
               formRef={formRef}
+              label={strings.enterNewEmail()}
               fwdRef={emailInputRef}
-              placeholder={strings.enterNewEmail()}
+              placeholder={"you@example.com"}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -130,9 +139,10 @@ export const ChangeEmail = () => {
             />
             <FormInput
               name="password"
+              label={strings.password()}
               formRef={formRef}
               fwdRef={passInputRef}
-              placeholder={strings.enterAccountPassword()}
+              placeholder={PASSWORD_PLACEHOLDER}
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
@@ -170,7 +180,7 @@ export const ChangeEmail = () => {
           loading
             ? undefined
             : step === EmailChangeSteps.verify
-              ? strings.verify()
+              ? strings.continue()
               : strings.changeEmail()
         }
         type="accent"

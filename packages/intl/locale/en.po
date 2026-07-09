@@ -5632,6 +5632,10 @@ msgstr "Privacy Policy. "
 msgid "private analytics and bug reports."
 msgstr "private analytics and bug reports."
 
+#: src/strings.ts:2778
+msgid "Private key"
+msgstr "Private key"
+
 #: src/strings.ts:2792
 msgid "Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase."
 msgstr "Private key is passphrase-protected. Please provide the decrypted key or a key without a passphrase."
@@ -5639,10 +5643,6 @@ msgstr "Private key is passphrase-protected. Please provide the decrypted key or
 #: src/strings.ts:2812
 msgid "Private key required"
 msgstr "Private key required"
-
-#: src/strings.ts:2778
-msgid "Private key:"
-msgstr "Private key:"
 
 #: src/strings.ts:853
 msgid "Private."
@@ -5700,13 +5700,13 @@ msgstr "Provide your own keys"
 msgid "Proxy"
 msgstr "Proxy"
 
+#: src/strings.ts:2777
+msgid "Public key"
+msgstr "Public key"
+
 #: src/strings.ts:2811
 msgid "Public key required"
 msgstr "Public key required"
-
-#: src/strings.ts:2777
-msgid "Public key:"
-msgstr "Public key:"
 
 #: src/strings.ts:510
 msgid "Publish"

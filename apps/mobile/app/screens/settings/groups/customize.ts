@@ -233,11 +233,16 @@ export const customizeGroup: SettingSection = {
               type: "screen",
               name: strings.customizeToolbar(),
               description: strings.customizeToolbarDesc(),
-              component: "configuretoolbar"
+              icon: "wrench",
+              iconFamily: "notesnook",
+              component: "configuretoolbar",
+              headerBottomBorder: true
             },
             {
               id: "reset-toolbar",
               name: strings.resetToolbar(),
+              icon: "arrow-counter-clockwise",
+              iconFamily: "notesnook",
               description: strings.resetToolbarDesc(),
               modifer: () => {
                 useDragState.getState().setPreset("default");
@@ -339,7 +344,8 @@ export const customizeGroup: SettingSection = {
       description: strings.serversConfigurationDesc(),
       icon: "hard-drives",
       iconFamily: "notesnook",
-      component: "server-config"
+      component: "server-config",
+      headerBottomBorder: true
     }
   ]
 };

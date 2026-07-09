@@ -60,7 +60,8 @@ export const legalGroup: SettingSection = {
       component: "licenses",
       description: strings.ossLibs(),
       icon: "file-dashed",
-      iconFamily: "notesnook"
+      iconFamily: "notesnook",
+      headerBottomBorder: true
     }
   ]
 };

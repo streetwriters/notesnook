@@ -282,7 +282,7 @@ const SettingsUserSection = ({ item }) => {
               paddingHorizontal: Spacing.LEVEL_3,
               marginBottom: Spacing.LEVEL_2
             }}
-            color={colors.secondary.paragraph}
+            color={colors.primary.accent}
             size={AppFontSize.sm}
             fontFamily="MEDIUM"
           >

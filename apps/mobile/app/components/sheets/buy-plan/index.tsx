@@ -211,7 +211,7 @@ export const BuyPlan = (props: {
                   style={{
                     width: "100%",
                     height: 1,
-                    backgroundColor: colors.primary.border,
+                    backgroundColor: colors.primary.separator,
                     marginVertical: Spacing.LEVEL_2
                   }}
                 />

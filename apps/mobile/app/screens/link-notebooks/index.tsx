@@ -285,7 +285,7 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
             <View
               style={{
                 height: 1,
-                backgroundColor: colors.primary.border
+                backgroundColor: colors.primary.separator
               }}
             />
 
