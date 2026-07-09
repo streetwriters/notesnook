@@ -17,11 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./icon/index.js";
-export * from "./menu/index.js";
-export * from "./popup-presenter/index.js";
-export * from "./scroll-container/index.js";
-export * from "./button.js";
-export * from "./box.js";
-export * from "./flex.js";
-export * from "./slider.js";
+import React from "react";
+import {
+  Box as ThemeUIBox,
+  BoxProps as ThemeUIBoxProps
+} from "@theme-ui/components";
+import { Theme } from "@notesnook/theme";
+import {
+  RestrictedColorProps,
+  RestrictedSpaceProps,
+  RestrictedSxProp
+} from "../utils/types.js";
+
+export interface BoxProps
+  extends Omit<
+      ThemeUIBoxProps,
+      "variant" | "sx" | keyof RestrictedSpaceProps | keyof RestrictedColorProps
+    >,
+    RestrictedSpaceProps,
+    RestrictedColorProps {
+  variant?: keyof Theme["variants"];
+  sx?: RestrictedSxProp;
+}
+
+export const Box = React.forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
+  return <ThemeUIBox ref={ref} {...props} />;
+});

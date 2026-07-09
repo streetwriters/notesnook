@@ -17,11 +17,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export * from "./icon/index.js";
-export * from "./menu/index.js";
-export * from "./popup-presenter/index.js";
-export * from "./scroll-container/index.js";
-export * from "./button.js";
-export * from "./box.js";
-export * from "./flex.js";
-export * from "./slider.js";
+import React from "react";
+import {
+  Flex as ThemeUIFlex,
+  FlexProps as ThemeUIFlexProps
+} from "@theme-ui/components";
+import { Theme } from "@notesnook/theme";
+import {
+  RestrictedColorProps,
+  RestrictedSpaceProps,
+  RestrictedSxProp
+} from "../utils/types.js";
+
+export interface FlexProps
+  extends Omit<
+      ThemeUIFlexProps,
+      "variant" | "sx" | keyof RestrictedSpaceProps | keyof RestrictedColorProps
+    >,
+    RestrictedSpaceProps,
+    RestrictedColorProps {
+  variant?: keyof Theme["variants"];
+  sx?: RestrictedSxProp;
+}
+
+export const Flex = React.forwardRef<HTMLDivElement, FlexProps>(
+  (props, ref) => {
+    return <ThemeUIFlex ref={ref} {...props} />;
+  }
+);
