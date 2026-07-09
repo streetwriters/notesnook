@@ -41,6 +41,10 @@ const onPressFloatingButton = () => {
     paragraph: strings.clearTrashDesc(),
     positiveText: strings.clear(),
     negativeText: strings.cancel(),
+    centered: true,
+    icon: "warning-circle",
+    iconType: "error",
+    iconFamily: "notesnook",
     positivePress: async () => {
       await db.trash?.clear();
       useTrashStore.getState().refresh();
@@ -51,7 +55,7 @@ const onPressFloatingButton = () => {
         context: "local"
       });
     },
-    positiveType: "errorShade"
+    positiveType: "accent"
   });
 };
 const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
