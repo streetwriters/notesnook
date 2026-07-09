@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import React from "react";
+import { Spacing } from "../../common/design/spacing";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
@@ -32,7 +33,6 @@ import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
 import { db } from "../../common/database";
 import LineSeparator from "../../components/ui/seperator/line-separator";
-import { Spacing } from "../../common/design/spacing";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -72,8 +72,6 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
         }}
         onPressDefaultRightButton={openEditor}
       />
-
-      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
 
       <DelayLayout wait={loading}>
         <List
