@@ -194,7 +194,8 @@ export const SetupInboxKeys = () => {
         <View
           style={{
             paddingHorizontal: Spacing.LEVEL_3,
-            alignItems: "center"
+            alignItems: "center",
+            paddingTop: Spacing.LEVEL_4
           }}
         >
           <CirclesBackground
@@ -259,7 +260,8 @@ export const SetupInboxKeys = () => {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: Spacing.LEVEL_3,
-            gap: Spacing.LEVEL_4
+            gap: Spacing.LEVEL_4,
+            paddingTop: Spacing.LEVEL_4
           }}
         >
           <View style={{ gap: Spacing.LEVEL_1 }}>
@@ -367,7 +369,8 @@ export const SetupInboxKeys = () => {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: Spacing.LEVEL_3,
-            gap: Spacing.LEVEL_4
+            gap: Spacing.LEVEL_4,
+            paddingTop: Spacing.LEVEL_4
           }}
         >
           <View style={{ gap: Spacing.LEVEL_1 }}>
@@ -456,7 +459,8 @@ export const SetupInboxKeys = () => {
         <View
           style={{
             paddingHorizontal: Spacing.LEVEL_3,
-            alignItems: "center"
+            alignItems: "center",
+            paddingTop: Spacing.LEVEL_4
           }}
         >
           <CirclesBackground
@@ -622,10 +626,11 @@ const ManageInboxKeys = () => {
     <ScrollView
       contentContainerStyle={{
         paddingHorizontal: Spacing.LEVEL_3,
-        gap: Spacing.LEVEL_4
+        gap: Spacing.LEVEL_4,
+        paddingTop: Spacing.LEVEL_4
       }}
     >
-      <Notice type="alert" text={strings.changingInboxPgpKeysNotice()} />
+      {/* <Notice type="information" text={strings.changingInboxPgpKeysNotice()} /> */}
 
       <View style={{ gap: Spacing.LEVEL_1 }}>
         <View
@@ -831,7 +836,8 @@ const InboxKeysList = () => {
       contentContainerStyle={{
         width: "100%",
         paddingHorizontal: Spacing.LEVEL_3,
-        minHeight: "100%"
+        minHeight: "100%",
+        paddingTop: Spacing.LEVEL_4
       }}
     >
       {apiKeys.length === 0 ? (

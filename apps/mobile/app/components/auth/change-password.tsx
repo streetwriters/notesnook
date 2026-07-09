@@ -110,7 +110,7 @@ export const ChangePassword = () => {
     <View
       style={{
         width: "100%",
-        paddingTop: Spacing.LEVEL_0,
+        paddingTop: Spacing.LEVEL_4,
         paddingHorizontal: Spacing.LEVEL_3,
         gap: Spacing.LEVEL_2
       }}
@@ -202,7 +202,8 @@ export const ChangePassword = () => {
 
       <Button
         style={{
-          width: "100%"
+          width: "100%",
+          marginTop: Spacing.LEVEL_1
         }}
         loading={loading}
         onPress={changePassword}

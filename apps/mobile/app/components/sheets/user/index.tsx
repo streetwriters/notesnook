@@ -257,7 +257,7 @@ export const UserSheet = () => {
             borderBottomWidth: 1,
             height: 1,
             width: "100%",
-            borderColor: colors.primary.border,
+            borderColor: colors.primary.separator,
             marginVertical: 0
           }}
         />
