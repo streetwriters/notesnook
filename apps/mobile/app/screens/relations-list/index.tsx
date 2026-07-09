@@ -148,6 +148,7 @@ function RelationsList(props: NavigationProps<"RelationsList">) {
           <List
             data={items}
             loading={false}
+            hideHeaderTopBorder
             groupType={
               referenceType === "note"
                 ? "notes"
