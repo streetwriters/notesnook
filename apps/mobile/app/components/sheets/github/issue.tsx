@@ -31,7 +31,7 @@ import { openLinkInBrowser } from "../../../utils/functions";
 import { defaultBorderRadius, AppFontSize } from "../../../utils/size/index";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
