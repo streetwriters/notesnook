@@ -36,7 +36,7 @@ import { DefaultAppStyles } from "../../utils/styles";
 import DialogHeader from "../dialog/dialog-header";
 import SheetProvider from "../sheet-provider";
 import { Pressable } from "../ui/pressable";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
 
