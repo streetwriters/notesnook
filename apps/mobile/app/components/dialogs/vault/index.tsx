@@ -55,7 +55,7 @@ import FormInput, {
   createFormRef,
   validators
 } from "../../ui/input/form-input";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
