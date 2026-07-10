@@ -28,7 +28,7 @@ import { LoginToNotesnook } from "./components/step-1";
 import { GetAccountSalt } from "./components/step-2";
 import { EnterAccountPassword } from "./components/step-3";
 import { PasteEncryptedData, SyncRequestBody } from "./components/step-4";
-import { StepSeperator } from "./components/step-seperator";
+import { StepSeparator } from "./components/step-separator";
 import { Footer } from "./components/footer";
 import { useState } from "react";
 import { NNCrypto, Cipher } from "@notesnook/crypto";
@@ -67,19 +67,19 @@ function App() {
           }}
         >
           <LoginToNotesnook />
-          <StepSeperator />
+          <StepSeparator />
           <GetAccountSalt onSaltSubmitted={setSalt} setAccountDataKey={setAccountDataKey} />
 
           {salt && (
             <>
-              <StepSeperator icon={BiPlus} />
+              <StepSeparator icon={BiPlus} />
               <EnterAccountPassword onPasswordSubmitted={setPassword} />
             </>
           )}
 
           {salt && password && (
             <>
-              <StepSeperator
+              <StepSeparator
                 icon={MdVpnKey}
                 tooltip="Click to see derived encryption key"
                 onShowPopup={async () => {
@@ -142,7 +142,7 @@ function App() {
           )}
           {password && salt && data && (
             <>
-              <StepSeperator icon={MdCheck} />
+              <StepSeparator icon={MdCheck} />
               <DecryptedResult
                 password={password}
                 salt={salt}
