@@ -92,7 +92,7 @@ export function keydownHandler(
     ) {
       // Try falling back to the keyCode when there's a modifier
       // active or the character produced isn't ASCII, and our table
-      // produces a different name from the the keyCode. See #668,
+      // produces a different name from the keyCode. See #668,
       // #1060
       const fromCode = map[modifiers(baseName, event, true)];
       if (fromCode && fromCode()) {
