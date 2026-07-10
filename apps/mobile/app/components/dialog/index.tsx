@@ -42,7 +42,7 @@ import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { FormInput, type FormRef } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
