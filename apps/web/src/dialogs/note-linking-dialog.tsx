@@ -235,24 +235,19 @@ export const NoteLinkingDialog = DialogManager.register(
                   setSearchQuery(query);
                   setNotes(
                     query
-                      ? await db.lookup.notes(e.target.value).sorted()
+                      ? await db.lookup.notes(`title: ${query}`).sorted()
                       : await db.notes.all.sorted(
                           db.settings.getGroupOptions("home")
                         )
                   );
                   if (!query) return setHasExactMatch(false);
-                  // "no note matches" = no non-trashed note with this exact title.
-                  // lookup above is fuzzy full-text, so it can't answer this on its own.
-                  // LIKE (no wildcards) is a case-insensitive full-string match in SQLite.
-                  const existing = await db
-                    .sql()
-                    .selectFrom("notes")
-                    .select("id")
-                    .where("type", "!=", "trash")
-                    .where("title", "like", query)
-                    .limit(1)
-                    .execute();
-                  setHasExactMatch(existing.length > 0);
+                  // Only offer to create a note when no existing note already has
+                  // this exact title. The notes.title column is COLLATE NOCASE, so
+                  // this "==" comparison is a case-insensitive full-string match.
+                  const existing = await db.notes.all.find((eb) =>
+                    eb("notes.title", "==", query)
+                  );
+                  setHasExactMatch(!!existing);
                 }}
               />
               {searchQuery.length > 0 && !hasExactMatch ? (
