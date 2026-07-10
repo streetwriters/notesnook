@@ -507,6 +507,13 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("data", "text")
             .addColumn("dateCreated", "integer")
             .execute();
+
+          await db.schema
+            .createIndex("pending_sync_items_type")
+            .ifNotExists()
+            .on("pendingsyncitems")
+            .column("type")
+            .execute();
         }
       }
     };
