@@ -41,10 +41,9 @@ import Animated, {
 } from "react-native-reanimated";
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
-import { FluidPanels } from "../components/fluid-panels";
+import { FluidPanels, FluidTabPage } from "../components/fluid-panels";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
-import { useShortcutManager } from "../hooks/use-shortcut-manager";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 import { editorController, editorState } from "../screens/editor/tiptap/utils";
@@ -67,9 +66,7 @@ import { valueLimiter } from "../utils/functions";
 import { fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
 import type { PaneWidths } from "../screens/editor/wrapper";
-import AddReminder from "../screens/add-reminder";
 import Navigation from "../services/navigation";
-import { ShortcutItem } from "react-native-actions-shortcuts";
 
 const MOBILE_SIDEBAR_SIZE = 0.85;
 
@@ -94,6 +91,18 @@ export const FluidPanelsView = React.memo(
     );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
+    const pendingShortcut = useSettingStore((state) => state.pendingShortcut);
+    const [initialPane] = useState<FluidTabPage>(() =>
+      pendingShortcut?.type === "notesnook.action.newnote" ? "editor" : "home"
+    );
+
+    useEffect(() => {
+      if (pendingShortcut?.type === "notesnook.action.newnote") {
+        eSendEvent(eOnLoadNote, { newNote: true });
+        editorState().movedAway = false;
+        useSettingStore.setState({ pendingShortcut: null });
+      }
+    }, []);
 
     useDeviceOrientationChange((o) => {
       if (
@@ -113,38 +122,6 @@ export const FluidPanelsView = React.memo(
         }, 200);
       }
     }, [appLoading]);
-
-    useEffect(() => {
-      const pending = globalThis.__pendingShortcut;
-      if (
-        pending?.type === "notesnook.action.newnote" &&
-        fluidTabsRef.current &&
-        !appLoading
-      ) {
-        eSendEvent(eOnLoadNote, { newNote: true });
-        editorState().movedAway = false;
-        fluidTabsRef.current.goToPage("editor", false);
-        globalThis.__pendingShortcut = null;
-      }
-    }, [deviceMode, appLoading]);
-
-    const onShortcutPressed = useCallback(async (item: ShortcutItem | null) => {
-      if (!item) return;
-
-      if (item?.type === "notesnook.action.newnote") {
-        Navigation.navigate("FluidPanelsView");
-        requestAnimationFrame(() => {
-          eSendEvent(eOnLoadNote, { newNote: true });
-          editorState().movedAway = false;
-          fluidTabsRef.current?.goToPage("editor", false);
-        });
-      }
-      if (item?.type === "notesnook.action.newreminder") {
-        AddReminder.present();
-      }
-    }, []);
-
-    useShortcutManager({ onShortcutPressed });
 
     const showFullScreenEditor = useCallback(() => {
       setFullscreen(true);
@@ -368,6 +345,7 @@ export const FluidPanelsView = React.memo(
             dimensions={dimensions}
             widths={PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS]}
             enabled={deviceMode !== "tablet" && !fullscreen}
+            initialPage={initialPane}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
             onDrawerStateChange={(state) => {

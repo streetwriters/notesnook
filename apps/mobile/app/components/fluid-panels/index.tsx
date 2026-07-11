@@ -51,9 +51,10 @@ interface TabProps extends ViewProps {
   onScroll: (offset: number) => void;
   enabled: boolean;
   onDrawerStateChange: (state: boolean) => void;
+  initialPage?: FluidTabPage;
 }
 
-type FluidTabPage = "home" | "editor";
+export type FluidTabPage = "home" | "editor";
 
 export interface TabsRef {
   goToPage: (page: FluidTabPage, animated?: boolean) => void;
@@ -77,15 +78,19 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
     onChangeTab,
     onScroll,
     enabled,
-    onDrawerStateChange
+    onDrawerStateChange,
+    initialPage
   }: TabProps,
   ref
 ) {
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const fullscreen = useSettingStore((state) => state.fullscreen);
-  const translateX = useSharedValue(widths ? widths.sidebar : 0);
+  const editorStartPosition = widths.sidebar + widths.list;
+  const translateX = useSharedValue(
+    initialPage === "editor" ? editorStartPosition : widths ? widths.sidebar : 0
+  );
   const startX = useSharedValue(0);
-  const currentTab = useSharedValue(1);
+  const currentTab = useSharedValue(initialPage === "editor" ? 2 : 1);
   const previousTab = useSharedValue(1);
   const isDrawerOpen = useSharedValue(false);
   const gestureStartValue = useSharedValue({

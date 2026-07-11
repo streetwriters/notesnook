@@ -27,6 +27,7 @@ import { ThemeDark, ThemeLight, ThemeDefinition } from "@notesnook/theme";
 import { DayFormat, WeekFormat, Reminder } from "@notesnook/core";
 import { db } from "../common/database";
 import { EDITOR_LINE_HEIGHT } from "../utils/constants";
+import { ShortcutItem } from "react-native-actions-shortcuts";
 export const HostIds = [
   "API_HOST",
   "AUTH_HOST",
@@ -149,6 +150,8 @@ export interface SettingStore {
   refresh: () => void;
   inboxEnabled: boolean;
   setInboxEnabled: (inboxEnabled: boolean) => void;
+  pendingShortcut: ShortcutItem | null;
+  pendingShortcutLoaded: boolean;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -269,5 +272,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     });
   },
   inboxEnabled: false,
-  setInboxEnabled: (inboxEnabled) => set({ inboxEnabled })
+  setInboxEnabled: (inboxEnabled) => set({ inboxEnabled }),
+  pendingShortcut: null,
+  pendingShortcutLoaded: false
 }));

@@ -17,19 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import Shortcuts, { ShortcutItem } from "react-native-actions-shortcuts";
-import { useEffect } from "react";
-import { NativeEventEmitter, NativeModule } from "react-native";
-import { useRef } from "react";
-import { Platform } from "react-native";
+import { NativeEventEmitter, NativeModule, Platform } from "react-native";
 import deviceInfoModule from "react-native-device-info";
 import { strings } from "@notesnook/intl";
+import { useSettingStore } from "../stores/use-setting-store";
+
 const ShortcutsEmitter = new NativeEventEmitter(
   Shortcuts as unknown as NativeModule
 );
 
-function isSupported() {
+export function isShortcutsSupported() {
   return Platform.OS !== "android" || deviceInfoModule.getApiLevelSync() > 25;
 }
+
 const defaultShortcuts: ShortcutItem[] = [
   {
     type: "notesnook.action.newnote",
@@ -44,24 +44,22 @@ const defaultShortcuts: ShortcutItem[] = [
     iconName: Platform.OS === "android" ? "ic_newnote" : "plus"
   }
 ];
-export const useShortcutManager = ({
-  onShortcutPressed
-}: {
-  onShortcutPressed: (shortcut: ShortcutItem | null) => void;
-}) => {
-  useEffect(() => {
-    if (!isSupported()) return;
-    const subscription = ShortcutsEmitter.addListener(
-      "onShortcutItemPressed",
-      onShortcutPressed
-    );
-    return () => {
-      subscription?.remove();
-    };
-  }, [onShortcutPressed]);
-};
 
-export const registerAppShortcuts = () => {
-  if (!isSupported()) return;
-  Shortcuts.setShortcuts(defaultShortcuts);
-};
+export function registerAppShortcuts(
+  shortcuts: ShortcutItem[] = defaultShortcuts
+) {
+  if (!isShortcutsSupported()) return;
+  Shortcuts.setShortcuts(shortcuts);
+}
+
+let listenerInitialized = false;
+export function initShortcutListener() {
+  if (!isShortcutsSupported() || listenerInitialized) return;
+  listenerInitialized = true;
+  ShortcutsEmitter.addListener(
+    "onShortcutItemPressed",
+    (shortcut: ShortcutItem) => {
+      useSettingStore.setState({ pendingShortcut: shortcut });
+    }
+  );
+}

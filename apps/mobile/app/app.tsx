@@ -44,30 +44,32 @@ import { useUserStore } from "./stores/use-user-store";
 import RNBootSplash from "react-native-bootsplash";
 import AppLocked from "./components/app-lock";
 import { useSettingStore } from "./stores/use-setting-store";
-import { registerAppShortcuts } from "./hooks/use-shortcut-manager";
-import Shortcuts, { ShortcutItem } from "react-native-actions-shortcuts";
+import {
+  initShortcutListener,
+  registerAppShortcuts
+} from "./hooks/use-shortcut-manager";
+import Shortcuts from "react-native-actions-shortcuts";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
-declare global {
-  var __pendingShortcut: ShortcutItem | null | undefined;
-}
 
 const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
-RNBootSplash.hide({
-  fade: true
-});
+initShortcutListener();
 Linking.getInitialURL().then((url) => {
-  useSettingStore.setState({
-    initialUrl: url
-  });
+  useSettingStore.setState({ initialUrl: url });
 });
+
 Shortcuts.getInitialShortcut().then((shortcut) => {
-  globalThis.__pendingShortcut = shortcut;
+  useSettingStore.setState({
+    pendingShortcut: shortcut ?? null,
+    pendingShortcutLoaded: true
+  });
+  RNBootSplash.hide({ fade: true });
 });
+
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore

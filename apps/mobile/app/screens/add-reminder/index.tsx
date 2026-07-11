@@ -20,8 +20,9 @@ import { Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  BackHandler,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -106,6 +107,23 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
       return false;
     }
   });
+  const handleBackNavigation = useCallback(() => {
+    const routes = props.navigation.getState()?.routes;
+    if (routes && routes.length <= 1) {
+      props.navigation.navigate("FluidPanelsView" as any);
+      return true;
+    }
+    Navigation.goBack();
+    return true;
+  }, [props.navigation]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      return handleBackNavigation();
+    });
+    return () => sub.remove();
+  }, [handleBackNavigation]);
+
   const { colors, isDark } = useThemeColors();
   const weekFormat = useSettingStore((state) => state.weekFormat);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
@@ -267,6 +285,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         <Header
           title={reminder ? strings.editReminder() : strings.newReminder()}
           canGoBack
+          onLeftMenuButtonPress={handleBackNavigation}
           rightButton={{
             name: "check",
             onPress: saveReminder
