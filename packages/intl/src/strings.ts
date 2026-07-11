@@ -2985,5 +2985,31 @@ Continue without attachments?`,
   linkedReferences: () => t`Linked References`,
   selectParagraphs: () => t`Select paragraphs`,
   addLink: () => t`Add Link`,
-  linkAdded: () => t`Link added`
+  linkAdded: () => t`Link added`,
+  reminderFrequency: () => t`Reminder frequency`,
+  reminderFrequencyDescription: (mode: string) =>
+    select(mode, {
+      once: "The reminder will occur once.",
+      day: "The reminder will occur daily.",
+      week: "Custom schedule active",
+      month: "Custom schedule active",
+      year: "The reminder will repeat every year.",
+      other: ""
+    }),
+  reminderSelectDays: () => t`Select Days`,
+  reminderSelectedDayHelp: () =>
+    t`The reminder will occur on the selected day.`,
+  reminderSelecetDateHelp: () => t`Adjusts to last day in shorter months`,
+  selectDateAndTime: () => t`Select date & time`,
+  selectTimeHeading: () => t`Select time`,
+  selectDatesPlaceholder: () => t`Select Dates`,
+  selectTimePlaceholder: () => t`Select Time`,
+  moreOptions: () => t`More options`,
+  allDayReminder: () => t`All-day reminder`,
+  allDayReminderDescription: () => t`Remains active throughout the day.`,
+  alertMode: () => t`Alert mode`,
+  reminderShortDetail: () => t`Short Detail`,
+  reminderTitlePlaceholder: () => t`What needs to be done?`,
+  reminderDetailsPlaceholder: () => t`Add some details...`,
+  createReminder: () => t`Create Reminder`
 };

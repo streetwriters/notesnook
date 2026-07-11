@@ -16,28 +16,28 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { getFormattedReminderTime } from "@notesnook/common";
 import { Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import useIsSelected from "../../../hooks/use-selected";
 import AddReminder from "../../../screens/add-reminder";
 import { eSendEvent } from "../../../services/event-manager";
-import { useSelectionStore } from "../../../stores/use-selection-store";
+import {
+  selectItem,
+  useSelectionStore
+} from "../../../stores/use-selection-store";
 import { eCloseSheet } from "../../../utils/events";
-import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import { Properties } from "../../properties";
 import AppIcon from "../../ui/AppIcon";
 import { IconButton } from "../../ui/icon-button";
-import { ReminderTime } from "../../ui/reminder-time";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SelectionWrapper from "../selection-wrapper";
-import { selectItem } from "../../../stores/use-selection-store";
 
 const ReminderItem = React.memo(
   ({
@@ -50,6 +50,7 @@ const ReminderItem = React.memo(
     isSheet: boolean;
   }) => {
     const { colors } = useThemeColors();
+    const [checked, setChecked] = useState(false);
     const openReminder = () => {
       if (selectItem(item)) return;
       AddReminder.present(item, undefined);
@@ -59,148 +60,129 @@ const ReminderItem = React.memo(
     };
     const selectionMode = useSelectionStore((state) => state.selectionMode);
     const [selected] = useIsSelected(item);
+
+    // Subtitle segments (reminder time · recurring mode · disabled), rendered as
+    // plain text separated by a dot to match the redesign.
+    const subtitleSegments = [
+      getFormattedReminderTime(item, false),
+      item.mode === "repeat" && item.recurringMode
+        ? strings.reminderRecurringMode[item.recurringMode]()
+        : undefined,
+      item.disabled ? strings.disabled() : undefined
+    ].filter(Boolean) as string[];
+
     return (
-      <SelectionWrapper onPress={openReminder} item={item} isSheet={isSheet}>
+      <SelectionWrapper
+        onPress={() => {
+          if (selectItem(item)) return;
+
+          setChecked(!checked);
+        }}
+        item={item}
+        isSheet={isSheet}
+        hideSeparator
+        style={{
+          borderWidth: 1,
+          borderColor: colors.primary.border,
+          borderRadius: Radius.S,
+          marginBottom: Spacing.LEVEL_2,
+          backgroundColor: selected ? colors.primary.shade : undefined
+        }}
+        wrapperStyle={{
+          paddingHorizontal: Spacing.LEVEL_3
+        }}
+      >
+        {/* Leading "done" checkbox — visual only for now, not yet wired. */}
+        <AppIcon
+          name={checked ? "checkbox" : "box-empty"}
+          iconFamily="notesnook"
+          color={
+            checked
+              ? [colors.primary.accent, colors.primary.accentForeground]
+              : colors.primary.icon
+          }
+          size={16}
+          style={{
+            marginRight: Spacing.LEVEL_1
+          }}
+        />
+
         <View
           style={{
-            opacity: item.disabled ? 0.5 : 1,
-            maxWidth: "80%",
-            flexGrow: 1
+            flexGrow: 1,
+            flexShrink: 1,
+            gap: Spacing.LEVEL_1,
+            opacity: item.disabled ? 0.5 : 1
           }}
         >
-          <Heading
-            numberOfLines={1}
+          <View
             style={{
-              flexWrap: "wrap"
+              flexDirection: "row",
+              justifyContent: "space-between"
             }}
-            size={AppFontSize.md}
           >
-            {item.title}
-          </Heading>
+            <Heading
+              fontSize="MD"
+              style={{
+                flexShrink: 1
+              }}
+              color={colors.primary.heading}
+            >
+              {item.title}
+            </Heading>
+
+            <IconButton
+              testID={notesnook.listitem.menu}
+              color={colors.secondary.icon}
+              name="dots-three"
+              iconFamily="notesnook"
+              size={20}
+              onPress={() => Properties.present(item, isSheet)}
+              style={{
+                justifyContent: "center",
+                height: undefined,
+                width: undefined,
+                borderRadius: 100,
+                alignItems: "center"
+              }}
+            />
+          </View>
 
           {item.description ? (
-            <Paragraph
-              style={{
-                flexWrap: "wrap"
-              }}
-              numberOfLines={2}
-            >
-              {item.description}
-            </Paragraph>
+            <Paragraph fontSize="SM">{item.description}</Paragraph>
           ) : null}
 
           <View
             style={{
               flexDirection: "row",
+              alignItems: "center",
               flexWrap: "wrap",
-              marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL
+              gap: Spacing.LEVEL_1
             }}
           >
-            {item.disabled ? (
-              <View
-                style={{
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: defaultBorderRadius,
-                  flexDirection: "row",
-                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-                  alignItems: "center",
-                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  justifyContent: "flex-start",
-                  alignSelf: "flex-start",
-                  marginRight: 10,
-                  height: 30
-                }}
-              >
-                <Icon
-                  name="bell-off-outline"
-                  size={AppFontSize.md}
-                  color={colors.error.icon}
-                />
+            {subtitleSegments.map((segment, i) => (
+              <React.Fragment key={segment}>
+                {i > 0 ? (
+                  <View
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: 100,
+                      backgroundColor: colors.secondary.icon
+                    }}
+                  />
+                ) : null}
                 <Paragraph
-                  size={AppFontSize.xs}
+                  fontSize="SM"
+                  lineHeight="100%"
                   color={colors.secondary.paragraph}
-                  style={{ marginLeft: 5 }}
                 >
-                  {strings.disabled()}
+                  {segment}
                 </Paragraph>
-              </View>
-            ) : null}
-            {item.mode === "repeat" && item.recurringMode ? (
-              <View
-                style={{
-                  backgroundColor: colors.secondary.background,
-                  borderRadius: defaultBorderRadius,
-                  flexDirection: "row",
-                  paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-                  alignItems: "center",
-                  marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  justifyContent: "flex-start",
-                  alignSelf: "flex-start",
-                  marginRight: DefaultAppStyles.GAP_SMALL,
-                  height: 30
-                }}
-              >
-                <Icon
-                  name="reload"
-                  size={AppFontSize.md}
-                  color={colors.primary.accent}
-                />
-                <Paragraph
-                  size={AppFontSize.xs}
-                  color={colors.secondary.paragraph}
-                  style={{ marginLeft: 5 }}
-                >
-                  {strings.reminderRecurringMode[item.recurringMode]()}
-                </Paragraph>
-              </View>
-            ) : null}
-
-            <ReminderTime
-              reminder={item}
-              checkIsActive={false}
-              fontSize={AppFontSize.xxs}
-              style={{
-                justifyContent: "flex-start",
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL / 2,
-                alignSelf: "flex-start"
-              }}
-            />
+              </React.Fragment>
+            ))}
           </View>
         </View>
-
-        {selectionMode === "note" || selectionMode === "trash" ? (
-          <>
-            <View
-              style={{
-                height: 35,
-                width: 35,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <AppIcon
-                name={selected ? "checkbox-outline" : "checkbox-blank-outline"}
-                color={selected ? colors.selected.icon : colors.primary.icon}
-                size={AppFontSize.lg}
-              />
-            </View>
-          </>
-        ) : (
-          <IconButton
-            testID={notesnook.listitem.menu}
-            color={colors.primary.paragraph}
-            name="dots-horizontal"
-            size={AppFontSize.xl}
-            onPress={() => Properties.present(item, isSheet)}
-            style={{
-              justifyContent: "center",
-              height: 35,
-              width: 35,
-              borderRadius: 100,
-              alignItems: "center"
-            }}
-          />
-        )}
       </SelectionWrapper>
     );
   },
