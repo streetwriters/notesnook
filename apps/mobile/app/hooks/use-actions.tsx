@@ -506,10 +506,8 @@ export const useActions = ({
     actions.push(
       {
         id: "disable-reminder",
-        title: !item.disabled
-          ? strings.turnOffReminder()
-          : strings.turnOnReminder(),
-        icon: !item.disabled ? "bell-off-outline" : "bell",
+        title: !item.disabled ? strings.disable() : strings.enable(),
+        icon: !item.disabled ? "bell-z" : "bell",
         onPress: async () => {
           close();
           await db.reminders.add({
@@ -524,7 +522,7 @@ export const useActions = ({
       {
         id: "edit-reminder",
         title: strings.editReminder(),
-        icon: "pencil",
+        icon: "pencil-simple",
         onPress: async () => {
           AddReminder.present(item);
           close();
