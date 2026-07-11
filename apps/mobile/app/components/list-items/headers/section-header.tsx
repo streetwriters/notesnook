@@ -101,7 +101,7 @@ export const SectionHeader = React.memo<
               alignSelf: "center",
               textAlignVertical: "center"
             }}
-            color={colors.secondary.paragraph}
+            color={colors.primary.accent}
           >
             {!item.title || item.title === ""
               ? screen === "Search"

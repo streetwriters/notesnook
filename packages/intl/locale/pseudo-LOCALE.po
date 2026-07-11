@@ -544,6 +544,10 @@ msgstr ""
 msgid "{mode, select, day {Daily} week {Weekly} month {Monthly} year {Yearly} other {Unknown mode}}"
 msgstr ""
 
+#: src/strings.ts:2987
+msgid "{mode, select, once {The reminder will occur once.} day {The reminder will occur daily.} week {Custom schedule active} month {Custom schedule active} year {The reminder will repeat every year.} other {}}"
+msgstr ""
+
 #: src/strings.ts:622
 msgid "{mode, select, repeat {Repeat} once {Once} permanent {Permanent} other {Unknown mode}}"
 msgstr ""
@@ -772,6 +776,10 @@ msgstr ""
 msgid "Add shortcuts for notebooks and tags here."
 msgstr ""
 
+#: src/strings.ts:3009
+msgid "Add some details..."
+msgstr ""
+
 #: src/strings.ts:596
 msgid "Add tag"
 msgstr ""
@@ -809,6 +817,10 @@ msgstr ""
 msgid "Adjust the line height of the editor"
 msgstr ""
 
+#: src/strings.ts:2998
+msgid "Adjusts to last day in shorter months"
+msgstr ""
+
 #: src/strings.ts:2232
 msgid "Advanced"
 msgstr ""
@@ -823,6 +835,10 @@ msgstr ""
 
 #: src/strings.ts:1777
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
+msgstr ""
+
+#: src/strings.ts:3006
+msgid "Alert mode"
 msgstr ""
 
 #: src/strings.ts:2371
@@ -899,6 +915,10 @@ msgstr ""
 
 #: src/strings.ts:1392
 msgid "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
+msgstr ""
+
+#: src/strings.ts:3004
+msgid "All-day reminder"
 msgstr ""
 
 #: src/strings.ts:108
@@ -2139,6 +2159,10 @@ msgstr ""
 
 #: src/strings.ts:1562
 msgid "Create notebook"
+msgstr ""
+
+#: src/strings.ts:3010
+msgid "Create Reminder"
 msgstr ""
 
 #: src/strings.ts:1519
@@ -4531,6 +4555,10 @@ msgstr ""
 msgid "More"
 msgstr ""
 
+#: src/strings.ts:3003
+msgid "More options"
+msgstr ""
+
 #: src/strings.ts:669
 msgid "Most relevant first"
 msgstr ""
@@ -5926,6 +5954,10 @@ msgstr ""
 msgid "Relogin to your Account"
 msgstr ""
 
+#: src/strings.ts:3005
+msgid "Remains active throughout the day."
+msgstr ""
+
 #: src/strings.ts:1847
 msgid "Remembered your password?"
 msgstr ""
@@ -5953,6 +5985,10 @@ msgstr ""
 
 #: src/strings.ts:311
 msgid "Reminder"
+msgstr ""
+
+#: src/strings.ts:2985
+msgid "Reminder frequency"
 msgstr ""
 
 #: src/strings.ts:1292
@@ -6523,8 +6559,20 @@ msgstr ""
 msgid "Select date"
 msgstr ""
 
+#: src/strings.ts:2999
+msgid "Select date & time"
+msgstr ""
+
+#: src/strings.ts:3001
+msgid "Select Dates"
+msgstr ""
+
 #: src/strings.ts:351
 msgid "Select day of the week to repeat the reminder."
+msgstr ""
+
+#: src/strings.ts:2995
+msgid "Select Days"
 msgstr ""
 
 #: src/strings.ts:1814
@@ -6589,6 +6637,14 @@ msgstr ""
 
 #: src/strings.ts:2520
 msgid "Select the release track for Notesnook."
+msgstr ""
+
+#: src/strings.ts:3000
+msgid "Select time"
+msgstr ""
+
+#: src/strings.ts:3002
+msgid "Select Time"
 msgstr ""
 
 #: src/strings.ts:2976
@@ -6815,6 +6871,10 @@ msgstr ""
 
 #: src/strings.ts:2963
 msgid "Share ZIP"
+msgstr ""
+
+#: src/strings.ts:3007
+msgid "Short Detail"
 msgstr ""
 
 #: src/strings.ts:305
@@ -7335,6 +7395,10 @@ msgstr ""
 
 #: src/strings.ts:2143
 msgid "The password/pin for unlocking the app."
+msgstr ""
+
+#: src/strings.ts:2997
+msgid "The reminder will occur on the selected day."
 msgstr ""
 
 #: src/strings.ts:350
@@ -8180,6 +8244,10 @@ msgstr ""
 
 #: src/strings.ts:2581
 msgid "What is your refund policy?"
+msgstr ""
+
+#: src/strings.ts:3008
+msgid "What needs to be done?"
 msgstr ""
 
 #: src/strings.ts:1718

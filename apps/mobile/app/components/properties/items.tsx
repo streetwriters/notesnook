@@ -60,6 +60,7 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
   "duplicate",
   "launcher-shortcut",
   "expiry-date",
+  "disable-reminder",
   "trash"
 ];
 

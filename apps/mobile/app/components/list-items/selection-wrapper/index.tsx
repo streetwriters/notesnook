@@ -24,7 +24,7 @@ import { useIsCompactModeEnabled } from "../../../hooks/use-is-compact-mode-enab
 import { useTabStore } from "../../../screens/editor/tiptap/use-tab-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { Pressable } from "../../ui/pressable";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { Spacing } from "../../../common/design/spacing";
 
 type SelectionWrapperProps = PropsWithChildren<{
@@ -35,6 +35,9 @@ type SelectionWrapperProps = PropsWithChildren<{
   color?: string;
   index?: number;
   hasGroupHeader?: boolean;
+  style?: ViewStyle;
+  wrapperStyle?: ViewStyle;
+  hideSeparator?: boolean;
 }>;
 
 const SelectionWrapper = ({
@@ -45,7 +48,10 @@ const SelectionWrapper = ({
   children,
   color,
   hasGroupHeader,
-  index = 0
+  index = 0,
+  style,
+  wrapperStyle,
+  hideSeparator
 }: SelectionWrapperProps) => {
   const itemId = useRef(item.id);
   const { colors, isDark } = useThemeColors();
@@ -72,7 +78,7 @@ const SelectionWrapper = ({
 
   return (
     <>
-      {hasGroupHeader ? null : (
+      {hasGroupHeader || hideSeparator ? null : (
         <View
           style={{
             paddingHorizontal: Spacing.LEVEL_3
@@ -91,7 +97,8 @@ const SelectionWrapper = ({
         style={{
           backgroundColor: isEditingNote
             ? colors.selected.background
-            : undefined
+            : undefined,
+          ...wrapperStyle
         }}
       >
         <Pressable
@@ -106,7 +113,8 @@ const SelectionWrapper = ({
           style={{
             paddingHorizontal: Spacing.LEVEL_3,
             paddingBottom: Spacing.LEVEL_2,
-            paddingTop: hasGroupHeader ? 0 : Spacing.LEVEL_2
+            paddingTop: hasGroupHeader ? 0 : Spacing.LEVEL_2,
+            ...style
           }}
         >
           <View
