@@ -27,10 +27,13 @@ import useNavigationStore, {
 } from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { rootNavigatorRef } from "../utils/global-refs";
+import { fluidTabsRef, rootNavigatorRef } from "../utils/global-refs";
 import Navigation from "../services/navigation";
 import { isFeatureAvailable } from "@notesnook/common";
 import { isInternalLink, parseInternalLink } from "@notesnook/core";
+import { eSendEvent } from "../services/event-manager";
+import { editorState } from "../screens/editor/tiptap/utils";
+import { eOnLoadNote } from "../utils/events";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -300,8 +303,13 @@ export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
+  const pendingShortcut = useSettingStore((state) => state.pendingShortcut);
+  const pendingShortcutLoaded = useSettingStore(
+    (state) => state.pendingShortcutLoaded
+  );
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const resetTimer = React.useRef<NodeJS.Timeout>(undefined);
+  const isFirstRun = React.useRef(true);
   const onStateChange = React.useCallback(
     (state: any) => {
       if (useSelectionStore.getState().selectionMode) {
@@ -316,28 +324,59 @@ export const RootNavigation = () => {
     [clearSelection]
   );
 
-  const onNavigationReady = React.useCallback(() => {
-    const pending = globalThis.__pendingShortcut;
-    if (pending?.type === "notesnook.action.newreminder") {
-      rootNavigatorRef.current?.navigate("AddReminder", {
-        reminder: undefined,
-        reference: undefined
-      });
-      globalThis.__pendingShortcut = null;
+  React.useEffect(() => {
+    if (pendingShortcut?.type === "notesnook.action.newreminder") {
+      useSettingStore.setState({ pendingShortcut: null });
     }
   }, []);
 
+  React.useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    if (!pendingShortcut) return;
+
+    const routes = rootNavigatorRef.current?.getState()?.routes;
+    const currentRoute = routes?.[routes.length - 1]?.name;
+
+    if (pendingShortcut.type === "notesnook.action.newreminder") {
+      if (currentRoute !== "AddReminder") {
+        rootNavigatorRef.current?.navigate("AddReminder" as any);
+      }
+      useSettingStore.setState({ pendingShortcut: null });
+    } else if (pendingShortcut.type === "notesnook.action.newnote") {
+      if (fluidTabsRef.current) {
+        if (currentRoute !== "FluidPanelsView") {
+          rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
+        }
+        eSendEvent(eOnLoadNote, { newNote: true });
+        editorState().movedAway = false;
+        fluidTabsRef.current.goToPage("editor", true);
+        useSettingStore.setState({ pendingShortcut: null });
+      } else {
+        if (currentRoute !== "FluidPanelsView") {
+          rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
+        }
+      }
+    }
+  }, [pendingShortcut]);
+
+  if (!pendingShortcutLoaded) return null;
+
+  const initialRouteName = !introCompleted
+    ? "Welcome"
+    : pendingShortcut?.type === "notesnook.action.newreminder"
+      ? "AddReminder"
+      : "FluidPanelsView";
+
   return (
-    <NavigationContainer
-      onStateChange={onStateChange}
-      onReady={onNavigationReady}
-      ref={rootNavigatorRef}
-    >
+    <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
       <RootStack.Navigator
         screenOptions={{
           headerShown: false
         }}
-        initialRouteName={introCompleted ? "FluidPanelsView" : "Welcome"}
+        initialRouteName={initialRouteName}
       >
         <RootStack.Screen
           name="Welcome"
