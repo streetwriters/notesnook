@@ -112,7 +112,8 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
       }
       setStep(Steps.buy);
     }
-  }, [pricingPlans, routeParams.state]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeParams.state]);
 
   useEffect(() => {
     let listener: NativeEventSubscription;
