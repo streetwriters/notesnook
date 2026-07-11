@@ -268,8 +268,8 @@ export default class Lookup {
     if (!sortOptions || sortOptions.sortBy === "relevance") {
       matches.values.sort(
         sortOptions?.sortDirection === "desc"
-          ? (a, b) => a.rank - b.rank
-          : (a, b) => b.rank - a.rank
+          ? (a, b) => b.rank - a.rank
+          : (a, b) => a.rank - b.rank
       );
       matches.ids = matches.values.map((c) => c.id);
     } else {
@@ -708,8 +708,8 @@ export default class Lookup {
     if (!sortOptions || sortOptions.sortBy === "relevance")
       sorted.sort(
         sortOptions?.sortDirection === "desc"
-          ? (a, b) => a[1].rank - b[1].rank
-          : (a, b) => b[1].rank - a[1].rank
+          ? (a, b) => b[1].rank - a[1].rank
+          : (a, b) => a[1].rank - b[1].rank
       );
     else {
       const selector = getSortSelectors(sortOptions)[sortOptions.sortDirection];
