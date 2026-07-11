@@ -206,7 +206,7 @@ export const settingsGroups: SettingSection[] = [
               : status === SubscriptionStatus.ACTIVE
                 ? strings.subRenewOn(expiryDate)
                 : status === SubscriptionStatus.CANCELED ||
-                  status === SubscriptionStatus.PAUSED
+                    status === SubscriptionStatus.PAUSED
                   ? strings.subEndsOn(expiryDate)
                   : status === SubscriptionStatus.EXPIRED
                     ? subscriptionDaysLeft.time < -3
@@ -884,7 +884,8 @@ export const settingsGroups: SettingSection[] = [
             property: "defaultLineHeight",
             icon: "format-line-spacing",
             minInputValue: EDITOR_LINE_HEIGHT.MIN,
-            maxInputValue: EDITOR_LINE_HEIGHT.MAX
+            maxInputValue: EDITOR_LINE_HEIGHT.MAX,
+            step: 0.1
           },
           {
             id: "title-format",
