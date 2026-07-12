@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { PropsWithChildren, useEffect, useRef } from "react";
-import { Box } from "@theme-ui/components";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { Box, Text } from "@theme-ui/components";
 import { Close, AddReminder, Menu } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
+import { useRecentSearchStore } from "../../stores/recent-search-store";
 import useMobile from "../../hooks/use-mobile";
 import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
@@ -66,6 +67,8 @@ function Header(props: RouteContainerProps) {
   const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [showRecents, setShowRecents] = useState(false);
+  const recentSearches = useRecentSearchStore((store) => store.recentSearches);
 
   useEffect(() => {
     if (inputRef.current && inputRef.current.value !== query) {
@@ -82,7 +85,8 @@ function Header(props: RouteContainerProps) {
       sx={{
         bg: type === "notebook" ? "background-secondary" : "transparent",
         zIndex: 2,
-        p: 1
+        p: 1,
+        position: "relative"
       }}
       className="route-container-header search-container"
       data-test-id="routeHeader"
@@ -127,12 +131,24 @@ function Header(props: RouteContainerProps) {
             : type
         )}
         onChange={debounce(
-          (e) => useSearchStore.setState({ query: e.target.value }),
+          (e) => {
+            const value = e.target.value;
+            useSearchStore.setState({ query: value });
+            setShowRecents(!value);
+            if (value) {
+              useRecentSearchStore.getState().addRecentSearch(value);
+            }
+          },
           250
         )}
+        onFocus={() => setShowRecents(!query)}
         onKeyUp={(e) => {
-          if (e.key === "Escape") useSearchStore.getState().resetSearch();
-          else useSearchStore.setState({ isSearching: true, searchType: type });
+          if (e.key === "Escape") {
+            useSearchStore.getState().resetSearch();
+            setShowRecents(false);
+          } else {
+            useSearchStore.setState({ isSearching: true, searchType: type });
+          }
         }}
         leftActions={[
           {
@@ -166,6 +182,86 @@ function Header(props: RouteContainerProps) {
             : [])
         ]}
       />
+      {showRecents && recentSearches.length > 0 && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            right: 0,
+            bg: "background",
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "default",
+            mt: 1,
+            maxHeight: "300px",
+            overflowY: "auto",
+            zIndex: 10
+          }}
+        >
+          <Box
+            sx={{
+              p: 2,
+              borderBottom: "1px solid",
+              borderColor: "border",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <Text variant="subBody" sx={{ fontWeight: "bold" }}>
+              {strings.recentSearches()}
+            </Text>
+            <Text
+              variant="subBody"
+              sx={{
+                color: "primary",
+                cursor: "pointer",
+                "&:hover": { opacity: 0.8 }
+              }}
+              onClick={() => useRecentSearchStore.getState().clearRecentSearches()}
+            >
+              {strings.clearAll()}
+            </Text>
+          </Box>
+          {recentSearches.map((search, index) => (
+            <Box
+              key={`${search}-${index}`}
+              sx={{
+                p: 2,
+                borderBottom: index < recentSearches.length - 1 ? "1px solid" : "none",
+                borderColor: "border",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                cursor: "pointer",
+                "&:hover": { bg: "hover" }
+              }}
+              onClick={() => {
+                if (inputRef.current) inputRef.current.value = search;
+                useSearchStore.setState({ query: search, isSearching: true, searchType: type });
+                setShowRecents(false);
+              }}
+            >
+              <Text variant="body">{search}</Text>
+              <Text
+                variant="subBody"
+                sx={{
+                  color: "icon",
+                  cursor: "pointer",
+                  "&:hover": { color: "primary" }
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  useRecentSearchStore.getState().removeRecentSearch(search);
+                }}
+              >
+                ✕
+              </Text>
+            </Box>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 }
