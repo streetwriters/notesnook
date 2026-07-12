@@ -135,9 +135,6 @@ function Header(props: RouteContainerProps) {
             const value = e.target.value;
             useSearchStore.setState({ query: value });
             setShowRecents(!value);
-            if (value) {
-              useRecentSearchStore.getState().addRecentSearch(value);
-            }
           },
           250
         )}
@@ -148,6 +145,11 @@ function Header(props: RouteContainerProps) {
             setShowRecents(false);
           } else {
             useSearchStore.setState({ isSearching: true, searchType: type });
+            if (e.key === "Enter") {
+              const value = e.currentTarget.value;
+              if (value) useRecentSearchStore.getState().addRecentSearch(value);
+              setShowRecents(false);
+            }
           }
         }}
         leftActions={[
