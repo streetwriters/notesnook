@@ -587,7 +587,7 @@ function openSettingsDialog(context: string) {
         Platform.OS === "ios"
           ? undefined
           : async () => {
-              return checkAndRequestPermissions(false);
+              resolve(true);
             },
       onClose: () => {
         resolve(false);
@@ -625,56 +625,66 @@ async function checkAndRequestPermissions(
 ): Promise<boolean> {
   let permissionStatus = await notifee.getNotificationSettings();
   if (Platform.OS === "android") {
-    if (
-      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
-      permissionStatus.android.alarm === 1
-    )
+    const hasNotificationPermission =
+      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED;
+    const hasAlarmPermission = permissionStatus.android.alarm === 1;
+
+    if (hasNotificationPermission && hasAlarmPermission) {
       return true;
+    }
+
     if (permissionStatus.authorizationStatus === AuthorizationStatus.DENIED) {
       permissionStatus = await notifee.requestPermission();
     }
+
+    // Wait for user to return from exact alarm settings
     if (permissionStatus.android.alarm !== 1) {
+      const waitForAppFocus = waitForAppFocusAfterSettings();
+
       await notifee.openAlarmPermissionSettings();
+      await waitForAppFocus;
     }
     permissionStatus = await notifee.getNotificationSettings();
 
-    if (
+    const authorized =
       permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
-      permissionStatus.android.alarm === 1
-    )
+      permissionStatus.android.alarm === 1;
+
+    if (authorized) {
       return true;
-
-    if (promptUser) {
-      const waitForAppFocus = waitForAppFocusAfterSettings();
-      await notifee.openNotificationSettings();
-      await waitForAppFocus;
-      permissionStatus = await notifee.getNotificationSettings();
-
-      const authorized =
-        permissionStatus.authorizationStatus ===
-          AuthorizationStatus.AUTHORIZED &&
-        permissionStatus.android.alarm === 1;
-
-      if (authorized) {
-        eSendEvent(eCloseSimpleDialog);
-        return authorized;
-      } else {
-        return await openSettingsDialog("local");
-      }
     }
 
-    return false;
-  } else {
-    permissionStatus = await notifee.requestPermission();
-    if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED)
-      return true;
     if (promptUser) {
-      openSettingsDialog("local");
+      const openSettings = await openSettingsDialog("local");
+      if (openSettings) {
+        const waitForAppFocus = waitForAppFocusAfterSettings();
+        await notifee.openNotificationSettings();
+        await waitForAppFocus;
+        permissionStatus = await notifee.getNotificationSettings();
+        const finalAuthorized =
+          permissionStatus.authorizationStatus ===
+            AuthorizationStatus.AUTHORIZED &&
+          permissionStatus.android.alarm === 1;
+        if (finalAuthorized) {
+          eSendEvent(eCloseSimpleDialog);
+          return true;
+        }
+      }
+      return false;
     }
     return false;
   }
-}
 
+  // iOS
+  permissionStatus = await notifee.requestPermission();
+  if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED) {
+    return true;
+  }
+  if (promptUser) {
+    await openSettingsDialog("local");
+  }
+  return false;
+}
 async function getTriggers(
   reminder: Reminder
 ): Promise<(Trigger & { id: string })[] | undefined> {
