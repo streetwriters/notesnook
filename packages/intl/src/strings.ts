@@ -3001,6 +3001,8 @@ Continue without attachments?`,
     t`The reminder will occur on the selected day.`,
   reminderSelecetDateHelp: () => t`Adjusts to last day in shorter months`,
   selectDateAndTime: () => t`Select date & time`,
+  selectReminderDate: () => t`Choose the day you want to be reminded.`,
+  selectReminderTime: () => t`Choose the time you want to be reminded.`,
   selectTimeHeading: () => t`Select time`,
   selectDatesPlaceholder: () => t`Select Dates`,
   selectTimePlaceholder: () => t`Select Time`,
@@ -3011,5 +3013,9 @@ Continue without attachments?`,
   reminderShortDetail: () => t`Short Detail`,
   reminderTitlePlaceholder: () => t`What needs to be done?`,
   reminderDetailsPlaceholder: () => t`Add some details...`,
-  createReminder: () => t`Create Reminder`
+  createReminder: () => t`Create Reminder`,
+  setExpiryDesc: () => t`Note will get deleted on the set date.`,
+  changeCreatedDate: () => t`Change created date`,
+  changeCreatedDateDesc: () =>
+    t`Select date and time to change the created date`
 };

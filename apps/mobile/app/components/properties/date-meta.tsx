@@ -17,22 +17,39 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from "react";
-import { View } from "react-native";
-import { useThemeColors } from "@notesnook/theme";
-import { AppFontSize } from "../../utils/size";
-import Paragraph from "../ui/typography/paragraph";
 import { getFormattedDate } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { db } from "../../common/database";
 import { Item, Note } from "@notesnook/core";
-import AppIcon from "../ui/AppIcon";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React, { useState } from "react";
+import { TouchableOpacity, View } from "react-native";
+import { db } from "../../common/database";
 import { Radius, Spacing } from "../../common/design/spacing";
+import { presentDateTimePicker } from "../date-time-picker";
+import AppIcon from "../ui/AppIcon";
+import Paragraph from "../ui/typography/paragraph";
 export const DateMeta = ({ item }: { item: Item }) => {
-  const { colors, isDark } = useThemeColors();
-  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+  const { colors } = useThemeColors();
   const [dateCreated, setDateCreated] = useState(item.dateCreated);
+
+  const editDateCreated = () => {
+    presentDateTimePicker({
+      context: "properties",
+      mode: "datetime",
+      title: strings.changeCreatedDate(),
+      description: strings.changeCreatedDateDesc(),
+      confirmText: strings.change(),
+      date: new Date(dateCreated),
+      maxDate: new Date((item as Note).dateEdited),
+      onConfirm: async (date) => {
+        await db.notes.add({
+          id: item.id,
+          dateCreated: date.getTime()
+        });
+        setDateCreated(date.getTime());
+      }
+    });
+  };
 
   function getDateMeta() {
     const keys = Object.keys(item);
@@ -46,8 +63,14 @@ export const DateMeta = ({ item }: { item: Item }) => {
 
   const renderItem = (key: string) =>
     !item[key as keyof Item] ? null : (
-      <View
+      <TouchableOpacity
         key={key}
+        activeOpacity={1}
+        onPress={
+          item.type !== "note" || key !== "dateCreated"
+            ? undefined
+            : editDateCreated
+        }
         style={{
           flexDirection: "row",
           width: "48.5%",
@@ -64,7 +87,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
             gap: Spacing.LEVEL_0
           }}
         >
-          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
             {strings.dateDescFromKey(
               key as
                 | "dateDeleted"
@@ -75,16 +98,9 @@ export const DateMeta = ({ item }: { item: Item }) => {
             )}
           </Paragraph>
           <Paragraph
-            size={AppFontSize.xs}
+            fontSize="XS"
             color={colors.primary.heading}
             fontFamily="MEDIUM"
-            onPress={
-              item.type !== "note"
-                ? undefined
-                : () => {
-                    setIsDatePickerVisible(true);
-                  }
-            }
           >
             {getFormattedDate(
               key === "dateCreated"
@@ -100,42 +116,17 @@ export const DateMeta = ({ item }: { item: Item }) => {
             <AppIcon name="edit-pencil" size={16} iconFamily="notesnook" />
           </>
         ) : null}
-      </View>
+      </TouchableOpacity>
     );
 
   return (
-    <>
-      {item.type === "note" ? (
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="datetime"
-          onConfirm={async (date: Date) => {
-            await db.notes.add({
-              id: item.id,
-              dateCreated: date.getTime()
-            });
-            setDateCreated(date.getTime());
-            setIsDatePickerVisible(false);
-          }}
-          onCancel={() => {
-            setIsDatePickerVisible(false);
-          }}
-          maximumDate={new Date((item as Note).dateEdited)}
-          isDarkModeEnabled={isDark}
-          themeVariant={isDark ? "dark" : "light"}
-          is24Hour={db.settings.getTimeFormat() === "24-hour"}
-          date={new Date(dateCreated)}
-        />
-      ) : null}
-
-      <View
-        style={{
-          flexDirection: "row",
-          gap: Spacing.LEVEL_2
-        }}
-      >
-        {getDateMeta().map(renderItem)}
-      </View>
-    </>
+    <View
+      style={{
+        flexDirection: "row",
+        gap: Spacing.LEVEL_2
+      }}
+    >
+      {getDateMeta().map(renderItem)}
+    </View>
   );
 };

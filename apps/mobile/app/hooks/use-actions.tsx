@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
 import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
+import dayjs from "dayjs";
 import {
   Color,
   createInternalLink,
@@ -32,7 +33,7 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
@@ -75,7 +76,7 @@ import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 
-import DatePickerComponent from "../components/date-picker";
+import { presentDateTimePicker } from "../components/date-time-picker";
 
 export type ActionId =
   | "select"
@@ -1227,26 +1228,26 @@ export const useActions = ({
               return;
             }
 
-            presentDialog({
+            presentDateTimePicker({
               context: "properties",
-              component: (close) => (
-                <DatePickerComponent
-                  onCancel={() => close?.()}
-                  onConfirm={async (date) => {
-                    close?.();
-                    await db.notes.setExpiryDate(date.getTime(), item.id);
-                    Navigation.queueRoutesForUpdate();
-                    eSendEvent(eMenuItemUpdate);
-                    ToastManager.show({
-                      message: strings.expiryDateSet(),
-                      type: "success",
-                      context: "local"
-                    });
+              mode: "date",
+              title: strings.setExpiry(),
+              description: strings.setExpiryDesc(),
+              confirmText: strings.setExpiry(),
+              date: dayjs().add(1, "week").toDate(),
+              minDate: dayjs().add(1, "day").toDate(),
+              onConfirm: async (date) => {
+                await db.notes.setExpiryDate(date.getTime(), item.id);
+                Navigation.queueRoutesForUpdate();
+                eSendEvent(eMenuItemUpdate);
+                ToastManager.show({
+                  message: strings.expiryDateSet(),
+                  type: "success",
+                  context: "local"
+                });
 
-                    setItem((await db.notes.note(item.id)) as Item);
-                  }}
-                />
-              )
+                setItem((await db.notes.note(item.id)) as Item);
+              }
             });
           }
         }
