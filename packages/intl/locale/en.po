@@ -788,7 +788,7 @@ msgstr "Add shortcut"
 msgid "Add shortcuts for notebooks and tags here."
 msgstr "Add shortcuts for notebooks and tags here."
 
-#: src/strings.ts:3027
+#: src/strings.ts:3029
 msgid "Add some details..."
 msgstr "Add some details..."
 
@@ -849,7 +849,7 @@ msgstr "Advanced settings"
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
 msgstr "After scanning the QR code image, the app will display a code that you can enter below."
 
-#: src/strings.ts:3024
+#: src/strings.ts:3026
 msgid "Alert mode"
 msgstr "Alert mode"
 
@@ -929,7 +929,7 @@ msgstr "All tools in this group will be removed from the toolbar."
 msgid "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
 msgstr "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
 
-#: src/strings.ts:3022
+#: src/strings.ts:3024
 msgid "All-day reminder"
 msgstr "All-day reminder"
 
@@ -1556,6 +1556,10 @@ msgstr "Change app lock pin"
 msgid "Change backup location"
 msgstr "Change backup location"
 
+#: src/strings.ts:3032
+msgid "Change created date"
+msgstr "Change created date"
+
 #: src/strings.ts:490
 msgid "Change email address"
 msgstr "Change email address"
@@ -1715,6 +1719,14 @@ msgstr "Choose how you want to secure your notes locally."
 #: src/strings.ts:2814
 msgid "Choose how you want to set up your Inbox PGP keys:"
 msgstr "Choose how you want to set up your Inbox PGP keys:"
+
+#: src/strings.ts:3018
+msgid "Choose the day you want to be reminded."
+msgstr "Choose the day you want to be reminded."
+
+#: src/strings.ts:3019
+msgid "Choose the time you want to be reminded."
+msgstr "Choose the time you want to be reminded."
 
 #: src/strings.ts:2702
 msgid "Choose what day to display as the first day of the week"
@@ -2192,7 +2204,7 @@ msgstr "Create new key"
 msgid "Create notebook"
 msgstr "Create notebook"
 
-#: src/strings.ts:3028
+#: src/strings.ts:3030
 msgid "Create Reminder"
 msgstr "Create Reminder"
 
@@ -4607,7 +4619,7 @@ msgstr "Monthly"
 msgid "More"
 msgstr "More"
 
-#: src/strings.ts:3021
+#: src/strings.ts:3023
 msgid "More options"
 msgstr "More options"
 
@@ -4976,6 +4988,10 @@ msgstr "Note unpublished"
 #: src/strings.ts:178
 msgid "Note version history is local only."
 msgstr "Note version history is local only."
+
+#: src/strings.ts:3031
+msgid "Note will get deleted on the set date."
+msgstr "Note will get deleted on the set date."
 
 #: src/strings.ts:1270
 msgid "NOTE: Creating a backup with attachments can take a while, and also fail completely. The app will try to resume/restart the backup in case of interruptions."
@@ -6020,7 +6036,7 @@ msgstr "Reload app"
 msgid "Relogin to your account"
 msgstr "Relogin to your account"
 
-#: src/strings.ts:3023
+#: src/strings.ts:3025
 msgid "Remains active throughout the day."
 msgstr "Remains active throughout the day."
 
@@ -6629,7 +6645,11 @@ msgstr "Select date"
 msgid "Select date & time"
 msgstr "Select date & time"
 
-#: src/strings.ts:3019
+#: src/strings.ts:3034
+msgid "Select date and time to change the created date"
+msgstr "Select date and time to change the created date"
+
+#: src/strings.ts:3021
 msgid "Select Dates"
 msgstr "Select Dates"
 
@@ -6705,11 +6725,11 @@ msgstr "Select the languages the spell checker should check in."
 msgid "Select the release track for Notesnook."
 msgstr "Select the release track for Notesnook."
 
-#: src/strings.ts:3018
+#: src/strings.ts:3020
 msgid "Select time"
 msgstr "Select time"
 
-#: src/strings.ts:3020
+#: src/strings.ts:3022
 msgid "Select Time"
 msgstr "Select Time"
 
@@ -6947,7 +6967,7 @@ msgstr "Share to cloud"
 msgid "Share ZIP"
 msgstr "Share ZIP"
 
-#: src/strings.ts:3025
+#: src/strings.ts:3027
 msgid "Short Detail"
 msgstr "Short Detail"
 
@@ -8348,7 +8368,7 @@ msgstr "What happens to my data if I switch plans?"
 msgid "What is your refund policy?"
 msgstr "What is your refund policy?"
 
-#: src/strings.ts:3026
+#: src/strings.ts:3028
 msgid "What needs to be done?"
 msgstr "What needs to be done?"
 

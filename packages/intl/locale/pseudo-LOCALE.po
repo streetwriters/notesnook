@@ -786,9 +786,9 @@ msgstr ""
 
 #: src/strings.ts:761
 msgid "Add shortcuts for notebooks and tags here."
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3027
+#: src/strings.ts:3029
 msgid "Add some details..."
 msgstr ""
 
@@ -847,9 +847,9 @@ msgstr ""
 
 #: src/strings.ts:1777
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3024
+#: src/strings.ts:3026
 msgid "Alert mode"
 msgstr ""
 
@@ -927,9 +927,9 @@ msgstr ""
 
 #: src/strings.ts:1392
 msgid "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3022
+#: src/strings.ts:3024
 msgid "All-day reminder"
 msgstr ""
 
@@ -1556,6 +1556,10 @@ msgstr ""
 msgid "Change backup location"
 msgstr ""
 
+#: src/strings.ts:3032
+msgid "Change created date"
+msgstr ""
+
 #: src/strings.ts:490
 msgid "Change email address"
 msgstr ""
@@ -1714,6 +1718,14 @@ msgstr ""
 
 #: src/strings.ts:2814
 msgid "Choose how you want to set up your Inbox PGP keys:"
+msgstr ""
+
+#: src/strings.ts:3018
+msgid "Choose the day you want to be reminded."
+msgstr ""
+
+#: src/strings.ts:3019
+msgid "Choose the time you want to be reminded."
 msgstr ""
 
 #: src/strings.ts:2702
@@ -2179,9 +2191,9 @@ msgstr ""
 
 #: src/strings.ts:1562
 msgid "Create notebook"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3028
+#: src/strings.ts:3030
 msgid "Create Reminder"
 msgstr ""
 
@@ -4585,9 +4597,9 @@ msgstr ""
 
 #: src/strings.ts:2375
 msgid "More"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3021
+#: src/strings.ts:3023
 msgid "More options"
 msgstr ""
 
@@ -4955,6 +4967,10 @@ msgstr ""
 
 #: src/strings.ts:178
 msgid "Note version history is local only."
+msgstr ""
+
+#: src/strings.ts:3031
+msgid "Note will get deleted on the set date."
 msgstr ""
 
 #: src/strings.ts:1270
@@ -5992,9 +6008,9 @@ msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:1879
 msgid "Relogin to your account"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3023
+#: src/strings.ts:3025
 msgid "Remains active throughout the day."
 msgstr ""
 
@@ -6601,9 +6617,13 @@ msgstr ""
 
 #: src/strings.ts:3017
 msgid "Select date & time"
+msgstr "<<<<<<< HEAD"
+
+#: src/strings.ts:3034
+msgid "Select date and time to change the created date"
 msgstr ""
 
-#: src/strings.ts:3019
+#: src/strings.ts:3021
 msgid "Select Dates"
 msgstr ""
 
@@ -6677,13 +6697,13 @@ msgstr ""
 
 #: src/strings.ts:2520
 msgid "Select the release track for Notesnook."
-msgstr "<<<<<<< HEAD"
+msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
-#: src/strings.ts:3018
+#: src/strings.ts:3020
 msgid "Select time"
 msgstr ""
 
-#: src/strings.ts:3020
+#: src/strings.ts:3022
 msgid "Select Time"
 msgstr ""
 
@@ -6911,9 +6931,9 @@ msgstr "<<<<<<< HEAD<<<<<<< HEAD"
 
 #: src/strings.ts:2981
 msgid "Share ZIP"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3025
+#: src/strings.ts:3027
 msgid "Short Detail"
 msgstr ""
 
@@ -8296,9 +8316,9 @@ msgstr ""
 
 #: src/strings.ts:2581
 msgid "What is your refund policy?"
-msgstr ""
+msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:3026
+#: src/strings.ts:3028
 msgid "What needs to be done?"
 msgstr ""
 
