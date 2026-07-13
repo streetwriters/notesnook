@@ -96,30 +96,27 @@ export async function saveContent(
     ignoreEdit,
     length: content.length
   });
-  await Promise.race([
-    useEditorStore.getState().saveSessionContent(noteId, ignoreEdit, {
+
+  await useEditorStore
+    .getState()
+    .saveSessionContent(noteId, ignoreEdit, {
       type: "tiptap",
       data: content
-    }),
-    new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error(strings.savingNoteTakingTooLong())),
-        30 * 1000
-      )
-    )
-  ]).catch((e) => {
-    const { hide } = showToast(
-      "error",
-      (e as Error).message,
-      [
-        {
-          text: strings.dismiss(),
-          onClick: () => hide()
-        }
-      ],
-      0
-    );
-  });
+    })
+
+    .catch((e) => {
+      const { hide } = showToast(
+        "error",
+        (e as Error).message,
+        [
+          {
+            text: strings.dismiss(),
+            onClick: () => hide()
+          }
+        ],
+        0
+      );
+    });
 }
 const deferredSave = debounceWithId(saveContent, 100);
 
