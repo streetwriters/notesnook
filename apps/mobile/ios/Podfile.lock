@@ -1448,28 +1448,6 @@ PODS:
     - react-native-config/App (= 1.5.7)
   - react-native-config/App (1.5.7):
     - React-Core
-  - react-native-date-picker (5.0.13):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - react-native-document-picker (11.0.3):
     - hermes-engine
     - RCTRequired
@@ -2297,28 +2275,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNDateTimePicker (8.4.5):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - RNDeviceInfo (14.1.1):
     - React-Core
   - RNExitApp (1.1.0):
@@ -2766,7 +2722,6 @@ DEPENDENCIES:
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-config (from `../node_modules/react-native-config`)
-  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
   - react-native-fast-openpgp (from `.prebuilt-xcframeworks/.cache/react-native-fast-openpgp`)
   - "react-native-fingerprint-scanner (from `../node_modules/@ammarahmed/react-native-fingerprint-scanner`)"
@@ -2830,7 +2785,6 @@ DEPENDENCIES:
   - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
-  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNExitApp (from `../node_modules/react-native-exit-app`)
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
@@ -2959,8 +2913,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-camera-roll/camera-roll"
   react-native-config:
     :path: "../node_modules/react-native-config"
-  react-native-date-picker:
-    :path: "../node_modules/react-native-date-picker"
   react-native-document-picker:
     :path: "../node_modules/@react-native-documents/picker"
   react-native-fast-openpgp:
@@ -3087,8 +3039,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
-  RNDateTimePicker:
-    :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNExitApp:
@@ -3189,7 +3139,6 @@ SPEC CHECKSUMS:
   react-native-blob-util: 354f8b60758d5c2a40df4dbb4d6aa5e64cb090a2
   react-native-cameraroll: bd1a177463acbba89365d09e81057294eba1e2f6
   react-native-config: 963b5efabc864cf69412e54b5de49b6a23e4af03
-  react-native-date-picker: 72dddb0a4b6019b11af8bf0ceefe636685921a79
   react-native-document-picker: 936a9aa901feaaa7946c4ff10bbfe1ffc991be43
   react-native-fast-openpgp: 73247d6987c45d8466e0f2c9cbe23d1f4193e4f3
   react-native-fingerprint-scanner: d5e143a361f3f01858e9c45141ddcabc4fd57055
@@ -3253,7 +3202,6 @@ SPEC CHECKSUMS:
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
   RNCClipboard: 88d7eeb555d1183915f0885bdbc5c97eb6f7f3ba
   RNCMaskedView: d2578d41c59b936db122b2798ba37e4722d21035
-  RNDateTimePicker: 7dda2673bd2a6022ea8888fe669d735b2eac0b2d
   RNDeviceInfo: bcce8752b5043a623fe3c26789679b473f705d3c
   RNExitApp: 890cce29b4e01372c84b3b775f9a63f90d77de19
   RNFileViewer: 4b5d83358214347e4ab2d4ca8d5c1c90d869e251
