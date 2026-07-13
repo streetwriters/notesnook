@@ -884,7 +884,8 @@ export const settingsGroups: SettingSection[] = [
             property: "defaultLineHeight",
             icon: "format-line-spacing",
             minInputValue: EDITOR_LINE_HEIGHT.MIN,
-            maxInputValue: EDITOR_LINE_HEIGHT.MAX
+            maxInputValue: EDITOR_LINE_HEIGHT.MAX,
+            step: 0.1
           },
           {
             id: "title-format",

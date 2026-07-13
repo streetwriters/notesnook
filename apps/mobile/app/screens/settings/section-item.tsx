@@ -43,6 +43,7 @@ import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
+import { strings } from "@notesnook/intl";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
@@ -67,6 +68,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   );
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
+  const [inputError, setInputError] = useState<string | undefined>();
 
   const onChangeSettings = async () => {
     if (isDisabled) return;
@@ -106,18 +108,30 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     });
   };
 
-  const onChangeInputSelectorValue = (text: any) => {
-    if (text) {
-      const min = item.minInputValue || 0;
-      const max = item.maxInputValue || 0;
-      const value = parseInt(text);
-      text =
-        Number.isNaN(value) || value < min ? min : value > max ? max : text;
-
-      SettingsService.set({
-        [item.property as string]: `${text}`
-      });
+  const onChangeInputSelectorValue = (text: string) => {
+    if (!item.property) return;
+    const trimmed = text.trim();
+    if (!trimmed) {
+      setInputError(undefined);
+      return;
     }
+
+    if (trimmed.endsWith(".")) {
+      setInputError(undefined);
+      return;
+    }
+    const value = Number(trimmed);
+    const min = item.minInputValue ?? 0;
+    const max = item.maxInputValue ?? 0;
+
+    if (Number.isNaN(value) || value < min || value > max) {
+      setInputError(strings.valueMustBeBetween(min, max));
+      return;
+    }
+    setInputError(undefined);
+    SettingsService.set({
+      [item.property]: value
+    });
   };
 
   useEffect(() => {
@@ -302,91 +316,116 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           )}
 
           {item.type === "input-selector" && (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: DefaultAppStyles.GAP_VERTICAL
-              }}
-            >
-              <IconButton
-                name="minus"
-                color={colors.primary.icon}
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: DefaultAppStyles.GAP_VERTICAL
+                }}
+              >
+                <IconButton
+                  name="minus"
+                  color={colors.primary.icon}
+                  onPress={() => {
+                    if (!checkIsFeatureAvailable()) return;
+                    if (isDisabled) return;
+                    const rawValue = SettingsService.get()[
+                      item.property as keyof SettingStore["settings"]
+                    ] as string;
+                    if (rawValue == null) return;
+                    const step = item.step ?? 1;
+                    const decimalPlaces = (step.toString().split(".")[1] || "")
+                      .length;
+
+                    const currentValue = Number(rawValue);
+                    if (Number.isNaN(currentValue)) return;
                     const minValue = item.minInputValue || 0;
                     if (currentValue <= minValue) return;
-                    const nextValue = currentValue - 1;
+                    const nextValue = Number(
+                      (currentValue - step).toFixed(decimalPlaces)
+                    );
                     SettingsService.set({
                       [item.property as string]: nextValue
                     });
+                    setInputError(undefined);
                     updateInput(nextValue);
-                  }
-                }}
-                size={AppFontSize.xl}
-              />
-              <Input
-                {...item.inputProperties}
-                onSubmit={(e) => {
-                  onChangeInputSelectorValue(e.nativeEvent.text);
-                  item.inputProperties?.onSubmitEditing?.(e);
-                }}
-                editable={!isDisabled}
-                onChangeText={(text) => {
-                  onChangeInputSelectorValue(text);
-                  item.inputProperties?.onSubmitEditing?.(text as any);
-                }}
-                keyboardType="decimal-pad"
-                containerStyle={{
-                  width: 60
-                }}
-                inputStyle={{
-                  width: 60,
-                  textAlign: "center"
-                }}
-                wrapperStyle={{
-                  maxWidth: 60,
-                  flexGrow: 0,
-                  marginBottom: 0,
-                  marginHorizontal: DefaultAppStyles.GAP_SMALL
-                }}
-                fwdRef={inputRef}
-                onLayout={() => {
-                  if (item.property) {
-                    updateInput(SettingsService.get()[item.property]);
-                  }
-                }}
-                defaultValue={item.inputProperties?.defaultValue}
-              />
-              <IconButton
-                name="plus"
-                color={colors.primary.icon}
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
+                  }}
+                  size={AppFontSize.xl}
+                />
+                <Input
+                  {...item.inputProperties}
+                  onSubmit={(e) => {
+                    onChangeInputSelectorValue(e.nativeEvent.text);
+                    item.inputProperties?.onSubmitEditing?.(e);
+                  }}
+                  editable={!isDisabled}
+                  onChangeText={(text) => {
+                    onChangeInputSelectorValue(text);
+                    item.inputProperties?.onSubmitEditing?.(text as any);
+                  }}
+                  keyboardType="decimal-pad"
+                  containerStyle={{
+                    width: 60
+                  }}
+                  inputStyle={{
+                    width: 60,
+                    textAlign: "center"
+                  }}
+                  wrapperStyle={{
+                    maxWidth: 60,
+                    flexGrow: 0,
+                    marginBottom: 0,
+                    marginHorizontal: DefaultAppStyles.GAP_SMALL
+                  }}
+                  fwdRef={inputRef}
+                  onLayout={() => {
+                    if (item.property) {
+                      updateInput(SettingsService.get()[item.property]);
+                    }
+                  }}
+                  defaultValue={item.inputProperties?.defaultValue}
+                />
+                <IconButton
+                  name="plus"
+                  color={colors.primary.icon}
+                  onPress={() => {
+                    if (!checkIsFeatureAvailable()) return;
+                    if (isDisabled) return;
+                    const rawValue = SettingsService.get()[
+                      item.property as keyof SettingStore["settings"]
+                    ] as string;
+                    if (rawValue == null) return;
+                    const step = item.step ?? 1;
+                    const decimalPlaces = (step.toString().split(".")[1] || "")
+                      .length;
+
+                    const currentValue = Number(rawValue);
+                    if (Number.isNaN(currentValue)) return;
                     const max = item.maxInputValue || 0;
                     if (currentValue >= max) return;
-                    const nextValue = currentValue + 1;
+                    const nextValue = Number(
+                      (currentValue + step).toFixed(decimalPlaces)
+                    );
                     SettingsService.set({
                       [item.property as string]: nextValue
                     });
+                    setInputError(undefined);
                     updateInput(nextValue);
-                  }
-                }}
-                size={AppFontSize.xl}
-              />
-            </View>
+                  }}
+                  size={AppFontSize.xl}
+                />
+              </View>
+
+              {inputError && (
+                <Paragraph
+                  size={AppFontSize.xxxs}
+                  color={colors.error.paragraph}
+                >
+                  {inputError}
+                </Paragraph>
+              )}
+            </>
           )}
         </View>
       </View>
