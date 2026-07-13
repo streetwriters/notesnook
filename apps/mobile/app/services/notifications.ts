@@ -35,7 +35,7 @@ import notifee, {
 import NetInfo from "@react-native-community/netinfo";
 import dayjs, { Dayjs } from "dayjs";
 import { encodeNonAsciiHTML } from "entities";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { db, setupDatabase } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import { presentDialog } from "../components/dialog/functions";
@@ -45,7 +45,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eOnLoadNote } from "../utils/events";
+import { eCloseSimpleDialog, eOnLoadNote } from "../utils/events";
 import { fluidTabsRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
@@ -577,7 +577,7 @@ async function displayNotification({
 }
 
 function openSettingsDialog(context: string) {
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     presentDialog({
       title: strings.notificationsDisabled(),
       paragraph: strings.notificationsDisabledDesc(),
@@ -587,12 +587,35 @@ function openSettingsDialog(context: string) {
         Platform.OS === "ios"
           ? undefined
           : async () => {
-              resolve(true);
+              return checkAndRequestPermissions(false);
             },
       onClose: () => {
         resolve(false);
       },
       context: context
+    });
+  });
+}
+
+function waitForAppFocusAfterSettings(timeoutMs = 120000): Promise<void> {
+  return new Promise((resolve) => {
+    let didLeaveApp = AppState.currentState !== "active";
+    const timeout = setTimeout(() => {
+      subscription.remove();
+      resolve();
+    }, timeoutMs);
+
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state !== "active") {
+        didLeaveApp = true;
+        return;
+      }
+
+      if (didLeaveApp && state === "active") {
+        clearTimeout(timeout);
+        subscription.remove();
+        resolve();
+      }
     });
   });
 }
@@ -622,9 +645,21 @@ async function checkAndRequestPermissions(
       return true;
 
     if (promptUser) {
-      if (await openSettingsDialog("local")) {
-        await notifee.openNotificationSettings();
-        return false;
+      const waitForAppFocus = waitForAppFocusAfterSettings();
+      await notifee.openNotificationSettings();
+      await waitForAppFocus;
+      permissionStatus = await notifee.getNotificationSettings();
+
+      const authorized =
+        permissionStatus.authorizationStatus ===
+          AuthorizationStatus.AUTHORIZED &&
+        permissionStatus.android.alarm === 1;
+
+      if (authorized) {
+        eSendEvent(eCloseSimpleDialog);
+        return authorized;
+      } else {
+        return await openSettingsDialog("local");
       }
     }
 
@@ -634,7 +669,7 @@ async function checkAndRequestPermissions(
     if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED)
       return true;
     if (promptUser) {
-      await openSettingsDialog("local");
+      openSettingsDialog("local");
     }
     return false;
   }
