@@ -16,12 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Note, Reminder } from "@notesnook/core";
 import {
   getFormattedDate,
   useIsFeatureAvailable,
   usePromise
 } from "@notesnook/common";
+import { Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
@@ -32,12 +32,13 @@ import {
   TextInput,
   View
 } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Spacing, Radius } from "../../common/design/spacing";
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
+import { presentDateTimePicker } from "../../components/date-time-picker";
 import { Dialog } from "../../components/dialog";
 import { Header } from "../../components/header";
+import PaywallSheet from "../../components/sheets/paywall";
 import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
 import FormInput, {
@@ -54,7 +55,6 @@ import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import Notifications from "../../services/notifications";
 import SettingsService from "../../services/settings";
-import PaywallSheet from "../../components/sheets/paywall";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eOnLoadNote } from "../../utils/events";
@@ -89,7 +89,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
       return false;
     }
   });
-  const { colors, isDark } = useThemeColors();
+  const { colors } = useThemeColors();
   const weekFormat = useSettingStore((state) => state.weekFormat);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
     reminder?.mode === "permanent" ? "once" : reminder?.mode || "once"
@@ -107,8 +107,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [reminderNotificationMode, setReminderNotificatioMode] = useState<
     Reminder["priority"]
   >(reminder?.priority || SettingsService.get().reminderNotificationMode);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [pickerMode, setPickerMode] = useState<"date" | "time">("date");
   const [dateSelected, setDateSelected] = useState(!!reminder);
   const [timeSelected, setTimeSelected] = useState(!!reminder);
   const [frequencyExpanded, setFrequencyExpanded] = useState(true);
@@ -150,20 +148,10 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
     reminderMode === "repeat" &&
     (recurringMode === "week" || recurringMode === "month");
 
-  const openPicker = (mode: "date" | "time") => {
-    setPickerMode(mode);
-    setDatePickerVisibility(true);
-  };
-
-  const hidePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (selected: Date) => {
-    hidePicker();
+  const handleConfirm = (mode: "date" | "time", selected: Date) => {
     setDateError(undefined);
     const next = new Date(date);
-    if (pickerMode === "time") {
+    if (mode === "time") {
       next.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
       setTimeSelected(true);
     } else {
@@ -175,6 +163,20 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
       setDateSelected(true);
     }
     setDate(next);
+  };
+
+  const openPicker = (mode: "date" | "time") => {
+    presentDateTimePicker({
+      mode,
+      date,
+      minDate:
+        mode === "date" && reminderMode === "once" ? new Date() : undefined,
+      onConfirm: (selected) => handleConfirm(mode, selected),
+      description:
+        mode === "date"
+          ? strings.selectReminderDate()
+          : strings.selectReminderTime()
+    });
   };
 
   const selectFrequency = (mode: FrequencyMode) => {
@@ -599,19 +601,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
               </Paragraph>
             ) : null}
           </View>
-
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode={pickerMode}
-            minimumDate={reminderMode === "once" ? new Date() : undefined}
-            onConfirm={handleConfirm}
-            onCancel={hidePicker}
-            isDarkModeEnabled={isDark}
-            firstDayOfWeek={weekFormat === "Mon" ? 1 : 0}
-            is24Hour={db.settings.getTimeFormat() === "24-hour"}
-            date={date}
-            themeVariant={isDark ? "dark" : "light"}
-          />
 
           {/* More options */}
           <View style={{ gap: Spacing.LEVEL_3 }}>
