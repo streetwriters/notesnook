@@ -100,9 +100,10 @@ export const FluidPanelsView = React.memo(
       if (pendingShortcut?.type === "notesnook.action.newnote") {
         eSendEvent(eOnLoadNote, { newNote: true });
         editorState().movedAway = false;
+        fluidTabsRef.current?.goToPage("editor", true);
         useSettingStore.setState({ pendingShortcut: null });
       }
-    }, []);
+    }, [pendingShortcut]);
 
     useDeviceOrientationChange((o) => {
       if (
