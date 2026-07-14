@@ -90,7 +90,9 @@ export const FluidPanels = forwardRef<TabsRef, TabProps>(function FluidTabs(
     initialPage === "editor" ? editorStartPosition : widths ? widths.sidebar : 0
   );
   const startX = useSharedValue(0);
-  const currentTab = useSharedValue(initialPage === "editor" ? 2 : 1);
+  const currentTab = useSharedValue(
+    initialPage === "editor" && deviceMode !== "tablet" ? 2 : 1
+  );
   const previousTab = useSharedValue(1);
   const isDrawerOpen = useSharedValue(false);
   const gestureStartValue = useSharedValue({

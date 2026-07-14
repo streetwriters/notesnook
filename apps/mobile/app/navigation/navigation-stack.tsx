@@ -309,7 +309,7 @@ export const RootNavigation = () => {
   );
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const resetTimer = React.useRef<NodeJS.Timeout>(undefined);
-  const isFirstRun = React.useRef(true);
+  const isNavigationLoaded = React.useRef(true);
   const onStateChange = React.useCallback(
     (state: any) => {
       if (useSelectionStore.getState().selectionMode) {
@@ -331,34 +331,17 @@ export const RootNavigation = () => {
   }, []);
 
   React.useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false;
+    if (isNavigationLoaded.current) {
+      isNavigationLoaded.current = false;
       return;
     }
     if (!pendingShortcut) return;
 
-    const routes = rootNavigatorRef.current?.getState()?.routes;
-    const currentRoute = routes?.[routes.length - 1]?.name;
-
     if (pendingShortcut.type === "notesnook.action.newreminder") {
-      if (currentRoute !== "AddReminder") {
-        rootNavigatorRef.current?.navigate("AddReminder" as any);
-      }
+      rootNavigatorRef.current?.navigate("AddReminder" as any);
       useSettingStore.setState({ pendingShortcut: null });
     } else if (pendingShortcut.type === "notesnook.action.newnote") {
-      if (fluidTabsRef.current) {
-        if (currentRoute !== "FluidPanelsView") {
-          rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
-        }
-        eSendEvent(eOnLoadNote, { newNote: true });
-        editorState().movedAway = false;
-        fluidTabsRef.current.goToPage("editor", true);
-        useSettingStore.setState({ pendingShortcut: null });
-      } else {
-        if (currentRoute !== "FluidPanelsView") {
-          rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
-        }
-      }
+      rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
     }
   }, [pendingShortcut]);
 

@@ -57,10 +57,6 @@ const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
-initShortcutListener();
-Linking.getInitialURL().then((url) => {
-  useSettingStore.setState({ initialUrl: url });
-});
 
 Shortcuts.getInitialShortcut().then((shortcut) => {
   useSettingStore.setState({
@@ -68,6 +64,11 @@ Shortcuts.getInitialShortcut().then((shortcut) => {
     pendingShortcutLoaded: true
   });
   RNBootSplash.hide({ fade: true });
+  initShortcutListener();
+});
+
+Linking.getInitialURL().then((url) => {
+  useSettingStore.setState({ initialUrl: url });
 });
 
 const App = (props: { configureMode: "note-preview" }) => {
