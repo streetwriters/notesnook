@@ -341,7 +341,16 @@ export const RootNavigation = () => {
       rootNavigatorRef.current?.navigate("AddReminder" as any);
       useSettingStore.setState({ pendingShortcut: null });
     } else if (pendingShortcut.type === "notesnook.action.newnote") {
-      rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
+      rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
+        initialPage: !fluidTabsRef.current ? "editor" : undefined
+      });
+
+      if (fluidTabsRef.current) {
+        eSendEvent(eOnLoadNote, { newNote: true });
+        editorState().movedAway = false;
+        fluidTabsRef.current.goToPage("editor", true);
+        useSettingStore.setState({ pendingShortcut: null });
+      }
     }
   }, [pendingShortcut]);
 
@@ -383,6 +392,12 @@ export const RootNavigation = () => {
               FluidPanelsView ||
               require("../navigation/fluid-panels-view").default;
             return FluidPanelsView;
+          }}
+          initialParams={{
+            initialPage:
+              pendingShortcut?.type === "notesnook.action.newnote"
+                ? "editor"
+                : undefined
           }}
         />
 
