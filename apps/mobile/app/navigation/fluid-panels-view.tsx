@@ -58,7 +58,6 @@ import {
   eCloseFullscreenEditor,
   eOnEnterEditor,
   eOnExitEditor,
-  eOnLoadNote,
   eOpenFullscreenEditor,
   eUnlockNote
 } from "../utils/events";
@@ -66,7 +65,7 @@ import { valueLimiter } from "../utils/functions";
 import { fluidTabsRef } from "../utils/global-refs";
 import { AppNavigationStack } from "./navigation-stack";
 import type { PaneWidths } from "../screens/editor/wrapper";
-import Navigation from "../services/navigation";
+import { NavigationProps } from "../services/navigation";
 
 const MOBILE_SIDEBAR_SIZE = 0.85;
 
@@ -74,7 +73,7 @@ let SideMenu: any = null;
 let EditorWrapper: any = null;
 
 export const FluidPanelsView = React.memo(
-  () => {
+  ({ route }: NavigationProps<"FluidPanelsView">) => {
     const { colors } = useThemeColors();
     const deviceMode = useSettingStore((state) => state.deviceMode);
     const setFullscreen = useSettingStore((state) => state.setFullscreen);
@@ -91,19 +90,6 @@ export const FluidPanelsView = React.memo(
     );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
-    const pendingShortcut = useSettingStore((state) => state.pendingShortcut);
-    const [initialPane] = useState<FluidTabPage>(() =>
-      pendingShortcut?.type === "notesnook.action.newnote" ? "editor" : "home"
-    );
-
-    useEffect(() => {
-      if (pendingShortcut?.type === "notesnook.action.newnote") {
-        eSendEvent(eOnLoadNote, { newNote: true });
-        editorState().movedAway = false;
-        fluidTabsRef.current?.goToPage("editor", true);
-        useSettingStore.setState({ pendingShortcut: null });
-      }
-    }, [pendingShortcut]);
 
     useDeviceOrientationChange((o) => {
       if (
@@ -346,7 +332,7 @@ export const FluidPanelsView = React.memo(
             dimensions={dimensions}
             widths={PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS]}
             enabled={deviceMode !== "tablet" && !fullscreen}
-            initialPage={initialPane}
+            initialPage={route.params?.initialPage}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
             onDrawerStateChange={(state) => {

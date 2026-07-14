@@ -88,7 +88,7 @@ export interface RouteParams extends ParamListBase {
   Monographs: NotesScreenParams;
   Reminders: GenericRouteParam;
   SettingsGroup: GenericRouteParam;
-  FluidPanelsView: GenericRouteParam;
+  FluidPanelsView: { initialPage?: "editor" | "home" };
   AppLock: GenericRouteParam;
   Settings: GenericRouteParam;
   Auth: AuthParams;
