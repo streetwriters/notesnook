@@ -170,7 +170,7 @@ export type ToastOptions = {
   heading?: string;
   message?: string;
   context?: any;
-  type?: "error" | "success" | "info";
+  type?: "error" | "success" | "info" | "warning";
   duration?: number;
   func?: () => void;
   actionText?: string;
