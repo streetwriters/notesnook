@@ -85,7 +85,8 @@ const Home = ({
           renderItem={renderItem}
           contentContainerStyle={{
             gap: Spacing.LEVEL_2,
-            marginTop: Spacing.LEVEL_4
+            marginTop: Spacing.LEVEL_4,
+            paddingBottom: 80
           }}
         />
       </DelayLayout>
