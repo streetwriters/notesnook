@@ -88,7 +88,8 @@ export class ThemeFactory {
         spacing10: 35,
         spacing11: 40,
         spacing12: 45,
-        spacing13: 50
+        spacing13: 50,
+        auto: "auto"
       }),
       sizes: { full: "100%", half: "50%" },
       radii: {
