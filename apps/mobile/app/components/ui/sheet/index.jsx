@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ScopedThemeProvider, useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef } from "react";
-import { Platform, View } from "react-native";
+import { Platform } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../../stores/use-setting-store";
@@ -166,14 +166,6 @@ const SheetWrapper = ({
         onClose={_onClose}
       >
         {children}
-
-        {bottomPadding ? (
-          <View
-            style={{
-              height: Platform.OS === "android" ? bottomInsets : 10
-            }}
-          />
-        ) : null}
       </ActionSheet>
     </ScopedThemeProvider>
   );
