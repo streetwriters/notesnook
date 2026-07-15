@@ -1604,6 +1604,10 @@ msgstr ""
 msgid "Change your primary two-factor authentication method"
 msgstr ""
 
+#: src/strings.ts:3022
+msgid "Changes from other devices won't be updated in the editor in real-time."
+msgstr ""
+
 #: src/strings.ts:2776
 msgid "Changing Inbox PGP keys will delete all your unsynced inbox items."
 msgstr ""
@@ -2557,12 +2561,24 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
+#: src/strings.ts:3017
+msgid "Disable auto sync"
+msgstr ""
+
 #: src/strings.ts:2062
 msgid "Disable editor margins"
 msgstr ""
 
 #: src/strings.ts:2725
 msgid "Disable Inbox API"
+msgstr ""
+
+#: src/strings.ts:3020
+msgid "Disable realtime sync"
+msgstr ""
+
+#: src/strings.ts:3023
+msgid "Disable sync"
 msgstr ""
 
 #: src/strings.ts:165
@@ -7676,6 +7692,10 @@ msgstr ""
 msgid "Tuesday"
 msgstr ""
 
+#: src/strings.ts:3019
+msgid "Turn off automatic syncing. Changes from this client will be synced only when you run sync manually."
+msgstr ""
+
 #: src/strings.ts:930
 msgid "Turn off reminder"
 msgstr ""
@@ -7685,6 +7705,7 @@ msgid "Turn on reminder"
 msgstr ""
 
 #: src/strings.ts:1136
+#: src/strings.ts:3025
 msgid "Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device."
 msgstr ""
 
