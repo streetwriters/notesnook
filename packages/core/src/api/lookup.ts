@@ -109,12 +109,12 @@ export default class Lookup {
 
   async notesWithHighlighting(
     query: string,
-    notes: FilteredSelector<Note>,
+    notes?: FilteredSelector<Note>,
     sortOptions?: SortOptions
   ): Promise<VirtualizedGrouping<HighlightedResult>> {
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
     const excludedIds = this.db.trash.cache.notes;
-
+    notes ||= this.db.notes.all;
     const {
       content,
       title,
