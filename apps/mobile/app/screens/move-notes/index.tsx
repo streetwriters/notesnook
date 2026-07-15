@@ -165,6 +165,8 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
         />
 
         <FlatList
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <View
               style={{
@@ -194,6 +196,7 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
           <FloatingButton
             icon="check"
             alwaysVisible
+            hideOnKeyboard={false}
             onPress={async () => {
               await db.notes?.addToNotebook(
                 currentNotebook.id,
