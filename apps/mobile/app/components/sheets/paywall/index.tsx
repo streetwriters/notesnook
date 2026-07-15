@@ -157,7 +157,7 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
       style={{
         width: "100%",
         paddingHorizontal: Spacing.LEVEL_3,
-        paddingVertical: Spacing.LEVEL_4,
+        paddingTop: Spacing.LEVEL_4,
         gap: Spacing.LEVEL_3
       }}
     >

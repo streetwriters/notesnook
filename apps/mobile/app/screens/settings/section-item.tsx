@@ -166,11 +166,12 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         justifyContent: "space-between",
         paddingHorizontal: Spacing.LEVEL_3,
         paddingVertical: item.component && !item.name ? 0 : Spacing.LEVEL_1,
-        borderRadius: Radius.S,
-        backgroundColor: colors.primary.background,
+        borderRadius: 0,
         marginBottom: Spacing.LEVEL_0,
         overflow: "hidden"
       }}
+      type="transparent"
+      noborder
       onPress={async () => {
         if (!checkIsFeatureAvailable()) return;
         if (isDisabled) return;
@@ -267,7 +268,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               {!isFeatureAvailable?.isAllowed ? (
                 <View
                   style={{
-                    paddingVertical: Spacing.LEVEL_0 / 2,
+                    paddingVertical: Spacing.LEVEL_0,
                     paddingHorizontal: Spacing.LEVEL_1,
                     borderRadius: 100,
                     backgroundColor: colors.primary.accent,
@@ -279,8 +280,9 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                 >
                   <AppIcon
                     color={colors.static.orange}
-                    size={AppFontSize.md}
-                    name="crown"
+                    size={10}
+                    name="crown-simple"
+                    iconFamily="notesnook"
                   />
                   {isFeatureAvailable?.availableOn ? (
                     <Paragraph
@@ -288,7 +290,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                       fontSize="XXS"
                       fontFamily="MEDIUM"
                     >
-                      {planToDisplayNameShort(isFeatureAvailable?.availableOn)}
+                      Pro
                     </Paragraph>
                   ) : null}
                 </View>
@@ -299,7 +301,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
               <Paragraph
                 color={colors.primary.paragraph}
                 fontSize="SM"
-                lineHeight="100%"
+                lineHeight="110%"
               >
                 {typeof item.description === "function"
                   ? item.description(current)
@@ -308,30 +310,40 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             ) : null}
           </View>
 
-          {item.type === "switch" && !loading && (
-            <AppIcon
-              name={isOn ? "toggle-on" : "toggle-off"}
-              iconFamily="notesnook"
-              size={16}
-              color={
-                isOn
-                  ? [colors.primary.accent, colors.primary.background]
-                  : [colors.disabled.icon, colors.primary.background]
-              }
-            />
-          )}
+          {loading || item.type === "switch" ? (
+            <View
+              style={{
+                width: 26,
+                height: 26,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {item.type === "switch" && !loading && (
+                <AppIcon
+                  name={isOn ? "toggle-on" : "toggle-off"}
+                  iconFamily="notesnook"
+                  size={16}
+                  color={
+                    isOn
+                      ? [colors.primary.accent, colors.primary.accentForeground]
+                      : [colors.disabled.icon, colors.primary.background]
+                  }
+                />
+              )}
+              {loading ? (
+                <ActivityIndicator size={16} color={colors.primary.accent} />
+              ) : null}
+            </View>
+          ) : null}
 
           {item.type === "screen" ? (
             <AppIcon
               name="chevron-right"
               iconFamily="notesnook"
               size={16}
-              color={colors.secondary.paragraph}
+              color={colors.primary.icon}
             />
-          ) : null}
-
-          {loading ? (
-            <ActivityIndicator size={16} color={colors.primary.accent} />
           ) : null}
         </View>
 
