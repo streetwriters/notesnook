@@ -40,8 +40,6 @@ export interface FlexProps
   sx?: RestrictedSxProp;
 }
 
-export const Flex = React.forwardRef<HTMLDivElement, FlexProps>(
-  (props, ref) => {
-    return <ThemeUIFlex ref={ref} {...props} />;
-  }
-);
+export const Flex = React.forwardRef<HTMLElement, FlexProps>((props, ref) => {
+  return <ThemeUIFlex ref={ref} {...props} />;
+});
