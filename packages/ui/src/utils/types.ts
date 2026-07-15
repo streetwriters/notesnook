@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Theme, ThemeColor } from "@notesnook/theme";
-import { ThemeUIStyleObject } from "@theme-ui/core";
+import { ThemeUICSSObject } from "@theme-ui/core";
 
 type ThemeSpace = Theme["space"];
 
@@ -66,7 +66,7 @@ export type RestrictedSpaceProps = {
 };
 
 export type RestrictedSxProp = Omit<
-  ThemeUIStyleObject,
+  ThemeUICSSObject,
   keyof RestrictedSpaceProps | keyof RestrictedColorProps
 > &
   RestrictedSpaceProps &
