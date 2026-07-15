@@ -3031,5 +3031,14 @@ Continue without attachments?`,
   enterVaultPassword: () => t`Enter vault password`,
   valueMustBeGreaterThan: (value: string) =>
     t`Value must be greater than ${value}`,
-  openLocation: () => t`Open location`
+  openLocation: () => t`Open location`,
+  disableAutoSync: () => t`Disable auto sync`,
+  disableAutoSyncDesc: () =>
+    t`Turn off automatic syncing. Changes from this client will be synced only when you run sync manually.`,
+  disableRealtimeSync: () => t`Disable realtime sync`,
+  disableRealtimeSyncDesc: () =>
+    t`Changes from other devices won't be updated in the editor in real-time.`,
+  disableSync: () => t`Disable sync`,
+  disableSyncDesc: () =>
+    t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`
 };
