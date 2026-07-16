@@ -30,6 +30,7 @@ import { Pressable } from "../ui/pressable";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import { useSideBarDraggingStore } from "./dragging-store";
+import SyncStatusButton from "./sync-status-button";
 
 const SettingsIcon = () => {
   const { colors } = useThemeColors();
@@ -123,7 +124,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
             size={AppFontSize.lg}
           />
         ))}
-
+        <SyncStatusButton />
         <SettingsIcon />
       </View>
     </View>
