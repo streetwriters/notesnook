@@ -34,9 +34,9 @@ export const helpSupportGroup: SettingSection = {
       name: strings.reportAnIssue(),
       icon: "warning-circle",
       iconFamily: "notesnook",
+      isModal: true,
       modifer: () => {
         presentSheet({
-          //@ts-ignore Migrate to TS
           component: <Issue />
         });
       },
@@ -76,6 +76,7 @@ export const helpSupportGroup: SettingSection = {
       description: strings.downloadDebugLogsDesc(),
       icon: "bug-droid",
       iconFamily: "notesnook",
+      isModal: true,
       modifer: () => {
         DownloadLogs.present();
       }

@@ -275,6 +275,10 @@ const Partner = ({
                   }}
                   onPress={() => {
                     Clipboard.setString(code);
+                    ToastManager.show({
+                      message: strings.codeCopied(),
+                      type: "success"
+                    });
                   }}
                 />
               </View>

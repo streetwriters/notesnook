@@ -198,6 +198,11 @@ export const validators = {
       ? undefined
       : message || `Must be at least ${length} characters`,
 
+  number:
+    (message = "Please enter a valid number") =>
+    (value: string) =>
+      !value?.trim() || !Number.isNaN(Number(value)) ? undefined : message,
+
   url:
     (message = "Please enter a valid URL") =>
     (value: string) =>

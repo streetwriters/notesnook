@@ -129,6 +129,7 @@ export const backRestoreGroup: SettingSection = {
               },
               icon: "folder",
               iconFamily: "notesnook",
+              isModal: true,
               hidden: () =>
                 !!SettingsService.get().backupDirectoryAndroid ||
                 Platform.OS !== "android",
@@ -152,6 +153,7 @@ export const backRestoreGroup: SettingSection = {
             {
               id: "change-backup-dir",
               name: strings.changeBackupDir(),
+              isModal: true,
               description: () =>
                 SettingsService.get().backupDirectoryAndroid?.name || "",
               icon: "folder",
@@ -187,7 +189,8 @@ export const backRestoreGroup: SettingSection = {
               type: "switch",
               name: strings.backupEncryption(),
               description: strings.backupEncryptionDesc(),
-              icon: "lock",
+              icon: "folder-lock",
+              iconFamily: "notesnook",
               property: "encryptedBackup",
               modifer: async () => {
                 const user = useUserStore.getState().user;
@@ -233,6 +236,7 @@ export const backRestoreGroup: SettingSection = {
               id: "restore-from-files",
               name: strings.restoreFromFiles(),
               icon: "folder",
+              isModal: true,
               modifer: async () => {
                 useUserStore.setState({
                   disableAppLockRequests: true
@@ -270,6 +274,7 @@ export const backRestoreGroup: SettingSection = {
               id: "select-backup-folder",
               name: strings.selectBackupFolder(),
               icon: "folder",
+              isModal: true,
               hidden: () => Platform.OS !== "android",
               modifer: async () => {
                 const folder = await ScopedStorage.openDocumentTree(true);
@@ -303,6 +308,7 @@ export const backRestoreGroup: SettingSection = {
       icon: "export",
       iconFamily: "notesnook",
       description: strings.exportAllNotesDesc(),
+      isModal: true,
       modifer: () => {
         verifyUser(undefined, () => {
           ExportNotesSheet.present(undefined, true);

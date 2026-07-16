@@ -106,15 +106,24 @@ export function SettingsPicker<T>({
               type={
                 compareValue(currentValue, item)
                   ? "shade-plain"
-                  : "secondary-outline"
+                  : "plain-outline"
               }
               onPress={() => {
                 onChange(item);
               }}
+              textStyle={{
+                color: compareValue(currentValue, item)
+                  ? colors.primary.heading
+                  : colors.primary.paragraph
+              }}
               style={{
                 paddingVertical: Spacing.LEVEL_1,
                 paddingHorizontal: Spacing.LEVEL_1,
-                borderRadius: Radius.XS
+                borderRadius: Radius.XS,
+                borderWidth: 1,
+                borderColor: compareValue(currentValue, item)
+                  ? "transparent"
+                  : colors.primary.border
               }}
             />
           ))}

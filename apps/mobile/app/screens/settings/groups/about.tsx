@@ -63,6 +63,7 @@ export const aboutGroup: SettingSection = {
       icon: "device-mobile-camera",
       iconFamily: "notesnook",
       description: strings.checkForUpdatesDesc(),
+      isModal: true,
       modifer: async () => {
         presentSheet({
           //@ts-ignore // Migrate to ts

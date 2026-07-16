@@ -60,7 +60,7 @@ export type DialogInfo = {
       ref: RefObject<TextInput | null>;
       inputProps?: TextInputProps;
     }[];
-    onFormSubmit?: (form: FormRef) => Promise<boolean>;
+    onFormSubmit?: (form: FormRef, checked?: boolean) => Promise<boolean>;
   };
   input: boolean;
   inputLabel?: string;

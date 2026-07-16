@@ -21,6 +21,7 @@ import { TextInput } from "react-native";
 import { Settings } from "../../stores/use-setting-store";
 import { FeatureId } from "@notesnook/common";
 import { IconProps } from "../../components/ui/AppIcon";
+import { FieldValidator } from "../../components/ui/input/form-input";
 
 export type SettingSection = {
   id: string;
@@ -51,11 +52,25 @@ export type SettingSection = {
   options?: any[];
   minInputValue?: number;
   maxInputValue?: number;
+  /**
+   * Amount to increment/decrement an `input-selector` by when the plus/minus
+   * buttons are pressed. Defaults to `1` (e.g. font size). Use a fractional
+   * value for point-based inputs like line height (e.g. `0.1`).
+   */
+  step?: number;
+  /**
+   * Validators applied to `input` and `input-selector` fields. Invalid values
+   * surface an error (styled like `FormInput`) and are not saved.
+   */
+  validators?: FieldValidator[];
+  /** Optional label rendered above an `input` field. */
+  inputLabel?: string;
   inputBadgeValue?: string;
   onVerify?: () => Promise<boolean>;
   hideHeader?: boolean;
   disabled?: (current: unknown) => boolean;
   featureId?: FeatureId;
+  isModal?: boolean;
 };
 
 export type SettingsGroup = {
