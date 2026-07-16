@@ -168,6 +168,7 @@ export const accountGroup: SettingSection = {
         ),
       icon: "gift",
       iconFamily: "notesnook",
+      isModal: true,
       modifer: () => {
         presentDialog({
           title: strings.redeemGiftCode(),
@@ -232,6 +233,7 @@ export const accountGroup: SettingSection = {
                     useUserStore((state) => state.profile?.profilePicture),
                   hidden: () =>
                     !useUserStore.getState().profile?.profilePicture,
+                  isModal: true,
                   modifer: () => {
                     presentDialog({
                       title: strings.removeProfilePicture(),
@@ -260,6 +262,7 @@ export const accountGroup: SettingSection = {
                   useHook: () =>
                     useUserStore((state) => state.profile?.fullName),
                   hidden: () => !useUserStore.getState().profile?.fullName,
+                  isModal: true,
                   modifer: () => {
                     presentDialog({
                       title: strings.removeFullName(),
@@ -296,6 +299,7 @@ export const accountGroup: SettingSection = {
               icon: "warning-circle",
               iconFamily: "notesnook",
               hidden: () => Platform.OS !== "ios",
+              isModal: true,
               modifer: async () => {
                 if (Platform.OS === "android") return;
                 presentSheet({
@@ -366,6 +370,7 @@ export const accountGroup: SettingSection = {
                       name: strings.change2faMethod(),
                       icon: "shield-check",
                       iconFamily: "notesnook",
+                      isModal: true,
                       modifer: () => {
                         verifyUser("global", async () => {
                           MFASheet.present();
@@ -386,6 +391,7 @@ export const accountGroup: SettingSection = {
                           !(user as User)?.mfa?.isEnabled
                         );
                       },
+                      isModal: true,
                       modifer: () => {
                         verifyUser("global", async () => {
                           MFASheet.present(true);
@@ -404,6 +410,7 @@ export const accountGroup: SettingSection = {
                           !(user as User)?.mfa?.isEnabled
                         );
                       },
+                      isModal: true,
                       modifer: () => {
                         verifyUser("global", async () => {
                           MFASheet.present(true);
@@ -414,6 +421,7 @@ export const accountGroup: SettingSection = {
                     {
                       id: "view-2fa-codes",
                       name: strings.viewRecoveryCodes(),
+                      isModal: true,
                       modifer: () => {
                         verifyUser("global", async () => {
                           MFARecoveryCodes.present("sms");
@@ -435,11 +443,11 @@ export const accountGroup: SettingSection = {
               id: "recovery-key",
               name: strings.saveDataRecoveryKey(),
               iconFamily: "notesnook",
+              isModal: true,
               modifer: async () => {
-                // if (await verifyUser()) {
-
-                // }
-                RecoveryKeySheet.present();
+                if (await verifyUser()) {
+                  RecoveryKeySheet.present();
+                }
               },
               description: strings.saveDataRecoveryKeyDesc(),
               icon: "key"
@@ -468,6 +476,7 @@ export const accountGroup: SettingSection = {
               name: strings.clearCache(),
               icon: "trash",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: async () => {
                 presentDialog({
                   title: strings.clearCacheConfirm(),
@@ -521,6 +530,7 @@ export const accountGroup: SettingSection = {
               description: strings.logoutWarnin(),
               icon: "user-sheet-logout",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: logoutUser
             },
             {
@@ -530,6 +540,7 @@ export const accountGroup: SettingSection = {
               icon: "user-circle-minus",
               iconFamily: "notesnook",
               description: strings.deleteAccountDesc(),
+              isModal: true,
               modifer: () => {
                 presentDialog({
                   title: strings.deleteAccount(),
@@ -700,6 +711,7 @@ export const accountGroup: SettingSection = {
               description: strings.forcePullChangesDesc(),
               icon: "git-pull-request",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: () => {
                 ForceSyncSheet.present("fetch");
               }
@@ -710,6 +722,7 @@ export const accountGroup: SettingSection = {
               description: strings.forcePushChangesDesc(),
               icon: "arrow-fat-up",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: () => {
                 ForceSyncSheet.present("send");
               }

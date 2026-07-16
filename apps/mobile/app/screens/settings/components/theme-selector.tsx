@@ -514,8 +514,8 @@ function ThemeSelector() {
                 textStyle={{
                   color:
                     colorScheme === "all"
-                      ? colors.secondary.paragraph
-                      : colors.primary.paragraph
+                      ? colors.primary.heading
+                      : colors.secondary.paragraph
                 }}
                 title={strings.all()}
                 fontSize={AppFontSize.sm}
@@ -533,8 +533,8 @@ function ThemeSelector() {
                 textStyle={{
                   color:
                     colorScheme === "dark"
-                      ? colors.secondary.paragraph
-                      : colors.primary.paragraph
+                      ? colors.primary.heading
+                      : colors.secondary.paragraph
                 }}
                 title={strings.dark()}
                 fontSize={AppFontSize.sm}
@@ -553,8 +553,8 @@ function ThemeSelector() {
                 textStyle={{
                   color:
                     colorScheme === "light"
-                      ? colors.secondary.paragraph
-                      : colors.primary.paragraph
+                      ? colors.primary.heading
+                      : colors.secondary.paragraph
                 }}
                 title={strings.light()}
                 onPress={() => {

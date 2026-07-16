@@ -3013,5 +3013,7 @@ Continue without attachments?`,
   setExpiryDesc: () => t`Note will get deleted on the set date.`,
   changeCreatedDate: () => t`Change created date`,
   changeCreatedDateDesc: () =>
-    t`Select date and time to change the created date`
+    t`Select date and time to change the created date`,
+  codeCopied: () => t`Code copied`,
+  enterVaultPassword: () => t`Enter vault password`
 };

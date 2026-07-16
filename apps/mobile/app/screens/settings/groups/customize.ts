@@ -130,6 +130,7 @@ export const customizeGroup: SettingSection = {
               description: strings.dateFormatDesc(),
               icon: "calendar",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: () => {
                 DateFormat.present();
               }
@@ -174,6 +175,7 @@ export const customizeGroup: SettingSection = {
               description: strings.clearTrashIntervalDesc(),
               icon: "trash",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: () => {
                 TrashInterval.present();
               }
@@ -273,8 +275,9 @@ export const customizeGroup: SettingSection = {
               name: strings.defaultFontSize(),
               description: strings.defaultFontSizeDesc(),
               type: "input-selector",
-              minInputValue: 8,
-              maxInputValue: 120,
+              minInputValue: 1,
+              maxInputValue: 400,
+              step: 1,
               inputBadgeValue: "px",
               icon: "format-size",
               property: "defaultFontSize"
@@ -287,7 +290,8 @@ export const customizeGroup: SettingSection = {
               property: "defaultLineHeight",
               icon: "format-line-spacing",
               minInputValue: EDITOR_LINE_HEIGHT.MIN,
-              maxInputValue: EDITOR_LINE_HEIGHT.MAX
+              maxInputValue: EDITOR_LINE_HEIGHT.MAX,
+              step: 0.1
             }
           ]
         },
@@ -310,11 +314,12 @@ export const customizeGroup: SettingSection = {
                 });
               }
             },
-
             {
               id: "toggle-markdown",
               name: strings.mardownShortcuts(),
               property: "markdownShortcuts",
+              icon: "markdown",
+              iconFamily: "notesnook",
               description: strings.mardownShortcutsDesc(),
               type: "switch",
               featureId: "markdownShortcuts"
@@ -330,6 +335,8 @@ export const customizeGroup: SettingSection = {
               id: "title-format",
               name: strings.titleFormat(),
               component: "title-format",
+              icon: "pencil-ruler",
+              iconFamily: "notesnook",
               description: strings.titleFormatDesc(),
               type: "component"
             }
