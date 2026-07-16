@@ -64,6 +64,7 @@ import FormInput, {
   validators
 } from "../../components/ui/input/form-input";
 import AppIcon from "../../components/ui/AppIcon";
+import { presentDialog } from "../../components/dialog/functions";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -145,6 +146,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const referencedItem = reference ? (reference as Note) : null;
   const recurringReminderFeature = useIsFeatureAvailable("recurringReminders");
+  const activeReminderFeature = useIsFeatureAvailable("activeReminders");
   const formRef = useRef(
     createFormRef({
       title: reminder?.title || referencedItem?.title || "",
@@ -171,6 +173,23 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   );
   const [dateError, setDateError] = useState<string>();
   const [selectDayError, setSelectDayError] = useState<string>();
+  useEffect(() => {
+    if (activeReminderFeature === undefined) return;
+    if (!activeReminderFeature.isAllowed) {
+      presentDialog({
+        title: strings.upgrade(),
+        paragraph: activeReminderFeature.error,
+        positiveText: strings.upgrade(),
+        negativeText: strings.cancel(),
+        positivePress: async () => {
+          PaywallSheet.present(activeReminderFeature);
+        },
+        onClose: () => {
+          props.navigation.navigate("FluidPanelsView" as any);
+        }
+      });
+    }
+  }, [activeReminderFeature]);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -291,7 +310,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             onPress: saveReminder
           }}
         />
-        <Dialog context="local" />
         <ScrollView
           style={{
             marginBottom: DDS.isTab ? 25 : undefined,
