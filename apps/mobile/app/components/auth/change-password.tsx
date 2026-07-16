@@ -21,7 +21,10 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import BackupService from "../../services/backup";
 import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
@@ -29,14 +32,12 @@ import { useUserStore } from "../../stores/use-user-store";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Dialog } from "../dialog";
+import RecoveryKeySheet from "../sheets/recovery-key";
 import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import FormInput, { createFormRef, validators } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
 import Paragraph from "../ui/typography/paragraph";
-import { TextInput } from "react-native-gesture-handler";
-import { Spacing } from "../../common/design/spacing";
-import RecoveryKeySheet from "../sheets/recovery-key";
 
 export const ChangePassword = () => {
   const { colors } = useThemeColors();
@@ -107,13 +108,17 @@ export const ChangePassword = () => {
   };
 
   return (
-    <View
+    <KeyboardAwareScrollView
       style={{
-        width: "100%",
+        width: "100%"
+      }}
+      contentContainerStyle={{
         paddingTop: Spacing.LEVEL_4,
         paddingHorizontal: Spacing.LEVEL_3,
         gap: Spacing.LEVEL_2
       }}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
     >
       <Dialog context="change-password-dialog" />
       <FormInput
@@ -227,6 +232,6 @@ export const ChangePassword = () => {
         />
         <Paragraph>{strings.yourSecurityIsPriority()}</Paragraph>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };

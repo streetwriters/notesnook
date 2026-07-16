@@ -74,7 +74,10 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
         }
         if (dialogInfo.form.onFormSubmit) {
           setLoading(true);
-          const result = await dialogInfo.form.onFormSubmit(formRef.current);
+          const result = await dialogInfo.form.onFormSubmit(
+            formRef.current,
+            checked
+          );
           if (result === false) {
             setLoading(false);
             return;

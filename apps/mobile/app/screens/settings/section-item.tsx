@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import {
   NavigationProp,
@@ -32,6 +33,10 @@ import PaywallSheet from "../../components/sheets/paywall";
 import AppIcon from "../../components/ui/AppIcon";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
+import FormInput, {
+  createFormRef,
+  FormRef
+} from "../../components/ui/input/form-input";
 import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
@@ -41,7 +46,6 @@ import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
 import { components } from "./components/components";
 import { RouteParams, SettingSection } from "./types";
-import { planToDisplayNameShort } from "../../utils/constants";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
   const { colors } = useThemeColors();
@@ -66,7 +70,23 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   );
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
-  const [inputSelectorValue, setInputSelectorValue] = useState(() =>
+  const fieldName = (item.property as string) || item.id;
+  const formRef = useRef<FormRef>(
+    createFormRef({
+      [fieldName]: item.property
+        ? `${
+            SettingsService.get()[
+              item.property as keyof SettingStore["settings"]
+            ] ??
+            item.inputProperties?.defaultValue ??
+            ""
+          }`
+        : `${item.inputProperties?.defaultValue ?? ""}`
+    })
+  );
+
+  const [selectorError, setSelectorError] = useState<string>();
+  const [selectorValue, setSelectorValue] = useState(() =>
     item.property
       ? `${
           SettingsService.get()[
@@ -75,6 +95,66 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         }`
       : ""
   );
+
+  const step = item.step || 1;
+  const stepDecimals = `${step}`.split(".")[1]?.length || 0;
+  const roundToStep = (value: number) => Number(value.toFixed(stepDecimals));
+
+  const commitInputValue = (text: string) => {
+    if (!item.property) return;
+    const error = formRef.current?.validateField(fieldName);
+    if (error) return;
+    SettingsService.set({
+      [item.property as string]: text
+    });
+  };
+
+  const validateSelectorValue = (text: string): string | undefined => {
+    for (const validator of item.validators || []) {
+      const error = validator(text, {});
+      if (error) return error;
+    }
+    const min = item.minInputValue ?? 0;
+    const max = item.maxInputValue ?? Number.MAX_SAFE_INTEGER;
+    const num = Number(text);
+
+    if (!text?.trim() || Number.isNaN(num) || num < min || num > max) {
+      return strings.valueMustBeBetween(min, max);
+    }
+    return undefined;
+  };
+
+  const onChangeSelectorValue = (text: string) => {
+    setSelectorValue(text);
+    const error = validateSelectorValue(text);
+    setSelectorError(error);
+    if (error || !text.trim() || !item.property) return;
+    SettingsService.set({
+      [item.property as string]: text
+    });
+  };
+
+  const stepInputValue = (direction: 1 | -1) => {
+    if (!checkIsFeatureAvailable()) return;
+    if (isDisabled || !item.property) return;
+    const min = item.minInputValue ?? 0;
+    const max = item.maxInputValue ?? Number.MAX_SAFE_INTEGER;
+    const raw = `${
+      SettingsService.get()[item.property as keyof SettingStore["settings"]] ??
+      ""
+    }`;
+    const parsed = parseFloat(raw);
+    const base = Number.isNaN(parsed) ? (direction === 1 ? min : max) : parsed;
+    let next = roundToStep(base + direction * step);
+    if (next < min) next = min;
+    if (next > max) next = max;
+    if (next === base) return;
+    setSelectorError(undefined);
+    setSelectorValue(`${next}`);
+    SettingsService.set({
+      [item.property as string]: `${next}`
+    });
+  };
 
   const onChangeSettings = async () => {
     if (isDisabled) return;
@@ -98,39 +178,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         setIsHidden(item.hidden && item.hidden(item.property || current));
       item.disabled &&
         setIsDisabled(item.disabled && item.disabled(item.property || current));
-    });
-  };
-
-  const updateInput = (value: any) => {
-    setInputSelectorValue(`${value}`);
-  };
-
-  const onChangeInputSelectorValue = (text: any, commit?: boolean) => {
-    // While typing (commit === false) an empty field is allowed so the user can
-    // clear and retype; on commit (submit/blur) an empty field falls back to min.
-    if (!text && !commit) {
-      setInputSelectorValue("");
-      return;
-    }
-
-    const min = item.minInputValue || 0;
-    const max = item.maxInputValue || 0;
-    const value = parseInt(text);
-
-    // Always cap the upper bound. Only enforce the lower bound on commit so that
-    // partial entries (e.g. typing "5" on the way to "50" when min is 8) aren't
-    // snapped up prematurely.
-    let clamped: number;
-    if (Number.isNaN(value)) clamped = min;
-    else if (value > max) clamped = max;
-    else if (commit && value < min) clamped = min;
-    else clamped = value;
-
-    // The input is controlled via `value`, so the clamped result is reflected in
-    // the field directly and can never display a value outside the range.
-    setInputSelectorValue(`${clamped}`);
-    SettingsService.set({
-      [item.property as string]: `${clamped}`
     });
   };
 
@@ -337,7 +384,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             </View>
           ) : null}
 
-          {item.type === "screen" ? (
+          {item.type === "screen" || item.isModal ? (
             <AppIcon
               name="chevron-right"
               iconFamily="notesnook"
@@ -365,180 +412,160 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           )}
 
           {item.type === "input" && (
-            <Input
+            <FormInput
               {...item.inputProperties}
-              onSubmit={(e) => {
-                SettingsService.set({
-                  [item.property as string]: e.nativeEvent.text
-                });
-                item.inputProperties?.onSubmitEditing?.(e);
-              }}
+              name={fieldName}
+              formRef={formRef}
+              validators={item.validators || []}
+              label={item.inputLabel}
               editable={!isDisabled}
-              onChangeText={(text) => {
-                SettingsService.set({
-                  [item.property as string]: text
-                });
-                item.inputProperties?.onSubmitEditing?.(text as any);
-              }}
+              fwdRef={inputRef}
+              fontSize={AppFontSize.sm}
+              marginBottom={0}
               containerStyle={{
                 marginTop: Spacing.LEVEL_2,
                 backgroundColor: colors.secondary.background,
-                borderWidth: 0
+                borderRadius: Radius.XS
               }}
               inputStyle={{
                 color: colors.primary.heading
               }}
-              fontSize={AppFontSize.sm}
-              fwdRef={inputRef}
-              onLayout={() => {
-                inputRef?.current?.setNativeProps({
-                  text:
-                    SettingsService.get()[
-                      item.property as keyof SettingStore["settings"]
-                    ] + ""
-                });
+              onChangeText={(text) => {
+                commitInputValue(text);
               }}
-              defaultValue={item.inputProperties?.defaultValue}
+              onSubmitEditing={(e) => {
+                commitInputValue(e.nativeEvent.text);
+                item.inputProperties?.onSubmitEditing?.(e);
+              }}
             />
           )}
 
           {item.type === "input-selector" && (
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
                 marginTop: Spacing.LEVEL_2,
-                backgroundColor: colors.secondary.background,
-                alignSelf: "flex-start",
-                padding: Spacing.LEVEL_2,
                 gap: Spacing.LEVEL_1,
-                borderRadius: Radius.S
+                alignSelf: "flex-start"
               }}
             >
-              <IconButton
-                name="plus"
-                color={colors.primary.icon}
-                iconFamily="notesnook"
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
-                    const max = item.maxInputValue || 0;
-                    if (currentValue >= max) return;
-                    const nextValue = currentValue + 1;
-                    SettingsService.set({
-                      [item.property as string]: nextValue
-                    });
-                    updateInput(nextValue);
-                  }
-                }}
-                size={16}
-                type="tertiary"
-                style={{
-                  borderRadius: Radius.XXS,
-                  padding: Spacing.LEVEL_0,
-                  width: undefined,
-                  height: undefined
-                }}
-              />
               <View
                 style={{
                   flexDirection: "row",
-                  alignItems: "flex-end",
-                  gap: 1
+                  alignItems: "center",
+                  backgroundColor: colors.secondary.background,
+                  padding: Spacing.LEVEL_2,
+                  gap: Spacing.LEVEL_1,
+                  borderRadius: Radius.S,
+                  borderWidth: 1,
+                  borderColor: selectorError
+                    ? colors.error.border
+                    : "transparent"
                 }}
               >
-                <Input
-                  {...item.inputProperties}
-                  onSubmit={(e) => {
-                    onChangeInputSelectorValue(e.nativeEvent.text, true);
-                    item.inputProperties?.onSubmitEditing?.(e);
+                <IconButton
+                  name="minus"
+                  iconFamily="notesnook"
+                  color={colors.primary.icon}
+                  onPress={() => stepInputValue(-1)}
+                  size={16}
+                  type="tertiary"
+                  style={{
+                    borderRadius: Radius.XXS,
+                    padding: Spacing.LEVEL_0,
+                    width: undefined,
+                    height: undefined
                   }}
-                  editable={!isDisabled}
-                  value={inputSelectorValue}
-                  onChangeText={(text) => {
-                    onChangeInputSelectorValue(text);
-                    item.inputProperties?.onSubmitEditing?.(text as any);
+                />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "flex-end",
+                    gap: 1
                   }}
-                  keyboardType="decimal-pad"
-                  containerStyle={{
-                    borderWidth: 0,
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                    height: 25,
-                    borderRadius: 0,
-                    minWidth: 25
+                >
+                  <Input
+                    {...item.inputProperties}
+                    onSubmit={(e) => {
+                      onChangeSelectorValue(e.nativeEvent.text);
+                      item.inputProperties?.onSubmitEditing?.(e);
+                    }}
+                    editable={!isDisabled}
+                    value={selectorValue}
+                    onChangeText={onChangeSelectorValue}
+                    keyboardType="decimal-pad"
+                    containerStyle={{
+                      borderWidth: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      height: 25,
+                      borderRadius: 0,
+                      minWidth: 25
+                    }}
+                    fontSize={AppFontSize.sm}
+                    inputStyle={{
+                      textAlign: "center",
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      fontFamily: FontFamily.SEMI_BOLD,
+                      color: colors.primary.heading
+                    }}
+                    wrapperStyle={{
+                      flexGrow: 0,
+                      marginBottom: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0
+                    }}
+                    buttons={
+                      <>
+                        {item.inputBadgeValue ? (
+                          <Paragraph
+                            fontSize="XXS"
+                            style={{
+                              marginLeft: 1,
+                              marginTop: 2,
+                              color: colors.primary.heading
+                            }}
+                            color={colors.primary.paragraph}
+                          >
+                            {item.inputBadgeValue}
+                          </Paragraph>
+                        ) : null}
+                      </>
+                    }
+                  />
+                </View>
+
+                <IconButton
+                  name="plus"
+                  color={colors.primary.icon}
+                  iconFamily="notesnook"
+                  onPress={() => stepInputValue(1)}
+                  size={16}
+                  type="tertiary"
+                  style={{
+                    borderRadius: Radius.XXS,
+                    padding: Spacing.LEVEL_0,
+                    width: undefined,
+                    height: undefined
                   }}
-                  fontSize={AppFontSize.sm}
-                  inputStyle={{
-                    textAlign: "center",
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                    fontFamily: FontFamily.SEMI_BOLD,
-                    color: colors.primary.heading
-                  }}
-                  wrapperStyle={{
-                    flexGrow: 0,
-                    marginBottom: 0,
-                    paddingLeft: 0,
-                    paddingRight: 0
-                  }}
-                  buttons={
-                    <>
-                      {item.inputBadgeValue ? (
-                        <Paragraph
-                          fontSize="XXS"
-                          style={{
-                            marginLeft: 1,
-                            marginTop: 2,
-                            color: colors.primary.heading
-                          }}
-                          color={colors.primary.paragraph}
-                        >
-                          px
-                        </Paragraph>
-                      ) : null}
-                    </>
-                  }
                 />
               </View>
 
-              <IconButton
-                name="minus"
-                iconFamily="notesnook"
-                color={colors.primary.icon}
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
-                    const minValue = item.minInputValue || 0;
-                    if (currentValue <= minValue) return;
-                    const nextValue = currentValue - 1;
-                    SettingsService.set({
-                      [item.property as string]: nextValue
-                    });
-                    updateInput(nextValue);
-                  }
-                }}
-                size={16}
-                type="tertiary"
-                style={{
-                  borderRadius: Radius.XXS,
-                  padding: Spacing.LEVEL_0,
-                  width: undefined,
-                  height: undefined
-                }}
-              />
+              {selectorError ? (
+                <Paragraph
+                  size={AppFontSize.xs}
+                  style={{ color: colors.error.icon }}
+                >
+                  <AppIcon
+                    color={colors.error.accent}
+                    name="alert-circle-outline"
+                    size={AppFontSize.sm - 1}
+                  />{" "}
+                  {selectorError}
+                </Paragraph>
+              ) : null}
             </View>
           )}
         </View>

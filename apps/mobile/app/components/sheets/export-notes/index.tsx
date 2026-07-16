@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ActivityIndicator, Linking, Platform, View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
@@ -65,11 +65,14 @@ const ExportNotesSheet = ({
     | undefined
   >();
   const [status, setStatus] = useState<string>();
+  const abortController = useRef<AbortController | undefined>(undefined);
 
   const exportNoteAs = async (
     type: "pdf" | "txt" | "md" | "html" | "md-frontmatter"
   ) => {
     if (exporting) return;
+    const controller = new AbortController();
+    abortController.current = controller;
     setExporting(true);
     update?.({ disableClosing: true } as PresentSheetOptions);
     setComplete(false);
@@ -78,7 +81,8 @@ const ExportNotesSheet = ({
       result = await Exporter.bulkExport(
         db.notes.all.where((eb) => eb("id", "in", ids)),
         type,
-        setStatus
+        setStatus,
+        controller.signal
       );
     } else {
       const note = await db.notes.note(ids[0]);
@@ -86,10 +90,15 @@ const ExportNotesSheet = ({
         setExporting(false);
         return;
       }
-      result = await Exporter.exportNote(note, type, setStatus);
+      result = await Exporter.exportNote(
+        note,
+        type,
+        setStatus,
+        controller.signal
+      );
       await sleep(1000);
     }
-    if (!result) {
+    if (!result || controller.signal.aborted) {
       update?.({ disableClosing: false } as PresentSheetOptions);
       return setExporting(false);
     }
@@ -98,6 +107,13 @@ const ExportNotesSheet = ({
     setComplete(true);
     setExporting(false);
     requestInAppReview();
+  };
+
+  const cancelExport = () => {
+    abortController.current?.abort();
+    update?.({ disableClosing: false } as PresentSheetOptions);
+    setExporting(false);
+    setStatus(undefined);
   };
 
   const actions = [
@@ -276,6 +292,12 @@ const ExportNotesSheet = ({
                   " " +
                   strings.pleaseWait()}
               </Paragraph>
+              <Button
+                title={strings.cancel()}
+                type="secondary-simple"
+                width={undefined}
+                onPress={cancelExport}
+              />
             </>
           ) : (
             <>
