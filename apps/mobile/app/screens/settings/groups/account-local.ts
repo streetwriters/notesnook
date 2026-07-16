@@ -45,6 +45,7 @@ export const accountLocalGroup: SettingSection = {
       icon: "trash",
       iconFamily: "notesnook",
       description: strings.deleteAccountDesc(),
+      isModal: true,
       modifer: () => {
         presentDialog({
           title: strings.deleteData(),

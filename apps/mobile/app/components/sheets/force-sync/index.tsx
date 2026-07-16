@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useState } from "react";
-import { View } from "react-native";
+import { Linking, View } from "react-native";
 import { Radius, Spacing } from "../../../common/design/spacing";
 import { Button } from "../../ui/button";
 import AppIcon from "../../ui/AppIcon";
@@ -142,6 +142,9 @@ function ForceSync({ mode, close }: ForceSyncProps) {
             size={AppFontSize.sm}
             fontFamily="SEMI_BOLD"
             color={colors.primary.accent}
+            onPress={() => {
+              Linking.openURL("mailto:support@streetwriters.co");
+            }}
           >
             support@streetwriters.co
           </Paragraph>
@@ -164,7 +167,7 @@ function ForceSync({ mode, close }: ForceSyncProps) {
       >
         <AppIcon
           size={16}
-          name={acknowledged ? "checkbox" : "checkbox-blank-outline"}
+          name={acknowledged ? "checkbox" : "box-empty"}
           iconFamily="notesnook"
           color={
             acknowledged

@@ -193,7 +193,8 @@ export const Toast = ({ context = "global" }) => {
           style={{
             maxWidth: "100%",
             flexDirection: "row",
-            alignItems: "flex-start",
+            alignItems:
+              !description && !toastOptions.func ? "center" : "flex-start",
             gap: Spacing.LEVEL_1,
             padding: Spacing.LEVEL_1,
             borderRadius: Radius.S,
@@ -212,9 +213,6 @@ export const Toast = ({ context = "global" }) => {
             iconFamily={toastOptions.icon ? "material" : variant.icon.family}
             size={16}
             color={variant.accent}
-            style={{
-              marginTop: description ? 1 : 0
-            }}
           />
 
           <View
@@ -227,7 +225,7 @@ export const Toast = ({ context = "global" }) => {
               {title ? (
                 <Heading
                   fontSize="XS"
-                  lineHeight="100%"
+                  lineHeight={null}
                   color={colors.primary.heading}
                 >
                   {title}
