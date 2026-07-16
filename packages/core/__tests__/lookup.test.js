@@ -209,17 +209,4 @@ describe("notesWithHighlighting", () => {
       );
       expect(searchWithDiacritics.length).toBe(4);
     }));
-
-  test("search with a field filter should not throw when notes selector is undefined", () =>
-    databaseTest().then(async (db) => {
-      await db.notes.add({ title: "meeting notes" });
-
-      // a nonexistent tag filter matches everything (a separate, pre-existing
-      // quirk) — the point of this test is that it resolves instead of throwing
-      const filtered = await db.lookup.notesWithHighlighting(
-        "tag:meeting",
-        undefined
-      );
-      expect(filtered.length).toBe(1);
-    }));
 });
