@@ -1885,6 +1885,10 @@ msgstr ""
 msgid "Code block"
 msgstr ""
 
+#: src/strings.ts:3017
+msgid "Code copied"
+msgstr ""
+
 #: src/strings.ts:2330
 msgid "Code remove"
 msgstr ""
@@ -3004,6 +3008,10 @@ msgstr ""
 
 #: src/strings.ts:2695
 msgid "Enter title"
+msgstr ""
+
+#: src/strings.ts:3018
+msgid "Enter vault password"
 msgstr ""
 
 #: src/strings.ts:1541

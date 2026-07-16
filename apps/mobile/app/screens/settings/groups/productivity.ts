@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
 import { Platform } from "react-native";
+import { validators } from "../../../components/ui/input/form-input";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { SettingSection } from "../types";
@@ -86,6 +87,7 @@ export const productivityGroup: SettingSection = {
               iconFamily: "notesnook",
               name: strings.defaultSnoozeTime(),
               description: strings.defaultSnoozeTimeDesc(),
+              validators: [validators.number()],
               inputProperties: {
                 keyboardType: "decimal-pad",
                 defaultValue: 5 + "",

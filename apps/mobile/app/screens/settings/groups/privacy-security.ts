@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
+import { validators } from "../../../components/ui/input/form-input";
 import { db } from "../../../common/database";
 import { AppLockPassword } from "../../../components/dialogs/applock-password";
 import AppLockTimeout from "../../../components/sheets/app-lock-timeout";
@@ -67,6 +68,7 @@ export const privacySecurityGroup: SettingSection = {
       type: "input",
       name: strings.corsBypass(),
       description: strings.corsBypassDesc(),
+      validators: [validators.url()],
       inputProperties: {
         defaultValue: "https://cors.notesnook.com",
         autoCorrect: false,
@@ -97,6 +99,7 @@ export const privacySecurityGroup: SettingSection = {
               iconFamily: "notesnook",
               useHook: useVaultStatus,
               hidden: (current) => (current as VaultStatusType)?.exists,
+              isModal: true,
               modifer: () => {
                 openVault({
                   requestType: VaultRequestType.CreateVault,
@@ -143,6 +146,7 @@ export const privacySecurityGroup: SettingSection = {
               iconFamily: "notesnook",
               description: strings.changeVaultPasswordDesc(),
               hidden: (current) => !(current as VaultStatusType)?.exists,
+              isModal: true,
               modifer: () =>
                 openVault({
                   requestType: VaultRequestType.ChangePassword,
@@ -159,6 +163,7 @@ export const privacySecurityGroup: SettingSection = {
               hidden: (current) => !(current as VaultStatusType)?.exists,
               icon: "clock",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: () => {
                 LockVaultTimer.present();
               }
@@ -171,6 +176,7 @@ export const privacySecurityGroup: SettingSection = {
               icon: "paint-brush-household",
               iconFamily: "notesnook",
               hidden: (current) => !(current as VaultStatusType)?.exists,
+              isModal: true,
               modifer: () => {
                 openVault({
                   requestType: VaultRequestType.ClearVault,
@@ -190,6 +196,7 @@ export const privacySecurityGroup: SettingSection = {
               type: "danger",
               useHook: useVaultStatus,
               hidden: (current) => !(current as VaultStatusType)?.exists,
+              isModal: true,
               modifer: () => {
                 openVault({
                   requestType: VaultRequestType.DeleteVault,
@@ -281,6 +288,7 @@ export const privacySecurityGroup: SettingSection = {
               description: strings.appLockTimeoutDesc(),
               icon: "clock",
               iconFamily: "notesnook",
+              isModal: true,
               modifer: async () => {
                 if (await verifyUserWithApplock()) {
                   AppLockTimeout.present();
@@ -302,6 +310,7 @@ export const privacySecurityGroup: SettingSection = {
                 return verifyUserWithApplock();
               },
               property: "appLockHasPasswordSecurity",
+              isModal: true,
               modifer: () => {
                 AppLockPassword.present("create");
               }
@@ -318,6 +327,7 @@ export const privacySecurityGroup: SettingSection = {
                 );
               },
               property: "appLockHasPasswordSecurity",
+              isModal: true,
               modifer: () => {
                 AppLockPassword.present("change");
               }
@@ -334,6 +344,7 @@ export const privacySecurityGroup: SettingSection = {
               icon: "backspace",
               iconFamily: "notesnook",
               property: "appLockHasPasswordSecurity",
+              isModal: true,
               modifer: () => {
                 AppLockPassword.present("remove");
               }

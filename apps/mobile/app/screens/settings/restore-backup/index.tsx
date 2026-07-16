@@ -38,6 +38,10 @@ import {
   updateProgress
 } from "../../../components/dialogs/progress";
 import { Button } from "../../../components/ui/button";
+import {
+  createFormRef,
+  validators
+} from "../../../components/ui/input/form-input";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import { ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
@@ -50,30 +54,79 @@ import { Spacing } from "../../../common/design/spacing";
 
 type PasswordOrKey = { password?: string; encryptionKey?: string };
 
-const withPassword = () => {
-  return new Promise<PasswordOrKey>((resolve) => {
-    let resolved = false;
+const RESTORE_CANCELLED = new Error("restore-cancelled");
+
+const getPasswordError = (e: unknown): string | undefined => {
+  const message = e instanceof Error ? e.message : "";
+  if (message === "Incorrect password.") return strings.passwordIncorrect();
+  if (message === "Invalid encryption key.")
+    return strings.invalid(strings.encryptionKey());
+  return undefined;
+};
+
+const verifyWithImport =
+  (importBackup: (passwordOrKey: PasswordOrKey) => Promise<unknown>) =>
+  async (passwordOrKey: PasswordOrKey): Promise<string | undefined> => {
+    try {
+      await importBackup(passwordOrKey);
+      return undefined;
+    } catch (e) {
+      const error = getPasswordError(e);
+      if (error) return error;
+      throw e;
+    }
+  };
+
+const withPassword = (
+  verify: (passwordOrKey: PasswordOrKey) => Promise<string | undefined>
+) => {
+  return new Promise<PasswordOrKey>((resolve, reject) => {
+    const formRef = createFormRef({ password: "" });
+    let done = false;
     presentDialog({
       context: "local",
       title: strings.backupEncrypted(),
-      input: true,
-      inputPlaceholder: strings.password(),
       paragraph: strings.backupEnterPassword(),
       positiveText: strings.restore(),
       secureTextEntry: true,
+      form: {
+        formRef,
+        items: [
+          {
+            name: "password",
+            placeholder: strings.password(),
+            ref: React.createRef(),
+            validators: [validators.required(strings.passwordNotEntered())]
+          }
+        ],
+        onFormSubmit: async (form, isEncryptionKey) => {
+          if (!form.validate()) return false;
+          const value = form.getValue("password");
+          const passwordOrKey: PasswordOrKey = {
+            encryptionKey: isEncryptionKey ? value : undefined,
+            password: isEncryptionKey ? undefined : value
+          };
+          try {
+            const error = await verify(passwordOrKey);
+            if (error) {
+              form.setError("password", error);
+              return false;
+            }
+          } catch (e) {
+            done = true;
+            reject(e);
+            return true;
+          }
+          done = true;
+          resolve(passwordOrKey);
+          return true;
+        }
+      },
       onClose: () => {
-        if (resolved) return;
+        if (done) return;
         resolve({});
       },
       negativeText: strings.cancel(),
-      positivePress: async (password, isEncryptionKey) => {
-        resolve({
-          encryptionKey: isEncryptionKey ? password : undefined,
-          password: isEncryptionKey ? undefined : password
-        });
-        resolved = true;
-        return true;
-      },
       check: {
         info: strings.useEncryptionKey(),
         type: "transparent"
@@ -174,23 +227,26 @@ export const restoreBackup = async (options: {
 
           const isEncryptedBackup = backup.encrypted;
 
-          passwordOrKey = !isEncryptedBackup
-            ? ({} as PasswordOrKey)
-            : passwordOrKey || (await withPassword());
+          const importBackup = (passwordOrKey: PasswordOrKey) =>
+            db.backup.import(backup, {
+              ...passwordOrKey,
+              attachmentsKey: attachmentsKey
+            });
 
-          if (
-            isEncryptedBackup &&
-            !passwordOrKey?.encryptionKey &&
-            !passwordOrKey?.password
-          ) {
-            endProgress();
-            throw new Error(strings.failedToDecryptBackup());
+          if (!isEncryptedBackup) {
+            await importBackup({});
+            continue;
           }
 
-          await db.backup.import(backup, {
-            ...passwordOrKey,
-            attachmentsKey: attachmentsKey
-          });
+          if (!passwordOrKey) {
+            passwordOrKey = await withPassword(verifyWithImport(importBackup));
+            if (!passwordOrKey.encryptionKey && !passwordOrKey.password) {
+              throw RESTORE_CANCELLED;
+            }
+            continue;
+          }
+
+          await importBackup(passwordOrKey);
         }
       });
 
@@ -238,29 +294,29 @@ export const restoreBackup = async (options: {
       const isEncryptedBackup =
         typeof backup.data !== "string" && backup.data.cipher;
 
-      updateProgress({
-        progress: isEncryptedBackup
-          ? strings.decryptingBackup()
-          : strings.preparingBackupRestore()
-      });
-
-      const { encryptionKey, password } = isEncryptedBackup
-        ? ({} as PasswordOrKey)
-        : await withPassword();
-
-      if (isEncryptedBackup && !encryptionKey && !password) {
-        endProgress();
-        throw new Error(strings.failedToDecryptBackup());
-      }
-
       await db.transaction(async () => {
+        const importBackup = (passwordOrKey: PasswordOrKey) =>
+          db.backup.import(backup, passwordOrKey);
+
+        if (!isEncryptedBackup) {
+          updateProgress({
+            progress: strings.restoringBackup()
+          });
+          await importBackup({});
+          return;
+        }
+
         updateProgress({
-          progress: strings.restoringBackup()
+          progress: strings.decryptingBackup()
         });
-        await db.backup.import(backup, {
-          encryptionKey,
-          password
-        });
+        // Prompt for the password and validate it by importing from inside the
+        // dialog so an incorrect password keeps the dialog open.
+        const passwordOrKey = await withPassword(
+          verifyWithImport(importBackup)
+        );
+        if (!passwordOrKey.encryptionKey && !passwordOrKey.password) {
+          throw RESTORE_CANCELLED;
+        }
       });
       endProgress();
     }
@@ -276,6 +332,8 @@ export const restoreBackup = async (options: {
     endProgress();
   } catch (e) {
     endProgress();
+    // User dismissed the password prompt: abort silently without an error toast.
+    if (e === RESTORE_CANCELLED) return;
     DatabaseLogger.error(e as Error);
     ToastManager.error(e as Error, strings.restoreFailed());
   }

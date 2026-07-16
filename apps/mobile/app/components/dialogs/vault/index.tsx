@@ -188,7 +188,6 @@ export const VaultDialog: React.FC = () => {
         }
         await db.vault.delete(deleteAll);
         await BiometricService.resetCredentials();
-
         if (deleteAll) {
           noteIds.forEach((id) => {
             eSendEvent(
@@ -753,9 +752,13 @@ export const VaultDialog: React.FC = () => {
                 name="password"
                 formRef={formRef}
                 label={
-                  isChangePassword
-                    ? strings.currentPassword()
-                    : strings.password()
+                  isDeleteVault
+                    ? strings.enterAccountPassword()
+                    : isClearVault
+                      ? strings.enterVaultPassword()
+                      : isChangePassword
+                        ? strings.currentPassword()
+                        : strings.password()
                 }
                 fwdRef={passInputRef}
                 editable={!loading}
@@ -809,11 +812,17 @@ export const VaultDialog: React.FC = () => {
               width="100%"
               style={{
                 justifyContent: "flex-start",
-                paddingHorizontal: 0
+                paddingHorizontal: 0,
+                paddingVertical: 0,
+                marginTop: Spacing.LEVEL_1
               }}
               title={strings.deleteAllNotes()}
               type="transparent"
-              iconColor={colors.error.accent}
+              iconColor={
+                deleteAll
+                  ? [colors.error.accent, colors.error.accentForeground]
+                  : colors.error.accent
+              }
               textStyle={{
                 color: colors.error.accent
               }}

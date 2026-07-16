@@ -92,9 +92,6 @@ export const Checkbox = ({
         name={checked ? "checkbox" : "box-empty"}
         iconFamily="notesnook"
         size={iconSize}
-        style={{
-          marginTop: 1.5
-        }}
         color={
           iconColor ||
           (checked

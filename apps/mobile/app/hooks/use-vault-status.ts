@@ -43,6 +43,7 @@ export const useVaultStatus = () => {
     db.vault?.exists().then(async (exists) => {
       const available = await BiometricService.isBiometryAvailable();
       const fingerprint = await BiometricService.hasInternetCredentials();
+      console.log("VAULT EXISTS?", exists);
       setVaultStatus({
         exists: exists,
         biometryEnrolled: fingerprint,

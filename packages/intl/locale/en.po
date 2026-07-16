@@ -1896,6 +1896,10 @@ msgstr "Code"
 msgid "Code block"
 msgstr "Code block"
 
+#: src/strings.ts:3017
+msgid "Code copied"
+msgstr "Code copied"
+
 #: src/strings.ts:2330
 msgid "Code remove"
 msgstr "Code remove"
@@ -3016,6 +3020,10 @@ msgstr "Enter the gift code to redeem your subscription."
 #: src/strings.ts:2695
 msgid "Enter title"
 msgstr "Enter title"
+
+#: src/strings.ts:3018
+msgid "Enter vault password"
+msgstr "Enter vault password"
 
 #: src/strings.ts:1541
 msgid "Enter verification code sent to your new email"
