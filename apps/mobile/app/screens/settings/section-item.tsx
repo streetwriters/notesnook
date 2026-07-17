@@ -274,9 +274,11 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
             >
               <AppIcon
                 color={
-                  item.type === "danger"
-                    ? colors.error.accent
-                    : colors.primary.icon
+                  item.iconColor
+                    ? item.iconColor(colors)
+                    : item.type === "danger"
+                      ? colors.error.accent
+                      : colors.primary.icon
                 }
                 iconFamily={item.iconFamily}
                 name={item.icon}

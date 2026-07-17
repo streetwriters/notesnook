@@ -5143,6 +5143,10 @@ msgstr ""
 msgid "Open link"
 msgstr ""
 
+#: src/strings.ts:3021
+msgid "Open location"
+msgstr ""
+
 #: src/strings.ts:1914
 msgid "Open note"
 msgstr ""
@@ -8043,6 +8047,10 @@ msgstr ""
 
 #: src/strings.ts:2790
 msgid "Value must be between {min} and {max}"
+msgstr ""
+
+#: src/strings.ts:3020
+msgid "Value must be greater than {value}"
 msgstr ""
 
 #: src/strings.ts:1217

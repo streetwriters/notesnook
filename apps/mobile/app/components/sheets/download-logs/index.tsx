@@ -326,7 +326,7 @@ function DownloadLogs({ close }: DownloadLogsProps) {
                 }}
               />
               <Button
-                title={strings.openFileLocation()}
+                title={strings.openLocation()}
                 type="plain-outline"
                 style={{ flex: 1, borderRadius: Radius.S }}
                 onPress={async () => {
