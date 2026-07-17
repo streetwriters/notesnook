@@ -52,7 +52,8 @@ export const helpSupportGroup: SettingSection = {
         ToastManager.show({
           heading: strings.emailCopied(),
           type: "success",
-          icon: "content-copy"
+          icon: "copy",
+          iconFamily: "notesnook"
         });
         setTimeout(() => {
           Linking.openURL("mailto:support@streetwriters.co");
