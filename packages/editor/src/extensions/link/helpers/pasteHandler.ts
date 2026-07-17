@@ -21,30 +21,77 @@ import { Editor } from "@tiptap/core";
 import { MarkType } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { find } from "linkifyjs";
+import { linkRegex } from "../link";
+
+function linkifyHtml(text: string): string {
+  const links = find(text).filter((i) => i.isLink);
+  let out = "";
+  let lastIndex = 0;
+  links.forEach((link) => {
+    out += text.slice(lastIndex, link.start);
+    out += `<a href="${link.href}" target="_blank" rel="noopener noreferrer nofollow">${link.value}</a>`;
+    lastIndex = link.end;
+  });
+  out += text.slice(lastIndex);
+  return out;
+}
 
 type PasteHandlerOptions = {
   editor: Editor;
   type: MarkType;
+  linkOnPaste: boolean;
 };
 
 export function pasteHandler(options: PasteHandlerOptions): Plugin {
+  let shiftKey = false;
   return new Plugin({
     key: new PluginKey("handlePasteLink"),
     props: {
+      handleKeyDown(_, event) {
+        shiftKey = event.shiftKey;
+        return false;
+      },
       handlePaste: (view, event, slice) => {
+        if (!options.linkOnPaste) {
+          return false;
+        }
+
+        const clipboardHtmlData = event.clipboardData?.getData("text/html");
+        if (clipboardHtmlData) {
+          return false;
+        }
+
         const { state } = view;
         const { selection } = state;
         const { empty } = selection;
-
-        if (empty) {
-          return false;
-        }
 
         let textContent = "";
 
         slice.content.forEach((node) => {
           textContent += node.textContent;
         });
+
+        // don't deal with markdown links in this handler
+        if (linkRegex.test(textContent)) {
+          // reset the regex since we don't want the above test method to affect other places where the regex is used
+          linkRegex.lastIndex = 0;
+          return false;
+        }
+
+        if (shiftKey) {
+          shiftKey = false;
+          return false;
+        }
+
+        if (empty) {
+          const clipboardPlainData = event.clipboardData?.getData("text/plain");
+          if (clipboardPlainData) {
+            const html = linkifyHtml(clipboardPlainData);
+            options.editor.commands.insertContent(html);
+            return true;
+          }
+          return false;
+        }
 
         const link = find(textContent).find(
           (item) => item.isLink && item.value === textContent
