@@ -5167,6 +5167,10 @@ msgstr "Open issue"
 msgid "Open link"
 msgstr "Open link"
 
+#: src/strings.ts:3021
+msgid "Open location"
+msgstr "Open location"
+
 #: src/strings.ts:1914
 msgid "Open note"
 msgstr "Open note"
@@ -8096,6 +8100,10 @@ msgstr "v{version} available"
 #: src/strings.ts:2790
 msgid "Value must be between {min} and {max}"
 msgstr "Value must be between {min} and {max}"
+
+#: src/strings.ts:3020
+msgid "Value must be greater than {value}"
+msgstr "Value must be greater than {value}"
 
 #: src/strings.ts:1217
 msgid "Vault"

@@ -290,7 +290,7 @@ export const Update = ({ version: appVersion }: UpdateProps) => {
               });
             }}
           >
-            {strings.readReleaseNotes[1]()}
+            {strings.readReleaseNotes[1]()}{" "}
             <Paragraph
               color={colors.primary.accent}
               fontFamily="MEDIUM"

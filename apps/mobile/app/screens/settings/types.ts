@@ -22,6 +22,7 @@ import { Settings } from "../../stores/use-setting-store";
 import { FeatureId } from "@notesnook/common";
 import { IconProps } from "../../components/ui/AppIcon";
 import { FieldValidator } from "../../components/ui/input/form-input";
+import { VariantsWithStaticColors } from "../../../../../packages/theme/dist/types";
 
 export type SettingSection = {
   id: string;
@@ -40,6 +41,7 @@ export type SettingSection = {
   icon?: string;
   iconFamily?: IconProps["iconFamily"];
   iconSize?: number;
+  iconColor?: (colors: VariantsWithStaticColors<true>) => string;
   property?: keyof Settings;
   sections?: SettingSection[];
   component?: string;

@@ -3019,5 +3019,8 @@ Continue without attachments?`,
   changeCreatedDateDesc: () =>
     t`Select date and time to change the created date`,
   codeCopied: () => t`Code copied`,
-  enterVaultPassword: () => t`Enter vault password`
+  enterVaultPassword: () => t`Enter vault password`,
+  valueMustBeGreaterThan: (value: string) =>
+    t`Value must be greater than ${value}`,
+  openLocation: () => t`Open location`
 };
