@@ -54,6 +54,7 @@ import {
   useUnresolvedItem
 } from "@notesnook/common";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { ListItemWrapper } from "../list-container/list-profiles";
 import { VirtualizedList } from "../virtualized-list";
@@ -117,6 +118,7 @@ type EditorPropertiesProps = {
 };
 function EditorProperties(props: EditorPropertiesProps) {
   const toggleProperties = useEditorStore((store) => store.toggleProperties);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
   useSpellChecker((store) => store.enabled);
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const timeFormat = useSettingStore((store) => store.timeFormat);
