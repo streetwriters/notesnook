@@ -535,23 +535,32 @@ function normalizeSizes(
     return size;
   });
 
-  // Handle panes with undefined initial sizes
+  // Handle panes with undefined initial sizes (auto-sized, like the editor)
   if (count > 0) {
-    const average = Math.max(0, (wrapSize - curSum) / count);
+    const available = Math.max(0, wrapSize - curSum);
+    // Clamp the auto pane to a minimum of 200px so the editor stays usable
+    const average = Math.max(200, available / count);
     return res.map((size, index) => {
       const initialSize = panes[index].initialSize;
       return initialSize === Infinity ? average : size;
     });
   }
 
-  // Handle overflow: scale all panes proportionally to fit
+  // Handle overflow: scale all panes proportionally to fit, but respect min/max
   if (curSum > 0 && Math.abs(curSum - wrapSize) > 0.1) {
     const scale = wrapSize / curSum;
-    return res.map((size, index) => {
+    const scaled = res.map((size, index) => {
       const min = panes[index].min;
       const max = panes[index].max;
       return Math.min(max, Math.max(min, size * scale));
     });
+    // After clamping, redistribute any rounding difference to the last pane
+    // so the total always matches wrapSize exactly.
+    const totalClamped = scaled.reduce((a, b) => a + b, 0);
+    if (Math.abs(totalClamped - wrapSize) > 0.1 && scaled.length > 1) {
+      scaled[scaled.length - 1] += wrapSize - totalClamped;
+    }
+    return scaled;
   }
 
   return res;
