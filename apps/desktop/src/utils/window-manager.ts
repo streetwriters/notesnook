@@ -487,6 +487,22 @@ export class WindowManager {
     }
     return { handled: false };
   }
+
+  /**
+   * Broadcast an IPC event to all windows except the one that originated it.
+   * Used for cross-window notifications (e.g. note content changes).
+   */
+  broadcastToWindows(
+    channel: string,
+    payload: unknown,
+    excludeWindowId?: number
+  ) {
+    for (const window of this.windows) {
+      if (window.isDestroyed()) continue;
+      if (excludeWindowId && window.id === excludeWindowId) continue;
+      window.webContents.send(channel, payload);
+    }
+  }
 }
 
 export const windowManager = new WindowManager();

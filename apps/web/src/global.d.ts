@@ -81,6 +81,10 @@ declare global {
         path: string
       ): Promise<WritableStreamDefaultWriter<any>>;
     };
+    appEvents: {
+      onExternalDrop: (callback: (payload: any) => void) => () => void;
+      onNoteChanged: (callback: (payload: { noteId: string }) => void) => () => void;
+    };
     // Notesnook defines
     isPro: boolean;
   }

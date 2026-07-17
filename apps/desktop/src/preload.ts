@@ -62,6 +62,11 @@ const appEvents = {
     const subscription = (_event: any, args: any) => callback(args);
     ipcRenderer.on("app:external-drop", subscription);
     return () => ipcRenderer.removeListener("app:external-drop", subscription);
+  },
+  onNoteChanged: (callback: (payload: { noteId: string }) => void) => {
+    const subscription = (_event: any, args: { noteId: string }) => callback(args);
+    ipcRenderer.on("app:note-changed", subscription);
+    return () => ipcRenderer.removeListener("app:note-changed", subscription);
   }
 };
 

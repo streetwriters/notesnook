@@ -22,9 +22,7 @@ import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
 import { EVENTS } from "@notesnook/core";
-import { useEditorStore as editorStore } from "../../stores/editor-store";
 import { db } from "../db";
-import { debounce } from "@notesnook/common";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { store as settingStore } from "../../stores/setting-store";
@@ -77,47 +75,36 @@ function attachListeners() {
     checkForUpdate(settingStore.get().autoUpdates);
   });
 
-  // Debounced handler to listen for database changes from the main process.
-  // This ensures the UI stays in sync when changes happen outside the current window (e.g., sync, other windows).
-  const handleDbChange = debounce(async () => {
-    // This is required because we don't know what changed
-    // and we want to make sure we show the latest data
-    await db.notes.buildCache();
-
-    AppEventManager.publish(EVENTS.appRefreshRequested);
-
-    // Check if active editor needs update
-    const session = editorStore.getState().getActiveSession();
-    if (session && "note" in session && session.note.id) {
+  // Cross-window content sync: when another window saves a note, this
+  // listener fires and we reload the note + content from the shared
+  // SQLite DB and publish syncItemMerged so any open editors update.
+  if (window.appEvents?.onNoteChanged) {
+    window.appEvents.onNoteChanged(async ({ noteId }: { noteId: string }) => {
       try {
-        const note = await db.notes.note(session.note.id);
-        if (
-          note &&
-          note.contentId &&
-          note.dateModified > session.note.dateModified
-        ) {
-          console.log(
-            "External change detected for current note, reloading...",
-            note.id
-          );
-          const content = await db.content.get(note.contentId);
-          if (content) {
-            db.eventManager.publish(EVENTS.syncItemMerged, {
-              ...content,
-              type: "tiptap",
-              noteId: note.id
-            });
-            db.eventManager.publish(EVENTS.syncItemMerged, {
-              ...note,
-              type: "note"
-            });
-          }
+        const note = await db.notes.note(noteId);
+        if (!note || !note.contentId) return;
+
+        // Refresh the notes cache so the list shows the updated title/date
+        await db.notes.buildCache();
+        AppEventManager.publish(EVENTS.appRefreshRequested);
+
+        const content = await db.content.get(note.contentId);
+        if (content) {
+          db.eventManager.publish(EVENTS.syncItemMerged, {
+            ...content,
+            type: "tiptap",
+            noteId: note.id
+          });
+          db.eventManager.publish(EVENTS.syncItemMerged, {
+            ...note,
+            type: "note"
+          });
         }
       } catch (error) {
-        console.error("Failed to sync external change:", error);
+        console.error("Failed to sync cross-window note change:", error);
       }
-    }
-  }, 500);
+    });
+  }
 }
 
 function attachListener(event: string) {

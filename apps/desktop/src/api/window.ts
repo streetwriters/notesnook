@@ -130,5 +130,13 @@ export const windowRouter = t.router({
     )
     .mutation(({ input, ctx }) => {
       return windowManager.handleExternalDrop(input, ctx.window.id);
+    }),
+  // Broadcast a note change to all other windows so they can sync content.
+  // Called when a note is saved in one window; other windows with the same
+  // note open will reload the content from the shared SQLite DB.
+  notifyNoteChanged: t.procedure
+    .input(z.object({ noteId: z.string() }))
+    .mutation(({ input, ctx }) => {
+      windowManager.broadcastToWindows("app:note-changed", input, ctx.window.id);
     })
 });
