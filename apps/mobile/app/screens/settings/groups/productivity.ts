@@ -87,7 +87,14 @@ export const productivityGroup: SettingSection = {
               iconFamily: "notesnook",
               name: strings.defaultSnoozeTime(),
               description: strings.defaultSnoozeTimeDesc(),
-              validators: [validators.number()],
+              validators: [
+                validators.number(),
+                validators.custom((value) => {
+                  return value < 5
+                    ? strings.valueMustBeGreaterThan("5")
+                    : undefined;
+                })
+              ],
               inputProperties: {
                 keyboardType: "decimal-pad",
                 defaultValue: 5 + "",

@@ -166,19 +166,11 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
           style={{
             justifyContent: "center",
             alignItems: "center",
-            gap: Spacing.LEVEL_2,
-            paddingVertical: Spacing.LEVEL_3
+            gap: Spacing.LEVEL_0
           }}
         >
           <Heading>{responseInfo?.title}</Heading>
-          <Paragraph
-            style={{
-              textAlign: "center"
-            }}
-            selectable={true}
-          >
-            {responseInfo?.message}
-          </Paragraph>
+          <Paragraph selectable={true}>{responseInfo?.message}</Paragraph>
 
           <Button
             title={responseInfo?.positiveButtonText || strings.done()}
@@ -187,6 +179,9 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
                 Linking.openURL(responseInfo?.url);
               }
               eSendEvent(eCloseSheet);
+            }}
+            style={{
+              marginTop: Spacing.LEVEL_2
             }}
             type="accent"
             width="100%"

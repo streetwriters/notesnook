@@ -510,8 +510,9 @@ export const SetupInboxKeys = () => {
                 {createdKey}
               </Paragraph>
               <IconButton
-                name={copied ? "check" : "content-copy"}
-                size={AppFontSize.md}
+                name={copied ? "check" : "copy"}
+                iconFamily="notesnook"
+                size={14}
                 color={colors.primary.icon}
                 onPress={handleCopyKey}
               />
@@ -913,6 +914,7 @@ const InboxKeysList = () => {
                 paddingHorizontal: Spacing.LEVEL_2,
                 paddingVertical: Spacing.LEVEL_1
               }}
+              fontSize={AppFontSize.sm}
               onPress={() => {
                 if (apiKeys.length >= 10) {
                   presentDialog({
@@ -974,24 +976,35 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
       paragraph: strings.enterPasswordToViewApiKey(),
       positiveText: strings.authenticate(),
       negativeText: strings.cancel(),
-      input: true,
       secureTextEntry: true,
-      inputPlaceholder: strings.accountPassword(),
-      positivePress: async (value) => {
-        try {
-          const verified = await db.user.verifyPassword(value);
-          if (!verified) {
-            ToastManager.show({
-              message: strings.invalidPassword(),
-              type: "error"
-            });
+      form: {
+        formRef: createFormRef({
+          password: ""
+        }),
+        items: [
+          {
+            name: "password",
+            placeholder: strings.accountPassword(),
+            ref: React.createRef(),
+            validators: [validators.required(strings.passwordRequired())]
+          }
+        ],
+        onFormSubmit: async (form) => {
+          try {
+            if (!form.validate()) return false;
+            const verified = await db.user.verifyPassword(
+              form.getValue("password")
+            );
+            if (!verified) {
+              form.setError("password", strings.invalidPassword());
+              return false;
+            }
+            setViewing(true);
+            return true;
+          } catch (error) {
+            form.setError("password", (error as Error).message);
             return false;
           }
-          setViewing(true);
-          return true;
-        } catch (error) {
-          ToastManager.error(error as Error);
-          return false;
         }
       }
     });
@@ -1186,16 +1199,18 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
                 {secondsLeft}s
               </Paragraph>
               <IconButton
-                name={copied ? "check" : "content-copy"}
-                size={AppFontSize.md}
+                name={copied ? "check" : "copy"}
+                iconFamily="notesnook"
+                size={16}
                 color={colors.primary.icon}
                 onPress={() => copyToClipboard()}
               />
             </View>
           ) : (
             <IconButton
-              name="eye-off-outline"
-              size={AppFontSize.md}
+              name="eye-open"
+              iconFamily="notesnook"
+              size={16}
               color={colors.primary.icon}
               onPress={() => viewKey()}
             />
@@ -1215,7 +1230,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           <AppIcon
             name="trash"
             iconFamily="notesnook"
-            size={AppFontSize.md}
+            size={16}
             color={colors.error.icon}
           />
         </Pressable>

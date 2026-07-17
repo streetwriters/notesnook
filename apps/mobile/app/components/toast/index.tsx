@@ -312,7 +312,7 @@ export const Toast = ({
         >
           <AppIcon
             name={toastOptions.icon || variant.icon.name}
-            iconFamily={toastOptions.icon ? "material" : variant.icon.family}
+            iconFamily={toastOptions.iconFamily || variant.icon.family}
             size={16}
             color={variant.accent}
           />

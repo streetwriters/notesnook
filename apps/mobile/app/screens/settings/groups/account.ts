@@ -743,7 +743,8 @@ export const accountGroup: SettingSection = {
     {
       id: "inbox-api",
       name: strings.inboxAPI(),
-      icon: "inbox",
+      icon: "file-cloud",
+      iconFamily: "notesnook",
       type: "screen",
       description: strings.inboxAPIDesc(),
       sections: [
@@ -854,6 +855,7 @@ export const accountGroup: SettingSection = {
               component: "failed-inbox-items",
               icon: "warning-circle",
               iconFamily: "notesnook",
+              iconColor: (colors) => colors.static.red,
               hideHeader: true
             }
           ]
