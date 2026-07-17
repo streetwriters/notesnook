@@ -77,7 +77,7 @@ async function initializeDatabase(persistence: DatabasePersistence) {
           multiTab
         }),
       ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
-        ? { journalMode: "WAL", lockingMode: "exclusive" }
+        ? { journalMode: "WAL", lockingMode: "normal" }
         : {
             journalMode: "MEMORY",
             lockingMode: "normal"
