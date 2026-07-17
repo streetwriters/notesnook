@@ -16,21 +16,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { useTimeAgo } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { useNetInfo } from "@react-native-community/netinfo";
 import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming
+} from "react-native-reanimated";
 import Sync from "../../services/sync";
 import { SyncStatus, useUserStore } from "../../stores/use-user-store";
 import { AppFontSize } from "../../utils/size";
-import { IconButton } from "../ui/icon-button";
 import NativeTooltip from "../../utils/tooltip";
 import AppIcon from "../ui/AppIcon";
+import { IconButton } from "../ui/icon-button";
 
 const SyncStatusButton = () => {
   const { colors } = useThemeColors();
-
   const [user, syncing, lastSyncStatus, lastSynced] = useUserStore((state) => [
     state.user,
     state.syncing,
@@ -44,11 +52,39 @@ const SyncStatusButton = () => {
 
   const isFailed = lastSyncStatus === SyncStatus.Failed;
   const isSynced = lastSyncStatus === SyncStatus.Passed;
+  const lastSyncedTimeAgo = useTimeAgo(lastSynced, {
+    interval: 5000,
+    live: true
+  });
 
   const getIconColor = (): string => {
+    if (syncing) return colors.primary.accent;
     if (isSynced) return colors.primary.accent;
     return colors.secondary.icon;
   };
+
+  const rotation = useSharedValue(0);
+
+  React.useEffect(() => {
+    if (syncing && !isOffline) {
+      rotation.value = 0;
+      rotation.value = withRepeat(
+        withTiming(360, { duration: 1000, easing: Easing.linear }),
+        -1,
+        false
+      );
+    } else {
+      cancelAnimation(rotation);
+      rotation.value = withTiming(360, {
+        duration: 1000 * (1 - (rotation.value % 360) / 360),
+        easing: Easing.linear
+      });
+    }
+  }, [syncing, rotation, isOffline]);
+
+  const rotationStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }]
+  }));
 
   const tooltipText = React.useMemo(() => {
     const offlineSuffix = isOffline ? ` (${strings.offline()})` : "";
@@ -56,8 +92,8 @@ const SyncStatusButton = () => {
     if (syncing) return strings.syncing();
     if (!hasSyncedBefore) return `${strings.never()}${offlineSuffix}`;
     if (isFailed) return `${strings.syncFailed()}${offlineSuffix}`;
-    return `${strings.synced()}${offlineSuffix}`;
-  }, [syncing, hasSyncedBefore, isFailed, isOffline]);
+    return `${strings.synced()} • ${lastSyncedTimeAgo}${offlineSuffix ? ` • ${offlineSuffix}` : ""}`;
+  }, [isOffline, syncing, hasSyncedBefore, isFailed, lastSyncedTimeAgo]);
 
   const onPress = () => {
     if (syncing) return;
@@ -86,10 +122,9 @@ const SyncStatusButton = () => {
             alignItems: "center"
           }}
         >
-          <ActivityIndicator
-            size={AppFontSize.sm}
-            color={colors.primary.accent}
-          />
+          <Animated.View style={rotationStyle}>
+            <AppIcon name="sync" size={AppFontSize.lg} color={getIconColor()} />
+          </Animated.View>
         </View>
       ) : (
         <IconButton
