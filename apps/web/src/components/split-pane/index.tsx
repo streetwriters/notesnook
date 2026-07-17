@@ -206,7 +206,8 @@ export const SplitPane = React.forwardRef<
     if (wrapSize.current === 0) return;
     updatePaneLimitSizes(children);
     setSizes(paneSizes.current, wrapSize.current, true);
-  }, [children, childrenLength]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [childrenLength]);
 
   const lastNotifiedSizes = useRef<number[]>([]);
 
