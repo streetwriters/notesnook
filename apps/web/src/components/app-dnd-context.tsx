@@ -254,15 +254,17 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
                       x: screenCoords.x,
                       y: screenCoords.y,
                       type: "tab",
-                      id: "new" // Special case for new note? Or just let it tear out?
+                      id: "new"
                    });
-                   // If dropped externally on another window, we probably want to create a new note THERE?
-                   // detailed logic: if dropped on another window, maybe we should just "move" the clean new tab?
-                   // For now, let's keep it simple: New tabs only tear out to new windows or stay put.
                    if (result?.handled) {
                       useEditorStore.getState().closeTabs(activeId);
                       return;
                    }
+                }
+                // No existing window handled — create a new window with a new note
+                if (desktop) {
+                   desktop.window.open.mutate({ create: true });
+                   useEditorStore.getState().closeTabs(activeId);
                 }
              });
              return;
@@ -286,8 +288,10 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
              }
           }
 
-          if (type === "tab") {
-             const tab = tabs.find((t) => t && t.id === activeId);
+          // No existing window handled the drop — create a new window
+          if (desktop) {
+            desktop.window.open.mutate({ noteId });
+            if (type === "tab") useEditorStore.getState().closeTabs(activeId);
           }
        });
     }
