@@ -136,6 +136,7 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
+    id?: string;
   } & {
     placeholder: string;
   };
@@ -163,6 +164,7 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
+    id,
     ...restOptions
   } = options;
 
@@ -199,7 +201,8 @@ const useTiptap = (
         ...CoreExtensions,
         SearchReplace.configure({
           onStartSearch: (term, isReplacing) => {
-            useEditorSearchStore.setState({
+            if (!id) return false;
+            useEditorSearchStore.getState().setSearchState(id, {
               isSearching: true,
               searchTerm: term,
               focusNonce: Math.random(),
@@ -208,7 +211,10 @@ const useTiptap = (
             return true;
           },
           onEndSearch: () => {
-            useEditorSearchStore.setState({ isSearching: false });
+            if (!id) return false;
+            useEditorSearchStore.getState().setSearchState(id, {
+              isSearching: false
+            });
             return true;
           }
         }),

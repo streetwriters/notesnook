@@ -48,6 +48,8 @@ import { getFontSizes } from "@notesnook/theme/theme/font/fontsize.js";
 import { useWindowControls } from "./hooks/use-window-controls";
 import { STATUS_BAR_HEIGHT } from "./common/constants";
 import { NavigationEvents } from "./navigation";
+// [CHANGE]: New import for Drag and Drop context
+import { AppDnDContext } from "./components/app-dnd-context";
 
 new WebExtensionRelay();
 
@@ -87,7 +89,8 @@ function App() {
             .mobile-nav-pane .theme-scope-navigationMenu {
               padding-top: env(titlebar-area-height) !important;
             }
-            .editor-pane:first-of-type .editor-action-bar,
+            #editor-panel > div:first-of-type > .editor-action-bar,
+            .app-focus-mode #editor-panel > .react-split:first-of-type .react-split__pane:first-of-type > div > .editor-action-bar,
             .mobile-editor-pane.pane-active .editor-action-bar,
             .mobile-list-pane.pane-active .route-container-header {
                 padding-left: 80px;
@@ -115,6 +118,7 @@ function App() {
       </Suspense>
       <AppEffects />
 
+      <AppDnDContext>
       <Flex
         id="app"
         bg="background"
@@ -131,6 +135,7 @@ function App() {
           containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
         />
       </Flex>
+      </AppDnDContext>
     </>
   );
 }
@@ -189,19 +194,19 @@ function DesktopAppContents() {
         sx={{
           overflow: "hidden"
         }}
-      >
-        <SplitPane
-          className="global-split-pane"
-          ref={navPane}
-          autoSaveId="global-panel-group"
-          direction="vertical"
-          onChange={(sizes) => {
-            useStore.setState({
-              isNavPaneCollapsed: sizes[0] <= 70,
-              isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
-            });
-          }}
         >
+          <SplitPane
+            className="global-split-pane"
+            ref={navPane}
+            autoSaveId="global-panel-group"
+            direction="vertical"
+            onChange={(sizes) => {
+              useStore.setState({
+                isNavPaneCollapsed: sizes[0] <= 70,
+                isListPaneVisible: sizes[1] > 5 // we keep a 5px margin just to be safe
+              });
+            }}
+          >
           {isFocusMode ? null : (
             <Pane
               id="nav-pane"
@@ -258,7 +263,7 @@ function DesktopAppContents() {
           >
             {<HashRouter />}
           </Pane>
-        </SplitPane>
+          </SplitPane>
       </Flex>
       <StatusBar />
     </>

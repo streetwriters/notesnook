@@ -1659,7 +1659,7 @@ msgstr "Clear data & reset account"
 msgid "Clear default notebook"
 msgstr "Clear default notebook"
 
-#: src/strings.ts:2800
+#: src/strings.ts:2803
 msgid "Clear history"
 msgstr "Clear history"
 
@@ -2311,7 +2311,7 @@ msgstr "Delete account"
 msgid "Delete all"
 msgstr "Delete all"
 
-#: src/strings.ts:2802
+#: src/strings.ts:2805
 msgid "Delete all version history for this note?"
 msgstr "Delete all version history for this note?"
 
@@ -4217,6 +4217,10 @@ msgstr "Meetings"
 #: src/strings.ts:1781
 msgid "Member since {date}"
 msgstr "Member since {date}"
+
+#: src/strings.ts:2812
+msgid "Menu"
+msgstr "Menu"
 
 #: src/strings.ts:2307
 msgid "Merge cells"
@@ -6525,6 +6529,14 @@ msgstr "Spell check"
 msgid "Split cells"
 msgstr "Split cells"
 
+#: src/strings.ts:2811
+msgid "Split down"
+msgstr "Split down"
+
+#: src/strings.ts:2810
+msgid "Split right"
+msgstr "Split right"
+
 #: src/strings.ts:2472
 msgid "Stable"
 msgstr "Stable"
@@ -7553,7 +7565,7 @@ msgstr "Verifying your email"
 msgid "Version"
 msgstr "Version"
 
-#: src/strings.ts:2801
+#: src/strings.ts:2804
 msgid "Version history cleared"
 msgstr "Version history cleared"
 

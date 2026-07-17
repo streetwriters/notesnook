@@ -17,10 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createTRPCProxyClient } from "@trpc/client";
+import { CreateTRPCProxyClient, createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
+import { EVENTS } from "@notesnook/core";
+import { useEditorStore as editorStore } from "../../stores/editor-store";
+import { db } from "../db";
+import { debounce } from "@notesnook/common";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { store as settingStore } from "../../stores/setting-store";
@@ -72,6 +76,48 @@ function attachListeners() {
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate(settingStore.get().autoUpdates);
   });
+
+  // Debounced handler to listen for database changes from the main process.
+  // This ensures the UI stays in sync when changes happen outside the current window (e.g., sync, other windows).
+  const handleDbChange = debounce(async () => {
+    // This is required because we don't know what changed
+    // and we want to make sure we show the latest data
+    await db.notes.buildCache();
+
+    AppEventManager.publish(EVENTS.appRefreshRequested);
+
+    // Check if active editor needs update
+    const session = editorStore.getState().getActiveSession();
+    if (session && "note" in session && session.note.id) {
+      try {
+        const note = await db.notes.note(session.note.id);
+        if (
+          note &&
+          note.contentId &&
+          note.dateModified > session.note.dateModified
+        ) {
+          console.log(
+            "External change detected for current note, reloading...",
+            note.id
+          );
+          const content = await db.content.get(note.contentId);
+          if (content) {
+            db.eventManager.publish(EVENTS.syncItemMerged, {
+              ...content,
+              type: "tiptap",
+              noteId: note.id
+            });
+            db.eventManager.publish(EVENTS.syncItemMerged, {
+              ...note,
+              type: "note"
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to sync external change:", error);
+      }
+    }
+  }, 500);
 }
 
 function attachListener(event: string) {
@@ -84,19 +130,14 @@ function attachListener(event: string) {
 }
 
 export async function createWritableStream(path: string) {
-  const id = await desktop.backups.open.mutate({ filename: path });
-  return new WritableStream<Uint8Array>({
-    write(chunk) {
-      return desktop.backups.write.mutate({
-        id,
-        chunk: Buffer.from(chunk).toString("base64")
-      });
-    },
-    close() {
-      return desktop.backups.close.mutate({ id });
-    },
-    abort() {
-      return desktop.backups.close.mutate({ id });
-    }
-  });
+  try {
+    const resolvedPath = await desktop.integration.resolvePath.query({
+      filePath: path
+    });
+    if (!resolvedPath) throw new Error("invalid path.");
+    return await window.electronFS.createWritableStream(resolvedPath);
+  } catch (ex) {
+    console.error(ex);
+    if (ex instanceof Error) showToast("error", ex.message);
+  }
 }

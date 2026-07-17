@@ -16,14 +16,36 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+/*
+ABOUTME: Switched from direct `globalThis` assignment to `contextBridge.exposeInMainWorld`
+to support Electron's Context Isolation (security best practice), which is enabled in `window-manager.ts`.
+
+- Added `electronFS` for secure file writing capability from renderer.
+- Added `appEvents` for handling external file drops.
+*/
+
 /* eslint-disable no-var */
 
 import { ELECTRON_TRPC_CHANNEL } from "electron-trpc/main";
 import { ipcRenderer, contextBridge } from "electron";
+import { createWriteStream, mkdirSync } from "fs";
+import { dirname } from "path";
+import { Writable } from "stream";
 
 declare global {
   var os: () => "mas" | typeof process.platform;
   var electronTRPC: any;
+
+  // file system stream writer for renderer to support secure file writes
+  var electronFS: {
+    createWritableStream: (path: string) => Promise<WritableStream<any>>;
+  };
+
+  // listener for external file drops to support drag-and-drop features
+  var appEvents: {
+    onExternalDrop: (callback: (payload: any) => void) => void;
+  };
 }
 
 const electronTRPC = {
@@ -35,5 +57,24 @@ const electronTRPC = {
 
 const os = () => (MAC_APP_STORE ? "mas" : process.platform);
 
+const appEvents = {
+  onExternalDrop: (callback: (payload: any) => void) => {
+    const subscription = (_event: any, args: any) => callback(args);
+    ipcRenderer.on("app:external-drop", subscription);
+    return () => ipcRenderer.removeListener("app:external-drop", subscription);
+  }
+};
+
+const electronFS = {
+  createWritableStream: async (path: string) => {
+    mkdirSync(dirname(path), { recursive: true });
+    return new WritableStream(
+      Writable.toWeb(createWriteStream(path, { encoding: "utf-8" })).getWriter()
+    );
+  }
+};
+
 contextBridge.exposeInMainWorld("electronTRPC", electronTRPC);
 contextBridge.exposeInMainWorld("os", os);
+contextBridge.exposeInMainWorld("appEvents", appEvents);
+contextBridge.exposeInMainWorld("electronFS", electronFS);
