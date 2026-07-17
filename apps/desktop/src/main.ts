@@ -52,7 +52,7 @@ locale.then(({ default: locale }) => {
   });
   i18n.activate("en");
 });
-setI18nGlobal(i18n);
+setI18nGlobal(i18n as unknown as Parameters<typeof setI18nGlobal>[0]);
 
 const appHostnames = isDevelopment()
   ? ["localhost", "127.0.0.1"]
