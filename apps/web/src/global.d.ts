@@ -76,12 +76,5 @@ declare global {
     ReactNativeWebView?: {
       postMessage(message: string): void;
     };
-    electronFS: {
-      createWritableStream(
-        path: string
-      ): Promise<WritableStreamDefaultWriter<any>>;
-    };
-    // Notesnook defines
-    isPro: boolean;
   }
 }

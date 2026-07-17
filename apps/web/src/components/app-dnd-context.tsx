@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -44,36 +44,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
   const [dragType, setDragType] = useState<"tab" | "note" | null>(null);
   const [draggedNote, setDraggedNote] = useState<Note | null>(null);
 
-  const cleanupRef = useRef<(() => void) | undefined>();
-
-  useEffect(() => {
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      const handleExternalDrop = async (event: any, payload: any) => {
-        const { type, id } = payload;
-        if (type === "tab" || type === "note") {
-             const noteId = id.includes("::") ? id.split("::")[1] : id;
-             if (noteId && noteId !== "new") {
-                 useEditorStore.getState().openSession(noteId, { openInNewTab: true });
-             } else if (noteId === "new") {
-                 useEditorStore.getState().newSession();
-             }
-        }
-      };
-
-      import("../common/desktop-bridge").then(({ desktop }) => {
-         if (cleanupRef.current) cleanupRef.current();
-         // @ts-ignore
-         const cleanup = window.appEvents?.onExternalDrop((payload: any) => {
-             handleExternalDrop(null, payload);
-         });
-         cleanupRef.current = cleanup;
-      });
-    }
-    return () => {
-        if (cleanupRef.current) cleanupRef.current();
-    };
-  }, []);
-
   const handleDragStart = async (event: DragStartEvent) => {
     const activeId = event.active.id as string;
     setActiveDragId(activeId);
@@ -99,37 +69,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
             else title = "Untitled";
           }
       }
-    }
-
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      import("../common/desktop-bridge").then(({ desktop }) => {
-        const themeEl = document.querySelector(".theme-scope-base") || document.documentElement;
-        const style = window.getComputedStyle(themeEl);
-
-        const bg =
-          style.getPropertyValue("--background") ||
-          style.backgroundColor;
-
-        const fg =
-          style.getPropertyValue("--paragraph") ||
-          style.color;
-
-        const border =
-          style.getPropertyValue("--border") ||
-          style.borderColor;
-
-        // Ensure we don't end up with transparent colors if variables are missing
-        const finalBg =
-          bg === "transparent" || bg === "rgba(0, 0, 0, 0)" || !bg
-            ? "#ffffff"
-            : bg;
-        const finalFg = fg || "#000000";
-
-        desktop?.window.startDragSession.mutate({
-          title,
-          colors: { bg, fg: finalFg, border }
-        });
-      });
     }
   };
 
@@ -179,37 +118,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
     setDragType(null);
     setDraggedNote(null);
 
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      import("../common/desktop-bridge").then(({ desktop }) => {
-        desktop?.window.endDragSession.mutate();
-      });
-    }
-    
-    // Handle Tear-out (Global for both Tabs and Notes)
-    if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-      const activator = event.activatorEvent as MouseEvent;
-      // MouseEvent might be missing on some sensors, but PointerSensor usually provides it.
-       if (activator && activator.clientX !== undefined) {
-          const { clientX: startX, clientY: startY, screenX: startScreenX, screenY: startScreenY } = activator;
-          const { x: dx, y: dy } = event.delta;
-          const finalX = startX + dx;
-          const finalY = startY + dy;
-          const finalScreenX = startScreenX + dx;
-          const finalScreenY = startScreenY + dy;
-
-          const isOutside = 
-            finalX < 0 ||
-            finalX > window.innerWidth ||
-            finalY < 0 ||
-            finalY > window.innerHeight;
-
-          if (isOutside) {
-            handleTearOut(activeId, dragType, { x: finalScreenX, y: finalScreenY });
-            return;
-          }
-       }
-    }
-
     if (!over) return;
     const overId = over.id as string;
 
@@ -217,79 +125,6 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
        handleTabDragEnd(activeId, overId);
     } else if (dragType === "note") {
        handleNoteDragEnd(activeId, overId);
-    }
-  };
-
-  const handleTearOut = (activeId: string, type: "tab" | "note" | null, screenCoords?: { x: number; y: number }) => {
-    let noteId: string | undefined;
-    
-    const handleInternalDrop = (type: "tab" | "note", id: string, noteId?: string | null) => {
-       import("../common/desktop-bridge").then(async ({ desktop }) => {
-          if (screenCoords && desktop) {
-             const result: any = await desktop.window.checkInternalDrop.mutate({
-                x: screenCoords.x,
-                y: screenCoords.y,
-                type: type,
-                id: noteId || id // Pass noteId if available, otherwise id (which shouldn't happen for tabs now)
-             });
-             if (result?.handled) {
-                if (type === "tab") useEditorStore.getState().closeTabs(activeId);
-                return true;
-             }
-          }
-          return false;
-       });
-    }
-
-    if (type === "tab") {
-       const tab = tabs.find((t) => t && t.id === activeId);
-       if (!tab) return;
-       const session = useEditorStore.getState().getSession(tab.sessionId);
-       if (session && "note" in session) noteId = session.note.id;
-       else if (session && session.type === "new") {
-           // Handle new note
-             import("../common/desktop-bridge").then(async ({ desktop }) => {
-                if (screenCoords && desktop) {
-                   const result: any = await desktop.window.checkInternalDrop.mutate({
-                      x: screenCoords.x,
-                      y: screenCoords.y,
-                      type: "tab",
-                      id: "new" // Special case for new note? Or just let it tear out?
-                   });
-                   // If dropped externally on another window, we probably want to create a new note THERE?
-                   // detailed logic: if dropped on another window, maybe we should just "move" the clean new tab?
-                   // For now, let's keep it simple: New tabs only tear out to new windows or stay put.
-                   if (result?.handled) {
-                      useEditorStore.getState().closeTabs(activeId);
-                      return;
-                   }
-                }
-             });
-             return;
-       }
-    } else if (type === "note") {
-       noteId = activeId.split("::")[1];
-    }
-
-    if (noteId) {
-       import("../common/desktop-bridge").then(async ({ desktop }) => {
-          if (screenCoords && desktop) {
-             const result: any = await desktop.window.checkInternalDrop.mutate({
-                x: screenCoords.x,
-                y: screenCoords.y,
-                type: type || "note",
-                id: noteId!
-             });
-             if (result?.handled) {
-               if (type === "tab") useEditorStore.getState().closeTabs(activeId);
-               return;
-             }
-          }
-
-          if (type === "tab") {
-             const tab = tabs.find((t) => t && t.id === activeId);
-          }
-       });
     }
   };
 
@@ -451,16 +286,9 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={(e) => {
-         // Copy cancellation logic (tear out) here too if needed
          setActiveDragId(null);
          setDragType(null);
          setDraggedNote(null);
-         
-         if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
-            import("../common/desktop-bridge").then(({ desktop }) => {
-              desktop?.window.endDragSession.mutate();
-            });
-         }
       }}
     >
       {children}

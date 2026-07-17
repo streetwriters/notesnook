@@ -11,5 +11,11 @@
     "cache": true,
     "cacheStrategy": "content"
   },
-  "git.rebaseWhenSync": false
+  "git.rebaseWhenSync": false,
+  "chat.tools.terminal.autoApprove": {
+    "git checkout": true,
+    "git rm": true,
+    "npm run build:desktop": true,
+    "git add": true
+  }
 }

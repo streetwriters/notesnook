@@ -157,41 +157,6 @@ export class DragManager {
       this.dragWindow = null;
     }
   }
-
-  /**
-   * Handles drop events that occur outside the source window (external drops).
-   * Determines which window triggers the drop and forwards the event to it.
-   *
-   * @param payload - The drop event data including coordinates and item type.
-   * @param excludeWindowId - The ID of the window where the drag originated (to avoid self-drops if needed).
-   * @returns Object indicating if the drop was handled.
-   */
-  handleExternalDrop(
-    payload: {
-      x: number;
-      y: number;
-      type: "tab" | "note";
-      id: string;
-    },
-    excludeWindowId: number
-  ) {
-    const { x, y } = payload;
-    const window = globalThis.window; // Main window reference
-    if (window && !window.isDestroyed() && window.id !== excludeWindowId) {
-      const bounds = window.getBounds();
-      if (
-        x >= bounds.x &&
-        x <= bounds.x + bounds.width &&
-        y >= bounds.y &&
-        y <= bounds.y + bounds.height
-      ) {
-        // Let's send the event to that window
-        window.webContents.send("app:external-drop", payload);
-        return { handled: true };
-      }
-    }
-    return { handled: false };
-  }
 }
 
 export const dragManager = new DragManager();
