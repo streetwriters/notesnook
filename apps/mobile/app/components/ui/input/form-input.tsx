@@ -213,7 +213,9 @@ export const validators = {
   matchField:
     (fieldName: string, message = "Values do not match") =>
     (value: string, values: FormValues) =>
-      value === values[fieldName] ? undefined : message
+      value === values[fieldName] ? undefined : message,
+  custom: (validator: (value: any) => string | undefined) => (value: any) =>
+    validator(value)
 };
 
 interface FormInputProps extends TextInputProps {
