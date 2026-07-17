@@ -37,6 +37,7 @@ import { eOnLoadNote } from "../utils/events";
 import { strings } from "@notesnook/intl";
 import PaywallSheet from "../components/sheets/paywall";
 import { presentDialog } from "../components/dialog/functions";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -361,25 +362,33 @@ export const RootNavigation = () => {
       rootNavigatorRef.current?.navigate("AddReminder" as any);
       useSettingStore.setState({ pendingShortcut: null });
     } else if (pendingShortcut.type === "notesnook.action.newnote") {
-      rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
-
-      const runNoteLoad = () => {
-        eSendEvent(eOnLoadNote, { newNote: true });
-        editorState().movedAway = false;
-        fluidTabsRef.current?.goToPage("editor", true);
-        useSettingStore.setState({ pendingShortcut: null });
-      };
+      let tabId;
 
       if (fluidTabsRef.current) {
-        runNoteLoad();
+        rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
+        eSendEvent(eOnLoadNote, { newNote: true });
+        editorState().movedAway = false;
+        fluidTabsRef.current.goToPage("editor", true);
       } else {
-        const unsub = useSettingStore.subscribe((state) => {
-          if (state.deviceMode && fluidTabsRef.current) {
-            unsub();
-            runNoteLoad();
+        const currentTab = useTabStore
+          .getState()
+          .getTab(useTabStore.getState().currentTab as string);
+
+        if (useTabStore.getState().tabs.length === 0 || currentTab?.pinned) {
+          tabId = useTabStore.getState().newTab();
+        } else {
+          tabId = useTabStore.getState().currentTab;
+          if (useTabStore.getState().getTab(tabId)?.session?.noteId) {
+            useTabStore.getState().newTabSession(tabId, {});
           }
+        }
+
+        rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
+          initialPage: "editor"
         });
       }
+
+      useSettingStore.setState({ pendingShortcut: null });
     }
   }, [pendingShortcut]);
 
