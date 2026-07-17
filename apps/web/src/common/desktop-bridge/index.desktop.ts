@@ -78,31 +78,42 @@ function attachListeners() {
   // Cross-window content sync: when another window saves a note, this
   // listener fires and we reload the note + content from the shared
   // SQLite DB and publish syncItemMerged so any open editors update.
+  // Per-note debouncing avoids multiple rapid reloads while typing.
+  const syncNoteTimers = new Map<string, NodeJS.Timeout>();
   if (window.appEvents?.onNoteChanged) {
     window.appEvents.onNoteChanged(async ({ noteId }: { noteId: string }) => {
-      try {
-        const note = await db.notes.note(noteId);
-        if (!note || !note.contentId) return;
+      // Debounce per noteId: clear any pending timer and set a new one
+      const existing = syncNoteTimers.get(noteId);
+      if (existing) clearTimeout(existing);
+      syncNoteTimers.set(
+        noteId,
+        setTimeout(async () => {
+          syncNoteTimers.delete(noteId);
+          try {
+            const note = await db.notes.note(noteId);
+            if (!note || !note.contentId) return;
 
-        // Refresh the notes cache so the list shows the updated title/date
-        await db.notes.buildCache();
-        AppEventManager.publish(EVENTS.appRefreshRequested);
+            // Refresh the notes cache so the list shows the updated title/date
+            await db.notes.buildCache();
+            AppEventManager.publish(EVENTS.appRefreshRequested);
 
-        const content = await db.content.get(note.contentId);
-        if (content) {
-          db.eventManager.publish(EVENTS.syncItemMerged, {
-            ...content,
-            type: "tiptap",
-            noteId: note.id
-          });
-          db.eventManager.publish(EVENTS.syncItemMerged, {
-            ...note,
-            type: "note"
-          });
-        }
-      } catch (error) {
-        console.error("Failed to sync cross-window note change:", error);
-      }
+            const content = await db.content.get(note.contentId);
+            if (content) {
+              db.eventManager.publish(EVENTS.syncItemMerged, {
+                ...content,
+                type: "tiptap",
+                noteId: note.id
+              });
+              db.eventManager.publish(EVENTS.syncItemMerged, {
+                ...note,
+                type: "note"
+              });
+            }
+          } catch (error) {
+            console.error("Failed to sync cross-window note change:", error);
+          }
+        }, 300)
+      );
     });
   }
 }

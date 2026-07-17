@@ -1231,6 +1231,15 @@ class EditorStore extends BaseStore<EditorStore> {
           useSettingStore.getState().hideNoteTitle ? undefined : note.title
         );
         this.setSaveState(id, SaveState.Saved);
+
+        // Notify other windows that this note changed so they can sync.
+        // This is called after the save completes (not before) to ensure
+        // the other window reads the latest content from the shared DB.
+        if (IS_DESKTOP_APP && note.id) {
+          import("../common/desktop-bridge").then(({ desktop }) => {
+            desktop?.window.notifyNoteChanged.mutate({ noteId: note.id });
+          });
+        }
       } catch (err) {
         showToast(
           "error",

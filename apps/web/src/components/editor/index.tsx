@@ -562,13 +562,6 @@ function EditorView({
             length: data.length
           });
           deferredSave(session.id, session.id, ignoreEdit, data);
-
-          // Notify other windows that this note changed so they can sync
-          if (noteId && IS_DESKTOP_APP) {
-            import("../../common/desktop-bridge").then(({ desktop }) => {
-              desktop?.window.notifyNoteChanged.mutate({ noteId });
-            });
-          }
         }}
         onFocus={() => {
           useEditorStore.getState().focusTab(session.tabId);
