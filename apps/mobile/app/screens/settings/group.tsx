@@ -80,7 +80,7 @@ const Group = ({
         <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
       )}
 
-      <DelayLayout type="settings">
+      <DelayLayout disabled={route.params.hideHeader} type="settings">
         <View
           style={{
             flex: 1
