@@ -210,7 +210,11 @@ export const Toast = ({ context = "global" }) => {
         >
           <AppIcon
             name={toastOptions.icon || variant.icon.name}
-            iconFamily={toastOptions.iconFamily || variant.icon.family}
+            iconFamily={
+              toastOptions.icon && toastOptions.iconFamily
+                ? toastOptions.iconFamily
+                : variant.icon.family
+            }
             size={16}
             color={variant.accent}
           />

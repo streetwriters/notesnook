@@ -39,6 +39,11 @@ export async function verifyUser(
   closeText?: string
 ) {
   return new Promise((resolve) => {
+    if (!useUserStore.getState().user) {
+      resolve(true);
+      onsuccess?.();
+      return;
+    }
     presentDialog({
       context: context || "global",
       title: strings.verifyItsYou(),
