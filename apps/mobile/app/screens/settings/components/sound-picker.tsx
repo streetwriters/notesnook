@@ -59,7 +59,7 @@ const SoundItem = ({
         height: 60,
         borderBottomWidth: 1,
         borderRadius: 0,
-        borderBottomColor: colors.primary.border,
+        borderBottomColor: colors.primary.separator,
         paddingHorizontal: DefaultAppStyles.GAP
       }}
       onPress={async () => {
@@ -83,7 +83,13 @@ const SoundItem = ({
         }}
       >
         <Icon
-          size={22}
+          size={16}
+          color={
+            selectedSoundId === item.soundID ||
+            (!selectedSoundId && item.soundID === "defaultSound")
+              ? colors.primary.accent
+              : colors.primary.icon
+          }
           name={
             selectedSoundId === item.soundID ||
             (!selectedSoundId && item.soundID === "defaultSound")
@@ -99,7 +105,7 @@ const SoundItem = ({
       {item.soundID === "defaultSound" ? null : (
         <IconButton
           type={isPlaying ? "secondaryAccented" : "plain"}
-          size={22}
+          size={16}
           name={isPlaying ? "pause" : "play"}
           color={isPlaying ? colors.primary.accent : colors.primary.icon}
           onPress={() => {

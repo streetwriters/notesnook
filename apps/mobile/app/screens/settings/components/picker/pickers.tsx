@@ -66,7 +66,7 @@ export const FontPicker = createSettingsPicker<
   },
   getItemKey: (item) => item.id,
   options: getFonts(),
-  compareValue: (current: any, item) => current.id === item.id,
+  compareValue: (current: any, item) => current === item.id,
   isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true
 });

@@ -19,325 +19,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { LegendList } from "@legendapp/list";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
-import { LegacyBackupFile } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import RNFetchBlob, { ReactNativeBlobUtilStat } from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
-import { unzip } from "react-native-zip-archive";
-import { DatabaseLogger, db } from "../../../common/database";
+import { Spacing } from "../../../common/design/spacing";
 import filesystem from "../../../common/filesystem";
-import { deleteCacheFileByName } from "../../../common/filesystem/io";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
-import { presentDialog } from "../../../components/dialog/functions";
-import {
-  endProgress,
-  startProgress,
-  updateProgress
-} from "../../../components/dialogs/progress";
 import { Button } from "../../../components/ui/button";
-import {
-  createFormRef,
-  validators
-} from "../../../components/ui/input/form-input";
+import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { ToastManager } from "../../../services/event-manager";
-import Navigation from "../../../services/navigation";
-import { refreshAllStores } from "../../../stores/create-db-collection-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
-import Heading from "../../../components/ui/typography/heading";
-import { Spacing } from "../../../common/design/spacing";
+import { restoreBackup } from "./restore-progress";
 
-type PasswordOrKey = { password?: string; encryptionKey?: string };
-
-const RESTORE_CANCELLED = new Error("restore-cancelled");
-
-const getPasswordError = (e: unknown): string | undefined => {
-  const message = e instanceof Error ? e.message : "";
-  if (message === "Incorrect password.") return strings.passwordIncorrect();
-  if (message === "Invalid encryption key.")
-    return strings.invalid(strings.encryptionKey());
-  return undefined;
-};
-
-const verifyWithImport =
-  (importBackup: (passwordOrKey: PasswordOrKey) => Promise<unknown>) =>
-  async (passwordOrKey: PasswordOrKey): Promise<string | undefined> => {
-    try {
-      await importBackup(passwordOrKey);
-      return undefined;
-    } catch (e) {
-      const error = getPasswordError(e);
-      if (error) return error;
-      throw e;
-    }
-  };
-
-const withPassword = (
-  verify: (passwordOrKey: PasswordOrKey) => Promise<string | undefined>
-) => {
-  return new Promise<PasswordOrKey>((resolve, reject) => {
-    const formRef = createFormRef({ password: "" });
-    let done = false;
-    presentDialog({
-      context: "local",
-      title: strings.backupEncrypted(),
-      paragraph: strings.backupEnterPassword(),
-      positiveText: strings.restore(),
-      secureTextEntry: true,
-      form: {
-        formRef,
-        items: [
-          {
-            name: "password",
-            placeholder: strings.password(),
-            ref: React.createRef(),
-            validators: [validators.required(strings.passwordNotEntered())]
-          }
-        ],
-        onFormSubmit: async (form, isEncryptionKey) => {
-          if (!form.validate()) return false;
-          const value = form.getValue("password");
-          const passwordOrKey: PasswordOrKey = {
-            encryptionKey: isEncryptionKey ? value : undefined,
-            password: isEncryptionKey ? undefined : value
-          };
-          try {
-            const error = await verify(passwordOrKey);
-            if (error) {
-              form.setError("password", error);
-              return false;
-            }
-          } catch (e) {
-            done = true;
-            reject(e);
-            return true;
-          }
-          done = true;
-          resolve(passwordOrKey);
-          return true;
-        }
-      },
-      onClose: () => {
-        if (done) return;
-        resolve({});
-      },
-      negativeText: strings.cancel(),
-      check: {
-        info: strings.useEncryptionKey(),
-        type: "transparent"
-      }
-    });
-  });
-};
-
-export const restoreBackup = async (options: {
-  uri: string;
-  deleteFile?: boolean;
-}) => {
-  try {
-    if (
-      !options.uri.endsWith(".nnbackup") &&
-      !options.uri.endsWith(".nnbackupz")
-    ) {
-      throw new Error(
-        `Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored.`
-      );
-    }
-
-    const isLegacyBackup = options.uri.endsWith(".nnbackup");
-
-    startProgress({
-      title: strings.restoring(),
-      paragraph: strings.preparingBackupRestore(),
-      icon: "arrows-clockwise",
-      canHideProgress: false
-    });
-
-    let filePath = options.uri;
-    let deleteBackupFile = options.deleteFile;
-
-    if (!isLegacyBackup) {
-      if (Platform.OS === "android") {
-        updateProgress({
-          progress: strings.copyingBackupFileToCache()
-        });
-        const cacheFile = `file://${RNFetchBlob.fs.dirs.CacheDir}/backup.zip`;
-        if (await RNFetchBlob.fs.exists(cacheFile)) {
-          await RNFetchBlob.fs.unlink(cacheFile);
-        }
-
-        await RNFetchBlob.fs.createFile(cacheFile, "", "utf8");
-        if (filePath.startsWith("content://")) {
-          await copyFileAsync(filePath, cacheFile);
-        } else {
-          await RNFetchBlob.fs.cp(filePath, cacheFile);
-        }
-        filePath = cacheFile;
-        deleteBackupFile = true;
-      }
-
-      const zipOutputFolder = `${cacheDir}/backup_extracted`;
-      if (await RNFetchBlob.fs.exists(zipOutputFolder)) {
-        await RNFetchBlob.fs.unlink(zipOutputFolder);
-        await RNFetchBlob.fs.mkdir(zipOutputFolder);
-      }
-      updateProgress({
-        progress: strings.extractingFiles()
-      });
-      await unzip(filePath, zipOutputFolder);
-
-      const extractedBackupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
-
-      const extractedAttachments = extractedBackupFiles.includes("attachments")
-        ? await RNFetchBlob.fs.ls(`${zipOutputFolder}/attachments`)
-        : [];
-
-      const attachmentsKeyPath: any = extractedAttachments?.find(
-        (path) => path === ".attachments_key"
-      );
-      const attachmentsKey = attachmentsKeyPath
-        ? await JSON.parse(
-            await RNFetchBlob.fs.readFile(
-              `${zipOutputFolder}/attachments/${attachmentsKeyPath}`,
-              "utf8"
-            )
-          )
-        : undefined;
-
-      let count = 0;
-      await db.transaction(async () => {
-        let passwordOrKey: PasswordOrKey | undefined = undefined;
-        for (const path of extractedBackupFiles) {
-          if (path === ".nnbackup" || path === "attachments") continue;
-
-          updateProgress({
-            progress: `${strings.restoringBackup()} (${count++}/${
-              extractedBackupFiles.length
-            })`
-          });
-
-          const filePath = `${zipOutputFolder}/${path}`;
-          const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
-          const backup = JSON.parse(data);
-
-          const isEncryptedBackup = backup.encrypted;
-
-          const importBackup = (passwordOrKey: PasswordOrKey) =>
-            db.backup.import(backup, {
-              ...passwordOrKey,
-              attachmentsKey: attachmentsKey
-            });
-
-          if (!isEncryptedBackup) {
-            await importBackup({});
-            continue;
-          }
-
-          if (!passwordOrKey) {
-            passwordOrKey = await withPassword(verifyWithImport(importBackup));
-            if (!passwordOrKey.encryptionKey && !passwordOrKey.password) {
-              throw RESTORE_CANCELLED;
-            }
-            continue;
-          }
-
-          await importBackup(passwordOrKey);
-        }
-      });
-
-      await db.initCollections();
-      count = 0;
-      for (const path of extractedAttachments) {
-        if (path === ".attachments_key") continue;
-        updateProgress({
-          progress: `Restoring attachments (${count++}/${
-            extractedAttachments.length
-          })`
-        });
-        const hash = path;
-        const attachment = await db.attachments.attachment(hash as string);
-        if (!attachment) continue;
-
-        await deleteCacheFileByName(hash);
-        await RNFetchBlob.fs.cp(
-          `${zipOutputFolder}/attachments/${hash}`,
-          `${cacheDir}/${hash}`
-        );
-      }
-      updateProgress({
-        progress: strings.cleaningUp()
-      });
-      // Remove files from cache
-      RNFetchBlob.fs.unlink(zipOutputFolder).catch(() => {
-        /* empty */
-      });
-      if (Platform.OS === "android" || deleteBackupFile) {
-        RNFetchBlob.fs.unlink(filePath).catch(() => {
-          /* empty */
-        });
-      }
-    } else {
-      updateProgress({
-        progress: strings.readingBackupFile()
-      });
-      const rawData =
-        Platform.OS === "android"
-          ? await ScopedStorage.readFile(filePath, "utf8")
-          : await RNFetchBlob.fs.readFile(filePath, "utf8");
-      const backup: LegacyBackupFile = JSON.parse(rawData) as LegacyBackupFile;
-
-      const isEncryptedBackup =
-        typeof backup.data !== "string" && backup.data.cipher;
-
-      await db.transaction(async () => {
-        const importBackup = (passwordOrKey: PasswordOrKey) =>
-          db.backup.import(backup, passwordOrKey);
-
-        if (!isEncryptedBackup) {
-          updateProgress({
-            progress: strings.restoringBackup()
-          });
-          await importBackup({});
-          return;
-        }
-
-        updateProgress({
-          progress: strings.decryptingBackup()
-        });
-        // Prompt for the password and validate it by importing from inside the
-        // dialog so an incorrect password keeps the dialog open.
-        const passwordOrKey = await withPassword(
-          verifyWithImport(importBackup)
-        );
-        if (!passwordOrKey.encryptionKey && !passwordOrKey.password) {
-          throw RESTORE_CANCELLED;
-        }
-      });
-      endProgress();
-    }
-
-    ToastManager.show({
-      heading: strings.backupRestored(),
-      type: "success"
-    });
-
-    await db.initCollections();
-    refreshAllStores();
-    Navigation.queueRoutesForUpdate();
-    endProgress();
-  } catch (e) {
-    endProgress();
-    // User dismissed the password prompt: abort silently without an error toast.
-    if (e === RESTORE_CANCELLED) return;
-    DatabaseLogger.error(e as Error);
-    ToastManager.error(e as Error, strings.restoreFailed());
-  }
-};
+// The restore flow (progress, password, confirmation, error handling) lives in
+// ./restore-progress alongside the dialog that drives it. Re-exported here so
+// existing importers of "../restore-backup" keep working.
+export { restoreBackup } from "./restore-progress";
 
 const BACKUP_FILES_CACHE: (ReactNativeBlobUtilStat | ScopedStorage.FileType)[] =
   [];
@@ -417,7 +118,7 @@ export const RestoreBackup = () => {
             style={{
               marginBottom: Spacing.LEVEL_2
             }}
-            color={colors.secondary.paragraph}
+            color={colors.primary.accent}
             size={AppFontSize.sm}
             fontFamily="MEDIUM"
           >
@@ -489,10 +190,6 @@ const BackupItem = ({
   index: number;
 }) => {
   const { colors } = useThemeColors();
-
-  const isLegacyBackup =
-    item.path?.endsWith(".nnbackup") ||
-    (item as ScopedStorage.FileType).uri?.endsWith(".nnbackup");
   const itemName = (
     (item as ReactNativeBlobUtilStat).filename ||
     (item as ScopedStorage.FileType).name
@@ -540,23 +237,13 @@ const BackupItem = ({
           paddingVertical: Spacing.LEVEL_1
         }}
         onPress={() => {
-          presentDialog({
-            title: `${strings.restore()} ${itemName}`,
-            paragraph: strings.restoreBackupConfirm(),
-            positiveText: strings.restore(),
-            negativeText: strings.cancel(),
-            context: "global",
-            positivePress: async () => {
-              setTimeout(() => {
-                restoreBackup({
-                  uri:
-                    Platform.OS === "android"
-                      ? (item as ScopedStorage.FileType).uri
-                      : (item as ReactNativeBlobUtilStat).path
-                });
-              }, 500);
-              return true;
-            }
+          restoreBackup({
+            confirm: true,
+            name: itemName,
+            uri:
+              Platform.OS === "android"
+                ? (item as ScopedStorage.FileType).uri
+                : (item as ReactNativeBlobUtilStat).path
           });
         }}
       />

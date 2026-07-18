@@ -266,7 +266,8 @@ export const customizeGroup: SettingSection = {
               name: strings.defaultFontFamily(),
               description: strings.defaultFontFamilyDesc(),
               type: "component",
-              icon: "format-font",
+              icon: "text-aa",
+              iconFamily: "notesnook",
               property: "defaultFontFamily",
               component: "font-selector"
             },
@@ -279,7 +280,8 @@ export const customizeGroup: SettingSection = {
               maxInputValue: 400,
               step: 1,
               inputBadgeValue: "px",
-              icon: "format-size",
+              icon: "text-aa",
+              iconFamily: "notesnook",
               property: "defaultFontSize"
             },
             {
@@ -288,7 +290,9 @@ export const customizeGroup: SettingSection = {
               description: strings.lineHeightDesc(),
               type: "input-selector",
               property: "defaultLineHeight",
-              icon: "format-line-spacing",
+              icon: "list",
+              iconSize: 8,
+              iconFamily: "notesnook",
               minInputValue: EDITOR_LINE_HEIGHT.MIN,
               maxInputValue: EDITOR_LINE_HEIGHT.MAX,
               step: 0.1
@@ -306,7 +310,9 @@ export const customizeGroup: SettingSection = {
               description: strings.doubleSpacedLinesDesc(),
               type: "switch",
               property: "doubleSpacedLines",
-              icon: "format-line-spacing",
+              icon: "list",
+              iconFamily: "notesnook",
+              iconSize: 8,
               onChange: () => {
                 ToastManager.show({
                   heading: strings.lineSpacingChanged(),
@@ -335,7 +341,7 @@ export const customizeGroup: SettingSection = {
               id: "title-format",
               name: strings.titleFormat(),
               component: "title-format",
-              icon: "pencil-ruler",
+              icon: "article-ny-times",
               iconFamily: "notesnook",
               description: strings.titleFormatDesc(),
               type: "component"
