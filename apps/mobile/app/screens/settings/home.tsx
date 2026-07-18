@@ -33,6 +33,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { Spacing } from "../../common/design/spacing";
 import { View } from "react-native";
 import LineSeparator from "../../components/ui/seperator/line-separator";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 
 const keyExtractor = (item: SettingSection) => item.id;
 
@@ -40,6 +41,7 @@ const Home = ({
   navigation
 }: NativeStackScreenProps<RouteParams, "SettingsHome">) => {
   const { colors } = useThemeColors();
+  const insets = useGlobalSafeAreaInsets();
   const settingsGroups = useSettingsData();
   useNavigationFocus(navigation, {
     onFocus: () => {
@@ -86,7 +88,7 @@ const Home = ({
           contentContainerStyle={{
             gap: Spacing.LEVEL_2,
             marginTop: Spacing.LEVEL_4,
-            paddingBottom: 80
+            paddingBottom: insets.bottom
           }}
         />
       </DelayLayout>

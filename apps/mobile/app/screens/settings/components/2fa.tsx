@@ -64,6 +64,7 @@ import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import PaywallSheet from "../../../components/sheets/paywall";
+import LineSeparator from "../../../components/ui/seperator/line-separator";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -141,7 +142,12 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
           paddingHorizontal: Spacing.LEVEL_3
         }}
       />
-      <Seperator />
+
+      <LineSeparator
+        paddingVertical={Spacing.LEVEL_3}
+        paddingHorizontal={Spacing.LEVEL_3}
+      />
+
       {getMethods().map((item, index, methods) => (
         <Pressable
           key={item.title}
@@ -466,7 +472,21 @@ export const MFASetup = ({
               }
               buttons={
                 <Button
-                  onPress={onSendCode}
+                  onPress={() => {
+                    if (method.id !== "sms" && user) {
+                      Clipboard.setString(
+                        method.id === "app"
+                          ? authenticatorDetails.sharedKey!
+                          : user.email!
+                      );
+                      ToastManager.show({
+                        message:
+                          method.id === "app"
+                            ? strings.codeCopied()
+                            : strings.emailCopied()
+                      });
+                    }
+                  }}
                   type="transparent"
                   fontFamily="MEDIUM"
                   fontSize={AppFontSize.sm}
@@ -479,6 +499,8 @@ export const MFASetup = ({
                     paddingHorizontal: 0,
                     marginLeft: Spacing.LEVEL_1
                   }}
+                  icon="copy"
+                  iconFamily="notesnook"
                   title={
                     sending
                       ? null
