@@ -1350,9 +1350,14 @@ class EditorStore extends BaseStore<EditorStore> {
     this.focusTab(history.pop());
     const remainingTabs = this.get().tabs;
     if (remainingTabs.length === 0) {
-      if (
-        new URLSearchParams(window.location.search).get("singleNote") === "true"
-      ) {
+      const params = new URLSearchParams(window.location.search);
+      const isSingleNote = params.get("singleNote") === "true";
+      const sessionId = params.get("windowSessionId");
+      const isSecondaryWindow = !!sessionId && sessionId !== "main";
+      if (isSingleNote || isSecondaryWindow) {
+        // Single-note windows and secondary (multi-tab) windows close when
+        // their last tab is closed or moved out. Only the main window keeps a
+        // tab open by adding a new one.
         window.close();
       } else {
         this.addTab();

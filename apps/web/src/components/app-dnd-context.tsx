@@ -45,6 +45,8 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
   const [draggedNote, setDraggedNote] = useState<Note | null>(null);
 
   const cleanupRef = useRef<(() => void) | undefined>();
+  const openNoteCleanupRef = useRef<(() => void) | undefined>();
+  const closeTabCleanupRef = useRef<(() => void) | undefined>();
 
   useEffect(() => {
     if (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) {
@@ -60,6 +62,19 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
         }
       };
 
+      // When another window moves a tab into this window, the main process
+      // sends `app:open-note` with the noteId. Open it as a new tab here so the
+      // tab effectively "moves" into this window.
+      const handleOpenNote = ({ noteId }: { noteId: string }) => {
+        useEditorStore.getState().openSession(noteId, { openInNewTab: true });
+      };
+
+      // When a tab is moved out of this window, the main process sends
+      // `app:close-tab` with the tabId so we can close it here.
+      const handleCloseTab = ({ tabId }: { tabId: string }) => {
+        useEditorStore.getState().closeTabs(tabId);
+      };
+
       import("../common/desktop-bridge").then(({ desktop }) => {
          if (cleanupRef.current) cleanupRef.current();
          // @ts-ignore
@@ -67,10 +82,20 @@ export function AppDnDContext({ children }: { children: React.ReactNode }) {
              handleExternalDrop(null, payload);
          });
          cleanupRef.current = cleanup;
+
+         if (openNoteCleanupRef.current) openNoteCleanupRef.current();
+         // @ts-ignore
+         openNoteCleanupRef.current = window.appEvents?.onOpenNote(handleOpenNote);
+
+         if (closeTabCleanupRef.current) closeTabCleanupRef.current();
+         // @ts-ignore
+         closeTabCleanupRef.current = window.appEvents?.onCloseTab(handleCloseTab);
       });
     }
     return () => {
         if (cleanupRef.current) cleanupRef.current();
+        if (openNoteCleanupRef.current) openNoteCleanupRef.current();
+        if (closeTabCleanupRef.current) closeTabCleanupRef.current();
     };
   }, []);
 

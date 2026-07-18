@@ -19,9 +19,61 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { Menu, MenuItem, clipboard, shell } from "electron";
+import { windowManager } from "./window-manager";
+
+function buildApplicationMenu() {
+  const isMac = process.platform === "darwin";
+
+  const template: Electron.MenuItemConstructorOptions[] = [
+    { role: "appMenu" },
+    { role: "fileMenu" },
+    { role: "editMenu" },
+    { role: "viewMenu" },
+    {
+      label: strings.window(),
+      submenu: [
+        {
+          label: strings.newWindow(),
+          accelerator: "CmdOrCtrl+Shift+N",
+          click: () => {
+            // Open a fresh multi-tab window (no note pinned).
+            windowManager.createWindow(
+              {},
+              {
+                note: false,
+                notebook: false,
+                reminder: false,
+                hidden: false,
+                singleNote: false
+              },
+              "/"
+            );
+          }
+        },
+        { type: "separator" },
+        { role: "minimize" },
+        { role: "zoom" },
+        { type: "separator" },
+        { role: "front" },
+        ...(isMac
+          ? ([{ type: "separator" }] as Electron.MenuItemConstructorOptions[])
+          : []),
+        ...(isMac
+          ? ([{ role: "front" }] as Electron.MenuItemConstructorOptions[])
+          : [])
+      ]
+    },
+    { role: "help" }
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
 
 function setupMenu() {
   if (!globalThis.window) return;
+
+  // Build the macOS/Windows application menu bar with a Window submenu.
+  buildApplicationMenu();
 
   globalThis.window.webContents.on("context-menu", (_event, params) => {
     const menu = new Menu();

@@ -44,7 +44,7 @@ import {
   HorizontalSplit,
   MoreVertical
 } from "../icons";
-import { ScrollContainer } from "@notesnook/ui";
+import { ScrollContainer, MenuItem } from "@notesnook/ui";
 import {
   SaveState,
   SessionType,
@@ -567,6 +567,7 @@ const TabStrip = React.memo(function TabStrip({
                   isLocked={isLockedSession(session)}
                   isRevealInListDisabled={isFocusMode}
                   type={session.type}
+                  noteId={"note" in session ? session.note.id : undefined}
                   onSave={() => {
                     const { getEditor } =
                       useEditorManager.getState();
@@ -649,6 +650,7 @@ type TabProps = {
   isUnsaved: boolean;
   isRevealInListDisabled: boolean;
   type: SessionType;
+  noteId?: string;
   onFocus: () => void;
   onClose: () => void;
   onCloseOthers: () => void;
@@ -670,6 +672,7 @@ export function Tab(props: TabProps) {
     isUnsaved,
     isRevealInListDisabled,
     type,
+    noteId,
     onFocus,
     onClose,
     onCloseAll,
@@ -755,6 +758,49 @@ export function Tab(props: TabProps) {
       }}
       onContextMenu={(e) => {
         e.preventDefault();
+        const isDesktop =
+          typeof IS_DESKTOP_APP !== "undefined" && IS_DESKTOP_APP;
+
+        const moveToWindowItems = () => {
+          // Build the submenu for "Move tab to window": lists every other
+          // open window (so the user can send the tab there) plus a final
+          // "Move to new window" entry that creates a brand-new window.
+          import("../../common/desktop-bridge").then(async ({ desktop }) => {
+            if (!desktop) return;
+            const otherWindows: { id: number; sessionId: string; title: string }[] =
+              await desktop.window.list.query();
+            const items: MenuItem[] = otherWindows.map((w) => ({
+              type: "button" as const,
+              key: `window-${w.id}`,
+              title: w.title || strings.window(),
+              onClick: () => {
+                if (!noteId) return;
+                desktop.window.moveTab.mutate({
+                  noteId,
+                  tabId: id,
+                  targetSessionId: w.sessionId
+                });
+              }
+            }));
+            if (otherWindows.length > 0) {
+              items.push({ type: "separator", key: "new-window-sep" });
+            }
+            items.push({
+              type: "button",
+              key: "new-window",
+              title: strings.moveToNewWindow(),
+              onClick: () => {
+                if (!noteId) return;
+                desktop.window.moveTab.mutate({
+                  noteId,
+                  tabId: id
+                });
+              }
+            });
+            Menu.openMenu(items);
+          });
+        };
+
         Menu.openMenu([
           {
             type: "button",
@@ -795,6 +841,16 @@ export function Tab(props: TabProps) {
             onClick: onCloseAll
           },
           { type: "separator", key: "sep1" },
+          ...(isDesktop && noteId
+            ? [
+                {
+                  type: "button" as const,
+                  key: "move-tab-to-window",
+                  title: strings.moveTabToWindow(),
+                  onClick: moveToWindowItems
+                }
+              ]
+            : []),
           {
             type: "button",
             title: strings.revealInList(),

@@ -100,7 +100,8 @@ export class WindowManager {
     if (sessionData && Array.isArray(sessionData)) {
       for (const winData of sessionData) {
         if (winData.type === "note" && winData.noteId) {
-          // Legacy support for old session data
+          // Legacy support for old session data — these were true single-note
+          // windows, so preserve that behavior.
           this.createWindow(
             {
               ...winData.bounds,
@@ -110,22 +111,29 @@ export class WindowManager {
               note: winData.noteId,
               notebook: false,
               reminder: false,
-              hidden: false
+              hidden: false,
+              singleNote: true
             }
           );
         } else if (winData.type === "window" && winData.sessionId) {
+          // Restored multi-tab window. If it had a note open, open that note as
+          // the first tab via the hash route instead of forcing single-note
+          // semantics.
+          const routePath = winData.noteId
+            ? `/notes/${winData.noteId}/edit`
+            : "/";
           this.createWindow(
             {
               ...winData.bounds,
               hidden: false
             },
             {
-              note: winData.noteId || false,
+              note: false,
               notebook: false,
               reminder: false,
               hidden: false
             },
-            "/",
+            routePath,
             winData.sessionId
           );
         }
@@ -139,6 +147,27 @@ export class WindowManager {
 
   getWindows() {
     return Array.from(this.windows);
+  }
+
+  /**
+   * Returns true if the given screen-space point is inside any of the app's
+   * non-destroyed windows (main window + note windows). Used by the drag
+   * session to decide whether the drag overlay should be visible.
+   */
+  private isPointOverAppWindow(point: Electron.Point): boolean {
+    for (const win of this.windows) {
+      if (win.isDestroyed()) continue;
+      const bounds = win.getBounds();
+      if (
+        point.x >= bounds.x &&
+        point.x <= bounds.x + bounds.width &&
+        point.y >= bounds.y &&
+        point.y <= bounds.y + bounds.height
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   async createMainWindow(cliOptions: CLIOptions) {
@@ -329,18 +358,41 @@ export class WindowManager {
     const url = new URL(
       isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL
     );
-    url.pathname = routePath;
+    // The web app uses hash-based routing, so `routePath` (e.g.
+    // `/notes/:id/edit`) is written to `url.hash`, not `url.pathname`. The
+    // pathname stays "/" so the dev/prod server serves the SPA shell.
+    url.pathname = "/";
 
-    if (options.note === true) {
-      url.hash = "/notes/create/1";
+    // `singleNote` is an explicit opt-in: only windows that are meant to be
+    // pinned to a single note (e.g. "Open in new window" from the note menu)
+    // set it. Regular multi-tab windows — including tear-out — do not, so
+    // they get a normal tab strip and multi-tab behavior.
+    const isSingleNote = options.singleNote === true;
+
+    if (isSingleNote) {
+      if (options.note === true) {
+        url.hash = "/notes/create/1";
+      } else if (typeof options.note === "string") {
+        url.hash = `/notes/${options.note}/edit`;
+      } else {
+        url.hash = routePath;
+      }
       url.searchParams.append("singleNote", "true");
-    } else if (options.notebook === true) url.hash = "/notebooks/create";
-    else if (options.reminder === true) url.hash = "/reminders/create";
-    else if (typeof options.note === "string") {
-      url.hash = `/notes/${options.note}/edit`;
-      url.searchParams.append("singleNote", "true");
-    } else if (typeof options.notebook === "string")
+    } else if (options.notebook === true) {
+      url.hash = "/notebooks/create";
+    } else if (options.reminder === true) {
+      url.hash = "/reminders/create";
+    } else if (typeof options.notebook === "string") {
       url.hash = `/notebooks/${options.notebook}`;
+    } else if (typeof options.reminder === "string") {
+      url.hash = `/reminders/${options.reminder}`;
+    } else {
+      // For the multi-tab case the caller already encoded the requested note
+      // (if any) into routePath as a `/notes/:id/edit` hash, so we use it
+      // directly. This lets the renderer open the note as the first tab of a
+      // normal multi-tab window instead of forcing single-note semantics.
+      url.hash = routePath;
+    }
 
     return url;
   }
@@ -417,7 +469,12 @@ export class WindowManager {
       `data:text/html;charset=utf-8,${encodeURIComponent(html)}`
     );
 
-    this.dragWindow.setIgnoreMouseEvents(true);
+    // `forward: true` is required on macOS so the screen-saver-level overlay
+    // does not swallow pointer events. Without it, the alwaysOnTop dragWindow
+    // intercepts pointermove events, which breaks dnd-kit's PointerSensor and
+    // prevents drop zones (splits) from being detected — `over` stays null and
+    // handleDragEnd returns early before the split logic runs.
+    this.dragWindow.setIgnoreMouseEvents(true, { forward: true });
 
     this.dragInterval = setInterval(() => {
       if (!this.dragWindow || this.dragWindow.isDestroyed()) {
@@ -426,6 +483,17 @@ export class WindowManager {
       }
 
       const point = screen.getCursorScreenPoint();
+
+      // Determine whether the cursor is over any of the app's windows.
+      // The drag overlay must NOT be shown while the cursor is inside an app
+      // window: on macOS the alwaysOnTop (screen-saver) overlay would block
+      // pointermove events from reaching the underlying window's renderer,
+      // which freezes dnd-kit's PointerSensor. The result is that drop zones
+      // (splits) are never detected — dropping a note just opens it instead
+      // of splitting the pane. We only need the overlay for the tear-out
+      // affordance when the cursor leaves the app windows.
+      const isOverAppWindow = this.isPointOverAppWindow(point);
+
       try {
         this.dragWindow.setPosition(
           Math.round(point.x - width / 2),
@@ -435,10 +503,13 @@ export class WindowManager {
         // console.error("[WindowManager] Error setting position:", e);
       }
 
-      // Check if we are over any of our app windows
-      const mainWin = this.getMainWindow();
-      if (mainWin && !mainWin.isDestroyed()) {
-        // Use isOverMain if needed for other logic, but for now we just ensuring visibility
+      if (isOverAppWindow) {
+        // Hide the overlay so the underlying window receives pointer events.
+        if (this.dragWindow.isVisible()) {
+          this.dragWindow.hide();
+        }
+      } else {
+        // Cursor is outside all app windows — show the tear-out drag overlay.
         if (!this.dragWindow.isVisible()) {
           this.dragWindow.showInactive();
         }
@@ -502,6 +573,70 @@ export class WindowManager {
       if (excludeWindowId && window.id === excludeWindowId) continue;
       window.webContents.send(channel, payload);
     }
+  }
+
+  /**
+   * Returns metadata for every other app window (excluding the one with the
+   * given id). Used by the renderer to populate the "Move tab to window"
+   * submenu. The title is derived from the window's webContents title (which
+   * the renderer keeps in sync with the active note title) so users can tell
+   * windows apart.
+   */
+  listOtherWindows(excludeWindowId: number) {
+    const result: { id: number; sessionId: string; title: string }[] = [];
+    for (const window of this.windows) {
+      if (window.isDestroyed() || window.id === excludeWindowId) continue;
+      const sessionId = this.windowSessions.get(window.id);
+      if (!sessionId) continue;
+      let title = "Notesnook";
+      try {
+        const docTitle = window.getTitle();
+        if (docTitle) title = docTitle;
+      } catch {
+        // ignore
+      }
+      result.push({ id: window.id, sessionId, title });
+    }
+    return result;
+  }
+
+  /**
+   * Moves a tab's note to an existing window (identified by its
+   * windowSessionId) or, when no targetSessionId is provided, creates a new
+   * window with the note opened as its first tab. Returns true when an
+   * existing window handled the move, false when a new window was created.
+   */
+  moveTabToWindow(
+    noteId: string,
+    targetSessionId: string | undefined,
+    sourceWindowId: number
+  ): boolean {
+    if (targetSessionId) {
+      for (const window of this.windows) {
+        if (window.isDestroyed() || window.id === sourceWindowId) continue;
+        const sessionId = this.windowSessions.get(window.id);
+        if (sessionId !== targetSessionId) continue;
+        window.webContents.send("app:open-note", { noteId });
+        if (window.isMinimized()) window.restore();
+        window.focus();
+        return true;
+      }
+      // Fall through to creating a new window if the target vanished.
+    }
+
+    // No existing target — create a new multi-tab window with the note open.
+    this.createWindow(
+      {},
+      {
+        note: false,
+        notebook: false,
+        reminder: false,
+        hidden: false,
+        singleNote: false
+      },
+      `/notes/${noteId}/edit`
+    );
+    return false;
   }
 }
 

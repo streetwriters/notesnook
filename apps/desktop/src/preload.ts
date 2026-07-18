@@ -45,6 +45,8 @@ declare global {
   // listener for external file drops to support drag-and-drop features
   var appEvents: {
     onExternalDrop: (callback: (payload: any) => void) => void;
+    onOpenNote: (callback: (payload: { noteId: string }) => void) => void;
+    onCloseTab: (callback: (payload: { tabId: string }) => void) => void;
   };
 }
 
@@ -67,6 +69,16 @@ const appEvents = {
     const subscription = (_event: any, args: { noteId: string }) => callback(args);
     ipcRenderer.on("app:note-changed", subscription);
     return () => ipcRenderer.removeListener("app:note-changed", subscription);
+  },
+  onOpenNote: (callback: (payload: { noteId: string }) => void) => {
+    const subscription = (_event: any, args: { noteId: string }) => callback(args);
+    ipcRenderer.on("app:open-note", subscription);
+    return () => ipcRenderer.removeListener("app:open-note", subscription);
+  },
+  onCloseTab: (callback: (payload: { tabId: string }) => void) => {
+    const subscription = (_event: any, args: { tabId: string }) => callback(args);
+    ipcRenderer.on("app:close-tab", subscription);
+    return () => ipcRenderer.removeListener("app:close-tab", subscription);
   }
 };
 

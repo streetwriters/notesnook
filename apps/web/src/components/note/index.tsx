@@ -370,6 +370,8 @@ export const noteMenuItems: (
 ) => Promise<MenuItem[]> = async (note, ids = [], context) => {
   // const isSynced = db.notes.note(note.id)?.synced();
   const features = await areFeaturesAvailable(["expiringNotes"]);
+  const isDesktop =
+    typeof IS_DESKTOP_APP !== "undefined" && IS_DESKTOP_APP;
   return [
     {
       type: "button",
@@ -379,6 +381,27 @@ export const noteMenuItems: (
       onClick: () =>
         useEditorStore.getState().openSession(note.id, { openInNewTab: true })
     },
+    ...(isDesktop
+      ? [
+          {
+            type: "button" as const,
+            key: "openinnewwindow",
+            title: strings.openInNewWindow(),
+            icon: OpenInNew.path,
+            onClick: () => {
+              import("../../common/desktop-bridge").then(({ desktop }) => {
+                // Open the note in a dedicated single-note window so it gets
+                // its own window with single-note semantics (closes when its
+                // last tab is closed, pinned to this note).
+                desktop?.window.open.mutate({
+                  noteId: note.id,
+                  singleNote: true
+                });
+              });
+            }
+          }
+        ]
+      : []),
     {
       type: "button",
       key: "pin",
