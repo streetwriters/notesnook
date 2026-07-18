@@ -70,13 +70,13 @@ export function SettingsPicker<T>({
     if ((await isFeatureAvailable()) && (await isOptionAvailable(item))) {
       menuRef.current?.hide();
       await updateValue(item);
-      setCurrentValue(item);
+      setCurrentValue(getValue());
       return;
     }
 
     menuRef.current?.hide();
     await updateValue(item);
-    setCurrentValue(item);
+    setCurrentValue(getValue());
   };
 
   return (

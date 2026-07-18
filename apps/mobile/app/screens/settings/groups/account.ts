@@ -298,7 +298,15 @@ export const accountGroup: SettingSection = {
               name: strings.subscriptionNotActivated(),
               icon: "warning-circle",
               iconFamily: "notesnook",
-              hidden: () => Platform.OS !== "ios",
+              useHook: () =>
+                useUserStore(
+                  (state) =>
+                    !state.user ||
+                    !state.user.subscription ||
+                    state.user?.subscription?.plan === SubscriptionPlan.FREE
+                ),
+              hidden: (isFreeUser) =>
+                Platform.OS !== "ios" || !(isFreeUser as boolean),
               isModal: true,
               modifer: async () => {
                 if (Platform.OS === "android") return;

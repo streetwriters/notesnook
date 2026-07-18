@@ -90,8 +90,8 @@ export const productivityGroup: SettingSection = {
               validators: [
                 validators.number(),
                 validators.custom((value) => {
-                  return value < 5
-                    ? strings.valueMustBeGreaterThan("5")
+                  return value < 4
+                    ? strings.valueMustBeGreaterThan("4")
                     : undefined;
                 })
               ],
@@ -112,9 +112,7 @@ export const productivityGroup: SettingSection = {
               component: "sound-picker",
               icon: "speaker-high",
               iconFamily: "notesnook",
-              hidden: () =>
-                Platform.OS === "ios" ||
-                (Platform.OS === "android" && Platform.Version > 25)
+              hidden: () => Platform.OS === "android"
             },
             {
               id: "reminder-sound-android",

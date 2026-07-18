@@ -361,7 +361,7 @@ export const strings = {
       other: `v${version} has been released`
     }),
   readReleaseNotes: {
-    1: () => t`Read full release notes on `,
+    1: () => t`Read full release notes on`,
     2: () => t`Github`
   },
   settings: () => t`Settings`,
