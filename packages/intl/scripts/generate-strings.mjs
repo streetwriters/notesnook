@@ -30,7 +30,8 @@ const DO_ACTIONS = [
       "notebook",
       "tag",
       "color",
-      "attachment"
+      "attachment",
+      "version"
     ]
   },
   { action: "unpin", label: "Unpin", dataTypes: ["note", "notebook"] },
@@ -73,7 +74,7 @@ const ACTIONS = [
   {
     action: "deleted",
     label: "deleted",
-    dataTypes: ["attachment", "reminder", "tag", "note", "notebook"]
+    dataTypes: ["attachment", "reminder", "tag", "note", "notebook", "version"]
   },
   {
     action: "movedToTrash",
@@ -126,7 +127,7 @@ const ACTION_CONFIRMATIONS = [
   {
     action: "permanentlyDelete",
     label: "permanently delete",
-    dataTypes: ["note", "notebook"]
+    dataTypes: ["note", "notebook", "version"]
   }
 ];
 
@@ -209,6 +210,12 @@ const DATA_TYPES = {
     singularCamelCase: `Shortcut`,
     plural: `shortcuts`,
     pluralCamelCase: `Shortcuts`
+  },
+  version: {
+    singular: `version`,
+    singularCamelCase: `Version`,
+    plural: `versions`,
+    pluralCamelCase: `Versions`
   }
 };
 

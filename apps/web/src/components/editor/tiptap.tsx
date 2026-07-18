@@ -684,6 +684,12 @@ function TiptapWrapper(
     }
   }, [props.spellcheck]);
 
+  useEffect(() => {
+    if (editorContainerRef.current) {
+      editorContainerRef.current.style.fontSize = `${editorConfig.fontSize}px`;
+    }
+  }, [editorConfig.fontSize]);
+
   return (
     <Flex
       ref={containerRef}

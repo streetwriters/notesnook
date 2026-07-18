@@ -107,24 +107,32 @@ export default function NotePreview({
   }, [note]);
 
   const deleteNote = async () => {
+    const isSession = !!session;
+
     presentDialog({
-      title: strings.deleteNote(),
-      paragraph: strings.deleteNoteConfirmation(),
+      title: isSession ? strings.deleteVersion() : strings.deleteNote(),
+      paragraph: isSession
+        ? strings.deleteVersionConfirmation()
+        : strings.deleteNoteConfirmation(),
       positiveText: strings.delete(),
       negativeText: strings.cancel(),
-      context: "local",
+      context: "preview",
       positivePress: async () => {
-        if (note) {
+        if (isSession) {
+          await db.noteHistory.remove(session.id);
+          eSendEvent(eCloseSheet, "note_history");
+          Navigation.queueRoutesForUpdate();
+        } else if (note.type === "trash") {
           await db.trash.delete(note.id);
           useTrashStore.getState().refresh();
           useSelectionStore.getState().setSelectionMode();
-          ToastManager.show({
-            heading: strings.noteDeleted(),
-            type: "success",
-            context: "local"
-          });
-          eSendEvent(eCloseSheet);
         }
+        ToastManager.show({
+          heading: isSession ? strings.versionDeleted() : strings.noteDeleted(),
+          type: "success"
+        });
+
+        eSendEvent(eCloseSheet);
       },
       positiveType: "error"
     });
@@ -137,7 +145,7 @@ export default function NotePreview({
         width: "100%"
       }}
     >
-      <Dialog context="local" />
+      <Dialog context="preview" />
       <DialogHeader
         padding={12}
         title={content?.title || note.title || session?.session}

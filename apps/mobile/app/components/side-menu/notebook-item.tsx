@@ -72,7 +72,7 @@ export const NotebookItem = ({
   const notebook = item.notebook;
   const isFocused = focused;
   const { totalNotes, getTotalNotes } = useTotalNotes("notebook");
-  const updater = useRelationStore(state => state.updater);
+  const updater = useRelationStore((state) => state.updater);
   const getTotalNotesRef = React.useRef(getTotalNotes);
   getTotalNotesRef.current = getTotalNotes;
   const { colors } = useThemeColors();
@@ -101,8 +101,8 @@ export const NotebookItem = ({
           item.depth === 0
             ? undefined
             : item.depth < 6
-            ? 15 * item.depth
-            : 15 * 5,
+              ? 15 * item.depth
+              : 15 * 5,
         width: "100%",
         marginTop: 2,
         opacity: item.disabled ? 0.5 : 1
@@ -162,7 +162,8 @@ export const NotebookItem = ({
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            flexShrink: 1
           }}
         >
           <IconButton
@@ -191,8 +192,8 @@ export const NotebookItem = ({
               !item.hasChildren || disableExpand
                 ? "book-outline"
                 : expanded
-                ? "chevron-down"
-                : "chevron-right"
+                  ? "chevron-down"
+                  : "chevron-right"
             }
           />
 
@@ -201,6 +202,7 @@ export const NotebookItem = ({
               isFocused ? colors.selected.paragraph : colors.primary.paragraph
             }
             size={AppFontSize.sm}
+            style={{ flexShrink: 1 }}
           >
             {notebook?.title}
           </Paragraph>
@@ -211,7 +213,8 @@ export const NotebookItem = ({
             gap: DefaultAppStyles.GAP_SMALL,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "center"
+            justifyContent: "center",
+            marginLeft: DefaultAppStyles.GAP_SMALL
           }}
         >
           {selectionEnabled ? (
