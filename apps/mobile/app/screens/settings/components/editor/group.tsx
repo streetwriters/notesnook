@@ -23,10 +23,10 @@ import { View } from "react-native";
 import { DraxDragWithReceiverEventData, DraxView } from "react-native-drax";
 import Animated, { Layout } from "react-native-reanimated";
 import { presentDialog } from "../../../../components/dialog/functions";
+import AppIcon from "../../../../components/ui/AppIcon";
 import { IconButton } from "../../../../components/ui/icon-button";
-import Paragraph from "../../../../components/ui/typography/paragraph";
+import Heading from "../../../../components/ui/typography/heading";
 import { getElevationStyle } from "../../../../utils/elevation";
-import { AppFontSize } from "../../../../utils/size";
 import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
@@ -34,9 +34,9 @@ import ToolSheet from "./tool-sheet";
 import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
 import { strings } from "@notesnook/intl";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ToastManager } from "../../../../services/event-manager";
 import { DefaultAppStyles } from "../../../../utils/styles";
+import { Radius, Spacing } from "../../../../common/design/spacing";
 
 export const Group = ({
   item,
@@ -138,7 +138,9 @@ export const Group = ({
 
   const buttons = [
     {
-      name: "minus",
+      name: "trash",
+      iconFamily: "notesnook" as const,
+      color: colors.error.icon,
       onPress: async () => {
         const feature = await isFeatureAvailable("customToolbarPreset");
         if (!feature.isAllowed) {
@@ -166,6 +168,8 @@ export const Group = ({
     },
     {
       name: "plus",
+      iconFamily: "notesnook" as const,
+      color: colors.primary.icon,
       onPress: async () => {
         const feature = await isFeatureAvailable("customToolbarPreset");
         if (!feature.isAllowed) {
@@ -195,10 +199,12 @@ export const Group = ({
         style={[
           {
             width: isDragged ? dimensions.current?.width : "100%",
-            backgroundColor: colors.primary.background,
-            borderRadius: 10,
-            ...getElevationStyle(hover ? 5 : 0),
-            marginTop: isSubgroup ? 0 : DefaultAppStyles.GAP_VERTICAL
+            backgroundColor: isDragged
+              ? colors.secondary.background
+              : colors.primary.background,
+            borderRadius: isDragged ? Radius.S : 0,
+            height: isDragged ? 50 : "auto",
+            paddingHorizontal: isDragged ? Spacing.LEVEL_2 : 0
           }
         ]}
       >
@@ -208,36 +214,37 @@ export const Group = ({
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              height: 40,
-              marginBottom: 5
+              paddingVertical: Spacing.LEVEL_3
             }}
           >
             <View
               style={{
                 flexDirection: "row",
-                alignItems: "center"
+                alignItems: "center",
+                gap: Spacing.LEVEL_1
               }}
             >
-              <Icon
-                size={AppFontSize.md}
-                name="drag"
-                color={colors.primary.icon}
+              <AppIcon
+                size={16}
+                name="dots-six-vertical"
+                iconFamily="notesnook"
+                color={colors.secondary.icon}
               />
-              <Paragraph
-                style={{
-                  marginLeft: 5
-                }}
-                color={colors.secondary.paragraph}
-                size={AppFontSize.xs}
+              <Heading
+                fontSize="SM"
+                fontFamily="MEDIUM"
+                lineHeight={null}
+                color={colors.secondary.heading}
               >
-                {strings.group()}
-              </Paragraph>
+                {strings.toolbarGroupName(groupIndex + 1)}
+              </Heading>
             </View>
 
             <View
               style={{
                 flexDirection: "row",
-                alignItems: "center"
+                alignItems: "center",
+                gap: Spacing.LEVEL_2
               }}
             >
               {buttons.map((item) => (
@@ -247,13 +254,11 @@ export const Group = ({
                   bottom={0}
                   right={0}
                   key={item.name}
-                  style={{
-                    marginLeft: 10
-                  }}
                   onPress={item.onPress}
                   name={item.name}
-                  color={colors.primary.icon}
-                  size={AppFontSize.lg}
+                  iconFamily={item.iconFamily}
+                  color={item.color}
+                  size={16}
                 />
               ))}
             </View>

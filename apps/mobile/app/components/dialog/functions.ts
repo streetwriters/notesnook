@@ -24,6 +24,7 @@ import { ButtonProps } from "../ui/button";
 import { FieldValidator, FormRef } from "../ui/input/form-input";
 import { RefObject } from "react";
 import { IconProps } from "../ui/AppIcon";
+import { PressableProps } from "../ui/pressable";
 
 export type DialogInfo = {
   title?: string;
@@ -36,15 +37,7 @@ export type DialogInfo = {
   statusBarTranslucent?: boolean;
   positivePress?: (...args: any[]) => Promise<any>;
   onClose?: () => void;
-  positiveType?:
-    | "transparent"
-    | "plain"
-    | "secondary"
-    | "accent"
-    | "inverted"
-    | "shade"
-    | "error"
-    | "errorShade";
+  positiveType?: PressableProps["type"];
   icon?: string;
   iconFamily?: IconProps["iconFamily"];
   iconType?: "error" | "normal";
