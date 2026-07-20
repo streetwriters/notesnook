@@ -49,6 +49,38 @@ export function getToolIcon(id: ToolId, color: string) {
 </svg>`;
 }
 
+/**
+ * Maps a tool to a glyph in the custom `notesnook` icon font (see
+ * `packages/icons/svgs/format-*`). Tools without an entry fall back to the
+ * editor's built-in icon set via {@link getToolIcon}.
+ */
+const TOOL_ICON_NAMES: { [id: string]: string } = {
+  bold: "format-text-b",
+  italic: "format-text-italic",
+  underline: "format-text-underline",
+  strikethrough: "format-text-strikethrough",
+  addInternalLink: "format-link",
+  addLink: "format-link-simple-horizontal",
+  code: "format-code-simple",
+  clearformatting: "format-text-t-slash",
+  subscript: "format-text-subscript",
+  superscript: "format-text-superscript",
+  bulletList: "format-frame",
+  numberedList: "format-list-numbers",
+  checkList: "format-list-dashes",
+  fontFamily: "format-text-aa",
+  fontSize: "format-arrows-vertical",
+  headings: "format-text-h-one",
+  alignment: "format-text-align-left",
+  highlight: "format-highlighter",
+  textColor: "format-palette",
+  math: "format-math-operations"
+};
+
+export function getToolIconName(id: ToolId): string | undefined {
+  return TOOL_ICON_NAMES[id as string];
+}
+
 export function getUngroupedTools(
   toolDefinition: (string | string[])[][]
 ): string[] {

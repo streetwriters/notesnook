@@ -81,7 +81,7 @@ export const SectionHeader = React.memo<
         style={{
           width: "100%",
           paddingHorizontal: Spacing.LEVEL_3,
-          marginBottom: Spacing.LEVEL_3,
+          marginBottom: Spacing.LEVEL_1,
           marginTop: index === 0 ? 0 : Spacing.LEVEL_3
         }}
       >
