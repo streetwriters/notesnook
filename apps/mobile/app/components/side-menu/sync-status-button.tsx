@@ -39,12 +39,14 @@ import { IconButton } from "../ui/icon-button";
 
 const SyncStatusButton = () => {
   const { colors } = useThemeColors();
-  const [user, syncing, lastSyncStatus, lastSynced] = useUserStore((state) => [
-    state.user,
-    state.syncing,
-    state.lastSyncStatus,
-    state.lastSynced
-  ]);
+  const [user, syncing, lastSyncStatus, lastSynced, isLoggingOut] =
+    useUserStore((state) => [
+      state.user,
+      state.syncing,
+      state.lastSyncStatus,
+      state.lastSynced,
+      state.isLoggingOut
+    ]);
 
   const { isInternetReachable } = useNetInfo();
   const isOffline = !isInternetReachable;
@@ -100,7 +102,7 @@ const SyncStatusButton = () => {
     Sync.run();
   };
 
-  if (!user) return null;
+  if (!user || isLoggingOut) return null;
 
   return (
     <View
