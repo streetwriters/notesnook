@@ -34,23 +34,22 @@ import Sync from "../../services/sync";
 import { clearAllStores } from "../../stores";
 import { useUserStore } from "../../stores/use-user-store";
 import { eLoginSessionExpired, eUserLoggedIn } from "../../utils/events";
-import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";
 import BaseDialog from "../dialog/base-dialog";
 import { presentDialog } from "../dialog/functions";
 import SheetProvider from "../sheet-provider";
 import { Toast } from "../toast";
+import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
-import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { useLogin } from "./use-login";
 import { strings } from "@notesnook/intl";
 import { getObfuscatedEmail } from "../../utils/functions";
 import { DefaultAppStyles } from "../../utils/styles";
+import { Spacing } from "../../common/design/spacing";
 import FormInput, { validators } from "../ui/input/form-input";
-import { PASSWORD_PLACEHOLDER } from "../../utils/constants";
 
 export const SessionExpired = () => {
   const { colors } = useThemeColors();
@@ -159,90 +158,119 @@ export const SessionExpired = () => {
             width: focused ? "100%" : "99.9%",
             padding: DefaultAppStyles.GAP,
             justifyContent: "center",
+            gap: Spacing.LEVEL_7,
             flex: 1,
             backgroundColor: colors.primary.background
           }}
         >
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              marginBottom: 20,
-              borderRadius: 10,
-              paddingVertical: 20
-            }}
-          >
-            <IconButton
+          <View style={{ gap: Spacing.LEVEL_7, alignItems: "center" }}>
+            <View
               style={{
-                width: 60,
-                height: 60
-              }}
-              name="alert"
-              color={colors.error.icon}
-              size={50}
-            />
-            <Heading size={AppFontSize.xxxl} color={colors.primary.heading}>
-              {strings.sessionExpired()}
-            </Heading>
-            <Paragraph
-              style={{
-                textAlign: "center"
+                width: 100,
+                height: 100,
+                borderRadius: 50,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: colors.error.background
               }}
             >
-              {strings.sessionExpiredDesc(
-                getObfuscatedEmail(formRef.current.getValue("email") as string)
-              )}
-            </Paragraph>
+              <View
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 28,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: colors.error.accent
+                }}
+              >
+                <AppIcon
+                  name="warning"
+                  iconFamily="notesnook"
+                  size={30}
+                  color={colors.static.white}
+                />
+              </View>
+            </View>
+
+            <View style={{ width: "100%", gap: Spacing.LEVEL_3 }}>
+              <View
+                style={{
+                  alignItems: "center",
+                  gap: DefaultAppStyles.GAP_VERTICAL_SMALL
+                }}
+              >
+                <Heading
+                  fontSize="XL"
+                  lineHeight="100%"
+                  color={colors.primary.heading}
+                >
+                  {strings.sessionExpired()}
+                </Heading>
+                <Paragraph
+                  fontSize="SM"
+                  color={colors.primary.paragraph}
+                  style={{
+                    textAlign: "center"
+                  }}
+                >
+                  {strings.sessionExpiredDesc(
+                    getObfuscatedEmail(
+                      formRef.current.getValue("email") as string
+                    )
+                  )}
+                </Paragraph>
+              </View>
+
+              <FormInput
+                fwdRef={passwordInputRef}
+                formRef={formRef}
+                name="password"
+                label={strings.enterYourPassword()}
+                validators={[validators.required(strings.passwordRequired())]}
+                returnKeyLabel={strings.done()}
+                returnKeyType="next"
+                secureTextEntry
+                autoComplete="password"
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholder={strings.password()}
+                onSubmitEditing={() => {
+                  login();
+                }}
+              />
+            </View>
           </View>
 
-          <FormInput
-            fwdRef={passwordInputRef}
-            formRef={formRef}
-            name="password"
-            validators={[validators.required(strings.passwordRequired())]}
-            returnKeyLabel={strings.done()}
-            returnKeyType="next"
-            secureTextEntry
-            autoComplete="password"
-            autoCapitalize="none"
-            autoCorrect={false}
-            placeholder={PASSWORD_PLACEHOLDER}
-            onSubmitEditing={() => {
-              login();
-            }}
-          />
+          <View style={{ gap: Spacing.LEVEL_2 }}>
+            <Button
+              style={{
+                width: "100%"
+              }}
+              loading={loading}
+              onPress={() => login()}
+              type="accent"
+              title={loading ? null : strings.login()}
+            />
 
-          <Button
-            style={{
-              marginTop: DefaultAppStyles.GAP_VERTICAL,
-              width: 250,
-              borderRadius: 100
-            }}
-            loading={loading}
-            onPress={() => login()}
-            type="accent"
-            title={loading ? null : strings.login()}
-          />
-
-          <Button
-            style={{
-              marginTop: DefaultAppStyles.GAP_VERTICAL,
-              width: "100%"
-            }}
-            onPress={() => {
-              presentDialog({
-                context: "session_expiry",
-                title: strings.logoutFromDevice(),
-                paragraph: strings.logoutDesc(),
-                positiveText: strings.logout(),
-                positiveType: "errorShade",
-                positivePress: logout
-              });
-            }}
-            type="errorShade"
-            title={loading ? null : strings.logoutFromDevice()}
-          />
+            <Button
+              style={{
+                width: "100%"
+              }}
+              onPress={() => {
+                presentDialog({
+                  context: "session_expiry",
+                  title: strings.logoutFromDevice(),
+                  paragraph: strings.logoutDesc(),
+                  positiveText: strings.logout(),
+                  positiveType: "error-shade-outline",
+                  positivePress: logout
+                });
+              }}
+              type="plain-outline"
+              title={strings.logoutFromDevice()}
+            />
+          </View>
         </View>
         <Toast context="local" />
         <Dialog context="session_expiry" />

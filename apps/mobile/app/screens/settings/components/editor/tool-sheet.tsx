@@ -18,131 +18,212 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ToolId } from "@notesnook/editor";
-import React, { RefObject } from "react";
-import { View } from "react-native";
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
+import React from "react";
+import { useWindowDimensions, View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
+import { Radius, Spacing } from "../../../../common/design/spacing";
+import AppIcon from "../../../../components/ui/AppIcon";
+import { Button } from "../../../../components/ui/button";
 import { Pressable } from "../../../../components/ui/pressable";
 import { SvgView } from "../../../../components/ui/svg";
+import Heading from "../../../../components/ui/typography/heading";
 import Paragraph from "../../../../components/ui/typography/paragraph";
 import { presentSheet } from "../../../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
-import { defaultBorderRadius, AppFontSize } from "../../../../utils/size";
+import { DefaultAppStyles } from "../../../../utils/styles";
 import { DraggableItem, useDragState } from "./state";
 import {
   findToolById,
   getToolIcon,
+  getToolIconName,
   getUngroupedTools
 } from "./toolbar-definition";
-import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../../utils/styles";
 
-export default function ToolSheet({
+function ToolSheet({
   group,
-  fwdRef
+  close
 }: {
   group: DraggableItem;
-  fwdRef: RefObject<ActionSheetRef>;
+  close?: (ctx?: string) => void;
 }) {
   const { colors } = useThemeColors();
+  const { height } = useWindowDimensions();
   const [data] = useDragState((state) => [state.data]);
-  const ungrouped = getUngroupedTools(data) as ToolId[];
+  const ungrouped = (getUngroupedTools(data) as ToolId[]).filter(
+    (item) => item !== "none"
+  );
+  const [selected, setSelected] = React.useState<ToolId[]>([]);
+  const allSelected =
+    ungrouped.length > 0 && selected.length === ungrouped.length;
 
-  const renderTool = React.useCallback(
-    (item: ToolId) => {
-      const tool = findToolById(item);
-      const iconSvgString = tool
+  const toggle = (item: ToolId) => {
+    setSelected((current) =>
+      current.includes(item)
+        ? current.filter((tool) => tool !== item)
+        : [...current, item]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    setSelected(allSelected ? [] : ungrouped.slice());
+  };
+
+  const onDone = () => {
+    if (selected.length === 0) {
+      close?.();
+      return;
+    }
+    const _data = useDragState.getState().data.slice();
+    const target =
+      group.groupIndex !== undefined
+        ? (_data[group.groupIndex][group.index] as ToolId[])
+        : (_data[group.index] as ToolId[]);
+    // Keep the selection order by unshifting from the end.
+    selected
+      .slice()
+      .reverse()
+      .forEach((item) => target.unshift(item));
+    useDragState.getState().setData(_data);
+    close?.();
+  };
+
+  const renderTool = (item: ToolId) => {
+    const tool = findToolById(item);
+    const isSelected = selected.includes(item);
+    const iconName = getToolIconName(item);
+    const iconSvgString =
+      tool && !iconName
         ? getToolIcon(tool.icon as ToolId, colors.secondary.icon)
         : null;
-      if (item === "none") return;
-      return (
-        <Pressable
-          key={item}
-          type="secondary"
-          onPress={() => {
-            const _data = useDragState.getState().data.slice();
-            if (group.groupIndex !== undefined) {
-              (_data[group.groupIndex][group.index] as ToolId[]).unshift(
-                item as ToolId
-              );
-            } else {
-              _data[group.index].unshift(item);
-            }
-            useDragState.getState().setData(_data);
-          }}
+
+    return (
+      <Pressable
+        key={item}
+        type="transparent"
+        onPress={() => toggle(item)}
+        style={{
+          width: "100%",
+          paddingVertical: Spacing.LEVEL_2,
+          borderRadius: Radius.S,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: Spacing.LEVEL_1,
+          justifyContent: "flex-start"
+        }}
+      >
+        <AppIcon
+          name={isSelected ? "checkbox" : "box-empty"}
+          iconFamily="notesnook"
+          size={16}
+          color={
+            isSelected
+              ? [colors.selected.accent, colors.static.white]
+              : colors.secondary.icon
+          }
+        />
+        <View
           style={{
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
-            width: "100%",
-            height: 50,
-            paddingHorizontal: DefaultAppStyles.GAP,
-            paddingRight: 0,
-            borderRadius: defaultBorderRadius,
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "flex-start"
+            gap: Spacing.LEVEL_0,
+            flexShrink: 1
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center"
-            }}
-          >
-            {iconSvgString ? (
-              <SvgView width={23} height={23} src={iconSvgString} />
-            ) : null}
-            <Paragraph
-              style={{
-                marginLeft: iconSvgString ? 10 : 0
-              }}
-              color={colors.primary.paragraph}
-              size={AppFontSize.sm}
-            >
-              {tool?.title}
-            </Paragraph>
-          </View>
-        </Pressable>
-      );
-    },
-    [
-      colors.primary.paragraph,
-      colors.secondary.icon,
-      group.groupIndex,
-      group.index
-    ]
-  );
+          {iconName ? (
+            <AppIcon
+              name={iconName}
+              iconFamily="notesnook"
+              size={16}
+              color={colors.secondary.icon}
+            />
+          ) : iconSvgString ? (
+            <SvgView width={16} height={16} src={iconSvgString} />
+          ) : null}
+          <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+            {tool?.title}
+          </Paragraph>
+        </View>
+      </Pressable>
+    );
+  };
 
   return (
     <View
       style={{
-        maxHeight: 400,
-        padding: DefaultAppStyles.GAP
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_2,
+        paddingBottom: Spacing.LEVEL_4,
+        gap: Spacing.LEVEL_3
       }}
     >
-      <ScrollView nestedScrollEnabled={true}>
-        {!ungrouped || ungrouped.length === 0 ? (
-          <Paragraph
-            style={{
-              alignSelf: "center"
-            }}
-            color={colors.secondary.paragraph}
-          >
-            {strings.groupedAllTools()}
-          </Paragraph>
-        ) : (
-          ungrouped.map(renderTool)
-        )}
+      <View style={{ gap: Spacing.LEVEL_0 }}>
         <View
           style={{
-            height: 200
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between"
           }}
-        />
-      </ScrollView>
+        >
+          <Heading fontSize="XL" lineHeight="100%">
+            {strings.addToolsToGroup()}
+          </Heading>
+          {ungrouped.length > 0 ? (
+            <Pressable
+              type="transparent"
+              onPress={toggleSelectAll}
+              style={{
+                paddingVertical: Spacing.LEVEL_0,
+                width: "auto"
+              }}
+            >
+              <Heading
+                fontSize="SM"
+                fontFamily="MEDIUM"
+                color={colors.primary.accent}
+              >
+                {allSelected ? strings.deselectAll() : strings.selectAll()}
+              </Heading>
+            </Pressable>
+          ) : null}
+        </View>
+        <Paragraph fontSize="XS" color={colors.primary.paragraph}>
+          {strings.addToolsToGroupDesc()}
+        </Paragraph>
+      </View>
+
+      <View style={{ height: 1, backgroundColor: colors.primary.border }} />
+
+      {ungrouped.length === 0 ? (
+        <Paragraph
+          style={{ alignSelf: "center" }}
+          color={colors.secondary.paragraph}
+        >
+          {strings.groupedAllTools()}
+        </Paragraph>
+      ) : (
+        <ScrollView
+          nestedScrollEnabled={true}
+          style={{ maxHeight: height * 0.6 }}
+        >
+          {ungrouped.map(renderTool)}
+        </ScrollView>
+      )}
+
+      <Button
+        title={strings.add()}
+        type="accent"
+        style={{ width: "100%" }}
+        onPress={onDone}
+      />
     </View>
   );
 }
 
 ToolSheet.present = (payload: DraggableItem) => {
   presentSheet({
-    component: (ref) => <ToolSheet fwdRef={ref} group={payload} />
+    component: (_ref, close) => <ToolSheet group={payload} close={close} />
   });
 };
+
+export default ToolSheet;
