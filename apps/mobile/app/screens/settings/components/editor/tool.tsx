@@ -23,20 +23,25 @@ import { View } from "react-native";
 import { DraxDragWithReceiverEventData, DraxView } from "react-native-drax";
 import Animated, { Layout } from "react-native-reanimated";
 import { presentDialog } from "../../../../components/dialog/functions";
+import AppIcon from "../../../../components/ui/AppIcon";
 import { IconButton } from "../../../../components/ui/icon-button";
 import { SvgView } from "../../../../components/ui/svg";
+import Heading from "../../../../components/ui/typography/heading";
 import Paragraph from "../../../../components/ui/typography/paragraph";
+import { Radius, Spacing } from "../../../../common/design/spacing";
 import { getElevationStyle } from "../../../../utils/elevation";
-import { AppFontSize, defaultBorderRadius } from "../../../../utils/size";
 import { renderGroup } from "./common";
-import { DraggableItem, useDragState } from "./state";
+import { DraggableItem, ToolDefinition, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
-import { findToolById, getToolIcon } from "./toolbar-definition";
+import {
+  findToolById,
+  getToolIcon,
+  getToolIconName
+} from "./toolbar-definition";
 
 import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
 import { strings } from "@notesnook/intl";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ToastManager } from "../../../../services/event-manager";
 import { DefaultAppStyles } from "../../../../utils/styles";
 
@@ -71,13 +76,24 @@ export const Tool = ({
     isSubgroup || !tool
       ? null
       : getToolIcon(tool.icon as ToolId, colors.secondary.icon);
+  // Prefer a glyph from the custom `notesnook` icon font when the tool has one;
+  // otherwise fall back to the editor's built-in per-tool icon (`iconSvgString`).
+  const toolIconName =
+    isSubgroup || !tool ? undefined : getToolIconName(item as ToolId);
   const featureAvailable = useIsFeatureAvailable("customToolbarPreset");
 
   const buttons = React.useCallback(() => {
-    const btns = isSubgroup
+    const btns: {
+      name: string;
+      iconFamily?: "notesnook" | "material" | "evilicons";
+      color?: string;
+      onPress: () => void;
+    }[] = isSubgroup
       ? [
           {
-            name: "minus",
+            name: "trash",
+            iconFamily: "notesnook",
+            color: colors.error.icon,
             onPress: async () => {
               const feature = await isFeatureAvailable("customToolbarPreset");
               if (!feature.isAllowed) {
@@ -103,6 +119,8 @@ export const Tool = ({
           },
           {
             name: "plus",
+            iconFamily: "notesnook",
+            color: colors.primary.icon,
             onPress: async () => {
               const feature = await isFeatureAvailable("customToolbarPreset");
               if (!feature.isAllowed) {
@@ -124,6 +142,8 @@ export const Tool = ({
       : [
           {
             name: "minus",
+            iconFamily: "notesnook",
+            color: colors.primary.icon,
             onPress: async () => {
               const feature = await isFeatureAvailable("customToolbarPreset");
               if (!feature.isAllowed) {
@@ -151,9 +171,12 @@ export const Tool = ({
           }
         ];
 
-    if (parentIndex === undefined && !isSubgroup) {
+    if (!isSubgroup && parentIndex === undefined) {
+      // Top-level tool: collapse it into this group's collapsed subgroup.
       btns.unshift({
-        name: "unfold-less-horizontal",
+        name: "format-arrows-in-simple",
+        iconFamily: "notesnook",
+        color: colors.primary.icon,
         onPress: async () => {
           if (groupIndex === undefined) return;
           const _data = useDragState.getState().data.slice();
@@ -176,9 +199,48 @@ export const Tool = ({
           setData(_data);
         }
       });
+    } else if (!isSubgroup && typeof parentIndex === "number") {
+      // Tool inside a collapsed subgroup: expand it back out to the parent group.
+      btns.unshift({
+        name: "format-arrows-out-simple",
+        iconFamily: "notesnook",
+        color: colors.primary.icon,
+        onPress: async () => {
+          const feature = await isFeatureAvailable("customToolbarPreset");
+          if (!feature.isAllowed) {
+            ToastManager.show({
+              type: "info",
+              message: feature?.error
+            });
+            return;
+          }
+          if (typeof groupIndex !== "number") return;
+          const _data = useDragState.getState().data.slice();
+          const parentGroup = _data[parentIndex] as ToolDefinition[];
+          const subgroup = parentGroup[groupIndex] as ToolId[];
+          if (!Array.isArray(subgroup)) return;
+          const idx = subgroup.findIndex((tool) => tool === item);
+          if (idx === -1) return;
+          const [removed] = subgroup.splice(idx, 1);
+          // Re-insert the tool into the parent group, just before the subgroup.
+          parentGroup.splice(groupIndex, 0, removed);
+          // Drop the subgroup if it is now empty.
+          if (subgroup.length === 0) parentGroup.splice(groupIndex + 1, 1);
+          setData(_data);
+        }
+      });
     }
     return btns;
-  }, [groupIndex, index, isSubgroup, item, parentIndex, setData]);
+  }, [
+    colors.error.icon,
+    colors.primary.icon,
+    groupIndex,
+    index,
+    isSubgroup,
+    item,
+    parentIndex,
+    setData
+  ]);
 
   const renderChild = React.useCallback(
     (hover?: boolean) => (
@@ -190,60 +252,65 @@ export const Tool = ({
           }}
           style={{
             backgroundColor: isSubgroup
-              ? colors.primary.background
+              ? "transparent"
               : colors.secondary.background,
-            borderWidth: isSubgroup ? 0 : 1,
-            borderColor: isSubgroup ? undefined : colors.secondary.background,
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
+            marginBottom: DefaultAppStyles.GAP_SMALL,
             width: isDragged ? dimensions.current.width : "100%",
-            paddingTop: isSubgroup ? 15 : 0,
-            height: 40,
-            paddingHorizontal: isSubgroup ? 0 : DefaultAppStyles.GAP,
-            paddingRight: 0,
-            borderRadius: defaultBorderRadius,
+            height: isSubgroup ? 40 : undefined,
+            padding: isSubgroup ? 0 : Spacing.LEVEL_2,
+            borderRadius: Radius.S,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            paddingLeft: isSubgroup ? 30 : 12,
             ...getElevationStyle(hover ? 3 : 0)
           }}
         >
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              gap: Spacing.LEVEL_0,
+              paddingLeft: isSubgroup ? Spacing.LEVEL_3 : 0
             }}
           >
-            {!isSubgroup && iconSvgString ? (
-              <SvgView width={23} height={23} src={iconSvgString} />
-            ) : null}
-            {isSubgroup && (
-              <Icon
-                style={{ marginRight: 5 }}
-                size={AppFontSize.md}
-                name="drag"
-                color={colors.primary.icon}
+            {isSubgroup ? (
+              <AppIcon
+                name="dots-six-vertical"
+                iconFamily="notesnook"
+                size={16}
+                color={colors.secondary.icon}
               />
+            ) : toolIconName ? (
+              <AppIcon
+                name={toolIconName}
+                iconFamily="notesnook"
+                size={16}
+                color={colors.secondary.icon}
+              />
+            ) : iconSvgString ? (
+              <SvgView width={16} height={16} src={iconSvgString} />
+            ) : null}
+            {isSubgroup ? (
+              <Heading
+                fontSize="SM"
+                fontFamily="MEDIUM"
+                lineHeight={null}
+                color={colors.secondary.heading}
+              >
+                {strings.collapsed()}
+              </Heading>
+            ) : (
+              <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+                {tool?.title}
+              </Paragraph>
             )}
-            <Paragraph
-              style={{
-                marginLeft: iconSvgString ? 10 : 0
-              }}
-              color={
-                isSubgroup
-                  ? colors.secondary.paragraph
-                  : colors.primary.paragraph
-              }
-              size={isSubgroup ? AppFontSize.xs : AppFontSize.sm - 1}
-            >
-              {isSubgroup ? strings.collapsed() : tool?.title}
-            </Paragraph>
           </View>
 
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              gap: DefaultAppStyles.GAP_SMALL
             }}
           >
             {buttons().map((btn) => (
@@ -254,12 +321,10 @@ export const Tool = ({
                 right={0}
                 key={item + btn.name}
                 onPress={btn.onPress}
-                style={{
-                  marginLeft: 10
-                }}
                 name={btn.name}
-                color={colors.primary.icon}
-                size={AppFontSize.lg}
+                iconFamily={btn.iconFamily}
+                color={btn.color}
+                size={isSubgroup ? 16 : 14}
               />
             ))}
           </View>
@@ -268,7 +333,7 @@ export const Tool = ({
         {isSubgroup && !isDragged ? (
           <View
             style={{
-              paddingLeft: 30
+              paddingLeft: Spacing.LEVEL_3
             }}
             key={`subgroup-${item.length}-${groupIndex}-${index}-${parentIndex}`}
           >
@@ -279,17 +344,18 @@ export const Tool = ({
     ),
     [
       buttons,
-      colors.primary.background,
-      colors.primary.icon,
       colors.secondary.background,
-      colors.primary.paragraph,
+      colors.secondary.heading,
+      colors.secondary.icon,
       colors.secondary.paragraph,
       groupIndex,
       iconSvgString,
+      toolIconName,
       index,
       isDragged,
       isSubgroup,
       item,
+      parentIndex,
       tool?.title
     ]
   );
@@ -393,13 +459,14 @@ export const Tool = ({
             dragged?.type === "subgroup"
               ? colors.secondary.background
               : undefined,
-          marginTop:
-            recievePosition === "above" ? DefaultAppStyles.GAP_VERTICAL : 0,
-          marginBottom:
-            recievePosition === "below" ? DefaultAppStyles.GAP_VERTICAL : 0,
+          marginTop: recievePosition === "above" ? Spacing.LEVEL_3 : 0,
+          marginBottom: recievePosition === "below" ? Spacing.LEVEL_3 : 0,
           borderRadius: 10
         }}
         renderHoverContent={() => renderChild(true)}
+        hoverStyle={{
+          height: "auto"
+        }}
         draggable={item !== "dummy"}
         onDragDrop={() => {
           setDragged({});

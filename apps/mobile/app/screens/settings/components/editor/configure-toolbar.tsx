@@ -24,25 +24,43 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
+import { Spacing } from "../../../../common/design/spacing";
 import PaywallSheet from "../../../../components/sheets/paywall";
+import AppIcon from "../../../../components/ui/AppIcon";
 import { Button } from "../../../../components/ui/button";
 import { Notice } from "../../../../components/ui/notice";
+import { Pressable } from "../../../../components/ui/pressable";
+import Heading from "../../../../components/ui/typography/heading";
 import Paragraph from "../../../../components/ui/typography/paragraph";
 import { ToastManager } from "../../../../services/event-manager";
-import { AppFontSize } from "../../../../utils/size";
 import { DefaultAppStyles } from "../../../../utils/styles";
 import { Group } from "./group";
 import { DragState, useDragState } from "./state";
+
+const PRESETS = [
+  { id: "default", name: strings.default() },
+  { id: "minimal", name: strings.minimal() },
+  { id: "custom", name: strings.custom(), pro: true }
+];
+
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
   const { colors } = useThemeColors();
+
+  const addGroup = () => {
+    const _data = data ? data.slice() : [];
+    _data.push([]);
+    useDragState.getState().setData(_data);
+  };
 
   const renderGroups = () => {
     return data?.map((item, index) => (
       <Group key={`group-${index}-${item.length}`} item={item} index={index} />
     ));
   };
+
+  const isEmpty = !data || data.length === 0;
 
   return (
     <DraxProvider>
@@ -53,79 +71,89 @@ export const ConfigureToolbar = () => {
       >
         <View
           style={{
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL
+            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+            gap: DefaultAppStyles.GAP
           }}
         >
-          <Notice text={strings.configureToolbarNotice()} type="information" />
+          <Notice
+            text={strings.configureToolbarNotice()}
+            type="information"
+            size="small"
+          />
 
-          <Paragraph
-            style={{
-              marginTop: DefaultAppStyles.GAP_VERTICAL
-            }}
-            size={AppFontSize.xs}
-            color={colors.secondary.paragraph}
-          >
-            {strings.presets()}
-          </Paragraph>
+          <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
+            <Heading
+              fontSize="SM"
+              fontFamily="MEDIUM"
+              color={colors.primary.accent}
+            >
+              {strings.presets()}
+            </Heading>
 
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              width: "100%",
-              marginTop: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            {[
-              {
-                id: "default",
-                name: strings.default()
-              },
-              {
-                id: "minimal",
-                name: strings.minimal()
-              },
-              {
-                id: "custom",
-                name: strings.custom(),
-                pro: true
-              }
-            ].map((item) => (
-              <Button
-                type={preset === item.id ? "accent" : "secondaryAccented"}
-                style={{
-                  borderRadius: 100,
-                  marginRight: 10,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
-                }}
-                proTag={item.pro}
-                onPress={async () => {
-                  if (item.id === "custom") {
-                    const customToolbarPresetFeature = await isFeatureAvailable(
-                      "customToolbarPreset"
-                    );
-                    if (!customToolbarPresetFeature.isAllowed) {
-                      ToastManager.show({
-                        message: customToolbarPresetFeature.error,
-                        type: "info",
-                        actionText: strings.upgrade(),
-                        func: () =>
-                          PaywallSheet.present(customToolbarPresetFeature)
-                      });
-                      return;
-                    }
-                  }
-                  useDragState
-                    .getState()
-                    .setPreset(item.id as DragState["preset"]);
-                }}
-                fontSize={AppFontSize.sm - 1}
-                key={item.name}
-                title={item.name}
-              />
-            ))}
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                width: "100%",
+                gap: Spacing.LEVEL_2
+              }}
+            >
+              {PRESETS.map((item) => {
+                const selected = preset === item.id;
+                return (
+                  <Pressable
+                    key={item.id}
+                    type="transparent"
+                    onPress={async () => {
+                      if (item.id === "custom") {
+                        const customToolbarPresetFeature =
+                          await isFeatureAvailable("customToolbarPreset");
+                        if (!customToolbarPresetFeature.isAllowed) {
+                          ToastManager.show({
+                            message: customToolbarPresetFeature.error,
+                            type: "info",
+                            actionText: strings.upgrade(),
+                            func: () =>
+                              PaywallSheet.present(customToolbarPresetFeature)
+                          });
+                          return;
+                        }
+                      }
+                      useDragState
+                        .getState()
+                        .setPreset(item.id as DragState["preset"]);
+                    }}
+                    style={{
+                      paddingHorizontal: Spacing.LEVEL_2,
+                      paddingVertical: Spacing.LEVEL_0,
+                      borderRadius: 50,
+                      backgroundColor: selected
+                        ? colors.selected.background
+                        : "transparent",
+                      borderWidth: selected ? 0 : 1,
+                      borderColor: colors.primary.border,
+                      width: "auto"
+                    }}
+                  >
+                    <Heading
+                      fontSize="SM"
+                      fontFamily={selected ? "MEDIUM" : "REGULAR"}
+                      lineHeight={null}
+                      color={
+                        selected
+                          ? colors.primary.heading
+                          : colors.secondary.paragraph
+                      }
+                    >
+                      {item.name}
+                    </Heading>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
         </View>
+
         <DraxScrollView
           style={{
             flex: 1
@@ -134,26 +162,90 @@ export const ConfigureToolbar = () => {
           scrollEventThrottle={13}
           showsVerticalScrollIndicator={false}
         >
-          {renderGroups()}
-          <View
-            style={{
-              height: 500
-            }}
-          >
-            <Button
-              title={strings.createAGroup()}
-              type="secondaryAccented"
-              icon="plus"
+          {isEmpty ? (
+            <View
               style={{
-                width: "100%"
+                gap: Spacing.LEVEL_4,
+                alignItems: "center",
+                paddingTop: Spacing.LEVEL_8
               }}
-              onPress={() => {
-                const _data = data ? data.slice() : [];
-                _data.push([]);
-                useDragState.getState().setData(_data);
-              }}
-            />
-          </View>
+            >
+              <View style={{ gap: Spacing.LEVEL_1 }}>
+                <Heading
+                  fontSize="XL"
+                  lineHeight="100%"
+                  style={{ textAlign: "center" }}
+                >
+                  {strings.noGroupsCreated()}
+                </Heading>
+                <Paragraph
+                  fontSize="SM"
+                  color={colors.primary.paragraph}
+                  style={{ textAlign: "center" }}
+                >
+                  {strings.noGroupsCreatedDesc()}
+                </Paragraph>
+              </View>
+              <Button
+                title={strings.createAGroup()}
+                type="accent"
+                style={{ width: "auto" }}
+                onPress={addGroup}
+              />
+            </View>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}
+              >
+                <Heading
+                  fontSize="SM"
+                  fontFamily="MEDIUM"
+                  color={colors.primary.accent}
+                >
+                  {strings.toolbarGroups()}
+                </Heading>
+                <Pressable
+                  type="transparent"
+                  onPress={addGroup}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
+                    width: "auto"
+                  }}
+                >
+                  <AppIcon
+                    name="plus"
+                    iconFamily="notesnook"
+                    size={16}
+                    color={colors.primary.accent}
+                  />
+                  <Heading
+                    fontSize="SM"
+                    fontFamily="MEDIUM"
+                    lineHeight={null}
+                    color={colors.primary.accent}
+                  >
+                    {strings.newGroup()}
+                  </Heading>
+                </Pressable>
+              </View>
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: colors.primary.border
+                }}
+              />
+              {renderGroups()}
+              <View style={{ height: 300 }} />
+            </>
+          )}
         </DraxScrollView>
       </Animated.View>
     </DraxProvider>

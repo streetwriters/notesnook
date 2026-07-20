@@ -96,7 +96,7 @@ const SelectionWrapper = ({
       <View
         style={{
           backgroundColor: isEditingNote
-            ? colors.selected.background
+            ? colors.secondary.background
             : undefined,
           ...wrapperStyle
         }}
@@ -113,10 +113,23 @@ const SelectionWrapper = ({
           style={{
             paddingHorizontal: Spacing.LEVEL_3,
             paddingBottom: Spacing.LEVEL_2,
-            paddingTop: hasGroupHeader ? 0 : Spacing.LEVEL_2,
+            paddingTop: hasGroupHeader ? Spacing.LEVEL_1 : Spacing.LEVEL_2,
             ...style
           }}
         >
+          {isEditingNote ? (
+            <View
+              style={{
+                backgroundColor: color || colors.selected.accent,
+                position: "absolute",
+                bottom: 0,
+                top: 0,
+                left: 0,
+                width: 4
+              }}
+            />
+          ) : null}
+
           <View
             style={{
               width: "100%",
