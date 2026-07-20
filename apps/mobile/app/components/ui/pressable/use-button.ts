@@ -40,7 +40,8 @@ export type ButtonTypes =
   | "selected"
   | "accent-outline"
   | "secondary-outline"
-  | "secondary-simple";
+  | "secondary-simple"
+  | "error-shade-outline";
 
 type ButtonVariant = {
   primary: string;
@@ -233,6 +234,14 @@ const buttonTypes = (
       0.07,
       isDark
     )
+  },
+  "error-shade-outline": {
+    primary: colors.error.background,
+    text: colors.error.paragraph,
+    selected: colors.error.background,
+    borderWidth: 0.8,
+    borderColor: colors.error.border,
+    borderSelectedColor: getColorLinearShade(colors.error.border, 0.07, isDark)
   },
   "error-outline": {
     primary: "transparent",

@@ -248,7 +248,9 @@ const NoteItem = ({
                     borderRadius: 100,
                     paddingHorizontal: Spacing.LEVEL_1,
                     paddingVertical: 2,
-                    backgroundColor: colors.secondary.background,
+                    backgroundColor: isEditingNote
+                      ? colors.primary.background
+                      : colors.secondary.background,
                     flexDirection: "row",
                     alignItems: "center",
                     gap: Spacing.LEVEL_0
@@ -276,7 +278,9 @@ const NoteItem = ({
                       borderRadius: 100,
                       paddingHorizontal: Spacing.LEVEL_1,
                       paddingVertical: 2,
-                      backgroundColor: colors.secondary.background,
+                      backgroundColor: isEditingNote
+                        ? colors.primary.background
+                        : colors.secondary.background,
                       flexDirection: "row",
                       alignItems: "center",
                       gap: Spacing.LEVEL_0
