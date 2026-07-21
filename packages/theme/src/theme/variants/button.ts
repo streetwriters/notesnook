@@ -70,6 +70,49 @@ export const createButtonVariant = (
   }
 });
 
+/**
+ * will eventually replace createButtonVariant when redesign is completed
+ */
+export const newCreateButtonVariant = (
+  background: SchemeColors = "transparent",
+  color: SchemeColors = "paragraph",
+  states?: {
+    hover?: ThemeUIStyleObject;
+    active?: ThemeUIStyleObject;
+  }
+): ThemeUIStyleObject => ({
+  ...createButtonVariant(background, color, states),
+  alignItems: "center",
+  justifyContent: "center",
+  alignSelf: "center",
+  display: "flex",
+  paddingY: "spacing6",
+  paddingX: "spacing5",
+  fontSize: "md",
+  fontWeight: 600,
+  borderRadius: "radius2"
+});
+
+const newAccent = newCreateButtonVariant("accent", "accentForeground", {
+  hover: { bg: alpha("accent", 0.9) },
+  active: { bg: alpha("accent", 0.8) }
+});
+
+const newBordered: ThemeUIStyleObject = {
+  ...newCreateButtonVariant("transparent", "buttonForeground-secondary", {
+    hover: { bg: "hover" },
+    active: { bg: "hover" }
+  }),
+  border: "1px solid",
+  borderColor: "border"
+};
+
+const newAnchor: ThemeUIStyleObject = {
+  variant: "buttons.anchor",
+  fontSize: "sm",
+  fontWeight: 500
+};
+
 const primary = createButtonVariant("transparent", "paragraph", {
   hover: { bg: "hover" },
   active: { bg: "hover" }
@@ -152,11 +195,14 @@ export const buttonVariants = {
   tertiary,
 
   accent,
+  new_accent: newAccent,
+  new_bordered: newBordered,
   accentSecondary,
   error,
   errorSecondary,
 
   anchor,
+  new_anchor: newAnchor,
   dialog,
   statusitem: statusItem,
   icon: menuItem,

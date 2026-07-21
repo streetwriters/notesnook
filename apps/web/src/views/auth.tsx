@@ -285,7 +285,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
           <Button
             data-test-id="auth-forgot-password"
             type="button"
-            variant="anchor"
+            variant="new_anchor"
             onClick={() => navigate("recover", { email: form?.email || "" })}
             sx={{
               mt: "spacing4",
@@ -1092,19 +1092,8 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
       {canSkip && (
         <Button
           type="button"
-          variant="anchor"
-          sx={{
-            mt: "spacing4",
-            paddingY: "spacing6",
-            paddingX: "spacing5",
-            fontWeight: 600,
-            fontSize: "md",
-            color: "buttonForeground-secondary",
-            textDecoration: "none",
-            border: "1px solid",
-            borderColor: "border",
-            borderRadius: "radius2"
-          }}
+          variant="new_bordered"
+          sx={{ width: "100%", mt: "spacing4" }}
           onClick={() => {
             openURL("/notes/", { authenticated: false });
           }}
@@ -1232,19 +1221,10 @@ export function SubmitButton(props: SubmitButtonProps) {
     <Button
       data-test-id="submitButton"
       type="submit"
-      variant="accent"
+      variant="new_accent"
       sx={{
         marginTop: "spacing8",
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "center",
-        display: "flex",
-        paddingY: "spacing6",
-        paddingX: "spacing5",
-        fontSize: "md",
-        fontWeight: 600,
-        width: "100%",
-        borderRadius: "radius2"
+        width: "100%"
       }}
       disabled={props.disabled}
     >

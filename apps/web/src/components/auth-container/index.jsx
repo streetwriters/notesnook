@@ -152,14 +152,8 @@ function AuthContainer(props) {
             }}
           >
             <Button
-              variant="anchor"
+              variant="new_anchor"
               onClick={() => SettingsDialog.show({ activeSection: "servers" })}
-              sx={{
-                fontSize: "sm",
-                fontWeight: 500,
-                color: "accent",
-                textDecoration: "underline"
-              }}
             >
               {"Change server"}
             </Button>
