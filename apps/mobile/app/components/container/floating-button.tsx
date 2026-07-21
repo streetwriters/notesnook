@@ -36,6 +36,7 @@ import { getElevationStyle } from "../../utils/elevation";
 import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -67,6 +68,7 @@ const FloatingButton = ({
   const translate = useSharedValue(0);
   const keyboardHeight = useSharedValue(0);
   const route = useRoute();
+  const insets = useGlobalSafeAreaInsets();
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -108,9 +110,12 @@ const FloatingButton = ({
       if (hideOnKeyboard) {
         animate(150);
       } else {
-        keyboardHeight.value = withTiming(e.endCoordinates.height, {
-          duration: 250
-        });
+        keyboardHeight.value = withTiming(
+          e.endCoordinates.height - insets.bottom,
+          {
+            duration: 250
+          }
+        );
       }
     };
 
@@ -121,7 +126,7 @@ const FloatingButton = ({
     return () => {
       sub.forEach((sub) => sub.remove());
     };
-  }, [deviceMode, animate, hideOnKeyboard]);
+  }, [deviceMode, animate, hideOnKeyboard, keyboardHeight, insets.bottom]);
 
   return deviceMode !== "mobile" && !alwaysVisible ? null : (
     <Animated.View
