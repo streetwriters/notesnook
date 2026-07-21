@@ -161,7 +161,7 @@ function AuthContainer(props) {
                 textDecoration: "underline"
               }}
             >
-              {strings.configure()}
+              {"Change server"}
             </Button>
           </Flex>
         </Box>
