@@ -1,0 +1,132 @@
+name: Notesnook iOS Preview Publish
+
+# TRUSTED stage. Runs via `workflow_run` after the build workflow finishes, so
+# it has the base repo's secrets and a write-scoped token. It checks out the
+# BASE repository (never fork code), downloads the unsigned archive the build
+# produced, then signs + exports + distributes it and posts the PR comment.
+# `xcodebuild -exportArchive` only packages and signs a prebuilt archive; it
+# does not run the app's build phases, so fork code is never executed here.
+
+on:
+  workflow_run:
+    workflows: ["Notesnook iOS Preview Build"]
+    types: [completed]
+
+jobs:
+  publish:
+    # Only publish previews for builds that actually succeeded.
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout base repo (trusted)
+        uses: actions/checkout@v5
+        # No `ref` -> checks out the default branch, i.e. trusted base code.
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.1.1"
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-preview-build
+          path: ${{ runner.temp }}/artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load PR metadata & extract archive
+        run: |
+          set -euo pipefail
+          cat "$RUNNER_TEMP/artifact/pr-meta.env" >> "$GITHUB_ENV"
+          tar -xzf "$RUNNER_TEMP/artifact/Notesnook.xcarchive.tar.gz" -C "$RUNNER_TEMP"
+
+      - name: Import signing certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+
+      - name: Install provisioning profiles
+        env:
+          PROFILE_APP: ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_APP }}
+          PROFILE_SHARE: ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_SHARE }}
+          PROFILE_WIDGET: ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_WIDGET }}
+        run: |
+          set -euo pipefail
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR"
+          i=0
+          for p in "$PROFILE_APP" "$PROFILE_SHARE" "$PROFILE_WIDGET"; do
+            echo "$p" | base64 --decode > "$PROFILE_DIR/preview-$i.mobileprovision"
+            i=$((i + 1))
+          done
+
+      - name: Export signed IPA
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
+          cp apps/mobile/ios/ExportOptionsStaging.plist "$EXPORT_PLIST"
+          # Augment the checked-in profile map with the fields exportArchive needs.
+          /usr/libexec/PlistBuddy -c "Add :method string ad-hoc" "$EXPORT_PLIST" 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Set :method ad-hoc" "$EXPORT_PLIST"
+          /usr/libexec/PlistBuddy -c "Add :signingStyle string manual" "$EXPORT_PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :signingCertificate string Apple Distribution" "$EXPORT_PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :teamID string $APPLE_TEAM_ID" "$EXPORT_PLIST" 2>/dev/null \
+            || /usr/libexec/PlistBuddy -c "Set :teamID $APPLE_TEAM_ID" "$EXPORT_PLIST"
+
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Notesnook.xcarchive" \
+            -exportOptionsPlist "$EXPORT_PLIST" \
+            -exportPath "$RUNNER_TEMP/export"
+
+          # Normalize the IPA name for the distribution step.
+          IPA="$(find "$RUNNER_TEMP/export" -name '*.ipa' | head -n1)"
+          cp "$IPA" "$RUNNER_TEMP/Notesnook.ipa"
+
+      - name: Publish to Firebase
+        id: firebase-output
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
+          groups: testers
+          file: ${{ runner.temp }}/Notesnook.ipa
+          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        env:
+          preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+        with:
+          script: |
+            const marker = '<!-- ios-preview-comment -->';
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!prNumber) return;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**iOS App Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.HEAD_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
