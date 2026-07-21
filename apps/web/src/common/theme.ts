@@ -43,7 +43,7 @@ export const THEME_LIGHT: any = {
       primary: {
         accent: "#008836",
         accentForeground: "#ffffff",
-        paragraph: "#666666",
+        paragraph: "#5b5b5b",
         background: "#ffffff",
         border: "#E2E2E2",
         heading: "#181818",
@@ -98,7 +98,7 @@ export const THEME_LIGHT: any = {
         accent: "#008836",
         accentForeground: "#ffffff",
         paragraph: "#181818",
-        background: "#00883610",
+        background: "#E2EDE6",
         border: "#008836",
         heading: "#212121",
         icon: "#181818",
