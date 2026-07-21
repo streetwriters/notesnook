@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
@@ -56,7 +56,7 @@ jobs:
       macos-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
@@ -127,7 +127,7 @@ jobs:
       linux-x64-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
@@ -171,7 +171,7 @@ jobs:
       linux-arm64-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
@@ -215,7 +215,7 @@ jobs:
       windows-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
