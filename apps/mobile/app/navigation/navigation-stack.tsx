@@ -307,14 +307,15 @@ export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
-  const pendingShortcut = useSettingStore((state) => state.pendingShortcut);
-  const pendingShortcutLoaded = useSettingStore(
-    (state) => state.pendingShortcutLoaded
-  );
+
+  const initialShortcut = React.useRef(
+    useSettingStore.getState().pendingShortcut
+  ).current;
+
   const reminderFeature = useIsFeatureAvailable("activeReminders");
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const resetTimer = React.useRef<NodeJS.Timeout>(undefined);
-  const isNavigationLoaded = React.useRef(true);
+
   const onStateChange = React.useCallback(
     (state: any) => {
       if (useSelectionStore.getState().selectionMode) {
@@ -330,59 +331,55 @@ export const RootNavigation = () => {
   );
 
   React.useEffect(() => {
-    if (pendingShortcut?.type === "notesnook.action.newreminder") {
-      useSettingStore.setState({ pendingShortcut: null });
-    }
-  }, []);
+    const unsubscribe = useSettingStore.subscribe((state, prevState) => {
+      const pendingShortcut = state.pendingShortcut;
 
-  React.useEffect(() => {
-    if (isNavigationLoaded.current) {
-      isNavigationLoaded.current = false;
-      return;
-    }
-    if (!pendingShortcut) return;
-
-    if (pendingShortcut.type === "notesnook.action.newreminder") {
-      if (reminderFeature === undefined) return;
-
-      if (!reminderFeature.isAllowed) {
-        presentDialog({
-          title: strings.upgrade(),
-          paragraph: reminderFeature.error,
-          positiveText: strings.upgrade(),
-          negativeText: strings.cancel(),
-          positivePress: async () => {
-            PaywallSheet.present(reminderFeature);
-          }
-        });
-        useSettingStore.setState({ pendingShortcut: null });
+      if (pendingShortcut === prevState.pendingShortcut || !pendingShortcut) {
         return;
       }
-      rootNavigatorRef.current?.navigate("AddReminder" as any);
-      useSettingStore.setState({ pendingShortcut: null });
-    } else if (pendingShortcut.type === "notesnook.action.newnote") {
-      if (fluidTabsRef.current) {
-        rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
-        eSendEvent(eOnLoadNote, { newNote: true });
-        editorState().movedAway = false;
-        fluidTabsRef.current.goToPage("editor", true);
-      } else {
-        launchNewNoteTab();
 
-        rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
-          initialPage: "editor"
-        });
+      if (pendingShortcut.type === "notesnook.action.newreminder") {
+        if (reminderFeature === undefined) return;
+
+        if (!reminderFeature.isAllowed) {
+          presentDialog({
+            title: strings.upgrade(),
+            paragraph: reminderFeature.error,
+            positiveText: strings.upgrade(),
+            negativeText: strings.cancel(),
+            positivePress: async () => {
+              PaywallSheet.present(reminderFeature);
+            }
+          });
+          useSettingStore.setState({
+            pendingShortcut: null
+          });
+          return;
+        }
+
+        rootNavigatorRef.current?.navigate("AddReminder" as any);
+      } else if (pendingShortcut.type === "notesnook.action.newnote") {
+        if (fluidTabsRef.current) {
+          rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
+          eSendEvent(eOnLoadNote, { newNote: true });
+          editorState().movedAway = false;
+          fluidTabsRef.current.goToPage("editor", true);
+        } else {
+          launchNewNoteTab();
+
+          rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
+            initialPage: "editor"
+          });
+        }
       }
+    });
 
-      useSettingStore.setState({ pendingShortcut: null });
-    }
-  }, [pendingShortcut]);
-
-  if (!pendingShortcutLoaded) return null;
+    return unsubscribe;
+  }, [reminderFeature]);
 
   const initialRouteName = !introCompleted
     ? "Welcome"
-    : pendingShortcut?.type === "notesnook.action.newreminder"
+    : initialShortcut?.type === "notesnook.action.newreminder"
       ? "AddReminder"
       : "FluidPanelsView";
 
@@ -419,7 +416,7 @@ export const RootNavigation = () => {
           }}
           initialParams={{
             initialPage:
-              pendingShortcut?.type === "notesnook.action.newnote"
+              initialShortcut?.type === "notesnook.action.newnote"
                 ? "editor"
                 : undefined
           }}

@@ -151,7 +151,6 @@ export interface SettingStore {
   inboxEnabled: boolean;
   setInboxEnabled: (inboxEnabled: boolean) => void;
   pendingShortcut: ShortcutItem | null;
-  pendingShortcutLoaded: boolean;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -273,6 +272,5 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   },
   inboxEnabled: false,
   setInboxEnabled: (inboxEnabled) => set({ inboxEnabled }),
-  pendingShortcut: null,
-  pendingShortcutLoaded: false
+  pendingShortcut: null
 }));

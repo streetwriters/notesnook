@@ -101,6 +101,15 @@ export const FluidPanelsView = React.memo(
         setOrientation(o);
       }
     });
+    React.useEffect(() => {
+      const shortcut = useSettingStore.getState().pendingShortcut;
+
+      if (shortcut?.type === "notesnook.action.newnote") {
+        useSettingStore.setState({
+          pendingShortcut: null
+        });
+      }
+    }, []);
 
     useEffect(() => {
       if (!appLoading) {
