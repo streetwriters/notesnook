@@ -31,6 +31,7 @@ import { getFormattedDate } from "@notesnook/common";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { isCipher } from "@notesnook/core";
 import { attachFiles } from "../components/editor/picker";
+import { BaseAttachment } from "@notesnook/editor";
 
 export class WebExtensionServer implements Server {
   async login() {
@@ -88,11 +89,16 @@ export class WebExtensionServer implements Server {
         }
       );
 
-      let attachment;
-      for await (const message of attachFiles([clippedFile])) {
-        if (message.type === "done") attachment = message.attachment;
-        else if (message.type === "error") return;
-      }
+      let attachment: BaseAttachment | undefined;
+      await attachFiles([clippedFile], (message) => {
+        switch (message.type) {
+          case ("done"):
+            attachment = message.attachment;
+            break;
+          case ("error"):
+            return;
+        }
+      })
       if (!attachment) return;
 
       clipContent += h("iframe", [], {
@@ -116,14 +122,14 @@ export class WebExtensionServer implements Server {
     content +=
       clip.mode === "bookmark"
         ? h("div", [
-            h("p", [`Date bookmarked: ${getFormattedDate(Date.now())}`]),
-            h("hr")
-          ]).innerHTML
+          h("p", [`Date bookmarked: ${getFormattedDate(Date.now())}`]),
+          h("hr")
+        ]).innerHTML
         : h("div", [
-            h("hr"),
-            h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
-            h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
-          ]).innerHTML;
+          h("hr"),
+          h("p", ["Clipped from ", h("a", [clip.title], { href: clip.url })]),
+          h("p", [`Date clipped: ${getFormattedDate(Date.now())}`])
+        ]).innerHTML;
 
     const id = await db.notes.add({
       id: note?.id,
