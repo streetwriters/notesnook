@@ -46,6 +46,7 @@ import AppLocked from "./components/app-lock";
 import { useSettingStore } from "./stores/use-setting-store";
 import {
   initShortcutListener,
+  launchNewNoteTab,
   registerAppShortcuts
 } from "./hooks/use-shortcut-manager";
 import Shortcuts from "react-native-actions-shortcuts";
@@ -59,6 +60,10 @@ if (appLockEnabled || appLockMode !== "none") {
 }
 
 Shortcuts.getInitialShortcut().then((shortcut) => {
+  if (shortcut?.type === "notesnook.action.newnote") {
+    launchNewNoteTab();
+  }
+
   useSettingStore.setState({
     pendingShortcut: shortcut ?? null,
     pendingShortcutLoaded: true

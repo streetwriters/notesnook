@@ -37,7 +37,7 @@ import { eOnLoadNote } from "../utils/events";
 import { strings } from "@notesnook/intl";
 import PaywallSheet from "../components/sheets/paywall";
 import { presentDialog } from "../components/dialog/functions";
-import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
+import { launchNewNoteTab } from "../hooks/use-shortcut-manager";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -358,30 +358,16 @@ export const RootNavigation = () => {
         useSettingStore.setState({ pendingShortcut: null });
         return;
       }
-
       rootNavigatorRef.current?.navigate("AddReminder" as any);
       useSettingStore.setState({ pendingShortcut: null });
     } else if (pendingShortcut.type === "notesnook.action.newnote") {
-      let tabId;
-
       if (fluidTabsRef.current) {
         rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
         eSendEvent(eOnLoadNote, { newNote: true });
         editorState().movedAway = false;
         fluidTabsRef.current.goToPage("editor", true);
       } else {
-        const currentTab = useTabStore
-          .getState()
-          .getTab(useTabStore.getState().currentTab as string);
-
-        if (useTabStore.getState().tabs.length === 0 || currentTab?.pinned) {
-          tabId = useTabStore.getState().newTab();
-        } else {
-          tabId = useTabStore.getState().currentTab;
-          if (useTabStore.getState().getTab(tabId)?.session?.noteId) {
-            useTabStore.getState().newTabSession(tabId, {});
-          }
-        }
+        launchNewNoteTab();
 
         rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
           initialPage: "editor"

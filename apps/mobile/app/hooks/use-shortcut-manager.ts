@@ -21,6 +21,7 @@ import { NativeEventEmitter, NativeModule, Platform } from "react-native";
 import deviceInfoModule from "react-native-device-info";
 import { strings } from "@notesnook/intl";
 import { useSettingStore } from "../stores/use-setting-store";
+import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
 
 const ShortcutsEmitter = new NativeEventEmitter(
   Shortcuts as unknown as NativeModule
@@ -59,7 +60,24 @@ export function initShortcutListener() {
   ShortcutsEmitter.addListener(
     "onShortcutItemPressed",
     (shortcut: ShortcutItem) => {
+      console.time("shortcut");
       useSettingStore.setState({ pendingShortcut: shortcut });
     }
   );
+}
+
+export function launchNewNoteTab() {
+  let tabId;
+  const currentTab = useTabStore
+    .getState()
+    .getTab(useTabStore.getState().currentTab as string);
+
+  if (useTabStore.getState().tabs.length === 0 || currentTab?.pinned) {
+    tabId = useTabStore.getState().newTab();
+  } else {
+    tabId = useTabStore.getState().currentTab;
+    if (useTabStore.getState().getTab(tabId)?.session?.noteId) {
+      useTabStore.getState().newTabSession(tabId, {});
+    }
+  }
 }
