@@ -113,8 +113,13 @@ function AuthContainer(props) {
             </Flex>
             <Image
               src={NotesnookPhoneImage}
-              width={420}
-              sx={{ marginLeft: "58px" }}
+              sx={{
+                marginLeft: "58px",
+                objectFit: "contain",
+                height: "100%",
+                flex: 0.95,
+                overflow: "hidden"
+              }}
             />
           </Flex>
           <Box
