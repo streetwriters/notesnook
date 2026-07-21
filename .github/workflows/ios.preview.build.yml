@@ -1,0 +1,143 @@
+name: Notesnook iOS Preview Build
+
+# UNTRUSTED stage. Runs on `pull_request`, so fork code is checked out and
+# compiled with a read-only GITHUB_TOKEN and NO repository secrets. It only
+# produces an *unsigned* archive. Signing, Firebase distribution and PR
+# comments happen in ios.preview.publish.yml, which runs in the trusted
+# `workflow_run` context and never executes fork code.
+#
+# The `authorize` gate is resource/abuse control only (secrets are not exposed
+# here): whitelisted authors run automatically; everyone else waits on the
+# `external` environment's manual approval.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "apps/mobile/**"
+      - "packages/**"
+      - ".github/workflows/ios.preview.build.yml"
+      - ".github/workflows/ios.preview.publish.yml"
+
+# A fork that spams pushes shouldn't queue up macOS builds.
+concurrency:
+  group: ios-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  authorize:
+    # `internal` has no protection rules (auto-passes); `external` requires
+    # manual reviewer approval. Whitelist = same-repo branch OR trusted role
+    # OR explicitly allowlisted org/account.
+    environment: ${{ (
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
+      contains(fromJSON('["streetwriters","ammarahm-ed"]'), github.event.pull_request.head.repo.owner.login)
+      ) && 'internal' || 'external' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "authorized"
+
+  build:
+    needs: authorize
+    runs-on: macos-26
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "26.1.1"
+
+      - name: Setup iOS Platform
+        run: |
+          xcodebuild -downloadPlatform iOS -exportPath ~/Downloads
+          xcodebuild -importPlatform ~/Downloads/iphonesimulator_26.1_23B86.dmg
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+
+      - name: Build packages
+        run: npm run tx @notesnook/mobile:build
+
+      - name: Cache Pods
+        uses: actions/cache@v4
+        id: pods-cache
+        with:
+          path: apps/mobile/ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('apps/mobile/ios/Podfile.lock') }}
+
+      - name: Install Pods
+        run: |
+          cd apps/mobile/ios
+          pod install
+
+      - name: Check for typescript errors
+        run: |
+          npm run tx mobile:build
+          cd apps/mobile
+          npx tsc --noEmit
+
+      - name: Get marketing version
+        id: marketing-version
+        run: echo "version=$(grep "IOS_MARKETING_VERSION" apps/mobile/ios/build-configs/ios-build.staging.xcconfig | awk -F'=' '{print $2}' | xargs)" >> $GITHUB_OUTPUT
+
+      - name: Get build number
+        id: build-number
+        run: echo "timestamp=$(($(date +%s) - 1774851180 ))" >> $GITHUB_OUTPUT
+
+      - name: Make staging xcconfig active
+        run: |
+          cd apps/mobile/ios/build-configs
+          ./use-ios-build-config.sh staging --marketing-version ${{steps.marketing-version.outputs.version}} --build-number ${{steps.build-number.outputs.timestamp}}
+
+      # Archive WITHOUT signing. No certificates or secrets are present in this
+      # job. The trusted publish workflow re-signs and exports this archive;
+      # `-exportArchive` only packages/signs and does NOT re-run the app's build
+      # phases, so fork code never runs alongside secrets.
+      - name: Archive (unsigned)
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace apps/mobile/ios/Notesnook.xcworkspace \
+            -scheme Notesnook \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Notesnook.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" \
+            archive
+
+      - name: Stage build artifact
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/artifact"
+          tar -czf "$RUNNER_TEMP/artifact/Notesnook.xcarchive.tar.gz" \
+            -C "$RUNNER_TEMP" Notesnook.xcarchive
+          # Carry the PR context forward; workflow_run cannot see it reliably for forks.
+          {
+            echo "PR_NUMBER=${{ github.event.pull_request.number }}"
+            echo "HEAD_SHA=${{ github.event.pull_request.head.sha }}"
+          } > "$RUNNER_TEMP/artifact/pr-meta.env"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-preview-build
+          path: ${{ runner.temp }}/artifact
+          if-no-files-found: error
+          retention-days: 1
