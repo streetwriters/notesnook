@@ -133,7 +133,8 @@ export default function NotePreview({
         }
         ToastManager.show({
           heading: isSession ? strings.versionDeleted() : strings.noteDeleted(),
-          type: "success"
+          type: "success",
+          context: isSession ? "local" : "global"
         });
 
         return true;
