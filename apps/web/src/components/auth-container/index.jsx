@@ -68,7 +68,8 @@ function AuthContainer(props) {
               flexDirection: "column",
               gap: "76px",
               position: "relative",
-              zIndex: 1
+              zIndex: 1,
+              height: "100%"
             }}
           >
             <Flex

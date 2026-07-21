@@ -795,15 +795,32 @@ type MFAMethod = {
   type: MFAMethodType;
   title: string;
   icon: Icon;
+  description: string;
 };
 const MFAMethods: MFAMethod[] = [
-  { type: "app", title: strings.sendCode(), icon: MfaAuthenticator },
-  { type: "sms", title: strings.sendCodeSms(), icon: Chat },
-  { type: "email", title: strings.sendCodeEmail(), icon: Email },
+  {
+    type: "app",
+    title: strings.sendCode(),
+    icon: MfaAuthenticator,
+    description: "Use the authenticator app"
+  },
+  {
+    type: "sms",
+    title: strings.sendCodeSms(),
+    icon: Chat,
+    description: "Text message to my registered number"
+  },
+  {
+    type: "email",
+    title: strings.sendCodeEmail(),
+    icon: Email,
+    description: "Verify via registered inbox"
+  },
   {
     type: "recoveryCode",
     title: strings.recoveryCode(),
-    icon: RecoveryCode
+    icon: RecoveryCode,
+    description: "Use my original emergency key"
   }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
@@ -881,18 +898,33 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                 >
                   <method.icon size={15} color="icon" />
                 </Flex>
-                <Text
-                  variant="body"
+                <Flex
                   sx={{
-                    fontWeight: 500,
-                    color: "heading",
-                    fontSize: "sm"
+                    flexDirection: "column",
+                    gap: "spacing3"
                   }}
                 >
-                  {method.title}
-                </Text>
+                  <Text
+                    sx={{
+                      fontWeight: 500,
+                      color: "heading",
+                      fontSize: "sm"
+                    }}
+                  >
+                    {method.title}
+                  </Text>
+                  <Text
+                    sx={{
+                      fontWeight: 400,
+                      color: "paragraph",
+                      fontSize: "xs"
+                    }}
+                  >
+                    {method.description}
+                  </Text>
+                </Flex>
               </Flex>
-              <ChevronRight size={13} color="icon" sx={{ flexShrink: 0 }} />
+              <ChevronRight size={13} />
             </Button>
           )
       )}
@@ -970,9 +1002,11 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         flex: 1,
         flexDirection: "column",
         alignItems: "left",
-        justifyContent: "center",
+        // justifyContent: "center",
         width: ["95%", "95%", "65%"],
-        alignSelf: "center"
+        maxWidth: "500px",
+        alignSelf: "center",
+        mt: "149px"
       }}
     >
       {onBack ? (
@@ -1064,7 +1098,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             paddingY: "spacing6",
             paddingX: "spacing5",
             fontWeight: 600,
-            fontSize: "sm",
+            fontSize: "md",
             color: "buttonForeground-secondary",
             textDecoration: "none",
             border: "1px solid",
@@ -1086,7 +1120,9 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             fontSize: "xs",
             textAlign: "center",
             fontWeight: 400,
-            lineHeight: "150%"
+            lineHeight: "150%",
+            mt: "auto",
+            mb: "spacing11"
           }}
         >
           {strings.signupAgreement[0]()}{" "}
@@ -1159,10 +1195,10 @@ export function AuthField(props: FieldProps) {
       {...props}
       name={props.name || props.id}
       data-test-id={props["data-test-id"] || props.id}
-      sx={{ mt: 2, width: "100%", gap: "spacing4" }}
+      sx={{ mt: 2, width: "100%", gap: "spacing3" }}
       styles={{
         label: {
-          fontSize: "xxs",
+          fontSize: "xs",
           fontWeight: 400,
           color: "paragraph-secondary"
         },

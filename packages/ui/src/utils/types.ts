@@ -23,8 +23,9 @@ import { ThemeUICSSObject } from "@theme-ui/core";
 type ThemeSpace = Theme["space"];
 
 type ValidSpaceValues =
-  | Exclude<keyof ThemeSpace, keyof Array<any> | "small">
+  | Exclude<keyof ThemeSpace, keyof Array<any> | "small" | "auto">
   | "small"
+  | "auto"
   | number;
 
 export type RestrictedColorProps = {
