@@ -1239,7 +1239,7 @@ export function SubmitButton(props: SubmitButtonProps) {
         justifyContent: "center",
         alignSelf: "center",
         display: "flex",
-        paddingY: "spacing7",
+        paddingY: "spacing6",
         paddingX: "spacing5",
         fontSize: "md",
         fontWeight: 600,
