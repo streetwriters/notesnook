@@ -173,6 +173,14 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   );
   const [dateError, setDateError] = useState<string>();
   const [selectDayError, setSelectDayError] = useState<string>();
+  React.useEffect(() => {
+    const shortcut = useSettingStore.getState().pendingShortcut;
+    if (shortcut?.type === "notesnook.action.newreminder") {
+      useSettingStore.setState({
+        pendingShortcut: null
+      });
+    }
+  }, []);
   useEffect(() => {
     if (activeReminderFeature === undefined) return;
     if (!activeReminderFeature.isAllowed) {

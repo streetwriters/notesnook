@@ -23,7 +23,7 @@ import {
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
 } from "@notesnook/theme";
-import React, { PropsWithChildren, useEffect } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import { Appearance, I18nManager, Linking, StatusBar } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -58,23 +58,6 @@ const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
-
-Shortcuts.getInitialShortcut().then((shortcut) => {
-  if (shortcut?.type === "notesnook.action.newnote") {
-    launchNewNoteTab();
-  }
-
-  useSettingStore.setState({
-    pendingShortcut: shortcut ?? null,
-    pendingShortcutLoaded: true
-  });
-  RNBootSplash.hide({ fade: true });
-  initShortcutListener();
-});
-
-Linking.getInitialURL().then((url) => {
-  useSettingStore.setState({ initialUrl: url });
-});
 
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
@@ -203,4 +186,38 @@ export const withTheme = (
   };
 };
 
-export default withTheme(withErrorBoundry(App, "App"));
+export const withStartupBoundry = (
+  Element: (props: PropsWithChildren) => JSX.Element
+) => {
+  return function AppWithStartupBoundary(props: PropsWithChildren) {
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+      async function init() {
+        const [url, shortcut] = await Promise.all([
+          Linking.getInitialURL(),
+          Shortcuts.getInitialShortcut()
+        ]);
+        if (shortcut?.type === "notesnook.action.newnote") {
+          launchNewNoteTab();
+        }
+        useSettingStore.setState({
+          initialUrl: url,
+          pendingShortcut: shortcut ?? null
+        });
+
+        initShortcutListener();
+        await RNBootSplash.hide({ fade: true });
+        setReady(true);
+      }
+
+      init();
+    }, []);
+
+    if (!ready) return null;
+
+    return <Element {...props} />;
+  };
+};
+
+export default withStartupBoundry(withTheme(withErrorBoundry(App, "App")));
