@@ -5,10 +5,8 @@ name: Notesnook Android Preview Build
 # APK is built without any signing secret (the same as before). Firebase
 # distribution and the PR comment happen in android.preview.publish.yml, which
 # runs in the trusted `workflow_run` context and never executes fork code.
-#
-# The `authorize` gate is resource/abuse control only (secrets are not exposed
-# here): whitelisted authors run automatically; everyone else waits on the
-# `external` environment's manual approval.
+# Because no secrets are exposed here, the build runs automatically for every
+# PR (including forks) with no authorization gate.
 
 on:
   pull_request:
@@ -25,18 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  authorize:
-    environment: ${{ (
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-      contains(fromJSON('["streetwriters","ammarahm-ed"]'), github.event.pull_request.head.repo.owner.login)
-      ) && 'internal' || 'external' }}
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "authorized"
-
   build:
-    needs: authorize
     runs-on: ubuntu-22.04
     env:
       STAGING_BUILD: true

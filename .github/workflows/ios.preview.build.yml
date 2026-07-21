@@ -4,11 +4,9 @@ name: Notesnook iOS Preview Build
 # compiled with a read-only GITHUB_TOKEN and NO repository secrets. It only
 # produces an *unsigned* archive. Signing, Firebase distribution and PR
 # comments happen in ios.preview.publish.yml, which runs in the trusted
-# `workflow_run` context and never executes fork code.
-#
-# The `authorize` gate is resource/abuse control only (secrets are not exposed
-# here): whitelisted authors run automatically; everyone else waits on the
-# `external` environment's manual approval.
+# `workflow_run` context and never executes fork code. Because no secrets are
+# exposed here, the build runs automatically for every PR (including forks)
+# with no authorization gate.
 
 on:
   pull_request:
@@ -26,21 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  authorize:
-    # `internal` has no protection rules (auto-passes); `external` requires
-    # manual reviewer approval. Whitelist = same-repo branch OR trusted role
-    # OR explicitly allowlisted org/account.
-    environment: ${{ (
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association) ||
-      contains(fromJSON('["streetwriters","ammarahm-ed"]'), github.event.pull_request.head.repo.owner.login)
-      ) && 'internal' || 'external' }}
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "authorized"
-
   build:
-    needs: authorize
     runs-on: macos-26
     timeout-minutes: 60
 
