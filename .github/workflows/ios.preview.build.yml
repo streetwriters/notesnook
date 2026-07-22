@@ -42,69 +42,34 @@ jobs:
         with:
           xcode-version: "26.1.1"
 
-      # Xcode 26 ships without the iOS platform on the runner image, so it must
-      # be installed before archiving. `-downloadPlatform iOS` downloads AND
-      # installs in one shot; the old two-step (-exportPath then -importPlatform
-      # of a simulator dmg) is what randomly died with "Unable to connect to
-      # simulator" (exit 70), so it's gone. Probe with xcrun (authoritative --
-      # `xcodebuild -showsdks | grep` gives false positives) and retry the
-      # download, since it hits Apple's CDN and is intermittently flaky.
-      # The iOS platform must be downloaded AND imported: `-downloadPlatform`
-      # only fetches the dmg to -exportPath, `-importPlatform` is what actually
-      # installs it. Skipping the import makes the archive fail with "iOS 26.1
-      # Platform Not Installed".
-      #
-      # Don't try to detect whether it's already installed first: both
-      # `xcodebuild -showsdks` and `xcrun --sdk iphoneos --show-sdk-version`
-      # report "iOS 26.1 / iphoneos26.1" from the SDK stub bundled with Xcode
-      # even when the platform is absent, so any such probe false-positives.
-      - name: Ensure iOS platform is installed
+      - name: Setup iOS Platform
         run: |
-          set -uo pipefail
+          # GitHub runs this as `/bin/bash -e`, so `set +e` is required -- without
+          # it the first failure aborts the step before any retry can happen.
+          # Both commands hit "Unable to connect to simulator" (exit 70) when
+          # CoreSimulatorService is wedged, so retry each and bounce it between.
+          set +e
           DL_DIR="$RUNNER_TEMP/ios-platform"
-          mkdir -p "$DL_DIR"
 
-          # Download the platform dmg. Hits Apple's CDN, so retry.
-          for attempt in 1 2 3; do
-            echo "::group::xcodebuild -downloadPlatform iOS (attempt $attempt)"
-            xcodebuild -downloadPlatform iOS -exportPath "$DL_DIR"
-            status=$?
-            echo "::endgroup::"
-            [ $status -eq 0 ] && break
-            echo "Download attempt $attempt failed (exit $status); retrying in 30s..."
-            sleep 30
-          done
-
-          # Discover the dmg instead of hardcoding a filename like
-          # iphonesimulator_26.1_23B86.dmg, which breaks whenever Apple ships a
-          # new build number.
-          DMG="$(find "$DL_DIR" -maxdepth 1 -name '*.dmg' | head -n1)"
-          if [ -z "$DMG" ]; then
-            echo "::error::No iOS platform dmg was downloaded into $DL_DIR"
-            ls -la "$DL_DIR" || true
+          retry() {
+            for i in 1 2 3; do
+              "$@" && return 0
+              echo "Attempt $i failed ($*); resetting CoreSimulator..."
+              sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService simdiskimaged 2>/dev/null
+              sleep 20
+              xcrun simctl list runtimes >/dev/null 2>&1
+            done
+            echo "::error::Failed after 3 attempts: $*"
             exit 1
-          fi
-          echo "Importing $DMG"
+          }
 
-          # This is the step that randomly dies with "Unable to connect to
-          # simulator" (exit 70) when CoreSimulator is wedged. Bounce those
-          # services between attempts and retry.
-          for attempt in 1 2 3; do
-            echo "::group::xcodebuild -importPlatform (attempt $attempt)"
-            xcodebuild -importPlatform "$DMG"
-            status=$?
-            echo "::endgroup::"
-            if [ $status -eq 0 ]; then
-              echo "iOS platform installed."
-              exit 0
-            fi
-            echo "Import attempt $attempt failed (exit $status); resetting CoreSimulator and retrying in 30s..."
-            sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null || true
-            sudo killall -9 simdiskimaged 2>/dev/null || true
-            sleep 30
-          done
-          echo "::error::Failed to import the iOS platform after 3 attempts"
-          exit 1
+          xcrun simctl list runtimes >/dev/null 2>&1
+          retry xcodebuild -downloadPlatform iOS -exportPath "$DL_DIR"
+
+          # Find the dmg; its name embeds a build number that changes.
+          DMG="$(find "$DL_DIR" -name '*.dmg' | head -n1)"
+          [ -n "$DMG" ] || { echo "::error::No dmg in $DL_DIR"; exit 1; }
+          retry xcodebuild -importPlatform "$DMG"
 
       - name: Install node modules
         run: |
