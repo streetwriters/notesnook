@@ -42,10 +42,16 @@ jobs:
         with:
           xcode-version: "26.1.1"
 
-      - name: Setup iOS Platform
+      - name: Ensure iOS SDK is available
         run: |
-          xcodebuild -downloadPlatform iOS -exportPath ~/Downloads
-          xcodebuild -importPlatform ~/Downloads/iphonesimulator_26.1_23B86.dmg
+          set -euo pipefail
+          if xcodebuild -showsdks | grep -q iphoneos; then
+            echo "iOS device SDK present:"
+            xcodebuild -showsdks | grep iphoneos
+          else
+            echo "iOS device SDK missing; downloading platform..."
+            xcodebuild -downloadPlatform iOS
+          fi
 
       - name: Install node modules
         run: |
