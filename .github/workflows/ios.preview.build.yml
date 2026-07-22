@@ -42,16 +42,34 @@ jobs:
         with:
           xcode-version: "26.1.1"
 
-      - name: Ensure iOS SDK is available
+      # Xcode 26 ships without the iOS platform on the runner image, so it must
+      # be installed before archiving. `-downloadPlatform iOS` downloads AND
+      # installs in one shot; the old two-step (-exportPath then -importPlatform
+      # of a simulator dmg) is what randomly died with "Unable to connect to
+      # simulator" (exit 70), so it's gone. Probe with xcrun (authoritative --
+      # `xcodebuild -showsdks | grep` gives false positives) and retry the
+      # download, since it hits Apple's CDN and is intermittently flaky.
+      - name: Ensure iOS platform is installed
         run: |
-          set -euo pipefail
-          if xcodebuild -showsdks | grep -q iphoneos; then
-            echo "iOS device SDK present:"
-            xcodebuild -showsdks | grep iphoneos
-          else
-            echo "iOS device SDK missing; downloading platform..."
-            xcodebuild -downloadPlatform iOS
+          set -uo pipefail
+          if xcrun --sdk iphoneos --show-sdk-version >/dev/null 2>&1; then
+            echo "iOS platform already installed: $(xcrun --sdk iphoneos --show-sdk-version)"
+            exit 0
           fi
+          echo "iOS platform missing; installing..."
+          for attempt in 1 2 3; do
+            echo "::group::xcodebuild -downloadPlatform iOS (attempt $attempt)"
+            xcodebuild -downloadPlatform iOS
+            echo "::endgroup::"
+            if xcrun --sdk iphoneos --show-sdk-version >/dev/null 2>&1; then
+              echo "iOS platform installed: $(xcrun --sdk iphoneos --show-sdk-version)"
+              exit 0
+            fi
+            echo "Attempt $attempt did not install the platform; retrying in 30s..."
+            sleep 30
+          done
+          echo "::error::Failed to install the iOS platform after 3 attempts"
+          exit 1
 
       - name: Install node modules
         run: |
