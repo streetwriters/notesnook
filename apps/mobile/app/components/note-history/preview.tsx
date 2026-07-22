@@ -53,7 +53,8 @@ import {
 export default function NotePreview({
   session,
   content,
-  note
+  note,
+  update
 }: {
   session?: HistorySession & { session: string };
   content:
@@ -64,6 +65,7 @@ export default function NotePreview({
       >
     | undefined;
   note: TrashOrItem<Note>;
+  update?: () => void;
 }) {
   const { colors } = useThemeColors();
   const [locked, setLocked] = useState(false);
@@ -120,19 +122,22 @@ export default function NotePreview({
       positivePress: async () => {
         if (isSession) {
           await db.noteHistory.remove(session.id);
+          update?.();
           eSendEvent(eCloseSheet, "note_history");
           Navigation.queueRoutesForUpdate();
         } else if (note.type === "trash") {
           await db.trash.delete(note.id);
           useTrashStore.getState().refresh();
           useSelectionStore.getState().setSelectionMode();
+          eSendEvent(eCloseSheet);
         }
         ToastManager.show({
           heading: isSession ? strings.versionDeleted() : strings.noteDeleted(),
-          type: "success"
+          type: "success",
+          context: isSession ? "local" : "global"
         });
 
-        eSendEvent(eCloseSheet);
+        return true;
       },
       positiveType: "error"
     });

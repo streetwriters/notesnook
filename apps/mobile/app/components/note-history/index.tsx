@@ -45,11 +45,13 @@ import { Dialog } from "../dialog";
 const HistoryItem = ({
   index,
   items,
-  note
+  note,
+  refresh
 }: {
   index: number;
   items?: VirtualizedGrouping<HistorySession>;
   note: Note;
+  refresh: () => void;
 }) => {
   const [item] = useDBItem(index, "noteHistory", items);
   const { colors } = useThemeColors();
@@ -60,8 +62,9 @@ const HistoryItem = ({
     const _start_time = getFormattedDate(start, "time");
     const _end_time = getFormattedDate(end + 60000, "time");
 
-    return `${_start_date} ${_start_time} - ${_end_date === _start_date ? " " : _end_date + " "
-      }${_end_time}`;
+    return `${_start_date} ${_start_time} - ${
+      _end_date === _start_date ? " " : _end_date + " "
+    }${_end_time}`;
   };
 
   const preview = useCallback(
@@ -76,12 +79,13 @@ const HistoryItem = ({
             }}
             content={content}
             note={note}
+            update={refresh}
           />
         ),
         context: "note_history"
       });
     },
-    [note]
+    [note, refresh]
   );
 
   return (
@@ -123,7 +127,7 @@ export default function NoteHistory({
   const [_loading, setLoading] = useState(true);
   const { colors } = useThemeColors();
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     db.noteHistory
       .get(note.id)
       .sorted({
@@ -139,11 +143,20 @@ export default function NoteHistory({
       });
   }, [note.id]);
 
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
   const renderItem = useCallback(
     ({ index }: { index: number }) => (
-      <HistoryItem index={index} items={history} note={note} />
+      <HistoryItem
+        index={index}
+        items={history}
+        note={note}
+        refresh={refresh}
+      />
     ),
-    [history, note]
+    [history, note, refresh]
   );
 
   return (
@@ -156,27 +169,27 @@ export default function NoteHistory({
         button={
           history?.placeholders.length
             ? {
-              title: strings.clearHistory(),
-              type: "secondary",
-              onPress: () => {
-                presentDialog({
-                  title: strings.clearHistory(),
-                  paragraph: strings.clearHistoryConfirmation(),
-                  positiveText: strings.clear(),
-                  negativeText: strings.cancel(),
-                  positiveType: "errorShade",
-                  context: "local",
-                  positivePress: async () => {
-                    await db.noteHistory.clearSessions(note.id);
-                    fwdRef.current?.hide();
-                    ToastManager.show({
-                      heading: strings.historyCleared(),
-                      type: "success"
-                    });
-                  }
-                });
+                title: strings.clearHistory(),
+                type: "secondary",
+                onPress: () => {
+                  presentDialog({
+                    title: strings.clearHistory(),
+                    paragraph: strings.clearHistoryConfirmation(),
+                    positiveText: strings.clear(),
+                    negativeText: strings.cancel(),
+                    positiveType: "errorShade",
+                    context: "local",
+                    positivePress: async () => {
+                      await db.noteHistory.clearSessions(note.id);
+                      fwdRef.current?.hide();
+                      ToastManager.show({
+                        heading: strings.historyCleared(),
+                        type: "success"
+                      });
+                    }
+                  });
+                }
               }
-            }
             : undefined
         }
       />
