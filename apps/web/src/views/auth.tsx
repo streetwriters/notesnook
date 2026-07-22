@@ -664,10 +664,8 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       <Flex
         sx={{
           flexDirection: "column",
-          bg: "background-secondary",
-          borderRadius: "radius2",
           my: "spacing7",
-          p: "spacing5"
+          gap: "spacing4"
         }}
       >
         {(selectedMethod === "sms" || selectedMethod === "email") && (
@@ -675,7 +673,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
             <Flex
               sx={{
                 alignItems: "center",
-                justifyContent: "space-between"
+                justifyContent: "space-between",
+                background: "background-secondary",
+                p: "spacing5",
+                borderRadius: "radius2"
               }}
             >
               <Flex sx={{ alignItems: "center", gap: "10px" }}>
@@ -730,17 +731,6 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                 {isSending ? <Loading size={18} /> : strings.resendCode()}
               </Button>
             </Flex>
-            <Box
-              as="hr"
-              sx={{
-                height: 0,
-                border: "none",
-                borderTop: "1px solid",
-                borderColor: "border",
-                alignSelf: "stretch",
-                my: "spacing4"
-              }}
-            />
           </>
         )}
 
@@ -751,9 +741,9 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            p: 0,
-            borderRadius: 0,
-            textAlign: "left"
+            p: "spacing5",
+            textAlign: "left",
+            borderRadius: "radius2"
           }}
           onClick={() => navigate("mfa:select", formData)}
         >
