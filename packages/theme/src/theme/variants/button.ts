@@ -90,7 +90,8 @@ export const newCreateButtonVariant = (
   paddingX: "spacing5",
   fontSize: "md",
   fontWeight: 600,
-  borderRadius: "radius2"
+  borderRadius: "radius2",
+  lineHeight: "100%"
 });
 
 const newAccent = newCreateButtonVariant("accent", "accentForeground", {
