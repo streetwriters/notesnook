@@ -86,6 +86,7 @@ type MFAFormData = EmailFormData & {
   code?: string;
   secondaryMethod?: MFAMethodType;
   phoneNumber?: string;
+  password?: string;
 };
 
 type MFAErrorData = {
@@ -216,7 +217,7 @@ export function HeadlessAuth(props: AuthProps) {
 }
 
 function Login(props: BaseAuthComponentProps<"login">) {
-  const { navigate, canSkip = true, openURL } = props;
+  const { navigate, canSkip = true, openURL, formData } = props;
 
   return (
     <AuthForm
@@ -246,6 +247,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
 
         navigate("mfa:code", {
           email: form.email,
+          password: form.password,
           selectedMethod: result.primaryMethod,
           primaryMethod: result.primaryMethod,
           phoneNumber: result.phoneNumber,
@@ -273,14 +275,14 @@ function Login(props: BaseAuthComponentProps<"login">) {
             autoComplete="email"
             label={strings.enterEmailAddress()}
             autoFocus
-            defaultValue={form?.email}
+            defaultValue={form?.email ?? formData?.email}
           />
           <AuthField
             id="password"
             type="password"
             autoComplete="current-password"
             label={strings.enterPassword()}
-            defaultValue={form?.password}
+            defaultValue={form?.password ?? formData?.password}
           />
           <Button
             data-test-id="auth-forgot-password"
@@ -647,7 +649,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         openURL("/plans", { authenticated: true });
       }}
       onBack={() => {
-        navigate("login", { email: formData.email, password: "" });
+        navigate("login", {
+          email: formData.email,
+          password: formData.password ?? ""
+        });
       }}
     >
       {selectedMethod !== "recoveryCode" ? (
