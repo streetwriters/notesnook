@@ -558,17 +558,6 @@ export function Footer() {
           ))}
         </Flex>
       </Flex>
-      <Button
-        variant="new_accent"
-        sx={{ alignSelf: "center", mt: "spacing2", mb: "spacing13" }}
-        onClick={() =>
-          document
-            .getElementById("select-plan")
-            ?.scrollIntoView({ behavior: "smooth" })
-        }
-      >
-        Upgrade now
-      </Button>
     </>
   );
 }
@@ -619,23 +608,24 @@ function RecurringPricing(props: PricingProps) {
         }}
       >
         {getCurrencySymbol(plan.currency)}
-        {monthlyPrice}
+        {monthlyPrice}{" "}
+        {isZero ? (
+          ""
+        ) : (
+          <Text
+            as="span"
+            sx={{
+              fontSize: "md",
+              color: "paragraph-secondary",
+              fontWeight: 400
+            }}
+          >
+            {" "}
+            /Month
+          </Text>
+        )}
       </Text>
-      {isZero ? (
-        ""
-      ) : (
-        <Text
-          as="span"
-          sx={{
-            fontSize: "md",
-            color: "paragraph-secondary",
-            fontWeight: 400
-          }}
-        >
-          {" "}
-          / month
-        </Text>
-      )}
+
       <Text
         as="div"
         sx={{ fontSize: "xxs", color: "paragraph-secondary", fontWeight: 400 }}
