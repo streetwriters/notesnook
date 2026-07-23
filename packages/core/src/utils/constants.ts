@@ -52,7 +52,7 @@ export const hosts = {
     : "http://localhost:6264",
   NOTESNOOK_HOST: isProduction()
     ? "https://notesnook.com"
-    : "http://localhost:8787"
+    : "http://localhost:3001"
 };
 
 export default hosts;

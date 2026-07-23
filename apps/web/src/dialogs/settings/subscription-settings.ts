@@ -163,25 +163,56 @@ export const SubscriptionSettings: SettingsGroup[] = [
             title: "Cancel",
             variant: "error",
             async action() {
-              const cancelTrial = await ConfirmDialog.show({
-                title: "Cancel trial?",
-                message:
-                  "Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.",
-                negativeButtonText: "No",
-                positiveButtonText: "Yes"
-              });
-              if (cancelTrial) {
-                await TaskManager.startTask({
-                  type: "modal",
-                  title: "Cancelling your trial",
-                  subtitle: "Please wait...",
-                  action: () => db.subscriptions.cancel()
-                })
-                  .catch((e) => showToast("error", e.message))
-                  .then(() =>
-                    showToast("success", "Your trial has been canceled.")
-                  );
+              const canExtend =
+                !useUserStore.getState().user?.subscription?.extensionsAvailed
+                  ?.length;
+
+              if (canExtend) {
+                const isExtending = await ConfirmDialog.show({
+                  title: "We're sorry to see you go!",
+                  message:
+                    "Before you cancel, did you just need more time to test? We'd love to give you an extra 14 days, completely free.",
+                  negativeButtonText: "No, cancel my trial",
+                  positiveButtonText: "Yes, extend my trial"
+                });
+                if (isExtending) {
+                  const error = await TaskManager.startTask({
+                    type: "modal",
+                    title: "Extending your trial",
+                    subtitle: "Please wait...",
+                    action: async () => {
+                      await db.subscriptions.extend();
+                      await useUserStore.getState().refreshUser();
+                      showToast(
+                        "success",
+                        "Your trial has been extended by 14 days. Enjoy!"
+                      );
+                    }
+                  });
+                  if (error instanceof Error) showToast("error", error.message);
+                  return;
+                }
+              } else {
+                const cancelTrial = await ConfirmDialog.show({
+                  title: "Cancel trial?",
+                  message:
+                    "Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.",
+                  negativeButtonText: "No",
+                  positiveButtonText: "Yes"
+                });
+                if (!cancelTrial) return;
               }
+
+              await TaskManager.startTask({
+                type: "modal",
+                title: "Cancelling your trial",
+                subtitle: "Please wait...",
+                action: () => db.subscriptions.cancel()
+              })
+                .catch((e) => showToast("error", e.message))
+                .then(() =>
+                  showToast("success", "Your trial has been canceled.")
+                );
             }
           }
         ]
