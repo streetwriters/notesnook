@@ -306,6 +306,19 @@ export class Sync {
   }
 
   async stop(options: SyncOptions) {
+    const pendingInboxItems = await this.db.pendingSyncItems.getByType(
+      "inbox-item"
+    );
+    if (pendingInboxItems.length > 0) {
+      const items = pendingInboxItems.map(
+        (item) => JSON.parse(item.data) as SyncInboxItem
+      );
+      await handleInboxItems(items, this.db);
+      await this.db.pendingSyncItems.remove(
+        pendingInboxItems.map((item) => item.id)
+      );
+    }
+
     if (
       (options.type === "send" || options.type === "full") &&
       (await this.collector.hasUnsyncedChanges())
@@ -584,7 +597,18 @@ export class Sync {
           return false;
         }
 
-        await handleInboxItems(inboxItems, this.db);
+        /**
+         * We will process the inbox items after sync is completed.
+         * TODO: do this for other items as well
+         */
+        for (const item of inboxItems) {
+          await this.db.pendingSyncItems.add({
+            id: item.id,
+            type: "inbox-item",
+            data: JSON.stringify(item),
+            dateCreated: Date.now()
+          });
+        }
 
         return true;
       }
