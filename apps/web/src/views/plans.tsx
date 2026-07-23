@@ -120,11 +120,7 @@ function Plans() {
               }}
             >
               Skip
-              <ChevronLeft
-                size={14}
-                sx={{ transform: "rotate(180deg)" }}
-                color="heading"
-              />
+              <ChevronLeft size={14} color="heading" />
             </Button>
             <Flex
               sx={{
