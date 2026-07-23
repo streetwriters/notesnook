@@ -20,16 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SubscriptionPlan } from "@notesnook/core";
 import {
   ComparePlans,
+  FeaturedOn,
   Footer,
-  PlansList
+  PlansList,
+  TestimonialsCarousel
 } from "../dialogs/buy-dialog/plan-list";
 import { FlexScrollContainer } from "../components/scroll-container";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Text, Button, Image, Box } from "@notesnook/ui";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useEffect } from "react";
 import { getQueryParams, hardNavigate } from "../navigation";
-import { Close } from "../components/icons";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
+import { ChevronLeft } from "../components/icons";
+import Star from "../assets/star.svg";
 
 function Plans() {
   const user = useUserStore((store) => store.user);
@@ -46,56 +49,108 @@ function Plans() {
   return (
     <Flex
       id="app"
-      bg="background"
+      bg="background-secondary"
       sx={{
         overflow: "hidden",
         flexDirection: "column",
         height: "100%",
-        pt: 50
+        postion: "relative"
       }}
     >
       <Flex variant="columnFill" sx={{ overflowY: "hidden" }}>
         <FlexScrollContainer>
-          <Button
-            variant="icon"
-            data-test-id="close-plans"
-            sx={{
-              position: "absolute",
-              top: 5,
-              right: 5,
-              borderRadius: "100%"
-            }}
-            onClick={() => openURL("/")}
-          >
-            <Close size={28} />
-          </Button>
           <Flex
             sx={{
+              position: "relative",
               flexDirection: "column",
-              flex: 1,
-              px: 25,
-              minHeight: "100vh",
-              justifyContent: "center"
+              alignItems: "center",
+              py: "80px",
+              px: "80px",
+              gap: "50px"
             }}
           >
-            <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                top: 72,
+                left: 146,
+                width: "43px",
+                height: "43px"
+              }}
+            />
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                top: 61,
+                left: 959,
+                width: "25px",
+                height: "25px"
+              }}
+            />
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                top: 266,
+                right: 229,
+                width: "43px",
+                height: "43px"
+              }}
+            />
+            <Image
+              src={Star}
+              sx={{
+                position: "absolute",
+                bottom: -30,
+                right: 73,
+                width: "64px",
+                height: "64px"
+              }}
+            />
+            <Button
+              onClick={() => openURL("/")}
+              variant="new_bordered"
+              sx={{
+                position: "absolute",
+                top: 80,
+                right: 80,
+                gap: "12px"
+              }}
+            >
+              Skip
+              <ChevronLeft size={14} color="heading" />
+            </Button>
+            <Flex
+              sx={{
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "spacing6"
+              }}
+            >
               <Text
                 id="select-plan"
                 variant="heading"
-                sx={{ fontSize: 32, textAlign: "center" }}
+                sx={{ fontSize: "4xl", textAlign: "center" }}
               >
-                Select a plan
+                Notesnook Plans
               </Text>
               <Text
-                variant="title"
-                mt={1}
+                variant="body"
                 sx={{
-                  fontSize: "subheading",
-                  color: "heading-secondary",
-                  textAlign: "center"
+                  fontSize: "sm",
+                  color: "paragraph",
+                  textAlign: "center",
+                  lineHeight: "1.5",
+                  fontWeight: 400
                 }}
               >
-                One subscription for a lifetime of notes.
+                Choose a plan that fits your workflow and keep your notes secure
+                across every device.
+                <br />
+                Enjoy powerful privacy-focused features designed for
+                distraction-free writing and organization.
               </Text>
             </Flex>
             <PlansList
@@ -108,14 +163,15 @@ function Plans() {
               }}
             />
           </Flex>
+          <FeaturedOn />
           <Flex
             sx={{
               flexDirection: "column",
-              flex: 1,
-              px: "20%"
+              flex: 1
             }}
           >
             <ComparePlans />
+            <TestimonialsCarousel />
             <Footer />
           </Flex>
         </FlexScrollContainer>
