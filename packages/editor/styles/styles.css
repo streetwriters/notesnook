@@ -1035,3 +1035,68 @@ del.diffdel {
 .scroll-bar::-webkit-scrollbar-thumb:active {
   background-color: var(--border);
 }
+
+/* Drag & drop (see extensions/drag-drop) */
+.ProseMirror .drop-gap {
+  list-style-type: none;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-block: 8px;
+  border-radius: 5px;
+  background-color: var(--background-secondary);
+  border: 1px dashed var(--border);
+  /* the gap opens up rather than popping into place, and follows the level
+     it will drop at */
+  transition: height 120ms ease-out, margin-inline-start 120ms ease-out;
+}
+
+.drag-preview {
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+  margin: 0;
+  /* nothing on the left: the item has to sit exactly where it will land.
+     The right is only ever the count's breathing room */
+  padding: 6px 8px 6px 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  user-select: none;
+  border-radius: 5px;
+  background-color: var(--background);
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.2);
+  /* it follows the level it will drop at; the pointer is followed with a
+     transform, which this must not touch */
+  transition: left 120ms ease-out, width 120ms ease-out;
+}
+
+/* the item is styled by the list it was taken out of, so the preview has to
+   say what a task item looks like on its own */
+.drag-preview ul {
+  margin: 0;
+  padding: 0;
+}
+
+.drag-preview li {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+}
+
+/* how many children are coming along with the item */
+.drag-preview-badge {
+  align-self: center;
+  flex-shrink: 0;
+  margin-inline-start: 4px;
+  padding: 0px 6px;
+  border-radius: 100px;
+  font-size: 0.8em;
+  background-color: var(--background-secondary);
+  color: var(--paragraph-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ProseMirror .drop-gap,
+  .drag-preview {
+    transition: none;
+  }
+}
