@@ -399,6 +399,13 @@ export const READONLY_MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
   ]
 ];
 
+export const READONLY_MOBILE_TOOLBAR_NODES = [
+  "image",
+  "attachment",
+  "webclip",
+  "link"
+];
+
 const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {
   default: [
     [

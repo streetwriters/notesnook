@@ -22,7 +22,8 @@ import {
   getDefaultPresets,
   STATIC_TOOLBAR_GROUPS,
   MOBILE_STATIC_TOOLBAR_GROUPS,
-  READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
+  READONLY_MOBILE_STATIC_TOOLBAR_GROUPS,
+  READONLY_MOBILE_TOOLBAR_NODES
 } from "./tool-definitions.js";
 import { useEffect, useMemo } from "react";
 import { Editor } from "../types.js";
@@ -67,6 +68,11 @@ export function Toolbar(props: ToolbarProps) {
     [tools, editor.isEditable, isMobile]
   );
 
+  const isEmptyReadonlyToolbar =
+    isMobile &&
+    !editor.isEditable &&
+    !READONLY_MOBILE_TOOLBAR_NODES.some((node) => editor.isActive(node));
+
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
   );
@@ -89,33 +95,35 @@ export function Toolbar(props: ToolbarProps) {
 
   return (
     <>
-      <Flex
-        className={["editor-toolbar", className].join(" ")}
-        sx={{
-          flexWrap: isMobile ? "nowrap" : "wrap",
-          overflowX: isMobile ? "auto" : "hidden",
-          bg: "background",
-          borderRadius: isMobile ? "0px" : "default",
-          ...sx
-        }}
-        {...flexProps}
-      >
-        {toolbarTools.map((tools) => {
-          return (
-            <ToolbarGroup
-              key={tools.join("")}
-              tools={tools}
-              editor={editor}
-              groupId={tools.join("")}
-              sx={{
-                borderRight: "1px solid var(--separator)",
-                ":last-of-type": { borderRight: "none" },
-                alignItems: "center"
-              }}
-            />
-          );
-        })}
-      </Flex>
+      {isEmptyReadonlyToolbar ? null : (
+        <Flex
+          className={["editor-toolbar", className].join(" ")}
+          sx={{
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            overflowX: isMobile ? "auto" : "hidden",
+            bg: "background",
+            borderRadius: isMobile ? "0px" : "default",
+            ...sx
+          }}
+          {...flexProps}
+        >
+          {toolbarTools.map((tools) => {
+            return (
+              <ToolbarGroup
+                key={tools.join("")}
+                tools={tools}
+                editor={editor}
+                groupId={tools.join("")}
+                sx={{
+                  borderRight: "1px solid var(--separator)",
+                  ":last-of-type": { borderRight: "none" },
+                  alignItems: "center"
+                }}
+              />
+            );
+          })}
+        </Flex>
+      )}
       <EditorFloatingMenus editor={editor} />
     </>
   );
