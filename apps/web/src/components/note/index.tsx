@@ -39,6 +39,8 @@ import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { Flex, Text } from "@theme-ui/components";
 import React from "react";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
@@ -133,9 +135,19 @@ function Note(props: NoteProps) {
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
   const dateFormat = useSettingStore((store) => store.dateFormat);
 
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `note::${note.id}`,
+    data: note
+  });
+
+  const style = transform ? {
+    transform: (typeof IS_DESKTOP_APP !== 'undefined' && IS_DESKTOP_APP) ? undefined : CSS.Translate.toString(transform),
+  } : undefined;
+
   return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
     <ListItem
-      draggable={true}
+      draggable={false} // We handle drag manually via wrapper
       isFocused={isOpened}
       isCompact={compact}
       item={note}
@@ -296,6 +308,7 @@ function Note(props: NoteProps) {
         </Flex>
       }
     />
+    </div>
   );
 }
 
@@ -357,6 +370,8 @@ export const noteMenuItems: (
 ) => Promise<MenuItem[]> = async (note, ids = [], context) => {
   // const isSynced = db.notes.note(note.id)?.synced();
   const features = await areFeaturesAvailable(["expiringNotes"]);
+  const isDesktop =
+    typeof IS_DESKTOP_APP !== "undefined" && IS_DESKTOP_APP;
   return [
     {
       type: "button",
@@ -366,6 +381,27 @@ export const noteMenuItems: (
       onClick: () =>
         useEditorStore.getState().openSession(note.id, { openInNewTab: true })
     },
+    ...(isDesktop
+      ? [
+          {
+            type: "button" as const,
+            key: "openinnewwindow",
+            title: strings.openInNewWindow(),
+            icon: OpenInNew.path,
+            onClick: () => {
+              import("../../common/desktop-bridge").then(({ desktop }) => {
+                // Open the note in a dedicated single-note window so it gets
+                // its own window with single-note semantics (closes when its
+                // last tab is closed, pinned to this note).
+                desktop?.window.open.mutate({
+                  noteId: note.id,
+                  singleNote: true
+                });
+              });
+            }
+          }
+        ]
+      : []),
     {
       type: "button",
       key: "pin",

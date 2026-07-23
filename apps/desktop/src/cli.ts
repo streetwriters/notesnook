@@ -25,6 +25,11 @@ export type CLIOptions = {
   notebook: boolean | string;
   reminder: boolean | string;
   hidden: boolean;
+  // When true the window is opened in "single note" mode (pinned to one note,
+  // single-group layout, closes when the last tab is closed). When false the
+  // window is a regular multi-tab window. Only meaningful when a note is
+  // requested via `note`.
+  singleNote?: boolean;
 };
 
 export async function parseArguments(argv: string[]): Promise<CLIOptions> {

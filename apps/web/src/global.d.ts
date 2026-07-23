@@ -76,5 +76,18 @@ declare global {
     ReactNativeWebView?: {
       postMessage(message: string): void;
     };
+    electronFS: {
+      createWritableStream(
+        path: string
+      ): Promise<WritableStreamDefaultWriter<any>>;
+    };
+    appEvents: {
+      onExternalDrop: (callback: (payload: any) => void) => () => void;
+      onNoteChanged: (callback: (payload: { noteId: string }) => void) => () => void;
+      onOpenNote: (callback: (payload: { noteId: string }) => void) => () => void;
+      onCloseTab: (callback: (payload: { tabId: string }) => void) => () => void;
+    };
+    // Notesnook defines
+    isPro: boolean;
   }
 }

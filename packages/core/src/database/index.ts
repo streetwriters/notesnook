@@ -42,7 +42,6 @@ import {
   Color,
   ContentItem,
   HistorySession,
-  InboxItemHistory,
   ItemReference,
   ItemReferences,
   ItemType,
@@ -93,7 +92,6 @@ export interface DatabaseSchema {
   shortcuts: SQLiteItem<Shortcut>;
   vaults: SQLiteItem<Vault>;
   monographs: SQLiteItem<Monograph>;
-  inboxitemshistory: SQLiteItem<InboxItemHistory>;
 }
 
 export type RawDatabaseSchema = DatabaseSchema & {
@@ -196,6 +194,7 @@ export interface DatabaseCollection<T, IsAsync extends boolean> {
   stream(
     chunkSize: number
   ): IsAsync extends true ? AsyncIterableIterator<T> : IterableIterator<T>;
+  invalidateCache?(): void | Promise<void>;
 }
 
 export type DatabaseAccessor<TSchema = DatabaseSchema> = () =>
@@ -238,8 +237,7 @@ const BooleanProperties: Set<BooleanFields> = new Set([
   "synced",
   "isGeneratedTitle",
   "archived",
-  "selfDestruct",
-  "spellcheck"
+  "selfDestruct"
 ]);
 
 const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {

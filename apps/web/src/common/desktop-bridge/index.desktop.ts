@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createTRPCProxyClient } from "@trpc/client";
+import { CreateTRPCProxyClient, createTRPCProxyClient } from "@trpc/client";
 import { ipcLink } from "electron-trpc/renderer";
 import type { AppRouter } from "@notesnook/desktop";
 import { AppEventManager, AppEvents } from "../app-events";
+import { EVENTS } from "@notesnook/core";
+import { db } from "../db";
 import { TaskScheduler } from "../../utils/task-scheduler";
 import { checkForUpdate } from "../../utils/updater";
 import { store as settingStore } from "../../stores/setting-store";
@@ -72,6 +74,48 @@ function attachListeners() {
   TaskScheduler.register("updateCheck", "0 0 */12 * * * *", () => {
     checkForUpdate(settingStore.get().autoUpdates);
   });
+
+  // Cross-window content sync: when another window saves a note, this
+  // listener fires and we reload the note + content from the shared
+  // SQLite DB and publish syncItemMerged so any open editors update.
+  // Per-note debouncing avoids multiple rapid reloads while typing.
+  const syncNoteTimers = new Map<string, NodeJS.Timeout>();
+  if (window.appEvents?.onNoteChanged) {
+    window.appEvents.onNoteChanged(async ({ noteId }: { noteId: string }) => {
+      // Debounce per noteId: clear any pending timer and set a new one
+      const existing = syncNoteTimers.get(noteId);
+      if (existing) clearTimeout(existing);
+      syncNoteTimers.set(
+        noteId,
+        setTimeout(async () => {
+          syncNoteTimers.delete(noteId);
+          try {
+            const note = await db.notes.note(noteId);
+            if (!note || !note.contentId) return;
+
+            // Refresh the notes cache so the list shows the updated title/date
+            await db.notes.buildCache();
+            AppEventManager.publish(EVENTS.appRefreshRequested);
+
+            const content = await db.content.get(note.contentId);
+            if (content) {
+              db.eventManager.publish(EVENTS.syncItemMerged, {
+                ...content,
+                type: "tiptap",
+                noteId: note.id
+              });
+              db.eventManager.publish(EVENTS.syncItemMerged, {
+                ...note,
+                type: "note"
+              });
+            }
+          } catch (error) {
+            console.error("Failed to sync cross-window note change:", error);
+          }
+        }, 300)
+      );
+    });
+  }
 }
 
 function attachListener(event: string) {
@@ -84,19 +128,14 @@ function attachListener(event: string) {
 }
 
 export async function createWritableStream(path: string) {
-  const id = await desktop.backups.open.mutate({ filename: path });
-  return new WritableStream<Uint8Array>({
-    write(chunk) {
-      return desktop.backups.write.mutate({
-        id,
-        chunk: Buffer.from(chunk).toString("base64")
-      });
-    },
-    close() {
-      return desktop.backups.close.mutate({ id });
-    },
-    abort() {
-      return desktop.backups.close.mutate({ id });
-    }
-  });
+  try {
+    const resolvedPath = await desktop.integration.resolvePath.query({
+      filePath: path
+    });
+    if (!resolvedPath) throw new Error("invalid path.");
+    return await window.electronFS.createWritableStream(resolvedPath);
+  } catch (ex) {
+    console.error(ex);
+    if (ex instanceof Error) showToast("error", ex.message);
+  }
 }

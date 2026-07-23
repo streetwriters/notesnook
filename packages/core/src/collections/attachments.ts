@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { ICollection } from "./collection.js";
 import { getId } from "../utils/id.js";
-import { EVENTS } from "../common.js";
+import { EV, EVENTS } from "../common.js";
 import dataurl from "../utils/dataurl.js";
 import dayjs from "dayjs";
 import {
@@ -48,7 +48,7 @@ export class Attachments implements ICollection {
       db.sanitizer
     );
 
-    db.eventManager.subscribe(
+    EV.subscribe(
       EVENTS.fileDownloaded,
       async ({
         success,
@@ -68,7 +68,7 @@ export class Attachments implements ICollection {
         const src = await this.read(filename, getOutputType(attachment));
         if (!src) return;
 
-        this.db.eventManager.publish(EVENTS.mediaAttachmentDownloaded, {
+        EV.publish(EVENTS.mediaAttachmentDownloaded, {
           groupId,
           hash: attachment.hash,
           attachmentType: getAttachmentType(attachment),
@@ -77,7 +77,7 @@ export class Attachments implements ICollection {
       }
     );
 
-    db.eventManager.subscribe(
+    EV.subscribe(
       EVENTS.fileUploaded,
       async ({
         success,
@@ -103,6 +103,13 @@ export class Attachments implements ICollection {
   async init() {
     await this.collection.init();
   }
+
+  /**
+   * Required to satisfy the ICollection interface.
+   * This collection does not currently maintain a local cache that needs invalidation,
+   * but the method must exist for type safety when iterating over all collections.
+   */
+  invalidateCache() {}
 
   async add(
     item: Partial<
@@ -224,44 +231,6 @@ export class Attachments implements ICollection {
       return true;
     }
     return false;
-  }
-
-  async bulkRemove(attachments: Attachment[], localOnly: boolean) {
-    logger.debug("Bulk removing attachments", {
-      count: attachments.length,
-      localOnly
-    });
-    if (attachments.length === 0) return;
-
-    const detachable: Attachment[] = [];
-    for (const attachment of attachments) {
-      if (!localOnly && !(await this.canDetach(attachment))) continue;
-      detachable.push(attachment);
-    }
-
-    const localOnlyHashes = detachable
-      .filter((a) => localOnly || !a.dateUploaded)
-      .map((a) => a.hash);
-    const remoteHashes = detachable
-      .filter((a) => !localOnly && !!a.dateUploaded)
-      .map((a) => a.hash);
-
-    if (localOnlyHashes.length > 0) {
-      await this.db.fs().bulkDeleteFiles(localOnlyHashes, true);
-    }
-    if (remoteHashes.length > 0) {
-      await this.db.fs().bulkDeleteFiles(remoteHashes, false);
-    }
-
-    if (!localOnly) {
-      for (const attachment of detachable) {
-        await this.detach(attachment);
-      }
-    }
-
-    const ids = detachable.map((a) => a.id);
-    await this.db.relations.unlinkOfType("attachment", ids);
-    await this.collection.softDelete(ids);
   }
 
   async detach(attachment: Attachment) {
@@ -611,14 +580,6 @@ export class Attachments implements ICollection {
         "Failed to get user encryption key. Cannot cache attachments."
       );
     return this.key;
-  }
-
-  async removeOrphaned() {
-    const orphaned = await this.db.attachments.orphaned.items();
-    logger.info("Deleting orphaned attachments", {
-      attachments: orphaned
-    });
-    await this.bulkRemove(orphaned, false);
   }
 }
 

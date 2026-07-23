@@ -231,7 +231,9 @@ import {
   mdiConsoleLine,
   mdiSpellcheck,
   mdiDeleteSweepOutline,
-  mdiCloseCircle
+  mdiCloseCircle,
+  mdiViewSplitVertical,
+  mdiViewSplitHorizontal
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
@@ -299,7 +301,13 @@ export type Icon = {
 
 export function createIcon(path: string, rotate = false) {
   const NNIcon: Icon = function Icon(props) {
-    const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
+    const {
+      sx,
+      rotate: _rotate = rotate,
+      size,
+      rotateDirection,
+      ...restProps
+    } = props;
     return (
       <Flex
         {...restProps}
@@ -578,6 +586,8 @@ export const Coupon = createIcon(mdiTagOutline);
 export const Support = createIcon(mdiChatQuestionOutline);
 export const NewTab = createIcon(mdiTabPlus);
 export const Radar = createIcon(mdiRadar);
+export const VerticalSplit = createIcon(mdiViewSplitVertical);
+export const HorizontalSplit = createIcon(mdiViewSplitHorizontal);
 
 export const LinkedTo = createIcon(mdiVectorLink);
 export const ReferencedIn = createIcon(mdiLink);

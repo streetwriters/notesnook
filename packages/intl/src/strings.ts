@@ -2335,6 +2335,11 @@ Use this if changes from other devices are not appearing on this device. This wi
   webclipSettings: () => t`Web clip settings`,
   fullscreen: () => t`Full screen`,
   openInNewTab: () => t`Open in new tab`,
+  openInNewWindow: () => t`Open in new window`,
+  newWindow: () => t`New window`,
+  moveTabToWindow: () => t`Move tab to window`,
+  moveToNewWindow: () => t`Move to new window`,
+  window: () => t`Window`,
   openSource: () => t`Open source`,
   outdent: () => t`Lift list item`,
   indent: () => t`Sink list item`,
@@ -2806,5 +2811,8 @@ Continue without attachments?`,
   deleteVersion: () => doActions.delete.version(1),
   deleteVersionConfirmation: () =>
     actionConfirmations.permanentlyDelete.version(1),
-  versionDeleted: () => actions.deleted.version(1)
+  versionDeleted: () => actions.deleted.version(1),
+  splitRight: () => t`Split right`,
+  splitDown: () => t`Split down`,
+  menu: () => t`Menu`
 };
