@@ -56,6 +56,9 @@ export type ResponsivePresenterProps = MenuPresenterProps &
   PopupPresenterProps & {
     mobile?: PopupType;
     desktop?: PopupType;
+    // Optional prop to control if clicking the overlay closes the popup.
+    // Useful for modal-like popups or when exact click handling is needed.
+    shouldCloseOnOverlayClick?: boolean;
   };
 
 export function ResponsivePresenter(

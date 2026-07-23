@@ -52,7 +52,7 @@ locale.then(({ default: locale }) => {
   });
   i18n.activate("en");
 });
-setI18nGlobal(i18n);
+setI18nGlobal(i18n as unknown as Parameters<typeof setI18nGlobal>[0]);
 
 const appHostnames = isDevelopment()
   ? ["localhost", "127.0.0.1"]
@@ -132,7 +132,13 @@ async function createWindow() {
     webPreferences: {
       zoomFactor: config.zoomFactor,
       spellcheck: config.isSpellCheckerEnabled,
-      preload: __dirname + "/preload.js"
+      preload: __dirname + "/preload.js",
+      // Preload needs Node.js built-ins (fs, path, stream) for the electronFS
+      // bridge used by split panes drag-and-drop file writes. contextBridge
+      // keeps them isolated from the renderer while sandbox: false exposes
+      // them to the preload script.
+      sandbox: false,
+      contextIsolation: true
     }
   });
 
