@@ -236,7 +236,11 @@ export function TaskListComponent(
           if (readonly) e.preventDefault();
         }}
         sx={{
-          ul: {
+          // NOTE: the class is part of the selector to win over
+          // `.ProseMirror ul ul` (styles.css), which is more specific than
+          // a plain `ul` and squashed a nested list against the item it
+          // belongs to
+          "ul.tasklist-content-wrapper": {
             display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
