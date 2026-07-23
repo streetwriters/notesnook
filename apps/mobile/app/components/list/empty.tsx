@@ -27,7 +27,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
 import { Tip } from "../tip";
 import { Button } from "../ui/button";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 

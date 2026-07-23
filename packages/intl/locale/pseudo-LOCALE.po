@@ -6130,7 +6130,7 @@ msgid "Select folder with backup files"
 msgstr ""
 
 #: src/strings.ts:112
-msgid "Select how you would like to recieve the code"
+msgid "Select how you would like to receive the code"
 msgstr ""
 
 #: src/strings.ts:2366
@@ -7718,7 +7718,7 @@ msgid "Yes, you can cancel your trial anytime. No questions asked."
 msgstr ""
 
 #: src/strings.ts:106
-msgid "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
+msgid "You also agree to receive marketing emails from us which you can opt-out of from app settings."
 msgstr ""
 
 #: src/strings.ts:2604

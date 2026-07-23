@@ -103,13 +103,13 @@ export const strings = {
     2: () => t`and `,
     3: () => t`Privacy Policy. `,
     4: () =>
-      t`You also agree to recieve marketing emails from us which you can opt-out of from app settings.`
+      t`You also agree to receive marketing emails from us which you can opt-out of from app settings.`
   },
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
   "2fa": () => t`Two factor authentication`,
   select2faMethod: () => t`Select method for two-factor authentication`,
-  select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
+  select2faCodeHelpText: () => t`Select how you would like to receive the code`,
   "2faCodeHelpText": {
     email: () =>
       t`Enter the 6 digit code sent to your email to continue logging in`,
@@ -1753,8 +1753,8 @@ For example:
   importCompleted: () => t`Import completed`,
   errorsOccured: (count: number) =>
     plural(count, {
-      one: "# error occured",
-      other: "# errors occured"
+      one: "# error occurred",
+      other: "# errors occurred"
     }),
   startOver: () => t`Start over`,
   filesReadyToImport: (count: number) =>

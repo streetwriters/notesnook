@@ -29,7 +29,7 @@ import { STORE_LINK } from "../../../utils/constants";
 import { eCloseRateDialog, eOpenRateDialog } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";

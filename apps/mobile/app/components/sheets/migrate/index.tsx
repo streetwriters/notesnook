@@ -37,7 +37,7 @@ import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { Issue } from "../github/issue";
