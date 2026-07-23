@@ -114,6 +114,18 @@ const newAnchor: ThemeUIStyleObject = {
   fontWeight: 500
 };
 
+const newSecondary: ThemeUIStyleObject = {
+  ...newCreateButtonVariant(
+    "background-secondary",
+    "buttonForeground-secondary",
+    {
+      hover: { bg: "hover-secondary" },
+      active: { bg: "hover-secondary" }
+    }
+  ),
+  border: "1px solid var(--border-secondary)"
+};
+
 const primary = createButtonVariant("transparent", "paragraph", {
   hover: { bg: "hover" },
   active: { bg: "hover" }
@@ -193,6 +205,7 @@ const menuItem: ThemeUIStyleObject = {
 export const buttonVariants = {
   primary,
   secondary,
+  new_secondary: newSecondary,
   tertiary,
 
   accent,

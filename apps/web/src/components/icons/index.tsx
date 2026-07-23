@@ -244,8 +244,14 @@ import EnvelopeSimple from "@notesnook/icons/envelope-simple.svg?react";
 import LockSimple from "@notesnook/icons/lock-simple.svg?react";
 import ChevronLeftIcon from "@notesnook/icons/chevron-left.svg?react";
 import ChevronRightIcon from "@notesnook/icons/chevron-right.svg?react";
+import ChevronDownIcon from "@notesnook/icons/chevron-down.svg?react";
 import ClockIcon from "@notesnook/icons/clock.svg?react";
 import WarningCircle from "@notesnook/icons/warning-circle.svg?react";
+import CloudSvg from "@notesnook/icons/cloud.svg?react";
+import FileSvg from "@notesnook/icons/file.svg?react";
+import ImageSvg from "@notesnook/icons/image.svg?react";
+import CheckSvg from "@notesnook/icons/check.svg?react";
+import ArrowRightSvg from "@notesnook/icons/arrow-right.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -621,6 +627,7 @@ export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
 export const CloseCircle = createIcon(mdiCloseCircle);
 
+export const CheckSvgIcon = createSvgIcon(CheckSvg);
 export const PasswordInvisible = createSvgIcon(EyeOpen);
 export const PasswordVisible = createSvgIcon(EyeClosed);
 export const Chat = createSvgIcon(ChatIcon);
@@ -628,5 +635,10 @@ export const Email = createSvgIcon(EnvelopeSimple);
 export const RecoveryCode = createSvgIcon(LockSimple);
 export const ChevronLeft = createSvgIcon(ChevronLeftIcon);
 export const ChevronRight = createSvgIcon(ChevronRightIcon);
+export const CaretDown = createSvgIcon(ChevronDownIcon);
 export const Clock = createSvgIcon(ClockIcon);
 export const Warning = createSvgIcon(WarningCircle);
+export const Cloud = createSvgIcon(CloudSvg);
+export const FileDoc = createSvgIcon(FileSvg);
+export const Picture = createSvgIcon(ImageSvg);
+export const ArrowRightSvgIcon = createSvgIcon(ArrowRightSvg);
