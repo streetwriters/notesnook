@@ -21,7 +21,6 @@ import { sanitizeFilename, useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
-import isMobilePhone from "validator/lib/isMobilePhone";
 import React, {
   Dispatch,
   SetStateAction,
@@ -38,10 +37,12 @@ import {
 } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
-import { Radius, Spacing } from "../../../common/design/spacing";
+import isMobilePhone from "validator/lib/isMobilePhone";
 import { db } from "../../../common/database";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import filesystem from "../../../common/filesystem";
 import DialogHeader from "../../../components/dialog/dialog-header";
+import PaywallSheet from "../../../components/sheets/paywall";
 import AppIcon from "../../../components/ui/AppIcon";
 import { Button } from "../../../components/ui/button";
 import FormInput, {
@@ -50,7 +51,7 @@ import FormInput, {
 } from "../../../components/ui/input/form-input";
 import PinInput from "../../../components/ui/pin-input";
 import { Pressable } from "../../../components/ui/pressable";
-import Seperator from "../../../components/ui/seperator";
+import LineSeparator from "../../../components/ui/seperator/line-separator";
 import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
 import useTimer from "../../../hooks/use-timer";
@@ -63,8 +64,6 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
 import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
-import PaywallSheet from "../../../components/sheets/paywall";
-import LineSeparator from "../../../components/ui/seperator/line-separator";
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",
@@ -473,18 +472,15 @@ export const MFASetup = ({
               buttons={
                 <Button
                   onPress={() => {
-                    if (method.id !== "sms" && user) {
-                      Clipboard.setString(
-                        method.id === "app"
-                          ? authenticatorDetails.sharedKey!
-                          : user.email!
-                      );
+                    if (method.id === "app" && authenticatorDetails.sharedKey) {
+                      Clipboard.setString(authenticatorDetails.sharedKey);
                       ToastManager.show({
-                        message:
-                          method.id === "app"
-                            ? strings.codeCopied()
-                            : strings.emailCopied()
+                        message: strings.codeCopied(),
+                        context: "local",
+                        type: "success"
                       });
+                    } else {
+                      onSendCode();
                     }
                   }}
                   type="transparent"
@@ -499,7 +495,7 @@ export const MFASetup = ({
                     paddingHorizontal: 0,
                     marginLeft: Spacing.LEVEL_1
                   }}
-                  icon="copy"
+                  icon={method.id === "app" ? "copy" : undefined}
                   iconFamily="notesnook"
                   title={
                     sending
