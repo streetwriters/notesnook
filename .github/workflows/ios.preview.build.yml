@@ -111,10 +111,8 @@ jobs:
           ./use-ios-build-config.sh staging --marketing-version ${{steps.marketing-version.outputs.version}} --build-number ${{steps.build-number.outputs.timestamp}}
 
       # Archive unsigned: this job has no certs/profiles (secrets), and the iOS
-      # device SDK forbids ad-hoc signing, so real signing must wait for publish.
-      # Do NOT pass CODE_SIGN_ENTITLEMENTS="" -- each target must keep its own
-      # entitlements file so the archive records them (App Group etc.); the
-      # publish job's -exportArchive re-signs using those. Blanking them is what
+      # device SDK forbids ad-hoc signing, so real signing happens below.
+      # Do NOT pass CODE_SIGN_ENTITLEMENTS="" -- blanking entitlements is what
       # dropped the App Group and crashed MMKV on launch.
       - name: Archive (unsigned)
         run: |
@@ -131,22 +129,167 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             archive
 
-      - name: Stage build artifact
+      # ============================================================
+      # TEMPORARY (testing only) -- signing + Firebase inline.
+      # `workflow_run` (ios.preview.publish.yml) only runs from the default
+      # branch, so the split cannot be validated from a PR branch. These steps
+      # + the `publish` job below sign and distribute in-place so the fix can be
+      # tested end-to-end on a same-repo PR.
+      #
+      # REVERT BEFORE MERGING TO master: restore the archive upload here and let
+      # ios.preview.publish.yml do signing/distribution. This inline version does
+      # NOT work for fork PRs (pull_request withholds secrets from forks), which
+      # is exactly what the workflow_run split exists to support.
+      # ============================================================
+      - name: Import signing certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+
+      - name: Install provisioning profiles
+        env:
+          PROFILE_APP: ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_APP }}
+          PROFILE_SHARE: ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_SHARE }}
+          PROFILE_WIDGET: ${{ secrets.APPLE_MOBILE_PROVISION_ADHOC_WIDGET }}
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/artifact"
-          tar -czf "$RUNNER_TEMP/artifact/Notesnook.xcarchive.tar.gz" \
-            -C "$RUNNER_TEMP" Notesnook.xcarchive
-          # Carry the PR context forward; workflow_run cannot see it reliably for forks.
-          {
-            echo "PR_NUMBER=${{ github.event.pull_request.number }}"
-            echo "HEAD_SHA=${{ github.event.pull_request.head.sha }}"
-          } > "$RUNNER_TEMP/artifact/pr-meta.env"
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR"
+          i=0
+          for p in "$PROFILE_APP" "$PROFILE_SHARE" "$PROFILE_WIDGET"; do
+            echo "$p" | base64 --decode > "$PROFILE_DIR/preview-$i.mobileprovision"
+            i=$((i + 1))
+          done
 
-      - name: Upload build artifact
+      - name: Sign IPA
+        run: |
+          set -euo pipefail
+          PROFILES="$HOME/Library/MobileDevice/Provisioning Profiles"
+          APP="$(find "$RUNNER_TEMP/Notesnook.xcarchive/Products/Applications" -maxdepth 1 -name '*.app' | head -n1)"
+          [ -n "$APP" ] || { echo "::error::No .app in archive"; exit 1; }
+
+          IDENTITY="$(security find-identity -v -p codesigning | awk '/Apple Distribution/{print $2; exit}')"
+          [ -n "$IDENTITY" ] || { echo "::error::No Apple Distribution identity found"; exit 1; }
+          echo "Signing identity: $IDENTITY"
+
+          TMP="$RUNNER_TEMP/sign"; mkdir -p "$TMP"
+
+          profile_bundle_id() {
+            security cms -D -i "$1" -o "$TMP/_p.plist" 2>/dev/null
+            local appid; appid="$(plutil -extract Entitlements.application-identifier raw -o - "$TMP/_p.plist")"
+            echo "${appid#*.}"
+          }
+          profile_for() {
+            local want="$1" p
+            for p in "$PROFILES"/*.mobileprovision; do
+              [ -e "$p" ] || continue
+              [ "$(profile_bundle_id "$p")" = "$want" ] && { echo "$p"; return 0; }
+            done
+            return 1
+          }
+          sign_bundle() {
+            local bundle="$1" bid prof ent
+            bid="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$bundle/Info.plist")"
+            prof="$(profile_for "$bid")" || { echo "::error::No provisioning profile for $bid"; exit 1; }
+            ent="$TMP/ent-$bid.plist"
+            security cms -D -i "$prof" -o "$TMP/_p.plist"
+            plutil -extract Entitlements xml1 -o "$ent" "$TMP/_p.plist"
+            cp "$prof" "$bundle/embedded.mobileprovision"
+            echo "Signing $(basename "$bundle") ($bid)"
+            codesign --force --sign "$IDENTITY" --entitlements "$ent" "$bundle"
+          }
+
+          if [ -d "$APP/Frameworks" ]; then
+            find "$APP/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -print0 \
+              | while IFS= read -r -d '' f; do codesign --force --sign "$IDENTITY" "$f"; done
+          fi
+          if [ -d "$APP/PlugIns" ]; then
+            for appex in "$APP/PlugIns"/*.appex; do
+              [ -e "$appex" ] || continue
+              if [ -d "$appex/Frameworks" ]; then
+                find "$appex/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -print0 \
+                  | while IFS= read -r -d '' f; do codesign --force --sign "$IDENTITY" "$f"; done
+              fi
+              sign_bundle "$appex"
+            done
+          fi
+          sign_bundle "$APP"
+
+          codesign --verify --deep --strict --verbose=2 "$APP"
+
+          rm -rf "$TMP/Payload"; mkdir -p "$TMP/Payload"
+          cp -R "$APP" "$TMP/Payload/"
+          ( cd "$TMP" && zip -qry "$RUNNER_TEMP/Notesnook.ipa" Payload )
+
+          echo "::group::Signed app entitlements"
+          codesign -d --entitlements :- "$APP" 2>/dev/null || true
+          echo "::endgroup::"
+          codesign -d --entitlements :- "$APP" 2>/dev/null | grep -q "group.org.streetwriters.notesnook" \
+            || { echo "::error::Signed app is missing the App Group entitlement; it would crash on launch."; exit 1; }
+          echo "App Group entitlement present."
+
+      - name: Upload signed IPA
         uses: actions/upload-artifact@v4
         with:
-          name: ios-preview-build
-          path: ${{ runner.temp }}/artifact
+          name: ios-preview-ipa
+          path: ${{ runner.temp }}/Notesnook.ipa
           if-no-files-found: error
           retention-days: 1
+
+  # TEMPORARY (testing only) -- distribute inline. Firebase's action is a Docker
+  # container action, so it must run on Linux, separate from the macOS build.
+  # Remove together with the inline signing steps above before merging.
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Download signed IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: ${{ runner.temp }}
+
+      - name: Publish to Firebase
+        id: firebase-output
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_IOS_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
+          groups: testers
+          file: ${{ runner.temp }}/Notesnook.ipa
+          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        env:
+          preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+        with:
+          script: |
+            const marker = '<!-- ios-preview-comment -->';
+            const prNumber = context.issue.number || context.payload.pull_request.number;
+            if (!prNumber) return;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**iOS App Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${context.sha}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
