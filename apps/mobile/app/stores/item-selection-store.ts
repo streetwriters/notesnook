@@ -56,17 +56,14 @@ export function createItemSelectionStore(
     canEnableMultiSelectMode: multiSelectMode,
     initialState: {},
     markAs: (item, state) => {
-      set({
-        selection: {
-          ...get().selection,
-          [item.id]:
-            state === "deselected"
-              ? get().initialState === undefined
-                ? undefined
-                : "deselected"
-              : state
-        }
-      });
+      const selection = { ...get().selection };
+      const initial = get().initialState[item.id];
+      if (state === "deselected" && initial === undefined) {
+        delete selection[item.id];
+      } else {
+        selection[item.id] = state;
+      }
+      set({ selection });
     },
     multiSelect: false,
     toggleMultiSelect: () => {
