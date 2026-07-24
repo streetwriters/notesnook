@@ -6,6 +6,9 @@ name: Notesnook iOS Preview Publish
 # produced, then signs + exports + distributes it and posts the PR comment.
 # `xcodebuild -exportArchive` only packages and signs a prebuilt archive; it
 # does not run the app's build phases, so fork code is never executed here.
+#
+# Split into two jobs on purpose: signing needs macOS, but the Firebase
+# distribution action is a Docker container action and only runs on Linux.
 
 on:
   workflow_run:
@@ -13,11 +16,14 @@ on:
     types: [completed]
 
 jobs:
-  publish:
+  export:
     # Only publish previews for builds that actually succeeded.
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: macos-26
     timeout-minutes: 30
+    outputs:
+      pr_number: ${{ steps.meta.outputs.PR_NUMBER }}
+      head_sha: ${{ steps.meta.outputs.HEAD_SHA }}
 
     steps:
       - name: Checkout base repo (trusted)
@@ -38,9 +44,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Load PR metadata & extract archive
+        id: meta
         run: |
           set -euo pipefail
-          cat "$RUNNER_TEMP/artifact/pr-meta.env" >> "$GITHUB_ENV"
+          cat "$RUNNER_TEMP/artifact/pr-meta.env" >> "$GITHUB_OUTPUT"
           tar -xzf "$RUNNER_TEMP/artifact/Notesnook.xcarchive.tar.gz" -C "$RUNNER_TEMP"
 
       - name: Import signing certificate
@@ -84,9 +91,31 @@ jobs:
             -exportOptionsPlist "$EXPORT_PLIST" \
             -exportPath "$RUNNER_TEMP/export"
 
-          # Normalize the IPA name for the distribution step.
+          # Normalize the IPA name for the distribution job.
           IPA="$(find "$RUNNER_TEMP/export" -name '*.ipa' | head -n1)"
           cp "$IPA" "$RUNNER_TEMP/Notesnook.ipa"
+
+      - name: Upload signed IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: ${{ runner.temp }}/Notesnook.ipa
+          if-no-files-found: error
+          retention-days: 1
+
+  # Must be Linux: wzieba/Firebase-Distribution-Github-Action is a Docker
+  # container action, which GitHub only supports on Linux runners.
+  distribute:
+    needs: export
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Download signed IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-preview-ipa
+          path: ${{ runner.temp }}
 
       - name: Publish to Firebase
         id: firebase-output
@@ -96,12 +125,14 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
           groups: testers
           file: ${{ runner.temp }}/Notesnook.ipa
-          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
+          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ needs.export.outputs.pr_number }}
 
       - name: Post or update PR comment
         uses: actions/github-script@v7
         env:
           preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+          PR_NUMBER: ${{ needs.export.outputs.pr_number }}
+          HEAD_SHA: ${{ needs.export.outputs.head_sha }}
         with:
           script: |
             const marker = '<!-- ios-preview-comment -->';

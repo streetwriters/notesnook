@@ -44,8 +44,32 @@ jobs:
 
       - name: Setup iOS Platform
         run: |
-          xcodebuild -downloadPlatform iOS -exportPath ~/Downloads
-          xcodebuild -importPlatform ~/Downloads/iphonesimulator_26.1_23B86.dmg
+          # GitHub runs this as `/bin/bash -e`, so `set +e` is required -- without
+          # it the first failure aborts the step before any retry can happen.
+          # Both commands hit "Unable to connect to simulator" (exit 70) when
+          # CoreSimulatorService is wedged, so retry each and bounce it between.
+          set +e
+          DL_DIR="$RUNNER_TEMP/ios-platform"
+
+          retry() {
+            for i in 1 2 3; do
+              "$@" && return 0
+              echo "Attempt $i failed ($*); resetting CoreSimulator..."
+              sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService simdiskimaged 2>/dev/null
+              sleep 20
+              xcrun simctl list runtimes >/dev/null 2>&1
+            done
+            echo "::error::Failed after 3 attempts: $*"
+            exit 1
+          }
+
+          xcrun simctl list runtimes >/dev/null 2>&1
+          retry xcodebuild -downloadPlatform iOS -exportPath "$DL_DIR"
+
+          # Find the dmg; its name embeds a build number that changes.
+          DMG="$(find "$DL_DIR" -name '*.dmg' | head -n1)"
+          [ -n "$DMG" ] || { echo "::error::No dmg in $DL_DIR"; exit 1; }
+          retry xcodebuild -importPlatform "$DMG"
 
       - name: Install node modules
         run: |
