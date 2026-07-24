@@ -203,7 +203,7 @@ export const FailedInboxItems = () => {
                     title: strings.deleteAll(),
                     paragraph: strings.deleteAllFailedItemsDesc(),
                     positiveText: strings.delete(),
-                    positiveType: "errorShade",
+                    positiveType: "error-shade-outline",
                     positivePress: async () => {
                       if (result.status !== "pending") {
                         await db.inboxItemsHistory.deleteFailed();
