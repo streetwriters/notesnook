@@ -3,9 +3,9 @@ name: Notesnook iOS Preview Publish
 # TRUSTED stage. Runs via `workflow_run` after the build workflow finishes, so
 # it has the base repo's secrets and a write-scoped token. It checks out the
 # BASE repository (never fork code), downloads the unsigned archive the build
-# produced, then signs + exports + distributes it and posts the PR comment.
-# `xcodebuild -exportArchive` only packages and signs a prebuilt archive; it
-# does not run the app's build phases, so fork code is never executed here.
+# produced, then signs + distributes it and posts the PR comment. Signing is
+# done directly with `codesign` on the prebuilt archive -- no app build phases
+# run here, so fork code is never executed in this trusted context.
 #
 # Split into two jobs on purpose: signing needs macOS, but the Firebase
 # distribution action is a Docker container action and only runs on Linux.
