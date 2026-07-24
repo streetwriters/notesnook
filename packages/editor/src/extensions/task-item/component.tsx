@@ -26,6 +26,7 @@ import { useCallback } from "react";
 import type { TaskItemAttributes } from "./task-item.js";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { isiOS } from "../../utils/platform.js";
+import { startItemDrag } from "../drag-drop/index.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
 import TaskItem from "@tiptap/extension-task-item";
 import { strings } from "@notesnook/intl";
@@ -80,11 +81,9 @@ export function TaskItemComponent(
         {editor.isEditable && (
           <Icon
             className="dragHandle"
-            draggable="true"
-            // NOTE: Turning this off somehow makes drag/drop stop working
-            // properly on touch devices.
-            // contentEditable={false}
             data-drag-handle
+            // dragging is ours, not the browser's: see extensions/drag-drop
+            onPointerDown={(e) => startItemDrag(editor, getPos, e.nativeEvent)}
             path={Icons.dragHandle}
             sx={{
               opacity: [1, 1, 0],
@@ -93,7 +92,13 @@ export function TaskItemComponent(
               cursor: "grab",
               mr: "0.2rem",
               fontFamily: "inherit",
-              marginTop: "calc((1lh - 18px) / 2)"
+              marginTop: "calc((1lh - 18px) / 2)",
+              // the browser must not take this gesture for scrolling, text
+              // selection or the long press callout
+              touchAction: "none",
+              userSelect: "none",
+              WebkitTouchCallout: "none",
+              svg: { pointerEvents: "none" }
             }}
             size={isMobile ? "2.46ch" : "2.22ch"}
           />
