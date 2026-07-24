@@ -95,6 +95,23 @@ jobs:
           IPA="$(find "$RUNNER_TEMP/export" -name '*.ipa' | head -n1)"
           cp "$IPA" "$RUNNER_TEMP/Notesnook.ipa"
 
+          # Fail fast if the App Group entitlement didn't survive re-signing.
+          # Its absence is what crashes the app at launch (MMKV nil group path),
+          # so never distribute a build without it.
+          WORK="$RUNNER_TEMP/verify"
+          mkdir -p "$WORK"
+          unzip -q "$RUNNER_TEMP/Notesnook.ipa" -d "$WORK"
+          APP="$(find "$WORK/Payload" -maxdepth 1 -name '*.app' | head -n1)"
+          echo "::group::Signed app entitlements"
+          codesign -d --entitlements :- "$APP" 2>/dev/null || codesign -d --entitlements - "$APP"
+          echo "::endgroup::"
+          if codesign -d --entitlements :- "$APP" 2>/dev/null | grep -q "group.org.streetwriters.notesnook"; then
+            echo "App Group entitlement present."
+          else
+            echo "::error::Exported app is missing the App Group entitlement; it would crash on launch."
+            exit 1
+          fi
+
       - name: Upload signed IPA
         uses: actions/upload-artifact@v4
         with:

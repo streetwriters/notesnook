@@ -110,6 +110,12 @@ jobs:
           cd apps/mobile/ios/build-configs
           ./use-ios-build-config.sh staging --marketing-version ${{steps.marketing-version.outputs.version}} --build-number ${{steps.build-number.outputs.timestamp}}
 
+      # Archive unsigned: this job has no certs/profiles (secrets), and the iOS
+      # device SDK forbids ad-hoc signing, so real signing must wait for publish.
+      # Do NOT pass CODE_SIGN_ENTITLEMENTS="" -- each target must keep its own
+      # entitlements file so the archive records them (App Group etc.); the
+      # publish job's -exportArchive re-signs using those. Blanking them is what
+      # dropped the App Group and crashed MMKV on launch.
       - name: Archive (unsigned)
         run: |
           set -euo pipefail
@@ -120,12 +126,9 @@ jobs:
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Notesnook.xcarchive" \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGN_STYLE=Manual \
+            CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=YES \
-            PROVISIONING_PROFILE_SPECIFIER="" \
-            DEVELOPMENT_TEAM="" \
+            CODE_SIGN_IDENTITY="" \
             archive
 
       - name: Stage build artifact
