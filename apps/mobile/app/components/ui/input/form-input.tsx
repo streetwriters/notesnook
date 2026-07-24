@@ -320,7 +320,7 @@ export function FormInput({
       onPress && loading ? colors.primary.accent : colors.primary.paragraph,
     paddingTop: Spacing.LEVEL_3,
     paddingBottom: Spacing.LEVEL_3,
-    lineHeight: fontSize + fontSize * 0.3,
+    lineHeight: fontSize + fontSize * 0.2,
     flexGrow: 1,
     flexShrink: 1,
     fontFamily: "Inter-Regular",

@@ -280,7 +280,7 @@ export const customizeGroup: SettingSection = {
               maxInputValue: 400,
               step: 1,
               inputBadgeValue: "px",
-              icon: "text-aa",
+              icon: "format-font-size",
               iconFamily: "notesnook",
               property: "defaultFontSize"
             },
@@ -290,8 +290,7 @@ export const customizeGroup: SettingSection = {
               description: strings.lineHeightDesc(),
               type: "input-selector",
               property: "defaultLineHeight",
-              icon: "list",
-              iconSize: 8,
+              icon: "format-arrows-vertical",
               iconFamily: "notesnook",
               minInputValue: EDITOR_LINE_HEIGHT.MIN,
               maxInputValue: EDITOR_LINE_HEIGHT.MAX,
