@@ -51,6 +51,7 @@ import {
 } from "../manage-inbox-keys";
 import { FailedInboxItems } from "../failed-inbox-items";
 import AccountCard from "./account-card";
+import { EditProfile } from "./edit-profile";
 
 export const components: { [name: string]: ReactElement } = {
   homeselector: <HomePicker />,
@@ -83,5 +84,6 @@ export const components: { [name: string]: ReactElement } = {
   "inbox-keys": <InboxKeysList />,
   "failed-inbox-items": <FailedInboxItems />,
   "setup-inbox-keys": <SetupInboxKeys />,
-  "account-card": <AccountCard />
+  "account-card": <AccountCard />,
+  "edit-profile": <EditProfile />
 };

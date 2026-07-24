@@ -62,99 +62,6 @@ export const accountGroup: SettingSection = {
   useHook: () => useUserStore((state) => state.user),
   hidden: (current) => !current,
   sections: [
-    // {
-    //   id: "subscription-status",
-    //   useHook: () => useUserStore((state) => state.user),
-    //   hidden: (current) => {
-    //     const user = current as User;
-    //     return (
-    //       !user ||
-    //       !user.subscription ||
-    //       user.subscription.provider === undefined ||
-    //       !strings.subscriptionProviderInfo[user?.subscription?.provider] ||
-    //       user.subscription?.plan === SubscriptionPlan.FREE
-    //     );
-    //   },
-    //   name: (current) => {
-    //     const user = (current as User) || useUserStore.getState().user;
-    //     return (
-    //       strings.subscriptionProviderInfo[
-    //         user?.subscription?.provider
-    //       ]?.title() || `Unknown provider id: ${user?.subscription?.provider}`
-    //     );
-    //   },
-    //   icon: "credit-card",
-    //   modifer: () => {
-    //     const user = useUserStore.getState().user;
-    //     if (!user) return;
-    //     const subscriptionProviderInfo =
-    //       strings.subscriptionProviderInfo[user?.subscription?.provider];
-
-    //     if (!subscriptionProviderInfo) return;
-
-    //     const isCurrentPlatform =
-    //       (user.subscription?.provider === SubscriptionProvider.APPLE &&
-    //         Platform.OS === "ios") ||
-    //       (user.subscription?.provider === SubscriptionProvider.GOOGLE &&
-    //         Platform.OS === "android");
-
-    //     if (
-    //       (user.subscription?.provider === SubscriptionProvider.GOOGLE ||
-    //         user.subscription?.provider === SubscriptionProvider.APPLE) &&
-    //       isCurrentPlatform &&
-    //       user?.subscription?.productId
-    //     ) {
-    //       RNIap.deepLinkToSubscriptions({
-    //         sku: user?.subscription.productId
-    //       });
-    //     } else {
-    //       presentSheet({
-    //         title: subscriptionProviderInfo.title(),
-    //         paragraph: subscriptionProviderInfo.desc()
-    //       });
-    //     }
-    //   },
-    //   description: (current) => {
-    //     const user = current as User;
-    //     if (!user) return strings.neverHesitate();
-    //     const subscriptionDaysLeft =
-    //       user && getTimeLeft(user.subscription?.expiry);
-    //     const expiryDate = dayjs(user?.subscription?.expiry).format(
-    //       "dddd, MMMM D, YYYY h:mm A"
-    //     );
-    //     const startDate = dayjs(user?.subscription?.start).format(
-    //       "dddd, MMMM D, YYYY h:mm A"
-    //     );
-
-    //     const trialEndDate = dayjs(user?.subscription?.start)
-    //       .add(
-    //         user?.subscription?.productId?.includes("monthly") ? 7 : 14,
-    //         "day"
-    //       )
-    //       .format("dddd, MMMM D, YYYY h:mm A");
-
-    //     if (
-    //       user.subscription?.plan !== SubscriptionPlan.FREE &&
-    //       user.subscription?.productId
-    //     ) {
-    //       const status = user.subscription?.status;
-    //       return status === SubscriptionStatus.TRIAL
-    //         ? strings.trialOnGoing(trialEndDate)
-    //         : status === SubscriptionStatus.ACTIVE
-    //           ? strings.subRenewOn(expiryDate)
-    //           : status === SubscriptionStatus.CANCELED ||
-    //               status === SubscriptionStatus.PAUSED
-    //             ? strings.subEndsOn(expiryDate)
-    //             : status === SubscriptionStatus.EXPIRED
-    //               ? subscriptionDaysLeft.time < -3
-    //                 ? strings.subEnded()
-    //                 : strings.accountDowngradedIn(3)
-    //               : strings.neverHesitate();
-    //     }
-
-    //     return strings.neverHesitate();
-    //   }
-    // },
     {
       id: "redeem-gift-code",
       name: strings.redeemGiftCode(),
@@ -222,76 +129,17 @@ export const accountGroup: SettingSection = {
               description: strings.editProfileDesc(),
               icon: "user",
               iconFamily: "notesnook",
-              sections: [
-                {
-                  id: "remove-profile-picture",
-                  icon: "trash",
-                  iconFamily: "notesnook",
-                  name: strings.removeProfilePicture(),
-                  description: strings.removeProfilePictureDesc(),
-                  useHook: () =>
-                    useUserStore((state) => state.profile?.profilePicture),
-                  hidden: () =>
-                    !useUserStore.getState().profile?.profilePicture,
-                  isModal: true,
-                  modifer: () => {
-                    presentDialog({
-                      title: strings.removeProfilePicture(),
-                      paragraph: strings.removeProfilePictureConfirmation(),
-                      positiveText: strings.remove(),
-                      positivePress: async () => {
-                        db.settings
-                          .setProfile({
-                            profilePicture: undefined
-                          })
-                          .then(async () => {
-                            useUserStore.setState({
-                              profile: db.settings.getProfile()
-                            });
-                          });
-                      }
-                    });
-                  }
-                },
-                {
-                  id: "remove-name",
-                  icon: "trash",
-                  iconFamily: "notesnook",
-                  name: strings.removeFullName(),
-                  description: strings.removeFullNameDesc(),
-                  useHook: () =>
-                    useUserStore((state) => state.profile?.fullName),
-                  hidden: () => !useUserStore.getState().profile?.fullName,
-                  isModal: true,
-                  modifer: () => {
-                    presentDialog({
-                      title: strings.removeFullName(),
-                      paragraph: strings.removeFullNameConfirmation(),
-                      positiveText: strings.remove(),
-                      positivePress: async () => {
-                        db.settings
-                          .setProfile({
-                            fullName: undefined
-                          })
-                          .then(async () => {
-                            useUserStore.setState({
-                              profile: db.settings.getProfile()
-                            });
-                          });
-                      }
-                    });
-                  }
-                },
-                {
-                  id: "change-email",
-                  name: strings.changeEmail(),
-                  type: "screen",
-                  component: "change-email",
-                  description: strings.changeEmailDesc(),
-                  icon: "at",
-                  headerBottomBorder: true
-                }
-              ]
+              component: "edit-profile"
+            },
+
+            {
+              id: "change-email",
+              name: strings.changeEmail(),
+              type: "screen",
+              component: "change-email",
+              description: strings.changeEmailDesc(),
+              icon: "at",
+              headerBottomBorder: true
             },
             {
               id: "subscription-not-active",
