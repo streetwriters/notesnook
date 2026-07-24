@@ -110,10 +110,6 @@ jobs:
           cd apps/mobile/ios/build-configs
           ./use-ios-build-config.sh staging --marketing-version ${{steps.marketing-version.outputs.version}} --build-number ${{steps.build-number.outputs.timestamp}}
 
-      # Archive WITHOUT signing. No certificates or secrets are present in this
-      # job. The trusted publish workflow re-signs and exports this archive;
-      # `-exportArchive` only packages/signs and does NOT re-run the app's build
-      # phases, so fork code never runs alongside secrets.
       - name: Archive (unsigned)
         run: |
           set -euo pipefail
@@ -124,10 +120,12 @@ jobs:
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Notesnook.xcarchive" \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGN_STYLE=Manual \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGN_ENTITLEMENTS="" \
+            CODE_SIGNING_ALLOWED=YES \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            DEVELOPMENT_TEAM="" \
             archive
 
       - name: Stage build artifact
