@@ -22,6 +22,7 @@ import { Color, Note, Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
@@ -210,6 +211,9 @@ const NotesPage = ({
           });
         }}
         onPressDefaultRightButton={onPressFloatingButton}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
       />
 
       <DelayLayout color={accentColor} wait={loadingNotes}>

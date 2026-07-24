@@ -25,10 +25,11 @@ import { TextInput, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
 import { useDBItem, useTotalNotes } from "../../hooks/use-db-item";
 import { TaggedNotes } from "../../screens/notes/tagged";
+import { presentDialog } from "../dialog/functions";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { useTags } from "../../stores/use-tag-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { useTags, useTagStore } from "../../stores/use-tag-store";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Properties } from "../properties";
 import AppIcon from "../ui/AppIcon";
@@ -39,6 +40,8 @@ import { SideMenuListEmpty } from "./side-menu-list-empty";
 import { useSideMenuTagsSelectionStore } from "./stores";
 import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 import { useRelationStore } from "../../stores/use-relation-store";
+import { Radius, Spacing } from "../../common/design/spacing";
+import { createFormRef, validators } from "../ui/input/form-input";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -56,7 +59,7 @@ const TagItem = (props: {
   const totalNotes = useTotalNotes("tag");
   const totalNotesRef = React.useRef(totalNotes);
   totalNotesRef.current = totalNotes;
-  const updater = useRelationStore(state => state.updater);
+  const updater = useRelationStore((state) => state.updater);
 
   useEffect(() => {
     if (item?.id) {
@@ -67,20 +70,19 @@ const TagItem = (props: {
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        marginTop:
-          (props.id as number) === 0 ? DefaultAppStyles.GAP_VERTICAL : 2
+        paddingHorizontal: Spacing.LEVEL_3,
+        marginBottom: Spacing.LEVEL_0
       }}
     >
       {item ? (
         <Pressable
-          type={isSelected || isFocused ? "selected" : "transparent"}
+          type={isFocused ? "selected" : "transparent"}
           onLongPress={() => {
             Properties.present(item, false, [
               {
                 id: "select",
-                title: strings.select() + " " + strings.dataTypes["tag"](),
-                icon: "checkbox-outline",
+                title: strings.select(),
+                icon: "check-square",
                 onPress: () => {
                   const store = useSideMenuTagsSelectionStore;
                   store.setState({
@@ -116,30 +118,23 @@ const TagItem = (props: {
             width: "100%",
             alignItems: "center",
             flexDirection: "row",
-            borderRadius: defaultBorderRadius,
-            paddingRight: DefaultAppStyles.GAP_SMALL
+            borderRadius: Radius.XS,
+            padding: Spacing.LEVEL_1
           }}
         >
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              gap: Spacing.LEVEL_1
             }}
           >
-            <View
-              style={{
-                width: 32,
-                height: 32,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <AppIcon
-                size={AppFontSize.md}
-                color={isFocused ? colors.selected.icon : colors.primary.icon}
-                name="pound"
-              />
-            </View>
+            <AppIcon
+              size={16}
+              color={isFocused ? colors.selected.icon : colors.primary.icon}
+              name="shopping-mode"
+              iconFamily="notesnook"
+            />
 
             <Paragraph
               color={
@@ -152,26 +147,21 @@ const TagItem = (props: {
           </View>
 
           {enabled ? (
-            <View
-              style={{
-                width: 22,
-                height: 22,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <AppIcon
-                name={
-                  isSelected ? "checkbox-outline" : "checkbox-blank-outline"
-                }
-                color={isSelected ? colors.selected.icon : colors.primary.icon}
-              />
-            </View>
+            <AppIcon
+              name={isSelected ? "checkbox" : "box-empty"}
+              iconFamily="notesnook"
+              size={16}
+              color={
+                isSelected
+                  ? [colors.primary.accent, colors.primary.accentForeground]
+                  : colors.primary.icon
+              }
+            />
           ) : (
             <>
-              {item?.id && totalNotes.totalNotes?.(item?.id) ? (
+              {item?.id && totalNotes.totalNotes?.(item?.id) !== undefined ? (
                 <Paragraph
-                  size={AppFontSize.xxs}
+                  size={AppFontSize.sm}
                   color={colors.secondary.paragraph}
                 >
                   {totalNotes.totalNotes(item?.id)}
@@ -232,6 +222,43 @@ export const SideMenuTags = () => {
     setLoading(false);
   }, [tags]);
 
+  const onPressAddTag = React.useCallback(() => {
+    presentDialog({
+      title: strings.addTag(),
+      form: {
+        formRef: createFormRef({
+          title: ""
+        }),
+        items: [
+          {
+            label: strings.enterTitle(),
+            name: "title",
+            placeholder: "eg. journal",
+            ref: React.createRef(),
+            validators: [validators.required(strings.allFieldsRequired())],
+            inputProps: {
+              autoCapitalize: "none"
+            }
+          }
+        ],
+        onFormSubmit: async (form) => {
+          try {
+            if (!form.validate()) return false;
+            await db.tags.add({
+              title: form.getValue("title").trim()
+            });
+            useTagStore.getState().refresh();
+            return true;
+          } catch (e) {
+            form.setError("title", (e as Error).message);
+            return false;
+          }
+        }
+      },
+      positiveText: strings.add()
+    });
+  }, []);
+
   useEffect(() => {
     if (!isLoading) {
       updateTags();
@@ -253,7 +280,10 @@ export const SideMenuTags = () => {
     >
       {!tags || tags?.placeholders.length === 0 ? (
         <SideMenuListEmpty
-          placeholder={strings.emptyPlaceholders("tag")}
+          placeholderTitle={strings.noTagsYet()}
+          placeholderBody={strings.tagsEmptyBody()}
+          placeholderButtonTitle={strings.addTag()}
+          onPressPlaceholderButton={onPressAddTag}
           isLoading={loading}
         />
       ) : (
@@ -269,7 +299,8 @@ export const SideMenuTags = () => {
               <View
                 style={{
                   backgroundColor: colors.primary.background,
-                  paddingTop: DefaultAppStyles.GAP_VERTICAL
+                  paddingTop: Spacing.LEVEL_1,
+                  paddingBottom: Spacing.LEVEL_3
                 }}
               >
                 <SideMenuHeader />
@@ -279,36 +310,45 @@ export const SideMenuTags = () => {
           />
           <View
             style={{
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              backgroundColor: colors.primary.background,
-              borderTopColor: colors.primary.border,
-              borderTopWidth: 1,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              paddingHorizontal: Spacing.LEVEL_3
             }}
           >
-            <TextInput
-              placeholder="Filter tags..."
+            <View
               style={{
-                fontFamily: "Inter-Regular",
-                fontSize: AppFontSize.xs,
-                paddingTop: 0,
-                paddingBottom: 0
+                width: "100%",
+                backgroundColor: colors.primary.background,
+                borderTopColor: colors.primary.separator,
+                borderTopWidth: 1,
+                paddingVertical: Spacing.LEVEL_2,
+                flexDirection: "row",
+                justifyContent: "space-between"
               }}
-              cursorColor={colors.primary.accent}
-              onChangeText={async (value) => {
-                searchTimer.current && clearTimeout(searchTimer.current);
-                searchTimer.current = setTimeout(async () => {
-                  try {
-                    lastQuery.current = value;
-                    updateTags();
-                  } catch (e) {
-                    DatabaseLogger.error(e);
-                  }
-                }, 100);
-              }}
-              placeholderTextColor={colors.primary.placeholder}
-            />
+            >
+              <TextInput
+                placeholder={strings.filterTags()}
+                style={{
+                  fontFamily: "Inter-Regular",
+                  fontSize: AppFontSize.sm,
+                  paddingTop: 0,
+                  paddingBottom: 0
+                }}
+                cursorColor={colors.primary.accent}
+                onChangeText={async (value) => {
+                  searchTimer.current && clearTimeout(searchTimer.current);
+                  searchTimer.current = setTimeout(async () => {
+                    try {
+                      lastQuery.current = value;
+                      updateTags();
+                    } catch (e) {
+                      DatabaseLogger.error(e);
+                    }
+                  }, 100);
+                }}
+                placeholderTextColor={colors.secondary.placeholder}
+              />
+
+              <AppIcon name="funnel" size={14} iconFamily="notesnook" />
+            </View>
           </View>
         </>
       )}

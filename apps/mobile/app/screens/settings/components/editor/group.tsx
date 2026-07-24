@@ -1,0 +1,342 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { useThemeColors } from "@notesnook/theme";
+import * as React from "react";
+import { View } from "react-native";
+import { DraxDragWithReceiverEventData, DraxView } from "react-native-drax";
+import Animated, { Layout } from "react-native-reanimated";
+import { presentDialog } from "../../../../components/dialog/functions";
+import AppIcon from "../../../../components/ui/AppIcon";
+import { IconButton } from "../../../../components/ui/icon-button";
+import Heading from "../../../../components/ui/typography/heading";
+import { getElevationStyle } from "../../../../utils/elevation";
+import { renderTool } from "./common";
+import { DraggableItem, useDragState } from "./state";
+import ToolSheet from "./tool-sheet";
+
+import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
+import type { ToolId } from "@notesnook/editor";
+import { strings } from "@notesnook/intl";
+import { ToastManager } from "../../../../services/event-manager";
+import { DefaultAppStyles } from "../../../../utils/styles";
+import { Radius, Spacing } from "../../../../common/design/spacing";
+
+export const Group = ({
+  item,
+  index: groupIndex,
+  parentIndex
+}: DraggableItem) => {
+  const setData = useDragState((state) => state.setData);
+  const [dragged, setDragged] = useDragState((state) => [
+    state.dragged,
+    state.setDragged
+  ]);
+  const [_recieving, setRecieving] = React.useState(false);
+  const [recievePosition, setRecievePosition] = React.useState("above");
+  const isDragged =
+    dragged &&
+    Array.isArray(dragged?.item) &&
+    dragged?.item[0] === item[0] &&
+    parentIndex === undefined;
+
+  const isSubgroup = parentIndex !== undefined;
+  const dimensions = React.useRef({
+    height: 0,
+    width: 0
+  });
+  const { colors } = useThemeColors();
+  const featureAvailable = useIsFeatureAvailable("customToolbarPreset");
+
+  const onDrop = React.useCallback(
+    (data: DraxDragWithReceiverEventData) => {
+      if (!featureAvailable?.isAllowed) {
+        ToastManager.show({
+          type: "info",
+          message: featureAvailable?.error || strings.featureNotAvailable()
+        });
+        return;
+      }
+      const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
+      const dragged = data.dragged.payload;
+      const reciever = data.receiver.payload;
+      const _data = useDragState.getState().data.slice();
+
+      if (dragged.type === "group") {
+        const fromIndex = dragged.index;
+        const toIndex = isDroppedAbove
+          ? Math.max(0, reciever.index)
+          : reciever.index + 1;
+
+        _data.splice(
+          toIndex > fromIndex ? toIndex - 1 : toIndex,
+          0,
+          _data.splice(fromIndex, 1)[0]
+        );
+      }
+
+      // Always insert sub group at the end of the group.
+      if (dragged.type === "subgroup") {
+        const fromIndex = dragged.index;
+
+        const insertAt = _data[reciever.index] as string[];
+        const insertFrom = _data[dragged.groupIndex] as string[];
+
+        if (typeof insertAt[insertAt.length - 1] !== "string") {
+          setRecieving(false);
+          return data.dragAbsolutePosition;
+        }
+        insertAt.push(insertFrom.splice(fromIndex, 1)[0]);
+      }
+
+      if (dragged.type === "tool") {
+        const insertFrom =
+          typeof dragged.parentIndex === "number"
+            ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
+            : (_data[dragged.groupIndex] as string[]);
+        _data[groupIndex].push(
+          insertFrom.splice(dragged.index, 1)[0] as ToolId
+        );
+      }
+
+      setData(_data);
+      setRecieving(false);
+      return data.dragAbsolutePosition;
+    },
+    [featureAvailable]
+  );
+
+  const onRecieveData = React.useCallback(
+    (data: DraxDragWithReceiverEventData) => {
+      setRecieving(true);
+      if (data.dragged.payload.type !== "group")
+        return setRecievePosition("below");
+      if (data.receiver.receiveOffsetRatio.y < 0.5) {
+        setRecievePosition("above");
+      } else {
+        setRecievePosition("below");
+      }
+    },
+    []
+  );
+
+  const buttons = [
+    {
+      name: "trash",
+      iconFamily: "notesnook" as const,
+      color: colors.error.icon,
+      onPress: async () => {
+        const feature = await isFeatureAvailable("customToolbarPreset");
+        if (!feature.isAllowed) {
+          ToastManager.show({
+            type: "info",
+            message: feature?.error
+          });
+          return;
+        }
+        presentDialog({
+          context: "global",
+          title: strings.deleteGroup(),
+          positiveText: strings.delete(),
+          paragraph: strings.deleteGroupDesc(),
+          positivePress: async () => {
+            if (groupIndex === undefined) return;
+            const _data = useDragState.getState().data.slice();
+
+            _data.splice(groupIndex, 1);
+
+            setData(_data);
+          }
+        });
+      }
+    },
+    {
+      name: "plus",
+      iconFamily: "notesnook" as const,
+      color: colors.primary.icon,
+      onPress: async () => {
+        const feature = await isFeatureAvailable("customToolbarPreset");
+        if (!feature.isAllowed) {
+          ToastManager.show({
+            type: "info",
+            message: feature?.error
+          });
+          return;
+        }
+        ToolSheet.present({
+          item,
+          index: groupIndex
+        });
+      }
+    }
+  ];
+
+  const renderGroup = (hover: boolean) => {
+    const isSubgroup = parentIndex !== undefined;
+
+    return (
+      <View
+        onLayout={(event) => {
+          if (hover) return;
+          if (!isDragged) dimensions.current = event.nativeEvent.layout;
+        }}
+        style={[
+          {
+            width: isDragged ? dimensions.current?.width : "100%",
+            backgroundColor: isDragged
+              ? colors.secondary.background
+              : colors.primary.background,
+            borderRadius: isDragged ? Radius.S : 0,
+            height: isDragged ? 50 : "auto",
+            paddingHorizontal: isDragged ? Spacing.LEVEL_2 : 0
+          }
+        ]}
+      >
+        {isSubgroup ? null : (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingVertical: Spacing.LEVEL_3
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: Spacing.LEVEL_1
+              }}
+            >
+              <AppIcon
+                size={16}
+                name="dots-six-vertical"
+                iconFamily="notesnook"
+                color={colors.secondary.icon}
+              />
+              <Heading
+                fontSize="SM"
+                fontFamily="MEDIUM"
+                lineHeight={null}
+                color={colors.secondary.heading}
+              >
+                {strings.toolbarGroupName(groupIndex + 1)}
+              </Heading>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: Spacing.LEVEL_2
+              }}
+            >
+              {buttons.map((item) => (
+                <IconButton
+                  top={0}
+                  left={0}
+                  bottom={0}
+                  right={0}
+                  key={item.name}
+                  onPress={item.onPress}
+                  name={item.name}
+                  iconFamily={item.iconFamily}
+                  color={item.color}
+                  size={16}
+                />
+              ))}
+            </View>
+          </View>
+        )}
+
+        {isDragged && hover
+          ? null
+          : renderTool({
+              item,
+              index: groupIndex,
+              groupIndex,
+              parentIndex: parentIndex
+            })}
+      </View>
+    );
+  };
+
+  return (
+    <Animated.View layout={Layout}>
+      <DraxView
+        longPressDelay={500}
+        receptive={
+          (dragged.type === "subgroup" && dragged.groupIndex === groupIndex) ||
+          (dragged.type === "tool" && item.length > 0) ||
+          (dragged.type === "group" && isSubgroup) ||
+          (dragged.type === "subgroup" && isSubgroup) ||
+          (dragged.type === "subgroup" &&
+            dragged.item &&
+            dragged.item[0] === item[0])
+            ? false
+            : true
+        }
+        payload={{
+          item,
+          index: groupIndex,
+          parentIndex,
+          type: "group"
+        }}
+        onDragStart={() => {
+          setDragged({
+            item,
+            type: "group",
+            ...dimensions.current
+          });
+        }}
+        onDragDrop={() => {
+          setDragged({});
+        }}
+        onDragEnd={() => {
+          setDragged({});
+        }}
+        hoverDragReleasedStyle={{
+          opacity: 0
+        }}
+        receivingStyle={{
+          paddingBottom: recievePosition === "below" ? 50 : 0,
+          paddingTop: recievePosition === "above" ? 50 : 0,
+          backgroundColor:
+            dragged.type === "subgroup"
+              ? colors.secondary.background
+              : undefined,
+          marginTop:
+            recievePosition === "above" ? DefaultAppStyles.GAP_VERTICAL : 0,
+          marginBottom:
+            recievePosition === "below" ? DefaultAppStyles.GAP_VERTICAL : 0,
+          borderRadius: 10
+        }}
+        renderHoverContent={() => renderGroup(true)}
+        onReceiveDragDrop={onDrop}
+        onReceiveDragOver={onRecieveData}
+        onReceiveDragExit={() => {
+          setRecieving(false);
+        }}
+        onReceiveDragEnter={onRecieveData}
+      >
+        {!isDragged ? renderGroup(false) : <View />}
+      </DraxView>
+    </Animated.View>
+  );
+};

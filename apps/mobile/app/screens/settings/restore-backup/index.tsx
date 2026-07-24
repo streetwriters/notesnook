@@ -19,268 +19,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { LegendList } from "@legendapp/list";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
-import { LegacyBackupFile } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { keepLocalCopy, pick } from "@react-native-documents/picker";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, View } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 import RNFetchBlob, { ReactNativeBlobUtilStat } from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
-import { unzip } from "react-native-zip-archive";
-import { DatabaseLogger, db } from "../../../common/database";
+import { Spacing } from "../../../common/design/spacing";
 import filesystem from "../../../common/filesystem";
-import { deleteCacheFileByName } from "../../../common/filesystem/io";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
-import { presentDialog } from "../../../components/dialog/functions";
-import {
-  endProgress,
-  startProgress,
-  updateProgress
-} from "../../../components/dialogs/progress";
 import { Button } from "../../../components/ui/button";
 import Heading from "../../../components/ui/typography/heading";
 import Paragraph from "../../../components/ui/typography/paragraph";
-import { SectionItem } from "../../../screens/settings/section-item";
-import { ToastManager } from "../../../services/event-manager";
-import Navigation from "../../../services/navigation";
-import SettingsService from "../../../services/settings";
-import { refreshAllStores } from "../../../stores/create-db-collection-store";
-import { useUserStore } from "../../../stores/use-user-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { AppFontSize } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { restoreBackup } from "./restore-progress";
 
-type PasswordOrKey = { password?: string; encryptionKey?: string };
-
-const withPassword = () => {
-  return new Promise<PasswordOrKey>((resolve) => {
-    let resolved = false;
-    presentDialog({
-      context: "local",
-      title: strings.backupEncrypted(),
-      input: true,
-      inputPlaceholder: strings.password(),
-      paragraph: strings.backupEnterPassword(),
-      positiveText: strings.restore(),
-      secureTextEntry: true,
-      onClose: () => {
-        if (resolved) return;
-        resolve({});
-      },
-      negativeText: strings.cancel(),
-      positivePress: async (password, isEncryptionKey) => {
-        resolve({
-          encryptionKey: isEncryptionKey ? password : undefined,
-          password: isEncryptionKey ? undefined : password
-        });
-        resolved = true;
-        return true;
-      },
-      check: {
-        info: strings.useEncryptionKey(),
-        type: "transparent"
-      }
-    });
-  });
-};
-
-const restoreBackup = async (options: {
-  uri: string;
-  deleteFile?: boolean;
-}) => {
-  try {
-    if (
-      !options.uri.endsWith(".nnbackup") &&
-      !options.uri.endsWith(".nnbackupz")
-    ) {
-      throw new Error(
-        `Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored.`
-      );
-    }
-
-    const isLegacyBackup = options.uri.endsWith(".nnbackup");
-
-    startProgress({
-      title: strings.restoring(),
-      paragraph: strings.preparingBackupRestore(),
-      canHideProgress: false
-    });
-
-    let filePath = options.uri;
-    let deleteBackupFile = options.deleteFile;
-
-    if (!isLegacyBackup) {
-      if (Platform.OS === "android") {
-        updateProgress({
-          progress: strings.copyingBackupFileToCache()
-        });
-        const cacheFile = `file://${RNFetchBlob.fs.dirs.CacheDir}/backup.zip`;
-        if (await RNFetchBlob.fs.exists(cacheFile)) {
-          await RNFetchBlob.fs.unlink(cacheFile);
-        }
-
-        await RNFetchBlob.fs.createFile(cacheFile, "", "utf8");
-        if (filePath.startsWith("content://")) {
-          await copyFileAsync(filePath, cacheFile);
-        } else {
-          await RNFetchBlob.fs.cp(filePath, cacheFile);
-        }
-        filePath = cacheFile;
-        deleteBackupFile = true;
-      }
-
-      const zipOutputFolder = `${cacheDir}/backup_extracted`;
-      if (await RNFetchBlob.fs.exists(zipOutputFolder)) {
-        await RNFetchBlob.fs.unlink(zipOutputFolder);
-        await RNFetchBlob.fs.mkdir(zipOutputFolder);
-      }
-      updateProgress({
-        progress: strings.extractingFiles()
-      });
-      await unzip(filePath, zipOutputFolder);
-
-      const extractedBackupFiles = await RNFetchBlob.fs.ls(zipOutputFolder);
-
-      const extractedAttachments = extractedBackupFiles.includes("attachments")
-        ? await RNFetchBlob.fs.ls(`${zipOutputFolder}/attachments`)
-        : [];
-
-      const attachmentsKeyPath: any = extractedAttachments?.find(
-        (path) => path === ".attachments_key"
-      );
-      const attachmentsKey = attachmentsKeyPath
-        ? await JSON.parse(
-            await RNFetchBlob.fs.readFile(
-              `${zipOutputFolder}/attachments/${attachmentsKeyPath}`,
-              "utf8"
-            )
-          )
-        : undefined;
-
-      let count = 0;
-      await db.transaction(async () => {
-        let passwordOrKey: PasswordOrKey | undefined = undefined;
-        for (const path of extractedBackupFiles) {
-          if (path === ".nnbackup" || path === "attachments") continue;
-
-          updateProgress({
-            progress: `${strings.restoringBackup()} (${count++}/${
-              extractedBackupFiles.length
-            })`
-          });
-
-          const filePath = `${zipOutputFolder}/${path}`;
-          const data = await RNFetchBlob.fs.readFile(filePath, "utf8");
-          const backup = JSON.parse(data);
-
-          const isEncryptedBackup = backup.encrypted;
-
-          passwordOrKey = !isEncryptedBackup
-            ? ({} as PasswordOrKey)
-            : passwordOrKey || (await withPassword());
-
-          if (
-            isEncryptedBackup &&
-            !passwordOrKey?.encryptionKey &&
-            !passwordOrKey?.password
-          ) {
-            endProgress();
-            throw new Error(strings.failedToDecryptBackup());
-          }
-
-          await db.backup.import(backup, {
-            ...passwordOrKey,
-            attachmentsKey: attachmentsKey
-          });
-        }
-      });
-
-      await db.initCollections();
-      count = 0;
-      for (const path of extractedAttachments) {
-        if (path === ".attachments_key") continue;
-        updateProgress({
-          progress: `Restoring attachments (${count++}/${
-            extractedAttachments.length
-          })`
-        });
-        const hash = path;
-        const attachment = await db.attachments.attachment(hash as string);
-        if (!attachment) continue;
-
-        await deleteCacheFileByName(hash);
-        await RNFetchBlob.fs.cp(
-          `${zipOutputFolder}/attachments/${hash}`,
-          `${cacheDir}/${hash}`
-        );
-      }
-      updateProgress({
-        progress: strings.cleaningUp()
-      });
-      // Remove files from cache
-      RNFetchBlob.fs.unlink(zipOutputFolder).catch(() => {
-        /* empty */
-      });
-      if (Platform.OS === "android" || deleteBackupFile) {
-        RNFetchBlob.fs.unlink(filePath).catch(() => {
-          /* empty */
-        });
-      }
-    } else {
-      updateProgress({
-        progress: strings.readingBackupFile()
-      });
-      const rawData =
-        Platform.OS === "android"
-          ? await ScopedStorage.readFile(filePath, "utf8")
-          : await RNFetchBlob.fs.readFile(filePath, "utf8");
-      const backup: LegacyBackupFile = JSON.parse(rawData) as LegacyBackupFile;
-
-      const isEncryptedBackup =
-        typeof backup.data !== "string" && backup.data.cipher;
-
-      updateProgress({
-        progress: isEncryptedBackup
-          ? strings.decryptingBackup()
-          : strings.preparingBackupRestore()
-      });
-
-      const { encryptionKey, password } = isEncryptedBackup
-        ? ({} as PasswordOrKey)
-        : await withPassword();
-
-      if (isEncryptedBackup && !encryptionKey && !password) {
-        endProgress();
-        throw new Error(strings.failedToDecryptBackup());
-      }
-
-      await db.transaction(async () => {
-        updateProgress({
-          progress: strings.restoringBackup()
-        });
-        await db.backup.import(backup, {
-          encryptionKey,
-          password
-        });
-      });
-      endProgress();
-    }
-
-    ToastManager.show({
-      heading: strings.backupRestored(),
-      type: "success"
-    });
-
-    await db.initCollections();
-    refreshAllStores();
-    Navigation.queueRoutesForUpdate();
-    endProgress();
-  } catch (e) {
-    endProgress();
-    DatabaseLogger.error(e as Error);
-    ToastManager.error(e as Error, strings.restoreFailed());
-  }
-};
+// The restore flow (progress, password, confirmation, error handling) lives in
+// ./restore-progress alongside the dialog that drives it. Re-exported here so
+// existing importers of "../restore-backup" keep working.
+export { restoreBackup } from "./restore-progress";
 
 const BACKUP_FILES_CACHE: (ReactNativeBlobUtilStat | ScopedStorage.FileType)[] =
   [];
@@ -292,8 +50,9 @@ export const RestoreBackup = () => {
       BACKUP_FILES_CACHE
     );
   const [loading, setLoading] = useState(true);
-  const [backupDirectoryAndroid, setBackupDirectoryAndroid] =
-    useState<ScopedStorage.FileType>();
+  const backupDirectoryAndroid = useSettingStore(
+    (state) => state.settings.backupDirectoryAndroid
+  );
 
   useEffect(() => {
     setTimeout(() => {
@@ -305,10 +64,8 @@ export const RestoreBackup = () => {
     try {
       let files: (ReactNativeBlobUtilStat | ScopedStorage.FileType)[] = [];
       if (Platform.OS === "android") {
-        const backupDirectory = SettingsService.get().backupDirectoryAndroid;
-        if (backupDirectory) {
-          setBackupDirectoryAndroid(backupDirectory);
-          files = await ScopedStorage.listFiles(backupDirectory.uri);
+        if (backupDirectoryAndroid) {
+          files = await ScopedStorage.listFiles(backupDirectoryAndroid.uri);
         } else {
           setLoading(false);
           return;
@@ -355,148 +112,72 @@ export const RestoreBackup = () => {
 
   return (
     <>
-      <ScrollView
+      <LegendList
+        ListHeaderComponent={
+          <Heading
+            style={{
+              marginBottom: Spacing.LEVEL_2
+            }}
+            color={colors.primary.accent}
+            size={AppFontSize.sm}
+            fontFamily="MEDIUM"
+          >
+            {strings.recentBackups()}
+          </Heading>
+        }
+        ListEmptyComponent={
+          loading ? (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                height: 300,
+                paddingHorizontal: 50
+              }}
+            >
+              <ActivityIndicator
+                color={colors.primary.accent}
+                size={AppFontSize.lg}
+              />
+            </View>
+          ) : (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 12,
+                height: 300,
+                paddingHorizontal: 50
+              }}
+            >
+              <Paragraph
+                style={{
+                  textAlign: "center"
+                }}
+                color={colors.secondary.paragraph}
+              >
+                {strings.noBackupsFound()}.
+              </Paragraph>
+            </View>
+          )
+        }
+        keyExtractor={(item) =>
+          (item as ScopedStorage.FileType).name ||
+          (item as ReactNativeBlobUtilStat).filename
+        }
+        ListFooterComponent={
+          <View
+            style={{
+              height: 200
+            }}
+          />
+        }
         style={{
           width: "100%"
         }}
-      >
-        <SectionItem
-          item={{
-            id: "restore-from-files",
-            name: strings.restoreFromFiles(),
-            icon: "folder",
-            modifer: async () => {
-              useUserStore.setState({
-                disableAppLockRequests: true
-              });
-              const file = await pick();
-              const fileCopy = await keepLocalCopy({
-                destination: "cachesDirectory",
-                files: [
-                  {
-                    uri: file[0].uri,
-                    fileName: file[0].name ?? `backup_restore_${Date.now()}`
-                  }
-                ]
-              });
-
-              if (fileCopy[0].status === "error") {
-                ToastManager.error(new Error("File copy error"));
-                return;
-              }
-
-              setTimeout(() => {
-                useUserStore.setState({
-                  disableAppLockRequests: false
-                });
-              }, 1000);
-
-              restoreBackup({
-                uri: fileCopy[0].localUri,
-                deleteFile: true
-              });
-            },
-            description: strings.selectBackupFileDesc()
-          }}
-        />
-
-        {Platform.OS === "android" ? (
-          <SectionItem
-            item={{
-              id: "select-backup-folder",
-              name: strings.selectBackupFolder(),
-              icon: "folder",
-              modifer: async () => {
-                const folder = await ScopedStorage.openDocumentTree(true);
-                let subfolder;
-                if (folder.name !== "Notesnook backups") {
-                  subfolder = await ScopedStorage.createDirectory(
-                    folder.uri,
-                    "Notesnook backups"
-                  );
-                } else {
-                  subfolder = folder;
-                }
-                SettingsService.set({
-                  backupDirectoryAndroid: subfolder
-                });
-                setBackupDirectoryAndroid(subfolder);
-                setLoading(true);
-                checkBackups();
-              },
-              description: strings.selectFolderForBackupFilesDesc()
-            }}
-          />
-        ) : null}
-
-        <LegendList
-          ListHeaderComponent={
-            <View
-              style={{
-                backgroundColor: colors.primary.background,
-                marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
-              <Heading color={colors.primary.accent} size={AppFontSize.xs}>
-                {strings.recentBackups()}
-              </Heading>
-            </View>
-          }
-          ListEmptyComponent={
-            loading ? (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: 300,
-                  paddingHorizontal: 50
-                }}
-              >
-                <ActivityIndicator
-                  color={colors.primary.accent}
-                  size={AppFontSize.lg}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 12,
-                  height: 300,
-                  paddingHorizontal: 50
-                }}
-              >
-                <Paragraph
-                  style={{
-                    textAlign: "center"
-                  }}
-                  color={colors.secondary.paragraph}
-                >
-                  {strings.noBackupsFound()}.
-                </Paragraph>
-              </View>
-            )
-          }
-          keyExtractor={(item) =>
-            (item as ScopedStorage.FileType).name ||
-            (item as ReactNativeBlobUtilStat).filename
-          }
-          ListFooterComponent={
-            <View
-              style={{
-                height: 200
-              }}
-            />
-          }
-          style={{
-            width: "100%"
-          }}
-          data={files}
-          renderItem={renderItem}
-        />
-      </ScrollView>
+        data={files}
+        renderItem={renderItem}
+      />
     </>
   );
 };
@@ -509,10 +190,6 @@ const BackupItem = ({
   index: number;
 }) => {
   const { colors } = useThemeColors();
-
-  const isLegacyBackup =
-    item.path?.endsWith(".nnbackup") ||
-    (item as ScopedStorage.FileType).uri?.endsWith(".nnbackup");
   const itemName = (
     (item as ReactNativeBlobUtilStat).filename ||
     (item as ScopedStorage.FileType).name
@@ -528,54 +205,45 @@ const BackupItem = ({
         width: "100%",
         borderRadius: 0,
         flexDirection: "row",
-        borderBottomWidth: 0.5,
-        borderBottomColor: colors.primary.border,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-        paddingHorizontal: DefaultAppStyles.GAP,
-        gap: DefaultAppStyles.GAP_SMALL
+        gap: DefaultAppStyles.GAP_SMALL,
+        paddingVertical: Spacing.LEVEL_2,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.primary.separator
       }}
     >
       <View
         style={{
-          flexShrink: 1
+          flexShrink: 1,
+          gap: Spacing.LEVEL_1
         }}
       >
-        <Paragraph size={AppFontSize.sm}>{itemName}</Paragraph>
+        <Heading size={AppFontSize.md}>{itemName}</Heading>
+
         <Paragraph
           size={AppFontSize.xs}
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >
-          Created on {getFormattedDate(item?.lastModified, "date-time")}
-          {isLegacyBackup ? "(Legacy backup)" : ""} (
-          {formatBytes((item as ReactNativeBlobUtilStat).size)})
+          Created: {getFormattedDate(item?.lastModified, "date-time")}
+          {" • "}
+          {formatBytes((item as ReactNativeBlobUtilStat).size)}
         </Paragraph>
       </View>
       <Button
         title="Restore"
-        type="secondaryAccented"
+        type="plain-outline"
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+          paddingHorizontal: Spacing.LEVEL_2,
+          paddingVertical: Spacing.LEVEL_1
         }}
         onPress={() => {
-          presentDialog({
-            title: `${strings.restore()} ${itemName}`,
-            paragraph: strings.restoreBackupConfirm(),
-            positiveText: strings.restore(),
-            negativeText: strings.cancel(),
-            context: "global",
-            positivePress: async () => {
-              setTimeout(() => {
-                restoreBackup({
-                  uri:
-                    Platform.OS === "android"
-                      ? (item as ScopedStorage.FileType).uri
-                      : (item as ReactNativeBlobUtilStat).path
-                });
-              }, 500);
-              return true;
-            }
+          restoreBackup({
+            confirm: true,
+            name: itemName,
+            uri:
+              Platform.OS === "android"
+                ? (item as ScopedStorage.FileType).uri
+                : (item as ReactNativeBlobUtilStat).path
           });
         }}
       />

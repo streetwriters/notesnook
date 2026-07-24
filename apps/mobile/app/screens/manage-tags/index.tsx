@@ -25,17 +25,19 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { Header } from "../../components/header";
+import AppIcon from "../../components/ui/AppIcon";
+import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
 import { Pressable } from "../../components/ui/pressable";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
-  sendItemUpdateEvent,
-  ToastManager
+  ToastManager,
+  sendItemUpdateEvent
 } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
@@ -44,8 +46,7 @@ import {
 } from "../../stores/item-selection-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useTagStore } from "../../stores/use-tag-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
+import { AppFontSize } from "../../utils/size";
 
 async function updateInitialSelectionState(items: string[]) {
   const relations = await db.relations
@@ -90,18 +91,26 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
   const [tags, setTags] = useState<Tag[]>();
   const [query, setQuery] = useState<string>();
   const inputRef = useRef<TextInput>(null);
-  useNavigationFocus(props.navigation, { focusOnInit: true });
+  useNavigationFocus(props.navigation, {
+    focusOnInit: true
+  });
   const timerRef = useRef<NodeJS.Timeout>(undefined);
   const [queryExists, setQueryExists] = useState(false);
   const refreshSelection = useCallback(() => {
-    updateInitialSelectionState(ids).then((selection) => {
+    updateInitialSelectionState(ids).then((initialState) => {
+      const prev = useTagItemSelection.getState();
+      const selection = { ...initialState };
+      for (const id in prev.selection) {
+        if (prev.selection[id] !== prev.initialState[id]) {
+          selection[id] = prev.selection[id];
+        }
+      }
       useTagItemSelection.setState({
-        initialState: selection,
-        selection: { ...selection }
+        initialState,
+        selection
       });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ids, tags]);
+  }, [ids]);
 
   const sortAndSetTags = useCallback(
     async (items: VirtualizedGrouping<Tag>) => {
@@ -129,6 +138,12 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
     },
     [ids]
   );
+
+  useEffect(() => {
+    return () => {
+      useTagItemSelection.getState().reset();
+    };
+  }, []);
 
   const refreshTags = useCallback(() => {
     if (query && query.trim() !== "") {
@@ -190,83 +205,91 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
       }
 
       if (id) {
-        for (const noteId of ids) {
-          await db.relations.add(
-            {
-              id: id,
-              type: "tag"
-            },
-            {
-              id: noteId,
-              type: "note"
-            }
-          );
-        }
+        const { selection } = useTagItemSelection.getState();
+        useTagItemSelection.setState({
+          selection: {
+            ...selection,
+            [id]: "selected"
+          }
+        });
       }
 
-      useRelationStore.getState().update();
-      sendItemUpdateEvent(id, "tag");
       useTagStore.getState().refresh();
       setQuery(undefined);
     } catch (e) {
       ToastManager.error(e as Error);
     }
-
-    Navigation.queueRoutesForUpdate();
   };
 
-  const onPress = useCallback(
-    async (id: string) => {
-      for (const noteId of ids) {
-        try {
-          if (!id) return;
-          const isSelected =
-            useTagItemSelection.getState().initialState[id] === "selected";
-          if (isSelected) {
-            await db.relations.unlink(
-              {
-                id: id,
-                type: "tag"
-              },
-              {
-                id: noteId,
-                type: "note"
-              }
+  const onPress = useCallback((id: string) => {
+    if (!id) return;
+    const { selection } = useTagItemSelection.getState();
+    useTagItemSelection.setState({
+      selection: {
+        ...selection,
+        [id]: selection[id] === "selected" ? "deselected" : "selected"
+      }
+    });
+  }, []);
+
+  const onSave = useCallback(async () => {
+    const { selection, initialState } = useTagItemSelection.getState();
+    const changedIds = new Set([
+      ...Object.keys(selection),
+      ...Object.keys(initialState)
+    ]);
+
+    try {
+      for (const id of changedIds) {
+        if (selection[id] === initialState[id]) continue;
+
+        const shouldLink = selection[id] === "selected";
+        for (const noteId of ids) {
+          if (shouldLink) {
+            await db.relations.add(
+              { id, type: "tag" },
+              { id: noteId, type: "note" }
             );
           } else {
-            await db.relations.add(
-              {
-                id: id,
-                type: "tag"
-              },
-              {
-                id: noteId,
-                type: "note"
-              }
+            await db.relations.unlink(
+              { id, type: "tag" },
+              { id: noteId, type: "note" }
             );
           }
-        } catch (e) {
-          console.error(e);
         }
+        sendItemUpdateEvent(id, "tag");
       }
-      sendItemUpdateEvent(id, "tag");
+
       useTagStore.getState().refresh();
       useRelationStore.getState().update();
-      refreshTags();
-      setTimeout(() => {
-        Navigation.queueRoutesForUpdate();
-      }, 1);
-      refreshSelection();
-    },
-    [ids, refreshSelection, refreshTags]
-  );
+      Navigation.queueRoutesForUpdate();
+      Navigation.goBack();
+    } catch (e) {
+      ToastManager.error(e as Error);
+    }
+  }, [ids]);
 
   const renderTag = useCallback(
-    ({ index, item }: { item: Tag; index: number }) => (
+    ({ item }: { item: Tag; index: number }) => (
       <TagItem tag={item} onPress={onPress} />
     ),
     [onPress]
   );
+
+  const hasChanges = useTagItemSelection((state) => {
+    const norm = (v?: string) =>
+      v === "selected" ? "s" : v === "intermediate" ? "i" : "n";
+    const changedIds = new Set([
+      ...Object.keys(state.selection),
+      ...Object.keys(state.initialState)
+    ]);
+    for (const id of changedIds) {
+      if (norm(state.selection[id]) !== norm(state.initialState[id])) {
+        return true;
+      }
+    }
+    return false;
+  });
 
   return (
     <SafeAreaView
@@ -274,24 +297,35 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
         width: "100%",
         alignSelf: "center",
         backgroundColor: colors.primary.background,
-        gap: DefaultAppStyles.GAP_VERTICAL,
         flex: 1
       }}
     >
-      <Header title={strings.manageTags()} canGoBack />
+      <Header
+        style={{
+          backgroundColor: "transparent"
+        }}
+        title={strings.manageTags()}
+        canGoBack
+      />
 
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          flex: 1
+          paddingHorizontal: Spacing.LEVEL_3,
+          flex: 1,
+          gap: Spacing.LEVEL_3
         }}
       >
         <Input
           button={{
-            icon: "magnify",
-            color: colors.primary.accent,
-            size: AppFontSize.lg,
+            icon: "search",
+            iconFamily: "notesnook",
+            color: colors.primary.icon,
+            size: 16,
             onPress: () => {}
+          }}
+          containerStyle={{
+            backgroundColor: colors.secondary.background,
+            borderWidth: 0
           }}
           testID="tag-input"
           fwdRef={inputRef}
@@ -309,28 +343,12 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           placeholder={strings.searchForTags()}
         />
 
-        {query && !queryExists ? (
-          <Pressable
-            key={"query_item"}
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-            onPress={onSubmit}
-            type="selected"
-          >
-            <Heading size={AppFontSize.sm} color={colors.selected.heading}>
-              {strings.add()} {'"' + "#" + query + '"'}
-            </Heading>
-            <Icon
-              name="plus"
-              color={colors.selected.icon}
-              size={AppFontSize.lg}
-            />
-          </Pressable>
-        ) : null}
+        <View
+          style={{
+            height: 1,
+            backgroundColor: colors.primary.separator
+          }}
+        />
 
         <View
           style={{
@@ -344,6 +362,37 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
             keyboardDismissMode="interactive"
             estimatedItemSize={50}
             renderItem={renderTag}
+            ListHeaderComponent={
+              query && !queryExists ? (
+                <Pressable
+                  key={"query_item"}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: Spacing.LEVEL_2,
+                    borderRadius: Radius.XS,
+                    marginBottom: Spacing.LEVEL_0
+                  }}
+                  onPress={onSubmit}
+                  type="selected"
+                >
+                  <Heading
+                    fontSize="SM"
+                    fontFamily="MEDIUM"
+                    color={colors.selected.heading}
+                  >
+                    {strings.add()} {'"' + "#" + query + '"'}
+                  </Heading>
+                  <AppIcon
+                    name="plus"
+                    iconFamily="material"
+                    color={colors.selected.icon}
+                    size={AppFontSize.md}
+                  />
+                </Pressable>
+              ) : null
+            }
             ListEmptyComponent={
               <View
                 style={{
@@ -368,6 +417,23 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
           />
         </View>
       </View>
+
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: colors.primary.border,
+          backgroundColor: colors.primary.background,
+          padding: Spacing.LEVEL_3
+        }}
+      >
+        <Button
+          title={strings.saveChanges()}
+          type="accent"
+          width="100%"
+          disabled={!hasChanges}
+          onPress={onSave}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -389,65 +455,49 @@ const TagItem = ({
 }) => {
   const { colors } = useThemeColors();
   const selection = useTagItemSelection((state) =>
-    tag?.id ? state.selection[tag?.id] : false
+    tag?.id ? state.selection[tag?.id] : undefined
   );
+  const selected = selection === "selected" || selection === "intermediate";
 
   return (
     <Pressable
       style={{
         flexDirection: "row",
-        marginVertical: 5,
+        alignItems: "center",
+        gap: Spacing.LEVEL_1,
         justifyContent: "flex-start",
-        height: 40
+        padding: Spacing.LEVEL_2,
+        borderRadius: Radius.XS,
+        marginBottom: Spacing.LEVEL_0
       }}
       onPress={() => {
         if (!tag) return;
         onPress(tag.id);
       }}
-      type="plain"
+      type={selected ? "selected" : "transparent"}
     >
-      {!tag ? null : (
-        <Icon
-          size={22}
-          onPress={() => {
-            if (!tag) return;
-            onPress(tag.id);
-          }}
-          color={
-            selection === "selected" || selection === "intermediate"
-              ? colors.selected.icon
-              : colors.primary.icon
-          }
-          style={{
-            marginRight: 6
-          }}
-          testID={
-            selection === "selected"
-              ? "check-circle-outline"
-              : selection === "intermediate"
-                ? "minus-circle-outline"
-                : "checkbox-blank-circle-outline"
-          }
-          name={
-            selection === "selected"
-              ? "check-circle-outline"
-              : selection === "intermediate"
-                ? "minus-circle-outline"
-                : "checkbox-blank-circle-outline"
-          }
-        />
-      )}
-      {tag ? (
-        <Paragraph size={AppFontSize.sm}>{"#" + tag?.title}</Paragraph>
-      ) : (
-        <View
-          style={{
-            width: 200,
-            height: 30,
-            borderRadius: defaultBorderRadius
-          }}
-        />
-      )}
+      <AppIcon
+        name={
+          selection === "selected"
+            ? "checkbox"
+            : selection === "intermediate"
+              ? "checkbox-intermediate"
+              : "box-empty"
+        }
+        iconFamily="notesnook"
+        size={16}
+        color={
+          selected
+            ? [colors.selected.accent, colors.static.white]
+            : colors.secondary.icon
+        }
+      />
+      <Paragraph
+        fontSize="SM"
+        color={selected ? colors.primary.heading : colors.secondary.paragraph}
+      >
+        {"#" + tag?.title}
+      </Paragraph>
     </Pressable>
   );
 };

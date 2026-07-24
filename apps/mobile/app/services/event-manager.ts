@@ -37,6 +37,7 @@ import {
   eShowToast
 } from "../utils/events";
 import { strings } from "@notesnook/intl";
+import { IconProps } from "../components/ui/AppIcon";
 
 export enum VaultRequestType {
   CreateVault = "createVault",
@@ -65,6 +66,7 @@ export type Vault = {
   positiveButtonType?: "errorShade" | "transparent" | "accent";
   customActionTitle?: string;
   customActionParagraph?: string;
+  icon?: string;
   onUnlock?: (
     item: Note & {
       content?: NoteContent<false>;
@@ -169,11 +171,12 @@ export type ToastOptions = {
   heading?: string;
   message?: string;
   context?: any;
-  type?: "error" | "success" | "info";
+  type?: "error" | "success" | "info" | "warning";
   duration?: number;
   func?: () => void;
   actionText?: string;
   icon?: string;
+  iconFamily?: IconProps["iconFamily"];
 };
 
 export const ToastManager = {
@@ -185,7 +188,8 @@ export const ToastManager = {
     func,
     actionText,
     icon,
-    duration = 3000
+    duration = 3000,
+    iconFamily = "material"
   }: ToastOptions) => {
     if (Config.isTesting) return;
     eSendEvent(eShowToast, {
@@ -196,7 +200,8 @@ export const ToastManager = {
       func,
       actionText,
       icon,
-      duration
+      duration,
+      iconFamily
     });
   },
   hide: () => eSendEvent(eHideToast),

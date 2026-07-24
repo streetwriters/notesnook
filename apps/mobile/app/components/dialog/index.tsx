@@ -19,13 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useThemeColors } from "@notesnook/theme";
 import React, {
+  RefObject,
   useCallback,
   useEffect,
   useRef,
-  useState,
-  RefObject
+  useState
 } from "react";
 import { TextInput, View, ViewStyle } from "react-native";
+import { Spacing } from "../../common/design/spacing";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
@@ -38,11 +39,10 @@ import { defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Toast } from "../toast";
-import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import Input from "../ui/input";
 import { FormInput, type FormRef } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
-import Seperator from "../ui/seperator";
 import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
@@ -74,7 +74,10 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
         }
         if (dialogInfo.form.onFormSubmit) {
           setLoading(true);
-          const result = await dialogInfo.form.onFormSubmit(formRef.current);
+          const result = await dialogInfo.form.onFormSubmit(
+            formRef.current,
+            checked
+          );
           if (result === false) {
             setLoading(false);
             return;
@@ -143,9 +146,6 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
   }, [hide, show]);
 
   const onNegativePress = async () => {
-    if (dialogInfo?.onClose) {
-      await dialogInfo.onClose();
-    }
     hide();
   };
 
@@ -155,7 +155,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
     maxHeight: 450,
     borderRadius: defaultBorderRadius,
     backgroundColor: colors.primary.background,
-    paddingTop: 12,
+    gap: Spacing.LEVEL_4,
     ...getContainerBorder(colors.primary.border, 0.5),
     overflow: "hidden"
   };
@@ -170,9 +170,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
       bounce={!dialogInfo.input && !dialogInfo.form}
       closeOnTouch={!dialogInfo.disableBackdropClosing}
       background={dialogInfo.background}
-      transparent={
-        dialogInfo.transparent === undefined ? false : dialogInfo.transparent
-      }
+      transparent={dialogInfo.transparent}
       onShow={async () => {
         if (dialogInfo.input && !dialogInfo.form) {
           inputRef.current?.setNativeProps({
@@ -201,54 +199,66 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
         : dialogInfo.component}
 
       {dialogInfo.component ? null : (
-        <View style={style}>
-          <DialogHeader
-            title={dialogInfo.title}
-            icon={dialogInfo.icon}
-            paragraph={dialogInfo.paragraph}
-            paragraphColor={dialogInfo.paragraphColor}
-            padding={12}
-            style={{
-              minHeight: 0
-            }}
-          />
-          <Seperator half />
+        <View
+          style={[
+            {
+              paddingVertical: Spacing.LEVEL_4
+            },
+            style
+          ]}
+        >
+          <View
+            style={[
+              {
+                paddingHorizontal: Spacing.LEVEL_3,
+                gap: Spacing.LEVEL_4
+              }
+            ]}
+          >
+            <DialogHeader
+              title={dialogInfo.title}
+              icon={dialogInfo.icon}
+              iconFamily={dialogInfo.iconFamily}
+              iconType={dialogInfo.iconType}
+              centered={dialogInfo.centered}
+              paragraph={dialogInfo.paragraph}
+              paragraphColor={dialogInfo.paragraphColor}
+              style={{
+                minHeight: 0
+              }}
+            />
 
-          {dialogInfo.form ? (
-            <View
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP,
-                gap: DefaultAppStyles.GAP / 2
-              }}
-            >
-              {dialogInfo.form.items.map((item, index) => (
-                <FormInput
-                  key={item.name}
-                  fwdRef={item.ref}
-                  name={item.name}
-                  autoFocus={index === 0}
-                  placeholder={item.placeholder}
-                  formRef={formRef as RefObject<FormRef>}
-                  validators={item.validators}
-                  defaultValue={item.defaultValue}
-                  secureTextEntry={dialogInfo.secureTextEntry}
-                  onSubmitEditing={() => {
-                    const nextItem = dialogInfo?.form?.items?.[index + 1];
-                    if (nextItem) {
-                      nextItem?.ref.current?.focus();
-                    } else {
-                      onPressPositive();
-                    }
-                  }}
-                />
-              ))}
-            </View>
-          ) : dialogInfo.input ? (
-            <View
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
+            {dialogInfo.form ? (
+              <View
+                style={{
+                  gap: Spacing.LEVEL_2
+                }}
+              >
+                {dialogInfo.form.items.map((item, index) => (
+                  <FormInput
+                    {...item.inputProps}
+                    key={item.name}
+                    fwdRef={item.ref}
+                    name={item.name}
+                    label={item.label}
+                    autoFocus={index === 0}
+                    placeholder={item.placeholder}
+                    formRef={formRef as RefObject<FormRef>}
+                    validators={item.validators}
+                    defaultValue={item.defaultValue}
+                    secureTextEntry={dialogInfo.secureTextEntry}
+                    onSubmitEditing={() => {
+                      const nextItem = dialogInfo?.form?.items?.[index + 1];
+                      if (nextItem) {
+                        nextItem?.ref.current?.focus();
+                      } else {
+                        onPressPositive();
+                      }
+                    }}
+                  />
+                ))}
+              </View>
+            ) : dialogInfo.input ? (
               <Input
                 fwdRef={inputRef}
                 autoCapitalize="none"
@@ -258,6 +268,7 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                 testID="input-value"
                 secureTextEntry={dialogInfo.secureTextEntry}
                 defaultValue={dialogInfo.defaultValue}
+                label={dialogInfo.inputLabel}
                 onSubmit={() => {
                   onPressPositive();
                 }}
@@ -266,48 +277,34 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
                 keyboardType={dialogInfo.keyboardType || "default"}
                 placeholder={dialogInfo.inputPlaceholder}
               />
-            </View>
-          ) : null}
+            ) : null}
 
-          {dialogInfo?.notice ? (
-            <View
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
-              <Notice
-                type={dialogInfo.notice.type || "information"}
-                text={dialogInfo.notice.text}
-              />
-            </View>
-          ) : null}
+            {dialogInfo?.notice ? (
+              <View
+                style={{
+                  paddingHorizontal: DefaultAppStyles.GAP
+                }}
+              >
+                <Notice
+                  type={dialogInfo.notice.type || "information"}
+                  text={dialogInfo.notice.text}
+                />
+              </View>
+            ) : null}
 
-          {dialogInfo.check ? (
-            <>
-              <Button
+            {dialogInfo.check ? (
+              <Checkbox
+                checked={checked}
                 onPress={() => {
                   setChecked(!checked);
                 }}
-                icon={
-                  checked
-                    ? "check-circle-outline"
-                    : "checkbox-blank-circle-outline"
-                }
-                iconColor={
-                  checked ? colors.secondary.icon : colors.primary.icon
-                }
-                style={{
-                  justifyContent: "flex-start"
-                }}
-                height={35}
-                iconSize={20}
-                width="100%"
                 title={dialogInfo.check.info}
-                type={checked ? dialogInfo.check.type || "plain" : "plain"}
+                style={{
+                  marginTop: -Spacing.LEVEL_1
+                }}
               />
-            </>
-          ) : null}
-
+            ) : null}
+          </View>
           <DialogButtons
             onPressNegative={onNegativePress}
             onPressPositive={

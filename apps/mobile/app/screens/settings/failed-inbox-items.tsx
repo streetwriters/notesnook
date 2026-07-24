@@ -23,15 +23,18 @@ import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
+import { FontSizes } from "../../common/design/font";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { db } from "../../common/database";
 import { presentDialog } from "../../components/dialog/functions";
+import { Header } from "../../components/header";
+import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
-import { IconButton } from "../../components/ui/icon-button";
+import { Pressable } from "../../components/ui/pressable";
+import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { ToastManager } from "../../services/event-manager";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import { Header } from "../../components/header";
+import LineSeparator from "../../components/ui/seperator/line-separator";
 
 type FailedInboxItem = {
   id: string;
@@ -51,50 +54,7 @@ function parseErrorContext(
   }
 }
 
-function ErrorBadge({
-  message
-}: {
-  message: InboxItemsHistoryErrorContext["message"] | undefined;
-}) {
-  const { colors } = useThemeColors();
-
-  if (!message) {
-    return (
-      <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-        N/A
-      </Paragraph>
-    );
-  }
-
-  const palette =
-    message === "Invalid JSON"
-      ? { background: "rgba(255, 152, 0, 0.15)", paragraph: "#e65100" }
-      : message === "Validation failed"
-        ? { background: "rgba(255, 193, 7, 0.15)", paragraph: "#8a6000" }
-        : colors.error;
-
-  return (
-    <View
-      style={{
-        alignSelf: "flex-start",
-        backgroundColor: palette.background,
-        borderRadius: defaultBorderRadius,
-        paddingVertical: 4,
-        paddingHorizontal: 8
-      }}
-    >
-      <Paragraph
-        size={AppFontSize.xxs}
-        color={palette.paragraph}
-        style={{ fontWeight: "700" }}
-      >
-        {message}
-      </Paragraph>
-    </View>
-  );
-}
-
-function DetailsBlock({ value }: { value: string }) {
+function PayloadDataBlock({ value }: { value: string }) {
   const { colors } = useThemeColors();
   const [copied, setCopied] = useState(false);
 
@@ -107,25 +67,27 @@ function DetailsBlock({ value }: { value: string }) {
   return (
     <View
       style={{
-        borderWidth: 1,
-        borderColor: colors.secondary.border,
-        borderRadius: defaultBorderRadius,
         backgroundColor: colors.secondary.background,
-        overflow: "hidden"
+        borderRadius: Radius.S,
+        padding: Spacing.LEVEL_2,
+        gap: Spacing.LEVEL_2,
+        width: "100%"
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "flex-end",
-          borderBottomWidth: 1,
-          borderBottomColor: colors.secondary.border
+          alignItems: "center",
+          justifyContent: "space-between",
+          width: "100%"
         }}
       >
-        <IconButton
-          name={copied ? "check" : "content-copy"}
-          color={colors.primary.icon}
-          size={AppFontSize.lg}
+        <Heading fontSize="MD" lineHeight="100%">
+          {strings.payloadData()}
+        </Heading>
+
+        <Pressable
+          type="transparent"
           onPress={() => {
             try {
               Clipboard.setString(value);
@@ -141,24 +103,56 @@ function DetailsBlock({ value }: { value: string }) {
               });
             }
           }}
-        />
-      </View>
-
-      <ScrollView
-        style={{ maxHeight: 120 }}
-        contentContainerStyle={{
-          padding: DefaultAppStyles.GAP_SMALL
-        }}
-      >
-        <Paragraph
-          size={AppFontSize.xxs}
           style={{
-            fontFamily: "monospace"
+            flexDirection: "row",
+            alignItems: "center",
+            gap: Spacing.LEVEL_1,
+            paddingVertical: 0,
+            paddingHorizontal: 0,
+
+            flexShrink: 1,
+            width: undefined
           }}
         >
-          {value}
-        </Paragraph>
-      </ScrollView>
+          <AppIcon
+            name={copied ? "check" : "copy"}
+            iconFamily={"notesnook"}
+            size={16}
+            color={colors.primary.accent}
+          />
+          <Paragraph
+            fontFamily="MEDIUM"
+            fontSize="SM"
+            color={colors.primary.accent}
+          >
+            {strings.copy()}
+          </Paragraph>
+        </Pressable>
+      </View>
+
+      <View style={{ height: 1, backgroundColor: colors.primary.separator }} />
+
+      <View
+        style={{
+          backgroundColor: colors.tertiary.background,
+          borderRadius: Radius.S,
+          padding: Spacing.LEVEL_2,
+          width: "100%"
+        }}
+      >
+        <ScrollView
+          style={{ maxHeight: 160, width: "100%" }}
+          nestedScrollEnabled
+        >
+          <Paragraph
+            fontSize="SM"
+            color={colors.primary.paragraph}
+            style={{ fontFamily: "monospace" }}
+          >
+            {value}
+          </Paragraph>
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -194,17 +188,22 @@ export const FailedInboxItems = () => {
         title={strings.failedInboxItems()}
         canGoBack={true}
         id="Settings"
+        style={{
+          backgroundColor: "transparent"
+        }}
         rightButton={
           items?.length > 0
             ? {
-                name: "delete",
+                name: "trash",
+                iconFamily: "notesnook",
+                size: 20,
                 color: colors.primary.icon,
                 onPress: async () => {
                   presentDialog({
                     title: strings.deleteAll(),
                     paragraph: strings.deleteAllFailedItemsDesc(),
                     positiveText: strings.delete(),
-                    positiveType: "errorShade",
+                    positiveType: "error-shade-outline",
                     positivePress: async () => {
                       if (result.status !== "pending") {
                         await db.inboxItemsHistory.deleteFailed();
@@ -220,13 +219,15 @@ export const FailedInboxItems = () => {
         }
       />
 
+      <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
+
       {result.status === "pending" ? (
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            gap: DefaultAppStyles.GAP_VERTICAL
+            gap: Spacing.LEVEL_2
           }}
         >
           <ActivityIndicator size="small" color={colors.primary.accent} />
@@ -242,8 +243,8 @@ export const FailedInboxItems = () => {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            gap: DefaultAppStyles.GAP_VERTICAL,
-            paddingHorizontal: DefaultAppStyles.GAP
+            gap: Spacing.LEVEL_2,
+            paddingHorizontal: Spacing.LEVEL_3
           }}
         >
           <Paragraph color={colors.error.paragraph}>
@@ -260,33 +261,27 @@ export const FailedInboxItems = () => {
       {items.length === 0 ? (
         <View
           style={{
-            paddingHorizontal: DefaultAppStyles.GAP,
-            paddingTop: DefaultAppStyles.GAP_VERTICAL,
+            paddingHorizontal: Spacing.LEVEL_3,
+            paddingTop: Spacing.LEVEL_2,
             flex: 1,
-            justifyContent: "center"
+            justifyContent: "center",
+            alignItems: "center"
           }}
         >
-          <View
-            style={{
-              padding: DefaultAppStyles.GAP,
-              borderRadius: defaultBorderRadius,
-              alignItems: "center"
-            }}
-          >
-            <Paragraph color={colors.secondary.paragraph}>
-              {strings.noFailedInboxItems()}
-            </Paragraph>
-          </View>
+          <Paragraph color={colors.secondary.paragraph}>
+            {strings.noFailedInboxItems()}
+          </Paragraph>
         </View>
       ) : null}
 
       {result.status === "fulfilled" && items.length > 0 ? (
         <ScrollView
           contentContainerStyle={{
-            gap: DefaultAppStyles.GAP_VERTICAL,
-            paddingHorizontal: DefaultAppStyles.GAP,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-            paddingBottom: 50
+            gap: Spacing.LEVEL_4,
+            paddingHorizontal: Spacing.LEVEL_3,
+            paddingVertical: Spacing.LEVEL_4,
+            paddingBottom: 50,
+            paddingTop: Spacing.LEVEL_3
           }}
         >
           {items.map((item) => {
@@ -304,96 +299,78 @@ export const FailedInboxItems = () => {
               <View
                 key={item.id}
                 style={{
-                  borderWidth: 1,
-                  borderColor: colors.secondary.border,
-                  borderRadius: defaultBorderRadius,
-                  backgroundColor: colors.primary.background,
-                  padding: DefaultAppStyles.GAP,
-                  gap: DefaultAppStyles.GAP_VERTICAL
+                  gap: Spacing.LEVEL_3,
+                  width: "100%"
                 }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  <Paragraph
-                    size={AppFontSize.xs}
-                    color={colors.secondary.paragraph}
-                  >
-                    {getFormattedDate(item.dateSynced, "date-time")}
-                  </Paragraph>
+                <View style={{ gap: Spacing.LEVEL_2, width: "100%" }}>
+                  <View style={{ gap: Spacing.LEVEL_1, width: "100%" }}>
+                    <Heading fontSize="LG" lineHeight="100%">
+                      {(message as string) || strings.failed()}
+                    </Heading>
+                    {description ? (
+                      <Paragraph fontSize="SM" color={colors.primary.paragraph}>
+                        {description as string}
+                      </Paragraph>
+                    ) : null}
+                  </View>
 
-                  <ErrorBadge message={message} />
-                </View>
-
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: DefaultAppStyles.GAP_SMALL,
-                    alignItems: "flex-start"
-                  }}
-                >
                   <View
                     style={{
-                      backgroundColor: colors.error.background,
-                      padding: 3,
-                      paddingHorizontal: 6,
-                      borderRadius: 4,
+                      flexDirection: "row",
                       alignItems: "center",
-                      flexWrap: "wrap"
+                      gap: Spacing.LEVEL_0 + 2
                     }}
                   >
-                    <Paragraph color={colors.error.paragraph}>Error</Paragraph>
+                    <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                      {getFormattedDate(item.dateSynced, "date")}
+                    </Paragraph>
+                    <View
+                      style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: Radius.MD,
+                        backgroundColor: colors.secondary.paragraph
+                      }}
+                    />
+                    <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
+                      {getFormattedDate(item.dateSynced, "time")}
+                    </Paragraph>
                   </View>
-                  <Paragraph
-                    style={{
-                      flexShrink: 1
-                    }}
-                  >
-                    {(description as string) || "N/A"}
-                  </Paragraph>
                 </View>
 
-                {details ? (
-                  <DetailsBlock value={details} />
-                ) : (
-                  <Paragraph
-                    size={AppFontSize.xs}
-                    color={colors.secondary.paragraph}
-                  >
-                    N/A
-                  </Paragraph>
-                )}
+                {details ? <PayloadDataBlock value={details} /> : null}
 
-                <View style={{ alignItems: "flex-end" }}>
-                  <Button
-                    title={strings.delete()}
-                    type="error"
-                    style={{
-                      width: "100%"
-                    }}
-                    onPress={() => {
-                      presentDialog({
-                        title: strings.delete(),
-                        paragraph: strings.areYouSure(),
-                        positiveText: strings.delete(),
-                        positiveType: "error",
-                        negativeText: strings.cancel(),
-                        positivePress: async () => {
-                          try {
-                            await deleteItem(item.id);
-                            return true;
-                          } catch (error) {
-                            ToastManager.error(error as Error);
-                            return false;
-                          }
+                <Button
+                  title={strings.delete()}
+                  type="error"
+                  fontSize={FontSizes.MD}
+                  style={{
+                    width: "100%",
+                    borderWidth: 1,
+                    borderColor: colors.error.border,
+                    borderRadius: Radius.XS,
+                    paddingVertical: Spacing.LEVEL_3
+                  }}
+                  onPress={() => {
+                    presentDialog({
+                      title: strings.delete(),
+                      paragraph: strings.areYouSure(),
+                      positiveText: strings.delete(),
+                      positiveType: "error",
+                      negativeText: strings.cancel(),
+                      positivePress: async () => {
+                        try {
+                          await deleteItem(item.id);
+                          return true;
+                        } catch (error) {
+                          ToastManager.error(error as Error);
+                          return false;
                         }
-                      });
-                    }}
-                  />
-                </View>
+                      }
+                    });
+                  }}
+                />
               </View>
             );
           })}

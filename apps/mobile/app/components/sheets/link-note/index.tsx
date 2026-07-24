@@ -17,325 +17,264 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useIsFeatureAvailable } from "@notesnook/common";
-import {
-  ContentBlock,
-  Note,
-  VirtualizedGrouping,
-  createInternalLink
-} from "@notesnook/core";
-import type { LinkAttributes } from "@notesnook/editor";
+import { ContentBlock, Note, createInternalLink } from "@notesnook/core";
 import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useEffect, useRef, useState } from "react";
-import { TextInput, View } from "react-native";
-import { FlatList } from "react-native-actions-sheet";
+import React, { useEffect, useState } from "react";
+import { useWindowDimensions, View } from "react-native";
+import { ScrollView } from "react-native-actions-sheet";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { db } from "../../../common/database";
-import { useDBItem } from "../../../hooks/use-db-item";
 import { editorController } from "../../../screens/editor/tiptap/utils";
-import { presentSheet } from "../../../services/event-manager";
-import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
+import { presentSheet, ToastManager } from "../../../services/event-manager";
+import { getElevationStyle } from "../../../utils/elevation";
+import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
-import Input from "../../ui/input";
 import { Pressable } from "../../ui/pressable";
+import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-const ListNoteItem = ({
-  id,
-  items,
-  onSelectNote
-}: {
-  id: any;
-  items: VirtualizedGrouping<Note> | undefined;
-  onSelectNote: any;
-}) => {
-  const [item] = useDBItem(id, "note", items);
-  return (
-    <Pressable
-      onPress={() => {
-        if (!item) return;
-        onSelectNote(item as Note);
-      }}
-      type={"transparent"}
-      style={{
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-        flexDirection: "row",
-        width: "100%",
-        justifyContent: "flex-start",
-        height: 50
-      }}
-    >
-      <View
-        style={{
-          flexShrink: 1
-        }}
-      >
-        <Paragraph numberOfLines={1}>{item?.title}</Paragraph>
-      </View>
-    </Pressable>
-  );
-};
+type LinkMode = "note" | "paragraphs";
 
-const ListBlockItem = ({
-  item,
-  onSelectBlock
+const ParagraphItem = ({
+  block,
+  selected,
+  onSelect
 }: {
-  item: ContentBlock;
-  onSelectBlock: any;
+  block: ContentBlock;
+  selected: boolean;
+  onSelect: (block: ContentBlock) => void;
 }) => {
   const { colors } = useThemeColors();
+  const content =
+    !block.content || block.content.trim() === ""
+      ? strings.linkNoteEmptyBlock()
+      : block.content.length > 200
+        ? block.content.slice(0, 200) + "..."
+        : block.content;
+
   return (
     <Pressable
-      onPress={() => {
-        onSelectBlock(item);
-      }}
-      type={"transparent"}
+      type={selected ? "selected" : "transparent"}
+      onPress={() => onSelect(block)}
       style={{
-        flexDirection: "row",
         width: "100%",
-        justifyContent: "flex-start",
-        minHeight: 45
+        padding: Spacing.LEVEL_2,
+        borderRadius: Radius.S,
+        borderWidth: selected ? 0 : 1,
+        borderColor: colors.secondary.border,
+        alignItems: "flex-start"
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          columnGap: 10,
-          alignItems: "flex-start",
-          borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-          justifyContent: "space-between"
-        }}
+      <Paragraph
+        fontSize="SM"
+        numberOfLines={2}
+        color={selected ? colors.primary.heading : colors.primary.paragraph}
       >
-        <Paragraph
-          style={{
-            flexShrink: 1
-          }}
-        >
-          {item?.content.length > 200
-            ? item?.content.slice(0, 200) + "..."
-            : !item.content || item.content.trim() === ""
-            ? strings.linkNoteEmptyBlock()
-            : item.content}
-        </Paragraph>
-
-        <View
-          style={{
-            borderRadius: defaultBorderRadius,
-            backgroundColor: colors.secondary.background,
-            height: 25,
-            minWidth: 25,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
-            {item.type.toUpperCase()}
-          </Paragraph>
-        </View>
-      </View>
+        {content}
+      </Paragraph>
     </Pressable>
   );
 };
 
 export default function LinkNote(props: {
-  attributes: LinkAttributes;
+  note: Note;
   resolverId: string;
   onLinkCreated: () => void;
   close?: (ctx?: string) => void;
 }) {
-  const blockLinking = useIsFeatureAvailable("blockLinking");
+  const { note, resolverId } = props;
   const { colors } = useThemeColors();
-  const query = useRef<string>(undefined);
-  const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
-  const nodesRef = useRef<ContentBlock[]>([]);
-  const [nodes, setNodes] = useState<ContentBlock[]>([]);
-
-  const inputRef = useRef<TextInput>(null);
-
-  const [selectedNote, setSelectedNote] = useState<Note>();
-  const [selectedNodeId, setSelectedNodeId] = useState<string>();
+  const { height } = useWindowDimensions();
+  const blockLinking = useIsFeatureAvailable("blockLinking");
+  const [mode, setMode] = useState<LinkMode>("note");
+  const [blocks, setBlocks] = useState<ContentBlock[]>([]);
+  const [selectedBlockId, setSelectedBlockId] = useState<string>();
 
   useEffect(() => {
-    db.notes.all.sorted(db.settings.getGroupOptions("notes")).then((notes) => {
-      setNotes(notes);
-    });
-  }, []);
+    db.notes.contentBlocks(note.id).then((result) => setBlocks(result));
+  }, [note.id]);
 
-  const onChange = async (value: string) => {
-    query.current = value;
-    if (!selectedNote) {
-      const notes = await db.lookup.notes(value).sorted();
-      setNotes(notes);
-    } else {
-      if (value.startsWith("#")) {
-        const headingNodes = nodesRef.current.filter((n) =>
-          n.type.match(/(h1|h2|h3|h4|h5|h6)/g)
-        );
-        setNodes(
-          headingNodes.filter((n) => n.content.includes(value.slice(1)))
-        );
-      } else {
-        setNodes(nodesRef.current.filter((n) => n.content.includes(value)));
-      }
-    }
-  };
-
-  const onCreateLink = (blockId?: string) => {
-    if (!selectedNote) return;
+  const onAddLink = () => {
+    const blockId = mode === "paragraphs" ? selectedBlockId : undefined;
     const link = createInternalLink(
       "note",
-      selectedNote.id,
-      blockId
-        ? {
-            blockId: blockId
-          }
-        : undefined
+      note.id,
+      blockId ? { blockId } : undefined
     );
     editorController.current?.postMessage(NativeEvents.resolve, {
       data: {
         href: link,
-        title: selectedNote.title
+        title: note.title
       },
-      resolverId: props.resolverId
+      resolverId
     });
-  };
-
-  const onSelectNote = async (note: Note) => {
-    setSelectedNote(note);
-    inputRef.current?.clear();
-    setTimeout(async () => {
-      nodesRef.current = await db.notes.contentBlocks(note.id);
-      setNodes(nodesRef.current);
-    });
-    // Fetch and set note's nodes.
-  };
-
-  const onSelectBlock = (block: ContentBlock) => {
-    onCreateLink(block.id);
-    props.onLinkCreated();
     props.close?.();
+    props.onLinkCreated();
+    ToastManager.show({
+      message: strings.linkAdded(),
+      type: "success",
+      context: "global"
+    });
   };
 
   return (
     <View
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
-        minHeight: "100%",
-        maxHeight: "100%"
+        width: "100%",
+        backgroundColor: colors.primary.background,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_2,
+        paddingBottom: Spacing.LEVEL_2,
+        gap: Spacing.LEVEL_4
       }}
     >
-      <View
-        style={{
-          flexDirection: "column",
-          width: "100%",
-          alignItems: "flex-start",
-          gap: 10
-        }}
-      >
-        <Input
-          placeholder={
-            selectedNote
-              ? strings.searchSectionToLinkPlaceholder()
-              : strings.searchNoteToLinkPlaceholder()
-          }
-          containerStyle={{
-            width: "100%"
-          }}
-          marginBottom={0}
-          onChangeText={(value) => {
-            onChange(value);
-          }}
-        />
-
-        {selectedNote ? (
-          <View
-            style={{
-              gap: 10
-            }}
-          >
-            <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
-              {strings.linkNoteSelectedNote()}
-            </Paragraph>
-            <Pressable
-              onPress={() => {
-                setSelectedNote(undefined);
-                setSelectedNodeId(undefined);
-                setNodes([]);
-              }}
-              style={{
-                flexDirection: "row",
-                width: "100%",
-                justifyContent: "flex-start",
-                height: 45,
-                borderWidth: 1,
-                borderColor: colors.primary.accent,
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-              type="secondaryAccented"
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  width: "100%"
-                }}
-              >
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                  numberOfLines={1}
-                >
-                  {selectedNote?.title}
-                </Paragraph>
-
-                <Paragraph
-                  color={colors.secondary.paragraph}
-                  size={AppFontSize.xs}
-                >
-                  {strings.tapToDeselect()}
-                </Paragraph>
-              </View>
-            </Pressable>
-
-            {nodes?.length > 0 ? (
-              <Paragraph
-                style={{
-                  marginBottom: DefaultAppStyles.GAP_VERTICAL
-                }}
-                color={colors.secondary.paragraph}
-                size={AppFontSize.xs}
-              >
-                {strings.linkNoteToSection()}
-              </Paragraph>
-            ) : null}
-          </View>
-        ) : null}
+      <View style={{ gap: Spacing.LEVEL_1 }}>
+        <Heading fontSize="XL" lineHeight="100%">
+          {strings.linkOptions()}
+        </Heading>
+        <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+          {strings.linkOptionsDesc()}
+        </Paragraph>
       </View>
 
-      {selectedNote ? (
-        <FlatList
-          renderItem={({ item, index }) => (
-            <ListBlockItem item={item} onSelectBlock={onSelectBlock} />
-          )}
+      <View style={{ gap: Spacing.LEVEL_2 }}>
+        <Heading fontSize="LG" lineHeight="100%">
+          {strings.selectedNoteLabel()}
+        </Heading>
+        <View
           style={{
-            marginTop: DefaultAppStyles.GAP_VERTICAL
+            backgroundColor: colors.secondary.background,
+            borderRadius: Radius.XS,
+            paddingHorizontal: Spacing.LEVEL_2,
+            paddingVertical: Spacing.LEVEL_3
           }}
-          keyboardShouldPersistTaps="handled"
-          windowSize={3}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={
+        >
+          <Paragraph
+            color={colors.primary.heading}
+            fontFamily="MEDIUM"
+            fontSize="SM"
+          >
+            {note.title}
+          </Paragraph>
+        </View>
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          gap: Spacing.LEVEL_2,
+          backgroundColor: colors.secondary.background,
+          padding: Spacing.LEVEL_1,
+          borderRadius: Radius.S
+        }}
+      >
+        {(
+          [
+            { key: "note", label: strings.linkEntireNote() },
+            { key: "paragraphs", label: strings.specifyParagraphs() }
+          ] as { key: LinkMode; label: string }[]
+        ).map(({ key, label }) => {
+          const active = mode === key;
+          return (
+            <Pressable
+              key={key}
+              type="transparent"
+              onPress={() => setMode(key)}
+              style={{
+                flex: 1,
+                paddingVertical: Spacing.LEVEL_2,
+                paddingHorizontal: Spacing.LEVEL_1,
+                borderRadius: Radius.XS,
+                backgroundColor: active
+                  ? colors.primary.background
+                  : "transparent",
+                ...(active ? getElevationStyle(2) : {})
+              }}
+            >
+              <Heading
+                fontSize="MD"
+                style={{ textAlign: "center" }}
+                color={
+                  active ? colors.primary.accent : colors.secondary.paragraph
+                }
+              >
+                {label}
+              </Heading>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {mode === "note" ? (
+        <View style={{ gap: Spacing.LEVEL_1 }}>
+          <Paragraph fontFamily="MEDIUM" fontSize="SM">
+            {strings.linkedReferences()}
+          </Paragraph>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: Spacing.LEVEL_1,
+              padding: Spacing.LEVEL_2,
+              borderRadius: Radius.S,
+              borderWidth: 1,
+              borderColor: colors.secondary.border
+            }}
+          >
             <View
               style={{
-                gap: DefaultAppStyles.GAP_VERTICAL,
+                width: 40,
+                height: 40,
+                borderRadius: Radius.XS,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: colors.secondary.background
+              }}
+            >
+              <AppIcon
+                name="file-text"
+                iconFamily="notesnook"
+                size={20}
+                color={colors.primary.icon}
+              />
+            </View>
+            <Heading fontSize="SM" style={{ flexShrink: 1 }}>
+              {strings.entireNote()}
+            </Heading>
+          </View>
+        </View>
+      ) : (
+        <View style={{ gap: Spacing.LEVEL_3 }}>
+          <Heading fontSize="LG" lineHeight="100%">
+            {strings.selectParagraphs()}
+          </Heading>
+          {blockLinking?.isAllowed ? (
+            <ScrollView
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+              style={{ maxHeight: height * 0.4 }}
+              contentContainerStyle={{ gap: Spacing.LEVEL_2 }}
+            >
+              {blocks.map((block) => (
+                <ParagraphItem
+                  key={block.id}
+                  block={block}
+                  selected={selectedBlockId === block.id}
+                  onSelect={(b) => setSelectedBlockId(b.id)}
+                />
+              ))}
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                gap: Spacing.LEVEL_2,
                 backgroundColor: colors.secondary.background,
-                padding: DefaultAppStyles.GAP,
-                borderRadius: defaultBorderRadius,
+                padding: Spacing.LEVEL_3,
+                borderRadius: Radius.S,
                 borderWidth: 0.5,
                 borderColor: colors.secondary.border,
                 alignItems: "center"
@@ -346,71 +285,42 @@ export default function LinkNote(props: {
               </Paragraph>
               <Button
                 title={strings.upgradePlan()}
-                style={{
-                  width: "100%"
-                }}
+                style={{ width: "100%" }}
                 type="accent"
               />
             </View>
-          }
-          data={blockLinking?.isAllowed ? nodes : []}
-        />
-      ) : (
-        <FlatList
-          renderItem={({ item, index }: any) => (
-            <ListNoteItem
-              id={index}
-              items={notes}
-              onSelectNote={onSelectNote}
-            />
           )}
-          keyboardShouldPersistTaps="handled"
-          style={{
-            marginTop: DefaultAppStyles.GAP_VERTICAL
-          }}
-          windowSize={3}
-          data={notes?.placeholders}
-        />
+        </View>
       )}
 
-      {selectedNote ? (
-        <Button
-          style={{
-            marginTop: DefaultAppStyles.GAP_VERTICAL
-          }}
-          title={strings.createLink()}
-          type="accent"
-          width="100%"
-          onPress={() => {
-            onCreateLink();
-            props.onLinkCreated();
-            props.close?.();
-          }}
-        />
-      ) : null}
+      <Button
+        title={strings.addLink()}
+        type="accent"
+        disabled={
+          mode === "paragraphs" &&
+          selectedBlockId === undefined &&
+          blocks.length !== 0
+        }
+        width="100%"
+        onPress={onAddLink}
+      />
     </View>
   );
 }
 
-LinkNote.present = (attributes: LinkAttributes, resolverId: string) => {
-  let didCreateLink = false;
+LinkNote.present = (
+  note: Note,
+  resolverId: string,
+  onLinkCreated: () => void
+) => {
   presentSheet({
     component: (ref, close) => (
       <LinkNote
-        attributes={attributes}
+        note={note}
         resolverId={resolverId}
-        onLinkCreated={() => {
-          didCreateLink = true;
-        }}
+        onLinkCreated={onLinkCreated}
         close={close}
       />
-    ),
-    onClose: () => {
-      if (!didCreateLink) {
-        editorController?.current.commands.dismissCreateInternalLinkRequest(
-          resolverId
-        );
-      }
-    }
+    )
   });
 };

@@ -25,6 +25,7 @@ import { ActivityIndicator, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   createNotebookTreeStores,
@@ -35,10 +36,9 @@ import { useNotebooks } from "../../stores/use-notebook-store";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { updateNotebook } from "../../utils/notebooks";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import { FloatingButton } from "../../components/container/floating-button";
 import { Header } from "../../components/header";
 import { NotebookItem } from "../../components/side-menu/notebook-item";
+import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
 import Paragraph from "../../components/ui/typography/paragraph";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
@@ -193,10 +193,35 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
     []
   );
 
+  const onCreateNotebook = async () => {
+    const notebooksFeature = await isFeatureAvailable("notebooks");
+    if (!notebooksFeature.isAllowed) {
+      ToastManager.show({
+        message: notebooksFeature.error,
+        type: "info",
+        context: "local",
+        actionText: strings.upgrade(),
+        func: () => {
+          ToastManager.hide();
+          PaywallSheet.present(notebooksFeature);
+        }
+      });
+      return;
+    }
+    AddNotebookSheet.present(
+      undefined,
+      undefined,
+      "global",
+      undefined,
+      false,
+      searchQuery.current
+    );
+  };
+
   return (
     <SafeAreaView
       style={{
-        gap: DefaultAppStyles.GAP_VERTICAL,
+        gap: Spacing.LEVEL_2,
         flex: 1,
         backgroundColor: colors.primary.background
       }}
@@ -204,10 +229,15 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
       <Header
         title={strings.addToNotebook()}
         canGoBack
+        style={{
+          backgroundColor: colors.primary.background
+        }}
         rightButton={
           hasSelection
             ? {
-                name: "restore",
+                name: "arrow-counter-clockwise",
+                iconFamily: "notesnook",
+                size: 20,
                 onPress: () => {
                   updateInitialSelectionState(noteIds);
                 }
@@ -225,9 +255,10 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
         ListHeaderComponent={
           <View
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP,
+              paddingHorizontal: Spacing.LEVEL_3,
               width: "100%",
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
+              paddingBottom: Spacing.LEVEL_3,
+              gap: Spacing.LEVEL_3
             }}
           >
             <Input
@@ -238,35 +269,33 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
                   updateNotebooks();
                 }, 300);
               }}
-              button={{
-                icon: "plus",
-                onPress: async () => {
-                  const notebooksFeature =
-                    await isFeatureAvailable("notebooks");
-                  if (!notebooksFeature.isAllowed) {
-                    ToastManager.show({
-                      message: notebooksFeature.error,
-                      type: "info",
-                      context: "local",
-                      actionText: strings.upgrade(),
-                      func: () => {
-                        ToastManager.hide();
-                        PaywallSheet.present(notebooksFeature);
-                      }
-                    });
-                    return;
-                  }
-                  AddNotebookSheet.present(
-                    undefined,
-                    undefined,
-                    "global",
-                    undefined,
-                    false,
-                    searchQuery.current
-                  );
-                },
-                color: colors.primary.icon
+              containerStyle={{
+                backgroundColor: colors.secondary.background,
+                borderWidth: 0
               }}
+              button={{
+                icon: "search",
+                iconFamily: "notesnook",
+                onPress: () => {},
+                color: colors.secondary.icon,
+                size: 16
+              }}
+            />
+
+            <View
+              style={{
+                height: 1,
+                backgroundColor: colors.primary.separator
+              }}
+            />
+
+            <Button
+              title={strings.createNotebook()}
+              icon="plus"
+              iconPosition="left"
+              type="accent-outline"
+              width="100%"
+              onPress={onCreateNotebook}
             />
 
             {!multiSelect ? (
@@ -302,14 +331,23 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
         }
       />
 
-      {hasSelection ? (
-        <FloatingButton
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: colors.primary.border,
+          backgroundColor: colors.primary.background,
+          padding: Spacing.LEVEL_3
+        }}
+      >
+        <Button
           testID="floating-save-button"
-          icon="check"
-          alwaysVisible
+          title={strings.saveChanges()}
+          type="accent"
+          width="100%"
+          disabled={!hasSelection}
           onPress={() => onSave()}
         />
-      ) : null}
+      </View>
     </SafeAreaView>
   );
 };
@@ -357,12 +395,13 @@ const NotebookItemWrapper = React.memo(
     return (
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP
+          paddingHorizontal: Spacing.LEVEL_3
         }}
       >
         <NotebookItem
           item={item}
           index={index}
+          selectionCheckboxLocation="left"
           expanded={expanded}
           onToggleExpanded={async () => {
             useNotebookExpandedStore.getState().setExpanded(item.notebook.id);
@@ -394,6 +433,12 @@ const NotebookItemWrapper = React.memo(
                     ? undefined
                     : "deselected"
               );
+          }}
+          style={{
+            paddingVertical: Spacing.LEVEL_1
+          }}
+          subNotebookButtonStyle={{
+            paddingVertical: Spacing.LEVEL_1
           }}
           canDisableSelectionMode={false}
           selected={selected}

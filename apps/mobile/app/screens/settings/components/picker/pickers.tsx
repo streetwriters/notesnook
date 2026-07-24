@@ -1,0 +1,275 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import {
+  DayFormat,
+  TIME_FORMATS,
+  TimeFormat,
+  WeekFormat
+} from "@notesnook/core";
+import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
+import dayjs from "dayjs";
+import { createSettingsPicker } from ".";
+import { db } from "../../../../common/database";
+import { ToastManager } from "../../../../services/event-manager";
+import SettingsService from "../../../../services/settings";
+import {
+  Settings,
+  useSettingStore
+} from "../../../../stores/use-setting-store";
+import { useUserStore } from "../../../../stores/use-user-store";
+import { MenuItemsList } from "../../../../utils/menu-items";
+import { strings } from "@notesnook/intl";
+import { isFeatureAvailable } from "@notesnook/common";
+import PaywallSheet from "../../../../components/sheets/paywall";
+
+const DAY_FORMATS = ["short", "long"];
+const DayFormatFormats = {
+  short: "ddd",
+  long: "dddd"
+};
+
+const WEEK_FORMATS = ["Sun", "Mon"];
+const WeekFormatNames = {
+  Sun: "Sunday",
+  Mon: "Monday"
+};
+
+export const FontPicker = createSettingsPicker<
+  ReturnType<typeof getFonts>[0],
+  Settings["defaultFontFamily"]
+>({
+  getValue: () => useSettingStore.getState().settings.defaultFontFamily,
+  updateValue: async (item) => {
+    SettingsService.set({
+      defaultFontFamily: item.id
+    });
+  },
+  formatValue: (item) => {
+    return getFontById(typeof item === "object" ? item.id : item)?.title;
+  },
+  getItemKey: (item) => item.id,
+  options: getFonts(),
+  compareValue: (current: any, item) => current === item.id,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const HomePicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.homepage,
+  updateValue: async (item) => {
+    SettingsService.set({ homepage: item.title });
+    ToastManager.show({
+      heading: strings.homePageChangedTo(item.title),
+      message: strings.restartAppToApplyChanges(),
+      type: "success"
+    });
+  },
+  formatValue: (item) => {
+    return strings.routes[
+      (typeof item === "object"
+        ? item.title
+        : item) as keyof typeof strings.routes
+    ]?.();
+  },
+  getItemKey: (item) => item.title,
+  options: MenuItemsList.slice(0, MenuItemsList.length - 1),
+  compareValue: (current, item) => current === item.title,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const SidebarTabPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.defaultSidebarTab,
+  updateValue: async (item) => {
+    SettingsService.set({ defaultSidebarTab: item });
+  },
+  formatValue: (item) => {
+    const SidebarTabs = [
+      strings.routes.Home(),
+      strings.routes.Notebooks(),
+      strings.routes.Tags()
+    ];
+    return SidebarTabs[item];
+  },
+  getItemKey: (item) => `side-bar-tab-picker-${item}`,
+  options: [0, 1, 2],
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: async () => {
+    const result = await isFeatureAvailable("defaultSidebarTab");
+    if (!result.isAllowed) {
+      ToastManager.show({
+        message: result.error,
+        type: "info",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(result);
+        }
+      });
+    }
+    return result.isAllowed;
+  },
+  isOptionAvailable: async () => true
+});
+
+export const DayFormatPicker = createSettingsPicker({
+  getValue: () => db.settings.getDayFormat(),
+  updateValue: async (item) => {
+    db.settings.setDayFormat(item);
+    useSettingStore.setState({
+      dayFormat: item
+    });
+  },
+  formatValue: (item) => {
+    return `${strings.dayFormat()} (${dayjs().format(DayFormatFormats[item])})`;
+  },
+  getItemKey: (item) => item,
+  options: DAY_FORMATS as DayFormat[],
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const WeekFormatPicker = createSettingsPicker({
+  getValue: () => db.settings.getWeekFormat(),
+  updateValue: async (item) => {
+    db.settings.setWeekFormat(item);
+    useSettingStore.setState({
+      weekFormat: item
+    });
+  },
+  formatValue: (item) => {
+    return `${WeekFormatNames[item]}`;
+  },
+  getItemKey: (item) => item,
+  options: WEEK_FORMATS as WeekFormat[],
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+const TimeFormats = {
+  "12-hour": "hh:mm A",
+  "24-hour": "HH:mm"
+};
+
+export const TimeFormatPicker = createSettingsPicker({
+  getValue: () => db.settings.getTimeFormat(),
+  updateValue: async (item) => {
+    db.settings.setTimeFormat(item);
+    useSettingStore.setState({
+      timeFormat: item
+    });
+  },
+  formatValue: (item) => {
+    return `${strings[item]()} (${dayjs().format(TimeFormats[item])})`;
+  },
+  getItemKey: (item) => item,
+  options: TIME_FORMATS as TimeFormat[],
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const BackupReminderPicker = createSettingsPicker<
+  Settings["reminder"],
+  Settings["reminder"]
+>({
+  getValue: () => useSettingStore.getState().settings.reminder,
+  updateValue: async (item) => {
+    SettingsService.set({ reminder: item });
+  },
+  formatValue: (item) => {
+    return item === "useroff" ? strings.off() : strings[item]?.();
+  },
+  getItemKey: (item) => item,
+  options: ["daily", "weekly", "monthly", "useroff"],
+  compareValue: (current, item) => current === item,
+  requiresVerification: () => {
+    return (
+      !useSettingStore.getState().settings.encryptedBackup &&
+      !!useUserStore.getState().user
+    );
+  },
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.fullBackupReminder,
+  updateValue: async (item) => {
+    SettingsService.set({ fullBackupReminder: item });
+  },
+  formatValue: (item) => {
+    //@ts-ignore
+    return item === "useroff" || item === "off" || item === "never"
+      ? "Off"
+      : item.slice(0, 1).toUpperCase() + item.slice(1);
+  },
+  getItemKey: (item) => item,
+  options: ["weekly", "monthly", "never"] as Settings["fullBackupReminder"][],
+  compareValue: (current, item) => current === item,
+  requiresVerification: () => {
+    return (
+      !useSettingStore.getState().settings.encryptedBackup &&
+      !!useUserStore.getState().user
+    );
+  },
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
+
+export const ImageCompressionPicker = createSettingsPicker({
+  getValue: () => useSettingStore.getState().settings.imageCompression,
+  updateValue: async (item) => {
+    SettingsService.set({ imageCompression: item });
+  },
+  formatValue: (item) => {
+    return item === "ask-every-time"
+      ? strings.alwaysAsk()
+      : item === "enabled"
+        ? strings.enable()
+        : strings.disable();
+  },
+  getItemKey: (item) => item,
+  options: [
+    "ask-every-time",
+    "enabled",
+    "disabled"
+  ] as Settings["imageCompression"][],
+  compareValue: (current, item) => current === item,
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async (item) => {
+    const feature = await isFeatureAvailable("fullQualityImages");
+
+    if (!feature.isAllowed && item === "enabled") {
+      ToastManager.show({
+        message: feature.error,
+        type: "info",
+        actionText: strings.upgrade(),
+        func: () => {
+          PaywallSheet.present(feature);
+        }
+      });
+      return false;
+    }
+
+    return true;
+  }
+});

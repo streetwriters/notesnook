@@ -16,10 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import {
+  getFormattedDate,
+  useIsFeatureAvailable,
+  usePromise
+} from "@notesnook/common";
 import { Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import dayjs from "dayjs";
 import React, { useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -28,60 +32,39 @@ import {
   TextInput,
   View
 } from "react-native";
-import DatePicker from "react-native-date-picker";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
+import { presentDateTimePicker } from "../../components/date-time-picker";
 import { Dialog } from "../../components/dialog";
 import { Header } from "../../components/header";
+import PaywallSheet from "../../components/sheets/paywall";
+import AppIcon from "../../components/ui/AppIcon";
 import { Button } from "../../components/ui/button";
-import { ReminderTime } from "../../components/ui/reminder-time";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../components/ui/input/form-input";
+import { Pressable } from "../../components/ui/pressable";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import { TimeSince } from "../../components/ui/time-since";
+import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { DDS } from "../../services/device-detection";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import Notifications from "../../services/notifications";
 import SettingsService from "../../services/settings";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import {
-  getFormattedDate,
-  useIsFeatureAvailable,
-  usePromise
-} from "@notesnook/common";
-import PaywallSheet from "../../components/sheets/paywall";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { Pressable } from "../../components/ui/pressable";
-import { TimeSince } from "../../components/ui/time-since";
-import Heading from "../../components/ui/typography/heading";
 import { eOnLoadNote } from "../../utils/events";
 import { fluidTabsRef } from "../../utils/global-refs";
-import FormInput, {
-  createFormRef,
-  validators
-} from "../../components/ui/input/form-input";
-import AppIcon from "../../components/ui/AppIcon";
+import { AppFontSize } from "../../utils/size";
 
-const ReminderModes =
-  Platform.OS === "ios"
-    ? {
-        Once: "once",
-        Repeat: "repeat"
-      }
-    : {
-        Once: "once",
-        Repeat: "repeat",
-        Permanent: "permanent"
-      };
-
-const RecurringModes = {
-  Daily: "day",
-  Week: "week",
-  Month: "month",
-  Year: "year"
-};
+// Frequency chips shown in the "Reminder frequency" section. "once" maps to
+// reminderMode = "once", the rest map to reminderMode = "repeat" + recurringMode.
+const FrequencyModes = ["once", "day", "week", "month", "year"] as const;
+type FrequencyMode = (typeof FrequencyModes)[number];
 
 const WeekDays = [0, 1, 2, 3, 4, 5, 6];
 const WeekDaysMon = [1, 2, 3, 4, 5, 6, 0];
@@ -91,7 +74,7 @@ const ReminderNotificationModes = {
   Silent: "silent",
   Vibrate: "vibrate",
   Urgent: "urgent"
-};
+} as const;
 
 export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const { reminder, reference } = props.route.params;
@@ -106,11 +89,12 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
       return false;
     }
   });
-  const { colors, isDark } = useThemeColors();
+  const { colors } = useThemeColors();
   const weekFormat = useSettingStore((state) => state.weekFormat);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
-    reminder?.mode || "once"
+    reminder?.mode === "permanent" ? "once" : reminder?.mode || "once"
   );
+  const [allDay, setAllDay] = useState(reminder?.mode === "permanent");
   const [recurringMode, setRecurringMode] = useState<Reminder["recurringMode"]>(
     reminder?.recurringMode || "week"
   );
@@ -123,8 +107,10 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [reminderNotificationMode, setReminderNotificatioMode] = useState<
     Reminder["priority"]
   >(reminder?.priority || SettingsService.get().reminderNotificationMode);
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [repeatFrequency, setRepeatFrequency] = useState(1);
+  const [dateSelected, setDateSelected] = useState(!!reminder);
+  const [timeSelected, setTimeSelected] = useState(!!reminder);
+  const [frequencyExpanded, setFrequencyExpanded] = useState(true);
+  const [moreOptionsExpanded, setMoreOptionsExpanded] = useState(false);
   const referencedItem = reference ? (reference as Note) : null;
   const recurringReminderFeature = useIsFeatureAvailable("recurringReminders");
   const formRef = useRef(
@@ -141,7 +127,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   );
   const titleRef = useRef<TextInput>(null);
   const descriptionRef = useRef<TextInput>(null);
-  const timer = useRef<NodeJS.Timeout>(undefined);
   const referencedNotes = usePromise(
     () =>
       reminder?.id
@@ -154,54 +139,94 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [dateError, setDateError] = useState<string>();
   const [selectDayError, setSelectDayError] = useState<string>();
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
+  // The frequency chip currently reflected by reminderMode + recurringMode.
+  const currentFrequency: FrequencyMode =
+    reminderMode === "once" ? "once" : recurringMode || "week";
+  // Once and yearly reminders pick a specific date; daily/weekly/monthly only a time.
+  const showDatePicker = reminderMode === "once" || recurringMode === "year";
+  const showDaySelector =
+    reminderMode === "repeat" &&
+    (recurringMode === "week" || recurringMode === "month");
+
+  const handleConfirm = (mode: "date" | "time", selected: Date) => {
+    setDateError(undefined);
+    const next = new Date(date);
+    if (mode === "time") {
+      next.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
+      setTimeSelected(true);
+    } else {
+      next.setFullYear(
+        selected.getFullYear(),
+        selected.getMonth(),
+        selected.getDate()
+      );
+      setDateSelected(true);
+    }
+    setDate(next);
   };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
+  const openPicker = (mode: "date" | "time") => {
+    presentDateTimePicker({
+      mode,
+      date,
+      minDate:
+        mode === "date" && reminderMode === "once" ? new Date() : undefined,
+      onConfirm: (selected) => handleConfirm(mode, selected),
+      description:
+        mode === "date"
+          ? strings.selectReminderDate()
+          : strings.selectReminderTime()
+    });
   };
 
-  const handleConfirm = (date: Date) => {
-    timer.current = setTimeout(() => {
-      setDateError(undefined);
-      hideDatePicker();
-      setDate(date);
-    }, 10);
+  const selectFrequency = (mode: FrequencyMode) => {
+    if (
+      mode !== "once" &&
+      recurringReminderFeature &&
+      !recurringReminderFeature?.isAllowed
+    ) {
+      PaywallSheet.present(recurringReminderFeature);
+      return;
+    }
+    setSelectDayError(undefined);
+    if (mode === "once") {
+      setReminderMode("once");
+      return;
+    }
+    setReminderMode("repeat");
+    setRecurringMode(mode as Reminder["recurringMode"]);
+    if (mode === "week") {
+      setSelectedDays((days) => (days.length ? days : [date.getDay()]));
+    } else if (mode === "month") {
+      setSelectedDays((days) => (days.length ? days : [date.getDate()]));
+    } else {
+      setSelectedDays([]);
+    }
   };
-  function nth(n: number) {
-    return (
-      ["st", "nd", "rd"][(((((n < 0 ? -n : n) + 90) % 100) - 10) % 10) - 1] ||
-      "th"
-    );
-  }
 
-  function getSelectedDaysText(selectedDays: number[]) {
-    const text = selectedDays
-      .sort((a, b) => a - b)
-      .map((day, index) => {
-        const isLast = index === selectedDays.length - 1;
-        const isSecondLast = index === selectedDays.length - 2;
-        const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
-        return recurringMode === RecurringModes.Week
-          ? strings.weekDayNames[day as keyof typeof strings.weekDayNames]() +
-              joinWith
-          : `${day}${nth(day)} ${joinWith}`;
-      })
-      .join("");
-    return text;
-  }
+  const toggleDay = (day: number) => {
+    setSelectDayError(undefined);
+    setSelectedDays((days) => {
+      if (days.indexOf(day) > -1) {
+        return days.filter((d) => d !== day);
+      }
+      return [...days, day];
+    });
+  };
 
   async function saveReminder() {
     try {
       if (!formRef.current.validate()) return;
-      if (date.getTime() < Date.now() && reminderMode === "once") {
+
+      const mode: Reminder["mode"] = allDay ? "permanent" : reminderMode;
+
+      if (date.getTime() < Date.now() && mode === "once") {
         setDateError(strings.dateError());
         return;
       }
 
       if (
-        reminderMode === ReminderModes.Repeat &&
+        mode === "repeat" &&
         recurringMode !== "day" &&
         recurringMode !== "year" &&
         selectedDays.length === 0
@@ -210,7 +235,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         return;
       }
 
-      if (!date && reminderMode !== ReminderModes.Permanent) return;
+      if (!date && mode !== "permanent") return;
 
       if (!(await Notifications.checkAndRequestPermissions(true)))
         throw new Error(strings.noNotificationPermission());
@@ -225,8 +250,8 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         description: details.current,
         recurringMode: recurringMode,
         selectedDays: selectedDays,
-        mode: reminderMode,
-        localOnly: reminderMode === "permanent",
+        mode: mode,
+        localOnly: mode === "permanent",
         snoozeUntil:
           date?.getTime() > Date.now() ? undefined : reminder?.snoozeUntil,
         disabled: false
@@ -267,449 +292,454 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         <Header
           title={reminder ? strings.editReminder() : strings.newReminder()}
           canGoBack
-          rightButton={{
-            name: "check",
-            onPress: saveReminder
+          style={{
+            backgroundColor: "transparent"
           }}
         />
+        <LineSeparator paddingHorizontal={Spacing.LEVEL_3} />
+
         <Dialog context="local" />
         <ScrollView
           style={{
-            marginBottom: DDS.isTab ? 25 : undefined,
-            paddingHorizontal: DefaultAppStyles.GAP
+            flex: 1
           }}
           contentContainerStyle={{
-            gap: DefaultAppStyles.GAP_VERTICAL
+            paddingHorizontal: Spacing.LEVEL_3,
+            paddingVertical: Spacing.LEVEL_4,
+            gap: Spacing.LEVEL_4
           }}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
         >
-          <FormInput
-            name="title"
-            validators={[validators.required(strings.titleIsRequired())]}
-            formRef={formRef}
-            fwdRef={titleRef}
-            defaultValue={reminder?.title || referencedItem?.title}
-            placeholder={strings.remindeMeOf()}
-            onChangeText={(text) => (title.current = text)}
-            wrapperStyle={{
-              marginTop: DefaultAppStyles.GAP_VERTICAL
-            }}
-            onSubmitEditing={() => {
-              descriptionRef.current?.focus();
-            }}
-          />
-
-          <FormInput
-            name="description"
-            validators={[]}
-            formRef={formRef}
-            defaultValue={
-              reminder ? reminder?.description : referencedItem?.headline
-            }
-            fwdRef={descriptionRef}
-            placeholder={strings.addShortNote()}
-            onChangeText={(text) => (details.current = text)}
-            containerStyle={{
-              maxHeight: 80
-            }}
-            multiline
-            textAlignVertical="top"
-            inputStyle={{
-              minHeight: 80,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-            height={80}
-          />
-
-          <ScrollView
-            style={{
-              flexDirection: "row"
-            }}
-            horizontal
-          >
-            {Object.keys(ReminderModes).map((mode) => (
-              <Button
-                key={mode}
-                title={strings.reminderModes(
-                  ReminderModes[mode as keyof typeof ReminderModes] as string
-                )}
-                style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                  marginRight: DefaultAppStyles.GAP_SMALL
-                }}
-                proTag={mode === "Repeat"}
-                height={35}
-                type={
-                  reminderMode ===
-                  ReminderModes[mode as keyof typeof ReminderModes]
-                    ? "selectedAccent"
-                    : "plain"
-                }
-                onPress={() => {
-                  if (
-                    recurringReminderFeature &&
-                    !recurringReminderFeature?.isAllowed
-                  ) {
-                    PaywallSheet.present(recurringReminderFeature);
-                    return;
-                  }
-
-                  setReminderMode(
-                    ReminderModes[
-                      mode as keyof typeof ReminderModes
-                    ] as Reminder["mode"]
-                  );
-                  if (mode === "Repeat") {
-                    setSelectedDays((days) => {
-                      if (days.length > 0) return days;
-                      if (days.indexOf(date.getDay()) > -1) {
-                        return days;
-                      }
-                      days.push(date.getDay());
-                      return [...days];
-                    });
-                  }
-                }}
-              />
-            ))}
-          </ScrollView>
-
-          {reminderMode === ReminderModes.Repeat ? (
-            <View
-              style={{
-                backgroundColor: colors.secondary.background,
-                padding: DefaultAppStyles.GAP,
-                borderRadius: defaultBorderRadius
+          {/* Title + short detail */}
+          <View style={{ gap: Spacing.LEVEL_2 }}>
+            <FormInput
+              name="title"
+              validators={[validators.required(strings.titleIsRequired())]}
+              formRef={formRef}
+              fwdRef={titleRef}
+              label={strings.title()}
+              defaultValue={reminder?.title || referencedItem?.title}
+              placeholder={strings.reminderTitlePlaceholder()}
+              onChangeText={(text) => (title.current = text)}
+              onSubmitEditing={() => {
+                descriptionRef.current?.focus();
               }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginBottom:
-                    recurringMode === "day" || recurringMode === "year"
-                      ? 0
-                      : 12,
-                  alignItems: "center"
-                }}
-              >
-                {Object.keys(RecurringModes).map((mode) => (
-                  <Button
-                    key={mode}
-                    title={strings.recurringModes(
-                      RecurringModes[mode as keyof typeof RecurringModes]
-                    )}
-                    style={{
-                      marginRight: 6,
-                      borderRadius: 100,
-                      paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
-                    }}
-                    type={
-                      recurringMode ===
-                      RecurringModes[mode as keyof typeof RecurringModes]
-                        ? "selected"
-                        : "plain"
-                    }
-                    onPress={() => {
-                      setRecurringMode(
-                        RecurringModes[
-                          mode as keyof typeof RecurringModes
-                        ] as Reminder["recurringMode"]
-                      );
-                      setSelectedDays([]);
-                      setRepeatFrequency(1);
-                    }}
-                  />
-                ))}
-              </View>
+            />
 
-              <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-                {recurringMode === RecurringModes.Daily ||
-                recurringMode === RecurringModes.Year
-                  ? null
-                  : recurringMode === RecurringModes.Week
-                    ? (weekFormat === "Mon" ? WeekDaysMon : WeekDays).map(
-                        (item) => (
-                          <Button
-                            key={strings.weekDayNamesShort[
-                              item as keyof typeof strings.weekDayNamesShort
-                            ]()}
-                            title={strings.weekDayNamesShort[
-                              item as keyof typeof strings.weekDayNamesShort
-                            ]()}
-                            type={
-                              selectedDays.indexOf(item) > -1
-                                ? "selected"
-                                : "plain"
-                            }
-                            fontSize={AppFontSize.xs}
-                            style={{
-                              height: 40,
-                              borderRadius: 100,
-                              marginRight: 10
-                            }}
-                            onPress={() => {
-                              setSelectedDays((days) => {
-                                if (days.indexOf(item) > -1) {
-                                  days.splice(days.indexOf(item), 1);
-                                  return [...days];
-                                }
-                                days.push(item);
-                                return [...days];
-                              });
-                            }}
-                          />
-                        )
-                      )
-                    : MonthDays.map((item, index) => (
-                        <Button
-                          key={index + "monthday"}
-                          title={index + 1 + ""}
-                          type={
-                            selectedDays.indexOf(index + 1) > -1
-                              ? "selected"
-                              : "plain"
-                          }
-                          fontSize={AppFontSize.xs}
-                          style={{
-                            height: 40,
-                            borderRadius: 100,
-                            marginRight: 10
-                          }}
-                          onPress={() => {
-                            setSelectedDays((days) => {
-                              if (days.indexOf(index + 1) > -1) {
-                                days.splice(days.indexOf(index + 1), 1);
-                                return [...days];
-                              }
-                              days.push(index + 1);
-                              return [...days];
-                            });
-                          }}
-                        />
-                      ))}
-              </ScrollView>
-              {selectDayError ? (
-                <Paragraph
-                  size={AppFontSize.xs}
-                  style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
-                    color: colors.error.icon
-                  }}
-                >
-                  <AppIcon
-                    color={colors.error.accent}
-                    name="alert-circle-outline"
-                    size={AppFontSize.sm - 1}
-                  />{" "}
-                  {selectDayError}
-                </Paragraph>
-              ) : null}
-            </View>
-          ) : null}
+            <FormInput
+              name="description"
+              validators={[]}
+              formRef={formRef}
+              label={strings.reminderShortDetail()}
+              defaultValue={
+                reminder ? reminder?.description : referencedItem?.headline
+              }
+              fwdRef={descriptionRef}
+              placeholder={strings.reminderDetailsPlaceholder()}
+              containerStyle={{
+                maxHeight: 100
+              }}
+              multiline
+              textAlignVertical="top"
+              inputStyle={{
+                minHeight: 80,
+                paddingVertical: Spacing.LEVEL_2
+              }}
+              height={80}
+            />
+          </View>
 
-          {reminderMode === ReminderModes.Permanent ? null : (
-            <View
+          {/* Reminder frequency */}
+          <View style={{ gap: Spacing.LEVEL_3 }}>
+            <Heading fontSize="LG" lineHeight="100%">
+              {strings.reminderFrequency()}
+            </Heading>
+
+            <Pressable
+              type={frequencyExpanded ? "selected" : "plain-outline"}
+              onPress={() => setFrequencyExpanded((v) => !v)}
               style={{
                 width: "100%",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <DateTimePickerModal
-                isVisible={isDatePickerVisible}
-                mode="datetime"
-                minimumDate={
-                  reminderMode === "once" ? dayjs().toDate() : new Date(0)
-                }
-                onConfirm={handleConfirm}
-                onCancel={hideDatePicker}
-                isDarkModeEnabled={isDark}
-                firstDayOfWeek={weekFormat === "Mon" ? 1 : 0}
-                is24Hour={db.settings.getTimeFormat() === "24-hour"}
-                date={date || new Date(Date.now())}
-                themeVariant={isDark ? "dark" : "light"}
-              />
-
-              <DatePicker
-                date={date}
-                minimumDate={
-                  reminderMode === "once" ? dayjs().toDate() : new Date(0)
-                }
-                maximumDate={dayjs(date).add(3, "months").toDate()}
-                onDateChange={handleConfirm}
-                theme={isDark ? "dark" : "light"}
-                is24hourSource="locale"
-                locale={
-                  db.settings?.getTimeFormat() === "24-hour" ? "en_GB" : "en_US"
-                }
-                mode={
-                  reminderMode === ReminderModes.Repeat &&
-                  recurringMode !== "year"
-                    ? "time"
-                    : "datetime"
-                }
-              />
-
-              {reminderMode === ReminderModes.Repeat ? null : (
-                <Button
-                  style={{
-                    width: "100%"
-                  }}
-                  title={
-                    date
-                      ? getFormattedDate(date, "date-time")
-                      : strings.selectDate()
-                  }
-                  type={date ? "secondaryAccented" : "secondary"}
-                  icon="calendar"
-                  fontSize={AppFontSize.sm}
-                  onPress={() => {
-                    showDatePicker();
-                  }}
-                />
-              )}
-
-              {dateError ? (
-                <Paragraph
-                  size={AppFontSize.xs}
-                  style={{
-                    marginTop: DefaultAppStyles.GAP_VERTICAL,
-                    color: colors.error.icon
-                  }}
-                >
-                  <AppIcon
-                    color={colors.error.accent}
-                    name="alert-circle-outline"
-                    size={AppFontSize.sm - 1}
-                  />{" "}
-                  {dateError}
-                </Paragraph>
-              ) : null}
-            </View>
-          )}
-
-          {reminderMode === ReminderModes.Once ||
-          reminderMode === ReminderModes.Permanent ? null : (
-            <View
-              style={{
-                borderRadius: defaultBorderRadius,
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "flex-start"
+                justifyContent: "space-between",
+                gap: Spacing.LEVEL_1,
+                padding: Spacing.LEVEL_2,
+                borderRadius: Radius.S
               }}
             >
-              <>
+              <View style={{ flex: 1, gap: Spacing.LEVEL_1 }}>
+                <Heading fontFamily="MEDIUM" fontSize="MD" lineHeight="100%">
+                  {`${strings.reminderModes("repeat")}: ${
+                    currentFrequency === "once"
+                      ? strings.reminderModes("once")
+                      : strings.recurringModes(currentFrequency)
+                  }`}
+                </Heading>
                 <Paragraph
-                  size={AppFontSize.xxs}
+                  fontSize="SM"
                   color={colors.secondary.paragraph}
+                  lineHeight="120%"
                 >
-                  {recurringMode === RecurringModes.Daily
-                    ? strings.reminderRepeatStrings.day(
-                        dayjs(date).format("hh:mm A")
-                      )
-                    : recurringMode === RecurringModes.Year
-                      ? strings.reminderRepeatStrings.year(
-                          dayjs(date).format("dddd, MMMM D, h:mm A")
-                        )
-                      : selectedDays.length === 7 &&
-                          recurringMode === RecurringModes.Week
-                        ? strings.reminderRepeatStrings.week.daily(
-                            dayjs(date).format("hh:mm A")
-                          )
-                        : selectedDays.length === 0
-                          ? strings.reminderRepeatStrings[
-                              recurringMode as "week" | "month"
-                            ].selectDays()
-                          : strings.reminderRepeatStrings.repeats(
-                              repeatFrequency,
-                              recurringMode as string,
-                              getSelectedDaysText(selectedDays),
-                              dayjs(date).format("hh:mm A")
-                            )}
+                  {strings.reminderFrequencyDescription(currentFrequency)}
                 </Paragraph>
-              </>
-            </View>
-          )}
+              </View>
+              <AppIcon
+                name={frequencyExpanded ? "chevron-up" : "chevron-down"}
+                iconFamily="notesnook"
+                size={12}
+                color={colors.primary.icon}
+              />
+            </Pressable>
 
-          {reminderMode === ReminderModes.Permanent ? null : (
-            <ScrollView
-              style={{
-                flexDirection: "row",
-                height: 50
-              }}
-              horizontal
-            >
-              {Object.keys(ReminderNotificationModes).map((mode) => (
-                <Button
-                  key={mode}
-                  title={strings.reminderNotificationModes(
-                    mode as keyof typeof ReminderNotificationModes
-                  )}
+            {frequencyExpanded ? (
+              <>
+                <View
                   style={{
-                    marginRight: 12,
-                    paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: Spacing.LEVEL_2
                   }}
-                  icon={
-                    mode === "Silent"
-                      ? "minus-circle"
-                      : mode === "Vibrate"
-                        ? "vibrate"
-                        : "volume-high"
+                >
+                  {FrequencyModes.map((mode) => {
+                    const selected = currentFrequency === mode;
+                    return (
+                      <Pressable
+                        key={mode}
+                        type={selected ? "selected" : "transparent"}
+                        onPress={() => selectFrequency(mode)}
+                        style={{
+                          width: "auto",
+                          alignSelf: "flex-start",
+                          paddingHorizontal: Spacing.LEVEL_3,
+                          paddingVertical: Spacing.LEVEL_1,
+                          borderRadius: Radius.XS,
+                          borderWidth: selected ? 0 : 1,
+                          borderColor: colors.primary.border
+                        }}
+                      >
+                        <Heading
+                          fontFamily="MEDIUM"
+                          fontSize="SM"
+                          lineHeight="100%"
+                          color={
+                            selected
+                              ? colors.primary.heading
+                              : colors.secondary.paragraph
+                          }
+                        >
+                          {mode === "once"
+                            ? strings.reminderModes("once")
+                            : strings.recurringModes(mode)}
+                        </Heading>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                {showDaySelector ? (
+                  <View style={{ gap: Spacing.LEVEL_2 }}>
+                    <Paragraph
+                      fontSize="SM"
+                      color={colors.primary.paragraph}
+                      lineHeight="100%"
+                    >
+                      {recurringMode === "month"
+                        ? strings.selectDate()
+                        : strings.reminderSelectDays()}
+                    </Paragraph>
+                    <View>
+                      <ScrollView
+                        horizontal
+                        contentContainerStyle={{
+                          gap: Spacing.LEVEL_1
+                        }}
+                      >
+                        {recurringMode === "week"
+                          ? (weekFormat === "Mon" ? WeekDaysMon : WeekDays).map(
+                              (day) => {
+                                const selected = selectedDays.indexOf(day) > -1;
+                                return (
+                                  <Pressable
+                                    key={day + "weekday"}
+                                    type={selected ? "selected" : "transparent"}
+                                    onPress={() => toggleDay(day)}
+                                    style={{
+                                      width: 35,
+                                      height: 32,
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                      borderRadius: Radius.XS,
+                                      borderWidth: selected ? 0 : 1,
+                                      borderColor: colors.primary.border
+                                    }}
+                                  >
+                                    <Heading
+                                      fontFamily={
+                                        selected ? "SEMI_BOLD" : "MEDIUM"
+                                      }
+                                      fontSize="SM"
+                                      lineHeight="100%"
+                                      color={
+                                        selected
+                                          ? colors.primary.accent
+                                          : colors.secondary.paragraph
+                                      }
+                                    >
+                                      {strings.weekDayNamesShort[
+                                        day as keyof typeof strings.weekDayNamesShort
+                                      ]().charAt(0)}
+                                    </Heading>
+                                  </Pressable>
+                                );
+                              }
+                            )
+                          : MonthDays.map((_, index) => {
+                              const day = index + 1;
+                              const selected = selectedDays.indexOf(day) > -1;
+                              return (
+                                <Pressable
+                                  key={day + "monthday"}
+                                  type={selected ? "selected" : "transparent"}
+                                  onPress={() => toggleDay(day)}
+                                  style={{
+                                    width: 35,
+                                    height: 32,
+                                    borderRadius: Radius.XS,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    borderWidth: selected ? 0 : 1,
+                                    borderColor: colors.primary.border
+                                  }}
+                                >
+                                  <Heading
+                                    fontFamily={
+                                      selected ? "SEMI_BOLD" : "MEDIUM"
+                                    }
+                                    fontSize="SM"
+                                    lineHeight="100%"
+                                    color={
+                                      selected
+                                        ? colors.primary.accent
+                                        : colors.secondary.paragraph
+                                    }
+                                  >
+                                    {day}
+                                  </Heading>
+                                </Pressable>
+                              );
+                            })}
+                      </ScrollView>
+                    </View>
+                    {selectDayError ? (
+                      <Paragraph fontSize="XS" color={colors.error.icon}>
+                        <AppIcon
+                          color={colors.error.accent}
+                          name="alert-circle-outline"
+                          size={AppFontSize.sm - 1}
+                        />{" "}
+                        {selectDayError}
+                      </Paragraph>
+                    ) : (
+                      <Paragraph
+                        fontSize="SM"
+                        color={colors.primary.paragraph}
+                        lineHeight="100%"
+                        style={{ fontStyle: "italic" }}
+                      >
+                        {recurringMode === "month"
+                          ? strings.reminderSelecetDateHelp()
+                          : strings.reminderSelectedDayHelp()}
+                      </Paragraph>
+                    )}
+                  </View>
+                ) : null}
+              </>
+            ) : null}
+          </View>
+
+          {/* Date & time */}
+          <View style={{ gap: Spacing.LEVEL_3 }}>
+            <Heading fontSize="LG" lineHeight="100%">
+              {showDatePicker
+                ? strings.selectDateAndTime()
+                : strings.selectTimeHeading()}
+            </Heading>
+            <View style={{ flexDirection: "row", gap: Spacing.LEVEL_2 }}>
+              {showDatePicker ? (
+                <DateTimeField
+                  value={
+                    dateSelected
+                      ? getFormattedDate(date, "date")
+                      : strings.selectDatesPlaceholder()
                   }
-                  fontSize={AppFontSize.xs}
-                  height={35}
-                  type={
-                    reminderNotificationMode ===
-                    ReminderNotificationModes[
-                      mode as keyof typeof ReminderNotificationModes
-                    ]
-                      ? "selectedAccent"
-                      : "plain"
-                  }
-                  onPress={() => {
-                    const _mode = ReminderNotificationModes[
-                      mode as keyof typeof ReminderNotificationModes
-                    ] as Reminder["priority"];
-                    SettingsService.set({
-                      reminderNotificationMode: _mode
-                    });
-                    setReminderNotificatioMode(_mode);
-                  }}
+                  placeholder={!dateSelected}
+                  icon="calendar-dots"
+                  onPress={() => openPicker("date")}
                 />
-              ))}
-            </ScrollView>
-          )}
+              ) : null}
+              <DateTimeField
+                value={
+                  timeSelected
+                    ? getFormattedDate(date, "time")
+                    : strings.selectTimePlaceholder()
+                }
+                placeholder={!timeSelected}
+                icon="clock"
+                onPress={() => openPicker("time")}
+              />
+            </View>
+            {dateError ? (
+              <Paragraph fontSize="XS" color={colors.error.icon}>
+                <AppIcon
+                  color={colors.error.accent}
+                  name="alert-circle-outline"
+                  size={AppFontSize.sm - 1}
+                />{" "}
+                {dateError}
+              </Paragraph>
+            ) : null}
+          </View>
 
-          <ReminderTime
-            reminder={reminder}
-            style={{
-              width: "100%",
-              justifyContent: "flex-start",
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-              alignSelf: "flex-start"
-            }}
-          />
+          {/* More options */}
+          <View style={{ gap: Spacing.LEVEL_3 }}>
+            <Pressable
+              type={moreOptionsExpanded ? "selected" : "transparent"}
+              onPress={() => setMoreOptionsExpanded((v) => !v)}
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: Spacing.LEVEL_2,
+                borderRadius: Radius.S,
+                borderWidth: moreOptionsExpanded ? 0 : 1,
+                borderColor: colors.primary.border
+              }}
+            >
+              <Heading fontSize="MD" lineHeight="100%">
+                {strings.moreOptions()}
+              </Heading>
+              <AppIcon
+                name={moreOptionsExpanded ? "chevron-up" : "chevron-down"}
+                iconFamily="notesnook"
+                size={12}
+                color={colors.primary.icon}
+              />
+            </Pressable>
 
+            {moreOptionsExpanded ? (
+              <>
+                {Platform.OS !== "ios" ? (
+                  <Pressable
+                    type="secondary"
+                    onPress={() => setAllDay((v) => !v)}
+                    style={{
+                      width: "100%",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: Spacing.LEVEL_1,
+                      padding: Spacing.LEVEL_2,
+                      borderRadius: Radius.S
+                    }}
+                  >
+                    <View style={{ flex: 1, gap: Spacing.LEVEL_1 }}>
+                      <Heading fontSize="MD" lineHeight="100%">
+                        {strings.allDayReminder()}
+                      </Heading>
+                      <Paragraph
+                        fontSize="SM"
+                        color={colors.secondary.paragraph}
+                        lineHeight="120%"
+                      >
+                        {strings.allDayReminderDescription()}
+                      </Paragraph>
+                    </View>
+                    <AppIcon
+                      name={allDay ? "toggle-on" : "toggle-off"}
+                      iconFamily="notesnook"
+                      size={40}
+                      color={
+                        allDay
+                          ? [colors.primary.accent, colors.primary.background]
+                          : [colors.disabled.icon, colors.primary.background]
+                      }
+                    />
+                  </Pressable>
+                ) : null}
+
+                <View style={{ gap: Spacing.LEVEL_3 }}>
+                  <Heading fontSize="MD" lineHeight="100%">
+                    {strings.alertMode()}
+                  </Heading>
+                  <View style={{ flexDirection: "row", gap: Spacing.LEVEL_2 }}>
+                    {Object.keys(ReminderNotificationModes).map((key) => {
+                      const value =
+                        ReminderNotificationModes[
+                          key as keyof typeof ReminderNotificationModes
+                        ];
+                      const selected = reminderNotificationMode === value;
+                      return (
+                        <Button
+                          key={key}
+                          title={strings.reminderNotificationModes(
+                            key as keyof typeof ReminderNotificationModes
+                          )}
+                          icon={
+                            key === "Silent"
+                              ? "minus-circle"
+                              : key === "Vibrate"
+                                ? "vibrate"
+                                : "volume-high"
+                          }
+                          iconSize={AppFontSize.md}
+                          fontSize={AppFontSize.sm}
+                          bold={false}
+                          type={selected ? "selected" : "plain-outline"}
+                          style={{
+                            flex: 1,
+                            width: "auto",
+                            paddingVertical: Spacing.LEVEL_3
+                          }}
+                          onPress={() => {
+                            SettingsService.set({
+                              reminderNotificationMode: value
+                            });
+                            setReminderNotificatioMode(value);
+                          }}
+                        />
+                      );
+                    })}
+                  </View>
+                </View>
+              </>
+            ) : null}
+          </View>
+
+          {/* Referenced notes */}
           {referencedNotes &&
           referencedNotes.status === "fulfilled" &&
           referencedNotes.value !== null &&
           referencedNotes.value?.length > 0 ? (
             <View
               style={{
-                gap: DefaultAppStyles.GAP_VERTICAL
+                gap: Spacing.LEVEL_2
               }}
             >
-              <Heading size={AppFontSize.md}>{strings.referencedIn()}</Heading>
+              <Heading fontSize="MD" lineHeight="100%">
+                {strings.referencedIn()}
+              </Heading>
               {referencedNotes.value.map((item) => (
                 <Pressable
                   key={item.id}
                   style={{
                     justifyContent: "space-between",
                     flexDirection: "row",
-                    paddingHorizontal: DefaultAppStyles.GAP,
-                    paddingVertical: DefaultAppStyles.GAP_VERTICAL
+                    alignItems: "center",
+                    paddingHorizontal: Spacing.LEVEL_3,
+                    paddingVertical: Spacing.LEVEL_2,
+                    borderRadius: Radius.S
                   }}
                   onPress={() => {
                     Navigation.navigate("FluidPanelsView");
@@ -724,8 +754,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                   <TimeSince
                     style={{
                       fontSize: AppFontSize.xxs,
-                      color: colors.secondary.paragraph,
-                      marginRight: 6
+                      color: colors.secondary.paragraph
                     }}
                     time={item.dateEdited}
                     updateFrequency={
@@ -737,8 +766,81 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
             </View>
           ) : null}
         </ScrollView>
+
+        {/* Bottom sticky action */}
+        <View
+          style={{
+            paddingHorizontal: Spacing.LEVEL_3,
+            paddingVertical: Spacing.LEVEL_3,
+            borderTopWidth: 1,
+            borderTopColor: colors.primary.border,
+            backgroundColor: colors.primary.background
+          }}
+        >
+          <Button
+            title={strings.createReminder()}
+            type="accent"
+            width="100%"
+            fontSize={AppFontSize.md}
+            style={{
+              paddingVertical: Spacing.LEVEL_3,
+              borderRadius: Radius.S
+            }}
+            onPress={saveReminder}
+          />
+        </View>
       </KeyboardViewIOS>
     </SafeAreaView>
+  );
+}
+
+type DateTimeFieldProps = {
+  value: string;
+  placeholder: boolean;
+  icon: string;
+  onPress: () => void;
+};
+
+function DateTimeField({
+  value,
+  placeholder,
+  icon,
+  onPress
+}: DateTimeFieldProps) {
+  const { colors } = useThemeColors();
+  return (
+    <Pressable
+      type="secondary"
+      onPress={onPress}
+      style={{
+        flex: 1,
+        width: "auto",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: Spacing.LEVEL_1,
+        paddingHorizontal: Spacing.LEVEL_2,
+        paddingVertical: Spacing.LEVEL_3,
+        borderRadius: Radius.S
+      }}
+    >
+      <Paragraph
+        fontSize="SM"
+        lineHeight="100%"
+        color={
+          placeholder ? colors.primary.placeholder : colors.primary.paragraph
+        }
+        numberOfLines={1}
+      >
+        {value}
+      </Paragraph>
+      <AppIcon
+        name={icon}
+        iconFamily="notesnook"
+        size={16}
+        color={colors.secondary.icon}
+      />
+    </Pressable>
   );
 }
 

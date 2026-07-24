@@ -17,21 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { presentDialog } from "../../components/dialog/functions";
 import { Header } from "../../components/header";
 import List from "../../components/list";
+import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrash, useTrashStore } from "../../stores/use-trash-store";
-import SelectionHeader from "../../components/selection-header";
-import { strings } from "@notesnook/intl";
 
 const onPressFloatingButton = () => {
   presentDialog({
@@ -39,6 +40,10 @@ const onPressFloatingButton = () => {
     paragraph: strings.clearTrashDesc(),
     positiveText: strings.clear(),
     negativeText: strings.cancel(),
+    centered: true,
+    icon: "warning-circle",
+    iconType: "error",
+    iconFamily: "notesnook",
     positivePress: async () => {
       await db.trash?.clear();
       useTrashStore.getState().refresh();
@@ -49,7 +54,7 @@ const onPressFloatingButton = () => {
         context: "local"
       });
     },
-    positiveType: "errorShade"
+    positiveType: "accent"
   });
 };
 const PLACEHOLDER_DATA = (trashCleanupInterval = 7) => ({
@@ -85,6 +90,9 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         id={route.name}
         canGoBack={false}
         hasSearch={true}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
         onSearch={() => {
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(route.name),

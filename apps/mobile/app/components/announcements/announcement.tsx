@@ -71,7 +71,7 @@ export const Announcement = () => {
               alignItems: "center",
               paddingHorizontal: DefaultAppStyles.GAP,
               borderBottomWidth: 1,
-              borderBottomColor: colors.primary.border,
+              borderBottomColor: colors.primary.separator,
               paddingBottom: DefaultAppStyles.GAP_VERTICAL_SMALL
             }}
           >

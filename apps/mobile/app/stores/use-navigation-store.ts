@@ -20,12 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   Color,
   FilteredSelector,
+  HistorySession,
   Item,
+  ItemReference,
   ItemType,
   Note,
   Notebook,
   Reminder,
-  Tag
+  Tag,
+  TrashOrItem
 } from "@notesnook/core";
 import { ParamListBase } from "@react-navigation/core";
 import { create } from "zustand";
@@ -113,6 +116,8 @@ export interface RouteParams extends ParamListBase {
     referenceType: "notebook" | "tag" | "reminder" | "note";
     relationType: "to" | "from";
     title: string;
+    listEmptyTitle?: string;
+    listEmptyParagraph?: string;
     onAdd?: () => void;
   };
   Intro: GenericRouteParam;
@@ -122,6 +127,22 @@ export interface RouteParams extends ParamListBase {
     state?: BillingState;
   };
   Wrapped: GenericRouteParam;
+  Attachments: {
+    note?: Note;
+  };
+  References: {
+    reference: ItemReference;
+  };
+  NoteHistory: {
+    note: Note;
+  };
+  NotePreview: {
+    note: TrashOrItem<Note>;
+    session?: HistorySession & { session: string };
+  };
+  AddReference: {
+    resolverId: string;
+  };
 }
 
 export type RouteName = keyof RouteParams;

@@ -17,16 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { KeyboardTypeOptions, TextInput } from "react-native";
+import { KeyboardTypeOptions, TextInput, TextInputProps } from "react-native";
 import { eSendEvent } from "../../services/event-manager";
 import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 import { ButtonProps } from "../ui/button";
 import { FieldValidator, FormRef } from "../ui/input/form-input";
 import { RefObject } from "react";
+import { IconProps } from "../ui/AppIcon";
+import { PressableProps } from "../ui/pressable";
 
 export type DialogInfo = {
   title?: string;
   paragraph?: string;
+  centered?: boolean;
   positiveText: string;
   negativeText: string;
   background?: string;
@@ -34,16 +37,10 @@ export type DialogInfo = {
   statusBarTranslucent?: boolean;
   positivePress?: (...args: any[]) => Promise<any>;
   onClose?: () => void;
-  positiveType?:
-    | "transparent"
-    | "plain"
-    | "secondary"
-    | "accent"
-    | "inverted"
-    | "shade"
-    | "error"
-    | "errorShade";
+  positiveType?: PressableProps["type"];
   icon?: string;
+  iconFamily?: IconProps["iconFamily"];
+  iconType?: "error" | "normal";
   paragraphColor: string;
   form?: {
     formRef: FormRef;
@@ -54,10 +51,12 @@ export type DialogInfo = {
       validators: FieldValidator[];
       defaultValue?: string;
       ref: RefObject<TextInput | null>;
+      inputProps?: TextInputProps;
     }[];
-    onFormSubmit?: (form: FormRef) => Promise<boolean>;
+    onFormSubmit?: (form: FormRef, checked?: boolean) => Promise<boolean>;
   };
   input: boolean;
+  inputLabel?: string;
   inputPlaceholder: string;
   defaultValue: string;
   // eslint-disable-next-line @typescript-eslint/ban-types

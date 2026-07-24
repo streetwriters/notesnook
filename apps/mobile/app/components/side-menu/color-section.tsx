@@ -32,6 +32,7 @@ import { useSideBarDraggingStore } from "./dragging-store";
 import { MenuItem } from "./menu-item";
 import { Default_Drag_Action } from "../../hooks/use-actions";
 
+
 export const ColorSection = React.memo(
   function ColorSection() {
     const [colorNotes] = useMenuStore((state) => [
@@ -75,8 +76,8 @@ export const ColorSection = React.memo(
         >
           <View
             style={{
-              width: size - 5,
-              height: size - 5,
+              width: 10,
+              height: 10,
               backgroundColor: (item.data as Color).colorCode,
               borderRadius: 100
             }}
