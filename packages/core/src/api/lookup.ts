@@ -155,6 +155,12 @@ export default class Lookup {
           ? await this.db.notebooks.all.ids()
           : [];
 
+      if (
+        (!!tag?.length && tag.length !== tagIds.length) ||
+        (!!color?.length && color.length !== colorIds.length)
+      )
+        return emptySearchResults();
+
       const defaultVault = await this.db.vaults.default();
       notes = notes.where((eb) => {
         const exprs = [];
@@ -1211,4 +1217,13 @@ function highlightRegexMatches(
 
 function removeDiacritics(s: string) {
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function emptySearchResults() {
+  return new VirtualizedGrouping<HighlightedResult>(
+    0,
+    20,
+    () => Promise.resolve([]),
+    () => Promise.resolve({ ids: [], items: [] })
+  );
 }
