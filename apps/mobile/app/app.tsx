@@ -23,7 +23,7 @@ import {
   THEME_COMPATIBILITY_VERSION,
   useThemeEngineStore
 } from "@notesnook/theme";
-import React, { PropsWithChildren, useEffect } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import { Appearance, I18nManager, Linking, StatusBar } from "react-native";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -44,25 +44,35 @@ import { useUserStore } from "./stores/use-user-store";
 import RNBootSplash from "react-native-bootsplash";
 import AppLocked from "./components/app-lock";
 import { useSettingStore } from "./stores/use-setting-store";
+import {
+  initShortcutListener,
+  launchNewNoteTab,
+  registerAppShortcuts
+} from "./hooks/use-shortcut-manager";
+import Shortcuts from "react-native-actions-shortcuts";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
+
 const { appLockEnabled, appLockMode } = SettingsService.get();
 if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
-RNBootSplash.hide({
-  fade: true
-});
-Linking.getInitialURL().then((url) => {
-  useSettingStore.setState({
-    initialUrl: url
-  });
-});
+
 const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
+  const introCompleted = useSettingStore(
+    (state) => state.settings.introCompleted
+  );
+
+  useEffect(() => {
+    if (introCompleted) {
+      registerAppShortcuts();
+    }
+  }, [introCompleted]);
+
   useEffect(() => {
     SettingsService.onFirstLaunch();
     changeSystemBarColors();
@@ -176,4 +186,38 @@ export const withTheme = (
   };
 };
 
-export default withTheme(withErrorBoundry(App, "App"));
+export const withStartupBoundry = (
+  Element: (props: PropsWithChildren) => JSX.Element
+) => {
+  return function AppWithStartupBoundary(props: PropsWithChildren) {
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+      async function init() {
+        const [url, shortcut] = await Promise.all([
+          Linking.getInitialURL(),
+          Shortcuts.getInitialShortcut()
+        ]);
+        if (shortcut?.type === "notesnook.action.newnote") {
+          launchNewNoteTab();
+        }
+        useSettingStore.setState({
+          initialUrl: url,
+          pendingShortcut: shortcut ?? null
+        });
+
+        initShortcutListener();
+        await RNBootSplash.hide({ fade: true });
+        setReady(true);
+      }
+
+      init();
+    }, []);
+
+    if (!ready) return null;
+
+    return <Element {...props} />;
+  };
+};
+
+export default withStartupBoundry(withTheme(withErrorBoundry(App, "App")));

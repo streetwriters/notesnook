@@ -20,8 +20,9 @@ import { Note, Reminder } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  BackHandler,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -63,6 +64,7 @@ import FormInput, {
   validators
 } from "../../components/ui/input/form-input";
 import AppIcon from "../../components/ui/AppIcon";
+import { presentDialog } from "../../components/dialog/functions";
 
 const ReminderModes =
   Platform.OS === "ios"
@@ -94,7 +96,7 @@ const ReminderNotificationModes = {
 };
 
 export default function AddReminder(props: NavigationProps<"AddReminder">) {
-  const { reminder, reference } = props.route.params;
+  const { reminder, reference } = props.route.params ?? {};
   useNavigationFocus(props.navigation, {
     focusOnInit: true,
     onFocus: () => {
@@ -106,6 +108,23 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
       return false;
     }
   });
+  const handleBackNavigation = useCallback(() => {
+    const routes = props.navigation.getState()?.routes;
+    if (routes && routes.length <= 1) {
+      props.navigation.navigate("FluidPanelsView" as any);
+      return true;
+    }
+    Navigation.goBack();
+    return true;
+  }, [props.navigation]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      return handleBackNavigation();
+    });
+    return () => sub.remove();
+  }, [handleBackNavigation]);
+
   const { colors, isDark } = useThemeColors();
   const weekFormat = useSettingStore((state) => state.weekFormat);
   const [reminderMode, setReminderMode] = useState<Reminder["mode"]>(
@@ -127,6 +146,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   const [repeatFrequency, setRepeatFrequency] = useState(1);
   const referencedItem = reference ? (reference as Note) : null;
   const recurringReminderFeature = useIsFeatureAvailable("recurringReminders");
+  const activeReminderFeature = useIsFeatureAvailable("activeReminders");
   const formRef = useRef(
     createFormRef({
       title: reminder?.title || referencedItem?.title || "",
@@ -153,6 +173,31 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
   );
   const [dateError, setDateError] = useState<string>();
   const [selectDayError, setSelectDayError] = useState<string>();
+  React.useEffect(() => {
+    const shortcut = useSettingStore.getState().pendingShortcut;
+    if (shortcut?.type === "notesnook.action.newreminder") {
+      useSettingStore.setState({
+        pendingShortcut: null
+      });
+    }
+  }, []);
+  useEffect(() => {
+    if (activeReminderFeature === undefined) return;
+    if (!activeReminderFeature.isAllowed) {
+      presentDialog({
+        title: strings.upgrade(),
+        paragraph: activeReminderFeature.error,
+        positiveText: strings.upgrade(),
+        negativeText: strings.cancel(),
+        positivePress: async () => {
+          PaywallSheet.present(activeReminderFeature);
+        },
+        onClose: () => {
+          props.navigation.navigate("FluidPanelsView" as any);
+        }
+      });
+    }
+  }, [activeReminderFeature]);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -267,12 +312,12 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
         <Header
           title={reminder ? strings.editReminder() : strings.newReminder()}
           canGoBack
+          onLeftMenuButtonPress={handleBackNavigation}
           rightButton={{
             name: "check",
             onPress: saveReminder
           }}
         />
-        <Dialog context="local" />
         <ScrollView
           style={{
             marginBottom: DDS.isTab ? 25 : undefined,
