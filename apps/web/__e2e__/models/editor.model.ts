@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { Locator, Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { TabItemModel } from "./tab-item.model";
+import { NoteLinkingDialogModel } from "./note-linking-dialog.model";
 import { iterateList } from "./utils";
 
 export class EditorModel {
@@ -256,6 +257,14 @@ export class EditorModel {
     return format === "html"
       ? await this.content.innerHTML()
       : (await this.content.innerText()).trim().replace(/\n+/gm, "\n");
+  }
+
+  async openNoteLinkDialog() {
+    await this.content.click();
+    await this.content.press("ControlOrMeta+Shift+KeyK");
+    const dialog = new NoteLinkingDialogModel(this.page);
+    await dialog.waitFor();
+    return dialog;
   }
 
   async enterFocusMode() {

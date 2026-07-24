@@ -34,8 +34,9 @@ import {
   ResolvedItem,
   useIsFeatureAvailable
 } from "@notesnook/common";
-import { Lock } from "../components/icons";
+import { Lock, Plus } from "../components/icons";
 import { ellipsize } from "@notesnook/core";
+import { store as noteStore } from "../stores/note-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { Virtuoso } from "react-virtuoso";
@@ -51,6 +52,8 @@ export const NoteLinkingDialog = DialogManager.register(
   function NoteLinkingDialog(props: NoteLinkingDialogProps) {
     const { attributes } = props;
     const [notes, setNotes] = useState<VirtualizedGrouping<NoteType>>();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [hasExactMatch, setHasExactMatch] = useState(false);
     const [selectedNote, setSelectedNote] = useState<NoteType>();
     const [isNoteLocked, setIsNoteLocked] = useState(false);
     const [blocks, setBlocks] = useState<ContentBlock[]>([]);
@@ -62,6 +65,7 @@ export const NoteLinkingDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
+        testId="note-linking-dialog"
         title={
           attributes ? strings.editInternalLink() : strings.newInternalLink()
         }
@@ -126,6 +130,8 @@ export const NoteLinkingDialog = DialogManager.register(
                   setIsNoteLocked(false);
                   setFilteredBlocks(undefined);
                   setBlocks([]);
+                  setSearchQuery("");
+                  setHasExactMatch(false);
                 }}
               >
                 {strings.linkNoteSelectedNote()}: {selectedNote.title} (
@@ -221,19 +227,60 @@ export const NoteLinkingDialog = DialogManager.register(
             <>
               <Field
                 autoFocus
+                data-test-id="link-note-search"
                 placeholder={strings.searchNoteToLinkPlaceholder()}
                 sx={{ mx: 0 }}
                 onChange={async (e) => {
                   const query = e.target.value.trim();
+                  setSearchQuery(query);
                   setNotes(
                     query
-                      ? await db.lookup.notes(e.target.value).sorted()
+                      ? await db.lookup.notes(`title: ${query}`).sorted()
                       : await db.notes.all.sorted(
                           db.settings.getGroupOptions("home")
                         )
                   );
+                  if (!query) return setHasExactMatch(false);
+                  // Only offer to create a note when no existing note already has
+                  // this exact title. The notes.title column is COLLATE NOCASE, so
+                  // this "==" comparison is a case-insensitive full-string match.
+                  const existing = await db.notes.all.find((eb) =>
+                    eb("notes.title", "==", query)
+                  );
+                  setHasExactMatch(!!existing);
                 }}
               />
+              {searchQuery.length > 0 && !hasExactMatch ? (
+                <Button
+                  variant="menuitem"
+                  data-test-id="create-linked-note"
+                  sx={{
+                    p: 1,
+                    mt: 1,
+                    width: "100%",
+                    textAlign: "left",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexShrink: 0,
+                    color: "accent",
+                    borderBottom: "1px solid var(--border)"
+                  }}
+                  onClick={async () => {
+                    const id = await db.notes.add({ title: searchQuery });
+                    await noteStore.refresh();
+                    props.onClose({
+                      title: searchQuery,
+                      href: createInternalLink("note", id)
+                    });
+                  }}
+                >
+                  <Plus size={14} color="accent" />
+                  <Text variant="body">
+                    {strings.createNoteToLink(searchQuery)}
+                  </Text>
+                </Button>
+              ) : null}
               {notes && (
                 <Virtuoso
                   data={notes.placeholders}
