@@ -2743,8 +2743,6 @@ Continue without attachments?`,
       contexts: ["trash"]
     }
   ],
-  filterNotebooks: () => t`Filter notebooks...`,
-  filterTags: () => t`Filter tags...`,
   searchForNotes: () => t`Search for notes`,
   enterNoteTitle: () => t`Enter note title`,
   enterTagTitle: () => t`Enter title of tag`,
@@ -2758,7 +2756,6 @@ Continue without attachments?`,
     plural(count, { one: "# column", other: "# columns" }),
   totalRows: (count: number) =>
     plural(count, { one: "# row", other: "# rows" }),
-  selectAll: () => t`Select all`,
   home: () => t`Home`,
   tags: () => t`Tags`,
   featureNotAvailableOnPlan: (feature: string) =>
@@ -3440,11 +3437,6 @@ Continue without attachments?`,
   dataAndStorage: () => t`Data and storage`,
   accountActions: () => t`Account actions`,
   subscriptionRequired: () => t`Subscription required`,
-  claimPromotion: {
-    clickHere: () => t`Click here`,
-    toClaim: () => t`to claim the promotion directly.`
-  },
-  navigation: () => t`Navigation`,
   storageAndCleanup: () => t`Storage & cleanup`,
   alwaysAsk: () => t`Always ask`,
   updates: () => t`Updates`,

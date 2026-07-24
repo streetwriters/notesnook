@@ -299,9 +299,9 @@ const Partner = ({
                     }
                   }}
                 >
-                  {strings.claimPromotion.clickHere()}{" "}
+                  {strings.claimPromotion[0]()}{" "}
                   <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
-                    {strings.claimPromotion.toClaim()}
+                    {strings.claimPromotion[1]()}
                   </Paragraph>
                 </Paragraph>
               ) : null}
