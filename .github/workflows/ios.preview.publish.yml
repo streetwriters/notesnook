@@ -71,46 +71,88 @@ jobs:
             i=$((i + 1))
           done
 
-      - name: Export signed IPA
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      # Sign the unsigned archive by hand. `xcodebuild -exportArchive` re-signs
+      # from the archive's `archived-expanded-entitlements.xcent`, which an
+      # unsigned archive does not contain, so it dropped the App Group and the
+      # app crashed on launch. Instead we sign each bundle directly, taking the
+      # entitlements from each provisioning profile (exactly what Apple
+      # provisioned -- App Group, keychain groups with the right team prefix).
+      # Runs on macOS but executes NO fork build phases, so it stays trusted.
+      - name: Sign IPA
         run: |
           set -euo pipefail
-          EXPORT_PLIST="$RUNNER_TEMP/ExportOptions.plist"
-          cp apps/mobile/ios/ExportOptionsStaging.plist "$EXPORT_PLIST"
-          # Augment the checked-in profile map with the fields exportArchive needs.
-          /usr/libexec/PlistBuddy -c "Add :method string ad-hoc" "$EXPORT_PLIST" 2>/dev/null \
-            || /usr/libexec/PlistBuddy -c "Set :method ad-hoc" "$EXPORT_PLIST"
-          /usr/libexec/PlistBuddy -c "Add :signingStyle string manual" "$EXPORT_PLIST" 2>/dev/null || true
-          /usr/libexec/PlistBuddy -c "Add :signingCertificate string Apple Distribution" "$EXPORT_PLIST" 2>/dev/null || true
-          /usr/libexec/PlistBuddy -c "Add :teamID string $APPLE_TEAM_ID" "$EXPORT_PLIST" 2>/dev/null \
-            || /usr/libexec/PlistBuddy -c "Set :teamID $APPLE_TEAM_ID" "$EXPORT_PLIST"
+          PROFILES="$HOME/Library/MobileDevice/Provisioning Profiles"
+          APP="$(find "$RUNNER_TEMP/Notesnook.xcarchive/Products/Applications" -maxdepth 1 -name '*.app' | head -n1)"
+          [ -n "$APP" ] || { echo "::error::No .app in archive"; exit 1; }
 
-          xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/Notesnook.xcarchive" \
-            -exportOptionsPlist "$EXPORT_PLIST" \
-            -exportPath "$RUNNER_TEMP/export"
+          # Single Apple Distribution identity from the imported keychain.
+          IDENTITY="$(security find-identity -v -p codesigning | awk '/Apple Distribution/{print $2; exit}')"
+          [ -n "$IDENTITY" ] || { echo "::error::No Apple Distribution identity found"; exit 1; }
+          echo "Signing identity: $IDENTITY"
 
-          # Normalize the IPA name for the distribution job.
-          IPA="$(find "$RUNNER_TEMP/export" -name '*.ipa' | head -n1)"
-          cp "$IPA" "$RUNNER_TEMP/Notesnook.ipa"
+          TMP="$RUNNER_TEMP/sign"; mkdir -p "$TMP"
 
-          # Fail fast if the App Group entitlement didn't survive re-signing.
-          # Its absence is what crashes the app at launch (MMKV nil group path),
-          # so never distribute a build without it.
-          WORK="$RUNNER_TEMP/verify"
-          mkdir -p "$WORK"
-          unzip -q "$RUNNER_TEMP/Notesnook.ipa" -d "$WORK"
-          APP="$(find "$WORK/Payload" -maxdepth 1 -name '*.app' | head -n1)"
-          echo "::group::Signed app entitlements"
-          codesign -d --entitlements :- "$APP" 2>/dev/null || codesign -d --entitlements - "$APP"
-          echo "::endgroup::"
-          if codesign -d --entitlements :- "$APP" 2>/dev/null | grep -q "group.org.streetwriters.notesnook"; then
-            echo "App Group entitlement present."
-          else
-            echo "::error::Exported app is missing the App Group entitlement; it would crash on launch."
-            exit 1
+          # Decode a profile's bundle id (application-identifier minus team prefix).
+          profile_bundle_id() {
+            security cms -D -i "$1" -o "$TMP/_p.plist" 2>/dev/null
+            local appid; appid="$(plutil -extract Entitlements.application-identifier raw -o - "$TMP/_p.plist")"
+            echo "${appid#*.}"
+          }
+          # Find the profile matching a bundle id; echoes its path.
+          profile_for() {
+            local want="$1" p
+            for p in "$PROFILES"/*.mobileprovision; do
+              [ -e "$p" ] || continue
+              [ "$(profile_bundle_id "$p")" = "$want" ] && { echo "$p"; return 0; }
+            done
+            return 1
+          }
+          # Embed the matching profile and sign a bundle with the profile's entitlements.
+          sign_bundle() {
+            local bundle="$1" bid prof ent
+            bid="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$bundle/Info.plist")"
+            prof="$(profile_for "$bid")" || { echo "::error::No provisioning profile for $bid"; exit 1; }
+            ent="$TMP/ent-$bid.plist"
+            security cms -D -i "$prof" -o "$TMP/_p.plist"
+            plutil -extract Entitlements xml1 -o "$ent" "$TMP/_p.plist"
+            cp "$prof" "$bundle/embedded.mobileprovision"
+            echo "Signing $(basename "$bundle") ($bid)"
+            codesign --force --sign "$IDENTITY" --entitlements "$ent" "$bundle"
+          }
+
+          # Sign inside-out: nested code first, then extensions, then the app.
+          if [ -d "$APP/Frameworks" ]; then
+            find "$APP/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -print0 \
+              | while IFS= read -r -d '' f; do codesign --force --sign "$IDENTITY" "$f"; done
           fi
+          if [ -d "$APP/PlugIns" ]; then
+            for appex in "$APP/PlugIns"/*.appex; do
+              [ -e "$appex" ] || continue
+              if [ -d "$appex/Frameworks" ]; then
+                find "$appex/Frameworks" -maxdepth 1 \( -name '*.framework' -o -name '*.dylib' \) -print0 \
+                  | while IFS= read -r -d '' f; do codesign --force --sign "$IDENTITY" "$f"; done
+              fi
+              sign_bundle "$appex"
+            done
+          fi
+          sign_bundle "$APP"
+
+          codesign --verify --deep --strict --verbose=2 "$APP"
+
+          # Package into an IPA.
+          rm -rf "$TMP/Payload"; mkdir -p "$TMP/Payload"
+          cp -R "$APP" "$TMP/Payload/"
+          ( cd "$TMP" && zip -qry "$RUNNER_TEMP/Notesnook.ipa" Payload )
+
+          # Fail fast if the App Group didn't make it into the signed app -- its
+          # absence is the launch crash (MMKV nil group path). Never distribute
+          # a build without it.
+          echo "::group::Signed app entitlements"
+          codesign -d --entitlements :- "$APP" 2>/dev/null || true
+          echo "::endgroup::"
+          codesign -d --entitlements :- "$APP" 2>/dev/null | grep -q "group.org.streetwriters.notesnook" \
+            || { echo "::error::Signed app is missing the App Group entitlement; it would crash on launch."; exit 1; }
+          echo "App Group entitlement present."
 
       - name: Upload signed IPA
         uses: actions/upload-artifact@v4
