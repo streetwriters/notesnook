@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React, { useEffect, useState } from "react";
-import { FlatList, Platform, View } from "react-native";
+import { ActivityIndicator, FlatList, Platform, View } from "react-native";
 import NotificationSounds, {
   playSampleSound,
   Sound,
@@ -34,6 +34,10 @@ import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../../utils/size";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { Header } from "../../../components/header";
+import LineSeparator from "../../../components/ui/seperator/line-separator";
+import { sleep } from "../../../utils/time";
+import { Spacing } from "../../../common/design/spacing";
 
 const SoundItem = ({
   playingSoundId,
@@ -127,43 +131,80 @@ const SoundItem = ({
 };
 
 export default function SoundPicker() {
+  const { colors } = useThemeColors();
   const [sounds, setSounds] = useState<Sound[]>([]);
   const [ringtones, setRingtones] = useState<Sound[]>([]);
   const [playing, setPlaying] = useState<Sound | undefined>();
+  const [loading, setLoading] = useState(true);
   const notificationSound = useSettingStore(
     (state) => state.settings.notificationSound
   );
 
   useEffect(() => {
-    NotificationSounds.getNotifications("ringtone").then((results) =>
-      setRingtones([
-        {
-          soundID: "defaultSound",
-          title: strings.defaultSound(),
-          url: ""
-        },
-        ...results
-      ])
-    );
-    NotificationSounds.getNotifications("notification").then((results) =>
-      setSounds([...results])
-    );
+    async function getSounds() {
+      try {
+        const ringtones = await NotificationSounds.getNotifications("ringtone");
+        const sounds =
+          await NotificationSounds.getNotifications("notification");
+        setRingtones([
+          {
+            soundID: "defaultSound",
+            title: strings.defaultSound(),
+            url: ""
+          },
+          ...ringtones
+        ]);
+        setSounds([...sounds]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getSounds();
   }, []);
 
   return (
-    <View>
-      <FlatList
-        data={[...sounds, ...ringtones]}
-        renderItem={({ item, index }) => (
-          <SoundItem
-            playingSoundId={playing?.soundID}
-            selectedSoundId={notificationSound?.soundID}
-            item={item}
-            index={index}
-            setPlaying={setPlaying}
-          />
-        )}
+    <View
+      style={{
+        flex: 1
+      }}
+    >
+      <Header
+        title={strings.changeNotificationSound()}
+        canGoBack
+        style={{
+          backgroundColor: "transparent"
+        }}
       />
+      <LineSeparator />
+
+      {loading ? (
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            gap: Spacing.LEVEL_2,
+            flex: 1
+          }}
+        >
+          <ActivityIndicator size="small" color={colors.primary.accent} />
+          <Paragraph color={colors.secondary.paragraph}>
+            {strings.loading()}
+          </Paragraph>
+        </View>
+      ) : (
+        <FlatList
+          data={[...sounds, ...ringtones]}
+          renderItem={({ item, index }) => (
+            <SoundItem
+              playingSoundId={playing?.soundID}
+              selectedSoundId={notificationSound?.soundID}
+              item={item}
+              index={index}
+              setPlaying={setPlaying}
+            />
+          )}
+        />
+      )}
     </View>
   );
 }

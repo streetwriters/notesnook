@@ -90,7 +90,7 @@ export const productivityGroup: SettingSection = {
               validators: [
                 validators.number(),
                 validators.custom((value) => {
-                  return value < 4
+                  return value < 5
                     ? strings.valueMustBeGreaterThan("4")
                     : undefined;
                 })
@@ -110,6 +110,7 @@ export const productivityGroup: SettingSection = {
               name: strings.changeNotificationSound(),
               description: strings.changeNotificationSoundDesc(),
               component: "sound-picker",
+              hideHeader: true,
               icon: "speaker-high",
               iconFamily: "notesnook",
               hidden: () => Platform.OS === "android"

@@ -1547,7 +1547,12 @@ $day$: Current day (eg. Monday)`,
   enterNotebookDescription: () => t`Enter notebook description`,
   searchNotebooks: () => t`Search notebooks`,
   enterNewEmail: () => t`Enter your new email`,
+  enterEmail: () => t`Enter email`,
   verifyNewEmail: () => t`Enter verification code sent to your new email`,
+  verifyCurrentEmail: () => t`Verify your current email`,
+  verifyCurrentEmailDesc: () =>
+    t`We've sent a verification code to your new email. Enter it below to continue.`,
+  enterCode: () => t`Enter code`,
   issueTitlePlaceholder: () => t`Tell us what happened`,
   issuePlaceholder: () => t`Tell us more about the issue you are facing.
 
@@ -3040,5 +3045,6 @@ Continue without attachments?`,
     t`Changes from other devices won't be updated in the editor in real-time.`,
   disableSync: () => t`Disable sync`,
   disableSyncDesc: () =>
-    t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`
+    t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`,
+  noNotesToExport: () => t`No notes to export`
 };

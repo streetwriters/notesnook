@@ -18,25 +18,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import { db } from "../../../common/database";
+import { Spacing } from "../../../common/design/spacing";
 import { Button } from "../../../components/ui/button";
 import FormInput, {
   createFormRef,
   validators
 } from "../../../components/ui/input/form-input";
+import Heading from "../../../components/ui/typography/heading";
+import Paragraph from "../../../components/ui/typography/paragraph";
 import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { eUserLoggedIn } from "../../../utils/events";
-import { DefaultAppStyles } from "../../../utils/styles";
-import { Spacing } from "../../../common/design/spacing";
-import { PASSWORD_PLACEHOLDER } from "../../../utils/constants";
 
 enum EmailChangeSteps {
   verify,
   changeEmail
 }
+
+const RESEND_TIMEOUT = 30;
 
 export const ChangeEmail = () => {
   const { colors } = useThemeColors();
@@ -49,9 +51,29 @@ export const ChangeEmail = () => {
     })
   );
   const [loading, setLoading] = useState(false);
+  const [resendSeconds, setResendSeconds] = useState(RESEND_TIMEOUT);
   const emailInputRef = useRef<TextInput>(null);
   const passInputRef = useRef<TextInput>(null);
   const codeInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (step !== EmailChangeSteps.changeEmail || resendSeconds <= 0) return;
+    const timer = setTimeout(() => {
+      setResendSeconds((seconds) => seconds - 1);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [step, resendSeconds]);
+
+  const onResend = useCallback(async () => {
+    if (resendSeconds > 0) return;
+    try {
+      const { email } = formRef.current.getValues();
+      await db.user?.sendVerificationEmail(email);
+      setResendSeconds(RESEND_TIMEOUT);
+    } catch (e) {
+      formRef.current.setError("code", (e as Error).message);
+    }
+  }, [resendSeconds]);
 
   const onSubmit = async () => {
     try {
@@ -67,6 +89,7 @@ export const ChangeEmail = () => {
         if (!verified) throw new Error(strings.passwordIncorrect());
         await db.user?.sendVerificationEmail(email);
         setStep(EmailChangeSteps.changeEmail);
+        setResendSeconds(RESEND_TIMEOUT);
         formRef.current.clearErrors();
         formRef.current.setValue("code", "");
         setLoading(false);
@@ -113,67 +136,98 @@ export const ChangeEmail = () => {
         gap: Spacing.LEVEL_4
       }}
     >
-      <View
-        style={{
-          gap: Spacing.LEVEL_2
-        }}
-      >
-        {step === EmailChangeSteps.verify ? (
-          <>
-            <FormInput
-              name="email"
-              formRef={formRef}
-              label={strings.enterNewEmail()}
-              fwdRef={emailInputRef}
-              placeholder={"you@example.com"}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              validators={[
-                validators.required(strings.emailRequired()),
-                validators.email(strings.enterValidEmail())
-              ]}
-              onSubmitEditing={() => {
-                passInputRef.current?.focus();
-              }}
-            />
-            <FormInput
-              name="password"
-              label={strings.password()}
-              formRef={formRef}
-              fwdRef={passInputRef}
-              placeholder={PASSWORD_PLACEHOLDER}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="password"
-              validators={[validators.required(strings.passwordRequired())]}
-              onSubmitEditing={onSubmit}
-            />
-          </>
-        ) : (
-          <>
-            <FormInput
-              name="code"
-              formRef={formRef}
-              fwdRef={codeInputRef}
-              placeholder={strings.code()}
-              keyboardType="number-pad"
-              autoCapitalize="none"
-              autoCorrect={false}
-              maxLength={6}
-              validators={[
-                validators.required(strings.enterSixDigitCode()),
-                (value: string) =>
-                  /^\d{6}$/.test(value.trim())
-                    ? undefined
-                    : strings.enterSixDigitCode()
-              ]}
-              onSubmitEditing={onSubmit}
-            />
-          </>
-        )}
-      </View>
+      {step === EmailChangeSteps.verify ? (
+        <View
+          style={{
+            gap: Spacing.LEVEL_2
+          }}
+        >
+          <FormInput
+            name="email"
+            formRef={formRef}
+            label={strings.enterNewEmail()}
+            fwdRef={emailInputRef}
+            placeholder={strings.enterEmail()}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            validators={[
+              validators.required(strings.emailRequired()),
+              validators.email(strings.enterValidEmail())
+            ]}
+            onSubmitEditing={() => {
+              passInputRef.current?.focus();
+            }}
+          />
+          <FormInput
+            name="password"
+            label={strings.enterAccountPassword()}
+            formRef={formRef}
+            fwdRef={passInputRef}
+            placeholder={strings.password()}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="password"
+            validators={[validators.required(strings.passwordRequired())]}
+            onSubmitEditing={onSubmit}
+          />
+        </View>
+      ) : (
+        <View
+          style={{
+            gap: Spacing.LEVEL_4
+          }}
+        >
+          <View
+            style={{
+              gap: Spacing.LEVEL_1
+            }}
+          >
+            <Heading fontSize="MD" lineHeight="100%">
+              {strings.verifyCurrentEmail()}
+            </Heading>
+            <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+              {strings.verifyCurrentEmailDesc()}
+            </Paragraph>
+          </View>
+          <FormInput
+            name="code"
+            formRef={formRef}
+            label={strings.enterCode()}
+            fwdRef={codeInputRef}
+            placeholder={strings.code()}
+            keyboardType="number-pad"
+            autoCapitalize="none"
+            autoCorrect={false}
+            maxLength={6}
+            validators={[
+              validators.required(strings.enterSixDigitCode()),
+              (value: string) =>
+                /^\d{6}$/.test(value.trim())
+                  ? undefined
+                  : strings.enterSixDigitCode()
+            ]}
+            onSubmitEditing={onSubmit}
+          />
+          <Paragraph
+            fontSize="SM"
+            onPress={onResend}
+            style={{
+              marginTop: -Spacing.LEVEL_1
+            }}
+            color={
+              resendSeconds > 0
+                ? colors.secondary.paragraph
+                : colors.primary.accent
+            }
+          >
+            {resendSeconds > 0
+              ? strings.resend2faCode(`${resendSeconds}`)
+              : strings.resendCode()}
+          </Paragraph>
+        </View>
+      )}
 
       <Button
         title={
@@ -181,7 +235,7 @@ export const ChangeEmail = () => {
             ? undefined
             : step === EmailChangeSteps.verify
               ? strings.continue()
-              : strings.changeEmail()
+              : strings.verify()
         }
         type="accent"
         style={{
