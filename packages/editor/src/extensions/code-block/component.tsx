@@ -236,8 +236,27 @@ type LanguageSelectorProps = {
   onClose: () => void;
 };
 function LanguageSelector(props: LanguageSelectorProps) {
-  const { onLanguageSelected, selectedLanguage, onClose } = props;
-  const [languages, setLanguages] = useState(Languages);
+  const { selectedLanguage, onClose } = props;
+  const recentlyUsed =
+    config.get<Record<string, number>>("recentlyUsedCodeBlockLanguages", {}) ??
+    {};
+
+  const [languages, setLanguages] = useState(() =>
+    [...Languages].sort((a, b) => {
+      const aCount = recentlyUsed[a.filename] || 0;
+      const bCount = recentlyUsed[b.filename] || 0;
+      if (aCount !== bCount) return bCount - aCount;
+      return 0;
+    })
+  );
+
+  const onLanguageSelected = (language: string) => {
+    props.onLanguageSelected(language);
+    config.set("recentlyUsedCodeBlockLanguages", {
+      ...recentlyUsed,
+      [language]: Date.now()
+    });
+  };
 
   return (
     <Popup onClose={onClose}>
