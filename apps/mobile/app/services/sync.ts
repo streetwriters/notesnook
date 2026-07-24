@@ -63,6 +63,11 @@ const run = async (
 
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async () => {
+    if (useUserStore.getState().isLoggingOut) {
+      DatabaseLogger.info("Sync skipped — user is logging out");
+      return;
+    }
+
     const userstore = useUserStore.getState();
     userstore.setSyncing(true);
     const user = await db.user.getUser();
