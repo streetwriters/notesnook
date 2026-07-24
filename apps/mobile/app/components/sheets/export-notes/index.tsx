@@ -382,6 +382,13 @@ const ExportNotesSheet = ({
 
 ExportNotesSheet.present = async (ids?: string[], allNotes?: boolean) => {
   const exportNoteIds = allNotes ? await db.notes.all?.ids() : ids || [];
+  if (!exportNoteIds.length) {
+    ToastManager.show({
+      message: strings.noNotesToExport(),
+      type: "info"
+    });
+    return;
+  }
   presentSheet({
     component: (ref, close, update) => (
       <ExportNotesSheet ids={exportNoteIds} update={update} close={close} />
