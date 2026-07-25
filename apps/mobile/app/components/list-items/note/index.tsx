@@ -134,7 +134,7 @@ const NoteItem = ({
     {
       condition: item.readonly,
       testID: "pencil-lock",
-      name: "pencil-lock",
+      name: "pencil-simple-slash",
       color: primaryColors.icon
     },
     {
