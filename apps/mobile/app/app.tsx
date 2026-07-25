@@ -74,6 +74,7 @@ const App = (props: { configureMode: "note-preview" }) => {
   }, [introCompleted]);
 
   useEffect(() => {
+    RNBootSplash.hide({ fade: true });
     SettingsService.onFirstLaunch();
     changeSystemBarColors();
     SettingsService.setPrivacyScreen(
@@ -194,21 +195,24 @@ export const withStartupBoundry = (
 
     useEffect(() => {
       async function init() {
-        const [url, shortcut] = await Promise.all([
-          Linking.getInitialURL(),
-          Shortcuts.getInitialShortcut()
-        ]);
-        if (shortcut?.type === "notesnook.action.newnote") {
-          launchNewNoteTab();
-        }
-        useSettingStore.setState({
-          initialUrl: url,
-          pendingShortcut: shortcut ?? null
-        });
+        try {
+          const [url, shortcut] = await Promise.all([
+            Linking.getInitialURL(),
+            Shortcuts.getInitialShortcut()
+          ]);
+          console.log(url, shortcut);
+          if (shortcut?.type === "notesnook.action.newnote") {
+            launchNewNoteTab();
+          }
+          useSettingStore.setState({
+            initialUrl: url,
+            pendingShortcut: shortcut ?? null
+          });
 
-        initShortcutListener();
-        await RNBootSplash.hide({ fade: true });
-        setReady(true);
+          initShortcutListener();
+        } finally {
+          setReady(true);
+        }
       }
 
       init();
