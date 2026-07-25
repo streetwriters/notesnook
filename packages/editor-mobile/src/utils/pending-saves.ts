@@ -23,13 +23,14 @@ class PendingSaveRequests {
   static TITLES = "pendingTitles";
   static CONTENT = "pendingContents";
 
-  async setTitle(value: any) {
+  async setTitle(value: any, editedAt: number) {
     const pendingTitles = JSON.parse(
       this.get(PendingSaveRequests.TITLES) || "[]"
     );
 
     (pendingTitles as any[]).push({
       id: randId("title-pending"),
+      editedAt,
       params: value
     });
     return localStorage.setItem(
@@ -45,13 +46,14 @@ class PendingSaveRequests {
     return pendingTitles;
   }
 
-  async setContent(value: any) {
+  async setContent(value: any, editedAt: number) {
     const pendingContents = JSON.parse(
       this.get(PendingSaveRequests.CONTENT) || "[]"
     );
 
     (pendingContents as any[]).push({
       id: randId("content-pending"),
+      editedAt,
       params: value
     });
     return localStorage.setItem(
@@ -118,7 +120,10 @@ class PendingSaveRequests {
       const pendingTitles = await this.getPendingTitles();
       this.remove(PendingSaveRequests.TITLES);
       for (const pending of pendingTitles) {
-        if (pending.params[0]) pending.params[0].pendingChanges = true;
+        if (pending.params[0]) {
+          pending.params[0].pendingChanges = true;
+          pending.params[0].pendingChangesAt = pending.editedAt;
+        }
         await postAsyncWithTimeout(EditorEvents.title, ...pending.params);
       }
     };
@@ -127,7 +132,10 @@ class PendingSaveRequests {
       const pendingContents = await this.getPendingContent();
       this.remove(PendingSaveRequests.CONTENT);
       for (const pending of pendingContents) {
-        if (pending.params[0]) pending.params[0].pendingChanges = true;
+        if (pending.params[0]) {
+          pending.params[0].pendingChanges = true;
+          pending.params[0].pendingChangesAt = pending.editedAt;
+        }
         await postAsyncWithTimeout(EditorEvents.content, ...pending.params);
       }
     };

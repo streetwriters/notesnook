@@ -411,16 +411,20 @@ export const useEditorEvents = (
         .getState()
         .getNoteIdForTab(editorMessage.tabId);
 
+      const saveNoteId = editorMessage.noteId || noteId;
+
       switch (editorMessage.type) {
         case EditorEvents.content:
           DatabaseLogger.log("EditorEvents.content");
           editor.saveContent({
             type: editorMessage.type,
             content: editorMessage.value.html as string,
-            noteId: noteId,
+            noteId: saveNoteId,
+            sourceNoteId: editorMessage.noteId,
             tabId: editorMessage.tabId,
             ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit,
-            pendingChanges: editorMessage.value?.pendingChanges
+            pendingChanges: editorMessage.value?.pendingChanges,
+            pendingChangesAt: editorMessage.value?.pendingChangesAt
           });
           break;
         case EditorEvents.title:
@@ -428,10 +432,12 @@ export const useEditorEvents = (
           editor.saveContent({
             type: editorMessage.type,
             title: editorMessage.value?.title as string,
-            noteId: noteId,
+            noteId: saveNoteId,
+            sourceNoteId: editorMessage.noteId,
             tabId: editorMessage.tabId,
             ignoreEdit: false,
-            pendingChanges: editorMessage.value?.pendingChanges
+            pendingChanges: editorMessage.value?.pendingChanges,
+            pendingChangesAt: editorMessage.value?.pendingChangesAt
           });
           break;
         case EditorEvents.logger:
