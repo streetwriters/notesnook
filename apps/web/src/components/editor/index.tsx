@@ -252,16 +252,6 @@ const MemoizedEditorView = React.memo(EditorView, (prev, next) => {
     prev.session.activeSearchResultId === next.session.activeSearchResultId &&
     prev.session.nonce === next.session.nonce;
 
-  if (
-    "attachmentsLength" in prev.session &&
-    "attachmentsLength" in next.session
-  ) {
-    return (
-      baseConditions &&
-      prev.session.attachmentsLength === next.session.attachmentsLength
-    );
-  }
-
   if ("note" in prev.session && "note" in next.session) {
     return (
       baseConditions &&
