@@ -357,7 +357,7 @@ export const FailedInboxItems = () => {
                       title: strings.delete(),
                       paragraph: strings.areYouSure(),
                       positiveText: strings.delete(),
-                      positiveType: "error",
+                      positiveType: "error-shade-outline",
                       negativeText: strings.cancel(),
                       positivePress: async () => {
                         try {
