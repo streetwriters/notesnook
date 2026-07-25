@@ -24,6 +24,8 @@ import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 import { EditorView } from "@tiptap/pm/view";
 import { useEditorSearchStore } from "../toolbar/stores/search-store.js";
 
+import { TiptapOptions } from "../index.js";
+
 function useForceUpdate() {
   const [, setValue] = useState(0);
 
@@ -31,7 +33,7 @@ function useForceUpdate() {
 }
 
 export const useEditor = (
-  options: Partial<EditorOptions> = {},
+  options: Partial<TiptapOptions> = {},
   deps: DependencyList = []
 ) => {
   const editor = useMemo<Editor>(() => new Editor(options), []);
@@ -58,7 +60,9 @@ export const useEditor = (
       if (oldIsFocused && !editor.isFocused) editor.commands.focus();
       options.onCreate?.({ editor: editor });
 
-      const { searchTerm, ...searchOptions } = useEditorSearchStore.getState();
+      const { searchTerm, ...searchOptions } = options.id
+        ? useEditorSearchStore.getState().getSearchState(options.id)
+        : useEditorSearchStore.getState().getSearchState("");
       if (!searchOptions.isSearching) {
         editor.commands.endSearch();
       } else {

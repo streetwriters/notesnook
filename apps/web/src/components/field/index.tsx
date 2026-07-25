@@ -61,6 +61,8 @@ function Field(props: FieldProps) {
     inputRef,
     validate,
     disabled,
+    leftActions: _leftActions,
+    rightActions: _rightActions,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);

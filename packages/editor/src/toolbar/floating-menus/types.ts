@@ -18,4 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor } from "../../types.js";
-export type FloatingMenuProps = { editor: Editor };
+export type FloatingMenuProps = {
+  editor: Editor;
+  toolbarRef?: React.RefObject<HTMLDivElement>;
+  editorId?: string;
+};

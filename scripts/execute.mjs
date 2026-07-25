@@ -34,7 +34,7 @@ for (let i = 2; i < process.argv.length; i++) {
     const isLong = arg.startsWith("--");
     const [key, value] = isLong ? arg.split("=") : [arg[1], null];
     const flag = isLong ? key.slice(2) : shortFlags[key];
-    if (!args[flag]) args._.push(arg);
+    if (!(flag in args)) args._.push(arg);
     else if (Array.isArray(args[flag]))
       args[flag] = value
         ? value.split(",")

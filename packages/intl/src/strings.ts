@@ -2806,5 +2806,8 @@ Continue without attachments?`,
   deleteVersion: () => doActions.delete.version(1),
   deleteVersionConfirmation: () =>
     actionConfirmations.permanentlyDelete.version(1),
-  versionDeleted: () => actions.deleted.version(1)
+  versionDeleted: () => actions.deleted.version(1),
+  splitRight: () => t`Split right`,
+  splitDown: () => t`Split down`,
+  menu: () => t`Menu`
 };

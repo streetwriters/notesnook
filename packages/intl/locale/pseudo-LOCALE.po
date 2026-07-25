@@ -1659,7 +1659,7 @@ msgstr ""
 msgid "Clear default notebook"
 msgstr ""
 
-#: src/strings.ts:2800
+#: src/strings.ts:2803
 msgid "Clear history"
 msgstr ""
 
@@ -2300,7 +2300,7 @@ msgstr ""
 msgid "Delete all"
 msgstr ""
 
-#: src/strings.ts:2802
+#: src/strings.ts:2805
 msgid "Delete all version history for this note?"
 msgstr ""
 
@@ -4196,6 +4196,10 @@ msgstr ""
 
 #: src/strings.ts:1781
 msgid "Member since {date}"
+msgstr ""
+
+#: src/strings.ts:2812
+msgid "Menu"
 msgstr ""
 
 #: src/strings.ts:2307
@@ -6491,6 +6495,14 @@ msgstr ""
 msgid "Split cells"
 msgstr ""
 
+#: src/strings.ts:2811
+msgid "Split down"
+msgstr ""
+
+#: src/strings.ts:2810
+msgid "Split right"
+msgstr ""
+
 #: src/strings.ts:2472
 msgid "Stable"
 msgstr ""
@@ -7503,7 +7515,7 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: src/strings.ts:2801
+#: src/strings.ts:2804
 msgid "Version history cleared"
 msgstr ""
 

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useEffect, useRef, useState } from "react";
 import { FloatingMenuProps } from "./types.js";
 import { SearchReplacePopup } from "../popups/search-replace.js";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
@@ -24,18 +25,58 @@ import { getToolbarElement } from "../utils/dom.js";
 import { useEditorSearchStore } from "../stores/search-store.js";
 
 export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
-  const { editor } = props;
-  const isSearching = useEditorSearchStore((store) => store.isSearching);
+  const { editor, editorId, toolbarRef } = props;
+  const isSearching = useEditorSearchStore((store) =>
+    editorId ? store.getSearchState(editorId).isSearching : false
+  );
+  const [hasFocus, setHasFocus] = useState(
+    editor.isFocused || editor.storage.isSearchFocused
+  );
+  const popupContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onFocus() {
+      setHasFocus(true);
+    }
+    function onBlur({ event }: { event: FocusEvent }) {
+      if (
+        event?.relatedTarget &&
+        (popupContainerRef.current?.contains(event.relatedTarget as Node) ||
+          (event.relatedTarget as HTMLElement).closest(".popup-presenter"))
+      ) {
+        return;
+      }
+      setHasFocus(false);
+    }
+
+    editor.on("focus", onFocus);
+    editor.on("blur", onBlur);
+    return () => {
+      editor.off("focus", onFocus);
+      editor.off("blur", onBlur);
+    };
+  }, [editor]);
+
+  // wait for the ref to be available
+  useEffect(() => {
+    if (editor.isFocused) setHasFocus(true);
+  }, [popupContainerRef.current, editor.isFocused]);
+
+  useEffect(() => {
+    if (isSearching) setHasFocus(true);
+  }, [isSearching]);
+
+  if (!isSearching) return null;
 
   return (
     <ResponsivePresenter
       mobile="sheet"
       desktop="popup"
       scope="dialog"
-      isOpen={isSearching}
+      isOpen={isSearching && hasFocus}
       onClose={() => editor.commands.endSearch()}
       position={{
-        target: getToolbarElement(),
+        target: toolbarRef?.current || getToolbarElement(editorId),
         isTargetAbsolute: true,
         location: "below",
         align: "end",
@@ -44,8 +85,27 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
       blocking={false}
       focusOnRender={false}
       draggable={false}
+      shouldCloseOnOverlayClick={false}
     >
-      <SearchReplacePopup editor={editor} />
+      <div
+        ref={popupContainerRef}
+        onFocus={() => setHasFocus(true)}
+        onBlur={(e) => {
+          if (
+            e.relatedTarget &&
+            (e.relatedTarget === editor.view.dom ||
+              popupContainerRef.current?.contains(e.relatedTarget) ||
+              (e.relatedTarget as HTMLElement).closest(".popup-presenter"))
+          ) {
+            return;
+          }
+          setHasFocus(false);
+        }}
+        tabIndex={-1}
+        style={{ outline: "none" }}
+      >
+        <SearchReplacePopup editor={editor} editorId={editorId} />
+      </div>
     </ResponsivePresenter>
   );
 }
