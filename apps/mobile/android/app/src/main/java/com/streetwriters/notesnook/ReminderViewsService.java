@@ -42,11 +42,24 @@ class ReminderRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
 
     @Override
     public void onDataSetChanged() {
-        reminders.clear();
         SharedPreferences preferences = context.getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        reminders = gson.fromJson(preferences.getString("remindersList","[]"), new TypeToken<List<Reminder>>(){}.getType());
+        List<Reminder> stored = null;
+        try {
+            Gson gson = new Gson();
+            stored = gson.fromJson(preferences.getString("remindersList", "[]"), new TypeToken<List<Reminder>>(){}.getType());
+        } catch (Exception e) {
+            Log.e("Reminders", "Could not read the stored reminders list", e);
+        }
 
+        List<Reminder> updated = new ArrayList<Reminder>();
+        if (stored != null) {
+            for (Reminder reminder : stored) {
+                if (WidgetUtils.isReminderActive(reminder)) {
+                    updated.add(reminder);
+                }
+            }
+        }
+        reminders = updated;
     }
 
     @Override
@@ -71,7 +84,7 @@ class ReminderRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactor
         if (!useMiniLayout) {
                views.setTextViewText(R.id.reminder_description, reminder.getDescription());
         }
-        views.setTextViewText(R.id.reminder_time, reminder.getFormattedTime());
+        views.setTextViewText(R.id.reminder_time, WidgetUtils.formatReminderTime(context, reminder));
         final Intent fillInIntent = new Intent();
         final Bundle extras = new Bundle();
         extras.putString(ReminderViewsService.OpenReminderId, reminder.getId());

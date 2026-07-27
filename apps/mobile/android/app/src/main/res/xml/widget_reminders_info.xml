@@ -9,6 +9,6 @@
     android:targetCellHeight="2"
     android:resizeMode="horizontal|vertical"
     android:previewImage="@drawable/reminder_preview"
-    android:updatePeriodMillis="1024"
+    android:updatePeriodMillis="1800000"
     android:widgetCategory="home_screen"
     />
