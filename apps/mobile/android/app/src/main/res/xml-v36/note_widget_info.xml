@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  Keep this in sync with res/xml/note_widget_info.xml. It exists only to add not_keyguard: from
+  Android 16 QPR1 widgets are lock screen eligible by default, and this one renders the note's
+  title and preview text, which should not be readable on a locked device.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialKeyguardLayout="@layout/note_widget"
+    android:initialLayout="@layout/note_widget"
+    android:configure="com.streetwriters.notesnook.NotePreviewConfigureActivity"
+    android:widgetFeatures="reconfigurable"
+    android:minResizeWidth="100dp"
+    android:minResizeHeight="50dp"
+    android:minWidth="400dp"
+    android:description="@string/note_description"
+    android:minHeight="50dp"
+    android:targetCellWidth="5"
+    android:targetCellHeight="1"
+    android:previewImage="@drawable/note_widget_preview"
+    android:previewLayout="@layout/note_widget_preview"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="86400000"
+    android:widgetCategory="home_screen|not_keyguard"/>
