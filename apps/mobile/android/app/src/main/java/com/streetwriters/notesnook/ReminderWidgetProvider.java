@@ -8,15 +8,21 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
+import androidx.core.widget.RemoteViewsCompat;
+
+import com.streetwriters.notesnook.datatypes.Reminder;
+
+import java.util.List;
+
 public class ReminderWidgetProvider extends AppWidgetProvider {
     static String NewReminder = "com.streetwriters.notesnook.NewReminder";
+    static String OpenReminderId = "com.streetwriters.notesnook.OpenReminderId";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_reminders);
             updateAppWidget(context, appWidgetManager, appWidgetId, views);
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list_view);
         }
     }
 
@@ -35,10 +41,28 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
         PendingIntent pendingIntent2 = PendingIntent.getActivity(context, appWidgetId, new_reminder_intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE, WidgetUtils.getActivityOptionsBundle());
         views.setOnClickPendingIntent(R.id.add_button, pendingIntent2);
 
-        Intent list_remote_adapter_intent = new Intent(context, ReminderViewsService.class);
-        list_remote_adapter_intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        views.setRemoteAdapter(R.id.widget_list_view, list_remote_adapter_intent);
+        // The rows travel with the update itself, so there is no bound service to keep in sync and
+        // nothing to invalidate separately: every update redraws from the current data.
+        List<Reminder> reminders = WidgetUtils.getActiveReminders(context);
+        RemoteViewsCompat.RemoteCollectionItems.Builder items =
+                new RemoteViewsCompat.RemoteCollectionItems.Builder();
+        for (Reminder reminder : reminders) {
+            items.addItem(getItemId(reminder), WidgetUtils.createReminderItem(context, reminder));
+        }
+        // Two, because a reminder without a description uses the compact row layout.
+        items.setViewTypeCount(2);
+        items.setHasStableIds(true);
+
+        RemoteViewsCompat.setRemoteAdapter(context, views, appWidgetId, R.id.widget_list_view, items.build());
         views.setEmptyView(R.id.widget_list_view, R.id.empty_view);
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    /**
+     * Ties a row to its reminder rather than to its position, so rows keep their identity when the
+     * list shifts around them.
+     */
+    private static long getItemId(Reminder reminder) {
+        return reminder.getId() == null ? 0 : reminder.getId().hashCode();
     }
 }

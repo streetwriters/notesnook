@@ -2,18 +2,87 @@ package com.streetwriters.notesnook;
 
 import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.util.Log;
+import android.widget.RemoteViews;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.streetwriters.notesnook.datatypes.Reminder;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Shared helpers for the home screen widgets.
  */
 public class WidgetUtils {
+
+    static final String PREFERENCES = "appPreview";
+    static final String REMINDERS_KEY = "remindersList";
+
+    /**
+     * Every row is serialized into the widget update itself, which has to fit inside a binder
+     * transaction, so the list cannot grow without bound. Far more than fits on screen anyway.
+     */
+    private static final int MAX_REMINDERS = 50;
+
+    /**
+     * The reminders the app last wrote out, minus any that have since fired. Reading and filtering
+     * happens here so the provider can push the rows straight into the widget.
+     */
+    static List<Reminder> getActiveReminders(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        List<Reminder> stored = null;
+        try {
+            stored = new Gson().fromJson(preferences.getString(REMINDERS_KEY, "[]"),
+                    new TypeToken<List<Reminder>>() {}.getType());
+        } catch (Exception e) {
+            Log.e("Reminders", "Could not read the stored reminders list", e);
+        }
+
+        List<Reminder> active = new ArrayList<>();
+        if (stored == null) return active;
+
+        for (Reminder reminder : stored) {
+            if (!isReminderActive(reminder)) continue;
+            if (active.size() >= MAX_REMINDERS) {
+                Log.w("Reminders", "Widget list truncated to " + MAX_REMINDERS + " reminders");
+                break;
+            }
+            active.add(reminder);
+        }
+        return active;
+    }
+
+    /**
+     * Builds a single row of the reminders list.
+     */
+    static RemoteViews createReminderItem(Context context, Reminder reminder) {
+        boolean useMiniLayout = reminder.getDescription() == null || reminder.getDescription().isEmpty();
+
+        RemoteViews views = new RemoteViews(context.getPackageName(),
+                useMiniLayout ? R.layout.widget_reminder_layout_small : R.layout.widget_reminder_layout);
+
+        views.setTextViewText(R.id.reminder_title, reminder.getTitle());
+        if (!useMiniLayout) {
+            views.setTextViewText(R.id.reminder_description, reminder.getDescription());
+        }
+        views.setTextViewText(R.id.reminder_time, formatReminderTime(context, reminder));
+
+        Intent fillInIntent = new Intent();
+        fillInIntent.setData(Uri.parse("https://app.notesnook.com/open_reminder?id=" + reminder.getId()));
+        fillInIntent.putExtra(RCTNNativeModule.IntentType, "OpenReminder");
+        fillInIntent.putExtra(ReminderWidgetProvider.OpenReminderId, reminder.getId());
+        views.setOnClickFillInIntent(R.id.reminder_item_btn, fillInIntent);
+        return views;
+    }
 
     /**
      * Options attached to the PendingIntents our widgets hand to the launcher, opting the creator

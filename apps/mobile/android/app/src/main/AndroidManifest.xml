@@ -231,11 +231,6 @@
             </intent-filter>
         </service>
 
-        <service
-            android:name=".ReminderViewsService"
-            android:exported="true"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
