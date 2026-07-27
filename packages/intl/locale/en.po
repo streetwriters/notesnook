@@ -6,6 +6,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
 #: src/strings.ts:2481
 msgid " \"Notebook > Notes\""
@@ -8473,8 +8479,8 @@ msgid "You are editing #{tag}"
 msgstr "You are editing #{tag}"
 
 #: src/strings.ts:1841
-msgid "You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
-msgstr "You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
+msgid "You are logging into the beta version of Notesnook. Switching between beta and stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
+msgstr "You are logging into the beta version of Notesnook. Switching between beta and stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
 
 #: src/strings.ts:1416
 msgid "You are not logged in"
