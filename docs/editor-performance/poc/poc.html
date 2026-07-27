@@ -1,0 +1,507 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font: 14px/1.5 system-ui; margin: 0; padding: 8px; }
+  .ed { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 8px; }
+  .ProseMirror { outline: none; }
+  .vpage-placeholder { background: #fafafa; color: #999; overflow: hidden; }
+  pre { background: #f4f4f4; padding: 6px; white-space: pre-wrap; }
+  .tok { color: #07a; }
+</style>
+</head>
+<body>
+<div id="host"></div>
+<script src="./pm-bundle.js"></script>
+<script>
+const {
+  EditorState, TextSelection, AllSelection, Plugin, PluginKey,
+  EditorView, Decoration, DecorationSet, serializeForClipboard,
+  Schema, DOMSerializer, keymap, baseKeymap, selectAll,
+  history, undo, redo, addListNodes, basicSchema
+} = window.PM;
+
+/* ------------------------------------------------------------------ *
+ * Schemas. `flat` = today's Notesnook shape (doc -> block+).
+ * `paged` = doc -> page+, page -> block+  (the wrapper-node variant).
+ * ------------------------------------------------------------------ */
+const baseNodes = addListNodes(basicSchema.spec.nodes, "paragraph block*", "block");
+
+const codeblockSpec = {
+  content: "text*", group: "block", code: true, defining: true, marks: "",
+  toDOM: () => ["pre", ["code", 0]],
+  parseDOM: [{ tag: "pre", preserveWhitespace: "full" }]
+};
+
+const flatSchema = new Schema({
+  nodes: baseNodes.addToEnd("codeblock_hl", codeblockSpec),
+  marks: basicSchema.spec.marks
+});
+
+const pagedSchema = new Schema({
+  nodes: baseNodes
+    .addToEnd("codeblock_hl", codeblockSpec)
+    .addToEnd("page", { content: "block+", toDOM: () => ["div", { class: "vpage" }, 0], parseDOM: [{ tag: "div.vpage" }] }),
+  marks: basicSchema.spec.marks,
+  topNode: "doc"
+});
+// rebuild paged doc content expression
+const pagedSchema2 = new Schema({
+  nodes: pagedSchema.spec.nodes.update("doc", { content: "page+" }),
+  marks: basicSchema.spec.marks
+});
+
+/* ------------------------------------------------------------------ *
+ * Document generator - representative of a heavy Notesnook note.
+ * ------------------------------------------------------------------ */
+function makeBlocks(schema, n, sentinelAt) {
+  const blocks = [];
+  for (let i = 0; i < n; i++) {
+    if (sentinelAt != null && i === sentinelAt) {
+      blocks.push(schema.node("paragraph", null, schema.text("SENTINEL_DEEP_MARKER_" + i)));
+      continue;
+    }
+    const kind = i % 10;
+    if (kind === 3) {
+      // heavy code block: 40 lines -> nodeView renders ~ 1 span per token
+      const lines = [];
+      for (let l = 0; l < 40; l++) lines.push("function foo" + l + "(a, b) { return a + b * " + l + "; }");
+      blocks.push(schema.node("codeblock_hl", null, schema.text(lines.join("\n"))));
+    } else if (kind === 6) {
+      const items = [];
+      for (let l = 0; l < 8; l++) {
+        items.push(schema.node("list_item", null,
+          schema.node("paragraph", null, schema.text("list item " + i + "." + l + " with some reasonably long text content here"))));
+      }
+      blocks.push(schema.node("bullet_list", null, items));
+    } else if (kind === 8) {
+      blocks.push(schema.node("heading", { level: 2 }, schema.text("Section heading number " + i)));
+    } else {
+      blocks.push(schema.node("paragraph", null, schema.text(
+        "Paragraph " + i + ": " + "the quick brown fox jumps over the lazy dog. ".repeat(4))));
+    }
+  }
+  return blocks;
+}
+
+function makeFlatDoc(n, sentinelAt) {
+  return flatSchema.node("doc", null, makeBlocks(flatSchema, n, sentinelAt));
+}
+
+function makePagedDoc(n, perPage, sentinelAt) {
+  const blocks = makeBlocks(pagedSchema2, n, sentinelAt);
+  const pages = [];
+  for (let i = 0; i < blocks.length; i += perPage) {
+    pages.push(pagedSchema2.node("page", null, blocks.slice(i, i + perPage)));
+  }
+  return pagedSchema2.node("doc", null, pages);
+}
+
+/* ------------------------------------------------------------------ *
+ * A deliberately EXPENSIVE nodeView for code blocks, standing in for
+ * refractor/prism syntax highlighting (what Notesnook actually does).
+ * ------------------------------------------------------------------ */
+let expensiveRenderCount = 0;
+function codeblockNodeView(node) {
+  expensiveRenderCount++;
+  const dom = document.createElement("pre");
+  const code = document.createElement("code");
+  dom.appendChild(code);
+  // simulate tokenisation: one span per token
+  const text = node.textContent;
+  const tokens = text.split(/(\s+)/);
+  for (const t of tokens) {
+    const s = document.createElement("span");
+    s.className = "tok";
+    s.textContent = t;
+    code.appendChild(s);
+  }
+  // NOTE: this nodeView is intentionally NOT editable-correct; it stands in
+  // for "a node whose rendering is expensive". contentDOM = code would be
+  // wrong with the spans, so we mark it atom-ish for measurement purposes.
+  return { dom, contentDOM: null, ignoreMutation: () => true, stopEvent: () => true };
+}
+
+/* ------------------------------------------------------------------ *
+ * THE VIRTUALIZATION PLUGIN
+ * Holds a visible position range; emits a node decoration on every
+ * top-level child that should be MATERIALIZED. Everything else gets a
+ * contentDOM-less placeholder nodeView.
+ * ------------------------------------------------------------------ */
+const viewportKey = new PluginKey("viewport");
+
+function viewportPlugin(targetType) {
+  return new Plugin({
+    key: viewportKey,
+    state: {
+      init: () => ({ from: 0, to: 0 }),
+      apply(tr, prev) {
+        const set = tr.getMeta(viewportKey);
+        if (set) return set;
+        return prev; // positions are doc-relative; recomputed on scroll
+      }
+    },
+    props: {
+      decorations(state) {
+        const { from, to } = viewportKey.getState(state);
+        const decos = [];
+        state.doc.forEach((child, offset) => {
+          if (targetType && child.type.name !== targetType) return;
+          const end = offset + child.nodeSize;
+          if (end > from && offset < to) {
+            decos.push(Decoration.node(offset, end, {}, { materialize: true }));
+          }
+        });
+        return DecorationSet.create(state.doc, decos);
+      }
+    }
+  });
+}
+
+// height memory so placeholders keep the scrollbar stable
+const heightMemory = new Map();
+
+function makeVirtualNodeView(key) {
+  return function (node, view, getPos, decorations) {
+    const materialize = decorations.some((d) => d.spec && d.spec.materialize);
+    const id = key(getPos());
+
+    if (materialize) {
+      const dom = document.createElement("div");
+      dom.className = "vpage";
+      const contentDOM = dom;
+      return {
+        dom,
+        contentDOM,
+        update(newNode, newDecos) {
+          if (newNode.type !== node.type) return false;
+          // mode change -> force PM to rebuild this nodeView
+          if (!newDecos.some((d) => d.spec && d.spec.materialize)) return false;
+          heightMemory.set(id, dom.offsetHeight);
+          return true;
+        },
+        destroy() {
+          if (dom.offsetHeight) heightMemory.set(id, dom.offsetHeight);
+        }
+      };
+    }
+
+    // ---- PLACEHOLDER: no contentDOM => PM renders ZERO child DOM ----
+    const dom = document.createElement("div");
+    dom.className = "vpage vpage-placeholder";
+    const h = heightMemory.get(id) || estimateHeight(node);
+    dom.style.height = h + "px";
+    dom.setAttribute("data-virtual-placeholder", "true");
+    return {
+      dom,
+      contentDOM: null,
+      update(newNode, newDecos) {
+        if (newNode.type !== node.type) return false;
+        if (newDecos.some((d) => d.spec && d.spec.materialize)) return false; // rebuild materialized
+        node = newNode;
+        dom.style.height = (heightMemory.get(id) || estimateHeight(newNode)) + "px";
+        return true;
+      },
+      ignoreMutation: () => true
+    };
+  };
+}
+
+function estimateHeight(node) {
+  // crude: 21px per ~90 chars of text, min one line per block
+  let h = 0;
+  node.forEach((child) => {
+    h += Math.max(21, Math.ceil(child.textContent.length / 90) * 21) + 8;
+  });
+  return h || 21;
+}
+
+/* ------------------------------------------------------------------ *
+ * Editor builders
+ * ------------------------------------------------------------------ */
+function buildEditor({ doc, virtualized, targetType, mountEl }) {
+  const plugins = [history(), keymap({ "Mod-z": undo, "Mod-y": redo }), keymap(baseKeymap)];
+  if (virtualized) plugins.push(viewportPlugin(targetType));
+
+  const state = EditorState.create({ doc, plugins });
+  const nodeViews = { codeblock_hl: codeblockNodeView };
+  if (virtualized) {
+    nodeViews[targetType] = makeVirtualNodeView((pos) => targetType + ":" + pos);
+  }
+  const view = new EditorView(mountEl, { state, nodeViews });
+  return view;
+}
+
+function setViewport(view, from, to) {
+  view.dispatch(view.state.tr.setMeta(viewportKey, { from, to }));
+}
+
+/* ------------------------------------------------------------------ *
+ * Measurement helpers
+ * ------------------------------------------------------------------ */
+function domNodeCount(el) {
+  let n = 0;
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_ALL);
+  while (walk.nextNode()) n++;
+  return n;
+}
+
+function mount(id) {
+  const d = document.createElement("div");
+  d.className = "ed";
+  d.id = id;
+  document.getElementById("host").appendChild(d);
+  return d;
+}
+
+function median(a) { const s = [...a].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; }
+function p95(a) { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))]; }
+
+function measureTyping(view, atPos, iterations) {
+  const times = [];
+  for (let i = 0; i < iterations; i++) {
+    const t0 = performance.now();
+    const tr = view.state.tr.insertText("x", atPos + i);
+    view.dispatch(tr); // dispatch includes updateState -> full DOM sync
+    view.dom.offsetHeight; // force layout flush so we measure real cost
+    times.push(performance.now() - t0);
+  }
+  return { median: +median(times).toFixed(3), p95: +p95(times).toFixed(3), mean: +(times.reduce((a, b) => a + b, 0) / times.length).toFixed(3) };
+}
+
+/* ------------------------------------------------------------------ *
+ * THE PROOFS
+ * ------------------------------------------------------------------ */
+window.runProofs = function (BLOCKS) {
+  const results = {};
+  const assertions = [];
+  function assert(name, cond, detail) {
+    assertions.push({ name, pass: !!cond, detail: detail === undefined ? null : detail });
+  }
+
+  const PER_PAGE = 20;
+  const SENTINEL_INDEX = Math.floor(BLOCKS * 0.9); // deep in the doc, far off-screen
+
+  // ---------- Baseline: render everything ----------
+  {
+    expensiveRenderCount = 0;
+    const el = mount("baseline");
+    const doc = makeFlatDoc(BLOCKS, SENTINEL_INDEX);
+    const t0 = performance.now();
+    const view = buildEditor({ doc, virtualized: false, mountEl: el });
+    el.offsetHeight;
+    const mountMs = performance.now() - t0;
+    results.baseline = {
+      mountMs: +mountMs.toFixed(1),
+      domNodes: domNodeCount(view.dom),
+      expensiveRenders: expensiveRenderCount,
+      docSize: view.state.doc.nodeSize,
+      textLength: view.state.doc.textContent.length,
+      typing: measureTyping(view, 1, 50)
+    };
+    results.baseline.sentinelInDOM = view.dom.textContent.includes("SENTINEL_DEEP_MARKER_");
+    window.__baselineView = view;
+  }
+
+  // ---------- Virtualized with a `page` wrapper node ----------
+  {
+    expensiveRenderCount = 0;
+    heightMemory.clear();
+    const el = mount("paged");
+    const doc = makePagedDoc(BLOCKS, PER_PAGE, SENTINEL_INDEX);
+    const t0 = performance.now();
+    const view = buildEditor({ doc, virtualized: true, targetType: "page", mountEl: el });
+    // materialize only the first ~3 pages (i.e. the initial viewport)
+    let to = 0, count = 0;
+    view.state.doc.forEach((c, off) => { if (count++ < 3) to = off + c.nodeSize; });
+    setViewport(view, 0, to);
+    el.offsetHeight;
+    const mountMs = performance.now() - t0;
+
+    results.paged = {
+      mountMs: +mountMs.toFixed(1),
+      domNodes: domNodeCount(view.dom),
+      expensiveRenders: expensiveRenderCount,
+      docSize: view.state.doc.nodeSize,
+      textLength: view.state.doc.textContent.length,
+      placeholders: view.dom.querySelectorAll("[data-virtual-placeholder]").length,
+      typing: measureTyping(view, 2, 50)
+    };
+    results.paged.sentinelInDOM = view.dom.textContent.includes("SENTINEL_DEEP_MARKER_");
+
+    // ===== PROOF 1: content that is NOT rendered is STILL in the doc state =====
+    assert("P1: unrendered content absent from DOM",
+      !view.dom.textContent.includes("SENTINEL_DEEP_MARKER_"));
+    assert("P1: unrendered content present in doc state",
+      view.state.doc.textContent.includes("SENTINEL_DEEP_MARKER_"));
+
+    // ===== PROOF 2: Ctrl+A selects the WHOLE document, not just rendered part =====
+    let selInfo = null;
+    selectAll(view.state, (tr) => { view.dispatch(tr); });
+    const sel = view.state.selection;
+    selInfo = { from: sel.from, to: sel.to, docSize: view.state.doc.nodeSize, type: sel.constructor.name };
+    results.paged.selectAll = selInfo;
+    assert("P2: selectAll spans entire doc",
+      sel.from <= 1 && sel.to >= view.state.doc.nodeSize - 3, selInfo);
+
+    // ===== PROOF 3: Copy All serialises the FULL document incl. unrendered =====
+    const slice = view.state.selection.content();
+    const ser = serializeForClipboard(view, slice);
+    const html = ser.dom.innerHTML;
+    const text = ser.text;
+    results.paged.clipboard = {
+      htmlLength: html.length,
+      textLength: text.length,
+      containsSentinel: text.includes("SENTINEL_DEEP_MARKER_"),
+      htmlContainsSentinel: html.includes("SENTINEL_DEEP_MARKER_")
+    };
+    assert("P3: clipboard TEXT contains unrendered content", text.includes("SENTINEL_DEEP_MARKER_"));
+    assert("P3: clipboard HTML contains unrendered content", html.includes("SENTINEL_DEEP_MARKER_"));
+
+    // ===== PROOF 4: positions/domFromPos into unrendered region do not throw =====
+    let posErr = null, atomResult = null;
+    try {
+      const deepPos = Math.floor(view.state.doc.nodeSize * 0.9);
+      atomResult = view.domAtPos(deepPos);
+      atomResult = { nodeName: atomResult.node.nodeName, offset: atomResult.offset };
+    } catch (e) { posErr = String(e); }
+    results.paged.domAtPosDeep = atomResult;
+    assert("P4: domAtPos in unrendered region does not throw", posErr === null, posErr);
+
+    let coordsErr = null;
+    try { view.coordsAtPos(Math.floor(view.state.doc.nodeSize * 0.9)); }
+    catch (e) { coordsErr = String(e); }
+    results.paged.coordsAtPosDeepError = coordsErr;
+    assert("P4b: coordsAtPos in unrendered region does not throw", coordsErr === null, coordsErr);
+
+    // ===== PROOF 5: edits INSIDE an unrendered region apply correctly =====
+    const before = view.state.doc.textContent.length;
+    const sentinelPos = findTextPos(view.state.doc, "SENTINEL_DEEP_MARKER_");
+    let editOk = false, editErr = null;
+    try {
+      view.dispatch(view.state.tr.insertText("EDITED_OFFSCREEN_", sentinelPos));
+      editOk = view.state.doc.textContent.includes("EDITED_OFFSCREEN_SENTINEL_DEEP_MARKER_");
+    } catch (e) { editErr = String(e); }
+    results.paged.offscreenEdit = {
+      ok: editOk, err: editErr,
+      lengthDelta: view.state.doc.textContent.length - before,
+      stillNotInDOM: !view.dom.textContent.includes("EDITED_OFFSCREEN_")
+    };
+    assert("P5: edit inside unrendered region applies to state", editOk, editErr);
+    assert("P5b: edited unrendered region still not in DOM",
+      !view.dom.textContent.includes("EDITED_OFFSCREEN_"));
+
+    // ===== PROOF 6: undo works across the unrendered region =====
+    let undoOk = false;
+    undo(view.state, (tr) => view.dispatch(tr));
+    undoOk = !view.state.doc.textContent.includes("EDITED_OFFSCREEN_");
+    results.paged.undoAcrossUnrendered = undoOk;
+    assert("P6: undo of an offscreen edit works", undoOk);
+
+    // ===== PROOF 7: scrolling to the region materialises it, content intact =====
+    let matOk = false, matErr = null;
+    try {
+      let from = 0, to = 0, i = 0;
+      const targetPage = Math.floor(SENTINEL_INDEX / PER_PAGE);
+      view.state.doc.forEach((c, off) => {
+        if (i === targetPage) { from = off; to = off + c.nodeSize; }
+        i++;
+      });
+      setViewport(view, from, to);
+      view.dom.offsetHeight;
+      matOk = view.dom.textContent.includes("SENTINEL_DEEP_MARKER_");
+    } catch (e) { matErr = String(e); }
+    results.paged.materializeOnScroll = { ok: matOk, err: matErr };
+    assert("P7: scrolling into region materialises real content", matOk, matErr);
+
+    // ===== PROOF 8: doc state is byte-identical to a never-virtualized doc =====
+    const freshDoc = makePagedDoc(BLOCKS, PER_PAGE, SENTINEL_INDEX);
+    assert("P8: doc state unchanged by virtualization round-trip",
+      JSON.stringify(view.state.doc.toJSON()) === JSON.stringify(freshDoc.toJSON()));
+
+    window.__pagedView = view;
+  }
+
+  // ---------- Virtualized WITHOUT a schema change (per-top-level-block) ----------
+  {
+    expensiveRenderCount = 0;
+    heightMemory.clear();
+    const el = mount("perblock");
+    const doc = makeFlatDoc(BLOCKS, SENTINEL_INDEX);
+    const t0 = performance.now();
+
+    // decorate only the first N top-level blocks
+    const plugins = [history(), keymap(baseKeymap), new Plugin({
+      key: viewportKey,
+      state: { init: () => ({ from: 0, to: 0 }), apply: (tr, p) => tr.getMeta(viewportKey) || p },
+      props: {
+        decorations(state) {
+          const { from, to } = viewportKey.getState(state);
+          const decos = [];
+          state.doc.forEach((child, offset) => {
+            const end = offset + child.nodeSize;
+            if (end > from && offset < to) decos.push(Decoration.node(offset, end, {}, { materialize: true }));
+          });
+          return DecorationSet.create(state.doc, decos);
+        }
+      }
+    })];
+    const state = EditorState.create({ doc, plugins });
+    const vnv = makeVirtualNodeView((pos) => "blk:" + pos);
+    // wrap every top-level block type
+    const nodeViews = {};
+    for (const t of ["paragraph", "heading", "bullet_list", "ordered_list", "blockquote", "codeblock_hl"]) {
+      nodeViews[t] = (node, view, getPos, decos) => {
+        // only virtualize when the node is top-level
+        const pos = getPos();
+        const $pos = view.state.doc.resolve(pos);
+        if ($pos.depth !== 0) {
+          return t === "codeblock_hl" ? codeblockNodeView(node) : null;
+        }
+        return vnv(node, view, getPos, decos);
+      };
+    }
+    const view = new EditorView(el, { state, nodeViews });
+    let to = 0, count = 0;
+    view.state.doc.forEach((c, off) => { if (count++ < 12) to = off + c.nodeSize; });
+    view.dispatch(view.state.tr.setMeta(viewportKey, { from: 0, to }));
+    el.offsetHeight;
+    const mountMs = performance.now() - t0;
+    results.perBlock = {
+      mountMs: +mountMs.toFixed(1),
+      domNodes: domNodeCount(view.dom),
+      expensiveRenders: expensiveRenderCount,
+      placeholders: view.dom.querySelectorAll("[data-virtual-placeholder]").length,
+      sentinelInDOM: view.dom.textContent.includes("SENTINEL_DEEP_MARKER_"),
+      typing: measureTyping(view, 2, 50)
+    };
+    const slice2 = (selectAll(view.state, (tr) => view.dispatch(tr)), view.state.selection.content());
+    const ser2 = serializeForClipboard(view, slice2);
+    results.perBlock.clipboardContainsSentinel = ser2.text.includes("SENTINEL_DEEP_MARKER_");
+    assert("P9: per-block virtualization also yields full clipboard",
+      ser2.text.includes("SENTINEL_DEEP_MARKER_"));
+    window.__perBlockView = view;
+  }
+
+  results.assertions = assertions;
+  results.allPassed = assertions.every((a) => a.pass);
+  return results;
+};
+
+function findTextPos(doc, needle) {
+  let found = -1;
+  doc.descendants((node, pos) => {
+    if (found >= 0) return false;
+    if (node.isText && node.text.includes(needle)) {
+      found = pos + node.text.indexOf(needle);
+      return false;
+    }
+    return true;
+  });
+  return found;
+}
+window.__ready = true;
+</script>
+</body>
+</html>

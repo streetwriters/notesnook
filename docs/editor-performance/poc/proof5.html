@@ -1,0 +1,246 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>body{font:14px system-ui}.ed{height:300px;overflow:auto;border:1px solid #ccc}</style></head>
+<body><div id="host"></div>
+<script src="./pm-bundle.js"></script>
+<script>
+const { EditorState, EditorView, Schema, keymap, baseKeymap, history,
+        addListNodes, basicSchema, DOMSerializer, Plugin, PluginKey } = window.PM;
+
+const S = new Schema({ nodes: addListNodes(basicSchema.spec.nodes, "paragraph block*", "block"),
+                       marks: basicSchema.spec.marks });
+
+function makeDoc(n) {
+  const b = [];
+  for (let i = 0; i < n; i++) {
+    if (i % 7 === 0) b.push(S.node("bullet_list", null, [
+      S.node("list_item", null, [S.node("paragraph", null, S.text("item " + i + " alpha beta gamma delta epsilon"))]),
+      S.node("list_item", null, [S.node("paragraph", null, S.text("item " + i + " zeta eta theta"))])]));
+    else if (i % 11 === 0) b.push(S.node("heading", { level: 2 }, S.text("Heading " + i)));
+    else b.push(S.node("paragraph", null, S.text(
+      "Para " + i + " lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor.")));
+  }
+  return S.node("doc", null, b);
+}
+
+function mk(n) {
+  const el = document.createElement("div"); el.className = "ed";
+  document.getElementById("host").appendChild(el);
+  return new EditorView(el, { state: EditorState.create({ doc: makeDoc(n), plugins: [history(), keymap(baseKeymap)] }) });
+}
+
+/* ============================================================
+ * PROOF 1: structural sharing — how much of the doc keeps
+ * reference identity after a single-character edit?
+ * ============================================================ */
+window.structuralSharing = function (sizes) {
+  const out = [];
+  for (const n of sizes) {
+    const view = mk(n);
+    const before = view.state.doc;
+
+    // count all nodes before
+    let totalNodes = 0;
+    before.descendants(() => { totalNodes++; return true; });
+
+    // one character typed into block 0
+    view.dispatch(view.state.tr.insertText("x", 3));
+    const after = view.state.doc;
+
+    // top-level identity retention
+    let topSame = 0;
+    for (let i = 0; i < after.childCount; i++)
+      if (after.child(i) === before.child(i)) topSame++;
+
+    // deep identity retention: walk both, count identical subtree roots
+    let sharedNodes = 0;
+    const beforeSet = new Set();
+    before.descendants((nd) => { beforeSet.add(nd); return true; });
+    after.descendants((nd) => { if (beforeSet.has(nd)) { sharedNodes++; return false; } return true; });
+
+    out.push({
+      blocks: n,
+      totalNodes,
+      topLevelChildren: after.childCount,
+      topLevelIdentical: topSame,
+      topLevelRetainedPct: +(topSame / after.childCount * 100).toFixed(2),
+      sharedSubtreeRoots: sharedNodes,
+      docIsSameObject: before === after
+    });
+    view.destroy(); document.getElementById("host").innerHTML = "";
+  }
+  return out;
+};
+
+/* ============================================================
+ * PROOF 2: changed-range extraction from step maps is O(steps),
+ * not O(doc). Compare against a full descendants() walk.
+ * ============================================================ */
+window.changedRangeCost = function (sizes) {
+  const out = [];
+  for (const n of sizes) {
+    const view = mk(n);
+    const ITER = 200;
+
+    // Time ONLY the analysis pass, not dispatch. Dispatch cost is identical
+    // in both cases and would otherwise mask the difference.
+    let fullTotal = 0, rangeTotal = 0, fullCount = 0, rangeCount = 0;
+
+    for (let i = 0; i < ITER; i++) {
+      const tr = view.state.tr.insertText("y", 3);
+      view.dispatch(tr);
+      const doc = view.state.doc;
+
+      let t0 = performance.now();
+      let c1 = 0;
+      doc.descendants(() => { c1++; return true; });
+      fullTotal += performance.now() - t0;
+      fullCount = c1;
+
+      t0 = performance.now();
+      let c2 = 0;
+      for (const map of tr.mapping.maps) {
+        map.forEach((_os, _oe, ns, ne) => {
+          doc.nodesBetween(Math.max(0, ns), Math.min(doc.content.size, ne), () => { c2++; return true; });
+        });
+      }
+      rangeTotal += performance.now() - t0;
+      rangeCount = c2;
+    }
+
+    out.push({
+      blocks: n,
+      fullWalkMs: +(fullTotal / ITER).toFixed(4),
+      fullWalkNodesVisited: fullCount,
+      changedRangeWalkMs: +(rangeTotal / ITER).toFixed(4),
+      changedRangeNodesVisited: rangeCount,
+      speedup: +(fullTotal / rangeTotal).toFixed(1)
+    });
+    view.destroy(); document.getElementById("host").innerHTML = "";
+  }
+  return out;
+};
+
+/* ============================================================
+ * PROOF 3: memoized serialization via WeakMap keyed by node
+ * identity vs. full re-serialization on every edit.
+ * ============================================================ */
+window.serializationCost = function (sizes) {
+  const out = [];
+  for (const n of sizes) {
+    const view = mk(n);
+    const ser = DOMSerializer.fromSchema(S);
+    const ITER = 50;
+
+    function fullHTML(doc) {
+      const tmp = document.createElement("div");
+      tmp.appendChild(ser.serializeFragment(doc.content, { document }));
+      return tmp.innerHTML;
+    }
+
+    const cache = new WeakMap();
+    function memoHTML(doc) {
+      let html = "";
+      for (let i = 0; i < doc.childCount; i++) {
+        const child = doc.child(i);
+        let s = cache.get(child);
+        if (s === undefined) {
+          const tmp = document.createElement("div");
+          tmp.appendChild(ser.serializeNode ? ser.serializeNode(child, { document })
+                                            : ser.serializeFragment(child.content, { document }));
+          s = tmp.innerHTML;
+          cache.set(child, s);
+        }
+        html += s;
+      }
+      return html;
+    }
+
+    // warm the cache
+    memoHTML(view.state.doc);
+
+    let t0 = performance.now();
+    for (let i = 0; i < ITER; i++) { view.dispatch(view.state.tr.insertText("a", 3)); fullHTML(view.state.doc); }
+    const fullMs = (performance.now() - t0) / ITER;
+
+    t0 = performance.now();
+    for (let i = 0; i < ITER; i++) { view.dispatch(view.state.tr.insertText("b", 3)); memoHTML(view.state.doc); }
+    const memoMs = (performance.now() - t0) / ITER;
+
+    // correctness: memoized output must equal full output
+    const identical = memoHTML(view.state.doc) === fullHTML(view.state.doc);
+
+    out.push({
+      blocks: n,
+      fullSerializeMs: +fullMs.toFixed(3),
+      memoizedSerializeMs: +memoMs.toFixed(3),
+      speedup: +(fullMs / memoMs).toFixed(1),
+      outputIdentical: identical
+    });
+    view.destroy(); document.getElementById("host").innerHTML = "";
+  }
+  return out;
+};
+
+/* ============================================================
+ * PROOF 4: incremental word count from changed ranges vs
+ * full-document textBetween + count.
+ * ============================================================ */
+window.wordCountCost = function (sizes) {
+  const out = [];
+  const countWords = (s) => { let c = 0, inW = false; for (let i = 0; i < s.length; i++) { const w = /\S/.test(s[i]); if (w && !inW) c++; inW = w; } return c; };
+  for (const n of sizes) {
+    const view = mk(n);
+    const ITER = 100;
+
+    let t0 = performance.now();
+    for (let i = 0; i < ITER; i++) {
+      view.dispatch(view.state.tr.insertText("c ", 3));
+      countWords(view.state.doc.textBetween(0, view.state.doc.content.size, "\n", " "));
+    }
+    const fullMs = (performance.now() - t0) / ITER;
+
+    // incremental: only recount the top-level blocks that changed
+    const blockWords = new WeakMap();
+    let total = 0;
+    for (let i = 0; i < view.state.doc.childCount; i++) {
+      const c = view.state.doc.child(i);
+      const w = countWords(c.textContent); blockWords.set(c, w); total += w;
+    }
+
+    t0 = performance.now();
+    for (let i = 0; i < ITER; i++) {
+      const before = view.state.doc;
+      const tr = view.state.tr.insertText("d ", 3);
+      view.dispatch(tr);
+      const after = view.state.doc;
+      // only blocks whose identity changed need recounting
+      for (let j = 0; j < after.childCount; j++) {
+        const c = after.child(j);
+        if (blockWords.has(c)) continue;
+        const w = countWords(c.textContent);
+        const old = j < before.childCount && blockWords.has(before.child(j)) ? blockWords.get(before.child(j)) : 0;
+        blockWords.set(c, w);
+        total += w - old;
+      }
+    }
+    const incMs = (performance.now() - t0) / ITER;
+
+    // correctness
+    let recomputed = 0;
+    for (let i = 0; i < view.state.doc.childCount; i++) recomputed += countWords(view.state.doc.child(i).textContent);
+
+    out.push({
+      blocks: n,
+      fullCountMs: +fullMs.toFixed(3),
+      incrementalCountMs: +incMs.toFixed(3),
+      speedup: +(fullMs / incMs).toFixed(1),
+      incrementalTotal: total,
+      groundTruth: recomputed,
+      correct: total === recomputed
+    });
+    view.destroy(); document.getElementById("host").innerHTML = "";
+  }
+  return out;
+};
+window.__ready5 = true;
+</script></body></html>

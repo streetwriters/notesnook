@@ -1,0 +1,109 @@
+{
+  "structuralSharing": [
+    {
+      "blocks": 500,
+      "totalNodes": 1360,
+      "topLevelChildren": 500,
+      "topLevelIdentical": 499,
+      "topLevelRetainedPct": 99.8,
+      "sharedSubtreeRoots": 500,
+      "docIsSameObject": false
+    },
+    {
+      "blocks": 2000,
+      "totalNodes": 5430,
+      "topLevelChildren": 2000,
+      "topLevelIdentical": 1999,
+      "topLevelRetainedPct": 99.95,
+      "sharedSubtreeRoots": 2000,
+      "docIsSameObject": false
+    },
+    {
+      "blocks": 4000,
+      "totalNodes": 10860,
+      "topLevelChildren": 4000,
+      "topLevelIdentical": 3999,
+      "topLevelRetainedPct": 99.98,
+      "sharedSubtreeRoots": 4000,
+      "docIsSameObject": false
+    }
+  ],
+  "changedRangeCost": [
+    {
+      "blocks": 500,
+      "fullWalkMs": 0.0125,
+      "fullWalkNodesVisited": 1360,
+      "changedRangeWalkMs": 0.0005,
+      "changedRangeNodesVisited": 4,
+      "speedup": 25
+    },
+    {
+      "blocks": 2000,
+      "fullWalkMs": 0.0455,
+      "fullWalkNodesVisited": 5430,
+      "changedRangeWalkMs": 0.0005,
+      "changedRangeNodesVisited": 4,
+      "speedup": 91
+    },
+    {
+      "blocks": 4000,
+      "fullWalkMs": 0.0755,
+      "fullWalkNodesVisited": 10860,
+      "changedRangeWalkMs": 0,
+      "changedRangeNodesVisited": 4,
+      "speedup": null
+    }
+  ],
+  "serializationCost": [
+    {
+      "blocks": 500,
+      "fullSerializeMs": 0.464,
+      "memoizedSerializeMs": 0.104,
+      "speedup": 4.5,
+      "outputIdentical": true
+    },
+    {
+      "blocks": 2000,
+      "fullSerializeMs": 1.888,
+      "memoizedSerializeMs": 0.346,
+      "speedup": 5.5,
+      "outputIdentical": true
+    },
+    {
+      "blocks": 4000,
+      "fullSerializeMs": 3.822,
+      "memoizedSerializeMs": 0.784,
+      "speedup": 4.9,
+      "outputIdentical": true
+    }
+  ],
+  "wordCountCost": [
+    {
+      "blocks": 500,
+      "fullCountMs": 0.597,
+      "incrementalCountMs": 0.12,
+      "speedup": 5,
+      "incrementalTotal": 6516,
+      "groundTruth": 6516,
+      "correct": true
+    },
+    {
+      "blocks": 2000,
+      "fullCountMs": 2.191,
+      "incrementalCountMs": 0.406,
+      "speedup": 5.4,
+      "incrementalTotal": 25470,
+      "groundTruth": 25470,
+      "correct": true
+    },
+    {
+      "blocks": 4000,
+      "fullCountMs": 4.422,
+      "incrementalCountMs": 0.761,
+      "speedup": 5.8,
+      "incrementalTotal": 50740,
+      "groundTruth": 50740,
+      "correct": true
+    }
+  ]
+}

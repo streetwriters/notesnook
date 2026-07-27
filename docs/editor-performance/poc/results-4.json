@@ -1,0 +1,168 @@
+{
+  "cvTest": [
+    {
+      "blocks": 500,
+      "plain": {
+        "mountMs": 14.4,
+        "forcedLayout": {
+          "median": 1,
+          "p95": 1.1
+        },
+        "typing": {
+          "median": 0.1,
+          "p95": 0.5
+        },
+        "scrollHeight": 25399,
+        "sentinelInDOM": true,
+        "sentinelHasLayout": {
+          "offsetHeight": 17,
+          "rectH": 17
+        },
+        "windowFindFindsIt": true,
+        "clipboardHasSentinel": true,
+        "coordsAtOffscreen": {
+          "top": 22883,
+          "bottom": 22900,
+          "height": 17
+        }
+      },
+      "contentVisibility": {
+        "mountMs": 2.9,
+        "forcedLayout": {
+          "median": 0.2,
+          "p95": 0.3
+        },
+        "typing": {
+          "median": 0,
+          "p95": 0.1
+        },
+        "scrollHeight": 27030,
+        "sentinelInDOM": true,
+        "sentinelHasLayout": {
+          "offsetHeight": 40,
+          "rectH": 40
+        },
+        "windowFindFindsIt": true,
+        "clipboardHasSentinel": true,
+        "coordsAtOffscreen": {
+          "top": 25403,
+          "bottom": 25420,
+          "height": 17
+        }
+      },
+      "layoutSpeedup": 5
+    },
+    {
+      "blocks": 1500,
+      "plain": {
+        "mountMs": 21.6,
+        "forcedLayout": {
+          "median": 2.9,
+          "p95": 4.7
+        },
+        "typing": {
+          "median": 0.3,
+          "p95": 0.5
+        },
+        "scrollHeight": 76199,
+        "sentinelInDOM": true,
+        "sentinelHasLayout": {
+          "offsetHeight": 17,
+          "rectH": 17
+        },
+        "windowFindFindsIt": true,
+        "clipboardHasSentinel": true,
+        "coordsAtOffscreen": {
+          "top": 68603,
+          "bottom": 68620,
+          "height": 17
+        }
+      },
+      "contentVisibility": {
+        "mountMs": 4.1,
+        "forcedLayout": {
+          "median": 0.5,
+          "p95": 0.6
+        },
+        "typing": {
+          "median": 0.1,
+          "p95": 0.2
+        },
+        "scrollHeight": 81030,
+        "sentinelInDOM": true,
+        "sentinelHasLayout": {
+          "offsetHeight": 40,
+          "rectH": 40
+        },
+        "windowFindFindsIt": true,
+        "clipboardHasSentinel": true,
+        "coordsAtOffscreen": {
+          "top": 76163,
+          "bottom": 76180,
+          "height": 17
+        }
+      },
+      "layoutSpeedup": 5.8
+    },
+    {
+      "blocks": 3000,
+      "plain": {
+        "mountMs": 41,
+        "forcedLayout": {
+          "median": 6.4,
+          "p95": 9.1
+        },
+        "typing": {
+          "median": 0.6,
+          "p95": 0.7
+        },
+        "scrollHeight": 152399,
+        "sentinelInDOM": true,
+        "sentinelHasLayout": {
+          "offsetHeight": 17,
+          "rectH": 17
+        },
+        "windowFindFindsIt": true,
+        "clipboardHasSentinel": true,
+        "coordsAtOffscreen": {
+          "top": 137183,
+          "bottom": 137200,
+          "height": 17
+        }
+      },
+      "contentVisibility": {
+        "mountMs": 8.4,
+        "forcedLayout": {
+          "median": 1.1,
+          "p95": 1.7
+        },
+        "typing": {
+          "median": 0.1,
+          "p95": 0.2
+        },
+        "scrollHeight": 162030,
+        "sentinelInDOM": true,
+        "sentinelHasLayout": {
+          "offsetHeight": 40,
+          "rectH": 40
+        },
+        "windowFindFindsIt": true,
+        "clipboardHasSentinel": true,
+        "coordsAtOffscreen": {
+          "top": 152303,
+          "bottom": 152320,
+          "height": 17
+        }
+      },
+      "layoutSpeedup": 5.8
+    }
+  ],
+  "cvEditingIntegrity": {
+    "visibleEditApplied": true,
+    "offscreenEditApplied": true,
+    "offscreenStillInDOM": true,
+    "domAtPosOk": true,
+    "posAtDOMRoundTrip": 260034,
+    "roundTripMatches": true
+  }
+}

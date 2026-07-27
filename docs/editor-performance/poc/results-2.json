@@ -1,0 +1,129 @@
+{
+  "differentialFuzz": [
+    {
+      "nBlocks": 200,
+      "nEdits": 150,
+      "seed": 1,
+      "opsApplied": 150,
+      "mismatchAt": null,
+      "identical": true,
+      "docJsonLength": 35335,
+      "errors": []
+    },
+    {
+      "nBlocks": 400,
+      "nEdits": 150,
+      "seed": 42,
+      "opsApplied": 150,
+      "mismatchAt": null,
+      "identical": true,
+      "docJsonLength": 68715,
+      "errors": []
+    },
+    {
+      "nBlocks": 100,
+      "nEdits": 200,
+      "seed": 7,
+      "opsApplied": 200,
+      "mismatchAt": null,
+      "identical": true,
+      "docJsonLength": 18756,
+      "errors": []
+    }
+  ],
+  "selectAllReplace": {
+    "beforeLength": 27840,
+    "selSpan": {
+      "from": 0,
+      "to": 30180,
+      "docSize": 30182
+    },
+    "afterText": "replaced",
+    "afterLength": 8,
+    "wipedEverything": true,
+    "pagesRemaining": 1
+  },
+  "scaleSweep": [
+    {
+      "blocks": 200,
+      "fullRender": {
+        "mountMs": 1.9,
+        "domNodes": 742,
+        "typingP95": 0.1
+      },
+      "virtualized": {
+        "mountMs": 0.7,
+        "domNodes": 233,
+        "typingP95": 0.1
+      },
+      "mountSpeedup": 2.7,
+      "domReduction": 3.2
+    },
+    {
+      "blocks": 500,
+      "fullRender": {
+        "mountMs": 4,
+        "domNodes": 1808,
+        "typingP95": 0.1
+      },
+      "virtualized": {
+        "mountMs": 0.8,
+        "domNodes": 248,
+        "typingP95": 0.1
+      },
+      "mountSpeedup": 5,
+      "domReduction": 7.3
+    },
+    {
+      "blocks": 1000,
+      "fullRender": {
+        "mountMs": 7.6,
+        "domNodes": 3584,
+        "typingP95": 0.1
+      },
+      "virtualized": {
+        "mountMs": 1,
+        "domNodes": 273,
+        "typingP95": 0.1
+      },
+      "mountSpeedup": 7.6,
+      "domReduction": 13.1
+    },
+    {
+      "blocks": 2000,
+      "fullRender": {
+        "mountMs": 15.1,
+        "domNodes": 7169,
+        "typingP95": 0.1
+      },
+      "virtualized": {
+        "mountMs": 1.4,
+        "domNodes": 323,
+        "typingP95": 0.1
+      },
+      "mountSpeedup": 10.8,
+      "domReduction": 22.2
+    },
+    {
+      "blocks": 4000,
+      "fullRender": {
+        "mountMs": 37,
+        "domNodes": 14414,
+        "typingP95": 0.2
+      },
+      "virtualized": {
+        "mountMs": 3.7,
+        "domNodes": 423,
+        "typingP95": 0.1
+      },
+      "mountSpeedup": 10,
+      "domReduction": 34.1
+    }
+  ],
+  "findInPage": {
+    "inDocState": true,
+    "inRenderedDOM": false,
+    "browserFindFinds": false,
+    "stateSearchFindsIt": true
+  }
+}

@@ -1,0 +1,158 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+body{font:14px system-ui;margin:0}
+.ed{border:1px solid #ccc;height:500px;overflow-y:auto;padding:8px;width:800px}
+.ProseMirror{outline:none}
+/* the containment strategy under test */
+.cv-on > .ProseMirror > * { content-visibility: auto; contain-intrinsic-size: auto 40px; }
+</style></head><body><div id="host"></div>
+<script src="./pm-bundle.js"></script>
+<script>
+const { EditorState, EditorView, Schema, keymap, baseKeymap, history,
+        addListNodes, basicSchema, selectAll, serializeForClipboard, Plugin, PluginKey,
+        Decoration, DecorationSet } = window.PM;
+
+const S = new Schema({ nodes: addListNodes(basicSchema.spec.nodes, "paragraph block*", "block"),
+                       marks: basicSchema.spec.marks });
+
+function doc(n, sentinelAt) {
+  const b = [];
+  for (let i = 0; i < n; i++) {
+    if (i === sentinelAt) { b.push(S.node("paragraph", null, S.text("DEEPSENTINEL77"))); continue; }
+    if (i % 5 === 0) b.push(S.node("bullet_list", null, [
+      S.node("list_item", null, [S.node("paragraph", null, S.text("item " + i + " alpha beta gamma delta"))]),
+      S.node("list_item", null, [S.node("paragraph", null, S.text("item " + i + " epsilon zeta eta"))])]));
+    else b.push(S.node("paragraph", null, S.text("Para " + i + " " +
+      "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod. ".repeat(3))));
+  }
+  return S.node("doc", null, b);
+}
+
+function mountEl(cv) {
+  const d = document.createElement("div");
+  d.className = "ed" + (cv ? " cv-on" : "");
+  document.getElementById("host").appendChild(d);
+  return d;
+}
+
+function build(n, cv, sentinelAt) {
+  const el = mountEl(cv);
+  const view = new EditorView(el, {
+    state: EditorState.create({ doc: doc(n, sentinelAt), plugins: [history(), keymap(baseKeymap)] })
+  });
+  return { view, el };
+}
+
+/* Force a FULL style+layout recalc and time it. Changing width on the
+   scroll container invalidates layout for every child. */
+function forcedLayout(el, iterations) {
+  const t = [];
+  for (let i = 0; i < iterations; i++) {
+    el.style.width = (800 + (i % 2)) + "px";
+    const t0 = performance.now();
+    void el.scrollHeight;          // forces sync layout
+    t.push(performance.now() - t0);
+  }
+  t.sort((a, b) => a - b);
+  return { median: +t[Math.floor(t.length / 2)].toFixed(2), p95: +t[Math.floor(t.length * 0.95)].toFixed(2) };
+}
+
+function typing(view, el, iters) {
+  const t = [];
+  for (let i = 0; i < iters; i++) {
+    const t0 = performance.now();
+    view.dispatch(view.state.tr.insertText("x", 3));
+    void el.scrollHeight;
+    t.push(performance.now() - t0);
+  }
+  t.sort((a, b) => a - b);
+  return { median: +t[Math.floor(iters / 2)].toFixed(3), p95: +t[Math.floor(iters * 0.95)].toFixed(3) };
+}
+
+/* ============ MAIN: does content-visibility work in contenteditable? ============ */
+window.cvTest = function (sizes) {
+  const out = [];
+  for (const n of sizes) {
+    const row = { blocks: n };
+    for (const cv of [false, true]) {
+      const t0 = performance.now();
+      const { view, el } = build(n, cv, Math.floor(n * 0.9));
+      void el.scrollHeight;
+      const mountMs = performance.now() - t0;
+
+      // scroll to top so the sentinel block is definitely off-screen
+      el.scrollTop = 0;
+      void el.scrollHeight;
+
+      const key = cv ? "contentVisibility" : "plain";
+      row[key] = {
+        mountMs: +mountMs.toFixed(1),
+        forcedLayout: forcedLayout(el, 30),
+        typing: typing(view, el, 40),
+        scrollHeight: el.scrollHeight,
+        // is the DOM still complete? (this is the whole point of the approach)
+        sentinelInDOM: view.dom.textContent.includes("DEEPSENTINEL77"),
+        sentinelHasLayout: (() => {
+          // find the element and check whether it was skipped by containment
+          const els = view.dom.children;
+          for (const e of els) if (e.textContent.includes("DEEPSENTINEL77"))
+            return { offsetHeight: e.offsetHeight, rectH: +e.getBoundingClientRect().height.toFixed(1) };
+          return null;
+        })()
+      };
+
+      // browser find-in-page still works?
+      window.getSelection().removeAllRanges();
+      el.scrollTop = 0;
+      try { row[key].windowFindFindsIt = window.find ? window.find("DEEPSENTINEL77") : "unavailable"; }
+      catch (e) { row[key].windowFindFindsIt = "err:" + e; }
+
+      // clipboard still complete?
+      selectAll(view.state, (tr) => view.dispatch(tr));
+      row[key].clipboardHasSentinel =
+        serializeForClipboard(view, view.state.selection.content()).text.includes("DEEPSENTINEL77");
+
+      // coordsAtPos into the off-screen region - real coords or collapsed?
+      let cpos = null;
+      try {
+        let target = -1;
+        view.state.doc.descendants((nd, p) => { if (nd.isText && nd.text.includes("DEEPSENTINEL77")) { target = p; return false; } });
+        const c = view.coordsAtPos(target);
+        cpos = { top: +c.top.toFixed(1), bottom: +c.bottom.toFixed(1), height: +(c.bottom - c.top).toFixed(1) };
+      } catch (e) { cpos = "err:" + String(e).slice(0, 80); }
+      row[key].coordsAtOffscreen = cpos;
+
+      view.destroy();
+      document.getElementById("host").innerHTML = "";
+    }
+    row.layoutSpeedup = +(row.plain.forcedLayout.median / Math.max(0.001, row.contentVisibility.forcedLayout.median)).toFixed(1);
+    out.push(row);
+  }
+  return out;
+};
+
+/* Caret / editing integrity under content-visibility inside contenteditable */
+window.cvEditingIntegrity = function (n) {
+  const { view, el } = build(n, true, Math.floor(n * 0.9));
+  const res = {};
+  // type into a visible block
+  view.dispatch(view.state.tr.insertText("HELLO", 3));
+  res.visibleEditApplied = view.state.doc.textContent.includes("HELLO");
+  // edit deep offscreen block
+  let target = -1;
+  view.state.doc.descendants((nd, p) => { if (nd.isText && nd.text.includes("DEEPSENTINEL77")) { target = p; return false; } });
+  view.dispatch(view.state.tr.insertText("OFFSCR", target));
+  res.offscreenEditApplied = view.state.doc.textContent.includes("OFFSCRDEEPSENTINEL77");
+  res.offscreenStillInDOM = view.dom.textContent.includes("OFFSCRDEEPSENTINEL77");
+  // does the ViewDesc tree stay consistent? (domAtPos round trip)
+  try {
+    const d = view.domAtPos(target);
+    res.domAtPosOk = !!d.node;
+    res.posAtDOMRoundTrip = view.posAtDOM(d.node, d.offset);
+    res.roundTripMatches = Math.abs(res.posAtDOMRoundTrip - target) <= 1;
+  } catch (e) { res.domAtPosOk = "err:" + e; }
+  view.destroy(); document.getElementById("host").innerHTML = "";
+  return res;
+};
+window.__ready4 = true;
+</script></body></html>

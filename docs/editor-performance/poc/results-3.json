@@ -1,0 +1,134 @@
+{
+  "docWideCost": [
+    {
+      "blocks": 500,
+      "combos": [
+        {
+          "label": "plain",
+          "median": 0.1,
+          "p95": 0.4
+        },
+        {
+          "label": "plain+docwide",
+          "median": 0.3,
+          "p95": 0.5
+        },
+        {
+          "label": "virtual",
+          "median": 0,
+          "p95": 0.2
+        },
+        {
+          "label": "virtual+docwide",
+          "median": 0.3,
+          "p95": 0.5
+        }
+      ]
+    },
+    {
+      "blocks": 1000,
+      "combos": [
+        {
+          "label": "plain",
+          "median": 0,
+          "p95": 0.1
+        },
+        {
+          "label": "plain+docwide",
+          "median": 0.4,
+          "p95": 0.7
+        },
+        {
+          "label": "virtual",
+          "median": 0,
+          "p95": 0.1
+        },
+        {
+          "label": "virtual+docwide",
+          "median": 0.4,
+          "p95": 0.6
+        }
+      ]
+    },
+    {
+      "blocks": 2000,
+      "combos": [
+        {
+          "label": "plain",
+          "median": 0,
+          "p95": 0.2
+        },
+        {
+          "label": "plain+docwide",
+          "median": 0.8,
+          "p95": 1.9
+        },
+        {
+          "label": "virtual",
+          "median": 0,
+          "p95": 0.2
+        },
+        {
+          "label": "virtual+docwide",
+          "median": 0.8,
+          "p95": 1.4
+        }
+      ]
+    },
+    {
+      "blocks": 4000,
+      "combos": [
+        {
+          "label": "plain",
+          "median": 0.1,
+          "p95": 0.1
+        },
+        {
+          "label": "plain+docwide",
+          "median": 1.6,
+          "p95": 2.8
+        },
+        {
+          "label": "virtual",
+          "median": 0.1,
+          "p95": 0.2
+        },
+        {
+          "label": "virtual+docwide",
+          "median": 1.6,
+          "p95": 2.1
+        }
+      ]
+    }
+  ],
+  "parseCost": [
+    {
+      "blocks": 500,
+      "htmlBytes": 84390,
+      "innerHTMLms": 0.2,
+      "pmParsems": 2.5,
+      "docSize": 81392
+    },
+    {
+      "blocks": 1000,
+      "htmlBytes": 168890,
+      "innerHTMLms": 0.2,
+      "pmParsems": 1.9,
+      "docSize": 162892
+    },
+    {
+      "blocks": 2000,
+      "htmlBytes": 338890,
+      "innerHTMLms": 0.3,
+      "pmParsems": 3.1,
+      "docSize": 326892
+    },
+    {
+      "blocks": 5000,
+      "htmlBytes": 848890,
+      "innerHTMLms": 1,
+      "pmParsems": 8.5,
+      "docSize": 818892
+    }
+  ]
+}

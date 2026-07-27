@@ -1,0 +1,145 @@
+{
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+  "blocks": 600,
+  "baseline": {
+    "mountMs": 79.3,
+    "domNodes": 108060,
+    "expensiveRenders": 60,
+    "docSize": 218895,
+    "textLength": 215773,
+    "typing": {
+      "median": 0.2,
+      "p95": 0.4,
+      "mean": 0.206
+    },
+    "sentinelInDOM": true
+  },
+  "paged": {
+    "mountMs": 8.1,
+    "domNodes": 10836,
+    "expensiveRenders": 6,
+    "docSize": 218955,
+    "textLength": 215773,
+    "placeholders": 27,
+    "typing": {
+      "median": 0,
+      "p95": 0.1,
+      "mean": 0.048
+    },
+    "sentinelInDOM": false,
+    "selectAll": {
+      "from": 0,
+      "to": 219003,
+      "docSize": 219005,
+      "type": "_AllSelection"
+    },
+    "clipboard": {
+      "htmlLength": 229736,
+      "textLength": 217861,
+      "containsSentinel": true,
+      "htmlContainsSentinel": true
+    },
+    "domAtPosDeep": {
+      "nodeName": "DIV",
+      "offset": 0
+    },
+    "coordsAtPosDeepError": null,
+    "offscreenEdit": {
+      "ok": true,
+      "err": null,
+      "lengthDelta": 17,
+      "stillNotInDOM": true
+    },
+    "undoAcrossUnrendered": true,
+    "materializeOnScroll": {
+      "ok": true,
+      "err": null
+    }
+  },
+  "perBlock": {
+    "mountMs": 3.5,
+    "domNodes": 635,
+    "expensiveRenders": 0,
+    "placeholders": 588,
+    "sentinelInDOM": false,
+    "typing": {
+      "median": 0.2,
+      "p95": 0.3,
+      "mean": 0.176
+    },
+    "clipboardContainsSentinel": true
+  },
+  "assertions": [
+    {
+      "name": "P1: unrendered content absent from DOM",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P1: unrendered content present in doc state",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P2: selectAll spans entire doc",
+      "pass": true,
+      "detail": {
+        "from": 0,
+        "to": 219003,
+        "docSize": 219005,
+        "type": "_AllSelection"
+      }
+    },
+    {
+      "name": "P3: clipboard TEXT contains unrendered content",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P3: clipboard HTML contains unrendered content",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P4: domAtPos in unrendered region does not throw",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P4b: coordsAtPos in unrendered region does not throw",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P5: edit inside unrendered region applies to state",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P5b: edited unrendered region still not in DOM",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P6: undo of an offscreen edit works",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P7: scrolling into region materialises real content",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "P8: doc state unchanged by virtualization round-trip",
+      "pass": false,
+      "detail": null
+    },
+    {
+      "name": "P9: per-block virtualization also yields full clipboard",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "allPassed": false
+}

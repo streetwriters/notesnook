@@ -1,0 +1,129 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+body{font:14px system-ui;margin:0}.ed{border:1px solid #ccc;height:400px;overflow-y:auto;padding:8px}
+.ProseMirror{outline:none}.vpage-placeholder{background:#fafafa;overflow:hidden}
+</style></head><body><div id="host"></div>
+<script src="./pm-bundle.js"></script>
+<script>
+const { EditorState, Plugin, PluginKey, EditorView, Decoration, DecorationSet,
+  Schema, keymap, baseKeymap, history, addListNodes, basicSchema, PMDOMParser } = window.PM;
+
+const baseNodes = addListNodes(basicSchema.spec.nodes, "paragraph block*", "block");
+const S = new Schema({
+  nodes: baseNodes.addToEnd("page", { content: "block+", toDOM: () => ["div", {class:"vpage"}, 0], parseDOM: [{tag:"div.vpage"}] })
+    .update("doc", { content: "page+" }),
+  marks: basicSchema.spec.marks
+});
+
+function pagedDoc(n, perPage) {
+  const b = [];
+  for (let i = 0; i < n; i++)
+    b.push(S.node("paragraph", null, S.text("Para " + i + " " + "lorem ipsum dolor sit amet consectetur adipiscing. ".repeat(3))));
+  const pages = [];
+  for (let i = 0; i < b.length; i += perPage) pages.push(S.node("page", null, b.slice(i, i + perPage)));
+  return S.node("doc", null, pages);
+}
+
+const viewportKey = new PluginKey("vp");
+const vpPlugin = new Plugin({
+  key: viewportKey,
+  state: { init: () => ({from:0,to:0}), apply: (tr,p) => tr.getMeta(viewportKey) || p },
+  props: { decorations(state) {
+    const {from,to} = viewportKey.getState(state); const d = [];
+    state.doc.forEach((c,off) => { const e = off+c.nodeSize; if (e>from && off<to) d.push(Decoration.node(off,e,{},{materialize:true})); });
+    return DecorationSet.create(state.doc, d);
+  }}
+});
+
+const heights = new Map();
+function virtualPageView(node, view, getPos, decos) {
+  const mat = decos.some(d => d.spec && d.spec.materialize);
+  const dom = document.createElement("div");
+  dom.className = "vpage" + (mat ? "" : " vpage-placeholder");
+  if (mat) return { dom, contentDOM: dom,
+    update(n2,d2){ if(n2.type!==node.type) return false; return d2.some(d=>d.spec&&d.spec.materialize); } };
+  dom.style.height = Math.max(21, node.textContent.length/90*21) + "px";
+  return { dom, contentDOM: null,
+    update(n2,d2){ if(n2.type!==node.type) return false; if(d2.some(d=>d.spec&&d.spec.materialize)) return false; node=n2; return true; },
+    ignoreMutation: () => true };
+}
+
+/* A plugin that walks the WHOLE doc on every transaction - this is what
+   word-count / table-of-contents / link-scanning extensions typically do. */
+let walkCount = 0;
+const docWideKey = new PluginKey("docwide");
+const docWidePlugin = new Plugin({
+  key: docWideKey,
+  state: {
+    init(_, s) { return count(s.doc); },
+    apply(tr, prev, _o, newState) { return tr.docChanged ? count(newState.doc) : prev; }
+  }
+});
+function count(doc) {
+  walkCount++;
+  let words = 0, headings = [];
+  doc.descendants((n, pos) => {
+    if (n.isText) words += n.text.split(/\s+/).length;
+    if (n.type.name === "heading") headings.push({ pos, text: n.textContent });
+  });
+  return { words, headings };
+}
+
+function mountEl(){ const d=document.createElement("div"); d.className="ed"; document.getElementById("host").appendChild(d); return d; }
+
+function build({ n, virtualized, docWide }) {
+  const plugins = [history(), keymap(baseKeymap)];
+  if (virtualized) plugins.push(vpPlugin);
+  if (docWide) plugins.push(docWidePlugin);
+  const view = new EditorView(mountEl(), {
+    state: EditorState.create({ doc: pagedDoc(n, 20), plugins }),
+    nodeViews: virtualized ? { page: virtualPageView } : {}
+  });
+  if (virtualized) { let to=0,i=0; view.state.doc.forEach((c,off)=>{ if(i++<3) to=off+c.nodeSize; });
+    view.dispatch(view.state.tr.setMeta(viewportKey,{from:0,to})); }
+  return view;
+}
+
+function typing(view, iters) {
+  const t = [];
+  for (let i=0;i<iters;i++){ const t0=performance.now(); view.dispatch(view.state.tr.insertText("x",3)); view.dom.offsetHeight; t.push(performance.now()-t0); }
+  t.sort((a,b)=>a-b);
+  return { median:+t[Math.floor(iters/2)].toFixed(3), p95:+t[Math.floor(iters*0.95)].toFixed(3) };
+}
+
+/* Does virtualization fix per-keystroke lag caused by doc-wide plugins? */
+window.docWideCost = function(sizes){
+  const out=[];
+  for(const n of sizes){
+    const combos=[];
+    for(const [label,virt,dw] of [["plain",false,false],["plain+docwide",false,true],["virtual",true,false],["virtual+docwide",true,true]]){
+      heights.clear();
+      const v=build({n,virtualized:virt,docWide:dw});
+      const r=typing(v,40);
+      combos.push({label, ...r});
+      v.destroy(); document.getElementById("host").innerHTML="";
+    }
+    out.push({blocks:n, combos});
+  }
+  return out;
+};
+
+/* Cost of PARSING large HTML into a doc (the "loading a large note" path). */
+window.parseCost = function(sizes){
+  const out=[];
+  for(const n of sizes){
+    let html="";
+    for(let i=0;i<n;i++) html+="<p>Para "+i+" "+"lorem ipsum dolor sit amet consectetur adipiscing. ".repeat(3)+"</p>";
+    const t0=performance.now();
+    const el=document.createElement("div"); el.innerHTML=html;
+    const tHtml=performance.now()-t0;
+    const flat=new Schema({nodes:baseNodes,marks:basicSchema.spec.marks});
+    const t1=performance.now();
+    const doc=PMDOMParser.fromSchema(flat).parse(el);
+    const tParse=performance.now()-t1;
+    out.push({blocks:n, htmlBytes:html.length, innerHTMLms:+tHtml.toFixed(1), pmParsems:+tParse.toFixed(1), docSize:doc.nodeSize});
+  }
+  return out;
+};
+window.__ready3=true;
+</script></body></html>

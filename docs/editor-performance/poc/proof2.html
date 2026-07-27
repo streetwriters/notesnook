@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  body { font: 14px/1.5 system-ui; margin: 0; }
+  .ed { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 8px; }
+  .ProseMirror { outline: none; }
+  .vpage-placeholder { background: #fafafa; overflow: hidden; }
+  pre { background: #f4f4f4; padding: 6px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="host"></div>
+<script src="./pm-bundle.js"></script>
+<script>
+const {
+  EditorState, TextSelection, AllSelection, Plugin, PluginKey,
+  EditorView, Decoration, DecorationSet, serializeForClipboard,
+  Schema, keymap, baseKeymap, selectAll, toggleMark,
+  history, undo, redo, addListNodes, basicSchema
+} = window.PM;
+
+const baseNodes = addListNodes(basicSchema.spec.nodes, "paragraph block*", "block");
+const S = new Schema({
+  nodes: baseNodes.addToEnd("page", {
+    content: "block+", toDOM: () => ["div", { class: "vpage" }, 0], parseDOM: [{ tag: "div.vpage" }]
+  }).update("doc", { content: "page+" }),
+  marks: basicSchema.spec.marks
+});
+const FLAT = new Schema({ nodes: baseNodes, marks: basicSchema.spec.marks });
+
+/* deterministic PRNG so the fuzz is reproducible */
+function rng(seed) {
+  let s = seed >>> 0;
+  return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+}
+
+function blocks(schema, n, rnd) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const k = Math.floor(rnd() * 4);
+    if (k === 0) out.push(schema.node("heading", { level: 2 }, schema.text("Heading " + i)));
+    else if (k === 1) out.push(schema.node("bullet_list", null, [
+      schema.node("list_item", null, [schema.node("paragraph", null, schema.text("item " + i + " alpha beta gamma"))]),
+      schema.node("list_item", null, [schema.node("paragraph", null, schema.text("item " + i + " delta epsilon"))])
+    ]));
+    else if (k === 2) out.push(schema.node("blockquote", null, [
+      schema.node("paragraph", null, schema.text("quote " + i + " lorem ipsum dolor sit amet"))]));
+    else out.push(schema.node("paragraph", null, schema.text(
+      "Para " + i + " " + "lorem ipsum dolor sit amet consectetur. ".repeat(3))));
+  }
+  return out;
+}
+
+function pagedDoc(n, perPage, seed) {
+  const b = blocks(S, n, rng(seed));
+  const pages = [];
+  for (let i = 0; i < b.length; i += perPage) pages.push(S.node("page", null, b.slice(i, i + perPage)));
+  return S.node("doc", null, pages);
+}
+
+const viewportKey = new PluginKey("viewport");
+const vpPlugin = new Plugin({
+  key: viewportKey,
+  state: { init: () => ({ from: 0, to: 0 }), apply: (tr, p) => tr.getMeta(viewportKey) || p },
+  props: {
+    decorations(state) {
+      const { from, to } = viewportKey.getState(state);
+      const d = [];
+      state.doc.forEach((c, off) => {
+        const end = off + c.nodeSize;
+        if (end > from && off < to) d.push(Decoration.node(off, end, {}, { materialize: true }));
+      });
+      return DecorationSet.create(state.doc, d);
+    }
+  }
+});
+
+const heights = new Map();
+function virtualPageView(node, view, getPos, decos) {
+  const mat = decos.some((d) => d.spec && d.spec.materialize);
+  const id = "p" + getPos();
+  const dom = document.createElement("div");
+  dom.className = "vpage" + (mat ? "" : " vpage-placeholder");
+  if (mat) {
+    return {
+      dom, contentDOM: dom,
+      update(n2, d2) {
+        if (n2.type !== node.type) return false;
+        if (!d2.some((d) => d.spec && d.spec.materialize)) return false;
+        heights.set(id, dom.offsetHeight); return true;
+      },
+      destroy() { if (dom.offsetHeight) heights.set(id, dom.offsetHeight); }
+    };
+  }
+  dom.setAttribute("data-placeholder", "true");
+  dom.style.height = (heights.get(id) || Math.max(21, node.textContent.length / 90 * 21)) + "px";
+  return {
+    dom, contentDOM: null,
+    update(n2, d2) {
+      if (n2.type !== node.type) return false;
+      if (d2.some((d) => d.spec && d.spec.materialize)) return false;
+      node = n2; return true;
+    },
+    ignoreMutation: () => true
+  };
+}
+
+function mountEl() {
+  const d = document.createElement("div"); d.className = "ed";
+  document.getElementById("host").appendChild(d); return d;
+}
+
+function buildPaged({ doc, virtualized, pagesVisible = 3 }) {
+  const plugins = [history(), keymap(baseKeymap)];
+  if (virtualized) plugins.push(vpPlugin);
+  const view = new EditorView(mountEl(), {
+    state: EditorState.create({ doc, plugins }),
+    nodeViews: virtualized ? { page: virtualPageView } : {}
+  });
+  if (virtualized) {
+    let to = 0, i = 0;
+    view.state.doc.forEach((c, off) => { if (i++ < pagesVisible) to = off + c.nodeSize; });
+    view.dispatch(view.state.tr.setMeta(viewportKey, { from: 0, to }));
+  }
+  return view;
+}
+
+/* ================================================================
+ * PROOF A - DIFFERENTIAL FUZZ
+ * Two editors, identical doc. One virtualized, one fully rendered.
+ * Apply the SAME pseudo-random edit sequence to both. The resulting
+ * documents must be byte-identical.
+ * ================================================================ */
+window.differentialFuzz = function (nBlocks, nEdits, seed) {
+  const docA = pagedDoc(nBlocks, 20, seed);
+  const docB = pagedDoc(nBlocks, 20, seed);
+  const plain = buildPaged({ doc: docA, virtualized: false });
+  const virt = buildPaged({ doc: docB, virtualized: true });
+
+  const rnd = rng(seed + 999);
+  const ops = [];
+  let mismatchAt = null;
+
+  for (let i = 0; i < nEdits; i++) {
+    const size = plain.state.doc.content.size;
+    const op = Math.floor(rnd() * 5);
+    let describe;
+    const at = 1 + Math.floor(rnd() * Math.max(1, size - 2));
+
+    const applyBoth = (fn) => {
+      fn(plain);
+      fn(virt);
+    };
+
+    try {
+      if (op === 0) {                       // insert text at a random pos
+        describe = "insertText@" + at;
+        applyBoth((v) => {
+          const p = Math.min(at, v.state.doc.content.size - 1);
+          const $p = v.state.doc.resolve(p);
+          if ($p.parent.isTextblock) v.dispatch(v.state.tr.insertText("Z" + i, p));
+        });
+      } else if (op === 1) {                // delete a range
+        describe = "delete@" + at;
+        applyBoth((v) => {
+          const s = v.state.doc.content.size;
+          const from = Math.min(at, s - 2), to = Math.min(from + 5, s - 1);
+          const $f = v.state.doc.resolve(from), $t = v.state.doc.resolve(to);
+          if ($f.parent.isTextblock && $t.parent === $f.parent) v.dispatch(v.state.tr.delete(from, to));
+        });
+      } else if (op === 2) {                // toggle a mark over a range
+        describe = "toggleMark@" + at;
+        applyBoth((v) => {
+          const s = v.state.doc.content.size;
+          const from = Math.min(at, s - 2), to = Math.min(from + 10, s - 1);
+          const $f = v.state.doc.resolve(from), $t = v.state.doc.resolve(to);
+          if ($f.parent.isTextblock && $t.parent === $f.parent) {
+            const tr = v.state.tr.setSelection(TextSelection.create(v.state.doc, from, to));
+            v.dispatch(tr);
+            toggleMark(v.state.schema.marks.strong)(v.state, (t) => v.dispatch(t));
+          }
+        });
+      } else if (op === 3) {                // undo
+        describe = "undo";
+        applyBoth((v) => undo(v.state, (t) => v.dispatch(t)));
+      } else {                              // move the viewport (virt only)
+        describe = "scroll";
+        const pages = virt.state.doc.childCount;
+        const start = Math.floor(rnd() * pages);
+        let from = 0, to = 0, k = 0;
+        virt.state.doc.forEach((c, off) => {
+          if (k === start) from = off;
+          if (k >= start && k < start + 3) to = off + c.nodeSize;
+          k++;
+        });
+        virt.dispatch(virt.state.tr.setMeta(viewportKey, { from, to }));
+      }
+    } catch (e) {
+      ops.push({ i, describe, error: String(e) });
+      break;
+    }
+
+    ops.push({ i, describe });
+    const a = JSON.stringify(plain.state.doc.toJSON());
+    const b = JSON.stringify(virt.state.doc.toJSON());
+    if (a !== b) { mismatchAt = { i, describe, aLen: a.length, bLen: b.length }; break; }
+  }
+
+  const finalA = JSON.stringify(plain.state.doc.toJSON());
+  const finalB = JSON.stringify(virt.state.doc.toJSON());
+  const result = {
+    nBlocks, nEdits, seed,
+    opsApplied: ops.length,
+    mismatchAt,
+    identical: finalA === finalB,
+    docJsonLength: finalA.length,
+    errors: ops.filter((o) => o.error)
+  };
+  plain.destroy(); virt.destroy();
+  document.getElementById("host").innerHTML = "";
+  return result;
+};
+
+/* ================================================================
+ * PROOF B - select-all then REPLACE, with most content unrendered
+ * ================================================================ */
+window.selectAllReplace = function (nBlocks) {
+  const view = buildPaged({ doc: pagedDoc(nBlocks, 20, 7), virtualized: true });
+  const before = view.state.doc.textContent.length;
+  selectAll(view.state, (t) => view.dispatch(t));
+  const selSpan = { from: view.state.selection.from, to: view.state.selection.to, docSize: view.state.doc.nodeSize };
+  // typing over an AllSelection must wipe the ENTIRE doc, incl. unrendered pages
+  view.dispatch(view.state.tr.replaceSelectionWith(S.node("paragraph", null, S.text("replaced")), false));
+  const after = view.state.doc.textContent;
+  const r = {
+    beforeLength: before, selSpan,
+    afterText: after.slice(0, 60),
+    afterLength: after.length,
+    wipedEverything: after.trim() === "replaced",
+    pagesRemaining: view.state.doc.childCount
+  };
+  view.destroy(); document.getElementById("host").innerHTML = "";
+  return r;
+};
+
+/* ================================================================
+ * PROOF C - scale sweep: mount cost & DOM size, rendered vs virtual
+ * ================================================================ */
+window.scaleSweep = function (sizes) {
+  const out = [];
+  for (const n of sizes) {
+    heights.clear();
+    // full render
+    let t0 = performance.now();
+    const plain = buildPaged({ doc: pagedDoc(n, 20, 3), virtualized: false });
+    plain.dom.offsetHeight;
+    const plainMount = performance.now() - t0;
+    const plainNodes = countNodes(plain.dom);
+    const plainType = typingCost(plain);
+    plain.destroy();
+
+    heights.clear();
+    t0 = performance.now();
+    const virt = buildPaged({ doc: pagedDoc(n, 20, 3), virtualized: true });
+    virt.dom.offsetHeight;
+    const virtMount = performance.now() - t0;
+    const virtNodes = countNodes(virt.dom);
+    const virtType = typingCost(virt);
+    virt.destroy();
+
+    document.getElementById("host").innerHTML = "";
+    out.push({
+      blocks: n,
+      fullRender: { mountMs: +plainMount.toFixed(1), domNodes: plainNodes, typingP95: plainType.p95 },
+      virtualized: { mountMs: +virtMount.toFixed(1), domNodes: virtNodes, typingP95: virtType.p95 },
+      mountSpeedup: +(plainMount / virtMount).toFixed(1),
+      domReduction: +(plainNodes / virtNodes).toFixed(1)
+    });
+  }
+  return out;
+};
+
+function countNodes(el) {
+  let n = 0; const w = document.createTreeWalker(el, NodeFilter.SHOW_ALL);
+  while (w.nextNode()) n++; return n;
+}
+function typingCost(view) {
+  const t = [];
+  for (let i = 0; i < 40; i++) {
+    const t0 = performance.now();
+    view.dispatch(view.state.tr.insertText("x", 3));
+    view.dom.offsetHeight;
+    t.push(performance.now() - t0);
+  }
+  t.sort((a, b) => a - b);
+  return { median: +t[20].toFixed(3), p95: +t[38].toFixed(3) };
+}
+
+/* ================================================================
+ * PROOF D - what BREAKS: browser find-in-page / DOM text search
+ * ================================================================ */
+window.findInPageCheck = function (nBlocks) {
+  const view = buildPaged({ doc: pagedDoc(nBlocks, 20, 11), virtualized: true });
+  // insert a unique token deep into an unrendered page
+  const deep = Math.floor(view.state.doc.content.size * 0.9);
+  const $d = view.state.doc.resolve(deep);
+  let pos = deep;
+  if (!$d.parent.isTextblock) { view.state.doc.descendants((n, p) => { if (n.isTextblock && p > deep) { pos = p + 1; return false; } }); }
+  view.dispatch(view.state.tr.insertText("UNIQUETOKEN42", pos));
+
+  const r = {
+    inDocState: view.state.doc.textContent.includes("UNIQUETOKEN42"),
+    inRenderedDOM: view.dom.textContent.includes("UNIQUETOKEN42"),
+    // window.find is what Cmd+F effectively drives
+    browserFindFinds: (() => { try { return window.find ? window.find("UNIQUETOKEN42") : "no window.find"; } catch (e) { return "err:" + e; } })(),
+    // but a doc-state search DOES find it (this is the mitigation)
+    stateSearchFindsIt: (() => {
+      let found = false;
+      view.state.doc.descendants((n) => { if (n.isText && n.text.includes("UNIQUETOKEN42")) found = true; });
+      return found;
+    })()
+  };
+  view.destroy(); document.getElementById("host").innerHTML = "";
+  return r;
+};
+
+window.__ready2 = true;
+</script>
+</body>
+</html>
