@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 import com.google.gson.Gson;
 import com.streetwriters.notesnook.datatypes.Note;
@@ -21,12 +22,28 @@ public class NotePreviewWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
         String data = context.getSharedPreferences("appPreview", Context.MODE_PRIVATE).getString(String.valueOf(appWidgetId), "");
-        if (data.isEmpty()) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
+
+        Note note = null;
+        if (data != null && !data.isEmpty()) {
+            try {
+                note = new Gson().fromJson(data, Note.class);
+            } catch (Exception e) {
+                Log.e("NotePreviewWidget", "Could not read the note stored for widget " + appWidgetId, e);
+            }
+        }
+
+        if (note == null) {
+            // Either the widget was never configured, or we lost the note it pointed at (ids
+            // reassigned, data cleared). Point it back at the picker rather than leaving the user
+            // with an inert widget they can only fix by deleting and re-adding it.
+            views.setTextViewText(R.id.widget_title, context.getString(R.string.widget_note_unconfigured_title));
+            views.setTextViewText(R.id.widget_body, context.getString(R.string.widget_note_unconfigured_body));
+            views.setOnClickPendingIntent(R.id.open_note, getConfigurePendingIntent(context, appWidgetId));
+            appWidgetManager.updateAppWidget(appWidgetId, views);
             return;
         }
-        Gson gson = new Gson();
-        Note note = gson.fromJson(data, Note.class);
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
+
         views.setTextViewText(R.id.widget_title, note.getTitle());
         views.setTextViewText(R.id.widget_body, note.getHeadline());
 
@@ -39,6 +56,22 @@ public class NotePreviewWidget extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.open_note, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    /**
+     * Reopens the configure screen for this widget. The launcher's own "reconfigure" gesture is
+     * hard to discover and not offered by every launcher, so an unconfigured widget needs its own
+     * way back in.
+     */
+    private static PendingIntent getConfigurePendingIntent(Context context, int appWidgetId) {
+        Intent intent = new Intent(context, NotePreviewConfigureActivity.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        // PendingIntent equality ignores extras, so the widget id has to be the request code for
+        // each widget to get its own.
+        return PendingIntent.getActivity(context, appWidgetId, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE,
+                WidgetUtils.getActivityOptionsBundle());
     }
 
     @Override

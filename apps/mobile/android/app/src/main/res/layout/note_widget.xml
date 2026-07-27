@@ -25,7 +25,7 @@
             android:textColor="@color/text"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:text="Widget unconfigured" />
+            android:text="@string/widget_note_unconfigured_title" />
         <TextView
             android:id="@+id/widget_body"
             android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
             android:layout_marginLeft="8dp"
             android:textColor="@color/text"
             android:textSize="14sp"
-            android:text="Configure this widget to show a note here." />
+            android:text="@string/widget_note_unconfigured_body" />
     </LinearLayout>
 
 </RelativeLayout>
