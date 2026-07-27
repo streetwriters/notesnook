@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import com.google.gson.Gson;
 import com.streetwriters.notesnook.datatypes.Note;
@@ -46,6 +47,10 @@ public class NotePreviewWidget extends AppWidgetProvider {
 
         views.setTextViewText(R.id.widget_title, note.getTitle());
         views.setTextViewText(R.id.widget_body, note.getHeadline());
+        // Once the user shrinks the widget down to a single row there is no room for the preview
+        // text, and a clipped half-line of it looks like a rendering glitch.
+        views.setViewVisibility(R.id.widget_body,
+                hasRoomForBody(appWidgetManager, appWidgetId) ? View.VISIBLE : View.GONE);
 
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra(OpenNoteId, note.getId());
@@ -74,9 +79,25 @@ public class NotePreviewWidget extends AppWidgetProvider {
                 WidgetUtils.getActivityOptionsBundle());
     }
 
+    /**
+     * Height below which the note preview text is dropped, leaving just the title.
+     */
+    private static final int MIN_HEIGHT_FOR_BODY_DP = 70;
+
+    private static boolean hasRoomForBody(AppWidgetManager appWidgetManager, int appWidgetId) {
+        Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
+        if (options == null) return true;
+
+        int minHeight = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
+        // Not reported yet (the widget has just been placed): assume there is room.
+        return minHeight <= 0 || minHeight >= MIN_HEIGHT_FOR_BODY_DP;
+    }
+
     @Override
     public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+        // This used to do nothing at all, so resizing the widget left it rendered for its old size.
+        updateAppWidget(context, appWidgetManager, appWidgetId);
     }
 
     /**
