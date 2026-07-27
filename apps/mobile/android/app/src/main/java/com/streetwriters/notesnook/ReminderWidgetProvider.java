@@ -1,14 +1,11 @@
 package com.streetwriters.notesnook;
 
-import android.app.ActivityOptions;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
 import android.widget.RemoteViews;
 
 public class ReminderWidgetProvider extends AppWidgetProvider {
@@ -23,20 +20,10 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
     }
 
 
-    private static Bundle getActivityOptionsBundle() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ActivityOptions activityOptions = ActivityOptions.makeBasic();
-            activityOptions.setPendingIntentCreatorBackgroundActivityStartMode(
-                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
-            return activityOptions.toBundle();
-        } else
-            return null;
-    }
-
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, RemoteViews views) {
         Intent listview_intent_template = new Intent(context, MainActivity.class);
         listview_intent_template.setAction(Intent.ACTION_VIEW);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, listview_intent_template, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE, getActivityOptionsBundle());
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, listview_intent_template, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE, WidgetUtils.getActivityOptionsBundle());
         views.setPendingIntentTemplate(R.id.widget_list_view, pendingIntent);
 
         Intent new_reminder_intent = new Intent(context, MainActivity.class);
@@ -44,7 +31,7 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
         new_reminder_intent.setAction(Intent.ACTION_VIEW);
         new_reminder_intent.putExtra(RCTNNativeModule.IntentType, "NewReminder");
         new_reminder_intent.setData(Uri.parse("https://app.notesnook.com/new_reminder"));
-        PendingIntent pendingIntent2 = PendingIntent.getActivity(context, appWidgetId, new_reminder_intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE, getActivityOptionsBundle());
+        PendingIntent pendingIntent2 = PendingIntent.getActivity(context, appWidgetId, new_reminder_intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE, WidgetUtils.getActivityOptionsBundle());
         views.setOnClickPendingIntent(R.id.add_button, pendingIntent2);
 
         Intent list_remote_adapter_intent = new Intent(context, ReminderViewsService.class);
