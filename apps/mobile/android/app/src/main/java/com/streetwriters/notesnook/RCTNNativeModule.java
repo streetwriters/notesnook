@@ -138,7 +138,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
                 if (Objects.equals(extras.getString(IntentType), "NewReminder")) {
                     map.putString(ReminderWidgetProvider.NewReminder, extras.getString(ReminderWidgetProvider.NewReminder));
                 } else if (Objects.equals(extras.getString(IntentType), "OpenReminder")) {
-                    map.putString(ReminderViewsService.OpenReminderId, extras.getString(ReminderViewsService.OpenReminderId));
+                    map.putString(ReminderWidgetProvider.OpenReminderId, extras.getString(ReminderWidgetProvider.OpenReminderId));
                 } else if (Objects.equals(extras.getString(IntentType), "OpenNote")) {
                     map.putString(NotePreviewWidget.OpenNoteId, extras.getString(NotePreviewWidget.OpenNoteId));
                 }
@@ -208,8 +208,8 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         for (int id: ids) {
             Log.d("Reminders", "Updating" + id);
             RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_reminders);
+            // The rows are part of this update, so there is nothing left to invalidate afterwards.
             ReminderWidgetProvider.updateAppWidget(mContext, wm, id, views);
-            wm.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view);
         }
     }
 
