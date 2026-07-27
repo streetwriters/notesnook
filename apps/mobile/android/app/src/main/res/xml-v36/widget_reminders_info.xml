@@ -1,0 +1,20 @@
+<!--
+  Keep this in sync with res/xml/widget_reminders_info.xml. It exists only to add not_keyguard:
+  from Android 16 QPR1 widgets are lock screen eligible by default, and this one renders reminder
+  titles and descriptions, which should not be readable on a locked device.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/widget_reminders"
+    android:minWidth="400dp"
+    android:minHeight="100dp"
+    android:minResizeWidth="400dp"
+    android:minResizeHeight="50dp"
+    android:description="@string/reminders"
+    android:targetCellWidth="5"
+    android:targetCellHeight="2"
+    android:resizeMode="horizontal|vertical"
+    android:previewImage="@drawable/reminder_preview"
+    android:previewLayout="@layout/widget_reminders_preview"
+    android:updatePeriodMillis="1800000"
+    android:widgetCategory="home_screen|not_keyguard"
+    />
