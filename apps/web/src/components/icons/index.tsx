@@ -246,6 +246,11 @@ import ChevronLeftIcon from "@notesnook/icons/chevron-left.svg?react";
 import ChevronRightIcon from "@notesnook/icons/chevron-right.svg?react";
 import ClockIcon from "@notesnook/icons/clock.svg?react";
 import WarningCircle from "@notesnook/icons/warning-circle.svg?react";
+import CloudSvg from "@notesnook/icons/cloud.svg?react";
+import FileSvg from "@notesnook/icons/file.svg?react";
+import ImageSvg from "@notesnook/icons/image.svg?react";
+import ArrowRightSvg from "@notesnook/icons/arrow-right.svg?react";
+import CheckCircleSvg from "@notesnook/icons/check-circle.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -423,7 +428,6 @@ export const LightMode = createIcon(mdiWeatherSunny);
 export const ThemeIcon = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const DoubleCheckmark = createIcon(mdiCheckAll);
-export const CheckCircle = createIcon(mdiCheckCircle);
 export const CheckIntermediate = createIcon(mdiMinusCircleOutline);
 export const CheckRemove = createIcon(mdiCloseCircleOutline);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
@@ -630,3 +634,8 @@ export const ChevronLeft = createSvgIcon(ChevronLeftIcon);
 export const ChevronRight = createSvgIcon(ChevronRightIcon);
 export const Clock = createSvgIcon(ClockIcon);
 export const Warning = createSvgIcon(WarningCircle);
+export const Cloud = createSvgIcon(CloudSvg);
+export const FileDoc = createSvgIcon(FileSvg);
+export const Picture = createSvgIcon(ImageSvg);
+export const ArrowRightSvgIcon = createSvgIcon(ArrowRightSvg);
+export const CheckCircle = createSvgIcon(CheckCircleSvg);
