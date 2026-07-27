@@ -30,6 +30,7 @@ export { type DatabaseUpdatedEvent } from "./database/index.js";
 export { FilteredSelector } from "./database/sql-collection.js";
 export {
   getUpcomingReminder,
+  getUpcomingReminderTime,
   formatReminderTime,
   isReminderToday,
   isReminderActive
