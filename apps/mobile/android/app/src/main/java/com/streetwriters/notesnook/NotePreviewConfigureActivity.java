@@ -5,15 +5,11 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
-import com.google.gson.Gson;
-import com.streetwriters.notesnook.datatypes.Note;
 
 public class NotePreviewConfigureActivity extends ReactActivity {
 
