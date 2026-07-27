@@ -12,6 +12,9 @@ import android.widget.RemoteViews;
 import com.google.gson.Gson;
 import com.streetwriters.notesnook.datatypes.Note;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class NotePreviewWidget extends AppWidgetProvider {
     static String OpenNoteId = "com.streetwriters.notesnook.OpenNoteId";
@@ -41,6 +44,44 @@ public class NotePreviewWidget extends AppWidgetProvider {
     @Override
     public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+    }
+
+    /**
+     * The note shown by each widget is stored in the "appPreview" preferences under its widget id.
+     * When the system restores our widgets it hands out fresh ids, so unless we move the stored
+     * notes over to the new ids the widgets are left permanently blank with no way to recover
+     * other than removing and re-adding them.
+     *
+     * AppWidgetProvider calls onUpdate() with the new ids right after this, which re-renders them.
+     */
+    @Override
+    public void onRestored(Context context, int[] oldWidgetIds, int[] newWidgetIds) {
+        super.onRestored(context, oldWidgetIds, newWidgetIds);
+        if (oldWidgetIds == null || newWidgetIds == null) return;
+
+        int count = Math.min(oldWidgetIds.length, newWidgetIds.length);
+        SharedPreferences preferences = context.getSharedPreferences("appPreview", Context.MODE_PRIVATE);
+
+        // Read everything up front: an old id can collide with the new id of another widget.
+        String[] notes = new String[count];
+        Set<String> newKeys = new HashSet<>();
+        for (int i = 0; i < count; i++) {
+            notes[i] = preferences.getString(String.valueOf(oldWidgetIds[i]), "");
+            newKeys.add(String.valueOf(newWidgetIds[i]));
+        }
+
+        SharedPreferences.Editor edit = preferences.edit();
+        for (int i = 0; i < count; i++) {
+            String oldKey = String.valueOf(oldWidgetIds[i]);
+            if (!newKeys.contains(oldKey)) {
+                edit.remove(oldKey);
+            }
+        }
+        for (int i = 0; i < count; i++) {
+            if (notes[i].isEmpty()) continue;
+            edit.putString(String.valueOf(newWidgetIds[i]), notes[i]);
+        }
+        edit.apply();
     }
 
     @Override
