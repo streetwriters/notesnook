@@ -124,7 +124,7 @@ const features = {
       return user?.storageUsed || 0;
     },
     availability: {
-      free: createLimit("50MB/mo", 50 * 1024 * 1024),
+      free: createLimit("infinity", Infinity),
       essential: createLimit("1GB/mo", 1024 * 1024 * 1024),
       pro: createLimit("10GB/mo", 10 * 1024 * 1024 * 1024),
       believer: createLimit("25GB/mo", 25 * 1024 * 1024 * 1024),
@@ -137,7 +137,7 @@ const features = {
     error: (limit) =>
       `You cannot upload files larger than ${limit.caption} on this plan.`,
     availability: {
-      free: createLimit("10MB", 10 * 1024 * 1024),
+      free: createLimit("512MB", 512 * 1024 * 1024),
       essential: createLimit("100MB", 100 * 1024 * 1024),
       pro: createLimit("1GB", 1024 * 1024 * 1024),
       believer: createLimit("5GB", 5 * 1024 * 1024 * 1024),
@@ -148,7 +148,7 @@ const features = {
     id: "fullQualityImages",
     title: "Full quality images",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -160,7 +160,7 @@ const features = {
     title: "Block-level note links",
     error: () => `Block-level note links are not available on this plan.`,
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -171,7 +171,7 @@ const features = {
     id: "taskList",
     title: "Task list",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -182,7 +182,7 @@ const features = {
     id: "outlineList",
     title: "Outline list",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -193,7 +193,7 @@ const features = {
     id: "callout",
     title: "Callouts",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -205,7 +205,7 @@ const features = {
     title: "Colors",
     used: () => db.colors.all.count(),
     availability: {
-      free: createLimit(7),
+      free: createLimit("infinity"),
       essential: createLimit(20),
       pro: createLimit("infinity"),
       believer: createLimit("infinity"),
@@ -217,7 +217,7 @@ const features = {
     title: "Tags",
     used: () => db.tags.all.count(),
     availability: {
-      free: createLimit(50),
+      free: createLimit("infinity"),
       essential: createLimit(500),
       pro: createLimit("infinity"),
       believer: createLimit("infinity"),
@@ -229,7 +229,7 @@ const features = {
     title: "Notebooks",
     used: () => db.notebooks.all.count(),
     availability: {
-      free: createLimit(50),
+      free: createLimit("infinity"),
       essential: createLimit(500),
       pro: createLimit("infinity"),
       believer: createLimit("infinity"),
@@ -241,7 +241,7 @@ const features = {
     title: "Active reminders",
     used: () => db.reminders.active.count(),
     availability: {
-      free: createLimit(10),
+      free: createLimit("infinity"),
       essential: createLimit(50),
       pro: createLimit("infinity"),
       believer: createLimit("infinity"),
@@ -253,7 +253,7 @@ const features = {
     title: "Shortcuts",
     used: () => db.shortcuts.all.length,
     availability: {
-      free: createLimit(10),
+      free: createLimit("infinity")
       essential: createLimit("infinity"),
       pro: createLimit("infinity"),
       believer: createLimit("infinity"),
@@ -265,7 +265,7 @@ const features = {
     title: "Default notebook & tag",
     error: () => `You cannot set a default notebook or tag on this plan.`,
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -276,7 +276,7 @@ const features = {
     id: "recurringReminders",
     title: "Recurring reminders",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -287,7 +287,7 @@ const features = {
     id: "pinNoteInNotification",
     title: "Pin note in notification",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -298,7 +298,7 @@ const features = {
     id: "createNoteFromNotificationDrawer",
     title: "Create note from notification drawer",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -309,7 +309,7 @@ const features = {
     id: "defaultSidebarTab",
     title: "Default sidebar tab",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -320,7 +320,7 @@ const features = {
     id: "customHomepage",
     title: "Custom homepage",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -331,7 +331,7 @@ const features = {
     id: "markdownShortcuts",
     title: "Markdown shortcuts",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -342,7 +342,7 @@ const features = {
     id: "fontLigatures",
     title: "Font ligatures",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -353,7 +353,7 @@ const features = {
     id: "customToolbarPreset",
     title: "Custom toolbar preset",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -364,7 +364,7 @@ const features = {
     id: "customizableSidebar",
     title: "Customizable sidebar",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -375,7 +375,7 @@ const features = {
     id: "disableTrashCleanup",
     title: "Disable trash cleanup",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -386,7 +386,7 @@ const features = {
     id: "appLock",
     title: "App lock",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -397,7 +397,7 @@ const features = {
     id: "maxNoteVersions",
     title: "Maximum note versions",
     availability: {
-      free: createLimit(100),
+      free: createLimit("infinity"),
       essential: createLimit(1000),
       pro: createLimit("infinity"),
       believer: createLimit("infinity"),
@@ -408,7 +408,7 @@ const features = {
     id: "fullOfflineMode",
     title: "Full offline mode",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -419,7 +419,7 @@ const features = {
     id: "syncControls",
     title: "Sync controls",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -430,7 +430,7 @@ const features = {
     id: "monographLinksAndEmbeds",
     title: "Links & embeds in monographs",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -441,7 +441,7 @@ const features = {
     id: "monographAnalytics",
     title: "Monographs analytics",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -452,7 +452,7 @@ const features = {
     id: "sms2FA",
     title: "2FA via SMS",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -463,7 +463,7 @@ const features = {
     id: "notesnookCircle",
     title: "Notesnook Circle",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(true),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -474,7 +474,7 @@ const features = {
     id: "androidLauncherShortcuts",
     title: "Android Launcher Shortcuts",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -485,7 +485,7 @@ const features = {
     id: "expiringNotes",
     title: "Expiring notes",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -496,7 +496,7 @@ const features = {
     id: "exportTableAsCsv",
     title: "Export table as CSV",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -507,7 +507,7 @@ const features = {
     id: "importCsvToTable",
     title: "Import CSV to table",
     availability: {
-      free: createLimit(false),
+      free: createLimit(true),
       essential: createLimit(false),
       pro: createLimit(true),
       believer: createLimit(true),
@@ -647,7 +647,7 @@ const PLAN_TO_AVAILABILITY: Record<
   SubscriptionPlan,
   keyof Feature["availability"]
 > = {
-  [SubscriptionPlan.FREE]: "free",
+  [SubscriptionPlan.FREE]: "legacyPro",
   [SubscriptionPlan.ESSENTIAL]: "essential",
   [SubscriptionPlan.PRO]: "pro",
   [SubscriptionPlan.BELIEVER]: "believer",
