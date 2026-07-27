@@ -86,7 +86,7 @@
             android:name=".NotePreviewWidget"
             android:exported="false"
             android:label="@string/note">
-            <intent-filter>"
+            <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.appwidget.action.APPWIDGET_RESTORED" />
             </intent-filter>
