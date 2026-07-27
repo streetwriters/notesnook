@@ -2,13 +2,14 @@ package com.streetwriters.notesnook.datatypes;
 
 import androidx.annotation.Keep;
 
-import java.util.concurrent.TimeUnit;
-
 @Keep
 public class Reminder extends BaseItem {
     private String title;
     private String description;
     private String formattedTime;
+    private String formattedTimeOfDay; // e.g. "5:00 PM"
+    private String formattedDateTime; // e.g. "12-05-2026, 5:00 PM"
+    private long triggerDate; // absolute time this reminder next fires
     private String priority; // "silent", "vibrate", "urgent"
     private long date;
     private String mode; // "repeat", "once", "permanent"
@@ -107,32 +108,27 @@ public class Reminder extends BaseItem {
         this.formattedTime = formattedTime;
     }
 
-    public String formatTime(long timeInMillis) {
-        long currentTime = System.currentTimeMillis();
-        long diff = timeInMillis - currentTime;
+    public String getFormattedTimeOfDay() {
+        return formattedTimeOfDay;
+    }
 
-        if (diff < TimeUnit.MINUTES.toMillis(1)) {
-            return "in " + (diff / 1000) + " seconds";
-        } else if (diff < TimeUnit.HOURS.toMillis(1)) {
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-            return "in " + minutes + " minute" + (minutes > 1 ? "s" : "");
-        } else if (diff < TimeUnit.DAYS.toMillis(1)) {
-            long hours = TimeUnit.MILLISECONDS.toHours(diff);
-            return "in " + hours + " hour" + (hours > 1 ? "s" : "");
-        } else if (diff < TimeUnit.DAYS.toMillis(2)) {
-            return "tomorrow";
-        } else if (diff < TimeUnit.DAYS.toMillis(7)) {
-            long days = TimeUnit.MILLISECONDS.toDays(diff);
-            return "in " + days + " day" + (days > 1 ? "s" : "");
-        } else if (diff < TimeUnit.DAYS.toMillis(30)) {
-            long weeks = TimeUnit.MILLISECONDS.toDays(diff) / 7;
-            return "in " + weeks + " week" + (weeks > 1 ? "s" : "");
-        } else if (diff < TimeUnit.DAYS.toMillis(365)) {
-            long months = TimeUnit.MILLISECONDS.toDays(diff) / 30;
-            return "in " + months + " month" + (months > 1 ? "s" : "");
-        } else {
-            long years = TimeUnit.MILLISECONDS.toDays(diff) / 365;
-            return "in " + years + " year" + (years > 1 ? "s" : "");
-        }
+    public void setFormattedTimeOfDay(String formattedTimeOfDay) {
+        this.formattedTimeOfDay = formattedTimeOfDay;
+    }
+
+    public String getFormattedDateTime() {
+        return formattedDateTime;
+    }
+
+    public void setFormattedDateTime(String formattedDateTime) {
+        this.formattedDateTime = formattedDateTime;
+    }
+
+    public long getTriggerDate() {
+        return triggerDate;
+    }
+
+    public void setTriggerDate(long triggerDate) {
+        this.triggerDate = triggerDate;
     }
 }
