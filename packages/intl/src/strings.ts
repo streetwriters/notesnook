@@ -1843,7 +1843,7 @@ For example:
   yourFullName: () => t`Your full name`,
   memberSince: (date: string) => t`Member since ${date}`,
   betaLoginNotice: () =>
-    t`You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
+    t`You are logging into the beta version of Notesnook. Switching between beta and stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
   loggingIn: () => t`Logging you in`,
   pleaseWaitLogin: () => t`Please wait while you are authenticated.`,
   emailConfirmed: () => t`Your email has been confirmed.`,

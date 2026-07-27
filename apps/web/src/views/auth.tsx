@@ -17,7 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  createContext,
+  useContext
+} from "react";
 import { Button, Flex, Link, Text, Box } from "@notesnook/ui";
 import {
   CheckCircle,
@@ -125,6 +133,8 @@ type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
   navigate: NavigateFunction;
   formData?: AuthFormData[TRoute];
 };
+
+const AuthFormContext = createContext<{ error?: string }>({});
 
 export type AuthProps = {
   route: AuthRoutes;
@@ -482,9 +492,95 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
   );
 }
 
+function RecoverySuccessCard({ email }: { email: string }) {
+  return (
+    <>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing6",
+          p: "spacing7",
+          bg: "background",
+          border: "1px solid var(--border)",
+          borderRadius: "radius4",
+          boxShadow: "0px 4px 25px 0px rgba(0,0,0,0.04)"
+        }}
+      >
+        <CheckCircle size={40} color="accent" />
+        <Flex
+          sx={{
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "spacing3"
+          }}
+        >
+          <Text
+            sx={{
+              fontSize: "md",
+              fontWeight: "bold",
+              color: "heading",
+              textAlign: "center"
+            }}
+          >
+            Recovery email sent!
+          </Text>
+          <Text
+            sx={{
+              fontSize: "sm",
+              color: "paragraph",
+              textAlign: "center",
+              lineHeight: "1.4"
+            }}
+          >
+            We've sent instructions to recover your account to{" "}
+            <Text as="span" sx={{ fontWeight: "medium", color: "accent" }}>
+              {email}
+            </Text>
+          </Text>
+        </Flex>
+        <Box
+          sx={{
+            width: "100%",
+            height: "1px",
+            bg: "separator"
+          }}
+        />
+        <Flex sx={{ gap: "spacing3", alignItems: "flex-start" }}>
+          <Flex
+            sx={{
+              bg: "background-secondary",
+              borderRadius: "default",
+              width: 30,
+              height: 30,
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0
+            }}
+          >
+            <Email size={15} color="icon" />
+          </Flex>
+          <Text
+            sx={{
+              fontSize: "sm",
+              color: "paragraph",
+              lineHeight: "1.4",
+              flex: "1 1 auto"
+            }}
+          >
+            Please check your inbox and follow the instructions to recover your
+            account.
+          </Text>
+        </Flex>
+      </Flex>
+      <SubmitButton text={strings.confirmEmail()} />
+    </>
+  );
+}
+
 function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
   const { navigate, formData, openURL } = props;
-  const [success, setSuccess] = useState<string>();
+  const [recoveryEmail, setRecoveryEmail] = useState<string>();
 
   return (
     <AuthForm
@@ -506,7 +602,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       openURL={openURL}
       onSubmit={async (form) => {
         if (!form.email) {
-          setSuccess(undefined);
+          setRecoveryEmail(undefined);
           return;
         }
 
@@ -516,19 +612,11 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
           window.open(url, "_self");
           return;
         }
-        setSuccess(strings.recoveryEmailSentDesc());
+        setRecoveryEmail(form.email);
       }}
     >
-      {success ? (
-        <>
-          <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
-            <CheckCircle size={20} color="accent" />
-            <Text variant="body" ml={2} sx={{ color: "accent" }}>
-              {success}
-            </Text>
-          </Flex>
-          <SubmitButton text={strings.confirmEmail()} />
-        </>
+      {recoveryEmail ? (
+        <RecoverySuccessCard email={recoveryEmail} />
       ) : (
         <>
           <AuthField
@@ -965,181 +1053,185 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
     return <Loader title={props.loading.title} text={props.loading.subtitle} />;
 
   return (
-    <Flex
-      ref={formRef}
-      as="form"
-      id="authForm"
-      onSubmit={async (e) => {
-        if (!formRef.current) return;
-        e.preventDefault();
+    <AuthFormContext.Provider value={{ error }}>
+      <Flex
+        ref={formRef}
+        as="form"
+        id="authForm"
+        onSubmit={async (e) => {
+          if (!formRef.current) return;
+          e.preventDefault();
 
-        setError("");
-        setIsSubmitting(true);
-        const formData = new FormData(formRef.current);
-        const form = Object.fromEntries(formData.entries()) as AuthFormData[T];
-        try {
-          setForm(form);
-          await props.onSubmit(form);
-          if (!loadForever) setIsSubmitting(false);
-        } catch (e) {
-          setIsSubmitting(false);
-          const error = e as Error;
-          if (error.message === "invalid_grant") {
-            setError(
-              "Login session has expired. Please refresh this page and try logging in again."
-            );
-            return;
+          setError("");
+          setIsSubmitting(true);
+          const formData = new FormData(formRef.current);
+          const form = Object.fromEntries(
+            formData.entries()
+          ) as AuthFormData[T];
+          try {
+            setForm(form);
+            await props.onSubmit(form);
+            if (!loadForever) setIsSubmitting(false);
+          } catch (e) {
+            setIsSubmitting(false);
+            const error = e as Error;
+            if (error.message === "invalid_grant") {
+              setError(
+                "Login session has expired. Please refresh this page and try logging in again."
+              );
+              return;
+            }
+            setError(error.message);
           }
-          setError(error.message);
-        }
-      }}
-      sx={{
-        flex: 1,
-        flexDirection: "column",
-        alignItems: "left",
-        // justifyContent: "center",
-        width: ["95%", "95%", "65%"],
-        maxWidth: "500px",
-        alignSelf: "center",
-        mt: "149px"
-      }}
-    >
-      {onBack ? (
-        <Button
-          type="button"
-          onClick={onBack}
-          sx={{
-            background: "background",
-            borderRadius: "radius2",
-            display: "flex",
-            alignItems: "center",
-            gap: "spacing4",
-            px: "spacing6",
-            py: "spacing5",
-            alignSelf: "flex-start",
-            mb: "spacing9",
-            border: "1px solid var(--border)"
-          }}
-        >
-          <ChevronLeft size={14} color="icon" />
-          <Text
-            sx={{
-              fontSize: "sm",
-              fontWeight: 600,
-              color: "heading"
-            }}
-          >
-            {strings.goBack()}
-          </Text>
-        </Button>
-      ) : (
-        <Flex
-          sx={{
-            mb: "70px",
-            alignItems: "center",
-            gap: "spacing4"
-          }}
-        >
-          <svg
-            style={{
-              borderRadius: "default",
-              height: 30,
-              width: 30,
-              alignSelf: "center"
-            }}
-          >
-            <use href="#full-logo" />
-          </svg>
-          <Text
-            sx={{
-              fontSize: "2xl",
-              fontWeight: 600,
-              color: "heading"
-            }}
-          >
-            Notesnook
-          </Text>
-        </Flex>
-      )}
-      <Text
+        }}
         sx={{
-          fontSize: "xl",
-          textAlign: "left",
-          fontWeight: 600,
-          color: "heading"
+          flex: 1,
+          flexDirection: "column",
+          alignItems: "left",
+          // justifyContent: "center",
+          width: ["95%", "95%", "65%"],
+          maxWidth: "500px",
+          alignSelf: "center",
+          mt: 100
         }}
       >
-        {title}
-      </Text>
-      <Text
-        sx={{
-          mt: "spacing3",
-          mb: "spacing7",
-          fontSize: "sm",
-          textAlign: "left",
-          color: "paragraph",
-          fontWeight: 400
-        }}
-      >
-        {subtitle}
-      </Text>
-      {typeof children === "function" ? children(form) : children}
-      {canSkip && (
-        <Button
-          type="button"
-          variant="new_bordered"
-          sx={{ width: "100%", mt: "spacing4" }}
-          onClick={() => {
-            openURL("/notes/", { authenticated: false });
-          }}
-        >
-          {strings.skipAndGoToApp()}
-        </Button>
-      )}
-      {showAgreement && (
+        {onBack ? (
+          <Button
+            type="button"
+            onClick={onBack}
+            sx={{
+              background: "background",
+              borderRadius: "radius2",
+              display: "flex",
+              alignItems: "center",
+              gap: "spacing4",
+              px: "spacing6",
+              py: "spacing5",
+              alignSelf: "flex-start",
+              mb: "spacing9",
+              border: "1px solid var(--border)"
+            }}
+          >
+            <ChevronLeft size={14} color="icon" />
+            <Text
+              sx={{
+                fontSize: "sm",
+                fontWeight: 600,
+                color: "heading"
+              }}
+            >
+              {strings.goBack()}
+            </Text>
+          </Button>
+        ) : (
+          <Flex
+            sx={{
+              mb: 70,
+              alignItems: "center",
+              gap: "spacing4"
+            }}
+          >
+            <svg
+              style={{
+                borderRadius: "default",
+                height: 30,
+                width: 30,
+                alignSelf: "center"
+              }}
+            >
+              <use href="#full-logo" />
+            </svg>
+            <Text
+              sx={{
+                fontSize: "2xl",
+                fontWeight: 600,
+                color: "heading"
+              }}
+            >
+              Notesnook
+            </Text>
+          </Flex>
+        )}
         <Text
-          mt={4}
           sx={{
-            color: "paragraph",
-            fontSize: "xs",
-            textAlign: "center",
-            fontWeight: 400,
-            lineHeight: "150%",
-            mt: "auto",
-            mb: "spacing11"
+            fontSize: "xl",
+            textAlign: "left",
+            fontWeight: 600,
+            color: "heading"
           }}
         >
-          {strings.signupAgreement[0]()}{" "}
-          <Link
-            target="_blank"
-            rel="noreferrer"
-            href="https://notesnook.com/tos"
-            sx={{
-              fontWeight: 600,
-              color: "accent",
-              textDecoration: "none"
-            }}
-          >
-            {strings.signupAgreement[1]()}
-          </Link>{" "}
-          {strings.signupAgreement[2]()}{" "}
-          <Link
-            rel="noreferrer"
-            href="https://notesnook.com/privacy"
-            sx={{
-              fontWeight: 600,
-              color: "accent",
-              textDecoration: "none"
-            }}
-          >
-            {strings.signupAgreement[3]()}
-          </Link>
-          . {strings.signupAgreement[4]()}
+          {title}
         </Text>
-      )}
+        <Text
+          sx={{
+            mt: "spacing3",
+            mb: "spacing7",
+            fontSize: "sm",
+            textAlign: "left",
+            color: "paragraph",
+            fontWeight: 400
+          }}
+        >
+          {subtitle}
+        </Text>
+        {typeof children === "function" ? children(form) : children}
 
-      <AuthErrorText error={error} mt={"spacing7"} />
-    </Flex>
+        {canSkip && (
+          <Button
+            type="button"
+            variant="new_bordered"
+            sx={{ width: "100%", mt: "spacing4" }}
+            onClick={() => {
+              openURL("/notes/", { authenticated: false });
+            }}
+          >
+            {strings.skipAndGoToApp()}
+          </Button>
+        )}
+        {showAgreement && (
+          <Text
+            mt={4}
+            sx={{
+              color: "paragraph",
+              fontSize: "xs",
+              textAlign: "center",
+              fontWeight: 400,
+              lineHeight: "150%",
+              mt: "auto",
+              mb: "spacing11"
+            }}
+          >
+            {strings.signupAgreement[0]()}{" "}
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href="https://notesnook.com/tos"
+              sx={{
+                fontWeight: 600,
+                color: "accent",
+                textDecoration: "none"
+              }}
+            >
+              {strings.signupAgreement[1]()}
+            </Link>{" "}
+            {strings.signupAgreement[2]()}{" "}
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href="https://notesnook.com/privacy"
+              sx={{
+                fontWeight: 600,
+                color: "accent",
+                textDecoration: "none"
+              }}
+            >
+              {strings.signupAgreement[3]()}
+            </Link>{" "}
+            {strings.signupAgreement[4]()}
+          </Text>
+        )}
+      </Flex>
+    </AuthFormContext.Provider>
   );
 }
 
@@ -1188,7 +1280,7 @@ export function AuthField(props: FieldProps) {
         },
         input: {
           fontSize: "xs",
-          borderRadius: "spacing4",
+          borderRadius: "radius2",
           outline: 0,
           bg: "background-secondary",
           paddingY: "spacing6",
@@ -1212,19 +1304,23 @@ type SubmitButtonProps = {
   loading?: boolean;
 };
 export function SubmitButton(props: SubmitButtonProps) {
+  const { error } = useContext(AuthFormContext);
   return (
-    <Button
-      data-test-id="submitButton"
-      type="submit"
-      variant="new_accent"
-      sx={{
-        marginTop: "spacing8",
-        width: "100%"
-      }}
-      disabled={props.disabled}
-    >
-      {props.loading ? <Loading color="accentForeground" /> : props.text}
-    </Button>
+    <>
+      <AuthErrorText error={error} sx={{ mt: "spacing4", px: 0 }} />
+      <Button
+        data-test-id="submitButton"
+        type="submit"
+        variant="new_accent"
+        sx={{
+          marginTop: "spacing8",
+          width: "100%"
+        }}
+        disabled={props.disabled}
+      >
+        {props.loading ? <Loading color="accentForeground" /> : props.text}
+      </Button>
+    </>
   );
 }
 

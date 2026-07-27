@@ -8505,8 +8505,8 @@ msgstr ""
 msgid "You are editing #{tag}"
 msgstr ""
 
-#: src/strings.ts:1846
-msgid "You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
+#: src/strings.ts:1841
+msgid "You are logging into the beta version of Notesnook. Switching between beta and stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
 msgstr ""
 
 #: src/strings.ts:1416
