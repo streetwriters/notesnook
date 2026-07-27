@@ -57,7 +57,8 @@
             android:layout_height="match_parent"
             android:textAlignment="center"
             android:gravity="center"
-            android:text="Tap on + to add reminder"/>
+            android:textColor="@color/text"
+            android:text="@string/widget_reminders_empty"/>
 
     </LinearLayout>
 
