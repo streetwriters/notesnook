@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { FunctionComponent, SyntheticEvent } from "react";
-import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
+import {
+  NodeView,
+  Decoration,
+  DecorationSource,
+  ViewMutationRecord
+} from "prosemirror-view";
 import { Node as PMNode, Slice } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import { PortalProviderAPI } from "./react-portal-provider.js";
@@ -401,7 +406,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   }
 
   ignoreMutation(
-    mutation: MutationRecord | { type: "selection"; target: Element }
+    mutation: ViewMutationRecord // MutationRecord | { type: "selection"; target: Element }
   ) {
     if (!this.dom || !this.contentDOM) {
       return true;

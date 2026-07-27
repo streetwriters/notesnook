@@ -1,8 +1,8 @@
 diff --git a/node_modules/prosemirror-model/dist/index.cjs b/node_modules/prosemirror-model/dist/index.cjs
-index aa31355..1409b46 100644
+index 96ef508..8f56356 100644
 --- a/node_modules/prosemirror-model/dist/index.cjs
 +++ b/node_modules/prosemirror-model/dist/index.cjs
-@@ -95,6 +95,7 @@ var Fragment = function () {
+@@ -112,6 +112,7 @@ var Fragment = function () {
        var nodeStart = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
        var parent = arguments.length > 4 ? arguments[4] : undefined;
        for (var i = 0, pos = 0; pos < to; i++) {
@@ -10,7 +10,7 @@ index aa31355..1409b46 100644
          var child = this.content[i],
            end = pos + child.nodeSize;
          if (end > from && f(child, nodeStart + pos, parent || null, i) !== false && child.content.size) {
-@@ -2817,7 +2818,7 @@ function _renderSpec(doc, structure, xmlNS, blockArraysIn) {
+@@ -2860,7 +2861,7 @@ function _renderSpec(doc, structure, xmlNS, blockArraysIn) {
    var tagName = structure[0],
      suspicious;
    if (typeof tagName != "string") throw new RangeError("Invalid array passed to renderSpec");
@@ -20,10 +20,10 @@ index aa31355..1409b46 100644
    if (space > 0) {
      xmlNS = tagName.slice(0, space);
 diff --git a/node_modules/prosemirror-model/dist/index.js b/node_modules/prosemirror-model/dist/index.js
-index 0097d9f..19d7031 100644
+index 6b00598..c7c4a38 100644
 --- a/node_modules/prosemirror-model/dist/index.js
 +++ b/node_modules/prosemirror-model/dist/index.js
-@@ -84,6 +84,7 @@ class Fragment {
+@@ -94,6 +94,7 @@ class Fragment {
      */
      nodesBetween(from, to, f, nodeStart = 0, parent) {
          for (let i = 0, pos = 0; pos < to; i++) {
@@ -31,7 +31,7 @@ index 0097d9f..19d7031 100644
              let child = this.content[i], end = pos + child.nodeSize;
              if (end > from && f(child, nodeStart + pos, parent || null, i) !== false && child.content.size) {
                  let start = pos + 1;
-@@ -3397,9 +3398,9 @@ function renderSpec(doc, structure, xmlNS, blockArraysIn) {
+@@ -3420,9 +3421,9 @@ function renderSpec(doc, structure, xmlNS, blockArraysIn) {
      let tagName = structure[0], suspicious;
      if (typeof tagName != "string")
          throw new RangeError("Invalid array passed to renderSpec");
