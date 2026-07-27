@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Android 12 onwards the launcher tells us what radius widgets should use, so ours line up
+         with every other widget on the home screen instead of being a fixed 10dp. -->
+    <dimen name="widget_background_radius">@android:dimen/system_app_widget_background_radius</dimen>
+
+</resources>
