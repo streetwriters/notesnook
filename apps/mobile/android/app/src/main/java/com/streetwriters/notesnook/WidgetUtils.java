@@ -13,11 +13,14 @@ import android.widget.RemoteViews;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.streetwriters.notesnook.datatypes.Note;
 import com.streetwriters.notesnook.datatypes.Reminder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Shared helpers for the home screen widgets.
@@ -32,6 +35,50 @@ public class WidgetUtils {
      * transaction, so the list cannot grow without bound. Far more than fits on screen anyway.
      */
     private static final int MAX_REMINDERS = 50;
+
+    /**
+     * The note each note widget is showing, keyed by widget id.
+     *
+     * The preferences file mixes two things: one note per widget id, and the reminders list under
+     * its own key. Only numeric keys are widget notes, so anything else is skipped rather than
+     * being treated as a note.
+     */
+    static Map<Integer, Note> getWidgetNotes(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        Map<Integer, Note> notes = new LinkedHashMap<>();
+
+        for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            Integer widgetId = parseWidgetId(entry.getKey());
+            if (widgetId == null) continue;
+            if (!(entry.getValue() instanceof String)) continue;
+
+            Note note = parseNote((String) entry.getValue());
+            if (note == null || note.getId() == null) continue;
+            notes.put(widgetId, note);
+        }
+        return notes;
+    }
+
+    /**
+     * The widget id a preferences key refers to, or null if the key is not a widget id at all.
+     */
+    private static Integer parseWidgetId(String key) {
+        try {
+            return Integer.valueOf(key);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    static Note parseNote(String data) {
+        if (data == null || data.isEmpty()) return null;
+        try {
+            return new Gson().fromJson(data, Note.class);
+        } catch (Exception e) {
+            Log.e("NotePreviewWidget", "Could not read a stored note", e);
+            return null;
+        }
+    }
 
     /**
      * The reminders the app last wrote out, minus any that have since fired. Reading and filtering

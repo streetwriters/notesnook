@@ -29,7 +29,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.google.gson.Gson;
 import com.streetwriters.notesnook.datatypes.Note;
 
 import java.util.ArrayList;
@@ -156,14 +155,8 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getWidgetNotes(Promise promise) {
-        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Map<String, ?> map = pref.getAll();
         WritableArray arr = Arguments.createArray();
-        for(Map.Entry<String,?> entry : map.entrySet()){
-            if (entry.getKey().equals("remindersList")) continue;
-            String value = (String) entry.getValue();
-            Gson gson = new Gson();
-            Note note = gson.fromJson(value, Note.class);
+        for (Note note : WidgetUtils.getWidgetNotes(getReactApplicationContext()).values()) {
             arr.pushString(note.getId());
         }
         promise.resolve(arr);
@@ -171,33 +164,33 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void hasWidgetNote(final String noteId, Promise promise) {
-        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Map<String, ?> map = pref.getAll();
         boolean found = false;
-        for(Map.Entry<String,?> entry : map.entrySet()){
-            String value = (String) entry.getValue();
-            if (value.contains(noteId)) {
+        for (Note note : WidgetUtils.getWidgetNotes(getReactApplicationContext()).values()) {
+            if (note.getId().equals(noteId)) {
                 found = true;
+                break;
             }
         }
         promise.resolve(found);
     }
+
     @ReactMethod
     public void updateWidgetNote(final String noteId, final String data) {
-        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Map<String, ?> map = pref.getAll();
+        SharedPreferences pref = getReactApplicationContext().getSharedPreferences(WidgetUtils.PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = pref.edit();
-        ArrayList<String> ids = new ArrayList<>();
-        for(Map.Entry<String,?> entry : map.entrySet()) {
-            String value = (String) entry.getValue();
-            if (value.contains(noteId)) {
-                edit.putString(entry.getKey(), data);
-                ids.add(entry.getKey());
-            }
+        List<Integer> ids = new ArrayList<>();
+
+        // Match on the note's id, not on the raw JSON containing it somewhere: a note whose body
+        // happens to mention another note's id is not the same note.
+        for (Map.Entry<Integer, Note> entry : WidgetUtils.getWidgetNotes(getReactApplicationContext()).entrySet()) {
+            if (!noteId.equals(entry.getValue().getId())) continue;
+            edit.putString(String.valueOf(entry.getKey()), data);
+            ids.add(entry.getKey());
         }
         edit.apply();
-        for (String id: ids) {
-            NotePreviewWidget.updateAppWidget(mContext, AppWidgetManager.getInstance(mContext), Integer.parseInt(id));
+
+        for (int id : ids) {
+            NotePreviewWidget.updateAppWidget(mContext, AppWidgetManager.getInstance(mContext), id);
         }
     }
 

@@ -8,10 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
-import com.google.gson.Gson;
 import com.streetwriters.notesnook.datatypes.Note;
 
 import java.util.HashSet;
@@ -22,18 +20,10 @@ public class NotePreviewWidget extends AppWidgetProvider {
     static String OpenNoteId = "com.streetwriters.notesnook.OpenNoteId";
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-        String data = context.getSharedPreferences("appPreview", Context.MODE_PRIVATE).getString(String.valueOf(appWidgetId), "");
+        String data = context.getSharedPreferences(WidgetUtils.PREFERENCES, Context.MODE_PRIVATE).getString(String.valueOf(appWidgetId), "");
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
 
-        Note note = null;
-        if (data != null && !data.isEmpty()) {
-            try {
-                note = new Gson().fromJson(data, Note.class);
-            } catch (Exception e) {
-                Log.e("NotePreviewWidget", "Could not read the note stored for widget " + appWidgetId, e);
-            }
-        }
-
+        Note note = WidgetUtils.parseNote(data);
         if (note == null) {
             // Either the widget was never configured, or we lost the note it pointed at (ids
             // reassigned, data cleared). Point it back at the picker rather than leaving the user
