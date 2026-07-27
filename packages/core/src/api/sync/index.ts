@@ -387,6 +387,10 @@ export class Sync {
       const itemsToDecrypt = itemsByKeyVersion.get(keyInfo.version);
       if (!itemsToDecrypt || itemsToDecrypt.length === 0) continue;
 
+      this.logger.info("Decrypting using key", {
+        keyInfo: keyInfo.version,
+        items: itemsToDecrypt.length
+      });
       decrypted.push(
         ...(await this.db.storage().decryptMulti(keyInfo.key, itemsToDecrypt))
       );
