@@ -9,6 +9,8 @@
     <string name="note">Note</string>
     <string name="note_description">Add a note to home screen</string>
     <string name="quick_note">Quick note</string>
+    <string name="widget_note_unconfigured_title">Tap to choose a note</string>
+    <string name="widget_note_unconfigured_body">Pick the note you want shown here.</string>
     <string name="reminder_ongoing">Ongoing</string>
     <string name="reminder_snoozed_until">Snoozed until %1$s</string>
     <string name="reminder_today">Today, %1$s</string>

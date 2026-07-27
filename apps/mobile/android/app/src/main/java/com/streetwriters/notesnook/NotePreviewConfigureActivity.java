@@ -40,18 +40,32 @@ public class NotePreviewConfigureActivity extends ReactActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(null);
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
-        if (extras != null) {
-            appWidgetId = extras.getInt(
-                    AppWidgetManager.EXTRA_APPWIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID);
-            NotePreviewConfigureActivity.appWidgetId = appWidgetId;
-        }
+        activity = this;
+        readAppWidgetId(getIntent());
+    }
+
+    /**
+     * We launch as singleTask, so configuring a second widget while this screen is still alive
+     * arrives here rather than in onCreate(). Without this the activity would keep writing to
+     * whichever widget it happened to be opened for first.
+     */
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        activity = this;
+        readAppWidgetId(intent);
+    }
+
+    private void readAppWidgetId(Intent intent) {
+        Bundle extras = intent != null ? intent.getExtras() : null;
+        int appWidgetId = extras != null
+                ? extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+                : AppWidgetManager.INVALID_APPWIDGET_ID;
+
+        NotePreviewConfigureActivity.appWidgetId = appWidgetId;
         Intent resultValue = new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         setResult(Activity.RESULT_CANCELED, resultValue);
-        activity = this;
     }
 
     public static void saveAndFinish(Context context) {
