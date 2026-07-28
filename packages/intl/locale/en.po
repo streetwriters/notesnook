@@ -1659,7 +1659,7 @@ msgstr "Clear data & reset account"
 msgid "Clear default notebook"
 msgstr "Clear default notebook"
 
-#: src/strings.ts:2800
+#: src/strings.ts:2803
 msgid "Clear history"
 msgstr "Clear history"
 
@@ -2311,7 +2311,7 @@ msgstr "Delete account"
 msgid "Delete all"
 msgstr "Delete all"
 
-#: src/strings.ts:2802
+#: src/strings.ts:2805
 msgid "Delete all version history for this note?"
 msgstr "Delete all version history for this note?"
 
@@ -4733,6 +4733,10 @@ msgstr "Off"
 msgid "Offline"
 msgstr "Offline"
 
+#: src/strings.ts:2810
+msgid "Offline mode"
+msgstr "Offline mode"
+
 #: src/strings.ts:2688
 msgid "OK"
 msgstr "OK"
@@ -6156,8 +6160,8 @@ msgid "Select folder with backup files"
 msgstr "Select folder with backup files"
 
 #: src/strings.ts:112
-msgid "Select how you would like to recieve the code"
-msgstr "Select how you would like to recieve the code"
+msgid "Select how you would like to receive the code"
+msgstr "Select how you would like to receive the code"
 
 #: src/strings.ts:2366
 msgid "Select language"
@@ -6476,10 +6480,6 @@ msgstr "Size"
 #: src/strings.ts:550
 msgid "Skip"
 msgstr "Skip"
-
-#: src/strings.ts:1831
-msgid "Skip & go directly to the app"
-msgstr "Skip & go directly to the app"
 
 #: src/strings.ts:673
 msgid "Skip introduction"
@@ -7435,6 +7435,10 @@ msgstr "Use native OS titlebar instead of replacing it with a custom one. Requir
 msgid "Use native titlebar"
 msgstr "Use native titlebar"
 
+#: src/strings.ts:1831
+msgid "Use offline"
+msgstr "Use offline"
+
 #: src/strings.ts:1801
 msgid "Use recovery key"
 msgstr "Use recovery key"
@@ -7484,6 +7488,10 @@ msgstr "User verification failed"
 #: src/strings.ts:2267
 msgid "Using {instance} (v{version})"
 msgstr "Using {instance} (v{version})"
+
+#: src/strings.ts:2812
+msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
+msgstr "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
 
 #: src/strings.ts:2265
 msgid "Using official Notesnook instance"
@@ -7553,7 +7561,7 @@ msgstr "Verifying your email"
 msgid "Version"
 msgstr "Version"
 
-#: src/strings.ts:2801
+#: src/strings.ts:2804
 msgid "Version history cleared"
 msgstr "Version history cleared"
 
@@ -7768,8 +7776,8 @@ msgid "Yes, you can cancel your trial anytime. No questions asked."
 msgstr "Yes, you can cancel your trial anytime. No questions asked."
 
 #: src/strings.ts:106
-msgid "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
-msgstr "You also agree to recieve marketing emails from us which you can opt-out of from app settings."
+msgid "You also agree to receive marketing emails from us which you can opt-out of from app settings."
+msgstr "You also agree to receive marketing emails from us which you can opt-out of from app settings."
 
 #: src/strings.ts:2604
 msgid "You are already subscribed to this plan."
