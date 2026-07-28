@@ -19,28 +19,16 @@ jobs:
           # VitePress reads git history to show the last updated date per page.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      # The docs consume both packages as built output: intl supplies the UI
-      # labels resolved at build time, common supplies the keybinding registry
-      # keyboard-shortcuts.md is generated from.
-      - name: Build string catalogue
-        run: npm ci && npm run build
-        working-directory: packages/intl
-
-      - name: Build shared package
-        run: npm run build
-        working-directory: packages/common
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
 
       - name: Install dependencies
-        run: npm ci
-        working-directory: docs/help
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=help
 
-      - name: Build site
-        run: npm run docs:build
-        working-directory: docs/help
+      - name: Build help
+        run: npm run build:help
 
       - name: Setup environment
         run: |
