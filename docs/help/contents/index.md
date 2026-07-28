@@ -12,6 +12,9 @@ hero:
     alt: Notesnook
   actions:
     - theme: brand
+      text: Go to docs
+      link: /docs
+    - theme: alt
       text: Create your first note
       link: /create-a-note-in-notesnook
     - theme: alt
@@ -56,8 +59,16 @@ Can't find what you're looking for? [Contact us](https://notesnook.com/contact-u
 <style>
 .nn-home-note {
   max-width: 768px;
-  margin: 0 auto;
-  padding: 0 24px 64px;
+  margin: 64px auto 0;
+  padding: 32px 24px 72px;
+  border-top: 1px solid var(--vp-c-divider);
   color: var(--vp-c-text-2);
+}
+
+@media (max-width: 640px) {
+  .nn-home-note {
+    margin-top: 40px;
+    padding-bottom: 56px;
+  }
 }
 </style>
