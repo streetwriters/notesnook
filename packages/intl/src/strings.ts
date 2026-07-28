@@ -103,13 +103,13 @@ export const strings = {
     2: () => t`and `,
     3: () => t`Privacy Policy. `,
     4: () =>
-      t`You also agree to recieve marketing emails from us which you can opt-out of from app settings.`
+      t`You also agree to receive marketing emails from us which you can opt-out of from app settings.`
   },
   alreadyHaveAccount: () => t`Already have an account?`,
   login: () => t`Login`,
   "2fa": () => t`Two factor authentication`,
   select2faMethod: () => t`Select method for two-factor authentication`,
-  select2faCodeHelpText: () => t`Select how you would like to recieve the code`,
+  select2faCodeHelpText: () => t`Select how you would like to receive the code`,
   "2faCodeHelpText": {
     email: () =>
       t`Enter the 6 digit code sent to your email to continue logging in`,
@@ -1828,7 +1828,7 @@ For example:
   cancelSub: () => t`Cancel subscription`,
   unlockWithSecurityKey: () => t`Unlock with security key`,
   reloginToYourAccount: () => t`Relogin to your account`,
-  skipAndGoToApp: () => t`Skip & go directly to the app`,
+  skipAndGoToApp: () => t`Use offline`,
   startAccountRecovery: () => t`Start account recovery`,
   dontHaveRecoveryKey: () => t`Don't have your account recovery key?`,
   dontHaveBackupFile: () => t`Don't have backup file?`,
@@ -2806,5 +2806,8 @@ Continue without attachments?`,
   deleteVersion: () => doActions.delete.version(1),
   deleteVersionConfirmation: () =>
     actionConfirmations.permanentlyDelete.version(1),
-  versionDeleted: () => actions.deleted.version(1)
+  versionDeleted: () => actions.deleted.version(1),
+  offlineMode: () => t`Offline mode`,
+  offlineModeDesc: () =>
+    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`
 };

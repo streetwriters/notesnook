@@ -40,7 +40,7 @@ import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
 import { ErrorText } from "../components/error-text";
 import { AuthenticatorType, User } from "@notesnook/core";
-import { showLogoutConfirmation } from "../dialogs/confirm";
+import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
 import { ScrollContainer } from "@notesnook/ui";
@@ -907,10 +907,19 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           sx={{
             mt: 5,
             color: "paragraph",
-            textDecoration: "none"
+            textDecoration: "none",
+            position: "absolute",
+            top: 0,
+            right: 5
           }}
-          onClick={() => {
-            openURL("/notes/", { authenticated: false });
+          onClick={async () => {
+            const result = await ConfirmDialog.show({
+              title: strings.offlineMode(),
+              message: strings.offlineModeDesc(),
+              negativeButtonText: strings.cancel(),
+              positiveButtonText: strings.understand()
+            });
+            if (result) openURL("/notes/", { authenticated: false });
           }}
         >
           {strings.skipAndGoToApp()}
