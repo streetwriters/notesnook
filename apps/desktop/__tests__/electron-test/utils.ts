@@ -154,6 +154,7 @@ export async function buildApp(version?: string) {
         stdio: IS_DEBUG ? "inherit" : "ignore",
         env: {
           ...process.env,
+          CSC_IDENTITY_AUTO_DISCOVERY: "false",
           NOTESNOOK_STAGING: "true",
           NN_PRODUCT_NAME: productName,
           NN_APP_ID: `com.notesnook.test.${productName}`,
