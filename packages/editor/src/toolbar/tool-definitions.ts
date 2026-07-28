@@ -127,7 +127,7 @@ const tools = (): Record<ToolId, ToolDefinition> => ({
   },
   alignment: {
     icon: "alignCenter",
-    title: strings.alignCenter()
+    title: strings.alignment()
   },
   textDirection: {
     icon: "ltr",

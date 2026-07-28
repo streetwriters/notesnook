@@ -1,8 +1,13 @@
+---
+title: Introduction
+description: An overview of how Notesnook's theme engine works, including scopes, variants and colors.
+---
+
 # Introduction
 
-> info
->
-> This document reflects v1.0 of the Notesnook Theme specification.
+::: info
+This document reflects v1.0 of the Notesnook Theme specification.
+:::
 
 The goal of this document is to provide you with an exact idea of what each scope, variant & color in the theme does, how they all fit together, and how you can use them to create your own custom theme for Notesnook. This document will also serve as a descriptive guide for any `theme.json` file you may find online.
 
@@ -21,7 +26,7 @@ Each scope represents a specific part of the app. For example, you can style the
 
 Here's a quick schematic diagram of each scope used by the Notesnook Web app.
 
-![](/custom-themes/theme-scopes-schema.png)
+![Theme scopes schema in Notesnook](/custom-themes/theme-scopes-schema.png)
 
 Currently, Notesnook has 10 scopes:
 
@@ -42,49 +47,49 @@ This allows you to change only the colors you need without any duplication.
 
 The `navigationMenu` scope is used by the left-most side bar that contains the links to your Notes, Notebooks, Favorites etc.
 
-![](/custom-themes/theme-scope-navigation-menu.png)
+![Theme scope navigation menu in Notesnook](/custom-themes/theme-scope-navigation-menu.png)
 
 #### 3. `statusBar`
 
 The `statusBar` scope is used by the bottom most horizontal bar that contains your email address, the sync status etc.
 
-![](/custom-themes/theme-scope-status-bar.png)
+![Theme scope status bar in Notesnook](/custom-themes/theme-scope-status-bar.png)
 
 #### 4. `list`
 
 The `list` scope is used by the list of notes, notebooks & everything else that is in the middle pane.
 
-![](/custom-themes/theme-scope-list.png)
+![Theme scope list in Notesnook](/custom-themes/theme-scope-list.png)
 
 #### 5. `editor`
 
 The `editor` scope is used by the editor and everything inside of it like task lists, outline lists, tables etc. This scope does not include the editor toolbar.
 
-![](/custom-themes/theme-scope-editor.png)
+![Theme scope editor in Notesnook](/custom-themes/theme-scope-editor.png)
 
 #### 6. `editorToolbar`
 
 The `editorToolbar` scope is used specifically by the editor toolbar for styling all its icons, buttons & menus.
 
-![](/custom-themes/theme-scope-editor-toolbar.png)
+![Theme scope editor toolbar in Notesnook](/custom-themes/theme-scope-editor-toolbar.png)
 
 #### 7. `editorSidebar`
 
 The `editorSidebar` scope is used by the right-most properties menu, and the PDF attachments preview.
 
-![](/custom-themes/theme-scope-editor-sidebar.png)
+![Theme scope editor sidebar in Notesnook](/custom-themes/theme-scope-editor-sidebar.png)
 
 #### 8. `dialog`
 
 All the dialogs in the app, regardless of how they are triggered or what they contain, use the `dialog` scope. This includes the settings dialog, notebook creation dialog, reminder creation dialog etc.
 
-![](/custom-themes/theme-scope-dialog.png)
+![Theme scope dialog in Notesnook](/custom-themes/theme-scope-dialog.png)
 
 #### 9. `contextMenu`
 
 All the context menus & drop down menus in the app use the `contextMenu` scope. This includes the menus in the `editor`, `list`, and other scopes.
 
-![](/custom-themes/theme-scope-context-menu.png)
+![Theme scope context menu in Notesnook](/custom-themes/theme-scope-context-menu.png)
 
 #### 10. `sheet`
 
@@ -150,3 +155,10 @@ Each variant further contains a total of 12 Colors:
 ## Further reading
 
 - [Build your own theme using the Theme Builder](/custom-themes/create-a-theme-with-theme-builder).
+
+## Related pages
+
+- [Using themes](/custom-themes/using-themes) — light, dark and the theme store
+- [Theme Builder](/custom-themes/create-a-theme-with-theme-builder) — building a theme visually
+- [Publish a theme](/custom-themes/publish-a-theme) — sharing a theme with everyone
+- [Customizing the app](/customizing-notesnook) — home screen, sidebar, sorting and formats

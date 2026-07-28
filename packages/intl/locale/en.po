@@ -800,6 +800,10 @@ msgstr "Advanced"
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
 msgstr "After scanning the QR code image, the app will display a code that you can enter below."
 
+#: src/strings.ts:2292
+msgid "Align center"
+msgstr "Align center"
+
 #: src/strings.ts:2322
 msgid "Align left"
 msgstr "Align left"
@@ -808,7 +812,7 @@ msgstr "Align left"
 msgid "Align right"
 msgstr "Align right"
 
-#: src/strings.ts:2292
+#: src/strings.ts:2813
 msgid "Alignment"
 msgstr "Alignment"
 
@@ -1419,7 +1423,6 @@ msgid "Cell border color"
 msgstr "Cell border color"
 
 #: src/strings.ts:2318
-#: src/strings.ts:2319
 msgid "Cell border width"
 msgstr "Cell border width"
 
@@ -4553,6 +4556,7 @@ msgid "No updates available"
 msgstr "No updates available"
 
 #: src/strings.ts:661
+#: src/strings.ts:2319
 msgid "None"
 msgstr "None"
 

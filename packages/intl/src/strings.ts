@@ -2289,7 +2289,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   fontFamily: () => t`Font family`,
   fontSize: () => t`Font size`,
   headings: () => t`Headings`,
-  alignCenter: () => t`Alignment`,
+  alignCenter: () => t`Align center`,
   ltr: () => t`Text direction`,
   highlight: () => t`Highlight`,
   textColor: () => t`Text color`,
@@ -2316,7 +2316,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   cellBorderColor: () => t`Cell border color`,
   cellTextColor: () => t`Cell text color`,
   cellBorderWidth: () => t`Cell border width`,
-  none: () => t`Cell border width`,
+  none: () => t`None`,
   imageSettings: () => t`Image settings`,
   // alignCenter: () => t`Align center`,
   alignLeft: () => t`Align left`,
@@ -2809,5 +2809,6 @@ Continue without attachments?`,
   versionDeleted: () => actions.deleted.version(1),
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
-    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`
+    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
+  alignment: () => t`Alignment`
 };

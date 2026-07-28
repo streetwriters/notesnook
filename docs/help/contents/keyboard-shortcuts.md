@@ -39,7 +39,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Toggle check list | Ctrl ⇧ 9 | Ctrl ⇧ 9 | ⌘ ⇧ 9 |
 | Split list item | ↵ | ↵ | ↵ |
 | Lift list item | ⇧ Tab | ⇧ Tab | ⇧ Tab |
-| Sink list item | Ctrl ⇧ Down | Ctrl ⇧ Down | ⌘ ⇧ Down |
+| Sink list item | Tab | Tab | Tab |
 | Toggle code | Ctrl E | Ctrl E | ⌘ E |
 | Toggle code block | Ctrl ⇧ C | Ctrl ⇧ C | ⌘ ⇧ C |
 | Insert date | Alt D | Alt D | ⌥ D |

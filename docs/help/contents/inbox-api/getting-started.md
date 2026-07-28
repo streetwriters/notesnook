@@ -22,38 +22,34 @@ Some common use cases include:
 
 ### 1. Enable Inbox API from settings.
 
-# [Desktop/Web](#/tab/web)
-
-1. Go to Settings > Inbox
-2. Turn on the `Enable Inbox API` toggle
+:::tabs key:platform
+== Desktop/Web
+1. Go to Settings > Account > Inbox
+2. Turn on the `{{enableInboxAPI}}` toggle
 3. Choose whether you want to use your own PGP keypair or let Notesnook autogenerate one for you
+== Mobile
+`Settings > Account > Inbox API > Enable Inbox API`.
+:::
 
-# [Mobile](#/tab/mobile)
-
-`Settings > Inbox > Enable Inbox API`.
-
----
-
-> info
->
-> The PGP keys are validated (round-trip encrypt/decrypt) before being saved.
+::: info
+The PGP keys are validated (round-trip encrypt/decrypt) before being saved.
+:::
 
 ### 2. Create your Inbox API Key
 
-A default API key is created automatically when you enable the Inbox API. You can create up to 10 API keys and revoke them individually.
+You create your own API keys — none is generated for you when you turn the Inbox API on. You can hold up to **10 keys at a time** and revoke them individually, so each service you connect can have its own.
 
-# [Desktop/Web](#/tab/web)
+Each key gets an expiry: `{{expiryOneDay}}`, `{{expiryOneWeek}}`, `{{expiryOneMonth}}` (the default), `{{expiryOneYear}}`, or `{{never}}`.
 
-1. Go to Settings > Inbox
-2. Click `Create Key` in the `API Keys` section
+:::tabs key:platform
+== Desktop/Web
+1. Go to Settings > Account > Inbox
+2. Click `{{createKey}}` in the `{{viewAPIKeys}}` section
 3. Set a name for the API Key (e.g. Zapier)
 4. Set an expiry date
-
-# [Mobile](#/tab/mobile)
-
-`Settings > Inbox > View API Keys > +`.
-
----
+== Mobile
+`Settings > Account > Inbox API > API Keys > Create Key`.
+:::
 
 ### 3. Send data to the Inbox
 
@@ -84,9 +80,9 @@ A default API key is created automatically when you enable the Inbox API. You ca
 | `notebookIds`  | string[] | Optional                           | Array of notebook IDs to assign the note to.          |
 | `tagIds`       | string[] | Optional                           | Array of tag IDs to apply to the note.                |
 
-> info Notebook & Tag IDs
->
-> Notebook and Tag IDs can be found by right-clicking on a notebook/tag and selecting `Copy ID`.
+::: info Notebook & Tag IDs
+Notebook and Tag IDs can be found by right-clicking on a notebook/tag and selecting `{{copyId}}`.
+:::
 
 #### Limits
 
@@ -157,9 +153,9 @@ This Zap sends every new email you receive in your Gmail inbox to your Notesnook
 | Data — `content__data`    | _(Gmail)_ Body HTML            |
 | Headers — `Authorization` | `<your-inbox-api-key>`         |
 
-> info
->
-> In Zapier's nested JSON syntax, use double underscores (`__`) to represent nested keys. `content__type` maps to `content.type` and `content__data` maps to `content.data` in the JSON body.
+::: info
+In Zapier's nested JSON syntax, use double underscores (`__`) to represent nested keys. `content__type` maps to `content.type` and `content__data` maps to `content.data` in the JSON body.
+:::
 
 **4. Test and activate the Zap.** Zapier will POST a note to your Notesnook inbox for every matching email. The note will appear after your next sync.
 
@@ -183,7 +179,7 @@ This Applet sends any email you forward to your IFTTT trigger address into your 
 | URL                | `https://inbox.notesnook.com/`       |
 | Method             | `POST`                               |
 | Content Type       | `application/json`                   |
-| Additional Headers | `Authorization: <your-inbox-api-key> |
+| Additional Headers | `Authorization: <your-inbox-api-key>` |
 | Body               | _(see below)_                        |
 
 Use the following JSON body template, substituting IFTTT ingredients:
@@ -214,7 +210,7 @@ Inbox uses OpenPGP asymmetric encryption to ensure your data is encrypted before
 1. **When you enable Inbox from settings:**
 
    - The client generates an OpenPGP public/private keypair (or you provide your own). The public key is stored on Notesnook's servers. The private key is encrypted with your account's master key before being stored. Notesnook never sees it in plaintext.
-   - You can now generate API keys for the inbox endpoint. These are short tokens (with a fixed lifetime) you paste into Zapier, IFTTT, or your own code. They tell the inbox server which account to deliver the note to. You can create multiple keys (one per service) and revoke them individually without affecting your account.
+   - You can now generate API keys for the inbox endpoint. These are tokens you paste into Zapier, IFTTT, or your own code — each with the expiry you chose, or none at all if you picked `{{never}}`. They tell the inbox server which account to deliver the note to. You can create multiple keys (one per service) and revoke them individually without affecting your account.
 
 2. **When data is posted to the Inbox API:**
 
@@ -225,3 +221,32 @@ Inbox uses OpenPGP asymmetric encryption to ensure your data is encrypted before
 3. **When your client syncs:**
    - Encrypted inbox items are pushed to all your connected clients (web, desktop, and mobile) via sync.
    - Your device decrypts the payload using your PGP private key (decrypted from the master key on-device) and adds the note to your database.
+
+## When an item fails to arrive
+
+Every item the Inbox API processes is recorded, and anything that fails is kept with the reason it failed — a decryption failure, invalid JSON, or a payload that didn't match the schema, with the offending field named.
+
+:::tabs key:platform
+== Desktop/Web
+1. Go to `{{settings}}`.
+2. Open `{{account}}` > `Inbox`.
+3. Next to `{{failedInboxItems}}`, click `{{show}}`.
+== Mobile
+1. Go to `{{settings}}`.
+2. Open `{{account}}` > `{{inboxAPI}}`.
+3. Tap `{{failedInboxItems}}`.
+:::
+
+You can delete individual entries or clear the whole list. If a service keeps failing, check that `type` is `"note"`, `version` is `1`, and `content.type` is `"html"`.
+
+## Turning the Inbox API off
+
+::: danger Disabling revokes every key
+Turning off the Inbox API **deletes all your unsynced inbox items and revokes every API key you have created**. Any service still posting to your inbox will start getting `401 unauthorized`, and you will have to create new keys and update every integration if you turn it back on.
+:::
+
+## Related pages
+
+- [Self-hosting the Inbox API](/inbox-api/self-hosting-inbox-api) — running the relay yourself
+- [Account settings](/account-settings) — email, password and profile
+- [How is my data encrypted?](/how-is-my-data-encrypted) — the encryption behind every note
