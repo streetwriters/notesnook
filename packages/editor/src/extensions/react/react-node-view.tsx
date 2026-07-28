@@ -24,7 +24,7 @@ import {
   DecorationSource,
   ViewMutationRecord
 } from "prosemirror-view";
-import { Node as PMNode, Slice } from "prosemirror-model";
+import { Node as PMNode } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import { PortalProviderAPI } from "./react-portal-provider.js";
 import {
@@ -34,19 +34,18 @@ import {
   ContentDOM
 } from "./types.js";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
-import { __serializeForClipboard, EditorView } from "prosemirror-view";
 import { EmotionThemeProvider } from "@notesnook/theme";
 import { isAndroid, isiOS } from "../../utils/platform.js";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.
-declare module "prosemirror-view" {
-  export function __serializeForClipboard(
-    view: EditorView,
-    slice: Slice
-  ): { dom: HTMLElement; text: string };
-}
+// declare module "prosemirror-view" {
+//   export function __serializeForClipboard(
+//     view: EditorView,
+//     slice: Slice
+//   ): { dom: HTMLElement; text: string };
+// }
 const portalProviderAPI = new PortalProviderAPI();
 export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
@@ -506,7 +505,7 @@ function forceHandleDrag(event: DragEvent, editor: Editor) {
   if (!event.dataTransfer) return;
   const { view } = editor;
   const slice = view.state.selection.content();
-  const { dom, text } = __serializeForClipboard(view, slice);
+  const { dom, text } = view.serializeForClipboard(slice);
 
   event.dataTransfer.clearData();
   event.dataTransfer.setData("Text", text);
