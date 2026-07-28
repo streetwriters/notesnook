@@ -7,7 +7,7 @@ description: Notesnook Web Clipper is open source and available to download for 
 
 ## Chromium-based browsers
 
-[Go to chrome webstore](https://chrome.google.com/webstore/detail/notesnook-web-clipper/kljhpemdlcnjohmfmkogahelkcidieaj) to get the latest version of [web clipper for Notesnook](https://notesnook.com/notesnook-web-clipper).
+[Go to chrome webstore](https://chrome.google.com/webstore/detail/notesnook-web-clipper/kljhpemdlcnjohmfmkogahelkcidieaj) to get the latest version of the [web clipper for Notesnook](https://notesnook.com/notesnook-web-clipper).
 
 ## Firefox-based browsers
 

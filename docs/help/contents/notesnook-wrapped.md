@@ -45,7 +45,7 @@ On mobile, the summary card has a `Share with friends` button. It captures the c
 On desktop and web there is no share button — the summary card is on screen for you to screenshot.
 
 ::: info It really is local
-The summary card itself says so: *Generated 100% locally on your device.* Wrapped reads your local database directly. It needs no account, no internet connection, and no telemetry.
+Notesnook simply couldn't do it otherwise. Notesnook has no idea how many words are in your notes, encryption makes it impossible for us to do it any other way.
 :::
 
 ## Related pages

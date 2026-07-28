@@ -5,7 +5,7 @@ description: Forgot your Notesnook password? Recover your account with your data
 
 # Recovering your account
 
-Notesnook is one of the few end-to-end encrypted software that allows users to recovery their account in case they forget their passwords. Here is a detailed step-by-step guide into how you can recover your Notesnook account.
+Notesnook is one of the few end-to-end encrypted software that allows users to recover their account in case they forget their passwords. Here is a detailed step-by-step guide into how you can recover your Notesnook account.
 
 ::: warning You will be logged out
 For account recovery to work reliably, you will be force logged out from all your other devices. It is recommended that you save & backup all your data on your other devices before continuing.
@@ -21,6 +21,7 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 
 ::::tabs key:platform
 == Desktop/Web
+
 1. Go to [Notesnook Login page](https://app.notesnook.com/login)
 2. Enter your email & continue
 3. Verify your 2FA & continue
@@ -35,10 +36,14 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
    _Check your spam/junk folder if you haven't received one & [contact us](mailto:support@streetwriters.co) if you still don't find it._
    :::
 8. Click on `Reset your password` button in the email. This will take you to the account recovery page.
+
+<!--Needs Validation? I don't think you can request recovery from mobile--->
+
 == Mobile
+
 1. Open the Notesnook app
 2. Go to the Login page
-::::
+   ::::
 
 ## Choosing an account recovery method
 

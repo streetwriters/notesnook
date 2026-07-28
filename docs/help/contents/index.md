@@ -5,8 +5,7 @@ description: Your complete and free resource to using Notesnook as a daily note 
 
 hero:
   name: Notesnook Help
-  text: Everything you can do with Notesnook
-  tagline: Step-by-step guides for the web, desktop and mobile apps — written for the way you actually use them.
+  tagline: Helping you discover everything you can do with Notesnook
   image:
     src: /logo.png
     alt: Notesnook

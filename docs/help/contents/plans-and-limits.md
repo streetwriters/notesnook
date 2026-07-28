@@ -26,7 +26,7 @@ faqs:
 
 Notesnook has four plans — **Free**, **Essential**, **Pro** and **Believer** — plus an **Education** plan and a grandfathered **Pro (legacy)** plan for long-time subscribers.
 
-Everything that makes Notesnook *Notesnook* is on the free plan: unlimited notes, unlimited devices, end-to-end encryption, sync, backups, the [private vault](/lock-notes-with-private-vault), and [publishing with monographs](/publish-notes-with-monographs). Paid plans raise the storage limits and unlock conveniences on top.
+Everything that makes Notesnook _Notesnook_ is on the free plan: unlimited notes, unlimited devices, end-to-end encryption, sync, backups, the [private vault](/lock-notes-with-private-vault), and [publishing with monographs](/publish-notes-with-monographs). Paid plans raise the storage limits and unlock conveniences on top.
 
 ::: tip Plans are cumulative
 Each plan includes everything from the plans below it. A feature marked <PlanTag plan="essential" /> works on Essential, Pro **and** Believer. A feature marked <PlanTag plan="pro" /> works on Pro **and** Believer.
@@ -34,24 +34,22 @@ Each plan includes everything from the plans below it. A feature marked <PlanTag
 
 ## What each plan gives you
 
-| | Free | Essential | Pro | Believer |
-| --- | --- | --- | --- | --- |
-| Notes | Unlimited | Unlimited | Unlimited | Unlimited |
-| Devices | Unlimited | Unlimited | Unlimited | Unlimited |
-| Storage per month | 50 MB | 1 GB | 10 GB | 25 GB |
-| Maximum file size | 10 MB | 100 MB | 1 GB | 5 GB |
-| Notebooks | 50 | 500 | Unlimited | Unlimited |
-| Tags | 50 | 500 | Unlimited | Unlimited |
-| Colors | 7 | 20 | Unlimited | Unlimited |
-| Active reminders | 10 | 50 | Unlimited | Unlimited |
-| Side menu shortcuts | 10 | Unlimited | Unlimited | Unlimited |
-| Note versions kept | 100 | 1,000 | Unlimited | Unlimited |
+|                     | Free      | Essential | Pro       | Believer  |
+| ------------------- | --------- | --------- | --------- | --------- |
+| Notes               | Unlimited | Unlimited | Unlimited | Unlimited |
+| Devices             | Unlimited | Unlimited | Unlimited | Unlimited |
+| Storage per month   | 50 MB     | 1 GB      | 10 GB     | 25 GB     |
+| Maximum file size   | 10 MB     | 100 MB    | 1 GB      | 5 GB      |
+| Notebooks           | 50        | 500       | Unlimited | Unlimited |
+| Tags                | 50        | 500       | Unlimited | Unlimited |
+| Colors              | 7         | 20        | Unlimited | Unlimited |
+| Active reminders    | 10        | 50        | Unlimited | Unlimited |
+| Side menu shortcuts | 10        | Unlimited | Unlimited | Unlimited |
+| Note versions kept  | 100       | 1,000     | Unlimited | Unlimited |
 
-Storage counts **attachments only** — images, files, audio and web clips. Your notes themselves never count against it, however many you write.
+Storage counts **attachments only**, meaning images, files, audio and web clips. Your notes themselves never count against it, however many you write.
 
 ## Features unlocked by Essential
-
-These work on Essential, Pro and Believer.
 
 - [Task lists](/rich-text-editor/task-and-todo-lists) — checkable, sortable to-do blocks inside a note
 - [Outline lists](/rich-text-editor/outline-lists) — collapsible nested bullets
@@ -66,20 +64,18 @@ These work on Essential, Pro and Believer.
 
 ## Features unlocked by Pro
 
-These work on Pro and Believer.
-
 - [App lock](/app-lock) — lock the whole app with a PIN, password, biometrics or a security key
 - [Expiring notes](/notes/note-expiry) — have a note delete itself on a date you choose
-- [Default notebook and tag](/organizing-notes/organize-notes-using-notebooks) — send every new note somewhere automatically
+- [Set a default notebook and tag](/organizing-notes/organize-notes-using-notebooks) — send every new note somewhere automatically
 - [Custom home screen](/customizing-notesnook) and default sidebar tab
 - [Full-quality images](/attachments-and-files) — upload without compression
 - [Sync controls](/sync/sync-settings) — turn off automatic, realtime or all syncing
 - [Import and export tables as CSV](/rich-text-editor/tables)
 - [Monograph view counts](/publish-notes-with-monographs)
 - [Two-factor authentication by SMS](/two-factor-authentication)
-- Keep trash forever — disable [automatic trash cleanup](/trash)
+- Disable [automatic trash cleanup](/trash)
 - Font ligatures in the editor
-- Saving a custom [editor toolbar](/rich-text-editor/rich-text-editor-toolbar) layout
+- Save a custom [editor toolbar](/rich-text-editor/rich-text-editor-toolbar) layout
 - On Android: [pin a note to your notifications](/mobile-integration/pin-notes-to-notifications), [write notes from the notification drawer](/mobile-integration/quick-note-from-notification), and pin notes to your launcher
 
 ## Believer
@@ -88,7 +84,7 @@ Believer includes everything above and exists for people who want to fund privat
 
 ## Education plan
 
-The Education plan gives students and teachers **Pro features and Pro limits**. It is not sold from the plan grid — [contact us](https://notesnook.com/contact-us) to apply. Education plans do not include a free trial.
+The Education plan gives students and teachers **Pro features and Pro limits**. It is not sold from the plan grid. [Contact us](https://notesnook.com/education) to apply. Education plans do not include a trial.
 
 ## Pro (legacy)
 
@@ -96,7 +92,7 @@ If you subscribed before the current plans existed, you keep a grandfathered **P
 
 ## Regional pricing
 
-Notesnook is priced for where you live. In many countries the paid plans are sold at a regional discount, applied automatically — there is no code to enter.
+Notesnook Pro is priced for where you live. In many countries the paid plans are sold at a regional discount, and it's applied automatically.
 
 When a regional price applies, the plan shows the standard price struck through next to a badge reading **“N% off in {your country}”**, and you are charged the discounted amount in your local currency. On Android and iOS the same regional tiers are used through Google Play and the App Store.
 
@@ -105,10 +101,10 @@ If you think your country should be included, [tell us](https://notesnook.com/co
 ## Free trials
 
 | Billing period | Free trial | Refund window |
-| --- | --- | --- |
-| Monthly | 7 days | 7 days |
-| Yearly | 14 days | 14 days |
-| 5 year | 30 days | 30 days |
+| -------------- | ---------- | ------------- |
+| Monthly        | 14 days    | 14 days       |
+| Yearly         | 14 days    | 14 days       |
+| 5 year         | 14 days    | 14 days       |
 
 You can trial **each plan once**. Trials give you the full plan, so a feature you unlock during a trial stops working when the trial ends unless you subscribe. The Education plan has no trial.
 
@@ -116,6 +112,7 @@ You can trial **each plan once**. Trials give you the full plan, so a feature yo
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}`.
 2. Open `{{subDetails}}`.
 3. Choose `{{changePlan}}` to move up or down a tier — the difference is prorated — or turn off `Auto renew` to stop the subscription at the end of the period.
@@ -127,7 +124,7 @@ Subscriptions bought on mobile are managed by the store that sold them.
 1. Go to `{{settings}}`.
 2. Open `{{account}}`.
 3. Tap your subscription. If it was bought on the store you are using, this opens Google Play or App Store subscription management; otherwise Notesnook tells you where the subscription was bought so you can manage it there.
-:::
+   :::
 
 Refunds are self-service inside the app on subscriptions bought through Notesnook's own checkout, within the window listed above.
 
@@ -137,7 +134,7 @@ Refunds are self-service inside the app on subscriptions bought through Notesnoo
 
 You go back to free-plan limits, which means:
 
-- you can't create *new* items above the free caps, but everything you already have stays;
+- you can't create _new_ items above the free caps, but everything you already have stays;
 - paid-only settings are switched off — app lock is disabled, a custom home screen resets to the default, and a custom toolbar layout returns to the standard one;
 - attachments you already uploaded stay downloadable, even if you're over the free storage limit.
 
