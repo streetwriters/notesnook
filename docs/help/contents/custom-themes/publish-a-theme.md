@@ -1,3 +1,8 @@
+---
+title: Publish a theme
+description: Submit your custom Notesnook theme to the official themes repository so anyone can install it.
+---
+
 # Publish a new theme
 
 ## Prerequisites
@@ -33,9 +38,9 @@
 
 Once your theme is published, you will probably need to push a new update for your theme to fix a color or change something. You can do this by [selecting your theme as the starter theme](/custom-themes/create-a-theme-with-theme-builder#1-select-a-starter-theme) in the Theme Builder and making the changes. Once everything is ready, just [export the changed theme](/custom-themes/create-a-theme-with-theme-builder#5-exporting-your-theme) as usual.
 
-> warn
->
-> Don't forget to increment the version of your theme; otherwise, no one will be able to see the changes.
+::: warning
+Don't forget to increment the version of your theme; otherwise, no one will be able to see the changes.
+:::
 
 To publish the updated theme, you will need to submit a new pull request in the same way as you did while publishing:
 
@@ -54,3 +59,9 @@ To publish the updated theme, you will need to submit a new pull request in the 
    ![Toolbar](/update-theme-5.png)
 9. You are all done!
    ![Toolbar](/update-theme-6.png)
+
+## Related pages
+
+- [Theme Builder](/custom-themes/create-a-theme-with-theme-builder) — building a theme visually
+- [How themes work](/custom-themes/introduction) — scopes, variants and colors
+- [Using themes](/custom-themes/using-themes) — light, dark and the theme store

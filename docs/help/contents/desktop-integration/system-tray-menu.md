@@ -1,3 +1,8 @@
+---
+title: System tray menu
+description: Access quick actions from the Notesnook system tray icon, and minimize or close the app to the tray.
+---
+
 # System tray menu
 
 Notesnook features a system tray menu to give quick access to some common functions such as:
@@ -14,14 +19,20 @@ See it in action here:
 
 Instead of always taking space in your taskbar, you can hide Notesnook in your system tray on minimizing:
 
-1. Go to `Settings`
-2. Click on `Desktop integration`
-3. Click on `Minimize to system tray` to enable/disable it.
+1. Go to `{{settings}}`
+2. Click on `{{desktopIntegration}}`
+3. Click on `{{minimizeToSystemTray}}` to enable/disable it.
 
 ## Close to tray
 
 To prevent accidentally closing the Notesnook app, it is possible to always close it to the system tray:
 
-1. Go to `Settings`
-2. Click on `Desktop integration`
-3. Click on `Close to system tray` to enable/disable it.
+1. Go to `{{settings}}`
+2. Click on `{{desktopIntegration}}`
+3. Click on `{{closeToSystemTray}}` to enable/disable it.
+
+## Related pages
+
+- [Auto start](/desktop-integration/auto-start-on-system-startup) — launching with your computer
+- [Jumplist & dock menu](/desktop-integration/jumplist-and-dock-menu) — new note from the taskbar
+- [Updates & advanced](/desktop-integration/updates-and-advanced-settings) — release track, DNS and zoom

@@ -2289,7 +2289,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   fontFamily: () => t`Font family`,
   fontSize: () => t`Font size`,
   headings: () => t`Headings`,
-  alignCenter: () => t`Alignment`,
+  alignCenter: () => t`Align center`,
   ltr: () => t`Text direction`,
   highlight: () => t`Highlight`,
   textColor: () => t`Text color`,
@@ -2316,7 +2316,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   cellBorderColor: () => t`Cell border color`,
   cellTextColor: () => t`Cell text color`,
   cellBorderWidth: () => t`Cell border width`,
-  none: () => t`Cell border width`,
+  none: () => t`None`,
   imageSettings: () => t`Image settings`,
   // alignCenter: () => t`Align center`,
   alignLeft: () => t`Align left`,
@@ -2806,5 +2806,6 @@ Continue without attachments?`,
   deleteVersion: () => doActions.delete.version(1),
   deleteVersionConfirmation: () =>
     actionConfirmations.permanentlyDelete.version(1),
-  versionDeleted: () => actions.deleted.version(1)
+  versionDeleted: () => actions.deleted.version(1),
+  alignment: () => t`Alignment`
 };

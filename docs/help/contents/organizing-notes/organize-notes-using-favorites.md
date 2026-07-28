@@ -1,5 +1,6 @@
 ---
 title: Favorites
+description: Add a note to favorites for quick access, or remove it from favorites.
 ---
 
 # Add notes to favorites
@@ -8,28 +9,28 @@ While you organize your notes with all different types of notebooks, tags and co
 
 ## Add a note to favorites
 
-# [Desktop/Web](#/tab/web)
-
+:::tabs key:platform
+== Desktop/Web
 1. Right click on a note or click on the three-dot more button to open the `Note properties` menu.
-2. Toggle `Favorite`.
-
-# [Mobile](#/tab/mobile)
-
+2. Toggle `{{favorite}}`.
+== Mobile
 1. Press the ![Three dot button](/three-dot-button.png) button
-2. Press `Favorite`. If you do not see the option, scroll the bar left.
-
----
+2. Press `{{favorite}}`. If you do not see the option, scroll the bar left.
+:::
 
 ## Removing a note from favorites
 
-# [Desktop/Web](#/tab/web)
-
+:::tabs key:platform
+== Desktop/Web
 1. Right click on a note or click on the three-dot more button to open the `Note properties` menu.
-2. Untoggle `Favorite`.
-
-# [Mobile](#/tab/mobile)
-
+2. Untoggle `{{favorite}}`.
+== Mobile
 1. Press the ![Three dot button](/three-dot-button.png) button
-2. Press `Unfavorite`. If you do not see the option, scroll the bar left.
+2. Press `{{unfavorite}}`. If you do not see the option, scroll the bar left.
+:::
 
----
+## Related pages
+
+- [Pins](/organizing-notes/pin-notes) — keeping a note at the top
+- [Tags](/organizing-notes/organize-notes-using-tags) — cross-cutting labels
+- [Search & navigation](/search-and-navigation) — finding anything, fast

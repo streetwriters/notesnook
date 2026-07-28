@@ -87,7 +87,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
   },
   addKeyboardShortcuts() {
     return {
-      [tiptapKeys.decreaseFontSize.keys]: ({ editor }) => {
+      [tiptapKeys.increaseFontSize.keys]: ({ editor }) => {
         editor
           .chain()
           .focus()
@@ -95,7 +95,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
           .run();
         return true;
       },
-      [tiptapKeys.increaseFontSize.keys]: ({ editor }) => {
+      [tiptapKeys.decreaseFontSize.keys]: ({ editor }) => {
         editor
           .chain()
           .focus()

@@ -800,6 +800,10 @@ msgstr "Advanced"
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
 msgstr "After scanning the QR code image, the app will display a code that you can enter below."
 
+#: src/strings.ts:2292
+msgid "Align center"
+msgstr "Align center"
+
 #: src/strings.ts:2322
 msgid "Align left"
 msgstr "Align left"
@@ -808,7 +812,7 @@ msgstr "Align left"
 msgid "Align right"
 msgstr "Align right"
 
-#: src/strings.ts:2292
+#: src/strings.ts:2810
 msgid "Alignment"
 msgstr "Alignment"
 
@@ -1419,7 +1423,6 @@ msgid "Cell border color"
 msgstr "Cell border color"
 
 #: src/strings.ts:2318
-#: src/strings.ts:2319
 msgid "Cell border width"
 msgstr "Cell border width"
 
@@ -1659,7 +1662,7 @@ msgstr "Clear data & reset account"
 msgid "Clear default notebook"
 msgstr "Clear default notebook"
 
-#: src/strings.ts:2800
+#: src/strings.ts:2803
 msgid "Clear history"
 msgstr "Clear history"
 
@@ -2311,7 +2314,7 @@ msgstr "Delete account"
 msgid "Delete all"
 msgstr "Delete all"
 
-#: src/strings.ts:2802
+#: src/strings.ts:2805
 msgid "Delete all version history for this note?"
 msgstr "Delete all version history for this note?"
 
@@ -4553,6 +4556,7 @@ msgid "No updates available"
 msgstr "No updates available"
 
 #: src/strings.ts:661
+#: src/strings.ts:2319
 msgid "None"
 msgstr "None"
 
@@ -7553,7 +7557,7 @@ msgstr "Verifying your email"
 msgid "Version"
 msgstr "Version"
 
-#: src/strings.ts:2801
+#: src/strings.ts:2804
 msgid "Version history cleared"
 msgstr "Version history cleared"
 
