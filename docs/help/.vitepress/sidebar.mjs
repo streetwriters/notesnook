@@ -10,6 +10,7 @@ export const sidebar = [
     text: "Getting started",
     collapsed: false,
     items: [
+      { text: "All help topics", link: "/docs" },
       { text: "Create your first note", link: "/create-a-note-in-notesnook" },
       { text: "Search & navigation", link: "/search-and-navigation" },
       { text: "Keyboard shortcuts", link: "/keyboard-shortcuts" },
