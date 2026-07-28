@@ -5,9 +5,9 @@ description: Every byte of your notes data is encrypted with the strongest encry
 
 # How is my data encrypted?
 
-> warn Note
->
-> This document is not a spec, only an explanation of the encryption process.
+::: info Note
+This document is not a spec, only an explanation of the encryption process.
+:::
 
 ## Algorithms & cryptographic library
 
@@ -19,9 +19,9 @@ description: Every byte of your notes data is encrypted with the strongest encry
 
 On all three platforms we use the same exact library for all cryptographic functions. This ensures data integrity across platforms.
 
-> info Fun story
->
-> When we first added encryption, we used AES-GCM-256 across platforms but the cross-platform compatibility was abyssmal. That is when I found out about the great libsodium. Written in C, wrappers available for all platforms...what more could I want?
+::: info Fun story
+When we first added encryption, we used AES-GCM-256 across platforms but the cross-platform compatibility was abyssmal. That is when I found out about the great libsodium. Written in C, wrappers available for all platforms...what more could I want?
+:::
 
 ## Process
 
@@ -31,9 +31,9 @@ When you sign up for an account, the app takes your password and hashes it using
 
 This predictable salt is generated using a `fixed client salt` + `your email`.
 
-> info Your password never leaves your device
->
-> Sending the hash over sending your plain text password ensures that there is no way for us (or anyone else) to get your password.
+::: info Your password never leaves your device
+Sending the hash over sending your plain text password ensures that there is no way for us (or anyone else) to get your password.
+:::
 
 After the hash is generated, it is sent to the server. This hash is used as a `password` and is hashed again to mitigate password passthrough attacks.
 
@@ -45,17 +45,14 @@ When you first sign up for an account, your client generates two encryption keys
 
 ### 3. Encryption key storage
 
-# [Desktop/Web](#/tab/web)
-
+:::tabs key:platform
+== Desktop/Web
 Instead of storing the key as plain text (and allowing anyone to copy/move it), we use browser's `IndexedDB` to store the key as a `CryptoKey`.
 
 `CryptoKey` is stored securely by the browser and cannot be exported, viewed, or copied except by the app & browser.
-
-# [Mobile](#/tab/mobile)
-
+== Mobile
 On iOS and Android, the encryption key is stored in the phone's keychain.
-
----
+:::
 
 ### 4. Data encryption
 
@@ -72,9 +69,9 @@ Encryption only takes place when you sync. Each item in the database is encrypte
    4. Algorithm id `alg`
    5. ItemId `id`
 
-> info
->
-> See the whole process in action [here.](https://vericrypt.notesnook.com/)
+::: info
+See the whole process in action [here.](https://vericrypt.notesnook.com/)
+:::
 
 This object is then sent to the server for storage. The server performs no further operation on this data (because it can't).
 
@@ -83,3 +80,11 @@ This object is then sent to the server for storage. The server performs no furth
 ### I am an old user of Notesnook, I don't have a data encryption key.
 
 Your data encryption key will be created when you change your password.
+
+## Related pages
+
+- [Private vault](/lock-notes-with-private-vault) — locking individual notes
+- [Recovering your account](/recovering-your-account) — when you forget your password
+- [Backup and restore](/backup-and-restore-notes-in-notesnook) — keeping your own encrypted copy
+- [Two-factor authentication](/two-factor-authentication) — a second step at login
+- [Self-hosting](/self-hosting) — running your own servers

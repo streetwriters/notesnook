@@ -1,5 +1,6 @@
 ---
 title: Pins
+description: Pin a note or notebook to keep it at the top of your lists.
 ---
 
 # Pin notes
@@ -8,32 +9,32 @@ You can pin an unlimited amount of notes. Pinning enables you to keep important 
 
 ## Pinning a note/notebook
 
-# [Desktop/Web](#/tab/web)
-
+:::tabs key:platform
+== Desktop/Web
 1. Go to `Notes`
 2. Right click on a note
-3. Click on `Pin` to pin a note on top
-
-# [Mobile](#/tab/mobile)
-
+3. Click on `{{pin}}` to pin a note on top
+== Mobile
 1. Go to `Notes`
 2. Press on the ![Three dot button](/three-dot-button.png) button
-3. Press on `Pin` to pin a note on top. If you do not see the option, scroll the top bar left.
-
----
+3. Press on `{{pin}}` to pin a note on top. If you do not see the option, scroll the top bar left.
+:::
 
 ## Unpinning a note/notebook
 
-# [Desktop/Web](#/tab/web)
-
+:::tabs key:platform
+== Desktop/Web
 1. Go to `Notes`
 2. Right click on a note
-3. Untoggle `Pin` to unpin a note.
-
-# [Mobile](#/tab/mobile)
-
+3. Untoggle `{{pin}}` to unpin a note.
+== Mobile
 1. Go to `Notes`
 2. Press on the ![Three dot button](/three-dot-button.png) button
-3. Press on `Unpin` to unpin the note. If you do not see the option, scroll the top bar left.
+3. Press on `{{unpin}}` to unpin the note. If you do not see the option, scroll the top bar left.
+:::
 
----
+## Related pages
+
+- [Favorites](/organizing-notes/organize-notes-using-favorites) — quick access to the notes you use most
+- [Archive](/organizing-notes/archive-notes) — clearing the clutter without deleting
+- [Side menu shortcuts](/organizing-notes/side-menu-shortcuts) — pinning notebooks and tags to the sidebar
