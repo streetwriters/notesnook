@@ -215,13 +215,20 @@ export function useEditorController({
         logger("info", "Edit skipped, tab is in loading state");
         return;
       }
+
+      const timerPending = !!timers.current.change;
+      if (ignoreEdit && timerPending) {
+        logger("info", "Ignoring ignoreEdit update, a save is already pending");
+        return;
+      }
+
       const currentSessionId = globalThis.sessionId;
       const tabId = tabRef.current.id;
       const noteId = tabRef.current.session?.noteId;
       post(EditorEvents.contentchange, undefined, tabId, noteId);
       if (!editor) return;
-      if (typeof timers.current.change === "number") {
-        clearTimeout(timers.current?.change);
+      if (timerPending) {
+        clearTimeout(timers.current?.change as any);
       }
 
       timers.current.change = setTimeout(async () => {
@@ -239,6 +246,8 @@ export function useEditorController({
 
         const editedAt = Date.now();
         htmlContentRef.current = editor.getHTML();
+        timers.current.change = null;
+
         const params = [
           {
             html: htmlContentRef.current,
@@ -284,7 +293,7 @@ export function useEditorController({
           });
 
         logger("info", "Editor saving content", params[1], params[2]);
-      }, 300);
+      }, 100);
 
       countWords(5000);
     },
