@@ -1,17 +1,17 @@
 {
-  "name": "@notesnook/docs-help",
+  "name": "@notesnook/help",
   "version": "1.0.0",
   "scripts": {
     "document-keyboard-shortcuts": "node scripts/document-keyboard-shortcuts.mjs",
-    "docs:versions": "node scripts/check-strings-fresh.mjs && node scripts/build-versions.mjs",
-    "predocs:dev": "npm run docs:versions",
-    "docs:dev": "vitepress dev",
-    "predocs:build": "npm run docs:versions",
-    "docs:build": "vitepress build",
-    "docs:preview": "vitepress preview",
-    "docs:version": "node scripts/new-version.mjs",
-    "docs:fork": "node scripts/fork-page.mjs",
-    "docs:strings": "node --experimental-strip-types scripts/check-strings.mjs"
+    "versions": "node scripts/check-strings-fresh.mjs && node scripts/build-versions.mjs",
+    "predev": "npm run versions",
+    "dev": "vitepress dev",
+    "prebuild": "npm run versions",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "version": "node scripts/new-version.mjs",
+    "fork": "node scripts/fork-page.mjs",
+    "strings": "node --experimental-strip-types scripts/check-strings.mjs"
   },
   "repository": {
     "type": "git",

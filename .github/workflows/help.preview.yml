@@ -1,14 +1,13 @@
-name: Notesnook Web PR Preview
+name: Notesnook Help PR Preview
 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
     branches: [master, beta]
     paths:
-      - "apps/web/**"
-      - "packages/**"
+      - "docs/help/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/web.preview.yml"
+      - ".github/workflows/help.preview.yml"
 
 jobs:
   build-and-deploy:
@@ -29,19 +28,19 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit
-          npm run bootstrap -- --scope=web
+          npm run bootstrap -- --scope=help
 
-      - name: Build web
-        run: npm run build:web
+      - name: Build help
+        run: npm run build:help
 
       - name: Deploy to Cloudflare Pages
         id: deploy
-        working-directory: ./apps/web
+        working-directory: ./docs/help
         run: |
           set -euo pipefail
           BRANCH=pr-${{ github.event.number }}-$(echo "${{ github.sha }}" | cut -c1-7)
           echo "Deploying branch: $BRANCH"
-          DEPLOY_OUT=$(npx --yes wrangler pages deploy --project-name=notesnook-app --branch="$BRANCH" ./build 2>&1) || { echo "$DEPLOY_OUT"; exit 1; }
+          DEPLOY_OUT=$(npx --yes wrangler pages deploy --project-name=notesnook-help --branch="$BRANCH" ./.vitepress/dist 2>&1) || { echo "$DEPLOY_OUT"; exit 1; }
           echo "$DEPLOY_OUT"
           PREVIEW_URL=$(printf "%s" "$DEPLOY_OUT" | grep -Eo 'https?://[^ ]+' | head -1 || true)
           if [ -z "$PREVIEW_URL" ]; then
@@ -55,10 +54,10 @@ jobs:
           preview_url: ${{ env.preview_url }}
         with:
           script: |
-            const marker = '<!-- pages-preview-comment -->';
+            const marker = '<!-- docs-pages-preview-comment -->';
             const prNumber = context.issue.number;
             const previewUrl = process.env.preview_url || '';
-            const body = `${marker}\n**Cloudflare Pages Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
+            const body = `${marker}\n**Cloudflare Pages Docs Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
