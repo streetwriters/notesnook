@@ -54,6 +54,7 @@ import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
 import { AuthErrorText } from "../components/error-text";
+import isEmail from "validator/lib/isEmail";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
@@ -246,6 +247,8 @@ function Login(props: BaseAuthComponentProps<"login">) {
         subtitle: strings.authWait()
       }}
       onSubmit={async (form) => {
+        if (!isEmail(form.email)) throw new Error(strings.emailInvalid());
+
         const result = (await userstore.login(form)) as
           | MFAErrorData
           | undefined;
@@ -281,7 +284,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
           ) : null}
           <AuthField
             id="email"
-            type="email"
+            type="text"
             autoComplete="email"
             label={strings.enterEmailAddress()}
             autoFocus
@@ -340,6 +343,8 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
       }}
       openURL={openURL}
       onSubmit={async (form) => {
+        if (!isEmail(form.email)) throw new Error(strings.emailInvalid());
+
         if (form.password !== form["confirm-password"]) {
           throw new Error(strings.passwordNotMatched());
         }
@@ -352,7 +357,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         <>
           <AuthField
             id="email"
-            type="email"
+            type="text"
             autoComplete="email"
             label={strings.enterEmailAddress()}
             autoFocus
@@ -606,6 +611,8 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
           return;
         }
 
+        if (!isEmail(form.email)) throw new Error(strings.emailInvalid());
+
         const url = await db.user.recoverAccount(form.email.toLowerCase());
         console.log(url);
         if (IS_TESTING) {
@@ -621,7 +628,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
         <>
           <AuthField
             id="email"
-            type="email"
+            type="text"
             autoComplete={"email"}
             label={strings.enterEmailAddress()}
             helpText={strings.accountRecoverHelpText()}
@@ -1307,7 +1314,7 @@ export function SubmitButton(props: SubmitButtonProps) {
   const { error } = useContext(AuthFormContext);
   return (
     <>
-      <AuthErrorText error={error} sx={{ mt: "spacing4", px: 0 }} />
+      <AuthErrorText error={error} sx={{ mt: "spacing4", p: 0 }} />
       <Button
         data-test-id="submitButton"
         type="submit"
