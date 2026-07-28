@@ -442,6 +442,9 @@ export const useEditorEvents = (
           break;
         case EditorEvents.logger:
           logger.info("[EDITOR LOG]", editorMessage.value);
+          if (__DEV__) {
+            console.log(editorMessage.value);
+          }
           break;
         case EditorEvents.dbLogger:
           if (editorMessage.value.error) {

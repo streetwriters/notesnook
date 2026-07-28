@@ -137,6 +137,7 @@ const Tiptap = ({
   const tiptapOptions = useMemo<Partial<TiptapOptions>>(() => {
     return {
       onUpdate: ({ editor, transaction }) => {
+        console.log("onUpdate.....");
         globalThis.editorControllers[tab.id]?.contentChange(
           editor as Editor,
           transaction.getMeta("ignoreEdit")
