@@ -24,10 +24,10 @@ async function getMainWindowState(app: ElectronApplication) {
   return await app.evaluate((window) => {
     const { BrowserWindow } = window;
     const mainWindow = BrowserWindow.getAllWindows()[0];
-
+    if (!mainWindow) throw new Error("Main window not found");
     return {
-      isMinimized: mainWindow?.isMinimized() ?? false,
-      isVisible: mainWindow?.isVisible() ?? false
+      isMinimized: mainWindow.isMinimized(),
+      isVisible: mainWindow.isVisible()
     };
   });
 }
@@ -42,6 +42,7 @@ test("hidden launch minimizes when tray is disabled", async ({
 }) => {
   const app = await launchElectronApp({
     version: options.version,
+    args: ["--hidden"],
     config: {
       desktopSettings: {
         minimizeToSystemTray: false,
@@ -63,6 +64,7 @@ test("hidden launch does not minimize when close-to-tray is enabled", async ({
 }) => {
   const app = await launchElectronApp({
     version: options.version,
+    args: ["--hidden"],
     config: {
       desktopSettings: {
         minimizeToSystemTray: false,

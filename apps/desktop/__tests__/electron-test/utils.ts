@@ -42,6 +42,7 @@ export interface AppContext {
 
 export interface TestOptions {
   version: string;
+  args?: string[];
   config?: Record<string, unknown>;
 }
 
@@ -72,7 +73,8 @@ export async function buildAndLaunchApp(
   const { app } = await launchApp(
     executablePath,
     userDataDir,
-    options?.version
+    options?.version,
+    options?.args
   );
   const ctx: AppContext = {
     app,
@@ -82,7 +84,8 @@ export async function buildAndLaunchApp(
       const { app } = await launchApp(
         executablePath,
         userDataDir,
-        options?.version
+        options?.version,
+        options?.args
       );
       ctx.app = app;
       ctx.userDataDir = userDataDir;
@@ -94,11 +97,12 @@ export async function buildAndLaunchApp(
 async function launchApp(
   executablePath: string,
   userDataDir: string,
-  version?: string
+  version?: string,
+  args: string[] = []
 ) {
   const app = await electron.launch({
     executablePath,
-    args: IS_DEBUG ? [] : ["--hidden"],
+    args: IS_DEBUG ? [...args] : ["--hidden", ...args],
     baseURL: "https://app.notesnook.com",
     acceptDownloads: true,
     env: {
