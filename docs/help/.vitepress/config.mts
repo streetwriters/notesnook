@@ -30,7 +30,9 @@ export default defineConfig({
     hostname: "https://help.notesnook.com",
     // Only the latest docs belong in the sitemap.
     transformItems: (items) =>
-      items.filter((i) => !isArchivedPath(`/${i.url}`) && !i.url.startsWith("404"))
+      items.filter(
+        (i) => !isArchivedPath(`/${i.url}`) && !i.url.startsWith("404")
+      )
   },
 
   transformPageData(pageData, ctx) {
