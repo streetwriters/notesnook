@@ -130,8 +130,6 @@ Deleting a note does not delete the files it contained — they become **orphane
 
 ## Why is my storage full when I deleted my attachments?
 
-<!---Reviewer: Is the time correct?-->
-
 Your monthly storage limit resets on the first of the month at midnight UTC. Deleting attachments does not give you storage back.
 
 <GetNotesnook action="pricing" title="Need more room for files?" text="The free plan gives you 50 MB a month and a 10 MB file size cap. Paid plans go up to 25 GB a month with 5 GB files — and every file stays end-to-end encrypted on all of them." />

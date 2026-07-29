@@ -11,8 +11,6 @@ The notes editor toolbar has all the basic tools for rich formatting of your not
 
 ## Adding blocks to a note
 
-<!-- Why is this here? --->
-
 1. Focus inside the note where you want to insert a block.
 2. Click on the ![Toolbar plus](/toolbar-plus.png) button on the toolbar.
 3. Select the block you want to insert; for example a task list.

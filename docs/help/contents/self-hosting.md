@@ -15,8 +15,6 @@ Every Notesnook app — web, desktop and mobile — lets you replace the servers
 
 ## Getting Started
 
-<!---Reviewer's note: I'm assuming you will merge @ibaraki-douji's PR https://github.com/streetwriters/notesnook-sync-server/pull/106, which fixes some oversights in the current setup's docker compose. That's the configuration this guide is referring to, just with links pointing to `master`.-->
-
 This guide assumes you are already familiar with the command line and basic systems security. Notesnook is not responsible for issues that may arise from improper configuration of the server. You are fully responsible for making adequate backups and for the security of your data and server.
 
 ### Hardware requirements
