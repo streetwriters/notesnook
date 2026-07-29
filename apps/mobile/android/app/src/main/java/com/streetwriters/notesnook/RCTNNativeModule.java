@@ -193,6 +193,16 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
+    /**
+     * Redraws every widget from scratch. Needed because the app can be stopped while its widgets
+     * stay on the home screen: clearing app data empties the store without the widgets ever being
+     * told, so they keep showing content that is gone until something forces a redraw.
+     */
+    @ReactMethod
+    public void refreshWidgets() {
+        WidgetUtils.refreshAll(mContext);
+    }
+
     @ReactMethod
     public void updateReminderWidget() {
         AppWidgetManager wm = AppWidgetManager.getInstance(mContext);

@@ -81,6 +81,7 @@ import {
   setUpdateAvailableMessage
 } from "../services/message";
 import Navigation from "../services/navigation";
+import { NotePreviewWidget } from "../services/note-preview-widget";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -573,6 +574,11 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     if (isAppLoading) return;
+
+    // Widgets outlive the app process, so they can be left showing content the app no longer has
+    // (most obviously after the user clears app data). Nothing can run at that moment, so the
+    // first launch afterwards is the earliest chance to put them right.
+    NotePreviewWidget.updateNotes();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;

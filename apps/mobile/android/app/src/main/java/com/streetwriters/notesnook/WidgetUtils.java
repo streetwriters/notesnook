@@ -1,6 +1,8 @@
 package com.streetwriters.notesnook;
 
 import android.app.ActivityOptions;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,9 +20,11 @@ import com.streetwriters.notesnook.datatypes.Reminder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Shared helpers for the home screen widgets.
@@ -35,6 +39,56 @@ public class WidgetUtils {
      * transaction, so the list cannot grow without bound. Far more than fits on screen anyway.
      */
     private static final int MAX_REMINDERS = 50;
+
+    /**
+     * Redraws every widget that currently exists, and drops stored notes for widgets that no
+     * longer do.
+     *
+     * Everything else keys off what we have stored, which is fine while the app is running but
+     * leaves widgets showing content that no longer exists once the store is emptied underneath
+     * them (clearing app data) or a widget is removed while the app is stopped (onDeleted never
+     * arrives). Starting from the widgets the system knows about, rather than from our own data,
+     * is what makes this self-correcting.
+     *
+     * NoteWidget is left alone deliberately: it is a static button with no stored state, and its
+     * layout depends on the size it was last given.
+     */
+    static void refreshAll(Context context) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+
+        int[] noteWidgetIds = manager.getAppWidgetIds(
+                new ComponentName(context, NotePreviewWidget.class));
+        removeOrphanedNotes(context, noteWidgetIds);
+        for (int appWidgetId : noteWidgetIds) {
+            NotePreviewWidget.updateAppWidget(context, manager, appWidgetId);
+        }
+
+        for (int appWidgetId : manager.getAppWidgetIds(
+                new ComponentName(context, ReminderWidgetProvider.class))) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_reminders);
+            ReminderWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
+        }
+    }
+
+    /**
+     * Drops stored notes whose widget is gone, so the preferences file cannot grow forever.
+     */
+    private static void removeOrphanedNotes(Context context, int[] liveWidgetIds) {
+        Set<String> live = new HashSet<>();
+        for (int appWidgetId : liveWidgetIds) live.add(String.valueOf(appWidgetId));
+
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = preferences.edit();
+        boolean changed = false;
+
+        for (String key : preferences.getAll().keySet()) {
+            // Leave anything that is not a widget id alone, the reminders list included.
+            if (parseWidgetId(key) == null || live.contains(key)) continue;
+            edit.remove(key);
+            changed = true;
+        }
+        if (changed) edit.apply();
+    }
 
     /**
      * The note each note widget is showing, keyed by widget id.
