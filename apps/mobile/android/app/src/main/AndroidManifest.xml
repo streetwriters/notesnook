@@ -97,6 +97,15 @@
         </receiver>
 
         <receiver
+            android:name=".WidgetTimeChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".ReminderWidgetProvider"
             android:exported="false"
             android:label="@string/reminders_title">
