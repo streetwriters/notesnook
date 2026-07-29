@@ -59,6 +59,9 @@ export const AuthenticationSettings: SettingsGroup[] = [
                   }
                 },
                 validate: async ({ oldPassword, newPassword }) => {
+                  const verify = await db.user.verifyPassword(oldPassword);
+                  if (!verify) return false;
+
                   try {
                     if (!(await createBackup({ noVerify: true }))) return false;
                     return (

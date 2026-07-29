@@ -300,6 +300,7 @@ export class Sync {
       throw new Error(
         `Failed to send all items. Sent ${done} out of ${total}.`
       );
+    if (total === 0) return false;
     await this.connection?.send("PushCompletedV2", deviceId);
     return true;
   }
@@ -386,6 +387,10 @@ export class Sync {
       const itemsToDecrypt = itemsByKeyVersion.get(keyInfo.version);
       if (!itemsToDecrypt || itemsToDecrypt.length === 0) continue;
 
+      this.logger.info("Decrypting using key", {
+        keyInfo: keyInfo.version,
+        items: itemsToDecrypt.length
+      });
       decrypted.push(
         ...(await this.db.storage().decryptMulti(keyInfo.key, itemsToDecrypt))
       );
@@ -560,15 +565,18 @@ export class Sync {
       return true;
     });
 
-    this.connection.on("SendMonographs", async (monographs) => {
+    this.connection.on("SendMonographs", async (monographs: Monograph[]) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
-      this.db.monographsCollection.collection.put(
-        monographs.map((m: Monograph) => ({
+      const ids = monographs.map((m) => m.id);
+      await this.db.monographsCollection.collection.put(
+        monographs.map((m) => ({
           ...m,
           type: "monograph"
         }))
       );
+      await this.db.monographs.refresh().catch(this.logger.error);
+      this.db.eventManager.publish(EVENTS.monographsUpdated, ids);
 
       return true;
     });

@@ -27,6 +27,7 @@ import {
   sql
 } from "@streetwriters/kysely";
 import { rebuildSearchIndex } from "./fts.js";
+import type { RawDatabaseSchema } from "./index.js";
 
 const COLLATE_NOCASE: ColumnBuilderCallback = (col) =>
   col.modifyEnd(sql`collate nocase`);
@@ -389,18 +390,22 @@ export class NNMigrationProvider implements MigrationProvider {
       },
       "8": {
         async up(db) {
-          await db.schema
-            .alterTable("notes")
-            .addColumn("isGeneratedTitle", "boolean")
-            .execute();
+          await ensureColumn(db, "notes", "isGeneratedTitle", async () => {
+            await db.schema
+              .alterTable("notes")
+              .addColumn("isGeneratedTitle", "boolean")
+              .execute();
+          });
         }
       },
       "9": {
         async up(db) {
-          await db.schema
-            .alterTable("notes")
-            .addColumn("archived", "boolean")
-            .execute();
+          await ensureColumn(db, "notes", "archived", async () => {
+            await db.schema
+              .alterTable("notes")
+              .addColumn("archived", "boolean")
+              .execute();
+          });
         }
       },
       // changing the migrations name scheme from here because
@@ -434,10 +439,12 @@ export class NNMigrationProvider implements MigrationProvider {
       },
       "a-2026-01-07": {
         async up(db) {
-          await db.schema
-            .alterTable("notes")
-            .addColumn("expiryDate", "text")
-            .execute();
+          await ensureColumn(db, "notes", "expiryDate", async () => {
+            await db.schema
+              .alterTable("notes")
+              .addColumn("expiryDate", "text")
+              .execute();
+          });
           await db.schema
             .createIndex("note_expiry_date")
             .ifNotExists()
@@ -448,32 +455,39 @@ export class NNMigrationProvider implements MigrationProvider {
       },
       "a-2026-01-09": {
         async up(db) {
-          await db.schema
-            .alterTable("sessioncontent")
-            .addColumn("title", "text")
-            .execute();
+          await ensureColumn(db, "sessioncontent", "title", async () => {
+            await db.schema
+              .alterTable("sessioncontent")
+              .addColumn("title", "text")
+              .execute();
+          });
         }
       },
       "a-2026-02-11": {
         async up(db) {
-          await db.schema
-            .alterTable("monographs")
-            .addColumn("publishUrl", "text", COLLATE_NOCASE)
-            .execute();
+          await ensureColumn(db, "monographs", "publishUrl", async () => {
+            await db.schema
+              .alterTable("monographs")
+              .addColumn("publishUrl", "text", COLLATE_NOCASE)
+              .execute();
+          });
         }
       },
       "a-2026-04-06": {
         async up(db) {
-          await db.schema
-            .alterTable("notes")
-            .addColumn("spellcheck", "boolean", (c) => c.defaultTo(true))
-            .execute();
+          await ensureColumn(db, "notes", "spellcheck", async () => {
+            await db.schema
+              .alterTable("notes")
+              .addColumn("spellcheck", "boolean", (c) => c.defaultTo(true))
+              .execute();
+          });
         }
       },
       "a-2026-05-07": {
         async up(db) {
           await db.schema
             .createTable("inboxitemshistory")
+            .ifNotExists()
             .modifyEnd(sql`without rowid`)
             .$call(addBaseColumns)
             .addColumn("dateSynced", "integer")
@@ -567,4 +581,28 @@ async function runFTSTablesMigrations(db: Kysely<any>) {
     ).execute(tx);
   });
   await rebuildSearchIndex(db);
+}
+
+async function hasColumn(
+  db: Kysely<RawDatabaseSchema>,
+  tableName: string,
+  columnName: string
+) {
+  const result = await sql<{ name: string }>`
+    SELECT name
+    FROM pragma_table_info(${tableName})
+    WHERE name = ${columnName}
+  `.execute(db);
+
+  return result.rows.length > 0;
+}
+
+async function ensureColumn(
+  db: Kysely<RawDatabaseSchema>,
+  tableName: string,
+  columnName: string,
+  callback: () => Promise<void>
+) {
+  if (await hasColumn(db, tableName, columnName)) return;
+  await callback();
 }

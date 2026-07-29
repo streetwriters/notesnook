@@ -44,6 +44,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertBrToSingleSpacedParagraphs(dom);
       removeRestrictedFeatures(dom);
       removeBlockId(dom);
+      cleanupPastedNNLinkHtml(dom);
     }
     return super.parseSlice(dom, options);
   }
@@ -55,6 +56,7 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
       convertBrToSingleSpacedParagraphs(dom);
       removeRestrictedFeatures(dom);
       removeBlockId(dom);
+      cleanupPastedNNLinkHtml(dom);
     }
     return super.parse(dom, options);
   }
@@ -63,6 +65,15 @@ export class ClipboardDOMParser extends ProsemirrorDOMParser {
 export function removeBlockId(dom: HTMLElement | Document) {
   for (const element of dom.querySelectorAll("[data-block-id]")) {
     element.removeAttribute("data-block-id");
+  }
+}
+
+export function cleanupPastedNNLinkHtml(dom: HTMLElement | Document) {
+  const isNNLink = dom.querySelectorAll(`[href^="nn://"]`).length === 1;
+  if (isNNLink) {
+    for (const element of dom.querySelectorAll("[style]")) {
+      element.removeAttribute("style");
+    }
   }
 }
 

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Button, Text, Link } from "@theme-ui/components";
 import { StepContainer } from "./step-container";
 import { SyncRequestBody } from "./step-4";
-import { NNCrypto } from "@notesnook/crypto";
+import { NNCrypto, Cipher } from "@notesnook/crypto";
 import { useEffect, useState } from "react";
 import { FcDataEncryption } from "react-icons/fc";
 import { Code } from "./code";
@@ -32,6 +32,7 @@ type DecryptedResultProps = {
   password: string;
   salt: string;
   data: SyncRequestBody;
+  accountKey: Cipher<"base64"> | null | undefined;
   onRestartProcess: () => void;
 };
 
@@ -51,10 +52,19 @@ export function DecryptedResult(props: DecryptedResultProps) {
         };
         const crypto = new NNCrypto();
         const key = await crypto.exportKey(props.password, props.salt);
+        let encryptionKey = undefined;
+        if (props.accountKey != null){
+          // Need to decrypt the account key
+          props.accountKey.format = "base64"; // account keys don't have the format set, but they're base64.
+          const dataEncryptionKey = JSON.parse(await crypto.decrypt(key, props.accountKey, "text"))
+          encryptionKey = dataEncryptionKey;
+        } else {
+          encryptionKey = key;
+        }
         for (const arrayKey in data) {
           const array = data[arrayKey];
           for (const encryptedItem of (props.data as any)[arrayKey]) {
-            const data = await crypto.decrypt(key, encryptedItem, "text");
+            const data = await crypto.decrypt(encryptionKey, encryptedItem, "text");
             array.push(JSON.parse(data));
           }
         }
@@ -150,18 +160,8 @@ export function DecryptedResult(props: DecryptedResultProps) {
             support@streetwriters.co
           </Link>{" "}
           or{" "}
-          <Link href="https://discord.gg/">joining our Discord community</Link>.
+          <Link href="https://go.notesnook.com/discord">join our Discord community</Link>.
           We&apos;ll do our best to alleviate all your worries.
-        </Text>
-        <Text as="p" variant="body" sx={{ mx: 2, mt: 2, fontWeight: "bold" }}>
-          What about open sourcing Notesnook?
-        </Text>
-        <Text as="p" variant="body" sx={{ mx: 2, my: 2 }}>
-          Open sourcing is another part of garnering our users&apos; trust. We
-          have <Link href="https://notesnook.com/roadmap">plans</Link> to begin
-          open sourcing in May but open sourcing will not make this tool
-          obsolete. Verifying the integrity of encrypted data at any point in
-          time is very important even if the software is open source.
         </Text>
       </Accordion>
       <Flex sx={{ alignSelf: "center", mt: 4 }}>

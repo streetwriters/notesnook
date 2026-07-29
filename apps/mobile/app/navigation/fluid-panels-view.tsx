@@ -447,7 +447,9 @@ const onChangeTab = async (event: { i: number; from: number }) => {
   if (event.i === 2) {
     editorState().movedAway = false;
     editorState().isFocused = true;
-    activateKeepAwake();
+    if (useSettingStore.getState().settings.keepScreenOn) {
+      activateKeepAwake();
+    }
     eSendEvent(eOnEnterEditor);
 
     if (

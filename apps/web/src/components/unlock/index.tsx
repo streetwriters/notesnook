@@ -115,7 +115,7 @@ export function UnlockView(props: UnlockViewProps) {
           }
         }}
       />
-      {isWrong && <ErrorText error="Wrong password" />}
+      {isWrong && <ErrorText sx={{ mt: 1 }} error="Wrong password" />}
       <Button
         mt={3}
         variant="accent"

@@ -72,6 +72,7 @@ const MergeConflicts = () => {
   const insets = useGlobalSafeAreaInsets();
   const content = useRef<UnencryptedContentItem>(null);
   const { height } = useSettingStore((state) => state.dimensions);
+  const keepScreenOn = useSettingStore((state) => state.settings.keepScreenOn);
 
   const applyChanges = async () => {
     const contentToSave = selectedContent;
@@ -155,9 +156,9 @@ const MergeConflicts = () => {
               ...item.content,
               conflicted: currentContent?.conflicted
                 ? await db.vault.decryptContent(
-                    currentContent?.conflicted as EncryptedContentItem,
-                    password
-                  )
+                  currentContent?.conflicted as EncryptedContentItem,
+                  password
+                )
                 : undefined
             } as UnencryptedContentItem;
 
@@ -182,9 +183,9 @@ const MergeConflicts = () => {
                     ...item.content,
                     conflicted: currentContent?.conflicted
                       ? await db.vault.decryptContent(
-                          currentContent?.conflicted as EncryptedContentItem,
-                          password
-                        )
+                        currentContent?.conflicted as EncryptedContentItem,
+                        password
+                      )
                       : undefined
                   } as UnencryptedContentItem;
 
@@ -385,7 +386,7 @@ const MergeConflicts = () => {
           paddingTop: insets.top
         }}
       >
-        <KeepAwake />
+        {keepScreenOn && <KeepAwake />}
         {dialogVisible && (
           <BaseDialog visible={true}>
             <DialogContainer>

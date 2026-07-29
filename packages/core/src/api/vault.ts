@@ -40,14 +40,17 @@ export default class Vault {
   }
 
   private set password(value) {
-    this.vaultPassword = value;
+    if (this.vaultPassword !== value) {
+      this.vaultPassword = value;
+      if (value) this.db.eventManager.publish(EVENTS.vaultUnlocked);
+    }
+
     if (value) {
       this.startEraser();
     }
   }
 
   private startEraser() {
-    this.db.eventManager.publish(EVENTS.vaultUnlocked);
     clearTimeout(this.erasureTimeout);
 
     const lockAfter = this.db.settings.getVaultLockAfter();
@@ -158,17 +161,30 @@ export default class Vault {
     }
   }
 
+  /**
+   *
+   * There's an unintentional and unrelated bug where multiple vaults
+   * can be created.
+   * So when user triggers delete, we should delete all vaults.
+   */
   async delete(deleteAllLockedNotes = false) {
-    const vault = await this.db.vaults.default();
-    if (!vault) return;
+    const vaults = await this.db.vaults.all.items();
+    if (!vaults.length) return;
 
     if (deleteAllLockedNotes) {
-      const relations = await this.db.relations.from(vault, "note").get();
-      const lockedIds = relations.map((r) => r.toId);
-      await this.db.notes.remove(...lockedIds);
+      const lockedIds = new Set<string>();
+      for (const vault of vaults) {
+        const relations = await this.db.relations.from(vault, "note").get();
+        for (const { toId } of relations) {
+          lockedIds.add(toId);
+        }
+      }
+      if (lockedIds.size) {
+        await this.db.notes.remove(...lockedIds);
+      }
     }
 
-    await this.db.vaults.remove(vault.id);
+    await this.db.vaults.removeAll();
     this.password = undefined;
   }
 

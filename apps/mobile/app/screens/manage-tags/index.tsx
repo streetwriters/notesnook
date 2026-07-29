@@ -398,7 +398,8 @@ const TagItem = ({
         flexDirection: "row",
         marginVertical: 5,
         justifyContent: "flex-start",
-        height: 40
+        minHeight: 40,
+        alignItems: "center"
       }}
       onPress={() => {
         if (!tag) return;
@@ -438,7 +439,9 @@ const TagItem = ({
         />
       )}
       {tag ? (
-        <Paragraph size={AppFontSize.sm}>{"#" + tag?.title}</Paragraph>
+        <Paragraph style={{ flexShrink: 1 }} size={AppFontSize.sm}>
+          {"#" + tag?.title}
+        </Paragraph>
       ) : (
         <View
           style={{

@@ -404,11 +404,13 @@ class UserManager {
     { version: KeyVersion; key: SerializedKey }[] | undefined
   > {
     const masterKey = await this.getMasterKey();
+    logger.info("master key exists: ", { masterKey: !!masterKey });
     if (!masterKey) return;
 
     const dataEncryptionKey = await this.keyManager.get("dataEncryptionKey", {
       refetchUser: false
     });
+    logger.info("DEK exists: ", { dataEncryptionKey: !!dataEncryptionKey });
     if (!dataEncryptionKey)
       return [
         {
@@ -424,6 +426,9 @@ class UserManager {
         refetchUser: false
       }
     );
+    logger.info("legacy DEK exists: ", {
+      legacyDataEncryptionKey: !!legacyDataEncryptionKey
+    });
     if (legacyDataEncryptionKey)
       keys.push({
         key: await this.keyManager.unwrapKey(
@@ -435,6 +440,10 @@ class UserManager {
     keys.push({
       key: await this.keyManager.unwrapKey(dataEncryptionKey, masterKey),
       version: KEY_VERSION.DEK
+    });
+    logger.info("Keys:", {
+      keys: keys.length,
+      keyVersions: keys.map((k) => k.version)
     });
     return keys;
   }
@@ -632,7 +641,10 @@ class UserManager {
       throw new Error("Incorrect old password.");
 
     const oldPassword = old_password
-      ? await this.db.storage().hash(old_password, email, {
+      ? // we don't lowercase email here to allow user accounts with
+        // mixed cased emails to change their passwords. Once that is done,
+        // we will lowercase the email in the backend.
+        await this.db.storage().hash(old_password, email, {
           usesFallback: await this.usesFallbackPWHash(old_password)
         })
       : null;
@@ -696,7 +708,9 @@ class UserManager {
       `${constants.API_HOST}/users/password/${type}`,
       {
         oldPassword: oldPassword,
-        newPassword: await this.db.storage().hash(new_password, email),
+        newPassword: await this.db
+          .storage()
+          .hash(new_password, email.toLowerCase()),
         userKeys: updateUserPayload
       },
       token

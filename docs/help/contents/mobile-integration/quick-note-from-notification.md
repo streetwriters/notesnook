@@ -2,7 +2,7 @@
 
 > error This feature is Android only.
 
-A simple, quick and convinient way to take notes on your phone from notifications. This works the same way as a messaging/chat app allows you to reply to messages from notifications.
+A simple, quick and convenient way to take notes on your phone from notifications. This works the same way as a messaging/chat app allows you to reply to messages from notifications.
 
 ![Notes in notifications](/static/mobile-integration/android-quick-note-notifications.png)
 

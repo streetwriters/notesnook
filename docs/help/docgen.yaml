@@ -42,6 +42,8 @@ navigation:
       - path: importing-notes/import-notes-from-html-files.md
       - path: importing-notes/import-notes-from-markdown-files.md
       - path: importing-notes/import-notes-from-plaintext-files.md
+      - path: importing-notes/import-notes-from-colornote.md
+      - path: importing-notes/import-notes-from-upnote.md
   - path: export-notes-from-notesnook.md
   - path: backup-and-restore-notes-in-notesnook.md
 

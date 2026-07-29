@@ -1,0 +1,7 @@
+- Inbox API is now in beta. Learn more about it at https://help.notesnook.com/inbox-api/getting-started
+- Added close all tabs button in editor
+- Deeplinking support for nn:// urls
+- Set default image compression mode in Settings -> Behavior
+- Minor bug fixes and performance improvements
+
+Thank you for using Notesnook!

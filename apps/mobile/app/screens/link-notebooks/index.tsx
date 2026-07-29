@@ -163,7 +163,20 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
   }, [noteIds]);
 
   const onSave = async () => {
-    const changedNotebooks = useNotebookSelectionStore.getState().selection;
+    const selectionState = useNotebookSelectionStore.getState();
+    const changedNotebooks = { ...selectionState.selection };
+
+    if (!selectionState.multiSelect) {
+      for (const id in selectionState.initialState) {
+        if (
+          selectionState.initialState[id] === "selected" &&
+          changedNotebooks[id] !== "selected"
+        ) {
+          changedNotebooks[id] = "deselected";
+        }
+      }
+    }
+
     for (const id in changedNotebooks) {
       const item = await db.notebooks.notebook(id);
       if (!item) continue;
@@ -207,11 +220,11 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
         rightButton={
           hasSelection
             ? {
-                name: "restore",
-                onPress: () => {
-                  updateInitialSelectionState(noteIds);
-                }
+              name: "restore",
+              onPress: () => {
+                updateInitialSelectionState(noteIds);
               }
+            }
             : undefined
         }
       />

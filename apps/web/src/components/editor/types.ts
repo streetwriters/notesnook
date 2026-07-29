@@ -48,7 +48,7 @@ export interface IEditor {
   undo: () => void;
   redo: () => void;
   updateContent: (content: string) => void;
-  attachFile: (file: Attachment) => void;
+  attachFiles: (...files: Attachment[]) => void;
   sendAttachmentProgress: (hash: string, progress: number) => void;
   startSearch: () => void;
   getContent: () => string;

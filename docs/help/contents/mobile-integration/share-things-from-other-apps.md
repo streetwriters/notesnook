@@ -2,7 +2,7 @@
 
 Basic web clipping support is available on both Android & iOS apps via share extensions.
 
-We are going to use browser app as an example to demonstarte how you can clip information from webpages and other apps on your iPhone.
+We are going to use browser app as an example to demonstrate how you can clip information from webpages and other apps on your iPhone.
 
 1. Select some text on a webpage then Tap on "Share" on the context menu.
 
@@ -40,7 +40,7 @@ We are going to use browser app as an example to demonstarte how you can clip in
 
 > info
 >
-> Share exenstion will save the note you selected so in future web clips, it will be selected by default until you reset it.
+> Share extension will save the note you selected so in future web clips, it will be selected by default until you reset it.
 
 ## Clipping full webpage content
 

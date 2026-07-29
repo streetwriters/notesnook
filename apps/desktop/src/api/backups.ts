@@ -33,17 +33,38 @@ function generateId() {
   return Math.random().toString(36).slice(2);
 }
 
+function getStreamOrThrow(id: string, operation: "write" | "close") {
+  const stream = activeStreams.get(id);
+  if (!stream) {
+    throw new Error(
+      `Backup stream not found during ${operation}. The stream may have already been closed or was never opened. Stream id: ${id}`
+    );
+  }
+  return stream;
+}
+
 export const backupsRouter = t.router({
   open: t.procedure
     .input(z.object({ filename: z.string() }))
     .mutation(({ input }) => {
       const { filename } = input;
+      if (!filename.trim()) {
+        throw new Error("Invalid backup filename: filename cannot be empty.");
+      }
       if (filename.includes(path.sep) || filename.includes("\\"))
-        throw new Error("Invalid filename");
+        throw new Error(
+          `Invalid backup filename: expected a plain file name without path separators, received "${filename}".`
+        );
       const resolvedBackupDir = resolvePath(config.backupDirectory);
       const backupPath = path.resolve(resolvedBackupDir, filename);
-      if (!backupPath.startsWith(resolvedBackupDir))
-        throw new Error("Invalid filename");
+      const relativeBackupPath = path.relative(resolvedBackupDir, backupPath);
+      if (
+        relativeBackupPath.startsWith("..") ||
+        path.isAbsolute(relativeBackupPath)
+      )
+        throw new Error(
+          `Invalid backup filename: resolved path "${backupPath}" is outside the configured backup directory "${resolvedBackupDir}". The configured backup directory may be invalid.`
+        );
 
       mkdirSync(resolvedBackupDir, { recursive: true });
       const stream = createWriteStream(backupPath, { encoding: "utf-8" });
@@ -55,8 +76,7 @@ export const backupsRouter = t.router({
   write: t.procedure
     .input(z.object({ id: z.string(), chunk: z.string() }))
     .mutation(({ input }) => {
-      const stream = activeStreams.get(input.id);
-      if (!stream) throw new Error("Stream not found");
+      const stream = getStreamOrThrow(input.id, "write");
       return new Promise<void>((resolve, reject) => {
         stream.write(Buffer.from(input.chunk, "base64"), (err) =>
           err ? reject(err) : resolve()
@@ -67,8 +87,7 @@ export const backupsRouter = t.router({
   close: t.procedure
     .input(z.object({ id: z.string() }))
     .mutation(({ input }) => {
-      const stream = activeStreams.get(input.id);
-      if (!stream) throw new Error("Stream not found");
+      const stream = getStreamOrThrow(input.id, "close");
       return new Promise<void>((resolve) => {
         stream.end(() => {
           activeStreams.delete(input.id);

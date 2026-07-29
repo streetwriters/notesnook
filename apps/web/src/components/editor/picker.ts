@@ -27,10 +27,10 @@ import {
   hashStream,
   writeEncryptedFile
 } from "../../interfaces/fs";
-import { compressImage, FileWithURI } from "../../utils/image-compressor";
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { strings } from "@notesnook/intl";
+import Queue from "p-queue";
 
 export async function insertAttachments(
   type: string,
@@ -81,7 +81,6 @@ export async function reuploadAttachment(
 }
 
 type AttachFilesMessage =
-  | { type: "compressing"; index: number }
   | { type: "encrypting"; index: number }
   | {
       type: "done";
@@ -90,60 +89,39 @@ type AttachFilesMessage =
     }
   | { type: "error"; index: number; error: string };
 
-export async function* attachFiles(
+export async function attachFiles(
   files: File[],
-  shouldCompress: boolean[],
+  report: (progress: AttachFilesMessage) => void,
   skipSpecialImageHandling = false
-): AsyncGenerator<AttachFilesMessage> {
+) {
+  const queue = new Queue({ concurrency: 8 });
   for (let i = 0; i < files.length; i++) {
-    let file = files[i];
-    const shouldCompressFile = shouldCompress[i];
+    queue.add(async () => {
+      const file = files[i];
 
-    if (shouldCompressFile) {
-      yield { type: "compressing", index: i };
+      report({ type: "encrypting", index: i });
+
       try {
-        const compressed = await compressImage(file, {
-          maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
-          width: (naturalWidth) => naturalWidth,
-          height: (_, naturalHeight) => naturalHeight,
-          resize: "contain",
-          quality: 0.7
+        const allowed = await checkFeature("fileSize", {
+          value: file.size,
+          type: "toast"
         });
-        file = new FileWithURI([compressed], file.name, {
-          lastModified: file.lastModified,
-          type: file.type
-        });
+        if (!allowed) {
+          throw new Error(strings.fileSizeLimitExceededPleaseUpgrade());
+        }
+
+        const attachment =
+          !skipSpecialImageHandling && file.type.startsWith("image/")
+            ? await pickImage(file)
+            : await pickFile(file);
+
+        report({ type: "done", index: i, attachment: attachment || undefined });
       } catch (e) {
-        yield {
-          type: "error",
-          index: i,
-          error: (e as Error).message || strings.compressionFailed()
-        };
-        continue;
+        report({ type: "error", index: i, error: (e as Error).message });
       }
-    }
-
-    yield { type: "encrypting", index: i };
-
-    try {
-      const allowed = await checkFeature("fileSize", {
-        value: file.size,
-        type: "toast"
-      });
-      if (!allowed) {
-        throw new Error(strings.fileSizeLimitExceededPleaseUpgrade());
-      }
-
-      const attachment =
-        !skipSpecialImageHandling && file.type.startsWith("image/")
-          ? await pickImage(file)
-          : await pickFile(file);
-
-      yield { type: "done", index: i, attachment: attachment || undefined };
-    } catch (e) {
-      yield { type: "error", index: i, error: (e as Error).message };
-    }
+    });
   }
+  await queue.onIdle();
 }
 
 /**
@@ -205,6 +183,7 @@ export type AttachmentProgress = {
   type: "encrypt" | "download" | "upload";
   total: number;
   loaded: number;
+  file?: File;
 };
 
 type AddAttachmentOptions = {
@@ -250,7 +229,7 @@ async function addAttachment(
       hash,
       hashType,
       filename: exists?.filename || file.name,
-      mimeType: exists?.type || file.type,
+      mimeType: exists?.mimeType || file.type,
       key
     });
   }

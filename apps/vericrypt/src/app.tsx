@@ -31,7 +31,7 @@ import { PasteEncryptedData, SyncRequestBody } from "./components/step-4";
 import { StepSeperator } from "./components/step-seperator";
 import { Footer } from "./components/footer";
 import { useState } from "react";
-import { NNCrypto } from "@notesnook/crypto";
+import { NNCrypto, Cipher } from "@notesnook/crypto";
 import { Code } from "./components/code";
 import { Accordion } from "./components/accordion";
 import { DecryptedResult } from "./components/decrypted-result";
@@ -41,7 +41,7 @@ const instructions = [
   "Go to Notesnook",
   "Open Settings",
   <>
-    Click on <Code text="Backup data recovery key" />
+    Click on <Code text="Save data recovery key" />
   </>,
   "Enter your account password for verification",
   "Confirm that your generated encryption key matches"
@@ -52,6 +52,7 @@ function App() {
   const [salt, setSalt] = useState<string>();
   const [key, setKey] = useState<string>();
   const [data, setData] = useState<SyncRequestBody | undefined>();
+  const [accountDataKey, setAccountDataKey] = useState<Cipher<"base64"> | null | undefined>();
   const theme = useTheme({ accent: getDefaultAccentColor(), theme: "light" });
 
   return (
@@ -67,7 +68,7 @@ function App() {
         >
           <LoginToNotesnook />
           <StepSeperator />
-          <GetAccountSalt onSaltSubmitted={setSalt} />
+          <GetAccountSalt onSaltSubmitted={setSalt} setAccountDataKey={setAccountDataKey} />
 
           {salt && (
             <>
@@ -91,7 +92,7 @@ function App() {
                   return true;
                 }}
                 popup={{
-                  title: "Your data encryption key",
+                  title: "Your master encryption key",
                   body: key ? (
                     <>
                       <Text
@@ -146,11 +147,13 @@ function App() {
                 password={password}
                 salt={salt}
                 data={data}
+                accountKey={accountDataKey}
                 onRestartProcess={() => {
                   setSalt(undefined);
                   setPassword(undefined);
                   setKey(undefined);
                   setData(undefined);
+                  setAccountDataKey(undefined);
                 }}
               />
             </>

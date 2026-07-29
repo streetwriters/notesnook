@@ -437,6 +437,7 @@ export class Notes implements ICollection {
       const duplicateId = await this.db.notes.add({
         ...clone(note),
         id: undefined,
+        pinned: false,
         isGeneratedTitle: false,
         contentId: undefined,
         title: note.title + " (Copy)",
@@ -489,6 +490,7 @@ export class Notes implements ICollection {
         await this.db.relations.unlinkOfType("note", ids);
         await this.collection.softDelete(ids);
         await this.db.content.removeByNoteId(...ids);
+        await this.db.inboxItemsHistory.delete(ids);
       });
     }
 

@@ -67,8 +67,7 @@ function Toggle(props: ToggleProps) {
         sx={{
           m: 0,
           bg: isOn ? "accent" : "icon-secondary",
-          flexShrink: 0,
-          scale: 0.75
+          flexShrink: 0
         }}
         checked={isOn}
         onClick={(e) => e.stopPropagation()}

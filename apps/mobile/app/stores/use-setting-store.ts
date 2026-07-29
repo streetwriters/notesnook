@@ -104,6 +104,7 @@ export type Settings = {
   checkForUpdates?: boolean;
   defaultLineHeight: number;
   imageCompression: "ask-every-time" | "enabled" | "disabled";
+  keepScreenOn?: boolean;
 };
 
 type DimensionsType = {
@@ -213,7 +214,8 @@ export const defaultSettings: SettingStore["settings"] = {
   lastFullBackupDate: 0,
   checkForUpdates: true,
   defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT,
-  imageCompression: "ask-every-time"
+  imageCompression: "ask-every-time",
+  keepScreenOn: true
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

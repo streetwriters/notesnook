@@ -1,0 +1,72 @@
+name: Notesnook Android Preview Publish
+
+# TRUSTED stage. Runs via `workflow_run` after the build workflow finishes, so
+# it has the base repo's secrets and a write-scoped token. It downloads the APK
+# the build produced and distributes it + posts the PR comment. It never checks
+# out or executes fork code.
+
+on:
+  workflow_run:
+    workflows: ["Notesnook Android Preview Build"]
+    types: [completed]
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-preview-build
+          path: ${{ runner.temp }}/artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load PR metadata
+        run: cat "$RUNNER_TEMP/artifact/pr-meta.env" >> "$GITHUB_ENV"
+
+      - name: Publish to Firebase
+        id: firebase-output
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
+          groups: testers
+          file: ${{ runner.temp }}/artifact/app-preview.apk
+          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        env:
+          preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+        with:
+          script: |
+            const marker = '<!-- android-preview-comment -->';
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!prNumber) return;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**Android App Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.HEAD_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }

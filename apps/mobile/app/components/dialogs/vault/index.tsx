@@ -729,6 +729,13 @@ export const VaultDialog: React.FC = () => {
         >
           {(isChangePassword ||
             isClearVault ||
+            requestType === VaultRequestType.LockNote ||
+            requestType === VaultRequestType.UnlockNote ||
+            requestType === VaultRequestType.PermanentUnlock ||
+            isGoToEditor ||
+            isShareNote ||
+            isDeleteNote ||
+            isEnableFingerprint ||
             (isDeleteVault && isUserLoggedIn) ||
             isCustomAction) &&
           !isRevokeFingerprint ? (

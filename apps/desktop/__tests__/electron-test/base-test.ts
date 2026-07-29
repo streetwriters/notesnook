@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { mergeTests } from "@playwright/test";
-import { test } from "@playwright/test";
+import { mergeTests, test } from "@playwright/test";
 import type { CommonFixtures, CommonWorkerFixtures } from "./common-fixtures";
 import { commonFixtures } from "./common-fixtures";
 import { platformTest } from "./platform-fixtures";

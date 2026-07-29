@@ -35,7 +35,7 @@ import notifee, {
 import NetInfo from "@react-native-community/netinfo";
 import dayjs, { Dayjs } from "dayjs";
 import { encodeNonAsciiHTML } from "entities";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import { db, setupDatabase } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import { presentDialog } from "../components/dialog/functions";
@@ -45,7 +45,7 @@ import { useRelationStore } from "../stores/use-relation-store";
 import { useReminderStore } from "../stores/use-reminder-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useUserStore } from "../stores/use-user-store";
-import { eOnLoadNote } from "../utils/events";
+import { eCloseSimpleDialog, eOnLoadNote } from "../utils/events";
 import { fluidTabsRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
@@ -577,7 +577,7 @@ async function displayNotification({
 }
 
 function openSettingsDialog(context: string) {
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     presentDialog({
       title: strings.notificationsDisabled(),
       paragraph: strings.notificationsDisabledDesc(),
@@ -597,49 +597,94 @@ function openSettingsDialog(context: string) {
   });
 }
 
+function waitForAppFocusAfterSettings(timeoutMs = 120000): Promise<void> {
+  return new Promise((resolve) => {
+    let didLeaveApp = AppState.currentState !== "active";
+    const timeout = setTimeout(() => {
+      subscription.remove();
+      resolve();
+    }, timeoutMs);
+
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state !== "active") {
+        didLeaveApp = true;
+        return;
+      }
+
+      if (didLeaveApp && state === "active") {
+        clearTimeout(timeout);
+        subscription.remove();
+        resolve();
+      }
+    });
+  });
+}
+
 async function checkAndRequestPermissions(
   promptUser?: boolean
 ): Promise<boolean> {
   let permissionStatus = await notifee.getNotificationSettings();
   if (Platform.OS === "android") {
-    if (
-      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
-      permissionStatus.android.alarm === 1
-    )
+    const hasNotificationPermission =
+      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED;
+    const hasAlarmPermission = permissionStatus.android.alarm === 1;
+
+    if (hasNotificationPermission && hasAlarmPermission) {
       return true;
+    }
+
     if (permissionStatus.authorizationStatus === AuthorizationStatus.DENIED) {
       permissionStatus = await notifee.requestPermission();
     }
+
+    // Wait for user to return from exact alarm settings
     if (permissionStatus.android.alarm !== 1) {
+      const waitForAppFocus = waitForAppFocusAfterSettings();
+
       await notifee.openAlarmPermissionSettings();
+      await waitForAppFocus;
     }
     permissionStatus = await notifee.getNotificationSettings();
 
-    if (
+    const authorized =
       permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
-      permissionStatus.android.alarm === 1
-    )
-      return true;
+      permissionStatus.android.alarm === 1;
 
-    if (promptUser) {
-      if (await openSettingsDialog("local")) {
-        await notifee.openNotificationSettings();
-        return false;
-      }
+    if (authorized) {
+      return true;
     }
 
-    return false;
-  } else {
-    permissionStatus = await notifee.requestPermission();
-    if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED)
-      return true;
     if (promptUser) {
-      await openSettingsDialog("local");
+      const openSettings = await openSettingsDialog("local");
+      if (openSettings) {
+        const waitForAppFocus = waitForAppFocusAfterSettings();
+        await notifee.openNotificationSettings();
+        await waitForAppFocus;
+        permissionStatus = await notifee.getNotificationSettings();
+        const finalAuthorized =
+          permissionStatus.authorizationStatus ===
+            AuthorizationStatus.AUTHORIZED &&
+          permissionStatus.android.alarm === 1;
+        if (finalAuthorized) {
+          eSendEvent(eCloseSimpleDialog);
+          return true;
+        }
+      }
+      return false;
     }
     return false;
   }
-}
 
+  // iOS
+  permissionStatus = await notifee.requestPermission();
+  if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED) {
+    return true;
+  }
+  if (promptUser) {
+    await openSettingsDialog("local");
+  }
+  return false;
+}
 async function getTriggers(
   reminder: Reminder
 ): Promise<(Trigger & { id: string })[] | undefined> {

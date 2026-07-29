@@ -231,6 +231,80 @@ test("delete vault and delete all locked notes", () =>
     expect(await db.vaults.default()).toBeUndefined();
   }));
 
+test("delete all vaults and their locked notes", () =>
+  noteTest().then(async ({ db, id: note1Id }) => {
+    /**
+     * simulating the case where multiple vaults have been created
+     * and each vault has a locked note
+     */
+    const key = {
+      format: "base64",
+      alg: "aes-256-gcm",
+      cipher: "key",
+      iv: "iv",
+      salt: "salt",
+      length: 16
+    };
+    const vault1Id = await db.vaults.add({
+      title: "Vault 1",
+      key
+    });
+    const vault2Id = await db.vaults.add({
+      title: "Vault 2",
+      key
+    });
+    await db.relations.add(
+      {
+        id: vault1Id,
+        type: "vault"
+      },
+      {
+        id: note1Id,
+        type: "note"
+      }
+    );
+    const note2Id = await db.notes.add(TEST_NOTE);
+    await db.relations.add(
+      {
+        id: vault2Id,
+        type: "vault"
+      },
+      {
+        id: note2Id,
+        type: "note"
+      }
+    );
+
+    await db.vault.delete(true);
+
+    expect(
+      await db.relations
+        .from(
+          {
+            id: vault1Id,
+            type: "vault"
+          },
+          "note"
+        )
+        .has(note1Id)
+    ).toBe(false);
+    expect(
+      await db.relations
+        .from(
+          {
+            id: vault2Id,
+            type: "vault"
+          },
+          "note"
+        )
+        .has(note2Id)
+    ).toBe(false);
+    expect(await db.notes.exists(note1Id)).toBe(false);
+    expect(await db.notes.exists(note2Id)).toBe(false);
+    expect(await db.vaults.default()).toBeUndefined();
+    expect(await db.vaults.all.count()).toBe(0);
+  }));
+
 test("vault password is cleared after specified time", () =>
   databaseTest().then(async (db) => {
     await expect(db.vault.create("password")).resolves.toBe(true);

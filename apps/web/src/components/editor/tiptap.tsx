@@ -684,6 +684,12 @@ function TiptapWrapper(
     }
   }, [props.spellcheck]);
 
+  useEffect(() => {
+    if (editorContainerRef.current) {
+      editorContainerRef.current.style.fontSize = `${editorConfig.fontSize}px`;
+    }
+  }, [editorConfig.fontSize]);
+
   return (
     <Flex
       ref={containerRef}
@@ -786,10 +792,8 @@ function toIEditor(editor: Editor): IEditor {
         })
         .run();
     },
-    attachFile: (file: Attachment) =>
-      file.type === "image"
-        ? editor.commands.insertImage(file)
-        : editor.commands.insertAttachment(file),
+    attachFiles: async (...files: Attachment[]) =>
+      editor.commands.insertAttachment(...files),
     sendAttachmentProgress: (hash, progress) =>
       editor.commands.updateAttachment(
         {

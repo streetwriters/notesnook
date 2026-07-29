@@ -156,7 +156,8 @@ export function MenuItem({
         style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: DefaultAppStyles.GAP_SMALL
+          gap: DefaultAppStyles.GAP_SMALL,
+          flexShrink: 1
         }}
       >
         {renderIcon ? (
@@ -185,6 +186,7 @@ export function MenuItem({
             isFocused ? colors.selected.paragraph : colors.primary.paragraph
           }
           size={AppFontSize.sm}
+          style={{ flexShrink: 1 }}
         >
           {item.title}
         </Paragraph>
@@ -195,6 +197,9 @@ export function MenuItem({
         color={
           isFocused ? colors.primary.paragraph : colors.secondary.paragraph
         }
+        style={{
+          marginLeft: DefaultAppStyles.GAP_SMALL
+        }}
       >
         {menuItemCount}
       </Paragraph>

@@ -293,8 +293,16 @@ export function CopyLink(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={false}
-      onClick={() => {
-        editor.storage.copyToClipboard?.(href);
+      onClick={async () => {
+        const linkData = await editor.storage.getLinkData?.(href);
+        if (linkData?.title) {
+          editor.storage.copyToClipboard?.(
+            href,
+            `<a href="${href}">${linkData.title}</a>`
+          );
+        } else {
+          editor.storage.copyToClipboard?.(href);
+        }
         hide();
       }}
     />

@@ -142,7 +142,13 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           <Flex sx={{ flexDirection: "column" }} p={4} pb={0}>
             {props.title && (
               <Flex
-                sx={{ alignItems: "center", justifyContent: "space-between" }}
+                sx={{
+                  alignItems: "center",
+                  justifyContent:
+                    props.textAlignment === "center"
+                      ? "center"
+                      : "space-between"
+                }}
               >
                 <Text
                   variant="heading"

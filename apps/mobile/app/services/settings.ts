@@ -28,7 +28,17 @@ import { NotesnookModule } from "../utils/notesnook-module";
 import { scale, updateSize } from "../utils/size";
 import { useUserStore } from "../stores/use-user-store";
 import ScreenGuardModule from "react-native-screenguard";
-ScreenGuardModule.initSettings();
+
+let isScreenGuardModuleReady = false;
+async function callScreenGuard(callback: () => void) {
+  try {
+    if (!isScreenGuardModuleReady) {
+      await ScreenGuardModule.initSettings();
+      isScreenGuardModuleReady = true;
+    }
+    callback();
+  } catch (e) {}
+}
 
 function reset() {
   const settings = get();
@@ -129,15 +139,21 @@ function setPrivacyScreen(enabled?: boolean) {
   if (enabled) {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(true);
-      ScreenGuardModule.registerWithoutEffect();
+      callScreenGuard(() => {
+        ScreenGuardModule.registerWithoutEffect();
+      });
     } else {
-      ScreenGuardModule.register({ backgroundColor: "#000000" });
+      callScreenGuard(() => {
+        ScreenGuardModule.register({ backgroundColor: "#000000" });
+      });
     }
   } else {
     if (Platform.OS === "android") {
       NotesnookModule.setSecureMode(false);
     }
-    ScreenGuardModule.unregister();
+    callScreenGuard(() => {
+      ScreenGuardModule.unregister();
+    });
   }
 }
 
@@ -256,7 +272,8 @@ export const SettingsService = {
   canLockAppInBackground,
   appEnteredBackground,
   setPrivacyScreen,
-  getBackgroundEnterTime
+  getBackgroundEnterTime,
+  callScreenGuard
 };
 
 init();

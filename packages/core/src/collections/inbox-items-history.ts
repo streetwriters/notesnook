@@ -67,8 +67,8 @@ export class InboxItemsHistory implements ICollection {
     );
   }
 
-  async delete(id: string) {
-    await this.collection.softDelete([id]);
+  async delete(ids: string[]) {
+    await this.collection.softDelete(ids);
   }
 
   async deleteFailed() {

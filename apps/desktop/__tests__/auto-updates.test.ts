@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test } from "@nn/test";
+import { test, expect } from "@nn/test";
 import { gt, lt } from "semver";
 import { AppModel } from "../../web/__e2e__/models/app.model.js";
-import { expect } from "playwright/test";
 
 test.extend({ options: { version: "3.0.0" } })(
   "update starts downloading if version is outdated",

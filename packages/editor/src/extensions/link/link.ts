@@ -28,7 +28,7 @@ import {
   PasteRuleMatch
 } from "@tiptap/core";
 import { Plugin, TextSelection } from "@tiptap/pm/state";
-import { find, registerCustomProtocol, reset } from "linkifyjs";
+import { find, registerCustomProtocol } from "linkifyjs";
 import { autolink } from "./helpers/autolink.js";
 import { clickHandler } from "./helpers/clickHandler.js";
 import { pasteHandler } from "./helpers/pasteHandler.js";
@@ -112,10 +112,6 @@ export const Link = Mark.create<LinkOptions>({
       }
       registerCustomProtocol(protocol.scheme, protocol.optionalSlashes);
     });
-  },
-
-  onDestroy() {
-    reset();
   },
 
   inclusive() {

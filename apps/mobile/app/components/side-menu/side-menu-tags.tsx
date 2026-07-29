@@ -56,7 +56,7 @@ const TagItem = (props: {
   const totalNotes = useTotalNotes("tag");
   const totalNotesRef = React.useRef(totalNotes);
   totalNotesRef.current = totalNotes;
-  const updater = useRelationStore(state => state.updater);
+  const updater = useRelationStore((state) => state.updater);
 
   useEffect(() => {
     if (item?.id) {
@@ -67,6 +67,8 @@ const TagItem = (props: {
   return (
     <View
       style={{
+        minHeight: 35,
+        justifyContent: "center",
         paddingHorizontal: DefaultAppStyles.GAP,
         marginTop:
           (props.id as number) === 0 ? DefaultAppStyles.GAP_VERTICAL : 2
@@ -123,7 +125,8 @@ const TagItem = (props: {
           <View
             style={{
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              flexShrink: 1
             }}
           >
             <View
@@ -146,6 +149,9 @@ const TagItem = (props: {
                 isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
               size={AppFontSize.sm}
+              style={{
+                flexShrink: 1
+              }}
             >
               {item?.title}
             </Paragraph>
@@ -173,6 +179,9 @@ const TagItem = (props: {
                 <Paragraph
                   size={AppFontSize.xxs}
                   color={colors.secondary.paragraph}
+                  style={{
+                    marginLeft: DefaultAppStyles.GAP_SMALL
+                  }}
                 >
                   {totalNotes.totalNotes(item?.id)}
                 </Paragraph>

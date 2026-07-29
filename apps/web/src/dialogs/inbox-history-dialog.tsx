@@ -31,6 +31,7 @@ import ScrollContainer, {
 import { strings } from "@notesnook/intl";
 import { writeText } from "clipboard-polyfill";
 import { showToast } from "../utils/toast";
+import { ConfirmDialog } from "./confirm";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
@@ -105,6 +106,7 @@ function DetailsCell({ value }: { value: string }) {
         <Box
           as="pre"
           sx={{
+            color: "paragraph",
             m: 0,
             fontSize: "0.72em",
             whiteSpace: "pre-wrap",
@@ -152,7 +154,7 @@ export const InboxHistoryDialog = DialogManager.register(
     const result = usePromise(() => db.inboxItemsHistory.failed.items());
 
     async function deleteItem(id: string) {
-      await db.inboxItemsHistory.delete(id);
+      await db.inboxItemsHistory.delete([id]);
       showToast("success", strings.itemDeleted());
       if (result.status !== "pending") {
         result.refresh();
@@ -160,6 +162,14 @@ export const InboxHistoryDialog = DialogManager.register(
     }
 
     async function deleteAll() {
+      const ok = await ConfirmDialog.show({
+        title: strings.deleteAll(),
+        subtitle: strings.deleteAllFailedItemsDesc(),
+        positiveButtonText: strings.yes(),
+        negativeButtonText: strings.no()
+      });
+      if (!ok) return;
+
       await db.inboxItemsHistory.deleteFailed();
       showToast("success", strings.allItemsDeleted());
       if (result.status !== "pending") {
@@ -265,7 +275,17 @@ export const InboxHistoryDialog = DialogManager.register(
                           <Button
                             variant="icon"
                             title={strings.delete()}
-                            onClick={() => deleteItem(item.id)}
+                            onClick={async () => {
+                              const ok = await ConfirmDialog.show({
+                                title: strings.deleteItem(),
+                                subtitle: strings.areYouSure(),
+                                positiveButtonText: strings.yes(),
+                                negativeButtonText: strings.no()
+                              });
+                              if (!ok) return;
+
+                              deleteItem(item.id);
+                            }}
                             sx={{ color: "accent-error", p: "2px" }}
                           >
                             <Trash size={16} />

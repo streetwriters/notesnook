@@ -29,7 +29,7 @@ The first step to recovering your account consists of requesting an account reco
 5. On the next page, your email should be prefilled. If it isn't, fill it out.
    ![](/static/account-recovery/step-2.png)
 6. Click on `Send recovery email`
-7. If everything goes well, you should recieve an email from Notesnook in your inbox:
+7. If everything goes well, you should receive an email from Notesnook in your inbox:
    ![](/static/account-recovery/recovery_email.png)
    > info What if I didn't receive an email?
    >

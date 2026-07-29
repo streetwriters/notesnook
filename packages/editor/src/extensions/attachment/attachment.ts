@@ -25,6 +25,8 @@ import { Attachment } from "./types.js";
 import { tiptapKeys } from "@notesnook/common";
 import { hasPermission } from "../../types.js";
 import { AudioNode } from "../audio/audio.js";
+import { ImageNode } from "../image/image.js";
+import { WebClipNode } from "../web-clip/web-clip.js";
 
 export type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {
@@ -35,7 +37,7 @@ export interface AttachmentOptions {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     attachment: {
-      insertAttachment: (attachment: Attachment) => ReturnType;
+      insertAttachment: (...attachment: Attachment[]) => ReturnType;
       removeAttachment: () => ReturnType;
       updateAttachment: (
         attachment: Partial<Attachment>,
@@ -110,27 +112,41 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   addCommands() {
     return {
       insertAttachment:
-        (attachment) =>
+        (...attachments) =>
         ({ commands, state }) => {
-          if (!hasPermission("insertAttachment")) {
+          if (!hasPermission("insertAttachment") || attachments.length === 0) {
             return false;
           }
 
           const { $from } = state.selection;
-          const maybeAttachmentNode = state.doc.nodeAt($from.pos);
-          if (maybeAttachmentNode?.type === this.type) {
+          const selectedNode = state.doc.nodeAt($from.pos);
+          if (
+            selectedNode &&
+            [
+              ImageNode.name,
+              WebClipNode.name,
+              AudioNode.name,
+              this.name
+            ].includes(selectedNode.type.name)
+          ) {
+            console.log(
+              "Inserting attachment after the selected node",
+              selectedNode
+            );
             return commands.insertContentAt(
-              $from.pos + maybeAttachmentNode.nodeSize,
-              {
-                type: mimeToExtension(attachment.mime),
-                attrs: attachment
-              }
+              $from.pos + selectedNode.nodeSize,
+              attachments.map((a) => ({
+                type: mimeToExtension(a.mime),
+                attrs: a
+              }))
             );
           }
-          return commands.insertContent({
-            type: mimeToExtension(attachment.mime),
-            attrs: attachment
-          });
+          return commands.insertContent(
+            attachments.map((a) => ({
+              type: mimeToExtension(a.mime),
+              attrs: a
+            }))
+          );
         },
       removeAttachment:
         () =>
@@ -189,7 +205,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
 });
 
 function mimeToExtension(mime: string): string {
-  if (mime.startsWith("audio/")) return AudioNode.name;
+  if (mime.startsWith("image/")) return ImageNode.name;
+  else if (mime.startsWith("audio/")) return AudioNode.name;
   return AttachmentNode.name;
 }
 

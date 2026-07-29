@@ -40,6 +40,7 @@ import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 import { Messages, setI18nGlobal } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
 import { PATHS } from "./constants";
+import { normalizePathString } from "./utils/resolve-path";
 
 const locale =
   process.env.NODE_ENV === "development"
@@ -91,6 +92,17 @@ async function createWindow() {
   const cliOptions = await parseArguments(process.argv);
   setTheme(getTheme());
 
+  // this workaround is necessary because macos doesn't support
+  // the --hidden flag when launching the app on startup
+  if (
+    process.platform === "darwin" &&
+    app.getLoginItemSettings().wasOpenedAtLogin &&
+    config.desktopSettings.autoStart &&
+    config.desktopSettings.startMinimized
+  ) {
+    cliOptions.hidden = true;
+  }
+
   const mainWindowState = new WindowState({});
   const mainWindow = new BrowserWindow({
     show: !cliOptions.hidden,
@@ -140,7 +152,13 @@ async function createWindow() {
   mainWindow.setMenuBarVisibility(false);
   mainWindowState.manage(mainWindow);
 
-  if (cliOptions.hidden && !config.desktopSettings.minimizeToSystemTray)
+  if (
+    cliOptions.hidden &&
+    !(
+      config.desktopSettings.minimizeToSystemTray ||
+      config.desktopSettings.closeToSystemTray
+    )
+  )
     mainWindow.minimize();
 
   await mainWindow.webContents.loadURL(`${createURL(cliOptions, "/")}`);
@@ -163,6 +181,14 @@ async function createWindow() {
   );
   mainWindow.webContents.session.setProxy({ proxyRules: config.proxyRules });
 
+  mainWindow.on("show", () =>
+    /**
+     * We may set `skipTaskbar` to true at startup.
+     * This also removes the window from the Alt-Tab switcher.
+     * To fix that, whenever the app is shown, we set `skipTaskbar` to false.
+     */
+    mainWindow.setSkipTaskbar(false)
+  );
   mainWindow.once("closed", () => {
     globalThis.window = null;
   });
@@ -294,7 +320,7 @@ async function migrateBackupDirectory() {
       `localStorage.getItem("backupStorageLocation")`
     );
     if (!oldPath || oldPath === PATHS.backupsDirectory) return;
-    config.backupDirectory = oldPath;
+    config.backupDirectory = normalizePathString(oldPath);
   } catch (e) {
     console.error("Failed to migrate backup directory", e);
     const pressedButton = dialog.showMessageBoxSync(globalThis.window, {

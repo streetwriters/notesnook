@@ -168,7 +168,7 @@ export const FailedInboxItems = () => {
   const result = usePromise(() => db.inboxItemsHistory.failed.items());
 
   async function deleteItem(id: string) {
-    await db.inboxItemsHistory.delete(id);
+    await db.inboxItemsHistory.delete([id]);
     ToastManager.show({
       message: strings.itemDeleted(),
       type: "success"

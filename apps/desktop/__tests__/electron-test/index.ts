@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { AppContext, buildAndLaunchApp, TestOptions } from "./utils";
 import path from "path";
 import { version } from "../../package.json";
-import type { Browser, ElectronApplication, Page } from "@playwright/test";
+import type { ElectronApplication, Page } from "@playwright/test";
 import type { TraceViewerFixtures } from "./trace-viewer-fixtures";
 import { traceViewerFixtures } from "./trace-viewer-fixtures";
 import { PageTestFixtures, PageWorkerFixtures } from "./page-test-api";

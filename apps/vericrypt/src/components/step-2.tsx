@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Flex, Text, Image, Input } from "@theme-ui/components";
+import { Flex, Text, Image, Textarea } from "@theme-ui/components";
 import { StepContainer } from "./step-container";
-import DevtoolsCopySaltChrome from "../assets/screenshots/devtools_copy_salt.png";
+import DevtoolsCopyUsersChrome from "../assets/screenshots/devtools_copy_users.png";
 
-import DevtoolsCopySaltFirefox from "../assets/screenshots/firefox/firefox_copy_salt.png";
+import DevtoolsCopyUsersFirefox from "../assets/screenshots/firefox/firefox_copy_users.png";
 
 import { Accordion } from "./accordion";
 import { getCombo } from "../utils/keycombos";
@@ -29,9 +29,11 @@ import { KeyCombo } from "./key-combo";
 import { Code } from "./code";
 import { useState } from "react";
 import { getSourceUrl } from "../utils/links";
+import { Cipher } from "@notesnook/crypto";
 
 type GetAccountSaltProps = {
   onSaltSubmitted: (salt: string) => void;
+  setAccountDataKey: (accountDataKey: Cipher<"base64"> | null) => void;
 };
 
 const steps = {
@@ -52,10 +54,10 @@ const steps = {
     </Text>,
     <Flex key="key-named-salt" sx={{ flexDirection: "column" }}>
       <Text as="p">Follow the steps as shown in the image:</Text>
-      <Image src={DevtoolsCopySaltChrome} width={"100%"} sx={{ mt: 1 }} />
+      <Image src={DevtoolsCopyUsersChrome} width={"100%"} sx={{ mt: 1 }} />
     </Flex>,
     <Flex key="copy-salt" sx={{ flexDirection: "column" }}>
-      <Text as="p">Copy the salt and paste it below.</Text>
+      <Text as="p">Copy everything in the response and paste it below.</Text>
     </Flex>
   ],
   firefox: [
@@ -75,10 +77,10 @@ const steps = {
     </Text>,
     <Flex key="key-named-salt" sx={{ flexDirection: "column" }}>
       <Text as="p">Follow the steps as shown in the image:</Text>
-      <Image src={DevtoolsCopySaltFirefox} width={"100%"} sx={{ mt: 1 }} />
+      <Image src={DevtoolsCopyUsersFirefox} width={"100%"} sx={{ mt: 1 }} />
     </Flex>,
     <Flex key="copy-salt" sx={{ flexDirection: "column" }}>
-      <Text as="p">Copy the salt and paste it below.</Text>
+      <Text as="p">Copy everything in the response and paste it below.</Text>
     </Flex>
   ]
 };
@@ -114,14 +116,14 @@ export function GetAccountSalt(props: GetAccountSaltProps) {
       sx={{ flexDirection: "column" }}
     >
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
-        <Text variant="title">Account salt</Text>
+        <Text variant="title">Account Key Data</Text>
         <Code
           text="src/components/step-2.tsx"
           href={getSourceUrl("src/components/step-2.tsx")}
         />
       </Flex>
       <Accordion
-        title="How to get your account salt?"
+        title="How to get your key data?"
         sx={{
           border: "1px solid var(--border)",
           mt: 2,
@@ -129,9 +131,9 @@ export function GetAccountSalt(props: GetAccountSaltProps) {
         }}
       >
         <Text variant="body" sx={{ mx: 2 }}>
-          We&apos;ll be extracting your account&apos;s salt right from
+          You&apos;ll be extracting your account&apos;s keys right from
           Notesnook&apos;s local database that lives in your web browser. So put
-          on your seat belt and let&apos;s get some salt!
+          on your seat belt and let&apos;s retrieve those keys.
         </Text>
         <Text as="ol" variant="body" sx={{ mb: 2 }}>
           {instructions?.map((item, index) => (
@@ -141,12 +143,11 @@ export function GetAccountSalt(props: GetAccountSaltProps) {
           ))}
         </Text>
       </Accordion>
-      <Input
+      <Textarea
         variant="forms.clean"
-        id="salt"
-        name="salt"
-        type="text"
-        placeholder="Enter your account salt"
+        id="account-data"
+        name="account-data"
+        placeholder="Paste the response here"
         sx={{
           mt: 2,
           fontSize: "subheading",
@@ -162,13 +163,21 @@ export function GetAccountSalt(props: GetAccountSaltProps) {
         spellCheck={false}
         onChange={(e) => {
           setIsSaltValid(undefined);
+          /*
+          If there is no dataEncryptionKey, try reading the legacyDataEncryptionKey.
+          If there is a legacyDataEncryptionKey, use this one.
+          If there is no legacyDataEncryptionKey, it is a legacy account (pre DEK update) that has not
+          changed passwords. (Use master key instead.)
+          */
           try {
-            const value = e.target.value;
-            const isValid = Buffer.from(value, "base64").length === 16;
+            const value = JSON.parse(e.target.value);
+            props.setAccountDataKey(value.dataEncryptionKey ?? value.legacyDataEncryptionKey ?? null);
+            const salt = value.salt;
+            const isValid = Buffer.from(salt, "base64").length === 16;
             if (!isValid) setIsSaltValid(false);
             else {
               setIsSaltValid(true);
-              props.onSaltSubmitted(value);
+              props.onSaltSubmitted(salt);
             }
           } catch (e) {
             console.error(e);

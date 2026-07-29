@@ -29,7 +29,7 @@ import { ActionSheetRef, ScrollView } from "react-native-actions-sheet";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { useDBItem } from "../../hooks/use-db-item";
-import { presentSheet } from "../../services/event-manager";
+import { presentSheet, ToastManager } from "../../services/event-manager";
 import { openLinkInBrowser } from "../../utils/functions";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -39,15 +39,19 @@ import { Pressable } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
 import NotePreview from "./preview";
+import { presentDialog } from "../dialog/functions";
+import { Dialog } from "../dialog";
 
 const HistoryItem = ({
   index,
   items,
-  note
+  note,
+  refresh
 }: {
   index: number;
   items?: VirtualizedGrouping<HistorySession>;
   note: Note;
+  refresh: () => void;
 }) => {
   const [item] = useDBItem(index, "noteHistory", items);
   const { colors } = useThemeColors();
@@ -75,12 +79,13 @@ const HistoryItem = ({
             }}
             content={content}
             note={note}
+            update={refresh}
           />
         ),
         context: "note_history"
       });
     },
-    [note]
+    [note, refresh]
   );
 
   return (
@@ -112,7 +117,8 @@ const HistoryItem = ({
 };
 
 export default function NoteHistory({
-  note
+  note,
+  fwdRef
 }: {
   note: Note;
   fwdRef: RefObject<ActionSheetRef>;
@@ -121,7 +127,7 @@ export default function NoteHistory({
   const [_loading, setLoading] = useState(true);
   const { colors } = useThemeColors();
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     db.noteHistory
       .get(note.id)
       .sorted({
@@ -137,17 +143,56 @@ export default function NoteHistory({
       });
   }, [note.id]);
 
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
   const renderItem = useCallback(
     ({ index }: { index: number }) => (
-      <HistoryItem index={index} items={history} note={note} />
+      <HistoryItem
+        index={index}
+        items={history}
+        note={note}
+        refresh={refresh}
+      />
     ),
-    [history, note]
+    [history, note, refresh]
   );
 
   return (
     <View>
       <SheetProvider context="note_history" />
-      <DialogHeader title={strings.noteHistory()} padding={12} />
+      <Dialog context="local" />
+      <DialogHeader
+        title={strings.noteHistory()}
+        padding={12}
+        button={
+          history?.placeholders.length
+            ? {
+                title: strings.clearHistory(),
+                type: "secondary",
+                onPress: () => {
+                  presentDialog({
+                    title: strings.clearHistory(),
+                    paragraph: strings.clearHistoryConfirmation(),
+                    positiveText: strings.clear(),
+                    negativeText: strings.cancel(),
+                    positiveType: "errorShade",
+                    context: "local",
+                    positivePress: async () => {
+                      await db.noteHistory.clearSessions(note.id);
+                      fwdRef.current?.hide();
+                      ToastManager.show({
+                        heading: strings.historyCleared(),
+                        type: "success"
+                      });
+                    }
+                  });
+                }
+              }
+            : undefined
+        }
+      />
 
       <Seperator />
 

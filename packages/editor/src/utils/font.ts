@@ -56,9 +56,5 @@ export function getFontIds() {
 }
 
 function normalizeFontFamily(fontFamily: string) {
-  return fontFamily
-    .replace(/['"]+/g, "")
-    .replaceAll(", ", ",")
-    .replaceAll(",", "")
-    .replace(/\s+/g, "");
+  return fontFamily.replace(/['",\s]+/g, "");
 }

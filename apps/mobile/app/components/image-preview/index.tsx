@@ -39,6 +39,7 @@ import Share from "react-native-share";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { DefaultAppStyles } from "../../utils/styles";
+import FileViewer from "react-native-file-viewer";
 
 const ImagePreview = () => {
   const { colors } = useThemeColors("dialog");
@@ -87,9 +88,8 @@ const ImagePreview = () => {
         return;
       }
       const attachment = await db.attachments.attachment(hash);
-      const path = `${cacheDir}/${
-        "NN_" + (await getFileNameWithExtension(hash, attachment?.mimeType))
-      }`;
+      const path = `${cacheDir}/${"NN_" + (await getFileNameWithExtension(hash, attachment?.mimeType))
+        }`;
       await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(() => {
         /* empty */
       });
@@ -136,17 +136,23 @@ const ImagePreview = () => {
               borderWidth: 0
             }}
             onPress={async () => {
-              useSettingStore
-                .getState()
-                .setAppDidEnterBackgroundForAction(true);
-              await Share.open({
-                url: image
-              }).catch(() => {
-                /* empty */
-              });
-              useSettingStore
-                .getState()
-                .setAppDidEnterBackgroundForAction(false);
+              if (!image) return;
+
+              try {
+                if (Platform.OS === "android") {
+                  await FileViewer.open(image.replace("file://", ""), {
+                    showOpenWithDialog: true,
+                    showAppsSuggestions: true,
+                    shareFile: true
+                  } as any);
+                } else {
+                  await Share.open({
+                    url: image
+                  });
+                }
+              } catch (error) {
+                console.error(error);
+              }
             }}
           />
           <IconButton

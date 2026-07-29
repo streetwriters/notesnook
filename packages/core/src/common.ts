@@ -103,6 +103,7 @@ export const EVENTS = {
   fileUploaded: "file:uploaded",
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
+  monographsUpdated: "monographs:updated",
   vaultLocked: "vault:locked",
   vaultUnlocked: "vault:unlocked",
   systemTimeInvalid: "system:invalidTime",

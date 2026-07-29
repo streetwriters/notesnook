@@ -3,10 +3,6 @@ title: Getting Started
 description: Learn about Notesnook's Inbox API.
 ---
 
-> warn Beta feature
->
-> Inbox API is still in beta so expect things to change and/or break. If you find any issues, kindly open an issue on our [GitHub repo](https://github.com/streetwriters/notesnook).
-
 # Getting started with the Inbox API
 
 Think of the Inbox API as a private mailbox for your Notesnook account. You give other apps or services a key to drop notes into it, and those notes show up in your Notesnook account the next time you sync — fully encrypted, readable only by you.
