@@ -84,7 +84,7 @@ Believer includes everything above and exists for people who want to fund privat
 
 ## Education plan
 
-The Education plan gives students and teachers **Pro features and Pro limits**. It is not sold from the plan grid. [Contact us](https://notesnook.com/education) to apply. Education plans do not include a trial.
+The Education plan gives students and teachers **Pro features and Pro limits**. It is not sold from the plan grid. You can [apply for the discount here](https://notesnook.com/education). Education plans do not include a trial.
 
 ## Pro (legacy)
 
