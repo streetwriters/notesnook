@@ -260,7 +260,6 @@ export const useEditor = (
       id,
       data,
       type,
-      ignoreEdit,
       sessionHistoryId: currentSessionHistoryId,
       tabId,
       pendingChanges,
@@ -342,11 +341,6 @@ export const useEditor = (
         };
 
         noteData.title = title;
-
-        if (ignoreEdit) {
-          DatabaseLogger.log("Ignoring edits...");
-          noteData.dateEdited = note?.dateEdited;
-        }
 
         if (data) {
           noteData.content = {
@@ -984,7 +978,6 @@ export const useEditor = (
       title,
       content,
       type,
-      ignoreEdit,
       noteId,
       tabId,
       pendingChanges,
@@ -995,7 +988,6 @@ export const useEditor = (
       title?: string;
       content?: string;
       type: string;
-      ignoreEdit: boolean;
       tabId: string;
       pendingChanges?: boolean;
       sourceNoteId?: string;
@@ -1005,7 +997,6 @@ export const useEditor = (
         `saveContent... title: ${!!title}, content: ${!!content}, noteId: ${noteId}`
       );
       if (
-        ignoreEdit ||
         lock.current ||
         (currentLoadingNoteId.current &&
           currentLoadingNoteId.current === noteId)
@@ -1014,7 +1005,6 @@ export const useEditor = (
 
           lock.current: ${lock.current}
           currentLoadingNoteId.current: ${currentLoadingNoteId.current}
-          ignoreEdit: ${ignoreEdit}
         `);
         if (lock.current) {
           setTimeout(() => {
@@ -1051,7 +1041,6 @@ export const useEditor = (
         data: content,
         type: "tiptap",
         id: noteId,
-        ignoreEdit,
         sessionHistoryId: noteId ? editorSessionHistory.get(noteId) : undefined,
         tabId: tabId,
         pendingChanges,
@@ -1080,7 +1069,7 @@ export const useEditor = (
             saveNote(params);
           }
         },
-        ignoreEdit ? 0 : 150
+        150
       );
     },
     [editorSessionHistory, withTimer, onChange, saveNote]

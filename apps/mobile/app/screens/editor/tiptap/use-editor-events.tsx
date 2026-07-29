@@ -149,7 +149,7 @@ const showActionsheet = async () => {
   }
 };
 
-type ContentMessage = { html: string; ignoreEdit: boolean };
+type ContentMessage = { html: string };
 
 export const useEditorEvents = (
   editor: useEditorType,
@@ -422,7 +422,6 @@ export const useEditorEvents = (
             noteId: saveNoteId,
             sourceNoteId: editorMessage.noteId,
             tabId: editorMessage.tabId,
-            ignoreEdit: (editorMessage.value as ContentMessage).ignoreEdit,
             pendingChanges: editorMessage.value?.pendingChanges,
             pendingChangesAt: editorMessage.value?.pendingChangesAt
           });
@@ -435,7 +434,6 @@ export const useEditorEvents = (
             noteId: saveNoteId,
             sourceNoteId: editorMessage.noteId,
             tabId: editorMessage.tabId,
-            ignoreEdit: false,
             pendingChanges: editorMessage.value?.pendingChanges,
             pendingChangesAt: editorMessage.value?.pendingChangesAt
           });

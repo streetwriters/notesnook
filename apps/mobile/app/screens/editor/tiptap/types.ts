@@ -90,7 +90,6 @@ export type SavePayload = {
   data?: string;
   type?: "tiptap";
   sessionHistoryId?: number;
-  ignoreEdit: boolean;
   tabId: string;
   pendingChanges?: boolean;
   sourceNoteId?: string;
