@@ -245,7 +245,10 @@ export function TaskListComponent(
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0,
+            // NOTE: inline-start, not left: the indent has to be on the
+            // side the text flows from, so it stays on the right in RTL
+            // instead of showing up on the wrong side
+            marginInlineStart: isNested ? (editor.isEditable ? -35 : -10) : 0,
             padding: 0
           },
           li: {

@@ -74,7 +74,7 @@ export function TaskItemComponent(
         style={{
           flexDirection: "row",
           alignItems: "center",
-          maxWidth: "95%",
+          maxWidth: "100%",
           flexGrow: 1
         }}
       >
@@ -159,7 +159,9 @@ export function TaskItemComponent(
           sx={{
             bg: "background",
             opacity: 0,
-            alignSelf: "flex-start",
+            position: "absolute",
+            insetInlineEnd: 0,
+            top: 0,
             marginTop: "calc((1lh - 14px) / 2)"
           }}
         >

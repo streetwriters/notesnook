@@ -79,6 +79,7 @@ function dropGapPlugin() {
 }
 
 function createGap({ height, indent }: DropGap) {
+  // a task list is made of list items, so the gap is one too
   const element = document.createElement("li");
   element.className = DROP_GAP_CLASS;
   element.contentEditable = "false";
@@ -182,8 +183,13 @@ export function startItemDrag(
     const top = e.clientY + state.offsetY;
     state.preview.style.transform = `translate3d(0, ${top}px, 0)`;
 
+    // undefined means "leave the gap as it is"; null clears it, so a drop
+    // outside any task list has no target and is cancelled
     const target = findGap(view, state, e.clientX, top);
-    if (target) setGap(view, (state.gap = target));
+    if (target !== undefined) {
+      state.gap = target ?? undefined;
+      setGap(view, target);
+    }
     fitPreview(view, state);
     autoScroll(state, e.clientY);
   };
@@ -259,18 +265,29 @@ function createPreview(view: EditorView, item: HTMLElement, box: DOMRect) {
 
 /**
  * Where the item would land: the sibling top edge nearest to the top edge
- * of the item being dragged. The gap counts as one of those edges, which
- * is what keeps it in place while the item is over it — moving it would
- * move everything below it, putting a different edge under the item, and
- * it would flicker between the two.
+ * of the item being dragged, within the task list under the pointer. The
+ * gap counts as one of those edges, which is what keeps it in place while
+ * the item is over it — moving it would move everything below it, putting a
+ * different edge under the item, and it would flicker between the two.
+ *
+ * Returns `undefined` to leave the gap where it is (the pointer is over the
+ * item itself, or off the document for a frame), and `null` to clear it —
+ * a task item only drops into a task list, so anywhere else is cancelled.
  */
-function findGap(view: EditorView, drag: Drag, x: number, top: number) {
+function findGap(
+  view: EditorView,
+  drag: Drag,
+  x: number,
+  top: number
+): DropGap | null | undefined {
   const element = document.elementFromPoint(
     Math.max(x, view.dom.getBoundingClientRect().left + 1),
     top
   );
-  const list = element?.closest("ul");
-  if (!list || !view.dom.contains(list)) return drag.gap ?? null;
+  if (!element || !view.dom.contains(element)) return undefined;
+
+  const list = element.closest<HTMLElement>("ul.tasklist-content-wrapper");
+  if (!list || !view.dom.contains(list)) return null;
 
   let closest: number | null = null;
   let distance = Infinity;
@@ -295,8 +312,9 @@ function findGap(view: EditorView, drag: Drag, x: number, top: number) {
     if (child === children.at(-1)) consider(box.bottom, pos.after);
   }
 
-  if (closest === null || (closest > drag.pos && closest < drag.end))
-    return drag.gap ?? null;
+  if (closest === null) return null;
+  // dropping the item into itself is a no-op: leave the gap alone
+  if (closest > drag.pos && closest < drag.end) return undefined;
 
   const nest = x - drag.startX > NEST_THRESHOLD && canNest(view, closest, drag);
   return { pos: closest, height: drag.height, indent: nest ? NEST_INDENT : 0 };
@@ -340,18 +358,34 @@ function canNest(view: EditorView, pos: number, drag: Drag) {
 
 /** moves the item at `from` to `to`, returning where it ended up */
 function moveItem(view: EditorView, from: number, to: number) {
-  const item = view.state.doc.nodeAt(from);
+  const { state } = view;
+  const item = state.doc.nodeAt(from);
   if (!item) return null;
 
-  const tr = view.state.tr.deleteRange(from, from + item.nodeSize);
-  const at = tr.mapping.map(to);
+  // NOTE: `deleteRange`, not `delete`: taking the only child out of a
+  // nested list leaves the list empty, and an empty list is not valid
+  // content, so it would be filled with a blank item. This takes the list
+  // itself away instead.
+  const tr = state.tr.deleteRange(from, from + item.nodeSize);
+  const at = Math.min(tr.mapping.map(to), tr.doc.content.size);
   const deleted = tr.doc;
 
-  tr.replaceRangeWith(at, at, item);
-  if (tr.doc.eq(deleted)) return null;
-  if (tr.doc.eq(view.state.doc)) return at;
+  // the target is always a task list, but guard anyway: dropping the item
+  // where it does not fit would put it somewhere unexpected
+  const $at = tr.doc.resolve(at);
+  if (!$at.parent.canReplaceWith($at.index(), $at.index(), item.type))
+    return null;
 
-  tr.setSelection(NodeSelection.create(tr.doc, at));
+  tr.replaceRangeWith(at, at, item);
+  // nowhere it fits, or already exactly there
+  if (tr.doc.eq(deleted)) return null;
+  if (tr.doc.eq(state.doc)) return at;
+
+  // select the item, but only if it really landed where we think it did:
+  // NodeSelection throws if there is no node right after `at`
+  const node = tr.doc.resolve(at).nodeAfter;
+  if (node?.type === item.type) tr.setSelection(NodeSelection.create(tr.doc, at)); // prettier-ignore
+
   view.dispatch(tr.setMeta("uiEvent", "drop"));
   return at;
 }
