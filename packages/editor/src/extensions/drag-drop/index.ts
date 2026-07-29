@@ -133,7 +133,10 @@ export function startItemDrag(
   if (!editor.isEditable || event.button !== 0 || !item) return;
 
   event.stopPropagation();
-  if (event.pointerType === "mouse") event.preventDefault();
+  // the handle has no tap action of its own, so cancelling the default is
+  // safe — and on touch it is what stops the WebView from starting a text
+  // selection instead of the drag
+  if (event.cancelable) event.preventDefault();
 
   const { view } = editor;
   let drag: Drag | undefined;
@@ -185,7 +188,7 @@ export function startItemDrag(
 
     // undefined means "leave the gap as it is"; null clears it, so a drop
     // outside any task list has no target and is cancelled
-    const target = findGap(view, state, e.clientX, top);
+    const target = findGap(view, state, e.clientX, e.clientY, top);
     if (target !== undefined) {
       state.gap = target ?? undefined;
       setGap(view, target);
@@ -205,9 +208,12 @@ export function startItemDrag(
 
   const cleanup = () => {
     clearTimeout(hold);
-    handle.removeEventListener("pointermove", move);
-    handle.removeEventListener("pointerup", end);
-    handle.removeEventListener("pointercancel", cleanup);
+    // NOTE: on `window`, not the handle. The handle is re-rendered whenever
+    // the gap moves (a decoration change re-renders the node views), and
+    // listeners on the old element would be lost — the drag would freeze.
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerup", end);
+    window.removeEventListener("pointercancel", cleanup);
     if (!drag) return;
     cancelAnimationFrame(drag.frame ?? 0);
     drag.preview.remove();
@@ -217,12 +223,24 @@ export function startItemDrag(
     drag = undefined;
   };
 
-  handle.setPointerCapture?.(event.pointerId);
-  handle.addEventListener("pointermove", move, { passive: false });
-  handle.addEventListener("pointerup", end);
-  handle.addEventListener("pointercancel", cleanup);
+  window.addEventListener("pointermove", move, { passive: false });
+  window.addEventListener("pointerup", end);
+  window.addEventListener("pointercancel", cleanup);
   if (event.pointerType !== "mouse")
     hold = setTimeout(start, HOLD_DELAY) as unknown as number;
+}
+
+/** the nearest background colour that is not see-through */
+function opaqueBackground(element: HTMLElement) {
+  for (
+    let node: HTMLElement | null = element;
+    node;
+    node = node.parentElement
+  ) {
+    const bg = getComputedStyle(node).backgroundColor;
+    if (bg && bg !== "transparent" && !bg.startsWith("rgba(0, 0, 0, 0")) return bg; // prettier-ignore
+  }
+  return "var(--background, #fff)";
 }
 
 /**
@@ -237,6 +255,12 @@ function createPreview(view: EditorView, item: HTMLElement, box: DOMRect) {
   preview.style.width = `${box.width}px`;
   preview.style.font = style.font;
   preview.style.color = style.color;
+  // the preview lives on `document.body`, where the editor's theme
+  // variables are not defined, so the CSS `var(--background)` resolves to
+  // transparent — a WebKit issue in particular. Read a concrete colour
+  // while the item is still in the editor, or the checkboxes below show
+  // through it.
+  preview.style.backgroundColor = opaqueBackground(item);
 
   const list = (item.parentElement ?? document.createElement("ul")).cloneNode(
     false
@@ -273,20 +297,33 @@ function createPreview(view: EditorView, item: HTMLElement, box: DOMRect) {
  * Returns `undefined` to leave the gap where it is (the pointer is over the
  * item itself, or off the document for a frame), and `null` to clear it —
  * a task item only drops into a task list, so anywhere else is cancelled.
+ *
+ * The list is found under the pointer (`pointerY`), but the slot within it
+ * from the item's own top edge (`top`). The item's top rises above the list
+ * before the pointer does, so hit testing with the pointer is what lets the
+ * item reach the very first slot.
  */
 function findGap(
   view: EditorView,
   drag: Drag,
   x: number,
+  pointerY: number,
   top: number
 ): DropGap | null | undefined {
   const element = document.elementFromPoint(
     Math.max(x, view.dom.getBoundingClientRect().left + 1),
-    top
+    pointerY
   );
   if (!element || !view.dom.contains(element)) return undefined;
 
-  const list = element.closest<HTMLElement>("ul.tasklist-content-wrapper");
+  // the list under the pointer, or — when the pointer is on a list's header
+  // (the tools bar sits above the first item, outside the `ul`) — that
+  // list, so the item can still be dropped into its first slot
+  const list =
+    element.closest<HTMLElement>("ul.tasklist-content-wrapper") ||
+    element
+      .closest(".taskList-view-content-wrap")
+      ?.querySelector<HTMLElement>("ul.tasklist-content-wrapper");
   if (!list || !view.dom.contains(list)) return null;
 
   let closest: number | null = null;

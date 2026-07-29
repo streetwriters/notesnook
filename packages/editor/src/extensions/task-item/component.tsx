@@ -97,8 +97,20 @@ export function TaskItemComponent(
               // selection or the long press callout
               touchAction: "none",
               userSelect: "none",
+              WebkitUserSelect: "none",
               WebkitTouchCallout: "none",
-              svg: { pointerEvents: "none" }
+              svg: { pointerEvents: "none" },
+              // hit slop: an invisible box larger than the icon, so a finger
+              // landing near the handle still starts the drag instead of the
+              // browser selecting the text next to it.
+              position: "relative",
+              "::before": {
+                content: '""',
+                position: "absolute",
+                insetBlock: "-12px",
+                insetInlineStart: "-16px",
+                insetInlineEnd: "-2px"
+              }
             }}
             size={isMobile ? "2.46ch" : "2.22ch"}
           />
