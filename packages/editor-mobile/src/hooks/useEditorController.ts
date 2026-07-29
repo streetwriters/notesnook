@@ -216,8 +216,7 @@ export function useEditorController({
         return;
       }
 
-      const timerPending = !!timers.current.change;
-      if (ignoreEdit && timerPending) {
+      if (ignoreEdit) {
         logger("info", "Ignoring ignoreEdit update, a save is already pending");
         return;
       }
@@ -227,8 +226,8 @@ export function useEditorController({
       const noteId = tabRef.current.session?.noteId;
       post(EditorEvents.contentchange, undefined, tabId, noteId);
       if (!editor) return;
-      if (timerPending) {
-        clearTimeout(timers.current?.change as any);
+      if (typeof timers.current.change === "number") {
+        clearTimeout(timers.current?.change);
       }
 
       timers.current.change = setTimeout(async () => {
@@ -246,7 +245,6 @@ export function useEditorController({
 
         const editedAt = Date.now();
         htmlContentRef.current = editor.getHTML();
-        timers.current.change = null;
 
         const params = [
           {
