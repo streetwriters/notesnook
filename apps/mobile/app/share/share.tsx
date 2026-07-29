@@ -97,10 +97,10 @@ function makeHtmlFromUrl(url: string) {
 function makeHtmlFromPlainText(text: string) {
   if (!text) return "";
 
-  return `<p>${text
+  return text
     .split(/\r\n|\r|\n/)
-    .map((line) => encodeHTML5(line))
-    .join("</p><p>")}</p>`;
+    .map((line) => `<p>${encodeHTML5(line)}</p>`)
+    .join("");
 }
 
 type DefaultNote = {
