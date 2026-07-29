@@ -42,7 +42,7 @@ Press `Enter` to start the next item, exactly as in any other list.
 On an empty line, type `-o` followed by a space and the line becomes the first item of an outline list.
 
 ::: info Markdown shortcuts need Essential
-`-o ` is a [Markdown shortcut.](/rich-text-editor/markdown-notes-editing)Markdown shortcuts are **off by default on web and desktop**: turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}`. On mobile they are on by default. The toolbar button and `Ctrl+Shift+O` do not depend on that setting.
+`-o ` is a [Markdown shortcut.](/rich-text-editor/markdown-notes-editing) Markdown shortcuts are **off by default on web and desktop**: turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}`. On mobile they are on by default. The toolbar button and `Ctrl+Shift+O` do not depend on that setting.
 :::
 
 ## Nest an item under another

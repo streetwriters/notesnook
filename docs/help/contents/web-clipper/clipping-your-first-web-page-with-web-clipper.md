@@ -64,7 +64,10 @@ The `Selected nodes` mode allows you to select exactly which nodes you want to c
 3. Click on all the nodes you want to clip (they can be in any part of the screen).
    ::: info
    The web clipper stacks all the selected nodes vertically during final processing.
-   ::: 4. Clicking again on the selected nodes will deselect them. 5. Once you are done, click on the Clip button 6. Activate the Notesnook Web Clipper and save your clip.
+   :::
+4. Clicking again on the selected nodes will deselect them.
+5. Once you are done, click on the Clip button
+6. Activate the Notesnook Web Clipper and save your clip.
 
 ## Selecting the clipping mode
 

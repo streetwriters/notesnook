@@ -37,9 +37,12 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 7. If everything goes well, you should receive an email from Notesnook in your inbox:
 
 ![Recovery email in Notesnook](/static/account-recovery/recovery_email.png)
+
 ::: info What if I didn't receive an email?
 _Check your spam/junk folder if you haven't received one & [contact us](mailto:support@streetwriters.co) if you still don't find it._
-::: 8. Click on `Reset your password` button in the email. This will take you to the account recovery page.
+:::
+
+8. Click on `Reset your password` button in the email. This will take you to the account recovery page.
 
 <!--Needs Validation? I don't think you can request recovery from mobile--->
 
