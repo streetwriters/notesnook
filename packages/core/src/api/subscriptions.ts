@@ -102,6 +102,14 @@ export default class Subscriptions {
     await http.post(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, null, token);
   }
 
+  async extend() {
+    const token = await this.db.tokenManager.getAccessToken();
+    const user = await this.db.user.getUser();
+    if (!token || !user || isLegacySubscription(user)) return;
+    const endpoint = `subscriptions/v2/extend`;
+    await http.post(`${hosts.SUBSCRIPTIONS_HOST}/${endpoint}`, null, token);
+  }
+
   async pause() {
     const token = await this.db.tokenManager.getAccessToken();
     const user = await this.db.user.getUser();
