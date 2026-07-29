@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Shared helpers for the home screen widgets.
@@ -135,10 +136,10 @@ public class WidgetUtils {
     }
 
     /**
-     * The reminders the app last wrote out, minus any that have since fired. Reading and filtering
-     * happens here so the provider can push the rows straight into the widget.
+     * The reminders the app last wrote out, minus any that have now dropped out of view. Reading
+     * and filtering happens here so the provider can push the rows straight into the widget.
      */
-    static List<Reminder> getActiveReminders(Context context) {
+    static List<Reminder> getWidgetReminders(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         List<Reminder> stored = null;
         try {
@@ -152,7 +153,7 @@ public class WidgetUtils {
         if (stored == null) return active;
 
         for (Reminder reminder : stored) {
-            if (!isReminderActive(reminder)) continue;
+            if (!isVisibleInWidget(reminder)) continue;
             if (active.size() >= MAX_REMINDERS) {
                 Log.w("Reminders", "Widget list truncated to " + MAX_REMINDERS + " reminders");
                 break;
@@ -211,12 +212,20 @@ public class WidgetUtils {
     }
 
     /**
-     * Whether a reminder should still be listed. Mirrors isReminderActive() in the core package,
-     * which the app applies when it writes the list out. We re-check here because the stored list
-     * is only rewritten while the app runs, so one-off reminders would otherwise linger in the
-     * widget long after they fired.
+     * How long a reminder keeps its place in the list after going off, so the user can see that it
+     * happened rather than watching it vanish. Must match RECENTLY_PASSED_WINDOW in
+     * services/notifications.ts, which decides what gets written out in the first place.
      */
-    static boolean isReminderActive(Reminder reminder) {
+    private static final long RECENTLY_PASSED_WINDOW_MS = TimeUnit.HOURS.toMillis(3);
+
+    /**
+     * Whether a reminder should still be drawn.
+     *
+     * We re-check here rather than trusting the stored list because that list is only rewritten
+     * while the app runs. This is what actually retires a reminder once its grace period is up:
+     * every redraw re-evaluates it against the current time.
+     */
+    static boolean isVisibleInWidget(Reminder reminder) {
         if (reminder == null) return false;
         if (reminder.isDisabled()) return false;
 
@@ -225,7 +234,7 @@ public class WidgetUtils {
         if (!"once".equals(reminder.getMode())) return true;
 
         long triggerDate = reminder.getTriggerDate() > 0 ? reminder.getTriggerDate() : reminder.getDate();
-        return triggerDate > now;
+        return triggerDate > now - RECENTLY_PASSED_WINDOW_MS;
     }
 
     /**

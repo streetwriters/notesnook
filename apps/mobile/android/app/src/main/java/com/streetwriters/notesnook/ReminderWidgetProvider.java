@@ -43,7 +43,7 @@ public class ReminderWidgetProvider extends AppWidgetProvider {
 
         // The rows travel with the update itself, so there is no bound service to keep in sync and
         // nothing to invalidate separately: every update redraws from the current data.
-        List<Reminder> reminders = WidgetUtils.getActiveReminders(context);
+        List<Reminder> reminders = WidgetUtils.getWidgetReminders(context);
         RemoteViewsCompat.RemoteCollectionItems.Builder items =
                 new RemoteViewsCompat.RemoteCollectionItems.Builder();
         for (Reminder reminder : reminders) {

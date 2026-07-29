@@ -271,6 +271,8 @@ type ReminderWithFormattedTime = Reminder & {
   formattedDateTime?: string;
 };
 
+const RECENTLY_PASSED_WINDOW = 3 * 60 * 60 * 1000;
+
 async function updateRemindersForWidget() {
   if (Platform.OS === "ios") return;
   const reminders: ReminderWithFormattedTime[] = await db.reminders?.all.items(
@@ -280,28 +282,33 @@ async function updateRemindersForWidget() {
       sortDirection: "asc"
     }
   );
-  const activeReminders = [];
+  const widgetReminders = [];
   if (!reminders) return;
   for (const reminder of reminders) {
-    if (isReminderActive(reminder)) {
-      const triggerDate =
-        reminder.snoozeUntil && reminder.snoozeUntil > Date.now()
-          ? reminder.snoozeUntil
-          : reminder.mode === "repeat"
-            ? getUpcomingReminderTime(reminder)
-            : reminder.date;
+    const triggerDate =
+      reminder.snoozeUntil && reminder.snoozeUntil > Date.now()
+        ? reminder.snoozeUntil
+        : reminder.mode === "repeat"
+          ? getUpcomingReminderTime(reminder)
+          : reminder.date;
 
-      reminder.triggerDate = triggerDate;
-      reminder.formattedTimeOfDay = getFormattedDate(triggerDate, "time");
-      reminder.formattedDateTime = getFormattedDate(triggerDate, "date-time");
-      reminder.formattedTime = getFormattedReminderTime(reminder);
-      activeReminders.push(reminder);
-    }
+    const recentlyPassed =
+      reminder.mode === "once" &&
+      !reminder.disabled &&
+      triggerDate > Date.now() - RECENTLY_PASSED_WINDOW;
+
+    if (!isReminderActive(reminder) && !recentlyPassed) continue;
+
+    reminder.triggerDate = triggerDate;
+    reminder.formattedTimeOfDay = getFormattedDate(triggerDate, "time");
+    reminder.formattedDateTime = getFormattedDate(triggerDate, "date-time");
+    reminder.formattedTime = getFormattedReminderTime(reminder);
+    widgetReminders.push(reminder);
   }
   NotesnookModule.setString(
     "appPreview",
     "remindersList",
-    JSON.stringify(activeReminders)
+    JSON.stringify(widgetReminders)
   );
   NotesnookModule.updateReminderWidget();
 }
