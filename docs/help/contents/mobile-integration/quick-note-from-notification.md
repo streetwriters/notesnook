@@ -5,9 +5,6 @@ description: Write a note straight from your Android notification shade, without
 
 # Quick notes from notifications <PlanTag plan="pro" note="Android only" />
 
-::: danger This feature is Android only.
-:::
-
 Taking a note from the notification drawer requires a Pro plan and is available on Android only — see [Plans & limits](/plans-and-limits).
 
 A simple, quick and convenient way to take notes on your phone from notifications. This works the same way as a messaging/chat app allows you to reply to messages from notifications.

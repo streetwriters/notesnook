@@ -19,13 +19,15 @@ Deleting your account immediately and permanently erases all your notes, noteboo
 3. Go to Settings
 4. Go to `{{account}}`
 5. Click on `{{deleteAccount}}`
-   == Mobile
-6. Open the Notesnook app
-7. Make sure you are logged in
-8. Go to Settings
-9. Go to `{{account}}` then `{{manageAccount}}`
-10. Tap on `{{deleteAccount}}`
-    :::
+
+== Mobile
+
+1. Open the Notesnook app
+2. Make sure you are logged in
+3. Go to Settings
+4. Go to `{{account}}` then `{{manageAccount}}`
+5. Tap on `{{deleteAccount}}`
+   :::
 
 ## FAQs
 

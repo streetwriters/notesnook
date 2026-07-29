@@ -72,10 +72,12 @@ To keep your backups secure & private, it is recommended that you enable encrypt
 1. Go to Settings
 2. Scroll down in the Settings navigation menu and click on `{{backupExport}}` section
 3. Click on the toggle next to `{{backupEncryption}}` to enable/disable encrypted backups
-   == Mobile
-4. Go to `{{settings}}` > `Backup & Restore`
-5. Tap on `{{backups}}`
-6. Tap on the toggle next to `{{backupEncryption}}` to enable/disable encrypted backups
+
+== Mobile
+
+1. Go to `{{settings}}` > `Backup & Restore`
+2. Tap on `{{backups}}`
+3. Tap on the toggle next to `{{backupEncryption}}` to enable/disable encrypted backups
    :::
 
 ::: info

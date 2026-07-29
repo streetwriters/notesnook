@@ -11,7 +11,7 @@ keywords:
 
 # How do I search my notes in Notesnook?
 
-Every list view has a search box at the top of it. Type into it and Notesnook searches the notes in *that* view — the whole notes list, one notebook, one tag, favorites, trash — matching both note titles and the text inside notes, and showing you the matching passages.
+Every list view has a search box at the top of it. Type into it and Notesnook searches the notes in _that_ view — the whole notes list, one notebook, one tag, favorites, trash — matching both note titles and the text inside notes, and showing you the matching passages.
 
 Search runs on your device against the local database. Nothing about what you search for is sent anywhere.
 
@@ -19,30 +19,32 @@ Search runs on your device against the local database. Nothing about what you se
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the search box at the top of the list. It's labelled after the view you're in — `Search in Notes`, `Search in Notebook`, `Search in Trash` and so on.
 2. Type your query. Results appear as you type.
 3. Press `Escape`, or click the ✕ in the box, to clear the search and go back to the full list.
 
 `Ctrl+F` (`⌘+F` on macOS) puts the cursor in that box whenever the editor isn't focused. If you're in a note, `Ctrl+F` opens the editor's own find bar instead.
 == Mobile
+
 1. Tap the bar at the top of the screen — it reads `Search in Notes`, `Search in Notebook` and so on, depending on the view.
 2. Type your query. Results appear as you type.
 3. Tap the back arrow to return to the list.
-:::
+   :::
 
 ## What is actually searched
 
-| You're searching | Matched on |
-| --- | --- |
-| Notes | Title and the full text of the note |
-| Notebooks | Title and description |
-| Tags | Title |
-| Reminders | Title and description |
-| Attachments | Filename, file type and hash |
-| Trash | Deleted notes and notebooks |
+| You're searching | Matched on                          |
+| ---------------- | ----------------------------------- |
+| Notes            | Title and the full text of the note |
+| Notebooks        | Title and description               |
+| Tags             | Title                               |
+| Reminders        | Title and description               |
+| Attachments      | Filename, file type and hash        |
+| Trash            | Deleted notes and notebooks         |
 
 ::: info Locked notes
-The content of a note in your [private vault](/lock-notes-with-private-vault) is encrypted, so it is never added to the search index. Locked notes are found by their titles only. This is a deliberate limitation of end-to-end encryption, not a bug.
+The content of a note in your [private vault](/lock-notes-with-private-vault) is encrypted, so it is never added to the search index. Locked notes are found by their titles only. This is a limitation of end-to-end encryption, not a bug.
 :::
 
 ## Read the results and jump to a match
@@ -51,12 +53,15 @@ A note that matched shows its title with the matching words highlighted, and the
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the arrow next to a result to expand it. Each matching passage in the note is listed underneath, with the matched words highlighted.
 2. Click a passage to open the note scrolled straight to that spot.
 3. Middle-click a passage to open it in a new tab instead.
 
 Passages are only shown in the detailed list. Switching the notes list to compact view collapses results to titles.
+
 == Mobile
+
 1. Tap a result to open the note.
 
 Matching passages are highlighted in the result so you can see the context before opening it.
@@ -78,18 +83,18 @@ The command palette is a desktop and web feature. Press `Ctrl+Shift+P` (`⌘+Shi
 Move with `↑` and `↓`, run with `⏎`. Press `Delete` on an entry under recents, or click the ✕ on it, to drop it from the list.
 
 ::: info Not on mobile
-The command palette and quick open are keyboard features of the desktop and web apps. On mobile, use the search bar and the side menu.
+The command palette and quick open are only features of the **desktop and web apps**. On mobile, use the search bar and the side menu.
 :::
 
 ## Jump to a note by name
 
 Quick open is a desktop and web feature. Press `Ctrl+P` (`⌘+P` on macOS) for **quick open**. It searches your notes, notebooks, tags and reminders by title and opens whatever you pick. With the box empty it lists your recent items and the notes already open in tabs.
 
-| Key | What it does |
-| --- | --- |
-| `⏎` | Open the highlighted item |
-| `Ctrl+⏎` / `⌘+⏎` | Open the highlighted note in a new tab |
-| `Shift+⏎` | Open a new tab titled with whatever you typed |
+| Key              | What it does                                  |
+| ---------------- | --------------------------------------------- |
+| `⏎`              | Open the highlighted item                     |
+| `Ctrl+⏎` / `⌘+⏎` | Open the highlighted note in a new tab        |
+| `Shift+⏎`        | Open a new tab titled with whatever you typed |
 
 `Shift+⏎` is the fast way to turn a search that found nothing into a new note: type the title you were looking for, press `Shift+⏎`, and start writing.
 
@@ -97,6 +102,7 @@ Quick open is a desktop and web feature. Press `Ctrl+P` (`⌘+P` on macOS) for *
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Press `Ctrl+,` (`⌘+,` on macOS), or open `{{settings}}` from the side menu.
 2. Type into the `{{search}}` box at the top of the settings sidebar.
 
@@ -111,12 +117,15 @@ The notebooks and tags lists have their own filter box, separate from note searc
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open `{{notebooks}}` or `Tags` from the side menu.
 2. Type into the `Filter notebooks...` or `Filter tags...` box at the bottom of the list.
+
 == Mobile
+
 1. Open `{{notebooks}}` or `Tags` in the side menu.
 2. Type into the `Filter notebooks...` or `Filter tags...` box at the bottom of the list.
-:::
+   :::
 
 Clearing the box restores the full list.
 
@@ -126,26 +135,29 @@ Sorting is set per view, and separately for each individual notebook, tag and co
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the sort icon in the group header at the top of the list.
 2. Open `{{orderBy}}` and choose the direction.
 3. Open `{{sortBy}}` and choose the key.
+
 == Mobile
+
 1. Tap the sort icon in the group header at the top of the list.
 2. Tap the direction button next to `{{sortBy}}` to flip between ascending and descending.
 3. Tap a key under `{{sortBy}}`.
-:::
+   :::
 
 There are seven sort keys. Which ones are offered depends on the list you're in:
 
-| Sort by | Available in |
-| --- | --- |
-| `Date created` | Everywhere except trash |
-| `Date edited` | Everywhere except trash and tags — and, on mobile, except reminders |
-| `Date modified` | Tags, and reminders on mobile |
-| `Date deleted` | Trash |
-| `Due date` | Reminders |
-| `{{title}}` | Everywhere |
-| `Relevance` | Search results |
+| Sort by         | Available in                                                        |
+| --------------- | ------------------------------------------------------------------- |
+| `Date created`  | Everywhere except trash                                             |
+| `Date edited`   | Everywhere except trash and tags — and, on mobile, except reminders |
+| `Date modified` | Tags, and reminders on mobile                                       |
+| `Date deleted`  | Trash                                                               |
+| `Due date`      | Reminders                                                           |
+| `{{title}}`     | Everywhere                                                          |
+| `Relevance`     | Search results                                                      |
 
 The direction labels change with the key: `{{aToZ}}` / `{{zToA}}` for `{{title}}`, `{{earliestFirst}}` / `{{latestFirst}}` for `Due date`, `{{mostRelevantFirst}}` / `{{leastRelevantFirst}}` for `Relevance`, and `{{oldestToNewest}}` / `{{newestToOldest}}` for the date keys.
 
@@ -153,22 +165,25 @@ The direction labels change with the key: `{{aToZ}}` / `{{zToA}}` for `{{title}}
 
 Grouping splits the list into labelled sections. Six modes are available:
 
-| `{{groupBy}}` | Result |
-| --- | --- |
+| `{{groupBy}}` | Result                                 |
+| ------------- | -------------------------------------- |
 | `{{default}}` | Today, Yesterday, This week, and so on |
-| `None` | One flat list, no headers |
-| `Abc` | One section per first letter |
-| `Year` | One section per year |
-| `{{month}}` | One section per month |
-| `Week` | One section per week |
+| `None`        | One flat list, no headers              |
+| `Abc`         | One section per first letter           |
+| `Year`        | One section per year                   |
+| `{{month}}`   | One section per month                  |
+| `Week`        | One section per week                   |
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the sort icon in the group header.
 2. Open `{{groupBy}}` and pick a mode.
 
 Clicking the group header itself opens `{{jumpToGroup}}`, which scrolls the list straight to any section.
+
 == Mobile
+
 1. Tap the sort icon in the group header.
 2. Scroll to `{{groupBy}}` and pick a mode.
 
@@ -183,10 +198,13 @@ Compact mode drops each row to a single line: title, plus small icons for locked
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the view icon next to the sort icon in the group header.
 
 It's available on the notes, favorites and notebooks lists, and it also collapses search results to their titles.
+
 == Mobile
+
 1. Tap the list-view icon next to the sort icon in the group header.
 
 Notes, notebooks and search results each remember their own setting.

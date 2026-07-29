@@ -104,17 +104,22 @@ You can choose to append your web clip to an existing note and it'll be automati
 
 1. Click on `Select a note to append to`
 2. Select the note you want to append to
-   == Add to notebook
-   ::: info
-   You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
-   :::
 
-3. Click on `Select a notebook`
-4. Select the notebook you want to add the web clip to
-   == Assign tags
-5. Click on `Assign a tag`
-6. Select the tag you want to assign (you can assign multiple tags)
-7. You can also create & assign a new tag by typing in the search bar
+== Add to notebook
+
+::: info
+You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
+:::
+
+1. Click on `Select a notebook`
+2. Select the notebook you want to add the web clip to
+
+== Assign tags
+
+1. Click on `Assign a tag`
+2. Select the tag you want to assign (you can assign multiple tags)
+3. You can also create & assign a new tag by typing in the search bar
+
    ![Assigning a tag to a web clip from the web clipper](/static/web-clipper/assign-a-tag.gif)
    ::::
 

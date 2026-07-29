@@ -15,22 +15,23 @@ An outline list is a nested list whose items **fold**. Any item with children ge
 
 That is the whole difference from a normal bullet list: a bullet list nests too, but everything in it is always visible. An outline list hides and shows branches, which makes it the better choice for meeting structures, project breakdowns, book outlines and anything else you scroll past more often than you read.
 
-Outline lists are part of the [Essential plan and above](/plans-and-limits).
-
 ## Create an outline list
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Place the cursor on an empty line, or select the lines you want to convert.
 2. Click the `+` (Insert) button in the toolbar.
 3. Choose `{{outlineList}}`.
 
 `Ctrl+Shift+O` (`⌘+Shift+O` on macOS) does the same thing, and toggles the list back to plain paragraphs if you press it inside one.
+
 == Mobile
+
 1. Place the cursor on an empty line, or select the lines you want to convert.
 2. Tap the `+` (Insert) button in the bottom toolbar.
 3. Choose `{{outlineList}}` from the `{{chooseBlockToInsert}}` sheet.
-:::
+   :::
 
 Press `Enter` to start the next item, exactly as in any other list.
 
@@ -41,17 +42,20 @@ Press `Enter` to start the next item, exactly as in any other list.
 On an empty line, type `-o` followed by a space and the line becomes the first item of an outline list.
 
 ::: info Markdown shortcuts need Essential
-`-o ` is a [Markdown shortcut](/rich-text-editor/markdown-notes-editing), part of the [Essential plan and above](/plans-and-limits) — the same plan outline lists themselves need. Markdown shortcuts are **off by default on web and desktop**: turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}`. On mobile they are on by default. The toolbar button and `Ctrl+Shift+O` do not depend on that setting.
+`-o ` is a [Markdown shortcut.](/rich-text-editor/markdown-notes-editing)Markdown shortcuts are **off by default on web and desktop**: turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}`. On mobile they are on by default. The toolbar button and `Ctrl+Shift+O` do not depend on that setting.
 :::
 
 ## Nest an item under another
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Put the cursor in the item you want to move in.
 2. Press `Tab` to nest it under the item above.
 3. Press `Shift+Tab` to move it back out one level.
+
 == Mobile
+
 1. Tap into the item you want to move in.
 2. Tap `{{indent}}` in the bottom toolbar to nest it one level deeper.
 3. Tap `{{outdent}}` to move it back out.
@@ -65,11 +69,13 @@ As soon as an item has something nested under it, it becomes a parent and grows 
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the arrow in the margin to the left of a parent item — or put the cursor anywhere in that item and press `Ctrl+Space` (`⌘+Space` on macOS).
 2. Everything nested under it folds away; the item itself stays visible.
 
 Repeat to expand it again.
 == Mobile
+
 1. Tap the arrow in the margin to the left of a parent item.
 2. Everything nested under it folds away.
 
