@@ -243,17 +243,25 @@ export const sidebar = [
     collapsed: false,
     items: [
       { text: "Customizing the app", link: "/customizing-notesnook" },
-      { text: "Using themes", link: "/custom-themes/using-themes" },
-      { text: "How themes work", link: "/custom-themes/introduction" },
       {
-        text: "Theme Builder",
-        link: "/custom-themes/create-a-theme-with-theme-builder"
-      },
-      {
-        text: "Install from file",
-        link: "/custom-themes/install-a-theme-from-file"
-      },
-      { text: "Publish a theme", link: "/custom-themes/publish-a-theme" }
+        text: "Using themes",
+        link: "/custom-themes/using-themes",
+        items: [
+          { text: "How themes work", link: "/custom-themes/introduction" },
+          {
+            text: "Theme Builder",
+            link: "/custom-themes/create-a-theme-with-theme-builder"
+          },
+          {
+            text: "Install from file",
+            link: "/custom-themes/install-a-theme-from-file"
+          },
+          {
+            text: "Publish a new theme",
+            link: "/custom-themes/publish-a-theme"
+          }
+        ]
+      }
     ]
   },
   {
@@ -264,20 +272,28 @@ export const sidebar = [
       { text: "Notesnook Circle", link: "/notesnook-circle" },
       { text: "Recovering your account", link: "/recovering-your-account" },
       { text: "Deleting your account", link: "/deleting-your-account" },
-      { text: "Gift cards", link: "/gift-cards" }
+      { text: "Gift cards", link: "/gift-cards" },
+      { text: "Notesnook Wrapped", link: "/notesnook-wrapped" }
     ]
   },
   {
     text: "Advanced",
     collapsed: false,
     items: [
-      { text: "Inbox API", link: "/inbox-api/getting-started" },
       {
-        text: "Self-hosting the Inbox API",
-        link: "/inbox-api/self-hosting-inbox-api"
-      },
+        text: "Inbox API",
+        items: [
+          {
+            text: "Getting started",
+            link: "/inbox-api/getting-started"
+          },
+          {
+            text: "Self-hosting the Inbox API",
+            link: "/inbox-api/self-hosting-inbox-api"
+          }
+        ]
+      }
       //      { text: "Self-hosting Notesnook", link: "/self-hosting" },
-      { text: "Notesnook Wrapped", link: "/notesnook-wrapped" }
     ]
   },
   {
