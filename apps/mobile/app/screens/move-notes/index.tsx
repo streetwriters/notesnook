@@ -35,7 +35,10 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useDBItem } from "../../hooks/use-db-item";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
-import { createItemSelectionStore } from "../../stores/item-selection-store";
+import {
+  createItemSelectionStore,
+  SelectionState
+} from "../../stores/item-selection-store";
 import { updateNotebook } from "../../utils/notebooks";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -47,14 +50,12 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
   const currentNotebook = props.route.params.notebook;
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
-  const selectionCount = useItemSelectionStore(
-    (state) =>
-      Object.keys(state.selection).filter(
-        (k) =>
-          state.selection?.[k] === "selected" ||
-          state.selection[k] === "deselected"
-      )?.length > 0
-  );
+
+  const hasPendingChanges = useItemSelectionStore((state) => {
+    return Object.keys(state.selection).some((id) => {
+      return state.selection[id] !== state.initialState[id];
+    });
+  });
 
   useNavigationFocus(props.navigation, { focusOnInit: true });
 
@@ -76,26 +77,31 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
         .catch(() => {
           setLoading(false);
         });
-
-      db.relations
-        .from(currentNotebook, "note")
-        .get()
-        .then((existingNotes) => {
-          const selection: { [name: string]: any } = {};
-          existingNotes.forEach((rel) => {
-            selection[rel.toId] = "selected";
-          });
-          useItemSelectionStore.setState({
-            selection: selection,
-            initialState: selection
-          });
-        });
     },
     [currentNotebook]
   );
 
   useEffect(() => {
     loadNotes();
+
+    const loadSelection = async () => {
+      const existingNotes = await db.relations
+        .from(currentNotebook, "note")
+        .get();
+
+      const selection: Record<string, SelectionState> = {};
+
+      existingNotes.forEach((rel) => {
+        selection[rel.toId] = "selected";
+      });
+
+      useItemSelectionStore.setState({
+        selection,
+        initialState: selection
+      });
+    };
+
+    loadSelection();
 
     return () => {
       useItemSelectionStore.getState().reset();
@@ -159,6 +165,8 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
         />
 
         <FlatList
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
           ListEmptyComponent={
             <View
               style={{
@@ -176,17 +184,19 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
               )}
             </View>
           }
-          style={{
-            flexGrow: 1
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingBottom: hasPendingChanges ? 80 : 0
           }}
           data={loading ? [] : notes?.placeholders}
           renderItem={renderItem}
         />
 
-        {selectionCount ? (
+        {hasPendingChanges ? (
           <FloatingButton
             icon="check"
             alwaysVisible
+            hideOnKeyboard={false}
             onPress={async () => {
               await db.notes?.addToNotebook(
                 currentNotebook.id,
