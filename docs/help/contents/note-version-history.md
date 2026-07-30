@@ -29,9 +29,9 @@ In short, if you open a note and edit it at 10 different times during the day, y
 4. Click `{{restoreThisVersion}}` to bring it back, or `{{saveACopy}}` to keep both.
 == Mobile
 1. Open the note.
-2. Press the three dot button to open `Note properties`.
-3. Press `{{history}}` and choose a session to preview it.
-4. Press `{{restore}}` to bring it back. (`{{saveACopy}}` is desktop and web only.)
+2. Tap the three dot button to open `Note properties`.
+3. Tap `{{history}}` and choose a session to preview it.
+4. Tap `{{restore}}` to bring it back. (`{{saveACopy}}` is desktop and web only.)
 :::
 
 Restoring replaces the note's current content with the version you picked. To compare instead, `{{saveACopy}}` creates a new note from the old version and leaves the original untouched.
@@ -55,9 +55,9 @@ See [plans and limits](/plans-and-limits) for the full comparison.
 There is no button to clear a single note's history on desktop or web. History is cleared when the note is locked, trashed and deleted, or when you log out.
 == Mobile
 1. Open the note.
-2. Press the three dot button to open `Note properties`.
-3. Press `{{history}}`.
-4. Press `{{clearHistory}}` and confirm.
+2. Tap the three dot button to open `Note properties`.
+3. Tap `{{history}}`.
+4. Tap `{{clearHistory}}` and confirm.
 :::
 
 Clearing is permanent — once cleared, earlier versions of that note are gone.

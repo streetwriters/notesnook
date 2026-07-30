@@ -22,9 +22,9 @@ If you are tech savvy and know your way around a computer, you can use a tool li
 
 1. Open the Evernote Desktop app (its not possible to export notes from the Evernote web app), and go to `{{notebooks}}` from the side menu:
    ![ in Notesnook](/static/evernote-importer/1.png)
-2. Click on the `three-dot` button on each notebook and click on `Export Notebook`
+2. Click the `three dot` button on each notebook and click `Export Notebook`
    ![ in Notesnook](/static/evernote-importer/2.png)
-3. Choose `ENEX format` then click on `{{export}}`, and save it to your desired location. Repeat this for all the Notebooks you want to import into Notesnook.
+3. Choose `ENEX format` then click `{{export}}`, and save it to your desired location. Repeat this for all the Notebooks you want to import into Notesnook.
    ![ in Notesnook](/static/evernote-importer/3.png)
 
 ## Importing .ENEX files into Notesnook

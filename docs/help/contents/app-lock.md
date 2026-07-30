@@ -35,7 +35,7 @@ App lock is a local, device-only lock and is completely separate from your accou
 
 ### Turn on App Lock
 
-1. Go to Settings and Click on App lock. Then turn on the App lock switch. You will be prompted to enter your App Lock Password. When it is successful App Lock will be turned on.
+1. Go to Settings and Click App lock. Then turn on the App lock switch. You will be prompted to enter your App Lock Password. When it is successful App Lock will be turned on.
 
 <img src="/desktop-enable-app-lock.png" alt="drawing" height="500"/>
 
@@ -55,7 +55,7 @@ App lock is a local, device-only lock and is completely separate from your accou
 
 ### Turn on App Lock
 
-1. Go to Settings and Tap on App lock.
+1. Go to Settings and Tap App lock.
 
    <img src="/app-lock-setting.png" alt="drawing" height="500"/>
 

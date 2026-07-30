@@ -68,7 +68,7 @@ You can drag the items in your side menu into the order you want, and hide the o
 4. Tap `{{done}}` at the bottom of the side menu to leave reorder mode.
 :::
 
-<!-- TODO: screenshot — the side menu right-click menu on desktop showing checked/unchecked items and Reset sidebar -->
+<!-- TODO: screenshot — the side menu right click menu on desktop showing checked/unchecked items and Reset sidebar -->
 
 ::: info Shortcuts are separate
 Pinning notebooks and tags to the side menu is a different feature — see [side menu shortcuts](/organizing-notes/side-menu-shortcuts). Free plans can keep 10 shortcuts; Essential and above are unlimited.

@@ -25,7 +25,7 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 1. Go to [Notesnook Login page](https://app.notesnook.com/login)
 2. Enter your email & continue
 3. Verify your 2FA & continue
-4. On the next page, click on `{{forgotPassword}}`
+4. On the next page, click `{{forgotPassword}}`
 
 ![Step in Notesnook](/static/account-recovery/step-1.png)
 
@@ -33,7 +33,7 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 
 ![Step in Notesnook](/static/account-recovery/step-2.png)
 
-6. Click on `{{sendRecoveryEmail}}`
+6. Click `{{sendRecoveryEmail}}`
 7. If everything goes well, you should receive an email from Notesnook in your inbox:
 
 ![Recovery email in Notesnook](/static/account-recovery/recovery_email.png)
@@ -42,7 +42,7 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 _Check your spam/junk folder if you haven't received one & [contact us](mailto:support@streetwriters.co) if you still don't find it._
 :::
 
-8. Click on `Reset your password` button in the email. This will take you to the account recovery page.
+8. Click `Reset your password` button in the email. This will take you to the account recovery page.
 
 <!--Needs Validation? I don't think you can request recovery from mobile--->
 
@@ -66,10 +66,10 @@ This is the safest method of recovering your account because it just decrypts yo
 If you don't have your data recovery key, you can skip to the next section.
 :::
 
-1. Click on the first option (the button that says `{{recoveryKeyMethod}}`) if you haven't already
-2. Enter your recovery key in the input field & click on `{{startAccountRecovery}}`
+1. Click the first option (the button that says `{{recoveryKeyMethod}}`) if you haven't already
+2. Enter your recovery key in the input field & click `{{startAccountRecovery}}`
    ![Step in Notesnook](/static/account-recovery/step-4.png)
-3. Click on `{{downloadBackupFile}}` once you data has been downloaded. **_Don't forget to save the file in a safe place._**
+3. Click `{{downloadBackupFile}}` once you data has been downloaded. **_Don't forget to save the file in a safe place._**
    ![Step in Notesnook](/static/account-recovery/step-5.png)
 4. For next steps, see [Resetting account password](#resetting-account-password) section
 
@@ -79,7 +79,7 @@ If you don't have your data recovery key, you can skip to the next section.
 This method will clear all your data including your notes, notebooks, reminders, tags etc. **Proceed with caution.**
 :::
 
-1. Click on the third option (the button that says `{{clearDataAndResetMethod}}`)
+1. Click the third option (the button that says `{{clearDataAndResetMethod}}`)
 2. For next steps, see [Resetting account password](#resetting-account-password) section
 
 ## Resetting account password
@@ -89,7 +89,7 @@ Once you have selected the appropriate account recovery method, you'll be asked 
 ![Step in Notesnook](/static/account-recovery/step-7.png)
 
 1. Choose a strong & memorable password. _We recommend using a password manager like 1Password or Bitwarden so you never lose your password again._
-2. Click on `{{continue}}` and wait until the process finishes.
+2. Click `{{continue}}` and wait until the process finishes.
 3. Save the new recovery key when prompted in a safe place.
 
 ---

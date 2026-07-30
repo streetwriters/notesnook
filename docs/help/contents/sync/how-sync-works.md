@@ -110,13 +110,13 @@ Any individual note can be excluded from sync entirely. This is useful for a scr
 
 :::tabs key:platform
 == Desktop/Web
-1. Right-click the note in the notes list, or open its properties.
+1. Right click the note in the notes list, or open its properties.
 2. Choose `{{syncOff}}`.
 3. Confirm — the dialog warns that the note *"will be automatically deleted from all other devices & any future changes won't get synced."*
 
 The note now shows a crossed-out sync icon in the list. Choose `{{syncOff}}` again to turn syncing back on.
 == Mobile
-1. Tap the three-dot menu on the note.
+1. Tap the three dot menu on the note.
 2. Tap `{{syncOff}}`.
 
 The note shows a crossed-out sync icon in the list. Tap `{{syncOff}}` again to re-enable syncing for it.

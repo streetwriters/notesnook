@@ -15,37 +15,37 @@ Free accounts can keep up to 50 notebooks. Essential raises the cap to 500, and 
 
 :::tabs key:platform
 == Desktop/Web
-1. Click on the Notebook icon at the top of the side menu.
-2. Click on the `+` button on top right corner of the side menu.
+1. Click the Notebook icon at the top of the side menu.
+2. Click the `+` button on top right corner of the side menu.
 3. Add a title for your notebook, and optionally, a description.
-4. Click on the `{{create}}` button
+4. Click the `{{create}}` button
 5. You have created your first notebook in Notesnook
 == Mobile
-1. Tap on the Notebook icon at the bottom of the side menu.
-2. Press the `+` button on the bottom right corner
+1. Tap the Notebook icon at the bottom of the side menu.
+2. Tap the `+` button on the bottom right corner
 3. Add a title for your notebook, and optionally, a description.
-4. Press the `{{add}}` button.
+4. Tap the `{{add}}` button.
 5. You have created your first notebook in Notesnook.
 :::
 
 ::: info
-Starting from v3, you can create new Notebooks inside existing notebooks. Simply go to any notebook's properties and click on "Add notebook".
+Starting from v3, you can create new Notebooks inside existing notebooks. Simply go to any notebook's properties and click "Add notebook".
 :::
 
 ## Editing a notebook
 
 :::tabs key:platform
 == Desktop/Web
-1. Click on the Notebook icon at the top of the side menu.
-2. Right click on the Notebook you want to edit and select "Edit" from dropdown.
+1. Click the Notebook icon at the top of the side menu.
+2. Right click the Notebook you want to edit and select "Edit" from dropdown.
 3. Edit your notebook.
-4. Click on `{{save}}` button to save the changes.
+4. Click `{{save}}` button to save the changes.
 == Mobile
-1. Tap on the Notebook icon at the bottom of the side menu.
+1. Tap the Notebook icon at the bottom of the side menu.
 2. Hold down on the notebook you wish to edit.
-3. Press on `{{editNotebook}}`
+3. Tap `{{editNotebook}}`
 4. Edit your notebook
-5. Press `{{save}}` button to save changes
+5. Tap `{{save}}` button to save changes
 :::
 
 ## Creating a new note in a notebook
@@ -53,11 +53,11 @@ Starting from v3, you can create new Notebooks inside existing notebooks. Simply
 :::tabs key:platform
 == Desktop/Web
 1. Go to the notebooks section by clicking on the notebook icon, and open a notebook
-2. Click on the ![Three dot button](/plus-button-desktop.png) button on the top left corner of the note editor.
+2. Click the ![Three dot button](/plus-button-desktop.png) button on the top left corner of the note editor.
 3. Start writing in editor to create a note in the notebook
 == Mobile
 1. Go to the notebooks section by tapping on the notebook icon, and open a notebook
-2. Tap on the ![Three dot button](/plus-button-desktop.png) button on bottom right corner to open the editor or just **swipe from right to left** to open editor
+2. Tap the ![Three dot button](/plus-button-desktop.png) button on bottom right corner to open the editor or just **swipe from right to left** to open editor
 3. Start writing in editor to create a note in the notebook
 :::
 
@@ -71,13 +71,13 @@ Once a note is added to a notebook, you will see its path on the bottom of the n
 
 :::tabs key:platform
 == Desktop/Web
-1. Right click on a note
-2. Click on `{{notebooks}}` > `{{linkNotebooks}}`
+1. Right click a note
+2. Click `{{notebooks}}` > `{{linkNotebooks}}`
 3. Select the notebook you want to link the note to (you can select multiple)
 4. Click `{{done}}` to save your changes.
 == Mobile
 1. Tap the ![Three dot button](/three-dot-button.png) button
-2. Tap on `{{addToNotebook}}` button.
+2. Tap `{{addToNotebook}}` button.
 3. Select the notebook you want to link the note to (you can select multiple)
 4. Tap the checkmark button in the bottom right to save your changes.
 :::
@@ -91,13 +91,13 @@ In Notesnook a single note can exist in multiple Notebooks. However, a note will
 :::tabs key:platform
 == Desktop/Web
 1. Hold `Ctrl` key and click on all the notes you want to link
-2. Right click on selected notes
-3. Click on `{{notebooks}}` > `{{linkNotebooks}}`
+2. Right click selected notes
+3. Click `{{notebooks}}` > `{{linkNotebooks}}`
 4. Select the notebook you want to link the note to (you can select multiple)
 5. Click `{{done}}` to save your changes.
 == Mobile
-1. Long press on a note to enter multi selection mode.
-2. Tap on all the notes you want to link to select them
+1. Long press a note to enter multi selection mode.
+2. Tap all the notes you want to link to select them
 3. Tap the `+` button in top header
 4. Select the notebook you want to link the note to (you can select multiple)
 5. Tap the `{{save}}` button at the top right corner to save your changes.
@@ -107,12 +107,12 @@ In Notesnook a single note can exist in multiple Notebooks. However, a note will
 
 ::::tabs key:platform
 == Desktop/Web
-1. Right click on a note
-2. Click on `{{notebooks}}` in the context menu
-3. Click on the notebook you want to remove the note from
+1. Right click a note
+2. Click `{{notebooks}}` in the context menu
+3. Click the notebook you want to remove the note from
 == Mobile
-1. Press the ![Three dot button](/three-dot-button.png) button
-2. Tap on `{{addToNotebook}}`.
+1. Tap the ![Three dot button](/three-dot-button.png) button
+2. Tap `{{addToNotebook}}`.
 3. Unselect the notebooks you wish to remove this note from, and press the checkmark in the bottom right corner.
 
 ::: warning You can only add or remove a note from a notebook.
@@ -127,7 +127,7 @@ Every new note you create outside a notebook is added to your default notebook a
 :::tabs key:platform
 == Desktop/Web
 1. Go to the notebooks section by clicking on the notebook icon.
-2. Right click on the notebook.
+2. Right click the notebook.
 3. Click `{{setAsDefault}}`.
 
 A checkmark appears next to `{{setAsDefault}}` for the notebook that is currently the default. Click it again to clear the default.
@@ -148,7 +148,7 @@ A notebook nested inside another notebook can be pulled back out to the top leve
 :::tabs key:platform
 == Desktop/Web
 1. Open the parent notebook so the nested notebook is visible.
-2. Right click on the nested notebook.
+2. Right click the nested notebook.
 3. Click `{{moveToTop}}`.
 
 The notebook is unlinked from its parent and appears at the root of the notebooks list. The action is hidden for notebooks that are already at the root.
@@ -162,13 +162,13 @@ The notebook is unlinked from its parent and appears at the root of the notebook
 :::tabs key:platform
 == Desktop/Web
 1. Go to the notebooks section by clicking on the notebook icon.
-2. Right click on the notebook
-3. Click on `{{moveToTrash}}`.
+2. Right click the notebook
+3. Click `{{moveToTrash}}`.
 4. Select whether you also want to move the notes inside this notebook to the trash.
 == Mobile
 1. Go to the notebooks section by tapping on the notebook icon.
 2. Hold down on the notebook.
-3. Press `{{moveToTrash}}` to delete the notebook.
+3. Tap `{{moveToTrash}}` to delete the notebook.
 4. Select whether you also want to move the notes inside this notebook to the trash.
 :::
 

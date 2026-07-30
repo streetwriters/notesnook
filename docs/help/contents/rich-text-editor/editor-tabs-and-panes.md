@@ -20,7 +20,7 @@ The Notesnook editor keeps every note you open in a tab, so you can jump between
 :::tabs key:platform
 == Desktop/Web
 
-1. Right-click a note in the list and choose `{{openInNewTab}}`. Middle-clicking the note does the same thing.
+1. Right click a note in the list and choose `{{openInNewTab}}`. Middle-clicking the note does the same thing.
 2. Or click the `{{newTab}}` button in the editor's top bar to open an empty tab, then start writing.
 
 You can also drag a note from the list onto the tab strip to open it in a new tab, or drop it **onto an existing tab** to open it in that tab. Double-clicking the empty part of the tab strip opens a new tab.
@@ -48,7 +48,7 @@ Every open tab is listed in that sheet. Tap one to switch to it, tap the close i
 
 :::tabs key:platform
 == Desktop/Web
-Right-click any tab for its menu:
+Right click any tab for its menu:
 
 - `{{save}}` — only shown when that tab has unsaved changes
 - `{{close}}`
@@ -79,7 +79,7 @@ Pinning keeps a note where you put it. A pinned tab:
 
 :::tabs key:platform
 == Desktop/Web
-Right-click the tab and choose `{{pin}}`. Click the pin icon on the tab to unpin it again.
+Right click the tab and choose `{{pin}}`. Click the pin icon on the tab to unpin it again.
 == Mobile
 Tap the number badge in the editor header, then tap the pin icon on the tab you want to pin. Tap it again to unpin.
 :::

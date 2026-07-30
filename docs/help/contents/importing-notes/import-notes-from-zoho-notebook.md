@@ -12,7 +12,7 @@ schema: howto
 
 The following steps will help you import your notes from Zoho notebook easily.
 
-1. Go to Zoho notebook and click on account icon on top right corner.
+1. Go to Zoho notebook and click account icon on top right corner.
    ![ in Notesnook](/static/zoho-importer/1.png)
 2. From the Side menu, go to Settings.
    ![ in Notesnook](/static/zoho-importer/2.png)

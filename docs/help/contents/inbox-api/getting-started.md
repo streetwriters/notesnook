@@ -81,7 +81,7 @@ Each key gets an expiry: `{{expiryOneDay}}`, `{{expiryOneWeek}}`, `{{expiryOneMo
 | `tagIds`       | string[] | Optional                           | Array of tag IDs to apply to the note.                |
 
 ::: info Notebook & Tag IDs
-Notebook and Tag IDs can be found by right-clicking on a notebook/tag and selecting `{{copyId}}`.
+Notebook and Tag IDs can be found by right clicking on a notebook/tag and selecting `{{copyId}}`.
 :::
 
 #### Limits

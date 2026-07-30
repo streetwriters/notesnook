@@ -81,7 +81,7 @@ The search box at the top filters the list by filename. On desktop and web you c
 
 ### Act on an attachment
 
-Open an attachment's menu — right click on desktop and web, tap the item on mobile — for:
+Open an attachment's menu — right click desktop and web, tap the item on mobile — for:
 
 | Action                                           | What it does                                                                  |
 | ------------------------------------------------ | ----------------------------------------------------------------------------- |

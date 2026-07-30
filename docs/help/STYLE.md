@@ -24,7 +24,7 @@ Open `{{privacyAndSecurity}}`  renders: Open `Privacy & security`
 Keys come from `packages/intl/src/strings.ts` — the same catalogue the apps render from — so when someone renames a string in the app, every page quoting it updates on the next build. An unknown key **fails the build**; it never ships as a placeholder.
 
 - Plural entries take a count: `{{notebooks:2}}`.
-- `npm run docs:strings` lists labels that could be keys but aren't; `-- --fix` rewrites the unambiguous ones.
+- `npm run strings` lists labels that could be keys but aren't; `-- --fix` rewrites the unambiguous ones.
 - **Never add a string to `packages/intl` for the docs' sake.** If a label has no key — third-party UI, native OS text, a screen that isn't localized — write it as plain text.
 
 If web and mobile differ, both go in the platform tabs. If you cannot verify something, leave it out and flag it — never guess.

@@ -9,7 +9,7 @@ Basic web clipping support is available on both Android & iOS apps via share ext
 
 We are going to use browser app as an example to demonstrate how you can clip information from webpages and other apps on your iPhone.
 
-1. Select some text on a webpage then Tap on "Share" on the context menu.
+1. Select some text on a webpage then Tap "Share" on the context menu.
 
 :::tabs key:platform
 == iOS
@@ -27,13 +27,13 @@ We are going to use browser app as an example to demonstrate how you can clip in
 ![Select Notesnook](/static/mobile-integration/select-notesnook-android.png)
 :::
 
-3. Tap on the Save button on bottom right corner to save the web clip. This will save the web clip as a new note in Notesnook.
+3. Tap the Save button on bottom right corner to save the web clip. This will save the web clip as a new note in Notesnook.
 
 ![Save web clip](/static/mobile-integration/save-clip-ios.png)
 
 ## Append to note
 
-1. Tap on Append to note on the Share extension
+1. Tap Append to note on the Share extension
 2. Search for a note to append the web clip to and select it
 3. Save the web clip.
 

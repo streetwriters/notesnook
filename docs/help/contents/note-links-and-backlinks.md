@@ -87,8 +87,8 @@ Every note keeps two lists:
 
 == Mobile
 
-1. Press the ![Three dot button](/three-dot-button.png) button on a note.
-2. Press `{{references}}`.
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap `{{references}}`.
 3. Switch between the `{{linkedNotes}}` and `{{referencedIn}}` tabs.
 4. Tap an entry to open the note, or expand it to see the individual blocks and jump straight to them.
    :::
@@ -104,14 +104,14 @@ Every note has a permanent internal link of the form `nn://note/<note id>`. A bl
 :::tabs key:platform
 == Desktop/Web
 
-1. Right click on a note to open the `Note properties` menu.
+1. Right click a note to open the `Note properties` menu.
 2. Click `{{copyLink}}`.
 
 A `{{linkCopied}}` toast confirms it. The link is copied as plain text, as HTML and as Markdown, so pasting into another note produces a ready-made link.
 == Mobile
 
-1. Press the ![Three dot button](/three-dot-button.png) button on a note.
-2. Press `{{copyLink}}`.
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap `{{copyLink}}`.
 
 A `{{linkCopied}}` toast shows the copied link.
 :::

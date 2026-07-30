@@ -38,7 +38,7 @@ Conflicted notes appear at the very top of your notes list.
 To resolve a merge conflict on your desktop or web app, follow these steps:
 
 1. Locate the conflicted note at the top of your notes list.
-2. Click on the note to open the conflict resolution screen.
+2. Click the note to open the conflict resolution screen.
 3. On the conflict resolution screen, you’ll see two versions of your note side by side:
    1. **Current Note** is the version from the device you are using.
    2. **Incoming Note** is the version coming from the other device.
@@ -52,14 +52,14 @@ To resolve a merge conflict on your desktop or web app, follow these steps:
 To resolve a merge conflict on your mobile device, follow these steps:
 
 1. Locate the conflicted note at the top of your notes list.
-2. Tap on the note to open the conflict resolution screen.
+2. Tap the note to open the conflict resolution screen.
 3. On the conflict resolution screen, you’ll see two versions of your note, one above the other:
    1. **This Device** is the version from the device you are using.
    2. **Incoming** is the version coming from the other device.
    <p><img src="/static/merge-conflicts-resolution-screen-mobile.png" alt="drawing" height="414"/></p>
 4. Review both versions and decide which one you want to keep.
-5. Press the **Keep** button on the version you want to retain.
-6. Press the **Discard** button on the version you don’t want to keep, or press **Save a Copy** if you want to keep both versions.
+5. Tap the **Keep** button on the version you want to retain.
+6. Tap the **Discard** button on the version you don’t want to keep, or press **Save a Copy** if you want to keep both versions.
    <p><img src="/static/merge-conflicts-resolution-screen-mobile-2.png" alt="drawing" height="414"/></p>
 :::
 

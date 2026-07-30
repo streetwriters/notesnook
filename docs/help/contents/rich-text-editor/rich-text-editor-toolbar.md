@@ -12,7 +12,7 @@ The notes editor toolbar has all the basic tools for rich formatting of your not
 ## Adding blocks to a note
 
 1. Focus inside the note where you want to insert a block.
-2. Click on the ![Toolbar plus](/toolbar-plus.png) button on the toolbar.
+2. Click the ![Toolbar plus](/toolbar-plus.png) button on the toolbar.
 3. Select the block you want to insert; for example a task list.
 
 ![Toolbar](/toolbar-blocks.png)
@@ -27,11 +27,11 @@ One of the great features of the editor is the ability to customize the editor t
 
 :::tabs key:platform
 == Desktop/Web
-To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}}` and click on `{{customizeToolbar}}`.
+To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}}` and click `{{customizeToolbar}}`.
 
 ![Configure editor toolbar](/config-toolbar-desktop.png)
 == Mobile
-To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}}` and click on `{{customizeToolbar}}`.
+To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}}` and click `{{customizeToolbar}}`.
 :::
 
 **Groups** - Tools are distrubted across groups. You can add, remove and reorder the groups in the toolbar. You can move tools between groups with drag and drop.
@@ -42,7 +42,7 @@ To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}
 == Desktop/Web
 **Disabled Items** - Tools that are hidden from the toolbar. You can drag and drop a tool into this section to remove it from the toolbar.
 == Mobile
-**Disabled Items** - Tools that are hidden from the toolbar. Click on the `+` button on a group to view disabled tools and add them back to the toolbar.
+**Disabled Items** - Tools that are hidden from the toolbar. Click the `+` button on a group to view disabled tools and add them back to the toolbar.
 :::
 
 ### Choose a toolbar preset
@@ -89,9 +89,9 @@ The toolbar goes back to the `{{default}}` preset and a `{{toolbarReset}}` toast
 
 :::tabs key:platform
 == Desktop/Web
-To add a new group to the toolbar, click on the `+` button in the header.
+To add a new group to the toolbar, click the `+` button in the header.
 == Mobile
-Scroll down the bottom of all groups. Click on `{{createAGroup}}` button to add a new group.
+Scroll down the bottom of all groups. Click `{{createAGroup}}` button to add a new group.
 :::
 
 ### Adding tools to a group
@@ -100,7 +100,7 @@ Scroll down the bottom of all groups. Click on `{{createAGroup}}` button to add 
 == Desktop/Web
 Drag and drop tools from other groups or the `Disabled item` section into a group to add them to the group.
 == Mobile
-Click on the `+` button on a group header to add any disabled tools into the group. You can also drag and drop tools from other groups.
+Click the `+` button on a group header to add any disabled tools into the group. You can also drag and drop tools from other groups.
 :::
 
 ### Creating a subgroup
@@ -109,7 +109,7 @@ Click on the `+` button on a group header to add any disabled tools into the gro
 == Desktop/Web
 
 1. Hover on a group header.
-2. Click on the `+` button to add a subgroup.
+2. Click the `+` button to add a subgroup.
 3. Drag and drop tools into the subgroup.
 4. Tools in the subgroup will be collapsed into a drop down.
 
@@ -124,12 +124,12 @@ You can create a subgroup by clicking on collapse button on a tool. Tools in the
 You can remove a group and all it's tools from the toolbar.
 
 1. Hover on a group header
-2. Click on the trash icon to delete the group.
+2. Click the trash icon to delete the group.
 3. All the tools in the group will be moved to `Disabled items` section at the bottom.
 
 == Mobile
 
-1. Click on the `-` button on a group header to remove the group
+1. Click the `-` button on a group header to remove the group
 2. Tools removed from a group can be added back with the `+` button on the group header.
    :::
 
@@ -139,7 +139,7 @@ You can remove a group and all it's tools from the toolbar.
 == Desktop/Web
 
 1. Hover on a tool header
-2. Click on the trash icon to disable the tool.
+2. Click the trash icon to disable the tool.
 3. Deleted tools in the group will be moved to `Disabled items` section at the bottom.
 
 == Mobile

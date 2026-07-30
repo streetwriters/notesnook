@@ -10,23 +10,23 @@ Basic home screen widgets are availble on both Android & iOS for quick note taki
 :::tabs key:platform
 == iOS
 
-1. Long press on home screen
-2. Tap on the + button on top left
+1. Long press home screen
+2. Tap the + button on top left
 3. Select Notesnook Quick Note widget and add it to home screen
 
 ![Home widget](/static/mobile-integration/ios-quick-note-widget.png)
 
-4. Tap on the widget to directly launch the editor in the app.
+4. Tap the widget to directly launch the editor in the app.
 
 == Android
 
-1. Long press on home screen
-2. Tap on widgets
+1. Long press home screen
+2. Tap widgets
 3. Add Notesnook widget to home screen
 
 ![Home widget](/static/mobile-integration/android-quick-note-widget.png)
 
-4. Tap on the widget to quickly take a note without launching the app.
+4. Tap the widget to quickly take a note without launching the app.
    :::
 
 ## Which widgets are available?
@@ -49,7 +49,7 @@ On iOS the widget is listed as `Quick Note`, described as `A widget to add notes
 
 The `{{note}}` widget — `Add a note to home screen` in the widget picker — pins one specific note to your home screen and shows its title and headline. It updates whenever you edit the note.
 
-1. Long press on the home screen and open the widget picker.
+1. Long press the home screen and open the widget picker.
 2. Drag the Notesnook `{{note}}` widget onto your home screen.
 3. The `Select a note` screen opens — pick the note you want on the widget.
 4. Tap the widget to open that note in the app.
@@ -62,7 +62,7 @@ Because the widget is reconfigurable, you can long press it later and choose a d
 
 The `{{reminders}}` widget — `Quick overview of upcoming reminders` in the widget picker — shows a scrollable list of your upcoming [reminders](/reminders).
 
-1. Long press on the home screen and open the widget picker.
+1. Long press the home screen and open the widget picker.
 2. Drag the Notesnook `{{reminders}}` widget onto your home screen.
 3. Tap a reminder in the list to open it in the app, or tap the `+` button on the widget to create a new reminder.
 

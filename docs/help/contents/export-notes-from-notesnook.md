@@ -21,14 +21,14 @@ On desktop and web, PDF is only offered when you export a **single note** — mu
 
 :::tabs key:platform
 == Desktop/Web
-1. Right click on a note
-2. Click on `{{exportAs}}`
+1. Right click a note
+2. Click `{{exportAs}}`
 3. Select the desired format
 4. Wait a few moments while your note is exported
 5. Save the note at your desired location
 == Mobile
 1. Tap the ![Three dot button](/three-dot-button.png) button on a note
-2. Tap on `{{export}}`
+2. Tap `{{export}}`
 3. Select the desired format
 4. Wait a few moments while your note is exported
 5. Exported notes are stored in `Notesnook/exported` folder.
@@ -39,14 +39,14 @@ On desktop and web, PDF is only offered when you export a **single note** — mu
 :::tabs key:platform
 == Desktop/Web
 1. Hold `Ctrl` & click on all the notes you want to export
-2. Right click & click on `{{exportAs}}`
+2. Right click & click `{{exportAs}}`
 3. Select your desired export format
 4. Wait a few moments while your notes are exported
 5. Save the `.zip` file at your desired location
 == Mobile
-1. Long press on a note to enter multi selection mode
-2. Tap on all the notes you want to export
-3. Press on the Export button on top right corner
+1. Long press a note to enter multi selection mode
+2. Tap all the notes you want to export
+3. Tap the Export button on top right corner
 4. Select the desired format
 5. Exported notes are stored in `Notesnook/exported` folder
 :::
@@ -55,17 +55,17 @@ On desktop and web, PDF is only offered when you export a **single note** — mu
 
 :::tabs key:platform
 == Desktop/Web
-1. Go to Settings
-2. Scroll down to `{{importExport}}` section
-3. Click on `{{backupExport}}`
-4. Click on `Select format` dropdown next to `{{exportAllNotes}}` heading
+1. Go to `{{settings}}`.
+2. Open `{{importExport}}`
+3. Click `{{backupExport}}`
+4. Click `Select format` dropdown next to `{{exportAllNotes}}` heading
 5. Select the desired format
 6. Enter account password for authentication
 7. Save the `.zip` file at your desired location
 == Mobile
-1. Go to Settings from Sidebar
-2. Scroll down to `{{backupRestore}}`
-3. Tap on `{{exportAllNotes}}`
+1. Go to `{{settings}}`.
+2. Open `{{backupRestore}}`
+3. Tap `{{exportAllNotes}}`
 4. Select the desired format
 5. Enter account password for authentication
 6. Exported notes are stored in `Notesnook/exported` folder as a single .zip file

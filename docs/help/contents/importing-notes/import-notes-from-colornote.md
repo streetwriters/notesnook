@@ -18,7 +18,7 @@ The following steps will help you import your notes from ColorNote easily.
 3. Open the Notesnook app (web or desktop).
 4. Go to `Settings > Import & export > Notesnook Importer` and select `ColorNote` from list of apps.
 5. Drop the backup file you exported earlier in the box or click anywhere to open system file picker to select the backup. 
-6. Click on "Start importing" and enter the password you used while creating the backup in the popup.
+6. Click "Start importing" and enter the password you used while creating the backup in the popup.
 7. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, [report it on github](https://github.com/streetwriters/notesnook).
 
 <GetNotesnook title="Your notes, encrypted the moment they land" text="Notesnook imports run entirely on your device — not one byte of your ColorNote export is sent to our servers. Once imported, everything is end-to-end encrypted and syncs to all your devices for free." />
