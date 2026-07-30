@@ -3,7 +3,7 @@ title: Install from file
 description: Install a custom Notesnook theme directly from a theme.json file on mobile, desktop or web.
 ---
 
-## Install a theme directly from theme.json file
+# Install a theme directly from theme.json file
 
 In both mobile and desktop/web apps, you can install themes directly from a JSON theme file.
 

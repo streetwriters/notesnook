@@ -1,5 +1,5 @@
 ---
-title: Publish a theme
+title: Publish a new theme
 description: Submit your custom Notesnook theme to the official themes repository so anyone can install it.
 ---
 
