@@ -31,7 +31,7 @@ const tier = computed(() => PLANS[props.plan.toLowerCase()] ?? PLANS.pro);
 </script>
 
 <template>
-  <span class="nn-plan-tag" :class="`nn-plan-tag--${plan.toLowerCase()}`" :title="tier.title">
+  <span class="nn-plan-tag ignore-header" :class="`nn-plan-tag--${plan.toLowerCase()}`" :title="tier.title">
     {{ tier.label }}
     <span v-if="note" class="nn-plan-tag__note">· {{ note }}</span>
   </span>

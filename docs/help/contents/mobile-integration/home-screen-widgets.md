@@ -9,6 +9,7 @@ Basic home screen widgets are availble on both Android & iOS for quick note taki
 
 :::tabs key:platform
 == iOS
+
 1. Long press on home screen
 2. Tap on the + button on top left
 3. Select Notesnook Quick Note widget and add it to home screen
@@ -16,7 +17,9 @@ Basic home screen widgets are availble on both Android & iOS for quick note taki
 ![Home widget](/static/mobile-integration/ios-quick-note-widget.png)
 
 4. Tap on the widget to directly launch the editor in the app.
+
 == Android
+
 1. Long press on home screen
 2. Tap on widgets
 3. Add Notesnook widget to home screen
@@ -24,17 +27,17 @@ Basic home screen widgets are availble on both Android & iOS for quick note taki
 ![Home widget](/static/mobile-integration/android-quick-note-widget.png)
 
 4. Tap on the widget to quickly take a note without launching the app.
-:::
+   :::
 
 ## Which widgets are available?
 
 Android ships three widgets; iOS ships one.
 
-| Widget | Android | iOS | What it does |
-| --- | --- | --- | --- |
-| `{{quickNoteTitle}}` (`Quick Note` on iOS) | Yes | Yes | Opens a small note-taking screen straight from the home screen. |
-| `{{note}}` | Yes | No | Shows the title and first line of a note you pick, and opens that note when tapped. |
-| `{{reminders}}` | Yes | No | Lists your upcoming reminders and lets you add a new one. |
+| Widget                                     | Android | iOS | What it does                                                                        |
+| ------------------------------------------ | ------- | --- | ----------------------------------------------------------------------------------- |
+| `{{quickNoteTitle}}` (`Quick Note` on iOS) | Yes     | Yes | Opens a small note-taking screen straight from the home screen.                     |
+| `{{note}}`                                 | Yes     | No  | Shows the title and first line of a note you pick, and opens that note when tapped. |
+| `{{reminders}}`                            | Yes     | No  | Lists your upcoming reminders and lets you add a new one.                           |
 
 ### Quick note
 

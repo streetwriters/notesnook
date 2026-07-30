@@ -16,27 +16,34 @@ Sharing a note with someone can be such a tedious task. You have to copy/downloa
 With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in a single click. Once a note is published as a monograph, you get a public URL which you can share with anyone. They don't need to download Notesnook or install any extra software — it's just like a blog, only simpler.
 
 ::: warning Size limit
-Currently, monographs are limited to 15 MB in size. This includes attachments as well. If you try to publish a note larger than 15 MB, you'll get an error.
+Currently, monographs are limited to 15 MB in size. This also includes attachments, like images. If you try to publish a note larger than 15 MB, you'll get an error.
 :::
 
 ## How to publish a note?
 
+::: warning A monograph is a public URL
+Anyone with the link can open a monograph unless you set a password. Notesnook cannot tell who has opened it, and an unprotected monograph can be indexed if the link is posted publicly. Use password protection for anything sensitive, and unpublish when you are done.
+:::
+
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on a note
 2. Click on `{{publish}}` from Note properties to open publish note dialog.
 3. Click on `{{publish}}` button to publish note.
 4. Copy the URL and send it to respective person.
+
 == Mobile
+
 1. Tap on ![Three dot button](/three-dot-button.png) button on a note.
 2. Tap on `{{publish}}` to open Publish note sheet
 3. Tap on `{{publish}}` button to publish note.
 4. Copy the URL and send it to respective person.
-:::
+   :::
 
 ## Password protection
 
-When you are sharing sensitive information with someone, you can encrypt the monograph with a password. Only someone who has the password can decrypt and read the contents of the note. While you are on the Publish note dialog, turn on password protection and enter a password for the monograph. Then click publish to publish the note.
+When you are sharing sensitive information with someone, you can encrypt the monograph with a password. Only someone who has the password can decrypt and read the contents of the note. While you are on the Publish note dialog, enter a password for the monograph. Then click publish to publish the note.
 
 ## Self destruct
 
@@ -46,16 +53,23 @@ Self destruct means that the published note can be viewed only once. Once someon
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on a note
 2. Click on `{{publish}}` to open publish note popup
 3. Click on `{{unpublish}}` button to unpublish note
+
 == Mobile
+
 1. Tap on ![Three dot button](/three-dot-button.png) button on a published note
 2. Tap on `{{publish}}` to open Publish note sheet
 3. Tap on `{{unpublish}}` button to unpublish note
-:::
+   :::
 
 ## Once a note is published
+
+:::warning
+**Published notes cannot be deleted while published.**
+:::
 
 Opening `{{publish}}` on a note that is already published gives you the full set of actions rather than a single toggle:
 
@@ -73,15 +87,6 @@ The publish view shows how many times a monograph has been opened. View counts a
 ## Links and embeds in a published note <PlanTag plan="essential" />
 
 Links and embedded content inside a note are preserved in the published monograph on the [Essential plan and above](/plans-and-limits).
-
-## What cannot be published
-
-- **Locked notes.** A note in the [private vault](/lock-notes-with-private-vault) cannot be published — unlock it first if you want to share it.
-- A **published note cannot be moved to trash**. Unpublish it first, then delete it.
-
-::: warning A monograph is a public URL
-Anyone with the link can open a monograph unless you set a password. Notesnook cannot tell who has opened it, and an unprotected monograph can be indexed if the link is posted publicly. Use password protection for anything sensitive, and unpublish when you are done.
-:::
 
 ## Related pages
 

@@ -13,6 +13,7 @@ Free accounts can have up to 10 active reminders at a time. Essential raises the
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on a note to open the `Note properties` menu
 2. Click on `{{remindMe}}` to open the add reminder dialog
 3. Enter a title for the reminder and description (optional)
@@ -21,7 +22,9 @@ Free accounts can have up to 10 active reminders at a time. Essential raises the
    - **Repeat** (paid plans only): Create a recurring reminder (daily, weekly, monthly, or yearly)
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Click `{{add}}` to save the reminder
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on a note
 2. Tap `{{remindMe}}` to open the add reminder dialog
 3. Enter a title for the reminder and description (optional)
@@ -31,7 +34,7 @@ Free accounts can have up to 10 active reminders at a time. Essential raises the
    - **Permanent** _(Android only)_: A persistent reminder that shows up every day
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Tap the checkmark button on top right to save the reminder
-:::
+   :::
 
 ## Creating a standalone reminder
 
@@ -39,20 +42,23 @@ You can also create reminders without attaching them to a specific note. This is
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to the `{{reminders}}` screen from the side menu
 2. Click the add reminder button (![Plus icon](/plus-reminder-icon.png)) on top right
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type (Once or Repeat)
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Click `{{add}}` to save the reminder
+
 == Mobile
+
 1. Go to the `{{reminders}}` screen from the side menu
 2. Tap the add reminder button (![Plus icon](/plus-button-mobile.png)) on bottom right
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type (Once, Repeat, or Permanent on Android)
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Tap the checkmark button on top right to save the reminder
-:::
+   :::
 
 ## Configuring recurring reminders <PlanTag plan="essential" />
 
@@ -67,8 +73,6 @@ When you select **Repeat** mode, you can customize how often you want to be remi
 - **Monthly**: Pick specific dates of the month
 - **Yearly**: Choose the month and day for your yearly reminder
 
----
-
 ## Notification preferences
 
 Choose how you want to be notified:
@@ -80,8 +84,6 @@ Choose how you want to be notified:
 ::: info
 Reminders require notification permissions. You'll be asked to enable notifications when you create your first reminder.
 :::
-
----
 
 ## Editing or viewing reminders
 
@@ -95,14 +97,17 @@ Deactivating a reminder stops it from notifying you without deleting it, so you 
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to the `{{reminders}}` screen from the side menu.
 2. Right click on the reminder.
 3. Click `{{deactivate}}` to switch it off, or `{{activate}}` to switch it back on.
+
 == Mobile
+
 1. Go to the `{{reminders}}` screen from the side menu.
 2. Press the ![Three dot button](/three-dot-button.png) button on the reminder.
 3. Tap `{{turnOffReminder}}` to switch it off, or `{{turnOnReminder}}` to switch it back on.
-:::
+   :::
 
 ## Snooze a reminder
 
@@ -110,11 +115,13 @@ When a reminder fires you can push it back instead of dismissing it.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the reminder notification. The reminder preview opens.
 2. Under `{{remindMeIn}}`, click `5 minutes`, `10 minutes`, `15 minutes` or `1 hour`.
 
 The reminder fires again after the interval you picked.
 == Mobile
+
 1. Expand the reminder notification in your notification shade.
 2. Tap the snooze action on it — `Remind in 5 min` on Android, `Remind me in 5 min` on iOS. Both labels show your default snooze time.
 
@@ -135,9 +142,7 @@ The default is `5` minutes. This is the interval the snooze button on a reminder
 
 On Android 8 and above this opens the system notification channel settings for Notesnook's urgent reminder channel, where the sound is set. On older Android versions you pick the sound from a list inside the app. There is no sound setting on iOS.
 
----
-
-## Permanent reminders (Android only)
+## Permanent reminders <PlanTag plan="essential" note="Android only"/>
 
 **Permanent reminders** are available only on Android devices. Unlike one-time or recurring reminders, permanent reminders persist every day and won't disappear after triggering. This is useful for important daily tasks or notes you want constant access to.
 

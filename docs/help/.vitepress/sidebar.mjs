@@ -21,13 +21,22 @@ export const sidebar = [
     text: "Organizing notes",
     collapsed: false,
     items: [
-      { text: "Notebooks", link: "/organizing-notes/organize-notes-using-notebooks" },
+      {
+        text: "Notebooks",
+        link: "/organizing-notes/organize-notes-using-notebooks"
+      },
       { text: "Tags", link: "/organizing-notes/organize-notes-using-tags" },
       { text: "Colors", link: "/organizing-notes/organize-notes-using-colors" },
-      { text: "Favorites", link: "/organizing-notes/organize-notes-using-favorites" },
+      {
+        text: "Favorites",
+        link: "/organizing-notes/organize-notes-using-favorites"
+      },
       { text: "Pins", link: "/organizing-notes/pin-notes" },
       { text: "Archive", link: "/organizing-notes/archive-notes" },
-      { text: "Side menu shortcuts", link: "/organizing-notes/side-menu-shortcuts" },
+      {
+        text: "Side menu shortcuts",
+        link: "/organizing-notes/side-menu-shortcuts"
+      },
       { text: "Reminders", link: "/reminders" }
     ]
   },
@@ -46,18 +55,33 @@ export const sidebar = [
     text: "Editor",
     collapsed: false,
     items: [
-      { text: "Editor toolbar", link: "/rich-text-editor/rich-text-editor-toolbar" },
+      {
+        text: "Editor toolbar",
+        link: "/rich-text-editor/rich-text-editor-toolbar"
+      },
       { text: "Tabs & panes", link: "/rich-text-editor/editor-tabs-and-panes" },
-      { text: "Personalizing the editor", link: "/rich-text-editor/personalizing-rich-text-editor" },
-      { text: "Markdown shortcuts", link: "/rich-text-editor/markdown-notes-editing" },
-      { text: "Headings", link: "/rich-text-editor/headings-and-collapsible-sections" },
+      {
+        text: "Personalizing the editor",
+        link: "/rich-text-editor/personalizing-rich-text-editor"
+      },
+      {
+        text: "Markdown shortcuts",
+        link: "/rich-text-editor/markdown-notes-editing"
+      },
+      {
+        text: "Headings",
+        link: "/rich-text-editor/headings-and-collapsible-sections"
+      },
       { text: "Tables", link: "/rich-text-editor/tables" },
       { text: "Task lists", link: "/rich-text-editor/task-and-todo-lists" },
       { text: "Outline lists", link: "/rich-text-editor/outline-lists" },
       { text: "Callouts", link: "/rich-text-editor/callouts" },
       { text: "Code blocks", link: "/rich-text-editor/code-blocks" },
       { text: "Math & formulas", link: "/rich-text-editor/math-and-formulas" },
-      { text: "Images & embeds", link: "/rich-text-editor/images-attachments-and-embeds" },
+      {
+        text: "Images & embeds",
+        link: "/rich-text-editor/images-attachments-and-embeds"
+      },
       { text: "Find & replace", link: "/rich-text-editor/search-and-replace" }
     ]
   },
@@ -67,27 +91,63 @@ export const sidebar = [
     items: [
       { text: "Overview", link: "/importing-notes/" },
       { text: "Evernote", link: "/importing-notes/import-notes-from-evernote" },
-      { text: "Google Keep", link: "/importing-notes/import-notes-from-googlekeep" },
+      {
+        text: "Google Keep",
+        link: "/importing-notes/import-notes-from-googlekeep"
+      },
       { text: "Joplin", link: "/importing-notes/import-notes-from-joplin" },
       { text: "Obsidian", link: "/importing-notes/import-notes-from-obsidian" },
-      { text: "Simplenote", link: "/importing-notes/import-notes-from-simplenote" },
-      { text: "Standard Notes", link: "/importing-notes/import-notes-from-standardnotes" },
-      { text: "ColorNote", link: "/importing-notes/import-notes-from-colornote" },
+      {
+        text: "Simplenote",
+        link: "/importing-notes/import-notes-from-simplenote"
+      },
+      {
+        text: "Standard Notes",
+        link: "/importing-notes/import-notes-from-standardnotes"
+      },
+      {
+        text: "ColorNote",
+        link: "/importing-notes/import-notes-from-colornote"
+      },
       { text: "UpNote", link: "/importing-notes/import-notes-from-upnote" },
-      { text: "Skiff Pages", link: "/importing-notes/import-notes-from-skiff-pages" },
-      { text: "Zoho Notebook", link: "/importing-notes/import-notes-from-zoho-notebook" },
-      { text: "Fusebase (Nimbus Note)", link: "/importing-notes/import-notes-from-fusebase" },
-      { text: "Markdown files", link: "/importing-notes/import-notes-from-markdown-files" },
-      { text: "HTML files", link: "/importing-notes/import-notes-from-html-files" },
-      { text: "Plaintext files", link: "/importing-notes/import-notes-from-plaintext-files" },
-      { text: "TextBundle files", link: "/importing-notes/import-notes-from-textbundle-files" }
+      {
+        text: "Skiff Pages",
+        link: "/importing-notes/import-notes-from-skiff-pages"
+      },
+      {
+        text: "Zoho Notebook",
+        link: "/importing-notes/import-notes-from-zoho-notebook"
+      },
+      {
+        text: "Fusebase (Nimbus Note)",
+        link: "/importing-notes/import-notes-from-fusebase"
+      },
+      {
+        text: "Markdown files",
+        link: "/importing-notes/import-notes-from-markdown-files"
+      },
+      {
+        text: "HTML files",
+        link: "/importing-notes/import-notes-from-html-files"
+      },
+      {
+        text: "Plaintext files",
+        link: "/importing-notes/import-notes-from-plaintext-files"
+      },
+      {
+        text: "TextBundle files",
+        link: "/importing-notes/import-notes-from-textbundle-files"
+      }
     ]
   },
   {
     text: "Backup & export",
     collapsed: false,
     items: [
-      { text: "Backup and restore", link: "/backup-and-restore-notes-in-notesnook" },
+      {
+        text: "Backup and restore",
+        link: "/backup-and-restore-notes-in-notesnook"
+      },
       { text: "Exporting notes", link: "/export-notes-from-notesnook" },
       { text: "Attachments & files", link: "/attachments-and-files" }
     ]
@@ -133,20 +193,44 @@ export const sidebar = [
     text: "Mobile",
     collapsed: false,
     items: [
-      { text: "Home screen widgets", link: "/mobile-integration/home-screen-widgets" },
-      { text: "Android quick actions", link: "/mobile-integration/android-quick-actions" },
-      { text: "Pin to notifications", link: "/mobile-integration/pin-notes-to-notifications" },
-      { text: "Quick notes", link: "/mobile-integration/quick-note-from-notification" },
-      { text: "Share from other apps", link: "/mobile-integration/share-things-from-other-apps" }
+      {
+        text: "Home screen widgets",
+        link: "/mobile-integration/home-screen-widgets"
+      },
+      {
+        text: "Android quick actions",
+        link: "/mobile-integration/android-quick-actions"
+      },
+      {
+        text: "Pin to notifications",
+        link: "/mobile-integration/pin-notes-to-notifications"
+      },
+      {
+        text: "Quick notes",
+        link: "/mobile-integration/quick-note-from-notification"
+      },
+      {
+        text: "Share from other apps",
+        link: "/mobile-integration/share-things-from-other-apps"
+      }
     ]
   },
   {
     text: "Desktop",
     collapsed: false,
     items: [
-      { text: "Auto start", link: "/desktop-integration/auto-start-on-system-startup" },
-      { text: "System tray menu", link: "/desktop-integration/system-tray-menu" },
-      { text: "Jumplist & dock menu", link: "/desktop-integration/jumplist-and-dock-menu" },
+      {
+        text: "Auto start",
+        link: "/desktop-integration/auto-start-on-system-startup"
+      },
+      {
+        text: "System tray menu",
+        link: "/desktop-integration/system-tray-menu"
+      },
+      {
+        text: "Jumplist & dock menu",
+        link: "/desktop-integration/jumplist-and-dock-menu"
+      },
       { text: "Spell checker", link: "/desktop-integration/spell-checker" },
       {
         text: "Updates & advanced",
@@ -161,8 +245,14 @@ export const sidebar = [
       { text: "Customizing the app", link: "/customizing-notesnook" },
       { text: "Using themes", link: "/custom-themes/using-themes" },
       { text: "How themes work", link: "/custom-themes/introduction" },
-      { text: "Theme Builder", link: "/custom-themes/create-a-theme-with-theme-builder" },
-      { text: "Install from file", link: "/custom-themes/install-a-theme-from-file" },
+      {
+        text: "Theme Builder",
+        link: "/custom-themes/create-a-theme-with-theme-builder"
+      },
+      {
+        text: "Install from file",
+        link: "/custom-themes/install-a-theme-from-file"
+      },
       { text: "Publish a theme", link: "/custom-themes/publish-a-theme" }
     ]
   },
@@ -182,8 +272,11 @@ export const sidebar = [
     collapsed: false,
     items: [
       { text: "Inbox API", link: "/inbox-api/getting-started" },
-      { text: "Self-hosting the Inbox API", link: "/inbox-api/self-hosting-inbox-api" },
-      { text: "Self-hosting Notesnook", link: "/self-hosting" },
+      {
+        text: "Self-hosting the Inbox API",
+        link: "/inbox-api/self-hosting-inbox-api"
+      },
+      //      { text: "Self-hosting Notesnook", link: "/self-hosting" },
       { text: "Notesnook Wrapped", link: "/notesnook-wrapped" }
     ]
   },
@@ -191,9 +284,15 @@ export const sidebar = [
     text: "FAQs",
     collapsed: false,
     items: [
-      { text: "What are merge conflicts?", link: "/faqs/what-are-merge-conflicts" },
+      {
+        text: "What are merge conflicts?",
+        link: "/faqs/what-are-merge-conflicts"
+      },
       { text: "Is there an ETA for X feature?", link: "/faqs/is-there-an-eta" },
-      { text: "Login to upload attachments", link: "/faqs/login-to-upload-attachments" },
+      {
+        text: "Login to upload attachments",
+        link: "/faqs/login-to-upload-attachments"
+      },
       {
         text: "Login to restore attachments",
         link: "/faqs/login-to-restore-attachments-in-backup"

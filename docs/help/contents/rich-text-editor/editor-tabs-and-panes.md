@@ -19,6 +19,7 @@ The Notesnook editor keeps every note you open in a tab, so you can jump between
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right-click a note in the list and choose `{{openInNewTab}}`. Middle-clicking the note does the same thing.
 2. Or click the `{{newTab}}` button in the editor's top bar to open an empty tab, then start writing.
 
@@ -26,16 +27,17 @@ You can also drag a note from the list onto the tab strip to open it in a new ta
 
 In the desktop app there are keyboard shortcuts for all of this:
 
-| Action | Shortcut |
-| --- | --- |
-| New tab | `Ctrl+T` |
-| Close the active tab | `Ctrl+W` |
-| Close all tabs | `Ctrl+Shift+W` |
-| Next tab | `Ctrl+Tab` |
-| Previous tab | `Ctrl+Shift+Tab` |
+| Action               | Shortcut         |
+| -------------------- | ---------------- |
+| New tab              | `Ctrl+T`         |
+| Close the active tab | `Ctrl+W`         |
+| Close all tabs       | `Ctrl+Shift+W`   |
+| Next tab             | `Ctrl+Tab`       |
+| Previous tab         | `Ctrl+Shift+Tab` |
 
 In the web app the browser owns most of those combinations, so only tab switching is bound: `Ctrl+Alt+→` for the next tab and `Ctrl+Alt+←` for the previous one. On macOS use `Command` wherever the table says `Ctrl`.
 == Mobile
+
 1. Open a note. It takes over the current tab.
 2. To keep it and start another note, tap the **number badge** in the editor header — it shows how many tabs are open — and then tap `+` in the `Tabs` sheet.
 
@@ -121,7 +123,7 @@ Previewing a PDF attachment opens it in a full-screen viewer instead of a pane.
 
 :::tabs key:platform
 == Desktop/Web
-Click `{{focusMode}}` in the status bar at the bottom of the window. The side menu and the notes list disappear and only the editor is left. Click `{{normalMode}}` to bring them back.
+Click the sunglasses in the status bar at the bottom of the window. The side menu and the notes list disappear and only the editor is left. Click the glasses again to bring them back.
 
 While focus mode is on, a second button appears next to it: `{{enterFullScreen}}`. That one hands the whole screen to Notesnook; `{{exitFullScreen}}` or the `Esc` key returns you to the window.
 == Mobile
@@ -159,9 +161,9 @@ Each one shows the total, and how many are inside your current selection.
 
 ::: warning Very long notes stop saving automatically
 Above **100,000 words** the status bar shows `{{autoSaveOff}}`. From then on the note is saved only when you ask it to — press `Ctrl+S`, or click the save indicator at the right of the status bar (`{{clickToSave}}`). The same indicator tells you whether the current note is saved.
-:::
+Even when autosave is off, notes are still saved when you switch away from the current editor tab.
 == Mobile
-Word and character statistics are shown on desktop and web only.
+Word statistics are shown at the top left of the editor. Tapping the count flips the view to the current character count.
 :::
 
 ## Related pages

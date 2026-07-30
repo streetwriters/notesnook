@@ -24,6 +24,7 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
 
 2. Click on `Connect with Notesnook`
 3. Notesnook web app will open in a new tab in the background. Wait a few seconds and the web clipper should automatically connect.
+
    ::: details What to do if the web clipper doesn't connect?
    There are a few things you can do to troubleshoot:
 
@@ -31,7 +32,7 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
    2. Make sure you have the Notesnook web app opened in the background
    3. The web clipper doesn't yet support multiple browser windows so make sure there aren't any additional browser windows opened in the background.
    4. Try restarting the browser
-   :::
+      :::
 
 ## Selecting the clipping area
 
@@ -56,8 +57,10 @@ The `Visible area` mode clips only the nodes that fit in the viewport. Any nodes
 The `Selected nodes` mode allows you to select exactly which nodes you want to clip:
 
 1. Select the `Selected nodes` mode from the Notesnook Web Clipper
-2. You should now see a small popup in the bottom-right corner of the page
-   ![The selected-nodes popup shown in the bottom-right corner of the page](/static/web-clipper/selected-nodes-popup.png)
+2. You should now see a small popup in the bottom-right corner of the page.
+
+![The selected-nodes popup shown in the bottom-right corner of the page](/static/web-clipper/selected-nodes-popup.png)
+
 3. Click on all the nodes you want to clip (they can be in any part of the screen).
    ::: info
    The web clipper stacks all the selected nodes vertically during final processing.
@@ -104,19 +107,24 @@ You can choose to append your web clip to an existing note and it'll be automati
 
 1. Click on `Select a note to append to`
 2. Select the note you want to append to
+
 == Add to notebook
+
 ::: info
 You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
 :::
 
 1. Click on `Select a notebook`
 2. Select the notebook you want to add the web clip to
+
 == Assign tags
+
 1. Click on `Assign a tag`
 2. Select the tag you want to assign (you can assign multiple tags)
 3. You can also create & assign a new tag by typing in the search bar
+
    ![Assigning a tag to a web clip from the web clipper](/static/web-clipper/assign-a-tag.gif)
-::::
+   ::::
 
 ## Saving your web clip
 

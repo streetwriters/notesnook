@@ -18,10 +18,13 @@ Every note has a menu of actions on it. Right click a note on desktop or web, or
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on a note in the list to open the `Note properties` menu.
 
 Some of the same switches also live in the editor: open a note, then click `{{properties}}` in the action bar at the top right.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on a note.
 
 The sheet that opens holds every action for that note.
@@ -33,8 +36,10 @@ The sheet that opens holds every action for that note.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Click `{{openInNewTab}}`.
+
 == Mobile
 There is no `{{openInNewTab}}` action on mobile.
 :::
@@ -45,11 +50,13 @@ There is no `{{openInNewTab}}` action on mobile.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note, or select several notes and right click.
 2. Open `{{notebooks}}`.
 3. Click `{{unlinkFromAll}}`.
 
 The action only appears when at least one of the selected notes is already in a notebook.
+
 == Mobile
 There is no bulk unlink action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{addToNotebook}}`, and unselect the notebooks one by one.
 :::
@@ -60,11 +67,13 @@ There is no bulk unlink action on mobile. Press the ![Three dot button](/three-d
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note, or select several notes and right click.
 2. Open `Tags`.
 3. Click `{{removeFromAll}}`.
 
 The action only appears when at least one of the selected notes already has a tag.
+
 == Mobile
 There is no bulk remove action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{addTags}}`, and remove the tags one by one.
 :::
@@ -75,14 +84,17 @@ There is no bulk remove action on mobile. Press the ![Three dot button](/three-d
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Click `{{readOnly}}`.
 
 The editor's `{{properties}}` panel has the same `{{readOnly}}` switch, and it applies to any note tab that is already open.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on the note.
 2. Press `{{readOnly}}`.
-:::
+   :::
 
 A read-only note shows a small pencil-lock icon in the notes list.
 
@@ -92,11 +104,14 @@ A read-only note shows a small pencil-lock icon in the notes list.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Click `{{duplicate}}`.
 
 `{{duplicate}}` also works on a multiple selection: select several notes first and every one of them is copied.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on the note.
 2. Press `{{duplicate}}`.
 
@@ -109,27 +124,33 @@ A `{{noteDuplicated}}` toast confirms it.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Click `{{copyLink}}`.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on the note.
 2. Press `{{copyLink}}`.
-:::
+   :::
 
 Either way a `{{linkCopied}}` toast confirms it.
 
 ## Copy a note as text or Markdown
 
-This copies the note's *content* to the clipboard, not a link to it — for pasting into an email, a chat, or another app.
+This copies the note's _content_ to the clipboard, not a link to it — for pasting into an email, a chat, or another app.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Open `{{copyAs}}`.
 3. Choose `Text` for plain text, or `Markdown` to keep headings, lists, bold and links as Markdown syntax.
 
 A `{{noteCopied}}` toast confirms it.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on the note.
 2. Press `{{copy}}`.
 
@@ -142,10 +163,12 @@ If the note is in your [private vault](/lock-notes-with-private-vault) you'll be
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Click `{{print}}`.
 
 The note is rendered as a PDF and handed to your system print dialog, so you can send it to a printer or save it as a PDF file.
+
 == Mobile
 There is no print action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{export}}`, choose `PDF`, and print or share the resulting file from there.
 :::
@@ -156,6 +179,7 @@ Useful after an import, when notes arrive stamped with the day you imported them
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open the note.
 2. Click `{{properties}}` in the action bar at the top right.
 3. Next to `{{createdAt}}`, click the pencil icon.
@@ -163,8 +187,9 @@ Useful after an import, when notes arrive stamped with the day you imported them
 5. Click `{{save}}`.
 
 The creation date cannot be later than the note's last edited date. If you pick a later one, Notesnook refuses with `{{creationDateCannotBeAfterLastEditedDate}}`.
+
 == Mobile
-Editing a note's creation date is not available on mobile. Do it on the desktop app or on web — the change syncs to your phone.
+Editing a note's creation date is not available on mobile. Do it on the desktop app or on web, the change will sync to your phone.
 :::
 
 ## Keep a note off sync
@@ -177,12 +202,15 @@ Turning `{{syncOff}}` on for a note deletes it from every other device you're si
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on the note.
 2. Click `{{syncOff}}`.
 3. Confirm `Prevent note from syncing` with `{{yes}}`.
 
-Turning it back off syncs the note again from that device. The editor `{{properties}}` panel carries the same switch, labelled `{{disableSync}}`. The action only appears when you're logged in.
+Turning it off syncs the note again from that device. The editor `{{properties}}` panel carries the same switch, labelled `{{disableSync}}`. The action only appears when you're logged in.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on the note.
 2. Press `{{syncOff}}`.
 
@@ -197,14 +225,17 @@ A local-only note shows a crossed-out sync icon in the notes list.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open the note.
 2. Click `{{properties}}` in the action bar at the top right.
 3. Switch between `{{linkedNotes}}` and `{{referencedIn}}` at the top of the panel.
+
 == Mobile
+
 1. Press the ![Three dot button](/three-dot-button.png) button on the note.
 2. Press `{{references}}`.
 3. Switch between the `{{linkedNotes}}` and `{{referencedIn}}` tabs.
-:::
+   :::
 
 See [note links](/note-links-and-backlinks) for what these lists contain and how to jump to an individual paragraph.
 

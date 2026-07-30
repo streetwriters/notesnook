@@ -11,8 +11,8 @@ keywords:
 
 # Quick actions on Android
 
-::: danger This page is Android only.
-The iOS app has its own share extension — see [share things from other apps](/mobile-integration/share-things-from-other-apps).
+::: info This page is Android only.
+The iOS app has its own share extension — see [share things from other apps.](/mobile-integration/share-things-from-other-apps)
 :::
 
 Android gives Notesnook three ways to start writing without opening the app first, plus a way to pin any note, notebook, tag or color to your launcher.

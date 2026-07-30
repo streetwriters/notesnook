@@ -17,43 +17,49 @@ A code block keeps code as code: monospaced, syntax highlighted, indentation pre
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Place the cursor on an empty line.
 2. Click the `+` (Insert) button in the toolbar.
 3. Choose `Code block`.
 
 You can also press `Ctrl+Shift+C` (`⌘+Shift+C` on macOS). If you press it with text selected, the selected text becomes the code block's contents, line breaks and all. Pressing it again while the cursor is inside a code block turns the block back into normal paragraphs.
+
 == Mobile
+
 1. Place the cursor on an empty line.
 2. Tap the `+` (Insert) button in the bottom toolbar.
 3. Choose `Code block` from the `Choose a block to insert` sheet.
-:::
+   :::
 
 ![The insert block menu in the Notesnook editor, with Code block listed alongside Task list, Outline list, Math & formulas and Callout](/screenshots/editor-insert-block-menu.png)
 
-### Type ` ``` ` instead
+### Type ` ``` ` instead <PlanTag plan="essential"/>
 
-On an empty line, type three backticks followed by a space or Enter — ` ``` ` — and the line becomes a code block. Add a language name straight after the backticks to set the language at the same time: ` ```javascript `. The name has to be plain lowercase letters, so ` ```c++ ` and ` ```objective-c ` won't trigger it — pick those from the language menu instead. Three tildes (` ~~~ `) work the same way.
+On an empty line, type three backticks followed by a space or Enter — ` ``` ` — and the line becomes a code block. Add a language name straight after the backticks to set the language at the same time: ` ```javascript `. The name has to be plain lowercase letters, so ` ```c++ ` and ` ```objective-c ` won't trigger it — pick those from the language menu instead. Three tildes (`~~~`) work the same way.
 
-::: info Markdown shortcuts need Essential
-Typing ` ``` ` relies on [Markdown shortcuts](/rich-text-editor/markdown-notes-editing), which are part of the [Essential plan and above](/plans-and-limits). They are **off by default on web and desktop** — turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}` first. On mobile they are on by default. The toolbar button and `Ctrl+Shift+C` work on every plan.
+::: info Markdown shortcuts need to be enabled.
+Typing ` ``` ` relies on [Markdown shortcuts.](/rich-text-editor/markdown-notes-editing) They are **off by default on web and desktop** — turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}` first. On mobile they are on by default. The toolbar button and `Ctrl+Shift+C` work on every plan.
 :::
 
 ## Choose the language
 
 ![A code block in the Notesnook editor showing the footer bar with the caret position, indentation mode, language and copy button](/screenshots/editor-code-block.png)
 
-Every code block has a language button in the bar along its bottom edge showing the current language — `Plaintext` until you change it.
+Every code block has a language button in the bar along its bottom edge showing the current language. The default is `Plaintext` until you change the language once.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click the language name at the bottom of the code block.
 2. Type in the `{{searchLanguages}}` box to filter the list — it matches both language names and their aliases (searching `js` finds JavaScript).
 3. Click the language you want, or press `Enter` to take the first result.
+
 == Mobile
+
 1. Tap the language name at the bottom of the code block.
 2. In the `{{selectLanguage}}` sheet, type in `{{searchLanguages}}` to filter the list.
 3. Tap the language you want.
-:::
+   :::
 
 There are **297 languages** to choose from, each highlighted with its own grammar.
 
