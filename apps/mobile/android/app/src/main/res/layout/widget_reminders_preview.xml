@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="2dp"
-            android:text="Upcoming Reminders"
+            android:text="Reminders"
             android:textColor="@color/text"
             android:textSize="16sp"
             android:textStyle="bold" />

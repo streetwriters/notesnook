@@ -23,7 +23,7 @@
             android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="@color/text"
-            android:text="Upcoming Reminders"/>
+            android:text="Reminders"/>
 
         <ImageButton
             android:layout_width="25dp"
