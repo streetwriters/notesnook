@@ -114,7 +114,6 @@ export default class Lookup {
   ): Promise<VirtualizedGrouping<HighlightedResult>> {
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
     const excludedIds = this.db.trash.cache.notes;
-
     const {
       content,
       title,

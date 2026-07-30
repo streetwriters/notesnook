@@ -74,13 +74,21 @@ export interface RouteParams extends ParamListBase {
   Tags: GenericRouteParam;
   Favorites: GenericRouteParam;
   Trash: GenericRouteParam;
-  Search: {
-    placeholder: string;
-    type: ItemType;
-    title: string;
-    route: RouteName;
-    items?: FilteredSelector<Item>;
-  };
+  Search:
+    | {
+        placeholder: string;
+        type: "note";
+        title: string;
+        route: RouteName;
+        items: FilteredSelector<Note>;
+      }
+    | {
+        placeholder: string;
+        type: Exclude<ItemType, "note">;
+        title: string;
+        route: RouteName;
+        items?: FilteredSelector<Item>;
+      };
   TaggedNotes: NotesScreenParams;
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
