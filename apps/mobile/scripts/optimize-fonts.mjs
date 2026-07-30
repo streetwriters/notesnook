@@ -128,7 +128,8 @@ const EXTRA_ICON_NAMES = [
   "identifier",
   "image-area",
   "clock-outline",
-  "delete-sweep-outline"
+  "delete-sweep-outline",
+  "sync"
 ];
 
 const __filename = fileURLToPath(import.meta.url);

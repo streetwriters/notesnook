@@ -48,6 +48,8 @@ export interface UserStore {
   disableAppLockRequests: boolean;
   setDisableAppLockRequests: (disableAppLockRequests: boolean) => void;
   profile?: Partial<Profile>;
+  isLoggingOut: boolean;
+  setIsLoggingOut: (value: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -95,5 +97,7 @@ export const useUserStore = create<UserStore>((set) => ({
       set({ disableAppLockRequests: false });
     }, 1000);
   },
-  profile: undefined
+  profile: undefined,
+  isLoggingOut: false,
+  setIsLoggingOut: (value) => set({ isLoggingOut: value })
 }));
