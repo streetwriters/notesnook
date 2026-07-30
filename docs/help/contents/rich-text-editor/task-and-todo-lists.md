@@ -68,7 +68,7 @@ Notesnook supports unlimited subtasks under a single task item.
 == Mobile
 1. Move selection to the end of the parent task item
 2. Press `Enter` to create a new task item
-3. Tap on the Indent tool button in the toolbar to indent it into a sub task
+3. Tap the Indent tool button in the toolbar to indent it into a sub task
 :::
 
 Subtasks support the following features:

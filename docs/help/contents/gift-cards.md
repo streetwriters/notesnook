@@ -34,18 +34,18 @@ You can't redeem a gift code on an account with an active Notesnook subscription
 
 1. Go to `{{settings}}`
 2. Go to `{{subDetails}}`
-3. Click on `{{redeemGiftCode}}` button
+3. Click `{{redeemGiftCode}}` button
 4. Enter the gift code you received
-5. Click on `{{submit}}` and wait for the app to verify your gift code.
+5. Click `{{submit}}` and wait for the app to verify your gift code.
 6. Once the process succeeds, you should be upgraded to Pro.
 
 == Mobile
 
 1. Go to `{{settings}}`
 2. Go to `{{account}}`
-3. Tap on `{{redeemGiftCode}}`
+3. Tap `{{redeemGiftCode}}`
 4. Enter the gift code you received
-5. Tap on `{{redeem}}` and wait for the app to verify your gift code.
+5. Tap `{{redeem}}` and wait for the app to verify your gift code.
 6. Once the process succeeds, you should be upgraded to Pro.
    :::
 

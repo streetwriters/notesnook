@@ -9,7 +9,7 @@ You are in a note taking app, the first thing you'd want to do is create a note.
 
 ::::tabs key:platform
 == Desktop/Web
-1.  Click on the `+` button on top right corner or click anywhere inside the editor to focus it.
+1.  Click the `+` button on top right corner or click anywhere inside the editor to focus it.
 2.  Start typing in the editor and a new note will be automatically created.
 3.  As you type, your note is saved automatically whenever you stop for a few seconds.
 

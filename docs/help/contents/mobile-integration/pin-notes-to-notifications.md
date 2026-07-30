@@ -14,7 +14,7 @@ Android allows you to add sticky/on-going notifications to the System Notificati
 
 ![Pinned notifications](/static/mobile-integration/android-pin-notification.png)
 
-1. Tap on the ![Three dot button](/three-dot-button.png) on a note
+1. Tap the ![Three dot button](/three-dot-button.png) on a note
 2. Select `{{pinToNotifications}}`
 3. The pinned note will appear in notifications permanently until you select `{{unpinFromNotifications}}` on it.
 

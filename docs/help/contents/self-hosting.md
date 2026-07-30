@@ -83,10 +83,10 @@ Public URLs are how the servers can generate valid publicly accessible URLs for 
 
 | Variable                        | Description                                                                                         | Example                                                         |
 | ------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `NOTESNOOK_APP_PUBLIC_URL`      | If you're self-hosting the web app too, you put the url to it here, otherwise, leave it alone.      | [https://app.notesnook.com/](/self-hosting#public-urls)         |
-| `MONOGRAPH_PUBLIC_URL`          | This is the url for the monograph server, it is also where published notes will be accessible from. | [https://monogr.ph/](/self-hosting#public-urls)                 |
-| `AUTH_SERVER_PUBLIC_URL`        | This is the url for the auth server.                                                                | [https://auth.streetwriters.co/](/self-hosting#public-urls)     |
-| `ATTACHMENTS_SERVER_PUBLIC_URL` | This is the url for the attachments server. It's where your attachments will be downloaded from.    | [https://attachments.notesnook.com/](/self-hosting#public-urls) |
+| `NOTESNOOK_APP_PUBLIC_URL`      | If you're self-hosting the web app too, you put the url to it here, otherwise, leave it alone.      | [https://app.notesnook.com/](#public-urls)         |
+| `MONOGRAPH_PUBLIC_URL`          | This is the url for the monograph server, it is also where published notes will be accessible from. | [https://monogr.ph/](#public-urls)                 |
+| `AUTH_SERVER_PUBLIC_URL`        | This is the url for the auth server.                                                                | [https://auth.streetwriters.co/](#public-urls)     |
+| `ATTACHMENTS_SERVER_PUBLIC_URL` | This is the url for the attachments server. It's where your attachments will be downloaded from.    | [https://attachments.notesnook.com/](#public-urls) |
 
 You don't need to configure the sse/events server's public url in the `.env` file, but it is required to forward it through your reverse proxy.
 
@@ -145,7 +145,7 @@ This guide will cover hosting Notesnook using a Cloudflare Tunnel, as we believe
 
 9. Restart your Docker containers by running `docker compose down` and `docker compose up -d`. In a moment, everything should start back up, and the continue button on the cloudflare dash will light up, allowing you to proceed.
 
-10. Now you add your domains that you configured earlier to the newly created tunnel. To do this, click on your new tunnel in the dashboard, then select `Routes` at the top.
+10. Now you add your domains that you configured earlier to the newly created tunnel. To do this, click your new tunnel in the dashboard, then select `Routes` at the top.
 
 11. Click `Add route`, then select `Published application`. You'll configure your subdomain, and for the `Service URL` field you should see the table below. Repeat this for each service listed.
 
@@ -155,17 +155,17 @@ If you changed ports for a service, **use the configured port** instead of the d
 
 | Service            | Service URL                                                             |
 | ------------------ | ----------------------------------------------------------------------- |
-| Sync server        | [http://notesnook-server:5264](/self-hosting/#exposing-to-the-internet) |
-| Monograph server   | [http://monograph-server:3000](/self-hosting/#exposing-to-the-internet) |
-| Events/SSE server  | [http://sse-server:7264](/self-hosting/#exposing-to-the-internet)       |
-| Attachments server | [http://notesnook-s3:9000](/self-hosting/#exposing-to-the-internet)     |
-| Auth server        | [http://identity-server:8264](/self-hosting/#exposing-to-the-internet)  |
+| Sync server        | [http://notesnook-server:5264](#exposing-to-the-internet) |
+| Monograph server   | [http://monograph-server:3000](#exposing-to-the-internet) |
+| Events/SSE server  | [http://sse-server:7264](#exposing-to-the-internet)       |
+| Attachments server | [http://notesnook-s3:9000](#exposing-to-the-internet)     |
+| Auth server        | [http://identity-server:8264](#exposing-to-the-internet)  |
 
 :::info
 The attachments server doesn't get entered into the client, the public url is used by the sync server to generate signed S3 links. Those are scoped to a specific hostname.
 :::
 
-You should now [configure your client](/self-hosting/#point-notesnook-at-your-own-servers) to ensure that everything is publicly accessible, everything should be now. The `{{testConnection}}` button is the easiest way to do this, as it will tell you which server is not reachable, should anything be wrong.
+You should now [configure your client](#point-notesnook-at-your-own-servers) to ensure that everything is publicly accessible, everything should be now. The `{{testConnection}}` button is the easiest way to do this, as it will tell you which server is not reachable, should anything be wrong.
 
 ## What servers do I need to configure in my client?
 

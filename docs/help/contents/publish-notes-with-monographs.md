@@ -28,16 +28,16 @@ Anyone with the link can open a monograph unless you set a password. Notesnook c
 :::tabs key:platform
 == Desktop/Web
 
-1. Right click on a note
-2. Click on `{{publish}}` from Note properties to open publish note dialog.
-3. Click on `{{publish}}` button to publish note.
+1. Right click a note
+2. Click `{{publish}}` from Note properties to open publish note dialog.
+3. Click `{{publish}}` button to publish note.
 4. Copy the URL and send it to respective person.
 
 == Mobile
 
-1. Tap on ![Three dot button](/three-dot-button.png) button on a note.
-2. Tap on `{{publish}}` to open Publish note sheet
-3. Tap on `{{publish}}` button to publish note.
+1. Tap ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap `{{publish}}` to open Publish note sheet
+3. Tap `{{publish}}` button to publish note.
 4. Copy the URL and send it to respective person.
    :::
 
@@ -54,15 +54,15 @@ Self destruct means that the published note can be viewed only once. Once someon
 :::tabs key:platform
 == Desktop/Web
 
-1. Right click on a note
-2. Click on `{{publish}}` to open publish note popup
-3. Click on `{{unpublish}}` button to unpublish note
+1. Right click a note
+2. Click `{{publish}}` to open publish note popup
+3. Click `{{unpublish}}` button to unpublish note
 
 == Mobile
 
-1. Tap on ![Three dot button](/three-dot-button.png) button on a published note
-2. Tap on `{{publish}}` to open Publish note sheet
-3. Tap on `{{unpublish}}` button to unpublish note
+1. Tap ![Three dot button](/three-dot-button.png) button on a published note
+2. Tap `{{publish}}` to open Publish note sheet
+3. Tap `{{unpublish}}` button to unpublish note
    :::
 
 ## Once a note is published

@@ -4,9 +4,9 @@ The source of [help.notesnook.com](https://help.notesnook.com), built with [Vite
 
 ```bash
 npm install
-npm run docs:dev      # http://localhost:5173
-npm run docs:build    # production build; fails on dead internal links
-npm run docs:preview  # serve the built site
+npm run dev      # http://localhost:5173
+npm run build    # production build; fails on dead internal links
+npm run preview  # serve the built site
 ```
 
 ## Where things are
@@ -27,13 +27,13 @@ Button and menu labels are written as string keys and resolved at build time fro
 Click on `{{archive}}` to archive the note.
 ```
 
-Rename that string in the app and this page updates on the next build. An unknown key fails the build. Run `npm run docs:strings` to see which hardcoded labels could become keys (`-- --fix` rewrites them). Don't add strings to `packages/intl` for the docs — if there's no key, write plain text.
+Rename that string in the app and this page updates on the next build. An unknown key fails the build. Run `npm run strings` to see which hardcoded labels could become keys (`-- --fix` rewrites them). Don't add strings to `packages/intl` for the docs — if there's no key, write plain text.
 
 ## Writing an article
 
 1. Create `contents/<section>/<slug>.md` with `title` (short, used in the sidebar) and `description` (one sentence, used as the search snippet) frontmatter.
 2. Add it to the right group in `.vitepress/sidebar.mjs`.
-3. Run `npm run docs:build` before opening a PR.
+3. Run `npm run build` before opening a PR.
 
 Steps that differ per platform go in tabs, which stay in sync across the whole site via `key:platform`:
 
@@ -59,7 +59,7 @@ Older versions are stored as **differences, not copies**. A page is shared by ev
 **When Notesnook ships a new version:**
 
 ```bash
-npm run docs:version -- 3.4
+npm run version -- 3.4
 ```
 
 Nothing is copied — 3.3 becomes an older version whose pages are all still shared with the root.
@@ -67,12 +67,12 @@ Nothing is copied — 3.3 becomes an older version whose pages are all still sha
 **When you change a page in a way that doesn't apply to the old version**, preserve the old text first, then edit the root copy as usual:
 
 ```bash
-npm run docs:fork -- 3.3 organizing-notes/archive-notes
+npm run fork -- 3.3 organizing-notes/archive-notes
 ```
 
 That writes `contents/_versions/3.3/organizing-notes/archive-notes.md` — the only file 3.3 needs. For a page that didn't exist in an older version, add its path to `contents/_versions/<version>/_excluded.txt` instead.
 
-`npm run docs:versions` (run automatically before dev and build) composes the full `/v<version>/` trees from the shared pages plus those overrides. The composed trees live in `contents/v<version>/` and are gitignored — never edit them.
+`npm run versions` (run automatically before dev and build) composes the full `/v<version>/` trees from the shared pages plus those overrides. The composed trees live in `contents/v<version>/` and are gitignored — never edit them.
 
 Archived pages carry a banner linking to the current version of the same page, are excluded from search and the sitemap, and are `noindex` so they don't compete with the latest docs. Images are shared across versions.
 

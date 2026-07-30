@@ -14,11 +14,11 @@ schema: howto
 The following steps will help you import your notes from Simplenote easily.
 
 1. Open Simplenote app on Desktop or Login to [https://app.simplenote.com](https://app.simplenote.com).
-2. Go to sidebar and click on Settings.
+2. Go to sidebar and click Settings.
    ![ in Notesnook](/static/simplenote-importer/1.png)
 3. Go to `Tools` tab in Settings
    ![ in Notesnook](/static/simplenote-importer/2.png)
-4. Click on `Export notes` to download your notes as a .zip file.
+4. Click `Export notes` to download your notes as a .zip file.
 5. Open the Notesnook app (web or desktop)
 6. Go to `Settings > Import & export > Notesnook Importer` and select `Simplenote` from list of apps.
    ![ in Notesnook](/static/simplenote-importer/3.png)

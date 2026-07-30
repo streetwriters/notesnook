@@ -11,22 +11,22 @@ While you organize your notes with all different types of notebooks, tags and co
 
 :::tabs key:platform
 == Desktop/Web
-1. Right click on a note or click on the three-dot more button to open the `Note properties` menu.
+1. Right click a note or click the three dot more button to open the `Note properties` menu.
 2. Toggle `{{favorite}}`.
 == Mobile
-1. Press the ![Three dot button](/three-dot-button.png) button
-2. Press `{{favorite}}`. If you do not see the option, scroll the bar left.
+1. Tap the ![Three dot button](/three-dot-button.png) button
+2. Tap `{{favorite}}`. If you do not see the option, scroll the bar left.
 :::
 
 ## Removing a note from favorites
 
 :::tabs key:platform
 == Desktop/Web
-1. Right click on a note or click on the three-dot more button to open the `Note properties` menu.
-2. Untoggle `{{favorite}}`.
+1. Right click a note or click the three dot more button to open the `Note properties` menu.
+2. Click `{{favorite}}` again — the checkmark next to it clears.
 == Mobile
-1. Press the ![Three dot button](/three-dot-button.png) button
-2. Press `{{unfavorite}}`. If you do not see the option, scroll the bar left.
+1. Tap the ![Three dot button](/three-dot-button.png) button
+2. Tap `{{unfavorite}}`. If you do not see the option, scroll the bar left.
 :::
 
 ## Related pages

@@ -20,16 +20,16 @@ See it in action here:
 Instead of always taking space in your taskbar, you can hide Notesnook in your system tray on minimizing:
 
 1. Go to `{{settings}}`
-2. Click on `{{desktopIntegration}}`
-3. Click on `{{minimizeToSystemTray}}` to enable/disable it.
+2. Click `{{desktopIntegration}}`
+3. Click `{{minimizeToSystemTray}}` to enable/disable it.
 
 ## Close to tray
 
 To prevent accidentally closing the Notesnook app, it is possible to always close it to the system tray:
 
 1. Go to `{{settings}}`
-2. Click on `{{desktopIntegration}}`
-3. Click on `{{closeToSystemTray}}` to enable/disable it.
+2. Click `{{desktopIntegration}}`
+3. Click `{{closeToSystemTray}}` to enable/disable it.
 
 ## Related pages
 

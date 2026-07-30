@@ -18,7 +18,7 @@ The following steps will help you quickly import your notes from Skiff Pages int
 1. Open the [Skiff Pages](https://app.skiff.com) app
 2. Open Settings > Export or just go directly to [https://app.skiff.com/dashboard/?settingTab=export](https://app.skiff.com/dashboard/?settingTab=export)
    ![ in Notesnook](/static/skiff-importer/1.png)
-3. Click on the Export button next to `Pages and Files` — this might take a few minutes depending on how many pages you have.
+3. Click the Export button next to `Pages and Files` — this might take a few minutes depending on how many pages you have.
 4. Once the export is complete, save the `Skiff.zip` file at your preferred location.
    ![ in Notesnook](/static/skiff-importer/2.png)
 

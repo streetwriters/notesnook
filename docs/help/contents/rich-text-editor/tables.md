@@ -13,7 +13,7 @@ The first row of a newly created table is always a header. You can always delete
 
 ## Insert a table
 
-1. Click on the ![Toolbar plus](/toolbar-plus.png) and select the table block.
+1. Click the ![Toolbar plus](/toolbar-plus.png) and select the table block.
 2. Select the size of the table grid.
 
 ![Create a table in rich text editor](/create-table.png)
@@ -29,7 +29,7 @@ Table columns are resizable on all platforms.
 
 ![Resize a table](/resize-table.gif)
 == Mobile
-1. Tap on the separator between the two columns.
+1. Tap the separator between the two columns.
 2. Drag the separator left or right to resize.
 
 ![Resize a table on mobile](/resize-table-mobile.gif)
@@ -37,64 +37,64 @@ Table columns are resizable on all platforms.
 
 ## Insert a row
 
-1. Click on a cell below which you want to insert a new row.
-2. Click on the `{{insertRowBelow}}` button to insert a new row.
+1. Click a cell below which you want to insert a new row.
+2. Click the `{{insertRowBelow}}` button to insert a new row.
 
 ![Insert row in the table](/insert-row-table.gif)
 
 ## Delete a row
 
-1. Click on a cell of the row you want to delete
-2. Click on the row properties button and select `{{deleteRow}}`
+1. Click a cell of the row you want to delete
+2. Click the row properties button and select `{{deleteRow}}`
 
 ![Delete a row from the table](/table-row-delete.png)
 
 ## Move row
 
-1. Click on a cell of the row you want to move.
-2. Click on the row properties button and select `{{moveRowUp}}` to move the row up or `{{moveRowDown}}` to move the row down.
+1. Click a cell of the row you want to move.
+2. Click the row properties button and select `{{moveRowUp}}` to move the row up or `{{moveRowDown}}` to move the row down.
 
 ![Move a row in the table](/table-move-row.gif)
 
 ## Insert a column
 
-1. Click on a cell in a column after which you want to insert a new column.
-2. Click on the `{{insertColumnRight}}` button to insert a new column.
+1. Click a cell in a column after which you want to insert a new column.
+2. Click the `{{insertColumnRight}}` button to insert a new column.
 
 ![Insert a column in the table](/table-insert-column.gif)
 
 ## Delete a column
 
-1. Click on a cell of the column you want to delete
-2. Click on the column properties button and select `{{deleteColumn}}`
+1. Click a cell of the column you want to delete
+2. Click the column properties button and select `{{deleteColumn}}`
 
 ![Delete a column from the table](/table-delete-column.png)
 
 ## Move column
 
-1. Click on a cell of the column you move.
-2. Click on the column properties button on top and select `{{moveColumnRight}}` to move the column right or `{{moveColumnLeft}}` to move the column left.
+1. Click a cell of the column you move.
+2. Click the column properties button on top and select `{{moveColumnRight}}` to move the column right or `{{moveColumnLeft}}` to move the column left.
 
 ![Move a column in the table](/table-move-column.gif)
 
 ## Merge cells
 
 1. Drag and select the cells you want to merge
-2. Click on table properties on top of table and select `{{mergeCells}}`
+2. Click table properties on top of table and select `{{mergeCells}}`
 
 ![Merge table cells](/table-merge-cells.gif)
 
 ## Split cells
 
 1. Double click to select the cell you want to split
-2. Click on table properties on top of table and select `{{splitCells}}`
+2. Click table properties on top of table and select `{{splitCells}}`
 
 ![Split table cells](/table-split-cell.gif)
 
 ## Cell Properties
 
 1. Select the cell you want to customize
-2. Click on the table properties button on top
+2. Click the table properties button on top
 3. Select Cell properties
 4. You can now change cell background, text color and border color.
 
@@ -107,7 +107,7 @@ Table columns are resizable on all platforms.
 :::tabs key:platform
 == Desktop/Web
 1. Focus inside the note where you want the table.
-2. Click on the ![Toolbar plus](/toolbar-plus.png) button and open `{{table}}`.
+2. Click the ![Toolbar plus](/toolbar-plus.png) button and open `{{table}}`.
 3. Click `{{importCsv}}` and pick a `.csv` file.
 
 The table is inserted with one row per line and one column per field.
@@ -127,7 +127,7 @@ Importing a CSV into a table requires a Pro plan. See [Plans & limits](/plans-an
 
 :::tabs key:platform
 == Desktop/Web
-1. Click on a cell in the table.
+1. Click a cell in the table.
 2. Click the `{{tableSettings}}` button on top of the table.
 3. Click `{{exportCsv}}`.
 
@@ -147,7 +147,7 @@ Exporting a table as CSV requires a Pro plan. See [Plans & limits](/plans-and-li
 ## Delete table
 
 1. Select the table
-2. Click on table properties button on top.
+2. Click table properties button on top.
 3. Select `{{deleteTable}}` from drop down menu
 
 ![Delete a table from the notes editor](/delete-table.png)

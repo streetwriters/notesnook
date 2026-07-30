@@ -14,8 +14,8 @@ Free accounts can have up to 10 active reminders at a time. Essential raises the
 :::tabs key:platform
 == Desktop/Web
 
-1. Right click on a note to open the `Note properties` menu
-2. Click on `{{remindMe}}` to open the add reminder dialog
+1. Right click a note to open the `Note properties` menu
+2. Click `{{remindMe}}` to open the add reminder dialog
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type:
    - **Once**: Set a specific date and time
@@ -25,7 +25,7 @@ Free accounts can have up to 10 active reminders at a time. Essential raises the
 
 == Mobile
 
-1. Press the ![Three dot button](/three-dot-button.png) button on a note
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note
 2. Tap `{{remindMe}}` to open the add reminder dialog
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type:
@@ -99,13 +99,13 @@ Deactivating a reminder stops it from notifying you without deleting it, so you 
 == Desktop/Web
 
 1. Go to the `{{reminders}}` screen from the side menu.
-2. Right click on the reminder.
+2. Right click the reminder.
 3. Click `{{deactivate}}` to switch it off, or `{{activate}}` to switch it back on.
 
 == Mobile
 
 1. Go to the `{{reminders}}` screen from the side menu.
-2. Press the ![Three dot button](/three-dot-button.png) button on the reminder.
+2. Tap the ![Three dot button](/three-dot-button.png) button on the reminder.
 3. Tap `{{turnOffReminder}}` to switch it off, or `{{turnOnReminder}}` to switch it back on.
    :::
 

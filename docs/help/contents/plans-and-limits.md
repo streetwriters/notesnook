@@ -88,15 +88,18 @@ The Education plan gives students and teachers **Pro features and Pro limits**. 
 
 ## Pro (legacy)
 
-If you subscribed before the current plans existed, you keep a grandfathered **Pro (legacy)** plan: unlimited notebooks, tags, colors, reminders, shortcuts and note versions, unlimited monthly storage, and a **512 MB** maximum file size. You keep it for as long as the subscription stays active.
+If you subscribed before the current plans existed, you keep a grandfathered **Pro (legacy)** plan. It gives you everything in the current Pro plan, with two differences:
+
+- **Unlimited storage** instead of 10 GB a month
+- A **512 MB** maximum file size instead of 1 GB
+
+You keep it for as long as the subscription stays active.
 
 ## Regional pricing
 
-Notesnook Pro is priced for where you live. In many countries the paid plans are sold at a regional discount, and it's applied automatically.
+Notesnook Pro is priced for where you live. The **Pro** plan is sold at a regional price in every country, applied automatically — there is no code to enter, and no country is left out. Essential and Believer are priced the same everywhere.
 
-When a regional price applies, the plan shows the standard price struck through next to a badge reading **“N% off in {your country}”**, and you are charged the discounted amount in your local currency. On Android and iOS the same regional tiers are used through Google Play and the App Store.
-
-If you think your country should be included, [tell us](https://notesnook.com/contact-us).
+Where your regional price is below the standard one, the plan shows the standard price struck through next to a badge reading **“N% off in {your country}”**, and you are charged the regional amount in your local currency. Android and iOS use the same regional tiers through Google Play and the App Store.
 
 ## Free trials
 

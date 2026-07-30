@@ -40,8 +40,8 @@ Tags, colors, reminders and attachments do not pass through the trash — deleti
 Restoring a notebook also restores every sub-notebook that went to the trash with it.
 == Mobile
 1. Open `{{trash}}` from the side menu.
-2. Press the ![Three dot button](/three-dot-button.png) button on the item.
-3. Press `{{restore}}`.
+2. Tap the ![Three dot button](/three-dot-button.png) button on the item.
+3. Tap `{{restore}}`.
 
 Tapping a trashed **notebook** opens a `{{restore}}` prompt directly, with `{{restore}}` and `{{delete}}` as the two choices.
 :::
@@ -61,8 +61,8 @@ Free plans allow 50 notebooks and Essential allows 500; Pro and Believer are unl
 3. Confirm the prompt.
 == Mobile
 1. Open `{{trash}}` from the side menu.
-2. Press the ![Three dot button](/three-dot-button.png) button on the item.
-3. Press `{{delete}}` and confirm.
+2. Tap the ![Three dot button](/three-dot-button.png) button on the item.
+3. Tap `{{delete}}` and confirm.
 :::
 
 Permanently deleting a note also removes its content and its whole [version history](/note-version-history).
@@ -78,7 +78,7 @@ Permanently deleting a note also removes its content and its whole [version hist
 You should see `{{trashCleared}}`.
 == Mobile
 1. Open `{{trash}}` from the side menu.
-2. Press the floating button at the bottom right.
+2. Tap the floating button at the bottom right.
 3. Read the prompt and press `{{clear}}`.
 
 You should see `{{trashCleared}}`.

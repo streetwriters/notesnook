@@ -25,15 +25,15 @@ Privacy mode enables some OS specific settings to enhance your privacy while wor
 == Desktop
 
 1. Go to `{{settings}}`
-2. Scroll down to `{{securityPrivacy}}` section
-3. Click on `{{privacy}}`
-4. Click on toggle next to `{{privacyMode}}` to enable/disable privacy mode.
+2. Open `{{privacyAndSecurity}}`
+3. Click `{{privacy}}`
+4. Click toggle next to `{{privacyMode}}` to enable/disable privacy mode.
 
 == Mobile
 
 1. Go to `{{settings}}`
-2. Scroll down to `{{privacyAndSecurity}}`
-3. Tap on `{{privacyMode}}` to enable/disable it
+2. Open `{{privacyAndSecurity}}`
+3. Tap `{{privacyMode}}` to enable/disable it
    :::
 
 ::: info

@@ -1,8 +1,8 @@
 /**
  * Preserves a page's current text for an older version, before you change it.
  *
- *     npm run docs:fork -- 3.3 organizing-notes/archive-notes
- *     npm run docs:fork -- 3.3 app-lock.md
+ *     npm run fork -- 3.3 organizing-notes/archive-notes
+ *     npm run fork -- 3.3 app-lock.md
  *
  * Run this *before* editing the page at the root. It copies today's text into
  * `contents/_versions/3.3/<page>`, so v3.3 keeps describing the old behaviour
@@ -22,8 +22,8 @@ const CONTENTS = join(HELP, "contents");
 const [version, rawPage] = process.argv.slice(2);
 if (!version || !rawPage) {
   console.error(
-    "Usage: npm run docs:fork -- <version> <page>\n" +
-      "  e.g. npm run docs:fork -- 3.3 organizing-notes/archive-notes"
+    "Usage: npm run fork -- <version> <page>\n" +
+      "  e.g. npm run fork -- 3.3 organizing-notes/archive-notes"
   );
   process.exit(1);
 }

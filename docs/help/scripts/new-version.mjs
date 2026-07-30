@@ -1,11 +1,11 @@
 /**
  * Starts a new docs version.
  *
- *     npm run docs:version -- 3.4
+ *     npm run version -- 3.4
  *
  * Nothing is copied. The current docs simply become the newest archived version
  * — they are shared with the root until a page actually changes, at which point
- * `npm run docs:fork` records the old text for that one page.
+ * `npm run fork` records the old text for that one page.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
@@ -16,7 +16,7 @@ const versionsPath = join(HELP, ".vitepress", "versions.mjs");
 
 const next = process.argv[2];
 if (!next || !/^\d+\.\d+$/.test(next)) {
-  console.error("Usage: npm run docs:version -- <version>   (e.g. 3.4)");
+  console.error("Usage: npm run version -- <version>   (e.g. 3.4)");
   process.exit(1);
 }
 
@@ -51,8 +51,8 @@ writeFileSync(
       /export const ARCHIVED = \[[^\]]*\];/,
       `export const ARCHIVED = [${[LATEST, ...ARCHIVED].map((v) => `"${v}"`).join(", ")}];`
     )
-    .replace(/npm run docs:version -- [\d.]+/, `npm run docs:version -- ${bumpMinor(next)}`)
-    .replace(/npm run docs:fork -- [\d.]+ /, `npm run docs:fork -- ${next} `)
+    .replace(/npm run version -- [\d.]+/, `npm run version -- ${bumpMinor(next)}`)
+    .replace(/npm run fork -- [\d.]+ /, `npm run fork -- ${next} `)
 );
 
 function bumpMinor(v) {
@@ -67,7 +67,7 @@ console.log(
     "No pages were copied — every page is shared until it changes. Before you",
     `edit a page in a way that does not apply to v${LATEST}, run:`,
     "",
-    `    npm run docs:fork -- ${LATEST} <page>`,
+    `    npm run fork -- ${LATEST} <page>`,
     ""
   ].join("\n")
 );

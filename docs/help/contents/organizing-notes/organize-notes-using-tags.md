@@ -13,7 +13,7 @@ Free accounts can keep up to 50 tags. Essential raises the cap to 500, and Pro a
 
 ::::tabs key:platform
 == Desktop/Web
-1. Click on the note you want to add tags to and open it in the editor
+1. Click the note you want to add tags to and open it in the editor
 2. Under the note title, focus the `{{addATag}}` input.
 3. Type the tag name & press enter to add it. The input supports auto complete for existing tags
 
@@ -23,8 +23,8 @@ Added tags appear at the bottom of each note item in the notes list. Clicking on
 ![Tagged note](/tagged-note.png)
 :::
 == Mobile
-1. Press on the ![Three dot button](/three-dot-button.png) button on a note.
-2. Tap on `{{addTags}}` button under the title
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap `{{addTags}}` button under the title
 3. Type the tag name then press enter to add it
 
 ::: info
@@ -49,7 +49,7 @@ Every new note you create outside a tag gets your default tag applied automatica
 :::tabs key:platform
 == Desktop/Web
 1. Open the tags section from the side menu.
-2. Right click on the tag.
+2. Right click the tag.
 3. Click `{{setAsDefault}}`.
 
 A checkmark marks the tag that is currently the default. Click it again to clear the default.

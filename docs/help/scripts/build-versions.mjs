@@ -15,7 +15,7 @@
  * fork supersedes it. It also generates `.vitepress/sidebars/generated.mjs`,
  * which the config imports.
  *
- * Run automatically by `predocs:dev` / `predocs:build`.
+ * Run automatically by `predev` / `prebuild`.
  */
 import {
   copyFileSync,

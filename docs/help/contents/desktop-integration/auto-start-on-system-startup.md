@@ -8,8 +8,8 @@ description: Configure the Notesnook desktop app to automatically start, and opt
 If your workflow requires Notesnook to be always opened, it's a good idea to enable auto start on system startup:
 
 1. Go to `{{settings}}`
-2. Click on `{{desktopIntegration}}`
-3. Click on `{{autoStartOnSystemStartup}}` to enable/disable it.
+2. Click `{{desktopIntegration}}`
+3. Click `{{autoStartOnSystemStartup}}` to enable/disable it.
 
 ## Start minimized
 
@@ -20,8 +20,8 @@ This only works when `{{autoStartOnSystemStartup}}` is enabled.
 Notesnook can also start minimized when it's opened on system startup:
 
 1. Go to `{{settings}}`
-2. Click on `{{desktopIntegration}}`
-3. Click on `{{startMinimized}}` to enable/disable it.
+2. Click `{{desktopIntegration}}`
+3. Click `{{startMinimized}}` to enable/disable it.
 
 ## Related pages
 

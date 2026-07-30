@@ -16,9 +16,9 @@ The following steps will help you quickly import your notes from Google Keep int
 ## Exporting your Google Keep notes
 
 1. Go to [Google Takeout](https://takeout.google.com/settings/takeout) and log into your Google account.
-2. On the Google Takeout page, first deselect all the items by clicking on `Deselect all`, and then scroll down and select only `{{keep}}` from the list. Once selected, click on `Next Step` by scrolling to the very bottom of the page.
+2. On the Google Takeout page, first deselect all the items by clicking on `Deselect all`, and then scroll down and select only `{{keep}}` from the list. Once selected, click `Next Step` by scrolling to the very bottom of the page.
    ![ in Notesnook](/static/google-keep-importer/1.png)
-3. On the next section, leave everything as is and just click on the "Create export" button:
+3. On the next section, leave everything as is and just click the "Create export" button:
    ![ in Notesnook](/static/google-keep-importer/2.png)
 4. Download the exported .zip file once it becomes available:
    ![ in Notesnook](/static/google-keep-importer/3.png)

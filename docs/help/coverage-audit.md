@@ -98,4 +98,4 @@ Claims that remain unverifiable in this repo, and need a product answer: the 5-y
 - `docs/help/STYLE.md` is the contract: verification requirement, plan tags, platform tabs, SEO frontmatter, linking clusters.
 - Plan tiers come from `packages/common/src/utils/is-feature-available.ts` and nowhere else. All 35 gated features are monotonic across tiers, so "Pro includes Essential" is provably true.
 - Where `keybindings.ts` and an editor extension disagree about a shortcut, the extension wins.
-- `contents/v<version>/` is generated build output. Never edit it; edit the root copy, and use `npm run docs:fork` to preserve old text for an archived version.
+- `contents/v<version>/` is generated build output. Never edit it; edit the root copy, and use `npm run fork` to preserve old text for an archived version.

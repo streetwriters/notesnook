@@ -24,17 +24,17 @@ An expiry date is a scheduled deletion. On the day it falls due the note leaves 
 
 :::tabs key:platform
 == Desktop/Web
-1. Right click on a note to open the `Note properties` menu.
+1. Right click a note to open the `Note properties` menu.
 2. Click `{{setExpiry}}`.
 3. In the `{{setExpiry}}` dialog, type a date into the `{{date}}` field — the format shown under the field is your own date format from settings — or click the calendar icon and pick a day.
 4. Click `{{done}}`.
 
 The earliest date you can choose is tomorrow, and the latest is one year from today. Notesnook refuses anything else with `{{expiryDateMustBeInTheFuture}}` or `{{expiryDateCannotBeMoreThan1YearInTheFuture}}`.
 == Mobile
-1. Press the ![Three dot button](/three-dot-button.png) button on a note.
-2. Press `{{setExpiry}}`.
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap `{{setExpiry}}`.
 3. Scroll the date picker to the day you want. It opens one week ahead by default, and the earliest date you can choose is tomorrow.
-4. Press `{{setExpiry}}`.
+4. Tap `{{setExpiry}}`.
 :::
 
 An `{{expiryDateSet}}` toast confirms it, and the note now carries an expiry badge in the notes list.
@@ -54,13 +54,13 @@ The note shows a bomb icon with the expiry date next to it, in the same row as i
 
 :::tabs key:platform
 == Desktop/Web
-1. Right click on the note. The menu entry now reads `{{expiryDate}}` instead of `{{setExpiry}}`.
+1. Right click the note. The menu entry now reads `{{expiryDate}}` instead of `{{setExpiry}}`.
 2. Open `{{expiryDate}}` and choose:
    - `{{change}}` — reopens the date dialog with the current date filled in.
    - `{{remove}}` — clears the expiry date and leaves the note alone.
 == Mobile
-1. Press the ![Three dot button](/three-dot-button.png) button on the note. The entry now reads `{{unsetExpiry}}`.
-2. Press `{{unsetExpiry}}` to clear the date.
+1. Tap the ![Three dot button](/three-dot-button.png) button on the note. The entry now reads `{{unsetExpiry}}`.
+2. Tap `{{unsetExpiry}}` to clear the date.
 
 To move the date instead, clear it with `{{unsetExpiry}}` and then set a new one with `{{setExpiry}}`.
 :::

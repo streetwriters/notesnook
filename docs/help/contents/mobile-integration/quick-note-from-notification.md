@@ -12,7 +12,7 @@ A simple, quick and convenient way to take notes on your phone from notification
 ![Notes in notifications](/static/mobile-integration/android-quick-note-notifications.png)
 
 1. Go to Settings from Side Menu
-2. Scroll down to `{{productivity}}` section
+2. Open `{{productivity}}`
 3. Enable `{{quickNoteNotification}}`
 4. Open notifications drawer, you should see a notification with button `{{takeNote}}`.
 

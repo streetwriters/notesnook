@@ -14,9 +14,9 @@ schema: howto
 The following steps will help you import your notes from UpNote easily.
 
 1. Download the UpNote desktop app.
-2. Click on settings icon on the header. 
+2. Click settings icon on the header. 
 3. Go to `{{general}}` tab in Settings
-4. Click on `Export All Notes`.
+4. Click `Export All Notes`.
 5. Export from the `Export to HTML` option to download your notes. 
 6. Create a `.zip` file of the exported folder. 
 7. Open the Notesnook app (web or desktop).

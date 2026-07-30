@@ -14,8 +14,8 @@ Configuring the spell checker is only available in the desktop app.
 You can enable/disable the spell checker at any time from Settings:
 
 1. Go to `{{settings}}`
-2. Click on `{{editor}}`
-3. Click on the `{{enableSpellChecker}}` toggle to enable/disable the spell checker
+2. Click `{{editor}}`
+3. Click the `{{enableSpellChecker}}` toggle to enable/disable the spell checker
 
 ## Choosing languages
 
@@ -32,11 +32,11 @@ Selecting a new language will **download the dictionary from `dictionaries.notes
 To select new languages:
 
 1. Go to `{{settings}}`
-2. Click on `{{editor}}`
-3. Click on `{{languages}}`
+2. Click `{{editor}}`
+3. Click `{{languages}}`
    ![Spell checker languages dialog](/static/spell-checker-languages.png)
 4. Select the languages you need
-5. Click on `{{done}}` and spell checking should now be working for the languages you selected.
+5. Click `{{done}}` and spell checking should now be working for the languages you selected.
 
 ### My language is not included in the list
 
