@@ -2,11 +2,6 @@ name: Publish Notesnook Help
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "master"
-    paths:
-      - "docs/help/**"
 
 jobs:
   build:
