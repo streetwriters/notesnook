@@ -97,19 +97,11 @@ You keep it for as long as the subscription stays active.
 
 ## Regional pricing
 
-Notesnook Pro is priced for where you live. The **Pro** plan is sold at a regional price in every country, applied automatically — there is no code to enter, and no country is left out. Essential and Believer are priced the same everywhere.
-
-Where your regional price is below the standard one, the plan shows the standard price struck through next to a badge reading **“N% off in {your country}”**, and you are charged the regional amount in your local currency. Android and iOS use the same regional tiers through Google Play and the App Store.
+Only the **Pro** plan is sold at a regional price in every country, applied automatically — there is no code to enter, and no country is left out. Essential and Believer plans are priced the same everywhere.
 
 ## Free trials
 
-| Billing period | Free trial | Refund window |
-| -------------- | ---------- | ------------- |
-| Monthly        | 14 days    | 14 days       |
-| Yearly         | 14 days    | 14 days       |
-| 5 year         | 14 days    | 14 days       |
-
-You can trial **each plan once**. Trials give you the full plan, so a feature you unlock during a trial stops working when the trial ends unless you subscribe. The Education plan has no trial.
+All plans have a 14-day free trial. You can trial **each plan only once**. A valid payment method is required to start a trial. Trials works like a short term subscription i.e a feature you unlock during a trial stops working when the trial ends unless you subscribe. The Education plan has no trial.
 
 ## Changing or cancelling your plan
 
