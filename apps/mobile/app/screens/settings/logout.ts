@@ -28,6 +28,7 @@ import {
 } from "../../components/dialogs/progress";
 import Navigation from "../../services/navigation";
 import BackupService from "../../services/backup";
+import { useUserStore } from "../../stores/use-user-store";
 
 export async function logoutUser() {
   const hasUnsyncedChanges = await db.hasUnsyncedChanges();
@@ -47,6 +48,7 @@ export async function logoutUser() {
       : undefined,
     positivePress: async (_, takeBackup) => {
       eSendEvent(eCloseSimpleDialog);
+      useUserStore.getState().setIsLoggingOut(true);
       setTimeout(async () => {
         try {
           startProgress({
@@ -104,6 +106,7 @@ export async function logoutUser() {
           DatabaseLogger.error(e);
           ToastManager.error(e as Error, strings.logoutError());
           endProgress();
+          useUserStore.getState().setIsLoggingOut(false);
         }
       }, 300);
     }
