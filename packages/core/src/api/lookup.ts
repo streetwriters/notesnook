@@ -156,8 +156,13 @@ export default class Lookup {
           : [];
 
       if (
-        (!!tag?.length && tag.length !== tagIds.length) ||
-        (!!color?.length && color.length !== colorIds.length)
+        !(await isMatchingAllColorsAndTags(
+          this.db,
+          colorIds,
+          tagIds,
+          colored ? [] : color || [],
+          tagged ? [] : tag || []
+        ))
       )
         return emptySearchResults();
 
@@ -1226,4 +1231,37 @@ function emptySearchResults() {
     () => Promise.resolve([]),
     () => Promise.resolve({ ids: [], items: [] })
   );
+}
+
+async function isMatchingAllColorsAndTags(
+  db: Database,
+  colorIds: string[],
+  tagIds: string[],
+  colors: string[],
+  tags: string[]
+): Promise<boolean> {
+  if (colors.length > 0) {
+    const resolvedColors = await db.colors.all
+      .fields(["colors.id", "colors.title"])
+      .records(colorIds);
+    console.log({ resolvedColors });
+    for (const [_, color] of Object.entries(resolvedColors)) {
+      console.log(color);
+      if (!color) return false;
+      if (colors.some((c) => c.toLowerCase() !== color.title.toLowerCase()))
+        return false;
+    }
+  }
+
+  if (tags.length > 0) {
+    const resolvedTags = await db.tags.all
+      .fields(["tags.id", "tags.title"])
+      .records(tagIds);
+    for (const [_, tag] of Object.entries(resolvedTags)) {
+      if (!tag) return false;
+      if (tags.some((c) => c.toLowerCase() !== tag.title.toLowerCase()))
+        return false;
+    }
+  }
+  return true;
 }
