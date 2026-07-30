@@ -1,6 +1,6 @@
 ---
 title: Deleting your account
-description: No questions asked! You can delete your account anytime from mobile and desktop apps with a single click and delete all your data
+description: No questions asked! You can delete your account anytime from the mobile and desktop apps with a single click and delete all your data
 ---
 
 # Deleting your account
@@ -13,18 +13,21 @@ Deleting your account immediately and permanently erases all your notes, noteboo
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open Notesnook web or desktop app
 2. Make sure you are logged in
 3. Go to Settings
 4. Go to `{{account}}`
 5. Click on `{{deleteAccount}}`
+
 == Mobile
+
 1. Open the Notesnook app
 2. Make sure you are logged in
 3. Go to Settings
 4. Go to `{{account}}` then `{{manageAccount}}`
 5. Tap on `{{deleteAccount}}`
-:::
+   :::
 
 ## FAQs
 

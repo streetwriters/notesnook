@@ -17,10 +17,10 @@ The notes editor toolbar has all the basic tools for rich formatting of your not
 
 ![Toolbar](/toolbar-blocks.png)
 
-## Customzing editor toolbar
+## Customzing editor toolbar <PlanTag plan="pro"/>
 
 ::: info
-Toolbar configuration is automatically synced across all your devices.
+Toolbar configuration is automatically synced across all your devices. Notesnook does not sync the desktop toolbars to mobile, and vice versa.
 :::
 
 One of the great features of the editor is the ability to customize the editor toolbar to fit your own needs. There's usually many tools in an editor toolbar and being able to hide the tools you never use and just keep what you use more frequently on top helps focus on your note taking.
@@ -55,14 +55,16 @@ The toolbar always uses one of three presets, shown at the top of the `{{customi
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}` > `{{customization}}` > `{{editor}}` > `{{customizeToolbar}}`.
 2. Select `{{default}}`, `{{minimal}}` or `{{custom}}`.
 
 Editing groups or tools while `{{default}}` or `{{minimal}}` is selected switches you to `{{custom}}` automatically.
 == Mobile
+
 1. Go to `{{settings}}` > `{{customization}}` > `{{editor}}` > `{{customizeToolbar}}`.
 2. Under `{{presets}}`, tap `{{default}}`, `{{minimal}}` or `{{custom}}`.
-:::
+   :::
 
 Saving a `{{custom}}` preset requires a Pro plan — `{{default}}` and `{{minimal}}` are available on every plan. See [Plans & limits](/plans-and-limits).
 
@@ -76,6 +78,7 @@ Mobile keeps a separate toolbar layout for each device class — phone, small ta
 == Desktop/Web
 There is no reset action. Select the `{{default}}` preset on the `{{customizeToolbar}}` screen to go back to the stock toolbar.
 == Mobile
+
 1. Go to `{{settings}}` > `{{customization}}` > `{{editor}}`.
 2. Tap `{{resetToolbar}}`.
 
@@ -104,10 +107,12 @@ Click on the `+` button on a group header to add any disabled tools into the gro
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Hover on a group header.
 2. Click on the `+` button to add a subgroup.
 3. Drag and drop tools into the subgroup.
 4. Tools in the subgroup will be collapsed into a drop down.
+
 == Mobile
 You can create a subgroup by clicking on collapse button on a tool. Tools in the subgroup will be collapsed into a popup.
 :::
@@ -121,18 +126,22 @@ You can remove a group and all it's tools from the toolbar.
 1. Hover on a group header
 2. Click on the trash icon to delete the group.
 3. All the tools in the group will be moved to `Disabled items` section at the bottom.
+
 == Mobile
+
 1. Click on the `-` button on a group header to remove the group
 2. Tools removed from a group can be added back with the `+` button on the group header.
-:::
+   :::
 
 ### Disable a tool
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Hover on a tool header
 2. Click on the trash icon to disable the tool.
 3. Deleted tools in the group will be moved to `Disabled items` section at the bottom.
+
 == Mobile
 A tool can be disabled from the toolbar by clicking on the `-` button on the tool.
 :::

@@ -22,6 +22,7 @@ Trying to insert an attachment while logged out shows `{{notLoggedIn}}` with the
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Put the cursor where the file should go.
 2. Open the insert menu (the `+` button on the toolbar).
 3. Choose `{{attachment}}` for any file, or `{{image}}` → `{{uploadFromDisk}}` for a picture.
@@ -29,20 +30,21 @@ Trying to insert an attachment while logged out shows `{{notLoggedIn}}` with the
 
 Shortcuts: `Ctrl/Cmd + Shift + A` for an attachment, `Ctrl/Cmd + Shift + I` for an image. You can also drag files straight into the editor.
 == Mobile
+
 1. Put the cursor where the file should go.
 2. Open the insert menu (the `+` button on the toolbar).
 3. Choose `{{attachment}}` for any file, or `{{image}}` for a picture.
 4. Under `{{image}}` you also get `{{takePhotoUsingCamera}}`, which is mobile only.
-:::
+   :::
 
 Notesnook hashes each file first, so attaching the same file twice reuses the copy that is already uploaded instead of consuming your storage again.
 
 ## File size and storage limits
 
-| | Free | Essential | Pro | Believer |
-| --- | --- | --- | --- | --- |
-| Maximum file size | 10 MB | 100 MB | 1 GB | 5 GB |
-| Storage per month | 50 MB | 1 GB | 10 GB | 25 GB |
+|                   | Free  | Essential | Pro   | Believer |
+| ----------------- | ----- | --------- | ----- | -------- |
+| Maximum file size | 10 MB | 100 MB    | 1 GB  | 5 GB     |
+| Storage per month | 50 MB | 1 GB      | 10 GB | 25 GB    |
 
 Storage counts **attachments only** — images, files, audio and web clips. Your notes never count against it. If a file is over your plan's limit, the upload is refused with a message telling you the size you are allowed. Full details are on [Plans & limits](/plans-and-limits).
 
@@ -81,15 +83,15 @@ The search box at the top filters the list by filename. On desktop and web you c
 
 Open an attachment's menu — right click on desktop and web, tap the item on mobile — for:
 
-| Action | What it does |
-| --- | --- |
-| `{{previewAttachment}}` | Opens images and PDFs without downloading them (desktop and web) |
-| `{{linkedNotes}}` | Lists the notes that use this file; picking one opens it |
-| `{{fileCheck}}` | Verifies the uploaded file is intact and decryptable |
-| `{{rename}}` | Changes the filename |
-| `Download` | Saves the file to your device |
-| `Reupload` | Replaces a broken upload — you must pick the same file, the hash has to match |
-| `{{deletePermanently}}` (`{{delete}}` on mobile) | Removes the file from your account and from the notes that use it |
+| Action                                           | What it does                                                                  |
+| ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `{{previewAttachment}}`                          | Opens images and PDFs without downloading them (desktop and web)              |
+| `{{linkedNotes}}`                                | Lists the notes that use this file; picking one opens it                      |
+| `{{fileCheck}}`                                  | Verifies the uploaded file is intact and decryptable                          |
+| `{{rename}}`                                     | Changes the filename                                                          |
+| `Download`                                       | Saves the file to your device                                                 |
+| `Reupload`                                       | Replaces a broken upload — you must pick the same file, the hash has to match |
+| `{{deletePermanently}}` (`{{delete}}` on mobile) | Removes the file from your account and from the notes that use it             |
 
 `Download`, `{{fileCheck}}` and `{{delete}}` also work on a multi-selection from the toolbar at the top of the desktop and web list.
 
@@ -120,15 +122,15 @@ Anything that has not finished uploading is lost when you clear the cache. Let u
 
 ## Deleting an attachment
 
-Deleting an attachment removes it from your account **and** from every note that references it — attachments are not moved to [Trash](/trash) the way notes are. The deleted record itself is kept for **7 days** before it is cleaned up, so the deletion has time to reach your other devices.
+Deleting an attachment removes it from your account **and** from every note that references it — attachments are not moved to [Trash](/trash) the way notes are.
 
-::: warning Attachments inside locked notes are protected
-If a file is used by a note in your [private vault](/lock-notes-with-private-vault), deleting it fails with `This attachment is inside a locked note.` Unlock the note first if you really want the file gone.
-:::
-
-## Why is my storage full when I deleted my notes?
+## What is an orphaned attachment?
 
 Deleting a note does not delete the files it contained — they become **orphaned** attachments and keep occupying storage. Open the attachment manager, switch to `{{orphaned}}`, and delete what you no longer need.
+
+## Why is my storage full when I deleted my attachments?
+
+Your monthly storage limit resets on the first of the month at midnight UTC. Deleting attachments does not give you storage back.
 
 <GetNotesnook action="pricing" title="Need more room for files?" text="The free plan gives you 50 MB a month and a 10 MB file size cap. Paid plans go up to 25 GB a month with 5 GB files — and every file stays end-to-end encrypted on all of them." />
 

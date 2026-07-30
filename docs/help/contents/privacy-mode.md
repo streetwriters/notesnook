@@ -12,7 +12,7 @@ keywords:
 
 Privacy mode stops other software from seeing what's on your screen while Notesnook is open — screenshots, screen recorders and remote-desktop tools get a blank window instead of your notes.
 
-::: info Not available on Linux
+::: warning Not available on Linux
 Privacy mode is not available on Linux.
 :::
 
@@ -23,15 +23,18 @@ Privacy mode enables some OS specific settings to enhance your privacy while wor
 
 :::tabs key:platform
 == Desktop
+
 1. Go to `{{settings}}`
 2. Scroll down to `{{securityPrivacy}}` section
 3. Click on `{{privacy}}`
 4. Click on toggle next to `{{privacyMode}}` to enable/disable privacy mode.
+
 == Mobile
+
 1. Go to `{{settings}}`
 2. Scroll down to `{{privacyAndSecurity}}`
 3. Tap on `{{privacyMode}}` to enable/disable it
-:::
+   :::
 
 ::: info
 Privacy mode will prevent all screen capturing software from capturing Notesnook. This includes softwares like TeamViewer, AnyDesk & RustDesk etc.
@@ -45,9 +48,11 @@ Separately from privacy mode, the desktop and web apps can keep the open note's 
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}`.
 2. Open `{{privacyAndSecurity}}` > `{{privacy}}`.
 3. Turn on `{{hideNoteTitle}}`.
+
 == Mobile
 Mobile hides note content from the app switcher as part of privacy mode above; there is no separate title setting.
 :::

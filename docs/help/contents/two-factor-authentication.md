@@ -15,16 +15,16 @@ schema: howto
 Two-factor authentication (2FA) asks for a 6-digit code in addition to your password every time you log in. You set it up from `{{settings}}`, choose one of three methods — an authenticator app, email or SMS — and save the recovery codes Notesnook shows you at the end.
 
 ::: info 2FA protects your account, not your notes
-Your notes are already end-to-end encrypted with a key derived from your password. 2FA stops someone from *logging in* as you. It is a separate protection from [the encryption on your data](/how-is-my-data-encrypted).
+Your notes are already end-to-end encrypted with a key derived from your password. 2FA stops someone from _logging in_ as you. It is a separate protection from [the encryption of your data.](/how-is-my-data-encrypted)
 :::
 
 ## The three 2FA methods
 
-| Method | What it is | Plan |
-| --- | --- | --- |
-| `{{mfaAuthAppTitle}}` | Use an authenticator app to generate 2FA codes. Marked `{{recommended}}`. | All plans |
-| `{{mfaEmailTitle}}` | Notesnook sends a 2FA code to your account email when prompted. | All plans |
-| `{{mfaSmsTitle}}` | Notesnook sends an SMS with a 2FA code when prompted. | Pro and Believer |
+| Method                | What it is                                                                | Plan             |
+| --------------------- | ------------------------------------------------------------------------- | ---------------- |
+| `{{mfaAuthAppTitle}}` | Use an authenticator app to generate 2FA codes. Marked `{{recommended}}`. | All plans        |
+| `{{mfaEmailTitle}}`   | Notesnook sends a 2FA code to your account email when prompted.           | All plans        |
+| `{{mfaSmsTitle}}`     | Notesnook sends an SMS with a 2FA code when prompted.                     | Pro and Believer |
 
 An authenticator app is the recommended option because it generates codes on your device and keeps working without a network connection.
 
@@ -32,6 +32,7 @@ An authenticator app is the recommended option because it generates codes on you
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}` → `{{authentication}}`.
 2. Under `{{twoFactorAuth}}`, press `{{change}}` next to `{{change2faMethod}}`.
 3. Confirm the `{{verifyItsYou}}` prompt with your account password.
@@ -40,7 +41,9 @@ An authenticator app is the recommended option because it generates codes on you
 6. Save the codes on the `{{saveRecoveryCodes}}` screen, then finish.
 
 You should now see `{{twoFactorAuthEnabled}}`.
+
 == Mobile
+
 1. Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}`.
 2. Open `{{twoFactorAuth}}`, then tap `{{change2faMethod}}`.
 3. Confirm your identity with your account password.
@@ -56,6 +59,7 @@ You should now see `{{twoFactorAuthEnabled}}`.
 :::tabs key:platform
 == Desktop/Web
 Notesnook shows a QR code with the instruction `{{mfaScanQrCode}}`. If your app cannot scan it, copy the text key shown underneath instead — spaces do not matter. Your app then displays a rotating 6-digit code to enter.
+
 == Mobile
 Notesnook shows the setup key in a field with a `{{copy}}` button. Tapping it copies the key and opens your installed authenticator app directly. Your app then displays a rotating 6-digit code to enter.
 :::
@@ -78,13 +82,16 @@ A fallback is a second method you can use when your primary one is unavailable �
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}` → `{{authentication}}`.
 2. Press `{{addFallback2faMethod}}` (it reads `{{change2faFallbackMethod}}` once one exists).
 3. Confirm the `{{verifyItsYou}}` prompt.
 4. Pick a method and complete the same setup steps as above.
 
 You should now see `{{fallbackMethodEnabled}}`.
+
 == Mobile
+
 1. Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}` → `{{twoFactorAuth}}`.
 2. Tap `{{addFallback2faMethod}}` (it reads `{{change2faFallbackMethod}}` once one exists).
 3. Confirm your identity.
@@ -99,11 +106,14 @@ Recovery codes are single-use codes that log you in when no 2FA method is reacha
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}` → `{{authentication}}`.
 2. Press `{{viewRecoveryCodes}}` and confirm the `{{verifyItsYou}}` prompt.
 3. Use `{{print}}`, `{{copy}}` or `Download` to keep a copy. `Download` saves a `notesnook-recovery-codes.txt` file.
 4. Press `{{regenerate}}` to replace the current set with a new one.
+
 == Mobile
+
 1. Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}` → `{{twoFactorAuth}}`.
 2. Tap `{{viewRecoveryCodes}}` and confirm your identity.
 3. Use `{{copyCodes}}` or `{{saveToFile}}` — the file is saved as `notesnook_recoverycodes.txt`.

@@ -14,7 +14,7 @@ keywords:
 Notes aren't only text. You can drop an image into a note, attach a file of any type, play back an audio recording, preview a PDF beside what you're writing, and embed a video or a post from the web. Everything you attach is encrypted before it leaves your device.
 
 ::: info You need an account to attach anything
-Attachments are uploaded to your encrypted storage, so Notesnook asks you to log in the first time you try to add one — the message reads `{{notLoggedIn}}` on desktop and web, and `{{loginRequired}}` on mobile. On mobile your email also has to be confirmed. Storage and maximum file size depend on your plan; see [plans & limits](/plans-and-limits).
+Attachments are uploaded to your encrypted storage, so Notesnook asks you to log in the first time you try to add one — the message reads `{{notLoggedIn}}` on desktop and web, and `{{loginRequired}}` on mobile. Storage and maximum file size depend on your plan; see [plans & limits](/plans-and-limits).
 :::
 
 <!-- TODO: screenshot — a note containing an image, a file attachment and an embedded video -->
@@ -23,6 +23,7 @@ Attachments are uploaded to your encrypted storage, so Notesnook asks you to log
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Put the cursor where the image should go.
 2. Click the ![Toolbar plus](/toolbar-plus.png) button in the toolbar and choose `{{image}}`.
 3. Pick `{{uploadFromDisk}}` (or press `Ctrl+Shift+I`) and select one or more image files, or pick `{{attachImageFromURL}}` and paste a link.
@@ -31,13 +32,15 @@ Attachments are uploaded to your encrypted storage, so Notesnook asks you to log
 Two shortcuts skip the menu entirely:
 
 - **Drag and drop** — drag image files from your file manager straight onto the editor.
-- **Paste** — paste an image from your clipboard. If the clipboard holds text *and* a file, Notesnook pastes the text.
+- **Paste** — paste an image from your clipboard. If the clipboard holds text _and_ a file, Notesnook pastes the text.
+
 == Mobile
+
 1. Tap where the image should go.
 2. Tap the `+` button in the toolbar at the bottom of the screen and choose `{{image}}`.
 3. Choose `{{uploadFromDisk}}` to pick from your gallery, `{{takePhotoUsingCamera}}` to shoot one now, or `{{attachImageFromURL}}` to paste a link.
 4. Confirm in the sheet that appears; the image is encrypted and inserted into the note.
-:::
+   :::
 
 ::: info Images from a URL are downloaded, not hot-linked
 When you use `{{attachImageFromURL}}`, Notesnook downloads the image and stores it as one of your attachments. The note never asks the original website for the file, so opening the note doesn't tell that site anything about you.
@@ -52,13 +55,14 @@ Images are compressed before upload by default, which keeps them small and fast 
 When the `{{attachingFiles}}` dialog is set to ask, each image has a `{{compress}}` toggle. Turn it off for full quality, then click `{{insert}}`.
 
 To change what happens by default, go to `{{settings}}` > `{{customization}}` > `{{behaviour}}` > `{{imageCompression}}` and choose `{{askEveryTime}}`, `{{enableRecommended}}` or `{{disable}}`.
+
 == Mobile
 The sheet shown when you attach an image has a `Compress (recommended)` checkbox. Clear it for full quality.
 
 To change the default, go to `{{settings}}` > `{{customization}}` > `{{behavior}}` > `{{imageCompression}}`.
 :::
 
-On a free or Essential plan, choosing full quality tells you which plan you need — on mobile the option is greyed out as well. See [plans & limits](/plans-and-limits).
+On a plan that doesn't support full quality images, the option is greyed out. Attempting to change it will ask you to upgrade your plan.
 
 ## Resize and align an image
 
@@ -71,6 +75,7 @@ Alignment lives in the same toolbar, as three buttons: `{{alignLeft}}`, the cent
 :::tabs key:platform
 == Desktop/Web
 Selecting an image floats a small toolbar above it with `{{previewAttachment}}`, `{{downloadAttachment}}`, the three alignment buttons and `{{imageProperties}}`.
+
 == Mobile
 Selecting an image adds an `{{imageSettings}}` button to the toolbar at the bottom. Tap it for `{{downloadAttachment}}`, alignment and `{{imageProperties}}`. `{{previewAttachment}}` is available directly in the toolbar.
 :::
