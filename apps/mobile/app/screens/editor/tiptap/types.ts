@@ -93,6 +93,8 @@ export type SavePayload = {
   ignoreEdit: boolean;
   tabId: string;
   pendingChanges?: boolean;
+  sourceNoteId?: string;
+  pendingChangesAt?: number;
 };
 
 export type AppState = {
