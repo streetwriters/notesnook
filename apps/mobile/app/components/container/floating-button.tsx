@@ -27,16 +27,15 @@ import Animated, {
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { editorState } from "../../screens/editor/tiptap/utils";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevationStyle } from "../../utils/elevation";
-import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
 import AppIcon from "../ui/AppIcon";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -48,6 +47,7 @@ interface FloatingButtonProps {
   position?: "left" | "right";
   size?: "small" | "large";
   style?: ViewStyle;
+  hideOnKeyboard?: boolean;
 }
 
 const FloatingButton = ({
@@ -58,26 +58,28 @@ const FloatingButton = ({
   testID,
   position = "right",
   size = "large",
-  style
+  style,
+  hideOnKeyboard = true
 }: FloatingButtonProps) => {
   const { colors } = useThemeColors();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const translate = useSharedValue(0);
+  const keyboardHeight = useSharedValue(0);
   const route = useRoute();
+  const insets = useGlobalSafeAreaInsets();
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateX: translate.value
-        },
-        {
-          translateY: translate.value
-        }
-      ]
-    };
-  });
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: hideOnKeyboard ? translate.value : 0
+      },
+      {
+        translateY: hideOnKeyboard ? translate.value : 0
+      }
+    ],
+    bottom: hideOnKeyboard ? 15 : keyboardHeight.value + 15
+  }));
 
   const animate = useCallback(
     (toValue: number) => {
@@ -98,12 +100,22 @@ const FloatingButton = ({
       editorState().keyboardState = false;
       if (deviceMode !== "mobile") return;
       animate(0);
+      keyboardHeight.value = withTiming(0);
     };
 
-    const onKeyboardShow = () => {
+    const onKeyboardShow = (e: any) => {
       editorState().keyboardState = true;
       if (deviceMode !== "mobile") return;
-      animate(150);
+      if (hideOnKeyboard) {
+        animate(150);
+      } else {
+        keyboardHeight.value = withTiming(
+          e.endCoordinates.height - insets.bottom,
+          {
+            duration: 250
+          }
+        );
+      }
     };
 
     const sub = [
@@ -111,9 +123,9 @@ const FloatingButton = ({
       Keyboard.addListener("keyboardDidHide", onKeyboardHide)
     ];
     return () => {
-      sub.forEach((sub) => sub?.remove?.());
+      sub.forEach((sub) => sub.remove());
     };
-  }, [deviceMode, animate]);
+  }, [deviceMode, animate, hideOnKeyboard, keyboardHeight, insets.bottom]);
 
   return deviceMode !== "mobile" && !alwaysVisible ? null : (
     <Animated.View

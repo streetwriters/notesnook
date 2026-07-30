@@ -30,7 +30,8 @@ import { Pressable } from "../ui/pressable";
 import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import { useSideBarDraggingStore } from "./dragging-store";
-import { Radius, Spacing } from "../../common/design/spacing";
+import { Spacing } from "../../common/design/spacing";
+import SyncStatusButton from "./sync-status-button";
 
 const SettingsIcon = () => {
   const { colors } = useThemeColors();
@@ -79,7 +80,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: Spacing.LEVEL_3,
+        paddingHorizontal: Spacing.LEVEL_3
       }}
     >
       <View
@@ -123,7 +124,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
             size={AppFontSize.lg}
           />
         ))}
-
+        <SyncStatusButton />
         <SettingsIcon />
       </View>
     </View>
