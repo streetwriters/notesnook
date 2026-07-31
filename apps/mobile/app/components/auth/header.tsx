@@ -24,6 +24,8 @@ import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import { hideAuth } from "./common";
 import { AuthParams } from "../../stores/use-navigation-store";
+import { strings } from "@notesnook/intl";
+import { presentDialog } from "../dialog/functions";
 export const AuthHeader = (props: { welcome?: boolean }) => {
   const { colors } = useThemeColors();
   const route = useRoute();
@@ -56,18 +58,18 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
 
         {!props.welcome ? null : (
           <Button
-            title="Skip"
+            title={strings.skipAndGoToApp()}
             onPress={() => {
-              hideAuth();
+              presentDialog({
+                title: strings.offlineMode(),
+                paragraph: strings.offlineModeDesc(),
+                paragraphColor: colors.primary.accent,
+                positiveText: strings.understand(),
+                positivePress: hideAuth as any
+              });
             }}
-            iconSize={16}
             type="plain"
-            iconPosition="right"
-            icon="chevron-right"
             height={25}
-            iconStyle={{
-              marginTop: 2
-            }}
             style={{
               paddingHorizontal: 6
             }}
