@@ -1045,8 +1045,6 @@ del.diffdel {
   border-radius: 5px;
   background-color: var(--background-secondary);
   border: 1px dashed var(--border);
-  /* the gap opens up rather than popping into place, and follows the level
-     it will drop at */
   transition: height 120ms ease-out, margin-inline-start 120ms ease-out;
 }
 
@@ -1064,8 +1062,6 @@ del.diffdel {
   border-radius: 5px;
   background-color: var(--background);
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.2);
-  /* it follows the level it will drop at; the pointer is followed with a
-     transform, which this must not touch */
   transition: left 120ms ease-out, width 120ms ease-out;
 }
 

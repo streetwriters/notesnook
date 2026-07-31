@@ -236,18 +236,11 @@ export function TaskListComponent(
           if (readonly) e.preventDefault();
         }}
         sx={{
-          // NOTE: the class is part of the selector to win over
-          // `.ProseMirror ul ul` (styles.css), which is more specific than
-          // a plain `ul` and squashed a nested list against the item it
-          // belongs to
           "ul.tasklist-content-wrapper": {
             display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            // NOTE: inline-start, not left: the indent has to be on the
-            // side the text flows from, so it stays on the right in RTL
-            // instead of showing up on the wrong side
             marginInlineStart: isNested ? (editor.isEditable ? -35 : -10) : 0,
             padding: 0
           },
