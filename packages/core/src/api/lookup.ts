@@ -154,6 +154,17 @@ export default class Lookup {
           ? await this.db.notebooks.all.ids()
           : [];
 
+      if (
+        !(await isMatchingAllColorsAndTags(
+          this.db,
+          colorIds,
+          tagIds,
+          colored ? [] : color || [],
+          tagged ? [] : tag || []
+        ))
+      )
+        return emptySearchResults();
+
       const defaultVault = await this.db.vaults.default();
       notes = notes.where((eb) => {
         const exprs = [];
@@ -1210,4 +1221,46 @@ function highlightRegexMatches(
 
 function removeDiacritics(s: string) {
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function emptySearchResults() {
+  return new VirtualizedGrouping<HighlightedResult>(
+    0,
+    20,
+    () => Promise.resolve([]),
+    () => Promise.resolve({ ids: [], items: [] })
+  );
+}
+
+async function isMatchingAllColorsAndTags(
+  db: Database,
+  colorIds: string[],
+  tagIds: string[],
+  colors: string[],
+  tags: string[]
+): Promise<boolean> {
+  if (colors.length > 0) {
+    const resolvedColors = await db.colors.all
+      .fields(["colors.id", "colors.title"])
+      .records(colorIds);
+    const resolvedColorTitles = Object.values(resolvedColors).map((color) =>
+      color?.title.toLowerCase()
+    );
+    for (const color of colors) {
+      if (!resolvedColorTitles.includes(color.toLowerCase())) return false;
+    }
+  }
+
+  if (tags.length > 0) {
+    const resolvedTags = await db.tags.all
+      .fields(["tags.id", "tags.title"])
+      .records(tagIds);
+    const resolvedTagTitles = Object.values(resolvedTags).map((tag) =>
+      tag?.title.toLowerCase()
+    );
+    for (const tag of tags) {
+      if (!resolvedTagTitles.includes(tag.toLowerCase())) return false;
+    }
+  }
+  return true;
 }
