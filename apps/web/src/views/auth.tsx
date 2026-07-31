@@ -135,7 +135,7 @@ type BaseAuthComponentProps<TRoute extends AuthRoutes> = {
   formData?: AuthFormData[TRoute];
 };
 
-const AuthFormContext = createContext<{ error?: string }>({});
+export const AuthFormContext = createContext<{ error?: string }>({});
 
 export type AuthProps = {
   route: AuthRoutes;
@@ -1095,7 +1095,6 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           flex: 1,
           flexDirection: "column",
           alignItems: "left",
-          // justifyContent: "center",
           width: ["95%", "95%", "65%"],
           maxWidth: "500px",
           alignSelf: "center",
@@ -1133,7 +1132,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         ) : (
           <Flex
             sx={{
-              mb: 70,
+              mb: "spacing13",
               alignItems: "center",
               gap: "spacing4"
             }}
