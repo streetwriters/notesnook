@@ -1244,12 +1244,11 @@ async function isMatchingAllColorsAndTags(
     const resolvedColors = await db.colors.all
       .fields(["colors.id", "colors.title"])
       .records(colorIds);
-    console.log({ resolvedColors });
-    for (const [_, color] of Object.entries(resolvedColors)) {
-      console.log(color);
-      if (!color) return false;
-      if (colors.some((c) => c.toLowerCase() !== color.title.toLowerCase()))
-        return false;
+    const resolvedColorTitles = Object.values(resolvedColors).map((color) =>
+      color?.title.toLowerCase()
+    );
+    for (const color of colors) {
+      if (!resolvedColorTitles.includes(color.toLowerCase())) return false;
     }
   }
 
@@ -1257,10 +1256,11 @@ async function isMatchingAllColorsAndTags(
     const resolvedTags = await db.tags.all
       .fields(["tags.id", "tags.title"])
       .records(tagIds);
-    for (const [_, tag] of Object.entries(resolvedTags)) {
-      if (!tag) return false;
-      if (tags.some((c) => c.toLowerCase() !== tag.title.toLowerCase()))
-        return false;
+    const resolvedTagTitles = Object.values(resolvedTags).map((tag) =>
+      tag?.title.toLowerCase()
+    );
+    for (const tag of tags) {
+      if (!resolvedTagTitles.includes(tag.toLowerCase())) return false;
     }
   }
   return true;
