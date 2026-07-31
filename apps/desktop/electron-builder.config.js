@@ -203,11 +203,12 @@ module.exports = {
   toolsets: {
     appimage: "1.0.2"
   },
-  snap: {
-    autoStart: false,
-    confinement: "strict",
-    allowNativeWayland: true,
-    base: "core22"
+  snapcraft: {
+    base: "core24",
+    core24: {
+      confinement: "strict",
+      autoStart: false
+    }
   },
   extraResources: ["app-update.yml", "./assets/**"],
   extraMetadata: {
