@@ -859,7 +859,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
                   </Flex>
                   <Text
                     sx={{
-                      fontSize: "xs",
+                      fontSize: "sm",
                       fontWeight: 500,
                       color: "heading"
                     }}
@@ -900,7 +900,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
                   </Flex>
                   <Text
                     sx={{
-                      fontSize: "xs",
+                      fontSize: "sm",
                       fontWeight: 500,
                       color: "heading"
                     }}
@@ -939,7 +939,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
                   </Flex>
                   <Text
                     sx={{
-                      fontSize: "xs",
+                      fontSize: "sm",
                       fontWeight: 500,
                       color: "heading"
                     }}
