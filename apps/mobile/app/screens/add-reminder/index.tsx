@@ -288,7 +288,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
       Notifications.scheduleNotification(_reminder as Reminder);
       Navigation.queueRoutesForUpdate();
       useRelationStore.getState().update();
-      Navigation.goBack();
+      handleBackNavigation();
     } catch (e) {
       ToastManager.error(e as Error, undefined);
     }
