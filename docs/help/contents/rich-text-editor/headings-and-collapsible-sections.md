@@ -44,7 +44,7 @@ On macOS use `Command+Option` in place of `Ctrl+Alt`.
 Applying a heading keeps the line's alignment and text direction, and clears any custom font size on the selection so the heading uses its own size.
 
 ::: info Headings are unavailable inside a code block
-The `{{headings}}` dropdown is disabled while the cursor is inside a [code block](/rich-text-editor/code-blocks), where `#` is just a character.
+The `{{headings}}` dropdown is disabled while the cursor is inside a [code block](/rich-text-editor/code-blocks), where `#` is an ordinary character.
 :::
 
 ## Type a heading with Markdown <PlanTag plan="essential" />
@@ -59,7 +59,7 @@ Every heading with text in it has a chevron at the end of the line.
 
 :::tabs key:platform
 == Desktop/Web
-1. Hover over the heading — the chevron fades in just after the last word.
+1. Hover over the heading — the chevron fades in immediately after the last word.
 2. Click it. Everything below the heading is hidden and the chevron rotates to point right.
 3. Click it again to unfold the section.
 == Mobile

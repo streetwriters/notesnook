@@ -1,7 +1,7 @@
 ---
 title: App lock
 pageTitle: Lock the Notesnook app with a PIN, password or biometrics
-description: Turn on app lock in Notesnook to require a PIN, password, biometrics or a security key before your notes can be opened, even when your device is already unlocked.
+description: Turn on app lock in Notesnook to require a PIN, password, biometrics or a security key before your notes open, even when your device is already unlocked.
 keywords:
   - lock notes app
   - password protect notes app
@@ -22,67 +22,78 @@ App lock is part of the [Pro plan and above](/plans-and-limits). If a paid plan 
 | Biometrics (fingerprint, Face ID) | Mobile |
 | Security key | Desktop and web |
 
-## How long before it locks
-
-On desktop and web the `Lock app after` options are `{{immediately}}`, `1`, `5`, `10`, `15`, `30`, `45` minutes, `1 hour` or `Never`. On mobile they are `Never`, `Immediately`, `1`, `5`, `15` and `30` minutes. `Never` means the app only asks when it starts.
-
-::: danger Don't forget your app lock credential
-App lock is a local, device-only lock and is completely separate from your account password. If you forget your app lock password/pin (and don't have a working biometric or security key fallback), there is no in-app way to reset it and you will be locked out of the app **on that device**. Your notes themselves are not lost — they remain safely synced to your account — but to regain access you'll need to reinstall the app (or clear its local data) and log back in, which discards any local changes that hadn't synced yet.
-:::
+## Turn on app lock
 
 :::tabs key:platform
-== Desktop
+== Desktop/Web
 
-### Turn on App Lock
+1. Go to `{{settings}}` → `{{appLock}}`.
+2. Turn on `{{enableAppLock}}`.
+3. Enter a password or PIN when prompted, and confirm it.
 
-1. Go to Settings and Click App lock. Then turn on the App lock switch. You will be prompted to enter your App Lock Password. When it is successful App Lock will be turned on.
-
-<img src="/desktop-enable-app-lock.png" alt="drawing" height="500"/>
-
-### Setting App Lock Time Out
-
-2. You can set the time out for your App Lock from one minute to an hour or you can turn it off by setting it to **Never**.
-
-<img src="/desktop-lock-app-after.png" alt="drawing" height="500"/>
-
-### Change Password
-
-3. You can also change the pin or password or you can set a security key if you want a more secure app.
-
-<img src="/desktop-password-key.png" alt="drawing" height="500"/>
+![The App lock section of Notesnook desktop settings, with the Enable app lock switch turned on](/desktop-enable-app-lock.png)
 
 == Mobile
 
-### Turn on App Lock
+1. Go to `{{settings}}` → `{{appLock}}`.
 
-1. Go to Settings and Tap App lock.
+   ![The App lock entry in the Notesnook mobile settings list](/app-lock-setting.png)
 
-   <img src="/app-lock-setting.png" alt="drawing" height="500"/>
+2. Turn on `{{enableAppLock}}` and enter a PIN, or authenticate with your fingerprint or face.
 
-2. Then turn on the App lock switch. You will be prompted to enter a pin or fingerprint. When it is successful App Lock will be turned on.
+   ![The App lock switch turned on in Notesnook mobile settings](/app-lock-setting-on-off.png)
 
-   <img src="/app-lock-setting-on-off.png" alt="drawing" height="500"/>
+:::
 
-### Setting App Lock Time Out
+Notesnook now asks for your credential every time it starts, and after the timeout you set below.
 
-3. You can set the time out for your App Lock
+## Set how long before it locks
 
-   <img src="/app-lock-setting-time-out.png" alt="drawing" height="500"/>
+`Lock app after` decides how long the app can sit idle before it locks itself again. `{{never}}` means Notesnook only asks when it starts.
 
-### Set a pin
+:::tabs key:platform
+== Desktop/Web
 
-4. You can set a pin instead of a fingerprint if you are more comfortable with it (or if your mobile is not fingerprint friendly).
+1. Go to `{{settings}}` → `{{appLock}}`.
+2. Set `Lock app after` to `{{immediately}}`, `1`, `5`, `10`, `15`, `30` or `45` minutes, `1 hour`, or `{{never}}`.
 
-   <img src="/setup-app-lock-pin.png" alt="drawing" height="500"/>
+![The Lock app after dropdown in Notesnook desktop settings, showing the available timeout intervals](/desktop-lock-app-after.png)
 
-5. You can also change or remove the pin.
+== Mobile
 
-   <img src="/change-remove-app-lock-pin.png" alt="Changing or removing the app lock PIN in Notesnook settings on mobile" height="500"/>
+1. Go to `{{settings}}` → `{{appLock}}`.
+2. Set `{{appLockTimeout}}` to `{{never}}`, `{{immediately}}`, `1`, `5`, `15` or `30` minutes.
+
+   ![The App lock timeout options in Notesnook mobile settings](/app-lock-setting-time-out.png)
+
+:::
+
+## Change or remove your PIN, password or security key
+
+:::tabs key:platform
+== Desktop/Web
+
+Under `{{credientials}}` on the same screen:
+
+- `{{passwordPin}}` — press `{{change}}` to set a new one, or `{{disable}}` to remove it.
+- `{{securityKey}}` — press `{{register}}` to add a hardware security key, or `{{unregister}}` to remove it.
+
+![The Credentials section of Notesnook desktop app lock settings, with the password and security key options](/desktop-password-key.png)
+
+== Mobile
+
+- `{{setupAppLockPin}}` or `{{setupAppLockPassword}}` add a credential; once one exists the entries read `{{changeAppLockPin}}` and `{{changeAppLockPassword}}`.
+- `{{removeAppLockPin}}` and `{{removeAppLockPassword}}` take one away. App lock is switched off entirely if you remove the last remaining method.
+
+  ![Setting an app lock PIN in Notesnook on mobile](/setup-app-lock-pin.png)
+
+  ![Changing or removing the app lock PIN in Notesnook settings on mobile](/change-remove-app-lock-pin.png)
+
 :::
 
 ## Lock the app right now
 
-Rather than waiting for the timeout, you can lock immediately: on desktop and web click the lock icon in the status bar at the bottom of the window.
+Rather than waiting for the timeout, you can lock immediately. On desktop and web, click the lock icon in the status bar at the bottom of the window.
 
 ## Related pages
 

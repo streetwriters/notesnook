@@ -1,6 +1,21 @@
 ---
 title: Gift cards
-description: Gift your friends and family a Notesnook Pro subscription.
+pageTitle: Notesnook gift cards — buying and redeeming a gift code
+description: Buy a Notesnook gift card for one, three or five years, send the code to anyone, and redeem it on an account that is currently on the free plan.
+keywords:
+  - notesnook gift card
+  - gift notesnook subscription
+  - redeem notesnook code
+schema: faq
+faqs:
+  - q: Who can redeem a Notesnook gift code?
+    a: Anyone whose account is currently on the free plan. You cannot redeem a gift code on an account with an active subscription, and a cancelled subscription counts as active until its billing period ends.
+  - q: Can I use a gift card to extend my existing subscription?
+    a: No. Your current subscription has to end completely before a gift code can be redeemed on that account.
+  - q: Do Notesnook gift codes expire?
+    a: Yes, one year from the date of purchase.
+  - q: Are Notesnook gift cards refundable or auto-renewing?
+    a: Neither. Gift codes are non-refundable and are a one-time purchase that never renews.
 ---
 
 # Gift cards

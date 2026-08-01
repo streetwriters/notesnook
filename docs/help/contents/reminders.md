@@ -1,6 +1,12 @@
 ---
 title: Setting reminders on notes
-description: Learn how to create reminders on your notes in Notesnook. Set one-time or recurring reminders with custom notification preferences.
+pageTitle: How do I set a reminder on a note in Notesnook?
+description: Set one-time, recurring and permanent reminders on your Notesnook notes, snooze them from the notification, and change the sound and snooze time.
+keywords:
+  - notesnook reminders
+  - reminder on a note
+  - recurring reminders notes app
+schema: howto
 ---
 
 # Creating reminders

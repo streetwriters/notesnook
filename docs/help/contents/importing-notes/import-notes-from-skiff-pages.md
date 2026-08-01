@@ -16,11 +16,11 @@ The following steps will help you quickly import your notes from Skiff Pages int
 ## Exporting your Skiff Pages
 
 1. Open the [Skiff Pages](https://app.skiff.com) app
-2. Open Settings > Export or just go directly to [https://app.skiff.com/dashboard/?settingTab=export](https://app.skiff.com/dashboard/?settingTab=export)
-   ![ in Notesnook](/static/skiff-importer/1.png)
+2. Open Settings > Export, or go straight to [https://app.skiff.com/dashboard/?settingTab=export](https://app.skiff.com/dashboard/?settingTab=export)
+   ![The Export tab in Skiff settings](/static/skiff-importer/1.png)
 3. Click the Export button next to `Pages and Files` — this might take a few minutes depending on how many pages you have.
 4. Once the export is complete, save the `Skiff.zip` file at your preferred location.
-   ![ in Notesnook](/static/skiff-importer/2.png)
+   ![The finished Skiff export, ready to save as Skiff.zip](/static/skiff-importer/2.png)
 
 ## Importing Skiff.zip file into Notesnook
 
@@ -28,9 +28,9 @@ Once you have the `Skiff.zip` file containing your Skiff pages, its time to impo
 
 1. Open the Notesnook app (web or desktop)
 2. Go to `Settings > Import & export > Notesnook Importer` and select "Skiff Pages".
-   ![ in Notesnook](/static/skiff-importer/3.png)
+   ![The Notesnook Importer app list with Skiff Pages selected](/static/skiff-importer/3.png)
 3. Drop your Skiff.zip file, or click anywhere inside the box to browse and select your Skiff.zip file. Then click "Start importing".
-   ![ in Notesnook](/static/skiff-importer/4.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/skiff-importer/4.png)
 4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 ## Supported formats

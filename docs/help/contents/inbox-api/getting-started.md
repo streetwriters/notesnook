@@ -1,6 +1,12 @@
 ---
 title: Getting Started
-description: Learn about Notesnook's Inbox API.
+pageTitle: Getting started with the Notesnook Inbox API
+description: Send notes into your Notesnook account from other apps and services with the Inbox API — enabling it, creating keys, and posting your first note.
+keywords:
+  - notesnook inbox api
+  - notesnook api
+  - send note to notesnook
+  - notesnook zapier
 ---
 
 # Getting started with the Inbox API
@@ -216,7 +222,7 @@ Inbox uses OpenPGP asymmetric encryption to ensure your data is encrypted before
 
    - The inbox server fetches your PGP public key from Notesnook's API using the provided API key.
    - Your payload is encrypted using your PGP public key (`alg: pgp-aes256`). The result is an armored PGP ciphertext blob.
-   - The encrypted payload is forwarded to Notesnook's servers and stored in the database. The inbox server never stores your data in plaintext or encrypted. It just acts as a relay.
+   - The encrypted payload is forwarded to Notesnook's servers and stored in the database. The inbox server never stores your data in plaintext or encrypted. It only acts as a relay.
 
 3. **When your client syncs:**
    - Encrypted inbox items are pushed to all your connected clients (web, desktop, and mobile) via sync.

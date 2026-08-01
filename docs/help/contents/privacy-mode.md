@@ -37,7 +37,7 @@ Privacy mode enables some OS specific settings to enhance your privacy while wor
    :::
 
 ::: info
-Privacy mode will prevent all screen capturing software from capturing Notesnook. This includes softwares like TeamViewer, AnyDesk & RustDesk etc.
+Privacy mode prevents screen capturing software from capturing Notesnook. That includes tools like TeamViewer, AnyDesk and RustDesk.
 
 On Android, it'll also show a blank screen in the Activity Switcher & taking a screenshot will show an error.
 :::

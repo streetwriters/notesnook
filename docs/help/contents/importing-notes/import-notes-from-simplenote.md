@@ -11,19 +11,19 @@ schema: howto
 
 # How to import notes from Simplenote notes app?
 
-The following steps will help you import your notes from Simplenote easily.
+Here is how to move your notes from Simplenote into Notesnook.
 
 1. Open Simplenote app on Desktop or Login to [https://app.simplenote.com](https://app.simplenote.com).
 2. Go to sidebar and click Settings.
-   ![ in Notesnook](/static/simplenote-importer/1.png)
+   ![The Settings entry in the Simplenote sidebar](/static/simplenote-importer/1.png)
 3. Go to `Tools` tab in Settings
-   ![ in Notesnook](/static/simplenote-importer/2.png)
+   ![The Tools tab in Simplenote settings, where Export notes lives](/static/simplenote-importer/2.png)
 4. Click `Export notes` to download your notes as a .zip file.
 5. Open the Notesnook app (web or desktop)
 6. Go to `Settings > Import & export > Notesnook Importer` and select `Simplenote` from list of apps.
-   ![ in Notesnook](/static/simplenote-importer/3.png)
+   ![The Notesnook Importer app list with Simplenote selected](/static/simplenote-importer/3.png)
 7. Drop the .zip backup file you exported earlier from Simplenote in the box or click anywhere to open system file picker to select the backup and click "Start importing".
-   ![ in Notesnook](/static/simplenote-importer/4.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/simplenote-importer/4.png)
 8. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, [report it on github](https://github.com/streetwriters/notesnook).
 
 ## Supported formats

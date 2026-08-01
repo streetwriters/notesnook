@@ -1,6 +1,12 @@
 ---
 title: Favorites
-description: Add a note to favorites for quick access, or remove it from favorites.
+pageTitle: How do I favorite a note in Notesnook?
+description: Add a note to favorites in Notesnook for one-tap access from the side menu, and remove it again from the same menu.
+keywords:
+  - notesnook favorites
+  - favorite a note
+  - bookmark notes app
+schema: howto
 ---
 
 # Add notes to favorites

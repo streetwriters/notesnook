@@ -1,13 +1,22 @@
 ---
-title: Keyboard Shortcuts
-description: Keyboard shortcuts for Notesnook
+title: Keyboard shortcuts
+pageTitle: Every keyboard shortcut in Notesnook
+description: The complete list of Notesnook keyboard shortcuts for web, Windows, Linux and macOS — navigation, the editor, formatting and note actions.
+keywords:
+  - notesnook keyboard shortcuts
+  - notesnook hotkeys
+  - notes app shortcuts
 ---
 
 # Keyboard shortcuts
 
-The following keyboard shortcuts will help you navigate Notesnook faster.
+These are every keyboard shortcut the Notesnook desktop and web apps respond to, grouped by what they do. Press `Ctrl` `/` (`⌘` `/` on macOS) inside the app to bring the same list up there.
 
-### General
+::: info This page is generated from the app
+The tables below are generated straight from the app's own keybinding registry, so they cannot drift out of step with the shortcuts that actually fire.
+:::
+
+## General
 
 | Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |
@@ -16,7 +25,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Keyboard shortcuts | Ctrl / | Ctrl / | ⌘ / |
 | New note | - | Ctrl N | ⌘ N |
 
-### Navigation
+## Navigation
 
 | Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |
@@ -28,7 +37,7 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Close active tab | - | Ctrl W | ⌘ W |
 | Close all tabs | - | Ctrl ⇧ W | ⌘ ⇧ W |
 
-### Editor
+## Editor
 
 | Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |
@@ -84,3 +93,11 @@ The following keyboard shortcuts will help you navigate Notesnook faster.
 | Move parent node up | Alt ⇧ ↑ | Alt ⇧ ↑ | ⌥ ⇧ ↑ |
 | Move parent node down | Alt ⇧ ↓ | Alt ⇧ ↓ | ⌥ ⇧ ↓ |
 | Clear current line | Ctrl L | Ctrl L | ⌘ L |
+
+## Related pages
+
+- [Editor toolbar](/rich-text-editor/rich-text-editor-toolbar) — the same actions as buttons, and how to rearrange them
+- [Markdown shortcuts](/rich-text-editor/markdown-notes-editing) — formatting that triggers as you type
+- [Find & replace](/rich-text-editor/search-and-replace) — searching inside the note you are editing
+- [Search & navigation](/search-and-navigation) — the command palette and quick open
+- [Tabs & panes](/rich-text-editor/editor-tabs-and-panes) — moving between open notes

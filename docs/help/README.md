@@ -54,23 +54,23 @@ Renaming or moving a file changes a live URL that the apps and support replies l
 
 The docs are versioned by Notesnook version. The **latest** version lives at the site root, so canonical URLs never move; older versions are served from `/v<version>/` and reachable from the version picker in the nav bar.
 
-Older versions are stored as **differences, not copies**. A page is shared by every version until it actually changes; only then does the old text get its own file. `.vitepress/versions.mjs` holds `LATEST` (currently `3.3`) and the list of older versions.
+Older versions are stored as **differences, not copies**. A page is shared by every version until it actually changes; only then does the old text get its own file. `.vitepress/versions.mjs` holds `LATEST` and the list of older versions.
 
 **When Notesnook ships a new version:**
 
 ```bash
-npm run version -- 3.4
+npm run version -- <next-version>
 ```
 
-Nothing is copied — 3.3 becomes an older version whose pages are all still shared with the root.
+Nothing is copied — the outgoing version becomes an older version whose pages are all still shared with the root.
 
 **When you change a page in a way that doesn't apply to the old version**, preserve the old text first, then edit the root copy as usual:
 
 ```bash
-npm run fork -- 3.3 organizing-notes/archive-notes
+npm run fork -- <old-version> organizing-notes/archive-notes
 ```
 
-That writes `contents/_versions/3.3/organizing-notes/archive-notes.md` — the only file 3.3 needs. For a page that didn't exist in an older version, add its path to `contents/_versions/<version>/_excluded.txt` instead.
+That writes `contents/_versions/<old-version>/organizing-notes/archive-notes.md` — the only file that version needs. For a page that didn't exist in an older version, add its path to `contents/_versions/<version>/_excluded.txt` instead.
 
 `npm run versions` (run automatically before dev and build) composes the full `/v<version>/` trees from the shared pages plus those overrides. The composed trees live in `contents/v<version>/` and are gitignored — never edit them.
 

@@ -1,48 +1,48 @@
 ---
 title: Editor toolbar
-description: Add blocks to a note and customize the editor toolbar's groups and tools to fit how you write.
+pageTitle: The Notesnook editor toolbar, and how to customize it
+description: Insert blocks from the Notesnook editor toolbar, and rearrange its groups, subgroups and tools — or switch between the default, minimal and custom presets.
+keywords:
+  - notesnook editor toolbar
+  - customize notes toolbar
+  - notesnook insert block
 ---
 
-# Editor Toolbar
+# Editor toolbar
 
-The notes editor toolbar has all the basic tools for rich formatting of your notes. It also lets you add various blocks to your notes like task lists, images, videos etc.
+The editor toolbar holds every formatting tool, and the `+` button on it inserts blocks — task lists, tables, images, code blocks and more.
 
-![Toolbar](/toolbar-editor.png)
+![The Notesnook editor toolbar, with its formatting tools grouped along the top of a note](/toolbar-editor.png)
 
-## Adding blocks to a note
+## Add a block to a note
 
 1. Focus inside the note where you want to insert a block.
 2. Click the ![Toolbar plus](/toolbar-plus.png) button on the toolbar.
 3. Select the block you want to insert; for example a task list.
 
-![Toolbar](/toolbar-blocks.png)
+![The insert menu open in the editor, listing the blocks you can add to a note](/toolbar-blocks.png)
 
-## Customzing editor toolbar <PlanTag plan="pro"/>
+## Customize the editor toolbar <PlanTag plan="pro" />
 
-::: info
-Toolbar configuration is automatically synced across all your devices. Notesnook does not sync the desktop toolbars to mobile, and vice versa.
+An editor toolbar carries a lot of tools. Hiding the ones you never use, and keeping the ones you reach for at the front, leaves you with a toolbar that matches how you actually write.
+
+::: info Desktop and mobile keep separate toolbars
+Your toolbar layout syncs to your other devices, but desktop and mobile are stored separately — changing the toolbar on your laptop does not change the one on your phone, and the other way round.
 :::
 
-One of the great features of the editor is the ability to customize the editor toolbar to fit your own needs. There's usually many tools in an editor toolbar and being able to hide the tools you never use and just keep what you use more frequently on top helps focus on your note taking.
+On every platform the toolbar editor lives in the same place: `{{settings}}` > `{{customization}}` > `{{editor}}` > `{{customizeToolbar}}`.
+
+![The Customize toolbar screen on desktop, showing the toolbar's groups and the tools inside each one](/config-toolbar-desktop.png)
+
+**Groups** — tools are distributed across groups. You can add, remove and reorder the groups in the toolbar. You can move tools between groups with drag and drop.
+
+**Subgroups** — each group can have a single subgroup. Tools in a subgroup are collapsed into a drop down menu in the toolbar.
 
 :::tabs key:platform
 == Desktop/Web
-To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}}` and click `{{customizeToolbar}}`.
-
-![Configure editor toolbar](/config-toolbar-desktop.png)
+**Disabled items** — tools that are hidden from the toolbar. Drag a tool into this section to remove it from the toolbar.
 == Mobile
-To customize the toolbar go to `{{settings}}` > `{{customization}}` > `{{editor}}` and click `{{customizeToolbar}}`.
-:::
-
-**Groups** - Tools are distrubted across groups. You can add, remove and reorder the groups in the toolbar. You can move tools between groups with drag and drop.
-
-**Subgroup** - Each group can have a single sub group. Tools in a subgroup are collapsed into a drop down menu in the toolbar.
-
-:::tabs key:platform
-== Desktop/Web
-**Disabled Items** - Tools that are hidden from the toolbar. You can drag and drop a tool into this section to remove it from the toolbar.
-== Mobile
-**Disabled Items** - Tools that are hidden from the toolbar. Click the `+` button on a group to view disabled tools and add them back to the toolbar.
+**Disabled items** — tools that are hidden from the toolbar. Tap the `+` button on a group to see them and add them back.
 :::
 
 ### Choose a toolbar preset
@@ -91,19 +91,19 @@ The toolbar goes back to the `{{default}}` preset and a `{{toolbarReset}}` toast
 == Desktop/Web
 To add a new group to the toolbar, click the `+` button in the header.
 == Mobile
-Scroll down the bottom of all groups. Click `{{createAGroup}}` button to add a new group.
+Scroll to the bottom of the group list and tap `{{createAGroup}}`.
 :::
 
-### Adding tools to a group
+### Add tools to a group
 
 :::tabs key:platform
 == Desktop/Web
-Drag and drop tools from other groups or the `Disabled item` section into a group to add them to the group.
+Drag tools from other groups or from `Disabled items` into a group to add them.
 == Mobile
-Click the `+` button on a group header to add any disabled tools into the group. You can also drag and drop tools from other groups.
+Tap the `+` button on a group header to add any disabled tools into the group. You can also drag tools in from other groups.
 :::
 
-### Creating a subgroup
+### Create a subgroup
 
 :::tabs key:platform
 == Desktop/Web
@@ -111,25 +111,25 @@ Click the `+` button on a group header to add any disabled tools into the group.
 1. Hover on a group header.
 2. Click the `+` button to add a subgroup.
 3. Drag and drop tools into the subgroup.
-4. Tools in the subgroup will be collapsed into a drop down.
+4. Tools in the subgroup are collapsed into a drop down.
 
 == Mobile
-You can create a subgroup by clicking on collapse button on a tool. Tools in the subgroup will be collapsed into a popup.
+Create a subgroup by tapping the collapse button on a tool. Tools in the subgroup are collapsed into a popup.
 :::
 
-### Deleting a group
+### Delete a group
 
 :::tabs key:platform
 == Desktop/Web
-You can remove a group and all it's tools from the toolbar.
+You can remove a group and all its tools from the toolbar.
 
 1. Hover on a group header
 2. Click the trash icon to delete the group.
-3. All the tools in the group will be moved to `Disabled items` section at the bottom.
+3. All the tools in the group are moved to the `Disabled items` section at the bottom.
 
 == Mobile
 
-1. Click the `-` button on a group header to remove the group
+1. Tap the `-` button on a group header to remove the group.
 2. Tools removed from a group can be added back with the `+` button on the group header.
    :::
 
@@ -140,10 +140,10 @@ You can remove a group and all it's tools from the toolbar.
 
 1. Hover on a tool header
 2. Click the trash icon to disable the tool.
-3. Deleted tools in the group will be moved to `Disabled items` section at the bottom.
+3. The tool is moved to the `Disabled items` section at the bottom.
 
 == Mobile
-A tool can be disabled from the toolbar by clicking on the `-` button on the tool.
+Tap the `-` button on a tool to disable it.
 :::
 
 ## Related pages

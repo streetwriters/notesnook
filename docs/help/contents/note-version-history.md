@@ -6,7 +6,14 @@ keywords:
   - restore previous version of note
   - note history notes app
   - undo changes to a note
-schema: howto
+schema: faq
+faqs:
+  - q: Is note version history synced across my devices?
+    a: No. Version history is kept on the device it was created on. Logging out clears the stored versions for all your notes on that device.
+  - q: Does note version history count against my storage?
+    a: No. Storage limits apply to attachments only. Note versions are stored on your device, not on the server.
+  - q: What happens to a note's history when I delete the note?
+    a: It goes with the note. Moving a note to trash and then deleting it permanently removes its versions too.
 ---
 
 # Note version history

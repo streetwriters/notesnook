@@ -16,7 +16,7 @@ faqs:
   - q: What goes to the trash in Notesnook?
     a: Only notes and notebooks. Tags, colors, reminders and attachments are removed immediately when you delete them and do not pass through the trash.
   - q: Does clearing the trash free up my storage?
-    a: Storage counts attachments, and attachments are not stored in the trash. Deleting an attachment from the attachment manager is what frees storage.
+    a: No. Your storage limit counts attachments only, and attachments never go to the trash — so notes and notebooks sitting in the trash cost you nothing against it.
 ---
 
 # How do I restore a deleted note in Notesnook?
@@ -111,13 +111,13 @@ Cleanup measures from the start of the day an item was deleted, and runs against
 
 <!-- TODO: screenshot — the Clear trash interval dropdown in Settings → Behaviour -->
 
-## Does the trash count against my storage?
+## Does clearing the trash free up my storage?
 
-No. Storage limits count [attachments](/attachments-and-files) only, and attachments never go to the trash. Notes cost you nothing against your storage whether they are live or trashed.
+No. Storage limits count [attachments](/attachments-and-files) only, and attachments never go to the trash. Notes cost you nothing against your storage whether they are live or trashed, so emptying the trash does not change your storage figure.
 
 ## Related pages
 
-- [Attachments and files](/attachments-and-files) — deleting files, which is what actually frees storage
+- [Attachments and files](/attachments-and-files) — what actually counts against your storage
 - [Note version history](/note-version-history) — recovering an earlier draft instead of a deleted note
 - [Backup and restore](/backup-and-restore-notes-in-notesnook) — the only copy that survives a cleared trash
 - [Notebooks](/organizing-notes/organize-notes-using-notebooks) — how deleting a notebook affects its notes

@@ -1,6 +1,12 @@
 ---
 title: Clipping your first webpage with web clipper
-description: Clip web pages & save interesting things you find on the web with Notesnook web clipper in a private & secure way.
+pageTitle: How do I clip a web page into Notesnook?
+description: Connect the Notesnook Web Clipper to the web app, choose what part of a page to clip and in what mode, then file the clip into a note, notebook or tag.
+keywords:
+  - notesnook web clipper
+  - clip web page to notes
+  - save article to notes app
+schema: howto
 ---
 
 # Clipping your first webpage with web clipper
@@ -38,7 +44,7 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
 
 The [web clipper](https://notesnook.com/notesnook-web-clipper) provides a few options to help you clip exactly the part of the page you need:
 
-![Notesnook Web Clipper clipping area options](/static/web-clipper/clipping-area.png)
+![The clipping area options in the Notesnook Web Clipper](/static/web-clipper/clipping-area.png)
 
 ### Full page
 
@@ -99,7 +105,7 @@ The clipping mode controls how the final clip should look.
 
 The Notesnook Web Clipper offers 3 easy ways to organize your web clips (all of which are completely optional):
 
-![Options for organizing a web clip: append to a note, add to a notebook, or assign tags](/static/web-clipper/organize-web-clip.png)
+![The Notesnook Web Clipper options for appending to a note, adding to a notebook, or assigning tags](/static/web-clipper/organize-web-clip.png)
 
 ::::tabs
 == Append to note

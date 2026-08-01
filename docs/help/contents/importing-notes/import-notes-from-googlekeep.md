@@ -17,11 +17,11 @@ The following steps will help you quickly import your notes from Google Keep int
 
 1. Go to [Google Takeout](https://takeout.google.com/settings/takeout) and log into your Google account.
 2. On the Google Takeout page, first deselect all the items by clicking on `Deselect all`, and then scroll down and select only `{{keep}}` from the list. Once selected, click `Next Step` by scrolling to the very bottom of the page.
-   ![ in Notesnook](/static/google-keep-importer/1.png)
-3. On the next section, leave everything as is and just click the "Create export" button:
-   ![ in Notesnook](/static/google-keep-importer/2.png)
+   ![The Google Takeout page with every product deselected except Keep](/static/google-keep-importer/1.png)
+3. Leave everything in the next section as it is and click the "Create export" button:
+   ![The Google Takeout export options, with the Create export button at the bottom](/static/google-keep-importer/2.png)
 4. Download the exported .zip file once it becomes available:
-   ![ in Notesnook](/static/google-keep-importer/3.png)
+   ![The finished Google Takeout export, ready to download as a .zip file](/static/google-keep-importer/3.png)
 
 ## Importing Google Takeout into Notesnook
 
@@ -29,9 +29,9 @@ Once you have the Google Takeout containing your Google Keep notes, its time to 
 
 1. Open the Notesnook app (web or desktop)
 2. Go to `Settings > Import & export > Notesnook Importer` and select `Google Keep` from list of apps.
-   ![ in Notesnook](/static/google-keep-importer/4.png)
+   ![The Notesnook Importer app list with Google Keep selected](/static/google-keep-importer/4.png)
 3. Drop the .zip backup file(s) you exported earlier from Google Takeout in the box or click anywhere to open system file picker to select the backup.
-   ![ in Notesnook](/static/google-keep-importer/5.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/google-keep-importer/5.png)
 4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 ## Supported formats

@@ -1,18 +1,21 @@
 ---
 title: Pin to notifications
-description: Pin a note to your Android notification shade for quick access and fast note taking.
+pageTitle: Pin a note to your Android notifications
+description: Keep a Notesnook note in your Android notification shade so it is always one swipe away, and unpin it when you no longer need it there.
+keywords:
+  - pin note to notification
+  - android sticky note
+  - notesnook notification
+schema: howto
 ---
 
 # Pin to notifications <PlanTag plan="pro" note="Android only" />
 
-::: info Android only
-:::
+Android lets apps keep an ongoing notification in the shade. Notesnook uses that to keep a note one swipe away — useful for a shopping list, a door code, or anything you keep reaching for during the day.
 
-Pinning a note to your notifications requires a Pro plan and is available on Android only — see [Plans & limits](/plans-and-limits).
+Pinning a note to your notifications needs a Pro plan and is Android only — see [Plans & limits](/plans-and-limits).
 
-Android allows you to add sticky/on-going notifications to the System Notifications drawer. In Notesnook we use this feature to allow you to pin notes in notifications.
-
-![Pinned notifications](/static/mobile-integration/android-pin-notification.png)
+![A note pinned to the Android notification shade](/static/mobile-integration/android-pin-notification.png)
 
 1. Tap the ![Three dot button](/three-dot-button.png) on a note
 2. Select `{{pinToNotifications}}`

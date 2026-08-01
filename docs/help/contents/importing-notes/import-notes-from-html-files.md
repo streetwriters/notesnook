@@ -12,9 +12,9 @@ schema: howto
 
 1. Open the Notesnook app (web or desktop)
 2. Go to `Settings > Import & export > Notesnook Importer` and select `HTML` from list of apps.
-   ![ in Notesnook](/static/html/1.png)
+   ![The Notesnook Importer app list with HTML selected](/static/html/1.png)
 3. Drop your .html files, or click anywhere inside the box to browse and select your .html files. You can also provide a .zip file containing all your .html files. Then click "Start importing".
-   ![ in Notesnook](/static/html/2.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/html/2.png)
 4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 <GetNotesnook title="Your notes, encrypted the moment they land" text="Notesnook imports run entirely on your device — not one byte of your HTML files export is sent to our servers. Once imported, everything is end-to-end encrypted and syncs to all your devices for free." />

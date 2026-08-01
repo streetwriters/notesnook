@@ -1,6 +1,12 @@
 ---
 title: System tray menu
-description: Access quick actions from the Notesnook system tray icon, and minimize or close the app to the tray.
+pageTitle: The Notesnook system tray menu
+description: Use the Notesnook system tray icon for quick actions, and set the app to minimize or close to the tray instead of the taskbar.
+keywords:
+  - notesnook system tray
+  - minimize to tray
+  - close to tray notes app
+schema: howto
 ---
 
 # System tray menu
@@ -13,7 +19,7 @@ Notesnook features a system tray menu to give quick access to some common functi
 
 See it in action here:
 
-![The system tray menu](/static/desktop-integration/system-tray-menu.png)
+![The Notesnook system tray menu, with New note and New notebook](/static/desktop-integration/system-tray-menu.png)
 
 ## Minimize to tray
 

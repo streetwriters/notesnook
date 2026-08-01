@@ -240,10 +240,13 @@ html {
   border-radius: var(--nn-radius-default);
 }
 
+/* The hover fill bleeds left of the label so item text keeps the same left edge
+   as the group headers and the nav logo (32px), instead of sitting 10px in. */
 .VPSidebarItem.level-1 .item,
 .VPSidebarItem.level-2 .item,
 .VPSidebarItem.level-3 .item {
   border-radius: var(--nn-radius-default);
+  margin-left: calc(var(--nn-space-2) * -1);
   padding-left: var(--nn-space-2);
   padding-right: var(--nn-space-1);
   transition: background-color 100ms ease-out;

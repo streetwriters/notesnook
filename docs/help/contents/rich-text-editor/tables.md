@@ -1,11 +1,18 @@
 ---
 title: Tables
-description: Insert a table in your notes and resize, merge, split, or format its rows, columns and cells.
+pageTitle: How do I add a table to a note in Notesnook?
+description: Insert a table in a Notesnook note and resize, move, merge and split its rows, columns and cells — plus importing and exporting tables as CSV.
+keywords:
+  - notesnook table
+  - insert table in note
+  - notes app with tables
+  - import csv to note
+schema: howto
 ---
 
 # Tables
 
-![Notes editor with table example](/table-example-22.png)
+![A table in the Notesnook editor with its row and column controls visible](/table-example-22.png)
 
 Tables in Notesnook provide all the basic to advanced functionality. On the left side are the `{{rowProperties}}` and `{{insertRowBelow}}` buttons while on top of the table are `{{tableSettings}}` and `{{insertColumnRight}}` buttons.
 
@@ -16,7 +23,7 @@ The first row of a newly created table is always a header. You can always delete
 1. Click the ![Toolbar plus](/toolbar-plus.png) and select the table block.
 2. Select the size of the table grid.
 
-![Create a table in rich text editor](/create-table.png)
+![The table size grid in the insert menu](/create-table.png)
 
 ## Resizing table columns
 

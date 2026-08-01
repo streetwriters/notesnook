@@ -80,7 +80,7 @@ There is no bulk remove action on mobile. Press the ![Three dot button](/three-d
 
 ## Make a note read-only
 
-`{{readOnly}}` locks the note against editing. The content stays visible and searchable — you just can't type into it. It is a toggle: turn it off and the note becomes editable again.
+`{{readOnly}}` locks the note against editing. The content stays visible and searchable — you cannot type into it. It is a toggle: turn it off and the note becomes editable again.
 
 :::tabs key:platform
 == Desktop/Web

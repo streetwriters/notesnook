@@ -31,7 +31,7 @@ Everything on this page is in the `{{sync}}` group.
 
 ## Turn on full offline mode <PlanTag plan="essential" />
 
-`{{fullOfflineMode}}` — *"Download everything including attachments on sync"* — makes every sync also download your attachments, not just your notes. Without it, an image or file is fetched from the server the first time you open it, which needs a connection.
+`{{fullOfflineMode}}` — *"Download everything including attachments on sync"* — makes every sync also download your attachments, not only your notes. Without it, an image or file is fetched from the server the first time you open it, which needs a connection.
 
 Turn it on if you want your notes **and** every image, file and audio recording readable with no internet at all — on a flight, or on a laptop you deliberately keep offline.
 

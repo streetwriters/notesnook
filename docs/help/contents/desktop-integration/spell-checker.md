@@ -1,6 +1,12 @@
 ---
 title: Spell checker
-description: Enable the built-in spell checker in the Notesnook desktop app and choose which languages to check against.
+pageTitle: Turn on the spell checker in Notesnook desktop
+description: Enable the built-in spell checker in the Notesnook desktop app and choose which languages it checks against, including multiple at once.
+keywords:
+  - notesnook spell check
+  - notes app spell checker
+  - spell check languages
+schema: howto
 ---
 
 # Spell checker
@@ -34,7 +40,7 @@ To select new languages:
 1. Go to `{{settings}}`
 2. Click `{{editor}}`
 3. Click `{{languages}}`
-   ![Spell checker languages dialog](/static/spell-checker-languages.png)
+   ![The spell checker language picker in Notesnook desktop settings](/static/spell-checker-languages.png)
 4. Select the languages you need
 5. Click `{{done}}` and spell checking should now be working for the languages you selected.
 

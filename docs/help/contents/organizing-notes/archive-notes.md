@@ -1,6 +1,12 @@
 ---
 title: Archive
-description: Archive a note to move it out of your notes list without deleting it, and restore it later.
+pageTitle: How do I archive a note in Notesnook?
+description: Archive a note in Notesnook to move it out of your notes list without deleting it, then find it again in the Archive section and restore it.
+keywords:
+  - notesnook archive
+  - archive notes app
+  - hide notes without deleting
+schema: howto
 ---
 
 # Archive notes

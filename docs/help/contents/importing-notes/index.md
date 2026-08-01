@@ -1,7 +1,7 @@
 ---
 title: Importing notes
 pageTitle: Import notes into Notesnook from any app
-description: Move your notes into Notesnook from Evernote, Google Keep, Obsidian, Simplenote, Joplin, ColorNote, UpNote and more — or from Markdown, HTML, TextBundle and text files.
+description: Move your notes into Notesnook from Evernote, Google Keep, Obsidian, Simplenote, Joplin, UpNote and more — or from Markdown, HTML and text files.
 keywords:
   - import notes to notesnook
   - migrate notes app
@@ -67,7 +67,7 @@ Once the import finishes, your notes are [end-to-end encrypted](/how-is-my-data-
 
 ## Related pages
 
-- [Exporting notes](/export-notes-from-notesnook) — leaving with your notes is just as easy as arriving
+- [Exporting notes](/export-notes-from-notesnook) — leaving with your notes takes the same few steps as arriving
 - [Backup and restore](/backup-and-restore-notes-in-notesnook) — your safety net after a big import
 - [Attachments & files](/attachments-and-files) — what imported images and files count against
 - [How is my data encrypted?](/how-is-my-data-encrypted) — what protects your notes once they're in

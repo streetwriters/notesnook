@@ -1,6 +1,12 @@
 ---
 title: Pins
-description: Pin a note or notebook to keep it at the top of your lists.
+pageTitle: How do I pin a note in Notesnook?
+description: Pin a note or notebook in Notesnook to keep it at the top of every list, and unpin it when you no longer need it there.
+keywords:
+  - notesnook pin note
+  - pin note to top
+  - notesnook pinned notes
+schema: howto
 ---
 
 # Pin notes

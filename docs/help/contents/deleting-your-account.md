@@ -1,6 +1,17 @@
 ---
 title: Deleting your account
-description: No questions asked! You can delete your account anytime from the mobile and desktop apps with a single click and delete all your data
+pageTitle: How do I delete my Notesnook account?
+description: Delete your Notesnook account and all its data from the app in a few taps. What gets removed, and why none of it can be recovered afterwards.
+keywords:
+  - delete notesnook account
+  - remove notes app account
+  - notesnook data deletion
+schema: faq
+faqs:
+  - q: What information is deleted when I delete my Notesnook account?
+    a: "Everything: all your notes, notebooks, attachments and other data, your login credentials, your subscription and billing information, and the account itself. Your email address is no longer associated with Notesnook and cannot be used to log in."
+  - q: Can I recover my data after deleting my Notesnook account?
+    a: No. Deletion is immediate and permanent, and because your data is end-to-end encrypted there is no copy anyone can restore from. Take a backup or export your notes before you delete the account.
 ---
 
 # Deleting your account

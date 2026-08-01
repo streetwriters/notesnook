@@ -11,7 +11,7 @@ schema: howto
 
 # How to import notes from UpNote notes app?
 
-The following steps will help you import your notes from UpNote easily.
+Here is how to move your notes from UpNote into Notesnook.
 
 1. Download the UpNote desktop app.
 2. Click settings icon on the header. 

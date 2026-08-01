@@ -1,6 +1,6 @@
 ---
 title: Standard Notes
-description: Moving from Standard Notes to Notesnook — export a decrypted backup and import it as Markdown or plain text files.
+description: Moving from Standard Notes to Notesnook — export a decrypted backup and import it with the Markdown or plaintext importer.
 pageTitle: How to import Standard Notes into Notesnook
 keywords:
   - import standard notes
@@ -11,43 +11,49 @@ schema: howto
 
 # How do I import notes from Standard Notes?
 
-::: warning Standard Notes is no longer in the importer list
-Recent versions of the Notesnook Importer no longer offer Standard Notes as a source app, so the steps below cannot be completed as written.
+Export a **decrypted backup** from Standard Notes, unzip it, and bring the files in with Notesnook's Markdown or plaintext importer.
 
-Import your notes this way instead:
-
-1. In Standard Notes, export a **decrypted backup** as described below.
-2. Unzip it — the notes are plain text and Markdown files.
-3. Import those with the [Markdown files](/importing-notes/import-notes-from-markdown-files) or [plaintext files](/importing-notes/import-notes-from-plaintext-files) importer.
-
-Notebooks and tags won't carry across that way. If you need them, [tell us](https://github.com/streetwriters/notesnook/issues/new/choose) — we track importer requests there.
+::: warning There is no longer a Standard Notes importer
+Recent versions of the Notesnook Importer don't list Standard Notes as a source app, so you import the files it exports rather than the backup itself. The steps below take that route.
 :::
 
-The following steps will help you import your notes from Standard notes easily.
+## Export a decrypted backup from Standard Notes
 
-1. Open Standard Notes app on Desktop or visit [https://app.standardnotes.org](https://app.standardnotes.org) and login to your account.
-2. Select all your notes, right click, and select `{{export}}`.
-3. Open the Notesnook (app or desktop).
-4. Go to `Settings > Import & export > Notesnook Importer` and select `Standard Notes` from list of apps.
-   ![ in Notesnook](/static/standard-notes-importer/3.png)
-5. Drop the .zip file you exported earlier from Standard Notes in the box or click anywhere to open system file picker to select the backup.
-   ![ in Notesnook](/static/standard-notes-importer/4.png)
-6. Once importing completes you should see all your notes in Notesnook. If you face any issues during importing, [report it on github](https://github.com/streetwriters/notesnook).
+1. Open the Standard Notes desktop app, or go to [https://app.standardnotes.com](https://app.standardnotes.com) and sign in.
+2. Select all your notes, right click, and choose `{{export}}`.
+3. Choose the **decrypted** backup option. An encrypted backup can only be read by Standard Notes, so nothing can import it.
+4. Save the `.zip` file somewhere you can find it.
 
-## Supported formats
+## Import the files into Notesnook
 
-- [x] Text files
-- [x] Authentication notes
-- [x] Spreadsheets
-- [ ] Tags
+1. Unzip the backup. Inside it, your notes are plain text and Markdown files.
+2. Open Notesnook on web or desktop.
+3. Go to `Settings > Import & export > Notesnook Importer`.
+4. Choose **Markdown** for `.md` files, or **Text** for `.txt` files. Run the importer once for each type you have.
+5. Drop the files in, or click the box to pick them, and start the import.
+
+Full steps for each importer are on [import Markdown files](/importing-notes/import-notes-from-markdown-files) and [import plaintext files](/importing-notes/import-notes-from-plaintext-files).
+
+## What carries across
+
+| | Imported |
+| --- | --- |
+| Note titles and content | Yes |
+| Plain text and Markdown notes | Yes |
+| Tags | No |
+| Notebooks or folders | No |
+
+Your notes arrive as a flat list, so plan to re-file them into [notebooks](/organizing-notes/organize-notes-using-notebooks) and re-apply [tags](/organizing-notes/organize-notes-using-tags) afterwards.
+
+If you'd like a proper Standard Notes importer back, [open an issue](https://github.com/streetwriters/notesnook/issues/new/choose) — that is where importer requests are tracked.
 
 <GetNotesnook title="Your notes, encrypted the moment they land" text="Notesnook imports run entirely on your device — not one byte of your Standard Notes export is sent to our servers. Once imported, everything is end-to-end encrypted and syncs to all your devices for free." />
 
 ## Related pages
 
 - [Importing notes](/importing-notes/) — every app and file format Notesnook can import
-- [Import from Evernote](/importing-notes/import-notes-from-evernote) — moving notes out of Evernote
-- [Import from Google Keep](/importing-notes/import-notes-from-googlekeep) — moving notes out of Google Keep
+- [Import Markdown files](/importing-notes/import-notes-from-markdown-files) — the importer this page routes you to
+- [Import plaintext files](/importing-notes/import-notes-from-plaintext-files) — for `.txt` exports
 - [Import from Joplin](/importing-notes/import-notes-from-joplin) — moving notes out of Joplin
 - [Backup and restore](/backup-and-restore-notes-in-notesnook) — protecting your notes once they're in
 - [How is my data encrypted?](/how-is-my-data-encrypted) — what happens to your notes after the import

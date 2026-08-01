@@ -11,7 +11,7 @@ schema: howto
 
 # How to import notes from ColorNote notes app?
 
-The following steps will help you import your notes from ColorNote easily.
+Here is how to move your notes from ColorNote into Notesnook.
 
 1. Download the ColorNote mobile app.
 2. Go to `Settings > Backup` and create a backup. Make sure to remember the password you set while creating the backup as it will be needed during import.

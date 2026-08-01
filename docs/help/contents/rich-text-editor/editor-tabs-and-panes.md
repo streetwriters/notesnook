@@ -11,7 +11,7 @@ keywords:
 
 # Editor tabs and panes
 
-The Notesnook editor keeps every note you open in a tab, so you can jump between notes without losing your place. Beside the editor you can open a table of contents, a note's properties or a PDF preview, and you can strip the app down to just the writing surface with focus mode.
+The Notesnook editor keeps every note you open in a tab, so you can jump between notes without losing your place. Beside the editor you can open a table of contents, a note's properties or a PDF preview, and you can strip the app back to the writing surface alone with focus mode.
 
 <!-- TODO: screenshot — the editor tab strip on desktop with three tabs, one pinned and one with unsaved changes -->
 
@@ -139,7 +139,7 @@ The status bar at the bottom of the window holds both controls:
 - `{{enableEditorMargins}}` / `{{disableEditorMargins}}` — switch between a comfortable centered column and using the full width of the pane.
 - The `−` and `+` buttons zoom the editor text between **30%** and **500%** in steps of 10%. Click the percentage itself to reset it to 100%.
 
-![The editor status bar with margins, focus mode, zoom and word count](/editor-status-bar-desktop.png)
+![The editor status bar at the bottom right, showing the word count and last saved time](/editor-status-bar-desktop.png)
 == Mobile
 Editor margins and zoom aren't available on mobile. Set your preferred text size instead in `{{settings}}` > `{{customization}}` > `{{editor}}`, as described in [personalizing the editor](/rich-text-editor/personalizing-rich-text-editor).
 :::

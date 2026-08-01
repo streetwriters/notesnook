@@ -1,11 +1,18 @@
 ---
 title: Home screen widgets
-description: Add a Notesnook widget to your Android or iOS home screen for quick note taking without opening the app.
+pageTitle: Notesnook home screen widgets on Android and iOS
+description: Add the Notesnook quick note, note preview and reminders widgets to your Android or iOS home screen, and pick which note a widget shows.
+keywords:
+  - notesnook widget
+  - android notes widget
+  - ios notes widget
+  - quick note widget
+schema: howto
 ---
 
 # Home screen widgets
 
-Basic home screen widgets are availble on both Android & iOS for quick note taking.
+Basic home screen widgets are available on both Android and iOS for quick note taking.
 
 :::tabs key:platform
 == iOS
@@ -14,7 +21,7 @@ Basic home screen widgets are availble on both Android & iOS for quick note taki
 2. Tap the + button on top left
 3. Select Notesnook Quick Note widget and add it to home screen
 
-![Home widget](/static/mobile-integration/ios-quick-note-widget.png)
+![The Notesnook Quick Note widget on an iOS home screen](/static/mobile-integration/ios-quick-note-widget.png)
 
 4. Tap the widget to directly launch the editor in the app.
 
@@ -24,7 +31,7 @@ Basic home screen widgets are availble on both Android & iOS for quick note taki
 2. Tap widgets
 3. Add Notesnook widget to home screen
 
-![Home widget](/static/mobile-integration/android-quick-note-widget.png)
+![The Notesnook quick note widget on an Android home screen](/static/mobile-integration/android-quick-note-widget.png)
 
 4. Tap the widget to quickly take a note without launching the app.
    :::

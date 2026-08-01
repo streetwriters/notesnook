@@ -1,6 +1,12 @@
 ---
 title: Tags
-description: Tag your notes to organize them, and browse all your tags from the side menu.
+pageTitle: How do I tag notes in Notesnook?
+description: Add tags to notes in Notesnook from the editor or the note menu, browse every tag from the side menu, and set a tag that applies to new notes automatically.
+keywords:
+  - notesnook tags
+  - tag notes app
+  - organize notes with tags
+schema: howto
 ---
 
 # Tags
@@ -20,7 +26,7 @@ Free accounts can keep up to 50 tags. Essential raises the cap to 500, and Pro a
 ::: info
 Added tags appear at the bottom of each note item in the notes list. Clicking on the tag takes you to the respective tag.
 
-![Tagged note](/tagged-note.png)
+![A note in the desktop list showing its tags along the bottom of the row](/tagged-note.png)
 :::
 == Mobile
 1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
@@ -30,11 +36,11 @@ Added tags appear at the bottom of each note item in the notes list. Clicking on
 ::: info
 When you open a note in editor, tags will appear on top of title on mobile. Tapping on a tag will take you to the manage tags screen.
 
-![Tags in editor mobile](/tags-in-editor.png)
+![Tags shown above the note title in the mobile editor](/tags-in-editor.png)
 
 Added tags also appear at the bottom of each note item in the notes list.
 
-![Tagged note](/tagged-note-mobile.png)
+![A note in the mobile list showing its tags along the bottom of the row](/tagged-note-mobile.png)
 :::
 ::::
 

@@ -10,8 +10,8 @@
  * every other page is shared, and the full `/v<version>/` tree is composed at
  * build time by `scripts/build-versions.mjs`.
  *
- * Cutting a new version:      npm run docs:version -- 3.5
- * Changing a page afterwards: npm run docs:fork -- 3.4 <page>   (before editing)
+ * Cutting a new version:      npm run version -- 3.5
+ * Changing a page afterwards: npm run fork -- 3.4 <page>   (before editing)
  */
 
 /** The version the docs at the site root describe. */

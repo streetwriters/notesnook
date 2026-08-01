@@ -1,7 +1,7 @@
 ---
 title: Self-hosting
 pageTitle: How do I self-host Notesnook?
-description: Point the Notesnook apps at your own sync, auth, events and monograph servers. What each server does, why you must be logged out, and what Test connection checks.
+description: Point the Notesnook apps at your own sync, auth, events and monograph servers. What each server does, and what Test connection actually checks.
 keywords:
   - self host notesnook
   - notesnook sync server
