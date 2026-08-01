@@ -36,7 +36,7 @@ Wrapped scrolls through a few slides and finishes on a summary card. Between the
 - **Notes per month**, drawn as a bar chart.
 - Fun facts: your longest note in words, and your largest attachment.
 
-Anything you have none of is skipped — if you didn't write any words this year, that slide simply doesn't appear.
+Anything you have none of is skipped — if you didn't write any words this year, that slide doesn't appear.
 
 ## Share your Wrapped
 
@@ -45,7 +45,7 @@ On mobile, the summary card has a `Share with friends` button. It captures the c
 On desktop and web there is no share button — the summary card is on screen for you to screenshot.
 
 ::: info It really is local
-Notesnook simply couldn't do it otherwise. Notesnook has no idea how many words are in your notes, encryption makes it impossible for us to do it any other way.
+There is no other way for it to work. Encryption means Notesnook has no idea how many notes you have written or how many words are in them, so the only machine that can count them is yours.
 :::
 
 ## Related pages

@@ -132,7 +132,7 @@ Notesnook never merges the text of two versions together and never silently thro
 
 When a note comes in from another device, Notesnook compares when each side was last edited:
 
-- If the two edits are **less than 60 seconds apart**, or the content is identical, the more recent version simply wins and no conflict is raised. This is why typing on two devices at the same time, with sync working on both, does not create conflicts.
+- If the two edits are **less than 60 seconds apart**, or the content is identical, the more recent version wins and no conflict is raised. This is why typing on two devices at the same time, with sync working on both, does not create conflicts.
 - If they are **more than 60 seconds apart**, the note is marked **conflicted**. It moves to the top of your notes list under a `Conflicted` group, and sync will keep flagging it until you pick a version.
 
 Resolving a conflict is a two-click job — keep one version, discard the other, or save both. See [what are merge conflicts?](/faqs/what-are-merge-conflicts) for the full walkthrough of the resolution screen.

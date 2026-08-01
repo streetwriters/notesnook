@@ -1,6 +1,12 @@
 ---
 title: Notebooks
-description: Create, edit and link notebooks, add notes to them, and move a notebook to trash.
+pageTitle: How do I organize notes with notebooks in Notesnook?
+description: Create nested notebooks in Notesnook, add one note to several notebooks at once, set a default notebook, and move a notebook out of its parent.
+keywords:
+  - notesnook notebooks
+  - nested notebooks notes app
+  - organize notes notebooks
+schema: howto
 ---
 
 # Organizing notes with notebooks
@@ -29,7 +35,7 @@ Free accounts can keep up to 50 notebooks. Essential raises the cap to 500, and 
 :::
 
 ::: info
-Starting from v3, you can create new Notebooks inside existing notebooks. Simply go to any notebook's properties and click "Add notebook".
+You can create notebooks inside other notebooks. Open any notebook's properties and click `{{addNotebook}}`.
 :::
 
 ## Editing a notebook
@@ -53,18 +59,18 @@ Starting from v3, you can create new Notebooks inside existing notebooks. Simply
 :::tabs key:platform
 == Desktop/Web
 1. Go to the notebooks section by clicking on the notebook icon, and open a notebook
-2. Click the ![Three dot button](/plus-button-desktop.png) button on the top left corner of the note editor.
+2. Click the ![Add a note](/plus-button-desktop.png) button at the top right of the notebook.
 3. Start writing in editor to create a note in the notebook
 == Mobile
 1. Go to the notebooks section by tapping on the notebook icon, and open a notebook
-2. Tap the ![Three dot button](/plus-button-desktop.png) button on bottom right corner to open the editor or just **swipe from right to left** to open editor
+2. Tap the ![Add a note](/plus-button-mobile.png) button at the bottom right to open the editor, or **swipe from right to left**.
 3. Start writing in editor to create a note in the notebook
 :::
 
 ::: info
 Once a note is added to a notebook, you will see its path on the bottom of the note in the list. Clicking on it will take you to the respective notebook. Tags are always displayed first.
 
-![Notebook reference on a note](/notebook-ref.png)
+![A note in the list showing the notebook it belongs to along the bottom of the row](/notebook-ref.png)
 :::
 
 ## Linking an existing note to a notebook

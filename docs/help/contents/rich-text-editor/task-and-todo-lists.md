@@ -40,21 +40,21 @@ Every task list carries a header showing how many of its items are done, with a 
 
 When you add a task list to a note, a header is added on top of each task list. You can add a title to the task list.
 
-![Add a heading to the todo list in notes editor](/task-header-title.png)
+![A task list in the editor with a title typed into its header and a progress bar beneath it](/task-header-title.png)
 
 ## Sort completed tasks in task list
 
-Sort completed tasks at the bottom of task list by clicking on the ![Sort completed task icon](/sort-task-icon.png) button on the task list header.
+Sort completed tasks to the bottom of the list with the ![Sort completed tasks](/sort-task-icon.png) button in the task list header.
 
 ## Clear completed tasks from task list
 
-Clear completed task items by clicking on the ![Clear completed task button](/sort-task-icon.png) button on the task list header.
+Remove every completed item at once with the ![Clear completed tasks](/clear-task-icon.png) button in the task list header.
 
 ## Moving task items with drag and drop
 
 You can move task items and change the order by drag and drop using the drag handle at the start of each task item.
 
-![Move todo item with drag and drop](/drag-drop.gif)
+![Dragging a task by the handle at the start of the row to reorder it within the list](/drag-drop.gif)
 
 ## Adding a subtask to a parent task
 

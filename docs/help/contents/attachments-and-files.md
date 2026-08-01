@@ -75,7 +75,7 @@ Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}` → `{{manageAtta
 Both apps group attachments by type. On desktop and web the sidebar has `All files`, `Images`, `Documents`, `Videos`, `Audios`, `{{uploads}}` and `{{orphaned}}`, each with a count. Mobile shows `All files`, `Images`, `Audios`, `Videos`, `Documents`, `{{orphaned}}` and `Errors`.
 
 - **`{{uploads}}`** — files that are still waiting to be uploaded.
-- **`{{orphaned}}`** — files that are no longer referenced by any note. These are usually safe to delete, and are the first place to look when your storage is fuller than you expect.
+- **`{{orphaned}}`** — files that are no longer referenced by any note, usually left behind by a note you deleted. These are safe to delete once you are sure you don't want the file itself.
 
 The search box at the top filters the list by filename. On desktop and web you can also sort by clicking the `{{name}}`, `{{size}}` or `{{dateUploaded}}` column headers.
 
@@ -126,11 +126,13 @@ Deleting an attachment removes it from your account **and** from every note that
 
 ## What is an orphaned attachment?
 
-Deleting a note does not delete the files it contained — they become **orphaned** attachments and keep occupying storage. Open the attachment manager, switch to `{{orphaned}}`, and delete what you no longer need.
+Deleting a note does not delete the files it contained — they stay in your account as **orphaned** attachments, listed under `{{orphaned}}` in the attachment manager. Delete the ones you no longer want the file for.
 
-## Why is my storage full when I deleted my attachments?
+## Why is my storage still full after I deleted attachments?
 
-Your monthly storage limit resets on the first of the month at midnight UTC. Deleting attachments does not give you storage back.
+Your plan's storage figure is a **monthly allowance**, not a measure of how much you are currently storing — that is why every plan is written as `50 MB/mo`, `1 GB/mo` and so on. Uploading a file spends part of that month's allowance, and deleting the file afterwards does not hand the allowance back. The allowance starts again at the beginning of the next month.
+
+So deleting attachments is worth doing to keep your account tidy, but it is not the way to get more room this month. If you are hitting the ceiling regularly, a plan with a larger monthly allowance is the fix — see [plans & limits](/plans-and-limits).
 
 <GetNotesnook action="pricing" title="Need more room for files?" text="The free plan gives you 50 MB a month and a 10 MB file size cap. Paid plans go up to 25 GB a month with 5 GB files — and every file stays end-to-end encrypted on all of them." />
 

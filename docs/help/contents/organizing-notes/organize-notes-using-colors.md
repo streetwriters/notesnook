@@ -1,6 +1,12 @@
 ---
 title: Colors
-description: Assign colors to notes, add color shortcuts to the side menu, and rename or hide colors.
+pageTitle: How do I color-code notes in Notesnook?
+description: Assign colors to notes in Notesnook, rename them, and show or hide color shortcuts in the side menu on desktop and mobile.
+keywords:
+  - notesnook colors
+  - color code notes
+  - organize notes by color
+schema: howto
 ---
 
 # Organize notes with colors
@@ -26,14 +32,14 @@ Free accounts can create up to 7 colors. Essential raises the cap to 20, and Pro
 ::: info
 After you assign a color to a note, the note will adapt to that color.
 
-![Colored note](/colored-note.png)
+![A note in the list tinted with the colour assigned to it](/colored-note.png)
 :::
 
 ## Color Shortcuts
 
 By default, all created colors are displayed in the side menu.
 
-![Colored note](/colored-note-sidemenu.png)
+![The side menu listing every colour you have created](/colored-note-sidemenu.png)
 
 ### Hiding Shortcuts
 

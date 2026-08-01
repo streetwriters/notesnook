@@ -6,13 +6,19 @@ keywords:
   - notesnook markdown
   - markdown shortcuts notes app
   - markdown note taking
+schema: faq
+faqs:
+  - q: Does Notesnook support Markdown editing?
+    a: Not as a raw editing mode. The Markdown shortcuts convert what you type into rich text blocks as you go, but the note itself is not stored or edited as raw Markdown.
+  - q: Can I import and export Markdown files in Notesnook?
+    a: Yes. You can import Markdown files and export any note as Markdown, with or without frontmatter.
 ---
 
 # Markdown shortcuts in notes <PlanTag plan="essential" />
 
 Markdown shortcuts turn what you type into formatting. Type `# ` for a heading, `**bold**` for bold text, `- ` for a bullet list, and Notesnook applies the formatting the moment you finish the pattern — you never have to reach for the toolbar.
 
-![Formatting a note as you type using Markdown shortcuts in the Notesnook editor](/markdown-editing.gif)
+![Typing markdown in the editor and watching it turn into formatting](/markdown-editing.gif)
 
 ## Turn Markdown shortcuts on
 
@@ -79,7 +85,7 @@ Task lists, [outline lists](/rich-text-editor/outline-lists) and [callouts](/ric
 
 ### Does Notesnook support Markdown editing?
 
-No. The Markdown shortcuts listed above are just that: shortcuts. They'll help you to quickly use the various formats & blocks in the editor but they aren't raw Markdown.
+No. The Markdown shortcuts listed above are exactly that: shortcuts. They'll help you to quickly use the various formats & blocks in the editor but they aren't raw Markdown.
 
 ### Can I import and export Markdown files?
 

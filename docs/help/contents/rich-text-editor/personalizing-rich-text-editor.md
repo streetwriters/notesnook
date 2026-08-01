@@ -1,6 +1,12 @@
 ---
 title: Personalizing the editor
-description: Change the default font, font size and note title format used by the Notesnook editor on every platform.
+pageTitle: Change the font, size and line spacing in the Notesnook editor
+description: Set the default font and size in the Notesnook editor, adjust line height and paragraph spacing, turn on font ligatures, and change the note title format.
+keywords:
+  - notesnook editor font
+  - notes app line spacing
+  - notesnook title format
+schema: howto
 ---
 
 # Personalizing text editor

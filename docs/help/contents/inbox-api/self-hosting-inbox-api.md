@@ -1,6 +1,11 @@
 ---
 title: Self-Hosting Inbox API
-description: Learn about self-hosting Notesnook's Inbox API.
+pageTitle: Self-host the Notesnook Inbox API
+description: Run your own Notesnook Inbox API server so inbound notes never touch Notesnook's infrastructure, and point the apps at it.
+keywords:
+  - self host inbox api
+  - notesnook inbox server
+  - notesnook self hosting
 ---
 
 # Self-Hosting Inbox API

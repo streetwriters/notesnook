@@ -292,8 +292,8 @@ export const sidebar = [
             link: "/inbox-api/self-hosting-inbox-api"
           }
         ]
-      }
-      //      { text: "Self-hosting Notesnook", link: "/self-hosting" },
+      },
+      { text: "Self-hosting Notesnook", link: "/self-hosting" }
     ]
   },
   {
@@ -306,11 +306,11 @@ export const sidebar = [
       },
       { text: "Is there an ETA for X feature?", link: "/faqs/is-there-an-eta" },
       {
-        text: "Login to upload attachments",
+        text: "Why login is needed to upload attachments",
         link: "/faqs/login-to-upload-attachments"
       },
       {
-        text: "Login to restore attachments",
+        text: "Why login is needed to restore attachments",
         link: "/faqs/login-to-restore-attachments-in-backup"
       }
     ]

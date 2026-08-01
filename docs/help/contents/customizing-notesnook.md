@@ -96,7 +96,7 @@ Sorting and grouping are stored per list, and separately for each notebook, tag 
 1. Click the sort icon at the top right of the list. The menu is titled `Group & sort`, or `{{sort}}` where grouping doesn't apply.
 2. Use `{{orderBy}}` to flip the direction — `{{oldestToNewest}}` / `{{newestToOldest}}`, or `{{aToZ}}` / `{{zToA}}` when sorting by title.
 3. Use `{{sortBy}}` to choose `Date created`, `Date edited`, `Date modified`, `Date deleted`, `Due date`, `{{title}}` or `Relevance`, depending on the list.
-4. Use `{{groupBy}}` to choose `None`, `{{default}}`, `Year`, `{{month}}`, `Week` or `Abc`.
+4. Use `{{groupBy}}` to choose `{{none}}`, `{{default}}`, `Year`, `{{month}}`, `Week` or `Abc`.
 == Mobile
 1. Tap the sort icon at the top right of the list.
 2. Tap the button beside `{{sortBy}}` to flip the direction between ascending and descending.

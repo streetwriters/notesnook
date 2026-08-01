@@ -86,7 +86,7 @@ Selecting an image adds an `{{imageSettings}}` button to the toolbar at the bott
 2. Open the ![Toolbar plus](/toolbar-plus.png) menu and choose `{{attachment}}` — on desktop and web the shortcut is `Ctrl+Shift+A`.
 3. Select the file. It's encrypted on your device and uploaded to your storage.
 
-The attachment appears in the note as a block with its filename and size. Select it for `{{downloadAttachment}}`, and `{{previewAttachment}}` where the file type supports it. Dragging files onto the editor works for any file type, not just images.
+The attachment appears in the note as a block with its filename and size. Select it for `{{downloadAttachment}}`, and `{{previewAttachment}}` where the file type supports it. Dragging files onto the editor works for any file type, not only images.
 
 ## Play an audio attachment
 

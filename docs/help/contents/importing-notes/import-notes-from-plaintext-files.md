@@ -12,9 +12,9 @@ schema: howto
 
 1. Open the Notesnook app (web or desktop)
 2. Go to `Settings > Import & export > Notesnook Importer` and select "Text".
-   ![ in Notesnook](/static/plaintext-importer/1.png)
+   ![The Notesnook Importer app list with Text selected](/static/plaintext-importer/1.png)
 3. Drop your .txt files, or click anywhere inside the box to browse and select your .txt files. You can also provide a .zip file containing all your .txt files. Then click "Start importing".
-   ![ in Notesnook](/static/plaintext-importer/2.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/plaintext-importer/2.png)
 4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 <GetNotesnook title="Your notes, encrypted the moment they land" text="Notesnook imports run entirely on your device — not one byte of your Plaintext files export is sent to our servers. Once imported, everything is end-to-end encrypted and syncs to all your devices for free." />

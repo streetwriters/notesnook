@@ -1,6 +1,11 @@
 ---
 title: Jumplist & dock menu
-description: Use the Windows/Linux jumplist or macOS dock menu to quickly jump to common actions in Notesnook.
+pageTitle: The Notesnook jumplist and macOS dock menu
+description: Start a new note or notebook straight from the Notesnook jumplist on Windows and Linux, or from the dock menu on macOS.
+keywords:
+  - notesnook jumplist
+  - notesnook dock menu
+  - taskbar quick actions
 ---
 
 # Jumplist & dock menu
@@ -9,11 +14,11 @@ Notesnook supports quick actions from the "jumplist" menu (dock menu on macOS):
 
 :::tabs key:platform
 == Windows
-![Jumplist menu windows in Notesnook](/static/desktop-integration/jumplist-menu-windows.png)
+![The Notesnook jumplist on the Windows taskbar](/static/desktop-integration/jumplist-menu-windows.png)
 == Linux
-![Jumplist menu linux in Notesnook](/static/desktop-integration/jumplist-menu-linux.png)
+![The Notesnook jumplist on Linux](/static/desktop-integration/jumplist-menu-linux.png)
 == macOS
-![Dock menu macos in Notesnook](/static/desktop-integration/dock-menu-macos.png)
+![The Notesnook dock menu on macOS](/static/desktop-integration/dock-menu-macos.png)
 :::
 
 ## How does it work?

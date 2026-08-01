@@ -1,9 +1,10 @@
 ---
 title: Search & navigation
 pageTitle: How to search your notes and move around Notesnook fast
-description: Search across your notes, jump anywhere with the command palette and quick open, and sort, group and filter any list in Notesnook.
+description: Search your notes in Notesnook, narrow results with filters like tag, color, date and favorite, and jump anywhere with the command palette and quick open.
 keywords:
   - notesnook search notes
+  - notesnook search filters
   - notesnook command palette
   - search inside notes
   - notesnook sort notes
@@ -14,6 +15,8 @@ keywords:
 Every list view has a search box at the top of it. Type into it and Notesnook searches the notes in _that_ view — the whole notes list, one notebook, one tag, favorites, trash — matching both note titles and the text inside notes, and showing you the matching passages.
 
 Search runs on your device against the local database. Nothing about what you search for is sent anywhere.
+
+You can also [narrow a search with filters](#narrow-a-search-with-filters) — by tag, color, date, or whether a note is favorited, archived or filed in a notebook.
 
 ## Search inside a view
 
@@ -46,6 +49,103 @@ Search runs on your device against the local database. Nothing about what you se
 ::: info Locked notes
 The content of a note in your [private vault](/lock-notes-with-private-vault) is encrypted, so it is never added to the search index. Locked notes are found by their titles only. This is a limitation of end-to-end encryption, not a bug.
 :::
+
+## Narrow a search with filters
+
+Search understands filters — `field:value` pairs you add to a search to cut the results down. Filters work when you are **searching notes**; searching notebooks, tags, reminders, trash or attachments matches on text only.
+
+::: warning Put your words first, filters last
+A word typed *after* a filter is swallowed into it, and the whole search silently returns nothing:
+
+- `favorite:true meeting` — finds nothing at all
+- `meeting favorite:true` — finds favorite notes containing "meeting" ✓
+
+Always write what you're looking for, then the filters.
+:::
+
+### Filters you can use
+
+**Where to look**
+
+| Filter | Finds |
+| --- | --- |
+| `title:budget` | Notes whose **title** matches |
+| `content:budget` | Notes whose **body text** matches |
+
+Without either of these, your words are matched against both.
+
+**Tags and colors**
+
+| Filter | Finds |
+| --- | --- |
+| `tag:work` | Notes with the tag *work* |
+| `color:red` | Notes with the color *red* |
+
+Values match the tag or color's exact title. Quote anything with a space: `tag:"work stuff"`.
+
+**Dates**
+
+| Filter | Finds |
+| --- | --- |
+| `created_after:2026-01-01` | Notes created after that date |
+| `created_before:2026-01-01` | Notes created before it |
+| `edited_after:2026-01-01` | Notes edited after it |
+| `edited_before:2026-01-01` | Notes edited before it |
+
+Write dates as `YYYY-MM-DD`. Words like `yesterday` are not understood and will make the search return nothing.
+
+**Yes / no filters**
+
+Each takes exactly `true` or `false`.
+
+| Filter | `true` finds | `false` finds |
+| --- | --- | --- |
+| `favorite:` | Favorited notes | Notes that aren't favorited |
+| `pinned:` | Pinned notes | Unpinned notes |
+| `archived:` | Archived notes | Notes not archived |
+| `readonly:` | Read-only notes | Editable notes |
+| `locked:` | Notes in your [vault](/lock-notes-with-private-vault) | Notes outside it |
+| `tagged:` | Notes with **any** tag | Notes with no tags at all |
+| `colored:` | Notes with **any** color | Notes with no color |
+| `in_notebook:` | Notes filed in **any** notebook | Notes in no notebook |
+
+The last three are the quickest way to find notes you never filed: `in_notebook:false` lists every loose note, `tagged:false` every untagged one.
+
+`locked:` only works once you have created a vault.
+
+### Combine filters
+
+Add as many as you like — a note has to satisfy all of them:
+
+```
+roadmap tag:work favorite:true edited_after:2026-06-01
+```
+
+That reads: notes containing "roadmap", tagged *work*, favorited, and edited since 1 June 2026.
+
+You can also search with filters **and no words at all**, which lists everything that matches:
+
+```
+in_notebook:false archived:false
+```
+
+### Useful searches
+
+| Search | What it gives you |
+| --- | --- |
+| `in_notebook:false` | Notes you never filed into a notebook |
+| `tagged:false` | Notes with no tags |
+| `favorite:true edited_after:2026-07-01` | Recently edited favorites |
+| `tag:receipts created_after:2026-01-01` | This year's receipts |
+| `budget content:quarterly` | "budget" anywhere, "quarterly" in the body |
+| `locked:true` | Everything in your vault |
+
+### Things to watch out for
+
+- **`true` and `false` must be lowercase.** `favorite:TRUE` or `favorite:yes` makes the search return nothing.
+- **Don't repeat the same filter twice in a row.** `tag:work tag:urgent` is read as a single tag named "work AND urgent" and matches nothing. Search one tag at a time.
+- **A filter Notesnook doesn't recognise is treated as plain text.** `colour:red` searches for the literal words rather than filtering by color — the spelling is `color:`.
+- Filter names are not case-sensitive: `Tag:work` works the same as `tag:work`.
 
 ## Read the results and jump to a match
 
@@ -168,7 +268,7 @@ Grouping splits the list into labelled sections. Six modes are available:
 | `{{groupBy}}` | Result                                 |
 | ------------- | -------------------------------------- |
 | `{{default}}` | Today, Yesterday, This week, and so on |
-| `None`        | One flat list, no headers              |
+| `{{none}}`        | One flat list, no headers              |
 | `Abc`         | One section per first letter           |
 | `Year`        | One section per year                   |
 | `{{month}}`   | One section per month                  |

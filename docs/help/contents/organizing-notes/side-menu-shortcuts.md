@@ -1,6 +1,12 @@
 ---
 title: Side menu shortcuts
-description: Add shortcuts for notebooks and tags to the side menu for quick access, and remove them later.
+pageTitle: How do I add a notebook or tag to the Notesnook side menu?
+description: Add shortcuts for the notebooks and tags you use most to the Notesnook side menu, and remove them when they stop being useful.
+keywords:
+  - notesnook shortcuts
+  - pin notebook to sidebar
+  - notesnook side menu
+schema: howto
 ---
 
 # Side menu shortcuts

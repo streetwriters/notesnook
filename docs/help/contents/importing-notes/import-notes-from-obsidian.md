@@ -13,9 +13,9 @@ schema: howto
 
 1. Open the Notesnook app (web or desktop)
 2. Go to `Settings > Import & export > Notesnook Importer` and select "Obsidian".
-   ![ in Notesnook](/static/obsidian-importer/1.png)
+   ![The Notesnook Importer app list with Obsidian selected](/static/obsidian-importer/1.png)
 3. Drop your .md files from your Obsidian Vault, or click anywhere inside the box to browse and select your .md files. You can also provide a .zip file containing all your Obsidian .md files. Then click "Start importing".
-   ![ in Notesnook](/static/obsidian-importer/2.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/obsidian-importer/2.png)
 4. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 ## Supported formats

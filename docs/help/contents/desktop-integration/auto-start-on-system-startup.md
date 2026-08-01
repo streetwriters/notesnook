@@ -1,6 +1,12 @@
 ---
 title: Auto start
-description: Configure the Notesnook desktop app to automatically start, and optionally start minimized, when your system boots up.
+pageTitle: Start Notesnook automatically when your computer boots
+description: Configure the Notesnook desktop app to launch at system startup, and to start minimized so it stays out of your way.
+keywords:
+  - notesnook auto start
+  - launch notes app on startup
+  - notesnook start minimized
+schema: howto
 ---
 
 # Auto start on system startup

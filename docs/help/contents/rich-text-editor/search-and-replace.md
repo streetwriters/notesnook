@@ -48,7 +48,7 @@ The three matching options are folded away until you ask for them.
 3. The result count updates immediately.
 
 ::: info About regular expressions
-With `{{enableRegex}}` off, regular expression characters are escaped so the term is matched literally. With it on, the term is compiled as a JavaScript regular expression with the `g`, `u` and `m` flags, so patterns like `\d+` or `^Chapter` work and `^`/`$` anchor to each line. `.` does not match across line breaks. An expression that doesn't compile simply returns no matches.
+With `{{enableRegex}}` off, regular expression characters are escaped so the term is matched literally. With it on, the term is compiled as a JavaScript regular expression with the `g`, `u` and `m` flags, so patterns like `\d+` or `^Chapter` work and `^`/`$` anchor to each line. `.` does not match across line breaks. An expression that doesn't compile returns no matches.
 :::
 
 ## Replace one match or all of them

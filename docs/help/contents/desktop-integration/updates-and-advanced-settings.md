@@ -60,7 +60,7 @@ By default Notesnook draws its own titlebar. You can switch to the one your oper
 
 ## Change the zoom factor
 
-Zoom scales the whole app, not just the editor text.
+Zoom scales the whole app, not only the editor text.
 
 1. Go to `{{settings}}`.
 2. Open `{{customization}}` → `{{appearance}}`.

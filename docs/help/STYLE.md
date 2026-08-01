@@ -101,7 +101,7 @@ The help site already ranks #1 for high-intent queries like `import enex`, so ea
 - **Use real phrasings in `##` headings** — "Can I use it offline?", "Why is my note not syncing?" — they win featured snippets.
 - **Answer in the first 40 words** after the H1. That paragraph is what Google quotes.
 - **Never leave alt text empty.** Describe what the reader should look for: `![The Archive item in the note context menu](/img.png)`.
-- **Every page ends with a `## Related pages` list** of 3–6 links with descriptive anchors — "[backing up your notes](/backup-and-restore-notes-in-notesnook)", never "click here". This is what builds the internal link graph.
+- **Every page ends with a `## Related pages` list** of 3–6 links with descriptive anchors (the home page, `/docs` and `/404` are exempt — they are already link lists) — "[backing up your notes](/backup-and-restore-notes-in-notesnook)", never "click here". This is what builds the internal link graph.
 - **Link the first mention** of any concept that has its own page, in body text, with the concept as the anchor.
 - **Add `<GetNotesnook />`** to pages people arrive at from search with buying intent — importers, comparisons, "how do I move from X" — placed after the instructions, never before them.
 - Prefer one page that fully answers a question over three thin pages.
@@ -128,4 +128,7 @@ Any page that mentions a paid feature links to the plans hub. Any page that ment
 - "Simply", "just", "easily", "seamlessly", "powerful".
 - Telling the reader to contact support before the documented steps.
 - Image paths that don't exist — leave `<!-- TODO: screenshot — … -->` instead.
-- Renaming or moving an existing page (its URL is live and linked from the apps).
+- Renaming or moving an existing page (its URL is live and linked from the apps). Some pages are linked from inside the app itself via `packages/intl/src/strings.ts` — grep it before touching a slug.
+- More than one `# H1` on a page, and `##`/`###` headings inside a `:::tabs` block. Headings in tabs are emitted once per tab, so they show up twice in the page outline with duplicate anchors.
+- Unquoted frontmatter values containing `: ` — the YAML parser fails the build. Quote them.
+- Alt text that describes nothing: `drawing`, a filename, or an unfilled template. Inline UI glyphs ("press the ⋯ button") are the one case where a short label is correct.

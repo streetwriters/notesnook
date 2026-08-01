@@ -1,6 +1,11 @@
 ---
 title: Troubleshooting web clipper
-description: Common issues with the web clipper and how to fix them.
+pageTitle: Notesnook Web Clipper won't connect — how do I fix it?
+description: Fixes for the Notesnook Web Clipper when it will not connect to the web app, shows a connection error, or renders a clipped page incorrectly.
+keywords:
+  - web clipper not connecting
+  - notesnook clipper error
+  - receiving end does not exist
 ---
 
 # Troubleshooting web clipper

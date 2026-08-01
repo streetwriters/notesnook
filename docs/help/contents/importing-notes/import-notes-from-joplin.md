@@ -11,16 +11,16 @@ schema: howto
 
 # How do I import notes from Joplin notes app?
 
-The following steps will help you import your notes from Joplin easily.
+Here is how to move your notes from Joplin into Notesnook.
 
 1. Open the Joplin Desktop app.
 2. Click `File > Export All -> JEX - Joplin Export File` and save the .JEX file at your desired location.
-   ![ in Notesnook](/static/joplin-importer/1.png)
+   ![The Joplin export menu, with JEX chosen as the export format](/static/joplin-importer/1.png)
 3. Open the Notesnook app (web or desktop)
 4. Go to `Settings > Import & export > Notesnook Importer` and select `Joplin` from list of apps.
-   ![ in Notesnook](/static/joplin-importer/2.png)
+   ![The Notesnook Importer app list with Joplin selected](/static/joplin-importer/2.png)
 5. Drop (or select) the .jex backup file you exported earlier from Joplin:
-   ![ in Notesnook](/static/joplin-importer/3.png)
+   ![The Notesnook Importer drop zone, ready to accept the export file](/static/joplin-importer/3.png)
 6. Once the importing completes you should see all your notes in Notesnook. If you face any issues during importing, feel free to [report them on GitHub](https://github.com/streetwriters/notesnook-importer).
 
 ## Supported formats

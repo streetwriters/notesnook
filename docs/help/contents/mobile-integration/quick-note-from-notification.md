@@ -1,6 +1,12 @@
 ---
 title: Quick notes
-description: Write a note straight from your Android notification shade, without opening the Notesnook app.
+pageTitle: Write a note from the Android notification drawer
+description: Turn on the Notesnook quick note notification so you can write a note straight from your Android notification shade without opening the app.
+keywords:
+  - quick note android
+  - note from notification
+  - notesnook quick note
+schema: howto
 ---
 
 # Quick notes from notifications <PlanTag plan="pro" note="Android only" />
@@ -9,7 +15,7 @@ Taking a note from the notification drawer requires a Pro plan and is available 
 
 A simple, quick and convenient way to take notes on your phone from notifications. This works the same way as a messaging/chat app allows you to reply to messages from notifications.
 
-![Notes in notifications](/static/mobile-integration/android-quick-note-notifications.png)
+![The Notesnook notification with a Take note button in the Android shade](/static/mobile-integration/android-quick-note-notifications.png)
 
 1. Go to Settings from Side Menu
 2. Open `{{productivity}}`

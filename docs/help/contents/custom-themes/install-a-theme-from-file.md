@@ -1,6 +1,12 @@
 ---
 title: Install from file
-description: Install a custom Notesnook theme directly from a theme.json file on mobile, desktop or web.
+pageTitle: How do I install a Notesnook theme from a file?
+description: Load a theme.json file directly into Notesnook on mobile, desktop or web, and set it as your default theme.
+keywords:
+  - install notesnook theme
+  - theme.json notesnook
+  - load theme from file
+schema: howto
 ---
 
 # Install a theme directly from theme.json file
@@ -14,10 +20,10 @@ In both mobile and desktop/web apps, you can install themes directly from a JSON
 1. Open the Notesnook app
 2. Go to Settings > Appearance > Themes
 3. Click "Load from file" button
-   ![Toolbar](/theme-load-file.png)
+   ![The Load from file button in the Notesnook theme settings](/theme-load-file.png)
 4. Select the JSON file to load the theme from.
 5. Click "Set as default"
-   ![Theme set as default in Notesnook](/theme-set-as-default.png)
+   ![The Set as default button on a theme loaded from a file](/theme-set-as-default.png)
 
 ## Related pages
 

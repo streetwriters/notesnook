@@ -1,11 +1,18 @@
 ---
 title: Locking notes with private vault
-description: Password protect your most important and sensitive notes with private vault and store them encrypted even on your device.
+pageTitle: How do I password protect a note in Notesnook?
+description: Lock individual notes behind a second password with the Notesnook private vault, unlock with biometrics, and change or clear the vault.
+keywords:
+  - password protect notes
+  - notesnook vault
+  - lock a note
+  - private notes app
+schema: howto
 ---
 
 # Locking notes
 
-Notesnook is a private notes app. All your notes are encrypted and secure by default. We can not read your notes even if we want to on our servers. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault.
+Notesnook is a private notes app: every note is encrypted by default, and nobody here can read your notes on our servers even if we wanted to. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault.
 
 Adding notes to private vault is useful when you do not want anyone to read your notes, _even if they have access to your phone_.
 
@@ -119,7 +126,7 @@ Turning biometrics on doesn't replace your vault password, and it doesn't travel
 3. Tap `{{vault}}`
 4. Tap `{{changeVaultPassword}}`
 5. Enter the old and new password for the vault
-6. Click Change to update password
+6. Tap `{{change}}` to update the password
    :::
 
 ## Clear vault

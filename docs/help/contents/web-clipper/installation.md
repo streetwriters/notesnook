@@ -1,6 +1,12 @@
 ---
 title: Installation
-description: Notesnook Web Clipper is open source and available to download for Firefox and Chromium based browsers.
+pageTitle: Install the Notesnook Web Clipper
+description: Install the Notesnook Web Clipper extension in Chrome, Edge and other Chromium browsers, or in Firefox from the signed .xpi file.
+keywords:
+  - notesnook web clipper install
+  - web clipper extension
+  - chrome notes clipper
+schema: howto
 ---
 
 # Installation
