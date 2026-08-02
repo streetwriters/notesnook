@@ -98,4 +98,39 @@ describe("outline list item", () => {
 
     expect(editor.getHTML()).toMatchSnapshot();
   });
+
+  test("ctrl+space should collapse/expand outline list item", async () => {
+    const el = outlineList(
+      outlineListItem(["item"], outlineList(outlineListItem(["sub item"])))
+    );
+    const { editor } = createEditor({
+      initialContent: el.outerHTML,
+      extensions: {
+        outlineList: OutlineList,
+        outlineListItem: OutlineListItem,
+        paragraph: Paragraph
+      }
+    });
+
+    editor.commands.setTextSelection(3);
+    const collapseEvent = new KeyboardEvent("keydown", {
+      key: " ",
+      code: "Space",
+      ctrlKey: true,
+      bubbles: true
+    });
+    editor.view.dom.dispatchEvent(collapseEvent);
+
+    expect(editor.getHTML()).toMatchSnapshot();
+
+    const expandEvent = new KeyboardEvent("keydown", {
+      key: " ",
+      code: "Space",
+      ctrlKey: true,
+      bubbles: true
+    });
+    editor.view.dom.dispatchEvent(expandEvent);
+
+    expect(editor.getHTML()).toMatchSnapshot();
+  });
 });

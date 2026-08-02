@@ -6,6 +6,10 @@ exports[`collapse heading > heading uncollapsed 1`] = `"<h1>Main Heading</h1><p>
 
 exports[`converting collapsed heading to lower level should unhide higher level headings 1`] = `"<h3 data-collapsed="true">Level 1 (to be changed)</h3><h2 data-collapsed="true">Level 2</h2><p data-hidden="true">Paragraph under level 2</p>"`;
 
+exports[`ctrl+space should collapse/expand heading 1`] = `"<h1 data-collapsed="true">Heading</h1><p data-hidden="true">Paragraph</p>"`;
+
+exports[`ctrl+space should collapse/expand heading 2`] = `"<h1>Heading</h1><p>Paragraph</p>"`;
+
 exports[`replacing collapsed heading with another heading level should not unhide content 1`] = `"<h2 data-collapsed="true">A collapsed heading</h2><p data-hidden="true">Hidden paragraph</p>"`;
 
 exports[`replacing collapsed heading with another node (blockquote) should unhide content 1`] = `"<blockquote><h1 data-collapsed="true">A collpased heading</h1></blockquote><p>Hidden paragraph</p>"`;
