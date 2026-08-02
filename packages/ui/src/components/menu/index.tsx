@@ -63,7 +63,10 @@ export function Menu(props: MenuProps) {
         const item = items[focusIndex];
         if (item && item.type === "button") onAction(e, item);
       },
-      () => onClose()
+      () => onClose(),
+      (item) => {
+        if (item.type === "button") item.onKeyboardFocus?.();
+      }
     );
   const focusedItem = items[focusIndex];
 
@@ -226,7 +229,12 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
           {title}
         </Text>
       )}
-      <ScrollContainer suppressScrollX>{children}</ScrollContainer>
+      <ScrollContainer
+        suppressScrollX
+        onWheel={(e) => e.stopPropagation()}
+      >
+        {children}
+      </ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}
     </Box>
   );

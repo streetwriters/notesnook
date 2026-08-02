@@ -44,6 +44,7 @@ export type LazyMenuItemsLoader = BaseMenuItem<"lazy-loader"> & {
 
 export type MenuButtonItem = BaseMenuItem<"button"> & {
   onClick?: () => void;
+  onKeyboardFocus?: () => void;
   title: string;
   icon?: string;
   tooltip?: string;

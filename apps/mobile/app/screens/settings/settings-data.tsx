@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatBytes } from "@notesnook/common";
+import { FONT_SIZE_BOUNDS, formatBytes } from "@notesnook/common";
 import {
   SubscriptionPlan,
   SubscriptionProvider,
@@ -1028,8 +1028,8 @@ export const settingsGroups: SettingSection[] = [
             name: strings.defaultFontSize(),
             description: strings.defaultFontSizeDesc(),
             type: "input-selector",
-            minInputValue: 8,
-            maxInputValue: 120,
+            minInputValue: FONT_SIZE_BOUNDS.MIN,
+            maxInputValue: FONT_SIZE_BOUNDS.MAX,
             icon: "format-size",
             property: "defaultFontSize"
           },
@@ -1050,7 +1050,8 @@ export const settingsGroups: SettingSection[] = [
             property: "defaultLineHeight",
             icon: "format-line-spacing",
             minInputValue: EDITOR_LINE_HEIGHT.MIN,
-            maxInputValue: EDITOR_LINE_HEIGHT.MAX
+            maxInputValue: EDITOR_LINE_HEIGHT.MAX,
+            step: 0.1
           },
           {
             id: "title-format",
