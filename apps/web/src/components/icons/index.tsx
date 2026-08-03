@@ -226,7 +226,6 @@ import {
   mdiHistory,
   mdiArrowCollapseRight,
   mdiNoteEditOutline,
-  mdiArrowUp,
   mdiInbox,
   mdiConsoleLine,
   mdiSpellcheck,
@@ -252,6 +251,12 @@ import FileSvg from "@notesnook/icons/file.svg?react";
 import ImageSvg from "@notesnook/icons/image.svg?react";
 import CheckSvg from "@notesnook/icons/check.svg?react";
 import ArrowRightSvg from "@notesnook/icons/arrow-right.svg?react";
+import ShieldCheckSvg from "@notesnook/icons/shield-check.svg?react";
+import CalendarBlankSvg from "@notesnook/icons/calendar-blank.svg?react";
+import ProhibitSvg from "@notesnook/icons/prohibit.svg?react";
+import HandCoinsSvg from "@notesnook/icons/hand-coins.svg?react";
+import ArrowUpSvg from "@notesnook/icons/arrow-up.svg?react";
+import LightningSvg from "@notesnook/icons/lightning.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -621,7 +626,6 @@ export const SessionHistory = createIcon(mdiHistory);
 export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
-export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
 export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
@@ -642,3 +646,9 @@ export const Cloud = createSvgIcon(CloudSvg);
 export const FileDoc = createSvgIcon(FileSvg);
 export const Picture = createSvgIcon(ImageSvg);
 export const ArrowRightSvgIcon = createSvgIcon(ArrowRightSvg);
+export const ShieldCheck = createSvgIcon(ShieldCheckSvg);
+export const CalendarBlank = createSvgIcon(CalendarBlankSvg);
+export const Prohibit = createSvgIcon(ProhibitSvg);
+export const HandCoins = createSvgIcon(HandCoinsSvg);
+export const ArrowUp = createSvgIcon(ArrowUpSvg);
+export const Lightning = createSvgIcon(LightningSvg);
