@@ -177,9 +177,11 @@ function resetRootState(
 
   if (state.routes.length < 2) return;
 
-  const routes = state.routes.filter(
+  let routes = state.routes.filter(
     (route) =>
-      (route.name !== "Auth" && route.name !== "Welcome") ||
+      (route.name !== "Auth" &&
+        route.name !== "Welcome" &&
+        route.name !== "AddReminder") ||
       route.key === focusedRoute.key
   );
 
