@@ -292,8 +292,8 @@ export const sidebar = [
             link: "/inbox-api/self-hosting-inbox-api"
           }
         ]
-      },
-      { text: "Self-hosting Notesnook", link: "/self-hosting" }
+      }
+      // { text: "Self-hosting Notesnook", link: "/self-hosting" }
     ]
   },
   {
