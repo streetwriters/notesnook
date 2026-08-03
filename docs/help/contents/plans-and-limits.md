@@ -10,18 +10,18 @@ keywords:
   - notesnook attachment size limit
 schema: faq
 faqs:
-  - q: Is Notesnook free?
+  - q: Can I use Notesnook for free?
     a: Yes. Notesnook is free to use with unlimited notes, unlimited devices, end-to-end encryption, sync, backups, the private vault and monographs. Paid plans raise storage and file size limits and unlock extras such as task lists, callouts, outline lists, markdown shortcuts and app lock.
   - q: Does the Pro plan include everything in Essential?
-    a: Yes. Plans are cumulative. Every feature unlocked by Essential is also available on Pro and Believer, and everything in Pro is available on Believer.
+    a: Yes. Plans are cumulative. Every feature unlocked by Essential is also available on Pro and Believer, and everything in Pro is available on the Believer plan.
   - q: How much storage do I get on the free plan?
     a: The free plan gives you 50 MB of attachment storage per month and a maximum file size of 10 MB. Notes themselves are not counted against storage.
   - q: What happens to my notes if my subscription expires?
-    a: Nothing is deleted. Your notes stay readable and syncable. You return to free-plan limits, so you cannot create new items above the free caps, and paid-only settings such as app lock are switched off.
+    a: Nothing is deleted. Your notes stay readable and syncable. You return to free-plan limits, so you cannot create new items above the free caps, and paid-only settings such as app lock are automatically switched off.
   - q: Does Notesnook offer regional pricing?
-    a: Yes. Notesnook applies a regional price automatically, based on the country of the payment method you check out with. There is no code to enter. If a regional price applies to you, the plan shows the original price struck through with the percentage off.
+    a: Yes. Notesnook applies a regional price automatically, based on the country of the payment method you check out with. There is no code to enter.
   - q: Can I get a refund?
-    a: Yes, within the refund window for the billing period you bought — 7 days on a monthly subscription, 14 days on a yearly one and 30 days on a 5-year purchase. Refunds are requested from inside the app on subscriptions bought through Notesnook's own checkout.
+    a: Yes, you can request a refund within 14 days of your purchase. Refunds are requested from inside the app on subscriptions bought through Notesnook web/desktop apps.
 ---
 
 # Notesnook plans and limits
@@ -111,11 +111,11 @@ A trial works like a short subscription: a feature you unlock during it stops wo
 
 Refunds are self-service inside the app on subscriptions bought through Notesnook's own checkout, within the window for the billing period you bought:
 
-| Billing period | Refund window |
-| --- | --- |
-| Monthly | 7 days from purchase |
-| Yearly | 14 days from purchase |
-| 5-year | 30 days from purchase |
+| Billing period | Refund window         |
+| -------------- | --------------------- |
+| Monthly        | 14 days from purchase |
+| Yearly         | 14 days from purchase |
+| 5-year         | 14 days from purchase |
 
 Requesting a refund downgrades your account to the free plan immediately, and eligible funds are returned within 24 hours. Subscriptions bought through Google Play or the App Store are refunded by that store, not by Notesnook.
 
@@ -135,7 +135,7 @@ Subscriptions bought on mobile are managed by the store that sold them.
 1. Go to `{{settings}}`.
 2. Open `{{account}}`.
 3. Tap your subscription. If it was bought on the store you are using, this opens Google Play or App Store subscription management; otherwise Notesnook tells you where the subscription was bought so you can manage it there.
-:::
+   :::
 
 ## What happens when a subscription ends
 
