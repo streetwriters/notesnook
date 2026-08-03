@@ -233,6 +233,9 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    // Lets the widgets push their list data straight into the RemoteViews on every API level,
+    // instead of the deprecated RemoteViewsService adapter (which needs API 31 to do natively).
+    implementation("androidx.core:core-remoteviews:1.0.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
     
     implementation 'androidx.multidex:multidex:2.0.1' 

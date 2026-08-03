@@ -11,5 +11,5 @@
     android:previewImage="@drawable/reminder_preview"
     android:previewLayout="@layout/widget_reminders_preview"
     android:updatePeriodMillis="1800000"
-    android:widgetCategory="home_screen"
+    android:widgetCategory="home_screen|not_keyguard"
     />

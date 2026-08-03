@@ -34,6 +34,10 @@ export const NotePreviewWidget = {
 
         NotesnookModule.updateWidgetNote(id, JSON.stringify(newNote));
       }
+      // Redraw from the widgets that actually exist rather than only the ones we
+      // have notes for. After app data is cleared there are none, and the widgets
+      // would otherwise keep showing content that no longer exists.
+      NotesnookModule.refreshWidgets();
     }, 500);
   },
   updateNote: async (id: string, note: Note) => {

@@ -86,13 +86,23 @@
             android:name=".NotePreviewWidget"
             android:exported="false"
             android:label="@string/note">
-            <intent-filter>"
+            <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_RESTORED" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/note_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".WidgetTimeChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
         </receiver>
 
         <receiver
@@ -229,11 +239,6 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-
-        <service
-            android:name=".ReminderViewsService"
-            android:exported="true"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

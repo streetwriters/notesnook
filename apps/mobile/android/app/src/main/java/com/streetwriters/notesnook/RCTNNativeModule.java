@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,7 +28,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.google.gson.Gson;
 import com.streetwriters.notesnook.datatypes.Note;
 
 import java.util.ArrayList;
@@ -138,7 +136,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
                 if (Objects.equals(extras.getString(IntentType), "NewReminder")) {
                     map.putString(ReminderWidgetProvider.NewReminder, extras.getString(ReminderWidgetProvider.NewReminder));
                 } else if (Objects.equals(extras.getString(IntentType), "OpenReminder")) {
-                    map.putString(ReminderViewsService.OpenReminderId, extras.getString(ReminderViewsService.OpenReminderId));
+                    map.putString(ReminderWidgetProvider.OpenReminderId, extras.getString(ReminderWidgetProvider.OpenReminderId));
                 } else if (Objects.equals(extras.getString(IntentType), "OpenNote")) {
                     map.putString(NotePreviewWidget.OpenNoteId, extras.getString(NotePreviewWidget.OpenNoteId));
                 }
@@ -156,14 +154,8 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getWidgetNotes(Promise promise) {
-        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Map<String, ?> map = pref.getAll();
         WritableArray arr = Arguments.createArray();
-        for(Map.Entry<String,?> entry : map.entrySet()){
-            if (entry.getKey().equals("remindersList")) continue;
-            String value = (String) entry.getValue();
-            Gson gson = new Gson();
-            Note note = gson.fromJson(value, Note.class);
+        for (Note note : WidgetUtils.getWidgetNotes(getReactApplicationContext()).values()) {
             arr.pushString(note.getId());
         }
         promise.resolve(arr);
@@ -171,34 +163,44 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void hasWidgetNote(final String noteId, Promise promise) {
-        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Map<String, ?> map = pref.getAll();
         boolean found = false;
-        for(Map.Entry<String,?> entry : map.entrySet()){
-            String value = (String) entry.getValue();
-            if (value.contains(noteId)) {
+        for (Note note : WidgetUtils.getWidgetNotes(getReactApplicationContext()).values()) {
+            if (note.getId().equals(noteId)) {
                 found = true;
+                break;
             }
         }
         promise.resolve(found);
     }
+
     @ReactMethod
     public void updateWidgetNote(final String noteId, final String data) {
-        SharedPreferences pref = getReactApplicationContext().getSharedPreferences("appPreview", Context.MODE_PRIVATE);
-        Map<String, ?> map = pref.getAll();
+        SharedPreferences pref = getReactApplicationContext().getSharedPreferences(WidgetUtils.PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = pref.edit();
-        ArrayList<String> ids = new ArrayList<>();
-        for(Map.Entry<String,?> entry : map.entrySet()) {
-            String value = (String) entry.getValue();
-            if (value.contains(noteId)) {
-                edit.putString(entry.getKey(), data);
-                ids.add(entry.getKey());
-            }
+        List<Integer> ids = new ArrayList<>();
+
+        // Match on the note's id, not on the raw JSON containing it somewhere: a note whose body
+        // happens to mention another note's id is not the same note.
+        for (Map.Entry<Integer, Note> entry : WidgetUtils.getWidgetNotes(getReactApplicationContext()).entrySet()) {
+            if (!noteId.equals(entry.getValue().getId())) continue;
+            edit.putString(String.valueOf(entry.getKey()), data);
+            ids.add(entry.getKey());
         }
         edit.apply();
-        for (String id: ids) {
-            NotePreviewWidget.updateAppWidget(mContext, AppWidgetManager.getInstance(mContext), Integer.parseInt(id));
+
+        for (int id : ids) {
+            NotePreviewWidget.updateAppWidget(mContext, AppWidgetManager.getInstance(mContext), id);
         }
+    }
+
+    /**
+     * Redraws every widget from scratch. Needed because the app can be stopped while its widgets
+     * stay on the home screen: clearing app data empties the store without the widgets ever being
+     * told, so they keep showing content that is gone until something forces a redraw.
+     */
+    @ReactMethod
+    public void refreshWidgets() {
+        WidgetUtils.refreshAll(mContext);
     }
 
     @ReactMethod
@@ -208,8 +210,8 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         for (int id: ids) {
             Log.d("Reminders", "Updating" + id);
             RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_reminders);
+            // The rows are part of this update, so there is nothing left to invalidate afterwards.
             ReminderWidgetProvider.updateAppWidget(mContext, wm, id, views);
-            wm.notifyAppWidgetViewDataChanged(id, R.id.widget_list_view);
         }
     }
 

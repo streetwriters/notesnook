@@ -12,22 +12,23 @@
         android:orientation="horizontal"
         android:paddingHorizontal="12dp"
         android:layout_gravity="center"
-        android:paddingTop="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="2dp"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:textColor="@color/text"
-            android:text="Upcoming Reminders"/>
+            android:text="Reminders"/>
 
         <ImageButton
-            android:layout_width="35dp"
+            android:layout_width="25dp"
             android:id="@+id/add_button"
-            android:layout_height="35dp"
+            android:layout_height="25dp"
             android:layout_alignParentRight="true"
             android:background="@drawable/ic_newnote" />
     </RelativeLayout>
@@ -57,7 +58,8 @@
             android:layout_height="match_parent"
             android:textAlignment="center"
             android:gravity="center"
-            android:text="Tap on + to add reminder"/>
+            android:textColor="@color/text"
+            android:text="@string/widget_reminders_empty"/>
 
     </LinearLayout>
 
