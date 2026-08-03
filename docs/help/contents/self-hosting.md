@@ -63,6 +63,7 @@ Open the `.env` file into an editor. This guide will go over the minimum you nee
 
 :::warning This guide does not cover setting up an SMTP server!
 You **will have to** do this if you plan on using the password reset feature, or want to use email-based two factor auth (the default). If you don't change the two factor method after creating your account, you may become locked out of the account. You have been warned.
+
 :::
 
 #### `INSTANCE_NAME`
@@ -81,8 +82,8 @@ This is a setting you should change after signing up, unless you want your serve
 
 Public URLs are how the servers can generate valid publicly accessible URLs for different things like email confirmation, password reset links etc. These URLs must be accessible from _outside_ of where you are hosting your servers (e.g. by using a reverse proxy like Nginx).
 
-| Variable                        | Description                                                                                         | Example                                                         |
-| ------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Variable                        | Description                                                                                         | Example                                            |
+| ------------------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | `NOTESNOOK_APP_PUBLIC_URL`      | If you're self-hosting the web app too, you put the url to it here, otherwise, leave it alone.      | [https://app.notesnook.com/](#public-urls)         |
 | `MONOGRAPH_PUBLIC_URL`          | This is the url for the monograph server, it is also where published notes will be accessible from. | [https://monogr.ph/](#public-urls)                 |
 | `AUTH_SERVER_PUBLIC_URL`        | This is the url for the auth server.                                                                | [https://auth.streetwriters.co/](#public-urls)     |
@@ -118,6 +119,7 @@ Running the Docker containers on device is all well and good, but if you want to
 
 :::warning HTTPS is required.
 **HTTPS is required by the browser and mobile apps**. Notesnook does not necessarily mandate this, but your browser and mobile operating system may.
+
 :::
 
 This guide will cover hosting Notesnook using a Cloudflare Tunnel, as we believe it is the easiest option, doesn't require port forwarding, and HTTPS is automatically set up.
@@ -151,10 +153,11 @@ This guide will cover hosting Notesnook using a Cloudflare Tunnel, as we believe
 
 :::tip What to do if you changed the port configuration
 If you changed ports for a service, **use the configured port** instead of the default ones shown below. If you haven't already, you may additionally need to double check that your `docker-compose.yml` file doesn't use the defaults.
+
 :::
 
-| Service            | Service URL                                                             |
-| ------------------ | ----------------------------------------------------------------------- |
+| Service            | Service URL                                               |
+| ------------------ | --------------------------------------------------------- |
 | Sync server        | [http://notesnook-server:5264](#exposing-to-the-internet) |
 | Monograph server   | [http://monograph-server:3000](#exposing-to-the-internet) |
 | Events/SSE server  | [http://sse-server:7264](#exposing-to-the-internet)       |
@@ -163,6 +166,7 @@ If you changed ports for a service, **use the configured port** instead of the d
 
 :::info
 The attachments server doesn't get entered into the client, the public url is used by the sync server to generate signed S3 links. Those are scoped to a specific hostname.
+
 :::
 
 You should now [configure your client](#point-notesnook-at-your-own-servers) to ensure that everything is publicly accessible, everything should be now. The `{{testConnection}}` button is the easiest way to do this, as it will tell you which server is not reachable, should anything be wrong.
@@ -190,6 +194,7 @@ This is not an arbitrary restriction. Your account, your keys and your data live
 
 ::: warning Make a backup, then log out.
 Take a [backup](/backup-and-restore-notes-in-notesnook) before logging out of notesnook to change your server configuration. An account on Notesnook's servers does not exist on your own. You'll have to sign up again on your instance, and you bring your notes over by restoring your backup. **Notesnook cannot move an account between backends for you.**
+
 :::
 
 ## Point Notesnook at your own servers
@@ -214,6 +219,7 @@ Take a [backup](/backup-and-restore-notes-in-notesnook) before logging out of no
 5. Tap `{{save}}`.
 
 Tapping `{{save}}` before testing shows `{{testConnectionBeforeSave}}`. After saving you get a `{{serverUrlChanged}}` dialog reading `{{restartAppToTakeEffect}}` — close the app fully and reopen it.
+
 :::
 
 <!-- TODO: screenshot — the Servers configuration screen with the four URL fields and the Test connection button -->
@@ -246,6 +252,7 @@ The app reloads after 5 seconds.
 3. Tap `{{resetServerUrls}}`.
 
 You get a `{{serverUrlsReset}}` dialog reading `{{restartAppToTakeEffect}}` — close and reopen the app.
+
 :::
 
 Your notes on your hosted server are untouched by the app reset, but the account you used on your own instance does not exist on Notesnook's servers. You'll have to log in (or sign up) again, and restore a backup to transfer your data back over.

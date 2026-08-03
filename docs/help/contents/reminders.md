@@ -40,7 +40,8 @@ Free accounts can have up to 10 active reminders at a time. Essential raises the
    - **Permanent** _(Android only)_: A persistent reminder that shows up every day
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Tap the checkmark button on top right to save the reminder
-   :::
+
+:::
 
 ## Creating a standalone reminder
 
@@ -64,12 +65,14 @@ You can also create reminders without attaching them to a specific note. This is
 4. Choose your reminder type (Once, Repeat, or Permanent on Android)
 5. Select your notification preference (Silent, Vibrate, or Urgent)
 6. Tap the checkmark button on top right to save the reminder
-   :::
+
+:::
 
 ## Configuring recurring reminders <PlanTag plan="essential" />
 
 ::: info Recurring reminders are a paid feature
 Recurring reminders can only be used if you are on a paid plan — Essential, Pro or Believer. See [Plans & limits](/plans-and-limits).
+
 :::
 
 When you select **Repeat** mode, you can customize how often you want to be reminded:
@@ -89,6 +92,7 @@ Choose how you want to be notified:
 
 ::: info
 Reminders require notification permissions. You'll be asked to enable notifications when you create your first reminder.
+
 :::
 
 ## Editing or viewing reminders
@@ -113,7 +117,8 @@ Deactivating a reminder stops it from notifying you without deleting it, so you 
 1. Go to the `{{reminders}}` screen from the side menu.
 2. Tap the ![Three dot button](/three-dot-button.png) button on the reminder.
 3. Tap `{{turnOffReminder}}` to switch it off, or `{{turnOnReminder}}` to switch it back on.
-   :::
+
+:::
 
 ## Snooze a reminder
 
@@ -126,12 +131,14 @@ When a reminder fires you can push it back instead of dismissing it.
 2. Under `{{remindMeIn}}`, click `5 minutes`, `10 minutes`, `15 minutes` or `1 hour`.
 
 The reminder fires again after the interval you picked.
+
 == Mobile
 
 1. Expand the reminder notification in your notification shade.
 2. Tap the snooze action on it — `Remind in 5 min` on Android, `Remind me in 5 min` on iOS. Both labels show your default snooze time.
 
 The action uses your default snooze time, which is 5 minutes until you change it. Recurring reminders also get a `{{disable}}` action on the notification, which deactivates the reminder.
+
 :::
 
 ### Change the default snooze time _(mobile)_

@@ -19,17 +19,21 @@ Task lists are part of the [Essential plan and above](/plans-and-limits). On the
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Place the cursor on an empty line.
 2. Click the `+` (Insert) button in the toolbar.
 3. Choose `{{taskList}}`.
 
 You can also press `Ctrl+Shift+T`, or type `[] ` on an empty line if you have [Markdown shortcuts](/rich-text-editor/markdown-notes-editing) turned on.
+
 == Mobile
+
 1. Place the cursor on an empty line.
 2. Tap the `+` (Insert) button in the toolbar.
 3. Choose `{{taskList}}`.
 
 Typing `[] ` on an empty line also works — Markdown shortcuts are on by default on mobile.
+
 :::
 
 ## Track your progress
@@ -62,13 +66,17 @@ Notesnook supports unlimited subtasks under a single task item.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Move selection to the end of the parent task item
 2. Press `Enter` to create a new task item
 3. Press `Tab` to indent it into a sub task
+
 == Mobile
+
 1. Move selection to the end of the parent task item
 2. Press `Enter` to create a new task item
 3. Tap the Indent tool button in the toolbar to indent it into a sub task
+
 :::
 
 Subtasks support the following features:

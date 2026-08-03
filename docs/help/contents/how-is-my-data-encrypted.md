@@ -23,15 +23,16 @@ Everything you write is encrypted on your own device before it is sent anywhere.
 
 ::: info This is an explanation, not a specification
 This page describes how the encryption works in practice. It is not a formal spec.
+
 :::
 
 ## Algorithms & cryptographic library
 
-| Purpose | Algorithm |
-| --- | --- |
-| Encrypting and decrypting your data | XChaCha20-Poly1305-IETF |
-| Deriving your master key from your password | Argon2i |
-| Hashing your password for the server | Argon2id |
+| Purpose                                     | Algorithm               |
+| ------------------------------------------- | ----------------------- |
+| Encrypting and decrypting your data         | XChaCha20-Poly1305-IETF |
+| Deriving your master key from your password | Argon2i                 |
+| Hashing your password for the server        | Argon2id                |
 
 All of it comes from [**libsodium**](https://libsodium.org). Web, desktop and mobile use the same library for every cryptographic operation, so a note encrypted on one platform decrypts identically on the others.
 
@@ -45,6 +46,7 @@ This predictable salt is generated using a `fixed client salt` + `your email`.
 
 ::: info Your password never leaves your device
 Only the hash is sent, never the password itself, so there is no way for us — or anyone who intercepts the request — to learn your password.
+
 :::
 
 After the hash is generated, it is sent to the server. This hash is used as a `password` and is hashed again to mitigate password passthrough attacks.
@@ -62,8 +64,11 @@ When you first sign up for an account, your client generates two encryption keys
 Instead of storing the key as plain text (and allowing anyone to copy/move it), we use browser's `IndexedDB` to store the key as a `CryptoKey`.
 
 `CryptoKey` is stored securely by the browser and cannot be exported, viewed, or copied except by the app & browser.
+
 == Mobile
+
 On iOS and Android, the encryption key is stored in the phone's keychain.
+
 :::
 
 ### 4. Data encryption
@@ -83,6 +88,7 @@ Encryption takes place when you sync. Each item in the database is encrypted sep
 
 ::: info
 See the whole process in action [here.](https://vericrypt.notesnook.com/)
+
 :::
 
 This object is then sent to the server for storage. The server performs no further operation on this data (because it can't).

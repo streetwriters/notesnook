@@ -31,7 +31,8 @@ That is the whole difference from a normal bullet list: a bullet list nests too,
 1. Place the cursor on an empty line, or select the lines you want to convert.
 2. Tap the `+` (Insert) button in the bottom toolbar.
 3. Choose `{{outlineList}}` from the `{{chooseBlockToInsert}}` sheet.
-   :::
+
+:::
 
 Press `Enter` to start the next item, exactly as in any other list.
 
@@ -43,6 +44,7 @@ On an empty line, type `-o` followed by a space and the line becomes the first i
 
 ::: info Markdown shortcuts need to be enabled
 `-o ` is a [Markdown shortcut.](/rich-text-editor/markdown-notes-editing) Markdown shortcuts are **off by default on web and desktop**: turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}`. On mobile they are on by default. The toolbar button and `Ctrl+Shift+O` do not depend on that setting.
+
 :::
 
 ## Nest an item under another
@@ -61,6 +63,7 @@ On an empty line, type `-o` followed by a space and the line becomes the first i
 3. Tap `{{outdent}}` to move it back out.
 
 These two buttons only appear while the cursor is inside a list item.
+
 :::
 
 As soon as an item has something nested under it, it becomes a parent and grows a collapse arrow.
@@ -74,12 +77,14 @@ As soon as an item has something nested under it, it becomes a parent and grows 
 2. Everything nested under it folds away; the item itself stays visible.
 
 Repeat to expand it again.
+
 == Mobile
 
 1. Tap the arrow in the margin to the left of a parent item.
 2. Everything nested under it folds away.
 
 Tap the arrow again to expand.
+
 :::
 
 Items with no children have nothing to fold, so no arrow appears on them. The collapsed state is saved with the note, so a branch you folded is still folded next time you open the note, on any device.
@@ -88,6 +93,7 @@ Items with no children have nothing to fold, so no arrow appears on them. The co
 
 ::: tip `⌘+Space` on macOS
 macOS assigns `⌘+Space` to Spotlight by default. If nothing happens when you press it in the editor, use the collapse arrow instead, or rebind Spotlight in `System Settings` → `Keyboard` → `Keyboard Shortcuts`.
+
 :::
 
 ## Related pages

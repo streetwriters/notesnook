@@ -18,13 +18,17 @@ It is not a family plan or a shared workspace — it is a list of partner produc
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}`.
 2. Open `{{account}}` > `{{notesnookCircle}}`.
 3. Pick a partner and redeem its code.
+
 == Mobile
+
 1. Go to `{{settings}}`.
 2. Open `{{account}}` > `{{notesnookCircle}}`.
 3. Pick a partner and redeem its code.
+
 :::
 
 ## Who can redeem
@@ -37,6 +41,7 @@ Circle is part of the [Essential plan and above](/plans-and-limits), and it need
 
 ::: info Codes come from the partner, not from Notesnook
 Each code is issued by the partner and redeemed on their site under their terms. If a code doesn't work, contact that partner — Notesnook cannot reissue someone else's discount.
+
 :::
 
 ## Related pages

@@ -15,6 +15,7 @@ Notes aren't only text. You can drop an image into a note, attach a file of any 
 
 ::: info You need an account to attach anything
 Attachments are uploaded to your encrypted storage, so Notesnook asks you to log in the first time you try to add one — the message reads `{{notLoggedIn}}` on desktop and web, and `{{loginRequired}}` on mobile. Storage and maximum file size depend on your plan; see [plans & limits](/plans-and-limits).
+
 :::
 
 <!-- TODO: screenshot — a note containing an image, a file attachment and an embedded video -->
@@ -40,10 +41,12 @@ Two shortcuts skip the menu entirely:
 2. Tap the `+` button in the toolbar at the bottom of the screen and choose `{{image}}`.
 3. Choose `{{uploadFromDisk}}` to pick from your gallery, `{{takePhotoUsingCamera}}` to shoot one now, or `{{attachImageFromURL}}` to paste a link.
 4. Confirm in the sheet that appears; the image is encrypted and inserted into the note.
-   :::
+
+:::
 
 ::: info Images from a URL are downloaded, not hot-linked
 When you use `{{attachImageFromURL}}`, Notesnook downloads the image and stores it as one of your attachments. The note never asks the original website for the file, so opening the note doesn't tell that site anything about you.
+
 :::
 
 ## Keep images at full quality <PlanTag plan="pro" />
@@ -57,9 +60,11 @@ When the `{{attachingFiles}}` dialog is set to ask, each image has a `{{compress
 To change what happens by default, go to `{{settings}}` > `{{customization}}` > `{{behaviour}}` > `{{imageCompression}}` and choose `{{askEveryTime}}`, `{{enableRecommended}}` or `{{disable}}`.
 
 == Mobile
+
 The sheet shown when you attach an image has a `Compress (recommended)` checkbox. Clear it for full quality.
 
 To change the default, go to `{{settings}}` > `{{customization}}` > `{{behavior}}` > `{{imageCompression}}`.
+
 :::
 
 On a plan that doesn't support full quality images, the option is greyed out. Attempting to change it will ask you to upgrade your plan.
@@ -77,7 +82,9 @@ Alignment lives in the same toolbar, as three buttons: `{{alignLeft}}`, the cent
 Selecting an image floats a small toolbar above it with `{{previewAttachment}}`, `{{downloadAttachment}}`, the three alignment buttons and `{{imageProperties}}`.
 
 == Mobile
+
 Selecting an image adds an `{{imageSettings}}` button to the toolbar at the bottom. Tap it for `{{downloadAttachment}}`, alignment and `{{imageProperties}}`. `{{previewAttachment}}` is available directly in the toolbar.
+
 :::
 
 ## Attach any other file
@@ -99,8 +106,11 @@ Select the attachment and choose `{{previewAttachment}}`.
 :::tabs key:platform
 == Desktop/Web
 Images open in a viewer. **PDFs open in a preview pane beside the editor**, so you can read the document and take notes on it at the same time. Drag the divider to resize the pane, and close it when you're done. See [tabs & panes](/rich-text-editor/editor-tabs-and-panes).
+
 == Mobile
+
 Images open in a full-screen image viewer and PDFs open in a full-screen PDF viewer.
+
 :::
 
 ## Embed a video or a post
@@ -115,6 +125,7 @@ Select an embed to resize it with the bottom-right handle — embeds resize free
 
 ::: warning Embeds load content from the internet
 An embed is a live frame from another website, so opening a note that contains one makes a request to that site. Everything else in your note stays end-to-end encrypted; see [how your data is encrypted](/how-is-my-data-encrypted).
+
 :::
 
 ## Read a web clip inside a note

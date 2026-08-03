@@ -31,15 +31,19 @@ Table columns are resizable on all platforms.
 
 :::tabs key:platform
 == Desktop
+
 1. Hover on the separator between two columns, it will turn green
 2. Click and hold separator to resize the column.
 
 ![Resize a table](/resize-table.gif)
+
 == Mobile
+
 1. Tap the separator between the two columns.
 2. Drag the separator left or right to resize.
 
 ![Resize a table on mobile](/resize-table-mobile.gif)
+
 :::
 
 ## Insert a row
@@ -113,15 +117,19 @@ Table columns are resizable on all platforms.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Focus inside the note where you want the table.
 2. Click the ![Toolbar plus](/toolbar-plus.png) button and open `{{table}}`.
 3. Click `{{importCsv}}` and pick a `.csv` file.
 
 The table is inserted with one row per line and one column per field.
+
 == Mobile
+
 1. Focus inside the note where you want the table.
 2. Tap the ![Toolbar plus](/toolbar-plus.png) button and open `{{table}}`.
 3. Tap `{{importCsv}}` and pick a `.csv` file.
+
 :::
 
 <!-- TODO: screenshot — the Import CSV item in the toolbar's Table insert menu -->
@@ -134,17 +142,21 @@ Importing a CSV into a table requires a Pro plan. See [Plans & limits](/plans-an
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Click a cell in the table.
 2. Click the `{{tableSettings}}` button on top of the table.
 3. Click `{{exportCsv}}`.
 
 The file is saved as `table.csv`.
+
 == Mobile
+
 1. Tap a cell in the table.
 2. Tap the `{{tableSettings}}` button in the toolbar at the bottom.
 3. Tap `{{exportCsv}}`.
 
 On Android you are asked where to save `table.csv`. On iOS the file is saved inside the app and a `Table saved to csv` sheet lets you share it from there.
+
 :::
 
 <!-- TODO: screenshot — the Export CSV item in the table settings menu -->

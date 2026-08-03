@@ -29,7 +29,8 @@ You can also press `Ctrl+Shift+C` (`⌘+Shift+C` on macOS). If you press it with
 1. Place the cursor on an empty line.
 2. Tap the `+` (Insert) button in the bottom toolbar.
 3. Choose `Code block` from the `Choose a block to insert` sheet.
-   :::
+
+:::
 
 ![The insert block menu in the Notesnook editor, with Code block listed alongside Task list, Outline list, Math & formulas and Callout](/screenshots/editor-insert-block-menu.png)
 
@@ -39,6 +40,7 @@ On an empty line, type three backticks followed by a space or Enter — ` ``` ` 
 
 ::: info Markdown shortcuts need to be enabled.
 Typing ` ``` ` relies on [Markdown shortcuts.](/rich-text-editor/markdown-notes-editing) They are **off by default on web and desktop** — turn on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}` first. On mobile they are on by default. The toolbar button and `Ctrl+Shift+C` work on every plan.
+
 :::
 
 ## Choose the language
@@ -59,12 +61,14 @@ Every code block has a language button in the bar along its bottom edge showing 
 1. Tap the language name at the bottom of the code block.
 2. In the `{{selectLanguage}}` sheet, type in `{{searchLanguages}}` to filter the list.
 3. Tap the language you want.
-   :::
+
+:::
 
 There are **297 languages** to choose from, each highlighted with its own grammar.
 
 ::: tip The last language becomes the default
 The language you pick is remembered on that device and used for every code block you create afterwards, so you only have to set your usual language once.
+
 :::
 
 <!-- TODO: screenshot — the language picker with the search languages field -->
@@ -94,6 +98,7 @@ Short single-line snippets are treated as [inline code](/rich-text-editor/rich-t
 
 ::: tip Leaving a code block
 Press `Enter` three times at the end of a block, or press the down arrow at the very bottom of the last block in a note, and the cursor moves out into a new paragraph. `Ctrl+A` inside a code block selects that block's code rather than the whole note.
+
 :::
 
 ## Related pages

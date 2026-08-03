@@ -28,12 +28,14 @@ You can also [narrow a search with filters](#narrow-a-search-with-filters) — b
 3. Press `Escape`, or click the ✕ in the box, to clear the search and go back to the full list.
 
 `Ctrl+F` (`⌘+F` on macOS) puts the cursor in that box whenever the editor isn't focused. If you're in a note, `Ctrl+F` opens the editor's own find bar instead.
+
 == Mobile
 
 1. Tap the bar at the top of the screen — it reads `Search in Notes`, `Search in Notebook` and so on, depending on the view.
 2. Type your query. Results appear as you type.
 3. Tap the back arrow to return to the list.
-   :::
+
+:::
 
 ## What is actually searched
 
@@ -48,6 +50,7 @@ You can also [narrow a search with filters](#narrow-a-search-with-filters) — b
 
 ::: info Locked notes
 The content of a note in your [private vault](/lock-notes-with-private-vault) is encrypted, so it is never added to the search index. Locked notes are found by their titles only. This is a limitation of end-to-end encryption, not a bug.
+
 :::
 
 ## Narrow a search with filters
@@ -61,6 +64,7 @@ A word typed _after_ a filter is swallowed into it, and the whole search silentl
 - `meeting favorite:true` — finds favorite notes containing "meeting" ✓
 
 Always write what you're looking for, then the filters.
+
 :::
 
 ### Filters you can use
@@ -164,6 +168,7 @@ Passages are only shown in the detailed list. Switching the notes list to compac
 1. Tap a result to open the note.
 
 Matching passages are highlighted in the result so you can see the context before opening it.
+
 :::
 
 <!-- TODO: screenshot — an expanded search result showing highlighted matches under the note title -->
@@ -183,6 +188,7 @@ Move with `↑` and `↓`, run with `⏎`. Press `Delete` on an entry under rece
 
 ::: info Not on mobile
 The command palette and quick open are only features of the **desktop and web apps**. On mobile, use the search bar and the side menu.
+
 :::
 
 ## Jump to a note by name
@@ -206,8 +212,11 @@ Quick open is a desktop and web feature. Press `Ctrl+P` (`⌘+P` on macOS) for *
 2. Type into the `{{search}}` box at the top of the settings sidebar.
 
 The search covers every section at once — section names, group headings, setting titles, their descriptions and their keywords — so you can find a setting without knowing which section it lives in. `{{noResultsFound}}` means nothing matched.
+
 == Mobile
+
 Settings on mobile has no search box. Open `{{settings}}` from the side menu and pick the section you need.
+
 :::
 
 ## Filter notebooks and tags
@@ -224,7 +233,8 @@ The notebooks and tags lists have their own filter box, separate from note searc
 
 1. Open `{{notebooks}}` or `Tags` in the side menu.
 2. Type into the `Filter notebooks...` or `Filter tags...` box at the bottom of the list.
-   :::
+
+:::
 
 Clearing the box restores the full list.
 
@@ -244,7 +254,8 @@ Sorting is set per view, and separately for each individual notebook, tag and co
 1. Tap the sort icon in the group header at the top of the list.
 2. Tap the direction button next to `{{sortBy}}` to flip between ascending and descending.
 3. Tap a key under `{{sortBy}}`.
-   :::
+
+:::
 
 There are seven sort keys. Which ones are offered depends on the list you're in:
 
@@ -287,6 +298,7 @@ Clicking the group header itself opens `{{jumpToGroup}}`, which scrolls the list
 2. Scroll to `{{groupBy}}` and pick a mode.
 
 Tapping the group title opens the jump-to-group list.
+
 :::
 
 Grouping isn't offered for reminders or for search results — those are always sorted, never grouped.
@@ -307,6 +319,7 @@ It's available on the notes, favorites and notebooks lists, and it also collapse
 1. Tap the list-view icon next to the sort icon in the group header.
 
 Notes, notebooks and search results each remember their own setting.
+
 :::
 
 ## Related pages

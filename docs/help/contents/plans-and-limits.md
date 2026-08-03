@@ -32,6 +32,7 @@ Everything that makes Notesnook _Notesnook_ is on the free plan: unlimited notes
 
 ::: tip Plans are cumulative
 Each plan includes everything from the plans below it. A feature marked <PlanTag plan="essential" /> works on Essential, Pro **and** Believer. A feature marked <PlanTag plan="pro" /> works on Pro **and** Believer.
+
 :::
 
 ## What each plan gives you
@@ -129,13 +130,16 @@ Requesting a refund downgrades your account to the free plan immediately, and el
 3. Choose `{{changePlan}}` to move up or down a tier — the difference is prorated — or turn off `Auto renew` to stop the subscription at the end of the period.
 
 Your `{{billingHistory}}` on the same screen lists every payment with a downloadable receipt.
+
 == Mobile
+
 Subscriptions bought on mobile are managed by the store that sold them.
 
 1. Go to `{{settings}}`.
 2. Open `{{account}}`.
 3. Tap your subscription. If it was bought on the store you are using, this opens Google Play or App Store subscription management; otherwise Notesnook tells you where the subscription was bought so you can manage it there.
-   :::
+
+:::
 
 ## What happens when a subscription ends
 
@@ -149,6 +153,7 @@ You go back to free-plan limits, which means:
 
 ::: warning Before you let a subscription lapse
 If you rely on app lock, take a moment to set up your device's own lock screen first — Notesnook will turn app lock off when the plan expires.
+
 :::
 
 ## Redeeming a gift or promo code

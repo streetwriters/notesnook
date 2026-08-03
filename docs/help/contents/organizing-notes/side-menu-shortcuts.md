@@ -21,41 +21,53 @@ Free accounts can keep up to 10 shortcuts. Essential, Pro and Believer are all u
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to the notebooks section. You can do this by selecting the notebook icon at the top of the side menu.
 2. Right click a notebook
 3. Click `{{addShortcut}}`
 4. The notebook will appear on the home screen of the side menu.
+
 == Mobile
+
 1. Go to the notebooks section. You can do this by selecting the notebook icon at the bottom of the side menu.
 2. Hold down on the notebook.
 3. Tap `{{addShortcut}}`
 4. The notebook will appear on the home screen of the side menu.
+
 :::
 
 ## Creating shortcut for a tag
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to the tags section. You can do this by selecting the `#` icon at the top of the side menu.
 2. Right click a tag
 3. Click `{{addShortcut}}`
 4. The tag will appear on the home screen of the side menu.
+
 == Mobile
+
 1. Go to the tags section. You can do this by selecting the `#` icon at the bottom of the side menu.
 2. Hold down on the tag.
 3. Tap `{{addShortcut}}`
 4. The tag will appear on the home screen of the side menu.
+
 :::
 
 ## Removing a shortcut
 
 :::tabs key:platform
 == Desktop/Web
+
 1. On the home screen of the side menu, right click a shortcut
 2. Click `{{removeShortcut}}` to remove it from side menu
+
 == Mobile
+
 1. On the home screen of the side menu, long press on any shortcut
 2. Tap `{{removeShortcut}}` to remove it from side menu
+
 :::
 
 ## Related pages

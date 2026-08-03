@@ -11,13 +11,13 @@ npm run preview  # serve the built site
 
 ## Where things are
 
-| | |
-| --- | --- |
-| `contents/` | the articles — a file's path here is its public URL |
-| `contents/public/` | images and fonts, served from `/` |
-| `.vitepress/config.mts` | site config, nav, head |
-| `.vitepress/sidebar.mjs` | the sidebar — **add every new article here** |
-| `.vitepress/theme/` | Notesnook design tokens and self-hosted fonts |
+|                          |                                                     |
+| ------------------------ | --------------------------------------------------- |
+| `contents/`              | the articles — a file's path here is its public URL |
+| `contents/public/`       | images and fonts, served from `/`                   |
+| `.vitepress/config.mts`  | site config, nav, head                              |
+| `.vitepress/sidebar.mjs` | the sidebar — **add every new article here**        |
+| `.vitepress/theme/`      | Notesnook design tokens and self-hosted fonts       |
 
 ## UI labels come from the app
 
@@ -40,9 +40,13 @@ Steps that differ per platform go in tabs, which stay in sync across the whole s
 ```md
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click on a note to open the `Note properties` menu.
+
 == Mobile
+
 1. Press the three dot button on a note.
+
 :::
 ```
 

@@ -30,15 +30,20 @@ Some common use cases include:
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to Settings > Account > Inbox
 2. Turn on the `{{enableInboxAPI}}` toggle
 3. Choose whether you want to use your own PGP keypair or let Notesnook autogenerate one for you
+
 == Mobile
+
 `Settings > Account > Inbox API > Enable Inbox API`.
+
 :::
 
 ::: info
 The PGP keys are validated (round-trip encrypt/decrypt) before being saved.
+
 :::
 
 ### 2. Create your Inbox API Key
@@ -49,12 +54,16 @@ Each key gets an expiry: `{{expiryOneDay}}`, `{{expiryOneWeek}}`, `{{expiryOneMo
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to Settings > Account > Inbox
 2. Click `{{createKey}}` in the `{{viewAPIKeys}}` section
 3. Set a name for the API Key (e.g. Zapier)
 4. Set an expiry date
+
 == Mobile
+
 `Settings > Account > Inbox API > API Keys > Create Key`.
+
 :::
 
 ### 3. Send data to the Inbox
@@ -88,6 +97,7 @@ Each key gets an expiry: `{{expiryOneDay}}`, `{{expiryOneWeek}}`, `{{expiryOneMo
 
 ::: info Notebook & Tag IDs
 Notebook and Tag IDs can be found by right clicking on a notebook/tag and selecting `{{copyId}}`.
+
 :::
 
 #### Limits
@@ -161,6 +171,7 @@ This Zap sends every new email you receive in your Gmail inbox to your Notesnook
 
 ::: info
 In Zapier's nested JSON syntax, use double underscores (`__`) to represent nested keys. `content__type` maps to `content.type` and `content__data` maps to `content.data` in the JSON body.
+
 :::
 
 **4. Test and activate the Zap.** Zapier will POST a note to your Notesnook inbox for every matching email. The note will appear after your next sync.
@@ -180,13 +191,13 @@ This Applet sends any email you forward to your IFTTT trigger address into your 
 
 **3. Configure the Webhooks action:**
 
-| Field              | Value                                |
-| ------------------ | ------------------------------------ |
-| URL                | `https://inbox.notesnook.com/`       |
-| Method             | `POST`                               |
-| Content Type       | `application/json`                   |
+| Field              | Value                                 |
+| ------------------ | ------------------------------------- |
+| URL                | `https://inbox.notesnook.com/`        |
+| Method             | `POST`                                |
+| Content Type       | `application/json`                    |
 | Additional Headers | `Authorization: <your-inbox-api-key>` |
-| Body               | _(see below)_                        |
+| Body               | _(see below)_                         |
 
 Use the following JSON body template, substituting IFTTT ingredients:
 
@@ -234,13 +245,17 @@ Every item the Inbox API processes is recorded, and anything that fails is kept 
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}`.
 2. Open `{{account}}` > `Inbox`.
 3. Next to `{{failedInboxItems}}`, click `{{show}}`.
+
 == Mobile
+
 1. Go to `{{settings}}`.
 2. Open `{{account}}` > `{{inboxAPI}}`.
 3. Tap `{{failedInboxItems}}`.
+
 :::
 
 You can delete individual entries or clear the whole list. If a service keeps failing, check that `type` is `"note"`, `version` is `1`, and `content.type` is `"html"`.
@@ -249,6 +264,7 @@ You can delete individual entries or clear the whole list. If a service keeps fa
 
 ::: danger Disabling revokes every key
 Turning off the Inbox API **deletes all your unsynced inbox items and revokes every API key you have created**. Any service still posting to your inbox will start getting `401 unauthorized`, and you will have to create new keys and update every integration if you turn it back on.
+
 :::
 
 ## Related pages

@@ -17,8 +17,8 @@ Never describe UI from memory. Every menu label, settings path, limit, default a
 Don't type a label and hope it stays true. Write the **string key** and the build resolves it from the app's own catalogue:
 
 ```md
-Click on `{{archive}}`        renders: Click on `Archive`
-Open `{{privacyAndSecurity}}`  renders: Open `Privacy & security`
+Click on `{{archive}}` renders: Click on `Archive`
+Open `{{privacyAndSecurity}}` renders: Open `Privacy & security`
 ```
 
 Keys come from `packages/intl/src/strings.ts` — the same catalogue the apps render from — so when someone renames a string in the app, every page quoting it updates on the next build. An unknown key **fails the build**; it never ships as a placeholder.
@@ -33,13 +33,13 @@ If web and mobile differ, both go in the platform tabs. If you cannot verify som
 
 ```yaml
 ---
-title: Archive                       # short sidebar label, 2–3 words
-pageTitle: How to archive notes…     # optional: SEO <title>, ~60 chars
-description: One sentence…           # required, <160 chars, becomes the search snippet
-keywords:                            # optional, real search phrases
+title: Archive # short sidebar label, 2–3 words
+pageTitle: How to archive notes… # optional: SEO <title>, ~60 chars
+description: One sentence… # required, <160 chars, becomes the search snippet
+keywords: # optional, real search phrases
   - archive notes notesnook
-schema: howto                        # optional: howto | faq | article (default article)
-faqs:                                # required when schema: faq
+schema: howto # optional: howto | faq | article (default article)
+faqs: # required when schema: faq
   - q: …
     a: …
 ---
@@ -74,9 +74,13 @@ One or two sentences: what this is and why someone would want it.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. …
+
 == Mobile
+
 1. …
+
 :::
 ```
 
@@ -110,14 +114,14 @@ The help site already ranks #1 for high-intent queries like `import enex`, so ea
 
 Pages are grouped into clusters, each with a hub that links to every member and members that link back to the hub and sideways to siblings:
 
-| Cluster | Hub |
-| --- | --- |
-| Importing | [Importing notes](/importing-notes/) |
-| Editor | [Editor toolbar](/rich-text-editor/rich-text-editor-toolbar) |
-| Organization | [Notebooks](/organizing-notes/organize-notes-using-notebooks) |
-| Privacy & security | [How is my data encrypted?](/how-is-my-data-encrypted) |
-| Sync | [How sync works](/sync/how-sync-works) |
-| Plans | [Plans & limits](/plans-and-limits) |
+| Cluster            | Hub                                                           |
+| ------------------ | ------------------------------------------------------------- |
+| Importing          | [Importing notes](/importing-notes/)                          |
+| Editor             | [Editor toolbar](/rich-text-editor/rich-text-editor-toolbar)  |
+| Organization       | [Notebooks](/organizing-notes/organize-notes-using-notebooks) |
+| Privacy & security | [How is my data encrypted?](/how-is-my-data-encrypted)        |
+| Sync               | [How sync works](/sync/how-sync-works)                        |
+| Plans              | [Plans & limits](/plans-and-limits)                           |
 
 Any page that mentions a paid feature links to the plans hub. Any page that mentions encryption links to the encryption hub.
 

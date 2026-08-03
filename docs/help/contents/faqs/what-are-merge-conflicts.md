@@ -30,6 +30,7 @@ Merge conflicts happen because Notesnook cannot safely figure out which version 
 
 ::: info Both edits must be at least a minute apart
 The changes on both devices must be at least a minute apart for a merge conflict to occur. For example, if you are editing on both devices simultaneously (and both devices have a working sync), a merge conflict will NOT occur.
+
 :::
 
 ## Why doesn't Notesnook resolve merge conflicts automatically?
@@ -61,7 +62,9 @@ To resolve a merge conflict on your desktop or web app, follow these steps:
 5. Click the **Keep** button on the version you want to retain.
 6. Click the **Discard** button on the version you don’t want to keep, or press **Save a Copy** if you want to keep both versions.
    ![The Keep, Discard and Save a Copy buttons on the desktop conflict resolution screen](/static/merge-conflicts-resolution-screen-2.png)
+
 == Mobile
+
 To resolve a merge conflict on your mobile device, follow these steps:
 
 1. Locate the conflicted note at the top of your notes list.
@@ -69,11 +72,12 @@ To resolve a merge conflict on your mobile device, follow these steps:
 3. On the conflict resolution screen, you’ll see two versions of your note, one above the other:
    1. **This Device** is the version from the device you are using.
    2. **Incoming** is the version coming from the other device.
-   ![The mobile conflict resolution screen, with This Device above and Incoming below](/static/merge-conflicts-resolution-screen-mobile.png)
+      ![The mobile conflict resolution screen, with This Device above and Incoming below](/static/merge-conflicts-resolution-screen-mobile.png)
 4. Review both versions and decide which one you want to keep.
 5. Tap the **Keep** button on the version you want to retain.
 6. Tap the **Discard** button on the version you don’t want to keep, or press **Save a Copy** if you want to keep both versions.
    ![The Keep, Discard and Save a Copy buttons on the mobile conflict resolution screen](/static/merge-conflicts-resolution-screen-mobile-2.png)
+
 :::
 
 ## Related pages

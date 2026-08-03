@@ -34,7 +34,8 @@ Note links are internal links. They use the `nn://` scheme instead of `http://`,
 3. Use the `{{searchNoteToLinkPlaceholder}}` box to find the note.
 4. Tap the note to select it.
 5. Tap `{{createLink}}`.
-   :::
+
+:::
 
 The link appears as the note's title (or as the text you had selected). Tapping or clicking it opens that note.
 
@@ -53,6 +54,7 @@ Block-level note links are part of the [Essential plan and above](/plans-and-lim
 4. Click the block you want. The link is inserted immediately, without pressing `{{insertLink}}`.
 
 To pick a different note, click the `{{linkNoteSelectedNote}}` button at the top of the dialog to deselect it.
+
 == Mobile
 
 1. Tap `{{noteLink}}` and select the note, as above.
@@ -61,12 +63,14 @@ To pick a different note, click the `{{linkNoteSelectedNote}}` button at the top
 4. Tap the block you want. The link is created immediately.
 
 To pick a different note, tap the selected note at the top of the sheet to deselect it.
+
 :::
 
 Blocks with no text show as `{{linkNoteEmptyBlock}}`. If the note you picked is empty you'll see `{{noBlocksOnNote}}`
 
 ::: info Locked notes
 A note in your [private vault](/lock-notes-with-private-vault) can be linked to as a whole, but not block by block — its content is encrypted, so Notesnook can't list its blocks. The dialog says `Linking to a specific block is not available for locked notes.`
+
 :::
 
 ## See which notes link to this one
@@ -91,7 +95,8 @@ Every note keeps two lists:
 2. Tap `{{references}}`.
 3. Switch between the `{{linkedNotes}}` and `{{referencedIn}}` tabs.
 4. Tap an entry to open the note, or expand it to see the individual blocks and jump straight to them.
-   :::
+
+:::
 
 When a note has nothing to show you'll see `{{notLinked}}` or `{{notReferenced}}`
 
@@ -108,18 +113,21 @@ Every note has a permanent internal link of the form `nn://note/<note id>`. A bl
 2. Click `{{copyLink}}`.
 
 A `{{linkCopied}}` toast confirms it. The link is copied as plain text, as HTML and as Markdown, so pasting into another note produces a ready-made link.
+
 == Mobile
 
 1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
 2. Tap `{{copyLink}}`.
 
 A `{{linkCopied}}` toast shows the copied link.
+
 :::
 
 Notebooks, tags and colors have internal links too — `nn://notebook/<id>`, `nn://tag/<id>` and `nn://color/<id>` — copied the same way from their own menus.
 
 ::: tip Opening links from outside the app
 Internal links only resolve inside Notesnook. A `nn://` link pasted into a browser or another app will open the Notesnook app. To share a note with someone who doesn't use Notesnook, [publish it as a monograph](/publish-notes-with-monographs) instead.
+
 :::
 
 ## Related pages

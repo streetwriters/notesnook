@@ -16,11 +16,11 @@ App lock is part of the [Pro plan and above](/plans-and-limits). If a paid plan 
 
 ## Ways to unlock
 
-| Method | Where |
-| --- | --- |
-| PIN or password | Desktop, web and mobile |
-| Biometrics (fingerprint, Face ID) | Mobile |
-| Security key | Desktop and web |
+| Method                            | Where                   |
+| --------------------------------- | ----------------------- |
+| PIN or password                   | Desktop, web and mobile |
+| Biometrics (fingerprint, Face ID) | Mobile                  |
+| Security key                      | Desktop and web         |
 
 ## Turn on app lock
 

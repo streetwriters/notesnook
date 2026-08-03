@@ -19,6 +19,7 @@ Notesnook supports quick actions from the "jumplist" menu (dock menu on macOS):
 ![The Notesnook jumplist on Linux](/static/desktop-integration/jumplist-menu-linux.png)
 == macOS
 ![The Notesnook dock menu on macOS](/static/desktop-integration/dock-menu-macos.png)
+
 :::
 
 ## How does it work?

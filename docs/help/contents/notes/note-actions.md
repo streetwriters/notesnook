@@ -28,6 +28,7 @@ Some of the same switches also live in the editor: open a note, then click `{{pr
 1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
 
 The sheet that opens holds every action for that note.
+
 :::
 
 ## Open a note in a new tab
@@ -41,7 +42,9 @@ The sheet that opens holds every action for that note.
 2. Click `{{openInNewTab}}`.
 
 == Mobile
+
 There is no `{{openInNewTab}}` action on mobile.
+
 :::
 
 ## Unlink a note from all its notebooks
@@ -58,7 +61,9 @@ There is no `{{openInNewTab}}` action on mobile.
 The action only appears when at least one of the selected notes is already in a notebook.
 
 == Mobile
+
 There is no bulk unlink action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{addToNotebook}}`, and unselect the notebooks one by one.
+
 :::
 
 ## Remove all tags from a note
@@ -75,7 +80,9 @@ There is no bulk unlink action on mobile. Press the ![Three dot button](/three-d
 The action only appears when at least one of the selected notes already has a tag.
 
 == Mobile
+
 There is no bulk remove action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{addTags}}`, and remove the tags one by one.
+
 :::
 
 ## Make a note read-only
@@ -94,7 +101,8 @@ The editor's `{{properties}}` panel has the same `{{readOnly}}` switch, and it a
 
 1. Tap the ![Three dot button](/three-dot-button.png) button on the note.
 2. Tap `{{readOnly}}`.
-   :::
+
+:::
 
 A read-only note shows a small pencil-lock icon in the notes list.
 
@@ -116,6 +124,7 @@ A read-only note shows a small pencil-lock icon in the notes list.
 2. Tap `{{duplicate}}`.
 
 A `{{noteDuplicated}}` toast confirms it.
+
 :::
 
 ## Copy a note's link
@@ -132,7 +141,8 @@ A `{{noteDuplicated}}` toast confirms it.
 
 1. Tap the ![Three dot button](/three-dot-button.png) button on the note.
 2. Tap `{{copyLink}}`.
-   :::
+
+:::
 
 Either way a `{{linkCopied}}` toast confirms it.
 
@@ -155,6 +165,7 @@ A `{{noteCopied}}` toast confirms it.
 2. Tap `{{copy}}`.
 
 Mobile copies the note as plain text. There is no Markdown option in the copy action — use `{{export}}` and pick `Markdown` if you need Markdown, or use `{{share}}` to hand the text to another app.
+
 :::
 
 If the note is in your [private vault](/lock-notes-with-private-vault) you'll be asked for your vault password first.
@@ -170,7 +181,9 @@ If the note is in your [private vault](/lock-notes-with-private-vault) you'll be
 The note is rendered as a PDF and handed to your system print dialog, so you can send it to a printer or save it as a PDF file.
 
 == Mobile
+
 There is no print action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{export}}`, choose `PDF`, and print or share the resulting file from there.
+
 :::
 
 ## Change a note's creation date
@@ -189,7 +202,9 @@ Useful after an import, when notes arrive stamped with the day you imported them
 The creation date cannot be later than the note's last edited date. If you pick a later one, Notesnook refuses with `{{creationDateCannotBeAfterLastEditedDate}}`.
 
 == Mobile
+
 Editing a note's creation date is not available on mobile. Do it on the desktop app or on web, the change will sync to your phone.
+
 :::
 
 ## Keep a note off sync
@@ -198,6 +213,7 @@ Editing a note's creation date is not available on mobile. Do it on the desktop 
 
 ::: warning This removes the note from your other devices
 Turning `{{syncOff}}` on for a note deletes it from every other device you're signed in on, and any changes you make to it afterwards will not sync. This is exactly what the confirmation asks you: `Prevent note from syncing`. Make sure the device you're keeping it on is the one you want it on, and that you have a [backup](/backup-and-restore-notes-in-notesnook).
+
 :::
 
 :::tabs key:platform
@@ -215,6 +231,7 @@ Turning it off syncs the note again from that device. The editor `{{properties}}
 2. Tap `{{syncOff}}`.
 
 The action only does anything when you're logged in.
+
 :::
 
 A local-only note shows a crossed-out sync icon in the notes list.
@@ -235,7 +252,8 @@ A local-only note shows a crossed-out sync icon in the notes list.
 1. Tap the ![Three dot button](/three-dot-button.png) button on the note.
 2. Tap `{{references}}`.
 3. Switch between the `{{linkedNotes}}` and `{{referencedIn}}` tabs.
-   :::
+
+:::
 
 See [note links](/note-links-and-backlinks) for what these lists contain and how to jump to an individual paragraph.
 

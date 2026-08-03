@@ -23,13 +23,17 @@ If your app offers both, `.textpack` is easier to move around because it's a sin
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open the Notesnook web or desktop app.
 2. Go to `Settings > Import & export > Notesnook Importer`.
 3. Select `TextBundle` from the list of apps.
 4. Drag and drop your `.textbundle` or `.textpack` files, or click to browse for them. You can add as many as you like.
 5. Click `Start importing` and wait for the import to finish.
+
 == Mobile
+
 The Notesnook Importer runs in the **web and desktop apps only**. Import on a computer and the notes will sync down to your phone automatically.
+
 :::
 
 ## Supported formats
@@ -43,6 +47,7 @@ The importer reads whichever text file the package contains, so a TextBundle wri
 
 ::: info macOS export folders
 Files inside a `__MACOSX` folder — the metadata macOS adds when zipping — are ignored automatically, so you can import an archive straight from Finder.
+
 :::
 
 ## Related pages

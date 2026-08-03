@@ -23,13 +23,17 @@ Fusebase — the app formerly called **Nimbus Note** — can export your workspa
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open the Notesnook web or desktop app.
 2. Go to `Settings > Import & export > Notesnook Importer`.
 3. Select `Fusebase (formerly Nimbus Note)` from the list of apps.
 4. Drag and drop the `.zip` file, or click to browse for it.
 5. Click `Start importing` and wait for the import to finish.
+
 == Mobile
+
 The Notesnook Importer runs in the **web and desktop apps only**. Import on a computer and the notes will sync down to your phone automatically.
+
 :::
 
 ## Supported formats

@@ -15,6 +15,7 @@ Export a **decrypted backup** from Standard Notes, unzip it, and bring the files
 
 ::: warning There is no longer a Standard Notes importer
 Recent versions of the Notesnook Importer don't list Standard Notes as a source app, so you import the files it exports rather than the backup itself. The steps below take that route.
+
 :::
 
 ## Export a decrypted backup from Standard Notes
@@ -36,12 +37,12 @@ Full steps for each importer are on [import Markdown files](/importing-notes/imp
 
 ## What carries across
 
-| | Imported |
-| --- | --- |
-| Note titles and content | Yes |
-| Plain text and Markdown notes | Yes |
-| Tags | No |
-| Notebooks or folders | No |
+|                               | Imported |
+| ----------------------------- | -------- |
+| Note titles and content       | Yes      |
+| Plain text and Markdown notes | Yes      |
+| Tags                          | No       |
+| Notebooks or folders          | No       |
 
 Your notes arrive as a flat list, so plan to re-file them into [notebooks](/organizing-notes/organize-notes-using-notebooks) and re-apply [tags](/organizing-notes/organize-notes-using-tags) afterwards.
 

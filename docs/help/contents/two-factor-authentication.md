@@ -16,6 +16,7 @@ Two-factor authentication (2FA) asks for a 6-digit code in addition to your pass
 
 ::: info 2FA protects your account, not your notes
 Your notes are already end-to-end encrypted with a key derived from your password. 2FA stops someone from _logging in_ as you. It is a separate protection from [the encryption of your data.](/how-is-my-data-encrypted)
+
 :::
 
 ## The three 2FA methods
@@ -52,6 +53,7 @@ You should now see `{{twoFactorAuthEnabled}}`.
 6. Save the codes on the `{{saveRecoveryCodes}}` screen with `{{copyCodes}}` or `{{saveToFile}}`, then tap `{{next}}`.
 
 You should now see `{{twoFactorAuthEnabled}}`.
+
 :::
 
 ### Set up an authenticator app
@@ -61,7 +63,9 @@ You should now see `{{twoFactorAuthEnabled}}`.
 Notesnook shows a QR code with the instruction `{{mfaScanQrCode}}`. If your app cannot scan it, copy the text key shown underneath instead — spaces do not matter. Your app then displays a rotating 6-digit code to enter.
 
 == Mobile
+
 Notesnook shows the setup key in a field with a `{{copy}}` button. Tapping it copies the key and opens your installed authenticator app directly. Your app then displays a rotating 6-digit code to enter.
+
 :::
 
 ### Set up email
@@ -98,6 +102,7 @@ You should now see `{{fallbackMethodEnabled}}`.
 4. Pick a method and complete the same setup steps as above.
 
 You should now see `{{fallbackMethodEnabled}}`.
+
 :::
 
 ## View or regenerate your recovery codes
@@ -119,10 +124,12 @@ Recovery codes are single-use codes that log you in when no 2FA method is reacha
 3. Use `{{copyCodes}}` or `{{saveToFile}}` — the file is saved as `notesnook_recoverycodes.txt`.
 
 Regenerating codes is available on the desktop and web apps.
+
 :::
 
 ::: warning Regenerating invalidates the old codes
 Once you regenerate, the previous set stops working. Replace any copy you printed or stored.
+
 :::
 
 <!-- TODO: screenshot — the Save recovery codes screen with the Print / Copy / Download / Regenerate buttons -->
@@ -147,6 +154,7 @@ Work through these in order:
 
 ::: danger Notesnook cannot bypass 2FA for you
 If you have no fallback method, no recovery codes and no logged-in device, support cannot unlock the account — the same way we cannot recover your password or decrypt your notes. Save your recovery codes somewhere outside the phone that holds your authenticator app.
+
 :::
 
 ## Turn 2FA off

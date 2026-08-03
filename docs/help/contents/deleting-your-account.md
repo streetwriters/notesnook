@@ -20,6 +20,7 @@ Notesnook allows you to delete your accounts and your data without any questions
 
 ::: danger This cannot be undone
 Deleting your account immediately and permanently erases all your notes, notebooks, attachments and other data. Because of end-to-end encryption, Notesnook cannot recover this data for you afterwards. Take a [backup](/backup-and-restore-notes-in-notesnook) or [export your notes](/export-notes-from-notesnook) first if you might need this data again.
+
 :::
 
 :::tabs key:platform
@@ -38,7 +39,8 @@ Deleting your account immediately and permanently erases all your notes, noteboo
 3. Go to `{{settings}}`.
 4. Go to `{{account}}` then `{{manageAccount}}`
 5. Tap `{{deleteAccount}}`
-   :::
+
+:::
 
 ## FAQs
 

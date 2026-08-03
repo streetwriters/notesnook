@@ -36,12 +36,14 @@ You can purchase a gift card from [https://notesnook.com/giftcards](https://note
 
 ::: info
 Gift cards are not attached to a user account and can be claimed by any Notesnook user.
+
 :::
 
 ## Redeem a gift code
 
 ::: info
 You can't redeem a gift code on an account with an active Notesnook subscription. A cancelled subscription is still active until its current billing period ends.
+
 :::
 
 :::tabs key:platform
@@ -62,10 +64,12 @@ You can't redeem a gift code on an account with an active Notesnook subscription
 4. Enter the gift code you received
 5. Tap `{{redeem}}` and wait for the app to verify your gift code.
 6. Once the process succeeds, you should be upgraded to Pro.
-   :::
+
+:::
 
 ::: info
 Once you redeem a gift code, the person who purchased it will receive an email informing them that one of their gift codes was claimed. The email **does not** contain any information about who claimed the gift code.
+
 :::
 
 ## FAQs

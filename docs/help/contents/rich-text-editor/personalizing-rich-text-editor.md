@@ -18,12 +18,16 @@ Customize some common editor defaults to get a personalized editing experience.
 :::tabs key:platform
 == Desktop/Web
 The default font size and font family for all notes in the notes editor can be configured from `Settings > Customization > Editor`.
+
 == Mobile
+
 The default font size and font family for all notes in the notes editor can be configured from `Settings > Customization > Editor`.
+
 :::
 
 ::: info
 Custom fonts are not supported yet.
+
 :::
 
 ## Line height
@@ -33,8 +37,11 @@ Custom fonts are not supported yet.
 :::tabs key:platform
 == Desktop/Web
 Go to `{{settings}}` > `{{customization}}` > `{{editor}}` and set `{{lineHeight}}`.
+
 == Mobile
+
 Go to `{{settings}}` > `{{customization}}` > `{{editor}}` and tap `{{lineHeight}}`, then pick or type a value.
+
 :::
 
 ## Font ligatures <PlanTag plan="pro" note="Web/desktop only" />
@@ -44,8 +51,11 @@ Go to `{{settings}}` > `{{customization}}` > `{{editor}}` and tap `{{lineHeight}
 :::tabs key:platform
 == Desktop/Web
 Go to `{{settings}}` > `{{customization}}` > `{{editor}}` and turn on `{{fontLigatures}}`.
+
 == Mobile
+
 Font ligatures are not available in the mobile editor. Turn them on in the desktop or web app — notes you write there keep the substituted symbols everywhere, because the substitution happens once as you type.
+
 :::
 
 Font ligatures require a Pro plan. See [Plans & limits](/plans-and-limits).

@@ -18,19 +18,24 @@ Notesnook keeps two themes at once — one for light mode and one for dark mode 
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}`.
 2. Open `{{customization}}` → `{{appearance}}`.
 3. Under `{{themes}}`, set `{{colorScheme}}` to `{{light}}`, `{{dark}}` or `{{auto}}`.
 
 `{{auto}}` follows your operating system, so Notesnook flips with it.
+
 == Mobile
+
 1. Go to `{{settings}}`.
 2. Open `{{customization}}` → `{{appearance}}`.
 3. Turn on `{{useSystemTheme}}` to follow your phone's light/dark setting, or turn it off and use the `{{darkMode}}` switch to choose yourself.
+
 :::
 
 ::: tip Faster switching on desktop
 The side menu profile menu has a `{{toggleDarkLightMode}}` item, so you don't have to open settings.
+
 :::
 
 ## Install a theme from the theme store
@@ -39,19 +44,23 @@ Every theme in the store is fetched from `themes-api.notesnook.com` and installe
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}` → `{{customization}}` → `{{appearance}}`.
 2. Scroll to `{{selectTheme}}`.
 3. Type in the `{{searchThemes}}` box to search, or use the `{{all}}`, `{{dark}}` and `{{light}}` filters to narrow the list.
 4. Click a theme to see its details, then confirm — or hover it and click `{{setAsDarkTheme}}` / `{{setAsLightTheme}}` directly.
 
 A checkmark marks the themes you currently have applied.
+
 == Mobile
+
 1. Go to `{{settings}}` → `{{customization}}` → `{{appearance}}`.
 2. Tap `{{themes}}`.
 3. Use the search box or the `{{all}}`, `{{dark}}` and `{{light}}` filters.
 4. Tap a theme to open its details, then tap `{{setAsDarkTheme}}` or `{{setAsLightTheme}}`.
 
 An applied theme reads `{{appliedDark}}` or `{{appliedLight}}` on its details screen.
+
 :::
 
 <!-- TODO: screenshot — the theme store with the All/Dark/Light filters and a theme card -->

@@ -19,15 +19,16 @@ Attachments are encrypted with a sub-key derived from your account's data encryp
 
 ## What restores without an account, and what doesn't
 
-| In the backup | Restores while signed out? |
-| --- | --- |
-| Notes, notebooks, tags, colors and reminders | Yes |
-| Attachments — images, files, audio, web clips | No, sign in first |
+| In the backup                                 | Restores while signed out? |
+| --------------------------------------------- | -------------------------- |
+| Notes, notebooks, tags, colors and reminders  | Yes                        |
+| Attachments — images, files, audio, web clips | No, sign in first          |
 
 If you restore while signed out, your notes come back but the files inside them stay unavailable until you log in and run the restore again.
 
 ::: tip Sign in before you restore
 The simplest order is: log in, let the first sync finish, then restore the backup. That way notes and attachments come back in one pass.
+
 :::
 
 ## Related pages

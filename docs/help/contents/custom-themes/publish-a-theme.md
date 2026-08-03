@@ -46,6 +46,7 @@ Once your theme is published, you will probably need to push a new update for yo
 
 ::: warning
 Don't forget to increment the version of your theme; otherwise, no one will be able to see the changes.
+
 :::
 
 To publish the updated theme, you will need to submit a new pull request in the same way as you did while publishing:

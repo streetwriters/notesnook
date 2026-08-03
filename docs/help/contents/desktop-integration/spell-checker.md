@@ -13,6 +13,7 @@ schema: howto
 
 ::: info Desktop app only
 Configuring the spell checker is only available in the desktop app.
+
 :::
 
 ## Toggling the spell checker
@@ -27,12 +28,14 @@ You can enable/disable the spell checker at any time from Settings:
 
 ::: info For macOS users
 On macOS it is not possible to choose custom languages. Instead the spell checker uses your system settings.
+
 :::
 
 ::: warning Network activity notice
 Notesnook supports spell checking text in multiple languages at the same time. However, it doesn't ship all the supported languages but gives you the choice to enable the languages you want.
 
 Selecting a new language will **download the dictionary from `dictionaries.notesnook.com`**.
+
 :::
 
 To select new languages:

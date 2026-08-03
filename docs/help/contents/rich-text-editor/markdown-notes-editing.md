@@ -26,51 +26,56 @@ Markdown shortcuts are part of the [Essential plan and above](/plans-and-limits)
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}`.
 2. Open `{{customization}}` > `{{editor}}`.
 3. Turn on `{{mardownShortcuts}}`.
+
 == Mobile
+
 1. Go to `{{settings}}`.
 2. Open `{{customization}}` > `{{editor}}`.
 3. Make sure `{{mardownShortcuts}}` is on.
+
 :::
 
 ::: warning Nothing formats as you type until this is on
 While Markdown shortcuts are off, **every** shortcut in the table below stops working — `#` headings, `**bold**`, list markers, code fences and math included. The toolbar and the keyboard shortcuts keep working either way.
+
 :::
 
 ## Available shortcuts
 
 Notesnook supports the following (Markdown) shortcuts in the editor:
 
-| Block                             | Markdown shortcut                                                     |
-| --------------------------------- | --------------------------------------------------------------------- |
-| Heading 1                         | #                                                                     |
-| Heading 2                         | ##                                                                    |
-| Heading 3                         | ###                                                                   |
-| Heading 4                         | ####                                                                  |
-| Heading 5                         | #####                                                                 |
-| Heading 6                         | ######                                                                |
-| Bold                              | \*\*bold text\*\*                                                     |
-| Italic                            | \_italicized text\_                                                   |
-| Strikethrough                     | \~\~strikethrough\~\~                                                 |
-| Blockquote                        | > blockquote                                                          |
-| Ordered list                      | 1. First item<br>2. Second item<br>3. Third item                      |
-| Unordered list                    | - First item<br>- Second item<br>- Third item                         |
-| Task list                         | \[x] Write the note<br>[ ] Update the help<br>[ ] Call the team       |
-| Outline list                      | -o Write the note<br>-o Update the help<br>-o Call the team           |
-| Inline code                       | \`inline code\`                                                       |
-| Inline Math                       | \$\$2 + 2 = 4\$\$                                                     |
-| Horizontal rule                   | ---                                                                   |
-| Link                              | \[title](https://www.example.com)                                     |
-| Codeblock                         | \`\`\`javascript<br>function hello() { }<br>\`\`\`                    |
-| Math block                        | $$$ followed by a space                                               |
-| Current Date                      | `/date`                                                               |
-| Current Day                       | `/day`                                                                |
-| Current Time                      | `/time`                                                               |
-| Current Date & Time               | `/now`                                                                |
-| Current Date & Time with timezone | `/nowz`                                                               |
-| Callout                           | \>info Heads up<br>\>warn Careful<br>\>tip Try this                   |
+| Block                             | Markdown shortcut                                               |
+| --------------------------------- | --------------------------------------------------------------- |
+| Heading 1                         | #                                                               |
+| Heading 2                         | ##                                                              |
+| Heading 3                         | ###                                                             |
+| Heading 4                         | ####                                                            |
+| Heading 5                         | #####                                                           |
+| Heading 6                         | ######                                                          |
+| Bold                              | \*\*bold text\*\*                                               |
+| Italic                            | \_italicized text\_                                             |
+| Strikethrough                     | \~\~strikethrough\~\~                                           |
+| Blockquote                        | > blockquote                                                    |
+| Ordered list                      | 1. First item<br>2. Second item<br>3. Third item                |
+| Unordered list                    | - First item<br>- Second item<br>- Third item                   |
+| Task list                         | \[x] Write the note<br>[ ] Update the help<br>[ ] Call the team |
+| Outline list                      | -o Write the note<br>-o Update the help<br>-o Call the team     |
+| Inline code                       | \`inline code\`                                                 |
+| Inline Math                       | \$\$2 + 2 = 4\$\$                                               |
+| Horizontal rule                   | ---                                                             |
+| Link                              | \[title](https://www.example.com)                               |
+| Codeblock                         | \`\`\`javascript<br>function hello() { }<br>\`\`\`              |
+| Math block                        | $$$ followed by a space                                         |
+| Current Date                      | `/date`                                                         |
+| Current Day                       | `/day`                                                          |
+| Current Time                      | `/time`                                                         |
+| Current Date & Time               | `/now`                                                          |
+| Current Date & Time with timezone | `/nowz`                                                         |
+| Callout                           | \>info Heads up<br>\>warn Careful<br>\>tip Try this             |
 
 ## Checklists and task lists share one shortcut
 
