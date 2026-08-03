@@ -1053,9 +1053,8 @@ del.diffdel {
   top: 0;
   z-index: 9999;
   margin: 0;
-  /* nothing on the left: the item has to sit exactly where it will land.
-     The right is only ever the count's breathing room */
-  padding: 6px 8px 6px 0;
+  padding-block: 6px;
+  padding-inline: 8px;
   box-sizing: border-box;
   pointer-events: none;
   user-select: none;

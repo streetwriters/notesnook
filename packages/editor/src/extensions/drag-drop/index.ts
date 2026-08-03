@@ -43,11 +43,13 @@ const DRAG_THRESHOLD = 4;
 const HOLD_DELAY = 150;
 // how far to the right the pointer travels to nest the item, and by how
 // much the gap is indented to show it
-const NEST_THRESHOLD = 60;
+const NEST_THRESHOLD = 40;
 const NEST_INDENT = 24;
 // distance from the edge of the scroller at which auto scrolling starts
 const SCROLL_ZONE = 60;
 const SCROLL_SPEED = 12;
+// how far below a list the pointer can be and still drop into its last slot
+const LIST_SLOP = 24;
 
 type DropGap = { pos: number; height: number; indent: number };
 const gapKey = new PluginKey<DropGap | null>("drop-gap");
@@ -158,7 +160,10 @@ export function startItemDrag(
     if (isAndroid || isiOS) setTimeout(() => editor.commands.blur());
 
     const box = item.getBoundingClientRect();
+
+    const rtl = getComputedStyle(item).direction === "rtl";
     const { preview, row } = createPreview(view, item, box);
+    preview.style.direction = rtl ? "rtl" : "ltr";
     drag = {
       item,
       pos,
@@ -166,7 +171,7 @@ export function startItemDrag(
       offsetY: box.top - event.clientY,
       height: row.getBoundingClientRect().height,
       startX: event.clientX,
-      rtl: getComputedStyle(item).direction === "rtl",
+      rtl,
       preview,
       previewWidth: box.width,
       scroller: getScroller(view.dom)
@@ -233,46 +238,34 @@ export function startItemDrag(
     hold = setTimeout(start, HOLD_DELAY) as unknown as number;
 }
 
-/** the nearest background colour that is not see-through */
-function opaqueBackground(element: HTMLElement) {
-  for (
-    let node: HTMLElement | null = element;
-    node;
-    node = node.parentElement
-  ) {
-    const bg = getComputedStyle(node).backgroundColor;
-    if (bg && bg !== "transparent" && !bg.startsWith("rgba(0, 0, 0, 0")) return bg; // prettier-ignore
-  }
-  return "var(--background, #fff)";
-}
-
 /**
  * A copy of the item that follows the pointer, with its nested items left
  * out so that tall items stay easy to place.
  */
 function createPreview(view: EditorView, item: HTMLElement, box: DOMRect) {
-  const style = getComputedStyle(item);
   const preview = document.createElement("div");
-  preview.className = `drag-preview ${view.dom.className}`;
+  preview.className = "drag-preview";
   preview.style.left = `${box.left}px`;
   preview.style.width = `${box.width}px`;
-  preview.style.font = style.font;
-  preview.style.color = style.color;
-  // the preview lives on `document.body`, where the editor's theme
-  // variables are not defined, so the CSS `var(--background)` resolves to
-  // transparent — a WebKit issue in particular. Read a concrete colour
-  // while the item is still in the editor, or the checkboxes below show
-  // through it.
-  preview.style.backgroundColor = opaqueBackground(item);
+
+  const context = document.createElement("div");
+  context.className = view.dom.className;
+  // `.ProseMirror:first-child` adds a top margin to the editor content; the
+  // wrapper is not that, so drop it or the card gains a top gap
+  context.style.margin = "0";
+  preview.appendChild(context);
 
   const list = (item.parentElement ?? document.createElement("ul")).cloneNode(
     false
   ) as HTMLElement;
   list.style.margin = list.style.padding = "0";
-  preview.appendChild(list);
+  context.appendChild(list);
 
   const clone = item.cloneNode(true) as HTMLElement;
   clone.style.margin = "0";
+  // the handle is what is being held, not part of the item, so leave it out
+  // of the copy — otherwise it takes up an empty slot on the start side
+  clone.querySelector("[data-drag-handle]")?.remove();
   let children = 0;
   clone.querySelectorAll("ul, ol").forEach((nested) => {
     children += nested.querySelectorAll("li").length;
@@ -286,7 +279,7 @@ function createPreview(view: EditorView, item: HTMLElement, box: DOMRect) {
   }
   list.appendChild(clone);
 
-  document.body.appendChild(preview);
+  (view.dom.parentElement ?? document.body).appendChild(preview);
   return { preview, row: clone };
 }
 
@@ -313,21 +306,24 @@ function findGap(
   pointerY: number,
   top: number
 ): DropGap | null | undefined {
-  const element = document.elementFromPoint(
-    Math.max(x, view.dom.getBoundingClientRect().left + 1),
-    pointerY
-  );
-  if (!element || !view.dom.contains(element)) return undefined;
+  const hx = Math.max(x, view.dom.getBoundingClientRect().left + 1);
 
-  // the list under the pointer, or — when the pointer is on a list's header
-  // (the tools bar sits above the first item, outside the `ul`) — that
-  // list, so the item can still be dropped into its first slot
-  const list =
-    element.closest<HTMLElement>("ul.tasklist-content-wrapper") ||
-    element
-      .closest(".taskList-view-content-wrap")
-      ?.querySelector<HTMLElement>("ul.tasklist-content-wrapper");
-  if (!list || !view.dom.contains(list)) return null;
+  // The list under the pointer, or the item's top (the handle is grabbed
+  // near the top, so they are close).
+  let list = listAt(view, hx, pointerY) ?? listAt(view, hx, top);
+
+  // ...but a list ending just above the point wins if it is deeper. This is
+  // how the last slot is reached: past the last row the point is over the
+  // parent, yet dropping there should land the item after the nested list's
+  // last row, not after the whole parent.
+  const above = listAbove(view, hx, Math.max(pointerY, top));
+  if (above && (!list || list.contains(above))) list = above;
+
+  if (!list) {
+    // off the document for a frame (keep the gap) vs. genuinely elsewhere
+    const element = document.elementFromPoint(hx, pointerY);
+    return !element || !view.dom.contains(element) ? undefined : null;
+  }
 
   let closest: number | null = null;
   let distance = Infinity;
@@ -359,6 +355,53 @@ function findGap(
   const toEnd = drag.rtl ? drag.startX - x : x - drag.startX;
   const nest = toEnd > NEST_THRESHOLD && canNest(view, closest, drag);
   return { pos: closest, height: drag.height, indent: nest ? NEST_INDENT : 0 };
+}
+
+/**
+ * The task list at the given point, if any. When the point is on a list's
+ * header (the tools bar sits above the first item, outside the `ul`) it
+ * still resolves to that list, so the item can be dropped into its first
+ * slot.
+ */
+function listAt(view: EditorView, x: number, y: number) {
+  const element = document.elementFromPoint(x, y);
+  if (!element || !view.dom.contains(element)) return null;
+
+  const list =
+    element.closest<HTMLElement>("ul.tasklist-content-wrapper") ||
+    element
+      .closest(".taskList-view-content-wrap")
+      ?.querySelector<HTMLElement>("ul.tasklist-content-wrapper");
+  return list && view.dom.contains(list) ? list : null;
+}
+
+/**
+ * The task list whose bottom edge is just above `y` (within a slop) —
+ * nothing is under the point past the last row, so this is what makes the
+ * last slot reachable there. The deepest such list wins, so the last slot
+ * of a nested list is preferred to its parent's.
+ *
+ * `x` is not used to pick the list: the handle sits at the far left, well
+ * left of an indented nested list, and a note is a single column anyway —
+ * only that the point is not off to the right of the list.
+ */
+function listAbove(view: EditorView, x: number, y: number) {
+  let match: HTMLElement | null = null;
+  let matchTop = -Infinity;
+  const lists = view.dom.querySelectorAll<HTMLElement>(
+    "ul.tasklist-content-wrapper"
+  );
+  for (const list of lists) {
+    const r = list.getBoundingClientRect();
+    if (x > r.right) continue;
+    if (y < r.bottom || y > r.bottom + LIST_SLOP) continue;
+    // the deepest (lowest starting) list wins
+    if (r.top > matchTop) {
+      matchTop = r.top;
+      match = list;
+    }
+  }
+  return match;
 }
 
 /** the item is as wide as the gap it will land in, and as indented */
