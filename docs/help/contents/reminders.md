@@ -60,7 +60,7 @@ You can also create reminders without attaching them to a specific note. This is
 == Mobile
 
 1. Go to the `{{reminders}}` screen from the side menu
-2. Tap the add reminder button (![Plus icon](/plus-button-mobile.png)) on bottom right
+2. Tap the add reminder button (![Plus icon](/plus-button-desktop.png)) on bottom right
 3. Enter a title for the reminder and description (optional)
 4. Choose your reminder type (Once, Repeat, or Permanent on Android)
 5. Select your notification preference (Silent, Vibrate, or Urgent)
