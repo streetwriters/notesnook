@@ -34,7 +34,8 @@ Adding notes to private vault is useful when you do not want anyone to read your
 3. Tap `{{createVault}}`
 4. Enter password for the vault (this password will be used to open all locked notes)
 5. Tap `{{create}}` button to create the vault.
-   :::
+
+:::
 
 ## Lock a note
 
@@ -52,10 +53,12 @@ Adding notes to private vault is useful when you do not want anyone to read your
 2. Tap `{{lock}}` button in the note properties
 3. Enter password for the vault
 4. Tap `{{lock}}` to add note to vault.
-   :::
+
+:::
 
 ::: danger Locking a note deletes its history
 When a note moves into the vault, every stored [version of that note](/note-version-history) is deleted. Restore or copy anything you still need from history **before** you lock it.
+
 :::
 
 ## Open/edit/delete a locked note
@@ -78,7 +81,8 @@ To open, edit or delete a locked note, you must provide the password for the vau
 2. Tap `{{unlock}}` button in the note properties
 3. Enter password for the vault
 4. Tap `{{unlock}}` to remove note from vault.
-   :::
+
+:::
 
 ## How long the vault stays unlocked
 
@@ -96,7 +100,8 @@ Once you enter your vault password, the vault stays unlocked for a while so you 
 1. Go to `{{settings}}`.
 2. Open `{{privacyAndSecurity}}` > `{{vault}}`.
 3. Set `{{lockVaultAfter}}`.
-   :::
+
+:::
 
 `{{never}}` keeps the vault open until you close the app or lock it yourself. The setting only appears once a vault exists.
 
@@ -106,6 +111,7 @@ On mobile you can open locked notes with your fingerprint or face instead of typ
 
 ::: warning Biometrics are per device
 Turning biometrics on doesn't replace your vault password, and it doesn't travel with your account. On a new device you'll be asked for the password again — so don't rely on biometrics as your only copy of it.
+
 :::
 
 ## Change vault password
@@ -127,7 +133,8 @@ Turning biometrics on doesn't replace your vault password, and it doesn't travel
 4. Tap `{{changeVaultPassword}}`
 5. Enter the old and new password for the vault
 6. Tap `{{change}}` to update the password
-   :::
+
+:::
 
 ## Clear vault
 
@@ -146,7 +153,8 @@ Turning biometrics on doesn't replace your vault password, and it doesn't travel
 3. Tap `{{vault}}`
 4. Tap `{{clearVault}}`
 5. Enter your vault password and tap `{{clear}}`. All notes in the vault will be deleted.
-   :::
+
+:::
 
 ## Delete vault
 
@@ -154,6 +162,7 @@ In the event that you have forgotten your vault password, you can delete the vau
 
 ::: danger Permanent data loss
 Deleting the vault only requires your account password, but if you also choose to delete all the notes in it, those notes are permanently and irrecoverably destroyed. Because of end-to-end encryption, there is no way for Notesnook to recover a forgotten vault password or restore deleted vault notes afterwards.
+
 :::
 
 :::tabs key:platform
@@ -171,7 +180,8 @@ Deleting the vault only requires your account password, but if you also choose t
 3. Tap `{{vault}}`
 4. Tap `{{deleteVault}}`
 5. Enter your account password and tap `{{delete}}` to delete the vault
-   :::
+
+:::
 
 ## Related pages
 

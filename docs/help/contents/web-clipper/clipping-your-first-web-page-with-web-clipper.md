@@ -25,8 +25,10 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
    ![How to pin the Notesnook Web Clipper to toolbar in Chrome](/static/web-clipper/chrome-pin-to-toolbar.gif)
    == Firefox
    ![How to pin the Notesnook Web Clipper to toolbar in Firefox](/static/web-clipper/firefox-pin-to-toolbar.gif)
-   :::
-   ::::
+
+:::
+:
+:::
 
 2. Click `Connect with Notesnook`
 3. Notesnook web app will open in a new tab in the background. Wait a few seconds and the web clipper should automatically connect.
@@ -38,7 +40,8 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
    2. Make sure you have the Notesnook web app opened in the background
    3. The web clipper doesn't yet support multiple browser windows so make sure there aren't any additional browser windows opened in the background.
    4. Try restarting the browser
-      :::
+
+:::
 
 ## Selecting the clipping area
 
@@ -70,10 +73,8 @@ The `Selected nodes` mode allows you to select exactly which nodes you want to c
 3. Click all the nodes you want to clip (they can be in any part of the screen).
    ::: info
    The web clipper stacks all the selected nodes vertically during final processing.
-   :::
-4. Clicking again on the selected nodes will deselect them.
-5. Once you are done, click the Clip button
-6. Activate the Notesnook Web Clipper and save your clip.
+
+::: 4. Clicking again on the selected nodes will deselect them. 5. Once you are done, click the Clip button 6. Activate the Notesnook Web Clipper and save your clip.
 
 ## Selecting the clipping mode
 
@@ -91,6 +92,7 @@ The clipping mode controls how the final clip should look.
 
 ::: info Requires a signed-in account
 `Screenshot` and `Complete with styles` are offered only while you are **logged in** to the Notesnook web app. Clip while signed out and the clipper falls back to `Simplified`. Both modes use some of your [monthly attachment storage](/plans-and-limits) for every page you clip.
+
 :::
 
 `Screenshot` mode includes all the styles + images but the final result is saved as an image i.e. it is non-interactive.
@@ -118,6 +120,7 @@ You can choose to append your web clip to an existing note and it'll be automati
 
 ::: info
 You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
+
 :::
 
 1. Click `Select a notebook`
@@ -130,7 +133,8 @@ You can only assign the web clip to an existing notebook. Creating new notebooks
 3. You can also create & assign a new tag by typing in the search bar
 
    ![Assigning a tag to a web clip from the web clipper](/static/web-clipper/assign-a-tag.gif)
-   ::::
+   :
+   :::
 
 ## Saving your web clip
 

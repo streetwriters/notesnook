@@ -17,6 +17,7 @@ Taking regular backups means you can recover your notes if your data is corrupte
 
 ::: danger Store your password & recovery key safely
 Since all your data is end-to-end encrypted, we have no way to restore your account data if you forget your account password and lose your account recovery key. That's why we recommend that you store your password & recovery key in a password manager or some other safe place.
+
 :::
 
 ::::tabs key:platform
@@ -27,6 +28,7 @@ Since all your data is end-to-end encrypted, we have no way to restore your acco
 3. Click `Create backup` under `{{backupNow}}` heading to create a new `.nnbackupz` file
 
 ![The Backup & export section of Notesnook settings on web, with the Create backup button](/create-backup-web.png)
+
 == Mobile
 
 1. Go to `{{settings}}`.
@@ -38,8 +40,10 @@ Since all your data is end-to-end encrypted, we have no way to restore your acco
 On **Android** when you take a backup for the first time, you will be asked to select a folder where you want to store all your backup files. You can always change your backup files location from `Backups > Select backup directory`.
 
 Regardless of the folder you select, Notesnook will create a folder "Notesnook/backups" inside it and store all backup files there.
+
 :::
-::::
+:
+:::
 
 ## Turn on automatic backups
 
@@ -56,6 +60,7 @@ For maximum safety against potential data loss, you can enable daily, weekly or 
 == Web
 ::: info
 On the **web** app there is no way to automatically save backups to a folder, that is why Notesnook only reminds the users when it's time to create a new backup.
+
 :::
 
 1. Go to `{{settings}}`.
@@ -63,12 +68,14 @@ On the **web** app there is no way to automatically save backups to a folder, th
 3. Select the Backup reminders interval from the dropdown
 
 ![The backup reminder interval dropdown in Notesnook on the web](/auto-backups-web.png)
+
 == Mobile
 
 1. Go to `{{settings}}` → `{{backupRestore}}`.
 2. Tap `{{backups}}`.
 3. Choose an automatic backup frequency.
-   ::::
+   :
+   :::
 
 ## Keep backups encrypted
 
@@ -86,10 +93,12 @@ To keep your backups secure & private, it is recommended that you enable encrypt
 1. Go to `{{settings}}` → `{{backupRestore}}`
 2. Tap `{{backups}}`
 3. Tap the toggle next to `{{backupEncryption}}` to enable/disable encrypted backups
-   :::
+
+:::
 
 ::: info
 Backups are always encrypted with your account password.
+
 :::
 
 ## Restore a backup
@@ -98,6 +107,7 @@ Backups are always encrypted with your account password.
 Restoring a backup replaces your current content in-place. Anything that changed since that backup was taken is reverted to how it was in the backup. Entirely new content — notes you created after the backup — is not touched.
 
 **Always create a backup before restoring one.**
+
 :::
 
 ### Recover a few old notes without losing today's work
@@ -128,6 +138,7 @@ At any point in time, you can restore a backup to recover lost data. Backups cre
 4. From `{{restoreBackup}}` sheet, select the backup you want to restore. If your backup file is located in some other location, tap `{{restoreFromFiles}}` on top right corner of the sheet then select the backup file.
 
 ![The Restore backup sheet on Notesnook mobile, listing the backup files it found](/restore-backup-mobile.png)
+
 :::
 
 ## Related pages

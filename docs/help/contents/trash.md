@@ -33,17 +33,21 @@ Tags, colors, reminders and attachments do not pass through the trash — deleti
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open `{{trash}}` from the side menu.
 2. Right click the item to open its menu.
 3. Press `{{restore}}`.
 
 Restoring a notebook also restores every sub-notebook that went to the trash with it.
+
 == Mobile
+
 1. Open `{{trash}}` from the side menu.
 2. Tap the ![Three dot button](/three-dot-button.png) button on the item.
 3. Tap `{{restore}}`.
 
 Tapping a trashed **notebook** opens a `{{restore}}` prompt directly, with `{{restore}}` and `{{delete}}` as the two choices.
+
 :::
 
 Restored notes keep their content, their tags and their place in notebooks — nothing is re-created from scratch.
@@ -56,13 +60,17 @@ Free plans allow 50 notebooks and Essential allows 500; Pro and Believer are unl
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open `{{trash}}` from the side menu.
 2. Right click the item and press `{{delete}}`, or select it and press the `{{delete}}` key.
 3. Confirm the prompt.
+
 == Mobile
+
 1. Open `{{trash}}` from the side menu.
 2. Tap the ![Three dot button](/three-dot-button.png) button on the item.
 3. Tap `{{delete}}` and confirm.
+
 :::
 
 Permanently deleting a note also removes its content and its whole [version history](/note-version-history).
@@ -71,21 +79,26 @@ Permanently deleting a note also removes its content and its whole [version hist
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open `{{trash}}` from the side menu.
 2. Press the clear trash button on the list.
 3. Read the prompt and press `{{clear}}`.
 
 You should see `{{trashCleared}}`.
+
 == Mobile
+
 1. Open `{{trash}}` from the side menu.
 2. Tap the floating button at the bottom right.
 3. Read the prompt and press `{{clear}}`.
 
 You should see `{{trashCleared}}`.
+
 :::
 
 ::: danger This cannot be undone
 `Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE.` Notesnook has no server-side copy to restore from — the only other copy is one you made yourself with a [backup](/backup-and-restore-notes-in-notesnook).
+
 :::
 
 ## Change how long the trash keeps things
@@ -96,13 +109,17 @@ Cleanup measures from the start of the day an item was deleted, and runs against
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Go to `{{settings}}` → `{{behaviour}}`.
 2. Under `{{trash}}`, open the `{{clearTrashInterval}}` dropdown.
 3. Pick an interval.
+
 == Mobile
+
 1. Go to `{{settings}}` → `{{customization}}` → `{{behavior}}`.
 2. Open `{{clearTrashInterval}}`.
 3. Pick an interval.
+
 :::
 
 ### Keep trash forever <PlanTag plan="pro" />

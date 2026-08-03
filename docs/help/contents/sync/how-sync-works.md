@@ -21,11 +21,11 @@ faqs:
 
 # How does sync work in Notesnook?
 
-Sync is free in Notesnook, on an unlimited number of devices, on every plan. Your notes are encrypted on your device *before* they are sent, so the sync server stores nothing it can read — it only moves encrypted blobs between the devices you are logged in on.
+Sync is free in Notesnook, on an unlimited number of devices, on every plan. Your notes are encrypted on your device _before_ they are sent, so the sync server stores nothing it can read — it only moves encrypted blobs between the devices you are logged in on.
 
 ## Is sync free?
 
-Yes. Sync is on the free plan, and every plan — Free, Essential, Pro and Believer — allows **unlimited devices**. Nothing about syncing itself is behind a paywall. Only the [sync settings](/sync/sync-settings) that turn parts of syncing *off*, and full offline mode, need a paid plan.
+Yes. Sync is on the free plan, and every plan — Free, Essential, Pro and Believer — allows **unlimited devices**. Nothing about syncing itself is behind a paywall. Only the [sync settings](/sync/sync-settings) that turn parts of syncing _off_, and full offline mode, need a paid plan.
 
 ## What gets encrypted, and when
 
@@ -44,21 +44,26 @@ Sync is not on a fixed timer. It runs when something actually happens:
 
 ::: info
 Automatic and realtime sync can both be switched off individually on a paid plan — see [sync settings](/sync/sync-settings).
+
 :::
 
 ### Sync now
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Look at the status bar along the bottom of the window.
 2. Click the sync icon next to your account indicator.
 
 The icon starts spinning and its tooltip changes to `{{syncing}}` — or `{{downloading}}` / `{{uploading}}` — until it finishes.
+
 == Mobile
+
 1. Tap your profile picture — or the cog icon, if you have not set one — at the top of the side menu.
 2. Tap `{{syncNow}}`.
 
 You can also pull down on any list of notes to start a sync.
+
 :::
 
 ## What the sync status indicator means
@@ -67,18 +72,20 @@ You can also pull down on any list of notes to start a sync.
 == Desktop/Web
 Only the icon is drawn in the status bar at the bottom of the window — hover it and the tooltip tells you the state. There are seven:
 
-| Tooltip | What it means |
-| --- | --- |
-| `Synced <time> ago` | Everything is up to date. |
-| `{{syncing}}`, `{{downloading}}` or `{{uploading}}` | A sync is running right now. The number in brackets is how many items have been transferred. |
-| `Merge conflicts` | Sync stopped because two versions of a note need your decision. The icon becomes a red alert triangle. |
-| `Sync disabled`, with a red alert icon | Your email address is not confirmed yet. The status bar also shows `{{emailNotConfirmed}}` next to your account dot. |
-| `{{syncFailed}}` | The last sync did not finish. |
-| `Synced <time> ago (offline)` | You have no internet connection. |
-| `Sync disabled`, with a greyed-out icon | You turned sync off in settings. |
+| Tooltip                                             | What it means                                                                                                        |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Synced <time> ago`                                 | Everything is up to date.                                                                                            |
+| `{{syncing}}`, `{{downloading}}` or `{{uploading}}` | A sync is running right now. The number in brackets is how many items have been transferred.                         |
+| `Merge conflicts`                                   | Sync stopped because two versions of a note need your decision. The icon becomes a red alert triangle.               |
+| `Sync disabled`, with a red alert icon              | Your email address is not confirmed yet. The status bar also shows `{{emailNotConfirmed}}` next to your account dot. |
+| `{{syncFailed}}`                                    | The last sync did not finish.                                                                                        |
+| `Synced <time> ago (offline)`                       | You have no internet connection.                                                                                     |
+| `Sync disabled`, with a greyed-out icon             | You turned sync off in settings.                                                                                     |
 
 Clicking the icon starts a sync, unless sync is disabled.
+
 == Mobile
+
 Mobile does not have a status bar icon. Tap your profile picture — or the cog icon, if you have not set one — at the top of the side menu. Under your email you will see one of:
 
 - `{{syncing}}` — a sync is running, with the number of items transferred so far, and a spinner beside it
@@ -88,13 +95,14 @@ Mobile does not have a status bar icon. Tap your profile picture — or the cog 
 - `(Offline)` appended to any of the above when you have no connection
 
 A colored dot sits at the end of the line: green when the last sync passed, orange when you are offline, red when it failed or you are not logged in.
+
 :::
 
 <!-- TODO: screenshot — the sync status icon in the desktop status bar, showing "Synced 2m ago" -->
 
 ## Sync while the app is closed
 
-On mobile there is an extra setting called `{{backgroundSync}}`: *"Sync your notes in the background even when the app is closed. This is an experimental feature. If you face any issues, please turn it off."*
+On mobile there is an extra setting called `{{backgroundSync}}`: _"Sync your notes in the background even when the app is closed. This is an experimental feature. If you face any issues, please turn it off."_
 
 With it on, the operating system wakes Notesnook up periodically — at most every 15 minutes, and only when the OS decides it is a good moment — to run a full sync, refresh your reminders and update note widgets. It also restarts after your phone reboots.
 
@@ -102,6 +110,7 @@ Because the OS controls the schedule, background sync is best-effort: it is not 
 
 ::: info
 `{{backgroundSync}}` lives under `{{settings}}` → `{{account}}` → `{{syncSettings}}`, on mobile only. It is available on every plan. The three `Disable …` switches next to it are not — see [sync settings](/sync/sync-settings).
+
 :::
 
 ## Keep a single note off sync
@@ -110,20 +119,25 @@ Any individual note can be excluded from sync entirely. This is useful for a scr
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Right click the note in the notes list, or open its properties.
 2. Choose `{{syncOff}}`.
-3. Confirm — the dialog warns that the note *"will be automatically deleted from all other devices & any future changes won't get synced."*
+3. Confirm — the dialog warns that the note _"will be automatically deleted from all other devices & any future changes won't get synced."_
 
 The note now shows a crossed-out sync icon in the list. Choose `{{syncOff}}` again to turn syncing back on.
+
 == Mobile
+
 1. Tap the three dot menu on the note.
 2. Tap `{{syncOff}}`.
 
 The note shows a crossed-out sync icon in the list. Tap `{{syncOff}}` again to re-enable syncing for it.
+
 :::
 
 ::: warning This removes the note from your other devices
 Turning `{{syncOff}}` on a note deletes it from every other device. Only the copy on the device where you switched it off remains, and it will not be in any backup taken on another device.
+
 :::
 
 ## What happens when two devices edit the same note

@@ -15,6 +15,7 @@ In both mobile and desktop/web apps, you can install themes directly from a JSON
 
 ::: info You cannot currently import CSS for a code block.
 [Themes must be published](/custom-themes/publish-a-theme) in order for you to use custom CSS for code blocks.
+
 :::
 
 1. Open the Notesnook app

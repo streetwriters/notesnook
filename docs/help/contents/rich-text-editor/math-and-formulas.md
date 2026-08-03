@@ -20,17 +20,21 @@ Inline math flows with the sentence around it, the way `$E = mc^2$` would in a p
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Put the cursor where the formula should go.
 2. Click the `{{more}}` button in the first toolbar group (the one holding `{{bold}}`, `{{italic}}` and `{{underline}}`) and choose `{{mathInline}}`.
 3. Type the LaTeX into the editor that opens under the formula.
 4. Click anywhere outside it to render.
 
 There is no keyboard shortcut for inline math. With [Markdown shortcuts](/rich-text-editor/markdown-notes-editing) on, typing `$$2 + 2 = 4$$` converts to inline math as soon as you close the second pair of dollar signs.
+
 == Mobile
+
 1. Put the cursor where the formula should go.
 2. Tap the `{{more}}` button in the bottom toolbar's first group (`{{bold}}`, `{{italic}}`, `{{underline}}`) and tap `{{mathInline}}`.
 3. Type the LaTeX into the editor that opens under the formula.
 4. Tap outside it to render.
+
 :::
 
 The `{{mathInline}}` button is disabled while the cursor is inside a [code block](/rich-text-editor/code-blocks).
@@ -43,23 +47,28 @@ A math block is rendered in display mode — centered, on its own line, with ful
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Place the cursor on an empty line.
 2. Click the `+` (Insert) button in the toolbar.
 3. Choose `{{mathAndFormulas}}`.
 4. Type the LaTeX and click outside the block.
 
 `Ctrl+Shift+M` (`⌘+Shift+M` on macOS) inserts a math block from anywhere in the note.
+
 == Mobile
+
 1. Place the cursor on an empty line.
 2. Tap the `+` (Insert) button in the bottom toolbar.
 3. Choose `{{mathAndFormulas}}` from the `{{chooseBlockToInsert}}` sheet.
 4. Type the LaTeX and tap outside the block.
+
 :::
 
 With Markdown shortcuts on, typing `$$$` followed by a space also creates a math block.
 
 ::: info Markdown shortcuts need Essential
 The `$$…$$` and `$$$` shortcuts are [Markdown shortcuts](/rich-text-editor/markdown-notes-editing), part of the [Essential plan and above](/plans-and-limits), and they are **off by default on web and desktop** — switch on `{{mardownShortcuts}}` in `{{settings}}` → `{{customization}}` → `{{editor}}`. They are on by default on mobile. The toolbar buttons and `Ctrl+Shift+M` work on every plan.
+
 :::
 
 ## Edit a formula you already wrote
@@ -79,7 +88,7 @@ The mhchem extension is loaded alongside KaTeX, so `\ce{...}` notation works out
 
 ## What happens when the LaTeX is invalid
 
-Notesnook never throws away your input over a typo. KaTeX renders unrecognized commands in red inside the formula and leaves everything it *could* parse rendered normally, so a stray `\frac{1}` shows you exactly where the problem is. The raw LaTeX you typed is untouched — click the formula and fix it.
+Notesnook never throws away your input over a typo. KaTeX renders unrecognized commands in red inside the formula and leaves everything it _could_ parse rendered normally, so a stray `\frac{1}` shows you exactly where the problem is. The raw LaTeX you typed is untouched — click the formula and fix it.
 
 ## Related pages
 

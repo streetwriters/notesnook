@@ -13,6 +13,7 @@ keywords:
 
 ::: info This page is Android only.
 The iOS app has its own share extension — see [share things from other apps.](/mobile-integration/share-things-from-other-apps)
+
 :::
 
 Android gives Notesnook three ways to start writing without opening the app first, plus a way to pin any note, notebook, tag or color to your launcher.
@@ -54,6 +55,7 @@ The shortcut gets a generated icon based on the item's title and color, and its 
 
 ::: info What happens if your plan expires
 Launcher shortcuts are a Pro feature. See [plans & limits](/plans-and-limits) for everything each plan unlocks.
+
 :::
 
 ## Related pages

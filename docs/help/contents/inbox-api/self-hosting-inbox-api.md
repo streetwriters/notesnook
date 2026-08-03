@@ -25,6 +25,7 @@ The source code and setup instructions are available in the [notesnook-sync-serv
 
 ::: info
 Even on Notesnook's hosted instance, your payload is encrypted with your PGP public key before it leaves the server — it cannot be read in transit or at rest.
+
 :::
 
 ## Option 2: Encrypt locally and post directly
@@ -131,6 +132,7 @@ Usage:
 
 ::: info
 After rotating your PGP keys in Notesnook settings, re-fetch the public key (Step 1) and re-import it before encrypting new payloads.
+
 :::
 
 ## Related pages

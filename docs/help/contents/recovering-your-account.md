@@ -16,6 +16,7 @@ Notesnook is one of the few end-to-end encrypted apps that lets you recover your
 
 ::: danger You will be logged out
 For account recovery to work reliably, you will be force logged out from all your other devices. It is recommended that you save & backup all your data on your other devices before continuing.
+
 :::
 
 ## Requesting an account recovery link
@@ -24,6 +25,7 @@ The first step to recovering your account consists of requesting an account reco
 
 ::: info The new login flow
 The recent versions of Notesnook have updated the login flow. It is now **mandatory to verify your 2FA** before you can request an account recovery link.
+
 :::
 
 ::::tabs key:platform
@@ -47,6 +49,7 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 
 ::: info What if I didn't receive an email?
 _Check your spam/junk folder if you haven't received one & [contact us](mailto:support@streetwriters.co) if you still don't find it._
+
 :::
 
 8. Click the `Reset your password` button in the email. This takes you to the account recovery page.
@@ -61,7 +64,8 @@ You can request the recovery email from the mobile app, but the recovery itself 
 4. Tap `{{forgotPassword}}` under the password field.
 5. Confirm your email in the sheet that opens and send the recovery email. You should see `{{recoveryEmailSent}}`.
 6. Open the email on any device and click `Reset your password` to continue in a browser.
-::::
+   :
+   :::
 
 ## Choosing an account recovery method
 
@@ -71,11 +75,11 @@ Notesnook gives its users a variety of recovery methods depending on the data th
 
 There are three, and they are listed in order of how much you keep:
 
-| Method | What it does | Your notes |
-| --- | --- | --- |
-| `{{recoveryKeyMethod}}` | Decrypts your data with your old key and re-encrypts it with the new password | Kept |
-| `{{backupFileMethod}}` | Restores your data from a `.nnbackup` file you saved earlier | Kept, up to the date of that backup |
-| `{{clearDataAndResetMethod}}` | Wipes the account and starts it over | **Deleted** |
+| Method                        | What it does                                                                  | Your notes                          |
+| ----------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
+| `{{recoveryKeyMethod}}`       | Decrypts your data with your old key and re-encrypts it with the new password | Kept                                |
+| `{{backupFileMethod}}`        | Restores your data from a `.nnbackup` file you saved earlier                  | Kept, up to the date of that backup |
+| `{{clearDataAndResetMethod}}` | Wipes the account and starts it over                                          | **Deleted**                         |
 
 ### Use recovery key
 
@@ -100,6 +104,7 @@ If you don't have your recovery key but you do have a [backup file](/backup-and-
 
 ::: danger This deletes everything in the account
 This method clears all your data — notes, notebooks, reminders, tags and attachments. It is irreversible, and because your data is end-to-end encrypted, **Notesnook cannot restore any of it afterwards.** Only use it if you have neither a recovery key nor a backup file, and you accept starting from scratch.
+
 :::
 
 1. Click the third option (the button that says `{{clearDataAndResetMethod}}`).

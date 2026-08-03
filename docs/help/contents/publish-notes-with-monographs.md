@@ -15,12 +15,14 @@ A monograph turns any note into a link you can send to anyone. Your reader needs
 
 ::: warning Size limit
 Currently, monographs are limited to 15 MB in size. This also includes attachments, like images. If you try to publish a note larger than 15 MB, you'll get an error.
+
 :::
 
 ## How to publish a note?
 
 ::: warning A monograph is a public URL
 Anyone with the link can open a monograph unless you set a password. Notesnook cannot tell who has opened it, and an unprotected monograph can be indexed if the link is posted publicly. Use password protection for anything sensitive, and unpublish when you are done.
+
 :::
 
 :::tabs key:platform
@@ -37,7 +39,8 @@ Anyone with the link can open a monograph unless you set a password. Notesnook c
 2. Tap `{{publish}}` to open Publish note sheet
 3. Tap `{{publish}}` button to publish note.
 4. Copy the URL and send it to the person you are sharing with.
-   :::
+
+:::
 
 ## Password protection
 
@@ -61,12 +64,14 @@ Self destruct means that the published note can be viewed only once. Once someon
 1. Tap ![Three dot button](/three-dot-button.png) button on a published note
 2. Tap `{{publish}}` to open Publish note sheet
 3. Tap `{{unpublish}}` button to unpublish note
-   :::
+
+:::
 
 ## Once a note is published
 
 :::warning
 **Published notes cannot be deleted while published.**
+
 :::
 
 Opening `{{publish}}` on a note that is already published gives you the full set of actions rather than a single toggle:

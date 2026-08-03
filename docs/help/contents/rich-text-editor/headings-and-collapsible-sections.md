@@ -18,33 +18,38 @@ Headings give a note its structure. Notesnook supports six levels, each one avai
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Put the cursor on the line you want to turn into a heading, or select several lines.
 2. Open the `{{headings}}` dropdown in the toolbar — it shows the current block, either `{{paragraph}}` or `Heading 1` to `Heading 6`.
 3. Choose the level you want.
 
 Or skip the toolbar entirely:
 
-| Block | Shortcut |
-| --- | --- |
-| Heading 1 | `Ctrl+Alt+1` |
-| Heading 2 | `Ctrl+Alt+2` |
-| Heading 3 | `Ctrl+Alt+3` |
-| Heading 4 | `Ctrl+Alt+4` |
-| Heading 5 | `Ctrl+Alt+5` |
-| Heading 6 | `Ctrl+Alt+6` |
+| Block               | Shortcut     |
+| ------------------- | ------------ |
+| Heading 1           | `Ctrl+Alt+1` |
+| Heading 2           | `Ctrl+Alt+2` |
+| Heading 3           | `Ctrl+Alt+3` |
+| Heading 4           | `Ctrl+Alt+4` |
+| Heading 5           | `Ctrl+Alt+5` |
+| Heading 6           | `Ctrl+Alt+6` |
 | Back to a paragraph | `Ctrl+Alt+0` |
 
 On macOS use `Command+Option` in place of `Ctrl+Alt`.
+
 == Mobile
+
 1. Tap the line you want to turn into a heading.
 2. Open the `{{headings}}` dropdown in the toolbar at the bottom of the screen. On mobile the levels are labelled `H1` to `H6`.
 3. Tap a level to apply it, or `{{paragraph}}` to turn a heading back into ordinary text.
+
 :::
 
 Applying a heading keeps the line's alignment and text direction, and clears any custom font size on the selection so the heading uses its own size.
 
 ::: info Headings are unavailable inside a code block
 The `{{headings}}` dropdown is disabled while the cursor is inside a [code block](/rich-text-editor/code-blocks), where `#` is an ordinary character.
+
 :::
 
 ## Type a heading with Markdown <PlanTag plan="essential" />
@@ -59,12 +64,16 @@ Every heading with text in it has a chevron at the end of the line.
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Hover over the heading — the chevron fades in immediately after the last word.
 2. Click it. Everything below the heading is hidden and the chevron rotates to point right.
 3. Click it again to unfold the section.
+
 == Mobile
+
 1. The chevron is always visible at the end of a heading line.
 2. Tap it to collapse the section, tap it again to expand it.
+
 :::
 
 A collapsed heading hides everything after it **until the next heading of the same or a higher level**. So collapsing a `Heading 2` folds away the paragraphs, lists and any `Heading 3` blocks that belong to it, and stops at the next `Heading 2` or `Heading 1`.
@@ -80,11 +89,12 @@ Nested folds are remembered: if a `Heading 3` was already collapsed inside a sec
 
 ::: info The fold is stored in the note
 Collapsing a section is a change to the note's content, so the fold state is saved and syncs to your other devices. It doesn't delete or move anything — expanding the heading brings everything back exactly as it was.
+
 :::
 
 ## Keep writing after a collapsed section
 
-Pressing `Enter` at the **end of a collapsed heading's text** doesn't push a new line into the hidden content. Notesnook adds a new paragraph *after* the whole collapsed section and puts the cursor there, so you can carry on writing beneath a folded chapter without unfolding it first.
+Pressing `Enter` at the **end of a collapsed heading's text** doesn't push a new line into the hidden content. Notesnook adds a new paragraph _after_ the whole collapsed section and puts the cursor there, so you can carry on writing beneath a folded chapter without unfolding it first.
 
 Pressing `Enter` anywhere else in the heading behaves normally.
 
@@ -95,8 +105,11 @@ Headings are what the table of contents is built from.
 :::tabs key:platform
 == Desktop/Web
 Click the table-of-contents button in the editor's top bar. The pane opens beside the note, lists every heading as a tree, follows along as you scroll, and jumps to a heading when you click it. A note with no headings shows `{{noHeadingsFound}}`.
+
 == Mobile
+
 Tap the `⋮` menu in the editor header and choose `Table of contents`. The entry only appears when the note actually has headings. `{{scrollToTop}}` and `{{scrollToBottom}}` in the same menu move you through the note quickly.
+
 :::
 
 [Find & replace](/rich-text-editor/search-and-replace) also expands collapsed headings automatically when a match is hidden inside one.

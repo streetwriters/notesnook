@@ -19,8 +19,11 @@ Wrapped covers the current calendar year — 1 January to 31 December — and sh
 :::tabs key:platform
 == Desktop/Web
 A `🎉 Wrapped <year>` button appears at the bottom of the side menu during December, while the `Notes` tab is selected and the side menu is not collapsed. Visiting the Wrapped page outside December sends you back to your notes.
+
 == Mobile
+
 A `Wrapped <year> 🎉` button replaces the upgrade button at the bottom of the side menu during December. Tap it to open your Wrapped.
+
 :::
 
 <!-- TODO: screenshot — the Wrapped button at the bottom of the side menu -->
@@ -46,6 +49,7 @@ On desktop and web there is no share button — the summary card is on screen fo
 
 ::: info It really is local
 There is no other way for it to work. Encryption means Notesnook has no idea how many notes you have written or how many words are in them, so the only machine that can count them is yours.
+
 :::
 
 ## Related pages

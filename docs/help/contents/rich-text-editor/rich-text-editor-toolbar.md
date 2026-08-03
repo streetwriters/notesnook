@@ -28,6 +28,7 @@ An editor toolbar carries a lot of tools. Hiding the ones you never use, and kee
 
 ::: info Desktop and mobile keep separate toolbars
 Your toolbar layout syncs to your other devices, but desktop and mobile are stored separately — changing the toolbar on your laptop does not change the one on your phone, and the other way round.
+
 :::
 
 On every platform the toolbar editor lives in the same place: `{{settings}}` > `{{customization}}` > `{{editor}}` > `{{customizeToolbar}}`.
@@ -41,8 +42,11 @@ On every platform the toolbar editor lives in the same place: `{{settings}}` > `
 :::tabs key:platform
 == Desktop/Web
 **Disabled items** — tools that are hidden from the toolbar. Drag a tool into this section to remove it from the toolbar.
+
 == Mobile
+
 **Disabled items** — tools that are hidden from the toolbar. Tap the `+` button on a group to see them and add them back.
+
 :::
 
 ### Choose a toolbar preset
@@ -60,11 +64,13 @@ The toolbar always uses one of three presets, shown at the top of the `{{customi
 2. Select `{{default}}`, `{{minimal}}` or `{{custom}}`.
 
 Editing groups or tools while `{{default}}` or `{{minimal}}` is selected switches you to `{{custom}}` automatically.
+
 == Mobile
 
 1. Go to `{{settings}}` > `{{customization}}` > `{{editor}}` > `{{customizeToolbar}}`.
 2. Under `{{presets}}`, tap `{{default}}`, `{{minimal}}` or `{{custom}}`.
-   :::
+
+:::
 
 Saving a `{{custom}}` preset requires a Pro plan — `{{default}}` and `{{minimal}}` are available on every plan. See [Plans & limits](/plans-and-limits).
 
@@ -77,12 +83,14 @@ Mobile keeps a separate toolbar layout for each device class — phone, small ta
 :::tabs key:platform
 == Desktop/Web
 There is no reset action. Select the `{{default}}` preset on the `{{customizeToolbar}}` screen to go back to the stock toolbar.
+
 == Mobile
 
 1. Go to `{{settings}}` > `{{customization}}` > `{{editor}}`.
 2. Tap `{{resetToolbar}}`.
 
 The toolbar goes back to the `{{default}}` preset and a `{{toolbarReset}}` toast confirms it.
+
 :::
 
 ### Add a new group
@@ -90,8 +98,11 @@ The toolbar goes back to the `{{default}}` preset and a `{{toolbarReset}}` toast
 :::tabs key:platform
 == Desktop/Web
 To add a new group to the toolbar, click the `+` button in the header.
+
 == Mobile
+
 Scroll to the bottom of the group list and tap `{{createAGroup}}`.
+
 :::
 
 ### Add tools to a group
@@ -99,8 +110,11 @@ Scroll to the bottom of the group list and tap `{{createAGroup}}`.
 :::tabs key:platform
 == Desktop/Web
 Drag tools from other groups or from `Disabled items` into a group to add them.
+
 == Mobile
+
 Tap the `+` button on a group header to add any disabled tools into the group. You can also drag tools in from other groups.
+
 :::
 
 ### Create a subgroup
@@ -114,7 +128,9 @@ Tap the `+` button on a group header to add any disabled tools into the group. Y
 4. Tools in the subgroup are collapsed into a drop down.
 
 == Mobile
+
 Create a subgroup by tapping the collapse button on a tool. Tools in the subgroup are collapsed into a popup.
+
 :::
 
 ### Delete a group
@@ -131,7 +147,8 @@ You can remove a group and all its tools from the toolbar.
 
 1. Tap the `-` button on a group header to remove the group.
 2. Tools removed from a group can be added back with the `+` button on the group header.
-   :::
+
+:::
 
 ### Disable a tool
 
@@ -143,7 +160,9 @@ You can remove a group and all its tools from the toolbar.
 3. The tool is moved to the `Disabled items` section at the bottom.
 
 == Mobile
+
 Tap the `-` button on a tool to disable it.
+
 :::
 
 ## Related pages

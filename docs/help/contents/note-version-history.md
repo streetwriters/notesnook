@@ -30,15 +30,19 @@ In short, if you open a note and edit it at 10 different times during the day, y
 
 :::tabs key:platform
 == Desktop/Web
+
 1. Open the note.
 2. Open the `{{properties}}` panel from the editor's action bar.
 3. Scroll to `{{noteHistory}}` and click a session to preview it.
 4. Click `{{restoreThisVersion}}` to bring it back, or `{{saveACopy}}` to keep both.
+
 == Mobile
+
 1. Open the note.
 2. Tap the three dot button to open `Note properties`.
 3. Tap `{{history}}` and choose a session to preview it.
 4. Tap `{{restore}}` to bring it back. (`{{saveACopy}}` is desktop and web only.)
+
 :::
 
 Restoring replaces the note's current content with the version you picked. To compare instead, `{{saveACopy}}` creates a new note from the old version and leaves the original untouched.
@@ -47,11 +51,11 @@ Restoring replaces the note's current content with the version you picked. To co
 
 Version history is capped by plan, and versions past the cap are **deleted permanently** — they are not hidden or archived.
 
-| Plan | Versions kept per note |
-| --- | --- |
-| Free | 100 |
-| Essential | 1,000 |
-| Pro and Believer | Unlimited |
+| Plan             | Versions kept per note |
+| ---------------- | ---------------------- |
+| Free             | 100                    |
+| Essential        | 1,000                  |
+| Pro and Believer | Unlimited              |
 
 See [plans and limits](/plans-and-limits) for the full comparison.
 
@@ -60,17 +64,21 @@ See [plans and limits](/plans-and-limits) for the full comparison.
 :::tabs key:platform
 == Desktop/Web
 There is no button to clear a single note's history on desktop or web. History is cleared when the note is locked, trashed and deleted, or when you log out.
+
 == Mobile
+
 1. Open the note.
 2. Tap the three dot button to open `Note properties`.
 3. Tap `{{history}}`.
 4. Tap `{{clearHistory}}` and confirm.
+
 :::
 
 Clearing is permanent — once cleared, earlier versions of that note are gone.
 
 ::: danger Locking a note erases its history
 Moving a note into the [private vault](/lock-notes-with-private-vault) deletes every stored version of it. Old unencrypted copies of a note you have chosen to lock would defeat the point of locking it. Restore anything you still need **before** you lock the note.
+
 :::
 
 ## FAQs

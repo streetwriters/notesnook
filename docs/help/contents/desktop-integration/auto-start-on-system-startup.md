@@ -21,6 +21,7 @@ If your workflow requires Notesnook to be always opened, it's a good idea to ena
 
 ::: info
 This only works when `{{autoStartOnSystemStartup}}` is enabled.
+
 :::
 
 Notesnook can also start minimized when it's opened on system startup:

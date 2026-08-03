@@ -34,7 +34,8 @@ Basic home screen widgets are available on both Android and iOS for quick note t
 ![The Notesnook quick note widget on an Android home screen](/static/mobile-integration/android-quick-note-widget.png)
 
 4. Tap the widget to quickly take a note without launching the app.
-   :::
+
+:::
 
 ## Which widgets are available?
 

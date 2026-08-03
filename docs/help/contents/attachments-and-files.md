@@ -16,6 +16,7 @@ Open the insert menu in the editor and pick `{{image}}` or `{{attachment}}`. The
 
 ::: info You need an account to attach files
 Trying to insert an attachment while logged out shows `{{notLoggedIn}}` with the message `Login to upload attachments.` Attachments are stored on Notesnook's servers in encrypted form, which is why an account is required. See [why login is needed to upload attachments](/faqs/login-to-upload-attachments).
+
 :::
 
 ## Attach a file or an image
@@ -29,13 +30,15 @@ Trying to insert an attachment while logged out shows `{{notLoggedIn}}` with the
 4. Pick one or more files.
 
 Shortcuts: `Ctrl/Cmd + Shift + A` for an attachment, `Ctrl/Cmd + Shift + I` for an image. You can also drag files straight into the editor.
+
 == Mobile
 
 1. Put the cursor where the file should go.
 2. Open the insert menu (the `+` button on the toolbar).
 3. Choose `{{attachment}}` for any file, or `{{image}}` for a picture.
 4. Under `{{image}}` you also get `{{takePhotoUsingCamera}}`, which is mobile only.
-   :::
+
+:::
 
 Notesnook hashes each file first, so attaching the same file twice reuses the copy that is already uploaded instead of consuming your storage again.
 
@@ -55,8 +58,11 @@ By default Notesnook compresses images before uploading. The `{{imageCompression
 :::tabs key:platform
 == Desktop/Web
 Go to `{{settings}}` → `{{behaviour}}` → `{{imageCompression}}`.
+
 == Mobile
+
 Go to `{{settings}}` → `{{customization}}` → `{{behavior}}` → `{{imageCompression}}`.
+
 :::
 
 ## Manage your attachments
@@ -66,8 +72,11 @@ The attachment manager lists every file in your account with its name, upload st
 :::tabs key:platform
 == Desktop/Web
 Go to `{{settings}}` → `{{profile}}` → `{{attachments}}` and press `{{open}}`.
+
 == Mobile
+
 Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}` → `{{manageAttachments}}`.
+
 :::
 
 ### Filter and search
@@ -97,6 +106,7 @@ Open an attachment's menu — right click desktop and web, tap the item on mobil
 
 ::: tip Fix a failed attachment
 A file that shows an error usually needs `{{fileCheck}}` first. If the check reports a problem, `Reupload` with the original file repairs it.
+
 :::
 
 <!-- TODO: screenshot — the attachment manager with the type sidebar and the toolbar actions -->
@@ -112,12 +122,16 @@ The download button at the bottom of the desktop and web sidebar is `{{downloadA
 :::tabs key:platform
 == Desktop/Web
 Use the `{{clearCache}}` button at the bottom of the attachment manager's sidebar.
+
 == Mobile
+
 Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}` → `{{clearCache}}`. The setting shows the current cache size.
+
 :::
 
 ::: warning Pending uploads are cleared too
 Anything that has not finished uploading is lost when you clear the cache. Let uploads finish first.
+
 :::
 
 ## Deleting an attachment

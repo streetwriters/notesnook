@@ -18,6 +18,7 @@ Here is how to move your notes from Evernote into Notesnook.
 
 ::: info
 If you are tech savvy and know your way around a computer, you can use a tool like [evernote-backup](https://github.com/vzhd1701/evernote-backup) to quickly export all your Evernote notes as .ENEX files.
+
 :::
 
 1. Open the Evernote desktop app — exporting is not possible from the Evernote web app — and go to `{{notebooks}}` in the side menu:

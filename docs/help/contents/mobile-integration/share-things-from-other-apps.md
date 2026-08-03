@@ -22,6 +22,7 @@ The examples below use a browser, but the same share sheet works from any app th
 ![Sharing selected text from a web page on iOS](/static/mobile-integration/clip-selection-ios.png)
 == Android
 ![Sharing selected text from a web page on Android](/static/mobile-integration/clip-selection-android.png)
+
 :::
 
 2. Choose Notesnook from the list of apps.
@@ -31,6 +32,7 @@ The examples below use a browser, but the same share sheet works from any app th
 ![Choosing Notesnook from the iOS share sheet](/static/mobile-integration/select-notesnook-ios.png)
 == Android
 ![Choosing Notesnook from the Android share sheet](/static/mobile-integration/select-notesnook-android.png)
+
 :::
 
 3. Tap the save button at the bottom right. The clip is saved as a new note in Notesnook.
@@ -45,6 +47,7 @@ The examples below use a browser, but the same share sheet works from any app th
 
 ::: info
 The share extension remembers the note you picked, so later clips default to the same one until you change it.
+
 :::
 
 ## Clipping full webpage content

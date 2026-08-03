@@ -28,26 +28,27 @@ You can try out the importer by opening the web or desktop app and going to `Set
 
 ::: info Import from a computer
 The Notesnook Importer is available in the **web and desktop apps only**. Import on a computer and your notes will sync down to your phone and tablet automatically.
+
 :::
 
 ## Supported note apps and formats
 
-| App or format | Guide |
-| --- | --- |
-| Evernote (`.enex`) | [Import from Evernote](/importing-notes/import-notes-from-evernote) |
-| Google Keep | [Import from Google Keep](/importing-notes/import-notes-from-googlekeep) |
-| Simplenote | [Import from Simplenote](/importing-notes/import-notes-from-simplenote) |
-| Joplin | [Import from Joplin](/importing-notes/import-notes-from-joplin) |
-| Obsidian | [Import from Obsidian](/importing-notes/import-notes-from-obsidian) |
-| ColorNote | [Import from ColorNote](/importing-notes/import-notes-from-colornote) |
-| UpNote | [Import from UpNote](/importing-notes/import-notes-from-upnote) |
-| Zoho Notebook | [Import from Zoho Notebook](/importing-notes/import-notes-from-zoho-notebook) |
-| Skiff Pages | [Import from Skiff Pages](/importing-notes/import-notes-from-skiff-pages) |
-| Fusebase (Nimbus Note) | [Import from Fusebase](/importing-notes/import-notes-from-fusebase) |
+| App or format                           | Guide                                                                          |
+| --------------------------------------- | ------------------------------------------------------------------------------ |
+| Evernote (`.enex`)                      | [Import from Evernote](/importing-notes/import-notes-from-evernote)            |
+| Google Keep                             | [Import from Google Keep](/importing-notes/import-notes-from-googlekeep)       |
+| Simplenote                              | [Import from Simplenote](/importing-notes/import-notes-from-simplenote)        |
+| Joplin                                  | [Import from Joplin](/importing-notes/import-notes-from-joplin)                |
+| Obsidian                                | [Import from Obsidian](/importing-notes/import-notes-from-obsidian)            |
+| ColorNote                               | [Import from ColorNote](/importing-notes/import-notes-from-colornote)          |
+| UpNote                                  | [Import from UpNote](/importing-notes/import-notes-from-upnote)                |
+| Zoho Notebook                           | [Import from Zoho Notebook](/importing-notes/import-notes-from-zoho-notebook)  |
+| Skiff Pages                             | [Import from Skiff Pages](/importing-notes/import-notes-from-skiff-pages)      |
+| Fusebase (Nimbus Note)                  | [Import from Fusebase](/importing-notes/import-notes-from-fusebase)            |
 | TextBundle (`.textbundle`, `.textpack`) | [Import TextBundle files](/importing-notes/import-notes-from-textbundle-files) |
-| Markdown (`.md`) files | [Import Markdown files](/importing-notes/import-notes-from-markdown-files) |
-| HTML files | [Import HTML files](/importing-notes/import-notes-from-html-files) |
-| Plain text (`.txt`) files | [Import plaintext files](/importing-notes/import-notes-from-plaintext-files) |
+| Markdown (`.md`) files                  | [Import Markdown files](/importing-notes/import-notes-from-markdown-files)     |
+| HTML files                              | [Import HTML files](/importing-notes/import-notes-from-html-files)             |
+| Plain text (`.txt`) files               | [Import plaintext files](/importing-notes/import-notes-from-plaintext-files)   |
 
 **Don't see your notes app?** No worries, create an issue on [Github](https://github.com/streetwriters/notesnook/issues)
 

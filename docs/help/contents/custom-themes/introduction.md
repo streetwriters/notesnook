@@ -12,6 +12,7 @@ keywords:
 
 ::: info
 This document reflects v1.0 of the Notesnook Theme specification.
+
 :::
 
 The goal of this document is to provide you with an exact idea of what each scope, variant & color in the theme does, how they all fit together, and how you can use them to create your own custom theme for Notesnook. This document will also serve as a descriptive guide for any `theme.json` file you may find online.

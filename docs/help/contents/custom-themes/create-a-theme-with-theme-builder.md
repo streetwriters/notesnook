@@ -17,6 +17,7 @@ You can access the Theme Builder at [https://theme-builder.notesnook.com](https:
 
 ::: info
 The Theme Builder is a full copy of the Notesnook web app, with an extra panel for tweaking the colors. You can use it to sign into your account, create notes, and everything else you do in the Notesnook app.
+
 :::
 
 Here's a look at the theme builder:
@@ -36,6 +37,7 @@ The Theme Builder makes this very easy:
 
 ::: warning
 Keep in mind that a theme can only have one color scheme: `light` or `dark` so choose your starter theme accordingly.
+
 :::
 
 For our example, we are going to select "Notesnook Light" as our base theme.
@@ -52,12 +54,14 @@ Theme metadata allows better discoverability in search and gives users a quick i
 
 ::: warning Theme ID conflicts
 Remember that the `id` for your custom theme should not conflict with other published themes on Notesnook. You can see the list of all published theme IDs [here](https://github.com/streetwriters/notesnook-themes/tree/main/themes).
+
 :::
 
 ## 3. Configuring base theme scope
 
 ::: info
 Before you proceed, it is recommended that you [learn about how theming in Notesnook works](/custom-themes/introduction#what-is-a-theme), what scopes, variants & colors do etc.
+
 :::
 
 Every Notesnook theme must implement the base theme scope. Colors from the `base` theme scope are used as a fallback in all other scopes if a specific color is not defined.
@@ -84,6 +88,7 @@ For example, in the default Notesnook Light theme, the background color of the n
 This is because the default Notesnook Light theme has a different background color set for the `navigationMenu` scope.
 
 ![The navigationMenu scope in the Theme Builder, showing its own background colour](/theme-builder-navigation-menu-scope.png)
+
 :::
 
 The sky is the limit here. In most cases, though, the `base` scope will suffice unless you want to get more adventurous.

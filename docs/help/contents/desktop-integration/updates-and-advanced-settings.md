@@ -14,6 +14,7 @@ keywords:
 
 ::: info Mostly, but not only, the desktop app
 `{{useNativeTitlebar}}`, `{{zoomFactor}}` and `{{useCustomDns}}` are desktop-only. The update controls, `{{releaseTrack}}`, `{{proxy}}` and the CORS proxy also appear in the web app, where an "update" means swapping the service worker rather than downloading an installer.
+
 :::
 
 ## Keep the app updated automatically
@@ -33,6 +34,7 @@ When automatic updates are on, the desktop app downloads new versions in the bac
 
 ::: info Flatpak, Snap and portable builds
 These builds are updated by the system that installed them, so the `{{automaticUpdates}}` toggle, `{{checkForUpdates}}` and `{{installUpdate}}` buttons don't appear. Only `{{copy}}` (for the version number) is shown.
+
 :::
 
 ## Switch between the Stable and Beta release track
@@ -47,6 +49,7 @@ Switching from `{{beta}}` back to `{{stable}}` is allowed to downgrade you, but 
 
 ::: warning Beta builds are still beta
 Keep [current backups](/backup-and-restore-notes-in-notesnook) before moving to the beta track.
+
 :::
 
 ## Use your system's native titlebar
