@@ -215,6 +215,12 @@ export function useEditorController({
         logger("info", "Edit skipped, tab is in loading state");
         return;
       }
+
+      if (ignoreEdit) {
+        logger("info", "Ignoring ignoreEdit update, a save is already pending");
+        return;
+      }
+
       const currentSessionId = globalThis.sessionId;
       const tabId = tabRef.current.id;
       const noteId = tabRef.current.session?.noteId;
@@ -239,6 +245,7 @@ export function useEditorController({
 
         const editedAt = Date.now();
         htmlContentRef.current = editor.getHTML();
+
         const params = [
           {
             html: htmlContentRef.current,
@@ -284,7 +291,7 @@ export function useEditorController({
           });
 
         logger("info", "Editor saving content", params[1], params[2]);
-      }, 300);
+      }, 100);
 
       countWords(5000);
     },
