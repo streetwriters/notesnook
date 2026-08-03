@@ -25,7 +25,12 @@ import {
   FileDoc,
   Picture,
   CheckSvgIcon,
-  ArrowRightSvgIcon
+  ArrowRightSvgIcon,
+  ShieldCheck,
+  CaretDown,
+  CalendarBlank,
+  Prohibit,
+  HandCoins
 } from "../../components/icons";
 import { Plan } from "./types";
 import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
@@ -52,6 +57,8 @@ import Accordion from "../../components/accordion";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { getCurrencySymbol } from "../../common/currencies";
 import Star from "../../assets/star.svg";
+import { DialogManager } from "../../common/dialog-manager";
+import Dialog from "../../components/dialog";
 
 const PLAN_CARD_FEATURES = [
   getFeature("storage"),
@@ -200,208 +207,274 @@ export function PlansList(props: PlansListProps) {
           </Button>
         ))}
       </Flex>
-      <Flex
-        sx={{
-          flexDirection: ["column", "row"],
-          gap: "spacing8",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%"
-        }}
-      >
-        {isLoading ? (
-          <Loading />
-        ) : (
-          plans
-            .filter(
-              (p) =>
-                p.plan !== SubscriptionPlan.EDUCATION &&
-                p.period === selectedPeriod
-            )
-            .map((plan) => {
-              const metadata = PLAN_METADATA[plan.plan];
-              const isRecommended = recommendedPlan === plan.plan;
-              return (
-                <Flex
-                  key={plan.id}
-                  data-test-id={`checkout-plan`}
-                  sx={{
-                    bg: isRecommended ? "background-selected" : "background",
-                    border: isRecommended
-                      ? "1px solid var(--accent)"
-                      : "1px solid var(--border-secondary)",
-                    borderRadius: "radius4",
-                    flexDirection: "column",
-                    gap: "spacing11",
-                    px: "spacing7",
-                    py: "spacing11",
-                    flex: "1 0 0",
-                    maxWidth: "500px",
-                    boxShadow: isRecommended
-                      ? "0px 0px 12.5px rgba(0,0,0,0.12)"
-                      : "0px 0px 12.5px rgba(0,0,0,0.08)"
-                  }}
-                >
+      <Box sx={{ width: "100%" }}>
+        <Flex
+          sx={{
+            flexDirection: ["column", "row"],
+            gap: "spacing8",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%"
+          }}
+        >
+          {isLoading ? (
+            <Loading />
+          ) : (
+            plans
+              .filter(
+                (p) =>
+                  p.plan !== SubscriptionPlan.EDUCATION &&
+                  p.period === selectedPeriod
+              )
+              .map((plan) => {
+                const metadata = PLAN_METADATA[plan.plan];
+                const isRecommended = recommendedPlan === plan.plan;
+                return (
                   <Flex
+                    key={plan.id}
+                    data-test-id={`checkout-plan`}
                     sx={{
+                      bg: isRecommended ? "background-selected" : "background",
+                      border: isRecommended
+                        ? "1px solid var(--accent)"
+                        : "1px solid var(--border-secondary)",
+                      borderRadius: "radius4",
                       flexDirection: "column",
-                      gap: "32px",
-                      width: "100%"
+                      gap: "spacing11",
+                      p: "spacing7",
+                      flex: "1 0 0",
+                      maxWidth: "500px",
+                      boxShadow: isRecommended
+                        ? "0px 0px 12.5px rgba(0,0,0,0.12)"
+                        : "0px 0px 12.5px rgba(0,0,0,0.08)"
                     }}
                   >
                     <Flex
                       sx={{
                         flexDirection: "column",
-                        gap: "12px"
+                        gap: "32px",
+                        width: "100%"
                       }}
                     >
                       <Flex
                         sx={{
-                          justifyContent: "space-between",
-                          alignItems: "center"
+                          flexDirection: "column",
+                          gap: "12px"
                         }}
                       >
-                        <Text
-                          variant="heading"
-                          sx={{ fontSize: "2xl" }}
-                          data-test-id="title"
+                        <Flex
+                          sx={{
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                          }}
                         >
-                          {metadata.title}
-                        </Text>
-                        {isRecommended && (
-                          <Flex
-                            sx={{
-                              bg: "accent",
-                              borderRadius: "50px",
-                              px: "8px",
-                              py: "4px"
-                            }}
+                          <Text
+                            variant="heading"
+                            sx={{ fontSize: "2xl" }}
+                            data-test-id="title"
                           >
-                            <Text
-                              variant="subBody"
-                              sx={{
-                                color: "accentForeground",
-                                fontSize: "md",
-                                fontWeight: 500,
-                                lineHeight: "1"
-                              }}
-                            >
-                              Recommended
-                            </Text>
-                          </Flex>
-                        )}
-                      </Flex>
-                      <Text
-                        sx={{
-                          fontSize: "sm",
-                          color: "paragraph",
-                          fontWeight: "normal"
-                        }}
-                      >
-                        {metadata.subtitle}
-                      </Text>
-                    </Flex>
-                    <Flex sx={{ flexDirection: "column" }}>
-                      {plan.recurring ? (
-                        <RecurringPricing plan={plan} />
-                      ) : (
-                        <OneTimePricing plan={plan} />
-                      )}
-                    </Flex>
-                    <Flex
-                      sx={{
-                        flexDirection: "column",
-                        gap: "16px"
-                      }}
-                    >
-                      {PLAN_CARD_FEATURES.map((feature, index) => {
-                        const caption =
-                          feature.availability[planToAvailability(plan.plan)]
-                            .caption;
-                        return (
-                          <Flex
-                            key={feature.id}
-                            sx={{ flexDirection: "column", gap: "16px" }}
-                          >
+                            {metadata.title}
+                          </Text>
+                          {isRecommended && (
                             <Flex
                               sx={{
-                                justifyContent: "space-between",
-                                alignItems: "center"
+                                bg: "accent",
+                                borderRadius: "50px",
+                                px: "8px",
+                                py: "4px"
                               }}
                             >
-                              <Flex sx={{ gap: "12px", alignItems: "center" }}>
-                                <FeatureIcon id={feature.id} />
-                                <Text
-                                  sx={{
-                                    fontSize: "18px",
-                                    color: "paragraph",
-                                    fontWeight: "normal"
-                                  }}
-                                >
-                                  {feature.title}
-                                </Text>
-                              </Flex>
                               <Text
+                                variant="subBody"
                                 sx={{
-                                  fontSize: "title",
-                                  fontWeight: "bold",
-                                  color: "paragraph"
+                                  color: "accentForeground",
+                                  fontSize: "md",
+                                  fontWeight: 500,
+                                  lineHeight: "1"
                                 }}
                               >
-                                <FeatureCaption caption={caption} />
+                                Recommended
                               </Text>
                             </Flex>
-                            {index < PLAN_CARD_FEATURES.length - 1 && (
-                              <Box
+                          )}
+                        </Flex>
+                        <Text
+                          sx={{
+                            fontSize: "sm",
+                            color: "paragraph",
+                            fontWeight: "normal"
+                          }}
+                        >
+                          {metadata.subtitle}
+                        </Text>
+                      </Flex>
+                      <Flex sx={{ flexDirection: "column" }}>
+                        {plan.recurring ? (
+                          <RecurringPricing plan={plan} />
+                        ) : (
+                          <OneTimePricing plan={plan} />
+                        )}
+                      </Flex>
+                      <Flex
+                        sx={{
+                          flexDirection: "column",
+                          gap: "16px"
+                        }}
+                      >
+                        {PLAN_CARD_FEATURES.map((feature, index) => {
+                          const caption =
+                            feature.availability[planToAvailability(plan.plan)]
+                              .caption;
+                          return (
+                            <Flex
+                              key={feature.id}
+                              sx={{ flexDirection: "column", gap: "16px" }}
+                            >
+                              <Flex
                                 sx={{
-                                  borderTop:
-                                    "1px solid var(--border-secondary)",
-                                  width: "100%"
+                                  justifyContent: "space-between",
+                                  alignItems: "center"
                                 }}
-                              />
-                            )}
-                          </Flex>
-                        );
-                      })}
+                              >
+                                <Flex
+                                  sx={{ gap: "12px", alignItems: "center" }}
+                                >
+                                  <FeatureIcon id={feature.id} />
+                                  <Text
+                                    sx={{
+                                      fontSize: "18px",
+                                      color: "paragraph",
+                                      fontWeight: "normal"
+                                    }}
+                                  >
+                                    {feature.title}
+                                  </Text>
+                                </Flex>
+                                <Text
+                                  sx={{
+                                    fontSize: "title",
+                                    fontWeight: "bold",
+                                    color: "paragraph"
+                                  }}
+                                >
+                                  <FeatureCaption caption={caption} />
+                                </Text>
+                              </Flex>
+                              {index < PLAN_CARD_FEATURES.length - 1 && (
+                                <Box
+                                  sx={{
+                                    borderTop:
+                                      "1px solid var(--border-secondary)",
+                                    width: "100%"
+                                  }}
+                                />
+                              )}
+                            </Flex>
+                          );
+                        })}
+                      </Flex>
                     </Flex>
+                    {selectedPlan === plan.id ? (
+                      <Flex sx={{ alignItems: "center", gap: 1 }}>
+                        <CheckCircleOutline color="accent" size={16} />
+                        <Text variant="subBody">You are on this plan.</Text>
+                      </Flex>
+                    ) : (
+                      <Button
+                        variant={isRecommended ? "new_accent" : "new_secondary"}
+                        onClick={() => onPlanSelected(plan)}
+                        sx={{
+                          width: "100%"
+                        }}
+                      >
+                        Select Plan
+                      </Button>
+                    )}
                   </Flex>
-                  {selectedPlan === plan.id ? (
-                    <Flex sx={{ alignItems: "center", gap: 1 }}>
-                      <CheckCircleOutline color="accent" size={16} />
-                      <Text variant="subBody">You are on this plan.</Text>
-                    </Flex>
-                  ) : (
-                    <Button
-                      variant={isRecommended ? "new_accent" : "new_secondary"}
-                      onClick={() => onPlanSelected(plan)}
-                      sx={{
-                        width: "100%"
-                      }}
-                    >
-                      Select Plan
-                    </Button>
-                  )}
-                </Flex>
-              );
-            })
-        )}
-      </Flex>
-
-      {/* <Text variant="body" sx={{ alignSelf: "center", mt: 2 }}> */}
-      {/* Cancel anytime. {PERIOD_METADATA[selectedPeriod].refundDays}-day */}
-      {/* money-back guarantee. */}
-      {/* </Text> */}
-      {/* <Button
-        variant="tertiary"
-        sx={{ alignSelf: "center", mt: 25 }}
-        onClick={() =>
-          document
-            .getElementById("compare-plans")
-            ?.scrollIntoView({ behavior: "smooth" })
-        }
-      >
-        Compare all plans
-      </Button> */}
+                );
+              })
+          )}
+        </Flex>
+        <Flex
+          sx={{
+            mt: "spacing7",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "space-between",
+            p: "spacing6",
+            bg: "background",
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "radius2"
+          }}
+        >
+          <Flex sx={{ alignItems: "flex-start", gap: "spacing6" }}>
+            <Flex
+              sx={{
+                width: "30px",
+                height: "30px",
+                alignItems: "center",
+                justifyContent: "center",
+                bg: "background-secondary",
+                borderRadius: "radius1",
+                flexShrink: 0
+              }}
+            >
+              <ShieldCheck size={20} color="icon" />
+            </Flex>
+            <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+              <Text
+                sx={{
+                  color: "heading",
+                  fontSize: "lg",
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                Cancel anytime
+              </Text>
+              <Text
+                sx={{
+                  color: "paragraph",
+                  fontSize: "sm",
+                  fontWeight: 400,
+                  lineHeight: 1
+                }}
+              >
+                14-day money back guarantee
+              </Text>
+            </Flex>
+          </Flex>
+          <Button
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "spacing3"
+            }}
+            onClick={() => CancelInfoDialog.show({})}
+          >
+            <Text
+              sx={{
+                color: "heading-secondary",
+                fontSize: "sm",
+                fontWeight: 600,
+                lineHeight: 1,
+                whiteSpace: "nowrap"
+              }}
+            >
+              Learn more
+            </Text>
+            <CaretDown
+              sx={{
+                rotate: "-90deg"
+              }}
+              size={15}
+              color="icon-secondary"
+            />
+          </Button>
+        </Flex>
+      </Box>
     </>
   );
 }
@@ -621,7 +694,7 @@ function RecurringPricing(props: PricingProps) {
             }}
           >
             {" "}
-            /Month
+            / Month
           </Text>
         )}
       </Text>
@@ -1215,4 +1288,123 @@ function toMonthlyPrice(price: number, period: Period) {
     : period === "5-year"
     ? (price / (12 * 5)).toFixed(2)
     : (price / 12).toFixed(2);
+}
+
+const CancelInfoDialog = DialogManager.register(function CancelInfoDialog(
+  props
+) {
+  return (
+    <Dialog
+      isOpen={true}
+      title="Cancel anytime, hassle-free"
+      description="You're in control. Cancel at anytime, no cancellation fees, no penalties ever. "
+      showCloseButton={true}
+      onClose={() => props.onClose(false)}
+      width={550}
+    >
+      <Flex
+        sx={{
+          my: "spacing7",
+          flexDirection: "column",
+          gap: "spacing4",
+          width: "100%"
+        }}
+      >
+        <CancelInfoCard
+          icon={CalendarBlank}
+          title="Cancel anytime"
+          description="Your subscription will remain active until the end of your current billing period. You won't be charged again unless you renew."
+        />
+        <CancelInfoCard
+          icon={Prohibit}
+          title="No cancellation fees"
+          description="We don't charge any fees for canceling your plan. You only pay for the subscription period you've already purchased."
+        />
+        <CancelInfoCard
+          icon={HandCoins}
+          title="Refund policy"
+          description="If you're not satisfied, you can request a refund by contacting our support team within 14 days of your purchase, subject to our refund policy."
+        />
+      </Flex>
+    </Dialog>
+  );
+});
+
+type CancelInfoCardProps = {
+  icon: React.ComponentType<{ size: number; color?: string }>;
+  title: string;
+  description: string;
+};
+
+function CancelInfoCard(props: CancelInfoCardProps) {
+  const Icon = props.icon;
+
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        px: "spacing3",
+        py: "spacing4",
+        bg: "background-secondary",
+        borderRadius: "12px"
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "flex-start",
+          justifyContent: "center",
+          gap: "spacing3",
+          flex: 1,
+          minWidth: 0
+        }}
+      >
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            width: "32px",
+            height: "32px",
+            bg: "background-tertiary",
+            borderRadius: "radius1",
+            flexShrink: 0
+          }}
+        >
+          <Icon size={15} color="icon" />
+        </Flex>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            gap: "spacing3",
+            alignItems: "flex-start",
+            flex: 1,
+            minWidth: 0
+          }}
+        >
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              whiteSpace: "nowrap"
+            }}
+          >
+            {props.title}
+          </Text>
+          <Text
+            sx={{
+              color: "paragraph",
+              fontSize: "xs",
+              fontWeight: 400,
+              lineHeight: 1.4
+            }}
+          >
+            {props.description}
+          </Text>
+        </Flex>
+      </Flex>
+    </Flex>
+  );
 }

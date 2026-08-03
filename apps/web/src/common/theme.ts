@@ -60,7 +60,7 @@ export const THEME_LIGHT: any = {
         paragraph: "#858585",
         background: "#F7F7F7",
         border: "#EFEFEF",
-        heading: "#4B4B4B",
+        heading: "#6F6F6F",
         icon: "#666666",
         separator: "#E8E8E8",
         placeholder: "#999999",
