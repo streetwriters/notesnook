@@ -17,7 +17,7 @@ Free accounts can keep up to 50 tags. Essential raises the cap to 500, and Pro a
 
 ## Tagging a note
 
-::::tabs key:platform
+:::tabs key:platform
 == Desktop/Web
 
 1. Click the note you want to add tags to and open it in the editor
@@ -28,8 +28,6 @@ Free accounts can keep up to 50 tags. Essential raises the cap to 500, and Pro a
 Added tags appear at the bottom of each note item in the notes list. Clicking on the tag takes you to the respective tag.
 
 ![A note in the desktop list showing its tags along the bottom of the row](/tagged-note.png)
-
-:::
 
 == Mobile
 
@@ -46,8 +44,6 @@ Added tags also appear at the bottom of each note item in the notes list.
 
 ![A note in the mobile list showing its tags along the bottom of the row](/tagged-note-mobile.png)
 
-:::
-:
 :::
 
 ## Accessing your tags

@@ -75,7 +75,7 @@ You can create notebooks inside other notebooks. Open any notebook's properties 
 == Mobile
 
 1. Go to the notebooks section by tapping on the notebook icon, and open a notebook
-2. Tap the ![Add a note](/plus-button-mobile.png) button at the bottom right to open the editor, or **swipe from right to left**.
+2. Tap the ![Add a note](/plus-button-desktop.png) button at the bottom right to open the editor, or **swipe from right to left**.
 3. Start writing in editor to create a note in the notebook
 
 :::
@@ -134,7 +134,7 @@ In Notesnook a single note can exist in multiple Notebooks. However, a note will
 
 ## Remove note from a notebook
 
-::::tabs key:platform
+:::tabs key:platform
 == Desktop/Web
 
 1. Right click a note
@@ -147,11 +147,10 @@ In Notesnook a single note can exist in multiple Notebooks. However, a note will
 2. Tap `{{addToNotebook}}`.
 3. Unselect the notebooks you wish to remove this note from, and press the checkmark in the bottom right corner.
 
+:::
+
 ::: warning You can only add or remove a note from a notebook.
 Attempting to do both at the same time will not work, and the note will not be removed from _any_ notebook.
-
-:::
-:
 :::
 
 ## Set a default notebook <PlanTag plan="pro" />

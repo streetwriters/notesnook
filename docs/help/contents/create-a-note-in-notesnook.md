@@ -13,7 +13,7 @@ schema: howto
 
 You are in a note taking app, the first thing you'd want to do is create a note.
 
-::::tabs key:platform
+:::tabs key:platform
 == Desktop/Web
 
 1.  Click the `+` button on top right corner or click anywhere inside the editor to focus it.
@@ -27,8 +27,6 @@ The bottom right corner of the app will show the number of words of current note
 
 ![The editor status bar at the bottom right, showing the word count and last saved time](/editor-status-bar-desktop.png)
 
-:::
-
 == Mobile
 
 1. On mobile regardless of what screen you are on, you can swipe from right to left to open the editor.
@@ -41,8 +39,6 @@ The bottom right corner of the app will show the number of words of current note
 ::: info
 Below the note title is the editor status bar. It shows you the number of words in the note and last saved time.
 
-:::
-:
 :::
 
 And that is how you create your first private note in Notesnook!
