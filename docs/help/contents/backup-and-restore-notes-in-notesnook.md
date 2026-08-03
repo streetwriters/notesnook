@@ -20,7 +20,7 @@ Since all your data is end-to-end encrypted, we have no way to restore your acco
 
 :::
 
-::::tabs key:platform
+:::tabs key:platform
 == Desktop/Web
 
 1. Go to `{{settings}}`.
@@ -42,14 +42,12 @@ On **Android** when you take a backup for the first time, you will be asked to s
 Regardless of the folder you select, Notesnook will create a folder "Notesnook/backups" inside it and store all backup files there.
 
 :::
-:
-:::
 
 ## Turn on automatic backups
 
 For maximum safety against potential data loss, you can enable daily, weekly or monthly backups of your notes. Enabling automatic backups will ensure that all your data is safely backed up locally after a regular interval.
 
-::::tabs key:platform
+:::tabs key:platform
 == Desktop
 
 1. Go to `{{settings}}`.

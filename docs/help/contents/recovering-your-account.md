@@ -28,7 +28,7 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 
 :::
 
-::::tabs key:platform
+:::tabs key:platform
 == Desktop/Web
 
 1. Go to [Notesnook Login page](https://app.notesnook.com/login)
@@ -47,11 +47,6 @@ The recent versions of Notesnook have updated the login flow. It is now **mandat
 
 ![Recovery email in Notesnook](/static/account-recovery/recovery_email.png)
 
-::: info What if I didn't receive an email?
-_Check your spam/junk folder if you haven't received one & [contact us](mailto:support@streetwriters.co) if you still don't find it._
-
-:::
-
 8. Click the `Reset your password` button in the email. This takes you to the account recovery page.
 
 == Mobile
@@ -64,8 +59,12 @@ You can request the recovery email from the mobile app, but the recovery itself 
 4. Tap `{{forgotPassword}}` under the password field.
 5. Confirm your email in the sheet that opens and send the recovery email. You should see `{{recoveryEmailSent}}`.
 6. Open the email on any device and click `Reset your password` to continue in a browser.
-   :
-   :::
+
+:::
+
+::: info What if I didn't receive an email?
+_Check your spam/junk folder if you haven't received one & [contact us](mailto:support@streetwriters.co) if you still don't find it._
+:::
 
 ## Choosing an account recovery method
 

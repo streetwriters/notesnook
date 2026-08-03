@@ -17,7 +17,7 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
 
 1. Activate the web clipper by clicking on the Notesnook icon in your browser toolbar
 
-   :::: info Pin the Notesnook Web Clipper to toolbar
+   ::: info Pin the Notesnook Web Clipper to toolbar
    Modern browsers group all extensions under their Extensions dropdown by default. It is recommended that you `Pin to toolbar` the Notesnook Web Clipper.
 
    :::tabs
@@ -26,9 +26,7 @@ Before you can clip pages, you must connect the web clipper with the Notesnook w
    == Firefox
    ![How to pin the Notesnook Web Clipper to toolbar in Firefox](/static/web-clipper/firefox-pin-to-toolbar.gif)
 
-:::
-:
-:::
+   :::
 
 2. Click `Connect with Notesnook`
 3. Notesnook web app will open in a new tab in the background. Wait a few seconds and the web clipper should automatically connect.
@@ -109,7 +107,7 @@ The Notesnook Web Clipper offers 3 easy ways to organize your web clips (all of 
 
 ![The Notesnook Web Clipper options for appending to a note, adding to a notebook, or assigning tags](/static/web-clipper/organize-web-clip.png)
 
-::::tabs
+:::tabs
 == Append to note
 You can choose to append your web clip to an existing note and it'll be automatically added at the bottom of that note:
 
@@ -118,13 +116,11 @@ You can choose to append your web clip to an existing note and it'll be automati
 
 == Add to notebook
 
-::: info
-You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
-
-:::
-
 1. Click `Select a notebook`
 2. Select the notebook you want to add the web clip to
+
+::: info
+You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
 
 == Assign tags
 
@@ -133,8 +129,8 @@ You can only assign the web clip to an existing notebook. Creating new notebooks
 3. You can also create & assign a new tag by typing in the search bar
 
    ![Assigning a tag to a web clip from the web clipper](/static/web-clipper/assign-a-tag.gif)
-   :
-   :::
+
+:::
 
 ## Saving your web clip
 
