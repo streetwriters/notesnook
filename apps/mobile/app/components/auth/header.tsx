@@ -63,7 +63,6 @@ export const AuthHeader = (props: { welcome?: boolean }) => {
               presentDialog({
                 title: strings.offlineMode(),
                 paragraph: strings.offlineModeDesc(),
-                paragraphColor: colors.primary.accent,
                 positiveText: strings.understand(),
                 positivePress: hideAuth as any
               });
