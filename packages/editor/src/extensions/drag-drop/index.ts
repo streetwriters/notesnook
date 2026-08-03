@@ -112,6 +112,8 @@ type Drag = {
   /** measured before the item is hidden, when it still has a size */
   height: number;
   startX: number;
+  /** the list reads right to left, so nesting is a drag to the left */
+  rtl: boolean;
   gap?: DropGap;
   preview: HTMLElement;
   /** what the preview is currently as wide as */
@@ -164,6 +166,7 @@ export function startItemDrag(
       offsetY: box.top - event.clientY,
       height: row.getBoundingClientRect().height,
       startX: event.clientX,
+      rtl: getComputedStyle(item).direction === "rtl",
       preview,
       previewWidth: box.width,
       scroller: getScroller(view.dom)
@@ -353,7 +356,8 @@ function findGap(
   // dropping the item into itself is a no-op: leave the gap alone
   if (closest > drag.pos && closest < drag.end) return undefined;
 
-  const nest = x - drag.startX > NEST_THRESHOLD && canNest(view, closest, drag);
+  const toEnd = drag.rtl ? drag.startX - x : x - drag.startX;
+  const nest = toEnd > NEST_THRESHOLD && canNest(view, closest, drag);
   return { pos: closest, height: drag.height, indent: nest ? NEST_INDENT : 0 };
 }
 
@@ -399,13 +403,14 @@ function moveItem(view: EditorView, from: number, to: number) {
   const item = state.doc.nodeAt(from);
   if (!item) return null;
 
+  if (to === from || to === from + item.nodeSize) return from;
+
   // NOTE: `deleteRange`, not `delete`: taking the only child out of a
   // nested list leaves the list empty, and an empty list is not valid
   // content, so it would be filled with a blank item. This takes the list
   // itself away instead.
   const tr = state.tr.deleteRange(from, from + item.nodeSize);
   const at = Math.min(tr.mapping.map(to), tr.doc.content.size);
-  const deleted = tr.doc;
 
   // the target is always a task list, but guard anyway: dropping the item
   // where it does not fit would put it somewhere unexpected
@@ -413,15 +418,17 @@ function moveItem(view: EditorView, from: number, to: number) {
   if (!$at.parent.canReplaceWith($at.index(), $at.index(), item.type))
     return null;
 
+  const steps = tr.steps.length;
   tr.replaceRangeWith(at, at, item);
-  // nowhere it fits, or already exactly there
-  if (tr.doc.eq(deleted)) return null;
-  if (tr.doc.eq(state.doc)) return at;
+
+  if (tr.steps.length === steps) return null;
 
   // select the item, but only if it really landed where we think it did:
   // NodeSelection throws if there is no node right after `at`
   const node = tr.doc.resolve(at).nodeAfter;
-  if (node?.type === item.type) tr.setSelection(NodeSelection.create(tr.doc, at)); // prettier-ignore
+  if (node?.type === item.type) {
+    tr.setSelection(NodeSelection.create(tr.doc, at));
+  }
 
   view.dispatch(tr.setMeta("uiEvent", "drop"));
   return at;
@@ -455,9 +462,8 @@ function autoScroll(drag: Drag, y: number) {
 
 function getScroller(element: HTMLElement): HTMLElement | null {
   for (let node = element.parentElement; node; node = node.parentElement) {
-    const { overflowY } = getComputedStyle(node);
-    if (/auto|scroll/.test(overflowY) && node.scrollHeight > node.clientHeight)
-      return node;
+    if (node.scrollHeight <= node.clientHeight) continue;
+    if (/auto|scroll/.test(getComputedStyle(node).overflowY)) return node;
   }
   return null;
 }
