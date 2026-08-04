@@ -230,7 +230,7 @@ class RecoveryKeySheet extends React.Component {
           >
             <Paragraph
               color={colors.primary.paragraph}
-              size={AppFontSize.sm}
+              size={AppFontSize.md}
               numberOfLines={2}
               selectable
               style={{
@@ -238,7 +238,9 @@ class RecoveryKeySheet extends React.Component {
                 maxWidth: "100%",
                 paddingRight: 10,
                 textAlign: "center",
-                textDecorationLine: "underline"
+                textDecorationLine: "underline",
+                letterSpacing: 0.5,
+                fontFamily: "monospace"
               }}
             >
               {this.state.key}
