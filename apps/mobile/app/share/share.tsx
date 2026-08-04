@@ -447,7 +447,7 @@ const ShareView = () => {
     if (index > -1) {
       setRawFiles((state) => {
         const files = [...state];
-        files.splice(index);
+        files.splice(index, 1);
         return files;
       });
       RNFetchBlob.fs.unlink(item.value).catch(console.log);
