@@ -28,7 +28,7 @@ import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import FormInput, { createFormRef, validators } from "../ui/input/form-input";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";

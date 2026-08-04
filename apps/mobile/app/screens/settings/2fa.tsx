@@ -49,7 +49,7 @@ import FormInput, {
   validators
 } from "../../components/ui/input/form-input";
 import { Pressable } from "../../components/ui/pressable";
-import Seperator from "../../components/ui/seperator";
+import Separator from "../../components/ui/separator";
 import { SvgView } from "../../components/ui/svg";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";

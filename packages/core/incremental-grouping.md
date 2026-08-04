@@ -5,7 +5,7 @@
 1. We do not want to bring all the items to the client side as that would take a lot of memory
 2. We want to preserve & customize sorting
 3. We want to avoid creating duplicate groups
-4. Each batch of items should append and add groups as necesary
+4. Each batch of items should append and add groups as necessary
 
 ## Approach
 
@@ -53,7 +53,7 @@ Approach:
 2. Request the first batch of `n` items.
 3. Group the first batch
 4. If user is moving downward:
-   1. When user moves closer to the the end of the first batch, load the next batch & group it accordingly
+   1. When user moves closer to the end of the first batch, load the next batch & group it accordingly
    2. Compare last & first groups of both batches
    3. If last & first groups are the same, remove the first group of the new batch
    4. Otherwise keep it & do nothing
