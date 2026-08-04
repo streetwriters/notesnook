@@ -809,7 +809,7 @@ export const VaultDialog: React.FC = () => {
           ) : null}
 
           {isDeleteVault && (
-            <Pressable
+            <Button
               onPress={() => setDeleteAll(!deleteAll)}
               icon={deleteAll ? "checkbox" : "box-empty"}
               iconFamily="notesnook"
