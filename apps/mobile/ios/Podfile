@@ -5,6 +5,8 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
+require_relative 'scripts/patch_fmt_consteval'
+
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
@@ -66,6 +68,10 @@ post_install do |installer|
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+  # Keep fmt buildable on Xcode >= 26.2. See ios/scripts/patch_fmt_consteval.rb.
+  PatchFmtConsteval.apply!(installer.sandbox.root)
+
   installer.pods_project.targets.each do |target|
   target.build_configurations.each do |config|
       config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
