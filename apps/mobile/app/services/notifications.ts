@@ -17,8 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getFormattedReminderTime } from "@notesnook/common";
-import { isReminderActive, Reminder } from "@notesnook/core";
+import { getFormattedDate, getFormattedReminderTime } from "@notesnook/common";
+import {
+  getUpcomingReminderTime,
+  isReminderActive,
+  Reminder
+} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee, {
   AndroidStyle,
@@ -262,7 +266,12 @@ const onEvent = async ({ type, detail }: Event) => {
 
 type ReminderWithFormattedTime = Reminder & {
   formattedTime?: string;
+  triggerDate?: number;
+  formattedTimeOfDay?: string;
+  formattedDateTime?: string;
 };
+
+const RECENTLY_PASSED_WINDOW = 3 * 60 * 60 * 1000;
 
 async function updateRemindersForWidget() {
   if (Platform.OS === "ios") return;
@@ -273,18 +282,33 @@ async function updateRemindersForWidget() {
       sortDirection: "asc"
     }
   );
-  const activeReminders = [];
+  const widgetReminders = [];
   if (!reminders) return;
   for (const reminder of reminders) {
-    if (isReminderActive(reminder)) {
-      reminder.formattedTime = getFormattedReminderTime(reminder);
-      activeReminders.push(reminder);
-    }
+    const triggerDate =
+      reminder.snoozeUntil && reminder.snoozeUntil > Date.now()
+        ? reminder.snoozeUntil
+        : reminder.mode === "repeat"
+          ? getUpcomingReminderTime(reminder)
+          : reminder.date;
+
+    const recentlyPassed =
+      reminder.mode === "once" &&
+      !reminder.disabled &&
+      triggerDate > Date.now() - RECENTLY_PASSED_WINDOW;
+
+    if (!isReminderActive(reminder) && !recentlyPassed) continue;
+
+    reminder.triggerDate = triggerDate;
+    reminder.formattedTimeOfDay = getFormattedDate(triggerDate, "time");
+    reminder.formattedDateTime = getFormattedDate(triggerDate, "date-time");
+    reminder.formattedTime = getFormattedReminderTime(reminder);
+    widgetReminders.push(reminder);
   }
   NotesnookModule.setString(
     "appPreview",
     "remindersList",
-    JSON.stringify(activeReminders)
+    JSON.stringify(widgetReminders)
   );
   NotesnookModule.updateReminderWidget();
 }

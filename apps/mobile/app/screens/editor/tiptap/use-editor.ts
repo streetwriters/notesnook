@@ -260,29 +260,65 @@ export const useEditor = (
       id,
       data,
       type,
-      ignoreEdit,
       sessionHistoryId: currentSessionHistoryId,
       tabId,
-      pendingChanges
+      pendingChanges,
+      sourceNoteId,
+      pendingChangesAt
     }: SavePayload) => {
       if (currentNotes.current[id as string]?.readonly || readonly) return;
+
+      if (sourceNoteId && id && sourceNoteId !== id) {
+        DatabaseLogger.error(
+          new Error(
+            `Refused to save content of note ${sourceNoteId} into note ${id}`
+          )
+        );
+        return;
+      }
+
       try {
         if (id && !(await db.notes?.note(id))) {
-          await reset(tabId);
-          useTabStore.getState().updateTab(tabId, {
-            session: {
-              noteId: undefined,
-              noteLocked: undefined,
-              locked: undefined,
-              readonly: undefined,
-              scrollTop: undefined,
-              selection: undefined,
-              spellCheckDisabled: false
-            }
-          });
+          if (useTabStore.getState().getNoteIdForTab(tabId) === id) {
+            await reset(tabId);
+            useTabStore.getState().updateTab(tabId, {
+              session: {
+                noteId: undefined,
+                noteLocked: undefined,
+                locked: undefined,
+                readonly: undefined,
+                scrollTop: undefined,
+                selection: undefined,
+                spellCheckDisabled: false
+              }
+            });
+          }
           return;
         }
         let note = id ? await db.notes?.note(id) : undefined;
+
+        // A restored pending change can be older than what is already in the
+        // db (it was saved on another device, or the save actually went
+        // through and only the acknowledgement was lost). Applying it would
+        // roll the note back, so verify it is still the newest edit. Content
+        // and title are compared separately so that a newer title doesn't
+        // discard pending content, and vice versa.
+        if (pendingChanges && pendingChangesAt && note) {
+          const dateEdited = data
+            ? note.contentId
+              ? (await db.content?.get(note.contentId))?.dateEdited
+              : undefined
+            : note.dateEdited;
+
+          if (dateEdited && dateEdited > pendingChangesAt) {
+            DatabaseLogger.log(
+              `Discarding stale pending ${
+                data ? "content" : "title"
+              } for note ${id}: edited at ${dateEdited}, change captured at ${pendingChangesAt}`
+            );
+            return id;
+          }
+        }
         const locked = note && (await db.vaults.itemExists(note));
 
         if (note?.conflicted) {
@@ -306,11 +342,6 @@ export const useEditor = (
 
         noteData.title = title;
 
-        if (ignoreEdit) {
-          DatabaseLogger.log("Ignoring edits...");
-          noteData.dateEdited = note?.dateEdited;
-        }
-
         if (data) {
           noteData.content = {
             data: data,
@@ -321,6 +352,9 @@ export const useEditor = (
         let saved = false;
         setTimeout(() => {
           if (saved) return;
+          // Don't report progress on a tab that has moved on to another note.
+          if (id && useTabStore.getState().getNoteIdForTab(tabId) !== id)
+            return;
           commands.setStatus(
             getFormattedDate(note ? note.dateEdited : Date.now(), "date-time"),
             strings.saving(),
@@ -436,14 +470,26 @@ export const useEditor = (
           }
         }
 
-        if (
-          id &&
-          id === useTabStore.getState().getCurrentNoteId() &&
-          pendingChanges
-        ) {
-          postMessage(NativeEvents.title, title || note?.title, tabId);
-          postMessage(NativeEvents.html, data, tabId);
-          currentNotes.current[id] = note;
+        if (id && pendingChanges) {
+          if (data) {
+            currentContents.current[id] = {
+              data: data,
+              type: "tiptap",
+              noteId: id
+            };
+          }
+          lastContentChangeTime.current[id] = Date.now();
+
+          // Push the restored change into the editor only if the note is
+          // actually open in a tab, and only into that tab.
+          const noteTabId = useTabStore.getState().getTabForNote(id);
+          if (noteTabId !== undefined) {
+            postMessage(NativeEvents.title, title || note?.title, noteTabId);
+            if (data) {
+              postMessage(NativeEvents.html, { data: data }, noteTabId);
+            }
+            currentNotes.current[id] = note;
+          }
         }
 
         if (!saveCount.current[tabId]) {
@@ -932,24 +978,25 @@ export const useEditor = (
       title,
       content,
       type,
-      ignoreEdit,
       noteId,
       tabId,
-      pendingChanges
+      pendingChanges,
+      sourceNoteId,
+      pendingChangesAt
     }: {
       noteId?: string;
       title?: string;
       content?: string;
       type: string;
-      ignoreEdit: boolean;
       tabId: string;
       pendingChanges?: boolean;
+      sourceNoteId?: string;
+      pendingChangesAt?: number;
     }) => {
       DatabaseLogger.log(
         `saveContent... title: ${!!title}, content: ${!!content}, noteId: ${noteId}`
       );
       if (
-        ignoreEdit ||
         lock.current ||
         (currentLoadingNoteId.current &&
           currentLoadingNoteId.current === noteId)
@@ -958,7 +1005,6 @@ export const useEditor = (
 
           lock.current: ${lock.current}
           currentLoadingNoteId.current: ${currentLoadingNoteId.current}
-          ignoreEdit: ${ignoreEdit}
         `);
         if (lock.current) {
           setTimeout(() => {
@@ -971,7 +1017,10 @@ export const useEditor = (
         return;
       }
 
-      if (noteId) {
+      // A restored pending change is not a live edit: it may still be
+      // discarded as stale by saveNote, so it must not claim to be the newest
+      // content until it is actually written.
+      if (noteId && !pendingChanges) {
         lastContentChangeTime.current[noteId] = Date.now();
         localTabState.current?.setEditTime(noteId, Date.now());
         localTabState?.current?.set(tabId, {
@@ -979,7 +1028,7 @@ export const useEditor = (
         });
       }
 
-      if (type === EditorEvents.content && noteId) {
+      if (type === EditorEvents.content && noteId && !pendingChanges) {
         currentContents.current[noteId as string] = {
           data: content,
           type: "tiptap",
@@ -992,15 +1041,17 @@ export const useEditor = (
         data: content,
         type: "tiptap",
         id: noteId,
-        ignoreEdit,
         sessionHistoryId: noteId ? editorSessionHistory.get(noteId) : undefined,
         tabId: tabId,
-        pendingChanges
+        pendingChanges,
+        sourceNoteId,
+        pendingChangesAt
       };
+
       withTimer(
-        noteId || "newnote",
+        `${noteId || tabId}:${type}`,
         () => {
-          if (!params.id) {
+          if (!params.id && !params.sourceNoteId) {
             params.id = useTabStore.getState().getNoteIdForTab(tabId);
           }
           if (onChange && params.data) {
@@ -1018,7 +1069,7 @@ export const useEditor = (
             saveNote(params);
           }
         },
-        ignoreEdit ? 0 : 150
+        150
       );
     },
     [editorSessionHistory, withTimer, onChange, saveNote]

@@ -143,9 +143,6 @@ export const Dialog = ({ context = "global" }: { context?: string }) => {
   }, [hide, show]);
 
   const onNegativePress = async () => {
-    if (dialogInfo?.onClose) {
-      await dialogInfo.onClose();
-    }
     hide();
   };
 

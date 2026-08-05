@@ -30,6 +30,7 @@ import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotes } from "../../stores/use-notes-store";
 import { openEditor } from "../notes/common";
+import { db } from "../../common/database";
 
 export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
   const [notes, loading] = useNotes();
@@ -59,7 +60,8 @@ export const Home = ({ navigation, route }: NavigationProps<"Notes">) => {
             placeholder: strings.searchInRoute(route.name),
             type: "note",
             title: route.name,
-            route: route.name
+            route: route.name,
+            items: db.notes.all
           });
         }}
         id={route.name}

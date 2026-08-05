@@ -27,10 +27,17 @@ import useNavigationStore, {
 } from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useSettingStore } from "../stores/use-setting-store";
-import { rootNavigatorRef } from "../utils/global-refs";
+import { fluidTabsRef, rootNavigatorRef } from "../utils/global-refs";
 import Navigation from "../services/navigation";
-import { isFeatureAvailable } from "@notesnook/common";
+import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import { isInternalLink, parseInternalLink } from "@notesnook/core";
+import { eSendEvent } from "../services/event-manager";
+import { editorState } from "../screens/editor/tiptap/utils";
+import { eOnLoadNote } from "../utils/events";
+import { strings } from "@notesnook/intl";
+import PaywallSheet from "../components/sheets/paywall";
+import { presentDialog } from "../components/dialog/functions";
+import { launchNewNoteTab } from "../hooks/use-shortcut-manager";
 
 const RootStack = createNativeStackNavigator();
 const AppStack = createNativeStackNavigator();
@@ -300,8 +307,15 @@ export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
+
+  const initialShortcut = React.useRef(
+    useSettingStore.getState().pendingShortcut
+  ).current;
+
+  const reminderFeature = useIsFeatureAvailable("activeReminders");
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const resetTimer = React.useRef<NodeJS.Timeout>(undefined);
+
   const onStateChange = React.useCallback(
     (state: any) => {
       if (useSelectionStore.getState().selectionMode) {
@@ -316,13 +330,66 @@ export const RootNavigation = () => {
     [clearSelection]
   );
 
+  React.useEffect(() => {
+    const unsubscribe = useSettingStore.subscribe((state, prevState) => {
+      const pendingShortcut = state.pendingShortcut;
+
+      if (pendingShortcut === prevState.pendingShortcut || !pendingShortcut) {
+        return;
+      }
+
+      if (pendingShortcut.type === "notesnook.action.newreminder") {
+        if (reminderFeature === undefined) return;
+
+        if (!reminderFeature.isAllowed) {
+          presentDialog({
+            title: strings.upgrade(),
+            paragraph: reminderFeature.error,
+            positiveText: strings.upgrade(),
+            negativeText: strings.cancel(),
+            positivePress: async () => {
+              PaywallSheet.present(reminderFeature);
+            }
+          });
+          useSettingStore.setState({
+            pendingShortcut: null
+          });
+          return;
+        }
+
+        rootNavigatorRef.current?.navigate("AddReminder" as any);
+      } else if (pendingShortcut.type === "notesnook.action.newnote") {
+        if (fluidTabsRef.current) {
+          rootNavigatorRef.current?.navigate("FluidPanelsView" as any);
+          eSendEvent(eOnLoadNote, { newNote: true });
+          editorState().movedAway = false;
+          fluidTabsRef.current.goToPage("editor", true);
+        } else {
+          launchNewNoteTab();
+
+          rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
+            initialPage: "editor"
+          });
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [reminderFeature]);
+
+  const initialRouteName = !introCompleted
+    ? "Welcome"
+    : initialShortcut?.type === "notesnook.action.newreminder"
+      ? "AddReminder"
+      : "FluidPanelsView";
+
   return (
     <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
       <RootStack.Navigator
         screenOptions={{
           headerShown: false
         }}
-        initialRouteName={introCompleted ? "FluidPanelsView" : "Welcome"}
+        initialRouteName={initialRouteName}
       >
         <RootStack.Screen
           name="Welcome"
@@ -346,6 +413,12 @@ export const RootNavigation = () => {
               FluidPanelsView ||
               require("../navigation/fluid-panels-view").default;
             return FluidPanelsView;
+          }}
+          initialParams={{
+            initialPage:
+              initialShortcut?.type === "notesnook.action.newnote"
+                ? "editor"
+                : undefined
           }}
         />
 

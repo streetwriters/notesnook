@@ -4,9 +4,28 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
     <string name="take_a_quick_note">Take a quick note.</string>
-    <string name="reminders">Quick overview of upcoming reminders</string>
+    <string name="reminders">Quick overview of reminders</string>
     <string name="reminders_title">Reminders</string>
     <string name="note">Note</string>
     <string name="note_description">Add a note to home screen</string>
     <string name="quick_note">Quick note</string>
+    <string name="widget_reminders_empty">Tap + to add a reminder</string>
+
+    <!-- Sample content, only ever shown in the widget picker's preview. -->
+    <string name="widget_preview_note_title">Meeting notes</string>
+    <string name="widget_preview_note_body">Discuss the roadmap and agree on timelines.</string>
+    <string name="widget_preview_reminder_title">Take a walk</string>
+    <string name="widget_preview_reminder_time">Upcoming: Today, 5:00 PM</string>
+    <string name="widget_preview_reminder_title_alt">Call the dentist</string>
+    <string name="widget_preview_reminder_time_alt">Upcoming: Tomorrow, 9:00 AM</string>
+
+    <string name="widget_note_unconfigured_title">Tap to choose a note</string>
+    <string name="widget_note_unconfigured_body">Pick the note you want shown here.</string>
+    <string name="reminder_ongoing">Ongoing</string>
+    <string name="reminder_snoozed_until">Snoozed until %1$s</string>
+    <string name="reminder_today">Today, %1$s</string>
+    <string name="reminder_tomorrow">Tomorrow, %1$s</string>
+    <string name="reminder_yesterday">Yesterday, %1$s</string>
+    <string name="reminder_upcoming">Upcoming: %1$s</string>
+    <string name="reminder_last">Last: %1$s</string>
 </resources>

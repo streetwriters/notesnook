@@ -153,18 +153,17 @@ export function useEditorController({
   const titleChange = useCallback(async (title: string) => {
     if (!isReactNative()) return;
     const currentSessionId = globalThis.sessionId;
-    post(
-      EditorEvents.contentchange,
-      undefined,
-      tabRef.current.id,
-      tabRef.current.session?.noteId
-    );
+    const editedAt = Date.now();
+
+    const tabId = tabRef.current.id;
+    const noteId = tabRef.current.session?.noteId;
+    post(EditorEvents.contentchange, undefined, tabId, noteId);
     const params = [
       {
         title
       },
-      tabRef.current.id,
-      tabRef.current.session?.noteId,
+      tabId,
+      noteId,
       currentSessionId,
       1000
     ];
@@ -186,12 +185,12 @@ export function useEditorController({
           `Saving title failed, setting pending request ${pendingTitleIds.length}`
         );
         if (params[2]) {
-          pendingSaveRequests.setTitle(params);
+          pendingSaveRequests.setTitle(params, editedAt);
         }
         const element = document.getElementById("editor-saving-failed-overlay");
         if (element) {
           element.style.display = "flex";
-          editors[tabRef.current.id]?.commands?.blur();
+          editors[tabId]?.commands?.blur();
           element.focus();
         }
       });
@@ -216,27 +215,44 @@ export function useEditorController({
         logger("info", "Edit skipped, tab is in loading state");
         return;
       }
+
+      if (ignoreEdit) {
+        logger("info", "Ignoring ignoreEdit update, a save is already pending");
+        return;
+      }
+
       const currentSessionId = globalThis.sessionId;
-      post(
-        EditorEvents.contentchange,
-        undefined,
-        tabRef.current.id,
-        tabRef.current.session?.noteId
-      );
+      const tabId = tabRef.current.id;
+      const noteId = tabRef.current.session?.noteId;
+      post(EditorEvents.contentchange, undefined, tabId, noteId);
       if (!editor) return;
       if (typeof timers.current.change === "number") {
         clearTimeout(timers.current?.change);
       }
 
       timers.current.change = setTimeout(async () => {
+        if (tabRef.current.session?.noteId !== noteId) {
+          logger(
+            "info",
+            `Edit discarded, tab ${tabId} moved from note ${noteId} to ${tabRef.current.session?.noteId}`
+          );
+          return;
+        }
+        if (editorControllers[tabId]?.loading) {
+          logger("info", "Edit discarded, tab is in loading state");
+          return;
+        }
+
+        const editedAt = Date.now();
         htmlContentRef.current = editor.getHTML();
+
         const params = [
           {
             html: htmlContentRef.current,
             ignoreEdit: ignoreEdit
           },
-          tabRef.current.id,
-          tabRef.current.session?.noteId,
+          tabId,
+          noteId,
           currentSessionId,
           5000
         ];
@@ -262,7 +278,7 @@ export function useEditorController({
               }`
             );
             if (params[2]) {
-              pendingSaveRequests.setContent(params);
+              pendingSaveRequests.setContent(params, editedAt);
             }
 
             const element = document.getElementById(
@@ -275,7 +291,7 @@ export function useEditorController({
           });
 
         logger("info", "Editor saving content", params[1], params[2]);
-      }, 300);
+      }, 100);
 
       countWords(5000);
     },

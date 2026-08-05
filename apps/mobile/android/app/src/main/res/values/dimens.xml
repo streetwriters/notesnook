@@ -7,4 +7,8 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     -->
     <dimen name="widget_margin">0dp</dimen>
 
+    <!-- Overridden in values-v31 with the platform's own widget radius, so our widgets match the
+         rest of the home screen. This is the fallback for older versions. -->
+    <dimen name="widget_background_radius">10dp</dimen>
+
 </resources>
