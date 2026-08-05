@@ -373,7 +373,7 @@ export class Sync {
     const versionMap = new Map<string, number>();
 
     for (const item of chunk.items) {
-      const keyVersion = item.keyVersion ?? KEY_VERSION.LEGACY;
+      const keyVersion = item.keyVersion ?? KEY_VERSION.UNKNOWN;
       const group = itemsByKeyVersion.get(keyVersion);
       if (group) {
         group.push(item);
@@ -381,6 +381,37 @@ export class Sync {
         itemsByKeyVersion.set(keyVersion, [item]);
       }
       versionMap.set(item.id, item.v);
+    }
+
+    const unknownKeyVersionItems = itemsByKeyVersion.get(KEY_VERSION.UNKNOWN);
+    if (
+      unknownKeyVersionItems &&
+      unknownKeyVersionItems.length > 0 &&
+      keys.length > 1
+    ) {
+      this.logger.info(
+        `Decrypting ${unknownKeyVersionItems.length} items with unknown key version using all available keys.`
+      );
+      for (const item of unknownKeyVersionItems ?? []) {
+        for (const keyInfo of keys) {
+          try {
+            this.logger.info("Decrypting unknown key version item using key", {
+              keyInfo: keyInfo.version
+            });
+            const decryptedItem = await this.db
+              .storage()
+              .decrypt(keyInfo.key, item);
+            decrypted.push(decryptedItem);
+            break;
+          } catch (error) {
+            this.logger.error(
+              new Error(
+                `Failed to decrypt item ${item.id} with key version ${keyInfo.version}.`
+              )
+            );
+          }
+        }
+      }
     }
 
     for (const keyInfo of keys) {

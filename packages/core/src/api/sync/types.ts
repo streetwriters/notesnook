@@ -21,7 +21,8 @@ import { Cipher } from "@notesnook/crypto";
 
 export const KEY_VERSION = {
   LEGACY: 0,
-  DEK: 1
+  DEK: 1,
+  UNKNOWN: -1
 } as const;
 
 export type KeyVersion = (typeof KEY_VERSION)[keyof typeof KEY_VERSION];
