@@ -27,7 +27,7 @@ import {
   isFeatureAvailable,
   useIsFeatureAvailable
 } from "@notesnook/common";
-import { isImage } from "@notesnook/core";
+import { isImageFile } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -421,8 +421,8 @@ const ShareView = () => {
         const html = !rawData.value
           ? ""
           : isURL(rawData?.value)
-            ? makeHtmlFromUrl(rawData?.value)
-            : makeHtmlFromPlainText(rawData?.value);
+          ? makeHtmlFromUrl(rawData?.value)
+          : makeHtmlFromPlainText(rawData?.value);
         setNote((note) => {
           note.content.data = html;
           noteContent.current = html;
@@ -628,7 +628,7 @@ const ShareView = () => {
                       </Paragraph>
                       <ScrollView horizontal>
                         {rawFiles.map((item) =>
-                          isImage(item.type) || item.value?.endsWith(".png") ? (
+                          isImageFile(item.name, item.type) ? (
                             <TouchableOpacity
                               onPress={() => onRemoveFile(item)}
                               key={item.name}
@@ -701,7 +701,9 @@ const ShareView = () => {
                       >
                         Tap to remove an attachment.
                       </Paragraph>
-                      {rawFiles.some((item) => isImage(item.type)) ? (
+                      {rawFiles.some((item) =>
+                        isImageFile(item.name, item.type)
+                      ) ? (
                         <TouchableOpacity
                           activeOpacity={1}
                           style={{
