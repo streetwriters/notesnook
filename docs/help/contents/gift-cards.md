@@ -1,6 +1,21 @@
 ---
 title: Gift cards
-description: Gift your friends and family a Notesnook Pro subscription.
+pageTitle: Notesnook gift cards — buying and redeeming a gift code
+description: Buy a Notesnook gift card for one, three or five years, send the code to anyone, and redeem it on an account that is currently on the free plan.
+keywords:
+  - notesnook gift card
+  - gift notesnook subscription
+  - redeem notesnook code
+schema: faq
+faqs:
+  - q: Who can redeem a Notesnook gift code?
+    a: Anyone whose account is currently on the free plan. You cannot redeem a gift code on an account with an active subscription, and a cancelled subscription counts as active until its billing period ends.
+  - q: Can I use a gift card to extend my existing subscription?
+    a: No. Your current subscription has to end completely before a gift code can be redeemed on that account.
+  - q: Do Notesnook gift codes expire?
+    a: Yes, one year from the date of purchase.
+  - q: Are Notesnook gift cards refundable or auto-renewing?
+    a: Neither. Gift codes are non-refundable and are a one-time purchase that never renews.
 ---
 
 # Gift cards
@@ -19,39 +34,43 @@ You can purchase a gift card from [https://notesnook.com/giftcards](https://note
 - 3 years gift card
 - 5 years gift card
 
-> info
->
-> Gift cards are not attached to a user account and can be claimed by any Notesnook user.
+::: info
+Gift cards are not attached to a user account and can be claimed by any Notesnook user.
+
+:::
 
 ## Redeem a gift code
 
-> info
->
-> You can't redeem a gift code on an account with an active Notesnook subscription. A cancelled subscription is still active until its current billing period ends.
+::: info
+You can't redeem a gift code on an account with an active Notesnook subscription. A cancelled subscription is still active until its current billing period ends.
 
-# [Desktop/Web](#/tab/web)
+:::
 
-1. Go to `Settings`
-2. Go to `Subscription settings`
-3. Click on `Redeem a gift code` button
+:::tabs key:platform
+== Desktop/Web
+
+1. Go to `{{settings}}`
+2. Go to `{{subDetails}}`
+3. Click `{{redeemGiftCode}}` button
 4. Enter the gift code you received
-5. Click on `Submit` and wait for the app to verify your gift code.
+5. Click `{{submit}}` and wait for the app to verify your gift code.
 6. Once the process succeeds, you should be upgraded to Pro.
 
-# [Mobile](#/tab/mobile)
+== Mobile
 
-1. Go to `Settings`
-2. Go to `Account settings`
-3. Tap on `Redeem a gift code`
+1. Go to `{{settings}}`
+2. Go to `{{account}}`
+3. Tap `{{redeemGiftCode}}`
 4. Enter the gift code you received
-5. Tap on `Redeem` and wait for the app to verify your gift code.
+5. Tap `{{redeem}}` and wait for the app to verify your gift code.
 6. Once the process succeeds, you should be upgraded to Pro.
 
----
+:::
 
-> info
->
-> Once you redeem a gift code, the person who purchased it will receive an email informing them that one of their gift codes was claimed. The email **does not** contain any information about who claimed the gift code.
+::: info
+Once you redeem a gift code, the person who purchased it will receive an email informing them that one of their gift codes was claimed. The email **does not** contain any information about who claimed the gift code.
+
+:::
 
 ## FAQs
 
@@ -81,4 +100,9 @@ No. Gift cards are a one-time purchase.
 
 ### Can I use cryptocurrency to purchase a gift card?
 
-Currently, no. But we are actively working on a solution to support this so stay tuned.
+Yes! You can do so over at [Proxystore.](https://digitalgoods.proxysto.re/en)
+
+## Related pages
+
+- [Plans & limits](/plans-and-limits) — what each plan unlocks and the exact limits
+- [Account settings](/account-settings) — email, password and profile

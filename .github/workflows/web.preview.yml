@@ -27,7 +27,9 @@ jobs:
         uses: ./.github/actions/setup-node-with-cache
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
 
       - name: Build web
         run: npm run build:web

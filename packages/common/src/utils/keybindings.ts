@@ -168,7 +168,7 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   sinkListItem: {
-    keys: "Mod-Shift-Down",
+    keys: "Tab",
     description: "Sink list item",
     category: "Editor",
     type: "tiptap"
@@ -210,13 +210,13 @@ export const tiptapKeys = {
     type: "tiptap"
   },
   increaseFontSize: {
-    keys: "Ctrl-[",
+    keys: "Mod-[",
     description: "Increase font size",
     category: "Editor",
     type: "tiptap"
   },
   decreaseFontSize: {
-    keys: "Ctrl-]",
+    keys: "Mod-]",
     description: "Decrease font size",
     category: "Editor",
     type: "tiptap"
