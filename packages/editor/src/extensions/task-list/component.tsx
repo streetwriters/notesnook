@@ -236,12 +236,12 @@ export function TaskListComponent(
           if (readonly) e.preventDefault();
         }}
         sx={{
-          ul: {
+          "ul.tasklist-content-wrapper": {
             display: "block",
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0,
+            marginInlineStart: isNested ? (editor.isEditable ? -35 : -10) : 0,
             padding: 0
           },
           li: {
