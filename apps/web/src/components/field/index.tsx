@@ -31,6 +31,7 @@ type Action = {
   icon?: Icon;
   component?: JSX.Element;
   hidden?: boolean;
+  sx?: ThemeUIStyleObject;
 };
 export type FieldProps = InputProps & {
   label?: string;
@@ -184,7 +185,8 @@ function Field(props: FieldProps) {
                   margin: 0,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
+                  ...action.sx
                 }}
                 disabled={action.disabled}
               >
@@ -227,7 +229,8 @@ function Field(props: FieldProps) {
                   margin: 0,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
+                  ...action.sx
                 }}
                 disabled={action.disabled}
               >
