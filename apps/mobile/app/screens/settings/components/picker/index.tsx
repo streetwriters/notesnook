@@ -104,23 +104,21 @@ export function SettingsPicker<T>({
               fontSize={AppFontSize.sm}
               fontFamily="REGULAR"
               type={
-                compareValue(currentValue, item)
-                  ? "shade-plain"
-                  : "plain-outline"
+                compareValue(currentValue, item) ? "selected" : "plain-outline"
               }
               onPress={() => {
                 onChange(item);
               }}
               textStyle={{
                 color: compareValue(currentValue, item)
-                  ? colors.primary.heading
+                  ? colors.selected.heading
                   : colors.primary.paragraph
               }}
               style={{
                 paddingVertical: Spacing.LEVEL_1,
                 paddingHorizontal: Spacing.LEVEL_1,
                 borderRadius: Radius.XS,
-                borderWidth: 1,
+                borderWidth: compareValue(currentValue, item) ? 0 : 1,
                 borderColor: compareValue(currentValue, item)
                   ? "transparent"
                   : colors.primary.border

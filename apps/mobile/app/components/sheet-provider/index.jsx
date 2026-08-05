@@ -143,15 +143,16 @@ const SheetProvider = ({ context = "global" }) => {
                   borderRadius: Radius.XS,
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: colors.secondary.background
+                  backgroundColor:
+                    data.iconBackground || colors.secondary.background
                 }}
               >
                 {data.icon ? (
                   <AppIcon
-                    name="clock"
+                    name={data.icon}
                     iconFamily="notesnook"
                     size={16}
-                    color={colors.primary.icon}
+                    color={data.iconColor}
                   />
                 ) : (
                   <ActivityIndicator
@@ -169,7 +170,7 @@ const SheetProvider = ({ context = "global" }) => {
               <View
                 style={{
                   flex: 1,
-                  gap: Spacing.LEVEL_1
+                  gap: Spacing.LEVEL_0
                 }}
               >
                 {data.title ? (

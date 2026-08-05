@@ -1405,7 +1405,7 @@ $day$: Current day (eg. Monday)`,
   biometricsAuthFailedDesc: () => t`Wait 30 seconds to try again`,
   biometricsAuthCancelled: () => t`Authentication cancelled by user`,
   biometricsAuthError: () => t`Authentication failed`,
-  tryAgain: () => t`Tap to try again`,
+  tryAgain: () => t`Try again`,
   rateAppMessage: () => t`We would love to know what you think!`,
   rateAppActionText: (platform: string) =>
     platform === "ios"
@@ -3060,5 +3060,11 @@ Continue without attachments?`,
   disableSync: () => t`Disable sync`,
   disableSyncDesc: () =>
     t`Turns off syncing completely on this device. Any changes made will remain local only and new changes from your other devices won't sync to this device.`,
-  noNotesToExport: () => t`No notes to export`
+  noNotesToExport: () => t`No notes to export`,
+  anErrorOccured: () => t`An error occured`,
+  anErrorOccuredDuringSync: () =>
+    t`An error occured during sync. please try again in a moment.`,
+  youAreOffline: () => t`You are offline`,
+  groupCreated: () => t`Group created`,
+  groupDeleted: () => t`Group deleted`
 };

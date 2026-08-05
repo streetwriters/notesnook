@@ -145,6 +145,7 @@ export function MenuItem({
         width: "100%",
         alignSelf: "center",
         borderRadius: Radius.XS,
+        borderWidth: 0,
         flexDirection: "row",
         paddingHorizontal: Spacing.LEVEL_1,
         justifyContent: "space-between",

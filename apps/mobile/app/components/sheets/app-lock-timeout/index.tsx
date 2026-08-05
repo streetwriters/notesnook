@@ -139,7 +139,9 @@ function AppLockTimeout({ close }: AppLockTimeoutProps) {
                 padding: Spacing.LEVEL_2,
                 borderRadius: Radius.XS,
                 borderWidth: selected ? 0 : 1,
-                borderColor: colors.primary.border
+                borderColor: selected
+                  ? colors.selected.border
+                  : colors.secondary.border
               }}
             >
               <Heading

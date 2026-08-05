@@ -953,6 +953,14 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
+#: src/strings.ts:3064
+msgid "An error occured"
+msgstr ""
+
+#: src/strings.ts:3066
+msgid "An error occured during sync. please try again in a moment."
+msgstr ""
+
 #: src/strings.ts:249
 msgid "An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced."
 msgstr ""
@@ -3741,6 +3749,14 @@ msgstr ""
 
 #: src/strings.ts:570
 msgid "Group by"
+msgstr ""
+
+#: src/strings.ts:3068
+msgid "Group created"
+msgstr ""
+
+#: src/strings.ts:3069
+msgid "Group deleted"
 msgstr ""
 
 #: src/strings.ts:785
@@ -7414,10 +7430,6 @@ msgstr ""
 msgid "Tap to stop reordering"
 msgstr ""
 
-#: src/strings.ts:1408
-msgid "Tap to try again"
-msgstr ""
-
 #: src/strings.ts:290
 msgid "Tap twice to confirm you have saved the recovery key."
 msgstr ""
@@ -7768,6 +7780,7 @@ msgstr ""
 msgid "Try {plan} for free"
 msgstr "<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD<<<<<<< HEAD"
 
+#: src/strings.ts:1408
 #: src/strings.ts:2996
 msgid "Try again"
 msgstr ""
@@ -8498,6 +8511,10 @@ msgstr ""
 
 #: src/strings.ts:1416
 msgid "You are not logged in"
+msgstr ""
+
+#: src/strings.ts:3067
+msgid "You are offline"
 msgstr ""
 
 #: src/strings.ts:933
