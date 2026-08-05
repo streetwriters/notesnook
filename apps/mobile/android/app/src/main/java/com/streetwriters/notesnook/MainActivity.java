@@ -23,11 +23,32 @@ public class MainActivity extends ReactActivity {
   protected void onCreate(Bundle savedInstanceState) {
     RNBootSplash.init(this, R.style.BootTheme);
 
+    // Seed the metrics before React Native starts up...
+    DisplayMetricsSync.sync(this);
+
     super.onCreate(null);
+
+    // ...and again afterwards: super.onCreate() runs React Native's own
+    // initDisplayMetrics(), which unconditionally overwrites the screen metrics with the
+    // *default* display's. This second call is the one that actually sticks.
+    DisplayMetricsSync.sync(this);
+    DisplayMetricsSync.logState(this, "onCreate:after-super+sync");
+
     if (BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+
+    // Belt and braces: the first real layout pass happens after this, so make sure the metrics
+    // are still ours by then, and let JS re-read Dimensions if anything did change them.
+    DisplayMetricsSync.sync(this);
+    DisplayMetricsSync.emitDimensionsChanged(this, getReactHost());
+    DisplayMetricsSync.logState(this, "onResume");
   }
 
   /**
@@ -53,6 +74,14 @@ public class MainActivity extends ReactActivity {
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     getReactHost().onConfigurationChanged(this);
+
+    DisplayMetricsSync.logState(this, "onConfigurationChanged:before-sync");
+    // Must run after the calls above, which put the built-in panel's metrics back.
+    // See DisplayMetricsSync.
+    DisplayMetricsSync.sync(this);
+    DisplayMetricsSync.emitDimensionsChanged(this, getReactHost());
+    DisplayMetricsSync.logState(this, "onConfigurationChanged:after-sync");
+
     Intent intent = new Intent("onConfigurationChanged");
     intent.putExtra("newConfig", newConfig);
     this.sendBroadcast(intent);

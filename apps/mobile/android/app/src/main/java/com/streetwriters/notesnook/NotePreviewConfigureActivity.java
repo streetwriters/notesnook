@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import com.facebook.react.ReactActivity;
@@ -35,9 +36,30 @@ public class NotePreviewConfigureActivity extends ReactActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Seed before startup, then re-apply: super.onCreate() runs React Native's own
+        // initDisplayMetrics(), which overwrites the screen metrics. See DisplayMetricsSync.
+        DisplayMetricsSync.sync(this);
         super.onCreate(null);
+        DisplayMetricsSync.sync(this);
         activity = this;
         readAppWidgetId(getIntent());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DisplayMetricsSync.sync(this);
+        DisplayMetricsSync.emitDimensionsChanged(this, getReactHost());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Must run after super, which puts the built-in panel's metrics back.
+        // See DisplayMetricsSync.
+        DisplayMetricsSync.sync(this);
+        DisplayMetricsSync.emitDimensionsChanged(this, getReactHost());
     }
 
     /**

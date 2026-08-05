@@ -72,6 +72,7 @@ export type EditorProps = {
   editorId?: string;
   onLoad?: () => void;
   onChange?: (html: string) => void;
+  deviceMode?: string | null;
 };
 
 export type EditorMessage<T> = {

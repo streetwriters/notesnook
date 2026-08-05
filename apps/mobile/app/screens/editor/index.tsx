@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import { i18n } from "@lingui/core";
+import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
+import { strings } from "@notesnook/intl";
 import React, {
-  forwardRef,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useLayoutEffect,
   useRef,
   useState
@@ -33,12 +34,14 @@ import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
+import { useVaultStatus } from "../../hooks/use-vault-status";
 import BiometricService from "../../services/biometrics";
 import {
   ToastManager,
   eSendEvent,
   eSubscribeEvent
 } from "../../services/event-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
 import {
   eEditorReset,
   eOnLoadNote,
@@ -47,9 +50,10 @@ import {
   eUnlockWithPassword
 } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
+import { fluidTabsRef } from "../../utils/global-refs";
 import EditorOverlay from "./loading";
 import { EDITOR_URI } from "./source";
-import { EditorProps, useEditorType } from "./tiptap/types";
+import { EditorProps } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { syncTabs, useTabStore } from "./tiptap/use-tab-store";
@@ -59,12 +63,6 @@ import {
   openInternalLink,
   randId
 } from "./tiptap/utils";
-import { fluidTabsRef } from "../../utils/global-refs";
-import { strings } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
-import { useVaultStatus } from "../../hooks/use-vault-status";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 
 const style: ViewStyle = {
   height: "100%",
@@ -86,74 +84,60 @@ const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
   }
 };
 
-const Editor = React.memo(
-  forwardRef<
-    {
-      get: () => useEditorType;
-    },
-    EditorProps
-  >(
-    (
-      {
-        readonly = false,
-        noToolbar = false,
-        noHeader = false,
-        withController = true,
-        editorId = "",
-        onLoad,
-        onChange
-      },
-      ref
-    ) => {
-      const editor = useEditor(editorId || "", readonly, onChange);
-      const onMessage = useEditorEvents(editor, {
-        readonly,
-        noToolbar,
-        noHeader
-      });
-      const [renderKey, setRenderKey] = useState(
-        randId("editor-id") + editorId
-      );
-      useImperativeHandle(ref, () => ({
-        get: () => editor
-      }));
-      useLockedNoteHandler();
+const Editor = ({
+  readonly = false,
+  noToolbar = false,
+  noHeader = false,
+  withController = true,
+  editorId = "",
+  onLoad,
+  onChange
+}: EditorProps) => {
+  const editor = useEditor(editorId || "", readonly, onChange);
+  const onMessage = useEditorEvents(editor, {
+    readonly,
+    noToolbar,
+    noHeader
+  });
+  const [renderKey, setRenderKey] = useState(randId("editor-id") + editorId);
 
-      const onError = useCallback(() => {
-        setRenderKey(randId("editor-id") + editorId);
-        editor.state.current.ready = false;
-        editor.state.current.initialLoadCalled = false;
-        editor.setLoading(true);
-      }, [editor]);
+  useLockedNoteHandler();
 
-      useEffect(() => {
-        const sub = [eSubscribeEvent(eEditorReset, onError)];
-        return () => {
-          sub.forEach((s) => s?.unsubscribe());
-        };
-      }, [onError]);
+  const onError = useCallback(() => {
+    setRenderKey(randId("editor-id") + editorId);
+    editor.state.current.ready = false;
+    editor.state.current.initialLoadCalled = false;
+    editor.setLoading(true);
+  }, [editor]);
 
-      useLayoutEffect(() => {
-        setImmediate(() => {
-          onLoad && onLoad();
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [onLoad]);
+  useEffect(() => {
+    const sub = [eSubscribeEvent(eEditorReset, onError)];
+    return () => {
+      sub.forEach((s) => s?.unsubscribe());
+    };
+  }, [onError]);
 
-      if (withController) {
-        editorController.current = editor;
-      }
+  useLayoutEffect(() => {
+    setImmediate(() => {
+      onLoad && onLoad();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onLoad]);
 
-      return editor.loading ? null : (
-        <>
-          <WebView
-            testID={notesnook.editor.id}
-            ref={editor.ref}
-            key={renderKey}
-            onRenderProcessGone={onError}
-            nestedScrollEnabled
-            onError={onError}
-            injectedJavaScript={`
+  if (withController) {
+    editorController.current = editor;
+  }
+
+  return editor.loading ? null : (
+    <>
+      <WebView
+        testID={notesnook.editor.id}
+        ref={editor.ref}
+        key={renderKey}
+        onRenderProcessGone={onError}
+        nestedScrollEnabled
+        onError={onError}
+        injectedJavaScript={`
               globalThis.__DEV__ = ${__DEV__}
               globalThis.readonly=${readonly};
               globalThis.noToolbar=${noToolbar};
@@ -164,43 +148,40 @@ const Editor = React.memo(
               })};
               globalThis.loadApp();
           `}
-            useSharedProcessPool={false}
-            javaScriptEnabled={true}
-            focusable={true}
-            onContentProcessDidTerminate={onError}
-            setSupportMultipleWindows={false}
-            overScrollMode="never"
-            scrollEnabled={false}
-            keyboardDisplayRequiresUserAction={false}
-            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-            cacheMode="LOAD_DEFAULT"
-            cacheEnabled={true}
-            domStorageEnabled={true}
-            bounces={false}
-            setBuiltInZoomControls={false}
-            setDisplayZoomControls={false}
-            allowFileAccess={true}
-            scalesPageToFit={true}
-            hideKeyboardAccessoryView={false}
-            allowsFullscreenVideo={true}
-            allowFileAccessFromFileURLs={true}
-            allowsInlineMediaPlayback
-            allowUniversalAccessFromFileURLs={true}
-            originWhitelist={["*"]}
-            source={{
-              uri: EDITOR_URI
-            }}
-            style={style}
-            autoManageStatusBarEnabled={false}
-            onMessage={onMessage || undefined}
-          />
-          <EditorOverlay editor={editor} editorId={editorId} />
-        </>
-      );
-    }
-  ),
-  () => true
-);
+        useSharedProcessPool={false}
+        javaScriptEnabled={true}
+        focusable={true}
+        onContentProcessDidTerminate={onError}
+        setSupportMultipleWindows={false}
+        overScrollMode="never"
+        scrollEnabled={false}
+        keyboardDisplayRequiresUserAction={false}
+        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        cacheMode="LOAD_DEFAULT"
+        cacheEnabled={true}
+        domStorageEnabled={true}
+        bounces={false}
+        setBuiltInZoomControls={false}
+        setDisplayZoomControls={false}
+        allowFileAccess={true}
+        scalesPageToFit={true}
+        hideKeyboardAccessoryView={false}
+        allowsFullscreenVideo={true}
+        allowFileAccessFromFileURLs={true}
+        allowsInlineMediaPlayback
+        allowUniversalAccessFromFileURLs={true}
+        originWhitelist={["*"]}
+        source={{
+          uri: EDITOR_URI
+        }}
+        style={style}
+        autoManageStatusBarEnabled={false}
+        onMessage={onMessage || undefined}
+      />
+      <EditorOverlay editor={editor} editorId={editorId} />
+    </>
+  );
+};
 
 export default Editor;
 
