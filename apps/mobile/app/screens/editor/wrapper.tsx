@@ -136,7 +136,7 @@ export const EditorWrapper = ({ widths }: { widths: PaneWidths }) => {
             style={{ height: 1, padding: 0, width: 1, position: "absolute" }}
             blurOnSubmit={false}
           />
-          <Editor key="editor" withController={true} />
+          <Editor key={"editor" + deviceMode} withController={true} />
         </KeyboardAvoidingView>
       )}
     </View>
