@@ -151,6 +151,7 @@ export type PresentSheetOptions = {
   action: () => void;
   actionText: string;
   iconColor?: string;
+  iconBackground?: string;
   actionsArray: SheetAction[];
   learnMore: string;
   learnMorePress: () => void;

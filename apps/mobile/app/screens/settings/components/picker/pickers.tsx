@@ -43,7 +43,7 @@ import RNRestart from "react-native-restart";
 import { presentDialog } from "../../../../components/dialog/functions";
 import { eCloseSimpleDialog } from "../../../../utils/events";
 
-const DAY_FORMATS = ["short", "long"];
+const DAY_FORMATS = ["long", "short"];
 const DayFormatFormats = {
   short: "ddd",
   long: "dddd"
@@ -195,7 +195,7 @@ export const DayFormatPicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return `${strings.dayFormat()} (${dayjs().format(DayFormatFormats[item])})`;
+    return `${strings.dayFormat()} (${item === "long" ? "full" : "short"})`;
   },
   getItemKey: (item) => item,
   options: DAY_FORMATS as DayFormat[],
@@ -236,7 +236,7 @@ export const TimeFormatPicker = createSettingsPicker({
     });
   },
   formatValue: (item) => {
-    return `${strings[item]()} (${dayjs().format(TimeFormats[item])})`;
+    return `${strings[item]()}`;
   },
   getItemKey: (item) => item,
   options: TIME_FORMATS as TimeFormat[],

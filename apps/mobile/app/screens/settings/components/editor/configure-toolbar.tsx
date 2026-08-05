@@ -52,6 +52,10 @@ export const ConfigureToolbar = () => {
     const _data = data ? data.slice() : [];
     _data.push([]);
     useDragState.getState().setData(_data);
+    ToastManager.show({
+      message: strings.groupCreated(),
+      type: "success"
+    });
   };
 
   const renderGroups = () => {

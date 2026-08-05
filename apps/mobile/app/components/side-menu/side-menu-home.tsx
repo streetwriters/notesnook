@@ -30,7 +30,6 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { MenuItemsList } from "../../utils/menu-items";
-import { DefaultAppStyles } from "../../utils/styles";
 import ReorderableList from "../list/reorderable-list";
 import { MenuItemProperties } from "../sheets/menu-item-properties";
 import { Button } from "../ui/button";
@@ -56,7 +55,6 @@ export function SideMenuHome() {
   const user = useUserStore.getState().user;
   const colorNotes = useMenuStore((state) => state.colorNotes);
   const menuPins = useMenuStore((state) => state.menuPins);
-
 
   return (
     <View
@@ -92,7 +90,7 @@ export function SideMenuHome() {
                   alwaysBounceVertical={false}
                   data={MenuItemsList}
                   style={{
-                    width: "100%",
+                    width: "100%"
                   }}
                   disableDefaultDrag
                   showsVerticalScrollIndicator={false}
@@ -117,21 +115,25 @@ export function SideMenuHome() {
                   }}
                 />
                 {colorNotes.length > 0 && (
-                  <View style={{
-                    marginTop: Spacing.LEVEL_2,
-                    borderTopWidth: 1,
-                    borderTopColor: colors.primary.separator,
-                    marginBottom: Spacing.LEVEL_2
-                  }} />
+                  <View
+                    style={{
+                      marginTop: Spacing.LEVEL_2,
+                      borderTopWidth: 1,
+                      borderTopColor: colors.primary.separator,
+                      marginBottom: Spacing.LEVEL_2
+                    }}
+                  />
                 )}
                 <ColorSection />
                 {menuPins.length > 0 && (
-                  <View style={{
-                    marginTop: Spacing.LEVEL_2,
-                    borderTopWidth: 1,
-                    borderTopColor: colors.primary.separator,
-                    marginBottom: Spacing.LEVEL_2
-                  }} />
+                  <View
+                    style={{
+                      marginTop: Spacing.LEVEL_2,
+                      borderTopWidth: 1,
+                      borderTopColor: colors.primary.separator,
+                      marginBottom: Spacing.LEVEL_2
+                    }}
+                  />
                 )}
                 {menuPins.length > 0 && <PinnedSection />}
               </>
@@ -156,7 +158,7 @@ export function SideMenuHome() {
             {(subscriptionType === SubscriptionPlan.FREE ||
               !subscriptionType ||
               !user) &&
-              !SettingsService.getProperty("serverUrls") ? (
+            !SettingsService.getProperty("serverUrls") ? (
               <Button
                 title={strings.upgradePlan()}
                 style={{

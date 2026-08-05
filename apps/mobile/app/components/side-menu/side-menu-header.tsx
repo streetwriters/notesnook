@@ -80,7 +80,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingHorizontal: Spacing.LEVEL_3,
+        paddingHorizontal: Spacing.LEVEL_3
       }}
     >
       <View
@@ -109,7 +109,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          gap: DefaultAppStyles.GAP_SMALL
+          gap: Spacing.LEVEL_2
         }}
       >
         {props.rightButtons?.map((button, index) => (

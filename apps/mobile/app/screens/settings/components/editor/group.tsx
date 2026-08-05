@@ -26,7 +26,6 @@ import { presentDialog } from "../../../../components/dialog/functions";
 import AppIcon from "../../../../components/ui/AppIcon";
 import { IconButton } from "../../../../components/ui/icon-button";
 import Heading from "../../../../components/ui/typography/heading";
-import { getElevationStyle } from "../../../../utils/elevation";
 import { renderTool } from "./common";
 import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
@@ -34,9 +33,9 @@ import ToolSheet from "./tool-sheet";
 import { isFeatureAvailable, useIsFeatureAvailable } from "@notesnook/common";
 import type { ToolId } from "@notesnook/editor";
 import { strings } from "@notesnook/intl";
+import { Radius, Spacing } from "../../../../common/design/spacing";
 import { ToastManager } from "../../../../services/event-manager";
 import { DefaultAppStyles } from "../../../../utils/styles";
-import { Radius, Spacing } from "../../../../common/design/spacing";
 
 export const Group = ({
   item,
@@ -152,16 +151,19 @@ export const Group = ({
         }
         presentDialog({
           context: "global",
+          positiveType: "error-shade-outline",
           title: strings.deleteGroup(),
           positiveText: strings.delete(),
           paragraph: strings.deleteGroupDesc(),
           positivePress: async () => {
             if (groupIndex === undefined) return;
             const _data = useDragState.getState().data.slice();
-
             _data.splice(groupIndex, 1);
-
             setData(_data);
+            ToastManager.show({
+              type: "success",
+              heading: strings.groupDeleted()
+            });
           }
         });
       }

@@ -134,9 +134,9 @@ const buttonTypes = (
     text: colors.selected.buttonForeground,
     selected: colors.selected.background,
     borderWidth: 0.8,
-    borderColor: getColorLinearShade(colors.selected.background, 0.05, isDark),
+    borderColor: colors.selected.border,
     borderSelectedColor: getColorLinearShade(
-      colors.selected.background,
+      colors.selected.border,
       0.05,
       isDark
     )

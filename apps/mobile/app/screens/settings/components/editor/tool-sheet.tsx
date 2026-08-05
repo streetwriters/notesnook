@@ -31,7 +31,6 @@ import { SvgView } from "../../../../components/ui/svg";
 import Heading from "../../../../components/ui/typography/heading";
 import Paragraph from "../../../../components/ui/typography/paragraph";
 import { presentSheet } from "../../../../services/event-manager";
-import { DefaultAppStyles } from "../../../../utils/styles";
 import { DraggableItem, useDragState } from "./state";
 import {
   findToolById,
@@ -210,12 +209,14 @@ function ToolSheet({
         </ScrollView>
       )}
 
-      <Button
-        title={strings.add()}
-        type="accent"
-        style={{ width: "100%" }}
-        onPress={onDone}
-      />
+      {ungrouped.length === 0 ? null : (
+        <Button
+          title={strings.add()}
+          type="accent"
+          style={{ width: "100%" }}
+          onPress={onDone}
+        />
+      )}
     </View>
   );
 }

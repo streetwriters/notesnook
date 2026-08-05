@@ -504,7 +504,7 @@ function ThemeSelector() {
                 style={{
                   borderRadius: Radius.XXL,
                   paddingHorizontal: 14,
-                  paddingVertical: 10
+                  paddingVertical: Spacing.LEVEL_1
                 }}
                 type={
                   colorScheme === "all" || !colorScheme
@@ -527,7 +527,7 @@ function ThemeSelector() {
                 style={{
                   borderRadius: Radius.XXL,
                   paddingHorizontal: 14,
-                  paddingVertical: 10
+                  paddingVertical: Spacing.LEVEL_1
                 }}
                 type={colorScheme === "dark" ? "selected" : "plain-outline"}
                 textStyle={{
@@ -546,7 +546,7 @@ function ThemeSelector() {
                 style={{
                   borderRadius: Radius.XXL,
                   paddingHorizontal: 14,
-                  paddingVertical: 10
+                  paddingVertical: Spacing.LEVEL_1
                 }}
                 fontSize={AppFontSize.sm}
                 type={colorScheme === "light" ? "selected" : "plain-outline"}
@@ -568,7 +568,7 @@ function ThemeSelector() {
               style={{
                 borderRadius: Radius.XS,
                 paddingHorizontal: Spacing.LEVEL_2,
-                paddingVertical: Spacing.LEVEL_2,
+                paddingVertical: Spacing.LEVEL_1,
                 minWidth: 123
               }}
               type={"accent-outline"}
