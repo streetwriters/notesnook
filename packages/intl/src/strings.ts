@@ -1908,7 +1908,7 @@ For example:
   phoneNumber: () => t`Phone number`,
   createAccount: () => t`Create account`,
   accountRecoverHelpText: () =>
-    t`You will receive instructions on how to recover your account on this email`,
+    t`You will receive instructions on how to recover your account on this email.`,
   enterRecoveryKey: () => t`Enter account recovery key`,
   enterRecoveryKeyHelp: () =>
     t`Your data recovery key will be used to decrypt your data`,

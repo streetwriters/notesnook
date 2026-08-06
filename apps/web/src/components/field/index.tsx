@@ -80,6 +80,7 @@ function Field(props: FieldProps) {
         // m: "2px",
         // mr: "2px",
         opacity: disabled ? 0.7 : 1,
+        gap: "spacing3",
         ...sx,
         flexDirection: "column"
       }}
@@ -89,6 +90,7 @@ function Field(props: FieldProps) {
         sx={{
           fontFamily: "body",
           flexDirection: "column",
+          fontSize: "xs",
           ...styles?.label
         }}
       >

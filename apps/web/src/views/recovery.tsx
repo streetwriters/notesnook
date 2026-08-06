@@ -253,8 +253,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
             bg: index === selected ? "background-selected" : "background",
             borderRadius: "radius2",
             cursor: "pointer",
-            ":first-of-type": { mt: 0 },
-            mt: "spacing4"
+            mt: index === 0 ? 0 : "spacing4"
           }}
           onClick={() => setSelected(index)}
         >
@@ -373,9 +372,9 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       onBack={() => navigate("methods")}
       onSubmit={async (form) => {
         const recoveryKey = form.recoveryKey;
-        if (recoveryKey.length < 40) {
-          throw new Error(strings.invalidRecoveryKey());
-        }
+        // if (recoveryKey.length < 40) {
+        //   throw new Error(strings.invalidRecoveryKey());
+        // }
 
         setProgress(0);
 
@@ -450,11 +449,11 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
           if (form.password !== form.confirmPassword)
             throw new Error("Passwords do not match.");
 
-          if (formData?.userResetRequired && !(await db.user.resetUser()))
-            throw new Error("Failed to reset user.");
+          // if (formData?.userResetRequired && !(await db.user.resetUser()))
+          //   throw new Error("Failed to reset user.");
 
-          if (!(await db.user.resetPassword(form.password)))
-            throw new Error("Could not reset account password.");
+          // if (!(await db.user.resetPassword(form.password)))
+          //   throw new Error("Could not reset account password.");
 
           navigate("final");
         } catch (e) {
@@ -574,372 +573,306 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
     return <Loader title="Getting encryption key" text="Please wait..." />;
 
   return (
-    <Flex
-      data-test-id="step-recovery-final"
-      sx={{
-        flex: 1,
-        flexDirection: "column",
-        alignItems: "left",
-        width: ["95%", "95%", "65%"],
-        maxWidth: "500px",
-        alignSelf: "center",
-        gap: "spacing13"
-      }}
+    <RecoveryForm
+      testId="step-new-password"
+      type="new"
+      title={""}
+      subtitle={<></>}
+      onSubmit={async () => {}}
     >
-      <Flex sx={{ flexDirection: "column", gap: "spacing9" }}>
-        <Button
-          type="button"
-          variant="new_bordered"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            alignSelf: "flex-start",
-            opacity: 0
-          }}
-        >
-          <ChevronLeft size={14} color="icon" />
-          <Text
-            sx={{
-              fontSize: "sm",
-              fontWeight: 600,
-              color: "heading"
-            }}
-          >
-            {strings.goBack()}
-          </Text>
-        </Button>
-        <Flex
-          sx={{
-            alignItems: "center",
-            gap: "spacing4"
-          }}
-        >
-          <svg
-            style={{
-              borderRadius: "default",
-              height: 30,
-              width: 30,
-              alignSelf: "center"
-            }}
-          >
-            <use href="#full-logo" />
-          </svg>
-          <Text
-            sx={{
-              fontSize: "2xl",
-              fontWeight: 600,
-              color: "heading"
-            }}
-          >
-            Notesnook
-          </Text>
-        </Flex>
-      </Flex>
       <Flex
         sx={{
           flexDirection: "column",
           gap: "spacing8",
-          bg: "background",
-          borderRadius: "radius4",
-          width: "100%"
+          alignItems: "center"
         }}
       >
         <Flex
           sx={{
             flexDirection: "column",
-            gap: "spacing7",
-            alignItems: "center"
+            gap: "spacing6",
+            alignItems: "center",
+            bg: "background",
+            border: "1px solid var(--border)",
+            borderRadius: "radius4",
+            p: "spacing7",
+            boxShadow: "0px 4px 25px 0px rgba(0,0,0,0.04)",
+            width: "100%"
           }}
         >
+          <CheckCircle size={40} color="accent" />
           <Flex
             sx={{
               flexDirection: "column",
-              gap: "spacing6",
+              gap: "spacing3",
               alignItems: "center",
-              bg: "background",
-              border: "1px solid var(--border)",
-              borderRadius: "radius4",
-              p: "spacing7",
-              boxShadow: "0px 4px 25px 0px rgba(0,0,0,0.04)",
               width: "100%"
             }}
           >
-            <CheckCircle size={40} color="accent" />
-            <Flex
+            <Text
               sx={{
-                flexDirection: "column",
-                gap: "spacing3",
-                alignItems: "center",
-                width: "100%"
+                fontSize: "md",
+                fontWeight: 600,
+                color: "heading",
+                whiteSpace: "nowrap"
               }}
             >
+              Password reset successful
+            </Text>
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph",
+                fontWeight: 400,
+                textAlign: "center",
+                lineHeight: "1.4"
+              }}
+            >
+              Your password has been updated
+            </Text>
+          </Flex>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing4",
+              bg: "background-secondary",
+              px: "spacing3",
+              py: "spacing4",
+              borderRadius: "radius2",
+              width: "100%"
+            }}
+          >
+            <Flex
+              sx={{
+                alignItems: "center",
+                gap: "spacing3"
+              }}
+            >
+              <RecoveryKeyShieldCheck size={15} color="accent" />
               <Text
                 sx={{
-                  fontSize: "md",
-                  fontWeight: 600,
-                  color: "heading",
-                  whiteSpace: "nowrap"
-                }}
-              >
-                Password reset successful
-              </Text>
-              <Text
-                sx={{
-                  fontSize: "sm",
-                  color: "paragraph",
+                  fontSize: "xs",
                   fontWeight: 400,
-                  textAlign: "center",
-                  lineHeight: "1.4"
+                  color: "accent"
                 }}
               >
-                Your password has been updated
+                Save Your Recovery Key
               </Text>
             </Flex>
             <Flex
               sx={{
-                flexDirection: "column",
-                gap: "spacing4",
-                bg: "background-secondary",
-                px: "spacing3",
-                py: "spacing4",
+                bg: "background-tertiary",
+                border: "1px dashed var(--accent)",
                 borderRadius: "radius2",
+                p: "spacing4",
+                alignItems: "center",
+                justifyContent: "space-between",
                 width: "100%"
               }}
             >
+              <ScrollContainer
+                trackStyle={() => ({
+                  backgroundColor: "transparent",
+                  "--ms-track-size": "3px"
+                })}
+                thumbStyle={() => ({ height: 3 })}
+                style={{ flex: "1 0 0", minWidth: 0 }}
+              >
+                <Text
+                  sx={{
+                    userSelect: "text",
+                    lineHeight: 1,
+                    color: "paragraph",
+                    fontWeight: 400,
+                    fontSize: "xxs"
+                  }}
+                >
+                  {recoveryKey}
+                </Text>
+              </ScrollContainer>
               <Flex
                 sx={{
                   alignItems: "center",
-                  gap: "spacing3"
+                  gap: "spacing3",
+                  flexShrink: 0,
+                  cursor: "pointer"
                 }}
+                onClick={handleCopy}
               >
-                <RecoveryKeyShieldCheck size={15} color="accent" />
+                <Copy size={15} color="accent" />
                 <Text
                   sx={{
                     fontSize: "xs",
-                    fontWeight: 400,
+                    fontWeight: 500,
                     color: "accent"
                   }}
                 >
-                  Save Your Recovery Key
+                  {activeButton === "copy" ? "Copied!" : "Copy"}
                 </Text>
-              </Flex>
-              <Flex
-                sx={{
-                  bg: "background-tertiary",
-                  border: "1px dashed var(--accent)",
-                  borderRadius: "radius2",
-                  p: "spacing4",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%"
-                }}
-              >
-                <ScrollContainer
-                  trackStyle={() => ({
-                    backgroundColor: "transparent",
-                    "--ms-track-size": "3px"
-                  })}
-                  thumbStyle={() => ({ height: 3 })}
-                  style={{ flex: "1 0 0", minWidth: 0 }}
-                >
-                  <Text
-                    sx={{
-                      userSelect: "text",
-                      lineHeight: 1,
-                      color: "paragraph",
-                      fontWeight: 400,
-                      fontSize: "xxs"
-                    }}
-                  >
-                    {recoveryKey}
-                  </Text>
-                </ScrollContainer>
-                <Flex
-                  sx={{
-                    alignItems: "center",
-                    gap: "spacing3",
-                    flexShrink: 0,
-                    cursor: "pointer"
-                  }}
-                  onClick={handleCopy}
-                >
-                  <Copy size={15} color="accent" />
-                  <Text
-                    sx={{
-                      fontSize: "xs",
-                      fontWeight: 500,
-                      color: "accent"
-                    }}
-                  >
-                    {activeButton === "copy" ? "Copied!" : "Copy"}
-                  </Text>
-                </Flex>
-              </Flex>
-            </Flex>
-            <Flex
-              sx={{
-                flexDirection: "row",
-                gap: "spacing4",
-                bg: "background-secondary",
-                p: "spacing4",
-                borderRadius: "radius2",
-                width: "100%"
-              }}
-            >
-              <Suspense fallback={<div />}>
-                <Flex
-                  sx={{
-                    position: "relative",
-                    bg: "background",
-                    border: "1px solid var(--border-secondary)",
-                    flexShrink: 0
-                  }}
-                >
-                  <QRCode
-                    value={recoveryKey || ""}
-                    logoImage={Logo}
-                    logoWidth={40}
-                    logoHeight={40}
-                    ecLevel={"M"}
-                    logoPaddingStyle="square"
-                  />
-                </Flex>
-              </Suspense>
-              <Flex
-                sx={{
-                  flex: "1 0 0",
-                  flexDirection: "column",
-                  gap: "spacing3",
-                  justifyContent: "center",
-                  minWidth: 0
-                }}
-              >
-                <Button
-                  type="button"
-                  variant="new_anchor"
-                  onClick={handleCopyQRCode}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "spacing3",
-                    bg: "background",
-                    border: "1px solid var(--border)",
-                    borderRadius: "radius2",
-                    p: "spacing4",
-                    textDecoration: "none",
-                    width: "100%"
-                  }}
-                >
-                  <Flex
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "5px",
-                      bg: "rgba(0,136,54,0.1)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0
-                    }}
-                  >
-                    <Copy size={15} color="icon" />
-                  </Flex>
-                  <Text
-                    sx={{
-                      fontSize: "sm",
-                      fontWeight: 500,
-                      color: "heading"
-                    }}
-                  >
-                    {activeButton === "copyQR"
-                      ? "Copied!"
-                      : "Copy to clipboard"}
-                  </Text>
-                </Button>
-                <Button
-                  type="button"
-                  variant="new_anchor"
-                  onClick={handleDownloadQRCode}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "spacing3",
-                    bg: "background",
-                    border: "1px solid var(--border)",
-                    borderRadius: "radius2",
-                    p: "spacing4",
-                    textDecoration: "none",
-                    width: "100%"
-                  }}
-                >
-                  <Flex
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "5px",
-                      bg: "rgba(0,136,54,0.1)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0
-                    }}
-                  >
-                    <FloppyDisk size={15} color="icon" />
-                  </Flex>
-                  <Text
-                    sx={{
-                      fontSize: "sm",
-                      fontWeight: 500,
-                      color: "heading"
-                    }}
-                  >
-                    {activeButton === "saveQR" ? "Saved!" : "Save QR image"}
-                  </Text>
-                </Button>
-                <Button
-                  type="button"
-                  variant="new_anchor"
-                  onClick={handleSaveToFile}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "spacing3",
-                    bg: "background",
-                    border: "1px solid var(--border)",
-                    borderRadius: "radius2",
-                    p: "spacing4",
-                    textDecoration: "none",
-                    width: "100%"
-                  }}
-                >
-                  <Flex
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: "5px",
-                      bg: "rgba(0,136,54,0.1)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0
-                    }}
-                  >
-                    <Download size={15} color="icon" />
-                  </Flex>
-                  <Text
-                    sx={{
-                      fontSize: "sm",
-                      fontWeight: 500,
-                      color: "heading"
-                    }}
-                  >
-                    {activeButton === "download"
-                      ? "Downloaded!"
-                      : "Download text file"}
-                  </Text>
-                </Button>
               </Flex>
             </Flex>
           </Flex>
+          <Flex
+            sx={{
+              flexDirection: "row",
+              gap: "spacing4",
+              bg: "background-secondary",
+              p: "spacing4",
+              borderRadius: "radius2",
+              width: "100%"
+            }}
+          >
+            <Suspense fallback={<div />}>
+              <Flex
+                sx={{
+                  position: "relative",
+                  bg: "background",
+                  border: "1px solid var(--border-secondary)",
+                  flexShrink: 0
+                }}
+              >
+                <QRCode
+                  value={recoveryKey || ""}
+                  logoImage={Logo}
+                  logoWidth={40}
+                  logoHeight={40}
+                  ecLevel={"M"}
+                  logoPaddingStyle="square"
+                />
+              </Flex>
+            </Suspense>
+            <Flex
+              sx={{
+                flex: "1 0 0",
+                flexDirection: "column",
+                gap: "spacing3",
+                justifyContent: "center",
+                minWidth: 0
+              }}
+            >
+              <Button
+                type="button"
+                variant="new_anchor"
+                onClick={handleCopyQRCode}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "spacing3",
+                  bg: "background",
+                  border: "1px solid var(--border)",
+                  borderRadius: "radius2",
+                  p: "spacing4",
+                  textDecoration: "none",
+                  width: "100%"
+                }}
+              >
+                <Flex
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "5px",
+                    bg: "rgba(0,136,54,0.1)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <Copy size={15} color="icon" />
+                </Flex>
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: 500,
+                    color: "heading"
+                  }}
+                >
+                  {activeButton === "copyQR" ? "Copied!" : "Copy to clipboard"}
+                </Text>
+              </Button>
+              <Button
+                type="button"
+                variant="new_anchor"
+                onClick={handleDownloadQRCode}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "spacing3",
+                  bg: "background",
+                  border: "1px solid var(--border)",
+                  borderRadius: "radius2",
+                  p: "spacing4",
+                  textDecoration: "none",
+                  width: "100%"
+                }}
+              >
+                <Flex
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "5px",
+                    bg: "rgba(0,136,54,0.1)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <FloppyDisk size={15} color="icon" />
+                </Flex>
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: 500,
+                    color: "heading"
+                  }}
+                >
+                  {activeButton === "saveQR" ? "Saved!" : "Save QR image"}
+                </Text>
+              </Button>
+              <Button
+                type="button"
+                variant="new_anchor"
+                onClick={handleSaveToFile}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "spacing3",
+                  bg: "background",
+                  border: "1px solid var(--border)",
+                  borderRadius: "radius2",
+                  p: "spacing4",
+                  textDecoration: "none",
+                  width: "100%"
+                }}
+              >
+                <Flex
+                  sx={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: "5px",
+                    bg: "rgba(0,136,54,0.1)",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0
+                  }}
+                >
+                  <Download size={15} color="icon" />
+                </Flex>
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: 500,
+                    color: "heading"
+                  }}
+                >
+                  {activeButton === "download"
+                    ? "Downloaded!"
+                    : "Download text file"}
+                </Text>
+              </Button>
+            </Flex>
+          </Flex>
         </Flex>
+
         <Button
           type="button"
           variant="new_accent"
@@ -951,7 +884,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
           Go to login
         </Button>
       </Flex>
-    </Flex>
+    </RecoveryForm>
   );
 }
 
@@ -1027,7 +960,7 @@ export function RecoveryForm<T extends RecoveryRoutes>(
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: "12px",
+              gap: "spacing5",
               alignSelf: "flex-start",
               mb: "spacing9"
             }}

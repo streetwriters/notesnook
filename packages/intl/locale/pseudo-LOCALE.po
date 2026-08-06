@@ -8600,7 +8600,7 @@ msgid "You will be logged out from all your devices"
 msgstr ""
 
 #: src/strings.ts:1911
-msgid "You will receive instructions on how to recover your account on this email"
+msgid "You will receive instructions on how to recover your account on this email."
 msgstr ""
 
 #: src/strings.ts:501
