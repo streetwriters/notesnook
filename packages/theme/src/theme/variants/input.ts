@@ -27,7 +27,7 @@ const defaultVariant: ThemeUIStyleObject = {
   outline: "1.5px solid var(--border)",
   fontFamily: "body",
   fontWeight: "body",
-  fontSize: "input",
+  fontSize: "xs",
   color: "paragraph",
   ":-webkit-autofill": {
     WebkitTextFillColor: "var(--paragraph)",
