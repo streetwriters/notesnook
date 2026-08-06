@@ -86,9 +86,9 @@ export const newCreateButtonVariant = (
   justifyContent: "center",
   alignSelf: "center",
   display: "flex",
-  paddingY: "spacing6",
-  paddingX: "spacing5",
-  fontSize: "md",
+  py: "spacing5",
+  px: "spacing5",
+  fontSize: "sm",
   fontWeight: 600,
   borderRadius: "radius2",
   lineHeight: "100%"
@@ -104,6 +104,7 @@ const newBordered: ThemeUIStyleObject = {
     hover: { bg: "hover" },
     active: { bg: "hover" }
   }),
+  px: "spacing6",
   border: "1px solid",
   borderColor: "border"
 };

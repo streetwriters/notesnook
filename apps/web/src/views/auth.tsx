@@ -538,7 +538,7 @@ function RecoverySuccessCard({ email }: { email: string }) {
               lineHeight: "1.4"
             }}
           >
-            We've sent instructions to recover your account to{" "}
+            We&apos;ve sent instructions to recover your account to{" "}
             <Text as="span" sx={{ fontWeight: "medium", color: "accent" }}>
               {email}
             </Text>
@@ -578,7 +578,7 @@ function RecoverySuccessCard({ email }: { email: string }) {
           </Text>
         </Flex>
       </Flex>
-      <SubmitButton text={strings.confirmEmail()} />
+      <SubmitButton text={strings.resendEmail()} />
     </>
   );
 }
@@ -590,20 +590,23 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
   return (
     <AuthForm
       type="recover"
-      title={strings.accountRecovery()}
+      title={recoveryEmail ? "" : strings.accountRecovery()}
       subtitle={
-        <SubtitleWithAction
-          text={strings.rememberedYourPassword()}
-          action={{
-            text: strings.login(),
-            onClick: () => navigate("login")
-          }}
-        />
+        recoveryEmail ? (
+          <></>
+        ) : (
+          <>
+            <Text>{strings.accountRecoverHelpText()}</Text>{" "}
+            <SubtitleWithAction
+              text={strings.rememberedYourPassword()}
+              action={{
+                text: strings.login(),
+                onClick: () => navigate("login")
+              }}
+            />
+          </>
+        )
       }
-      loading={{
-        title: strings.sendingRecoveryEmail(),
-        subtitle: strings.sendingRecoveryEmailDesc()
-      }}
       openURL={openURL}
       onSubmit={async (form) => {
         if (!form.email) {
@@ -625,18 +628,26 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       {recoveryEmail ? (
         <RecoverySuccessCard email={recoveryEmail} />
       ) : (
-        <>
-          <AuthField
-            id="email"
-            type="text"
-            autoComplete={"email"}
-            label={strings.enterEmailAddress()}
-            helpText={strings.accountRecoverHelpText()}
-            defaultValue={formData ? formData.email : ""}
-            autoFocus
-          />
-          <SubmitButton text={strings.sendRecoveryEmail()} />
-        </>
+        (_, options) => (
+          <>
+            <AuthField
+              id="email"
+              type="text"
+              autoComplete={"email"}
+              label={strings.enterEmailAddress()}
+              defaultValue={formData ? formData.email : ""}
+              autoFocus
+            />
+            <SubmitButton
+              loading={options?.loading}
+              text={
+                options?.loading
+                  ? strings.sendingRecoveryEmail()
+                  : strings.sendRecoveryEmail()
+              }
+            />
+          </>
+        )
       )}
     </AuthForm>
   );
@@ -1027,7 +1038,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
 type AuthFormProps<TType extends AuthRoutes> = {
   title: string;
   subtitle: string | JSX.Element;
-  loading: { title: string; subtitle: string };
+  // loading: { title: string; subtitle: string };
   type: TType;
   onSubmit: (form: AuthFormData[TType]) => Promise<void>;
   openURL: OpenURLFunction;
@@ -1037,7 +1048,10 @@ type AuthFormProps<TType extends AuthRoutes> = {
   onBack?: () => void;
   children?:
     | React.ReactNode
-    | ((form?: AuthFormData[TType]) => React.ReactNode);
+    | ((
+        form?: AuthFormData[TType],
+        options?: { loading?: boolean }
+      ) => React.ReactNode);
 };
 
 export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
@@ -1056,8 +1070,8 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState<AuthFormData[T] | undefined>();
 
-  if (isSubmitting)
-    return <Loader title={props.loading.title} text={props.loading.subtitle} />;
+  // if (isSubmitting)
+  //   return <Loader title={props.loading.title} text={props.loading.subtitle} />;
 
   return (
     <AuthFormContext.Provider value={{ error }}>
@@ -1180,7 +1194,9 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         >
           {subtitle}
         </Text>
-        {typeof children === "function" ? children(form) : children}
+        {typeof children === "function"
+          ? children(form, { loading: isSubmitting })
+          : children}
 
         {canSkip && (
           <Button
@@ -1322,9 +1338,12 @@ export function SubmitButton(props: SubmitButtonProps) {
           marginTop: "spacing8",
           width: "100%"
         }}
-        disabled={props.disabled}
+        disabled={props.loading || props.disabled}
       >
-        {props.loading ? <Loading color="accentForeground" /> : props.text}
+        {props.loading ? (
+          <Loading color="accentForeground" size={15} sx={{ mr: "spacing6" }} />
+        ) : null}
+        {props.text}
       </Button>
     </>
   );

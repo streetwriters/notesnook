@@ -8741,9 +8741,9 @@ msgstr "You were awarded a subscription to Notesnook Pro by Streetwriters."
 msgid "You will be logged out from all your devices"
 msgstr "You will be logged out from all your devices"
 
-#: src/strings.ts:1916
-msgid "You will receive instructions on how to recover your account on this email"
-msgstr "You will receive instructions on how to recover your account on this email"
+#: src/strings.ts:1911
+msgid "You will receive instructions on how to recover your account on this email."
+msgstr "You will receive instructions on how to recover your account on this email."
 
 #: src/strings.ts:501
 msgid "Your account email will be changed without affecting your subscription or any other settings."
