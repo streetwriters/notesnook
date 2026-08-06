@@ -154,7 +154,6 @@ const ShareView = () => {
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [loadingExtension, setLoadingExtension] = useState(true);
-  const fullQualityImages = useIsFeatureAvailable("fullQualityImages");
   const [rawData, setRawData] = useState<{
     type?: string;
     value?: string;
@@ -172,6 +171,14 @@ const ShareView = () => {
   const insets = useSafeAreaInsets();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [compress, setCompress] = useState(true);
+  const [isCompressAllowed, setIsCompressAllowed] = useState(false);
+  const compressCheckInFlight = useRef(false);
+
+  const checkCompressAllowed = useCallback(async () => {
+    const feature = await isFeatureAvailable("fullQualityImages");
+    return !!feature?.isAllowed;
+  }, []);
+
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event: KeyboardEvent) => {
     const height =
@@ -206,10 +213,24 @@ const ShareView = () => {
   }, []);
 
   useEffect(() => {
-    if (!fullQualityImages?.isAllowed) {
-      setCompress(true);
+    (async () => {
+      const allowed = await checkCompressAllowed();
+      setIsCompressAllowed(allowed);
+      if (!allowed) setCompress(true);
+    })();
+  }, [checkCompressAllowed]);
+
+  const onToggleCompress = useCallback(async () => {
+    if (compressCheckInFlight.current) return;
+    compressCheckInFlight.current = true;
+    try {
+      const allowed = await checkCompressAllowed();
+      setIsCompressAllowed(allowed);
+      if (allowed) setCompress((prev) => !prev);
+    } finally {
+      compressCheckInFlight.current = false;
     }
-  }, [fullQualityImages]);
+  }, [checkCompressAllowed]);
 
   const showLinkPreview = async (note: DefaultNote, link: string) => {
     const _note = note;
@@ -711,11 +732,7 @@ const ShareView = () => {
                             width: "100%",
                             marginTop: 6
                           }}
-                          onPress={() => {
-                            if (fullQualityImages?.isAllowed) {
-                              setCompress(!compress);
-                            }
-                          }}
+                          onPress={onToggleCompress}
                         >
                           <Icon
                             size={20}
@@ -726,12 +743,11 @@ const ShareView = () => {
                             }
                             allowFontScaling={false}
                             color={
-                              compress && fullQualityImages?.isAllowed
+                              compress && isCompressAllowed
                                 ? colors.primary.accent
                                 : colors.primary.icon
                             }
                           />
-
                           <Text
                             style={{
                               flexShrink: 1,
