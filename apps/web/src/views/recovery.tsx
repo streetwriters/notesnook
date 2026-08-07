@@ -958,11 +958,16 @@ export function RecoveryForm<T extends RecoveryRoutes>(
             variant="new_bordered"
             onClick={onBack}
             sx={{
+              background: "background",
+              borderRadius: "radius2",
               display: "flex",
               alignItems: "center",
-              gap: "spacing5",
+              gap: "spacing3",
+              px: "spacing6",
+              py: "spacing5",
               alignSelf: "flex-start",
-              mb: "spacing9"
+              mb: "spacing9",
+              border: "1px solid var(--border)"
             }}
           >
             <ChevronLeft size={14} color="icon" />
