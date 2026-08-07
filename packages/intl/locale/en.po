@@ -3860,6 +3860,10 @@ msgstr "Key name"
 msgid "Languages"
 msgstr "Languages"
 
+#: src/strings.ts:2813
+msgid "Last backup: {date}"
+msgstr "Last backup: {date}"
+
 #: src/strings.ts:2243
 msgid "Last edited at"
 msgstr "Last edited at"
@@ -4454,6 +4458,10 @@ msgstr "Newly created notes will be uncategorized"
 #: src/strings.ts:552
 msgid "Next"
 msgstr "Next"
+
+#: src/strings.ts:2814
+msgid "Next backup: {date}"
+msgstr "Next backup: {date}"
 
 #: src/strings.ts:2391
 msgid "Next match"
