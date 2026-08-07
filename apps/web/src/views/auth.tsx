@@ -1126,7 +1126,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
               borderRadius: "radius2",
               display: "flex",
               alignItems: "center",
-              gap: "spacing4",
+              gap: "spacing3",
               px: "spacing6",
               py: "spacing5",
               alignSelf: "flex-start",
