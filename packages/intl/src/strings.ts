@@ -2809,5 +2809,7 @@ Continue without attachments?`,
   versionDeleted: () => actions.deleted.version(1),
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
-    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`
+    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
+  lastBackupOn: (date: string) => t`Last backup: ${date}`,
+  nextBackupOn: (date: string) => t`Next backup: ${date}`
 };
