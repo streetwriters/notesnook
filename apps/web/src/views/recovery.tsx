@@ -17,22 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useMemo, useRef, useState, Suspense } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
-import { AuthField, AuthFormContext, SubmitButton } from "./auth";
+import {
+  AuthField,
+  AuthFormContainer,
+  AuthFormContainerProps,
+  SubmitButton
+} from "./auth";
 import Config from "../utils/config";
-import { EVENTS, User } from "@notesnook/core";
+import { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useKeyStore } from "../interfaces/key-store";
 import { ScrollContainer } from "@notesnook/ui";
 import Logo from "../assets/notesnook-logo.png";
 import {
-  ChevronLeft,
   KeyIcon,
   Trash,
   CheckCircle,
@@ -119,13 +123,18 @@ function useAuthenticateUser({
   code,
   userId
 }: {
-  code: string;
-  userId: string;
+  code?: string;
+  userId?: string;
 }) {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [user, setUser] = useState<User>();
   useEffect(() => {
     async function authenticateUser() {
+      if (!code || !userId) {
+        openURL("/");
+        return;
+      }
+
       setIsAuthenticating(true);
       try {
         const accessToken = await db.tokenManager.getAccessToken();
@@ -346,18 +355,6 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
 
 function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
   const { navigate, formData } = props;
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    db.eventManager.subscribe(
-      EVENTS.syncProgress,
-      ({ type, current }: { type: string; current: number }) => {
-        if (type === "download") {
-          setProgress(current);
-        }
-      }
-    );
-  }, []);
 
   return (
     <RecoveryForm
@@ -365,18 +362,12 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       type="method:key"
       title={strings.accountRecovery()}
       subtitle={strings.accountRecoveryWithKey()}
-      loading={{
-        title: strings.network.downloading(progress),
-        subtitle: strings.keyRecoveryProgressDesc()
-      }}
       onBack={() => navigate("methods")}
       onSubmit={async (form) => {
         const recoveryKey = form.recoveryKey;
-        // if (recoveryKey.length < 40) {
-        //   throw new Error(strings.invalidRecoveryKey());
-        // }
-
-        setProgress(0);
+        if (recoveryKey.length < 40) {
+          throw new Error(strings.invalidRecoveryKey());
+        }
 
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
@@ -415,16 +406,6 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
 
 function NewPassword(props: BaseRecoveryComponentProps<"new">) {
   const { navigate, formData } = props;
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    db.eventManager.subscribe(
-      EVENTS.syncProgress,
-      ({ current }: { current: number }) => {
-        setProgress(current);
-      }
-    );
-  }, []);
 
   return (
     <RecoveryForm
@@ -432,10 +413,6 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       type="new"
       title={strings.resetAccountPassword()}
       subtitle={strings.accountPassDesc()}
-      loading={{
-        title: strings.resettingAccountPassword(progress),
-        subtitle: strings.resetPasswordWait()
-      }}
       onBack={() =>
         navigate(
           formData?.userResetRequired ? "methods" : "method:key",
@@ -444,16 +421,14 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       }
       onSubmit={async (form) => {
         try {
-          setProgress(0);
-
           if (form.password !== form.confirmPassword)
             throw new Error("Passwords do not match.");
 
-          // if (formData?.userResetRequired && !(await db.user.resetUser()))
-          //   throw new Error("Failed to reset user.");
+          if (formData?.userResetRequired && !(await db.user.resetUser()))
+            throw new Error("Failed to reset user.");
 
-          // if (!(await db.user.resetPassword(form.password)))
-          //   throw new Error("Could not reset account password.");
+          if (!(await db.user.resetPassword(form.password)))
+            throw new Error("Could not reset account password.");
 
           navigate("final");
         } catch (e) {
@@ -468,7 +443,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         }
       }}
     >
-      {(form?: NewPasswordFormData) => (
+      {(form, options) => (
         <>
           <AuthField
             id="password"
@@ -484,7 +459,14 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             label={strings.confirmPassword()}
             defaultValue={form?.confirmPassword}
           />
-          <SubmitButton text={strings.continue()} />
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading
+                ? strings.resettingAccountPassword()
+                : strings.continue()
+            }
+          />
         </>
       )}
     </RecoveryForm>
@@ -888,153 +870,10 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
   );
 }
 
-type RecoveryFormProps<TType extends RecoveryRoutes> = {
-  testId: string;
-  title: string;
-  subtitle: string | JSX.Element;
-  loading?: { title: string; subtitle: string };
-  type: TType;
-  onSubmit: (form: RecoveryFormData[TType]) => Promise<void>;
-  children?:
-    | React.ReactNode
-    | ((form?: RecoveryFormData[TType]) => React.ReactNode);
-  onBack?: () => void;
-};
-
-export function RecoveryForm<T extends RecoveryRoutes>(
-  props: RecoveryFormProps<T>
+function RecoveryForm<T extends RecoveryRoutes>(
+  props: AuthFormContainerProps<T, RecoveryFormData>
 ) {
-  const { title, subtitle, children, testId, onBack } = props;
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string>();
-  const formRef = useRef<HTMLFormElement>(null);
-  const [form, setForm] = useState<RecoveryFormData[T] | undefined>();
-
-  if (isSubmitting && props.loading)
-    return <Loader title={props.loading.title} text={props.loading.subtitle} />;
-
-  return (
-    <AuthFormContext.Provider value={{ error }}>
-      <Flex
-        ref={formRef}
-        data-test-id={testId}
-        as="form"
-        id="authForm"
-        onSubmit={async (e) => {
-          if (!formRef.current) return;
-
-          e.preventDefault();
-
-          setError("");
-          setIsSubmitting(true);
-          const formData = new FormData(formRef.current);
-          const form = Object.fromEntries(
-            formData.entries()
-          ) as RecoveryFormData[T];
-          try {
-            setForm(form);
-            await props.onSubmit(form);
-          } catch (e) {
-            console.error(e);
-            const error = e as Error;
-            setError(error.message);
-          } finally {
-            setIsSubmitting(false);
-          }
-        }}
-        sx={{
-          flex: 1,
-          flexDirection: "column",
-          alignItems: "left",
-          width: ["95%", "95%", "65%"],
-          maxWidth: "500px",
-          alignSelf: "center",
-          mt: 100
-        }}
-      >
-        {onBack && (
-          <Button
-            type="button"
-            variant="new_bordered"
-            onClick={onBack}
-            sx={{
-              background: "background",
-              borderRadius: "radius2",
-              display: "flex",
-              alignItems: "center",
-              gap: "spacing3",
-              px: "spacing6",
-              py: "spacing5",
-              alignSelf: "flex-start",
-              mb: "spacing9",
-              border: "1px solid var(--border)"
-            }}
-          >
-            <ChevronLeft size={14} color="icon" />
-            <Text
-              sx={{
-                fontSize: "sm",
-                fontWeight: 600,
-                color: "heading"
-              }}
-            >
-              {strings.goBack()}
-            </Text>
-          </Button>
-        )}
-        <Flex
-          sx={{
-            mb: "spacing13",
-            alignItems: "center",
-            gap: "spacing4"
-          }}
-        >
-          <svg
-            style={{
-              borderRadius: "default",
-              height: 30,
-              width: 30,
-              alignSelf: "center"
-            }}
-          >
-            <use href="#full-logo" />
-          </svg>
-          <Text
-            sx={{
-              fontSize: "2xl",
-              fontWeight: 600,
-              color: "heading"
-            }}
-          >
-            Notesnook
-          </Text>
-        </Flex>
-        <Text
-          sx={{
-            fontSize: "xl",
-            textAlign: "left",
-            fontWeight: 600,
-            color: "heading"
-          }}
-        >
-          {title}
-        </Text>
-        <Text
-          sx={{
-            mt: "spacing3",
-            mb: "spacing7",
-            fontSize: "sm",
-            textAlign: "left",
-            color: "paragraph",
-            fontWeight: 400
-          }}
-        >
-          {subtitle}
-        </Text>
-        {typeof children === "function" ? children(form) : children}
-      </Flex>
-    </AuthFormContext.Provider>
-  );
+  return <AuthFormContainer {...props} />;
 }
 
 function openURL(url: string) {
