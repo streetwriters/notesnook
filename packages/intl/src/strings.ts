@@ -3274,5 +3274,7 @@ Continue without attachments?`,
   waitForPreviousDownloadToFinish: () =>
     t`Please wait for the previous download to finish or cancel it.`,
   checkingAttachmentsProgress: (current: number, total: number) =>
-    t`Checking attachments (${current}/${total})`
+    t`Checking attachments (${current}/${total})`,
+  lastBackupOn: (date: string) => t`Last backup: ${date}`,
+  nextBackupOn: (date: string) => t`Next backup: ${date}`
 };
