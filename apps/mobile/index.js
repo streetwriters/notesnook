@@ -16,6 +16,7 @@ BackgroundSync.start();
 Notifications.init();
 
 enableFreeze(true);
+
 NetInfo.configure({
   reachabilityUrl: "https://api.notesnook.com/health",
   reachabilityTest: (response) => {

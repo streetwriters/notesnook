@@ -45,6 +45,7 @@ import { IconButton } from "../../ui/icon-button";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import ReactNativeBlobUtil from "react-native-blob-util";
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 const WIN_WIDTH = Dimensions.get("window").width;
 const WIN_HEIGHT = Dimensions.get("window").height;
@@ -286,6 +287,9 @@ const PDFPreview = () => {
                     color={colors.static.white}
                     name="open-in-new"
                     onPress={() => {
+                      useSettingStore
+                        .getState()
+                        .setAppDidEnterBackgroundForAction(true);
                       FileViewer.open(pdfSource, {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true
