@@ -1820,8 +1820,7 @@ All attachments will be downloaded & cached again on access.
   backingUpDataWait: () =>
     t`We are creating a backup of your data. Please wait...`,
   resetAccountPassword: () => t`Reset account password`,
-  resettingAccountPassword: (progress: number) =>
-    t`Resetting account password (${progress})`,
+  resettingAccountPassword: () => t`Resetting account password...`,
   resetPasswordWait: () => t`Please wait while we reset your account password.`,
   backupSavedAt: (path: string) => t`Backup saved at ${path}`,
   irreverisibleAction: () => t`This action is IRREVERSIBLE.`,
