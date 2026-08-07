@@ -49,7 +49,6 @@ import { getQueryParams, hardNavigate, makeURL } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
-import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
@@ -242,10 +241,6 @@ function Login(props: BaseAuthComponentProps<"login">) {
           action={{ text: strings.signUp(), onClick: () => navigate("signup") }}
         />
       }
-      loading={{
-        title: strings.loggingIn(),
-        subtitle: strings.authWait()
-      }}
       onSubmit={async (form) => {
         if (!isEmail(form.email)) throw new Error(strings.emailInvalid());
 
@@ -268,7 +263,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
         });
       }}
     >
-      {(form?: LoginFormData) => (
+      {(form, options) => (
         <>
           {IS_BETA ? (
             <Flex
@@ -312,7 +307,14 @@ function Login(props: BaseAuthComponentProps<"login">) {
           >
             {strings.forgotPassword()}
           </Button>
-          <SubmitButton text={strings.loginToYourAccount()} />
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading
+                ? strings.loggingIn()
+                : strings.loginToYourAccount()
+            }
+          />
         </>
       )}
     </AuthForm>
@@ -337,10 +339,6 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
           }}
         />
       }
-      loading={{
-        title: strings.creatingAccount(),
-        subtitle: strings.creatingAccountDesc()
-      }}
       openURL={openURL}
       onSubmit={async (form) => {
         if (!isEmail(form.email)) throw new Error(strings.emailInvalid());
@@ -353,7 +351,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         openURL("/plans", { authenticated: true });
       }}
     >
-      {(form?: SignupFormData) => (
+      {(form, options) => (
         <>
           <AuthField
             id="email"
@@ -377,7 +375,14 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             label={strings.confirmPassword()}
             defaultValue={form?.["confirm-password"]}
           />
-          <SubmitButton text={strings.createAccount()} />
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading
+                ? strings.creatingAccount()
+                : strings.createAccount()
+            }
+          />
         </>
       )}
     </AuthForm>
@@ -411,10 +416,6 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
           </Text>
         </Flex>
       }
-      loading={{
-        title: strings.loggingIn(),
-        subtitle: strings.pleaseWaitLogin()
-      }}
       openURL={openURL}
       onSubmit={async (form) => {
         if (!user) return;
@@ -440,59 +441,70 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         });
       }}
     >
-      <AuthField
-        id="email"
-        type="email"
-        autoComplete={"false"}
-        label={strings.enterEmailAddress()}
-        placeholder={user ? maskEmail(user.email) : undefined}
-        autoFocus
-        disabled
-        required={false}
-      />
-      <AuthField
-        id="password"
-        type="password"
-        autoComplete={"false"}
-        label={strings.enterPassword()}
-        autoFocus
-      />
-      <Button
-        data-test-id="auth-forgot-password"
-        type="button"
-        mt={2}
-        variant="anchor"
-        onClick={() => user && navigate("recover", { email: user.email })}
-        sx={{ color: "paragraph", alignSelf: "end" }}
-      >
-        {strings.forgotPassword()}
-      </Button>
-      <SubmitButton text={strings.reloginToYourAccount()} />
-      <Button
-        type="button"
-        variant="anchor"
-        sx={{
-          mt: 5,
-          color: "paragraph-error",
-          textDecoration: "none",
-          ":hover": {
-            color: "var(--paragraph-error)"
-          }
-        }}
-        onClick={async () => {
-          if (await showLogoutConfirmation()) {
-            await TaskManager.startTask({
-              type: "modal",
-              title: strings.loggingOut(),
-              action: () => db.user.logout(true),
-              subtitle: strings.loggingOutDesc()
-            });
-            navigate("login");
-          }
-        }}
-      >
-        {strings.logout()}
-      </Button>
+      {(_, options) => (
+        <>
+          <AuthField
+            id="email"
+            type="email"
+            autoComplete={"false"}
+            label={strings.enterEmailAddress()}
+            placeholder={user ? maskEmail(user.email) : undefined}
+            autoFocus
+            disabled
+            required={false}
+          />
+          <AuthField
+            id="password"
+            type="password"
+            autoComplete={"false"}
+            label={strings.enterPassword()}
+            autoFocus
+          />
+          <Button
+            data-test-id="auth-forgot-password"
+            type="button"
+            mt={2}
+            variant="anchor"
+            onClick={() => user && navigate("recover", { email: user.email })}
+            sx={{ color: "paragraph", alignSelf: "end" }}
+          >
+            {strings.forgotPassword()}
+          </Button>
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading
+                ? strings.loggingIn()
+                : strings.reloginToYourAccount()
+            }
+          />
+          <Button
+            type="button"
+            variant="anchor"
+            sx={{
+              mt: 5,
+              color: "paragraph-error",
+              textDecoration: "none",
+              ":hover": {
+                color: "var(--paragraph-error)"
+              }
+            }}
+            onClick={async () => {
+              if (await showLogoutConfirmation()) {
+                await TaskManager.startTask({
+                  type: "modal",
+                  title: strings.loggingOut(),
+                  action: () => db.user.logout(true),
+                  subtitle: strings.loggingOutDesc()
+                });
+                navigate("login");
+              }
+            }}
+          >
+            {strings.logout()}
+          </Button>
+        </>
+      )}
     </AuthForm>
   );
 }
@@ -737,10 +749,6 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       type="mfa:code"
       title={strings["2fa"]()}
       subtitle={texts.subtitle}
-      loading={{
-        title: strings.verifying2faCode(),
-        subtitle: strings.authWait()
-      }}
       openURL={openURL}
       onSubmit={async (form) => {
         const code = selectedMethod !== "recoveryCode" ? otpValue : form.code;
@@ -761,34 +769,115 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         });
       }}
     >
-      {selectedMethod !== "recoveryCode" ? (
-        <OtpInput
-          length={6}
-          value={otpValue}
-          onChange={setOtpValue}
-          autoFocus
-        />
-      ) : (
-        <AuthField id="code" type="text" label={texts.label} autoFocus />
-      )}
-      <SubmitButton text={strings.submit()} />
-      <Flex
-        sx={{
-          flexDirection: "column",
-          my: "spacing7",
-          gap: "spacing4"
-        }}
-      >
-        {(selectedMethod === "sms" || selectedMethod === "email") && (
-          <>
-            <Flex
+      {(_, options) => (
+        <>
+          {selectedMethod !== "recoveryCode" ? (
+            <OtpInput
+              length={6}
+              value={otpValue}
+              onChange={setOtpValue}
+              autoFocus
+            />
+          ) : (
+            <AuthField id="code" type="text" label={texts.label} autoFocus />
+          )}
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading ? strings.verifying2faCode() : strings.submit()
+            }
+          />
+          <Flex
+            sx={{
+              flexDirection: "column",
+              my: "spacing7",
+              gap: "spacing4"
+            }}
+          >
+            {(selectedMethod === "sms" || selectedMethod === "email") && (
+              <>
+                <Flex
+                  sx={{
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    background: "background-secondary",
+                    p: "spacing5",
+                    borderRadius: "radius2"
+                  }}
+                >
+                  <Flex sx={{ alignItems: "center", gap: "10px" }}>
+                    <Flex
+                      sx={{
+                        bg: "background-tertiary",
+                        borderRadius: "5px",
+                        width: 32,
+                        height: 32,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0
+                      }}
+                    >
+                      <Clock size={15} color="icon" />
+                    </Flex>
+                    <Flex sx={{ flexDirection: "column" }}>
+                      <Text
+                        sx={{
+                          fontSize: "sm",
+                          fontWeight: 500,
+                          color: "heading"
+                        }}
+                      >
+                        {"Didn't receive code?"}
+                      </Text>
+                      {!enabled && (
+                        <Text
+                          sx={{
+                            color: "paragraph",
+                            fontSize: "xs",
+                            fontWeight: 400
+                          }}
+                        >
+                          {`${strings.resendCodeWait()} `}
+                          <Text as="span" sx={{ color: "accent" }}>
+                            {elapsed}s
+                          </Text>
+                        </Text>
+                      )}
+                    </Flex>
+                  </Flex>
+                  <Button
+                    type="button"
+                    variant="anchor"
+                    disabled={isSending || !enabled}
+                    onClick={() => sendCode(selectedMethod as "sms" | "email")}
+                    sx={{
+                      fontSize: "xs",
+                      fontWeight: 500,
+                      color:
+                        enabled && !isSending
+                          ? "accent"
+                          : "paragraph-secondary",
+                      textDecoration: "none"
+                    }}
+                  >
+                    {isSending ? <Loading size={18} /> : strings.resendCode()}
+                  </Button>
+                </Flex>
+              </>
+            )}
+
+            <Button
+              type="button"
+              variant="secondary"
               sx={{
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                background: "background-secondary",
                 p: "spacing5",
+                textAlign: "left",
                 borderRadius: "radius2"
               }}
+              onClick={() => navigate("mfa:select", formData)}
             >
               <Flex sx={{ alignItems: "center", gap: "10px" }}>
                 <Flex
@@ -802,91 +891,27 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                     flexShrink: 0
                   }}
                 >
-                  <Clock size={15} color="icon" />
-                </Flex>
-                <Flex sx={{ flexDirection: "column" }}>
-                  <Text
-                    sx={{ fontSize: "sm", fontWeight: 500, color: "heading" }}
-                  >
-                    {"Didn't receive code?"}
-                  </Text>
-                  {!enabled && (
-                    <Text
-                      sx={{
-                        color: "paragraph",
-                        fontSize: "xs",
-                        fontWeight: 400
-                      }}
-                    >
-                      {`${strings.resendCodeWait()} `}
-                      <Text as="span" sx={{ color: "accent" }}>
-                        {elapsed}s
-                      </Text>
-                    </Text>
+                  {selectedMethod === "email" ? (
+                    <MfaEmail size={16} color="icon" />
+                  ) : selectedMethod === "sms" ? (
+                    <MfaSms size={16} color="icon" />
+                  ) : selectedMethod === "app" ? (
+                    <MfaAuthenticator size={16} color="icon" />
+                  ) : (
+                    <MfaRecoveryCode size={16} color="icon" />
                   )}
                 </Flex>
+                <Text
+                  sx={{ fontWeight: 500, fontSize: "sm", color: "heading" }}
+                >
+                  {texts.selector}
+                </Text>
               </Flex>
-              <Button
-                type="button"
-                variant="anchor"
-                disabled={isSending || !enabled}
-                onClick={() => sendCode(selectedMethod as "sms" | "email")}
-                sx={{
-                  fontSize: "xs",
-                  fontWeight: 500,
-                  color:
-                    enabled && !isSending ? "accent" : "paragraph-secondary",
-                  textDecoration: "none"
-                }}
-              >
-                {isSending ? <Loading size={18} /> : strings.resendCode()}
-              </Button>
-            </Flex>
-          </>
-        )}
-
-        <Button
-          type="button"
-          variant="secondary"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            p: "spacing5",
-            textAlign: "left",
-            borderRadius: "radius2"
-          }}
-          onClick={() => navigate("mfa:select", formData)}
-        >
-          <Flex sx={{ alignItems: "center", gap: "10px" }}>
-            <Flex
-              sx={{
-                bg: "background-tertiary",
-                borderRadius: "5px",
-                width: 32,
-                height: 32,
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}
-            >
-              {selectedMethod === "email" ? (
-                <MfaEmail size={16} color="icon" />
-              ) : selectedMethod === "sms" ? (
-                <MfaSms size={16} color="icon" />
-              ) : selectedMethod === "app" ? (
-                <MfaAuthenticator size={16} color="icon" />
-              ) : (
-                <MfaRecoveryCode size={16} color="icon" />
-              )}
-            </Flex>
-            <Text sx={{ fontWeight: 500, fontSize: "sm", color: "heading" }}>
-              {texts.selector}
-            </Text>
+              <ChevronRight size={13} color="icon" sx={{ flexShrink: 0 }} />
+            </Button>
           </Flex>
-          <ChevronRight size={13} color="icon" sx={{ flexShrink: 0 }} />
-        </Button>
-      </Flex>
+        </>
+      )}
     </AuthForm>
   );
 }
@@ -946,10 +971,6 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
       type="mfa:select"
       title={strings.select2faMethod()}
       subtitle={strings.select2faCodeHelpText()}
-      loading={{
-        title: strings.loggingIn(),
-        subtitle: strings.authWait()
-      }}
       openURL={openURL}
       onSubmit={async () => {}}
       onBack={() => navigate("mfa:code", formData)}
@@ -1035,13 +1056,17 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
 
 // function MFAMethodSelector(params) {}
 
-type AuthFormProps<TType extends AuthRoutes> = {
+export type AuthFormContainerProps<
+  TType extends string,
+  TFormData extends Record<TType, Record<string, any>>
+> = {
+  testId?: string;
   title: string;
   subtitle: string | JSX.Element;
   // loading: { title: string; subtitle: string };
   type: TType;
-  onSubmit: (form: AuthFormData[TType]) => Promise<void>;
-  openURL: OpenURLFunction;
+  onSubmit: (form: TFormData[TType]) => Promise<void>;
+  openURL?: OpenURLFunction;
   loadForever?: boolean;
   canSkip?: boolean;
   showAgreement?: boolean;
@@ -1049,12 +1074,21 @@ type AuthFormProps<TType extends AuthRoutes> = {
   children?:
     | React.ReactNode
     | ((
-        form?: AuthFormData[TType],
+        form?: TFormData[TType],
         options?: { loading?: boolean }
       ) => React.ReactNode);
 };
 
-export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
+function AuthForm<T extends AuthRoutes>(
+  props: AuthFormContainerProps<T, AuthFormData>
+) {
+  return <AuthFormContainer {...props} />;
+}
+
+export function AuthFormContainer<
+  TType extends string,
+  TFormData extends Record<TType, Record<string, any>>
+>(props: AuthFormContainerProps<TType, TFormData>) {
   const {
     title,
     subtitle,
@@ -1068,7 +1102,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>(null);
-  const [form, setForm] = useState<AuthFormData[T] | undefined>();
+  const [form, setForm] = useState<TFormData[TType] | undefined>();
 
   // if (isSubmitting)
   //   return <Loader title={props.loading.title} text={props.loading.subtitle} />;
@@ -1088,7 +1122,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           const formData = new FormData(formRef.current);
           const form = Object.fromEntries(
             formData.entries()
-          ) as AuthFormData[T];
+          ) as TFormData[TType];
           try {
             setForm(form);
             await props.onSubmit(form);
@@ -1137,7 +1171,8 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
               sx={{
                 fontSize: "sm",
                 fontWeight: 600,
-                color: "heading"
+                color: "heading",
+                lineHeight: "100%"
               }}
             >
               {strings.goBack()}
@@ -1198,7 +1233,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           ? children(form, { loading: isSubmitting })
           : children}
 
-        {canSkip && (
+        {canSkip && openURL && (
           <Button
             type="button"
             variant="new_bordered"

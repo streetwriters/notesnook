@@ -1970,8 +1970,7 @@ All attachments will be downloaded & cached again on access.
   backingUpDataWait: () =>
     t`We are creating a backup of your data. Please wait...`,
   resetAccountPassword: () => t`Reset account password`,
-  resettingAccountPassword: (progress: number) =>
-    t`Resetting account password (${progress})`,
+  resettingAccountPassword: () => t`Resetting account password...`,
   resetPasswordWait: () => t`Please wait while we reset your account password.`,
   recoverySuccess: () => t`Recovery successful!`,
   recoverySuccessDesc: () => t`Your account has been recovered.`,
