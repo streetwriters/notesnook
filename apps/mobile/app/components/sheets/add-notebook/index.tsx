@@ -163,7 +163,7 @@ export const AddNotebookSheet = ({
               }, 300);
             }}
             validators={[validators.required(strings.titleIsRequired())]}
-            placeholder={"eg. My Notebook"}
+            placeholder={"e.g. My Notebook"}
             onSubmitEditing={() => {
               descriptionInput.current?.focus();
             }}
@@ -181,7 +181,7 @@ export const AddNotebookSheet = ({
             formRef={formRef}
             testID={notesnook.ids.dialogs.notebook.inputs.description}
             label={strings.enterNotebookDescription()}
-            placeholder={"eg. This is My Notebook"}
+            placeholder={"e.g. This is My Notebook"}
             returnKeyLabel={strings.next()}
             returnKeyType="next"
             defaultValue={notebook ? notebook.description : ""}

@@ -42,6 +42,7 @@ import { LegendList, LegendListRenderItemProps } from "@legendapp/list";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { Radius, Spacing } from "../../common/design/spacing";
 import { createFormRef, validators } from "../ui/input/form-input";
+import { ToastManager } from "../../services/event-manager";
 
 const TagItem = (props: {
   tags: VirtualizedGrouping<Tag>;
@@ -240,9 +241,9 @@ export const SideMenuTags = () => {
           {
             label: strings.enterTitle(),
             name: "title",
-            placeholder: "eg. journal",
+            placeholder: "e.g. journal",
             ref: React.createRef(),
-            validators: [validators.required(strings.allFieldsRequired())],
+            validators: [validators.required(strings.titleIsRequired())],
             inputProps: {
               autoCapitalize: "none"
             }
@@ -255,6 +256,10 @@ export const SideMenuTags = () => {
               title: form.getValue("title").trim()
             });
             useTagStore.getState().refresh();
+            ToastManager.show({
+                                                  message: strings.actions.created.tag(1),
+                                                  type: "success",
+                                                });
             return true;
           } catch (e) {
             form.setError("title", (e as Error).message);

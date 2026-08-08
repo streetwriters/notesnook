@@ -33,7 +33,7 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { DisplayedNotification } from "@notifee/react-native";
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
@@ -78,6 +78,7 @@ import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 
 import { presentDateTimePicker } from "../components/date-time-picker";
+import { createFormRef, validators } from "../components/ui/input/form-input";
 
 export type ActionId =
   | "select"
@@ -302,8 +303,6 @@ export const useActions = ({
 
   async function createMenuShortcut() {
     if (item.type !== "notebook" && item.type !== "tag") return;
-
-    close();
     try {
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
@@ -334,32 +333,46 @@ export const useActions = ({
 
   async function renameTag() {
     if (item.type !== "tag") return;
-
     close();
     await sleep(300);
     presentDialog({
       title: strings.renameTag(),
-      positivePress: async (value: string) => {
-        if (!value || value === "" || value.trimStart().length == 0) return;
-        try {
-          await db.tags.add({
-            id: item.id,
-            title: value
-          });
-          eSendEvent(Navigation.routeNames.TaggedNotes);
-          InteractionManager.runAfterInteractions(() => {
-            useTagStore.getState().refresh();
-            useMenuStore.getState().setMenuPins();
-            Navigation.queueRoutesForUpdate();
-            useRelationStore.getState().update();
-          });
-        } catch (e) {
-          ToastManager.error(e as Error, undefined, "local");
+      form: {
+        formRef: createFormRef({
+          title: item.title
+        }),
+        items: [
+          {
+            label: strings.enterTitle(),
+            name: "title",
+            placeholder: "e.g. journal",
+            ref: React.createRef(),
+            validators: [validators.required(strings.titleIsRequired())],
+            inputProps: {
+              autoCapitalize: "none"
+            }
+          }
+        ],
+        onFormSubmit: async (form) => {
+          try {
+            await db.tags.add({
+              id: item.id,
+              title: form.getValue("title")
+            });
+            eSendEvent(Navigation.routeNames.TaggedNotes);
+            InteractionManager.runAfterInteractions(() => {
+              useTagStore.getState().refresh();
+              useMenuStore.getState().setMenuPins();
+              Navigation.queueRoutesForUpdate();
+              useRelationStore.getState().update();
+            });
+            return true;
+          } catch (e) {
+            form.setError("title", (e as Error).message);
+            return false;
+          }
         }
       },
-      input: true,
-      defaultValue: item.title,
-      inputPlaceholder: strings.enterTagTitle(),
       positiveText: strings.save()
     });
   }
@@ -435,6 +448,16 @@ export const useActions = ({
             useTagStore.getState().refresh();
             Navigation.queueRoutesForUpdate();
             useRelationStore.getState().update();
+          });
+          const actions = strings.actions.deleted;
+          ToastManager.show({
+            message:
+              item.type === "reminder"
+                ? actions.reminder(1)
+                : item.type === "tag"
+                  ? actions.tag(1)
+                  : actions.color(1),
+            type: "success"
           });
         },
         positiveText: strings.delete(),
@@ -556,9 +579,7 @@ export const useActions = ({
     actions.push(
       {
         id: "add-shortcut",
-        title: isPinnedToMenu
-          ? strings.removeShortcut()
-          : strings.addShortcut(),
+        title: strings.addShortcut(),
         icon: "arrow-square-out",
         onPress: createMenuShortcut,
         isToggle: true,
@@ -567,10 +588,7 @@ export const useActions = ({
       },
       {
         id: "default-tag",
-        title:
-          defaultTag === item.id
-            ? strings.removeAsDefault()
-            : strings.setAsDefault(),
+        title: strings.setAsDefault(),
         hidden: item.type !== "tag",
         icon: "check",
         onPress: async () => {
@@ -594,7 +612,6 @@ export const useActions = ({
             await db.settings.setDefaultTag(item.id);
             setDefaultTag(item.id);
           }
-          close();
         },
         checked: defaultTag === item.id,
         locked: !features?.defaultNotebookAndTag.isAllowed
@@ -628,16 +645,16 @@ export const useActions = ({
         },
         locked: !features?.notebooks.isAllowed
       },
-      // {
-      //   id: "edit-notebook",
-      //   title: strings.editNotebook(),
-      //   icon: "square-edit-outline",
-      //   onPress: async () => {
-      //     close();
-      //     await sleep(300);
-      //     AddNotebookSheet.present(item);
-      //   }
-      // },
+      {
+        id: "edit-notebook",
+        title: strings.editNotebook(),
+        icon: "square-edit-outline",
+        onPress: async () => {
+          close();
+          await sleep(300);
+          AddNotebookSheet.present(item);
+        }
+      },
       {
         id: "default-notebook",
         title:
@@ -670,7 +687,6 @@ export const useActions = ({
             await db.settings.setDefaultNotebook(notebook.id);
             setDefaultNotebook(notebook.id);
           }
-          close();
         },
         checked: defaultNotebook === item.id,
 
@@ -721,7 +737,7 @@ export const useActions = ({
   ) {
     actions.push({
       id: "default-homepage",
-      title: isHomepage ? strings.unsetAsHomepage() : strings.setAsHomepage(),
+      title: strings.setAsHomepage(),
       icon: "house",
       isToggle: true,
       checked: isHomepage,
