@@ -182,6 +182,7 @@ export const NotebookItem = ({
             alignItems: "center",
             flexDirection: "row",
             borderRadius: Radius.XS,
+            borderWidth: 0,
             paddingVertical: Spacing.LEVEL_1,
             paddingHorizontal: Spacing.LEVEL_1,
             marginBottom:
@@ -279,7 +280,9 @@ export const NotebookItem = ({
             ) : null}
 
             {item.hasChildren || hideNoteCount || selectionEnabled ? null : (
-              <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+              <Paragraph style={{
+                minWidth: 10
+              }} fontSize="SM" color={colors.secondary.paragraph}>
                 {totalNotes?.(notebook?.id) || 0}
               </Paragraph>
             )}
@@ -326,8 +329,8 @@ export const NotebookItem = ({
                 left={0}
                 style={{
                   borderRadius: defaultBorderRadius,
-                  width: undefined,
-                  height: undefined,
+                  width: 12,
+                  height: 12,
                   marginRight: 1.5
                 }}
                 iconFamily="notesnook"

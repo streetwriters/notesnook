@@ -178,7 +178,7 @@ export const Items = ({
           testID={"icon-" + item.id}
           style={{
             width: columnItemWidth - 10,
-            paddingVertical: Spacing.LEVEL_2,
+            paddingVertical: Spacing.LEVEL_2 - 2,
             borderRadius: 10,
             justifyContent: "center",
             alignItems: "center",
@@ -240,8 +240,10 @@ export const Items = ({
           paddingVertical: Spacing.LEVEL_2,
           paddingHorizontal: Spacing.LEVEL_2,
           borderRadius: Radius.XS,
-          borderWidth: item.checked ? 0 : 1,
-          borderColor: colors.primary.border,
+          borderWidth: item.checked ? 1 : 1,
+          borderColor: item.checked
+            ? colors.selected.background
+            : colors.primary.border,
           opacity: item.locked ? 0.7 : 1
         }}
       >
@@ -258,16 +260,14 @@ export const Items = ({
             iconFamily="notesnook"
             allowFontScaling
             size={AppFontSize.md}
-            color={item.checked ? colors.primary.icon : colors.secondary.icon}
+            color={colors.primary.icon}
           />
           <Paragraph
             numberOfLines={1}
             fontSize="XS"
-            fontFamily="MEDIUM"
+            fontFamily={item.checked ? "MEDIUM" : "REGULAR"}
             color={
-              item.checked
-                ? colors.primary.paragraph
-                : colors.secondary.paragraph
+              item.checked ? colors.primary.heading : colors.primary.paragraph
             }
             style={{ flexShrink: 1 }}
           >
@@ -292,10 +292,10 @@ export const Items = ({
       colors.primary.accent,
       colors.primary.background,
       colors.primary.border,
+      colors.primary.heading,
       colors.primary.icon,
       colors.primary.paragraph,
-      colors.secondary.icon,
-      colors.secondary.paragraph
+      colors.selected.background
     ]
   );
 
@@ -485,7 +485,7 @@ export const Items = ({
               <Paragraph
                 fontFamily="MEDIUM"
                 fontSize="SM"
-                color={colors.secondary.paragraph}
+                color={colors.primary.accent}
               >
                 {strings.preferences()}
               </Paragraph>
@@ -515,7 +515,7 @@ export const Items = ({
               <Paragraph
                 fontFamily="MEDIUM"
                 fontSize="SM"
-                color={colors.secondary.paragraph}
+                color={colors.primary.accent}
               >
                 {strings.actionsHeading()}
               </Paragraph>

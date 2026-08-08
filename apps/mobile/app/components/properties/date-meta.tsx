@@ -84,7 +84,7 @@ export const DateMeta = ({ item }: { item: Item }) => {
       >
         <View
           style={{
-            gap: Spacing.LEVEL_0
+            gap: Spacing.LEVEL_1
           }}
         >
           <Paragraph fontSize="XS" color={colors.secondary.paragraph}>

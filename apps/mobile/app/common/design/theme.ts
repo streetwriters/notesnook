@@ -238,7 +238,7 @@ export const THEME_DARK: any = {
         accent: "#008836",
         accentForeground: "#ffffff",
         paragraph: "#FBFBFB",
-        background: "#494949",
+        background: "#00883630",
         border: "#008836",
         heading: "#e3e3e3",
         icon: "#008836",

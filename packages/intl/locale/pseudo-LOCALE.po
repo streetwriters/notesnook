@@ -166,7 +166,11 @@ msgstr ""
 msgid "{count, plural, one {Attachment downloaded at {path}} other {#/{total} attachments downloaded as a zip file at {path}}}"
 msgstr ""
 
-#: generated/actions.ts:222
+#: generated/actions.ts:32
+msgid "{count, plural, one {Color deleted} other {# colors deleted}}"
+msgstr ""
+
+#: generated/actions.ts:228
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr ""
 
@@ -263,41 +267,41 @@ msgstr ""
 msgid "{count, plural, one {Item could not be unpublished} other {# items could not be unpublished}}"
 msgstr ""
 
-#: generated/actions.ts:214
+#: generated/actions.ts:220
 msgid "{count, plural, one {Item created} other {# items created}}"
 msgstr ""
 
-#: generated/actions.ts:47
+#: generated/actions.ts:53
 msgid "{count, plural, one {Item deleted} other {# items deleted}}"
 msgstr ""
 
-#: generated/actions.ts:185
+#: generated/actions.ts:191
 msgid "{count, plural, one {Item edited} other {# items edited}}"
 msgstr ""
 
-#: generated/actions.ts:70
+#: generated/actions.ts:76
 msgid "{count, plural, one {Item moved to trash} other {# items moved to trash}}"
 msgstr ""
 
-#: generated/actions.ts:86
-#: generated/actions.ts:99
+#: generated/actions.ts:92
+#: generated/actions.ts:105
 msgid "{count, plural, one {Item permanently deleted} other {# items permanently deleted}}"
 msgstr ""
 
-#: generated/actions.ts:116
+#: generated/actions.ts:122
 msgid "{count, plural, one {Item published} other {# items published}}"
 msgstr ""
 
-#: generated/actions.ts:231
+#: generated/actions.ts:237
 msgid "{count, plural, one {Item renamed} other {# items renamed}}"
 msgstr ""
 
-#: generated/actions.ts:149
-#: generated/actions.ts:162
+#: generated/actions.ts:155
+#: generated/actions.ts:168
 msgid "{count, plural, one {Item restored} other {# items restored}}"
 msgstr ""
 
-#: generated/actions.ts:133
+#: generated/actions.ts:139
 msgid "{count, plural, one {Item unpublished} other {# items unpublished}}"
 msgstr ""
 
@@ -329,23 +333,23 @@ msgstr ""
 msgid "{count, plural, one {Note exported} other {# notes exported}}"
 msgstr ""
 
-#: generated/actions.ts:55
+#: generated/actions.ts:61
 msgid "{count, plural, one {Note moved to trash} other {# notes moved to trash}}"
 msgstr ""
 
-#: generated/actions.ts:78
+#: generated/actions.ts:84
 msgid "{count, plural, one {Note permanently deleted} other {# notes permanently deleted}}"
 msgstr ""
 
-#: generated/actions.ts:107
+#: generated/actions.ts:113
 msgid "{count, plural, one {Note published} other {# notes published}}"
 msgstr ""
 
-#: generated/actions.ts:141
+#: generated/actions.ts:147
 msgid "{count, plural, one {Note restored} other {# notes restored}}"
 msgstr ""
 
-#: generated/actions.ts:124
+#: generated/actions.ts:130
 msgid "{count, plural, one {Note unpublished} other {# notes unpublished}}"
 msgstr ""
 
@@ -353,7 +357,7 @@ msgstr ""
 msgid "{count, plural, one {Note will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?} other {# notes will be automatically deleted from all other devices & any future changes won't get synced. Are you sure you want to continue?}}"
 msgstr ""
 
-#: generated/actions.ts:193
+#: generated/actions.ts:199
 msgid "{count, plural, one {Notebook created} other {# notebooks created}}"
 msgstr ""
 
@@ -361,19 +365,19 @@ msgstr ""
 msgid "{count, plural, one {Notebook deleted} other {# notebooks deleted}}"
 msgstr ""
 
-#: generated/actions.ts:174
+#: generated/actions.ts:180
 msgid "{count, plural, one {Notebook edited} other {# notebooks edited}}"
 msgstr ""
 
-#: generated/actions.ts:59
+#: generated/actions.ts:65
 msgid "{count, plural, one {Notebook moved to trash} other {# notebooks moved to trash}}"
 msgstr ""
 
-#: generated/actions.ts:82
+#: generated/actions.ts:88
 msgid "{count, plural, one {Notebook permanently deleted} other {# notebooks permanently deleted}}"
 msgstr ""
 
-#: generated/actions.ts:145
+#: generated/actions.ts:151
 msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 msgstr ""
 
@@ -468,11 +472,11 @@ msgstr ""
 msgid "{count, plural, one {Restoring item...} other {Restoring # items...}}"
 msgstr ""
 
-#: generated/actions.ts:201
+#: generated/actions.ts:207
 msgid "{count, plural, one {Shortcut created} other {# shortcuts created}}"
 msgstr ""
 
-#: generated/actions.ts:197
+#: generated/actions.ts:203
 msgid "{count, plural, one {Tag created} other {# tags created}}"
 msgstr ""
 
@@ -480,7 +484,7 @@ msgstr ""
 msgid "{count, plural, one {Tag deleted} other {# tags deleted}}"
 msgstr ""
 
-#: generated/actions.ts:170
+#: generated/actions.ts:176
 msgid "{count, plural, one {Tag edited} other {# tags edited}}"
 msgstr ""
 

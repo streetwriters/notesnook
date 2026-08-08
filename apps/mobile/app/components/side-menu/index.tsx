@@ -219,7 +219,7 @@ const TabBar = (props: SimpleTabBarProps) => {
       case "home":
         return "home";
       case "notebooks":
-        return "bookmark";
+        return "book";
       case "tags":
         return "shopping-mode";
       default:
@@ -439,13 +439,16 @@ const TabBar = (props: SimpleTabBarProps) => {
                                   {
                                     label: strings.enterTitle(),
                                     name: "title",
-                                    placeholder: "eg. journal",
+                                    placeholder: "e.g. journal",
                                     ref: React.createRef(),
                                     validators: [
                                       validators.required(
-                                        strings.allFieldsRequired()
+                                        strings.titleIsRequired()
                                       )
-                                    ]
+                                    ],
+                                    inputProps: {
+                                      autoCapitalize: "none"
+                                    }
                                   }
                                 ],
                                 onFormSubmit: async (form) => {
@@ -455,6 +458,10 @@ const TabBar = (props: SimpleTabBarProps) => {
                                       title: form.getValue("title").trim()
                                     });
                                     useTagStore.getState().refresh();
+                                    ToastManager.show({
+                                      message: strings.actions.created.tag(1),
+                                      type: "success",
+                                    });
                                     return true;
                                   } catch (e) {
                                     form.setError(

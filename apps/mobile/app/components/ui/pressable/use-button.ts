@@ -133,7 +133,7 @@ const buttonTypes = (
     primary: colors.selected.background,
     text: colors.selected.buttonForeground,
     selected: colors.selected.background,
-    borderWidth: 0.8,
+    borderWidth: 0,
     borderColor: colors.selected.border,
     borderSelectedColor: getColorLinearShade(
       colors.selected.border,

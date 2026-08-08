@@ -160,7 +160,8 @@ export const Properties = ({
         >
           <View
             style={{
-              gap: Spacing.LEVEL_1
+              gap: Spacing.LEVEL_1,
+              marginBottom: Spacing.LEVEL_3
             }}
           >
             {item.type === "note" && (noteNotebooks.length || tags.length) ? (
@@ -224,7 +225,7 @@ export const Properties = ({
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-between"
+                justifyContent: "space-between",
               }}
             >
               <View
@@ -306,10 +307,13 @@ export const Properties = ({
               />
             ) : null}
           </View>
+
           {item.type === "note" ? (
             <LineSeparator paddingVertical={Spacing.LEVEL_3} />
           ) : null}
-          <DateMeta item={item} />.
+
+          <DateMeta item={item} />
+
           {item.type === "note" && colorNotes.length > 0 ? (
             <View>
               <LineSeparator
@@ -392,7 +396,7 @@ export const Properties = ({
         </View>
 
         <LineSeparator
-          paddingVertical={Spacing.LEVEL_2}
+          paddingVertical={Spacing.LEVEL_3}
           paddingHorizontal={Spacing.LEVEL_3}
         />
 
