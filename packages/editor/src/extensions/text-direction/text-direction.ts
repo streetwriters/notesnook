@@ -114,10 +114,40 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
     return {
       setTextDirection:
         (direction) =>
-        ({ commands }) => {
-          return this.options.types.every((type) =>
-            commands.updateAttributes(type, { textDirection: direction })
-          );
+        ({ state, tr, dispatch }) => {
+          const value = direction || "";
+          const { $from, from, to } = state.selection;
+
+          // Expand to the outermost block that carries a direction, so a
+          // whole task list turns together — every item's paragraph and
+          // all — instead of only the row the cursor is in. Otherwise the
+          // list's own direction flips while its items keep theirs, and the
+          // checkboxes and text end up on opposite sides.
+          let start = from;
+          let end = to;
+          for (let depth = $from.depth; depth > 0; depth--) {
+            if (this.options.types.includes($from.node(depth).type.name)) {
+              start = Math.min(start, $from.before(depth));
+              end = Math.max(end, $from.after(depth));
+            }
+          }
+
+          let changed = false;
+          state.doc.nodesBetween(start, end, (node, pos) => {
+            if (
+              !this.options.types.includes(node.type.name) ||
+              node.attrs.textDirection === value
+            )
+              return;
+            tr.setNodeMarkup(pos, undefined, {
+              ...node.attrs,
+              textDirection: value
+            });
+            changed = true;
+          });
+
+          if (changed) dispatch?.(tr);
+          return changed;
         }
     };
   }
