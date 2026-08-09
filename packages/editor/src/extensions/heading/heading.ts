@@ -34,6 +34,7 @@ import {
   AttributeUpdate,
   BatchAttributeStep
 } from "../../utils/batch-attribute-step.js";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 const COLLAPSIBLE_BLOCK_TYPES = [
   "paragraph",
@@ -223,24 +224,34 @@ export const Heading = TiptapHeading.extend({
         const range = document.createRange();
         range.selectNodeContents(e.target);
 
-        const hitArea = { height: 40, width: 40 };
-
         const rects = range.getClientRects();
         const lines = rectsToLines(rects);
         const lastLine = lines[lines.length - 1];
         if (!lastLine) return;
         const targetRect = isRtl ? lastLine[0] : lastLine[lastLine.length - 1];
 
-        const { x, y, width } = targetRect;
+        const { x, y, width, height } = targetRect;
 
-        let xStart = clientX >= x + width;
-        let xEnd = clientX <= x + width + hitArea.width;
-        const yStart = clientY >= y;
-        const yEnd = clientY <= y + hitArea.height;
+        const isMobile = useToolbarStore.getState().isMobile;
 
-        if (isRtl) {
-          xStart = clientX >= x - hitArea.width;
-          xEnd = clientX <= x;
+        let xStart: boolean, xEnd: boolean, yStart: boolean, yEnd: boolean;
+        if (isMobile) {
+          const hitWidth = 40;
+          const gap = 10;
+          xStart = isRtl
+            ? clientX >= x - gap - hitWidth
+            : clientX >= x + width + gap;
+          xEnd = isRtl ? clientX <= x - gap : clientX <= x + width + gap + hitWidth;
+          yStart = clientY >= y;
+          yEnd = clientY <= y + height;
+        } else {
+          const size = 15;
+          const centerX = isRtl ? x - 20 : x + width + 20;
+          const centerY = y + height / 2;
+          xStart = clientX >= centerX - size / 2;
+          xEnd = clientX <= centerX + size / 2;
+          yStart = clientY >= centerY - size / 2;
+          yEnd = clientY <= centerY + size / 2;
         }
 
         if (xStart && xEnd && yStart && yEnd) {
