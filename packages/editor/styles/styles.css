@@ -657,6 +657,21 @@ p > *::selection {
   border-left: 1px solid var(--hover);
 }
 
+.outline-list > li.nested::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40px;
+  width: 40px;
+  height: 1lh;
+  cursor: pointer;
+}
+
+.outline-list[dir="rtl"] > li.nested::after {
+  left: unset;
+  right: -40px;
+}
+
 /* IMAGE */
 
 .image-view-content-wrap.ProseMirror-selectednode .resizer::before {
