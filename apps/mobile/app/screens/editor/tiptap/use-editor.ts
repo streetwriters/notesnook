@@ -749,12 +749,13 @@ export const useEditor = (
           await postMessage(NativeEvents.title, item.title, tabId);
           overlay(false);
 
+          const updatedTab = useTabStore.getState().getTab(tabId!);
           await postMessage(
             NativeEvents.html,
             {
               data: currentContents.current[item.id]?.data || "",
-              scrollTop: tab?.session?.scrollTop,
-              selection: tab?.session?.selection,
+              scrollTop: updatedTab?.session?.scrollTop,
+              selection: updatedTab?.session?.selection,
               searchResultIndex: event.searchResultIndex
             },
             tabId,
