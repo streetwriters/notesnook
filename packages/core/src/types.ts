@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Cipher } from "@notesnook/crypto";
 import { isCipher } from "./utils/index.js";
+import type { SyncableItemType, SyncItem } from "./api/sync/types.js";
 
 export type TimeFormat = "12-hour" | "24-hour";
 export type DayFormat = "short" | "long";
@@ -85,6 +86,7 @@ export type Collections = {
   vaults: "vault";
   monographs: "monograph";
   inboxitemshistory: "inboxitemhistory";
+  failedsyncitems: "failedsyncitem";
 
   /**
    * @deprecated only kept here for migration purposes
@@ -117,6 +119,7 @@ export type GroupableItem = ValueOf<
     | "vault"
     | "monograph"
     | "inboxitemhistory"
+    | "failedsyncitem"
   >
 >;
 
@@ -140,6 +143,7 @@ export type ItemMap = {
   searchResult: HighlightedResult;
   monograph: Monograph;
   inboxitemhistory: InboxItemHistory;
+  failedsyncitem: FailedSyncItem;
 
   /**
    * @deprecated only kept here for migration purposes
@@ -545,6 +549,14 @@ export interface InboxItemHistory extends BaseItem<"inboxitemhistory"> {
   status: "failed" | "success";
   source?: string;
   errorContext?: string;
+}
+
+export interface FailedSyncItem extends BaseItem<"failedsyncitem"> {
+  itemType: SyncableItemType;
+  itemId: string;
+  dateSynced: number;
+  cipher: SyncItem;
+  errors: string[];
 }
 
 export type Match = {

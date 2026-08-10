@@ -41,6 +41,7 @@ import {
   Attachment,
   Color,
   ContentItem,
+  FailedSyncItem,
   HistorySession,
   InboxItemHistory,
   ItemReference,
@@ -94,6 +95,7 @@ export interface DatabaseSchema {
   vaults: SQLiteItem<Vault>;
   monographs: SQLiteItem<Monograph>;
   inboxitemshistory: SQLiteItem<InboxItemHistory>;
+  failedsyncitems: SQLiteItem<FailedSyncItem>;
 }
 
 export type RawDatabaseSchema = DatabaseSchema & {
@@ -279,6 +281,10 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
   },
   trash: (row) => {
     if (row.expiryDate) row.expiryDate = JSON.parse(row.expiryDate);
+  },
+  failedsyncitem: (row) => {
+    if (row.cipher) row.cipher = JSON.parse(row.cipher);
+    if (row.errors) row.errors = JSON.parse(row.errors);
   }
 };
 

@@ -496,6 +496,21 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("errorContext", "text")
             .execute();
         }
+      },
+      "a-2026-08-10": {
+        async up(db) {
+          await db.schema
+            .createTable("failedsyncitems")
+            .ifNotExists()
+            .modifyEnd(sql`without rowid`)
+            .$call(addBaseColumns)
+            .addColumn("dateSynced", "integer")
+            .addColumn("cipher", "text")
+            .addColumn("errors", "text")
+            .addColumn("itemType", "text")
+            .addColumn("itemId", "text")
+            .execute();
+        }
       }
     };
   }
