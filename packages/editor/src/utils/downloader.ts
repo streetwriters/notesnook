@@ -67,7 +67,11 @@ export function corsify(url?: string, host?: string) {
   return url;
 }
 
-export async function downloadImage(url: string, options?: DownloadOptions) {
+export async function downloadMedia(
+  url: string,
+  mimePrefix: "image/" | "audio/",
+  options?: DownloadOptions
+) {
   const corsifiedURL = corsify(url, options?.corsHost);
   if (!corsifiedURL) return;
 
@@ -83,7 +87,7 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
 
   if (contentType && UTITypes[contentType]) contentType = UTITypes[contentType];
 
-  if (!contentType || !contentType.startsWith("image/")) return;
+  if (!contentType || !contentType.startsWith(mimePrefix)) return;
 
   let blob = await response.blob();
   if (UTITypes[blob.type])
@@ -96,6 +100,29 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
     url: URL.createObjectURL(blob),
     mimeType: contentType,
     size: blob.size
+  };
+}
+
+export async function downloadImage(url: string, options?: DownloadOptions) {
+  return downloadMedia(url, "image/", options);
+}
+
+export async function downloadAudio(url: string, options?: DownloadOptions) {
+  return downloadMedia(url, "audio/", options);
+}
+
+export function getDataURLMetadata(dataurl: string): {
+  mimeType?: string;
+  size?: number;
+} {
+  const { data, mimeType } = DataURL.toObject(dataurl);
+  if (!data || !dataurl.slice(0, dataurl.indexOf(",")).endsWith(";base64"))
+    return { mimeType };
+
+  const padding = data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0;
+  return {
+    mimeType,
+    size: Math.floor((data.length * 3) / 4) - padding
   };
 }
 

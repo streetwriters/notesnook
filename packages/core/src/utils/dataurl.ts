@@ -19,13 +19,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { parse, validate } from "@readme/data-urls";
 
-function toObject(dataurl: string): { mimeType?: string; data?: string } {
+function toObject(dataurl: string): {
+  mimeType?: string;
+  data?: string;
+  size?: number;
+} {
   const result = parse(dataurl);
   if (!result) return {};
   return {
     mimeType: result.contentType,
-    data: result.data
+    data: result.data,
+    size: result.base64 ? getBase64Size(result.data) : undefined
   };
+}
+
+function getBase64Size(data: string) {
+  const padding = data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0;
+  return Math.floor((data.length * 3) / 4) - padding;
 }
 
 function fromObject({ mimeType, data }: { mimeType: string; data: string }) {
