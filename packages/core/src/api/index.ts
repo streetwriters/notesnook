@@ -85,6 +85,7 @@ import { LazyPromise } from "../utils/lazy-promise.js";
 import { InboxApiKeys } from "./inbox-api-keys.js";
 import { Circle } from "./circle.js";
 import { Wrapped } from "./wrapped.js";
+import { FailedSyncItems } from "../collections/failed-sync-items.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -230,6 +231,7 @@ class Database {
 
   inboxApiKeys = new InboxApiKeys(this, this.tokenManager);
   inboxItemsHistory = new InboxItemsHistory(this);
+  failedSyncItems = new FailedSyncItems(this);
 
   wrapped = new Wrapped(this);
 
@@ -353,6 +355,7 @@ class Database {
     await this.monographsCollection.init();
 
     await this.inboxItemsHistory.init();
+    await this.failedSyncItems.init();
 
     await this.trash.init();
 

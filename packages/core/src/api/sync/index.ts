@@ -51,6 +51,7 @@ import {
   SYNC_COLLECTIONS_MAP,
   SyncableItemType,
   SyncInboxItem,
+  SyncItem,
   SyncTransferItem
 } from "./types.js";
 import { DownloadableFile } from "../../database/fs.js";
@@ -383,17 +384,76 @@ export class Sync {
       versionMap.set(item.id, item.v);
     }
 
-    for (const keyInfo of keys) {
-      const itemsToDecrypt = itemsByKeyVersion.get(keyInfo.version);
-      if (!itemsToDecrypt || itemsToDecrypt.length === 0) continue;
+    const failedItems: SyncItem[] = [];
+    for (const [keyVersion, items] of itemsByKeyVersion.entries()) {
+      const keyInfo = keys.find((k) => k.version === keyVersion);
+      if (!keyInfo) {
+        this.logger.error(
+          new Error(
+            `No key found for key version ${keyVersion}. Retrying items will all available keys.`
+          )
+        );
+        failedItems.push(...items);
+        continue;
+      }
 
       this.logger.info("Decrypting using key", {
         keyInfo: keyInfo.version,
-        items: itemsToDecrypt.length
+        items: items.length
       });
-      decrypted.push(
-        ...(await this.db.storage().decryptMulti(keyInfo.key, itemsToDecrypt))
-      );
+      try {
+        const decryptedItems = await this.db
+          .storage()
+          .decryptMulti(keyInfo.key, items);
+        decrypted.push(...decryptedItems);
+      } catch (error) {
+        this.logger.error(
+          error,
+          `Failed to decrypt items with key version ${keyInfo.version}.`
+        );
+        failedItems.push(...items);
+      }
+    }
+
+    if (failedItems.length > 0) {
+      for (const item of failedItems) {
+        const decryptionErrors: string[] = [];
+        for (const keyInfo of keys) {
+          this.logger.info("Decrypting failed sync item using key", {
+            keyInfo: keyInfo.version
+          });
+          const decryptedItem = await this.db
+            .storage()
+            .decrypt(keyInfo.key, item)
+            .catch((error) => {
+              decryptionErrors.push(
+                `Failed to decrypt item ${item.id} with key version ${
+                  keyInfo.version
+                }. Error: ${
+                  error instanceof Error ? error.message : JSON.stringify(error)
+                }`
+              );
+              this.logger.error(
+                error,
+                `Failed to decrypt item ${item.id} with key version ${keyInfo.version}.`
+              );
+              return false;
+            });
+          if (typeof decryptedItem === "string") {
+            decrypted.push(decryptedItem);
+            break;
+          }
+        }
+        if (decryptionErrors.length === keys.length) {
+          await this.db.failedSyncItems.add({
+            itemId: item.id,
+            itemType: itemType,
+            cipher: item,
+            errors: decryptionErrors,
+            dateSynced: Date.now()
+          });
+        }
+      }
     }
 
     const deserialized: MaybeDeletedItem<Item>[] = [];
