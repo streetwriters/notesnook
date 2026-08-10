@@ -29,7 +29,6 @@ import { TreeItem } from "../../stores/create-notebook-tree-stores";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNotebooks } from "../../stores/use-notebook-store";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import { Properties } from "../properties";
 import { NotebookItem } from "./notebook-item";
 import { SideMenuHeader } from "./side-menu-header";
@@ -41,6 +40,10 @@ import {
 } from "./stores";
 import { LegendList } from "@legendapp/list";
 import { useRelationStore } from "../../stores/use-relation-store";
+import { AddNotebookSheet } from "../sheets/add-notebook";
+import { Spacing } from "../../common/design/spacing";
+import AppIcon from "../ui/AppIcon";
+import { KeyboardAvoidingView, Platform } from "react-native";
 useSideMenuNotebookSelectionStore.setState({
   multiSelect: true
 });
@@ -53,7 +56,7 @@ export const SideMenuNotebooks = () => {
   const [filteredNotebooks, setFilteredNotebooks] = React.useState(notebooks);
   const searchTimer = React.useRef<NodeJS.Timeout>(undefined);
   const lastQuery = React.useRef<string>(undefined);
-  const updater = useRelationStore(state => state.updater);
+  const updater = useRelationStore((state) => state.updater);
   const loadRootNotebooks = React.useCallback(async () => {
     if (!filteredNotebooks) return;
     const _notebooks: Notebook[] = [];
@@ -81,7 +84,7 @@ export const SideMenuNotebooks = () => {
 
   useEffect(() => {
     updateNotebooks();
-  }, [updateNotebooks,updater]);
+  }, [updateNotebooks, updater]);
 
   useEffect(() => {
     (async () => {
@@ -127,23 +130,29 @@ export const SideMenuNotebooks = () => {
     },
     []
   );
-
   return (
-    <View
-      style={{
-        height: "100%"
-      }}
+    <KeyboardAvoidingView
+      style={{ height: "100%" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? 64 : 0}
     >
       {!notebooks || notebooks.placeholders.length === 0 ? (
         <SideMenuListEmpty
-          placeholder={strings.emptyPlaceholders("notebook")}
+          placeholderTitle={strings.noNotebooksYet()}
+          placeholderBody={strings.notebooksEmptyBody()}
+          placeholderButtonTitle={strings.createNotebook()}
+          onPressPlaceholderButton={() => {
+            AddNotebookSheet.present();
+          }}
           isLoading={isLoading}
         />
       ) : (
         <>
           <LegendList
+            style={{ flex: 1 }}
             data={tree}
             bounces={false}
+            keyboardShouldPersistTaps="handled"
             bouncesZoom={false}
             overScrollMode="never"
             estimatedItemSize={30}
@@ -151,7 +160,8 @@ export const SideMenuNotebooks = () => {
               <View
                 style={{
                   backgroundColor: colors.primary.background,
-                  paddingTop: DefaultAppStyles.GAP_VERTICAL
+                  paddingTop: Spacing.LEVEL_1,
+                  paddingBottom: Spacing.LEVEL_3
                 }}
               >
                 <SideMenuHeader />
@@ -159,38 +169,44 @@ export const SideMenuNotebooks = () => {
             }
             renderItem={renderItem}
           />
-          <View
-            style={{
-              width: "100%",
-              paddingHorizontal: DefaultAppStyles.GAP,
-              backgroundColor: colors.primary.background,
-              borderTopColor: colors.primary.border,
-              borderTopWidth: 1,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL
-            }}
-          >
-            <TextInput
-              placeholder="Filter notebooks..."
+
+          <View style={{ paddingHorizontal: Spacing.LEVEL_3 }}>
+            <View
               style={{
-                fontFamily: "Inter-Regular",
-                fontSize: AppFontSize.xs,
-                paddingTop: 0,
-                paddingBottom: 0
+                width: "100%",
+                backgroundColor: colors.primary.background,
+                borderTopColor: colors.primary.separator,
+                borderTopWidth: 1,
+                paddingVertical: Spacing.LEVEL_2,
+                flexDirection: "row",
+                justifyContent: "space-between"
               }}
-              cursorColor={colors.primary.accent}
-              onChangeText={async (value: string) => {
-                searchTimer.current && clearTimeout(searchTimer.current);
-                searchTimer.current = setTimeout(async () => {
-                  lastQuery.current = value;
-                  updateNotebooks();
-                }, 500);
-              }}
-              placeholderTextColor={colors.primary.placeholder}
-            />
+            >
+              <TextInput
+                placeholder={strings.filterNotebooks()}
+                style={{
+                  fontFamily: "Inter-Regular",
+                  fontSize: AppFontSize.sm,
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  color: colors.secondary.paragraph
+                }}
+                cursorColor={colors.primary.accent}
+                onChangeText={async (value: string) => {
+                  searchTimer.current && clearTimeout(searchTimer.current);
+                  searchTimer.current = setTimeout(async () => {
+                    lastQuery.current = value;
+                    updateNotebooks();
+                  }, 500);
+                }}
+                placeholderTextColor={colors.primary.placeholder}
+              />
+              <AppIcon name="funnel" size={14} iconFamily="notesnook" />
+            </View>
           </View>
         </>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -235,8 +251,7 @@ const NotebookItemWrapper = React.memo(
     return (
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          marginTop: index === 0 ? DefaultAppStyles.GAP_VERTICAL : 0
+          paddingHorizontal: Spacing.LEVEL_3
         }}
       >
         <NotebookItem
@@ -275,8 +290,8 @@ const NotebookItemWrapper = React.memo(
             Properties.present(item.notebook, false, [
               {
                 id: "select",
-                title: strings.select() + " " + strings.dataTypes["notebook"](),
-                icon: "checkbox-outline",
+                title: strings.select(),
+                icon: "check-square",
                 onPress: () => {
                   const store = useSideMenuNotebookSelectionStore;
                   store.setState({

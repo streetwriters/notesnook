@@ -27,7 +27,8 @@ import Navigation from "../../../services/navigation";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
 import { presentDialog } from "../../dialog/functions";
-import SelectionWrapper, { selectItem } from "../selection-wrapper";
+import SelectionWrapper from "../selection-wrapper";
+import { selectItem } from "../../../stores/use-selection-store";
 import { strings } from "@notesnook/intl";
 
 export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
