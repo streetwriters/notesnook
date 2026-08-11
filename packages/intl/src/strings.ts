@@ -2809,5 +2809,20 @@ Continue without attachments?`,
   versionDeleted: () => actions.deleted.version(1),
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
-    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`
+    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
+  troubleshoot: () => t`Troubleshoot`,
+  failedSyncItems: () => t`Failed sync items`,
+  failedSyncItemsDesc: () =>
+    t`View items that failed to decrypt during sync and retry them with a different key`,
+  noFailedSyncItems: () => t`No failed sync items`,
+  deleteAllFailedSyncItemsDesc: () =>
+    t`Are you sure you want to delete all failed sync items? This will also remove the corresponding local items.`,
+  retryWithCustomKey: () => t`Retry with custom key`,
+  retryWithCurrentKeys: () => t`Retry with current keys`,
+  decryptionSucceeded: (count: number) =>
+    t`${count} item(s) decrypted successfully`,
+  decryptionFailed: () => t`Decryption failed`,
+  decryptionPartialSuccess: (succeeded: number, failed: number) =>
+    t`${succeeded} item(s) recovered, ${failed} still failed`,
+  itemId: () => t`Item ID`
 };

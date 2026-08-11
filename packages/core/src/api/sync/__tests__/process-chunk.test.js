@@ -278,6 +278,100 @@ test("failedSyncItems.clear removes all failed items", () =>
     expect(await isItemDeleted(db, "notes", noteId2)).toBeTruthy();
   }));
 
+test("failedSyncItems.remove deletes the failed row without soft-deleting the underlying item", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+
+    const noteId = await db.notes.add(TEST_NOTE);
+    const failedId = await db.failedSyncItems.add(
+      failedItemPayload(noteId, "note")
+    );
+
+    await db.failedSyncItems.remove([failedId]);
+
+    expect(await db.failedSyncItems.all.items()).toHaveLength(0);
+    expect(await isItemDeleted(db, "notes", noteId)).toBe(false);
+    expect(await db.notes.note(noteId)).toBeDefined();
+  }));
+
+test("retryFailedItems decrypts with a custom key, merges the item, and removes the failed row", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+
+    const keys = await db.user.getDataEncryptionKeys();
+    const key = keys[0].key;
+    const notePayload = {
+      id: "retry-note-1",
+      type: "note",
+      title: "Recovered Note",
+      dateModified: Date.now(),
+      dateCreated: Date.now()
+    };
+    const cipher = await db.storage().encrypt(key, JSON.stringify(notePayload));
+    const failedId = await db.failedSyncItems.add({
+      itemId: notePayload.id,
+      itemType: "note",
+      cipher: {
+        ...cipher,
+        id: notePayload.id,
+        v: CURRENT_DATABASE_VERSION,
+        keyVersion: keys[0].version
+      },
+      errors: ["previous failure"],
+      dateSynced: Date.now()
+    });
+
+    const result = await db.syncer.sync.retryFailedItems([failedId], key);
+
+    expect(result.succeeded).toEqual([failedId]);
+    expect(result.failed).toHaveLength(0);
+    expect(await db.failedSyncItems.all.items()).toHaveLength(0);
+
+    const note = await db.notes.note(notePayload.id);
+    expect(note).toBeDefined();
+    expect(note.title).toBe("Recovered Note");
+  }));
+
+test("retryFailedItems records a failure and keeps the failed row when the key is wrong", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+
+    const keys = await db.user.getDataEncryptionKeys();
+    const key = keys[0].key;
+    const wrongKey = await db.crypto().generateRandomKey();
+    const notePayload = {
+      id: "retry-note-2",
+      type: "note",
+      title: "Still Locked",
+      dateModified: Date.now(),
+      dateCreated: Date.now()
+    };
+    const cipher = await db.storage().encrypt(key, JSON.stringify(notePayload));
+    const failedId = await db.failedSyncItems.add({
+      itemId: notePayload.id,
+      itemType: "note",
+      cipher: {
+        ...cipher,
+        id: notePayload.id,
+        v: CURRENT_DATABASE_VERSION,
+        keyVersion: keys[0].version
+      },
+      errors: ["previous failure"],
+      dateSynced: Date.now()
+    });
+
+    const result = await db.syncer.sync.retryFailedItems([failedId], wrongKey);
+
+    expect(result.succeeded).toHaveLength(0);
+    expect(result.failed).toHaveLength(1);
+    expect(result.failed[0].id).toBe(failedId);
+
+    const failedItems = await db.failedSyncItems.all.items();
+    expect(failedItems).toHaveLength(1);
+    expect(failedItems[0].errors.length).toBeGreaterThan(1);
+    expect(await db.notes.note(notePayload.id)).toBeUndefined();
+  }));
+
 async function isItemDeleted(db, collectionName, itemId) {
   const item = await db
     .sql()

@@ -87,6 +87,11 @@ export class FailedSyncItems implements ICollection {
     await this.collection.delete(ids);
   }
 
+  async remove(ids: string[]) {
+    if (ids.length <= 0) return;
+    await this.collection.delete(ids);
+  }
+
   async clear() {
     const ids = await this.all.ids();
     await this.delete(ids);

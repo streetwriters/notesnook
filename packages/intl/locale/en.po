@@ -512,6 +512,10 @@ msgstr "{count, plural, one {Version deleted} other {# versions deleted}}"
 msgid "{count} characters"
 msgstr "{count} characters"
 
+#: src/strings.ts:2823
+msgid "{count} item(s) decrypted successfully"
+msgstr "{count} item(s) decrypted successfully"
+
 #: src/strings.ts:1566
 msgid "{days, plural, one {1 day} other {# days}}"
 msgstr "{days, plural, one {1 day} other {# days}}"
@@ -595,6 +599,10 @@ msgstr "{platform, select, android {Backup file saved in \"Notesnook backups\" f
 #: src/strings.ts:2370
 msgid "{selected} selected"
 msgstr "{selected} selected"
+
+#: src/strings.ts:2826
+msgid "{succeeded} item(s) recovered, {failed} still failed"
+msgstr "{succeeded} item(s) recovered, {failed} still failed"
 
 #: src/strings.ts:382
 msgid "{type, select, github {v{version} has been released on GitHub} other {v{version} has been released}}"
@@ -994,6 +1002,10 @@ msgstr "Are you sure you want to clear trash?"
 #: src/strings.ts:2761
 msgid "Are you sure you want to delete all failed inbox items?"
 msgstr "Are you sure you want to delete all failed inbox items?"
+
+#: src/strings.ts:2819
+msgid "Are you sure you want to delete all failed sync items? This will also remove the corresponding local items."
+msgstr "Are you sure you want to delete all failed sync items? This will also remove the corresponding local items."
 
 #: src/strings.ts:2734
 msgid "Are you sure you want to delete this attachment?"
@@ -2258,6 +2270,10 @@ msgstr "Debugging"
 msgid "Decrease {title}"
 msgstr "Decrease {title}"
 
+#: src/strings.ts:2824
+msgid "Decryption failed"
+msgstr "Decryption failed"
+
 #: src/strings.ts:660
 #: src/strings.ts:2010
 msgid "Default"
@@ -3027,6 +3043,10 @@ msgstr "Failed"
 msgid "Failed inbox items"
 msgstr "Failed inbox items"
 
+#: src/strings.ts:2814
+msgid "Failed sync items"
+msgstr "Failed sync items"
+
 #: src/strings.ts:2653
 msgid "Failed to attach file"
 msgstr "Failed to attach file"
@@ -3792,6 +3812,10 @@ msgstr "Item"
 msgid "Item deleted"
 msgstr "Item deleted"
 
+#: src/strings.ts:2827
+msgid "Item ID"
+msgstr "Item ID"
+
 #: src/strings.ts:311
 #: src/strings.ts:1705
 msgid "items"
@@ -4499,6 +4523,10 @@ msgstr "No encryption key found"
 #: src/strings.ts:2756
 msgid "No failed inbox items"
 msgstr "No failed inbox items"
+
+#: src/strings.ts:2817
+msgid "No failed sync items"
+msgstr "No failed sync items"
 
 #: src/strings.ts:1667
 msgid "No headings found"
@@ -5846,6 +5874,14 @@ msgstr "Resubscribe to Pro"
 msgid "Retry"
 msgstr "Retry"
 
+#: src/strings.ts:2821
+msgid "Retry with current keys"
+msgstr "Retry with current keys"
+
+#: src/strings.ts:2820
+msgid "Retry with custom key"
+msgstr "Retry with custom key"
+
 #: src/strings.ts:513
 msgid "Reupload"
 msgstr "Reupload"
@@ -7127,6 +7163,10 @@ msgstr "Trash gets automatically cleaned up after {days} days"
 msgid "Trash gets automatically cleaned up daily"
 msgstr "Trash gets automatically cleaned up daily"
 
+#: src/strings.ts:2813
+msgid "Troubleshoot"
+msgstr "Troubleshoot"
+
 #: src/strings.ts:2553
 msgid "Try {plan} for free"
 msgstr "Try {plan} for free"
@@ -7592,6 +7632,10 @@ msgstr "View and share debug logs"
 #: src/strings.ts:2755
 msgid "View failed inbox items and error contexts"
 msgstr "View failed inbox items and error contexts"
+
+#: src/strings.ts:2816
+msgid "View items that failed to decrypt during sync and retry them with a different key"
+msgstr "View items that failed to decrypt during sync and retry them with a different key"
 
 #: src/strings.ts:1749
 msgid "View receipt"

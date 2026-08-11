@@ -367,11 +367,10 @@ export class Sync {
     options: SyncOptions
   ) {
     const itemType = chunk.type;
-    const decrypted: string[] = [];
+    const decrypted: { data: string; version: number }[] = [];
 
     // Pre-group items by keyVersion for O(1) lookups
     const itemsByKeyVersion = new Map<KeyVersion, typeof chunk.items>();
-    const versionMap = new Map<string, number>();
 
     for (const item of chunk.items) {
       const keyVersion = item.keyVersion ?? KEY_VERSION.LEGACY;
@@ -381,7 +380,6 @@ export class Sync {
       } else {
         itemsByKeyVersion.set(keyVersion, [item]);
       }
-      versionMap.set(item.id, item.v);
     }
 
     const failedItems: SyncItem[] = [];
@@ -405,7 +403,9 @@ export class Sync {
         const decryptedItems = await this.db
           .storage()
           .decryptMulti(keyInfo.key, items);
-        decrypted.push(...decryptedItems);
+        for (let i = 0; i < decryptedItems.length; ++i) {
+          decrypted.push({ data: decryptedItems[i], version: items[i].v });
+        }
       } catch (error) {
         this.logger.error(
           error,
@@ -427,11 +427,7 @@ export class Sync {
             .decrypt(keyInfo.key, item)
             .catch((error) => {
               decryptionErrors.push(
-                `Failed to decrypt item ${item.id} with key version ${
-                  keyInfo.version
-                }. Error: ${
-                  error instanceof Error ? error.message : JSON.stringify(error)
-                }`
+                error instanceof Error ? error.message : JSON.stringify(error)
               );
               this.logger.error(
                 error,
@@ -440,7 +436,7 @@ export class Sync {
               return false;
             });
           if (typeof decryptedItem === "string") {
-            decrypted.push(decryptedItem);
+            decrypted.push({ data: decryptedItem, version: item.v });
             break;
           }
         }
@@ -456,18 +452,84 @@ export class Sync {
       }
     }
 
-    const deserialized: MaybeDeletedItem<Item>[] = [];
-    for (let i = 0; i < decrypted.length; ++i) {
-      const decryptedItem = JSON.parse(decrypted[i]) as MaybeDeletedItem<Item>;
-      const version = versionMap.get(decryptedItem.id);
-      if (version === undefined) {
+    await this.mergeDecryptedItems(itemType, decrypted, options);
+  }
+
+  /**
+   * Attempt to decrypt and merge failed sync items using the provided key.
+   * Successfully recovered items are removed from failedSyncItems without
+   * soft-deleting the underlying item. Failures append to the stored error list.
+   */
+  async retryFailedItems(
+    ids: string[],
+    key: SerializedKey
+  ): Promise<{
+    succeeded: string[];
+    failed: { id: string; error: string }[];
+  }> {
+    const result: {
+      succeeded: string[];
+      failed: { id: string; error: string }[];
+    } = { succeeded: [], failed: [] };
+    if (ids.length <= 0) return result;
+
+    const items = await this.db.failedSyncItems.all.items(ids);
+    for (const failedItem of items) {
+      try {
+        await this.retryFailedItem(failedItem, key);
+        result.succeeded.push(failedItem.id);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : JSON.stringify(error);
         this.logger.error(
-          new Error(
-            `Version not found for item ${decryptedItem.id}. Skipping item.`
-          )
+          error,
+          `Failed to retry decryption for item ${failedItem.itemId}.`
         );
-        continue;
+        result.failed.push({ id: failedItem.id, error: message });
+        await this.db.failedSyncItems.collection.upsert({
+          ...failedItem,
+          errors: [...(failedItem.errors ?? []), message],
+          dateModified: Date.now()
+        });
       }
+    }
+    return result;
+  }
+
+  private async retryFailedItem(
+    failedItem: {
+      id: string;
+      itemId: string;
+      itemType: SyncableItemType;
+      cipher: SyncItem;
+    },
+    key: SerializedKey
+  ) {
+    const { cipher, itemType, itemId } = failedItem;
+    const decrypted = await this.db.storage().decrypt(key, cipher);
+    const merged = await this.mergeDecryptedItems(itemType, [
+      { data: decrypted, version: cipher.v }
+    ]);
+    if (merged.length === 0) {
+      throw new Error(`Failed to deserialize item ${itemId}.`);
+    }
+    await this.db.failedSyncItems.remove([failedItem.id]);
+  }
+
+  /**
+   * Deserialize decrypted payloads, merge with local items, and persist.
+   * Shared by processChunk and retryFailedItems.
+   */
+  private async mergeDecryptedItems(
+    itemType: SyncableItemType,
+    decrypted: { data: string; version: number }[],
+    options: Pick<SyncOptions, "offlineMode"> = {}
+  ): Promise<(MaybeDeletedItem<Item> | undefined)[]> {
+    if (decrypted.length === 0) return [];
+
+    const deserialized: MaybeDeletedItem<Item>[] = [];
+    for (const { data, version } of decrypted) {
+      const decryptedItem = JSON.parse(data) as MaybeDeletedItem<Item>;
       const item = await deserializeItem(
         decryptedItem,
         itemType,
@@ -477,38 +539,38 @@ export class Sync {
       if (item) deserialized.push(item);
     }
 
-    const collectionType = SYNC_COLLECTIONS_MAP[itemType];
+    if (deserialized.length === 0) return [];
 
+    const collectionType = SYNC_COLLECTIONS_MAP[itemType];
     if (!collectionType) {
       this.logger.error(
         new Error(
-          `Unknown collection type for item type ${itemType}. Skipping chunk.`
+          `Unknown collection type for item type ${itemType}. Skipping items.`
         )
       );
-      return;
+      return [];
     }
 
     const collection = this.db[collectionType].collection;
-    const localItems = await collection.records(chunk.items.map((i) => i.id));
+    const localItems = await collection.records(deserialized.map((i) => i.id));
     let items: (MaybeDeletedItem<Item> | undefined)[] = [];
     if (itemType === "content") {
       items = deserialized.map((item) =>
         this.merger.mergeContent(item, localItems[item.id])
       );
+    } else if (itemType === "attachment") {
+      items = await Promise.all(
+        deserialized.map((item) =>
+          this.merger.mergeAttachment(
+            item as MaybeDeletedItem<Attachment>,
+            localItems[item.id] as MaybeDeletedItem<Attachment>
+          )
+        )
+      );
     } else {
-      items =
-        itemType === "attachment"
-          ? await Promise.all(
-              deserialized.map((item) =>
-                this.merger.mergeAttachment(
-                  item as MaybeDeletedItem<Attachment>,
-                  localItems[item.id] as MaybeDeletedItem<Attachment>
-                )
-              )
-            )
-          : deserialized.map((item) =>
-              this.merger.mergeItem(item, localItems[item.id])
-            );
+      items = deserialized.map((item) =>
+        this.merger.mergeItem(item, localItems[item.id])
+      );
     }
 
     if (itemType === "note" || itemType === "content") {
@@ -533,6 +595,7 @@ export class Sync {
       ids: items.map((i) => i?.id)
     });
     await collection.put(items as any);
+    return items;
   }
 
   private async pushItem(deviceId: string, item: SyncTransferItem) {

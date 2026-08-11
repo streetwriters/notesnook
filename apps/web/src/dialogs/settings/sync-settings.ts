@@ -22,6 +22,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ConfirmDialog } from "../confirm";
 import { strings } from "@notesnook/intl";
+import { FailedSyncItemsDialog } from "../failed-sync-items-dialog";
 
 export const SyncSettings: SettingsGroup[] = [
   {
@@ -92,7 +93,14 @@ export const SyncSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleFullOfflineMode()
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    key: "troubleshoot-sync",
+    section: "sync",
+    header: strings.troubleshoot(),
+    settings: [
       {
         key: "force-sync",
         title: strings.havingProblemsWithSync(),
@@ -138,6 +146,28 @@ export const SyncSettings: SettingsGroup[] = [
                   .getState()
                   .sync({ force: true, type: "fetch" });
               })
+          }
+        ]
+      },
+      {
+        key: "failed-sync-items",
+        title: strings.failedSyncItems(),
+        description: strings.failedSyncItemsDesc(),
+        keywords: [
+          "failed",
+          "decrypt",
+          "sync error",
+          "missing key",
+          "ciphertext"
+        ],
+        components: [
+          {
+            type: "button",
+            title: strings.show(),
+            variant: "secondary",
+            action: () => {
+              FailedSyncItemsDialog.show({});
+            }
           }
         ]
       }
