@@ -27,6 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { SidebarScroller } from "../components/sidebar-scroller";
+import { Box } from "@notesnook/ui";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
@@ -55,10 +56,7 @@ function Tags() {
       id="tags"
       sx={{
         flex: 1,
-        '[data-viewport-type="element"]': {
-          px: 1,
-          width: `calc(100% - ${2 * 6}px) !important`
-        }
+        mt: "spacing4"
       }}
     >
       <ListContainer
@@ -69,11 +67,18 @@ function Tags() {
         header={<></>}
         Scroller={SidebarScroller}
       />
+      <Box sx={{ mx: "spacing4", height: "1px", bg: "border-secondary" }} />
       <Input
         ref={inputRef}
         variant="clean"
         placeholder="Filter tags..."
-        sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
+        sx={{
+          pb: 0,
+          pt: "spacing4",
+          mx: "spacing4",
+          fontSize: "xs",
+          color: "paragraph"
+        }}
         onChange={debounce(async (e) => {
           const query = e.target.value.trim();
           setFilteredTags(

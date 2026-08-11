@@ -29,15 +29,7 @@ type TabItemProps = {
 };
 
 export function TabItem(props: TabItemProps & FlexProps) {
-  const {
-    icon: Icon,
-    color,
-    title,
-    selected,
-    onClick,
-    sx,
-    ...restProps
-  } = props;
+  const { icon: Icon, title, selected, onClick, sx, ...restProps } = props;
 
   return (
     <Flex
@@ -65,7 +57,7 @@ export function TabItem(props: TabItemProps & FlexProps) {
         if (onClick) onClick();
       }}
     >
-      <Icon size={16} color={color || (selected ? "icon-selected" : "icon")} />
+      <Icon size={15} color={selected ? "icon" : "icon-secondary"} />
     </Flex>
   );
 }

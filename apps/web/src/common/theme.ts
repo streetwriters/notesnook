@@ -141,13 +141,14 @@ export const THEME_LIGHT: any = {
       primary: {
         background: "#f7f7f7",
         paragraph: "#666",
-        icon: "#666",
+        icon: "#181818",
         hover: "#eee"
       },
-      secondary: { background: "#EEEEEE" },
+      secondary: { background: "#f7f7f7", icon: "#666666", heading: "#6f6f6f" },
       selected: {
-        background: "#00883610",
-        hover: "#eee"
+        background: "#e2ede6",
+        hover: "#eee",
+        icon: "#ffffff"
       }
     },
     contextMenu: { primary: { background: "#f7f7f7" } },

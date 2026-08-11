@@ -33,6 +33,8 @@ import { ListLoader } from "../components/loaders/list-loader";
 import { debounce } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { SidebarScroller } from "../components/sidebar-scroller";
+import Placeholder from "../components/placeholders";
+import { Flex } from "@notesnook/ui";
 
 export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
@@ -86,13 +88,15 @@ export function Notebooks() {
         {!notebooks ? (
           <ListLoader />
         ) : notebooks.length === 0 ? (
-          <Text
-            variant="body"
-            sx={{ color: "paragraph-secondary", mx: 1 }}
-            data-test-id="list-placeholder"
+          <Flex
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%"
+            }}
           >
-            {strings.notebooksEmpty()}
-          </Text>
+            <Placeholder context="notebooks" />
+          </Flex>
         ) : (
           <VirtualizedTree
             testId="notebooks-list"
@@ -176,7 +180,15 @@ export function Notebooks() {
         ref={inputRef}
         variant="clean"
         placeholder="Filter notebooks..."
-        sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
+        sx={{
+          borderTop: "1px solid var(--border-secondary)",
+          mx: 0,
+          pb: 0,
+          pt: "spacing4",
+          px: 0,
+          fontSize: "xs",
+          color: "paragraph"
+        }}
         onChange={debounce(async (e) => {
           const query = e.target.value.trim();
           setFilteredNotebooks(
