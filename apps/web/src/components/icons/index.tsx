@@ -226,7 +226,6 @@ import {
   mdiHistory,
   mdiArrowCollapseRight,
   mdiNoteEditOutline,
-  mdiArrowUp,
   mdiInbox,
   mdiConsoleLine,
   mdiSpellcheck,
@@ -244,6 +243,7 @@ import EnvelopeSimple from "@notesnook/icons/envelope-simple.svg?react";
 import LockSimple from "@notesnook/icons/lock-simple.svg?react";
 import ChevronLeftIcon from "@notesnook/icons/chevron-left.svg?react";
 import ChevronRightIcon from "@notesnook/icons/chevron-right.svg?react";
+import ChevronDownIcon from "@notesnook/icons/chevron-down.svg?react";
 import ClockIcon from "@notesnook/icons/clock.svg?react";
 import WarningCircle from "@notesnook/icons/warning-circle.svg?react";
 import CloudSvg from "@notesnook/icons/cloud.svg?react";
@@ -258,6 +258,13 @@ import CopyIcon from "@notesnook/icons/copy.svg?react";
 import BoxArrowDownIcon from "@notesnook/icons/box-arrow-down.svg?react";
 import DownloadIcon from "@notesnook/icons/download-simple.svg?react";
 import FloppyDiskIcon from "@notesnook/icons/floppy-disk.svg?react";
+import CheckSvg from "@notesnook/icons/check.svg?react";
+import ShieldCheckSvg from "@notesnook/icons/shield-check.svg?react";
+import CalendarBlankSvg from "@notesnook/icons/calendar-blank.svg?react";
+import ProhibitSvg from "@notesnook/icons/prohibit.svg?react";
+import HandCoinsSvg from "@notesnook/icons/hand-coins.svg?react";
+import ArrowUpSvg from "@notesnook/icons/arrow-up.svg?react";
+import LightningSvg from "@notesnook/icons/lightning.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -623,12 +630,12 @@ export const SessionHistory = createIcon(mdiHistory);
 export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
-export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
 export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
 export const CloseCircle = createIcon(mdiCloseCircle);
 
+export const CheckSvgIcon = createSvgIcon(CheckSvg);
 export const PasswordInvisible = createSvgIcon(EyeOpen);
 export const PasswordVisible = createSvgIcon(EyeClosed);
 export const Chat = createSvgIcon(ChatIcon);
@@ -636,6 +643,7 @@ export const Email = createSvgIcon(EnvelopeSimple);
 export const RecoveryCode = createSvgIcon(LockSimple);
 export const ChevronLeft = createSvgIcon(ChevronLeftIcon);
 export const ChevronRight = createSvgIcon(ChevronRightIcon);
+export const CaretDown = createSvgIcon(ChevronDownIcon);
 export const Clock = createSvgIcon(ClockIcon);
 export const Warning = createSvgIcon(WarningCircle);
 export const Cloud = createSvgIcon(CloudSvg);
@@ -650,3 +658,9 @@ export const Copy = createSvgIcon(CopyIcon);
 export const BoxArrowDown = createSvgIcon(BoxArrowDownIcon);
 export const Download = createSvgIcon(DownloadIcon);
 export const FloppyDisk = createSvgIcon(FloppyDiskIcon);
+export const ShieldCheck = createSvgIcon(ShieldCheckSvg);
+export const CalendarBlank = createSvgIcon(CalendarBlankSvg);
+export const Prohibit = createSvgIcon(ProhibitSvg);
+export const HandCoins = createSvgIcon(HandCoinsSvg);
+export const ArrowUp = createSvgIcon(ArrowUpSvg);
+export const Lightning = createSvgIcon(LightningSvg);
