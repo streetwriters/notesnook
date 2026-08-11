@@ -64,55 +64,70 @@ function Placeholder(props: PlaceholderProps) {
       </Flex>
     );
   }
+
   if (!tip) return null;
 
   return (
-    <>
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing7",
+        width: "100%",
+        alignItems: "center"
+      }}
+    >
       <Flex
-        variant="columnCenter"
         sx={{
-          position: "relative",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          alignSelf: "stretch",
-          px: 6
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing3",
+          width: "100%",
+          textAlign: "center"
         }}
       >
-        <Flex
+        <Text
+          variant="body"
           sx={{
-            border: "1px solid var(--accent)",
-            borderRadius: 50,
-            p: 1,
-            py: "1.5px"
+            fontSize: "md",
+            fontWeight: "heading",
+            color: "heading",
+            lineHeight: 1
           }}
         >
-          <Info color="accent" size={13} sx={{ mr: "small" }} />
-          <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            {strings.tip()}
-          </Text>
-        </Flex>
-        <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
-          {text || tip.text}
+          {tip.title || "dafsd"}
         </Text>
-        {tip.button && (
-          <Button
-            sx={{
-              mt: 2,
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex"
-            }}
-            variant="secondary"
-            onClick={tip.button.onClick}
-          >
-            <Text mr={1} color="accent">
-              {tip.button.title}
-            </Text>
-            {tip.button.icon && <tip.button.icon size={18} color="accent" />}
-          </Button>
-        )}
+        <Text
+          variant="body"
+          sx={{
+            width: "208px",
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1.2
+          }}
+        >
+          {tip.text}
+        </Text>
       </Flex>
-    </>
+      {tip.button && (
+        <Button
+          onClick={tip.button.onClick}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "spacing3",
+            color: "accent",
+            fontSize: "sm",
+            fontWeight: 600,
+            lineHeight: 1,
+            width: "fit-content"
+          }}
+        >
+          {tip.button.icon && <tip.button.icon size={15} color="accent" />}
+          {tip.button.title}
+        </Button>
+      )}
+    </Flex>
   );
 }
 export default Placeholder;

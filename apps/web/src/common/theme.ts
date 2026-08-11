@@ -57,7 +57,7 @@ export const THEME_LIGHT: any = {
       secondary: {
         accent: "#0D9E46",
         accentForeground: "#ffffff",
-        paragraph: "#858585",
+        paragraph: "#909090",
         background: "#F7F7F7",
         border: "#EFEFEF",
         heading: "#4B4B4B",
@@ -141,13 +141,14 @@ export const THEME_LIGHT: any = {
       primary: {
         background: "#f7f7f7",
         paragraph: "#666",
-        icon: "#666",
+        icon: "#181818",
         hover: "#eee"
       },
-      secondary: { background: "#EEEEEE" },
+      secondary: { background: "#f7f7f7", icon: "#666666", heading: "#6f6f6f" },
       selected: {
-        background: "#00883610",
-        hover: "#eee"
+        background: "#e2ede6",
+        hover: "#eee",
+        icon: "#ffffff"
       }
     },
     contextMenu: { primary: { background: "#f7f7f7" } },
