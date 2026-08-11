@@ -882,8 +882,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
       <Flex
         sx={{
           flexDirection: "column",
-          width: ["95%", "95%", "45%"],
-          maxWidth: ["95%", "95%", "600px"],
+          width: ["95%", "95%", "550px"],
           background: "var(--background)",
           p: 6,
           my: 10,
