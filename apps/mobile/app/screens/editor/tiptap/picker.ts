@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Sodium from "@ammarahmed/react-native-sodium";
 import { isFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { getImageMimeTypeFromFilename } from "@notesnook/core";
 import {
   DocumentPickerOptions,
   keepLocalCopy,
@@ -107,15 +108,14 @@ const file = async (fileOptions: PickerOptions) => {
       uri: uri,
       type: "url"
     });
-    if (
-      !(await attachFile(
-        uri,
-        hash,
-        file.type || "application/octet-stream",
-        fileName,
-        fileOptions
-      ))
-    ) {
+
+    const detectedMime =
+      getImageMimeTypeFromFilename(fileName) ||
+      file.type ||
+      "application/octet-stream";
+    const isPickedFileImage = detectedMime.startsWith("image/");
+
+    if (!(await attachFile(uri, hash, detectedMime, fileName, fileOptions))) {
       throw new Error("Failed to attach file");
     }
 
@@ -128,16 +128,29 @@ const file = async (fileOptions: PickerOptions) => {
       useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
         fileOptions.noteId
     ) {
-      editorController.current?.commands.insertAttachment(
-        {
-          hash: hash,
-          filename: fileName,
-          mime: file.type || "application/octet-stream",
-          size: file.size || 0,
-          type: "file"
-        },
-        fileOptions.tabId
-      );
+      if (isPickedFileImage) {
+        editorController.current?.commands.insertImage(
+          {
+            hash: hash,
+            mime: detectedMime,
+            type: "image",
+            size: file.size || 0,
+            filename: fileName as string
+          },
+          fileOptions.tabId
+        );
+      } else {
+        editorController.current?.commands.insertAttachment(
+          {
+            hash: hash,
+            filename: fileName,
+            mime: detectedMime,
+            size: file.size || 0,
+            type: "file"
+          },
+          fileOptions.tabId
+        );
+      }
     } else {
       throw new Error("Failed to attach file, no tabId is set");
     }
@@ -251,6 +264,13 @@ const handleImageResponse = async (
   const compress = result.compress;
 
   for (const image of response) {
+    if (!image.mime || image.mime === "application/octet-stream") {
+      const inferred = getImageMimeTypeFromFilename(
+        image.filename || image.sourceURL || image.path
+      );
+      if (inferred !== undefined) image.mime = inferred;
+    }
+
     const isPng = /(png)/g.test(image.mime);
     const isJpeg = /(jpeg|jpg)/g.test(image.mime);
     if (compress && (isPng || isJpeg)) {
