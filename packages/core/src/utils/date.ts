@@ -113,23 +113,26 @@ export function formatDate(
     type: "date-time"
   }
 ) {
+  if (date === null || date === undefined) return "";
+  const d = dayjs(date);
+  if (!d.isValid()) return "";
   switch (options.type) {
     case "date-time-timezone":
-      return dayjs(date).format(
+      return d.format(
         `${options.dateFormat} ${getTimeFormat(options.timeFormat)} z`
       );
     case "date-time":
-      return dayjs(date).format(
+      return d.format(
         `${options.dateFormat} ${getTimeFormat(options.timeFormat)}`
       );
     case "time":
-      return dayjs(date).format(getTimeFormat(options.timeFormat));
+      return d.format(getTimeFormat(options.timeFormat));
     case "date":
-      return dayjs(date).format(options.dateFormat);
+      return d.format(options.dateFormat);
     case "day":
-      return dayjs(date).format(getDayFormat(options.dayFormat));
+      return d.format(getDayFormat(options.dayFormat));
     case "timezone":
-      return dayjs(date).format("ZZ");
+      return d.format("ZZ");
   }
 }
 
