@@ -33,15 +33,21 @@ type UnlockViewProps = {
 };
 export function UnlockView(props: UnlockViewProps) {
   const { title, subtitle, buttonTitle, unlock } = props;
-  const [isWrong, setIsWrong] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
   const [isUnlocking, setIsUnlocking] = useState(false);
 
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const submit = useCallback(async () => {
-    if (!passwordRef.current?.value) return;
+    const password = passwordRef?.current?.value;
+    if (!password) {
+      setErrorMessage(strings.passwordRequired());
+      return;
+    }
+
     setIsUnlocking(true);
-    const password = passwordRef.current.value;
     try {
       await unlock(password);
     } catch (e) {
@@ -49,7 +55,7 @@ export function UnlockView(props: UnlockViewProps) {
         e instanceof Error &&
         e.message.includes("ciphertext cannot be decrypted using that key")
       ) {
-        setIsWrong(true);
+        setErrorMessage(strings.passwordIncorrect());
       } else {
         showToast("error", `${strings.couldNotUnlock()}: ` + e);
         console.error(e);
@@ -57,7 +63,7 @@ export function UnlockView(props: UnlockViewProps) {
     } finally {
       setIsUnlocking(false);
     }
-  }, [setIsWrong, unlock]);
+  }, [setErrorMessage, unlock]);
 
   return (
     <Flex
@@ -110,12 +116,12 @@ export function UnlockView(props: UnlockViewProps) {
         onKeyUp={async (e) => {
           if (e.key === "Enter") {
             await submit();
-          } else if (isWrong) {
-            setIsWrong(false);
+          } else if (errorMessage) {
+            setErrorMessage(undefined);
           }
         }}
       />
-      {isWrong && <ErrorText sx={{ mt: 1 }} error="Wrong password" />}
+      {errorMessage && <ErrorText sx={{ mt: 1 }} error={errorMessage} />}
       <Button
         mt={3}
         variant="accent"
