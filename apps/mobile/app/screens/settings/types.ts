@@ -53,6 +53,7 @@ export type SettingSection = {
   hideHeader?: boolean;
   disabled?: (current: unknown) => boolean;
   featureId?: FeatureId;
+  step?: number;
 };
 
 export type SettingsGroup = {

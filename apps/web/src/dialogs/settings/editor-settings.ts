@@ -32,6 +32,7 @@ import { DictionaryWords } from "./components/dictionary-words";
 import { strings } from "@notesnook/intl";
 import { isMac } from "../../utils/platform";
 import { EDITOR_LINE_HEIGHT } from "../../components/editor/common";
+import { FONT_SIZE_BOUNDS } from "@notesnook/common";
 
 export const EditorSettings: SettingsGroup[] = [
   {
@@ -86,8 +87,8 @@ export const EditorSettings: SettingsGroup[] = [
           {
             type: "input",
             inputType: "number",
-            max: 120,
-            min: 8,
+            max: FONT_SIZE_BOUNDS.MAX,
+            min: FONT_SIZE_BOUNDS.MIN,
             defaultValue: () => editorConfig().fontSize,
             onChange: (value) =>
               useEditorManager.getState().setEditorConfig({ fontSize: value })
