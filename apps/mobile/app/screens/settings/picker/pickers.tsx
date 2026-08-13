@@ -40,7 +40,7 @@ import { AVAILABLE_LANGUAGES, getSupportedLocale } from "../../../../globals";
 import { setI18nGlobal, strings } from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
 import { i18n } from "@lingui/core";
-import { DevSettings } from "react-native";
+import RNRestart from "react-native-restart";
 import { presentDialog } from "../../../components/dialog/functions";
 import { eCloseSimpleDialog } from "../../../utils/events";
 
@@ -89,11 +89,7 @@ export const LanguagePicker = createSettingsPicker<
         i18n.activate(lang);
         setI18nGlobal(i18n);
         SettingsService.setProperty("appLanguage", lang);
-        setTimeout(() => {
-          try {
-            DevSettings.reload();
-          } catch (e) {}
-        }, 150);
+        RNRestart.restart();
       }
     });
   },
