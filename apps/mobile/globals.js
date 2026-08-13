@@ -6,9 +6,8 @@ import "@formatjs/intl-pluralrules/locale-data/en";
 import "react-native-url-polyfill/auto";
 import "./polyfills/console-time.js";
 import "./app/common/logger/index";
-import { setI18nGlobal } from "@notesnook/intl";
+import { setI18nGlobal, getSupportedLocale } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
-import Config from "react-native-config";
 import OpenPGP from "react-native-fast-openpgp";
 
 OpenPGP.useJSI = false;
@@ -38,19 +37,6 @@ const localeCatalogs = {
   it: require("@notesnook/intl/dist/locales/$it.json").messages
 };
 
-export const AVAILABLE_LANGUAGES = [
-  { code: "en", label: "English", nativeLabel: "English" },
-  { code: "fr", label: "French", nativeLabel: "Français" },
-  { code: "es", label: "Spanish", nativeLabel: "Español" },
-  { code: "de", label: "German", nativeLabel: "Deutsch" },
-  { code: "it", label: "Italian", nativeLabel: "Italiano" }
-];
-
-export function getSupportedLocale(locale) {
-  if (!locale) return "en";
-  const lang = locale.split("-")[0].toLowerCase();
-  return localeCatalogs[lang] ? lang : "en";
-}
 
 export function initLocale() {
   const savedLanguage = SettingsService.getProperty("appLanguage");
