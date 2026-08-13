@@ -1848,6 +1848,126 @@ export const settingsGroups: SettingSection[] = [
           }
         },
         description: getVersion()
+      },
+      // TEMPORARY — demo data seeder for the App Store / Play Store screenshots.
+      // Delete this section and app/common/seed-demo.ts once they are captured.
+      {
+        id: "seed-demo-account",
+        name: "Seed demo account",
+        icon: "database-plus",
+        description:
+          "Fills this account with the persona, notebooks, 44 notes, tags, colours, reminders and vault note used for the store screenshots. Run once, on an empty account.",
+        hidden: () => !__DEV__,
+        modifer: async () => {
+          presentDialog({
+            title: "Seed demo account",
+            paragraph:
+              "This adds 44 notes and creates a vault. Only run it on a fresh, empty account — it does not clean up after itself.",
+            positiveText: "Seed",
+            negativeText: strings.cancel(),
+            positivePress: async () => {
+              setTimeout(async () => {
+                startProgress({
+                  title: "Seeding demo account",
+                  paragraph: "Please wait, this takes about a minute."
+                });
+                try {
+                  const { seedDemoAccount } = await import(
+                    "../../common/seed-demo"
+                  );
+                  const result = await seedDemoAccount((message) => {
+                    DatabaseLogger.info(`[seed] ${message}`);
+                    startProgress({
+                      title: "Seeding demo account",
+                      paragraph: message
+                    });
+                  });
+                  await refreshAllStores();
+                  endProgress();
+                  ToastManager.show({
+                    heading: `Created ${result.notes} notes`,
+                    message: "Vault password: demo-vault-2026",
+                    type: "success",
+                    context: "global"
+                  });
+                } catch (e) {
+                  endProgress();
+                  DatabaseLogger.error(e);
+                  ToastManager.error(
+                    e as Error,
+                    "Failed to seed demo account",
+                    "global"
+                  );
+                }
+              }, 300);
+            }
+          });
+        }
+      },
+      {
+        id: "clear-demo-data",
+        type: "danger",
+        name: "Delete all items",
+        icon: "database-remove",
+        description:
+          "Permanently deletes every note, notebook, tag, colour, reminder and the vault, then empties the trash. The account itself is kept. Cannot be undone.",
+        hidden: () => !__DEV__,
+        modifer: async () => {
+          presentDialog({
+            title: "Delete all items",
+            paragraph:
+              "This permanently deletes everything in this account — not just the demo data — and empties the trash. It cannot be undone. Type DELETE to confirm.",
+            input: true,
+            inputPlaceholder: "DELETE",
+            positiveText: strings.delete(),
+            negativeText: strings.cancel(),
+            positiveType: "errorShade",
+            positivePress: async (value) => {
+              if (value?.trim() !== "DELETE") {
+                ToastManager.error(
+                  new Error("Type DELETE to confirm"),
+                  undefined,
+                  "local"
+                );
+                return false;
+              }
+              setTimeout(async () => {
+                startProgress({
+                  title: "Deleting all items",
+                  paragraph: "Please wait."
+                });
+                try {
+                  const { clearAllData } = await import(
+                    "../../common/seed-demo"
+                  );
+                  const counts = await clearAllData((message) => {
+                    DatabaseLogger.info(`[seed] ${message}`);
+                    startProgress({
+                      title: "Deleting all items",
+                      paragraph: message
+                    });
+                  });
+                  await refreshAllStores();
+                  endProgress();
+                  ToastManager.show({
+                    heading: `Deleted ${counts.notes} notes`,
+                    message: `${counts.notebooks} notebooks, ${counts.tags} tags, ${counts.reminders} reminders`,
+                    type: "success",
+                    context: "global"
+                  });
+                } catch (e) {
+                  endProgress();
+                  DatabaseLogger.error(e);
+                  ToastManager.error(
+                    e as Error,
+                    "Failed to delete all items",
+                    "global"
+                  );
+                }
+              }, 300);
+            }
+          });
+        }
       }
     ]
   }

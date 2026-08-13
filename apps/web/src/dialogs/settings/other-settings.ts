@@ -30,6 +30,13 @@ import { strings } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import { TaskManager } from "../../common/task-manager";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+// TEMPORARY — used only by the demo data group at the bottom of this file.
+import { ConfirmDialog } from "../confirm";
+import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
+import { useStore as useTagStore } from "../../stores/tag-store";
+import { useStore as useReminderStore } from "../../stores/reminder-store";
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -419,8 +426,117 @@ export const SupportSettings: SettingsGroup[] = [
         ]
       }
     ]
+  },
+  // TEMPORARY — demo data seeder for producing App Store / Play Store
+  // screenshots. Delete this group and src/common/seed-demo.ts once the store
+  // assets are captured.
+  {
+    key: "demo-data",
+    section: "about",
+    header: "Demo data",
+    isHidden: () => !import.meta.env.DEV,
+    settings: [
+      {
+        key: "seed-demo-account",
+        title: "Seed demo account",
+        description:
+          "Fills this account with the persona, notebooks, notes, tags, colours, reminders and vault notes the marketing site shows. Run once, on an empty account. Open the notes with pictures afterwards so the images download and become attachments.",
+        components: [
+          {
+            type: "button",
+            action: async () => {
+              const { seedDemoAccount } = await import("../../common/seed-demo");
+              await TaskManager.startTask({
+                type: "modal",
+                title: "Seeding demo account",
+                subtitle: "This takes about a minute. Do not close the app.",
+                action: async (report) => {
+                  await seedDemoAccount((message) => {
+                    console.log("[seed]", message);
+                    report({ text: message });
+                  });
+                }
+              });
+              await refreshAfterBulkChange();
+              showToast("success", "Demo data created. Sync, then capture.");
+            },
+            title: "Seed",
+            variant: "secondary"
+          }
+        ]
+      },
+      {
+        key: "clear-demo-data",
+        title: "Delete all items",
+        description:
+          "Permanently deletes every note, notebook, tag, colour, reminder and the vault, then empties the trash. The account itself is kept. Cannot be undone.",
+        components: [
+          {
+            type: "button",
+            action: async () => {
+              // Typed confirmation, not a yes/no: this deletes everything in
+              // the account, including anything that was not seeded.
+              const result = await ConfirmDialog.show({
+                title: "Delete all items",
+                message:
+                  "This permanently deletes everything in this account — not just the demo data — and empties the trash. It cannot be undone.",
+                inputs: {
+                  confirmation: {
+                    title: 'Type DELETE to confirm',
+                    required: true
+                  }
+                },
+                positiveButtonText: strings.delete(),
+                negativeButtonText: strings.cancel()
+              });
+              if (!result) return;
+              if (result.inputs?.confirmation?.trim() !== "DELETE") {
+                showToast("error", "Type DELETE to confirm.");
+                return;
+              }
+
+              const { clearAllData } = await import("../../common/seed-demo");
+              let counts: Awaited<ReturnType<typeof clearAllData>> | undefined;
+              await TaskManager.startTask({
+                type: "modal",
+                title: "Deleting all items",
+                subtitle: "Please wait.",
+                action: async (report) => {
+                  counts = await clearAllData((message) => {
+                    console.log("[seed]", message);
+                    report({ text: message });
+                  });
+                }
+              });
+              await refreshAfterBulkChange();
+              showToast(
+                "success",
+                counts
+                  ? `Deleted ${counts.notes} notes, ${counts.notebooks} notebooks, ${counts.tags} tags, ${counts.reminders} reminders.`
+                  : "Account cleared."
+              );
+            },
+            title: "Delete",
+            variant: "error"
+          }
+        ]
+      }
+    ]
   }
 ];
+
+/**
+ * Both demo actions rewrite the whole database underneath the UI. The stores
+ * read from a cache that does not know that happened, so without this the app
+ * keeps rendering the previous account until a reload.
+ */
+async function refreshAfterBulkChange() {
+  await useAppStore.getState().refreshNavItems();
+  await useNoteStore.getState().refresh();
+  await useNotebookStore.getState().refresh();
+  await useTagStore.getState().refresh();
+  await useReminderStore.getState().refresh();
+}
 
 async function switchReleaseTrack(track: string) {
   const registration = await navigator.serviceWorker.getRegistration();

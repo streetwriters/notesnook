@@ -448,7 +448,7 @@ export const ReferencesList = ({ item, close }: ReferencesListProps) => {
   );
 
   return (
-    <View style={{ height: "100%" }}>
+    <View style={{ height: "50%" }}>
       <SheetProvider context="local" />
 
       <View
