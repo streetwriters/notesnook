@@ -1,12 +1,13 @@
 ---
 title: Attachments & files
 pageTitle: How do I attach files and images to a note in Notesnook?
-description: Attach images and files to your notes, see the per-plan size and storage limits, and manage every attachment from the attachment manager.
+description: Attach images and files to your notes, read PDFs without downloading them, see the per-plan size and storage limits, and manage every attachment.
 keywords:
   - notesnook attach file to note
   - notesnook attachment size limit
   - notesnook attachment manager
   - notesnook orphaned attachments
+  - notesnook pdf preview
 schema: howto
 ---
 
@@ -131,6 +132,50 @@ Go to `{{settings}}` → `{{account}}` → `{{manageAccount}}` → `{{clearCache
 
 ::: warning Pending uploads are cleared too
 Anything that has not finished uploading is lost when you clear the cache. Let uploads finish first.
+
+:::
+
+## Read a PDF without downloading it
+
+PDFs open in a viewer inside Notesnook, so you can read one without saving it to your device first. The file is downloaded to the local cache, decrypted in memory and shown — it is never handed to another app unless you ask for that.
+
+To open one, click or tap the PDF attachment where it sits in the note. On desktop and web there is a second route: open the file's menu in the [attachment manager](#manage-your-attachments) and choose `{{previewAttachment}}`. That entry appears only on images and PDFs, and the attachment manager on mobile has no preview action — go through the note instead.
+
+:::tabs key:platform
+== Desktop/Web
+
+The PDF opens in a **side pane to the right of the editor**, so you can read it and write at the same time. Drag the divider between the two to resize them.
+
+The pane's toolbar has:
+
+| Control                | What it does                                                    |
+| ---------------------- | --------------------------------------------------------------- |
+| `{{search}}`           | Searches the text of the PDF and highlights the matches         |
+| `{{goToPreviousPage}}` | Back one page                                                   |
+| Page number            | Shows the current page and the total; type a number to jump     |
+| `{{goToNextPage}}`     | Forward one page                                                |
+| `{{zoomOut}}` / `{{zoomIn}}` | Steps the zoom down or up; the current percentage sits between them |
+| `Download`             | Saves the PDF to your device                                    |
+| `{{enterFullScreen}}`  | Hands the whole screen to the PDF                               |
+| `{{close}}`            | Closes the pane and returns the space to the editor             |
+
+The table of contents and the note properties share this space, so opening the PDF preview closes whichever of those was open.
+
+== Mobile
+
+The PDF opens **full screen** over the app. In its header you get:
+
+- a back arrow to close the viewer and return to the note;
+- the current page number with the page total beside it — tap the number, type a page and confirm to jump straight to it;
+- a download button to save the file to your device;
+- an open-in-new button that hands the PDF to another app on your phone, so you can read it in your usual PDF reader or share it onward.
+
+Scroll and pinch to zoom as you would in any other viewer.
+
+:::
+
+::: info Password-protected PDFs
+A PDF with a password on it opens on a `{{pdfLocked}}` screen instead of the document. Enter the PDF's own password to read it. This is the password whoever made the file set on it — it has nothing to do with your Notesnook account password or your [vault](/lock-notes-with-private-vault) password, and Notesnook cannot recover it for you.
 
 :::
 

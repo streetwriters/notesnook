@@ -65,7 +65,7 @@ The screen warns that changing your password logs you out from all your devices,
 
 ### Are my notes re-encrypted when I change my password?
 
-**No, and that is why it is fast.** Your notes are encrypted with data keys, and those keys are what your password protects. When you change your password, Notesnook derives a new master key from the new password and re-wraps the existing keys — your attachments key, monograph passwords key, inbox keys and data encryption keys — with it. The notes themselves are never re-encrypted, so the time it takes does not grow with the size of your notebook.
+**No, and that is why it is fast.** Your notes are encrypted with data keys, and those keys are what your password protects. When you change your password, Notesnook derives a new master key from the new password and re-wraps the existing keys — your attachments key, monograph passwords key, inbox keys and data encryption keys — with it. The notes themselves are never re-encrypted, so the time it takes does not grow with the size of your notes.
 
 ::: danger Your password is the only way in
 Notesnook never sees your password and cannot reset it for you. If you forget it, your [account recovery key](/recovering-your-account) is the only way back to your data. Your email must be confirmed before you can change your password.

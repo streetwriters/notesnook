@@ -308,6 +308,18 @@ html {
   display: none;
 }
 
+/* The default theme nudges the hero image up and left by 32px to optically
+   centre it against the blurred `image-bg` circle behind it. We hide that
+   circle, so the nudge has nothing left to compensate for — it just lifts the
+   logo above the middle of the text column, leaving it centred on the heading
+   and tagline with the action buttons hanging below. Dropping the transform
+   centres it against the whole column: heading, tagline and actions. */
+@media (min-width: 960px) {
+  .VPHero .image-container {
+    transform: none;
+  }
+}
+
 .VPHero .image-container img {
   max-width: 208px;
   max-height: 208px;
@@ -451,8 +463,9 @@ html {
 
 /* The CSS reset makes every image `display: block`, which breaks the line when a
    UI glyph is referenced mid-sentence ("press the ⋯ button"). An image sharing
-   its paragraph or list item with text is treated as a glyph — inline, sized to
-   the text, unframed. An image on its own line stays a block. */
+   its *line* with text is treated as a glyph — inline, sized to the text,
+   unframed. An image on its own line stays a block, even when it sits inside a
+   numbered step whose text is on the line above. */
 .vp-doc img.inline-glyph {
   display: inline-block;
   vertical-align: text-bottom;

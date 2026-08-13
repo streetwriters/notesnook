@@ -101,10 +101,12 @@ export const sidebar = [
         text: "Simplenote",
         link: "/importing-notes/import-notes-from-simplenote"
       },
-      {
-        text: "Standard Notes",
-        link: "/importing-notes/import-notes-from-standardnotes"
-      },
+      // Standard Notes is unpublished for now; the page is excluded from the
+      // build in config.mts. Restore this entry when it goes live again.
+      // {
+      //   text: "Standard Notes",
+      //   link: "/importing-notes/import-notes-from-standardnotes"
+      // },
       {
         text: "ColorNote",
         link: "/importing-notes/import-notes-from-colornote"

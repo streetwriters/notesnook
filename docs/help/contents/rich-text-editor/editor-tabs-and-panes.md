@@ -44,6 +44,8 @@ In the web app the browser owns most of those combinations, so only tab switchin
 
 Every open tab is listed in that sheet. Tap one to switch to it, tap the close icon to close it, or use the close-all button beside `+` to close everything at once.
 
+To open a **specific note** in its own tab rather than a blank one, tap the ![Three dot button](/three-dot-button.png) button on that note and then the open-in-new icon at the top right of the properties sheet. See [note actions](/notes/note-actions) for the rest of that menu.
+
 :::
 
 ## Manage tabs from the tab menu
@@ -120,7 +122,7 @@ Three panes can open to the right of the editor:
 
 - **Table of contents** — click the table-of-contents button in the top bar. It lists every heading in the note as a tree; click a heading to scroll to it, and use the chevrons to collapse a branch. If the note has no headings it says `{{noHeadingsFound}}`.
 - **Properties** — click the `{{properties}}` button in the top bar for tags, notebooks, colors, reminders, attachments, `{{noteHistory}}` and note settings.
-- **PDF preview** — opens by itself when you preview a PDF [attachment](/attachments-and-files) in the note, so you can read the PDF and write at the same time.
+- **PDF preview** — opens by itself when you preview a PDF [attachment](/attachments-and-files) in the note, so you can read the PDF and write at the same time. See [reading a PDF](/attachments-and-files#read-a-pdf-without-downloading-it) for the pane's own toolbar.
 
 Drag the divider between two panes to resize them; the widths are remembered for next time. The table of contents and the properties pane share the same space, so opening one closes the other.
 

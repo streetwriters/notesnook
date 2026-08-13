@@ -33,17 +33,20 @@ The sheet that opens holds every action for that note.
 
 ## Open a note in a new tab
 
-`{{openInNewTab}}` opens the note in its own editor tab instead of replacing whatever is already open, so you can keep two notes in your tab strip at once. It is the first item in the note menu.
+Opening a note in a new tab puts it in its own editor tab instead of replacing whatever is already open, so you can keep two notes on the go at once.
 
 :::tabs key:platform
 == Desktop/Web
 
 1. Right click the note.
-2. Click `{{openInNewTab}}`.
+2. Click `{{openInNewTab}}`. It is the first item in the note menu.
 
 == Mobile
 
-There is no `{{openInNewTab}}` action on mobile.
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
+2. Tap the open-in-new icon at the top right of the properties sheet, beside the note's title.
+
+The button only appears for notes, and it has no text label. On a phone, tapping it also takes you straight to the editor; on a tablet the note opens in a new tab beside the list you are already looking at.
 
 :::
 
@@ -62,7 +65,10 @@ The action only appears when at least one of the selected notes is already in a 
 
 == Mobile
 
-There is no bulk unlink action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{addToNotebook}}`, and unselect the notebooks one by one.
+There is no single action that unlinks a note from *every* notebook at once. Two ways round it:
+
+- **One note** — tap the ![Three dot button](/three-dot-button.png) button, tap `{{addToNotebook}}`, and unselect the notebooks one by one.
+- **Several notes, one notebook** — open the notebook, long press a note to start selecting, tap the rest, then tap `{{unlinkNotebook}}` in the header. That removes every selected note from the notebook you are viewing. The action only appears while you are inside a notebook.
 
 :::
 
@@ -81,7 +87,13 @@ The action only appears when at least one of the selected notes already has a ta
 
 == Mobile
 
-There is no bulk remove action on mobile. Press the ![Three dot button](/three-dot-button.png) button, press `{{addTags}}`, and remove the tags one by one.
+There is no single action that strips *every* tag at once, but tags can be removed from several notes together:
+
+1. Long press a note to start selecting, then tap the other notes you want.
+2. Tap `{{manageTags}}` in the header.
+3. Tap a tag that is currently applied to remove it from every selected note. Tap it again to put it back.
+
+For a single note, tap the ![Three dot button](/three-dot-button.png) button and `{{addTags}}` instead.
 
 :::
 
@@ -203,9 +215,18 @@ The creation date cannot be later than the note's last edited date. If you pick 
 
 == Mobile
 
-Editing a note's creation date is not available on mobile. Do it on the desktop app or on web, the change will sync to your phone.
+1. Tap the ![Three dot button](/three-dot-button.png) button on a note.
+2. Scroll to the dates at the bottom of the properties sheet.
+3. Tap the date beside `Created at` — it has a pencil icon after it.
+4. Pick a date and time in the picker, then confirm.
+
+The picker sets the date and the time together, and uses whichever 12- or 24-hour format you have set in [your date and time settings](/customizing-notesnook). There is no separate save step — confirming the picker saves the change.
+
+The picker won't let you choose anything later than the note's last edited date; those days are unselectable rather than rejected with an error.
 
 :::
+
+The pencil only appears on notes. Notebooks, tags and reminders show their dates read-only.
 
 ## Keep a note off sync
 

@@ -22,7 +22,13 @@ export default defineConfig({
   lang: "en-US",
   srcDir: "./contents",
   // Version overrides are source material for build-versions.mjs, not pages.
-  srcExclude: ["_versions/**"],
+  // The Standard Notes importer is unpublished for now — the page is kept in
+  // the repo but is not built, linked or listed in the sitemap. Delete the
+  // second entry (and restore the sidebar link) to publish it again.
+  srcExclude: [
+    "_versions/**",
+    "importing-notes/import-notes-from-standardnotes.md"
+  ],
   cleanUrls: true,
   lastUpdated: true,
   metaChunk: true,
@@ -110,14 +116,29 @@ export default defineConfig({
       md.core.ruler.push("nn_inline_glyphs", (state) => {
         for (const token of state.tokens) {
           if (token.type !== "inline" || !token.children) continue;
-          const sharesLineWithText = token.children.some(
-            (child) =>
-              (child.type === "text" && child.content.trim()) ||
-              child.type === "code_inline"
-          );
-          if (!sharesLineWithText) continue;
+          // Line breaks split the inline token into segments. A screenshot on
+          // its own line inside a numbered step lives in the same inline token
+          // as the step's text, so "does this token contain text?" would wrongly
+          // shrink it — the question is whether text sits on *its* line.
+          let segment: typeof token.children = [];
+          const segments = [segment];
           for (const child of token.children) {
-            if (child.type === "image") child.attrJoin("class", "inline-glyph");
+            if (child.type === "softbreak" || child.type === "hardbreak") {
+              segment = [];
+              segments.push(segment);
+            } else segment.push(child);
+          }
+          for (const line of segments) {
+            const sharesLineWithText = line.some(
+              (child) =>
+                (child.type === "text" && child.content.trim()) ||
+                child.type === "code_inline"
+            );
+            if (!sharesLineWithText) continue;
+            for (const child of line) {
+              if (child.type === "image")
+                child.attrJoin("class", "inline-glyph");
+            }
           }
         }
         return true;

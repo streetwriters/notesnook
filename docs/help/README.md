@@ -52,7 +52,7 @@ Steps that differ per platform go in tabs, which stay in sync across the whole s
 
 Callouts use VitePress containers — `::: info`, `::: tip`, `::: warning`, `::: danger`, `::: details`.
 
-Renaming or moving a file changes a live URL that the apps and support replies link to. Don't, unless a redirect goes with it.
+Renaming or moving a file changes a live URL that the apps and support replies link to. Don't, unless a 301 goes into `contents/public/_redirects` with it. Some pages are linked from inside the app via `packages/intl/src/strings.ts`, and the importer package links to the `importing-notes/*` slugs — grep both before touching a slug.
 
 ## Versioning
 

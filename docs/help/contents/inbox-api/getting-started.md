@@ -7,6 +7,7 @@ keywords:
   - notesnook api
   - send note to notesnook
   - notesnook zapier
+  - notesnook inbox api html
 ---
 
 # Getting started with the Inbox API
@@ -99,6 +100,34 @@ Each key gets an expiry: `{{expiryOneDay}}`, `{{expiryOneWeek}}`, `{{expiryOneMo
 Notebook and Tag IDs can be found by right clicking on a notebook/tag and selecting `{{copyId}}`.
 
 :::
+
+#### What HTML can I send?
+
+`content.data` is an HTML string, and `content.type` must be `"html"` — it is the only content format the Inbox API accepts. There is no `"text"` or `"markdown"` type, but you can send plain text with no tags in it at all and it becomes a paragraph.
+
+You don't have to send a fragment. A whole document works too: a `<!doctype>`, `<html>`, `<head>` or `<body>` wrapper is unwrapped for you and only the body content is kept, so you can pipe an email body or a scraped page straight through.
+
+The HTML is sanitized on your own device, after decryption and before the note is saved. Ordinary document markup survives:
+
+- headings, paragraphs, lists, tables, blockquotes and preformatted text
+- inline formatting — `<strong>`, `<em>`, `<u>`, `<s>`, `<code>`, `<sub>`, `<sup>`
+- links with an `http` or `https` address
+- images
+- `<iframe>` with a safe `src`, so embeds are not stripped
+
+Anything that could run code is removed, and the surrounding text is kept:
+
+- `<script>` tags and their contents
+- inline event handlers — `onclick`, `onerror`, `onmouseover` and the rest
+- `javascript:` and `data:` addresses in `href` and `src`
+- `<object>`, `<embed>` and `<base>`
+
+::: warning Unbalanced tags turn the whole note into a code block
+Your HTML is checked for balanced tags before anything else. An unclosed or mismatched tag anywhere in the payload is **not** repaired — the entire string is escaped and stored as one code block, so the note arrives showing your raw markup instead of formatted text. If a note lands looking like source code, that is why. Close every tag before you post.
+
+:::
+
+Notesnook stores the result in its own editor format, so markup is kept to the extent that it maps onto something the editor can represent. Presentational details that have no equivalent — most inline `style` attributes and layout scaffolding, for example — are dropped, and the text and structure remain.
 
 #### Limits
 
@@ -259,6 +288,8 @@ Every item the Inbox API processes is recorded, and anything that fails is kept 
 :::
 
 You can delete individual entries or clear the whole list. If a service keeps failing, check that `type` is `"note"`, `version` is `1`, and `content.type` is `"html"`.
+
+A note that arrives as a **code block** full of raw markup is not a failure and won't show up in this list — it means the HTML you sent had an unclosed or mismatched tag. See [what HTML can I send?](#what-html-can-i-send).
 
 ## Turning the Inbox API off
 

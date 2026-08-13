@@ -59,8 +59,6 @@ The `navigationMenu` scope is used by the left-most side bar that contains the l
 
 The `titleBar` scope is used by the title bar Notesnook draws along the top of the desktop window. It has no effect when you have switched to [your system's native titlebar](/desktop-integration/updates-and-advanced-settings).
 
-<!-- TODO: screenshot — the desktop title bar with the titleBar scope highlighted -->
-
 #### 4. `statusBar`
 
 The `statusBar` scope is used by the bottom most horizontal bar that contains your email address, the sync status etc.

@@ -17,8 +17,9 @@ Method: mechanical sweeps over the whole `contents/` tree, plus targeted verific
 | Gated features (35) documented | 35 / 35 |
 | Structured data | BreadcrumbList + TechArticle on all 93; HowTo on 57; FAQPage on 13 |
 | Images with descriptive alt text | 100% |
-| Outstanding screenshot TODOs | 25 |
+| Outstanding screenshot TODOs | 24 |
 | `npm run build` | passes — 0 dead internal links, 0 unresolved string keys |
+| Legacy URLs still resolving | 71 / 71 (8 section indexes now 301) |
 
 ## Verified against source this run
 
@@ -65,6 +66,7 @@ There are no known outstanding source-side bugs affecting the docs.
 
 **Structure**
 
+- The VitePress migration dropped the ten `README.md` section stubs the legacy docgen site served as directory landing pages, so `/organizing-notes`, `/rich-text-editor`, `/custom-themes`, `/faqs`, `/mobile-integration`, `/desktop-integration`, `/web-clipper` and `/inbox-api` started returning 404. Every *article* slug survived the migration unchanged; only these eight moved. They are now 301'd to their cluster hub from `contents/public/_redirects`. (`/` and `/importing-notes` were already covered by `index.md` and `importing-notes/index.md`.)
 - `backup-and-restore-notes-in-notesnook.md` and `custom-themes/publish-a-theme.md` each had two `# H1`s, which hid a whole section from the page outline. Both now use one H1.
 - `app-lock.md` had `###` headings **inside** both tab panels, so each appeared twice in the outline with duplicate anchor slugs, plus step numbering that ran across headings and six `alt="drawing"` images. Rewritten with headings outside the tabs and real UI string keys.
 - `keyboard-shortcuts.md` started at `###`, leaving the page outline empty. The generator (`scripts/document-keyboard-shortcuts.mjs`) now emits `##` per category and a `## Related pages` block, and the page carries proper SEO frontmatter.
@@ -99,14 +101,13 @@ These could not be settled from this repo and are the main risk of a wrong claim
 
 ## Screenshots
 
-**25 TODO markers** remain, in four groups:
+**24 TODO markers** remain, in three groups:
 
 | Group | Why it isn't captured | Examples |
 | --- | --- | --- |
 | Needs a signed-in account | The capture harness runs logged out on purpose | attachment manager, sync status indicator, 2FA recovery codes, note links panel |
 | Needs a paid plan | Feature is gated | the expiry badge on a note (Pro) |
 | Needs a device or a date | Not reproducible in a browser | Android widgets, quick settings tile, Wrapped (December only) |
-| Newly marked | Added this run | the desktop title bar, for the `titleBar` theme scope |
 
 Five screenshots in `contents/public/screenshots/` were captured from a real production build of the web app and are current.
 

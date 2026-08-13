@@ -19,6 +19,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { HeadConfig, TransformPageContext, PageData } from "vitepress";
+import { resolveString } from "./strings.mjs";
 
 const SITE = "https://help.notesnook.com";
 const OG_IMAGE = `${SITE}/logo.png`;
@@ -58,6 +59,8 @@ function pageSource(relativePath: string) {
 }
 
 /** Numbered list items in the first tab of a page become HowTo steps. */
+const STRING_TOKEN = /\{\{\s*([A-Za-z][A-Za-z0-9_]*)(?::(\d+))?\s*\}\}/g;
+
 function howToSteps(src: string) {
   const steps: { name: string; text: string }[] = [];
   for (const line of src.split("\n")) {
@@ -66,6 +69,12 @@ function howToSteps(src: string) {
     const text = m[1]
       .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
       .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      // These steps come from the raw markdown, before the markdown-it plugin
+      // has swapped `{{key}}` for the app's label — resolve them here too, or
+      // the structured data Google reads ships the raw tokens.
+      .replace(STRING_TOKEN, (_m, key: string, count?: string) =>
+        resolveString(key, count ? Number(count) : undefined)
+      )
       .replace(/[`*_]/g, "")
       .trim();
     if (text.length > 3) steps.push({ name: text.slice(0, 110), text });
