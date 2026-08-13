@@ -28,21 +28,51 @@ Object.defineProperty(global, "Buffer", {
   }
 });
 
-if (__DEV__ && Config.isTesting !== "true") {
-  const messages =
-    require("@notesnook/intl/dist/locales/$pseudo-LOCALE.json").messages;
-  i18n.load({
-    en: messages
-  });
-} else {
-  const messages = require("@notesnook/intl/dist/locales/$en.json").messages;
-  i18n.load({
-    en: messages
-  });
+import SettingsService from "./app/services/settings";
+
+const localeCatalogs = {
+  en: require("@notesnook/intl/dist/locales/$en.json").messages,
+  fr: require("@notesnook/intl/dist/locales/$fr.json").messages,
+  es: require("@notesnook/intl/dist/locales/$es.json").messages,
+  de: require("@notesnook/intl/dist/locales/$de.json").messages,
+  it: require("@notesnook/intl/dist/locales/$it.json").messages
+};
+
+export const AVAILABLE_LANGUAGES = [
+  { code: "en", label: "English", nativeLabel: "English" },
+  { code: "fr", label: "French", nativeLabel: "Français" },
+  { code: "es", label: "Spanish", nativeLabel: "Español" },
+  { code: "de", label: "German", nativeLabel: "Deutsch" },
+  { code: "it", label: "Italian", nativeLabel: "Italiano" }
+];
+
+export function getSupportedLocale(locale) {
+  if (!locale) return "en";
+  const lang = locale.split("-")[0].toLowerCase();
+  return localeCatalogs[lang] ? lang : "en";
 }
 
-i18n.activate("en");
-setI18nGlobal(i18n);
+export function initLocale() {
+  const savedLanguage = SettingsService.getProperty("appLanguage");
+  let targetLang;
+
+  if (savedLanguage && localeCatalogs[savedLanguage]) {
+    targetLang = savedLanguage;
+  } else {
+    let systemLocale = "en";
+    try {
+      systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+    } catch (e) {}
+    targetLang = getSupportedLocale(systemLocale);
+  }
+
+  i18n.load(localeCatalogs);
+  i18n.activate(targetLang);
+  setI18nGlobal(i18n);
+  return targetLang;
+}
+
+initLocale();
 
 if (__DEV__) {
   try {
