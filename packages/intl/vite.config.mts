@@ -56,8 +56,7 @@ export default defineConfig({
       }
     }),
     dts({
-      exclude: ["**/locales/*.json"],
-      rollupTypes: true
+      exclude: ["**/locales/*.json"]
     })
   ],
   build: {
