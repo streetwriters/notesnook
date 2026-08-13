@@ -180,8 +180,10 @@ export const withTheme = (
       }
     }, [colorScheme, darkTheme, lightTheme]);
 
+    const appLanguage = useSettingStore((state) => state.settings.appLanguage);
+
     return (
-      <I18nProvider i18n={i18n}>
+      <I18nProvider key={appLanguage || "en"} i18n={i18n}>
         <Element {...props} />
       </I18nProvider>
     );
