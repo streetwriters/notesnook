@@ -84,7 +84,8 @@ import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 
-export const settingsGroups: SettingSection[] = [
+export function getSettingsGroups(): SettingSection[] {
+  return [
   {
     id: "account-local",
     name: strings.account(),
@@ -896,6 +897,15 @@ export const settingsGroups: SettingSection[] = [
         name: strings.behavior(),
         description: strings.behaviorDesc(),
         sections: [
+          {
+            id: "app-language",
+            name: strings.selectLanguage(),
+            description: strings.changeLanguage(),
+            type: "component",
+            component: "language-selector",
+            property: "appLanguage",
+            icon: "google-translate"
+          },
           {
             id: "default-sidebar-view",
             type: "component",
@@ -1852,3 +1862,18 @@ export const settingsGroups: SettingSection[] = [
     ]
   }
 ];
+}
+
+export function useSettingsGroups(): SettingSection[] {
+  useSettingStore((state) => state.settings.appLanguage);
+  return getSettingsGroups();
+}
+
+export const settingsGroups: SettingSection[] = new Proxy([] as SettingSection[], {
+  get(target, prop, receiver) {
+    const groups = getSettingsGroups();
+    const value = Reflect.get(groups, prop, groups);
+    return typeof value === "function" ? value.bind(groups) : value;
+  }
+});
+

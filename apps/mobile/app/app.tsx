@@ -63,6 +63,7 @@ const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
+  useSettingStore((state) => state.settings.appLanguage);
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
