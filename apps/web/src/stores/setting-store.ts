@@ -92,6 +92,8 @@ class SettingStore extends BaseStore<SettingStore> {
   isPortable = false;
   proxyRules?: string;
   isInboxEnabled = false;
+  appLanguage = Config.get<string | undefined>("appLanguage", undefined);
+
 
   init = () => {
     db.eventManager.subscribe(EVENTS.userFetched, async () => {
@@ -110,6 +112,7 @@ class SettingStore extends BaseStore<SettingStore> {
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
+      appLanguage: Config.get<string | undefined>("appLanguage", undefined),
       isFlatpak: await desktop?.integration.isFlatpak.query(),
       isSnap: await desktop?.integration.isSnap.query(),
       isPortable: await desktop?.integration.isPortable.query(),
@@ -192,6 +195,12 @@ class SettingStore extends BaseStore<SettingStore> {
     this.set({ imageCompression });
     Config.set("imageCompression", imageCompression);
   };
+
+  setAppLanguage = (appLanguage: string) => {
+    this.set({ appLanguage });
+    Config.set("appLanguage", appLanguage);
+  };
+
 
   setDesktopIntegration = async (settings: DesktopIntegration) => {
     const { desktopIntegrationSettings } = this.get();
