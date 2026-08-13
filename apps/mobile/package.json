@@ -130,6 +130,7 @@
     "react-native-quick-sqlite": "^8.2.7",
     "react-native-reanimated": "^4.2.0",
     "react-native-reanimated-progress-bar": "1.0.1",
+    "react-native-restart": "^0.0.28",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-scoped-storage": "^1.9.5",
     "react-native-screenguard": "^2.0.0-beta5",
