@@ -19,11 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /** @type {import('@lingui/conf').LinguiConfig} */
 module.exports = {
-  locales: ["en", "pseudo-LOCALE"],
+  locales: ["en", "pseudo-LOCALE", "fr", "es", "de", "it"],
   sourceLocale: "en",
   pseudoLocale: "pseudo-LOCALE",
   fallbackLocales: {
-    "pseudo-LOCALE": "en"
+    "pseudo-LOCALE": "en",
+    fr: "en",
+    es: "en",
+    de: "en",
+    it: "en"
   },
   catalogs: [
     {
