@@ -17,9 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export type { Messages } from "@lingui/core";
-export { strings } from "./strings";
-export { setI18nGlobal } from "./setup";
-export { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
-export type { Language } from "./languages";
+export type Language = {
+  code: string;
+  label: string;
+  nativeLabel: string;
+};
 
+export const AVAILABLE_LANGUAGES: Language[] = [
+  { code: "en", label: "English", nativeLabel: "English" },
+  { code: "fr", label: "French", nativeLabel: "Français" },
+  { code: "es", label: "Spanish", nativeLabel: "Español" },
+  { code: "de", label: "German", nativeLabel: "Deutsch" },
+  { code: "it", label: "Italian", nativeLabel: "Italiano" }
+];
+
+export function getSupportedLocale(locale?: string): string {
+  if (!locale) return "en";
+  const lang = locale.split("-")[0].toLowerCase();
+  const found = AVAILABLE_LANGUAGES.find((l) => l.code === lang);
+  return found ? found.code : "en";
+}
