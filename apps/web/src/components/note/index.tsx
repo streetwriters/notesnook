@@ -550,7 +550,7 @@ export const noteMenuItems: (
 
             await exportNotes(
               format.type,
-              db.notes.all.where((eb) => eb("id", "in", ids))
+              db.notes.exportable.where((eb) => eb("id", "in", ids))
             );
           }
         }))
