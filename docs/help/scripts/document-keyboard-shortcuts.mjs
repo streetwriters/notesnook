@@ -30,20 +30,37 @@ console.log("Generating keyboard shortcuts documentation...");
 const keyboardShortcutFilePath = "./contents/keyboard-shortcuts.md";
 
 const frontmatter = `---
-title: Keyboard Shortcuts
-description: Keyboard shortcuts for Notesnook
+title: Keyboard shortcuts
+pageTitle: Every keyboard shortcut in Notesnook
+description: The complete list of Notesnook keyboard shortcuts for web, Windows, Linux and macOS — navigation, the editor, formatting and note actions.
+keywords:
+  - notesnook keyboard shortcuts
+  - notesnook hotkeys
+  - notes app shortcuts
 ---
 `;
 
 const content = `# Keyboard shortcuts
 
-The following keyboard shortcuts will help you navigate Notesnook faster.`;
+These are every keyboard shortcut the Notesnook desktop and web apps respond to, grouped by what they do. Press \`Ctrl\` \`/\` (\`⌘\` \`/\` on macOS) inside the app to bring the same list up there.
+
+::: info This page is generated from the app
+The tables below are generated straight from the app's own keybinding registry, so they cannot drift out of step with the shortcuts that actually fire.
+:::`;
+
+const relatedPages = `## Related pages
+
+- [Editor toolbar](/rich-text-editor/rich-text-editor-toolbar) — the same actions as buttons, and how to rearrange them
+- [Markdown shortcuts](/rich-text-editor/markdown-notes-editing) — formatting that triggers as you type
+- [Find & replace](/rich-text-editor/search-and-replace) — searching inside the note you are editing
+- [Search & navigation](/search-and-navigation) — the command palette and quick open
+- [Tabs & panes](/rich-text-editor/editor-tabs-and-panes) — moving between open notes`;
 
 const markdownTable = getGroupedTableKeybindingsMarkdown();
 
 writeFileSync(
   keyboardShortcutFilePath,
-  frontmatter + "\n" + content + "\n\n" + markdownTable,
+  frontmatter + "\n" + content + "\n\n" + markdownTable + "\n\n" + relatedPages + "\n",
   "utf-8"
 );
 
@@ -95,6 +112,6 @@ function getGroupedTableKeybindingsMarkdown() {
       })
       .join("\n");
 
-    return `### ${category}\n\n${header}\n${rows}`;
+    return `## ${category}\n\n${header}\n${rows}`;
   }).join("\n\n");
 }

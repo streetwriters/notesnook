@@ -1,6 +1,11 @@
 ---
 title: Self-Hosting Inbox API
-description: Learn about self-hosting Notesnook's Inbox API.
+pageTitle: Self-host the Notesnook Inbox API
+description: Run your own Notesnook Inbox API server so inbound notes never touch Notesnook's infrastructure, and point the apps at it.
+keywords:
+  - self host inbox api
+  - notesnook inbox server
+  - notesnook self hosting
 ---
 
 # Self-Hosting Inbox API
@@ -18,9 +23,10 @@ The inbox server is a lightweight proxy: it fetches your PGP public key from Not
 
 The source code and setup instructions are available in the [notesnook-sync-server](https://github.com/streetwriters/notesnook-sync-server/tree/master/Notesnook.Inbox.API) repository. Once running, replace `https://inbox.notesnook.com/` with your own instance URL in any API calls or automation tools.
 
-> info
->
-> Even on Notesnook's hosted instance, your payload is encrypted with your PGP public key before it leaves the server — it cannot be read in transit or at rest.
+::: info
+Even on Notesnook's hosted instance, your payload is encrypted with your PGP public key before it leaves the server — it cannot be read in transit or at rest.
+
+:::
 
 ## Option 2: Encrypt locally and post directly
 
@@ -124,6 +130,13 @@ Usage:
 ./send-to-notesnook.sh "Meeting notes" "<p>Discussed the Q4 roadmap.</p>"
 ```
 
-> info
->
-> After rotating your PGP keys in Notesnook settings, re-fetch the public key (Step 1) and re-import it before encrypting new payloads.
+::: info
+After rotating your PGP keys in Notesnook settings, re-fetch the public key (Step 1) and re-import it before encrypting new payloads.
+
+:::
+
+## Related pages
+
+- [Inbox API](/inbox-api/getting-started) — sending notes in from other services
+- [Self-hosting](/self-hosting) — running your own servers
+- [How is my data encrypted?](/how-is-my-data-encrypted) — the encryption behind every note

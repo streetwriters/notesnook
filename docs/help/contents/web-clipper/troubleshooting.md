@@ -1,6 +1,11 @@
 ---
 title: Troubleshooting web clipper
-description: Common issues with the web clipper and how to fix them.
+pageTitle: Notesnook Web Clipper won't connect — how do I fix it?
+description: Fixes for the Notesnook Web Clipper when it will not connect to the web app, shows a connection error, or renders a clipped page incorrectly.
+keywords:
+  - web clipper not connecting
+  - notesnook clipper error
+  - receiving end does not exist
 ---
 
 # Troubleshooting web clipper
@@ -23,3 +28,9 @@ However, if you are seeing this on a website it is recommended that you trigger 
 ## What to do if a website appears broken in the web clip?
 
 Since the [Notesnook Web Clipper](https://notesnook.com/notesnook-web-clipper) is still in alpha-beta stage, some rendering issues are expected in the web clips. If you notice any such problem, feel free to open a new issue on our [GitHub Issue Tracker](https://github.com/streetwriters/notesnook/issues/new/choose).
+
+## Related pages
+
+- [Installing the web clipper](/web-clipper/installation) — Chrome, Edge and Firefox
+- [Clipping your first page](/web-clipper/clipping-your-first-web-page-with-web-clipper) — areas, modes and organizing clips
+- [Attachments & files](/attachments-and-files) — managing the files in your notes
