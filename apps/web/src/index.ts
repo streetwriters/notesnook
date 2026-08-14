@@ -25,8 +25,7 @@ import { getServiceWorkerVersion } from "./utils/version";
 import { register as registerStreamSaver } from "./utils/stream-saver/mitm";
 import { ThemeDark, ThemeLight, themeToCSS } from "@notesnook/theme";
 import Config from "./utils/config";
-import { setI18nGlobal, AVAILABLE_LANGUAGES, getSupportedLocale } from "@notesnook/intl";
-import { i18n, type Messages } from "@lingui/core";
+import { initLocale } from "./common/locale";
 
 const colorScheme = JSON.parse(
   window.localStorage.getItem("colorScheme") || '"light"'
@@ -44,59 +43,13 @@ if (theme) {
   if (stylesheet) stylesheet.innerHTML = css;
 } else stylesheet?.remove();
 
-const localeMap: Record<
-  string,
-  () => Promise<{ default: { messages: unknown } }>
-> = {
-  en: () => import("@notesnook/intl/locales/$en.json"),
-  fr: () => import("@notesnook/intl/locales/$fr.json"),
-  es: () => import("@notesnook/intl/locales/$es.json"),
-  de: () => import("@notesnook/intl/locales/$de.json"),
-  it: () => import("@notesnook/intl/locales/$it.json")
-};
-
-const savedLanguage = Config.get<string | undefined>("appLanguage", undefined);
-let targetLang = "en";
-if (
-  savedLanguage &&
-  AVAILABLE_LANGUAGES.some((l) => l.code === savedLanguage)
-) {
-  targetLang = savedLanguage;
-} else {
-  let systemLocale = "en";
-  try {
-    systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-  } catch (e) {}
-  targetLang = getSupportedLocale(systemLocale);
-}
-
-const getLocaleMessages = async (lang: string) => {
-  const loader = localeMap[lang] || localeMap.en;
-  const mod = await loader();
-  return mod.default.messages as unknown as Messages;
-};
-
-Promise.all([
-  getLocaleMessages(targetLang),
-  targetLang !== "en" ? getLocaleMessages("en") : Promise.resolve(null)
-]).then(([targetMessages, enMessages]) => {
-  const catalogs: Record<string, Messages> = {
-    [targetLang]: targetMessages
-  };
-  if (enMessages) {
-    catalogs.en = enMessages;
-  }
-
-  i18n.load(catalogs);
-  i18n.activate(targetLang);
-
+initLocale().then(() => {
   performance.mark("import:root");
   import("./root").then(({ startApp }) => {
     performance.mark("start:app");
     startApp();
   });
 });
-setI18nGlobal(i18n);
 
 if (!IS_DESKTOP_APP) {
   //   logger.info("Initializing service worker...");
