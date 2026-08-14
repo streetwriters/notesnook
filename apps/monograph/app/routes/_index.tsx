@@ -141,7 +141,7 @@ export default function Monograph() {
               bg: "background-secondary",
               border: "1px solid var(--border)"
             }}
-            href="https://help.notesnook.com/publish-notes-with-monographs"
+            href="https://notesnook.com/help/publish-notes-with-monographs"
             target="_blank"
           >
             How it works

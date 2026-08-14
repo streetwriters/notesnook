@@ -179,7 +179,7 @@ const staticCommands: Command[] = [
     id: "help",
     title: strings.helpAndSupport(),
     icon: ArrowTopRight,
-    action: () => (window.location.href = "https://help.notesnook.com"),
+    action: () => (window.location.href = "https://notesnook.com/help"),
     group: strings.navigate(),
     type: "command"
   },

@@ -181,7 +181,7 @@ const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
       icon: ArrowTopRight,
       onClick() {
         window.open(
-          "https://help.notesnook.com/publish-notes-with-monographs",
+          "https://notesnook.com/help/publish-notes-with-monographs",
           "_blank"
         );
       }

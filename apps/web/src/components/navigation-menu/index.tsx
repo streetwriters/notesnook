@@ -918,7 +918,7 @@ function NavigationDropdown() {
               icon: Documentation.path,
               key: "help-and-support",
               onClick: () => {
-                window.open("https://help.notesnook.com/", "_blank");
+                window.open("https://notesnook.com/help/", "_blank");
               }
             },
             {

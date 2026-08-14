@@ -472,7 +472,7 @@ function ThemeSelector() {
                       actionText: strings.learnMore(),
                       func: () => {
                         openLinkInBrowser(
-                          "https://help.notesnook.com/custom-themes/introduction"
+                          "https://notesnook.com/help/custom-themes/introduction"
                         );
                       }
                     });

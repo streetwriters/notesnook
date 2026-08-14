@@ -33,14 +33,12 @@ jobs:
       - name: Build help
         run: npm run build:help
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare
         id: deploy
         working-directory: ./docs/help
         run: |
           set -euo pipefail
-          BRANCH=pr-${{ github.event.number }}-$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "Deploying branch: $BRANCH"
-          DEPLOY_OUT=$(npx --yes wrangler pages deploy --project-name=notesnook-help --branch="$BRANCH" ./.vitepress/dist 2>&1) || { echo "$DEPLOY_OUT"; exit 1; }
+          DEPLOY_OUT=$(npx --yes wrangler versions upload 2>&1) || { echo "$DEPLOY_OUT"; exit 1; }
           echo "$DEPLOY_OUT"
           PREVIEW_URL=$(printf "%s" "$DEPLOY_OUT" | grep -Eo 'https?://[^ ]+' | head -1 || true)
           if [ -z "$PREVIEW_URL" ]; then

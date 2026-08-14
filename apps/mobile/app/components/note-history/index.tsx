@@ -249,7 +249,7 @@ export default function NoteHistory({
         <Text
           onPress={() => {
             openLinkInBrowser(
-              "https://help.notesnook.com/note-version-history"
+              "https://notesnook.com/help/note-version-history"
             );
           }}
           style={{

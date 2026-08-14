@@ -138,5 +138,4 @@ After rotating your PGP keys in Notesnook settings, re-fetch the public key (Ste
 ## Related pages
 
 - [Inbox API](/inbox-api/getting-started) — sending notes in from other services
-- [Self-hosting](/self-hosting) — running your own servers
 - [How is my data encrypted?](/how-is-my-data-encrypted) — the encryption behind every note

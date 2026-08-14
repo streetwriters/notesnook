@@ -21,19 +21,22 @@ export default defineConfig({
     "Your complete and free resource to using Notesnook as a daily note taking app to organize your work and life while safeguarding your privacy.",
   lang: "en-US",
   srcDir: "./contents",
+  base: "/help/",
+  outDir: "./.vitepress/dist/help",
   // Version overrides are source material for build-versions.mjs, not pages.
   // The Standard Notes importer is unpublished for now — the page is kept in
   // the repo but is not built, linked or listed in the sitemap. Delete the
   // second entry (and restore the sidebar link) to publish it again.
   srcExclude: [
     "_versions/**",
-    "importing-notes/import-notes-from-standardnotes.md"
+    "importing-notes/import-notes-from-standardnotes.md",
+    "self-hosting.md"
   ],
   cleanUrls: true,
   lastUpdated: true,
   metaChunk: true,
   sitemap: {
-    hostname: "https://help.notesnook.com",
+    hostname: "https://notesnook.com/help",
     // Only the latest docs belong in the sitemap.
     transformItems: (items) =>
       items.filter(
@@ -69,7 +72,7 @@ export default defineConfig({
       "link",
       {
         rel: "preload",
-        href: "/fonts/Inter-Regular.woff2",
+        href: "/help/fonts/Inter-Regular.woff2",
         as: "font",
         type: "font/woff2",
         crossorigin: ""
@@ -79,7 +82,7 @@ export default defineConfig({
       "link",
       {
         rel: "preload",
-        href: "/fonts/Inter-SemiBold.woff2",
+        href: "/help/fonts/Inter-SemiBold.woff2",
         as: "font",
         type: "font/woff2",
         crossorigin: ""
@@ -94,9 +97,9 @@ export default defineConfig({
       {
         async: "",
         defer: "",
-        "data-website-id": "ad34576b-2721-436c-b36a-47a614009d2b",
+        "data-website-id": "676a7449-2151-44f7-a8c7-3b0691cade30",
         src: "https://aas.streetwriters.co/script.js",
-        "data-domains": "help.notesnook.com"
+        "data-domains": "notesnook.com"
       }
     ]
   ],

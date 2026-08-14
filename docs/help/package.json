@@ -34,6 +34,7 @@
     "@notesnook/intl": "file:../../packages/intl",
     "markdown-it-task-lists": "^2.1.1",
     "vitepress": "^1.6.4",
-    "vitepress-plugin-tabs": "^0.9.1"
+    "vitepress-plugin-tabs": "^0.9.1",
+    "wrangler": "^4.123.0"
   }
 }

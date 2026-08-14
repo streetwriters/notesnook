@@ -386,7 +386,7 @@ export const SupportSettings: SettingsGroup[] = [
           {
             type: "button",
             action: () =>
-              void window.open("https://help.notesnook.com/", "_blank"),
+              void window.open("https://notesnook.com/help/", "_blank"),
             title: strings.open(),
             variant: "secondary"
           }
