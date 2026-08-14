@@ -21,7 +21,7 @@ import { fuzzy } from "../fuzzy.js";
 import { test, expect, describe } from "vitest";
 
 describe("lookup.fuzzy", () => {
-  test("should sort items by score", () => {
+  test("should sort items by score", async () => {
     const items = [
       {
         id: "1",
@@ -37,12 +37,12 @@ describe("lookup.fuzzy", () => {
       }
     ];
     const query = "ems";
-    expect(fuzzy(query, items, (item) => item.id, { title: 1 })).toStrictEqual([
-      items[2]
-    ]);
+    expect(
+      await fuzzy(query, items, (item) => item.id, { title: 1 })
+    ).toStrictEqual([items[2]]);
   });
   describe("opts.prefix", () => {
-    test("should prefix matched field with provided value when given", () => {
+    test("should prefix matched field with provided value when given", async () => {
       const items = [
         {
           id: "1",
@@ -55,7 +55,7 @@ describe("lookup.fuzzy", () => {
       ];
       const query = "d";
       expect(
-        fuzzy(
+        await fuzzy(
           query,
           items,
           (item) => item.id,
@@ -68,7 +68,7 @@ describe("lookup.fuzzy", () => {
     });
   });
   describe("opt.suffix", () => {
-    test("should suffix matched field with provided value when given", () => {
+    test("should suffix matched field with provided value when given", async () => {
       const items = [
         {
           id: "1",
@@ -81,7 +81,7 @@ describe("lookup.fuzzy", () => {
       ];
       const query = "llo";
       expect(
-        fuzzy(
+        await fuzzy(
           query,
           items,
           (item) => item.id,
@@ -103,13 +103,13 @@ describe("lookup.fuzzy", () => {
       { id: "5", title: "note-393.jpg" }
     ];
 
-    test("query with space matches all separator variants", () => {
-      const result = fuzzy("fl srch", items, (i) => i.id, { title: 1 });
+    test("query with space matches all separator variants", async () => {
+      const result = await fuzzy("fl srch", items, (i) => i.id, { title: 1 });
       expect(result).toStrictEqual(items.slice(0, 4));
     });
 
-    test("variants with only separators should match", () => {
-      const result = fuzzy(
+    test("variants with only separators should match", async () => {
+      const result = await fuzzy(
         "---",
         [
           { id: "1", title: "--------.jpg" },
@@ -121,11 +121,11 @@ describe("lookup.fuzzy", () => {
       expect(result).toStrictEqual([{ id: "1", title: "--------.jpg" }]);
     });
 
-    test("query with special character between words matches all separator variants", () => {
-      let result = fuzzy("file_search", items, (i) => i.id, { title: 1 });
+    test("query with special character between words matches all separator variants", async () => {
+      let result = await fuzzy("file_search", items, (i) => i.id, { title: 1 });
       expect(result).toStrictEqual([items[2], items[3], items[0], items[1]]);
 
-      result = fuzzy("file-search", items, (i) => i.id, { title: 1 });
+      result = await fuzzy("file-search", items, (i) => i.id, { title: 1 });
       expect(result).toStrictEqual([items[1], items[0], items[2], items[3]]);
     });
   });

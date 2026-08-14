@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { match, surround } from "fuzzyjs";
 import { clone } from "./clone.js";
 
-export function fuzzy<T>(
+export async function fuzzy<T>(
   query: string,
   items: T[],
   getIdentifier: (item: T) => string,
@@ -29,8 +29,9 @@ export function fuzzy<T>(
     limit?: number;
     prefix?: string;
     suffix?: string;
+    sort?: (matches: T[]) => Promise<T[]>;
   } = {}
-): T[] {
+): Promise<T[]> {
   const results = fuzzyMatch(query, items, getIdentifier, fields, options);
   if (results.size === 0) return [];
 
@@ -57,9 +58,11 @@ export function fuzzy<T>(
     }
   }
 
-  const matches = Array.from(results.entries())
-    .sort((a, b) => b[1].score - a[1].score)
-    .map((item) => item[1].item);
+  const matches = options.sort
+    ? await options.sort(Array.from(results.values()).map((item) => item.item))
+    : Array.from(results.entries())
+        .sort((a, b) => b[1].score - a[1].score)
+        .map((item) => item[1].item);
 
   return matches;
 }
