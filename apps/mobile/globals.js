@@ -6,11 +6,11 @@ import "@formatjs/intl-pluralrules/locale-data/en";
 import "react-native-url-polyfill/auto";
 import "./polyfills/console-time.js";
 import "./app/common/logger/index";
-import { setI18nGlobal, getSupportedLocale } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
 import OpenPGP from "react-native-fast-openpgp";
+import { initLocale } from "./app/common/locale";
 
 OpenPGP.useJSI = false;
+initLocale();
 
 let domParser;
 Object.defineProperty(global, "DOMParser", {
@@ -26,39 +26,6 @@ Object.defineProperty(global, "Buffer", {
     return buffer.Buffer;
   }
 });
-
-import SettingsService from "./app/services/settings";
-
-const localeCatalogs = {
-  en: require("@notesnook/intl/dist/locales/$en.json").messages,
-  fr: require("@notesnook/intl/dist/locales/$fr.json").messages,
-  es: require("@notesnook/intl/dist/locales/$es.json").messages,
-  de: require("@notesnook/intl/dist/locales/$de.json").messages,
-  it: require("@notesnook/intl/dist/locales/$it.json").messages
-};
-
-
-export function initLocale() {
-  const savedLanguage = SettingsService.getProperty("appLanguage");
-  let targetLang;
-
-  if (savedLanguage && localeCatalogs[savedLanguage]) {
-    targetLang = savedLanguage;
-  } else {
-    let systemLocale = "en";
-    try {
-      systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch (e) {}
-    targetLang = getSupportedLocale(systemLocale);
-  }
-
-  i18n.load(localeCatalogs);
-  i18n.activate(targetLang);
-  setI18nGlobal(i18n);
-  return targetLang;
-}
-
-initLocale();
 
 if (__DEV__) {
   try {

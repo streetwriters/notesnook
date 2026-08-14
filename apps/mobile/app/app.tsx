@@ -63,7 +63,6 @@ const App = (props: { configureMode: "note-preview" }) => {
   useAppEvents();
   //@ts-ignore
   globalThis["IS_MAIN_APP_RUNNING"] = true;
-  useSettingStore((state) => state.settings.appLanguage);
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
@@ -145,11 +144,11 @@ export const withTheme = (
             if (theme) {
               theme.colorScheme === "dark"
                 ? useThemeStore.setState({
-                    darkTheme: theme
-                  })
+                  darkTheme: theme
+                })
                 : useThemeStore.setState({
-                    lightTheme: theme
-                  });
+                  lightTheme: theme
+                });
             }
           })
           .catch(() => {
@@ -180,10 +179,8 @@ export const withTheme = (
       }
     }, [colorScheme, darkTheme, lightTheme]);
 
-    const appLanguage = useSettingStore((state) => state.settings.appLanguage);
-
     return (
-      <I18nProvider key={appLanguage || "en"} i18n={i18n}>
+      <I18nProvider i18n={i18n}>
         <Element {...props} />
       </I18nProvider>
     );
