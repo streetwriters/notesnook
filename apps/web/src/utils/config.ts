@@ -24,10 +24,10 @@ function set<T>(key: string, value: T) {
   return value;
 }
 
-function get<T = any>(key: string, def?: T): T {
+function get<T>(key: string, def?: T): T {
   const value = window.localStorage.getItem(key);
   if (!value && def !== undefined) return def;
-  return (value ? tryParse(value) : def) as T;
+  return value ? tryParse(value) : def;
 }
 
 function remove(key: string) {
