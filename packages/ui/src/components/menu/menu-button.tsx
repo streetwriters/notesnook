@@ -62,7 +62,7 @@ export function MenuButton(props: MenuButtonProps) {
         ref={itemRef}
         tabIndex={-1}
         variant="menuitem"
-        title={tooltip}
+        title={tooltip || title}
         disabled={isDisabled}
         onClick={(e) => onClick?.(e.nativeEvent)}
         sx={{
@@ -73,7 +73,12 @@ export function MenuButton(props: MenuButtonProps) {
         }}
       >
         <Flex
-          sx={{ fontSize: "inherit", fontFamily: "inherit", flexShrink: 0 }}
+          sx={{
+            fontSize: "inherit",
+            fontFamily: "inherit",
+            minWidth: 0,
+            overflow: "hidden"
+          }}
         >
           <Icon
             path={icon || ""}
@@ -92,7 +97,10 @@ export function MenuButton(props: MenuButtonProps) {
               fontFamily: "inherit",
               color: variant === "dangerous" ? "paragraph-error" : "paragraph",
               textAlign: "left",
-              flexShrink: 0,
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               ...styles?.title
             }}
           >
