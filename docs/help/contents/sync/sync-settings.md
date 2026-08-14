@@ -150,4 +150,3 @@ If you are here because something is not syncing, try the ordinary fixes in [syn
 - [Plans & limits](/plans-and-limits) — full offline mode needs Essential, sync controls need Pro
 - [Backup and restore](/backup-and-restore-notes-in-notesnook) — take one before any forced sync
 - [What are merge conflicts?](/faqs/what-are-merge-conflicts) — resolving two versions of the same note
-- [Self-hosting](/self-hosting) — pointing sync at your own server instead

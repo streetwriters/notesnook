@@ -113,4 +113,3 @@ Your data encryption key is created the next time you change your password.
 - [Recovering your account](/recovering-your-account) — when you forget your password
 - [Backup and restore](/backup-and-restore-notes-in-notesnook) — keeping your own encrypted copy
 - [Two-factor authentication](/two-factor-authentication) — a second step at login
-- [Self-hosting](/self-hosting) — running your own servers

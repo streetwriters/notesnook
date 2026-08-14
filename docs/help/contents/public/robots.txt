@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://help.notesnook.com/sitemap.xml
+Sitemap: https://notesnook.com/help/sitemap.xml

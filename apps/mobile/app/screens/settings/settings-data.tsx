@@ -208,15 +208,15 @@ export const settingsGroups: SettingSection[] = [
             return status === SubscriptionStatus.TRIAL
               ? strings.trialOnGoing(trialEndDate)
               : status === SubscriptionStatus.ACTIVE
-                ? strings.subRenewOn(expiryDate)
-                : status === SubscriptionStatus.CANCELED ||
-                  status === SubscriptionStatus.PAUSED
-                  ? strings.subEndsOn(expiryDate)
-                  : status === SubscriptionStatus.EXPIRED
-                    ? subscriptionDaysLeft.time < -3
-                      ? strings.subEnded()
-                      : strings.accountDowngradedIn(3)
-                    : strings.neverHesitate();
+              ? strings.subRenewOn(expiryDate)
+              : status === SubscriptionStatus.CANCELED ||
+                status === SubscriptionStatus.PAUSED
+              ? strings.subEndsOn(expiryDate)
+              : status === SubscriptionStatus.EXPIRED
+              ? subscriptionDaysLeft.time < -3
+                ? strings.subEnded()
+                : strings.accountDowngradedIn(3)
+              : strings.neverHesitate();
           }
 
           return strings.neverHesitate();
@@ -971,7 +971,7 @@ export const settingsGroups: SettingSection[] = [
             name: strings.keepScreenOn(),
             description: strings.keepScreenOnDesc(),
             property: "keepScreenOn",
-            icon: "cellphone-screenshot",
+            icon: "cellphone-screenshot"
           },
           {
             id: "image-compression",
@@ -1679,7 +1679,7 @@ export const settingsGroups: SettingSection[] = [
         id: "docs-link",
         name: strings.documentation(),
         modifer: async () => {
-          Linking.openURL("https://help.notesnook.com/");
+          Linking.openURL("https://notesnook.com/help/");
         },
         description: strings.documentationDesc(),
         icon: "file-document"

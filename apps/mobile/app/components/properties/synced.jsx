@@ -50,7 +50,7 @@ export const Synced = ({ item, close }) => {
           close();
           await sleep(300);
           await openLinkInBrowser(
-            "https://help.notesnook.com/how-is-my-data-encrypted",
+            "https://notesnook.com/help/how-is-my-data-encrypted",
             colors
           );
         } catch (e) {

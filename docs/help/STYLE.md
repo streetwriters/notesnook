@@ -1,6 +1,6 @@
 # Help docs — writing conventions
 
-Every page on help.notesnook.com follows these. They cover accuracy, plan tags, SEO and linking.
+Every page on notesnook.com/help follows these. They cover accuracy, plan tags, SEO and linking.
 
 ## 1. Accuracy is non-negotiable
 

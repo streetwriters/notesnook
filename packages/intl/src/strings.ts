@@ -2622,7 +2622,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   clickToDirectlyClaimPromo: () =>
     t`Click here to directly claim the promotion.`,
   loginToUploadAttachments: () =>
-    t`Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)`,
+    t`Login to upload attachments. [Read more](https://notesnook.com/help/faqs/login-to-upload-attachments)`,
   views: () => t`Views`,
   clickToUpdate: () => t`Click to update`,
   noPassword: () => t`No password`,
@@ -2738,7 +2738,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   currentPasswordRequired: () => t`Current password required`,
   loginToRestoreAttachments: () => t`Login required to restore attachments`,
   loginToRestoreAttachmentsDesc: () =>
-    t`You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).
+    t`You need to login to restore attachments from a backup file. [Read more](https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).
   
 Continue without attachments?`,
   pleaseLoginToDownloadAttachments: () =>

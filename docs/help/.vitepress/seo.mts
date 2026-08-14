@@ -21,14 +21,13 @@ import { join } from "node:path";
 import type { HeadConfig, TransformPageContext, PageData } from "vitepress";
 import { resolveString } from "./strings.mjs";
 
-const SITE = "https://help.notesnook.com";
+const SITE = "https://notesnook.com/help";
 const OG_IMAGE = `${SITE}/logo.png`;
 
 const url = (relativePath: string) =>
-  `${SITE}/${relativePath.replace(/(index)?\.md$/, "").replace(/\/$/, "")}`.replace(
-    /\/$/,
-    ""
-  ) || SITE;
+  `${SITE}/${relativePath
+    .replace(/(index)?\.md$/, "")
+    .replace(/\/$/, "")}`.replace(/\/$/, "") || SITE;
 
 /** "organizing-notes/archive-notes.md" -> ["Organizing notes", "Archive notes"] */
 function breadcrumbs(relativePath: string, title: string) {

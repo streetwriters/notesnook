@@ -1,6 +1,6 @@
 # Notesnook Help
 
-The source of [help.notesnook.com](https://help.notesnook.com), built with [VitePress](https://vitepress.dev).
+The source of [notesnook.com/help](https://notesnook.com/help), built with [VitePress](https://vitepress.dev).
 
 ```bash
 npm install
