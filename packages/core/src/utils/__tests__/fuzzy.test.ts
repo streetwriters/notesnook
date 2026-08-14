@@ -41,6 +41,7 @@ describe("lookup.fuzzy", () => {
       items[2]
     ]);
   });
+
   describe("opts.prefix", () => {
     test("should prefix matched field with provided value when given", () => {
       const items = [
@@ -67,6 +68,7 @@ describe("lookup.fuzzy", () => {
       ).toStrictEqual([{ id: "2", title: "worlprefix-d" }]);
     });
   });
+
   describe("opt.suffix", () => {
     test("should suffix matched field with provided value when given", () => {
       const items = [
@@ -91,6 +93,27 @@ describe("lookup.fuzzy", () => {
           }
         )
       ).toStrictEqual([{ id: "1", title: "hello-suffix" }]);
+    });
+  });
+
+  describe("opt.preserveOrder", () => {
+    test("should preserve input order when requested", () => {
+      const items = [
+        { id: "1", title: "alpha" },
+        { id: "2", title: "a" }
+      ];
+
+      const result = fuzzy(
+        "a",
+        items,
+        (i) => i.id,
+        { title: 1 },
+        {
+          preserveOrder: true
+        }
+      );
+
+      expect(result).toStrictEqual(items);
     });
   });
 
