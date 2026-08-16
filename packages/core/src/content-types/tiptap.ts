@@ -41,8 +41,9 @@ import {
   isNoteLink,
   parseInternalLink
 } from "../utils/internal-link.js";
-import { Element } from "domhandler";
+import { Element, type AnyNode } from "domhandler";
 import { render } from "dom-serializer";
+import { escape } from "entities";
 import { logger } from "../logger.js";
 
 export type ResolveHashes = (
@@ -73,6 +74,123 @@ const ATTRIBUTES = {
 const converter = new showdown.Converter();
 converter.setFlavor("original");
 
+// showdown.makeMarkdown collapses runs of whitespace in text nodes; it restores
+// this placeholder back to a space after conversion.
+const MARKDOWN_EXPORT_SPACE = "¨NBSP;";
+
+const MARKDOWN_EXPORT_TAGS = new Set([
+  "a",
+  "b",
+  "blockquote",
+  "br",
+  "code",
+  "del",
+  "div",
+  "em",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "i",
+  "iframe",
+  "img",
+  "input",
+  "li",
+  "math",
+  "mrow",
+  "mi",
+  "mo",
+  "mn",
+  "msup",
+  "msub",
+  "mfrac",
+  "msqrt",
+  "mtext",
+  "annotation",
+  "semantics",
+  "nn-search-result",
+  "ol",
+  "p",
+  "pre",
+  "s",
+  "span",
+  "strike",
+  "strong",
+  "sub",
+  "sup",
+  "table",
+  "tbody",
+  "td",
+  "th",
+  "thead",
+  "tr",
+  "u",
+  "ul"
+]);
+
+function preserveMarkdownExportWhitespace(text: string) {
+  return text.replace(/ {2,}/g, (spaces) => {
+    return " " + MARKDOWN_EXPORT_SPACE.repeat(spaces.length - 1);
+  });
+}
+
+function escapeUnknownHtmlTags(html: string) {
+  const preserved: string[] = [];
+  const masked = html.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, (block) => {
+    const index = preserved.push(block) - 1;
+    return `\u0000NNPRE${index}\u0000`;
+  });
+
+  const escaped = masked.replace(
+    /<\/?([a-zA-Z][\w-]*)(?:\s[^>]*?)?\/?>/g,
+    (match, tagName) => {
+      if (MARKDOWN_EXPORT_TAGS.has(tagName.toLowerCase())) return match;
+      return escape(match);
+    }
+  );
+
+  return escaped.replace(/\u0000NNPRE(\d+)\u0000/g, (_, index) => {
+    return preserved[Number(index)];
+  });
+}
+
+function prepareHtmlForMarkdownExport(html: string) {
+  const document = parseDocument(escapeUnknownHtmlTags(html), {
+    decodeEntities: false
+  });
+
+  walkNodes(document.children, (node, parents) => {
+    if (node.type !== "text" || !node.data) return;
+    if (parents.some((parent) => isTag(parent) && isPreformattedExportNode(parent))) {
+      return;
+    }
+    node.data = preserveMarkdownExportWhitespace(node.data);
+  });
+
+  return render(document, { encodeEntities: false });
+}
+
+function isPreformattedExportNode(node: Element) {
+  const name = node.name.toLowerCase();
+  return name === "pre" || name === "code";
+}
+
+function walkNodes(
+  nodes: AnyNode[],
+  visit: (node: AnyNode, parents: AnyNode[]) => void,
+  parents: AnyNode[] = []
+) {
+  for (const node of nodes) {
+    visit(node, parents);
+    if ("children" in node && node.children?.length) {
+      walkNodes(node.children, visit, [...parents, node]);
+    }
+  }
+}
+
 const splitter = /\W+/gm;
 export class Tiptap {
   constructor(private data: string) {}
@@ -86,7 +204,7 @@ export class Tiptap {
   }
 
   toMD() {
-    return converter.makeMarkdown(this.data);
+    return converter.makeMarkdown(prepareHtmlForMarkdownExport(this.data));
   }
 
   toHeadline() {
