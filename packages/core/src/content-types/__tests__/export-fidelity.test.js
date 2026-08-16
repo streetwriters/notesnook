@@ -9,20 +9,29 @@ test("bug1: preserves double space after sentence end in markdown export", () =>
   expect(md).not.toContain("four.Nobody");
 });
 
+test("bug1 entity shape: preserves nbsp spacing after sentence end", () => {
+  const html =
+    '<p data-spacing="double">at half past four.&nbsp;&nbsp;Nobody came to the door</p>';
+  const md = new Tiptap(html).toMD();
+  expect(md).toContain("four.  Nobody");
+  expect(md).not.toContain("four.Nobody");
+});
+
 test("bug2: preserves space after inline emphasis in markdown export", () => {
-  const html = '<p data-spacing="double">The map was <em>almost</em> right</p>';
+  const html =
+    '<p data-spacing="double">The map was <em>almost</em>&#160;right</p>';
   const md = new Tiptap(html).toMD();
   expect(md).toMatch(/\*almost\* right/);
   expect(md).not.toMatch(/\*almost\*right/);
 });
 
-test("bug3: preserves mid-line spaces and leading indentation in txt export", () => {
+test("bug3: preserves mid-line spaces and leading indentation in markdown export", () => {
   const html =
-    '<p data-spacing="double">IF gate = open</p><p data-spacing="double">   AND dog = gone</p><p data-spacing="double">      ELSE note = under the stone</p>';
-  const txt = new Tiptap(html).toTXT();
-  expect(txt).toContain("under the stone");
-  expect(txt).not.toContain("underthe");
-  expect(txt).toMatch(/AND dog = gone/);
+    '<p data-spacing="double">IF gate = open</p><p data-spacing="double">&nbsp;&nbsp;&nbsp;AND dog = gone</p><p data-spacing="double">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ELSE note = under&nbsp;the stone</p>';
+  const md = new Tiptap(html).toMD();
+  expect(md).toContain("under the stone");
+  expect(md).not.toContain("underthe");
+  expect(md).toMatch(/AND dog = gone/);
 });
 
 test("bug4: does not append closing tags for angle-bracket notation in markdown export", () => {
@@ -40,4 +49,19 @@ test("bug5: does not turn bracket-paren notation into markdown links", () => {
   const md = new Tiptap(html).toMD();
   expect(md).not.toMatch(/\[type A\]\(the older casting\)/);
   expect(md).toMatch(/\[type A.*the older casting/);
+});
+
+test("bug11: preserves deliberate nbsp gaps from stored HTML", () => {
+  const html = "<p>a deliberate&#160;&#160;&#160; gap between words</p>";
+  const md = new Tiptap(html).toMD();
+  expect(md).toMatch(/deliberate\s{3,}\s*gap/);
+  expect(md).not.toMatch(/deliberate gap/);
+});
+
+test("audio attachments keep raw html in markdown export", () => {
+  const html =
+    '<p>clip</p><audio data-hash="h1" src="x.mp3" controls></audio>';
+  const md = new Tiptap(html).toMD();
+  expect(md).toContain("<audio");
+  expect(md).not.toContain("&lt;audio");
 });

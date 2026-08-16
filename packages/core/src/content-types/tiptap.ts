@@ -80,13 +80,19 @@ const MARKDOWN_EXPORT_SPACE = "¨NBSP;";
 
 const MARKDOWN_EXPORT_TAGS = new Set([
   "a",
+  "audio",
   "b",
   "blockquote",
   "br",
   "code",
+  "dd",
   "del",
   "div",
+  "dl",
+  "dt",
   "em",
+  "figcaption",
+  "figure",
   "h1",
   "h2",
   "h3",
@@ -99,6 +105,7 @@ const MARKDOWN_EXPORT_TAGS = new Set([
   "img",
   "input",
   "li",
+  "mark",
   "math",
   "mrow",
   "mi",
@@ -116,6 +123,7 @@ const MARKDOWN_EXPORT_TAGS = new Set([
   "p",
   "pre",
   "s",
+  "source",
   "span",
   "strike",
   "strong",
@@ -128,13 +136,23 @@ const MARKDOWN_EXPORT_TAGS = new Set([
   "thead",
   "tr",
   "u",
-  "ul"
+  "ul",
+  "video"
 ]);
 
+function decodeExportWhitespaceEntities(text: string) {
+  return text
+    .replace(/&nbsp;/gi, "\u00a0")
+    .replace(/&#160;/g, "\u00a0")
+    .replace(/&#x0*a0;/gi, "\u00a0");
+}
+
 function preserveMarkdownExportWhitespace(text: string) {
-  return text.replace(/ {2,}/g, (spaces) => {
+  const decoded = decodeExportWhitespaceEntities(text);
+  const preserved = decoded.replace(/[\u00a0 ]{2,}/g, (spaces) => {
     return " " + MARKDOWN_EXPORT_SPACE.repeat(spaces.length - 1);
   });
+  return preserved.replace(/\u00a0/g, " ");
 }
 
 function escapeUnknownHtmlTags(html: string) {
