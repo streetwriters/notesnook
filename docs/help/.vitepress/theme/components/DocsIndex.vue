@@ -7,6 +7,7 @@
  * built from, so it can never drift from the navigation.
  */
 import { sidebar } from "../../sidebar.mjs";
+import { withBase } from "vitepress";
 
 type Item = { text: string; link?: string; items?: Item[] };
 
@@ -24,13 +25,19 @@ const pageCount = groups.reduce(
 
 <template>
   <div class="nn-index">
-    <p class="nn-index__count">{{ pageCount }} pages, grouped by what you're trying to do.</p>
+    <p class="nn-index__count">
+      {{ pageCount }} pages, grouped by what you're trying to do.
+    </p>
     <div class="nn-index__grid">
-      <section v-for="group in groups" :key="group.text" class="nn-index__group">
+      <section
+        v-for="group in groups"
+        :key="group.text"
+        class="nn-index__group"
+      >
         <h2 class="nn-index__heading">{{ group.text }}</h2>
         <ul class="nn-index__list">
           <li v-for="item in group.items" :key="item.link || item.text">
-            <a v-if="item.link" :href="item.link">{{ item.text }}</a>
+            <a v-if="item.link" :href="withBase(item.link)">{{ item.text }}</a>
             <span v-else>{{ item.text }}</span>
           </li>
         </ul>
