@@ -1,5 +1,6 @@
 package com.streetwriters.notesnook;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -28,7 +29,28 @@ public class ShareActivity extends ReactActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Seed before startup, then re-apply: super.onCreate() runs React Native's own
+        // initDisplayMetrics(), which overwrites the screen metrics. See DisplayMetricsSync.
+        DisplayMetricsSync.sync(this);
         super.onCreate(null);
+        DisplayMetricsSync.sync(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DisplayMetricsSync.sync(this);
+        DisplayMetricsSync.emitDimensionsChanged(this, getReactHost());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Must run after super, which puts the built-in panel's metrics back.
+        // See DisplayMetricsSync.
+        DisplayMetricsSync.sync(this);
+        DisplayMetricsSync.emitDimensionsChanged(this, getReactHost());
     }
 
     @Override
