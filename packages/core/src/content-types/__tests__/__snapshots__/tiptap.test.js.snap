@@ -161,11 +161,11 @@ But this post was supposed to be about the "Secrets" of Typescript Generics, rig
 `;
 
 exports[`convert HTML to markdown with leadingWhitespaces > html-to-md-leadingWhitespaces.md 1`] = `
-"two spaces
+"  two spaces
 
-four spaces  
-two spaces  
-four spaces
+    four spaces  
+  two spaces  
+    four spaces
 
 "
 `;

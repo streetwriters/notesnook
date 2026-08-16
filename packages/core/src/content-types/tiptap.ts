@@ -77,6 +77,9 @@ converter.setFlavor("original");
 // showdown.makeMarkdown collapses runs of whitespace in text nodes; it restores
 // this placeholder back to a space after conversion.
 const MARKDOWN_EXPORT_SPACE = "¨NBSP;";
+// Paragraph assembly trims leading/trailing Unicode whitespace, so leading indent
+// uses a private sentinel restored after makeMarkdown returns.
+const MARKDOWN_EXPORT_LEADING = "\uE000";
 
 const MARKDOWN_EXPORT_TAGS = new Set([
   "a",
@@ -149,10 +152,19 @@ function decodeExportWhitespaceEntities(text: string) {
 
 function preserveMarkdownExportWhitespace(text: string) {
   const decoded = decodeExportWhitespaceEntities(text);
-  const preserved = decoded.replace(/[\u00a0 ]{2,}/g, (spaces) => {
-    return " " + MARKDOWN_EXPORT_SPACE.repeat(spaces.length - 1);
-  });
-  return preserved.replace(/\u00a0/g, " ");
+  const leading = decoded.match(/^[\u00a0 ]+/)?.[0] ?? "";
+  let body = decoded.slice(leading.length);
+  const prefix = leading
+    ? MARKDOWN_EXPORT_LEADING.repeat(leading.length)
+    : "";
+
+  const preservedBody = body
+    .replace(/[\u00a0 ]{2,}/g, (spaces) => {
+      return " " + MARKDOWN_EXPORT_SPACE.repeat(spaces.length - 1);
+    })
+    .replace(/\u00a0/g, " ");
+
+  return prefix + preservedBody;
 }
 
 function escapeUnknownHtmlTags(html: string) {
@@ -222,7 +234,8 @@ export class Tiptap {
   }
 
   toMD() {
-    return converter.makeMarkdown(prepareHtmlForMarkdownExport(this.data));
+    const md = converter.makeMarkdown(prepareHtmlForMarkdownExport(this.data));
+    return md.replace(/\uE000/g, " ");
   }
 
   toHeadline() {

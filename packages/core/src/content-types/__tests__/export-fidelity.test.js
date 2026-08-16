@@ -31,7 +31,8 @@ test("bug3: preserves mid-line spaces and leading indentation in markdown export
   const md = new Tiptap(html).toMD();
   expect(md).toContain("under the stone");
   expect(md).not.toContain("underthe");
-  expect(md).toMatch(/AND dog = gone/);
+  expect(md).toMatch(/   AND dog = gone/);
+  expect(md).toMatch(/      ELSE note = under the stone/);
 });
 
 test("bug4: does not append closing tags for angle-bracket notation in markdown export", () => {
