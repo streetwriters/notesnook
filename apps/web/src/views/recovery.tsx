@@ -356,16 +356,16 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         autoFocus
         defaultValue={formData?.recoveryKey || ""}
       />
-      <Flex sx={{ gap: 1 }}>
+      <Flex sx={{ gap: 1, mt: 3 }}>
         <Button
           variant="secondary"
           type="button"
-          sx={{ mt: 50, borderRadius: 50 }}
+          sx={{ flex: 1, py: 2, fontSize: "subtitle" }}
           onClick={() => navigate("methods")}
         >
           {strings.back()}
         </Button>
-        <SubmitButton text={strings.startAccountRecovery()} />
+        <SubmitButton text={strings.startAccountRecovery()} sx={{ flex: 1, mt: 0 }} />
       </Flex>
 
       <Button
@@ -447,11 +447,11 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             label={strings.confirmPassword()}
             defaultValue={form?.confirmPassword}
           />
-          <Flex sx={{ gap: 1 }}>
+          <Flex sx={{ gap: 1, mt: 3 }}>
             <Button
               variant="secondary"
               type="button"
-              sx={{ mt: 50, borderRadius: 50 }}
+              sx={{ flex: 1, py: 2, fontSize: "subtitle" }}
               onClick={() =>
                 navigate(
                   formData?.userResetRequired ? "methods" : "method:key",
@@ -461,7 +461,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             >
               {strings.back()}
             </Button>
-            <SubmitButton text={strings.continue()} />
+            <SubmitButton text={strings.continue()} sx={{ flex: 1, mt: 0 }} />
           </Flex>
         </>
       )}
@@ -539,31 +539,41 @@ export function RecoveryForm<T extends RecoveryRoutes>(
         }
       }}
       sx={{
-        flex: 1,
         flexDirection: "column",
+        size: "100%",
         alignItems: "center",
-        justifyContent: "center",
-        width: ["95%", 420],
-        alignSelf: "center"
+        justifyContent: "center"
       }}
     >
-      <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
-        {title}
-      </Text>
-      <Text
-        variant="body"
-        mt={2}
-        mb={35}
+      <Flex
         sx={{
-          fontSize: "title",
-          textAlign: "center",
-          color: "var(--paragraph-secondary)"
+          flexDirection: "column",
+          width: ["95%", "95%", "550px"],
+          background: "var(--background)",
+          p: 6,
+          my: 10,
+          borderRadius: "15px",
+          border: "1px solid var(--border)",
+          boxShadow: "0px 0px 10px 0px #00000019"
         }}
       >
-        {subtitle}
-      </Text>
-      {typeof children === "function" ? children(form) : children}
-      <ErrorText error={error} sx={{ mt: 2 }} />
+        <Text variant={"heading"} sx={{ fontSize: 32 }}>
+          {title}
+        </Text>
+        <Text
+          variant="body"
+          mt={2}
+          mb={2}
+          sx={{
+            fontSize: "title",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          {subtitle}
+        </Text>
+        {typeof children === "function" ? children(form) : children}
+        <ErrorText error={error} sx={{ mt: 2 }} />
+      </Flex>
     </Flex>
   );
 }
