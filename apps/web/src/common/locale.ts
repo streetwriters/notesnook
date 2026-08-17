@@ -30,10 +30,16 @@ const localeMap: Record<
   () => Promise<{ default: { messages: unknown } }>
 > = {
   en: () => import("@notesnook/intl/locales/$en.json"),
-  fr: () => import("@notesnook/intl/locales/$fr.json"),
-  es: () => import("@notesnook/intl/locales/$es.json"),
   de: () => import("@notesnook/intl/locales/$de.json"),
-  it: () => import("@notesnook/intl/locales/$it.json")
+  es: () => import("@notesnook/intl/locales/$es.json"),
+  fr: () => import("@notesnook/intl/locales/$fr.json"),
+  it: () => import("@notesnook/intl/locales/$it.json"),
+  nl: () => import("@notesnook/intl/locales/$nl.json"),
+  pl: () => import("@notesnook/intl/locales/$pl.json"),
+  "pt-BR": () => import("@notesnook/intl/locales/$pt-BR.json"),
+  ru: () => import("@notesnook/intl/locales/$ru.json"),
+  tr: () => import("@notesnook/intl/locales/$tr.json"),
+  uk: () => import("@notesnook/intl/locales/$uk.json")
 };
 
 function resolveTargetLang(): string {
