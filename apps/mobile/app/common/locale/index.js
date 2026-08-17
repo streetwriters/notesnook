@@ -26,10 +26,16 @@ const localeCatalogs = {};
 
 const LOCALE_LOADERS = {
   en: () => require("@notesnook/intl/dist/locales/$en.json").messages,
-  fr: () => require("@notesnook/intl/dist/locales/$fr.json").messages,
-  es: () => require("@notesnook/intl/dist/locales/$es.json").messages,
   de: () => require("@notesnook/intl/dist/locales/$de.json").messages,
-  it: () => require("@notesnook/intl/dist/locales/$it.json").messages
+  es: () => require("@notesnook/intl/dist/locales/$es.json").messages,
+  fr: () => require("@notesnook/intl/dist/locales/$fr.json").messages,
+  it: () => require("@notesnook/intl/dist/locales/$it.json").messages,
+  nl: () => require("@notesnook/intl/dist/locales/$nl.json").messages,
+  pl: () => require("@notesnook/intl/dist/locales/$pl.json").messages,
+  "pt-BR": () => require("@notesnook/intl/dist/locales/$pt-BR.json").messages,
+  ru: () => require("@notesnook/intl/dist/locales/$ru.json").messages,
+  tr: () => require("@notesnook/intl/dist/locales/$tr.json").messages,
+  uk: () => require("@notesnook/intl/dist/locales/$uk.json").messages
 };
 
 for (const locale of Object.keys(LOCALE_LOADERS)) {
