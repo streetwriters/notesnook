@@ -665,7 +665,19 @@ export default class Lookup {
       Object.fromEntries(
         fields.filter((f) => !f.ignore).map((f) => [f.name, f.weight || 1])
       ) as Record<keyof T, number>,
-      options
+      {
+        limit: options.limit,
+        prefix: options.prefix,
+        suffix: options.suffix,
+        sort:
+          options.sortOptions && options.sortOptions.sortBy !== "relevance"
+            ? (matches) =>
+                selector.items(
+                  matches.map((m) => m.id),
+                  options.sortOptions
+                )
+            : undefined
+      }
     );
   }
 
