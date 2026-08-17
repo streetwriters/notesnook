@@ -1009,6 +1009,7 @@ type SubmitButtonProps = {
   text: string;
   disabled?: boolean;
   loading?: boolean;
+  sx?: Record<string, unknown>;
 };
 export function SubmitButton(props: SubmitButtonProps) {
   return (
@@ -1020,7 +1021,8 @@ export function SubmitButton(props: SubmitButtonProps) {
         alignSelf: "stretch",
         py: 2,
         mt: 3,
-        fontSize: "subtitle"
+        fontSize: "subtitle",
+        ...props.sx
       }}
       disabled={props.disabled}
     >
