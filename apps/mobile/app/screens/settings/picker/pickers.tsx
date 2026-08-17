@@ -29,15 +29,19 @@ import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";
-import { ToastManager } from "../../../services/event-manager";
+import { ToastManager, eSendEvent } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { Settings, useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
-import { strings } from "@notesnook/intl";
-import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../../../components/sheets/paywall";
+import { AVAILABLE_LANGUAGES, getSupportedLocale, setI18nGlobal, strings } from "@notesnook/intl";
+import { isFeatureAvailable } from "@notesnook/common";
+import { i18n } from "@lingui/core";
+import RNRestart from "react-native-restart";
+import { presentDialog } from "../../../components/dialog/functions";
+import { eCloseSimpleDialog } from "../../../utils/events";
 
 const DAY_FORMATS = ["short", "long"];
 const DayFormatFormats = {
@@ -50,6 +54,55 @@ const WeekFormatNames = {
   Sun: "Sunday",
   Mon: "Monday"
 };
+
+export const LanguagePicker = createSettingsPicker<
+  {
+    code: string;
+    label: string;
+    nativeLabel: string;
+  },
+  string
+>({
+  getValue: () => {
+    const saved = useSettingStore.getState().settings.appLanguage;
+    let systemLocale = "en";
+    try {
+      systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+    } catch (e) { }
+    return saved || getSupportedLocale(systemLocale);
+  },
+  updateValue: async (item) => {
+    const lang = typeof item === "object" ? item.code : item;
+    const currentLang = useSettingStore.getState().settings.appLanguage;
+    if (lang === currentLang) return;
+
+    presentDialog({
+      title: strings.changeLanguage ? strings.changeLanguage() : "Change language",
+      paragraph: strings.restartAppToApplyChanges
+        ? strings.restartAppToApplyChanges()
+        : "Restart the app to apply the changes.",
+      positiveText: strings.restartNow ? strings.restartNow() : "Restart now",
+      negativeText: strings.cancel ? strings.cancel() : "Cancel",
+      positivePress: async () => {
+        eSendEvent(eCloseSimpleDialog);
+        i18n.activate(lang);
+        setI18nGlobal(i18n);
+        SettingsService.setProperty("appLanguage", lang);
+        RNRestart.restart();
+      }
+    });
+  },
+  formatValue: (item) => {
+    const code = typeof item === "object" ? item.code : item;
+    const found = AVAILABLE_LANGUAGES.find((l) => l.code === code);
+    return found ? `${found.label} (${found.nativeLabel})` : code;
+  },
+  getItemKey: (item) => (typeof item === "object" ? item.code : item),
+  options: AVAILABLE_LANGUAGES,
+  compareValue: (current, item) => current === (typeof item === "object" ? item.code : item),
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
 
 export const FontPicker = createSettingsPicker<
   ReturnType<typeof getFonts>[0],
