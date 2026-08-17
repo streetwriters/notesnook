@@ -20,12 +20,15 @@
   "scripts": {
     "build": "tsdown src/index.ts",
     "prepublishOnly": "npm run build",
-    "watch": "npm run build -- --watch"
+    "watch": "npm run build -- --watch",
+    "test": "vitest run"
   },
   "dependencies": {
     "@notesnook/sodium": "file:../sodium"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "vitest": "2.1.8"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/streetwriters/notesnook.git",
