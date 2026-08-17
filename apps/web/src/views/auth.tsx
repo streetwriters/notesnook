@@ -389,7 +389,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
           <Text
             mt={4}
             variant="subBody"
-            sx={{ fontSize: 13, textAlign: "center" }}
+            sx={{ fontSize: "subBody", textAlign: "center" }}
           >
             {strings.signupAgreement[0]()}{" "}
             <Link
@@ -843,9 +843,6 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
   const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState<AuthFormData[T] | undefined>();
 
-  if (isSubmitting)
-    return <Loader title={props.loading.title} text={props.loading.subtitle} />;
-
   return (
     <Flex
       ref={formRef}
@@ -876,57 +873,74 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
         }
       }}
       sx={{
-        flex: 1,
         flexDirection: "column",
+        size: "100%",
         alignItems: "center",
-        justifyContent: "center",
-        width: ["95%", "95%", "45%"],
-        alignSelf: "center"
+        justifyContent: "center"
       }}
     >
-      <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
-        {title}
-      </Text>
-      <Text
-        variant="body"
-        mt={2}
-        mb={35}
+      <Flex
         sx={{
-          fontSize: "title",
-          textAlign: "center",
-          color: "var(--paragraph-secondary)"
+          flexDirection: "column",
+          width: ["95%", "95%", "550px"],
+          background: "var(--background)",
+          p: 6,
+          my: 10,
+          borderRadius: "15px",
+          border: "1px solid var(--border)",
+          boxShadow: "0px 0px 10px 0px #00000019"
         }}
       >
-        {subtitle}
-      </Text>
-      {typeof children === "function" ? children(form) : children}
-      {canSkip && (
-        <Button
-          type="button"
-          variant="anchor"
+        <Text variant={"heading"} sx={{ fontSize: 32 }}>
+          {title}
+        </Text>
+        <Text
+          variant="body"
+          mt={2}
+          mb={2}
           sx={{
-            mt: 5,
-            color: "paragraph",
-            textDecoration: "none",
-            position: "absolute",
-            top: 0,
-            right: 5
-          }}
-          onClick={async () => {
-            const result = await ConfirmDialog.show({
-              title: strings.offlineMode(),
-              message: strings.offlineModeDesc(),
-              negativeButtonText: strings.cancel(),
-              positiveButtonText: strings.understand()
-            });
-            if (result) openURL("/notes/", { authenticated: false });
+            fontSize: "title",
+            color: "var(--paragraph-secondary)"
           }}
         >
-          {strings.skipAndGoToApp()}
-        </Button>
-      )}
+          {subtitle}
+        </Text>
+        {canSkip && (
+          <Button
+            type="button"
+            variant="secondary"
+            sx={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+              bg: "transparent",
+              border: "2px solid var(--border)",
+              borderRadius: "default",
+              px: 2
+            }}
+            onClick={async () => {
+              const result = await ConfirmDialog.show({
+                title: strings.offlineMode(),
+                message: strings.offlineModeDesc(),
+                negativeButtonText: strings.cancel(),
+                positiveButtonText: strings.understand()
+              });
+              if (result) openURL("/notes/", { authenticated: false });
+            }}
+          >
+            {strings.skipAndGoToApp()}
+          </Button>
+        )}
+        {isSubmitting ? (
+          <Loader title={props.loading.title} text={props.loading.subtitle} />
+        ) : typeof children === "function" ? (
+          children(form)
+        ) : (
+          children
+        )}
 
-      <ErrorText error={error} mt={5} />
+        <ErrorText error={error} mt={5} />
+      </Flex>
     </Flex>
   );
 }
@@ -948,8 +962,7 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
         sx={{
           textDecoration: "underline",
           fontWeight: "bold",
-          fontSize: "subtitle",
-          color: "paragraph",
+          fontSize: "title",
           cursor: "pointer"
         }}
         onClick={props.action.onClick}
@@ -969,7 +982,11 @@ export function AuthField(props: FieldProps) {
       data-test-id={props["data-test-id"] || props.id}
       sx={{ mt: 2, width: "100%" }}
       styles={{
-        // label: { fontWeight: "normal" },
+        label: { fontWeight: "normal", fontSize: "subtitle" },
+        helpText: {
+          fontSize: "body",
+          my: "2px"
+        },
         input: {
           p: "12px",
           borderRadius: "default",
@@ -992,21 +1009,20 @@ type SubmitButtonProps = {
   text: string;
   disabled?: boolean;
   loading?: boolean;
+  sx?: Record<string, unknown>;
 };
 export function SubmitButton(props: SubmitButtonProps) {
   return (
     <Button
       data-test-id="submitButton"
       type="submit"
-      mt={50}
       variant="accent"
-      px={50}
       sx={{
-        borderRadius: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "center",
-        display: "flex"
+        alignSelf: "stretch",
+        py: 2,
+        mt: 3,
+        fontSize: "subtitle",
+        ...props.sx
       }}
       disabled={props.disabled}
     >

@@ -21,13 +21,15 @@ import { ThemeProvider } from "@theme-ui/core";
 import React, { ForwardedRef, PropsWithChildren, useMemo } from "react";
 import { Box, BoxProps } from "@theme-ui/components";
 import { useTheme } from "@emotion/react";
-import { ThemeScopes } from "../theme-engine/types.js";
+import { ThemeDefinition, ThemeScopes } from "../theme-engine/types.js";
 import { Theme, ThemeFactory } from "../theme/index.js";
 import {
+  getThemeScope,
   ScopedThemeProvider,
   useThemeColors,
   useThemeEngineStore
 } from "../theme-engine/index.js";
+import { colorsToCSSVariables } from "../theme-engine/utils.js";
 
 export type EmotionThemeProviderProps = {
   scope?: keyof ThemeScopes;
@@ -89,6 +91,65 @@ function _EmotionThemeProvider(
     </ThemeProvider>
   );
 }
+
+type FixedThemeProviderProps = {
+  scope: keyof ThemeScopes;
+  injectCssVars?: boolean;
+  theme: ThemeDefinition;
+} & Omit<BoxProps, "variant" | "ref">;
+
+function _FixedThemeProvider(
+  props: PropsWithChildren<FixedThemeProviderProps>,
+  forwardedRef: ForwardedRef<HTMLDivElement>
+) {
+  const {
+    children,
+    scope = "base",
+    injectCssVars = true,
+    theme,
+    ...restProps
+  } = props;
+
+  const themeScope = getThemeScope(scope, theme);
+  const { colors } = themeScope;
+
+  const themeProperties = useMemo(
+    () =>
+      ThemeFactory.construct({
+        scope: colors,
+        colorScheme: theme.colorScheme
+      }),
+    [colors, theme.colorScheme]
+  );
+
+  return (
+    <ThemeProvider
+      theme={{
+        ...themeProperties,
+        colors: themeProperties.colors
+      }}
+    >
+      <ScopedThemeProvider value={scope}>
+        {injectCssVars ? (
+          <Box
+            {...restProps}
+            ref={forwardedRef}
+            css={colorsToCSSVariables(themeProperties.colors)}
+          >
+            {children}
+          </Box>
+        ) : (
+          children
+        )}
+      </ScopedThemeProvider>
+    </ThemeProvider>
+  );
+}
+
+export const FixedThemeProvider = React.forwardRef<
+  HTMLDivElement,
+  FixedThemeProviderProps
+>(_FixedThemeProvider);
 
 export const EmotionThemeProvider = React.forwardRef<
   HTMLDivElement,

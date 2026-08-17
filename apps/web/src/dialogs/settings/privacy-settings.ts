@@ -124,7 +124,7 @@ export const PrivacySettings: SettingsGroup[] = [
               if (!result) return;
               try {
                 const url = new URL(result);
-                Config.set("corsProxy", `${url.protocol}//${url.hostname}`);
+                Config.set("corsProxy", url.href);
               } catch (e) {
                 console.error(e);
                 showToast("error", strings.invalidCors());
