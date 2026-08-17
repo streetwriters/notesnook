@@ -70,16 +70,12 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
         const element = e.target;
 
         if (activePopup.current) {
-          const isOutsideEditor = !element.closest(".ProseMirror");
           const isInsidePopup = element.closest(".popup-presenter-portal");
           const isActiveElement = activePopup.current.element === element;
-          if (isInsidePopup) return;
+          if (isInsidePopup || isActiveElement) return;
 
-          if (isOutsideEditor || !isActiveElement) {
-            activePopup.current.hide();
-            activePopup.current = undefined;
-            return;
-          }
+          activePopup.current.hide();
+          activePopup.current = undefined;
         }
 
         clearTimeout(hoverTimeoutId.current);
