@@ -145,6 +145,13 @@ export async function getUploadedFileSize(hash: string, retry = 0) {
     const contentLength = parseInt(fileSize as string);
     return isNaN(contentLength) ? FileSizeResult.Empty : contentLength;
   } catch (e) {
+    if (retry < 3) {
+      DatabaseLogger.log(
+        `Retrying file size check after error: ${hash}, ${retry}`
+      );
+      await new Promise((resolve) => setTimeout(resolve, 500 * (retry + 1)));
+      return getUploadedFileSize(hash, retry + 1);
+    }
     DatabaseLogger.error(e);
     return FileSizeResult.Error;
   }
