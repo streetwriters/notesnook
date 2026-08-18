@@ -711,9 +711,10 @@ const ShareView = () => {
                             width: "100%",
                             marginTop: 6
                           }}
-                          onPress={() => {
-                            if (fullQualityImages?.isAllowed) {
-                              setCompress(!compress);
+                          onPress={async () => {
+                            const feature = await isFeatureAvailable("fullQualityImages");
+                            if (feature?.isAllowed) {
+                              setCompress((prev) => !prev);
                             }
                           }}
                         >
