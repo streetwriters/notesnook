@@ -27,7 +27,7 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { getContainerBorder } from "../../../utils/colors";
 import { NotesnookModule } from "../../../utils/notesnook-module";
 import { Toast } from "../../toast";
-
+import { useReduceMotion } from "../../../hooks/use-reduce-motion";
 /**
  *
  * @param {any} param0
@@ -53,6 +53,9 @@ const SheetWrapper = ({
   const sheetKeyboardHandler = useSettingStore(
     (state) => state.sheetKeyboardHandler
   );
+  const isReduceMotionEnabled = useReduceMotion();
+  const isAnimated = !isReduceMotionEnabled;
+
   const largeTablet = deviceMode === "tablet";
   const smallTablet = deviceMode === "smallTablet";
   const dimensions = useSettingStore((state) => state.dimensions);
@@ -125,6 +128,7 @@ const SheetWrapper = ({
     <ScopedThemeProvider value="sheet">
       <ActionSheet
         ref={fwdRef || localRef}
+        animated={isAnimated}
         testIDs={{
           backdrop: "sheet-backdrop"
         }}
