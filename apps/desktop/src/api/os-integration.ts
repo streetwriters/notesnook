@@ -30,6 +30,7 @@ import {
 } from "electron";
 import { AutoLaunch } from "../utils/autolaunch";
 import { config, DesktopIntegration } from "../utils/config";
+import { JSONStorage } from "../utils/json-storage";
 import { bringToFront } from "../utils/bring-to-front";
 import { getTheme, setTheme, Theme } from "../utils/theme";
 import { existsSync } from "fs";
@@ -136,6 +137,13 @@ export const osIntegrationRouter = t.router({
 
     config.backupDirectory = result.filePaths[0];
   }),
+  setAppLanguage: t.procedure
+    .input(z.string())
+    .mutation(({ input: language }) => {
+      JSONStorage.set("appLanguage", language);
+      app.relaunch();
+      app.exit();
+    }),
   restart: t.procedure.query(() => {
     app.relaunch();
     app.exit();
