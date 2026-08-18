@@ -68,17 +68,11 @@ class Vault {
     const result = await (useUserStore.getState().isLoggedIn
       ? showPasswordDialog({
           title: strings.deleteVault(),
-          subtitle: strings.deleteVaultDesc(),
+          message: strings.deleteVaultDesc(),
           inputs: {
             password: {
               label: strings.accountPassword(),
               autoComplete: "current-password"
-            }
-          },
-          checks: {
-            deleteAllLockedNotes: {
-              text: strings.deleteAllNotes(),
-              default: false
             }
           },
           validate: ({ password }) => {
@@ -87,21 +81,15 @@ class Vault {
         })
       : showPasswordDialog({
           title: strings.deleteVault(),
-          subtitle: strings.deleteVaultDesc(),
+          message: strings.deleteVaultDesc(),
           inputs: {},
-          checks: {
-            deleteAllLockedNotes: {
-              text: strings.deleteAllNotes(),
-              default: false
-            }
-          },
           validate: () => {
             return Promise.resolve(true);
           }
         }));
 
     if (result) {
-      await db.vault.delete(result.deleteAllLockedNotes);
+      await db.vault.delete();
       return true;
     }
 
