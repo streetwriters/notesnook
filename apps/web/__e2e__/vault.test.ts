@@ -125,3 +125,27 @@ test("clicking on vault unlocked status should lock the readonly note", async ({
 
   expect(await note?.isLockedNotePasswordFieldVisible()).toBe(true);
 });
+
+test("deleting the vault should permanently delete locked notes", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+
+  let notes = await app.goToNotes();
+  let note = await notes.createNote(NOTE);
+  await note?.contextMenu.lock(PASSWORD);
+
+  const settings = await app.goToSettings();
+  await settings.deleteVault();
+  await page.waitForTimeout(100);
+  await settings.close();
+
+  notes = await app.goToNotes();
+  note = await notes.findNote(NOTE);
+  expect(note).toBeUndefined();
+
+  const trash = await app.goToTrash();
+  const trashNote = await trash.findItem(NOTE.title);
+  expect(trashNote).toBeUndefined();
+});
