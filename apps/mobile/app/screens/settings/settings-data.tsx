@@ -83,6 +83,7 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { useShallow } from "zustand/react/shallow";
 
 export function getSettingsGroups(): SettingSection[] {
   return [
@@ -1466,10 +1467,12 @@ export function getSettingsGroups(): SettingSection[] {
               type: "component",
               name: strings.automaticBackups(),
             useHook: () =>
-              useSettingStore((state) => [
-                state.settings.reminder,
-                state.settings.lastBackupDate
-              ]),
+              useSettingStore(
+                useShallow((state) => [
+                  state.settings.reminder,
+                  state.settings.lastBackupDate
+                ])
+              ),
             description: () => {
               const next = BackupService.getNextBackupTime(
                 SettingsService.get().reminder,
@@ -1489,10 +1492,12 @@ export function getSettingsGroups(): SettingSection[] {
               hidden: () => !useUserStore.getState().user,
               name: strings.automaticBackupsWithAttachments(),
             useHook: () =>
-              useSettingStore((state) => [
-                state.settings.fullBackupReminder,
-                state.settings.lastFullBackupDate
-              ]),
+              useSettingStore(
+                useShallow((state) => [
+                  state.settings.fullBackupReminder,
+                  state.settings.lastFullBackupDate
+                ])
+              ),
             description: () => {
               const next = BackupService.getNextBackupTime(
                 SettingsService.get().fullBackupReminder,
