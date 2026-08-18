@@ -191,8 +191,16 @@ export default class Backup {
     return this.db.kv().read("lastBackupTime");
   }
 
-  async updateBackupTime() {
-    await this.db.kv().write("lastBackupTime", Date.now());
+  lastFullBackupTime() {
+    return this.db.kv().read("lastFullBackupTime");
+  }
+
+  async updateBackupTime(mode: "full" | "partial" = "partial") {
+    if (mode === "full") {
+      await this.db.kv().write("lastFullBackupTime", Date.now());
+    } else {
+      await this.db.kv().write("lastBackupTime", Date.now());
+    }
   }
 
   /**
@@ -274,7 +282,7 @@ export default class Backup {
     if (bufferLength > 0 || buffer.length > 0)
       throw new Error("Buffer not empty.");
 
-    await this.updateBackupTime();
+    await this.updateBackupTime("partial");
   }
 
   async *export(options: {
@@ -346,7 +354,7 @@ export default class Backup {
 
     if (backupState.buffer.length > 0) yield* this.bufferToFile(backupState);
     if (mode === "partial") {
-      await this.updateBackupTime();
+      await this.updateBackupTime("partial");
       return;
     }
 
@@ -379,7 +387,7 @@ export default class Backup {
       }
     }
 
-    await this.updateBackupTime();
+    await this.updateBackupTime("full");
   }
 
   private async *backupCollection<T, B extends boolean>(
