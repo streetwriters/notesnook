@@ -31,7 +31,7 @@ export function isShortcutsSupported() {
   return Platform.OS !== "android" || deviceInfoModule.getApiLevelSync() > 25;
 }
 
-const defaultShortcuts: ShortcutItem[] = [
+const getDefaultShortcuts = (): ShortcutItem[] => [
   {
     type: "notesnook.action.newnote",
     title: strings.createNewNote(),
@@ -47,7 +47,7 @@ const defaultShortcuts: ShortcutItem[] = [
 ];
 
 export function registerAppShortcuts(
-  shortcuts: ShortcutItem[] = defaultShortcuts
+  shortcuts: ShortcutItem[] = getDefaultShortcuts()
 ) {
   if (!isShortcutsSupported()) return;
   Shortcuts.setShortcuts(shortcuts);

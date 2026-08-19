@@ -53,7 +53,7 @@ type VersionResponse = {
   id: string;
   instance: string;
 };
-const SERVERS: Server[] = [
+const getServers = (): Server[] => [
   {
     id: "notesnook-sync",
     host: "API_HOST",
@@ -109,7 +109,7 @@ export function ServersConfiguration() {
       ) : null}
 
       <View style={{ flexDirection: "column" }}>
-        {SERVERS.map((server) => (
+        {getServers().map((server) => (
           <Input
             key={server.id}
             editable={!isLoggedIn}
@@ -163,7 +163,7 @@ export function ServersConfiguration() {
               try {
                 for (const host of HostIds) {
                   const url = urls[host];
-                  const server = SERVERS.find((s) => s.host === host)!;
+                  const server = getServers().find((s) => s.host === host)!;
                   if (!server) throw new Error(strings.serverNotFound(host));
                   if (!url) throw new Error(strings.allServerUrlsRequired());
                   const version = await fetch(`${url}${server.versionEndpoint}`)
