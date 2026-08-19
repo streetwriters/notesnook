@@ -92,13 +92,14 @@ export const Card = ({
 
           <View
             style={{
+              flex: 1,
               marginLeft: 10,
               marginRight: 10
             }}
           >
             <Paragraph
               style={{
-                flexWrap: "nowrap",
+                flexWrap: "wrap",
                 flexShrink: 1
               }}
               size={AppFontSize.sm}
