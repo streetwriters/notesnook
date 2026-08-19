@@ -83,6 +83,7 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { useShallow } from "zustand/react/shallow";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -1396,7 +1397,15 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "backup-now",
             name: strings.backupNow(),
-            description: strings.backupNowDesc(),
+            property: "lastBackupDate",
+            description: () => {
+              const last = SettingsService.get().lastBackupDate;
+              return last
+                ? `${strings.backupNowDesc()}\n${strings.lastBackupOn(
+                  dayjs(last).format("MMM D, YYYY [at] h:mm A")
+                )}`
+                : strings.backupNowDesc();
+            },
             modifer: async () => {
               const user = useUserStore.getState().user;
               if (!user || SettingsService.getProperty("encryptedBackup")) {
@@ -1410,7 +1419,15 @@ export const settingsGroups: SettingSection[] = [
           {
             id: "backup-now-with-attachments",
             name: strings.backupNowWithAttachments(),
-            description: strings.backupNowWithAttachmentsDesc(),
+            property: "lastFullBackupDate",
+            description: () => {
+              const last = SettingsService.get().lastFullBackupDate;
+              return last
+                ? `${strings.backupNowWithAttachmentsDesc()}\n${strings.lastBackupOn(
+                  dayjs(last).format("MMM D, YYYY [at] h:mm A")
+                )}`
+                : strings.backupNowWithAttachmentsDesc();
+            },
             hidden: () => !useUserStore.getState().user,
             modifer: async () => {
               const user = useUserStore.getState().user;
@@ -1428,7 +1445,24 @@ export const settingsGroups: SettingSection[] = [
             id: "auto-backups",
             type: "component",
             name: strings.automaticBackups(),
-            description: strings.automaticBackupsDesc(),
+            useHook: () =>
+              useSettingStore(
+                useShallow((state) => [
+                  state.settings.reminder,
+                  state.settings.lastBackupDate
+                ])
+              ),
+            description: () => {
+              const next = BackupService.getNextBackupTime(
+                SettingsService.get().reminder,
+                "lastBackupDate"
+              );
+              return next
+                ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
+                  dayjs(next).format("MMM D, YYYY [at] h:mm A")
+                )}`
+                : strings.automaticBackupsDesc();
+            },
             component: "autobackups"
           },
           {
@@ -1436,9 +1470,27 @@ export const settingsGroups: SettingSection[] = [
             type: "component",
             hidden: () => !useUserStore.getState().user,
             name: strings.automaticBackupsWithAttachments(),
-            description: [
-              ...strings.automaticBackupsWithAttachmentsDesc()
-            ].join("\n"),
+            useHook: () =>
+              useSettingStore(
+                useShallow((state) => [
+                  state.settings.fullBackupReminder,
+                  state.settings.lastFullBackupDate
+                ])
+              ),
+            description: () => {
+              const next = BackupService.getNextBackupTime(
+                SettingsService.get().fullBackupReminder,
+                "lastFullBackupDate"
+              );
+              const base = [
+                ...strings.automaticBackupsWithAttachmentsDesc()
+              ].join("\n");
+              return next
+                ? `${base}\n${strings.nextBackupOn(
+                  dayjs(next).format("MMM D, YYYY [at] h:mm A")
+                )}`
+                : base;
+            },
             component: "autobackupsattachments"
           },
           {

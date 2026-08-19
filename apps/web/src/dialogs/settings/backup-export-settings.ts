@@ -26,6 +26,23 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
+import { formatDate } from "@notesnook/core";
+import dayjs from "dayjs";
+
+function getNextBackupTime(
+  offset: number,
+  lastBackupDate?: number,
+  isFull: boolean = false
+): number | undefined {
+  if (offset === 0 || !lastBackupDate) return undefined;
+  let days = 0;
+  if (isFull) {
+    days = offset === 1 ? 7 : 30;
+  } else {
+    days = offset === 1 ? 1 : offset === 2 ? 7 : 30;
+  }
+  return dayjs(lastBackupDate).add(days, "d").valueOf();
+}
 
 const getDesktopBackupsDirectoryPath = () =>
   useSettingStore.getState().backupStorageLocation;
@@ -39,7 +56,28 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "create-backup",
         title: strings.backupNow(),
-        description: strings.backupNowDesc(),
+        description: () => {
+          const s = useSettingStore.getState();
+          const partial = s.lastBackupTime || 0;
+          const full = s.lastFullBackupTime || 0;
+          const last = Math.max(partial, full);
+
+          if (!last) return strings.backupNowDesc();
+
+          const typeStr = last === full ? " (Full)" : " (Partial)";
+          return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
+            formatDate(last, {
+              type: "date-time",
+              dateFormat: s.dateFormat,
+              timeFormat: s.timeFormat
+            })
+          )}${typeStr}`;
+        },
+        onStateChange: (listener) =>
+          useSettingStore.subscribe(
+            (s) => `${s.lastBackupTime}-${s.lastFullBackupTime}`,
+            listener
+          ),
         components: [
           {
             type: "dropdown",
@@ -78,9 +116,28 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "auto-backup",
         title: strings.automaticBackups(),
-        description: strings.automaticBackupsDesc(),
+        description: () => {
+          const s = useSettingStore.getState();
+          const next = getNextBackupTime(
+            s.backupReminderOffset,
+            s.lastBackupTime,
+            false
+          );
+          return next
+            ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
+                formatDate(next, {
+                  type: "date-time",
+                  dateFormat: s.dateFormat,
+                  timeFormat: s.timeFormat
+                })
+              )}`
+            : strings.automaticBackupsDesc();
+        },
         onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
+          useSettingStore.subscribe(
+            (s) => `${s.backupReminderOffset}-${s.lastBackupTime}`,
+            listener
+          ),
         components: [
           {
             type: "dropdown",
@@ -107,10 +164,29 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "auto-backup-with-attachments",
         title: strings.automaticBackupsWithAttachments(),
-        description: strings.automaticBackupsWithAttachmentsDesc().join("\n\n"),
+        description: () => {
+          const s = useSettingStore.getState();
+          const next = getNextBackupTime(
+            s.fullBackupReminderOffset,
+            s.lastFullBackupTime,
+            true
+          );
+          const base = strings
+            .automaticBackupsWithAttachmentsDesc()
+            .join("\n\n");
+          return next
+            ? `${base}\n${strings.nextBackupOn(
+                formatDate(next, {
+                  type: "date-time",
+                  dateFormat: s.dateFormat,
+                  timeFormat: s.timeFormat
+                })
+              )}`
+            : base;
+        },
         onStateChange: (listener) =>
           useSettingStore.subscribe(
-            (s) => s.fullBackupReminderOffset,
+            (s) => `${s.fullBackupReminderOffset}-${s.lastFullBackupTime}`,
             listener
           ),
         components: [
