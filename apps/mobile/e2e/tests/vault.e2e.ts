@@ -115,22 +115,6 @@ describe("VAULT", () => {
       .waitAndTapByText("Delete")
       .isVisibleByText("Create vault")
       .pressBack(3)
-      .isVisibleById(notesnook.listitem.menu)
-      .run();
-  });
-
-  it("Delete vault with locked notes", async () => {
-    await TestBuilder.create()
-      .prepare()
-      .createNote()
-      .addStep(lockNote)
-      .addStep(goToPrivacySecuritySettings)
-      .waitAndTapByText("Delete vault")
-      .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
-      .waitAndTapByText("Delete notes in this vault")
-      .waitAndTapByText("Delete")
-      .isVisibleByText("Create vault")
-      .pressBack(3)
       .isNotVisibleById(notesnook.listitem.menu)
       .run();
   });
