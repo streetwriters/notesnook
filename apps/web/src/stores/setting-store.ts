@@ -61,6 +61,9 @@ class SettingStore extends BaseStore<SettingStore> {
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
 
+  lastBackupTime?: number;
+  lastFullBackupTime?: number;
+
   zoomFactor = 1.0;
   privacyMode = false;
   customDns = true;
@@ -101,6 +104,13 @@ class SettingStore extends BaseStore<SettingStore> {
     });
   };
 
+  refreshBackupTime = async () => {
+    this.set({
+      lastBackupTime: await db.backup.lastBackupTime(),
+      lastFullBackupTime: await db.backup.lastFullBackupTime()
+    });
+  };
+
   refresh = async () => {
     this.set({
       dateFormat: db.settings.getDateFormat(),
@@ -123,6 +133,7 @@ class SettingStore extends BaseStore<SettingStore> {
       isInboxEnabled: await db.user.hasInboxKeys(),
       backupStorageLocation: await desktop?.integration.backupDirectory.query()
     });
+    await this.refreshBackupTime();
   };
 
   setDateFormat = async (dateFormat: string) => {

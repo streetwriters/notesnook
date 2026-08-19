@@ -195,6 +195,7 @@ export async function createBackup(
         ? `${strings.backupSavedAt(path.join(backupDirectory, filePath))}`
         : strings.backupSuccess()
     );
+    await useSettingStore.getState().refreshBackupTime();
     return true;
   }
   return false;
