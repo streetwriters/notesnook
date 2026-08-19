@@ -30,7 +30,6 @@ import { ErrorText } from "../components/error-text";
 import { EVENTS, User } from "@notesnook/core";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
-import { useKeyStore } from "../interfaces/key-store";
 
 type RecoveryMethodType = "key" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -105,8 +104,8 @@ function useAuthenticateUser({
   code,
   userId
 }: {
-  code: string;
-  userId: string;
+  code?: string;
+  userId?: string;
 }) {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [user, setUser] = useState<User>();
@@ -114,6 +113,10 @@ function useAuthenticateUser({
     async function authenticateUser() {
       setIsAuthenticating(true);
       try {
+        if (!code || !userId) {
+          throw new Error("Missing code or userId in query params.");
+        }
+
         const accessToken = await db.tokenManager.getAccessToken();
         if (!accessToken) {
           await db.tokenManager.getAccessTokenFromAuthorizationCode(
@@ -181,7 +184,7 @@ function Recovery(props: RecoveryProps) {
                 }}
                 variant={"body"}
               >
-                {strings.authenticatedAs(user?.email)}
+                {user?.email ? strings.authenticatedAs(user.email) : ""}
               </Text>
               <Button
                 sx={{
@@ -334,16 +337,25 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         subtitle: strings.keyRecoveryProgressDesc()
       }}
       onSubmit={async (form) => {
+        const user = await db.user.getUser();
+        if (!user) throw new Error(strings.notLoggedIn());
+
         const recoveryKey = form.recoveryKey;
-        if (recoveryKey.length < 40) {
+        if (
+          !(await db
+            .storage()
+            .encrypt({ key: recoveryKey, salt: user.salt }, "test")
+            .then(() => true)
+            .catch(() => false))
+        ) {
           throw new Error(strings.invalidRecoveryKey());
         }
 
-        setProgress(0);
+        await db.user.verifyEncryptionKey({
+          key: recoveryKey,
+          salt: user.salt
+        });
 
-        const user = await db.user.getUser();
-        if (!user) throw new Error(strings.notLoggedIn());
-        await useKeyStore.getState().setValue("userEncryptionKey", recoveryKey);
         navigate("new", form);
       }}
     >
@@ -365,7 +377,10 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         >
           {strings.back()}
         </Button>
-        <SubmitButton text={strings.startAccountRecovery()} sx={{ flex: 1, mt: 0 }} />
+        <SubmitButton
+          text={strings.startAccountRecovery()}
+          sx={{ flex: 1, mt: 0 }}
+        />
       </Flex>
 
       <Button
@@ -405,29 +420,28 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         subtitle: strings.resetPasswordWait()
       }}
       onSubmit={async (form) => {
-        try {
-          setProgress(0);
+        setProgress(0);
+        const user = await db.user.getUser();
+        if (!user) throw new Error(strings.notLoggedIn());
 
-          if (form.password !== form.confirmPassword)
-            throw new Error("Passwords do not match.");
+        if (!formData?.recoveryKey)
+          throw new Error("Recovery key is required to reset password.");
 
-          if (formData?.userResetRequired && !(await db.user.resetUser()))
-            throw new Error("Failed to reset user.");
+        if (form.password !== form.confirmPassword)
+          throw new Error("Passwords do not match.");
 
-          if (!(await db.user.resetPassword(form.password)))
-            throw new Error("Could not reset account password.");
+        if (formData?.userResetRequired && !(await db.user.resetUser()))
+          throw new Error("Failed to reset user.");
 
-          navigate("final");
-        } catch (e) {
-          if ((e as Error).message === "invalid input") {
-            console.error(e);
-            throw new Error(
-              "Password reset failed because of invalid recovery key"
-            );
-          }
+        if (
+          !(await db.user.resetPassword({
+            encryptionKey: { key: formData?.recoveryKey, salt: user.salt },
+            newPassword: form.password
+          }))
+        )
+          throw new Error("Could not reset account password.");
 
-          throw e;
-        }
+        navigate("final");
       }}
     >
       {(form?: NewPasswordFormData) => (

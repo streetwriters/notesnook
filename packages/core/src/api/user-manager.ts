@@ -24,7 +24,7 @@ import TokenManager from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
 import { HealthCheck } from "./healthcheck.js";
 import Database from "./index.js";
-import { SerializedKeyPair, SerializedKey } from "@notesnook/crypto";
+import { SerializedKeyPair, SerializedKey, Cipher } from "@notesnook/crypto";
 import { logger } from "../logger.js";
 import { KEY_VERSION, KeyVersion } from "./sync/types.js";
 import {
@@ -394,9 +394,13 @@ class UserManager {
     );
   }
 
-  resetPassword(newPassword: string) {
+  resetPassword(options: {
+    newPassword: string;
+    encryptionKey: SerializedKey;
+  }) {
     return this._updatePassword("reset", {
-      new_password: newPassword
+      new_password: options.newPassword,
+      encryptionKey: options.encryptionKey
     });
   }
 
@@ -622,6 +626,41 @@ class UserManager {
     }
   }
 
+  private async fetchEncryptionVerifier(): Promise<
+    Cipher<"base64"> | undefined
+  > {
+    const token = await this.tokenManager.getAccessToken();
+    return http.get(`${constants.API_HOST}/users/verifier`, token);
+  }
+
+  async verifyEncryptionKey(key: SerializedKey) {
+    const user = await this.getUser();
+    if (!user) throw new Error("User not found.");
+
+    if (user.legacyDataEncryptionKey && user.dataEncryptionKey)
+      await this.keyManager.unwrapKey(user.legacyDataEncryptionKey, key);
+    else if (!user.legacyDataEncryptionKey && !user.dataEncryptionKey) {
+      const verifier =
+        user.attachmentsKey ??
+        user.monographPasswordsKey ??
+        (await this.fetchEncryptionVerifier());
+      if (!verifier) throw new Error("Failed to fetch encryption verifier.");
+      const decryptedData = await this.db
+        .storage()
+        .decrypt(key, verifier)
+        .then(() => true)
+        .catch(() => false);
+
+      if (!decryptedData)
+        throw new Error(
+          "Your data cannot be decrypted using the provided encryption key."
+        );
+    } else
+      throw new Error(
+        "Cannot verify the provided encryption key as user has only a single encryption key."
+      );
+  }
+
   async _updatePassword(
     type: "change" | "reset",
     data: {
@@ -651,7 +690,13 @@ class UserManager {
 
     if (!new_password) throw new Error("New password is required.");
 
-    data.encryptionKey = data.encryptionKey || (await this.getMasterKey());
+    if (oldPassword && !data.encryptionKey)
+      data.encryptionKey = await this.getMasterKey();
+    if (!data.encryptionKey) throw new Error("Encryption key is required.");
+
+    // we must be 100% sure that the provided encryption key is valid before
+    // proceeding
+    await this.verifyEncryptionKey(data.encryptionKey);
 
     const updateUserPayload: Partial<User> = {};
     if (data.encryptionKey) {
@@ -688,13 +733,15 @@ class UserManager {
             data.encryptionKey,
             newMasterKey
           );
+
       if (user.dataEncryptionKey)
         updateUserPayload.dataEncryptionKey = await this.keyManager.rewrapKey(
           user.dataEncryptionKey,
           data.encryptionKey,
           newMasterKey
         );
-      else {
+
+      if (!user.legacyDataEncryptionKey && !user.dataEncryptionKey) {
         updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
           await this.db.crypto().generateRandomKey(),
           newMasterKey
