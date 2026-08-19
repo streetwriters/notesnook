@@ -35,8 +35,8 @@ import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
 
-const APP_MESSAGES: Message[] = [
-  {
+const APP_MESSAGE_BUILDERS: Record<MessageId, () => Message> = {
+  "rate-app": () => ({
     visible: true,
     message: strings.rateAppMessage(),
     actionText: strings.rateAppActionText(Platform.OS),
@@ -47,8 +47,8 @@ const APP_MESSAGES: Message[] = [
     icon: "star",
     type: "normal",
     id: "rate-app"
-  },
-  {
+  }),
+  "recovery-key": () => ({
     visible: true,
     message: strings.recoveryKeyMessage(),
     actionText: strings.recoveryKeyMessageActionText(),
@@ -72,8 +72,8 @@ const APP_MESSAGES: Message[] = [
     icon: "key",
     type: "normal",
     id: "recovery-key"
-  },
-  {
+  }),
+  "log-in": () => ({
     visible: true,
     message: strings.loginMessage(),
     actionText: strings.loginMessageActionText(),
@@ -86,8 +86,8 @@ const APP_MESSAGES: Message[] = [
     icon: "account-outline",
     type: "normal",
     id: "log-in"
-  },
-  {
+  }),
+  "confirm-email": () => ({
     visible: true,
     message: strings.syncDisabled(),
     actionText: strings.syncDisabledActionText(),
@@ -98,13 +98,33 @@ const APP_MESSAGES: Message[] = [
     icon: "email",
     type: "error",
     id: "confirm-email"
-  }
-];
+  }),
+  "app-update": () => ({}) as Message,
+  none: () => ({}) as Message
+};
 
 function showMessageById(id: MessageId) {
-  useMessageStore
-    .getState()
-    .setMessage(APP_MESSAGES.find((m) => m.id === id) as Message);
+  if (APP_MESSAGE_BUILDERS[id]) {
+    useMessageStore.getState().setMessage(APP_MESSAGE_BUILDERS[id]());
+  }
+}
+
+export function getLocalizedMessageStrings(id: MessageId): { message: string; actionText: string } | null {
+  if (id === "app-update") {
+    return {
+      message: strings.newUpdateMessage(),
+      actionText: strings.newUpdateActionText()
+    };
+  }
+  const builder = APP_MESSAGE_BUILDERS[id];
+  if (builder && id !== "none") {
+    const msg = builder();
+    return {
+      message: msg.message as string,
+      actionText: msg.actionText as string
+    };
+  }
+  return null;
 }
 
 export function setRateAppMessage() {

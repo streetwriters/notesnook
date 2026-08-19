@@ -93,7 +93,7 @@ const useRechecker = create<RecheckerState>((set) => ({
   }
 }));
 
-const attachmentTypes = [
+const getAttachmentTypes = () => [
   {
     title: strings.mediaTypes.all(),
     filterBy: "all"
@@ -475,7 +475,7 @@ export const AttachmentDialog = ({
             }}
             horizontal
           >
-            {attachmentTypes.map((item) =>
+            {getAttachmentTypes().map((item) =>
               item.filterBy === "orphaned" && note ? null : (
                 <Button
                   type={
