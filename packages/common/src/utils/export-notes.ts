@@ -25,6 +25,7 @@ import {
   ResolveInternalLink,
   isImage,
   isWebClip,
+  isAudio,
   FilteredSelector,
   EMPTY_CONTENT
 } from "@notesnook/core";
@@ -333,10 +334,12 @@ function resolveAttachment(
       attachment.filename
     }" width="${attributes.width}" height="${attributes.height}" />`;
   }
-  // markdown doesn't allow arbitrary iframes in its html so no need
-  // to support that
+  // markdown doesn't allow arbitrary iframes/audio embeds in its html so
+  // no need to support that
   else if (isWebClip(attachment.mimeType) && format === "html") {
     return `<iframe src="${relativePath} "width="${attributes.width}" height="${attributes.height}" />`;
+  } else if (isAudio(attachment.mimeType) && format === "html") {
+    return `<audio controls src="${relativePath}"></audio>`;
   }
 
   return `<a href="${relativePath}" title="${attachment.filename}">${attachment.filename}</a>`;

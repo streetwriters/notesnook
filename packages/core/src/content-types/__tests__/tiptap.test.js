@@ -35,6 +35,26 @@ test("img src is empty after extract attachments", async () => {
   expect(result.data).toContain(`data-hash="helloworld"`);
 });
 
+test("audio data URLs are extracted with attachment metadata", async () => {
+  const audioData =
+    "UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
+  const tiptap = new Tiptap(
+    `<audio src="data:audio/wav;base64,${audioData}"></audio>`
+  );
+
+  const result = await tiptap.postProcess(async (data, mime) => {
+    expect(data).toBe(audioData);
+    expect(mime).toBe("audio/wav");
+    return "audiohash";
+  });
+
+  expect(result.hashes).toEqual(["audiohash"]);
+  expect(result.data).not.toContain("src=");
+  expect(result.data).toContain('data-hash="audiohash"');
+  expect(result.data).toContain('data-mime="audio/wav"');
+  expect(result.data).toContain('data-size="44"');
+});
+
 test("img src is present after insert attachments", async () => {
   const tiptap = new Tiptap(IMG_CONTENT);
   const result = await tiptap.postProcess(async () => {
