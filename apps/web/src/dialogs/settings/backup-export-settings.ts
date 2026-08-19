@@ -26,6 +26,7 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
+import { formatDate } from "@notesnook/core";
 import dayjs from "dayjs";
 
 function getNextBackupTime(
@@ -60,12 +61,16 @@ export const BackupExportSettings: SettingsGroup[] = [
           const partial = s.lastBackupTime || 0;
           const full = s.lastFullBackupTime || 0;
           const last = Math.max(partial, full);
-          
+
           if (!last) return strings.backupNowDesc();
-          
+
           const typeStr = last === full ? " (Full)" : " (Partial)";
           return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
-            dayjs(last).format("MMM D, YYYY [at] h:mm A")
+            formatDate(last, {
+              type: "date-time",
+              dateFormat: s.dateFormat,
+              timeFormat: s.timeFormat
+            })
           )}${typeStr}`;
         },
         onStateChange: (listener) =>
@@ -112,15 +117,20 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "auto-backup",
         title: strings.automaticBackups(),
         description: () => {
+          const s = useSettingStore.getState();
           const next = getNextBackupTime(
-            useSettingStore.getState().backupReminderOffset,
-            useSettingStore.getState().lastBackupTime,
+            s.backupReminderOffset,
+            s.lastBackupTime,
             false
           );
           return next
             ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
-              dayjs(next).format("MMM D, YYYY [at] h:mm A")
-            )}`
+                formatDate(next, {
+                  type: "date-time",
+                  dateFormat: s.dateFormat,
+                  timeFormat: s.timeFormat
+                })
+              )}`
             : strings.automaticBackupsDesc();
         },
         onStateChange: (listener) =>
@@ -155,16 +165,23 @@ export const BackupExportSettings: SettingsGroup[] = [
         key: "auto-backup-with-attachments",
         title: strings.automaticBackupsWithAttachments(),
         description: () => {
+          const s = useSettingStore.getState();
           const next = getNextBackupTime(
-            useSettingStore.getState().fullBackupReminderOffset,
-            useSettingStore.getState().lastFullBackupTime,
+            s.fullBackupReminderOffset,
+            s.lastFullBackupTime,
             true
           );
-          const base = strings.automaticBackupsWithAttachmentsDesc().join("\n\n");
+          const base = strings
+            .automaticBackupsWithAttachmentsDesc()
+            .join("\n\n");
           return next
             ? `${base}\n${strings.nextBackupOn(
-              dayjs(next).format("MMM D, YYYY [at] h:mm A")
-            )}`
+                formatDate(next, {
+                  type: "date-time",
+                  dateFormat: s.dateFormat,
+                  timeFormat: s.timeFormat
+                })
+              )}`
             : base;
         },
         onStateChange: (listener) =>

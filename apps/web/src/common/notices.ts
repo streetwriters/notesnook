@@ -98,7 +98,7 @@ export async function shouldAddBackupNotice() {
 
   const lastBackupTime = await db.backup.lastBackupTime();
   if (!lastBackupTime) {
-    await db.backup.updateBackupTime();
+    await db.backup.updateBackupTime("partial");
     return false;
   }
 
@@ -210,7 +210,7 @@ async function saveBackup(mode: "full" | "partial" = "partial") {
         {
           text: strings.later(),
           onClick: async () => {
-            await db.backup.updateBackupTime();
+            await db.backup.updateBackupTime(mode);
             openedToast?.hide();
             openedToast = null;
           },
