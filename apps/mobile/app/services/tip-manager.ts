@@ -94,12 +94,12 @@ export class TipManager {
       MMKV.setString("tipState", JSON.stringify(tipState));
     }
 
-    const tipsForCtx = tips.filter((tip) => tip.contexts.indexOf(context) > -1);
+    const tipsForCtx = getTips().filter((tip) => tip.contexts.indexOf(context) > -1);
     return tipsForCtx.sample();
   }
 
   static popup(id: string) {
-    const pop = popups.find((p) => p.id === id);
+    const pop = getPopups().find((p) => p.id === id);
 
     return pop;
   }
@@ -144,9 +144,9 @@ export const useTip = (
   return tip;
 };
 
-const tips: TTip[] = strings.tips as TTip[];
+const getTips = (): TTip[] => strings.tips as TTip[];
 
-const popups: Popup[] = strings.popups;
+const getPopups = (): Popup[] => strings.popups;
 
 const placeholderTips = [
   "Want to remember something? Pin an important note in notifications.",
