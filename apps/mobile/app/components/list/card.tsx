@@ -22,6 +22,7 @@ import React from "react";
 import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Message, useMessageStore } from "../../stores/use-message-store";
+import { getLocalizedMessageStrings } from "../../services/message";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
@@ -41,6 +42,7 @@ export const Card = ({
   );
   const announcements = useMessageStore((state) => state.announcements);
   const fontScale = Dimensions.get("window").fontScale;
+  const freshStrings = getLocalizedMessageStrings(messageBoardState.id);
 
   return !messageBoardState.visible ||
     (announcements && announcements.length) ? null : (
@@ -90,22 +92,23 @@ export const Card = ({
 
           <View
             style={{
+              flex: 1,
               marginLeft: 10,
               marginRight: 10
             }}
           >
             <Paragraph
               style={{
-                flexWrap: "nowrap",
+                flexWrap: "wrap",
                 flexShrink: 1
               }}
               size={AppFontSize.sm}
               color={colors.primary.heading}
             >
-              {messageBoardState.actionText}
+              {freshStrings?.actionText || messageBoardState.actionText}
             </Paragraph>
             <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
-              {messageBoardState.message}
+              {freshStrings?.message || messageBoardState.message}
             </Paragraph>
           </View>
         </View>

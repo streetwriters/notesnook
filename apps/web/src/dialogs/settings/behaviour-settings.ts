@@ -26,8 +26,13 @@ import {
 import dayjs from "dayjs";
 import { TimeFormat, DayFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
-import { checkFeature } from "../../common";
+import {
+  strings,
+  AVAILABLE_LANGUAGES,
+  getSupportedLocale
+} from "@notesnook/intl";
+import { desktop } from "../../common/desktop-bridge";
+import { ConfirmDialog } from "../confirm";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
@@ -35,6 +40,57 @@ export const BehaviourSettings: SettingsGroup[] = [
     section: "behaviour",
     header: strings.general(),
     settings: [
+      {
+        key: "app-language",
+        title: strings.selectLanguage(),
+        description: strings.changeLanguage(),
+        keywords: ["language", "locale", "select language", "change language"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.appLanguage, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: async (value) => {
+              const currentLang = useSettingStore.getState().appLanguage;
+              let systemLocale = "en";
+              try {
+                systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+              } catch (e) { }
+              const effectiveCurrent =
+                currentLang || getSupportedLocale(systemLocale);
+              if (value === effectiveCurrent) return;
+
+              const ok = await ConfirmDialog.show({
+                title: strings.changeLanguage(),
+                message: strings.restartAppToApplyChanges(),
+                positiveButtonText: strings.restartNow(),
+                negativeButtonText: strings.cancel()
+              });
+
+              if (ok) {
+                useSettingStore.getState().setAppLanguage(value);
+                if (IS_DESKTOP_APP && desktop) {
+                  await desktop.integration.setAppLanguage.mutate(value);
+                } else {
+                  window.location.reload();
+                }
+              }
+            },
+            selectedOption: () => {
+              const saved = useSettingStore.getState().appLanguage;
+              let systemLocale = "en";
+              try {
+                systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+              } catch (e) { }
+              return saved || getSupportedLocale(systemLocale);
+            },
+            options: AVAILABLE_LANGUAGES.map((l) => ({
+              value: l.code,
+              title: `${l.label} (${l.nativeLabel})`
+            }))
+          }
+        ]
+      },
       {
         key: "default-sidebar-tab",
         title: strings.defaultSidebarTab(),
