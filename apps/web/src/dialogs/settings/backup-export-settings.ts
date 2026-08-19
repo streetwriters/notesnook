@@ -26,6 +26,22 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
+import dayjs from "dayjs";
+
+function getNextBackupTime(
+  offset: number,
+  lastBackupDate?: number,
+  isFull: boolean = false
+): number | undefined {
+  if (offset === 0 || !lastBackupDate) return undefined;
+  let days = 0;
+  if (isFull) {
+    days = offset === 1 ? 7 : 30;
+  } else {
+    days = offset === 1 ? 1 : offset === 2 ? 7 : 30;
+  }
+  return dayjs(lastBackupDate).add(days, "d").valueOf();
+}
 
 const getDesktopBackupsDirectoryPath = () =>
   useSettingStore.getState().backupStorageLocation;
@@ -39,7 +55,24 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "create-backup",
         title: strings.backupNow(),
-        description: strings.backupNowDesc(),
+        description: () => {
+          const s = useSettingStore.getState();
+          const partial = s.lastBackupTime || 0;
+          const full = s.lastFullBackupTime || 0;
+          const last = Math.max(partial, full);
+          
+          if (!last) return strings.backupNowDesc();
+          
+          const typeStr = last === full ? " (Full)" : " (Partial)";
+          return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
+            dayjs(last).format("MMM D, YYYY [at] h:mm A")
+          )}${typeStr}`;
+        },
+        onStateChange: (listener) =>
+          useSettingStore.subscribe(
+            (s) => `${s.lastBackupTime}-${s.lastFullBackupTime}`,
+            listener
+          ),
         components: [
           {
             type: "dropdown",
@@ -78,9 +111,23 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "auto-backup",
         title: strings.automaticBackups(),
-        description: strings.automaticBackupsDesc(),
+        description: () => {
+          const next = getNextBackupTime(
+            useSettingStore.getState().backupReminderOffset,
+            useSettingStore.getState().lastBackupTime,
+            false
+          );
+          return next
+            ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
+              dayjs(next).format("MMM D, YYYY [at] h:mm A")
+            )}`
+            : strings.automaticBackupsDesc();
+        },
         onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.backupReminderOffset, listener),
+          useSettingStore.subscribe(
+            (s) => `${s.backupReminderOffset}-${s.lastBackupTime}`,
+            listener
+          ),
         components: [
           {
             type: "dropdown",
@@ -107,10 +154,22 @@ export const BackupExportSettings: SettingsGroup[] = [
       {
         key: "auto-backup-with-attachments",
         title: strings.automaticBackupsWithAttachments(),
-        description: strings.automaticBackupsWithAttachmentsDesc().join("\n\n"),
+        description: () => {
+          const next = getNextBackupTime(
+            useSettingStore.getState().fullBackupReminderOffset,
+            useSettingStore.getState().lastFullBackupTime,
+            true
+          );
+          const base = strings.automaticBackupsWithAttachmentsDesc().join("\n\n");
+          return next
+            ? `${base}\n${strings.nextBackupOn(
+              dayjs(next).format("MMM D, YYYY [at] h:mm A")
+            )}`
+            : base;
+        },
         onStateChange: (listener) =>
           useSettingStore.subscribe(
-            (s) => s.fullBackupReminderOffset,
+            (s) => `${s.fullBackupReminderOffset}-${s.lastFullBackupTime}`,
             listener
           ),
         components: [
