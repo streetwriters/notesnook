@@ -67,9 +67,6 @@ import {
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
 import { useUserStore } from "../../../stores/use-user-store";
-import { AppFontSize } from "../../../utils/size";
-import { Pressable } from "../../ui/pressable";
-import AppIcon from "../../ui/AppIcon";
 
 export const VaultDialog: React.FC = () => {
   const { colors } = useThemeColors();
@@ -78,7 +75,6 @@ export const VaultDialog: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const isUserLoggedIn = useUserStore((state) => !!state.user);
   const [loading, setLoading] = useState(false);
-  const [deleteAll, setDeleteAll] = useState(false);
   const [biometricUnlock, setBiometricUnlock] = useState(false);
   const [isBiometryAvailable, setIsBiometryAvailable] = useState(false);
   const [isBiometryEnrolled, setIsBiometryEnrolled] = useState(false);
@@ -155,7 +151,6 @@ export const VaultDialog: React.FC = () => {
     // Reset UI state
     setVisible(false);
     setLoading(false);
-    setDeleteAll(false);
     setBiometricUnlock(false);
     setIsBiometryAvailable(false);
     setIsBiometryEnrolled(false);
@@ -171,34 +166,30 @@ export const VaultDialog: React.FC = () => {
       }
       if (verified) {
         let noteIds: string[] = [];
-        if (deleteAll) {
-          const vault = await db.vaults.default();
-          const relations = await db.relations
-            .from(
-              {
-                type: "vault",
-                id: vault!.id
-              },
-              "note"
-            )
-            .get();
-          noteIds = relations.map((item) => item.toId);
-        }
-        await db.vault.delete(deleteAll);
+        const vault = await db.vaults.default();
+        const relations = await db.relations
+          .from(
+            {
+              type: "vault",
+              id: vault!.id
+            },
+            "note"
+          )
+          .get();
+        noteIds = relations.map((item) => item.toId);
+        await db.vault.delete();
         await BiometricService.resetCredentials();
 
-        if (deleteAll) {
-          noteIds.forEach((id) => {
-            eSendEvent(
-              eUpdateNoteInEditor,
-              {
-                id: id,
-                deleted: true
-              },
-              true
-            );
-          });
-        }
+        noteIds.forEach((id) => {
+          eSendEvent(
+            eUpdateNoteInEditor,
+            {
+              id: id,
+              deleted: true
+            },
+            true
+          );
+        });
         eSendEvent("vaultUpdated");
         setLoading(false);
         close();
@@ -214,7 +205,7 @@ export const VaultDialog: React.FC = () => {
     } catch (e) {
       console.error(e);
     }
-  }, [deleteAll, close]);
+  }, [close]);
 
   const clearVault = useCallback(async () => {
     setLoading(true);
@@ -638,7 +629,6 @@ export const VaultDialog: React.FC = () => {
       setIsBiometryAvailable(available);
       setIsBiometryEnrolled(fingerprint);
       setBiometricUnlock(fingerprint);
-      setDeleteAll(false);
       setLoading(false);
 
       // Auto-unlock with fingerprint if applicable
@@ -796,35 +786,6 @@ export const VaultDialog: React.FC = () => {
               )}
             </>
           ) : null}
-
-          {isDeleteVault && (
-            <Pressable
-              onPress={() => setDeleteAll(!deleteAll)}
-              style={{
-                paddingVertical: 0,
-                flexDirection: "row",
-                gap: DefaultAppStyles.GAP_SMALL,
-                marginTop: isUserLoggedIn
-                  ? DefaultAppStyles.GAP_VERTICAL_SMALL
-                  : 0,
-                justifyContent: "flex-start"
-              }}
-            >
-              <AppIcon
-                name={
-                  deleteAll
-                    ? "check-circle-outline"
-                    : "checkbox-blank-circle-outline"
-                }
-                color={colors.error.accent}
-                size={AppFontSize.md}
-              />
-
-              <Paragraph color={colors.error.accent} size={AppFontSize.sm}>
-                {strings.deleteAllNotes()}
-              </Paragraph>
-            </Pressable>
-          )}
 
           {isChangePassword ? (
             <>
