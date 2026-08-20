@@ -61,7 +61,7 @@ export default defineConfig({
         plugins: [emitEditorStyles()],
         assetFileNames: "assets/[name]-[hash:12][extname]",
         chunkFileNames: "assets/[name]-[hash:12].js",
-        manualChunks: (id: string) => {
+        manualChunks: (id) => {
           if (
             (id.includes("/editor/languages/") ||
               id.includes("/html/languages/") ||
@@ -69,6 +69,8 @@ export default defineConfig({
             path.basename(id) !== "index.js"
           )
             return `code-lang-${path.basename(id, "js")}`;
+          else if (id.includes("notesnook-importer"))
+            return `notesnook-importer`;
           return null;
         }
       }
