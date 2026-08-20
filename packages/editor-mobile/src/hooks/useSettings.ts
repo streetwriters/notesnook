@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getDefaultPresets } from "@notesnook/editor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Settings } from "../utils";
 
 const settingsJson = localStorage.getItem("editorSettings");
@@ -73,6 +73,15 @@ export const useSettings = (): Settings => {
     ...global.settingsController.previous
   });
   global.settingsController.set = setSettings;
+
+  useEffect(() => {
+    setSettings((current) =>
+      JSON.stringify(current) ===
+      JSON.stringify(global.settingsController.previous)
+        ? current
+        : { ...global.settingsController.previous }
+    );
+  }, []);
 
   return settings;
 };

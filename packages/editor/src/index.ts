@@ -424,7 +424,13 @@ const useTiptap = (
       timeFormat,
       editorProps,
       copyToClipboard,
-      createInternalLink
+      createInternalLink,
+      dayFormat,
+      doubleSpacedLines,
+      enableFontLigatures,
+      getLinkData,
+      downloadCsvTable,
+      options.placeholder
     ]
   );
 
