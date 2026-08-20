@@ -956,7 +956,14 @@ const Tiptap = ({
         </div>
 
         <TiptapEditorWrapper
-          key={tick + tab.id + "-editor"}
+          key={[
+            tick,
+            tab.id,
+            settings.doubleSpacedLines ? "ds" : "ss",
+            settings.dateFormat,
+            settings.timeFormat,
+            settings.dayFormat
+          ].join("-")}
           options={tiptapOptions}
           settings={settings}
           onEditorUpdate={(editor) => {
