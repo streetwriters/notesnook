@@ -209,7 +209,6 @@ export const useEditorEvents = (
     };
   }, [editor, editor.commands, editor.postMessage]);
   useEffect(() => {
-    if (loading) return;
     if (typeof defaultFontFamily === "object") {
       SettingsService.set({
         defaultFontFamily: (defaultFontFamily as any).id
