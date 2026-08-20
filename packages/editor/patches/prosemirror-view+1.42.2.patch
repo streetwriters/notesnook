@@ -1,5 +1,5 @@
 diff --git a/node_modules/prosemirror-view/dist/index.cjs b/node_modules/prosemirror-view/dist/index.cjs
-index a615cb7..c1a6cbb 100644
+index a615cb7..c9b1f46 100644
 --- a/node_modules/prosemirror-view/dist/index.cjs
 +++ b/node_modules/prosemirror-view/dist/index.cjs
 @@ -1005,8 +1005,8 @@ var ViewDesc = function () {
@@ -21,8 +21,17 @@ index a615cb7..c1a6cbb 100644
    view.dispatch(tr.setMeta("uiEvent", "drop"));
  }
  handlers.focus = function (view) {
+@@ -4881,7 +4881,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+   var inlineChange = $from.sameParent($to) && $from.parent.inlineContent && $fromA.end() >= change.endA;
+   if ((ios && view.input.lastIOSEnter > Date.now() - 225 && (!inlineChange || addedNodes.some(function (n) {
+     return n.nodeName == "DIV" || n.nodeName == "P";
+-  })) || !inlineChange && $from.pos < parse.doc.content.size && (!$from.sameParent($to) || !$from.parent.inlineContent) && $from.pos < $to.pos && !/\S/.test(parse.doc.textBetween($from.pos, $to.pos, "", ""))) && view.someProp("handleKeyDown", function (f) {
++  })) || change.endB > change.endA && !inlineChange && $from.pos < parse.doc.content.size && (!$from.sameParent($to) || !$from.parent.inlineContent) && $from.pos < $to.pos && !/\S/.test(parse.doc.textBetween($from.pos, $to.pos, "", ""))) && view.someProp("handleKeyDown", function (f) {
+     return f(view, keyEvent(13, "Enter"));
+   })) {
+     view.input.lastIOSEnter = 0;
 diff --git a/node_modules/prosemirror-view/dist/index.js b/node_modules/prosemirror-view/dist/index.js
-index 61118ee..ec4c853 100644
+index 61118ee..c8c510b 100644
 --- a/node_modules/prosemirror-view/dist/index.js
 +++ b/node_modules/prosemirror-view/dist/index.js
 @@ -1079,8 +1079,8 @@ class ViewDesc {
@@ -44,3 +53,12 @@ index 61118ee..ec4c853 100644
      view.dispatch(tr.setMeta("uiEvent", "drop"));
  }
  handlers.focus = view => {
+@@ -5193,7 +5193,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+     // as being an iOS enter press), just dispatch an Enter key instead.
+     if (((ios && view.input.lastIOSEnter > Date.now() - 225 &&
+         (!inlineChange || addedNodes.some(n => n.nodeName == "DIV" || n.nodeName == "P"))) ||
+-        (!inlineChange && $from.pos < parse.doc.content.size &&
++        (change.endB > change.endA && !inlineChange && $from.pos < parse.doc.content.size &&
+             (!$from.sameParent($to) || !$from.parent.inlineContent) &&
+             $from.pos < $to.pos && !/\S/.test(parse.doc.textBetween($from.pos, $to.pos, "", "")))) &&
+         view.someProp("handleKeyDown", f => f(view, keyEvent(13, "Enter")))) {
