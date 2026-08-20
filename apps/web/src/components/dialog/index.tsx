@@ -147,7 +147,8 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                   justifyContent:
                     props.textAlignment === "center"
                       ? "center"
-                      : "space-between"
+                      : "space-between",
+                  minWidth: 0
                 }}
               >
                 <Text
@@ -157,8 +158,10 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                     fontSize: "subheading",
                     textAlign: props.textAlignment || "left",
                     color: "paragraph",
-                    overflowWrap: "anywhere",
-                    wordSpacing: "wrap"
+                    minWidth: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap"
                   }}
                 >
                   {props.title}
