@@ -383,7 +383,7 @@ export function NotebookItem(props: {
         toggle();
       }}
     >
-      <Flex sx={{ alignItems: "center" }}>
+      <Flex sx={{ alignItems: "center", minWidth: 0, flex: 1 }}>
         {isExpandable ? (
           isExpanded ? (
             <ChevronDown data-test-id="collapse-notebook" size={18} />
@@ -392,11 +392,25 @@ export function NotebookItem(props: {
           )
         ) : null}
         <SelectedCheck size={18} item={notebook} onClick={check} />
-        <Text className="title" data-test-id="notebook-title" variant="body">
+        <Text
+          className="title"
+          data-test-id="notebook-title"
+          variant="body"
+          title={notebook.title}
+          sx={{
+            minWidth: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap"
+          }}
+        >
           {notebook.title}
         </Text>
       </Flex>
-      <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
+      <Flex
+        data-test-id="notebook-tools"
+        sx={{ alignItems: "center", flexShrink: 0 }}
+      >
         <Button
           variant="secondary"
           data-test-id="add-sub-notebook"
