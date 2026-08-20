@@ -206,7 +206,7 @@ export const defaultSettings: SettingStore["settings"] = {
   colorScheme: "light",
   lighTheme: ThemeLight,
   darkTheme: ThemeDark,
-  markdownShortcuts: true,
+  markdownShortcuts: false,
   biometricsAuthEnabled: false,
   appLockHasPasswordSecurity: false,
   backgroundSync: true,
