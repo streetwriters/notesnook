@@ -61,7 +61,7 @@ export default defineConfig({
         plugins: [emitEditorStyles()],
         assetFileNames: "assets/[name]-[hash:12][extname]",
         chunkFileNames: "assets/[name]-[hash:12].js",
-        manualChunks: (id: string) => {
+        manualChunks: (id) => {
           if (
             (id.includes("/editor/languages/") ||
               id.includes("/html/languages/") ||
@@ -190,6 +190,7 @@ export default defineConfig({
       : [
           prefetchPlugin({
             excludeFn: (assetName) =>
+              assetName.includes("notesnook-importer") ||
               assetName.includes("wa-sqlite-async") ||
               !assetName.includes("wa-sqlite")
           })

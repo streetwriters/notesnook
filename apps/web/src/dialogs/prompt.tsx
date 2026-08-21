@@ -27,6 +27,7 @@ export type PromptDialogProps = BaseDialogProps<undefined | string> & {
   title: string;
   description?: string;
   defaultValue?: string;
+  type?: "text" | "password" | "email" | "number";
 };
 
 export const PromptDialog = DialogManager.register(function PromptDialog(
@@ -51,6 +52,7 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
       <Field
         inputRef={inputRef}
         defaultValue={props.defaultValue}
+        type={props.type}
         autoFocus
         onKeyUp={(e) => {
           if (e.key == "Enter") props.onClose(inputRef.current?.value || "");

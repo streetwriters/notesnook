@@ -37,6 +37,11 @@ type SQLiteOptions = {
   async: boolean;
   url?: string;
   encrypted: boolean;
+  /**
+   * Skip FTS5 extension registration. Used for imported (read-only) databases
+   * whose schema should not be touched before the importer queries them.
+   */
+  skipExtensions?: boolean;
 };
 
 class _SQLiteWorker {
@@ -49,6 +54,7 @@ class _SQLiteWorker {
   encrypted = false;
   name = "";
   async = false;
+  skipExtensions = false;
 
   async open(name: string, options: SQLiteOptions) {
     if (this.db) {
@@ -59,6 +65,7 @@ class _SQLiteWorker {
     this.encrypted = options.encrypted;
     this.name = name;
     this.async = options.async;
+    this.skipExtensions = !!options.skipExtensions;
 
     const option = options.url ? { locateFile: () => options.url } : {};
     const sqliteModule = options.async
@@ -230,7 +237,7 @@ class _SQLiteWorker {
   }
 
   async initialize() {
-    if (typeof this.db === "number")
+    if (typeof this.db === "number" && !this.skipExtensions)
       await this.sqlite.register_extensions(this.db);
 
     self.dispatchEvent(

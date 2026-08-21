@@ -1762,7 +1762,7 @@ For example:
       one: "# file ready for import",
       other: "# files ready for import"
     }),
-  selectFilesToImport: () => t`Select files to import`,
+  selectFiles: () => t`Select files`,
   importerHelpText: () => [
     t`Please refer to the`,
     t`import guide`,
@@ -2792,10 +2792,6 @@ Continue without attachments?`,
   enterPgpPublicKey: () => t`Enter your PGP public key`,
   enterPgpPrivateKey: () => t`Enter your PGP private key`,
   expiryDateRemoved: () => t`Expiry date removed`,
-  colorNotePasswordFor: (filename: string) =>
-    t`Colornote password for ${filename}`,
-  colorNotPasswordForDesc: () =>
-    t`The password for decrypting the Colornote backup file.`,
   deleteItem: () => t`Delete item`,
   keepScreenOn: () => t`Keep screen on`,
   keepScreenOnDesc: () =>
@@ -2810,5 +2806,9 @@ Continue without attachments?`,
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
     t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
-  alignment: () => t`Alignment`
+  alignment: () => t`Alignment`,
+  browserStorageQuotaReached: () =>
+    t`Browser storage quota reached. Please delete some attachments from the attachment manager or clear some local data to free up space.`,
+  passwordFor: (filename: string) => t`Enter password for ${filename}`,
+  selectFolder: () => t`Select folder`
 };

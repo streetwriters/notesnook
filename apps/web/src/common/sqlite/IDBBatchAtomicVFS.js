@@ -88,6 +88,67 @@ export class IDBBatchAtomicVFS extends VFS.Base {
   }
 
   /**
+   * Import a file into the VFS so it can be opened by SQLite. Block 0 (offset
+   * 0) carries the total file size; a streamed file is written in chunks as
+   * blocks at negative offsets, matching the layout {@link xRead} expects.
+   *
+   * @param {string} path
+   * @param {Uint8Array | ReadableStream<Uint8Array>} source
+   */
+  async importFile(path, source) {
+    if (source instanceof Uint8Array) {
+      await this.#idb.run("readwrite", ({ blocks }) => {
+        blocks.put({
+          path,
+          offset: 0,
+          version: 0,
+          data: source,
+          fileSize: source.byteLength
+        });
+      });
+      return;
+    }
+
+    const reader = source.getReader();
+    const batch = [];
+    let offset = 0;
+    let firstChunk;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        firstChunk = firstChunk ?? value;
+        batch.push(
+          offset === 0
+            ? { path, offset: 0, version: 0, data: value, fileSize: 0 }
+            : { path, offset: -offset, version: 0, data: value }
+        );
+        offset += value.byteLength;
+        if (batch.length >= 8) {
+          const blocks = batch.splice(0);
+          await this.#idb.run("readwrite", ({ blocks: store }) => {
+            for (const block of blocks) store.put(block);
+          });
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    // Final block 0 with the total file size (replaces the placeholder).
+    await this.#idb.run("readwrite", ({ blocks }) => {
+      for (const block of batch) blocks.put(block);
+      blocks.put({
+        path,
+        offset: 0,
+        version: 0,
+        data: firstChunk ?? new Uint8Array(0),
+        fileSize: offset
+      });
+    });
+  }
+
+  /**
    * @param {string?} name
    * @param {number} fileId
    * @param {number} flags

@@ -103,19 +103,22 @@ export class IDBContext {
         // @ts-ignore
         this.#tx = db.transaction(db.objectStoreNames, mode, this.#txOptions);
         const timestamp = (this.#txTimestamp = performance.now());
+        const tx = this.#tx;
 
         // Chain the result of every transaction. If any transaction is
-        // aborted then the next sync() call will throw.
+        // aborted then the next sync() call will throw. The transaction is
+        // captured so a later transaction (which replaces `#tx`) or a
+        // completed one (which nulls it) cannot break this handler.
         this.#putChain = this.#putChain.then(() => {
           return new Promise((resolve, reject) => {
-            this.#tx.addEventListener("complete", (event) => {
+            tx.addEventListener("complete", (event) => {
               resolve();
               if (this.#tx === event.target) {
                 this.#tx = null;
               }
               log(`transaction ${mapTxToId.get(event.target)} complete`);
             });
-            this.#tx.addEventListener("abort", (event) => {
+            tx.addEventListener("abort", (event) => {
               console.warn("tx abort", (performance.now() - timestamp) / 1000);
               // @ts-ignore
               const e = event.target.error;

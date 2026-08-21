@@ -18,7 +18,7 @@
     "@lingui/react": "5.1.2",
     "@mdi/js": "7.4.47",
     "@mdi/react": "1.6.1",
-    "@notesnook-importer/core": "^2.4.5",
+    "@notesnook-importer/core": "^2.6.0",
     "@notesnook/common": "file:../../packages/common",
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/crypto": "file:../../packages/crypto",
@@ -82,6 +82,7 @@
     "timeago.js": "4.0.2",
     "w3c-keyname": "^2.2.6",
     "wouter": "2.12.1",
+    "zod": "^4.4.3",
     "zustand": "4.5.5",
     "zustand-mutative": "^1.2.0"
   },
