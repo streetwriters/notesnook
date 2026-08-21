@@ -165,7 +165,7 @@ export function useEditorController({
       tabId,
       noteId,
       currentSessionId,
-      1000
+      20000
     ];
     const pendingTitleIds = await pendingSaveRequests.getPendingTitleIds();
     postAsyncWithTimeout(EditorEvents.title, ...params)
@@ -230,6 +230,11 @@ export function useEditorController({
         clearTimeout(timers.current?.change);
       }
 
+      const changeDebounce = Math.min(
+        1000,
+        Math.max(100, editor.state.doc.content.size / 100)
+      );
+
       timers.current.change = setTimeout(async () => {
         if (tabRef.current.session?.noteId !== noteId) {
           logger(
@@ -244,7 +249,14 @@ export function useEditorController({
         }
 
         const editedAt = Date.now();
+        const __perfStart = performance.now();
         htmlContentRef.current = editor.getHTML();
+        logger(
+          "info",
+          `[PERF] getHTML size=${htmlContentRef.current.length} docSize=${
+            editor.state.doc.content.size
+          } took=${(performance.now() - __perfStart).toFixed(1)}ms`
+        );
 
         const params = [
           {
@@ -254,7 +266,7 @@ export function useEditorController({
           tabId,
           noteId,
           currentSessionId,
-          5000
+          20000
         ];
 
         const pendingContentIds =
@@ -291,7 +303,7 @@ export function useEditorController({
           });
 
         logger("info", "Editor saving content", params[1], params[2]);
-      }, 100);
+      }, changeDebounce);
 
       countWords(5000);
     },
