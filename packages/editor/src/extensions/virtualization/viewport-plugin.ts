@@ -140,6 +140,17 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         schedule();
       };
 
+      let observed: Element[] = [];
+
+      const childrenChanged = () => {
+        const children = editorView.dom.children;
+        if (children.length !== observed.length) return true;
+        for (let i = 0; i < children.length; i++) {
+          if (children[i] !== observed[i]) return true;
+        }
+        return false;
+      };
+
       const observe = () => {
         observer?.disconnect();
         observer = new IntersectionObserver(onIntersect, {
@@ -148,7 +159,8 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
           rootMargin: "100% 0px 100% 0px",
           threshold: 0
         });
-        for (const child of Array.from(editorView.dom.children)) {
+        observed = Array.from(editorView.dom.children);
+        for (const child of observed) {
           if (child instanceof HTMLElement) observer.observe(child);
         }
       };
@@ -156,15 +168,17 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
       observe();
 
       return {
-        update(view, prevState) {
-          // Re-observe whenever the document structure changed, since
-          // materialize/dematerialize replaces the top-level DOM elements.
-          if (!prevState.doc.eq(view.state.doc)) observe();
+        update() {
+          // Materialize/dematerialize swaps the top-level DOM elements without
+          // changing the document, so re-observe whenever the child element set
+          // changes identity, not just on doc changes.
+          if (childrenChanged()) observe();
         },
         destroy() {
           if (frame) cancelAnimationFrame(frame);
           observer?.disconnect();
           observer = null;
+          observed = [];
         }
       };
     }
