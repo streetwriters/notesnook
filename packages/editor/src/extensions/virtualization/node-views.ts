@@ -172,7 +172,8 @@ function wrapCustom(
 
 export function withVirtualization(
   nodeViews: Record<string, NodeViewConstructor>,
-  heightMap: HeightMap
+  heightMap: HeightMap,
+  thresholdBlocks: number
 ): Record<string, NodeViewConstructor> {
   const wrapped: Record<string, NodeViewConstructor> = { ...nodeViews };
 
@@ -182,9 +183,13 @@ export function withVirtualization(
       const topLevel = isTopLevel(view, getPos as () => number | undefined);
       const materialize = isMaterialized(decorations);
 
+      // Only page documents past the size threshold. Smaller notes — the
+      // overwhelming majority — render fully and are unaffected by any of this.
+      const belowThreshold = view.state.doc.childCount <= thresholdBlocks;
+
       // Nested instances (inside callouts, tables, list items) are never
       // virtualized — only the outermost blocks are paged.
-      if (!topLevel) {
+      if (!topLevel || belowThreshold) {
         return inner
           ? inner(node, view, getPos, decorations, innerDecorations)
           : createMaterializedDefault(node, heightMap);

@@ -22,12 +22,17 @@ import { HeightMap } from "./height-map.js";
 import { withVirtualization } from "./node-views.js";
 import { virtualizationPlugin } from "./viewport-plugin.js";
 
+/** Paging only engages for notes larger than this many top-level blocks. */
+const DEFAULT_THRESHOLD_BLOCKS = 300;
+
 export type VirtualizationOptions = {
   enabled: boolean;
+  thresholdBlocks: number;
 };
 
 export type VirtualizationStorage = {
   enabled: boolean;
+  thresholdBlocks: number;
   heightMap: HeightMap;
 };
 
@@ -44,12 +49,13 @@ export const Virtualization = Extension.create<VirtualizationOptions>({
   name: "virtualization",
 
   addOptions() {
-    return { enabled: false };
+    return { enabled: false, thresholdBlocks: DEFAULT_THRESHOLD_BLOCKS };
   },
 
   addStorage(): VirtualizationStorage {
     return {
       enabled: this.options.enabled,
+      thresholdBlocks: this.options.thresholdBlocks,
       heightMap: new HeightMap()
     };
   },
@@ -87,7 +93,11 @@ export function installVirtualization(editor: Editor): void {
   Object.defineProperty(editor.extensionManager, "nodeViews", {
     configurable: true,
     get() {
-      return withVirtualization(originalGetter.call(this), storage.heightMap);
+      return withVirtualization(
+        originalGetter.call(this),
+        storage.heightMap,
+        storage.thresholdBlocks
+      );
     }
   });
 }
