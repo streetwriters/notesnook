@@ -69,8 +69,6 @@ export default defineConfig({
             path.basename(id) !== "index.js"
           )
             return `code-lang-${path.basename(id, "js")}`;
-          else if (id.includes("notesnook-importer"))
-            return `notesnook-importer`;
           return null;
         }
       }
@@ -192,6 +190,7 @@ export default defineConfig({
       : [
           prefetchPlugin({
             excludeFn: (assetName) =>
+              assetName.includes("notesnook-importer") ||
               assetName.includes("wa-sqlite-async") ||
               !assetName.includes("wa-sqlite")
           })

@@ -17,11 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  IFileProvider,
-  ProviderSettings,
-  transform
-} from "@notesnook-importer/core";
+import { IFileProvider, ProviderSettings } from "@notesnook-importer/core";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
 import { Button, Flex, Text } from "@theme-ui/components";
@@ -126,6 +122,8 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       total: files.length,
       done: 0
     });
+
+    const { transform } = await import("@notesnook-importer/core");
 
     errors.push(
       ...(await transform(
