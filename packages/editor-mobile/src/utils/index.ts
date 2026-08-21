@@ -240,18 +240,16 @@ export function post(
 ): string {
   const id = randId(type);
   if (isReactNative()) {
-    setTimeout(() =>
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          type,
-          value: value,
-          sessionId: sessionId || globalThis.sessionId,
-          tabId,
-          noteId,
-          resolverId: id,
-          hasTimeout: hasTimeout
-        })
-      )
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type,
+        sessionId: sessionId || globalThis.sessionId,
+        tabId,
+        noteId,
+        resolverId: id,
+        hasTimeout: hasTimeout,
+        value: value
+      })
     );
   }
   return id;
