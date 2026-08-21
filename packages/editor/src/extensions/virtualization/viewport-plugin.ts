@@ -116,8 +116,16 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         const current = virtualizationKey.getState(editorView.state)?.visible;
         const next = new Set(intersecting);
         if (current && sameSet(current, next)) return;
+        // This transaction only records which blocks are on-screen; it changes
+        // no content. It carries no steps (docChanged is false), and we mark it
+        // preventUpdate + addToHistory:false as belt-and-suspenders so it can
+        // never trigger a save, never enter the undo history, and never touch
+        // user data — virtualization is a pure view concern.
         editorView.dispatch(
-          editorView.state.tr.setMeta(virtualizationKey, { visible: next })
+          editorView.state.tr
+            .setMeta(virtualizationKey, { visible: next })
+            .setMeta("preventUpdate", true)
+            .setMeta("addToHistory", false)
         );
       };
 
