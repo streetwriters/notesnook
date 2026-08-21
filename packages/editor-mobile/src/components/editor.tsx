@@ -325,9 +325,10 @@ const Tiptap = ({
   const controller = useEditorController({
     update,
     getTableOfContents: () => {
-      return !containerRef.current
+      const editor = editors[tab.id];
+      return !containerRef.current || !editor
         ? []
-        : getTableOfContents(containerRef.current);
+        : getTableOfContents(editor.state.doc, containerRef.current);
     },
     scrollTop: () => containerRef.current?.scrollTop || 0,
     scrollTo: (top) => {
