@@ -138,52 +138,79 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         schedule();
       };
 
-      let observed: Element[] = [];
+      const observed = new Set<Element>();
 
-      const childrenChanged = () => {
-        const children = editorView.dom.children;
-        if (children.length !== observed.length) return true;
-        for (let i = 0; i < children.length; i++) {
-          if (children[i] !== observed[i]) return true;
-        }
-        return false;
-      };
-
-      const observe = () => {
-        observer?.disconnect();
+      const ensureObserver = () => {
         // Resolve the scroll container lazily: at view-init the document may be
         // empty (no overflow yet), so it must be re-resolved once content grows.
         const resolved = findScrollParent(editorView.dom);
         if (resolved && resolved !== scrollParent) {
-          resolved.style.overflowAnchor = "none";
+          // Keep the browser's scroll anchoring ON: when an off-screen
+          // placeholder above the viewport materializes to its real height, the
+          // browser compensates scrollTop so the visible content stays put
+          // instead of jumping.
+          resolved.style.overflowAnchor = "auto";
           scrollParent = resolved;
+          // The observer's root is fixed at construction, so it must be rebuilt
+          // when the scroll container changes.
+          observer?.disconnect();
+          observer = null;
+          observed.clear();
         }
-        observer = new IntersectionObserver(onIntersect, {
-          root: scrollParent,
-          // one viewport of overscan in each direction
-          rootMargin: "100% 0px 100% 0px",
-          threshold: 0
-        });
-        observed = Array.from(editorView.dom.children);
-        for (const child of observed) {
-          if (child instanceof HTMLElement) observer.observe(child);
+        if (!observer) {
+          observer = new IntersectionObserver(onIntersect, {
+            root: scrollParent,
+            // one viewport of overscan in each direction
+            rootMargin: "100% 0px 100% 0px",
+            threshold: 0
+          });
         }
       };
 
-      observe();
+      // Keep a single observer alive and only add/remove the blocks that
+      // actually changed. Disconnecting and re-observing every block on each
+      // materialization resets all intersection state; during a scroll that
+      // never converges and leaves visible blocks stuck as blank placeholders.
+      const syncObserved = () => {
+        ensureObserver();
+        if (!observer) return;
+        const children = editorView.dom.children;
+        const current = new Set<Element>(children as unknown as Element[]);
+        for (const el of observed) {
+          if (!current.has(el)) {
+            observer.unobserve(el);
+            observed.delete(el);
+          }
+        }
+        for (const el of Array.from(children)) {
+          if (el instanceof HTMLElement && !observed.has(el)) {
+            observer.observe(el);
+            observed.add(el);
+          }
+        }
+      };
+
+      const childrenChanged = () => {
+        const children = editorView.dom.children;
+        if (children.length !== observed.size) return true;
+        for (const child of children) if (!observed.has(child)) return true;
+        return false;
+      };
+
+      syncObserved();
 
       return {
         update() {
           // Materialize/dematerialize swaps the top-level DOM elements without
-          // changing the document, so re-observe whenever the child element set
-          // changes identity, not just on doc changes.
-          if (childrenChanged()) observe();
+          // changing the document, so re-sync whenever the child element set
+          // changes identity — but only the delta, not the whole observer.
+          if (childrenChanged()) syncObserved();
         },
         destroy() {
           if (frame) cancelAnimationFrame(frame);
           observer?.disconnect();
           observer = null;
-          observed = [];
+          observed.clear();
         }
       };
     }
