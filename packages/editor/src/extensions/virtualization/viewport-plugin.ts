@@ -109,9 +109,7 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
       let observer: IntersectionObserver | null = null;
       let frame = 0;
       const intersecting = new Set<string>();
-
-      const scrollParent = findScrollParent(editorView.dom);
-      if (scrollParent) scrollParent.style.overflowAnchor = "none";
+      let scrollParent: HTMLElement | null = null;
 
       const flush = () => {
         frame = 0;
@@ -153,6 +151,13 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
 
       const observe = () => {
         observer?.disconnect();
+        // Resolve the scroll container lazily: at view-init the document may be
+        // empty (no overflow yet), so it must be re-resolved once content grows.
+        const resolved = findScrollParent(editorView.dom);
+        if (resolved && resolved !== scrollParent) {
+          resolved.style.overflowAnchor = "none";
+          scrollParent = resolved;
+        }
         observer = new IntersectionObserver(onIntersect, {
           root: scrollParent,
           // one viewport of overscan in each direction
