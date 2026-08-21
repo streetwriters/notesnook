@@ -38,6 +38,12 @@ type FieldPhraseNode = {
   value: QueryNode;
 };
 
+type FieldToken = {
+  field?: string;
+  fieldOccurrence?: number;
+  token: string;
+};
+
 type OperatorNode = {
   type: "AND" | "OR" | "NOT";
 };
@@ -77,6 +83,8 @@ const SUPPORTED_FIELDS = {
   in_notebook: (ast) => parseBooleanField("in_notebook", ast)
 } satisfies Record<string, (ast: (QueryNode | FieldPhraseNode)[]) => unknown>;
 
+const ARRAY_FIELDS = ["tag", "color"];
+
 function isFieldSupported(field: string) {
   return field in SUPPORTED_FIELDS;
 }
@@ -101,8 +109,13 @@ function parseArrayField(
       (a): a is FieldPhraseNode =>
         a.type === "field_phrase" && a.field === field
     )
-    .map((a) => generateSQL(a.value));
+    .map((a) => unquoteExactValue(generateSQL(a.value)));
   return values.length > 0 ? values : null;
+}
+
+function unquoteExactValue(value: string) {
+  if (!value.startsWith('"') || !value.endsWith('"')) return value;
+  return value.slice(1, -1).replace(/""/g, '"');
 }
 
 function parseDateField(
@@ -146,13 +159,23 @@ function escapeSQLString(str: string): string {
   return str.replace(/"/g, '""');
 }
 
-function tokenizeWithFields(
-  query: string
-): Array<{ field?: string; token: string }> {
-  const tokens: Array<{ field?: string; token: string }> = [];
+function tokenizeWithFields(query: string): FieldToken[] {
+  const tokens: FieldToken[] = [];
   let buffer = "";
   let isQuoted = false;
   let currentField: string | undefined = undefined;
+  let fieldOccurrence = 0;
+
+  const pushToken = () => {
+    if (buffer.length > 0) {
+      tokens.push({
+        field: currentField,
+        fieldOccurrence: currentField ? fieldOccurrence : undefined,
+        token: buffer
+      });
+      buffer = "";
+    }
+  };
 
   for (let i = 0; i < query.length; ++i) {
     const char = query[i];
@@ -160,15 +183,13 @@ function tokenizeWithFields(
       isQuoted = !isQuoted;
     }
     if (char === " " && !isQuoted) {
-      if (buffer.length > 0) {
-        tokens.push({ field: currentField, token: buffer });
-        buffer = "";
-      }
+      pushToken();
     } else if (char === ":" && !isQuoted) {
       // Check for field
       const maybeField = buffer.trim().toLowerCase();
       if (isFieldSupported(maybeField)) {
         currentField = maybeField;
+        fieldOccurrence++;
         buffer = "";
       } else {
         buffer += char;
@@ -177,24 +198,31 @@ function tokenizeWithFields(
       buffer += char;
     }
   }
-  if (buffer.length > 0) tokens.push({ field: currentField, token: buffer });
+  pushToken();
 
   return tokens;
 }
 
 // Helper: group tokens by field
-function groupTokensByField(tokens: Array<{ field?: string; token: string }>) {
+function groupTokensByField(tokens: FieldToken[]) {
   const groups: Array<{ field?: string; tokens: string[] }> = [];
   let currentField: string | undefined = undefined;
+  let currentOccurrence: number | undefined = undefined;
   let currentTokens: string[] = [];
 
-  for (const { field, token } of tokens) {
-    if (field !== currentField) {
+  for (const { field, fieldOccurrence, token } of tokens) {
+    const isArrayField = ARRAY_FIELDS.includes(field || "");
+    const shouldStartNewGroup =
+      field !== currentField ||
+      (isArrayField && fieldOccurrence !== currentOccurrence);
+
+    if (shouldStartNewGroup) {
       if (currentTokens.length > 0) {
         groups.push({ field: currentField, tokens: currentTokens });
         currentTokens = [];
       }
       currentField = field;
+      currentOccurrence = fieldOccurrence;
     }
     currentTokens.push(token);
   }

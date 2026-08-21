@@ -77,3 +77,37 @@ for (const [input, expectedOutput] of TRANSFORM_QUERY_TESTS) {
     expect(transformQuery(input).content?.query).toBe(expectedOutput);
   });
 }
+
+test("should remove syntax quotes from multi-word tag filters", () => {
+  expect(transformQuery('tag:"the diary"').tag).toEqual(["the diary"]);
+});
+
+test("should preserve multiple exact tag filter values", () => {
+  expect(transformQuery('tag:"the diary" title:journal tag:work').tag).toEqual([
+    "the diary",
+    "work"
+  ]);
+});
+
+test("should remove syntax quotes from multi-word color filters", () => {
+  expect(transformQuery('color:"deep blue"').color).toEqual(["deep blue"]);
+});
+
+test("should remove syntax quotes added for punctuation in exact filters", () => {
+  expect(transformQuery("tag:foo-bar").tag).toEqual(["foo-bar"]);
+});
+
+test("should separate repeated tag filters", () => {
+  expect(transformQuery("tag:one tag:two").tag).toEqual(["one", "two"]);
+});
+
+test("should separate repeated color filters", () => {
+  expect(transformQuery("color:red color:blue").color).toEqual(["red", "blue"]);
+});
+
+test("should separate repeated quoted tag filters", () => {
+  expect(transformQuery('tag:"one two" tag:"three four"').tag).toEqual([
+    "one two",
+    "three four"
+  ]);
+});
