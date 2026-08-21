@@ -23,6 +23,7 @@ import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 import { EditorView } from "@tiptap/pm/view";
 import { useEditorSearchStore } from "../toolbar/stores/search-store.js";
+import { installVirtualization } from "../extensions/virtualization/index.js";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -50,6 +51,7 @@ export const useEditor = (
       const oldIsFocused = editor.isFocused;
 
       destroyView(editor.view);
+      installVirtualization(editor);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore instead of creating a new editor, we just create
       // a new view. Due to some reason this is faster than resetting

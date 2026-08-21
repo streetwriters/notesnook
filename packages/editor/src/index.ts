@@ -82,6 +82,7 @@ import CheckList from "./extensions/check-list/index.js";
 import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
+import { Virtualization } from "./extensions/virtualization/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
@@ -137,6 +138,7 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
+    virtualization?: boolean;
   } & {
     placeholder: string;
   };
@@ -164,6 +166,7 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
+    virtualization,
     ...restOptions
   } = options;
 
@@ -272,6 +275,7 @@ const useTiptap = (
           }
         }),
         BlockId,
+        Virtualization.configure({ enabled: !!virtualization }),
         Blockquote,
         CharacterCount,
         Underline,
@@ -424,7 +428,8 @@ const useTiptap = (
       timeFormat,
       editorProps,
       copyToClipboard,
-      createInternalLink
+      createInternalLink,
+      virtualization
     ]
   );
 
