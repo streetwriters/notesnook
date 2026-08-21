@@ -51,6 +51,28 @@ import Title from "./title";
 
 globalThis.toBlobURL = toBlobURL as typeof globalThis.toBlobURL;
 
+const VIRTUALIZATION_KEY = "nn:virtualization";
+
+function isVirtualizationEnabled(): boolean {
+  try {
+    return localStorage.getItem(VIRTUALIZATION_KEY) === "true";
+  } catch (e) {
+    return false;
+  }
+}
+
+// Dev/test toggle: flip block virtualization on/off and reload the editor so the
+// new setting takes effect. Callable from the WebView console or over CDP.
+(globalThis as unknown as { setVirtualization?: (on: boolean) => void }).setVirtualization =
+  (on: boolean) => {
+    try {
+      localStorage.setItem(VIRTUALIZATION_KEY, on ? "true" : "false");
+    } catch (e) {
+      /* ignore */
+    }
+    location.reload();
+  };
+
 let didCallOnLoad = false;
 
 const Tiptap = ({
@@ -258,7 +280,8 @@ const Tiptap = ({
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
       dayFormat: settings.dayFormat,
-      enableInputRules: settings.markdownShortcuts
+      enableInputRules: settings.markdownShortcuts,
+      virtualization: isVirtualizationEnabled()
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
