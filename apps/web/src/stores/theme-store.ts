@@ -50,6 +50,7 @@ class ThemeStore extends BaseStore<ThemeStore> {
 
   setTheme = (theme: ThemeDefinition) => {
     changeDesktopTheme(theme, this.get().followSystemTheme);
+    Config.set("colorScheme", theme.colorScheme);
     Config.set(`theme:${theme.colorScheme}`, theme);
     this.set({
       [getKey(theme)]: theme,
