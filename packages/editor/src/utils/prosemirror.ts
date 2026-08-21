@@ -353,12 +353,16 @@ export function isClickWithinBounds(
   e: MouseEvent | TouchEvent,
   pos: ResolvedPos,
   hitPosition: "left" | "right",
-  hitArea: { width: number; height: number } = { width: 40, height: 40 }
+  hitArea: { width: number; height: number; offset?: number } = {
+    width: 40,
+    height: 40
+  }
 ) {
   const { target } = e;
   if (!(target instanceof HTMLElement)) return false;
 
   const { x, y, right, width } = target.getBoundingClientRect();
+  const offset = hitArea.offset ?? 0;
   const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
   const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
   const isRtl =
@@ -368,27 +372,27 @@ export function isClickWithinBounds(
 
   switch (hitPosition) {
     case "left": {
-      let xStart = clientX >= x - hitArea.width;
-      let xEnd = clientX <= x;
+      let xStart = clientX >= x - hitArea.width - offset;
+      let xEnd = clientX <= x - offset;
       const yStart = clientY >= y;
       const yEnd = clientY <= y + hitArea.height;
 
       if (isRtl) {
-        xEnd = clientX <= right + hitArea.width;
-        xStart = clientX >= right;
+        xEnd = clientX <= right + hitArea.width + offset;
+        xStart = clientX >= right + offset;
       }
 
       return xStart && xEnd && yStart && yEnd;
     }
     case "right": {
-      let xEnd = clientX <= x + width;
-      let xStart = clientX >= x + width - hitArea.width;
+      let xEnd = clientX <= x + width + offset;
+      let xStart = clientX >= x + width - hitArea.width + offset;
       const yStart = clientY >= y;
       const yEnd = clientY <= y + hitArea.height;
 
       if (isRtl) {
-        xStart = clientX >= x;
-        xEnd = clientX <= x + hitArea.width;
+        xStart = clientX >= x - offset;
+        xEnd = clientX <= x + hitArea.width - offset;
       }
 
       return xStart && xEnd && yStart && yEnd;

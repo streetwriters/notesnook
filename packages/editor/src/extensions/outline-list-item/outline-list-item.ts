@@ -24,7 +24,6 @@ import {
 } from "@tiptap/core";
 import {
   findParentNodeOfTypeClosestToPos,
-  isClickWithinBounds,
   ensureLeadingParagraph
 } from "../../utils/prosemirror.js";
 import { OutlineList } from "../outline-list/outline-list.js";
@@ -147,14 +146,24 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
       function onClick(e: MouseEvent | TouchEvent) {
         if (e instanceof MouseEvent && e.button !== 0) return;
-        if (!(e.target instanceof HTMLElement)) return;
         if (!li.classList.contains("nested")) return;
 
         const pos = typeof getPos === "function" ? getPos() : 0;
         if (typeof pos !== "number") return;
 
-        const resolvedPos = editor.state.doc.resolve(pos);
-        if (isClickWithinBounds(e, resolvedPos, "left")) {
+        const point = e instanceof MouseEvent ? e : e.touches[0];
+        if (!point) return;
+
+        const rect = li.getBoundingClientRect();
+        const row = (li.firstElementChild ?? li).getBoundingClientRect();
+        const rtl = getComputedStyle(li).direction === "rtl";
+
+        const withinX = rtl
+          ? point.clientX >= rect.right && point.clientX <= rect.right + 40
+          : point.clientX >= rect.left - 40 && point.clientX <= rect.left;
+        const withinY = point.clientY >= row.top && point.clientY <= row.bottom;
+
+        if (withinX && withinY) {
           e.preventDefault();
           e.stopImmediatePropagation();
           editor.commands.command(({ tr }) => {
