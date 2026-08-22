@@ -62,6 +62,7 @@ export async function attachFile(uri, hash, type, filename, options) {
         /* empty */
       });
     DatabaseLogger.error(e, "Attach file error");
+    console.error("Attach file error", e);
 
     return false;
   }
@@ -69,7 +70,7 @@ export async function attachFile(uri, hash, type, filename, options) {
 
 async function createNotes(bundle) {
   const sessionId = bundle.note.sessionId;
-  const id = await db.notes.add(bundle.note);
+  const id = (await db.notes.add(bundle.note)) || bundle.note.id;
 
   if (!bundle.notebooks || !bundle.notebooks.length) {
     const defaultNotebook = db.settings?.getDefaultNotebook();
@@ -141,6 +142,7 @@ async function createNotes(bundle) {
       });
     }
   }
+  return id;
 }
 
 export const NoteBundle = {

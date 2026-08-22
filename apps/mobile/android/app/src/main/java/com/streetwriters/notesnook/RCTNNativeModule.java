@@ -449,4 +449,49 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         return colors[hash % colors.length];
     }
 
+    @ReactMethod
+    public void setPebbleIndexCaptureEnabled(boolean enabled) {
+        com.streetwriters.notesnook.pebble.PebbleIndexPrefs.setCaptureEnabled(
+                getReactApplicationContext(), enabled);
+    }
+
+    @ReactMethod
+    public void setPebbleIndexKeepAlive(boolean enabled) {
+        android.content.Context context = getReactApplicationContext();
+        com.streetwriters.notesnook.pebble.PebbleIndexPrefs.setKeepAlive(context, enabled);
+        if (enabled) {
+            com.streetwriters.notesnook.pebble.PebbleIndexKeepAliveService.start(context);
+        } else {
+            com.streetwriters.notesnook.pebble.PebbleIndexKeepAliveService.stop(context);
+        }
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public boolean isPebbleIndexKeepAliveRunning() {
+        return com.streetwriters.notesnook.pebble.PebbleIndexPrefs.keepAlive(
+                getReactApplicationContext());
+    }
+
+    @ReactMethod
+    public void ackPebbleIndexCapture(String id) {
+        if (id == null) return;
+        com.streetwriters.notesnook.pebble.PebbleIndexInbox.remove(
+                getReactApplicationContext(), id);
+    }
+
+    @ReactMethod
+    public void setPebbleIndexReminderPriority(String priority) {
+        com.streetwriters.notesnook.pebble.PebbleIndexPrefs.setReminderPriority(
+                getReactApplicationContext(), priority);
+    }
+
+    @ReactMethod
+    public void getPebbleIndexInbox(Promise promise) {
+        promise.resolve(
+                com.streetwriters.notesnook.pebble.PebbleIndexInbox
+                        .pendingAsJson(getReactApplicationContext())
+                        .toString()
+        );
+    }
+
 }
