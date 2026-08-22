@@ -43,7 +43,7 @@ hello
 `;
 
 exports[`convert HTML to markdown with codeblocks > html-to-md-codeblocks.md 1`] = `
-"Typescript is one of those languages that appear to be very simple. It's often described as "Javascript with types" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own "secrets", it's own set of quirks.
+"Typescript is one of those languages that appear to be very simple. It's often described as "Javascript with types" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript *is *a language and like all other languages it has it's own "secrets", it's own set of quirks.
 
 When I started out with Typescript a few years back, I absolutely hated it. It was unnecessary, a box of clutter, making me write code that would never actually run. I hated defining interfaces, typing out all my functions, and thinking in terms I was not used to as a Javascript developer. Before Javascript, I had coded in C# and I had never really liked C# (I still don't) mostly for the huge amounts of boilerplate and magic involved. Typescript is heavily inspired by C# and seeing that contaminate the Javascript ecosystem irked me no end.
 
@@ -161,11 +161,11 @@ But this post was supposed to be about the "Secrets" of Typescript Generics, rig
 `;
 
 exports[`convert HTML to markdown with leadingWhitespaces > html-to-md-leadingWhitespaces.md 1`] = `
-"two spaces
+"  two spaces
 
-four spaces  
-two spaces  
-four spaces
+    four spaces  
+  two spaces  
+    four spaces
 
 "
 `;
@@ -242,7 +242,7 @@ Features:
 exports[`convert HTML to markdown with tables2 > html-to-md-tables2.md 1`] = `
 "# Note 8/6/22, 10:48 AM
 
-hell
+  hell
 
 what
 

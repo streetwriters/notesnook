@@ -41,8 +41,9 @@ import {
   isNoteLink,
   parseInternalLink
 } from "../utils/internal-link.js";
-import { Element } from "domhandler";
+import { Element, type AnyNode } from "domhandler";
 import { render } from "dom-serializer";
+import { escape } from "entities";
 import { logger } from "../logger.js";
 
 export type ResolveHashes = (
@@ -73,6 +74,153 @@ const ATTRIBUTES = {
 const converter = new showdown.Converter();
 converter.setFlavor("original");
 
+// showdown.makeMarkdown collapses runs of whitespace in text nodes; it restores
+// this placeholder back to a space after conversion.
+const MARKDOWN_EXPORT_SPACE = "¨NBSP;";
+// Paragraph assembly trims leading/trailing Unicode whitespace, so leading indent
+// uses a private sentinel restored after makeMarkdown returns.
+const MARKDOWN_EXPORT_LEADING = "\uE000";
+
+const MARKDOWN_EXPORT_TAGS = new Set([
+  "a",
+  "audio",
+  "b",
+  "blockquote",
+  "br",
+  "code",
+  "dd",
+  "del",
+  "div",
+  "dl",
+  "dt",
+  "em",
+  "figcaption",
+  "figure",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "i",
+  "iframe",
+  "img",
+  "input",
+  "li",
+  "mark",
+  "math",
+  "mrow",
+  "mi",
+  "mo",
+  "mn",
+  "msup",
+  "msub",
+  "mfrac",
+  "msqrt",
+  "mtext",
+  "annotation",
+  "semantics",
+  "nn-search-result",
+  "ol",
+  "p",
+  "pre",
+  "s",
+  "source",
+  "span",
+  "strike",
+  "strong",
+  "sub",
+  "sup",
+  "table",
+  "tbody",
+  "td",
+  "th",
+  "thead",
+  "tr",
+  "u",
+  "ul",
+  "video"
+]);
+
+function decodeExportWhitespaceEntities(text: string) {
+  return text
+    .replace(/&nbsp;/gi, "\u00a0")
+    .replace(/&#160;/g, "\u00a0")
+    .replace(/&#x0*a0;/gi, "\u00a0");
+}
+
+function preserveMarkdownExportWhitespace(text: string) {
+  const decoded = decodeExportWhitespaceEntities(text);
+  const leading = decoded.match(/^[\u00a0 ]+/)?.[0] ?? "";
+  let body = decoded.slice(leading.length);
+  const prefix = leading
+    ? MARKDOWN_EXPORT_LEADING.repeat(leading.length)
+    : "";
+
+  const preservedBody = body
+    .replace(/[\u00a0 ]{2,}/g, (spaces) => {
+      return " " + MARKDOWN_EXPORT_SPACE.repeat(spaces.length - 1);
+    })
+    .replace(/\u00a0/g, " ");
+
+  return prefix + preservedBody;
+}
+
+function escapeUnknownHtmlTags(html: string) {
+  const preserved: string[] = [];
+  const masked = html.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, (block) => {
+    const index = preserved.push(block) - 1;
+    return `\u0000NNPRE${index}\u0000`;
+  });
+
+  const escaped = masked.replace(
+    /<\/?([a-zA-Z][\w-]*)(?:\s[^>]*?)?\/?>/g,
+    (match, tagName) => {
+      if (MARKDOWN_EXPORT_TAGS.has(tagName.toLowerCase())) return match;
+      return escape(match);
+    }
+  );
+
+  return escaped.replace(/\u0000NNPRE(\d+)\u0000/g, (_, index) => {
+    return preserved[Number(index)];
+  });
+}
+
+function prepareHtmlForMarkdownExport(html: string) {
+  const document = parseDocument(escapeUnknownHtmlTags(html), {
+    decodeEntities: false
+  });
+
+  walkNodes(document.children, (node, parents) => {
+    if (node.type !== "text" || !node.data) return;
+    if (parents.some((parent) => isTag(parent) && isPreformattedExportNode(parent))) {
+      return;
+    }
+    node.data = preserveMarkdownExportWhitespace(node.data);
+  });
+
+  return render(document, { encodeEntities: false });
+}
+
+function isPreformattedExportNode(node: Element) {
+  const name = node.name.toLowerCase();
+  return name === "pre" || name === "code";
+}
+
+function walkNodes(
+  nodes: AnyNode[],
+  visit: (node: AnyNode, parents: AnyNode[]) => void,
+  parents: AnyNode[] = []
+) {
+  for (const node of nodes) {
+    visit(node, parents);
+    if ("children" in node && node.children?.length) {
+      walkNodes(node.children, visit, [...parents, node]);
+    }
+  }
+}
+
 const splitter = /\W+/gm;
 export class Tiptap {
   constructor(private data: string) {}
@@ -86,7 +234,8 @@ export class Tiptap {
   }
 
   toMD() {
-    return converter.makeMarkdown(this.data);
+    const md = converter.makeMarkdown(prepareHtmlForMarkdownExport(this.data));
+    return md.replace(/\uE000/g, " ");
   }
 
   toHeadline() {
