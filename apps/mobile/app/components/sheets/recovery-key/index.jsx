@@ -40,7 +40,7 @@ import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import SheetWrapper from "../../ui/sheet";
 import { QRCode } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";

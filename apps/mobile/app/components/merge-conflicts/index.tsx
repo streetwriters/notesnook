@@ -56,7 +56,7 @@ import DialogContainer from "../dialog/dialog-container";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import Paragraph from "../ui/typography/paragraph";
 import { presentDialog } from "../dialog/functions";
 import { Cipher } from "@notesnook/crypto";

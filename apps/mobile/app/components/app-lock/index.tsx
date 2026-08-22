@@ -48,7 +48,7 @@ import { Toast } from "../toast";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
