@@ -42,3 +42,23 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
+
+/**
+ * Pin every Android module to the NDK this project declares above.
+ *
+ * Most native modules already honour rootProject's ndkVersion, but a module that has an
+ * externalNativeBuild and never sets ndkVersion on its android extension silently falls back to
+ * whatever NDK the Android Gradle Plugin defaults to. That default is a different version than the
+ * one we pin, so the build then demands an NDK nobody asked for and fails at configuration time
+ * with "[CXX1101] NDK at .../<version> did not have a source.properties file" if it isn't installed
+ * (or is a partial install). react-native-nitro-cloud-uploader is one such module.
+ *
+ * Setting it here keeps every module on a single NDK regardless of what each one declares.
+ */
+subprojects { subproject ->
+    ["com.android.application", "com.android.library"].each { pluginId ->
+        subproject.plugins.withId(pluginId) {
+            subproject.android.ndkVersion = rootProject.ext.ndkVersion
+        }
+    }
+}

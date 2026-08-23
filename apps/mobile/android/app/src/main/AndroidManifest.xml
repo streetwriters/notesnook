@@ -30,6 +30,23 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <!-- Desktop mode / external display support (Samsung DeX, Android freeform windows). -->
+    <uses-feature
+        android:name="android.software.freeform_window_management"
+        android:required="false" />
+    <!--
+      Google Play implicitly treats touchscreen as required. Declaring it optional keeps the app
+      available on, and usable with, mouse + keyboard in desktop mode. Do not add
+      <uses-configuration android:reqTouchScreen="finger"> or mark these required: per Samsung's
+      DeX guidance that disables mouse and keyboard support.
+    -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.faketouch"
+        android:required="false" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -66,8 +83,20 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:requestLegacyExternalStorage="true"
+        android:resizeableActivity="true"
         android:supportsRtl="true"
         android:theme="@style/BootTheme">
+
+        <!--
+          Keeps the process alive across the density change when entering/leaving Samsung DeX
+          instead of tearing it down. The two keys cover DeX < 3.0 and >= 3.0 respectively.
+        -->
+        <meta-data
+            android:name="com.samsung.android.keepalive.density"
+            android:value="true" />
+        <meta-data
+            android:name="com.samsung.android.multidisplay.keep_process_alive"
+            android:value="true" />
 
         <receiver
             android:name=".NoteWidget"
@@ -119,7 +148,7 @@
 
         <activity
             android:name=".NotePreviewConfigureActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:exported="true"
             android:label="NotePreviewConfigure"
             android:launchMode="singleTask"
@@ -132,7 +161,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
@@ -180,7 +209,7 @@
             android:exported="false" />
         <activity
             android:name=".ShareActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:configChanges="density|keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:excludeFromRecents="true"
             android:exported="true"
             android:label="@string/title_activity_share"
