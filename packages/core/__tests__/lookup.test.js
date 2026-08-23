@@ -133,8 +133,7 @@ test("search notes by relevance sorts best match first by default and with sortD
       content: { type: "tiptap", data: "<p>short exact title match</p>" }
     });
     const badId = await db.notes.add({
-      title:
-        "apple " + "filler word padding extra noise text here ".repeat(10),
+      title: "apple " + "filler word padding extra noise text here ".repeat(10),
       content: { type: "tiptap", data: "<p>diluted long title match</p>" }
     });
 
