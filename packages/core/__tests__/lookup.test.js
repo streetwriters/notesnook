@@ -126,6 +126,68 @@ test("search should return restored notes", () =>
     expect(filtered).toHaveLength(1);
   }));
 
+test("search notes by relevance sorts best match first by default and with sortDirection desc, worst match first with sortDirection asc", () =>
+  databaseTest().then(async (db) => {
+    const goodId = await db.notes.add({
+      title: "apple",
+      content: { type: "tiptap", data: "<p>short exact title match</p>" }
+    });
+    const badId = await db.notes.add({
+      title:
+        "apple " + "filler word padding extra noise text here ".repeat(10),
+      content: { type: "tiptap", data: "<p>diluted long title match</p>" }
+    });
+
+    const byDefault = await db.lookup
+      .notesWithHighlighting("apple", db.notes.all)
+      .then((r) => r.ids());
+    expect(byDefault).toEqual([goodId, badId]);
+
+    const desc = await db.lookup
+      .notesWithHighlighting("apple", db.notes.all, {
+        sortBy: "relevance",
+        sortDirection: "desc"
+      })
+      .then((r) => r.ids());
+    expect(desc).toEqual([goodId, badId]);
+
+    const asc = await db.lookup
+      .notesWithHighlighting("apple", db.notes.all, {
+        sortBy: "relevance",
+        sortDirection: "asc"
+      })
+      .then((r) => r.ids());
+    expect(asc).toEqual([badId, goodId]);
+  }));
+
+test("search trash by relevance sorts best match first by default and with sortDirection desc, worst match first with sortDirection asc", () =>
+  databaseTest().then(async (db) => {
+    const goodId = await db.notes.add({ title: "meeting notes" });
+    await db.notes.moveToTrash(goodId);
+    const badId = await db.notes.add({
+      title: "meeting notes " + "xxxxxxxxxx ".repeat(10)
+    });
+    await db.notes.moveToTrash(badId);
+
+    const byDefault = await db.lookup
+      .trash("meeting notes")
+      .items()
+      .then((items) => items.map((i) => i.id));
+    expect(byDefault).toEqual([goodId, badId]);
+
+    const desc = await db.lookup
+      .trash("meeting notes")
+      .items(undefined, { sortBy: "relevance", sortDirection: "desc" })
+      .then((items) => items.map((i) => i.id));
+    expect(desc).toEqual([goodId, badId]);
+
+    const asc = await db.lookup
+      .trash("meeting notes")
+      .items(undefined, { sortBy: "relevance", sortDirection: "asc" })
+      .then((items) => items.map((i) => i.id));
+    expect(asc).toEqual([badId, goodId]);
+  }));
+
 test("search reminders", () =>
   databaseTest().then(async (db) => {
     await db.reminders.add({
