@@ -280,7 +280,13 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           >
             {files.map((file, index) => (
               <Flex
-                key={file.name}
+                key={
+                  file.name +
+                  file.size +
+                  file.lastModified +
+                  file.webkitRelativePath +
+                  index
+                }
                 sx={{
                   p: 2,
                   bg: index % 2 ? "transparent" : "background-secondary",

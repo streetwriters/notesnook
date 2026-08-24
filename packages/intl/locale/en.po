@@ -2810,8 +2810,8 @@ msgid "Enter password"
 msgstr "Enter password"
 
 #: src/strings.ts:2812
-msgid "Enter password for {filename}"
-msgstr "Enter password for {filename}"
+msgid "Enter password for \"{filename}\""
+msgstr "Enter password for \"{filename}\""
 
 #: src/strings.ts:2100
 msgid "Enter pin or password to enable app lock."

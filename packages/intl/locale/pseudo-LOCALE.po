@@ -2799,7 +2799,7 @@ msgid "Enter password"
 msgstr ""
 
 #: src/strings.ts:2812
-msgid "Enter password for {filename}"
+msgid "Enter password for \"{filename}\""
 msgstr ""
 
 #: src/strings.ts:2100

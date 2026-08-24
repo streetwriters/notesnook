@@ -2809,6 +2809,6 @@ Continue without attachments?`,
   alignment: () => t`Alignment`,
   browserStorageQuotaReached: () =>
     t`Browser storage quota reached. Please delete some attachments from the attachment manager or clear some local data to free up space.`,
-  passwordFor: (filename: string) => t`Enter password for ${filename}`,
+  passwordFor: (filename: string) => t`Enter password for "${filename}"`,
   selectFolder: () => t`Select folder`
 };
