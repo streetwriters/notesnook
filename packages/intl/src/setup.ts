@@ -20,7 +20,7 @@ import { I18n, i18n as i18nn } from "@lingui/core";
 
 let i18nGlobal: I18n | undefined = undefined;
 
-export const setI18nGlobal = (i18n: I18n) => {
+export const setI18nGlobal = (i18n: any) => {
   i18nGlobal = i18n;
 };
 
