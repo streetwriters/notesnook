@@ -139,6 +139,7 @@ export function useEditorController({
     wordCounter: null,
     scroll: null
   });
+  const hasRestored = useRef(false);
 
   if (!tabRef.current.session?.noteId && loading) {
     setTimeout(() => {
@@ -300,6 +301,7 @@ export function useEditorController({
 
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      if (!hasRestored.current) return;
       const value = _event.currentTarget.scrollTop;
       if (timers.current.scroll !== null) clearTimeout(timers.current.scroll);
       timers.current.scroll = setTimeout(() => {
@@ -367,6 +369,7 @@ export function useEditorController({
             }
 
             scrollTo?.(value.scrollTop || 0);
+            hasRestored.current = true;
             setLoading(false);
             countWords(0);
           }
@@ -382,6 +385,7 @@ export function useEditorController({
           logger("info", "LOADING NOTE HTML");
           if (!editor) break;
           update(value.scrollTop, value.selection, value.searchResultIndex);
+          hasRestored.current = true;
           setTimeout(() => {
             countWords(0);
           }, 300);
