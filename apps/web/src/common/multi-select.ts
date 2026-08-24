@@ -214,7 +214,7 @@ async function deleteItemsFromTrash(ids: string[]) {
 
   await TaskManager.startTask({
     type: "status",
-    id: "restoreItems",
+    id: "deleteItems",
     title: strings.inProgressActions.permanentlyDeleting.item(ids.length),
     action: async (report) => {
       report({
