@@ -56,6 +56,7 @@ export function FontSize(props: ToolProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isClickingOnPopup = useRef(false);
   const isMobile = useIsMobile();
   const { open, close } = usePopupManager({
     id: "fontSizeItems",
@@ -76,6 +77,7 @@ export function FontSize(props: ToolProps) {
       FONT_SIZE_BOUNDS.MAX,
       Math.max(FONT_SIZE_BOUNDS.MIN, parsedValue)
     );
+    inputRef.current.value = String(clamped);
     editor.chain().focus().setFontSize(`${clamped}px`).run();
   }, [editor, currentSize]);
 
@@ -101,6 +103,25 @@ export function FontSize(props: ToolProps) {
     document.addEventListener("mousedown", handleMouseDown);
     return () => document.removeEventListener("mousedown", handleMouseDown);
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    function handlePointerDown(e: PointerEvent) {
+      if ((e.target as HTMLElement)?.closest?.(".popup-presenter")) {
+        isClickingOnPopup.current = true;
+      }
+    }
+    function handlePointerUp() {
+      setTimeout(() => {
+        isClickingOnPopup.current = false;
+      }, 0);
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, []);
 
   useEffect(() => {
     if (isMobile) {
@@ -164,12 +185,12 @@ export function FontSize(props: ToolProps) {
             disabled
               ? undefined
               : (e) => {
-                  e.stopPropagation();
-                  const current =
-                    parseInt(inputRef.current?.value ?? "") || currentSize;
-                  const newSize = Math.max(FONT_SIZE_BOUNDS.MIN, current - 1);
-                  editor.chain().focus().setFontSize(`${newSize}px`).run();
-                }
+                e.stopPropagation();
+                const current =
+                  parseInt(inputRef.current?.value ?? "") || currentSize;
+                const newSize = Math.max(FONT_SIZE_BOUNDS.MIN, current - 1);
+                editor.chain().focus().setFontSize(`${newSize}px`).run();
+              }
           }
         />
 
@@ -224,8 +245,24 @@ export function FontSize(props: ToolProps) {
               return;
             }
 
-            if (inputRef.current) inputRef.current.value = String(currentSize);
+            if (isClickingOnPopup.current) {
+              setIsMenuOpen(false);
+              return;
+            }
+
+            applyInputValue();
             setIsMenuOpen(false);
+          }}
+          onChange={(e) => {
+            const raw = e.target.value;
+            if (raw.trim() === "") return;
+            const val = Number(raw);
+            if (isNaN(val)) return;
+            if (val > FONT_SIZE_BOUNDS.MAX) {
+              e.target.value = String(FONT_SIZE_BOUNDS.MAX);
+            } else if (val < FONT_SIZE_BOUNDS.MIN && raw.length >= String(FONT_SIZE_BOUNDS.MIN).length) {
+              e.target.value = String(FONT_SIZE_BOUNDS.MIN);
+            }
           }}
         />
 
@@ -239,12 +276,12 @@ export function FontSize(props: ToolProps) {
             disabled
               ? undefined
               : (e) => {
-                  e.stopPropagation();
-                  const current =
-                    parseInt(inputRef.current?.value ?? "") || currentSize;
-                  const newSize = Math.min(FONT_SIZE_BOUNDS.MAX, current + 1);
-                  editor.chain().focus().setFontSize(`${newSize}px`).run();
-                }
+                e.stopPropagation();
+                const current =
+                  parseInt(inputRef.current?.value ?? "") || currentSize;
+                const newSize = Math.min(FONT_SIZE_BOUNDS.MAX, current + 1);
+                editor.chain().focus().setFontSize(`${newSize}px`).run();
+              }
           }
         />
       </Flex>
