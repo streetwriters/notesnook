@@ -33,7 +33,6 @@ import {
   setGroupOptionsById
 } from "../../../hooks/use-group-options";
 import { eSendEvent } from "../../../services/event-manager";
-import Navigation from "../../../services/navigation";
 import { RouteName } from "../../../stores/use-navigation-store";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useTagStore } from "../../../stores/use-tag-store";
@@ -46,6 +45,7 @@ import { Button } from "../../ui/button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import Navigation from "../../../services/navigation";
 const Sort = ({
   dataType,
   screen,
@@ -87,8 +87,7 @@ const Sort = ({
   };
 
   const updateGroupOptions = async (_groupOptions: GroupOptions) => {
-    console.log(groupId, type);
-    setGroupOptionsById(groupType, _groupOptions, groupId, type);
+    await setGroupOptionsById(groupType, _groupOptions, groupId, type);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       if (screen) Navigation.queueRoutesForUpdate(screen);
