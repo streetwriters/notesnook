@@ -83,6 +83,7 @@ import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
 import { Virtualization } from "./extensions/virtualization/index.js";
+import { EditorProfiler } from "./extensions/profiler/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
@@ -276,6 +277,7 @@ const useTiptap = (
         }),
         BlockId,
         Virtualization.configure({ enabled: !!virtualization }),
+        EditorProfiler,
         Blockquote,
         CharacterCount,
         Underline,
@@ -462,6 +464,7 @@ export * from "./types.js";
 export * from "./utils/word-counter.js";
 export * from "./utils/font.js";
 export * from "./utils/toc.js";
+export * from "./utils/profiler.js";
 export * from "./utils/downloader.js";
 export {
   useTiptap,
