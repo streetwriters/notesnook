@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Node } from "@tiptap/core";
+import { Node, mergeAttributes } from "@tiptap/core";
 
 export const PAGE_NODE = "page";
 
@@ -33,7 +33,11 @@ export const Page = Node.create({
   group: "page",
   selectable: false,
 
-  renderHTML() {
-    return ["div", { "data-page": "true" }, 0];
+  // The block id must survive onto the element: the viewport plugin tracks
+  // pages by `data-block-id`, and a page that renders without one is invisible
+  // to it -- it materializes, disappears from the window, and dematerializes
+  // again on the next frame.
+  renderHTML({ HTMLAttributes }) {
+    return ["div", mergeAttributes(HTMLAttributes, { "data-page": "true" }), 0];
   }
 });

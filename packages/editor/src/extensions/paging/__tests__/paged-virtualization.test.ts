@@ -116,6 +116,29 @@ describe("paged virtualization", () => {
     editor.destroy();
   });
 
+  test("a materialized page still carries its block id", async () => {
+    const editor = createEditor();
+    await created();
+
+    const first = editor.view.dom.children[0] as HTMLElement;
+    expect(first.hasAttribute("data-virtual-placeholder")).toBe(false);
+    // Without this the viewport window loses sight of a page the moment it
+    // renders, and it flips between rendered and blank on every frame.
+    expect(first.getAttribute("data-block-id")).toBe(
+      editor.state.doc.child(0).attrs.blockId
+    );
+    editor.destroy();
+  });
+
+  test("placeholder and rendered pages are tracked the same way", async () => {
+    const editor = createEditor();
+    await created();
+
+    for (const element of Array.from(editor.view.dom.children))
+      expect(element.getAttribute("data-block-id")).toBeTruthy();
+    editor.destroy();
+  });
+
   test("the page holding the caret is never a placeholder", async () => {
     const editor = createEditor();
     await created();
