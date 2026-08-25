@@ -208,6 +208,12 @@ function TipTap(props: TipTapProps) {
   } = props;
 
   const autoSave = useRef(true);
+
+  useEffect(() => {
+    profiler.count("editor.mounts");
+    profiler.event("editor.mount", { id });
+    return () => profiler.count("editor.unmounts");
+  }, []);
   const { toolbarConfig } = useToolbarConfig();
   const features = useAreFeaturesAvailable([
     "callout",

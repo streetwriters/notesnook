@@ -950,6 +950,16 @@ function isFile(e: DragEvent) {
   );
 }
 
+/** The editor is not always registered yet when a note first loads. */
+function retryScrollAnchor(sessionId: string, anchor: ScrollAnchor, tries = 5) {
+  if (tries <= 0) return;
+  requestAnimationFrame(() => {
+    const editor = useEditorManager.getState().getEditor(sessionId)?.editor;
+    if (editor?.restoreScrollAnchor(anchor)) return;
+    retryScrollAnchor(sessionId, anchor, tries - 1);
+  });
+}
+
 function restoreScrollPosition(session: EditorSession, editor?: IEditor) {
   if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
 
@@ -957,11 +967,20 @@ function restoreScrollPosition(session: EditorSession, editor?: IEditor) {
   // against a fully rendered document, and a paged one only knows estimated
   // heights until it renders. The editor reveals the page holding the block
   // before scrolling, so the position it lands on is the real one.
+  //
+  // Once there is an anchor the pixel path must not run at all, not even as a
+  // fallback: it scrolls to an offset that means something else now, and its
+  // ResizeObserver fires again every time a page renders and changes the
+  // document's height.
   const anchor = Config.get<ScrollAnchor | null>(
     `${session.id}:scroll-anchor`,
     null
   );
-  if (anchor && editor?.restoreScrollAnchor(anchor)) return;
+  if (anchor) {
+    if (editor?.restoreScrollAnchor(anchor)) return;
+    retryScrollAnchor(session.id, anchor);
+    return;
+  }
 
   const scrollContainer = document.getElementById(`editorScroll_${session.id}`);
   const scrollPosition = Config.get(`${session.id}:scroll-position`, 0);

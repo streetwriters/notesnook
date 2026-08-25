@@ -57,7 +57,8 @@ export const useEditor = (
       // The Editor constructor already rendered a view into the same element,
       // so replacing it on the first run means rendering the whole document
       // twice. Only later runs (changed options) need a fresh view.
-      if (isFirstRun.current) {
+      const firstRun = isFirstRun.current;
+      if (firstRun) {
         isFirstRun.current = false;
       } else {
         profiler.time("editor.destroyView", () => destroyView(editor.view));
@@ -70,7 +71,9 @@ export const useEditor = (
         });
       }
       if (oldIsFocused && !editor.isFocused) editor.commands.focus();
-      options.onCreate?.({ editor: editor });
+      // The Editor constructor emits `create` for the view it made, so calling
+      // the option here as well would run every consumer twice on load.
+      if (!firstRun) options.onCreate?.({ editor: editor });
 
       const { searchTerm, ...searchOptions } = useEditorSearchStore.getState();
       if (!searchOptions.isSearching) {
