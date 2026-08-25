@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
+import { profiler } from "./profiler.js";
 
 export type TOCItem = {
   level: number;
@@ -57,6 +58,7 @@ export function getTableOfContents(
   doc: ProsemirrorNode,
   content: HTMLElement
 ): TOCItem[] {
+  const end = profiler.start("toc.build");
   const tableOfContents: TOCItem[] = [];
   let level = -1;
   let prevHeading = 0;
@@ -91,6 +93,9 @@ export function getTableOfContents(
     });
   });
 
+  end();
+  profiler.count("toc.builds");
+  profiler.gauge("toc.headings", tableOfContents.length);
   return tableOfContents;
 }
 

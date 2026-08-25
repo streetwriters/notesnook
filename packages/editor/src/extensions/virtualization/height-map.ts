@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
+import { profiler } from "../../utils/profiler.js";
 
 const DEFAULT_ESTIMATES: Record<string, number> = {
   paragraph: 24,
@@ -49,8 +50,10 @@ export class HeightMap {
   heightFor(node: ProsemirrorNode): number {
     const blockId = node.attrs.blockId as string | undefined;
     if (blockId && this.measured.has(blockId)) {
+      profiler.count("virtualization.heightMap.hit");
       return this.measured.get(blockId) as number;
     }
+    profiler.count("virtualization.heightMap.miss");
     return this.estimate(node);
   }
 
@@ -58,6 +61,7 @@ export class HeightMap {
     const blockId = node.attrs.blockId as string | undefined;
     if (!blockId || !Number.isFinite(height) || height <= 0) return;
     this.measured.set(blockId, Math.round(height));
+    profiler.gauge("virtualization.heightMap.size", this.measured.size);
   }
 
   toJSON(): Record<string, number> {
