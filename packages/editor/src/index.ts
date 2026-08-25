@@ -282,7 +282,10 @@ const useTiptap = (
         BlockId,
         PagedDocument,
         Page,
-        Virtualization.configure({ enabled: mode === "blocks" }),
+        Virtualization.configure({
+          enabled: mode !== "off",
+          unit: mode === "pages" ? "pages" : "blocks"
+        }),
         Paging.configure({ enabled: mode === "pages" }),
         EditorProfiler,
         Blockquote,

@@ -21,7 +21,7 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
-import { TOP_LEVEL_BLOCK_TYPES } from "./node-views.js";
+import { VirtualizationUnit, unitTypes } from "./node-views.js";
 
 export const virtualizationKey = new PluginKey<VirtualizationState>(
   "notesnook-virtualization"
@@ -42,9 +42,7 @@ const KEEP_OVERSCAN = 1.5;
 const MATERIALIZE_ATTRS = {};
 const MATERIALIZE_SPEC = { materialize: true };
 
-function isPageable(typeName: string): boolean {
-  return TOP_LEVEL_BLOCK_TYPES.includes(typeName);
-}
+type IsPageable = (typeName: string) => boolean;
 
 function findScrollParent(node: HTMLElement): HTMLElement | null {
   let current: HTMLElement | null = node.parentElement;
@@ -107,7 +105,8 @@ function materializeDecoration(from: number, to: number): Decoration {
 function buildDecorations(
   doc: ProsemirrorNode,
   visible: Set<string>,
-  selectionIndex: number
+  selectionIndex: number,
+  isPageable: IsPageable
 ): DecorationSet {
   const end = profiler.start("virtualization.decorations");
   const decorations: Decoration[] = [];
@@ -185,7 +184,8 @@ function hasMaterializeDecoration(
  */
 function repairSelection(
   set: DecorationSet,
-  state: EditorState
+  state: EditorState,
+  isPageable: IsPageable
 ): DecorationSet {
   const missing: Decoration[] = [];
   for (const range of selectionRanges(state)) {
@@ -199,7 +199,12 @@ function repairSelection(
   return set.add(state.doc, missing);
 }
 
-export function virtualizationPlugin(): Plugin<VirtualizationState> {
+export function virtualizationPlugin(
+  unit: VirtualizationUnit = "blocks"
+): Plugin<VirtualizationState> {
+  const types = unitTypes(unit);
+  const isPageable: IsPageable = (typeName) => types.includes(typeName);
+
   return new Plugin<VirtualizationState>({
     key: virtualizationKey,
     state: {
@@ -212,7 +217,8 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
           decorations: buildDecorations(
             state.doc,
             EMPTY_VISIBLE,
-            selectionIndex
+            selectionIndex,
+            isPageable
           )
         };
       },
@@ -237,7 +243,12 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
             visible,
             selectionIndex,
             blockCount,
-            decorations: buildDecorations(tr.doc, visible, selectionIndex)
+            decorations: buildDecorations(
+              tr.doc,
+              visible,
+              selectionIndex,
+              isPageable
+            )
           };
         }
 
@@ -247,7 +258,8 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         const end = profiler.start("virtualization.decorationMap");
         const mapped = repairSelection(
           value.decorations.map(tr.mapping, tr.doc),
-          newState
+          newState,
+          isPageable
         );
         end();
         profiler.count("virtualization.decorationMaps");

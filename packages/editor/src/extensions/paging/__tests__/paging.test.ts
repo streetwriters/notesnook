@@ -23,6 +23,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Node } from "@tiptap/core";
 import { Page, Paging, countPages, flattenBlocks } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
+import { getTableOfContents } from "../../../utils/toc.js";
 
 const PagedDocument = Node.create({
   name: "doc",
@@ -136,6 +137,43 @@ describe("paging", () => {
     expect(countPages(editor.state.doc)).toBe(3);
     expect(updates).toBe(0);
     expect(editor.can().undo()).toBe(false);
+    editor.destroy();
+  });
+
+  test("headings inside pages still reach the table of contents", async () => {
+    let content = "";
+    for (let i = 0; i < BLOCKS; i++)
+      content += `<h1 data-block-id="h${i}">Heading ${i}</h1>`;
+    const editor = createEditor(content);
+    await created();
+
+    expect(countPages(editor.state.doc)).toBe(3);
+    const toc = getTableOfContents(
+      editor.state.doc,
+      editor.view.dom as HTMLElement
+    );
+    expect(toc).toHaveLength(BLOCKS);
+    expect(toc[0].title).toBe("Heading 0");
+    editor.destroy();
+  });
+
+  test("blocks inside pages keep getting block ids", async () => {
+    let content = "";
+    for (let i = 0; i < BLOCKS; i++) content += `<p>Paragraph ${i}.</p>`;
+    const editor = createEditor(content);
+    await created();
+
+    editor.commands.setTextSelection(3);
+    editor.commands.insertContent("x");
+    await created();
+
+    const page = editor.state.doc.child(0);
+    let withIds = 0;
+    page.forEach((node) => {
+      if (node.attrs.blockId) withIds++;
+    });
+    expect(withIds).toBe(page.childCount);
+    expect(editor.state.doc.child(0).attrs.blockId).toBeTruthy();
     editor.destroy();
   });
 

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor, Extension } from "@tiptap/core";
 import { HeightMap } from "./height-map.js";
-import { withVirtualization } from "./node-views.js";
+import { VirtualizationUnit, withVirtualization } from "./node-views.js";
 import { virtualizationPlugin } from "./viewport-plugin.js";
 
 /** Paging only engages for notes larger than this many top-level blocks. */
@@ -28,11 +28,13 @@ const DEFAULT_THRESHOLD_BLOCKS = 300;
 export type VirtualizationOptions = {
   enabled: boolean;
   thresholdBlocks: number;
+  unit: VirtualizationUnit;
 };
 
 export type VirtualizationStorage = {
   enabled: boolean;
   thresholdBlocks: number;
+  unit: VirtualizationUnit;
   heightMap: HeightMap;
 };
 
@@ -49,13 +51,18 @@ export const Virtualization = Extension.create<VirtualizationOptions>({
   name: "virtualization",
 
   addOptions() {
-    return { enabled: false, thresholdBlocks: DEFAULT_THRESHOLD_BLOCKS };
+    return {
+      enabled: false,
+      thresholdBlocks: DEFAULT_THRESHOLD_BLOCKS,
+      unit: "blocks"
+    };
   },
 
   addStorage(): VirtualizationStorage {
     return {
       enabled: this.options.enabled,
       thresholdBlocks: this.options.thresholdBlocks,
+      unit: this.options.unit,
       heightMap: new HeightMap()
     };
   },
@@ -70,7 +77,7 @@ export const Virtualization = Extension.create<VirtualizationOptions>({
 
   addProseMirrorPlugins() {
     if (!this.options.enabled) return [];
-    return [virtualizationPlugin()];
+    return [virtualizationPlugin(this.options.unit)];
   }
 });
 
@@ -94,10 +101,7 @@ export function installVirtualization(editor: Editor): void {
     | undefined;
   if (!storage?.enabled) return;
 
-  const manager = editor.extensionManager as unknown as Record<
-    string,
-    unknown
-  >;
+  const manager = editor.extensionManager as unknown as Record<string, unknown>;
   if (Object.prototype.hasOwnProperty.call(manager, "nodeViews")) return;
 
   const proto = Object.getPrototypeOf(editor.extensionManager);
@@ -111,7 +115,8 @@ export function installVirtualization(editor: Editor): void {
       return withVirtualization(
         originalGetter.call(this),
         storage.heightMap,
-        storage.thresholdBlocks
+        storage.thresholdBlocks,
+        storage.unit
       );
     }
   });

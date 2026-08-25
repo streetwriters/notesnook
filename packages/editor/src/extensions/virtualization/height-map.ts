@@ -44,6 +44,11 @@ export class HeightMap {
   private measured = new Map<string, number>();
 
   estimate(node: ProsemirrorNode): number {
+    if (node.type.name === "page") {
+      let total = 0;
+      node.forEach((child) => (total += this.heightFor(child)));
+      return total || FALLBACK_ESTIMATE;
+    }
     return DEFAULT_ESTIMATES[node.type.name] ?? FALLBACK_ESTIMATE;
   }
 

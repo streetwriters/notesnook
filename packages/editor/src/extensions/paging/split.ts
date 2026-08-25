@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Fragment, Node as ProsemirrorNode, Schema } from "@tiptap/pm/model";
+import { nanoid } from "nanoid";
 import { PAGE_NODE } from "./page.js";
 
 /** Blocks are grouped into pages of this size when a note is opened. */
@@ -43,9 +44,18 @@ export function toPages(
   const blocks = flattenBlocks(doc);
   if (!blocks.length) return doc.content;
 
+  // Pages are identified at creation rather than by the block id plugin: the
+  // viewport plugin needs an id the moment a page exists, and one assigned a
+  // transaction later would leave every page permanently materialized.
+  const identify = "blockId" in (pageType.spec.attrs ?? {});
   const pages: ProsemirrorNode[] = [];
   for (let i = 0; i < blocks.length; i += pageSize)
-    pages.push(pageType.create(null, blocks.slice(i, i + pageSize)));
+    pages.push(
+      pageType.create(
+        identify ? { blockId: nanoid(8) } : null,
+        blocks.slice(i, i + pageSize)
+      )
+    );
 
   return Fragment.fromArray(pages);
 }

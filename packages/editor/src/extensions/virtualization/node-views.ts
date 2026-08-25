@@ -28,6 +28,15 @@ import {
 import { profiler } from "../../utils/profiler.js";
 import { HeightMap } from "./height-map.js";
 
+export type VirtualizationUnit = "blocks" | "pages";
+
+/** A page is virtualized exactly like a block; it is just a much taller one. */
+export const PAGE_TYPES = ["page"];
+
+export function unitTypes(unit: VirtualizationUnit): string[] {
+  return unit === "pages" ? PAGE_TYPES : TOP_LEVEL_BLOCK_TYPES;
+}
+
 export const TOP_LEVEL_BLOCK_TYPES = [
   "paragraph",
   "heading",
@@ -212,17 +221,21 @@ function wrapCustom(
 export function withVirtualization(
   nodeViews: Record<string, NodeViewConstructor>,
   heightMap: HeightMap,
-  thresholdBlocks: number
+  thresholdBlocks: number,
+  unit: VirtualizationUnit = "blocks"
 ): Record<string, NodeViewConstructor> {
   const wrapped: Record<string, NodeViewConstructor> = { ...nodeViews };
 
-  for (const type of TOP_LEVEL_BLOCK_TYPES) {
+  for (const type of unitTypes(unit)) {
     const inner = nodeViews[type];
     wrapped[type] = (node, view, getPos, decorations, innerDecorations) => {
       const topLevel = isTopLevel(view, getPos as () => number | undefined);
       const materialize = isMaterialized(decorations);
 
-      const belowThreshold = view.state.doc.childCount <= thresholdBlocks;
+      // Pages only exist once a note is past the threshold, so their presence
+      // is the gate; blocks are counted directly.
+      const belowThreshold =
+        unit === "pages" ? false : view.state.doc.childCount <= thresholdBlocks;
 
       if (!topLevel || belowThreshold) {
         profiler.count("virtualization.nodeView.unvirtualized");
