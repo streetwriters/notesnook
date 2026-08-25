@@ -39,7 +39,7 @@ import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
 
-const pro = {
+const getProItem = () => ({
   title: strings.upgradePlan(),
   icon: "crown",
   id: "pro",
@@ -48,9 +48,10 @@ const pro = {
       context: "logged-in"
     });
   }
-};
+});
 
 export function SideMenuHome() {
+  const pro = getProItem();
   const { colors } = useThemeColors();
   const [isAppLoading, introCompleted] = useSettingStore((state) => [
     state.isAppLoading,

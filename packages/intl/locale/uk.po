@@ -664,6 +664,10 @@ msgstr "Тариф на 5 років (одноразова покупка)"
 msgid "6 digit code"
 msgstr "6-значний код"
 
+#: src/strings.ts:2847
+msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
+msgstr "Блокнот може мати необмежену кількість підблокнотів із необмеженою кількістю нотаток."
+
 #: src/strings.ts:1433
 msgid "A notebook can have unlimited topics with unlimited notes."
 msgstr "Блокнот може містити необмежену кількість тем із необмеженою кількістю нотаток."
@@ -800,6 +804,10 @@ msgstr "Додатково"
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
 msgstr "Після сканування QR-коду застосунок покаже код, який можна ввести нижче."
 
+#: src/strings.ts:2292
+msgid "Align center"
+msgstr ""
+
 #: src/strings.ts:2322
 msgid "Align left"
 msgstr "За лівим краєм"
@@ -808,7 +816,7 @@ msgstr "За лівим краєм"
 msgid "Align right"
 msgstr "За правим краєм"
 
-#: src/strings.ts:2292
+#: src/strings.ts:2813
 msgid "Alignment"
 msgstr "Вирівнювання"
 
@@ -980,6 +988,7 @@ msgid "Archive"
 msgstr "Архівувати"
 
 #: src/strings.ts:1447
+#: src/strings.ts:2861
 msgid "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties."
 msgstr "Багато прокручуєте, щоб знайти певну нотатку? Закріпіть її вгорі у властивостях нотатки."
 
@@ -1419,7 +1428,6 @@ msgid "Cell border color"
 msgstr "Колір межі клітинки"
 
 #: src/strings.ts:2318
-#: src/strings.ts:2319
 msgid "Cell border width"
 msgstr "Товщина межі клітинки"
 
@@ -1697,7 +1705,17 @@ msgid ""
 "\n"
 "**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
 msgstr ""
-"Очищення кешу вкладень виконає такі дії:\n"
+"Clearing attachments cache will perform the following actions:\n"
+"\n"
+"- Downloaded images & files: **cleared**\n"
+"- Pending uploads: **cleared**\n"
+"- Uploaded images & files: _unaffected_\n"
+"\n"
+"All attachments will be downloaded & cached again on access.\n"
+"\n"
+"---\n"
+"\n"
+"**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**Очищення кешу вкладень виконає такі дії:\n"
 "\n"
 "- Завантажені зображення та файли: **очищено**\n"
 "- Надсилання в очікуванні: **очищено**\n"
@@ -3271,7 +3289,13 @@ msgid ""
 "\n"
 "**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**"
 msgstr ""
-"Примусове надсилання:\n"
+"Force push:\n"
+"Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.\n"
+"\n"
+"Force pull:\n"
+"Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n"
+"\n"
+"**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**Примусове надсилання:\n"
 "Використовуйте, якщо зміни з цього пристрою не з'являються на інших. Дані на сервері буде перезаписано даними з цього пристрою.\n"
 "\n"
 "Примусове отримання:\n"
@@ -3495,6 +3519,10 @@ msgstr "Виділити"
 msgid "History"
 msgstr "Історія"
 
+#: src/strings.ts:2822
+msgid "Hold Ctrl/Cmd & click on multiple items to select them."
+msgstr "Утримуйте Ctrl/Cmd і натискайте на кілька елементів, щоб вибрати їх."
+
 #: src/strings.ts:1529
 msgid "Home"
 msgstr "Головна"
@@ -3592,7 +3620,8 @@ msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "            working,"
 msgstr ""
-"Якщо ви не отримали від нас листа або посилання підтвердження не\n"
+"If you didn't get an email from us or the confirmation link isn't\n"
+"            working,Якщо ви не отримали від нас листа або посилання підтвердження не\n"
 "            працює,"
 
 #: src/strings.ts:1806
@@ -4107,8 +4136,8 @@ msgid "Login to encrypt and sync notes"
 msgstr "Увійдіть, щоб шифрувати та синхронізувати нотатки"
 
 #: src/strings.ts:2625
-msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
-msgstr "Увійдіть, щоб надсилати вкладення. [Докладніше](https://help.notesnook.com/faqs/login-to-upload-attachments)"
+msgid "Login to upload attachments. [Read more](https://notesnook.com/help/faqs/login-to-upload-attachments)"
+msgstr ""
 
 #: src/strings.ts:542
 msgid "Login to your account"
@@ -4171,6 +4200,7 @@ msgid "Manage your sync settings here"
 msgstr "Керуйте тут налаштуваннями синхронізації"
 
 #: src/strings.ts:1442
+#: src/strings.ts:2856
 msgid "Mark important notes by adding them to favorites."
 msgstr "Позначайте важливі нотатки, додаючи їх до обраного."
 
@@ -4275,10 +4305,12 @@ msgid "Monographs"
 msgstr "Монографії"
 
 #: src/strings.ts:1424
+#: src/strings.ts:2832
 msgid "Monographs can be encrypted with a secret key and shared with anyone."
 msgstr "Монографії можна зашифрувати секретним ключем і поділитися ними з ким завгодно."
 
 #: src/strings.ts:1419
+#: src/strings.ts:2827
 msgid "Monographs enable you to share your notes in a secure and private way."
 msgstr "Монографії дають змогу ділитися нотатками безпечно та конфіденційно."
 
@@ -4553,6 +4585,7 @@ msgid "No updates available"
 msgstr "Оновлень немає"
 
 #: src/strings.ts:661
+#: src/strings.ts:2319
 msgid "None"
 msgstr "Немає"
 
@@ -4694,7 +4727,12 @@ msgid ""
 "\n"
 "This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings."
 msgstr ""
-"Notesnook використовує таких DNS-провайдерів:\n"
+"Notesnook uses the following DNS providers:\n"
+"\n"
+"1. Cloudflare DNS\n"
+"2. Quad9\n"
+"\n"
+"This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings.Notesnook використовує таких DNS-провайдерів:\n"
 "\n"
 "1. Cloudflare DNS\n"
 "2. Quad9\n"
@@ -4977,6 +5015,10 @@ msgstr "Закріплювати нотатки в панелі сповіщен
 #: src/strings.ts:930
 msgid "Pin notification"
 msgstr "Закріпити сповіщення"
+
+#: src/strings.ts:2866
+msgid "Pin your most important Notebooks to the top from Notebook properties."
+msgstr "Закріпіть найважливіші блокноти вгорі через властивості блокнота."
 
 #: src/strings.ts:523
 msgid "Pinned"
@@ -5382,6 +5424,10 @@ msgstr "Опубліковану нотатку зможе переглянут�
 #: src/strings.ts:271
 msgid "Published note link will be automatically deleted once it is viewed by someone."
 msgstr "Посилання на опубліковану нотатку буде автоматично видалено після першого перегляду."
+
+#: src/strings.ts:2837
+msgid "Published notes can be encrypted. Which means only you and the person you share the password with can read them."
+msgstr "Опубліковані нотатки можна зашифрувати. Це означає, що прочитати їх зможете лише ви та особа, з якою ви поділитеся паролем."
 
 #: src/strings.ts:2583
 msgid "Purchase"
@@ -6364,7 +6410,14 @@ msgid ""
 "\n"
 "To remove the proxy, simply erase everything in the input."
 msgstr ""
-"Налаштуйте проксі HTTP/HTTPS/SOCKS.\n"
+"Setup an HTTP/HTTPS/SOCKS proxy.\n"
+"\n"
+"For example:\n"
+"http://foobar:80\n"
+"socks4://proxy.example.com\n"
+"http://username:password@foobar:80\n"
+"\n"
+"To remove the proxy, simply erase everything in the input.Налаштуйте проксі HTTP/HTTPS/SOCKS.\n"
 "\n"
 "Наприклад:\n"
 "http://foobar:80\n"
@@ -6836,7 +6889,13 @@ msgid ""
 "- Steps to reproduce the issue\n"
 "- Things you have tried etc."
 msgstr ""
-"Розкажіть докладніше про проблему, з якою ви зіткнулися.\n"
+"Tell us more about the issue you are facing.\n"
+"\n"
+"For example:\n"
+"- What were you trying to do in the app?\n"
+"- What did you expect to happen?\n"
+"- Steps to reproduce the issue\n"
+"- Things you have tried etc.Розкажіть докладніше про проблему, з якою ви зіткнулися.\n"
 "\n"
 "Наприклад:\n"
 "- Що ви намагалися зробити в застосунку?\n"
@@ -7459,7 +7518,15 @@ msgid ""
 "$headline$: Use starting line of the note as title.\n"
 "$day$: Current day (eg. Monday)"
 msgstr ""
-"Використовуйте такі ключі для форматування заголовка:\n"
+"Use the following key to format the title:\n"
+"\n"
+"$date$: Current date.\n"
+"$time$: Current time.\n"
+"$timestamp$: Full date and time without any spaces or other symbols.\n"
+"(e.g 202305261253).\n"
+"$count$: Number of notes + 1.\n"
+"$headline$: Use starting line of the note as title.\n"
+"$day$: Current day (eg. Monday)Використовуйте такі ключі для форматування заголовка:\n"
 "\n"
 "$date$: поточна дата.\n"
 "$time$: поточний час.\n"
@@ -7490,8 +7557,8 @@ msgid "Using {instance} (v{version})"
 msgstr "Використовується {instance} (v{version})"
 
 #: src/strings.ts:2812
-msgid "Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
-msgstr "Використання Notesnook без облікового запису НЕ синхронізує ваші нотатки між пристроями й може призвести до втрати даних, якщо ви втратите доступ до пристрою або видалите застосунок. Регулярно створюйте резервні копії нотаток."
+msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
+msgstr ""
 
 #: src/strings.ts:2265
 msgid "Using official Notesnook instance"
@@ -7653,6 +7720,10 @@ msgstr "Ми запитуємо дані банківської картки, щ
 msgid "We send you occasional promotional offers & product updates on your email (once every month)."
 msgstr "Ми іноді надсилаємо вам рекламні пропозиції та новини про продукт електронною поштою (раз на місяць)."
 
+#: src/strings.ts:2871
+msgid "We value your feedback so join us on Discord and share your experiences and ideas."
+msgstr "Ми цінуємо ваші відгуки, тому приєднуйтесь до нас у Discord та діліться своїм досвідом і ідеями."
+
 #: src/strings.ts:1169
 msgid "We will send you occasional promotional offers & product updates on your email (sent once every month)."
 msgstr "Ми іноді надсилатимемо вам рекламні пропозиції та новини про продукт електронною поштою (раз на місяць)."
@@ -7710,6 +7781,10 @@ msgstr "Ласкаво просимо до Notesnook {plan}"
 msgid "Welcome to Notesnook Pro"
 msgstr "Ласкаво просимо до Notesnook Pro"
 
+#: src/strings.ts:2814
+msgid "What are monographs?"
+msgstr "Що таке монографії?"
+
 #: src/strings.ts:1394
 msgid "What do I do if I am not getting the email?"
 msgstr "Що робити, якщо лист не надходить?"
@@ -7741,6 +7816,10 @@ msgstr "Слова"
 #: src/strings.ts:2425
 msgid "Work & Office"
 msgstr "Робота й офіс"
+
+#: src/strings.ts:2818
+msgid "Wrap a query in double quotes to search for an exact match."
+msgstr "Візьміть запит у подвійні лапки для пошуку точного збігу."
 
 #: src/strings.ts:823
 msgid "Write notes with freedom, no spying, no tracking."
@@ -7803,6 +7882,10 @@ msgstr "Ви не увійшли в обліковий запис"
 msgid "You are renaming color {color}"
 msgstr "Ви перейменовуєте колір {color}"
 
+#: src/strings.ts:2876
+msgid "You can adjust how long items live in your trash from Settings -> Trash settings."
+msgstr "Ви можете налаштувати строк зберігання елементів у кошику в Налаштування -> Налаштування кошика."
+
 #: src/strings.ts:464
 msgid "You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select."
 msgstr "Ви також можете пов'язати нотатку з кількома блокнотами. Натисніть і утримуйте блокнот, щоб увімкнути множинний вибір."
@@ -7827,7 +7910,12 @@ msgstr "Ви можете імпортувати свої нотатки з бі
 msgid "You can multi-select notes and move them to a notebook at once"
 msgstr "Ви можете вибрати кілька нотаток і перемістити їх до блокнота за один раз"
 
+#: src/strings.ts:2852
+msgid "You can multi-select notes and move them to a notebook or a sub-notebook at once."
+msgstr "Ви можете вибрати кілька нотаток одночасно та перемістити їх до блокнота чи підблокнота."
+
 #: src/strings.ts:1429
+#: src/strings.ts:2842
 msgid "You can pin frequently used Notebooks to the Side Menu to quickly access them."
 msgstr "Ви можете закріпити часто використовувані блокноти в бічному меню для швидкого доступу."
 
@@ -7847,7 +7935,11 @@ msgid ""
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support."
 msgstr ""
-"Ви можете відстежувати свій звіт про помилку за адресою [{url}]({url}).\n"
+"You can track your bug report at [{url}]({url}).\n"
+"\n"
+"Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
+"\n"
+"If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.Ви можете відстежувати свій звіт про помилку за адресою [{url}]({url}).\n"
 "\n"
 "Зверніть увагу: ми відповімо на ваш звіт за посиланням вище. **Радимо зберегти це посилання на майбутнє.**\n"
 "\n"
@@ -7859,7 +7951,9 @@ msgid ""
 "\n"
 "Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**"
 msgstr ""
-"Ви можете відстежувати свій запит функції за адресою [{url}]({url}).\n"
+"You can track your feature request at [{url}]({url}).\n"
+"\n"
+"Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**Ви можете відстежувати свій запит функції за адресою [{url}]({url}).\n"
 "\n"
 "Зверніть увагу: ми відповімо на ваш запит за посиланням вище. **Радимо зберегти це посилання на майбутнє.**"
 
@@ -7929,13 +8023,10 @@ msgstr "Щоб змінити або скинути URL-адреси серве�
 
 #: src/strings.ts:2741
 msgid ""
-"You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
+"You need to login to restore attachments from a backup file. [Read more](https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).\n"
 "  \n"
 "Continue without attachments?"
 msgstr ""
-"Щоб відновити вкладення з файлу резервної копії, необхідно увійти в обліковий запис. [Докладніше](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
-"  \n"
-"Продовжити без вкладень?"
 
 #: src/strings.ts:836
 msgid "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source"

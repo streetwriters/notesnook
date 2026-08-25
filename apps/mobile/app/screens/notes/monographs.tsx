@@ -25,7 +25,7 @@ import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { openMonographsWebpage } from "./common";
 import { strings } from "@notesnook/intl";
 
-export const MONOGRAPH_PLACEHOLDER_DATA = {
+export const getMonographPlaceholderData = () => ({
   title: strings.yourMonographs(),
   paragraph: strings.monographsEmpty(),
   button: strings.learnMoreMonographs(),
@@ -33,7 +33,7 @@ export const MONOGRAPH_PLACEHOLDER_DATA = {
   loading: strings.loadingMonographs(),
   type: "monograph",
   buttonIcon: "information-outline"
-};
+});
 
 export const Monographs = ({
   navigation,
@@ -44,7 +44,7 @@ export const Monographs = ({
       navigation={navigation}
       route={route}
       get={Monographs.get}
-      placeholder={MONOGRAPH_PLACEHOLDER_DATA}
+      placeholder={getMonographPlaceholderData()}
       onPressFloatingButton={openMonographsWebpage}
       canGoBack={route.params?.canGoBack}
       focusControl={true}

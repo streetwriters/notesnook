@@ -37,22 +37,9 @@ import { bringToFront } from "./utils/bring-to-front";
 import { bridge } from "./api/bridge";
 import { setupDesktopIntegration } from "./utils/desktop-integration";
 import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
-import { Messages, setI18nGlobal } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
 import { PATHS } from "./constants";
 import { normalizePathString } from "./utils/resolve-path";
-
-const locale =
-  process.env.NODE_ENV === "development"
-    ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
-    : import("@notesnook/intl/locales/$en.json");
-locale.then(({ default: locale }) => {
-  i18n.load({
-    en: locale.messages as unknown as Messages
-  });
-  i18n.activate("en");
-});
-setI18nGlobal(i18n);
+import { initLocale } from "./utils/locale";
 
 const appHostnames = isDevelopment()
   ? ["localhost", "127.0.0.1"]
@@ -124,21 +111,21 @@ async function createWindow() {
     ...(config.desktopSettings.nativeTitlebar
       ? {}
       : {
-          titleBarStyle:
-            process.platform === "win32" || process.platform === "darwin"
-              ? "hidden"
-              : "default",
-          frame: process.platform === "win32" || process.platform === "darwin",
-          titleBarOverlay: {
-            height: 37,
-            color: "#00000000",
-            symbolColor: config.windowControlsIconColor
-          },
-          trafficLightPosition: {
-            x: 16,
-            y: 12
-          }
-        }),
+        titleBarStyle:
+          process.platform === "win32" || process.platform === "darwin"
+            ? "hidden"
+            : "default",
+        frame: process.platform === "win32" || process.platform === "darwin",
+        titleBarOverlay: {
+          height: 37,
+          color: "#00000000",
+          symbolColor: config.windowControlsIconColor
+        },
+        trafficLightPosition: {
+          x: 16,
+          y: 12
+        }
+      }),
 
     webPreferences: {
       zoomFactor: config.zoomFactor,
@@ -230,6 +217,8 @@ async function createWindow() {
 
 app.once("ready", async () => {
   console.info("App ready. Opening window.");
+
+  await initLocale();
 
   if (app.runningUnderARM64Translation) {
     console.log("App is running under ARM64 translation");

@@ -664,6 +664,10 @@ msgstr "Piano di 5 anni (acquisto singolo)"
 msgid "6 digit code"
 msgstr "Codice a 6 cifre"
 
+#: src/strings.ts:2847
+msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
+msgstr "Un taccuino può avere sotto-taccuini illimitati con note illimitate."
+
 #: src/strings.ts:1433
 msgid "A notebook can have unlimited topics with unlimited notes."
 msgstr "Un taccuino può contenere argomenti illimitati con note illimitate."
@@ -800,6 +804,10 @@ msgstr "Avanzate"
 msgid "After scanning the QR code image, the app will display a code that you can enter below."
 msgstr "Dopo aver scansionato il codice QR, l'app mostrerà un codice che potrai inserire qui sotto."
 
+#: src/strings.ts:2292
+msgid "Align center"
+msgstr ""
+
 #: src/strings.ts:2322
 msgid "Align left"
 msgstr "Allinea a sinistra"
@@ -808,7 +816,7 @@ msgstr "Allinea a sinistra"
 msgid "Align right"
 msgstr "Allinea a destra"
 
-#: src/strings.ts:2292
+#: src/strings.ts:2813
 msgid "Alignment"
 msgstr "Allineamento"
 
@@ -980,6 +988,7 @@ msgid "Archive"
 msgstr "Archivia"
 
 #: src/strings.ts:1447
+#: src/strings.ts:2861
 msgid "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties."
 msgstr "Scorri molto per trovare una nota specifica? Fissala in alto dalle proprietà della nota."
 
@@ -1419,7 +1428,6 @@ msgid "Cell border color"
 msgstr "Colore del bordo della cella"
 
 #: src/strings.ts:2318
-#: src/strings.ts:2319
 msgid "Cell border width"
 msgstr "Spessore del bordo della cella"
 
@@ -1697,7 +1705,17 @@ msgid ""
 "\n"
 "**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
 msgstr ""
-"Lo svuotamento della cache degli allegati eseguirà le seguenti azioni:\n"
+"Clearing attachments cache will perform the following actions:\n"
+"\n"
+"- Downloaded images & files: **cleared**\n"
+"- Pending uploads: **cleared**\n"
+"- Uploaded images & files: _unaffected_\n"
+"\n"
+"All attachments will be downloaded & cached again on access.\n"
+"\n"
+"---\n"
+"\n"
+"**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**Lo svuotamento della cache degli allegati eseguirà le seguenti azioni:\n"
 "\n"
 "- Immagini e file scaricati: **eliminati**\n"
 "- Caricamenti in sospeso: **eliminati**\n"
@@ -3271,7 +3289,13 @@ msgid ""
 "\n"
 "**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**"
 msgstr ""
-"Invio forzato:\n"
+"Force push:\n"
+"Use this if changes made on this device are not appearing on other devices. This will overwrite the data on the server with the data from this device.\n"
+"\n"
+"Force pull:\n"
+"Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n"
+"\n"
+"**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**Invio forzato:\n"
 "Usa questa opzione se le modifiche effettuate su questo dispositivo non compaiono sugli altri. I dati sul server verranno sovrascritti con quelli di questo dispositivo.\n"
 "\n"
 "Recupero forzato:\n"
@@ -3495,6 +3519,10 @@ msgstr "Evidenzia"
 msgid "History"
 msgstr "Cronologia"
 
+#: src/strings.ts:2822
+msgid "Hold Ctrl/Cmd & click on multiple items to select them."
+msgstr "Tieni premuto Ctrl/Cmd e fai clic su più elementi per selezionarli."
+
 #: src/strings.ts:1529
 msgid "Home"
 msgstr "Home"
@@ -3592,7 +3620,8 @@ msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "            working,"
 msgstr ""
-"Se non hai ricevuto un'email da noi o il link di conferma non\n"
+"If you didn't get an email from us or the confirmation link isn't\n"
+"            working,Se non hai ricevuto un'email da noi o il link di conferma non\n"
 "            funziona,"
 
 #: src/strings.ts:1806
@@ -4107,8 +4136,8 @@ msgid "Login to encrypt and sync notes"
 msgstr "Accedi per cifrare e sincronizzare le note"
 
 #: src/strings.ts:2625
-msgid "Login to upload attachments. [Read more](https://help.notesnook.com/faqs/login-to-upload-attachments)"
-msgstr "Accedi per caricare gli allegati. [Scopri di più](https://help.notesnook.com/faqs/login-to-upload-attachments)"
+msgid "Login to upload attachments. [Read more](https://notesnook.com/help/faqs/login-to-upload-attachments)"
+msgstr ""
 
 #: src/strings.ts:542
 msgid "Login to your account"
@@ -4171,6 +4200,7 @@ msgid "Manage your sync settings here"
 msgstr "Gestisci qui le impostazioni di sincronizzazione"
 
 #: src/strings.ts:1442
+#: src/strings.ts:2856
 msgid "Mark important notes by adding them to favorites."
 msgstr "Contrassegna le note importanti aggiungendole ai preferiti."
 
@@ -4275,10 +4305,12 @@ msgid "Monographs"
 msgstr "Monografie"
 
 #: src/strings.ts:1424
+#: src/strings.ts:2832
 msgid "Monographs can be encrypted with a secret key and shared with anyone."
 msgstr "Le monografie possono essere cifrate con una chiave segreta e condivise con chiunque."
 
 #: src/strings.ts:1419
+#: src/strings.ts:2827
 msgid "Monographs enable you to share your notes in a secure and private way."
 msgstr "Le monografie ti permettono di condividere le tue note in modo sicuro e privato."
 
@@ -4553,6 +4585,7 @@ msgid "No updates available"
 msgstr "Nessun aggiornamento disponibile"
 
 #: src/strings.ts:661
+#: src/strings.ts:2319
 msgid "None"
 msgstr "Nessuno"
 
@@ -4694,7 +4727,12 @@ msgid ""
 "\n"
 "This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings."
 msgstr ""
-"Notesnook usa i seguenti provider DNS:\n"
+"Notesnook uses the following DNS providers:\n"
+"\n"
+"1. Cloudflare DNS\n"
+"2. Quad9\n"
+"\n"
+"This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings.Notesnook usa i seguenti provider DNS:\n"
 "\n"
 "1. Cloudflare DNS\n"
 "2. Quad9\n"
@@ -4977,6 +5015,10 @@ msgstr "Fissa le note nel pannello delle notifiche"
 #: src/strings.ts:930
 msgid "Pin notification"
 msgstr "Fissa notifica"
+
+#: src/strings.ts:2866
+msgid "Pin your most important Notebooks to the top from Notebook properties."
+msgstr "Fissa i tuoi taccuini più importanti in alto dalle proprietà del taccuino."
 
 #: src/strings.ts:523
 msgid "Pinned"
@@ -5382,6 +5424,10 @@ msgstr "La nota pubblicata può essere vista solo da chi possiede la password."
 #: src/strings.ts:271
 msgid "Published note link will be automatically deleted once it is viewed by someone."
 msgstr "Il link della nota pubblicata verrà eliminato automaticamente una volta visualizzato."
+
+#: src/strings.ts:2837
+msgid "Published notes can be encrypted. Which means only you and the person you share the password with can read them."
+msgstr "Le note pubblicate possono essere crittografate. Ciò significa che solo tu e la persona con cui condividi la password potrete leggerle."
 
 #: src/strings.ts:2583
 msgid "Purchase"
@@ -6364,7 +6410,14 @@ msgid ""
 "\n"
 "To remove the proxy, simply erase everything in the input."
 msgstr ""
-"Configura un proxy HTTP/HTTPS/SOCKS.\n"
+"Setup an HTTP/HTTPS/SOCKS proxy.\n"
+"\n"
+"For example:\n"
+"http://foobar:80\n"
+"socks4://proxy.example.com\n"
+"http://username:password@foobar:80\n"
+"\n"
+"To remove the proxy, simply erase everything in the input.Configura un proxy HTTP/HTTPS/SOCKS.\n"
 "\n"
 "Ad esempio:\n"
 "http://foobar:80\n"
@@ -6836,7 +6889,13 @@ msgid ""
 "- Steps to reproduce the issue\n"
 "- Things you have tried etc."
 msgstr ""
-"Raccontaci di più sul problema che stai riscontrando.\n"
+"Tell us more about the issue you are facing.\n"
+"\n"
+"For example:\n"
+"- What were you trying to do in the app?\n"
+"- What did you expect to happen?\n"
+"- Steps to reproduce the issue\n"
+"- Things you have tried etc.Raccontaci di più sul problema che stai riscontrando.\n"
 "\n"
 "Ad esempio:\n"
 "- Cosa stavi cercando di fare nell'app?\n"
@@ -7459,7 +7518,15 @@ msgid ""
 "$headline$: Use starting line of the note as title.\n"
 "$day$: Current day (eg. Monday)"
 msgstr ""
-"Usa le seguenti chiavi per formattare il titolo:\n"
+"Use the following key to format the title:\n"
+"\n"
+"$date$: Current date.\n"
+"$time$: Current time.\n"
+"$timestamp$: Full date and time without any spaces or other symbols.\n"
+"(e.g 202305261253).\n"
+"$count$: Number of notes + 1.\n"
+"$headline$: Use starting line of the note as title.\n"
+"$day$: Current day (eg. Monday)Usa le seguenti chiavi per formattare il titolo:\n"
 "\n"
 "$date$: data corrente.\n"
 "$time$: ora corrente.\n"
@@ -7490,8 +7557,8 @@ msgid "Using {instance} (v{version})"
 msgstr "In uso {instance} (v{version})"
 
 #: src/strings.ts:2812
-msgid "Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
-msgstr "Usare Notesnook senza un account NON sincronizzerà le tue note tra i dispositivi e potrebbe causare la perdita di dati se perdi l'accesso al dispositivo o disinstalli l'app. Assicurati di eseguire regolarmente il backup delle tue note."
+msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
+msgstr ""
 
 #: src/strings.ts:2265
 msgid "Using official Notesnook instance"
@@ -7653,6 +7720,10 @@ msgstr "Richiediamo i dati della carta di credito per contrastare gli abusi e re
 msgid "We send you occasional promotional offers & product updates on your email (once every month)."
 msgstr "Ti inviamo occasionalmente offerte promozionali e novità sul prodotto via email (una volta al mese)."
 
+#: src/strings.ts:2871
+msgid "We value your feedback so join us on Discord and share your experiences and ideas."
+msgstr "Apprezziamo il tuo feedback, quindi unisciti a noi su Discord e condividi le tue esperienze e idee."
+
 #: src/strings.ts:1169
 msgid "We will send you occasional promotional offers & product updates on your email (sent once every month)."
 msgstr "Ti invieremo occasionalmente offerte promozionali e novità sul prodotto via email (una volta al mese)."
@@ -7710,6 +7781,10 @@ msgstr "Benvenuto in Notesnook {plan}"
 msgid "Welcome to Notesnook Pro"
 msgstr "Benvenuto in Notesnook Pro"
 
+#: src/strings.ts:2814
+msgid "What are monographs?"
+msgstr "Cosa sono le monografie?"
+
 #: src/strings.ts:1394
 msgid "What do I do if I am not getting the email?"
 msgstr "Cosa faccio se non ricevo l'email?"
@@ -7741,6 +7816,10 @@ msgstr "Parole"
 #: src/strings.ts:2425
 msgid "Work & Office"
 msgstr "Lavoro e ufficio"
+
+#: src/strings.ts:2818
+msgid "Wrap a query in double quotes to search for an exact match."
+msgstr "Racchiudi una ricerca tra virgolette doppie per cercare una corrispondenza esatta."
 
 #: src/strings.ts:823
 msgid "Write notes with freedom, no spying, no tracking."
@@ -7803,6 +7882,10 @@ msgstr "Non hai effettuato l'accesso"
 msgid "You are renaming color {color}"
 msgstr "Stai rinominando il colore {color}"
 
+#: src/strings.ts:2876
+msgid "You can adjust how long items live in your trash from Settings -> Trash settings."
+msgstr "Puoi regolare la durata degli elementi nel cestino da Impostazioni -> Impostazioni cestino."
+
 #: src/strings.ts:464
 msgid "You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select."
 msgstr "Puoi anche collegare una nota a più taccuini. Tieni premuto un taccuino per attivare la selezione multipla."
@@ -7827,7 +7910,12 @@ msgstr "Puoi importare le tue note dalla maggior parte delle altre app per appun
 msgid "You can multi-select notes and move them to a notebook at once"
 msgstr "Puoi selezionare più note e spostarle in un taccuino in una sola volta"
 
+#: src/strings.ts:2852
+msgid "You can multi-select notes and move them to a notebook or a sub-notebook at once."
+msgstr "Puoi selezionare più note contemporaneamente e spostarle in un taccuino o sotto-taccuino."
+
 #: src/strings.ts:1429
+#: src/strings.ts:2842
 msgid "You can pin frequently used Notebooks to the Side Menu to quickly access them."
 msgstr "Puoi fissare nel menu laterale i taccuini che usi più spesso per accedervi rapidamente."
 
@@ -7847,7 +7935,11 @@ msgid ""
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support."
 msgstr ""
-"Puoi seguire la tua segnalazione di bug su [{url}]({url}).\n"
+"You can track your bug report at [{url}]({url}).\n"
+"\n"
+"Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
+"\n"
+"If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.Puoi seguire la tua segnalazione di bug su [{url}]({url}).\n"
 "\n"
 "Tieni presente che risponderemo alla tua segnalazione al link qui sopra. **Ti consigliamo di salvarlo per riferimento futuro.**\n"
 "\n"
@@ -7859,7 +7951,9 @@ msgid ""
 "\n"
 "Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**"
 msgstr ""
-"Puoi seguire la tua richiesta di funzionalità su [{url}]({url}).\n"
+"You can track your feature request at [{url}]({url}).\n"
+"\n"
+"Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**Puoi seguire la tua richiesta di funzionalità su [{url}]({url}).\n"
 "\n"
 "Tieni presente che risponderemo alla tua richiesta al link qui sopra. **Ti consigliamo di salvarlo per riferimento futuro.**"
 
@@ -7929,13 +8023,10 @@ msgstr "Devi disconnetterti per modificare o reimpostare gli URL dei server."
 
 #: src/strings.ts:2741
 msgid ""
-"You need to login to restore attachments from a backup file. [Read more](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
+"You need to login to restore attachments from a backup file. [Read more](https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).\n"
 "  \n"
 "Continue without attachments?"
 msgstr ""
-"Devi accedere per ripristinare gli allegati da un file di backup. [Scopri di più](https://help.notesnook.com/faqs/login-to-restore-attachments-in-backup).\n"
-"  \n"
-"Continuare senza gli allegati?"
 
 #: src/strings.ts:836
 msgid "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source"

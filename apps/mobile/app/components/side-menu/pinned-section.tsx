@@ -33,7 +33,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { DefaultAppStyles } from "../../utils/styles";
 import { useSideBarDraggingStore } from "./dragging-store";
 import { Properties } from "../properties";
-import { Default_Drag_Action } from "../../hooks/use-actions";
+import { getDefaultDragAction } from "../../hooks/use-actions";
 
 export const PinnedSection = React.memo(
   function PinnedSection() {
@@ -62,7 +62,7 @@ export const PinnedSection = React.memo(
 
     const onLongPress = React.useCallback((item: SideMenuItem) => {
       if (useSideBarDraggingStore.getState().dragging) return;
-      Properties.present(item.data as Notebook, false, [Default_Drag_Action]);
+      Properties.present(item.data as Notebook, false, [getDefaultDragAction()]);
     }, []);
 
     const menuItems = useMemo(
