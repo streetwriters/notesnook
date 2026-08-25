@@ -60,6 +60,14 @@ export const Virtualization = Extension.create<VirtualizationOptions>({
     };
   },
 
+  // Runs immediately before the Editor constructor creates its first view, so
+  // that view is already virtualized. Installing any later (e.g. from
+  // useEditor's effect) means the whole document gets mounted unvirtualized
+  // once, which is the exact cost virtualization exists to avoid.
+  onBeforeCreate() {
+    installVirtualization(this.editor);
+  },
+
   addProseMirrorPlugins() {
     if (!this.options.enabled) return [];
     return [virtualizationPlugin()];
@@ -67,10 +75,18 @@ export const Virtualization = Extension.create<VirtualizationOptions>({
 });
 
 /**
- * Wraps the editor's node views with the virtualization layer. Must run before
- * the view is (re)created. A ProseMirror plugin cannot do this — prosemirror-view
- * consults the view's own `nodeViews` prop before any plugin (buildNodeViews is
- * first-wins) — so we decorate `extensionManager.nodeViews` at its source.
+ * Wraps the editor's node views with the virtualization layer.
+ *
+ * Called from the extension's own `onBeforeCreate`, which fires before the
+ * Editor constructor's `createView()` — so the very first view is virtualized.
+ *
+ * A ProseMirror plugin cannot do this: prosemirror-view consults the view's own
+ * `nodeViews` prop before any plugin (buildNodeViews is first-wins), and Tiptap
+ * overwrites `editorProps.nodeViews` with `extensionManager.nodeViews` via
+ * setProps right after construction. So we decorate the getter at its source.
+ *
+ * The patch lives on the extensionManager instance, which outlives individual
+ * views, so later `createView()` calls pick it up without reinstalling.
  */
 export function installVirtualization(editor: Editor): void {
   const storage = editor.storage.virtualization as
