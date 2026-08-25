@@ -47,6 +47,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
+import { ScrollAnchor } from "@notesnook/editor";
 import Tiptap, { OnChangeHandler } from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
@@ -564,7 +565,7 @@ export function Editor(props: EditorProps) {
         onLoad={(editor) => {
           editor = editor || useEditorManager.getState().getEditor(id)?.editor;
           if (editor) restoreSelection(editor, id);
-          restoreScrollPosition(session);
+          restoreScrollPosition(session, editor);
         }}
         onSelectionChange={({ from, to }) => {
           Config.set(`${id}:selection`, { from, to });
@@ -760,6 +761,11 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             const scrollTop = e.target.scrollTop;
             Config.set(`${id}:scroll-position`, scrollTop);
           }
+          const anchor = useEditorManager
+            .getState()
+            .getEditor(id)
+            ?.editor?.getScrollAnchor();
+          Config.set(`${id}:scroll-anchor`, anchor ?? null);
         }, 500)}
       >
         <Flex
@@ -944,8 +950,18 @@ function isFile(e: DragEvent) {
   );
 }
 
-function restoreScrollPosition(session: EditorSession) {
+function restoreScrollPosition(session: EditorSession, editor?: IEditor) {
   if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
+
+  // Restoring by block avoids the guesswork: a saved pixel offset was measured
+  // against a fully rendered document, and a paged one only knows estimated
+  // heights until it renders. The editor reveals the page holding the block
+  // before scrolling, so the position it lands on is the real one.
+  const anchor = Config.get<ScrollAnchor | null>(
+    `${session.id}:scroll-anchor`,
+    null
+  );
+  if (anchor && editor?.restoreScrollAnchor(anchor)) return;
 
   const scrollContainer = document.getElementById(`editorScroll_${session.id}`);
   const scrollPosition = Config.get(`${session.id}:scroll-position`, 0);
@@ -973,7 +989,8 @@ function restoreScrollPosition(session: EditorSession) {
 function restoreSelection(editor: IEditor, id: string) {
   setTimeout(() => {
     editor.focus({
-      position: Config.get(`${id}:selection`)
+      position: Config.get(`${id}:selection`),
+      scrollIntoView: false
     });
   });
 }

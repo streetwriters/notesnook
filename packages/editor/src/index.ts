@@ -499,6 +499,11 @@ export {
   serializeDocumentHTML,
   toFlatPosition
 } from "./extensions/paging/index.js";
+export {
+  getScrollAnchor,
+  restoreScrollAnchor,
+  type ScrollAnchor
+} from "./extensions/virtualization/index.js";
 export * from "./utils/downloader.js";
 export {
   useTiptap,

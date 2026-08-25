@@ -124,3 +124,8 @@ export function installVirtualization(editor: Editor): void {
 
 export { HeightMap } from "./height-map.js";
 export { virtualizationKey } from "./viewport-plugin.js";
+export {
+  getScrollAnchor,
+  restoreScrollAnchor,
+  type ScrollAnchor
+} from "./anchor.js";

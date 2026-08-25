@@ -44,7 +44,7 @@ const MATERIALIZE_SPEC = { materialize: true };
 
 type IsPageable = (typeName: string) => boolean;
 
-function findScrollParent(node: HTMLElement): HTMLElement | null {
+export function findScrollParent(node: HTMLElement): HTMLElement | null {
   let current: HTMLElement | null = node.parentElement;
   while (current) {
     const overflowY = getComputedStyle(current).overflowY;

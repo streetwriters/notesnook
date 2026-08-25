@@ -38,7 +38,9 @@ import {
   getChangedNodes,
   LinkAttributes,
   fromFlatPosition,
+  getScrollAnchor,
   profiler,
+  restoreScrollAnchor,
   serializeDocumentHTML,
   toFlatPosition,
   type VirtualizationMode,
@@ -302,7 +304,7 @@ function TipTap(props: TipTapProps) {
         profiler.event("editor.created");
 
         if (oldNonce.current !== nonce)
-          editor.commands.focus("start", { scrollIntoView: true });
+          editor.commands.focus("start", { scrollIntoView: false });
         oldNonce.current = nonce;
 
         const instance = toIEditor(editor as Editor);
@@ -822,7 +824,7 @@ function toIEditor(editor: Editor): IEditor {
       if (typeof position === "object")
         editor
           .chain()
-          .focus()
+          .focus(null, { scrollIntoView: scrollIntoView ?? true })
           .setTextSelection({
             from: fromFlatPosition(editor.state.doc, position.from),
             to: fromFlatPosition(editor.state.doc, position.to)
@@ -871,7 +873,9 @@ function toIEditor(editor: Editor): IEditor {
         from: toFlatPosition(editor.state.doc, from),
         to: toFlatPosition(editor.state.doc, to)
       };
-    }
+    },
+    getScrollAnchor: () => getScrollAnchor(editor.view),
+    restoreScrollAnchor: (anchor) => restoreScrollAnchor(editor.view, anchor)
   };
 }
 
