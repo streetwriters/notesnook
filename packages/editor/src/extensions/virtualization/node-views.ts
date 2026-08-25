@@ -75,11 +75,9 @@ function createPlaceholder(
 
   return {
     dom,
-    // children are never rendered
     contentDOM: null,
     update(updatedNode: ProsemirrorNode, decorations: readonly Decoration[]) {
       if (updatedNode.type !== node.type) return false;
-      // switch to the real node once it enters the viewport
       if (isMaterialized(decorations)) return false;
       node = updatedNode;
       dom.style.height = `${heightMap.heightFor(updatedNode)}px`;
@@ -102,7 +100,6 @@ function createMaterializedDefault(
 ): NodeView {
   const spec = node.type.spec.toDOM?.(node);
   if (!spec) {
-    // leaf-like or spec-less node: fall back to an empty box
     const dom = document.createElement("div");
     return { dom };
   }
@@ -117,9 +114,7 @@ function createMaterializedDefault(
     contentDOM,
     update(updatedNode: ProsemirrorNode, decorations: readonly Decoration[]) {
       if (updatedNode.type !== node.type) return false;
-      // scrolled out of view -> rebuild as a placeholder
       if (!isMaterialized(decorations)) return false;
-      // attribute/mark change -> let ProseMirror rebuild the DOM
       if (!node.sameMarkup(updatedNode)) return false;
       node = updatedNode;
       record();
@@ -183,12 +178,8 @@ export function withVirtualization(
       const topLevel = isTopLevel(view, getPos as () => number | undefined);
       const materialize = isMaterialized(decorations);
 
-      // Only page documents past the size threshold. Smaller notes — the
-      // overwhelming majority — render fully and are unaffected by any of this.
       const belowThreshold = view.state.doc.childCount <= thresholdBlocks;
 
-      // Nested instances (inside callouts, tables, list items) are never
-      // virtualized — only the outermost blocks are paged.
       if (!topLevel || belowThreshold) {
         return inner
           ? inner(node, view, getPos, decorations, innerDecorations)

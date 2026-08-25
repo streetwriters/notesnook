@@ -72,8 +72,6 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         const visible = pluginState?.visible ?? new Set<string>();
         const doc = state.doc;
 
-        // Top-level index of the selection so we can always keep the block the
-        // caret is in (and its neighbours) rendered.
         const selectionIndex = state.selection.$from.index(0);
 
         const decorations: Decoration[] = [];
@@ -116,11 +114,6 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         const current = virtualizationKey.getState(editorView.state)?.visible;
         const next = new Set(intersecting);
         if (current && sameSet(current, next)) return;
-        // This transaction only records which blocks are on-screen; it changes
-        // no content. It carries no steps (docChanged is false), and we mark it
-        // preventUpdate + addToHistory:false as belt-and-suspenders so it can
-        // never trigger a save, never enter the undo history, and never touch
-        // user data — virtualization is a pure view concern.
         editorView.dispatch(
           editorView.state.tr
             .setMeta(virtualizationKey, { visible: next })
@@ -149,18 +142,10 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
       const observed = new Set<Element>();
 
       const ensureObserver = () => {
-        // Resolve the scroll container lazily: at view-init the document may be
-        // empty (no overflow yet), so it must be re-resolved once content grows.
         const resolved = findScrollParent(editorView.dom);
         if (resolved && resolved !== scrollParent) {
-          // Keep the browser's scroll anchoring ON: when an off-screen
-          // placeholder above the viewport materializes to its real height, the
-          // browser compensates scrollTop so the visible content stays put
-          // instead of jumping.
           resolved.style.overflowAnchor = "auto";
           scrollParent = resolved;
-          // The observer's root is fixed at construction, so it must be rebuilt
-          // when the scroll container changes.
           observer?.disconnect();
           observer = null;
           observed.clear();
@@ -168,17 +153,12 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
         if (!observer) {
           observer = new IntersectionObserver(onIntersect, {
             root: scrollParent,
-            // one viewport of overscan in each direction
             rootMargin: "100% 0px 100% 0px",
             threshold: 0
           });
         }
       };
 
-      // Keep a single observer alive and only add/remove the blocks that
-      // actually changed. Disconnecting and re-observing every block on each
-      // materialization resets all intersection state; during a scroll that
-      // never converges and leaves visible blocks stuck as blank placeholders.
       const syncObserved = () => {
         ensureObserver();
         if (!observer) return;
@@ -209,9 +189,6 @@ export function virtualizationPlugin(): Plugin<VirtualizationState> {
 
       return {
         update() {
-          // Materialize/dematerialize swaps the top-level DOM elements without
-          // changing the document, so re-sync whenever the child element set
-          // changes identity — but only the delta, not the whole observer.
           if (childrenChanged()) syncObserved();
         },
         destroy() {

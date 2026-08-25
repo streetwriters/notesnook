@@ -98,7 +98,6 @@ export function installVirtualization(editor: Editor): void {
     string,
     unknown
   >;
-  // already installed on this instance
   if (Object.prototype.hasOwnProperty.call(manager, "nodeViews")) return;
 
   const proto = Object.getPrototypeOf(editor.extensionManager);
