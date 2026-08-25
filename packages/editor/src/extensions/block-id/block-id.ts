@@ -26,7 +26,7 @@ import {
 } from "../../utils/batch-attribute-step.js";
 import { profiler } from "../../utils/profiler.js";
 
-const NESTED_BLOCK_ID_TYPES = ["callout"];
+const NESTED_BLOCK_ID_TYPES = ["callout", "page"];
 const BLOCK_ID_TYPES = [
   "paragraph",
   "heading",
@@ -42,7 +42,8 @@ const BLOCK_ID_TYPES = [
   "outlineList",
   "mathBlock",
   "webclip",
-  "embed"
+  "embed",
+  "page"
 ];
 
 export const BlockId = Extension.create({

@@ -63,7 +63,7 @@ export function getTableOfContents(
   let level = -1;
   let prevHeading = 0;
 
-  doc.forEach((node) => {
+  const visit = (node: ProsemirrorNode) => {
     if (node.type.name !== "heading") return;
 
     const title = node.textContent;
@@ -91,6 +91,11 @@ export function getTableOfContents(
       id,
       top: element ? getOffsetTopRelativeTo(element, content) : 0
     });
+  };
+
+  doc.forEach((node) => {
+    if (node.type.name === "page") node.forEach(visit);
+    else visit(node);
   });
 
   end();
