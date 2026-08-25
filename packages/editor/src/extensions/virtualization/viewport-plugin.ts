@@ -21,6 +21,7 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
+import { HeightMap } from "./height-map.js";
 import { VirtualizationUnit, unitTypes } from "./node-views.js";
 
 export const virtualizationKey = new PluginKey<VirtualizationState>(
@@ -200,7 +201,8 @@ function repairSelection(
 }
 
 export function virtualizationPlugin(
-  unit: VirtualizationUnit = "blocks"
+  unit: VirtualizationUnit = "blocks",
+  heightMap?: HeightMap
 ): Plugin<VirtualizationState> {
   const types = unitTypes(unit);
   const isPageable: IsPageable = (typeName) => types.includes(typeName);
@@ -353,6 +355,42 @@ export function virtualizationPlugin(
         return next;
       };
 
+      /**
+       * The top-most unit on screen, remembered by index so it can be found
+       * again after the DOM is rebuilt.
+       */
+      const pinnedUnit = (): { index: number; top: number } | undefined => {
+        if (!scrollParent) return undefined;
+        const children = editorView.dom.children;
+        const fold = scrollParent.getBoundingClientRect().top;
+        for (
+          let i = firstChildBelow(children, fold);
+          i < children.length;
+          i++
+        ) {
+          const rect = (children[i] as HTMLElement).getBoundingClientRect();
+          if (rect.bottom > fold) return { index: i, top: rect.top };
+        }
+        return undefined;
+      };
+
+      /**
+       * A placeholder's height is an estimate, so a unit that renders resizes
+       * and shoves everything after it. Putting the pinned unit back where it
+       * was keeps the reader's position still through that.
+       */
+      const restorePin = (pin?: { index: number; top: number }) => {
+        if (!pin || !scrollParent) return;
+        const element = editorView.dom.children[pin.index] as
+          | HTMLElement
+          | undefined;
+        if (!element) return;
+        const delta = element.getBoundingClientRect().top - pin.top;
+        if (!delta) return;
+        scrollParent.scrollTop += delta;
+        profiler.record("virtualization.pinCorrection", Math.abs(delta));
+      };
+
       const flush = () => {
         frame = 0;
         const end = profiler.start("virtualization.measure");
@@ -371,12 +409,32 @@ export function virtualizationPlugin(
         visible = next;
         profiler.count("virtualization.visibilityFlushes");
         profiler.gauge("virtualization.visibleBlocks", next.size);
+
+        const pin = pinnedUnit();
         editorView.dispatch(
           editorView.state.tr
             .setMeta(virtualizationKey, { visible: next })
             .setMeta("preventUpdate", true)
             .setMeta("addToHistory", false)
         );
+        restorePin(pin);
+        recordRenderedHeights();
+      };
+
+      /**
+       * Whatever is rendered right now has a real height; remembering it means
+       * its placeholder is the right size when it scrolls away again.
+       */
+      const recordRenderedHeights = () => {
+        if (!heightMap) return;
+        const children = editorView.dom.children;
+        const doc = editorView.state.doc;
+        const count = Math.min(children.length, doc.childCount);
+        for (let i = 0; i < count; i++) {
+          const element = children[i] as HTMLElement;
+          if (element.hasAttribute("data-virtual-placeholder")) continue;
+          heightMap.record(doc.child(i), element.offsetHeight);
+        }
       };
 
       function schedule() {

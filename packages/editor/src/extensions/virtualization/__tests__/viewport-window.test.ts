@@ -142,6 +142,33 @@ describe("viewport window", () => {
     editor.destroy();
   });
 
+  test("keeps the visible unit still when a placeholder resizes", async () => {
+    const editor = createEditor();
+    stubLayout(editor);
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    const container = editor.view.dom.parentElement;
+    const before = container?.scrollTop ?? 0;
+
+    // the second block renders and turns out to be far taller than its
+    // estimate: everything after it moves, so the scroll must follow
+    const dom = editor.view.dom as HTMLElement;
+    let top = 0;
+    for (const [index, child] of Array.from(dom.children).entries()) {
+      const height = index === 1 ? BLOCK_HEIGHT * 10 : BLOCK_HEIGHT;
+      const childTop = top;
+      (child as HTMLElement).getBoundingClientRect = () =>
+        rect(childTop, height);
+      top += height;
+    }
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    expect(container?.scrollTop ?? 0).toBeGreaterThanOrEqual(before);
+    editor.destroy();
+  });
+
   test("keeps blocks that drift into the hysteresis band", async () => {
     const editor = createEditor();
     stubLayout(editor);

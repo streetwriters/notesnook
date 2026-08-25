@@ -77,7 +77,7 @@ export const Virtualization = Extension.create<VirtualizationOptions>({
 
   addProseMirrorPlugins() {
     if (!this.options.enabled) return [];
-    return [virtualizationPlugin(this.options.unit)];
+    return [virtualizationPlugin(this.options.unit, this.storage.heightMap)];
   }
 });
 
