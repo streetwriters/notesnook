@@ -121,7 +121,41 @@ export async function saveContent(
     );
   });
 }
-const deferredSave = debounceWithId(saveContent, 100);
+function syncSessionContent(sessionId: string, data: string) {
+  const currentSession = useEditorStore.getState().getSession(sessionId);
+  const noteId =
+    currentSession && "note" in currentSession ? currentSession.note.id : null;
+  const sessions = noteId
+    ? useEditorStore.getState().getSessionsForNote(noteId)
+    : [currentSession];
+
+  for (const session of sessions) {
+    if (
+      session?.type !== "default" &&
+      session?.type !== "readonly" &&
+      session?.type !== "new"
+    )
+      continue;
+    if (!session.content) session.content = { type: "tiptap", data };
+    else session.content.data = data;
+
+    // update content in other tabs
+    if (session.id !== sessionId) {
+      const editor = useEditorManager.getState().getEditor(session.id);
+      editor?.editor?.updateContent(data);
+    }
+  }
+}
+
+const deferredSave = debounceWithId(
+  (sessionId: string, ignoreEdit: boolean, content: () => string) => {
+    const data = content();
+    syncSessionContent(sessionId, data);
+    logger.debug("scheduling save", { id: sessionId, length: data.length });
+    return saveContent(sessionId, ignoreEdit, data);
+  },
+  100
+);
 
 export default function TabsView() {
   const tabs = useEditorStore((store) => store.tabs);
@@ -367,41 +401,7 @@ function EditorView({
         onContentChange={() => (lastChangedTime.current = Date.now())}
         onSelectionChange={() => root.current?.classList.remove("searching")}
         onSave={(content, ignoreEdit) => {
-          const currentSession = useEditorStore
-            .getState()
-            .getSession(session.id);
-          const noteId =
-            currentSession && "note" in currentSession
-              ? currentSession.note.id
-              : null;
-          const sessions = noteId
-            ? useEditorStore.getState().getSessionsForNote(noteId)
-            : [currentSession];
-
-          const currentSessionId = session.id;
-          const data = content();
-          for (const session of sessions) {
-            if (
-              session?.type !== "default" &&
-              session?.type !== "readonly" &&
-              session?.type !== "new"
-            )
-              continue;
-            if (!session.content) session.content = { type: "tiptap", data };
-            else session.content.data = data;
-
-            // update content in other tabs
-            if (session.id !== currentSessionId) {
-              const editor = useEditorManager.getState().getEditor(session.id);
-              editor?.editor?.updateContent(data);
-            }
-          }
-
-          logger.debug("scheduling save", {
-            id: session.id,
-            length: data.length
-          });
-          deferredSave(session.id, session.id, ignoreEdit, data);
+          deferredSave(session.id, session.id, ignoreEdit, content);
         }}
         options={{
           readonly: session?.type === "readonly" || session?.type === "deleted",
