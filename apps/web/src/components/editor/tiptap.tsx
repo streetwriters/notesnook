@@ -691,7 +691,10 @@ function TiptapWrapper(
       theme.scopes.base.primary.paragraph;
   }, [theme]);
 
-  useEffect(() => {
+  // Runs before the browser paints: `onLoad` restores the scroll position, and
+  // doing that in a passive effect paints the note at the top for a frame
+  // before it jumps to where the reader left off.
+  useLayoutEffect(() => {
     if (!isHydrating) {
       onLoad?.();
       containerRef.current
