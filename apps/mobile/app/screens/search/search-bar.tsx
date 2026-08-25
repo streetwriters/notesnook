@@ -84,7 +84,7 @@ export const SearchBar = ({
           style={{
             fontSize: AppFontSize.sm,
             fontFamily: "Inter-Regular",
-            flexGrow: 1,
+            flex: 1,
             color: colors.primary.paragraph,
             paddingTop: 0,
             paddingBottom: 0
