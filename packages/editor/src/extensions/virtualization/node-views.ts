@@ -25,6 +25,7 @@ import {
   NodeView,
   NodeViewConstructor
 } from "@tiptap/pm/view";
+import { profiler } from "../../utils/profiler.js";
 import { HeightMap } from "./height-map.js";
 
 export const TOP_LEVEL_BLOCK_TYPES = [
@@ -46,13 +47,48 @@ export const TOP_LEVEL_BLOCK_TYPES = [
 ];
 
 function isMaterialized(decorations: readonly Decoration[]): boolean {
-  return decorations.some((d) => (d.spec as { materialize?: boolean })?.materialize);
+  return decorations.some(
+    (d) => (d.spec as { materialize?: boolean })?.materialize
+  );
 }
 
-function isTopLevel(view: EditorView, getPos: () => number | undefined): boolean {
+const topLevelOffsets = new WeakMap<ProsemirrorNode, Set<number>>();
+
+function topLevelOffsetsOf(doc: ProsemirrorNode): Set<number> {
+  const cached = topLevelOffsets.get(doc);
+  if (cached) return cached;
+
+  const end = profiler.start("virtualization.topLevelIndex");
+  const offsets = new Set<number>();
+  doc.forEach((_node, offset) => offsets.add(offset));
+  end();
+  profiler.count("virtualization.topLevelIndexBuilds");
+
+  topLevelOffsets.set(doc, offsets);
+  return offsets;
+}
+
+function isTopLevel(
+  view: EditorView,
+  getPos: () => number | undefined
+): boolean {
   const pos = getPos();
-  if (pos == null || pos < 0 || pos > view.state.doc.content.size) return false;
-  return view.state.doc.resolve(pos).depth === 0;
+  if (pos == null) return false;
+  return topLevelOffsetsOf(view.state.doc).has(pos);
+}
+
+let placeholderTemplate: HTMLDivElement | undefined;
+
+function createPlaceholderElement(): HTMLDivElement {
+  if (!placeholderTemplate) {
+    placeholderTemplate = document.createElement("div");
+    placeholderTemplate.setAttribute("data-virtual-placeholder", "true");
+    placeholderTemplate.style.width = "100%";
+    // an empty, explicitly sized box: tell the browser its (absent) contents
+    // can never affect layout elsewhere, so it stays out of layout cascades.
+    placeholderTemplate.style.contain = "strict";
+  }
+  return placeholderTemplate.cloneNode(false) as HTMLDivElement;
 }
 
 /**
@@ -66,19 +102,21 @@ function createPlaceholder(
   getPos: () => number | undefined,
   heightMap: HeightMap
 ): NodeView {
-  const dom = document.createElement("div");
-  dom.setAttribute("data-virtual-placeholder", "true");
+  profiler.count("virtualization.nodeView.placeholderCreated");
+  const dom = createPlaceholderElement();
   const blockId = node.attrs.blockId as string | undefined;
   if (blockId) dom.setAttribute("data-block-id", blockId);
   dom.style.height = `${heightMap.heightFor(node)}px`;
-  dom.style.width = "100%";
 
   return {
     dom,
     contentDOM: null,
     update(updatedNode: ProsemirrorNode, decorations: readonly Decoration[]) {
       if (updatedNode.type !== node.type) return false;
-      if (isMaterialized(decorations)) return false;
+      if (isMaterialized(decorations)) {
+        profiler.count("virtualization.materialized");
+        return false;
+      }
       node = updatedNode;
       dom.style.height = `${heightMap.heightFor(updatedNode)}px`;
       return true;
@@ -114,7 +152,10 @@ function createMaterializedDefault(
     contentDOM,
     update(updatedNode: ProsemirrorNode, decorations: readonly Decoration[]) {
       if (updatedNode.type !== node.type) return false;
-      if (!isMaterialized(decorations)) return false;
+      if (!isMaterialized(decorations)) {
+        profiler.count("virtualization.dematerialized");
+        return false;
+      }
       if (!node.sameMarkup(updatedNode)) return false;
       node = updatedNode;
       record();
@@ -149,7 +190,10 @@ function wrapCustom(
     decorations: readonly Decoration[],
     innerDecorations: DecorationSource
   ) => {
-    if (!isMaterialized(decorations)) return false;
+    if (!isMaterialized(decorations)) {
+      profiler.count("virtualization.dematerialized");
+      return false;
+    }
     node = updatedNode;
     record();
     return originalUpdate
@@ -181,12 +225,14 @@ export function withVirtualization(
       const belowThreshold = view.state.doc.childCount <= thresholdBlocks;
 
       if (!topLevel || belowThreshold) {
+        profiler.count("virtualization.nodeView.unvirtualized");
         return inner
           ? inner(node, view, getPos, decorations, innerDecorations)
           : createMaterializedDefault(node, heightMap);
       }
 
       if (materialize) {
+        profiler.count("virtualization.nodeView.materializedCreated");
         return inner
           ? wrapCustom(
               inner(node, view, getPos, decorations, innerDecorations),
