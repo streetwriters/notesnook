@@ -230,9 +230,9 @@ export const useEditorEvents = (
           ? parseInt(defaultFontSize)
           : defaultFontSize,
       fontFamily: SettingsService.get().defaultFontFamily,
-      dateFormat: db.settings?.getDateFormat(),
-      timeFormat: db.settings?.getTimeFormat(),
-      dayFormat: db.settings?.getDayFormat(),
+      dateFormat: dateFormat,
+      timeFormat: timeFormat,
+      dayFormat: dayFormat,
       fontScale,
       markdownShortcuts,
       features,
