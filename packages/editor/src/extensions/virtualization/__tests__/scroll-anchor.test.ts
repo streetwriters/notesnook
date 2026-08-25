@@ -59,22 +59,28 @@ function rect(top: number, height: number) {
 const original = HTMLElement.prototype.getBoundingClientRect;
 
 /** happy-dom lays nothing out, so blocks and pages get a synthetic geometry. */
-function stubLayout(editor: Editor) {
+function stubLayout(editor: Editor, scrollTop = 0) {
   const dom = editor.view.dom as HTMLElement;
   HTMLElement.prototype.getBoundingClientRect = function () {
-    if (this === dom) return rect(0, BLOCKS * BLOCK_HEIGHT);
+    if (this === dom) return rect(-scrollTop, BLOCKS * BLOCK_HEIGHT);
     // the scroll container and anything outside the editor sits at the top
     if (!dom.contains(this)) return rect(0, 800);
     const siblings = this.parentElement?.children;
     const index = siblings ? Array.prototype.indexOf.call(siblings, this) : -1;
     if (index < 0) return rect(0, 0);
     if (this.parentElement === dom)
-      return rect(index * PAGE_SIZE * BLOCK_HEIGHT, PAGE_SIZE * BLOCK_HEIGHT);
+      return rect(
+        index * PAGE_SIZE * BLOCK_HEIGHT - scrollTop,
+        PAGE_SIZE * BLOCK_HEIGHT
+      );
     const pageIndex = Array.prototype.indexOf.call(
       dom.children,
       this.parentElement
     );
-    return rect((pageIndex * PAGE_SIZE + index) * BLOCK_HEIGHT, BLOCK_HEIGHT);
+    return rect(
+      (pageIndex * PAGE_SIZE + index) * BLOCK_HEIGHT - scrollTop,
+      BLOCK_HEIGHT
+    );
   };
 }
 
@@ -148,6 +154,21 @@ describe("scroll anchor", () => {
       editor.view.dom.querySelector('[data-block-id="blk300"]')
     ).not.toBeNull();
     expect(page.attrs.blockId).toBeTruthy();
+    editor.destroy();
+  });
+
+  test("anchors on a placeholder page using the document", () => {
+    const editor = createEditor(createContainer());
+    // scrolled so the fold sits on page 6, which has never rendered
+    stubLayout(editor, 6 * PAGE_SIZE * BLOCK_HEIGHT);
+    expect(
+      (editor.view.dom.children[6] as HTMLElement).hasAttribute(
+        "data-virtual-placeholder"
+      )
+    ).toBe(true);
+
+    const anchor = getScrollAnchor(editor.view);
+    expect(anchor?.blockId).toBe("blk300");
     editor.destroy();
   });
 

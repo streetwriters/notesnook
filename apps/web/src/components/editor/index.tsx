@@ -547,6 +547,10 @@ export function Editor(props: EditorProps) {
       const editor = useEditorManager.getState().getEditor(id)?.editor;
       const selection = editor?.getSelection();
       if (selection) Config.set(`${id}:selection`, selection);
+      // the scroll handler is debounced, so a reload right after scrolling
+      // would otherwise lose the position
+      const anchor = editor?.getScrollAnchor();
+      if (anchor) Config.set(`${id}:scroll-anchor`, anchor);
     };
   }, [id]);
 

@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
+import { isPage } from "../paging/split.js";
 import { findScrollParent, virtualizationKey } from "./viewport-plugin.js";
 
 export type ScrollAnchor = {
@@ -43,21 +44,35 @@ function containerOf(view: EditorView) {
  */
 export function getScrollAnchor(view: EditorView): ScrollAnchor | undefined {
   const { top } = containerOf(view);
-  const blocks = view.dom.querySelectorAll<HTMLElement>("[data-block-id]");
+  const children = view.dom.children;
 
-  for (const element of blocks) {
-    // Pages carry a block id too, but theirs is regenerated every time a note
-    // is opened and split, so only real blocks make a durable anchor.
-    if (
-      element.hasAttribute("data-page") ||
-      element.hasAttribute("data-virtual-placeholder")
-    )
-      continue;
+  for (let i = 0; i < children.length; i++) {
+    const element = children[i] as HTMLElement;
     const rect = element.getBoundingClientRect();
     if (rect.bottom <= top) continue;
-    const blockId = element.getAttribute("data-block-id");
-    if (!blockId) continue;
-    return { blockId, offset: Math.round(top - rect.top) };
+
+    const node = view.state.doc.child(i);
+    if (!isPage(node)) {
+      const blockId = node.attrs.blockId as string | undefined;
+      return blockId
+        ? { blockId, offset: Math.round(top - rect.top) }
+        : undefined;
+    }
+
+    // Inside a rendered page, anchor on the exact block at the fold.
+    for (const child of Array.from(element.children)) {
+      const childRect = child.getBoundingClientRect();
+      if (childRect.bottom <= top) continue;
+      const blockId = child.getAttribute("data-block-id");
+      if (blockId) return { blockId, offset: Math.round(top - childRect.top) };
+    }
+
+    // A page that has not rendered has no blocks to inspect, but the document
+    // still knows which block it starts with.
+    const blockId = node.firstChild?.attrs.blockId as string | undefined;
+    return blockId
+      ? { blockId, offset: Math.round(top - rect.top) }
+      : undefined;
   }
   return undefined;
 }
