@@ -39,6 +39,7 @@ import {
   getChangedNodes,
   LinkAttributes,
   profiler,
+  type VirtualizationMode,
   type Selection
 } from "@notesnook/editor";
 import { installProfilerGlobals, setProfiledEditor } from "./profiling";
@@ -117,7 +118,7 @@ type TipTapProps = {
   dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
-  virtualization: boolean;
+  virtualization: VirtualizationMode;
 };
 
 function countCharacters(text: string) {
@@ -292,7 +293,7 @@ function TipTap(props: TipTapProps) {
       onFocus,
       onCreate: async ({ editor }) => {
         setProfiledEditor(editor as Editor);
-        profiler.setContext("virtualization", !!virtualization);
+        profiler.setContext("virtualization", virtualization);
         profiler.setContext("noteId", id);
         profiler.setContext("topLevelBlocks", editor.state.doc.childCount);
         profiler.setContext("characters", editor.state.doc.textContent.length);

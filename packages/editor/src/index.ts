@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   EditorOptions,
+  Node as TiptapNode,
   extensions as TiptapCoreExtensions,
   getHTMLFromFragment
 } from "@tiptap/core";
@@ -84,6 +85,7 @@ import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
 import { Virtualization } from "./extensions/virtualization/index.js";
 import { EditorProfiler } from "./extensions/profiler/index.js";
+import { Page, Paging } from "./extensions/paging/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
@@ -139,7 +141,7 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
-    virtualization?: boolean;
+    virtualization?: VirtualizationMode | boolean;
   } & {
     placeholder: string;
   };
@@ -192,8 +194,9 @@ const useTiptap = (
     };
   }, [closeAllPopups]);
 
-  const defaultOptions = useMemo<Partial<EditorOptions>>(
-    () => ({
+  const defaultOptions = useMemo<Partial<EditorOptions>>(() => {
+    const mode = toVirtualizationMode(virtualization);
+    return {
       enableCoreExtensions: false,
       editorProps: {
         ...editorProps,
@@ -237,6 +240,7 @@ const useTiptap = (
           doubleSpaced: doubleSpacedLines
         }),
         StarterKit.configure({
+          document: false,
           code: false,
           codeBlock: false,
           listItem: false,
@@ -276,7 +280,10 @@ const useTiptap = (
           }
         }),
         BlockId,
-        Virtualization.configure({ enabled: !!virtualization }),
+        PagedDocument,
+        Page,
+        Virtualization.configure({ enabled: mode === "blocks" }),
+        Paging.configure({ enabled: mode === "pages" }),
         EditorProfiler,
         Blockquote,
         CharacterCount,
@@ -417,23 +424,22 @@ const useTiptap = (
       },
       injectCSS: false,
       parseOptions: { preserveWhitespace: true }
-    }),
-    [
-      isMobile,
-      previewAttachment,
-      downloadAttachment,
-      openAttachmentPicker,
-      getAttachmentData,
-      onBeforeCreate,
-      openLink,
-      dateFormat,
-      timeFormat,
-      editorProps,
-      copyToClipboard,
-      createInternalLink,
-      virtualization
-    ]
-  );
+    };
+  }, [
+    isMobile,
+    previewAttachment,
+    downloadAttachment,
+    openAttachmentPicker,
+    getAttachmentData,
+    onBeforeCreate,
+    openLink,
+    dateFormat,
+    timeFormat,
+    editorProps,
+    copyToClipboard,
+    createInternalLink,
+    virtualization
+  ]);
 
   const editor = useEditor(
     {
@@ -445,6 +451,26 @@ const useTiptap = (
 
   return editor;
 };
+
+/**
+ * Pages are optional in the schema so an unpaged document stays valid: nothing
+ * has to be migrated, and turning paging off simply stops producing them.
+ */
+const PagedDocument = TiptapNode.create({
+  name: "doc",
+  topNode: true,
+  content: "(page | block)+"
+});
+
+export type VirtualizationMode = "off" | "blocks" | "pages";
+
+export function toVirtualizationMode(
+  value: VirtualizationMode | boolean | undefined
+): VirtualizationMode {
+  if (value === true) return "blocks";
+  if (!value) return "off";
+  return value;
+}
 
 function hasStyle(element: HTMLElement | string) {
   const style = (element as HTMLElement).getAttribute("style");

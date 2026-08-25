@@ -25,6 +25,7 @@ import Config from "../utils/config";
 import BaseStore from "./index";
 import { TimeFormat, DayFormat, WeekFormat, EVENTS } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
+import { VirtualizationMode, toVirtualizationMode } from "@notesnook/editor";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
 import * as openpgp from "openpgp";
@@ -57,7 +58,9 @@ class SettingStore extends BaseStore<SettingStore> {
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", false);
   fontLigatures = Config.get("fontLigatures", false);
-  editorVirtualization = Config.get("editorVirtualization", false);
+  editorVirtualization: VirtualizationMode = toVirtualizationMode(
+    Config.get<VirtualizationMode | boolean>("editorVirtualization", "off")
+  );
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
@@ -251,11 +254,9 @@ class SettingStore extends BaseStore<SettingStore> {
     Config.set("fontLigatures", !fontLigatures);
   };
 
-  toggleEditorVirtualization = (toggleState?: boolean) => {
-    const editorVirtualization = this.get().editorVirtualization;
-    const next = toggleState ?? !editorVirtualization;
-    this.set((state) => (state.editorVirtualization = next));
-    Config.set("editorVirtualization", next);
+  setEditorVirtualization = (mode: VirtualizationMode) => {
+    this.set((state) => (state.editorVirtualization = mode));
+    Config.set("editorVirtualization", mode);
   };
 
   togglePrivacyMode = async () => {

@@ -2479,6 +2479,9 @@ Use this if changes from other devices are not appearing on this device. This wi
   editorVirtualization: () => t`Editor paging (experimental)`,
   editorVirtualizationDesc: () =>
     t`Only render the part of a note that is currently on screen. Makes very large notes much faster to open, scroll and type in. While this is on, your browser's find (Ctrl+F) and printing will only cover the visible part of a note — use the editor's own search instead. If you face any issues, please turn it off.`,
+  editorVirtualizationOff: () => t`Off`,
+  editorVirtualizationBlocks: () => t`Blocks`,
+  editorVirtualizationPages: () => t`Pages`,
   expandSidebar: () => t`Expand sidebar`,
   viewAllLimits: () => `View all limits`,
   freePlan: () => t`Free plan`,
