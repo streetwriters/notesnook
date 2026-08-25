@@ -312,7 +312,7 @@ function TipTap(props: TipTapProps) {
               selected: 0
             }
           },
-          tableOfContents: getTableOfContents(editor.view.dom)
+          tableOfContents: getTableOfContents(editor.state.doc, editor.view.dom)
         });
       },
       onUpdate: ({ editor, transaction }) => {
@@ -322,7 +322,10 @@ function TipTap(props: TipTapProps) {
         });
         if (changedHeadings.length > 0) {
           useEditorManager.getState().updateEditor(id, {
-            tableOfContents: getTableOfContents(editor.view.dom)
+            tableOfContents: getTableOfContents(
+              editor.state.doc,
+              editor.view.dom
+            )
           });
         }
 
@@ -350,7 +353,7 @@ function TipTap(props: TipTapProps) {
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           tableOfContents: transaction.getMeta("isUpdatingContent")
-            ? getTableOfContents(editor.view.dom)
+            ? getTableOfContents(editor.state.doc, editor.view.dom)
             : useEditorManager.getState().getEditor(id)?.tableOfContents
         });
       },
