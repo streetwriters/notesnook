@@ -38,7 +38,9 @@ import {
   getTableOfContents,
   getChangedNodes,
   LinkAttributes,
+  fromFlatPosition,
   profiler,
+  toFlatPosition,
   type VirtualizationMode,
   type Selection
 } from "@notesnook/editor";
@@ -385,7 +387,11 @@ function TipTap(props: TipTapProps) {
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
-        if (onSelectionChange) onSelectionChange(transaction.selection);
+        if (onSelectionChange)
+          onSelectionChange({
+            from: toFlatPosition(editor.state.doc, transaction.selection.from),
+            to: toFlatPosition(editor.state.doc, transaction.selection.to)
+          });
         useEditorManager.getState().updateEditor(id, (old) => {
           const oldSelected = old.statistics?.words?.selected;
           const oldWords = old.statistics?.words.total || 0;
@@ -807,7 +813,14 @@ function toIEditor(editor: Editor): IEditor {
   return {
     focus: ({ position, scrollIntoView } = {}) => {
       if (typeof position === "object")
-        editor.chain().focus().setTextSelection(position).run();
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({
+            from: fromFlatPosition(editor.state.doc, position.from),
+            to: fromFlatPosition(editor.state.doc, position.to)
+          })
+          .run();
       else
         editor.commands.focus(position, {
           scrollIntoView
@@ -847,7 +860,10 @@ function toIEditor(editor: Editor): IEditor {
       ),
     getSelection: () => {
       const { from, to } = editor.state.selection;
-      return { from, to };
+      return {
+        from: toFlatPosition(editor.state.doc, from),
+        to: toFlatPosition(editor.state.doc, to)
+      };
     }
   };
 }
