@@ -286,7 +286,7 @@ describe("Key migration during password change", () => {
     });
   });
 
-  test("user with only DEK (no legacy): password change fails verification", async () => {
+  test("user with only DEK (no legacy): password change succeeds verification", async () => {
     await databaseTest().then(async (db) => {
       const password = "oldpassword";
       const salt = randomBytes(16).toString("base64");
@@ -305,12 +305,14 @@ describe("Key migration during password change", () => {
 
       await db.user.setUser({ ...FULL_USER, salt, dataEncryptionKey: dek });
 
-      // verifyEncryptionKey throws when only one of legacy DEK or DEK exists
-      await expect(
-        db.user.changePassword("oldpassword", "newpassword")
-      ).rejects.toThrow(
-        "Cannot verify the provided encryption key as user has only a single encryption key."
-      );
+      // A single DEK is now a valid verifier, so the change should succeed
+      // and the DEK should be rewrapped with the new password.
+      const result = await db.user.changePassword("oldpassword", "newpassword");
+      expect(result).toBe(true);
+
+      const userAfter = await db.user.getUser();
+      expect(userAfter.dataEncryptionKey).toBeDefined();
+      expect(userAfter.dataEncryptionKey?.cipher).not.toBe(dek.cipher);
     });
   });
 

@@ -637,28 +637,34 @@ class UserManager {
     const user = await this.getUser();
     if (!user) throw new Error("User not found.");
 
-    if (user.legacyDataEncryptionKey && user.dataEncryptionKey)
-      await this.keyManager.unwrapKey(user.legacyDataEncryptionKey, key);
-    else if (!user.legacyDataEncryptionKey && !user.dataEncryptionKey) {
-      const verifier =
-        user.attachmentsKey ??
-        user.monographPasswordsKey ??
-        (await this.fetchEncryptionVerifier());
-      if (!verifier) throw new Error("Failed to fetch encryption verifier.");
+    const verifiers = [
+      user.attachmentsKey,
+      user.monographPasswordsKey,
+      user.legacyDataEncryptionKey,
+      user.dataEncryptionKey,
+      user.inboxKeys?.private
+    ].filter((v): v is Cipher<"base64"> => !!v);
+
+    if (verifiers.length === 0) {
+      const verifier = await this.fetchEncryptionVerifier();
+      if (verifier) verifiers.push(verifier);
+      else
+        throw new Error(
+          "Encryption key cannot be verified: no encryption verifier found."
+        );
+    }
+
+    for (const verifier of verifiers) {
       const decryptedData = await this.db
         .storage()
         .decrypt(key, verifier)
         .then(() => true)
         .catch(() => false);
-
       if (!decryptedData)
         throw new Error(
           "Your data cannot be decrypted using the provided encryption key."
         );
-    } else
-      throw new Error(
-        "Cannot verify the provided encryption key as user has only a single encryption key."
-      );
+    }
   }
 
   async _updatePassword(

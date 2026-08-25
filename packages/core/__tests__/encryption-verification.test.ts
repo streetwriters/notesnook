@@ -229,7 +229,9 @@ describe("UserManager.verifyEncryptionKey", () => {
         // Server returns undefined — should throw
         await expect(
           db.user.verifyEncryptionKey({ password, salt })
-        ).rejects.toThrow("Failed to fetch encryption verifier.");
+        ).rejects.toThrow(
+          "Encryption key cannot be verified: no encryption verifier found."
+        );
       });
 
       mockGet.mockRestore();
@@ -315,7 +317,7 @@ describe("UserManager.verifyEncryptionKey", () => {
   });
 
   describe("user with only one of legacy DEK or DEK", () => {
-    test("throws when only dataEncryptionKey exists", async () => {
+    test("succeeds when only dataEncryptionKey exists", async () => {
       await databaseTest().then(async (db) => {
         const password = "password";
         const salt = randomBytes(16).toString("base64");
@@ -336,13 +338,11 @@ describe("UserManager.verifyEncryptionKey", () => {
 
         await expect(
           db.user.verifyEncryptionKey({ password, salt })
-        ).rejects.toThrow(
-          "Cannot verify the provided encryption key as user has only a single encryption key."
-        );
+        ).resolves.toBeUndefined();
       });
     });
 
-    test("throws when only legacyDataEncryptionKey exists", async () => {
+    test("succeeds when only legacyDataEncryptionKey exists", async () => {
       await databaseTest().then(async (db) => {
         const password = "password";
         const salt = randomBytes(16).toString("base64");
@@ -363,8 +363,33 @@ describe("UserManager.verifyEncryptionKey", () => {
 
         await expect(
           db.user.verifyEncryptionKey({ password, salt })
+        ).resolves.toBeUndefined();
+      });
+    });
+
+    test("invalid key throws even when only a single DEK exists", async () => {
+      await databaseTest().then(async (db) => {
+        const password = "correct";
+        const salt = randomBytes(16).toString("base64");
+        await db.user.setUser({
+          id: "user-123", email: "test@example.com", isEmailConfirmed: true,
+          salt, mfa: { isEnabled: false, primaryMethod: "app", remainingValidCodes: 0 },
+          subscription: { appId: 0, cancelURL: null, expiry: 0, productId: null, provider: "none", start: 0, plan: "free", status: "trial", updateURL: null, googlePurchaseToken: null }
+        } as any);
+        await db.storage().deriveCryptoKey({ password, salt });
+        const masterKey = await db.user.getMasterKey();
+        const km = new KeyManager(db);
+
+        const randomKey = await db.crypto().generateRandomKey();
+        const dek = await km.wrapKey(randomKey, masterKey!);
+
+        const user = await db.user.getUser();
+        await db.user.setUser({ ...user, dataEncryptionKey: dek });
+
+        await expect(
+          db.user.verifyEncryptionKey({ password: "wrongpassword", salt })
         ).rejects.toThrow(
-          "Cannot verify the provided encryption key as user has only a single encryption key."
+          "Your data cannot be decrypted using the provided encryption key."
         );
       });
     });
