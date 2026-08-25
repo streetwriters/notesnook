@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 const STORAGE_KEY = "nn:profiler";
-const DEFAULT_ENABLED = true;
+const DEFAULT_ENABLED = false;
 const DEFAULT_MAX_SAMPLES = 4000;
 const DEFAULT_MAX_TIMELINE = 4000;
 

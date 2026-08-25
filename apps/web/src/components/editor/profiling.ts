@@ -197,10 +197,9 @@ export function installProfilerGlobals() {
   };
 
   (globalThis as unknown as Record<string, unknown>).editorProfiler = api;
-  console.log(
-    profiler.enabled
-      ? "[profiler] on by default. window.editorProfiler.print() for a report, .disable() to turn off."
-      : "[profiler] off. window.editorProfiler.enable() to turn it back on."
-  );
+  if (profiler.enabled)
+    console.log(
+      "[profiler] active. window.editorProfiler.print() for a report, .disable() to turn off."
+    );
   return api;
 }

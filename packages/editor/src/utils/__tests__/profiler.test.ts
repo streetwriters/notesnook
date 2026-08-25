@@ -29,15 +29,15 @@ beforeEach(() => {
 });
 
 describe("profiler", () => {
-  test("is enabled by default", () => {
+  test("is disabled by default", () => {
     globalThis.localStorage?.clear();
-    expect(new Profiler().enabled).toBe(true);
+    expect(new Profiler().enabled).toBe(false);
   });
 
-  test("stays disabled across reloads once turned off", () => {
+  test("stays enabled across reloads once turned on", () => {
     globalThis.localStorage?.clear();
-    new Profiler().disable();
-    expect(new Profiler().enabled).toBe(false);
+    new Profiler().enable();
+    expect(new Profiler().enabled).toBe(true);
   });
 
   test("records nothing while disabled", () => {
