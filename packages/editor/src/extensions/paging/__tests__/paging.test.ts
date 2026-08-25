@@ -21,7 +21,14 @@ import { describe, expect, test } from "vitest";
 import { Editor, getHTMLFromFragment } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { Node } from "@tiptap/core";
-import { Page, Paging, countPages, flattenBlocks } from "../index.js";
+import {
+  Page,
+  Paging,
+  countPages,
+  flattenBlocks,
+  fromFlatPosition,
+  toFlatPosition
+} from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
 import { getTableOfContents } from "../../../utils/toc.js";
 
@@ -63,6 +70,64 @@ async function created() {
   await new Promise((resolve) => setTimeout(resolve, 0));
 }
 
+describe("paging positions", () => {
+  test("flat positions round-trip through a paged document", async () => {
+    const editor = createEditor(savedNoteHTML(BLOCKS));
+    await created();
+    expect(countPages(editor.state.doc)).toBe(3);
+
+    // Positions on a page boundary are ambiguous by nature -- the gap between
+    // two pages is a single position once the pages are gone. Carets only ever
+    // sit inside a textblock, and those must survive exactly.
+    const doc = editor.state.doc;
+    let checked = 0;
+    for (let pos = 1; pos < doc.content.size; pos++) {
+      if (!doc.resolve(pos).parent.isTextblock) continue;
+      const flat = toFlatPosition(doc, pos);
+      expect(fromFlatPosition(doc, flat)).toBe(pos);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(1000);
+    editor.destroy();
+  });
+
+  test("a position saved unpaged resolves to the same block when paged", async () => {
+    const flatEditor = createEditor(savedNoteHTML(BLOCKS), false);
+    await created();
+    expect(countPages(flatEditor.state.doc)).toBe(0);
+
+    // caret inside block 120 of the unpaged document
+    let target = 0;
+    for (let i = 0; i < 120; i++)
+      target += flatEditor.state.doc.child(i).nodeSize;
+    target += 3;
+    const saved = toFlatPosition(flatEditor.state.doc, target);
+    expect(saved).toBe(target);
+    const text = flatEditor.state.doc.child(120).textContent;
+    flatEditor.destroy();
+
+    const pagedEditor = createEditor(savedNoteHTML(BLOCKS));
+    await created();
+    const restored = fromFlatPosition(pagedEditor.state.doc, saved);
+    expect(pagedEditor.state.doc.resolve(restored).parent.textContent).toBe(
+      text
+    );
+    pagedEditor.destroy();
+  });
+
+  test("conversions are the identity without pages", async () => {
+    const editor = createEditor(savedNoteHTML(20), false);
+    await created();
+
+    const doc = editor.state.doc;
+    for (let pos = 0; pos <= doc.content.size; pos += 5) {
+      expect(toFlatPosition(doc, pos)).toBe(pos);
+      expect(fromFlatPosition(doc, pos)).toBe(pos);
+    }
+    editor.destroy();
+  });
+});
+
 describe("paging", () => {
   test("groups blocks into pages once the note is opened", async () => {
     const editor = createEditor(savedNoteHTML(BLOCKS));
@@ -72,6 +137,16 @@ describe("paging", () => {
     expect(editor.state.doc.childCount).toBe(3);
     expect(editor.state.doc.child(0).childCount).toBe(PAGE_SIZE);
     expect(editor.state.doc.child(2).childCount).toBe(50);
+    editor.destroy();
+  });
+
+  test("pages exist before the first render, not after it", () => {
+    const editor = createEditor(savedNoteHTML(BLOCKS));
+
+    // no `await created()`: the parser pages the document, so the very first
+    // view already renders pages instead of 250 blocks.
+    expect(countPages(editor.state.doc)).toBe(3);
+    expect(editor.view.dom.children).toHaveLength(3);
     editor.destroy();
   });
 

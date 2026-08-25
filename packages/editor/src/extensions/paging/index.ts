@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Extension } from "@tiptap/core";
 import { profiler } from "../../utils/profiler.js";
 import { installFlatteningSerializer } from "./serializer.js";
+import { installPagingParser } from "./parser.js";
 import { DEFAULT_PAGE_SIZE, countPages, toPages } from "./split.js";
 
 export type PagingOptions = {
@@ -39,12 +40,19 @@ export const Paging = Extension.create<PagingOptions>({
     };
   },
 
-  // Runs before the first view exists. Installing the serializer here means no
-  // code path can serialize a paged document before pages are stripped.
+  // Runs before the first view exists, so the document arrives already paged
+  // and is never rendered flat.
   onBeforeCreate() {
     installFlatteningSerializer(this.editor.schema);
+    if (!this.options.enabled) return;
+    installPagingParser(this.editor.schema, {
+      pageSize: this.options.pageSize,
+      thresholdBlocks: this.options.thresholdBlocks
+    });
   },
 
+  // Content that arrives as JSON bypasses the parser, so this stays as a
+  // fallback for documents the parser never saw.
   onCreate() {
     if (!this.options.enabled) return;
     const { editor } = this;
@@ -77,3 +85,5 @@ export {
   toPages
 } from "./split.js";
 export { installFlatteningSerializer } from "./serializer.js";
+export { installPagingParser, uninstallPagingParser } from "./parser.js";
+export { fromFlatPosition, toFlatPosition } from "./positions.js";
