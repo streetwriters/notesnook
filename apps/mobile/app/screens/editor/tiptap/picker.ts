@@ -123,10 +123,19 @@ const file = async (fileOptions: PickerOptions) => {
       console.log(e, "error");
     });
 
+    const currentFileNoteId =
+      fileOptions.tabId !== undefined
+        ? useTabStore.getState().getNoteIdForTab(fileOptions.tabId)
+        : undefined;
+
+    if (!fileOptions.noteId && currentFileNoteId) {
+      fileOptions.noteId = currentFileNoteId;
+    }
+
     if (
       fileOptions.tabId !== undefined &&
-      useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
-        fileOptions.noteId
+      (currentFileNoteId === fileOptions.noteId ||
+        fileOptions.noteId === undefined)
     ) {
       editorController.current?.commands.insertAttachment(
         {
@@ -245,6 +254,7 @@ const handleImageResponse = async (
   response: Image[],
   options: PickerOptions
 ) => {
+  const isNewNote = options.noteId === undefined;
   const result = await AttachImage.present(response, options.context);
 
   if (!result) return;
@@ -295,9 +305,16 @@ const handleImageResponse = async (
 
     RNFetchBlob.fs.unlink(uri).catch((e) => {});
 
+    const currentNoteId =
+      options.tabId !== undefined
+        ? useTabStore.getState().getNoteIdForTab(options.tabId)
+        : undefined;
+
+    const isSameNote = currentNoteId === options.noteId;
+
     if (
       options.tabId !== undefined &&
-      useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+      (isSameNote || isNewNote)
     ) {
       editorController.current?.commands.insertImage(
         {
