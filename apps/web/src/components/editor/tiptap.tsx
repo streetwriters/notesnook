@@ -38,8 +38,10 @@ import {
   getTableOfContents,
   getChangedNodes,
   LinkAttributes,
+  profiler,
   type Selection
 } from "@notesnook/editor";
+import { installProfilerGlobals, setProfiledEditor } from "./profiling";
 import { Box, Flex } from "@theme-ui/components";
 import {
   PropsWithChildren,
@@ -138,6 +140,7 @@ function countSpaces(text: string) {
 }
 
 function updateNoteStatistics(id: string, content: () => Fragment) {
+  const end = profiler.start("statistics.update");
   const fragment = content();
   const documentText = fragment.textBetween(0, fragment.size, "\n", " ");
   useEditorManager.getState().updateEditor(id, {
@@ -160,9 +163,13 @@ function updateNoteStatistics(id: string, content: () => Fragment) {
       }
     }
   });
+  end();
+  profiler.count("statistics.updates");
 }
 
 const deferredUpdateNoteStatistics = debounce(updateNoteStatistics, 1000);
+
+installProfilerGlobals();
 
 function TipTap(props: TipTapProps) {
   const {
@@ -247,7 +254,9 @@ function TipTap(props: TipTapProps) {
             event.preventDefault();
             onChange?.(
               () =>
-                getHTMLFromFragment(editor.state.doc.content, editor.schema),
+                profiler.time("serialize.getHTML", () =>
+                  getHTMLFromFragment(editor.state.doc.content, editor.schema)
+                ),
               false
             );
           }
@@ -282,6 +291,13 @@ function TipTap(props: TipTapProps) {
       autofocus: "start",
       onFocus,
       onCreate: async ({ editor }) => {
+        setProfiledEditor(editor as Editor);
+        profiler.setContext("virtualization", !!virtualization);
+        profiler.setContext("noteId", id);
+        profiler.setContext("topLevelBlocks", editor.state.doc.childCount);
+        profiler.setContext("characters", editor.state.doc.textContent.length);
+        profiler.event("editor.created");
+
         if (oldNonce.current !== nonce)
           editor.commands.focus("start", { scrollIntoView: true });
         oldNonce.current = nonce;
@@ -289,7 +305,9 @@ function TipTap(props: TipTapProps) {
         const instance = toIEditor(editor as Editor);
         if (onLoad) onLoad(instance);
 
-        const totalWords = getTotalWords(editor as Editor);
+        const totalWords = profiler.time("statistics.totalWords", () =>
+          getTotalWords(editor as Editor)
+        );
         useEditorManager.getState().setEditor(id, {
           editor: instance,
           canRedo: editor.can().redo(),
@@ -341,11 +359,15 @@ function TipTap(props: TipTapProps) {
         if (!autoSave.current) return;
 
         onChange(
-          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          () =>
+            profiler.time("serialize.getHTML", () =>
+              getHTMLFromFragment(editor.state.doc.content, editor.schema)
+            ),
           ignoreEdit
         );
       },
       onDestroy: () => {
+        setProfiledEditor(undefined);
         useEditorManager.getState().setEditor(id);
       },
       onTransaction: ({ editor, transaction }) => {
@@ -819,7 +841,9 @@ function toIEditor(editor: Editor): IEditor {
       ),
     startSearch: () => editor.commands.startSearch(),
     getContent: () =>
-      getHTMLFromFragment(editor.state.doc.content, editor.schema),
+      profiler.time("serialize.getHTML", () =>
+        getHTMLFromFragment(editor.state.doc.content, editor.schema)
+      ),
     getSelection: () => {
       const { from, to } = editor.state.selection;
       return { from, to };
