@@ -388,6 +388,17 @@ export class FilteredSelector<T extends Item> {
     this.filter = filter;
   }
 
+  clone() {
+    const selector = new FilteredSelector<T>(
+      this.type,
+      this.filter,
+      this.batchSize
+    );
+    selector._fields = this._fields.slice();
+    selector._limit = this._limit;
+    return selector;
+  }
+
   fields(fields: AnyColumnWithTable<DatabaseSchema, keyof DatabaseSchema>[]) {
     this._fields = fields;
     return this;

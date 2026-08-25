@@ -209,4 +209,39 @@ describe("notesWithHighlighting", () => {
       );
       expect(searchWithDiacritics.length).toBe(4);
     }));
+
+  test("should not reuse filters (aka mutate selector) between searches", () =>
+    databaseTest().then(async (db) => {
+      const note1Id = await db.notes.add({ title: "note 1" });
+      const note2Id = await db.notes.add({ title: "note 2" });
+      const note3Id = await db.notes.add({ title: "note 3" });
+      const tag1Id = await db.tags.add({ title: "daily" });
+      const tag2Id = await db.tags.add({ title: "academia" });
+      await db.relations.add(
+        { id: tag1Id, type: "tag" },
+        { id: note1Id, type: "note" }
+      );
+      await db.relations.add(
+        { id: tag2Id, type: "tag" },
+        { id: note2Id, type: "note" }
+      );
+
+      /**
+       * this test ensures that the selector passed to `notesWithHighlighting` is not mutated between searches
+       */
+      const selector = db.notes.all;
+
+      const tag1SearchResults = await db.lookup.notesWithHighlighting(
+        "tag:daily",
+        selector
+      );
+      expect(await tag1SearchResults.ids()).toEqual([note1Id]);
+      expect(await selector.ids()).toEqual([note1Id, note2Id, note3Id]);
+      const bothTagResults = await db.lookup.notesWithHighlighting(
+        "tag:daily tag:academia",
+        selector
+      );
+      expect(await bothTagResults.ids()).toEqual([note1Id, note2Id]);
+      expect(await selector.ids()).toEqual([note1Id, note2Id, note3Id]);
+    }));
 });
