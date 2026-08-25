@@ -1,5 +1,5 @@
 diff --git a/node_modules/prosemirror-view/dist/index.cjs b/node_modules/prosemirror-view/dist/index.cjs
-index a615cb7..9ba1d10 100644
+index a615cb7..e07b6e0 100644
 --- a/node_modules/prosemirror-view/dist/index.cjs
 +++ b/node_modules/prosemirror-view/dist/index.cjs
 @@ -1005,8 +1005,8 @@ var ViewDesc = function () {
@@ -12,29 +12,64 @@ index a615cb7..9ba1d10 100644
            if (anchor != head) domSel.extend(headDOM.node, headDOM.offset);
            domSelExtended = true;
          } catch (_) {}
-@@ -2935,6 +2935,7 @@ var InputState = _createClass(function InputState() {
+@@ -2935,6 +2935,8 @@ var InputState = _createClass(function InputState() {
    this.lastSelectionOrigin = null;
    this.lastSelectionTime = 0;
    this.lastIOSEnter = 0;
 +  this.lastAndroidEnter = 0;
++  this.androidEnterFallbackTimeout = -1;
    this.lastIOSEnterFallbackTimeout = -1;
    this.lastFocus = 0;
    this.lastTouch = 0;
-@@ -3003,11 +3004,12 @@ function _dispatchEvent(view, event) {
+@@ -2978,6 +2980,7 @@ function destroyInput(view) {
+   for (var type in view.input.eventHandlers) view.dom.removeEventListener(type, view.input.eventHandlers[type]);
+   clearTimeout(view.input.composingTimeout);
+   clearTimeout(view.input.lastIOSEnterFallbackTimeout);
++  clearTimeout(view.input.androidEnterFallbackTimeout);
+ }
+ function ensureListeners(view) {
+   view.someProp("handleDOMEvents", function (currentHandlers) {
+@@ -3003,11 +3006,30 @@ function _dispatchEvent(view, event) {
  }
  editHandlers.keydown = function (view, _event) {
    var event = _event;
-+  if (android && event.keyCode == 13) view.input.lastAndroidEnter = Date.now();
++  if (android && event.keyCode == 13) {
++    var enterNow = Date.now();
++    view.input.lastAndroidEnter = enterNow;
++    clearTimeout(view.input.androidEnterFallbackTimeout);
++    view.input.androidEnterFallbackTimeout = setTimeout(function () {
++      if (view.input.lastAndroidEnter == enterNow) {
++        view.input.lastAndroidEnter = 0;
++        view.domObserver.forceFlush();
++        view.domObserver.flush();
++        view.someProp("handleKeyDown", function (f) {
++          return f(view, keyEvent(13, "Enter"));
++        });
++      }
++    }, 200);
++  }
    view.input.shiftKey = event.keyCode == 16 || event.shiftKey;
    if (inOrNearComposition(view)) return;
    view.input.lastKeyCode = event.keyCode;
    view.input.lastKeyCodeTime = Date.now();
 -  if (android && chrome && event.keyCode == 13) return;
-+  if (android && chrome && event.keyCode == 13 && view.state.selection.empty) return;
++  if (android && chrome && event.keyCode == 13) {
++    view.domObserver.forceFlush();
++    view.domObserver.flush();
++    if (view.state.selection.empty) return;
++  }
    if (event.keyCode != 229) view.domObserver.forceFlush();
    if (ios && event.keyCode == 13 && !event.ctrlKey && !event.altKey && !event.metaKey) {
      var now = Date.now();
-@@ -3647,7 +3649,7 @@ function handleDrop(view, event, dragging) {
+@@ -3023,6 +3045,7 @@ editHandlers.keydown = function (view, _event) {
+   } else if (view.someProp("handleKeyDown", function (f) {
+     return f(view, event);
+   }) || captureKeyDown(view, event)) {
++    if (android && event.keyCode == 13) view.input.lastAndroidEnter = 0;
+     event.preventDefault();
+   } else {
+     setSelectionOrigin(view, "key");
+@@ -3647,7 +3670,7 @@ function handleDrop(view, event, dragging) {
      });
      tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
    }
@@ -43,7 +78,7 @@ index a615cb7..9ba1d10 100644
    view.dispatch(tr.setMeta("uiEvent", "drop"));
  }
  handlers.focus = function (view) {
-@@ -3674,6 +3676,7 @@ handlers.blur = function (view, _event) {
+@@ -3674,6 +3697,7 @@ handlers.blur = function (view, _event) {
  };
  handlers.beforeinput = function (view, _event) {
    var event = _event;
@@ -51,7 +86,15 @@ index a615cb7..9ba1d10 100644
    if (android && event.inputType == "deleteContentBackward") {
      view.domObserver.flushSoon();
      var domChangeCount = view.input.domChangeCount;
-@@ -4881,10 +4884,11 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+@@ -4841,6 +4865,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+     return f(view, keyEvent(13, "Enter"));
+   })) {
+     view.input.lastIOSEnter = 0;
++    view.input.lastAndroidEnter = 0;
+     return;
+   }
+   if (!change) {
+@@ -4881,10 +4906,11 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
    var inlineChange = $from.sameParent($to) && $from.parent.inlineContent && $fromA.end() >= change.endA;
    if ((ios && view.input.lastIOSEnter > Date.now() - 225 && (!inlineChange || addedNodes.some(function (n) {
      return n.nodeName == "DIV" || n.nodeName == "P";
@@ -64,8 +107,16 @@ index a615cb7..9ba1d10 100644
      return;
    }
    if (view.state.selection.anchor > change.start && looksLikeBackspace(doc, change.start, change.endA, $from, $to) && view.someProp("handleKeyDown", function (f) {
+@@ -4893,6 +4919,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+     if (android && chrome) view.domObserver.suppressSelectionUpdates();
+     return;
+   }
++  view.input.lastAndroidEnter = 0;
+   if (chrome && change.endB == change.start) view.input.lastChromeDelete = Date.now();
+   if (android && !inlineChange && $from.start() != $to.start() && $to.parentOffset == 0 && $from.depth == $to.depth && parse.sel && parse.sel.anchor == parse.sel.head && parse.sel.head == change.endA) {
+     change.endB -= 2;
 diff --git a/node_modules/prosemirror-view/dist/index.js b/node_modules/prosemirror-view/dist/index.js
-index 61118ee..8484889 100644
+index 61118ee..b82e477 100644
 --- a/node_modules/prosemirror-view/dist/index.js
 +++ b/node_modules/prosemirror-view/dist/index.js
 @@ -1079,8 +1079,8 @@ class ViewDesc {
@@ -78,33 +129,68 @@ index 61118ee..8484889 100644
                  if (anchor != head)
                      domSel.extend(headDOM.node, headDOM.offset);
                  domSelExtended = true;
-@@ -3098,6 +3098,7 @@ class InputState {
+@@ -3098,6 +3098,8 @@ class InputState {
          this.lastSelectionTime = 0;
          this.lastIOSEnter = 0;
          this.lastIOSEnterFallbackTimeout = -1;
 +        this.lastAndroidEnter = 0;
++        this.androidEnterFallbackTimeout = -1;
          this.lastFocus = 0;
          this.lastTouch = 0;
          this.lastChromeDelete = 0;
-@@ -3175,6 +3176,8 @@ function dispatchEvent(view, event) {
+@@ -3143,6 +3145,7 @@ function destroyInput(view) {
+         view.dom.removeEventListener(type, view.input.eventHandlers[type]);
+     clearTimeout(view.input.composingTimeout);
+     clearTimeout(view.input.lastIOSEnterFallbackTimeout);
++    clearTimeout(view.input.androidEnterFallbackTimeout);
+ }
+ function ensureListeners(view) {
+     view.someProp("handleDOMEvents", currentHandlers => {
+@@ -3175,6 +3178,19 @@ function dispatchEvent(view, event) {
  }
  editHandlers.keydown = (view, _event) => {
      let event = _event;
-+    if (android && event.keyCode == 13)
-+        view.input.lastAndroidEnter = Date.now();
++    if (android && event.keyCode == 13) {
++        let now = Date.now();
++        view.input.lastAndroidEnter = now;
++        clearTimeout(view.input.androidEnterFallbackTimeout);
++        view.input.androidEnterFallbackTimeout = setTimeout(() => {
++            if (view.input.lastAndroidEnter == now) {
++                view.input.lastAndroidEnter = 0;
++                view.domObserver.forceFlush();
++                view.domObserver.flush();
++                view.someProp("handleKeyDown", f => f(view, keyEvent(13, "Enter")));
++            }
++        }, 200);
++    }
      view.input.shiftKey = event.keyCode == 16 || event.shiftKey;
      if (inOrNearComposition(view))
          return;
-@@ -3183,7 +3186,7 @@ editHandlers.keydown = (view, _event) => {
+@@ -3183,8 +3199,12 @@ editHandlers.keydown = (view, _event) => {
      // Suppress enter key events on Chrome Android, because those tend
      // to be part of a confused sequence of composition events fired,
      // and handling them eagerly tends to corrupt the input.
 -    if (android && chrome && event.keyCode == 13)
-+    if (android && chrome && event.keyCode == 13 && view.state.selection.empty)
-         return;
+-        return;
++    if (android && chrome && event.keyCode == 13) {
++        view.domObserver.forceFlush();
++        view.domObserver.flush();
++        if (view.state.selection.empty)
++            return;
++    }
      if (event.keyCode != 229)
          view.domObserver.forceFlush();
-@@ -3885,7 +3888,7 @@ function handleDrop(view, event, dragging) {
+     // On iOS, if we preventDefault enter key presses, the virtual
+@@ -3202,6 +3222,8 @@ editHandlers.keydown = (view, _event) => {
+         }, 200);
+     }
+     else if (view.someProp("handleKeyDown", f => f(view, event)) || captureKeyDown(view, event)) {
++        if (android && event.keyCode == 13)
++            view.input.lastAndroidEnter = 0;
+         event.preventDefault();
+     }
+     else {
+@@ -3885,7 +3907,7 @@ function handleDrop(view, event, dragging) {
          tr.mapping.maps[tr.mapping.maps.length - 1].forEach((_from, _to, _newFrom, newTo) => end = newTo);
          tr.setSelection(selectionBetween(view, $pos, tr.doc.resolve(end)));
      }
@@ -113,7 +199,7 @@ index 61118ee..8484889 100644
      view.dispatch(tr.setMeta("uiEvent", "drop"));
  }
  handlers.focus = view => {
-@@ -3914,6 +3917,8 @@ handlers.blur = (view, _event) => {
+@@ -3914,6 +3936,8 @@ handlers.blur = (view, _event) => {
  };
  handlers.beforeinput = (view, _event) => {
      let event = _event;
@@ -122,7 +208,15 @@ index 61118ee..8484889 100644
      // We should probably do more with beforeinput events, but support
      // is so spotty that I'm still waiting to see where they are going.
      // Very specific hack to deal with backspace sometimes failing on
-@@ -5193,11 +5198,12 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+@@ -5139,6 +5163,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+         (!change || change.endA >= change.endB) &&
+         view.someProp("handleKeyDown", f => f(view, keyEvent(13, "Enter")))) {
+         view.input.lastIOSEnter = 0;
++        view.input.lastAndroidEnter = 0;
+         return;
+     }
+     if (!change) {
+@@ -5193,11 +5218,12 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
      // as being an iOS enter press), just dispatch an Enter key instead.
      if (((ios && view.input.lastIOSEnter > Date.now() - 225 &&
          (!inlineChange || addedNodes.some(n => n.nodeName == "DIV" || n.nodeName == "P"))) ||
@@ -136,3 +230,13 @@ index 61118ee..8484889 100644
          return;
      }
      // Same for backspace
+@@ -5208,6 +5234,9 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
+             view.domObserver.suppressSelectionUpdates(); // #820
+         return;
+     }
++    // A DOM change is about to be applied, so an Enter keypress (if any) is
++    // accounted for -- don't let the Android Enter fallback fire on top of it.
++    view.input.lastAndroidEnter = 0;
+     // Chrome will occasionally, during composition, delete the
+     // entire composition and then immediately insert it again. This is
+     // used to detect that situation.
