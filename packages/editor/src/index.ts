@@ -494,7 +494,11 @@ export * from "./utils/word-counter.js";
 export * from "./utils/font.js";
 export * from "./utils/toc.js";
 export * from "./utils/profiler.js";
-export { fromFlatPosition, toFlatPosition } from "./extensions/paging/index.js";
+export {
+  fromFlatPosition,
+  serializeDocumentHTML,
+  toFlatPosition
+} from "./extensions/paging/index.js";
 export * from "./utils/downloader.js";
 export {
   useTiptap,

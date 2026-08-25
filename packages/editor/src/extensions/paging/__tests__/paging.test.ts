@@ -27,10 +27,12 @@ import {
   countPages,
   flattenBlocks,
   fromFlatPosition,
+  serializeDocumentHTML,
   toFlatPosition
 } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
 import { getTableOfContents } from "../../../utils/toc.js";
+import { profiler } from "../../../utils/profiler.js";
 
 const PagedDocument = Node.create({
   name: "doc",
@@ -263,6 +265,61 @@ describe("paging", () => {
     expect(html).not.toContain("data-page");
     expect(html).toContain("edited");
     expect(html.match(/<p/g)).toHaveLength(BLOCKS);
+    editor.destroy();
+  });
+});
+
+describe("serialization cache", () => {
+  test("matches the plain serializer exactly", async () => {
+    const editor = createEditor(savedNoteHTML(BLOCKS));
+    await created();
+
+    expect(serializeDocumentHTML(editor.state.doc, editor.schema)).toBe(
+      editor.getHTML()
+    );
+    editor.destroy();
+  });
+
+  test("reuses unedited pages and re-serializes only the edited one", async () => {
+    const editor = createEditor(savedNoteHTML(BLOCKS));
+    await created();
+
+    serializeDocumentHTML(editor.state.doc, editor.schema);
+    profiler.enable();
+    editor.commands.setTextSelection(3);
+    editor.commands.insertContent("edited ");
+    serializeDocumentHTML(editor.state.doc, editor.schema);
+
+    const counters = profiler.report().counters;
+    expect(counters["serialize.cacheMiss"]).toBe(1);
+    expect(counters["serialize.cacheHit"]).toBe(2);
+    profiler.disable();
+    profiler.reset();
+    editor.destroy();
+  });
+
+  test("still reflects the edit", async () => {
+    const editor = createEditor(savedNoteHTML(BLOCKS));
+    await created();
+
+    serializeDocumentHTML(editor.state.doc, editor.schema);
+    editor.commands.setTextSelection(3);
+    editor.commands.insertContent("edited ");
+
+    const html = serializeDocumentHTML(editor.state.doc, editor.schema);
+    expect(html).toContain("edited");
+    expect(html).toBe(editor.getHTML());
+    expect(html.match(/<p/g)).toHaveLength(BLOCKS);
+    editor.destroy();
+  });
+
+  test("works without pages too", async () => {
+    const editor = createEditor(savedNoteHTML(20), false);
+    await created();
+
+    expect(serializeDocumentHTML(editor.state.doc, editor.schema)).toBe(
+      editor.getHTML()
+    );
     editor.destroy();
   });
 });

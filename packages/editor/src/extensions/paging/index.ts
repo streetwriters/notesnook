@@ -87,3 +87,4 @@ export {
 export { installFlatteningSerializer } from "./serializer.js";
 export { installPagingParser, uninstallPagingParser } from "./parser.js";
 export { fromFlatPosition, toFlatPosition } from "./positions.js";
+export { serializeDocumentHTML } from "./serialize.js";
