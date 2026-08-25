@@ -1,3 +1,4 @@
+- Fix drag/drop issues in task-lists and improved UX
 - Minor bug fixes and improvements
 
 Thank you for using Notesnook!

@@ -42,3 +42,12 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
+
+// Pin the ndkVersion for all subprojects
+subprojects { subproject ->
+    ["com.android.application", "com.android.library"].each { pluginId ->
+        subproject.plugins.withId(pluginId) {
+            subproject.android.ndkVersion = rootProject.ext.ndkVersion
+        }
+    }
+}
