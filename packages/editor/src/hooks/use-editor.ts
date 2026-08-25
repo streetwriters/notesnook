@@ -23,6 +23,7 @@ import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 import { EditorView } from "@tiptap/pm/view";
 import { useEditorSearchStore } from "../toolbar/stores/search-store.js";
+import { profiler } from "../utils/profiler.js";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -34,9 +35,13 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const editor = useMemo<Editor>(() => new Editor(options), []);
+  const editor = useMemo<Editor>(
+    () => profiler.time("editor.construct", () => new Editor(options)),
+    []
+  );
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
+  const isFirstRun = useRef(true);
 
   useEffect(
     () => {
@@ -49,12 +54,21 @@ export const useEditor = (
       options.onBeforeCreate?.({ editor });
       const oldIsFocused = editor.isFocused;
 
-      destroyView(editor.view);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore instead of creating a new editor, we just create
-      // a new view. Due to some reason this is faster than resetting
-      // the state of the same view.
-      editor.createView();
+      // The Editor constructor already rendered a view into the same element,
+      // so replacing it on the first run means rendering the whole document
+      // twice. Only later runs (changed options) need a fresh view.
+      if (isFirstRun.current) {
+        isFirstRun.current = false;
+      } else {
+        profiler.time("editor.destroyView", () => destroyView(editor.view));
+        profiler.time("editor.createView", () => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore instead of creating a new editor, we just create
+          // a new view. Due to some reason this is faster than resetting
+          // the state of the same view.
+          editor.createView();
+        });
+      }
       if (oldIsFocused && !editor.isFocused) editor.commands.focus();
       options.onCreate?.({ editor: editor });
 
