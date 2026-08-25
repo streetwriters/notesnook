@@ -367,7 +367,10 @@ function TipTap(props: TipTapProps) {
         if (ignoreEdit || preventSave || !editor.isEditable || !onChange)
           return;
 
-        if (!autoSave.current) return;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+          return;
+        }
 
         onChange(
           () =>
@@ -571,9 +574,6 @@ function TipTap(props: TipTapProps) {
   useEffect(() => {
     const update = (totalWords?: number) => {
       autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
-      if (!autoSave.current) {
-        onAutoSaveDisabled();
-      }
     };
 
     // The editor's statistics are set from `onCreate`, which runs before this
