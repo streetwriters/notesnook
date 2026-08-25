@@ -27,7 +27,6 @@ import {
   Editor,
   AttachmentType,
   usePermissionHandler,
-  getHTMLFromFragment,
   Fragment,
   type DownloadOptions,
   getTotalWords,
@@ -40,6 +39,7 @@ import {
   LinkAttributes,
   fromFlatPosition,
   profiler,
+  serializeDocumentHTML,
   toFlatPosition,
   type VirtualizationMode,
   type Selection
@@ -257,8 +257,8 @@ function TipTap(props: TipTapProps) {
             event.preventDefault();
             onChange?.(
               () =>
-                profiler.time("serialize.getHTML", () =>
-                  getHTMLFromFragment(editor.state.doc.content, editor.schema)
+                profiler.time("serialize.manualSave", () =>
+                  serializeDocumentHTML(editor.state.doc, editor.schema)
                 ),
               false
             );
@@ -363,8 +363,8 @@ function TipTap(props: TipTapProps) {
 
         onChange(
           () =>
-            profiler.time("serialize.getHTML", () =>
-              getHTMLFromFragment(editor.state.doc.content, editor.schema)
+            profiler.time("serialize.autoSave", () =>
+              serializeDocumentHTML(editor.state.doc, editor.schema)
             ),
           ignoreEdit
         );
@@ -561,14 +561,21 @@ function TipTap(props: TipTapProps) {
   }, [editor]);
 
   useEffect(() => {
+    const update = (totalWords?: number) => {
+      autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+      if (!autoSave.current) {
+        onAutoSaveDisabled();
+      }
+    };
+
+    // The editor's statistics are set from `onCreate`, which runs before this
+    // effect, and a store subscription only fires on later changes. Without
+    // seeding from the current value auto-save stays on for large notes.
+    update(useEditorManager.getState().editors[id]?.statistics?.words.total);
+
     const unsubscribe = useEditorManager.subscribe(
       (s) => s.editors[id]?.statistics?.words.total,
-      (totalWords) => {
-        autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
-        if (!autoSave.current) {
-          onAutoSaveDisabled();
-        }
-      }
+      update
     );
     return () => {
       unsubscribe();
@@ -855,8 +862,8 @@ function toIEditor(editor: Editor): IEditor {
       ),
     startSearch: () => editor.commands.startSearch(),
     getContent: () =>
-      profiler.time("serialize.getHTML", () =>
-        getHTMLFromFragment(editor.state.doc.content, editor.schema)
+      profiler.time("serialize.getContent", () =>
+        serializeDocumentHTML(editor.state.doc, editor.schema)
       ),
     getSelection: () => {
       const { from, to } = editor.state.selection;
