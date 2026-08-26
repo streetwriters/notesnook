@@ -104,6 +104,46 @@ function createEditor() {
 }
 
 describe("viewport window", () => {
+  test("re-measures when the editor is re-laid out", async () => {
+    const observed: Element[] = [];
+    const RealResizeObserver = globalThis.ResizeObserver;
+    let notify: (() => void) | undefined;
+    globalThis.ResizeObserver = class {
+      constructor(callback: () => void) {
+        notify = callback;
+      }
+      observe(element: Element) {
+        observed.push(element);
+      }
+      unobserve() {}
+      disconnect() {}
+    } as unknown as typeof ResizeObserver;
+
+    const editor = createEditor();
+    stubLayout(editor);
+    await frames();
+
+    // zooming changes the layout without scrolling or editing, so a resize is
+    // the only signal that what is on screen has moved
+    expect(observed).toContain(editor.view.dom);
+    expect(notify).toBeDefined();
+
+    const dom = editor.view.dom as HTMLElement;
+    let top = 0;
+    for (const child of Array.from(dom.children)) {
+      const childTop = top;
+      (child as HTMLElement).getBoundingClientRect = () =>
+        rect(childTop, BLOCK_HEIGHT * 4);
+      top += BLOCK_HEIGHT * 4;
+    }
+    notify?.();
+    await frames();
+
+    expect(visibleBlocks(editor).length).toBeGreaterThan(0);
+    globalThis.ResizeObserver = RealResizeObserver;
+    editor.destroy();
+  });
+
   test("observes nothing: no IntersectionObserver is created", async () => {
     const editor = createEditor();
     stubLayout(editor);

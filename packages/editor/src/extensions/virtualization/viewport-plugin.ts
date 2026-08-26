@@ -495,6 +495,20 @@ export function virtualizationPlugin(
       }
 
       window.addEventListener("resize", schedule, { passive: true });
+
+      // Zooming or changing the font re-lays out the note without scrolling it
+      // and without touching the document, so nothing else would tell the
+      // window that what is on screen has moved.
+      let layout: ResizeObserver | undefined;
+      try {
+        if (typeof ResizeObserver !== "undefined") {
+          layout = new ResizeObserver(() => schedule());
+          layout.observe(editorView.dom);
+        }
+      } catch (e) {
+        layout = undefined;
+      }
+
       schedule();
 
       return {
@@ -506,6 +520,8 @@ export function virtualizationPlugin(
           if (frame) cancelAnimationFrame(frame);
           window.removeEventListener("resize", schedule);
           scrollParent?.removeEventListener("scroll", schedule);
+          layout?.disconnect();
+          layout = undefined;
           scrollParent = null;
         }
       };
