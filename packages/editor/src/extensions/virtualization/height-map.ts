@@ -52,6 +52,10 @@ const DEFAULT_PIXELS_PER_UNIT = 0.4;
 const RECALIBRATION_THRESHOLD = 0.15;
 
 const PAGE_TYPE = "page";
+const TABLE_TYPE = "table";
+
+/** A table row is at least this tall, however little its cells hold. */
+const MIN_ROW_HEIGHT = 32;
 
 type Samples = { height: number; content: number };
 
@@ -60,6 +64,18 @@ export class HeightMap {
   private samples = new Map<string, Samples>();
   private global: Samples = { height: 0, content: 0 };
   private stale = false;
+  private estimates = new WeakMap<ProsemirrorNode, number>();
+  private width = 0;
+
+  /**
+   * The width content is laid out in. An image wider than the editor is scaled
+   * down to fit, and its height with it.
+   */
+  setWidth(width: number): void {
+    if (!Number.isFinite(width) || width <= 0 || width === this.width) return;
+    this.width = width;
+    this.estimates = new WeakMap();
+  }
 
   /**
    * Pixels per unit of content for a node type. Prose wraps to many lines while
@@ -76,26 +92,72 @@ export class HeightMap {
     return DEFAULT_PIXELS_PER_UNIT;
   }
 
+  /**
+   * Estimates a node from whatever structure it actually has: an image from
+   * its stored dimensions, a table from its rows, anything holding blocks from
+   * the blocks themselves, and text from how much of it there is.
+   */
   estimate(node: ProsemirrorNode): number {
-    // A page is only as tall as what it holds: estimate each block by its own
-    // type rather than assuming the page is uniform.
-    if (node.type.name === PAGE_TYPE) {
+    const cached = this.estimates.get(node);
+    if (cached !== undefined) return cached;
+
+    const height = this.computeEstimate(node);
+    this.estimates.set(node, height);
+    return height;
+  }
+
+  private computeEstimate(node: ProsemirrorNode): number {
+    const base = DEFAULT_ESTIMATES[node.type.name] ?? FALLBACK_ESTIMATE;
+
+    const stored = this.storedHeight(node);
+    if (stored) return stored;
+
+    // Structure beats the type's fallback: a two-row table is not as tall as
+    // the average table, it is as tall as two rows.
+    if (node.type.name === TABLE_TYPE) return this.table(node) || base;
+
+    // Lists, callouts, quotes, pages: a container is as tall as its contents,
+    // and its children carry their own structure down as far as it goes.
+    if (this.holdsBlocks(node)) {
       let total = 0;
       node.forEach((child) => (total += this.heightFor(child)));
-      return total || FALLBACK_ESTIMATE;
+      return total || base;
     }
 
-    // Images and embeds carry their own dimensions, so there is nothing to
-    // guess: the stored height is what they will occupy.
-    const stored = Number(node.attrs.height);
-    if (Number.isFinite(stored) && stored > 0) return Math.round(stored);
-
-    const base = DEFAULT_ESTIMATES[node.type.name] ?? FALLBACK_ESTIMATE;
-    // `content.size` is O(1) and proportional to how much a node holds, unlike
-    // `textContent`, which would copy every character of every page.
+    // `content.size` is O(1) and proportional to how much text a node holds,
+    // unlike `textContent`, which would copy every character of every page.
     const content = node.content.size;
     if (!content) return base;
     return Math.max(base, Math.round(content * this.ratioFor(node.type.name)));
+  }
+
+  /** Images and embeds know their own size; scale it if it must fit. */
+  private storedHeight(node: ProsemirrorNode): number | undefined {
+    const height = Number(node.attrs.height);
+    if (!Number.isFinite(height) || height <= 0) return undefined;
+
+    const width = Number(node.attrs.width);
+    if (this.width > 0 && Number.isFinite(width) && width > this.width)
+      return Math.round(height * (this.width / width));
+    return Math.round(height);
+  }
+
+  private holdsBlocks(node: ProsemirrorNode): boolean {
+    return node.childCount > 0 && !!node.firstChild?.isBlock;
+  }
+
+  /** Rows stack, but the cells within a row sit side by side. */
+  private table(node: ProsemirrorNode): number {
+    let total = 0;
+    node.forEach((row) => {
+      let tallest = 0;
+      row.forEach((cell) => {
+        const height = this.estimate(cell);
+        if (height > tallest) tallest = height;
+      });
+      total += Math.max(MIN_ROW_HEIGHT, tallest);
+    });
+    return total;
   }
 
   /** True once measurements have moved a ratio enough to resize placeholders. */
@@ -105,6 +167,7 @@ export class HeightMap {
 
   markRecalibrated(): void {
     this.stale = false;
+    this.estimates = new WeakMap();
   }
 
   heightFor(node: ProsemirrorNode): number {
@@ -121,6 +184,7 @@ export class HeightMap {
     const blockId = node.attrs.blockId as string | undefined;
     if (!blockId || !Number.isFinite(height) || height <= 0) return;
     this.measured.set(blockId, Math.round(height));
+    this.estimates.delete(node);
     profiler.gauge("virtualization.heightMap.size", this.measured.size);
 
     // Pages are containers; calibrating from them would average away the

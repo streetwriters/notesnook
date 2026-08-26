@@ -25,6 +25,10 @@ import { HeightMap } from "../height-map.js";
 import { Page, Paging } from "../../paging/index.js";
 import { BlockId } from "../../block-id/block-id.js";
 import { ImageNode } from "../../image/index.js";
+import { Table } from "../../table/index.js";
+import TableCell from "../../table-cell/index.js";
+import TableHeader from "../../table-header/index.js";
+import TableRow from "@tiptap/extension-table-row";
 
 const PagedDocument = Node.create({
   name: "doc",
@@ -37,6 +41,10 @@ function createEditor(content: string, pageSize = 100) {
     extensions: [
       StarterKit.configure({ document: false }),
       ImageNode,
+      Table,
+      TableRow,
+      TableCell,
+      TableHeader,
       PagedDocument,
       Page,
       BlockId,
@@ -110,23 +118,70 @@ describe("height map", () => {
     editor.destroy();
   });
 
-  test("each node type calibrates from its own measurements", () => {
+  test("text types calibrate from their own measurements", () => {
+    const editor = createEditor(
+      para("word ".repeat(50)) + para("word ".repeat(50))
+    );
+    const map = new HeightMap();
+    const [measured, other] = blocks(editor);
+
+    map.record(measured, 400);
+
+    expect(map.heightFor(measured)).toBe(400);
+    // an identical paragraph that was never measured now follows that ratio
+    expect(map.estimate(other)).toBeGreaterThan(300);
+    expect(map.estimate(other)).toBeLessThanOrEqual(420);
+    editor.destroy();
+  });
+
+  test("a list is measured by its items, not by prose density", () => {
     const editor = createEditor(para("word ".repeat(50)) + listOf(20));
     const map = new HeightMap();
     const [paragraph, list] = blocks(editor);
 
-    // the list renders far denser per unit of content than the prose does
-    map.record(paragraph, 400);
-    map.record(list, 100);
+    // calibrating prose to something extreme must not move the list, which is
+    // estimated from the items it holds
+    const before = map.estimate(list);
+    map.record(paragraph, 4000);
 
-    // measured nodes report what they measured
-    expect(map.heightFor(paragraph)).toBe(400);
-    expect(map.heightFor(list)).toBe(100);
+    expect(map.estimate(list)).toBe(before);
+    editor.destroy();
+  });
 
-    // an unmeasured list of the same shape now follows the list's ratio, not
-    // the paragraph's
-    const other = list.type.create(null, list.content);
-    expect(map.estimate(other)).toBeLessThan(map.estimate(paragraph));
+  test("a table is estimated row by row", () => {
+    const rows = (count: number) => {
+      let html = `<table data-block-id="${id()}"><tbody>`;
+      for (let i = 0; i < count; i++)
+        html += `<tr><td><p>a</p></td><td><p>b</p></td></tr>`;
+      return html + "</tbody></table>";
+    };
+    const editor = createEditor(rows(2) + rows(20));
+    const map = new HeightMap();
+    const tables = blocks(editor).filter((n) => n.type.name === "table");
+
+    expect(tables).toHaveLength(2);
+    const small = map.estimate(tables[0]);
+    const big = map.estimate(tables[1]);
+    // ten times the rows, and the cells of a row sit side by side
+    expect(big).toBeGreaterThan(small * 3);
+    expect(big).toBeLessThan(small * 15);
+    editor.destroy();
+  });
+
+  test("an image too wide for the editor is scaled down", () => {
+    const editor = createEditor(
+      `${para(
+        "one"
+      )}<img src="x.png" width="1000" height="500" data-block-id="${id()}" />`
+    );
+    const map = new HeightMap();
+    const image = blocks(editor).find(
+      (node) => node.type.name === "image"
+    ) as ProsemirrorNode;
+
+    expect(map.estimate(image)).toBe(500);
+    map.setWidth(500);
+    expect(map.estimate(image)).toBe(250);
     editor.destroy();
   });
 

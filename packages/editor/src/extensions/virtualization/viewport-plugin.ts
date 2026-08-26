@@ -451,6 +451,7 @@ export function virtualizationPlugin(
        */
       const recordRenderedHeights = () => {
         if (!heightMap) return;
+        heightMap.setWidth(editorView.dom.clientWidth);
         const children = editorView.dom.children;
         const doc = editorView.state.doc;
         const count = Math.min(children.length, doc.childCount);
