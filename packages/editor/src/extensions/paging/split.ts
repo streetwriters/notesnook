@@ -22,7 +22,7 @@ import { nanoid } from "nanoid";
 import { PAGE_NODE } from "./page.js";
 
 /** Blocks are grouped into pages of this size when a note is opened. */
-export const DEFAULT_PAGE_SIZE = 100;
+export const DEFAULT_PAGE_SIZE = 50;
 
 export function isPage(node: ProsemirrorNode): boolean {
   return node.type.name === PAGE_NODE;

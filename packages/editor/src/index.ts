@@ -142,6 +142,8 @@ export type TiptapOptions = EditorOptions &
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
     virtualization?: VirtualizationMode | boolean;
+    /** How many top-level blocks make up a page when paging is on. */
+    pageSize?: number;
   } & {
     placeholder: string;
   };
@@ -170,6 +172,7 @@ const useTiptap = (
     editorProps,
     enableFontLigatures,
     virtualization,
+    pageSize,
     ...restOptions
   } = options;
 
@@ -286,7 +289,10 @@ const useTiptap = (
           enabled: mode !== "off",
           unit: mode === "pages" ? "pages" : "blocks"
         }),
-        Paging.configure({ enabled: mode === "pages" }),
+        Paging.configure({
+          enabled: mode === "pages",
+          ...(pageSize ? { pageSize } : {})
+        }),
         EditorProfiler,
         Blockquote,
         CharacterCount,
@@ -441,7 +447,8 @@ const useTiptap = (
     editorProps,
     copyToClipboard,
     createInternalLink,
-    virtualization
+    virtualization,
+    pageSize
   ]);
 
   const editor = useEditor(

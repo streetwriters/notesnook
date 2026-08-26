@@ -22,6 +22,7 @@ import { Editor, getHTMLFromFragment } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { Node } from "@tiptap/core";
 import {
+  DEFAULT_PAGE_SIZE,
   Page,
   Paging,
   countPages,
@@ -194,6 +195,25 @@ describe("paging", () => {
 
     expect(countPages(editor.state.doc)).toBe(0);
     expect(editor.state.doc.childCount).toBe(5);
+    editor.destroy();
+  });
+
+  test("falls back to the default page size", async () => {
+    const editor = new Editor({
+      extensions: [
+        StarterKit.configure({ document: false }),
+        PagedDocument,
+        Page,
+        BlockId,
+        Paging.configure({ enabled: true, thresholdBlocks: 10 })
+      ],
+      content: savedNoteHTML(DEFAULT_PAGE_SIZE * 3)
+    });
+    await created();
+
+    expect(DEFAULT_PAGE_SIZE).toBe(50);
+    expect(countPages(editor.state.doc)).toBe(3);
+    expect(editor.state.doc.child(0).childCount).toBe(DEFAULT_PAGE_SIZE);
     editor.destroy();
   });
 
