@@ -451,7 +451,16 @@ export function virtualizationPlugin(
        */
       const recordRenderedHeights = () => {
         if (!heightMap) return;
-        heightMap.setWidth(editorView.dom.clientWidth);
+        // Read the layout the note is actually rendered in, so estimates for
+        // everything still off screen match what the reader will see.
+        const style = getComputedStyle(editorView.dom);
+        const fontSize = parseFloat(style.fontSize);
+        const lineHeight = parseFloat(style.lineHeight);
+        heightMap.setMetrics({
+          width: editorView.dom.clientWidth,
+          fontSize,
+          lineHeight: Number.isFinite(lineHeight) ? lineHeight : fontSize * 1.5
+        });
         const children = editorView.dom.children;
         const doc = editorView.state.doc;
         const count = Math.min(children.length, doc.childCount);

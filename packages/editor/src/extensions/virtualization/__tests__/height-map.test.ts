@@ -179,8 +179,10 @@ describe("height map", () => {
       (node) => node.type.name === "image"
     ) as ProsemirrorNode;
 
-    expect(map.estimate(image)).toBe(500);
-    map.setWidth(500);
+    // the editor defaults to an 850px measure, so a 1000px image already
+    // scales; a narrower one scales further
+    expect(map.estimate(image)).toBe(425);
+    map.setMetrics({ width: 500 });
     expect(map.estimate(image)).toBe(250);
     editor.destroy();
   });
@@ -197,6 +199,40 @@ describe("height map", () => {
     // no guessing needed: the note already knows how tall the image is
     expect(map.estimate(image as ProsemirrorNode)).toBe(512);
     editor.destroy();
+  });
+
+  test("text is estimated from the lines it wraps to", () => {
+    const editor = createEditor(para("word ".repeat(200)));
+    const map = new HeightMap();
+    const [paragraph] = blocks(editor);
+
+    const wide = map.estimate(paragraph);
+    map.setMetrics({ width: 300 });
+    const narrow = map.estimate(paragraph);
+
+    // the same text in a narrower measure wraps to more lines
+    expect(narrow).toBeGreaterThan(wide);
+    editor.destroy();
+  });
+
+  test("a heading is estimated at its own size", () => {
+    const text = "a fairly long heading that will wrap ".repeat(4);
+    const editor = createEditor(
+      para(text) + `<h1 data-block-id="${id()}">${text}</h1>`
+    );
+    const map = new HeightMap();
+    const [paragraph, heading] = blocks(editor);
+
+    expect(heading.type.name).toBe("heading");
+    expect(map.estimate(heading)).toBeGreaterThan(map.estimate(paragraph));
+    editor.destroy();
+  });
+
+  test("new layout metrics mark the map for recalibration", () => {
+    const map = new HeightMap();
+    expect(map.needsRecalibration).toBe(false);
+    map.setMetrics({ width: 400 });
+    expect(map.needsRecalibration).toBe(true);
   });
 
   test("a measured height wins over any estimate", () => {

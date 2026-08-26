@@ -57,6 +57,28 @@ const TABLE_TYPE = "table";
 /** A table row is at least this tall, however little its cells hold. */
 const MIN_ROW_HEIGHT = 32;
 
+/**
+ * Layout the estimates assume until the editor can be measured. The width
+ * matches the editor's own max-width so a first estimate is close even though
+ * the element has not been laid out yet.
+ */
+const DEFAULT_METRICS: Metrics = { width: 850, fontSize: 16, lineHeight: 24 };
+
+/** Average glyph width as a fraction of font size, for proportional text. */
+const AVERAGE_CHAR_WIDTH = 0.5;
+
+/** How much larger each heading level renders than body text. */
+const HEADING_SCALE: Record<number, number> = {
+  1: 2,
+  2: 1.5,
+  3: 1.25,
+  4: 1.1,
+  5: 1,
+  6: 1
+};
+
+export type Metrics = { width: number; fontSize: number; lineHeight: number };
+
 type Samples = { height: number; content: number };
 
 export class HeightMap {
@@ -65,16 +87,29 @@ export class HeightMap {
   private global: Samples = { height: 0, content: 0 };
   private stale = false;
   private estimates = new WeakMap<ProsemirrorNode, number>();
-  private width = 0;
+  private metrics: Metrics = { ...DEFAULT_METRICS };
 
   /**
-   * The width content is laid out in. An image wider than the editor is scaled
-   * down to fit, and its height with it.
+   * The layout text is wrapped in. Nothing has been measured on a first load,
+   * so estimates are built from the editor's own font and width instead of a
+   * fixed guess: an 800-character paragraph is however many lines it wraps to.
    */
-  setWidth(width: number): void {
-    if (!Number.isFinite(width) || width <= 0 || width === this.width) return;
-    this.width = width;
+  setMetrics(metrics: Partial<Metrics>): void {
+    let changed = false;
+    for (const key of ["width", "fontSize", "lineHeight"] as const) {
+      const value = metrics[key];
+      if (!Number.isFinite(value) || !value || value <= 0) continue;
+      if (Math.abs((value as number) - this.metrics[key]) < 1) continue;
+      this.metrics[key] = value as number;
+      changed = true;
+    }
+    if (!changed) return;
     this.estimates = new WeakMap();
+    this.stale = true;
+  }
+
+  private get width(): number {
+    return this.metrics.width;
   }
 
   /**
@@ -124,11 +159,37 @@ export class HeightMap {
       return total || base;
     }
 
+    return this.text(node, base);
+  }
+
+  /**
+   * Text is estimated from the lines it wraps to. A measured ratio for the type
+   * wins once there is one, since it accounts for margins and font quirks the
+   * line model cannot see.
+   */
+  private text(node: ProsemirrorNode, base: number): number {
     // `content.size` is O(1) and proportional to how much text a node holds,
     // unlike `textContent`, which would copy every character of every page.
     const content = node.content.size;
     if (!content) return base;
-    return Math.max(base, Math.round(content * this.ratioFor(node.type.name)));
+
+    const sample = this.samples.get(node.type.name);
+    if (sample && sample.content > 0)
+      return Math.max(
+        base,
+        Math.round(content * (sample.height / sample.content))
+      );
+
+    const scale =
+      node.type.name === "heading"
+        ? HEADING_SCALE[Number(node.attrs.level)] ?? 1
+        : 1;
+    const charsPerLine = Math.max(
+      20,
+      this.metrics.width / (this.metrics.fontSize * scale * AVERAGE_CHAR_WIDTH)
+    );
+    const lines = Math.max(1, Math.ceil(content / charsPerLine));
+    return Math.max(base, Math.round(lines * this.metrics.lineHeight * scale));
   }
 
   /** Images and embeds know their own size; scale it if it must fit. */
