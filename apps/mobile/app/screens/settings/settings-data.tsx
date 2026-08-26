@@ -1027,7 +1027,8 @@ export const settingsGroups: SettingSection[] = [
             id: "editor-virtualization",
             name: strings.editorVirtualization(),
             description: strings.editorVirtualizationDesc(),
-            type: "switch",
+            type: "component",
+            component: "editor-virtualization-selector",
             property: "editorVirtualization",
             icon: "page-next-outline"
           },

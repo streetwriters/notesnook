@@ -78,7 +78,7 @@ export type Settings = {
   sessionExpired: boolean;
   version: string | null;
   doubleSpacedLines?: boolean;
-  editorVirtualization?: boolean;
+  editorVirtualization?: "off" | "blocks" | "pages";
   disableAutoSync?: boolean;
   disableSync?: boolean;
   reminderNotifications?: boolean;
@@ -197,7 +197,7 @@ export const defaultSettings: SettingStore["settings"] = {
   sessionExpired: false,
   version: null,
   doubleSpacedLines: true,
-  editorVirtualization: false,
+  editorVirtualization: "off",
   reminderNotifications: true,
   defaultSnoozeTime: "5",
   corsProxy: "https://cors.notesnook.com",
