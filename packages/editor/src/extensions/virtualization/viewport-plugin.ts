@@ -278,6 +278,7 @@ export function virtualizationPlugin(
       let frame = 0;
       let scrollParent: HTMLElement | null = null;
       let visible: Set<string> = EMPTY_VISIBLE;
+      const measuredPages = new Set<string>();
 
       const ensureScrollParent = () => {
         // Resolved lazily: at view-init the document may not overflow yet.
@@ -419,6 +420,29 @@ export function virtualizationPlugin(
         );
         restorePin(pin);
         recordRenderedHeights();
+        resizePlaceholders();
+      };
+
+      /**
+       * Placeholders created before anything had been measured are sized from a
+       * guess. Once real measurements move that ratio, the ones still on screen
+       * are resized so the scrollbar stops lying; the pin keeps the reader in
+       * place while they change.
+       */
+      const resizePlaceholders = () => {
+        if (!heightMap?.needsRecalibration) return;
+        const pin = pinnedUnit();
+        const children = editorView.dom.children;
+        const doc = editorView.state.doc;
+        const count = Math.min(children.length, doc.childCount);
+        for (let i = 0; i < count; i++) {
+          const element = children[i] as HTMLElement;
+          if (!element.hasAttribute("data-virtual-placeholder")) continue;
+          element.style.height = `${heightMap.heightFor(doc.child(i))}px`;
+        }
+        heightMap.markRecalibrated();
+        restorePin(pin);
+        profiler.count("virtualization.placeholderResizes");
       };
 
       /**
@@ -433,7 +457,25 @@ export function virtualizationPlugin(
         for (let i = 0; i < count; i++) {
           const element = children[i] as HTMLElement;
           if (element.hasAttribute("data-virtual-placeholder")) continue;
-          heightMap.record(doc.child(i), element.offsetHeight);
+          const node = doc.child(i);
+          heightMap.record(node, element.offsetHeight);
+
+          // The blocks inside a rendered page are what the estimates are built
+          // from, and their ids outlive this session's page boundaries. Measure
+          // each page once; re-measuring on every flush would read layout for
+          // hundreds of elements for nothing.
+          const pageId = node.attrs.blockId as string | undefined;
+          if (node.type.name !== "page" || !pageId || measuredPages.has(pageId))
+            continue;
+          measuredPages.add(pageId);
+          const blocks = element.children;
+          const blockCount = Math.min(blocks.length, node.childCount);
+          for (let j = 0; j < blockCount; j++)
+            heightMap.record(
+              node.child(j),
+              (blocks[j] as HTMLElement).offsetHeight
+            );
+          profiler.count("virtualization.pagesMeasured");
         }
       };
 
