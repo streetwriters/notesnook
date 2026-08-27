@@ -567,9 +567,14 @@ export function Editor(props: EditorProps) {
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
         }}
         onLoad={(editor) => {
-          editor = editor || useEditorManager.getState().getEditor(id)?.editor;
+          restoreScrollPosition(
+            session,
+            editor || useEditorManager.getState().getEditor(id)?.editor
+          );
+          // The caret is only put back once the editor is fully created. Doing
+          // it earlier as well means it is moved twice, and the editor scrolls
+          // to follow the caret each time.
           if (editor) restoreSelection(editor, id);
-          restoreScrollPosition(session, editor);
         }}
         onSelectionChange={({ from, to }) => {
           Config.set(`${id}:selection`, { from, to });
