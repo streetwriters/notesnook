@@ -20,9 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { afterEach, describe, expect, test } from "vitest";
 import { Editor, Node } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import { Page, Paging } from "../../paging/index.js";
+import { Page, Paging } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
-import { Virtualization } from "../index.js";
 import { getScrollAnchor, restoreScrollAnchor } from "../anchor.js";
 
 const PagedDocument = Node.create({
@@ -105,8 +104,7 @@ function createEditor(container?: HTMLElement) {
         enabled: true,
         pageSize: PAGE_SIZE,
         thresholdBlocks: 10
-      }),
-      Virtualization.configure({ enabled: true, unit: "pages" })
+      })
     ],
     content: savedNoteHTML(BLOCKS)
   });

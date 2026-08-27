@@ -18,14 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
+import { HeightMap } from "./height-map.js";
+import { createPageView } from "./page-view.js";
 
 export const PAGE_NODE = "page";
 
 /**
- * A grouping wrapper around a run of top-level blocks. Pages exist only in the
- * editor's document: they are created when a note is opened and removed again
- * on serialization, so stored content is unchanged and older clients are
- * unaffected. There is deliberately no `parseHTML` rule for the same reason.
+ * A run of top-level blocks, rendered as one unit so an off-screen page costs a
+ * single empty box instead of a few hundred elements.
+ *
+ * Pages exist only in the editor's document: they are created when a note is
+ * opened and removed again on serialization, so stored content is unchanged and
+ * older clients are unaffected. There is deliberately no `parseHTML` rule for
+ * the same reason.
  */
 export const Page = Node.create({
   name: PAGE_NODE,
@@ -33,11 +38,15 @@ export const Page = Node.create({
   group: "page",
   selectable: false,
 
-  // The block id must survive onto the element: the viewport plugin tracks
-  // pages by `data-block-id`, and a page that renders without one is invisible
-  // to it -- it materializes, disappears from the window, and dematerializes
-  // again on the next frame.
   renderHTML({ HTMLAttributes }) {
     return ["div", mergeAttributes(HTMLAttributes, { "data-page": "true" }), 0];
+  },
+
+  addNodeView() {
+    return ({ node, decorations }) => {
+      const heights = (this.editor.storage.paging as { heights: HeightMap })
+        .heights;
+      return createPageView(node, decorations, heights);
+    };
   }
 });

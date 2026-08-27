@@ -83,7 +83,6 @@ import CheckList from "./extensions/check-list/index.js";
 import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
-import { Virtualization } from "./extensions/virtualization/index.js";
 import { EditorProfiler } from "./extensions/profiler/index.js";
 import { Page, Paging } from "./extensions/paging/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
@@ -141,7 +140,8 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
-    virtualization?: VirtualizationMode | boolean;
+    /** Render only the pages near the viewport. */
+    virtualization?: boolean;
     /** How many top-level blocks make up a page when paging is on. */
     pageSize?: number;
   } & {
@@ -198,7 +198,6 @@ const useTiptap = (
   }, [closeAllPopups]);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(() => {
-    const mode = toVirtualizationMode(virtualization);
     return {
       enableCoreExtensions: false,
       editorProps: {
@@ -285,12 +284,8 @@ const useTiptap = (
         BlockId,
         PagedDocument,
         Page,
-        Virtualization.configure({
-          enabled: mode !== "off",
-          unit: mode === "pages" ? "pages" : "blocks"
-        }),
         Paging.configure({
-          enabled: mode === "pages",
+          enabled: !!virtualization,
           ...(pageSize ? { pageSize } : {})
         }),
         EditorProfiler,
@@ -472,16 +467,6 @@ const PagedDocument = TiptapNode.create({
   content: "(page | block)+"
 });
 
-export type VirtualizationMode = "off" | "blocks" | "pages";
-
-export function toVirtualizationMode(
-  value: VirtualizationMode | boolean | undefined
-): VirtualizationMode {
-  if (value === true) return "blocks";
-  if (!value) return "off";
-  return value;
-}
-
 function hasStyle(element: HTMLElement | string) {
   const style = (element as HTMLElement).getAttribute("style");
   if (!style || style === "font-family: inherit;") return false;
@@ -510,7 +495,7 @@ export {
   getScrollAnchor,
   restoreScrollAnchor,
   type ScrollAnchor
-} from "./extensions/virtualization/index.js";
+} from "./extensions/paging/index.js";
 export * from "./utils/downloader.js";
 export {
   useTiptap,

@@ -95,34 +95,6 @@ export const HomePicker = createSettingsPicker({
   isOptionAvailable: async () => true
 });
 
-type VirtualizationMode = NonNullable<Settings["editorVirtualization"]>;
-
-const VIRTUALIZATION_MODES: VirtualizationMode[] = ["off", "blocks", "pages"];
-
-export const EditorVirtualizationPicker = createSettingsPicker<
-  VirtualizationMode,
-  VirtualizationMode
->({
-  getValue: () =>
-    useSettingStore.getState().settings.editorVirtualization || "off",
-  updateValue: async (item) => {
-    SettingsService.set({ editorVirtualization: item });
-  },
-  formatValue: (item) => {
-    const mode = (
-      typeof item === "object" ? "off" : item
-    ) as VirtualizationMode;
-    if (mode === "blocks") return strings.editorVirtualizationBlocks();
-    if (mode === "pages") return strings.editorVirtualizationPages();
-    return strings.editorVirtualizationOff();
-  },
-  getItemKey: (item) => item,
-  options: VIRTUALIZATION_MODES,
-  compareValue: (current, item) => current === item,
-  isFeatureAvailable: async () => true,
-  isOptionAvailable: async () => true
-});
-
 export const SidebarTabPicker = createSettingsPicker({
   getValue: () => useSettingStore.getState().settings.defaultSidebarTab,
   updateValue: async (item) => {

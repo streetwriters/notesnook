@@ -23,10 +23,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { DecorationSet } from "@tiptap/pm/view";
 import { Page, Paging, countPages } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
-import {
-  Virtualization,
-  virtualizationKey
-} from "../../virtualization/index.js";
+import { viewportKey } from "../index.js";
 
 const PagedDocument = Node.create({
   name: "doc",
@@ -55,8 +52,7 @@ function createEditor() {
         enabled: true,
         pageSize: PAGE_SIZE,
         thresholdBlocks: 10
-      }),
-      Virtualization.configure({ enabled: true, unit: "pages" })
+      })
     ],
     content: savedNoteHTML(BLOCKS)
   });
@@ -67,9 +63,7 @@ async function created() {
 }
 
 function decorations(editor: Editor): DecorationSet {
-  return (
-    virtualizationKey.getState(editor.state)?.decorations ?? DecorationSet.empty
-  );
+  return viewportKey.getState(editor.state)?.decorations ?? DecorationSet.empty;
 }
 
 describe("paged virtualization", () => {

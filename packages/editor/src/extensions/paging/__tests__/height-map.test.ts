@@ -22,7 +22,7 @@ import { Editor, Node } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { HeightMap } from "../height-map.js";
-import { Page, Paging } from "../../paging/index.js";
+import { Page, Paging } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
 import { ImageNode } from "../../image/index.js";
 import { Table } from "../../table/index.js";

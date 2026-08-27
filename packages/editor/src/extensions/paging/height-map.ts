@@ -147,12 +147,8 @@ export class HeightMap {
     const stored = this.storedHeight(node);
     if (stored) return stored;
 
-    // Structure beats the type's fallback: a two-row table is not as tall as
-    // the average table, it is as tall as two rows.
     if (node.type.name === TABLE_TYPE) return this.table(node) || base;
 
-    // Lists, callouts, quotes, pages: a container is as tall as its contents,
-    // and its children carry their own structure down as far as it goes.
     if (this.holdsBlocks(node)) {
       let total = 0;
       node.forEach((child) => (total += this.heightFor(child)));
@@ -168,8 +164,6 @@ export class HeightMap {
    * line model cannot see.
    */
   private text(node: ProsemirrorNode, base: number): number {
-    // `content.size` is O(1) and proportional to how much text a node holds,
-    // unlike `textContent`, which would copy every character of every page.
     const content = node.content.size;
     if (!content) return base;
 
@@ -248,8 +242,6 @@ export class HeightMap {
     this.estimates.delete(node);
     profiler.gauge("virtualization.heightMap.size", this.measured.size);
 
-    // Pages are containers; calibrating from them would average away the
-    // difference between the types they hold.
     if (node.type.name === PAGE_TYPE) return;
 
     const content = node.content.size;

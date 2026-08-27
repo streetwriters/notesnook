@@ -17,29 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  DOMSerializer,
-  Fragment,
-  Node as ProsemirrorNode,
-  Schema
-} from "@tiptap/pm/model";
-import { PAGE_NODE } from "./page.js";
-
-function withoutPages(fragment: Fragment): Fragment {
-  let paged = false;
-  fragment.forEach((node) => {
-    if (node.type.name === PAGE_NODE) paged = true;
-  });
-  if (!paged) return fragment;
-
-  const blocks: ProsemirrorNode[] = [];
-  fragment.forEach((node) => {
-    if (node.type.name === PAGE_NODE)
-      node.content.forEach((child) => blocks.push(child));
-    else blocks.push(node);
-  });
-  return Fragment.fromArray(blocks);
-}
+import { DOMSerializer, Fragment, Schema } from "@tiptap/pm/model";
+import { flattenPages } from "./split.js";
 
 /**
  * Serializes pages as if they were not there, so stored HTML, the clipboard and
@@ -53,7 +32,7 @@ class FlatteningDOMSerializer extends DOMSerializer {
     options?: { document?: Document },
     target?: HTMLElement | DocumentFragment
   ) {
-    return super.serializeFragment(withoutPages(fragment), options, target);
+    return super.serializeFragment(flattenPages(fragment), options, target);
   }
 }
 

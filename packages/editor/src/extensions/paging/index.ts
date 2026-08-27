@@ -19,9 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Extension } from "@tiptap/core";
 import { profiler } from "../../utils/profiler.js";
-import { installFlatteningSerializer } from "./serializer.js";
+import { HeightMap } from "./height-map.js";
 import { installPagingParser } from "./parser.js";
+import { installFlatteningSerializer } from "./serializer.js";
 import { DEFAULT_PAGE_SIZE, countPages, toPages } from "./split.js";
+import { viewportPlugin } from "./viewport-plugin.js";
+
+/** Paging only engages for notes larger than this many top-level blocks. */
+const DEFAULT_THRESHOLD_BLOCKS = 300;
 
 export type PagingOptions = {
   enabled: boolean;
@@ -29,6 +34,19 @@ export type PagingOptions = {
   thresholdBlocks: number;
 };
 
+export type PagingStorage = {
+  heights: HeightMap;
+};
+
+/**
+ * Renders only the pages near the viewport, keeping the rest of the note in the
+ * document as empty boxes of their estimated height. Pages are grouped as a
+ * note is parsed and stripped again on serialization, so nothing about how a
+ * note is stored changes.
+ *
+ * Browser find-in-page and printing only cover rendered pages, so this is
+ * opt-in and only engages past a size threshold.
+ */
 export const Paging = Extension.create<PagingOptions>({
   name: "paging",
 
@@ -36,12 +54,14 @@ export const Paging = Extension.create<PagingOptions>({
     return {
       enabled: false,
       pageSize: DEFAULT_PAGE_SIZE,
-      thresholdBlocks: 300
+      thresholdBlocks: DEFAULT_THRESHOLD_BLOCKS
     };
   },
 
-  // Runs before the first view exists, so the document arrives already paged
-  // and is never rendered flat.
+  addStorage(): PagingStorage {
+    return { heights: new HeightMap() };
+  },
+
   onBeforeCreate() {
     installFlatteningSerializer(this.editor.schema);
     if (!this.options.enabled) return;
@@ -51,8 +71,6 @@ export const Paging = Extension.create<PagingOptions>({
     });
   },
 
-  // Content that arrives as JSON bypasses the parser, so this stays as a
-  // fallback for documents the parser never saw.
   onCreate() {
     if (!this.options.enabled) return;
     const { editor } = this;
@@ -60,22 +78,37 @@ export const Paging = Extension.create<PagingOptions>({
     if (doc.childCount <= this.options.thresholdBlocks) return;
     if (countPages(doc) > 0) return;
 
-    const end = profiler.start("paging.split");
-    const pages = toPages(doc, editor.schema, this.options.pageSize);
     editor.view.dispatch(
       editor.state.tr
-        .replaceWith(0, doc.content.size, pages)
+        .replaceWith(
+          0,
+          doc.content.size,
+          toPages(doc, editor.schema, this.options.pageSize)
+        )
         .setMeta("preventUpdate", true)
         .setMeta("addToHistory", false)
         .setMeta("ignoreEdit", true)
     );
-    end();
-    profiler.count("paging.splits");
     profiler.gauge("paging.pages", countPages(editor.state.doc));
+  },
+
+  addProseMirrorPlugins() {
+    if (!this.options.enabled) return [];
+    return [viewportPlugin(this.storage.heights)];
   }
 });
 
-export { Page, PAGE_NODE } from "./page.js";
+export { HeightMap } from "./height-map.js";
+export { PAGE_NODE, Page } from "./page.js";
+export {
+  getScrollAnchor,
+  restoreScrollAnchor,
+  type ScrollAnchor
+} from "./anchor.js";
+export { installPagingParser, uninstallPagingParser } from "./parser.js";
+export { fromFlatPosition, toFlatPosition } from "./positions.js";
+export { serializeDocumentHTML } from "./serialize.js";
+export { installFlatteningSerializer } from "./serializer.js";
 export {
   DEFAULT_PAGE_SIZE,
   countPages,
@@ -84,7 +117,4 @@ export {
   isPage,
   toPages
 } from "./split.js";
-export { installFlatteningSerializer } from "./serializer.js";
-export { installPagingParser, uninstallPagingParser } from "./parser.js";
-export { fromFlatPosition, toFlatPosition } from "./positions.js";
-export { serializeDocumentHTML } from "./serialize.js";
+export { viewportKey } from "./viewport-plugin.js";

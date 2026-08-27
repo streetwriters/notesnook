@@ -43,7 +43,6 @@ import {
   restoreScrollAnchor,
   serializeDocumentHTML,
   toFlatPosition,
-  type VirtualizationMode,
   type Selection
 } from "@notesnook/editor";
 import { installProfilerGlobals, setProfiledEditor } from "./profiling";
@@ -122,7 +121,7 @@ type TipTapProps = {
   dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
-  virtualization: VirtualizationMode;
+  virtualization: boolean;
 };
 
 function countCharacters(text: string) {

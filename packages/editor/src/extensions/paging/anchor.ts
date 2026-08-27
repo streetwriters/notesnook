@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
-import { isPage } from "../paging/split.js";
-import { findScrollParent, virtualizationKey } from "./viewport-plugin.js";
+import { isPage } from "./split.js";
+import { findScrollParent, viewportKey } from "./viewport-plugin.js";
 
 export type ScrollAnchor = {
   /** The block that was at the top of the viewport. */
@@ -59,7 +59,6 @@ export function getScrollAnchor(view: EditorView): ScrollAnchor | undefined {
         : undefined;
     }
 
-    // Inside a rendered page, anchor on the exact block at the fold.
     for (const child of Array.from(element.children)) {
       const childRect = child.getBoundingClientRect();
       if (childRect.bottom <= top) continue;
@@ -67,8 +66,6 @@ export function getScrollAnchor(view: EditorView): ScrollAnchor | undefined {
       if (blockId) return { blockId, offset: Math.round(top - childRect.top) };
     }
 
-    // A page that has not rendered has no blocks to inspect, but the document
-    // still knows which block it starts with.
     const blockId = node.firstChild?.attrs.blockId as string | undefined;
     return blockId
       ? { blockId, offset: Math.round(top - rect.top) }
@@ -105,7 +102,7 @@ export function restoreScrollAnchor(
   view: EditorView,
   anchor: ScrollAnchor
 ): boolean {
-  const end = profiler.start("virtualization.restoreAnchor");
+  const end = profiler.start("paging.restoreAnchor");
   const { container, top } = containerOf(view);
   if (!container) {
     end();
@@ -115,18 +112,18 @@ export function restoreScrollAnchor(
   const target = findBlock(view.state.doc, anchor.blockId);
   if (!target.found) {
     end();
-    profiler.count("virtualization.restoreAnchorMissed");
+    profiler.count("paging.restoreAnchorMissed");
     return false;
   }
 
   if (target.pageId) {
-    const visible = virtualizationKey.getState(view.state)?.visible;
+    const visible = viewportKey.getState(view.state)?.visible;
     if (!visible?.has(target.pageId)) {
       const next = new Set(visible ?? []);
       next.add(target.pageId);
       view.dispatch(
         view.state.tr
-          .setMeta(virtualizationKey, { visible: next })
+          .setMeta(viewportKey, { visible: next })
           .setMeta("preventUpdate", true)
           .setMeta("addToHistory", false)
       );
@@ -138,13 +135,13 @@ export function restoreScrollAnchor(
   );
   if (!element) {
     end();
-    profiler.count("virtualization.restoreAnchorMissed");
+    profiler.count("paging.restoreAnchorMissed");
     return false;
   }
 
   container.scrollTop +=
     element.getBoundingClientRect().top - top - anchor.offset;
   end();
-  profiler.count("virtualization.restoreAnchors");
+  profiler.count("paging.restoreAnchors");
   return true;
 }

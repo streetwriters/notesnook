@@ -18,13 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { Editor } from "@tiptap/core";
+import { Editor, Node } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import { Virtualization, virtualizationKey } from "../index.js";
+import { Page, Paging, viewportKey } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
 
-const BLOCKS = 60;
-const BLOCK_HEIGHT = 100;
+const PagedDocument = Node.create({
+  name: "doc",
+  topNode: true,
+  content: "(page | block)+"
+});
+
+const PAGES = 60;
+const PAGE_HEIGHT = 100;
 
 function savedNoteHTML(n: number) {
   let content = "";
@@ -47,17 +53,16 @@ function rect(top: number, height: number) {
   } as DOMRect;
 }
 
-/** happy-dom does no layout, so the block geometry is stubbed in. */
-function stubLayout(editor: Editor, blockHeight = BLOCK_HEIGHT) {
+/** happy-dom does no layout, so the page geometry is stubbed in. */
+function stubLayout(editor: Editor, pageHeight = PAGE_HEIGHT) {
   const dom = editor.view.dom as HTMLElement;
-  const total = dom.children.length * blockHeight;
-  dom.getBoundingClientRect = () => rect(0, total);
+  dom.getBoundingClientRect = () => rect(0, dom.children.length * pageHeight);
   let top = 0;
   for (const child of Array.from(dom.children)) {
     const childTop = top;
     (child as HTMLElement).getBoundingClientRect = () =>
-      rect(childTop, blockHeight);
-    top += blockHeight;
+      rect(childTop, pageHeight);
+    top += pageHeight;
   }
 }
 
@@ -70,8 +75,28 @@ function frames(count = 2) {
   });
 }
 
-function visibleBlocks(editor: Editor) {
-  return [...(virtualizationKey.getState(editor.state)?.visible ?? [])].sort();
+/** The indexes of the pages the window currently considers visible. */
+function visiblePages(editor: Editor) {
+  const visible = viewportKey.getState(editor.state)?.visible ?? new Set();
+  const indexes: number[] = [];
+  editor.state.doc.forEach((page, _offset, index) => {
+    if (visible.has(page.attrs.blockId)) indexes.push(index);
+  });
+  return indexes;
+}
+
+// one block per page keeps the geometry easy to reason about
+function createEditor() {
+  return new Editor({
+    extensions: [
+      StarterKit.configure({ document: false }),
+      PagedDocument,
+      Page,
+      BlockId,
+      Paging.configure({ enabled: true, pageSize: 1, thresholdBlocks: 5 })
+    ],
+    content: savedNoteHTML(PAGES)
+  });
 }
 
 let observers: number;
@@ -92,18 +117,88 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function createEditor() {
-  return new Editor({
-    extensions: [
-      StarterKit,
-      BlockId,
-      Virtualization.configure({ enabled: true, thresholdBlocks: 5 })
-    ],
-    content: savedNoteHTML(BLOCKS)
-  });
-}
-
 describe("viewport window", () => {
+  test("observes nothing: no IntersectionObserver is created", async () => {
+    const editor = createEditor();
+    stubLayout(editor);
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    expect(observers).toBe(0);
+    editor.destroy();
+  });
+
+  test("tracks only the pages within the overscan band", async () => {
+    const editor = createEditor();
+    stubLayout(editor);
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    const visible = visiblePages(editor);
+    expect(visible.length).toBeGreaterThan(0);
+    expect(visible.length).toBeLessThan(PAGES);
+    // happy-dom reports a 768px viewport and the band reaches one viewport
+    // past it, so nothing beyond ~1536px may be tracked
+    expect(Math.max(...visible) * PAGE_HEIGHT).toBeLessThanOrEqual(1536);
+    editor.destroy();
+  });
+
+  test("does not measure while the editor has no layout", async () => {
+    const editor = createEditor();
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    expect(visiblePages(editor)).toEqual([]);
+    editor.destroy();
+  });
+
+  test("keeps pages that drift into the hysteresis band", async () => {
+    const editor = createEditor();
+    stubLayout(editor);
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+    const before = visiblePages(editor);
+
+    const dom = editor.view.dom as HTMLElement;
+    let top = 384;
+    for (const child of Array.from(dom.children)) {
+      const childTop = top;
+      (child as HTMLElement).getBoundingClientRect = () =>
+        rect(childTop, PAGE_HEIGHT);
+      top += PAGE_HEIGHT;
+    }
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    const after = visiblePages(editor);
+    for (const index of before) expect(after).toContain(index);
+    editor.destroy();
+  });
+
+  test("keeps the visible page still when a placeholder resizes", async () => {
+    const editor = createEditor();
+    stubLayout(editor);
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+    const container = editor.view.dom.parentElement;
+    const before = container?.scrollTop ?? 0;
+
+    const dom = editor.view.dom as HTMLElement;
+    let top = 0;
+    for (const [index, child] of Array.from(dom.children).entries()) {
+      const height = index === 1 ? PAGE_HEIGHT * 10 : PAGE_HEIGHT;
+      const childTop = top;
+      (child as HTMLElement).getBoundingClientRect = () =>
+        rect(childTop, height);
+      top += height;
+    }
+    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
+    await frames();
+
+    expect(container?.scrollTop ?? 0).toBeGreaterThanOrEqual(before);
+    editor.destroy();
+  });
+
   test("re-measures when the editor is re-laid out", async () => {
     const observed: Element[] = [];
     const RealResizeObserver = globalThis.ResizeObserver;
@@ -123,113 +218,21 @@ describe("viewport window", () => {
     stubLayout(editor);
     await frames();
 
-    // zooming changes the layout without scrolling or editing, so a resize is
-    // the only signal that what is on screen has moved
     expect(observed).toContain(editor.view.dom);
-    expect(notify).toBeDefined();
 
     const dom = editor.view.dom as HTMLElement;
     let top = 0;
     for (const child of Array.from(dom.children)) {
       const childTop = top;
       (child as HTMLElement).getBoundingClientRect = () =>
-        rect(childTop, BLOCK_HEIGHT * 4);
-      top += BLOCK_HEIGHT * 4;
+        rect(childTop, PAGE_HEIGHT * 4);
+      top += PAGE_HEIGHT * 4;
     }
     notify?.();
     await frames();
 
-    expect(visibleBlocks(editor).length).toBeGreaterThan(0);
+    expect(visiblePages(editor).length).toBeGreaterThan(0);
     globalThis.ResizeObserver = RealResizeObserver;
-    editor.destroy();
-  });
-
-  test("observes nothing: no IntersectionObserver is created", async () => {
-    const editor = createEditor();
-    stubLayout(editor);
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-
-    expect(observers).toBe(0);
-    editor.destroy();
-  });
-
-  test("tracks only the blocks within the overscan band", async () => {
-    const editor = createEditor();
-    stubLayout(editor);
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-
-    const visible = visibleBlocks(editor);
-    expect(visible.length).toBeGreaterThan(0);
-    expect(visible.length).toBeLessThan(BLOCKS);
-
-    // window.innerHeight is 768 in happy-dom and the add band is one viewport
-    // in each direction, so blocks past ~1536px must stay out.
-    const highest = Math.max(
-      ...visible.map((id) => Number(id.replace("blk", "")))
-    );
-    expect(highest * BLOCK_HEIGHT).toBeLessThanOrEqual(1536);
-    editor.destroy();
-  });
-
-  test("does not measure while the editor has no layout", async () => {
-    const editor = createEditor();
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-
-    expect(visibleBlocks(editor)).toEqual([]);
-    editor.destroy();
-  });
-
-  test("keeps the visible unit still when a placeholder resizes", async () => {
-    const editor = createEditor();
-    stubLayout(editor);
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-
-    const container = editor.view.dom.parentElement;
-    const before = container?.scrollTop ?? 0;
-
-    // the second block renders and turns out to be far taller than its
-    // estimate: everything after it moves, so the scroll must follow
-    const dom = editor.view.dom as HTMLElement;
-    let top = 0;
-    for (const [index, child] of Array.from(dom.children).entries()) {
-      const height = index === 1 ? BLOCK_HEIGHT * 10 : BLOCK_HEIGHT;
-      const childTop = top;
-      (child as HTMLElement).getBoundingClientRect = () =>
-        rect(childTop, height);
-      top += height;
-    }
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-
-    expect(container?.scrollTop ?? 0).toBeGreaterThanOrEqual(before);
-    editor.destroy();
-  });
-
-  test("keeps blocks that drift into the hysteresis band", async () => {
-    const editor = createEditor();
-    stubLayout(editor);
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-    const before = visibleBlocks(editor);
-
-    // Everything shifts down by half a viewport: blocks that leave the add
-    // band but stay inside the keep band must not be dropped.
-    const dom = editor.view.dom as HTMLElement;
-    let top = 384;
-    for (const child of Array.from(dom.children)) {
-      const childTop = top;
-      (child as HTMLElement).getBoundingClientRect = () =>
-        rect(childTop, BLOCK_HEIGHT);
-      top += BLOCK_HEIGHT;
-    }
-    editor.view.dispatch(editor.state.tr.setMeta("nudge", true));
-    await frames();
-
-    for (const id of before) expect(visibleBlocks(editor)).toContain(id);
     editor.destroy();
   });
 });

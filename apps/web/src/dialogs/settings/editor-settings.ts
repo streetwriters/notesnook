@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
-import { VirtualizationMode } from "@notesnook/editor";
 import {
   editorConfig,
   onEditorConfigChange,
@@ -166,18 +165,10 @@ export const EditorSettings: SettingsGroup[] = [
           useSettingStore.subscribe((c) => c.editorVirtualization, listener),
         components: [
           {
-            type: "dropdown",
-            options: [
-              { value: "off", title: strings.editorVirtualizationOff() },
-              { value: "blocks", title: strings.editorVirtualizationBlocks() },
-              { value: "pages", title: strings.editorVirtualizationPages() }
-            ],
-            selectedOption: () =>
-              useSettingStore.getState().editorVirtualization,
-            onSelectionChanged: (value) =>
-              useSettingStore
-                .getState()
-                .setEditorVirtualization(value as VirtualizationMode)
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().editorVirtualization,
+            toggle: () =>
+              useSettingStore.getState().toggleEditorVirtualization()
           }
         ]
       }

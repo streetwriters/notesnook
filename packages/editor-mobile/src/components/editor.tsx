@@ -259,7 +259,7 @@ const Tiptap = ({
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
       dayFormat: settings.dayFormat,
       enableInputRules: settings.markdownShortcuts,
-      virtualization: settings.virtualization || "off"
+      virtualization: !!settings.virtualization
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -963,7 +963,7 @@ const Tiptap = ({
           // once and only rebuilds its view afterwards, so extension options are
           // frozen at construction — toggling paging only takes effect when this
           // component remounts.
-          key={tick + tab.id + "-editor-" + (settings.virtualization || "off")}
+          key={tick + tab.id + "-editor-" + !!settings.virtualization}
           options={tiptapOptions}
           settings={settings}
           onEditorUpdate={(editor) => {

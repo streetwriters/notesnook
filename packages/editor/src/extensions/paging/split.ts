@@ -44,9 +44,6 @@ export function toPages(
   const blocks = flattenBlocks(doc);
   if (!blocks.length) return doc.content;
 
-  // Pages are identified at creation rather than by the block id plugin: the
-  // viewport plugin needs an id the moment a page exists, and one assigned a
-  // transaction later would leave every page permanently materialized.
   const identify = "blockId" in (pageType.spec.attrs ?? {});
   const pages: ProsemirrorNode[] = [];
   for (let i = 0; i < blocks.length; i += pageSize)
@@ -60,24 +57,26 @@ export function toPages(
   return Fragment.fromArray(pages);
 }
 
-/** The document's blocks with every page wrapper removed. */
-export function flattenBlocks(doc: ProsemirrorNode): ProsemirrorNode[] {
-  const blocks: ProsemirrorNode[] = [];
-  doc.forEach((node) => {
-    if (isPage(node)) node.forEach((child) => blocks.push(child));
-    else blocks.push(node);
-  });
-  return blocks;
-}
-
-/** The document's content with page wrappers removed, for serialization. */
-export function flattenPages(doc: ProsemirrorNode): Fragment {
+/** The same content with every page wrapper removed. */
+export function flattenPages(fragment: Fragment): Fragment {
   let paged = false;
-  doc.forEach((node) => {
+  fragment.forEach((node) => {
     if (isPage(node)) paged = true;
   });
-  if (!paged) return doc.content;
-  return Fragment.fromArray(flattenBlocks(doc));
+  if (!paged) return fragment;
+
+  const blocks: ProsemirrorNode[] = [];
+  fragment.forEach((node) => {
+    if (isPage(node)) node.content.forEach((child) => blocks.push(child));
+    else blocks.push(node);
+  });
+  return Fragment.fromArray(blocks);
+}
+
+export function flattenBlocks(doc: ProsemirrorNode): ProsemirrorNode[] {
+  const blocks: ProsemirrorNode[] = [];
+  flattenPages(doc.content).forEach((node) => blocks.push(node));
+  return blocks;
 }
 
 export function countPages(doc: ProsemirrorNode): number {

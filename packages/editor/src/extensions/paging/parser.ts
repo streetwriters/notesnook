@@ -54,8 +54,6 @@ export function installPagingParser(
 ): void {
   const cached = schema.cached as { domParser?: DOMParser };
   if (!(cached.domParser instanceof PagingDOMParser)) {
-    // `fromSchema` seeds the default parser; reuse its rules so the paging
-    // parser behaves identically apart from the wrapping.
     const base = DOMParser.fromSchema(schema);
     cached.domParser = new PagingDOMParser(schema, base.rules);
   }

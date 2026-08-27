@@ -22,13 +22,11 @@ import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
 import { HeightMap } from "./height-map.js";
-import { VirtualizationUnit, unitTypes } from "./node-views.js";
+import { PAGE_NODE } from "./page.js";
 
-export const virtualizationKey = new PluginKey<VirtualizationState>(
-  "notesnook-virtualization"
-);
+export const viewportKey = new PluginKey<ViewportState>("notesnook-paging");
 
-type VirtualizationState = {
+type ViewportState = {
   visible: Set<string>;
   selectionIndex: number;
   blockCount: number;
@@ -42,8 +40,6 @@ const ADD_OVERSCAN = 1;
 const KEEP_OVERSCAN = 1.5;
 const MATERIALIZE_ATTRS = {};
 const MATERIALIZE_SPEC = { materialize: true };
-
-type IsPageable = (typeName: string) => boolean;
 
 export function findScrollParent(node: HTMLElement): HTMLElement | null {
   let current: HTMLElement | null = node.parentElement;
@@ -74,20 +70,20 @@ function shouldMaterialize(
   selectionIndex: number
 ): boolean {
   if (index === 0 || index === lastIndex) {
-    profiler.count("virtualization.materializedBy.edge");
+    profiler.count("paging.materializedBy.edge");
     return true;
   }
   if (Math.abs(index - selectionIndex) <= 1) {
-    profiler.count("virtualization.materializedBy.selection");
+    profiler.count("paging.materializedBy.selection");
     return true;
   }
   const blockId = node.attrs.blockId as string | undefined;
   if (!blockId) {
-    profiler.count("virtualization.materializedBy.missingBlockId");
+    profiler.count("paging.materializedBy.missingBlockId");
     return true;
   }
   if (visible.has(blockId)) {
-    profiler.count("virtualization.materializedBy.visible");
+    profiler.count("paging.materializedBy.visible");
     return true;
   }
   return false;
@@ -106,17 +102,16 @@ function materializeDecoration(from: number, to: number): Decoration {
 function buildDecorations(
   doc: ProsemirrorNode,
   visible: Set<string>,
-  selectionIndex: number,
-  isPageable: IsPageable
+  selectionIndex: number
 ): DecorationSet {
-  const end = profiler.start("virtualization.decorations");
+  const end = profiler.start("paging.decorations");
   const decorations: Decoration[] = [];
   const lastIndex = doc.childCount - 1;
   let index = -1;
 
   doc.forEach((node, offset) => {
     index++;
-    if (!isPageable(node.type.name)) return;
+    if (node.type.name !== PAGE_NODE) return;
     if (!shouldMaterialize(node, index, lastIndex, visible, selectionIndex))
       return;
     decorations.push(materializeDecoration(offset, offset + node.nodeSize));
@@ -124,9 +119,9 @@ function buildDecorations(
 
   const set = DecorationSet.create(doc, decorations);
   end();
-  profiler.count("virtualization.decorationBuilds");
-  profiler.gauge("virtualization.materializedBlocks", decorations.length);
-  profiler.gauge("virtualization.blocksInDoc", doc.childCount);
+  profiler.count("paging.decorationBuilds");
+  profiler.gauge("paging.materializedBlocks", decorations.length);
+  profiler.gauge("paging.blocksInDoc", doc.childCount);
   return set;
 }
 
@@ -185,30 +180,23 @@ function hasMaterializeDecoration(
  */
 function repairSelection(
   set: DecorationSet,
-  state: EditorState,
-  isPageable: IsPageable
+  state: EditorState
 ): DecorationSet {
   const missing: Decoration[] = [];
   for (const range of selectionRanges(state)) {
-    if (!isPageable(state.doc.child(range.index).type.name)) continue;
+    if (state.doc.child(range.index).type.name !== PAGE_NODE) continue;
     if (hasMaterializeDecoration(set, range)) continue;
     missing.push(materializeDecoration(range.from, range.to));
   }
   if (!missing.length) return set;
 
-  profiler.count("virtualization.decorationRepairs", missing.length);
+  profiler.count("paging.decorationRepairs", missing.length);
   return set.add(state.doc, missing);
 }
 
-export function virtualizationPlugin(
-  unit: VirtualizationUnit = "blocks",
-  heightMap?: HeightMap
-): Plugin<VirtualizationState> {
-  const types = unitTypes(unit);
-  const isPageable: IsPageable = (typeName) => types.includes(typeName);
-
-  return new Plugin<VirtualizationState>({
-    key: virtualizationKey,
+export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
+  return new Plugin<ViewportState>({
+    key: viewportKey,
     state: {
       init(_config, state) {
         const selectionIndex = state.selection.$from.index(0);
@@ -219,13 +207,12 @@ export function virtualizationPlugin(
           decorations: buildDecorations(
             state.doc,
             EMPTY_VISIBLE,
-            selectionIndex,
-            isPageable
+            selectionIndex
           )
         };
       },
       apply(tr, value, _oldState, newState) {
-        const meta = tr.getMeta(virtualizationKey) as
+        const meta = tr.getMeta(viewportKey) as
           | { visible: Set<string> }
           | undefined;
         const visible = meta?.visible ?? value.visible;
@@ -236,7 +223,7 @@ export function virtualizationPlugin(
         const structural = blockCount !== value.blockCount;
 
         if (!meta && !selectionMoved && !structural && !tr.docChanged) {
-          profiler.count("virtualization.decorationReuses");
+          profiler.count("paging.decorationReuses");
           return value;
         }
 
@@ -245,33 +232,24 @@ export function virtualizationPlugin(
             visible,
             selectionIndex,
             blockCount,
-            decorations: buildDecorations(
-              tr.doc,
-              visible,
-              selectionIndex,
-              isPageable
-            )
+            decorations: buildDecorations(tr.doc, visible, selectionIndex)
           };
         }
 
-        // Text-only edit: the block structure is unchanged, so the existing
-        // decorations only need their positions mapped instead of a full
-        // O(blocks x decorations) rebuild.
-        const end = profiler.start("virtualization.decorationMap");
+        const end = profiler.start("paging.decorationMap");
         const mapped = repairSelection(
           value.decorations.map(tr.mapping, tr.doc),
-          newState,
-          isPageable
+          newState
         );
         end();
-        profiler.count("virtualization.decorationMaps");
+        profiler.count("paging.decorationMaps");
 
         return { visible, selectionIndex, blockCount, decorations: mapped };
       }
     },
     props: {
       decorations(state) {
-        return virtualizationKey.getState(state)?.decorations;
+        return viewportKey.getState(state)?.decorations;
       }
     },
     view(editorView) {
@@ -281,12 +259,9 @@ export function virtualizationPlugin(
       const measuredPages = new Set<string>();
 
       const ensureScrollParent = () => {
-        // Resolved lazily: at view-init the document may not overflow yet.
         const resolved = findScrollParent(editorView.dom);
         if (!resolved || resolved === scrollParent) return;
         scrollParent?.removeEventListener("scroll", schedule);
-        // Keep scroll anchoring on so a placeholder above the viewport growing
-        // to its real height does not shove the visible content.
         resolved.style.overflowAnchor = "auto";
         resolved.addEventListener("scroll", schedule, { passive: true });
         scrollParent = resolved;
@@ -389,32 +364,32 @@ export function virtualizationPlugin(
         const delta = element.getBoundingClientRect().top - pin.top;
         if (!delta) return;
         scrollParent.scrollTop += delta;
-        profiler.record("virtualization.pinCorrection", Math.abs(delta));
+        profiler.record("paging.pinCorrection", Math.abs(delta));
       };
 
       const flush = () => {
         frame = 0;
-        const end = profiler.start("virtualization.measure");
+        const end = profiler.start("paging.measure");
         ensureScrollParent();
         const next = measure();
         end();
-        profiler.count("virtualization.measures");
+        profiler.count("paging.measures");
         if (!next) return;
 
-        const current = virtualizationKey.getState(editorView.state)?.visible;
+        const current = viewportKey.getState(editorView.state)?.visible;
         if (current && sameSet(current, next)) {
-          profiler.count("virtualization.measuresUnchanged");
+          profiler.count("paging.measuresUnchanged");
           return;
         }
 
         visible = next;
-        profiler.count("virtualization.visibilityFlushes");
-        profiler.gauge("virtualization.visibleBlocks", next.size);
+        profiler.count("paging.visibilityFlushes");
+        profiler.gauge("paging.visibleBlocks", next.size);
 
         const pin = pinnedUnit();
         editorView.dispatch(
           editorView.state.tr
-            .setMeta(virtualizationKey, { visible: next })
+            .setMeta(viewportKey, { visible: next })
             .setMeta("preventUpdate", true)
             .setMeta("addToHistory", false)
         );
@@ -430,7 +405,7 @@ export function virtualizationPlugin(
        * place while they change.
        */
       const resizePlaceholders = () => {
-        if (!heightMap?.needsRecalibration) return;
+        if (!heights.needsRecalibration) return;
         const pin = pinnedUnit();
         const children = editorView.dom.children;
         const doc = editorView.state.doc;
@@ -438,11 +413,11 @@ export function virtualizationPlugin(
         for (let i = 0; i < count; i++) {
           const element = children[i] as HTMLElement;
           if (!element.hasAttribute("data-virtual-placeholder")) continue;
-          element.style.height = `${heightMap.heightFor(doc.child(i))}px`;
+          element.style.height = `${heights.heightFor(doc.child(i))}px`;
         }
-        heightMap.markRecalibrated();
+        heights.markRecalibrated();
         restorePin(pin);
-        profiler.count("virtualization.placeholderResizes");
+        profiler.count("paging.placeholderResizes");
       };
 
       /**
@@ -450,13 +425,10 @@ export function virtualizationPlugin(
        * its placeholder is the right size when it scrolls away again.
        */
       const recordRenderedHeights = () => {
-        if (!heightMap) return;
-        // Read the layout the note is actually rendered in, so estimates for
-        // everything still off screen match what the reader will see.
         const style = getComputedStyle(editorView.dom);
         const fontSize = parseFloat(style.fontSize);
         const lineHeight = parseFloat(style.lineHeight);
-        heightMap.setMetrics({
+        heights.setMetrics({
           width: editorView.dom.clientWidth,
           fontSize,
           lineHeight: Number.isFinite(lineHeight) ? lineHeight : fontSize * 1.5
@@ -468,12 +440,8 @@ export function virtualizationPlugin(
           const element = children[i] as HTMLElement;
           if (element.hasAttribute("data-virtual-placeholder")) continue;
           const node = doc.child(i);
-          heightMap.record(node, element.offsetHeight);
+          heights.record(node, element.offsetHeight);
 
-          // The blocks inside a rendered page are what the estimates are built
-          // from, and their ids outlive this session's page boundaries. Measure
-          // each page once; re-measuring on every flush would read layout for
-          // hundreds of elements for nothing.
           const pageId = node.attrs.blockId as string | undefined;
           if (node.type.name !== "page" || !pageId || measuredPages.has(pageId))
             continue;
@@ -481,11 +449,11 @@ export function virtualizationPlugin(
           const blocks = element.children;
           const blockCount = Math.min(blocks.length, node.childCount);
           for (let j = 0; j < blockCount; j++)
-            heightMap.record(
+            heights.record(
               node.child(j),
               (blocks[j] as HTMLElement).offsetHeight
             );
-          profiler.count("virtualization.pagesMeasured");
+          profiler.count("paging.pagesMeasured");
         }
       };
 
@@ -496,9 +464,6 @@ export function virtualizationPlugin(
 
       window.addEventListener("resize", schedule, { passive: true });
 
-      // Zooming or changing the font re-lays out the note without scrolling it
-      // and without touching the document, so nothing else would tell the
-      // window that what is on screen has moved.
       let layout: ResizeObserver | undefined;
       try {
         if (typeof ResizeObserver !== "undefined") {
@@ -513,7 +478,6 @@ export function virtualizationPlugin(
 
       return {
         update() {
-          // Materializing changes block heights, which moves the window.
           schedule();
         },
         destroy() {

@@ -58,7 +58,7 @@ export type Settings = {
   timeFormat: string;
   fontScale: number;
   markdownShortcuts: boolean;
-  virtualization?: "off" | "blocks" | "pages";
+  virtualization?: boolean;
   features: Record<any, any>;
   loggedIn: boolean;
   defaultLineHeight: number;
