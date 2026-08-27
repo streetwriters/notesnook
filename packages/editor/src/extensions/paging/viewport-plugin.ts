@@ -29,11 +29,11 @@ export const viewportKey = new PluginKey<ViewportState>("notesnook-paging");
 type ViewportState = {
   visible: Set<string>;
   selectionIndex: number;
-  blockCount: number;
+  pageCount: number;
   decorations: DecorationSet;
 };
 
-type BlockRange = { from: number; to: number; index: number };
+type PageRange = { from: number; to: number; index: number };
 
 const EMPTY_VISIBLE: Set<string> = new Set();
 const SHOW_MARGIN = 1;
@@ -119,7 +119,7 @@ function buildDecorations(
   end();
   profiler.count("paging.decorationBuilds");
   profiler.gauge("paging.renderedPages", decorations.length);
-  profiler.gauge("paging.blocksInDoc", doc.childCount);
+  profiler.gauge("paging.pagesInDoc", doc.childCount);
   return set;
 }
 
@@ -127,7 +127,7 @@ function buildDecorations(
  * The pages around the caret, worked out from the selection instead of by
  * walking the document.
  */
-function selectionRanges(state: EditorState): BlockRange[] {
+function selectionRanges(state: EditorState): PageRange[] {
   const { $from } = state.selection;
   const doc = state.doc;
   const index = $from.index(0);
@@ -135,7 +135,7 @@ function selectionRanges(state: EditorState): BlockRange[] {
 
   const start = $from.depth > 0 ? $from.before(1) : $from.pos;
   const node = doc.child(index);
-  const ranges: BlockRange[] = [];
+  const ranges: PageRange[] = [];
 
   if (index > 0) {
     const previous = doc.child(index - 1);
@@ -157,7 +157,7 @@ function selectionRanges(state: EditorState): BlockRange[] {
   return ranges;
 }
 
-function hasRenderDecoration(set: DecorationSet, range: BlockRange): boolean {
+function hasRenderDecoration(set: DecorationSet, range: PageRange): boolean {
   return set
     .find(range.from, range.to)
     .some(
@@ -198,7 +198,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         return {
           visible: EMPTY_VISIBLE,
           selectionIndex,
-          blockCount: state.doc.childCount,
+          pageCount: state.doc.childCount,
           decorations: buildDecorations(
             state.doc,
             EMPTY_VISIBLE,
@@ -212,21 +212,21 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           | undefined;
         const visible = meta?.visible ?? value.visible;
         const selectionIndex = newState.selection.$from.index(0);
-        const blockCount = tr.doc.childCount;
+        const pageCount = tr.doc.childCount;
 
         const selectionMoved = selectionIndex !== value.selectionIndex;
-        const structural = blockCount !== value.blockCount;
+        const pagesChanged = pageCount !== value.pageCount;
 
-        if (!meta && !selectionMoved && !structural && !tr.docChanged) {
+        if (!meta && !selectionMoved && !pagesChanged && !tr.docChanged) {
           profiler.count("paging.decorationReuses");
           return value;
         }
 
-        if (meta || selectionMoved || structural) {
+        if (meta || selectionMoved || pagesChanged) {
           return {
             visible,
             selectionIndex,
-            blockCount,
+            pageCount,
             decorations: buildDecorations(tr.doc, visible, selectionIndex)
           };
         }
@@ -239,7 +239,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         end();
         profiler.count("paging.decorationMaps");
 
-        return { visible, selectionIndex, blockCount, decorations: mapped };
+        return { visible, selectionIndex, pageCount, decorations: mapped };
       }
     },
     props: {
@@ -250,7 +250,6 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
     view(editorView) {
       let frame = 0;
       let scrollParent: HTMLElement | null = null;
-      let visible: Set<string> = EMPTY_VISIBLE;
       const measuredPages = new Set<string>();
 
       const ensureScrollParent = () => {
@@ -305,6 +304,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         const keepTop = bounds.top - height * KEEP_MARGIN;
         const keepBottom = bounds.top + height * (1 + KEEP_MARGIN);
 
+        const shown = viewportKey.getState(editorView.state)?.visible;
         const next = new Set<string>();
         for (
           let i = firstPageBelow(children, keepTop);
@@ -314,13 +314,13 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           const element = children[i] as HTMLElement;
           const rect = element.getBoundingClientRect();
           if (rect.top > keepBottom) break;
-          const blockId = element.getAttribute("data-block-id");
-          if (!blockId) continue;
+          const pageId = element.getAttribute("data-block-id");
+          if (!pageId) continue;
           if (
             (rect.bottom >= addTop && rect.top <= addBottom) ||
-            visible.has(blockId)
+            shown?.has(pageId)
           )
-            next.add(blockId);
+            next.add(pageId);
         }
         return next;
       };
@@ -372,9 +372,8 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           return;
         }
 
-        visible = next;
         profiler.count("paging.visibilityFlushes");
-        profiler.gauge("paging.visibleBlocks", next.size);
+        profiler.gauge("paging.visiblePages", next.size);
 
         const pin = pinnedPage();
         editorView.dispatch(
@@ -384,6 +383,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
             .setMeta("addToHistory", false)
         );
         restorePin(pin);
+        updateMetrics();
         measureRenderedPages();
         resizePlaceholders();
       };
@@ -413,7 +413,8 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
        * Whatever is on screen has a real height. Remembering it means the empty
        * box left behind is the right size once it scrolls away.
        */
-      const measureRenderedPages = () => {
+      /** The layout text is wrapped in, read from the editor itself. */
+      const updateMetrics = () => {
         const style = getComputedStyle(editorView.dom);
         const fontSize = parseFloat(style.fontSize);
         const lineHeight = parseFloat(style.lineHeight);
@@ -422,6 +423,9 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           fontSize,
           lineHeight: Number.isFinite(lineHeight) ? lineHeight : fontSize * 1.5
         });
+      };
+
+      const measureRenderedPages = () => {
         const children = editorView.dom.children;
         const doc = editorView.state.doc;
         const count = Math.min(children.length, doc.childCount);
@@ -432,7 +436,11 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           heights.record(node, element.offsetHeight);
 
           const pageId = node.attrs.blockId as string | undefined;
-          if (node.type.name !== "page" || !pageId || measuredPages.has(pageId))
+          if (
+            node.type.name !== PAGE_NODE ||
+            !pageId ||
+            measuredPages.has(pageId)
+          )
             continue;
           measuredPages.add(pageId);
           const blocks = element.children;

@@ -59,8 +59,3 @@ export function installPagingParser(
   }
   (cached.domParser as PagingDOMParser).options = options;
 }
-
-export function uninstallPagingParser(schema: Schema): void {
-  const cached = schema.cached as { domParser?: DOMParser };
-  if (cached.domParser instanceof PagingDOMParser) delete cached.domParser;
-}

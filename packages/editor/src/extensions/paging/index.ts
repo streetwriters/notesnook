@@ -98,17 +98,14 @@ export const Paging = Extension.create<PagingOptions>({
   }
 });
 
-export { HeightMap } from "./height-map.js";
 export { PAGE_NODE, Page } from "./page.js";
 export {
   getScrollAnchor,
   restoreScrollAnchor,
   type ScrollAnchor
 } from "./anchor.js";
-export { installPagingParser, uninstallPagingParser } from "./parser.js";
 export { fromFlatPosition, toFlatPosition } from "./positions.js";
 export { serializeDocumentHTML } from "./serialize.js";
-export { installFlatteningSerializer } from "./serializer.js";
 export {
   DEFAULT_PAGE_SIZE,
   countPages,

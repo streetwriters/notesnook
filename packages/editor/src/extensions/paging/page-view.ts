@@ -69,31 +69,22 @@ function placeholder(node: ProsemirrorNode, heights: HeightMap): NodeView {
   };
 }
 
-/** A page rendered normally, measured so its placeholder is the right size. */
-function rendered(node: ProsemirrorNode, heights: HeightMap): NodeView {
+/** A page shown normally, rendered the way the schema says. */
+function rendered(node: ProsemirrorNode): NodeView {
   const spec = node.type.spec.toDOM?.(node);
   if (!spec) return { dom: document.createElement("div") };
 
   const { dom, contentDOM } = DOMSerializer.renderSpec(document, spec);
-  const measure = () => {
-    if (dom instanceof HTMLElement) heights.record(node, dom.offsetHeight);
-  };
-
   return {
     dom,
     contentDOM,
     update(updated, decorations) {
-      if (updated.type !== node.type) return false;
       if (!isRendered(decorations)) {
         profiler.count("paging.pageHidden");
         return false;
       }
-      if (!node.sameMarkup(updated)) return false;
-      node = updated;
-      measure();
-      return true;
-    },
-    destroy: measure
+      return node.sameMarkup(updated);
+    }
   };
 }
 
@@ -102,7 +93,5 @@ export function createPageView(
   decorations: readonly Decoration[],
   heights: HeightMap
 ): NodeView {
-  return isRendered(decorations)
-    ? rendered(node, heights)
-    : placeholder(node, heights);
+  return isRendered(decorations) ? rendered(node) : placeholder(node, heights);
 }
