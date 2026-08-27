@@ -21,7 +21,11 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
 import { isPage } from "./split.js";
-import { findScrollParent, viewportKey } from "./viewport-plugin.js";
+import {
+  findScrollParent,
+  renderViewportNow,
+  viewportKey
+} from "./viewport-plugin.js";
 
 export type ScrollAnchor = {
   /** The block that was at the top of the viewport. */
@@ -141,6 +145,7 @@ export function restoreScrollAnchor(
 
   container.scrollTop +=
     element.getBoundingClientRect().top - top - anchor.offset;
+  renderViewportNow(view);
   end();
   profiler.count("paging.restoreAnchors");
   return true;

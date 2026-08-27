@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
-import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { Decoration, DecorationSet, EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
 import { HeightMap } from "./height-map.js";
 import { PAGE_NODE } from "./page.js";
@@ -36,6 +36,17 @@ type ViewportState = {
 type PageRange = { from: number; to: number; index: number };
 
 const EMPTY_VISIBLE: Set<string> = new Set();
+
+const pending = new WeakMap<EditorView, () => void>();
+
+/**
+ * Works out what is on screen right now instead of waiting for the next frame.
+ * Used after jumping the scroll somewhere new, so the pages that land in view
+ * are rendered in the same frame rather than showing as empty boxes first.
+ */
+export function renderViewportNow(view: EditorView): void {
+  pending.get(view)?.();
+}
 const SHOW_MARGIN = 1;
 const KEEP_MARGIN = 1.5;
 const RENDER_ATTRS = {};
@@ -488,6 +499,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         schedule();
       };
 
+      pending.set(editorView, flush);
       window.addEventListener("beforeprint", beforePrint);
       window.addEventListener("afterprint", afterPrint);
 
@@ -520,6 +532,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           window.removeEventListener("beforeprint", beforePrint);
           window.removeEventListener("afterprint", afterPrint);
           printMedia?.removeEventListener?.("change", onPrintMedia);
+          pending.delete(editorView);
           window.removeEventListener("resize", schedule);
           scrollParent?.removeEventListener("scroll", schedule);
           layout?.disconnect();

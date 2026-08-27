@@ -312,14 +312,14 @@ function TipTap(props: TipTapProps) {
           editor.commands.focus("start", { scrollIntoView: false });
         oldNonce.current = nonce;
 
-        const instance = toIEditor(editor as Editor);
-        if (onLoad) onLoad(instance);
+        const editorInstance = instance.current ?? toIEditor(editor as Editor);
+        if (onLoad) onLoad(editorInstance);
 
         const totalWords = profiler.time("statistics.totalWords", () =>
           getTotalWords(editor as Editor)
         );
         useEditorManager.getState().setEditor(id, {
-          editor: instance,
+          editor: editorInstance,
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           statistics: {
@@ -547,6 +547,15 @@ function TipTap(props: TipTapProps) {
     // IMPORTANT: only put stuff here that the editor depends on.
     [tiptapOptions]
   );
+
+  // Registered before the browser paints. `onCreate` runs a task later, and
+  // whoever restores the scroll position needs the editor in the frame the note
+  // first appears in, or the note paints at the top and then jumps.
+  const instance = useRef<IEditor>();
+  useLayoutEffect(() => {
+    instance.current = toIEditor(editor as Editor);
+    useEditorManager.getState().setEditor(id, { editor: instance.current });
+  }, [editor, id]);
 
   useEffect(() => {
     function onClick(e: MouseEvent) {

@@ -58,9 +58,15 @@ function rect(top: number, height: number) {
 const original = HTMLElement.prototype.getBoundingClientRect;
 
 /** happy-dom lays nothing out, so blocks and pages get a synthetic geometry. */
-function stubLayout(editor: Editor, scrollTop = 0) {
+/** Behaves like a real scroller: moving `scrollTop` moves the content. */
+function stubLayout(editor: Editor, initialScrollTop = 0) {
   const dom = editor.view.dom as HTMLElement;
+  const container = dom.parentElement as HTMLElement | null;
+  if (container) container.scrollTop = initialScrollTop;
+  const scrolled = () => container?.scrollTop ?? initialScrollTop;
+
   HTMLElement.prototype.getBoundingClientRect = function () {
+    const scrollTop = scrolled();
     if (this === dom) return rect(-scrollTop, BLOCKS * BLOCK_HEIGHT);
     // the scroll container and anything outside the editor sits at the top
     if (!dom.contains(this)) return rect(0, 800);
@@ -167,6 +173,25 @@ describe("scroll anchor", () => {
 
     const anchor = getScrollAnchor(editor.view);
     expect(anchor?.blockId).toBe("blk300");
+    editor.destroy();
+  });
+
+  test("renders what lands in view, without waiting for a frame", () => {
+    const editor = createEditor(createContainer());
+    stubLayout(editor);
+
+    restoreScrollAnchor(editor.view, { blockId: "blk300", offset: 0 });
+
+    // the pages around the anchor are rendered straight away, so the note is
+    // never shown as a column of empty boxes at the right offset
+    const pages = Array.from(editor.view.dom.children) as HTMLElement[];
+    const rendered = pages.filter(
+      (page) => !page.hasAttribute("data-page-placeholder")
+    );
+    expect(rendered.length).toBeGreaterThan(1);
+    expect(
+      editor.view.dom.querySelector('[data-block-id="blk300"]')
+    ).not.toBeNull();
     editor.destroy();
   });
 
