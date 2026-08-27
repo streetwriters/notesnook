@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { DOMSerializer } from "@tiptap/pm/model";
 import { Fragment, Schema } from "prosemirror-model";
+import { flattenPages } from "../paging/split.js";
 
 export class ClipboardDOMSerializer extends DOMSerializer {
   static fromSchema(schema: Schema): ClipboardDOMSerializer {
@@ -36,7 +37,11 @@ export class ClipboardDOMSerializer extends DOMSerializer {
     options?: { document?: Document | undefined } | undefined,
     target?: HTMLElement | DocumentFragment | undefined
   ): HTMLElement | DocumentFragment {
-    const dom = super.serializeFragment(fragment, options, target);
+    const dom = super.serializeFragment(
+      flattenPages(fragment),
+      options,
+      target
+    );
     for (const p of dom.querySelectorAll("li > p")) {
       if (p.parentElement && p.parentElement.childElementCount > 1) continue;
       p.parentElement?.append(...p.childNodes);

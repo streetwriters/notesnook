@@ -26,7 +26,7 @@ import { DEFAULT_PAGE_SIZE, countPages, toPages } from "./split.js";
 import { viewportPlugin } from "./viewport-plugin.js";
 
 /** Paging only engages for notes larger than this many top-level blocks. */
-const DEFAULT_THRESHOLD_BLOCKS = 300;
+const DEFAULT_THRESHOLD_BLOCKS = 100;
 
 export type PagingOptions = {
   enabled: boolean;

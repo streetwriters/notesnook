@@ -33,6 +33,7 @@ import {
 } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
 import { getTableOfContents } from "../../../utils/toc.js";
+import { ClipboardDOMSerializer } from "../../clipboard/clipboard-dom-serializer.js";
 import { profiler } from "../../../utils/profiler.js";
 
 const PagedDocument = Node.create({
@@ -186,6 +187,25 @@ describe("paging", () => {
     const html = getHTMLFromFragment(editor.state.doc.content, editor.schema);
     expect(html).not.toContain("data-page");
     expect(html.match(/<p/g)).toHaveLength(BLOCKS);
+    editor.destroy();
+  });
+
+  test("copying across pages puts plain content on the clipboard", async () => {
+    const editor = createEditor(savedNoteHTML(BLOCKS));
+    await created();
+    expect(countPages(editor.state.doc)).toBe(3);
+
+    editor.commands.selectAll();
+    const container = document.createElement("div");
+    container.appendChild(
+      ClipboardDOMSerializer.fromSchema(editor.schema).serializeFragment(
+        editor.state.selection.content().content
+      )
+    );
+
+    // the clipboard has its own serializer, which has to strip pages as well
+    expect(container.innerHTML).not.toContain("data-page");
+    expect(container.innerHTML.match(/<p/g)).toHaveLength(BLOCKS);
     editor.destroy();
   });
 
