@@ -133,6 +133,24 @@ describe("paged virtualization", () => {
     editor.destroy();
   });
 
+  test("every page is rendered while the browser prints", async () => {
+    const editor = createEditor();
+    await created();
+    expect(
+      editor.view.dom.querySelectorAll("[data-page-placeholder]").length
+    ).toBeGreaterThan(0);
+
+    window.dispatchEvent(new Event("beforeprint"));
+
+    expect(
+      editor.view.dom.querySelectorAll("[data-page-placeholder]")
+    ).toHaveLength(0);
+    expect(editor.getText()).toContain(`Paragraph number ${BLOCKS - 1}.`);
+
+    window.dispatchEvent(new Event("afterprint"));
+    editor.destroy();
+  });
+
   test("the page holding the caret is never a placeholder", async () => {
     const editor = createEditor();
     await created();

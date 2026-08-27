@@ -2478,7 +2478,7 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Enable ligatures for common symbols like →, ←, etc`,
   editorVirtualization: () => t`Editor paging (experimental)`,
   editorVirtualizationDesc: () =>
-    t`Only render the part of a note that is currently on screen. Makes very large notes much faster to open, scroll and type in. While this is on, your browser's find (Ctrl+F) and printing will only cover the visible part of a note — use the editor's own search instead. If you face any issues, please turn it off.`,
+    t`Only render the part of a note that is currently on screen. Makes very large notes much faster to open, scroll and type in. While this is on, your browser's own find (Ctrl+F) only covers the visible part of a note, so use the editor's search instead. If you face any issues, please turn it off.`,
   expandSidebar: () => t`Expand sidebar`,
   viewAllLimits: () => `View all limits`,
   freePlan: () => t`Free plan`,

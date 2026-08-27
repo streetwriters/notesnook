@@ -249,6 +249,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
     },
     view(editorView) {
       let frame = 0;
+      let printing = false;
       let scrollParent: HTMLElement | null = null;
       const measuredPages = new Set<string>();
 
@@ -359,6 +360,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
 
       const flush = () => {
         frame = 0;
+        if (printing) return;
         const end = profiler.start("paging.measure");
         ensureScrollParent();
         const next = measure();
@@ -459,6 +461,33 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         frame = requestAnimationFrame(flush);
       }
 
+      /**
+       * The browser can only print what is in the page, so everything has to be
+       * rendered before it takes its snapshot and can go back to normal after.
+       */
+      const beforePrint = () => {
+        printing = true;
+        const everything = new Set<string>();
+        editorView.state.doc.forEach((page) => {
+          const pageId = page.attrs.blockId as string | undefined;
+          if (pageId) everything.add(pageId);
+        });
+        editorView.dispatch(
+          editorView.state.tr
+            .setMeta(viewportKey, { visible: everything })
+            .setMeta("preventUpdate", true)
+            .setMeta("addToHistory", false)
+        );
+        profiler.count("paging.printExpanded");
+      };
+
+      const afterPrint = () => {
+        printing = false;
+        schedule();
+      };
+
+      window.addEventListener("beforeprint", beforePrint);
+      window.addEventListener("afterprint", afterPrint);
       window.addEventListener("resize", schedule, { passive: true });
 
       let layout: ResizeObserver | undefined;
@@ -479,6 +508,8 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         },
         destroy() {
           if (frame) cancelAnimationFrame(frame);
+          window.removeEventListener("beforeprint", beforePrint);
+          window.removeEventListener("afterprint", afterPrint);
           window.removeEventListener("resize", schedule);
           scrollParent?.removeEventListener("scroll", schedule);
           layout?.disconnect();
