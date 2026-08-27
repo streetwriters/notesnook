@@ -298,7 +298,10 @@ function TipTap(props: TipTapProps) {
       element: editorContainer(),
       editable: !readonly,
       content: content?.(),
-      autofocus: "start",
+      // Tiptap's autofocus scrolls to the caret a frame after the editor is
+      // created, which would undo the restored scroll position. The caret is
+      // placed by the selection restore instead.
+      autofocus: false,
       onFocus,
       onCreate: async ({ editor }) => {
         setProfiledEditor(editor as Editor);

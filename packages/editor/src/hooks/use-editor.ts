@@ -70,7 +70,9 @@ export const useEditor = (
           editor.createView();
         });
       }
-      if (oldIsFocused && !editor.isFocused) editor.commands.focus();
+      // Restoring focus must not drag the view to the caret.
+      if (oldIsFocused && !editor.isFocused)
+        editor.commands.focus(null, { scrollIntoView: false });
       // The Editor constructor emits `create` for the view it made, so calling
       // the option here as well would run every consumer twice on load.
       if (!firstRun) options.onCreate?.({ editor: editor });
