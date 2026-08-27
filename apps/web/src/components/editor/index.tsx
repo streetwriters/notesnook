@@ -509,6 +509,7 @@ export function Editor(props: EditorProps) {
     (store) => store.saveSessionContentIfNotSaved
   );
   const setEditorSaveState = useEditorStore((store) => store.setSaveState);
+  const restoredScroll = useRef(false);
   useScrollToBlock(session);
   useScrollToSearchResult(session);
 
@@ -567,10 +568,15 @@ export function Editor(props: EditorProps) {
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
         }}
         onLoad={(editor) => {
-          restoreScrollPosition(
-            session,
-            editor || useEditorManager.getState().getEditor(id)?.editor
-          );
+          // Only once: the viewport corrects the scroll itself as pages are
+          // measured, and restoring again would undo those corrections.
+          if (!restoredScroll.current) {
+            restoredScroll.current = restoreScrollPosition(
+              session,
+              editor || useEditorManager.getState().getEditor(id)?.editor,
+              () => (restoredScroll.current = true)
+            );
+          }
           // The caret is only put back once the editor is fully created. Doing
           // it earlier as well means it is moved twice, and the editor scrolls
           // to follow the caret each time.
@@ -960,17 +966,30 @@ function isFile(e: DragEvent) {
 }
 
 /** The editor is not always registered yet when a note first loads. */
-function retryScrollAnchor(sessionId: string, anchor: ScrollAnchor, tries = 5) {
+function retryScrollAnchor(
+  sessionId: string,
+  anchor: ScrollAnchor,
+  done: () => void,
+  tries = 5
+) {
   if (tries <= 0) return;
   requestAnimationFrame(() => {
     const editor = useEditorManager.getState().getEditor(sessionId)?.editor;
-    if (editor?.restoreScrollAnchor(anchor)) return;
-    retryScrollAnchor(sessionId, anchor, tries - 1);
+    if (editor?.restoreScrollAnchor(anchor)) return done();
+    retryScrollAnchor(sessionId, anchor, done, tries - 1);
   });
 }
 
-function restoreScrollPosition(session: EditorSession, editor?: IEditor) {
-  if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
+/** Returns whether the position was restored, so it is only attempted once. */
+function restoreScrollPosition(
+  session: EditorSession,
+  editor?: IEditor,
+  onRestored: () => void = () => undefined
+): boolean {
+  if (session?.activeBlockId) {
+    scrollIntoViewById(session.activeBlockId);
+    return true;
+  }
 
   // Restoring by block avoids the guesswork: a saved pixel offset was measured
   // against a fully rendered document, and a paged one only knows estimated
@@ -986,9 +1005,9 @@ function restoreScrollPosition(session: EditorSession, editor?: IEditor) {
     null
   );
   if (anchor) {
-    if (editor?.restoreScrollAnchor(anchor)) return;
-    retryScrollAnchor(session.id, anchor);
-    return;
+    if (editor?.restoreScrollAnchor(anchor)) return true;
+    retryScrollAnchor(session.id, anchor, onRestored);
+    return false;
   }
 
   const scrollContainer = document.getElementById(`editorScroll_${session.id}`);
@@ -1012,6 +1031,7 @@ function restoreScrollPosition(session: EditorSession, editor?: IEditor) {
     } else
       requestAnimationFrame(() => (scrollContainer.scrollTop = scrollPosition));
   }
+  return true;
 }
 
 function restoreSelection(editor: IEditor, id: string) {
