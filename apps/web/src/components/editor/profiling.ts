@@ -19,7 +19,67 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor, getHTMLFromFragment, profiler } from "@notesnook/editor";
 
+const TRACE_KEY = "nn:profiler:trace-scroll";
+
 let activeEditor: Editor | undefined;
+
+function isEditorScroller(element: unknown): element is HTMLElement {
+  return (
+    element instanceof HTMLElement && element.id.startsWith("editorScroll_")
+  );
+}
+
+function stack(): string {
+  const lines = (new Error().stack || "").split("\n").slice(3, 8);
+  return lines.map((line) => line.trim()).join("\n    ");
+}
+
+/**
+ * Logs every scroll of the editor's container and who caused it. Installed at
+ * import time so it catches whatever happens while a note is opening.
+ */
+function traceScrolling() {
+  const proto = Element.prototype as unknown as Record<string, unknown>;
+  if (proto.__nnScrollTraced) return;
+  proto.__nnScrollTraced = true;
+
+  const descriptor = Object.getOwnPropertyDescriptor(
+    Element.prototype,
+    "scrollTop"
+  );
+  if (descriptor?.set && descriptor.get) {
+    const { get, set } = descriptor;
+    Object.defineProperty(Element.prototype, "scrollTop", {
+      ...descriptor,
+      set(this: Element, value: number) {
+        if (isEditorScroller(this))
+          console.log(
+            `[scroll] scrollTop ${Math.round(
+              get.call(this) as number
+            )} -> ${Math.round(value)}\n    ${stack()}`
+          );
+        set.call(this, value);
+      }
+    });
+  }
+
+  for (const name of ["scrollBy", "scrollTo", "scrollIntoView"] as const) {
+    const original = Element.prototype[name] as (...args: unknown[]) => void;
+    Element.prototype[name] = function (this: Element, ...args: unknown[]) {
+      if (isEditorScroller(this) || name === "scrollIntoView")
+        console.log(
+          `[scroll] ${name}(${JSON.stringify(args[0])})\n    ${stack()}`
+        );
+      return original.apply(this, args);
+    } as typeof original;
+  }
+}
+
+try {
+  if (globalThis.localStorage?.getItem(TRACE_KEY) === "1") traceScrolling();
+} catch (e) {
+  /* storage unavailable */
+}
 
 export function setProfiledEditor(editor: Editor | undefined) {
   activeEditor = editor;
@@ -193,7 +253,20 @@ export function installProfilerGlobals() {
     },
     typeTest,
     scrollTest,
-    serializeTest
+    serializeTest,
+    traceScroll(on = true) {
+      try {
+        if (on) globalThis.localStorage?.setItem(TRACE_KEY, "1");
+        else globalThis.localStorage?.removeItem(TRACE_KEY);
+      } catch (e) {
+        /* storage unavailable */
+      }
+      console.log(
+        on
+          ? "[profiler] scroll tracing on. reload, then open the note."
+          : "[profiler] scroll tracing off. reload to stop."
+      );
+    }
   };
 
   (globalThis as unknown as Record<string, unknown>).editorProfiler = api;
