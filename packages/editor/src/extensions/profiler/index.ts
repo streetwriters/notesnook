@@ -45,7 +45,7 @@ function recordGauges(view: EditorView): void {
   );
   profiler.gauge(
     "dom.placeholders",
-    view.dom.querySelectorAll("[data-virtual-placeholder]").length
+    view.dom.querySelectorAll("[data-page-placeholder]").length
   );
 }
 

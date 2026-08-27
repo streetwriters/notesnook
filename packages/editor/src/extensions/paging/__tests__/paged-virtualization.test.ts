@@ -82,7 +82,7 @@ describe("paged virtualization", () => {
 
     // pages 0 and 9 are edges and 0-1 hold the caret, so the rest are empty
     const placeholders = editor.view.dom.querySelectorAll(
-      "[data-virtual-placeholder]"
+      "[data-page-placeholder]"
     );
     expect(placeholders).toHaveLength(7);
     editor.destroy();
@@ -102,7 +102,7 @@ describe("paged virtualization", () => {
     await created();
 
     expect(
-      editor.view.dom.querySelectorAll("[data-virtual-placeholder]").length
+      editor.view.dom.querySelectorAll("[data-page-placeholder]").length
     ).toBeGreaterThan(0);
     const html = editor.getHTML();
     expect(html.match(/<p/g)).toHaveLength(BLOCKS);
@@ -110,12 +110,12 @@ describe("paged virtualization", () => {
     editor.destroy();
   });
 
-  test("a materialized page still carries its block id", async () => {
+  test("a rendered page still carries its block id", async () => {
     const editor = createEditor();
     await created();
 
     const first = editor.view.dom.children[0] as HTMLElement;
-    expect(first.hasAttribute("data-virtual-placeholder")).toBe(false);
+    expect(first.hasAttribute("data-page-placeholder")).toBe(false);
     // Without this the viewport window loses sight of a page the moment it
     // renders, and it flips between rendered and blank on every frame.
     expect(first.getAttribute("data-block-id")).toBe(
@@ -139,7 +139,7 @@ describe("paged virtualization", () => {
 
     editor.commands.setTextSelection(editor.state.doc.content.size - 2);
     const lastPage = editor.view.dom.children[9] as HTMLElement;
-    expect(lastPage.hasAttribute("data-virtual-placeholder")).toBe(false);
+    expect(lastPage.hasAttribute("data-page-placeholder")).toBe(false);
     editor.destroy();
   });
 });

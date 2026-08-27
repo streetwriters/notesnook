@@ -21,14 +21,13 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { isPage } from "./split.js";
 
 /**
- * Positions are persisted (restored selections, saved scroll targets) and must
- * survive a note being paged differently — or not at all — next time it is
- * opened. Both conversions are the identity for an unpaged document.
+ * Saved positions, such as where the caret was, have to survive a note being
+ * split into different pages next time it opens — or not split at all. These
+ * convert between a position in the paged note and the same position in the
+ * plain one, and do nothing at all when the note has no pages.
  *
- * Positions inside a textblock convert exactly in both directions. A position
- * on a page boundary does not: the gap between two pages collapses to a single
- * position once the wrappers are gone, and converting back lands inside the
- * following page.
+ * A position inside text converts back exactly. A position in the gap between
+ * two pages does not, since that gap does not exist without them.
  */
 export function toFlatPosition(doc: ProsemirrorNode, pos: number): number {
   let flat = 0;

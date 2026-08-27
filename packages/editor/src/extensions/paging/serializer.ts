@@ -21,10 +21,10 @@ import { DOMSerializer, Fragment, Schema } from "@tiptap/pm/model";
 import { flattenPages } from "./split.js";
 
 /**
- * Serializes pages as if they were not there, so stored HTML, the clipboard and
- * drag-and-drop all keep the flat shape older clients expect. ProseMirror has no
- * transparent node spec — `renderSpec` requires every node to produce an
- * element — so the wrapper has to be dropped here instead of in `renderHTML`.
+ * Writes pages out as if they were not there, so saved notes, the clipboard
+ * and drag-and-drop keep the plain shape every other client expects. A node
+ * always renders an element in ProseMirror, so the wrapper has to be dropped
+ * here rather than in the page's own `renderHTML`.
  */
 class FlatteningDOMSerializer extends DOMSerializer {
   serializeFragment(
@@ -37,9 +37,8 @@ class FlatteningDOMSerializer extends DOMSerializer {
 }
 
 /**
- * `DOMSerializer.fromSchema` memoizes on `schema.cached.domSerializer`, so
- * seeding it makes every consumer (getHTML, the clipboard, drag-and-drop) use
- * the flattening serializer without touching their call sites.
+ * ProseMirror keeps one serializer per schema, so replacing it here is enough
+ * for everything that writes HTML: getHTML, the clipboard, drag-and-drop.
  */
 export function installFlatteningSerializer(schema: Schema): void {
   const cached = schema.cached as { domSerializer?: DOMSerializer };

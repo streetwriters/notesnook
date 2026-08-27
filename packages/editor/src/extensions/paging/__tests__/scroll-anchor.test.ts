@@ -133,7 +133,7 @@ describe("scroll anchor", () => {
     const page = editor.state.doc.child(6);
     expect(
       (editor.view.dom.children[6] as HTMLElement).hasAttribute(
-        "data-virtual-placeholder"
+        "data-page-placeholder"
       )
     ).toBe(true);
 
@@ -145,7 +145,7 @@ describe("scroll anchor", () => {
     expect(restored).toBe(true);
     expect(
       (editor.view.dom.children[6] as HTMLElement).hasAttribute(
-        "data-virtual-placeholder"
+        "data-page-placeholder"
       )
     ).toBe(false);
     expect(
@@ -161,7 +161,7 @@ describe("scroll anchor", () => {
     stubLayout(editor, 6 * PAGE_SIZE * BLOCK_HEIGHT);
     expect(
       (editor.view.dom.children[6] as HTMLElement).hasAttribute(
-        "data-virtual-placeholder"
+        "data-page-placeholder"
       )
     ).toBe(true);
 

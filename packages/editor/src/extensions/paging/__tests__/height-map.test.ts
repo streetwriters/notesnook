@@ -228,11 +228,11 @@ describe("height map", () => {
     editor.destroy();
   });
 
-  test("new layout metrics mark the map for recalibration", () => {
+  test("a new layout means placeholders need resizing", () => {
     const map = new HeightMap();
-    expect(map.needsRecalibration).toBe(false);
+    expect(map.placeholdersNeedResizing).toBe(false);
     map.setMetrics({ width: 400 });
-    expect(map.needsRecalibration).toBe(true);
+    expect(map.placeholdersNeedResizing).toBe(true);
   });
 
   test("a measured height wins over any estimate", () => {
@@ -245,16 +245,16 @@ describe("height map", () => {
     editor.destroy();
   });
 
-  test("measurements mark the map for recalibration", () => {
+  test("measuring something means placeholders need resizing", () => {
     const editor = createEditor(para("word ".repeat(50)));
     const map = new HeightMap();
     const [paragraph] = blocks(editor);
 
-    expect(map.needsRecalibration).toBe(false);
+    expect(map.placeholdersNeedResizing).toBe(false);
     map.record(paragraph, 800);
-    expect(map.needsRecalibration).toBe(true);
-    map.markRecalibrated();
-    expect(map.needsRecalibration).toBe(false);
+    expect(map.placeholdersNeedResizing).toBe(true);
+    map.markPlaceholdersResized();
+    expect(map.placeholdersNeedResizing).toBe(false);
     editor.destroy();
   });
 });

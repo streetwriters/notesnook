@@ -36,10 +36,10 @@ type ViewportState = {
 type BlockRange = { from: number; to: number; index: number };
 
 const EMPTY_VISIBLE: Set<string> = new Set();
-const ADD_OVERSCAN = 1;
-const KEEP_OVERSCAN = 1.5;
-const MATERIALIZE_ATTRS = {};
-const MATERIALIZE_SPEC = { materialize: true };
+const SHOW_MARGIN = 1;
+const KEEP_MARGIN = 1.5;
+const RENDER_ATTRS = {};
+const RENDER_SPEC = { render: true };
 
 export function findScrollParent(node: HTMLElement): HTMLElement | null {
   let current: HTMLElement | null = node.parentElement;
@@ -62,7 +62,7 @@ function sameSet(a: Set<string>, b: Set<string>): boolean {
   return true;
 }
 
-function shouldMaterialize(
+function shouldRender(
   node: ProsemirrorNode,
   index: number,
   lastIndex: number,
@@ -70,34 +70,33 @@ function shouldMaterialize(
   selectionIndex: number
 ): boolean {
   if (index === 0 || index === lastIndex) {
-    profiler.count("paging.materializedBy.edge");
+    profiler.count("paging.renderedBecause.edge");
     return true;
   }
   if (Math.abs(index - selectionIndex) <= 1) {
-    profiler.count("paging.materializedBy.selection");
+    profiler.count("paging.renderedBecause.selection");
     return true;
   }
   const blockId = node.attrs.blockId as string | undefined;
   if (!blockId) {
-    profiler.count("paging.materializedBy.missingBlockId");
+    profiler.count("paging.renderedBecause.missingBlockId");
     return true;
   }
   if (visible.has(blockId)) {
-    profiler.count("paging.materializedBy.visible");
+    profiler.count("paging.renderedBecause.visible");
     return true;
   }
   return false;
 }
 
-function materializeDecoration(from: number, to: number): Decoration {
-  return Decoration.node(from, to, MATERIALIZE_ATTRS, MATERIALIZE_SPEC);
+function renderDecoration(from: number, to: number): Decoration {
+  return Decoration.node(from, to, RENDER_ATTRS, RENDER_SPEC);
 }
 
 /**
- * Only pageable types get a decoration: every other node type is rendered by
- * its own node view, which never reads the materialize spec. DecorationSet
- * construction is O(blocks x decorations), so each unnecessary decoration costs
- * a full pass over the document.
+ * Marks the pages that should be rendered. Only pages are marked: building a
+ * decoration set walks the whole document once per decoration, so a decoration
+ * nothing reads is not free.
  */
 function buildDecorations(
   doc: ProsemirrorNode,
@@ -112,22 +111,21 @@ function buildDecorations(
   doc.forEach((node, offset) => {
     index++;
     if (node.type.name !== PAGE_NODE) return;
-    if (!shouldMaterialize(node, index, lastIndex, visible, selectionIndex))
-      return;
-    decorations.push(materializeDecoration(offset, offset + node.nodeSize));
+    if (!shouldRender(node, index, lastIndex, visible, selectionIndex)) return;
+    decorations.push(renderDecoration(offset, offset + node.nodeSize));
   });
 
   const set = DecorationSet.create(doc, decorations);
   end();
   profiler.count("paging.decorationBuilds");
-  profiler.gauge("paging.materializedBlocks", decorations.length);
+  profiler.gauge("paging.renderedPages", decorations.length);
   profiler.gauge("paging.blocksInDoc", doc.childCount);
   return set;
 }
 
 /**
- * The blocks around the caret, resolved in constant time from the (already
- * resolved) selection rather than by walking the document.
+ * The pages around the caret, worked out from the selection instead of by
+ * walking the document.
  */
 function selectionRanges(state: EditorState): BlockRange[] {
   const { $from } = state.selection;
@@ -159,24 +157,21 @@ function selectionRanges(state: EditorState): BlockRange[] {
   return ranges;
 }
 
-function hasMaterializeDecoration(
-  set: DecorationSet,
-  range: BlockRange
-): boolean {
+function hasRenderDecoration(set: DecorationSet, range: BlockRange): boolean {
   return set
     .find(range.from, range.to)
     .some(
       (decoration) =>
         decoration.from === range.from &&
         decoration.to === range.to &&
-        (decoration.spec as { materialize?: boolean })?.materialize
+        (decoration.spec as { render?: boolean })?.render
     );
 }
 
 /**
- * Mapping can drop a node decoration whose range no longer lines up with its
- * node, which would blank out the block the caret is in. Re-add only the ones
- * that went missing.
+ * Moving decorations can drop one whose range no longer lines up with its page,
+ * which would blank out the page the caret is in. Puts back any that went
+ * missing.
  */
 function repairSelection(
   set: DecorationSet,
@@ -185,8 +180,8 @@ function repairSelection(
   const missing: Decoration[] = [];
   for (const range of selectionRanges(state)) {
     if (state.doc.child(range.index).type.name !== PAGE_NODE) continue;
-    if (hasMaterializeDecoration(set, range)) continue;
-    missing.push(materializeDecoration(range.from, range.to));
+    if (hasRenderDecoration(set, range)) continue;
+    missing.push(renderDecoration(range.from, range.to));
   }
   if (!missing.length) return set;
 
@@ -268,11 +263,10 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
       };
 
       /**
-       * Finds the first child whose bottom edge reaches `y`, in viewport
-       * coordinates. Top-level blocks are stacked, so their edges increase
-       * monotonically and can be bisected instead of scanned.
+       * The first page reaching down to `y`. Pages are stacked, so their edges
+       * only ever increase and can be searched by halving instead of scanning.
        */
-      const firstChildBelow = (children: HTMLCollection, y: number): number => {
+      const firstPageBelow = (children: HTMLCollection, y: number): number => {
         let low = 0;
         let high = children.length - 1;
         let result = children.length - 1;
@@ -290,9 +284,9 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
       };
 
       /**
-       * Blocks are added to the window one viewport beyond the visible area and
-       * only dropped half a viewport further out, so a block sitting on the
-       * boundary cannot flip on every frame.
+       * Pages start rendering one screen before they come into view and stop
+       * half a screen after they leave, so a page sitting on the edge cannot
+       * flicker on and off every frame.
        */
       const measure = (): Set<string> | undefined => {
         const children = editorView.dom.children;
@@ -306,14 +300,14 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         const height = container ? container.clientHeight : bounds.height;
         if (!height) return undefined;
 
-        const addTop = bounds.top - height * ADD_OVERSCAN;
-        const addBottom = bounds.top + height * (1 + ADD_OVERSCAN);
-        const keepTop = bounds.top - height * KEEP_OVERSCAN;
-        const keepBottom = bounds.top + height * (1 + KEEP_OVERSCAN);
+        const addTop = bounds.top - height * SHOW_MARGIN;
+        const addBottom = bounds.top + height * (1 + SHOW_MARGIN);
+        const keepTop = bounds.top - height * KEEP_MARGIN;
+        const keepBottom = bounds.top + height * (1 + KEEP_MARGIN);
 
         const next = new Set<string>();
         for (
-          let i = firstChildBelow(children, keepTop);
+          let i = firstPageBelow(children, keepTop);
           i < children.length;
           i++
         ) {
@@ -332,18 +326,14 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
       };
 
       /**
-       * The top-most unit on screen, remembered by index so it can be found
-       * again after the DOM is rebuilt.
+       * The top page on screen, remembered by position so it can be found again
+       * after the pages are redrawn.
        */
-      const pinnedUnit = (): { index: number; top: number } | undefined => {
+      const pinnedPage = (): { index: number; top: number } | undefined => {
         if (!scrollParent) return undefined;
         const children = editorView.dom.children;
         const fold = scrollParent.getBoundingClientRect().top;
-        for (
-          let i = firstChildBelow(children, fold);
-          i < children.length;
-          i++
-        ) {
+        for (let i = firstPageBelow(children, fold); i < children.length; i++) {
           const rect = (children[i] as HTMLElement).getBoundingClientRect();
           if (rect.bottom > fold) return { index: i, top: rect.top };
         }
@@ -351,9 +341,9 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
       };
 
       /**
-       * A placeholder's height is an estimate, so a unit that renders resizes
-       * and shoves everything after it. Putting the pinned unit back where it
-       * was keeps the reader's position still through that.
+       * An empty page is only a guess at its real height, so a page that
+       * renders changes size and shoves everything below it. Moving the scroll
+       * by the same amount keeps the reader looking at the same place.
        */
       const restorePin = (pin?: { index: number; top: number }) => {
         if (!pin || !scrollParent) return;
@@ -386,7 +376,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         profiler.count("paging.visibilityFlushes");
         profiler.gauge("paging.visibleBlocks", next.size);
 
-        const pin = pinnedUnit();
+        const pin = pinnedPage();
         editorView.dispatch(
           editorView.state.tr
             .setMeta(viewportKey, { visible: next })
@@ -394,37 +384,36 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
             .setMeta("addToHistory", false)
         );
         restorePin(pin);
-        recordRenderedHeights();
+        measureRenderedPages();
         resizePlaceholders();
       };
 
       /**
-       * Placeholders created before anything had been measured are sized from a
-       * guess. Once real measurements move that ratio, the ones still on screen
-       * are resized so the scrollbar stops lying; the pin keeps the reader in
-       * place while they change.
+       * Empty pages made before anything was measured are sized from a guess.
+       * Once real measurements come in, the guesses on screen are corrected so
+       * the scrollbar stops lying about how long the note is.
        */
       const resizePlaceholders = () => {
-        if (!heights.needsRecalibration) return;
-        const pin = pinnedUnit();
+        if (!heights.placeholdersNeedResizing) return;
+        const pin = pinnedPage();
         const children = editorView.dom.children;
         const doc = editorView.state.doc;
         const count = Math.min(children.length, doc.childCount);
         for (let i = 0; i < count; i++) {
           const element = children[i] as HTMLElement;
-          if (!element.hasAttribute("data-virtual-placeholder")) continue;
+          if (!element.hasAttribute("data-page-placeholder")) continue;
           element.style.height = `${heights.heightFor(doc.child(i))}px`;
         }
-        heights.markRecalibrated();
+        heights.markPlaceholdersResized();
         restorePin(pin);
         profiler.count("paging.placeholderResizes");
       };
 
       /**
-       * Whatever is rendered right now has a real height; remembering it means
-       * its placeholder is the right size when it scrolls away again.
+       * Whatever is on screen has a real height. Remembering it means the empty
+       * box left behind is the right size once it scrolls away.
        */
-      const recordRenderedHeights = () => {
+      const measureRenderedPages = () => {
         const style = getComputedStyle(editorView.dom);
         const fontSize = parseFloat(style.fontSize);
         const lineHeight = parseFloat(style.lineHeight);
@@ -438,7 +427,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         const count = Math.min(children.length, doc.childCount);
         for (let i = 0; i < count; i++) {
           const element = children[i] as HTMLElement;
-          if (element.hasAttribute("data-virtual-placeholder")) continue;
+          if (element.hasAttribute("data-page-placeholder")) continue;
           const node = doc.child(i);
           heights.record(node, element.offsetHeight);
 

@@ -22,10 +22,8 @@ import { Decoration, NodeView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
 import { HeightMap } from "./height-map.js";
 
-export function isMaterialized(decorations: readonly Decoration[]): boolean {
-  return decorations.some(
-    (d) => (d.spec as { materialize?: boolean })?.materialize
-  );
+export function isRendered(decorations: readonly Decoration[]): boolean {
+  return decorations.some((d) => (d.spec as { render?: boolean })?.render);
 }
 
 let template: HTMLDivElement | undefined;
@@ -33,7 +31,7 @@ let template: HTMLDivElement | undefined;
 function placeholderElement(): HTMLDivElement {
   if (!template) {
     template = document.createElement("div");
-    template.setAttribute("data-virtual-placeholder", "true");
+    template.setAttribute("data-page-placeholder", "true");
     template.style.width = "100%";
     template.style.contain = "strict";
   }
@@ -57,8 +55,8 @@ function placeholder(node: ProsemirrorNode, heights: HeightMap): NodeView {
     contentDOM: null,
     update(updated, decorations) {
       if (updated.type !== node.type) return false;
-      if (isMaterialized(decorations)) {
-        profiler.count("paging.materialized");
+      if (isRendered(decorations)) {
+        profiler.count("paging.pageShown");
         return false;
       }
       node = updated;
@@ -86,8 +84,8 @@ function rendered(node: ProsemirrorNode, heights: HeightMap): NodeView {
     contentDOM,
     update(updated, decorations) {
       if (updated.type !== node.type) return false;
-      if (!isMaterialized(decorations)) {
-        profiler.count("paging.dematerialized");
+      if (!isRendered(decorations)) {
+        profiler.count("paging.pageHidden");
         return false;
       }
       if (!node.sameMarkup(updated)) return false;
@@ -104,7 +102,7 @@ export function createPageView(
   decorations: readonly Decoration[],
   heights: HeightMap
 ): NodeView {
-  return isMaterialized(decorations)
+  return isRendered(decorations)
     ? rendered(node, heights)
     : placeholder(node, heights);
 }

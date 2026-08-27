@@ -65,7 +65,7 @@ function documentStats(editor: Editor) {
     characters: editor.state.doc.textContent.length,
     domTopLevelElements: dom.children.length,
     domTotalElements: dom.getElementsByTagName("*").length,
-    placeholders: dom.querySelectorAll("[data-virtual-placeholder]").length,
+    placeholders: dom.querySelectorAll("[data-page-placeholder]").length,
     virtualization: !!(
       editor.storage.virtualization as { enabled?: boolean } | undefined
     )?.enabled

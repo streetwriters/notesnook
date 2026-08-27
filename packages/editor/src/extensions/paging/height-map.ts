@@ -41,15 +41,14 @@ const DEFAULT_ESTIMATES: Record<string, number> = {
 const FALLBACK_ESTIMATE = 40;
 
 /**
- * Pixels per unit of content, before anything has been measured. Type
- * estimates alone assume every paragraph is one line, which is wrong by an
- * order of magnitude for long-form notes, so height is derived from how much
- * content a node holds and the ratio is corrected from real measurements.
+ * How many pixels tall a character makes a block, before anything has been
+ * measured. A fixed height per type assumes every paragraph is one line, which
+ * is ten times wrong in a long note, so height follows how much a block holds.
  */
-const DEFAULT_PIXELS_PER_UNIT = 0.4;
+const DEFAULT_PIXELS_PER_CHARACTER = 0.4;
 
 /** How far the ratio must move before cached estimates are worth redoing. */
-const RECALIBRATION_THRESHOLD = 0.15;
+const RESIZE_THRESHOLD = 0.15;
 
 const PAGE_TYPE = "page";
 const TABLE_TYPE = "table";
@@ -58,14 +57,13 @@ const TABLE_TYPE = "table";
 const MIN_ROW_HEIGHT = 32;
 
 /**
- * Layout the estimates assume until the editor can be measured. The width
- * matches the editor's own max-width so a first estimate is close even though
- * the element has not been laid out yet.
+ * The layout guessed at until the editor can be measured. The width is the
+ * editor's own maximum, so even the first guess is close.
  */
 const DEFAULT_METRICS: Metrics = { width: 850, fontSize: 16, lineHeight: 24 };
 
 /** Average glyph width as a fraction of font size, for proportional text. */
-const AVERAGE_CHAR_WIDTH = 0.5;
+const CHARACTER_WIDTH = 0.5;
 
 /** How much larger each heading level renders than body text. */
 const HEADING_SCALE: Record<number, number> = {
@@ -79,12 +77,12 @@ const HEADING_SCALE: Record<number, number> = {
 
 export type Metrics = { width: number; fontSize: number; lineHeight: number };
 
-type Samples = { height: number; content: number };
+type Measured = { height: number; characters: number };
 
 export class HeightMap {
   private measured = new Map<string, number>();
-  private samples = new Map<string, Samples>();
-  private global: Samples = { height: 0, content: 0 };
+  private measurements = new Map<string, Measured>();
+  private global: Measured = { height: 0, characters: 0 };
   private stale = false;
   private estimates = new WeakMap<ProsemirrorNode, number>();
   private metrics: Metrics = { ...DEFAULT_METRICS };
@@ -119,12 +117,13 @@ export class HeightMap {
    * own measurements and falls back to the document-wide ratio until it has
    * been seen.
    */
-  private ratioFor(typeName: string): number {
-    const sample = this.samples.get(typeName);
-    if (sample && sample.content > 0) return sample.height / sample.content;
-    if (this.global.content > 0)
-      return this.global.height / this.global.content;
-    return DEFAULT_PIXELS_PER_UNIT;
+  private pixelsPerCharacterFor(typeName: string): number {
+    const measured = this.measurements.get(typeName);
+    if (measured && measured.characters > 0)
+      return measured.height / measured.characters;
+    if (this.global.characters > 0)
+      return this.global.height / this.global.characters;
+    return DEFAULT_PIXELS_PER_CHARACTER;
   }
 
   /**
@@ -167,22 +166,22 @@ export class HeightMap {
     const content = node.content.size;
     if (!content) return base;
 
-    const sample = this.samples.get(node.type.name);
-    if (sample && sample.content > 0)
+    const measured = this.measurements.get(node.type.name);
+    if (measured && measured.characters > 0)
       return Math.max(
         base,
-        Math.round(content * (sample.height / sample.content))
+        Math.round(content * (measured.height / measured.characters))
       );
 
     const scale =
       node.type.name === "heading"
         ? HEADING_SCALE[Number(node.attrs.level)] ?? 1
         : 1;
-    const charsPerLine = Math.max(
+    const charactersPerLine = Math.max(
       20,
-      this.metrics.width / (this.metrics.fontSize * scale * AVERAGE_CHAR_WIDTH)
+      this.metrics.width / (this.metrics.fontSize * scale * CHARACTER_WIDTH)
     );
-    const lines = Math.max(1, Math.ceil(content / charsPerLine));
+    const lines = Math.max(1, Math.ceil(content / charactersPerLine));
     return Math.max(base, Math.round(lines * this.metrics.lineHeight * scale));
   }
 
@@ -216,11 +215,11 @@ export class HeightMap {
   }
 
   /** True once measurements have moved a ratio enough to resize placeholders. */
-  get needsRecalibration(): boolean {
+  get placeholdersNeedResizing(): boolean {
     return this.stale;
   }
 
-  markRecalibrated(): void {
+  markPlaceholdersResized(): void {
     this.stale = false;
     this.estimates = new WeakMap();
   }
@@ -247,23 +246,22 @@ export class HeightMap {
     const content = node.content.size;
     if (content <= 0) return;
 
-    const before = this.ratioFor(node.type.name);
-    const sample = this.samples.get(node.type.name) ?? {
+    const before = this.pixelsPerCharacterFor(node.type.name);
+    const measured = this.measurements.get(node.type.name) ?? {
       height: 0,
-      content: 0
+      characters: 0
     };
-    sample.height += height;
-    sample.content += content;
-    this.samples.set(node.type.name, sample);
+    measured.height += height;
+    measured.characters += content;
+    this.measurements.set(node.type.name, measured);
     this.global.height += height;
-    this.global.content += content;
+    this.global.characters += content;
 
-    const after = this.ratioFor(node.type.name);
-    if (Math.abs(after - before) / before > RECALIBRATION_THRESHOLD)
-      this.stale = true;
+    const after = this.pixelsPerCharacterFor(node.type.name);
+    if (Math.abs(after - before) / before > RESIZE_THRESHOLD) this.stale = true;
     profiler.gauge(
-      "virtualization.heightMap.pixelsPerUnit",
-      Math.round((this.global.height / this.global.content) * 1000) / 1000
+      "virtualization.heightMap.pixelsPerCharacter",
+      Math.round((this.global.height / this.global.characters) * 1000) / 1000
     );
   }
 

@@ -124,7 +124,7 @@ describe("viewport decorations", () => {
       );
 
     const page = editor.view.dom.children[0] as HTMLElement;
-    expect(page.hasAttribute("data-virtual-placeholder")).toBe(false);
+    expect(page.hasAttribute("data-page-placeholder")).toBe(false);
     editor.destroy();
   });
 
