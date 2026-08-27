@@ -278,7 +278,10 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         const resolved = findScrollParent(editorView.dom);
         if (!resolved || resolved === scrollParent) return;
         scrollParent?.removeEventListener("scroll", schedule);
-        resolved.style.overflowAnchor = "auto";
+        // The browser's own scroll anchoring compensates for the same height
+        // changes the pin does, and the two corrections add up to twice the
+        // shift. The pin is the one that knows which page to hold on to.
+        resolved.style.overflowAnchor = "none";
         resolved.addEventListener("scroll", schedule, { passive: true });
         scrollParent = resolved;
       };
