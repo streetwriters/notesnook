@@ -113,6 +113,12 @@ export function restoreScrollAnchor(
     return false;
   }
 
+  // Empty pages start out sized from a guess, and the note shrinks once the
+  // first real measurements arrive. Doing that first means scrolling against
+  // the heights the note will actually have, instead of being dragged along
+  // when it changes size a moment later.
+  renderViewportNow(view);
+
   const target = findBlock(view.state.doc, anchor.blockId);
   if (!target.found) {
     end();
