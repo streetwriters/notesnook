@@ -712,7 +712,8 @@ const ShareView = () => {
                             marginTop: 6
                           }}
                           onPress={async () => {
-                            const feature = await isFeatureAvailable("fullQualityImages");
+                            const feature =
+                              await isFeatureAvailable("fullQualityImages");
                             if (feature?.isAllowed) {
                               setCompress((prev) => !prev);
                             }
@@ -737,7 +738,8 @@ const ShareView = () => {
                             style={{
                               flexShrink: 1,
                               marginLeft: 3,
-                              fontSize: 12
+                              fontSize: 12,
+                              color: colors.primary.paragraph
                             }}
                             allowFontScaling={false}
                           >
