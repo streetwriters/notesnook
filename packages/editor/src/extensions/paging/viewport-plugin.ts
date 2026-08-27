@@ -38,6 +38,16 @@ type PageRange = { from: number; to: number; index: number };
 const EMPTY_VISIBLE: Set<string> = new Set();
 
 const pending = new WeakMap<EditorView, () => void>();
+const calibrations = new WeakMap<EditorView, () => void>();
+
+/**
+ * Sizes the empty pages from what the note actually looks like, without
+ * changing which pages are rendered. Used before scrolling somewhere, so the
+ * note is not still changing height once it gets there.
+ */
+export function calibrateHeightsNow(view: EditorView): void {
+  calibrations.get(view)?.();
+}
 
 /**
  * Works out what is on screen right now instead of waiting for the next frame.
@@ -500,6 +510,11 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
       };
 
       pending.set(editorView, flush);
+      calibrations.set(editorView, () => {
+        updateMetrics();
+        measureRenderedPages();
+        resizePlaceholders();
+      });
       window.addEventListener("beforeprint", beforePrint);
       window.addEventListener("afterprint", afterPrint);
 
@@ -533,6 +548,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           window.removeEventListener("afterprint", afterPrint);
           printMedia?.removeEventListener?.("change", onPrintMedia);
           pending.delete(editorView);
+          calibrations.delete(editorView);
           window.removeEventListener("resize", schedule);
           scrollParent?.removeEventListener("scroll", schedule);
           layout?.disconnect();

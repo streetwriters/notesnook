@@ -195,6 +195,26 @@ describe("scroll anchor", () => {
     editor.destroy();
   });
 
+  test("does not render pages it is about to scroll away from", () => {
+    const editor = createEditor(createContainer());
+    stubLayout(editor);
+    const before = Array.from(editor.view.dom.children).map((page) =>
+      (page as HTMLElement).hasAttribute("data-page-placeholder")
+    );
+
+    restoreScrollAnchor(editor.view, { blockId: "blk300", offset: 0 });
+
+    // page 3 is neither an edge, nor next to the caret, nor near the anchor:
+    // nothing should have rendered it on the way past
+    expect(before[3]).toBe(true);
+    expect(
+      (editor.view.dom.children[3] as HTMLElement).hasAttribute(
+        "data-page-placeholder"
+      )
+    ).toBe(true);
+    editor.destroy();
+  });
+
   test("reports failure for a block that is no longer there", () => {
     const editor = createEditor(createContainer());
     stubLayout(editor);

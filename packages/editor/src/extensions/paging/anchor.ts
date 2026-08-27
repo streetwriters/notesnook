@@ -22,6 +22,7 @@ import { EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
 import { isPage } from "./split.js";
 import {
+  calibrateHeightsNow,
   findScrollParent,
   renderViewportNow,
   viewportKey
@@ -113,11 +114,12 @@ export function restoreScrollAnchor(
     return false;
   }
 
-  // Empty pages start out sized from a guess, and the note shrinks once the
-  // first real measurements arrive. Doing that first means scrolling against
-  // the heights the note will actually have, instead of being dragged along
-  // when it changes size a moment later.
-  renderViewportNow(view);
+  // Empty pages start out sized from a guess, and the note changes height once
+  // the first real measurements arrive. Sizing them first means scrolling
+  // against the heights the note will actually have, and doing it without
+  // rendering anything avoids showing pages here that are about to be left
+  // behind.
+  calibrateHeightsNow(view);
 
   const target = findBlock(view.state.doc, anchor.blockId);
   if (!target.found) {
