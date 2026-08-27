@@ -97,6 +97,40 @@ describe("UserManager._updatePassword (change)", () => {
     });
   });
 
+  test("new master key decrypts dataEncryptionKey and old master key throws (regression)", async () => {
+    await databaseTest().then(async (db) => {
+      const { salt } = await setupLoggedInUser(db, "oldpassword");
+
+      // Simulate a full password change with old -> new passwords.
+      const result = await db.user.changePassword("oldpassword", "newpassword");
+      expect(result).toBe(true);
+
+      const user = await db.user.getUser();
+
+      // The stored master key must now be the one derived from the NEW password.
+      const newMasterKey = await db.user.getMasterKey();
+      expect(newMasterKey).toBeDefined();
+      expect(newMasterKey!.key).toBe(
+        (await db.storage().generateCryptoKey("newpassword", salt)).key
+      );
+
+      // (a) The NEW master key must decrypt the rewrapped dataEncryptionKey.
+      await expect(
+        db.storage().decrypt(newMasterKey!, user!.dataEncryptionKey!)
+      ).resolves.toBeDefined();
+
+      // (b) The OLD master key must NOT be able to decrypt it anymore.
+      // We derive it without persisting it to the key store.
+      const oldMasterKey = await db.storage().generateCryptoKey(
+        "oldpassword",
+        salt
+      );
+      await expect(
+        db.storage().decrypt(oldMasterKey, user!.dataEncryptionKey!)
+      ).rejects.toThrow();
+    });
+  });
+
   test("empty new password throws 'New password is required'", async () => {
     await databaseTest().then(async (db) => {
       await setupLoggedInUser(db, "oldpassword");

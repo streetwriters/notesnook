@@ -675,15 +675,77 @@ class UserManager {
       encryptionKey?: SerializedKey;
     }
   ) {
+    const { new_password, old_password } = data;
+    if (!new_password) throw new Error("New password is required.");
+
     const token = await this.tokenManager.getAccessToken();
     const user = await this.getUser();
     if (!token || !user) throw new Error("You are not logged in.");
 
     const { email, salt } = user;
 
-    const { new_password, old_password } = data;
     if (old_password && !(await this.verifyPassword(old_password)))
       throw new Error("Incorrect old password.");
+    if (old_password && !data.encryptionKey)
+      data.encryptionKey = await this.getMasterKey();
+
+    if (!data.encryptionKey) throw new Error("Encryption key is required.");
+
+    // we must be 100% sure that the provided encryption key is valid before
+    // proceeding
+    await this.verifyEncryptionKey(data.encryptionKey);
+
+    const updateUserPayload: Partial<User> = {};
+    const newMasterKey = await this.db
+      .storage()
+      .generateCryptoKey(new_password, salt);
+
+    if (user.attachmentsKey) {
+      updateUserPayload.attachmentsKey = await this.keyManager.rewrapKey(
+        user.attachmentsKey,
+        data.encryptionKey,
+        newMasterKey
+      );
+    }
+    if (user.monographPasswordsKey) {
+      updateUserPayload.monographPasswordsKey = await this.keyManager.rewrapKey(
+        user.monographPasswordsKey,
+        data.encryptionKey,
+        newMasterKey
+      );
+    }
+    if (user.inboxKeys) {
+      updateUserPayload.inboxKeys = await this.keyManager.rewrapKey(
+        user.inboxKeys,
+        data.encryptionKey,
+        newMasterKey
+      );
+    }
+
+    if (user.legacyDataEncryptionKey)
+      updateUserPayload.legacyDataEncryptionKey =
+        await this.keyManager.rewrapKey(
+          user.legacyDataEncryptionKey,
+          data.encryptionKey,
+          newMasterKey
+        );
+    if (user.dataEncryptionKey)
+      updateUserPayload.dataEncryptionKey = await this.keyManager.rewrapKey(
+        user.dataEncryptionKey,
+        data.encryptionKey,
+        newMasterKey
+      );
+
+    if (!user.legacyDataEncryptionKey && !user.dataEncryptionKey) {
+      updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
+        await this.db.crypto().generateRandomKey(),
+        newMasterKey
+      );
+      updateUserPayload.legacyDataEncryptionKey = await this.keyManager.wrapKey(
+        data.encryptionKey,
+        newMasterKey
+      );
+    }
 
     const oldPassword = old_password
       ? // we don't lowercase email here to allow user accounts with
@@ -693,69 +755,6 @@ class UserManager {
           usesFallback: await this.usesFallbackPWHash(old_password)
         })
       : null;
-
-    if (!new_password) throw new Error("New password is required.");
-
-    if (oldPassword && !data.encryptionKey)
-      data.encryptionKey = await this.getMasterKey();
-    if (!data.encryptionKey) throw new Error("Encryption key is required.");
-
-    // we must be 100% sure that the provided encryption key is valid before
-    // proceeding
-    await this.verifyEncryptionKey(data.encryptionKey);
-
-    const updateUserPayload: Partial<User> = {};
-    if (data.encryptionKey) {
-      const newMasterKey = await this.db
-        .storage()
-        .generateCryptoKey(new_password, salt);
-      if (user.attachmentsKey) {
-        updateUserPayload.attachmentsKey = await this.keyManager.rewrapKey(
-          user.attachmentsKey,
-          data.encryptionKey,
-          newMasterKey
-        );
-      }
-      if (user.monographPasswordsKey) {
-        updateUserPayload.monographPasswordsKey =
-          await this.keyManager.rewrapKey(
-            user.monographPasswordsKey,
-            data.encryptionKey,
-            newMasterKey
-          );
-      }
-      if (user.inboxKeys) {
-        updateUserPayload.inboxKeys = await this.keyManager.rewrapKey(
-          user.inboxKeys,
-          data.encryptionKey,
-          newMasterKey
-        );
-      }
-
-      if (user.legacyDataEncryptionKey)
-        updateUserPayload.legacyDataEncryptionKey =
-          await this.keyManager.rewrapKey(
-            user.legacyDataEncryptionKey,
-            data.encryptionKey,
-            newMasterKey
-          );
-
-      if (user.dataEncryptionKey)
-        updateUserPayload.dataEncryptionKey = await this.keyManager.rewrapKey(
-          user.dataEncryptionKey,
-          data.encryptionKey,
-          newMasterKey
-        );
-
-      if (!user.legacyDataEncryptionKey && !user.dataEncryptionKey) {
-        updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
-          await this.db.crypto().generateRandomKey(),
-          newMasterKey
-        );
-        updateUserPayload.legacyDataEncryptionKey =
-          await this.keyManager.wrapKey(data.encryptionKey, newMasterKey);
-      }
-    }
 
     await http.patch.json(
       `${constants.API_HOST}/users/password/${type}`,
