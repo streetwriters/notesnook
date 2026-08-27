@@ -58,6 +58,40 @@ function createEditor() {
   });
 }
 
+function rect(top: number, height: number) {
+  return {
+    top,
+    bottom: top + height,
+    height,
+    left: 0,
+    right: 800,
+    width: 800,
+    x: 0,
+    y: top,
+    toJSON: () => ({})
+  } as DOMRect;
+}
+
+/** happy-dom lays nothing out, so the pages get a synthetic geometry. */
+function stubLayout(editor: Editor) {
+  const dom = editor.view.dom as HTMLElement;
+  const height = 500;
+  HTMLElement.prototype.getBoundingClientRect = function () {
+    if (this === dom) return rect(0, dom.children.length * height);
+    const index = Array.prototype.indexOf.call(dom.children, this);
+    return index < 0 ? rect(0, 0) : rect(index * height, height);
+  };
+}
+
+function frames(count = 2) {
+  return new Promise<void>((resolve) => {
+    let remaining = count;
+    const tick = () =>
+      remaining-- > 0 ? requestAnimationFrame(tick) : resolve();
+    tick();
+  });
+}
+
 async function created() {
   await new Promise((resolve) => setTimeout(resolve, 0));
 }
@@ -136,6 +170,8 @@ describe("paged virtualization", () => {
   test("every page is rendered while the browser prints", async () => {
     const editor = createEditor();
     await created();
+    const layout = HTMLElement.prototype.getBoundingClientRect;
+    stubLayout(editor);
     expect(
       editor.view.dom.querySelectorAll("[data-page-placeholder]").length
     ).toBeGreaterThan(0);
@@ -148,6 +184,13 @@ describe("paged virtualization", () => {
     expect(editor.getText()).toContain(`Paragraph number ${BLOCKS - 1}.`);
 
     window.dispatchEvent(new Event("afterprint"));
+    await frames();
+
+    // and it goes back to rendering only what is on screen
+    expect(
+      editor.view.dom.querySelectorAll("[data-page-placeholder]").length
+    ).toBeGreaterThan(0);
+    HTMLElement.prototype.getBoundingClientRect = layout;
     editor.destroy();
   });
 

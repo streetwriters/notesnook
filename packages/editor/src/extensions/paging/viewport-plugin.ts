@@ -466,6 +466,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
        * rendered before it takes its snapshot and can go back to normal after.
        */
       const beforePrint = () => {
+        if (printing) return;
         printing = true;
         const everything = new Set<string>();
         editorView.state.doc.forEach((page) => {
@@ -482,12 +483,20 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
       };
 
       const afterPrint = () => {
+        if (!printing) return;
         printing = false;
         schedule();
       };
 
       window.addEventListener("beforeprint", beforePrint);
       window.addEventListener("afterprint", afterPrint);
+
+      // Safari has only reported printing through a media query for most of its
+      // life, and it is the same signal either way.
+      const printMedia = window.matchMedia?.("print");
+      const onPrintMedia = (event: MediaQueryListEvent) =>
+        event.matches ? beforePrint() : afterPrint();
+      printMedia?.addEventListener?.("change", onPrintMedia);
       window.addEventListener("resize", schedule, { passive: true });
 
       let layout: ResizeObserver | undefined;
@@ -510,6 +519,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
           if (frame) cancelAnimationFrame(frame);
           window.removeEventListener("beforeprint", beforePrint);
           window.removeEventListener("afterprint", afterPrint);
+          printMedia?.removeEventListener?.("change", onPrintMedia);
           window.removeEventListener("resize", schedule);
           scrollParent?.removeEventListener("scroll", schedule);
           layout?.disconnect();
