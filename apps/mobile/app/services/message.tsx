@@ -35,7 +35,10 @@ import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
 
-const APP_MESSAGE_BUILDERS: Record<MessageId, () => Message> = {
+const APP_MESSAGE_BUILDERS: Record<
+  MessageId,
+  (data?: object) => Message
+> = {
   "rate-app": () => ({
     visible: true,
     message: strings.rateAppMessage(),
@@ -99,48 +102,62 @@ const APP_MESSAGE_BUILDERS: Record<MessageId, () => Message> = {
     type: "error",
     id: "confirm-email"
   }),
-  "app-update": () => ({}) as Message,
+  "app-update": (data) => {
+    const version = (data as { version?: GithubVersionInfo | CheckVersionResponse } | undefined)?.version;
+    return {
+      visible: true,
+      message: strings.newUpdateMessage(),
+      actionText: strings.newUpdateActionText(),
+      onPress: () => {
+        if (version) {
+          presentSheet({
+            component: (ref) => <Update version={version} fwdRef={ref} />
+          });
+        }
+      },
+      data: data || {},
+      icon: "update",
+      type: "normal",
+      id: "app-update"
+    };
+  },
   none: () => ({}) as Message
 };
 
-function showMessageById(id: MessageId) {
-  if (APP_MESSAGE_BUILDERS[id]) {
-    useMessageStore.getState().setMessage(APP_MESSAGE_BUILDERS[id]());
-  }
+export function setMessageById(id: MessageId, data?: object) {
+  useMessageStore.getState().setMessage({
+    ...useMessageStore.getState().message,
+    visible: id !== "none",
+    id,
+    data: data || {}
+  });
 }
 
-export function getLocalizedMessageStrings(id: MessageId): { message: string; actionText: string } | null {
-  if (id === "app-update") {
-    return {
-      message: strings.newUpdateMessage(),
-      actionText: strings.newUpdateActionText()
-    };
-  }
+export function getMessageById(
+  id: MessageId,
+  data?: object
+): Message | null {
   const builder = APP_MESSAGE_BUILDERS[id];
   if (builder && id !== "none") {
-    const msg = builder();
-    return {
-      message: msg.message as string,
-      actionText: msg.actionText as string
-    };
+    return builder(data);
   }
   return null;
 }
 
 export function setRateAppMessage() {
-  showMessageById("rate-app");
+  setMessageById("rate-app");
 }
 
 export function setRecoveryKeyMessage() {
-  showMessageById("recovery-key");
+  setMessageById("recovery-key");
 }
 
 export function setLoginMessage() {
-  showMessageById("log-in");
+  setMessageById("log-in");
 }
 
 export function setEmailVerifyMessage() {
-  showMessageById("confirm-email");
+  setMessageById("confirm-email");
 }
 
 export function clearMessage() {
@@ -150,26 +167,9 @@ export function clearMessage() {
   });
 }
 
-const updateAvailableMessage = (
-  version: GithubVersionInfo | CheckVersionResponse
-) =>
-  ({
-    visible: true,
-    message: strings.newUpdateMessage(),
-    actionText: strings.newUpdateActionText(),
-    onPress: () => {
-      presentSheet({
-        component: (ref) => <Update version={version} fwdRef={ref} />
-      });
-    },
-    data: {},
-    icon: "update",
-    type: "normal",
-    id: "app-update"
-  }) as Message;
-
 export function setUpdateAvailableMessage(
   version: GithubVersionInfo | CheckVersionResponse
 ) {
-  useMessageStore.getState().setMessage(updateAvailableMessage(version));
+  setMessageById("app-update", { version });
 }
+
