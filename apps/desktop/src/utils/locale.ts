@@ -18,57 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { app } from "electron";
-import { JSONStorage } from "./json-storage";
-import {
-  setI18nGlobal,
-  AVAILABLE_LANGUAGES,
-  getSupportedLocale
-} from "@notesnook/intl";
-import { i18n, type Messages } from "@lingui/core";
-
-const localeMap: Record<
-  string,
-  () => Promise<{ default: { messages: unknown } }>
-> = {
-  en: () => import("@notesnook/intl/locales/$en.json"),
-  de: () => import("@notesnook/intl/locales/$de.json"),
-  es: () => import("@notesnook/intl/locales/$es.json"),
-  fr: () => import("@notesnook/intl/locales/$fr.json"),
-  it: () => import("@notesnook/intl/locales/$it.json"),
-  nl: () => import("@notesnook/intl/locales/$nl.json"),
-  pl: () => import("@notesnook/intl/locales/$pl.json"),
-  "pt-BR": () => import("@notesnook/intl/locales/$pt-BR.json"),
-  ru: () => import("@notesnook/intl/locales/$ru.json"),
-  tr: () => import("@notesnook/intl/locales/$tr.json"),
-  uk: () => import("@notesnook/intl/locales/$uk.json")
-};
-
-function resolveTargetLang(): string {
-  const savedLanguage = JSONStorage.get<string>("appLanguage", "");
-  if (
-    savedLanguage &&
-    AVAILABLE_LANGUAGES.some((l) => l.code === savedLanguage)
-  ) {
-    return savedLanguage;
-  }
-
-  const systemLocale = app.getLocale() || "en";
-  const detected = getSupportedLocale(systemLocale);
-  JSONStorage.set("appLanguage", detected);
-  return detected;
-}
-
-async function getLocaleMessages(lang: string): Promise<Messages> {
-  const loader = localeMap[lang] || localeMap.en;
-  const mod = await loader();
-  return mod.default.messages as unknown as Messages;
-}
+import { config } from "./config";
+import { initLocale as initIntlLocale } from "@notesnook/intl";
 
 export async function initLocale() {
-  const targetLang = resolveTargetLang();
-  const messages = await getLocaleMessages(targetLang);
-  i18n.load({ [targetLang]: messages });
-  i18n.activate(targetLang);
-  setI18nGlobal(i18n as any);
-  return targetLang;
+  return initIntlLocale({
+    getSavedLocale: () => config.appLanguage,
+    onSaveLocale: (locale) => {
+      config.appLanguage = locale;
+    },
+    systemLocale: app.getLocale() || "en"
+  });
 }
+
