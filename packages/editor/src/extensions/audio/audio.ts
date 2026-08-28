@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
+import { DataURL } from "@notesnook/common";
 import { hasSameAttributes } from "../../utils/prosemirror.js";
 import { AudioAttachment, getDataAttribute } from "../attachment/index.js";
 import { createNodeView } from "../react/index.js";
 import { AudioComponent } from "./component.js";
+import { getDataURLMetadata } from "../../utils/downloader.js";
 
 export interface AudioOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -59,6 +61,11 @@ export const AudioNode = Node.create<AudioOptions>({
         default: 0,
         rendered: false
       },
+      // plain (non data-*) attribute so it round-trips through the native
+      // <audio src="..."> markup, mirroring how the image node keeps `src`.
+      // this is what carries a pasted data: URI or an external https URL
+      // until postProcess() turns it into a real hashed attachment.
+      src: { default: null },
       filename: getDataAttribute("filename"),
       size: getDataAttribute("size"),
       hash: getDataAttribute("hash"),
@@ -69,7 +76,17 @@ export const AudioNode = Node.create<AudioOptions>({
   parseHTML() {
     return [
       {
-        tag: "audio"
+        tag: "audio",
+        getAttrs: (element) => {
+          const src = element.getAttribute("src");
+          if (!src || !DataURL.isValid(src)) return null;
+
+          const { mimeType, size } = getDataURLMetadata(src);
+          return {
+            mime: element.dataset.mime || mimeType,
+            size: element.dataset.size || size
+          };
+        }
       }
     ];
   },
