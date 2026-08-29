@@ -52,6 +52,7 @@ const RESIZE_THRESHOLD = 0.15;
 
 const PAGE_TYPE = "page";
 const TABLE_TYPE = "table";
+const TABLE_ROW_TYPE = "tableRow";
 
 /** A table row is at least this tall, however little its cells hold. */
 const MIN_ROW_HEIGHT = 32;
@@ -81,6 +82,8 @@ type Measured = { height: number; characters: number };
 
 export class HeightMap {
   private measured = new Map<string, number>();
+  private sizes = new WeakMap<ProsemirrorNode, number>();
+  private childRevision = 0;
   private measurements = new Map<string, Measured>();
   private global: Measured = { height: 0, characters: 0 };
   private stale = false;
@@ -147,6 +150,7 @@ export class HeightMap {
     if (stored) return stored;
 
     if (node.type.name === TABLE_TYPE) return this.table(node) || base;
+    if (node.type.name === TABLE_ROW_TYPE) return this.row(node);
 
     if (this.holdsBlocks(node)) {
       let total = 0;
@@ -200,18 +204,20 @@ export class HeightMap {
     return node.childCount > 0 && !!node.firstChild?.isBlock;
   }
 
-  /** Rows stack, but the cells within a row sit side by side. */
   private table(node: ProsemirrorNode): number {
     let total = 0;
-    node.forEach((row) => {
-      let tallest = 0;
-      row.forEach((cell) => {
-        const height = this.estimate(cell);
-        if (height > tallest) tallest = height;
-      });
-      total += Math.max(MIN_ROW_HEIGHT, tallest);
-    });
+    node.forEach((row) => (total += this.estimate(row)));
     return total;
+  }
+
+  /** The cells within a row sit side by side, so the tallest one wins. */
+  private row(node: ProsemirrorNode): number {
+    let tallest = 0;
+    node.forEach((cell) => {
+      const height = this.estimate(cell);
+      if (height > tallest) tallest = height;
+    });
+    return Math.max(MIN_ROW_HEIGHT, tallest);
   }
 
   /** True once measurements have moved a ratio enough to resize placeholders. */
@@ -230,13 +236,31 @@ export class HeightMap {
       profiler.count("virtualization.heightMap.hit");
       return this.measured.get(blockId) as number;
     }
+    const size = this.sizes.get(node);
+    if (size !== undefined) {
+      profiler.count("virtualization.heightMap.hit");
+      return size;
+    }
     profiler.count("virtualization.heightMap.miss");
     return this.estimate(node);
   }
 
   record(node: ProsemirrorNode, height: number): void {
+    if (!Number.isFinite(height) || height <= 0) return;
+
     const blockId = node.attrs.blockId as string | undefined;
-    if (!blockId || !Number.isFinite(height) || height <= 0) return;
+    // A row or a list item has no id of its own, so its height is remembered
+    // against the node. Nodes are immutable, so editing one forgets only that
+    // one, and a stand-in is the size of the thing it replaced rather than a
+    // guess -- which is what stops the note shifting under the reader.
+    if (!blockId) {
+      const measured = Math.round(height);
+      if (this.sizes.get(node) !== measured) {
+        this.sizes.set(node, measured);
+        this.childRevision++;
+      }
+      return;
+    }
     this.measured.set(blockId, Math.round(height));
     this.estimates.delete(node);
     profiler.gauge("virtualization.heightMap.size", this.measured.size);
@@ -263,6 +287,15 @@ export class HeightMap {
       "virtualization.heightMap.pixelsPerCharacter",
       Math.round((this.global.height / this.global.characters) * 1000) / 1000
     );
+  }
+
+  /**
+   * Bumped whenever a container child's real height turns out to differ from
+   * what was remembered, so anything totalling those heights knows to add up
+   * again -- and, just as importantly, does not when nothing moved.
+   */
+  get revision(): number {
+    return this.childRevision;
   }
 
   toJSON(): Record<string, number> {

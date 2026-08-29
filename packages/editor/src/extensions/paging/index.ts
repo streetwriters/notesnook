@@ -114,4 +114,4 @@ export {
   isPage,
   toPages
 } from "./split.js";
-export { viewportKey } from "./viewport-plugin.js";
+export { viewportKey } from "./state.js";
