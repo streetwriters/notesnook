@@ -58,7 +58,10 @@ import {
   useSensors,
   KeyboardSensor,
   DragOverlay,
+  DragEndEvent,
+  DragMoveEvent,
   MeasuringStrategy,
+  Modifier,
   MouseSensor
 } from "@dnd-kit/core";
 import {
@@ -74,15 +77,15 @@ import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { showPublishView } from "../publish-view";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
 import { getWindowControls } from "../title-bar";
 import useTablet from "../../hooks/use-tablet";
 import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
-import { getDragData } from "../../utils/data-transfer";
+import { getDragData, setDragData } from "../../utils/data-transfer";
 import { saveContent } from "./index";
+import { dispatchSyntheticDropToNavMenuItem } from "../navigation-menu";
 
 type ToolButton = {
   title: string;
@@ -376,6 +379,29 @@ const TabStrip = React.memo(function TabStrip() {
 
               tabs.splice(to, 0, fromTab);
               useEditorStore.setState({ tabs });
+            }}
+            onDropOutside={(tab, point) => {
+              const session = useEditorStore
+                .getState()
+                .getSession(tab.sessionId);
+              if (
+                !session ||
+                !("note" in session) ||
+                session.type === "deleted"
+              ) {
+                return;
+              }
+
+              const noteId = session.note.id;
+              if (!noteId) return;
+
+              const dataTransfer = new DataTransfer();
+              setDragData(dataTransfer, "note", [noteId]);
+              dispatchSyntheticDropToNavMenuItem(
+                point.x,
+                point.y,
+                dataTransfer
+              );
             }}
             renderItem={({ item: tab, index: i }) => {
               const session = useEditorStore
@@ -714,16 +740,28 @@ function Tab(props: TabProps) {
   );
 }
 
+const VERTICAL_DRAG_OUT_THRESHOLD = 30;
+
+function isDraggedOutVertically(event: DragMoveEvent | DragEndEvent) {
+  return Math.abs(event.delta.y) >= VERTICAL_DRAG_OUT_THRESHOLD;
+}
+
+const restrictToHorizontalUnlessDraggedOut: Modifier = ({ transform }) =>
+  Math.abs(transform.y) < VERTICAL_DRAG_OUT_THRESHOLD
+    ? { ...transform, y: 0 }
+    : transform;
+
 type ReorderableListProps<T> = {
   items: T[];
   renderItem: (props: { item: T; index: number }) => JSX.Element | null;
   moveItem: (from: number, to: number) => void;
+  onDropOutside: (item: T, point: { x: number; y: number }) => void;
 };
 
 function ReorderableList<T extends { id: string }>(
   props: ReorderableListProps<T>
 ) {
-  const { items, renderItem: Item, moveItem } = props;
+  const { items, renderItem: Item, moveItem, onDropOutside } = props;
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: {
@@ -735,6 +773,10 @@ function ReorderableList<T extends { id: string }>(
     })
   );
   const [activeItem, setActiveItem] = useState<T>();
+  const pointerPosition = useRef<{ x: number; y: number } | null>(null);
+  const pointerMoveListener = useRef<((event: PointerEvent) => void) | null>(
+    null
+  );
 
   return (
     <DndContext
@@ -743,23 +785,47 @@ function ReorderableList<T extends { id: string }>(
       // onDragCancel={(event) => {}}
       onDragStart={(event) => {
         setActiveItem(items.find((i) => i.id === event.active.id));
+
+        pointerPosition.current = null;
+        const onPointerMove = (event: PointerEvent) => {
+          pointerPosition.current = { x: event.clientX, y: event.clientY };
+        };
+        pointerMoveListener.current = onPointerMove;
+        window.addEventListener("pointermove", onPointerMove);
       }}
       onDragEnd={(event) => {
         const { active, over } = event;
 
-        const overId = over?.id as string;
-        if (overId && active.id !== overId) {
-          const transitionItems = items.slice();
-          const newIndex = transitionItems.findIndex((i) => i.id === overId);
-          const oldIndex = transitionItems.findIndex((i) => i.id === active.id);
-          moveItem(oldIndex, newIndex);
+        if (isDraggedOutVertically(event)) {
+          const item = items.find((i) => i.id === active.id);
+          if (item && pointerPosition.current) {
+            onDropOutside(item, pointerPosition.current);
+          }
+        } else {
+          const overId = over?.id as string;
+          if (overId && active.id !== overId) {
+            const transitionItems = items.slice();
+            const newIndex = transitionItems.findIndex((i) => i.id === overId);
+            const oldIndex = transitionItems.findIndex(
+              (i) => i.id === active.id
+            );
+            moveItem(oldIndex, newIndex);
+          }
         }
         setActiveItem(undefined);
+
+        if (pointerMoveListener.current) {
+          window.removeEventListener(
+            "pointermove",
+            pointerMoveListener.current
+          );
+          pointerMoveListener.current = null;
+        }
       }}
       measuring={{
         droppable: { strategy: MeasuringStrategy.Always }
       }}
-      modifiers={[restrictToHorizontalAxis]}
+      modifiers={[restrictToHorizontalUnlessDraggedOut]}
     >
       <SortableContext items={items} strategy={horizontalListSortingStrategy}>
         {items.map((item, index) => (
@@ -767,6 +833,7 @@ function ReorderableList<T extends { id: string }>(
         ))}
 
         <DragOverlay
+          style={{ pointerEvents: "none" }}
           dropAnimation={{
             duration: 500,
             easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
