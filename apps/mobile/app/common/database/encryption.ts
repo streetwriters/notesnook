@@ -146,7 +146,23 @@ export async function validateAppLockPassword(appLockPassword: string) {
     );
     return typeof decrypted === "string";
   } catch (e) {
-    DatabaseLogger.error(e);
+    // A failed authentication tag means the password really is wrong. Anything
+    // else (a missing or malformed field, unreadable storage) is not, and
+    // reporting it as an incorrect password sends the user round a loop that
+    // retyping cannot fix. The return type has to stay boolean because two of
+    // the callers do not wrap this, so the distinction is recorded in the log.
+    const error = e as Error & { code?: string };
+    const isWrongPassword =
+      error?.message === "FAILURE" || error?.code === "BAD_MAC";
+
+    if (!isWrongPassword) {
+      DatabaseLogger.error(
+        error,
+        "validateAppLockPassword failed for a reason other than a wrong password"
+      );
+    } else {
+      DatabaseLogger.info("validateAppLockPassword: incorrect password");
+    }
     return false;
   }
 }
