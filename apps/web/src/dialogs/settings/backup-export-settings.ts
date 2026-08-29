@@ -27,6 +27,8 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
 import { formatDate } from "@notesnook/core";
+import { BACKUP_CRON_EXPRESSIONS, FULL_BACKUP_CRON_EXPRESSIONS } from "../../common/notices";
+import { CronosExpression } from "cronosjs";
 import dayjs from "dayjs";
 
 function getNextBackupTime(
@@ -35,13 +37,19 @@ function getNextBackupTime(
   isFull: boolean = false
 ): number | undefined {
   if (offset === 0 || !lastBackupDate) return undefined;
-  let days = 0;
-  if (isFull) {
-    days = offset === 1 ? 7 : 30;
-  } else {
-    days = offset === 1 ? 1 : offset === 2 ? 7 : 30;
+  try {
+    const cronString = isFull
+      ? FULL_BACKUP_CRON_EXPRESSIONS[offset as keyof typeof FULL_BACKUP_CRON_EXPRESSIONS]
+      : BACKUP_CRON_EXPRESSIONS[offset as keyof typeof BACKUP_CRON_EXPRESSIONS];
+
+    if (!cronString) return undefined;
+
+    const expr = CronosExpression.parse(cronString);
+    const nextDate = expr.nextDate(new Date(lastBackupDate));
+    return nextDate ? nextDate.getTime() : undefined;
+  } catch (e) {
+    return undefined;
   }
-  return dayjs(lastBackupDate).add(days, "d").valueOf();
 }
 
 const getDesktopBackupsDirectoryPath = () =>
@@ -64,14 +72,9 @@ export const BackupExportSettings: SettingsGroup[] = [
 
           if (!last) return strings.backupNowDesc();
 
-          const typeStr = last === full ? " (Full)" : " (Partial)";
-          return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
-            formatDate(last, {
-              type: "date-time",
-              dateFormat: s.dateFormat,
-              timeFormat: s.timeFormat
-            })
-          )}${typeStr}`;
+          const formattedDate = formatDate(last, { type: "date-time", dateFormat: s.dateFormat, timeFormat: s.timeFormat });
+          const backupStr = last === full ? strings.lastFullBackupOn(formattedDate) : strings.lastPartialBackupOn(formattedDate);
+          return `${strings.backupNowDesc()}\n${backupStr}`;
         },
         onStateChange: (listener) =>
           useSettingStore.subscribe(

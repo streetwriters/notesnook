@@ -3276,5 +3276,7 @@ Continue without attachments?`,
   checkingAttachmentsProgress: (current: number, total: number) =>
     t`Checking attachments (${current}/${total})`,
   lastBackupOn: (date: string) => t`Last backup: ${date}`,
-  nextBackupOn: (date: string) => t`Next backup: ${date}`
+  nextBackupOn: (date: string) => t`Next backup: ${date}`,
+  lastPartialBackupOn: (date: string) => t`Last backup: ${date} (Partial)`,
+  lastFullBackupOn: (date: string) => t`Last backup: ${date} (Full)`
 };

@@ -4513,6 +4513,14 @@ msgstr "Last"
 msgid "Last backup: {date}"
 msgstr ""
 
+#: src/strings.ts:3281
+msgid "Last backup: {date} (Full)"
+msgstr ""
+
+#: src/strings.ts:3280
+msgid "Last backup: {date} (Partial)"
+msgstr ""
+
 #: src/strings.ts:2029
 msgid "Last edited at"
 msgstr "Last edited at"
