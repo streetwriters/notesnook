@@ -240,7 +240,13 @@ export const Callout = Node.create({
         if (typeof pos !== "number") return;
 
         const resolvedPos = editor.state.doc.resolve(pos);
-        if (isClickWithinBounds(e, resolvedPos, "right")) {
+        if (
+          isClickWithinBounds(e, resolvedPos, "right", {
+            width: 40,
+            height: 40,
+            offset: 11
+          })
+        ) {
           e.preventDefault();
           e.stopImmediatePropagation();
 

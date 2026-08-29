@@ -73,6 +73,71 @@ describe("outline list item", () => {
     expect(editor.getJSON()).toMatchSnapshot();
   });
 
+  test("tapping the gutter of a nested item toggles it; a flat item ignores it", () => {
+    const el = outlineList(
+      outlineListItem(["flat item"]),
+      li(
+        [
+          h("p", ["Parent"]),
+          outlineList(
+            outlineListItem(["Child one"]),
+            outlineListItem(["Child two"])
+          )
+        ],
+        { "data-type": "outlineListItem" }
+      )
+    );
+
+    const { editor } = createEditor({
+      initialContent: el.outerHTML,
+      extensions: {
+        outlineList: OutlineList,
+        outlineListItem: OutlineListItem,
+        paragraph: Paragraph
+      }
+    });
+
+    const dom = editor.view.dom as HTMLElement;
+    const nested = dom.querySelector("li.nested");
+    const flat = Array.from(dom.querySelectorAll("li")).find(
+      (item) => !item.classList.contains("nested")
+    );
+    expect(nested).toBeTruthy();
+    expect(flat).toBeTruthy();
+
+    const collapsed = () => {
+      let value: boolean | undefined;
+      editor.state.doc.descendants((node) => {
+        if (
+          node.type.name === OutlineListItem.name &&
+          node.lastChild?.type.name === OutlineList.name
+        )
+          value = node.attrs.collapsed;
+      });
+      return value;
+    };
+
+    const tapGutter = (item: Element) =>
+      item.dispatchEvent(
+        new MouseEvent("mousedown", {
+          button: 0,
+          clientX: -10,
+          clientY: 0,
+          bubbles: true,
+          cancelable: true
+        })
+      );
+
+    expect(collapsed()).toBe(false);
+    tapGutter(nested!);
+    expect(collapsed()).toBe(true);
+    tapGutter(nested!);
+    expect(collapsed()).toBe(false);
+
+    tapGutter(flat!);
+    expect(collapsed()).toBe(false);
+  });
+
   /**
    * Two changes happened:
    * 1. Images were converted from inline nodes to block nodes (https://github.com/streetwriters/notesnook/pull/8563)
