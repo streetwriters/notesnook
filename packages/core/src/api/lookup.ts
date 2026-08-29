@@ -656,8 +656,13 @@ export default class Lookup {
     } = {}
   ) {
     const columns = fields.map((f) => f.column);
-    const items = await selector.fields(columns).items();
+    const sortOptions =
+      options.sortOptions?.sortBy !== "relevance"
+        ? options.sortOptions
+        : undefined;
+    const items = await selector.fields(columns).items(undefined, sortOptions);
     selector.fields([]);
+
     return fuzzy(
       query,
       items,
@@ -665,7 +670,12 @@ export default class Lookup {
       Object.fromEntries(
         fields.filter((f) => !f.ignore).map((f) => [f.name, f.weight || 1])
       ) as Record<keyof T, number>,
-      options
+      {
+        limit: options.limit,
+        prefix: options.prefix,
+        suffix: options.suffix,
+        preserveOrder: sortOptions !== undefined
+      }
     );
   }
 
