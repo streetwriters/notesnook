@@ -58,3 +58,38 @@ test("remove orphaned attachments should remove only orphaned attachments", () =
     expect(await db.attachments.exists(hash1)).toBe(true);
     expect(await db.attachments.orphaned.count()).toBe(0);
   }));
+
+test("relations wait for their pending attachment to upload before syncing", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+
+    const hash = await db.attachments.save(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEEAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "image/png",
+      "test.png"
+    );
+    if (!hash) throw new Error("Failed to create attachment");
+
+    const attachment = await db.attachments.attachment(hash);
+    if (!attachment) throw new Error("Failed to find attachment");
+
+    const noteId = await db.notes.add({ title: "Test Note" });
+    await db.relations.add(
+      { id: noteId, type: "note" },
+      { id: attachment.id, type: "attachment" }
+    );
+
+    const pendingRelations: unknown[] = [];
+    for await (const chunk of db.relations.collection.unsynced(100))
+      pendingRelations.push(...chunk);
+    expect(pendingRelations).toHaveLength(0);
+    expect(await db.relations.collection.unsyncedCount()).toBe(0);
+
+    await db.attachments.markAsUploaded(attachment.id);
+
+    const syncableRelations: unknown[] = [];
+    for await (const chunk of db.relations.collection.unsynced(100))
+      syncableRelations.push(...chunk);
+    expect(syncableRelations).toHaveLength(1);
+    expect(await db.relations.collection.unsyncedCount()).toBe(1);
+  }));
