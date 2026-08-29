@@ -26,6 +26,7 @@ import {
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { CheckList } from "../check-list/check-list.js";
 import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
+import { virtualizable } from "../paging/child-view.js";
 
 export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;
@@ -104,7 +105,7 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
   },
 
   addNodeView() {
-    return ({ node, getPos, editor }) => {
+    return virtualizable(({ node, getPos, editor }) => {
       const li = document.createElement("li");
       if (node.attrs.checked) li.classList.add("checked");
       else li.classList.remove("checked");
@@ -175,6 +176,6 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
           return true;
         }
       };
-    };
+    });
   }
 });

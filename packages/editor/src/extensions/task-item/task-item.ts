@@ -21,6 +21,7 @@ import { mergeAttributes } from "@tiptap/core";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component.js";
 import { createNodeView } from "../react/index.js";
+import { virtualizable } from "../paging/child-view.js";
 import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
 
 export type TaskItemAttributes = {
@@ -70,17 +71,19 @@ export const TaskItemNode = TaskItem.extend({
   },
 
   addNodeView() {
-    return createNodeView(TaskItemComponent, {
-      contentDOMFactory: true,
-      wrapperFactory: () => {
-        const li = document.createElement("li");
-        li.dataset.dragImage = "true";
-        return li;
-      },
-      shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
-        return prev.checked !== next.checked;
-      }
-    });
+    return virtualizable(
+      createNodeView(TaskItemComponent, {
+        contentDOMFactory: true,
+        wrapperFactory: () => {
+          const li = document.createElement("li");
+          li.dataset.dragImage = "true";
+          return li;
+        },
+        shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
+          return prev.checked !== next.checked;
+        }
+      })
+    );
   },
 
   addInputRules() {
