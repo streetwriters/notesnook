@@ -47,10 +47,129 @@ function recordGauges(view: EditorView): void {
     "dom.placeholders",
     view.dom.querySelectorAll("[data-page-placeholder]").length
   );
+
+  // Chrome only, and coarse, but it is the same heap the document lives in.
+  const memory = (
+    performance as unknown as {
+      memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
+    }
+  ).memory;
+  if (memory) {
+    profiler.gauge(
+      "memory.usedMB",
+      Math.round(memory.usedJSHeapSize / 1048576)
+    );
+    profiler.gauge(
+      "memory.totalMB",
+      Math.round(memory.totalJSHeapSize / 1048576)
+    );
+  }
 }
 
 function afterPaint(callback: () => void): void {
   requestAnimationFrame(() => setTimeout(callback, 0));
+}
+
+/**
+ * Times everything the state does with a transaction -- every plugin's `apply`
+ * and every appended transaction -- so the work between dispatching and
+ * rendering can be told apart from the handlers that run afterwards.
+ *
+ * Patched once and left in place: an editor that is torn down while another is
+ * still running would otherwise take the timing away with it.
+ */
+let stateInstrumented = false;
+function instrumentState(): void {
+  if (stateInstrumented) return;
+  stateInstrumented = true;
+
+  const prototype = EditorState.prototype as unknown as {
+    applyTransaction: (tr: Transaction) => unknown;
+  };
+  const original = prototype.applyTransaction;
+  prototype.applyTransaction = function (tr: Transaction) {
+    if (!profiler.enabled) return original.call(this, tr);
+    return profiler.time("tx.stateApply", () => original.call(this, tr));
+  };
+}
+
+function pluginName(plugin: Plugin): string {
+  return String((plugin as unknown as { key?: string }).key ?? "plugin")
+    .replace(/\$.*$/, "")
+    .replace(/[^\w.-]/g, "");
+}
+
+/**
+ * Times each plugin's state field `apply` under its own name.
+ *
+ * ProseMirror binds those functions when a state is built, so they have to be
+ * wrapped before that happens -- wrapping them on a live view is too late, and
+ * silently records nothing.
+ */
+let stateFieldsInstrumented = false;
+export function instrumentPluginState(): void {
+  if (stateFieldsInstrumented) return;
+  stateFieldsInstrumented = true;
+
+  const wrap = (plugins?: readonly Plugin[]) => {
+    for (const plugin of plugins ?? []) {
+      const spec = plugin.spec as {
+        state?: { apply?: (...args: never[]) => unknown };
+        profiledState?: boolean;
+      };
+      const apply = spec.state?.apply;
+      if (!apply || !spec.state || spec.profiledState) continue;
+      spec.profiledState = true;
+
+      const name = pluginName(plugin);
+      spec.state.apply = function (this: unknown, ...args: never[]) {
+        if (!profiler.enabled) return apply.apply(this, args);
+        return profiler.time(`plugin.apply.${name}`, () =>
+          apply.apply(this, args)
+        );
+      };
+    }
+  };
+
+  const create = EditorState.create;
+  EditorState.create = function (config) {
+    wrap(config.plugins);
+    return create(config);
+  } as typeof EditorState.create;
+
+  const reconfigure = EditorState.prototype.reconfigure;
+  EditorState.prototype.reconfigure = function (
+    this: EditorState,
+    config: Parameters<EditorState["reconfigure"]>[0]
+  ) {
+    wrap(config.plugins);
+    return reconfigure.call(this, config);
+  };
+}
+
+/**
+ * Times each plugin's `appendTransaction` under its own name, so a slow
+ * transaction says which plugin spent the time.
+ */
+function instrumentPlugins(view: EditorView): void {
+  for (const plugin of view.state.plugins) {
+    const name = pluginName(plugin);
+    const spec = plugin.spec as {
+      appendTransaction?: (...args: never[]) => unknown;
+      profiled?: boolean;
+    };
+    if (spec.profiled) continue;
+    spec.profiled = true;
+
+    const append = spec.appendTransaction;
+    if (append)
+      spec.appendTransaction = function (this: unknown, ...args: never[]) {
+        if (!profiler.enabled) return append.apply(this, args);
+        return profiler.time(`plugin.append.${name}`, () =>
+          append.apply(this, args)
+        );
+      };
+  }
 }
 
 function instrumentView(view: EditorView): () => void {
@@ -156,6 +275,8 @@ export function profilerPlugin(): Plugin {
     key: profilerKey,
     view(view) {
       const dispose = instrumentView(view);
+      instrumentState();
+      instrumentPlugins(view);
       let lastGauge = 0;
       recordGauges(view);
 
@@ -177,6 +298,11 @@ export function profilerPlugin(): Plugin {
 
 export const EditorProfiler = Extension.create({
   name: "profiler",
+
+  onBeforeCreate() {
+    instrumentPluginState();
+  },
+
   addProseMirrorPlugins() {
     return [profilerPlugin()];
   }
