@@ -25,8 +25,10 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
  * rendered whole.
  */
 
+const TABLE = "table";
+
 const WINDOWABLE_CONTAINERS = new Set([
-  "table",
+  TABLE,
   "bulletList",
   "orderedList",
   "taskList",
@@ -39,10 +41,19 @@ export const TABLE_ROW_NODE = "tableRow";
 export const LIST_ITEM_NODE = "listItem";
 
 /** Fewer children than this and rendering the whole container is cheap. */
-const MIN_CHILDREN = 100;
+const MIN_CHILDREN = 50;
 
-/** How far into a block to look for containers worth windowing. */
-const MAX_DEPTH = 3;
+/**
+ * How far into a block to look for containers worth windowing.
+ *
+ * What keeps this walk cheap is not the limit but where it stops: at leaves, at
+ * text, and at any container long enough to window, whose children it never
+ * looks inside. The limit is only a guard against runaway recursion, so it is
+ * set well past anything a writer would type -- outline and task lists nest as
+ * deep as they like, and each level of nesting costs two steps here, one for
+ * the list and one for the item holding the next one.
+ */
+const MAX_DEPTH = 20;
 
 /** How many children to render before anything has been measured. */
 export const CHILDREN_BEFORE_MEASURING = 30;
@@ -51,8 +62,11 @@ export type WindowedContainer = {
   node: ProsemirrorNode;
   /** Where the container begins, counted from the start of the block. */
   offset: number;
+  /** Stable across edits, so a window survives the text changing under it. */
   id: string;
 };
+
+type Found = Omit<WindowedContainer, "id">;
 
 const containersByBlock = new WeakMap<ProsemirrorNode, WindowedContainer[]>();
 const widestByTable = new WeakMap<ProsemirrorNode, number[]>();
@@ -68,15 +82,13 @@ function findContainers(
   parent: ProsemirrorNode,
   contentStart: number,
   depth: number,
-  found: WindowedContainer[]
+  found: Found[]
 ): void {
   parent.forEach((child, offset) => {
     if (child.isLeaf || child.isTextblock) return;
     const start = contentStart + offset;
-    if (isWorthWindowing(child)) {
-      const id = child.attrs.blockId as string | undefined;
-      if (id) found.push({ node: child, offset: start, id });
-    } else if (depth < MAX_DEPTH)
+    if (isWorthWindowing(child)) found.push({ node: child, offset: start });
+    else if (depth < MAX_DEPTH)
       findContainers(child, start + 1, depth + 1, found);
   });
 }
@@ -96,13 +108,23 @@ export function containersWorthWindowing(
   const cached = containersByBlock.get(block);
   if (cached) return cached;
 
-  const found: WindowedContainer[] = [];
-  const id = block.attrs.blockId as string | undefined;
-  if (!isWorthWindowing(block)) findContainers(block, 1, 0, found);
-  else if (id) found.push({ node: block, offset: 0, id });
+  // Only the blocks of a note are given ids of their own, so a container nested
+  // inside one has none to be named by. Counting them off within their block
+  // names them just as well, and just as steadily: editing the text around a
+  // container does not change how many come before it, so its window survives.
+  const blockId = block.attrs.blockId as string | undefined;
+  const found: Found[] = [];
+  if (blockId) {
+    if (isWorthWindowing(block)) found.push({ node: block, offset: 0 });
+    else findContainers(block, 1, 0, found);
+  }
 
-  containersByBlock.set(block, found);
-  return found;
+  const containers = found.map((container, index) => ({
+    ...container,
+    id: `${blockId}#${index}`
+  }));
+  containersByBlock.set(block, containers);
+  return containers;
 }
 
 /**
@@ -115,7 +137,7 @@ export function containersWorthWindowing(
  * what the width follows.
  */
 export function widestChildren(container: ProsemirrorNode): number[] {
-  if (container.type.name !== "table") return NO_CHILDREN;
+  if (container.type.name !== TABLE) return NO_CHILDREN;
 
   const cached = widestByTable.get(container);
   if (cached) return cached;

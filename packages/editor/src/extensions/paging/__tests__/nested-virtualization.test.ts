@@ -30,7 +30,7 @@ import TableCell from "../../table-cell/index.js";
 import TableHeader from "../../table-header/index.js";
 import { Table } from "../../table/index.js";
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
-import { widestChildren } from "../containers.js";
+import { containersWorthWindowing, widestChildren } from "../containers.js";
 import { countPages, Page, Paging } from "../index.js";
 
 const PagedDocument = Node.create({
@@ -74,6 +74,19 @@ function outlineListOf(items: number) {
   for (let i = 0; i < items; i++)
     html += `<li data-type="outlineListItem"><p>Point ${i}</p></li>`;
   return html + "</ul>";
+}
+
+/** A list buried `levels` deep, with the long one at the bottom. */
+function nestedOutlineOf(levels: number, items: number) {
+  let inner = "";
+  for (let i = 0; i < items; i++)
+    inner += `<li data-type="outlineListItem"><p>Point ${i}</p></li>`;
+  let html = `<ul data-type="outlineList">${inner}</ul>`;
+  for (let level = 0; level < levels; level++)
+    html = `<ul data-type="outlineList"${
+      level === levels - 1 ? ` data-block-id="${id()}"` : ""
+    }><li data-type="outlineListItem"><p>Level ${level}</p>${html}</li></ul>`;
+  return html;
 }
 
 function tableOf(rows: number) {
@@ -529,6 +542,43 @@ describe("nested virtualization", () => {
 
     one.destroy();
     two.destroy();
+  });
+
+  test("a long list buried under several levels is still windowed", async () => {
+    // outline and task lists nest as deep as the writer likes, and the long
+    // one can be at the bottom of that
+    const editor = createEditor(para("intro") + nestedOutlineOf(5, 300), 100);
+    await created();
+
+    expect(hidden(editor).length).toBeGreaterThan(200);
+    expect(editor.getHTML()).toContain("Point 299");
+    editor.destroy();
+  });
+
+  test("a nested container keeps its name when the text around it changes", async () => {
+    // the window is remembered against this name, so a name that moved with the
+    // text would throw the reader back to the top of the list on every keystroke
+    const editor = createEditor(para("intro") + nestedOutlineOf(5, 300), 100);
+    await created();
+
+    const block = () => editor.state.doc.child(1);
+    const before = containersWorthWindowing(block()).map((c) => c.id);
+    expect(before).toHaveLength(1);
+
+    // inside the same block and above the nested list, so anything naming it
+    // by where it sits would be renaming it on every keystroke
+    let at = -1;
+    const blockStart = editor.state.doc.child(0).nodeSize;
+    editor.state.doc.descendants((node, position) => {
+      if (at < 0 && position > blockStart && node.type.name === "paragraph")
+        at = position + 1;
+      return at < 0;
+    });
+    editor.commands.setTextSelection(at);
+    editor.commands.insertContent("typing above the list");
+
+    expect(containersWorthWindowing(block()).map((c) => c.id)).toEqual(before);
+    editor.destroy();
   });
 
   test("a stand-in child keeps the tag its container expects", async () => {
