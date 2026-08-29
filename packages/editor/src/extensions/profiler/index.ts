@@ -47,6 +47,7 @@ function recordGauges(view: EditorView): void {
     "dom.placeholders",
     view.dom.querySelectorAll("[data-page-placeholder]").length
   );
+  recordLifetimes();
 
   // Chrome only, and coarse, but it is the same heap the document lives in.
   const memory = (
@@ -270,10 +271,56 @@ function instrumentView(view: EditorView): () => void {
   };
 }
 
+/**
+ * Watches whether editors and views are actually freed once they are done with.
+ *
+ * Destroying one is not the same as freeing it: anything still holding a
+ * reference -- a listener never removed, a store never cleared -- keeps it and
+ * its whole document alive. A weak reference tells the truth on the spot, so
+ * the count is right as soon as a collection has run rather than whenever the
+ * browser gets round to a callback.
+ */
+type Watched = { ref: WeakRef<object>; done: boolean };
+
+const watchedEditors: Watched[] = [];
+const watchedViews: Watched[] = [];
+// Extension instances can be shared between editors, so the entry is kept
+// against the editor rather than in the extension's storage.
+const watchByEditor = new WeakMap<object, Watched>();
+
+function watch(list: Watched[], subject: object): Watched | undefined {
+  if (typeof WeakRef === "undefined") return undefined;
+  const entry = { ref: new WeakRef(subject), done: false };
+  list.push(entry);
+  return entry;
+}
+
+function countStillHeld(list: Watched[], name: string): void {
+  let alive = 0;
+  let held = 0;
+  for (let i = list.length - 1; i >= 0; i--) {
+    if (!list[i].ref.deref()) {
+      list.splice(i, 1);
+      continue;
+    }
+    alive++;
+    if (list[i].done) held++;
+  }
+  profiler.gauge(`editor.${name}Alive`, alive);
+  profiler.gauge(`editor.${name}Leaked`, held);
+}
+
+function recordLifetimes(): void {
+  countStillHeld(watchedEditors, "editors");
+  countStillHeld(watchedViews, "views");
+}
+
 export function profilerPlugin(): Plugin {
   return new Plugin({
     key: profilerKey,
     view(view) {
+      profiler.count("editor.viewsCreated");
+      const watched = watch(watchedViews, view);
       const dispose = instrumentView(view);
       instrumentState();
       instrumentPlugins(view);
@@ -289,6 +336,8 @@ export function profilerPlugin(): Plugin {
           recordGauges(updatedView);
         },
         destroy() {
+          profiler.count("editor.viewsDestroyed");
+          if (watched) watched.done = true;
           dispose();
         }
       };
@@ -301,6 +350,20 @@ export const EditorProfiler = Extension.create({
 
   onBeforeCreate() {
     instrumentPluginState();
+  },
+
+  // `this.editor` is only here, not in the plugin -- the element does not carry
+  // it yet while the view is being built.
+  onCreate() {
+    profiler.count("editor.editorsCreated");
+    const watched = watch(watchedEditors, this.editor);
+    if (watched) watchByEditor.set(this.editor, watched);
+  },
+
+  onDestroy() {
+    profiler.count("editor.editorsDestroyed");
+    const watched = watchByEditor.get(this.editor);
+    if (watched) watched.done = true;
   },
 
   addProseMirrorPlugins() {
