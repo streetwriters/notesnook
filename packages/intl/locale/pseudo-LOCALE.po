@@ -3840,8 +3840,16 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
-#: src/strings.ts:2813
+#: src/strings.ts:2814
 msgid "Last backup: {date}"
+msgstr ""
+
+#: src/strings.ts:2817
+msgid "Last backup: {date} (Full)"
+msgstr ""
+
+#: src/strings.ts:2816
+msgid "Last backup: {date} (Partial)"
 msgstr ""
 
 #: src/strings.ts:2243
@@ -4439,7 +4447,7 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: src/strings.ts:2814
+#: src/strings.ts:2815
 msgid "Next backup: {date}"
 msgstr ""
 
