@@ -24,10 +24,9 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
  * of them leaves the rest in the right place. Anything not listed here is
  * rendered whole.
  */
-const TABLE = "table";
 
 const WINDOWABLE_CONTAINERS = new Set([
-  TABLE,
+  "table",
   "bulletList",
   "orderedList",
   "taskList",
@@ -116,7 +115,7 @@ export function containersWorthWindowing(
  * what the width follows.
  */
 export function widestChildren(container: ProsemirrorNode): number[] {
-  if (container.type.name !== TABLE) return NO_CHILDREN;
+  if (container.type.name !== "table") return NO_CHILDREN;
 
   const cached = widestByTable.get(container);
   if (cached) return cached;

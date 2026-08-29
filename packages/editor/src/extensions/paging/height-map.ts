@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { profiler } from "../../utils/profiler.js";
+import { HeightIndex } from "./height-index.js";
 
 const DEFAULT_ESTIMATES: Record<string, number> = {
   paragraph: 24,
@@ -83,7 +84,7 @@ type Measured = { height: number; characters: number };
 export class HeightMap {
   private measured = new Map<string, number>();
   private sizes = new WeakMap<ProsemirrorNode, number>();
-  private childRevision = 0;
+  private indexes = new Map<string, HeightIndex & { childCount: number }>();
   private measurements = new Map<string, Measured>();
   private global: Measured = { height: 0, characters: 0 };
   private stale = false;
@@ -106,6 +107,7 @@ export class HeightMap {
     }
     if (!changed) return;
     this.estimates = new WeakMap();
+    this.indexes.clear();
     this.stale = true;
   }
 
@@ -228,6 +230,7 @@ export class HeightMap {
   markPlaceholdersResized(): void {
     this.stale = false;
     this.estimates = new WeakMap();
+    this.indexes.clear();
   }
 
   heightFor(node: ProsemirrorNode): number {
@@ -257,7 +260,7 @@ export class HeightMap {
       const measured = Math.round(height);
       if (this.sizes.get(node) !== measured) {
         this.sizes.set(node, measured);
-        this.childRevision++;
+        this.indexes.clear();
       }
       return;
     }
@@ -290,12 +293,29 @@ export class HeightMap {
   }
 
   /**
-   * Bumped whenever a container child's real height turns out to differ from
-   * what was remembered, so anything totalling those heights knows to add up
-   * again -- and, just as importantly, does not when nothing moved.
+   * Where each child of a container sits, as a running total of the heights
+   * before it. The children that are off screen are hidden rather than laid
+   * out, so the browser cannot be asked where they are.
+   *
+   * Adding up every child is too much to do while scrolling, so the answer is
+   * kept until the container gains or loses a child, or a measurement moves a
+   * height. Editing the text in a child does neither.
    */
-  get revision(): number {
-    return this.childRevision;
+  runningHeights(id: string, container: ProsemirrorNode): HeightIndex {
+    const cached = this.indexes.get(id);
+    if (cached && cached.childCount === container.childCount) return cached;
+
+    const before = new Float64Array(container.childCount + 1);
+    let total = 0;
+    container.forEach((child, _offset, index) => {
+      before[index] = total;
+      total += this.heightFor(child);
+    });
+    before[container.childCount] = total;
+
+    const index = { before, total, childCount: container.childCount };
+    this.indexes.set(id, index);
+    return index;
   }
 
   toJSON(): Record<string, number> {

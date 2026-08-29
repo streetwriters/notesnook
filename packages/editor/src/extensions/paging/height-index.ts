@@ -35,46 +35,6 @@ export type HeightIndex = {
   total: number;
 };
 
-type Cached = HeightIndex & { childCount: number; revision: number };
-
-const indexes = new Map<string, Cached>();
-
-/**
- * Adding up every child is too much to do while scrolling, so the answer is
- * kept until the container gains or loses a child, or a measurement changes a
- * height. Editing the text in a child does neither.
- */
-export function heightIndexFor(
-  id: string,
-  container: ProsemirrorNode,
-  heights: HeightMap
-): HeightIndex {
-  const cached = indexes.get(id);
-  if (
-    cached &&
-    cached.childCount === container.childCount &&
-    cached.revision === heights.revision
-  )
-    return cached;
-
-  const before = new Float64Array(container.childCount + 1);
-  let total = 0;
-  container.forEach((child, _offset, index) => {
-    before[index] = total;
-    total += heights.heightFor(child);
-  });
-  before[container.childCount] = total;
-
-  const index: Cached = {
-    before,
-    total,
-    childCount: container.childCount,
-    revision: heights.revision
-  };
-  indexes.set(id, index);
-  return index;
-}
-
 /** The first child reaching down to `offset` pixels into the container. */
 export function childAt(index: HeightIndex, offset: number): number {
   const { before } = index;

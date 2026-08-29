@@ -23,7 +23,7 @@ import { Mapping } from "@tiptap/pm/transform";
 import { Decoration, DecorationSet, EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
 import { containerChildView } from "./child-view.js";
-import { childAt, HeightIndex, heightIndexFor } from "./height-index.js";
+import { childAt, HeightIndex } from "./height-index.js";
 import {
   CHILDREN_BEFORE_MEASURING,
   containersWorthWindowing,
@@ -277,7 +277,7 @@ function buildDecorations(
         container.node,
         window,
         selection,
-        heightIndexFor(container.id, container.node, heights),
+        heights.runningHeights(container.id, container.node),
         decorations
       );
       window.renderedStart = rendered.start;
@@ -657,7 +657,7 @@ export function viewportPlugin(heights: HeightMap): Plugin<ViewportState> {
         profiler.count("paging.containersMeasured");
 
         const top = host.getBoundingClientRect().top;
-        const index = heightIndexFor(container.id, container.node, heights);
+        const index = heights.runningHeights(container.id, container.node);
         const count = container.node.childCount;
         const at = (edge: number) =>
           Math.min(count, childAt(index, edge - top));

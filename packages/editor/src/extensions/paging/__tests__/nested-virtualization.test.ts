@@ -501,6 +501,36 @@ describe("nested virtualization", () => {
     editor.destroy();
   });
 
+  test("two editors of the same note keep their own measurements", async () => {
+    // the app shows more than one editor at a time, and a note open twice has
+    // the same block ids in both -- anything keyed by those has to belong to
+    // one editor, not to the module
+    const html = para("intro") + tableOf(300);
+    const one = createEditor(html, 100);
+    const two = createEditor(html, 100);
+    await created();
+
+    type Heights = {
+      record(node: ProsemirrorNode, height: number): void;
+      runningHeights(id: string, container: ProsemirrorNode): { total: number };
+    };
+    const heightsOf = (editor: Editor) =>
+      (editor.storage.paging as { heights: Heights }).heights;
+    const tableOf_ = (editor: Editor) => editor.state.doc.child(1);
+
+    const id = tableOf_(one).attrs.blockId as string;
+    expect(id).toBe(tableOf_(two).attrs.blockId);
+
+    heightsOf(one).record(tableOf_(one).child(0), 500);
+    const totals = [one, two].map(
+      (editor) => heightsOf(editor).runningHeights(id, tableOf_(editor)).total
+    );
+    expect(totals[0]).not.toBe(totals[1]);
+
+    one.destroy();
+    two.destroy();
+  });
+
   test("a stand-in child keeps the tag its container expects", async () => {
     const editor = createEditor(para("intro") + listOf(200));
     await created();
