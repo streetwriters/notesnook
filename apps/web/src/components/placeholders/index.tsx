@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Flex, Text } from "@theme-ui/components";
 import { TipContext, useTip } from "../../hooks/use-tip";
-import { Info, Sync } from "../icons";
+import { Error, Info, Sync } from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { strings } from "@notesnook/intl";
 
@@ -78,19 +78,23 @@ function Placeholder(props: PlaceholderProps) {
           px: 6
         }}
       >
-        <Flex
-          sx={{
-            border: "1px solid var(--accent)",
-            borderRadius: 50,
-            p: 1,
-            py: "1.5px"
-          }}
-        >
-          <Info color="accent" size={13} sx={{ mr: "small" }} />
-          <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
-            {strings.tip()}
-          </Text>
-        </Flex>
+        {tip.type === "error" ? (
+          <Error color="accent-error" size={13} />
+        ) : (
+          <Flex
+            sx={{
+              border: "1px solid var(--accent)",
+              borderRadius: 50,
+              p: 1,
+              py: "1.5px"
+            }}
+          >
+            <Info color="accent" size={13} sx={{ mr: "small" }} />
+            <Text variant="subBody" sx={{ fontSize: 10 }} color="accent">
+              {strings.tip()}
+            </Text>
+          </Flex>
+        )}
         <Text variant="subBody" sx={{ fontSize: "body", mt: 1 }}>
           {text || tip.text}
         </Text>
