@@ -24,22 +24,31 @@ import {
   VirtualizedGrouping
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
 import List from "../../components/list";
+import { IconButton } from "../../components/ui/icon-button";
 import SelectionHeader from "../../components/selection-header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastManager, eSubscribeEvent } from "../../services/event-manager";
 import { NavigationProps } from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
+import { useRecentSearchStore } from "../../stores/use-recent-search-store";
 import { eGroupOptionsUpdated, eOnRefreshSearch } from "../../utils/events";
+import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { SearchBar } from "./search-bar";
 export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
   const [results, setResults] = useState<VirtualizedGrouping<Item>>();
   const [loading, setLoading] = useState(false);
   const [searchStatus, setSearchStatus] = useState<string>();
+  const [query, setQuery] = useState<string>("");
   const currentQuery = useRef<string>(undefined);
   const timer = useRef<NodeJS.Timeout>(undefined);
+  const recentSearches = useRecentSearchStore((state) => state.recentSearches);
+  const { colors } = useThemeColors();
   useNavigationFocus(navigation, {
     onFocus: (prev) => {
       useNavigationStore.getState().setFocusedRouteId(route.name);
@@ -52,6 +61,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
 
   const onSearch = React.useCallback(
     async (query?: string) => {
+      setQuery(query || "");
       currentQuery.current = query;
       if (!query) {
         setResults(undefined);
@@ -59,6 +69,7 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         setSearchStatus(undefined);
         return;
       }
+      useRecentSearchStore.getState().addRecentSearch(query);
       try {
         setLoading(true);
         let results: VirtualizedGrouping<Item> | undefined;
@@ -150,18 +161,95 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         }}
         loading={loading}
       />
-      <List
-        data={results}
-        dataType={route.params?.type}
-        renderedInRoute={route.name}
-        groupType="search"
-        loading={loading}
-        placeholder={{
-          title: route.name,
-          paragraph: searchStatus || strings.searchInRoute(route.params?.title),
-          loading: strings.searchingFor(currentQuery.current as string)
-        }}
-      />
+      {!query && recentSearches.length > 0 ? (
+        <View
+          style={{
+            flex: 1,
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: DefaultAppStyles.GAP_SMALL
+            }}
+          >
+            <Text
+              style={{
+                fontSize: AppFontSize.sm,
+                fontFamily: "Inter-SemiBold",
+                color: colors.primary.paragraph
+              }}
+            >
+              {strings.recentSearches()}
+            </Text>
+            <TouchableOpacity
+              onPress={() => useRecentSearchStore.getState().clearRecentSearches()}
+            >
+              <Text
+                style={{
+                  fontSize: AppFontSize.xs,
+                  fontFamily: "Inter-Medium",
+                  color: colors.primary.accent
+                }}
+              >
+                {strings.clearAll()}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView>
+            {recentSearches.map((search, index) => (
+              <TouchableOpacity
+                key={`${search}-${index}`}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingVertical: DefaultAppStyles.GAP_SMALL,
+                  borderBottomWidth: 1,
+                  borderBottomColor: colors.primary.border
+                }}
+                onPress={() => onSearch(search)}
+              >
+                <Text
+                  style={{
+                    fontSize: AppFontSize.sm,
+                    fontFamily: "Inter-Regular",
+                    color: colors.primary.paragraph,
+                    flex: 1
+                  }}
+                >
+                  {search}
+                </Text>
+                <IconButton
+                  name="close"
+                  size={AppFontSize.lg}
+                  color={colors.primary.icon}
+                  type="plain"
+                  onPress={() =>
+                    useRecentSearchStore.getState().removeRecentSearch(search)
+                  }
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      ) : (
+        <List
+          data={results}
+          dataType={route.params?.type}
+          renderedInRoute={route.name}
+          groupType="search"
+          loading={loading}
+          placeholder={{
+            title: route.name,
+            paragraph: searchStatus || strings.searchInRoute(route.params?.title),
+            loading: strings.searchingFor(currentQuery.current as string)
+          }}
+        />
+      )}
       <SelectionHeader
         id={route.name}
         items={results}
