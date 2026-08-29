@@ -363,7 +363,10 @@ const ShareView = () => {
         : null;
       noteData = {
         content: {
-          data: (rawContent?.data || "") + "<br/>" + noteContent.current,
+          data:
+            (rawContent?.data || "") +
+            `<p data-spacing="single"><br></p>` +
+            noteContent.current,
           type: "tiptap"
         },
         id: note?.id,
