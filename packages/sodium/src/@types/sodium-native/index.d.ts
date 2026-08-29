@@ -545,7 +545,7 @@ declare module "sodium-native" {
    * * `publicKey` should be a public key.
    * * `secretKey` should be a secret key.
    *
-   * The encrypted message will be stored in `ciphertext` and the authentification code will be stored in `mac`.
+   * The encrypted message will be stored in `ciphertext` and the authentication code will be stored in `mac`.
    */
   export function crypto_box_detached(
     ciphertext: Buffer,
@@ -565,7 +565,7 @@ declare module "sodium-native" {
    * * `publicKey` should be a public key.
    * * `secretKey` should be a secret key.
    *
-   * The encrypted message and authentification code  will be stored in `ciphertext`.
+   * The encrypted message and authentication code  will be stored in `ciphertext`.
    */
   export function crypto_box_easy(
     ciphertext: Buffer,
@@ -661,9 +661,9 @@ declare module "sodium-native" {
    * * `mac` should be a buffer with length `crypto_secretbox_MACBYTES`.
    * * `message` should be a buffer of any length.
    * * `nonce` should be a buffer with length `crypto_secretbox_NONCEBYTES`.
-   * * `secretKey` should be a secret key with legnth `crypto_secretbox_KEYBYTES`.
+   * * `secretKey` should be a secret key with length `crypto_secretbox_KEYBYTES`.
    *
-   * The encrypted message will be stored in `ciphertext` and the authentification code will be stored in `mac`.
+   * The encrypted message will be stored in `ciphertext` and the authentication code will be stored in `mac`.
    */
   export function crypto_secretbox_detached(
     ciphertext: Buffer,
@@ -915,7 +915,7 @@ declare module "sodium-native" {
    *
    * * `output` should be a buffer of length `crypto_auth_BYTES`.
    * * `input` should be a buffer of any size.
-   * * `key` should be a buffer of lenght `crypto_auth_KEYBYTES`.
+   * * `key` should be a buffer of length `crypto_auth_KEYBYTES`.
    *
    * The generated token is stored in `output`.
    */
@@ -926,7 +926,7 @@ declare module "sodium-native" {
    *
    * * `output` should be a buffer of length `crypto_auth_BYTES`.
    * * `input` should be a buffer of any size.
-   * * `key` should be a buffer of lenght `crypto_auth_KEYBYTES`.
+   * * `key` should be a buffer of length `crypto_auth_KEYBYTES`.
    *
    * Returns `true` if the token could be verified. Otherwise `false`.
    *
@@ -1048,7 +1048,7 @@ declare module "sodium-native" {
    *
    * * `output` should be a buffer of length `crypto_onetimeauth_BYTES`.
    * * `input` should be a buffer of any size.
-   * * `key` should be a buffer of lenght `crypto_onetimeauth_KEYBYTES`.
+   * * `key` should be a buffer of length `crypto_onetimeauth_KEYBYTES`.
    *
    * Returns `true` if the token could be verified. Otherwise `false`.
    */
@@ -1289,7 +1289,7 @@ declare module "sodium-native" {
 
   /**
    * Maps a `crypto_core_ed25519_UNIFORMBYTES` bytes vector (usually the output of
-   * a hash function) to a a valid curve point and stores its compressed
+   * a hash function) to a valid curve point and stores its compressed
    * representation in `p`.
    *
    * The point is guaranteed to be on the main subgroup.

@@ -290,7 +290,7 @@ export function getChangedNodes(
 
     // Find all the nodes between the provided node range.
     tr.doc.nodesBetween(start, end, (node, pos) => {
-      // Check wether this is a node that should be added.
+      // Check whether this is a node that should be added.
       const shouldAdd = !predicate || predicate(node, start, range);
 
       if (shouldAdd && nodes.every((n) => n.pos !== pos)) {

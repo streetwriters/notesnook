@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { View } from "react-native";
-const Seperator = ({ half = false }) => {
+const Separator = ({ half = false }) => {
   return (
     <View
       style={{
@@ -30,4 +30,4 @@ const Seperator = ({ half = false }) => {
   );
 };
 
-export default Seperator;
+export default Separator;

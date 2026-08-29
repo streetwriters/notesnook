@@ -33,7 +33,7 @@ import AppIcon from "../../components/ui/AppIcon";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
 import { Pressable } from "../../components/ui/pressable";
-import Seperator from "../../components/ui/seperator";
+import Separator from "../../components/ui/separator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";

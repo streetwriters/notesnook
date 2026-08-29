@@ -28,7 +28,7 @@ export function ImportErrors(props: ImportErrorsProps) {
   return (
     <Accordion
       isClosed={false}
-      title={`${props.errors.length} errors occured`}
+      title={`${props.errors.length} errors occurred`}
       sx={{ bg: "background-error", borderRadius: "default", mt: 2 }}
       color="paragraph-error"
     >

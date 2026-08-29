@@ -1753,8 +1753,8 @@ For example:
   importCompleted: () => t`Import completed`,
   errorsOccured: (count: number) =>
     plural(count, {
-      one: "# error occured",
-      other: "# errors occured"
+      one: "# error occurred",
+      other: "# errors occurred"
     }),
   startOver: () => t`Start over`,
   filesReadyToImport: (count: number) =>
