@@ -392,18 +392,22 @@ export async function decrypt(password: SerializedKey, data: Cipher<"base64">) {
     try {
       return await Sodium.decrypt(key, _data);
     } catch (e) {
-      const fallbackKey = await Sodium.deriveKeyFallback?.(
-        password.password,
-        password.salt
-      );
-      if (Platform.OS === "ios" && fallbackKey) {
-        DatabaseLogger.info("Using fallback key for decryption");
+      // Whatever happens while trying the fallback must not replace the
+      // original failure: callers match on its message ("FAILURE") to report an
+      // incorrect password, and deriveKeyFallback can now reject on its own.
+      try {
+        const fallbackKey = await Sodium.deriveKeyFallback?.(
+          password.password,
+          password.salt
+        );
+        if (fallbackKey) {
+          DatabaseLogger.info("Using fallback key for decryption");
+          return await Sodium.decrypt(fallbackKey, _data);
+        }
+      } catch (fallbackError) {
+        DatabaseLogger.error(fallbackError, "Fallback decryption failed");
       }
-      if (fallbackKey) {
-        return await Sodium.decrypt(fallbackKey, _data);
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
@@ -428,18 +432,20 @@ export async function decryptMulti(
     try {
       return await Sodium.decryptMulti(key, data);
     } catch (e) {
-      const fallbackKey = await Sodium.deriveKeyFallback?.(
-        password.password,
-        password.salt as string
-      );
-      if (Platform.OS === "ios" && fallbackKey) {
-        DatabaseLogger.info("Using fallback key for decryption");
+      // See decrypt(): the original error is what callers act on.
+      try {
+        const fallbackKey = await Sodium.deriveKeyFallback?.(
+          password.password,
+          password.salt as string
+        );
+        if (fallbackKey) {
+          DatabaseLogger.info("Using fallback key for decryption");
+          return await Sodium.decryptMulti(fallbackKey, data);
+        }
+      } catch (fallbackError) {
+        DatabaseLogger.error(fallbackError, "Fallback decryption failed");
       }
-      if (fallbackKey) {
-        return await Sodium.decryptMulti(fallbackKey, data);
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
