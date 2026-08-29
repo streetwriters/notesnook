@@ -812,7 +812,7 @@ msgstr ""
 msgid "Align right"
 msgstr ""
 
-#: src/strings.ts:2813
+#: src/strings.ts:2809
 msgid "Alignment"
 msgstr ""
 
@@ -1358,6 +1358,10 @@ msgstr ""
 msgid "Browse"
 msgstr ""
 
+#: src/strings.ts:2811
+msgid "Browser storage quota reached. Please delete some attachments from the attachment manager or clear some local data to free up space."
+msgstr ""
+
 #: src/strings.ts:2286
 msgid "Bullet list"
 msgstr ""
@@ -1662,7 +1666,7 @@ msgstr ""
 msgid "Clear default notebook"
 msgstr ""
 
-#: src/strings.ts:2803
+#: src/strings.ts:2799
 msgid "Clear history"
 msgstr ""
 
@@ -1808,10 +1812,6 @@ msgstr ""
 
 #: src/strings.ts:1491
 msgid "Color title"
-msgstr ""
-
-#: src/strings.ts:2796
-msgid "Colornote password for {filename}"
 msgstr ""
 
 #: src/strings.ts:309
@@ -2303,7 +2303,7 @@ msgstr ""
 msgid "Delete all"
 msgstr ""
 
-#: src/strings.ts:2805
+#: src/strings.ts:2801
 msgid "Delete all version history for this note?"
 msgstr ""
 
@@ -2327,7 +2327,7 @@ msgstr ""
 msgid "Delete group"
 msgstr ""
 
-#: src/strings.ts:2799
+#: src/strings.ts:2795
 msgid "Delete item"
 msgstr ""
 
@@ -2796,6 +2796,10 @@ msgstr ""
 
 #: src/strings.ts:791
 msgid "Enter password"
+msgstr ""
+
+#: src/strings.ts:2812
+msgid "Enter password for \"{filename}\""
 msgstr ""
 
 #: src/strings.ts:2100
@@ -3824,7 +3828,7 @@ msgstr ""
 msgid "Keep open"
 msgstr ""
 
-#: src/strings.ts:2800
+#: src/strings.ts:2796
 msgid "Keep screen on"
 msgstr ""
 
@@ -4711,7 +4715,7 @@ msgstr ""
 msgid "Offline"
 msgstr ""
 
-#: src/strings.ts:2810
+#: src/strings.ts:2806
 msgid "Offline mode"
 msgstr ""
 
@@ -5197,7 +5201,7 @@ msgstr ""
 msgid "Prevent note title from appearing in tab/window title."
 msgstr ""
 
-#: src/strings.ts:2802
+#: src/strings.ts:2798
 msgid "Prevent the screen from turning off while the editor is focused."
 msgstr ""
 
@@ -6126,7 +6130,11 @@ msgid "Select day of the week to repeat the reminder."
 msgstr ""
 
 #: src/strings.ts:1765
-msgid "Select files to import"
+msgid "Select files"
+msgstr ""
+
+#: src/strings.ts:2813
+msgid "Select folder"
 msgstr ""
 
 #: src/strings.ts:1608
@@ -6883,10 +6891,6 @@ msgstr ""
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
 msgstr "<<<<<<< HEAD"
 
-#: src/strings.ts:2798
-msgid "The password for decrypting the Colornote backup file."
-msgstr ""
-
 #: src/strings.ts:2094
 msgid "The password/pin for unlocking the app."
 msgstr ""
@@ -7443,7 +7447,7 @@ msgstr ""
 msgid "Using {instance} (v{version})"
 msgstr ""
 
-#: src/strings.ts:2812
+#: src/strings.ts:2808
 msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
 msgstr ""
 
@@ -7515,7 +7519,7 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: src/strings.ts:2804
+#: src/strings.ts:2800
 msgid "Version history cleared"
 msgstr ""
 

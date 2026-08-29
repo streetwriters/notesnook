@@ -17,24 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  IFile,
-  IFileProvider,
-  ProviderSettings,
-  transform
-} from "@notesnook-importer/core";
+import { IFileProvider, ProviderSettings } from "@notesnook-importer/core";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { ScrollContainer } from "@notesnook/ui";
-import { Button, Flex, Input, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { useEffect, useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
 import { PromptDialog } from "../../../dialogs/prompt";
+import { ImporterSqliteAdapter } from "../../../common/sqlite/importer-sqlite-adapter";
 import Accordion from "../../accordion";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
 import { strings } from "@notesnook/intl";
+import { showFilePicker } from "../../../utils/file-picker";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -62,20 +58,6 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
   const [totalNoteCount, setTotalNoteCount] = useState(0);
   const [_, setCounter] = useState<number>(0);
   const logs = useRef<LogMessage[]>([]);
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles((files) => {
-      const newFiles = [...acceptedFiles, ...files];
-      return newFiles;
-    });
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      file: provider?.supportedExtensions?.concat([".zip"])
-    }
-  });
 
   useEffect(() => {
     setFiles([]);
@@ -122,14 +104,15 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         setTotalNoteCount(++totalNotes);
       },
       options: {
+        onenote: {
+          getPassword
+        },
         colornote: {
-          getPassword: async (filename: string) => {
-            const password = await PromptDialog.show({
-              title: strings.colorNotePasswordFor(filename),
-              description: strings.colorNotPasswordForDesc()
-            });
-            return password || undefined;
-          }
+          getPassword
+        },
+        applenotes: {
+          adapter: new ImporterSqliteAdapter(),
+          getPassword
         }
       }
     };
@@ -140,20 +123,26 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       done: 0
     });
 
-    for (const file of files) {
-      setFilesProgress((p) => ({
-        ...p,
-        done: p.done + 1
-      }));
+    const { transform } = await import("@notesnook-importer/core");
 
-      const providerFile: IFile = {
-        name: file.name,
-        modifiedAt: file.lastModified,
-        size: file.size,
-        data: file
-      };
-      errors.push(...(await transform(provider, [providerFile], settings)));
-    }
+    errors.push(
+      ...(await transform(
+        provider,
+        files.map((f) => ({
+          name: f.name,
+          modifiedAt: f.lastModified,
+          size: f.size,
+          data: f
+        })),
+        settings
+      ))
+    );
+
+    setFilesProgress({
+      total: files.length,
+      done: files.length
+    });
+
     await useAppStore.getState().refresh();
     onTransformFinished({
       totalNotes,
@@ -226,42 +215,53 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           how to import from {provider?.name}.
         </a>
       </Text>
-      <Flex
-        {...getRootProps()}
-        sx={{
-          justifyContent: "center",
-          alignItems: "center",
-          height: 100,
-          border: "2px dashed var(--border)",
-          borderRadius: "default",
-          mt: 2,
-          cursor: "pointer",
-          ":hover": {
-            bg: "background-secondary"
+      <Flex sx={{ mt: 1, gap: 1 }}>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            showFilePicker({
+              multiple: true,
+              acceptedFileTypes: provider?.supportedExtensions
+                ?.concat([".zip"])
+                .join(",")
+            }).then((newFiles) => {
+              setFiles((files) => {
+                const _files = [...files, ...newFiles];
+                return _files;
+              });
+            })
           }
-        }}
-      >
-        <Input {...getInputProps()} />
-        <Text variant="body" sx={{ textAlign: "center" }}>
-          {isDragActive
-            ? "Drop the files here"
-            : "Drag & drop files here, or click to select files"}
-          <br />
-          <Text variant="subBody">
-            Only {provider?.supportedExtensions.join(", ")} files are supported.{" "}
-            {provider?.supportedExtensions.includes(".zip") ? null : (
-              <>
-                You can also select .zip files containing{" "}
-                {provider?.supportedExtensions.join(", ")} files.
-              </>
-            )}
-            <br />
-            {provider.examples ? (
-              <>For example, {provider.examples.join(", ")}</>
-            ) : null}
-          </Text>
-        </Text>
+        >
+          {strings.selectFiles()}
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            showFilePicker({
+              directory: true
+            }).then((newFiles) => {
+              setFiles((files) => {
+                const _files = [...files, ...newFiles];
+                return _files;
+              });
+            });
+          }}
+        >
+          {strings.selectFolder()}
+        </Button>
       </Flex>
+      <Text variant="subBody" sx={{ mt: 1 }}>
+        Only {provider?.supportedExtensions.join(", ")} files are supported.{" "}
+        {provider?.supportedExtensions.includes(".zip") ? null : (
+          <>
+            You can also select .zip files containing{" "}
+            {provider?.supportedExtensions.join(", ")} files.
+          </>
+        )}
+        {provider.examples ? (
+          <> For example, {provider.examples.join(", ")}</>
+        ) : null}
+      </Text>
 
       {files.length > 0 ? (
         <Accordion
@@ -280,7 +280,13 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           >
             {files.map((file, index) => (
               <Flex
-                key={file.name}
+                key={
+                  file.name +
+                  file.size +
+                  file.lastModified +
+                  file.webkitRelativePath +
+                  index
+                }
                 sx={{
                   p: 2,
                   bg: index % 2 ? "transparent" : "background-secondary",
@@ -351,4 +357,12 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       )}
     </Flex>
   );
+}
+
+async function getPassword(filename: string) {
+  const password = await PromptDialog.show({
+    title: strings.passwordFor(filename),
+    type: "password"
+  });
+  return password || undefined;
 }

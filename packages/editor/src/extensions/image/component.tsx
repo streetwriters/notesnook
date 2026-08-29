@@ -60,18 +60,17 @@ export function ImageComponent(
   });
 
   const dom = editor.view.dom;
+  const downloadOptions = useToolbarStore((store) => store.downloadOptions);
+  const isReadonly = !editor.isEditable;
+  const isSVG = !!mime && mime.includes("/svg");
 
   const size =
     editor.view.dom.clientWidth === 0
       ? node.attrs
-      : clampSize(node.attrs, dom.clientWidth, aspectRatio);
+      : clampSize(node.attrs, dom.clientWidth, aspectRatio, isSVG);
 
   let align = node.attrs.align;
   if (!align) align = textDirection ? "right" : "left";
-
-  const downloadOptions = useToolbarStore((store) => store.downloadOptions);
-  const isReadonly = !editor.isEditable;
-  const isSVG = !!mime && mime.includes("/svg");
 
   useEffect(() => {
     if (!inView) return;
@@ -113,12 +112,114 @@ export function ImageComponent(
           }
         }}
       >
+        <DesktopOnly>
+          {selected && (
+            <Flex
+              sx={{
+                position: "absolute",
+                top: -40,
+                right: 0,
+                mb: 2,
+                alignItems: "end",
+                zIndex: 999
+              }}
+            >
+              <ToolbarGroup
+                editor={editor}
+                groupId="imageTools"
+                tools={
+                  isReadonly
+                    ? [
+                        hash ? "previewAttachment" : "none",
+                        hash ? "downloadAttachment" : "none"
+                      ]
+                    : [
+                        hash ? "previewAttachment" : "none",
+                        hash ? "downloadAttachment" : "none",
+                        "imageAlignLeft",
+                        "imageAlignCenter",
+                        "imageAlignRight",
+                        "imageProperties"
+                      ]
+                }
+                sx={{
+                  boxShadow: "menu",
+                  borderRadius: "default",
+                  bg: "background"
+                }}
+              />
+            </Flex>
+          )}
+          {Boolean(resizing) && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: -30,
+                left: 0,
+                zIndex: 9999,
+                background: "var(--background-secondary)",
+                px: 2,
+                py: 1,
+                borderRadius: "default"
+              }}
+            >
+              <Text variant="subBody" sx={{ fontWeight: "bold" }}>
+                {resizing?.width}
+                {" × "}
+                {resizing?.height}
+              </Text>
+            </Box>
+          )}
+        </DesktopOnly>
+        {isSVG ? (
+          <Box
+            sx={{
+              width: "100%",
+              display: editor.isEditable ? "flex" : "none",
+              position: "absolute",
+              top: -24,
+              height: 24,
+              justifyContent: "end",
+              p: "small",
+              bg: editor.isEditable
+                ? "var(--background-secondary)"
+                : "transparent",
+              borderTopLeftRadius: "default",
+              borderTopRightRadius: "default",
+              borderColor: selected ? "border" : "var(--border-secondary)",
+              cursor: "pointer",
+              ":hover": {
+                borderColor: "border"
+              }
+            }}
+          ></Box>
+        ) : null}
         <Resizer
-          style={{ marginTop: 5 }}
+          style={{
+            marginTop: 5,
+            ...(isSVG
+              ? { overflow: "auto", maxWidth: "100%", maxHeight: "80vh" }
+              : {})
+          }}
           enabled={editor.isEditable}
           selected={selected}
           width={size.width}
-          height={bloburl || src ? undefined : size.height}
+          height={
+            isSVG
+              ? Math.min(
+                  aspectRatio
+                    ? Math.min(
+                        size.width || dom.clientWidth,
+                        dom.clientWidth
+                      ) / aspectRatio
+                    : size.height || dom.clientWidth,
+                  window.innerHeight
+                )
+              : bloburl || src
+                ? undefined
+                : size.height
+          }
+          lockAspectRation={isSVG ? false : undefined}
           onResize={(width, height) => {
             setResizing({ width, height });
           }}
@@ -127,65 +228,6 @@ export function ImageComponent(
             editor.commands.setImageSize({ width, height });
           }}
         >
-          <DesktopOnly>
-            {selected && (
-              <Flex
-                sx={{
-                  position: "absolute",
-                  top: -40,
-                  right: 0,
-                  mb: 2,
-                  alignItems: "end",
-                  zIndex: 999
-                }}
-              >
-                <ToolbarGroup
-                  editor={editor}
-                  groupId="imageTools"
-                  tools={
-                    isReadonly
-                      ? [
-                          hash ? "previewAttachment" : "none",
-                          hash ? "downloadAttachment" : "none"
-                        ]
-                      : [
-                          hash ? "previewAttachment" : "none",
-                          hash ? "downloadAttachment" : "none",
-                          "imageAlignLeft",
-                          "imageAlignCenter",
-                          "imageAlignRight",
-                          "imageProperties"
-                        ]
-                  }
-                  sx={{
-                    boxShadow: "menu",
-                    borderRadius: "default",
-                    bg: "background"
-                  }}
-                />
-              </Flex>
-            )}
-            {Boolean(resizing) && (
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: -30,
-                  left: 0,
-                  zIndex: 9999,
-                  background: "var(--background-secondary)",
-                  px: 2,
-                  py: 1,
-                  borderRadius: "default"
-                }}
-              >
-                <Text variant="subBody" sx={{ fontWeight: "bold" }}>
-                  {resizing?.width}
-                  {" × "}
-                  {resizing?.height}
-                </Text>
-              </Box>
-            )}
-          </DesktopOnly>
           {progress ? (
             <Flex
               sx={{
@@ -281,7 +323,10 @@ export function ImageComponent(
               ? {
                   src: bloburl || corsify(src, downloadOptions?.corsHost),
                   type: mime,
-                  sandbox: ""
+                  // allow-same-origin is needed to read the SVG's viewBox
+                  // from contentDocument for correct aspect ratio detection.
+                  // The SVG content is from the user's own storage (trusted).
+                  sandbox: "allow-same-origin"
                 }
               : {
                   src: bloburl || corsify(src, downloadOptions?.corsHost)
@@ -296,7 +341,14 @@ export function ImageComponent(
                 ? "2px solid var(--accent) !important"
                 : "2px solid transparent !important",
               borderRadius: "default",
-              ...(isSVG ? { bg: "transparent" } : {})
+              ...(isSVG
+                ? {
+                    bg: "transparent",
+                    display: "block",
+                    minWidth: 0,
+                    minHeight: 0
+                  }
+                : {})
             }}
             onDoubleClick={() => {
               const { hash, filename, mime, size } = node.attrs;
@@ -311,6 +363,47 @@ export function ImageComponent(
             }}
             onLoad={async function onLoad() {
               if (!imageRef.current) return;
+
+              // For SVGs rendered as iframes, naturalWidth/naturalHeight are 0.
+              // Read the viewBox from the SVG contentDocument instead.
+              if (isSVG) {
+                try {
+                  const iframe = imageRef.current as unknown as HTMLIFrameElement;
+                  const svgEl =
+                    iframe.contentDocument?.querySelector("svg");
+                  const viewBox = svgEl?.getAttribute("viewBox");
+                  if (viewBox) {
+                    const parts = viewBox.split(/[\s,]+/).map(Number);
+                    if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+                      const svgAspectRatio = parts[2] / parts[3];
+                      if (
+                        !aspectRatio ||
+                        Math.abs(aspectRatio - svgAspectRatio) > 0.01
+                      ) {
+                        const fixedDimensions = fixAspectRatio(
+                          size.width ?? 0,
+                          svgAspectRatio
+                        );
+                        await editor.threadsafe((editor) =>
+                          editor.commands.updateAttachment(
+                            {
+                              ...fixedDimensions,
+                              aspectRatio: svgAspectRatio
+                            },
+                            {
+                              query: makeImageQuery(src, hash),
+                              ignoreEdit: true
+                            }
+                          )
+                        );
+                      }
+                    }
+                  }
+                } catch {
+                  // cross-origin or missing contentDocument — skip
+                }
+                return;
+              }
 
               const { naturalWidth, naturalHeight, clientHeight, clientWidth } =
                 imageRef.current;
@@ -389,7 +482,8 @@ function canParse(src: string) {
 function clampSize(
   size: { width?: number; height?: number },
   maxWidth: number,
-  aspectRatio?: number
+  aspectRatio?: number,
+  isSVG?: boolean
 ): { width: number; height: number } {
   if (typeof aspectRatio === "string" && isNaN(aspectRatio)) aspectRatio = 1;
 
@@ -397,6 +491,10 @@ function clampSize(
   if (!size.width || !size.height) return { width: maxWidth, height: maxWidth };
 
   if (!aspectRatio) aspectRatio = size.width / size.height;
+
+  // SVGs (especially infinite canvas exports from OneNote) should preserve
+  // their original dimensions. The container handles overflow via scrolling.
+  if (isSVG) return { width: size.width, height: size.height };
 
   if (size.width > maxWidth)
     return { width: maxWidth, height: maxWidth / aspectRatio };

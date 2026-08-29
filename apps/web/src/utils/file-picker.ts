@@ -21,17 +21,26 @@ import { PAGE_VISIBILITY_CHANGE } from "./page-visibility";
 import { strings } from "@notesnook/intl";
 import { TaskManager } from "../common/task-manager";
 
-type FilePickerOptions = { acceptedFileTypes: string; multiple?: boolean };
+type FilePickerOptions = {
+  acceptedFileTypes?: string;
+  multiple?: boolean;
+  directory?: boolean;
+};
 
 export async function showFilePicker({
   acceptedFileTypes,
-  multiple
+  multiple,
+  directory
 }: FilePickerOptions): Promise<File[]> {
   PAGE_VISIBILITY_CHANGE.ignore = true;
   const input = document.createElement("input");
   input.setAttribute("type", "file");
   input.setAttribute("multiple", `${multiple || false}`);
-  input.setAttribute("accept", acceptedFileTypes);
+  if (acceptedFileTypes) input.setAttribute("accept", acceptedFileTypes);
+  if (directory) {
+    input.setAttribute("webkitdirectory", "true");
+    input.setAttribute("directory", "true");
+  }
   input.dispatchEvent(new MouseEvent("click"));
   const result = await TaskManager.startTask<File[]>({
     type: "modal",
