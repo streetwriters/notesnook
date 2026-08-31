@@ -209,7 +209,6 @@ export const useEditorEvents = (
     };
   }, [editor, editor.commands, editor.postMessage]);
   useEffect(() => {
-    if (loading) return;
     if (typeof defaultFontFamily === "object") {
       SettingsService.set({
         defaultFontFamily: (defaultFontFamily as any).id
@@ -231,9 +230,9 @@ export const useEditorEvents = (
           ? parseInt(defaultFontSize)
           : defaultFontSize,
       fontFamily: SettingsService.get().defaultFontFamily,
-      dateFormat: db.settings?.getDateFormat(),
-      timeFormat: db.settings?.getTimeFormat(),
-      dayFormat: db.settings?.getDayFormat(),
+      dateFormat: dateFormat,
+      timeFormat: timeFormat,
+      dayFormat: dayFormat,
       fontScale,
       markdownShortcuts,
       features,
