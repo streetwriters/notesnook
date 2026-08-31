@@ -155,6 +155,13 @@ export default class Lookup {
           : [];
 
       const defaultVault = await this.db.vaults.default();
+
+      /**
+       * `notes` is a FilteredSelector whose `where` method mutates the selector.
+       * Thus the selector passed into `notesWithHighlighting` is mutated, which can cause unexpected results.
+       * To avoid this, we clone the selector before `where`.
+       */
+      notes = notes.clone();
       notes = notes.where((eb) => {
         const exprs = [];
         const tagsFilter = this.db.relations
