@@ -114,6 +114,8 @@ export const MoveNotebookDialog = DialogManager.register(
           variant="columnFill"
           sx={{
             height: "80vh",
+            minHeight: 0,
+            overflow: "hidden",
             px: 4
           }}
         >
