@@ -19,17 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Sodium from "@ammarahmed/react-native-sodium";
 import { DataURL, getFileNameWithExtension } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import type { ImageAttributes } from "@notesnook/editor";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import ImageViewer from "react-native-image-zoom-viewer";
-import { db } from "../../common/database";
+import { DatabaseLogger, db } from "../../common/database";
 import downloadAttachment from "../../common/filesystem/download-attachment";
 import { cacheDir } from "../../common/filesystem/utils";
 import {
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  ToastManager
 } from "../../services/event-manager";
 import BaseDialog from "../dialog/base-dialog";
 import { IconButton } from "../ui/icon-button";
@@ -37,7 +39,6 @@ import { ProgressBarComponent } from "../ui/svg/lazy";
 import RNFetchBlob from "react-native-blob-util";
 import Share from "react-native-share";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import { useSettingStore } from "../../stores/use-setting-store";
 import { DefaultAppStyles } from "../../utils/styles";
 import FileViewer from "react-native-file-viewer";
 
@@ -63,38 +64,48 @@ const ImagePreview = () => {
     setVisible(true);
     setLoading(true);
     setTimeout(async () => {
-      let hash = image.hash;
-      if (!hash && image.src && DataURL.toObject(image.src)) {
-        const data = DataURL.toObject(image.src);
-        if (!data) return;
-        hash = await Sodium.hashFile({
-          data: data.data,
-          type: "base64",
-          uri: ""
-        });
-        if (imageRef.current) {
-          imageRef.current.hash = hash;
+      try {
+        let hash = image.hash;
+        if (!hash && image.src && DataURL.toObject(image.src)) {
+          const data = DataURL.toObject(image.src);
+          if (!data) return;
+          hash = await Sodium.hashFile({
+            data: data.data,
+            type: "base64",
+            uri: ""
+          });
+          if (imageRef.current) {
+            imageRef.current.hash = hash;
+          }
         }
-      }
-      if (!hash) return;
-      //@ts-ignore // FIX ME
-      const uri = await downloadAttachment(hash, false, {
-        silent: true,
-        cache: true
-      });
+        if (!hash) return;
+        //@ts-ignore // FIX ME
+        const uri = await downloadAttachment(hash, false, {
+          silent: true,
+          cache: true
+        });
 
-      if (!uri) {
-        setLoading(false);
-        return;
-      }
-      const attachment = await db.attachments.attachment(hash);
-      const path = `${cacheDir}/${"NN_" + (await getFileNameWithExtension(hash, attachment?.mimeType))
+        if (!uri) return;
+
+        const attachment = await db.attachments.attachment(hash);
+        const path = `${cacheDir}/${
+          "NN_" + (await getFileNameWithExtension(hash, attachment?.mimeType))
         }`;
-      await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(() => {
-        /* empty */
-      });
-      setImage("file://" + path);
-      setLoading(false);
+        await RNFetchBlob.fs.mv(`${cacheDir}/${uri}`, path).catch(() => {
+          /* empty */
+        });
+        setImage("file://" + path);
+      } catch (e) {
+        DatabaseLogger.error(e);
+        ToastManager.show({
+          heading: strings.failToOpen(),
+          message: (e as Error)?.message,
+          type: "error",
+          context: "global"
+        });
+      } finally {
+        setLoading(false);
+      }
     }, 100);
   };
 
