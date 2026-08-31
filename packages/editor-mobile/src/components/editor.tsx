@@ -956,7 +956,7 @@ const Tiptap = ({
         </div>
 
         <TiptapEditorWrapper
-          key={tick + tab.id + "-editor"}
+          key={tick + tab.id + "-editor" + tab.session?.readonly}
           options={tiptapOptions}
           settings={settings}
           onEditorUpdate={(editor) => {
