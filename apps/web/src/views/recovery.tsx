@@ -39,7 +39,9 @@ import Logo from "../assets/notesnook-logo.png";
 import {
   KeyIcon,
   Trash,
+  CheckIcon,
   CheckCircle,
+  CaretRight,
   Copy,
   Download,
   FloppyDisk,
@@ -82,6 +84,7 @@ type NavigateFunction = <TRoute extends RecoveryRoutes>(
 type BaseRecoveryComponentProps<TRoute extends RecoveryRoutes> = {
   navigate: NavigateFunction;
   formData?: Partial<RecoveryFormData[TRoute]>;
+  user: User;
 };
 type RecoveryRoutes =
   | "methods"
@@ -168,11 +171,21 @@ function Recovery(props: RecoveryProps) {
   >();
 
   const [{ code, userId }] = useQueryParams();
-  useAuthenticateUser({ code, userId });
+  const { isAuthenticating, user } = useAuthenticateUser({ code, userId });
   const Route = useMemo(() => getRouteComponent(route), [route]);
   useEffect(() => {
     window.history.replaceState({}, "", makeURL(routePaths[route]));
   }, [route]);
+
+  if (isAuthenticating || !user)
+    return (
+      <AuthContainer>
+        <Loader
+          title="Authenticating user"
+          text="Please wait while you are authenticated."
+        />
+      </AuthContainer>
+    );
 
   return (
     <AuthContainer>
@@ -193,6 +206,7 @@ function Recovery(props: RecoveryProps) {
               setRoute(route);
             }}
             formData={storedFormData}
+            user={user}
           />
         )}
       </ScrollContainer>
@@ -226,7 +240,7 @@ const recoveryMethods: RecoveryMethod[] = [
 ];
 
 function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
-  const { navigate } = props;
+  const { navigate, user } = props;
   const [selected, setSelected] = useState(0);
 
   if (isSessionExpired()) {
@@ -272,7 +286,8 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
               flex: "1 1 auto",
               alignItems: "center",
               justifyContent: "space-between",
-              minWidth: 0
+              minWidth: 0,
+              gap: "spacing4"
             }}
           >
             <Flex sx={{ gap: "spacing3", alignItems: "flex-start" }}>
@@ -335,13 +350,18 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
                 WebkitAppearance: "none",
                 flexShrink: 0,
                 marginLeft: "10px",
-                width: 15,
-                height: 15,
+                width: 16,
+                height: 16,
                 borderRadius: "50%",
                 border:
                   index === selected
-                    ? "4px solid var(--accent)"
-                    : "1.5px solid var(--border)",
+                    ? "1px solid var(--accent)"
+                    : "1px solid var(--paragraph)",
+                background: index === selected ? "var(--accent)" : "none",
+                boxShadow:
+                  index === selected
+                    ? "inset 0 0 0 3px var(--background)"
+                    : "none",
                 cursor: "pointer",
                 margin: 0
               }}
@@ -350,12 +370,13 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
         </Flex>
       ))}
       <SubmitButton text={strings.continue()} />
+      <AuthenticatedAsCard user={user} />
     </RecoveryForm>
   );
 }
 
 function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
-  const { navigate, formData } = props;
+  const { navigate, formData, user } = props;
 
   return (
     <RecoveryForm
@@ -388,27 +409,56 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       />
       <SubmitButton text={strings.continue()} />
 
+      <AuthenticatedAsCard user={user} />
       <Button
         type="button"
-        mt={"spacing7"}
-        variant={"new_anchor"}
+        variant="secondary"
         onClick={() => navigate("methods")}
         sx={{
-          color: "paragraph",
-          textDecoration: "underline",
-          fontSize: "xs",
-          textAlign: "center",
-          alignSelf: "center"
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "spacing7",
+          p: "spacing5",
+          mt: "spacing6",
+          borderRadius: "radius2",
+          width: "100%"
         }}
       >
-        {strings.dontHaveRecoveryKey()}
+        <Flex sx={{ alignItems: "center", gap: "spacing4", flex: "1 0 0" }}>
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: 32,
+              height: 32,
+              bg: "background-tertiary",
+              borderRadius: "radius1"
+            }}
+          >
+            <KeyIcon size={15} color="icon" />
+          </Flex>
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              textAlign: "left"
+            }}
+          >
+            Don’t have account recovery key?
+          </Text>
+        </Flex>
+        <CaretRight size={13} color="icon" />
       </Button>
     </RecoveryForm>
   );
 }
 
 function NewPassword(props: BaseRecoveryComponentProps<"new">) {
-  const { navigate, formData } = props;
+  const { navigate, formData, user } = props;
 
   return (
     <RecoveryForm
@@ -471,13 +521,14 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
                 : strings.continue()
             }
           />
+          <AuthenticatedAsCard user={user} />
         </>
       )}
     </RecoveryForm>
   );
 }
 
-function Final(_props: BaseRecoveryComponentProps<"final">) {
+function Final() {
   const [recoveryKey, setRecoveryKey] = useState<string>();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -574,6 +625,71 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
         </Button>
       </Flex>
     </RecoveryForm>
+  );
+}
+
+function AuthenticatedAsCard({ user }: { user: User }) {
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "spacing4",
+        p: "spacing5",
+        mt: "spacing6",
+        bg: "background-secondary",
+        borderRadius: "radius2"
+      }}
+    >
+      <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            width: 32,
+            height: 32,
+            bg: "background-tertiary",
+            borderRadius: "radius1"
+          }}
+        >
+          <CheckIcon size={15} color="icon" />
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3", minWidth: 0 }}>
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            Authenticated as {user.email}
+          </Text>
+          <Text sx={{ color: "paragraph", fontSize: "xs", lineHeight: 1 }}>
+            {strings.rememberedYourPassword()}
+          </Text>
+        </Flex>
+      </Flex>
+      <Button
+        type="button"
+        variant="new_anchor"
+        onClick={() => openURL("/login")}
+        sx={{
+          flexShrink: 0,
+          color: "accent",
+          fontSize: "xs",
+          fontWeight: 500,
+          p: 0,
+          textDecoration: "none"
+        }}
+      >
+        {strings.login()}
+      </Button>
+    </Flex>
   );
 }
 

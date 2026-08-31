@@ -49,10 +49,11 @@ export const THEME_LIGHT: any = {
         heading: "#181818",
         icon: "#181818",
         separator: "#E5E5E5",
-        placeholder: "#858585",
+        placeholder: "#414141",
         hover: "#eee",
         backdrop: "#0000001a",
-        buttonForeground: "#181818"
+        buttonForeground: "#181818",
+        label: "#828282"
       },
       secondary: {
         accent: "#0D9E46",
