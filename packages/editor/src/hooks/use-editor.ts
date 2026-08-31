@@ -148,4 +148,10 @@ function destroyView(view: EditorView) {
   view.dispatchEvent = () => {};
   view.setProps = () => {};
   view.destroy();
+
+  // Tiptap points the element back at the editor when it builds the view and
+  // never lets go of it. Anything still holding the element -- and a detached
+  // element is easy to hold by accident -- would otherwise keep the editor, its
+  // state and the whole note alive with it.
+  delete (view.dom as HTMLElement & { editor?: unknown }).editor;
 }
