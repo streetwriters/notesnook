@@ -21,6 +21,7 @@ import { Extension } from "@tiptap/core";
 import { EditorState, Plugin, PluginKey, Transaction } from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
 import { profiler } from "../../utils/profiler.js";
+import { setProfiledEditor } from "./console.js";
 
 export const profilerKey = new PluginKey("notesnook-profiler");
 
@@ -313,6 +314,17 @@ function countStillHeld(list: Watched[], name: string): void {
 function recordLifetimes(): void {
   countStillHeld(watchedEditors, "editors");
   countStillHeld(watchedViews, "views");
+
+  // A view that was destroyed should have taken its element out of the page
+  // with it. One still attached means nothing ever removed it, which is a very
+  // different problem from a detached one that some reference will not let go.
+  let attached = 0;
+  for (const entry of watchedViews) {
+    if (!entry.done) continue;
+    const view = entry.ref.deref() as EditorView | undefined;
+    if (view?.dom.isConnected) attached++;
+  }
+  profiler.gauge("editor.viewsLeakedAttached", attached);
 }
 
 export function profilerPlugin(): Plugin {
@@ -356,6 +368,7 @@ export const EditorProfiler = Extension.create({
   // it yet while the view is being built.
   onCreate() {
     profiler.count("editor.editorsCreated");
+    setProfiledEditor(this.editor);
     const watched = watch(watchedEditors, this.editor);
     if (watched) watchByEditor.set(this.editor, watched);
   },

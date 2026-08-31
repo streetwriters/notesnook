@@ -45,7 +45,6 @@ import {
   toFlatPosition,
   type Selection
 } from "@notesnook/editor";
-import { installProfilerGlobals, setProfiledEditor } from "./profiling";
 import { Box, Flex } from "@theme-ui/components";
 import {
   PropsWithChildren,
@@ -172,8 +171,6 @@ function updateNoteStatistics(id: string, content: () => Fragment) {
 }
 
 const deferredUpdateNoteStatistics = debounce(updateNoteStatistics, 1000);
-
-installProfilerGlobals();
 
 function TipTap(props: TipTapProps) {
   const {
@@ -304,7 +301,6 @@ function TipTap(props: TipTapProps) {
       autofocus: false,
       onFocus,
       onCreate: async ({ editor }) => {
-        setProfiledEditor(editor as Editor);
         profiler.setContext("virtualization", virtualization);
         profiler.setContext("noteId", id);
         profiler.setContext("topLevelBlocks", editor.state.doc.childCount);
@@ -383,7 +379,6 @@ function TipTap(props: TipTapProps) {
         );
       },
       onDestroy: () => {
-        setProfiledEditor(undefined);
         useEditorManager.getState().setEditor(id);
       },
       onTransaction: ({ editor, transaction }) => {
