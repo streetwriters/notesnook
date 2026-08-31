@@ -17,20 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Node as ProsemirrorNode } from "@tiptap/pm/model";
+import { profiler } from "./profiler.js";
+
 export type TOCItem = {
   level: number;
   title: string;
   id: string;
   top: number;
-};
-
-const levelsMap: Record<string, number> = {
-  H1: 1,
-  H2: 2,
-  H3: 3,
-  H4: 4,
-  H5: 5,
-  H6: 6
 };
 
 function getOffsetTopRelativeTo(
@@ -50,21 +44,33 @@ function getOffsetTopRelativeTo(
   return top;
 }
 
-export function getTableOfContents(content: HTMLElement) {
+/**
+ * Builds the table of contents from the document state rather than the rendered
+ * DOM. With block virtualization the off-screen headings are content-less
+ * placeholders (no `h1`–`h6` element), so a DOM query would miss them. We still
+ * read each heading's pixel offset from its `data-block-id` element (present for
+ * placeholders too) so the active-section highlight keeps working.
+ *
+ * Only top-level headings are included; headings nested inside callouts are
+ * skipped, matching the previous behaviour (the walk never descends into them).
+ */
+export function getTableOfContents(
+  doc: ProsemirrorNode,
+  content: HTMLElement
+): TOCItem[] {
+  const end = profiler.start("toc.build");
   const tableOfContents: TOCItem[] = [];
   let level = -1;
   let prevHeading = 0;
-  for (const heading of content.querySelectorAll<HTMLHeadingElement>(
-    "h1, h2, h3, h4, h5, h6"
-  )) {
-    const title = heading.textContent;
-    const id = heading.dataset.blockId;
-    if (!id || !title) continue;
-    const nodeName = heading.nodeName;
-    const currentHeading = levelsMap[nodeName];
 
-    const isInsideCallout = !!closestWithin(heading, ".callout", content);
-    if (isInsideCallout) continue;
+  const visit = (node: ProsemirrorNode) => {
+    if (node.type.name !== "heading") return;
+
+    const title = node.textContent;
+    const id = node.attrs.blockId as string | undefined;
+    if (!id || !title) return;
+
+    const currentHeading = (node.attrs.level as number) || 1;
 
     level =
       prevHeading < currentHeading
@@ -75,13 +81,26 @@ export function getTableOfContents(content: HTMLElement) {
     level = Math.max(0, level);
     prevHeading = currentHeading;
 
+    const element = content.querySelector<HTMLElement>(
+      `[data-block-id=${JSON.stringify(id)}]`
+    );
+
     tableOfContents.push({
       level,
       title,
       id,
-      top: getOffsetTopRelativeTo(heading, content)
+      top: element ? getOffsetTopRelativeTo(element, content) : 0
     });
-  }
+  };
+
+  doc.forEach((node) => {
+    if (node.type.name === "page") node.forEach(visit);
+    else visit(node);
+  });
+
+  end();
+  profiler.count("toc.builds");
+  profiler.gauge("toc.headings", tableOfContents.length);
   return tableOfContents;
 }
 
@@ -112,17 +131,4 @@ export function scrollIntoViewById(blockId: string, optionalStyles = "") {
       100
     );
   }
-}
-
-function closestWithin(
-  element: Element,
-  selector: string,
-  boundary: Element
-): Element | null {
-  let current: Element | null = element;
-  while (current && current !== boundary) {
-    if (current.matches(selector)) return current;
-    current = current.parentElement;
-  }
-  return null;
 }

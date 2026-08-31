@@ -47,6 +47,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
+import { ScrollAnchor } from "@notesnook/editor";
 import Tiptap, { OnChangeHandler } from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
@@ -508,6 +509,7 @@ export function Editor(props: EditorProps) {
     (store) => store.saveSessionContentIfNotSaved
   );
   const setEditorSaveState = useEditorStore((store) => store.setSaveState);
+  const restoredScroll = useRef(false);
   useScrollToBlock(session);
   useScrollToSearchResult(session);
 
@@ -546,6 +548,10 @@ export function Editor(props: EditorProps) {
       const editor = useEditorManager.getState().getEditor(id)?.editor;
       const selection = editor?.getSelection();
       if (selection) Config.set(`${id}:selection`, selection);
+      // the scroll handler is debounced, so a reload right after scrolling
+      // would otherwise lose the position
+      const anchor = editor?.getScrollAnchor();
+      if (anchor) Config.set(`${id}:scroll-anchor`, anchor);
     };
   }, [id]);
 
@@ -562,9 +568,19 @@ export function Editor(props: EditorProps) {
           corsHost: Config.get("corsProxy", "https://cors.notesnook.com")
         }}
         onLoad={(editor) => {
-          editor = editor || useEditorManager.getState().getEditor(id)?.editor;
+          // Only once: the viewport corrects the scroll itself as pages are
+          // measured, and restoring again would undo those corrections.
+          if (!restoredScroll.current) {
+            restoredScroll.current = restoreScrollPosition(
+              session,
+              editor || useEditorManager.getState().getEditor(id)?.editor,
+              () => (restoredScroll.current = true)
+            );
+          }
+          // The caret is only put back once the editor is fully created. Doing
+          // it earlier as well means it is moved twice, and the editor scrolls
+          // to follow the caret each time.
           if (editor) restoreSelection(editor, id);
-          restoreScrollPosition(session);
         }}
         onSelectionChange={({ from, to }) => {
           Config.set(`${id}:selection`, { from, to });
@@ -760,6 +776,11 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             const scrollTop = e.target.scrollTop;
             Config.set(`${id}:scroll-position`, scrollTop);
           }
+          const anchor = useEditorManager
+            .getState()
+            .getEditor(id)
+            ?.editor?.getScrollAnchor();
+          Config.set(`${id}:scroll-anchor`, anchor ?? null);
         }, 500)}
       >
         <Flex
@@ -944,8 +965,50 @@ function isFile(e: DragEvent) {
   );
 }
 
-function restoreScrollPosition(session: EditorSession) {
-  if (session?.activeBlockId) return scrollIntoViewById(session.activeBlockId);
+/** The editor is not always registered yet when a note first loads. */
+function retryScrollAnchor(
+  sessionId: string,
+  anchor: ScrollAnchor,
+  done: () => void,
+  tries = 5
+) {
+  if (tries <= 0) return;
+  requestAnimationFrame(() => {
+    const editor = useEditorManager.getState().getEditor(sessionId)?.editor;
+    if (editor?.restoreScrollAnchor(anchor)) return done();
+    retryScrollAnchor(sessionId, anchor, done, tries - 1);
+  });
+}
+
+/** Returns whether the position was restored, so it is only attempted once. */
+function restoreScrollPosition(
+  session: EditorSession,
+  editor?: IEditor,
+  onRestored: () => void = () => undefined
+): boolean {
+  if (session?.activeBlockId) {
+    scrollIntoViewById(session.activeBlockId);
+    return true;
+  }
+
+  // Restoring by block avoids the guesswork: a saved pixel offset was measured
+  // against a fully rendered document, and a paged one only knows estimated
+  // heights until it renders. The editor reveals the page holding the block
+  // before scrolling, so the position it lands on is the real one.
+  //
+  // Once there is an anchor the pixel path must not run at all, not even as a
+  // fallback: it scrolls to an offset that means something else now, and its
+  // ResizeObserver fires again every time a page renders and changes the
+  // document's height.
+  const anchor = Config.get<ScrollAnchor | null>(
+    `${session.id}:scroll-anchor`,
+    null
+  );
+  if (anchor) {
+    if (editor?.restoreScrollAnchor(anchor)) return true;
+    retryScrollAnchor(session.id, anchor, onRestored);
+    return false;
+  }
 
   const scrollContainer = document.getElementById(`editorScroll_${session.id}`);
   const scrollPosition = Config.get(`${session.id}:scroll-position`, 0);
@@ -968,12 +1031,14 @@ function restoreScrollPosition(session: EditorSession) {
     } else
       requestAnimationFrame(() => (scrollContainer.scrollTop = scrollPosition));
   }
+  return true;
 }
 
 function restoreSelection(editor: IEditor, id: string) {
   setTimeout(() => {
     editor.focus({
-      position: Config.get(`${id}:selection`)
+      position: Config.get(`${id}:selection`),
+      scrollIntoView: false
     });
   });
 }

@@ -48,6 +48,7 @@ import {
   toggleHeaderCell
 } from "./prosemirror-tables/commands.js";
 import { fixTables } from "./prosemirror-tables/fixtables.js";
+import { renderedRanges } from "../paging/state.js";
 import { CellSelection } from "./prosemirror-tables/cellselection.js";
 import { columnResizing } from "./prosemirror-tables/columnresizing.js";
 import { tableEditing } from "./prosemirror-tables/index.js";
@@ -496,7 +497,8 @@ export const Table = Node.create<TableOptions>({
               cellMinWidth: this.options.cellMinWidth,
               View: TableNodeView(this.editor),
               showResizeHandleOnSelection:
-                this.options.showResizeHandleOnSelection
+                this.options.showResizeHandleOnSelection,
+              renderedRanges
             })
           ]
         : [tiptapTableView(this.editor, this.options.cellMinWidth)]),

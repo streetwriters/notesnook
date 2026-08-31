@@ -137,8 +137,8 @@ export const TrashIntervalPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item === 1
-        ? strings.reminderRecurringMode.day()
-        : strings.days(item);
+      ? strings.reminderRecurringMode.day()
+      : strings.days(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 1, 7, 30, 365] as TrashCleanupInterval[],
@@ -294,10 +294,10 @@ export const ApplockTimerPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item === 0 || item === undefined
-        ? strings.immediately()
-        : item === 1
-          ? strings.minutes(1)
-          : strings.minutes(item);
+      ? strings.immediately()
+      : item === 1
+      ? strings.minutes(1)
+      : strings.minutes(item);
   },
   getItemKey: (item) => item.toString(),
   options: [-1, 0, 1, 5, 15, 30],
@@ -321,8 +321,8 @@ export const VaultLockTimerPicker = createSettingsPicker({
     return item === -1
       ? strings.never()
       : item < 1000 * 60 * 60
-        ? strings.minutes(item / (1000 * 60))
-        : strings.hours(item / (1000 * 60 * 60));
+      ? strings.minutes(item / (1000 * 60))
+      : strings.hours(item / (1000 * 60 * 60));
   },
   getItemKey: (item) => item.toString(),
   options: [
@@ -349,8 +349,8 @@ export const ImageCompressionPicker = createSettingsPicker({
     return item === "ask-every-time"
       ? strings.askEveryTime()
       : item === "enabled"
-        ? strings.enableRecommended()
-        : strings.disable();
+      ? strings.enableRecommended()
+      : strings.disable();
   },
   getItemKey: (item) => item,
   options: [

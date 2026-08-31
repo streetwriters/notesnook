@@ -24,8 +24,9 @@ import {
   AttributeUpdate,
   BatchAttributeStep
 } from "../../utils/batch-attribute-step.js";
+import { profiler } from "../../utils/profiler.js";
 
-const NESTED_BLOCK_ID_TYPES = ["callout"];
+const NESTED_BLOCK_ID_TYPES = ["callout", "page"];
 const BLOCK_ID_TYPES = [
   "paragraph",
   "heading",
@@ -41,7 +42,8 @@ const BLOCK_ID_TYPES = [
   "outlineList",
   "mathBlock",
   "webclip",
-  "embed"
+  "embed",
+  "page"
 ];
 
 export const BlockId = Extension.create({
@@ -78,40 +80,49 @@ export const BlockId = Extension.create({
           const isDocChanged = transactions.some((tr) => tr.docChanged);
           if (!isDocChanged) return null;
 
-          const blockIds = new Set<string>();
-          const updates: AttributeUpdate[] = [];
-          const { tr } = newState;
+          return profiler.time("blockId.appendTransaction", () => {
+            const blockIds = new Set<string>();
+            const updates: AttributeUpdate[] = [];
+            const { tr } = newState;
+            let scanned = 0;
 
-          tr.doc.forEach(function addBlockId(n, offset) {
-            if (!n.isBlock || !BLOCK_ID_TYPES.includes(n.type.name)) return;
+            tr.doc.forEach(function addBlockId(n, offset) {
+              if (!n.isBlock || !BLOCK_ID_TYPES.includes(n.type.name)) return;
 
-            const currentId = n.attrs.blockId;
-            const shouldUpdateId = !currentId || blockIds.has(currentId);
-            const finalId = shouldUpdateId ? nanoid(8) : currentId;
+              scanned++;
+              const currentId = n.attrs.blockId;
+              const shouldUpdateId = !currentId || blockIds.has(currentId);
+              const finalId = shouldUpdateId ? nanoid(8) : currentId;
 
-            if (shouldUpdateId) {
-              updates.push({
-                pos: offset,
-                attrName: "blockId",
-                value: finalId
-              });
+              if (shouldUpdateId) {
+                updates.push({
+                  pos: offset,
+                  attrName: "blockId",
+                  value: finalId
+                });
+              }
+
+              blockIds.add(finalId);
+
+              if (NESTED_BLOCK_ID_TYPES.includes(n.type.name))
+                n.forEach((n, pos) => addBlockId(n, offset + pos + 1));
+            });
+
+            profiler.count("blockId.blocksScanned", scanned);
+            profiler.gauge("blockId.blocksPerScan", scanned);
+
+            if (updates.length > 0) {
+              profiler.count("blockId.idsAssigned", updates.length);
+              profiler.count("blockId.transactionsAppended");
+              tr.step(new BatchAttributeStep(updates));
+              tr.setMeta("ignoreEdit", true);
+              // Transaction.addStep always clears storedMarks
+              if (newState.storedMarks) tr.setStoredMarks(newState.storedMarks);
+              return tr;
             }
 
-            blockIds.add(finalId);
-
-            if (NESTED_BLOCK_ID_TYPES.includes(n.type.name))
-              n.forEach((n, pos) => addBlockId(n, offset + pos + 1));
+            return null;
           });
-
-          if (updates.length > 0) {
-            tr.step(new BatchAttributeStep(updates));
-            tr.setMeta("ignoreEdit", true);
-            // Transaction.addStep always clears storedMarks
-            if (newState.storedMarks) tr.setStoredMarks(newState.storedMarks);
-            return tr;
-          }
-
-          return null;
         }
       })
     ];

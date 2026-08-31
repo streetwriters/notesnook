@@ -23,6 +23,7 @@ import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 import { EditorView } from "@tiptap/pm/view";
 import { useEditorSearchStore } from "../toolbar/stores/search-store.js";
+import { profiler } from "../utils/profiler.js";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -34,9 +35,13 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const editor = useMemo<Editor>(() => new Editor(options), []);
+  const editor = useMemo<Editor>(
+    () => profiler.time("editor.construct", () => new Editor(options)),
+    []
+  );
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
+  const isFirstRun = useRef(true);
 
   useEffect(
     () => {
@@ -49,14 +54,28 @@ export const useEditor = (
       options.onBeforeCreate?.({ editor });
       const oldIsFocused = editor.isFocused;
 
-      destroyView(editor.view);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore instead of creating a new editor, we just create
-      // a new view. Due to some reason this is faster than resetting
-      // the state of the same view.
-      editor.createView();
-      if (oldIsFocused && !editor.isFocused) editor.commands.focus();
-      options.onCreate?.({ editor: editor });
+      // The Editor constructor already rendered a view into the same element,
+      // so replacing it on the first run means rendering the whole document
+      // twice. Only later runs (changed options) need a fresh view.
+      const firstRun = isFirstRun.current;
+      if (firstRun) {
+        isFirstRun.current = false;
+      } else {
+        profiler.time("editor.destroyView", () => destroyView(editor.view));
+        profiler.time("editor.createView", () => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore instead of creating a new editor, we just create
+          // a new view. Due to some reason this is faster than resetting
+          // the state of the same view.
+          editor.createView();
+        });
+      }
+      // Restoring focus must not drag the view to the caret.
+      if (oldIsFocused && !editor.isFocused)
+        editor.commands.focus(null, { scrollIntoView: false });
+      // The Editor constructor emits `create` for the view it made, so calling
+      // the option here as well would run every consumer twice on load.
+      if (!firstRun) options.onCreate?.({ editor: editor });
 
       const { searchTerm, ...searchOptions } = useEditorSearchStore.getState();
       if (!searchOptions.isSearching) {
@@ -129,4 +148,10 @@ function destroyView(view: EditorView) {
   view.dispatchEvent = () => {};
   view.setProps = () => {};
   view.destroy();
+
+  // Tiptap points the element back at the editor when it builds the view and
+  // never lets go of it. Anything still holding the element -- and a detached
+  // element is easy to hold by accident -- would otherwise keep the editor, its
+  // state and the whole note alive with it.
+  delete (view.dom as HTMLElement & { editor?: unknown }).editor;
 }

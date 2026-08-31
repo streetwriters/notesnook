@@ -27,7 +27,6 @@ import {
   Editor,
   AttachmentType,
   usePermissionHandler,
-  getHTMLFromFragment,
   Fragment,
   type DownloadOptions,
   getTotalWords,
@@ -38,6 +37,12 @@ import {
   getTableOfContents,
   getChangedNodes,
   LinkAttributes,
+  fromFlatPosition,
+  getScrollAnchor,
+  profiler,
+  restoreScrollAnchor,
+  serializeDocumentHTML,
+  toFlatPosition,
   type Selection
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
@@ -115,6 +120,7 @@ type TipTapProps = {
   dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
+  virtualization: boolean;
 };
 
 function countCharacters(text: string) {
@@ -137,6 +143,7 @@ function countSpaces(text: string) {
 }
 
 function updateNoteStatistics(id: string, content: () => Fragment) {
+  const end = profiler.start("statistics.update");
   const fragment = content();
   const documentText = fragment.textBetween(0, fragment.size, "\n", " ");
   useEditorManager.getState().updateEditor(id, {
@@ -159,6 +166,8 @@ function updateNoteStatistics(id: string, content: () => Fragment) {
       }
     }
   });
+  end();
+  profiler.count("statistics.updates");
 }
 
 const deferredUpdateNoteStatistics = debounce(updateNoteStatistics, 1000);
@@ -190,10 +199,17 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    virtualization
   } = props;
 
   const autoSave = useRef(true);
+
+  useEffect(() => {
+    profiler.count("editor.mounts");
+    profiler.event("editor.mount", { id });
+    return () => profiler.count("editor.unmounts");
+  }, []);
   const { toolbarConfig } = useToolbarConfig();
   const features = useAreFeaturesAvailable([
     "callout",
@@ -245,7 +261,9 @@ function TipTap(props: TipTapProps) {
             event.preventDefault();
             onChange?.(
               () =>
-                getHTMLFromFragment(editor.state.doc.content, editor.schema),
+                profiler.time("serialize.manualSave", () =>
+                  serializeDocumentHTML(editor.state.doc, editor.schema)
+                ),
               false
             );
           }
@@ -268,6 +286,7 @@ function TipTap(props: TipTapProps) {
       },
       enableInputRules: markdownShortcuts,
       enableFontLigatures: fontLigatures,
+      virtualization,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -276,19 +295,30 @@ function TipTap(props: TipTapProps) {
       element: editorContainer(),
       editable: !readonly,
       content: content?.(),
-      autofocus: "start",
+      // Tiptap's autofocus scrolls to the caret a frame after the editor is
+      // created, which would undo the restored scroll position. The caret is
+      // placed by the selection restore instead.
+      autofocus: false,
       onFocus,
       onCreate: async ({ editor }) => {
+        profiler.setContext("virtualization", virtualization);
+        profiler.setContext("noteId", id);
+        profiler.setContext("topLevelBlocks", editor.state.doc.childCount);
+        profiler.setContext("characters", editor.state.doc.textContent.length);
+        profiler.event("editor.created");
+
         if (oldNonce.current !== nonce)
-          editor.commands.focus("start", { scrollIntoView: true });
+          editor.commands.focus("start", { scrollIntoView: false });
         oldNonce.current = nonce;
 
-        const instance = toIEditor(editor as Editor);
-        if (onLoad) onLoad(instance);
+        const editorInstance = instance.current ?? toIEditor(editor as Editor);
+        if (onLoad) onLoad(editorInstance);
 
-        const totalWords = getTotalWords(editor as Editor);
+        const totalWords = profiler.time("statistics.totalWords", () =>
+          getTotalWords(editor as Editor)
+        );
         useEditorManager.getState().setEditor(id, {
-          editor: instance,
+          editor: editorInstance,
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           statistics: {
@@ -309,7 +339,7 @@ function TipTap(props: TipTapProps) {
               selected: 0
             }
           },
-          tableOfContents: getTableOfContents(editor.view.dom)
+          tableOfContents: getTableOfContents(editor.state.doc, editor.view.dom)
         });
       },
       onUpdate: ({ editor, transaction }) => {
@@ -319,7 +349,10 @@ function TipTap(props: TipTapProps) {
         });
         if (changedHeadings.length > 0) {
           useEditorManager.getState().updateEditor(id, {
-            tableOfContents: getTableOfContents(editor.view.dom)
+            tableOfContents: getTableOfContents(
+              editor.state.doc,
+              editor.view.dom
+            )
           });
         }
 
@@ -332,10 +365,16 @@ function TipTap(props: TipTapProps) {
         if (ignoreEdit || preventSave || !editor.isEditable || !onChange)
           return;
 
-        if (!autoSave.current) return;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+          return;
+        }
 
         onChange(
-          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          () =>
+            profiler.time("serialize.autoSave", () =>
+              serializeDocumentHTML(editor.state.doc, editor.schema)
+            ),
           ignoreEdit
         );
       },
@@ -347,7 +386,7 @@ function TipTap(props: TipTapProps) {
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           tableOfContents: transaction.getMeta("isUpdatingContent")
-            ? getTableOfContents(editor.view.dom)
+            ? getTableOfContents(editor.state.doc, editor.view.dom)
             : useEditorManager.getState().getEditor(id)?.tableOfContents
         });
       },
@@ -356,7 +395,11 @@ function TipTap(props: TipTapProps) {
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
-        if (onSelectionChange) onSelectionChange(transaction.selection);
+        if (onSelectionChange)
+          onSelectionChange({
+            from: toFlatPosition(editor.state.doc, transaction.selection.from),
+            to: toFlatPosition(editor.state.doc, transaction.selection.to)
+          });
         useEditorManager.getState().updateEditor(id, (old) => {
           const oldSelected = old.statistics?.words?.selected;
           const oldWords = old.statistics?.words.total || 0;
@@ -493,7 +536,8 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    virtualization
   ]);
 
   const editor = useTiptap(
@@ -501,6 +545,15 @@ function TipTap(props: TipTapProps) {
     // IMPORTANT: only put stuff here that the editor depends on.
     [tiptapOptions]
   );
+
+  // Registered before the browser paints. `onCreate` runs a task later, and
+  // whoever restores the scroll position needs the editor in the frame the note
+  // first appears in, or the note paints at the top and then jumps.
+  const instance = useRef<IEditor>();
+  useLayoutEffect(() => {
+    instance.current = toIEditor(editor as Editor);
+    useEditorManager.getState().setEditor(id, { editor: instance.current });
+  }, [editor, id]);
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -525,14 +578,18 @@ function TipTap(props: TipTapProps) {
   }, [editor]);
 
   useEffect(() => {
+    const update = (totalWords?: number) => {
+      autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+    };
+
+    // The editor's statistics are set from `onCreate`, which runs before this
+    // effect, and a store subscription only fires on later changes. Without
+    // seeding from the current value auto-save stays on for large notes.
+    update(useEditorManager.getState().editors[id]?.statistics?.words.total);
+
     const unsubscribe = useEditorManager.subscribe(
       (s) => s.editors[id]?.statistics?.words.total,
-      (totalWords) => {
-        autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
-        if (!autoSave.current) {
-          onAutoSaveDisabled();
-        }
-      }
+      update
     );
     return () => {
       unsubscribe();
@@ -600,6 +657,7 @@ function TiptapWrapper(
       | "dayFormat"
       | "markdownShortcuts"
       | "fontLigatures"
+      | "virtualization"
     >
   > & {
     isHydrating?: boolean;
@@ -619,6 +677,9 @@ function TiptapWrapper(
     (store) => store.markdownShortcuts
   );
   const fontLigatures = useSettingsStore((store) => store.fontLigatures);
+  const virtualization = useSettingsStore(
+    (store) => store.editorVirtualization
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig, setEditorConfig } = useEditorConfig();
@@ -642,7 +703,10 @@ function TiptapWrapper(
       theme.scopes.base.primary.paragraph;
   }, [theme]);
 
-  useEffect(() => {
+  // Runs before the browser paints: `onLoad` restores the scroll position, and
+  // doing that in a passive effect paints the note at the top for a frame
+  // before it jumps to where the reader left off.
+  useLayoutEffect(() => {
     if (!isHydrating) {
       onLoad?.();
       containerRef.current
@@ -706,7 +770,11 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}`}
+        // `virtualization` must stay in this key. useEditor creates the
+        // Editor instance once and only rebuilds its view afterwards, so
+        // extension options are frozen at construction — toggling paging only
+        // takes effect when the whole component remounts.
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}-${virtualization}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -716,6 +784,7 @@ function TiptapWrapper(
         dayFormat={dayFormat}
         markdownShortcuts={markdownShortcuts}
         fontLigatures={fontLigatures}
+        virtualization={virtualization}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);
@@ -768,7 +837,14 @@ function toIEditor(editor: Editor): IEditor {
   return {
     focus: ({ position, scrollIntoView } = {}) => {
       if (typeof position === "object")
-        editor.chain().focus().setTextSelection(position).run();
+        editor
+          .chain()
+          .focus(null, { scrollIntoView: scrollIntoView ?? true })
+          .setTextSelection({
+            from: fromFlatPosition(editor.state.doc, position.from),
+            to: fromFlatPosition(editor.state.doc, position.to)
+          })
+          .run();
       else
         editor.commands.focus(position, {
           scrollIntoView
@@ -803,11 +879,18 @@ function toIEditor(editor: Editor): IEditor {
       ),
     startSearch: () => editor.commands.startSearch(),
     getContent: () =>
-      getHTMLFromFragment(editor.state.doc.content, editor.schema),
+      profiler.time("serialize.getContent", () =>
+        serializeDocumentHTML(editor.state.doc, editor.schema)
+      ),
     getSelection: () => {
       const { from, to } = editor.state.selection;
-      return { from, to };
-    }
+      return {
+        from: toFlatPosition(editor.state.doc, from),
+        to: toFlatPosition(editor.state.doc, to)
+      };
+    },
+    getScrollAnchor: () => getScrollAnchor(editor.view),
+    restoreScrollAnchor: (anchor) => restoreScrollAnchor(editor.view, anchor)
   };
 }
 

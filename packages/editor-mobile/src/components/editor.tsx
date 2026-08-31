@@ -258,7 +258,8 @@ const Tiptap = ({
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
       dayFormat: settings.dayFormat,
-      enableInputRules: settings.markdownShortcuts
+      enableInputRules: settings.markdownShortcuts,
+      virtualization: !!settings.virtualization
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -269,6 +270,7 @@ const Tiptap = ({
     settings.dateFormat,
     settings.timeFormat,
     settings.markdownShortcuts,
+    settings.virtualization,
     tab.id,
     tick
   ]);
@@ -302,9 +304,10 @@ const Tiptap = ({
   const controller = useEditorController({
     update,
     getTableOfContents: () => {
-      return !containerRef.current
+      const editor = editors[tab.id];
+      return !containerRef.current || !editor
         ? []
-        : getTableOfContents(containerRef.current);
+        : getTableOfContents(editor.state.doc, containerRef.current);
     },
     scrollTop: () => containerRef.current?.scrollTop || 0,
     scrollTo: (top) => {
@@ -956,7 +959,11 @@ const Tiptap = ({
         </div>
 
         <TiptapEditorWrapper
-          key={tick + tab.id + "-editor"}
+          // `virtualization` must stay in this key. useEditor builds the Editor
+          // once and only rebuilds its view afterwards, so extension options are
+          // frozen at construction — toggling paging only takes effect when this
+          // component remounts.
+          key={tick + tab.id + "-editor-" + !!settings.virtualization}
           options={tiptapOptions}
           settings={settings}
           onEditorUpdate={(editor) => {
