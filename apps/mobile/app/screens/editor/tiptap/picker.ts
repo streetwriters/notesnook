@@ -123,19 +123,17 @@ const file = async (fileOptions: PickerOptions) => {
       console.log(e, "error");
     });
 
+    const isNewNote = fileOptions.noteId === undefined;
     const currentFileNoteId =
       fileOptions.tabId !== undefined
         ? useTabStore.getState().getNoteIdForTab(fileOptions.tabId)
         : undefined;
 
-    if (!fileOptions.noteId && currentFileNoteId) {
-      fileOptions.noteId = currentFileNoteId;
-    }
+    const isSameNote = currentFileNoteId === fileOptions.noteId;
 
     if (
       fileOptions.tabId !== undefined &&
-      (currentFileNoteId === fileOptions.noteId ||
-        fileOptions.noteId === undefined)
+      (isSameNote || isNewNote)
     ) {
       editorController.current?.commands.insertAttachment(
         {
