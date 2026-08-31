@@ -331,7 +331,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         <SubtitleWithAction
           text={strings.alreadyHaveAccount()}
           action={{
-            text: strings.login(),
+            text: "Log in",
             onClick: () => navigate("login")
           }}
         />
@@ -1359,7 +1359,7 @@ export function AuthField(props: FieldProps) {
           color: "label"
         },
         input: {
-          color: "placeholder",
+          color: "paragraph",
           fontSize: "xs",
           borderRadius: "radius2",
           outline: 0,

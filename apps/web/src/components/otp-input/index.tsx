@@ -129,7 +129,7 @@ export function OtpInput({
     <Flex
       sx={{
         gap: "15px",
-        justifyContent: "space-between",
+        justifyContent: "left",
         width: "100%"
       }}
     >
