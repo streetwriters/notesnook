@@ -2810,5 +2810,9 @@ Continue without attachments?`,
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
     t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
-  alignment: () => t`Alignment`
+  alignment: () => t`Alignment`,
+  lastBackupOn: (date: string) => t`Last backup: ${date}`,
+  nextBackupOn: (date: string) => t`Next backup: ${date}`,
+  lastPartialBackupOn: (date: string) => t`Last backup: ${date} (Partial)`,
+  lastFullBackupOn: (date: string) => t`Last backup: ${date} (Full)`
 };

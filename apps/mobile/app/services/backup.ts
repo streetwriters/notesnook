@@ -160,6 +160,21 @@ async function updateNextBackupTime(type: "full" | "partial") {
     [type === "full" ? "lastFullBackupDate" : "lastBackupDate"]: Date.now()
   });
 }
+
+function getNextBackupTime(
+  type: "daily" | "off" | "useroff" | "weekly" | "monthly" | "never",
+  lastBackupDateType: "lastBackupDate" | "lastFullBackupDate" = "lastBackupDate"
+): number | undefined {
+  if (type === "off" || type === "useroff" || type === "never" || !type) return;
+  const lastBackupDate = SettingsService.getProperty(lastBackupDateType) as
+    | number
+    | undefined;
+  if (!lastBackupDate) return;
+  const interval =
+    type === "daily" ? MS_DAY : type === "weekly" ? MS_WEEK : MONTH;
+  return lastBackupDate + interval;
+}
+
 let backupRunning = false;
 /**
  * @param {boolean=} progress
@@ -413,7 +428,8 @@ const BackupService = {
   run,
   checkAndRun,
   getDirectoryAndroid,
-  checkBackupDirExists
+  checkBackupDirExists,
+  getNextBackupTime
 };
 
 export default BackupService;
