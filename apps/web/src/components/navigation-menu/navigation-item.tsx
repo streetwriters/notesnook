@@ -78,7 +78,7 @@ function NavigationItem(
             }
           }
         ),
-        borderRadius: isCollapsed ? "5px" : "4px",
+        borderRadius: "radius1",
         px: "spacing2",
         py: isCollapsed ? "spacing2" : "spacing4",
         alignItems: "center",

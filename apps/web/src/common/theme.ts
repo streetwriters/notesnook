@@ -144,9 +144,14 @@ export const THEME_LIGHT: any = {
         icon: "#181818",
         hover: "#eee"
       },
-      secondary: { background: "#f7f7f7", icon: "#666666", heading: "#6f6f6f" },
+      secondary: {
+        background: "#f7f7f7",
+        icon: "#666666",
+        heading: "#6f6f6f",
+        paragraph: "#858585"
+      },
       selected: {
-        background: "#e2ede6",
+        background: "#E6F3EB",
         hover: "#eee",
         icon: "#ffffff"
       }
