@@ -64,7 +64,7 @@ function Tag(props: TagProps) {
       isCompact
       isFocused={isSelected}
       sx={{
-        borderRadius: "radius2",
+        borderRadius: "radius1",
         px: "spacing2",
         mx: "spacing4",
         py: "spacing4",
@@ -76,22 +76,28 @@ function Tag(props: TagProps) {
           sx={{
             alignItems: "center",
             justifyContent: "flex-start",
-            gap: "8px",
-            flexShrink: 0
+            gap: "spacing3",
+            minWidth: 0,
+            overflow: "hidden"
           }}
         >
-          <TagIcon size={13} color={isSelected ? "icon" : "icon-secondary"} />
+          <TagIcon
+            size={13}
+            color={isSelected ? "icon" : "icon-secondary"}
+            sx={{ flexShrink: 0 }}
+          />
           <Text
             data-test-id={`title`}
             variant={"body"}
-            color={isSelected ? "paragraph-selected" : "heading-secondary"}
+            color={isSelected ? "heading" : "paragraph"}
             sx={{
               fontSize: "xs",
               whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "normal",
-              display: "block"
+              display: "block",
+              minWidth: 0
             }}
           >
             {item.title}
@@ -101,7 +107,10 @@ function Tag(props: TagProps) {
       footer={
         <Text
           variant="subBody"
-          sx={{ fontSize: "xxs", color: "paragraph-secondary" }}
+          sx={{
+            fontSize: "xxs",
+            color: isSelected ? "paragraph" : "paragraph-secondary"
+          }}
         >
           {currentContext?.length || totalNotes}
         </Text>

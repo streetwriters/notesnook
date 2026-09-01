@@ -358,19 +358,18 @@ function NavigationMenu({
           >
             <svg
               style={{
-                width: 24,
-                height: 24
+                width: 25,
+                height: 25
               }}
             >
               <use href="#full-logo" />
             </svg>
 
             <Text
-              variant="heading"
               sx={{
-                fontSize: "18px",
-                fontWeight: "medium",
-                display: "block"
+                color: "black",
+                fontSize: "20px",
+                fontWeight: 600
               }}
             >
               Notesnook
@@ -461,13 +460,13 @@ function NavigationMenu({
             sx={{
               alignItems: "center",
               justifyContent: "center",
-              gap: "spacing3",
+              gap: "spacing4",
               display: "flex",
               my: "spacing4",
               px: "spacing4",
               py: isCollapsed ? "spacing4" : "spacing5",
               borderRadius: isCollapsed ? "radius1" : "radius2",
-              fontSize: "xs",
+              fontSize: "sm",
               fontWeight: 600,
               width: isCollapsed ? "25px" : "100%",
               height: isCollapsed ? "25px" : undefined
