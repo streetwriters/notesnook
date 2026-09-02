@@ -2810,5 +2810,8 @@ Continue without attachments?`,
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
     t`Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
-  alignment: () => t`Alignment`
+  alignment: () => t`Alignment`,
+  editorVirtualization: () => t`Editor paging (experimental)`,
+  editorVirtualizationDesc: () =>
+    t`Only render the part of a note that is currently on screen. Makes very large notes much faster to open, scroll and type in. While this is on, your browser's own find (Ctrl+F) only covers the visible part of a note, so use the editor's search instead. If you face any issues, please turn it off.`
 };
