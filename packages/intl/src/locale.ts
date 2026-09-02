@@ -17,26 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { Messages } from "@lingui/core";
-import { i18n, setI18nGlobal } from "./setup";
+import { i18n as defaultI18n, type Messages } from "@lingui/core";
+import { setI18nGlobal } from "./setup";
 import { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
 
-export const localeMap: Record<
-  string,
-  () => Promise<{ default: { messages: unknown } } | { messages: unknown }>
-> = {
-  en: () => import("../locales/$en.json"),
-  de: () => import("../locales/$de.json"),
-  es: () => import("../locales/$es.json"),
-  fr: () => import("../locales/$fr.json"),
-  it: () => import("../locales/$it.json"),
-  nl: () => import("../locales/$nl.json"),
-  pl: () => import("../locales/$pl.json"),
-  "pt-BR": () => import("../locales/$pt-BR.json"),
-  ru: () => import("../locales/$ru.json"),
-  tr: () => import("../locales/$tr.json"),
-  uk: () => import("../locales/$uk.json")
-};
+import { localeMap } from "./generated/locale-map";
+export { localeMap };
 
 export function resolveTargetLocale(
   savedLanguage?: string | null,
@@ -86,8 +72,8 @@ export async function initLocale(options?: InitLocaleOptions): Promise<string> {
     ? await options.getMessages(targetLang)
     : await getLocaleMessages(targetLang);
 
-  i18n.load({ [targetLang]: messages });
-  i18n.activate(targetLang);
-  setI18nGlobal(i18n);
+  defaultI18n.load({ [targetLang]: messages });
+  defaultI18n.activate(targetLang);
+  setI18nGlobal(defaultI18n);
   return targetLang;
 }
