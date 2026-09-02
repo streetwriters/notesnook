@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   EditorOptions,
+  Node as TiptapNode,
   extensions as TiptapCoreExtensions,
   getHTMLFromFragment
 } from "@tiptap/core";
@@ -82,6 +83,7 @@ import CheckList from "./extensions/check-list/index.js";
 import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
+import { Page } from "./extensions/paging/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
@@ -233,6 +235,7 @@ const useTiptap = (
           doubleSpaced: doubleSpacedLines
         }),
         StarterKit.configure({
+          document: false,
           code: false,
           codeBlock: false,
           listItem: false,
@@ -272,6 +275,8 @@ const useTiptap = (
           }
         }),
         BlockId,
+        PagedDocument,
+        Page,
         Blockquote,
         CharacterCount,
         Underline,
@@ -444,6 +449,16 @@ const useTiptap = (
 
   return editor;
 };
+
+/**
+ * Pages are optional in the schema so an unpaged document stays valid: nothing
+ * has to be migrated, and turning paging off simply stops producing them.
+ */
+const PagedDocument = TiptapNode.create({
+  name: "doc",
+  topNode: true,
+  content: "(page | block)+"
+});
 
 function hasStyle(element: HTMLElement | string) {
   const style = (element as HTMLElement).getAttribute("style");

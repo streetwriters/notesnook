@@ -25,7 +25,7 @@ import {
   BatchAttributeStep
 } from "../../utils/batch-attribute-step.js";
 
-const NESTED_BLOCK_ID_TYPES = ["callout"];
+const NESTED_BLOCK_ID_TYPES = ["callout", "page"];
 const BLOCK_ID_TYPES = [
   "paragraph",
   "heading",
@@ -41,7 +41,8 @@ const BLOCK_ID_TYPES = [
   "outlineList",
   "mathBlock",
   "webclip",
-  "embed"
+  "embed",
+  "page"
 ];
 
 export const BlockId = Extension.create({
