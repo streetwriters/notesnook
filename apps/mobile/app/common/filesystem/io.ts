@@ -67,9 +67,25 @@ export async function readEncrypted<TOutputFormat extends DataFormat>(
 
     return output as Output<TOutputFormat>;
   } catch (e) {
-    RNFetchBlob.fs.unlink(path).catch(() => {
-      /* empty */
-    });
+    // Only discard the local ciphertext when the server still has a copy of it.
+    // decryptFile now rejects for transient and structural reasons too (a
+    // missing cipher field, a short read, an app group container that is not
+    // available), and deleting an attachment that was never uploaded would lose
+    // it permanently. downloadAttachment already guards its cleanup this way.
+    try {
+      const attachment = await db.attachments.attachment(filename);
+      if (attachment?.dateUploaded) {
+        RNFetchBlob.fs.unlink(path).catch(() => {
+          /* empty */
+        });
+      } else {
+        DatabaseLogger.info(
+          `Keeping local ciphertext for ${filename}: it is not uploaded, so it cannot be re-downloaded`
+        );
+      }
+    } catch (lookupError) {
+      DatabaseLogger.error(lookupError, "Could not check if attachment is uploaded");
+    }
     DatabaseLogger.error(e);
   }
 }

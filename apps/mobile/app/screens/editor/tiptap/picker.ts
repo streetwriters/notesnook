@@ -152,6 +152,19 @@ const file = async (fileOptions: PickerOptions) => {
   }
 };
 
+const onImagePickerError = (e: unknown) => {
+  const error = e as Error & { code?: string };
+  if (error?.code === "E_PICKER_CANCELLED") return;
+
+  DatabaseLogger.error(error);
+  ToastManager.show({
+    heading: strings.failToOpen(),
+    message: error?.message,
+    type: "error",
+    context: "global"
+  });
+};
+
 const camera = async (options: PickerOptions) => {
   try {
     await db.attachments.generateKey();
@@ -165,15 +178,13 @@ const camera = async (options: PickerOptions) => {
       writeTempFile: true,
       compressImageQuality: 1
     })
-      .then((response) => {
+      .then((response) =>
         handleImageResponse(
           Array.isArray(response) ? response : [response],
           options
-        );
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+        )
+      )
+      .catch(onImagePickerError);
   } catch (e) {
     ToastManager.show({
       heading: (e as Error).message,
@@ -201,7 +212,7 @@ const gallery = async (options: PickerOptions) => {
           options
         )
       )
-      .catch((e) => {});
+      .catch(onImagePickerError);
   } catch (e) {
     useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     ToastManager.show({
