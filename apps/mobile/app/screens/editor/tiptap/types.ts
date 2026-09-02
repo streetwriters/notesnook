@@ -58,6 +58,7 @@ export type Settings = {
   timeFormat: string;
   fontScale: number;
   markdownShortcuts: boolean;
+  virtualization?: boolean;
   features: Record<any, any>;
   loggedIn: boolean;
   defaultLineHeight: number;
