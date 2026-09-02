@@ -21,7 +21,6 @@ import { describe, expect, test } from "vitest";
 import {
   createEditor,
   h,
-  p,
   taskList,
   taskItem
 } from "../../../../test-utils/index.js";
@@ -36,7 +35,7 @@ describe("task list item", () => {
    */
   test("inline image as first child in task list item", async () => {
     const el = taskList(
-      taskItem([p(["item 1"])]),
+      taskItem(["item 1"]),
       taskItem([h("img", [], { src: "image.png" })])
     );
 

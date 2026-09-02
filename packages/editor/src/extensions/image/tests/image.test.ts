@@ -55,17 +55,19 @@ test("copy image to clipboard when Ctrl+C is pressed on selected image", async (
   const editorElement = h("div");
   const { editor } = createEditor({
     element: editorElement,
+    // the image is put there as content rather than with `insertImage`, which
+    // needs the attachment extension: what is under test is the copying
+    initialContent: h("img", [], {
+      src: "test.png",
+      "data-hash": testHash,
+      "data-mime": "image/png",
+      "data-filename": "test.png"
+    }).outerHTML,
     extensions: {
       image: ImageNode
     }
   });
   editor.storage.getAttachmentData = vi.fn().mockResolvedValue(mockImageData);
-  editor.commands.insertImage({
-    src: "test.png",
-    hash: testHash,
-    mime: "image/png",
-    filename: "test.png"
-  });
   editor.commands.setNodeSelection(0);
 
   expect(editor.isActive("image")).toBe(true);
