@@ -86,6 +86,7 @@ export const Paging = Extension.create<PagingOptions>({
 });
 
 export { PAGE_NODE, Page } from "./page.js";
+export { fromFlatPosition, toFlatPosition } from "./positions.js";
 export {
   DEFAULT_PAGE_SIZE,
   countPages,
