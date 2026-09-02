@@ -190,6 +190,9 @@ export const useEditorEvents = (
   const markdownShortcuts = useSettingStore(
     (state) => state.settings.markdownShortcuts
   );
+  const editorVirtualization = useSettingStore(
+    (state) => state.settings.editorVirtualization
+  );
 
   const tools = useDragState((state) => state.data);
   useEffect(() => {
@@ -235,6 +238,7 @@ export const useEditorEvents = (
       dayFormat: dayFormat,
       fontScale,
       markdownShortcuts,
+      virtualization: editorVirtualization,
       features,
       loggedIn,
       defaultLineHeight
@@ -257,6 +261,7 @@ export const useEditorEvents = (
     loading,
     fontScale,
     markdownShortcuts,
+    editorVirtualization,
     loggedIn,
     defaultLineHeight,
     features

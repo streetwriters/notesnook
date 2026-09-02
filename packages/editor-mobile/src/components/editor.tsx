@@ -258,7 +258,8 @@ const Tiptap = ({
       dateFormat: settings.dateFormat,
       timeFormat: settings.timeFormat as "12-hour" | "24-hour" | undefined,
       dayFormat: settings.dayFormat,
-      enableInputRules: settings.markdownShortcuts
+      enableInputRules: settings.markdownShortcuts,
+      virtualization: !!settings.virtualization
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -269,6 +270,7 @@ const Tiptap = ({
     settings.dateFormat,
     settings.timeFormat,
     settings.markdownShortcuts,
+    settings.virtualization,
     tab.id,
     tick
   ]);
@@ -963,6 +965,7 @@ const Tiptap = ({
             settings.dateFormat,
             settings.timeFormat,
             settings.dayFormat,
+            settings.virtualization ? "paged" : "flat",
             tab.session?.readonly ? "readonly" : "edit"
           ].join("-")}
           options={tiptapOptions}

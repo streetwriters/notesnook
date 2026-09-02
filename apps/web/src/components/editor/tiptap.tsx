@@ -27,7 +27,6 @@ import {
   Editor,
   AttachmentType,
   usePermissionHandler,
-  getHTMLFromFragment,
   Fragment,
   type DownloadOptions,
   getTotalWords,
@@ -38,6 +37,9 @@ import {
   getTableOfContents,
   getChangedNodes,
   LinkAttributes,
+  fromFlatPosition,
+  serializeDocumentHTML,
+  toFlatPosition,
   type Selection
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
@@ -115,6 +117,7 @@ type TipTapProps = {
   dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
+  virtualization: boolean;
 };
 
 function countCharacters(text: string) {
@@ -190,7 +193,8 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    virtualization
   } = props;
 
   const autoSave = useRef(true);
@@ -244,8 +248,7 @@ function TipTap(props: TipTapProps) {
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
             onChange?.(
-              () =>
-                getHTMLFromFragment(editor.state.doc.content, editor.schema),
+              () => serializeDocumentHTML(editor.state.doc, editor.schema),
               false
             );
           }
@@ -268,6 +271,7 @@ function TipTap(props: TipTapProps) {
       },
       enableInputRules: markdownShortcuts,
       enableFontLigatures: fontLigatures,
+      virtualization,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -335,7 +339,7 @@ function TipTap(props: TipTapProps) {
         if (!autoSave.current) return;
 
         onChange(
-          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          () => serializeDocumentHTML(editor.state.doc, editor.schema),
           ignoreEdit
         );
       },
@@ -356,7 +360,11 @@ function TipTap(props: TipTapProps) {
       },
       onSelectionUpdate: debounce(({ editor, transaction }) => {
         const isEmptySelection = transaction.selection.empty;
-        if (onSelectionChange) onSelectionChange(transaction.selection);
+        if (onSelectionChange)
+          onSelectionChange({
+            from: toFlatPosition(editor.state.doc, transaction.selection.from),
+            to: toFlatPosition(editor.state.doc, transaction.selection.to)
+          });
         useEditorManager.getState().updateEditor(id, (old) => {
           const oldSelected = old.statistics?.words?.selected;
           const oldWords = old.statistics?.words.total || 0;
@@ -493,7 +501,8 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    virtualization
   ]);
 
   const editor = useTiptap(
@@ -600,6 +609,7 @@ function TiptapWrapper(
       | "dayFormat"
       | "markdownShortcuts"
       | "fontLigatures"
+      | "virtualization"
     >
   > & {
     isHydrating?: boolean;
@@ -619,6 +629,9 @@ function TiptapWrapper(
     (store) => store.markdownShortcuts
   );
   const fontLigatures = useSettingsStore((store) => store.fontLigatures);
+  const virtualization = useSettingsStore(
+    (store) => store.editorVirtualization
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig, setEditorConfig } = useEditorConfig();
@@ -706,7 +719,11 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}`}
+        // `virtualization` must stay in this key. useEditor creates the
+        // Editor instance once and only rebuilds its view afterwards, so
+        // extension options are frozen at construction -- toggling paging only
+        // takes effect when the whole component remounts.
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}-${virtualization}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -716,6 +733,7 @@ function TiptapWrapper(
         dayFormat={dayFormat}
         markdownShortcuts={markdownShortcuts}
         fontLigatures={fontLigatures}
+        virtualization={virtualization}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);
@@ -768,7 +786,14 @@ function toIEditor(editor: Editor): IEditor {
   return {
     focus: ({ position, scrollIntoView } = {}) => {
       if (typeof position === "object")
-        editor.chain().focus().setTextSelection(position).run();
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({
+            from: fromFlatPosition(editor.state.doc, position.from),
+            to: fromFlatPosition(editor.state.doc, position.to)
+          })
+          .run();
       else
         editor.commands.focus(position, {
           scrollIntoView
@@ -802,11 +827,13 @@ function toIEditor(editor: Editor): IEditor {
         { query: (a) => a.hash === hash, preventUpdate: true }
       ),
     startSearch: () => editor.commands.startSearch(),
-    getContent: () =>
-      getHTMLFromFragment(editor.state.doc.content, editor.schema),
+    getContent: () => serializeDocumentHTML(editor.state.doc, editor.schema),
     getSelection: () => {
       const { from, to } = editor.state.selection;
-      return { from, to };
+      return {
+        from: toFlatPosition(editor.state.doc, from),
+        to: toFlatPosition(editor.state.doc, to)
+      };
     }
   };
 }

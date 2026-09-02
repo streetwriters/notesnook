@@ -156,6 +156,21 @@ export const EditorSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleFontLigatures()
           }
         ]
+      },
+      {
+        key: "editor-virtualization",
+        title: strings.editorVirtualization(),
+        description: strings.editorVirtualizationDesc(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((c) => c.editorVirtualization, listener),
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().editorVirtualization,
+            toggle: () =>
+              useSettingStore.getState().toggleEditorVirtualization()
+          }
+        ]
       }
     ]
   },

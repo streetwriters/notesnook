@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   EditorOptions,
+  Node as TiptapNode,
   extensions as TiptapCoreExtensions,
   getHTMLFromFragment
 } from "@tiptap/core";
@@ -82,6 +83,7 @@ import CheckList from "./extensions/check-list/index.js";
 import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
+import { Page, Paging } from "./extensions/paging/index.js";
 import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
 import { getChangedNodes } from "./utils/prosemirror.js";
@@ -137,6 +139,10 @@ export type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     doubleSpacedLines?: boolean;
     enableFontLigatures?: boolean;
+    /** Group the note's blocks into pages. */
+    virtualization?: boolean;
+    /** How many top-level blocks make up a page when paging is on. */
+    pageSize?: number;
   } & {
     placeholder: string;
   };
@@ -164,6 +170,8 @@ const useTiptap = (
     downloadOptions,
     editorProps,
     enableFontLigatures,
+    virtualization,
+    pageSize,
     ...restOptions
   } = options;
 
@@ -233,6 +241,7 @@ const useTiptap = (
           doubleSpaced: doubleSpacedLines
         }),
         StarterKit.configure({
+          document: false,
           code: false,
           codeBlock: false,
           listItem: false,
@@ -272,6 +281,12 @@ const useTiptap = (
           }
         }),
         BlockId,
+        PagedDocument,
+        Page,
+        Paging.configure({
+          enabled: !!virtualization,
+          ...(pageSize ? { pageSize } : {})
+        }),
         Blockquote,
         CharacterCount,
         Underline,
@@ -430,7 +445,9 @@ const useTiptap = (
       enableFontLigatures,
       getLinkData,
       downloadCsvTable,
-      options.placeholder
+      options.placeholder,
+      virtualization,
+      pageSize
     ]
   );
 
@@ -444,6 +461,16 @@ const useTiptap = (
 
   return editor;
 };
+
+/**
+ * Pages are optional in the schema so an unpaged document stays valid: nothing
+ * has to be migrated, and turning paging off simply stops producing them.
+ */
+const PagedDocument = TiptapNode.create({
+  name: "doc",
+  topNode: true,
+  content: "(page | block)+"
+});
 
 function hasStyle(element: HTMLElement | string) {
   const style = (element as HTMLElement).getAttribute("style");
@@ -463,6 +490,11 @@ export * from "./types.js";
 export * from "./utils/word-counter.js";
 export * from "./utils/font.js";
 export * from "./utils/toc.js";
+export {
+  fromFlatPosition,
+  serializeDocumentHTML,
+  toFlatPosition
+} from "./extensions/paging/index.js";
 export * from "./utils/downloader.js";
 export {
   useTiptap,
