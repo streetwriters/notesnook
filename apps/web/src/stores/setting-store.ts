@@ -57,6 +57,7 @@ class SettingStore extends BaseStore<SettingStore> {
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", false);
   fontLigatures = Config.get("fontLigatures", false);
+  editorVirtualization = Config.get("editorVirtualization", false);
   notificationsSettings = Config.get("notifications", { reminder: true });
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
@@ -248,6 +249,12 @@ class SettingStore extends BaseStore<SettingStore> {
     const fontLigatures = this.get().fontLigatures;
     this.set((state) => (state.fontLigatures = toggleState ?? !fontLigatures));
     Config.set("fontLigatures", !fontLigatures);
+  };
+
+  toggleEditorVirtualization = (toggleState?: boolean) => {
+    const next = toggleState ?? !this.get().editorVirtualization;
+    this.set((state) => (state.editorVirtualization = next));
+    Config.set("editorVirtualization", next);
   };
 
   togglePrivacyMode = async () => {

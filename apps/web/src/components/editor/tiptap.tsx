@@ -117,6 +117,7 @@ type TipTapProps = {
   dayFormat: DayFormat;
   markdownShortcuts: boolean;
   fontLigatures: boolean;
+  virtualization: boolean;
 };
 
 function countCharacters(text: string) {
@@ -192,7 +193,8 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    virtualization
   } = props;
 
   const autoSave = useRef(true);
@@ -269,6 +271,7 @@ function TipTap(props: TipTapProps) {
       },
       enableInputRules: markdownShortcuts,
       enableFontLigatures: fontLigatures,
+      virtualization,
       downloadOptions,
       doubleSpacedLines,
       dateFormat,
@@ -498,7 +501,8 @@ function TipTap(props: TipTapProps) {
     timeFormat,
     dayFormat,
     markdownShortcuts,
-    fontLigatures
+    fontLigatures,
+    virtualization
   ]);
 
   const editor = useTiptap(
@@ -605,6 +609,7 @@ function TiptapWrapper(
       | "dayFormat"
       | "markdownShortcuts"
       | "fontLigatures"
+      | "virtualization"
     >
   > & {
     isHydrating?: boolean;
@@ -624,6 +629,9 @@ function TiptapWrapper(
     (store) => store.markdownShortcuts
   );
   const fontLigatures = useSettingsStore((store) => store.fontLigatures);
+  const virtualization = useSettingsStore(
+    (store) => store.editorVirtualization
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContainerRef = useRef<HTMLDivElement>();
   const { editorConfig, setEditorConfig } = useEditorConfig();
@@ -711,7 +719,11 @@ function TiptapWrapper(
       }}
     >
       <TipTap
-        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}`}
+        // `virtualization` must stay in this key. useEditor creates the
+        // Editor instance once and only rebuilds its view afterwards, so
+        // extension options are frozen at construction -- toggling paging only
+        // takes effect when the whole component remounts.
+        key={`tiptap-${props.id}-${doubleSpacedLines}-${dateFormat}-${timeFormat}-${dayFormat}-${markdownShortcuts}-${fontLigatures}-${virtualization}`}
         {...props}
         isMobile={isMobile}
         isTablet={isTablet}
@@ -721,6 +733,7 @@ function TiptapWrapper(
         dayFormat={dayFormat}
         markdownShortcuts={markdownShortcuts}
         fontLigatures={fontLigatures}
+        virtualization={virtualization}
         onLoad={(editor) => {
           if (!isHydrating) {
             onLoad?.(editor);
