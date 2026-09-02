@@ -3274,5 +3274,8 @@ Continue without attachments?`,
   waitForPreviousDownloadToFinish: () =>
     t`Please wait for the previous download to finish or cancel it.`,
   checkingAttachmentsProgress: (current: number, total: number) =>
-    t`Checking attachments (${current}/${total})`
+    t`Checking attachments (${current}/${total})`,
+  editorVirtualization: () => t`Editor paging (experimental)`,
+  editorVirtualizationDesc: () =>
+    t`Only render the part of a note that is currently on screen. Makes very large notes much faster to open, scroll and type in. While this is on, your browser's own find (Ctrl+F) only covers the visible part of a note, so use the editor's search instead. If you face any issues, please turn it off.`
 };
