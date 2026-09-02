@@ -1966,7 +1966,7 @@ All attachments will be downloaded & cached again on access.
   keyRecoveryProgressDesc: () =>
     t`Please wait while your data is downloaded & decrypted.`,
   verifying2faCode: () => t`Verifying 2FA code`,
-  coreRequired: () => t`2FA code is required()`,
+  twoFactorCodeRequired: () => t`2FA code is required`,
   backupFileRecoveryError: () =>
     t`All the data in your account will be overwritten with the data in the backup file. There is no way to reverse this action.`,
   backupYourData: () => `Backup your data`,

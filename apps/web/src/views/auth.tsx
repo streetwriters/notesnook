@@ -774,7 +774,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       onSubmit={async (form) => {
         const code = selectedMethod !== "recoveryCode" ? otpValue : form.code;
         if (!code || code.length < (selectedMethod !== "recoveryCode" ? 6 : 1))
-          throw new Error(strings.coreRequired());
+          throw new Error(strings.twoFactorCodeRequired());
 
         const loginForm: MFALoginFormData = {
           code,
