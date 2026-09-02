@@ -492,6 +492,7 @@ export * from "./utils/font.js";
 export * from "./utils/toc.js";
 export {
   fromFlatPosition,
+  serializeDocumentHTML,
   toFlatPosition
 } from "./extensions/paging/index.js";
 export * from "./utils/downloader.js";

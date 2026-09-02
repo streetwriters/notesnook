@@ -27,7 +27,6 @@ import {
   Editor,
   AttachmentType,
   usePermissionHandler,
-  getHTMLFromFragment,
   Fragment,
   type DownloadOptions,
   getTotalWords,
@@ -39,6 +38,7 @@ import {
   getChangedNodes,
   LinkAttributes,
   fromFlatPosition,
+  serializeDocumentHTML,
   toFlatPosition,
   type Selection
 } from "@notesnook/editor";
@@ -246,8 +246,7 @@ function TipTap(props: TipTapProps) {
           if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault();
             onChange?.(
-              () =>
-                getHTMLFromFragment(editor.state.doc.content, editor.schema),
+              () => serializeDocumentHTML(editor.state.doc, editor.schema),
               false
             );
           }
@@ -337,7 +336,7 @@ function TipTap(props: TipTapProps) {
         if (!autoSave.current) return;
 
         onChange(
-          () => getHTMLFromFragment(editor.state.doc.content, editor.schema),
+          () => serializeDocumentHTML(editor.state.doc, editor.schema),
           ignoreEdit
         );
       },
@@ -815,8 +814,7 @@ function toIEditor(editor: Editor): IEditor {
         { query: (a) => a.hash === hash, preventUpdate: true }
       ),
     startSearch: () => editor.commands.startSearch(),
-    getContent: () =>
-      getHTMLFromFragment(editor.state.doc.content, editor.schema),
+    getContent: () => serializeDocumentHTML(editor.state.doc, editor.schema),
     getSelection: () => {
       const { from, to } = editor.state.selection;
       return {
