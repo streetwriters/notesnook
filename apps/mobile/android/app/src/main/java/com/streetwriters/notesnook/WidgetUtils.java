@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.google.gson.Gson;
@@ -34,12 +35,14 @@ public class WidgetUtils {
 
     static final String PREFERENCES = "appPreview";
     static final String REMINDERS_KEY = "remindersList";
+    static final String PINNED_NOTES_KEY = "pinnedNotesList";
 
     /**
      * Every row is serialized into the widget update itself, which has to fit inside a binder
      * transaction, so the list cannot grow without bound. Far more than fits on screen anyway.
      */
     private static final int MAX_REMINDERS = 50;
+    private static final int MAX_PINNED_NOTES = 50;
 
     /**
      * Redraws every widget that currently exists, and drops stored notes for widgets that no
@@ -68,6 +71,12 @@ public class WidgetUtils {
                 new ComponentName(context, ReminderWidgetProvider.class))) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_reminders);
             ReminderWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
+        }
+
+        for (int appWidgetId : manager.getAppWidgetIds(
+                new ComponentName(context, PinnedNotesWidgetProvider.class))) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_pinned_notes);
+            PinnedNotesWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
         }
     }
 
@@ -183,6 +192,55 @@ public class WidgetUtils {
         fillInIntent.putExtra(RCTNNativeModule.IntentType, "OpenReminder");
         fillInIntent.putExtra(ReminderWidgetProvider.OpenReminderId, reminder.getId());
         views.setOnClickFillInIntent(R.id.reminder_item_btn, fillInIntent);
+        return views;
+    }
+
+    /**
+     * The pinned notes the app last wrote out.
+     */
+    static List<Note> getWidgetPinnedNotes(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        List<Note> stored = null;
+        try {
+            stored = new Gson().fromJson(preferences.getString(PINNED_NOTES_KEY, "[]"),
+                    new TypeToken<List<Note>>() {}.getType());
+        } catch (Exception e) {
+            Log.e("PinnedNotes", "Could not read the stored pinned notes list", e);
+        }
+
+        List<Note> active = new ArrayList<>();
+        if (stored == null) return active;
+
+        for (Note note : stored) {
+            if (active.size() >= MAX_PINNED_NOTES) {
+                Log.w("PinnedNotes", "Widget list truncated to " + MAX_PINNED_NOTES + " notes");
+                break;
+            }
+            active.add(note);
+        }
+        return active;
+    }
+
+    /**
+     * Builds a single row of the pinned notes list.
+     */
+    static RemoteViews createPinnedNoteItem(Context context, Note note) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_pinned_note_item);
+
+        views.setTextViewText(R.id.note_title, note.getTitle());
+        String headline = note.getHeadline();
+        if (headline != null && !headline.isEmpty()) {
+            views.setTextViewText(R.id.note_body, headline);
+            views.setViewVisibility(R.id.note_body, View.VISIBLE);
+        } else {
+            views.setViewVisibility(R.id.note_body, View.GONE);
+        }
+
+        Intent fillInIntent = new Intent();
+        fillInIntent.setData(Uri.parse("nn://note/" + note.getId()));
+        fillInIntent.putExtra(RCTNNativeModule.IntentType, "OpenNote");
+        fillInIntent.putExtra(NotePreviewWidget.OpenNoteId, note.getId());
+        views.setOnClickFillInIntent(R.id.pinned_note_item_btn, fillInIntent);
         return views;
     }
 
