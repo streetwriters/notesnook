@@ -20,3 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export type { Messages } from "@lingui/core";
 export { strings } from "./strings";
 export { setI18nGlobal } from "./setup";
+export { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
+export type { Language } from "./languages";
+export {
+  initLocale,
+  resolveTargetLocale,
+  getLocaleMessages,
+  localeMap
+} from "./locale";
+export type { InitLocaleOptions } from "./locale";
+
+

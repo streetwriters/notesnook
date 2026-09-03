@@ -17,44 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @type {import('@lingui/conf').LinguiConfig} */
-module.exports = {
-  locales: [
-    "en",
-    "pseudo-LOCALE",
-    "de",
-    "es",
-    "fr",
-    "it",
-    "nl",
-    "pl",
-    "pt-BR",
-    "ru",
-    "tr",
-    "uk"
-  ],
-  sourceLocale: "en",
-  pseudoLocale: "pseudo-LOCALE",
-  fallbackLocales: {
-    "pseudo-LOCALE": "en",
-    de: "en",
-    es: "en",
-    fr: "en",
-    it: "en",
-    nl: "en",
-    pl: "en",
-    "pt-BR": "en",
-    ru: "en",
-    tr: "en",
-    uk: "en"
-  },
-  catalogs: [
-    {
-      path: "<rootDir>/locale/{locale}",
-      include: ["src", "generated"]
+import Config from "../utils/config";
+import { initLocale as initIntlLocale } from "@notesnook/intl";
+
+export async function initLocale() {
+  return initIntlLocale({
+    getSavedLocale: () => Config.get<string>("appLanguage", ""),
+    onSaveLocale: (locale) => {
+      Config.set("appLanguage", locale);
     }
-  ],
-  format: "po",
-  catalogsMergePath: "<rootDir>/locales/${locale}",
-  compileNamespace: "json"
-};
+  });
+}

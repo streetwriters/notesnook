@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import "./globals.js";
 import NetInfo from "@react-native-community/netinfo";
 import React from "react";
 import { AppRegistry, LogBox } from "react-native";
@@ -9,7 +10,6 @@ import { enableFreeze } from "react-native-screens";
 import { BackgroundSync } from "./app/services/background-sync";
 import Notifications from "./app/services/notifications";
 import appJson from "./app.json";
-import "./globals.js";
 
 BackgroundSync.registerHeadlessTask();
 BackgroundSync.start();

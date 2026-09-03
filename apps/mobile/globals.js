@@ -6,12 +6,11 @@ import "@formatjs/intl-pluralrules/locale-data/en";
 import "react-native-url-polyfill/auto";
 import "./polyfills/console-time.js";
 import "./app/common/logger/index";
-import { setI18nGlobal } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
-import Config from "react-native-config";
 import OpenPGP from "react-native-fast-openpgp";
+import { initLocale } from "./app/common/locale";
 
 OpenPGP.useJSI = false;
+initLocale();
 
 let domParser;
 Object.defineProperty(global, "DOMParser", {
@@ -27,22 +26,6 @@ Object.defineProperty(global, "Buffer", {
     return buffer.Buffer;
   }
 });
-
-if (__DEV__ && Config.isTesting !== "true") {
-  const messages =
-    require("@notesnook/intl/dist/locales/$pseudo-LOCALE.json").messages;
-  i18n.load({
-    en: messages
-  });
-} else {
-  const messages = require("@notesnook/intl/dist/locales/$en.json").messages;
-  i18n.load({
-    en: messages
-  });
-}
-
-i18n.activate("en");
-setI18nGlobal(i18n);
 
 if (__DEV__) {
   try {

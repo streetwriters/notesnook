@@ -25,7 +25,7 @@
   "scripts": {
     "extract": "lingui extract --clean --overwrite",
     "compile": "lingui compile --typescript",
-    "build-locale": "node scripts/generate-strings.mjs && npm run extract && npm run compile",
+    "build-locale": "node scripts/generate-strings.mjs && node scripts/generate-locale-loaders.mjs && npm run extract && npm run compile",
     "build": "npm run build-locale && npx vite build && node scripts/postbuild.mjs",
     "watch": "nodemon --watch scripts/ --watch src --ext ts,mjs --exec \"npm run build\"",
     "postinstall": "patch-package"
