@@ -60,6 +60,7 @@ import {
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
+import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
@@ -293,6 +294,7 @@ export const useActions = ({
     if (item.type === "note") {
       await db.notes.pin(!item?.pinned, item.id);
       setItem((await db.notes.note(item.id)) as Item);
+      PinnedNotesWidget.updateNotes();
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
       setItem((await db.notebooks.notebook(item.id)) as Item);

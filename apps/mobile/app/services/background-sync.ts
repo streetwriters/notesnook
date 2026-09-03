@@ -27,6 +27,7 @@ import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { deleteDCacheFiles } from "../common/filesystem/io";
 import { useUserStore } from "../stores/use-user-store";
 import { NotePreviewWidget } from "./note-preview-widget";
+import { PinnedNotesWidget } from "./pinned-notes-widget";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
 
@@ -118,6 +119,7 @@ async function onBackgroundSyncStarted() {
     }
     Notifications.restorePinnedNotes();
     NotePreviewWidget.updateNotes();
+    PinnedNotesWidget.updateNotes();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {
@@ -146,6 +148,7 @@ const onBoot = async () => {
     }
     Notifications.restorePinnedNotes();
     NotePreviewWidget.updateNotes();
+    PinnedNotesWidget.updateNotes();
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);

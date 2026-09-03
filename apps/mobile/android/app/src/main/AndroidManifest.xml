@@ -117,6 +117,18 @@
                 android:resource="@xml/widget_reminders_info" />
         </receiver>
 
+        <receiver
+            android:name=".PinnedNotesWidgetProvider"
+            android:exported="false"
+            android:label="@string/pinned_notes_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_pinned_notes_info" />
+        </receiver>
+
         <activity
             android:name=".NotePreviewConfigureActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
