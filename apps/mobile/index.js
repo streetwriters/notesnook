@@ -7,12 +7,23 @@ import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableFreeze } from "react-native-screens";
 import { BackgroundSync } from "./app/services/background-sync";
+import { PebbleIndexCapture } from "./app/services/pebble-index-capture";
 import Notifications from "./app/services/notifications";
 import appJson from "./app.json";
 import "./globals.js";
 
-BackgroundSync.registerHeadlessTask();
 BackgroundSync.start();
+try {
+  BackgroundSync.registerHeadlessTask();
+} catch (e) {
+  console.warn("BOOT_TASK register failed", e);
+}
+try {
+  PebbleIndexCapture.registerHeadlessTask();
+  PebbleIndexCapture.syncNativePrefs();
+} catch (e) {
+  console.warn("PEBBLE INDEX register failed", e);
+}
 Notifications.init();
 
 enableFreeze(true);

@@ -24,5 +24,8 @@ class MainApplication : Application(), ReactApplication {
     super.onCreate()
       registerActivityLifecycleCallbacks(OrientationActivityLifecycle.getInstance());
     loadReactNative(this)
+    if (com.streetwriters.notesnook.pebble.PebbleIndexPrefs.keepAlive(this)) {
+      com.streetwriters.notesnook.pebble.PebbleIndexKeepAliveService.start(this)
+    }
   }
 }
