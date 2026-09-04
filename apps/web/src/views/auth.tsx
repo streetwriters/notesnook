@@ -26,7 +26,7 @@ import {
   createContext,
   useContext
 } from "react";
-import { Button, Flex, Link, Text, Box } from "@notesnook/ui";
+import { Button, Flex, Link, Text, Box, Label } from "@notesnook/ui";
 import {
   CheckCircle,
   Loading,
@@ -41,7 +41,8 @@ import {
   Warn,
   Chat,
   Email,
-  RecoveryCode
+  RecoveryCode,
+  CaretRight
 } from "../components/icons";
 import Field, { FieldProps } from "../components/field";
 import { OtpInput } from "../components/otp-input";
@@ -232,7 +233,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
   return (
     <AuthForm
       type="login"
-      title={strings.welcomeBack()}
+      title={strings.loginToYourAccount()}
       canSkip={canSkip}
       openURL={openURL}
       subtitle={
@@ -300,7 +301,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
             sx={{
               mt: "spacing4",
               fontSize: "xs",
-              color: "paragraph-secondary",
+              color: "paragraph",
               textDecoration: "none",
               alignSelf: "end"
             }}
@@ -309,11 +310,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
           </Button>
           <SubmitButton
             loading={options?.loading}
-            text={
-              options?.loading
-                ? strings.loggingIn()
-                : strings.loginToYourAccount()
-            }
+            text={options?.loading ? strings.loggingIn() : strings.continue()}
           />
         </>
       )}
@@ -327,14 +324,14 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
   return (
     <AuthForm
       type="signup"
-      title={strings.createAccount()}
+      title={"Create an account"}
       canSkip={canSkip}
       showAgreement
       subtitle={
         <SubtitleWithAction
           text={strings.alreadyHaveAccount()}
           action={{
-            text: strings.login(),
+            text: "Log in",
             onClick: () => navigate("login")
           }}
         />
@@ -547,11 +544,12 @@ function RecoverySuccessCard({ email }: { email: string }) {
               fontSize: "sm",
               color: "paragraph",
               textAlign: "center",
-              lineHeight: "1.4"
+              lineHeight: "1.4",
+              fontWeight: 400
             }}
           >
             We&apos;ve sent instructions to recover your account to{" "}
-            <Text as="span" sx={{ fontWeight: "medium", color: "accent" }}>
+            <Text as="span" sx={{ color: "accent" }}>
               {email}
             </Text>
           </Text>
@@ -608,14 +606,29 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
           <></>
         ) : (
           <>
-            <Text>{strings.accountRecoverHelpText()}</Text>{" "}
-            <SubtitleWithAction
-              text={strings.rememberedYourPassword()}
-              action={{
-                text: strings.login(),
-                onClick: () => navigate("login")
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph"
               }}
-            />
+            >
+              {strings.accountRecoverHelpText()}
+            </Text>{" "}
+            <br />
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph-secondary"
+              }}
+            >
+              <SubtitleWithAction
+                text={strings.rememberedYourPassword()}
+                action={{
+                  text: strings.login(),
+                  onClick: () => navigate("login")
+                }}
+              />
+            </Text>
           </>
         )
       }
@@ -747,13 +760,21 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   return (
     <AuthForm
       type="mfa:code"
-      title={strings["2fa"]()}
+      title={
+        selectedMethod === "email"
+          ? "Check your email"
+          : selectedMethod === "sms"
+          ? "Check your phone"
+          : selectedMethod === "recoveryCode"
+          ? "Recovery code"
+          : "Authenticator app"
+      }
       subtitle={texts.subtitle}
       openURL={openURL}
       onSubmit={async (form) => {
         const code = selectedMethod !== "recoveryCode" ? otpValue : form.code;
         if (!code || code.length < (selectedMethod !== "recoveryCode" ? 6 : 1))
-          throw new Error(strings.coreRequired());
+          throw new Error(strings.twoFactorCodeRequired());
 
         const loginForm: MFALoginFormData = {
           code,
@@ -762,30 +783,34 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         await userstore.login(loginForm);
         openURL("/plans", { authenticated: true });
       }}
-      onBack={() => {
-        navigate("login", {
-          email: formData.email,
-          password: formData.password ?? ""
-        });
-      }}
     >
       {(_, options) => (
         <>
           {selectedMethod !== "recoveryCode" ? (
-            <OtpInput
-              length={6}
-              value={otpValue}
-              onChange={setOtpValue}
-              autoFocus
-            />
+            <Flex sx={{ flexDirection: "column", gap: "spacing6" }}>
+              <Label
+                sx={{
+                  fontFamily: "body",
+                  fontSize: "sm",
+                  color: "label",
+                  fontWeight: 400
+                }}
+              >
+                Confirmation code
+              </Label>
+              <OtpInput
+                length={6}
+                value={otpValue}
+                onChange={setOtpValue}
+                autoFocus
+              />
+            </Flex>
           ) : (
             <AuthField id="code" type="text" label={texts.label} autoFocus />
           )}
           <SubmitButton
             loading={options?.loading}
-            text={
-              options?.loading ? strings.verifying2faCode() : strings.submit()
-            }
+            text={options?.loading ? "Verifying" : strings.submit()}
           />
           <Flex
             sx={{
@@ -907,7 +932,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   {texts.selector}
                 </Text>
               </Flex>
-              <ChevronRight size={13} color="icon" sx={{ flexShrink: 0 }} />
+              <CaretRight size={13} color="icon" sx={{ flexShrink: 0 }} />
             </Button>
           </Flex>
         </>
@@ -973,7 +998,6 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
       subtitle={strings.select2faCodeHelpText()}
       openURL={openURL}
       onSubmit={async () => {}}
-      onBack={() => navigate("mfa:code", formData)}
     >
       {MFAMethods.map(
         (method) =>
@@ -1046,7 +1070,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                   </Text>
                 </Flex>
               </Flex>
-              <ChevronRight size={13} />
+              <CaretRight size={13} />
             </Button>
           )
       )}
@@ -1149,7 +1173,7 @@ export function AuthFormContainer<
           mt: 100
         }}
       >
-        {onBack ? (
+        {onBack && (
           <Button
             type="button"
             onClick={onBack}
@@ -1178,35 +1202,34 @@ export function AuthFormContainer<
               {strings.goBack()}
             </Text>
           </Button>
-        ) : (
-          <Flex
-            sx={{
-              mb: "spacing13",
-              alignItems: "center",
-              gap: "spacing4"
+        )}
+        <Flex
+          sx={{
+            mb: "spacing13",
+            alignItems: "center",
+            gap: "spacing4"
+          }}
+        >
+          <svg
+            style={{
+              borderRadius: "default",
+              height: 30,
+              width: 30,
+              alignSelf: "center"
             }}
           >
-            <svg
-              style={{
-                borderRadius: "default",
-                height: 30,
-                width: 30,
-                alignSelf: "center"
-              }}
-            >
-              <use href="#full-logo" />
-            </svg>
-            <Text
-              sx={{
-                fontSize: "2xl",
-                fontWeight: 600,
-                color: "heading"
-              }}
-            >
-              Notesnook
-            </Text>
-          </Flex>
-        )}
+            <use href="#full-logo" />
+          </svg>
+          <Text
+            sx={{
+              fontSize: "2xl",
+              fontWeight: 600,
+              color: "heading"
+            }}
+          >
+            Notesnook
+          </Text>
+        </Flex>
         <Text
           sx={{
             fontSize: "xl",
@@ -1333,9 +1356,10 @@ export function AuthField(props: FieldProps) {
         label: {
           fontSize: "xs",
           fontWeight: 400,
-          color: "paragraph-secondary"
+          color: "label"
         },
         input: {
+          color: "paragraph",
           fontSize: "xs",
           borderRadius: "radius2",
           outline: 0,
