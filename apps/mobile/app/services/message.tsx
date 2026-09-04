@@ -34,6 +34,9 @@ import SettingsService from "./settings";
 import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
+import { db } from "../common/database";
+
+let isCheckingEmail = false;
 
 const APP_MESSAGES: Message[] = [
   {
@@ -91,7 +94,21 @@ const APP_MESSAGES: Message[] = [
     visible: true,
     message: strings.syncDisabled(),
     actionText: strings.syncDisabledActionText(),
-    onPress: () => {
+    onPress: async () => {
+      if (isCheckingEmail) return;
+      isCheckingEmail = true;
+      try {
+        const user = await db.user.fetchUser();
+        if (user?.isEmailConfirmed) {
+          clearMessage();
+          return;
+        }
+      } catch (e) {
+        /* empty */
+      } finally {
+        isCheckingEmail = false;
+      }
+
       PremiumService.showVerifyEmailDialog();
     },
     data: {},
