@@ -41,7 +41,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
-import { FluidPanels, FluidTabPage } from "../components/fluid-panels";
+import { FluidPanels } from "../components/fluid-panels";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
 import { hideAllTooltips } from "../hooks/use-tooltip";
@@ -90,7 +90,7 @@ export const FluidPanelsView = React.memo(
     );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
-
+    const availableWidth = dimensions.width - insets.left - insets.right;
     useDeviceOrientationChange((o) => {
       if (
         o !== OrientationType.UNKNOWN &&
@@ -239,54 +239,55 @@ export const FluidPanelsView = React.memo(
       [setDimensions]
     );
 
-    const PANE_OFFSET = useMemo(
-      () => ({
+    const PANE_OFFSET = useMemo(() => {
+      const smallTabletSidebar = valueLimiter(availableWidth * 0.3, 300, 450);
+      const smallTabletList = valueLimiter(availableWidth * 0.3, 300, 450);
+
+      return {
         mobile: {
-          sidebar: dimensions.width * MOBILE_SIDEBAR_SIZE,
-          list: dimensions.width + dimensions.width * MOBILE_SIDEBAR_SIZE,
-          editor: dimensions.width * 2 + dimensions.width * MOBILE_SIDEBAR_SIZE
+          sidebar: availableWidth * MOBILE_SIDEBAR_SIZE,
+          list: availableWidth + availableWidth * MOBILE_SIDEBAR_SIZE,
+          editor: availableWidth * 2 + availableWidth * MOBILE_SIDEBAR_SIZE
         },
         smallTablet: {
-          sidebar: fullscreen
-            ? 0
-            : valueLimiter(dimensions.width * 0.3, 300, 350),
-          list: fullscreen
-            ? 0
-            : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
+          sidebar: fullscreen ? 0 : smallTabletSidebar,
+          list: fullscreen ? 0 : smallTabletSidebar + smallTabletList,
           editor: fullscreen
             ? 0
-            : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350)
+            : smallTabletSidebar +
+              smallTabletList +
+              availableWidth -
+              smallTabletList
         },
         tablet: {
           sidebar: 0,
           list: 0,
           editor: 0
         }
-      }),
-      [dimensions.width, fullscreen]
-    );
+      };
+    }, [availableWidth, fullscreen]);
 
-    const PANE_WIDTHS: PaneWidths = useMemo(
-      () => ({
+    const PANE_WIDTHS: PaneWidths = useMemo(() => {
+      const smallTabletSidebar = valueLimiter(availableWidth * 0.3, 300, 450);
+      const smallTabletList = valueLimiter(availableWidth * 0.3, 300, 450);
+      return {
         mobile: {
-          sidebar: dimensions.width * MOBILE_SIDEBAR_SIZE,
-          list: dimensions.width,
-          editor: dimensions.width
+          sidebar: availableWidth * MOBILE_SIDEBAR_SIZE,
+          list: availableWidth,
+          editor: availableWidth
         },
         smallTablet: {
-          sidebar: valueLimiter(dimensions.width * 0.3, 300, 350),
-          list: valueLimiter(dimensions.width * 0.4, 300, 450),
-          editor:
-            dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
+          sidebar: smallTabletSidebar,
+          list: smallTabletList,
+          editor: availableWidth - smallTabletList
         },
         tablet: {
-          sidebar: dimensions.width * 0.22,
-          list: dimensions.width * 0.3,
-          editor: dimensions.width * 0.48
+          sidebar: availableWidth * 0.22,
+          list: availableWidth * 0.3,
+          editor: availableWidth * 0.48
         }
-      }),
-      [dimensions.width]
-    );
+      };
+    }, [availableWidth]);
 
     const onScroll = React.useCallback(
       (scrollOffset: number) => {
@@ -332,7 +333,9 @@ export const FluidPanelsView = React.memo(
         style={{
           height: "100%",
           width: "100%",
-          backgroundColor: colors.primary.background
+          backgroundColor: colors.primary.background,
+          paddingLeft: insets.left,
+          paddingRight: insets.right
         }}
       >
         {deviceMode && PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS] ? (
