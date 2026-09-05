@@ -183,8 +183,7 @@ export const SideMenu = React.memo(
           flex: 1,
           backgroundColor: colors.primary.background,
           paddingTop: insets.top,
-          paddingBottom: insets.bottom,
-          paddingLeft: insets.left
+          paddingBottom: insets.bottom
         }}
       >
         <SimpleTabView

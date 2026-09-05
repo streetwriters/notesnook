@@ -111,7 +111,7 @@ export const EditorWrapper = ({ widths }: { widths: PaneWidths }) => {
             ? deviceMode === "smallTablet"
               ? 0
               : dimensions.width * 0.15
-            : insets.right,
+            : null,
           borderLeftWidth: DDS.isTab ? 1 : 0,
           borderLeftColor: DDS.isTab
             ? colors.secondary.background
