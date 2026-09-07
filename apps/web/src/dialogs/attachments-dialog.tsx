@@ -122,8 +122,8 @@ export const AttachmentsDialog = DialogManager.register(
     });
     const [selected, setSelected] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<SortOptions>({
-      id: "filename",
-      direction: "asc"
+      id: "dateUploaded",
+      direction: "desc"
     });
     const currentRoute = useRef<Route>("all");
     const download = useStore((store) => store.download);
@@ -165,7 +165,12 @@ export const AttachmentsDialog = DialogManager.register(
               )
             }
             filter={async (query) => {
-              setAttachments(await db.lookup.attachments(query).sorted());
+              setAttachments(
+                await db.lookup.attachments(query).sorted({
+                  sortBy: sortBy.id,
+                  sortDirection: sortBy.direction
+                })
+              );
             }}
             counts={counts}
             onRouteChange={async (route) => {

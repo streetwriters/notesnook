@@ -22,7 +22,8 @@ import {
   TEST_NOTE,
   notebookTest,
   TEST_NOTEBOOK2,
-  databaseTest
+  databaseTest,
+  loginFakeUser
 } from "./utils/index.ts";
 import { test, expect, describe } from "vitest";
 
@@ -138,6 +139,37 @@ test("search reminders", () =>
     expect(titleSearch).toHaveLength(1);
     const descriptionSearch = await db.lookup.reminders("please do").ids();
     expect(descriptionSearch).toHaveLength(1);
+  }));
+
+test("search attachments sorted by dateUploaded should be sorted across batches, not just within each batch", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    // force multiple batches (2 items per batch)
+    db.options.batchSize = 2;
+
+    const dateUploaded = [3000, 1000, 4000, 2000];
+    for (let i = 0; i < dateUploaded.length; i++) {
+      const hash = await db.attachments.save(
+        Buffer.from(`attachment-data-${i}`).toString("base64"),
+        "image/png",
+        "photo.png"
+      );
+      await db.attachments.add({ hash, dateUploaded: dateUploaded[i] });
+    }
+
+    const searched = await db.lookup.attachments("photo").sorted({
+      sortBy: "dateUploaded",
+      sortDirection: "desc"
+    });
+
+    const results = [];
+    for (let i = 0; i < searched.length; i++) {
+      const { item } = await searched.item(i);
+      results.push(item.dateUploaded);
+    }
+
+    const expected = [...dateUploaded].sort((a, b) => b - a);
+    expect(results).toEqual(expected);
   }));
 
 describe("notesWithHighlighting", () => {
