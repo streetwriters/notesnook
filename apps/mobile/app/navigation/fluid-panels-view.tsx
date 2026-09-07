@@ -90,7 +90,11 @@ export const FluidPanelsView = React.memo(
     );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
-    const availableWidth = dimensions.width - insets.left - insets.right;
+    const availableWidth =
+      dimensions.width -
+      (orientation === "LANDSCAPE-LEFT" ? insets.left : 0) -
+      (orientation === "LANDSCAPE-RIGHT" ? insets.right : 0);
+
     useDeviceOrientationChange((o) => {
       if (
         o !== OrientationType.UNKNOWN &&
@@ -101,6 +105,7 @@ export const FluidPanelsView = React.memo(
         setOrientation(o);
       }
     });
+    console.log(orientation);
     React.useEffect(() => {
       const shortcut = useSettingStore.getState().pendingShortcut;
 
@@ -334,8 +339,8 @@ export const FluidPanelsView = React.memo(
           height: "100%",
           width: "100%",
           backgroundColor: colors.primary.background,
-          paddingLeft: insets.left,
-          paddingRight: insets.right
+          paddingLeft: orientation === "LANDSCAPE-LEFT" ? insets.left : 0,
+          paddingRight: orientation === "LANDSCAPE-RIGHT" ? insets.right : 0
         }}
       >
         {deviceMode && PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS] ? (
