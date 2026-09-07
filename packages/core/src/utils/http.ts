@@ -139,9 +139,11 @@ export function errorTransformer(errorJson: {
   };
 }
 
-async function fetchWrapped(input: string, init: RequestInit) {
+async function fetchWrapped(input: string, init: RequestInit, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(input, init);
+    const response = await fetch(input, { ...init, signal: controller.signal });
     return response;
   } catch (e) {
     const host = extractHostname(input);
@@ -154,6 +156,8 @@ async function fetchWrapped(input: string, init: RequestInit) {
       );
 
     throw e;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
