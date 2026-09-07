@@ -111,7 +111,6 @@ describe("VAULT", () => {
       .addStep(lockNote)
       .addStep(goToPrivacySecuritySettings)
       .waitAndTapByText("Delete vault")
-      .typeTextById(notesnook.ids.dialogs.vault.pwd, "1234")
       .waitAndTapByText("Delete")
       .isVisibleByText("Create vault")
       .pressBack(3)

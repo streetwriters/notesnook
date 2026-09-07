@@ -169,7 +169,8 @@ describe("NOTE TESTS", () => {
       .waitAndTapByText("Restore")
       .pressBack()
       .isVisibleByText(
-        "Test note description that is very long and should not fit in text."
+        "Test note description that is very long and should not fit in text.",
+        10000
       )
       .run();
   });

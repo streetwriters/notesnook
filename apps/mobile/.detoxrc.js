@@ -15,14 +15,14 @@ module.exports = {
       binaryPath:
         "ios/build/Build/Products/Debug-iphonesimulator/Notesnook.app",
       build:
-        "xcodebuild -workspace ios/Notesnook.xcworkspace -scheme YOUR_APP -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build"
+        "ENVFILE=.env.test xcodebuild -workspace ios/Notesnook.xcworkspace -scheme Notesnook -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build"
     },
     "ios.release": {
       type: "ios.app",
       binaryPath:
         "ios/build/Build/Products/Release-iphonesimulator/Notesnook.app",
       build:
-        "xcodebuild -workspace ios/Notesnook.xcworkspace -scheme YOUR_APP -configuration Release -sdk iphonesimulator -derivedDataPath ios/build"
+        "ENVFILE=.env.test xcodebuild -workspace ios/Notesnook.xcworkspace -scheme Notesnook -configuration Release -sdk iphonesimulator -derivedDataPath ios/build"
     },
     "android.debug": {
       type: "android.apk",
@@ -47,7 +47,7 @@ module.exports = {
     simulator: {
       type: "ios.simulator",
       device: {
-        type: "iPhone 17 Pro Max"
+        type: process.env.DETOX_IOS_DEVICE || "iPhone 17 Pro Max"
       }
     },
     attached: {
@@ -59,7 +59,7 @@ module.exports = {
     emulator: {
       type: "android.emulator",
       device: {
-        avdName: "Pixel_5_API_36"
+        avdName: process.env.DETOX_AVD_NAME || "Pixel_5_API_36"
       }
     }
   },
