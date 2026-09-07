@@ -842,11 +842,11 @@ msgstr "All items deleted"
 
 #: src/strings.ts:1179
 msgid ""
-"All locked notes associated will be <b style='color:var(--accent-error)'>PERMANENTLY DELETED</b>. \n"
+"All locked notes associated will be PERMANENTLY DELETED. \n"
 "\n"
 "If you want to keep them, remove locked notes from the vault."
 msgstr ""
-"All locked notes associated will be <b style='color:var(--accent-error)'>PERMANENTLY DELETED</b>. \n"
+"All locked notes associated will be PERMANENTLY DELETED. \n"
 "\n"
 "If you want to keep them, remove locked notes from the vault."
 

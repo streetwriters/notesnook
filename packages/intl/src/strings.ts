@@ -1176,7 +1176,7 @@ $day$: Current day (eg. Monday)`,
     t`All locked notes will be re-encrypted with the new password.`,
   clearVaultDesc: () => t`Remove all notes from the vault.`,
   deleteVaultDesc:
-    () => t`All locked notes associated will be <b style='color:var(--accent-error)'>PERMANENTLY DELETED</b>. 
+    () => t`All locked notes associated will be PERMANENTLY DELETED. 
 
 If you want to keep them, remove locked notes from the vault.`,
   biometricUnlock: () => t`Biometric unlocking`,
