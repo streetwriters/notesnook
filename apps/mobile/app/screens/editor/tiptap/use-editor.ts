@@ -49,6 +49,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { NotePreviewWidget } from "../../../services/note-preview-widget";
+import { PinnedNotesWidget } from "../../../services/pinned-notes-widget";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
@@ -502,6 +503,9 @@ export const useEditor = (
         timers.current.onsave = setTimeout(async () => {
           if (!id || !note) return;
           NotePreviewWidget.updateNote(id, note);
+          if (note.pinned) {
+            PinnedNotesWidget.updateNotes();
+          }
         }, 500);
 
         return id;
