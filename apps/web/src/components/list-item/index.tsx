@@ -146,11 +146,11 @@ function ListItem<TItem extends Item, TContext>(
       }}
       tabIndex={-1}
       sx={{
-        px: 1,
-        py: isCompact ? 0 : 1,
-        pr: isCompact ? 10 : 0,
-        height: isCompact ? 25 : "inherit",
-        cursor: "pointer",
+        // px: 1,
+        // py: isCompact ? 0 : 1,
+        // pr: isCompact ? 10 : 0,
+        // height: isCompact ? 25 : "inherit",
+        // cursor: "pointer",
         position: "relative",
         overflow: "hidden",
         maxWidth: "100%",
@@ -161,11 +161,8 @@ function ListItem<TItem extends Item, TContext>(
 
         opacity: isDisabled ? 0.7 : 1,
 
-        backgroundColor: selected ? "background-selected" : background,
+        backgroundColor: selected ? "background-secondary" : background,
 
-        ":hover": {
-          backgroundColor: selected ? "hover-selected" : "hover"
-        },
         ":focus": {
           backgroundColor: selected ? "hover-selected" : "hover"
         },
@@ -175,7 +172,11 @@ function ListItem<TItem extends Item, TContext>(
           backgroundColor:
             isSelected || isFocused ? "background-selected" : background
         },
-        ...sx
+        ...sx,
+        ":hover": {
+          backgroundColor: selected ? "hover-selected" : "hover",
+          ...(sx as { ":hover"?: ThemeUIStyleObject })?.[":hover"]
+        }
       }}
       onKeyUp={(e) => {
         if (e.key !== "Enter") {
@@ -218,28 +219,32 @@ function ListItem<TItem extends Item, TContext>(
         props.title
       )}
 
-      {!isCompact && props.body && (
-        <Text
-          as="p"
-          variant="body"
-          dir="auto"
-          data-test-id={`description`}
-          sx={{
-            mt: "small",
-            color: selected ? "paragraph-selected" : "paragraph",
-            lineHeight: `1.2rem`,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "pre-wrap",
-            position: "relative",
-            display: "-webkit-box",
-            WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical"
-          }}
-        >
-          {props.body}
-        </Text>
-      )}
+      {!isCompact &&
+        props.body &&
+        (typeof props.body === "string" ? (
+          <Text
+            as="p"
+            variant="body"
+            dir="auto"
+            data-test-id={`description`}
+            sx={{
+              mt: "small",
+              color: selected ? "paragraph-selected" : "paragraph",
+              lineHeight: `1.2rem`,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "pre-wrap",
+              position: "relative",
+              display: "-webkit-box",
+              WebkitLineClamp: 4,
+              WebkitBoxOrient: "vertical"
+            }}
+          >
+            {props.body}
+          </Text>
+        ) : (
+          props.body
+        ))}
       {props.footer ? <>{props.footer}</> : null}
     </Flex>
   );

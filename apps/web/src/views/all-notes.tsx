@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect } from "react";
+import { Flex, Text } from "@notesnook/ui";
 import { useStore } from "../stores/note-store";
 import ListContainer from "../components/list-container";
 import useNavigate from "../hooks/use-navigate";
@@ -26,6 +27,7 @@ import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { useEditorStore } from "../stores/editor-store";
 import { ListLoader } from "../components/loaders/list-loader";
+import notesEmptyView from "../assets/notes-empty-view.svg";
 
 function Home() {
   const notes = useStore((store) => store.notes);
@@ -60,7 +62,9 @@ function Home() {
       refresh={refresh}
       items={filteredItems || notes}
       isSearching={!!filteredItems}
-      placeholder={<Placeholder context={filteredItems ? "search" : "notes"} />}
+      placeholder={
+        filteredItems ? <Placeholder context="search" /> : <NotesPlaceholder />
+      }
       button={{
         onClick: () => useEditorStore.getState().newSession()
       }}
@@ -68,3 +72,51 @@ function Home() {
   );
 }
 export default React.memo(Home, () => true);
+
+function NotesPlaceholder() {
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "spacing7",
+        width: "100%"
+      }}
+    >
+      <img src={notesEmptyView} alt="" width={230} height={230} />
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing3",
+          textAlign: "center"
+        }}
+      >
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "md",
+            fontWeight: 600,
+            color: "heading",
+            lineHeight: 1
+          }}
+        >
+          Create your first note.
+        </Text>
+        <Text
+          sx={{
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1.2
+          }}
+        >
+          Click the{" "}
+          <Text as="span" sx={{ color: "accent" }}>
+            New Note
+          </Text>{" "}
+          button in the sidebar to get started.
+        </Text>
+      </Flex>
+    </Flex>
+  );
+}
