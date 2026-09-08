@@ -215,6 +215,17 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void updatePinnedNotesWidget() {
+        AppWidgetManager wm = AppWidgetManager.getInstance(mContext);
+        int[] ids = wm.getAppWidgetIds(ComponentName.createRelative(mContext.getPackageName(), PinnedNotesWidgetProvider.class.getName()));
+        for (int id: ids) {
+            Log.d("PinnedNotes", "Updating" + id);
+            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_pinned_notes);
+            PinnedNotesWidgetProvider.updateAppWidget(mContext, wm, id, views);
+        }
+    }
+
     @ReactMethod(isBlockingSynchronousMethod = true)
     public boolean isGestureNavigationEnabled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
