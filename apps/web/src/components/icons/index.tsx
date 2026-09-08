@@ -251,6 +251,7 @@ import FileSvg from "@notesnook/icons/file.svg?react";
 import ImageSvg from "@notesnook/icons/image.svg?react";
 import ArrowRightSvg from "@notesnook/icons/arrow-right.svg?react";
 import CheckCircleSvg from "@notesnook/icons/check-circle.svg?react";
+import CheckSvg from "@notesnook/icons/check.svg?react";
 import KeySvg from "@notesnook/icons/key.svg?react";
 import TrashSvg from "@notesnook/icons/trash.svg?react";
 import RecoveryKeyShieldCheckSvg from "@notesnook/icons/recovery-key-shield-check.svg?react";
@@ -258,6 +259,7 @@ import CopyIcon from "@notesnook/icons/copy.svg?react";
 import BoxArrowDownIcon from "@notesnook/icons/box-arrow-down.svg?react";
 import DownloadIcon from "@notesnook/icons/download-simple.svg?react";
 import FloppyDiskIcon from "@notesnook/icons/floppy-disk.svg?react";
+import CaretRightIcon from "@notesnook/icons/caret-right.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -643,6 +645,7 @@ export const FileDoc = createSvgIcon(FileSvg);
 export const Picture = createSvgIcon(ImageSvg);
 export const ArrowRightSvgIcon = createSvgIcon(ArrowRightSvg);
 export const CheckCircle = createSvgIcon(CheckCircleSvg);
+export const CheckIcon = createSvgIcon(CheckSvg);
 export const KeyIcon = createSvgIcon(KeySvg);
 export const Trash = createSvgIcon(TrashSvg);
 export const RecoveryKeyShieldCheck = createSvgIcon(RecoveryKeyShieldCheckSvg);
@@ -650,3 +653,4 @@ export const Copy = createSvgIcon(CopyIcon);
 export const BoxArrowDown = createSvgIcon(BoxArrowDownIcon);
 export const Download = createSvgIcon(DownloadIcon);
 export const FloppyDisk = createSvgIcon(FloppyDiskIcon);
+export const CaretRight = createSvgIcon(CaretRightIcon);

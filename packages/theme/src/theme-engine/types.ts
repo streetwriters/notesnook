@@ -248,6 +248,11 @@ export type Colors = {
    * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
    */
   buttonForeground: string;
+  /**
+   * Only Hex RGB values are supported. No Alpha. (e.g. #f33ff3)
+   * @pattern ^#(?:[0-9a-fA-F]{3}){1,2}$
+   */
+  label: string;
 };
 
 export type VariantsWithStaticColors<TRequired extends boolean = false> =
