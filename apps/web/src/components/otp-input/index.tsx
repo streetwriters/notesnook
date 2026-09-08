@@ -116,7 +116,10 @@ export function OtpInput({
     (e: ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
       const pasted = e.clipboardData.getData("text").replace(/\D/g, "");
-      const newValue = Array.from({ length }, (_, i) => pasted[i] || value[i] || "");
+      const newValue = Array.from(
+        { length },
+        (_, i) => pasted[i] || value[i] || ""
+      );
       onChange(newValue.join(""));
     },
     [length, onChange, value]
@@ -126,7 +129,7 @@ export function OtpInput({
     <Flex
       sx={{
         gap: "15px",
-        justifyContent: "center",
+        justifyContent: "left",
         width: "100%"
       }}
     >

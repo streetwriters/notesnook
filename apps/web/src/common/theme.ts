@@ -43,16 +43,17 @@ export const THEME_LIGHT: any = {
       primary: {
         accent: "#008836",
         accentForeground: "#ffffff",
-        paragraph: "#666666",
+        paragraph: "#474747",
         background: "#ffffff",
         border: "#E2E2E2",
         heading: "#181818",
         icon: "#181818",
         separator: "#E5E5E5",
-        placeholder: "#858585",
+        placeholder: "#414141",
         hover: "#eee",
         backdrop: "#0000001a",
-        buttonForeground: "#181818"
+        buttonForeground: "#181818",
+        label: "#828282"
       },
       secondary: {
         accent: "#0D9E46",
