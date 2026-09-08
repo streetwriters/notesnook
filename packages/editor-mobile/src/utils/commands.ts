@@ -90,8 +90,8 @@ globalThis.commands = {
   },
 
   setInsets: (insets: any) => {
-    if (typeof safeAreaController !== "undefined") {
-      safeAreaController.update(insets);
+    if (typeof globalThis.safeAreaController !== "undefined") {
+      globalThis.safeAreaController.update(insets);
     }
   },
 

@@ -29,7 +29,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { LayoutChangeEvent, View } from "react-native";
+import { LayoutChangeEvent, Platform, View } from "react-native";
 import Orientation, {
   OrientationType,
   useDeviceOrientationChange
@@ -92,8 +92,12 @@ export const FluidPanelsView = React.memo(
     const [isLoading, setIsLoading] = useState(false);
     const availableWidth =
       dimensions.width -
-      (orientation === "LANDSCAPE-LEFT" ? insets.left : 0) -
-      (orientation === "LANDSCAPE-RIGHT" ? insets.right : 0);
+      (orientation === "LANDSCAPE-LEFT" || Platform.OS === "android"
+        ? insets.left
+        : 0) -
+      (orientation === "LANDSCAPE-RIGHT" || Platform.OS === "android"
+        ? insets.right
+        : 0);
 
     useDeviceOrientationChange((o) => {
       if (
@@ -339,8 +343,14 @@ export const FluidPanelsView = React.memo(
           height: "100%",
           width: "100%",
           backgroundColor: colors.primary.background,
-          paddingLeft: orientation === "LANDSCAPE-LEFT" ? insets.left : 0,
-          paddingRight: orientation === "LANDSCAPE-RIGHT" ? insets.right : 0
+          paddingLeft:
+            orientation === "LANDSCAPE-LEFT" || Platform.OS === "android"
+              ? insets.left
+              : 0,
+          paddingRight:
+            orientation === "LANDSCAPE-RIGHT" || Platform.OS === "android"
+              ? insets.right
+              : 0
         }}
       >
         {deviceMode && PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS] ? (
