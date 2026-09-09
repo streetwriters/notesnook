@@ -35,6 +35,7 @@ import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
 import { db } from "../common/database";
+import { Walkthrough } from "../components/walkthroughs";
 
 let isCheckingEmail = false;
 
@@ -101,6 +102,10 @@ const APP_MESSAGES: Message[] = [
         const user = await db.user.fetchUser();
         if (user?.isEmailConfirmed) {
           clearMessage();
+          SettingsService.set({
+            userEmailConfirmed: true
+          });
+          Walkthrough.present("emailconfirmed", false, true);
           return;
         }
       } catch (e) {
