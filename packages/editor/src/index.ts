@@ -365,6 +365,7 @@ const useTiptap = (
             CodeBlock.name,
             Table.name,
             Blockquote.name,
+            Callout.name,
             ...LIST_NODE_TYPES
           ]
         }),
