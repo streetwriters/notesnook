@@ -40,6 +40,7 @@ import { strings } from "@notesnook/intl";
 import { RouteResult } from "../../navigation/types";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { AppEventManager, AppEvents } from "../../common/app-events";
+import { Context } from "../list-container/types";
 
 export type RouteContainerButtons = {
   search?: {
@@ -70,34 +71,30 @@ function RouteContainer(props: PropsWithChildren<RouteContainerProps>) {
 
 export default RouteContainer;
 
-function Header(props: RouteContainerProps) {
-  const { type, routeKey } = props;
-  const titlePromise = usePromise<string | undefined>(
-    () => (typeof props.title === "string" ? props.title : props.title?.()),
-    [props.title]
-  );
-  const isMobile = useMobile();
-  const isSearching = useSearchStore((store) => store.isSearching);
-  const query = useSearchStore((store) => store.query);
-  const noteContext = useNoteStore((store) => store.context);
+function useHasItems(
+  type: RouteContainerProps["type"],
+  routeKey?: RouteContainerProps["routeKey"]
+) {
   const hasNoteItems = useNoteStore((store) =>
     Boolean((routeKey === "home" ? store.notes : store.contextNotes)?.length)
   );
-  const viewMode = useNoteStore((store) => store.viewMode);
-  const setViewMode = useNoteStore((store) => store.setViewMode);
   const hasReminderItems = useReminderStore((store) =>
     Boolean(store.reminders?.length)
   );
   const hasTrashItems = useTrashStore((store) => Boolean(store.trash?.length));
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const hasItems =
-    type === "reminders"
-      ? hasReminderItems
-      : type === "trash"
-      ? hasTrashItems
-      : hasNoteItems;
+  return type === "reminders"
+    ? hasReminderItems
+    : type === "trash"
+    ? hasTrashItems
+    : hasNoteItems;
+}
 
+function useGroupingState(
+  type: RouteContainerProps["type"],
+  routeKey: RouteContainerProps["routeKey"],
+  noteContext: Context | undefined
+) {
   const groupingKey: GroupingKey =
     type === "reminders"
       ? "reminders"
@@ -121,6 +118,30 @@ function Header(props: RouteContainerProps) {
   const context =
     type === "notebook" || type === "notes" ? noteContext : undefined;
   const canToggleView = groupingKey === "home" || groupingKey === "notes";
+
+  return { groupingKey, refresh, context, canToggleView };
+}
+
+function Header(props: RouteContainerProps) {
+  const { type, routeKey } = props;
+  const titlePromise = usePromise<string | undefined>(
+    () => (typeof props.title === "string" ? props.title : props.title?.()),
+    [props.title]
+  );
+  const isMobile = useMobile();
+  const isSearching = useSearchStore((store) => store.isSearching);
+  const query = useSearchStore((store) => store.query);
+  const noteContext = useNoteStore((store) => store.context);
+  const viewMode = useNoteStore((store) => store.viewMode);
+  const setViewMode = useNoteStore((store) => store.setViewMode);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const hasItems = useHasItems(type, routeKey);
+  const { groupingKey, refresh, context, canToggleView } = useGroupingState(
+    type,
+    routeKey,
+    noteContext
+  );
 
   useEffect(() => {
     if (inputRef.current && inputRef.current.value !== query) {
@@ -151,7 +172,10 @@ function Header(props: RouteContainerProps) {
           flexDirection: "column",
           width: "100%",
           px: "spacing6",
-          pt: "spacing7",
+          pt: "spacing4",
+          pb: "spacing6",
+          borderBottom: "1px solid",
+          borderColor: "separator",
           bg: "background"
         }}
       >
@@ -314,14 +338,6 @@ function Header(props: RouteContainerProps) {
           />
         </Box>
       </Box>
-      <Box
-        sx={{
-          mt: "spacing6",
-          borderBottom: "1px solid",
-          borderColor: "separator",
-          width: "100%"
-        }}
-      />
     </Box>
   );
 }

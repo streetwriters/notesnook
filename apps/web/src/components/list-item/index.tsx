@@ -224,15 +224,16 @@ function ListItem<TItem extends Item, TContext>(
         (typeof props.body === "string" ? (
           <Text
             as="p"
-            variant="body"
             dir="auto"
             data-test-id={`description`}
             sx={{
-              mt: "small",
-              color: selected ? "paragraph-selected" : "paragraph",
-              lineHeight: `1.2rem`,
+              color: "paragraph",
+              fontSize: "xs",
+              width: "100%",
+              lineHeight: "1.2rem",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              mt: "-spacing1",
               whiteSpace: "pre-wrap",
               position: "relative",
               display: "-webkit-box",
