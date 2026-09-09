@@ -32,3 +32,4 @@ jobs:
 
       - name: Publish on Cloudflare Pages
         run: npx --yes wrangler deploy
+        working-directory: ./docs/help
