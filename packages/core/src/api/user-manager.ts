@@ -374,7 +374,7 @@ class UserManager {
   }
 
   changePassword(oldPassword: string, newPassword: string) {
-    return this._updatePassword("change", {
+    return this.updatePassword("change", {
       old_password: oldPassword,
       new_password: newPassword
     });
@@ -398,10 +398,58 @@ class UserManager {
     newPassword: string;
     encryptionKey: SerializedKey;
   }) {
-    return this._updatePassword("reset", {
+    return this.updatePassword("reset", {
       new_password: options.newPassword,
       encryptionKey: options.encryptionKey
     });
+  }
+
+  async resetPasswordWithoutRecoveryKey(newPassword: string) {
+    if (!newPassword) throw new Error("New password is required.");
+
+    const token = await this.tokenManager.getAccessToken();
+    const user = await this.getUser();
+    if (!token || !user) throw new Error("You are not logged in.");
+
+    const updateUserPayload: Partial<User> = {};
+    const newMasterKey = await this.db
+      .storage()
+      .generateCryptoKey(newPassword, user.salt);
+
+    updateUserPayload.dataEncryptionKey = await this.keyManager.wrapKey(
+      await this.db.crypto().generateRandomKey(),
+      newMasterKey
+    );
+
+    if (!(await this.resetUser())) throw new Error("Failed to reset user.");
+
+    await http.patch.json(
+      `${constants.API_HOST}/users/password/reset`,
+      {
+        newPassword: await this.db
+          .storage()
+          .hash(newPassword, user.email.toLowerCase()),
+        userKeys: updateUserPayload
+      },
+      token
+    );
+
+    await this.db.storage().deriveCryptoKey({
+      password: newPassword,
+      salt: user.salt
+    });
+
+    this.keyManager.clearCache();
+    await this.setUser({
+      ...user,
+      ...updateUserPayload,
+      attachmentsKey: undefined,
+      monographPasswordsKey: undefined,
+      inboxKeys: undefined,
+      legacyDataEncryptionKey: undefined
+    });
+
+    return true;
   }
 
   async getDataEncryptionKeys(): Promise<
@@ -667,7 +715,7 @@ class UserManager {
     }
   }
 
-  async _updatePassword(
+  private async updatePassword(
     type: "change" | "reset",
     data: {
       new_password: string;
