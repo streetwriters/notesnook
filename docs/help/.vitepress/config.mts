@@ -36,7 +36,8 @@ export default defineConfig({
   lastUpdated: true,
   metaChunk: true,
   sitemap: {
-    hostname: "https://notesnook.com/help",
+    // Keep the trailing slash so sitemap URLs resolve under /help/.
+    hostname: "https://notesnook.com/help/",
     // Only the latest docs belong in the sitemap.
     transformItems: (items) =>
       items.filter(
