@@ -198,54 +198,58 @@ function ListItem<TItem extends Item, TContext>(
     >
       {!isCompact && props.header}
 
-      {typeof props.title === "string" ? (
-        <Text
-          dir="auto"
-          data-test-id={`title`}
-          variant={"body"}
-          sx={{
-            whiteSpace: "pre",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: isCompact ? "body" : "medium",
-            color:
-              selected && heading === "heading" ? `heading-selected` : heading,
-            display: "block"
-          }}
-        >
-          {props.title}
-        </Text>
-      ) : (
-        props.title
-      )}
-
-      {!isCompact &&
-        props.body &&
-        (typeof props.body === "string" ? (
+      <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+        {typeof props.title === "string" ? (
           <Text
-            as="p"
             dir="auto"
-            data-test-id={`description`}
+            data-test-id={`title`}
+            variant={"body"}
             sx={{
-              color: "paragraph",
-              fontSize: "xs",
-              width: "100%",
-              lineHeight: "1.2rem",
+              whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              mt: "-spacing1",
-              whiteSpace: "pre-wrap",
-              position: "relative",
-              display: "-webkit-box",
-              WebkitLineClamp: 4,
-              WebkitBoxOrient: "vertical"
+              fontWeight: isCompact ? "body" : "medium",
+              color:
+                selected && heading === "heading"
+                  ? `heading-selected`
+                  : heading,
+              display: "block"
             }}
           >
-            {props.body}
+            {props.title}
           </Text>
         ) : (
-          props.body
-        ))}
+          props.title
+        )}
+
+        {!isCompact &&
+          props.body &&
+          (typeof props.body === "string" ? (
+            <Text
+              as="p"
+              dir="auto"
+              data-test-id={`description`}
+              sx={{
+                color: "paragraph",
+                fontSize: "xs",
+                width: "100%",
+                lineHeight: "1.2rem",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "pre-wrap",
+                position: "relative",
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical"
+              }}
+            >
+              {props.body}
+            </Text>
+          ) : (
+            props.body
+          ))}
+      </Flex>
+
       {props.footer ? <>{props.footer}</> : null}
     </Flex>
   );
