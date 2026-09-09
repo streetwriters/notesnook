@@ -35,6 +35,7 @@ import {
   CloseCircle
 } from "../components/icons";
 import { compressImage } from "../utils/image-compressor";
+import { isImageFile } from "@notesnook/core";
 import Queue from "p-queue";
 
 type FileStatus = "pending" | "compressing" | "encrypting" | "done" | "error";
@@ -61,7 +62,7 @@ export const AttachFilesDialog = DialogManager.register(
     onDone,
     onClose
   }: AttachFilesDialogProps) {
-    const hasImages = files.some((f) => f.type.startsWith("image/"));
+    const hasImages = files.some((f) => isImageFile(f.name, f.type));
     const imageCompressionConfig = Config.get<ImageCompressionOptions>(
       "imageCompression",
       ImageCompressionOptions.ASK_EVERY_TIME
@@ -69,8 +70,8 @@ export const AttachFilesDialog = DialogManager.register(
     const [fileStates, setFileStates] = useState<FileState[]>(() =>
       files
         .sort((a, b) => {
-          const aIsImage = a.type.startsWith("image/");
-          const bIsImage = b.type.startsWith("image/");
+          const aIsImage = isImageFile(a.name, a.type);
+          const bIsImage = isImageFile(b.name, b.type);
           if (aIsImage && !bIsImage) return -1;
           if (!aIsImage && bIsImage) return 1;
           return a.type.localeCompare(b.type);
@@ -79,7 +80,7 @@ export const AttachFilesDialog = DialogManager.register(
           file,
           status: "pending",
           progress: 0,
-          compress: file.type.startsWith("image/")
+          compress: isImageFile(file.name, file.type)
             ? imageCompressionConfig !== ImageCompressionOptions.DISABLE
             : false
         }))
@@ -291,7 +292,7 @@ function FileRow({
   onToggleCompress?: () => void;
 }) {
   const { file, status, progress, error, compress, compressedFile } = state;
-  const isImage = file.type.startsWith("image/");
+  const isImage = isImageFile(file.name, file.type);
   const activeFile = compress && compressedFile ? compressedFile : file;
   const thumbnail = useMemo(
     () => (isImage ? URL.createObjectURL(activeFile) : undefined),

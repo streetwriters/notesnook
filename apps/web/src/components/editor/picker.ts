@@ -30,6 +30,7 @@ import {
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { strings } from "@notesnook/intl";
+import { isImageFile } from "@notesnook/core";
 import Queue from "p-queue";
 
 export async function insertAttachments(
@@ -71,7 +72,7 @@ export async function reuploadAttachment(
     forceWrite: true
   };
 
-  if (selectedFile.type.startsWith("image/")) {
+  if (isImageFile(selectedFile.name, selectedFile.type)) {
     const image = await pickImage(selectedFile, options);
     if (!image) return;
   } else {
@@ -111,7 +112,7 @@ export async function attachFiles(
         }
 
         const attachment =
-          !skipSpecialImageHandling && file.type.startsWith("image/")
+          !skipSpecialImageHandling && isImageFile(file.name, file.type)
             ? await pickImage(file)
             : await pickFile(file);
 

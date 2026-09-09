@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import { isImage } from "@notesnook/core";
+import {
+  isImage,
+  isImageFile,
+  getImageMimeTypeFromFilename
+} from "@notesnook/core";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { DatabaseLogger, db } from "../common/database";
@@ -124,8 +128,12 @@ async function createNotes(bundle) {
     let content = ``;
 
     if (attached) {
-      if (isImage(file.type)) {
-        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" />`;
+      const detectedMime =
+        file.type && isImage(file.type)
+          ? file.type
+          : getImageMimeTypeFromFilename(file.name) || file.type;
+      if (isImageFile(file.name, file.type)) {
+        content = `<img data-hash="${hash}" data-mime="${detectedMime}" data-filename="${file.name}" data-size="${file.size}" />`;
       } else {
         content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
       }
