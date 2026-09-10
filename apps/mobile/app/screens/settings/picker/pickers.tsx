@@ -36,7 +36,12 @@ import { useUserStore } from "../../../stores/use-user-store";
 import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
 import PaywallSheet from "../../../components/sheets/paywall";
-import { AVAILABLE_LANGUAGES, getSupportedLocale, setI18nGlobal, strings } from "@notesnook/intl";
+import {
+  AVAILABLE_LANGUAGES,
+  getSupportedLocale,
+  setI18nGlobal,
+  strings
+} from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
 import { i18n } from "@lingui/core";
 import RNRestart from "react-native-restart";
@@ -68,7 +73,7 @@ export const LanguagePicker = createSettingsPicker<
     let systemLocale = "en";
     try {
       systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch (e) { }
+    } catch (e) {}
     return saved || getSupportedLocale(systemLocale);
   },
   updateValue: async (item) => {
@@ -76,21 +81,23 @@ export const LanguagePicker = createSettingsPicker<
     const currentLang = useSettingStore.getState().settings.appLanguage;
     if (lang === currentLang) return;
 
-    presentDialog({
-      title: strings.changeLanguage ? strings.changeLanguage() : "Change language",
-      paragraph: strings.restartAppToApplyChanges
-        ? strings.restartAppToApplyChanges()
-        : "Restart the app to apply the changes.",
-      positiveText: strings.restartNow ? strings.restartNow() : "Restart now",
-      negativeText: strings.cancel ? strings.cancel() : "Cancel",
-      positivePress: async () => {
-        eSendEvent(eCloseSimpleDialog);
-        i18n.activate(lang);
-        setI18nGlobal(i18n);
-        SettingsService.setProperty("appLanguage", lang);
-        RNRestart.restart();
-      }
-    });
+    setTimeout(() => {
+      presentDialog({
+        title: strings.changeLanguage(),
+        paragraph: strings.restartAppToApplyChanges(),
+        positiveText: strings.restartNow(),
+        negativeText: strings.cancel(),
+        positivePress: async () => {
+          eSendEvent(eCloseSimpleDialog);
+          i18n.activate(lang);
+          setI18nGlobal(i18n);
+          SettingsService.setProperty("appLanguage", lang);
+          // restarting early causes appLanguage value to not get saved.
+          setTimeout(() => RNRestart.restart(), 100);
+          return true;
+        }
+      });
+    }, 300);
   },
   formatValue: (item) => {
     const code = typeof item === "object" ? item.code : item;
@@ -99,7 +106,8 @@ export const LanguagePicker = createSettingsPicker<
   },
   getItemKey: (item) => (typeof item === "object" ? item.code : item),
   options: AVAILABLE_LANGUAGES,
-  compareValue: (current, item) => current === (typeof item === "object" ? item.code : item),
+  compareValue: (current, item) =>
+    current === (typeof item === "object" ? item.code : item),
   isFeatureAvailable: async () => true,
   isOptionAvailable: async () => true
 });
