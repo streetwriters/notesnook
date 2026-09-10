@@ -262,6 +262,7 @@ import FloppyDiskIcon from "@notesnook/icons/floppy-disk.svg?react";
 import CaretRightIcon from "@notesnook/icons/caret-right.svg?react";
 import HomeSvg from "@notesnook/icons/home.svg?react";
 import BookmarkSvg from "@notesnook/icons/bookmark.svg?react";
+import PencilSimpleSvg from "@notesnook/icons/pencil-simple.svg?react";
 import ShoppingModeSvg from "@notesnook/icons/shopping-mode.svg?react";
 import FileTextSvg from "@notesnook/icons/file-text.svg?react";
 import StarSvg from "@notesnook/icons/star.svg?react";
@@ -279,6 +280,9 @@ import NoteBellSvg from "@notesnook/icons/bell-note.svg?react";
 import NoteExpirySvg from "@notesnook/icons/bomb.svg?react";
 import SearchSvg from "@notesnook/icons/search.svg?react";
 import ViewListSvg from "@notesnook/icons/view-list.svg?react";
+import CaretRightSvg from "@notesnook/icons/caret-right.svg?react";
+import LinkSimpleSvg from "@notesnook/icons/link-simple.svg?react";
+import LinkBreakSvg from "@notesnook/icons/link-break.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -684,5 +688,9 @@ export const SearchIcon = createSvgIcon(SearchSvg);
 export const ViewList = createSvgIcon(ViewListSvg);
 export const Bell = createSvgIcon(BellSvg);
 export const Notebook = createSvgIcon(BookmarkSvg);
+export const PencilSimple = createSvgIcon(PencilSimpleSvg);
 export const Tag = createSvgIcon(ShoppingModeSvg);
 export const Star = createSvgIcon(StarSvg);
+export const CaretRight = createSvgIcon(CaretRightSvg);
+export const LinkSimple = createSvgIcon(LinkSimpleSvg);
+export const LinkBreak = createSvgIcon(LinkBreakSvg);

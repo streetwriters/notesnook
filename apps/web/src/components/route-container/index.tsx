@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { PropsWithChildren, useEffect, useRef } from "react";
-import { Box, Button, Text } from "@theme-ui/components";
+import { Box, Button, Text, Flex } from "@notesnook/ui";
 import {
   Close,
   AddReminder,
@@ -122,6 +122,66 @@ function useGroupingState(
   return { groupingKey, refresh, context, canToggleView };
 }
 
+function GroupOptions({
+  groupingKey,
+  refresh,
+  isSearching,
+  context,
+  canToggleView,
+  viewMode,
+  setViewMode
+}: {
+  groupingKey: GroupingKey;
+  refresh: () => void;
+  isSearching: boolean;
+  context: Context | undefined;
+  canToggleView: boolean;
+  viewMode: "compact" | "detailed" | undefined;
+  setViewMode: (viewMode: "compact" | "detailed") => void;
+}) {
+  return (
+    <Box
+      sx={{
+        alignItems: "center",
+        display: "flex",
+        gap: "spacing4"
+      }}
+    >
+      <Button
+        variant="tertiary"
+        title="Group and sort"
+        data-test-id={`${groupingKey}-sort-button`}
+        onClick={() =>
+          showGroupOptionsMenu(groupingKey, refresh, {
+            isSearching,
+            context
+          })
+        }
+        sx={{ p: 0 }}
+      >
+        <Sliders size={15} color="icon-secondary" />
+      </Button>
+      {canToggleView && viewMode && (
+        <Button
+          variant="tertiary"
+          title={
+            viewMode === "compact"
+              ? "Switch to detailed view"
+              : "Switch to compact view"
+          }
+          data-test-id={`${groupingKey}-view-mode-button`}
+          onClick={() =>
+            setViewMode(viewMode === "compact" ? "detailed" : "compact")
+          }
+          sx={{ p: 0 }}
+        >
+          <ViewList size={15} color="icon-secondary" />
+        </Button>
+      )}
+    </Box>
+  );
+}
+
 function Header(props: RouteContainerProps) {
   const { type, routeKey } = props;
   const titlePromise = usePromise<string | undefined>(
@@ -179,164 +239,150 @@ function Header(props: RouteContainerProps) {
           bg: "background"
         }}
       >
-        <Box
-          sx={{
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "space-between"
-          }}
-        >
-          <Text
+        {type !== "notebook" && (
+          <Box
             sx={{
-              color: "heading",
-              fontSize: "lg",
-              fontWeight: "bold",
-              lineHeight: 1
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "space-between"
             }}
           >
-            {headerTitle}
-          </Text>
-          {type !== "notFound" && hasItems && (
-            <Box
+            <Text
               sx={{
-                alignItems: "center",
-                display: "flex",
-                gap: "spacing4"
+                color: "heading",
+                fontSize: "lg",
+                fontWeight: "bold",
+                lineHeight: 1
               }}
             >
-              <Button
-                variant="tertiary"
-                title="Group and sort"
-                data-test-id={`${groupingKey}-sort-button`}
-                onClick={() =>
-                  showGroupOptionsMenu(groupingKey, refresh, {
-                    isSearching,
-                    context
-                  })
-                }
-                sx={{ p: 0 }}
-              >
-                <Sliders size={15} color="icon-secondary" />
-              </Button>
-              {canToggleView && viewMode && (
-                <Button
-                  variant="tertiary"
-                  title={
-                    viewMode === "compact"
-                      ? "Switch to detailed view"
-                      : "Switch to compact view"
-                  }
-                  data-test-id={`${groupingKey}-view-mode-button`}
-                  onClick={() =>
-                    setViewMode(viewMode === "compact" ? "detailed" : "compact")
-                  }
-                  sx={{ p: 0 }}
-                >
-                  <ViewList size={15} color="icon-secondary" />
-                </Button>
-              )}
-            </Box>
-          )}
-        </Box>
-        <Box
-          sx={{
-            position: "relative",
-            width: "100%"
-          }}
-        >
-          {!isMobile && (
-            <SearchIcon
-              size={15}
-              color="icon"
+              {headerTitle}
+            </Text>
+            {type !== "notFound" && hasItems && (
+              <GroupOptions
+                groupingKey={groupingKey}
+                refresh={refresh}
+                isSearching={isSearching}
+                context={context}
+                canToggleView={canToggleView}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+              />
+            )}
+          </Box>
+        )}
+        <Flex sx={{ gap: "15px" }}>
+          <Box
+            sx={{
+              position: "relative",
+              flex: 1
+            }}
+          >
+            {!isMobile && (
+              <SearchIcon
+                size={15}
+                color="icon"
+                sx={{
+                  left: "spacing4",
+                  pointerEvents: "none",
+                  position: "absolute",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  zIndex: 1
+                }}
+              />
+            )}
+            <Field
+              inputRef={inputRef}
+              data-test-id="search-input"
+              id="search"
+              name="search"
+              type="text"
+              variant="clean"
               sx={{
-                left: "spacing4",
-                pointerEvents: "none",
-                position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 1
+                gap: 0,
+                m: 0,
+                width: "100%"
               }}
+              styles={{
+                input: {
+                  m: 0,
+                  p: "spacing4",
+                  pl: "spacing10",
+                  fontSize: "xs",
+                  color: "paragraph-secondary",
+                  bg: "background-secondary",
+                  borderRadius: "dialog",
+                  "::placeholder": {
+                    textAlign: "start"
+                  },
+                  "& + .rightActions #search-action-button": {
+                    opacity: query ? 1 : 0
+                  },
+                  "&:focus + .rightActions #search-action-button": {
+                    opacity: 1
+                  }
+                }
+              }}
+              defaultValue={query}
+              placeholder={strings.searchInRoute(headerTitle)}
+              onChange={debounce(
+                (e) => useSearchStore.setState({ query: e.target.value }),
+                250
+              )}
+              onKeyUp={(e) => {
+                if (e.key === "Escape") useSearchStore.getState().resetSearch();
+                else
+                  useSearchStore.setState({
+                    isSearching: true,
+                    searchType: type
+                  });
+              }}
+              leftActions={[
+                {
+                  icon: Menu,
+                  hidden: !isMobile,
+                  id: "hamburger-menu",
+                  onClick: () => {
+                    AppEventManager.publish(AppEvents.toggleSideMenu, true);
+                  }
+                }
+              ]}
+              rightActions={[
+                {
+                  icon: Close,
+                  id: "search-action-button",
+                  testId: "search-button",
+                  onClick: () => {
+                    if (inputRef.current) inputRef.current.value = "";
+                    useSearchStore.getState().resetSearch();
+                  },
+                  hidden: !query
+                },
+                ...(type === "reminders"
+                  ? [
+                      {
+                        icon: AddReminder,
+                        testId: "create-reminder-button",
+                        ...CREATE_BUTTON_MAP.reminders
+                      }
+                    ]
+                  : [])
+              ]}
+            />
+          </Box>
+
+          {type === "notebook" && hasItems && (
+            <GroupOptions
+              groupingKey={groupingKey}
+              refresh={refresh}
+              isSearching={isSearching}
+              context={context}
+              canToggleView={canToggleView}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
             />
           )}
-          <Field
-            inputRef={inputRef}
-            data-test-id="search-input"
-            id="search"
-            name="search"
-            type="text"
-            variant="clean"
-            sx={{
-              gap: 0,
-              m: 0,
-              width: "100%"
-            }}
-            styles={{
-              input: {
-                m: 0,
-                p: "spacing4",
-                pl: "spacing10",
-                fontSize: "xs",
-                color: "paragraph-secondary",
-                bg: "background-secondary",
-                borderRadius: "dialog",
-                "::placeholder": {
-                  textAlign: "start"
-                },
-                "& + .rightActions #search-action-button": {
-                  opacity: query ? 1 : 0
-                },
-                "&:focus + .rightActions #search-action-button": {
-                  opacity: 1
-                }
-              }
-            }}
-            defaultValue={query}
-            placeholder={strings.searchInRoute(headerTitle)}
-            onChange={debounce(
-              (e) => useSearchStore.setState({ query: e.target.value }),
-              250
-            )}
-            onKeyUp={(e) => {
-              if (e.key === "Escape") useSearchStore.getState().resetSearch();
-              else
-                useSearchStore.setState({
-                  isSearching: true,
-                  searchType: type
-                });
-            }}
-            leftActions={[
-              {
-                icon: Menu,
-                hidden: !isMobile,
-                id: "hamburger-menu",
-                onClick: () => {
-                  AppEventManager.publish(AppEvents.toggleSideMenu, true);
-                }
-              }
-            ]}
-            rightActions={[
-              {
-                icon: Close,
-                id: "search-action-button",
-                testId: "search-button",
-                onClick: () => {
-                  if (inputRef.current) inputRef.current.value = "";
-                  useSearchStore.getState().resetSearch();
-                },
-                hidden: !query
-              },
-              ...(type === "reminders"
-                ? [
-                    {
-                      icon: AddReminder,
-                      testId: "create-reminder-button",
-                      ...CREATE_BUTTON_MAP.reminders
-                    }
-                  ]
-                : [])
-            ]}
-          />
-        </Box>
+        </Flex>
       </Box>
     </Box>
   );
