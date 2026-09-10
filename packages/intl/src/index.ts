@@ -26,7 +26,8 @@ export {
   initLocale,
   resolveTargetLocale,
   getLocaleMessages,
-  localeMap
+  localeMap,
+  LOCALE_LOADERS
 } from "./locale";
 export type { InitLocaleOptions } from "./locale";
 

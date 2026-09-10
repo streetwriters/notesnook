@@ -22,7 +22,8 @@ import { setI18nGlobal } from "./setup";
 import { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
 
 import { localeMap } from "./generated/locale-map";
-export { localeMap };
+import { LOCALE_LOADERS } from "./generated/loaders.mobile";
+export { localeMap, LOCALE_LOADERS };
 
 export function resolveTargetLocale(
   savedLanguage?: string | null,

@@ -18,9 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { i18n } from "@lingui/core";
-import { setI18nGlobal, resolveTargetLocale } from "@notesnook/intl";
+import {
+  setI18nGlobal,
+  resolveTargetLocale,
+  LOCALE_LOADERS
+} from "@notesnook/intl";
 import SettingsService from "../../services/settings";
-import { LOCALE_LOADERS } from "./loaders";
 
 const localeCache = {};
 const localeCatalogs = {};
