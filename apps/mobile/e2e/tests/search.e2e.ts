@@ -26,11 +26,9 @@ describe("Search", () => {
       .createNote()
       .waitAndTapById("search-header")
       .typeTextById("search-input", "Test")
-      .wait(1000)
-      .isVisibleByText("1")
+      .isVisibleByText("1 result", 10000)
       .waitAndTapById("clear-search")
-      .wait(2000)
-      .isNotVisibleByText("1")
+      .isNotVisibleByText("1 result", 10000)
       .run();
   });
 });

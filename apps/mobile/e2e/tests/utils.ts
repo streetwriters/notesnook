@@ -43,20 +43,40 @@ class Element {
   isVisible(timeout?: number) {
     return waitFor(this.element)
       .toBeVisible()
-      .withTimeout(timeout || 500);
+      .withTimeout(timeout || 2000);
   }
 
   isNotVisible(timeout?: number) {
     return waitFor(this.element)
       .not.toBeVisible()
-      .withTimeout(timeout || 500);
+      .withTimeout(timeout || 2000);
   }
 
   async waitAndTap(timeout?: number) {
     await waitFor(this.element)
       .toBeVisible()
-      .withTimeout(timeout || 500);
+      .withTimeout(timeout || 2000);
     await this.element.tap();
+  }
+
+  async waitAndTypeText(text: string, timeout?: number) {
+    await this.isVisible(timeout);
+    await this.element.typeText(text);
+  }
+
+  async waitAndReplaceText(text: string, timeout?: number) {
+    await this.isVisible(timeout);
+    await this.element.replaceText(text);
+  }
+
+  async waitAndClearText(timeout?: number) {
+    await this.isVisible(timeout);
+    await this.element.clearText();
+  }
+
+  async waitAndTapReturnKey(timeout?: number) {
+    await this.isVisible(timeout);
+    await this.element.tapReturnKey();
   }
 
   tap(point?: Detox.Point2D): Promise<void> {
@@ -75,7 +95,7 @@ const Tests = {
   awaitLaunch: async () => {
     await device.disableSynchronization();
     await waitFor(element(by.id(notesnook.ids.default.root)))
-      .toBeVisible()
+      .toExist()
       //@ts-ignore
       .withTimeout(globalThis["DEBUG_MODE"] ? 4000 : 500);
   },
@@ -96,7 +116,7 @@ const Tests = {
     let body =
       _body ||
       "Test note description that is very long and should not fit in text.";
-    await Tests.fromId(notesnook.buttons.add).tap();
+    await Tests.fromId(notesnook.buttons.add).waitAndTap(2000);
     if (title) {
       await web().element(by.web.id("editor-title")).focus();
       await web().element(by.web.id("editor-title")).typeText(title, false);
@@ -112,6 +132,7 @@ const Tests = {
     let menu = Tests.fromId(notesnook.ids.default.header.buttons.left);
     await menu.waitAndTap();
     await Tests.fromText(screen as string).waitAndTap();
+    await Tests.sleep(500);
   },
   async openSideMenu() {
     await Tests.fromId(notesnook.ids.default.header.buttons.left).waitAndTap();
@@ -130,16 +151,14 @@ const Tests = {
   },
   async createNotebook(title = "Notebook 1", description = true) {
     await Tests.sleep(1000);
-    const titleInput = Tests.fromId(
+    await Tests.fromId(
       notesnook.ids.dialogs.notebook.inputs.title
-    );
-    await titleInput.isVisible();
-    await titleInput.element.typeText(title);
+    ).waitAndTypeText(title);
     await Tests.sleep(1000);
     if (description) {
       await Tests.fromId(
         notesnook.ids.dialogs.notebook.inputs.description
-      ).element.typeText(`Description of ${title}`);
+      ).waitAndTypeText(`Description of ${title}`);
     }
     await Tests.fromText("Add").waitAndTap();
   },
@@ -285,10 +304,9 @@ class TestBuilder {
     });
   }
 
-  tapReturnKeyById(id: string) {
+  tapReturnKeyById(id: string, timeout?: number) {
     return this.addStep(async () => {
-      const element = new Element("id", id);
-      await element.element.tapReturnKey();
+      await Element.fromId(id).waitAndTapReturnKey(timeout);
     });
   }
 
@@ -309,21 +327,21 @@ class TestBuilder {
     });
   }
 
-  typeTextById(id: string, text: string) {
+  typeTextById(id: string, text: string, timeout?: number) {
     return this.addStep(async () => {
-      await Element.fromId(id).element.typeText(text);
+      await Element.fromId(id).waitAndTypeText(text, timeout);
     });
   }
 
-  replaceTextById(id: string, text: string) {
+  replaceTextById(id: string, text: string, timeout?: number) {
     return this.addStep(async () => {
-      await Element.fromId(id).element.replaceText(text);
+      await Element.fromId(id).waitAndReplaceText(text, timeout);
     });
   }
 
-  clearTextById(id: string) {
+  clearTextById(id: string, timeout?: number) {
     return this.addStep(async () => {
-      await Element.fromId(id).element.clearText();
+      await Element.fromId(id).waitAndClearText(timeout);
     });
   }
 

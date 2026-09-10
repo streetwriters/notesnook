@@ -184,6 +184,7 @@
     "babel-loader": "^10.0.0",
     "babel-plugin-syntax-hermes-parser": "^0.32.1",
     "detox": "^20.27.6",
+    "dotenv": "^16.6.1",
     "expect": "^29.7.0",
     "fonteditor-core": "^2.1.11",
     "jest": "^29.7.0",

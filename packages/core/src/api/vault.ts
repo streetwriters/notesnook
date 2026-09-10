@@ -167,21 +167,19 @@ export default class Vault {
    * can be created.
    * So when user triggers delete, we should delete all vaults.
    */
-  async delete(deleteAllLockedNotes = false) {
+  async delete() {
     const vaults = await this.db.vaults.all.items();
     if (!vaults.length) return;
 
-    if (deleteAllLockedNotes) {
-      const lockedIds = new Set<string>();
-      for (const vault of vaults) {
-        const relations = await this.db.relations.from(vault, "note").get();
-        for (const { toId } of relations) {
-          lockedIds.add(toId);
-        }
+    const lockedIds = new Set<string>();
+    for (const vault of vaults) {
+      const relations = await this.db.relations.from(vault, "note").get();
+      for (const { toId } of relations) {
+        lockedIds.add(toId);
       }
-      if (lockedIds.size) {
-        await this.db.notes.remove(...lockedIds);
-      }
+    }
+    if (lockedIds.size) {
+      await this.db.notes.remove(...lockedIds);
     }
 
     await this.db.vaults.removeAll();
