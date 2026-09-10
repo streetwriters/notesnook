@@ -22,7 +22,7 @@ import {
   notesFromContext,
   useStore as useNotesStore
 } from "../stores/note-store";
-import Placeholder from "../components/placeholders";
+import Placeholder, { ListPanePlaceholder } from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { handleDrop } from "../common/drop-handler";
@@ -64,19 +64,14 @@ function Notes(props: NotesProps) {
       isSearching={!!filteredItems}
       onDrop={(e) => handleDrop(e.dataTransfer, context)}
       placeholder={
-        <Placeholder
-          context={
-            filteredItems
-              ? "search"
-              : context.type === "favorite"
-              ? "favorites"
-              : context.type === "archive"
-              ? "archive"
-              : context.type === "monographs"
-              ? "monographs"
-              : "notes"
-          }
-        />
+        !filteredItems &&
+        (context.type === "favorite" ||
+          context.type === "archive" ||
+          context.type === "monographs") ? (
+          <ListPanePlaceholder variant={context.type} />
+        ) : (
+          <Placeholder context={filteredItems ? "search" : "notes"} />
+        )
       }
       button={{
         onClick: () => useEditorStore.getState().newSession()

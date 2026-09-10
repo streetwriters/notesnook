@@ -18,55 +18,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  GroupHeader as GroupHeaderType,
+  GroupingKey,
+  GroupOptions
+} from "@notesnook/core";
+import {
   GroupBy,
   OrderAtoZ,
   OrderOldestNewest,
   OrderZtoA,
   OrderNewestOldest,
-  SortBy,
-  SortAsc,
-  SortDesc,
-  DetailedView,
-  CompactView,
-  Icon
+  SortBy
 } from "../icons";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { useEffect, useRef } from "react";
+import { Flex, Text } from "@theme-ui/components";
 import { db } from "../../common/db";
 import { Menu, useMenuTrigger } from "../../hooks/use-menu";
-import { useStore as useNoteStore } from "../../stores/note-store";
-import { useStore as useNotebookStore } from "../../stores/notebook-store";
-import useMobile from "../../hooks/use-mobile";
 import { MenuButtonItem, MenuItem } from "@notesnook/ui";
-import {
-  GroupHeader as GroupHeaderType,
-  GroupOptions,
-  GroupingKey
-} from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import type { Context } from "../list-container/types";
-
-const groupByToTitleMap = {
-  get none() {
-    return strings.groupByStrings.none();
-  },
-  get default() {
-    return strings.groupByStrings.default();
-  },
-  get abc() {
-    return strings.groupByStrings.abc();
-  },
-  get year() {
-    return strings.groupByStrings.year();
-  },
-  get week() {
-    return strings.groupByStrings.week();
-  },
-  get month() {
-    return strings.groupByStrings.month();
-  }
-};
 
 type GroupingMenuOptions = {
   groupOptions: GroupOptions;
@@ -209,6 +180,37 @@ export function showSortMenu(groupingKey: GroupingKey, refresh: () => void) {
   );
 }
 
+export function showGroupOptionsMenu(
+  groupingKey: GroupingKey,
+  refresh: () => void,
+  options?: {
+    isSearching?: boolean;
+    context?: Context;
+  }
+) {
+  const groupOptions = getGroupOptions(
+    options?.context,
+    options?.isSearching,
+    groupingKey
+  );
+  const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
+    groupingKey: options?.isSearching ? "search" : groupingKey,
+    groupOptions,
+    refresh,
+    ...options
+  };
+  const groupBy = groupByMenu({ ...menuOptions, parentKey: "groupBy" });
+  const menuItems = [
+    orderByMenu({ ...menuOptions, parentKey: "sortDirection" }),
+    sortByMenu({ ...menuOptions, parentKey: "sortBy" })
+  ];
+  if (groupBy) menuItems.push(groupBy);
+
+  Menu.openMenu(menuItems, {
+    title: groupBy ? strings.groupAndSort() : strings.sort()
+  });
+}
+
 function getGroupOptions(
   context: Context | undefined,
   isSearching: boolean | undefined,
@@ -278,63 +280,20 @@ function map(
 
 type GroupHeaderProps = {
   title: string;
-  groupingKey: GroupingKey;
-  index: number;
-
   groups: () => Promise<{ index: number; group: GroupHeaderType }[]>;
   onJump: (index: number) => void;
-  refresh: () => void;
   onSelectGroup: () => void;
   isFocused: boolean;
-  isSearching?: boolean;
-  context?: Context;
 };
 function GroupHeader(props: GroupHeaderProps) {
-  const {
-    title,
-    groups,
-    onJump,
-    index,
-    groupingKey,
-    refresh,
-    onSelectGroup,
-    isFocused,
-    isSearching,
-    context
-  } = props;
+  const { title, groups, onJump, onSelectGroup, isFocused } = props;
 
-  const [groupOptions, setGroupOptions] = useState(
-    getGroupOptions(context, isSearching, groupingKey)
-  );
   const groupHeaderRef = useRef<HTMLDivElement>(null);
-  const { openMenu, target } = useMenuTrigger();
-  const notesViewMode = useNoteStore((store) => store.viewMode);
-  const setNotesViewMode = useNoteStore((store) => store.setViewMode);
-  const notebooksViewMode = useNotebookStore((store) => store.viewMode);
-  const setNotebooksViewMode = useNotebookStore((store) => store.setViewMode);
+  const { openMenu } = useMenuTrigger();
 
   useEffect(() => {
     if (isFocused && groupHeaderRef.current) groupHeaderRef.current.focus();
   }, [isFocused]);
-  const isMenuTarget = target && target === groupHeaderRef.current;
-
-  const [viewMode, setViewMode] = useMemo(() => {
-    if (
-      groupingKey === "home" ||
-      groupingKey === "notes" ||
-      groupingKey === "favorites"
-    ) {
-      return [notesViewMode, setNotesViewMode];
-    } else if (groupingKey === "notebooks")
-      return [notebooksViewMode, setNotebooksViewMode];
-    else return [null, null];
-  }, [
-    groupingKey,
-    notesViewMode,
-    notebooksViewMode,
-    setNotesViewMode,
-    setNotebooksViewMode
-  ]);
 
   return (
     <Flex
@@ -377,10 +336,9 @@ function GroupHeader(props: GroupHeaderProps) {
       // pr={0}
       sx={{
         cursor: "pointer",
-        px: 1,
-        py: 1,
-        pr: 2,
-        borderBottom: "1px solid var(--border)",
+        px: "spacing6",
+        my: "spacing6",
+        // borderBottom: "1px solid var(--border)",
         // border: isMenuTarget ? "1px solid" : "none",
         // borderColor: isMenuTarget ? "accent" : "transparent",
         ":focus": {
@@ -394,114 +352,18 @@ function GroupHeader(props: GroupHeaderProps) {
     >
       <Text
         data-test-id="title"
-        variant="subtitle"
         sx={{
-          fontSize: "subBody",
-          fontWeight: "medium",
+          fontSize: "xs",
+          fontWeight: 400,
           color:
             title === strings.conflicted() || title === "Conflicted"
               ? "error"
               : "accent"
         }}
       >
-        {title.toUpperCase()}
+        {title}
       </Text>
-
-      {index === 0 && (
-        <Flex>
-          {groupingKey && (
-            <IconButton
-              testId={`${groupingKey}-sort-button`}
-              icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
-              title={strings.groupedBy(
-                groupByToTitleMap[groupOptions.groupBy || "default"]
-              )}
-              onClick={() => {
-                const groupOptions = getGroupOptions(
-                  context,
-                  isSearching,
-                  groupingKey
-                );
-                setGroupOptions(groupOptions);
-
-                const menuOptions: Omit<GroupingMenuOptions, "parentKey"> = {
-                  groupingKey: isSearching ? "search" : groupingKey,
-                  groupOptions,
-                  refresh,
-                  isSearching,
-                  context
-                };
-                const groupBy = groupByMenu({
-                  ...menuOptions,
-                  parentKey: "groupBy"
-                });
-
-                const menuItems = [
-                  orderByMenu({
-                    ...menuOptions,
-                    parentKey: "sortDirection"
-                  }),
-                  sortByMenu({
-                    ...menuOptions,
-                    parentKey: "sortBy"
-                  })
-                ];
-                if (groupBy) menuItems.push(groupBy);
-
-                openMenu(menuItems, {
-                  title: groupBy ? strings.groupAndSort() : strings.sort()
-                });
-              }}
-            />
-          )}
-          {viewMode && (
-            <IconButton
-              icon={viewMode === "compact" ? DetailedView : CompactView}
-              title={
-                viewMode === "compact"
-                  ? strings.switchToDetailedView()
-                  : strings.switchToCompactView()
-              }
-              onClick={() =>
-                setViewMode(viewMode === "compact" ? "detailed" : "compact")
-              }
-            />
-          )}
-        </Flex>
-      )}
     </Flex>
   );
 }
 export default GroupHeader;
-
-type IconButtonProps = {
-  text?: string;
-  title: string;
-  onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  testId?: string;
-  icon: Icon;
-};
-function IconButton(props: IconButtonProps) {
-  const { text, title, onClick, testId } = props;
-  const isMobile = useMobile();
-  return (
-    <Button
-      variant="secondary"
-      bg="transparent"
-      title={title}
-      p={"2px"}
-      mr={[2, 0]}
-      data-test-id={testId}
-      sx={{ ":last-of-type": { mr: 0 }, alignItems: "center", display: "flex" }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick(e);
-      }}
-    >
-      {text && <Text variant="body">{text}</Text>}
-      {props.icon && (
-        <props.icon size={isMobile ? 20 : 14} sx={{ ml: text ? 1 : 0 }} />
-      )}
-    </Button>
-  );
-}
