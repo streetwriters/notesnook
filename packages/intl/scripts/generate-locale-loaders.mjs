@@ -91,13 +91,7 @@ writeFileSync(
 );
 
 // 2. Write Mobile locale loaders
-const mobileLocaleDir = path.join(
-  __dirname,
-  "../../../apps/mobile/app/common/locale"
+writeFileSync(
+  path.join(generatedDir, "loaders.mobile.ts"),
+  generateMobileLocaleLoaders()
 );
-if (existsSync(mobileLocaleDir)) {
-  writeFileSync(
-    path.join(mobileLocaleDir, "loaders.js"),
-    generateMobileLocaleLoaders()
-  );
-}
