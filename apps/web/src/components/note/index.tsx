@@ -59,14 +59,13 @@ import { store as appStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
-import IconTag from "../icon-tag";
 import {
   AddReminder,
   AddToNotebook,
   Alert,
   Archive,
-  Attachment,
   AttachmentError,
+  NoteBell,
   Circle,
   Close,
   Colors,
@@ -88,24 +87,30 @@ import {
   Print,
   Publish,
   Readonly,
-  Reminder,
   RemoveShortcutLink,
-  SpellCheck,
-  Star,
   StarOutline,
   Sync,
   SyncOff,
   Tag2,
   Tag as TagIcon,
+  NoteCalendar,
+  NoteExpiry,
+  NoteFavorite,
+  NoteLink,
+  NoteLock,
+  NotePin,
+  NoteReadonly,
   Trash,
   Update
 } from "../icons";
 import { Context } from "../list-container/types";
+import IconTag from "../icon-tag";
 import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
 import { withFeatureCheck } from "../../common";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -128,10 +133,26 @@ function Note(props: NoteProps) {
     context
   } = props;
   const note = item;
-
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
   const dateFormat = useSettingStore((store) => store.dateFormat);
+  const isSelected = useSelectionStore((store) =>
+    store.selectedItems.includes(item.id)
+  );
+  const metadataItems = compact
+    ? []
+    : getMetadataItems({
+        note,
+        context,
+        locked,
+        attachments,
+        notebooks,
+        tags,
+        reminder,
+        primary,
+        isSelected: isSelected || isOpened
+      });
+  const hasMetadata = metadataItems.length > 0;
 
   return (
     <ListItem
@@ -139,8 +160,35 @@ function Note(props: NoteProps) {
       isFocused={isOpened}
       isCompact={compact}
       item={note}
-      title={note.title}
-      body={note.headline as string}
+      title={
+        <Flex
+          sx={{
+            alignItems: "center",
+            gap: "spacing3",
+            minWidth: 0
+          }}
+        >
+          {color && (
+            <Circle size={10} color={primary} sx={{ width: 10, height: 10 }} />
+          )}
+          <Text
+            dir="auto"
+            data-test-id={`title`}
+            sx={{
+              color: "heading",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              fontWeight: 600,
+              fontSize: compact ? "xs" : "sm"
+            }}
+          >
+            {note.title}
+          </Text>
+        </Flex>
+      }
+      body={!compact && note.headline ? note.headline : undefined}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
           // @ts-expect-error write tests for this
@@ -155,9 +203,15 @@ function Note(props: NoteProps) {
         background: "background"
       }}
       sx={{
-        borderLeft: isOpened ? "4px solid" : "none",
-        pl: isOpened ? "3px" : "7px",
-        borderLeftColor: isOpened ? primary : "transparent"
+        py: "spacing4",
+        px: "spacing6",
+        height: compact ? "auto" : undefined,
+        borderBottom: "1px solid",
+        borderBottomColor: "border",
+        gap: "spacing4",
+        ":hover": {
+          ".note-chip": { backgroundColor: "background-tertiary" }
+        }
       }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
@@ -166,129 +220,92 @@ function Note(props: NoteProps) {
         useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
       header={
-        <Flex sx={{ alignItems: "center", mb: 1 }}>
-          <Text variant="subBody">
-            {formatDate(date, { type: "date", dateFormat })}
-          </Text>
-        </Flex>
+        compact || !hasMetadata ? undefined : (
+          <Flex
+            sx={{
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "spacing2",
+              minWidth: 0
+            }}
+          >
+            {metadataItems}
+          </Flex>
+        )
       }
       footer={
         <Flex
           sx={{
-            fontSize: "subBody",
-            color: "paragraph-secondary",
             alignItems: "center",
-            gap: 1,
-            flexWrap: "wrap",
-            mt: "small",
-            flexShrink: 0
+            color: "paragraph-secondary",
+            flexShrink: 0,
+            gap: "spacing2",
+            justifyContent: compact ? "flex-end" : undefined
           }}
         >
           {compact ? (
             <>
-              {note.conflicted && <Alert size={15} color="var(--icon-error)" />}
-              {locked && <Lock size={11} data-test-id={`locked`} />}
-              {note.favorite && <Star color={primary} size={15} />}
-              {note.readonly && <Readonly size={15} />}
-              {note.expiryDate?.value ? <Destruct size={13} /> : null}
-
-              <TimeAgo live={true} datetime={date} locale="short" />
+              <TimeAgo
+                sx={{
+                  color: "paragraph-secondary",
+                  fontSize: "xxs",
+                  fontWeight: "medium",
+                  whiteSpace: "nowrap"
+                }}
+                live={true}
+                datetime={date}
+                locale="short"
+              />
+              {note.conflicted && <Alert size={11} color="icon-error" />}
+              {locked && (
+                <NoteLock
+                  size={11}
+                  color="icon-secondary"
+                  data-test-id="locked"
+                />
+              )}
+              {note.readonly && (
+                <NoteReadonly size={11} color="icon-secondary" />
+              )}
+              {note.favorite && (
+                <NoteFavorite
+                  data-test-id="favorite"
+                  size={11}
+                  color="#E5C131"
+                />
+              )}
+              {note.expiryDate?.value ? (
+                <NoteExpiry size={11} color="paragraph-secondary" />
+              ) : null}
             </>
           ) : (
             <>
-              {note.conflicted && <Alert size={15} color="icon-error" />}
-
-              {note.localOnly && <SyncOff size={13} />}
-
-              {/* <TimeAgo
-                sx={{ flexShrink: 0 }}
-                locale="en_short"
-                live={true}
-                datetime={date}
-              /> */}
-
-              {attachments?.total ? (
-                <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
-                  <Attachment size={13} />
-                  <Text variant="subBody" ml={"2px"}>
-                    {attachments.total}
-                  </Text>
-                </Flex>
-              ) : null}
-
-              {attachments?.failed ? (
-                <Flex title={strings.errorsInAttachments(attachments.failed)}>
-                  <AttachmentError size={13} color="var(--icon-error)" />
-                  <Text ml={"2px"}>{attachments.failed}</Text>
-                </Flex>
-              ) : null}
-
-              {note.pinned && !props.context && <Pin size={13} />}
-
-              {locked && <Lock size={13} data-test-id={`locked`} />}
-
-              {note.readonly && <Readonly size={15} />}
-
-              {note.favorite && (
-                <Star data-test-id="favorite" color={primary} size={15} />
-              )}
-
-              {tags?.items.map((tag) => {
-                return (
-                  <IconTag
-                    testId={`tag-item`}
-                    key={tag.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!tag.id)
-                        return showToast("error", strings.tagNotFound());
-
-                      appStore.get().setNavigationTab("tags");
-                      navigate(`/tags/${tag.id}`);
-                    }}
-                    text={tag.title}
-                    title={strings.goToTag(tag.title)}
-                    icon={TagIcon}
-                  />
-                );
-              })}
-
-              {context?.type !== "notebook" &&
-                notebooks?.items.map((notebook) => (
-                  <IconTag
-                    key={notebook.id}
-                    onClick={() => {
-                      appStore.get().setNavigationTab("notebooks");
-                      navigate(`/notebooks/${notebook.id}`);
-                    }}
-                    text={notebook.title}
-                    icon={Notebook}
-                  />
-                ))}
-
-              {reminder && isReminderActive(reminder) ? (
-                <IconTag
-                  icon={Reminder}
-                  text={getFormattedReminderTime(reminder, true)}
-                  title={reminder.title}
-                  styles={
-                    isReminderToday(reminder)
-                      ? {
-                          icon: { color: primary },
-                          text: { color: primary }
-                        }
-                      : {}
-                  }
-                />
-              ) : null}
-
+              <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+                <NoteCalendar size={12} color="icon-secondary" />
+                <Text
+                  sx={{
+                    color: "paragraph-secondary",
+                    fontSize: "xxs",
+                    fontWeight: "medium"
+                  }}
+                >
+                  {formatDate(date, { type: "date", dateFormat })}
+                </Text>
+              </Flex>
               {note.expiryDate?.value && (
                 <IconTag
-                  icon={Destruct}
+                  className="note-chip"
+                  icon={NoteExpiry}
+                  selected={isSelected || isOpened}
                   text={formatDate(note.expiryDate.value, {
                     type: "date",
                     dateFormat
                   })}
+                  iconSize={12}
+                  styles={{
+                    icon: { color: "icon-secondary" },
+                    text: { color: "paragraph-secondary" }
+                  }}
                 />
               )}
             </>
@@ -919,4 +936,118 @@ async function copyNote(noteId: string, format: "md" | "txt") {
     if (e instanceof Error)
       showToast("error", `${strings.failedToCopyNote()}: ${e.message}.`);
   }
+}
+
+function getMetadataItems(props: {
+  note: NoteType;
+  context?: Context;
+  locked?: boolean;
+  attachments?: NoteResolvedData["attachments"];
+  notebooks?: NoteResolvedData["notebooks"];
+  tags?: NoteResolvedData["tags"];
+  reminder?: NoteResolvedData["reminder"];
+  primary: SchemeColors;
+  isSelected: boolean;
+}): React.ReactNode[] {
+  const {
+    note,
+    context,
+    locked,
+    attachments,
+    notebooks,
+    tags,
+    reminder,
+    primary,
+    isSelected
+  } = props;
+  return [
+    note.conflicted && <Alert key="conflicted" size={15} color="icon-error" />,
+    note.localOnly && <SyncOff key="local-only" size={15} />,
+    note.pinned && !context && <NotePin key="pinned" size={15} color="icon" />,
+    locked && (
+      <NoteLock key="locked" size={15} color="icon" data-test-id="locked" />
+    ),
+    note.readonly && <NoteReadonly key="readonly" size={15} color="icon" />,
+    note.favorite && (
+      <NoteFavorite
+        key="favorite"
+        data-test-id="favorite"
+        size={15}
+        color="#E5C131"
+      />
+    ),
+    attachments?.total ? (
+      <Flex
+        key="attachments-total"
+        sx={{ alignItems: "center", gap: "spacing1" }}
+      >
+        <NoteLink size={14} color="icon" sx={{ width: 8, height: 14 }} />
+        <Text sx={{ color: "heading", fontSize: "xs" }}>
+          {attachments.total}
+        </Text>
+      </Flex>
+    ) : null,
+    attachments?.failed ? (
+      <Flex
+        key="attachments-failed"
+        title={strings.errorsInAttachments(attachments.failed)}
+        sx={{ alignItems: "center", gap: "spacing1" }}
+      >
+        <AttachmentError size={13} color="icon-error" />
+        <Text sx={{ color: "paragraph", fontSize: "xs" }}>
+          {attachments.failed}
+        </Text>
+      </Flex>
+    ) : null,
+    ...(context?.type !== "notebook"
+      ? notebooks?.items.map((notebook) => (
+          <IconTag
+            className="note-chip"
+            selected={isSelected}
+            key={notebook.id}
+            icon={Notebook}
+            iconSize={12}
+            text={notebook.title}
+            onClick={() => {
+              appStore.get().setNavigationTab("notebooks");
+              navigate(`/notebooks/${notebook.id}`);
+            }}
+          />
+        )) ?? []
+      : []),
+    ...(tags?.items.map((tag) => (
+      <IconTag
+        className="note-chip"
+        key={tag.id}
+        selected={isSelected}
+        testId="tag-item"
+        icon={TagIcon}
+        text={tag.title}
+        title={strings.goToTag(tag.title)}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!tag.id) return showToast("error", strings.tagNotFound());
+
+          appStore.get().setNavigationTab("tags");
+          navigate(`/tags/${tag.id}`);
+        }}
+      />
+    )) ?? []),
+    reminder && isReminderActive(reminder) && (
+      <IconTag
+        key="reminder"
+        className="note-chip"
+        icon={NoteBell}
+        selected={isSelected}
+        iconSize={13}
+        text={getFormattedReminderTime(reminder, true)}
+        title={reminder.title}
+        styles={
+          isReminderToday(reminder)
+            ? { icon: { color: primary }, text: { color: primary } }
+            : undefined
+        }
+      />
+    )
+  ].filter(Boolean);
 }
