@@ -35,14 +35,14 @@ import {
   MfaEmail,
   MfaRecoveryCode,
   ChevronRight,
-  ChevronLeft,
   Clock,
   Icon,
   Warn,
   Chat,
   Email,
   RecoveryCode,
-  CaretRight
+  CaretRight,
+  Question
 } from "../components/icons";
 import Field, { FieldProps } from "../components/field";
 import { OtpInput } from "../components/otp-input";
@@ -923,7 +923,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   ) : selectedMethod === "app" ? (
                     <MfaAuthenticator size={16} color="icon" />
                   ) : (
-                    <MfaRecoveryCode size={16} color="icon" />
+                    <Question size={16} color="icon" />
                   )}
                 </Flex>
                 <Text
@@ -1094,7 +1094,6 @@ export type AuthFormContainerProps<
   loadForever?: boolean;
   canSkip?: boolean;
   showAgreement?: boolean;
-  onBack?: () => void;
   children?:
     | React.ReactNode
     | ((
@@ -1120,8 +1119,7 @@ export function AuthFormContainer<
     canSkip,
     loadForever,
     openURL,
-    showAgreement,
-    onBack
+    showAgreement
   } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
@@ -1173,36 +1171,6 @@ export function AuthFormContainer<
           mt: 100
         }}
       >
-        {onBack && (
-          <Button
-            type="button"
-            onClick={onBack}
-            sx={{
-              background: "background",
-              borderRadius: "radius2",
-              display: "flex",
-              alignItems: "center",
-              gap: "spacing3",
-              px: "spacing6",
-              py: "spacing5",
-              alignSelf: "flex-start",
-              mb: "spacing9",
-              border: "1px solid var(--border)"
-            }}
-          >
-            <ChevronLeft size={14} color="icon" />
-            <Text
-              sx={{
-                fontSize: "sm",
-                fontWeight: 600,
-                color: "heading",
-                lineHeight: "100%"
-              }}
-            >
-              {strings.goBack()}
-            </Text>
-          </Button>
-        )}
         <Flex
           sx={{
             mb: "spacing13",
@@ -1356,7 +1324,7 @@ export function AuthField(props: FieldProps) {
         label: {
           fontSize: "xs",
           fontWeight: 400,
-          color: "label"
+          color: "paragraph-secondary"
         },
         input: {
           color: "paragraph",

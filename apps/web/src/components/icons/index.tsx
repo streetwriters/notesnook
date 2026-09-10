@@ -282,6 +282,7 @@ import ViewListSvg from "@notesnook/icons/view-list.svg?react";
 import CaretRightSvg from "@notesnook/icons/caret-right.svg?react";
 import LinkSimpleSvg from "@notesnook/icons/link-simple.svg?react";
 import LinkBreakSvg from "@notesnook/icons/link-break.svg?react";
+import QuestionSvg from "@notesnook/icons/question.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -692,3 +693,4 @@ export const Star = createSvgIcon(StarSvg);
 export const CaretRight = createSvgIcon(CaretRightSvg);
 export const LinkSimple = createSvgIcon(LinkSimpleSvg);
 export const LinkBreak = createSvgIcon(LinkBreakSvg);
+export const Question = createSvgIcon(QuestionSvg);
