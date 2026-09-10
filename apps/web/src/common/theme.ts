@@ -52,8 +52,7 @@ export const THEME_LIGHT: any = {
         separator: "#F0F0F0",
         hover: "#eee",
         backdrop: "#0000001a",
-        buttonForeground: "#181818",
-        label: "#828282"
+        buttonForeground: "#181818"
       },
       secondary: {
         accent: "#0D9E46",

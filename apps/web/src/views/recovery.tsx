@@ -384,7 +384,6 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       type="method:key"
       title={strings.accountRecovery()}
       subtitle={strings.accountRecoveryWithKey()}
-      onBack={() => navigate("methods")}
       onSubmit={async (form) => {
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
@@ -475,12 +474,6 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       type="new"
       title={strings.resetAccountPassword()}
       subtitle={strings.accountPassDesc()}
-      onBack={() =>
-        navigate(
-          formData?.userResetRequired ? "methods" : "method:key",
-          formData
-        )
-      }
       onSubmit={async (form) => {
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
