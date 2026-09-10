@@ -399,13 +399,6 @@ export const useEditorEvents = (
         return onBackPress();
       }
 
-      if (
-        editorMessage.sessionId !== editor.sessionId.current &&
-        editorMessage.type !== NativeEvents.status
-      ) {
-        return;
-      }
-
       const noteId = useTabStore
         .getState()
         .getNoteIdForTab(editorMessage.tabId);
@@ -538,7 +531,13 @@ export const useEditorEvents = (
         case EditorEvents.getLinkData: {
           const url = (editorMessage.value as any)?.url as string;
           const link = parseInternalLink(url);
-          if (!link) return;
+          if (!link) {
+            editor.postMessage(NativeEvents.resolve, {
+              resolverId: editorMessage.resolverId,
+              data: undefined
+            });
+            return;
+          }
           switch (link.type) {
             case "note":
             case "notebook":
@@ -687,6 +686,10 @@ export const useEditorEvents = (
         }
         case EditorEvents.copyToClipboard: {
           Clipboard.setString(editorMessage.value as string);
+          ToastManager.show({
+            message: strings.linkCopied(),
+            type: "success"
+          });
           break;
         }
         case EditorEvents.saveScroll: {
