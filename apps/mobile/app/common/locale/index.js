@@ -17,26 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { setI18nGlobal, getSupportedLocale } from "@notesnook/intl";
 import { i18n } from "@lingui/core";
+import {
+  setI18nGlobal,
+  resolveTargetLocale,
+  LOCALE_LOADERS
+} from "@notesnook/intl";
 import SettingsService from "../../services/settings";
 
 const localeCache = {};
 const localeCatalogs = {};
-
-const LOCALE_LOADERS = {
-  en: () => require("@notesnook/intl/dist/locales/$en.json").messages,
-  de: () => require("@notesnook/intl/dist/locales/$de.json").messages,
-  es: () => require("@notesnook/intl/dist/locales/$es.json").messages,
-  fr: () => require("@notesnook/intl/dist/locales/$fr.json").messages,
-  it: () => require("@notesnook/intl/dist/locales/$it.json").messages,
-  nl: () => require("@notesnook/intl/dist/locales/$nl.json").messages,
-  pl: () => require("@notesnook/intl/dist/locales/$pl.json").messages,
-  "pt-BR": () => require("@notesnook/intl/dist/locales/$pt-BR.json").messages,
-  ru: () => require("@notesnook/intl/dist/locales/$ru.json").messages,
-  tr: () => require("@notesnook/intl/dist/locales/$tr.json").messages,
-  uk: () => require("@notesnook/intl/dist/locales/$uk.json").messages
-};
 
 for (const locale of Object.keys(LOCALE_LOADERS)) {
   Object.defineProperty(localeCatalogs, locale, {
@@ -51,17 +41,11 @@ for (const locale of Object.keys(LOCALE_LOADERS)) {
 }
 
 export function initLocale() {
-  const savedLanguage = SettingsService.getProperty("appLanguage");
-  let targetLang;
+  const saved = SettingsService.getProperty("appLanguage");
+  const targetLang = resolveTargetLocale(saved);
 
-  if (savedLanguage && localeCatalogs[savedLanguage]) {
-    targetLang = savedLanguage;
-  } else {
-    let systemLocale = "en";
-    try {
-      systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch (e) {}
-    targetLang = getSupportedLocale(systemLocale);
+  if (!saved) {
+    SettingsService.setProperty("appLanguage", targetLang);
   }
 
   i18n.load(localeCatalogs);
@@ -69,3 +53,4 @@ export function initLocale() {
   setI18nGlobal(i18n);
   return targetLang;
 }
+

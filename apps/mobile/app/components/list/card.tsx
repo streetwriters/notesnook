@@ -22,7 +22,7 @@ import React from "react";
 import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Message, useMessageStore } from "../../stores/use-message-store";
-import { getLocalizedMessageStrings } from "../../services/message";
+import { getMessageById } from "../../services/message";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
@@ -42,9 +42,12 @@ export const Card = ({
   );
   const announcements = useMessageStore((state) => state.announcements);
   const fontScale = Dimensions.get("window").fontScale;
-  const freshStrings = getLocalizedMessageStrings(messageBoardState.id);
+  const localizedMessage =
+    customMessage ||
+    getMessageById(messageBoardState.id, (messageBoardState as Message).data);
 
   return !messageBoardState.visible ||
+    !localizedMessage ||
     (announcements && announcements.length) ? null : (
     <View
       style={{
@@ -54,7 +57,7 @@ export const Card = ({
       }}
     >
       <Pressable
-        onPress={messageBoardState.onPress}
+        onPress={localizedMessage.onPress}
         type="plain"
         style={{
           paddingVertical: DefaultAppStyles.GAP_VERTICAL,
@@ -83,10 +86,10 @@ export const Card = ({
             <Icon
               size={AppFontSize.xxxl}
               color={
-                messageBoardState.type === "error" ? colors.error.icon : color
+                localizedMessage.type === "error" ? colors.error.icon : color
               }
               allowFontScaling
-              name={messageBoardState.icon}
+              name={localizedMessage.icon}
             />
           </View>
 
@@ -105,10 +108,10 @@ export const Card = ({
               size={AppFontSize.sm}
               color={colors.primary.heading}
             >
-              {freshStrings?.actionText || messageBoardState.actionText}
+              {localizedMessage.actionText}
             </Paragraph>
             <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
-              {freshStrings?.message || messageBoardState.message}
+              {localizedMessage.message}
             </Paragraph>
           </View>
         </View>

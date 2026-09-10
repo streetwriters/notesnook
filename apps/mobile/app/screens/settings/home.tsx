@@ -45,12 +45,15 @@ const Home = ({
     focusOnInit: true
   });
 
-  const renderItem = ({ item }: { item: SettingSection; index: number }) =>
-    item.id === "account" ? (
-      <SettingsUserSection item={item} />
-    ) : (
-      <SectionGroup item={item} />
-    );
+  const renderItem = React.useCallback(
+    ({ item }: { item: SettingSection; index: number }) =>
+      item.id === "account" ? (
+        <SettingsUserSection item={item} />
+      ) : (
+        <SectionGroup item={item} />
+      ),
+    []
+  );
 
   return (
     <>
