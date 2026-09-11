@@ -24,6 +24,7 @@ import {
   LOCALE_LOADERS
 } from "@notesnook/intl";
 import SettingsService from "../../services/settings";
+import * as RNLocalize from "react-native-localize";
 
 const localeCache = {};
 const localeCatalogs = {};
@@ -42,7 +43,8 @@ for (const locale of Object.keys(LOCALE_LOADERS)) {
 
 export function initLocale() {
   const saved = SettingsService.getProperty("appLanguage");
-  const targetLang = resolveTargetLocale(saved);
+  const systemLocale = RNLocalize.getLocales()[0]?.languageTag ?? "en";
+  const targetLang = resolveTargetLocale(saved, systemLocale);
 
   if (!saved) {
     SettingsService.setProperty("appLanguage", targetLang);
