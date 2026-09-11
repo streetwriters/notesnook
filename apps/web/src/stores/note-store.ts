@@ -58,6 +58,7 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   setContext = async (context?: Context) => {
+    this.set({ context, contextNotes: undefined });
     const groupOptions =
       context?.type === "notebook" ||
       context?.type === "tag" ||
