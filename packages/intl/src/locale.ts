@@ -26,8 +26,8 @@ import { LOCALE_LOADERS } from "./generated/loaders.mobile";
 export { localeMap, LOCALE_LOADERS };
 
 export function resolveTargetLocale(
-  savedLanguage?: string | null,
-  systemLocale?: string
+  savedLanguage: string | null | undefined,
+  systemLocale: string
 ): string {
   if (
     savedLanguage &&
@@ -36,40 +36,35 @@ export function resolveTargetLocale(
     return savedLanguage;
   }
 
-  let sysLocale = systemLocale;
-  if (!sysLocale) {
-    try {
-      sysLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch {
-      sysLocale = "en";
-    }
-  }
-
-  return getSupportedLocale(sysLocale);
+  const resolved = getSupportedLocale(systemLocale);
+  return resolved;
 }
 
 export async function getLocaleMessages(lang: string): Promise<Messages> {
   const loader = localeMap[lang] || localeMap.en;
   const mod = await loader();
-  const messages = "default" in mod ? mod.default.messages : (mod as { messages: unknown }).messages;
+  const messages =
+    "default" in mod
+      ? mod.default.messages
+      : (mod as { messages: unknown }).messages;
   return messages as unknown as Messages;
 }
 
 export type InitLocaleOptions = {
   getSavedLocale?: () => string | null | undefined;
   onSaveLocale?: (locale: string) => void;
-  systemLocale?: string;
+  systemLocale: string;
   getMessages?: (lang: string) => Promise<Messages> | Messages;
 };
 
-export async function initLocale(options?: InitLocaleOptions): Promise<string> {
-  const saved = options?.getSavedLocale?.();
-  const targetLang = resolveTargetLocale(saved, options?.systemLocale);
-  if (!saved && options?.onSaveLocale) {
+export async function initLocale(options: InitLocaleOptions): Promise<string> {
+  const saved = options.getSavedLocale?.();
+  const targetLang = resolveTargetLocale(saved, options.systemLocale);
+  if (!saved && options.onSaveLocale) {
     options.onSaveLocale(targetLang);
   }
 
-  const messages = options?.getMessages
+  const messages = options.getMessages
     ? await options.getMessages(targetLang)
     : await getLocaleMessages(targetLang);
 
