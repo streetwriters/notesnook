@@ -269,6 +269,7 @@ import TrashSvg from "@notesnook/icons/trash.svg?react";
 import PlusSvg from "@notesnook/icons/plus.svg?react";
 import SlidersSvg from "@notesnook/icons/sliders.svg?react";
 import FunnelSvg from "@notesnook/icons/funnel.svg?react";
+import CaretDownSvg from "@notesnook/icons/caret-down.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -666,3 +667,4 @@ export const Download = createSvgIcon(DownloadIcon);
 export const FloppyDisk = createSvgIcon(FloppyDiskIcon);
 export const Sliders = createSvgIcon(SlidersSvg);
 export const Funnel = createSvgIcon(FunnelSvg);
+export const CaretDown = createSvgIcon(CaretDownSvg);

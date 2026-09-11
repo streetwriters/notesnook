@@ -43,7 +43,7 @@ export const THEME_LIGHT: any = {
       primary: {
         accent: "#008836",
         accentForeground: "#ffffff",
-        paragraph: "#666666",
+        paragraph: "#474747",
         background: "#ffffff",
         border: "#E2E2E2",
         heading: "#181818",
@@ -60,7 +60,7 @@ export const THEME_LIGHT: any = {
         paragraph: "#909090",
         background: "#F7F7F7",
         border: "#EFEFEF",
-        heading: "#4B4B4B",
+        heading: "#6F6F6F",
         icon: "#666666",
         separator: "#E8E8E8",
         placeholder: "#999999",
@@ -140,7 +140,7 @@ export const THEME_LIGHT: any = {
     navigationMenu: {
       primary: {
         background: "#f7f7f7",
-        paragraph: "#666",
+        paragraph: "#474747",
         icon: "#181818",
         hover: "#eee"
       },
