@@ -25,7 +25,7 @@ import { Header } from "../../components/header";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SectionGroup } from "./section-group";
-import { settingsGroups } from "./settings-data";
+import { useSettingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./user-section";
 import { LegendList } from "@legendapp/list";
@@ -35,6 +35,8 @@ const keyExtractor = (item: SettingSection) => item.id;
 const Home = ({
   navigation
 }: NativeStackScreenProps<RouteParams, "SettingsHome">) => {
+  const settingsGroups = useSettingsGroups();
+
   useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().setFocusedRouteId("Settings");
@@ -43,12 +45,15 @@ const Home = ({
     focusOnInit: true
   });
 
-  const renderItem = ({ item }: { item: SettingSection; index: number }) =>
-    item.id === "account" ? (
-      <SettingsUserSection item={item} />
-    ) : (
-      <SectionGroup item={item} />
-    );
+  const renderItem = React.useCallback(
+    ({ item }: { item: SettingSection; index: number }) =>
+      item.id === "account" ? (
+        <SettingsUserSection item={item} />
+      ) : (
+        <SectionGroup item={item} />
+      ),
+    []
+  );
 
   return (
     <>

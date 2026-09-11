@@ -144,11 +144,11 @@ export const withTheme = (
             if (theme) {
               theme.colorScheme === "dark"
                 ? useThemeStore.setState({
-                    darkTheme: theme
-                  })
+                  darkTheme: theme
+                })
                 : useThemeStore.setState({
-                    lightTheme: theme
-                  });
+                  lightTheme: theme
+                });
             }
           })
           .catch(() => {

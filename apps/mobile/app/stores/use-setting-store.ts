@@ -106,6 +106,7 @@ export type Settings = {
   defaultLineHeight: number;
   imageCompression: "ask-every-time" | "enabled" | "disabled";
   keepScreenOn?: boolean;
+  appLanguage?: string;
 };
 
 type DimensionsType = {

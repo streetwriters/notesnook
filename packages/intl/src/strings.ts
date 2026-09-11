@@ -2809,6 +2809,72 @@ Continue without attachments?`,
   versionDeleted: () => actions.deleted.version(1),
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
-    t`Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
-  alignment: () => t`Alignment`
+    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
+  alignment: () => t`Alignment`,
+  whatAreMonographs: () => t`What are monographs?`,
+  webTips: [
+    {
+      text: () =>
+        t`Wrap a query in double quotes to search for an exact match.`,
+      contexts: ["search"]
+    },
+    {
+      text: () => t`Hold Ctrl/Cmd & click on multiple items to select them.`,
+      contexts: ["notes", "notebooks", "tags"]
+    },
+    {
+      text: () =>
+        t`Monographs enable you to share your notes in a secure and private way.`,
+      contexts: ["monographs"]
+    },
+    {
+      text: () =>
+        t`Monographs can be encrypted with a secret key and shared with anyone.`,
+      contexts: ["monographs"]
+    },
+    {
+      text: () =>
+        t`Published notes can be encrypted. Which means only you and the person you share the password with can read them.`,
+      contexts: ["monographs"]
+    },
+    {
+      text: () =>
+        t`You can pin frequently used Notebooks to the Side Menu to quickly access them.`,
+      contexts: ["notebooks"]
+    },
+    {
+      text: () =>
+        t`A notebook can have unlimited sub-notebooks with unlimited notes.`,
+      contexts: ["notebooks"]
+    },
+    {
+      text: () =>
+        t`You can multi-select notes and move them to a notebook or a sub-notebook at once.`,
+      contexts: ["notebooks"]
+    },
+    {
+      text: () => t`Mark important notes by adding them to favorites.`,
+      contexts: ["notes", "favorites"]
+    },
+    {
+      text: () =>
+        t`Are you scrolling a lot to find a specific note? Pin it to the top from Note properties.`,
+      contexts: ["notes"]
+    },
+    {
+      text: () =>
+        t`Pin your most important Notebooks to the top from Notebook properties.`,
+      contexts: ["notebooks"]
+    },
+    {
+      text: () =>
+        t`We value your feedback so join us on Discord and share your experiences and ideas.`,
+      contexts: ["notes", "notebooks", "tags"]
+    },
+    {
+      text: () =>
+        t`You can adjust how long items live in your trash from Settings -> Trash settings.`,
+      contexts: ["trash"]
+    }
+  ]
 };

@@ -39,17 +39,6 @@ import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
 
-const pro = {
-  title: strings.upgradePlan(),
-  icon: "crown",
-  id: "pro",
-  onPress: () => {
-    Navigation.navigate("PayWall", {
-      context: "logged-in"
-    });
-  }
-};
-
 export function SideMenuHome() {
   const { colors } = useThemeColors();
   const [isAppLoading, introCompleted] = useSettingStore((state) => [
@@ -149,12 +138,16 @@ export function SideMenuHome() {
               !user) &&
             !SettingsService.getProperty("serverUrls") ? (
               <Button
-                title={pro.title}
+                title={strings.upgradePlan()}
                 style={{
                   width: "100%"
                 }}
                 type="accent"
-                onPress={pro.onPress}
+                onPress={() => {
+                  Navigation.navigate("PayWall", {
+                    context: "logged-in"
+                  });
+                }}
               />
             ) : null}
           </>

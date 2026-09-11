@@ -164,7 +164,7 @@ const SheetWrapper = ({
         {bottomPadding ? (
           <View
             style={{
-              height: 10
+              height: Platform.OS === "android" ? bottomInsets : 10
             }}
           />
         ) : null}
