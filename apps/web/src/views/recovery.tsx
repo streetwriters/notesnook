@@ -424,14 +424,19 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
 
-        if (!formData?.recoveryKey)
-          throw new Error("Recovery key is required to reset password.");
-
         if (form.password !== form.confirmPassword)
           throw new Error("Passwords do not match.");
 
-        if (formData?.userResetRequired && !(await db.user.resetUser()))
-          throw new Error("Failed to reset user.");
+        if (formData?.userResetRequired) {
+          if (!(await db.user.resetPasswordWithoutRecoveryKey(form.password)))
+            throw new Error("Could not reset account password.");
+
+          navigate("final");
+          return;
+        }
+
+        if (!formData?.recoveryKey)
+          throw new Error("Recovery key is required to reset password.");
 
         if (
           !(await db.user.resetPassword({
