@@ -117,7 +117,10 @@ function useGroupingState(
       : useNoteStore.getState().refreshContext;
   const context =
     type === "notebook" || type === "notes" ? noteContext : undefined;
-  const canToggleView = groupingKey === "home" || groupingKey === "notes";
+  const canToggleView =
+    groupingKey === "home" ||
+    groupingKey === "notes" ||
+    groupingKey === "favorites";
 
   return { groupingKey, refresh, context, canToggleView };
 }
@@ -270,119 +273,123 @@ function Header(props: RouteContainerProps) {
             )}
           </Box>
         )}
-        <Flex sx={{ gap: "15px" }}>
-          <Box
-            sx={{
-              position: "relative",
-              flex: 1
-            }}
-          >
-            {!isMobile && (
-              <SearchIcon
-                size={15}
-                color="icon"
+        {hasItems && (
+          <Flex sx={{ gap: "15px" }}>
+            <Box
+              sx={{
+                position: "relative",
+                flex: 1
+              }}
+            >
+              {!isMobile && (
+                <SearchIcon
+                  size={15}
+                  color="icon"
+                  sx={{
+                    left: "spacing4",
+                    pointerEvents: "none",
+                    position: "absolute",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 1
+                  }}
+                />
+              )}
+              <Field
+                inputRef={inputRef}
+                data-test-id="search-input"
+                id="search"
+                name="search"
+                type="text"
+                variant="clean"
                 sx={{
-                  left: "spacing4",
-                  pointerEvents: "none",
-                  position: "absolute",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  zIndex: 1
+                  gap: 0,
+                  m: 0,
+                  width: "100%"
                 }}
+                styles={{
+                  input: {
+                    m: 0,
+                    p: "spacing4",
+                    pl: "spacing10",
+                    fontSize: "xs",
+                    color: "paragraph",
+                    bg: "background-secondary",
+                    borderRadius: "dialog",
+                    "::placeholder": {
+                      color: "paragraph-secondary",
+                      textAlign: "start"
+                    },
+                    "& + .rightActions #search-action-button": {
+                      opacity: query ? 1 : 0
+                    },
+                    "&:focus + .rightActions #search-action-button": {
+                      opacity: 1
+                    }
+                  }
+                }}
+                defaultValue={query}
+                placeholder={strings.searchInRoute(headerTitle)}
+                onChange={debounce(
+                  (e) => useSearchStore.setState({ query: e.target.value }),
+                  250
+                )}
+                onKeyUp={(e) => {
+                  if (e.key === "Escape")
+                    useSearchStore.getState().resetSearch();
+                  else
+                    useSearchStore.setState({
+                      isSearching: true,
+                      searchType: type
+                    });
+                }}
+                leftActions={[
+                  {
+                    icon: Menu,
+                    hidden: !isMobile,
+                    id: "hamburger-menu",
+                    onClick: () => {
+                      AppEventManager.publish(AppEvents.toggleSideMenu, true);
+                    }
+                  }
+                ]}
+                rightActions={[
+                  {
+                    icon: Close,
+                    id: "search-action-button",
+                    testId: "search-button",
+                    onClick: () => {
+                      if (inputRef.current) inputRef.current.value = "";
+                      useSearchStore.getState().resetSearch();
+                    },
+                    hidden: !query
+                  },
+                  ...(type === "reminders"
+                    ? [
+                        {
+                          icon: AddReminder,
+                          testId: "create-reminder-button",
+                          ...CREATE_BUTTON_MAP.reminders
+                        }
+                      ]
+                    : [])
+                ]}
+              />
+            </Box>
+
+            {type === "notebook" && hasItems && (
+              <GroupOptions
+                groupingKey={groupingKey}
+                refresh={refresh}
+                isSearching={isSearching}
+                context={context}
+                canToggleView={canToggleView}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
               />
             )}
-            <Field
-              inputRef={inputRef}
-              data-test-id="search-input"
-              id="search"
-              name="search"
-              type="text"
-              variant="clean"
-              sx={{
-                gap: 0,
-                m: 0,
-                width: "100%"
-              }}
-              styles={{
-                input: {
-                  m: 0,
-                  p: "spacing4",
-                  pl: "spacing10",
-                  fontSize: "xs",
-                  color: "paragraph-secondary",
-                  bg: "background-secondary",
-                  borderRadius: "dialog",
-                  "::placeholder": {
-                    textAlign: "start"
-                  },
-                  "& + .rightActions #search-action-button": {
-                    opacity: query ? 1 : 0
-                  },
-                  "&:focus + .rightActions #search-action-button": {
-                    opacity: 1
-                  }
-                }
-              }}
-              defaultValue={query}
-              placeholder={strings.searchInRoute(headerTitle)}
-              onChange={debounce(
-                (e) => useSearchStore.setState({ query: e.target.value }),
-                250
-              )}
-              onKeyUp={(e) => {
-                if (e.key === "Escape") useSearchStore.getState().resetSearch();
-                else
-                  useSearchStore.setState({
-                    isSearching: true,
-                    searchType: type
-                  });
-              }}
-              leftActions={[
-                {
-                  icon: Menu,
-                  hidden: !isMobile,
-                  id: "hamburger-menu",
-                  onClick: () => {
-                    AppEventManager.publish(AppEvents.toggleSideMenu, true);
-                  }
-                }
-              ]}
-              rightActions={[
-                {
-                  icon: Close,
-                  id: "search-action-button",
-                  testId: "search-button",
-                  onClick: () => {
-                    if (inputRef.current) inputRef.current.value = "";
-                    useSearchStore.getState().resetSearch();
-                  },
-                  hidden: !query
-                },
-                ...(type === "reminders"
-                  ? [
-                      {
-                        icon: AddReminder,
-                        testId: "create-reminder-button",
-                        ...CREATE_BUTTON_MAP.reminders
-                      }
-                    ]
-                  : [])
-              ]}
-            />
-          </Box>
-
-          {type === "notebook" && hasItems && (
-            <GroupOptions
-              groupingKey={groupingKey}
-              refresh={refresh}
-              isSearching={isSearching}
-              context={context}
-              canToggleView={canToggleView}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-            />
-          )}
-        </Flex>
+          </Flex>
+        )}
       </Box>
     </Box>
   );
