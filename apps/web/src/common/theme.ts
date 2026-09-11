@@ -140,7 +140,7 @@ export const THEME_LIGHT: any = {
     navigationMenu: {
       primary: {
         background: "#f7f7f7",
-        paragraph: "#666",
+        paragraph: "#474747",
         icon: "#181818",
         hover: "#eee"
       },

@@ -27,7 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { SidebarScroller } from "../components/sidebar-scroller";
-import { Box } from "@notesnook/ui";
+import { Funnel } from "../components/icons";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
@@ -67,25 +67,34 @@ function Tags() {
         header={<></>}
         Scroller={SidebarScroller}
       />
-      <Box sx={{ mx: "spacing4", height: "1px", bg: "border-secondary" }} />
-      <Input
-        ref={inputRef}
-        variant="clean"
-        placeholder="Filter tags..."
+      <Flex
         sx={{
-          pb: 0,
-          pt: "spacing4",
+          alignItems: "center",
+          borderTop: "1px solid var(--border-secondary)",
           mx: "spacing4",
-          fontSize: "xs",
-          color: "paragraph"
+          pt: "spacing4"
         }}
-        onChange={debounce(async (e) => {
-          const query = e.target.value.trim();
-          setFilteredTags(
-            query ? await db.lookup.tags(query).sorted() : undefined
-          );
-        }, 300)}
-      />
+      >
+        <Input
+          ref={inputRef}
+          variant="clean"
+          placeholder="Filter tags..."
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 0,
+            fontSize: "xs",
+            color: "paragraph"
+          }}
+          onChange={debounce(async (e) => {
+            const query = e.target.value.trim();
+            setFilteredTags(
+              query ? await db.lookup.tags(query).sorted() : undefined
+            );
+          }, 300)}
+        />
+        <Funnel size={13} color="icon-secondary" />
+      </Flex>
     </Flex>
   );
 }

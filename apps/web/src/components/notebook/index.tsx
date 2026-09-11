@@ -18,12 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { createInternalLink, Notebook as NotebookType } from "@notesnook/core";
 import {
-  ChevronDown,
-  ChevronRight,
+  CaretDown,
   NotebookEdit,
   Plus,
   RemoveShortcutLink,
@@ -123,46 +122,50 @@ export function Notebook(props: NotebookProps) {
         }
       }}
       title={
-        <Flex
-          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
-        >
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
           {isExpandable ? (
             <Button
               variant="secondary"
-              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+              sx={{
+                bg: "transparent",
+                p: 0,
+                borderRadius: "radius1",
+                width: 11,
+                height: 11
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 isExpanded ? collapse() : expand();
               }}
             >
-              {isExpanded ? (
-                <ChevronDown
-                  size={14}
-                  color={isOpened ? "icon-selected" : "icon"}
-                />
-              ) : (
-                <ChevronRight
-                  size={14}
-                  color={isOpened ? "icon-selected" : "icon"}
-                />
-              )}
+              <CaretDown
+                size={11}
+                color={isOpened ? "icon" : "icon-secondary"}
+                sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
+              />
             </Button>
           ) : (
-            <NotebookIcon
-              size={14}
-              color={isOpened ? "icon-selected" : "icon"}
-            />
+            <Box sx={{ width: 11, height: 11 }} />
           )}
+          {depth === 0 ? (
+            <NotebookIcon
+              size={13}
+              color={isOpened ? "icon" : "icon-secondary"}
+            />
+          ) : null}
           <Text
             data-test-id={`title`}
             variant={"body"}
-            color={isOpened ? "paragraph-selected" : "paragraph"}
+            color={isOpened ? "heading" : "heading-secondary"}
             sx={{
               whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontWeight: "body",
-              display: "block"
+              fontWeight: "normal",
+              display: "block",
+              fontSize: "xs",
+              lineHeight: 1,
+              minWidth: 0
             }}
           >
             {item.title}
@@ -170,16 +173,25 @@ export function Notebook(props: NotebookProps) {
         </Flex>
       }
       footer={
-        <Text variant="subBody">
+        <Text
+          variant="subBody"
+          color={isOpened ? "paragraph" : "paragraph-secondary"}
+          sx={{ fontSize: "xxs", lineHeight: 1 }}
+        >
           {currentContext ? currentContext?.length : totalNotes}
         </Text>
       }
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
       sx={{
-        mb: "small",
-        borderRadius: "default",
-        paddingLeft: `${5 + (depth === 0 ? 0 : 15 * depth)}px`
+        mb: 0,
+        borderRadius: "spacing1",
+        mx: "spacing4",
+        px: "spacing2",
+        py: "spacing4",
+        pr: "spacing2",
+        height: 33,
+        paddingLeft: depth === 0 ? "spacing2" : `${30 + (depth - 1) * 20}px`
       }}
     />
   );
