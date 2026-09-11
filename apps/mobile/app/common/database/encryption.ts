@@ -146,7 +146,23 @@ export async function validateAppLockPassword(appLockPassword: string) {
     );
     return typeof decrypted === "string";
   } catch (e) {
-    DatabaseLogger.error(e);
+    // A failed authentication tag means the password really is wrong. Anything
+    // else (a missing or malformed field, unreadable storage) is not, and
+    // reporting it as an incorrect password sends the user round a loop that
+    // retyping cannot fix. The return type has to stay boolean because two of
+    // the callers do not wrap this, so the distinction is recorded in the log.
+    const error = e as Error & { code?: string };
+    const isWrongPassword =
+      error?.message === "FAILURE" || error?.code === "BAD_MAC";
+
+    if (!isWrongPassword) {
+      DatabaseLogger.error(
+        error,
+        "validateAppLockPassword failed for a reason other than a wrong password"
+      );
+    } else {
+      DatabaseLogger.info("validateAppLockPassword: incorrect password");
+    }
     return false;
   }
 }
@@ -376,18 +392,22 @@ export async function decrypt(password: SerializedKey, data: Cipher<"base64">) {
     try {
       return await Sodium.decrypt(key, _data);
     } catch (e) {
-      const fallbackKey = await Sodium.deriveKeyFallback?.(
-        password.password,
-        password.salt
-      );
-      if (Platform.OS === "ios" && fallbackKey) {
-        DatabaseLogger.info("Using fallback key for decryption");
+      // Whatever happens while trying the fallback must not replace the
+      // original failure: callers match on its message ("FAILURE") to report an
+      // incorrect password, and deriveKeyFallback can now reject on its own.
+      try {
+        const fallbackKey = await Sodium.deriveKeyFallback?.(
+          password.password,
+          password.salt
+        );
+        if (fallbackKey) {
+          DatabaseLogger.info("Using fallback key for decryption");
+          return await Sodium.decrypt(fallbackKey, _data);
+        }
+      } catch (fallbackError) {
+        DatabaseLogger.error(fallbackError, "Fallback decryption failed");
       }
-      if (fallbackKey) {
-        return await Sodium.decrypt(fallbackKey, _data);
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
@@ -412,18 +432,20 @@ export async function decryptMulti(
     try {
       return await Sodium.decryptMulti(key, data);
     } catch (e) {
-      const fallbackKey = await Sodium.deriveKeyFallback?.(
-        password.password,
-        password.salt as string
-      );
-      if (Platform.OS === "ios" && fallbackKey) {
-        DatabaseLogger.info("Using fallback key for decryption");
+      // See decrypt(): the original error is what callers act on.
+      try {
+        const fallbackKey = await Sodium.deriveKeyFallback?.(
+          password.password,
+          password.salt as string
+        );
+        if (fallbackKey) {
+          DatabaseLogger.info("Using fallback key for decryption");
+          return await Sodium.decryptMulti(fallbackKey, data);
+        }
+      } catch (fallbackError) {
+        DatabaseLogger.error(fallbackError, "Fallback decryption failed");
       }
-      if (fallbackKey) {
-        return await Sodium.decryptMulti(fallbackKey, data);
-      } else {
-        throw e;
-      }
+      throw e;
     }
   }
 
