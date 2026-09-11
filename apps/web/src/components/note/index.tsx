@@ -37,6 +37,8 @@ import {
 import { strings } from "@notesnook/intl";
 import { SchemeColors } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
+import { alpha } from "@theme-ui/color";
+import { useThemeUI } from "@theme-ui/core";
 import { Flex, Text } from "@theme-ui/components";
 import React from "react";
 import { db } from "../../common/db";
@@ -133,7 +135,9 @@ function Note(props: NoteProps) {
     context
   } = props;
   const note = item;
+  const { theme } = useThemeUI();
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
+  const spacing6 = (theme.space as { spacing6: number }).spacing6;
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const isSelected = useSelectionStore((store) =>
@@ -200,13 +204,18 @@ function Note(props: NoteProps) {
       colors={{
         accent: primary,
         heading: color ? primary : "heading",
-        background: "background"
+        background: "background",
+        // @ts-ignore alpha(primary, 0,1) is not a theme color
+        backgroundSelected: color ? alpha(primary, 0.1) : "background-secondary"
       }}
       sx={{
         py: "spacing4",
         px: "spacing6",
+        pl: isOpened ? `calc(${spacing6}px - 2px)` : "spacing6",
         height: compact ? "auto" : undefined,
         borderBottom: "1px solid",
+        borderLeft: isOpened ? "2px solid" : undefined,
+        borderLeftColor: primary,
         borderBottomColor: "border",
         gap: "spacing4",
         ":hover": {
@@ -963,7 +972,7 @@ function getMetadataItems(props: {
   return [
     note.conflicted && <Alert key="conflicted" size={15} color="icon-error" />,
     note.localOnly && <SyncOff key="local-only" size={15} />,
-    note.pinned && !context && <NotePin key="pinned" size={15} color="icon" />,
+    note.pinned && <NotePin key="pinned" size={15} color="icon" />,
     locked && (
       <NoteLock key="locked" size={15} color="icon" data-test-id="locked" />
     ),
@@ -981,7 +990,7 @@ function getMetadataItems(props: {
         key="attachments-total"
         sx={{ alignItems: "center", gap: "spacing1" }}
       >
-        <NoteLink size={14} color="icon" sx={{ width: 8, height: 14 }} />
+        <NoteLink size={14} color="icon" />
         <Text sx={{ color: "heading", fontSize: "xs" }}>
           {attachments.total}
         </Text>

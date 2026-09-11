@@ -36,6 +36,7 @@ type ListItemProps<TItem extends Item, TContext> = {
     heading: SchemeColors;
     accent: SchemeColors;
     background: SchemeColors;
+    backgroundSelected: SchemeColors;
   };
   isFocused?: boolean;
   isCompact?: boolean;
@@ -71,10 +72,11 @@ function ListItem<TItem extends Item, TContext>(
   props: ListItemProps<TItem, TContext>
 ) {
   const {
-    colors: { heading, background, accent } = {
+    colors: { heading, background, accent, backgroundSelected } = {
       heading: "heading",
       accent: "accent",
-      background: "background"
+      background: "background",
+      backgroundSelected: "background-secondary"
     },
     isFocused,
     isCompact,
@@ -161,7 +163,7 @@ function ListItem<TItem extends Item, TContext>(
 
         opacity: isDisabled ? 0.7 : 1,
 
-        backgroundColor: selected ? "background-secondary" : background,
+        backgroundColor: selected ? backgroundSelected : background,
 
         ":focus": {
           backgroundColor: selected ? "hover-selected" : "hover"
