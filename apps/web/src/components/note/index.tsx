@@ -35,7 +35,7 @@ import {
   isReminderToday
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { SchemeColors } from "@notesnook/theme";
+import { SchemeColors, Theme } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
 import { useThemeUI } from "@theme-ui/core";
@@ -113,6 +113,7 @@ import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
 import { withFeatureCheck } from "../../common";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { useTheme } from "@emotion/react";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -135,9 +136,7 @@ function Note(props: NoteProps) {
     context
   } = props;
   const note = item;
-  const { theme } = useThemeUI();
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
-  const spacing6 = (theme.space as { spacing6: number }).spacing6;
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const isSelected = useSelectionStore((store) =>
@@ -211,11 +210,11 @@ function Note(props: NoteProps) {
       sx={{
         py: "spacing4",
         px: "spacing6",
-        pl: isOpened ? `calc(${spacing6}px - 2px)` : "spacing6",
+        pl: (t) => (t as Theme).space?.["spacing6"] - 2,
         height: compact ? "auto" : undefined,
         borderBottom: "1px solid",
-        borderLeft: isOpened ? "2px solid" : undefined,
-        borderLeftColor: primary,
+        borderLeft: "2px solid",
+        borderLeftColor: isOpened ? primary : "transparent",
         borderBottomColor: "border",
         gap: "spacing4",
         ":hover": {
