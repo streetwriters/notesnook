@@ -25,6 +25,7 @@ export async function initLocale() {
     getSavedLocale: () => Config.get<string>("appLanguage", ""),
     onSaveLocale: (locale) => {
       Config.set("appLanguage", locale);
-    }
+    },
+    systemLocale: navigator.language ?? "en"
   });
 }
