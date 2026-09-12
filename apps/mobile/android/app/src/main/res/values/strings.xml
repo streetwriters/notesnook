@@ -10,6 +10,9 @@
     <string name="note_description">Add a note to home screen</string>
     <string name="quick_note">Quick note</string>
     <string name="widget_reminders_empty">Tap + to add a reminder</string>
+    <string name="pinned_notes_title">Pinned notes</string>
+    <string name="pinned_notes_description">Quick overview of pinned notes</string>
+    <string name="widget_pinned_notes_empty">No pinned notes</string>
 
     <!-- Sample content, only ever shown in the widget picker's preview. -->
     <string name="widget_preview_note_title">Meeting notes</string>

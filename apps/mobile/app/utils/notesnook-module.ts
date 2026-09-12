@@ -45,6 +45,7 @@ interface NotesnookModuleInterface {
   hasWidgetNote: (noteId: string) => Promise<boolean>;
   updateWidgetNote: (noteId: string, data: string) => void;
   updateReminderWidget: () => void;
+  updatePinnedNotesWidget: () => void;
   refreshWidgets: () => void;
   isGestureNavigationEnabled: () => boolean;
   addShortcut: (
@@ -82,6 +83,7 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     hasWidgetNote: () => {},
     updateWidgetNote: () => {},
     updateReminderWidget: () => {},
+    updatePinnedNotesWidget: () => {},
     refreshWidgets: () => {},
     isGestureNavigationEnabled: () => true,
     addShortcut: () => Promise.resolve(false),
