@@ -50,6 +50,7 @@ import {
   registerAppShortcuts
 } from "./hooks/use-shortcut-manager";
 import Shortcuts from "react-native-actions-shortcuts";
+import { parseInternalLink } from "@notesnook/core";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
@@ -200,9 +201,12 @@ export const withStartupBoundry = (
             Linking.getInitialURL(),
             Shortcuts.getInitialShortcut()
           ]);
-          console.log(url, shortcut);
-          if (shortcut?.type === "notesnook.action.newnote") {
-            launchNewNoteTab();
+          const parsedLink = url ? parseInternalLink(url) : undefined;
+          if (
+            shortcut?.type === "notesnook.action.newnote" ||
+            parsedLink?.type === "note"
+          ) {
+            launchNewNoteTab(parsedLink?.id);
           }
           useSettingStore.setState({
             initialUrl: url,
