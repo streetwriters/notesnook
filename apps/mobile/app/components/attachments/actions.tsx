@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { formatBytes } from "@notesnook/common";
 import { Attachment, Note, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { RefObject, useEffect, useState } from "react";
@@ -26,6 +27,7 @@ import { TextInput, View } from "react-native";
 import { ActionSheetRef } from "react-native-actions-sheet";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
 import filesystem from "../../common/filesystem";
 import downloadAttachment from "../../common/filesystem/download-attachment";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
@@ -37,6 +39,7 @@ import {
   eSendEvent,
   presentSheet
 } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
 import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import {
@@ -46,20 +49,19 @@ import {
   eOnLoadNote
 } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
 import { openNote } from "../list-items/note/wrapper";
 import { DateMeta } from "../properties/date-meta";
 import SheetProvider from "../sheet-provider";
-import { Button } from "../ui/button";
+import AppIcon from "../ui/AppIcon";
+import { createFormRef, validators } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
 import { Pressable } from "../ui/pressable";
+import LineSeparator from "../ui/seperator/line-separator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../utils/styles";
-import Navigation from "../../services/navigation";
-import { createFormRef, validators } from "../ui/input/form-input";
 
 const Actions = ({
   attachment,
@@ -94,7 +96,7 @@ const Actions = ({
         downloadAttachment(attachment.hash, context === "global");
         fwdRef.current?.hide();
       },
-      icon: "download"
+      icon: "download-simple"
     },
     {
       name: strings.network.reupload(),
@@ -114,7 +116,7 @@ const Actions = ({
           type: attachment.mimeType.startsWith("image") ? "image" : "file"
         });
       },
-      icon: "upload"
+      icon: "upload-simple"
     },
     {
       name: strings.fileCheck(),
@@ -149,7 +151,7 @@ const Actions = ({
           name: undefined
         });
       },
-      icon: "file-check"
+      icon: "file"
     },
     {
       name: strings.rename(),
@@ -197,7 +199,7 @@ const Actions = ({
           });
         }, 500);
       },
-      icon: "form-textbox"
+      icon: "pencil-simple"
     },
     {
       name: strings.delete(),
@@ -249,7 +251,7 @@ const Actions = ({
           });
         }, 500);
       },
-      icon: "delete-outline"
+      icon: "trash"
     }
   ];
 
@@ -267,6 +269,7 @@ const Actions = ({
       onMomentumScrollEnd={() => {
         fwdRef?.current?.handleChildScrollEnd();
       }}
+      bounces={false}
       nestedScrollEnabled={true}
       style={{
         maxHeight: "100%"
@@ -277,42 +280,34 @@ const Actions = ({
       <SheetProvider context={contextId} />
       <View
         style={{
-          borderBottomWidth: 1,
-          borderBottomColor: colors.primary.border,
-          marginBottom:
-            notes && notes.length > 0 ? 0 : DefaultAppStyles.GAP_VERTICAL
+          paddingHorizontal: Spacing.LEVEL_3,
+          paddingTop: Spacing.LEVEL_4,
+          gap: Spacing.LEVEL_1
         }}
       >
-        <Heading
-          style={{
-            paddingHorizontal: DefaultAppStyles.GAP
-          }}
-          size={AppFontSize.lg}
-        >
-          {filename}
-        </Heading>
+        <Heading fontSize="LG">{filename}</Heading>
 
         <View
           style={{
             flexDirection: "row",
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
-            paddingHorizontal: DefaultAppStyles.GAP,
-            marginTop: DefaultAppStyles.GAP_VERTICAL_SMALL,
-            gap: 10
+            gap: Spacing.LEVEL_1,
+            alignItems: "center"
           }}
         >
-          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
+          <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
             {attachment.mimeType}
           </Paragraph>
+          <Paragraph fontSize="XS">•</Paragraph>
           <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
             {formatBytes(attachment.size)}
           </Paragraph>
-
+          <Paragraph fontSize="XS">•</Paragraph>
           {notes.length ? (
-            <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
+            <Paragraph fontSize="XS" color={colors.secondary.paragraph}>
               {strings.notes(notes.length)}
             </Paragraph>
           ) : null}
+          <Paragraph fontSize="XS">•</Paragraph>
           <Paragraph
             onPress={() => {
               Clipboard.setString(attachment.hash);
@@ -322,82 +317,123 @@ const Actions = ({
                 context: "local"
               });
             }}
-            size={AppFontSize.xs}
+            fontSize="XS"
             color={colors.secondary.paragraph}
           >
+            <AppIcon
+              name="copy"
+              size={10}
+              color={colors.secondary.paragraph}
+              iconFamily="notesnook"
+            />{" "}
             {attachment.hash}
           </Paragraph>
         </View>
+
+        <LineSeparator paddingVertical={Spacing.LEVEL_2} />
 
         <DateMeta item={attachment} />
       </View>
 
       {notes && notes.length > 0 ? (
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: colors.primary.border,
-            marginBottom: DefaultAppStyles.GAP_VERTICAL,
-            paddingVertical: DefaultAppStyles.GAP_VERTICAL
-          }}
-        >
-          <>
-            <Heading
-              style={{
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-              size={AppFontSize.sm}
-            >
-              {strings.listOf()} {strings.dataTypesPlural.note()}:
-            </Heading>
+        <>
+          <LineSeparator
+            paddingHorizontal={Spacing.LEVEL_3}
+            paddingVertical={Spacing.LEVEL_3}
+          />
+          <View
+            style={{
+              paddingHorizontal: Spacing.LEVEL_3,
+              gap: Spacing.LEVEL_2
+            }}
+          >
+            <>
+              <Heading size={AppFontSize.sm}>
+                {strings.notes(notes.length)}
+              </Heading>
 
-            {notes.map((item) => (
-              <Pressable
-                onPress={async () => {
-                  eSendEvent(eCloseSheet, contextId);
-                  close?.();
-                  eSendEvent(eCloseAttachmentDialog);
-                  Navigation.navigate("FluidPanelsView");
-                  openNote(item, (item as any).type === "trash");
-                }}
-                style={{
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-                  alignItems: "flex-start",
-
-                  paddingHorizontal: DefaultAppStyles.GAP
-                }}
-                key={item.id}
-              >
-                <Paragraph size={AppFontSize.xs}>{item.title}</Paragraph>
-              </Pressable>
-            ))}
-          </>
-        </View>
+              {notes.map((item) => (
+                <Pressable
+                  onPress={async () => {
+                    eSendEvent(eCloseSheet, contextId);
+                    close?.();
+                    eSendEvent(eCloseAttachmentDialog);
+                    Navigation.navigate("FluidPanelsView");
+                    openNote(item, (item as any).type === "trash");
+                  }}
+                  style={{
+                    alignItems: "flex-start"
+                  }}
+                  key={item.id}
+                >
+                  <Paragraph fontSize="XS">{item.title}</Paragraph>
+                </Pressable>
+              ))}
+            </>
+          </View>
+        </>
       ) : null}
 
-      {actions.map((item) => (
-        <Button
-          key={item.name}
-          buttonType={{
-            text:
-              item.name === "Delete"
-                ? colors.error.paragraph
-                : colors.primary.paragraph
-          }}
-          onPress={item.onPress}
-          title={item.name}
-          icon={item.icon}
-          loading={loading?.name === item.name}
-          type="plain"
-          fontSize={AppFontSize.sm}
-          style={{
-            borderRadius: 0,
-            justifyContent: "flex-start",
-            alignSelf: "flex-start",
-            width: "100%"
-          }}
-        />
-      ))}
+      <LineSeparator
+        paddingHorizontal={Spacing.LEVEL_3}
+        paddingVertical={Spacing.LEVEL_3}
+      />
+
+      <View
+        style={{
+          gap: Spacing.LEVEL_2
+        }}
+      >
+        {actions.map((item) => (
+          <Pressable
+            key={item.name}
+            onPress={item.onPress}
+            type="plain"
+            style={{
+              borderRadius: 0,
+              flexDirection: "row",
+              width: "100%",
+              gap: Spacing.LEVEL_1,
+              justifyContent: "flex-start",
+              paddingHorizontal: Spacing.LEVEL_3
+            }}
+          >
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                backgroundColor: colors.secondary.background,
+                borderRadius: Radius.XS,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <AppIcon
+                color={
+                  item.icon === "trash"
+                    ? colors.error.accent
+                    : colors.primary.icon
+                }
+                name={item.icon}
+                iconFamily="notesnook"
+                size={16}
+              />
+            </View>
+
+            <Paragraph
+              color={
+                item.icon === "trash"
+                  ? colors.error.accent
+                  : colors.primary.heading
+              }
+              fontSize="SM"
+              fontFamily="MEDIUM"
+            >
+              {item.name}
+            </Paragraph>
+          </Pressable>
+        ))}
+      </View>
 
       <View
         style={{

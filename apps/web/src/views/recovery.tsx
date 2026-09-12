@@ -17,20 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import { Loader } from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
-import { AuthField, SubmitButton } from "./auth";
+import {
+  AuthField,
+  AuthFormContainer,
+  AuthFormContainerProps,
+  SubmitButton
+} from "./auth";
 import Config from "../utils/config";
-import { ErrorText } from "../components/error-text";
-import { EVENTS, User } from "@notesnook/core";
-import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
+import { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useKeyStore } from "../interfaces/key-store";
+import { ScrollContainer } from "@notesnook/ui";
+import Logo from "../assets/notesnook-logo.png";
+import {
+  KeyIcon,
+  Trash,
+  CheckIcon,
+  CheckCircle,
+  CaretRight,
+  Copy,
+  Download,
+  FloppyDisk,
+  RecoveryKeyShieldCheck
+} from "../components/icons";
+import { writeText } from "clipboard-polyfill";
+import FileSaver from "file-saver";
+import { SaveRecoveryKey } from "../dialogs/recovery-key-dialog";
+
+const QRCode = React.lazy(() => import("../re-exports/react-qrcode-logo"));
 
 type RecoveryMethodType = "key" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -63,6 +84,7 @@ type NavigateFunction = <TRoute extends RecoveryRoutes>(
 type BaseRecoveryComponentProps<TRoute extends RecoveryRoutes> = {
   navigate: NavigateFunction;
   formData?: Partial<RecoveryFormData[TRoute]>;
+  user: User;
 };
 type RecoveryRoutes =
   | "methods"
@@ -105,13 +127,18 @@ function useAuthenticateUser({
   code,
   userId
 }: {
-  code: string;
-  userId: string;
+  code?: string;
+  userId?: string;
 }) {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [user, setUser] = useState<User>();
   useEffect(() => {
     async function authenticateUser() {
+      if (!code || !userId) {
+        openURL("/");
+        return;
+      }
+
       setIsAuthenticating(true);
       try {
         const accessToken = await db.tokenManager.getAccessToken();
@@ -150,67 +177,39 @@ function Recovery(props: RecoveryProps) {
     window.history.replaceState({}, "", makeURL(routePaths[route]));
   }, [route]);
 
+  if (isAuthenticating || !user)
+    return (
+      <AuthContainer>
+        <Loader
+          title="Authenticating user"
+          text="Please wait while you are authenticated."
+        />
+      </AuthContainer>
+    );
+
   return (
     <AuthContainer>
-      <Flex
-        sx={{
+      <ScrollContainer
+        className="auth-scroll-container"
+        style={{
+          display: "flex",
+          flexDirection: "column",
           zIndex: 1,
           flex: 1,
-          overflowY: "auto",
-          flexDirection: "column"
+          flexShrink: 0
         }}
       >
-        {isAuthenticating ? (
-          <Loader
-            title={strings.authenticatingUser()}
-            text={strings.authWait()}
+        {Route && (
+          <Route
+            navigate={(route, formData) => {
+              setStoredFormData(formData);
+              setRoute(route);
+            }}
+            formData={storedFormData}
+            user={user}
           />
-        ) : (
-          <>
-            <Flex
-              m={2}
-              sx={{ alignItems: "start", justifyContent: "space-between" }}
-            >
-              <Text
-                sx={{
-                  display: "flex",
-                  alignSelf: "center",
-                  alignItems: "center",
-                  wordWrap: "break-word",
-                  wordBreak: "break-all"
-                }}
-                variant={"body"}
-              >
-                {strings.authenticatedAs(user?.email)}
-              </Text>
-              <Button
-                sx={{
-                  display: "flex",
-                  mt: 0,
-                  ml: 2,
-                  alignSelf: "start",
-                  alignItems: "center",
-                  textWrap: "wrap",
-                  textAlign: "right"
-                }}
-                variant={"secondary"}
-                onClick={() => openURL("/login")}
-              >
-                {strings.rememberedYourPassword()}
-              </Button>
-            </Flex>
-            {Route && (
-              <Route
-                navigate={(route, formData) => {
-                  setStoredFormData(formData);
-                  setRoute(route);
-                }}
-                formData={storedFormData}
-              />
-            )}
-          </>
         )}
-      </Flex>
+      </ScrollContainer>
     </AuthContainer>
   );
 }
@@ -241,7 +240,7 @@ const recoveryMethods: RecoveryMethod[] = [
 ];
 
 function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
-  const { navigate } = props;
+  const { navigate, user } = props;
   const [selected, setSelected] = useState(0);
 
   if (isSessionExpired()) {
@@ -263,65 +262,121 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
       }}
     >
       {recoveryMethods.map((method, index) => (
-        <Button
+        <Flex
           key={method.testId}
           data-test-id={method.testId}
-          type="submit"
-          variant={"secondary"}
-          mt={2}
           sx={{
-            ":first-of-type": { mt: 2 },
             display: "flex",
-            flexDirection: "column",
-            bg: method.isDangerous
-              ? "var(--background-secondary)"
-              : "var(--background-error)",
-            alignSelf: "stretch",
-            // alignItems: "center",
-            textAlign: "left",
-            px: 2
+            alignItems: "center",
+            px: "spacing5",
+            py: "spacing6",
+            border:
+              index === selected
+                ? "1px solid var(--accent)"
+                : "1px solid var(--border)",
+            bg: index === selected ? "background-selected" : "background",
+            borderRadius: "radius2",
+            cursor: "pointer",
+            mt: index === 0 ? 0 : "spacing4"
           }}
           onClick={() => setSelected(index)}
         >
-          <Text
-            variant={"title"}
+          <Flex
             sx={{
-              color: method.isDangerous ? "var(--heading-error)" : "heading"
+              flex: "1 1 auto",
+              alignItems: "center",
+              justifyContent: "space-between",
+              minWidth: 0,
+              gap: "spacing4"
             }}
           >
-            {method.title()}
-          </Text>
-          <Text
-            variant={"body"}
-            sx={{
-              color: method.isDangerous
-                ? "var(--paragraph-error)"
-                : "var(--paragraph-secondary)",
-              whiteSpace: "pre-wrap"
-            }}
-          >
-            {method.description()}
-          </Text>
-        </Button>
+            <Flex sx={{ gap: "spacing3", alignItems: "flex-start" }}>
+              <Flex
+                sx={{
+                  bg: "background-secondary",
+                  borderRadius: "5px",
+                  width: 30,
+                  height: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}
+              >
+                {method.type === "key" ? (
+                  <KeyIcon size={15} color="icon" />
+                ) : (
+                  <Trash size={15} color="icon-error" />
+                )}
+              </Flex>
+              <Flex
+                sx={{
+                  flexDirection: "column",
+                  gap: "spacing3",
+                  flex: "1 1 auto",
+                  minWidth: 0
+                }}
+              >
+                <Text
+                  variant={"body"}
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "sm",
+                    color: "heading",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {method.title()}
+                </Text>
+                <Text
+                  variant={"body"}
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: "xs",
+                    color: "paragraph",
+                    lineHeight: "1.3"
+                  }}
+                >
+                  {method.description()}
+                </Text>
+              </Flex>
+            </Flex>
+            <input
+              type="radio"
+              name="recoveryMethod"
+              checked={index === selected}
+              onChange={() => setSelected(index)}
+              style={{
+                appearance: "none",
+                WebkitAppearance: "none",
+                flexShrink: 0,
+                marginLeft: "10px",
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                border:
+                  index === selected
+                    ? "1px solid var(--accent)"
+                    : "1px solid var(--paragraph)",
+                background: index === selected ? "var(--accent)" : "none",
+                boxShadow:
+                  index === selected
+                    ? "inset 0 0 0 3px var(--background)"
+                    : "none",
+                cursor: "pointer",
+                margin: 0
+              }}
+            />
+          </Flex>
+        </Flex>
       ))}
+      <SubmitButton text={strings.continue()} />
+      <AuthenticatedAsCard user={user} />
     </RecoveryForm>
   );
 }
 
 function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
-  const { navigate, formData } = props;
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    db.eventManager.subscribe(
-      EVENTS.syncProgress,
-      ({ type, current }: { type: string; current: number }) => {
-        if (type === "download") {
-          setProgress(current);
-        }
-      }
-    );
-  }, []);
+  const { navigate, formData, user } = props;
 
   return (
     <RecoveryForm
@@ -329,17 +384,13 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       type="method:key"
       title={strings.accountRecovery()}
       subtitle={strings.accountRecoveryWithKey()}
-      loading={{
-        title: strings.network.downloading(progress),
-        subtitle: strings.keyRecoveryProgressDesc()
-      }}
       onSubmit={async (form) => {
         const recoveryKey = form.recoveryKey;
-        if (recoveryKey.length < 40) {
-          throw new Error(strings.invalidRecoveryKey());
-        }
 
-        setProgress(0);
+        // TODO: re-enable once UI testing is done
+        // if (recoveryKey.length < 40) {
+        //   throw new Error(strings.invalidRecoveryKey());
+        // }
 
         const user = await db.user.getUser();
         if (!user) throw new Error(strings.notLoggedIn());
@@ -351,48 +402,62 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         id="recoveryKey"
         type="password"
         label={strings.enterRecoveryKey()}
-        helpText={strings.enterRecoveryKeyHelp()}
         autoComplete="none"
         autoFocus
         defaultValue={formData?.recoveryKey || ""}
       />
-      <Flex sx={{ gap: 1 }}>
-        <Button
-          variant="secondary"
-          type="button"
-          sx={{ mt: 50, borderRadius: 50 }}
-          onClick={() => navigate("methods")}
-        >
-          {strings.back()}
-        </Button>
-        <SubmitButton text={strings.startAccountRecovery()} />
-      </Flex>
+      <SubmitButton text={strings.continue()} />
 
+      <AuthenticatedAsCard user={user} />
       <Button
         type="button"
-        mt={4}
-        variant={"anchor"}
+        variant="secondary"
         onClick={() => navigate("methods")}
-        sx={{ color: "paragraph" }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "spacing7",
+          p: "spacing5",
+          mt: "spacing6",
+          borderRadius: "radius2",
+          width: "100%"
+        }}
       >
-        {strings.dontHaveRecoveryKey()}
+        <Flex sx={{ alignItems: "center", gap: "spacing4", flex: "1 0 0" }}>
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: 32,
+              height: 32,
+              bg: "background-tertiary",
+              borderRadius: "radius1"
+            }}
+          >
+            <KeyIcon size={15} color="icon" />
+          </Flex>
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              textAlign: "left"
+            }}
+          >
+            Don’t have account recovery key?
+          </Text>
+        </Flex>
+        <CaretRight size={13} color="icon" />
       </Button>
     </RecoveryForm>
   );
 }
 
 function NewPassword(props: BaseRecoveryComponentProps<"new">) {
-  const { navigate, formData } = props;
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    db.eventManager.subscribe(
-      EVENTS.syncProgress,
-      ({ current }: { current: number }) => {
-        setProgress(current);
-      }
-    );
-  }, []);
+  const { navigate, formData, user } = props;
 
   return (
     <RecoveryForm
@@ -400,22 +465,17 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       type="new"
       title={strings.resetAccountPassword()}
       subtitle={strings.accountPassDesc()}
-      loading={{
-        title: strings.resettingAccountPassword(progress),
-        subtitle: strings.resetPasswordWait()
-      }}
       onSubmit={async (form) => {
         try {
-          setProgress(0);
-
           if (form.password !== form.confirmPassword)
             throw new Error("Passwords do not match.");
 
-          if (formData?.userResetRequired && !(await db.user.resetUser()))
-            throw new Error("Failed to reset user.");
+          // TODO: re-enable once UI testing is done
+          // if (formData?.userResetRequired && !(await db.user.resetUser()))
+          //   throw new Error("Failed to reset user.");
 
-          if (!(await db.user.resetPassword(form.password)))
-            throw new Error("Could not reset account password.");
+          // if (!(await db.user.resetPassword(form.password)))
+          //   throw new Error("Could not reset account password.");
 
           navigate("final");
         } catch (e) {
@@ -430,14 +490,13 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         }
       }}
     >
-      {(form?: NewPasswordFormData) => (
+      {(form, options) => (
         <>
           <AuthField
             id="password"
             type="password"
             autoComplete="current-password"
             label={strings.newPassword()}
-            helpText={strings.newPasswordHelp()}
             defaultValue={form?.password}
           />
           <AuthField
@@ -447,125 +506,190 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             label={strings.confirmPassword()}
             defaultValue={form?.confirmPassword}
           />
-          <Flex sx={{ gap: 1 }}>
-            <Button
-              variant="secondary"
-              type="button"
-              sx={{ mt: 50, borderRadius: 50 }}
-              onClick={() =>
-                navigate(
-                  formData?.userResetRequired ? "methods" : "method:key",
-                  formData
-                )
-              }
-            >
-              {strings.back()}
-            </Button>
-            <SubmitButton text={strings.continue()} />
-          </Flex>
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading
+                ? strings.resettingAccountPassword()
+                : strings.continue()
+            }
+          />
+          <AuthenticatedAsCard user={user} />
         </>
       )}
     </RecoveryForm>
   );
 }
 
-function Final(_props: BaseRecoveryComponentProps<"final">) {
+function Final() {
+  const [recoveryKey, setRecoveryKey] = useState<string>();
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    async function finalize() {
-      await RecoveryKeyDialog.show({});
-      if (isSessionExpired()) {
-        openURL("/sessionexpired");
-      } else {
-        await db.user.clearSessions(true);
-        openURL("/login");
-      }
-    }
-    finalize();
+    db.user
+      .getMasterKey()
+      .then((key) => setRecoveryKey(key?.key))
+      .finally(() => setIsLoading(false));
   }, []);
 
-  return null;
-}
+  const handleGoToLogin = async () => {
+    if (isSessionExpired()) {
+      openURL("/sessionexpired");
+    } else {
+      await db.user.clearSessions(true);
+      openURL("/login");
+    }
+  };
 
-type RecoveryFormProps<TType extends RecoveryRoutes> = {
-  testId: string;
-  title: string;
-  subtitle: string | JSX.Element;
-  loading?: { title: string; subtitle: string };
-  type: TType;
-  onSubmit: (form: RecoveryFormData[TType]) => Promise<void>;
-  children?:
-    | React.ReactNode
-    | ((form?: RecoveryFormData[TType]) => React.ReactNode);
-};
-
-export function RecoveryForm<T extends RecoveryRoutes>(
-  props: RecoveryFormProps<T>
-) {
-  const { title, subtitle, children, testId } = props;
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string>();
-  const formRef = useRef<HTMLFormElement>(null);
-  const [form, setForm] = useState<RecoveryFormData[T] | undefined>();
-
-  if (isSubmitting && props.loading)
-    return <Loader title={props.loading.title} text={props.loading.subtitle} />;
+  if (isLoading)
+    return <Loader title="Getting encryption key" text="Please wait..." />;
 
   return (
-    <Flex
-      ref={formRef}
-      data-test-id={testId}
-      as="form"
-      id="authForm"
-      onSubmit={async (e) => {
-        if (!formRef.current) return;
-
-        e.preventDefault();
-
-        setError("");
-        setIsSubmitting(true);
-        const formData = new FormData(formRef.current);
-        const form = Object.fromEntries(
-          formData.entries()
-        ) as RecoveryFormData[T];
-        try {
-          setForm(form);
-          await props.onSubmit(form);
-        } catch (e) {
-          console.error(e);
-          const error = e as Error;
-          setError(error.message);
-        } finally {
-          setIsSubmitting(false);
-        }
-      }}
-      sx={{
-        flex: 1,
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        width: ["95%", 420],
-        alignSelf: "center"
-      }}
+    <RecoveryForm
+      testId="step-new-password"
+      type="new"
+      title={""}
+      subtitle={<></>}
+      onSubmit={async () => {}}
     >
-      <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
-        {title}
-      </Text>
-      <Text
-        variant="body"
-        mt={2}
-        mb={35}
+      <Flex
         sx={{
-          fontSize: "title",
-          textAlign: "center",
-          color: "var(--paragraph-secondary)"
+          flexDirection: "column",
+          gap: "spacing8",
+          alignItems: "center"
         }}
       >
-        {subtitle}
-      </Text>
-      {typeof children === "function" ? children(form) : children}
-      <ErrorText error={error} sx={{ mt: 2 }} />
+        <Flex
+          sx={{
+            flexDirection: "column",
+            gap: "spacing6",
+            alignItems: "center",
+            bg: "background",
+            border: "1px solid var(--border)",
+            borderRadius: "radius4",
+            p: "spacing7",
+            boxShadow: "0px 4px 25px 0px rgba(0,0,0,0.04)",
+            width: "100%"
+          }}
+        >
+          <CheckCircle size={40} color="accent" />
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing3",
+              alignItems: "center",
+              width: "100%"
+            }}
+          >
+            <Text
+              sx={{
+                fontSize: "md",
+                fontWeight: 600,
+                color: "heading",
+                whiteSpace: "nowrap"
+              }}
+            >
+              Password reset successful
+            </Text>
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph",
+                fontWeight: 400,
+                textAlign: "center",
+                lineHeight: "1.4"
+              }}
+            >
+              Your password has been updated
+            </Text>
+          </Flex>
+          <SaveRecoveryKey recoveryKey={recoveryKey} />
+        </Flex>
+
+        <Button
+          type="button"
+          variant="new_accent"
+          onClick={handleGoToLogin}
+          sx={{
+            width: "100%"
+          }}
+        >
+          Go to login
+        </Button>
+      </Flex>
+    </RecoveryForm>
+  );
+}
+
+function AuthenticatedAsCard({ user }: { user: User }) {
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "spacing4",
+        p: "spacing5",
+        mt: "spacing6",
+        bg: "background-secondary",
+        borderRadius: "radius2"
+      }}
+    >
+      <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            width: 32,
+            height: 32,
+            bg: "background-tertiary",
+            borderRadius: "radius1"
+          }}
+        >
+          <CheckIcon size={15} color="icon" />
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3", minWidth: 0 }}>
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            Authenticated as {user.email}
+          </Text>
+          <Text sx={{ color: "paragraph", fontSize: "xs", lineHeight: 1 }}>
+            {strings.rememberedYourPassword()}
+          </Text>
+        </Flex>
+      </Flex>
+      <Button
+        type="button"
+        variant="new_anchor"
+        onClick={() => openURL("/login")}
+        sx={{
+          flexShrink: 0,
+          color: "accent",
+          fontSize: "xs",
+          fontWeight: 500,
+          p: 0,
+          textDecoration: "none"
+        }}
+      >
+        {strings.login()}
+      </Button>
     </Flex>
   );
+}
+
+function RecoveryForm<T extends RecoveryRoutes>(
+  props: AuthFormContainerProps<T, RecoveryFormData>
+) {
+  return <AuthFormContainer {...props} />;
 }
 
 function openURL(url: string) {

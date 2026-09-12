@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SchemeColors } from "@notesnook/theme";
 import { Flex, FlexProps, Text } from "@theme-ui/components";
-import { PropsWithChildren, useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "../icons";
+import { PropsWithChildren, useState } from "react";
+import { CaretDown, ChevronDown, ChevronUp } from "../icons";
 
 export type AccordionProps = {
   title: string;
@@ -30,6 +30,7 @@ export type AccordionProps = {
   buttonSx?: FlexProps["sx"];
   titleSx?: FlexProps["sx"];
   containerSx?: FlexProps["sx"];
+  variant?: "default" | "faq";
 };
 
 export default function Accordion(
@@ -43,9 +44,51 @@ export default function Accordion(
     testId,
     sx,
     containerSx,
+    variant,
     ...restProps
   } = props;
   const [isContentHidden, setIsContentHidden] = useState(isClosed);
+  const isFaqVariant = variant === "faq";
+
+  if (isFaqVariant) {
+    return (
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing4",
+          p: "spacing6",
+          borderRadius: "radius2",
+          border: isContentHidden
+            ? "1px solid var(--border)"
+            : "1px solid var(--background-selected)",
+          bg: isContentHidden ? undefined : "background-selected",
+          ...sx
+        }}
+        {...restProps}
+      >
+        <Flex
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+            ...props.buttonSx
+          }}
+          onClick={() => setIsContentHidden((s) => !s)}
+          data-test-id={testId}
+        >
+          <Text variant="subtitle" sx={{ color, ...props.titleSx }}>
+            {title}
+          </Text>
+          <CaretDown size={20} />
+        </Flex>
+        {!isContentHidden && (
+          <Flex sx={{ flexDirection: "column", ...containerSx }}>
+            {children}
+          </Flex>
+        )}
+      </Flex>
+    );
+  }
 
   return (
     <Flex sx={{ flexDirection: "column", ...sx }} {...restProps}>

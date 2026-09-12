@@ -18,20 +18,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-
+import "../services/tip-manager";
 /**
  * A hook that can be used to rotate values in an array.
  * It will return random item in an array after given interval
  */
-function useRotator<T>(data: T[], interval = 3000): T | null {
+function useRotator<T>(
+  data: T[],
+  interval = 3000,
+  sequential = false
+): T | null {
   //@ts-ignore Added sample() method to Array.prototype to get random value.
-  const [current, setCurrent] = useState<T>(data.sample());
+  const [current, setCurrent] = useState<T>(
+    sequential ? data[0] : data.sample()
+  );
   const intervalRef = useRef<NodeJS.Timeout>(undefined);
+  const currentRef = useRef<T>(undefined);
+  const indexRef = useRef<number>(0);
+  currentRef.current = current;
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      //@ts-ignore Added sample() method to Array.prototype to get random value.
-      setCurrent(data.sample());
+      if (sequential) {
+        indexRef.current = (indexRef.current + 1) % data.length;
+        setCurrent(data[indexRef.current]);
+      } else {
+        //@ts-ignore Added sample() method to Array.prototype to get random value.
+        setCurrent(data.sample());
+      }
     }, interval);
 
     return () => {
@@ -39,7 +53,7 @@ function useRotator<T>(data: T[], interval = 3000): T | null {
         clearInterval(intervalRef.current);
       }
     };
-  }, [data, interval]);
+  }, [data, interval, sequential]);
 
   return current;
 }

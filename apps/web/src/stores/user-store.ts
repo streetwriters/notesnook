@@ -38,6 +38,12 @@ class UserStore extends BaseStore<UserStore> {
   user?: User = undefined;
   counter = 0;
 
+  private _pendingLogin?: {
+    email: string;
+    password: string;
+    sessionExpired: boolean;
+  };
+
   init = () => {
     db.eventManager.subscribe(EVENTS.userSessionExpired, async () => {
       Config.set("sessionExpired", true);
@@ -112,8 +118,8 @@ class UserStore extends BaseStore<UserStore> {
 
   login = async (
     form:
-      | { email: string }
       | { email: string; password: string }
+      | { email: string }
       | { code: string; method: AuthenticatorType | "recoveryCode" },
     skipInit = false,
     sessionExpired = false
@@ -121,21 +127,32 @@ class UserStore extends BaseStore<UserStore> {
     this.set((state) => (state.isLoggingIn = true));
 
     try {
-      if ("email" in form && !("password" in form)) {
+      if ("email" in form && "password" in form) {
+        this._pendingLogin = {
+          email: form.email,
+          password: form.password,
+          sessionExpired: Config.get("sessionExpired", false)
+        };
+        return await db.user.authenticateEmail(form.email);
+      } else if ("email" in form) {
         return await db.user.authenticateEmail(form.email);
       } else if ("code" in form) {
         const { code, method } = form;
-        return await db.user.authenticateMultiFactorCode(code, method);
-      } else if ("password" in form) {
-        const { email, password } = form;
-        await db.user.authenticatePassword(
-          email,
-          password,
-          undefined,
-          sessionExpired
-        );
-        Config.set("encryptBackups", true);
+        await db.user.authenticateMultiFactorCode(code, method);
 
+        if (this._pendingLogin) {
+          const { email, password, sessionExpired: sessExp } =
+            this._pendingLogin;
+          this._pendingLogin = undefined;
+          await db.user.authenticatePassword(
+            email,
+            password,
+            undefined,
+            sessExp
+          );
+        }
+
+        Config.set("encryptBackups", true);
         if (skipInit) return true;
         return this.init();
       }

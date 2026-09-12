@@ -21,16 +21,14 @@ import { getCurrentPath } from "./index";
 
 export type AuthRoutes =
   | "sessionExpiry"
-  | "login:email"
-  | "login:password"
+  | "login"
   | "signup"
   | "recover"
   | "mfa:code"
   | "mfa:select";
 
 export const authRoutes: Record<AuthRoutes, string> = {
-  "login:email": "/login",
-  "login:password": "/login/password",
+  login: "/login",
   "mfa:code": "/login/mfa/code",
   "mfa:select": "/login/mfa/select",
   recover: "/recover",
@@ -39,8 +37,7 @@ export const authRoutes: Record<AuthRoutes, string> = {
 };
 
 const unauthorizedRoutes: AuthRoutes[] = [
-  "login:email",
-  "login:password",
+  "login",
   "signup",
   "mfa:code",
   "mfa:select",

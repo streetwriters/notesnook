@@ -153,7 +153,7 @@ function RouteWrapper(props: {
       </div>
     );
   performance.mark("render:app");
-  return <Component route={routeProps?.route || "login:email"} />;
+  return <Component route={routeProps?.route || "login"} />;
 }
 
 if (import.meta.hot) import.meta.hot.accept();

@@ -44,6 +44,8 @@ import { Header } from "../list-items/headers/header";
 import { Empty, PlaceholderData } from "./empty";
 import { ListItemWrapper } from "./list-item.wrapper";
 import { ScrollView } from "react-native-actions-sheet";
+import { Spacing } from "../../common/design/spacing";
+import LineSeparator from "../ui/seperator/line-separator";
 
 type ListProps = {
   data: VirtualizedGrouping<Item> | undefined;
@@ -61,6 +63,7 @@ type ListProps = {
   groupType: GroupingKey;
   id?: string;
   type?: GroupingByIdKey;
+  hideHeaderTopBorder?: boolean;
 };
 
 const onMomentumScrollEnd = () => {
@@ -212,6 +215,10 @@ export default function List(props: ListProps) {
           }
           ListHeaderComponent={
             <>
+              {!props.hideHeaderTopBorder ? (
+                <LineSeparator paddingVertical={Spacing.LEVEL_3} />
+              ) : null}
+
               {props.CustomLisHeader ? (
                 props.CustomLisHeader
               ) : !props.headerTitle ? null : (

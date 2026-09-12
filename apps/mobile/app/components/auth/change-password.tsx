@@ -21,21 +21,23 @@ import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import BackupService from "../../services/backup";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
+import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useUserStore } from "../../stores/use-user-store";
-import { eOpenRecoveryKeyDialog } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Dialog } from "../dialog";
+import RecoveryKeySheet from "../sheets/recovery-key";
 import AppIcon from "../ui/AppIcon";
 import { Button } from "../ui/button";
 import FormInput, { createFormRef, validators } from "../ui/input/form-input";
 import { Notice } from "../ui/notice";
 import Paragraph from "../ui/typography/paragraph";
-import { TextInput } from "react-native-gesture-handler";
 
 export const ChangePassword = () => {
   const { colors } = useThemeColors();
@@ -92,7 +94,7 @@ export const ChangePassword = () => {
       });
       setLoading(false);
       Navigation.goBack();
-      eSendEvent(eOpenRecoveryKeyDialog);
+      RecoveryKeySheet.present();
     } catch (e) {
       const message = (e as Error).message;
       setLoading(false);
@@ -106,15 +108,22 @@ export const ChangePassword = () => {
   };
 
   return (
-    <View
+    <KeyboardAwareScrollView
       style={{
-        width: "100%",
-        padding: DefaultAppStyles.GAP
+        width: "100%"
       }}
+      contentContainerStyle={{
+        paddingTop: Spacing.LEVEL_4,
+        paddingHorizontal: Spacing.LEVEL_3,
+        gap: Spacing.LEVEL_2
+      }}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="interactive"
     >
       <Dialog context="change-password-dialog" />
       <FormInput
         name="oldPassword"
+        label={strings.oldPassword()}
         formRef={formRef}
         fwdRef={oldPasswordInputRef}
         loading={loading}
@@ -125,7 +134,7 @@ export const ChangePassword = () => {
         autoComplete="password"
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder={strings.currentPassword()}
+        placeholder={"•••••••••"}
         onSubmitEditing={() => {
           passwordInputRef.current?.focus();
         }}
@@ -133,6 +142,7 @@ export const ChangePassword = () => {
 
       <FormInput
         name="password"
+        label={strings.newPassword()}
         formRef={formRef}
         fwdRef={passwordInputRef}
         loading={loading}
@@ -143,7 +153,28 @@ export const ChangePassword = () => {
         autoComplete="password"
         autoCapitalize="none"
         autoCorrect={false}
-        placeholder={strings.newPassword()}
+        placeholder={"•••••••••"}
+        onSubmitEditing={() => {
+          changePassword();
+        }}
+      />
+
+      <FormInput
+        name="confirmPassword"
+        label={strings.confirmPassword()}
+        formRef={formRef}
+        fwdRef={passwordInputRef}
+        loading={loading}
+        validators={[
+          validators.matchField("password", strings.confirmPasswordRequired())
+        ]}
+        returnKeyLabel={strings.next()}
+        returnKeyType="next"
+        secureTextEntry
+        autoComplete="password"
+        autoCapitalize="none"
+        autoCorrect={false}
+        placeholder={"•••••••••"}
         onSubmitEditing={() => {
           changePassword();
         }}
@@ -168,22 +199,39 @@ export const ChangePassword = () => {
         </Paragraph>
       ) : null}
 
-      <Notice text={strings.changePasswordNotice()} type="alert" />
-
-      <View style={{ height: 10 }} />
-
-      <Notice text={strings.changePasswordNotice2()} type="alert" />
+      <Notice
+        text={strings.changePasswordNotice()}
+        type="information"
+        size="small"
+      />
 
       <Button
         style={{
-          marginTop: DefaultAppStyles.GAP_VERTICAL,
-          width: "100%"
+          width: "100%",
+          marginTop: Spacing.LEVEL_1
         }}
         loading={loading}
         onPress={changePassword}
         type="accent"
         title={loading ? null : strings.changePasswordConfirm()}
       />
-    </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          gap: Spacing.LEVEL_1,
+          alignSelf: "center",
+          marginTop: Spacing.LEVEL_0
+        }}
+      >
+        <AppIcon
+          size={15}
+          name="shield-check"
+          iconFamily="notesnook"
+          color={colors.secondary.icon}
+        />
+        <Paragraph>{strings.yourSecurityIsPriority()}</Paragraph>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };

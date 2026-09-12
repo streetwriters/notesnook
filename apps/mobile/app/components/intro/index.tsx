@@ -20,99 +20,93 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { Linking, useWindowDimensions, View } from "react-native";
-import { SwiperFlatList } from "react-native-swiper-flatlist";
+import { Platform, useWindowDimensions, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Spacing } from "../../common/design/spacing";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import useRotator from "../../hooks/use-rotator";
 import Navigation from "../../services/navigation";
-import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
+import SettingsService from "../../services/settings";
 import { AuthMode } from "../auth/common";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import SettingsService from "../../services/settings";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { IntroIllustration } from "./illustration";
+import { ProgressPills } from "./progress-pills";
 
 const Intro = () => {
   const { colors } = useThemeColors();
   const { width } = useWindowDimensions();
-  const insets = useGlobalSafeAreaInsets();
   const isTablet = width > 600;
+  const rotator = useRotator([0], 10000, true);
+  const insets = useGlobalSafeAreaInsets();
 
   const renderItem = React.useCallback(
     ({ item }: { item: (typeof strings.introData)[0] }) => (
-      <View
+      <Animated.View
+        entering={FadeIn}
+        exiting={FadeOut}
         style={{
-          justifyContent: "center",
-          width: isTablet ? width / 2 : width,
-          paddingHorizontal: isTablet ? (width / 2) * 0.05 : width * 0.05
+          justifyContent: "flex-start"
         }}
       >
         <View
           style={{
-            flexDirection: "row"
+            gap: Spacing.LEVEL_2
           }}
         >
-          <View
-            style={{
-              width: 100,
-              height: 5,
-              backgroundColor: colors.primary.accent,
-              borderRadius: 2,
-              marginRight: 7
-            }}
-          />
+          {item.headings?.map((heading, index) =>
+            heading.bold ? (
+              <Heading
+                key={heading.value()}
+                fontFamily="SEMI_BOLD"
+                fontSize="XXL"
+                lineHeight="120%"
+              >
+                {heading.value()}
+              </Heading>
+            ) : (
+              <Paragraph
+                key={heading.value()}
+                style={{
+                  marginTop: index !== 0 ? -5 : undefined
+                }}
+                fontFamily="MEDIUM"
+                fontSize="XL"
+              >
+                {heading.value()}
+              </Paragraph>
+            )
+          )}
 
-          <View
-            style={{
-              width: 20,
-              height: 5,
-              backgroundColor: colors.secondary.background,
-              borderRadius: 2
-            }}
-          />
-        </View>
-        <View
-          style={{
-            marginTop: DefaultAppStyles.GAP_VERTICAL,
-            maxWidth: "90%",
-            width: "100%"
-          }}
-        >
-          {item.headings?.map((heading) => (
-            <Heading
-              key={heading()}
-              style={{
-                marginBottom: 5
-              }}
-              extraBold
-              size={AppFontSize.xxl}
-            >
-              {heading()}
-            </Heading>
-          ))}
+          {item.user ? (
+            <Paragraph fontFamily="MEDIUM" fontSize="XL">
+              {item.user}
+            </Paragraph>
+          ) : null}
 
           {item.body ? (
-            <Paragraph size={AppFontSize.sm}>{item.body()}</Paragraph>
+            <Paragraph color={colors.primary.paragraph} fontSize="SM">
+              {item.body()}
+            </Paragraph>
           ) : null}
 
           {item.tesimonial ? (
             <Paragraph
-              style={{
-                fontStyle: "italic",
-                fontSize: AppFontSize.lg
-              }}
+              fontSize="SM"
+              color={colors.secondary.paragraph}
               onPress={() => {
-                Linking.openURL(item.link);
+                // Linking.openURL(item.link);
               }}
             >
-              {item.tesimonial()} — {item.user}
+              {item.tesimonial()}
             </Paragraph>
           ) : null}
         </View>
-      </View>
+      </Animated.View>
     ),
-    [colors.primary.accent, colors.secondary.background, isTablet, width]
+    [colors.primary.paragraph, colors.secondary.paragraph]
   );
 
   return (
@@ -126,17 +120,25 @@ const Intro = () => {
       <View
         testID="notesnook.splashscreen"
         style={{
-          flex: 1
+          flex: 1,
+          paddingTop: Platform.OS === "android" ? 60 - insets.top : undefined
         }}
       >
+        <View
+          style={{
+            flexDirection: "row",
+            paddingHorizontal: Spacing.LEVEL_3
+          }}
+        >
+          <ProgressPills activePillIndex={0} />
+        </View>
+
         <View
           style={[
             {
               width: "100%",
               borderBottomWidth: 1,
               borderBottomColor: colors.primary.border,
-              paddingTop: insets.top + 10,
-              paddingBottom: insets.top + 10,
               flexGrow: 1
             },
             isTablet && {
@@ -149,33 +151,34 @@ const Intro = () => {
             }
           ]}
         >
-          <SwiperFlatList
-            autoplay
-            autoplayDelay={10}
-            autoplayLoop={true}
-            index={0}
-            useReactNativeGestureHandler={true}
-            showPagination
-            data={strings.introData}
-            paginationActiveColor={colors.primary.accent}
-            paginationStyleItem={{
-              width: 10,
-              height: 5,
-              marginRight: 4,
-              marginLeft: 4
+          <View
+            style={{
+              alignItems: "center",
+              alignSelf: "center",
+              paddingVertical: Spacing.LEVEL_7
             }}
-            paginationDefaultColor={colors.primary.border}
-            renderItem={renderItem}
-          />
+          >
+            <IntroIllustration />
+          </View>
+
+          <View
+            style={{
+              paddingHorizontal: Spacing.LEVEL_3
+            }}
+          >
+            {strings.introData.map((item, index) =>
+              index !== rotator ? null : renderItem({ item })
+            )}
+          </View>
         </View>
       </View>
+
       <View
         style={{
           width: isTablet ? "50%" : "100%",
           justifyContent: "center",
-          gap: DefaultAppStyles.GAP_VERTICAL,
-          paddingHorizontal: isTablet ? 0 : DefaultAppStyles.GAP,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+          gap: Spacing.LEVEL_2,
+          padding: Spacing.LEVEL_3,
           flexShrink: 1,
           alignSelf: "center"
         }}
@@ -191,7 +194,7 @@ const Intro = () => {
             });
           }}
           type="accent"
-          title={strings.getStarted()}
+          title={strings.continue()}
         />
 
         <Button

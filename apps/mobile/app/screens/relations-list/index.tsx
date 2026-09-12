@@ -22,7 +22,6 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { db } from "../../common/database";
 import { Header } from "../../components/header";
 import List from "../../components/list";
@@ -31,12 +30,18 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { AppFontSize } from "../../utils/size";
+import AppIcon from "../../components/ui/AppIcon";
+import CirclesBackground from "../../components/ui/circles-background";
+import Heading from "../../components/ui/typography/heading";
+import { Spacing } from "../../common/design/spacing";
 
 type RelationsListProps = {
   item: Item;
   referenceType: "notebook" | "tag" | "reminder" | "note";
   relationType: "to" | "from";
   title: string;
+  listEmptyTitle?: string;
+  listEmptyParagraph?: string;
   onAdd?: () => void;
 };
 
@@ -45,12 +50,20 @@ const IconsByType = {
 };
 
 function RelationsList(props: NavigationProps<"RelationsList">) {
-  const { item, referenceType, relationType, title, onAdd } = props.route
-    .params as RelationsListProps;
+  const {
+    item,
+    referenceType,
+    relationType,
+    title,
+    onAdd,
+    listEmptyTitle,
+    listEmptyParagraph
+  } = props.route.params as RelationsListProps;
   const updater = useRelationStore((state) => state.updater);
   const { colors } = useThemeColors();
   const [items, setItems] = useState<VirtualizedGrouping<Item>>();
   const hasNoRelations = !items || items?.placeholders?.length === 0;
+  console.log(listEmptyTitle, listEmptyParagraph);
 
   useEffect(() => {
     db.relations?.[relationType]?.(
@@ -76,27 +89,58 @@ function RelationsList(props: NavigationProps<"RelationsList">) {
         width: "100%"
       }}
     >
-      <Header title={title} canGoBack />
+      <Header
+        title={title}
+        canGoBack
+        style={{
+          backgroundColor: colors.primary.background
+        }}
+      />
       <View style={{ flex: 1 }}>
         {hasNoRelations ? (
           <View
             style={{
               height: "85%",
-              justifyContent: "center",
-              alignItems: "center"
+              justifyContent: "flex-start",
+              alignItems: "center",
+              gap: Spacing.LEVEL_3,
+              paddingHorizontal: Spacing.LEVEL_3 * 2,
+              marginTop: 46
             }}
           >
-            <Icon
-              name={IconsByType[referenceType as keyof typeof IconsByType]}
-              size={60}
-              color={colors.primary.icon}
-            />
-            <Paragraph>{strings.noLinksFound()}</Paragraph>
+            <CirclesBackground>
+              <AppIcon
+                name={IconsByType[referenceType as keyof typeof IconsByType]}
+                iconFamily="notesnook"
+                size={18}
+                color={colors.primary.accentForeground}
+              />
+            </CirclesBackground>
+
+            <View
+              style={{
+                gap: Spacing.LEVEL_1,
+                alignItems: "center"
+              }}
+            >
+              <Heading fontSize="XL">{listEmptyTitle}</Heading>
+              <Paragraph
+                style={{
+                  textAlign: "center",
+                  maxWidth: 270
+                }}
+                fontSize="SM"
+              >
+                {listEmptyParagraph}
+              </Paragraph>
+            </View>
             <Button
               onPress={onAdd}
-              fontSize={AppFontSize.sm}
-              type="inverted"
-              icon="plus"
+              fontSize={AppFontSize.md}
+              type="accent"
+              style={{
+                marginTop: Spacing.LEVEL_0
+              }}
               title={strings.addItem(referenceType)}
             />
           </View>
@@ -104,6 +148,7 @@ function RelationsList(props: NavigationProps<"RelationsList">) {
           <List
             data={items}
             loading={false}
+            hideHeaderTopBorder
             groupType={
               referenceType === "note"
                 ? "notes"
@@ -128,12 +173,16 @@ RelationsList.present = ({
   relationType,
   referenceType,
   title,
+  listEmptyTitle,
+  listEmptyParagraph,
   onAdd
 }: RelationsListProps) => {
   Navigation.navigate("RelationsList", {
     item,
     relationType,
     referenceType,
+    listEmptyTitle,
+    listEmptyParagraph,
     title,
     onAdd
   });

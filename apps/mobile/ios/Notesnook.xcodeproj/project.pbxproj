@@ -386,6 +386,7 @@
 				240525450DF9ABA0F332B52E /* [CP] Copy Pods Resources */,
 				65A7F34B255687E600699170 /* Embed App Extensions */,
 				48C834D962D612F18A0388B3 /* [CP] Embed Pods Frameworks */,
+				5C222D5F8D0742BFAE9C4245 /* Copy nanoicons fonts */,
 			);
 			buildRules = (
 			);
@@ -722,6 +723,20 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		5C222D5F8D0742BFAE9C4245 /* Copy nanoicons fonts */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy nanoicons fonts";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\n        NANOICONS_DIR=\"${PROJECT_DIR}/nanoicons-fonts\"\n        if [ -d \"$NANOICONS_DIR\" ]; then\n          cp \"$NANOICONS_DIR\"/*.ttf \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\" 2>/dev/null || true\n        fi\n      ";
 		};
 		658D06A625A7446E008C70C0 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;

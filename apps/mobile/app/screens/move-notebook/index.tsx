@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { isFeatureAvailable } from "@notesnook/common";
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
@@ -24,9 +25,11 @@ import { Text, View } from "react-native";
 import { FlatList } from "react-native-actions-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { presentDialog } from "../../components/dialog/functions";
 import { Header } from "../../components/header";
 import { AddNotebookSheet } from "../../components/sheets/add-notebook";
+import PaywallSheet from "../../components/sheets/paywall";
 import { NotebookItem } from "../../components/side-menu/notebook-item";
 import {
   useSideMenuNotebookExpandedStore,
@@ -34,6 +37,9 @@ import {
 } from "../../components/side-menu/stores";
 import { Button } from "../../components/ui/button";
 import Input from "../../components/ui/input";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { eSendEvent, ToastManager } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import {
   createNotebookTreeStores,
@@ -43,18 +49,13 @@ import {
   useNotebooks,
   useNotebookStore
 } from "../../stores/use-notebook-store";
+import { eUpdateNotebookRoute } from "../../utils/events";
 import {
   checkParentSelected,
   findRootNotebookId,
   getAllNotebookChildren,
   getParentNotebookId
 } from "../../utils/notebooks";
-import { DefaultAppStyles } from "../../utils/styles";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-import { eSendEvent, ToastManager } from "../../services/event-manager";
-import { eUpdateNotebookRoute } from "../../utils/events";
-import { isFeatureAvailable } from "@notesnook/common";
-import PaywallSheet from "../../components/sheets/paywall";
 
 const {
   useNotebookExpandedStore,
@@ -136,14 +137,14 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
         excludedItems.push(notebook.id);
       }
       // Exclude and disable items as needed
-      const filtered = tree.filter(item => !excludedItems.includes(item.notebook.id)).map(
-        (treeItem) => {
+      const filtered = tree
+        .filter((item) => !excludedItems.includes(item.notebook.id))
+        .map((treeItem) => {
           return {
             ...treeItem,
             disabled: disabledItems.includes(treeItem.notebook.id)
-          }
-        }
-      );
+          };
+        });
       return filtered;
     }
     filterNotebooks().then((filtered) => {
@@ -157,13 +158,14 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
         <NotebookItemWrapper
           index={index}
           item={item}
+          hideNoteCount
           onPress={async () => {
-             if (item.disabled) {
-                        ToastManager.show({
-                          type: "info",
-                          "message": "You cannot move the selected notebook(s) here"
-                        })
-            return;
+            if (item.disabled) {
+              ToastManager.show({
+                type: "info",
+                message: "You cannot move the selected notebook(s) here"
+              });
+              return;
             }
             const selectedNotebook = item.notebook;
             presentDialog({
@@ -223,7 +225,6 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
   return (
     <SafeAreaView
       style={{
-        gap: DefaultAppStyles.GAP_VERTICAL,
         flex: 1,
         backgroundColor: colors.primary.background
       }}
@@ -233,6 +234,9 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
           selectedNotebooks.length,
           selectedNotebooks[0].title
         )}
+        style={{
+          backgroundColor: "transparent"
+        }}
         canGoBack
       />
 
@@ -244,7 +248,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
         ListHeaderComponent={
           <View
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP
+              paddingHorizontal: Spacing.LEVEL_3
             }}
           >
             <Input
@@ -255,13 +259,17 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                   updateNotebooks();
                 }, 300);
               }}
+              containerStyle={{
+                backgroundColor: colors.secondary.background,
+                borderWidth: 0,
+                borderRadius: Radius.S
+              }}
               testID="move-notebook-search"
               button={{
                 icon: "plus",
                 onPress: async () => {
-                  const notebooksFeature = await isFeatureAvailable(
-                    "notebooks"
-                  );
+                  const notebooksFeature =
+                    await isFeatureAvailable("notebooks");
                   if (!notebooksFeature.isAllowed) {
                     ToastManager.show({
                       message: notebooksFeature.error,
@@ -287,17 +295,19 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                 color: colors.primary.icon
               }}
             />
+
             {moveToTopEnabled && tree.length > 0 ? (
               <Button
                 title={strings.moveToTop()}
                 style={{
                   alignSelf: "flex-start",
                   width: "100%",
-                  justifyContent: "space-between"
+                  justifyContent: "space-between",
+                  marginTop: Spacing.LEVEL_2
                 }}
                 icon="arrow-up-bold"
                 iconPosition="right"
-                type="secondaryAccented"
+                type="accent"
                 onPress={async () => {
                   for (const notebook of selectedNotebooks) {
                     if (
@@ -325,6 +335,13 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                 }}
               />
             ) : null}
+
+            <LineSeparator
+              paddingVertical={Spacing.LEVEL_3}
+              style={{
+                paddingBottom: Spacing.LEVEL_0
+              }}
+            />
           </View>
         }
         ListEmptyComponent={
@@ -354,11 +371,13 @@ const NotebookItemWrapper = React.memo(
   ({
     item,
     index,
-    onPress
+    onPress,
+    hideNoteCount
   }: {
     item: TreeItem;
     index: number;
     onPress: () => void;
+    hideNoteCount?: boolean;
   }) => {
     const expanded = useNotebookExpandedStore(
       (state) => state.expanded[item.notebook.id]
@@ -393,8 +412,7 @@ const NotebookItemWrapper = React.memo(
     return (
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          marginTop: index === 0 ? DefaultAppStyles.GAP : 0
+          paddingHorizontal: Spacing.LEVEL_3
         }}
       >
         <NotebookItem
@@ -415,6 +433,13 @@ const NotebookItemWrapper = React.memo(
               useNotebookTreeStore.getState().removeChildren(item.notebook.id);
             }
           }}
+          style={{
+            paddingVertical: Spacing.LEVEL_2
+          }}
+          subNotebookButtonStyle={{
+            paddingVertical: Spacing.LEVEL_2
+          }}
+          hideNoteCount={hideNoteCount}
           disableExpand={disableExpand}
           selected={selected}
           selectionEnabled={selectionEnabled}

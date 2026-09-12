@@ -27,6 +27,7 @@ import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import {
   eSendEvent,
   sendItemUpdateEvent,
@@ -38,10 +39,9 @@ import { useRelationStore } from "../../stores/use-relation-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { refreshNotesPage } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
 import ColorPicker from "../dialogs/color-picker";
 import PaywallSheet from "../sheets/paywall";
-import { Button } from "../ui/button";
+import AppIcon from "../ui/AppIcon";
 import { Pressable } from "../ui/pressable";
 
 const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
@@ -80,20 +80,21 @@ const ColorItem = ({ item, note }: { item: Color; note: Note }) => {
       key={item.id}
       onPress={toggleColor}
       style={{
-        width: 35,
-        height: 35,
+        width: 40,
+        height: 40,
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
-        marginRight: 5
+        borderWidth: 0
       }}
     >
       {isLinked ? (
-        <Icon
+        <AppIcon
           testID="icon-check"
-          name="check"
-          color="white"
-          size={AppFontSize.lg}
+          name="check-small"
+          iconFamily="notesnook"
+          color={colors.static.black}
+          size={15}
         />
       ) : null}
     </Pressable>
@@ -151,31 +152,10 @@ export const ColorTags = ({ item }: { item: Note }) => {
       />
       <View
         style={{
-          flexGrow: isTablet ? undefined : 1,
-          flexDirection: "row",
-          marginLeft: 5,
-          flexShrink: 2
+          flexDirection: "row"
         }}
       >
-        {!colorNotes || !colorNotes.length ? (
-          <Button
-            onPress={onPress}
-            buttonType={{
-              text: colors.primary.accent
-            }}
-            title={strings.addColor()}
-            type="secondary"
-            icon="plus"
-            iconPosition="right"
-            height={30}
-            fontSize={AppFontSize.xs}
-            style={{
-              marginRight: 5,
-              paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-              paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
-            }}
-          />
-        ) : (
+        {colorNotes?.length ? (
           <LegendList
             data={colorNotes}
             estimatedItemSize={30}
@@ -184,11 +164,14 @@ export const ColorTags = ({ item }: { item: Note }) => {
             bounces={false}
             renderItem={renderItem}
             showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              gap: Spacing.LEVEL_1
+            }}
             ListFooterComponent={
               <Pressable
                 style={{
-                  width: 35,
-                  height: 35,
+                  width: 40,
+                  height: 40,
                   borderRadius: 100,
                   justifyContent: "center",
                   alignItems: "center",
@@ -197,16 +180,17 @@ export const ColorTags = ({ item }: { item: Note }) => {
                 type="secondary"
                 onPress={onPress}
               >
-                <Icon
+                <AppIcon
                   testID="icon-plus"
+                  iconFamily="notesnook"
                   name="plus"
-                  color={colors.primary.icon}
+                  color={colors.primary.accent}
                   size={AppFontSize.lg}
                 />
               </Pressable>
             }
           />
-        )}
+        ) : null}
       </View>
     </>
   );

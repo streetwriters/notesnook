@@ -26,13 +26,15 @@ import {
   ViewStyle,
   useWindowDimensions
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
 import NativeTooltip from "../../../utils/tooltip";
-import { Pressable, PressableProps, useButton } from "../pressable";
+import { Pressable, PressableProps } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
+import { Spacing } from "../../../common/design/spacing";
+import { FontFamily } from "../../../common/design/font";
+import AppIcon, { IconProps } from "../AppIcon";
+import { useButton } from "../pressable/use-button";
 export interface ButtonProps extends PressableProps {
   height?: number;
   icon?: string;
@@ -44,6 +46,7 @@ export interface ButtonProps extends PressableProps {
   title?: string | null;
   loading?: boolean;
   width?: string | number | null;
+  fontFamily?: keyof typeof FontFamily;
   buttonType?: {
     text?: ColorValue;
     selected?: ColorValue;
@@ -52,8 +55,9 @@ export interface ButtonProps extends PressableProps {
     alpha?: number;
   };
   bold?: boolean;
-  iconColor?: ColorValue;
+  iconColor?: ColorValue | ColorValue[];
   iconStyle?: TextStyle;
+  iconFamily?: IconProps["iconFamily"];
   proTag?: boolean;
   allowFontScaling?: boolean;
 }
@@ -64,7 +68,8 @@ export const Button = ({
   loading = false,
   title = null,
   icon,
-  fontSize = AppFontSize.sm,
+  fontFamily = "SEMI_BOLD",
+  fontSize = AppFontSize.md,
   type = "transparent",
   iconSize = AppFontSize.md,
   style = {},
@@ -75,11 +80,12 @@ export const Button = ({
   textStyle,
   iconPosition = "left",
   buttonType,
-  bold,
+  bold = true,
   iconColor,
   fwdRef,
   proTag,
   iconStyle,
+  iconFamily,
   allowFontScaling = true,
   ...restProps
 }: ButtonProps) => {
@@ -118,13 +124,12 @@ export const Button = ({
       customOpacity={buttonType?.opacity}
       customAlpha={buttonType?.alpha}
       style={{
-        // height: typeof height === "number" ? height * growFactor : height,
         width:
           typeof width === "number"
             ? width * growFactor
             : (width as DimensionValue) || undefined,
-        paddingHorizontal: DefaultAppStyles.GAP,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingVertical: Spacing.LEVEL_2,
         borderRadius: defaultBorderRadius,
         alignSelf: "center",
         justifyContent: "center",
@@ -138,8 +143,9 @@ export const Button = ({
         <ActivityIndicator color={textColor} size={fontSize + 4} />
       ) : null}
       {icon && !loading && iconPosition === "left" ? (
-        <Icon
+        <AppIcon
           name={icon}
+          iconFamily={iconFamily}
           allowFontScaling={allowFontScaling}
           style={[{ marginRight: 0 }, iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
@@ -152,11 +158,18 @@ export const Button = ({
           color={textColor as string}
           size={fontSize}
           numberOfLines={1}
+          fontFamily={fontFamily}
           allowFontScaling={allowFontScaling}
           style={[
             {
-              marginLeft: icon || (loading && iconPosition === "left") ? 5 : 0,
-              marginRight: icon || (loading && iconPosition === "right") ? 5 : 0
+              marginLeft:
+                icon || (loading && iconPosition === "left")
+                  ? Spacing.LEVEL_1
+                  : 0,
+              marginRight:
+                icon || (loading && iconPosition === "right")
+                  ? Spacing.LEVEL_1
+                  : 0
             },
             textStyle
           ]}
@@ -166,10 +179,11 @@ export const Button = ({
       )}
 
       {icon && !loading && iconPosition === "right" ? (
-        <Icon
+        <AppIcon
           name={icon}
+          iconFamily={iconFamily}
           allowFontScaling
-          style={[{ marginLeft: 0 }, iconStyle as any]}
+          style={[iconStyle as any]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />

@@ -36,6 +36,12 @@ import { AppFontSize } from "../../utils/size";
 import NativeTooltip from "../../utils/tooltip";
 import AppIcon from "../ui/AppIcon";
 import { IconButton } from "../ui/icon-button";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastManager
+} from "../../services/event-manager";
+import { eCloseSheet } from "../../utils/events";
 
 const SyncStatusButton = () => {
   const { colors } = useThemeColors();
@@ -99,6 +105,37 @@ const SyncStatusButton = () => {
 
   const onPress = () => {
     if (syncing) return;
+
+    if (isOffline) {
+      ToastManager.show({
+        type: "warning",
+        heading: strings.youAreOffline(),
+        context: "global"
+      });
+      return;
+    }
+
+    if (isFailed) {
+      presentSheet({
+        icon: "warning-circle",
+        iconColor: colors.error.accent,
+        iconBackground: colors.error.shade,
+        title: strings.anErrorOccured(),
+        paragraph: strings.anErrorOccuredDuringSync(),
+        actionsArray: [
+          {
+            action: () => {
+              Sync.run();
+              eSendEvent(eCloseSheet);
+            },
+            actionText: strings.tryAgain(),
+            type: "accent"
+          }
+        ]
+      });
+      return;
+    }
+
     Sync.run();
   };
 
@@ -125,12 +162,18 @@ const SyncStatusButton = () => {
           }}
         >
           <Animated.View style={rotationStyle}>
-            <AppIcon name="sync" size={AppFontSize.lg} color={getIconColor()} />
+            <AppIcon
+              name="user-sheet-sync"
+              iconFamily="notesnook"
+              size={AppFontSize.lg}
+              color={getIconColor()}
+            />
           </Animated.View>
         </View>
       ) : (
         <IconButton
-          name="sync"
+          name="user-sheet-sync"
+          iconFamily="notesnook"
           onPress={onPress}
           tooltipText={tooltipText}
           tooltipPosition={NativeTooltip.POSITIONS.BOTTOM}
@@ -148,10 +191,11 @@ const SyncStatusButton = () => {
 
       {!syncing && (isFailed || isOffline) ? (
         <AppIcon
-          name="information"
-          color={isOffline ? colors.static.yellow : colors.error.icon}
-          size={AppFontSize.xxs}
-          style={{ position: "absolute", bottom: -3, right: -3 }}
+          name="warning-circle-filled"
+          iconFamily="notesnook"
+          color={isOffline ? colors.static.orange : colors.error.icon}
+          size={16}
+          style={{ position: "absolute", bottom: -5, right: -5 }}
         />
       ) : null}
     </View>
