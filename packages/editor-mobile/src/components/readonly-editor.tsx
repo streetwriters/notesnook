@@ -26,12 +26,12 @@ import {
   useRef,
   useState
 } from "react";
-import { useSettings } from "../hooks/useSettings";
+import { useSettingsStore } from "../hooks/useSettings";
 import { Settings, isReactNative, randId } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
 
 export const ReadonlyEditorProvider = (): JSX.Element => {
-  const settings = useSettings();
+  const settings = useSettingsStore((state) => state.settings);
   const { colors } = useThemeColors("editor");
   const contentRef = useRef<HTMLElement>();
   const getContentDiv = useCallback(() => {
