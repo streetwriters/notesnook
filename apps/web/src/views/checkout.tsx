@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "../app.css";
 import { useEffect, useRef, useState } from "react";
-import { Box, Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Box, Button, Text } from "@notesnook/ui";
 import Field from "../components/field";
 import { hardNavigate, useQueryParams } from "../navigation";
 import {
@@ -161,7 +161,8 @@ function Checkout() {
         bg: "background",
         flexDirection: "column",
         height: "100%",
-        overflowY: "auto"
+        overflowY: "auto",
+        gap: "spacing7"
       }}
     >
       <Flex
@@ -184,7 +185,11 @@ function Checkout() {
             </Button>
           )}
           <Flex
-            sx={{ alignItems: "center", justifyContent: "center", gap: "12px" }}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "spacing4"
+            }}
           >
             <svg
               style={{
@@ -208,8 +213,8 @@ function Checkout() {
             </Text>
           </Flex>
         </Flex>
-        <Button variant="new_bordered" sx={{ px: "16px" }}>
-          <span>Contact</span>
+        <Button variant="new_bordered" sx={{ px: "spacing6" }}>
+          Contact
         </Button>
       </Flex>
       {currentStep === CHECKOUT_STEP.COMPLETE ? (
@@ -229,9 +234,8 @@ function Checkout() {
         <Flex
           sx={{
             flex: 1,
-            mx: "100px",
-            my: "spacing9",
-            gap: "32px"
+            px: "spacing13",
+            gap: "spacing10"
           }}
         >
           <Flex
@@ -243,7 +247,7 @@ function Checkout() {
               border: "1px solid var(--border-secondary)",
               borderRadius: "radius4",
               boxShadow: "0px 4px 25px rgba(0,0,0,0.05)",
-              px: "32px",
+              px: "spacing9",
               py: "spacing11"
             }}
           >
@@ -254,76 +258,79 @@ function Checkout() {
                 gap: "spacing7"
               }}
             >
-              {[CHECKOUT_STEP.ACCOUNT, CHECKOUT_STEP.PAYMENT].map(
-                (step, index) => (
-                  <>
-                    <Flex key={step} sx={{ alignItems: "center", gap: "12px" }}>
-                      <Flex
-                        sx={{
-                          bg:
-                            currentStep >= step
-                              ? "accent"
-                              : "background-secondary",
-                          height: 24,
-                          width: 24,
-                          borderRadius: 100,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0
-                        }}
-                      >
-                        <Text
-                          sx={{
-                            fontSize: "sm",
-                            fontWeight: 600,
-                            color:
-                              currentStep >= step
-                                ? "accentForeground"
-                                : "heading-secondary",
-                            textAlign: "center"
-                          }}
-                        >
-                          {index + 1}
-                        </Text>
-                      </Flex>
+              {[
+                CHECKOUT_STEP.ACCOUNT,
+                CHECKOUT_STEP.PAYMENT,
+                CHECKOUT_STEP.COMPLETE
+              ].map((step, index) => (
+                <>
+                  <Flex
+                    key={step}
+                    sx={{ alignItems: "center", gap: "spacing4" }}
+                  >
+                    <Flex
+                      sx={{
+                        bg:
+                          currentStep >= step
+                            ? "accent"
+                            : "background-secondary",
+                        height: 24,
+                        width: 24,
+                        borderRadius: 100,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0
+                      }}
+                    >
                       <Text
                         sx={{
-                          color: "heading",
                           fontSize: "sm",
-                          fontWeight: 500
+                          fontWeight: 600,
+                          color:
+                            currentStep >= step
+                              ? "accentForeground"
+                              : "heading-secondary",
+                          textAlign: "center"
                         }}
                       >
-                        {step}
+                        {index + 1}
                       </Text>
                     </Flex>
-                    {index <
-                    [CHECKOUT_STEP.ACCOUNT, CHECKOUT_STEP.PAYMENT].length -
-                      1 ? (
-                      <Box
-                        sx={{
-                          display: ["none", "none", "block"],
-                          height: 2,
-                          width: 100,
-                          bg: "separator"
-                        }}
-                      />
-                    ) : null}
-                  </>
-                )
-              )}
+                    <Text
+                      sx={{
+                        color: "heading",
+                        fontSize: "sm",
+                        fontWeight: 500
+                      }}
+                    >
+                      {step}
+                    </Text>
+                  </Flex>
+                  {index <
+                  [
+                    CHECKOUT_STEP.ACCOUNT,
+                    CHECKOUT_STEP.PAYMENT,
+                    CHECKOUT_STEP.COMPLETE
+                  ].length -
+                    1 ? (
+                    <Box
+                      sx={{
+                        display: ["none", "none", "block"],
+                        height: 2,
+                        width: 100,
+                        bg: "separator"
+                      }}
+                    />
+                  ) : null}
+                </>
+              ))}
             </Flex>
 
             <Flex
               sx={{
                 flex: 1,
-                // pr: 300,
                 position: "relative",
-                overflow: "hidden",
-                m: 2,
-                gap: 2,
-                ".auth-scroll-container form": {
-                  width: ["95%", "95%", "35%"]
-                }
+                overflow: "hidden"
               }}
             >
               {currentStep === CHECKOUT_STEP.ACCOUNT ? (
@@ -387,7 +394,7 @@ function Checkout() {
             sx={{
               display: ["none", "none", "flex"],
               // width: "300px",
-              flexBasis: "40%",
+              flexBasis: "30%",
               flexDirection: "column",
               justifyContent: "space-between",
               bg: "background"
@@ -584,7 +591,7 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
                 <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
                   <Text
                     sx={{
-                      color: "paragraph-primary",
+                      color: "paragraph",
                       fontSize: "xs",
                       fontWeight: 400,
                       lineHeight: 1
@@ -679,7 +686,7 @@ function CheckoutSummary() {
     <Flex
       sx={{
         flexDirection: "column",
-        gap: "24px"
+        gap: "spacing8"
       }}
     >
       <Text
@@ -700,7 +707,7 @@ function CheckoutSummary() {
           border: "1px solid var(--border-secondary)",
           borderRadius: "radius4",
           boxShadow: "0px 4px 25px rgba(0,0,0,0.05)",
-          px: "32px",
+          px: "spacing9",
           py: "spacing11"
         }}
       >
@@ -771,7 +778,7 @@ function SummaryContent(props: SummaryContentProps) {
           sx={{
             fontWeight: 400,
             fontSize: "sm",
-            color: "paragraph-primary",
+            color: "paragraph",
             lineHeight: "100%"
           }}
         >
@@ -783,7 +790,7 @@ function SummaryContent(props: SummaryContentProps) {
         sx={{
           flexDirection: "column",
           gap: "spacing7",
-          mt: "15px"
+          mt: "spacing11"
         }}
       >
         {FEATURE_HIGHLIGHTS.map((feature) => {
@@ -962,13 +969,14 @@ function SummaryContent(props: SummaryContentProps) {
           height: "spacing13",
           overflow: "hidden"
         }}
+        style={{ gap: 0 }}
         styles={{
           input: {
             border: "none",
             outline: "none !important",
             bg: "transparent",
-            fontSize: "lg",
-            color: "paragraph-primary",
+            fontSize: "sm",
+            color: "paragraph",
             pl: "38px",
             pr: "85px",
             lineHeight: "100%"
@@ -1013,7 +1021,7 @@ function SummaryContent(props: SummaryContentProps) {
               <Button
                 variant="new_accent"
                 sx={{
-                  fontSize: "md",
+                  fontSize: "sm",
                   fontWeight: 600,
                   p: "spacing6",
                   lineHeight: "100%",
