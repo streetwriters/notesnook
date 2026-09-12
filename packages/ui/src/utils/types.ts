@@ -63,7 +63,10 @@ export type RestrictedSpaceProps = {
     | "paddingBottom"
     | "paddingLeft"
     | "paddingX"
-    | "paddingY"]?: ValidSpaceValues | (ValidSpaceValues | null)[];
+    | "paddingY"
+    | "gap"
+    | "rowGap"
+    | "columnGap"]?: ValidSpaceValues | (ValidSpaceValues | null)[];
 };
 
 export type RestrictedSxProp = Omit<

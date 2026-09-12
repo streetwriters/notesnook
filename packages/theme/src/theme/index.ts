@@ -42,6 +42,7 @@ export type Theme = {
     spacing11: number;
     spacing12: number;
     spacing13: number;
+    spacing14: number;
   };
   sizes: { full: "100%"; half: "50%" };
   radii: {
@@ -89,6 +90,7 @@ export class ThemeFactory {
         spacing11: 40,
         spacing12: 45,
         spacing13: 50,
+        spacing14: 80,
         auto: "auto"
       }),
       sizes: { full: "100%", half: "50%" },
