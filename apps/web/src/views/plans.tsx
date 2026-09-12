@@ -66,9 +66,8 @@ function Plans() {
               position: "relative",
               flexDirection: "column",
               alignItems: "center",
-              py: "80px",
-              px: "80px",
-              gap: "50px"
+              p: "spacing14",
+              gap: "spacing13"
             }}
           >
             <Image
@@ -224,7 +223,7 @@ function PlansCTA() {
           overflow: "hidden",
           background: inverseBackground,
           px: "spacing14",
-          py: "70px"
+          py: "spacing14"
         }}
       >
         <Image

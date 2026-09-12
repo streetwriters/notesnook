@@ -175,13 +175,15 @@ export function PlansList(props: PlansListProps) {
       >
         {Object.entries(PERIOD_METADATA).map(([id, period]) => (
           <Button
+            key={id}
             variant={selectedPeriod === id ? "new_accent" : "new_secondary"}
             sx={{
               display: "flex",
               flexDirection: "row",
-              gap: "9px",
+              gap: "spacing3",
               bg: selectedPeriod === id ? "accent" : "background-tertiary",
               fontWeight: selectedPeriod === id ? 600 : 500,
+              border: "none",
               borderRadius: "8px",
               p: "spacing6"
             }}
@@ -193,8 +195,8 @@ export function PlansList(props: PlansListProps) {
                 sx={{
                   bg: "accent",
                   borderRadius: "50px",
-                  px: "5px",
-                  py: "3px",
+                  px: "spacing2",
+                  py: "spacing1",
                   color: "accentForeground",
                   fontSize: "subtitle",
                   fontWeight: "normal",
@@ -207,14 +209,11 @@ export function PlansList(props: PlansListProps) {
           </Button>
         ))}
       </Flex>
-      <Box sx={{ width: "100%" }}>
+      <Flex sx={{ flexDirection: "column", width: "100%" }}>
         <Flex
           sx={{
             flexDirection: ["column", "row"],
-            gap: "spacing8",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%"
+            gap: "spacing8"
           }}
         >
           {isLoading ? (
@@ -226,179 +225,20 @@ export function PlansList(props: PlansListProps) {
                   p.plan !== SubscriptionPlan.EDUCATION &&
                   p.period === selectedPeriod
               )
-              .map((plan) => {
-                const metadata = PLAN_METADATA[plan.plan];
-                const isRecommended = recommendedPlan === plan.plan;
-                return (
-                  <Flex
-                    key={plan.id}
-                    data-test-id={`checkout-plan`}
-                    sx={{
-                      bg: isRecommended ? "background-selected" : "background",
-                      border: isRecommended
-                        ? "1px solid var(--accent)"
-                        : "1px solid var(--border-secondary)",
-                      borderRadius: "radius4",
-                      flexDirection: "column",
-                      gap: "spacing11",
-                      p: "spacing7",
-                      flex: "1 0 0",
-                      maxWidth: "500px",
-                      boxShadow: isRecommended
-                        ? "0px 0px 12.5px rgba(0,0,0,0.12)"
-                        : "0px 0px 12.5px rgba(0,0,0,0.08)"
-                    }}
-                  >
-                    <Flex
-                      sx={{
-                        flexDirection: "column",
-                        gap: "32px",
-                        width: "100%"
-                      }}
-                    >
-                      <Flex
-                        sx={{
-                          flexDirection: "column",
-                          gap: "12px"
-                        }}
-                      >
-                        <Flex
-                          sx={{
-                            justifyContent: "space-between",
-                            alignItems: "center"
-                          }}
-                        >
-                          <Text
-                            variant="heading"
-                            sx={{ fontSize: "2xl" }}
-                            data-test-id="title"
-                          >
-                            {metadata.title}
-                          </Text>
-                          {isRecommended && (
-                            <Flex
-                              sx={{
-                                bg: "accent",
-                                borderRadius: "50px",
-                                px: "8px",
-                                py: "4px"
-                              }}
-                            >
-                              <Text
-                                variant="subBody"
-                                sx={{
-                                  color: "accentForeground",
-                                  fontSize: "md",
-                                  fontWeight: 500,
-                                  lineHeight: "1"
-                                }}
-                              >
-                                Recommended
-                              </Text>
-                            </Flex>
-                          )}
-                        </Flex>
-                        <Text
-                          sx={{
-                            fontSize: "sm",
-                            color: "paragraph",
-                            fontWeight: "normal"
-                          }}
-                        >
-                          {metadata.subtitle}
-                        </Text>
-                      </Flex>
-                      <Flex sx={{ flexDirection: "column" }}>
-                        {plan.recurring ? (
-                          <RecurringPricing plan={plan} />
-                        ) : (
-                          <OneTimePricing plan={plan} />
-                        )}
-                      </Flex>
-                      <Flex
-                        sx={{
-                          flexDirection: "column",
-                          gap: "16px"
-                        }}
-                      >
-                        {PLAN_CARD_FEATURES.map((feature, index) => {
-                          const caption =
-                            feature.availability[planToAvailability(plan.plan)]
-                              .caption;
-                          return (
-                            <Flex
-                              key={feature.id}
-                              sx={{ flexDirection: "column", gap: "16px" }}
-                            >
-                              <Flex
-                                sx={{
-                                  justifyContent: "space-between",
-                                  alignItems: "center"
-                                }}
-                              >
-                                <Flex
-                                  sx={{ gap: "12px", alignItems: "center" }}
-                                >
-                                  <FeatureIcon id={feature.id} />
-                                  <Text
-                                    sx={{
-                                      fontSize: "18px",
-                                      color: "paragraph",
-                                      fontWeight: "normal"
-                                    }}
-                                  >
-                                    {feature.title}
-                                  </Text>
-                                </Flex>
-                                <Text
-                                  sx={{
-                                    fontSize: "title",
-                                    fontWeight: "bold",
-                                    color: "paragraph"
-                                  }}
-                                >
-                                  <FeatureCaption caption={caption} />
-                                </Text>
-                              </Flex>
-                              {index < PLAN_CARD_FEATURES.length - 1 && (
-                                <Box
-                                  sx={{
-                                    borderTop:
-                                      "1px solid var(--border-secondary)",
-                                    width: "100%"
-                                  }}
-                                />
-                              )}
-                            </Flex>
-                          );
-                        })}
-                      </Flex>
-                    </Flex>
-                    {selectedPlan === plan.id ? (
-                      <Flex sx={{ alignItems: "center", gap: 1 }}>
-                        <CheckCircleOutline color="accent" size={16} />
-                        <Text variant="subBody">You are on this plan.</Text>
-                      </Flex>
-                    ) : (
-                      <Button
-                        variant={isRecommended ? "new_accent" : "new_secondary"}
-                        onClick={() => onPlanSelected(plan)}
-                        sx={{
-                          width: "100%"
-                        }}
-                      >
-                        Select Plan
-                      </Button>
-                    )}
-                  </Flex>
-                );
-              })
+              .map((plan) => (
+                <PlanCard
+                  key={plan.id}
+                  plan={plan}
+                  recommendedPlan={recommendedPlan}
+                  selectedPlan={selectedPlan}
+                  onPlanSelected={onPlanSelected}
+                />
+              ))
           )}
         </Flex>
         <Flex
           sx={{
             mt: "spacing7",
-            width: "100%",
             alignItems: "center",
             justifyContent: "space-between",
             p: "spacing6",
@@ -474,7 +314,7 @@ export function PlansList(props: PlansListProps) {
             />
           </Button>
         </Flex>
-      </Box>
+      </Flex>
     </>
   );
 }
@@ -485,8 +325,8 @@ export function FeaturedOn() {
       sx={{
         bg: "background",
         flexWrap: "wrap",
-        gap: "32px",
-        px: "80px",
+        gap: "spacing9",
+        px: "spacing14",
         py: "spacing13",
         alignItems: "center",
         justifyContent: "center"
@@ -507,10 +347,10 @@ export function FeaturedOn() {
               borderRadius: "16px",
               boxShadow: "0px 4px 25px rgba(0,0,0,0.04)",
               height: "90px",
-              px: "32px",
+              px: "spacing9",
               py: "spacing7",
               alignItems: "center",
-              gap: "12px"
+              gap: "spacing9"
             }}
           >
             <Image
@@ -544,8 +384,8 @@ export function Footer() {
       <Flex
         sx={{
           flexDirection: "column",
-          gap: "50px",
-          p: "80px",
+          gap: "spacing13",
+          p: "spacing14",
           alignItems: "center",
           position: "relative"
         }}
@@ -593,7 +433,6 @@ export function Footer() {
               fontSize: "sm",
               color: "paragraph",
               textAlign: "center",
-              maxWidth: "640px",
               lineHeight: "1.5"
             }}
           >
@@ -605,9 +444,8 @@ export function Footer() {
         <Flex
           sx={{
             flexDirection: "column",
-            gap: "16px",
-            width: "100%",
-            maxWidth: 1200
+            gap: "spacing6",
+            width: "100%"
           }}
         >
           {strings.checkoutFaqs.map((faq, index) => (
@@ -642,41 +480,32 @@ function RecurringPricing(props: PricingProps) {
   const { plan } = props;
   const isZero = plan.price.gross === 0;
   const monthlyPrice = toMonthlyPrice(plan.price.gross, plan.period);
+  const hasDiscount =
+    plan.originalPrice && plan.originalPrice.gross !== plan.price.gross;
   return (
     <>
-      {plan.originalPrice && plan.originalPrice.gross !== plan.price.gross ? (
-        <Flex sx={{ justifyContent: "space-between" }}>
-          <Text
-            sx={{
-              textDecorationLine: "line-through",
-              fontSize: "md",
-              color: "paragraph-secondary"
-            }}
-          >
+      <Text
+        sx={{
+          textDecorationLine: hasDiscount ? "line-through" : "none",
+          fontSize: "md",
+          color: "paragraph-secondary"
+        }}
+      >
+        {hasDiscount ? (
+          <>
             {getCurrencySymbol(plan.currency)}
-            {toMonthlyPrice(plan.originalPrice.gross, plan.period)}
-          </Text>
-          {plan.discount?.type === "regional" ? (
-            <Text
-              sx={{
-                fontSize: "xxxs",
-                bg: "shade",
-                color: "accent",
-                borderRadius: 100,
-                px: 1,
-                py: "small"
-              }}
-            >
-              {plan.discount?.amount}% off in {plan.country}
-            </Text>
-          ) : null}
-        </Flex>
-      ) : null}
+            {toMonthlyPrice(plan.originalPrice!.gross, plan.period)}
+          </>
+        ) : (
+          <>&nbsp;</>
+        )}
+      </Text>
+
       <Text
         as="span"
         sx={{
           fontWeight: "bold",
-          fontSize: "lg",
+          fontSize: "xl",
           color: "heading"
         }}
       >
@@ -688,20 +517,24 @@ function RecurringPricing(props: PricingProps) {
           <Text
             as="span"
             sx={{
-              fontSize: "md",
+              fontSize: "sm",
               color: "paragraph-secondary",
               fontWeight: 400
             }}
           >
             {" "}
-            / Month
+            / month
           </Text>
         )}
       </Text>
 
       <Text
         as="div"
-        sx={{ fontSize: "xxs", color: "paragraph-secondary", fontWeight: 400 }}
+        sx={{
+          fontSize: "sm",
+          color: "paragraph-secondary",
+          fontWeight: 400
+        }}
       >
         {isZero ? (
           "forever"
@@ -751,8 +584,8 @@ export function ComparePlans() {
       sx={{
         flexDirection: "column",
         alignItems: "center",
-        gap: 50,
-        p: "80px",
+        gap: "spacing13",
+        p: "spacing14",
         position: "relative"
       }}
     >
@@ -845,8 +678,7 @@ export function ComparePlans() {
           width: "100%",
           bg: "background",
           borderRadius: "radius6",
-          p: "spacing7",
-          maxWidth: 1200
+          p: "spacing7"
         }}
       >
         <Flex
@@ -854,7 +686,7 @@ export function ComparePlans() {
             bg: "background-selected",
             borderRadius: "16px",
             borderBottom: "1px solid var(--border-secondary)",
-            py: "8px"
+            py: "spacing3"
           }}
         >
           <Flex
@@ -862,7 +694,7 @@ export function ComparePlans() {
               flex: "1 0 0",
               minWidth: 0,
               px: "spacing7",
-              py: "16px"
+              py: "spacing6"
             }}
           >
             <Text
@@ -883,7 +715,7 @@ export function ComparePlans() {
                 flex: "1 0 0",
                 minWidth: 0,
                 px: "spacing7",
-                py: "16px"
+                py: "spacing6"
               }}
             >
               <Text
@@ -904,7 +736,7 @@ export function ComparePlans() {
             key={feature[0]}
             sx={{
               bg: rowIndex % 2 === 0 ? "background" : "background-secondary",
-              py: "8px",
+              py: "spacing3",
               ...(rowIndex % 2 === 1 ? { borderRadius: "16px" } : {})
             }}
           >
@@ -913,7 +745,7 @@ export function ComparePlans() {
                 flex: "1 0 0",
                 minWidth: 0,
                 px: "spacing7",
-                py: "16px"
+                py: "spacing6"
               }}
             >
               <Text
@@ -934,7 +766,7 @@ export function ComparePlans() {
                   flex: "1 0 0",
                   minWidth: 0,
                   px: "spacing7",
-                  py: "16px"
+                  py: "spacing6"
                 }}
               >
                 {typeof (limit as any).caption === "boolean" ? (
@@ -1030,7 +862,7 @@ export function TestimonialsCarousel() {
       sx={{
         flexDirection: "column",
         gap: "spacing13",
-        py: "80px",
+        py: "spacing14",
         alignItems: "center",
         overflow: "hidden",
         bg: "background",
@@ -1084,14 +916,13 @@ export function TestimonialsCarousel() {
         ref={viewportRef}
         sx={{
           width: "100%",
-          overflow: "hidden",
-          maxWidth: 1500
+          overflow: "hidden"
         }}
       >
         <Flex
           ref={trackRef}
           sx={{
-            gap: "20px",
+            gap: "spacing7",
             transform: `translateX(-${offset}px)`,
             transition: "transform 0.3s ease"
           }}
@@ -1104,8 +935,8 @@ export function TestimonialsCarousel() {
                 border: "1px solid var(--border-secondary)",
                 borderRadius: "radius6",
                 flexDirection: "column",
-                gap: "40px",
-                px: "20px",
+                gap: "spacing11",
+                px: "spacing7",
                 py: "spacing11",
                 width: 600,
                 flexShrink: 0,
@@ -1130,17 +961,17 @@ export function TestimonialsCarousel() {
               <Flex
                 sx={{
                   flexDirection: "column",
-                  gap: "20px",
+                  gap: "spacing7",
                   alignItems: "flex-start"
                 }}
               >
-                <Flex sx={{ gap: "12px", alignItems: "center" }}>
+                <Flex sx={{ gap: "spacing6", alignItems: "center" }}>
                   <Flex
                     sx={{
                       bg: "background",
                       border: "0.6px solid var(--border-secondary)",
                       borderRadius: "radius4",
-                      p: "4px",
+                      p: "spacing2",
                       boxShadow:
                         "0px 4px 1px 0px rgba(0,0,0,0), 0px 3px 1px 0px rgba(0,0,0,0.01), 0px 2px 1px 0px rgba(0,0,0,0.05), 0px 1px 1px 0px rgba(0,0,0,0.09)",
                       flexShrink: 0
@@ -1159,7 +990,7 @@ export function TestimonialsCarousel() {
                   <Flex
                     sx={{
                       flexDirection: "column",
-                      gap: "4px",
+                      gap: "spacing2",
                       alignItems: "flex-start"
                     }}
                   >
@@ -1202,7 +1033,7 @@ export function TestimonialsCarousel() {
           ))}
         </Flex>
       </Flex>
-      <Flex sx={{ gap: "20px", alignItems: "center" }}>
+      <Flex sx={{ gap: "spacing7", alignItems: "center" }}>
         <Flex
           sx={{
             width: 50,
@@ -1405,6 +1236,168 @@ function CancelInfoCard(props: CancelInfoCardProps) {
           </Text>
         </Flex>
       </Flex>
+    </Flex>
+  );
+}
+
+function PlanCard({
+  plan,
+  recommendedPlan,
+  selectedPlan,
+  onPlanSelected
+}: {
+  plan: Plan;
+  recommendedPlan?: SubscriptionPlan;
+  selectedPlan?: string | null;
+  onPlanSelected: (plan: Plan) => void;
+}) {
+  const metadata = PLAN_METADATA[plan.plan];
+  const isRecommended = recommendedPlan === plan.plan;
+  return (
+    <Flex
+      data-test-id={`checkout-plan`}
+      sx={{
+        bg: isRecommended ? "background-selected" : "background",
+        border: isRecommended
+          ? "1px solid var(--accent)"
+          : "1px solid var(--border-secondary)",
+        borderRadius: "radius4",
+        flexDirection: "column",
+        gap: "spacing11",
+        p: "spacing7",
+        flex: 1,
+        boxShadow: isRecommended
+          ? "0px 0px 12.5px rgba(0,0,0,0.12)"
+          : "0px 0px 12.5px rgba(0,0,0,0.08)"
+      }}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing9",
+          width: "100%"
+        }}
+      >
+        <Flex
+          sx={{
+            flexDirection: "column",
+            gap: "spacing4"
+          }}
+        >
+          <Flex
+            sx={{
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <Text
+              variant="heading"
+              sx={{ fontSize: "2xl" }}
+              data-test-id="title"
+            >
+              {metadata.title}
+            </Text>
+            {(plan.discount?.type === "regional" || isRecommended) && (
+              <Text
+                variant="subBody"
+                sx={{
+                  bg: "accent",
+                  borderRadius: "50px",
+                  px: "spacing3",
+                  py: "spacing2",
+                  color: "accentForeground",
+                  fontSize: "sm",
+                  lineHeight: "100%"
+                }}
+              >
+                {plan.discount?.type === "regional"
+                  ? `${plan.discount.amount}% OFF`
+                  : "Recommended"}
+              </Text>
+            )}
+          </Flex>
+          <Text
+            sx={{
+              fontSize: "sm",
+              color: "paragraph",
+              fontWeight: "normal"
+            }}
+          >
+            {metadata.subtitle}
+          </Text>
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+          {plan.recurring ? (
+            <RecurringPricing plan={plan} />
+          ) : (
+            <OneTimePricing plan={plan} />
+          )}
+        </Flex>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            gap: "spacing6"
+          }}
+        >
+          {PLAN_CARD_FEATURES.map((feature, index) => {
+            const caption =
+              feature.availability[planToAvailability(plan.plan)].caption;
+            return (
+              <Flex
+                key={feature.id}
+                sx={{
+                  pt: index > 0 ? "spacing6" : 0,
+                  borderTop:
+                    index > 0 ? "1px solid var(--border-secondary)" : "none",
+                  borderColor: isRecommended
+                    ? "accent-secondary"
+                    : "border-secondary",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Flex sx={{ gap: "spacing6", alignItems: "center" }}>
+                  <FeatureIcon id={feature.id} />
+                  <Text
+                    sx={{
+                      fontSize: "md",
+                      color: "paragraph",
+                      fontWeight: "normal"
+                    }}
+                  >
+                    {feature.title}
+                  </Text>
+                </Flex>
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: "bold",
+                    color: "paragraph"
+                  }}
+                >
+                  <FeatureCaption caption={caption} />
+                </Text>
+              </Flex>
+            );
+          })}
+        </Flex>
+      </Flex>
+      {selectedPlan === plan.id ? (
+        <Flex sx={{ alignItems: "center", gap: 1 }}>
+          <CheckCircleOutline color="accent" size={16} />
+          <Text variant="subBody">You are on this plan.</Text>
+        </Flex>
+      ) : (
+        <Button
+          variant={isRecommended ? "new_accent" : "new_secondary"}
+          onClick={() => onPlanSelected(plan)}
+          sx={{
+            width: "100%"
+          }}
+        >
+          Select Plan
+        </Button>
+      )}
     </Flex>
   );
 }
