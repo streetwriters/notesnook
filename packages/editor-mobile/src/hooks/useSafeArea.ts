@@ -17,35 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
-import { SafeAreaType } from "../utils";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import type { SafeAreaType } from "../utils";
 
-const insetsStorage = localStorage.getItem("safeAreaInsets");
-const initialState =
-  insetsStorage && !globalThis.noHeader
-    ? JSON.parse(insetsStorage)
-    : {
+type SafeAreaStore = {
+  insets: SafeAreaType;
+  setInsets: (insets: SafeAreaType) => void;
+};
+
+export const useSafeAreaStore = create<SafeAreaStore>()(
+  persist(
+    (set) => ({
+      insets: {
         top: 0,
         bottom: 0,
         left: 0,
         right: 0
-      };
-
-global.safeAreaController = {
-  update: (safeArea) => {
-    if (safeAreaController.set) safeAreaController.set(safeArea);
-    safeAreaController.previous = safeArea;
-    localStorage.setItem("safeAreaInsets", JSON.stringify(safeArea));
-  },
-  reset: () => {
-    if (safeAreaController.set) safeAreaController.set(initialState);
-  },
-  previous: initialState
-};
-
-export const useSafeArea = (): SafeAreaType => {
-  const [safeArea, setSafeArea] = useState(global.safeAreaController.previous);
-  global.safeAreaController.set = setSafeArea;
-
-  return safeArea;
-};
+      },
+      setInsets: (insets) => set({ insets })
+    }),
+    {
+      name: "safeAreaInsets",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ insets: state.insets })
+    }
+  )
+);

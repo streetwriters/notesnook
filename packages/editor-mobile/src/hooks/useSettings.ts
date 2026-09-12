@@ -18,11 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getDefaultPresets } from "@notesnook/editor";
-import { useEffect, useState } from "react";
-import { Settings } from "../utils";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import type { Settings } from "../utils";
 
-const settingsJson = localStorage.getItem("editorSettings");
-const initialState: Partial<Settings> = {
+type SettingsStore = {
+  settings: Settings;
+  setSettings: (settings?: Partial<Settings>) => void;
+};
+
+const initialSettings = {
   fullscreen: false,
   deviceMode: "mobile",
   premium: false,
@@ -37,51 +42,30 @@ const initialState: Partial<Settings> = {
   dateFormat: "DD-MM-YYYY",
   loggedIn: false,
   defaultLineHeight: 1.2
-};
+} as Settings;
 
-global.settingsController = {
-  update: (settings) => {
-    const nextSettings = {
-      ...settings,
-      noToolbar: globalThis.noToolbar || settings.noToolbar,
-      noHeader: globalThis.noHeader || settings.noHeader,
-      readonly: globalThis.readonly || settings.readonly
-    };
-    if (
-      JSON.stringify(nextSettings) ===
-      JSON.stringify(global.settingsController.previous)
-    ) {
-      return;
+export const useSettingsStore = create<SettingsStore>()(
+  persist(
+    (set, get) => ({
+      settings: initialSettings,
+      setSettings: (settings) => {
+        const nextSettings = {
+          ...get().settings,
+          ...settings,
+          noToolbar: globalThis.noToolbar || settings?.noToolbar,
+          noHeader: globalThis.noHeader || settings?.noHeader,
+          readonly: globalThis.readonly || settings?.readonly
+        } as Settings;
+
+        if (JSON.stringify(nextSettings) !== JSON.stringify(get().settings)) {
+          set({ settings: nextSettings });
+        }
+      }
+    }),
+    {
+      name: "editorSettings",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ settings: state.settings })
     }
-    if (global.settingsController.set)
-      global.settingsController.set(nextSettings);
-    if (settings) {
-      localStorage.setItem("editorSettings", JSON.stringify(nextSettings));
-    } else {
-      localStorage.removeItem("editorSettings");
-    }
-    settingsController.previous = { ...nextSettings };
-  },
-  previous: settingsJson ? JSON.parse(settingsJson) : { ...initialState }
-};
-global.settingsController.previous.noHeader = globalThis.noHeader;
-global.settingsController.previous.noToolbar = globalThis.noToolbar;
-global.settingsController.previous.readonly = globalThis.readonly;
-
-export const useSettings = (): Settings => {
-  const [settings, setSettings] = useState({
-    ...global.settingsController.previous
-  });
-  global.settingsController.set = setSettings;
-
-  useEffect(() => {
-    setSettings((current) =>
-      JSON.stringify(current) ===
-      JSON.stringify(global.settingsController.previous)
-        ? current
-        : { ...global.settingsController.previous }
-    );
-  }, []);
-
-  return settings;
-};
+  )
+);

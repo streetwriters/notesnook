@@ -33,7 +33,7 @@ import PlusIcon from "mdi-react/PlusIcon";
 import PencilLockIcon from "mdi-react/PencilLockIcon";
 import TableOfContentsIcon from "mdi-react/TableOfContentsIcon";
 import React, { useRef, useState } from "react";
-import { useSafeArea } from "../hooks/useSafeArea";
+import { useSafeAreaStore } from "../hooks/useSafeArea";
 import { useTabContext, useTabStore } from "../hooks/useTabStore";
 import { Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
@@ -140,7 +140,7 @@ function Header({
   const tab = useTabContext();
   const editor = editors[tab.id];
   const tableOfContents = editorControllers[tab.id]?.getTableOfContents?.();
-  const insets = useSafeArea();
+  const insets = useSafeAreaStore((state) => state.insets);
   const openedTabsCount = useTabStore((state) => state.tabs.length);
   const [isOpen, setOpen] = useState(false);
   const btnRef = useRef(null);

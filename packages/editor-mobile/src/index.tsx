@@ -16,9 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import "./polyfill";
 import "./utils/index";
 import "./utils/commands";
-global.Buffer = require("buffer").Buffer;
 import { i18n } from "@lingui/core";
 import "@notesnook/editor/styles/fonts.mobile.css";
 import "@notesnook/editor/styles/katex-fonts.mobile.css";

@@ -46,7 +46,7 @@ async function call(
 }
 
 const fn = (fn: string, name?: string) => {
-  const id = randId("fn_");
+  const id = randId(`fn_${name}-`);
   return {
     job: `(async () => {
       if (typeof __PLATFORM__ === "undefined") __PLATFORM__ = "${Platform.OS}";
@@ -55,6 +55,7 @@ const fn = (fn: string, name?: string) => {
         ${fn}
         post("${id}",response);
       } catch(e) {
+        post("${id}",false);
         const DEV_MODE = ${__DEV__};
         if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack, "${name}");
       }
@@ -73,7 +74,9 @@ class Commands {
   }
 
   async doAsync<T>(job: string, name?: string) {
-    if (!this.ref.current) return false;
+    if (!this.ref.current) {
+      return false;
+    }
     return call(this.ref, fn(job, name)) as Promise<T>;
   }
 

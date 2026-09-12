@@ -37,8 +37,8 @@ import {
   useState
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
-import { useSafeArea } from "../hooks/useSafeArea";
-import { useSettings } from "../hooks/useSettings";
+import { useSafeAreaStore } from "../hooks/useSafeArea";
+import { useSettingsStore } from "../hooks/useSettings";
 import { TabItem, useTabContext, useTabStore } from "../hooks/useTabStore";
 import { postAsyncWithTimeout, Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
@@ -79,7 +79,7 @@ const Tiptap = ({
     undo,
     redo
   });
-  const insets = useSafeArea();
+  const insets = useSafeAreaStore((state) => state.insets);
   tabRef.current = tab;
   valueRef.current = {
     undo,
@@ -986,7 +986,7 @@ const Tiptap = ({
 };
 
 const TiptapProvider = (): JSX.Element => {
-  const settings = useSettings();
+  const settings = useSettingsStore((state) => state.settings);
   const { colors } = useThemeColors("editor");
   const contentRef = useRef<HTMLElement>();
 
