@@ -106,6 +106,13 @@ export type Settings = {
   defaultLineHeight: number;
   imageCompression: "ask-every-time" | "enabled" | "disabled";
   keepScreenOn?: boolean;
+  pebbleIndexCapture?: boolean;
+  pebbleIndexKeepAlive?: boolean;
+  pebbleIndexNotebookId?: string;
+  pebbleIndexNotebookTitle?: string;
+  pebbleIndexReminderNotebookId?: string;
+  pebbleIndexReminderNotebookTitle?: string;
+  pebbleIndexReminderPriority?: "silent" | "vibrate" | "urgent";
 };
 
 type DimensionsType = {
@@ -217,7 +224,14 @@ export const defaultSettings: SettingStore["settings"] = {
   checkForUpdates: true,
   defaultLineHeight: EDITOR_LINE_HEIGHT.DEFAULT,
   imageCompression: "ask-every-time",
-  keepScreenOn: true
+  keepScreenOn: true,
+  pebbleIndexCapture: true,
+  pebbleIndexKeepAlive: false,
+  pebbleIndexNotebookId: "",
+  pebbleIndexNotebookTitle: "",
+  pebbleIndexReminderNotebookId: "",
+  pebbleIndexReminderNotebookTitle: "",
+  pebbleIndexReminderPriority: "urgent"
 };
 
 export const useSettingStore = create<SettingStore>((set, get) => ({

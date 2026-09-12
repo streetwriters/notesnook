@@ -380,7 +380,12 @@ async function scheduleNotification(
           title: title,
           message: description || "",
           ongoing: true,
-          // subtitle: description || "",
+          channelId:
+            priority === "silent" ||
+            priority === "vibrate" ||
+            priority === "urgent"
+              ? priority
+              : "urgent",
           actions: [strings.unpin()]
         });
       }
@@ -464,7 +469,7 @@ async function scheduleNotification(
     }
     updateRemindersForWidget();
   } catch (e) {
-    /* empty */
+    console.error("scheduleNotification failed", reminder?.id, e);
   }
 }
 

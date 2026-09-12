@@ -3,6 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.streetwriters.notesnook">
 
+    <permission
+        android:name="com.streetwriters.notesnook.permission.RECEIVE_INDEX_CAPTURE"
+        android:label="Receive Index 01 captures"
+        android:description="@string/permission_receive_index_capture"
+        android:protectionLevel="normal" />
+    <uses-permission android:name="com.streetwriters.notesnook.permission.RECEIVE_INDEX_CAPTURE" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -21,7 +28,11 @@
         tools:node="remove" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"
+        tools:ignore="ExactAlarm" />
     <uses-permission
         android:name="android.permission.USE_FULL_SCREEN_INTENT"
         tools:node="remove" />
@@ -57,6 +68,7 @@
             <!-- If you don't know the MIME type in advance, set "mimeType" to "*/*". -->
             <data android:mimeType="audio/*" />
         </intent>
+        <package android:name="coredevices.coreapp" />
     </queries>
 
     <application
@@ -198,6 +210,7 @@
                 <data android:mimeType="video/*" />
                 <data android:mimeType="image/*" />
                 <data android:mimeType="application/*" />
+                <data android:mimeType="audio/*" />
             </intent-filter>
 
             <intent-filter android:label="Make Note">
@@ -209,6 +222,7 @@
                 <data android:mimeType="video/*" />
                 <data android:mimeType="image/*" />
                 <data android:mimeType="application/*" />
+                <data android:mimeType="audio/*" />
             </intent-filter>
 
             <intent-filter android:label="Make Note">
@@ -228,6 +242,47 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="The service is required by the app to restore notifications of pinned notes, restore notification with reply input for creating notes and restore data in note preview widgets on device reboot." />
         </service>
+
+        <service
+            android:name=".pebble.PebbleIndexCaptureService"
+            android:exported="true"
+            android:foregroundServiceType="dataSync">
+            <intent-filter>
+                <action android:name="com.streetwriters.notesnook.action.INDEX_CAPTURE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".pebble.PebbleIndexKeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps Notesnook process-warm so Pebble Index 01 captures can be received as on-device intents without opening the app." />
+        </service>
+
+        <activity
+            android:name=".pebble.PebbleIndexCaptureActivity"
+            android:exported="true"
+            android:theme="@style/PebbleIndexCaptureTheme"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:finishOnTaskLaunch="true"
+            android:autoRemoveFromRecents="true">
+            <intent-filter>
+                <action android:name="com.streetwriters.notesnook.action.INDEX_CAPTURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".pebble.PebbleIndexCaptureReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.streetwriters.notesnook.action.INDEX_CAPTURE" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".NotesnookTileService"

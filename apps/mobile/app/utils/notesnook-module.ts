@@ -64,6 +64,12 @@ interface NotesnookModuleInterface {
   ) => Promise<boolean>;
   removeAllShortcuts: () => Promise<boolean>;
   getAllShortcuts: () => Promise<ShortcutInfo[]>;
+  setPebbleIndexCaptureEnabled?: (enabled: boolean) => void;
+  setPebbleIndexKeepAlive?: (enabled: boolean) => void;
+  setPebbleIndexReminderPriority?: (priority: string) => void;
+  isPebbleIndexKeepAliveRunning?: () => boolean;
+  ackPebbleIndexCapture?: (id: string) => void;
+  getPebbleIndexInbox?: () => Promise<string>;
 }
 
 export const NotesnookModule: NotesnookModuleInterface = Platform.select({

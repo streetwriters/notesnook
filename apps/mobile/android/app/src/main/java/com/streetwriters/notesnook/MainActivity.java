@@ -16,6 +16,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
+import com.streetwriters.notesnook.pebble.PebbleIndexCaptureService;
+import com.streetwriters.notesnook.pebble.PebbleIndexInbox;
 import com.zoontek.rnbootsplash.RNBootSplash;
 
 public class MainActivity extends ReactActivity {
@@ -27,7 +29,19 @@ public class MainActivity extends ReactActivity {
     if (BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
+    drainPebbleIndexInbox();
+  }
 
+  private void drainPebbleIndexInbox() {
+    try {
+      if (!PebbleIndexInbox.hasPending(this)) return;
+      Intent service = new Intent(this, PebbleIndexCaptureService.class);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        startForegroundService(service);
+      } else {
+        startService(service);
+      }
+    } catch (Exception ignored) {}
   }
 
   /**
