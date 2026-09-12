@@ -57,7 +57,7 @@ export const THEME_LIGHT: any = {
       secondary: {
         accent: "#00883626",
         accentForeground: "#ffffff",
-        paragraph: "#858585",
+        paragraph: "#909090",
         background: "#F7F7F7",
         border: "#EFEFEF",
         heading: "#6F6F6F",
