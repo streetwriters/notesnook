@@ -59,19 +59,21 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-const App = (props: { configureMode: "note-preview" }) => {
+const App = (props: { configureMode?: "note-preview" }) => {
   useAppEvents();
-  //@ts-ignore
-  globalThis["IS_MAIN_APP_RUNNING"] = true;
+  if (!props.configureMode) {
+    //@ts-ignore
+    globalThis["IS_MAIN_APP_RUNNING"] = true;
+  }
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
 
   useEffect(() => {
-    if (introCompleted) {
+    if (introCompleted && !props.configureMode) {
       registerAppShortcuts();
     }
-  }, [introCompleted]);
+  }, [introCompleted, props.configureMode]);
 
   useEffect(() => {
     RNBootSplash.hide({ fade: true });
@@ -80,14 +82,16 @@ const App = (props: { configureMode: "note-preview" }) => {
     SettingsService.setPrivacyScreen(
       SettingsService.getProperty("privacyScreen")
     );
-    setTimeout(async () => {
-      await Notifications.get();
-      if (SettingsService.get().notifNotes) {
-        Notifications.pinQuickNote();
-      }
-      TipManager.init();
-    }, 100);
-  }, []);
+    if (!props.configureMode) {
+      setTimeout(async () => {
+        await Notifications.get();
+        if (SettingsService.get().notifNotes) {
+          Notifications.pinQuickNote();
+        }
+        TipManager.init();
+      }, 100);
+    }
+  }, [props.configureMode]);
 
   return (
     <SafeAreaProvider>
@@ -188,14 +192,22 @@ export const withTheme = (
 };
 
 export const withStartupBoundry = (
-  Element: (props: PropsWithChildren) => JSX.Element
+  Element: (
+    props: PropsWithChildren & { configureMode?: "note-preview" }
+  ) => JSX.Element
 ) => {
-  return function AppWithStartupBoundary(props: PropsWithChildren) {
+  return function AppWithStartupBoundary(
+    props: PropsWithChildren & { configureMode?: "note-preview" }
+  ) {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
       async function init() {
         try {
+          if (props.configureMode === "note-preview") {
+            return;
+          }
+
           const [url, shortcut] = await Promise.all([
             Linking.getInitialURL(),
             Shortcuts.getInitialShortcut()
@@ -216,7 +228,7 @@ export const withStartupBoundry = (
       }
 
       init();
-    }, []);
+    }, [props.configureMode]);
 
     if (!ready) return null;
 
