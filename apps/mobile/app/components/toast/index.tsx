@@ -20,15 +20,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Dimensions,
+  Keyboard,
+  KeyboardEvent,
   Platform,
   TouchableOpacity,
   useWindowDimensions,
   View
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
-import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
@@ -43,7 +50,13 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
-export const Toast = ({ context = "global" }) => {
+export const Toast = ({
+  context = "global",
+  avoidKeyboard = context === "global"
+}: {
+  context?: string;
+  avoidKeyboard?: boolean;
+}) => {
   const { colors, isDark } = useThemeColors();
   const [toastOptions, setToastOptions] = useState<ToastOptions | undefined>();
   const hideTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -51,7 +64,76 @@ export const Toast = ({ context = "global" }) => {
   const [visible, setVisible] = useState(false);
   const toastMessages = useRef<ToastOptions[]>([]);
   const dimensions = useWindowDimensions();
-  const keyboard = useKeyboard();
+  const keyboardHeight = useSharedValue(0);
+
+  const getKeyboardOffset = useCallback(
+    (e?: KeyboardEvent | null) => {
+      const metrics =
+        e?.endCoordinates ||
+        (Keyboard.isVisible?.() ? Keyboard.metrics?.() : undefined);
+      const rawHeight = metrics?.height || 0;
+      const screenY = metrics?.screenY;
+      const screenHeight = Dimensions.get("screen").height;
+      const windowHeight = Dimensions.get("window").height;
+
+      let calculatedHeight = 0;
+      if (screenY != null && screenY > 0) {
+        calculatedHeight = Math.max(
+          screenHeight - screenY,
+          windowHeight - screenY
+        );
+      }
+
+      const actualKeyboardHeight = Math.max(rawHeight, calculatedHeight);
+      if (!actualKeyboardHeight) return 0;
+
+      // Ensure clearance above software keyboard + editor toolbar (~50px) + margin (~20px)
+      return actualKeyboardHeight + 70;
+    },
+    []
+  );
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    bottom:
+      avoidKeyboard && keyboardHeight.value > 0
+        ? Math.max(keyboardHeight.value, insets.bottom + 15)
+        : insets.bottom + 15
+  }));
+
+  useEffect(() => {
+    if (!avoidKeyboard) return;
+
+    const onKeyboardHide = () => {
+      keyboardHeight.value = withTiming(0, {
+        duration: 250
+      });
+    };
+
+    const onKeyboardShow = (e: KeyboardEvent) => {
+      const offset = getKeyboardOffset(e);
+      if (!offset) return;
+      keyboardHeight.value = withTiming(offset, {
+        duration: 250
+      });
+    };
+
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const sub = [
+      Keyboard.addListener(showEvent, onKeyboardShow),
+      Keyboard.addListener(hideEvent, onKeyboardHide)
+    ];
+    if (Platform.OS === "ios") {
+      sub.push(Keyboard.addListener("keyboardDidShow", onKeyboardShow));
+      sub.push(Keyboard.addListener("keyboardDidHide", onKeyboardHide));
+    }
+    return () => {
+      sub.forEach((s) => s.remove());
+    };
+  }, [avoidKeyboard, getKeyboardOffset, keyboardHeight]);
 
   const hideToast = useCallback(() => {
     const nextToastMessage = toastMessages.current.shift();
@@ -88,6 +170,16 @@ export const Toast = ({ context = "global" }) => {
       if (hideTimeout.current) {
         clearTimeout(hideTimeout.current);
       }
+      if (
+        avoidKeyboard &&
+        keyboardHeight.value === 0 &&
+        Keyboard.isVisible?.()
+      ) {
+        const offset = getKeyboardOffset();
+        if (offset > 0) {
+          keyboardHeight.value = offset;
+        }
+      }
       setVisible(true);
       const nextToastMessage = toastMessages.current.shift();
       setToastOptions(nextToastMessage);
@@ -95,7 +187,7 @@ export const Toast = ({ context = "global" }) => {
         hideToast();
       }, nextToastMessage?.duration);
     },
-    [context, hideToast]
+    [avoidKeyboard, context, getKeyboardOffset, hideToast, keyboardHeight]
   );
 
   useEffect(() => {
@@ -110,22 +202,31 @@ export const Toast = ({ context = "global" }) => {
   const isFullToastMessage = toastOptions?.heading && toastOptions?.message;
 
   return visible && toastOptions ? (
-    <TouchableOpacity
-      onPress={() => {
-        hideToast();
-      }}
-      activeOpacity={1}
-      style={{
-        width: DDS.isTab ? dimensions.width / 2 : "100%",
-        alignItems: "center",
-        alignSelf: "center",
-        bottom: insets.bottom + 15,
-        position: "absolute",
-        zIndex: 999,
-        elevation: 15
-      }}
+    <Animated.View
+      pointerEvents="box-none"
+      style={[
+        {
+          width: DDS.isTab ? dimensions.width / 2 : "100%",
+          alignItems: "center",
+          alignSelf: "center",
+          position: "absolute",
+          zIndex: 999,
+          elevation: 15
+        },
+        animatedStyle
+      ]}
     >
-      <View
+      <TouchableOpacity
+        onPress={() => {
+          hideToast();
+        }}
+        activeOpacity={1}
+        style={{
+          width: "100%",
+          alignItems: "center"
+        }}
+      >
+        <View
         style={{
           ...getElevationStyle(5),
           backgroundColor: isDark ? colors.static.black : colors.static.white,
@@ -215,5 +316,6 @@ export const Toast = ({ context = "global" }) => {
         ) : null}
       </View>
     </TouchableOpacity>
+  </Animated.View>
   ) : null;
 };
