@@ -170,10 +170,7 @@ export function CodeblockComponent(
                 bg: "transparent"
               }}
               onClick={() => {
-                editor.storage.copyToClipboard?.(
-                  node.textContent,
-                  elementRef?.current?.innerHTML
-                );
+                editor.storage.copyToClipboard?.(node.textContent);
                 start();
               }}
               title={strings.copyToClipboard()}
