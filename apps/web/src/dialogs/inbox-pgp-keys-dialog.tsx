@@ -26,6 +26,7 @@ import Field from "../components/field";
 import { showToast } from "../utils/toast";
 import { SerializedKeyPair } from "@notesnook/crypto";
 import { ConfirmDialog } from "./confirm";
+import { strings } from "@notesnook/intl";
 
 type InboxPGPKeysDialogProps = BaseDialogProps<boolean> & {
   keys?: SerializedKeyPair | null;
@@ -180,7 +181,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
               minHeight: 150,
               resize: "vertical"
             }}
-            placeholder="Enter your PGP public key..."
+            placeholder={strings.enterPgpPublicKey()}
             disabled={isLoading}
           />
           <Field
@@ -197,7 +198,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
               minHeight: 150,
               resize: "vertical"
             }}
-            placeholder="Enter your PGP private key..."
+            placeholder={strings.enterPgpPrivateKey()}
             disabled={isLoading}
           />
         </Flex>
