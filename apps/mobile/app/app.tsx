@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { i18n } from "@lingui/core";
+import { i18n } from "@notesnook/intl";
 import { I18nProvider } from "@lingui/react";
 import {
   ScopedThemeProvider,
@@ -180,7 +180,7 @@ export const withTheme = (
     }, [colorScheme, darkTheme, lightTheme]);
 
     return (
-      <I18nProvider i18n={i18n}>
+      <I18nProvider i18n={i18n as any}>
         <Element {...props} />
       </I18nProvider>
     );

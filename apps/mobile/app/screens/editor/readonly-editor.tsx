@@ -34,7 +34,7 @@ import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
 import { useThemeColors } from "@notesnook/theme";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { db } from "../../common/database";
-import { i18n } from "@lingui/core";
+import { i18n } from "@notesnook/intl";
 import { defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 
