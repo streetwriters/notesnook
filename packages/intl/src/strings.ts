@@ -2876,5 +2876,20 @@ Continue without attachments?`,
         t`You can adjust how long items live in your trash from Settings -> Trash settings.`,
       contexts: ["trash"]
     }
-  ]
+  ],
+  filterNotebooks: () => t`Filter notebooks...`,
+  filterTags: () => t`Filter tags...`,
+  searchForNotes: () => t`Search for notes`,
+  enterNoteTitle: () => t`Enter note title`,
+  enterTagTitle: () => t`Enter title of tag`,
+  searchForANote: () => t`Search for a note`,
+  searchForANotebook: () => t`Search for a notebook`,
+  searchForATag: () => t`Search for a tag`,
+  searchInAllNotes: () => t`Search in all notes`,
+  columns: () => t`Columns`,
+  rows: () => t`Rows`,
+  totalColumns: (count: number) =>
+    plural(count, { one: "# column", other: "# columns" }),
+  totalRows: (count: number) =>
+    plural(count, { one: "# row", other: "# rows" })
 };
