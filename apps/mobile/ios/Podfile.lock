@@ -2204,6 +2204,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - react-native-restart (0.0.28):
+    - React-Core
   - react-native-safe-area-context (5.6.1):
     - boost
     - DoubleConversion
@@ -3596,6 +3598,7 @@ DEPENDENCIES:
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
   - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
+  - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-screenguard (from `../node_modules/react-native-screenguard`)
   - "react-native-share-extension (from `../node_modules/@ammarahmed/react-native-share-extension`)"
@@ -3811,6 +3814,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-pdf"
   react-native-quick-sqlite:
     :path: "../node_modules/react-native-quick-sqlite"
+  react-native-restart:
+    :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-screenguard:
@@ -4021,6 +4026,7 @@ SPEC CHECKSUMS:
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pdf: edc236298f13f1609e42d41e45b8b6ea88ed10f9
   react-native-quick-sqlite: 1ed8d3db1e22a8604d006be69f06053382e93bb0
+  react-native-restart: f2a57ccec2e6481deb1f19958ac60c0813313784
   react-native-safe-area-context: c6e2edd1c1da07bdce287fa9d9e60c5f7b514616
   react-native-screenguard: 975d4612dce0c348b19b08a48aa23e9b68584d98
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec

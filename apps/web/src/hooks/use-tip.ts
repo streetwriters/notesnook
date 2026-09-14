@@ -52,7 +52,7 @@ export type TipContext =
   | "attachments";
 
 export type Tip = {
-  text: string;
+  text: () => string;
   contexts: TipContext[];
   button?: TipButton;
 };
@@ -73,7 +73,7 @@ export class TipManager {
       Config.set("tipState", tipState);
     }
 
-    const tipsForCtx = tips.filter((tip) => tip.contexts.indexOf(context) > -1);
+    const tipsForCtx = getTips().filter((tip) => tip.contexts.indexOf(context) > -1);
     return tipsForCtx.sample();
   }
 }
@@ -87,7 +87,7 @@ export const useTip = (
 ) => {
   const [tip, setTip] = useState(TipManager.tip(context));
   const intervalRef = useRef<number>(0);
-  const defaultTip = DEFAULT_TIPS[context];
+  const defaultTip = getDefaultTips()[context];
 
   useEffect(() => {
     setTip(TipManager.tip(context));
@@ -103,81 +103,30 @@ export const useTip = (
     };
   }, [context, options?.delay, options?.rotate]);
 
-  if (tip && defaultTip) {
-    return { ...tip, button: defaultTip.button };
-  } else return tip || defaultTip;
+  const activeTip = tip || defaultTip;
+  if (!activeTip) return null;
+
+  const text =
+    typeof activeTip.text === "function" ? activeTip.text() : activeTip.text;
+  const button = defaultTip?.button || tip?.button;
+
+  return { text, button };
 };
 
-const tips: Tip[] = [
-  {
-    text: `Wrap a query in double quotes to search for an exact match.`,
-    contexts: ["search"]
-  },
-  {
-    text: "Hold Ctrl/Cmd & click on multiple items to select them.",
-    contexts: ["notes", "notebooks", "tags"]
-  },
-  {
-    text: "Monographs enable you to share your notes in a secure and private way.",
-    contexts: ["monographs"]
-  },
-  {
-    text: "Monographs can be encrypted with a secret key and shared with anyone.",
-    contexts: ["monographs"]
-  },
-  {
-    text: "Published notes can be encrypted. Which means only you and the person you share the password with can read them.",
-    contexts: ["monographs"]
-  },
-  {
-    text: "You can pin frequently used Notebooks to the Side Menu to quickly access them.",
-    contexts: ["notebooks", "notebooks"]
-  },
-  {
-    text: "A notebook can have unlimited sub-notebooks with unlimited notes.",
-    contexts: ["notebooks"]
-  },
-  {
-    text: "You can multi-select notes and move them to a notebook or a sub-notebook at once.",
-    contexts: ["notebooks"]
-  },
-  {
-    text: "Mark important notes by adding them to favorites.",
-    contexts: ["notes", "favorites"]
-  },
-  {
-    text: "Are you scrolling a lot to find a specific note? Pin it to the top from Note properties.",
-    contexts: ["notes"]
-  },
-  {
-    text: "Pin your most important Notebooks to the top from Notebook properties.",
-    contexts: ["notebooks"]
-  },
-  {
-    text: "We value your feedback so join us on Discord and share your experiences and ideas.",
-    contexts: ["notes", "notebooks", "tags"],
-    button: {
-      title: strings.joinCommunity(),
-      icon: ArrowTopRight,
-      onClick: () =>
-        window.open("https://discord.gg/notesnook-796015620436787241", "_blank")
-    }
-  },
-  {
-    text: "You can adjust how long items live in your trash from Settings -> Trash settings.",
-    contexts: ["trash"]
-  }
-];
+const getTips = (): Tip[] => (strings.webTips as unknown as Tip[]) || [];
 
-const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
+const getDefaultTips = (): Record<
+  TipContext,
+  { text: () => string; button?: TipButton }
+> => ({
   attachments: {
-    text: "You have no attachments."
+    text: () => strings.noAttachments()
   },
-  favorites: { text: "Notes you favorite will appear here." },
+  favorites: { text: () => strings.favoritesEmpty() },
   monographs: {
-    text: "You haven't published any notes yet.",
+    text: () => strings.monographsEmpty(),
     button: {
-      title: "What are monographs?",
+      title: strings.whatAreMonographs(),
       icon: ArrowTopRight,
       onClick() {
         window.open(
@@ -188,32 +137,32 @@ const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
     }
   },
   notebooks: {
-    text: "You haven't created any notebooks.",
+    text: () => strings.notebooksEmpty(),
     button: { ...CREATE_BUTTON_MAP.notebooks, icon: Plus }
   },
   notes: {
-    text: "You have not created any notes yet.",
+    text: () => strings.notesEmpty(),
     button: {
       ...CREATE_BUTTON_MAP.notes,
       icon: Plus
     }
   },
   reminders: {
-    text: "You can set daily, weekly or monthly reminders & stay ahead of your tasks.",
+    text: () => strings.remindersEmpty(),
     button: { ...CREATE_BUTTON_MAP.reminders, icon: Plus }
   },
   tags: {
-    text: "You can use #tags to organize your notes.",
+    text: () => strings.tagsEmpty(),
     button: {
       ...CREATE_BUTTON_MAP.tags,
       icon: Plus
     }
   },
   trash: {
-    text: ""
+    text: () => ""
   },
   archive: {
-    text: strings.yourArchiveIsEmpty()
+    text: () => strings.yourArchiveIsEmpty()
   },
-  search: { text: "" }
-};
+  search: { text: () => "" }
+});

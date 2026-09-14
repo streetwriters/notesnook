@@ -136,6 +136,13 @@ export const osIntegrationRouter = t.router({
 
     config.backupDirectory = result.filePaths[0];
   }),
+  setAppLanguage: t.procedure
+    .input(z.string())
+    .mutation(({ input: language }) => {
+      config.appLanguage = language;
+      app.relaunch();
+      app.exit();
+    }),
   restart: t.procedure.query(() => {
     app.relaunch();
     app.exit();

@@ -28,6 +28,7 @@ import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { components } from "./components";
 import { SectionItem } from "./section-item";
+import { useSettingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 
 const keyExtractor = (item: SettingSection) => item.id;
@@ -39,6 +40,11 @@ const Group = ({
   navigation,
   route
 }: NativeStackScreenProps<RouteParams, "SettingsGroup">) => {
+  const settingsGroups = useSettingsGroups();
+  const currentGroup = settingsGroups.find((g) => g.id === route.params.id);
+  const title = currentGroup?.name || route.params.name;
+  const sections = currentGroup?.sections || route.params.sections;
+
   useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().setFocusedRouteId("Settings");
@@ -54,7 +60,7 @@ const Group = ({
       {route.params.hideHeader ? null : (
         <Header
           renderedInRoute="Settings"
-          title={route.params.name as string}
+          title={title as string}
           canGoBack={true}
           id="Settings"
         />
@@ -66,9 +72,9 @@ const Group = ({
           }}
         >
           {route.params.component ? components[route.params.component] : null}
-          {route.params.sections ? (
+          {sections ? (
             <AnimatedKeyboardAvoidingFlatList
-              data={route.params.sections}
+              data={sections}
               keyExtractor={keyExtractor}
               renderItem={renderItem}
               enableOnAndroid
