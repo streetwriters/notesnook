@@ -38,9 +38,8 @@ import { verifyUserWithApplock } from "../functions";
 import PaywallSheet from "../../../components/sheets/paywall";
 import {
   AVAILABLE_LANGUAGES,
-  getSupportedLocale,
+  resolveTargetLocale,
   i18n,
-  setI18nGlobal,
   strings
 } from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
@@ -74,7 +73,7 @@ export const LanguagePicker = createSettingsPicker<
     try {
       systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
     } catch (e) {}
-    return saved || getSupportedLocale(systemLocale);
+    return resolveTargetLocale(saved, systemLocale);
   },
   updateValue: async (item) => {
     const lang = typeof item === "object" ? item.code : item;
@@ -90,7 +89,6 @@ export const LanguagePicker = createSettingsPicker<
         positivePress: async () => {
           eSendEvent(eCloseSimpleDialog);
           i18n.activate(lang);
-          setI18nGlobal(i18n);
           SettingsService.setProperty("appLanguage", lang);
           // restarting early causes appLanguage value to not get saved.
           setTimeout(() => RNRestart.restart(), 100);

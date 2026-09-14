@@ -17,42 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  i18n,
-  setI18nGlobal,
-  resolveTargetLocale,
-  LOCALE_LOADERS
-} from "@notesnook/intl";
+import { initLocaleSync } from "@notesnook/intl";
 import SettingsService from "../../services/settings";
 import * as RNLocalize from "react-native-localize";
 
-const localeCache = {};
-const localeCatalogs = {};
-
-for (const locale of Object.keys(LOCALE_LOADERS)) {
-  Object.defineProperty(localeCatalogs, locale, {
-    enumerable: true,
-    get() {
-      if (!localeCache[locale]) {
-        localeCache[locale] = LOCALE_LOADERS[locale]();
-      }
-      return localeCache[locale];
-    }
-  });
-}
-
 export function initLocale() {
-  const saved = SettingsService.getProperty("appLanguage");
-  const systemLocale = RNLocalize.getLocales()[0]?.languageTag ?? "en";
-  const targetLang = resolveTargetLocale(saved, systemLocale);
-
-  if (!saved) {
-    SettingsService.setProperty("appLanguage", targetLang);
-  }
-
-  i18n.load(localeCatalogs);
-  i18n.activate(targetLang);
-  setI18nGlobal(i18n);
-  return targetLang;
+  return initLocaleSync({
+    getSavedLocale: () => SettingsService.getProperty("appLanguage"),
+    onSaveLocale: (locale) => {
+      SettingsService.setProperty("appLanguage", locale);
+    },
+    systemLocale: RNLocalize.getLocales()[0]?.languageTag ?? "en"
+  });
 }
 
