@@ -41,7 +41,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
     <Popup title={strings.imageProperties()} onClose={onClose}>
       <Flex sx={{ width: ["auto", 300], alignItems: "center", p: 1 }}>
         <InlineInput
-          label="width"
+          label={strings.width()}
           type="number"
           value={width || 0}
           containerProps={{
@@ -57,7 +57,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
           }}
         />
         <InlineInput
-          label="height"
+          label={strings.height()}
           type="number"
           value={height || 0}
           onChange={(e) => {
