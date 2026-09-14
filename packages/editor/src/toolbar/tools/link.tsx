@@ -208,7 +208,10 @@ export function OpenLink(props: ToolProps) {
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  const href = link?.attrs.href ?? null;
+  const href =
+    link?.attrs.href ??
+    (getMarkAttributes(editor.state, "link")?.href as string) ??
+    null;
   const [loading, setLoading] = useState(false);
   const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
 
@@ -227,7 +230,7 @@ export function OpenLink(props: ToolProps) {
     })();
   }, [href]);
 
-  if (!link || !href) return null;
+  if (!href) return null;
 
   const title = linkData?.title || href;
 
@@ -285,8 +288,10 @@ export function CopyLink(props: ToolProps) {
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  if (!link) return null;
-  const href = link?.attrs.href;
+  const href =
+    link?.attrs.href ??
+    (getMarkAttributes(editor.state, "link")?.href as string) ??
+    null;
   if (!href) return null;
 
   return (
