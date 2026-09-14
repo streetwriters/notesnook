@@ -154,24 +154,28 @@ export function EditLink(props: ToolProps) {
       title={props.title}
       isEditing
       onDone={(attributes) => {
-        if (selectedNode.current)
-          editor.chain().focus().setTextSelection(selectedNode.current).run();
+        editor.chain().focus().extendMarkRange("link").run();
         editor.commands.setLink(attributes);
         hide();
       }}
       onClick={() => {
-        if (!selectedNode.current) return;
+        editor.commands.extendMarkRange("link");
 
-        const { node } = selectedNode.current;
-        if (!node) return;
+        const href = attrs?.href;
+        if (!href) return;
 
-        const selectedText = node.textContent;
-        const mark = findMark(node, "link");
+        const selectedText =
+          editor.state.doc.textBetween(
+            editor.state.selection.from,
+            editor.state.selection.to
+          ) ||
+          selectedNode.current?.node?.textContent ||
+          editor.state.selection.$from.nodeBefore?.textContent ||
+          "";
 
-        if (!mark) return;
         return {
           title: selectedText,
-          href: mark.attrs.href
+          href
         };
       }}
     />
