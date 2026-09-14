@@ -153,7 +153,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
             <Flex sx={{ alignItems: "center", mt: 1 }}>
               <InlineInput
                 containerProps={{ sx: { mr: 1 } }}
-                label="width"
+                label={strings.width()}
                 type="number"
                 placeholder={strings.width()}
                 defaultValue={size.width}
@@ -164,7 +164,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 onChange={(e) => onSizeChange(e.target.valueAsNumber)}
               />
               <InlineInput
-                label="height"
+                label={strings.height()}
                 type="number"
                 placeholder={strings.height()}
                 defaultValue={size.height}
