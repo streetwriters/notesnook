@@ -359,7 +359,7 @@ export const useActions = ({
       },
       input: true,
       defaultValue: item.title,
-      inputPlaceholder: "Enter title of tag",
+      inputPlaceholder: strings.enterTagTitle(),
       positiveText: strings.save()
     });
   }

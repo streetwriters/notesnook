@@ -28,6 +28,7 @@ import {
   useIsFeatureAvailable
 } from "@notesnook/common";
 import { isImage } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -580,7 +581,7 @@ const ShareView = () => {
                       </Heading>
                     ) : (
                       <TextInput
-                        placeholder="Enter note title"
+                        placeholder={strings.enterNoteTitle()}
                         ref={inputRef}
                         allowFontScaling={false}
                         style={{
