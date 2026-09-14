@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Text } from "@theme-ui/components";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { FlexScrollContainer } from "../../../components/scroll-container";
 import { useSpellChecker } from "../../../hooks/use-spell-checker";
 import { strings } from "@notesnook/intl";
@@ -28,27 +28,22 @@ export function DictionaryWords() {
 
   return (
     <>
-      <FlexScrollContainer
-        suppressAutoHide
-        style={{
-          maxHeight: 400,
-          display: "flex",
-          flexDirection: "column"
-        }}
-      >
-        <Text variant="body" sx={{ my: 1 }}>
-          {strings.customDictWords(words.length)}
-        </Text>
-        {words.map((word) => (
-          <Button
-            key={word}
-            variant="menuitem"
-            sx={{ textAlign: "left", p: 1 }}
-            onClick={() => deleteWord(word)}
-          >
-            {word}
-          </Button>
-        ))}
+      <Text variant="body" sx={{ my: 1 }}>
+        {strings.customDictWords(words.length)}
+      </Text>
+      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
+        <Flex sx={{ flexDirection: "column" }}>
+          {words.map((word) => (
+            <Button
+              key={word}
+              variant="menuitem"
+              sx={{ textAlign: "left", p: 1 }}
+              onClick={() => deleteWord(word)}
+            >
+              {word}
+            </Button>
+          ))}
+        </Flex>
       </FlexScrollContainer>
     </>
   );
