@@ -39,11 +39,11 @@ import PaywallSheet from "../../../components/sheets/paywall";
 import {
   AVAILABLE_LANGUAGES,
   getSupportedLocale,
+  i18n,
   setI18nGlobal,
   strings
 } from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
-import { i18n } from "@lingui/core";
 import RNRestart from "react-native-restart";
 import { presentDialog } from "../../../components/dialog/functions";
 import { eCloseSimpleDialog } from "../../../utils/events";
