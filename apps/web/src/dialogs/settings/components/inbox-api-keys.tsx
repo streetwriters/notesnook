@@ -382,7 +382,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
           inputRef={inputRef}
           autoFocus
           label="Key name"
-          placeholder="e.g., Todo integration"
+          placeholder={strings.exampleKeyName()}
           onKeyUp={async (e) => {
             if (e.key === "Enter") {
               await onSubmit();
