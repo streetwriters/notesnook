@@ -188,6 +188,7 @@ const onAppOpenedFromURL = async (event: {
         const note = await db.notes.note(id);
         if (note) {
           editorState().initialLoadCalled = true;
+          Navigation.navigate("FluidPanelsView", { initialPage: "editor" });
           eSendEvent(eOnLoadNote, {
             item: note
           });
