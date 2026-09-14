@@ -220,7 +220,7 @@ export function OpenLink(props: ToolProps) {
   const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
 
   useEffect(() => {
-    if (!href) return;
+    if (!href || !isInternalLink(href)) return;
 
     (async () => {
       try {
@@ -303,7 +303,9 @@ export function CopyLink(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={async () => {
-        const linkData = await editor.storage.getLinkData?.(href);
+        const linkData = isInternalLink(href)
+          ? await editor.storage.getLinkData?.(href)
+          : undefined;
         if (linkData?.title) {
           editor.storage.copyToClipboard?.(
             href,
