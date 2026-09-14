@@ -24,11 +24,10 @@ export { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
 export type { Language } from "./languages";
 export {
   initLocale,
-  resolveTargetLocale,
-  getLocaleMessages,
-  localeMap,
-  LOCALE_LOADERS
+  initLocaleSync,
+  resolveTargetLocale
 } from "./locale";
-export type { InitLocaleOptions } from "./locale";
+export type { InitLocaleOptions, InitLocaleSyncOptions } from "./locale";
+
 
 
