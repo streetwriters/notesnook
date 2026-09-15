@@ -498,6 +498,7 @@ export function getSettingsGroups(): SettingSection[] {
                   title: strings.clearCacheConfirm(),
                   paragraph: strings.clearCacheConfirmDesc(),
                   positiveText: strings.clear(),
+                  negativeText: strings.cancel(),
                   positivePress: async () => {
                     filesystem.clearCache();
                     ToastManager.show({

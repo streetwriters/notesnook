@@ -282,8 +282,8 @@ export const useActions = ({
     ToastManager.show({
       heading:
         type === "note"
-          ? "Note restored from trash"
-          : "Notebook restored from trash",
+          ? strings.noteRestoredFromTrash()
+          : strings.notebookRestoredFromTrash(),
       type: "success"
     });
   }

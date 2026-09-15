@@ -200,9 +200,10 @@ const restoreBackup = async (options: {
       for (const path of extractedAttachments) {
         if (path === ".attachments_key") continue;
         updateProgress({
-          progress: `Restoring attachments (${count++}/${
+          progress: strings.restoringAttachmentsCount(
+            count++,
             extractedAttachments.length
-          })`
+          )
         });
         const hash = path;
         const attachment = await db.attachments.attachment(hash as string);
@@ -546,13 +547,13 @@ const BackupItem = ({
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >
-          Created on {getFormattedDate(item?.lastModified, "date-time")}
-          {isLegacyBackup ? "(Legacy backup)" : ""} (
+          {strings.createdOn()} {getFormattedDate(item?.lastModified, "date-time")}
+          {isLegacyBackup ? ` ${strings.legacyBackup()}` : ""} (
           {formatBytes((item as ReactNativeBlobUtilStat).size)})
         </Paragraph>
       </View>
       <Button
-        title="Restore"
+        title={strings.restore()}
         type="secondaryAccented"
         style={{
           paddingHorizontal: DefaultAppStyles.GAP,

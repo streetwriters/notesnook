@@ -61,7 +61,7 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
         }}
       >
         <Paragraph>
-          {progress.message || "Downloading files"} ({progress?.current}/
+          {progress.message || strings.downloadingFiles()} ({progress?.current}/
           {progress?.total})
         </Paragraph>
 
