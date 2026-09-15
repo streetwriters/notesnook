@@ -38,6 +38,7 @@ import { useCheckoutStore } from "./store";
 import { formatPrice, toPricingInfo } from "./helpers";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import BaseDialog from "../../components/dialog";
+import { strings } from "@notesnook/intl";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { Period, SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
@@ -136,14 +137,14 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
               variant="heading"
               sx={{ textAlign: "center" }}
             >
-              Select a plan
+              {strings.selectAPlan()}
             </Text>
             <Text
               variant="title"
               mt={1}
               sx={{ color: "heading-secondary", textAlign: "center" }}
             >
-              One subscription for a lifetime of notes.
+              {strings.oneSubscriptionLifetimeNotes()}
             </Text>
           </Flex>
           <PlansList
