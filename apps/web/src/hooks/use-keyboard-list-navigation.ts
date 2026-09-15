@@ -68,12 +68,12 @@ export function useKeyboardListNavigation(
   }, [reset]);
 
   const openActiveItem = useCallback(() => {
-    if (!open) return false;
+    if (!open || cursor.current < 0 || cursor.current >= length) return false;
     resetSelection();
     open(cursor.current);
     select(cursor.current);
     return true;
-  }, [open, resetSelection, select]);
+  }, [open, resetSelection, select, length]);
 
   const onMouseUp = useCallback(
     (e: MouseEvent, itemIndex: number) => {
@@ -136,10 +136,16 @@ export function useKeyboardListNavigation(
         "Shift-ArrowUp": () => {
           if (anchor.current === -1) {
             anchor.current = cursor.current;
-            select(anchor.current);
+            if (anchor.current >= 0 && anchor.current < length) {
+              select(anchor.current);
+            }
           }
 
-          if (direction() === DIRECTION.DOWN) {
+          if (
+            direction() === DIRECTION.DOWN &&
+            cursor.current >= 0 &&
+            cursor.current < length
+          ) {
             deselect(cursor.current);
           }
 
@@ -158,10 +164,16 @@ export function useKeyboardListNavigation(
         "Shift-ArrowDown": () => {
           if (anchor.current === -1) {
             anchor.current = cursor.current;
-            select(anchor.current);
+            if (anchor.current >= 0 && anchor.current < length) {
+              select(anchor.current);
+            }
           }
 
-          if (direction() === DIRECTION.UP) {
+          if (
+            direction() === DIRECTION.UP &&
+            cursor.current >= 0 &&
+            cursor.current < length
+          ) {
             deselect(cursor.current);
           }
 
