@@ -164,7 +164,7 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
             </Paragraph>
 
             <Button
-              title={responseInfo?.positiveButtonText || "Done"}
+              title={responseInfo?.positiveButtonText || strings.done()}
               onPress={() => {
                 if (responseInfo?.url) {
                   Linking.openURL(responseInfo?.url);
