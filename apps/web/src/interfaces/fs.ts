@@ -379,6 +379,7 @@ async function multiPartUploadFile(
 
   onUploadProgress();
   const queue = newQueue(4);
+  let uploadError: unknown = null;
   for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
     const from = i * UPLOAD_PART_REQUIRED_CHUNKS;
     const length = Math.min(
@@ -386,40 +387,58 @@ async function multiPartUploadFile(
       UPLOAD_PART_REQUIRED_CHUNKS
     );
     const url = parts[i];
-    queue.add(async () => {
-      const blob = await fileHandle.readChunks(
-        i * UPLOAD_PART_REQUIRED_CHUNKS,
-        length
-      );
-      const response = await axios
-        .request({
-          url,
-          method: "PUT",
-          headers: { "Content-Type": "" },
-          signal,
-          data: blob,
-          onUploadProgress: (ev) => {
-            uploadedBytes += ev.bytes;
-            onUploadProgress();
-          }
-        })
-        .catch((e) => {
-          throw new WrappedError(`Failed to upload part at offset ${i}`, e);
-        });
-
-      if (!response.headers.etag || typeof response.headers.etag !== "string")
-        throw new Error(
-          `Failed to upload part at offset ${i}: invalid etag. ETag: ${response.headers.etag}`
+    queue
+      .add(async () => {
+        if (uploadError || signal?.aborted) return;
+        const blob = await fileHandle.readChunks(
+          i * UPLOAD_PART_REQUIRED_CHUNKS,
+          length
         );
-      uploadedChunks.push({
-        PartNumber: i + 1,
-        ETag: JSON.parse(response.headers.etag)
+        const response = await axios
+          .request({
+            url,
+            method: "PUT",
+            headers: { "Content-Type": "" },
+            signal,
+            data: blob,
+            onUploadProgress: (ev) => {
+              uploadedBytes += ev.bytes;
+              onUploadProgress();
+            }
+          })
+          .catch((e) => {
+            throw new WrappedError(`Failed to upload part at offset ${i}`, e);
+          });
+
+        if (!response.headers.etag || typeof response.headers.etag !== "string")
+          throw new Error(
+            `Failed to upload part at offset ${i}: invalid etag. ETag: ${response.headers.etag}`
+          );
+        uploadedChunks.push({
+          PartNumber: i + 1,
+          ETag: JSON.parse(response.headers.etag)
+        });
+        await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
+        await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
+      })
+      .catch((e) => {
+        if (!uploadError) {
+          uploadError = e;
+          queue.clear();
+        }
       });
-      await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
-      await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
-    });
   }
   await queue.done();
+
+  if (uploadError) {
+    throw uploadError;
+  }
+
+  if (uploadedChunks.length !== TOTAL_PARTS) {
+    throw new Error(
+      `Could not complete multi-part upload: only ${uploadedChunks.length} of ${TOTAL_PARTS} parts were uploaded.`
+    );
+  }
 
   await axios
     .post(
