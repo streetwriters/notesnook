@@ -222,7 +222,7 @@ const NotesPage = ({
           renderedInRoute={route.name}
           id={params.current?.id}
           type={params.current?.item?.type}
-          headerTitle={title || "Monographs"}
+          headerTitle={title || strings.monographs()}
           customAccentColor={accentColor}
           placeholder={placeholder}
         />

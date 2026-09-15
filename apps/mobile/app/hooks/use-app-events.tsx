@@ -801,8 +801,8 @@ export const useAppEvents = () => {
         )
           return;
         startProgress({
-          title: "Migrating Data",
-          paragraph: "Please wait while we migrate your data",
+          title: strings.migratingData(),
+          paragraph: strings.migratingDataDesc(),
           canHideProgress: false,
           fillBackground: true
         });

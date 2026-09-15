@@ -20,14 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { i18n as defaultI18n, type Messages } from "@lingui/core";
 import { setI18nGlobal } from "./setup";
 import { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
-
 import { localeMap } from "./generated/locale-map";
 import { LOCALE_LOADERS } from "./generated/loaders.mobile";
-export { localeMap, LOCALE_LOADERS };
 
 export function resolveTargetLocale(
-  savedLanguage?: string | null,
-  systemLocale?: string
+  savedLanguage: string | null | undefined,
+  systemLocale: string
 ): string {
   if (
     savedLanguage &&
@@ -36,45 +34,65 @@ export function resolveTargetLocale(
     return savedLanguage;
   }
 
-  let sysLocale = systemLocale;
-  if (!sysLocale) {
-    try {
-      sysLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch {
-      sysLocale = "en";
-    }
-  }
-
-  return getSupportedLocale(sysLocale);
+  return getSupportedLocale(systemLocale);
 }
 
-export async function getLocaleMessages(lang: string): Promise<Messages> {
-  const loader = localeMap[lang] || localeMap.en;
+const localeCache: Record<string, Messages> = {};
+const localeCatalogs: Record<string, Messages> = {};
+
+for (const locale of Object.keys(LOCALE_LOADERS)) {
+  Object.defineProperty(localeCatalogs, locale, {
+    enumerable: true,
+    get() {
+      if (!localeCache[locale]) {
+        localeCache[locale] = (
+          LOCALE_LOADERS as Record<string, () => Messages>
+        )[locale]();
+      }
+      return localeCache[locale];
+    }
+  });
+}
+
+async function getLocaleMessages(lang: string): Promise<Messages> {
+  const loader = localeMap[lang];
   const mod = await loader();
-  const messages = "default" in mod ? mod.default.messages : (mod as { messages: unknown }).messages;
-  return messages as unknown as Messages;
+  return ("default" in mod ? mod.default.messages : mod.messages) as Messages;
 }
 
 export type InitLocaleOptions = {
   getSavedLocale?: () => string | null | undefined;
   onSaveLocale?: (locale: string) => void;
-  systemLocale?: string;
-  getMessages?: (lang: string) => Promise<Messages> | Messages;
+  systemLocale: string;
 };
 
-export async function initLocale(options?: InitLocaleOptions): Promise<string> {
-  const saved = options?.getSavedLocale?.();
-  const targetLang = resolveTargetLocale(saved, options?.systemLocale);
-  if (!saved && options?.onSaveLocale) {
+export type InitLocaleSyncOptions = InitLocaleOptions;
+
+function resolveAndSaveLocale(options: InitLocaleOptions): string {
+  const saved = options.getSavedLocale?.();
+  const targetLang = resolveTargetLocale(saved, options.systemLocale);
+  if (!saved && options.onSaveLocale) {
     options.onSaveLocale(targetLang);
   }
+  return targetLang;
+}
 
-  const messages = options?.getMessages
-    ? await options.getMessages(targetLang)
-    : await getLocaleMessages(targetLang);
-
-  defaultI18n.load({ [targetLang]: messages });
+function activateLocale(targetLang: string) {
   defaultI18n.activate(targetLang);
   setI18nGlobal(defaultI18n);
+}
+
+export function initLocaleSync(options: InitLocaleOptions): string {
+  const targetLang = resolveAndSaveLocale(options);
+  defaultI18n.load(localeCatalogs);
+  activateLocale(targetLang);
+  return targetLang;
+}
+
+export async function initLocale(options: InitLocaleOptions): Promise<string> {
+  const targetLang = resolveAndSaveLocale(options);
+  const messages = await getLocaleMessages(targetLang);
+  defaultI18n.load({ [targetLang]: messages });
+  activateLocale(targetLang);
   return targetLang;
 }

@@ -60,8 +60,7 @@ import {
   randId
 } from "./tiptap/utils";
 import { fluidTabsRef } from "../../utils/global-refs";
-import { strings } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
+import { strings, i18n } from "@notesnook/intl";
 import { useVaultStatus } from "../../hooks/use-vault-status";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";

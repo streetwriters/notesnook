@@ -25,12 +25,13 @@ import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
+import { strings } from "@notesnook/intl";
 
-const FAILED_CONTENT = `<html><head>
-<title>Failed to load web clip</title>
+const getFailedContent = () => `<html><head>
+<title>${strings.failedToLoadWebClip()}</title>
 </head>
 <body>
-<p>Failed to load web clip</p>
+<p>${strings.failedToLoadWebClip()}</p>
 </body>
 </html>`;
 
@@ -45,7 +46,7 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
         .getAttachmentData?.(node.attrs)
         .catch(() => null);
       const doc = new DOMParser().parseFromString(
-        html || FAILED_CONTENT,
+        html || getFailedContent(),
         "text/html"
       );
       doc.head.innerHTML += `<base target="_blank">`;
@@ -183,7 +184,7 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
           >
             <Icon path={Icons.loading} rotate size={32} />
             {progress ? (
-              <Text sx={{ mt: 2 }}>Loading web clip ({progress}%)</Text>
+              <Text sx={{ mt: 2 }}>{strings.loadingWebClip(progress)}</Text>
             ) : null}
           </Flex>
         )}

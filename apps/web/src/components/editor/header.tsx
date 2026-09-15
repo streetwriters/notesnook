@@ -108,7 +108,7 @@ function Header(props: HeaderProps) {
                 items.push({
                   type: "button",
                   key: "new",
-                  title: `Create "${query}" tag`,
+                  title: strings.createTagTitle(query),
                   icon: Plus.path,
                   onClick: () => setTag(noteId, tags, query).finally(reset)
                 });
