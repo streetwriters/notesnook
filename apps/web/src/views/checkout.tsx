@@ -132,7 +132,8 @@ function Checkout() {
     useCheckoutStore.getState().applyCoupon(pricingInfo.data.discount?.code);
     if (pricingInfo.data.customer) {
       setCustomer(pricingInfo.data.customer);
-      setCurrentStep(CHECKOUT_STEP.PAYMENT);
+      // TODO setCurrentStep(CHECKOUT_STEP.PAYMENT);
+      setCurrentStep(CHECKOUT_STEP.COMPLETE);
     }
   }, [plan]);
 
@@ -344,9 +345,10 @@ function Checkout() {
                       const user = useUserStore.getState().user;
                       setCustomer(user);
                       setCurrentStep(
-                        isUserSubscribed(user)
-                          ? CHECKOUT_STEP.COMPLETE
-                          : CHECKOUT_STEP.PAYMENT
+                        CHECKOUT_STEP.COMPLETE
+                        // TODO: isUserSubscribed(user)
+                        //   ? CHECKOUT_STEP.COMPLETE
+                        //   : CHECKOUT_STEP.PAYMENT
                       );
                     } else setError("Failed to create account.");
                   }}
@@ -967,9 +969,9 @@ function SummaryContent(props: SummaryContentProps) {
           border: "1px solid var(--border)",
           borderRadius: "radius2",
           height: "spacing13",
-          overflow: "hidden"
+          overflow: "hidden",
+          gap: 0
         }}
-        style={{ gap: 0 }}
         styles={{
           input: {
             border: "none",
