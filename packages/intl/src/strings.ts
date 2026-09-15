@@ -2894,5 +2894,9 @@ Continue without attachments?`,
     plural(count, { one: "# row", other: "# rows" }),
   selectAll: () => t`Select all`,
   home: () => t`Home`,
-  tags: () => t`Tags`
+  tags: () => t`Tags`,
+  featureNotAvailableOnPlan: (feature: string) =>
+    t`${feature} is not available on this plan.`,
+  reachedLimitOf: (limit: number | string, feature: string) =>
+    t`You have reached your limit of ${limit} ${feature}.`
 };
