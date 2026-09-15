@@ -24,7 +24,6 @@ import {
   mdiMinus,
   mdiBookOutline,
   mdiNotebookOutline,
-  mdiArrowLeft,
   mdiArrowRight,
   mdiArrowDown,
   mdiBookPlusMultipleOutline,
@@ -45,7 +44,6 @@ import {
   mdiMagnify,
   mdiMenu,
   mdiLoginVariant,
-  mdiEmailAlertOutline,
   mdiAccountOutline,
   mdiLogoutVariant,
   mdiSunglasses,
@@ -59,8 +57,6 @@ import {
   mdiExportVariant,
   mdiArrowExpandDown,
   mdiArrowTopRightThick,
-  mdiChevronLeft,
-  mdiChevronRight,
   mdiPound,
   mdiPinOutline,
   mdiPin,
@@ -109,7 +105,6 @@ import {
   mdiNoteOutline,
   mdiSyncAlert,
   mdiAlertOutline,
-  mdiEyeOutline,
   mdiEyeOffOutline,
   mdiAttachment,
   mdiPencilOutline,
@@ -176,7 +171,6 @@ import {
   mdiCalendarClockOutline,
   mdiPuzzleOutline,
   mdiBellRingOutline,
-  mdiClockTimeFiveOutline,
   mdiBellOffOutline,
   mdiVibrate,
   mdiBellCancelOutline,
@@ -226,7 +220,6 @@ import {
   mdiHistory,
   mdiArrowCollapseRight,
   mdiNoteEditOutline,
-  mdiArrowUp,
   mdiInbox,
   mdiConsoleLine,
   mdiSpellcheck,
@@ -237,6 +230,63 @@ import { useTheme } from "@emotion/react";
 import { Theme } from "@notesnook/theme";
 import { Flex, FlexProps } from "@theme-ui/components";
 import { isThemeColor, SchemeColors } from "@notesnook/theme";
+import EyeClosed from "@notesnook/icons/eye-closed.svg?react";
+import EyeOpen from "@notesnook/icons/eye-open.svg?react";
+import ChatIcon from "@notesnook/icons/chat.svg?react";
+import EnvelopeSimple from "@notesnook/icons/envelope-simple.svg?react";
+import LockSimple from "@notesnook/icons/lock-simple.svg?react";
+import ChevronLeftIcon from "@notesnook/icons/chevron-left.svg?react";
+import ChevronRightIcon from "@notesnook/icons/chevron-right.svg?react";
+import ChevronDownIcon from "@notesnook/icons/chevron-down.svg?react";
+import ClockIcon from "@notesnook/icons/clock.svg?react";
+import WarningCircle from "@notesnook/icons/warning-circle.svg?react";
+import CloudSvg from "@notesnook/icons/cloud.svg?react";
+import ShieldCheckSvg from "@notesnook/icons/shield-check.svg?react";
+import DeviceMobileCameraSvg from "@notesnook/icons/device-mobile-camera.svg?react";
+import FileSvg from "@notesnook/icons/file.svg?react";
+import ImageSvg from "@notesnook/icons/image.svg?react";
+import ArrowRightSvg from "@notesnook/icons/arrow-right.svg?react";
+import CheckCircleSvg from "@notesnook/icons/check-circle.svg?react";
+import CheckSvg from "@notesnook/icons/check.svg?react";
+import KeySvg from "@notesnook/icons/key.svg?react";
+import TrashSvg from "@notesnook/icons/trash.svg?react";
+import RecoveryKeyShieldCheckSvg from "@notesnook/icons/recovery-key-shield-check.svg?react";
+import CopyIcon from "@notesnook/icons/copy.svg?react";
+import BoxArrowDownIcon from "@notesnook/icons/box-arrow-down.svg?react";
+import DownloadIcon from "@notesnook/icons/download-simple.svg?react";
+import FloppyDiskIcon from "@notesnook/icons/floppy-disk.svg?react";
+import HomeSvg from "@notesnook/icons/home.svg?react";
+import BookmarkSvg from "@notesnook/icons/bookmark.svg?react";
+import PencilSimpleSvg from "@notesnook/icons/pencil-simple.svg?react";
+import ShoppingModeSvg from "@notesnook/icons/shopping-mode.svg?react";
+import FileTextSvg from "@notesnook/icons/file-text.svg?react";
+import StarSvg from "@notesnook/icons/star.svg?react";
+import PlusSvg from "@notesnook/icons/plus.svg?react";
+import FunnelSvg from "@notesnook/icons/funnel.svg?react";
+import SlidersSvg from "@notesnook/icons/sliders.svg?react";
+import BellSvg from "@notesnook/icons/bell.svg?react";
+import LockSimpleNoteSvg from "@notesnook/icons/lock-simple.svg?react";
+import NoteCalendarSvg from "@notesnook/icons/calendar.svg?react";
+import NotePinSvg from "@notesnook/icons/pin.svg?react";
+import NoteFavoriteSvg from "@notesnook/icons/star-filled.svg?react";
+import NoteReadonlySvg from "@notesnook/icons/pencil-simple-slash.svg?react";
+import NoteLinkSvg from "@notesnook/icons/link.svg?react";
+import NoteBellSvg from "@notesnook/icons/bell-note.svg?react";
+import NoteExpirySvg from "@notesnook/icons/bomb.svg?react";
+import SearchSvg from "@notesnook/icons/search.svg?react";
+import ViewListSvg from "@notesnook/icons/view-list.svg?react";
+import CaretRightSvg from "@notesnook/icons/caret-right.svg?react";
+import LinkSimpleSvg from "@notesnook/icons/link-simple.svg?react";
+import LinkBreakSvg from "@notesnook/icons/link-break.svg?react";
+import QuestionSvg from "@notesnook/icons/question.svg?react";
+import CalendarBlankSvg from "@notesnook/icons/calendar-blank.svg?react";
+import ProhibitSvg from "@notesnook/icons/prohibit.svg?react";
+import HandCoinsSvg from "@notesnook/icons/hand-coins.svg?react";
+import ArrowUpSvg from "@notesnook/icons/arrow-up.svg?react";
+import LightningSvg from "@notesnook/icons/lightning.svg?react";
+import ArrowLeftSvg from "@notesnook/icons/arrow-left.svg?react";
+import CheckCircleSuccesSvg from "@notesnook/icons/check-circle-success.svg?react";
+import InfoSvg from "@notesnook/icons/info.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -325,16 +375,41 @@ export function createIcon(path: string, rotate = false) {
   return NNIcon;
 }
 
+export function createSvgIcon(
+  Component: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
+) {
+  const NNIcon: Icon = function Icon(props) {
+    const { sx, size = 24, color = "icon", ...restProps } = props;
+    return (
+      <Flex
+        {...restProps}
+        sx={{
+          justifyContent: "center",
+          alignItems: "center",
+          flexShrink: 0,
+          color,
+          width: size,
+          height: size,
+          ...sx
+        }}
+      >
+        <Component width="100%" height="100%" />
+      </Flex>
+    );
+  };
+  NNIcon.isReactComponent = true;
+  NNIcon.path = "";
+  return NNIcon;
+}
+
 export const Plus = createIcon(mdiPlus);
 export const NoteAdd = createIcon(mdiNoteEditOutline);
 export const Note = createIcon(mdiNoteOutline);
 export const NoteRemove = createIcon(mdiNoteRemoveOutline);
 export const Notes = createIcon(mdiNoteMultipleOutline);
 export const Minus = createIcon(mdiMinus);
-export const Notebook = createIcon(mdiBookOutline);
 export const Notebooks = createIcon(mdiBookMultipleOutline);
 export const Notebook2 = createIcon(mdiNotebookOutline);
-export const ArrowLeft = createIcon(mdiArrowLeft);
 export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
 export const ArrowTopRight = createIcon(mdiArrowTopRight);
@@ -344,7 +419,6 @@ export const Alert = createIcon(mdiAlertOctagonOutline);
 export const Vault = createIcon(mdiShieldOutline);
 export const Unlock = createIcon(mdiLockOpenOutline);
 export const Lock = createIcon(mdiLockOutline);
-export const Star = createIcon(mdiStarOutline);
 export const StarOutline = createIcon(mdiStarOutline);
 export const Circle = createIcon(mdiCircle);
 export const CircleEmpty = createIcon(mdiCircleOutline);
@@ -353,7 +427,6 @@ export const Check = createIcon(mdiCheck);
 export const Cross = createIcon(mdiClose);
 export const MoreVertical = createIcon(mdiDotsVertical);
 export const MoreHorizontal = createIcon(mdiDotsHorizontal);
-export const Trash = createIcon(mdiTrashCanOutline);
 export const Archive = createIcon(mdiArchiveOutline);
 export const TopicRemove = createIcon(mdiBookmarkRemoveOutline);
 export const NotebookRemove = createIcon(mdiBookRemoveOutline);
@@ -361,7 +434,6 @@ export const Search = createIcon(mdiMagnify);
 export const TableOfContents = createIcon(mdiFormatListBulleted);
 export const Menu = createIcon(mdiMenu);
 export const Login = createIcon(mdiLoginVariant);
-export const Email = createIcon(mdiEmailAlertOutline);
 export const Signup = createIcon(mdiAccountOutline);
 export const Logout = createIcon(mdiLogoutVariant);
 export const FocusMode = createIcon(mdiGlasses);
@@ -377,10 +449,7 @@ export const Export = createIcon(mdiExportVariant);
 export const AddToNotebook = createIcon(mdiBookPlusMultipleOutline);
 export const Expand = createIcon(mdiArrowExpandDown);
 export const Shortcut = createIcon(mdiArrowTopRightThick);
-export const ChevronLeft = createIcon(mdiChevronLeft);
-export const ChevronRight = createIcon(mdiChevronRight);
 export const Close = createIcon(mdiClose);
-export const Tag = createIcon(mdiPound);
 export const Tag2 = createIcon(mdiPound);
 export const Pin = createIcon(mdiPinOutline);
 export const PinFilled = createIcon(mdiPin);
@@ -390,7 +459,6 @@ export const LightMode = createIcon(mdiWeatherSunny);
 export const ThemeIcon = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const DoubleCheckmark = createIcon(mdiCheckAll);
-export const CheckCircle = createIcon(mdiCheckCircle);
 export const CheckIntermediate = createIcon(mdiMinusCircleOutline);
 export const CheckRemove = createIcon(mdiCloseCircleOutline);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
@@ -405,7 +473,6 @@ export const Text = createIcon(mdiFormatTitle);
 export const Success = createIcon(mdiCheckCircle);
 export const Error = createIcon(mdiAlertCircle);
 export const Warn = createIcon(mdiAlertOutline);
-export const Info = createIcon(mdiInformation);
 export const ToggleUnchecked = createIcon(mdiToggleSwitchOffOutline);
 export const ToggleChecked = createIcon(mdiToggleSwitchOutline);
 export const Backup = createIcon(mdiBackupRestore);
@@ -418,17 +485,13 @@ export const ChevronDown = createIcon(mdiChevronDown);
 export const ChevronUp = createIcon(mdiChevronUp);
 export const SortAsc = createIcon(mdiSortAscending);
 export const SortDesc = createIcon(mdiSortDescending);
-export const PasswordInvisible = createIcon(mdiEyeOutline);
-export const PasswordVisible = createIcon(mdiEyeOffOutline);
 export const Fullscreen = createIcon(mdiFullscreen);
 export const ExitFullscreen = createIcon(mdiFullscreenExit);
 export const Announcement = createIcon(mdiBullhorn);
 export const Publish = createIcon(mdiCloudUploadOutline);
 export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
-export const Copy = createIcon(mdiContentCopy);
 export const Refresh = createIcon(mdiRefresh);
-export const Clock = createIcon(mdiClockTimeFiveOutline);
 export const Duplicate = createIcon(mdiContentDuplicate);
 export const InternalLink = createIcon(mdiLink);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
@@ -450,7 +513,6 @@ export const Github = createIcon(mdiGithub);
 export const Reddit = createIcon(mdiReddit);
 export const Dismiss = createIcon(mdiClose);
 export const File = createIcon(mdiFileOutline);
-export const Download = createIcon(mdiArrowDown);
 export const Print = createIcon(mdiPrinterOutline);
 export const ImageDownload = createIcon(mdiImage);
 export const Billboard = createIcon(mdiBillboard);
@@ -585,8 +647,63 @@ export const SessionHistory = createIcon(mdiHistory);
 export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
-export const ArrowUp = createIcon(mdiArrowUp);
 export const Inbox = createIcon(mdiInbox);
 export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
 export const CloseCircle = createIcon(mdiCloseCircle);
+
+export const CheckSvgIcon = createSvgIcon(CheckSvg);
+export const PasswordInvisible = createSvgIcon(EyeOpen);
+export const PasswordVisible = createSvgIcon(EyeClosed);
+export const Chat = createSvgIcon(ChatIcon);
+export const Email = createSvgIcon(EnvelopeSimple);
+export const RecoveryCode = createSvgIcon(LockSimple);
+export const ChevronLeft = createSvgIcon(ChevronLeftIcon);
+export const ChevronRight = createSvgIcon(ChevronRightIcon);
+export const CaretDown = createSvgIcon(ChevronDownIcon);
+export const Clock = createSvgIcon(ClockIcon);
+export const Warning = createSvgIcon(WarningCircle);
+export const Cloud = createSvgIcon(CloudSvg);
+export const DeviceMobileCamera = createSvgIcon(DeviceMobileCameraSvg);
+export const FileDoc = createSvgIcon(FileSvg);
+export const Picture = createSvgIcon(ImageSvg);
+export const ArrowRightSvgIcon = createSvgIcon(ArrowRightSvg);
+export const CheckCircle = createSvgIcon(CheckCircleSvg);
+export const CheckIcon = createSvgIcon(CheckSvg);
+export const KeyIcon = createSvgIcon(KeySvg);
+export const Trash = createSvgIcon(TrashSvg);
+export const RecoveryKeyShieldCheck = createSvgIcon(RecoveryKeyShieldCheckSvg);
+export const Copy = createSvgIcon(CopyIcon);
+export const BoxArrowDown = createSvgIcon(BoxArrowDownIcon);
+export const Download = createSvgIcon(DownloadIcon);
+export const FloppyDisk = createSvgIcon(FloppyDiskIcon);
+export const Sliders = createSvgIcon(SlidersSvg);
+export const Funnel = createSvgIcon(FunnelSvg);
+export const NoteCalendar = createSvgIcon(NoteCalendarSvg);
+export const NoteLock = createSvgIcon(LockSimpleNoteSvg);
+export const NotePin = createSvgIcon(NotePinSvg);
+export const NoteFavorite = createSvgIcon(NoteFavoriteSvg);
+export const NoteReadonly = createSvgIcon(NoteReadonlySvg);
+export const NoteLink = createSvgIcon(NoteLinkSvg);
+export const NoteBell = createSvgIcon(NoteBellSvg);
+export const NoteExpiry = createSvgIcon(NoteExpirySvg);
+export const SearchIcon = createSvgIcon(SearchSvg);
+export const ViewList = createSvgIcon(ViewListSvg);
+export const Bell = createSvgIcon(BellSvg);
+export const Notebook = createSvgIcon(BookmarkSvg);
+export const PencilSimple = createSvgIcon(PencilSimpleSvg);
+export const Tag = createSvgIcon(ShoppingModeSvg);
+export const Star = createSvgIcon(StarSvg);
+export const CaretRight = createSvgIcon(CaretRightSvg);
+export const LinkSimple = createSvgIcon(LinkSimpleSvg);
+export const LinkBreak = createSvgIcon(LinkBreakSvg);
+export const Question = createSvgIcon(QuestionSvg);
+export const ShieldCheck = createSvgIcon(ShieldCheckSvg);
+export const CalendarBlank = createSvgIcon(CalendarBlankSvg);
+export const Prohibit = createSvgIcon(ProhibitSvg);
+export const HandCoins = createSvgIcon(HandCoinsSvg);
+export const ArrowUp = createSvgIcon(ArrowUpSvg);
+export const Lightning = createSvgIcon(LightningSvg);
+export const ArrowLeft = createSvgIcon(ArrowLeftSvg);
+export const CheckCircleSuccess = createSvgIcon(CheckCircleSuccesSvg);
+export const Info = createSvgIcon(InfoSvg);

@@ -26,6 +26,8 @@ export const IOS_APPGROUPID = "group.org.streetwriters.notesnook";
 export const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 export const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
+export const PASSWORD_PLACEHOLDER = "•••••••••";
+
 export const BETA = getVersion().includes("beta");
 
 export const STORE_LINK =
@@ -36,10 +38,10 @@ export const STORE_LINK =
 export const GROUP = {
   default: "default",
   none: "none",
-  abc: "abc",
   year: "year",
+  month: "month",
   week: "week",
-  month: "month"
+  abc: "abc"
 };
 
 export const SORT = {
@@ -65,6 +67,24 @@ export const itemSkus = [
   "notesnook.believer.yearly",
   "notesnook.believer.5year"
 ];
+
+export function planToDisplayNameShort(plan: SubscriptionPlan): string {
+  switch (plan) {
+    case SubscriptionPlan.FREE:
+      return "Free";
+    case SubscriptionPlan.ESSENTIAL:
+      return "Essential";
+    case SubscriptionPlan.LEGACY_PRO:
+    case SubscriptionPlan.PRO:
+      return "Pro";
+    case SubscriptionPlan.BELIEVER:
+      return "Believer";
+    case SubscriptionPlan.EDUCATION:
+      return "Education";
+    default:
+      return "Free";
+  }
+}
 
 export function planToDisplayName(plan: SubscriptionPlan): string {
   switch (plan) {

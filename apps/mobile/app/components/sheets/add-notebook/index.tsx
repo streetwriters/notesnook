@@ -31,15 +31,18 @@ import { useNotebookStore } from "../../../stores/use-notebook-store";
 import { useRelationStore } from "../../../stores/use-relation-store";
 import { eOnNotebookUpdated } from "../../../utils/events";
 import { getParentNotebookId } from "../../../utils/notebooks";
-import Input from "../../ui/input";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import DialogHeader from "../../dialog/dialog-header";
 import DialogButtons from "../../dialog/dialog-buttons";
 import { presentDialog } from "../../dialog/functions";
 import { getElevationStyle } from "../../../utils/elevation";
-import { defaultBorderRadius } from "../../../utils/size";
 import { useThemeColors } from "@notesnook/theme";
 import { getContainerBorder } from "../../../utils/colors";
+import { Radius, Spacing } from "../../../common/design/spacing";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../ui/input/form-input";
 
 export const AddNotebookSheet = ({
   notebook,
@@ -55,29 +58,28 @@ export const AddNotebookSheet = ({
   defaultTitle?: string;
 }) => {
   const { colors } = useThemeColors();
-  const title = useRef(notebook?.title || defaultTitle);
-  const description = useRef(notebook?.description);
   const titleInput = useRef<TextInput>(null);
   const descriptionInput = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
+  const formRef = useRef(
+    createFormRef({
+      title: notebook?.title || defaultTitle || "",
+      description: notebook?.description || ""
+    })
+  );
 
   const onSaveChanges = async () => {
     if (loading) return;
 
-    if (!title.current || title?.current.trim().length === 0) {
-      ToastManager.show({
-        heading: strings.enterNotebookTitle(),
-        type: "error",
-        context: "local"
-      });
-      return;
-    }
+    if (!formRef.current?.validate()) return;
 
     setLoading(true);
 
+    const values = formRef.current.getValues();
+
     const id = await db.notebooks.add({
-      title: title.current,
-      description: description.current,
+      title: values.title,
+      description: values.description,
       id: notebook?.id
     });
 
@@ -127,57 +129,67 @@ export const AddNotebookSheet = ({
         ...getElevationStyle(5),
         width: DDS.isTab ? 400 : "85%",
         maxHeight: 450,
-        borderRadius: defaultBorderRadius,
+        borderRadius: Radius.LG,
         backgroundColor: colors.primary.background,
-        paddingTop: 12,
+        gap: Spacing.LEVEL_4,
+        paddingVertical: Spacing.LEVEL_4,
         ...getContainerBorder(colors.primary.border, 0.5),
         overflow: "hidden"
       }}
     >
       <View
         style={{
-          paddingHorizontal: 12
+          paddingHorizontal: Spacing.LEVEL_3,
+          gap: Spacing.LEVEL_4
         }}
       >
         <DialogHeader
           title={notebook ? strings.editNotebook() : strings.newNotebook()}
         />
 
-        <Input
-          fwdRef={titleInput}
-          testID={notesnook.ids.dialogs.notebook.inputs.title}
-          onChangeText={(value) => {
-            title.current = value;
+        <View
+          style={{
+            gap: Spacing.LEVEL_2
           }}
-          onLayout={() => {
-            setTimeout(() => {
-              titleInput?.current?.focus();
-            }, 300);
-          }}
-          placeholder={strings.enterNotebookTitle()}
-          onSubmit={() => {
-            descriptionInput.current?.focus();
-          }}
-          returnKeyLabel="Next"
-          returnKeyType="next"
-          defaultValue={notebook ? notebook.title : title.current}
-        />
+        >
+          <FormInput
+            fwdRef={titleInput}
+            name="title"
+            formRef={formRef}
+            testID={notesnook.ids.dialogs.notebook.inputs.title}
+            onLayout={() => {
+              setTimeout(() => {
+                titleInput?.current?.focus();
+              }, 300);
+            }}
+            validators={[validators.required(strings.titleIsRequired())]}
+            placeholder={"eg. My Notebook"}
+            onSubmitEditing={() => {
+              descriptionInput.current?.focus();
+            }}
+            label={strings.enterNotebookTitle()}
+            returnKeyLabel="Next"
+            returnKeyType="next"
+            defaultValue={
+              notebook ? notebook.title : formRef.current.getValue("title")
+            }
+          />
 
-        <Input
-          fwdRef={descriptionInput}
-          testID={notesnook.ids.dialogs.notebook.inputs.description}
-          onChangeText={(value) => {
-            description.current = value;
-          }}
-          placeholder={strings.enterNotebookDescription()}
-          returnKeyLabel={strings.next()}
-          returnKeyType="next"
-          defaultValue={notebook ? notebook.description : ""}
-        />
+          <FormInput
+            fwdRef={descriptionInput}
+            name="description"
+            formRef={formRef}
+            testID={notesnook.ids.dialogs.notebook.inputs.description}
+            label={strings.enterNotebookDescription()}
+            placeholder={"eg. This is My Notebook"}
+            returnKeyLabel={strings.next()}
+            returnKeyType="next"
+            defaultValue={notebook ? notebook.description : ""}
+          />
+        </View>
       </View>
       <DialogButtons
         onPressNegative={() => {
-          title.current = undefined;
           close?.(false);
           useSettingStore.getState().setSheetKeyboardHandler(true);
         }}

@@ -37,8 +37,8 @@ import PremiumService from "../../../services/premium";
 import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
-import { AppFontSize } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
+import { FontSizes } from "../../../common/design/font";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { AuthMode } from "../../auth/common";
 import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
@@ -87,181 +87,190 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
       SubscriptionProvider.GOOGLE &&
       Platform.OS === "android");
 
-  return !pricingPlans.currentPlan ? null : (
+  if (!pricingPlans.currentPlan) return null;
+
+  const features = [
+    {
+      title: `${
+        PlanOverView[pricingPlans.currentPlan.id as keyof typeof PlanOverView]
+          .storage
+      } ${strings.cloudStorage()}`,
+      description: strings.cloudStorageBenefit()
+    },
+    ...(pricingPlans.currentPlan.id !== "essential"
+      ? [
+          {
+            title: strings.appLockSecurity(),
+            description: strings.appLockSecurityBenefit()
+          }
+        ]
+      : []),
+    {
+      title: strings.advancedNoteElements(),
+      description: strings.advancedNoteElementsBenefit()
+    }
+  ];
+
+  const onUpgrade = () => {
+    if (PremiumService.get()) {
+      if (
+        pricingPlans.user?.subscription.plan === SubscriptionPlan.LEGACY_PRO ||
+        !isCurrentPlatform
+      ) {
+        ToastManager.show({
+          message: strings.cannotChangePlan(),
+          context: "local"
+        });
+        return;
+      }
+
+      if (isSubscribedOnWeb) {
+        ToastManager.show({
+          message: strings.changePlanOnWeb(),
+          context: "local"
+        });
+        return;
+      }
+    }
+
+    eSendEvent(eCloseSheet);
+    if (!useUserStore.getState().user) {
+      Navigation.navigate("Auth", {
+        mode: AuthMode.login
+      });
+      return;
+    }
+    Navigation.navigate("PayWall", {
+      context: "logged-in",
+      state: {
+        planId: pricingPlans.currentPlan?.id,
+        productId: isGithubRelease
+          ? "yearly"
+          : (pricingPlans.selectProduct as any).productId,
+        billingType: "annual"
+      }
+    });
+  };
+
+  return (
     <View
       style={{
         width: "100%",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: DefaultAppStyles.GAP_VERTICAL
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingTop: Spacing.LEVEL_4,
+        gap: Spacing.LEVEL_3
       }}
     >
-      <>
+      <View style={{ gap: Spacing.LEVEL_3, width: "100%" }}>
         <View
           style={{
-            width: "100%",
-            paddingHorizontal: DefaultAppStyles.GAP,
-            gap: DefaultAppStyles.GAP_VERTICAL
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: Spacing.LEVEL_1,
+            width: "100%"
           }}
         >
-          <Paragraph>
-            <AppIcon
-              name="crown"
-              size={AppFontSize.md}
-              color={colors.static.orange}
-            />
-            {strings.upgradePlanTo(pricingPlans.currentPlan?.name)}
-          </Paragraph>
-
           <View
             style={{
-              gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
-              width: "100%"
+              width: 32,
+              height: 32,
+              borderRadius: Radius.XS,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: colors.secondary.background
             }}
           >
-            <Heading>{strings.tryItForFree()}</Heading>
-
-            <Heading size={AppFontSize.sm}>
-              {strings.getThisAndSoMuchMore()}
+            <AppIcon
+              name="crown-simple"
+              iconFamily="notesnook"
+              size={16}
+              color={colors.static.orange}
+            />
+          </View>
+          <View style={{ flex: 1, gap: Spacing.LEVEL_1 }}>
+            <Heading fontSize="XL" lineHeight="100%">
+              {strings.tryItForFree()}
             </Heading>
-
-            <View
-              style={{
-                gap: DefaultAppStyles.GAP_SMALL,
-                flexDirection: "row"
-              }}
-            >
-              <AppIcon name="cloud" size={AppFontSize.xxl} />
-              <Paragraph
-                style={{
-                  flexShrink: 1
-                }}
-              >
-                <Heading size={AppFontSize.sm}>
-                  {
-                    PlanOverView[
-                      pricingPlans.currentPlan.id as keyof typeof PlanOverView
-                    ].storage
-                  }
-                </Heading>{" "}
-                {strings.cloudSpace()}
-              </Paragraph>
-            </View>
-
-            {pricingPlans.currentPlan.id !== "essential" ? (
-              <View
-                style={{
-                  gap: DefaultAppStyles.GAP_SMALL,
-                  flexDirection: "row"
-                }}
-              >
-                <AppIcon name="lock" size={AppFontSize.xxl} />
-                <Paragraph
-                  style={{
-                    flexShrink: 1
-                  }}
-                >
-                  <Heading size={AppFontSize.sm}>{strings.appLock()}</Heading>{" "}
-                  {strings.appLockFeatureBenefit()}
-                </Paragraph>
-              </View>
-            ) : null}
-
-            <View
-              style={{
-                gap: DefaultAppStyles.GAP_SMALL,
-                flexDirection: "row"
-              }}
-            >
-              <AppIcon name="vector-link" size={AppFontSize.xxl} />
-              <Paragraph
-                style={{
-                  flexShrink: 1
-                }}
-              >
-                {strings.advancedNoteTaking[0]()}{" "}
-                <Heading size={AppFontSize.sm}>
-                  {strings.advancedNoteTaking[1]()}
-                </Heading>{" "}
-                {strings.advancedNoteTaking[2]()}
-              </Paragraph>
-            </View>
+            <Paragraph fontSize="SM" color={colors.primary.paragraph}>
+              {strings.unlockPremiumFeatures()}
+            </Paragraph>
           </View>
         </View>
 
         <View
-          style={{
-            width: "100%",
-            paddingHorizontal: DefaultAppStyles.GAP
-          }}
-        >
-          <Paragraph
-            style={{
-              marginVertical: 10
-            }}
-            size={AppFontSize.xs}
-          >
-            <Heading size={AppFontSize.xs}>{strings.cancelAnytime()}</Heading>{" "}
-            {strings.googleReminderTrial()}
-          </Paragraph>
+          style={{ height: 1, backgroundColor: colors.primary.separator }}
+        />
 
-          <Button
-            type="accent"
-            title={strings.upgrade()}
-            style={{
-              marginVertical: DefaultAppStyles.GAP_VERTICAL,
-              width: "100%"
-            }}
-            onPress={() => {
-              if (PremiumService.get()) {
-                if (
-                  pricingPlans.user?.subscription.plan ===
-                    SubscriptionPlan.LEGACY_PRO ||
-                  !isCurrentPlatform
-                ) {
-                  ToastManager.show({
-                    message: strings.cannotChangePlan(),
-                    context: "local"
-                  });
-                  return;
-                }
-
-                if (isSubscribedOnWeb) {
-                  ToastManager.show({
-                    message: strings.changePlanOnWeb(),
-                    context: "local"
-                  });
-                  return;
-                }
-              }
-
-              eSendEvent(eCloseSheet);
-              if (!useUserStore.getState().user) {
-                Navigation.navigate("Auth", {
-                  mode: AuthMode.login
-                });
-                return;
-              }
-              Navigation.navigate("PayWall", {
-                context: "logged-in",
-                state: {
-                  planId: pricingPlans.currentPlan?.id,
-                  productId: isGithubRelease
-                    ? "yearly"
-                    : (pricingPlans.selectProduct as any).productId,
-                  billingType: "annual"
-                }
-              });
-            }}
-          />
+        <View style={{ gap: Spacing.LEVEL_2, width: "100%" }}>
+          {features.map((feature) => (
+            <View
+              key={feature.title}
+              style={{
+                flexDirection: "row",
+                alignItems: "flex-start",
+                gap: Spacing.LEVEL_1,
+                width: "100%"
+              }}
+            >
+              <AppIcon
+                name="check"
+                iconFamily="notesnook"
+                size={16}
+                color={colors.primary.accent}
+                style={{ marginTop: 1 }}
+              />
+              <View style={{ flex: 1, gap: Spacing.LEVEL_1 }}>
+                <Heading fontFamily="MEDIUM" fontSize="SM" lineHeight="100%">
+                  {feature.title}
+                </Heading>
+                <Paragraph fontSize="XS" color={colors.primary.paragraph}>
+                  {feature.description}
+                </Paragraph>
+              </View>
+            </View>
+          ))}
         </View>
 
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: Spacing.LEVEL_0 + 2,
+            padding: Spacing.LEVEL_1,
+            borderRadius: Radius.XS,
+            backgroundColor: colors.selected.background
+          }}
+        >
+          <Paragraph fontSize="XS" color={colors.secondary.heading}>
+            {strings.sevenDayFreeTrial()}
+          </Paragraph>
+          <View
+            style={{
+              width: 4,
+              height: 4,
+              borderRadius: Radius.MD,
+              backgroundColor: colors.secondary.heading
+            }}
+          />
+          <Paragraph fontSize="XS" color={colors.secondary.heading}>
+            {strings.cancelAnytimeShort()}
+          </Paragraph>
+        </View>
+      </View>
+
+      <View
+        style={{ flexDirection: "row", gap: Spacing.LEVEL_2, width: "100%" }}
+      >
         {isSubscribedOnWeb ? null : (
           <Button
-            type="plain"
-            title={strings.exploreAllPlans()}
-            icon="arrow-right"
-            iconPosition="right"
+            type="plain-outline"
+            title={strings.viewPlans()}
+            fontSize={FontSizes.MD}
+            style={{
+              flex: 1,
+              borderRadius: Radius.S,
+              paddingVertical: Spacing.LEVEL_3
+            }}
             onPress={() => {
               eSendEvent(eCloseSheet);
               Navigation.navigate("PayWall", {
@@ -272,7 +281,18 @@ export default function PaywallSheet<Tid extends FeatureId>(props: {
             }}
           />
         )}
-      </>
+        <Button
+          type="accent"
+          title={strings.upgrade()}
+          fontSize={FontSizes.MD}
+          style={{
+            flex: 1,
+            borderRadius: Radius.S,
+            paddingVertical: Spacing.LEVEL_3
+          }}
+          onPress={onUpgrade}
+        />
+      </View>
     </View>
   );
 }

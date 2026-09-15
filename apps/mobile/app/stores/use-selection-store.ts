@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ItemType } from "@notesnook/core";
+import { Item, ItemType } from "@notesnook/core";
 import { create } from "zustand";
 
 export interface SelectionStore {
@@ -62,3 +62,20 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     set({ selectionMode: undefined, selectedItemsList: [] });
   }
 }));
+
+export function selectItem(item: Item) {
+  if (useSelectionStore.getState().selectionMode === item.type) {
+    const { selectionMode, clearSelection, setSelectedItem } =
+      useSelectionStore.getState();
+
+    if (selectionMode === item.type) {
+      setSelectedItem(item.id);
+    }
+
+    if (useSelectionStore.getState().selectedItemsList.length === 0) {
+      clearSelection();
+    }
+    return true;
+  }
+  return false;
+}

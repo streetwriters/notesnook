@@ -25,10 +25,10 @@ import {
   TextStyle,
   useWindowDimensions
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/colors";
 import { AppFontSize } from "../../../utils/size";
 import NativeTooltip from "../../../utils/tooltip";
+import AppIcon, { IconProps } from "../AppIcon";
 import { Pressable, PressableProps } from "../pressable";
 export interface IconButtonProps extends PressableProps {
   name: string;
@@ -42,6 +42,8 @@ export interface IconButtonProps extends PressableProps {
   tooltipText?: string;
   tooltipPosition?: number;
   iconStyle?: TextStyle;
+  iconProps?: IconProps;
+  iconFamily?: IconProps["iconFamily"];
 }
 
 export const IconButton = ({
@@ -51,15 +53,17 @@ export const IconButton = ({
   style,
   size = AppFontSize.xxl,
   iconStyle = {},
-  left = 10,
-  right = 10,
-  top = 30,
-  bottom = 10,
+  left = 4,
+  right = 4,
+  top = 4,
+  bottom = 4,
   onLongPress,
   tooltipText,
   type = "plain",
   fwdRef,
+  iconProps,
   tooltipPosition = NativeTooltip.POSITIONS.TOP,
+  iconFamily,
   ...restProps
 }: IconButtonProps) => {
   const { colors } = useThemeColors();
@@ -94,14 +98,15 @@ export const IconButton = ({
       style={{
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: 100,
-        width: 40 * growFactor,
-        height: 40 * growFactor,
+        width: size,
+        height: size,
         ...style
       }}
     >
-      <Icon
+      <AppIcon
+        {...iconProps}
         name={name}
+        iconFamily={iconFamily}
         style={iconStyle as any}
         allowFontScaling
         color={

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { Restore, DeleteForver } from "../icons";
+import { Restore, DeleteForver, Note, Notebook, Trash } from "../icons";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { toTitleCase } from "@notesnook/common";
@@ -28,17 +28,37 @@ import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
 import { Multiselect } from "../../common/multi-select";
+import IconTag from "../icon-tag";
 
 type TrashItemProps = { item: TrashItemType; date: number };
 function TrashItem(props: TrashItemProps) {
   const { item, date } = props;
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
+  const isSelected = useSelectionStore((store) =>
+    store.selectedItems.includes(item.id)
+  );
 
   return (
     <ListItem
       isFocused={isOpened}
       item={item}
-      title={item.title}
+      title={
+        <Text
+          dir="auto"
+          data-test-id={`title`}
+          sx={{
+            color: "heading",
+            minWidth: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            fontWeight: 600,
+            fontSize: "sm"
+          }}
+        >
+          {item.title}
+        </Text>
+      }
       body={item.itemType === "note" ? item.headline : item.description}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
@@ -47,18 +67,67 @@ function TrashItem(props: TrashItemProps) {
           );
         }
       }}
+      sx={{
+        py: "spacing4",
+        px: "spacing6",
+        borderBottom: "1px solid",
+        borderBottomColor: "border",
+        gap: "spacing4",
+        ":hover": {
+          ".trash-chip": { backgroundColor: "background-tertiary" }
+        }
+      }}
+      header={
+        item.itemType === "note" ? (
+          <Flex
+            sx={{
+              minWidth: 0
+            }}
+          >
+            <IconTag
+              className="trash-chip"
+              icon={Note}
+              selected={isSelected || isOpened}
+              text={"Note"}
+              iconSize={12}
+              styles={{
+                icon: { color: "icon-secondary" },
+                text: { color: "paragraph" }
+              }}
+            />
+          </Flex>
+        ) : item.itemType === "notebook" ? (
+          <Flex
+            sx={{
+              minWidth: 0
+            }}
+          >
+            <IconTag
+              className="trash-chip"
+              icon={Notebook}
+              selected={isSelected || isOpened}
+              text={"Notebook"}
+              iconSize={12}
+              styles={{
+                icon: { color: "icon-secondary" },
+                text: { color: "paragraph" }
+              }}
+            />
+          </Flex>
+        ) : undefined
+      }
       footer={
         <Flex
-          mt={1}
-          sx={{ fontSize: "subBody", color: "var(--paragraph-secondary)" }}
+          sx={{
+            gap: "spacing3",
+            flexDirection: "row",
+            fontSize: "xxs",
+            color: "paragraph-disabled",
+            alignItems: "center"
+          }}
         >
+          <Trash color="icon-disabled" size={12} />
           <TimeAgo live={true} datetime={date} />
-          <Text as="span" mx={1}>
-            •
-          </Text>
-          <Text sx={{ color: "accent" }}>
-            {toTitleCase(item.itemType as string)}
-          </Text>
         </Flex>
       }
       menuItems={trashMenuItems}

@@ -27,7 +27,17 @@ export function getFontSizes(): FontSizes {
     body: "12px",
     subBody: "10px",
     menu: "12px",
-    code: "14px"
+    code: "14px",
+    xxxs: "10px",
+    xxs: "11px",
+    xs: "13px",
+    sm: "15px",
+    md: "17px",
+    lg: "20px",
+    xl: "25px",
+    "2xl": "30px",
+    "3xl": "35px",
+    "4xl": "40px"
   };
 }
 
@@ -41,4 +51,14 @@ export type FontSizes = {
   menu: string;
   subBody: string;
   code: string;
+  xxxs: string;
+  xxs: string;
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  "2xl": string;
+  "3xl": string;
+  "4xl": string;
 };

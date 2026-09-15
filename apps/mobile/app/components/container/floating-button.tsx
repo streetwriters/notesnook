@@ -37,6 +37,7 @@ import { AppFontSize, normalize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { hexToRGBA, RGB_Linear_Shade } from "../../utils/colors";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
+import AppIcon from "../ui/AppIcon";
 
 interface FloatingButtonProps {
   onPress: () => void;
@@ -154,7 +155,7 @@ const FloatingButton = ({
           borderBottomWidth: 0,
           borderLeftWidth: 0,
           borderRightWidth: 0,
-          backgroundColor: colors.primary.background
+          backgroundColor: colors.primary.accent
         }}
         onPress={onPress}
       >
@@ -162,26 +163,27 @@ const FloatingButton = ({
           style={{
             alignItems: "center",
             justifyContent: "center",
-            height: normalize(size === "small" ? 40 : 60),
-            width: normalize(size === "small" ? 40 : 60),
+            height: 55,
+            width: 55,
             backgroundColor: color
               ? RGB_Linear_Shade(0.87, hexToRGBA(color))
-              : colors.primary.shade,
+              : colors.primary.accent,
             borderRadius: size === "small" ? 15 : 20
           }}
         >
-          <Icon
+          <AppIcon
             name={
               icon
                 ? icon
                 : route.name === "Notebooks"
-                  ? "notebook-plus"
+                  ? "plus"
                   : route.name === "Trash"
-                    ? "delete"
+                    ? "trash-alt"
                     : "plus"
             }
-            color={color || colors.primary.accent}
-            size={size === "small" ? AppFontSize.xl : AppFontSize.xxxl}
+            iconFamily="notesnook"
+            color={color || colors.primary.accentForeground}
+            size={24}
           />
         </View>
       </TouchableOpacity>

@@ -32,18 +32,12 @@ export const ERRORS_LIST = {
   SHORT_PASS: strings.passTooShort()
 };
 
-export function validatePass(password) {
-  let errors = {
-    SHORT_PASS: false
-  };
-
-  if (password?.length < 8) {
-    errors.SHORT_PASS = true;
+export function validatePass(password, length = 8) {
+  if (password?.length < length) {
+    return true;
   } else {
-    errors.SHORT_PASS = false;
+    return false;
   }
-
-  return errors;
 }
 
 export function validateUsername(username) {
