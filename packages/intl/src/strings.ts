@@ -2891,5 +2891,8 @@ Continue without attachments?`,
   totalColumns: (count: number) =>
     plural(count, { one: "# column", other: "# columns" }),
   totalRows: (count: number) =>
-    plural(count, { one: "# row", other: "# rows" })
+    plural(count, { one: "# row", other: "# rows" }),
+  selectAll: () => t`Select all`,
+  home: () => t`Home`,
+  tags: () => t`Tags`
 };
