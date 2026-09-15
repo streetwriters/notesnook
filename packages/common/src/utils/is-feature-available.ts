@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SubscriptionPlan } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { database as db } from "../database.js";
 
 type CaptionValue = ("infinity" | (string & {})) | boolean | number;
@@ -69,10 +70,8 @@ function createFeature<A extends FeatureAvailability>(
       feature.error ??
       ((l) =>
         typeof l.caption === "number"
-          ? `You have reached your limit of ${
-              l.caption
-            } ${feature.title.toLowerCase()}.`
-          : `${feature.title} is not available on this plan.`)
+          ? strings.reachedLimitOf(l.caption, feature.title.toLowerCase())
+          : strings.featureNotAvailableOnPlan(feature.title))
   } as unknown as Feature<CaptionsFromAvailability<A>>;
 }
 
