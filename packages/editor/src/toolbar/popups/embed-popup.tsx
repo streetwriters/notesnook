@@ -80,12 +80,12 @@ export function EmbedPopup(props: EmbedPopupProps) {
           if (embedSource === "code") {
             const document = new DOMParser().parseFromString(src, "text/html");
             if (document.getElementsByTagName("iframe").length <= 0)
-              return setError("Embed code must include an iframe.");
+              return setError(strings.embedIframeRequired());
 
             const srcValue = getAttribute(document, "src");
             if (!srcValue)
               return setError(
-                "Embed code must include an iframe with an src attribute."
+                strings.embedIframeSrcRequired()
               );
 
             _src = srcValue;
@@ -100,7 +100,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
           }
 
           if (embedSource === "url" && !isValidUrl(src)) {
-            return setError("Please provide a valid url.");
+            return setError(strings.invalidUrl());
           }
 
           const convertedUrl = convertUrlToEmbedUrl(_src);
@@ -108,11 +108,11 @@ export function EmbedPopup(props: EmbedPopupProps) {
           if (convertedUrl) _src = convertedUrl;
 
           if (!_src && embedSource === "url") {
-            return setError("Please provide a valid embed url.");
+            return setError(strings.invalidEmbedUrl());
           }
 
           if (_src.startsWith("javascript:")) {
-            return setError("Embedding javascript code is not supported.");
+            return setError(strings.javascriptNotSupported());
           }
           onClose({
             height: _height,
@@ -132,7 +132,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               borderRadius: "default"
             }}
           >
-            Error: {error}
+            {strings.error()}: {error}
           </Text>
         )}
 
