@@ -27,6 +27,7 @@ import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
 import { toBlobURL, revokeBloburl } from "../../utils/downloader.js";
 import { formatBytes } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 const SAMPLE_AUDIO = toBlobURL(
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=",
@@ -164,7 +165,7 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
               }
             }}
           >
-            <Text as="p">Your browser does not support the audio element.</Text>
+            <Text as="p">{strings.browserAudioNotSupported()}</Text>
           </audio>
         </Box>
       )}
