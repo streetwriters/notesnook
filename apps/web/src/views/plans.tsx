@@ -30,6 +30,7 @@ import { useEffect } from "react";
 import { getQueryParams, hardNavigate } from "../navigation";
 import { Close } from "../components/icons";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
+import { strings } from "@notesnook/intl";
 
 function Plans() {
   const user = useUserStore((store) => store.user);
@@ -84,7 +85,7 @@ function Plans() {
                 variant="heading"
                 sx={{ fontSize: 32, textAlign: "center" }}
               >
-                Select a plan
+                {strings.selectAPlan()}
               </Text>
               <Text
                 variant="title"
@@ -95,7 +96,7 @@ function Plans() {
                   textAlign: "center"
                 }}
               >
-                One subscription for a lifetime of notes.
+                {strings.oneSubscriptionLifetimeNotes()}
               </Text>
             </Flex>
             <PlansList

@@ -84,8 +84,12 @@ export const SubscriptionSettings: SettingsGroup[] = [
       },
       {
         key: "change-plan",
-        title: "Change plan",
-        description: "Change your subscription plan.",
+        get title() {
+          return strings.changePlan();
+        },
+        get description() {
+          return strings.changeSubPlan();
+        },
         isHidden: () => {
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
@@ -188,7 +192,9 @@ export const SubscriptionSettings: SettingsGroup[] = [
       },
       {
         key: "refund-subscription",
-        title: "Refund subscription",
+        get title() {
+          return strings.refundSub();
+        },
         description: `You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.`,
         isHidden: () => {
           const user = useUserStore.getState().user;
@@ -221,7 +227,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
               if (refundSubscription) {
                 const result = await TaskManager.startTask({
                   type: "modal",
-                  title: "Requesting refund for your subscription",
+                  title: strings.requestingRefundForSub(),
                   subtitle: "Please wait...",
                   action: () =>
                     db.subscriptions.refund(refundSubscription.inputs?.reason)

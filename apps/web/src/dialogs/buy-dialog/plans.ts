@@ -26,20 +26,28 @@ import { usePromise } from "@notesnook/common";
 export const PLAN_METADATA: PlanMetadata = {
   [SubscriptionPlan.FREE]: {
     title: "Free",
-    subtitle: "Get started without compromise."
+    get subtitle() {
+      return strings.getStartedWithoutCompromise();
+    }
   },
   [SubscriptionPlan.ESSENTIAL]: {
     title: "Essential",
-    subtitle: "All the core features, minus the fluff."
+    get subtitle() {
+      return strings.coreFeaturesMinusFluff();
+    }
   },
   [SubscriptionPlan.PRO]: {
     title: "Pro",
-    subtitle: "Level up with more storage.",
+    get subtitle() {
+      return strings.levelUpMoreStorage();
+    },
     recommended: true
   },
   [SubscriptionPlan.BELIEVER]: {
     title: "Believer",
-    subtitle: "Support the mission - unlock everything."
+    get subtitle() {
+      return strings.supportMissionUnlockEverything();
+    }
   },
   [SubscriptionPlan.EDUCATION]: {
     title: "Education",
@@ -54,15 +62,21 @@ export const PLAN_METADATA: PlanMetadata = {
 type PeriodMetadata = { title: string; refundDays: number };
 export const PERIOD_METADATA: Record<Period, PeriodMetadata> = {
   monthly: {
-    title: strings.monthly(),
+    get title() {
+      return strings.monthly();
+    },
     refundDays: 7
   },
   yearly: {
-    title: strings.yearly(),
+    get title() {
+      return strings.yearly();
+    },
     refundDays: 14
   },
   "5-year": {
-    title: "5 year",
+    get title() {
+      return strings.fiveYear();
+    },
     refundDays: 30
   }
 };
