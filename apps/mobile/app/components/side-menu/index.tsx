@@ -113,6 +113,12 @@ const SimpleTabView = ({
     loadedKeysRef.current.add(activeKey);
   }
 
+  const prevRoutesRef = React.useRef(navigationState.routes);
+  if (prevRoutesRef.current !== navigationState.routes) {
+    prevRoutesRef.current = navigationState.routes;
+    scenesRef.current.clear();
+  }
+
   const getSceneForRoute = React.useCallback(
     (route: SimpleRoute) => {
       const cached = scenesRef.current.get(route.key);
@@ -199,8 +205,7 @@ export const SideMenu = React.memo(
         />
       </View>
     );
-  },
-  () => true
+  }
 );
 
 const TabBar = (props: SimpleTabBarProps) => {
