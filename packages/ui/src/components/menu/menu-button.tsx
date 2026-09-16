@@ -18,10 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Flex, Text, Button } from "@theme-ui/components";
+import { Flex, Text, Button, Box } from "@theme-ui/components";
 import { Icon } from "../icon/index.js";
 import { MenuButtonItem, MenuItemComponentProps } from "./types.js";
-import { mdiCheck, mdiChevronRight, mdiCrown, mdiLock } from "@mdi/js";
+import CrownSvg from "@notesnook/icons/crown-simple.svg";
+import CaretRightSvg from "@notesnook/icons/caret-right.svg";
+import CheckSvg from "@notesnook/icons/check.svg";
 
 type MenuButtonProps = {
   item: MenuButtonItem;
@@ -36,6 +38,7 @@ export function MenuButton(props: MenuButtonProps) {
     title,
     key,
     icon,
+    iconComponent: IconComponent,
     tooltip,
     isDisabled,
     isChecked,
@@ -69,30 +72,50 @@ export function MenuButton(props: MenuButtonProps) {
           bg: isFocused && "background-selected",
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between"
+          justifyContent: "space-between",
+          px: "spacing4",
+          py: "spacing3",
+          minHeight: 29
         }}
       >
         <Flex
-          sx={{ fontSize: "inherit", fontFamily: "inherit", flexShrink: 0 }}
+          sx={{
+            fontSize: "inherit",
+            fontFamily: "inherit",
+            flexShrink: 0,
+            alignItems: "center",
+            gap: "spacing3"
+          }}
         >
-          <Icon
-            path={icon || ""}
-            size={"medium"}
-            sx={{ mr: 1 }}
-            color={
-              (styles?.icon?.color as string) ||
-              (variant === "dangerous" ? "icon-error" : "icon")
-            }
-          />
+          {IconComponent ? (
+            <IconComponent
+              size={13}
+              color={
+                (styles?.icon?.color as string) ||
+                (variant === "dangerous" ? "icon-error" : "icon-secondary")
+              }
+            />
+          ) : icon ? (
+            <Icon
+              path={icon}
+              size={13}
+              color={
+                (styles?.icon?.color as string) ||
+                (variant === "dangerous" ? "icon-error" : "icon-secondary")
+              }
+            />
+          ) : null}
           <Text
             as="span"
             variant={"body"}
             sx={{
-              fontSize: "inherit",
               fontFamily: "inherit",
               color: variant === "dangerous" ? "paragraph-error" : "paragraph",
               textAlign: "left",
               flexShrink: 0,
+              fontSize: "xxs",
+              fontWeight: 400,
+              lineHeight: 1,
               ...styles?.title
             }}
           >
@@ -104,9 +127,7 @@ export function MenuButton(props: MenuButtonProps) {
             sx={{ ml: 4, flexShrink: 0, gap: 1 }}
             data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
           >
-            {premium && (
-              <Icon path={mdiCrown} size={"small"} color={"#e8b923"} />
-            )}
+            {premium && <SvgIcon src={CrownSvg} size={13} color="#D7C131" />}
             {modifier && (
               <Text
                 as="span"
@@ -121,17 +142,21 @@ export function MenuButton(props: MenuButtonProps) {
               </Text>
             )}
             {isChecked && (
-              <Icon
-                path={mdiCheck}
-                size={"small"}
-                color={variant === "dangerous" ? "icon-error" : "icon"}
+              <SvgIcon
+                src={CheckSvg}
+                size={13}
+                color={
+                  variant === "dangerous" ? "icon-error" : "icon-secondary"
+                }
               />
             )}
             {menu && (
-              <Icon
-                path={mdiChevronRight}
-                size={"small"}
-                color={variant === "dangerous" ? "icon-error" : "icon"}
+              <SvgIcon
+                src={CaretRightSvg}
+                size={13}
+                color={
+                  variant === "dangerous" ? "icon-error" : "icon-secondary"
+                }
               />
             )}
           </Flex>
@@ -177,4 +202,32 @@ function getPlatform() {
   }
 
   return os;
+}
+
+type SvgIconProps = {
+  src: string;
+  size?: number;
+  color?: string;
+};
+
+function SvgIcon({ src, size = 13, color = "icon" }: SvgIconProps) {
+  return (
+    <Box
+      aria-hidden="true"
+      sx={{
+        width: size,
+        height: size,
+        flexShrink: 0,
+        backgroundColor: color,
+        maskImage: `url(${src})`,
+        maskPosition: "center",
+        maskRepeat: "no-repeat",
+        maskSize: "contain",
+        WebkitMaskImage: `url(${src})`,
+        WebkitMaskPosition: "center",
+        WebkitMaskRepeat: "no-repeat",
+        WebkitMaskSize: "contain"
+      }}
+    />
+  );
 }
