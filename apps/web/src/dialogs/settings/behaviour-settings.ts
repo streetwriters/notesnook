@@ -33,6 +33,7 @@ import {
 } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import { ConfirmDialog } from "../confirm";
+import { checkFeature } from "../../common";
 
 export const BehaviourSettings: SettingsGroup[] = [
   {
