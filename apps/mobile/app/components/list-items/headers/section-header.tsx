@@ -39,6 +39,9 @@ import { IconButton } from "../../ui/icon-button";
 import { Pressable } from "../../ui/pressable";
 import Heading from "../../ui/typography/heading";
 
+import { formatGroupTitle } from "@notesnook/common";
+export { formatGroupTitle };
+
 type SectionHeaderProps = {
   item: GroupHeader;
   index: number;
@@ -121,7 +124,7 @@ export const SectionHeader = React.memo<
                 ? screen === "Search"
                   ? strings.results(itemCount || 0)
                   : strings.pinned().toUpperCase()
-                : item.title.toUpperCase()}
+                : formatGroupTitle(item.title).toUpperCase()}
             </Heading>
           </Pressable>
 
