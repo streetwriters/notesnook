@@ -40,6 +40,7 @@ import { disableCustomDns, enableCustomDns } from "./utils/custom-dns";
 import { PATHS } from "./constants";
 import { normalizePathString } from "./utils/resolve-path";
 import { initLocale } from "./utils/locale";
+import { strings } from "@notesnook/intl";
 
 const appHostnames = isDevelopment()
   ? ["localhost", "127.0.0.1"]
@@ -223,11 +224,10 @@ app.once("ready", async () => {
   if (app.runningUnderARM64Translation) {
     console.log("App is running under ARM64 translation");
     dialog.showMessageBoxSync({
-      message:
-        "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website.",
+      message: strings.arm64TranslationWarning(),
       type: "warning",
-      buttons: ["Okay"],
-      title: "Degraded Performance Warning"
+      buttons: [strings.okay()],
+      title: strings.degradedPerformanceWarning()
     });
   }
 
@@ -313,11 +313,10 @@ async function migrateBackupDirectory() {
   } catch (e) {
     console.error("Failed to migrate backup directory", e);
     const pressedButton = dialog.showMessageBoxSync(globalThis.window, {
-      message:
-        "Failed to migrate backup directory. It has been reset to default.",
-      title: "Backup Directory Migration Failed",
+      message: strings.backupDirMigrationFailedDesc(),
+      title: strings.backupDirMigrationFailed(),
       type: "error",
-      buttons: ["Set backup directory", "Ignore"]
+      buttons: [strings.setBackupDir(), strings.ignore()]
     });
     if (pressedButton === 0) {
       await api.integration.selectBackupDirectory();
