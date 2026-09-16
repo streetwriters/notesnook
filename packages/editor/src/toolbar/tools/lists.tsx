@@ -171,9 +171,9 @@ export function BulletList(props: ToolProps) {
       onClick={onClick}
       isActive={editor.isActive("bulletList")}
       subTypes={[
-        { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
-        { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
-        { type: "square", title: "Lower alpha", items: ["a", "b", "c"] }
+        { type: "disc", title: strings.disc(), items: ["1", "2", "3"] },
+        { type: "circle", title: strings.circle(), items: ["A", "B", "C"] },
+        { type: "square", title: strings.square(), items: ["a", "b", "c"] }
       ]}
     />
   );
