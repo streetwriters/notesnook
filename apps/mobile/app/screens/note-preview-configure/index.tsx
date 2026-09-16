@@ -121,7 +121,7 @@ export const NotePreviewConfigure = () => {
     >
       <Header
         canGoBack
-        title="Select a note"
+        title={strings.selectANote()}
         onLeftMenuButtonPress={() => {
           NotesnookModule.cancelAndFinish();
         }}

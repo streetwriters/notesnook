@@ -345,7 +345,7 @@ export const FailedInboxItems = () => {
                       flexWrap: "wrap"
                     }}
                   >
-                    <Paragraph color={colors.error.paragraph}>Error</Paragraph>
+                    <Paragraph color={colors.error.paragraph}>{strings.error()}</Paragraph>
                   </View>
                   <Paragraph
                     style={{

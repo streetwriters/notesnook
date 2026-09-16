@@ -102,7 +102,7 @@ export function getSettingsGroups(): SettingSection[] {
               title: strings.deleteData(),
               paragraph: strings.irreverisibleAction(),
               positiveType: "errorShade",
-              positiveText: "Delete data",
+              positiveText: strings.deleteData(),
               positivePress: async () => {
                 await PremiumService.setPremiumStatus();
                 await BiometricService.resetCredentials();
@@ -456,7 +456,7 @@ export function getSettingsGroups(): SettingSection[] {
                     )
                   ) {
                     ToastManager.show({
-                      message: "No active subscription found",
+                      message: strings.noActiveSubscriptionFound(),
                       type: "info"
                     });
                     eSendEvent(eCloseSheet);
@@ -570,9 +570,8 @@ export function getSettingsGroups(): SettingSection[] {
                         setTimeout(async () => {
                           try {
                             startProgress({
-                              title: "Deleting account",
-                              paragraph:
-                                "Please wait while we delete your account"
+                              title: strings.deletingAccount(),
+                              paragraph: strings.deletingAccountDesc()
                             });
                             await db.user?.deleteUser(value);
                             DatabaseLogger.info("User account deleted");
