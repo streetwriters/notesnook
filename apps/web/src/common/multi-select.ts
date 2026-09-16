@@ -164,7 +164,7 @@ async function deleteTags(ids: string[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteTags",
-    title: "Deleting tags",
+    title: strings.deletingTags(),
     action: async (report) => {
       report({
         text: strings.inProgressActions.deleting.tag(ids.length)

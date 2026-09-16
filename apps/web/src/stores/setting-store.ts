@@ -29,6 +29,7 @@ import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
 import * as openpgp from "openpgp";
 import { InboxPGPKeysDialog } from "../dialogs/inbox-pgp-keys-dialog";
+import { strings } from "@notesnook/intl";
 
 export const HostIds = [
   "API_HOST",
@@ -307,11 +308,10 @@ class SettingStore extends BaseStore<SettingStore> {
     try {
       if (isInboxEnabled) {
         const ok = await ConfirmDialog.show({
-          title: "Disable Inbox API",
-          message:
-            "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?",
-          positiveButtonText: "Yes",
-          negativeButtonText: "No"
+          title: strings.disableInboxApi(),
+          message: strings.disableInboxApiWarning(),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
         });
         if (!ok) return;
 

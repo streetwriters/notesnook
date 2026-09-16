@@ -29,6 +29,7 @@ import { useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
 import Accordion from "../../accordion";
 import { TransformResult } from "../types";
+import { strings } from "@notesnook/intl";
 
 type NetworkProviderHandlerProps = {
   provider: INetworkProvider<ProviderSettings>;
@@ -107,7 +108,7 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         <>
           <Text variant="title">Importing your notes from {provider.name}</Text>
           <Text variant="body" sx={{ mt: 4 }}>
-            Found {totalNoteCount} notes
+            {strings.foundNotes(totalNoteCount)}
           </Text>
           {logs.current.length > 0 && (
             <Accordion

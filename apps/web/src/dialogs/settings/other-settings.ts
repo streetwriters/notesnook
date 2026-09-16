@@ -138,9 +138,8 @@ export const AboutSettings: SettingsGroup[] = [
               } else {
                 await TaskManager.startTask({
                   type: "modal",
-                  title: "Changing release track",
-                  subtitle:
-                    "Please wait while we switch to the new release track...",
+                  title: strings.changingReleaseTrack(),
+                  subtitle: strings.changingReleaseTrackWait(),
                   action: () =>
                     new Promise<void>((resolve) => {
                       worker.onstatechange = async function () {

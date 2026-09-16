@@ -287,7 +287,7 @@ function SelectedPlan(props: SelectedPlanProps) {
 
   return (
     <>
-      <Text variant="title">Order summary</Text>
+      <Text variant="title">{strings.orderSummary()}</Text>
       <Flex
         sx={{
           flexDirection: "column",
@@ -546,13 +546,13 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
               variant="anchor"
               onClick={async () => {
                 const code = await PromptDialog.show({
-                  title: "Enter discount code",
+                  title: strings.enterDiscountCode(),
                   defaultValue: pricingInfo.coupon
                 });
                 if (code) applyCoupon(code);
               }}
             >
-              Add discount
+              {strings.addDiscount()}
             </Button>
           )}
         </Flex>
