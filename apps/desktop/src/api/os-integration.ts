@@ -187,8 +187,8 @@ export const osIntegrationRouter = t.router({
         if (globalThis.window) {
           await dialog.showMessageBox(globalThis.window, {
             type: "error",
-            title: "Path not found",
-            message: `The path does not exist:\n${wrapPath(resolvedPath)}`
+            title: strings.pathNotFound(),
+            message: strings.pathDoesNotExist(wrapPath(resolvedPath))
           });
         }
         return;

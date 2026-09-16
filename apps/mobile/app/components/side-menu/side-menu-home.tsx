@@ -153,7 +153,7 @@ export function SideMenuHome() {
           </>
         ) : (
           <Button
-            title={`Wrapped ${dayjs().year()} 🎉`}
+            title={strings.wrappedYear(dayjs().year())}
             style={{
               width: "100%"
             }}

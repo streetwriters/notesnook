@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { Plan, SubscriptionPlan } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { Platform } from "react-native";
@@ -86,14 +87,18 @@ const pricingPlans: PricingPlan[] = [
   {
     id: "free",
     name: "Free",
-    description: "Basic features for personal use",
+    get description() {
+      return strings.freePlanDesc();
+    },
     subscriptionSkuList: [],
     productSkuList: []
   },
   {
     id: "essential",
     name: "Essential",
-    description: "Unlocks essential features for personal use",
+    get description() {
+      return strings.essentialPlanDesc();
+    },
     subscriptionSkuList: [
       "notesnook.essential.monthly",
       "notesnook.essential.yearly"
@@ -104,7 +109,9 @@ const pricingPlans: PricingPlan[] = [
   {
     id: "pro",
     name: "Pro",
-    description: "Unlocks all features for professional use",
+    get description() {
+      return strings.proPlanDesc();
+    },
     subscriptionSkuList: [
       "notesnook.pro.monthly",
       "notesnook.pro.yearly",
@@ -118,7 +125,9 @@ const pricingPlans: PricingPlan[] = [
   {
     id: "believer",
     name: "Believer",
-    description: "Become a believer and support the project",
+    get description() {
+      return strings.believerPlanDesc();
+    },
     subscriptionSkuList: [
       "notesnook.believer.monthly",
       "notesnook.believer.yearly"

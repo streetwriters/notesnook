@@ -119,13 +119,14 @@ export async function downloadAttachment<
 
 export async function checkAttachment(hash: string) {
   const attachment = await db.attachments.attachment(hash);
-  if (!attachment) return { failed: "Attachment not found." };
+  if (!attachment) return { failed: strings.attachmentNotFound() };
 
   try {
     await checkUpload(hash, attachment.chunkSize, attachment.size);
     await db.attachments.markAsFailed(attachment.id);
   } catch (e) {
-    const reason = e instanceof Error ? e.message : "Unknown error.";
+    const reason =
+      e instanceof Error ? e.message : strings.unknownError();
     await db.attachments.markAsFailed(attachment.id, reason);
     return { failed: reason };
   }

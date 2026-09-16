@@ -326,10 +326,11 @@ export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
     SettingsService.set({ fullBackupReminder: item });
   },
   formatValue: (item) => {
-    //@ts-ignore
-    return item === "useroff" || item === "off" || item === "never"
-      ? "Off"
-      : item.slice(0, 1).toUpperCase() + item.slice(1);
+    return (item as string) === "useroff" ||
+      (item as string) === "off" ||
+      item === "never"
+      ? strings.off()
+      : strings[item]?.() || item;
   },
   getItemKey: (item) => item,
   options: ["never", "weekly", "monthly"] as Settings["fullBackupReminder"][],

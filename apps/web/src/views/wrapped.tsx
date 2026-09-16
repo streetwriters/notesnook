@@ -25,6 +25,7 @@ import { formatBytes } from "@notesnook/common";
 import { ArrowDown, ArrowLeft, Loading } from "../components/icons";
 import { hardNavigate } from "../navigation";
 import { MonthlyActivityHeatmap } from "../components/monthly-activity-heatmap";
+import { strings } from "@notesnook/intl";
 
 function formatNumber(num: number) {
   return num.toLocaleString();
@@ -490,32 +491,32 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
               {
                 icon: "📝",
                 count: stats.totalNotes,
-                label: "Notes"
+                label: strings.routes.Notes()
               },
               {
                 icon: "🎨",
                 count: stats.totalColors,
-                label: "Colors"
+                label: strings.colors()
               },
               {
                 icon: "📚",
                 count: stats.totalNotebooks,
-                label: "Notebooks"
+                label: strings.routes.Notebooks()
               },
               {
                 icon: "🏷️",
                 count: stats.totalTags,
-                label: "Tags"
+                label: strings.routes.Tags()
               },
               {
                 icon: "📂",
                 count: stats.totalAttachments,
-                label: "Files"
+                label: strings.attachments()
               },
               {
                 icon: "☁️",
                 count: stats.totalMonographs,
-                label: "Monographs"
+                label: strings.routes.Monographs()
               }
             ].map(({ icon, count, label }) => (
               <Flex
@@ -768,7 +769,7 @@ export default function Wrapped() {
       >
         <Flex sx={{ alignItems: "center", gap: 1, justifyContent: "center" }}>
           <ArrowLeft size={16} />
-          <Text variant="body">Go back to app</Text>
+          <Text variant="body">{strings.goBackToApp()}</Text>
         </Flex>
       </Button>
     </>

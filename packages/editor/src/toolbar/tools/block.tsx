@@ -146,24 +146,24 @@ const callout = (editor: Editor): MenuItem => ({
   icon: Icons.callout,
   menu: {
     items: [
-      "Abstract",
-      "Hint",
-      "Info",
-      "Success",
-      "Warn",
-      "Error",
-      "Example",
-      "Quote"
-    ].map((type) => ({
-      title: type,
-      key: type,
+      { key: "Abstract", title: strings.abstract() },
+      { key: "Hint", title: strings.hint() },
+      { key: "Info", title: strings.info() },
+      { key: "Success", title: strings.success() },
+      { key: "Warn", title: strings.warn() },
+      { key: "Error", title: strings.error() },
+      { key: "Example", title: strings.example() },
+      { key: "Quote", title: strings.quote() }
+    ].map((item) => ({
+      title: item.title,
+      key: item.key,
       type: "button",
-      isChecked: editor.isActive("callout", { type: type.toLowerCase() }),
+      isChecked: editor.isActive("callout", { type: item.key.toLowerCase() }),
       onClick: () =>
         editor
           .chain()
           .focus()
-          .setCallout({ type: type.toLowerCase() as any })
+          .setCallout({ type: item.key.toLowerCase() as any })
           .run()
     }))
   }

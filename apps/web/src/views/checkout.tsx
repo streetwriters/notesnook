@@ -41,6 +41,7 @@ import { planToAvailability } from "@notesnook/common";
 import { FeatureCaption } from "../dialogs/buy-dialog/feature-caption";
 import { EVENTS } from "@notesnook/core";
 import { db } from "../common/db";
+import { strings } from "@notesnook/intl";
 
 export type Plan = z.infer<typeof PlanSchema>;
 
@@ -176,7 +177,7 @@ function Checkout() {
           sx={{ display: "flex", alignItems: "center", gap: 1 }}
         >
           <Support size={18} />
-          <span>Contact support</span>
+          <span>{strings.contactSupport()}</span>
         </Button>
       </Flex>
       <Flex sx={{ flex: 1 }}>
@@ -309,7 +310,7 @@ function Checkout() {
               >
                 <CheckoutCompleted
                   onClose={() => hardNavigate("/notes")}
-                  buttonText="Start your journey"
+                  buttonText={strings.startYourJourney()}
                 />
               </Flex>
             ) : null}

@@ -44,6 +44,7 @@ import BaseDialog from "../../dialog/base-dialog";
 import { Pressable } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { formatGroupTitle } from "@notesnook/common";
 
 const JumpToSectionDialog = () => {
   const scrollRef = useRef<RefObject<FlatList>>(undefined);
@@ -207,7 +208,7 @@ const JumpToSectionDialog = () => {
                         textAlign: "center"
                       }}
                     >
-                      {item.group.title}
+                      {formatGroupTitle(item.group.title)}
                     </Paragraph>
                   </Pressable>
                 );

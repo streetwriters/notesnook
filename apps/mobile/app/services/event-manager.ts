@@ -206,7 +206,7 @@ export const ToastManager = {
       message: e?.message || "",
       type: "error",
       context: context || "global",
-      actionText: "Copy logs",
+      actionText: strings.copyLogs(),
       duration: duration,
       func: () => {
         Clipboard.setString(e?.stack || "");

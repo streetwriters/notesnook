@@ -180,7 +180,7 @@ async function run(
       startProgress({
         title: strings.backingUpData(backupType),
         paragraph: strings.backupDataDesc(),
-        progress: "Backup in progress...",
+        progress: strings.backupInProgress(),
         canHideProgress: true
       });
     }
@@ -217,7 +217,7 @@ async function run(
     startProgress({
       title: strings.backingUpData(backupType),
       paragraph: strings.backupDataDesc(),
-      progress: "Preparing backup...",
+      progress: strings.preparingBackup(),
       canHideProgress: true
     });
   }
@@ -275,7 +275,7 @@ async function run(
     DatabaseLogger.info(`Backup complete: ${backupType}. Creating zip file...`);
 
     updateProgress({
-      progress: "Creating backup zip file..."
+      progress: strings.creatingBackupZip()
     });
 
     await zip(zipSourceFolder, zipOutputFile);

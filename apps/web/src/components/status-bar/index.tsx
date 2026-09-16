@@ -85,7 +85,7 @@ function StatusBar() {
               color: "paragraph",
               height: "100%"
             }}
-            title={"Open command palette"}
+            title={strings.commandPalette()}
           >
             <ConsoleLine size={12} />
           </Button>
@@ -134,7 +134,7 @@ function StatusBar() {
                 color: "paragraph",
                 height: "100%"
               }}
-              title={"Lock app"}
+              title={strings.lock()}
               data-test-id="lock-app"
             >
               <CellphoneLock size={12} />
@@ -258,7 +258,7 @@ function SyncStatus() {
       title={
         (status.text
           ? status.text({ lastSynced, type: syncStatus.type })
-          : status.tooltip) +
+          : status.tooltip()) +
         (syncStatus.progress ? ` (${syncStatus.progress})` : "")
       }
       data-test-id={`sync-status-${status.key}`}
@@ -293,7 +293,7 @@ type SyncStatusFilter = {
     type?: "download" | "upload" | "sync";
     lastSynced: number;
   }) => string;
-  tooltip: string;
+  tooltip: () => string;
   iconColor?: string;
   loading?: boolean;
 };
@@ -307,8 +307,8 @@ const syncStatusFilters: SyncStatusFilter[] = [
     text: ({ lastSynced }) =>
       lastSynced
         ? `Synced ${getTimeAgo(lastSynced, "en_short", { minInterval: 1000 })}`
-        : "click to sync",
-    tooltip: "All changes are synced."
+        : strings.clickToSync(),
+    tooltip: () => strings.allChangesSynced()
   },
   {
     key: "syncing",
@@ -316,31 +316,31 @@ const syncStatusFilters: SyncStatusFilter[] = [
     icon: Sync,
     loading: true,
     text: ({ type }) => `${toTitleCase(type || "sync")}ing`,
-    tooltip: "Syncing your notes..."
+    tooltip: () => strings.syncingNotes()
   },
   {
     key: "conflicts",
     isActive: (syncStatus) => syncStatus === "conflicts",
     icon: Alert,
     iconColor: "var(--icon-error)",
-    text: () => "Merge conflicts",
-    tooltip: "Please resolve all merge conflicts and run the sync again."
+    text: () => strings.mergeConflicts(),
+    tooltip: () => strings.resolveConflictsAndResync()
   },
   {
     key: "emailNotConfirmed",
     isActive: (_syncStatus, user) => !user?.isEmailConfirmed,
     icon: Alert,
     iconColor: "var(--icon-error)",
-    text: () => "Sync disabled",
-    tooltip: "Please confirm your email to start syncing."
+    text: () => strings.syncIsDisabled(),
+    tooltip: () => strings.confirmEmailToSync()
   },
   {
     key: "failed",
     isActive: (syncStatus) => syncStatus === "failed",
     icon: SyncError,
     iconColor: "var(--icon-error)",
-    text: () => "Sync failed",
-    tooltip: "Sync failed to completed. Please try again."
+    text: () => strings.syncFailed(),
+    tooltip: () => strings.syncFailedTryAgain()
   },
   {
     key: "offline",
@@ -350,14 +350,14 @@ const syncStatusFilters: SyncStatusFilter[] = [
       `Synced ${getTimeAgo(lastSynced, "en_short", {
         minInterval: 1000
       })} (offline)`,
-    tooltip: "You are offline."
+    tooltip: () => strings.youAreOffline()
   },
   {
     key: "disabled",
     iconColor: "var(--icon-disabled)",
     isActive: (syncStatus) => syncStatus === "disabled",
     icon: SyncOff,
-    text: () => "Sync disabled",
-    tooltip: "Sync is disabled."
+    text: () => strings.syncIsDisabled(),
+    tooltip: () => strings.syncIsDisabled()
   }
 ];

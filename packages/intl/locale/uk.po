@@ -73,6 +73,10 @@ msgstr "Головне у {0} 🎉"
 msgid "{0} will remind you before your trial ends"
 msgstr "{0} нагадає вам до завершення пробного періоду"
 
+#: src/strings.ts:2892
+msgid "{count, plural, one {# column} other {# columns}}"
+msgstr "{count, plural, one {# стовпець} few {# стовпці} many {# стовпців} other {# стовпців}}"
+
 #: src/strings.ts:1755
 msgid "{count, plural, one {# error occured} other {# errors occured}}"
 msgstr "{count, plural, one {Сталася # помилка} few {Сталося # помилки} many {Сталося # помилок} other {Сталося # помилок}}"
@@ -88,6 +92,10 @@ msgstr "{count, plural, one {# файл} few {# файли} many {# файлів
 #: src/strings.ts:60
 msgid "{count, plural, one {# note} other {# notes}}"
 msgstr "{count, plural, one {# нотатка} few {# нотатки} many {# нотаток} other {# нотаток}}"
+
+#: src/strings.ts:2894
+msgid "{count, plural, one {# row} other {# rows}}"
+msgstr "{count, plural, one {# рядок} few {# рядки} many {# рядків} other {# рядків}}"
 
 #: src/strings.ts:1580
 msgid "{count, plural, one {1 hour} other {# hours}}"
@@ -520,6 +528,14 @@ msgstr "{days, plural, one {1 день} few {# дні} many {# днів} other {
 msgid "{days} days free"
 msgstr "{days} днів безкоштовно"
 
+#: src/strings.ts:2999
+msgid "{days}-day money-back guarantee."
+msgstr "{days}-денна гарантія повернення грошей."
+
+#: src/strings.ts:2899
+msgid "{feature} is not available on this plan."
+msgstr "{feature} недоступно в цьому тарифі."
+
 #: src/strings.ts:351
 msgid "{freq, plural, one {Repeats every day on {selectedDays} at {date}} other {Repeats every # day every {selectedDays} at {date}}}"
 msgstr "{freq, plural, one {Повторюється щодня у {selectedDays} о {date}} other {Повторюється кожні # днів у {selectedDays} о {date}}}"
@@ -567,6 +583,18 @@ msgstr "{n} {added, plural, one {додано до 1 блокнота} other {д
 #: src/strings.ts:1968
 msgid "{n} {removed, plural, one {removed from 1 notebook} other {removed from # notebooks}}."
 msgstr "{n} {removed, plural, one {вилучено з 1 блокнота} other {вилучено з # блокнотів}}."
+
+#: src/strings.ts:3019
+msgid "{n} hour"
+msgstr "{n} година"
+
+#: src/strings.ts:3018
+msgid "{n} minute"
+msgstr "{n} хвилина"
+
+#: src/strings.ts:3017
+msgid "{n} minutes"
+msgstr "{n} хвилин"
 
 #: src/strings.ts:1963
 msgid "{notes, plural, one {1 note} other {# notes}}"
@@ -656,6 +684,10 @@ msgstr "Потрібен код 2FA()"
 msgid "2FA code sent via {method}"
 msgstr "Код 2FA надіслано через {method}"
 
+#: src/strings.ts:2993
+msgid "5 year"
+msgstr "5 років"
+
 #: src/strings.ts:2597
 msgid "5 year plan (One time purchase)"
 msgstr "Тариф на 5 років (одноразова покупка)"
@@ -688,6 +720,10 @@ msgstr "Abc"
 msgid "About"
 msgstr "Про програму"
 
+#: src/strings.ts:2902
+msgid "Abstract"
+msgstr "Анотація"
+
 #: src/strings.ts:1026
 msgid "Account"
 msgstr "Обліковий запис"
@@ -716,6 +752,14 @@ msgstr "Активувати"
 msgid "Activating trial"
 msgstr "Активація пробного періоду"
 
+#: src/strings.ts:2973
+msgid "Active"
+msgstr "Активні"
+
+#: src/strings.ts:2946
+msgid "Active reminders"
+msgstr "Активні нагадування"
+
 #: src/strings.ts:530
 msgid "Add"
 msgstr "Додати"
@@ -723,6 +767,10 @@ msgstr "Додати"
 #: src/strings.ts:1058
 msgid "Add 2FA fallback method"
 msgstr "Додати резервний метод 2FA"
+
+#: src/strings.ts:3170
+msgid "Add a new reminder"
+msgstr "Додати нове нагадування"
 
 #: src/strings.ts:1509
 msgid "Add a short note"
@@ -736,9 +784,17 @@ msgstr "Додати тег"
 msgid "Add color"
 msgstr "Додати колір"
 
+#: src/strings.ts:3075
+msgid "Add discount"
+msgstr "Додати знижку"
+
 #: src/strings.ts:2667
 msgid "Add key"
 msgstr "Додати ключ"
+
+#: src/strings.ts:3043
+msgid "Add more"
+msgstr "Додати ще"
 
 #: src/strings.ts:895
 msgid "Add notebook"
@@ -806,7 +862,7 @@ msgstr "Після сканування QR-коду застосунок пок�
 
 #: src/strings.ts:2292
 msgid "Align center"
-msgstr ""
+msgstr "По центру"
 
 #: src/strings.ts:2322
 msgid "Align left"
@@ -832,6 +888,10 @@ msgstr "Усі вкладення захищені наскрізним шифр
 msgid "All cached attachments have been cleared."
 msgstr "Усі кешовані вкладення очищено."
 
+#: src/strings.ts:3104
+msgid "All changes are synced."
+msgstr "Усі зміни синхронізовано."
+
 #: src/strings.ts:767
 msgid "All fields are required"
 msgstr "Усі поля обов'язкові"
@@ -855,6 +915,10 @@ msgstr "Усі журнали зберігаються лише локально
 #: src/strings.ts:1639
 msgid "All server urls are required."
 msgstr "Усі URL-адреси серверів обов'язкові."
+
+#: src/strings.ts:2989
+msgid "All the core features, minus the fluff."
+msgstr "Усі ключові функції без зайвого."
 
 #: src/strings.ts:1908
 msgid "All the data in your account will be overwritten with the data in the backup file. There is no way to reverse this action."
@@ -891,6 +955,10 @@ msgstr "Сума"
 #: src/strings.ts:250
 msgid "An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced."
 msgstr "Під час перенесення ваших даних сталася помилка. Ви можете вийти з облікового запису та увійти знову. Однак це не рекомендовано, оскільки може призвести до втрати даних, якщо вони не були синхронізовані."
+
+#: src/strings.ts:2923
+msgid "An error occurred."
+msgstr "Сталася помилка."
 
 #: src/strings.ts:2591
 msgid "and"
@@ -1081,6 +1149,10 @@ msgstr "Вкладення видалено"
 msgid "Attachment manager"
 msgstr "Менеджер вкладень"
 
+#: src/strings.ts:3149
+msgid "Attachment not found."
+msgstr "Вкладення не знайдено."
+
 #: src/strings.ts:1937
 msgid "Attachment preview failed"
 msgstr "Не вдалося показати попередній перегляд вкладення"
@@ -1153,6 +1225,10 @@ msgstr "Помилка автентифікації"
 #: src/strings.ts:2109
 msgid "Auto"
 msgstr "Авто"
+
+#: src/strings.ts:3090
+msgid "Auto renew"
+msgstr "Автоподовження"
 
 #: src/strings.ts:1663
 msgid "Auto save: off"
@@ -1239,6 +1315,10 @@ msgstr "Резервне копіювання та відновлення"
 msgid "Backup complete"
 msgstr "Резервне копіювання завершено"
 
+#: src/strings.ts:3162
+msgid "Backup Directory Migration Failed"
+msgstr "Помилка міграції каталогу резервних копій"
+
 #: src/strings.ts:1563
 msgid "Backup directory not selected"
 msgstr "Папку для резервних копій не вибрано"
@@ -1250,6 +1330,10 @@ msgstr "Шифрування резервної копії"
 #: src/strings.ts:1860
 msgid "Backup files have .nnbackup extension"
 msgstr "Файли резервних копій мають розширення .nnbackup"
+
+#: src/strings.ts:2949
+msgid "Backup in progress..."
+msgstr "Створення резервної копії..."
 
 #: src/strings.ts:882
 msgid "Backup is encrypted"
@@ -1291,9 +1375,17 @@ msgstr "Резервні копії"
 msgid "Basic"
 msgstr "Базовий"
 
+#: src/strings.ts:2962
+msgid "Basic features for personal use"
+msgstr "Базові функції для особистого використання"
+
 #: src/strings.ts:1795
 msgid "Because where's the fun in nookin' alone?"
 msgstr "Адже наодинці це геть не так весело, чи не так?"
+
+#: src/strings.ts:2967
+msgid "Become a believer and support the project"
+msgstr "Станьте ентузіастом і підтримайте проєкт"
 
 #: src/strings.ts:1126
 msgid "Behavior"
@@ -1302,6 +1394,10 @@ msgstr "Поведінка"
 #: src/strings.ts:2148
 msgid "Behaviour"
 msgstr "Поведінка"
+
+#: src/strings.ts:3085
+msgid "Believer"
+msgstr "Believer"
 
 #: src/strings.ts:2484
 msgid "Believer plan"
@@ -1322,6 +1418,10 @@ msgstr "Двобічне зв'язування нотаток"
 #: src/strings.ts:2567
 msgid "billed annually at {price}"
 msgstr "оплата щороку за {price}"
+
+#: src/strings.ts:3151
+msgid "Billed at"
+msgstr "Виставлено рахунок"
 
 #: src/strings.ts:2568
 msgid "billed monthly at {price}"
@@ -1350,6 +1450,10 @@ msgstr "Помилка біометричної автентифікації. С
 #: src/strings.ts:1188
 msgid "Biometrics not enrolled"
 msgstr "Біометрію не налаштовано"
+
+#: src/strings.ts:2977
+msgid "Block-level note links"
+msgstr "Посилання на нотатки на рівні блоку"
 
 #: src/strings.ts:2269
 msgid "Bold"
@@ -1387,6 +1491,10 @@ msgstr "Виноска"
 msgid "Can I cancel my free trial anytime?"
 msgstr "Чи можу я скасувати безкоштовний пробний період будь-коли?"
 
+#: src/strings.ts:3121
+msgid "Can't find your notes app in the list?"
+msgstr "Не можете знайти свою програму нотаток у списку?"
+
 #: src/strings.ts:549
 msgid "Cancel"
 msgstr "Скасувати"
@@ -1411,9 +1519,21 @@ msgstr "Скасувати вхід"
 msgid "Cancel subscription"
 msgstr "Скасувати підписку"
 
+#: src/strings.ts:3093
+msgid "Cancel trial?"
+msgstr "Скасувати пробний період?"
+
 #: src/strings.ts:518
 msgid "Cancel upload"
 msgstr "Скасувати надсилання"
+
+#: src/strings.ts:3095
+msgid "Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan."
+msgstr "Скасуйте пробний період, щоб назавжди припинити майбутні списання. Вас буде негайно переведено на безкоштовний план."
+
+#: src/strings.ts:3096
+msgid "Cancelling your trial"
+msgstr "Скасування пробного періоду"
 
 #: src/strings.ts:2691
 msgid "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones."
@@ -1515,6 +1635,10 @@ msgstr "Змініть пароль свого облікового запису
 msgid "Change your primary two-factor authentication method"
 msgstr "Змініть основний метод двофакторної автентифікації"
 
+#: src/strings.ts:3011
+msgid "Change your subscription plan."
+msgstr "Змініть свій план передплати."
+
 #: src/strings.ts:1091
 msgid "Changes from other devices won't be updated in the editor in real-time."
 msgstr "Зміни з інших пристроїв не оновлюються в редакторі в реальному часі."
@@ -1526,6 +1650,14 @@ msgstr "Зміна PGP-ключів вхідних видалить усі не�
 #: src/strings.ts:734
 msgid "Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection."
 msgstr "Зміна пароля незворотна. Вас буде виведено з усіх ваших пристроїв. Не закривайте застосунок під час зміни пароля та переконайтеся, що маєте гарне інтернет-з'єднання."
+
+#: src/strings.ts:3145
+msgid "Changing release track"
+msgstr "Зміна каналу випусків"
+
+#: src/strings.ts:3077
+msgid "Changing subscription plan"
+msgstr "Зміна плану підписки"
 
 #: src/strings.ts:2503
 msgid "Characters"
@@ -1631,6 +1763,10 @@ msgstr "Виберіть, де зберігати резервні копії"
 msgid "Choose your style"
 msgstr "Виберіть свій стиль"
 
+#: src/strings.ts:3021
+msgid "Circle"
+msgstr "Коло"
+
 #: src/strings.ts:1619
 msgid "cleaningUp"
 msgstr "очищення"
@@ -1705,17 +1841,6 @@ msgid ""
 "\n"
 "**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
 msgstr ""
-"Clearing attachments cache will perform the following actions:\n"
-"\n"
-"- Downloaded images & files: **cleared**\n"
-"- Pending uploads: **cleared**\n"
-"- Uploaded images & files: _unaffected_\n"
-"\n"
-"All attachments will be downloaded & cached again on access.\n"
-"\n"
-"---\n"
-"\n"
-"**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**Очищення кешу вкладень виконає такі дії:\n"
 "\n"
 "- Завантажені зображення та файли: **очищено**\n"
 "- Надсилання в очікуванні: **очищено**\n"
@@ -1755,9 +1880,17 @@ msgstr "Натисніть, щоб скинути {title}"
 msgid "Click to save"
 msgstr "Натисніть, щоб зберегти"
 
+#: src/strings.ts:3112
+msgid "click to sync"
+msgstr "Натисніть для синхронізації"
+
 #: src/strings.ts:2627
 msgid "Click to update"
 msgstr "Натисніть, щоб оновити"
+
+#: src/strings.ts:3042
+msgid "Clip Mode:"
+msgstr "Режим кліпу:"
 
 #: src/strings.ts:1383
 msgid "Close"
@@ -1845,12 +1978,17 @@ msgid "colors"
 msgstr "кольори"
 
 #: src/strings.ts:319
+#: src/strings.ts:2945
 msgid "Colors"
 msgstr "Кольори"
 
 #: src/strings.ts:2298
 msgid "Column properties"
 msgstr "Властивості стовпця"
+
+#: src/strings.ts:2889
+msgid "Columns"
+msgstr "Стовпці"
 
 #: src/strings.ts:2454
 msgid "Command palette"
@@ -1859,6 +1997,10 @@ msgstr "Палітра команд"
 #: src/strings.ts:1273
 msgid "Community"
 msgstr "Спільнота"
+
+#: src/strings.ts:2997
+msgid "Compare all plans"
+msgstr "Порівняти всі плани"
 
 #: src/strings.ts:2561
 msgid "Compare plans"
@@ -1871,6 +2013,10 @@ msgstr "Завершено"
 #: src/strings.ts:139
 msgid "Compress"
 msgstr "Стиснути"
+
+#: src/strings.ts:3040
+msgid "Compress image(s) (recommended)"
+msgstr "Стискати зображення (рекомендовано)"
 
 #: src/strings.ts:1131
 msgid "Compress images before uploading"
@@ -1896,6 +2042,10 @@ msgstr "Налаштувати"
 msgid "Configure server URLs for Notesnook"
 msgstr "Налаштувати URL-адреси серверів для Notesnook"
 
+#: src/strings.ts:3174
+msgid "Confirm"
+msgstr "Підтвердити"
+
 #: src/strings.ts:682
 msgid "Confirm email"
 msgstr "Підтвердити електронну пошту"
@@ -1920,9 +2070,17 @@ msgstr "Потрібне підтвердження пароля"
 msgid "Confirm pin"
 msgstr "Підтвердьте PIN"
 
+#: src/strings.ts:3076
+msgid "Confirm plan change"
+msgstr "Підтвердити зміну плану"
+
 #: src/strings.ts:2655
 msgid "Confirmation email sent"
 msgstr "Лист із підтвердженням надіслано"
+
+#: src/strings.ts:2935
+msgid "Conflicted"
+msgstr "З конфліктами"
 
 #: src/strings.ts:2092
 msgid "Congratulations!"
@@ -2025,6 +2183,14 @@ msgstr "Не вдалося перетворити нотатку на {format}.
 msgid "Could not create backup"
 msgstr "Не вдалося створити резервну копію"
 
+#: src/strings.ts:3132
+msgid "Could not reset account password."
+msgstr "Не вдалося скинути пароль облікового запису."
+
+#: src/strings.ts:3031
+msgid "Could not save table to csv"
+msgstr "Не вдалося зберегти таблицю в csv"
+
 #: src/strings.ts:559
 msgid "Could not unlock"
 msgstr "Не вдалося розблокувати"
@@ -2033,6 +2199,10 @@ msgstr "Не вдалося розблокувати"
 msgid "Create"
 msgstr "Створити"
 
+#: src/strings.ts:2982
+msgid "Create \"{name}\" tag"
+msgstr "Створити тег \"{name}\""
+
 #: src/strings.ts:730
 msgid "Create a group"
 msgstr "Створити групу"
@@ -2040,6 +2210,10 @@ msgstr "Створити групу"
 #: src/strings.ts:940
 msgid "Create a new note"
 msgstr "Створити нову нотатку"
+
+#: src/strings.ts:3169
+msgid "Create a new notebook"
+msgstr "Створити новий блокнот"
 
 #: src/strings.ts:953
 msgid "Create a note first"
@@ -2110,6 +2284,14 @@ msgstr "Створено"
 msgid "Creating a{0} backup"
 msgstr "Створення резервної копії{0}"
 
+#: src/strings.ts:2951
+msgid "Creating backup zip file..."
+msgstr "Створення zip-файлу резервної копії..."
+
+#: src/strings.ts:2958
+msgid "Creating zip"
+msgstr "Створення zip"
+
 #: src/strings.ts:2678
 msgid "Creating..."
 msgstr "Створення..."
@@ -2162,6 +2344,10 @@ msgstr "Власний"
 #: src/strings.ts:2143
 msgid "Custom dictionary words"
 msgstr "Слова у власному словнику"
+
+#: src/strings.ts:2978
+msgid "Customizable sidebar"
+msgstr "Настроювана бічна панель"
 
 #: src/strings.ts:1115
 msgid "Customization"
@@ -2272,9 +2458,17 @@ msgstr "Журнали налагодження завантажено"
 msgid "Debugging"
 msgstr "Налагодження"
 
+#: src/strings.ts:2926
+msgid "Decimal"
+msgstr "Десятковий"
+
 #: src/strings.ts:2407
 msgid "Decrease {title}"
 msgstr "Зменшити {title}"
+
+#: src/strings.ts:2979
+msgid "Decrypting your notes"
+msgstr "Розшифрування ваших нотаток"
 
 #: src/strings.ts:660
 #: src/strings.ts:2010
@@ -2316,6 +2510,10 @@ msgstr "Типовий час відкладення"
 #: src/strings.ts:1303
 msgid "Default sound"
 msgstr "Типовий звук"
+
+#: src/strings.ts:3159
+msgid "Degraded Performance Warning"
+msgstr "Попередження про зниження продуктивності"
 
 #: src/strings.ts:154
 msgid "Delete"
@@ -2393,6 +2591,14 @@ msgstr "Видалено {date}"
 msgid "Deleting"
 msgstr "Видалення"
 
+#: src/strings.ts:3045
+msgid "Deleting account"
+msgstr "Видалення облікового запису"
+
+#: src/strings.ts:3148
+msgid "Deleting tags"
+msgstr "Видалення тегів"
+
 #: src/strings.ts:1840
 msgid "Description"
 msgstr "Опис"
@@ -2426,6 +2632,7 @@ msgid "Disable editor margins"
 msgstr "Вимкнути поля редактора"
 
 #: src/strings.ts:2664
+#: src/strings.ts:3140
 msgid "Disable Inbox API"
 msgstr "Вимкнути API вхідних"
 
@@ -2442,8 +2649,13 @@ msgid "Disabled"
 msgstr "Вимкнено"
 
 #: src/strings.ts:2666
+#: src/strings.ts:3142
 msgid "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?"
 msgstr "Вимкнення видалить усі несинхронізовані елементи вхідних. Крім того, усі наявні ключі API буде відкликано, і вони перестануть працювати. Ви впевнені?"
+
+#: src/strings.ts:3020
+msgid "Disc"
+msgstr "Диск"
 
 #: src/strings.ts:565
 msgid "Discard"
@@ -2561,7 +2773,6 @@ msgstr "Завантажити оновлення"
 msgid "Downloaded"
 msgstr "Завантажено"
 
-#: src/strings.ts:64
 #: src/strings.ts:507
 msgid "Downloading"
 msgstr "Завантаження"
@@ -2573,6 +2784,14 @@ msgstr "Завантаження ({progress})"
 #: src/strings.ts:261
 msgid "Downloading attachments"
 msgstr "Завантаження вкладень"
+
+#: src/strings.ts:2957
+msgid "Downloading attachments ({current})"
+msgstr "Завантаження вкладень ({current})"
+
+#: src/strings.ts:2948
+msgid "Downloading files"
+msgstr "Завантаження файлів"
 
 #: src/strings.ts:1706
 msgid "Downloading images"
@@ -2652,6 +2871,10 @@ msgstr "Відредагуйте своє повне ім'я"
 msgid "Editor"
 msgstr "Редактор"
 
+#: src/strings.ts:3086
+msgid "Education"
+msgstr "Освіта"
+
 #: src/strings.ts:2598
 msgid "Education plan"
 msgstr "Освітній тариф"
@@ -2688,6 +2911,14 @@ msgstr "Електронну пошту змінено на {email}"
 msgid "Embed"
 msgstr "Вбудувати"
 
+#: src/strings.ts:2913
+msgid "Embed code must include an iframe with an src attribute."
+msgstr "Код для вставки має містити iframe з атрибутом src."
+
+#: src/strings.ts:2911
+msgid "Embed code must include an iframe."
+msgstr "Код для вставки має містити iframe."
+
 #: src/strings.ts:2334
 msgid "Embed properties"
 msgstr "Властивості вбудовування"
@@ -2695,6 +2926,10 @@ msgstr "Властивості вбудовування"
 #: src/strings.ts:2330
 msgid "Embed settings"
 msgstr "Налаштування вбудовування"
+
+#: src/strings.ts:2917
+msgid "Embedding javascript code is not supported."
+msgstr "Вставка коду javascript не підтримується."
 
 #: src/strings.ts:151
 msgid "Enable"
@@ -2796,6 +3031,10 @@ msgstr "Введіть PIN блокування застосунку"
 msgid "Enter code from authenticator app"
 msgstr "Введіть код із застосунку автентифікації"
 
+#: src/strings.ts:3074
+msgid "Enter discount code"
+msgstr "Введіть промокод"
+
 #: src/strings.ts:1513
 msgid "Enter email address"
 msgstr "Введіть адресу електронної пошти"
@@ -2811,6 +3050,10 @@ msgstr "Введіть повне ім'я"
 #: src/strings.ts:1703
 msgid "Enter fullscreen"
 msgstr "Повноекранний режим"
+
+#: src/strings.ts:2883
+msgid "Enter note title"
+msgstr "Введіть назву нотатки"
 
 #: src/strings.ts:1492
 msgid "Enter notebook description"
@@ -2856,6 +3099,10 @@ msgstr "Введіть код відновлення, щоб продовжит�
 msgid "Enter title"
 msgstr "Введіть заголовок"
 
+#: src/strings.ts:2884
+msgid "Enter title of tag"
+msgstr "Введіть назву тегу"
+
 #: src/strings.ts:1495
 msgid "Enter verification code sent to your new email"
 msgstr "Введіть код підтвердження, надісланий на вашу нову електронну пошту"
@@ -2883,6 +3130,10 @@ msgstr "Помилка"
 #: src/strings.ts:1556
 msgid "Error applying promo code"
 msgstr "Помилка застосування промокоду"
+
+#: src/strings.ts:3030
+msgid "Error copying file"
+msgstr "Помилка копіювання файлу"
 
 #: src/strings.ts:747
 msgid "Error downloading file: {message}"
@@ -2912,6 +3163,10 @@ msgstr "Помилки"
 msgid "Errors in {count} attachments"
 msgstr "Помилки у {count} вкладеннях"
 
+#: src/strings.ts:3083
+msgid "Essential"
+msgstr "Essential"
+
 #: src/strings.ts:2483
 msgid "Essential plan"
 msgstr "Тариф Essential"
@@ -2931,6 +3186,10 @@ msgstr "Усе, що пов'язано з моєю роботою, в одном
 #: src/strings.ts:2435
 msgid "Everything related to my school in one place."
 msgstr "Усе, що пов'язано з навчанням, в одному місці."
+
+#: src/strings.ts:2906
+msgid "Example"
+msgstr "Приклад"
 
 #: src/strings.ts:2452
 msgid "Execute"
@@ -3025,6 +3284,10 @@ msgstr "Експортуйте нотатки у PDF, Markdown і HTML із Note
 msgid "Exporting \"{title}\""
 msgstr "Експорт \"{title}\""
 
+#: src/strings.ts:2955
+msgid "Exporting notes ({current}/{total})"
+msgstr "Експорт нотаток ({current}/{total})"
+
 #: src/strings.ts:1620
 msgid "Extracting files..."
 msgstr "Видобування файлів..."
@@ -3078,6 +3341,10 @@ msgstr "Не вдалося видалити обліковий запис"
 msgid "Failed to download file"
 msgstr "Не вдалося завантажити файл"
 
+#: src/strings.ts:2908
+msgid "Failed to download image: {error}."
+msgstr "Не вдалося завантажити зображення: {error}."
+
 #: src/strings.ts:2000
 msgid "Failed to install theme."
 msgstr "Не вдалося встановити тему."
@@ -3086,9 +3353,21 @@ msgstr "Не вдалося встановити тему."
 msgid "Failed to load API keys. Please try again."
 msgstr "Не вдалося завантажити ключі API. Спробуйте ще раз."
 
+#: src/strings.ts:2920
+msgid "Failed to load web clip"
+msgstr "Не вдалося завантажити вебкліп"
+
+#: src/strings.ts:3164
+msgid "Failed to migrate backup directory. It has been reset to default."
+msgstr "Не вдалося перенести каталог резервних копій. Його скинуто за замовчуванням."
+
 #: src/strings.ts:950
 msgid "Failed to open"
 msgstr "Не вдалося відкрити"
+
+#: src/strings.ts:2953
+msgid "Failed to open zip file"
+msgstr "Не вдалося відкрити zip-файл"
 
 #: src/strings.ts:867
 msgid "Failed to publish note"
@@ -3097,6 +3376,14 @@ msgstr "Не вдалося опублікувати нотатку"
 #: src/strings.ts:2005
 msgid "Failed to register task"
 msgstr "Не вдалося зареєструвати завдання"
+
+#: src/strings.ts:3026
+msgid "Failed to report issue on github"
+msgstr "Не вдалося повідомити про проблему на GitHub"
+
+#: src/strings.ts:3130
+msgid "Failed to reset user."
+msgstr "Не вдалося скинути користувача."
 
 #: src/strings.ts:804
 msgid "Failed to resolve download url"
@@ -3207,6 +3494,14 @@ msgstr "Фільтрувати вкладення за іменем файлу, 
 msgid "Filter languages"
 msgstr "Фільтрувати мови"
 
+#: src/strings.ts:2880
+msgid "Filter notebooks..."
+msgstr "Фільтрувати блокноти..."
+
+#: src/strings.ts:2881
+msgid "Filter tags..."
+msgstr "Фільтрувати теги..."
+
 #: src/strings.ts:2620
 msgid "Finish your purchase in the browser."
 msgstr "Завершіть покупку в браузері."
@@ -3307,6 +3602,14 @@ msgstr ""
 msgid "Forgot password?"
 msgstr "Забули пароль?"
 
+#: src/strings.ts:3123
+msgid "Found {count} notes"
+msgstr "Знайдено {count} нотаток"
+
+#: src/strings.ts:3082
+msgid "Free"
+msgstr "Безкоштовно"
+
 #: src/strings.ts:2577
 msgid "Free {duration} day trial, cancel any time"
 msgstr "Безкоштовний пробний період {duration} днів, скасування будь-коли"
@@ -3339,13 +3642,29 @@ msgstr "Повне ім'я оновлено"
 msgid "Full offline mode"
 msgstr "Повний автономний режим"
 
+#: src/strings.ts:2976
+msgid "Full quality images"
+msgstr "Зображення у повній якості"
+
 #: src/strings.ts:2336
 msgid "Full screen"
 msgstr "Повний екран"
 
+#: src/strings.ts:3064
+msgid "Fun facts of the year"
+msgstr "Цікаві факти року"
+
 #: src/strings.ts:2104
 msgid "General"
 msgstr "Загальні"
+
+#: src/strings.ts:3065
+msgid "Generated 100% locally on your device."
+msgstr "Створено на 100% локально на вашому пристрої."
+
+#: src/strings.ts:3175
+msgid "Generating..."
+msgstr "Генерування..."
 
 #: src/strings.ts:1270
 msgid "Get helpful debug info about the app to help us find bugs."
@@ -3383,6 +3702,10 @@ msgstr "Отримати Pro"
 msgid "Get started"
 msgstr "Почати"
 
+#: src/strings.ts:2988
+msgid "Get started without compromise."
+msgstr "Почніть без компромісів."
+
 #: src/strings.ts:2540
 msgid "Get this and so much more:"
 msgstr "Отримайте це й багато іншого:"
@@ -3394,6 +3717,10 @@ msgstr "Отримання ключа шифрування..."
 #: src/strings.ts:398
 msgid "Getting information"
 msgstr "Отримання інформації"
+
+#: src/strings.ts:3153
+msgid "Getting invoice"
+msgstr "Отримання рахунку"
 
 #: src/strings.ts:400
 msgid "Getting recovery codes"
@@ -3414,6 +3741,10 @@ msgstr "Назад"
 #: src/strings.ts:2459
 msgid "Go back in tab"
 msgstr "Назад у вкладці"
+
+#: src/strings.ts:3127
+msgid "Go back to app"
+msgstr "Повернутися до додатку"
 
 #: src/strings.ts:2237
 msgid "Go back to notebooks"
@@ -3515,6 +3846,10 @@ msgstr "Сховати заголовок нотатки"
 msgid "Highlight"
 msgstr "Виділити"
 
+#: src/strings.ts:2903
+msgid "Hint"
+msgstr "Підказка"
+
 #: src/strings.ts:909
 msgid "History"
 msgstr "Історія"
@@ -3524,6 +3859,7 @@ msgid "Hold Ctrl/Cmd & click on multiple items to select them."
 msgstr "Утримуйте Ctrl/Cmd і натискайте на кілька елементів, щоб вибрати їх."
 
 #: src/strings.ts:1529
+#: src/strings.ts:2896
 msgid "Home"
 msgstr "Головна"
 
@@ -3595,6 +3931,10 @@ msgstr "Я розумію, змінити мій пароль"
 msgid "ID copied"
 msgstr "ID скопійовано"
 
+#: src/strings.ts:3055
+msgid "ideas, thoughts, memories. 100% encrypted. 100% yours."
+msgstr "ідеї, думки, спогади. На 100% зашифровано. На 100% ваше."
+
 #: src/strings.ts:397
 msgid "If the editor fails to load even after reloading. Try restarting the app."
 msgstr "Якщо редактор не завантажується навіть після перезавантаження, спробуйте перезапустити застосунок."
@@ -3635,6 +3975,10 @@ msgstr "Якщо виникне будь-яка проблема, ви може�
 #: src/strings.ts:233
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
 msgstr "Якщо у вас є загальне запитання або потрібна допомога, радимо вам"
+
+#: src/strings.ts:3172
+msgid "Ignore"
+msgstr "Ігнорувати"
 
 #: src/strings.ts:2348
 msgid "Image"
@@ -3684,6 +4028,18 @@ msgstr "Імпортувати CSV"
 msgid "import guide"
 msgstr "посібник з імпорту"
 
+#: src/strings.ts:3116
+msgid "Import unsuccessful"
+msgstr "Імпорт не вдався"
+
+#: src/strings.ts:2974
+msgid "Inactive"
+msgstr "Неактивні"
+
+#: src/strings.ts:3015
+msgid "Inbox"
+msgstr "Вхідні"
+
 #: src/strings.ts:2656
 msgid "Inbox API"
 msgstr "API вхідних"
@@ -3711,6 +4067,10 @@ msgstr "Невірний {type}"
 #: src/strings.ts:2406
 msgid "Increase {title}"
 msgstr "Збільшити {title}"
+
+#: src/strings.ts:2904
+msgid "Info"
+msgstr "Інформація"
 
 #: src/strings.ts:2248
 msgid "Insert"
@@ -3787,6 +4147,10 @@ msgstr "Недопустима пара ключів PGP. Перевірте к�
 #: src/strings.ts:2722
 msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 msgstr "Недопустимий ключ відновлення. Переконайтеся, що вводите ключ відновлення облікового запису, а не код відновлення 2FA."
+
+#: src/strings.ts:3152
+msgid "Invoice"
+msgstr "Рахунок"
 
 #: src/strings.ts:224
 msgid "Issue created"
@@ -3882,9 +4246,17 @@ msgstr "Тримайте свої дані в безпеці"
 msgid "Key name"
 msgstr "Назва ключа"
 
+#: src/strings.ts:3155
+msgid "Keyboard shortcuts"
+msgstr "Гарячі клавіші"
+
 #: src/strings.ts:2140
 msgid "Languages"
 msgstr "Мови"
+
+#: src/strings.ts:2937
+msgid "Last"
+msgstr "Минулі"
 
 #: src/strings.ts:2243
 msgid "Last edited at"
@@ -3893,6 +4265,10 @@ msgstr "Останнє редагування"
 #: src/strings.ts:2704
 msgid "Last used on"
 msgstr "Останнє використання"
+
+#: src/strings.ts:2933
+msgid "Last week"
+msgstr "Минулого тижня"
 
 #: src/strings.ts:590
 msgid "Later"
@@ -3922,6 +4298,10 @@ msgstr "Докладніше про Notesnook Monograph"
 msgid "Least relevant first"
 msgstr "Спочатку найменш доречні"
 
+#: src/strings.ts:2952
+msgid "Legacy backup"
+msgstr "Застаріла резервна копія"
+
 #: src/strings.ts:1564
 msgid "Legal"
 msgstr "Правова інформація"
@@ -3929,6 +4309,14 @@ msgstr "Правова інформація"
 #: src/strings.ts:476
 msgid "Let us know if you have faced any issue/bug while using Notesnook. We will try to fix it as soon as possible."
 msgstr "Повідомте нам, якщо ви натрапили на проблему чи помилку під час використання Notesnook. Ми спробуємо виправити її якнайшвидше."
+
+#: src/strings.ts:3051
+msgid "Let's look back at your year in Notesnook"
+msgstr "Згадаймо ваш рік у Notesnook"
+
+#: src/strings.ts:2990
+msgid "Level up with more storage."
+msgstr "Перейдіть на новий рівень із більшим сховищем."
 
 #: src/strings.ts:2173
 msgid "License"
@@ -4023,6 +4411,10 @@ msgstr "Завантаження {0}, зачекайте..."
 msgid "Loading API keys..."
 msgstr "Завантаження ключів API..."
 
+#: src/strings.ts:3037
+msgid "Loading clip..."
+msgstr "Завантаження кліпу..."
+
 #: src/strings.ts:1666
 msgid "Loading editor. Please wait..."
 msgstr "Завантаження редактора. Зачекайте..."
@@ -4038,6 +4430,10 @@ msgstr "Завантаження тем..."
 #: src/strings.ts:1329
 msgid "Loading trash"
 msgstr "Завантаження кошика"
+
+#: src/strings.ts:2922
+msgid "Loading web clip ({progress}%)"
+msgstr "Завантаження вебкліпу ({progress}%)"
 
 #: src/strings.ts:975
 msgid "Loading your archive"
@@ -4070,6 +4466,10 @@ msgstr "Завантаження ваших тегів"
 #: src/strings.ts:159
 msgid "Lock"
 msgstr "Заблокувати"
+
+#: src/strings.ts:3016
+msgid "Lock app after"
+msgstr "Блокувати застосунок через"
 
 #: src/strings.ts:456
 msgid "Lock note"
@@ -4137,7 +4537,7 @@ msgstr "Увійдіть, щоб шифрувати та синхронізув�
 
 #: src/strings.ts:2625
 msgid "Login to upload attachments. [Read more](https://notesnook.com/help/faqs/login-to-upload-attachments)"
-msgstr ""
+msgstr "Увійдіть, щоб завантажувати вкладення. [Докладніше](https://notesnook.com/help/faqs/login-to-upload-attachments)"
 
 #: src/strings.ts:542
 msgid "Login to your account"
@@ -4155,9 +4555,25 @@ msgstr "Вийти та очистити дані"
 msgid "Logout from this device"
 msgstr "Вийти на цьому пристрої"
 
+#: src/strings.ts:3137
+msgid "Long (Monday, Tuesday)"
+msgstr "Довгий (Понеділок, Вівторок)"
+
 #: src/strings.ts:1414
 msgid "Long press on any item in list to enter multi-select mode."
 msgstr "Натисніть і утримуйте будь-який елемент списку, щоб увімкнути режим множинного вибору."
+
+#: src/strings.ts:2928
+msgid "Lower alpha"
+msgstr "Малі літери"
+
+#: src/strings.ts:2931
+msgid "Lower Greek"
+msgstr "Малі грецькі літери"
+
+#: src/strings.ts:2930
+msgid "Lower Roman"
+msgstr "Малі римські цифри"
 
 #: src/strings.ts:2374
 msgid "Make task list readonly"
@@ -4204,6 +4620,10 @@ msgstr "Керуйте тут налаштуваннями синхроніза�
 msgid "Mark important notes by adding them to favorites."
 msgstr "Позначайте важливі нотатки, додаючи їх до обраного."
 
+#: src/strings.ts:3135
+msgid "Markdown + Frontmatter"
+msgstr "Markdown + Frontmatter"
+
 #: src/strings.ts:1161
 msgid "Markdown shortcuts"
 msgstr "Скорочення Markdown"
@@ -4232,6 +4652,10 @@ msgstr "Математика та формули"
 msgid "Maximize"
 msgstr "Розгорнути"
 
+#: src/strings.ts:2975
+msgid "Maximum file size"
+msgstr "Максимальний розмір файлу"
+
 #: src/strings.ts:2783
 msgid "Maximum reminder date is {maxDate}"
 msgstr "Максимальна дата нагадування — {maxDate}"
@@ -4252,11 +4676,23 @@ msgstr "Учасник з {date}"
 msgid "Merge cells"
 msgstr "Об'єднати клітинки"
 
+#: src/strings.ts:3113
+msgid "Merge conflicts"
+msgstr "Конфлікти об'єднання"
+
 #. placeholder {0}: progress ? `${progress?.collection}` : ""
 #. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : ""
 #: src/strings.ts:246
 msgid "Migrating {0} {1}... please wait"
 msgstr "Перенесення {0} {1}... зачекайте"
+
+#: src/strings.ts:2968
+msgid "Migrating Data"
+msgstr "Перенесення даних"
+
+#: src/strings.ts:2981
+msgid "Migrating database. This might take a while."
+msgstr "Міграція бази даних. Це може зайняти деякий час."
 
 #: src/strings.ts:257
 msgid "Migration failed"
@@ -4287,6 +4723,7 @@ msgid "Mon"
 msgstr "Пн"
 
 #: src/strings.ts:614
+#: src/strings.ts:3139
 msgid "Monday"
 msgstr "Понеділок"
 
@@ -4314,6 +4751,10 @@ msgstr "Монографії можна зашифрувати секретни�
 msgid "Monographs enable you to share your notes in a secure and private way."
 msgstr "Монографії дають змогу ділитися нотатками безпечно та конфіденційно."
 
+#: src/strings.ts:3023
+msgid "Monospace"
+msgstr "Моноширинний"
+
 #: src/strings.ts:665
 #: src/strings.ts:1842
 msgid "Month"
@@ -4327,6 +4768,10 @@ msgstr "Щомісяця"
 #: src/strings.ts:2326
 msgid "More"
 msgstr "Більше"
+
+#: src/strings.ts:2994
+msgid "Most popular"
+msgstr "Найпопулярніший"
 
 #: src/strings.ts:645
 msgid "Most relevant first"
@@ -4496,6 +4941,10 @@ msgstr "Наступна вкладка"
 msgid "No"
 msgstr "Ні"
 
+#: src/strings.ts:3029
+msgid "No active subscription found"
+msgstr "Активної підписки не знайдено"
+
 #: src/strings.ts:859
 msgid "No application found to open {fileToOpen}"
 msgstr "Не знайдено застосунок для відкриття {fileToOpen}"
@@ -4630,6 +5079,10 @@ msgstr "Нотатку заблоковано"
 msgid "Note restored from history"
 msgstr "Нотатку відновлено з історії"
 
+#: src/strings.ts:2943
+msgid "Note restored from trash"
+msgstr "Нотатку відновлено з кошика"
+
 #: src/strings.ts:1587
 msgid "Note title"
 msgstr "Заголовок нотатки"
@@ -4658,6 +5111,14 @@ msgstr "Блокнот"
 #: src/strings.ts:2491
 msgid "Notebook added"
 msgstr "Блокнот додано"
+
+#: src/strings.ts:3002
+msgid "Notebook ID copied to clipboard"
+msgstr "ID блокнота скопійовано в буфер обміну"
+
+#: src/strings.ts:2944
+msgid "Notebook restored from trash"
+msgstr "Блокнот відновлено з кошика"
 
 #: src/strings.ts:306
 msgid "notebooks"
@@ -4694,6 +5155,14 @@ msgstr "Нотатки успішно експортовано як {path}"
 msgid "notes imported"
 msgstr "нотаток імпортовано"
 
+#: src/strings.ts:3062
+msgid "Notes per month"
+msgstr "Нотаток на місяць"
+
+#: src/strings.ts:3053
+msgid "notes this year"
+msgstr "нотаток цього року"
+
 #: src/strings.ts:2555
 msgid "Notesnook"
 msgstr "Notesnook"
@@ -4705,6 +5174,10 @@ msgstr "Notesnook Circle"
 #: src/strings.ts:2615
 msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 msgstr "Notesnook Circle об'єднує надійних партнерів, які поділяють нашу відданість приватності, прозорості та свободі користувачів."
+
+#: src/strings.ts:3161
+msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
+msgstr "Notesnook виявив, що працює в режимі емуляції ARM64. Для максимальної продуктивності завантажте збірку ARM64 з нашого сайту."
 
 #: src/strings.ts:2079
 msgid "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us."
@@ -4787,6 +5260,10 @@ msgstr "Добре"
 msgid "Old - new"
 msgstr "Старі — нові"
 
+#: src/strings.ts:2934
+msgid "Older"
+msgstr "Раніше"
+
 #: src/strings.ts:1837
 msgid "Older version"
 msgstr "Старіша версія"
@@ -4799,9 +5276,17 @@ msgstr "Найстаріші — найновіші"
 msgid "Once your password is changed, please make sure to save the new account recovery key"
 msgstr "Після зміни пароля обов'язково збережіть новий ключ відновлення облікового запису"
 
+#: src/strings.ts:2987
+msgid "One subscription for a lifetime of notes."
+msgstr "Одна передплата на все життя ваших нотаток."
+
 #: src/strings.ts:2573
 msgid "One time purchase, no auto-renewal"
 msgstr "Одноразова покупка, без автопродовження"
+
+#: src/strings.ts:2941
+msgid "Ongoing"
+msgstr "Постійні"
 
 #: src/strings.ts:1773
 msgid "Only .zip files are supported."
@@ -4882,6 +5367,10 @@ msgstr "Сортувати за"
 #: src/strings.ts:2232
 msgid "Order ID"
 msgstr "ID замовлення"
+
+#: src/strings.ts:3073
+msgid "Order summary"
+msgstr "Підсумок замовлення"
 
 #: src/strings.ts:758
 #: src/strings.ts:762
@@ -4976,6 +5465,10 @@ msgstr "Вставте сюди URL зображення"
 msgid "Paste without formatting"
 msgstr "Вставити без форматування"
 
+#: src/strings.ts:3166
+msgid "Path not found"
+msgstr "Шлях не знайдено"
+
 #: src/strings.ts:2574
 msgid "Pay once and use for 5 years"
 msgstr "Заплатіть один раз і користуйтеся 5 років"
@@ -5024,6 +5517,10 @@ msgstr "Закріпіть найважливіші блокноти вгорі 
 msgid "Pinned"
 msgstr "Закріплено"
 
+#: src/strings.ts:3035
+msgid "Plain text"
+msgstr "Звичайний текст"
+
 #: src/strings.ts:2595
 msgid "Plan limits"
 msgstr "Обмеження тарифу"
@@ -5031,6 +5528,10 @@ msgstr "Обмеження тарифу"
 #: src/strings.ts:2555
 msgid "Plans"
 msgstr "Тарифи"
+
+#: src/strings.ts:3108
+msgid "Please confirm your email to start syncing."
+msgstr "Будь ласка, підтвердьте електронну пошту, щоб почати синхронізацію."
 
 #: src/strings.ts:1366
 msgid "Please confirm your email to sync notes"
@@ -5143,9 +5644,25 @@ msgstr "Переконайтеся, що ви зберегли ключ відн
 msgid "Please note that we will respond to your issue on the given link. We recommend that you save it."
 msgstr "Зверніть увагу: ми відповімо на ваше звернення за вказаним посиланням. Радимо його зберегти."
 
+#: src/strings.ts:2915
+msgid "Please provide a valid embed url."
+msgstr "Вкажіть дійсну URL-адресу для вставки."
+
+#: src/strings.ts:3001
+msgid "Please provide a valid multi-factor authentication code."
+msgstr "Будь ласка, введіть дійсний код багатофакторної автентифікації."
+
+#: src/strings.ts:2914
+msgid "Please provide a valid url."
+msgstr "Вкажіть дійсну URL-адресу."
+
 #: src/strings.ts:1767
 msgid "Please refer to the"
 msgstr "Зверніться до"
+
+#: src/strings.ts:3107
+msgid "Please resolve all merge conflicts and run the sync again."
+msgstr "Будь ласка, вирішіть усі конфлікти об'єднання та запустіть синхронізацію знову."
 
 #: src/strings.ts:1559
 msgid "Please select the day to repeat the reminder on"
@@ -5184,6 +5701,14 @@ msgstr "Зачекайте, перш ніж запитувати новий ко
 msgid "Please wait before requesting another email"
 msgstr "Зачекайте, перш ніж запитувати ще один лист"
 
+#: src/strings.ts:3079
+msgid "Please wait while we change your subscription plan..."
+msgstr "Будь ласка, зачекайте, поки ми змінюємо ваш план підписки..."
+
+#: src/strings.ts:3046
+msgid "Please wait while we delete your account"
+msgstr "Будь ласка, зачекайте, поки ми видаляємо ваш обліковий запис"
+
 #: src/strings.ts:944
 msgid "Please wait while we encrypt {name} for upload."
 msgstr "Зачекайте, поки ми шифруємо {name} для надсилання."
@@ -5208,6 +5733,10 @@ msgstr "Зачекайте, поки ми завантажуємо вашу пі
 msgid "Please wait while we log you out."
 msgstr "Зачекайте, поки ми виконуємо вихід."
 
+#: src/strings.ts:2969
+msgid "Please wait while we migrate your data"
+msgstr "Будь ласка, зачекайте, поки ми переносимо ваші дані"
+
 #: src/strings.ts:1917
 msgid "Please wait while we reset your account password."
 msgstr "Зачекайте, поки ми скидаємо пароль вашого облікового запису."
@@ -5219,6 +5748,10 @@ msgstr "Зачекайте, поки ми відновлюємо вашу рез
 #: src/strings.ts:1899
 msgid "Please wait while we send you recovery instructions"
 msgstr "Зачекайте, поки ми надсилаємо вам інструкції з відновлення"
+
+#: src/strings.ts:3147
+msgid "Please wait while we switch to the new release track..."
+msgstr "Будь ласка, зачекайте, поки ми перемикаємося на новий канал..."
 
 #: src/strings.ts:260
 msgid "Please wait while we sync all your data."
@@ -5237,6 +5770,10 @@ msgstr "Зачекайте, поки виконується автентифік
 msgid "Please wait while your data is downloaded & decrypted."
 msgstr "Зачекайте, поки ваші дані завантажуються та розшифровуються."
 
+#: src/strings.ts:2950
+msgid "Preparing backup..."
+msgstr "Підготовка резервної копії..."
+
 #: src/strings.ts:905
 msgid "Preparing note for share"
 msgstr "Підготовка нотатки до надсилання"
@@ -5244,6 +5781,10 @@ msgstr "Підготовка нотатки до надсилання"
 #: src/strings.ts:1617
 msgid "Preparing to restore backup file..."
 msgstr "Підготовка до відновлення файлу резервної копії..."
+
+#: src/strings.ts:3041
+msgid "Preparing web clip..."
+msgstr "Підготовка веб-кліпу..."
 
 #: src/strings.ts:428
 msgid "PRESETS"
@@ -5342,8 +5883,13 @@ msgid "privileged few"
 msgstr "небагатьох привілейованих"
 
 #: src/strings.ts:1723
+#: src/strings.ts:3084
 msgid "Pro"
 msgstr "Pro"
+
+#: src/strings.ts:3087
+msgid "Pro (legacy)"
+msgstr "Pro (застарілий)"
 
 #: src/strings.ts:2482
 msgid "Pro plan"
@@ -5433,6 +5979,10 @@ msgstr "Опубліковані нотатки можна зашифруват�
 msgid "Purchase"
 msgstr "Придбати"
 
+#: src/strings.ts:3168
+msgid "Quick actions"
+msgstr "Швидкі дії"
+
 #: src/strings.ts:1373
 msgid "Quick note"
 msgstr "Швидка нотатка"
@@ -5452,6 +6002,10 @@ msgstr "Швидке відкриття"
 #: src/strings.ts:1245
 msgid "Quickly create a note from the notification"
 msgstr "Швидко створіть нотатку просто зі сповіщення"
+
+#: src/strings.ts:3173
+msgid "Quit"
+msgstr "Вийти"
 
 #: src/strings.ts:2345
 msgid "Quote"
@@ -5497,9 +6051,17 @@ msgstr "Читання файлу резервної копії..."
 msgid "Ready to take the next step on your private note taking journey?"
 msgstr "Готові зробити наступний крок на шляху до приватних нотаток?"
 
+#: src/strings.ts:3101
+msgid "Reason for refund"
+msgstr "Причина повернення"
+
 #: src/strings.ts:2235
 msgid "Receipt"
 msgstr "Квитанція"
+
+#: src/strings.ts:2932
+msgid "Recent"
+msgstr "Нещодавні"
 
 #: src/strings.ts:1613
 msgid "RECENT BACKUPS"
@@ -5553,6 +6115,10 @@ msgstr "Лист для відновлення надіслано!"
 msgid "Recovery key copied"
 msgstr "Ключ відновлення скопійовано"
 
+#: src/strings.ts:3129
+msgid "Recovery key is required to reset password."
+msgstr "Ключ відновлення потрібен для скидання пароля."
+
 #: src/strings.ts:874
 msgid "Recovery key QR code saved"
 msgstr "QR-код ключа відновлення збережено"
@@ -5593,6 +6159,10 @@ msgstr "Згадується в"
 msgid "References"
 msgstr "Посилання"
 
+#: src/strings.ts:3012
+msgid "Refund subscription"
+msgstr "Повернути кошти за передплату"
+
 #: src/strings.ts:520
 msgid "Regenerate"
 msgstr "Створити заново"
@@ -5616,6 +6186,10 @@ msgstr "Релевантність"
 #: src/strings.ts:1672
 msgid "Reload app"
 msgstr "Перезавантажити застосунок"
+
+#: src/strings.ts:2925
+msgid "Reload editor"
+msgstr "Перезавантажити редактор"
 
 #: src/strings.ts:1830
 msgid "Relogin to your account"
@@ -5767,9 +6341,21 @@ msgstr "Повідомити"
 msgid "Report an issue"
 msgstr "Повідомити про проблему"
 
+#: src/strings.ts:2924
+msgid "Report error"
+msgstr "Повідомити про помилку"
+
 #: src/strings.ts:472
 msgid "Report issue"
 msgstr "Повідомити про проблему"
+
+#: src/strings.ts:3098
+msgid "Request refund?"
+msgstr "Запросити повернення коштів?"
+
+#: src/strings.ts:3014
+msgid "Requesting refund for your subscription"
+msgstr "Запит на повернення коштів за передплату"
 
 #: src/strings.ts:128
 msgid "Resend code in ({seconds})"
@@ -5876,6 +6462,10 @@ msgstr "Відновлення"
 msgid "Restoring {collection}..."
 msgstr "Відновлення {collection}..."
 
+#: src/strings.ts:2971
+msgid "Restoring attachments ({current}/{total})"
+msgstr "Відновлення вкладень ({current}/{total})"
+
 #: src/strings.ts:1614
 msgid "Restoring backup..."
 msgstr "Відновлення резервної копії..."
@@ -5936,6 +6526,10 @@ msgstr "Повернути праворуч"
 msgid "Row properties"
 msgstr "Властивості рядка"
 
+#: src/strings.ts:2890
+msgid "Rows"
+msgstr "Рядки"
+
 #: src/strings.ts:545
 msgid "Run file check"
 msgstr "Запустити перевірку файлу"
@@ -5943,6 +6537,10 @@ msgstr "Запустити перевірку файлу"
 #: src/strings.ts:2071
 msgid "Safe & encrypted notes"
 msgstr "Безпечні та зашифровані нотатки"
+
+#: src/strings.ts:3024
+msgid "Sans-serif"
+msgstr "Без зарубок"
 
 #: src/strings.ts:628
 msgid "Sat"
@@ -5979,6 +6577,10 @@ msgstr "Зберегти ключ відновлення даних"
 #: src/strings.ts:955
 msgid "Save failed. Vault is locked"
 msgstr "Не вдалося зберегти. Сейф заблоковано"
+
+#: src/strings.ts:3038
+msgid "Save note"
+msgstr "Зберегти нотатку"
 
 #: src/strings.ts:592
 msgid "Save QR code to gallery"
@@ -6061,6 +6663,22 @@ msgstr "Знайти нотатку"
 msgid "Search a note to link to"
 msgstr "Знайдіть нотатку, на яку потрібно послатися"
 
+#: src/strings.ts:2885
+msgid "Search for a note"
+msgstr "Шукати нотатку"
+
+#: src/strings.ts:2886
+msgid "Search for a notebook"
+msgstr "Шукати блокнот"
+
+#: src/strings.ts:2887
+msgid "Search for a tag"
+msgstr "Шукати тег"
+
+#: src/strings.ts:2882
+msgid "Search for notes"
+msgstr "Шукати нотатки"
+
 #: src/strings.ts:2450
 msgid "Search for notes, notebooks, and tags..."
 msgstr "Шукайте нотатки, блокноти й теги..."
@@ -6068,6 +6686,10 @@ msgstr "Шукайте нотатки, блокноти й теги..."
 #: src/strings.ts:1540
 msgid "Search in {routeName}"
 msgstr "Пошук у {routeName}"
+
+#: src/strings.ts:2888
+msgid "Search in all notes"
+msgstr "Шукати в усіх нотатках"
 
 #: src/strings.ts:35
 msgid "Search in Editor"
@@ -6165,13 +6787,29 @@ msgstr "Вибрати"
 msgid "Select a backup file from your device to restore backup"
 msgstr "Виберіть файл резервної копії на пристрої, щоб відновити її"
 
+#: src/strings.ts:3044
+msgid "Select a note"
+msgstr "Виберіть нотатку"
+
 #: src/strings.ts:2501
 msgid "Select a notebook to move this notebook into, or unselect to move it to the root level."
 msgstr "Виберіть блокнот, до якого потрібно перемістити цей блокнот, або зніміть вибір, щоб перемістити його на кореневий рівень."
 
+#: src/strings.ts:3119
+msgid "Select a notes app to import from"
+msgstr "Виберіть програму нотаток для імпорту"
+
+#: src/strings.ts:2984
+msgid "Select a plan"
+msgstr "Виберіть план"
+
 #: src/strings.ts:2110
 msgid "Select a theme"
 msgstr "Виберіть тему"
+
+#: src/strings.ts:2895
+msgid "Select all"
+msgstr "Вибрати все"
 
 #: src/strings.ts:1228
 msgid "Select backup directory"
@@ -6225,6 +6863,10 @@ msgstr "Вибрати блокноти"
 msgid "Select notebooks you want to add note(s) to."
 msgstr "Виберіть блокноти, до яких потрібно додати нотатки."
 
+#: src/strings.ts:3120
+msgid "Select notes app"
+msgstr "Вибрати програму нотаток"
+
 #: src/strings.ts:2489
 msgid "Select notes to link to \"{title}\""
 msgstr "Виберіть нотатки для зв'язку з \"{title}\""
@@ -6232,6 +6874,10 @@ msgstr "Виберіть нотатки для зв'язку з \"{title}\""
 #: src/strings.ts:342
 msgid "Select nth day of the month to repeat the reminder."
 msgstr "Виберіть число місяця для повторення нагадування."
+
+#: src/strings.ts:2985
+msgid "Select plan"
+msgstr "Обрати план"
 
 #: src/strings.ts:1819
 msgid "Select profile picture"
@@ -6281,9 +6927,17 @@ msgstr "Надіслати код через SMS"
 msgid "Send recovery email"
 msgstr "Надіслати лист для відновлення"
 
+#: src/strings.ts:3122
+msgid "Send us a request."
+msgstr "Надішліть нам запит."
+
 #: src/strings.ts:1897
 msgid "Sending recovery email"
 msgstr "Надсилання листа для відновлення"
+
+#: src/strings.ts:3025
+msgid "Serif"
+msgstr "З зарубками"
 
 #: src/strings.ts:1648
 msgid "Server url changed"
@@ -6353,6 +7007,10 @@ msgstr "Встановити як світлу тему"
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr "Задайте інтервал автоматичного очищення кошика в розділі Налаштування > Поведінка > Інтервал очищення кошика."
 
+#: src/strings.ts:3165
+msgid "Set backup directory"
+msgstr "Встановити каталог резервних копій"
+
 #: src/strings.ts:2646
 msgid "Set expiry"
 msgstr "Задати термін дії"
@@ -6380,6 +7038,10 @@ msgstr "Задайте інтервал автоматичного створе�
 #: src/strings.ts:427
 msgid "Set your name"
 msgstr "Вкажіть своє ім'я"
+
+#: src/strings.ts:2959
+msgid "Setting up your account..."
+msgstr "Налаштування вашого облікового запису..."
 
 #: src/strings.ts:387
 #: src/strings.ts:1526
@@ -6482,6 +7144,14 @@ msgstr "Надсилайте матеріали до Notesnook звідусіл�
 msgid "Share to cloud"
 msgstr "Поділитися в хмару"
 
+#: src/strings.ts:3066
+msgid "Share with friends"
+msgstr "Поділитися з друзями"
+
+#: src/strings.ts:3136
+msgid "Short (Mon, Tue)"
+msgstr "Короткий (Пн, Вт)"
+
 #: src/strings.ts:292
 msgid "shortcut"
 msgstr "ярлик"
@@ -6499,12 +7169,17 @@ msgid "shortcuts"
 msgstr "ярлики"
 
 #: src/strings.ts:324
+#: src/strings.ts:2947
 msgid "Shortcuts"
 msgstr "Ярлики"
 
 #: src/strings.ts:2757
 msgid "Show"
 msgstr "Показати"
+
+#: src/strings.ts:3158
+msgid "Show app"
+msgstr "Показати додаток"
 
 #: src/strings.ts:96
 msgid "Sign up"
@@ -6518,7 +7193,7 @@ msgstr "Зареєстровано {date}"
 msgid "Signup failed"
 msgstr "Не вдалося зареєструватися"
 
-#: src/strings.ts:49
+#: src/strings.ts:3068
 msgid "Silent"
 msgstr "Без звуку"
 
@@ -6537,6 +7212,10 @@ msgstr "Пропустити"
 #: src/strings.ts:673
 msgid "Skip introduction"
 msgstr "Пропустити вступ"
+
+#: src/strings.ts:2942
+msgid "Snoozed until {time}"
+msgstr "Відкладено до {time}"
 
 #: src/strings.ts:1606
 msgid "Some exported notes are locked, Unlock to export them"
@@ -6578,6 +7257,10 @@ msgstr "Перевірка правопису"
 msgid "Split cells"
 msgstr "Розділити клітинки"
 
+#: src/strings.ts:3022
+msgid "Square"
+msgstr "Квадрат"
+
 #: src/strings.ts:2472
 msgid "Stable"
 msgstr "Стабільний"
@@ -6618,6 +7301,14 @@ msgstr "Почніть писати, щоб зберегти нотатку."
 msgid "Start writing your note..."
 msgstr "Почніть писати свою нотатку..."
 
+#: src/strings.ts:2996
+msgid "Start your free trial"
+msgstr "Розпочніть безкоштовний пробний період"
+
+#: src/strings.ts:3126
+msgid "Start your journey"
+msgstr "Почніть свою подорож"
+
 #: src/strings.ts:2234
 msgid "Status"
 msgstr "Статус"
@@ -6633,6 +7324,10 @@ msgstr "Потокове передавання не підтримується"
 #: src/strings.ts:2272
 msgid "Strikethrough"
 msgstr "Закреслений"
+
+#: src/strings.ts:3034
+msgid "Sub notebooks"
+msgstr "Вкладені блокноти"
 
 #: src/strings.ts:2236
 msgid "Subgroup 1"
@@ -6686,6 +7381,10 @@ msgstr "Нижній індекс"
 msgid "Subscription awarded from Streetwriters"
 msgstr "Підписку надано Streetwriters"
 
+#: src/strings.ts:3081
+msgid "Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app."
+msgstr "Підписку успішно змінено. Може знадобитися кілька хвилин, щоб зміни відобразилися в додатку."
+
 #: src/strings.ts:1031
 msgid "Subscription details"
 msgstr "Дані підписки"
@@ -6694,17 +7393,26 @@ msgstr "Дані підписки"
 msgid "Subscription not activated?"
 msgstr "Підписку не активовано?"
 
+#: src/strings.ts:2905
+msgid "Success"
+msgstr "Успішно"
+
 #: src/strings.ts:622
 msgid "Sun"
 msgstr "Нд"
 
 #: src/strings.ts:613
+#: src/strings.ts:3138
 msgid "Sunday"
 msgstr "Неділя"
 
 #: src/strings.ts:2284
 msgid "Superscript"
 msgstr "Верхній індекс"
+
+#: src/strings.ts:2992
+msgid "Support the mission - unlock everything."
+msgstr "Підтримайте місію — відкрийте все."
 
 #: src/strings.ts:1471
 msgid "Switch to search/replace mode"
@@ -6718,9 +7426,17 @@ msgstr "Синхронізувати"
 msgid "Sync failed"
 msgstr "Синхронізація не вдалася"
 
+#: src/strings.ts:3109
+msgid "Sync failed to complete. Please try again."
+msgstr "Не вдалося завершити синхронізацію. Будь ласка, спробуйте знову."
+
 #: src/strings.ts:1365
 msgid "Sync is disabled"
 msgstr "Синхронізацію вимкнено"
+
+#: src/strings.ts:3111
+msgid "Sync is disabled."
+msgstr "Синхронізацію вимкнено."
 
 #: src/strings.ts:392
 msgid "Sync now"
@@ -6758,6 +7474,10 @@ msgstr "Синхронізація ваших даних"
 msgid "Syncing your notes"
 msgstr "Синхронізація ваших нотаток"
 
+#: src/strings.ts:3105
+msgid "Syncing your notes..."
+msgstr "Синхронізація ваших нотаток..."
+
 #: src/strings.ts:2352
 msgid "Table"
 msgstr "Таблиця"
@@ -6765,6 +7485,10 @@ msgstr "Таблиця"
 #: src/strings.ts:538
 msgid "Table of contents"
 msgstr "Зміст"
+
+#: src/strings.ts:3047
+msgid "Table saved to csv"
+msgstr "Таблицю збережено у csv"
 
 #: src/strings.ts:2297
 msgid "Table settings"
@@ -6786,12 +7510,17 @@ msgstr "тег"
 msgid "Tag"
 msgstr "Тег"
 
+#: src/strings.ts:3003
+msgid "Tag ID copied to clipboard"
+msgstr "ID тегу скопійовано в буфер обміну"
+
 #: src/strings.ts:307
 msgid "tags"
 msgstr "теги"
 
 #: src/strings.ts:317
 #: src/strings.ts:1527
+#: src/strings.ts:2897
 msgid "Tags"
 msgstr "Теги"
 
@@ -6855,6 +7584,10 @@ msgstr "Торкніться, щоб скасувати"
 msgid "Tap to deselect"
 msgstr "Торкніться, щоб зняти вибір"
 
+#: src/strings.ts:3039
+msgid "Tap to remove an attachment."
+msgstr "Торкніться, щоб видалити вкладення."
+
 #: src/strings.ts:668
 msgid "Tap to stop reordering"
 msgstr "Торкніться, щоб завершити зміну порядку"
@@ -6889,13 +7622,6 @@ msgid ""
 "- Steps to reproduce the issue\n"
 "- Things you have tried etc."
 msgstr ""
-"Tell us more about the issue you are facing.\n"
-"\n"
-"For example:\n"
-"- What were you trying to do in the app?\n"
-"- What did you expect to happen?\n"
-"- Steps to reproduce the issue\n"
-"- Things you have tried etc.Розкажіть докладніше про проблему, з якою ви зіткнулися.\n"
 "\n"
 "Наприклад:\n"
 "- Що ви намагалися зробити в застосунку?\n"
@@ -6963,9 +7689,17 @@ msgstr "Дякуємо за ваш відгук!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Дякуємо. Ви — доказ того, що приватність завжди понад усе."
 
+#: src/strings.ts:3059
+msgid "That's almost the length of a short novel!"
+msgstr "Це майже довжина короткого роману!"
+
 #: src/strings.ts:1645
 msgid "The {title} at {url} is not compatible with this client."
 msgstr "{title} за адресою {url} несумісний із цим клієнтом."
+
+#: src/strings.ts:3144
+msgid "The API key allows you to access NN's inbox functionality."
+msgstr "Ключ API дозволяє отримати доступ до функцій вхідних повідомлень NN."
 
 #: src/strings.ts:2645
 msgid "The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note"
@@ -6974,6 +7708,10 @@ msgstr "Не вдалося розблокувати вхідну нотатку
 #: src/strings.ts:231
 msgid "The information above will be publically available at"
 msgstr "Наведена вище інформація буде загальнодоступною за адресою"
+
+#: src/strings.ts:3028
+msgid "The note you are trying to append to has been deleted."
+msgstr "Нотатку, до якої ви намагаєтеся додати вміст, видалено."
 
 #: src/strings.ts:2619
 msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
@@ -6986,6 +7724,18 @@ msgstr "Пароль для розшифрування файлу резервн
 #: src/strings.ts:2094
 msgid "The password/pin for unlocking the app."
 msgstr "Пароль або PIN для розблокування застосунку."
+
+#: src/strings.ts:3167
+msgid ""
+"The path does not exist:\n"
+"{path}"
+msgstr ""
+"Шлях не існує:\n"
+"{path}"
+
+#: src/strings.ts:3033
+msgid "The permission to show file upload notification was disallowed by the user."
+msgstr "Дозвіл на показ сповіщень про завантаження файлів відхилено користувачем."
 
 #: src/strings.ts:337
 msgid "The reminder will repeat daily at {date}."
@@ -7067,10 +7817,18 @@ msgstr "Це одноразова покупка, а не підписка."
 msgid "This may take a while"
 msgstr "Це може зайняти деякий час"
 
+#: src/strings.ts:3154
+msgid "This might take a minute or two."
+msgstr "Це може зайняти хвилину або дві."
+
 #: src/strings.ts:1103
 #: src/strings.ts:1112
 msgid "This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 msgstr "Це слід використовувати лише для усунення несправностей. Регулярне використання для синхронізації не рекомендовано й призведе до неочікуваної втрати даних та інших проблем. Якщо проблеми із синхронізацією не зникають, повідомте нам на support@streetwriters.co."
+
+#: src/strings.ts:1106
+msgid "This must only be used for troubleshooting. Using this regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
+msgstr "Це слід використовувати лише для усунення несправностей. Регулярне використання для синхронізації не рекомендується і призведе до несподіваної втрати даних та інших проблем. Якщо у вас постійні проблеми із синхронізацією, повідомте про них на support@streetwriters.co."
 
 #: src/strings.ts:2651
 msgid "This note is empty"
@@ -7137,9 +7895,21 @@ msgstr "Формат заголовка"
 msgid "Title is required"
 msgstr "Заголовок обов'язковий"
 
+#: src/strings.ts:2910
+msgid "To protect your privacy, we will download the image & add it to your attachments."
+msgstr "Щоб захистити вашу конфіденційність, ми завантажимо зображення і додамо його до ваших вкладень."
+
 #: src/strings.ts:1190
 msgid "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone."
 msgstr "Щоб використовувати блокування застосунку, увімкніть на телефоні біометрію, як-от розблокування за відбитком пальця або Face ID."
+
+#: src/strings.ts:2938
+msgid "Today"
+msgstr "Сьогодні"
+
+#: src/strings.ts:3092
+msgid "Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period."
+msgstr "Увімкніть або вимкніть автоподовження, щоб уникнути неочікуваних списань. Якщо ви не увімкнете його знову, наприкінці розрахункового періоду вас буде автоматично переведено на безкоштовний план."
 
 #: src/strings.ts:1814
 msgid "Toggle dark/light mode"
@@ -7160,6 +7930,10 @@ msgstr "Показати/сховати заміну"
 #: src/strings.ts:2464
 msgid "Toggle theme"
 msgstr "Перемкнути тему"
+
+#: src/strings.ts:2939
+msgid "Tomorrow"
+msgstr "Завтра"
 
 #: src/strings.ts:2144
 msgid "Toolbar"
@@ -7270,6 +8044,10 @@ msgstr "Скасувати"
 msgid "Unfavorite"
 msgstr "Прибрати з обраного"
 
+#: src/strings.ts:3150
+msgid "Unknown error."
+msgstr "Невідома помилка."
+
 #: src/strings.ts:2596
 msgid "Unlimited"
 msgstr "Необмежено"
@@ -7311,6 +8089,10 @@ msgstr "Розблокуйте нотатку, щоб об'єднати конф
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Розблокуйте застосунок за допомогою біометрії. Для цього біометрію має бути увімкнено на вашому пристрої."
 
+#: src/strings.ts:2983
+msgid "Unlock this feature today"
+msgstr "Розблокуйте цю функцію сьогодні"
+
 #: src/strings.ts:1934
 msgid "Unlock vault"
 msgstr "Розблокувати сейф"
@@ -7334,6 +8116,14 @@ msgstr "Розблокуйте свій сейф за допомогою біо�
 #: src/strings.ts:1712
 msgid "Unlocking"
 msgstr "Розблокування"
+
+#: src/strings.ts:2965
+msgid "Unlocks all features for professional use"
+msgstr "Розблокує всі функції для професійного використання"
+
+#: src/strings.ts:2964
+msgid "Unlocks essential features for personal use"
+msgstr "Розблокує основні функції для особистого використання"
 
 #: src/strings.ts:899
 msgid "Unpin"
@@ -7359,10 +8149,13 @@ msgstr "Скасувати реєстрацію"
 msgid "Unset expiry"
 msgstr "Прибрати термін дії"
 
-#: src/strings.ts:210
 #: src/strings.ts:2373
 msgid "Untitled"
 msgstr "Без назви"
+
+#: src/strings.ts:2936
+msgid "Upcoming"
+msgstr "Майбутні"
 
 #: src/strings.ts:588
 msgid "Update"
@@ -7425,7 +8218,6 @@ msgstr "Надіслано"
 msgid "Uploaded file verification failed."
 msgstr "Не вдалося перевірити надісланий файл."
 
-#: src/strings.ts:65
 #: src/strings.ts:512
 msgid "Uploading"
 msgstr "Надсилання"
@@ -7434,7 +8226,15 @@ msgstr "Надсилання"
 msgid "Uploads"
 msgstr "Надсилання"
 
-#: src/strings.ts:51
+#: src/strings.ts:2927
+msgid "Upper alpha"
+msgstr "Великі літери"
+
+#: src/strings.ts:2929
+msgid "Upper Roman"
+msgstr "Великі римські цифри"
+
+#: src/strings.ts:3070
 msgid "Urgent"
 msgstr "Терміново"
 
@@ -7558,7 +8358,7 @@ msgstr "Використовується {instance} (v{version})"
 
 #: src/strings.ts:2812
 msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
-msgstr ""
+msgstr "Використання Notesnook без облікового запису **НЕ** синхронізуватиме ваші нотатки між пристроями та може призвести до втрати даних, якщо ви втратите доступ до свого пристрою або видалите програму. Регулярно створюйте резервні копії своїх нотаток."
 
 #: src/strings.ts:2265
 msgid "Using official Notesnook instance"
@@ -7632,13 +8432,17 @@ msgstr "Версія"
 msgid "Version history cleared"
 msgstr "Історію версій очищено"
 
-#: src/strings.ts:50
+#: src/strings.ts:3069
 msgid "Vibrate"
 msgstr "Вібрація"
 
 #: src/strings.ts:756
 msgid "Videos"
 msgstr "Відео"
+
+#: src/strings.ts:2480
+msgid "View all limits"
+msgstr "Переглянути всі ліміти"
 
 #: src/strings.ts:570
 msgid "View all linked notebooks"
@@ -7692,6 +8496,10 @@ msgstr "Зачекайте 30 секунд, щоб спробувати знов
 msgid "Waiting for upload"
 msgstr "Очікування надсилання"
 
+#: src/strings.ts:2972
+msgid "Warn"
+msgstr "Попередження"
+
 #: src/strings.ts:1913
 msgid "We are creating a backup of your data. Please wait..."
 msgstr "Ми створюємо резервну копію ваших даних. Зачекайте..."
@@ -7707,6 +8515,10 @@ msgstr "Не вдалося завантажити цю тему. Перекон
 #: src/strings.ts:2787
 msgid "We couldn't load this theme. The file appears to be incomplete or missing required theme properties."
 msgstr "Не вдалося завантажити цю тему. Файл виглядає неповним або в ньому бракує обов'язкових властивостей теми."
+
+#: src/strings.ts:3118
+msgid "We failed to import the selected files. Please try again."
+msgstr "Не вдалося імпортувати вибрані файли. Будь ласка, спробуйте знову."
 
 #: src/strings.ts:1392
 msgid "We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder."
@@ -7735,6 +8547,10 @@ msgstr "Нам дуже цікава ваша думка!"
 #: src/strings.ts:2565
 msgid "We’re setting up your plan right now. We’ll notify you as soon as everything is ready."
 msgstr "Ми зараз налаштовуємо ваш тариф. Ми повідомимо, щойно все буде готово."
+
+#: src/strings.ts:3036
+msgid "Web clip"
+msgstr "Веб-кліп"
 
 #: src/strings.ts:2335
 msgid "Web clip settings"
@@ -7813,6 +8629,14 @@ msgstr "Ширина"
 msgid "Words"
 msgstr "Слова"
 
+#: src/strings.ts:3057
+msgid "words this year"
+msgstr "слів цього року"
+
+#: src/strings.ts:3063
+msgid "Words written"
+msgstr "Написано слів"
+
 #: src/strings.ts:2425
 msgid "Work & Office"
 msgstr "Робота й офіс"
@@ -7820,6 +8644,10 @@ msgstr "Робота й офіс"
 #: src/strings.ts:2818
 msgid "Wrap a query in double quotes to search for an exact match."
 msgstr "Візьміть запит у подвійні лапки для пошуку точного збігу."
+
+#: src/strings.ts:3048
+msgid "Wrapped {year} 🎉"
+msgstr "Підсумки року {year} 🎉"
 
 #: src/strings.ts:823
 msgid "Write notes with freedom, no spying, no tracking."
@@ -7854,6 +8682,10 @@ msgstr "Так"
 msgid "Yes, you can cancel your trial anytime. No questions asked."
 msgstr "Так, ви можете скасувати пробний період будь-коли. Без зайвих запитань."
 
+#: src/strings.ts:2940
+msgid "Yesterday"
+msgstr "Вчора"
+
 #: src/strings.ts:106
 msgid "You also agree to receive marketing emails from us which you can opt-out of from app settings."
 msgstr "Ви також погоджуєтеся отримувати від нас маркетингові листи, від яких можна відписатися в налаштуваннях застосунку."
@@ -7877,6 +8709,14 @@ msgstr "Ви входите в бета-версію Notesnook. Перемика
 #: src/strings.ts:1363
 msgid "You are not logged in"
 msgstr "Ви не увійшли в обліковий запис"
+
+#: src/strings.ts:3110
+msgid "You are offline."
+msgstr "Ви офлайн."
+
+#: src/strings.ts:2995
+msgid "You are on this plan."
+msgstr "Ви на цьому плані."
 
 #: src/strings.ts:886
 msgid "You are renaming color {color}"
@@ -7973,6 +8813,10 @@ msgstr "Ви можете використати резервний метод 2
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Ви можете переглядати та відновлювати старіші версії будь-якої нотатки через її властивості -> Історія."
 
+#: src/strings.ts:3052
+msgid "You created"
+msgstr "Ви створили"
+
 #: src/strings.ts:1751
 msgid "You have {count} custom dictionary words."
 msgstr "У вас {count} слів у власному словнику."
@@ -8013,6 +8857,10 @@ msgstr "Ви ще не опублікували жодної монографі�
 msgid "You have not set any reminders yet"
 msgstr "Ви ще не створили жодного нагадування"
 
+#: src/strings.ts:2901
+msgid "You have reached your limit of {limit} {feature}."
+msgstr "Ви досягли ліміту в {limit} {feature}."
+
 #: src/strings.ts:1547
 msgid "You have unsynced notes. Take a backup or sync your notes to avoid losing your critical data."
 msgstr "У вас є несинхронізовані нотатки. Створіть резервну копію або синхронізуйте нотатки, щоб не втратити важливі дані."
@@ -8027,6 +8875,9 @@ msgid ""
 "  \n"
 "Continue without attachments?"
 msgstr ""
+"Вам потрібно увійти, щоб відновити вкладення з файлу резервної копії. [Докладніше](https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).\n"
+"  \n"
+"Продовжити без вкладень?"
 
 #: src/strings.ts:836
 msgid "You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source"
@@ -8060,9 +8911,21 @@ msgstr "Streetwriters надала вам підписку Notesnook Pro."
 msgid "You will be logged out from all your devices"
 msgstr "Ви вийдете з облікового запису на всіх своїх пристроях"
 
+#: src/strings.ts:3100
+msgid "You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours."
+msgstr "Повернення коштів здійснюється лише у разі відповідності нашій політиці повернення. Ваш обліковий запис негайно перейде на базовий рівень, а кошти надійдуть протягом 24 годин."
+
 #: src/strings.ts:1853
 msgid "You will receive instructions on how to recover your account on this email"
 msgstr "Ви отримаєте інструкції з відновлення облікового запису на цю електронну пошту"
+
+#: src/strings.ts:3056
+msgid "You wrote a total of"
+msgstr "Загалом ви написали"
+
+#: src/strings.ts:3049
+msgid "Your {year} Wrapped"
+msgstr "Ваші підсумки {year} року"
 
 #: src/strings.ts:467
 msgid "Your account email will be changed without affecting your subscription or any other settings."
@@ -8072,6 +8935,10 @@ msgstr "Електронну пошту вашого облікового зап
 msgid "Your account has been recovered."
 msgstr "Ваш обліковий запис відновлено."
 
+#: src/strings.ts:2961
+msgid "Your account is almost ready, please wait..."
+msgstr "Ваш обліковий запис майже готовий, будь ласка, зачекайте..."
+
 #: src/strings.ts:502
 #: src/strings.ts:1730
 msgid "Your account is now 100% secure against unauthorized logins."
@@ -8080,6 +8947,10 @@ msgstr "Ваш обліковий запис тепер на 100% захищен
 #: src/strings.ts:1858
 msgid "Your account password must be strong & unique."
 msgstr "Пароль вашого облікового запису має бути надійним та унікальним."
+
+#: src/strings.ts:3010
+msgid "Your account will automatically downgrade to the Free plan on {date}."
+msgstr "Ваш обліковий запис буде автоматично переведено на безкоштовний план {date}."
 
 #: src/strings.ts:1036
 msgid "Your account will be downgraded in {days} days"
@@ -8100,6 +8971,10 @@ msgstr "Ваш архів порожній"
 #: src/strings.ts:1931
 msgid "Your backup is ready to download"
 msgstr "Ваша резервна копія готова до завантаження"
+
+#: src/strings.ts:2919
+msgid "Your browser does not support the audio element."
+msgstr "Ваш браузер не підтримує аудіоелемент."
 
 #: src/strings.ts:1588
 msgid "Your changes could not be saved"
@@ -8141,6 +9016,10 @@ msgstr "Вашу електронну пошту підтверджено. Те�
 msgid "Your email is not confirmed. Please confirm your email address to change account password."
 msgstr "Вашу електронну пошту не підтверджено. Підтвердьте її, щоб змінити пароль облікового запису."
 
+#: src/strings.ts:3061
+msgid "Your favorite day to write was"
+msgstr "Вашим улюбленим днем для записів був"
+
 #: src/strings.ts:956
 msgid "Your favorites"
 msgstr "Ваше обране"
@@ -8161,6 +9040,10 @@ msgstr "Ваш безкоштовний пробний період почавс
 msgid "Your free trial is ending soon"
 msgstr "Ваш безкоштовний пробний період скоро завершиться"
 
+#: src/strings.ts:3005
+msgid "Your free trial is on-going. Your subscription will start on {date}."
+msgstr "Ваш безкоштовний пробний період триває. Ваша передплата розпочнеться {date}."
+
 #: src/strings.ts:2638
 msgid "Your free trial is on-going. Your subscription will start on {trialExpiryDate}"
 msgstr "Ваш безкоштовний пробний період триває. Підписка почнеться {trialExpiryDate}"
@@ -8172,6 +9055,10 @@ msgstr "Ваше повне ім'я"
 #: src/strings.ts:961
 msgid "Your monographs"
 msgstr "Ваші монографії"
+
+#: src/strings.ts:3060
+msgid "Your most productive month was"
+msgstr "Вашим найпродуктивнішим місяцем був"
 
 #: src/strings.ts:1314
 msgid "Your name is stored 100% end-to-end encrypted and only visible to you."
@@ -8229,6 +9116,14 @@ msgstr "Ваша підписка завершилася"
 msgid "Your subscription renews on {date}"
 msgstr "Ваша підписка поновлюється {date}"
 
+#: src/strings.ts:3008
+msgid "Your subscription will auto renew on {date}."
+msgstr "Ваша передплата буде автоматично подовжена {date}."
+
+#: src/strings.ts:3006
+msgid "Your subscription will expire on {date}."
+msgstr "Термін дії вашої передплати закінчується {date}."
+
 #: src/strings.ts:2055
 msgid "Your support request has been forwarded"
 msgstr "Ваш запит до підтримки передано"
@@ -8240,6 +9135,10 @@ msgstr "Ваш запит передано нашій команді підтр�
 #: src/strings.ts:958
 msgid "Your tags"
 msgstr "Ваші теги"
+
+#: src/strings.ts:3097
+msgid "Your trial has been canceled."
+msgstr "Ваш пробний період скасовано."
 
 #: src/strings.ts:690
 msgid "yr"

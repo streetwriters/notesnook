@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -70,7 +71,7 @@ export const AddNotebooks = ({ onPress }) => {
                 fontSize: 15
               }}
             >
-              Add to notebook
+              {strings.addToNotebook()}
             </Text>
           </View>
         </>
@@ -103,7 +104,7 @@ export const AddNotebooks = ({ onPress }) => {
             }}
             key="$add-more"
           >
-            <Icon name="plus" size={16} /> Add more
+            <Icon name="plus" size={16} /> {strings.addMore()}
           </Text>
         </View>
       )}

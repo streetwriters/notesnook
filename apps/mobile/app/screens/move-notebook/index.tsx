@@ -341,7 +341,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
                 color: colors.secondary.icon
               }}
             >
-              No notebooks
+              {strings.emptyPlaceholders("notebook")}
             </Text>
           </View>
         }

@@ -18,41 +18,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { getFontConfig } from "@notesnook/theme";
+import { strings } from "@notesnook/intl";
 
-const FONTS = [
+const getFontsList = () => [
   {
-    title: "Monospace",
+    title: strings.monospace(),
     id: "monospace",
     font: getFontConfig().fonts.monospace
   },
   {
-    title: "Sans-serif",
+    title: strings.sansSerif(),
     id: "sans-serif",
     font: getFontConfig().fonts.body
   },
   {
-    title: "Serif",
+    title: strings.serif(),
     id: "serif",
     font: `Noto Serif, Times New Roman, serif`
   }
 ];
 
 export function getFonts() {
-  return FONTS;
+  return getFontsList();
 }
 
 export function getFontById(id: string) {
-  return FONTS.find((a) => a.id === id);
+  return getFontsList().find((a) => a.id === id);
 }
 
 export function getFont(font: string) {
-  return FONTS.find(
+  return getFontsList().find(
     (a) => normalizeFontFamily(a.font) === normalizeFontFamily(font)
   );
 }
 
 export function getFontIds() {
-  return FONTS.map((a) => a.id);
+  return getFontsList().map((a) => a.id);
 }
 
 function normalizeFontFamily(fontFamily: string) {

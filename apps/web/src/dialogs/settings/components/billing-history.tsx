@@ -131,10 +131,10 @@ export function BillingHistory() {
                 >
                   {[
                     { id: "id", title: "ID", width: "5%" },
-                    { id: "billedAt", title: "Billed at", width: "20%" },
+                    { id: "billedAt", title: strings.billedAt(), width: "20%" },
                     { id: "amount", title: strings.amount(), width: "20%" },
                     { id: "status", title: strings.status(), width: "20%" },
-                    { id: "invoice", title: "Invoice", width: "20%" }
+                    { id: "invoice", title: strings.invoice(), width: "20%" }
                   ].map((column) =>
                     !column.title ? (
                       <th key={column.id} />
@@ -193,8 +193,8 @@ export function BillingHistory() {
                         onClick={async () => {
                           const url = await TaskManager.startTask({
                             type: "modal",
-                            title: "Getting invoice",
-                            subtitle: "This might take a minute or two.",
+                            title: strings.gettingInvoice(),
+                            subtitle: strings.mightTakeMinuteOrTwo(),
                             action() {
                               return db.subscriptions.invoice(transaction.id);
                             }
@@ -210,7 +210,7 @@ export function BillingHistory() {
                           window.open(url, "_blank");
                         }}
                       >
-                        Download
+                        {strings.network.download()}
                       </Button>
                     </Text>
                   </Box>

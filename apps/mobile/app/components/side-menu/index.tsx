@@ -26,6 +26,7 @@ import { db } from "../../common/database";
 import { useGroupOptions } from "../../hooks/use-group-options";
 import { presentSheet, ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useTagStore } from "../../stores/use-tag-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { deleteItems } from "../../utils/functions";
@@ -112,6 +113,12 @@ const SimpleTabView = ({
     loadedKeysRef.current.add(activeKey);
   }
 
+  const prevRoutesRef = React.useRef(navigationState.routes);
+  if (prevRoutesRef.current !== navigationState.routes) {
+    prevRoutesRef.current = navigationState.routes;
+    scenesRef.current.clear();
+  }
+
   const getSceneForRoute = React.useCallback(
     (route: SimpleRoute) => {
       const cached = scenesRef.current.get(route.key);
@@ -159,23 +166,26 @@ export const SideMenu = React.memo(
   function SideMenu() {
     const { colors } = useThemeColors();
     const insets = useGlobalSafeAreaInsets();
+    const appLanguage = useSettingStore(
+      (state) => state.settings.appLanguage
+    );
     const [index, setIndex] = React.useState(
       SettingsService.getProperty("defaultSidebarTab")
     );
-    const [routes] = React.useState<SimpleRoute[]>([
+    const routes = React.useMemo<SimpleRoute[]>(() => [
       {
         key: "home",
-        title: "Home"
+        title: strings.home()
       },
       {
         key: "notebooks",
-        title: "Notebooks"
+        title: strings.notebooks()
       },
       {
         key: "tags",
-        title: "Tags"
+        title: strings.tags()
       }
-    ]);
+    ], [appLanguage]);
 
     return (
       <View
@@ -195,11 +205,11 @@ export const SideMenu = React.memo(
         />
       </View>
     );
-  },
-  () => true
+  }
 );
 
 const TabBar = (props: SimpleTabBarProps) => {
+  useSettingStore((state) => state.settings.appLanguage);
   const dragging = useSideBarDraggingStore((state) => state.dragging);
   const { colors, isDark } = useThemeColors();
   const groupOptions = useGroupOptions(
@@ -243,31 +253,34 @@ const TabBar = (props: SimpleTabBarProps) => {
         <>
           {[
             {
-              title: "Select all",
+              id: "selectAll",
+              title: strings.selectAll(),
               icon: "check-all"
             },
             {
-              title: "Delete",
+              id: "delete",
+              title: strings.delete(),
               icon: "delete"
             },
             {
-              title: "Move",
+              id: "move",
+              title: strings.move(),
               icon: "arrow-right-bold-box-outline",
               hidden:
                 !notebookSelectionEnabled || props.navigationState.index !== 1
             },
             {
-              title: "Close",
+              id: "close",
+              title: strings.close(),
               icon: "close"
             }
           ].map((item) =>
             item.hidden ? null : (
-              <>
+              <React.Fragment key={item.id}>
                 <Pressable
-                  key={item.title}
                   onPress={async () => {
-                    switch (item.title) {
-                      case "Select all": {
+                    switch (item.id) {
+                      case "selectAll": {
                         if (notebookSelectionEnabled) {
                           useSideMenuNotebookSelectionStore
                             .getState()
@@ -280,7 +293,7 @@ const TabBar = (props: SimpleTabBarProps) => {
 
                         break;
                       }
-                      case "Delete": {
+                      case "delete": {
                         if (notebookSelectionEnabled) {
                           const ids = useSideMenuNotebookSelectionStore
                             .getState()
@@ -294,7 +307,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                         }
                         break;
                       }
-                      case "Move": {
+                      case "move": {
                         const ids = useSideMenuNotebookSelectionStore
                           .getState()
                           .getSelectedItemIds();
@@ -312,7 +325,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                         });
                         break;
                       }
-                      case "Close": {
+                      case "close": {
                         useSideMenuNotebookSelectionStore.setState({
                           enabled: false,
                           selection: {}
@@ -344,7 +357,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                     {item.title}
                   </Paragraph>
                 </Pressable>
-              </>
+              </React.Fragment>
             )
           )}
         </>
@@ -455,7 +468,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                             title: strings.addTag(),
                             paragraph: strings.addTagDesc(),
                             input: true,
-                            positiveText: "Add",
+                            positiveText: strings.add(),
                             positivePress: async (tag) => {
                               if (tag) {
                                 await db.tags.add({

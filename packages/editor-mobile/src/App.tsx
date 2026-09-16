@@ -32,6 +32,7 @@ import { TabContext, useTabStore } from "./hooks/useTabStore";
 import { EmotionEditorTheme } from "./theme-factory";
 import { getTheme } from "./utils";
 import { ReadonlyEditorProvider } from "./components/readonly-editor";
+import { strings } from "@notesnook/intl";
 
 const currentTheme = getTheme();
 if (currentTheme) {
@@ -81,7 +82,7 @@ class ExceptionHandler extends React.Component<{
             marginBottom: 0
           }}
         >
-          An error occurred.
+          {strings.anErrorOccurred()}
         </h3>
 
         <button
@@ -113,7 +114,7 @@ class ExceptionHandler extends React.Component<{
               color: "white"
             }}
           >
-            Report error
+            {strings.reportError()}
           </p>
         </button>
 
@@ -142,7 +143,7 @@ class ExceptionHandler extends React.Component<{
               color: "white"
             }}
           >
-            Reload editor
+            {strings.reloadEditorBtn()}
           </p>
         </button>
       </div>

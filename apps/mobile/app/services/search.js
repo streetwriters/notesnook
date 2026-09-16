@@ -19,11 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useSearchStore } from "../stores/use-search-store";
 import { db } from "../common/database";
+import { strings } from "@notesnook/intl";
 
 let prepareSearch = () => {};
 
 let searchInformation = {
-  placeholder: "Search in all notes",
+  placeholder: strings.searchInAllNotes(),
   data: [],
   type: "notes",
   get: () => []

@@ -22,6 +22,7 @@ import { AssetManager } from "./asset-manager";
 import { isFlatpak } from "./index";
 import { bringToFront } from "./bring-to-front";
 import { bridge } from "../api/bridge";
+import { strings } from "@notesnook/intl";
 
 let tray: Tray | undefined = undefined;
 export function destroyTray() {
@@ -42,7 +43,7 @@ export function setupTray() {
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: "Show app",
+      label: strings.showApp(),
       type: "normal",
       icon: isFlatpak()
         ? undefined
@@ -51,7 +52,7 @@ export function setupTray() {
     },
     { type: "separator" },
     {
-      label: "New note",
+      label: strings.newNote(),
       type: "normal",
       icon: isFlatpak()
         ? undefined
@@ -62,7 +63,7 @@ export function setupTray() {
       }
     },
     {
-      label: "New notebook",
+      label: strings.newNotebook(),
       type: "normal",
       icon: isFlatpak()
         ? undefined
@@ -74,7 +75,7 @@ export function setupTray() {
     },
     { type: "separator" },
     {
-      label: "Quit",
+      label: strings.quit(),
       icon: isFlatpak()
         ? undefined
         : AssetManager.icon("quit", { size: trayIconSize }),

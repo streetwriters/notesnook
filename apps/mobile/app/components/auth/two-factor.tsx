@@ -77,7 +77,7 @@ const TwoFactorVerification = ({
   const onNext = async () => {
     if (!code.current || code.current.length < 6) {
       setError(
-        new Error("Please provide a valid multi-factor authentication code.")
+        new Error(strings.validMfaCodeRequired())
       );
       return;
     }

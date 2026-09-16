@@ -238,7 +238,7 @@ export async function uploadFile(
       );
       if (status !== "granted") {
         ToastManager.show({
-          message: `The permission to show file upload notification was disallowed by the user.`,
+          message: strings.fileUploadNotificationPermissionDisallowed(),
           type: "info"
         });
       }

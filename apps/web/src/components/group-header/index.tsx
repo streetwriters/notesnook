@@ -44,6 +44,7 @@ import {
   GroupingKey
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { formatGroupTitle } from "@notesnook/common";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import type { Context } from "../list-container/types";
 
@@ -333,7 +334,7 @@ function GroupHeader(props: GroupHeaderProps) {
 
         const groupItems = await groups();
         const items: MenuItem[] = groupItems.map(({ group, index }) => {
-          const groupTitle = group.title.toString();
+          const groupTitle = formatGroupTitle(group.title.toString());
           return {
             type: "button",
             key: groupTitle,
@@ -386,7 +387,7 @@ function GroupHeader(props: GroupHeaderProps) {
           color: title === "Conflicted" ? "error" : "accent"
         }}
       >
-        {title.toUpperCase()}
+        {formatGroupTitle(title).toUpperCase()}
       </Text>
 
       {index === 0 && (

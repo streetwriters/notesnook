@@ -185,7 +185,7 @@ const staticCommands: Command[] = [
   },
   {
     id: "keyboard-shortcuts",
-    title: "Keyboard shortcuts",
+    title: strings.keyboardShortcuts(),
     icon: ArrowTopRight,
     action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),

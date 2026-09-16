@@ -190,7 +190,7 @@ function EditorProperties(props: EditorPropertiesProps) {
             data-test-id="general-section"
             sx={{ flexDirection: "column", gap: 1 }}
           >
-            <Section title="Properties">
+            <Section title={strings.properties()}>
               <Flex sx={{ flexDirection: "column", gap: 1, px: 2, pt: 1 }}>
                 {session.type === "deleted" ||
                 session.type === "diff" ? null : (

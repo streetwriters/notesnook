@@ -115,13 +115,13 @@ const sectionGroups: SectionGroup[] = [
       },
       {
         key: "circle",
-        title: "Notesnook Circle",
+        title: strings.notesnookCircle(),
         icon: CircleEmpty,
         isHidden: () => !useUserStore.getState().isLoggedIn
       },
       {
         key: "inbox",
-        title: "Inbox",
+        title: strings.inbox(),
         icon: Inbox,
         isHidden: () => !useUserStore.getState().isLoggedIn
       }

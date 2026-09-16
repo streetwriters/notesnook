@@ -297,7 +297,7 @@ export const SideMenuTags = () => {
             }}
           >
             <TextInput
-              placeholder="Filter tags..."
+              placeholder={strings.filterTags()}
               style={{
                 fontFamily: "Inter-Regular",
                 fontSize: AppFontSize.xs,
