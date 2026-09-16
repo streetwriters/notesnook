@@ -46,9 +46,9 @@ const TRANSACTION_STATUS = {
 };
 
 const REMINDER_NOTIFICATION_MODES = {
-  Silent: () => t`Silent`,
-  Vibrate: () => t`Vibrate`,
-  Urgent: () => t`Urgent`
+  Silent: () => strings.silent(),
+  Vibrate: () => strings.vibrate(),
+  Urgent: () => strings.urgent()
 };
 
 export const strings = {
@@ -61,8 +61,8 @@ export const strings = {
       one: `# note`,
       other: `# notes`
     }),
-  downloading: () => t`Downloading`,
-  uploading: () => t`Uploading`,
+  downloading: () => strings.network.downloading(),
+  uploading: () => strings.network.uploading(),
   networkProgress: (type: "upload" | "download" | "sync") =>
     select(type, {
       upload: "Uploading",
@@ -207,7 +207,7 @@ export const strings = {
       tag: "No tags",
       note: "No notes"
     }),
-  untitledNote: () => t`Untitled`,
+  untitledNote: () => strings.untitled(),
   newNote: () => t`New note`,
   exportingNotes: (status?: string) =>
     t`${status ? status : "Exporting notes"}`,
@@ -1103,7 +1103,7 @@ $day$: Current day (eg. Monday)`,
       t`This must only be used for troubleshooting. Using it regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`
     ].join("\n"),
   forceSyncNotice: () =>
-    `This must only be used for troubleshooting. Using this regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
+    t`This must only be used for troubleshooting. Using this regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
   forcePushChanges: () => t`Force push changes`,
   forcePushChangesDesc: () =>
     [
@@ -2477,7 +2477,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   fontLigaturesDesc: () =>
     t`Enable ligatures for common symbols like →, ←, etc`,
   expandSidebar: () => t`Expand sidebar`,
-  viewAllLimits: () => `View all limits`,
+  viewAllLimits: () => t`View all limits`,
   freePlan: () => t`Free plan`,
   proPlan: () => t`Pro plan`,
   essentialPlan: () => t`Essential plan`,
@@ -2898,5 +2898,279 @@ Continue without attachments?`,
   featureNotAvailableOnPlan: (feature: string) =>
     t`${feature} is not available on this plan.`,
   reachedLimitOf: (limit: number | string, feature: string) =>
-    t`You have reached your limit of ${limit} ${feature}.`
+    t`You have reached your limit of ${limit} ${feature}.`,
+  abstract: () => t`Abstract`,
+  hint: () => t`Hint`,
+  info: () => t`Info`,
+  success: () => t`Success`,
+  example: () => t`Example`,
+  failedToDownloadImage: (error: string) =>
+    t`Failed to download image: ${error}.`,
+  imagePrivacyNotice: () =>
+    t`To protect your privacy, we will download the image & add it to your attachments.`,
+  embedIframeRequired: () => t`Embed code must include an iframe.`,
+  embedIframeSrcRequired: () =>
+    t`Embed code must include an iframe with an src attribute.`,
+  invalidUrl: () => t`Please provide a valid url.`,
+  invalidEmbedUrl: () => t`Please provide a valid embed url.`,
+  javascriptNotSupported: () =>
+    t`Embedding javascript code is not supported.`,
+  browserAudioNotSupported: () =>
+    t`Your browser does not support the audio element.`,
+  failedToLoadWebClip: () => t`Failed to load web clip`,
+  loadingWebClip: (progress: number | string) =>
+    t`Loading web clip (${progress}%)`,
+  anErrorOccurred: () => t`An error occurred.`,
+  reportError: () => t`Report error`,
+  reloadEditorBtn: () => t`Reload editor`,
+  decimal: () => t`Decimal`,
+  upperAlpha: () => t`Upper alpha`,
+  lowerAlpha: () => t`Lower alpha`,
+  upperRoman: () => t`Upper Roman`,
+  lowerRoman: () => t`Lower Roman`,
+  lowerGreek: () => t`Lower Greek`,
+  recent: () => t`Recent`,
+  lastWeek: () => t`Last week`,
+  older: () => t`Older`,
+  conflicted: () => t`Conflicted`,
+  upcoming: () => t`Upcoming`,
+  last: () => t`Last`,
+  today: () => t`Today`,
+  tomorrow: () => t`Tomorrow`,
+  yesterday: () => t`Yesterday`,
+  ongoing: () => t`Ongoing`,
+  snoozedUntil: (time: string) => t`Snoozed until ${time}`,
+  noteRestoredFromTrash: () => t`Note restored from trash`,
+  notebookRestoredFromTrash: () => t`Notebook restored from trash`,
+  colors: () => t`Colors`,
+  activeReminders: () => t`Active reminders`,
+  shortcuts: () => t`Shortcuts`,
+  downloadingFiles: () => t`Downloading files`,
+  backupInProgress: () => t`Backup in progress...`,
+  preparingBackup: () => t`Preparing backup...`,
+  creatingBackupZip: () => t`Creating backup zip file...`,
+  legacyBackup: () => t`Legacy backup`,
+  failedToOpenZipFile: () => t`Failed to open zip file`,
+  exportingNotesCount: (current: number, total: number) =>
+    t`Exporting notes (${current}/${total})`,
+  downloadingAttachmentsCount: (current: number) =>
+    t`Downloading attachments (${current})`,
+  creatingZip: () => t`Creating zip`,
+  settingUpAccount: () => t`Setting up your account...`,
+  accountAlmostReady: () =>
+    t`Your account is almost ready, please wait...`,
+  freePlanDesc: () => t`Basic features for personal use`,
+  essentialPlanDesc: () =>
+    t`Unlocks essential features for personal use`,
+  proPlanDesc: () => t`Unlocks all features for professional use`,
+  believerPlanDesc: () =>
+    t`Become a believer and support the project`,
+  migratingData: () => t`Migrating Data`,
+  migratingDataDesc: () => t`Please wait while we migrate your data`,
+  restoringAttachmentsCount: (current: number, total: number) =>
+    t`Restoring attachments (${current}/${total})`,
+  warn: () => t`Warn`,
+  active: () => t`Active`,
+  inactive: () => t`Inactive`,
+  maximumFileSize: () => t`Maximum file size`,
+  fullQualityImages: () => t`Full quality images`,
+  blockLevelNoteLinks: () => t`Block-level note links`,
+  customizableSidebar: () => t`Customizable sidebar`,
+  decryptingNotes: () => t`Decrypting your notes`,
+  migratingDatabaseNotice: () =>
+    t`Migrating database. This might take a while.`,
+  createTagTitle: (name: string) => t`Create "${name}" tag`,
+  unlockFeatureToday: () => t`Unlock this feature today`,
+  selectAPlan: () => t`Select a plan`,
+  selectPlan: () => t`Select plan`,
+  oneSubscriptionLifetimeNotes: () =>
+    t`One subscription for a lifetime of notes.`,
+  getStartedWithoutCompromise: () => t`Get started without compromise.`,
+  coreFeaturesMinusFluff: () => t`All the core features, minus the fluff.`,
+  levelUpMoreStorage: () => t`Level up with more storage.`,
+  supportMissionUnlockEverything: () =>
+    t`Support the mission - unlock everything.`,
+  fiveYear: () => t`5 year`,
+  mostPopular: () => t`Most popular`,
+  youAreOnThisPlan: () => t`You are on this plan.`,
+  startYourFreeTrial: () => t`Start your free trial`,
+  compareAllPlans: () => t`Compare all plans`,
+  dayMoneyBackGuarantee: (days: number) =>
+    t`${days}-day money-back guarantee.`,
+  validMfaCodeRequired: () =>
+    t`Please provide a valid multi-factor authentication code.`,
+  notebookIdCopied: () => t`Notebook ID copied to clipboard`,
+  tagIdCopied: () => t`Tag ID copied to clipboard`,
+  trialOngoingStartsOn: (date: string) =>
+    t`Your free trial is on-going. Your subscription will start on ${date}.`,
+  subExpiresOn: (date: string) => t`Your subscription will expire on ${date}.`,
+  subAutoRenewsOn: (date: string) =>
+    t`Your subscription will auto renew on ${date}.`,
+  accountDowngradesFreeOn: (date: string) =>
+    t`Your account will automatically downgrade to the Free plan on ${date}.`,
+  changeSubPlan: () => t`Change your subscription plan.`,
+  refundSub: () => t`Refund subscription`,
+  requestingRefundForSub: () =>
+    t`Requesting refund for your subscription`,
+  inbox: () => t`Inbox`,
+  lockAppAfter: () => t`Lock app after`,
+  nMinutes: (n: number) => t`${n} minutes`,
+  nMinute: (n: number) => t`${n} minute`,
+  nHour: (n: number) => t`${n} hour`,
+  disc: () => t`Disc`,
+  circle: () => t`Circle`,
+  square: () => t`Square`,
+  monospace: () => t`Monospace`,
+  sansSerif: () => t`Sans-serif`,
+  serif: () => t`Serif`,
+  failedToReportIssueOnGithub: () => t`Failed to report issue on github`,
+  noteToAppendDeleted: () =>
+    t`The note you are trying to append to has been deleted.`,
+  noActiveSubscriptionFound: () => t`No active subscription found`,
+  errorCopyingFile: () => t`Error copying file`,
+  couldNotSaveTableToCsv: () => t`Could not save table to csv`,
+  fileUploadNotificationPermissionDisallowed: () =>
+    t`The permission to show file upload notification was disallowed by the user.`,
+  subNotebooks: () => t`Sub notebooks`,
+  plainText: () => t`Plain text`,
+  webClip: () => t`Web clip`,
+  loadingClip: () => t`Loading clip...`,
+  saveNote: () => t`Save note`,
+  tapToRemoveAttachment: () => t`Tap to remove an attachment.`,
+  compressImagesRecommended: () => t`Compress image(s) (recommended)`,
+  preparingWebClip: () => t`Preparing web clip...`,
+  clipMode: () => t`Clip Mode:`,
+  addMore: () => t`Add more`,
+  selectANote: () => t`Select a note`,
+  deletingAccount: () => t`Deleting account`,
+  deletingAccountDesc: () => t`Please wait while we delete your account`,
+  tableSavedToCsv: () => t`Table saved to csv`,
+  wrappedYear: (year: number | string) => t`Wrapped ${year} 🎉`,
+  yourYearWrapped: (year: number | string) => t`Your ${year} Wrapped`,
+  letsLookBackAtYourYearInNotesnook: () =>
+    t`Let's look back at your year in Notesnook`,
+  youCreated: () => t`You created`,
+  notesThisYear: () => t`notes this year`,
+  wrappedNotesSubtext: () =>
+    t`ideas, thoughts, memories. 100% encrypted. 100% yours.`,
+  youWroteATotalOf: () => t`You wrote a total of`,
+  wordsThisYear: () => t`words this year`,
+  thatsAlmostTheLengthOfAShortNovel: () =>
+    t`That's almost the length of a short novel!`,
+  yourMostProductiveMonthWas: () => t`Your most productive month was`,
+  yourFavoriteDayToWriteWas: () => t`Your favorite day to write was`,
+  notesPerMonth: () => t`Notes per month`,
+  wordsWritten: () => t`Words written`,
+  funFactsOfTheYear: () => t`Fun facts of the year`,
+  generatedLocallyOnDevice: () => t`Generated 100% locally on your device.`,
+  shareWithFriendsButton: () => t`Share with friends`,
+  // Reminders
+  silent: () => t`Silent`,
+  vibrate: () => t`Vibrate`,
+  urgent: () => t`Urgent`,
+
+  // Buy Dialog & Plans
+  orderSummary: () => t`Order summary`,
+  enterDiscountCode: () => t`Enter discount code`,
+  addDiscount: () => t`Add discount`,
+  confirmPlanChange: () => t`Confirm plan change`,
+  changingSubscriptionPlan: () => t`Changing subscription plan`,
+  changingSubscriptionPlanWait: () =>
+    t`Please wait while we change your subscription plan...`,
+  subscriptionChangedSuccessfully: () =>
+    t`Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app.`,
+  planMetadataFree: () => t`Free`,
+  planMetadataEssential: () => t`Essential`,
+  planMetadataPro: () => t`Pro`,
+  planMetadataBeliever: () => t`Believer`,
+  planMetadataEducation: () => t`Education`,
+  planMetadataProLegacy: () => t`Pro (legacy)`,
+
+  // Subscription Settings
+  autoRenew: () => t`Auto renew`,
+  autoRenewDesc: () =>
+    t`Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period.`,
+  cancelTrialQuestion: () => t`Cancel trial?`,
+  cancelTrialDesc: () =>
+    t`Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.`,
+  cancellingYourTrial: () => t`Cancelling your trial`,
+  trialCanceled: () => t`Your trial has been canceled.`,
+  requestRefundQuestion: () => t`Request refund?`,
+  requestRefundDesc: () =>
+    t`You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.`,
+  reasonForRefund: () => t`Reason for refund`,
+
+  // Status Bar
+  allChangesSynced: () => t`All changes are synced.`,
+  syncingNotes: () => t`Syncing your notes...`,
+  resolveConflictsAndResync: () =>
+    t`Please resolve all merge conflicts and run the sync again.`,
+  confirmEmailToSync: () => t`Please confirm your email to start syncing.`,
+  syncFailedTryAgain: () => t`Sync failed to complete. Please try again.`,
+  youAreOffline: () => t`You are offline.`,
+  syncIsDisabled: () => t`Sync is disabled.`,
+  clickToSync: () => t`click to sync`,
+  mergeConflicts: () => t`Merge conflicts`,
+
+  // Importer
+  importUnsuccessful: () => t`Import unsuccessful`,
+  failedToImportSelectedFiles: () =>
+    t`We failed to import the selected files. Please try again.`,
+  selectNotesAppToImportFrom: () => t`Select a notes app to import from`,
+  selectNotesApp: () => t`Select notes app`,
+  cantFindNotesApp: () => t`Can't find your notes app in the list?`,
+  sendUsARequest: () => t`Send us a request.`,
+  foundNotes: (count: number) => t`Found ${count} notes`,
+
+  // Checkout, Recovery & Navigation
+  startYourJourney: () => t`Start your journey`,
+  goBackToApp: () => t`Go back to app`,
+  recoveryKeyRequired: () =>
+    t`Recovery key is required to reset password.`,
+  failedToResetUser: () => t`Failed to reset user.`,
+  couldNotResetAccountPassword: () =>
+    t`Could not reset account password.`,
+
+  // Settings & Formats
+  markdownFrontmatter: () => t`Markdown + Frontmatter`,
+  dayFormatShort: () => t`Short (Mon, Tue)`,
+  dayFormatLong: () => t`Long (Monday, Tuesday)`,
+  sunday: () => t`Sunday`,
+  monday: () => t`Monday`,
+  disableInboxApi: () => t`Disable Inbox API`,
+  disableInboxApiWarning: () =>
+    t`Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?`,
+  createInboxApiKeyDescription: () =>
+    t`The API key allows you to access NN's inbox functionality.`,
+  changingReleaseTrack: () => t`Changing release track`,
+  changingReleaseTrackWait: () =>
+    t`Please wait while we switch to the new release track...`,
+  deletingTags: () => t`Deleting tags`,
+  attachmentNotFound: () => t`Attachment not found.`,
+  unknownError: () => t`Unknown error.`,
+  billedAt: () => t`Billed at`,
+  invoice: () => t`Invoice`,
+  gettingInvoice: () => t`Getting invoice`,
+  mightTakeMinuteOrTwo: () => t`This might take a minute or two.`,
+  keyboardShortcuts: () => t`Keyboard shortcuts`,
+
+  // Desktop
+  showApp: () => t`Show app`,
+  degradedPerformanceWarning: () => t`Degraded Performance Warning`,
+  arm64TranslationWarning: () =>
+    t`Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website.`,
+  backupDirMigrationFailed: () => t`Backup Directory Migration Failed`,
+  backupDirMigrationFailedDesc: () =>
+    t`Failed to migrate backup directory. It has been reset to default.`,
+  setBackupDir: () => t`Set backup directory`,
+  pathNotFound: () => t`Path not found`,
+  pathDoesNotExist: (path: string) => t`The path does not exist:\n${path}`,
+  quickActions: () => t`Quick actions`,
+  createNewNotebook: () => t`Create a new notebook`,
+  addNewReminder: () => t`Add a new reminder`,
+
+  ignore: () => t`Ignore`,
+  quit: () => t`Quit`,
+  confirm: () => t`Confirm`,
+  generating: () => t`Generating...`
 };
