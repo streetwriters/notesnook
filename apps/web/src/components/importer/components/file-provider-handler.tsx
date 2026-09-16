@@ -168,7 +168,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           Processing {filesProgress.done} of {filesProgress.total} file(s)
         </Text>
         <Text variant="body" sx={{ mt: 4, textAlign: "center" }}>
-          Found {totalNoteCount} notes
+          {strings.foundNotes(totalNoteCount)}
         </Text>
         {logs.current.length > 0 && (
           <Accordion
@@ -298,7 +298,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
                     return _files;
                   });
                 }}
-                title="Click to remove"
+                title={strings.clickToRemove()}
               >
                 <Text variant="body">{file.name}</Text>
                 <Text variant="body">{formatBytes(file.size)}</Text>

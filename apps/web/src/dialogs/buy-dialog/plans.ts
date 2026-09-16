@@ -25,36 +25,48 @@ import { usePromise } from "@notesnook/common";
 
 export const PLAN_METADATA: PlanMetadata = {
   [SubscriptionPlan.FREE]: {
-    title: "Free",
+    get title() {
+      return strings.planMetadataFree();
+    },
     get subtitle() {
       return strings.getStartedWithoutCompromise();
     }
   },
   [SubscriptionPlan.ESSENTIAL]: {
-    title: "Essential",
+    get title() {
+      return strings.planMetadataEssential();
+    },
     get subtitle() {
       return strings.coreFeaturesMinusFluff();
     }
   },
   [SubscriptionPlan.PRO]: {
-    title: "Pro",
+    get title() {
+      return strings.planMetadataPro();
+    },
     get subtitle() {
       return strings.levelUpMoreStorage();
     },
     recommended: true
   },
   [SubscriptionPlan.BELIEVER]: {
-    title: "Believer",
+    get title() {
+      return strings.planMetadataBeliever();
+    },
     get subtitle() {
       return strings.supportMissionUnlockEverything();
     }
   },
   [SubscriptionPlan.EDUCATION]: {
-    title: "Education",
+    get title() {
+      return strings.planMetadataEducation();
+    },
     subtitle: ""
   },
   [SubscriptionPlan.LEGACY_PRO]: {
-    title: "Pro (legacy)",
+    get title() {
+      return strings.planMetadataProLegacy();
+    },
     subtitle: ""
   }
 };
