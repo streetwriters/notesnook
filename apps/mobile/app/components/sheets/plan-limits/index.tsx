@@ -125,8 +125,7 @@ export function PlanLimits() {
               user?.subscription.productId?.includes("5year")
             ) {
               ToastManager.show({
-                message:
-                  "You have made a one time purchase. To change your plan please contact support.",
+                message: strings.contactSupportToChangePlan(),
                 type: "info",
                 context: "local"
               });

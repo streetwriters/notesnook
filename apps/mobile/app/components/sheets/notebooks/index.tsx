@@ -160,7 +160,7 @@ export const Notebooks = (props: {
         }}
       >
         <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-          Sub notebooks
+          {strings.subNotebooks()}
         </Paragraph>
 
         <IconButton

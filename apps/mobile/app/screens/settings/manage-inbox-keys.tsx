@@ -602,7 +602,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
                 size={AppFontSize.xxs}
                 style={{ fontWeight: "bold" }}
               >
-                EXPIRED
+                {strings.expired().toUpperCase()}
               </Paragraph>
             </View>
           )}

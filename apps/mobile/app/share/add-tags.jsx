@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React from "react";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import { Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -67,7 +68,7 @@ export const AddTags = ({ onPress }) => {
               }}
               allowFontScaling={false}
             >
-              Add tags
+              {strings.addTags()}
             </Text>
           </View>
         </>
@@ -100,7 +101,7 @@ export const AddTags = ({ onPress }) => {
             key="$add-tag"
           >
             <Icon name="plus" size={17} />
-            Add tag
+            {" "}{strings.addTag()}
           </Text>
         </View>
       )}
