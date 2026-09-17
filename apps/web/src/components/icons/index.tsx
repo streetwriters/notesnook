@@ -287,6 +287,7 @@ import LightningSvg from "@notesnook/icons/lightning.svg?react";
 import ArrowLeftSvg from "@notesnook/icons/arrow-left.svg?react";
 import CheckCircleSuccesSvg from "@notesnook/icons/check-circle-success.svg?react";
 import InfoSvg from "@notesnook/icons/info.svg?react";
+import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -707,3 +708,4 @@ export const Lightning = createSvgIcon(LightningSvg);
 export const ArrowLeft = createSvgIcon(ArrowLeftSvg);
 export const CheckCircleSuccess = createSvgIcon(CheckCircleSuccesSvg);
 export const Info = createSvgIcon(InfoSvg);
+export const CalendarDots = createSvgIcon(CalendarDotsSvg);

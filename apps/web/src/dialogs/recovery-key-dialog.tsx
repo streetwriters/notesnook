@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useState } from "react";
-import { Text, Flex, Button } from "@theme-ui/components";
+import { Text, Flex, Button, Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { db } from "../common/db";
 import Logo from "../assets/notesnook-logo.png";
@@ -26,11 +26,9 @@ import { writeText } from "clipboard-polyfill";
 import { Suspense } from "react";
 import Config from "../utils/config";
 import FileSaver from "file-saver";
-import { ErrorText } from "../components/error-text";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { usePromise } from "@notesnook/common";
 import { Loader } from "../components/loader";
-import { showToast } from "../utils/toast";
 import { strings } from "@notesnook/intl";
 import {
   Copy,
@@ -47,14 +45,16 @@ export const RecoveryKeyDialog = DialogManager.register(
     const key = usePromise(() =>
       db.user.getMasterKey().then((key) => key?.key)
     );
-    const [copyText, setCopyText] = useState("Copy to clipboard");
 
     return (
       <Dialog
         testId="recovery-key-dialog"
         isOpen={true}
         title={strings.saveRecoveryKey()}
-        width={400}
+        description={
+          "Save your account recovery key in a safe place. You will need it to recover your account in case you forget your password"
+        }
+        width={500}
         positiveButton={{
           text: strings.keyBackedUp(),
           onClick: () => {
@@ -63,117 +63,16 @@ export const RecoveryKeyDialog = DialogManager.register(
           }
         }}
       >
-        {key.status !== "fulfilled" ? (
-          <Loader title={strings.gettingEncryptionKey()} />
-        ) : (
-          <Flex sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}>
-            <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
-              <ErrorText error={strings.saveRecoveryKeyDesc()} mt={0} />
-              <Text
-                data-test-id="recovery-key"
-                className="selectable"
-                mt={2}
-                bg="var(--background-secondary)"
-                p={2}
-                sx={{
-                  borderRadius: "default",
-                  overflowWrap: "anywhere",
-                  fontSize: "body",
-                  fontFamily: "monospace",
-                  color: "paragraph"
-                }}
-              >
-                {key.value}
-              </Text>
-              <Flex
-                mt={4}
-                sx={{ alignItems: "center", justifyContent: "space-around" }}
-              >
-                <Suspense fallback={<div />}>
-                  <QRCode
-                    value={key.value}
-                    logoImage={Logo}
-                    logoWidth={40}
-                    logoHeight={40}
-                    ecLevel={"M"}
-                  />
-                </Suspense>
-                <Flex sx={{ flexDirection: "column" }}>
-                  <Button
-                    variant="secondary"
-                    mt={1}
-                    className="copyKey"
-                    onClick={async () => {
-                      if (!key.value)
-                        return showToast(
-                          "error",
-                          strings.noEncryptionKeyFound()
-                        );
-
-                      writeText(key.value)
-                        .then(() => {
-                          setCopyText("Copied!");
-                          setTimeout(() => {
-                            setCopyText("Copy to clipboard");
-                          }, 2000);
-                        })
-                        .catch((e) => {
-                          console.error("Error while copying text.", e);
-                        });
-                    }}
-                    sx={{ fontSize: "body" }}
-                  >
-                    {copyText}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    mt={1}
-                    onClick={async () => {
-                      const email = await db.user
-                        .getUser()
-                        .then((user) => user?.email || "user");
-                      const qrcode = document.getElementById(
-                        "react-qrcode-logo"
-                      ) as HTMLCanvasElement | null;
-                      qrcode?.toBlob((blob) => {
-                        blob
-                          ? FileSaver.saveAs(
-                              blob,
-                              `${email}-notesnook-recoverykey.png`
-                            )
-                          : null;
-                      });
-                    }}
-                    sx={{ fontSize: "body" }}
-                  >
-                    {strings.saveQRCode()}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    mt={1}
-                    onClick={async () => {
-                      if (!key.value)
-                        return showToast(
-                          "error",
-                          strings.noEncryptionKeyFound()
-                        );
-                      const email = await db.user
-                        .getUser()
-                        .then((user) => user?.email || "user");
-                      FileSaver.saveAs(
-                        new Blob([Buffer.from(key.value)]),
-                        `${email}-notesnook-recoverykey.txt`
-                      );
-                    }}
-                    sx={{ fontSize: "body" }}
-                  >
-                    {strings.network.download()}
-                  </Button>
-                </Flex>
-              </Flex>
-            </Flex>
-          </Flex>
-        )}
+        <Flex
+          sx={{ overflowY: "auto", flexDirection: "column", mb: "spacing7" }}
+        >
+          <Box sx={{ height: "1px", bg: "separator", my: "spacing6" }} />
+          {key.status !== "fulfilled" ? (
+            <Loader title={strings.gettingEncryptionKey()} />
+          ) : (
+            <SaveRecoveryKey recoveryKey={key.value} />
+          )}
+        </Flex>
       </Dialog>
     );
   }

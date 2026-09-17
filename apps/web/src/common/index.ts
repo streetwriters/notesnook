@@ -254,7 +254,7 @@ export async function restoreBackupFile(backupFile: File) {
       if (hasAttachments) {
         const result = await ConfirmDialog.show({
           title: strings.loginToRestoreAttachments(),
-          message: strings.loginToRestoreAttachmentsDesc(),
+          subtitle: strings.loginToRestoreAttachmentsDesc(),
           positiveButtonText: strings.yes(),
           negativeButtonText: strings.no()
         });
@@ -466,7 +466,7 @@ export async function logout() {
       if (
         !(await ConfirmDialog.show({
           title: strings.failedToTakeBackup(),
-          message: strings.failedToTakeBackupMessage(),
+          subtitle: strings.failedToTakeBackupMessage(),
           negativeButtonText: strings.no(),
           positiveButtonText: strings.yes()
         }))

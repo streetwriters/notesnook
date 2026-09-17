@@ -60,7 +60,7 @@ function Trash() {
             title: strings.clearTrash(),
             positiveButtonText: strings.clear(),
             negativeButtonText: strings.cancel(),
-            message: strings.clearTrashDesc()
+            subtitle: strings.clearTrashDesc()
           }).then(async (res) => {
             if (res) {
               try {

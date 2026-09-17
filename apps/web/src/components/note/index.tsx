@@ -644,9 +644,9 @@ export const noteMenuItems: (
           note.localOnly ||
           (await ConfirmDialog.show({
             title: strings.syncOffConfirm(ids.length),
-            message: strings.syncOffDesc(ids.length),
-            positiveButtonText: strings.yes(),
-            negativeButtonText: strings.no()
+            subtitle: strings.syncOffDesc(ids.length),
+            positiveButtonText: strings.continue(),
+            negativeButtonText: strings.cancel()
           }))
         )
           await store.localOnly(!note.localOnly, ...ids);
