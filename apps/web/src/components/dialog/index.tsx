@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, ButtonProps, Flex, Text } from "@theme-ui/components";
+import { Button, ButtonProps, Flex, Text, Box } from "@theme-ui/components";
 import { SxProp } from "@theme-ui/core";
 import React from "react";
 import ReactModal from "react-modal";
@@ -34,6 +34,7 @@ type DialogButtonProps = ButtonProps & {
   text: JSX.Element | string;
   loading?: boolean;
   role?: string;
+  variant?: string;
 };
 
 type DialogProps = SxProp & {
@@ -99,7 +100,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
         sx={{
           display: "flex",
           flexDirection: "column",
-          width: ["100%", "90%", props.width || "380px"],
+          width: ["100%", "90%", props.width || "480px"],
           maxHeight: ["100%", "80%", props.height || "70%"],
           height: ["100%", "auto", "auto"],
           bg: "background",
@@ -109,10 +110,10 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           justifyContent: "stretch",
           position: "relative",
           overflow: "hidden",
-          boxShadow: `0px 0px 25px 5px ${
-            theme === "dark" ? "#000000aa" : "#0000004e"
+          boxShadow: `0px 4px 34px 0 ${
+            theme === "dark" ? "000000aa" : "rgba(0, 0, 0, 0.1)"
           }`,
-          borderRadius: "dialog",
+          borderRadius: "radius4",
 
           ...props.sx
         }}
@@ -139,7 +140,11 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           />
         )}
         {props.title || props.description ? (
-          <Flex sx={{ flexDirection: "column" }} p={4} pb={0}>
+          <Flex
+            sx={{ flexDirection: "column", gap: "spacing4" }}
+            p="spacing7"
+            pb={0}
+          >
             {props.title && (
               <Flex
                 sx={{
@@ -154,9 +159,11 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                   variant="heading"
                   data-test-id="dialog-title"
                   sx={{
-                    fontSize: "subheading",
+                    fontSize: "lg",
+                    fontWeight: 600,
+                    lineHeight: "100%",
                     textAlign: props.textAlignment || "left",
-                    color: "paragraph",
+                    color: "heading",
                     overflowWrap: "anywhere",
                     wordSpacing: "wrap"
                   }}
@@ -171,7 +178,9 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                 variant="body"
                 sx={{
                   textAlign: props.textAlignment || "left",
-                  color: "var(--paragraph-secondary)",
+                  color: "paragraph",
+                  fontSize: "md",
+                  lineHeight: 1.4,
                   overflowWrap: "anywhere",
                   wordSpacing: "wrap"
                 }}
@@ -181,10 +190,11 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
             )}
           </Flex>
         ) : null}
+
         {props.noScroll ? (
           <>{props.children}</>
         ) : (
-          <Flex variant="columnFill" sx={{ overflowY: "hidden" }} my={1}>
+          <Flex variant="columnFill" sx={{ overflowY: "hidden" }}>
             <FlexScrollContainer style={{ paddingRight: 20, paddingLeft: 20 }}>
               {props.children}
             </FlexScrollContainer>
@@ -193,16 +203,19 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
 
         {(props.positiveButton || props.negativeButton) && (
           <Flex
-            sx={{ justifyContent: props.buttonsAlignment || "end" }}
-            bg="var(--background-secondary)"
-            p={1}
-            px={2}
-            mt={2}
+            sx={{
+              justifyContent: props.buttonsAlignment || "end",
+              gap: "spacing4"
+            }}
+            bg="background-secondary"
+            p={0}
+            px="spacing7"
+            py="spacing4"
           >
             {props.negativeButton && (
               <DialogButton
                 {...props.negativeButton}
-                color="paragraph"
+                variant={props.negativeButton.variant || "new_tertiary"}
                 data-test-id="dialog-no"
                 role="negative-button"
               />
@@ -210,7 +223,7 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
             {props.positiveButton && (
               <DialogButton
                 {...props.positiveButton}
-                color="accent"
+                variant={props.positiveButton.variant || "new_accent"}
                 data-test-id="dialog-yes"
                 role="positive-button"
               />
@@ -236,7 +249,7 @@ export function DialogButton({
   return (
     <Button
       {...props}
-      variant="dialog"
+      variant={props.variant || "dialog"}
       disabled={disabled}
       onClick={disabled ? undefined : onClick}
       data-role={role}
@@ -244,7 +257,9 @@ export function DialogButton({
         maxWidth: "100%",
         textOverflow: "ellipsis",
         overflow: "hidden",
-        whiteSpace: "nowrap"
+        whiteSpace: "nowrap",
+        px: "spacing8",
+        py: "spacing6"
       }}
     >
       {loading ? <Loading size={16} color="accent" /> : text}

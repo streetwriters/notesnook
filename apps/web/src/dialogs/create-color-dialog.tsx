@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex } from "@theme-ui/components";
+import { Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { useRef } from "react";
@@ -26,6 +26,7 @@ import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
+import { Palette } from "../components/icons";
 
 type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
@@ -67,6 +68,13 @@ export const CreateColorDialog = DialogManager.register(
             });
             props.onClose(colorId || false);
           }}
+          sx={{
+            mt: "spacing6",
+            mb: "spacing7",
+            display: "flex",
+            flexDirection: "column",
+            gap: "spacing4"
+          }}
         >
           <Field
             required
@@ -75,36 +83,73 @@ export const CreateColorDialog = DialogManager.register(
             name="title"
             autoFocus
             data-test-id="title-input"
+            sx={{
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
+            placeholder={strings.enterTitle()}
           />
-          <Flex sx={{ alignItems: "end" }}>
-            <Field
-              inputRef={colorRef}
-              required
-              label={strings.color()}
-              id="color"
-              name="color"
-              data-test-id="color-input"
-              sx={{ flex: 1 }}
-              onChange={(e) => {
-                const color = e.target.value;
-                if (colorPickerRef.current && validateHexColor(color))
-                  colorPickerRef.current.value = color;
-              }}
-            />
-            <input
-              ref={colorPickerRef}
-              type="color"
-              style={{
-                height: 41,
-                backgroundColor: "transparent",
-                border: "1px solid var(--border)",
-                borderRadius: 5
-              }}
-              onChange={(e) => {
-                if (colorRef.current) colorRef.current.value = e.target.value;
-              }}
-            />
-          </Flex>
+          <Field
+            inputRef={colorRef}
+            required
+            label={strings.color()}
+            id="color"
+            name="color"
+            data-test-id="color-input"
+            placeholder="Select color"
+            onChange={(e) => {
+              const color = e.target.value;
+              if (colorPickerRef.current && validateHexColor(color))
+                colorPickerRef.current.value = color;
+            }}
+            rightActions={[
+              {
+                component: (
+                  <Box
+                    sx={{
+                      position: "relative",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 40,
+                      height: "100%"
+                    }}
+                  >
+                    <Palette size={15} />
+                    <input
+                      ref={colorPickerRef}
+                      type="color"
+                      aria-label={strings.color()}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0,
+                        cursor: "pointer",
+                        borderRadius: "10px"
+                      }}
+                      onChange={(e) => {
+                        if (colorRef.current)
+                          colorRef.current.value = e.target.value;
+                      }}
+                    />
+                  </Box>
+                ),
+                sx: { px: 0 }
+              }
+            ]}
+            sx={{
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
+          />
         </Box>
       </Dialog>
     );

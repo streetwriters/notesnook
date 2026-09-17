@@ -99,6 +99,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
             setIsLoading(false);
           }
         }}
+        sx={{ mb: "spacing7" }}
       >
         {message ? (
           <Text
@@ -110,6 +111,14 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
         {Object.entries<FieldProps>(inputs).map(([id, input], index) => (
           <Field
             autoFocus={index === 0}
+            sx={{
+              mt: "spacing7",
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
             {...input}
             key={id}
             id={id}
@@ -117,6 +126,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
             data-test-id={id}
             required
             type="password"
+            placeholder={strings.enterYourPassword()}
           />
         ))}
 
