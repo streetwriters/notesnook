@@ -273,7 +273,10 @@ export const FailedInboxItems = () => {
               alignItems: "center"
             }}
           >
-            <Paragraph color={colors.secondary.paragraph}>
+            <Paragraph
+              color={colors.secondary.paragraph}
+              style={{ textAlign: "center" }}
+            >
               {strings.noFailedInboxItems()}
             </Paragraph>
           </View>

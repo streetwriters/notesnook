@@ -242,7 +242,8 @@ export default function NoteHistory({
         size={AppFontSize.xs}
         color={colors.secondary.paragraph}
         style={{
-          alignSelf: "center"
+          textAlign: "center",
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {strings.noteHistoryNotice[0]()}{" "}
