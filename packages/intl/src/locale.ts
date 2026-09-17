@@ -37,17 +37,15 @@ export function resolveTargetLocale(
   return getSupportedLocale(systemLocale);
 }
 
-const mobileMap = mobileLocaleMap as Record<string, () => Messages>;
-
 function getLocaleMessagesSync(lang: string): Messages {
-  const loader = mobileMap[lang] || mobileMap.en;
+  const loader = mobileLocaleMap[lang] || mobileLocaleMap.en;
   return loader();
 }
 
 async function getLocaleMessages(lang: string): Promise<Messages> {
   const loader = webLocaleMap[lang] || webLocaleMap.en;
   const mod = await loader();
-  return ("default" in mod ? mod.default.messages : mod.messages) as Messages;
+  return "default" in mod ? mod.default.messages : mod.messages;
 }
 
 export type InitLocaleOptions = {
