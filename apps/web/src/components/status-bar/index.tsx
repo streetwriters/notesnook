@@ -39,7 +39,7 @@ import { useAutoUpdater, UpdateStatus } from "../../hooks/use-auto-updater";
 import useStatus, { statusToString } from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
-import { getTimeAgo, toTitleCase } from "@notesnook/common";
+import { getTimeAgo } from "@notesnook/common";
 import { User } from "@notesnook/core";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
 import { strings } from "@notesnook/intl";
@@ -306,7 +306,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     icon: Sync,
     text: ({ lastSynced }) =>
       lastSynced
-        ? `Synced ${getTimeAgo(lastSynced, "en_short", { minInterval: 1000 })}`
+        ? `${strings.synced()} ${getTimeAgo(lastSynced, "short", { minInterval: 1000 })}`
         : strings.clickToSync(),
     tooltip: () => strings.allChangesSynced()
   },
@@ -315,7 +315,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     isActive: (syncStatus) => syncStatus === "syncing",
     icon: Sync,
     loading: true,
-    text: ({ type }) => `${toTitleCase(type || "sync")}ing`,
+    text: ({ type }) => strings.networkProgress(type || "sync"),
     tooltip: () => strings.syncingNotes()
   },
   {
@@ -347,9 +347,11 @@ const syncStatusFilters: SyncStatusFilter[] = [
     isActive: (syncStatus) => syncStatus === "offline",
     icon: SyncOff,
     text: ({ lastSynced }) =>
-      `Synced ${getTimeAgo(lastSynced, "en_short", {
-        minInterval: 1000
-      })} (offline)`,
+      lastSynced
+        ? `${strings.synced()} ${getTimeAgo(lastSynced, "short", {
+            minInterval: 1000
+          })} (${strings.offline()})`
+        : `${strings.clickToSync()} (${strings.offline()})`,
     tooltip: () => strings.youAreOffline()
   },
   {
