@@ -56,7 +56,9 @@ export const BehaviourSettings: SettingsGroup[] = [
               let systemLocale = "en";
               try {
                 systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-              } catch (e) { }
+              } catch (e) {
+                // ignore
+              }
               const effectiveCurrent =
                 currentLang || getSupportedLocale(systemLocale);
               if (value === effectiveCurrent) return;
@@ -72,9 +74,8 @@ export const BehaviourSettings: SettingsGroup[] = [
                 useSettingStore.getState().setAppLanguage(value);
                 if (IS_DESKTOP_APP && desktop) {
                   await desktop.integration.setAppLanguage.mutate(value);
-                } else {
-                  window.location.reload();
                 }
+                window.location.reload();
               }
             },
             selectedOption: () => {
@@ -82,7 +83,9 @@ export const BehaviourSettings: SettingsGroup[] = [
               let systemLocale = "en";
               try {
                 systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-              } catch (e) { }
+              } catch (e) {
+                // ignore
+              }
               return saved || getSupportedLocale(systemLocale);
             },
             options: AVAILABLE_LANGUAGES.map((l) => ({
