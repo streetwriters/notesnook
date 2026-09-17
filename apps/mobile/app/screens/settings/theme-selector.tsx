@@ -540,17 +540,23 @@ function ThemeSelector() {
                 height: 100,
                 width: "100%",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
             >
               {themes.isLoading ? (
                 <ActivityIndicator color={colors.primary.accent} />
               ) : searchQuery ? (
-                <Paragraph color={colors.secondary.paragraph}>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  style={{ textAlign: "center" }}
+                >
                   {strings.noResultsForSearch(searchQuery)}
                 </Paragraph>
               ) : (
-                <Paragraph>{strings.noThemesFound()}.</Paragraph>
+                <Paragraph style={{ textAlign: "center" }}>
+                  {strings.noThemesFound()}.
+                </Paragraph>
               )}
             </View>
           }
@@ -560,11 +566,15 @@ function ThemeSelector() {
                 height: 100,
                 width: "100%",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
             >
               {themes.isError ? (
-                <Paragraph color={colors.error.paragraph}>
+                <Paragraph
+                  color={colors.error.paragraph}
+                  style={{ textAlign: "center" }}
+                >
                   {strings.errorLoadingThemes()}. {themes.error.message}.
                 </Paragraph>
               ) : (themes.isLoading || themes.isFetching) &&
