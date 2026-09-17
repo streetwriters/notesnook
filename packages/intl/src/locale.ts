@@ -37,25 +37,15 @@ export function resolveTargetLocale(
   return getSupportedLocale(systemLocale);
 }
 
-const localeCache: Record<string, Messages> = {};
-const localeCatalogs: Record<string, Messages> = {};
+const mobileMap = mobileLocaleMap as Record<string, () => Messages>;
 
-for (const locale of Object.keys(mobileLocaleMap)) {
-  Object.defineProperty(localeCatalogs, locale, {
-    enumerable: true,
-    get() {
-      if (!localeCache[locale]) {
-        localeCache[locale] = (
-          mobileLocaleMap as Record<string, () => Messages>
-        )[locale]();
-      }
-      return localeCache[locale];
-    }
-  });
+function getLocaleMessagesSync(lang: string): Messages {
+  const loader = mobileMap[lang] || mobileMap.en;
+  return loader();
 }
 
 async function getLocaleMessages(lang: string): Promise<Messages> {
-  const loader = webLocaleMap[lang];
+  const loader = webLocaleMap[lang] || webLocaleMap.en;
   const mod = await loader();
   return ("default" in mod ? mod.default.messages : mod.messages) as Messages;
 }
@@ -84,7 +74,8 @@ function activateLocale(targetLang: string) {
 
 export function initLocaleSync(options: InitLocaleOptions): string {
   const targetLang = resolveAndSaveLocale(options);
-  defaultI18n.load(localeCatalogs);
+  const messages = getLocaleMessagesSync(targetLang);
+  defaultI18n.load({ [targetLang]: messages });
   activateLocale(targetLang);
   return targetLang;
 }
