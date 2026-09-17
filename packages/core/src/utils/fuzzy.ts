@@ -29,6 +29,7 @@ export function fuzzy<T>(
     limit?: number;
     prefix?: string;
     suffix?: string;
+    preserveOrder?: boolean;
   } = {}
 ): T[] {
   const results = fuzzyMatch(query, items, getIdentifier, fields, options);
@@ -57,11 +58,13 @@ export function fuzzy<T>(
     }
   }
 
-  const matches = Array.from(results.entries())
-    .sort((a, b) => b[1].score - a[1].score)
-    .map((item) => item[1].item);
+  const matches = Array.from(results.entries());
 
-  return matches;
+  if (!options.preserveOrder) {
+    matches.sort((a, b) => b[1].score - a[1].score);
+  }
+
+  return matches.map((item) => item[1].item);
 }
 
 function fuzzyMatch<T>(
