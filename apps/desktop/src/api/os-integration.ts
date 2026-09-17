@@ -38,6 +38,8 @@ import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak, isPortable, isSnap } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
+import { setupJumplist } from "../utils/jumplist";
+import { initLocale } from "../utils/locale";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 import type { MenuItem as NNMenuItem } from "@notesnook/ui";
 import { platform } from "os";
@@ -138,10 +140,11 @@ export const osIntegrationRouter = t.router({
   }),
   setAppLanguage: t.procedure
     .input(z.string())
-    .mutation(({ input: language }) => {
+    .mutation(async ({ input: language }) => {
       config.appLanguage = language;
-      app.relaunch();
-      app.exit();
+      await initLocale();
+      setupDesktopIntegration(config.desktopSettings);
+      setupJumplist();
     }),
   restart: t.procedure.query(() => {
     app.relaunch();
