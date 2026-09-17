@@ -58,9 +58,11 @@ function generateWebLocaleMap() {
   });
 
   return `${LICENSE_HEADER}
+import { type Messages } from "@lingui/core";
+
 export const localeMap: Record<
   string,
-  () => Promise<{ default: { messages: unknown } } | { messages: unknown }>
+  () => Promise<{ default: Messages } | Messages>
 > = {
 ${entries.join(",\n")}
 };
@@ -74,7 +76,9 @@ function generateMobileLocaleLoaders() {
   });
 
   return `${LICENSE_HEADER}
-export const localeMap = {
+import { type Messages } from "@lingui/core";
+
+export const localeMap: Record<string, () => Messages> = {
 ${entries.join(",\n")}
 };
 `;
