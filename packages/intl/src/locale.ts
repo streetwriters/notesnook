@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { i18n as defaultI18n, type Messages } from "@lingui/core";
 import { setI18nGlobal } from "./setup";
 import { AVAILABLE_LANGUAGES, getSupportedLocale } from "./languages";
-import { localeMap } from "./generated/locale-map";
-import { LOCALE_LOADERS } from "./generated/loaders.mobile";
+import { localeMap as webLocaleMap } from "./generated/locale-map";
+import { localeMap as mobileLocaleMap } from "./generated/loaders.mobile";
 
 export function resolveTargetLocale(
   savedLanguage: string | null | undefined,
@@ -40,13 +40,13 @@ export function resolveTargetLocale(
 const localeCache: Record<string, Messages> = {};
 const localeCatalogs: Record<string, Messages> = {};
 
-for (const locale of Object.keys(LOCALE_LOADERS)) {
+for (const locale of Object.keys(mobileLocaleMap)) {
   Object.defineProperty(localeCatalogs, locale, {
     enumerable: true,
     get() {
       if (!localeCache[locale]) {
         localeCache[locale] = (
-          LOCALE_LOADERS as Record<string, () => Messages>
+          mobileLocaleMap as Record<string, () => Messages>
         )[locale]();
       }
       return localeCache[locale];
@@ -55,7 +55,7 @@ for (const locale of Object.keys(LOCALE_LOADERS)) {
 }
 
 async function getLocaleMessages(lang: string): Promise<Messages> {
-  const loader = localeMap[lang];
+  const loader = webLocaleMap[lang];
   const mod = await loader();
   return ("default" in mod ? mod.default.messages : mod.messages) as Messages;
 }

@@ -74,7 +74,7 @@ function generateMobileLocaleLoaders() {
   });
 
   return `${LICENSE_HEADER}
-export const LOCALE_LOADERS = {
+export const localeMap = {
 ${entries.join(",\n")}
 };
 `;
@@ -85,10 +85,7 @@ const generatedDir = path.join(__dirname, "../src/generated");
 if (!existsSync(generatedDir)) {
   mkdirSync(generatedDir, { recursive: true });
 }
-writeFileSync(
-  path.join(generatedDir, "locale-map.ts"),
-  generateWebLocaleMap()
-);
+writeFileSync(path.join(generatedDir, "locale-map.ts"), generateWebLocaleMap());
 
 // 2. Write Mobile locale loaders
 writeFileSync(
