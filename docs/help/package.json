@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/streetwriters/notesnook#readme",
   "devDependencies": {
-    "@lingui/core": "^5.2.0",
     "@notesnook/common": "file:../../packages/common",
     "@notesnook/intl": "file:../../packages/intl",
     "markdown-it-task-lists": "^2.1.1",
