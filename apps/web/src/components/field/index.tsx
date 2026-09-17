@@ -81,7 +81,7 @@ function Field(props: FieldProps) {
         // m: "2px",
         // mr: "2px",
         opacity: disabled ? 0.7 : 1,
-        gap: "spacing3",
+        gap: "spacing4",
         ...sx,
         flexDirection: "column"
       }}
@@ -92,6 +92,8 @@ function Field(props: FieldProps) {
           fontFamily: "body",
           flexDirection: "column",
           fontSize: "xs",
+          color: "paragraph-secondary",
+          lineHeight: 1.2,
           ...styles?.label
         }}
       >
@@ -143,8 +145,8 @@ function Field(props: FieldProps) {
               bottom: 0,
               px: 2,
               cursor: "pointer",
-              borderTopRightRadius: "default",
-              borderBottomRightRadius: "default",
+              borderTopRightRadius: "radius2",
+              borderBottomRightRadius: "radius2",
               ":hover": { bg: "border" }
             }}
           >
@@ -163,8 +165,8 @@ function Field(props: FieldProps) {
               top: 0,
               left: 0,
               height: "100%",
-              borderTopLeftRadius: "default",
-              borderBottomLeftRadius: "default",
+              borderTopLeftRadius: "radius2",
+              borderBottomLeftRadius: "radius2",
               overflow: "hidden"
             }}
           >
@@ -207,8 +209,8 @@ function Field(props: FieldProps) {
               top: 0,
               right: 0,
               height: "100%",
-              borderTopRightRadius: "default",
-              borderBottomRightRadius: "default",
+              borderTopRightRadius: "radius2",
+              borderBottomRightRadius: "radius2",
               overflow: "hidden"
             }}
           >

@@ -571,7 +571,8 @@ function RouteItem({
                     title: strings.clearTrash(),
                     positiveButtonText: strings.clear(),
                     negativeButtonText: strings.cancel(),
-                    message: strings.clearTrashDesc()
+                    subtitle: strings.clearTrashDesc(),
+                    positiveButtonVariant: "new_error"
                   });
                   if (!ok) return;
 

@@ -341,7 +341,8 @@ const AttachmentMenuItems: (
         const newName = await PromptDialog.show({
           title: strings.doActions.rename.attachment(1),
           description: attachment.filename,
-          defaultValue: attachment.filename
+          defaultValue: attachment.filename,
+          label: strings.enterTitle()
         });
         if (!newName) return;
         await store.rename(attachment.hash, newName);

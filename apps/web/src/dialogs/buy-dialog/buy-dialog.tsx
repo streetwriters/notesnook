@@ -545,8 +545,9 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
               variant="anchor"
               onClick={async () => {
                 const code = await PromptDialog.show({
-                  title: "Enter discount code",
-                  defaultValue: pricingInfo.coupon
+                  title: "Discount code",
+                  defaultValue: pricingInfo.coupon,
+                  label: "Enter discount code"
                 });
                 if (code) applyCoupon(code);
               }}

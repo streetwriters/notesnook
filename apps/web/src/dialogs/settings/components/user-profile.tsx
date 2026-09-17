@@ -215,7 +215,8 @@ export function UserProfile({ minimal }: Props) {
                   const fullName = await PromptDialog.show({
                     title: strings.editFullName(),
                     description: strings.setFullNameDesc(),
-                    defaultValue: profile?.fullName
+                    defaultValue: profile?.fullName,
+                    label: strings.enterFullName()
                   });
 
                   if (fullName === profile?.fullName) return;

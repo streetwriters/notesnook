@@ -613,7 +613,7 @@ export function Editor(props: EditorProps) {
           if (!useUserStore.getState().isLoggedIn) {
             ConfirmDialog.show({
               title: strings.notLoggedIn(),
-              message: strings.loginToUploadAttachments(),
+              subtitle: strings.loginToUploadAttachments(),
               positiveButtonText: strings.okay()
             });
             return;

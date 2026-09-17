@@ -127,6 +127,17 @@ const newSecondary: ThemeUIStyleObject = {
   border: "1px solid var(--border-secondary)"
 };
 
+const newTertiary: ThemeUIStyleObject = {
+  ...newCreateButtonVariant(
+    "background-tertiary",
+    "buttonForeground-secondary",
+    {
+      hover: { bg: "hover-secondary" },
+      active: { bg: "hover-secondary" }
+    }
+  )
+};
+
 const primary = createButtonVariant("transparent", "paragraph", {
   hover: { bg: "hover" },
   active: { bg: "hover" }
@@ -163,6 +174,13 @@ const accentSecondary = createButtonVariant("shade", "accent", {
 const error = createButtonVariant("accent-error", "accentForeground-error", {
   hover: { bg: alpha("accent-error", 0.9) }
 });
+
+const newError: ThemeUIStyleObject = {
+  ...newCreateButtonVariant("accent-error", "accentForeground", {
+    hover: { bg: "hover-secondary" },
+    active: { bg: "hover-secondary" }
+  })
+};
 
 const errorSecondary: ThemeUIStyleObject = createButtonVariant(
   "background-error",
@@ -208,12 +226,14 @@ export const buttonVariants = {
   secondary,
   new_secondary: newSecondary,
   tertiary,
+  new_tertiary: newTertiary,
 
   accent,
   new_accent: newAccent,
   new_bordered: newBordered,
   accentSecondary,
   error,
+  new_error: newError,
   errorSecondary,
 
   anchor,
