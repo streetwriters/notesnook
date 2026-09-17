@@ -521,7 +521,8 @@ export const AttachmentDialog = ({
               style={{
                 height: "100%",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
             >
               {loading ? (
@@ -533,7 +534,9 @@ export const AttachmentDialog = ({
                     size={60}
                     color={colors.secondary.icon}
                   />
-                  <Paragraph>{strings.noAttachments()}</Paragraph>
+                  <Paragraph style={{ textAlign: "center" }}>
+                    {strings.noAttachments()}
+                  </Paragraph>
                 </>
               )}
             </View>

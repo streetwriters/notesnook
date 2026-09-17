@@ -164,11 +164,10 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
               }}
             >
               {plan ? (
-                <>
-                  Upgrade to {metadata.title} {getCurrencySymbol(plan.currency)}
-                  {plan.price.gross}
-                  {formatRecurringPeriodShort(plan.period)}
-                </>
+                strings.upgradeToPlan(
+                  metadata.title,
+                  `${getCurrencySymbol(plan.currency)}${plan.price.gross}${formatRecurringPeriodShort(plan.period)}`
+                )
               ) : (
                 <Loading size={16} color="accentForeground" />
               )}

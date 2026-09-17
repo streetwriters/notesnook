@@ -39,9 +39,9 @@ import PaywallSheet from "../../../components/sheets/paywall";
 import {
   AVAILABLE_LANGUAGES,
   resolveTargetLocale,
-  i18n,
   strings
 } from "@notesnook/intl";
+import { initLocale } from "../../../common/locale";
 import { isFeatureAvailable } from "@notesnook/common";
 import RNRestart from "react-native-restart";
 import { presentDialog } from "../../../components/dialog/functions";
@@ -72,7 +72,9 @@ export const LanguagePicker = createSettingsPicker<
     let systemLocale = "en";
     try {
       systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch (e) {}
+    } catch (e) {
+      // ignore
+    }
     return resolveTargetLocale(saved, systemLocale);
   },
   updateValue: async (item) => {
@@ -88,8 +90,8 @@ export const LanguagePicker = createSettingsPicker<
         negativeText: strings.cancel(),
         positivePress: async () => {
           eSendEvent(eCloseSimpleDialog);
-          i18n.activate(lang);
           SettingsService.setProperty("appLanguage", lang);
+          initLocale();
           // restarting early causes appLanguage value to not get saved.
           setTimeout(() => RNRestart.restart(), 100);
           return true;
