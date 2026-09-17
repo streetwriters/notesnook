@@ -869,6 +869,13 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
             );
             return;
           }
+          if (
+            error?.message &&
+            /valid multi-factor authentication code/i.test(error.message)
+          ) {
+            setError(strings.validMfaCodeRequired());
+            return;
+          }
           setError(error.message);
         }
       }}
