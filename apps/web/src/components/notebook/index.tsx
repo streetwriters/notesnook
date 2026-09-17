@@ -140,7 +140,7 @@ export function Notebook(props: NotebookProps) {
             >
               <CaretDown
                 size={11}
-                color={isOpened ? "icon" : "icon-secondary"}
+                color={isOpened ? "icon-selected" : "icon"}
                 sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
               />
             </Button>
@@ -150,13 +150,13 @@ export function Notebook(props: NotebookProps) {
           {depth === 0 ? (
             <NotebookIcon
               size={13}
-              color={isOpened ? "icon" : "icon-secondary"}
+              color={isOpened ? "icon-selected" : "icon"}
             />
           ) : null}
           <Text
             data-test-id={`title`}
             variant={"body"}
-            color={isOpened ? "heading" : "heading-secondary"}
+            color={isOpened ? "paragraph-selected" : "paragraph"}
             sx={{
               whiteSpace: "pre",
               overflow: "hidden",
@@ -175,7 +175,7 @@ export function Notebook(props: NotebookProps) {
       footer={
         <Text
           variant="subBody"
-          color={isOpened ? "paragraph" : "paragraph-secondary"}
+          color={isOpened ? "paragraph-selected" : "paragraph"}
           sx={{ fontSize: "xxs", lineHeight: 1 }}
         >
           {currentContext ? currentContext?.length : totalNotes}

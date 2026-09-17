@@ -110,7 +110,7 @@ function NavigationItem(
         {Icon ? (
           <Icon
             size={isCollapsed ? 15 : iconSize || 13}
-            color={color || (selected ? "icon" : "icon-secondary")}
+            color={color || (selected ? "icon-selected" : "icon")}
             rotate={isLoading}
           />
         ) : null}
@@ -124,7 +124,7 @@ function NavigationItem(
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "normal",
-              color: selected ? "heading" : "paragraph"
+              color: selected ? "paragraph-selected" : "paragraph"
             }}
             ml="spacing3"
             data-test-id="title"

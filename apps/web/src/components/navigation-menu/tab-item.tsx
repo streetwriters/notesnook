@@ -57,7 +57,7 @@ export function TabItem(props: TabItemProps & FlexProps) {
         if (onClick) onClick();
       }}
     >
-      <Icon size={15} color={selected ? "icon" : "icon-secondary"} />
+      <Icon size={15} color={selected ? "icon-selected" : "icon"} />
     </Flex>
   );
 }

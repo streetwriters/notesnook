@@ -286,8 +286,8 @@ function NavigationMenu({
         flexDirection: "column",
         height: "100%",
         overflow: "hidden",
-        bg: "background-secondary",
-        borderRight: "1px solid var(--border)",
+        bg: "background",
+        borderRight: "1px solid var(--separator)",
         py: "spacing4",
         transition: "width 0.1s ease-in",
         width: isNavPaneCollapsed ? (expanded ? 250 : 45) : "100%"

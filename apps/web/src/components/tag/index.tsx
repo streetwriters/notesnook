@@ -83,13 +83,13 @@ function Tag(props: TagProps) {
         >
           <TagIcon
             size={13}
-            color={isSelected ? "icon" : "icon-secondary"}
+            color={isSelected ? "icon-selected" : "icon"}
             sx={{ flexShrink: 0 }}
           />
           <Text
             data-test-id={`title`}
             variant={"body"}
-            color={isSelected ? "heading" : "paragraph"}
+            color={isSelected ? "paragraph-selected" : "paragraph"}
             sx={{
               fontSize: "xs",
               whiteSpace: "pre",
