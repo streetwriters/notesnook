@@ -101,7 +101,14 @@ const TwoFactorVerification = ({
         setLoading(false);
       },
       (e) => {
-        setError(e);
+        if (
+          e?.message &&
+          /valid multi-factor authentication code/i.test(e.message)
+        ) {
+          setError(new Error(strings.validMfaCodeRequired()));
+        } else {
+          setError(e);
+        }
       }
     );
     setLoading(false);
@@ -155,9 +162,7 @@ const TwoFactorVerification = ({
       setSending(false);
     } catch (e) {
       setSending(false);
-      setError(
-        new Error(`Error sending 2FA Code. Tap "Send code" to try again `)
-      );
+      setError(new Error(strings.unableToSend2faCode()));
     }
   }, [currentMethod.method, secondsRef, sending, start]);
 
