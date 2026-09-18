@@ -82,6 +82,7 @@ import {
 } from "../services/message";
 import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
+import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -580,6 +581,7 @@ export const useAppEvents = () => {
     // (most obviously after the user clears app data). Nothing can run at that moment, so the
     // first launch afterwards is the earliest chance to put them right.
     NotePreviewWidget.updateNotes();
+    PinnedNotesWidget.updateNotes();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;
