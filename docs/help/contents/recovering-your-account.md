@@ -74,11 +74,10 @@ Notesnook gives its users a variety of recovery methods depending on the data th
 
 There are three, and they are listed in order of how much you keep:
 
-| Method                        | What it does                                                                  | Your notes                          |
-| ----------------------------- | ----------------------------------------------------------------------------- | ----------------------------------- |
-| `{{recoveryKeyMethod}}`       | Decrypts your data with your old key and re-encrypts it with the new password | Kept                                |
-| `{{backupFileMethod}}`        | Restores your data from a `.nnbackup` file you saved earlier                  | Kept, up to the date of that backup |
-| `{{clearDataAndResetMethod}}` | Wipes the account and starts it over                                          | **Deleted**                         |
+| Method                        | What it does                                                                  | Your notes  |
+| ----------------------------- | ----------------------------------------------------------------------------- | ----------- |
+| `{{recoveryKeyMethod}}`       | Decrypts your data with your old key and re-encrypts it with the new password | Kept        |
+| `{{clearDataAndResetMethod}}` | Wipes the account and starts it over                                          | **Deleted** |
 
 ### Use recovery key
 
@@ -90,14 +89,6 @@ This is the safest method, because it decrypts your data with your old key and t
 3. Click `{{downloadBackupFile}}` once your data has been downloaded. **_Don't forget to save the file in a safe place._**
    ![The account recovery screen offering a download of your decrypted backup file](/static/account-recovery/step-5.png)
 4. For next steps, see [Resetting account password](#resetting-account-password) section
-
-### Use a backup file
-
-If you don't have your recovery key but you do have a [backup file](/backup-and-restore-notes-in-notesnook), you can recover from that instead. You get back everything that was in the account when the backup was taken; anything written after it is not in the file and cannot be recovered.
-
-1. Click the second option (the button that says `{{backupFileMethod}}`).
-2. Select the `.nnbackup` file you saved.
-3. For next steps, see the [Resetting account password](#resetting-account-password) section.
 
 ### Clear data & reset account
 
