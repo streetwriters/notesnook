@@ -52,7 +52,13 @@ export type PaneWidths = {
   };
 };
 
-export const EditorWrapper = ({ widths }: { widths: PaneWidths }) => {
+export const EditorWrapper = ({
+  widths,
+  availableWidth
+}: {
+  widths: PaneWidths;
+  availableWidth: number;
+}) => {
   const { colors } = useThemeColors();
   const { colors: toolBarColors } = useThemeColors("editorToolbar");
   const deviceMode = useSettingStore((state) => state.deviceMode);
@@ -95,7 +101,7 @@ export const EditorWrapper = ({ widths }: { widths: PaneWidths }) => {
       style={[
         {
           width: isFullscreen
-            ? dimensions.width
+            ? availableWidth
             : widths[
                 !introCompleted ? "mobile" : (deviceMode as keyof PaneWidths)
               ]?.editor,
@@ -105,12 +111,12 @@ export const EditorWrapper = ({ widths }: { widths: PaneWidths }) => {
           paddingLeft: isFullscreen
             ? deviceMode === "smallTablet"
               ? 0
-              : dimensions.width * 0.15
+              : availableWidth * 0.15
             : null,
           paddingRight: isFullscreen
             ? deviceMode === "smallTablet"
               ? 0
-              : dimensions.width * 0.15
+              : availableWidth * 0.15
             : null,
           borderLeftWidth: DDS.isTab ? 1 : 0,
           borderLeftColor: DDS.isTab

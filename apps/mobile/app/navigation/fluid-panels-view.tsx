@@ -374,6 +374,7 @@ export const FluidPanelsView = React.memo(
               key="1"
               style={{
                 height: "100%",
+                display: fullscreen ? "none" : "flex",
                 width: fullscreen
                   ? 0
                   : PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS]?.sidebar
@@ -388,6 +389,7 @@ export const FluidPanelsView = React.memo(
               key="2"
               style={{
                 height: "100%",
+                display: fullscreen ? "none" : "flex",
                 width: fullscreen
                   ? 0
                   : PANE_WIDTHS[deviceMode as keyof typeof PANE_WIDTHS]?.list
@@ -434,7 +436,12 @@ export const FluidPanelsView = React.memo(
             </View>
 
             <ScopedThemeProvider value="editor">
-              {isLoading ? null : <EditorWrapper widths={PANE_WIDTHS} />}
+              {isLoading ? null : (
+                <EditorWrapper
+                  availableWidth={availableWidth}
+                  widths={PANE_WIDTHS}
+                />
+              )}
             </ScopedThemeProvider>
           </FluidPanels>
         ) : null}
