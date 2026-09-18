@@ -40,6 +40,7 @@ import { ChangePlanDialog } from "./change-plan-dialog";
 import { Loading } from "../../components/icons";
 import { showToast } from "../../utils/toast";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
+import { strings } from "@notesnook/intl";
 
 export type UpgradeDialogProps = {
   feature: FeatureResult<any>;
@@ -75,8 +76,8 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
   return (
     <BaseDialog
       testId="upgrade-dialog"
-      title={`Unlock this feature today`}
-      description={`Upgrade to the ${metadata.title} plan to use this feature`}
+      title={strings.unlockFeatureToday()}
+      description={strings.upgradePlanTo(metadata.title)}
       isOpen={true}
       onClose={onClose}
       textAlignment="center"
@@ -104,7 +105,11 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           }}
         >
           <Text variant="body" sx={{ fontWeight: "bold", color: "heading" }}>
-            {metadata.title} plan
+            {feature.availableOn === SubscriptionPlan.ESSENTIAL
+              ? strings.essentialPlan()
+              : feature.availableOn === SubscriptionPlan.BELIEVER
+              ? strings.believerPlan()
+              : strings.proPlan()}
           </Text>
           {features.map((f) => {
             const caption =
@@ -137,8 +142,8 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
           })}
         </Flex>
         <Text variant="body">
-          <strong>Cancel anytime.</strong> {PERIOD_METADATA.yearly.refundDays}
-          -day money-back guarantee.
+          <strong>{strings.cancelAnytime()}</strong>{" "}
+          {strings.dayMoneyBackGuarantee(PERIOD_METADATA.yearly.refundDays)}
         </Text>
         {!subscription || subscription.plan === SubscriptionPlan.FREE ? (
           <>
@@ -159,11 +164,10 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
               }}
             >
               {plan ? (
-                <>
-                  Upgrade to {metadata.title} {getCurrencySymbol(plan.currency)}
-                  {plan.price.gross}
-                  {formatRecurringPeriodShort(plan.period)}
-                </>
+                strings.upgradeToPlan(
+                  metadata.title,
+                  `${getCurrencySymbol(plan.currency)}${plan.price.gross}${formatRecurringPeriodShort(plan.period)}`
+                )
               ) : (
                 <Loading size={16} color="accentForeground" />
               )}
@@ -175,7 +179,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
                 BuyDialog.show({});
               }}
             >
-              Compare all plans
+              {strings.compareAllPlans()}
             </Button>
           </>
         ) : (
@@ -197,7 +201,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
             }}
           >
             {plan ? (
-              <>Change plan</>
+              <>{strings.changePlan()}</>
             ) : (
               <Loading size={16} color="accentForeground" />
             )}

@@ -27,6 +27,7 @@ import { showToast } from "../../utils/toast";
 import { ComparePlans, Footer, PlansList } from "./plan-list";
 import { ConfirmDialog } from "../confirm";
 import { TaskManager } from "../../common/task-manager";
+import { strings } from "@notesnook/intl";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;
@@ -60,7 +61,7 @@ export const ChangePlanDialog = DialogManager.register(
               variant="heading"
               sx={{ fontSize: 32, textAlign: "center" }}
             >
-              Change plan
+              {strings.changePlan()}
             </Text>
             <Text
               variant="title"
@@ -81,26 +82,25 @@ export const ChangePlanDialog = DialogManager.register(
             ignoreTrial
             onPlanSelected={async (plan) => {
               const result = await ConfirmDialog.show({
-                title: "Confirm plan change",
+                title: strings.confirmPlanChange(),
                 message: `Your plan will be switched to ${
                   PLAN_METADATA[plan.plan].title
                 } plan. You will receive a credit for unused time on your previous subscription, and you will only pay the prorated amount for your new subscription.`,
-                positiveButtonText: "Confirm",
-                negativeButtonText: "Cancel"
+                positiveButtonText: strings.confirm(),
+                negativeButtonText: strings.cancel()
               });
               if (result) {
                 onClose();
                 await TaskManager.startTask({
                   type: "modal",
-                  title: "Changing subscription plan",
-                  subtitle:
-                    "Please wait while we change your subscription plan...",
+                  title: strings.changingSubscriptionPlan(),
+                  subtitle: strings.changingSubscriptionPlanWait(),
                   action: async () => {
                     try {
                       await db.subscriptions.change(plan.id);
                       showToast(
                         "success",
-                        "Subscription changed successfully. It might take a couple of minutes for the changes to reflect in the app."
+                        strings.subscriptionChangedSuccessfully()
                       );
                     } catch (e) {
                       showToast("error", (e as Error).message);

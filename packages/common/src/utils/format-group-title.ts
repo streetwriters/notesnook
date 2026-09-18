@@ -17,11 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @type {import('@lingui/conf').LinguiConfig} */
+import { strings } from "@notesnook/intl";
 
-module.exports = {
-  locales: ["en", "cs", "fr"],
-  sourceLocale: "en",
-  format: "po",
-  compileNamespace: "ts"
+const GROUP_TITLES: Record<string, () => string> = {
+  pinned: strings.pinned,
+  recent: strings.recent,
+  "last week": strings.lastWeek,
+  older: strings.older,
+  conflicted: strings.conflicted,
+  all: strings.all,
+  active: strings.active,
+  inactive: strings.inactive
 };
+
+export function formatGroupTitle(title?: string): string {
+  if (!title) return "";
+  const resolve = GROUP_TITLES[title.toLowerCase()];
+  return resolve ? resolve() : title;
+}

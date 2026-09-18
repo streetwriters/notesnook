@@ -84,7 +84,7 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
       if (!issueReportResponse.current) {
         setLoading(false);
         ToastManager.show({
-          heading: "Failed to report issue on github",
+          heading: strings.failedToReportIssueOnGithub(),
           type: "error",
           context: "local"
         });
@@ -164,7 +164,7 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
             </Paragraph>
 
             <Button
-              title={responseInfo?.positiveButtonText || "Done"}
+              title={responseInfo?.positiveButtonText || strings.done()}
               onPress={() => {
                 if (responseInfo?.url) {
                   Linking.openURL(responseInfo?.url);

@@ -29,15 +29,23 @@ import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../common/database";
-import { ToastManager } from "../../../services/event-manager";
+import { ToastManager, eSendEvent } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { Settings, useSettingStore } from "../../../stores/use-setting-store";
 import { useUserStore } from "../../../stores/use-user-store";
 import { MenuItemsList } from "../../../utils/menu-items";
 import { verifyUserWithApplock } from "../functions";
-import { strings } from "@notesnook/intl";
-import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../../../components/sheets/paywall";
+import {
+  AVAILABLE_LANGUAGES,
+  resolveTargetLocale,
+  strings
+} from "@notesnook/intl";
+import { initLocale } from "../../../common/locale";
+import { isFeatureAvailable } from "@notesnook/common";
+import RNRestart from "react-native-restart";
+import { presentDialog } from "../../../components/dialog/functions";
+import { eCloseSimpleDialog } from "../../../utils/events";
 
 const DAY_FORMATS = ["short", "long"];
 const DayFormatFormats = {
@@ -50,6 +58,59 @@ const WeekFormatNames = {
   Sun: "Sunday",
   Mon: "Monday"
 };
+
+export const LanguagePicker = createSettingsPicker<
+  {
+    code: string;
+    label: string;
+    nativeLabel: string;
+  },
+  string
+>({
+  getValue: () => {
+    const saved = useSettingStore.getState().settings.appLanguage;
+    let systemLocale = "en";
+    try {
+      systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
+    } catch (e) {
+      // ignore
+    }
+    return resolveTargetLocale(saved, systemLocale);
+  },
+  updateValue: async (item) => {
+    const lang = typeof item === "object" ? item.code : item;
+    const currentLang = useSettingStore.getState().settings.appLanguage;
+    if (lang === currentLang) return;
+
+    setTimeout(() => {
+      presentDialog({
+        title: strings.changeLanguage(),
+        paragraph: strings.restartAppToApplyChanges(),
+        positiveText: strings.restartNow(),
+        negativeText: strings.cancel(),
+        positivePress: async () => {
+          eSendEvent(eCloseSimpleDialog);
+          SettingsService.setProperty("appLanguage", lang);
+          initLocale();
+          // restarting early causes appLanguage value to not get saved.
+          setTimeout(() => RNRestart.restart(), 100);
+          return true;
+        }
+      });
+    }, 300);
+  },
+  formatValue: (item) => {
+    const code = typeof item === "object" ? item.code : item;
+    const found = AVAILABLE_LANGUAGES.find((l) => l.code === code);
+    return found ? `${found.label} (${found.nativeLabel})` : code;
+  },
+  getItemKey: (item) => (typeof item === "object" ? item.code : item),
+  options: AVAILABLE_LANGUAGES,
+  compareValue: (current, item) =>
+    current === (typeof item === "object" ? item.code : item),
+  isFeatureAvailable: async () => true,
+  isOptionAvailable: async () => true
+});
 
 export const FontPicker = createSettingsPicker<
   ReturnType<typeof getFonts>[0],
@@ -267,10 +328,11 @@ export const BackupWithAttachmentsReminderPicker = createSettingsPicker({
     SettingsService.set({ fullBackupReminder: item });
   },
   formatValue: (item) => {
-    //@ts-ignore
-    return item === "useroff" || item === "off" || item === "never"
-      ? "Off"
-      : item.slice(0, 1).toUpperCase() + item.slice(1);
+    return (item as string) === "useroff" ||
+      (item as string) === "off" ||
+      item === "never"
+      ? strings.off()
+      : strings[item]?.() || item;
   },
   getItemKey: (item) => item,
   options: ["never", "weekly", "monthly"] as Settings["fullBackupReminder"][],

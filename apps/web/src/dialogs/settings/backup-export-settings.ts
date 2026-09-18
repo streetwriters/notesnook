@@ -207,11 +207,11 @@ export const BackupExportSettings: SettingsGroup[] = [
             type: "dropdown",
             options: [
               { value: "-", title: strings.exportAs() },
-              { value: "txt", title: "Text" },
+              { value: "txt", title: strings.plainText() },
               { value: "md", title: "Markdown" },
               {
                 value: "md-frontmatter",
-                title: "Markdown + Frontmatter"
+                title: strings.markdownFrontmatter()
               },
               { value: "html", title: "HTML" }
             ],

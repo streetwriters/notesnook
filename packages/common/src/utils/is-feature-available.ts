@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SubscriptionPlan } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { database as db } from "../database.js";
 
 type CaptionValue = ("infinity" | (string & {})) | boolean | number;
@@ -57,23 +58,48 @@ type CaptionsFromAvailability<A> = A extends Record<
   ? C
   : never;
 
+const FEATURE_TITLES: Partial<Record<string, () => string>> = {
+  storage: strings.storage,
+  fileSize: strings.maximumFileSize,
+  fullQualityImages: strings.fullQualityImages,
+  blockLinking: strings.blockLevelNoteLinks,
+  colors: strings.colors,
+  tags: strings.tags,
+  notebooks: strings.notebooks,
+  activeReminders: strings.activeReminders,
+  shortcuts: strings.shortcuts,
+  appLock: strings.appLock,
+  maxNoteVersions: strings.noteHistory,
+  customizableSidebar: strings.customizableSidebar,
+  syncControls: strings.sync,
+  callout: strings.callout,
+  sms2FA: strings.twoFactorAuth,
+  monographs: strings.monographs
+};
+
 function createFeature<A extends FeatureAvailability>(
   feature: Omit<Feature, "error" | "availability"> & {
     error?: Feature["error"];
     availability: A;
   }
 ): Feature<CaptionsFromAvailability<A>> {
-  return {
+  const getTitle = (): string => {
+    const localized = FEATURE_TITLES[feature.id];
+    return localized ? localized() : feature.title;
+  };
+  const f = {
     ...feature,
+    get title(): string {
+      return getTitle();
+    },
     error:
       feature.error ??
-      ((l) =>
+      ((l: Limit): string =>
         typeof l.caption === "number"
-          ? `You have reached your limit of ${
-              l.caption
-            } ${feature.title.toLowerCase()}.`
-          : `${feature.title} is not available on this plan.`)
-  } as unknown as Feature<CaptionsFromAvailability<A>>;
+          ? strings.reachedLimitOf(l.caption, getTitle().toLowerCase())
+          : strings.featureNotAvailableOnPlan(getTitle()))
+  };
+  return f as unknown as Feature<CaptionsFromAvailability<A>>;
 }
 
 function createLimit<
@@ -592,6 +618,14 @@ async function availableOn(id: FeatureId, value?: number) {
 
 export function getFeature<TId extends FeatureId>(id: TId): Feature<TId> {
   return features[id] as unknown as Feature<TId>;
+}
+
+export function getFeatureTitle<TId extends FeatureId>(
+  id: TId | string,
+  fallbackTitle?: string
+): string {
+  const feature = getFeature(id as FeatureId);
+  return feature?.title ?? fallbackTitle ?? id;
 }
 
 export function planToAvailability(plan: SubscriptionPlan) {

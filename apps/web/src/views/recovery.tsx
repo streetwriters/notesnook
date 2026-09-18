@@ -425,18 +425,18 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         if (!user) throw new Error(strings.notLoggedIn());
 
         if (form.password !== form.confirmPassword)
-          throw new Error("Passwords do not match.");
+          throw new Error(strings.passwordNotMatched());
 
         if (formData?.userResetRequired) {
           if (!(await db.user.resetPasswordWithoutRecoveryKey(form.password)))
-            throw new Error("Could not reset account password.");
+            throw new Error(strings.couldNotResetAccountPassword());
 
           navigate("final");
           return;
         }
 
         if (!formData?.recoveryKey)
-          throw new Error("Recovery key is required to reset password.");
+          throw new Error(strings.recoveryKeyRequired());
 
         if (
           !(await db.user.resetPassword({
@@ -444,7 +444,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             newPassword: form.password
           }))
         )
-          throw new Error("Could not reset account password.");
+          throw new Error(strings.couldNotResetAccountPassword());
 
         navigate("final");
       }}

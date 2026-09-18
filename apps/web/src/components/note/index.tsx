@@ -143,7 +143,6 @@ function Note(props: NoteProps) {
       body={note.headline as string}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
-          // @ts-expect-error write tests for this
           await Multiselect.moveNotesToTrash(
             selectionStore.get().selectedItems
           );
@@ -322,33 +321,33 @@ export default React.memo(Note, function (prevProps, nextProps) {
 //     .pin(note.id);
 // };
 
-const formats = [
+const getFormats = () => [
   {
-    type: "pdf",
+    type: "pdf" as const,
     title: "PDF",
     icon: PDF
   },
   {
-    type: "md",
+    type: "md" as const,
     title: "Markdown",
     icon: Markdown
   },
   {
-    type: "md-frontmatter",
-    title: "Markdown + Frontmatter",
+    type: "md-frontmatter" as const,
+    title: strings.markdownFrontmatter(),
     icon: Markdown
   },
   {
-    type: "html",
+    type: "html" as const,
     title: "HTML",
     icon: HTML
   },
   {
-    type: "txt",
-    title: "Text",
+    type: "txt" as const,
+    title: strings.plainText(),
     icon: Plaintext
   }
-] as const;
+];
 
 export const noteMenuItems: (
   note: NoteType,
@@ -533,7 +532,7 @@ export const noteMenuItems: (
       icon: Export.path,
       //isDisabled: !isSynced,
       menu: {
-        items: formats.map((format) => ({
+        items: getFormats().map((format) => ({
           type: "button",
           key: format.type,
           title: format.title,
@@ -567,8 +566,8 @@ export const noteMenuItems: (
           {
             type: "button",
             key: "copy-as-text",
-            tooltip: strings.copyAs("Text"),
-            title: "Text",
+            tooltip: strings.copyAs(strings.plainText()),
+            title: strings.plainText(),
             icon: Plaintext.path,
             onClick: () => copyNote(note.id, "txt")
           },

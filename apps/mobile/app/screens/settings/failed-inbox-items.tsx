@@ -273,7 +273,10 @@ export const FailedInboxItems = () => {
               alignItems: "center"
             }}
           >
-            <Paragraph color={colors.secondary.paragraph}>
+            <Paragraph
+              color={colors.secondary.paragraph}
+              style={{ textAlign: "center" }}
+            >
               {strings.noFailedInboxItems()}
             </Paragraph>
           </View>
@@ -345,7 +348,7 @@ export const FailedInboxItems = () => {
                       flexWrap: "wrap"
                     }}
                   >
-                    <Paragraph color={colors.error.paragraph}>Error</Paragraph>
+                    <Paragraph color={colors.error.paragraph}>{strings.error()}</Paragraph>
                   </View>
                   <Paragraph
                     style={{

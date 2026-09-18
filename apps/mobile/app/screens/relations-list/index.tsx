@@ -31,6 +31,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { useRelationStore } from "../../stores/use-relation-store";
 import { AppFontSize } from "../../utils/size";
+import { DefaultAppStyles } from "../../utils/styles";
 
 type RelationsListProps = {
   item: Item;
@@ -83,7 +84,8 @@ function RelationsList(props: NavigationProps<"RelationsList">) {
             style={{
               height: "85%",
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Icon
@@ -91,7 +93,9 @@ function RelationsList(props: NavigationProps<"RelationsList">) {
               size={60}
               color={colors.primary.icon}
             />
-            <Paragraph>{strings.noLinksFound()}</Paragraph>
+            <Paragraph style={{ textAlign: "center" }}>
+              {strings.noLinksFound()}
+            </Paragraph>
             <Button
               onPress={onAdd}
               fontSize={AppFontSize.sm}

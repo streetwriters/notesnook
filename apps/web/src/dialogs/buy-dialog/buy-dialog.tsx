@@ -38,6 +38,7 @@ import { useCheckoutStore } from "./store";
 import { formatPrice, toPricingInfo } from "./helpers";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import BaseDialog from "../../components/dialog";
+import { strings } from "@notesnook/intl";
 import { ScopedThemeProvider } from "../../components/theme-provider";
 import { Period, SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
@@ -136,14 +137,14 @@ export const BuyDialog = DialogManager.register(function BuyDialog(
               variant="heading"
               sx={{ textAlign: "center" }}
             >
-              Select a plan
+              {strings.selectAPlan()}
             </Text>
             <Text
               variant="title"
               mt={1}
               sx={{ color: "heading-secondary", textAlign: "center" }}
             >
-              One subscription for a lifetime of notes.
+              {strings.oneSubscriptionLifetimeNotes()}
             </Text>
           </Flex>
           <PlansList
@@ -286,7 +287,7 @@ function SelectedPlan(props: SelectedPlanProps) {
 
   return (
     <>
-      <Text variant="title">Order summary</Text>
+      <Text variant="title">{strings.orderSummary()}</Text>
       <Flex
         sx={{
           flexDirection: "column",
@@ -545,13 +546,13 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
               variant="anchor"
               onClick={async () => {
                 const code = await PromptDialog.show({
-                  title: "Enter discount code",
+                  title: strings.enterDiscountCode(),
                   defaultValue: pricingInfo.coupon
                 });
                 if (code) applyCoupon(code);
               }}
             >
-              Add discount
+              {strings.addDiscount()}
             </Button>
           )}
         </Flex>

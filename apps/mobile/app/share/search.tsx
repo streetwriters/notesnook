@@ -25,6 +25,7 @@ import {
   VirtualizedGrouping
 } from "@notesnook/core";
 import { useThemeColors } from "@notesnook/theme";
+import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
 import {
   FlatList,
@@ -110,13 +111,13 @@ const SearchLookup = {
   }
 };
 
-const SearchPlaceholder = {
-  appendNote: "Search for a note",
-  selectNotebooks: "Search for a notebook",
-  selectTags: "Search for a tag"
-};
-
 type SearchMode = "appendNote" | "selectNotebooks" | "selectTags";
+
+const SearchPlaceholder: Record<SearchMode, () => string> = {
+  appendNote: () => strings.searchForANote(),
+  selectNotebooks: () => strings.searchForANotebook(),
+  selectTags: () => strings.searchForATag()
+};
 
 const NotebookItem = ({
   id,
@@ -451,7 +452,7 @@ export const Search = ({
         />
         <TextInput
           ref={inputRef}
-          placeholder={SearchPlaceholder[mode]}
+          placeholder={SearchPlaceholder[mode]()}
           placeholderTextColor={colors.primary.placeholder}
           style={{
             fontSize: 16,

@@ -93,7 +93,7 @@ const useRechecker = create<RecheckerState>((set) => ({
   }
 }));
 
-const attachmentTypes = [
+const getAttachmentTypes = () => [
   {
     title: strings.mediaTypes.all(),
     filterBy: "all"
@@ -475,7 +475,7 @@ export const AttachmentDialog = ({
             }}
             horizontal
           >
-            {attachmentTypes.map((item) =>
+            {getAttachmentTypes().map((item) =>
               item.filterBy === "orphaned" && note ? null : (
                 <Button
                   type={
@@ -521,7 +521,8 @@ export const AttachmentDialog = ({
               style={{
                 height: "100%",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
             >
               {loading ? (
@@ -533,7 +534,9 @@ export const AttachmentDialog = ({
                     size={60}
                     color={colors.secondary.icon}
                   />
-                  <Paragraph>{strings.noAttachments()}</Paragraph>
+                  <Paragraph style={{ textAlign: "center" }}>
+                    {strings.noAttachments()}
+                  </Paragraph>
                 </>
               )}
             </View>

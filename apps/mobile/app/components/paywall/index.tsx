@@ -393,7 +393,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                     }}
                     size={AppFontSize.md}
                   >
-                    Open Source
+                    {strings.openSource()}
                   </Paragraph>
                 </TouchableOpacity>
 

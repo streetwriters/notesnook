@@ -229,7 +229,7 @@ export function PlansList(props: PlansListProps) {
                           py: "small"
                         }}
                       >
-                        Most popular
+                        {strings.mostPopular()}
                       </Text>
                     ) : null}
                   </Flex>
@@ -281,7 +281,7 @@ export function PlansList(props: PlansListProps) {
                   {selectedPlan === plan.id ? (
                     <Flex sx={{ mt: 2, alignItems: "center", gap: 1 }}>
                       <CheckCircleOutline color="accent" size={16} />
-                      <Text variant="subBody">You are on this plan.</Text>
+                      <Text variant="subBody">{strings.youAreOnThisPlan()}</Text>
                     </Flex>
                   ) : (
                     <Button
@@ -292,8 +292,8 @@ export function PlansList(props: PlansListProps) {
                       sx={{ mt: 2 }}
                     >
                       {isTrialAvailableForPlan(plan.plan, user) && !ignoreTrial
-                        ? "Start your free trial"
-                        : "Select plan"}
+                        ? strings.startYourFreeTrial()
+                        : strings.selectPlan()}
                     </Button>
                   )}
                 </Flex>
@@ -303,8 +303,10 @@ export function PlansList(props: PlansListProps) {
       </Flex>
 
       <Text variant="body" sx={{ alignSelf: "center", mt: 2 }}>
-        Cancel anytime. {PERIOD_METADATA[selectedPeriod].refundDays}-day
-        money-back guarantee.
+        {strings.cancelAnytime()}{" "}
+        {strings.dayMoneyBackGuarantee(
+          PERIOD_METADATA[selectedPeriod].refundDays
+        )}
       </Text>
       <Button
         variant="tertiary"
@@ -315,7 +317,7 @@ export function PlansList(props: PlansListProps) {
             ?.scrollIntoView({ behavior: "smooth" })
         }
       >
-        Compare all plans
+        {strings.compareAllPlans()}
       </Button>
       <Flex
         sx={{ alignItems: "center", justifyContent: "center", gap: 4, mt: 50 }}
