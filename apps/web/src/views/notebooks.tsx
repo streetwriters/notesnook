@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook as NotebookType, VirtualizedGrouping } from "@notesnook/core";
-import { Box, Input, Text } from "@theme-ui/components";
+import { Box, Flex, Input } from "@notesnook/ui";
 import { useEffect, useRef, useState } from "react";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
@@ -31,8 +31,10 @@ import {
 } from "../components/virtualized-tree";
 import { ListLoader } from "../components/loaders/list-loader";
 import { debounce } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
 import { SidebarScroller } from "../components/sidebar-scroller";
+import Placeholder from "../components/placeholders";
+import { Funnel } from "../components/icons";
+import { Theme } from "@notesnook/theme";
 
 export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
@@ -77,27 +79,31 @@ export function Notebooks() {
         id="notebooks"
         sx={{
           flex: 1,
+          mt: "spacing4",
           '[data-viewport-type="element"]': {
-            px: 1,
-            width: `calc(100% - ${2 * 6}px) !important`
+            px: "spacing4",
+            width: (t) =>
+              `calc(100% - ${2 * (t as Theme).space.spacing4}px) !important`
           }
         }}
       >
         {!notebooks ? (
           <ListLoader />
         ) : notebooks.length === 0 ? (
-          <Text
-            variant="body"
-            sx={{ color: "paragraph-secondary", mx: 1 }}
-            data-test-id="list-placeholder"
+          <Flex
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%"
+            }}
           >
-            {strings.notebooksEmpty()}
-          </Text>
+            <Placeholder context="notebooks" />
+          </Flex>
         ) : (
           <VirtualizedTree
             testId="notebooks-list"
             rootId={"root"}
-            itemHeight={26}
+            itemHeight={33}
             treeRef={treeRef}
             deselectAll={() => toggleSelection(false)}
             bulkSelect={setSelectedItems}
@@ -172,18 +178,34 @@ export function Notebooks() {
           />
         )}
       </Box>
-      <Input
-        ref={inputRef}
-        variant="clean"
-        placeholder="Filter notebooks..."
-        sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
-        onChange={debounce(async (e) => {
-          const query = e.target.value.trim();
-          setFilteredNotebooks(
-            await (query ? db.lookup.notebooks(query).sorted() : undefined)
-          );
-        }, 300)}
-      />
+      <Flex
+        sx={{
+          alignItems: "center",
+          borderTop: "1px solid var(--separator)",
+          mx: "spacing4",
+          pt: "spacing4"
+        }}
+      >
+        <Input
+          ref={inputRef}
+          variant="clean"
+          placeholder="Filter notebooks..."
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 0,
+            fontSize: "xs",
+            color: "paragraph"
+          }}
+          onChange={debounce(async (e) => {
+            const query = e.target.value.trim();
+            setFilteredNotebooks(
+              await (query ? db.lookup.notebooks(query).sorted() : undefined)
+            );
+          }, 300)}
+        />
+        <Funnel size={13} color="icon-secondary" />
+      </Flex>
     </>
   );
 }
