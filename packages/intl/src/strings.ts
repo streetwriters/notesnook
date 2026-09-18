@@ -264,16 +264,6 @@ export const strings = {
     item: () => t`item`,
     shortcut: () => t`shortcut`
   },
-  dataTypesCamelCase: {
-    note: () => t`Note`,
-    notebook: () => t`Notebook`,
-    tag: () => t`Tag`,
-    reminder: () => t`Reminder`,
-    color: () => t`Color`,
-    attachment: () => t`Attachment`,
-    item: () => t`Item`,
-    shortcut: () => t`Shortcut`
-  },
   dataTypesPlural: {
     note: () => t`notes`,
     notebook: () => t`notebooks`,
@@ -289,12 +279,9 @@ export const strings = {
     notebook: () => t`Notebooks`,
     tag: () => t`Tags`,
     reminder: () => t`Reminders`,
-    color: () => t`Colors`,
     attachment: () => t`Attachments`,
     favorite: () => t`Favorites`,
-    monograph: () => t`Monographs`,
-    item: () => t`Items`,
-    shortcut: () => t`Shortcuts`
+    monograph: () => t`Monographs`
   },
   addItem: (itemType: "tag" | "notebook" | "reminder" | "note") =>
     select(itemType, {
@@ -638,33 +625,25 @@ $day$: Current day (eg. Monday)`,
     t`Check your spam folder if you haven't received an email yet.`,
   subscriptionProviderInfo: {
     0: {
-      type: "Streetwriters",
       title: () => t`Subscription awarded from Streetwriters`,
       desc: () =>
         t`You were awarded a subscription to Notesnook Pro by Streetwriters.`
     },
     1: {
-      type: "iOS",
       title: () => t`Subscribed on iOS`,
       desc: () =>
-        t`You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.`,
-      icon: "ios"
+        t`You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.`
     },
     2: {
-      type: "Android",
       title: () => t`Subscribed on Android`,
       desc: () =>
-        t`You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.`,
-      icon: "android"
+        t`You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.`
     },
     3: {
-      type: "Web",
       title: () => t`Subscribed on Web`,
-      desc: () => t`You subscribed to Notesnook Pro on the Web/Desktop App.`,
-      icon: "web"
+      desc: () => t`You subscribed to Notesnook Pro on the Web/Desktop App.`
     },
     4: {
-      type: "Gift card",
       title: () => t`Subscribed using gift card`,
       desc: () => t`You subscribed to Notesnook Pro using a gift card.`
     }
@@ -1410,15 +1389,12 @@ For example:
   routes: {
     Notes: () => t`Notes`,
     Notebooks: () => t`Notebooks`,
-    Notebook: () => t`Notebook`,
     Favorites: () => t`Favorites`,
     Reminders: () => t`Reminders`,
     Trash: () => t`Trash`,
     Settings: () => t`Settings`,
     Tags: () => t`Tags`,
-    Editor: () => t`Editor`,
     Home: () => t`Home`,
-    Search: () => t`Search`,
     Monographs: () => t`Monographs`,
     Archive: () => t`Archive`
   },
@@ -2280,7 +2256,6 @@ Use this if changes from other devices are not appearing on this device. This wi
   iAlreadyHaveAnAccount: () => t`I already have an account`,
   upgradePlan: () => t`Upgrade plan`,
   upgrade: () => t`Upgrade`,
-  upgradeNow: () => t`Upgrade now`,
   checkoutFaqs: [
     {
       question: () => t`What happens to my data if I switch plans?`,
@@ -2887,7 +2862,6 @@ Continue without attachments?`,
   goBackToApp: () => t`Go back to app`,
   recoveryKeyRequired: () =>
     t`Recovery key is required to reset password.`,
-  failedToResetUser: () => t`Failed to reset user.`,
   couldNotResetAccountPassword: () =>
     t`Could not reset account password.`,
 
