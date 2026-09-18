@@ -35,10 +35,6 @@ public class PinnedNotesWidgetProvider extends AppWidgetProvider {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, listview_intent_template, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE, WidgetUtils.getActivityOptionsBundle());
         views.setPendingIntentTemplate(R.id.widget_list_view, pendingIntent);
 
-        // Header '+' button opens the quick note composer (ShareActivity) without loading the full app.
-        Intent new_note_intent = new Intent(context, ShareActivity.class);
-        PendingIntent pendingIntent2 = PendingIntent.getActivity(context, appWidgetId, new_note_intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE, WidgetUtils.getActivityOptionsBundle());
-        views.setOnClickPendingIntent(R.id.add_button, pendingIntent2);
 
         // Build list items using RemoteCollectionItems: rows travel directly inside the widget update,
         // so no bound RemoteViewsService is required and updates are completely self-contained.
