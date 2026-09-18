@@ -312,6 +312,15 @@ import OrderAlphabeticalAscendingSvg from "@notesnook/icons/order-alphabetical-a
 import OrderAlphabeticalDescendingSvg from "@notesnook/icons/order-alphabetical-descending.svg?react";
 import OrderNumericAscendingSvg from "@notesnook/icons/order-numeric-ascending.svg?react";
 import OrderNumericDescendingSvg from "@notesnook/icons/order-numeric-descending.svg?react";
+import ArrowCounterClockwiseSvg from "@notesnook/icons/arrow-counter-clockwise.svg?react";
+import HouseSvg from "@notesnook/icons/house.svg?react";
+import EllipseSvg from "@notesnook/icons/ellipse.svg?react";
+import ArrowsInCardinalSvg from "@notesnook/icons/arrows-in-cardinal.svg?react";
+import MoonStarsSvg from "@notesnook/icons/moon-stars.svg?react";
+import GearSixSvg from "@notesnook/icons/gear-six.svg?react";
+import SignOutSvg from "@notesnook/icons/sign-out.svg?react";
+import SignInSvg from "@notesnook/icons/sign-in.svg?react";
+import UserSvg from "@notesnook/icons/user.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -757,3 +766,12 @@ export const OrderAlphabeticalDescending = createSvgIcon(
 );
 export const OrderNumericAscending = createSvgIcon(OrderNumericAscendingSvg);
 export const OrderNumericDescending = createSvgIcon(OrderNumericDescendingSvg);
+export const ArrowCounterClockwise = createSvgIcon(ArrowCounterClockwiseSvg);
+export const House = createSvgIcon(HouseSvg);
+export const Ellipse = createSvgIcon(EllipseSvg);
+export const ArrowsInCardinal = createSvgIcon(ArrowsInCardinalSvg);
+export const MoonStars = createSvgIcon(MoonStarsSvg);
+export const GearSix = createSvgIcon(GearSixSvg);
+export const SignOut = createSvgIcon(SignOutSvg);
+export const SignIn = createSvgIcon(SignInSvg);
+export const UserProfileIcon = createSvgIcon(UserSvg);

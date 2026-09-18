@@ -116,6 +116,10 @@ export function MenuButton(props: MenuButtonProps) {
               fontSize: "xxs",
               fontWeight: 400,
               lineHeight: 1,
+              minWidth: 0,
+              overflow: "ellipsis",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               ...styles?.title
             }}
           >

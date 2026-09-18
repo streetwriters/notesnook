@@ -23,16 +23,17 @@ import { useStore as useNotesStore } from "../../stores/note-store";
 import { createInternalLink, Notebook as NotebookType } from "@notesnook/core";
 import {
   CaretDown,
-  NotebookEdit,
   Plus,
-  RemoveShortcutLink,
-  Shortcut,
   Trash,
   Notebook as NotebookIcon,
   ArrowUp,
-  Move,
   Copy,
-  InternalLink
+  PencilSimple,
+  LinkSimple,
+  LinkBreak,
+  ArrowsInCardinal,
+  LinkHorizontal,
+  ArrowCounterClockwise
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -218,7 +219,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "add",
       title: strings.newNotebook(),
-      icon: Plus.path,
+      iconComponent: Plus,
       onClick: () =>
         AddNotebookDialog.show({ parentId: notebook.id }).then((res) =>
           res ? context?.refresh?.() : null
@@ -229,7 +230,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "edit",
       title: strings.edit(),
-      icon: NotebookEdit.path,
+      iconComponent: PencilSimple,
       onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`)
     },
     {
@@ -237,7 +238,7 @@ export const notebookMenuItems: (
       key: "set-as-default",
       title: strings.setAsDefault(),
       isChecked: defaultNotebook === notebook.id,
-      icon: NotebookIcon.path,
+      iconComponent: ArrowCounterClockwise,
       premium: !features.defaultNotebookAndTag.isAllowed,
       onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
         const defaultNotebook = db.settings.getDefaultNotebook();
@@ -255,9 +256,7 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "shortcut",
-      icon: db.shortcuts.exists(notebook.id)
-        ? RemoveShortcutLink.path
-        : Shortcut.path,
+      iconComponent: db.shortcuts.exists(notebook.id) ? LinkBreak : LinkSimple,
       title: db.shortcuts.exists(notebook.id)
         ? strings.removeShortcut()
         : strings.addShortcut(),
@@ -270,7 +269,7 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "move",
-      icon: Move.path,
+      iconComponent: ArrowsInCardinal,
       title: strings.move(),
       onClick: () => {
         MoveNotebookDialog.show({ notebook: notebook });
@@ -280,7 +279,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "copy-link",
       title: strings.copyLink(),
-      icon: InternalLink.path,
+      iconComponent: LinkHorizontal,
       onClick: () => {
         const link = createInternalLink("notebook", notebook.id);
         writeToClipboard({
@@ -293,7 +292,7 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "move-to-top",
-      icon: ArrowUp.path,
+      iconComponent: ArrowUp,
       title: strings.moveToTop(),
       isHidden: context?.isRoot,
       onClick: async () => {
@@ -319,7 +318,7 @@ export const notebookMenuItems: (
       key: "movetotrash",
       title: strings.moveToTrash(),
       variant: "dangerous",
-      icon: Trash.path,
+      iconComponent: Trash,
       onClick: () => Multiselect.moveNotebooksToTrash(ids),
       multiSelect: true
     },
@@ -327,7 +326,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "copyid",
       title: "Copy ID",
-      icon: Copy.path,
+      iconComponent: Copy,
       onClick: async () => {
         try {
           await writeToClipboard({

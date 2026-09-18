@@ -179,7 +179,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
                     type: "button",
                     title: c.title,
                     key: c.id,
-                    icon: NotebookIcon.path,
+                    iconComponent: NotebookIcon,
                     onClick: () => navigateCrumb(c.id)
                   })),
                 {
