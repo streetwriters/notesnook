@@ -367,7 +367,7 @@ function NavigationMenu({
 
             <Text
               sx={{
-                color: "black",
+                color: "heading",
                 fontSize: "20px",
                 fontWeight: 600
               }}
@@ -472,7 +472,7 @@ function NavigationMenu({
               height: isCollapsed ? "25px" : undefined
             }}
           >
-            <Plus size={15} color="icon-selected" />
+            <Plus size={15} color="accentForeground" />
             {isCollapsed ? null : strings.addItem("note")}
           </Button>
         ) : null}
@@ -513,7 +513,7 @@ function NavigationMenu({
             <Flex
               sx={{
                 flexDirection: "column",
-                gap: isCollapsed ? "spacing2" : undefined,
+                gap: isCollapsed ? "spacing2" : "spacing1",
                 px: "spacing4"
               }}
             >
@@ -521,19 +521,9 @@ function NavigationMenu({
                 isCollapsed={isCollapsed}
                 collapse={() => isNavPaneCollapsed && setExpanded(false)}
               />
-              <Box
-                bg="separator"
-                my={"spacing4"}
-                sx={{ width: "100%", height: "1px" }}
-              />
               <Colors
                 isCollapsed={isCollapsed}
                 collapse={() => isNavPaneCollapsed && setExpanded(false)}
-              />
-              <Box
-                bg="separator"
-                my={"spacing4"}
-                sx={{ width: "100%", height: "1px" }}
               />
               <Shortcuts
                 isCollapsed={isCollapsed}
@@ -703,8 +693,14 @@ function Colors({
     : colors;
   const hasMoreColors = visibleColors.length > 6;
 
+  if (colors.length === 0) return null;
   return (
     <>
+      <Box
+        bg="separator"
+        my={"spacing4"}
+        sx={{ width: "100%", height: "1px" }}
+      />
       <ReorderableList
         items={visibleColors}
         visibleItemLimit={showAllColors ? undefined : 6}
@@ -837,18 +833,25 @@ function Shortcuts({
   collapse: () => void;
 }) {
   const shortcuts = useAppStore((store) => store.shortcuts);
-
+  if (shortcuts.length === 0) return null;
   return (
-    <ReorderableList
-      items={shortcuts}
-      orderKey={`sidebarOrder:shortcuts`}
-      order={() => db.settings.getSideBarOrder("shortcuts")}
-      onOrderChanged={(order) =>
-        db.settings.setSideBarOrder("shortcuts", order)
-      }
-      context={{ isCollapsed, collapse }}
-      renderItem={ShortcutItem}
-    />
+    <>
+      <Box
+        bg="separator"
+        my={"spacing4"}
+        sx={{ width: "100%", height: "1px" }}
+      />
+      <ReorderableList
+        items={shortcuts}
+        orderKey={`sidebarOrder:shortcuts`}
+        order={() => db.settings.getSideBarOrder("shortcuts")}
+        onOrderChanged={(order) =>
+          db.settings.setSideBarOrder("shortcuts", order)
+        }
+        context={{ isCollapsed, collapse }}
+        renderItem={ShortcutItem}
+      />
+    </>
   );
 }
 

@@ -70,7 +70,7 @@ function Tags() {
       <Flex
         sx={{
           alignItems: "center",
-          borderTop: "1px solid var(--border-secondary)",
+          borderTop: "1px solid var(--separator)",
           mx: "spacing4",
           pt: "spacing4"
         }}

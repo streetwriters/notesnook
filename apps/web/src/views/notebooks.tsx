@@ -34,6 +34,7 @@ import { debounce } from "@notesnook/common";
 import { SidebarScroller } from "../components/sidebar-scroller";
 import Placeholder from "../components/placeholders";
 import { Funnel } from "../components/icons";
+import { Theme } from "@notesnook/theme";
 
 export function Notebooks() {
   const roots = useStore((store) => store.notebooks);
@@ -80,8 +81,9 @@ export function Notebooks() {
           flex: 1,
           mt: "spacing4",
           '[data-viewport-type="element"]': {
-            px: "spacing2",
-            width: "100% !important"
+            px: "spacing4",
+            width: (t) =>
+              `calc(100% - ${2 * (t as Theme).space.spacing4}px) !important`
           }
         }}
       >
@@ -179,7 +181,7 @@ export function Notebooks() {
       <Flex
         sx={{
           alignItems: "center",
-          borderTop: "1px solid var(--border-secondary)",
+          borderTop: "1px solid var(--separator)",
           mx: "spacing4",
           pt: "spacing4"
         }}

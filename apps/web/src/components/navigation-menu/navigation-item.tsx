@@ -83,6 +83,7 @@ function NavigationItem(
         py: isCollapsed ? "spacing2" : "spacing4",
         alignItems: "center",
         position: "relative",
+        lineHeight: "100%",
         ":focus": { bg: selected ? "hover-selected" : "hover" },
         ...sx
       }}

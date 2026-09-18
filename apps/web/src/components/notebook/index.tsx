@@ -55,6 +55,7 @@ import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 import { areFeaturesAvailable } from "@notesnook/common";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
+import { Theme } from "@notesnook/theme";
 
 type NotebookProps = {
   item: NotebookType;
@@ -77,12 +78,9 @@ export function Notebook(props: NotebookProps) {
     refresh = () => {},
     depth = 0
   } = props;
-  const currentContext = useNotesStore((store) =>
-    store.context?.type === "notebook" && store.context.id === item.id
-      ? store.contextNotes
-      : null
-  );
-  const isOpened = !!currentContext;
+  const context = useNotesStore((store) => store.context);
+  const contextNotes = useNotesStore((store) => store.contextNotes);
+  const isOpened = context?.type === "notebook" && context.id === item.id;
   const dragTimeout = useRef(0);
   const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
@@ -175,23 +173,30 @@ export function Notebook(props: NotebookProps) {
       footer={
         <Text
           variant="subBody"
-          color={isOpened ? "paragraph-selected" : "paragraph"}
+          color={isOpened ? "paragraph" : "paragraph-secondary"}
           sx={{ fontSize: "xxs", lineHeight: 1 }}
         >
-          {currentContext ? currentContext?.length : totalNotes}
+          {contextNotes ? contextNotes.length : totalNotes}
         </Text>
       }
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
       sx={{
-        mb: 0,
-        borderRadius: "spacing1",
-        mx: "spacing4",
-        px: "spacing2",
-        py: "spacing4",
         pr: "spacing2",
-        height: 33,
-        paddingLeft: depth === 0 ? "spacing2" : `${30 + (depth - 1) * 20}px`
+        py: "spacing4",
+        borderRadius: "radius1",
+        height: "100%",
+        mb: "spacing1",
+        pl: (t) => {
+          const theme = t as Theme;
+          const iconSize = 11;
+          const notebookIconSize = 13;
+          const gap = theme.space.spacing3;
+
+          return depth === 0
+            ? `${theme.space.spacing2}px`
+            : theme.space.spacing2 + (depth * iconSize + gap);
+        }
       }}
     />
   );
