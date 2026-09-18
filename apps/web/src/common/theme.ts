@@ -110,7 +110,7 @@ export const THEME_LIGHT: any = {
       error: {
         accent: "#f54b42",
         accentForeground: "#ffffff",
-        paragraph: "#FF242E",
+        paragraph: "#F23E46",
         background: "#FFEDEE",
         border: "#F7999D",
         heading: "#f54b42",
@@ -152,7 +152,10 @@ export const THEME_LIGHT: any = {
         icon: "#181818"
       }
     },
-    contextMenu: { primary: { background: "#f7f7f7" } },
+    contextMenu: {
+      primary: { background: "#ffffff", separator: "#f0f0f0" },
+      selected: { background: "#eeeeee" }
+    },
     editor: { selected: { background: "#e1e1e1" } },
     sheet: { selected: { paragraph: "#008836" } },
     list: {

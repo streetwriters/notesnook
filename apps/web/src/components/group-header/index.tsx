@@ -23,12 +23,12 @@ import {
   GroupOptions
 } from "@notesnook/core";
 import {
-  GroupBy,
-  OrderAtoZ,
-  OrderOldestNewest,
-  OrderZtoA,
-  OrderNewestOldest,
-  SortBy
+  SelectAll,
+  SortAscending,
+  OrderAlphabeticalAscending,
+  OrderAlphabeticalDescending,
+  OrderNumericAscending,
+  OrderNumericDescending
 } from "../icons";
 import { useEffect, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
@@ -57,7 +57,7 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
         type: "button",
         key: "groupBy",
         title: strings.groupBy(),
-        icon: GroupBy.path,
+        iconComponent: SelectAll,
         menu: {
           items: map(options, [
             { key: "none", title: strings.groupByStrings.none() },
@@ -74,14 +74,14 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
   key: "sortDirection",
   title: strings.orderBy(),
-  icon:
+  iconComponent:
     options.groupOptions.sortDirection === "asc"
       ? options.groupOptions.sortBy === "title"
-        ? OrderAtoZ.path
-        : OrderOldestNewest.path
+        ? OrderAlphabeticalAscending
+        : OrderNumericDescending
       : options.groupOptions.sortBy === "title"
-      ? OrderZtoA.path
-      : OrderNewestOldest.path,
+      ? OrderAlphabeticalDescending
+      : OrderNumericAscending,
   menu: {
     items: map(options, [
       {
@@ -114,7 +114,7 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
   key: "sortBy",
   title: strings.sortBy(),
-  icon: SortBy.path,
+  iconComponent: SortAscending,
   menu: {
     items: map(options, [
       {

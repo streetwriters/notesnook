@@ -24,12 +24,14 @@ import { store as appStore } from "../../stores/app-store";
 import { store as settingStore } from "../../stores/setting-store";
 import { db } from "../../common/db";
 import {
-  Edit,
-  Shortcut,
-  DeleteForver,
   Tag as TagIcon,
   Copy,
-  InternalLink
+  PencilSimple,
+  ArrowCounterClockwise,
+  LinkSimple,
+  LinkBreak,
+  LinkHorizontal,
+  Trash
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { createInternalLink, Tag as TagType } from "@notesnook/core";
@@ -152,7 +154,7 @@ export const tagMenuItems: (
       type: "button",
       key: "edit",
       title: strings.renameTag(),
-      icon: Edit.path,
+      iconComponent: PencilSimple,
       onClick: () => EditTagDialog.show(tag)
     },
     {
@@ -160,7 +162,7 @@ export const tagMenuItems: (
       key: "set-as-default",
       title: strings.setAsDefault(),
       isChecked: defaultTag === tag.id,
-      icon: TagIcon.path,
+      iconComponent: ArrowCounterClockwise,
       premium: !features.defaultNotebookAndTag.isAllowed,
       onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
         const defaultTag = db.settings.getDefaultTag();
@@ -175,7 +177,7 @@ export const tagMenuItems: (
       title: db.shortcuts.exists(tag.id)
         ? strings.removeShortcut()
         : strings.addShortcut(),
-      icon: Shortcut.path,
+      iconComponent: db.shortcuts.exists(tag.id) ? LinkBreak : LinkSimple,
       premium: !features.shortcuts.isAllowed,
       onClick: withFeatureCheck(features.shortcuts, () =>
         appStore.addToShortcuts(tag)
@@ -185,7 +187,7 @@ export const tagMenuItems: (
       type: "button",
       key: "copy-link",
       title: strings.copyLink(),
-      icon: InternalLink.path,
+      iconComponent: LinkHorizontal,
       onClick: () => {
         const link = createInternalLink("tag", tag.id);
         writeToClipboard({
@@ -201,7 +203,7 @@ export const tagMenuItems: (
       key: "delete",
       variant: "dangerous",
       title: strings.delete(),
-      icon: DeleteForver.path,
+      iconComponent: Trash,
       onClick: async () => {
         await Multiselect.deleteTags(ids);
       },
@@ -211,7 +213,7 @@ export const tagMenuItems: (
       type: "button",
       key: "copyid",
       title: "Copy ID",
-      icon: Copy.path,
+      iconComponent: Copy,
       onClick: async () => {
         try {
           await writeToClipboard({

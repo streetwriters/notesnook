@@ -50,7 +50,17 @@ import {
   SortBy,
   InternalLink,
   ClearTrash,
-  Sliders
+  Sliders,
+  ArrowCounterClockwise,
+  PencilSimple,
+  Backspace,
+  LinkHorizontal,
+  Ellipse,
+  MoonStars,
+  GearSix,
+  SignOut,
+  Question,
+  SignIn
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -95,7 +105,7 @@ import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
 import { Color, createInternalLink, Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
-import { Menu, useMenuStore, useMenuTrigger } from "../../hooks/use-menu";
+import { Menu, useMenuStore } from "../../hooks/use-menu";
 import { RenameColorDialog } from "../../dialogs/item-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { showToast } from "../../utils/toast";
@@ -622,7 +632,7 @@ function RouteItem({
                 key: "clear-trash",
                 title: strings.clearTrash(),
                 isDisabled: !trash || trash.length === 0,
-                icon: ClearTrash.path,
+                iconComponent: Trash,
                 onClick: async () => {
                   const ok = await ConfirmDialog.show({
                     title: strings.clearTrash(),
@@ -757,7 +767,7 @@ function ColorItem({
       key={color.id}
       title={color.title}
       isCollapsed={context?.isCollapsed}
-      icon={Circle}
+      icon={Ellipse}
       iconSize={10}
       selected={currentContext?.id === color.id}
       color={color.colorCode}
@@ -772,7 +782,7 @@ function ColorItem({
           key: "rename-color",
           title: strings.renameColor(),
           onClick: () => RenameColorDialog.show(color),
-          icon: Rename.path
+          iconComponent: PencilSimple
         },
         {
           type: "button",
@@ -782,7 +792,7 @@ function ColorItem({
             await db.colors.remove(color.id);
             await useAppStore.getState().refreshNavItems();
           },
-          icon: Trash.path
+          iconComponent: Backspace
         },
         {
           type: "button",
@@ -796,7 +806,8 @@ function ColorItem({
               "text/html": `<a href="${link}">${color.title}</a>`,
               "text/markdown": `[${color.title}](${link})`
             });
-          }
+          },
+          iconComponent: LinkHorizontal
         },
         {
           type: "lazy-loader",
@@ -894,7 +905,7 @@ function ShortcutItem({
           type: "button",
           key: "removeshortcut",
           title: strings.doActions.remove.shortcut(1),
-          icon: Trash.path,
+          iconComponent: Trash,
           onClick: async () => {
             await db.shortcuts.remove(item.id);
             useAppStore.getState().refreshNavItems();
@@ -1010,7 +1021,7 @@ function NavigationDropdown() {
               type: "button",
               title: strings.toggleDarkLightMode(),
               key: "toggle-theme-mode",
-              icon: theme === "dark" ? LightMode.path : DarkMode.path,
+              iconComponent: MoonStars,
               onClick: () => {
                 setFollowSystemTheme(false);
                 toggleNightMode();
@@ -1022,13 +1033,13 @@ function NavigationDropdown() {
               icon: Pro.path,
               key: "upgrade",
               onClick: () => BuyDialog.show({}),
-              isHidden: notLoggedIn || isSubscribed
+              isHidden: notLoggedIn || !isSubscribed
             },
             {
               type: "button",
               title: settings.title,
               key: settings.id,
-              icon: settings.icon.path,
+              iconComponent: GearSix,
               onClick: () => {
                 hashNavigate(settings.path);
               }
@@ -1036,7 +1047,7 @@ function NavigationDropdown() {
             {
               type: "button",
               title: strings.helpAndSupport(),
-              icon: Documentation.path,
+              iconComponent: Question,
               key: "help-and-support",
               onClick: () => {
                 window.open("https://help.notesnook.com/", "_blank");
@@ -1045,7 +1056,7 @@ function NavigationDropdown() {
             {
               type: "button",
               title: strings.login(),
-              icon: Login.path,
+              iconComponent: SignIn,
               key: "login",
               isHidden: !notLoggedIn,
               onClick: () => hardNavigate("/login")
@@ -1053,7 +1064,7 @@ function NavigationDropdown() {
             {
               type: "button",
               title: strings.logout(),
-              icon: Logout.path,
+              iconComponent: SignOut,
               key: "logout",
               isHidden: notLoggedIn,
               onClick: () => logout()
@@ -1258,7 +1269,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
             useAppStore.getState().setHiddenColors([]);
           });
       },
-      icon: Reset.path
+      iconComponent: ArrowCounterClockwise
     },
     { type: "separator", key: "sep" },
     ...toMenuItems(
@@ -1269,7 +1280,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
           .setSideBarHiddenItems("routes", ids)
           .then(() => useAppStore.getState().setHiddenRoutes(ids)),
       customizableSidebar,
-      (item) => ({ icon: item.icon.path })
+      (item) => ({ iconComponent: item.icon })
     ),
     { type: "separator", key: "sep", isHidden: colors.length <= 0 },
     ...toMenuItems(
@@ -1281,7 +1292,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
           .then(() => useAppStore.getState().setHiddenColors(ids)),
       customizableSidebar,
       (item) => ({
-        icon: Circle.path,
+        iconComponent: Ellipse,
         styles: { icon: { color: item.colorCode } }
       })
     )
