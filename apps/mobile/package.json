@@ -42,8 +42,6 @@
     "@formatjs/intl-locale": "4.0.0",
     "@formatjs/intl-pluralrules": "5.2.14",
     "@legendapp/list": "^2.0.14",
-    "@lingui/core": "5.1.2",
-    "@lingui/react": "5.1.2",
     "@mdi/js": "^6.7.96",
     "@messageformat/parser": "^5.1.1",
     "@notesnook/common": "file:../../packages/common",

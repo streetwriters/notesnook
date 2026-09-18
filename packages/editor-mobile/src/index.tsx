@@ -19,12 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "./utils/index";
 import "./utils/commands";
 global.Buffer = require("buffer").Buffer;
-import { i18n } from "@lingui/core";
+import { i18n, initLocale, setI18nGlobal } from "@notesnook/intl";
 import "@notesnook/editor/styles/fonts.mobile.css";
 import "@notesnook/editor/styles/katex-fonts.mobile.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/styles.css";
-import { setI18nGlobal } from "@notesnook/intl";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
@@ -42,34 +41,25 @@ setTimeout(() => {
   }
 }, 1000);
 let appLoaded = false;
-function loadApp() {
+async function loadApp() {
   if (appLoaded) return;
   appLoaded = true;
-  const locale = globalThis.LINGUI_LOCALE_DATA
-    ? Promise.resolve(globalThis.LINGUI_LOCALE_DATA)
-    : globalThis.__DEV__ || process.env.NODE_ENV === "development"
-    ? import("@notesnook/intl/locales/$pseudo-LOCALE.json").then(
-        ({ default: locale }) => ({ en: locale.messages })
-      )
-    : import("@notesnook/intl/locales/$en.json").then(
-        ({ default: locale }) => ({
-          en: locale.messages
-        })
-      );
-
-  locale.then(async (locale: { [name: string]: any }) => {
-    i18n.load(locale);
+  if (globalThis.LINGUI_LOCALE_DATA) {
+    i18n.load(globalThis.LINGUI_LOCALE_DATA);
     i18n.activate(globalThis.LINGUI_LOCALE || "en");
-    //@ts-ignore
     setI18nGlobal(i18n);
+  } else {
+    await initLocale({
+      systemLocale: navigator.language || "en"
+    });
+  }
 
-    const rootElement = document.getElementById("root");
-    if (rootElement) {
-      const root = createRoot(rootElement);
-      const App = require("./App").default;
-      root.render(<App />);
-    }
-  });
+  const rootElement = document.getElementById("root");
+  if (rootElement) {
+    const root = createRoot(rootElement);
+    const App = require("./App").default;
+    root.render(<App />);
+  }
 }
 globalThis.loadApp = loadApp;
 
