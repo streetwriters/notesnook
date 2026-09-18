@@ -55,7 +55,7 @@ Automatic and realtime sync can both be switched off individually on a paid plan
 1. Look at the status bar along the bottom of the window.
 2. Click the sync icon next to your account indicator.
 
-The icon starts spinning and its tooltip changes to `{{syncing}}` — or `{{downloading}}` / `{{uploading}}` — until it finishes.
+The icon starts spinning and its tooltip changes to `{{networkProgress:sync}}` — or `{{networkProgress:download}}` / `{{networkProgress:upload}}` — until it finishes.
 
 == Mobile
 
@@ -72,15 +72,15 @@ You can also pull down on any list of notes to start a sync.
 == Desktop/Web
 Only the icon is drawn in the status bar at the bottom of the window — hover it and the tooltip tells you the state. There are seven:
 
-| Tooltip                                             | What it means                                                                                                        |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `Synced <time> ago`                                 | Everything is up to date.                                                                                            |
-| `{{syncing}}`, `{{downloading}}` or `{{uploading}}` | A sync is running right now. The number in brackets is how many items have been transferred.                         |
-| `Merge conflicts`                                   | Sync stopped because two versions of a note need your decision. The icon becomes a red alert triangle.               |
-| `Sync disabled`, with a red alert icon              | Your email address is not confirmed yet. The status bar also shows `{{emailNotConfirmed}}` next to your account dot. |
-| `{{syncFailed}}`                                    | The last sync did not finish.                                                                                        |
-| `Synced <time> ago (offline)`                       | You have no internet connection.                                                                                     |
-| `Sync disabled`, with a greyed-out icon             | You turned sync off in settings.                                                                                     |
+| Tooltip                                                                                    | What it means                                                                                                        |
+| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `Synced <time> ago`                                                                        | Everything is up to date.                                                                                            |
+| `{{networkProgress:sync}}`, `{{networkProgress:download}}` or `{{networkProgress:upload}}` | A sync is running right now. The number in brackets is how many items have been transferred.                         |
+| `Merge conflicts`                                                                          | Sync stopped because two versions of a note need your decision. The icon becomes a red alert triangle.               |
+| `Sync disabled`, with a red alert icon                                                     | Your email address is not confirmed yet. The status bar also shows `{{emailNotConfirmed}}` next to your account dot. |
+| `{{syncFailed}}`                                                                           | The last sync did not finish.                                                                                        |
+| `Synced <time> ago (offline)`                                                              | You have no internet connection.                                                                                     |
+| `Sync disabled`, with a greyed-out icon                                                    | You turned sync off in settings.                                                                                     |
 
 Clicking the icon starts a sync, unless sync is disabled.
 

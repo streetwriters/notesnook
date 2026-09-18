@@ -86,9 +86,7 @@ This is the safest method, because it decrypts your data with your old key and t
 1. Click the first option (the button that says `{{recoveryKeyMethod}}`) if you haven't already
 2. Enter your recovery key in the input field & click `{{startAccountRecovery}}`
    ![The recovery key field on the account recovery page](/static/account-recovery/step-4.png)
-3. Click `{{downloadBackupFile}}` once your data has been downloaded. **_Don't forget to save the file in a safe place._**
-   ![The account recovery screen offering a download of your decrypted backup file](/static/account-recovery/step-5.png)
-4. For next steps, see [Resetting account password](#resetting-account-password) section
+3. For next steps, see [Resetting account password](#resetting-account-password) section
 
 ### Clear data & reset account
 
