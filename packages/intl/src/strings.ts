@@ -1466,6 +1466,7 @@ For example:
   search: () => t`Search`,
   enterEmailAddress: () => t`Enter email address`,
   noNotebooksYet: () => t`No notebooks yet`,
+  noNotebooksCreated: () => t`You haven't created any notebooks.`,
   notebooksEmptyBody: () => t`Start organizing your ideas, notes and thoughts`,
   createNotebook: () => t`Create notebook`,
   enterValidEmail: () => t`Please enter a valid email address`,
@@ -3405,6 +3406,7 @@ Continue without attachments?`,
   freeTrialIncludes: (duration: number) =>
     t`${duration} days free trial includes all features`,
   noTagsYet: () => t`No tags yet`,
+  useTagsToOrganizeNotes: () => t`You can use #tags to organize your notes.`,
   tagsEmptyBody: () =>
     t`Create your first tag to start organizing your workspace.`,
   newestFirst: () => t`Newest first`,

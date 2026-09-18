@@ -79,6 +79,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     getChildNodes,
     treeRef,
     saveKey,
+    style,
 
     placeholder: Placeholder,
     isSelected,

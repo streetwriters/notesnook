@@ -139,15 +139,17 @@ export const THEME_LIGHT: any = {
     },
     navigationMenu: {
       primary: {
-        background: "#f7f7f7",
-        paragraph: "#666",
-        icon: "#666",
-        hover: "#eee"
+        background: "#F6F7F9",
+        paragraph: "#474747",
+        icon: "#666666",
+        hover: "#eee",
+        separator: "#E7E7E7"
       },
-      secondary: { background: "#EEEEEE" },
       selected: {
-        background: "#00883610",
-        hover: "#eee"
+        background: "#0088361a",
+        paragraph: "#181818",
+        hover: "#eee",
+        icon: "#181818"
       }
     },
     contextMenu: { primary: { background: "#f7f7f7" } },
