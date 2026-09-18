@@ -180,6 +180,7 @@ export default function ReminderNotify({
           <List
             data={references}
             loading={false}
+            hideHeaderTopBorder={true}
             dataType="note"
             groupType="notes"
             isRenderedInActionSheet={true}

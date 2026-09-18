@@ -70,7 +70,7 @@ export const PinnedSection = React.memo(
         menuPins.map((item) => ({
           id: item.id,
           title: item.title,
-          icon: item.type === "notebook" ? "notebook-outline" : "pound",
+          icon: item.type === "notebook" ? "bookmark" : "shopping-mode",
           dataType: item.type,
           data: item,
           onPress: onPress,
@@ -86,18 +86,14 @@ export const PinnedSection = React.memo(
     return (
       <View
         style={{
-          flexGrow: 1,
-          borderTopWidth: 1,
-          borderTopColor: colors.primary.separator,
-          marginTop: DefaultAppStyles.GAP_SMALL,
-          paddingTop: DefaultAppStyles.GAP_SMALL
+          flexGrow: 1
         }}
       >
         <ReorderableList
           onListOrderChanged={(data) => {
             db.settings.setSideBarOrder("shortcuts", data);
           }}
-          onHiddenItemsChanged={() => {}}
+          onHiddenItemsChanged={() => { }}
           canHideItems={false}
           itemOrder={order}
           hiddenItems={[]}

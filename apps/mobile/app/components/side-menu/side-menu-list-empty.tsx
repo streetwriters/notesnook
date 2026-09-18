@@ -23,9 +23,15 @@ import { AppFontSize, defaultBorderRadius } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import Paragraph from "../ui/typography/paragraph";
 import { SideMenuHeader } from "./side-menu-header";
+import Heading from "../ui/typography/heading";
+import { Spacing } from "../../common/design/spacing";
+import { Button } from "../ui/button";
 
 type SideMenuListEmptyProps = {
-  placeholder: string;
+  placeholderTitle: string;
+  placeholderBody: string;
+  placeholderButtonTitle: string;
+  onPressPlaceholderButton: () => void;
   isLoading?: boolean;
 };
 
@@ -41,7 +47,7 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
       <View
         style={{
           backgroundColor: colors.primary.background,
-          paddingTop: DefaultAppStyles.GAP_VERTICAL
+          paddingTop: Spacing.LEVEL_1
         }}
       >
         <SideMenuHeader />
@@ -76,9 +82,37 @@ export const SideMenuListEmpty = (props: SideMenuListEmptyProps) => {
             ))}
           </View>
         ) : (
-          <Paragraph size={AppFontSize.xs} color={colors.secondary.paragraph}>
-            {props.placeholder}
-          </Paragraph>
+          <View
+            style={{
+              alignItems: "center",
+              gap: Spacing.LEVEL_1
+            }}
+          >
+            <Heading size={AppFontSize.md} color={colors.primary.heading}>
+              {props.placeholderTitle}
+            </Heading>
+            <Paragraph
+              style={{
+                textAlign: "center",
+                maxWidth: "60%"
+              }}
+              fontSize="SM"
+              color={colors.primary.paragraph}
+            >
+              {props.placeholderBody}
+            </Paragraph>
+
+            <Button
+              title={props.placeholderButtonTitle}
+              onPress={props.onPressPlaceholderButton}
+              style={{
+                marginTop: Spacing.LEVEL_2,
+                paddingVertical: Spacing.LEVEL_3,
+                paddingHorizontal: Spacing.LEVEL_3
+              }}
+              type="accent"
+            />
+          </View>
         )}
       </View>
     </View>

@@ -52,6 +52,7 @@ export type TipContext =
   | "attachments";
 
 export type Tip = {
+  title?: string;
   text: string;
   contexts: TipContext[];
   button?: TipButton;
@@ -104,7 +105,11 @@ export const useTip = (
   }, [context, options?.delay, options?.rotate]);
 
   if (tip && defaultTip) {
-    return { ...tip, button: defaultTip.button };
+    return {
+      ...tip,
+      title: defaultTip.title || tip.title,
+      button: defaultTip.button
+    };
   } else return tip || defaultTip;
 };
 
@@ -188,6 +193,7 @@ const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
     }
   },
   notebooks: {
+    title: "No notebooks yet",
     text: "You haven't created any notebooks.",
     button: { ...CREATE_BUTTON_MAP.notebooks, icon: Plus }
   },
@@ -203,6 +209,7 @@ const DEFAULT_TIPS: Record<TipContext, Omit<Tip, "contexts">> = {
     button: { ...CREATE_BUTTON_MAP.reminders, icon: Plus }
   },
   tags: {
+    title: "No tags yet",
     text: "You can use #tags to organize your notes.",
     button: {
       ...CREATE_BUTTON_MAP.tags,

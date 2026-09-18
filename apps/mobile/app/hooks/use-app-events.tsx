@@ -63,7 +63,7 @@ import {
   useTabStore
 } from "../screens/editor/tiptap/use-tab-store";
 import { editorController, editorState } from "../screens/editor/tiptap/utils";
-import { useDragState } from "../screens/settings/editor/state";
+import { useDragState } from "../screens/settings/components/editor/state";
 import BackupService from "../services/backup";
 import BiometricService from "../services/biometrics";
 import {

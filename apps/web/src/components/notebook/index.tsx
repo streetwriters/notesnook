@@ -18,12 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { createInternalLink, Notebook as NotebookType } from "@notesnook/core";
 import {
-  ChevronDown,
-  ChevronRight,
+  CaretDown,
   NotebookEdit,
   Plus,
   RemoveShortcutLink,
@@ -56,6 +55,7 @@ import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 import { areFeaturesAvailable } from "@notesnook/common";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
+import { Theme } from "@notesnook/theme";
 
 type NotebookProps = {
   item: NotebookType;
@@ -78,12 +78,9 @@ export function Notebook(props: NotebookProps) {
     refresh = () => {},
     depth = 0
   } = props;
-  const currentContext = useNotesStore((store) =>
-    store.context?.type === "notebook" && store.context.id === item.id
-      ? store.contextNotes
-      : null
-  );
-  const isOpened = !!currentContext;
+  const context = useNotesStore((store) => store.context);
+  const contextNotes = useNotesStore((store) => store.contextNotes);
+  const isOpened = context?.type === "notebook" && context.id === item.id;
   const dragTimeout = useRef(0);
   const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
@@ -123,36 +120,37 @@ export function Notebook(props: NotebookProps) {
         }
       }}
       title={
-        <Flex
-          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
-        >
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
           {isExpandable ? (
             <Button
               variant="secondary"
-              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+              sx={{
+                bg: "transparent",
+                p: 0,
+                borderRadius: "radius1",
+                width: 11,
+                height: 11
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 isExpanded ? collapse() : expand();
               }}
             >
-              {isExpanded ? (
-                <ChevronDown
-                  size={14}
-                  color={isOpened ? "icon-selected" : "icon"}
-                />
-              ) : (
-                <ChevronRight
-                  size={14}
-                  color={isOpened ? "icon-selected" : "icon"}
-                />
-              )}
+              <CaretDown
+                size={11}
+                color={isOpened ? "icon-selected" : "icon"}
+                sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
+              />
             </Button>
           ) : (
+            <Box sx={{ width: 11, height: 11 }} />
+          )}
+          {depth === 0 ? (
             <NotebookIcon
-              size={14}
+              size={13}
               color={isOpened ? "icon-selected" : "icon"}
             />
-          )}
+          ) : null}
           <Text
             data-test-id={`title`}
             variant={"body"}
@@ -161,8 +159,11 @@ export function Notebook(props: NotebookProps) {
               whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontWeight: "body",
-              display: "block"
+              fontWeight: "normal",
+              display: "block",
+              fontSize: "xs",
+              lineHeight: 1,
+              minWidth: 0
             }}
           >
             {item.title}
@@ -170,16 +171,32 @@ export function Notebook(props: NotebookProps) {
         </Flex>
       }
       footer={
-        <Text variant="subBody">
-          {currentContext ? currentContext?.length : totalNotes}
+        <Text
+          variant="subBody"
+          color={isOpened ? "paragraph" : "paragraph-secondary"}
+          sx={{ fontSize: "xxs", lineHeight: 1 }}
+        >
+          {contextNotes ? contextNotes.length : totalNotes}
         </Text>
       }
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
       sx={{
-        mb: "small",
-        borderRadius: "default",
-        paddingLeft: `${5 + (depth === 0 ? 0 : 15 * depth)}px`
+        pr: "spacing2",
+        py: "spacing4",
+        borderRadius: "radius1",
+        height: "100%",
+        mb: "spacing1",
+        pl: (t) => {
+          const theme = t as Theme;
+          const iconSize = 11;
+          const notebookIconSize = 13;
+          const gap = theme.space.spacing3;
+
+          return depth === 0
+            ? `${theme.space.spacing2}px`
+            : theme.space.spacing2 + (depth * iconSize + gap);
+        }
       }}
     />
   );

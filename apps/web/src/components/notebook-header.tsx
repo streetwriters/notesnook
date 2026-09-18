@@ -22,12 +22,13 @@ import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate, navigate } from "../navigation";
 import { Button, Flex, Text } from "@theme-ui/components";
 import {
-  ChevronRight,
-  Edit,
+  LinkSimple,
   MoreHorizontal,
-  Notebook2,
-  RemoveShortcutLink,
-  ShortcutLink
+  Notebook as NotebookIcon,
+  NoteCalendar,
+  PencilSimple,
+  LinkBreak,
+  CaretRight
 } from "./icons";
 import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { db } from "../common/db";
@@ -71,69 +72,69 @@ export function NotebookHeader(props: {
   }, [props.notebook, props.totalNotes]);
 
   if (!notebook) return null;
-  const { title, description, dateEdited } = notebook;
 
   return (
     <Flex
       data-test-id="notebook-header"
       sx={{
         flexDirection: "column",
-        p: 1,
-        gap: "7px",
-        bg: "var(--background-secondary)",
-        borderBottom: "1px solid var(--border)"
+        mt: "spacing6",
+        gap: "spacing7",
+        px: "spacing6",
+        py: "spacing4",
+        bg: "background-selected"
       }}
     >
-      <NotebookCrumbs notebook={notebook} />
-      <Notebook2
-        size={24}
-        sx={{
-          alignSelf: "start"
-        }}
-      />
-      <Text
-        data-test-id="notebook-title"
-        variant="heading"
-        sx={{ fontSize: "title" }}
-      >
-        {title}
-      </Text>
-      {description && <Text variant="body">{description}</Text>}
-      <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Flex sx={{ alignItems: "center", gap: 2 }}>
-          <Text variant="subBody">
-            {formatDate(dateEdited, { type: "date", dateFormat })}
-          </Text>
-          <Text variant="subBody">{strings.notes(totalNotes || 0)}</Text>
+      <Flex sx={{ flexDirection: "column", gap: "spacing6" }}>
+        <NotebookCrumbs notebook={notebook} />
+        <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+          <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+            <NotebookIcon size={17} color="icon" />
+            <Text
+              data-test-id="notebook-title"
+              sx={{ fontSize: "md", fontWeight: 500, color: "heading" }}
+            >
+              {notebook.title}
+            </Text>
+          </Flex>
+          {notebook.description && (
+            <Text sx={{ fontSize: "xxs", fontWeight: 400, color: "paragraph" }}>
+              {notebook.description}
+            </Text>
+          )}
         </Flex>
-        <Flex sx={{ alignItems: "center", gap: 1 }}>
+      </Flex>
+      <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Flex sx={{ alignItems: "center", gap: "spacing2" }}>
+          <NoteCalendar size={13} color="icon-secondary" />
+          <Text
+            sx={{ fontSize: "xxs", color: "paragraph", lineHeight: "125%" }}
+          >
+            {formatDate(notebook.dateEdited, { type: "date", dateFormat })}
+          </Text>
+          <Text sx={{ fontSize: "xxs", color: "icon-disabled" }}>•</Text>
+          <Text sx={{ fontSize: "xxs", color: "paragraph" }}>
+            {strings.notes(totalNotes || 0)}
+          </Text>
+        </Flex>
+        <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
           <Button
-            variant="secondary"
-            sx={{
-              borderRadius: 100,
-              p: 1
-            }}
+            variant="icon"
+            sx={{ p: 0 }}
             title={
               isShortcut ? strings.removeShortcut() : strings.createShortcut()
             }
             onClick={() => addToShortcuts(notebook)}
           >
-            {isShortcut ? (
-              <RemoveShortcutLink size={14} />
-            ) : (
-              <ShortcutLink size={14} />
-            )}
+            {isShortcut ? <LinkBreak size={15} /> : <LinkSimple size={15} />}
           </Button>
           <Button
-            variant="secondary"
-            sx={{
-              borderRadius: 100,
-              p: 1
-            }}
+            variant="icon"
+            sx={{ p: 0 }}
             title={strings.editNotebook()}
             onClick={() => hashNavigate(`/notebooks/${notebook.id}/edit`)}
           >
-            <Edit size={14} />
+            <PencilSimple size={15} />
           </Button>
         </Flex>
       </Flex>
@@ -161,11 +162,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
         onClick={() => navigateCrumb(crumbs[0]?.id)}
         text={crumbs[0]?.title}
       />
-      <ChevronRight
-        as="span"
-        sx={{ display: "inline", verticalAlign: "bottom" }}
-        size={14}
-      />
+      <CaretRight sx={{ color: "icon-secondary", mx: "spacing2" }} size={11} />
       {crumbs.length > 3 && (
         <>
           <Button
@@ -182,7 +179,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
                     type: "button",
                     title: c.title,
                     key: c.id,
-                    icon: Notebook2.path,
+                    icon: NotebookIcon.path,
                     onClick: () => navigateCrumb(c.id)
                   })),
                 {
@@ -197,12 +194,12 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
               );
             }}
           >
-            <MoreHorizontal size={14} />
+            <MoreHorizontal size={14} color="icon-secondary" />
           </Button>
-          <ChevronRight
-            sx={{ display: "inline", verticalAlign: "bottom" }}
+          <CaretRight
+            sx={{ color: "icon-secondary", mx: "spacing2" }}
             as="span"
-            size={14}
+            size={11}
           />
         </>
       )}
@@ -213,10 +210,10 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
             text={crumb.title}
           />
           {index === array.length - 1 ? null : (
-            <ChevronRight
+            <CaretRight
               as="span"
-              sx={{ display: "inline", verticalAlign: "bottom" }}
-              size={14}
+              sx={{ color: "icon-secondary", mx: "spacing2" }}
+              size={11}
             />
           )}
         </>
@@ -229,14 +226,13 @@ function CrumbText(props: { text: string; onClick: () => void }) {
   return (
     <Text
       sx={{
-        fontSize: "subBody",
+        fontSize: "xxs",
         textDecoration: "none",
-        color: "var(--paragraph-secondary)",
+        color: "paragraph-secondary",
         whiteSpace: "nowrap",
         textOverflow: "ellipsis",
         overflow: "hidden",
         cursor: "pointer",
-        paddingBottom: "2px",
         ":hover": { color: "paragraph-hover" }
       }}
       onClick={props.onClick}
