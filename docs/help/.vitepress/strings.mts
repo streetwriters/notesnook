@@ -16,8 +16,7 @@
  */
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { i18n } from "@lingui/core";
-import { strings, setI18nGlobal } from "@notesnook/intl";
+import { strings, setI18nGlobal, i18n } from "@notesnook/intl";
 
 const require = createRequire(import.meta.url);
 
@@ -102,7 +101,9 @@ const TOKEN = /\{\{\s*([A-Za-z][A-Za-z0-9_]*)(?::(\d+))?\s*\}\}/g;
  */
 export function stringsMarkdownPlugin(md: any) {
   md.core.ruler.push("nn_ui_strings", (state: any) => {
-    const where = state.env?.relativePath ? ` in ${state.env.relativePath}` : "";
+    const where = state.env?.relativePath
+      ? ` in ${state.env.relativePath}`
+      : "";
     const swap = (text: string) =>
       text.replace(TOKEN, (_match: string, key: string, count?: string) => {
         try {
