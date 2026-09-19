@@ -120,9 +120,11 @@
         <activity
             android:name=".NotePreviewConfigureActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:label="NotePreviewConfigure"
             android:launchMode="singleTask"
+            android:taskAffinity=""
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
