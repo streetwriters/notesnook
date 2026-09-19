@@ -12,7 +12,9 @@
   "devDependencies": {
     "@playwright/test": "1.48.2",
     "@rsbuild/core": "^1.5.13",
-    "slugify": "1.6.6"
+    "linkedom": "^0.14.17",
+    "slugify": "1.6.6",
+    "vitest": "2.1.8"
   },
   "publishConfig": {
     "access": "public"
@@ -25,6 +27,7 @@
     "build": "tsc && npx rsbuild build",
     "prepublishOnly": "npm run build",
     "test": "playwright test",
+    "test:unit": "vitest run",
     "postinstall": "patch-package",
     "watch": "tsc --watch"
   },
