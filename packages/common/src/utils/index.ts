@@ -30,4 +30,3 @@ export * from "./dataurl.js";
 export * from "./tab-session-history.js";
 export * from "./keybindings.js";
 export * from "./is-feature-available.js";
-export * from "./format-group-title.js";
