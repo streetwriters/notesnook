@@ -58,47 +58,28 @@ type CaptionsFromAvailability<A> = A extends Record<
   ? C
   : never;
 
-const FEATURE_TITLES: Partial<Record<string, () => string>> = {
-  storage: strings.storage,
-  fileSize: strings.maximumFileSize,
-  fullQualityImages: strings.fullQualityImages,
-  blockLinking: strings.blockLevelNoteLinks,
-  colors: strings.colors,
-  tags: strings.tags,
-  notebooks: strings.notebooks,
-  activeReminders: strings.activeReminders,
-  shortcuts: strings.shortcuts,
-  appLock: strings.appLock,
-  maxNoteVersions: strings.noteHistory,
-  customizableSidebar: strings.customizableSidebar,
-  syncControls: strings.sync,
-  callout: strings.callout,
-  sms2FA: strings.twoFactorAuth,
-  monographs: strings.monographs
-};
-
 function createFeature<A extends FeatureAvailability>(
   feature: Omit<Feature, "error" | "availability"> & {
     error?: Feature["error"];
     availability: A;
   }
 ): Feature<CaptionsFromAvailability<A>> {
-  const getTitle = (): string => {
-    const localized = FEATURE_TITLES[feature.id];
-    return localized ? localized() : feature.title;
-  };
   const f = {
     ...feature,
-    get title(): string {
-      return getTitle();
-    },
     error:
       feature.error ??
       ((l: Limit): string =>
         typeof l.caption === "number"
-          ? strings.reachedLimitOf(l.caption, getTitle().toLowerCase())
-          : strings.featureNotAvailableOnPlan(getTitle()))
+          ? strings.reachedLimitOf(l.caption, feature.title.toLowerCase())
+          : strings.featureNotAvailableOnPlan(feature.title))
   };
+  Object.defineProperty(f, "title", {
+    get() {
+      return feature.title;
+    },
+    enumerable: true,
+    configurable: true
+  });
   return f as unknown as Feature<CaptionsFromAvailability<A>>;
 }
 
@@ -144,7 +125,9 @@ type Caption<TId extends FeatureId> =
 const features = {
   storage: createFeature({
     id: "storage",
-    title: "Storage",
+    get title() {
+      return strings.storage();
+    },
     used: async () => {
       const user = await db.user.getUser();
       return user?.storageUsed || 0;
@@ -159,7 +142,9 @@ const features = {
   }),
   fileSize: createFeature({
     id: "fileSize",
-    title: "Maximum file size",
+    get title() {
+      return strings.maximumFileSize();
+    },
     error: (limit) =>
       `You cannot upload files larger than ${limit.caption} on this plan.`,
     availability: {
@@ -172,7 +157,9 @@ const features = {
   }),
   fullQualityImages: createFeature({
     id: "fullQualityImages",
-    title: "Full quality images",
+    get title() {
+      return strings.fullQualityImages();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -183,7 +170,9 @@ const features = {
   }),
   blockLinking: createFeature({
     id: "blockLinking",
-    title: "Block-level note links",
+    get title() {
+      return strings.blockLevelNoteLinks();
+    },
     error: () => `Block-level note links are not available on this plan.`,
     availability: {
       free: createLimit(false),
@@ -195,7 +184,9 @@ const features = {
   }),
   taskList: createFeature({
     id: "taskList",
-    title: "Task list",
+    get title() {
+      return strings.taskList();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -206,7 +197,9 @@ const features = {
   }),
   outlineList: createFeature({
     id: "outlineList",
-    title: "Outline list",
+    get title() {
+      return strings.outlineList();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -217,7 +210,9 @@ const features = {
   }),
   callout: createFeature({
     id: "callout",
-    title: "Callouts",
+    get title() {
+      return strings.callout();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -228,7 +223,9 @@ const features = {
   }),
   colors: createFeature({
     id: "colors",
-    title: "Colors",
+    get title() {
+      return strings.colors();
+    },
     used: () => db.colors.all.count(),
     availability: {
       free: createLimit(7),
@@ -240,7 +237,9 @@ const features = {
   }),
   tags: createFeature({
     id: "tags",
-    title: "Tags",
+    get title() {
+      return strings.tags();
+    },
     used: () => db.tags.all.count(),
     availability: {
       free: createLimit(50),
@@ -252,7 +251,9 @@ const features = {
   }),
   notebooks: createFeature({
     id: "notebooks",
-    title: "Notebooks",
+    get title() {
+      return strings.notebooks();
+    },
     used: () => db.notebooks.all.count(),
     availability: {
       free: createLimit(50),
@@ -264,7 +265,9 @@ const features = {
   }),
   activeReminders: createFeature({
     id: "activeReminders",
-    title: "Active reminders",
+    get title() {
+      return strings.activeReminders();
+    },
     used: () => db.reminders.active.count(),
     availability: {
       free: createLimit(10),
@@ -276,7 +279,9 @@ const features = {
   }),
   shortcuts: createFeature({
     id: "shortcuts",
-    title: "Shortcuts",
+    get title() {
+      return strings.shortcuts();
+    },
     used: () => db.shortcuts.all.length,
     availability: {
       free: createLimit(10),
@@ -355,7 +360,9 @@ const features = {
   }),
   markdownShortcuts: createFeature({
     id: "markdownShortcuts",
-    title: "Markdown shortcuts",
+    get title() {
+      return strings.mardownShortcuts();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -366,7 +373,9 @@ const features = {
   }),
   fontLigatures: createFeature({
     id: "fontLigatures",
-    title: "Font ligatures",
+    get title() {
+      return strings.fontLigatures();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -388,7 +397,9 @@ const features = {
   }),
   customizableSidebar: createFeature({
     id: "customizableSidebar",
-    title: "Customizable sidebar",
+    get title() {
+      return strings.customizableSidebar();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -410,7 +421,9 @@ const features = {
   }),
   appLock: createFeature({
     id: "appLock",
-    title: "App lock",
+    get title() {
+      return strings.appLock();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -421,7 +434,9 @@ const features = {
   }),
   maxNoteVersions: createFeature({
     id: "maxNoteVersions",
-    title: "Maximum note versions",
+    get title() {
+      return strings.noteHistory();
+    },
     availability: {
       free: createLimit(100),
       essential: createLimit(1000),
@@ -432,7 +447,9 @@ const features = {
   }),
   fullOfflineMode: createFeature({
     id: "fullOfflineMode",
-    title: "Full offline mode",
+    get title() {
+      return strings.fullOfflineMode();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -443,7 +460,9 @@ const features = {
   }),
   syncControls: createFeature({
     id: "syncControls",
-    title: "Sync controls",
+    get title() {
+      return strings.sync();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -476,7 +495,9 @@ const features = {
   }),
   sms2FA: createFeature({
     id: "sms2FA",
-    title: "2FA via SMS",
+    get title() {
+      return strings.twoFactorAuth();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
