@@ -106,7 +106,7 @@ export const AppLockSettings: SettingsGroup[] = [
             },
             onSelectionChanged: async (value) => {
               if (!(await authenticateAppLock())) {
-                showToast("error", "Failed to authenticate.");
+                showToast("error", strings.biometricsAuthError());
                 return;
               }
               useKeyStore.getState().setValue("lockAfter", parseInt(value));
