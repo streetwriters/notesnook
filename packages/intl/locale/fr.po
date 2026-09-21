@@ -668,6 +668,10 @@ msgstr "Formule 5 ans (achat unique)"
 msgid "6 digit code"
 msgstr "Code à 6 chiffres"
 
+#: src/strings.ts:756
+msgid "@andrewsayer on Twitter"
+msgstr "@andrewsayer sur Twitter"
+
 #: src/strings.ts:2588
 msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
 msgstr "Un carnet peut contenir un nombre illimité de sous-carnets avec un nombre illimité de notes."

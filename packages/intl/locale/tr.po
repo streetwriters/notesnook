@@ -668,6 +668,10 @@ msgstr "5 yıllık plan (tek seferlik satın alma)"
 msgid "6 digit code"
 msgstr "6 haneli kod"
 
+#: src/strings.ts:756
+msgid "@andrewsayer on Twitter"
+msgstr "@andrewsayer Twitter'da"
+
 #: src/strings.ts:2588
 msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
 msgstr "Bir not defteri sınırsız not içeren sınırsız alt not defterine sahip olabilir."

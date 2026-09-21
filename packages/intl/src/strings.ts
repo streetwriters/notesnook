@@ -753,7 +753,7 @@ $day$: Current day (eg. Monday)`,
       tesimonial: () =>
         t`You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source`,
       link: "https://twitter.com/andrewsayer/status/1637817220113002503",
-      user: "@andrewsayer on Twitter"
+      user: () => t`@andrewsayer on Twitter`
     }
   ],
   shortcutCreated: () => actions.created.shortcut(1),
