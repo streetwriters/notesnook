@@ -146,7 +146,7 @@ const features = {
       return strings.maximumFileSize();
     },
     error: (limit) =>
-      `You cannot upload files larger than ${limit.caption} on this plan.`,
+      strings.cannotUploadFilesLargerThan(limit.caption as string | number),
     availability: {
       free: createLimit("10MB", 10 * 1024 * 1024),
       essential: createLimit("100MB", 100 * 1024 * 1024),
@@ -173,7 +173,8 @@ const features = {
     get title() {
       return strings.blockLevelNoteLinks();
     },
-    error: () => `Block-level note links are not available on this plan.`,
+    error: () =>
+      strings.featureNotAvailableOnPlan(strings.blockLevelNoteLinks()),
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -293,8 +294,10 @@ const features = {
   }),
   defaultNotebookAndTag: createFeature({
     id: "defaultNotebookAndTag",
-    title: "Default notebook & tag",
-    error: () => `You cannot set a default notebook or tag on this plan.`,
+    get title() {
+      return strings.defaultNotebookAndTag();
+    },
+    error: () => strings.cannotSetDefaultNotebookOrTag(),
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -305,7 +308,9 @@ const features = {
   }),
   recurringReminders: createFeature({
     id: "recurringReminders",
-    title: "Recurring reminders",
+    get title() {
+      return strings.recurringReminders();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -316,7 +321,9 @@ const features = {
   }),
   pinNoteInNotification: createFeature({
     id: "pinNoteInNotification",
-    title: "Pin note in notification",
+    get title() {
+      return strings.pinNoteInNotification();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -327,7 +334,9 @@ const features = {
   }),
   createNoteFromNotificationDrawer: createFeature({
     id: "createNoteFromNotificationDrawer",
-    title: "Create note from notification drawer",
+    get title() {
+      return strings.createNoteFromNotificationDrawer();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -338,7 +347,9 @@ const features = {
   }),
   defaultSidebarTab: createFeature({
     id: "defaultSidebarTab",
-    title: "Default sidebar tab",
+    get title() {
+      return strings.defaultSidebarTab();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -349,7 +360,9 @@ const features = {
   }),
   customHomepage: createFeature({
     id: "customHomepage",
-    title: "Custom homepage",
+    get title() {
+      return strings.customHomepage();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -386,7 +399,9 @@ const features = {
   }),
   customToolbarPreset: createFeature({
     id: "customToolbarPreset",
-    title: "Custom toolbar preset",
+    get title() {
+      return strings.customToolbarPreset();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -410,7 +425,9 @@ const features = {
   }),
   disableTrashCleanup: createFeature({
     id: "disableTrashCleanup",
-    title: "Disable trash cleanup",
+    get title() {
+      return strings.disableTrashCleanup();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -473,7 +490,9 @@ const features = {
   }),
   monographLinksAndEmbeds: createFeature({
     id: "monographLinksAndEmbeds",
-    title: "Links & embeds in monographs",
+    get title() {
+      return strings.monographLinksAndEmbeds();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -484,7 +503,9 @@ const features = {
   }),
   monographAnalytics: createFeature({
     id: "monographAnalytics",
-    title: "Monographs analytics",
+    get title() {
+      return strings.monographAnalytics();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -508,7 +529,9 @@ const features = {
   }),
   notesnookCircle: createFeature({
     id: "notesnookCircle",
-    title: "Notesnook Circle",
+    get title() {
+      return strings.notesnookCircle();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(true),
@@ -519,7 +542,9 @@ const features = {
   }),
   androidLauncherShortcuts: createFeature({
     id: "androidLauncherShortcuts",
-    title: "Android Launcher Shortcuts",
+    get title() {
+      return strings.androidLauncherShortcuts();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -530,7 +555,9 @@ const features = {
   }),
   expiringNotes: createFeature({
     id: "expiringNotes",
-    title: "Expiring notes",
+    get title() {
+      return strings.expiringNotes();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -541,7 +568,9 @@ const features = {
   }),
   exportTableAsCsv: createFeature({
     id: "exportTableAsCsv",
-    title: "Export table as CSV",
+    get title() {
+      return strings.exportTableAsCsv();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
@@ -552,7 +581,9 @@ const features = {
   }),
   importCsvToTable: createFeature({
     id: "importCsvToTable",
-    title: "Import CSV to table",
+    get title() {
+      return strings.importCsvToTable();
+    },
     availability: {
       free: createLimit(false),
       essential: createLimit(false),
