@@ -31,6 +31,7 @@ export type FileAttachment = BaseAttachment & {
 
 export type AudioAttachment = BaseAttachment & {
   type: "audio";
+  src?: string;
 };
 
 export type WebClipAttachment = BaseAttachment & {

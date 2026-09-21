@@ -64,6 +64,7 @@ const ATTRIBUTES = {
   hash: "data-hash",
   mime: "data-mime",
   filename: "data-filename",
+  size: "data-size",
   src: "src",
   href: "href",
   blockId: "data-block-id"
@@ -300,18 +301,20 @@ export class Tiptap {
       filename?: string;
       mime?: string;
       id: string;
+      tag: string;
     }[] = [];
     new HTMLParser({
       ontag: (name, attr, pos) => {
         const hash = attr[ATTRIBUTES.hash];
         const src = attr[ATTRIBUTES.src];
         const href = attr[ATTRIBUTES.href];
-        if (name === "img" && !hash && src) {
+        if ((name === "img" || name === "audio") && !hash && src) {
           sources.push({
             src,
             filename: attr[ATTRIBUTES.filename],
             mime: attr[ATTRIBUTES.mime],
-            id: `${pos.start}${pos.end}`
+            id: `${pos.start}${pos.end}`,
+            tag: name
           });
         } else if (name === "a" && href && href.startsWith("nn://")) {
           const internalLink = parseInternalLink(href);
@@ -321,20 +324,23 @@ export class Tiptap {
       }
     }).parse(this.data);
 
-    const images: Record<string, string | false> = {};
-    for (const image of sources) {
+    const mediaHashes: Record<
+      string,
+      { hash: string; mime: string; size?: number } | false
+    > = {};
+    for (const media of sources) {
       try {
-        const { data, mimeType } = dataurl.toObject(image.src);
+        const { data, mimeType, size } = dataurl.toObject(media.src);
         if (!data || !mimeType) continue;
-        const hash = await saveAttachment(data, mimeType, image.filename);
+        const hash = await saveAttachment(data, mimeType, media.filename);
         if (!hash) continue;
 
-        images[image.id] = hash;
+        mediaHashes[media.id] = { hash, mime: mimeType, size };
       } catch (e) {
-        logger.error(e, "Failed to save image attachment.", {
-          filename: image.filename
+        logger.error(e, `Failed to save ${media.tag} attachment.`, {
+          filename: media.filename
         });
-        images[image.id] = false;
+        mediaHashes[media.id] = false;
       }
     }
 
@@ -344,25 +350,28 @@ export class Tiptap {
         switch (name) {
           case "nn-search-result":
             return null;
-          case "img": {
+          case "img":
+          case "audio": {
             const hash = attr[ATTRIBUTES.hash];
 
             if (hash) {
               hashes.push(hash);
               delete attr[ATTRIBUTES.src];
             } else {
-              const hash = images[`${pos.start}${pos.end}`];
-              if (!hash) return;
+              const media = mediaHashes[`${pos.start}${pos.end}`];
+              if (!media) return;
 
-              hashes.push(hash);
+              hashes.push(media.hash);
 
-              attr[ATTRIBUTES.hash] = hash;
+              attr[ATTRIBUTES.hash] = media.hash;
+              if (!attr[ATTRIBUTES.mime]) attr[ATTRIBUTES.mime] = media.mime;
+              if (media.size !== undefined && !attr[ATTRIBUTES.size])
+                attr[ATTRIBUTES.size] = `${media.size}`;
               delete attr[ATTRIBUTES.src];
             }
             break;
           }
           case "iframe":
-          case "audio":
           case "span": {
             const hash = attr[ATTRIBUTES.hash];
             if (!hash) return;

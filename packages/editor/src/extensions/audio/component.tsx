@@ -18,15 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Box, Text } from "@theme-ui/components";
-import { AudioAttachment } from "../attachment/types.js";
-import { useRef, useState, useEffect } from "react";
+import { Attachment, AudioAttachment } from "../attachment/types.js";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Icon } from "@notesnook/ui";
 import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/index.js";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { DesktopOnly } from "../../components/responsive/index.js";
-import { toBlobURL, revokeBloburl } from "../../utils/downloader.js";
-import { formatBytes } from "@notesnook/common";
+import {
+  corsify,
+  downloadAudio,
+  getDataURLMetadata,
+  revokeBloburl,
+  toBlobURL,
+  toDataURL
+} from "../../utils/downloader.js";
+import { DataURL, formatBytes } from "@notesnook/common";
+import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 
 const SAMPLE_AUDIO = toBlobURL(
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=",
@@ -35,16 +43,41 @@ const SAMPLE_AUDIO = toBlobURL(
   "sample-audio"
 );
 
+function canParse(src: string) {
+  if (!src) return false;
+  try {
+    new URL(src);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function makeAudioQuery(src?: string, hash?: string) {
+  return (a: Attachment) =>
+    a.type === "audio" &&
+    ((!!a.src && !!src && a.src === src) ||
+      (!!a.hash && !!hash && a.hash === hash));
+}
+
 export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
   const { editor, node, selected } = props;
-  const { filename, size, progress, mime, hash } = node.attrs;
+  const { filename, size, progress, mime, hash, src } = node.attrs;
   const elementRef = useRef<HTMLDivElement>();
   const [isDragging, setIsDragging] = useState(false);
   const isLoading = useRef(false);
   const [error, setError] = useState<string>();
+  const controllerRef = useRef(new AbortController());
+  const downloadOptions = useToolbarStore((store) => store.downloadOptions);
+  const embeddedMetadata = useMemo(
+    () => (size === undefined && src ? getDataURLMetadata(src) : undefined),
+    [size, src]
+  );
+  const displaySize = size ?? embeddedMetadata?.size;
 
   useEffect(() => {
     return () => {
+      controllerRef.current.abort();
       if (hash) {
         revokeBloburl(hash);
       }
@@ -107,7 +140,11 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
             flexShrink: 0
           }}
         >
-          {progress ? `${progress}%` : formatBytes(size, 1)}
+          {progress
+            ? `${progress}%`
+            : displaySize !== undefined
+            ? formatBytes(displaySize, 1)
+            : ""}
         </Text>
       </Box>
       {error ? (
@@ -123,12 +160,24 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
           }}
         >
           <audio
+            crossOrigin="anonymous"
             onMouseDown={(e) => e.stopPropagation()}
             onDragStart={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
             controls
             controlsList="nodownload nofullscreen"
-            src={SAMPLE_AUDIO}
+            src={
+              // already-hashed audio is lazy-loaded on first play (below).
+              // otherwise, hand the raw src straight to the browser: a
+              // data: URI plays natively (corsify is a no-op on it), and
+              // an external URL is resolved into a real attachment in the
+              // background (see onLoadedMetadata).
+              hash
+                ? SAMPLE_AUDIO
+                : src
+                ? corsify(src, downloadOptions?.corsHost)
+                : SAMPLE_AUDIO
+            }
             onPause={(e) => {
               if (isLoading.current) {
                 e.preventDefault();
@@ -161,6 +210,38 @@ export function AudioComponent(props: ReactNodeViewProps<AudioAttachment>) {
                     isLoading.current = false;
                     setError((e as Error).message);
                   });
+              }
+            }}
+            onLoadedMetadata={async () => {
+              // mirrors ImageComponent's onLoad: once the browser has
+              // resolved an external URL, fetch it ourselves, convert to a
+              // data URI, and stash it back on the node so that on save
+              // Tiptap.postProcess() can turn it into a real encrypted,
+              // hashed attachment (see packages/core content-types/tiptap.ts).
+              // a raw data: URI needs no fetch here - its size/mime are
+              // derived locally by the effect above.
+              if (!hash && src && !DataURL.isValid(src) && canParse(src)) {
+                const audio = await downloadAudio(src, {
+                  ...downloadOptions,
+                  signal: controllerRef.current.signal
+                }).catch((e) => {
+                  setError((e as Error).message);
+                  return undefined;
+                });
+                if (!audio) return;
+
+                const { blob, size, mimeType } = audio;
+                const dataurl = await toDataURL(blob);
+                await editor.threadsafe((editor) =>
+                  editor.commands.updateAttachment(
+                    {
+                      src: dataurl,
+                      size,
+                      mime: mimeType
+                    },
+                    { query: makeAudioQuery(src, hash) }
+                  )
+                );
               }
             }}
           >
