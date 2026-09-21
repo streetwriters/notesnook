@@ -55,6 +55,7 @@ export type Tip = {
   text: string;
   contexts: TipContext[];
   button?: TipButton;
+  type?: "info" | "warning" | "error";
 };
 
 const destructiveContexts: string[] = [];
@@ -110,8 +111,9 @@ export const useTip = (
 
 const tips: Tip[] = [
   {
-    text: `Wrap a query in double quotes to search for an exact match.`,
-    contexts: ["search"]
+    text: `No results found. Try searching with different keywords or check your spelling.`,
+    contexts: ["search"],
+    type: "error"
   },
   {
     text: "Hold Ctrl/Cmd & click on multiple items to select them.",
