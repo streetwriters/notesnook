@@ -500,6 +500,10 @@ msgstr "{days} gün ücretsiz"
 msgid "{days}-day money-back guarantee."
 msgstr "{days} günlük para iade garantisi."
 
+#: src/strings.ts:2305
+msgid "{discount}% off"
+msgstr "%{discount} indirim"
+
 #: src/strings.ts:2640
 msgid "{feature} is not available on this plan."
 msgstr "{feature} bu planda kullanılamaz."
@@ -732,7 +736,7 @@ msgstr "Ekle"
 msgid "Add 2FA fallback method"
 msgstr "Yedek 2FA yöntemi ekle"
 
-#: src/strings.ts:2904
+#: src/strings.ts:2905
 msgid "Add a new reminder"
 msgstr "Yeni bir hatırlatıcı ekle"
 
@@ -919,6 +923,10 @@ msgstr "ve çok daha fazlası."
 #: src/strings.ts:1274
 msgid "and we will manually confirm your account."
 msgstr "ve hesabınızı manuel olarak onaylayalım."
+
+#: src/strings.ts:2924
+msgid "Android Launcher Shortcuts"
+msgstr "Android Başlatıcı Kısayolları"
 
 #: src/strings.ts:2354
 msgid "ANNOUNCEMENT"
@@ -1248,7 +1256,7 @@ msgstr "Yedekleme ve geri yükleme"
 msgid "Backup complete"
 msgstr "Yedekleme tamamlandı"
 
-#: src/strings.ts:2896
+#: src/strings.ts:2897
 msgid "Backup Directory Migration Failed"
 msgstr "Yedekleme Dizini Geçişi Başarısız Oldu"
 
@@ -1344,7 +1352,7 @@ msgstr "Çift yönlü not bağlantısı"
 msgid "billed annually at {price}"
 msgstr "yıllık {price} olarak faturalandırılır"
 
-#: src/strings.ts:2885
+#: src/strings.ts:2886
 msgid "Billed at"
 msgstr "Faturalandırma tarihi"
 
@@ -1603,6 +1611,10 @@ msgstr "Henüz e-posta almadıysanız spam klasörünüzü kontrol edin."
 #: src/strings.ts:2179
 msgid "Checking all attachments"
 msgstr "Tüm ekler denetleniyor"
+
+#: src/strings.ts:2002
+msgid "Checking attachments"
+msgstr "Ekler denetleniyor"
 
 #: src/strings.ts:336
 msgid "Checking for new version"
@@ -1937,7 +1949,7 @@ msgstr "Yapılandır"
 msgid "Configure server URLs for Notesnook"
 msgstr "Notesnook için sunucu adreslerini yapılandır"
 
-#: src/strings.ts:2908
+#: src/strings.ts:2909
 msgid "Confirm"
 msgstr "Onayla"
 
@@ -2090,7 +2102,7 @@ msgstr "Grup oluştur"
 msgid "Create a new note"
 msgstr "Yeni not oluştur"
 
-#: src/strings.ts:2903
+#: src/strings.ts:2904
 msgid "Create a new notebook"
 msgstr "Yeni bir not defteri oluştur"
 
@@ -2122,6 +2134,10 @@ msgstr "Anahtar oluştur"
 msgid "Create link"
 msgstr "Bağlantı oluştur"
 
+#: src/strings.ts:2918
+msgid "Create note from notification drawer"
+msgstr "Bildirim çekmecesinden not oluşturma"
+
 #: src/strings.ts:1348
 msgid "Create shortcut of this notebook in side menu"
 msgstr "Bu not defteri için yan menüde kısayol oluştur"
@@ -2150,6 +2166,10 @@ msgstr "Bir{0} yedek oluşturuluyor"
 #: src/strings.ts:2692
 msgid "Creating backup zip file..."
 msgstr "Yedekleme zip dosyası oluşturuluyor..."
+
+#: src/strings.ts:1719
+msgid "Creating your account"
+msgstr "Hesabınız oluşturuluyor"
 
 #: src/strings.ts:2698
 msgid "Creating zip"
@@ -2203,6 +2223,14 @@ msgstr "Özel"
 #: src/strings.ts:1917
 msgid "Custom dictionary words"
 msgstr "Özel sözlük kelimeleri"
+
+#: src/strings.ts:2919
+msgid "Custom homepage"
+msgstr "Özel ana sayfa"
+
+#: src/strings.ts:2920
+msgid "Custom toolbar preset"
+msgstr "Özel araç çubuğu ön ayarı"
 
 #: src/strings.ts:2718
 msgid "Customizable sidebar"
@@ -2350,6 +2378,10 @@ msgstr "Varsayılan yazı tipi boyutu"
 msgid "Default font size in editor"
 msgstr "Düzenleyicideki varsayılan yazı tipi boyutu"
 
+#: src/strings.ts:2914
+msgid "Default notebook & tag"
+msgstr "Varsayılan not defteri ve etiket"
+
 #: src/strings.ts:1037
 msgid "Default notebook cleared"
 msgstr "Varsayılan not defteri temizlendi"
@@ -2366,7 +2398,7 @@ msgstr "Varsayılan erteleme süresi"
 msgid "Default sound"
 msgstr "Varsayılan ses"
 
-#: src/strings.ts:2893
+#: src/strings.ts:2894
 msgid "Degraded Performance Warning"
 msgstr "Düşük Performans Uyarısı"
 
@@ -2494,6 +2526,10 @@ msgstr "Gerçek zamanlı eşitlemeyi kapat"
 #: src/strings.ts:986
 msgid "Disable sync"
 msgstr "Eşitlemeyi kapat"
+
+#: src/strings.ts:2921
+msgid "Disable trash cleanup"
+msgstr "Çöp kutusu temizliğini devre dışı bırak"
 
 #: src/strings.ts:147
 msgid "Disabled"
@@ -3009,6 +3045,10 @@ msgstr "Şu sürede sona erer:"
 msgid "Expires on"
 msgstr "Sona erme"
 
+#: src/strings.ts:2925
+msgid "Expiring notes"
+msgstr "Süresi dolan notlar"
+
 #: src/strings.ts:2393
 msgid "Expiry date"
 msgstr "Son kullanma tarihi"
@@ -3057,6 +3097,10 @@ msgstr "Farklı dışa aktar{0}"
 #: src/strings.ts:2394
 msgid "Export CSV"
 msgstr "CSV dışa aktar"
+
+#: src/strings.ts:2926
+msgid "Export table as CSV"
+msgstr "Tabloyu CSV olarak dışa aktar"
 
 #: src/strings.ts:195
 msgid "Exporting \"{title}\""
@@ -3135,7 +3179,7 @@ msgstr "API anahtarları yüklenemedi. Lütfen tekrar deneyin."
 msgid "Failed to load web clip"
 msgstr "Web kırpması yüklenemedi"
 
-#: src/strings.ts:2898
+#: src/strings.ts:2899
 msgid "Failed to migrate backup directory. It has been reset to default."
 msgstr "Yedekleme dizini taşınamadı. Varsayılana sıfırlandı."
 
@@ -3204,6 +3248,10 @@ msgstr "Sık kullanılanlar"
 msgid "Featured on"
 msgstr "Hakkımızda yazanlar"
 
+#: src/strings.ts:2913
+msgid "Features"
+msgstr "Özellikler"
+
 #: src/strings.ts:659
 msgid "File check failed: {reason} Try reuploading the file to fix the issue."
 msgstr "Dosya denetimi başarısız: {reason} Sorunu gidermek için dosyayı yeniden yükleyin."
@@ -3227,6 +3275,10 @@ msgstr "Dosya bağlantıları tarayıcılarda açılamaz. Lütfen Notesnook masa
 #: src/strings.ts:858
 msgid "File mismatch"
 msgstr "Dosya uyuşmazlığı"
+
+#: src/strings.ts:724
+msgid "File size"
+msgstr "Dosya boyutu"
 
 #: src/strings.ts:2511
 msgid "File size limit exceeded. Please upgrade your plan."
@@ -3404,7 +3456,7 @@ msgstr "Genel"
 msgid "Generated 100% locally on your device."
 msgstr "%100 yerel olarak cihazınızda oluşturuldu."
 
-#: src/strings.ts:2909
+#: src/strings.ts:2910
 msgid "Generating..."
 msgstr "Oluşturuluyor..."
 
@@ -3444,7 +3496,7 @@ msgstr "Şifreleme anahtarı alınıyor..."
 msgid "Getting information"
 msgstr "Bilgiler alınıyor"
 
-#: src/strings.ts:2887
+#: src/strings.ts:2888
 msgid "Getting invoice"
 msgstr "Fatura alınıyor"
 
@@ -3666,7 +3718,7 @@ msgstr ""
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
 msgstr "Genel bir şey sormak istiyorsanız veya yardıma ihtiyacınız varsa şunu öneririz:"
 
-#: src/strings.ts:2906
+#: src/strings.ts:2907
 msgid "Ignore"
 msgstr "Yoksay"
 
@@ -3709,6 +3761,10 @@ msgstr "İçe aktarma tamamlandı"
 #: src/strings.ts:2395
 msgid "Import CSV"
 msgstr "CSV içe aktar"
+
+#: src/strings.ts:2927
+msgid "Import CSV to table"
+msgstr "CSV'yi tabloya içe aktar"
 
 #: src/strings.ts:2851
 msgid "Import unsuccessful"
@@ -3822,7 +3878,7 @@ msgstr "Geçersiz PGP anahtar çifti. Lütfen anahtarlarınızı kontrol edip te
 msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 msgstr "Geçersiz kurtarma anahtarı. 2FA kurtarma kodu değil, hesap kurtarma anahtarınızı girdiğinizden emin olun."
 
-#: src/strings.ts:2886
+#: src/strings.ts:2887
 msgid "Invoice"
 msgstr "Fatura"
 
@@ -3900,7 +3956,7 @@ msgstr "Verilerinizi güvende tutun"
 msgid "Key name"
 msgstr "Anahtar adı"
 
-#: src/strings.ts:2889
+#: src/strings.ts:2890
 msgid "Keyboard shortcuts"
 msgstr "Klavye kısayolları"
 
@@ -4035,6 +4091,10 @@ msgstr "Bağlı notlar"
 #: src/strings.ts:1460
 msgid "Linking to a specific block is not available for locked notes."
 msgstr "Kilitli notlarda belirli bir bloğa bağlantı verilemez."
+
+#: src/strings.ts:2922
+msgid "Links & embeds in monographs"
+msgstr "Monograflarda bağlantılar ve yerleştirmeler"
 
 #: src/strings.ts:455
 msgid "List of"
@@ -4350,6 +4410,10 @@ msgstr "Monograf adresi kopyalandı"
 #: src/strings.ts:1398
 msgid "Monographs"
 msgstr "Monograflar"
+
+#: src/strings.ts:2923
+msgid "Monographs analytics"
+msgstr "Monograf analizleri"
 
 #: src/strings.ts:1297
 #: src/strings.ts:2573
@@ -4751,7 +4815,7 @@ msgstr "Notesnook Circle"
 msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 msgstr "Notesnook Circle, gizlilik, şeffaflık ve kullanıcı özgürlüğü konusundaki kararlılığımızı paylaşan güvenilir iş ortaklarını bir araya getirir."
 
-#: src/strings.ts:2895
+#: src/strings.ts:2896
 msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
 msgstr "Notesnook, ARM64 çevirisi altında çalıştığını tespit etti. En iyi performans için lütfen web sitemizden Notesnook'un ARM64 sürümünü indirin."
 
@@ -5017,7 +5081,7 @@ msgstr "Görsel adresini buraya yapıştırın"
 msgid "Paste without formatting"
 msgstr "Biçimlendirmeden yapıştır"
 
-#: src/strings.ts:2900
+#: src/strings.ts:2901
 msgid "Path not found"
 msgstr "Yol bulunamadı"
 
@@ -5048,6 +5112,10 @@ msgstr "Telefon numarası girilmedi"
 #: src/strings.ts:815
 msgid "Pin"
 msgstr "Sabitle"
+
+#: src/strings.ts:2916
+msgid "Pin note in notification"
+msgstr "Notu bildirimde sabitle"
 
 #: src/strings.ts:844
 msgid "Pin notification"
@@ -5482,7 +5550,7 @@ msgstr "Yayınlanan notlar şifrelenebilir. Bu, yalnızca sizin ve parolayı pay
 msgid "Purchase"
 msgstr "Satın al"
 
-#: src/strings.ts:2902
+#: src/strings.ts:2903
 msgid "Quick actions"
 msgstr "Hızlı eylemler"
 
@@ -5502,7 +5570,7 @@ msgstr "Hızlı aç"
 msgid "Quickly create a note from the notification"
 msgstr "Bildirimden hızlıca bir not oluşturun"
 
-#: src/strings.ts:2907
+#: src/strings.ts:2908
 msgid "Quit"
 msgstr "Çıkış"
 
@@ -5617,6 +5685,10 @@ msgstr "Kurtarma anahtarı QR kodu kaydedildi"
 #: src/strings.ts:792
 msgid "Recovery key text file saved"
 msgstr "Kurtarma anahtarı metin dosyası kaydedildi"
+
+#: src/strings.ts:2915
+msgid "Recurring reminders"
+msgstr "Yinelenen hatırlatıcılar"
 
 #: src/strings.ts:2195
 msgid "Redeem"
@@ -6433,7 +6505,7 @@ msgstr "Açık tema olarak ayarla"
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr "Otomatik çöp kutusu temizleme aralığını Ayarlar > Davranış > Çöp kutusu boşaltma aralığı bölümünden ayarlayın."
 
-#: src/strings.ts:2899
+#: src/strings.ts:2900
 msgid "Set backup directory"
 msgstr "Yedekleme dizinini ayarla"
 
@@ -6594,7 +6666,7 @@ msgstr "Kısayollar"
 msgid "Show"
 msgstr "Göster"
 
-#: src/strings.ts:2892
+#: src/strings.ts:2893
 msgid "Show app"
 msgstr "Uygulamayı göster"
 
@@ -6899,6 +6971,10 @@ msgstr "etiket"
 msgid "Tag ID copied to clipboard"
 msgstr "Etiket kimliği panoya kopyalandı"
 
+#: src/strings.ts:1650
+msgid "Tag not found"
+msgstr "Etiket bulunamadı"
+
 #: src/strings.ts:270
 msgid "tags"
 msgstr "etiketler"
@@ -7094,7 +7170,7 @@ msgstr "Colornote yedek dosyasının şifresini çözmek için gereken parola."
 msgid "The password/pin for unlocking the app."
 msgstr "Uygulamanın kilidini açmak için gereken parola veya PIN."
 
-#: src/strings.ts:2901
+#: src/strings.ts:2902
 msgid ""
 "The path does not exist:\n"
 "{path}"
@@ -7186,7 +7262,7 @@ msgstr "Bu, abonelik değil tek seferlik bir satın almadır."
 msgid "This may take a while"
 msgstr "Bu biraz zaman alabilir"
 
-#: src/strings.ts:2888
+#: src/strings.ts:2889
 msgid "This might take a minute or two."
 msgstr "Bu bir veya iki dakika sürebilir."
 
@@ -7402,6 +7478,10 @@ msgid "Unfavorite"
 msgstr "Sık kullanılanlardan çıkar"
 
 #: src/strings.ts:2884
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: src/strings.ts:2885
 msgid "Unknown error."
 msgstr "Bilinmeyen hata."
 
@@ -8101,6 +8181,14 @@ msgstr "Birincil yöntemle giriş yapamazsanız yedek 2FA yöntemini kullanabili
 #: src/strings.ts:1325
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Herhangi bir notun eski sürümlerini özellikleri -> Geçmiş bölümünden görüntüleyip geri yükleyebilirsiniz."
+
+#: src/strings.ts:2931
+msgid "You cannot set a default notebook or tag on this plan."
+msgstr "Bu planda varsayılan bir not defteri veya etiket ayarlayamazsınız."
+
+#: src/strings.ts:2929
+msgid "You cannot upload files larger than {limit} on this plan."
+msgstr "Bu planda {limit} boyutundan daha büyük dosyaları yükleyemezsiniz."
 
 #: src/strings.ts:2792
 msgid "You created"

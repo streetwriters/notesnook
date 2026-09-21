@@ -500,6 +500,10 @@ msgstr "{days} дней бесплатно"
 msgid "{days}-day money-back guarantee."
 msgstr "{days}-дневная гарантия возврата денег."
 
+#: src/strings.ts:2305
+msgid "{discount}% off"
+msgstr "Скидка {discount}%"
+
 #: src/strings.ts:2640
 msgid "{feature} is not available on this plan."
 msgstr "{feature} недоступно в этом тарифе."
@@ -732,7 +736,7 @@ msgstr "Добавить"
 msgid "Add 2FA fallback method"
 msgstr "Добавить резервный метод 2FA"
 
-#: src/strings.ts:2904
+#: src/strings.ts:2905
 msgid "Add a new reminder"
 msgstr "Добавить напоминание"
 
@@ -919,6 +923,10 @@ msgstr "и многое другое."
 #: src/strings.ts:1274
 msgid "and we will manually confirm your account."
 msgstr "и мы подтвердим ваш аккаунт вручную."
+
+#: src/strings.ts:2924
+msgid "Android Launcher Shortcuts"
+msgstr "Ярлыки лаунчера Android"
 
 #: src/strings.ts:2354
 msgid "ANNOUNCEMENT"
@@ -1248,7 +1256,7 @@ msgstr "Резервное копирование и восстановлени�
 msgid "Backup complete"
 msgstr "Резервное копирование завершено"
 
-#: src/strings.ts:2896
+#: src/strings.ts:2897
 msgid "Backup Directory Migration Failed"
 msgstr "Сбой миграции каталога резервных копий"
 
@@ -1344,7 +1352,7 @@ msgstr "Двусторонняя связь между заметками"
 msgid "billed annually at {price}"
 msgstr "оплата ежегодно по {price}"
 
-#: src/strings.ts:2885
+#: src/strings.ts:2886
 msgid "Billed at"
 msgstr "Дата счета"
 
@@ -1603,6 +1611,10 @@ msgstr "Проверьте папку «Спам», если письмо ещё
 #: src/strings.ts:2179
 msgid "Checking all attachments"
 msgstr "Проверка всех вложений"
+
+#: src/strings.ts:2002
+msgid "Checking attachments"
+msgstr "Проверка вложений"
 
 #: src/strings.ts:336
 msgid "Checking for new version"
@@ -1937,7 +1949,7 @@ msgstr "Настроить"
 msgid "Configure server URLs for Notesnook"
 msgstr "Настроить URL серверов для Notesnook"
 
-#: src/strings.ts:2908
+#: src/strings.ts:2909
 msgid "Confirm"
 msgstr "Подтвердить"
 
@@ -2090,7 +2102,7 @@ msgstr "Создать группу"
 msgid "Create a new note"
 msgstr "Создать новую заметку"
 
-#: src/strings.ts:2903
+#: src/strings.ts:2904
 msgid "Create a new notebook"
 msgstr "Создать новый блокнот"
 
@@ -2122,6 +2134,10 @@ msgstr "Создать ключ"
 msgid "Create link"
 msgstr "Создать ссылку"
 
+#: src/strings.ts:2918
+msgid "Create note from notification drawer"
+msgstr "Создание заметки из панели уведомлений"
+
 #: src/strings.ts:1348
 msgid "Create shortcut of this notebook in side menu"
 msgstr "Создать ярлык этого блокнота в боковом меню"
@@ -2150,6 +2166,10 @@ msgstr "Создание резервной копии{0}"
 #: src/strings.ts:2692
 msgid "Creating backup zip file..."
 msgstr "Создание zip-файла резервной копии..."
+
+#: src/strings.ts:1719
+msgid "Creating your account"
+msgstr "Создание аккаунта"
 
 #: src/strings.ts:2698
 msgid "Creating zip"
@@ -2203,6 +2223,14 @@ msgstr "Пользовательский"
 #: src/strings.ts:1917
 msgid "Custom dictionary words"
 msgstr "Слова в пользовательском словаре"
+
+#: src/strings.ts:2919
+msgid "Custom homepage"
+msgstr "Настраиваемая главная страница"
+
+#: src/strings.ts:2920
+msgid "Custom toolbar preset"
+msgstr "Пользовательский пресет панели инструментов"
 
 #: src/strings.ts:2718
 msgid "Customizable sidebar"
@@ -2350,6 +2378,10 @@ msgstr "Размер шрифта по умолчанию"
 msgid "Default font size in editor"
 msgstr "Размер шрифта по умолчанию в редакторе"
 
+#: src/strings.ts:2914
+msgid "Default notebook & tag"
+msgstr "Блокнот и тег по умолчанию"
+
 #: src/strings.ts:1037
 msgid "Default notebook cleared"
 msgstr "Блокнот по умолчанию сброшен"
@@ -2366,7 +2398,7 @@ msgstr "Время отсрочки по умолчанию"
 msgid "Default sound"
 msgstr "Звук по умолчанию"
 
-#: src/strings.ts:2893
+#: src/strings.ts:2894
 msgid "Degraded Performance Warning"
 msgstr "Предупреждение о снижении производительности"
 
@@ -2494,6 +2526,10 @@ msgstr "Отключить синхронизацию в реальном вре
 #: src/strings.ts:986
 msgid "Disable sync"
 msgstr "Отключить синхронизацию"
+
+#: src/strings.ts:2921
+msgid "Disable trash cleanup"
+msgstr "Отключить очистку корзины"
 
 #: src/strings.ts:147
 msgid "Disabled"
@@ -3009,6 +3045,10 @@ msgstr "Истекает через"
 msgid "Expires on"
 msgstr "Истекает"
 
+#: src/strings.ts:2925
+msgid "Expiring notes"
+msgstr "Заметки с истекающим сроком"
+
 #: src/strings.ts:2393
 msgid "Expiry date"
 msgstr "Дата истечения"
@@ -3057,6 +3097,10 @@ msgstr "Экспортировать как{0}"
 #: src/strings.ts:2394
 msgid "Export CSV"
 msgstr "Экспортировать CSV"
+
+#: src/strings.ts:2926
+msgid "Export table as CSV"
+msgstr "Экспорт таблицы в CSV"
 
 #: src/strings.ts:195
 msgid "Exporting \"{title}\""
@@ -3135,7 +3179,7 @@ msgstr "Не удалось загрузить ключи API. Попробуй�
 msgid "Failed to load web clip"
 msgstr "Не удалось загрузить веб-клип"
 
-#: src/strings.ts:2898
+#: src/strings.ts:2899
 msgid "Failed to migrate backup directory. It has been reset to default."
 msgstr "Не удалось перенести каталог резервных копий. Он был сброшен по умолчанию."
 
@@ -3204,6 +3248,10 @@ msgstr "Избранное"
 msgid "Featured on"
 msgstr "О нас пишут"
 
+#: src/strings.ts:2913
+msgid "Features"
+msgstr "Функции"
+
 #: src/strings.ts:659
 msgid "File check failed: {reason} Try reuploading the file to fix the issue."
 msgstr "Проверка файла не пройдена: {reason} Отправьте файл заново, чтобы устранить проблему."
@@ -3227,6 +3275,10 @@ msgstr "Ссылки на файлы нельзя открыть в браузе
 #: src/strings.ts:858
 msgid "File mismatch"
 msgstr "Несоответствие файла"
+
+#: src/strings.ts:724
+msgid "File size"
+msgstr "Размер файла"
 
 #: src/strings.ts:2511
 msgid "File size limit exceeded. Please upgrade your plan."
@@ -3404,7 +3456,7 @@ msgstr "Общие"
 msgid "Generated 100% locally on your device."
 msgstr "Создано на 100% локально на вашем устройстве."
 
-#: src/strings.ts:2909
+#: src/strings.ts:2910
 msgid "Generating..."
 msgstr "Генерация..."
 
@@ -3444,7 +3496,7 @@ msgstr "Получение ключа шифрования..."
 msgid "Getting information"
 msgstr "Получение информации"
 
-#: src/strings.ts:2887
+#: src/strings.ts:2888
 msgid "Getting invoice"
 msgstr "Получение квитанции"
 
@@ -3666,7 +3718,7 @@ msgstr ""
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
 msgstr "Если у вас есть общий вопрос или нужна помощь, рекомендуем вам"
 
-#: src/strings.ts:2906
+#: src/strings.ts:2907
 msgid "Ignore"
 msgstr "Игнорировать"
 
@@ -3709,6 +3761,10 @@ msgstr "Импорт завершён"
 #: src/strings.ts:2395
 msgid "Import CSV"
 msgstr "Импортировать CSV"
+
+#: src/strings.ts:2927
+msgid "Import CSV to table"
+msgstr "Импорт CSV в таблицу"
 
 #: src/strings.ts:2851
 msgid "Import unsuccessful"
@@ -3822,7 +3878,7 @@ msgstr "Недопустимая пара ключей PGP. Проверьте �
 msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 msgstr "Недопустимый ключ восстановления. Убедитесь, что вводите ключ восстановления аккаунта, а не код восстановления 2FA."
 
-#: src/strings.ts:2886
+#: src/strings.ts:2887
 msgid "Invoice"
 msgstr "Квитанция"
 
@@ -3900,7 +3956,7 @@ msgstr "Держите данные в безопасности"
 msgid "Key name"
 msgstr "Имя ключа"
 
-#: src/strings.ts:2889
+#: src/strings.ts:2890
 msgid "Keyboard shortcuts"
 msgstr "Горячие клавиши"
 
@@ -4035,6 +4091,10 @@ msgstr "Связанные заметки"
 #: src/strings.ts:1460
 msgid "Linking to a specific block is not available for locked notes."
 msgstr "Ссылка на конкретный блок недоступна для заблокированных заметок."
+
+#: src/strings.ts:2922
+msgid "Links & embeds in monographs"
+msgstr "Ссылки и встраивания в монографиях"
 
 #: src/strings.ts:455
 msgid "List of"
@@ -4350,6 +4410,10 @@ msgstr "URL монографии скопирован"
 #: src/strings.ts:1398
 msgid "Monographs"
 msgstr "Монографии"
+
+#: src/strings.ts:2923
+msgid "Monographs analytics"
+msgstr "Аналитика монографий"
 
 #: src/strings.ts:1297
 #: src/strings.ts:2573
@@ -4751,7 +4815,7 @@ msgstr "Notesnook Circle"
 msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 msgstr "Notesnook Circle объединяет доверенных партнёров, разделяющих нашу приверженность приватности, прозрачности и свободе пользователей."
 
-#: src/strings.ts:2895
+#: src/strings.ts:2896
 msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
 msgstr "Notesnook обнаружил, что запущен в режиме эмуляции ARM64. Для наилучшей производительности скачайте сборку ARM64 с нашего сайта."
 
@@ -5017,7 +5081,7 @@ msgstr "Вставьте сюда URL изображения"
 msgid "Paste without formatting"
 msgstr "Вставить без форматирования"
 
-#: src/strings.ts:2900
+#: src/strings.ts:2901
 msgid "Path not found"
 msgstr "Путь не найден"
 
@@ -5048,6 +5112,10 @@ msgstr "Номер телефона не введён"
 #: src/strings.ts:815
 msgid "Pin"
 msgstr "Закрепить"
+
+#: src/strings.ts:2916
+msgid "Pin note in notification"
+msgstr "Закрепление заметки в уведомлении"
 
 #: src/strings.ts:844
 msgid "Pin notification"
@@ -5482,7 +5550,7 @@ msgstr "Опубликованные заметки можно зашифров�
 msgid "Purchase"
 msgstr "Купить"
 
-#: src/strings.ts:2902
+#: src/strings.ts:2903
 msgid "Quick actions"
 msgstr "Быстрые действия"
 
@@ -5502,7 +5570,7 @@ msgstr "Быстрое открытие"
 msgid "Quickly create a note from the notification"
 msgstr "Быстро создайте заметку прямо из уведомления"
 
-#: src/strings.ts:2907
+#: src/strings.ts:2908
 msgid "Quit"
 msgstr "Выйти"
 
@@ -5617,6 +5685,10 @@ msgstr "QR-код ключа восстановления сохранён"
 #: src/strings.ts:792
 msgid "Recovery key text file saved"
 msgstr "Текстовый файл с ключом восстановления сохранён"
+
+#: src/strings.ts:2915
+msgid "Recurring reminders"
+msgstr "Повторяющиеся напоминания"
 
 #: src/strings.ts:2195
 msgid "Redeem"
@@ -6433,7 +6505,7 @@ msgstr "Установить как светлую тему"
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr "Задайте интервал автоматической очистки корзины в разделе Настройки > Поведение > Интервал очистки корзины."
 
-#: src/strings.ts:2899
+#: src/strings.ts:2900
 msgid "Set backup directory"
 msgstr "Выбрать каталог резервных копий"
 
@@ -6594,7 +6666,7 @@ msgstr "Ярлыки"
 msgid "Show"
 msgstr "Показать"
 
-#: src/strings.ts:2892
+#: src/strings.ts:2893
 msgid "Show app"
 msgstr "Показать приложение"
 
@@ -6899,6 +6971,10 @@ msgstr "тег"
 msgid "Tag ID copied to clipboard"
 msgstr "ID тега скопирован в буфер обмена"
 
+#: src/strings.ts:1650
+msgid "Tag not found"
+msgstr "Тег не найден"
+
 #: src/strings.ts:270
 msgid "tags"
 msgstr "теги"
@@ -7094,7 +7170,7 @@ msgstr "Пароль для расшифровки файла резервной
 msgid "The password/pin for unlocking the app."
 msgstr "Пароль или PIN для разблокировки приложения."
 
-#: src/strings.ts:2901
+#: src/strings.ts:2902
 msgid ""
 "The path does not exist:\n"
 "{path}"
@@ -7186,7 +7262,7 @@ msgstr "Это разовая покупка, а не подписка."
 msgid "This may take a while"
 msgstr "Это может занять некоторое время"
 
-#: src/strings.ts:2888
+#: src/strings.ts:2889
 msgid "This might take a minute or two."
 msgstr "Это может занять минуту или две."
 
@@ -7402,6 +7478,10 @@ msgid "Unfavorite"
 msgstr "Убрать из избранного"
 
 #: src/strings.ts:2884
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: src/strings.ts:2885
 msgid "Unknown error."
 msgstr "Неизвестная ошибка."
 
@@ -8101,6 +8181,14 @@ msgstr "Вы можете использовать резервный метод
 #: src/strings.ts:1325
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Вы можете просматривать и восстанавливать более старые версии любой заметки через её свойства -> История."
+
+#: src/strings.ts:2931
+msgid "You cannot set a default notebook or tag on this plan."
+msgstr "В этом тарифе нельзя установить блокнот или тег по умолчанию."
+
+#: src/strings.ts:2929
+msgid "You cannot upload files larger than {limit} on this plan."
+msgstr "В этом тарифе нельзя загружать файлы размером больше {limit}."
 
 #: src/strings.ts:2792
 msgid "You created"
