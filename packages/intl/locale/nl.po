@@ -500,6 +500,10 @@ msgstr "{days} dagen gratis"
 msgid "{days}-day money-back guarantee."
 msgstr "{days} dagen geld-terug-garantie."
 
+#: src/strings.ts:2305
+msgid "{discount}% off"
+msgstr "{discount}% korting"
+
 #: src/strings.ts:2640
 msgid "{feature} is not available on this plan."
 msgstr "{feature} is niet beschikbaar in dit abonnement."
@@ -732,7 +736,7 @@ msgstr "Toevoegen"
 msgid "Add 2FA fallback method"
 msgstr "2FA-reservemethode toevoegen"
 
-#: src/strings.ts:2904
+#: src/strings.ts:2905
 msgid "Add a new reminder"
 msgstr "Nieuwe herinnering toevoegen"
 
@@ -919,6 +923,10 @@ msgstr "en nog veel meer."
 #: src/strings.ts:1274
 msgid "and we will manually confirm your account."
 msgstr "en we bevestigen je account handmatig."
+
+#: src/strings.ts:2924
+msgid "Android Launcher Shortcuts"
+msgstr "Snelkoppelingen voor Android-starter"
 
 #: src/strings.ts:2354
 msgid "ANNOUNCEMENT"
@@ -1248,7 +1256,7 @@ msgstr "Back-up en herstel"
 msgid "Backup complete"
 msgstr "Back-up voltooid"
 
-#: src/strings.ts:2896
+#: src/strings.ts:2897
 msgid "Backup Directory Migration Failed"
 msgstr "Migratie van back-upmap mislukt"
 
@@ -1344,7 +1352,7 @@ msgstr "Bidirectionele notitiekoppeling"
 msgid "billed annually at {price}"
 msgstr "jaarlijks gefactureerd voor {price}"
 
-#: src/strings.ts:2885
+#: src/strings.ts:2886
 msgid "Billed at"
 msgstr "Gefactureerd op"
 
@@ -1603,6 +1611,10 @@ msgstr "Controleer je spammap als je nog geen e-mail hebt ontvangen."
 #: src/strings.ts:2179
 msgid "Checking all attachments"
 msgstr "Alle bijlagen controleren"
+
+#: src/strings.ts:2002
+msgid "Checking attachments"
+msgstr "Bijlagen controleren"
 
 #: src/strings.ts:336
 msgid "Checking for new version"
@@ -1937,7 +1949,7 @@ msgstr "Configureren"
 msgid "Configure server URLs for Notesnook"
 msgstr "Server-URL's voor Notesnook configureren"
 
-#: src/strings.ts:2908
+#: src/strings.ts:2909
 msgid "Confirm"
 msgstr "Bevestigen"
 
@@ -2090,7 +2102,7 @@ msgstr "Groep aanmaken"
 msgid "Create a new note"
 msgstr "Nieuwe notitie aanmaken"
 
-#: src/strings.ts:2903
+#: src/strings.ts:2904
 msgid "Create a new notebook"
 msgstr "Nieuw notitieblok maken"
 
@@ -2122,6 +2134,10 @@ msgstr "Sleutel aanmaken"
 msgid "Create link"
 msgstr "Link maken"
 
+#: src/strings.ts:2918
+msgid "Create note from notification drawer"
+msgstr "Notitie maken vanuit meldingenpaneel"
+
 #: src/strings.ts:1348
 msgid "Create shortcut of this notebook in side menu"
 msgstr "Snelkoppeling naar dit notitieboek maken in het zijmenu"
@@ -2150,6 +2166,10 @@ msgstr "Een{0} back-up maken"
 #: src/strings.ts:2692
 msgid "Creating backup zip file..."
 msgstr "Back-up zip-bestand maken..."
+
+#: src/strings.ts:1719
+msgid "Creating your account"
+msgstr "Je account wordt gemaakt"
 
 #: src/strings.ts:2698
 msgid "Creating zip"
@@ -2203,6 +2223,14 @@ msgstr "Aangepast"
 #: src/strings.ts:1917
 msgid "Custom dictionary words"
 msgstr "Aangepaste woordenboekwoorden"
+
+#: src/strings.ts:2919
+msgid "Custom homepage"
+msgstr "Aangepaste startpagina"
+
+#: src/strings.ts:2920
+msgid "Custom toolbar preset"
+msgstr "Aangepaste werkbalkvoorinstelling"
 
 #: src/strings.ts:2718
 msgid "Customizable sidebar"
@@ -2350,6 +2378,10 @@ msgstr "Standaardlettergrootte"
 msgid "Default font size in editor"
 msgstr "Standaardlettergrootte in de editor"
 
+#: src/strings.ts:2914
+msgid "Default notebook & tag"
+msgstr "Standaard notitieboek & tag"
+
 #: src/strings.ts:1037
 msgid "Default notebook cleared"
 msgstr "Standaardnotitieboek gewist"
@@ -2366,7 +2398,7 @@ msgstr "Standaard sluimertijd"
 msgid "Default sound"
 msgstr "Standaardgeluid"
 
-#: src/strings.ts:2893
+#: src/strings.ts:2894
 msgid "Degraded Performance Warning"
 msgstr "Waarschuwing verminderde prestaties"
 
@@ -2494,6 +2526,10 @@ msgstr "Realtime synchronisatie uitschakelen"
 #: src/strings.ts:986
 msgid "Disable sync"
 msgstr "Synchronisatie uitschakelen"
+
+#: src/strings.ts:2921
+msgid "Disable trash cleanup"
+msgstr "Prullenbakschoning uitschakelen"
 
 #: src/strings.ts:147
 msgid "Disabled"
@@ -3009,6 +3045,10 @@ msgstr "Verloopt over"
 msgid "Expires on"
 msgstr "Verloopt op"
 
+#: src/strings.ts:2925
+msgid "Expiring notes"
+msgstr "Verlopende notities"
+
 #: src/strings.ts:2393
 msgid "Expiry date"
 msgstr "Vervaldatum"
@@ -3057,6 +3097,10 @@ msgstr "Exporteren als{0}"
 #: src/strings.ts:2394
 msgid "Export CSV"
 msgstr "CSV exporteren"
+
+#: src/strings.ts:2926
+msgid "Export table as CSV"
+msgstr "Tabel exporteren als CSV"
 
 #: src/strings.ts:195
 msgid "Exporting \"{title}\""
@@ -3135,7 +3179,7 @@ msgstr "Kan API-sleutels niet laden. Probeer het opnieuw."
 msgid "Failed to load web clip"
 msgstr "Kan webclip niet laden"
 
-#: src/strings.ts:2898
+#: src/strings.ts:2899
 msgid "Failed to migrate backup directory. It has been reset to default."
 msgstr "Kan back-upmap niet migreren. Deze is teruggezet naar standaard."
 
@@ -3204,6 +3248,10 @@ msgstr "Favorieten"
 msgid "Featured on"
 msgstr "Te zien in"
 
+#: src/strings.ts:2913
+msgid "Features"
+msgstr "Functies"
+
 #: src/strings.ts:659
 msgid "File check failed: {reason} Try reuploading the file to fix the issue."
 msgstr "Bestandscontrole mislukt: {reason} Upload het bestand opnieuw om het probleem op te lossen."
@@ -3227,6 +3275,10 @@ msgstr "Bestandslinks kunnen niet in browsers worden geopend. Gebruik de Notesno
 #: src/strings.ts:858
 msgid "File mismatch"
 msgstr "Bestand komt niet overeen"
+
+#: src/strings.ts:724
+msgid "File size"
+msgstr "Bestandsgrootte"
 
 #: src/strings.ts:2511
 msgid "File size limit exceeded. Please upgrade your plan."
@@ -3404,7 +3456,7 @@ msgstr "Algemeen"
 msgid "Generated 100% locally on your device."
 msgstr "100% lokaal gegenereerd op uw apparaat."
 
-#: src/strings.ts:2909
+#: src/strings.ts:2910
 msgid "Generating..."
 msgstr "Genereren..."
 
@@ -3444,7 +3496,7 @@ msgstr "Versleutelingssleutel ophalen..."
 msgid "Getting information"
 msgstr "Informatie ophalen"
 
-#: src/strings.ts:2887
+#: src/strings.ts:2888
 msgid "Getting invoice"
 msgstr "Factuur ophalen"
 
@@ -3666,7 +3718,7 @@ msgstr ""
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
 msgstr "Als je iets in het algemeen wilt vragen of hulp nodig hebt, raden we je aan om"
 
-#: src/strings.ts:2906
+#: src/strings.ts:2907
 msgid "Ignore"
 msgstr "Negeren"
 
@@ -3709,6 +3761,10 @@ msgstr "Import voltooid"
 #: src/strings.ts:2395
 msgid "Import CSV"
 msgstr "CSV importeren"
+
+#: src/strings.ts:2927
+msgid "Import CSV to table"
+msgstr "CSV importeren naar tabel"
 
 #: src/strings.ts:2851
 msgid "Import unsuccessful"
@@ -3822,7 +3878,7 @@ msgstr "Ongeldig PGP-sleutelpaar. Controleer je sleutels en probeer het opnieuw.
 msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 msgstr "Ongeldige herstelsleutel. Zorg ervoor dat je je accountherstelsleutel invoert, niet een 2FA-herstelcode."
 
-#: src/strings.ts:2886
+#: src/strings.ts:2887
 msgid "Invoice"
 msgstr "Factuur"
 
@@ -3900,7 +3956,7 @@ msgstr "Houd je gegevens veilig"
 msgid "Key name"
 msgstr "Sleutelnaam"
 
-#: src/strings.ts:2889
+#: src/strings.ts:2890
 msgid "Keyboard shortcuts"
 msgstr "Sneltoetsen"
 
@@ -4035,6 +4091,10 @@ msgstr "Gekoppelde notities"
 #: src/strings.ts:1460
 msgid "Linking to a specific block is not available for locked notes."
 msgstr "Koppelen aan een specifiek blok is niet beschikbaar voor vergrendelde notities."
+
+#: src/strings.ts:2922
+msgid "Links & embeds in monographs"
+msgstr "Koppelingen & insluitingen in monografieën"
 
 #: src/strings.ts:455
 msgid "List of"
@@ -4350,6 +4410,10 @@ msgstr "Monografie-URL gekopieerd"
 #: src/strings.ts:1398
 msgid "Monographs"
 msgstr "Monografieën"
+
+#: src/strings.ts:2923
+msgid "Monographs analytics"
+msgstr "Monografieënstatistieken"
 
 #: src/strings.ts:1297
 #: src/strings.ts:2573
@@ -4751,7 +4815,7 @@ msgstr "Notesnook Circle"
 msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 msgstr "Notesnook Circle brengt vertrouwde partners samen die onze inzet voor privacy, transparantie en gebruikersvrijheid delen."
 
-#: src/strings.ts:2895
+#: src/strings.ts:2896
 msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
 msgstr "Notesnook heeft gedetecteerd dat het onder ARM64-vertaling draait. Download voor de beste prestaties de ARM64-versie van onze website."
 
@@ -5017,7 +5081,7 @@ msgstr "Plak hier de afbeeldings-URL"
 msgid "Paste without formatting"
 msgstr "Plakken zonder opmaak"
 
-#: src/strings.ts:2900
+#: src/strings.ts:2901
 msgid "Path not found"
 msgstr "Pad niet gevonden"
 
@@ -5048,6 +5112,10 @@ msgstr "Geen telefoonnummer ingevoerd"
 #: src/strings.ts:815
 msgid "Pin"
 msgstr "Vastmaken"
+
+#: src/strings.ts:2916
+msgid "Pin note in notification"
+msgstr "Notitie vastmaken in melding"
 
 #: src/strings.ts:844
 msgid "Pin notification"
@@ -5482,7 +5550,7 @@ msgstr "Gepubliceerde notities kunnen worden versleuteld. Dit betekent dat allee
 msgid "Purchase"
 msgstr "Kopen"
 
-#: src/strings.ts:2902
+#: src/strings.ts:2903
 msgid "Quick actions"
 msgstr "Snelle acties"
 
@@ -5502,7 +5570,7 @@ msgstr "Snel openen"
 msgid "Quickly create a note from the notification"
 msgstr "Maak snel een notitie vanuit de melding"
 
-#: src/strings.ts:2907
+#: src/strings.ts:2908
 msgid "Quit"
 msgstr "Afsluiten"
 
@@ -5617,6 +5685,10 @@ msgstr "QR-code van herstelsleutel opgeslagen"
 #: src/strings.ts:792
 msgid "Recovery key text file saved"
 msgstr "Tekstbestand met herstelsleutel opgeslagen"
+
+#: src/strings.ts:2915
+msgid "Recurring reminders"
+msgstr "Terugkerende herinneringen"
 
 #: src/strings.ts:2195
 msgid "Redeem"
@@ -6433,7 +6505,7 @@ msgstr "Instellen als licht thema"
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr "Stel het interval voor automatisch legen van de prullenbak in via Instellingen > Gedrag > Interval voor legen van prullenbak."
 
-#: src/strings.ts:2899
+#: src/strings.ts:2900
 msgid "Set backup directory"
 msgstr "Back-upmap instellen"
 
@@ -6594,7 +6666,7 @@ msgstr "Snelkoppelingen"
 msgid "Show"
 msgstr "Weergeven"
 
-#: src/strings.ts:2892
+#: src/strings.ts:2893
 msgid "Show app"
 msgstr "App tonen"
 
@@ -6899,6 +6971,10 @@ msgstr "tag"
 msgid "Tag ID copied to clipboard"
 msgstr "Tag-ID gekopieerd naar klembord"
 
+#: src/strings.ts:1650
+msgid "Tag not found"
+msgstr "Tag niet gevonden"
+
 #: src/strings.ts:270
 msgid "tags"
 msgstr "tags"
@@ -7094,7 +7170,7 @@ msgstr "Het wachtwoord om het Colornote-back-upbestand te ontsleutelen."
 msgid "The password/pin for unlocking the app."
 msgstr "Het wachtwoord of de pincode om de app te ontgrendelen."
 
-#: src/strings.ts:2901
+#: src/strings.ts:2902
 msgid ""
 "The path does not exist:\n"
 "{path}"
@@ -7186,7 +7262,7 @@ msgstr "Dit is een eenmalige aankoop, geen abonnement."
 msgid "This may take a while"
 msgstr "Dit kan even duren"
 
-#: src/strings.ts:2888
+#: src/strings.ts:2889
 msgid "This might take a minute or two."
 msgstr "Dit kan een minuut of twee duren."
 
@@ -7402,6 +7478,10 @@ msgid "Unfavorite"
 msgstr "Uit favorieten verwijderen"
 
 #: src/strings.ts:2884
+msgid "Unknown"
+msgstr "Onbekend"
+
+#: src/strings.ts:2885
 msgid "Unknown error."
 msgstr "Onbekende fout."
 
@@ -8101,6 +8181,14 @@ msgstr "Je kunt de 2FA-reservemethode gebruiken als je niet kunt inloggen via de
 #: src/strings.ts:1325
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Je kunt oudere versies van elke notitie bekijken en herstellen via de eigenschappen -> Geschiedenis."
+
+#: src/strings.ts:2931
+msgid "You cannot set a default notebook or tag on this plan."
+msgstr "Je kunt met dit abonnement geen standaard notitieblok of tag instellen."
+
+#: src/strings.ts:2929
+msgid "You cannot upload files larger than {limit} on this plan."
+msgstr "Je kunt met dit abonnement geen bestanden uploaden die groter zijn dan {limit}."
 
 #: src/strings.ts:2792
 msgid "You created"
