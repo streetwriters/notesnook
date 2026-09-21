@@ -111,10 +111,12 @@ function ThemesList() {
   const items = [
     {
       ...darkTheme,
+      description: strings.defaultDarkThemeDesc(),
       previewColors: getPreviewColors(darkTheme)
     },
     {
       ...lightTheme,
+      description: strings.defaultLightThemeDesc(),
       previewColors: getPreviewColors(lightTheme)
     },
     ...(themes.data?.pages.flatMap((a) => a.themes) || [])
@@ -284,9 +286,11 @@ function ThemeItem(props: ThemeItemProps) {
       <Text variant="body">{theme.authors[0].name}</Text>
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
         <Text variant="subBody">
-          {theme.colorScheme === "dark" ? "Dark" : "Light"}
+          {theme.colorScheme === "dark" ? strings.dark() : strings.light()}
           &nbsp;&nbsp;
-          {theme.totalInstalls ? `${theme.totalInstalls} installs` : ""}
+          {theme.totalInstalls
+            ? `${theme.totalInstalls} ${strings.installs()}`
+            : ""}
         </Text>
         {isApplied ? (
           <CheckCircleOutline color="accent" size={20} />
