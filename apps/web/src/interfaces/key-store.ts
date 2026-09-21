@@ -560,7 +560,7 @@ export function wrongCredentialError(query: CredentialQuery): string {
     case "password":
       return strings.passwordIncorrect();
     case "securityKey":
-      return "Wrong security key.";
+      return strings.wrongSecurityKey();
   }
 }
 
