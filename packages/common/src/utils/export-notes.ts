@@ -102,7 +102,10 @@ export async function* exportNotes(
 
   // case where the user has a notebook named attachments
   const attachmentsRoot = pathTree.add("attachments", "underscore");
-  const pendingAttachments: Map<string, Attachment> = new Map();
+  const resolvedAttachments: Map<
+    string,
+    { path: string; attachment: Attachment }
+  > = new Map();
 
   for (const [id] of notePathMap) {
     const note = await database.notes.note(id);
@@ -120,7 +123,8 @@ export async function* exportNotes(
         unlockVault: options.unlockVault,
         format,
         attachmentsRoot,
-        pendingAttachments,
+        resolvedAttachments,
+        attachmentTree: pathTree,
         resolveInternalLink: (link) => {
           const internalLink = parseInternalLink(link);
           if (!internalLink) return link;
@@ -152,7 +156,7 @@ export async function* exportNotes(
     }
   }
 
-  for (const [path, attachment] of pendingAttachments) {
+  for (const { path, attachment } of resolvedAttachments.values()) {
     yield <ExportableAttachment>{
       type: "attachment",
       path,
@@ -178,13 +182,18 @@ export async function* exportNote(
   });
   const ext = FORMAT_TO_EXT[options.format];
   const path = [filename, ext].join(".");
-  const pendingAttachments: Map<string, Attachment> = new Map();
+  const resolvedAttachments: Map<
+    string,
+    { path: string; attachment: Attachment }
+  > = new Map();
+  const attachmentTree = new PathTree();
 
   try {
     const content = await exportContent(note, {
       format,
       attachmentsRoot,
-      pendingAttachments,
+      resolvedAttachments,
+      attachmentTree,
       unlockVault: options.unlockVault
     });
     if (!content) return false;
@@ -197,7 +206,7 @@ export async function* exportNote(
       ctime: new Date(note.dateCreated)
     };
 
-    for (const [path, attachment] of pendingAttachments) {
+    for (const { path, attachment } of resolvedAttachments.values()) {
       yield <ExportableAttachment>{
         type: "attachment",
         path,
@@ -225,7 +234,8 @@ export async function exportContent(
 
     // TODO: remove these
     attachmentsRoot?: string;
-    pendingAttachments?: Map<string, Attachment>;
+    resolvedAttachments?: Map<string, { path: string; attachment: Attachment }>;
+    attachmentTree?: PathTree;
     resolveInternalLink?: ResolveInternalLink;
   }
 ) {
@@ -234,7 +244,8 @@ export async function exportContent(
     unlockVault,
     resolveInternalLink,
     attachmentsRoot,
-    pendingAttachments,
+    resolvedAttachments,
+    attachmentTree,
     disableTemplate
   } = options;
   const rawContent = await database.content.findByNoteId(note.id);
@@ -274,7 +285,7 @@ export async function exportContent(
 
   if (
     attachmentsRoot &&
-    pendingAttachments &&
+    resolvedAttachments &&
     format !== "txt" &&
     format !== "pdf"
   ) {
@@ -286,15 +297,32 @@ export async function exportContent(
 
       const sources: Record<string, string> = {};
       for (const attachment of attachments) {
-        const filename = [attachment.hash, attachment.filename].join("-");
-        const attachmentPath = join(attachmentsRoot, filename);
+        const existing = resolvedAttachments.get(attachment.hash);
+        if (existing) {
+          sources[attachment.hash] = resolveAttachment(
+            elements,
+            attachment,
+            existing.path,
+            format
+          );
+          continue;
+        }
+
+        const baseFilename = attachment.filename || attachment.hash;
+        const rawAttachmentPath = join(attachmentsRoot, baseFilename);
+        const attachmentPath =
+          attachmentTree?.add(rawAttachmentPath) || rawAttachmentPath;
+
         sources[attachment.hash] = resolveAttachment(
           elements,
           attachment,
           attachmentPath,
           format
         );
-        pendingAttachments.set(attachmentPath, attachment);
+        resolvedAttachments.set(attachment.hash, {
+          path: attachmentPath,
+          attachment
+        });
       }
       return sources;
     });
