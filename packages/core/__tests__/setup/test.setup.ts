@@ -21,6 +21,9 @@ import "isomorphic-fetch";
 import dotenv from "dotenv";
 import { DOMParser } from "linkedom";
 import WebSocket from "ws";
+import { initLocaleSync } from "@notesnook/intl";
+
+initLocaleSync({ systemLocale: "en" });
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

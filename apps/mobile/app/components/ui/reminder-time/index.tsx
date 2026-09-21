@@ -28,24 +28,6 @@ import { strings } from "@notesnook/intl";
 import { Reminder } from "@notesnook/core";
 import { DefaultAppStyles } from "../../../utils/styles";
 
-function localizeReminderTime(time?: string): string | undefined {
-  if (!time) return undefined;
-  if (time === "Ongoing") return strings.ongoing();
-  if (time.startsWith("Snoozed until ")) {
-    return strings.snoozedUntil(time.replace("Snoozed until ", ""));
-  }
-  let result = time;
-  if (result.startsWith("Upcoming: ")) {
-    result = `${strings.upcoming()}: ${result.slice(10)}`;
-  } else if (result.startsWith("Last: ")) {
-    result = `${strings.last()}: ${result.slice(6)}`;
-  }
-  return result
-    .replace("Today", strings.today())
-    .replace("Tomorrow", strings.tomorrow())
-    .replace("Yesterday", strings.yesterday());
-}
-
 export const ReminderTime = ({
   checkIsActive = true,
   style,
@@ -60,13 +42,13 @@ export const ReminderTime = ({
 } & ButtonProps) => {
   const { colors } = useThemeColors();
   const reminder = props.reminder;
-  const rawTime = !reminder
+  const time = !reminder
     ? undefined
     : getFormattedReminderTime(reminder, props.short || false);
-  const time = localizeReminderTime(rawTime);
   const isTodayOrTomorrow =
-    (rawTime?.includes("Today") || rawTime?.includes("Tomorrow")) &&
-    !rawTime?.includes("Last");
+    time &&
+    (time.includes(strings.today()) || time.includes(strings.tomorrow())) &&
+    !time.includes(strings.last());
   const isActive =
     checkIsActive && reminder ? isReminderActive(reminder) : true;
 

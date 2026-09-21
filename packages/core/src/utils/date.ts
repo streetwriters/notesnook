@@ -21,20 +21,44 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat.js";
 import timezone from "dayjs/plugin/timezone.js";
 import { TimeFormat, DayFormat } from "../types.js";
+import { i18n } from "@notesnook/intl";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(timezone);
 
-export function getWeekGroupFromTimestamp(timestamp: number) {
+function formatShortMonth(month: number, year: number, locale?: string): string {
+  try {
+    const str = new Intl.DateTimeFormat(locale || i18n.locale || undefined, {
+      month: "short"
+    }).format(new Date(year, month, 1));
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  } catch {
+    return MONTHS_SHORT[month];
+  }
+}
+
+export function formatMonthGroup(date: Date, locale?: string): string {
+  try {
+    const formatted = new Intl.DateTimeFormat(locale || i18n.locale || undefined, {
+      month: "long",
+      year: "numeric"
+    }).format(date);
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  } catch {
+    return `${MONTHS_FULL[date.getMonth()]} ${date.getFullYear()}`;
+  }
+}
+
+export function getWeekGroupFromTimestamp(timestamp: number, locale?: string) {
   const date = new Date(timestamp);
   const { start, end } = getWeek(date);
 
   const startMonth =
-    start.month !== end.month ? " " + MONTHS_SHORT[start.month] : "";
+    start.month !== end.month ? " " + formatShortMonth(start.month, start.year, locale) : "";
   const startYear = start.year !== end.year ? ", " + start.year : "";
 
   const startDate = `${start.day}${startMonth}${startYear}`;
-  const endDate = `${end.day} ${MONTHS_SHORT[end.month]}, ${end.year}`;
+  const endDate = `${end.day} ${formatShortMonth(end.month, end.year, locale)}, ${end.year}`;
 
   return `${startDate} - ${endDate}`;
 }

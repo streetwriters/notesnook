@@ -25,7 +25,8 @@ import {
   Reminder,
   SortOptions
 } from "../types.js";
-import { getWeekGroupFromTimestamp, MONTHS_FULL } from "../utils/date.js";
+import { formatMonthGroup, getWeekGroupFromTimestamp } from "../utils/date.js";
+import { strings } from "@notesnook/intl";
 
 type PartialGroupableItem = {
   id: string;
@@ -86,22 +87,25 @@ export function createKeySelector(
   }
 ): GroupKeySelectorFunction<PartialGroupableItem> {
   return (item) => {
-    if ("pinned" in item && item.pinned) return "Pinned";
-    else if ("conflicted" in item && item.conflicted) return "Conflicted";
+    if ("pinned" in item && item.pinned) return strings.pinned();
+    else if ("conflicted" in item && item.conflicted)
+      return strings.conflicted();
 
     const date = new Date();
     if (item.type === "reminder")
-      return isReminderActive(item as Reminder) ? "Active" : "Inactive";
+      return isReminderActive(item as Reminder)
+        ? strings.active()
+        : strings.inactive();
     else if (options.groupBy === "abc")
       return getFirstCharacter(getTitle(item));
     else {
       const value = getSortValue(options, item) || 0;
       switch (options.groupBy) {
         case "none":
-          return "All";
+          return strings.all();
         case "month":
           date.setTime(value);
-          return `${MONTHS_FULL[date.getMonth()]} ${date.getFullYear()}`;
+          return formatMonthGroup(date);
         case "week":
           return getWeekGroupFromTimestamp(value);
         case "year":
@@ -110,10 +114,10 @@ export function createKeySelector(
         case "default":
         default: {
           return value > date.getTime() - MILLISECONDS_IN_WEEK
-            ? "Recent"
+            ? strings.recent()
             : value > date.getTime() - MILLISECONDS_IN_WEEK * 2
-            ? "Last week"
-            : "Older";
+            ? strings.lastWeek()
+            : strings.older();
         }
       }
     }
@@ -138,7 +142,13 @@ export function groupArray<T>(
         i,
         {
           index: i,
-          group: { id: groupTitle, title: groupTitle, type: "header" }
+          group: {
+            id: groupTitle,
+            get title() {
+              return keySelector(item);
+            },
+            type: "header"
+          }
         }
       ]);
   }
@@ -153,5 +163,5 @@ function getFirstCharacter(str: string) {
 }
 
 function getTitle(item: PartialGroupableItem): string {
-  return ("filename" in item ? item.filename : item.title) || "Unknown";
+  return ("filename" in item ? item.filename : item.title) || strings.unknown();
 }

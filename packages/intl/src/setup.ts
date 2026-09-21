@@ -18,19 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { I18n, i18n as i18nn } from "@lingui/core";
 
-let i18nGlobal: I18n | undefined = undefined;
+const GLOBAL_I18N_KEY = "__notesnook_i18n__";
 
 export const setI18nGlobal = (newI18n: any) => {
   if (newI18n === i18n) return;
-  i18nGlobal = newI18n;
+  (globalThis as any)[GLOBAL_I18N_KEY] = newI18n;
 };
 
 export function getI18nGlobal() {
-  return i18nGlobal;
+  return (globalThis as any)[GLOBAL_I18N_KEY];
 }
 export const i18n: I18n = new Proxy({} as I18n, {
   get: (target, property) => {
-    const active = i18nGlobal || i18nn;
+    const active = (globalThis as any)[GLOBAL_I18N_KEY] || i18nn;
     const value = active[property as keyof I18n];
     if (typeof value === "function") {
       return value.bind(active);

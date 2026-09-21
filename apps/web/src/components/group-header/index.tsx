@@ -44,17 +44,28 @@ import {
   GroupingKey
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { formatGroupTitle } from "@notesnook/common";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import type { Context } from "../list-container/types";
 
 const groupByToTitleMap = {
-  none: "None",
-  default: "Default",
-  abc: "A - Z",
-  year: "Year",
-  week: "Week",
-  month: "Month"
+  get none() {
+    return strings.groupByStrings.none();
+  },
+  get default() {
+    return strings.groupByStrings.default();
+  },
+  get abc() {
+    return strings.groupByStrings.abc();
+  },
+  get year() {
+    return strings.groupByStrings.year();
+  },
+  get week() {
+    return strings.groupByStrings.week();
+  },
+  get month() {
+    return strings.groupByStrings.month();
+  }
 };
 
 type GroupingMenuOptions = {
@@ -72,21 +83,21 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
   options.groupingKey === "reminders" || options.isSearching
     ? null
     : {
-        type: "button",
-        key: "groupBy",
-        title: strings.groupBy(),
-        icon: GroupBy.path,
-        menu: {
-          items: map(options, [
-            { key: "none", title: strings.groupByStrings.none() },
-            { key: "default", title: strings.groupByStrings.default() },
-            { key: "year", title: strings.groupByStrings.year() },
-            { key: "month", title: strings.groupByStrings.month() },
-            { key: "week", title: strings.groupByStrings.week() },
-            { key: "abc", title: strings.groupByStrings.abc() }
-          ])
-        }
-      };
+      type: "button",
+      key: "groupBy",
+      title: strings.groupBy(),
+      icon: GroupBy.path,
+      menu: {
+        items: map(options, [
+          { key: "none", title: strings.groupByStrings.none() },
+          { key: "default", title: strings.groupByStrings.default() },
+          { key: "year", title: strings.groupByStrings.year() },
+          { key: "month", title: strings.groupByStrings.month() },
+          { key: "week", title: strings.groupByStrings.week() },
+          { key: "abc", title: strings.groupByStrings.abc() }
+        ])
+      }
+    };
 
 const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
@@ -98,8 +109,8 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
         ? OrderAtoZ.path
         : OrderOldestNewest.path
       : options.groupOptions.sortBy === "title"
-      ? OrderZtoA.path
-      : OrderNewestOldest.path,
+        ? OrderZtoA.path
+        : OrderNewestOldest.path,
   menu: {
     items: map(options, [
       {
@@ -108,10 +119,10 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
           options.groupOptions.sortBy === "title"
             ? strings.aToZ()
             : options.groupOptions.sortBy === "dueDate"
-            ? strings.earliestFirst()
-            : options.groupOptions.sortBy === "relevance"
-            ? strings.leastRelevantFirst()
-            : strings.oldestToNewest()
+              ? strings.earliestFirst()
+              : options.groupOptions.sortBy === "relevance"
+                ? strings.leastRelevantFirst()
+                : strings.oldestToNewest()
       },
       {
         key: "desc",
@@ -119,10 +130,10 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
           options.groupOptions.sortBy === "title"
             ? strings.zToA()
             : options.groupOptions.sortBy === "dueDate"
-            ? strings.latestFirst()
-            : options.groupOptions.sortBy === "relevance"
-            ? strings.mostRelevantFirst()
-            : strings.newestToOldest()
+              ? strings.latestFirst()
+              : options.groupOptions.sortBy === "relevance"
+                ? strings.mostRelevantFirst()
+                : strings.newestToOldest()
       }
     ])
   }
@@ -205,8 +216,8 @@ function getGroupOptions(
     : context?.type === "notebook" ||
       context?.type === "tag" ||
       context?.type === "color"
-    ? db.settings.getGroupOptionsById(context.id, context.type)
-    : db.settings.getGroupOptions(groupingKey);
+      ? db.settings.getGroupOptionsById(context.id, context.type)
+      : db.settings.getGroupOptions(groupingKey);
 }
 
 async function setGroupOptions(
@@ -334,7 +345,7 @@ function GroupHeader(props: GroupHeaderProps) {
 
         const groupItems = await groups();
         const items: MenuItem[] = groupItems.map(({ group, index }) => {
-          const groupTitle = formatGroupTitle(group.title.toString());
+          const groupTitle = group.title.toString();
           return {
             type: "button",
             key: groupTitle,
@@ -384,10 +395,13 @@ function GroupHeader(props: GroupHeaderProps) {
         sx={{
           fontSize: "subBody",
           fontWeight: "medium",
-          color: title === "Conflicted" ? "error" : "accent"
+          color:
+            title === strings.conflicted() || title === "Conflicted"
+              ? "error"
+              : "accent"
         }}
       >
-        {formatGroupTitle(title).toUpperCase()}
+        {title.toUpperCase()}
       </Text>
 
       {index === 0 && (
@@ -396,9 +410,8 @@ function GroupHeader(props: GroupHeaderProps) {
             <IconButton
               testId={`${groupingKey}-sort-button`}
               icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
-              title={`Grouped by ${
-                groupByToTitleMap[groupOptions.groupBy || "default"]
-              }`}
+              title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy || "default"]
+                }`}
               onClick={() => {
                 const groupOptions = getGroupOptions(
                   context,
