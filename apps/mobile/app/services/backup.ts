@@ -192,11 +192,13 @@ async function run(
     context
   )) as ScopedStorage.FileType;
 
-  if (!androidBackupDirectory)
+  if (!androidBackupDirectory) {
+    backupRunning = false;
     return {
       error: new Error(strings.backupDirectoryNotSelected()),
       report: false
     };
+  }
 
   let path;
 
