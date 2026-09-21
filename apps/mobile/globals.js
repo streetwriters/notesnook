@@ -13,6 +13,7 @@ import OpenPGP from "react-native-fast-openpgp";
 
 OpenPGP.useJSI = false;
 
+const testchange = 1;
 let domParser;
 Object.defineProperty(global, "DOMParser", {
   get: () => {
