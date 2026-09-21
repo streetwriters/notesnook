@@ -738,24 +738,28 @@ const ComparePlans = React.memo(
             gap: 10
           }}
         >
-          {["Features", "Free", "Essential", "Pro", "Believer"].map(
-            (plan, index) => (
-              <View
-                key={plan}
-                style={{
-                  width: index === 0 ? 150 : 120,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
-                  backgroundColor:
-                    index === 0 ? colors.secondary.background : undefined,
-                  borderBottomWidth: index === 0 ? 1 : undefined,
-                  borderBottomColor: colors.primary.border
-                }}
-              >
-                <Heading size={AppFontSize.sm}>{plan}</Heading>
-              </View>
-            )
-          )}
+          {[
+            { id: "features", title: strings.features() },
+            { id: "free", title: strings.planMetadataFree() },
+            { id: "essential", title: strings.planMetadataEssential() },
+            { id: "pro", title: strings.planMetadataPro() },
+            { id: "believer", title: strings.planMetadataBeliever() }
+          ].map((column, index) => (
+            <View
+              key={column.id}
+              style={{
+                width: index === 0 ? 150 : 120,
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                backgroundColor:
+                  index === 0 ? colors.secondary.background : undefined,
+                borderBottomWidth: index === 0 ? 1 : undefined,
+                borderBottomColor: colors.primary.border
+              }}
+            >
+              <Heading size={AppFontSize.sm}>{column.title}</Heading>
+            </View>
+          ))}
         </View>
 
         {getFeaturesTable().map((item, keyIndex) => {
@@ -855,8 +859,7 @@ const ComparePlans = React.memo(
         </View>
       </ScrollView>
     );
-  },
-  () => true
+  }
 );
 ComparePlans.displayName = "ComparePlans";
 
