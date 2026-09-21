@@ -23,7 +23,7 @@ import useSyncProgress from "../../../hooks/use-sync-progress";
 import { presentSheet } from "../../../services/event-manager";
 import { useThemeColors } from "@notesnook/theme";
 import { AppFontSize } from "../../../utils/size";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";

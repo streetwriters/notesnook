@@ -23,14 +23,14 @@ import { MdClose } from "react-icons/md";
 import { ThemeProvider } from "@emotion/react";
 import { getDefaultAccentColor, useTheme } from "@notesnook/theme";
 
-type StepSeperatorProps = {
+type StepSeparatorProps = {
   icon?: IconType;
   onShowPopup?: () => Promise<boolean>;
   tooltip?: string;
   popup?: { title: string; body?: JSX.Element };
 };
 
-export function StepSeperator(props: StepSeperatorProps) {
+export function StepSeparator(props: StepSeparatorProps) {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const theme = useTheme(
     { accent: getDefaultAccentColor(), theme: "dark" },

@@ -26,7 +26,7 @@ import { TTip } from "../../services/tip-manager";
 import { eCloseSheet } from "../../utils/events";
 import { AppFontSize } from "../../utils/size";
 import { Button } from "../ui/button";
-import Seperator from "../ui/seperator";
+import Separator from "../ui/separator";
 import Paragraph from "../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../utils/styles";

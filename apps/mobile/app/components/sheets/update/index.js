@@ -27,7 +27,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { STORE_LINK } from "../../../utils/constants";
 import { AppFontSize } from "../../../utils/size";
 import { Button } from "../../ui/button";
-import Seperator from "../../ui/seperator";
+import Separator from "../../ui/separator";
 import { SvgView } from "../../ui/svg";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
