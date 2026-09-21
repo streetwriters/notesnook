@@ -668,6 +668,10 @@ msgstr "Plan 5-letni (zakup jednorazowy)"
 msgid "6 digit code"
 msgstr "Kod 6-cyfrowy"
 
+#: src/strings.ts:756
+msgid "@andrewsayer on Twitter"
+msgstr "@andrewsayer na Twitterze"
+
 #: src/strings.ts:2588
 msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
 msgstr "Notatnik może zawierać nieograniczoną liczbę podnotatników z nieograniczoną liczbą notatek."

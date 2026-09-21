@@ -106,7 +106,8 @@ const Intro = () => {
                 Linking.openURL(item.link);
               }}
             >
-              {item.tesimonial()} — {item.user}
+              {item.tesimonial()} —{" "}
+              {typeof item.user === "function" ? item.user() : item.user}
             </Paragraph>
           ) : null}
         </View>

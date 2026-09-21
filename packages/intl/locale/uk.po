@@ -668,6 +668,10 @@ msgstr "Тариф на 5 років (одноразова покупка)"
 msgid "6 digit code"
 msgstr "6-значний код"
 
+#: src/strings.ts:756
+msgid "@andrewsayer on Twitter"
+msgstr "@andrewsayer у Twitter"
+
 #: src/strings.ts:2588
 msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
 msgstr "Блокнот може мати необмежену кількість підблокнотів із необмеженою кількістю нотаток."

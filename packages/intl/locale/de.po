@@ -668,6 +668,10 @@ msgstr "5-Jahres-Abo (Einmalkauf)"
 msgid "6 digit code"
 msgstr "6-stelliger Code"
 
+#: src/strings.ts:756
+msgid "@andrewsayer on Twitter"
+msgstr "@andrewsayer auf Twitter"
+
 #: src/strings.ts:2588
 msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
 msgstr "Ein Notizbuch kann unbegrenzt viele Unter-Notizbücher mit unbegrenzten Notizen enthalten."
