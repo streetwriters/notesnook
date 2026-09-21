@@ -342,7 +342,7 @@ function PublishView(props: PublishViewProps) {
               const title = titleInput.current?.value;
 
               if (!title || title.trim().length === 0) {
-                showToast("error", "Title cannot be empty.");
+                showToast("error", strings.titleIsRequired());
                 return;
               }
 

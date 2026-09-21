@@ -261,7 +261,7 @@ function Checkout() {
                     const user = useUserStore.getState().user;
                     setCustomer(user);
                     setCurrentStep(isUserSubscribed(user) ? 2 : 1);
-                  } else setError("Failed to create account.");
+                  } else setError(strings.failedToCreateAccount());
                 }}
               />
             ) : currentStep === 1 ? (
