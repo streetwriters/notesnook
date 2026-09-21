@@ -157,8 +157,8 @@ export const CheckListItem = Node.create<CheckListItemOptions>({
         }
       }
 
-      li.onmousedown = onClick;
-      li.ontouchstart = onClick;
+      li.onclick = onClick;
+      // li.ontouchstart = onClick;
 
       return {
         dom: li,
