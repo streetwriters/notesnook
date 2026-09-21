@@ -118,6 +118,14 @@ Detox device defaults in this repo:
 - Android emulator: `Pixel_5_API_36`
 - iOS simulator: `iPhone 17 Pro Max`
 
+If your local devices are named differently, override them without editing the
+config:
+
+```bash
+DETOX_AVD_NAME=Pixel_8_Pro npm run test:android:debug
+DETOX_IOS_DEVICE="iPhone 17 Pro" npm run test:ios
+```
+
 ### Android
 
 Build and run Android Detox tests:
@@ -148,8 +156,12 @@ If simulator tooling is missing, install [AppleSimulatorUtils](https://github.co
 
 ```bash
 brew tap wix/brew
+brew trust --formula wix/brew/applesimutils
 brew install applesimutils
 ```
+
+Recent Homebrew versions refuse to load formulae from untrusted third-party
+taps, hence the `brew trust` step.
 
 ## Release commands
 

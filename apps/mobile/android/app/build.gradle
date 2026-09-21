@@ -229,6 +229,14 @@ android {
 
 }
 
+configurations.matching { it.name.toLowerCase().contains("androidtest") }.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == "androidx.test.espresso") {
+            details.useVersion "3.7.0"
+        }
+    }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
@@ -247,6 +255,7 @@ dependencies {
     implementation project(":react-native-config")
 
     androidTestImplementation('com.wix:detox:+')
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.7.0')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     
     if (hermesEnabled.toBoolean()) {

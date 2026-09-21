@@ -231,4 +231,17 @@ export class SettingsViewModel {
       .locator("button", { hasText: "Check for updates" });
     await button.click();
   }
+
+  async deleteVault() {
+    const item = await this.navigation.findItem("Vault");
+    await item?.click();
+
+    const deleteVaultButton = this.page
+      .locator(getTestId("setting-delete-vault"))
+      .locator("button");
+
+    await deleteVaultButton.click();
+
+    await confirmDialog(this.page.locator(getTestId("password-dialog")));
+  }
 }

@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
-//@ts-ignore
-import { pathExists, ensureDir } from "fs-extra";
+import { existsSync } from "fs";
+import { mkdir } from "fs/promises";
 
 import { resolveConfig } from "detox/internals";
 import { globalSetup } from "detox/runners/jest";
@@ -21,8 +21,8 @@ async function downloadTestButlerAPK() {
   const artifactUrl = `https://repo1.maven.org/maven2/com/linkedin/testbutler/test-butler-app/${version}/test-butler-app-${version}.apk`;
   const filePath = `cache/test-butler-app.apk`;
 
-  await ensureDir("cache");
-  if (!(await pathExists(filePath))) {
+  await mkdir("cache", { recursive: true });
+  if (!existsSync(filePath)) {
     console.log(`\nDownloading Test-Butler APK v${version}...`);
     execSync(`curl -f -o ${filePath} ${artifactUrl}`);
   }
