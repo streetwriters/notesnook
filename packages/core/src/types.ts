@@ -630,6 +630,12 @@ export enum SubscriptionProvider {
   GIFT_CARD = 4
 }
 
+type SubscriptionExtension = {
+  expiry: number;
+  timestamp: number;
+  type: "trial_extension";
+};
+
 export type User = {
   id: string;
   email: string;
@@ -661,6 +667,7 @@ export type User = {
     plan: SubscriptionPlan;
     status: SubscriptionStatus;
     trialsAvailed?: SubscriptionPlan[];
+    extensionsAvailed?: SubscriptionExtension[];
     updateURL: string | null;
     googlePurchaseToken: string | null;
   };
