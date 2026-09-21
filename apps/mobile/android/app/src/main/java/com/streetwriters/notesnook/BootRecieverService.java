@@ -28,6 +28,9 @@ public class BootRecieverService extends BroadcastReceiver {
                  }
                  HeadlessJsTaskService.acquireWakeLockNow(context);
              }
+             if (com.streetwriters.notesnook.pebble.PebbleIndexPrefs.keepAlive(context)) {
+                 com.streetwriters.notesnook.pebble.PebbleIndexKeepAliveService.start(context);
+             }
          } catch (Exception ignored) {}
     }
 

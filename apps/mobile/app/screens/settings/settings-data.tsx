@@ -82,6 +82,7 @@ import { useDragState } from "./editor/state";
 import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
+import { NotesnookModule } from "../../utils/notesnook-module";
 import { getTimeLeft } from "./user-section";
 
 export const settingsGroups: SettingSection[] = [
@@ -1574,6 +1575,100 @@ export const settingsGroups: SettingSection[] = [
         },
         hidden: () => Platform.OS !== "android",
         featureId: "createNoteFromNotificationDrawer"
+      },
+      {
+        id: "pebble-index",
+        type: "screen",
+        name: "Pebble Index 01",
+        icon: "watch",
+        description:
+          "Receive Index notes, transcriptions, audio, and reminders from the Pebble Core app on this phone. No internet.",
+        hidden: () => Platform.OS !== "android",
+        sections: [
+          {
+            id: "pebble-index-capture",
+            name: "Receive Index captures",
+            description:
+              "Accept transcriptions and audio from the Pebble Core app via an explicit intent. No internet.",
+            type: "switch",
+            property: "pebbleIndexCapture",
+            icon: "microphone",
+            onChange: (value) => {
+              NotesnookModule.setPebbleIndexCaptureEnabled?.(!!value);
+            }
+          },
+          {
+            id: "pebble-index-keepalive",
+            name: "Keep ready in background",
+            description:
+              "Run a quiet foreground service so captures land even when Notesnook has not been opened. Uses a persistent notification.",
+            type: "switch",
+            property: "pebbleIndexKeepAlive",
+            icon: "power-sleep",
+            onChange: (value) => {
+              NotesnookModule.setPebbleIndexKeepAlive?.(!!value);
+            }
+          },
+          {
+            id: "pebble-index-notebook",
+            type: "screen",
+            name: "Notes notebook",
+            icon: "notebook-outline",
+            component: "pebble-index-notebook",
+            useHook: () =>
+              useSettingStore((state) => state.settings.pebbleIndexNotebookId),
+            description: () => {
+              const title = SettingsService.getProperty(
+                "pebbleIndexNotebookTitle"
+              );
+              const id = SettingsService.getProperty("pebbleIndexNotebookId");
+              return id
+                ? `Saving Index notes to “${title || "selected notebook"}”`
+                : "None — Index notes stay in the notes list";
+            }
+          },
+          {
+            id: "pebble-index-reminder-notebook",
+            type: "screen",
+            name: "Reminders notebook",
+            icon: "notebook-outline",
+            component: "pebble-index-reminder-notebook",
+            useHook: () =>
+              useSettingStore(
+                (state) => state.settings.pebbleIndexReminderNotebookId
+              ),
+            description: () => {
+              const title = SettingsService.getProperty(
+                "pebbleIndexReminderNotebookTitle"
+              );
+              const id = SettingsService.getProperty(
+                "pebbleIndexReminderNotebookId"
+              );
+              return id
+                ? `Saving Index reminders to “${title || "selected notebook"}”`
+                : "None — reminder notes stay in the notes list";
+            }
+          },
+          {
+            id: "pebble-index-reminder-alert",
+            type: "screen",
+            name: "Reminder alert",
+            icon: "bell-ring",
+            component: "pebble-index-reminder-alert",
+            useHook: () =>
+              useSettingStore(
+                (state) => state.settings.pebbleIndexReminderPriority
+              ),
+            description: () => {
+              const mode =
+                SettingsService.getProperty("pebbleIndexReminderPriority") ||
+                "urgent";
+              if (mode === "silent") return "Silent";
+              if (mode === "vibrate") return "Vibrate";
+              return "Urgent";
+            }
+          }
+        ]
       },
       {
         id: "reminders",

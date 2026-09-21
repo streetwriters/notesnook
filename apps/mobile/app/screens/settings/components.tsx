@@ -54,6 +54,11 @@ import {
   SetupInboxKeys
 } from "./manage-inbox-keys";
 import { FailedInboxItems } from "./failed-inbox-items";
+import {
+  PebbleIndexNotebookPicker,
+  PebbleIndexReminderAlertPicker,
+  PebbleIndexReminderNotebookPicker
+} from "./pebble-index-notebook";
 
 export const components: { [name: string]: ReactElement } = {
   homeselector: <HomePicker />,
@@ -89,5 +94,8 @@ export const components: { [name: string]: ReactElement } = {
   "manage-inbox-keys": <ManageInboxKeys />,
   "inbox-keys": <InboxKeysList />,
   "failed-inbox-items": <FailedInboxItems />,
-  "setup-inbox-keys": <SetupInboxKeys />
+  "setup-inbox-keys": <SetupInboxKeys />,
+  "pebble-index-notebook": <PebbleIndexNotebookPicker />,
+  "pebble-index-reminder-notebook": <PebbleIndexReminderNotebookPicker />,
+  "pebble-index-reminder-alert": <PebbleIndexReminderAlertPicker />
 };

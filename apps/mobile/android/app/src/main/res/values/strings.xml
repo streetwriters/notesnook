@@ -28,4 +28,5 @@
     <string name="reminder_yesterday">Yesterday, %1$s</string>
     <string name="reminder_upcoming">Upcoming: %1$s</string>
     <string name="reminder_last">Last: %1$s</string>
+    <string name="permission_receive_index_capture">Allows Pebble Core to send Index 01 transcriptions and audio recordings to Notesnook on this phone, without the internet.</string>
 </resources>
