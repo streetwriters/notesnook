@@ -154,24 +154,28 @@ export function EditLink(props: ToolProps) {
       title={props.title}
       isEditing
       onDone={(attributes) => {
-        if (selectedNode.current)
-          editor.chain().focus().setTextSelection(selectedNode.current).run();
+        editor.chain().focus().extendMarkRange("link").run();
         editor.commands.setLink(attributes);
         hide();
       }}
       onClick={() => {
-        if (!selectedNode.current) return;
+        editor.commands.extendMarkRange("link");
 
-        const { node } = selectedNode.current;
-        if (!node) return;
+        const href = attrs?.href;
+        if (!href) return;
 
-        const selectedText = node.textContent;
-        const mark = findMark(node, "link");
+        const selectedText =
+          editor.state.doc.textBetween(
+            editor.state.selection.from,
+            editor.state.selection.to
+          ) ||
+          selectedNode.current?.node?.textContent ||
+          editor.state.selection.$from.nodeBefore?.textContent ||
+          "";
 
-        if (!mark) return;
         return {
           title: selectedText,
-          href: mark.attrs.href
+          href
         };
       }}
     />
@@ -208,12 +212,15 @@ export function OpenLink(props: ToolProps) {
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  const href = link?.attrs.href ?? null;
+  const href =
+    link?.attrs.href ??
+    (getMarkAttributes(editor.state, "link")?.href as string) ??
+    null;
   const [loading, setLoading] = useState(false);
   const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
 
   useEffect(() => {
-    if (!href) return;
+    if (!href || !isInternalLink(href)) return;
 
     (async () => {
       try {
@@ -227,7 +234,7 @@ export function OpenLink(props: ToolProps) {
     })();
   }, [href]);
 
-  if (!link || !href) return null;
+  if (!href) return null;
 
   const title = linkData?.title || href;
 
@@ -285,8 +292,10 @@ export function CopyLink(props: ToolProps) {
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  if (!link) return null;
-  const href = link?.attrs.href;
+  const href =
+    link?.attrs.href ??
+    (getMarkAttributes(editor.state, "link")?.href as string) ??
+    null;
   if (!href) return null;
 
   return (
@@ -294,7 +303,9 @@ export function CopyLink(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={async () => {
-        const linkData = await editor.storage.getLinkData?.(href);
+        const linkData = isInternalLink(href)
+          ? await editor.storage.getLinkData?.(href)
+          : undefined;
         if (linkData?.title) {
           editor.storage.copyToClipboard?.(
             href,
