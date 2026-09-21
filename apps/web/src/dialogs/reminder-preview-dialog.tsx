@@ -32,13 +32,6 @@ export type ReminderPreviewDialogProps = BaseDialogProps<false> & {
   reminder: Reminder;
 };
 
-const RECURRING_MODE_MAP = {
-  week: "Weekly",
-  day: "Daily",
-  month: "Monthly",
-  year: "Yearly"
-} as const;
-
 const SNOOZE_TIMES = [
   {
     id: "5-min",
@@ -85,7 +78,7 @@ export const ReminderPreviewDialog = DialogManager.register(
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
               icon={Refresh}
-              text={RECURRING_MODE_MAP[reminder.recurringMode]}
+              text={strings.recurringModes(reminder.recurringMode)}
             />
           )}
           <IconTag icon={Clock} text={getFormattedReminderTime(reminder)} />
