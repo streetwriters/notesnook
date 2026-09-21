@@ -496,6 +496,25 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("errorContext", "text")
             .execute();
         }
+      },
+      "a-2026-07-06": {
+        async up(db) {
+          await db.schema
+            .createTable("pendingsyncitems")
+            .ifNotExists()
+            .addColumn("id", "text", (c) => c.primaryKey().unique().notNull())
+            .addColumn("type", "text")
+            .addColumn("data", "text")
+            .addColumn("dateCreated", "integer")
+            .execute();
+
+          await db.schema
+            .createIndex("pending_sync_items_type")
+            .ifNotExists()
+            .on("pendingsyncitems")
+            .column("type")
+            .execute();
+        }
       }
     };
   }
