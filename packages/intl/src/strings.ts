@@ -1014,6 +1014,8 @@ $day$: Current day (eg. Monday)`,
   logsDownloaded: () => t`Debug logs downloaded`,
   clearLogs: () => t`Clear logs`,
   clear: () => t`Clear`,
+  clearAll: () => t`Clear all`,
+  recentSearches: () => t`Recent searches`,
   clearLogsConfirmation: (key: string) =>
     t`Are you sure you want to clear all logs from ${key}?`,
   enterPasswordDesc: () => t`Please enter your password to continue`,
