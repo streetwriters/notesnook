@@ -620,6 +620,10 @@ msgstr "{words, plural, one {# mot} other {# mots}}"
 msgid "{words, plural, other {# selected}}"
 msgstr "{words, plural, other {# sélectionnés}}"
 
+#: src/strings.ts:756
+msgid "@andrewsayer on Twitter"
+msgstr "@andrewsayer sur Twitter"
+
 #: src/strings.ts:1632
 msgid "#notesnook"
 msgstr "#notesnook"
@@ -667,10 +671,6 @@ msgstr "Formule 5 ans (achat unique)"
 #: src/strings.ts:1674
 msgid "6 digit code"
 msgstr "Code à 6 chiffres"
-
-#: src/strings.ts:756
-msgid "@andrewsayer on Twitter"
-msgstr "@andrewsayer sur Twitter"
 
 #: src/strings.ts:2588
 msgid "A notebook can have unlimited sub-notebooks with unlimited notes."
@@ -7735,15 +7735,7 @@ msgid ""
 "$headline$: Use starting line of the note as title.\n"
 "$day$: Current day (eg. Monday)"
 msgstr ""
-"Use the following key to format the title:\n"
-"\n"
-"$date$: Current date.\n"
-"$time$: Current time.\n"
-"$timestamp$: Full date and time without any spaces or other symbols.\n"
-"(e.g 202305261253).\n"
-"$count$: Number of notes + 1.\n"
-"$headline$: Use starting line of the note as title.\n"
-"$day$: Current day (eg. Monday)Utilisez les clés suivantes pour formater le titre :\n"
+"Utilisez les clés suivantes pour formater le titre :\n"
 "\n"
 "$date$ : date actuelle.\n"
 "$time$ : heure actuelle.\n"
