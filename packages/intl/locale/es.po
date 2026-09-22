@@ -3681,6 +3681,10 @@ msgstr "Línea horizontal"
 msgid "How do you want to recover your account?"
 msgstr "¿Cómo quieres recuperar tu cuenta?"
 
+#: src/strings.ts:2466
+msgid "How long should the vault stay unlocked before automatically locking?"
+msgstr "¿Cuánto tiempo debe permanecer desbloqueada la bóveda antes de bloquearse automáticamente?"
+
 #: src/strings.ts:1534
 msgid "How to fix it?"
 msgstr "¿Cómo solucionarlo?"

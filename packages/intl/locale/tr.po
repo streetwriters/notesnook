@@ -3681,6 +3681,10 @@ msgstr "Yatay çizgi"
 msgid "How do you want to recover your account?"
 msgstr "Hesabınızı nasıl kurtarmak istersiniz?"
 
+#: src/strings.ts:2466
+msgid "How long should the vault stay unlocked before automatically locking?"
+msgstr "Kasa otomatik olarak kilitlenmeden önce ne kadar süre açık kalmalı?"
+
 #: src/strings.ts:1534
 msgid "How to fix it?"
 msgstr "Nasıl düzeltilir?"
