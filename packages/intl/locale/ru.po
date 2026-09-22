@@ -3681,6 +3681,10 @@ msgstr "Горизонтальная линия"
 msgid "How do you want to recover your account?"
 msgstr "Как вы хотите восстановить аккаунт?"
 
+#: src/strings.ts:2466
+msgid "How long should the vault stay unlocked before automatically locking?"
+msgstr "Как долго сейф должен оставаться разблокированным перед автоматической блокировкой?"
+
 #: src/strings.ts:1534
 msgid "How to fix it?"
 msgstr "Как это исправить?"

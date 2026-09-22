@@ -2463,7 +2463,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   inboxKeysSaved: () => t`Inbox keys saved`,
   lockVaultAfter: () => t`Lock vault after`,
   lockVaultAfterDesc: () =>
-    `How long should the vault stay unlocked before automatically locking?`,
+    t`How long should the vault stay unlocked before automatically locking?`,
   back: () => t`Back`,
   invalidRecoveryKey: () =>
     t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`,
