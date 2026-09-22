@@ -654,6 +654,9 @@ $day$: Current day (eg. Monday)`,
   loadFromFile: () => t`Load from file`,
   setAsDarkTheme: () => t`Set as dark theme`,
   setAsLightTheme: () => t`Set as light theme`,
+  defaultDarkThemeDesc: () => t`The default dark theme for the Notesnook app`,
+  defaultLightThemeDesc: () => t`The default light theme for Notesnook app.`,
+  source: () => t`Source`,
   createAGroup: () => t`Create a group`,
   fileCheckFailed: (reason: string) =>
     t`File check failed: ${reason} Try reuploading the file to fix the issue.`,
@@ -2928,5 +2931,24 @@ Continue without attachments?`,
   cannotUploadFilesLargerThan: (limit: string | number) =>
     t`You cannot upload files larger than ${limit} on this plan.`,
   cannotSetDefaultNotebookOrTag: () =>
-    t`You cannot set a default notebook or tag on this plan.`
+    t`You cannot set a default notebook or tag on this plan.`,
+  wrongSecurityKey: () => t`Wrong security key`,
+  loginSessionExpired: () =>
+    t`Login session has expired. Please refresh this page and try logging in again.`,
+  failedToCreateAccount: () => t`Failed to create account`,
+  failedToGenerateInboxKeys: () => t`Failed to generate inbox keys`,
+  publicAndPrivateKeysRequired: () =>
+    t`Both public and private keys are required`,
+  failedToSaveInboxKeys: () => t`Failed to save inbox keys`,
+  fileCopyError: () => t`File copy error`,
+  exportFailed: () => t`Export failed`,
+  exportCompletedWithErrors: (errorCount: number) =>
+    t`Export completed with ${errorCount} errors`,
+  exportCompletedSuccessfully: () => t`Export completed with 0 errors.`,
+  downloadingAttachment: (path: string) =>
+    t`Downloading attachment: ${path}`,
+  savingAttachment: (path: string) => t`Saving attachment: ${path}`,
+  failedToExportAttachment: (path: string, message: string) =>
+    t`Failed to export attachment: ${path}. ${message}`,
+  exportingNotePath: (path: string) => t`Exporting note: ${path}`
 };

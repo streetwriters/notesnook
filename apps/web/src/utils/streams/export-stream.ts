@@ -21,6 +21,7 @@ import { ExportableItem } from "@notesnook/common";
 import { db } from "../../common/db";
 import { ZipFile } from "./zip-stream";
 import { streamingDecryptFile } from "../../interfaces/fs";
+import { strings } from "@notesnook/intl";
 
 export class ExportStream extends TransformStream<
   ExportableItem | Error,
@@ -44,7 +45,7 @@ export class ExportStream extends TransformStream<
         }
         if (item.type === "attachment") {
           try {
-            report({ text: `Downloading attachment: ${item.path}` });
+            report({ text: strings.downloadingAttachment(item.path) });
             await db
               .fs()
               .downloadFile("exports", item.data.hash, item.data.chunkSize);
@@ -62,11 +63,11 @@ export class ExportStream extends TransformStream<
             controller.enqueue({ ...item, data: stream });
             report({
               current: this.progress++,
-              text: `Saving attachment: ${item.path}`
+              text: strings.savingAttachment(item.path)
             });
           } catch (e) {
             if (e instanceof Error) {
-              e.message = `Failed to export attachment: ${item.path}. ${e.message}`;
+              e.message = strings.failedToExportAttachment(item.path, e.message);
               handleError(e);
             }
           }
@@ -74,7 +75,7 @@ export class ExportStream extends TransformStream<
           controller.enqueue(item);
           report({
             current: this.progress++,
-            text: `Exporting note: ${item.path}`,
+            text: strings.exportingNotePath(item.path),
             total: totalItems
           });
         }
