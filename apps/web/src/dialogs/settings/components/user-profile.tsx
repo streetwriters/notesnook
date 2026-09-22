@@ -136,10 +136,10 @@ export function UserProfile({ minimal }: Props) {
               lineHeight: 1
             }}
           >
-            <Text sx={{ fontSize: "xxs", color: "heading", fontWeight: 600 }}>
+            <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
               {strings.loginMessage()}
             </Text>
-            <Text sx={{ fontSize: "xxs", color: "paragraph" }}>
+            <Text sx={{ fontSize: "3xs", color: "paragraph" }}>
               {strings.loginMessageActionText()}
             </Text>
           </Flex>
@@ -206,18 +206,18 @@ export function UserProfile({ minimal }: Props) {
             flexDirection: "column",
             flex: 1,
             gap: "spacing1",
-            fontSize: "xxs",
+            fontSize: "3xs",
             lineHeight: 1,
             wordBreak: "break-word"
           }}
         >
-          <Text sx={{ color: "accent", fontSize: "xxs", fontWeight: 500 }}>
+          <Text sx={{ color: "accent", fontSize: "3xs", fontWeight: 500 }}>
             {`${title}${trial ? " (trial)" : ""}`}
           </Text>
-          <Text sx={{ fontSize: "xxs", color: "heading", fontWeight: 600 }}>
+          <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
             {profile?.fullName || strings.yourFullName()}
           </Text>
-          <Text sx={{ fontSize: "xxs", color: "paragraph" }}>{user.email}</Text>
+          <Text sx={{ fontSize: "3xs", color: "paragraph" }}>{user.email}</Text>
         </Flex>
       </Flex>
     );

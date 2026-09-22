@@ -110,7 +110,7 @@ function Tag(props: TagProps) {
         <Text
           variant="subBody"
           sx={{
-            fontSize: "xxs",
+            fontSize: "3xs",
             color: isSelected ? "paragraph" : "paragraph-secondary"
           }}
         >

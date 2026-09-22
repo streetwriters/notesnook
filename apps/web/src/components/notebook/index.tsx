@@ -175,7 +175,7 @@ export function Notebook(props: NotebookProps) {
         <Text
           variant="subBody"
           color={isOpened ? "paragraph" : "paragraph-secondary"}
-          sx={{ fontSize: "xxs", lineHeight: 1 }}
+          sx={{ fontSize: "3xs", lineHeight: 1 }}
         >
           {contextNotes ? contextNotes.length : totalNotes}
         </Text>

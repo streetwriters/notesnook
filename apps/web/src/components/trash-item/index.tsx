@@ -128,7 +128,7 @@ function TrashItem(props: TrashItemProps) {
           sx={{
             gap: "spacing3",
             flexDirection: "row",
-            fontSize: "xxs",
+            fontSize: "3xs",
             color: "paragraph-disabled",
             alignItems: "center"
           }}

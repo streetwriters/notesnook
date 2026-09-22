@@ -979,7 +979,7 @@ function ItemCount({
     <Text
       variant="subBody"
       sx={{
-        fontSize: "xxs",
+        fontSize: "3xs",
         color: selected ? "paragraph" : "paragraph-secondary"
       }}
     >

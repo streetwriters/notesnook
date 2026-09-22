@@ -254,7 +254,7 @@ function Note(props: NoteProps) {
               <TimeAgo
                 sx={{
                   color: "paragraph-secondary",
-                  fontSize: "xxs",
+                  fontSize: "3xs",
                   fontWeight: "medium",
                   whiteSpace: "nowrap"
                 }}
@@ -291,7 +291,7 @@ function Note(props: NoteProps) {
                 <Text
                   sx={{
                     color: "paragraph-secondary",
-                    fontSize: "xxs",
+                    fontSize: "3xs",
                     fontWeight: "medium"
                   }}
                 >
