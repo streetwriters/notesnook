@@ -57,6 +57,10 @@ msgstr "{count, plural, one {# колонка} few {# колонки} many {# к
 msgid "{count, plural, one {# error occured} other {# errors occured}}"
 msgstr "{count, plural, one {Произошла # ошибка} few {Произошло # ошибки} many {Произошло # ошибок} other {Произошло # ошибок}}"
 
+#: src/strings.ts:2886
+msgid "{count, plural, one {# file selected} other {# files selected}}"
+msgstr "{count, plural, one {# файл выбран} few {# файла выбрано} many {# файлов выбрано} other {# файла выбрано}}"
+
 #: src/strings.ts:1578
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {# файл} few {# файла} many {# файлов} other {# файлов}}"
@@ -64,6 +68,10 @@ msgstr "{count, plural, one {# файл} few {# файла} many {# файлов
 #: src/strings.ts:1564
 msgid "{count, plural, one {# item selected} other {# items selected}}"
 msgstr "{count, plural, one {Выбран # элемент} few {Выбрано # элемента} many {Выбрано # элементов} other {Выбрано # элементов}}"
+
+#: src/strings.ts:2867
+msgid "{count, plural, one {# note successfully imported.} other {# notes successfully imported.}}"
+msgstr "{count, plural, one {# заметка успешно импортирована.} few {# заметки успешно импортированы.} many {# заметок успешно импортировано.} other {# заметки успешно импортированы.}}"
 
 #: src/strings.ts:60
 msgid "{count, plural, one {# note} other {# notes}}"
@@ -740,7 +748,7 @@ msgstr "Добавить"
 msgid "Add 2FA fallback method"
 msgstr "Добавить резервный метод 2FA"
 
-#: src/strings.ts:2912
+#: src/strings.ts:2946
 msgid "Add a new reminder"
 msgstr "Добавить напоминание"
 
@@ -928,7 +936,7 @@ msgstr "и многое другое."
 msgid "and we will manually confirm your account."
 msgstr "и мы подтвердим ваш аккаунт вручную."
 
-#: src/strings.ts:2931
+#: src/strings.ts:2965
 msgid "Android Launcher Shortcuts"
 msgstr "Ярлыки лаунчера Android"
 
@@ -1099,7 +1107,7 @@ msgstr "Вложение удалено"
 msgid "Attachment manager"
 msgstr "Менеджер вложений"
 
-#: src/strings.ts:2890
+#: src/strings.ts:2924
 msgid "Attachment not found."
 msgstr "Вложение не найдено."
 
@@ -1260,7 +1268,7 @@ msgstr "Резервное копирование и восстановлени�
 msgid "Backup complete"
 msgstr "Резервное копирование завершено"
 
-#: src/strings.ts:2904
+#: src/strings.ts:2938
 msgid "Backup Directory Migration Failed"
 msgstr "Сбой миграции каталога резервных копий"
 
@@ -1356,7 +1364,7 @@ msgstr "Двусторонняя связь между заметками"
 msgid "billed annually at {price}"
 msgstr "оплата ежегодно по {price}"
 
-#: src/strings.ts:2893
+#: src/strings.ts:2927
 msgid "Billed at"
 msgstr "Дата счета"
 
@@ -1396,7 +1404,7 @@ msgstr "Ссылки на заметки на уровне блока"
 msgid "Bold"
 msgstr "Полужирный"
 
-#: src/strings.ts:2945
+#: src/strings.ts:2979
 msgid "Both public and private keys are required"
 msgstr "Требуются как открытый, так и закрытый ключи"
 
@@ -1580,7 +1588,7 @@ msgstr "Изменение PGP-ключей входящих удалит все
 msgid "Changing password is an irreversible process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection."
 msgstr "Смена пароля необратима. Вы будете выйдены из всех своих устройств. Не закрывайте приложение во время смены пароля и убедитесь в хорошем интернет-соединении."
 
-#: src/strings.ts:2886
+#: src/strings.ts:2920
 msgid "Changing release track"
 msgstr "Смена канала обновлений"
 
@@ -1607,6 +1615,10 @@ msgstr "Проверить обновления"
 #: src/strings.ts:1197
 msgid "Check for updates automatically"
 msgstr "Автоматически проверять обновления"
+
+#: src/strings.ts:2875
+msgid "Check out our step-by-step guide on"
+msgstr "Ознакомьтесь с нашим пошаговым руководством:"
 
 #: src/strings.ts:1945
 msgid "Check roadmap"
@@ -1957,7 +1969,7 @@ msgstr "Настроить"
 msgid "Configure server URLs for Notesnook"
 msgstr "Настроить URL серверов для Notesnook"
 
-#: src/strings.ts:2916
+#: src/strings.ts:2950
 msgid "Confirm"
 msgstr "Подтвердить"
 
@@ -1992,6 +2004,10 @@ msgstr "Письмо с подтверждением отправлено"
 #: src/strings.ts:2683
 msgid "Conflicted"
 msgstr "С конфликтами"
+
+#: src/strings.ts:2898
+msgid "Connect your {provider} account"
+msgstr "Подключите свою учетную запись {provider}"
 
 #: src/strings.ts:1507
 msgid "Connected to all servers sucessfully."
@@ -2082,7 +2098,7 @@ msgstr "Не удалось преобразовать заметку в {format
 msgid "Could not create backup"
 msgstr "Не удалось создать резервную копию"
 
-#: src/strings.ts:2873
+#: src/strings.ts:2907
 msgid "Could not reset account password."
 msgstr "Не удалось сбросить пароль учетной записи."
 
@@ -2110,7 +2126,7 @@ msgstr "Создать группу"
 msgid "Create a new note"
 msgstr "Создать новую заметку"
 
-#: src/strings.ts:2911
+#: src/strings.ts:2945
 msgid "Create a new notebook"
 msgstr "Создать новый блокнот"
 
@@ -2142,7 +2158,7 @@ msgstr "Создать ключ"
 msgid "Create link"
 msgstr "Создать ссылку"
 
-#: src/strings.ts:2925
+#: src/strings.ts:2959
 msgid "Create note from notification drawer"
 msgstr "Создание заметки из панели уведомлений"
 
@@ -2232,11 +2248,11 @@ msgstr "Пользовательский"
 msgid "Custom dictionary words"
 msgstr "Слова в пользовательском словаре"
 
-#: src/strings.ts:2926
+#: src/strings.ts:2960
 msgid "Custom homepage"
 msgstr "Настраиваемая главная страница"
 
-#: src/strings.ts:2927
+#: src/strings.ts:2961
 msgid "Custom toolbar preset"
 msgstr "Пользовательский пресет панели инструментов"
 
@@ -2386,7 +2402,7 @@ msgstr "Размер шрифта по умолчанию"
 msgid "Default font size in editor"
 msgstr "Размер шрифта по умолчанию в редакторе"
 
-#: src/strings.ts:2921
+#: src/strings.ts:2955
 msgid "Default notebook & tag"
 msgstr "Блокнот и тег по умолчанию"
 
@@ -2406,7 +2422,7 @@ msgstr "Время отсрочки по умолчанию"
 msgid "Default sound"
 msgstr "Звук по умолчанию"
 
-#: src/strings.ts:2901
+#: src/strings.ts:2935
 msgid "Degraded Performance Warning"
 msgstr "Предупреждение о снижении производительности"
 
@@ -2486,7 +2502,7 @@ msgstr "Удалено {date}"
 msgid "Deleting account"
 msgstr "Удаление аккаунта"
 
-#: src/strings.ts:2889
+#: src/strings.ts:2923
 msgid "Deleting tags"
 msgstr "Удаление тегов"
 
@@ -2523,7 +2539,7 @@ msgid "Disable editor margins"
 msgstr "Отключить поля редактора"
 
 #: src/strings.ts:2416
-#: src/strings.ts:2881
+#: src/strings.ts:2915
 msgid "Disable Inbox API"
 msgstr "Отключить API входящих"
 
@@ -2535,7 +2551,7 @@ msgstr "Отключить синхронизацию в реальном вре
 msgid "Disable sync"
 msgstr "Отключить синхронизацию"
 
-#: src/strings.ts:2928
+#: src/strings.ts:2962
 msgid "Disable trash cleanup"
 msgstr "Отключить очистку корзины"
 
@@ -2544,7 +2560,7 @@ msgid "Disabled"
 msgstr "Отключено"
 
 #: src/strings.ts:2418
-#: src/strings.ts:2883
+#: src/strings.ts:2917
 msgid "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?"
 msgstr "Отключение удалит все несинхронизированные элементы входящих. Кроме того, все существующие ключи API будут отозваны и перестанут работать. Вы уверены?"
 
@@ -2656,7 +2672,7 @@ msgstr "Загрузка"
 msgid "Downloading ({progress})"
 msgstr "Загрузка ({progress})"
 
-#: src/strings.ts:2953
+#: src/strings.ts:2987
 msgid "Downloading attachment: {path}"
 msgstr "Загрузка вложения: {path}"
 
@@ -2675,6 +2691,14 @@ msgstr "Загрузка файлов"
 #: src/strings.ts:1568
 msgid "Downloading images"
 msgstr "Загрузка изображений"
+
+#: src/strings.ts:2879
+msgid "Drag & drop files here, or click to select files"
+msgstr "Перетащите файлы сюда или нажмите, чтобы выбрать файлы"
+
+#: src/strings.ts:2877
+msgid "Drop the files here"
+msgstr "Перетащите файлы сюда"
 
 #: src/strings.ts:1534
 msgid "Drop your files here to attach"
@@ -3057,7 +3081,7 @@ msgstr "Истекает через"
 msgid "Expires on"
 msgstr "Истекает"
 
-#: src/strings.ts:2932
+#: src/strings.ts:2966
 msgid "Expiring notes"
 msgstr "Заметки с истекающим сроком"
 
@@ -3106,11 +3130,11 @@ msgstr "Экспортируйте все заметки в PDF, Markdown, HTML 
 msgid "Export as{0}"
 msgstr "Экспортировать как{0}"
 
-#: src/strings.ts:2950
+#: src/strings.ts:2984
 msgid "Export completed with {errorCount} errors"
 msgstr "Экспорт завершён с {errorCount} ошибками"
 
-#: src/strings.ts:2951
+#: src/strings.ts:2985
 msgid "Export completed with 0 errors."
 msgstr "Экспорт завершён без ошибок."
 
@@ -3118,11 +3142,11 @@ msgstr "Экспорт завершён без ошибок."
 msgid "Export CSV"
 msgstr "Экспортировать CSV"
 
-#: src/strings.ts:2948
+#: src/strings.ts:2982
 msgid "Export failed"
 msgstr "Ошибка экспорта"
 
-#: src/strings.ts:2933
+#: src/strings.ts:2967
 msgid "Export table as CSV"
 msgstr "Экспорт таблицы в CSV"
 
@@ -3130,7 +3154,7 @@ msgstr "Экспорт таблицы в CSV"
 msgid "Exporting \"{title}\""
 msgstr "Экспорт \"{title}\""
 
-#: src/strings.ts:2957
+#: src/strings.ts:2991
 msgid "Exporting note: {path}"
 msgstr "Экспорт заметки: {path}"
 
@@ -3170,7 +3194,7 @@ msgstr "Не удалось скопировать заметку"
 msgid "Failed to copy to clipboard"
 msgstr "Не удалось скопировать в буфер обмена"
 
-#: src/strings.ts:2942
+#: src/strings.ts:2976
 msgid "Failed to create account"
 msgstr "Не удалось создать учётную запись"
 
@@ -3199,11 +3223,11 @@ msgstr "Не удалось загрузить файл"
 msgid "Failed to download image: {error}."
 msgstr "Не удалось загрузить изображение: {error}."
 
-#: src/strings.ts:2956
+#: src/strings.ts:2990
 msgid "Failed to export attachment: {path}. {message}"
 msgstr "Не удалось экспортировать вложение: {path}. {message}"
 
-#: src/strings.ts:2943
+#: src/strings.ts:2977
 msgid "Failed to generate inbox keys"
 msgstr "Не удалось сгенерировать ключи входящих"
 
@@ -3219,7 +3243,7 @@ msgstr "Не удалось загрузить ключи API. Попробуй�
 msgid "Failed to load web clip"
 msgstr "Не удалось загрузить веб-клип"
 
-#: src/strings.ts:2906
+#: src/strings.ts:2940
 msgid "Failed to migrate backup directory. It has been reset to default."
 msgstr "Не удалось перенести каталог резервных копий. Он был сброшен по умолчанию."
 
@@ -3247,7 +3271,7 @@ msgstr "Не удалось определить URL загрузки"
 msgid "Failed to revoke API key"
 msgstr "Не удалось отозвать ключ API"
 
-#: src/strings.ts:2946
+#: src/strings.ts:2980
 msgid "Failed to save inbox keys"
 msgstr "Не удалось сохранить ключи входящих"
 
@@ -3292,7 +3316,7 @@ msgstr "Избранное"
 msgid "Featured on"
 msgstr "О нас пишут"
 
-#: src/strings.ts:2920
+#: src/strings.ts:2954
 msgid "Features"
 msgstr "Функции"
 
@@ -3304,7 +3328,7 @@ msgstr "Проверка файла не пройдена: {reason} Отправ
 msgid "File check passed"
 msgstr "Проверка файла пройдена"
 
-#: src/strings.ts:2947
+#: src/strings.ts:2981
 msgid "File copy error"
 msgstr "Ошибка копирования файла"
 
@@ -3399,6 +3423,10 @@ msgstr "Размер шрифта"
 #: src/strings.ts:2286
 msgid "For a monthly subscription, you can get a refund within 7 days of purchase. For a yearly subscription, we offer a full refund within 14 days of purchase. For a 5 year subscription, you can request a refund within 30 days of purchase."
 msgstr "При месячной подписке вы можете получить возврат в течение 7 дней после покупки. При годовой подписке мы предлагаем полный возврат в течение 14 дней после покупки. При 5-летней подписке вы можете запросить возврат в течение 30 дней после покупки."
+
+#: src/strings.ts:2884
+msgid "For example, {examples}"
+msgstr "Например, {examples}"
 
 #: src/strings.ts:2297
 msgid "for locking your notes as soon as app enters background"
@@ -3498,7 +3526,7 @@ msgstr "Общие"
 msgid "Generated 100% locally on your device."
 msgstr "Создано на 100% локально на вашем устройстве."
 
-#: src/strings.ts:2917
+#: src/strings.ts:2951
 msgid "Generating..."
 msgstr "Генерация..."
 
@@ -3538,7 +3566,7 @@ msgstr "Получение ключа шифрования..."
 msgid "Getting information"
 msgstr "Получение информации"
 
-#: src/strings.ts:2895
+#: src/strings.ts:2929
 msgid "Getting invoice"
 msgstr "Получение квитанции"
 
@@ -3562,7 +3590,7 @@ msgstr "Назад"
 msgid "Go back in tab"
 msgstr "Назад во вкладке"
 
-#: src/strings.ts:2869
+#: src/strings.ts:2903
 msgid "Go back to app"
 msgstr "Вернуться в приложение"
 
@@ -3691,6 +3719,10 @@ msgstr "Как долго сейф должен оставаться разбл�
 msgid "How to fix it?"
 msgstr "Как это исправить?"
 
+#: src/strings.ts:2876
+msgid "how to import from {provider}."
+msgstr "как импортировать из {provider}."
+
 #: src/strings.ts:803
 msgid "hr"
 msgstr "ч"
@@ -3772,7 +3804,7 @@ msgstr ""
 msgid "If you want to ask something in general or need some assistance, we would suggest that you"
 msgstr "Если у вас есть общий вопрос или нужна помощь, рекомендуем вам"
 
-#: src/strings.ts:2914
+#: src/strings.ts:2948
 msgid "Ignore"
 msgstr "Игнорировать"
 
@@ -3816,13 +3848,17 @@ msgstr "Импорт завершён"
 msgid "Import CSV"
 msgstr "Импортировать CSV"
 
-#: src/strings.ts:2934
+#: src/strings.ts:2968
 msgid "Import CSV to table"
 msgstr "Импорт CSV в таблицу"
 
 #: src/strings.ts:2858
 msgid "Import unsuccessful"
 msgstr "Импорт не удался"
+
+#: src/strings.ts:2896
+msgid "Importing your notes from {provider}"
+msgstr "Импорт ваших заметок из {provider}"
 
 #: src/strings.ts:2721
 msgid "Inactive"
@@ -3932,7 +3968,7 @@ msgstr "Недопустимая пара ключей PGP. Проверьте �
 msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
 msgstr "Недопустимый ключ восстановления. Убедитесь, что вводите ключ восстановления аккаунта, а не код восстановления 2FA."
 
-#: src/strings.ts:2894
+#: src/strings.ts:2928
 msgid "Invoice"
 msgstr "Квитанция"
 
@@ -4010,7 +4046,7 @@ msgstr "Держите данные в безопасности"
 msgid "Key name"
 msgstr "Имя ключа"
 
-#: src/strings.ts:2897
+#: src/strings.ts:2931
 msgid "Keyboard shortcuts"
 msgstr "Горячие клавиши"
 
@@ -4146,7 +4182,7 @@ msgstr "Связанные заметки"
 msgid "Linking to a specific block is not available for locked notes."
 msgstr "Ссылка на конкретный блок недоступна для заблокированных заметок."
 
-#: src/strings.ts:2929
+#: src/strings.ts:2963
 msgid "Links & embeds in monographs"
 msgstr "Ссылки и встраивания в монографиях"
 
@@ -4267,7 +4303,7 @@ msgstr "Требуется вход"
 msgid "Login required to restore attachments"
 msgstr "Для восстановления вложений требуется вход"
 
-#: src/strings.ts:2941
+#: src/strings.ts:2975
 msgid "Login session has expired. Please refresh this page and try logging in again."
 msgstr "Сеанс входа истёк. Обновите эту страницу и попробуйте войти снова."
 
@@ -4299,7 +4335,11 @@ msgstr "Выйти и удалить данные"
 msgid "Logout from this device"
 msgstr "Выйти на этом устройстве"
 
-#: src/strings.ts:2878
+#: src/strings.ts:2873
+msgid "Logs"
+msgstr "Журналы"
+
+#: src/strings.ts:2912
 msgid "Long (Monday, Tuesday)"
 msgstr "Длинный (Понедельник, Вторник)"
 
@@ -4360,7 +4400,7 @@ msgstr "Управляйте здесь настройками синхрони�
 msgid "Mark important notes by adding them to favorites."
 msgstr "Отмечайте важные заметки, добавляя их в избранное."
 
-#: src/strings.ts:2876
+#: src/strings.ts:2910
 msgid "Markdown + Frontmatter"
 msgstr "Markdown + Frontmatter"
 
@@ -4451,7 +4491,7 @@ msgid "Mon"
 msgstr "Пн"
 
 #: src/strings.ts:561
-#: src/strings.ts:2880
+#: src/strings.ts:2914
 msgid "Monday"
 msgstr "Понедельник"
 
@@ -4469,7 +4509,7 @@ msgstr "URL монографии скопирован"
 msgid "Monographs"
 msgstr "Монографии"
 
-#: src/strings.ts:2930
+#: src/strings.ts:2964
 msgid "Monographs analytics"
 msgstr "Аналитика монографий"
 
@@ -4873,7 +4913,7 @@ msgstr "Notesnook Circle"
 msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
 msgstr "Notesnook Circle объединяет доверенных партнёров, разделяющих нашу приверженность приватности, прозрачности и свободе пользователей."
 
-#: src/strings.ts:2903
+#: src/strings.ts:2937
 msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
 msgstr "Notesnook обнаружил, что запущен в режиме эмуляции ARM64. Для наилучшей производительности скачайте сборку ARM64 с нашего сайта."
 
@@ -4976,6 +5016,10 @@ msgstr "Разовая покупка, без автопродления"
 #: src/strings.ts:2689
 msgid "Ongoing"
 msgstr "Постоянные"
+
+#: src/strings.ts:2881
+msgid "Only {extensions} files are supported."
+msgstr "Поддерживаются только файлы {extensions}."
 
 #: src/strings.ts:142
 msgid "Open"
@@ -5134,7 +5178,7 @@ msgstr "Вставьте сюда URL изображения"
 msgid "Paste without formatting"
 msgstr "Вставить без форматирования"
 
-#: src/strings.ts:2908
+#: src/strings.ts:2942
 msgid "Path not found"
 msgstr "Путь не найден"
 
@@ -5166,7 +5210,7 @@ msgstr "Номер телефона не введён"
 msgid "Pin"
 msgstr "Закрепить"
 
-#: src/strings.ts:2923
+#: src/strings.ts:2957
 msgid "Pin note in notification"
 msgstr "Закрепление заметки в уведомлении"
 
@@ -5292,6 +5336,14 @@ msgstr "Предоставьте разрешение на уведомлени�
 msgid "Please login to download attachments."
 msgstr "Войдите, чтобы загрузить вложения."
 
+#: src/strings.ts:2891
+msgid "Please make sure you have at least {size} of free space before proceeding."
+msgstr "Перед продолжением убедитесь, что у вас есть не менее {size} свободного места."
+
+#: src/strings.ts:2893
+msgid "Please make sure you have good Internet access before proceeding. The importer may send network requests in order to download media resources such as images, files, and other attachments."
+msgstr "Перед продолжением убедитесь, что у вас хорошее подключение к Интернету. Импортер может отправлять сетевые запросы для загрузки медиаресурсов, таких как изображения, файлы и другие вложения."
+
 #: src/strings.ts:797
 msgid "Please make sure you have saved the recovery key. Tap one more time to confirm."
 msgstr "Убедитесь, что вы сохранили ключ восстановления. Нажмите ещё раз для подтверждения."
@@ -5385,7 +5437,7 @@ msgstr "Подождите, пока мы восстанавливаем ваш�
 msgid "Please wait while we send you recovery instructions"
 msgstr "Подождите, пока мы отправляем вам инструкции по восстановлению"
 
-#: src/strings.ts:2888
+#: src/strings.ts:2922
 msgid "Please wait while we switch to the new release track..."
 msgstr "Пожалуйста, подождите, пока переключается канал обновлений..."
 
@@ -5527,6 +5579,10 @@ msgstr "Тариф Pro"
 msgid "Processing {collection}..."
 msgstr "Обработка {collection}..."
 
+#: src/strings.ts:2872
+msgid "Processing {done} of {total} file(s)"
+msgstr "Обработка {done} из {total} файл(ов)"
+
 #: src/strings.ts:1853
 msgid "Processing..."
 msgstr "Обработка..."
@@ -5603,7 +5659,7 @@ msgstr "Опубликованные заметки можно зашифров�
 msgid "Purchase"
 msgstr "Купить"
 
-#: src/strings.ts:2910
+#: src/strings.ts:2944
 msgid "Quick actions"
 msgstr "Быстрые действия"
 
@@ -5623,7 +5679,7 @@ msgstr "Быстрое открытие"
 msgid "Quickly create a note from the notification"
 msgstr "Быстро создайте заметку прямо из уведомления"
 
-#: src/strings.ts:2915
+#: src/strings.ts:2949
 msgid "Quit"
 msgstr "Выйти"
 
@@ -5727,7 +5783,7 @@ msgstr "Письмо для восстановления отправлено!"
 msgid "Recovery key copied"
 msgstr "Ключ восстановления скопирован"
 
-#: src/strings.ts:2871
+#: src/strings.ts:2905
 msgid "Recovery key is required to reset password."
 msgstr "Ключ восстановления необходим для сброса пароля."
 
@@ -5739,7 +5795,7 @@ msgstr "QR-код ключа восстановления сохранён"
 msgid "Recovery key text file saved"
 msgstr "Текстовый файл с ключом восстановления сохранён"
 
-#: src/strings.ts:2922
+#: src/strings.ts:2956
 msgid "Recurring reminders"
 msgstr "Повторяющиеся напоминания"
 
@@ -6206,7 +6262,7 @@ msgstr "Сохранено"
 msgid "Saving"
 msgstr "Сохранение"
 
-#: src/strings.ts:2954
+#: src/strings.ts:2988
 msgid "Saving attachment: {path}"
 msgstr "Сохранение вложения: {path}"
 
@@ -6358,6 +6414,10 @@ msgstr "Узнайте, каким будет будущее Notesnook."
 msgid "Select"
 msgstr "Выбрать"
 
+#: src/strings.ts:2874
+msgid "Select {provider} files"
+msgstr "Выберите файлы {provider}"
+
 #: src/strings.ts:1480
 msgid "Select a backup file from your device to restore backup"
 msgstr "Выберите файл резервной копии на устройстве, чтобы восстановить её"
@@ -6482,6 +6542,10 @@ msgstr "Отправить код по SMS"
 msgid "Send recovery email"
 msgstr "Отправить письмо для восстановления"
 
+#: src/strings.ts:2899
+msgid "Send us a bug report"
+msgstr "Отправьте нам отчет об ошибке"
+
 #: src/strings.ts:2864
 msgid "Send us a request."
 msgstr "Отправьте нам запрос."
@@ -6562,7 +6626,7 @@ msgstr "Установить как светлую тему"
 msgid "Set automatic trash cleanup interval from Settings > Behaviour > Clean trash interval."
 msgstr "Задайте интервал автоматической очистки корзины в разделе Настройки > Поведение > Интервал очистки корзины."
 
-#: src/strings.ts:2907
+#: src/strings.ts:2941
 msgid "Set backup directory"
 msgstr "Выбрать каталог резервных копий"
 
@@ -6692,7 +6756,7 @@ msgstr "Поделиться в облако"
 msgid "Share with friends"
 msgstr "Поделиться с друзьями"
 
-#: src/strings.ts:2877
+#: src/strings.ts:2911
 msgid "Short (Mon, Tue)"
 msgstr "Короткий (Пн, Вт)"
 
@@ -6716,7 +6780,7 @@ msgstr "Ярлыки"
 msgid "Show"
 msgstr "Показать"
 
-#: src/strings.ts:2900
+#: src/strings.ts:2934
 msgid "Show app"
 msgstr "Показать приложение"
 
@@ -6804,6 +6868,10 @@ msgstr "Начать"
 msgid "Start account recovery"
 msgstr "Начать восстановление аккаунта"
 
+#: src/strings.ts:2894
+msgid "Start importing"
+msgstr "Начать импорт"
+
 #: src/strings.ts:1907
 msgid "Start minimized"
 msgstr "Запускать свёрнутым"
@@ -6828,7 +6896,7 @@ msgstr "Начните писать свою заметку..."
 msgid "Start your free trial"
 msgstr "Начать бесплатный пробный период"
 
-#: src/strings.ts:2868
+#: src/strings.ts:2902
 msgid "Start your journey"
 msgstr "Начните свое путешествие"
 
@@ -6917,7 +6985,7 @@ msgid "Sun"
 msgstr "Вс"
 
 #: src/strings.ts:560
-#: src/strings.ts:2879
+#: src/strings.ts:2913
 msgid "Sunday"
 msgstr "Воскресенье"
 
@@ -7204,7 +7272,7 @@ msgstr "Это почти длина короткого романа!"
 msgid "The {title} at {url} is not compatible with this client."
 msgstr "{title} по адресу {url} несовместим с этим клиентом."
 
-#: src/strings.ts:2885
+#: src/strings.ts:2919
 msgid "The API key allows you to access NN's inbox functionality."
 msgstr "Ключ API дает доступ к функциям входящих сообщений NN."
 
@@ -7240,7 +7308,7 @@ msgstr "Пароль для расшифровки файла резервной
 msgid "The password/pin for unlocking the app."
 msgstr "Пароль или PIN для разблокировки приложения."
 
-#: src/strings.ts:2909
+#: src/strings.ts:2943
 msgid ""
 "The path does not exist:\n"
 "{path}"
@@ -7332,7 +7400,7 @@ msgstr "Это разовая покупка, а не подписка."
 msgid "This may take a while"
 msgstr "Это может занять некоторое время"
 
-#: src/strings.ts:2896
+#: src/strings.ts:2930
 msgid "This might take a minute or two."
 msgstr "Это может занять минуту или две."
 
@@ -7547,11 +7615,11 @@ msgstr "Отменить"
 msgid "Unfavorite"
 msgstr "Убрать из избранного"
 
-#: src/strings.ts:2891
+#: src/strings.ts:2925
 msgid "Unknown"
 msgstr "Неизвестно"
 
-#: src/strings.ts:2892
+#: src/strings.ts:2926
 msgid "Unknown error."
 msgstr "Неизвестная ошибка."
 
@@ -8116,7 +8184,7 @@ msgstr "Напишите что-нибудь..."
 msgid "Write with freedom."
 msgstr "Пишите свободно."
 
-#: src/strings.ts:2939
+#: src/strings.ts:2973
 msgid "Wrong security key"
 msgstr "Неверный ключ безопасности"
 
@@ -8185,6 +8253,10 @@ msgstr "Вы можете настроить срок хранения элем�
 msgid "You can also link a note to multiple Notebooks. Tap and hold any notebook to enable multi-select."
 msgstr "Вы также можете связать заметку с несколькими блокнотами. Нажмите и удерживайте блокнот, чтобы включить множественный выбор."
 
+#: src/strings.ts:2883
+msgid "You can also select .zip files containing {extensions} files."
+msgstr "Вы также можете выбрать файлы .zip, содержащие файлы {extensions}."
+
 #: src/strings.ts:2360
 msgid "You can change your subscription plan from the web app"
 msgstr "Вы можете изменить свой тарифный план в веб-приложении"
@@ -8248,11 +8320,11 @@ msgstr "Вы можете использовать резервный метод
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Вы можете просматривать и восстанавливать более старые версии любой заметки через её свойства -> История."
 
-#: src/strings.ts:2938
+#: src/strings.ts:2972
 msgid "You cannot set a default notebook or tag on this plan."
 msgstr "В этом тарифе нельзя установить блокнот или тег по умолчанию."
 
-#: src/strings.ts:2936
+#: src/strings.ts:2970
 msgid "You cannot upload files larger than {limit} on this plan."
 msgstr "В этом тарифе нельзя загружать файлы размером больше {limit}."
 

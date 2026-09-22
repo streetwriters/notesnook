@@ -2863,6 +2863,40 @@ Continue without attachments?`,
   cantFindNotesApp: () => t`Can't find your notes app in the list?`,
   sendUsARequest: () => t`Send us a request.`,
   foundNotes: (count: number) => t`Found ${count} notes`,
+  notesSuccessfullyImported: (count: number) =>
+    plural(count, {
+      one: `# note successfully imported.`,
+      other: `# notes successfully imported.`
+    }),
+  processingFiles: (done: number, total: number) =>
+    t`Processing ${done} of ${total} file(s)`,
+  logs: () => t`Logs`,
+  selectProviderFiles: (provider: string) => t`Select ${provider} files`,
+  checkOutOurStepByStepGuideOn: () => t`Check out our step-by-step guide on`,
+  howToImportFrom: (provider: string) => t`how to import from ${provider}.`,
+  dropTheFilesHere: () => t`Drop the files here`,
+  dragDropFilesHere: () =>
+    t`Drag & drop files here, or click to select files`,
+  onlySupportedExtensions: (extensions: string) =>
+    t`Only ${extensions} files are supported.`,
+  canAlsoSelectZipFiles: (extensions: string) =>
+    t`You can also select .zip files containing ${extensions} files.`,
+  forExampleExtensions: (examples: string) => t`For example, ${examples}`,
+  filesSelected: (count: number) =>
+    plural(count, {
+      one: `# file selected`,
+      other: `# files selected`
+    }),
+  freeSpaceWarning: (size: string) =>
+    t`Please make sure you have at least ${size} of free space before proceeding.`,
+  networkWarningForImport: () =>
+    t`Please make sure you have good Internet access before proceeding. The importer may send network requests in order to download media resources such as images, files, and other attachments.`,
+  startImporting: () => t`Start importing`,
+  importingNotesFrom: (provider: string) =>
+    t`Importing your notes from ${provider}`,
+  connectYourAccount: (provider: string) =>
+    t`Connect your ${provider} account`,
+  sendUsABugReport: () => t`Send us a bug report`,
 
   // Checkout, Recovery & Navigation
   startYourJourney: () => t`Start your journey`,

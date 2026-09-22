@@ -56,8 +56,9 @@ export function ImportResult(props: ImportResultProps) {
     <>
       <CheckCircleOutline color="accent" />
       <Text variant="body" my={2} sx={{ textAlign: "center" }}>
-        {strings.importCompleted()}. {props.result.totalNotes} notes
-        successfully imported. {strings.errorsOccured(result.errors.length)}
+        {strings.importCompleted()}.{" "}
+        {strings.notesSuccessfullyImported(props.result.totalNotes)}{" "}
+        {strings.errorsOccured(result.errors.length)}
       </Text>
       <Button
         variant="secondary"
