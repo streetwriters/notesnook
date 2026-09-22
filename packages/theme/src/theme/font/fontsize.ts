@@ -28,8 +28,8 @@ export function getFontSizes(): FontSizes {
     subBody: "10px",
     menu: "12px",
     code: "14px",
-    xxxs: "10px",
-    xxs: "11px",
+    "3xs": "11px",
+    xxs: "12px",
     xs: "13px",
     sm: "15px",
     md: "17px",
@@ -51,7 +51,7 @@ export type FontSizes = {
   menu: string;
   subBody: string;
   code: string;
-  xxxs: string;
+  "3xs": string;
   xxs: string;
   xs: string;
   sm: string;

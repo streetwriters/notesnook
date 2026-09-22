@@ -23,12 +23,12 @@ import {
   GroupOptions
 } from "@notesnook/core";
 import {
-  GroupBy,
-  OrderAtoZ,
-  OrderOldestNewest,
-  OrderZtoA,
-  OrderNewestOldest,
-  SortBy
+  SelectAll,
+  SortAscending,
+  OrderAlphabeticalAscending,
+  OrderAlphabeticalDescending,
+  OrderNumericAscending,
+  OrderNumericDescending
 } from "../icons";
 import { useEffect, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
@@ -54,35 +54,35 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
   options.groupingKey === "reminders" || options.isSearching
     ? null
     : {
-      type: "button",
-      key: "groupBy",
-      title: strings.groupBy(),
-      icon: GroupBy.path,
-      menu: {
+        type: "button",
+        key: "groupBy",
         title: strings.groupBy(),
-        items: map(options, [
-          { key: "none", title: strings.groupByStrings.none() },
-          { key: "default", title: strings.groupByStrings.default() },
-          { key: "year", title: strings.groupByStrings.year() },
-          { key: "month", title: strings.groupByStrings.month() },
-          { key: "week", title: strings.groupByStrings.week() },
-          { key: "abc", title: strings.groupByStrings.abc() }
-        ])
-      }
-    };
+        iconComponent: SelectAll,
+        menu: {
+          title: strings.groupBy(),
+          items: map(options, [
+            { key: "none", title: strings.groupByStrings.none() },
+            { key: "default", title: strings.groupByStrings.default() },
+            { key: "year", title: strings.groupByStrings.year() },
+            { key: "month", title: strings.groupByStrings.month() },
+            { key: "week", title: strings.groupByStrings.week() },
+            { key: "abc", title: strings.groupByStrings.abc() }
+          ])
+        }
+      };
 
 const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
   key: "sortDirection",
   title: strings.orderBy(),
-  icon:
+  iconComponent:
     options.groupOptions.sortDirection === "asc"
       ? options.groupOptions.sortBy === "title"
-        ? OrderAtoZ.path
-        : OrderOldestNewest.path
+        ? OrderAlphabeticalAscending
+        : OrderNumericDescending
       : options.groupOptions.sortBy === "title"
-        ? OrderZtoA.path
-        : OrderNewestOldest.path,
+      ? OrderAlphabeticalDescending
+      : OrderNumericAscending,
   menu: {
     title: strings.orderBy(),
     items: map(options, [
@@ -116,7 +116,7 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   type: "button",
   key: "sortBy",
   title: strings.sortBy(),
-  icon: SortBy.path,
+  iconComponent: SortAscending,
   menu: {
     title: strings.sortBy(),
     items: map(options, [
