@@ -53,7 +53,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
         showToast("success", "Inbox keys generated");
         onClose(true);
       } catch (error) {
-        showToast("error", "Failed to generate inbox keys");
+        showToast("error", strings.failedToGenerateInboxKeys());
         console.error(error);
       } finally {
         setIsLoading(false);
@@ -64,7 +64,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
       const trimmedPublicKey = publicKey.trim();
       const trimmedPrivateKey = privateKey.trim();
       if (!trimmedPublicKey || !trimmedPrivateKey) {
-        showToast("error", "Both public and private keys are required");
+        showToast("error", strings.publicAndPrivateKeysRequired());
         return;
       }
 
@@ -96,7 +96,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
         showToast("success", strings.inboxKeysSaved());
         onClose(true);
       } catch (error) {
-        showToast("error", "Failed to save inbox keys");
+        showToast("error", strings.failedToSaveInboxKeys());
         console.error(error);
       } finally {
         setIsLoading(false);

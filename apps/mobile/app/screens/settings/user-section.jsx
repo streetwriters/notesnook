@@ -305,9 +305,8 @@ const SettingsUserSection = ({ item }) => {
                   </Paragraph>
                   <Paragraph size={AppFontSize.xxs}>
                     {formatBytes(used)}/
-                    {total === -1
-                      ? "Unlimited"
-                      : formatBytes(total) + " " + strings.used()}
+                    {total === -1 ? strings.unlimited() : formatBytes(total)}{" "}
+                    {strings.used()}
                   </Paragraph>
                 </View>
                 <View

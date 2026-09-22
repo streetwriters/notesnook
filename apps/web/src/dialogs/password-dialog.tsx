@@ -91,7 +91,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
                   : true
               );
             } else {
-              setError("Wrong password.");
+              setError(strings.passwordIncorrect());
               setIsLoading(false);
             }
           } catch (e) {

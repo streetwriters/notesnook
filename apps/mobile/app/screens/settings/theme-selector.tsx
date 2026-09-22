@@ -526,11 +526,21 @@ function ThemeSelector() {
                   ...(colorScheme === "dark" ||
                   (searchQuery && searchQuery !== "")
                     ? []
-                    : [lightTheme as unknown as ThemeMetadata]),
+                    : [
+                        {
+                          ...lightTheme,
+                          description: strings.defaultLightThemeDesc()
+                        } as unknown as ThemeMetadata
+                      ]),
                   ...(colorScheme === "light" ||
                   (searchQuery && searchQuery !== "")
                     ? []
-                    : [darkTheme as unknown as ThemeMetadata]),
+                    : [
+                        {
+                          ...darkTheme,
+                          description: strings.defaultDarkThemeDesc()
+                        } as unknown as ThemeMetadata
+                      ]),
                   ...getThemes()
                 ]
           }

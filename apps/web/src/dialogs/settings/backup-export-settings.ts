@@ -65,7 +65,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: "Restore",
+            title: strings.restore(),
             action: async () => {
               if (await importBackup()) {
                 await useAppStore.getState().refresh();

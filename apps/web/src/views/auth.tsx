@@ -864,9 +864,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           setIsSubmitting(false);
           const error = e as Error;
           if (error.message === "invalid_grant") {
-            setError(
-              "Login session has expired. Please refresh this page and try logging in again."
-            );
+            setError(strings.loginSessionExpired());
             return;
           }
           if (

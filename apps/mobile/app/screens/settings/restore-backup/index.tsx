@@ -382,7 +382,7 @@ export const RestoreBackup = () => {
               });
 
               if (fileCopy[0].status === "error") {
-                ToastManager.error(new Error("File copy error"));
+                ToastManager.error(new Error(strings.fileCopyError()));
                 return;
               }
 

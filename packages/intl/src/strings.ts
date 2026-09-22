@@ -654,6 +654,9 @@ $day$: Current day (eg. Monday)`,
   loadFromFile: () => t`Load from file`,
   setAsDarkTheme: () => t`Set as dark theme`,
   setAsLightTheme: () => t`Set as light theme`,
+  defaultDarkThemeDesc: () => t`The default dark theme for the Notesnook app`,
+  defaultLightThemeDesc: () => t`The default light theme for Notesnook app.`,
+  source: () => t`Source`,
   createAGroup: () => t`Create a group`,
   fileCheckFailed: (reason: string) =>
     t`File check failed: ${reason} Try reuploading the file to fix the issue.`,
@@ -721,7 +724,7 @@ $day$: Current day (eg. Monday)`,
   fileLengthMismatch: (expectedSize: number, currentSize: number) =>
     t`File length mismatch. Expected ${expectedSize} but got ${currentSize} bytes. Please upload this file again from the attachment manager.`,
   failedToResolvedDownloadUrl: () => t`Failed to resolve download url`,
-  fileSize: () => `File size`,
+  fileSize: () => t`File size`,
   passwordNotEntered: () => t`Password not entered`,
   passwordNotMatched: () => t`Password does not match`,
   passwordUpdated: () => t`Password updated`,
@@ -753,7 +756,7 @@ $day$: Current day (eg. Monday)`,
       tesimonial: () =>
         t`You simply cannot get any better of a note taking app than @notesnook. The UI is clean and slick, it is feature rich, encrypted, reasonably priced (esp. for students & educators) & open source`,
       link: "https://twitter.com/andrewsayer/status/1637817220113002503",
-      user: "@andrewsayer on Twitter"
+      user: () => t`@andrewsayer on Twitter`
     }
   ],
   shortcutCreated: () => actions.created.shortcut(1),
@@ -1647,7 +1650,7 @@ For example:
   dontShowAgainConfirm: () => t`Don't show again on this device?`,
   toggleDarkLightMode: () => t`Toggle dark/light mode`,
   goToTag: (tag: string) => t`Go to #${tag}`,
-  tagNotFound: () => `Tag not found`,
+  tagNotFound: () => t`Tag not found`,
   downloadAllAttachments: () => t`Download all attachments`,
   selectProfilePicture: () => t`Select profile picture`,
   changeProfilePicture: () => t`Change profile picture`,
@@ -1716,7 +1719,7 @@ All attachments will be downloaded & cached again on access.
   authWait: () => t`Please wait while you are authenticated.`,
   accountPassDesc: () =>
     t`Your password is always hashed before leaving this device.`,
-  creatingAccount: () => `Creating your account`,
+  creatingAccount: () => t`Creating your account`,
   creatingAccountDesc: () => t`Please wait while we finalize your account.`,
   sendingRecoveryEmail: () => t`Sending recovery email`,
   sendingRecoveryEmailDesc: () =>
@@ -1999,7 +2002,7 @@ Force pull:
 Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.
 
 **These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**`,
-  checkingAttachments: () => `Checking attachments`,
+  checkingAttachments: () => t`Checking attachments`,
   orderId: () => t`Order ID`,
   amount: () => t`Amount`,
   status: () => t`Status`,
@@ -2302,7 +2305,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   notesnookPlans: [() => t`Notesnook`, () => t`Plans`],
   readyToTakeNextStep: () =>
     t`Ready to take the next step on your private note taking journey?`,
-  percentOff: (discount: string) => `${discount}% off`,
+  percentOff: (discount: string) => t`${discount}% off`,
   recommendedByPrivacyGuides: () => t`Recommended by Privacy Guides`,
   featuredOn: () => t`Featured on`,
   comparePlans: () => t`Compare plans`,
@@ -2460,7 +2463,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   inboxKeysSaved: () => t`Inbox keys saved`,
   lockVaultAfter: () => t`Lock vault after`,
   lockVaultAfterDesc: () =>
-    `How long should the vault stay unlocked before automatically locking?`,
+    t`How long should the vault stay unlocked before automatically locking?`,
   back: () => t`Back`,
   invalidRecoveryKey: () =>
     t`Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code.`,
@@ -2881,6 +2884,7 @@ Continue without attachments?`,
     t`Please wait while we switch to the new release track...`,
   deletingTags: () => t`Deleting tags`,
   attachmentNotFound: () => t`Attachment not found.`,
+  unknown: () => t`Unknown`,
   unknownError: () => t`Unknown error.`,
   billedAt: () => t`Billed at`,
   invoice: () => t`Invoice`,
@@ -2906,5 +2910,45 @@ Continue without attachments?`,
   ignore: () => t`Ignore`,
   quit: () => t`Quit`,
   confirm: () => t`Confirm`,
-  generating: () => t`Generating...`
+  generating: () => t`Generating...`,
+
+  // Features
+  features: () => t`Features`,
+  defaultNotebookAndTag: () => t`Default notebook & tag`,
+  recurringReminders: () => t`Recurring reminders`,
+  pinNoteInNotification: () => t`Pin note in notification`,
+  createNoteFromNotificationDrawer: () =>
+    t`Create note from notification drawer`,
+  customHomepage: () => t`Custom homepage`,
+  customToolbarPreset: () => t`Custom toolbar preset`,
+  disableTrashCleanup: () => t`Disable trash cleanup`,
+  monographLinksAndEmbeds: () => t`Links & embeds in monographs`,
+  monographAnalytics: () => t`Monographs analytics`,
+  androidLauncherShortcuts: () => t`Android Launcher Shortcuts`,
+  expiringNotes: () => t`Expiring notes`,
+  exportTableAsCsv: () => t`Export table as CSV`,
+  importCsvToTable: () => t`Import CSV to table`,
+  cannotUploadFilesLargerThan: (limit: string | number) =>
+    t`You cannot upload files larger than ${limit} on this plan.`,
+  cannotSetDefaultNotebookOrTag: () =>
+    t`You cannot set a default notebook or tag on this plan.`,
+  wrongSecurityKey: () => t`Wrong security key`,
+  loginSessionExpired: () =>
+    t`Login session has expired. Please refresh this page and try logging in again.`,
+  failedToCreateAccount: () => t`Failed to create account`,
+  failedToGenerateInboxKeys: () => t`Failed to generate inbox keys`,
+  publicAndPrivateKeysRequired: () =>
+    t`Both public and private keys are required`,
+  failedToSaveInboxKeys: () => t`Failed to save inbox keys`,
+  fileCopyError: () => t`File copy error`,
+  exportFailed: () => t`Export failed`,
+  exportCompletedWithErrors: (errorCount: number) =>
+    t`Export completed with ${errorCount} errors`,
+  exportCompletedSuccessfully: () => t`Export completed with 0 errors.`,
+  downloadingAttachment: (path: string) =>
+    t`Downloading attachment: ${path}`,
+  savingAttachment: (path: string) => t`Saving attachment: ${path}`,
+  failedToExportAttachment: (path: string, message: string) =>
+    t`Failed to export attachment: ${path}. ${message}`,
+  exportingNotePath: (path: string) => t`Exporting note: ${path}`
 };
