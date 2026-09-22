@@ -88,6 +88,7 @@ const groupByMenu: (options: GroupingMenuOptions) => MenuItem | null = (
       title: strings.groupBy(),
       icon: GroupBy.path,
       menu: {
+        title: strings.groupBy(),
         items: map(options, [
           { key: "none", title: strings.groupByStrings.none() },
           { key: "default", title: strings.groupByStrings.default() },
@@ -112,6 +113,7 @@ const orderByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
         ? OrderZtoA.path
         : OrderNewestOldest.path,
   menu: {
+    title: strings.orderBy(),
     items: map(options, [
       {
         key: "asc",
@@ -145,6 +147,7 @@ const sortByMenu: (options: GroupingMenuOptions) => MenuItem = (options) => ({
   title: strings.sortBy(),
   icon: SortBy.path,
   menu: {
+    title: strings.sortBy(),
     items: map(options, [
       {
         key: "dateCreated",
@@ -410,8 +413,9 @@ function GroupHeader(props: GroupHeaderProps) {
             <IconButton
               testId={`${groupingKey}-sort-button`}
               icon={groupOptions.sortDirection === "asc" ? SortAsc : SortDesc}
-              title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy || "default"]
-                }`}
+              title={strings.groupedBy(
+                groupByToTitleMap[groupOptions.groupBy || "default"]
+              )}
               onClick={() => {
                 const groupOptions = getGroupOptions(
                   context,
@@ -445,7 +449,7 @@ function GroupHeader(props: GroupHeaderProps) {
                 if (groupBy) menuItems.push(groupBy);
 
                 openMenu(menuItems, {
-                  title: groupBy ? "Group & sort" : "Sort"
+                  title: groupBy ? strings.groupAndSort() : strings.sort()
                 });
               }}
             />
@@ -455,8 +459,8 @@ function GroupHeader(props: GroupHeaderProps) {
               icon={viewMode === "compact" ? DetailedView : CompactView}
               title={
                 viewMode === "compact"
-                  ? "Switch to detailed view"
-                  : "Switch to compact view"
+                  ? strings.switchToDetailedView()
+                  : strings.switchToCompactView()
               }
               onClick={() =>
                 setViewMode(viewMode === "compact" ? "detailed" : "compact")
