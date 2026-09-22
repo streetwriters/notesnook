@@ -91,7 +91,7 @@ function IconTag(props: IconTagProps) {
       <Text
         sx={{
           color: highlight ? "accent" : "paragraph",
-          fontSize: "xxs",
+          fontSize: "3xs",
           fontWeight: "medium",
           overflow: "hidden",
           textOverflow: "ellipsis",

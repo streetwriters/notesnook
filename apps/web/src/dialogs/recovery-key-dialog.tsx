@@ -294,7 +294,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 lineHeight: 1,
                 color: "paragraph",
                 fontWeight: 400,
-                fontSize: "xxs"
+                fontSize: "3xs"
               }}
             >
               {recoveryKey ? recoveryKey : strings.loading()}

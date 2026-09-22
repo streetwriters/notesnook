@@ -98,7 +98,7 @@ export function NotebookHeader(props: {
             </Text>
           </Flex>
           {notebook.description && (
-            <Text sx={{ fontSize: "xxs", fontWeight: 400, color: "paragraph" }}>
+            <Text sx={{ fontSize: "3xs", fontWeight: 400, color: "paragraph" }}>
               {notebook.description}
             </Text>
           )}
@@ -108,12 +108,12 @@ export function NotebookHeader(props: {
         <Flex sx={{ alignItems: "center", gap: "spacing2" }}>
           <NoteCalendar size={13} color="icon-secondary" />
           <Text
-            sx={{ fontSize: "xxs", color: "paragraph", lineHeight: "125%" }}
+            sx={{ fontSize: "3xs", color: "paragraph", lineHeight: "125%" }}
           >
             {formatDate(notebook.dateEdited, { type: "date", dateFormat })}
           </Text>
-          <Text sx={{ fontSize: "xxs", color: "icon-disabled" }}>•</Text>
-          <Text sx={{ fontSize: "xxs", color: "paragraph" }}>
+          <Text sx={{ fontSize: "3xs", color: "icon-disabled" }}>•</Text>
+          <Text sx={{ fontSize: "3xs", color: "paragraph" }}>
             {strings.notes(totalNotes || 0)}
           </Text>
         </Flex>
@@ -179,7 +179,7 @@ function NotebookCrumbs(props: { notebook: Notebook }) {
                     type: "button",
                     title: c.title,
                     key: c.id,
-                    icon: NotebookIcon.path,
+                    iconComponent: NotebookIcon,
                     onClick: () => navigateCrumb(c.id)
                   })),
                 {
@@ -226,7 +226,7 @@ function CrumbText(props: { text: string; onClick: () => void }) {
   return (
     <Text
       sx={{
-        fontSize: "xxs",
+        fontSize: "3xs",
         textDecoration: "none",
         color: "paragraph-secondary",
         whiteSpace: "nowrap",

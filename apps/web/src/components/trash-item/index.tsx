@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { Restore, DeleteForver, Note, Notebook, Trash } from "../icons";
+import {
+  Restore,
+  DeleteForver,
+  Note,
+  Notebook,
+  Trash,
+  ClockCounterClockwise
+} from "../icons";
 import { Flex, Text } from "@theme-ui/components";
 import TimeAgo from "../time-ago";
 import { toTitleCase } from "@notesnook/common";
@@ -121,7 +128,7 @@ function TrashItem(props: TrashItemProps) {
           sx={{
             gap: "spacing3",
             flexDirection: "row",
-            fontSize: "xxs",
+            fontSize: "3xs",
             color: "paragraph-disabled",
             alignItems: "center"
           }}
@@ -150,6 +157,7 @@ export const trashMenuItems: (
       key: "restore",
       title: strings.restore(),
       icon: Restore.path,
+      iconComponent: ClockCounterClockwise,
       onClick: () => Multiselect.restoreItemsFromTrash(ids),
       multiSelect: true
     },
@@ -158,6 +166,7 @@ export const trashMenuItems: (
       key: "delete",
       title: strings.delete(),
       icon: DeleteForver.path,
+      iconComponent: Trash,
       variant: "dangerous",
       onClick: () => Multiselect.deleteItemsFromTrash(ids),
       multiSelect: true

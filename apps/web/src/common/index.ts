@@ -55,7 +55,7 @@ import { ABYTES, streamablefs } from "../interfaces/fs";
 import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
-import { Home } from "../components/icons";
+import { House } from "../components/icons";
 import { MenuItem } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
@@ -503,7 +503,7 @@ export function createSetDefaultHomepageMenuItem(
         useSettingStore.getState().setHomepage({ id, type });
       }
     }),
-    icon: Home.path
+    iconComponent: House
   } as MenuItem;
 }
 
