@@ -2677,8 +2677,6 @@ Continue without attachments?`,
   example: () => t`Example`,
   failedToDownloadImage: (error: string) =>
     t`Failed to download image: ${error}.`,
-  invalidStatusCode: (status: number | string) =>
-    t`invalid status code ${status}`,
   imagePrivacyNotice: () =>
     t`To protect your privacy, we will download the image & add it to your attachments.`,
   embedIframeRequired: () => t`Embed code must include an iframe.`,
