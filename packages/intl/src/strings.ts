@@ -3173,6 +3173,28 @@ Continue without attachments?`,
       one: `# word`,
       other: `# words`
     }),
-  yourLargestAttachmentWas: () => t`Your largest attachment was`
+  yourLargestAttachmentWas: () => t`Your largest attachment was`,
+  starsCount: (count: string | number) => t`${count} stars`,
+  tagsYourFavorites: (count: number) =>
+    plural(count, {
+      one: `tag, your favorite`,
+      other: `tags, your favorites`
+    }),
+  notebooksYourFavorites: (count: number) =>
+    plural(count, {
+      one: `notebook, your favorite`,
+      other: `notebooks, your favorites`
+    }),
+  filesTotaling: (storage: string) => t`files totaling ${storage}`,
+  yourLargestNoteWas: () => t`Your largest note was`,
+  addHashTag: (tag: string) => t`Add #${tag}`,
+  attachingFilesCount: (count: number) =>
+    plural(count, {
+      one: `Attaching # file:`,
+      other: `Attaching # files:`
+    }),
+  aboveContentWillAppendTo: () => t`Above content will append to`,
+  clickOnNewNoteToCreateNote: () =>
+    t`. Click on "New note" to create a new note.`
 };
 

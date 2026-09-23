@@ -21,6 +21,10 @@ msgstr " Разблокируйте один раз с помощью парол
 msgid "— not just the"
 msgstr "— а не только"
 
+#: src/strings.ts:3198
+msgid ". Click on \"New note\" to create a new note."
+msgstr ". Нажмите «Новая заметка», чтобы создать новую заметку."
+
 #: src/strings.ts:43
 msgid "\"Refunded"
 msgstr "\"Возвращено"
@@ -80,7 +84,7 @@ msgstr "{count, plural, one {# заметка} few {# заметки} many {# з
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# строка} few {# строки} many {# строк} other {# строк}}"
 
-#: src/strings.ts:3231
+#: src/strings.ts:3172
 msgid "{count, plural, one {# word} other {# words}}"
 msgstr "{count, plural, one {# слово} few {# слова} many {# слов} other {# слов}}"
 
@@ -148,6 +152,10 @@ msgstr "{count, plural, one {Вы действительно хотите без
 #: src/strings.ts:121
 msgid "{count, plural, one {Attach image} other {Attach # images}}"
 msgstr "{count, plural, one {Прикрепить изображение} few {Прикрепить # изображения} many {Прикрепить # изображений} other {Прикрепить # изображений}}"
+
+#: src/strings.ts:3192
+msgid "{count, plural, one {Attaching # file:} other {Attaching # files:}}"
+msgstr "{count, plural, one {Прикрепление # файла:} few {Прикрепление # файлов:} many {Прикрепление # файлов:} other {Прикрепление # файлов:}}"
 
 #: generated/actions.ts:8
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
@@ -364,6 +372,10 @@ msgstr "{count, plural, one {Блокнот удалён безвозвратн�
 msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 msgstr "{count, plural, one {Блокнот восстановлен} few {Восстановлено # блокнота} many {Восстановлено # блокнотов} other {Восстановлено # блокнотов}}"
 
+#: src/strings.ts:3184
+msgid "{count, plural, one {notebook, your favorite} other {notebooks, your favorites}}"
+msgstr "{count, plural, one {блокнот, ваш любимый} few {блокнота, ваши любимые} many {блокнотов, ваши любимые} other {блокнотов, ваши любимые}}"
+
 #: generated/do-actions.ts:147
 msgid "{count, plural, one {Permanently delete attachment} other {Permanently delete # attachments}}"
 msgstr "{count, plural, one {Удалить вложение безвозвратно} other {Удалить # вложений безвозвратно}}"
@@ -471,6 +483,10 @@ msgstr "{count, plural, one {Тег удалён} few {Удалено # тега
 msgid "{count, plural, one {Tag edited} other {# tags edited}}"
 msgstr "{count, plural, one {Тег изменён} few {Изменено # тега} many {Изменено # тегов} other {Изменено # тегов}}"
 
+#: src/strings.ts:3179
+msgid "{count, plural, one {tag, your favorite} other {tags, your favorites}}"
+msgstr "{count, plural, one {тег, ваш любимый} few {тега, ваши любимые} many {тегов, ваши любимые} other {тегов, ваши любимые}}"
+
 #: generated/do-actions.ts:82
 msgid "{count, plural, one {Unpin item} other {Unpin # items}}"
 msgstr "{count, plural, one {Открепить элемент} few {Открепить # элемента} many {Открепить # элементов} other {Открепить # элементов}}"
@@ -498,6 +514,10 @@ msgstr "{count, plural, one {Версия удалена} few {Удалено # 
 #: src/strings.ts:2271
 msgid "{count} characters"
 msgstr "Символов: {count}"
+
+#: src/strings.ts:3177
+msgid "{count} stars"
+msgstr "{count} звезд"
 
 #: src/strings.ts:1446
 msgid "{days, plural, one {1 day} other {# days}}"
@@ -695,7 +715,7 @@ msgstr "Более 10 тем"
 msgid "100% cross platform"
 msgstr "100% кроссплатформенность"
 
-#: src/strings.ts:3226
+#: src/strings.ts:3167
 msgid "100% encrypted."
 msgstr "100% зашифровано."
 
@@ -703,7 +723,7 @@ msgstr "100% зашифровано."
 msgid "100% end-to-end encrypted"
 msgstr "100% сквозное шифрование"
 
-#: src/strings.ts:3227
+#: src/strings.ts:3168
 msgid "100% yours."
 msgstr "100% ваше."
 
@@ -759,6 +779,10 @@ msgstr "Abc"
 msgid "About"
 msgstr "О программе"
 
+#: src/strings.ts:3196
+msgid "Above content will append to"
+msgstr "Вышеуказанное содержимое будет добавлено к"
+
 #: src/strings.ts:2673
 msgid "Abstract"
 msgstr "Аннотация"
@@ -798,6 +822,10 @@ msgstr "Активные напоминания"
 #: src/strings.ts:477
 msgid "Add"
 msgstr "Добавить"
+
+#: src/strings.ts:3190
+msgid "Add #{tag}"
+msgstr "Добавить #{tag}"
 
 #: src/strings.ts:959
 msgid "Add 2FA fallback method"
@@ -3578,6 +3606,10 @@ msgstr "Превышен лимит размера файла. Перейдит�
 msgid "File too big"
 msgstr "Файл слишком большой"
 
+#: src/strings.ts:3188
+msgid "files totaling {storage}"
+msgstr "файлов общим объемом {storage}"
+
 #: src/strings.ts:1369
 msgid "Filter attachments by filename, type or hash"
 msgstr "Фильтровать вложения по имени файла, типу или хешу"
@@ -4025,7 +4057,7 @@ msgstr "Я понимаю, изменить пароль"
 msgid "ID copied"
 msgstr "ID скопирован"
 
-#: src/strings.ts:3223
+#: src/strings.ts:3164
 msgid "ideas"
 msgstr "идей"
 
@@ -4738,7 +4770,7 @@ msgstr "Максимальная дата напоминания — {maxDate}"
 msgid "Member since {date}"
 msgstr "Участник с {date}"
 
-#: src/strings.ts:3225
+#: src/strings.ts:3166
 msgid "memories."
 msgstr "воспоминаний."
 
@@ -5271,7 +5303,7 @@ msgstr "Notesnook отправит вам код 2FA на эл. почту пр�
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook отправит вам SMS с кодом 2FA при запросе"
 
-#: src/strings.ts:3228
+#: src/strings.ts:3169
 msgid "NOTESNOOK WRAPPED {year}"
 msgstr "NOTESNOOK ИТОГИ {year}"
 
@@ -6696,7 +6728,7 @@ msgstr "Сохранение ZIP-архива. Подождите..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Отсканируйте QR-код приложением аутентификации"
 
-#: src/strings.ts:3221
+#: src/strings.ts:3162
 msgid "Scroll down to explore"
 msgstr "Прокрутите вниз, чтобы узнать больше"
 
@@ -7726,7 +7758,7 @@ msgstr "Спасибо за ваш отзыв!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Спасибо. Вы — доказательство того, что конфиденциальность всегда на первом месте."
 
-#: src/strings.ts:3222
+#: src/strings.ts:3163
 msgid "That's"
 msgstr "Это"
 
@@ -7911,7 +7943,7 @@ msgstr "Эта заметка будет опубликована по публ�
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Это имя пользователя будет использоваться для различения учётных данных в вашем ключе безопасности. Убедитесь, что оно уникально."
 
-#: src/strings.ts:3224
+#: src/strings.ts:3165
 msgid "thoughts"
 msgstr "мыслей"
 
@@ -9093,11 +9125,15 @@ msgstr "Ваш бесплатный пробный период продолжа
 msgid "Your full name"
 msgstr "Ваше полное имя"
 
-#: src/strings.ts:3235
+#: src/strings.ts:3176
 msgid "Your largest attachment was"
 msgstr "Ваше самое большое вложение было"
 
-#: src/strings.ts:3229
+#: src/strings.ts:3189
+msgid "Your largest note was"
+msgstr "Ваша самая большая заметка содержала"
+
+#: src/strings.ts:3170
 msgid "Your longest note was"
 msgstr "Ваша самая длинная заметка содержала"
 
