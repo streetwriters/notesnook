@@ -80,6 +80,10 @@ msgstr "{count, plural, one {# note} other {# notes}}"
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# row} other {# rows}}"
 
+#: src/strings.ts:3231
+msgid "{count, plural, one {# word} other {# words}}"
+msgstr "{count, plural, one {# word} other {# words}}"
+
 #: src/strings.ts:1460
 msgid "{count, plural, one {1 hour} other {# hours}}"
 msgstr "{count, plural, one {1 hour} other {# hours}}"
@@ -691,9 +695,17 @@ msgstr "10+ themes"
 msgid "100% cross platform"
 msgstr "100% cross platform"
 
+#: src/strings.ts:3226
+msgid "100% encrypted."
+msgstr "100% encrypted."
+
 #: src/strings.ts:3054
 msgid "100% end-to-end encrypted"
 msgstr "100% end-to-end encrypted"
+
+#: src/strings.ts:3227
+msgid "100% yours."
+msgstr "100% yours."
 
 #: src/strings.ts:1037
 msgid "12-hour"
@@ -4014,6 +4026,10 @@ msgstr "I understand, change my password"
 msgid "ID copied"
 msgstr "ID copied"
 
+#: src/strings.ts:3223
+msgid "ideas"
+msgstr "ideas"
+
 #: src/strings.ts:2837
 msgid "ideas, thoughts, memories. 100% encrypted. 100% yours."
 msgstr "ideas, thoughts, memories. 100% encrypted. 100% yours."
@@ -4722,6 +4738,10 @@ msgstr "Maximum reminder date is {maxDate}"
 msgid "Member since {date}"
 msgstr "Member since {date}"
 
+#: src/strings.ts:3225
+msgid "memories."
+msgstr "memories."
+
 #: src/strings.ts:2090
 msgid "Merge cells"
 msgstr "Merge cells"
@@ -5250,6 +5270,10 @@ msgstr "Notesnook will send you a 2FA code on your email when prompted"
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook will send you an SMS with a 2FA code when prompted"
+
+#: src/strings.ts:3228
+msgid "NOTESNOOK WRAPPED {year}"
+msgstr "NOTESNOOK WRAPPED {year}"
 
 #: src/strings.ts:3149
 msgid "Notice"
@@ -6672,6 +6696,10 @@ msgstr "Saving zip file. Please wait..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Scan the QR code with your authenticator app"
 
+#: src/strings.ts:3221
+msgid "Scroll down to explore"
+msgstr "Scroll down to explore"
+
 #: src/strings.ts:2268
 msgid "Scroll to bottom"
 msgstr "Scroll to bottom"
@@ -7699,6 +7727,10 @@ msgstr "Thank you for your feedback!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Thank you. You are the proof that privacy always comes first."
 
+#: src/strings.ts:3222
+msgid "That's"
+msgstr "That's"
+
 #: src/strings.ts:2841
 msgid "That's almost the length of a short novel!"
 msgstr "That's almost the length of a short novel!"
@@ -7879,6 +7911,10 @@ msgstr "This note will be published to a public URL."
 #: src/strings.ts:1896
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
+
+#: src/strings.ts:3224
+msgid "thoughts"
+msgstr "thoughts"
 
 #: src/strings.ts:573
 msgid "Thu"
@@ -9051,6 +9087,14 @@ msgstr "Your free trial is on-going. Your subscription will start on {trialExpir
 #: src/strings.ts:1636
 msgid "Your full name"
 msgstr "Your full name"
+
+#: src/strings.ts:3235
+msgid "Your largest attachment was"
+msgstr "Your largest attachment was"
+
+#: src/strings.ts:3229
+msgid "Your longest note was"
+msgstr "Your longest note was"
 
 #: src/strings.ts:873
 msgid "Your monographs"

@@ -80,6 +80,10 @@ msgstr "{count, plural, one {# nota} other {# notas}}"
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# fila} other {# filas}}"
 
+#: src/strings.ts:3231
+msgid "{count, plural, one {# word} other {# words}}"
+msgstr "{count, plural, one {# palabra} other {# palabras}}"
+
 #: src/strings.ts:1460
 msgid "{count, plural, one {1 hour} other {# hours}}"
 msgstr "{count, plural, one {1 hora} other {# horas}}"
@@ -691,9 +695,17 @@ msgstr "Más de 10 temas"
 msgid "100% cross platform"
 msgstr "100% multiplataforma"
 
+#: src/strings.ts:3226
+msgid "100% encrypted."
+msgstr "100% cifrado."
+
 #: src/strings.ts:3054
 msgid "100% end-to-end encrypted"
 msgstr "100% cifrado de extremo a extremo"
+
+#: src/strings.ts:3227
+msgid "100% yours."
+msgstr "100% tuyo."
 
 #: src/strings.ts:1037
 msgid "12-hour"
@@ -4013,6 +4025,10 @@ msgstr "Lo entiendo, cambiar mi contraseña"
 msgid "ID copied"
 msgstr "ID copiado"
 
+#: src/strings.ts:3223
+msgid "ideas"
+msgstr "ideas"
+
 #: src/strings.ts:2837
 msgid "ideas, thoughts, memories. 100% encrypted. 100% yours."
 msgstr "ideas, pensamientos, recuerdos. 100% cifrado. 100% tuyo."
@@ -4722,6 +4738,10 @@ msgstr "La fecha máxima del recordatorio es {maxDate}"
 msgid "Member since {date}"
 msgstr "Miembro desde {date}"
 
+#: src/strings.ts:3225
+msgid "memories."
+msgstr "recuerdos."
+
 #: src/strings.ts:2090
 msgid "Merge cells"
 msgstr "Combinar celdas"
@@ -5250,6 +5270,10 @@ msgstr "Notesnook te enviará un código 2FA a tu correo electrónico cuando se 
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook te enviará un SMS con un código 2FA cuando se solicite"
+
+#: src/strings.ts:3228
+msgid "NOTESNOOK WRAPPED {year}"
+msgstr "NOTESNOOK RESUMEN {year}"
 
 #: src/strings.ts:3149
 msgid "Notice"
@@ -6672,6 +6696,10 @@ msgstr "Guardando el archivo ZIP. Espera un momento..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Escanea el código QR con tu aplicación de autenticación"
 
+#: src/strings.ts:3221
+msgid "Scroll down to explore"
+msgstr "Desplázate hacia abajo para explorar"
+
 #: src/strings.ts:2268
 msgid "Scroll to bottom"
 msgstr "Desplazarse al final"
@@ -7698,6 +7726,10 @@ msgstr "¡Gracias por tus comentarios!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Gracias. Eres la prueba de que la privacidad siempre es lo primero."
 
+#: src/strings.ts:3222
+msgid "That's"
+msgstr "Eso son"
+
 #: src/strings.ts:2841
 msgid "That's almost the length of a short novel!"
 msgstr "¡Eso es casi la longitud de una novela corta!"
@@ -7878,6 +7910,10 @@ msgstr "Esta nota se publicará en una URL pública."
 #: src/strings.ts:1896
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Este nombre de usuario se usará para distinguir entre distintas credenciales de tu llave de seguridad. Asegúrate de que sea único."
+
+#: src/strings.ts:3224
+msgid "thoughts"
+msgstr "pensamientos"
 
 #: src/strings.ts:573
 msgid "Thu"
@@ -9056,6 +9092,14 @@ msgstr "Tu prueba gratuita está en curso. Tu suscripción comenzará el {trialE
 #: src/strings.ts:1636
 msgid "Your full name"
 msgstr "Tu nombre completo"
+
+#: src/strings.ts:3235
+msgid "Your largest attachment was"
+msgstr "Tu adjunto más grande fue"
+
+#: src/strings.ts:3229
+msgid "Your longest note was"
+msgstr "Tu nota más larga fue"
 
 #: src/strings.ts:873
 msgid "Your monographs"

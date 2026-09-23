@@ -3158,6 +3158,21 @@ Continue without attachments?`,
 
   couldNotUnwrapKey: () => t`Could not unwrap key.`,
   passwordIsRequired: () => t`Password is required.`,
-  wrongPassword: () => t`Wrong password.`
+  wrongPassword: () => t`Wrong password.`,
+  scrollDownToExplore: () => t`Scroll down to explore`,
+  thats: () => t`That's`,
+  wrappedIdeas: () => t`ideas`,
+  wrappedThoughts: () => t`thoughts`,
+  wrappedMemories: () => t`memories.`,
+  hundredPercentEncrypted: () => t`100% encrypted.`,
+  hundredPercentYours: () => t`100% yours.`,
+  notesnookWrappedYear: (year: number | string) => t`NOTESNOOK WRAPPED ${year}`,
+  yourLongestNoteWas: () => t`Your longest note was`,
+  wordsCount: (count: number) =>
+    plural(count, {
+      one: `# word`,
+      other: `# words`
+    }),
+  yourLargestAttachmentWas: () => t`Your largest attachment was`
 };
 
