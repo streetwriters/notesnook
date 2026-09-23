@@ -50,7 +50,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
       try {
         setIsLoading(true);
         await db.user.getInboxKeys();
-        showToast("success", "Inbox keys generated");
+        showToast("success", strings.inboxKeysGenerated());
         onClose(true);
       } catch (error) {
         showToast("error", strings.failedToGenerateInboxKeys());
@@ -81,7 +81,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
 
         if (initialKeys) {
           const ok = await ConfirmDialog.show({
-            title: "Change Inbox PGP Keys",
+            title: strings.changeInboxPgpKeys(),
             message: strings.changingInboxPgpKeysNotice(),
             positiveButtonText: strings.yes(),
             negativeButtonText: strings.no()
@@ -107,7 +107,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
       return (
         <Dialog
           isOpen={true}
-          title="Setup Inbox PGP Keys"
+          title={strings.setupInboxPgpKeys()}
           width={500}
           negativeButton={{
             text: strings.cancel(),
@@ -134,7 +134,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
                   textAlign: "center"
                 }}
               >
-                Or
+                {strings.or()}
               </Text>
               <Button
                 variant="secondary"
@@ -153,7 +153,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title="Inbox PGP Keys"
+        title={strings.manageInboxKeys()}
         width={600}
         positiveButton={{
           text: isLoading ? strings.saving() : strings.save(),
@@ -167,7 +167,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
       >
         <Flex sx={{ flexDirection: "column", gap: 3 }}>
           <Field
-            label="Public Key"
+            label={strings.publicKeyLabel()}
             id="publicKey"
             name="publicKey"
             as="textarea"
@@ -184,7 +184,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
             disabled={isLoading}
           />
           <Field
-            label="Private Key"
+            label={strings.privateKeyLabel()}
             id="privateKey"
             name="privateKey"
             as="textarea"
