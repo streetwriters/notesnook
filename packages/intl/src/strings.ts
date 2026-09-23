@@ -2310,6 +2310,8 @@ Use this if changes from other devices are not appearing on this device. This wi
   readyToTakeNextStep: () =>
     t`Ready to take the next step on your private note taking journey?`,
   percentOff: (discount: string) => t`${discount}% off`,
+  percentOffInCountry: (amount: number, country: string) =>
+    t`${amount}% off in ${country}`,
   recommendedByPrivacyGuides: () => t`Recommended by Privacy Guides`,
   featuredOn: () => t`Featured on`,
   comparePlans: () => t`Compare plans`,
@@ -2320,6 +2322,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   hdImages: () => t`hdImages`,
   billedAnnually: (price: string) => t`billed annually at ${price}`,
   billedMonthly: (price: string) => t`billed monthly at ${price}`,
+  billedEvery5Years: (price: string) => t`billed every 5 years at ${price}`,
   dueToday: () => t`Due today`,
   daysFree: (days: string) => t`${days} days free`,
   due: (date: string) => t`Due ${date}`,
@@ -2753,8 +2756,18 @@ Continue without attachments?`,
   youAreOnThisPlan: () => t`You are on this plan.`,
   startYourFreeTrial: () => t`Start your free trial`,
   compareAllPlans: () => t`Compare all plans`,
+  trustedAndRecommendedBy200KUsers: () =>
+    t`Trusted and recommended by over 200K users`,
+  upgradeNow: () => t`Upgrade now`,
   dayMoneyBackGuarantee: (days: number) =>
     t`${days}-day money-back guarantee.`,
+  perMonth: () => t`/ month`,
+  forever: () => t`forever`,
+  for1Month: () => t`for 1 month`,
+  for1Year: () => t`for 1 year`,
+  for5Years: () => t`for 5 years`,
+  annually: () => t`annually`,
+  every5Years: () => t`every 5 years`,
   validMfaCodeRequired: () =>
     t`Please provide a valid multi-factor authentication code.`,
   notebookIdCopied: () => t`Notebook ID copied to clipboard`,
