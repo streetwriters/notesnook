@@ -32,6 +32,7 @@ import { SyncInboxItem } from "./types.js";
 import { InboxItemsHistoryErrorContext } from "../../types.js";
 import { z } from "zod";
 import { sanitizeHtml } from "../../utils/html-parser.js";
+import { strings } from "@notesnook/intl";
 
 const THRESHOLD = process.env.NODE_ENV === "test" ? 2 * 1000 : 60 * 1000;
 class Merger {
@@ -253,7 +254,7 @@ export async function handleInboxItems(
           id: item.id,
           status: "failed",
           errorContext: JSON.stringify({
-            message: "Decryption failed",
+            message: strings.decryptionFailed(),
             description: (e as Error).message,
             inboxItem: { id: item.id, v: item.v, alg: item.alg }
           } satisfies InboxItemsHistoryErrorContext)
@@ -272,7 +273,7 @@ export async function handleInboxItems(
           id: item.id,
           status: "failed",
           errorContext: JSON.stringify({
-            message: "Invalid JSON",
+            message: strings.invalidJson(),
             description: (e as Error).message,
             inboxItem: { id: item.id, v: item.v, alg: item.alg },
             decryptedItem
@@ -295,7 +296,7 @@ export async function handleInboxItems(
           id: item.id,
           status: "failed",
           errorContext: JSON.stringify({
-            message: "Validation failed",
+            message: strings.validationFailed(),
             description: validation.error.issues
               .map((i) => `${i.path.join(".")}: ${i.message}`)
               .join("; "),
