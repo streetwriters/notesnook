@@ -30,6 +30,7 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 type NavigationItemProps = {
   icon?: Icon;
   iconSize?: number;
+  collapsedIconSize?: number;
   color?: SchemeColors;
   title?: string;
   isCollapsed?: boolean;
@@ -46,7 +47,8 @@ function NavigationItem(
 ) {
   const {
     icon: Icon,
-    iconSize,
+    iconSize = 13,
+    collapsedIconSize = 15,
     color,
     title,
     isLoading,
@@ -83,8 +85,6 @@ function NavigationItem(
         py: isCollapsed ? "spacing2" : "spacing4",
         alignItems: "center",
         position: "relative",
-        lineHeight: "100%",
-        ":focus": { bg: selected ? "hover-selected" : "hover" },
         ...sx
       }}
       onClick={() => {
@@ -110,7 +110,7 @@ function NavigationItem(
       >
         {Icon ? (
           <Icon
-            size={isCollapsed ? 15 : iconSize || 13}
+            size={isCollapsed ? collapsedIconSize : iconSize}
             color={color || (selected ? "icon-selected" : "icon")}
             rotate={isLoading}
           />
@@ -125,7 +125,8 @@ function NavigationItem(
               overflow: "hidden",
               textOverflow: "ellipsis",
               fontWeight: "normal",
-              color: selected ? "paragraph-selected" : "paragraph"
+              color: selected ? "paragraph-selected" : "paragraph",
+              pr: "spacing1"
             }}
             ml="spacing3"
             data-test-id="title"

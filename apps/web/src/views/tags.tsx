@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/tag-store";
-import Placeholder from "../components/placeholders";
+import { SidebarPlaceholder } from "../components/placeholders";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { Flex, Input } from "@theme-ui/components";
@@ -63,7 +63,14 @@ function Tags() {
         type="tags"
         refresh={refresh}
         items={items}
-        placeholder={<Placeholder context="tags" />}
+        placeholder={<SidebarPlaceholder variant="tags" />}
+        sx={{
+          ".list-container-placeholder": {
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }
+        }}
         header={<></>}
         Scroller={SidebarScroller}
       />
