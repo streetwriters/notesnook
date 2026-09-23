@@ -3154,6 +3154,10 @@ Continue without attachments?`,
     1: () => t`button to report all bugs. Thank you!`
   },
   betaSwitchingWarning: () =>
-    t`Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable.`
+    t`Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable.`,
+
+  couldNotUnwrapKey: () => t`Could not unwrap key.`,
+  passwordIsRequired: () => t`Password is required.`,
+  wrongPassword: () => t`Wrong password.`
 };
 

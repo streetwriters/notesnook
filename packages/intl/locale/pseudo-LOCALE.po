@@ -595,7 +595,7 @@ msgstr "{percentage}% updating..."
 msgid "{plan} plan"
 msgstr "{plan} plan"
 
-#: src/strings.ts:3142
+#: src/strings.ts:3140
 msgid "{planTitle} plan"
 msgstr "[{planTitle} ƥŀȧƞ]"
 
@@ -663,7 +663,7 @@ msgstr ""
 msgid "#notesnook"
 msgstr "#notesnook"
 
-#: src/strings.ts:3149
+#: src/strings.ts:3147
 msgid "🎉 Wrapped {year}"
 msgstr "[🎉 Ẇřȧƥƥēƌ {year}]"
 
@@ -1519,7 +1519,7 @@ msgstr "Bullet list"
 msgid "Bulletproof encryption"
 msgstr "Bulletproof encryption"
 
-#: src/strings.ts:3156
+#: src/strings.ts:3154
 msgid "button to report all bugs. Thank you!"
 msgstr "[ƀŭŧŧǿƞ ŧǿ řēƥǿřŧ ȧŀŀ ƀŭģş. Ŧħȧƞķ ẏǿŭ!]"
 
@@ -1921,7 +1921,7 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 
-#: src/strings.ts:3146
+#: src/strings.ts:3144
 msgid "Click here"
 msgstr "[Ƈŀīƈķ ħēřē]"
 
@@ -2245,6 +2245,10 @@ msgstr ""
 #: src/strings.ts:508
 msgid "Could not unlock"
 msgstr "Could not unlock"
+
+#: src/strings.ts:3159
+msgid "Could not unwrap key."
+msgstr "[Ƈǿŭŀƌ ƞǿŧ ŭƞẇřȧƥ ķēẏ.]"
 
 #: src/strings.ts:144
 msgid "Create"
@@ -3579,7 +3583,7 @@ msgstr "Filter notebooks..."
 msgid "Filter tags..."
 msgstr "Filter tags..."
 
-#: src/strings.ts:3138
+#: src/strings.ts:3136
 msgid "Final step, make the payment."
 msgstr "[Ƒīƞȧŀ şŧēƥ, ḿȧķē ŧħē ƥȧẏḿēƞŧ.]"
 
@@ -3966,7 +3970,7 @@ msgstr ""
 msgid "hr"
 msgstr "hr"
 
-#: src/strings.ts:3150
+#: src/strings.ts:3148
 msgid "Huzzah!"
 msgstr "[Ħŭƶƶȧħ!]"
 
@@ -5084,7 +5088,7 @@ msgstr "None"
 msgid "Normal mode"
 msgstr "Normal mode"
 
-#: src/strings.ts:3143
+#: src/strings.ts:3141
 msgid "Not found"
 msgstr "[Ƞǿŧ ƒǿŭƞƌ]"
 
@@ -5247,11 +5251,11 @@ msgstr "Notesnook will send you a 2FA code on your email when prompted"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook will send you an SMS with a 2FA code when prompted"
 
-#: src/strings.ts:3151
+#: src/strings.ts:3149
 msgid "Notice"
 msgstr "[Ƞǿŧīƈē]"
 
-#: src/strings.ts:3152
+#: src/strings.ts:3150
 msgid "Notice 2"
 msgstr "[Ƞǿŧīƈē 2]"
 
@@ -5459,6 +5463,10 @@ msgstr "Password does not match"
 #: src/strings.ts:711
 msgid "Password incorrect"
 msgstr "Password incorrect"
+
+#: src/strings.ts:3160
+msgid "Password is required."
+msgstr "[Ƥȧȧşşẇǿǿřḓ ȋȋş řḗḗɋŭŭȋȋřḗḗḓ.]"
 
 #: src/strings.ts:732
 msgid "Password not entered"
@@ -7390,7 +7398,7 @@ msgstr "Subscription not activated?"
 msgid "Success"
 msgstr "Success"
 
-#: src/strings.ts:3141
+#: src/strings.ts:3139
 msgid "Summary"
 msgstr "[Şŭḿḿȧřẏ]"
 
@@ -7423,7 +7431,7 @@ msgstr ""
 msgid "Switch to search/replace mode"
 msgstr "Switch to search/replace mode"
 
-#: src/strings.ts:3159
+#: src/strings.ts:3157
 msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
 msgstr "[Şẇīŧƈħīƞģ ƀēŧẇēēƞ ƀēŧȧ & şŧȧƀŀē ṽēřşīǿƞş ƈȧƞ ƈȧŭşē ẇēīřƌ īşşŭēş īƞƈŀŭƌīƞģ ƌȧŧȧ ŀǿşş. Īŧ īş řēƈǿḿḿēƞƌēƌ ŧħȧŧ ẏǿŭ ƌǿ ƞǿŧ ŭşē ƀǿŧħ şīḿŭŀŧȧƞēǿŭşŀẏ. Ẏǿŭ ƈȧƞ şẇīŧƈħ ǿƞƈē ŧħē ƀēŧȧ ṽēřşīǿƞ ēƞŧēřş şŧȧƀŀē.]"
 
@@ -7821,7 +7829,7 @@ msgstr "This image cannot be previewed"
 msgid "This is a one time purchase, no subscription."
 msgstr "This is a one time purchase, no subscription."
 
-#: src/strings.ts:3155
+#: src/strings.ts:3153
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
 msgstr "[Ŧħīş īş ŧħē ƀēŧȧ ṽēřşīǿƞ ȧƞƌ ȧş şŭƈħ ẇīŀŀ ƈǿƞŧȧīƞ ƀŭģş. Ŧħīƞģş ȧřē ēẋƥēƈŧēƌ ŧǿ ƀřēȧķ ƀŭŧ şħǿŭŀƌ ƀē ģēƞēřȧŀŀẏ şŧȧƀŀē. Ƥŀēȧşē ŭşē ŧħē]"
 
@@ -7903,7 +7911,7 @@ msgstr "Title format"
 msgid "Title is required"
 msgstr "Title is required"
 
-#: src/strings.ts:3147
+#: src/strings.ts:3145
 msgid "to directly claim the promotion."
 msgstr "[ŧǿ ƌīřēƈŧŀẏ ƈŀȧīḿ ŧħē ƥřǿḿǿŧīǿƞ.]"
 
@@ -8657,6 +8665,10 @@ msgstr "Write with freedom."
 msgid "Writing backup chunk of size... {size}"
 msgstr "[Ẁřīŧīƞģ ƀȧƈķŭƥ ƈħŭƞķ ǿƒ şīẑē... {size}]"
 
+#: src/strings.ts:3161
+msgid "Wrong password."
+msgstr "[Ẇřǿǿƞģ ƥȧȧşşẇǿǿřḓ.]"
+
 #: src/strings.ts:3029
 msgid "Wrong security key"
 msgstr ""
@@ -8722,7 +8734,7 @@ msgstr ""
 msgid "You are on this plan."
 msgstr "You are on this plan."
 
-#: src/strings.ts:3140
+#: src/strings.ts:3138
 msgid "You are one step away from unlocking the full potential of Notesnook."
 msgstr "[Ẏǿŭ ȧřē ǿƞē şŧēƥ ȧẇȧẏ ƒřǿḿ ŭƞŀǿƈķīƞģ ŧħē ƒŭŀŀ ƥǿŧēƞŧīȧŀ ǿƒ Ƞǿŧēşƞǿǿķ.]"
 
@@ -8839,7 +8851,7 @@ msgstr "You have not added any notebooks yet"
 msgid "You have not added any tags yet"
 msgstr "You have not added any tags yet"
 
-#: src/strings.ts:3144
+#: src/strings.ts:3142
 msgid "You have not been billed yet."
 msgstr "[Ẏǿŭ ħȧṽē ƞǿŧ ƀēēƞ ƀīŀŀēƌ ẏēŧ.]"
 

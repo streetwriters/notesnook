@@ -595,7 +595,7 @@ msgstr "{percentage}% wird aktualisiert ..."
 msgid "{plan} plan"
 msgstr "{plan}-Abo"
 
-#: src/strings.ts:3142
+#: src/strings.ts:3140
 msgid "{planTitle} plan"
 msgstr "Tarif {planTitle}"
 
@@ -663,7 +663,7 @@ msgstr "/ Monat"
 msgid "#notesnook"
 msgstr "#notesnook"
 
-#: src/strings.ts:3149
+#: src/strings.ts:3147
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Jahresrückblick {year}"
 
@@ -1519,7 +1519,7 @@ msgstr "Aufzählungsliste"
 msgid "Bulletproof encryption"
 msgstr "Kugelsichere Verschlüsselung"
 
-#: src/strings.ts:3156
+#: src/strings.ts:3154
 msgid "button to report all bugs. Thank you!"
 msgstr "Schaltfläche, um alle Fehler zu melden. Vielen Dank!"
 
@@ -1920,7 +1920,7 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Beim Leeren des Papierkorbs werden alle darin enthaltenen Elemente dauerhaft gelöscht. Diese Aktion ist UNWIDERRUFLICH."
 
-#: src/strings.ts:3146
+#: src/strings.ts:3144
 msgid "Click here"
 msgstr "Hier klicken"
 
@@ -2244,6 +2244,10 @@ msgstr "Tabelle konnte nicht als CSV gespeichert werden"
 #: src/strings.ts:508
 msgid "Could not unlock"
 msgstr "Entsperren nicht möglich"
+
+#: src/strings.ts:3159
+msgid "Could not unwrap key."
+msgstr "Schlüssel konnte nicht entpackt werden."
 
 #: src/strings.ts:144
 msgid "Create"
@@ -3578,7 +3582,7 @@ msgstr "Notizbücher filtern..."
 msgid "Filter tags..."
 msgstr "Tags filtern..."
 
-#: src/strings.ts:3138
+#: src/strings.ts:3136
 msgid "Final step, make the payment."
 msgstr "Letzter Schritt, führen Sie die Zahlung durch."
 
@@ -3965,7 +3969,7 @@ msgstr "wie man aus {provider} importiert."
 msgid "hr"
 msgstr "Std."
 
-#: src/strings.ts:3150
+#: src/strings.ts:3148
 msgid "Huzzah!"
 msgstr "Hurra!"
 
@@ -5084,7 +5088,7 @@ msgstr "Keine"
 msgid "Normal mode"
 msgstr "Normalmodus"
 
-#: src/strings.ts:3143
+#: src/strings.ts:3141
 msgid "Not found"
 msgstr "Nicht gefunden"
 
@@ -5247,11 +5251,11 @@ msgstr "Notesnook sendet Ihnen bei Bedarf einen 2FA-Code per E-Mail"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook sendet Ihnen bei Bedarf eine SMS mit einem 2FA-Code"
 
-#: src/strings.ts:3151
+#: src/strings.ts:3149
 msgid "Notice"
 msgstr "Hinweis"
 
-#: src/strings.ts:3152
+#: src/strings.ts:3150
 msgid "Notice 2"
 msgstr "Hinweis 2"
 
@@ -5459,6 +5463,10 @@ msgstr "Passwörter stimmen nicht überein"
 #: src/strings.ts:711
 msgid "Password incorrect"
 msgstr "Passwort falsch"
+
+#: src/strings.ts:3160
+msgid "Password is required."
+msgstr "Passwort ist erforderlich."
 
 #: src/strings.ts:732
 msgid "Password not entered"
@@ -7390,7 +7398,7 @@ msgstr "Abo nicht aktiviert?"
 msgid "Success"
 msgstr "Erfolg"
 
-#: src/strings.ts:3141
+#: src/strings.ts:3139
 msgid "Summary"
 msgstr "Zusammenfassung"
 
@@ -7423,7 +7431,7 @@ msgstr "Zur Detailansicht wechseln"
 msgid "Switch to search/replace mode"
 msgstr "Zum Suchen-und-Ersetzen-Modus wechseln"
 
-#: src/strings.ts:3159
+#: src/strings.ts:3157
 msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
 msgstr "Das Wechseln zwischen Beta- und stabilen Versionen kann zu seltsamen Problemen einschließlich Datenverlust führen. Es wird empfohlen, nicht beide gleichzeitig zu verwenden. Sie können wechseln, sobald die Beta-Version als stabil veröffentlicht wird."
 
@@ -7822,7 +7830,7 @@ msgstr "Für dieses Bild ist keine Vorschau möglich"
 msgid "This is a one time purchase, no subscription."
 msgstr "Dies ist ein Einmalkauf, kein Abo."
 
-#: src/strings.ts:3155
+#: src/strings.ts:3153
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
 msgstr "Dies ist die Beta-Version und enthält daher Fehler. Es ist zu erwarten, dass einige Dinge nicht funktionieren, aber im Allgemeinen sollte sie stabil sein. Bitte verwenden Sie die"
 
@@ -7904,7 +7912,7 @@ msgstr "Titelformat"
 msgid "Title is required"
 msgstr "Titel ist erforderlich"
 
-#: src/strings.ts:3147
+#: src/strings.ts:3145
 msgid "to directly claim the promotion."
 msgstr "um das Angebot direkt einzulösen."
 
@@ -8658,6 +8666,10 @@ msgstr "Schreiben Sie in Freiheit."
 msgid "Writing backup chunk of size... {size}"
 msgstr "Backup-Chunk der Größe {size} wird geschrieben..."
 
+#: src/strings.ts:3161
+msgid "Wrong password."
+msgstr "Falsches Passwort."
+
 #: src/strings.ts:3029
 msgid "Wrong security key"
 msgstr "Falscher Sicherheitsschlüssel"
@@ -8723,7 +8735,7 @@ msgstr "Sie sind offline."
 msgid "You are on this plan."
 msgstr "Sie nutzen diesen Plan."
 
-#: src/strings.ts:3140
+#: src/strings.ts:3138
 msgid "You are one step away from unlocking the full potential of Notesnook."
 msgstr "Sie sind nur einen Schritt davon entfernt, das volle Potenzial von Notesnook freizuschalten."
 
@@ -8846,7 +8858,7 @@ msgstr "Sie haben noch keine Notizbücher hinzugefügt"
 msgid "You have not added any tags yet"
 msgstr "Sie haben noch keine Tags hinzugefügt"
 
-#: src/strings.ts:3144
+#: src/strings.ts:3142
 msgid "You have not been billed yet."
 msgstr "Ihnen wurde noch nichts in Rechnung gestellt."
 

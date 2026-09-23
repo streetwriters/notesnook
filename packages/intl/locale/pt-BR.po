@@ -595,7 +595,7 @@ msgstr "{percentage}% atualizando..."
 msgid "{plan} plan"
 msgstr "Plano {plan}"
 
-#: src/strings.ts:3142
+#: src/strings.ts:3140
 msgid "{planTitle} plan"
 msgstr "Plano {planTitle}"
 
@@ -663,7 +663,7 @@ msgstr "/ mês"
 msgid "#notesnook"
 msgstr "#notesnook"
 
-#: src/strings.ts:3149
+#: src/strings.ts:3147
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Retrospectiva {year}"
 
@@ -1519,7 +1519,7 @@ msgstr "Lista com marcadores"
 msgid "Bulletproof encryption"
 msgstr "Criptografia à prova de balas"
 
-#: src/strings.ts:3156
+#: src/strings.ts:3154
 msgid "button to report all bugs. Thank you!"
 msgstr "botão para relatar todos os bugs. Obrigado!"
 
@@ -1920,7 +1920,7 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Esvaziar a lixeira excluirá permanentemente todos os itens nela. Esta ação é IRREVERSÍVEL."
 
-#: src/strings.ts:3146
+#: src/strings.ts:3144
 msgid "Click here"
 msgstr "Clique aqui"
 
@@ -2244,6 +2244,10 @@ msgstr "Não foi possível salvar a tabela em csv"
 #: src/strings.ts:508
 msgid "Could not unlock"
 msgstr "Não foi possível desbloquear"
+
+#: src/strings.ts:3159
+msgid "Could not unwrap key."
+msgstr "Não foi possível desembrulhar a chave."
 
 #: src/strings.ts:144
 msgid "Create"
@@ -3578,7 +3582,7 @@ msgstr "Filtrar cadernos..."
 msgid "Filter tags..."
 msgstr "Filtrar tags..."
 
-#: src/strings.ts:3138
+#: src/strings.ts:3136
 msgid "Final step, make the payment."
 msgstr "Última etapa, realize o pagamento."
 
@@ -3965,7 +3969,7 @@ msgstr "como importar do {provider}."
 msgid "hr"
 msgstr "h"
 
-#: src/strings.ts:3150
+#: src/strings.ts:3148
 msgid "Huzzah!"
 msgstr "Viva!"
 
@@ -5084,7 +5088,7 @@ msgstr "Nenhum"
 msgid "Normal mode"
 msgstr "Modo normal"
 
-#: src/strings.ts:3143
+#: src/strings.ts:3141
 msgid "Not found"
 msgstr "Não encontrado"
 
@@ -5247,11 +5251,11 @@ msgstr "O Notesnook enviará um código 2FA para o seu e-mail quando solicitado"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "O Notesnook enviará um SMS com um código 2FA quando solicitado"
 
-#: src/strings.ts:3151
+#: src/strings.ts:3149
 msgid "Notice"
 msgstr "Aviso"
 
-#: src/strings.ts:3152
+#: src/strings.ts:3150
 msgid "Notice 2"
 msgstr "Aviso 2"
 
@@ -5459,6 +5463,10 @@ msgstr "As senhas não coincidem"
 #: src/strings.ts:711
 msgid "Password incorrect"
 msgstr "Senha incorreta"
+
+#: src/strings.ts:3160
+msgid "Password is required."
+msgstr "A senha é obrigatória."
 
 #: src/strings.ts:732
 msgid "Password not entered"
@@ -7390,7 +7398,7 @@ msgstr "Assinatura não ativada?"
 msgid "Success"
 msgstr "Sucesso"
 
-#: src/strings.ts:3141
+#: src/strings.ts:3139
 msgid "Summary"
 msgstr "Resumo"
 
@@ -7423,7 +7431,7 @@ msgstr "Alternar para visualização detalhada"
 msgid "Switch to search/replace mode"
 msgstr "Alternar para o modo localizar/substituir"
 
-#: src/strings.ts:3159
+#: src/strings.ts:3157
 msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
 msgstr "Alternar entre as versões beta e estável pode causar problemas estranhos, incluindo perda de dados. É recomendável que você não use ambas simultaneamente. Você pode alternar assim que a versão beta entrar em estável."
 
@@ -7822,7 +7830,7 @@ msgstr "Não é possível visualizar esta imagem"
 msgid "This is a one time purchase, no subscription."
 msgstr "Esta é uma compra única, não uma assinatura."
 
-#: src/strings.ts:3155
+#: src/strings.ts:3153
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
 msgstr "Esta é a versão beta e, portanto, conterá bugs. É esperado que coisas quebrem, mas deve ser geralmente estável. Por favor, use o"
 
@@ -7904,7 +7912,7 @@ msgstr "Formato do título"
 msgid "Title is required"
 msgstr "O título é obrigatório"
 
-#: src/strings.ts:3147
+#: src/strings.ts:3145
 msgid "to directly claim the promotion."
 msgstr "para resgatar diretamente a promoção."
 
@@ -8658,6 +8666,10 @@ msgstr "Escreva com liberdade."
 msgid "Writing backup chunk of size... {size}"
 msgstr "Gravando fragmento de backup de tamanho... {size}"
 
+#: src/strings.ts:3161
+msgid "Wrong password."
+msgstr "Senha incorreta."
+
 #: src/strings.ts:3029
 msgid "Wrong security key"
 msgstr "Chave de segurança incorreta"
@@ -8723,7 +8735,7 @@ msgstr "Você está offline."
 msgid "You are on this plan."
 msgstr "Você está neste plano."
 
-#: src/strings.ts:3140
+#: src/strings.ts:3138
 msgid "You are one step away from unlocking the full potential of Notesnook."
 msgstr "Você está a um passo de desbloquear todo o potencial do Notesnook."
 
@@ -8846,7 +8858,7 @@ msgstr "Você ainda não adicionou nenhum caderno"
 msgid "You have not added any tags yet"
 msgstr "Você ainda não adicionou nenhuma tag"
 
-#: src/strings.ts:3144
+#: src/strings.ts:3142
 msgid "You have not been billed yet."
 msgstr "Você ainda não foi cobrado."
 
