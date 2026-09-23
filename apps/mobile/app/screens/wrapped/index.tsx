@@ -193,7 +193,7 @@ function TotalNotesSlide({ count, width }: { count: number; width: number }) {
           maxWidth: "80%"
         }}
       >
-        That's{" "}
+        {strings.thats()}{" "}
         <Heading
           style={{
             fontSize: AppFontSize.lg,
@@ -324,7 +324,7 @@ function ActivityStatsSlide({
                   textAlign: "center"
                 }}
               >
-                {formatNumber(mostNotesCreatedInMonth.count)} notes
+                {strings.notes(mostNotesCreatedInMonth.count)}
               </Paragraph>
             </View>
           </View>
@@ -361,7 +361,7 @@ function ActivityStatsSlide({
                   textAlign: "center"
                 }}
               >
-                {mostNotesCreatedInDay.count} notes
+                {strings.notes(mostNotesCreatedInDay.count)}
               </Paragraph>
             </View>
           </View>
@@ -393,7 +393,7 @@ function MostUsedTagsSlide({ tags, totalTags, width }: MostUsedTagsSlideProps) {
           textAlign: "center"
         }}
       >
-        You created{" "}
+        {strings.youCreated()}{" "}
         <Paragraph
           style={{
             fontWeight: "bold",
@@ -403,7 +403,7 @@ function MostUsedTagsSlide({ tags, totalTags, width }: MostUsedTagsSlideProps) {
         >
           {formatNumber(totalTags)}
         </Paragraph>{" "}
-        {totalTags === 1 ? "tag" : "tags"}, your favorites
+        {strings.tagsYourFavorites(totalTags)}
       </Paragraph>
       <View style={{ gap: DefaultAppStyles.GAP_VERTICAL, width: "100%" }}>
         {tags.map((tag, index) => (
@@ -433,7 +433,7 @@ function MostUsedTagsSlide({ tags, totalTags, width }: MostUsedTagsSlideProps) {
                   color: colors.secondary.paragraph
                 }}
               >
-                {formatNumber(tag.noteCount)} notes
+                {strings.notes(tag.noteCount)}
               </Paragraph>
             </View>
             <Paragraph
@@ -478,7 +478,7 @@ function MostActiveNotebooksSlide({
           textAlign: "center"
         }}
       >
-        You created{" "}
+        {strings.youCreated()}{" "}
         <Paragraph
           style={{
             fontWeight: "bold",
@@ -488,7 +488,7 @@ function MostActiveNotebooksSlide({
         >
           {formatNumber(totalNotebooks)}
         </Paragraph>{" "}
-        {totalNotebooks === 1 ? "notebook" : "notebooks"}, your favorites
+        {strings.notebooksYourFavorites(totalNotebooks)}
       </Paragraph>
       <View style={{ gap: DefaultAppStyles.GAP_VERTICAL, width: "100%" }}>
         {notebooks.map((notebook, index) => (
@@ -518,7 +518,7 @@ function MostActiveNotebooksSlide({
                   color: colors.secondary.paragraph
                 }}
               >
-                {formatNumber(notebook.noteCount)} notes
+                {strings.notes(notebook.noteCount)}
               </Paragraph>
             </View>
             <Paragraph
@@ -581,7 +581,7 @@ function AttachmentsSlide({
           textAlign: "center"
         }}
       >
-        files totaling {formatBytes(totalStorageUsed)}
+        {strings.filesTotaling(formatBytes(totalStorageUsed))}
       </Paragraph>
     </Slide>
   );
@@ -645,7 +645,7 @@ function SummarySlide({
                 marginTop: 30
               }}
             >
-              Notesnook Wrapped {dayjs().year()}
+              {strings.notesnookWrappedYear(dayjs().year())}
             </Heading>
             <View
               style={{
@@ -878,12 +878,12 @@ function SummarySlide({
                         color: colors.primary.paragraph
                       }}
                     >
-                      Your largest note was{" "}
+                      {strings.yourLargestNoteWas()}{" "}
                       <Heading
                         size={AppFontSize.sm}
                         color={colors.primary.accent}
                       >
-                        {formatNumber(stats.largestNote.length)} words
+                        {strings.wordsCount(stats.largestNote.length)}
                       </Heading>
                     </Paragraph>
                   </View>
@@ -897,7 +897,7 @@ function SummarySlide({
                         color: colors.primary.paragraph
                       }}
                     >
-                      Your largest attachment was{" "}
+                      {strings.yourLargestAttachmentWas()}{" "}
                       <Heading
                         size={AppFontSize.sm}
                         color={colors.primary.accent}

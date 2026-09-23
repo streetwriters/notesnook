@@ -21,6 +21,10 @@ msgstr " Ontgrendel eenmalig met het wachtwoord om biometrische toegang in te sc
 msgid "— not just the"
 msgstr "— niet alleen de"
 
+#: src/strings.ts:3198
+msgid ". Click on \"New note\" to create a new note."
+msgstr ". Klik op 'Nieuwe notitie' om een nieuwe notitie te maken."
+
 #: src/strings.ts:43
 msgid "\"Refunded"
 msgstr "\"Terugbetaald"
@@ -80,7 +84,7 @@ msgstr "{count, plural, one {# notitie} other {# notities}}"
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# rij} other {# rijen}}"
 
-#: src/strings.ts:3231
+#: src/strings.ts:3172
 msgid "{count, plural, one {# word} other {# words}}"
 msgstr "{count, plural, one {# woord} other {# woorden}}"
 
@@ -148,6 +152,10 @@ msgstr "{count, plural, one {Weet je zeker dat je deze versie permanent wilt ver
 #: src/strings.ts:121
 msgid "{count, plural, one {Attach image} other {Attach # images}}"
 msgstr "{count, plural, one {Afbeelding bijvoegen} other {# afbeeldingen bijvoegen}}"
+
+#: src/strings.ts:3192
+msgid "{count, plural, one {Attaching # file:} other {Attaching # files:}}"
+msgstr "{count, plural, one {# bestand bijvoegen:} other {# bestanden bijvoegen:}}"
 
 #: generated/actions.ts:8
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
@@ -364,6 +372,10 @@ msgstr "{count, plural, one {Notitieboek permanent verwijderd} other {# notitieb
 msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 msgstr "{count, plural, one {Notitieboek hersteld} other {# notitieboeken hersteld}}"
 
+#: src/strings.ts:3184
+msgid "{count, plural, one {notebook, your favorite} other {notebooks, your favorites}}"
+msgstr "{count, plural, one {notitieboek, jouw favoriet} other {notitieboeken, jouw favorieten}}"
+
 #: generated/do-actions.ts:147
 msgid "{count, plural, one {Permanently delete attachment} other {Permanently delete # attachments}}"
 msgstr "{count, plural, one {Bijlage permanent verwijderen} other {# bijlagen permanent verwijderen}}"
@@ -471,6 +483,10 @@ msgstr "{count, plural, one {Tag verwijderd} other {# tags verwijderd}}"
 msgid "{count, plural, one {Tag edited} other {# tags edited}}"
 msgstr "{count, plural, one {Tag bewerkt} other {# tags bewerkt}}"
 
+#: src/strings.ts:3179
+msgid "{count, plural, one {tag, your favorite} other {tags, your favorites}}"
+msgstr "{count, plural, one {label, jouw favoriet} other {labels, jouw favorieten}}"
+
 #: generated/do-actions.ts:82
 msgid "{count, plural, one {Unpin item} other {Unpin # items}}"
 msgstr "{count, plural, one {Item losmaken} other {# items losmaken}}"
@@ -498,6 +514,10 @@ msgstr "{count, plural, one {Versie verwijderd} other {# versies verwijderd}}"
 #: src/strings.ts:2271
 msgid "{count} characters"
 msgstr "{count} tekens"
+
+#: src/strings.ts:3177
+msgid "{count} stars"
+msgstr "{count} sterren"
 
 #: src/strings.ts:1446
 msgid "{days, plural, one {1 day} other {# days}}"
@@ -695,7 +715,7 @@ msgstr "10+ thema's"
 msgid "100% cross platform"
 msgstr "100% platformonafhankelijk"
 
-#: src/strings.ts:3226
+#: src/strings.ts:3167
 msgid "100% encrypted."
 msgstr "100% versleuteld."
 
@@ -703,7 +723,7 @@ msgstr "100% versleuteld."
 msgid "100% end-to-end encrypted"
 msgstr "100% end-to-end versleuteld"
 
-#: src/strings.ts:3227
+#: src/strings.ts:3168
 msgid "100% yours."
 msgstr "100% van jou."
 
@@ -759,6 +779,10 @@ msgstr "Abc"
 msgid "About"
 msgstr "Over"
 
+#: src/strings.ts:3196
+msgid "Above content will append to"
+msgstr "Bovenstaande inhoud wordt toegevoegd aan"
+
 #: src/strings.ts:2673
 msgid "Abstract"
 msgstr "Samenvatting"
@@ -798,6 +822,10 @@ msgstr "Actieve herinneringen"
 #: src/strings.ts:477
 msgid "Add"
 msgstr "Toevoegen"
+
+#: src/strings.ts:3190
+msgid "Add #{tag}"
+msgstr "#{tag} toevoegen"
 
 #: src/strings.ts:959
 msgid "Add 2FA fallback method"
@@ -3578,6 +3606,10 @@ msgstr "Bestandsgroottelimiet overschreden. Upgrade je abonnement."
 msgid "File too big"
 msgstr "Bestand te groot"
 
+#: src/strings.ts:3188
+msgid "files totaling {storage}"
+msgstr "bestanden met een totaal van {storage}"
+
 #: src/strings.ts:1369
 msgid "Filter attachments by filename, type or hash"
 msgstr "Bijlagen filteren op bestandsnaam, type of hash"
@@ -4025,7 +4057,7 @@ msgstr "Ik begrijp het, wijzig mijn wachtwoord"
 msgid "ID copied"
 msgstr "ID gekopieerd"
 
-#: src/strings.ts:3223
+#: src/strings.ts:3164
 msgid "ideas"
 msgstr "ideeën"
 
@@ -4738,7 +4770,7 @@ msgstr "De maximale herinneringsdatum is {maxDate}"
 msgid "Member since {date}"
 msgstr "Lid sinds {date}"
 
-#: src/strings.ts:3225
+#: src/strings.ts:3166
 msgid "memories."
 msgstr "herinneringen."
 
@@ -5271,7 +5303,7 @@ msgstr "Notesnook stuurt je desgevraagd een 2FA-code per e-mail"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook stuurt je desgevraagd een sms met een 2FA-code"
 
-#: src/strings.ts:3228
+#: src/strings.ts:3169
 msgid "NOTESNOOK WRAPPED {year}"
 msgstr "NOTESNOOK WRAPPED {year}"
 
@@ -6696,7 +6728,7 @@ msgstr "Zip-bestand opslaan. Even geduld..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Scan de QR-code met je authenticatie-app"
 
-#: src/strings.ts:3221
+#: src/strings.ts:3162
 msgid "Scroll down to explore"
 msgstr "Scroll naar beneden om te ontdekken"
 
@@ -7726,7 +7758,7 @@ msgstr "Bedankt voor je feedback!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Bedankt. Jij bent het bewijs dat privacy altijd voorop staat."
 
-#: src/strings.ts:3222
+#: src/strings.ts:3163
 msgid "That's"
 msgstr "Dat zijn"
 
@@ -7911,7 +7943,7 @@ msgstr "Deze notitie wordt gepubliceerd op een openbare URL."
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Deze gebruikersnaam wordt gebruikt om onderscheid te maken tussen verschillende inloggegevens in je beveiligingssleutel. Zorg ervoor dat hij uniek is."
 
-#: src/strings.ts:3224
+#: src/strings.ts:3165
 msgid "thoughts"
 msgstr "gedachten"
 
@@ -9093,11 +9125,15 @@ msgstr "Je gratis proefperiode loopt. Je abonnement start op {trialExpiryDate}"
 msgid "Your full name"
 msgstr "Je volledige naam"
 
-#: src/strings.ts:3235
+#: src/strings.ts:3176
 msgid "Your largest attachment was"
 msgstr "Jouw grootste bijlage was"
 
-#: src/strings.ts:3229
+#: src/strings.ts:3189
+msgid "Your largest note was"
+msgstr "Jouw grootste notitie was"
+
+#: src/strings.ts:3170
 msgid "Your longest note was"
 msgstr "Jouw langste notitie was"
 

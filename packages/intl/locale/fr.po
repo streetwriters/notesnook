@@ -21,6 +21,10 @@ msgstr " Déverrouillez une fois avec le mot de passe pour activer l'accès biom
 msgid "— not just the"
 msgstr "— pas seulement le"
 
+#: src/strings.ts:3198
+msgid ". Click on \"New note\" to create a new note."
+msgstr ". Cliquez sur « Nouvelle note » pour créer une nouvelle note."
+
 #: src/strings.ts:43
 msgid "\"Refunded"
 msgstr "\"Remboursé"
@@ -80,7 +84,7 @@ msgstr "{count, plural, one {# note} other {# notes}}"
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# ligne} other {# lignes}}"
 
-#: src/strings.ts:3231
+#: src/strings.ts:3172
 msgid "{count, plural, one {# word} other {# words}}"
 msgstr "{count, plural, one {# mot} other {# mots}}"
 
@@ -148,6 +152,10 @@ msgstr "{count, plural, one {Voulez-vous vraiment supprimer définitivement cett
 #: src/strings.ts:121
 msgid "{count, plural, one {Attach image} other {Attach # images}}"
 msgstr "{count, plural, one {Joindre une image} other {Joindre # images}}"
+
+#: src/strings.ts:3192
+msgid "{count, plural, one {Attaching # file:} other {Attaching # files:}}"
+msgstr "{count, plural, one {Ajout de # fichier :} other {Ajout de # fichiers :}}"
 
 #: generated/actions.ts:8
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
@@ -364,6 +372,10 @@ msgstr "{count, plural, one {Carnet supprimé définitivement} other {# carnets 
 msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 msgstr "{count, plural, one {Carnet restauré} other {# carnets restaurés}}"
 
+#: src/strings.ts:3184
+msgid "{count, plural, one {notebook, your favorite} other {notebooks, your favorites}}"
+msgstr "{count, plural, one {carnet, votre préféré} other {carnets, vos préférés}}"
+
 #: generated/do-actions.ts:147
 msgid "{count, plural, one {Permanently delete attachment} other {Permanently delete # attachments}}"
 msgstr "{count, plural, one {Supprimer définitivement la pièce jointe} other {Supprimer définitivement # pièces jointes}}"
@@ -471,6 +483,10 @@ msgstr "{count, plural, one {Étiquette supprimée} other {# étiquettes supprim
 msgid "{count, plural, one {Tag edited} other {# tags edited}}"
 msgstr "{count, plural, one {Étiquette modifiée} other {# étiquettes modifiées}}"
 
+#: src/strings.ts:3179
+msgid "{count, plural, one {tag, your favorite} other {tags, your favorites}}"
+msgstr "{count, plural, one {étiquette, votre préférée} other {étiquettes, vos préférées}}"
+
 #: generated/do-actions.ts:82
 msgid "{count, plural, one {Unpin item} other {Unpin # items}}"
 msgstr "{count, plural, one {Détacher l'élément} other {Détacher # éléments}}"
@@ -498,6 +514,10 @@ msgstr "{count, plural, one {Version supprimée} other {# versions supprimées}}
 #: src/strings.ts:2271
 msgid "{count} characters"
 msgstr "{count} caractères"
+
+#: src/strings.ts:3177
+msgid "{count} stars"
+msgstr "{count} étoiles"
 
 #: src/strings.ts:1446
 msgid "{days, plural, one {1 day} other {# days}}"
@@ -695,7 +715,7 @@ msgstr "Plus de 10 thèmes"
 msgid "100% cross platform"
 msgstr "100% multiplateforme"
 
-#: src/strings.ts:3226
+#: src/strings.ts:3167
 msgid "100% encrypted."
 msgstr "100% chiffré."
 
@@ -703,7 +723,7 @@ msgstr "100% chiffré."
 msgid "100% end-to-end encrypted"
 msgstr "100% chiffré de bout en bout"
 
-#: src/strings.ts:3227
+#: src/strings.ts:3168
 msgid "100% yours."
 msgstr "100% à vous."
 
@@ -759,6 +779,10 @@ msgstr "Abc"
 msgid "About"
 msgstr "À propos"
 
+#: src/strings.ts:3196
+msgid "Above content will append to"
+msgstr "Le contenu ci-dessus sera ajouté à"
+
 #: src/strings.ts:2673
 msgid "Abstract"
 msgstr "Résumé"
@@ -798,6 +822,10 @@ msgstr "Rappels actifs"
 #: src/strings.ts:477
 msgid "Add"
 msgstr "Ajouter"
+
+#: src/strings.ts:3190
+msgid "Add #{tag}"
+msgstr "Ajouter #{tag}"
 
 #: src/strings.ts:959
 msgid "Add 2FA fallback method"
@@ -3578,6 +3606,10 @@ msgstr "Limite de taille de fichier dépassée. Veuillez passer à une formule s
 msgid "File too big"
 msgstr "Fichier trop volumineux"
 
+#: src/strings.ts:3188
+msgid "files totaling {storage}"
+msgstr "fichiers totalisant {storage}"
+
 #: src/strings.ts:1369
 msgid "Filter attachments by filename, type or hash"
 msgstr "Filtrer les pièces jointes par nom de fichier, type ou hachage"
@@ -4025,7 +4057,7 @@ msgstr "Je comprends, modifier mon mot de passe"
 msgid "ID copied"
 msgstr "ID copié"
 
-#: src/strings.ts:3223
+#: src/strings.ts:3164
 msgid "ideas"
 msgstr "idées"
 
@@ -4738,7 +4770,7 @@ msgstr "La date de rappel maximale est {maxDate}"
 msgid "Member since {date}"
 msgstr "Membre depuis {date}"
 
-#: src/strings.ts:3225
+#: src/strings.ts:3166
 msgid "memories."
 msgstr "souvenirs."
 
@@ -5271,7 +5303,7 @@ msgstr "Notesnook vous enverra un code 2FA par e-mail lorsque cela sera demandé
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook vous enverra un SMS avec un code 2FA lorsque cela sera demandé"
 
-#: src/strings.ts:3228
+#: src/strings.ts:3169
 msgid "NOTESNOOK WRAPPED {year}"
 msgstr "NOTESNOOK RÉTROSPECTIVE {year}"
 
@@ -6696,7 +6728,7 @@ msgstr "Enregistrement de l'archive ZIP. Veuillez patienter..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Scannez le code QR avec votre application d'authentification"
 
-#: src/strings.ts:3221
+#: src/strings.ts:3162
 msgid "Scroll down to explore"
 msgstr "Faites défiler vers le bas pour explorer"
 
@@ -7726,7 +7758,7 @@ msgstr "Merci pour vos commentaires !"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Merci. Vous êtes la preuve que la confidentialité passe toujours en premier."
 
-#: src/strings.ts:3222
+#: src/strings.ts:3163
 msgid "That's"
 msgstr "C'est"
 
@@ -7911,7 +7943,7 @@ msgstr "Cette note sera publiée à une URL publique."
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Ce nom d'utilisateur servira à distinguer les différentes informations d'identification dans votre clé de sécurité. Assurez-vous qu'il soit unique."
 
-#: src/strings.ts:3224
+#: src/strings.ts:3165
 msgid "thoughts"
 msgstr "pensées"
 
@@ -9093,11 +9125,15 @@ msgstr "Votre essai gratuit est en cours. Votre abonnement débutera le {trialEx
 msgid "Your full name"
 msgstr "Votre nom complet"
 
-#: src/strings.ts:3235
+#: src/strings.ts:3176
 msgid "Your largest attachment was"
 msgstr "Votre pièce jointe la plus volumineuse a été"
 
-#: src/strings.ts:3229
+#: src/strings.ts:3189
+msgid "Your largest note was"
+msgstr "Votre plus grande note a été"
+
+#: src/strings.ts:3170
 msgid "Your longest note was"
 msgstr "Votre plus longue note a été"
 

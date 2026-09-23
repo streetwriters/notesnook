@@ -21,6 +21,10 @@ msgstr " Sblocca una volta con la password per abilitare l'accesso biometrico."
 msgid "— not just the"
 msgstr "— non solo il"
 
+#: src/strings.ts:3198
+msgid ". Click on \"New note\" to create a new note."
+msgstr ". Clicca su \"Nuova nota\" per creare una nuova nota."
+
 #: src/strings.ts:43
 msgid "\"Refunded"
 msgstr "\"Rimborsato"
@@ -80,7 +84,7 @@ msgstr "{count, plural, one {# nota} other {# note}}"
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# riga} other {# righe}}"
 
-#: src/strings.ts:3231
+#: src/strings.ts:3172
 msgid "{count, plural, one {# word} other {# words}}"
 msgstr "{count, plural, one {# parola} other {# parole}}"
 
@@ -148,6 +152,10 @@ msgstr "{count, plural, one {Vuoi davvero eliminare definitivamente questa versi
 #: src/strings.ts:121
 msgid "{count, plural, one {Attach image} other {Attach # images}}"
 msgstr "{count, plural, one {Allega immagine} other {Allega # immagini}}"
+
+#: src/strings.ts:3192
+msgid "{count, plural, one {Attaching # file:} other {Attaching # files:}}"
+msgstr "{count, plural, one {Allegando # file:} other {Allegando # file:}}"
 
 #: generated/actions.ts:8
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
@@ -364,6 +372,10 @@ msgstr "{count, plural, one {Taccuino eliminato definitivamente} other {# taccui
 msgid "{count, plural, one {Notebook restored} other {# notebooks restored}}"
 msgstr "{count, plural, one {Taccuino ripristinato} other {# taccuini ripristinati}}"
 
+#: src/strings.ts:3184
+msgid "{count, plural, one {notebook, your favorite} other {notebooks, your favorites}}"
+msgstr "{count, plural, one {taccuino, il tuo preferito} other {taccuini, i tuoi preferiti}}"
+
 #: generated/do-actions.ts:147
 msgid "{count, plural, one {Permanently delete attachment} other {Permanently delete # attachments}}"
 msgstr "{count, plural, one {Elimina definitivamente l'allegato} other {Elimina definitivamente # allegati}}"
@@ -471,6 +483,10 @@ msgstr "{count, plural, one {Tag eliminato} other {# tag eliminati}}"
 msgid "{count, plural, one {Tag edited} other {# tags edited}}"
 msgstr "{count, plural, one {Tag modificato} other {# tag modificati}}"
 
+#: src/strings.ts:3179
+msgid "{count, plural, one {tag, your favorite} other {tags, your favorites}}"
+msgstr "{count, plural, one {tag, il tuo preferito} other {tag, i tuoi preferiti}}"
+
 #: generated/do-actions.ts:82
 msgid "{count, plural, one {Unpin item} other {Unpin # items}}"
 msgstr "{count, plural, one {Rimuovi fissaggio elemento} other {Rimuovi fissaggio di # elementi}}"
@@ -498,6 +514,10 @@ msgstr "{count, plural, one {Versione eliminata} other {# versioni eliminate}}"
 #: src/strings.ts:2271
 msgid "{count} characters"
 msgstr "{count} caratteri"
+
+#: src/strings.ts:3177
+msgid "{count} stars"
+msgstr "{count} stelle"
 
 #: src/strings.ts:1446
 msgid "{days, plural, one {1 day} other {# days}}"
@@ -695,7 +715,7 @@ msgstr "Oltre 10 temi"
 msgid "100% cross platform"
 msgstr "100% multipiattaforma"
 
-#: src/strings.ts:3226
+#: src/strings.ts:3167
 msgid "100% encrypted."
 msgstr "100% crittografato."
 
@@ -703,7 +723,7 @@ msgstr "100% crittografato."
 msgid "100% end-to-end encrypted"
 msgstr "Crittografia end-to-end al 100%"
 
-#: src/strings.ts:3227
+#: src/strings.ts:3168
 msgid "100% yours."
 msgstr "100% tuo."
 
@@ -759,6 +779,10 @@ msgstr "Abc"
 msgid "About"
 msgstr "Informazioni"
 
+#: src/strings.ts:3196
+msgid "Above content will append to"
+msgstr "I contenuti sopra verranno aggiunti a"
+
 #: src/strings.ts:2673
 msgid "Abstract"
 msgstr "Sommario"
@@ -798,6 +822,10 @@ msgstr "Promemoria attivi"
 #: src/strings.ts:477
 msgid "Add"
 msgstr "Aggiungi"
+
+#: src/strings.ts:3190
+msgid "Add #{tag}"
+msgstr "Aggiungi #{tag}"
 
 #: src/strings.ts:959
 msgid "Add 2FA fallback method"
@@ -3578,6 +3606,10 @@ msgstr "Limite di dimensione del file superato. Passa a un piano superiore."
 msgid "File too big"
 msgstr "File troppo grande"
 
+#: src/strings.ts:3188
+msgid "files totaling {storage}"
+msgstr "file per un totale di {storage}"
+
 #: src/strings.ts:1369
 msgid "Filter attachments by filename, type or hash"
 msgstr "Filtra gli allegati per nome file, tipo o hash"
@@ -4025,7 +4057,7 @@ msgstr "Ho capito, cambia la mia password"
 msgid "ID copied"
 msgstr "ID copiato"
 
-#: src/strings.ts:3223
+#: src/strings.ts:3164
 msgid "ideas"
 msgstr "idee"
 
@@ -4738,7 +4770,7 @@ msgstr "La data massima del promemoria è {maxDate}"
 msgid "Member since {date}"
 msgstr "Membro dal {date}"
 
-#: src/strings.ts:3225
+#: src/strings.ts:3166
 msgid "memories."
 msgstr "ricordi."
 
@@ -5271,7 +5303,7 @@ msgstr "Notesnook ti invierà un codice 2FA via email quando richiesto"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook ti invierà un SMS con un codice 2FA quando richiesto"
 
-#: src/strings.ts:3228
+#: src/strings.ts:3169
 msgid "NOTESNOOK WRAPPED {year}"
 msgstr "NOTESNOOK WRAPPED {year}"
 
@@ -6696,7 +6728,7 @@ msgstr "Salvataggio del file ZIP. Attendi..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Scansiona il codice QR con la tua app di autenticazione"
 
-#: src/strings.ts:3221
+#: src/strings.ts:3162
 msgid "Scroll down to explore"
 msgstr "Scorri verso il basso per esplorare"
 
@@ -7726,7 +7758,7 @@ msgstr "Grazie per il tuo feedback!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Grazie. Sei la prova che la privacy viene sempre prima di tutto."
 
-#: src/strings.ts:3222
+#: src/strings.ts:3163
 msgid "That's"
 msgstr "Questo significa"
 
@@ -7911,7 +7943,7 @@ msgstr "Questa nota verrà pubblicata a un URL pubblico."
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Questo nome utente servirà a distinguere le diverse credenziali nella tua chiave di sicurezza. Assicurati che sia univoco."
 
-#: src/strings.ts:3224
+#: src/strings.ts:3165
 msgid "thoughts"
 msgstr "pensieri"
 
@@ -9093,11 +9125,15 @@ msgstr "La tua prova gratuita è in corso. Il tuo abbonamento inizierà il {tria
 msgid "Your full name"
 msgstr "Il tuo nome completo"
 
-#: src/strings.ts:3235
+#: src/strings.ts:3176
 msgid "Your largest attachment was"
 msgstr "Il tuo allegato più grande è stato"
 
-#: src/strings.ts:3229
+#: src/strings.ts:3189
+msgid "Your largest note was"
+msgstr "La tua nota più grande è stata"
+
+#: src/strings.ts:3170
 msgid "Your longest note was"
 msgstr "La tua nota più lunga è stata"
 
