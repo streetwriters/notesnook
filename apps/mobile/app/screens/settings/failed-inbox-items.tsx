@@ -67,9 +67,9 @@ function ErrorBadge({
   }
 
   const palette =
-    message === "Invalid JSON"
+    message === strings.invalidJson()
       ? { background: "rgba(255, 152, 0, 0.15)", paragraph: "#e65100" }
-      : message === "Validation failed"
+      : message === strings.validationFailed()
         ? { background: "rgba(255, 193, 7, 0.15)", paragraph: "#8a6000" }
         : colors.error;
 
@@ -197,25 +197,25 @@ export const FailedInboxItems = () => {
         rightButton={
           items?.length > 0
             ? {
-                name: "delete",
-                color: colors.primary.icon,
-                onPress: async () => {
-                  presentDialog({
-                    title: strings.deleteAll(),
-                    paragraph: strings.deleteAllFailedItemsDesc(),
-                    positiveText: strings.delete(),
-                    positiveType: "errorShade",
-                    positivePress: async () => {
-                      if (result.status !== "pending") {
-                        await db.inboxItemsHistory.deleteFailed();
-                        result.refresh();
-                      }
-
-                      return true;
+              name: "delete",
+              color: colors.primary.icon,
+              onPress: async () => {
+                presentDialog({
+                  title: strings.deleteAll(),
+                  paragraph: strings.deleteAllFailedItemsDesc(),
+                  positiveText: strings.delete(),
+                  positiveType: "errorShade",
+                  positivePress: async () => {
+                    if (result.status !== "pending") {
+                      await db.inboxItemsHistory.deleteFailed();
+                      result.refresh();
                     }
-                  });
-                }
+
+                    return true;
+                  }
+                });
               }
+            }
             : undefined
         }
       />
