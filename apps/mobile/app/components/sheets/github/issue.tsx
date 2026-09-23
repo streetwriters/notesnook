@@ -238,9 +238,9 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
           <Paragraph
             size={AppFontSize.xs}
             color={colors.secondary.paragraph}
-          >{`App version: ${getVersion()} Platform: ${
+          >{`${strings.appVersion()}: ${getVersion()} ${strings.platform()}: ${
             Platform.OS
-          } Model: ${getBrand()}-${getModel()}-${getSystemVersion()}`}</Paragraph>
+          } ${strings.phoneModel()}: ${getBrand()}-${getModel()}-${getSystemVersion()}`}</Paragraph>
 
           <Seperator />
           <Button
