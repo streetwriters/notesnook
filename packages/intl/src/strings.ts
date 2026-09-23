@@ -190,7 +190,7 @@ export const strings = {
   untitledNote: () => strings.untitled(),
   newNote: () => t`New note`,
   exportingNotes: (status?: string) =>
-    t`${status ? status : "Exporting notes"}`,
+    status ? status : t`Exporting notes`,
   exportingNotesDesc: () => t`Please wait while we export your notes.`,
   exportingNote: (title: string) => t`Exporting "${title}"`,
   exportingNoteDesc: () => t`Please wait while we export your not.`,
@@ -1198,6 +1198,9 @@ $day$: Current day (eg. Monday)`,
   autoUpdateCheckDesc: () =>
     t`Check for new version of the app available on app launch`,
   appVersion: () => t`App version`,
+  platform: () => t`Platform`,
+  phoneModel: () => t`Phone model`,
+  model: () => t`Model`,
   defaultSound: () => t`Default sound`,
   editProfilePicture: () => t`Edit profile picture`,
   editProfilePictureDesc: () =>
