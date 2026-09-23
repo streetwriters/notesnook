@@ -194,7 +194,7 @@ export const UpgradeDialog = DialogManager.register(function UpgradeDialog(
               )
                 return showToast(
                   "error",
-                  `You can only change your plan from the platform you originally bought the subscription from.`
+                  strings.onlyChangePlanFromOriginalPlatform()
                 );
               onClose();
               ChangePlanDialog.show({});
