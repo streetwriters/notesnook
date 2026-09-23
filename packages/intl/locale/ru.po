@@ -595,7 +595,7 @@ msgstr "{percentage}% обновление..."
 msgid "{plan} plan"
 msgstr "Тариф {plan}"
 
-#: src/strings.ts:3142
+#: src/strings.ts:3140
 msgid "{planTitle} plan"
 msgstr "Тариф {planTitle}"
 
@@ -663,7 +663,7 @@ msgstr "/ месяц"
 msgid "#notesnook"
 msgstr "#notesnook"
 
-#: src/strings.ts:3149
+#: src/strings.ts:3147
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Итоги года {year}"
 
@@ -1519,7 +1519,7 @@ msgstr "Маркированный список"
 msgid "Bulletproof encryption"
 msgstr "Бронебойное шифрование"
 
-#: src/strings.ts:3156
+#: src/strings.ts:3154
 msgid "button to report all bugs. Thank you!"
 msgstr "чтобы сообщить обо всех ошибках. Спасибо!"
 
@@ -1920,7 +1920,7 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Очистка корзины безвозвратно удалит все находящиеся в ней элементы. Это действие НЕОБРАТИМО."
 
-#: src/strings.ts:3146
+#: src/strings.ts:3144
 msgid "Click here"
 msgstr "Нажмите здесь"
 
@@ -2244,6 +2244,10 @@ msgstr "Не удалось сохранить таблицу в csv"
 #: src/strings.ts:508
 msgid "Could not unlock"
 msgstr "Не удалось разблокировать"
+
+#: src/strings.ts:3159
+msgid "Could not unwrap key."
+msgstr "Не удалось развернуть ключ."
 
 #: src/strings.ts:144
 msgid "Create"
@@ -3578,7 +3582,7 @@ msgstr "Фильтровать блокноты..."
 msgid "Filter tags..."
 msgstr "Фильтровать теги..."
 
-#: src/strings.ts:3138
+#: src/strings.ts:3136
 msgid "Final step, make the payment."
 msgstr "Последний шаг, совершите оплату."
 
@@ -3965,7 +3969,7 @@ msgstr "как импортировать из {provider}."
 msgid "hr"
 msgstr "ч"
 
-#: src/strings.ts:3150
+#: src/strings.ts:3148
 msgid "Huzzah!"
 msgstr "Ура!"
 
@@ -5084,7 +5088,7 @@ msgstr "Нет"
 msgid "Normal mode"
 msgstr "Обычный режим"
 
-#: src/strings.ts:3143
+#: src/strings.ts:3141
 msgid "Not found"
 msgstr "Не найдено"
 
@@ -5247,11 +5251,11 @@ msgstr "Notesnook отправит вам код 2FA на эл. почту пр�
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook отправит вам SMS с кодом 2FA при запросе"
 
-#: src/strings.ts:3151
+#: src/strings.ts:3149
 msgid "Notice"
 msgstr "Уведомление"
 
-#: src/strings.ts:3152
+#: src/strings.ts:3150
 msgid "Notice 2"
 msgstr "Уведомление 2"
 
@@ -5459,6 +5463,10 @@ msgstr "Пароли не совпадают"
 #: src/strings.ts:711
 msgid "Password incorrect"
 msgstr "Неверный пароль"
+
+#: src/strings.ts:3160
+msgid "Password is required."
+msgstr "Пароль обязателен."
 
 #: src/strings.ts:732
 msgid "Password not entered"
@@ -7390,7 +7398,7 @@ msgstr "Подписка не активирована?"
 msgid "Success"
 msgstr "Успешно"
 
-#: src/strings.ts:3141
+#: src/strings.ts:3139
 msgid "Summary"
 msgstr "Итог"
 
@@ -7423,7 +7431,7 @@ msgstr "Переключиться на подробный вид"
 msgid "Switch to search/replace mode"
 msgstr "Перейти в режим поиска и замены"
 
-#: src/strings.ts:3159
+#: src/strings.ts:3157
 msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
 msgstr "Переключение между бета- и стабильными версиями может вызвать странные проблемы, включая потерю данных. Рекомендуется не использовать обе версии одновременно. Вы сможете переключиться, когда бета-версия станет стабильной."
 
@@ -7822,7 +7830,7 @@ msgstr "Предпросмотр этого изображения невозм�
 msgid "This is a one time purchase, no subscription."
 msgstr "Это разовая покупка, а не подписка."
 
-#: src/strings.ts:3155
+#: src/strings.ts:3153
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
 msgstr "Это бета-версия, поэтому она содержит ошибки. Возможны сбои, но в целом работа должна быть стабильной. Пожалуйста, используйте кнопку"
 
@@ -7904,7 +7912,7 @@ msgstr "Формат заголовка"
 msgid "Title is required"
 msgstr "Заголовок обязателен"
 
-#: src/strings.ts:3147
+#: src/strings.ts:3145
 msgid "to directly claim the promotion."
 msgstr "чтобы напрямую активировать акцию."
 
@@ -8658,6 +8666,10 @@ msgstr "Пишите свободно."
 msgid "Writing backup chunk of size... {size}"
 msgstr "Запись фрагмента резервной копии размером... {size}"
 
+#: src/strings.ts:3161
+msgid "Wrong password."
+msgstr "Неверный пароль."
+
 #: src/strings.ts:3029
 msgid "Wrong security key"
 msgstr "Неверный ключ безопасности"
@@ -8723,7 +8735,7 @@ msgstr "Вы не в сети."
 msgid "You are on this plan."
 msgstr "Вы используете этот план."
 
-#: src/strings.ts:3140
+#: src/strings.ts:3138
 msgid "You are one step away from unlocking the full potential of Notesnook."
 msgstr "Вы в одном шаге от раскрытия полного потенциала Notesnook."
 
@@ -8846,7 +8858,7 @@ msgstr "Вы ещё не добавили ни одного блокнота"
 msgid "You have not added any tags yet"
 msgstr "Вы ещё не добавили ни одного тега"
 
-#: src/strings.ts:3144
+#: src/strings.ts:3142
 msgid "You have not been billed yet."
 msgstr "Счета вам еще не выставлялись."
 

@@ -595,7 +595,7 @@ msgstr "%{percentage} güncelleniyor..."
 msgid "{plan} plan"
 msgstr "{plan} planı"
 
-#: src/strings.ts:3142
+#: src/strings.ts:3140
 msgid "{planTitle} plan"
 msgstr "{planTitle} planı"
 
@@ -663,7 +663,7 @@ msgstr "/ ay"
 msgid "#notesnook"
 msgstr "#notesnook"
 
-#: src/strings.ts:3149
+#: src/strings.ts:3147
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Özet {year}"
 
@@ -1519,7 +1519,7 @@ msgstr "Madde işaretli liste"
 msgid "Bulletproof encryption"
 msgstr "Kurşun geçirmez şifreleme"
 
-#: src/strings.ts:3156
+#: src/strings.ts:3154
 msgid "button to report all bugs. Thank you!"
 msgstr "düğmesini kullanın. Teşekkürler!"
 
@@ -1920,7 +1920,7 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Çöp kutusunu boşaltmak, içindeki tüm öğeleri kalıcı olarak siler. Bu işlem GERİ ALINAMAZ."
 
-#: src/strings.ts:3146
+#: src/strings.ts:3144
 msgid "Click here"
 msgstr "Buraya tıklayın"
 
@@ -2244,6 +2244,10 @@ msgstr "Tablo csv olarak kaydedilemedi"
 #: src/strings.ts:508
 msgid "Could not unlock"
 msgstr "Kilit açılamadı"
+
+#: src/strings.ts:3159
+msgid "Could not unwrap key."
+msgstr "Anahtar açılamadı."
 
 #: src/strings.ts:144
 msgid "Create"
@@ -3578,7 +3582,7 @@ msgstr "Not defterlerini filtrele..."
 msgid "Filter tags..."
 msgstr "Etiketleri filtrele..."
 
-#: src/strings.ts:3138
+#: src/strings.ts:3136
 msgid "Final step, make the payment."
 msgstr "Son adım, ödemeyi yapın."
 
@@ -3965,7 +3969,7 @@ msgstr "{provider} üzerinden nasıl içe aktarılır."
 msgid "hr"
 msgstr "sa"
 
-#: src/strings.ts:3150
+#: src/strings.ts:3148
 msgid "Huzzah!"
 msgstr "Yaşasın!"
 
@@ -5084,7 +5088,7 @@ msgstr "Yok"
 msgid "Normal mode"
 msgstr "Normal mod"
 
-#: src/strings.ts:3143
+#: src/strings.ts:3141
 msgid "Not found"
 msgstr "Bulunamadı"
 
@@ -5247,11 +5251,11 @@ msgstr "Notesnook, istendiğinde e-postanıza bir 2FA kodu gönderir"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook, istendiğinde 2FA kodlu bir SMS gönderir"
 
-#: src/strings.ts:3151
+#: src/strings.ts:3149
 msgid "Notice"
 msgstr "Bildirim"
 
-#: src/strings.ts:3152
+#: src/strings.ts:3150
 msgid "Notice 2"
 msgstr "Bildirim 2"
 
@@ -5459,6 +5463,10 @@ msgstr "Parolalar eşleşmiyor"
 #: src/strings.ts:711
 msgid "Password incorrect"
 msgstr "Parola hatalı"
+
+#: src/strings.ts:3160
+msgid "Password is required."
+msgstr "Şifre gereklidir."
 
 #: src/strings.ts:732
 msgid "Password not entered"
@@ -7390,7 +7398,7 @@ msgstr "Abonelik etkinleştirilmedi mi?"
 msgid "Success"
 msgstr "Başarılı"
 
-#: src/strings.ts:3141
+#: src/strings.ts:3139
 msgid "Summary"
 msgstr "Özet"
 
@@ -7423,7 +7431,7 @@ msgstr "Ayrıntılı görünüme geç"
 msgid "Switch to search/replace mode"
 msgstr "Ara/değiştir moduna geç"
 
-#: src/strings.ts:3159
+#: src/strings.ts:3157
 msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
 msgstr "Beta ve kararlı sürümler arasında geçiş yapmak, veri kaybı da dahil olmak üzere garip sorunlara neden olabilir. Her ikisini aynı anda kullanmamanız önerilir. Beta sürüm kararlı hale geldiğinde geçiş yapabilirsiniz."
 
@@ -7822,7 +7830,7 @@ msgstr "Bu görsel önizlenemiyor"
 msgid "This is a one time purchase, no subscription."
 msgstr "Bu, abonelik değil tek seferlik bir satın almadır."
 
-#: src/strings.ts:3155
+#: src/strings.ts:3153
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
 msgstr "Bu beta sürümüdür ve bu nedenle hatalar içerecektir. Bazı şeylerin bozulması beklenir ancak genel olarak kararlı olmalıdır. Lütfen tüm hataları bildirmek için"
 
@@ -7904,7 +7912,7 @@ msgstr "Başlık biçimi"
 msgid "Title is required"
 msgstr "Başlık gerekli"
 
-#: src/strings.ts:3147
+#: src/strings.ts:3145
 msgid "to directly claim the promotion."
 msgstr "promosyonu doğrudan talep etmek için."
 
@@ -8658,6 +8666,10 @@ msgstr "Özgürce yazın."
 msgid "Writing backup chunk of size... {size}"
 msgstr "{size} boyutunda yedekleme parçası yazılıyor..."
 
+#: src/strings.ts:3161
+msgid "Wrong password."
+msgstr "Yanlış şifre."
+
 #: src/strings.ts:3029
 msgid "Wrong security key"
 msgstr "Yanlış güvenlik anahtarı"
@@ -8723,7 +8735,7 @@ msgstr "Çevrimdışısınız."
 msgid "You are on this plan."
 msgstr "Bu plandasınız."
 
-#: src/strings.ts:3140
+#: src/strings.ts:3138
 msgid "You are one step away from unlocking the full potential of Notesnook."
 msgstr "Notesnook'un tüm potansiyelini ortaya çıkarmaya bir adım uzaktasınız."
 
@@ -8846,7 +8858,7 @@ msgstr "Henüz not defteri eklemediniz"
 msgid "You have not added any tags yet"
 msgstr "Henüz etiket eklemediniz"
 
-#: src/strings.ts:3144
+#: src/strings.ts:3142
 msgid "You have not been billed yet."
 msgstr "Henüz faturalandırılmadınız."
 

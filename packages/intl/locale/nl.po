@@ -595,7 +595,7 @@ msgstr "{percentage}% bijwerken..."
 msgid "{plan} plan"
 msgstr "Abonnement {plan}"
 
-#: src/strings.ts:3142
+#: src/strings.ts:3140
 msgid "{planTitle} plan"
 msgstr "{planTitle}-abonnement"
 
@@ -663,7 +663,7 @@ msgstr "/ maand"
 msgid "#notesnook"
 msgstr "#notesnook"
 
-#: src/strings.ts:3149
+#: src/strings.ts:3147
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Terugblik {year}"
 
@@ -1519,7 +1519,7 @@ msgstr "Opsommingslijst"
 msgid "Bulletproof encryption"
 msgstr "Kogelvrije versleuteling"
 
-#: src/strings.ts:3156
+#: src/strings.ts:3154
 msgid "button to report all bugs. Thank you!"
 msgstr "knop om alle bugs te melden. Bedankt!"
 
@@ -1920,7 +1920,7 @@ msgstr ""
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Bij het legen van de prullenbak worden alle items erin permanent verwijderd. Deze actie is ONOMKEERBAAR."
 
-#: src/strings.ts:3146
+#: src/strings.ts:3144
 msgid "Click here"
 msgstr "Klik hier"
 
@@ -2244,6 +2244,10 @@ msgstr "Kon tabel niet opslaan naar csv"
 #: src/strings.ts:508
 msgid "Could not unlock"
 msgstr "Kan niet ontgrendelen"
+
+#: src/strings.ts:3159
+msgid "Could not unwrap key."
+msgstr "Kon de sleutel niet uitpakken."
 
 #: src/strings.ts:144
 msgid "Create"
@@ -3578,7 +3582,7 @@ msgstr "Notitieboeken filteren..."
 msgid "Filter tags..."
 msgstr "Tags filteren..."
 
-#: src/strings.ts:3138
+#: src/strings.ts:3136
 msgid "Final step, make the payment."
 msgstr "Laatste stap, voer de betaling uit."
 
@@ -3965,7 +3969,7 @@ msgstr "hoe te importeren vanuit {provider}."
 msgid "hr"
 msgstr "u"
 
-#: src/strings.ts:3150
+#: src/strings.ts:3148
 msgid "Huzzah!"
 msgstr "Hoera!"
 
@@ -5084,7 +5088,7 @@ msgstr "Geen"
 msgid "Normal mode"
 msgstr "Normale modus"
 
-#: src/strings.ts:3143
+#: src/strings.ts:3141
 msgid "Not found"
 msgstr "Niet gevonden"
 
@@ -5247,11 +5251,11 @@ msgstr "Notesnook stuurt je desgevraagd een 2FA-code per e-mail"
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook stuurt je desgevraagd een sms met een 2FA-code"
 
-#: src/strings.ts:3151
+#: src/strings.ts:3149
 msgid "Notice"
 msgstr "Kennisgeving"
 
-#: src/strings.ts:3152
+#: src/strings.ts:3150
 msgid "Notice 2"
 msgstr "Kennisgeving 2"
 
@@ -5459,6 +5463,10 @@ msgstr "Wachtwoorden komen niet overeen"
 #: src/strings.ts:711
 msgid "Password incorrect"
 msgstr "Wachtwoord onjuist"
+
+#: src/strings.ts:3160
+msgid "Password is required."
+msgstr "Wachtwoord is vereist."
 
 #: src/strings.ts:732
 msgid "Password not entered"
@@ -7390,7 +7398,7 @@ msgstr "Abonnement niet geactiveerd?"
 msgid "Success"
 msgstr "Geslaagd"
 
-#: src/strings.ts:3141
+#: src/strings.ts:3139
 msgid "Summary"
 msgstr "Overzicht"
 
@@ -7423,7 +7431,7 @@ msgstr "Overschakelen naar gedetailleerde weergave"
 msgid "Switch to search/replace mode"
 msgstr "Overschakelen naar zoeken/vervangen"
 
-#: src/strings.ts:3159
+#: src/strings.ts:3157
 msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
 msgstr "Schakelen tussen bèta- en stabiele versies kan vreemde problemen veroorzaken, waaronder gegevensverlies. Het wordt aanbevolen om ze niet tegelijkertijd te gebruiken. U kunt overschakelen zodra de bètaversie stabiel is."
 
@@ -7822,7 +7830,7 @@ msgstr "Van deze afbeelding kan geen voorbeeld worden getoond"
 msgid "This is a one time purchase, no subscription."
 msgstr "Dit is een eenmalige aankoop, geen abonnement."
 
-#: src/strings.ts:3155
+#: src/strings.ts:3153
 msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
 msgstr "Dit is de bètaversie en deze kan daarom bugs bevatten. Dingen kunnen kapot gaan, maar zouden over het algemeen stabiel moeten zijn. Gebruik de"
 
@@ -7904,7 +7912,7 @@ msgstr "Titelopmaak"
 msgid "Title is required"
 msgstr "Titel is verplicht"
 
-#: src/strings.ts:3147
+#: src/strings.ts:3145
 msgid "to directly claim the promotion."
 msgstr "om de promotie direct te claimen."
 
@@ -8658,6 +8666,10 @@ msgstr "Schrijf in vrijheid."
 msgid "Writing backup chunk of size... {size}"
 msgstr "Back-upblok van grootte {size} schrijven..."
 
+#: src/strings.ts:3161
+msgid "Wrong password."
+msgstr "Verkeerd wachtwoord."
+
 #: src/strings.ts:3029
 msgid "Wrong security key"
 msgstr "Verkeerde beveiligingssleutel"
@@ -8723,7 +8735,7 @@ msgstr "U bent offline."
 msgid "You are on this plan."
 msgstr "Je gebruikt momenteel dit plan."
 
-#: src/strings.ts:3140
+#: src/strings.ts:3138
 msgid "You are one step away from unlocking the full potential of Notesnook."
 msgstr "Je bent één stap verwijderd van het ontgrendelen van het volledige potentieel van Notesnook."
 
@@ -8846,7 +8858,7 @@ msgstr "Je hebt nog geen notitieboeken toegevoegd"
 msgid "You have not added any tags yet"
 msgstr "Je hebt nog geen tags toegevoegd"
 
-#: src/strings.ts:3144
+#: src/strings.ts:3142
 msgid "You have not been billed yet."
 msgstr "Er is nog niets in rekening gebracht."
 
