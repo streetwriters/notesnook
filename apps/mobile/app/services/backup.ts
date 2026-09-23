@@ -248,7 +248,7 @@ async function run(
     })) {
       if (file.type === "file") {
         updateProgress({
-          progress: `Writing backup chunk of size... ${file?.data?.length}`
+          progress: strings.writingBackupChunk(file?.data?.length || 0)
         });
         await RNFetchBlob.fs.writeFile(
           `${zipSourceFolder}/${file.path}`,
@@ -257,7 +257,7 @@ async function run(
         );
       } else if (file.type === "attachment") {
         updateProgress({
-          progress: `Saving attachments in backup... ${file.hash}`
+          progress: strings.savingAttachmentsInBackup(file.hash)
         });
         if (await FileStorage.exists(file.hash)) {
           await RNFetchBlob.fs
@@ -404,7 +404,9 @@ const checkAndRun = async () => {
   if (await checkBackupRequired(settings?.reminder)) {
     try {
       await run();
-    } catch (e) {}
+    } catch (e) {
+      /* empty */
+    }
   }
 };
 
