@@ -60,7 +60,9 @@ import {
   GearSix,
   SignOut,
   Question,
-  SignIn
+  SignIn,
+  LinkBreak,
+  UserProfileIcon
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -898,14 +900,10 @@ function ShortcutItem({
           ]
         },
         {
-          type: "separator",
-          key: "sep32"
-        },
-        {
           type: "button",
           key: "removeshortcut",
           title: strings.doActions.remove.shortcut(1),
-          iconComponent: Trash,
+          iconComponent: LinkBreak,
           onClick: async () => {
             await db.shortcuts.remove(item.id);
             useAppStore.getState().refreshNavItems();
@@ -1081,9 +1079,8 @@ function NavigationDropdown() {
       }}
       data-test-id="profile-dropdown"
       sx={{
-        bg: "background-secondary",
         size: 32,
-        borderRadius: 80,
+        borderRadius: "radius5",
         cursor: "pointer",
         position: "relative",
         border: "1px solid var(--border)",
@@ -1092,14 +1089,26 @@ function NavigationDropdown() {
       }}
     >
       {!user || !user.id || !profile?.profilePicture ? (
-        <User size={14} color="icon" />
+        <Flex
+          sx={{
+            bg: "background-tertiary",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "radius5"
+          }}
+        >
+          <UserProfileIcon size={17} color="icon-secondary" />
+        </Flex>
       ) : (
         <Image
           sx={{
             width: "100%",
             height: "100%",
             objectFit: "contain",
-            borderRadius: 80
+            borderRadius: "radius5"
           }}
           src={profile.profilePicture}
         />
