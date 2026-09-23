@@ -40,7 +40,7 @@ export function BillingHistory() {
         <ErrorText error={transactions.reason} />
       ) : transactions.value?.transactions.length === 0 ? (
         <Text variant="body" sx={{ mt: 2, color: "paragraph-secondary" }}>
-          You have not been billed yet.
+          {strings.youHaveNotBeenBilledYet()}
         </Text>
       ) : (
         <table

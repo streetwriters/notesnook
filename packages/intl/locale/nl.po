@@ -595,6 +595,10 @@ msgstr "{percentage}% bijwerken..."
 msgid "{plan} plan"
 msgstr "Abonnement {plan}"
 
+#: src/strings.ts:3142
+msgid "{planTitle} plan"
+msgstr "{planTitle}-abonnement"
+
 #: src/strings.ts:676
 msgid "{platform, select, android {{name} saved to selected path} other {{name} saved to File Manager/Notesnook/downloads}}"
 msgstr "{platform, select, android {{name} opgeslagen in het geselecteerde pad} other {{name} opgeslagen in File Manager/Notesnook/downloads}}"
@@ -658,6 +662,10 @@ msgstr "/ maand"
 #: src/strings.ts:1648
 msgid "#notesnook"
 msgstr "#notesnook"
+
+#: src/strings.ts:3149
+msgid "🎉 Wrapped {year}"
+msgstr "🎉 Terugblik {year}"
 
 #: src/strings.ts:2442
 msgid "1 day"
@@ -1511,6 +1519,10 @@ msgstr "Opsommingslijst"
 msgid "Bulletproof encryption"
 msgstr "Kogelvrije versleuteling"
 
+#: src/strings.ts:3156
+msgid "button to report all bugs. Thank you!"
+msgstr "knop om alle bugs te melden. Bedankt!"
+
 #: src/strings.ts:360
 msgid "By"
 msgstr "Door"
@@ -1907,6 +1919,10 @@ msgstr ""
 #: src/strings.ts:2026
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Bij het legen van de prullenbak worden alle items erin permanent verwijderd. Deze actie is ONOMKEERBAAR."
+
+#: src/strings.ts:3146
+msgid "Click here"
+msgstr "Klik hier"
 
 #: src/strings.ts:2388
 msgid "Click here to directly claim the promotion."
@@ -3562,6 +3578,10 @@ msgstr "Notitieboeken filteren..."
 msgid "Filter tags..."
 msgstr "Tags filteren..."
 
+#: src/strings.ts:3138
+msgid "Final step, make the payment."
+msgstr "Laatste stap, voer de betaling uit."
+
 #: src/strings.ts:2385
 msgid "Finish your purchase in the browser."
 msgstr "Rond je aankoop af in de browser."
@@ -3944,6 +3964,10 @@ msgstr "hoe te importeren vanuit {provider}."
 #: src/strings.ts:803
 msgid "hr"
 msgstr "u"
+
+#: src/strings.ts:3150
+msgid "Huzzah!"
+msgstr "Hoera!"
 
 #: src/strings.ts:2272
 msgid "I already have an account"
@@ -5060,6 +5084,10 @@ msgstr "Geen"
 msgid "Normal mode"
 msgstr "Normale modus"
 
+#: src/strings.ts:3143
+msgid "Not found"
+msgstr "Niet gevonden"
+
 #: src/strings.ts:346
 msgid "Not logged in"
 msgstr "Niet ingelogd"
@@ -5218,6 +5246,14 @@ msgstr "Notesnook stuurt je desgevraagd een 2FA-code per e-mail"
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook stuurt je desgevraagd een sms met een 2FA-code"
+
+#: src/strings.ts:3151
+msgid "Notice"
+msgstr "Kennisgeving"
+
+#: src/strings.ts:3152
+msgid "Notice 2"
+msgstr "Kennisgeving 2"
 
 #: src/strings.ts:1939
 msgid "Notifications"
@@ -7354,6 +7390,10 @@ msgstr "Abonnement niet geactiveerd?"
 msgid "Success"
 msgstr "Geslaagd"
 
+#: src/strings.ts:3141
+msgid "Summary"
+msgstr "Overzicht"
+
 #: src/strings.ts:569
 msgid "Sun"
 msgstr "zo"
@@ -7382,6 +7422,10 @@ msgstr "Overschakelen naar gedetailleerde weergave"
 #: src/strings.ts:1360
 msgid "Switch to search/replace mode"
 msgstr "Overschakelen naar zoeken/vervangen"
+
+#: src/strings.ts:3159
+msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
+msgstr "Schakelen tussen bèta- en stabiele versies kan vreemde problemen veroorzaken, waaronder gegevensverlies. Het wordt aanbevolen om ze niet tegelijkertijd te gebruiken. U kunt overschakelen zodra de bètaversie stabiel is."
 
 #: src/strings.ts:1937
 msgid "Sync"
@@ -7778,6 +7822,10 @@ msgstr "Van deze afbeelding kan geen voorbeeld worden getoond"
 msgid "This is a one time purchase, no subscription."
 msgstr "Dit is een eenmalige aankoop, geen abonnement."
 
+#: src/strings.ts:3155
+msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
+msgstr "Dit is de bètaversie en deze kan daarom bugs bevatten. Dingen kunnen kapot gaan, maar zouden over het algemeen stabiel moeten zijn. Gebruik de"
+
 #: src/strings.ts:1861
 msgid "This may take a while"
 msgstr "Dit kan even duren"
@@ -7855,6 +7903,10 @@ msgstr "Titelopmaak"
 #: src/strings.ts:2499
 msgid "Title is required"
 msgstr "Titel is verplicht"
+
+#: src/strings.ts:3147
+msgid "to directly claim the promotion."
+msgstr "om de promotie direct te claimen."
 
 #: src/strings.ts:2683
 msgid "To protect your privacy, we will download the image & add it to your attachments."
@@ -8671,6 +8723,10 @@ msgstr "U bent offline."
 msgid "You are on this plan."
 msgstr "Je gebruikt momenteel dit plan."
 
+#: src/strings.ts:3140
+msgid "You are one step away from unlocking the full potential of Notesnook."
+msgstr "Je bent één stap verwijderd van het ontgrendelen van het volledige potentieel van Notesnook."
+
 #: src/strings.ts:809
 msgid "You are renaming color {color}"
 msgstr "Je hernoemt kleur {color}"
@@ -8789,6 +8845,10 @@ msgstr "Je hebt nog geen notitieboeken toegevoegd"
 #: src/strings.ts:877
 msgid "You have not added any tags yet"
 msgstr "Je hebt nog geen tags toegevoegd"
+
+#: src/strings.ts:3144
+msgid "You have not been billed yet."
+msgstr "Er is nog niets in rekening gebracht."
 
 #: src/strings.ts:876
 msgid "You have not created any notes yet"

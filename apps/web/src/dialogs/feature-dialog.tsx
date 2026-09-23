@@ -74,27 +74,19 @@ const features: Record<FeatureKeys, Feature> = {
       ? [
           {
             icon: Warn,
-            title: "Notice",
+            title: strings.notice(),
             subtitle: (
               <>
-                This is the beta version and as such will contain bugs. Things
-                are expected to break but should be generally stable. Please use
-                the <Code text="Report an issue" /> button to report all bugs.
-                Thank you!
+                {strings.betaWarningDescription[0]()}{" "}
+                <Code text={strings.reportAnIssue()} />{" "}
+                {strings.betaWarningDescription[1]()}
               </>
             )
           },
           {
             icon: Warn,
-            title: "Notice 2",
-            subtitle: (
-              <>
-                Switching between beta &amp; stable versions can cause weird
-                issues including data loss. It is recommended that you do not
-                use both simultaneously. You can switch once the beta version
-                enters stable.
-              </>
-            )
+            title: strings.notice2(),
+            subtitle: strings.betaSwitchingWarning()
           }
         ]
       : [],

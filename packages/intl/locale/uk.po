@@ -595,6 +595,10 @@ msgstr "{percentage}% оновлення..."
 msgid "{plan} plan"
 msgstr "Тариф {plan}"
 
+#: src/strings.ts:3142
+msgid "{planTitle} plan"
+msgstr "Тариф {planTitle}"
+
 #: src/strings.ts:676
 msgid "{platform, select, android {{name} saved to selected path} other {{name} saved to File Manager/Notesnook/downloads}}"
 msgstr "{platform, select, android {{name} збережено у вибраній папці} other {{name} збережено у File Manager/Notesnook/downloads}}"
@@ -658,6 +662,10 @@ msgstr "/ місяць"
 #: src/strings.ts:1648
 msgid "#notesnook"
 msgstr "#notesnook"
+
+#: src/strings.ts:3149
+msgid "🎉 Wrapped {year}"
+msgstr "🎉 Підсумки року {year}"
 
 #: src/strings.ts:2442
 msgid "1 day"
@@ -1511,6 +1519,10 @@ msgstr "Маркований список"
 msgid "Bulletproof encryption"
 msgstr "Бездоганне шифрування"
 
+#: src/strings.ts:3156
+msgid "button to report all bugs. Thank you!"
+msgstr "щоб повідомити про всі помилки. Дякуємо!"
+
 #: src/strings.ts:360
 msgid "By"
 msgstr "Автор"
@@ -1907,6 +1919,10 @@ msgstr ""
 #: src/strings.ts:2026
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Очищення кошика безповоротно видалить усі елементи в ньому. Ця дія НЕЗВОРОТНА."
+
+#: src/strings.ts:3146
+msgid "Click here"
+msgstr "Натисніть тут"
 
 #: src/strings.ts:2388
 msgid "Click here to directly claim the promotion."
@@ -3562,6 +3578,10 @@ msgstr "Фільтрувати блокноти..."
 msgid "Filter tags..."
 msgstr "Фільтрувати теги..."
 
+#: src/strings.ts:3138
+msgid "Final step, make the payment."
+msgstr "Останній крок, здійсніть оплату."
+
 #: src/strings.ts:2385
 msgid "Finish your purchase in the browser."
 msgstr "Завершіть покупку в браузері."
@@ -3944,6 +3964,10 @@ msgstr "як імпортувати з {provider}."
 #: src/strings.ts:803
 msgid "hr"
 msgstr "год"
+
+#: src/strings.ts:3150
+msgid "Huzzah!"
+msgstr "Ура!"
 
 #: src/strings.ts:2272
 msgid "I already have an account"
@@ -5060,6 +5084,10 @@ msgstr "Немає"
 msgid "Normal mode"
 msgstr "Звичайний режим"
 
+#: src/strings.ts:3143
+msgid "Not found"
+msgstr "Не знайдено"
+
 #: src/strings.ts:346
 msgid "Not logged in"
 msgstr "Вхід не виконано"
@@ -5218,6 +5246,14 @@ msgstr "Notesnook надішле вам код 2FA на електронну п�
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook надішле вам SMS із кодом 2FA за запитом"
+
+#: src/strings.ts:3151
+msgid "Notice"
+msgstr "Повідомлення"
+
+#: src/strings.ts:3152
+msgid "Notice 2"
+msgstr "Повідомлення 2"
 
 #: src/strings.ts:1939
 msgid "Notifications"
@@ -7354,6 +7390,10 @@ msgstr "Підписку не активовано?"
 msgid "Success"
 msgstr "Успішно"
 
+#: src/strings.ts:3141
+msgid "Summary"
+msgstr "Підсумок"
+
 #: src/strings.ts:569
 msgid "Sun"
 msgstr "Нд"
@@ -7382,6 +7422,10 @@ msgstr "Перейти до детального вигляду"
 #: src/strings.ts:1360
 msgid "Switch to search/replace mode"
 msgstr "Перейти в режим пошуку та заміни"
+
+#: src/strings.ts:3159
+msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
+msgstr "Перемикання між бета- та стабільною версіями може спричинити несподівані проблеми, включаючи втрату даних. Рекомендується не використовувати обидві одночасно. Ви зможете перемкнутися, коли бета-версія стане стабільною."
 
 #: src/strings.ts:1937
 msgid "Sync"
@@ -7778,6 +7822,10 @@ msgstr "Попередній перегляд цього зображення н
 msgid "This is a one time purchase, no subscription."
 msgstr "Це одноразова покупка, а не підписка."
 
+#: src/strings.ts:3155
+msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
+msgstr "Це бета-версія, і вона може містити помилки. Деякі речі можуть ламатися, але загалом вона має бути стабільною. Будь ласка, використовуйте кнопку"
+
 #: src/strings.ts:1861
 msgid "This may take a while"
 msgstr "Це може зайняти деякий час"
@@ -7855,6 +7903,10 @@ msgstr "Формат заголовка"
 #: src/strings.ts:2499
 msgid "Title is required"
 msgstr "Заголовок обов'язковий"
+
+#: src/strings.ts:3147
+msgid "to directly claim the promotion."
+msgstr "щоб напряму отримати промокод."
 
 #: src/strings.ts:2683
 msgid "To protect your privacy, we will download the image & add it to your attachments."
@@ -8671,6 +8723,10 @@ msgstr "Ви офлайн."
 msgid "You are on this plan."
 msgstr "Ви на цьому плані."
 
+#: src/strings.ts:3140
+msgid "You are one step away from unlocking the full potential of Notesnook."
+msgstr "Ви за крок від розкриття повного потенціалу Notesnook."
+
 #: src/strings.ts:809
 msgid "You are renaming color {color}"
 msgstr "Ви перейменовуєте колір {color}"
@@ -8789,6 +8845,10 @@ msgstr "Ви ще не додали жодного блокнота"
 #: src/strings.ts:877
 msgid "You have not added any tags yet"
 msgstr "Ви ще не додали жодного тега"
+
+#: src/strings.ts:3144
+msgid "You have not been billed yet."
+msgstr "Вам ще не виставляли рахунків."
 
 #: src/strings.ts:876
 msgid "You have not created any notes yet"
