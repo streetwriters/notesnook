@@ -72,8 +72,7 @@ export const ChangePlanDialog = DialogManager.register(
                 textAlign: "center"
               }}
             >
-              You will only pay the prorated amount for the new subscription
-              plan
+              {strings.onlyPayProratedAmount()}
             </Text>
           </Flex>
           <PlansList
@@ -83,9 +82,9 @@ export const ChangePlanDialog = DialogManager.register(
             onPlanSelected={async (plan) => {
               const result = await ConfirmDialog.show({
                 title: strings.confirmPlanChange(),
-                message: `Your plan will be switched to ${
+                message: strings.planSwitchedConfirmation(
                   PLAN_METADATA[plan.plan].title
-                } plan. You will receive a credit for unused time on your previous subscription, and you will only pay the prorated amount for your new subscription.`,
+                ),
                 positiveButtonText: strings.confirm(),
                 negativeButtonText: strings.cancel()
               });

@@ -35,7 +35,7 @@ import { ConfirmDialog } from "./confirm";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
-const COLUMNS = [
+const getColumns = () => [
   { title: strings.dateSynced(), width: "160px" },
   { title: strings.error(), width: "120px" },
   { title: strings.description(), width: "1fr" },
@@ -44,9 +44,18 @@ const COLUMNS = [
 ];
 
 const ERROR_CHIP_STYLES: Record<
-  InboxItemsHistoryErrorContext["message"],
+  string,
   { bg: string; color: string }
 > = {
+  get [strings.decryptionFailed()]() {
+    return { bg: "background-error", color: "accent-error" };
+  },
+  get [strings.invalidJson()]() {
+    return { bg: "rgba(255, 152, 0, 0.15)", color: "#e65100" };
+  },
+  get [strings.validationFailed()]() {
+    return { bg: "rgba(255, 193, 7, 0.15)", color: "#8a6000" };
+  },
   "Decryption failed": { bg: "background-error", color: "accent-error" },
   "Invalid JSON": { bg: "rgba(255, 152, 0, 0.15)", color: "#e65100" },
   "Validation failed": { bg: "rgba(255, 193, 7, 0.15)", color: "#8a6000" }
@@ -69,6 +78,7 @@ function ErrorBadge({
     bg: "background-error",
     color: "accent-error"
   };
+
   return (
     <Text
       sx={{
@@ -119,7 +129,7 @@ function DetailsCell({ value }: { value: string }) {
       {(hovered || copied) && (
         <Button
           variant="icon"
-          title="Copy"
+          title={strings.copy()}
           onClick={handleCopy}
           sx={{
             position: "absolute",
@@ -223,7 +233,7 @@ export const InboxHistoryDialog = DialogManager.register(
               >
                 <Box as="thead">
                   <Box as="tr">
-                    {COLUMNS.map((col) => (
+                    {getColumns().map((col) => (
                       <Box
                         key={col.title}
                         as="th"

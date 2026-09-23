@@ -63,7 +63,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
       const password = passwordRef.current?.value;
       if (!password || typeof password !== "string") {
         setIsUnlocking(false);
-        setError("Password is required.");
+        setError(strings.passwordIsRequired());
         return;
       }
 
@@ -76,9 +76,12 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
               ? e
               : "message" in e && typeof e.message === "string"
               ? e.message === "ciphertext cannot be decrypted using that key" ||
-                e.message === "Could not unwrap key."
-                ? "Wrong password."
-                : e.message || "Wrong password."
+                e.message === "Could not unwrap key." ||
+                e.message === strings.couldNotUnwrapKey() ||
+                e.message === strings.passwordIncorrect() ||
+                e.message === "Wrong password."
+                ? strings.wrongPassword()
+                : e.message || strings.wrongPassword()
               : JSON.stringify(e)
           );
         })

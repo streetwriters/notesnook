@@ -97,7 +97,12 @@ export const AttachmentGroupProgress = (props: { groupId?: string }) => {
           {fileProgress?.percent ? `(${fileProgress.percent})` : ""}
         </Paragraph>
         <Paragraph size={10} color={colors.secondary.paragraph}>
-          {strings.group()}: {props.groupId}
+          {strings.group()}:{" "}
+          {props.groupId === "offline-mode"
+            ? strings.offlineMode()
+            : props.groupId?.startsWith("download-all")
+            ? strings.downloadAllAttachments()
+            : props.groupId}
         </Paragraph>
       </View>
       {props.groupId === "offline-mode" ? null : (

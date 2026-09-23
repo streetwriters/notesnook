@@ -483,7 +483,7 @@ function NavigationMenu({
             hardNavigate("/wrapped");
           }}
         >
-          🎉 Wrapped {new Date().getFullYear()}
+          {strings.wrappedTitle(new Date().getFullYear())}
         </Button>
       ) : null}
     </ScopedThemeProvider>

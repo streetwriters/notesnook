@@ -145,6 +145,7 @@ const callout = (editor: Editor): MenuItem => ({
   title: strings.callout(),
   icon: Icons.callout,
   menu: {
+    title: strings.callout(),
     items: [
       { key: "Abstract", title: strings.abstract() },
       { key: "Hint", title: strings.hint() },

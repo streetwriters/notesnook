@@ -509,7 +509,7 @@ export const Search = ({
               }}
               allowFontScaling={false}
             >
-              Add #{searchKeyword}
+              {strings.addHashTag(searchKeyword)}
             </Paragraph>
           </TouchableOpacity>
         ) : null}

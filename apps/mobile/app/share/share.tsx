@@ -631,7 +631,7 @@ const ShareView = () => {
                         color={colors.primary.paragraph}
                         allowFontScaling={false}
                       >
-                        Attaching {rawFiles.length} file(s):
+                        {strings.attachingFilesCount(rawFiles.length)}
                       </Paragraph>
                       <ScrollView horizontal>
                         {rawFiles.map((item) =>
@@ -962,7 +962,7 @@ const AppendNote = ({
         flexWrap: "wrap"
       }}
     >
-      Above content will append to{" "}
+      {strings.aboveContentWillAppendTo()}{" "}
       <Paragraph
         size={AppFontSize.xs}
         style={{
@@ -972,8 +972,8 @@ const AppendNote = ({
         allowFontScaling={false}
       >
         {`"${item.title}"`}
-      </Paragraph>{" "}
-      . Click on {'"New note"'} to create a new note.
+      </Paragraph>
+      {strings.clickOnNewNoteToCreateNote()}
     </Paragraph>
   );
 };

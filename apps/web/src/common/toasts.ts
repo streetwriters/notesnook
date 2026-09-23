@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { FeatureResult } from "@notesnook/common";
 import { showToast } from "../utils/toast";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
+import { strings } from "@notesnook/intl";
 
 export function showFeatureNotAllowedToast(
   result: FeatureResult<any> | undefined
@@ -27,7 +28,7 @@ export function showFeatureNotAllowedToast(
   if (!result) return;
   showToast("error", result.error, [
     {
-      text: "Upgrade",
+      text: strings.upgradeNow(),
       onClick: () =>
         UpgradeDialog.show({
           feature: result

@@ -430,7 +430,7 @@ const PayWall = (props: NavigationProps<"PayWall">) => {
                     }}
                     size={AppFontSize.md}
                   >
-                    12.5K stars
+                    {strings.starsCount("12.5K")}
                   </Paragraph>
                 </TouchableOpacity>
 

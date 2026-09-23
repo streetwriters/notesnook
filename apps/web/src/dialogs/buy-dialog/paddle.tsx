@@ -22,6 +22,7 @@ import { Flex } from "@theme-ui/components";
 import { Loader } from "../../components/loader";
 import { PaddleEvent, Plan, PricingInfo } from "./types";
 import { ScrollContainer } from "@notesnook/ui";
+import { strings } from "@notesnook/intl";
 import useMobile from "../../hooks/use-mobile";
 import {
   AvailablePaymentMethod,
@@ -175,8 +176,8 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
           <Loader
             title={
               coupon
-                ? "Applying coupon code..."
-                : "Loading checkout. Please wait..."
+                ? strings.applyingCouponCode()
+                : strings.loadingCheckoutPleaseWait()
             }
           />
         </Flex>

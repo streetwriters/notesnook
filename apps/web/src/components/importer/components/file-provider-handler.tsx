@@ -165,14 +165,14 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
     return (
       <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
         <Text variant="subtitle">
-          Processing {filesProgress.done} of {filesProgress.total} file(s)
+          {strings.processingFiles(filesProgress.done, filesProgress.total)}
         </Text>
         <Text variant="body" sx={{ mt: 4, textAlign: "center" }}>
           {strings.foundNotes(totalNoteCount)}
         </Text>
         {logs.current.length > 0 && (
           <Accordion
-            title="Logs"
+            title={strings.logs()}
             isClosed={false}
             sx={{
               border: "1px solid var(--border)",
@@ -215,15 +215,17 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
 
   return (
     <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
-      <Text variant="subtitle">Select {provider.name} files</Text>
+      <Text variant="subtitle">
+        {strings.selectProviderFiles(provider.name)}
+      </Text>
       <Text
         variant="body"
         as={"div"}
         sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
       >
-        Check out our step-by-step guide on{" "}
+        {strings.checkOutOurStepByStepGuideOn()}{" "}
         <a href={provider.helpLink} target="_blank" rel="noreferrer">
-          how to import from {provider?.name}.
+          {strings.howToImportFrom(provider?.name)}
         </a>
       </Text>
       <Flex
@@ -244,20 +246,23 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         <Input {...getInputProps()} />
         <Text variant="body" sx={{ textAlign: "center" }}>
           {isDragActive
-            ? "Drop the files here"
-            : "Drag & drop files here, or click to select files"}
+            ? strings.dropTheFilesHere()
+            : strings.dragDropFilesHere()}
           <br />
           <Text variant="subBody">
-            Only {provider?.supportedExtensions.join(", ")} files are supported.{" "}
+            {strings.onlySupportedExtensions(
+              provider?.supportedExtensions.join(", ")
+            )}{" "}
             {provider?.supportedExtensions.includes(".zip") ? null : (
               <>
-                You can also select .zip files containing{" "}
-                {provider?.supportedExtensions.join(", ")} files.
+                {strings.canAlsoSelectZipFiles(
+                  provider?.supportedExtensions.join(", ")
+                )}
               </>
             )}
             <br />
             {provider.examples ? (
-              <>For example, {provider.examples.join(", ")}</>
+              <>{strings.forExampleExtensions(provider.examples.join(", "))}</>
             ) : null}
           </Text>
         </Text>
@@ -266,9 +271,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       {files.length > 0 ? (
         <Accordion
           isClosed
-          title={`${files.length} ${
-            files.length > 1 ? "files" : "file"
-          } selected`}
+          title={strings.filesSelected(files.length)}
           sx={{
             border: "1px solid var(--border)",
             mt: 2,
@@ -320,9 +323,9 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
               p: 1
             }}
           >
-            Please make sure you have at least{" "}
-            {formatBytes(files.reduce((prev, file) => prev + file.size, 0))} of
-            free space before proceeding.
+            {strings.freeSpaceWarning(
+              formatBytes(files.reduce((prev, file) => prev + file.size, 0))
+            )}
           </Text>
           {provider.requiresNetwork ? (
             <Text
@@ -335,9 +338,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
                 p: 1
               }}
             >
-              Please make sure you have good Internet access before proceeding.
-              The importer may send network requests in order to download media
-              resources such as images, files, and other attachments.
+              {strings.networkWarningForImport()}
             </Text>
           ) : null}
           <Button
@@ -345,7 +346,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
             sx={{ alignSelf: "center", mt: 2, px: 4 }}
             onClick={onStartImport}
           >
-            Start importing
+            {strings.startImporting()}
           </Button>
         </>
       )}
