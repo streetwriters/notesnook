@@ -1239,7 +1239,13 @@ $day$: Current day (eg. Monday)`,
   shareBackup: () => t`Share backup`,
   neverAskAgain: () => t`Never ask again`,
   backingUpData: (type?: "full" | "partial") =>
-    t`Creating a${type === "full" ? " full" : ""} backup`,
+    type === "full" ? t`Creating a full backup` : t`Creating a backup`,
+  savingAttachmentsInBackup: (hash: string) =>
+    t`Saving attachments in backup... ${hash}`,
+  writingBackupChunk: (size: number) =>
+    t`Writing backup chunk of size... ${size}`,
+  savingFile: (path: string) => t`Saving file: ${path}`,
+  creatingBackupNamed: (name: string) => t`Creating backup (${name})`,
   backupDataDesc: () =>
     t`All your backups are stored in 'Phone Storage/Notesnook/backups/' folder`,
   backupSuccess: () => t`Backup successful`,
