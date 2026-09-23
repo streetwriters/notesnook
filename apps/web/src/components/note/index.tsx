@@ -841,7 +841,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
     {
       type: "button",
       key: "assign-tags",
-      title: strings.assignTo(),
+      title: strings.addTag(),
       iconComponent: Plus,
       onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
