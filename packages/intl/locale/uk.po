@@ -80,6 +80,10 @@ msgstr "{count, plural, one {# нотатка} few {# нотатки} many {# н
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# рядок} few {# рядки} many {# рядків} other {# рядків}}"
 
+#: src/strings.ts:3231
+msgid "{count, plural, one {# word} other {# words}}"
+msgstr "{count, plural, one {# слово} few {# слова} many {# слів} other {# слів}}"
+
 #: src/strings.ts:1460
 msgid "{count, plural, one {1 hour} other {# hours}}"
 msgstr "{count, plural, one {1 година} few {# години} many {# годин} other {# годин}}"
@@ -691,9 +695,17 @@ msgstr "Більше 10 тем"
 msgid "100% cross platform"
 msgstr "100% кросплатформність"
 
+#: src/strings.ts:3226
+msgid "100% encrypted."
+msgstr "100% зашифровано."
+
 #: src/strings.ts:3054
 msgid "100% end-to-end encrypted"
 msgstr "100% наскрізне шифрування"
+
+#: src/strings.ts:3227
+msgid "100% yours."
+msgstr "100% ваше."
 
 #: src/strings.ts:1037
 msgid "12-hour"
@@ -4013,6 +4025,10 @@ msgstr "Я розумію, змінити мій пароль"
 msgid "ID copied"
 msgstr "ID скопійовано"
 
+#: src/strings.ts:3223
+msgid "ideas"
+msgstr "ідей"
+
 #: src/strings.ts:2837
 msgid "ideas, thoughts, memories. 100% encrypted. 100% yours."
 msgstr "ідеї, думки, спогади. На 100% зашифровано. На 100% ваше."
@@ -4722,6 +4738,10 @@ msgstr "Максимальна дата нагадування — {maxDate}"
 msgid "Member since {date}"
 msgstr "Учасник з {date}"
 
+#: src/strings.ts:3225
+msgid "memories."
+msgstr "спогадів."
+
 #: src/strings.ts:2090
 msgid "Merge cells"
 msgstr "Об'єднати клітинки"
@@ -5250,6 +5270,10 @@ msgstr "Notesnook надішле вам код 2FA на електронну п�
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook надішле вам SMS із кодом 2FA за запитом"
+
+#: src/strings.ts:3228
+msgid "NOTESNOOK WRAPPED {year}"
+msgstr "NOTESNOOK ПІДСУМКИ {year}"
 
 #: src/strings.ts:3149
 msgid "Notice"
@@ -6672,6 +6696,10 @@ msgstr "Збереження ZIP-архіву. Зачекайте..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Відскануйте QR-код застосунком автентифікації"
 
+#: src/strings.ts:3221
+msgid "Scroll down to explore"
+msgstr "Прокрутіть униз, щоб дізнатися більше"
+
 #: src/strings.ts:2268
 msgid "Scroll to bottom"
 msgstr "Прокрутити донизу"
@@ -7698,6 +7726,10 @@ msgstr "Дякуємо за ваш відгук!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Дякуємо. Ви — доказ того, що приватність завжди понад усе."
 
+#: src/strings.ts:3222
+msgid "That's"
+msgstr "Це"
+
 #: src/strings.ts:2841
 msgid "That's almost the length of a short novel!"
 msgstr "Це майже довжина короткого роману!"
@@ -7878,6 +7910,10 @@ msgstr "Цю нотатку буде опубліковано за публіч�
 #: src/strings.ts:1896
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Це ім'я користувача використовуватиметься для розрізнення облікових даних у вашому ключі безпеки. Переконайтеся, що воно унікальне."
+
+#: src/strings.ts:3224
+msgid "thoughts"
+msgstr "думок"
 
 #: src/strings.ts:573
 msgid "Thu"
@@ -9056,6 +9092,14 @@ msgstr "Ваш безкоштовний пробний період триває
 #: src/strings.ts:1636
 msgid "Your full name"
 msgstr "Ваше повне ім'я"
+
+#: src/strings.ts:3235
+msgid "Your largest attachment was"
+msgstr "Ваше найбільше вкладення було"
+
+#: src/strings.ts:3229
+msgid "Your longest note was"
+msgstr "Ваша найдовша нотатка містила"
 
 #: src/strings.ts:873
 msgid "Your monographs"

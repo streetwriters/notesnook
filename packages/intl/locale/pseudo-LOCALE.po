@@ -80,6 +80,10 @@ msgstr "{count, plural, one {# note} other {# notes}}"
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# row} other {# rows}}"
 
+#: src/strings.ts:3231
+msgid "{count, plural, one {# word} other {# words}}"
+msgstr "[{count, plural, one {# ẇǿǿřḓ} other {# ẇǿǿřḓş}}]"
+
 #: src/strings.ts:1460
 msgid "{count, plural, one {1 hour} other {# hours}}"
 msgstr "{count, plural, one {1 hour} other {# hours}}"
@@ -691,9 +695,17 @@ msgstr "10+ themes"
 msgid "100% cross platform"
 msgstr "100% cross platform"
 
+#: src/strings.ts:3226
+msgid "100% encrypted."
+msgstr "[100% ḗḗƞƈřẏƥťḗḗḓ.]"
+
 #: src/strings.ts:3054
 msgid "100% end-to-end encrypted"
 msgstr "100% end-to-end encrypted"
+
+#: src/strings.ts:3227
+msgid "100% yours."
+msgstr "[100% ẏǿǿŭŭřş.]"
 
 #: src/strings.ts:1037
 msgid "12-hour"
@@ -3747,7 +3759,7 @@ msgstr "Full screen"
 
 #: src/strings.ts:2846
 msgid "Fun facts of the year"
-msgstr ""
+msgstr "[Ƒŭŭƞ ƒȧȧƈťş ǿǿƒ ťħḗḗ ẏḗḗȧȧř]"
 
 #: src/strings.ts:1897
 msgid "General"
@@ -3755,7 +3767,7 @@ msgstr "General"
 
 #: src/strings.ts:2847
 msgid "Generated 100% locally on your device."
-msgstr ""
+msgstr "[Ģḗḗƞḗḗřȧȧťḗḗḓ 100% łǿǿƈȧȧłłẏ ǿǿƞ ẏǿǿŭŭř ḓḗḗṽȋȋƈḗḗ.]"
 
 #: src/strings.ts:3007
 msgid "Generating..."
@@ -4013,6 +4025,10 @@ msgstr "I understand, change my password"
 #: src/strings.ts:834
 msgid "ID copied"
 msgstr "ID copied"
+
+#: src/strings.ts:3223
+msgid "ideas"
+msgstr "[ȋȋḓḗḗȧȧş]"
 
 #: src/strings.ts:2837
 msgid "ideas, thoughts, memories. 100% encrypted. 100% yours."
@@ -4382,7 +4398,7 @@ msgstr "Let us know if you have faced any issue/bug while using Notesnook. We wi
 
 #: src/strings.ts:2833
 msgid "Let's look back at your year in Notesnook"
-msgstr ""
+msgstr "[Łḗḗť'ş łǿǿǿƙ ƀȧȧƈƙ ȧȧť ẏǿǿŭŭř ẏḗḗȧȧř ȋȋƞ Ƞǿǿťḗḗşƞǿǿǿƙ]"
 
 #: src/strings.ts:2762
 msgid "Level up with more storage."
@@ -4721,6 +4737,10 @@ msgstr "Maximum reminder date is {maxDate}"
 #: src/strings.ts:1637
 msgid "Member since {date}"
 msgstr "Member since {date}"
+
+#: src/strings.ts:3225
+msgid "memories."
+msgstr "[ḿḗḗḿǿǿřȋȋḗḗş.]"
 
 #: src/strings.ts:2090
 msgid "Merge cells"
@@ -5193,11 +5213,11 @@ msgstr "Notes exported as {path} successfully"
 
 #: src/strings.ts:2844
 msgid "Notes per month"
-msgstr ""
+msgstr "[Ƞǿǿťḗḗş ƥḗḗř ḿǿǿƞťħ]"
 
 #: src/strings.ts:2835
 msgid "notes this year"
-msgstr ""
+msgstr "[ƞǿǿťḗḗş ťħȋȋş ẏḗḗȧȧř]"
 
 #: src/strings.ts:2318
 msgid "Notesnook"
@@ -5250,6 +5270,10 @@ msgstr "Notesnook will send you a 2FA code on your email when prompted"
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook will send you an SMS with a 2FA code when prompted"
+
+#: src/strings.ts:3228
+msgid "NOTESNOOK WRAPPED {year}"
+msgstr "[ȠǾØŦÉĖŞȠǾØǾØĶ ẆŘÁȦƤƤÉĖĎ {year}]"
 
 #: src/strings.ts:3149
 msgid "Notice"
@@ -6672,6 +6696,10 @@ msgstr "Saving zip file. Please wait..."
 msgid "Scan the QR code with your authenticator app"
 msgstr "Scan the QR code with your authenticator app"
 
+#: src/strings.ts:3221
+msgid "Scroll down to explore"
+msgstr "[Şƈřǿǿłł ḓǿǿẇƞ ťǿǿ ḗḗẋƥłǿǿřḗḗ]"
+
 #: src/strings.ts:2268
 msgid "Scroll to bottom"
 msgstr "Scroll to bottom"
@@ -7699,6 +7727,10 @@ msgstr "Thank you for your feedback!"
 msgid "Thank you. You are the proof that privacy always comes first."
 msgstr "Thank you. You are the proof that privacy always comes first."
 
+#: src/strings.ts:3222
+msgid "That's"
+msgstr "[Ŧħȧȧť'ş]"
+
 #: src/strings.ts:2841
 msgid "That's almost the length of a short novel!"
 msgstr ""
@@ -7877,6 +7909,10 @@ msgstr "This note will be published to a public URL."
 #: src/strings.ts:1896
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
+
+#: src/strings.ts:3224
+msgid "thoughts"
+msgstr "[ťħǿǿŭŭģħťş]"
 
 #: src/strings.ts:573
 msgid "Thu"
@@ -8635,7 +8671,7 @@ msgstr "Words"
 
 #: src/strings.ts:2839
 msgid "words this year"
-msgstr ""
+msgstr "[ẇǿǿřḓş ťħȋȋş ẏḗḗȧȧř]"
 
 #: src/strings.ts:2845
 msgid "Words written"
@@ -8825,7 +8861,7 @@ msgstr ""
 
 #: src/strings.ts:2834
 msgid "You created"
-msgstr ""
+msgstr "[Ýǿǿŭŭ ƈřḗḗȧȧťḗḗḓ]"
 
 #: src/strings.ts:1622
 msgid "You have {count} custom dictionary words."
@@ -8945,11 +8981,11 @@ msgstr "You will receive instructions on how to recover your account on this ema
 
 #: src/strings.ts:2838
 msgid "You wrote a total of"
-msgstr ""
+msgstr "[Ýǿǿŭŭ ẇřǿǿťḗḗ ȧȧ ťǿǿťȧȧł ǿǿƒ]"
 
 #: src/strings.ts:2831
 msgid "Your {year} Wrapped"
-msgstr ""
+msgstr "[Ýǿǿŭŭř {year} Ẇřȧȧƥƥḗḗḓ]"
 
 #: src/strings.ts:419
 msgid "Your account email will be changed without affecting your subscription or any other settings."
@@ -9034,7 +9070,7 @@ msgstr "Your email is not confirmed. Please confirm your email address to change
 
 #: src/strings.ts:2843
 msgid "Your favorite day to write was"
-msgstr ""
+msgstr "[Ýǿǿŭŭř ƒȧȧṽǿǿřȋȋťḗḗ ḓȧȧẏ ťǿǿ ẇřȋȋťḗḗ ẇȧȧş]"
 
 #: src/strings.ts:870
 msgid "Your favorites"
@@ -9052,13 +9088,21 @@ msgstr "Your free trial is on-going. Your subscription will start on {trialExpir
 msgid "Your full name"
 msgstr "Your full name"
 
+#: src/strings.ts:3235
+msgid "Your largest attachment was"
+msgstr "[Ýǿǿŭŭř łȧȧřģḗḗşť ȧȧťťȧȧƈħḿḗḗƞť ẇȧȧş]"
+
+#: src/strings.ts:3229
+msgid "Your longest note was"
+msgstr "[Ýǿǿŭŭř łǿǿƞģḗḗşť ƞǿǿťḗḗ ẇȧȧş]"
+
 #: src/strings.ts:873
 msgid "Your monographs"
 msgstr "Your monographs"
 
 #: src/strings.ts:2842
 msgid "Your most productive month was"
-msgstr ""
+msgstr "[Ýǿǿŭŭř ḿǿǿşť ƥřǿǿḓŭŭƈťȋȋṽḗḗ ḿǿǿƞťħ ẇȧȧş]"
 
 #: src/strings.ts:1210
 msgid "Your name is stored 100% end-to-end encrypted and only visible to you."
