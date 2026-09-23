@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { DataURL } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 
 export type DownloadOptions = {
   corsHost?: string;
@@ -77,7 +78,8 @@ export async function downloadImage(url: string, options?: DownloadOptions) {
     cache: "force-cache",
     signal: options?.signal
   });
-  if (!response.ok) throw new Error(`invalid status code ${response.status}`);
+  if (!response.ok)
+    throw new Error(strings.invalidStatusCode(response.status));
 
   let contentType = response.headers.get("Content-Type");
 

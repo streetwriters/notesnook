@@ -89,7 +89,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
               borderRadius: "default"
             }}
           >
-            {strings.failedToDownloadImage(error.toLowerCase())}
+            {strings.failedToDownloadImage(error)}
           </Text>
         ) : (
           <Text
