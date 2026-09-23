@@ -595,6 +595,10 @@ msgstr "%{percentage} güncelleniyor..."
 msgid "{plan} plan"
 msgstr "{plan} planı"
 
+#: src/strings.ts:3142
+msgid "{planTitle} plan"
+msgstr "{planTitle} planı"
+
 #: src/strings.ts:676
 msgid "{platform, select, android {{name} saved to selected path} other {{name} saved to File Manager/Notesnook/downloads}}"
 msgstr "{platform, select, android {{name} seçilen konuma kaydedildi} other {{name} File Manager/Notesnook/downloads konumuna kaydedildi}}"
@@ -658,6 +662,10 @@ msgstr "/ ay"
 #: src/strings.ts:1648
 msgid "#notesnook"
 msgstr "#notesnook"
+
+#: src/strings.ts:3149
+msgid "🎉 Wrapped {year}"
+msgstr "🎉 Özet {year}"
 
 #: src/strings.ts:2442
 msgid "1 day"
@@ -1511,6 +1519,10 @@ msgstr "Madde işaretli liste"
 msgid "Bulletproof encryption"
 msgstr "Kurşun geçirmez şifreleme"
 
+#: src/strings.ts:3156
+msgid "button to report all bugs. Thank you!"
+msgstr "düğmesini kullanın. Teşekkürler!"
+
 #: src/strings.ts:360
 msgid "By"
 msgstr "Yazan"
@@ -1907,6 +1919,10 @@ msgstr ""
 #: src/strings.ts:2026
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
 msgstr "Çöp kutusunu boşaltmak, içindeki tüm öğeleri kalıcı olarak siler. Bu işlem GERİ ALINAMAZ."
+
+#: src/strings.ts:3146
+msgid "Click here"
+msgstr "Buraya tıklayın"
 
 #: src/strings.ts:2388
 msgid "Click here to directly claim the promotion."
@@ -3562,6 +3578,10 @@ msgstr "Not defterlerini filtrele..."
 msgid "Filter tags..."
 msgstr "Etiketleri filtrele..."
 
+#: src/strings.ts:3138
+msgid "Final step, make the payment."
+msgstr "Son adım, ödemeyi yapın."
+
 #: src/strings.ts:2385
 msgid "Finish your purchase in the browser."
 msgstr "Satın alma işleminizi tarayıcıda tamamlayın."
@@ -3944,6 +3964,10 @@ msgstr "{provider} üzerinden nasıl içe aktarılır."
 #: src/strings.ts:803
 msgid "hr"
 msgstr "sa"
+
+#: src/strings.ts:3150
+msgid "Huzzah!"
+msgstr "Yaşasın!"
 
 #: src/strings.ts:2272
 msgid "I already have an account"
@@ -5060,6 +5084,10 @@ msgstr "Yok"
 msgid "Normal mode"
 msgstr "Normal mod"
 
+#: src/strings.ts:3143
+msgid "Not found"
+msgstr "Bulunamadı"
+
 #: src/strings.ts:346
 msgid "Not logged in"
 msgstr "Giriş yapılmadı"
@@ -5218,6 +5246,14 @@ msgstr "Notesnook, istendiğinde e-postanıza bir 2FA kodu gönderir"
 #: src/strings.ts:905
 msgid "Notesnook will send you an SMS with a 2FA code when prompted"
 msgstr "Notesnook, istendiğinde 2FA kodlu bir SMS gönderir"
+
+#: src/strings.ts:3151
+msgid "Notice"
+msgstr "Bildirim"
+
+#: src/strings.ts:3152
+msgid "Notice 2"
+msgstr "Bildirim 2"
 
 #: src/strings.ts:1939
 msgid "Notifications"
@@ -7354,6 +7390,10 @@ msgstr "Abonelik etkinleştirilmedi mi?"
 msgid "Success"
 msgstr "Başarılı"
 
+#: src/strings.ts:3141
+msgid "Summary"
+msgstr "Özet"
+
 #: src/strings.ts:569
 msgid "Sun"
 msgstr "Paz"
@@ -7382,6 +7422,10 @@ msgstr "Ayrıntılı görünüme geç"
 #: src/strings.ts:1360
 msgid "Switch to search/replace mode"
 msgstr "Ara/değiştir moduna geç"
+
+#: src/strings.ts:3159
+msgid "Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable."
+msgstr "Beta ve kararlı sürümler arasında geçiş yapmak, veri kaybı da dahil olmak üzere garip sorunlara neden olabilir. Her ikisini aynı anda kullanmamanız önerilir. Beta sürüm kararlı hale geldiğinde geçiş yapabilirsiniz."
 
 #: src/strings.ts:1937
 msgid "Sync"
@@ -7778,6 +7822,10 @@ msgstr "Bu görsel önizlenemiyor"
 msgid "This is a one time purchase, no subscription."
 msgstr "Bu, abonelik değil tek seferlik bir satın almadır."
 
+#: src/strings.ts:3155
+msgid "This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the"
+msgstr "Bu beta sürümüdür ve bu nedenle hatalar içerecektir. Bazı şeylerin bozulması beklenir ancak genel olarak kararlı olmalıdır. Lütfen tüm hataları bildirmek için"
+
 #: src/strings.ts:1861
 msgid "This may take a while"
 msgstr "Bu biraz zaman alabilir"
@@ -7855,6 +7903,10 @@ msgstr "Başlık biçimi"
 #: src/strings.ts:2499
 msgid "Title is required"
 msgstr "Başlık gerekli"
+
+#: src/strings.ts:3147
+msgid "to directly claim the promotion."
+msgstr "promosyonu doğrudan talep etmek için."
 
 #: src/strings.ts:2683
 msgid "To protect your privacy, we will download the image & add it to your attachments."
@@ -8671,6 +8723,10 @@ msgstr "Çevrimdışısınız."
 msgid "You are on this plan."
 msgstr "Bu plandasınız."
 
+#: src/strings.ts:3140
+msgid "You are one step away from unlocking the full potential of Notesnook."
+msgstr "Notesnook'un tüm potansiyelini ortaya çıkarmaya bir adım uzaktasınız."
+
 #: src/strings.ts:809
 msgid "You are renaming color {color}"
 msgstr "{color} rengini yeniden adlandırıyorsunuz"
@@ -8789,6 +8845,10 @@ msgstr "Henüz not defteri eklemediniz"
 #: src/strings.ts:877
 msgid "You have not added any tags yet"
 msgstr "Henüz etiket eklemediniz"
+
+#: src/strings.ts:3144
+msgid "You have not been billed yet."
+msgstr "Henüz faturalandırılmadınız."
 
 #: src/strings.ts:876
 msgid "You have not created any notes yet"

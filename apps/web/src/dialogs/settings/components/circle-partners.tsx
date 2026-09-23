@@ -128,9 +128,9 @@ export function CirclePartners() {
                           redeemedCode.code
                         )}
                       >
-                        Click here
+                        {strings.claimPromotion[0]()}
                       </Link>{" "}
-                      to directly claim the promotion.
+                      {strings.claimPromotion[1]()}
                     </Text>
                   ) : null}
                 </>

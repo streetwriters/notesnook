@@ -3132,5 +3132,28 @@ Continue without attachments?`,
   automaticDarkMode: () => t`Automatic dark mode`,
   changeDefaultHomePage: () => t`Change default home page`,
   applyingCouponCode: () => t`Applying coupon code...`,
-  loadingCheckoutPleaseWait: () => t`Loading checkout. Please wait...`
+  loadingCheckoutPleaseWait: () => t`Loading checkout. Please wait...`,
+  finalStepMakePayment: () => t`Final step, make the payment.`,
+  oneStepAwayFromUnlocking: () =>
+    t`You are one step away from unlocking the full potential of Notesnook.`,
+  summary: () => t`Summary`,
+  planWithTitle: (planTitle: string) => t`${planTitle} plan`,
+  notFound: () => t`Not found`,
+  youHaveNotBeenBilledYet: () => t`You have not been billed yet.`,
+  claimPromotion: {
+    0: () => t`Click here`,
+    1: () => t`to directly claim the promotion.`
+  },
+  wrappedTitle: (year: number | string) => t`🎉 Wrapped ${year}`,
+  huzzah: () => t`Huzzah!`,
+  notice: () => t`Notice`,
+  notice2: () => t`Notice 2`,
+  betaWarningDescription: {
+    0: () =>
+      t`This is the beta version and as such will contain bugs. Things are expected to break but should be generally stable. Please use the`,
+    1: () => t`button to report all bugs. Thank you!`
+  },
+  betaSwitchingWarning: () =>
+    t`Switching between beta & stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously. You can switch once the beta version enters stable.`
 };
+
