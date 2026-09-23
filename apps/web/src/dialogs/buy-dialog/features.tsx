@@ -87,66 +87,64 @@ type Section = {
   isVisible?: () => boolean;
 };
 
-const sections: Section[] = [
+const getSections = (): Section[] => [
   {
-    title: "Focused on privacy",
-    detail:
-      "Everything you do in Notesnook stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes.",
+    title: strings.focusedOnPrivacy(),
+    detail: strings.focusedOnPrivacyDesc(),
     features: [
       {
         id: "zero-ads",
-        title: "Zero ads & zero trackers",
+        title: strings.zeroAdsAndZeroTrackers(),
         icon: Billboard
       },
       {
         id: "on-device-encryption",
-        title: "On device encryption",
+        title: strings.onDeviceEncryption(),
         icon: Cellphone
       },
       {
         id: "secure-app-lock",
-        title: "Secure app lock for all",
+        title: strings.secureAppLockForAll(),
         icon: CellphoneLock
       },
       {
         id: "end-to-end-encrypted",
-        title: "100% end-to-end encrypted",
+        title: strings.endToEndEncrypted100(),
         icon: Lock
       },
       {
         id: "private-vault",
-        title: "Private vault for notes",
+        title: strings.privateVaultForNotes(),
         icon: ShieldLock,
         pro: true
       }
     ]
   },
   {
-    title: "Instant syncing",
-    detail:
-      "Seamlessly work from anywhere. Every change is synced instantly everywhere.",
+    title: strings.instantSyncing(),
+    detail: strings.instantSyncingDesc(),
     features: [
       {
         id: "unlimited-devices",
-        title: "Sync to unlimited devices",
+        title: strings.syncToUnlimitedDevices(),
         icon: Cellphone
       },
       {
         id: "real-time-sync",
-        title: "Real-time editor sync",
+        title: strings.realTimeEditorSync(),
         icon: Sync
       },
       {
         id: "sync-controls",
-        title: "Granular sync controls*",
+        title: strings.granularSyncControls(),
         icon: SyncOff
       }
     ],
-    info: "* Disable sync completely, turn off auto sync, or just disable real-time editor sync."
+    info: strings.granularSyncControlsDesc()
   },
   {
-    title: "100% cross platform",
-    detail: "Notesnook is available on all major platforms — for everyone.",
+    title: strings.crossPlatform100(),
+    detail: strings.crossPlatform100Desc(),
     columns: 8,
     isVisible: () => !isMacStoreApp(),
     features: [
@@ -185,243 +183,232 @@ const sections: Section[] = [
     ]
   },
   {
-    title: "Two-factor authentication",
-    detail:
-      "Improve your account security & prevent intruders from accessing your notes using 2FA.",
+    title: strings.twoFactorAuth(),
+    detail: strings.twoFactorAuthFeatureDesc(),
     features: [
       {
         id: "email",
-        title: "Email*",
+        title: strings.twoFactorEmail(),
         icon: MfaEmail
       },
       {
         id: "auth-app",
-        title: "Authenticator app",
+        title: strings.authenticatorApp(),
         icon: MfaAuthenticator
       },
       {
         id: "sms",
-        title: "SMS",
+        title: strings.twoFactorSms(),
         icon: MfaSms,
         pro: true
       }
     ],
-    info: "* 2FA via email is enabled by default for all users"
+    info: strings.twoFactorEmailDesc()
   },
   {
-    title: "Attach files & images",
-    detail:
-      "Add your documents, PDFs, images and videos, and keep them safe and organized.",
+    title: strings.attachFilesAndImages(),
+    detail: strings.attachFilesAndImagesDesc(),
     pro: true,
     features: [
       {
         id: "bulletproof-encryption",
-        title: "Bulletproof encryption",
+        title: strings.bulletproofEncryption(),
         icon: Lock
       },
       {
         id: "4k-images",
-        title: "High quality 4K images",
+        title: strings.highQuality4kImages(),
         icon: ImageMultiple
       },
       {
         id: "unlimited-storage",
-        title: "Unlimited storage",
+        title: strings.unlimitedStorage(),
         icon: Harddisk
       },
       {
         id: "500-mb-files",
-        title: "Upto 500 MB per file",
+        title: strings.upto500MbPerFile(),
         icon: FileCabinet
       },
       {
         id: "file-types",
-        title: "All file types supported",
+        title: strings.allFileTypesSupported(),
         icon: File
       }
     ]
   },
   {
-    title: "No limit on notes",
-    detail:
-      "We don't have nonsense like blocks and whatnot. You can create as many notes as you want — no limits."
+    title: strings.noLimitOnNotes(),
+    detail: strings.noLimitOnNotesDesc()
   },
   {
-    title: "Cross-platform reminders",
-    detail: "Stay updated on all your upcoming tasks with reminders.",
+    title: strings.crossPlatformReminders(),
+    detail: strings.crossPlatformRemindersDesc(),
     features: [
       {
         id: "one-time",
-        title: "One-time reminders",
+        title: strings.oneTimeReminders(),
         icon: Reminder
       },
       {
         id: "recurring",
-        title: "Daily, monthly & weekly recurring reminders",
+        title: strings.recurringRemindersDailyWeeklyMonthly(),
         icon: Refresh,
         pro: true
       }
     ]
   },
   {
-    title: "Safe publishing to the Internet",
-    detail:
-      "Publishing is nothing new but we offer fully encrypted, anonymous publishing. Take any note & share it with the world.",
+    title: strings.safePublishingToInternet(),
+    detail: strings.safePublishingToInternetDesc(),
     features: [
       {
         id: "anon-publishing",
-        title: "Anonymous publishing",
+        title: strings.anonymousPublishing(),
         icon: Anonymous
       },
       {
         id: "password-protected-publishing",
-        title: "Password protection",
+        title: strings.monographPassHeading(),
         icon: CloudLock
       },
       {
         id: "self-destructive-notes",
-        title: "Self destructable notes",
+        title: strings.selfDestructableNotes(),
         icon: Timebomb
       }
     ]
   },
   {
-    title: "Organize yourself in the best way",
-    detail:
-      "We offer multiple ways to keep you organized. The only limit is your imagination.",
+    title: strings.organizeYourselfBestWay(),
+    detail: strings.organizeYourselfBestWayDesc(),
     features: [
       {
         id: "unlimited-notebooks",
-        title: "Unlimited notebooks*",
+        title: strings.unlimitedNotebooksAsterisk(),
         icon: Notebook2,
         pro: true
       },
       {
         id: "colors-tags",
-        title: "Colors & tags*",
+        title: strings.colorsAndTagsAsterisk(),
         icon: Palette,
         pro: true
       },
       {
         id: "side-menu-shortcuts",
-        title: "Side menu shortcuts",
+        title: strings.sideMenuShortcuts(),
         icon: Shortcut
       },
       {
         id: "pins-favorites",
-        title: "Pins & favorites",
+        title: strings.pinsAndFavorites(),
         icon: Pin
       }
     ],
-    info: "* Free users can only create 20 notebooks and 5 tags."
+    info: strings.unlimitedNotebooksInfo()
   },
-
   {
-    title: "Rich tools for rich editing",
-    detail:
-      "Having the right tool at the right time is crucial for note taking. Lists, tables, codeblocks — you name it, we have it.",
+    title: strings.richToolsForRichEditing(),
+    detail: strings.richToolsForRichEditingDesc(),
     features: [
       {
         id: "lists-tables",
-        title: "Lists & tables",
+        title: strings.listsAndTables(),
         icon: Table
       },
       {
         id: "image-embeds",
-        title: "Images & embeds",
+        title: strings.imagesAndEmbeds(),
         icon: Embed
       },
       {
         id: "checklists",
-        title: "Checklists",
+        title: strings.checklists(),
         icon: CheckCircleOutline
       },
       {
         id: "md-shortcuts",
-        title: "Markdown shortcuts",
+        title: strings.mardownShortcuts(),
         icon: Markdown
       },
       {
         id: "custom-toolbar",
-        title: "Customizable toolbar*",
+        title: strings.customizableToolbarAsterisk(),
         pro: true,
         icon: CustomToolbar
       }
     ],
-    info: "* Free users can only choose from pre-defined toolbar presets."
+    info: strings.customizableToolbarInfo()
   },
   {
-    title: "Export and take your notes anywhere",
-    detail:
-      "You own your notes, not us. No proprietary formats. No vendor lock in. No waiting for hours to download your notes.",
-    // info: "* Free users can export notes in well formatted plain text.",
+    title: strings.exportAndTakeNotesAnywhere(),
+    detail: strings.exportAndTakeNotesAnywhereDesc(),
     features: [
       {
         id: "export-markdown",
-        title: "Export as Markdown",
+        title: strings.exportAsMarkdown(),
         icon: Markdown,
         pro: true
       },
       {
         id: "export-pdf",
-        title: "Export as PDF",
+        title: strings.exportAsPdf(),
         icon: PDF,
         pro: true
       },
       {
         id: "export-html",
-        title: "Export as HTML",
+        title: strings.exportAsHtml(),
         icon: HTML,
         pro: true
       },
       {
         id: "export-txt",
-        title: "Export as text",
+        title: strings.exportAsText(),
         icon: TextIcon
       },
       {
         id: "bulk-exports",
-        title: "Bulk exports",
+        title: strings.bulkExports(),
         icon: Export
       }
     ]
   },
   {
-    title: "Backup & keep your notes safe",
-    detail:
-      "Do not worry about losing your data. Turn on automatic backups on weekly or daily basis.",
+    title: strings.backupAndKeepNotesSafe(),
+    detail: strings.backupAndKeepNotesSafeDesc(),
     features: [
       {
         id: "auto-backups",
-        title: "Automatic monthly, weekly & daily backups",
+        title: strings.autoBackupsMonthlyWeeklyDaily(),
         icon: Backup,
         pro: true
       },
       {
         id: "backup-encryption",
-        title: "Backup encryption",
+        title: strings.backupEncryption(),
         icon: EncryptedBackup
       }
     ]
   },
   {
-    title: "Personalize & make Notesnook your own",
-    detail:
-      "Change app themes to match your style. Custom themes are coming soon.",
+    title: strings.personalizeMakeNotesnookYourOwn(),
+    detail: strings.personalizeMakeNotesnookYourOwnDesc(),
     features: [
       {
         id: "10-themes",
-        title: "10+ themes",
+        title: strings.themes10Plus(),
         icon: Accent
       },
       {
         id: "dark-mode",
-        title: "Automatic dark mode",
+        title: strings.automaticDarkMode(),
         icon: ThemeIcon
       },
       {
         id: "default-home-page",
-        title: "Change default home page",
+        title: strings.changeDefaultHomePage(),
         icon: Home,
         pro: true
       }
@@ -430,6 +417,7 @@ const sections: Section[] = [
 ];
 
 export function Features() {
+  const sections = getSections();
   return (
     <Flex
       sx={{

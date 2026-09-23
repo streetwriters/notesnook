@@ -2839,6 +2839,27 @@ Continue without attachments?`,
   orderSummary: () => t`Order summary`,
   enterDiscountCode: () => t`Enter discount code`,
   addDiscount: () => t`Add discount`,
+  salesTax: () => t`Sales tax`,
+  discount: () => t`Discount`,
+  totalForToday: () => t`Total for today`,
+  freeTrialDays: (days: number) => t`${days} day free trial`,
+  afterFreeTrialDays: (days: number) => t`After ${days} day free trial`,
+  nextMonth: () => t`Next month`,
+  nextYear: () => t`Next year`,
+  billedPeriod: (period: string) => t`Billed ${period}`,
+  savePercentBySwitchingPlan: (savings: string, period: string) =>
+    t`Save ${savings}% by switching to ${period} plan.`,
+  alreadySubscribedChangeFromSettings: () =>
+    t`You already have a Notesnook subscription. You can change your plan from Settings > Subscription details.`,
+  youAreAwesome: () => t`You are awesome!`,
+  thankYouForSupportingPrivacy: () =>
+    t`Thank you for supporting privacy! Your subscription is now active.`,
+  onlyPayProratedAmount: () =>
+    t`You will only pay the prorated amount for the new subscription plan`,
+  planSwitchedConfirmation: (plan: string) =>
+    t`Your plan will be switched to ${plan} plan. You will receive a credit for unused time on your previous subscription, and you will only pay the prorated amount for your new subscription.`,
+  onlyChangePlanFromOriginalPlatform: () =>
+    t`You can only change your plan from the platform you originally bought the subscription from.`,
   confirmPlanChange: () => t`Confirm plan change`,
   changingSubscriptionPlan: () => t`Changing subscription plan`,
   changingSubscriptionPlanWait: () =>
@@ -3012,5 +3033,93 @@ Continue without attachments?`,
   savingAttachment: (path: string) => t`Saving attachment: ${path}`,
   failedToExportAttachment: (path: string, message: string) =>
     t`Failed to export attachment: ${path}. ${message}`,
-  exportingNotePath: (path: string) => t`Exporting note: ${path}`
+  exportingNotePath: (path: string) => t`Exporting note: ${path}`,
+  focusedOnPrivacy: () => t`Focused on privacy`,
+  focusedOnPrivacyDesc: () =>
+    t`Everything you do in Notesnook stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes.`,
+  zeroAdsAndZeroTrackers: () => t`Zero ads & zero trackers`,
+  onDeviceEncryption: () => t`On device encryption`,
+  secureAppLockForAll: () => t`Secure app lock for all`,
+  endToEndEncrypted100: () => t`100% end-to-end encrypted`,
+  privateVaultForNotes: () => t`Private vault for notes`,
+  instantSyncing: () => t`Instant syncing`,
+  instantSyncingDesc: () =>
+    t`Seamlessly work from anywhere. Every change is synced instantly everywhere.`,
+  syncToUnlimitedDevices: () => t`Sync to unlimited devices`,
+  realTimeEditorSync: () => t`Real-time editor sync`,
+  granularSyncControls: () => t`Granular sync controls*`,
+  granularSyncControlsDesc: () =>
+    t`* Disable sync completely, turn off auto sync, or just disable real-time editor sync.`,
+  crossPlatform100: () => t`100% cross platform`,
+  crossPlatform100Desc: () =>
+    t`Notesnook is available on all major platforms — for everyone.`,
+  twoFactorAuthFeatureDesc: () =>
+    t`Improve your account security & prevent intruders from accessing your notes using 2FA.`,
+  twoFactorEmail: () => t`Email*`,
+  authenticatorApp: () => t`Authenticator app`,
+  twoFactorSms: () => t`SMS`,
+  twoFactorEmailDesc: () =>
+    t`* 2FA via email is enabled by default for all users`,
+  attachFilesAndImages: () => t`Attach files & images`,
+  attachFilesAndImagesDesc: () =>
+    t`Add your documents, PDFs, images and videos, and keep them safe and organized.`,
+  bulletproofEncryption: () => t`Bulletproof encryption`,
+  highQuality4kImages: () => t`High quality 4K images`,
+  unlimitedStorage: () => t`Unlimited storage`,
+  upto500MbPerFile: () => t`Upto 500 MB per file`,
+  allFileTypesSupported: () => t`All file types supported`,
+  noLimitOnNotes: () => t`No limit on notes`,
+  noLimitOnNotesDesc: () =>
+    t`We don't have nonsense like blocks and whatnot. You can create as many notes as you want — no limits.`,
+  crossPlatformReminders: () => t`Cross-platform reminders`,
+  crossPlatformRemindersDesc: () =>
+    t`Stay updated on all your upcoming tasks with reminders.`,
+  oneTimeReminders: () => t`One-time reminders`,
+  recurringRemindersDailyWeeklyMonthly: () =>
+    t`Daily, monthly & weekly recurring reminders`,
+  safePublishingToInternet: () => t`Safe publishing to the Internet`,
+  safePublishingToInternetDesc: () =>
+    t`Publishing is nothing new but we offer fully encrypted, anonymous publishing. Take any note & share it with the world.`,
+  anonymousPublishing: () => t`Anonymous publishing`,
+  selfDestructableNotes: () => t`Self destructable notes`,
+  organizeYourselfBestWay: () => t`Organize yourself in the best way`,
+  organizeYourselfBestWayDesc: () =>
+    t`We offer multiple ways to keep you organized. The only limit is your imagination.`,
+  unlimitedNotebooksAsterisk: () => t`Unlimited notebooks*`,
+  colorsAndTagsAsterisk: () => t`Colors & tags*`,
+  sideMenuShortcuts: () => t`Side menu shortcuts`,
+  pinsAndFavorites: () => t`Pins & favorites`,
+  unlimitedNotebooksInfo: () =>
+    t`* Free users can only create 20 notebooks and 5 tags.`,
+  richToolsForRichEditing: () => t`Rich tools for rich editing`,
+  richToolsForRichEditingDesc: () =>
+    t`Having the right tool at the right time is crucial for note taking. Lists, tables, codeblocks — you name it, we have it.`,
+  listsAndTables: () => t`Lists & tables`,
+  imagesAndEmbeds: () => t`Images & embeds`,
+  checklists: () => t`Checklists`,
+  customizableToolbarAsterisk: () => t`Customizable toolbar*`,
+  customizableToolbarInfo: () =>
+    t`* Free users can only choose from pre-defined toolbar presets.`,
+  exportAndTakeNotesAnywhere: () => t`Export and take your notes anywhere`,
+  exportAndTakeNotesAnywhereDesc: () =>
+    t`You own your notes, not us. No proprietary formats. No vendor lock in. No waiting for hours to download your notes.`,
+  exportAsMarkdown: () => t`Export as Markdown`,
+  exportAsPdf: () => t`Export as PDF`,
+  exportAsHtml: () => t`Export as HTML`,
+  exportAsText: () => t`Export as text`,
+  bulkExports: () => t`Bulk exports`,
+  backupAndKeepNotesSafe: () => t`Backup & keep your notes safe`,
+  backupAndKeepNotesSafeDesc: () =>
+    t`Do not worry about losing your data. Turn on automatic backups on weekly or daily basis.`,
+  autoBackupsMonthlyWeeklyDaily: () =>
+    t`Automatic monthly, weekly & daily backups`,
+  personalizeMakeNotesnookYourOwn: () =>
+    t`Personalize & make Notesnook your own`,
+  personalizeMakeNotesnookYourOwnDesc: () =>
+    t`Change app themes to match your style. Custom themes are coming soon.`,
+  themes10Plus: () => t`10+ themes`,
+  automaticDarkMode: () => t`Automatic dark mode`,
+  changeDefaultHomePage: () => t`Change default home page`,
+  applyingCouponCode: () => t`Applying coupon code...`,
+  loadingCheckoutPleaseWait: () => t`Loading checkout. Please wait...`
 };

@@ -234,8 +234,7 @@ function AlreadyPremium() {
         Notesnook
       </Text>
       <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-        You already have a Notesnook subscription. You can change your plan from
-        Settings {">"} Subscription details.
+        {strings.alreadySubscribedChangeFromSettings()}
       </Text>
     </>
   );
@@ -251,10 +250,10 @@ export function CheckoutCompleted(props: {
     <>
       <Image src={Rocket} style={{ flexShrink: 0, width: 200, height: 200 }} />
       <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
-        You are awesome!
+        {strings.youAreAwesome()}
       </Text>
       <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
-        Thank you for supporting privacy! Your subscription is now active.
+        {strings.thankYouForSupportingPrivacy()}
       </Text>
       <Button
         variant="accent"
@@ -263,7 +262,7 @@ export function CheckoutCompleted(props: {
         onClick={onClose}
         data-test-id="see-all-plans"
       >
-        {buttonText || "Continue"}
+        {buttonText || strings.continue()}
       </Button>
     </>
   );
@@ -304,7 +303,7 @@ function SelectedPlan(props: SelectedPlanProps) {
             variant="body"
             sx={{ fontWeight: "bold", color: "heading" }}
           >
-            {PLAN_METADATA[plan.plan].title} plan
+            {strings.plan(PLAN_METADATA[plan.plan].title)}
           </Text>
           <Text variant="body">
             {getCurrencySymbol(plan.currency)}
@@ -314,10 +313,10 @@ function SelectedPlan(props: SelectedPlanProps) {
         </Flex>
         <Flex sx={{ justifyContent: "space-between" }}>
           <Text variant="body">
-            Billed {formatRecurringPeriod(plan.period)}
+            {strings.billedPeriod(formatRecurringPeriod(plan.period))}
           </Text>
           <Button variant="anchor" onClick={onChangePlan}>
-            Change plan
+            {strings.changePlan()}
           </Button>
         </Flex>
         {upsellDetails.status === "fulfilled" && upsellDetails.value ? (
@@ -396,11 +395,13 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
         <Flex sx={{ justifyContent: "space-between" }}>
           <Flex sx={{ flexDirection: "column" }}>
             <Text variant="body" color="heading">
-              Today
+              {strings.today()}
             </Text>
             {pricingInfo.price.trial_period ? (
               <Text variant="subBody">
-                {pricingInfo.price.trial_period.frequency} day free trial
+                {strings.freeTrialDays(
+                  pricingInfo.price.trial_period.frequency
+                )}
               </Text>
             ) : null}
           </Flex>
@@ -420,8 +421,9 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             <Flex sx={{ justifyContent: "space-between" }}>
               <Flex sx={{ flexDirection: "column" }}>
                 <Text variant="body" color="heading">
-                  After {pricingInfo.price.trial_period.frequency} day free
-                  trial
+                  {strings.afterFreeTrialDays(
+                    pricingInfo.price.trial_period.frequency
+                  )}
                 </Text>
                 <Text variant="subBody">
                   {dayjs()
@@ -443,9 +445,9 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
               <Flex sx={{ flexDirection: "column" }}>
                 <Text variant="body" color="heading">
                   {pricingInfo.period === "monthly"
-                    ? "Next month"
+                    ? strings.nextMonth()
                     : pricingInfo.period === "yearly"
-                    ? "Next year"
+                    ? strings.nextYear()
                     : dayjs()
                         .add(5, "year")
                         .add(
@@ -499,7 +501,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             data-test-id={`label`}
             color="paragraph-secondary"
           >
-            Sales tax
+            {strings.salesTax()}
           </Text>
           <Text
             data-test-id={`value`}
@@ -522,7 +524,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
             data-test-id={`label`}
             color="paragraph-secondary"
           >
-            Discount
+            {strings.discount()}
           </Text>
           {isApplyingCoupon ? (
             <Loading size={14} />
@@ -561,7 +563,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           data-test-id={`checkout-price-item`}
         >
           <Text variant="title" data-test-id={`label`}>
-            Total for today
+            {strings.totalForToday()}
           </Text>
           {price.trial_period ? (
             <Text as="div" variant="title" sx={{ textAlign: "end" }}>
@@ -578,8 +580,10 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           )}
         </Flex>
         <Text variant="subBody" sx={{ mt: 2 }}>
-          Cancel anytime. {PERIOD_METADATA[pricingInfo.period].refundDays}-day
-          money-back guarantee.
+          {strings.cancelAnytime()}{" "}
+          {strings.dayMoneyBackGuarantee(
+            PERIOD_METADATA[pricingInfo.period].refundDays
+          )}
         </Text>
       </Flex>
     </>
@@ -603,7 +607,10 @@ async function getUpsellDetails(plan: Plan) {
   const savings = (100 - (dividedPrice / plan.price.gross) * 100).toFixed(0);
 
   return {
-    text: `Save ${savings}% by switching to ${nextPlan.period} plan.`,
+    text: strings.savePercentBySwitchingPlan(
+      savings,
+      PERIOD_METADATA[nextPlan.period].title
+    ),
     plan: nextPlan
   };
 }
