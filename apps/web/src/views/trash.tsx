@@ -21,7 +21,7 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/trash-store";
 import { showToast } from "../utils/toast";
 import useNavigate from "../hooks/use-navigate";
-import Placeholder, { ListPanePlaceholder } from "../components/placeholders";
+import { ListPanePlaceholder } from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
@@ -46,11 +46,7 @@ function Trash() {
       refresh={refresh}
       isSearching={!!filteredItems}
       placeholder={
-        filteredItems ? (
-          <Placeholder context="search" />
-        ) : (
-          <ListPanePlaceholder variant="trash" />
-        )
+        <ListPanePlaceholder variant={filteredItems ? "search" : "trash"} />
       }
       items={filteredItems || items}
       button={{

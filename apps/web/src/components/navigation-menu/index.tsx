@@ -62,7 +62,8 @@ import {
   Question,
   SignIn,
   LinkBreak,
-  UserProfileIcon
+  UserProfileIcon,
+  BoxArrowDown
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -176,7 +177,7 @@ const routes: Route[] = [
     id: "archive",
     title: strings.archive(),
     path: "/archive",
-    icon: Archive
+    icon: BoxArrowDown
   },
   {
     id: "trash",
@@ -218,17 +219,17 @@ const tabs: NavigationTabItem[] = [
     title: strings.routes.Notebooks(),
     actions: [
       {
-        id: "create-notebook-button",
-        title: CREATE_BUTTON_MAP.notebooks.title,
-        icon: Plus,
-        onClick: CREATE_BUTTON_MAP.notebooks.onClick
-      },
-      {
         id: "notebooks-sort-button",
         title: strings.sortBy(),
         icon: Sliders,
         onClick: () =>
           showSortMenu("notebooks", () => useNotebookStore.getState().refresh())
+      },
+      {
+        id: "create-notebook-button",
+        title: CREATE_BUTTON_MAP.notebooks.title,
+        icon: Plus,
+        onClick: CREATE_BUTTON_MAP.notebooks.onClick
       }
     ]
   },
@@ -238,17 +239,17 @@ const tabs: NavigationTabItem[] = [
     title: strings.routes.Tags(),
     actions: [
       {
-        id: "create-tag-button",
-        title: CREATE_BUTTON_MAP.tags.title,
-        icon: Plus,
-        onClick: CREATE_BUTTON_MAP.tags.onClick
-      },
-      {
         id: "tags-sort-button",
         title: strings.sortBy(),
         icon: Sliders,
         onClick: () =>
           showSortMenu("tags", () => useTagStore.getState().refresh())
+      },
+      {
+        id: "create-tag-button",
+        title: CREATE_BUTTON_MAP.tags.title,
+        icon: Plus,
+        onClick: CREATE_BUTTON_MAP.tags.onClick
       }
     ]
   }
@@ -485,7 +486,7 @@ function NavigationMenu({
             }}
           >
             <Plus size={15} color="accentForeground" />
-            {isCollapsed ? null : strings.addItem("note")}
+            {isCollapsed ? null : strings.newNote()}
           </Button>
         ) : null}
       </Flex>
@@ -771,6 +772,7 @@ function ColorItem({
       isCollapsed={context?.isCollapsed}
       icon={Ellipse}
       iconSize={10}
+      collapsedIconSize={10}
       selected={currentContext?.id === color.id}
       color={color.colorCode}
       onClick={() => {

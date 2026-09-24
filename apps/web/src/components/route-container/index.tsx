@@ -231,14 +231,12 @@ function Header(props: RouteContainerProps) {
       <Box
         sx={{
           display: "flex",
-          gap: "spacing6",
+          gap: hasItems ? "spacing6" : "spacing4",
           flexDirection: "column",
           width: "100%",
           px: "spacing6",
           pt: "spacing4",
           pb: "spacing6",
-          borderBottom: "1px solid",
-          borderColor: "separator",
           bg: "background"
         }}
       >
@@ -255,7 +253,10 @@ function Header(props: RouteContainerProps) {
                 color: "heading",
                 fontSize: "lg",
                 fontWeight: "bold",
-                lineHeight: 1
+                lineHeight: "100%",
+                height: hasItems ? "20px" : "32px",
+                display: "flex",
+                alignItems: "center"
               }}
             >
               {headerTitle}
@@ -273,8 +274,11 @@ function Header(props: RouteContainerProps) {
             )}
           </Box>
         )}
+        {!hasItems && (
+          <Box sx={{ height: "1px", background: "separator", width: "100%" }} />
+        )}
         {hasItems && (
-          <Flex sx={{ gap: "15px" }}>
+          <Flex sx={{ gap: "spacing6" }}>
             <Box
               sx={{
                 position: "relative",
@@ -305,7 +309,8 @@ function Header(props: RouteContainerProps) {
                 sx={{
                   gap: 0,
                   m: 0,
-                  width: "100%"
+                  width: "100%",
+                  height: "40px"
                 }}
                 styles={{
                   input: {
@@ -391,6 +396,20 @@ function Header(props: RouteContainerProps) {
           </Flex>
         )}
       </Box>
+
+      {hasItems && (
+        <Box
+          sx={{
+            /**
+             * 1px margin top aligns this separator with the separator in the sidebar
+             */
+            mt: "1px",
+            height: "1px",
+            background: "separator",
+            width: "100%"
+          }}
+        />
+      )}
     </Box>
   );
 }
