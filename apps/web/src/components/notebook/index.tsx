@@ -164,7 +164,6 @@ export function Notebook(props: NotebookProps) {
               fontWeight: "normal",
               display: "block",
               fontSize: "xs",
-              lineHeight: 1,
               minWidth: 0
             }}
           >
