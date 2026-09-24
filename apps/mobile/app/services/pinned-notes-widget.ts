@@ -38,7 +38,11 @@ export const PinnedNotesWidget = {
     clearTimeout(timer);
     timer = setTimeout(async () => {
       try {
-        const pinnedNotes = await db.notes.pinned.items();
+        const sortOptions = db.settings?.getGroupOptions("home") || {
+          sortBy: "dateEdited",
+          sortDirection: "desc"
+        };
+        const pinnedNotes = await db.notes.pinned.items(undefined, sortOptions);
         const payload = (pinnedNotes || []).map((note) => ({
           id: note.id,
           title: note.title || strings.untitledNote(),
