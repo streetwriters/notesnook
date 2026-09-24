@@ -137,7 +137,15 @@ function ListItem<TItem extends Item, TContext>(
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
-          menuItems = menuItems?.filter((i) => i.multiSelect === true);
+          const multiSelectItemsAndSeparators = menuItems?.filter(
+            (item) => item.type === "separator" || item.multiSelect === true
+          );
+          menuItems = multiSelectItemsAndSeparators?.filter(
+            (item, index, items) =>
+              item.type !== "separator" ||
+              (items[index - 1]?.multiSelect === true &&
+                items[index + 1]?.multiSelect === true)
+          );
         }
 
         if (!menuItems) return;
