@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef } from "react";
-import { Flex, Text, Button, Box } from "@theme-ui/components";
+import { Flex, Text, Button } from "@theme-ui/components";
 import { Icon } from "../icon/index.js";
+import { CaretRight } from "../icon/caret-right.js";
+import { Check } from "../icon/check.js";
+import { Crown } from "../icon/crown.js";
 import { MenuButtonItem, MenuItemComponentProps } from "./types.js";
-import CrownSvg from "@notesnook/icons/crown-simple.svg";
-import CaretRightSvg from "@notesnook/icons/caret-right.svg";
-import CheckSvg from "@notesnook/icons/check.svg";
 
 type MenuButtonProps = {
   item: MenuButtonItem;
@@ -131,7 +131,7 @@ export function MenuButton(props: MenuButtonProps) {
             sx={{ ml: 4, flexShrink: 0, gap: 1 }}
             data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
           >
-            {premium && <SvgIcon src={CrownSvg} size={13} color="#D7C131" />}
+            {premium && <Crown color="#D7C131" />}
             {modifier && (
               <Text
                 as="span"
@@ -146,18 +146,14 @@ export function MenuButton(props: MenuButtonProps) {
               </Text>
             )}
             {isChecked && (
-              <SvgIcon
-                src={CheckSvg}
-                size={13}
+              <Check
                 color={
                   variant === "dangerous" ? "icon-error" : "icon-secondary"
                 }
               />
             )}
             {menu && (
-              <SvgIcon
-                src={CaretRightSvg}
-                size={13}
+              <CaretRight
                 color={
                   variant === "dangerous" ? "icon-error" : "icon-secondary"
                 }
@@ -206,32 +202,4 @@ function getPlatform() {
   }
 
   return os;
-}
-
-type SvgIconProps = {
-  src: string;
-  size?: number;
-  color?: string;
-};
-
-function SvgIcon({ src, size = 13, color = "icon" }: SvgIconProps) {
-  return (
-    <Box
-      aria-hidden="true"
-      sx={{
-        width: size,
-        height: size,
-        flexShrink: 0,
-        backgroundColor: color,
-        maskImage: `url(${src})`,
-        maskPosition: "center",
-        maskRepeat: "no-repeat",
-        maskSize: "contain",
-        WebkitMaskImage: `url(${src})`,
-        WebkitMaskPosition: "center",
-        WebkitMaskRepeat: "no-repeat",
-        WebkitMaskSize: "contain"
-      }}
-    />
-  );
 }
