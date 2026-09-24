@@ -21,7 +21,7 @@ import React, { useEffect } from "react";
 import { useStore } from "../stores/note-store";
 import ListContainer from "../components/list-container";
 import useNavigate from "../hooks/use-navigate";
-import Placeholder, { ListPanePlaceholder } from "../components/placeholders";
+import { ListPanePlaceholder } from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { useEditorStore } from "../stores/editor-store";
@@ -61,11 +61,7 @@ function Home() {
       items={filteredItems || notes}
       isSearching={!!filteredItems}
       placeholder={
-        filteredItems ? (
-          <Placeholder context="search" />
-        ) : (
-          <ListPanePlaceholder variant="home" />
-        )
+        <ListPanePlaceholder variant={filteredItems ? "search" : "home"} />
       }
       button={{
         onClick: () => useEditorStore.getState().newSession()

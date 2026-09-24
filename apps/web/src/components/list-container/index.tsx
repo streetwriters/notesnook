@@ -213,6 +213,7 @@ function ListContainer(props: ListContainerProps) {
           ) : (
             <Flex
               sx={{ pt: "spacing6", px: "spacing6" }}
+              className="list-container-placeholder"
               data-test-id="list-placeholder"
             >
               {props.placeholder}

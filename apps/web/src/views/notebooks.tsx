@@ -32,7 +32,7 @@ import {
 import { ListLoader } from "../components/loaders/list-loader";
 import { debounce } from "@notesnook/common";
 import { SidebarScroller } from "../components/sidebar-scroller";
-import Placeholder from "../components/placeholders";
+import { SidebarPlaceholder } from "../components/placeholders";
 import { Funnel } from "../components/icons";
 import { Theme } from "@notesnook/theme";
 
@@ -89,7 +89,7 @@ export function Notebooks() {
       >
         {!notebooks ? (
           <ListLoader />
-        ) : notebooks.length === 0 ? (
+        ) : notebooks.length == 0 ? (
           <Flex
             sx={{
               justifyContent: "center",
@@ -97,7 +97,7 @@ export function Notebooks() {
               height: "100%"
             }}
           >
-            <Placeholder context="notebooks" />
+            <SidebarPlaceholder variant="notebooks" />
           </Flex>
         ) : (
           <VirtualizedTree
