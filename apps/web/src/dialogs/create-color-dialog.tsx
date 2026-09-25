@@ -20,19 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
-import { Palette } from "../components/icons";
 
 type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
   function CreateColorDialog(props: CreateColorDialogProps) {
     const colorRef = useRef<HTMLInputElement>(null);
     const colorPickerRef = useRef<HTMLInputElement>(null);
+    const [color, setColor] = useState("#666666");
     return (
       <Dialog
         testId="new-color-dialog"
@@ -101,9 +101,11 @@ export const CreateColorDialog = DialogManager.register(
             data-test-id="color-input"
             placeholder="Select color"
             onChange={(e) => {
-              const color = e.target.value;
-              if (colorPickerRef.current && validateHexColor(color))
-                colorPickerRef.current.value = color;
+              const value = e.target.value;
+              if (colorPickerRef.current && validateHexColor(value)) {
+                colorPickerRef.current.value = value;
+                setColor(value);
+              }
             }}
             rightActions={[
               {
@@ -115,10 +117,32 @@ export const CreateColorDialog = DialogManager.register(
                       alignItems: "center",
                       justifyContent: "center",
                       width: 40,
-                      height: "100%"
+                      height: "100%",
+                      mx: "spacing4"
                     }}
                   >
-                    <Palette size={15} />
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 33,
+                        border: "1px solid",
+                        borderColor: "border",
+                        borderRadius: "radius1",
+                        position: "relative"
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          top: "spacing1",
+                          left: "spacing1",
+                          width: 33,
+                          height: 25,
+                          borderRadius: "radius1",
+                          backgroundColor: color
+                        }}
+                      />
+                    </Box>
                     <input
                       ref={colorPickerRef}
                       type="color"
@@ -133,8 +157,9 @@ export const CreateColorDialog = DialogManager.register(
                         borderRadius: "10px"
                       }}
                       onChange={(e) => {
-                        if (colorRef.current)
-                          colorRef.current.value = e.target.value;
+                        const value = e.target.value;
+                        setColor(value);
+                        if (colorRef.current) colorRef.current.value = value;
                       }}
                     />
                   </Box>
