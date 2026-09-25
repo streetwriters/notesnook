@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/layout_bg">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/text"
+        android:text="@string/pinned_notes_title"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/border" />
+
+    <ListView
+        android:id="@+id/widget_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@color/border"
+        android:paddingBottom="12dp"
+        android:paddingHorizontal="12dp"
+        android:dividerHeight="1dp" />
+
+    <LinearLayout
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"
+            android:gravity="center"
+            android:textColor="@color/text"
+            android:text="@string/widget_pinned_notes_empty"/>
+    </LinearLayout>
+
+</LinearLayout>

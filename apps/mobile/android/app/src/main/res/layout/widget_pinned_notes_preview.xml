@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Shown in the widget picker only. Mirrors widget_pinned_notes.xml, but with the list replaced by
+  sample rows, since an adapter-backed list renders empty in the picker.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/layout_bg"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="@string/pinned_notes_title"
+        android:textColor="@color/text"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/border" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingBottom="12dp">
+
+        <!-- Sample Note 1 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_preview_note_title"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/widget_preview_note_body"
+                android:textColor="@color/text"
+                android:textSize="13sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/border" />
+
+        <!-- Sample Note 2 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/widget_preview_note_title_alt"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/widget_preview_note_body_alt"
+                android:textColor="@color/text"
+                android:textSize="13sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
