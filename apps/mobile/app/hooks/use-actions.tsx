@@ -1190,6 +1190,7 @@ export const useActions = ({
           setItem((await db.notes.note(item.id)) as Item);
           Navigation.queueRoutesForUpdate();
           useArchivedStore.getState().refresh();
+          PinnedNotesWidget.updateNotes();
         },
         checked: item.archived,
         isToggle: true
