@@ -112,7 +112,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
           <Field
             autoFocus={index === 0}
             sx={{
-              mt: "spacing7",
+              mt: "spacing6",
               input: {
                 fontSize: "sm",
                 px: "spacing4",
