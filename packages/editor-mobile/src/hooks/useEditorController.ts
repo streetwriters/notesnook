@@ -379,6 +379,9 @@ export function useEditorController({
         case "native:html":
           if (htmlContentRef.current === value.data) {
             setLoading(false);
+            if (value.searchResultIndex !== undefined) {
+              scrollToSearchResult(value.searchResultIndex);
+            }
             break;
           }
           htmlContentRef.current = value.data;
