@@ -44,14 +44,16 @@ import { strings } from "@notesnook/intl";
 import { Period, SubscriptionPlan } from "@notesnook/core";
 import Cameron from "../../assets/testimonials/cameron.jpg";
 import AndroidPolice from "../../assets/featured/android-police.svg";
+import AndroidPoliceTitle from "../../assets/featured/android-police-title.svg";
 import AppleInsider from "../../assets/featured/appleinsider.svg";
-// import Hackernoon from "../../assets/featured/hackernoon.png";
-import ItsFoss from "../../assets/featured/itsfoss.webp";
-import XDA from "../../assets/featured/xda.svg";
+import NessLabs from "../../assets/featured/ness-labs.svg";
 import PrivacyGuides from "../../assets/featured/privacy-guides.svg";
+import PrivacyGuidesTitle from "../../assets/featured/privacy-guides-title.svg";
 import Techlore from "../../assets/featured/techlore.svg";
+import TechloreTitle from "../../assets/featured/techlore-title.svg";
 import TheVerge from "../../assets/featured/theverge.svg";
 import FreedomPress from "../../assets/featured/freedom-press.svg";
+import XDA from "../../assets/featured/xda.svg";
 import { FeatureCaption } from "./feature-caption";
 import Accordion from "../../components/accordion";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -89,7 +91,7 @@ const FEATURED_ON = [
   {
     id: "android-police",
     logo: AndroidPolice,
-    title: "Android Police",
+    title: AndroidPoliceTitle,
     link: "https://www.androidpolice.com/tried-encrypted-all-in-one-productivity-app-blew-my-mind/"
   },
   {
@@ -106,13 +108,13 @@ const FEATURED_ON = [
   {
     id: "privacy-guides",
     logo: PrivacyGuides,
-    title: "Privacy Guides",
+    title: PrivacyGuidesTitle,
     link: "https://www.privacyguides.org/en/notebooks/#notesnook"
   },
   {
     id: "techlore",
     logo: Techlore,
-    title: "Techlore",
+    title: TechloreTitle,
     link: "https://www.youtube.com/watch?v=I9ibGRNjK3E"
   },
   {
@@ -126,15 +128,11 @@ const FEATURED_ON = [
     link: "https://www.xda-developers.com/note-taking-app-is-onenote-on-steroids/"
   },
   {
-    id: "itsfoss",
-    logo: ItsFoss,
-    link: "https://news.itsfoss.com/standard-notes-to-notesnook/"
+    id: "ness-labs",
+    logo: NessLabs,
+    logoSize: { width: 61, height: 36 },
+    link: "https://nesslabs.com/"
   }
-  // {
-  //   id: "Hackernoon",
-  //   logo: Hackernoon,
-  //   link: "https://hackernoon.com/top-6-privacy-note-apps-for-linux-and-android-that-actually-sync"
-  // },
 ];
 
 const FEATURE_ICONS: Record<string, React.ComponentType<{ size: number }>> = {
@@ -342,7 +340,12 @@ export function FeaturedOn() {
           href={f.link}
           title={f.id}
           target="_blank"
-          sx={{ textDecoration: "none", alignSelf: "stretch", flexShrink: 0 }}
+          sx={{
+            textDecoration: "none",
+            alignSelf: "stretch",
+            flexShrink: 0,
+            minWidth: 250
+          }}
         >
           <Flex
             sx={{
@@ -354,27 +357,19 @@ export function FeaturedOn() {
               px: "spacing9",
               py: "spacing7",
               alignItems: "center",
-              gap: "spacing9"
+              gap: "spacing9",
+              justifyContent: "center"
             }}
           >
             <Image
               src={f.logo}
               sx={{
+                width: f.logoSize?.width,
+                height: f.logoSize?.height,
                 maxWidth: 200
               }}
             />
-            {f.title && (
-              <Text
-                sx={{
-                  color: "heading",
-                  fontSize: "xl",
-                  fontWeight: 600,
-                  lineHeight: "100%"
-                }}
-              >
-                {f.title}
-              </Text>
-            )}
+            {f.title && <Image src={f.title} />}
           </Flex>
         </Link>
       ))}
