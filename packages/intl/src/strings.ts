@@ -189,8 +189,7 @@ export const strings = {
     }),
   untitledNote: () => strings.untitled(),
   newNote: () => t`New note`,
-  exportingNotes: (status?: string) =>
-    status ? status : t`Exporting notes`,
+  exportingNotes: (status?: string) => (status ? status : t`Exporting notes`),
   exportingNotesDesc: () => t`Please wait while we export your notes.`,
   exportingNote: (title: string) => t`Exporting "${title}"`,
   exportingNoteDesc: () => t`Please wait while we export your not.`,
@@ -217,8 +216,9 @@ export const strings = {
     collection: string;
     current: number;
   }) =>
-    t`Migrating ${progress ? `${progress?.collection}` : ""} ${progress ? `(${progress.current}/${progress.total}) ` : ""
-      }... please wait`,
+    t`Migrating ${progress ? `${progress?.collection}` : ""} ${
+      progress ? `(${progress.current}/${progress.total}) ` : ""
+    }... please wait`,
   migrationError: () =>
     t`An error occurred while migrating your data. You can logout of your account and try to relogin. However this is not recommended as it may result in some data loss if your data was not synced.`,
   migrationAppReset: () =>
@@ -580,8 +580,8 @@ $day$: Current day (eg. Monday)`,
   ) => {
     return mode in REMINDER_NOTIFICATION_MODES
       ? REMINDER_NOTIFICATION_MODES[
-        mode as keyof typeof REMINDER_NOTIFICATION_MODES
-      ]()
+          mode as keyof typeof REMINDER_NOTIFICATION_MODES
+        ]()
       : mode;
   },
   oldNew: () => t`Old - new`,
@@ -904,8 +904,9 @@ $day$: Current day (eg. Monday)`,
   mfaSmsDesc: () =>
     t`Notesnook will send you an SMS with a 2FA code when prompted`,
   mfaSmsSubtitle: (phoneNumber?: string) =>
-    t`Please confirm your identity by entering the authentication code sent to ${phoneNumber ? phoneNumber : "your registered phone number."
-      }.`,
+    t`Please confirm your identity by entering the authentication code sent to ${
+      phoneNumber ? phoneNumber : "your registered phone number."
+    }.`,
   mfaSmsInstructions: () => t`It may take a minute to receive your code.`,
   mfaSmsSelector: () => t`Don't have access to your phone number?`,
   mfaRecoveryCodeSubtitle: () =>
@@ -2342,8 +2343,9 @@ Use this if changes from other devices are not appearing on this device. This wi
   trialPlanConditions: [
     (duration: number) => t`Free ${duration} day trial, cancel any time`,
     (platform: "ios" | "android") =>
-      t`${platform === "ios" ? "Apple" : "Google"
-        } will remind you before your trial ends`
+      t`${
+        platform === "ios" ? "Apple" : "Google"
+      } will remind you before your trial ends`
   ],
   purchase: () => t`Purchase`,
   subscribe: () => t`Subscribe`,
@@ -2684,8 +2686,7 @@ Continue without attachments?`,
     t`Embed code must include an iframe with an src attribute.`,
   invalidUrl: () => t`Please provide a valid url.`,
   invalidEmbedUrl: () => t`Please provide a valid embed url.`,
-  javascriptNotSupported: () =>
-    t`Embedding javascript code is not supported.`,
+  javascriptNotSupported: () => t`Embedding javascript code is not supported.`,
   browserAudioNotSupported: () =>
     t`Your browser does not support the audio element.`,
   failedToLoadWebClip: () => t`Failed to load web clip`,
@@ -2711,6 +2712,11 @@ Continue without attachments?`,
   yesterday: () => t`Yesterday`,
   ongoing: () => t`Ongoing`,
   snoozedUntil: (time: string) => t`Snoozed until ${time}`,
+  reminderToday: (time: string) => t`Today, ${time}`,
+  reminderTomorrow: (time: string) => t`Tomorrow, ${time}`,
+  reminderYesterday: (time: string) => t`Yesterday, ${time}`,
+  reminderUpcoming: (time: string) => t`Upcoming: ${time}`,
+  reminderLast: (time: string) => t`Last: ${time}`,
   noteRestoredFromTrash: () => t`Note restored from trash`,
   notebookRestoredFromTrash: () => t`Notebook restored from trash`,
   colors: () => t`Colors`,
@@ -2727,14 +2733,11 @@ Continue without attachments?`,
     t`Downloading attachments (${current})`,
   creatingZip: () => t`Creating zip`,
   settingUpAccount: () => t`Setting up your account...`,
-  accountAlmostReady: () =>
-    t`Your account is almost ready, please wait...`,
+  accountAlmostReady: () => t`Your account is almost ready, please wait...`,
   freePlanDesc: () => t`Basic features for personal use`,
-  essentialPlanDesc: () =>
-    t`Unlocks essential features for personal use`,
+  essentialPlanDesc: () => t`Unlocks essential features for personal use`,
   proPlanDesc: () => t`Unlocks all features for professional use`,
-  believerPlanDesc: () =>
-    t`Become a believer and support the project`,
+  believerPlanDesc: () => t`Become a believer and support the project`,
   migratingData: () => t`Migrating Data`,
   migratingDataDesc: () => t`Please wait while we migrate your data`,
   restoringAttachmentsCount: (current: number, total: number) =>
@@ -2768,8 +2771,7 @@ Continue without attachments?`,
   trustedAndRecommendedBy200KUsers: () =>
     t`Trusted and recommended by over 200K users`,
   upgradeNow: () => t`Upgrade now`,
-  dayMoneyBackGuarantee: (days: number) =>
-    t`${days}-day money-back guarantee.`,
+  dayMoneyBackGuarantee: (days: number) => t`${days}-day money-back guarantee.`,
   perMonth: () => t`/ month`,
   forever: () => t`forever`,
   for1Month: () => t`for 1 month`,
@@ -2790,8 +2792,7 @@ Continue without attachments?`,
     t`Your account will automatically downgrade to the Free plan on ${date}.`,
   changeSubPlan: () => t`Change your subscription plan.`,
   refundSub: () => t`Refund subscription`,
-  requestingRefundForSub: () =>
-    t`Requesting refund for your subscription`,
+  requestingRefundForSub: () => t`Requesting refund for your subscription`,
   inbox: () => t`Inbox`,
   lockAppAfter: () => t`Lock app after`,
   nMinutes: (n: number) => t`${n} minutes`,
@@ -2929,8 +2930,7 @@ Continue without attachments?`,
   checkOutOurStepByStepGuideOn: () => t`Check out our step-by-step guide on`,
   howToImportFrom: (provider: string) => t`how to import from ${provider}.`,
   dropTheFilesHere: () => t`Drop the files here`,
-  dragDropFilesHere: () =>
-    t`Drag & drop files here, or click to select files`,
+  dragDropFilesHere: () => t`Drag & drop files here, or click to select files`,
   onlySupportedExtensions: (extensions: string) =>
     t`Only ${extensions} files are supported.`,
   canAlsoSelectZipFiles: (extensions: string) =>
@@ -2948,17 +2948,14 @@ Continue without attachments?`,
   startImporting: () => t`Start importing`,
   importingNotesFrom: (provider: string) =>
     t`Importing your notes from ${provider}`,
-  connectYourAccount: (provider: string) =>
-    t`Connect your ${provider} account`,
+  connectYourAccount: (provider: string) => t`Connect your ${provider} account`,
   sendUsABugReport: () => t`Send us a bug report`,
 
   // Checkout, Recovery & Navigation
   startYourJourney: () => t`Start your journey`,
   goBackToApp: () => t`Go back to app`,
-  recoveryKeyRequired: () =>
-    t`Recovery key is required to reset password.`,
-  couldNotResetAccountPassword: () =>
-    t`Could not reset account password.`,
+  recoveryKeyRequired: () => t`Recovery key is required to reset password.`,
+  couldNotResetAccountPassword: () => t`Could not reset account password.`,
 
   // Settings & Formats
   markdownFrontmatter: () => t`Markdown + Frontmatter`,
@@ -3037,8 +3034,7 @@ Continue without attachments?`,
   exportCompletedWithErrors: (errorCount: number) =>
     t`Export completed with ${errorCount} errors`,
   exportCompletedSuccessfully: () => t`Export completed with 0 errors.`,
-  downloadingAttachment: (path: string) =>
-    t`Downloading attachment: ${path}`,
+  downloadingAttachment: (path: string) => t`Downloading attachment: ${path}`,
   savingAttachment: (path: string) => t`Saving attachment: ${path}`,
   failedToExportAttachment: (path: string, message: string) =>
     t`Failed to export attachment: ${path}. ${message}`,
@@ -3195,4 +3191,3 @@ Continue without attachments?`,
   clickOnNewNoteToCreateNote: () =>
     t`. Click on "New note" to create a new note.`
 };
-
