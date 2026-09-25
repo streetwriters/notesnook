@@ -285,6 +285,7 @@ export class Notes implements ICollection {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
+          .where(isFalse("archived"))
           .where("pinned", "==", true),
       this.db.options?.batchSize
     );
