@@ -321,6 +321,7 @@ import GearSixSvg from "@notesnook/icons/gear-six.svg?react";
 import SignOutSvg from "@notesnook/icons/sign-out.svg?react";
 import SignInSvg from "@notesnook/icons/sign-in.svg?react";
 import UserSvg from "@notesnook/icons/user.svg?react";
+import ListSvg from "@notesnook/icons/list.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -775,3 +776,4 @@ export const GearSix = createSvgIcon(GearSixSvg);
 export const SignOut = createSvgIcon(SignOutSvg);
 export const SignIn = createSvgIcon(SignInSvg);
 export const UserProfileIcon = createSvgIcon(UserSvg);
+export const List = createSvgIcon(ListSvg);

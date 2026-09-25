@@ -264,15 +264,9 @@ function Note(props: NoteProps) {
               />
               {note.conflicted && <Alert size={11} color="icon-error" />}
               {locked && (
-                <NoteLock
-                  size={11}
-                  color="icon-secondary"
-                  data-test-id="locked"
-                />
+                <NoteLock size={11} color="icon" data-test-id="locked" />
               )}
-              {note.readonly && (
-                <NoteReadonly size={11} color="icon-secondary" />
-              )}
+              {note.readonly && <NoteReadonly size={11} color="icon" />}
               {note.favorite && (
                 <NoteFavorite
                   data-test-id="favorite"

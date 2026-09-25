@@ -25,7 +25,8 @@ import {
   Menu,
   SearchIcon,
   Sliders,
-  ViewList
+  ViewList,
+  List
 } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -120,7 +121,8 @@ function useGroupingState(
   const canToggleView =
     groupingKey === "home" ||
     groupingKey === "notes" ||
-    groupingKey === "favorites";
+    groupingKey === "favorites" ||
+    groupingKey === "archive";
 
   return { groupingKey, refresh, context, canToggleView };
 }
@@ -178,7 +180,11 @@ function GroupOptions({
           }
           sx={{ p: 0 }}
         >
-          <ViewList size={15} color="icon-secondary" />
+          {viewMode === "compact" ? (
+            <List size={15} color="icon-secondary" />
+          ) : (
+            <ViewList size={15} color="icon-secondary" />
+          )}
         </Button>
       )}
     </Box>
