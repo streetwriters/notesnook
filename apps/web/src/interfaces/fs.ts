@@ -379,6 +379,12 @@ async function multiPartUploadFile(
 
   onUploadProgress();
   const queue = newQueue(4);
+  const controller = new AbortController();
+  if (signal) {
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener("abort", () => controller.abort(), { once: true });
+  }
+
   let uploadError: unknown = null;
   for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
     const from = i * UPLOAD_PART_REQUIRED_CHUNKS;
@@ -389,7 +395,7 @@ async function multiPartUploadFile(
     const url = parts[i];
     queue
       .add(async () => {
-        if (uploadError || signal?.aborted) return;
+        if (controller.signal.aborted) return;
         const blob = await fileHandle.readChunks(
           i * UPLOAD_PART_REQUIRED_CHUNKS,
           length
@@ -399,7 +405,7 @@ async function multiPartUploadFile(
             url,
             method: "PUT",
             headers: { "Content-Type": "" },
-            signal,
+            signal: controller.signal,
             data: blob,
             onUploadProgress: (ev) => {
               uploadedBytes += ev.bytes;
@@ -424,6 +430,7 @@ async function multiPartUploadFile(
       .catch((e) => {
         if (!uploadError) {
           uploadError = e;
+          controller.abort();
           queue.clear();
         }
       });
