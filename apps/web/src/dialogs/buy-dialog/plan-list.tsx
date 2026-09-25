@@ -182,6 +182,10 @@ export function PlansList(props: PlansListProps) {
               flexDirection: "row",
               gap: "spacing3",
               bg: selectedPeriod === id ? "accent" : "background-tertiary",
+              color:
+                selectedPeriod === id
+                  ? "accentForeground"
+                  : "heading-secondary",
               fontWeight: selectedPeriod === id ? 600 : 500,
               border: "none",
               borderRadius: "8px",
@@ -798,7 +802,7 @@ export function ComparePlans() {
                   <Text
                     variant="body"
                     sx={{
-                      fontSize: "18px",
+                      fontSize: "sm",
                       color: "paragraph"
                     }}
                   >
@@ -998,7 +1002,7 @@ export function TestimonialsCarousel() {
                     <Text
                       variant="heading"
                       sx={{
-                        fontSize: "lg",
+                        fontSize: "xl",
                         fontWeight: 600,
                         lineHeight: "100%",
                         color: "heading"
@@ -1177,10 +1181,9 @@ function CancelInfoCard(props: CancelInfoCardProps) {
         alignItems: "center",
         justifyContent: "center",
         width: "100%",
-        px: "spacing3",
-        py: "spacing4",
+        p: "spacing5",
         bg: "background-secondary",
-        borderRadius: "12px"
+        borderRadius: "radius2"
       }}
     >
       <Flex
@@ -1228,7 +1231,7 @@ function CancelInfoCard(props: CancelInfoCardProps) {
           <Text
             sx={{
               color: "paragraph",
-              fontSize: "xs",
+              fontSize: "sm",
               fontWeight: 400,
               lineHeight: 1.4
             }}
@@ -1293,7 +1296,7 @@ function PlanCard({
           >
             <Text
               variant="heading"
-              sx={{ fontSize: "2xl" }}
+              sx={{ fontSize: "xl" }}
               data-test-id="title"
             >
               {metadata.title}
@@ -1393,7 +1396,8 @@ function PlanCard({
           variant={isRecommended ? "new_accent" : "new_secondary"}
           onClick={() => onPlanSelected(plan)}
           sx={{
-            width: "100%"
+            width: "100%",
+            fontSize: "md"
           }}
         >
           Select Plan

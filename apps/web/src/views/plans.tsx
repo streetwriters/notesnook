@@ -114,10 +114,11 @@ function Plans() {
               onClick={() => openURL("/")}
               variant="new_bordered"
               sx={{
+                background: "background",
                 position: "absolute",
                 top: 80,
                 right: 80,
-                gap: "12px"
+                gap: "spacing4"
               }}
             >
               Skip
@@ -197,11 +198,7 @@ function PlansCTA() {
   const inverseParagraph =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.paragraph
-      : darkTheme.scopes.base.primary.paragraph;
-  const inverseBackgroundSecondary =
-    colorScheme === "dark"
-      ? lightTheme.scopes.base.secondary.background
-      : darkTheme.scopes.base.secondary.background;
+      : "#FFFFFF";
   const inverseAccentForeground =
     colorScheme === "dark"
       ? lightTheme.scopes.base.primary.accentForeground
@@ -253,9 +250,9 @@ function PlansCTA() {
             sx={{
               alignItems: "center",
               gap: "spacing4",
-              bg: inverseBackgroundSecondary,
               borderRadius: "radius2",
-              p: "spacing3"
+              p: "spacing3",
+              border: "1px solid var(--border)"
             }}
           >
             <Lightning size={15} color={inverseAccentForeground} />
@@ -280,12 +277,13 @@ function PlansCTA() {
               sx={{
                 flexDirection: "column",
                 alignItems: "flex-start",
-                gap: "spacing3"
+                gap: "spacing3",
+                maxWidth: "650px"
               }}
             >
               <Text
                 sx={{
-                  fontSize: "4xl",
+                  fontSize: "50px",
                   lineHeight: 1.2,
                   fontWeight: 600,
                   color: inverseHeading

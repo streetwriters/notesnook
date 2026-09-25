@@ -112,7 +112,10 @@ const newBordered: ThemeUIStyleObject = {
 const newAnchor: ThemeUIStyleObject = {
   variant: "buttons.anchor",
   fontSize: "sm",
-  fontWeight: 500
+  fontWeight: 500,
+  ":hover:not(:disabled):not(:active)": {
+    bg: "transparent"
+  }
 };
 
 const newSecondary: ThemeUIStyleObject = {

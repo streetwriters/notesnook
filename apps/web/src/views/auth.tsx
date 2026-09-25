@@ -1231,7 +1231,15 @@ export function AuthFormContainer<
             type="button"
             variant="new_bordered"
             sx={{ width: "100%", mt: "spacing4" }}
-            onClick={() => {
+            onClick={async () => {
+              const ok = await ConfirmDialog.show({
+                title: strings.offlineMode(),
+                message: strings.offlineModeDesc(),
+                negativeButtonText: strings.cancel(),
+                positiveButtonText: strings.understand()
+              });
+              if (!ok) return;
+
               openURL("/notes/", { authenticated: false });
             }}
           >
@@ -1298,7 +1306,7 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
       {props.text}{" "}
       <Button
         type="button"
-        variant="anchor"
+        variant="new_anchor"
         sx={{
           fontWeight: 600,
           fontSize: "sm",
