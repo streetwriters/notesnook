@@ -236,6 +236,7 @@ export function ListPanePlaceholder({
         </Text>
         <Text
           sx={{
+            maxWidth: "250px",
             fontSize: "sm",
             color: "paragraph",
             lineHeight: 1.2
