@@ -133,8 +133,6 @@ export function formatReminderTime(
 ) {
   const { date } = reminder;
   let time = date;
-  let tag = "";
-  let text = "";
 
   if (reminder.mode === "permanent") return strings.ongoing();
 
@@ -162,23 +160,26 @@ export function formatReminderTime(
     type: "date-time"
   });
 
+  let isPast = false;
+  let text = "";
+
   if (dayjs(time).isTomorrow()) {
-    tag = strings.upcoming();
-    text = `${strings.tomorrow()}, ${formattedTime}`;
+    isPast = false;
+    text = strings.reminderTomorrow(formattedTime);
   } else if (dayjs(time).isYesterday()) {
-    tag = strings.last();
-    text = `${strings.yesterday()}, ${formattedTime}`;
+    isPast = true;
+    text = strings.reminderYesterday(formattedTime);
   } else {
-    const isPast = dayjs(time).isSameOrBefore(dayjs());
-    tag = isPast ? strings.last() : strings.upcoming();
+    isPast = dayjs(time).isSameOrBefore(dayjs());
     if (dayjs(time).isToday()) {
-      text = `${strings.today()}, ${formattedTime}`;
+      text = strings.reminderToday(formattedTime);
     } else {
       text = formattedDateTime;
     }
   }
 
-  return short ? text : `${tag}: ${text}`;
+  if (short) return text;
+  return isPast ? strings.reminderLast(text) : strings.reminderUpcoming(text);
 }
 
 export function isReminderToday(reminder: Reminder) {
