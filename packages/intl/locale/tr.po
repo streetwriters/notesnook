@@ -2270,6 +2270,10 @@ msgstr "Yedek dosyaları önbelleğe kopyalanıyor"
 msgid "CORS bypass"
 msgstr "CORS atlatma"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "Kullanıcı hesabı şifresi değiştirilemedi."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "Çöp kutusu boşaltılamadı."
@@ -4274,6 +4278,10 @@ msgstr "Anında senkronizasyon"
 #: src/strings.ts:681
 msgid "Invalid {type}"
 msgstr "Geçersiz {type}"
+
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Geçersiz yedekleme dosyası seçildi. Yalnızca .nnbackup ve .nnbackupz dosyaları geri yüklenebilir."
 
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
@@ -8040,6 +8048,10 @@ msgstr "Değiştirmeyi aç/kapat"
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Temayı değiştir"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "Belirtecin süresi doldu, tekrar giriş yapmayı deneyin"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"

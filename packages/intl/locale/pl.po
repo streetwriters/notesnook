@@ -2270,6 +2270,10 @@ msgstr "Kopiowanie plików kopii zapasowej do pamięci podręcznej"
 msgid "CORS bypass"
 msgstr "Omijanie CORS"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "Nie udało się zmienić hasła do konta użytkownika."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "Nie udało się opróżnić kosza."
@@ -4274,6 +4278,10 @@ msgstr "Błyskawiczna synchronizacja"
 #: src/strings.ts:681
 msgid "Invalid {type}"
 msgstr "Nieprawidłowy {type}"
+
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Wybrano nieprawidłowy plik kopii zapasowej. Można przywrócić tylko pliki .nnbackup i .nnbackupz."
 
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
@@ -8040,6 +8048,10 @@ msgstr "Pokaż/ukryj zamianę"
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Przełącz motyw"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "Token wygasł, spróbuj zalogować się ponownie"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"

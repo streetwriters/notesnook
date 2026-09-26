@@ -2270,6 +2270,10 @@ msgstr "Copiando los archivos de copia de seguridad a la caché"
 msgid "CORS bypass"
 msgstr "Omisión de CORS"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "No se pudo cambiar la contraseña de la cuenta de usuario."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "No se pudo vaciar la papelera."
@@ -4274,6 +4278,10 @@ msgstr "Sincronización instantánea"
 #: src/strings.ts:681
 msgid "Invalid {type}"
 msgstr "{type} no válido"
+
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Archivo de copia de seguridad no válido. Solo se pueden restaurar archivos .nnbackup y .nnbackupz."
 
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
@@ -8040,6 +8048,10 @@ msgstr "Mostrar u ocultar reemplazar"
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Cambiar de tema"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "El token ha caducado, intenta iniciar sesión de nuevo"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"
