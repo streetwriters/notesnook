@@ -624,7 +624,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
               <SubtitleWithAction
                 text={strings.rememberedYourPassword()}
                 action={{
-                  text: strings.login(),
+                  text: "Log in",
                   onClick: () => navigate("login")
                 }}
               />
