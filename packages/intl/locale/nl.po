@@ -2270,6 +2270,10 @@ msgstr "Back-upbestanden naar cache kopiëren"
 msgid "CORS bypass"
 msgstr "CORS omzeilen"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "Kon wachtwoord van gebruikersaccount niet wijzigen."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "Kan de prullenbak niet legen."
@@ -4274,6 +4278,10 @@ msgstr "Directe synchronisatie"
 #: src/strings.ts:681
 msgid "Invalid {type}"
 msgstr "Ongeldige {type}"
+
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Ongeldig reservekopiebestand geselecteerd. Alleen .nnbackup- en .nnbackupz-bestanden kunnen worden hersteld."
 
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
@@ -8040,6 +8048,10 @@ msgstr "Vervangen in-/uitschakelen"
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Thema wisselen"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "Token verlopen, probeer opnieuw in te loggen"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"

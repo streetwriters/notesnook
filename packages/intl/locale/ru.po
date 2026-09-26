@@ -2270,6 +2270,10 @@ msgstr "Копирование файлов резервной копии в к�
 msgid "CORS bypass"
 msgstr "Обход CORS"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "Не удалось изменить пароль учётной записи пользователя."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "Не удалось очистить корзину."
@@ -4274,6 +4278,10 @@ msgstr "Мгновенная синхронизация"
 #: src/strings.ts:681
 msgid "Invalid {type}"
 msgstr "Недопустимый {type}"
+
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Выбран недействительный файл резервной копии. Можно восстановить только файлы .nnbackup и .nnbackupz."
 
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
@@ -8040,6 +8048,10 @@ msgstr "Показать/скрыть замену"
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Переключить тему"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "Срок действия токена истёк, попробуйте войти снова"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"

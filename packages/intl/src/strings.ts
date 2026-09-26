@@ -3197,5 +3197,9 @@ Continue without attachments?`,
   cannotMoveNotebooksHere: () =>
     t`You cannot move the selected notebook(s) here`,
   unlockNoteToOpenInEditor: () => t`Unlock note to open it in editor.`,
-  unlockToAccessNotes: () => t`Unlock to access your notes`
+  unlockToAccessNotes: () => t`Unlock to access your notes`,
+  invalidBackupFileSelected: () =>
+    t`Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored.`,
+  tokenExpiredTryLoggingIn: () => t`Token expired, try logging in again`,
+  couldNotChangePassword: () => t`Could not change user account password.`
 };
