@@ -301,7 +301,7 @@ class SettingStore extends BaseStore<SettingStore> {
       if (isInboxEnabled) {
         const ok = await ConfirmDialog.show({
           title: "Disable Inbox API",
-          message:
+          subtitle:
             "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?",
           positiveButtonText: "Yes",
           negativeButtonText: "No"

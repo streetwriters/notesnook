@@ -92,7 +92,7 @@ class UserStore extends BaseStore<UserStore> {
       if (reason) {
         await ConfirmDialog.show({
           title: strings.loggedOut(),
-          message: reason,
+          subtitle: reason,
           negativeButtonText: strings.okay()
         });
       }
@@ -141,8 +141,11 @@ class UserStore extends BaseStore<UserStore> {
         await db.user.authenticateMultiFactorCode(code, method);
 
         if (this._pendingLogin) {
-          const { email, password, sessionExpired: sessExp } =
-            this._pendingLogin;
+          const {
+            email,
+            password,
+            sessionExpired: sessExp
+          } = this._pendingLogin;
           this._pendingLogin = undefined;
           await db.user.authenticatePassword(
             email,

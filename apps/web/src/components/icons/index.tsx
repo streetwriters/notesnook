@@ -322,6 +322,7 @@ import SignOutSvg from "@notesnook/icons/sign-out.svg?react";
 import SignInSvg from "@notesnook/icons/sign-in.svg?react";
 import UserSvg from "@notesnook/icons/user.svg?react";
 import ListSvg from "@notesnook/icons/list.svg?react";
+import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -777,3 +778,4 @@ export const SignOut = createSvgIcon(SignOutSvg);
 export const SignIn = createSvgIcon(SignInSvg);
 export const UserProfileIcon = createSvgIcon(UserSvg);
 export const List = createSvgIcon(ListSvg);
+export const CalendarDots = createSvgIcon(CalendarDotsSvg);

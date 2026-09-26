@@ -71,8 +71,9 @@ async function moveNotebooksToTrash(ids: string[]) {
 
   const result = await ConfirmDialog.show({
     title: strings.doActions.delete.notebook(ids.length),
-    positiveButtonText: strings.yes(),
-    negativeButtonText: strings.no(),
+    positiveButtonText: "Confirm",
+    positiveButtonVariant: "new_error",
+    negativeButtonText: strings.cancel(),
     checks: {
       deleteContainingNotes: {
         text: strings.deleteContainingNotes(ids.length)
@@ -105,7 +106,7 @@ async function deleteAttachments(ids: string[]) {
   if (
     !(await ConfirmDialog.show({
       title: strings.doActions.permanentlyDelete.attachment(ids.length),
-      message: strings.irreverisibleAction(),
+      subtitle: strings.irreverisibleAction(),
       negativeButtonText: strings.no(),
       positiveButtonText: strings.yes()
     }))

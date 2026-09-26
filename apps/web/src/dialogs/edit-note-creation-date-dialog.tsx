@@ -30,7 +30,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { DayPicker } from "../components/day-picker";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
-import { Calendar } from "../components/icons";
+import { CalendarDots } from "../components/icons";
 import { store as noteStore } from "../stores/note-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { setDateOnly, setTimeOnly } from "../utils/date-time";
@@ -65,7 +65,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
           onClose(false);
         }}
         title={strings.editCreationDate()}
-        description={`${strings.note()}: ${strings.creationDateCannotBeAfterLastEditedDate()}`}
+        description={`${strings.creationDateCannotBeAfterLastEditedDate()}`}
         negativeButton={{
           text: strings.cancel(),
           onClick: () => {
@@ -97,16 +97,23 @@ export const EditNoteCreationDateDialog = DialogManager.register(
           }
         }}
       >
-        <Flex sx={{ gap: 2, flexDirection: "column" }}>
+        <Flex
+          sx={{
+            gap: 2,
+            flexDirection: "column",
+            mt: "spacing6",
+            mb: "spacing7"
+          }}
+        >
           <Field
             id="date-created"
             label={strings.date()}
             required
             inputRef={dateInputRef}
             data-test-id="date-created-input"
-            helpText={`${db.settings.getDateFormat()}`}
+            // helpText={`${db.settings.getDateFormat()}`}
             action={{
-              icon: Calendar,
+              icon: CalendarDots,
               onClick() {
                 setShowCalendar(!showCalendar);
               }
@@ -116,6 +123,13 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             }
             defaultValue={date.format(db.settings.getDateFormat())}
             onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
+            sx={{
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
           />
           <PopupPresenter
             isOpen={showCalendar}
@@ -152,11 +166,11 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             label={strings.time()}
             required
             data-test-id="time-created-input"
-            helpText={`${
-              db.settings.getTimeFormat() === "12-hour"
-                ? "hh:mm AM/PM"
-                : "hh:mm"
-            }`}
+            // helpText={`${
+            //   db.settings.getTimeFormat() === "12-hour"
+            //     ? "hh:mm AM/PM"
+            //     : "hh:mm"
+            // }`}
             validate={(t) => {
               const format =
                 db.settings.getTimeFormat() === "12-hour" ? "hh:mm a" : "HH:mm";
@@ -166,6 +180,13 @@ export const EditNoteCreationDateDialog = DialogManager.register(
               getTimeFormat(db.settings.getTimeFormat())
             )}
             onChange={(e) => setDate((d) => setTimeOnly(e.target.value, d))}
+            sx={{
+              input: {
+                fontSize: "sm",
+                px: "spacing4",
+                py: "spacing6"
+              }
+            }}
           />
         </Flex>
       </Dialog>
