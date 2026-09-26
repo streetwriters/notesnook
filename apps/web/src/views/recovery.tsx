@@ -667,7 +667,6 @@ function AuthenticatedAsCard({ user }: { user: User }) {
               color: "heading",
               fontSize: "sm",
               fontWeight: 500,
-              lineHeight: 1,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap"
