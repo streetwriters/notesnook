@@ -17,11 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @type {import('@lingui/conf').LinguiConfig} */
+import { app } from "electron";
+import { config } from "./config";
+import { initLocale as initIntlLocale } from "@notesnook/intl";
 
-module.exports = {
-  locales: ["en", "cs", "fr"],
-  sourceLocale: "en",
-  format: "po",
-  compileNamespace: "ts"
-};
+export async function initLocale() {
+  return initIntlLocale({
+    getSavedLocale: () => config.appLanguage,
+    onSaveLocale: (locale) => {
+      config.appLanguage = locale;
+    },
+    systemLocale: app.getLocale() || "en"
+  });
+}
+

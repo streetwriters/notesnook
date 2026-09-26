@@ -228,7 +228,10 @@ export default function NoteHistory({
               ) : (
                 <>
                   <Icon name="history" size={50} color={colors.primary.icon} />
-                  <Paragraph color={colors.secondary.paragraph}>
+                  <Paragraph
+                    color={colors.secondary.paragraph}
+                    style={{ textAlign: "center" }}
+                  >
                     {strings.noteHistoryPlaceholder()}
                   </Paragraph>
                 </>
@@ -242,7 +245,8 @@ export default function NoteHistory({
         size={AppFontSize.xs}
         color={colors.secondary.paragraph}
         style={{
-          alignSelf: "center"
+          textAlign: "center",
+          paddingHorizontal: DefaultAppStyles.GAP
         }}
       >
         {strings.noteHistoryNotice[0]()}{" "}

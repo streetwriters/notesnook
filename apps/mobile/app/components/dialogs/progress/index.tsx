@@ -30,6 +30,7 @@ import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { strings } from "@notesnook/intl";
 
 export type ProgressOptions = {
   progress?: string;
@@ -167,7 +168,7 @@ export default function Progress() {
 
           {!data?.canHideProgress ? null : (
             <Button
-              title={cancelCallback.current ? "Cancel" : "Hide"}
+              title={cancelCallback.current ? strings.cancel() : strings.hide()}
               type="secondaryAccented"
               onPress={() => {
                 if (cancelCallback.current) {

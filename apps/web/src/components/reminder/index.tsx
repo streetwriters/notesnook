@@ -45,13 +45,6 @@ import { EditReminderDialog } from "../../dialogs/add-reminder-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
 
-const RECURRING_MODE_MAP = {
-  week: "Weekly",
-  day: "Daily",
-  month: "Monthly",
-  year: "Yearly"
-} as const;
-
 const PRIORITY_ICON_MAP = {
   silent: Silent,
   vibrate: Vibrate,
@@ -101,7 +94,11 @@ function Reminder(props: ReminderProps) {
         >
           {reminder.disabled ? null : <PriorityIcon size={14} />}
           {reminder.disabled ? (
-            <IconTag icon={ReminderOff} text={"Disabled"} testId={"disabled"} />
+            <IconTag
+              icon={ReminderOff}
+              text={strings.disabled()}
+              testId={"disabled"}
+            />
           ) : (
             <IconTag
               icon={Clock}
@@ -116,7 +113,7 @@ function Reminder(props: ReminderProps) {
           {reminder.mode === "repeat" && reminder.recurringMode && (
             <IconTag
               icon={Refresh}
-              text={RECURRING_MODE_MAP[reminder.recurringMode]}
+              text={strings.recurringModes(reminder.recurringMode)}
               testId={`recurring-mode`}
             />
           )}

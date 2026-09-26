@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { formatBytes } from "@notesnook/common";
 import { WrappedStats } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import dayjs from "dayjs";
 import React, { useEffect, useRef, useState } from "react";
@@ -125,7 +126,7 @@ function WelcomeSlide({ width }: { width: number }) {
             textAlign: "center"
           }}
         >
-          Your {dayjs().year()} Wrapped
+          {strings.yourYearWrapped(dayjs().year())}
         </Heading>
         <Paragraph
           style={{
@@ -134,7 +135,7 @@ function WelcomeSlide({ width }: { width: number }) {
             color: colors.secondary.paragraph
           }}
         >
-          Let's look back at your year in Notesnook
+          {strings.letsLookBackAtYourYearInNotesnook()}
         </Paragraph>
       </View>
     </Slide>
@@ -153,7 +154,7 @@ function TotalNotesSlide({ count, width }: { count: number; width: number }) {
           textAlign: "center"
         }}
       >
-        You created
+        {strings.youCreated()}
       </Heading>
       <Heading
         style={{
@@ -171,7 +172,7 @@ function TotalNotesSlide({ count, width }: { count: number; width: number }) {
           textAlign: "center"
         }}
       >
-        notes this year
+        {strings.notesThisYear()}
       </Heading>
 
       <View
@@ -192,7 +193,7 @@ function TotalNotesSlide({ count, width }: { count: number; width: number }) {
           maxWidth: "80%"
         }}
       >
-        That's{" "}
+        {strings.thats()}{" "}
         <Heading
           style={{
             fontSize: AppFontSize.lg,
@@ -201,7 +202,7 @@ function TotalNotesSlide({ count, width }: { count: number; width: number }) {
         >
           {formatNumber(count)}
         </Heading>{" "}
-        ideas, thoughts, memories. 100% encrypted. 100% yours.
+        {strings.wrappedNotesSubtext()}
       </Paragraph>
     </Slide>
   );
@@ -220,7 +221,7 @@ function TotalWordsSlide({ count, width }: { count: number; width: number }) {
           textAlign: "center"
         }}
       >
-        You wrote a total of
+        {strings.youWroteATotalOf()}
       </Paragraph>
       <Heading
         style={{
@@ -240,7 +241,7 @@ function TotalWordsSlide({ count, width }: { count: number; width: number }) {
           color: colors.primary.paragraph
         }}
       >
-        words this year
+        {strings.wordsThisYear()}
       </Heading>
 
       <View
@@ -261,7 +262,7 @@ function TotalWordsSlide({ count, width }: { count: number; width: number }) {
           maxWidth: "80%"
         }}
       >
-        That's almost the length of a short novel!
+        {strings.thatsAlmostTheLengthOfAShortNovel()}
       </Paragraph>
     </Slide>
   );
@@ -298,7 +299,7 @@ function ActivityStatsSlide({
                 color: colors.primary.paragraph
               }}
             >
-              Your most productive month was
+              {strings.yourMostProductiveMonthWas()}
             </Paragraph>
             <View
               style={{
@@ -323,7 +324,7 @@ function ActivityStatsSlide({
                   textAlign: "center"
                 }}
               >
-                {formatNumber(mostNotesCreatedInMonth.count)} notes
+                {strings.notes(mostNotesCreatedInMonth.count)}
               </Paragraph>
             </View>
           </View>
@@ -336,7 +337,7 @@ function ActivityStatsSlide({
                 color: colors.primary.paragraph
               }}
             >
-              Your favorite day to write was
+              {strings.yourFavoriteDayToWriteWas()}
             </Paragraph>
             <View
               style={{
@@ -360,7 +361,7 @@ function ActivityStatsSlide({
                   textAlign: "center"
                 }}
               >
-                {mostNotesCreatedInDay.count} notes
+                {strings.notes(mostNotesCreatedInDay.count)}
               </Paragraph>
             </View>
           </View>
@@ -392,7 +393,7 @@ function MostUsedTagsSlide({ tags, totalTags, width }: MostUsedTagsSlideProps) {
           textAlign: "center"
         }}
       >
-        You created{" "}
+        {strings.youCreated()}{" "}
         <Paragraph
           style={{
             fontWeight: "bold",
@@ -402,7 +403,7 @@ function MostUsedTagsSlide({ tags, totalTags, width }: MostUsedTagsSlideProps) {
         >
           {formatNumber(totalTags)}
         </Paragraph>{" "}
-        {totalTags === 1 ? "tag" : "tags"}, your favorites
+        {strings.tagsYourFavorites(totalTags)}
       </Paragraph>
       <View style={{ gap: DefaultAppStyles.GAP_VERTICAL, width: "100%" }}>
         {tags.map((tag, index) => (
@@ -432,7 +433,7 @@ function MostUsedTagsSlide({ tags, totalTags, width }: MostUsedTagsSlideProps) {
                   color: colors.secondary.paragraph
                 }}
               >
-                {formatNumber(tag.noteCount)} notes
+                {strings.notes(tag.noteCount)}
               </Paragraph>
             </View>
             <Paragraph
@@ -477,7 +478,7 @@ function MostActiveNotebooksSlide({
           textAlign: "center"
         }}
       >
-        You created{" "}
+        {strings.youCreated()}{" "}
         <Paragraph
           style={{
             fontWeight: "bold",
@@ -487,7 +488,7 @@ function MostActiveNotebooksSlide({
         >
           {formatNumber(totalNotebooks)}
         </Paragraph>{" "}
-        {totalNotebooks === 1 ? "notebook" : "notebooks"}, your favorites
+        {strings.notebooksYourFavorites(totalNotebooks)}
       </Paragraph>
       <View style={{ gap: DefaultAppStyles.GAP_VERTICAL, width: "100%" }}>
         {notebooks.map((notebook, index) => (
@@ -517,7 +518,7 @@ function MostActiveNotebooksSlide({
                   color: colors.secondary.paragraph
                 }}
               >
-                {formatNumber(notebook.noteCount)} notes
+                {strings.notes(notebook.noteCount)}
               </Paragraph>
             </View>
             <Paragraph
@@ -560,7 +561,7 @@ function AttachmentsSlide({
           textAlign: "center"
         }}
       >
-        Attachments
+        {strings.attachments()}
       </Heading>
       <Heading
         style={{
@@ -580,7 +581,7 @@ function AttachmentsSlide({
           textAlign: "center"
         }}
       >
-        files totaling {formatBytes(totalStorageUsed)}
+        {strings.filesTotaling(formatBytes(totalStorageUsed))}
       </Paragraph>
     </Slide>
   );
@@ -644,7 +645,7 @@ function SummarySlide({
                 marginTop: 30
               }}
             >
-              Notesnook Wrapped {dayjs().year()}
+              {strings.notesnookWrappedYear(dayjs().year())}
             </Heading>
             <View
               style={{
@@ -699,7 +700,7 @@ function SummarySlide({
                   }}
                   size={AppFontSize.sm}
                 >
-                  Notes per month
+                  {strings.notesPerMonth()}
                 </Heading>
               </View>
 
@@ -736,7 +737,7 @@ function SummarySlide({
                       textAlign: "center"
                     }}
                   >
-                    Words written
+                    {strings.wordsWritten()}
                   </Paragraph>
                 </View>
               )}
@@ -751,32 +752,32 @@ function SummarySlide({
               >
                 {[
                   {
-                    title: "Notes",
+                    title: strings.routes.Notes(),
                     count: stats.totalNotes,
                     emoji: "📝"
                   },
                   {
-                    title: "Notebooks",
+                    title: strings.routes.Notebooks(),
                     count: stats.totalNotebooks,
                     emoji: "📚"
                   },
                   {
-                    title: "Files",
+                    title: strings.attachments(),
                     count: stats.totalAttachments,
                     emoji: "📂"
                   },
                   {
-                    title: "Tags",
+                    title: strings.routes.Tags(),
                     count: stats.totalTags,
                     emoji: "🏷️"
                   },
                   {
-                    title: "Monographs",
+                    title: strings.routes.Monographs(),
                     count: stats.totalMonographs,
                     emoji: "☁️"
                   },
                   {
-                    title: "Colors",
+                    title: strings.colors(),
                     count: stats.totalColors,
                     emoji: "🟡"
                   }
@@ -830,7 +831,7 @@ function SummarySlide({
                   gap: DefaultAppStyles.GAP_VERTICAL
                 }}
               >
-                <Heading size={AppFontSize.md}>Fun facts of the year</Heading>
+                <Heading size={AppFontSize.md}>{strings.funFactsOfTheYear()}</Heading>
 
                 {stats.mostNotesCreatedInMonth && (
                   <View>
@@ -840,7 +841,7 @@ function SummarySlide({
                         color: colors.primary.paragraph
                       }}
                     >
-                      Your most productive month was{" "}
+                      {strings.yourMostProductiveMonthWas()}{" "}
                       <Heading
                         size={AppFontSize.sm}
                         color={colors.primary.accent}
@@ -858,7 +859,7 @@ function SummarySlide({
                         color: colors.primary.paragraph
                       }}
                     >
-                      Your favorite day to write was{" "}
+                      {strings.yourFavoriteDayToWriteWas()}{" "}
                       <Heading
                         size={AppFontSize.sm}
                         color={colors.primary.accent}
@@ -877,12 +878,12 @@ function SummarySlide({
                         color: colors.primary.paragraph
                       }}
                     >
-                      Your largest note was{" "}
+                      {strings.yourLargestNoteWas()}{" "}
                       <Heading
                         size={AppFontSize.sm}
                         color={colors.primary.accent}
                       >
-                        {formatNumber(stats.largestNote.length)} words
+                        {strings.wordsCount(stats.largestNote.length)}
                       </Heading>
                     </Paragraph>
                   </View>
@@ -896,7 +897,7 @@ function SummarySlide({
                         color: colors.primary.paragraph
                       }}
                     >
-                      Your largest attachment was{" "}
+                      {strings.yourLargestAttachmentWas()}{" "}
                       <Heading
                         size={AppFontSize.sm}
                         color={colors.primary.accent}
@@ -914,14 +915,14 @@ function SummarySlide({
                   color: colors.secondary.paragraph
                 }}
               >
-                Generated 100% locally on your device.
+                {strings.generatedLocallyOnDevice()}
               </Paragraph>
             </View>
           </View>
         </ViewShot>
 
         <Button
-          title="Share with friends"
+          title={strings.shareWithFriendsButton()}
           type="secondaryAccented"
           onPress={async () => {
             const path = await viewShotRef.current?.capture?.();

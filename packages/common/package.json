@@ -43,6 +43,7 @@
   "dependencies": {
     "@notesnook/common": "^2.1.3",
     "@notesnook/core": "file:../core",
+    "@notesnook/intl": "file:../intl",
     "@readme/data-urls": "^3.0.0",
     "dayjs": "1.11.13",
     "pathe": "^1.1.2",

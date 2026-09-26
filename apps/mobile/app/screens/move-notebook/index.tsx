@@ -333,15 +333,17 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              height: 200
+              height: 200,
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             <Text
               style={{
-                color: colors.secondary.icon
+                color: colors.secondary.icon,
+                textAlign: "center"
               }}
             >
-              No notebooks
+              {strings.emptyPlaceholders("notebook")}
             </Text>
           </View>
         }

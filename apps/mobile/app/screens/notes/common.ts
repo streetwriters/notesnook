@@ -30,13 +30,13 @@ import { openLinkInBrowser } from "../../utils/functions";
 import { fluidTabsRef } from "../../utils/global-refs";
 import { editorState } from "../editor/tiptap/utils";
 
-export const PLACEHOLDER_DATA = {
+export const getPlaceholderData = () => ({
   title: strings.yourNotes(),
   paragraph: strings.notesEmpty(),
   button: strings.addFirstNote(),
   action: openEditor,
   loading: strings.loadingNotes()
-};
+});
 
 export function toCamelCase(title: string) {
   if (!title) return "";

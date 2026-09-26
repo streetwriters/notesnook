@@ -229,7 +229,7 @@ export function PlansList(props: PlansListProps) {
                           py: "small"
                         }}
                       >
-                        Most popular
+                        {strings.mostPopular()}
                       </Text>
                     ) : null}
                   </Flex>
@@ -281,7 +281,7 @@ export function PlansList(props: PlansListProps) {
                   {selectedPlan === plan.id ? (
                     <Flex sx={{ mt: 2, alignItems: "center", gap: 1 }}>
                       <CheckCircleOutline color="accent" size={16} />
-                      <Text variant="subBody">You are on this plan.</Text>
+                      <Text variant="subBody">{strings.youAreOnThisPlan()}</Text>
                     </Flex>
                   ) : (
                     <Button
@@ -292,8 +292,8 @@ export function PlansList(props: PlansListProps) {
                       sx={{ mt: 2 }}
                     >
                       {isTrialAvailableForPlan(plan.plan, user) && !ignoreTrial
-                        ? "Start your free trial"
-                        : "Select plan"}
+                        ? strings.startYourFreeTrial()
+                        : strings.selectPlan()}
                     </Button>
                   )}
                 </Flex>
@@ -303,8 +303,10 @@ export function PlansList(props: PlansListProps) {
       </Flex>
 
       <Text variant="body" sx={{ alignSelf: "center", mt: 2 }}>
-        Cancel anytime. {PERIOD_METADATA[selectedPeriod].refundDays}-day
-        money-back guarantee.
+        {strings.cancelAnytime()}{" "}
+        {strings.dayMoneyBackGuarantee(
+          PERIOD_METADATA[selectedPeriod].refundDays
+        )}
       </Text>
       <Button
         variant="tertiary"
@@ -315,7 +317,7 @@ export function PlansList(props: PlansListProps) {
             ?.scrollIntoView({ behavior: "smooth" })
         }
       >
-        Compare all plans
+        {strings.compareAllPlans()}
       </Button>
       <Flex
         sx={{ alignItems: "center", justifyContent: "center", gap: 4, mt: 50 }}
@@ -354,7 +356,7 @@ export function Footer() {
         sx={{ alignSelf: "center", fontSize: "heading", mb: 25, mt: 100 }}
         id="compare-plans"
       >
-        FAQs
+        {strings.faqs()}
       </Text>
       <Flex sx={{ flexDirection: "column", gap: 2 }}>
         {strings.checkoutFaqs.map((faq) => (
@@ -367,7 +369,7 @@ export function Footer() {
         variant="heading"
         sx={{ fontSize: "subheading", textAlign: "center", mt: 100 }}
       >
-        Trusted and recommended by over 200K users
+        {strings.trustedAndRecommendedBy200KUsers()}
       </Text>
       <Flex
         sx={{ alignItems: "center", justifyContent: "center", gap: 4, mt: 4 }}
@@ -402,7 +404,7 @@ export function Footer() {
             ?.scrollIntoView({ behavior: "smooth" })
         }
       >
-        Upgrade now
+        {strings.upgradeNow()}
       </Button>
     </>
   );
@@ -440,7 +442,10 @@ function RecurringPricing(props: PricingProps) {
                 py: "small"
               }}
             >
-              {plan.discount?.amount}% off in {plan.country}
+              {strings.percentOffInCountry(
+                plan.discount?.amount || 0,
+                plan.country
+              )}
             </Text>
           ) : null}
         </Flex>
@@ -454,22 +459,24 @@ function RecurringPricing(props: PricingProps) {
           ""
         ) : (
           <Text sx={{ fontSize: "title", color: "paragraph-secondary" }}>
-            / month
+            {strings.perMonth()}
           </Text>
         )}
       </Text>
       <Text as="div" variant="subBody">
-        {isZero ? (
-          "forever"
-        ) : plan.period === "monthly" ? (
-          ""
-        ) : (
-          <>
-            billed {formatRecurringPeriod(plan.period)} at{" "}
-            {getCurrencySymbol(plan.currency)}
-            {plan.price.gross}
-          </>
-        )}
+        {isZero
+          ? strings.forever()
+          : plan.period === "monthly"
+          ? ""
+          : plan.period === "yearly"
+          ? strings.billedAnnually(
+              `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+            )
+          : plan.period === "5-year"
+          ? strings.billedEvery5Years(
+              `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+            )
+          : ""}
       </Text>
     </>
   );
@@ -490,8 +497,8 @@ function OneTimePricing(props: PricingProps) {
   );
 }
 
-const rows = getFeaturesTable();
 export function ComparePlans() {
+  const rows = getFeaturesTable();
   return (
     <Flex
       sx={{
@@ -508,7 +515,7 @@ export function ComparePlans() {
         sx={{ alignSelf: "center", fontSize: "heading", mb: 25 }}
         id="compare-plans"
       >
-        Compare plans
+        {strings.comparePlans()}
       </Text>
       <table
         style={{
@@ -607,7 +614,7 @@ function Testimonial() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          source
+          {strings.source()}
         </Link>
       </Text>
       <Flex mt={2} sx={{ alignItems: "center", justifyContent: "center" }}>
@@ -625,21 +632,21 @@ function Testimonial() {
 
 export function formatOneTimePeriod(period: Period) {
   return period === "monthly"
-    ? "for 1 month"
+    ? strings.for1Month()
     : period === "yearly"
-    ? "for 1 year"
+    ? strings.for1Year()
     : period === "5-year"
-    ? "for 5 years"
+    ? strings.for5Years()
     : "";
 }
 
 export function formatRecurringPeriod(period: Period) {
   return period === "monthly"
-    ? "monthly"
+    ? strings.monthly()
     : period === "yearly"
-    ? "annually"
+    ? strings.annually()
     : period === "5-year"
-    ? "every 5 years"
+    ? strings.every5Years()
     : "";
 }
 

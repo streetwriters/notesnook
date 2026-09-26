@@ -67,7 +67,8 @@ function logout() {
     "theme:dark",
     "colorScheme",
     "followSystemTheme",
-    "doubleSpacedLines"
+    "doubleSpacedLines",
+    "appLanguage"
   ];
   const vals = {} as Record<string, any>;
 

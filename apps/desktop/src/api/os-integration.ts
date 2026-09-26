@@ -38,6 +38,8 @@ import { observable } from "@trpc/server/observable";
 import { AssetManager } from "../utils/asset-manager";
 import { isFlatpak, isPortable, isSnap } from "../utils";
 import { setupDesktopIntegration } from "../utils/desktop-integration";
+import { setupJumplist } from "../utils/jumplist";
+import { initLocale } from "../utils/locale";
 import { disableCustomDns, enableCustomDns } from "../utils/custom-dns";
 import type { MenuItem as NNMenuItem } from "@notesnook/ui";
 import { platform } from "os";
@@ -136,6 +138,14 @@ export const osIntegrationRouter = t.router({
 
     config.backupDirectory = result.filePaths[0];
   }),
+  setAppLanguage: t.procedure
+    .input(z.string())
+    .mutation(async ({ input: language }) => {
+      config.appLanguage = language;
+      await initLocale();
+      setupDesktopIntegration(config.desktopSettings);
+      setupJumplist();
+    }),
   restart: t.procedure.query(() => {
     app.relaunch();
     app.exit();
@@ -180,8 +190,8 @@ export const osIntegrationRouter = t.router({
         if (globalThis.window) {
           await dialog.showMessageBox(globalThis.window, {
             type: "error",
-            title: "Path not found",
-            message: `The path does not exist:\n${wrapPath(resolvedPath)}`
+            title: strings.pathNotFound(),
+            message: strings.pathDoesNotExist(wrapPath(resolvedPath))
           });
         }
         return;

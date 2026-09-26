@@ -23,6 +23,7 @@ import { desktop } from "../common/desktop-bridge";
 import { SecurityKeyConfig } from "../utils/webauthn";
 import BaseStore, { GetState, SetState } from "../stores";
 import createStore from "../common/store";
+import { strings } from "@notesnook/intl";
 
 // Key chain credentials:
 /**
@@ -557,9 +558,9 @@ function fallbackCredential(
 export function wrongCredentialError(query: CredentialQuery): string {
   switch (query.type) {
     case "password":
-      return "Wrong password";
+      return strings.passwordIncorrect();
     case "securityKey":
-      return "Wrong security key.";
+      return strings.wrongSecurityKey();
   }
 }
 
