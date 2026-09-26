@@ -132,7 +132,8 @@ export function SubscriptionStatus() {
               onClick={async () => {
                 const giftCode = await PromptDialog.show({
                   title: strings.redeemGiftCode(),
-                  description: strings.redeemGiftCodeDesc()
+                  description: strings.redeemGiftCodeDesc(),
+                  label: "Enter gift code"
                 });
                 if (giftCode) {
                   await TaskManager.startTask({

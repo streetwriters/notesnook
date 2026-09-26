@@ -28,7 +28,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { DayPicker } from "../components/day-picker";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
-import { Calendar } from "../components/icons";
+import { CalendarDots } from "../components/icons";
 import { store } from "../stores/note-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { setDateOnly } from "../utils/date-time";
@@ -55,6 +55,7 @@ export const NoteExpiryDateDialog = DialogManager.register(
       <Dialog
         isOpen={true}
         title={strings.setExpiry()}
+        description="This note will automatically be deleted on the selected date."
         onClose={() => onClose(false)}
         width={400}
         positiveButton={{
@@ -87,9 +88,9 @@ export const NoteExpiryDateDialog = DialogManager.register(
           label={strings.date()}
           required
           inputRef={dateInputRef}
-          helpText={`${db.settings.getDateFormat()}`}
+          placeholder={`${db.settings.getDateFormat()}`}
           action={{
-            icon: Calendar,
+            icon: CalendarDots,
             onClick() {
               setShowCalendar(true);
             }
@@ -99,6 +100,15 @@ export const NoteExpiryDateDialog = DialogManager.register(
           }
           defaultValue={date.format(db.settings.getDateFormat())}
           onChange={(e) => setDate((d) => setDateOnly(e.target.value, d))}
+          sx={{
+            mt: "spacing6",
+            mb: "spacing7",
+            input: {
+              fontSize: "sm",
+              px: "spacing4",
+              py: "spacing6"
+            }
+          }}
         />
         <PopupPresenter
           isOpen={showCalendar}

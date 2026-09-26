@@ -119,7 +119,8 @@ export const PrivacySettings: SettingsGroup[] = [
                 defaultValue: Config.get(
                   "corsProxy",
                   "https://cors.notesnook.com"
-                )
+                ),
+                label: "Enter proxy URL"
               });
               if (!result) return;
               try {

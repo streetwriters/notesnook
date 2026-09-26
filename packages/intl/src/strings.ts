@@ -2952,6 +2952,7 @@ Continue without attachments?`,
   shareWithFriendsButton: () => t`Share with friends`,
   // Reminders
   orderSummary: () => t`Order summary`,
+  discountCode: () => t`Discount code`,
   enterDiscountCode: () => t`Enter discount code`,
   addDiscount: () => t`Add discount`,
   salesTax: () => t`Sales tax`,

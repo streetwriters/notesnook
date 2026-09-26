@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Checkbox, Flex, Label, Text } from "@theme-ui/components";
+import { Checkbox, Flex, Label, Text, Box } from "@theme-ui/components";
 import { useRef } from "react";
 import { mdToHtml } from "../utils/md";
 import Dialog from "../components/dialog";
@@ -48,6 +48,7 @@ export type ConfirmDialogProps = BaseDialogProps<
   subtitle?: string;
   width?: number;
   positiveButtonText?: string;
+  positiveButtonVariant?: string;
   negativeButtonText?: string;
   message?: string;
   warnings?: string[];
@@ -65,6 +66,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
     width,
     negativeButtonText,
     positiveButtonText,
+    positiveButtonVariant,
     message,
     warnings,
     checks,
@@ -80,6 +82,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
       title={title}
       width={width}
       description={subtitle}
+      noScroll={!message && !warnings?.length && !inputs && !checks}
       onClose={() => onClose(false)}
       onOpen={() => {
         for (const checkId in checks) {
@@ -98,7 +101,8 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                   checks: checkedItems.current,
                   inputs: inputItems.current
                 }),
-              autoFocus: !!positiveButtonText
+              autoFocus: !!positiveButtonText,
+              variant: positiveButtonVariant
             }
           : undefined
       }
@@ -114,9 +118,9 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
       <Flex
         sx={{
           flexDirection: "column",
-          gap: 1,
-          pb: !negativeButtonText && !positiveButtonText ? 2 : 0,
-          p: { m: 0 }
+          // gap: 1,
+          pb: !negativeButtonText && !positiveButtonText ? "spacing7" : 0,
+          mb: "spacing7"
         }}
       >
         {message ? (
@@ -145,22 +149,30 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
               />
             ))
           : null}
-        {checks
-          ? Object.entries<Check>(checks).map(([id, check]) => (
+        {checks ? (
+          <Box sx={{ marginTop: "spacing4" }}>
+            {Object.entries<Check>(checks).map(([id, check]) => (
               <Label
                 key={id}
                 id={id}
-                variant="text.body"
-                sx={{ fontWeight: "bold" }}
+                sx={{
+                  fontFamily: "body",
+                  fontSize: "md",
+                  color: "paragraph",
+                  lineHeight: 1.4,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "spacing3"
+                }}
               >
                 <Checkbox
                   name={id}
                   defaultChecked={check.default}
                   sx={{
-                    mr: "small",
                     width: 18,
                     height: 18,
-                    color: "accent"
+                    color: "accent",
+                    marginRight: 0
                   }}
                   onChange={(e) =>
                     (checkedItems.current[id] = e.currentTarget.checked)
@@ -168,8 +180,9 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
                 />
                 {check.text}
               </Label>
-            ))
-          : null}
+            ))}
+          </Box>
+        ) : null}
       </Flex>
     </Dialog>
   );
@@ -178,7 +191,7 @@ export const ConfirmDialog = DialogManager.register(function ConfirmDialog(
 export function showMultiDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
     title: strings.doActions.delete.item(length),
-    message: strings.moveToTrashDesc(
+    subtitle: strings.moveToTrashDesc(
       db.settings.getTrashCleanupInterval() || 7
     ),
     positiveButtonText: strings.yes(),
@@ -189,16 +202,17 @@ export function showMultiDeleteConfirmation(length: number) {
 export function showMultiPermanentDeleteConfirmation(length: number) {
   return ConfirmDialog.show({
     title: strings.doActions.permanentlyDelete.item(length),
-    message: strings.irreverisibleAction(),
+    subtitle: strings.irreverisibleAction(),
     positiveButtonText: strings.yes(),
-    negativeButtonText: strings.no()
+    negativeButtonText: strings.no(),
+    positiveButtonVariant: "new_error"
   });
 }
 
 export async function showLogoutConfirmation() {
   return await ConfirmDialog.show({
     title: strings.logout(),
-    message: strings.logoutConfirmation(),
+    subtitle: strings.logoutConfirmation(),
     positiveButtonText: strings.yes(),
     negativeButtonText: strings.no(),
     warnings: (await db.hasUnsyncedChanges())
@@ -216,7 +230,7 @@ export async function showLogoutConfirmation() {
 export function showClearSessionsConfirmation() {
   return ConfirmDialog.show({
     title: strings.logoutAllOtherDevices(),
-    message: strings.logoutAllOtherDevicesDescription(),
+    subtitle: strings.logoutAllOtherDevicesDescription(),
     positiveButtonText: strings.yes(),
     negativeButtonText: strings.no()
   });

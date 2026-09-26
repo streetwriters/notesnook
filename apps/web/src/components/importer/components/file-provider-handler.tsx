@@ -126,7 +126,8 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           getPassword: async (filename: string) => {
             const password = await PromptDialog.show({
               title: strings.colorNotePasswordFor(filename),
-              description: strings.colorNotPasswordForDesc()
+              description: strings.colorNotPasswordForDesc(),
+              label: strings.enterPassword()
             });
             return password || undefined;
           }

@@ -106,7 +106,7 @@ export const SyncSettings: SettingsGroup[] = [
             action: () =>
               ConfirmDialog.show({
                 title: strings.areYouSure(),
-                message: strings.forceSyncNotice(),
+                subtitle: strings.forceSyncNotice(),
                 checks: {
                   accept: { text: strings.understand(), default: false }
                 },
@@ -126,7 +126,7 @@ export const SyncSettings: SettingsGroup[] = [
             action: () =>
               ConfirmDialog.show({
                 title: strings.areYouSure(),
-                message: strings.forcePullChangesDesc(),
+                subtitle: strings.forcePullChangesDesc(),
                 checks: {
                   accept: { text: strings.understand(), default: false }
                 },

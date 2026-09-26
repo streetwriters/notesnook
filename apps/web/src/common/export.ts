@@ -113,14 +113,14 @@ export async function exportNotes(
   if (result instanceof Error) {
     ConfirmDialog.show({
       title: strings.exportFailed(),
-      message: result.stack || result.message,
+      subtitle: result.stack || result.message,
       positiveButtonText: strings.okay()
     });
     return false;
   } else {
     ConfirmDialog.show({
       title: strings.exportSuccessHeading(result.count),
-      message:
+      subtitle:
         result.errors.length > 0
           ? `${strings.exportCompletedWithErrors(result.errors.length)}:
 
