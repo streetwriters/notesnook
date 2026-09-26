@@ -187,7 +187,8 @@ export function PlansList(props: PlansListProps) {
               fontWeight: selectedPeriod === id ? 600 : 500,
               border: "none",
               borderRadius: "8px",
-              p: "spacing6"
+              p: "spacing6",
+              fontSize: "md"
             }}
             onClick={() => setPeriod(id as Period)}
           >
@@ -751,7 +752,7 @@ export function ComparePlans() {
                 variant="body"
                 sx={{
                   fontWeight: 500,
-                  fontSize: "18px",
+                  fontSize: "md",
                   color: "heading"
                 }}
               >

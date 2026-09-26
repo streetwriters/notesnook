@@ -1232,7 +1232,7 @@ export function AuthFormContainer<
             onClick={async () => {
               const ok = await ConfirmDialog.show({
                 title: strings.offlineMode(),
-                message: strings.offlineModeDesc(),
+                subtitle: strings.offlineModeDesc(),
                 negativeButtonText: strings.cancel(),
                 positiveButtonText: strings.understand()
               });
