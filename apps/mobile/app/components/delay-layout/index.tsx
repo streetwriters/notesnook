@@ -30,6 +30,7 @@ interface IDelayLayoutProps extends ViewProps {
   type?: "default" | "settings";
   color?: string;
   animated?: boolean;
+  disabled?: boolean;
 }
 
 const placeholder = {
@@ -39,13 +40,14 @@ const placeholder = {
 
 export default function DelayLayout({
   animated = true,
+  disabled,
   ...props
 }: IDelayLayoutProps) {
   const { colors } = useThemeColors();
   const loading = useDelayLayout(props.delay === undefined ? 200 : props.delay);
   const Placeholder = placeholder[props.type || "default"];
 
-  return loading || props.wait ? (
+  return (loading || props.wait) && !disabled ? (
     <View
       style={{
         backgroundColor: colors.primary.background,

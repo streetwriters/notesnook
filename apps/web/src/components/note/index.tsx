@@ -35,8 +35,10 @@ import {
   isReminderToday
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { SchemeColors } from "@notesnook/theme";
+import { SchemeColors, Theme } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
+import { alpha } from "@theme-ui/color";
+import { useThemeUI } from "@theme-ui/core";
 import { Flex, Text } from "@theme-ui/components";
 import React from "react";
 import { db } from "../../common/db";
@@ -59,53 +61,57 @@ import { store as appStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
-import IconTag from "../icon-tag";
 import {
-  AddReminder,
-  AddToNotebook,
   Alert,
-  Archive,
-  Attachment,
   AttachmentError,
+  Bell,
+  BoxArrowDown,
   Circle,
-  Close,
-  Colors,
   Copy,
-  Destruct,
   Duplicate,
-  Edit,
-  Export,
-  HTML,
-  InternalLink,
-  Lock,
   Markdown,
+  NoteBell,
+  NoteCalendar,
+  NoteExpiry,
+  NoteFavorite,
+  NoteLink,
+  NoteLock,
+  NotePin,
+  NoteReadonly,
   Notebook,
-  OpenInNew,
-  PDF,
-  Pin,
-  Text as Plaintext,
   Plus,
-  Print,
-  Publish,
-  Readonly,
-  Reminder,
-  RemoveShortcutLink,
-  SpellCheck,
   Star,
-  StarOutline,
-  Sync,
   SyncOff,
-  Tag2,
   Tag as TagIcon,
+  Text as Plaintext,
   Trash,
-  Update
+  Palette,
+  Tabs,
+  Printer,
+  CloudArrowUp,
+  Upload,
+  LinkHorizontal,
+  CloudSlash,
+  Cloud,
+  Hourglass,
+  LinkSimple,
+  ArrowSquareOut,
+  ClockClockwise,
+  LinkBreak,
+  Backspace,
+  FilePdf,
+  FileHtml,
+  TextAa,
+  PencilSimple
 } from "../icons";
 import { Context } from "../list-container/types";
+import IconTag from "../icon-tag";
 import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
 import { withFeatureCheck } from "../../common";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -128,10 +134,26 @@ function Note(props: NoteProps) {
     context
   } = props;
   const note = item;
-
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const primary: SchemeColors = color ? color.colorCode : "accent-selected";
   const dateFormat = useSettingStore((store) => store.dateFormat);
+  const isSelected = useSelectionStore((store) =>
+    store.selectedItems.includes(item.id)
+  );
+  const metadataItems = compact
+    ? []
+    : getMetadataItems({
+        note,
+        context,
+        locked,
+        attachments,
+        notebooks,
+        tags,
+        reminder,
+        primary,
+        isSelected: isSelected || isOpened
+      });
+  const hasMetadata = metadataItems.length > 0;
 
   return (
     <ListItem
@@ -139,8 +161,35 @@ function Note(props: NoteProps) {
       isFocused={isOpened}
       isCompact={compact}
       item={note}
-      title={note.title}
-      body={note.headline as string}
+      title={
+        <Flex
+          sx={{
+            alignItems: "center",
+            gap: "spacing3",
+            minWidth: 0
+          }}
+        >
+          {color && (
+            <Circle size={10} color={primary} sx={{ width: 10, height: 10 }} />
+          )}
+          <Text
+            dir="auto"
+            data-test-id={`title`}
+            sx={{
+              color: "heading",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              fontWeight: 600,
+              fontSize: compact ? "xs" : "sm"
+            }}
+          >
+            {note.title}
+          </Text>
+        </Flex>
+      }
+      body={!compact && note.headline ? note.headline : undefined}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
           // @ts-expect-error write tests for this
@@ -152,12 +201,23 @@ function Note(props: NoteProps) {
       colors={{
         accent: primary,
         heading: color ? primary : "heading",
-        background: "background"
+        background: "background",
+        // @ts-ignore alpha(primary, 0,1) is not a theme color
+        backgroundSelected: color ? alpha(primary, 0.1) : "background-secondary"
       }}
       sx={{
-        borderLeft: isOpened ? "4px solid" : "none",
-        pl: isOpened ? "3px" : "7px",
-        borderLeftColor: isOpened ? primary : "transparent"
+        py: "spacing4",
+        px: "spacing6",
+        pl: (t) => (t as Theme).space?.["spacing6"] - 2,
+        height: compact ? "auto" : undefined,
+        borderBottom: "1px solid",
+        borderLeft: "2px solid",
+        borderLeftColor: isOpened ? primary : "transparent",
+        borderBottomColor: "border",
+        gap: "spacing4",
+        ":hover": {
+          ".note-chip": { backgroundColor: "background-tertiary" }
+        }
       }}
       context={{ color, locked }}
       menuItems={noteMenuItems}
@@ -166,129 +226,86 @@ function Note(props: NoteProps) {
         useEditorStore.getState().openSession(note, { openInNewTab: true })
       }
       header={
-        <Flex sx={{ alignItems: "center", mb: 1 }}>
-          <Text variant="subBody">
-            {formatDate(date, { type: "date", dateFormat })}
-          </Text>
-        </Flex>
+        compact || !hasMetadata ? undefined : (
+          <Flex
+            sx={{
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "spacing2",
+              minWidth: 0
+            }}
+          >
+            {metadataItems}
+          </Flex>
+        )
       }
       footer={
         <Flex
           sx={{
-            fontSize: "subBody",
-            color: "paragraph-secondary",
             alignItems: "center",
-            gap: 1,
-            flexWrap: "wrap",
-            mt: "small",
-            flexShrink: 0
+            color: "paragraph-secondary",
+            flexShrink: 0,
+            gap: "spacing2",
+            justifyContent: compact ? "flex-end" : undefined
           }}
         >
           {compact ? (
             <>
-              {note.conflicted && <Alert size={15} color="var(--icon-error)" />}
-              {locked && <Lock size={11} data-test-id={`locked`} />}
-              {note.favorite && <Star color={primary} size={15} />}
-              {note.readonly && <Readonly size={15} />}
-              {note.expiryDate?.value ? <Destruct size={13} /> : null}
-
-              <TimeAgo live={true} datetime={date} locale="short" />
+              <TimeAgo
+                sx={{
+                  color: "paragraph-secondary",
+                  fontSize: "3xs",
+                  fontWeight: "medium",
+                  whiteSpace: "nowrap"
+                }}
+                live={true}
+                datetime={date}
+                locale="short"
+              />
+              {note.conflicted && <Alert size={11} color="icon-error" />}
+              {locked && (
+                <NoteLock size={11} color="icon" data-test-id="locked" />
+              )}
+              {note.readonly && <NoteReadonly size={11} color="icon" />}
+              {note.favorite && (
+                <NoteFavorite
+                  data-test-id="favorite"
+                  size={11}
+                  color="#E5C131"
+                />
+              )}
+              {note.expiryDate?.value ? (
+                <NoteExpiry size={11} color="paragraph-secondary" />
+              ) : null}
             </>
           ) : (
             <>
-              {note.conflicted && <Alert size={15} color="icon-error" />}
-
-              {note.localOnly && <SyncOff size={13} />}
-
-              {/* <TimeAgo
-                sx={{ flexShrink: 0 }}
-                locale="en_short"
-                live={true}
-                datetime={date}
-              /> */}
-
-              {attachments?.total ? (
-                <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
-                  <Attachment size={13} />
-                  <Text variant="subBody" ml={"2px"}>
-                    {attachments.total}
-                  </Text>
-                </Flex>
-              ) : null}
-
-              {attachments?.failed ? (
-                <Flex title={strings.errorsInAttachments(attachments.failed)}>
-                  <AttachmentError size={13} color="var(--icon-error)" />
-                  <Text ml={"2px"}>{attachments.failed}</Text>
-                </Flex>
-              ) : null}
-
-              {note.pinned && !props.context && <Pin size={13} />}
-
-              {locked && <Lock size={13} data-test-id={`locked`} />}
-
-              {note.readonly && <Readonly size={15} />}
-
-              {note.favorite && (
-                <Star data-test-id="favorite" color={primary} size={15} />
-              )}
-
-              {tags?.items.map((tag) => {
-                return (
-                  <IconTag
-                    testId={`tag-item`}
-                    key={tag.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!tag.id)
-                        return showToast("error", strings.tagNotFound());
-
-                      appStore.get().setNavigationTab("tags");
-                      navigate(`/tags/${tag.id}`);
-                    }}
-                    text={tag.title}
-                    title={strings.goToTag(tag.title)}
-                    icon={TagIcon}
-                  />
-                );
-              })}
-
-              {context?.type !== "notebook" &&
-                notebooks?.items.map((notebook) => (
-                  <IconTag
-                    key={notebook.id}
-                    onClick={() => {
-                      appStore.get().setNavigationTab("notebooks");
-                      navigate(`/notebooks/${notebook.id}`);
-                    }}
-                    text={notebook.title}
-                    icon={Notebook}
-                  />
-                ))}
-
-              {reminder && isReminderActive(reminder) ? (
-                <IconTag
-                  icon={Reminder}
-                  text={getFormattedReminderTime(reminder, true)}
-                  title={reminder.title}
-                  styles={
-                    isReminderToday(reminder)
-                      ? {
-                          icon: { color: primary },
-                          text: { color: primary }
-                        }
-                      : {}
-                  }
-                />
-              ) : null}
-
+              <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+                <NoteCalendar size={12} color="icon-secondary" />
+                <Text
+                  sx={{
+                    color: "paragraph-secondary",
+                    fontSize: "3xs",
+                    fontWeight: "medium"
+                  }}
+                >
+                  {formatDate(date, { type: "date", dateFormat })}
+                </Text>
+              </Flex>
               {note.expiryDate?.value && (
                 <IconTag
-                  icon={Destruct}
+                  className="note-chip"
+                  icon={NoteExpiry}
+                  selected={isSelected || isOpened}
                   text={formatDate(note.expiryDate.value, {
                     type: "date",
                     dateFormat
                   })}
+                  iconSize={12}
+                  styles={{
+                    icon: { color: "icon-secondary" },
+                    text: { color: "paragraph-secondary" }
+                  }}
                 />
               )}
             </>
@@ -326,7 +343,7 @@ const formats = [
   {
     type: "pdf",
     title: "PDF",
-    icon: PDF
+    icon: FilePdf
   },
   {
     type: "md",
@@ -341,12 +358,12 @@ const formats = [
   {
     type: "html",
     title: "HTML",
-    icon: HTML
+    icon: FileHtml
   },
   {
     type: "txt",
     title: "Text",
-    icon: Plaintext
+    icon: TextAa
   }
 ] as const;
 
@@ -362,7 +379,7 @@ export const noteMenuItems: (
       type: "button",
       key: "openinnewtab",
       title: strings.openInNewTab(),
-      icon: OpenInNew.path,
+      iconComponent: Tabs,
       onClick: () =>
         useEditorStore.getState().openSession(note.id, { openInNewTab: true })
     },
@@ -371,7 +388,7 @@ export const noteMenuItems: (
       key: "pin",
       title: strings.pin(),
       isChecked: note.pinned,
-      icon: Pin.path,
+      iconComponent: NotePin,
       onClick: () => store.pin(!note.pinned, ...ids),
       multiSelect: true
     },
@@ -380,7 +397,7 @@ export const noteMenuItems: (
       key: "readonly",
       title: strings.readOnly(),
       isChecked: note.readonly,
-      icon: Readonly.path,
+      iconComponent: NoteReadonly,
       onClick: () => store.readonly(!note.readonly, ...ids),
       multiSelect: true
     },
@@ -389,7 +406,7 @@ export const noteMenuItems: (
       key: "favorite",
       title: strings.favorite(),
       isChecked: note.favorite,
-      icon: StarOutline.path,
+      iconComponent: Star,
       onClick: () => store.favorite(!note.favorite, ...ids),
       multiSelect: true
     },
@@ -399,7 +416,7 @@ export const noteMenuItems: (
       //isDisabled: !isSynced,
       title: strings.lock(),
       isChecked: context?.locked,
-      icon: Lock.path,
+      iconComponent: NoteLock,
       onClick: async () => {
         const { unlock, lock } = store.get();
         if (!context?.locked) {
@@ -413,7 +430,7 @@ export const noteMenuItems: (
       type: "button",
       key: "remind-me",
       title: strings.remindMe(),
-      icon: AddReminder.path,
+      iconComponent: Bell,
       onClick: async () => {
         await AddReminderDialog.show({ note });
       }
@@ -423,7 +440,7 @@ export const noteMenuItems: (
       key: "archive",
       title: strings.archive(),
       isChecked: note.archived,
-      icon: Archive.path,
+      iconComponent: BoxArrowDown,
       onClick: () => store.archive(!note.archived, ...ids),
       multiSelect: true
     },
@@ -432,7 +449,7 @@ export const noteMenuItems: (
       type: "button",
       key: "notebooks",
       title: strings.notebooks(),
-      icon: Notebook.path,
+      iconComponent: Notebook,
       menu: { items: notebooksMenuItems(ids) },
       multiSelect: true
     },
@@ -440,7 +457,8 @@ export const noteMenuItems: (
       type: "button",
       key: "colors",
       title: strings.assignColor(),
-      icon: Colors.path,
+      iconComponent: Palette,
+
       multiSelect: true,
       menu: { items: colorsToMenuItems(context?.color, ids) }
     },
@@ -448,7 +466,7 @@ export const noteMenuItems: (
       type: "button",
       key: "add-tags",
       title: strings.dataTypesPluralCamelCase.tag(),
-      icon: Tag2.path,
+      iconComponent: TagIcon,
       multiSelect: true,
       menu: { items: tagsMenuItems(ids) }
     },
@@ -458,7 +476,7 @@ export const noteMenuItems: (
       key: "print",
       title: strings.print(),
       //isDisabled: !isSynced,
-      icon: Print.path,
+      iconComponent: Printer,
       onClick: async () => {
         await exportNote(note, {
           format: "pdf"
@@ -469,7 +487,7 @@ export const noteMenuItems: (
       type: "button",
       key: "publish",
       isDisabled: !db.monographs.isPublished(note.id) && context?.locked,
-      icon: Publish.path,
+      iconComponent: CloudArrowUp,
       title: strings.publish(),
       menu: db.monographs.isPublished(note.id)
         ? {
@@ -478,7 +496,7 @@ export const noteMenuItems: (
                 type: "button",
                 key: "open",
                 title: strings.open(),
-                icon: OpenInNew.path,
+                iconComponent: ArrowSquareOut,
                 onClick: async () => {
                   const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
                   window.open(url, "_blank");
@@ -488,7 +506,7 @@ export const noteMenuItems: (
                 type: "button",
                 key: "copy-link",
                 title: strings.copyLink(),
-                icon: Copy.path,
+                iconComponent: Copy,
                 onClick: async () => {
                   const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
                   await writeToClipboard({
@@ -503,7 +521,7 @@ export const noteMenuItems: (
                 type: "button",
                 key: "update",
                 title: strings.update(),
-                icon: Update.path,
+                iconComponent: ClockClockwise,
                 onClick: () => {
                   PublishDialog.show({ note });
                 }
@@ -516,7 +534,7 @@ export const noteMenuItems: (
                 type: "button",
                 key: "unpublish",
                 title: strings.unpublish(),
-                icon: Publish.path,
+                iconComponent: CloudSlash,
                 onClick: async () => {
                   await useMonographStore.getState().unpublish(note.id);
                 }
@@ -530,7 +548,7 @@ export const noteMenuItems: (
       type: "button",
       key: "export",
       title: strings.exportAs(),
-      icon: Export.path,
+      iconComponent: Upload,
       //isDisabled: !isSynced,
       menu: {
         items: formats.map((format) => ({
@@ -538,7 +556,7 @@ export const noteMenuItems: (
           key: format.type,
           title: format.title,
           tooltip: strings.exportAs(format.title),
-          icon: format.icon.path,
+          iconComponent: format.icon,
           isDisabled: format.type === "pdf" && ids.length > 1,
           multiSelect: true,
           onClick: async () => {
@@ -561,7 +579,7 @@ export const noteMenuItems: (
       type: "button",
       key: "copy",
       title: strings.copyAs(),
-      icon: Copy.path,
+      iconComponent: Copy,
       menu: {
         items: [
           {
@@ -569,7 +587,7 @@ export const noteMenuItems: (
             key: "copy-as-text",
             tooltip: strings.copyAs("Text"),
             title: "Text",
-            icon: Plaintext.path,
+            iconComponent: TextAa,
             onClick: () => copyNote(note.id, "txt")
           },
           {
@@ -577,7 +595,7 @@ export const noteMenuItems: (
             key: "copy-as-markdown",
             tooltip: strings.copyAs("Markdown"),
             title: "Markdown",
-            icon: Markdown.path,
+            iconComponent: Markdown,
             onClick: () => copyNote(note.id, "md")
           }
         ]
@@ -587,7 +605,7 @@ export const noteMenuItems: (
       type: "button",
       key: "copy-link",
       title: strings.copyLink(),
-      icon: InternalLink.path,
+      iconComponent: LinkHorizontal,
       onClick: () => {
         const link = createInternalLink("note", note.id);
         writeToClipboard({
@@ -602,7 +620,7 @@ export const noteMenuItems: (
       type: "button",
       key: "duplicate",
       title: strings.duplicate(),
-      icon: Duplicate.path,
+      iconComponent: Duplicate,
       onClick: () => store.get().duplicate(...ids),
       multiSelect: true
     },
@@ -613,15 +631,15 @@ export const noteMenuItems: (
       //isDisabled: !isSynced,
       title: strings.syncOff(),
       isChecked: note.localOnly,
-      icon: note.localOnly ? Sync.path : SyncOff.path,
+      iconComponent: note.localOnly ? CloudSlash : Cloud,
       onClick: async () => {
         if (
           note.localOnly ||
           (await ConfirmDialog.show({
             title: strings.syncOffConfirm(ids.length),
-            message: strings.syncOffDesc(ids.length),
-            positiveButtonText: strings.yes(),
-            negativeButtonText: strings.no()
+            subtitle: strings.syncOffDesc(ids.length),
+            positiveButtonText: strings.continue(),
+            negativeButtonText: strings.cancel()
           }))
         )
           await store.localOnly(!note.localOnly, ...ids);
@@ -634,7 +652,7 @@ export const noteMenuItems: (
           type: "button",
           key: "expiry-date",
           title: strings.expiryDate(),
-          icon: Destruct.path,
+          iconComponent: Hourglass,
           menu: {
             items: [
               {
@@ -647,7 +665,7 @@ export const noteMenuItems: (
                     expiryDate: note.expiryDate?.value
                   });
                 },
-                icon: Edit.path
+                iconComponent: PencilSimple
               },
               {
                 type: "button",
@@ -658,7 +676,7 @@ export const noteMenuItems: (
                   store.refresh();
                   showToast("success", "Expiry date removed");
                 },
-                icon: Close.path
+                iconComponent: Backspace
               }
             ]
           }
@@ -667,7 +685,7 @@ export const noteMenuItems: (
           type: "button",
           key: "expiry-date",
           title: strings.setExpiry(),
-          icon: Destruct.path,
+          iconComponent: Hourglass,
           premium: !features.expiringNotes.isAllowed,
           onClick: withFeatureCheck(features.expiringNotes, async () => {
             await NoteExpiryDateDialog.show({
@@ -681,6 +699,7 @@ export const noteMenuItems: (
       title: strings.moveToTrash(),
       variant: "dangerous",
       icon: Trash.path,
+      iconComponent: Trash,
       isDisabled: ids.length === 1 && db.monographs.isPublished(note.id),
       onClick: () => Multiselect.moveNotesToTrash(ids, ids.length > 1),
       multiSelect: true
@@ -697,7 +716,7 @@ function colorsToMenuItems(
       key: "new-color",
       type: "button",
       title: strings.addColor(),
-      icon: Plus.path,
+      iconComponent: Plus,
       onClick: async () => {
         const id = await CreateColorDialog.show({});
         if (!id) return;
@@ -738,7 +757,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
       type: "button",
       key: "link-notebooks",
       title: strings.linkNotebooks(),
-      icon: AddToNotebook.path,
+      iconComponent: LinkSimple,
       onClick: () => MoveNoteDialog.show({ noteIds: ids })
     },
     {
@@ -764,7 +783,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
             type: "button",
             key: "remove-from-all-notebooks",
             title: strings.unlinkFromAll(),
-            icon: RemoveShortcutLink.path,
+            iconComponent: LinkBreak,
             onClick: async () => {
               await db.notes.removeFromAllNotebooks(...ids);
               store.refresh();
@@ -780,7 +799,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
               type: "button",
               key: notebook.id,
               title: notebook.title,
-              icon: Notebook.path,
+              iconComponent: Notebook,
               isChecked: false,
               onClick: async () => {
                 await db.notes.addToNotebook(notebook.id, ...ids);
@@ -798,7 +817,7 @@ function notebooksMenuItems(ids: string[]): MenuItem[] {
             type: "button",
             key: notebook.id,
             title: notebook.title,
-            icon: Notebook.path,
+            iconComponent: Notebook,
             isChecked: true,
             onClick: async () => {
               await db.notes.removeFromNotebook(notebook.id, ...ids);
@@ -817,8 +836,8 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
     {
       type: "button",
       key: "assign-tags",
-      title: strings.assignTo(),
-      icon: Plus.path,
+      title: strings.addTag(),
+      iconComponent: Plus,
       onClick: () => AddTagsDialog.show({ noteIds: ids })
     },
     {
@@ -845,7 +864,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
               type: "button",
               key: "remove-from-all-tags",
               title: strings.removeFromAll(),
-              icon: RemoveShortcutLink.path,
+              iconComponent: Backspace,
               onClick: async () => {
                 for (const id of ids) {
                   await db.relations.to({ id, type: "note" }, "tag").unlink();
@@ -858,13 +877,12 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
           );
 
         if (tagShortcuts.size > 0) {
-          menuItems.push({ key: "sep3", type: "separator" });
           tagShortcuts.forEach((tag) => {
             menuItems.push({
               type: "button",
               key: tag.id,
               title: tag.title,
-              icon: TagIcon.path,
+              iconComponent: TagIcon,
               isChecked: false,
               onClick: async () => {
                 for (const id of ids) {
@@ -884,7 +902,7 @@ function tagsMenuItems(ids: string[]): MenuItem[] {
             type: "button",
             key: tag.id,
             title: tag.title,
-            icon: TagIcon.path,
+            iconComponent: TagIcon,
             isChecked: true,
             onClick: async () => {
               for (const id of ids) {
@@ -919,4 +937,118 @@ async function copyNote(noteId: string, format: "md" | "txt") {
     if (e instanceof Error)
       showToast("error", `${strings.failedToCopyNote()}: ${e.message}.`);
   }
+}
+
+function getMetadataItems(props: {
+  note: NoteType;
+  context?: Context;
+  locked?: boolean;
+  attachments?: NoteResolvedData["attachments"];
+  notebooks?: NoteResolvedData["notebooks"];
+  tags?: NoteResolvedData["tags"];
+  reminder?: NoteResolvedData["reminder"];
+  primary: SchemeColors;
+  isSelected: boolean;
+}): React.ReactNode[] {
+  const {
+    note,
+    context,
+    locked,
+    attachments,
+    notebooks,
+    tags,
+    reminder,
+    primary,
+    isSelected
+  } = props;
+  return [
+    note.conflicted && <Alert key="conflicted" size={15} color="icon-error" />,
+    note.localOnly && <SyncOff key="local-only" size={15} />,
+    note.pinned && <NotePin key="pinned" size={15} color="icon" />,
+    locked && (
+      <NoteLock key="locked" size={15} color="icon" data-test-id="locked" />
+    ),
+    note.readonly && <NoteReadonly key="readonly" size={15} color="icon" />,
+    note.favorite && (
+      <NoteFavorite
+        key="favorite"
+        data-test-id="favorite"
+        size={15}
+        color="#E5C131"
+      />
+    ),
+    attachments?.total ? (
+      <Flex
+        key="attachments-total"
+        sx={{ alignItems: "center", gap: "spacing1" }}
+      >
+        <NoteLink size={14} color="icon" />
+        <Text sx={{ color: "heading", fontSize: "xs" }}>
+          {attachments.total}
+        </Text>
+      </Flex>
+    ) : null,
+    attachments?.failed ? (
+      <Flex
+        key="attachments-failed"
+        title={strings.errorsInAttachments(attachments.failed)}
+        sx={{ alignItems: "center", gap: "spacing1" }}
+      >
+        <AttachmentError size={13} color="icon-error" />
+        <Text sx={{ color: "paragraph", fontSize: "xs" }}>
+          {attachments.failed}
+        </Text>
+      </Flex>
+    ) : null,
+    ...(context?.type !== "notebook"
+      ? notebooks?.items.map((notebook) => (
+          <IconTag
+            className="note-chip"
+            selected={isSelected}
+            key={notebook.id}
+            icon={Notebook}
+            iconSize={12}
+            text={notebook.title}
+            onClick={() => {
+              appStore.get().setNavigationTab("notebooks");
+              navigate(`/notebooks/${notebook.id}`);
+            }}
+          />
+        )) ?? []
+      : []),
+    ...(tags?.items.map((tag) => (
+      <IconTag
+        className="note-chip"
+        key={tag.id}
+        selected={isSelected}
+        testId="tag-item"
+        icon={TagIcon}
+        text={tag.title}
+        title={strings.goToTag(tag.title)}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!tag.id) return showToast("error", strings.tagNotFound());
+
+          appStore.get().setNavigationTab("tags");
+          navigate(`/tags/${tag.id}`);
+        }}
+      />
+    )) ?? []),
+    reminder && isReminderActive(reminder) && (
+      <IconTag
+        key="reminder"
+        className="note-chip"
+        icon={NoteBell}
+        selected={isSelected}
+        iconSize={13}
+        text={getFormattedReminderTime(reminder, true)}
+        title={reminder.title}
+        styles={
+          isReminderToday(reminder)
+            ? { icon: { color: primary }, text: { color: primary } }
+            : undefined
+        }
+      />
+    )
+  ].filter(Boolean);
 }

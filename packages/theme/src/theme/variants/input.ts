@@ -20,15 +20,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ThemeUIStyleObject } from "@theme-ui/core";
 
 const defaultVariant: ThemeUIStyleObject = {
-  borderRadius: "default",
+  borderRadius: "radius2",
   border: "none",
   width: "auto",
-  mx: "2px",
-  outline: "1.5px solid var(--border)",
+  // mx: "2px",
+  // outline: "1.5px solid var(--border)",
   fontFamily: "body",
   fontWeight: "body",
-  fontSize: "input",
+  fontSize: "xs",
   color: "paragraph",
+  background: "background-secondary",
   ":-webkit-autofill": {
     WebkitTextFillColor: "var(--paragraph)",
     caretColor: "var(--paragraph)",
@@ -41,7 +42,7 @@ const defaultVariant: ThemeUIStyleObject = {
     outline: "1.5px solid var(--accent)"
   },
   "::placeholder": {
-    color: "placeholder"
+    color: "placeholder !important"
   }
 };
 

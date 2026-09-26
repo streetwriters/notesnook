@@ -24,6 +24,7 @@ import SettingsService from "../services/settings";
 import switchTheme from "react-native-theme-switch-animation";
 
 import changeNavigationBarColor from "react-native-navigation-bar-color";
+import { THEME_DARK, THEME_LIGHT } from "../common/design/theme";
 export interface ThemeStore {
   lightTheme: ThemeDefinition;
   darkTheme: ThemeDefinition;
@@ -70,8 +71,8 @@ function switchThemeWithAnimation(fn: () => void) {
 }
 
 export const useThemeStore = create<ThemeStore>((set, get) => ({
-  lightTheme: SettingsService.get().lighTheme,
-  darkTheme: SettingsService.get().darkTheme,
+  lightTheme: THEME_LIGHT,
+  darkTheme: THEME_DARK,
   colorScheme: SettingsService.get().useSystemTheme
     ? (Appearance.getColorScheme() as "dark" | "light")
     : SettingsService.get().colorScheme,

@@ -24,12 +24,14 @@ import { store as appStore } from "../../stores/app-store";
 import { store as settingStore } from "../../stores/setting-store";
 import { db } from "../../common/db";
 import {
-  Edit,
-  Shortcut,
-  DeleteForver,
   Tag as TagIcon,
   Copy,
-  InternalLink
+  PencilSimple,
+  ArrowCounterClockwise,
+  LinkSimple,
+  LinkBreak,
+  LinkHorizontal,
+  Trash
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { createInternalLink, Tag as TagType } from "@notesnook/core";
@@ -64,24 +66,40 @@ function Tag(props: TagProps) {
       isCompact
       isFocused={isSelected}
       sx={{
-        borderRadius: "default",
-        mb: "small"
+        borderRadius: "radius1",
+        px: "spacing2",
+        mx: "spacing4",
+        py: "spacing4",
+        height: "fit-content",
+        pr: "spacing2"
       }}
       title={
         <Flex
-          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
+          sx={{
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: "spacing3",
+            minWidth: 0,
+            overflow: "hidden"
+          }}
         >
-          <TagIcon size={14} color={isSelected ? "icon-selected" : "icon"} />
+          <TagIcon
+            size={13}
+            color={isSelected ? "icon-selected" : "icon"}
+            sx={{ flexShrink: 0 }}
+          />
           <Text
             data-test-id={`title`}
             variant={"body"}
             color={isSelected ? "paragraph-selected" : "paragraph"}
             sx={{
+              fontSize: "xs",
               whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontWeight: "body",
-              display: "block"
+              fontWeight: "normal",
+              display: "block",
+              minWidth: 0
             }}
           >
             {item.title}
@@ -89,7 +107,13 @@ function Tag(props: TagProps) {
         </Flex>
       }
       footer={
-        <Text mt={1} variant="subBody">
+        <Text
+          variant="subBody"
+          sx={{
+            fontSize: "3xs",
+            color: isSelected ? "paragraph" : "paragraph-secondary"
+          }}
+        >
           {currentContext?.length || totalNotes}
         </Text>
       }
@@ -130,7 +154,7 @@ export const tagMenuItems: (
       type: "button",
       key: "edit",
       title: strings.renameTag(),
-      icon: Edit.path,
+      iconComponent: PencilSimple,
       onClick: () => EditTagDialog.show(tag)
     },
     {
@@ -138,7 +162,7 @@ export const tagMenuItems: (
       key: "set-as-default",
       title: strings.setAsDefault(),
       isChecked: defaultTag === tag.id,
-      icon: TagIcon.path,
+      iconComponent: ArrowCounterClockwise,
       premium: !features.defaultNotebookAndTag.isAllowed,
       onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
         const defaultTag = db.settings.getDefaultTag();
@@ -153,7 +177,7 @@ export const tagMenuItems: (
       title: db.shortcuts.exists(tag.id)
         ? strings.removeShortcut()
         : strings.addShortcut(),
-      icon: Shortcut.path,
+      iconComponent: db.shortcuts.exists(tag.id) ? LinkBreak : LinkSimple,
       premium: !features.shortcuts.isAllowed,
       onClick: withFeatureCheck(features.shortcuts, () =>
         appStore.addToShortcuts(tag)
@@ -163,7 +187,7 @@ export const tagMenuItems: (
       type: "button",
       key: "copy-link",
       title: strings.copyLink(),
-      icon: InternalLink.path,
+      iconComponent: LinkHorizontal,
       onClick: () => {
         const link = createInternalLink("tag", tag.id);
         writeToClipboard({
@@ -179,7 +203,7 @@ export const tagMenuItems: (
       key: "delete",
       variant: "dangerous",
       title: strings.delete(),
-      icon: DeleteForver.path,
+      iconComponent: Trash,
       onClick: async () => {
         await Multiselect.deleteTags(ids);
       },
@@ -189,7 +213,7 @@ export const tagMenuItems: (
       type: "button",
       key: "copyid",
       title: "Copy ID",
-      icon: Copy.path,
+      iconComponent: Copy,
       onClick: async () => {
         try {
           await writeToClipboard({

@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import React from "react";
+import { db } from "../../common/database";
+import { Spacing } from "../../common/design/spacing";
 import DelayLayout from "../../components/delay-layout";
 import { Header } from "../../components/header";
 import List from "../../components/list";
@@ -27,8 +30,6 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import { useFavorites } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
-import { db } from "../../common/database";
-import { strings } from "@notesnook/intl";
 
 export const Favorites = ({
   navigation,
@@ -56,6 +57,9 @@ export const Favorites = ({
         canGoBack={false}
         hasSearch={true}
         id={route.name}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
         onSearch={() => {
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(route.name),
@@ -66,6 +70,7 @@ export const Favorites = ({
           });
         }}
       />
+
       <DelayLayout wait={loading}>
         <List
           data={favorites}

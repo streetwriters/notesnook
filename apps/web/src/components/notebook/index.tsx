@@ -18,22 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import ListItem from "../list-item";
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { createInternalLink, Notebook as NotebookType } from "@notesnook/core";
 import {
-  ChevronDown,
-  ChevronRight,
-  NotebookEdit,
+  CaretDown,
   Plus,
-  RemoveShortcutLink,
-  Shortcut,
   Trash,
   Notebook as NotebookIcon,
   ArrowUp,
-  Move,
   Copy,
-  InternalLink
+  PencilSimple,
+  LinkSimple,
+  LinkBreak,
+  ArrowsInCardinal,
+  LinkHorizontal,
+  ArrowCounterClockwise
 } from "../icons";
 import { MenuItem } from "@notesnook/ui";
 import { hashNavigate, navigate } from "../../navigation";
@@ -56,6 +56,7 @@ import { MoveNotebookDialog } from "../../dialogs/move-notebook-dialog";
 import { areFeaturesAvailable } from "@notesnook/common";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
+import { Theme } from "@notesnook/theme";
 
 type NotebookProps = {
   item: NotebookType;
@@ -78,12 +79,10 @@ export function Notebook(props: NotebookProps) {
     refresh = () => {},
     depth = 0
   } = props;
-  const currentContext = useNotesStore((store) =>
-    store.context?.type === "notebook" && store.context.id === item.id
-      ? store.contextNotes
-      : null
-  );
-  const isOpened = !!currentContext;
+  const context = useNotesStore((store) => store.context);
+  const isOpened = context?.type === "notebook" && context.id === item.id;
+  const contextNotes = useNotesStore((store) => store.contextNotes);
+  const currentContext = isOpened ? contextNotes : null;
   const dragTimeout = useRef(0);
   const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
 
@@ -123,36 +122,37 @@ export function Notebook(props: NotebookProps) {
         }
       }}
       title={
-        <Flex
-          sx={{ alignItems: "center", justifyContent: "center", gap: "small" }}
-        >
+        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
           {isExpandable ? (
             <Button
               variant="secondary"
-              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
+              sx={{
+                bg: "transparent",
+                p: 0,
+                borderRadius: "radius1",
+                width: 11,
+                height: 11
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 isExpanded ? collapse() : expand();
               }}
             >
-              {isExpanded ? (
-                <ChevronDown
-                  size={14}
-                  color={isOpened ? "icon-selected" : "icon"}
-                />
-              ) : (
-                <ChevronRight
-                  size={14}
-                  color={isOpened ? "icon-selected" : "icon"}
-                />
-              )}
+              <CaretDown
+                size={11}
+                color={isOpened ? "icon-selected" : "icon"}
+                sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
+              />
             </Button>
           ) : (
+            <Box sx={{ width: 11, height: 11 }} />
+          )}
+          {depth === 0 ? (
             <NotebookIcon
-              size={14}
+              size={13}
               color={isOpened ? "icon-selected" : "icon"}
             />
-          )}
+          ) : null}
           <Text
             data-test-id={`title`}
             variant={"body"}
@@ -161,8 +161,10 @@ export function Notebook(props: NotebookProps) {
               whiteSpace: "pre",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              fontWeight: "body",
-              display: "block"
+              fontWeight: "normal",
+              display: "block",
+              fontSize: "xs",
+              minWidth: 0
             }}
           >
             {item.title}
@@ -170,16 +172,32 @@ export function Notebook(props: NotebookProps) {
         </Flex>
       }
       footer={
-        <Text variant="subBody">
+        <Text
+          variant="subBody"
+          color={isOpened ? "paragraph" : "paragraph-secondary"}
+          sx={{ fontSize: "3xs", lineHeight: 1 }}
+        >
           {currentContext ? currentContext?.length : totalNotes}
         </Text>
       }
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
       sx={{
-        mb: "small",
-        borderRadius: "default",
-        paddingLeft: `${5 + (depth === 0 ? 0 : 15 * depth)}px`
+        pr: "spacing2",
+        py: "spacing4",
+        borderRadius: "radius1",
+        height: "100%",
+        mb: "spacing1",
+        pl: (t) => {
+          const theme = t as Theme;
+          const iconSize = 11;
+          const notebookIconSize = 13;
+          const gap = theme.space.spacing3;
+
+          return depth === 0
+            ? `${theme.space.spacing2}px`
+            : theme.space.spacing2 + (depth * iconSize + gap);
+        }
       }}
     />
   );
@@ -201,7 +219,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "add",
       title: strings.newNotebook(),
-      icon: Plus.path,
+      iconComponent: Plus,
       onClick: () =>
         AddNotebookDialog.show({ parentId: notebook.id }).then((res) =>
           res ? context?.refresh?.() : null
@@ -212,7 +230,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "edit",
       title: strings.edit(),
-      icon: NotebookEdit.path,
+      iconComponent: PencilSimple,
       onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`)
     },
     {
@@ -220,7 +238,7 @@ export const notebookMenuItems: (
       key: "set-as-default",
       title: strings.setAsDefault(),
       isChecked: defaultNotebook === notebook.id,
-      icon: NotebookIcon.path,
+      iconComponent: ArrowCounterClockwise,
       premium: !features.defaultNotebookAndTag.isAllowed,
       onClick: withFeatureCheck(features.defaultNotebookAndTag, async () => {
         const defaultNotebook = db.settings.getDefaultNotebook();
@@ -238,9 +256,7 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "shortcut",
-      icon: db.shortcuts.exists(notebook.id)
-        ? RemoveShortcutLink.path
-        : Shortcut.path,
+      iconComponent: db.shortcuts.exists(notebook.id) ? LinkBreak : LinkSimple,
       title: db.shortcuts.exists(notebook.id)
         ? strings.removeShortcut()
         : strings.addShortcut(),
@@ -253,7 +269,7 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "move",
-      icon: Move.path,
+      iconComponent: ArrowsInCardinal,
       title: strings.move(),
       onClick: () => {
         MoveNotebookDialog.show({ notebook: notebook });
@@ -263,7 +279,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "copy-link",
       title: strings.copyLink(),
-      icon: InternalLink.path,
+      iconComponent: LinkHorizontal,
       onClick: () => {
         const link = createInternalLink("notebook", notebook.id);
         writeToClipboard({
@@ -276,7 +292,7 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "move-to-top",
-      icon: ArrowUp.path,
+      iconComponent: ArrowUp,
       title: strings.moveToTop(),
       isHidden: context?.isRoot,
       onClick: async () => {
@@ -302,7 +318,7 @@ export const notebookMenuItems: (
       key: "movetotrash",
       title: strings.moveToTrash(),
       variant: "dangerous",
-      icon: Trash.path,
+      iconComponent: Trash,
       onClick: () => Multiselect.moveNotebooksToTrash(ids),
       multiSelect: true
     },
@@ -310,7 +326,7 @@ export const notebookMenuItems: (
       type: "button",
       key: "copyid",
       title: "Copy ID",
-      icon: Copy.path,
+      iconComponent: Copy,
       onClick: async () => {
         try {
           await writeToClipboard({

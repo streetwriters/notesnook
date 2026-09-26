@@ -70,6 +70,77 @@ export const createButtonVariant = (
   }
 });
 
+/**
+ * will eventually replace createButtonVariant when redesign is completed
+ */
+export const newCreateButtonVariant = (
+  background: SchemeColors = "transparent",
+  color: SchemeColors = "paragraph",
+  states?: {
+    hover?: ThemeUIStyleObject;
+    active?: ThemeUIStyleObject;
+  }
+): ThemeUIStyleObject => ({
+  ...createButtonVariant(background, color, states),
+  alignItems: "center",
+  justifyContent: "center",
+  alignSelf: "center",
+  display: "flex",
+  py: "spacing5",
+  px: "spacing5",
+  fontSize: "sm",
+  fontWeight: 600,
+  borderRadius: "radius2",
+  lineHeight: "100%"
+});
+
+const newAccent = newCreateButtonVariant("accent", "accentForeground", {
+  hover: { bg: alpha("accent", 0.9) },
+  active: { bg: alpha("accent", 0.8) }
+});
+
+const newBordered: ThemeUIStyleObject = {
+  ...newCreateButtonVariant("transparent", "buttonForeground-secondary", {
+    hover: { bg: "hover" },
+    active: { bg: "hover" }
+  }),
+  px: "spacing6",
+  border: "1px solid",
+  borderColor: "border"
+};
+
+const newAnchor: ThemeUIStyleObject = {
+  variant: "buttons.anchor",
+  fontSize: "sm",
+  fontWeight: 500,
+  ":hover:not(:disabled):not(:active)": {
+    bg: "transparent"
+  }
+};
+
+const newSecondary: ThemeUIStyleObject = {
+  ...newCreateButtonVariant(
+    "background-secondary",
+    "buttonForeground-secondary",
+    {
+      hover: { bg: "hover-secondary" },
+      active: { bg: "hover-secondary" }
+    }
+  ),
+  border: "1px solid var(--border-secondary)"
+};
+
+const newTertiary: ThemeUIStyleObject = {
+  ...newCreateButtonVariant(
+    "background-tertiary",
+    "buttonForeground-secondary",
+    {
+      hover: { bg: "hover-secondary" },
+      active: { bg: "hover-secondary" }
+    }
+  )
+};
+
 const primary = createButtonVariant("transparent", "paragraph", {
   hover: { bg: "hover" },
   active: { bg: "hover" }
@@ -106,6 +177,13 @@ const accentSecondary = createButtonVariant("shade", "accent", {
 const error = createButtonVariant("accent-error", "accentForeground-error", {
   hover: { bg: alpha("accent-error", 0.9) }
 });
+
+const newError: ThemeUIStyleObject = {
+  ...newCreateButtonVariant("accent-error", "accentForeground", {
+    hover: { bg: "hover-secondary" },
+    active: { bg: "hover-secondary" }
+  })
+};
 
 const errorSecondary: ThemeUIStyleObject = createButtonVariant(
   "background-error",
@@ -149,14 +227,20 @@ const menuItem: ThemeUIStyleObject = {
 export const buttonVariants = {
   primary,
   secondary,
+  new_secondary: newSecondary,
   tertiary,
+  new_tertiary: newTertiary,
 
   accent,
+  new_accent: newAccent,
+  new_bordered: newBordered,
   accentSecondary,
   error,
+  new_error: newError,
   errorSecondary,
 
   anchor,
+  new_anchor: newAnchor,
   dialog,
   statusitem: statusItem,
   icon: menuItem,

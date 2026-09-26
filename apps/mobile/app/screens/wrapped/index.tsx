@@ -42,6 +42,7 @@ import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 function formatNumber(num: number) {
   if (num >= 1000000) {
@@ -926,6 +927,7 @@ function SummarySlide({
           onPress={async () => {
             const path = await viewShotRef.current?.capture?.();
             console.log(path, "shared path");
+            useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
             Share.open({
               url: path
             }).catch(() => {});

@@ -60,7 +60,7 @@ function CachedRouter() {
       RouteResult.component as React.FunctionComponent;
 
   return (
-    <RouteContainer {...RouteResult}>
+    <RouteContainer {...RouteResult} routeKey={RouteResult.key}>
       {Object.entries(cachedRoutes.current).map(([key, Component]) => (
         <Freeze key={key} freeze={key !== RouteResult.key}>
           <Flex

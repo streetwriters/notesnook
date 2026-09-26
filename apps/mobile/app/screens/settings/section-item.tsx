@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import {
   NavigationProp,
@@ -25,23 +27,24 @@ import {
 } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput, View } from "react-native";
-import { FeatureResult, useIsFeatureAvailable } from "@notesnook/common";
-//@ts-ignore
-import ToggleSwitch from "toggle-switch-react-native";
+import { FontFamily } from "../../common/design/font";
+import { Radius, Spacing } from "../../common/design/spacing";
 import PaywallSheet from "../../components/sheets/paywall";
 import AppIcon from "../../components/ui/AppIcon";
 import { IconButton } from "../../components/ui/icon-button";
 import Input from "../../components/ui/input";
+import FormInput, {
+  createFormRef,
+  FormRef
+} from "../../components/ui/input/form-input";
 import { Pressable } from "../../components/ui/pressable";
-import Seperator from "../../components/ui/seperator";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
 import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { SettingStore, useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
-import { DefaultAppStyles } from "../../utils/styles";
-import { components } from "./components";
+import { components } from "./components/components";
 import { RouteParams, SettingSection } from "./types";
 
 const _SectionItem = ({ item }: { item: SettingSection }) => {
@@ -67,6 +70,91 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
   );
   const inputRef = useRef<TextInput>(null);
   const [loading, setLoading] = useState(false);
+  const fieldName = (item.property as string) || item.id;
+  const formRef = useRef<FormRef>(
+    createFormRef({
+      [fieldName]: item.property
+        ? `${
+            SettingsService.get()[
+              item.property as keyof SettingStore["settings"]
+            ] ??
+            item.inputProperties?.defaultValue ??
+            ""
+          }`
+        : `${item.inputProperties?.defaultValue ?? ""}`
+    })
+  );
+
+  const [selectorError, setSelectorError] = useState<string>();
+  const [selectorValue, setSelectorValue] = useState(() =>
+    item.property
+      ? `${
+          SettingsService.get()[
+            item.property as keyof SettingStore["settings"]
+          ] ?? ""
+        }`
+      : ""
+  );
+
+  const step = item.step || 1;
+  const stepDecimals = `${step}`.split(".")[1]?.length || 0;
+  const roundToStep = (value: number) => Number(value.toFixed(stepDecimals));
+
+  const commitInputValue = (text: string) => {
+    if (!item.property) return;
+    const error = formRef.current?.validateField(fieldName);
+    if (error) return;
+    SettingsService.set({
+      [item.property as string]: text
+    });
+  };
+
+  const validateSelectorValue = (text: string): string | undefined => {
+    for (const validator of item.validators || []) {
+      const error = validator(text, {});
+      if (error) return error;
+    }
+    const min = item.minInputValue ?? 0;
+    const max = item.maxInputValue ?? Number.MAX_SAFE_INTEGER;
+    const num = Number(text);
+
+    if (!text?.trim() || Number.isNaN(num) || num < min || num > max) {
+      return strings.valueMustBeBetween(min, max);
+    }
+    return undefined;
+  };
+
+  const onChangeSelectorValue = (text: string) => {
+    setSelectorValue(text);
+    const error = validateSelectorValue(text);
+    setSelectorError(error);
+    if (error || !text.trim() || !item.property) return;
+    SettingsService.set({
+      [item.property as string]: text
+    });
+  };
+
+  const stepInputValue = (direction: 1 | -1) => {
+    if (!checkIsFeatureAvailable()) return;
+    if (isDisabled || !item.property) return;
+    const min = item.minInputValue ?? 0;
+    const max = item.maxInputValue ?? Number.MAX_SAFE_INTEGER;
+    const raw = `${
+      SettingsService.get()[item.property as keyof SettingStore["settings"]] ??
+      ""
+    }`;
+    const parsed = parseFloat(raw);
+    const base = Number.isNaN(parsed) ? (direction === 1 ? min : max) : parsed;
+    let next = roundToStep(base + direction * step);
+    if (next < min) next = min;
+    if (next > max) next = max;
+    if (next === base) return;
+    setSelectorError(undefined);
+    setSelectorValue(`${next}`);
+    SettingsService.set({
+      [item.property as string]: `${next}`
+    });
+  };
 
   const onChangeSettings = async () => {
     if (isDisabled) return;
@@ -93,33 +181,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     });
   };
 
-  const styles =
-    item.type === "danger"
-      ? {
-          backgroundColor: colors.error.background
-        }
-      : {};
-
-  const updateInput = (value: any) => {
-    inputRef?.current?.setNativeProps({
-      text: value + ""
-    });
-  };
-
-  const onChangeInputSelectorValue = (text: any) => {
-    if (text) {
-      const min = item.minInputValue || 0;
-      const max = item.maxInputValue || 0;
-      const value = parseInt(text);
-      text =
-        Number.isNaN(value) || value < min ? min : value > max ? max : text;
-
-      SettingsService.set({
-        [item.property as string]: `${text}`
-      });
-    }
-  };
-
   useEffect(() => {
     setIsHidden(item.hidden && item.hidden(item.property || current));
     setIsDisabled(
@@ -138,20 +199,26 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     return true;
   }, [isFeatureAvailable]);
 
+  const isOn = item.getter
+    ? item.getter(item.property || current)
+    : settings[item?.property as never];
+
   return isHidden ? null : (
     <Pressable
       disabled={item.type === "component"}
       style={{
         width: "100%",
         alignItems: "center",
-        padding: DefaultAppStyles.GAP,
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingVertical: DefaultAppStyles.GAP,
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingVertical: item.component && !item.name ? 0 : Spacing.LEVEL_1,
         borderRadius: 0,
-        overflow: "hidden",
-        ...styles
+        marginBottom: Spacing.LEVEL_0,
+        overflow: "hidden"
       }}
+      type="transparent"
+      noborder
       onPress={async () => {
         if (!checkIsFeatureAvailable()) return;
         if (isDisabled) return;
@@ -177,224 +244,336 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         }
       }}
     >
-      {!isFeatureAvailable?.isAllowed ? (
-        <View
-          style={{
-            width: 35,
-            height: 35,
-            borderRadius: 100,
-            backgroundColor: colors.primary.accent,
-            justifyContent: "center",
-            alignItems: "center",
-            position: "absolute",
-            bottom: -8,
-            right: -8
-          }}
-        >
-          <AppIcon
-            color={colors.static.orange}
-            size={AppFontSize.md}
-            name="crown"
-          />
-        </View>
-      ) : null}
       <View
         style={{
-          flexDirection: "row",
-          flexShrink: 1
+          flexDirection: "column",
+          width: "100%"
         }}
       >
         <View
           style={{
-            width: 40,
-            height: 40,
-            justifyContent: "center",
+            flexDirection: "row",
             alignItems: "center",
-            marginRight: 12,
-            backgroundColor:
-              item.component === "colorpicker"
-                ? colors.primary.accent
-                : undefined,
-            borderRadius: 100
+            gap: Spacing.LEVEL_2,
+            width: "100%"
           }}
         >
-          {!!item.icon && (
+          {item.icon ? (
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor:
+                  item.component === "colorpicker"
+                    ? colors.primary.accent
+                    : colors.secondary.background,
+                borderRadius: Radius.XS
+              }}
+            >
+              <AppIcon
+                color={
+                  item.iconColor
+                    ? item.iconColor(colors)
+                    : item.type === "danger"
+                      ? colors.error.accent
+                      : colors.primary.icon
+                }
+                iconFamily={item.iconFamily}
+                name={item.icon}
+                size={item.iconSize || 16}
+              />
+            </View>
+          ) : null}
+
+          <View
+            style={{
+              paddingRight: item.type === "switch" ? Spacing.LEVEL_1 : 0,
+              gap: Spacing.LEVEL_1,
+              flexShrink: 1,
+              flex: 1
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                gap: Spacing.LEVEL_1,
+                alignItems: "center"
+              }}
+            >
+              {item.name ? (
+                <Heading
+                  color={colors.primary.heading}
+                  fontSize="MD"
+                  lineHeight="100%"
+                >
+                  {typeof item.name === "function"
+                    ? item.name(current)
+                    : item.name}
+                </Heading>
+              ) : null}
+
+              {!isFeatureAvailable?.isAllowed ? (
+                <View
+                  style={{
+                    paddingVertical: Spacing.LEVEL_0,
+                    paddingHorizontal: Spacing.LEVEL_1,
+                    borderRadius: 100,
+                    backgroundColor: colors.primary.accent,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    gap: Spacing.LEVEL_0
+                  }}
+                >
+                  <AppIcon
+                    color={colors.static.orange}
+                    size={10}
+                    name="crown-simple"
+                    iconFamily="notesnook"
+                  />
+                  {isFeatureAvailable?.availableOn ? (
+                    <Paragraph
+                      style={{ color: colors.primary.accentForeground }}
+                      fontSize="XXS"
+                      fontFamily="MEDIUM"
+                    >
+                      Pro
+                    </Paragraph>
+                  ) : null}
+                </View>
+              ) : null}
+            </View>
+
+            {item.description ? (
+              <Paragraph
+                color={colors.primary.paragraph}
+                fontSize="SM"
+                lineHeight="110%"
+              >
+                {typeof item.description === "function"
+                  ? item.description(current)
+                  : item.description}
+              </Paragraph>
+            ) : null}
+          </View>
+
+          {loading || item.type === "switch" ? (
+            <View
+              style={{
+                width: 26,
+                height: 26,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {item.type === "switch" && !loading && (
+                <AppIcon
+                  name={isOn ? "toggle-on" : "toggle-off"}
+                  iconFamily="notesnook"
+                  size={16}
+                  color={
+                    isOn
+                      ? [colors.primary.accent, colors.primary.accentForeground]
+                      : [colors.disabled.icon, colors.primary.background]
+                  }
+                />
+              )}
+              {loading ? (
+                <ActivityIndicator size={16} color={colors.primary.accent} />
+              ) : null}
+            </View>
+          ) : null}
+
+          {item.type === "screen" || item.isModal ? (
             <AppIcon
-              color={
-                item.type === "danger"
-                  ? colors.error.icon
-                  : colors.secondary.icon
-              }
-              iconFamily={item.iconFamily}
-              name={item.icon}
-              size={item.iconSize || 30}
+              name="chevron-right"
+              iconFamily="notesnook"
+              size={16}
+              color={colors.primary.icon}
             />
-          )}
+          ) : null}
         </View>
 
         <View
           style={{
-            flexShrink: 1,
-            paddingRight: item.type === "switch" ? 10 : 0,
-            flex: item.type === "component" ? 1 : 0
+            gap: Spacing.LEVEL_1,
+            paddingLeft: item.name ? Spacing.LEVEL_2 + 32 : undefined
           }}
         >
-          {item.name ? (
-            <Heading
-              color={
-                item.type === "danger"
-                  ? colors.error.paragraph
-                  : colors.primary.heading
-              }
-              size={AppFontSize.sm}
-            >
-              {typeof item.name === "function" ? item.name(current) : item.name}
-            </Heading>
-          ) : null}
-
-          {!!item.description && (
-            <Paragraph
-              color={
-                item.type === "danger"
-                  ? colors.error.paragraph
-                  : colors.primary.paragraph
-              }
-              size={AppFontSize.sm}
-            >
-              {typeof item.description === "function"
-                ? item.description(current)
-                : item.description}
-            </Paragraph>
-          )}
-
           {!!item.component && item.type !== "screen" && (
-            <>
-              <Seperator half />
+            <View
+              style={{
+                width: "100%",
+                paddingTop: item.icon ? Spacing.LEVEL_2 : 0
+              }}
+            >
               {components[item.component]}
-            </>
+            </View>
           )}
 
           {item.type === "input" && (
-            <Input
+            <FormInput
               {...item.inputProperties}
-              onSubmit={(e) => {
-                SettingsService.set({
-                  [item.property as string]: e.nativeEvent.text
-                });
+              name={fieldName}
+              formRef={formRef}
+              validators={item.validators || []}
+              label={item.inputLabel}
+              editable={!isDisabled}
+              fwdRef={inputRef}
+              fontSize={AppFontSize.sm}
+              marginBottom={0}
+              containerStyle={{
+                marginTop: Spacing.LEVEL_2,
+                backgroundColor: colors.secondary.background,
+                borderRadius: Radius.XS
+              }}
+              inputStyle={{
+                color: colors.primary.heading
+              }}
+              onChangeText={(text) => {
+                commitInputValue(text);
+              }}
+              onSubmitEditing={(e) => {
+                commitInputValue(e.nativeEvent.text);
                 item.inputProperties?.onSubmitEditing?.(e);
               }}
-              editable={!isDisabled}
-              onChangeText={(text) => {
-                SettingsService.set({
-                  [item.property as string]: text
-                });
-                item.inputProperties?.onSubmitEditing?.(text as any);
-              }}
-              containerStyle={{ marginTop: DefaultAppStyles.GAP_VERTICAL }}
-              fwdRef={inputRef}
-              onLayout={() => {
-                inputRef?.current?.setNativeProps({
-                  text:
-                    SettingsService.get()[
-                      item.property as keyof SettingStore["settings"]
-                    ] + ""
-                });
-              }}
-              defaultValue={item.inputProperties?.defaultValue}
             />
           )}
 
           {item.type === "input-selector" && (
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: DefaultAppStyles.GAP_VERTICAL
+                marginTop: Spacing.LEVEL_2,
+                gap: Spacing.LEVEL_1,
+                alignSelf: "flex-start"
               }}
             >
-              <IconButton
-                name="minus"
-                color={colors.primary.icon}
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
-                    const minValue = item.minInputValue || 0;
-                    if (currentValue <= minValue) return;
-                    const nextValue = currentValue - 1;
-                    SettingsService.set({
-                      [item.property as string]: nextValue
-                    });
-                    updateInput(nextValue);
-                  }
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  backgroundColor: colors.secondary.background,
+                  padding: Spacing.LEVEL_2,
+                  gap: Spacing.LEVEL_1,
+                  borderRadius: Radius.S,
+                  borderWidth: 1,
+                  borderColor: selectorError
+                    ? colors.error.border
+                    : "transparent"
                 }}
-                size={AppFontSize.xl}
-              />
-              <Input
-                {...item.inputProperties}
-                onSubmit={(e) => {
-                  onChangeInputSelectorValue(e.nativeEvent.text);
-                  item.inputProperties?.onSubmitEditing?.(e);
-                }}
-                editable={!isDisabled}
-                onChangeText={(text) => {
-                  onChangeInputSelectorValue(text);
-                  item.inputProperties?.onSubmitEditing?.(text as any);
-                }}
-                keyboardType="decimal-pad"
-                containerStyle={{
-                  width: 60
-                }}
-                inputStyle={{
-                  width: 60,
-                  textAlign: "center"
-                }}
-                wrapperStyle={{
-                  maxWidth: 60,
-                  flexGrow: 0,
-                  marginBottom: 0,
-                  marginHorizontal: DefaultAppStyles.GAP_SMALL
-                }}
-                fwdRef={inputRef}
-                onLayout={() => {
-                  if (item.property) {
-                    updateInput(SettingsService.get()[item.property]);
-                  }
-                }}
-                defaultValue={item.inputProperties?.defaultValue}
-              />
-              <IconButton
-                name="plus"
-                color={colors.primary.icon}
-                onPress={() => {
-                  if (!checkIsFeatureAvailable()) return;
-                  if (isDisabled) return;
-                  const rawValue = SettingsService.get()[
-                    item.property as keyof SettingStore["settings"]
-                  ] as string;
-                  if (rawValue) {
-                    const currentValue = parseInt(rawValue);
-                    const max = item.maxInputValue || 0;
-                    if (currentValue >= max) return;
-                    const nextValue = currentValue + 1;
-                    SettingsService.set({
-                      [item.property as string]: nextValue
-                    });
-                    updateInput(nextValue);
-                  }
-                }}
-                size={AppFontSize.xl}
-              />
+              >
+                <IconButton
+                  name="minus"
+                  iconFamily="notesnook"
+                  color={colors.primary.icon}
+                  onPress={() => stepInputValue(-1)}
+                  size={16}
+                  type="tertiary"
+                  style={{
+                    borderRadius: Radius.XXS,
+                    padding: Spacing.LEVEL_0,
+                    width: undefined,
+                    height: undefined
+                  }}
+                />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "flex-end",
+                    gap: 1
+                  }}
+                >
+                  <Input
+                    {...item.inputProperties}
+                    onSubmit={(e) => {
+                      onChangeSelectorValue(e.nativeEvent.text);
+                      item.inputProperties?.onSubmitEditing?.(e);
+                    }}
+                    editable={!isDisabled}
+                    value={selectorValue}
+                    onChangeText={onChangeSelectorValue}
+                    keyboardType="decimal-pad"
+                    containerStyle={{
+                      borderWidth: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      height: 25,
+                      borderRadius: 0,
+                      minWidth: 25
+                    }}
+                    fontSize={AppFontSize.sm}
+                    inputStyle={{
+                      textAlign: "center",
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      fontFamily: FontFamily.SEMI_BOLD,
+                      color: colors.primary.heading
+                    }}
+                    wrapperStyle={{
+                      flexGrow: 0,
+                      marginBottom: 0,
+                      paddingLeft: 0,
+                      paddingRight: 0
+                    }}
+                    buttons={
+                      <>
+                        {item.inputBadgeValue ? (
+                          <Paragraph
+                            fontSize="XXS"
+                            style={{
+                              marginLeft: 1,
+                              marginTop: 2,
+                              color: colors.primary.heading
+                            }}
+                            color={colors.primary.paragraph}
+                          >
+                            {item.inputBadgeValue}
+                          </Paragraph>
+                        ) : null}
+                      </>
+                    }
+                  />
+                </View>
+
+                <IconButton
+                  name="plus"
+                  color={colors.primary.icon}
+                  iconFamily="notesnook"
+                  onPress={() => stepInputValue(1)}
+                  size={16}
+                  type="tertiary"
+                  style={{
+                    borderRadius: Radius.XXS,
+                    padding: Spacing.LEVEL_0,
+                    width: undefined,
+                    height: undefined
+                  }}
+                />
+              </View>
+
+              {selectorError ? (
+                <Paragraph
+                  size={AppFontSize.xs}
+                  style={{ color: colors.error.icon }}
+                >
+                  <AppIcon
+                    color={colors.error.accent}
+                    name="alert-circle-outline"
+                    size={AppFontSize.sm - 1}
+                  />{" "}
+                  {selectorError}
+                </Paragraph>
+              ) : null}
             </View>
           )}
         </View>
       </View>
 
-      {item.type === "switch" && !loading && (
+      {/* {item.type === "switch" && !loading && (
         <ToggleSwitch
           isOn={
             item.getter
@@ -407,14 +586,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
           animationSpeed={150}
           onToggle={onChangeSettings}
         />
-      )}
-
-      {loading ? (
-        <ActivityIndicator
-          size={AppFontSize.xxl}
-          color={colors.primary.accent}
-        />
-      ) : null}
+      )} */}
     </Pressable>
   );
 };

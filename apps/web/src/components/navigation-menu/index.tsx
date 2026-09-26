@@ -20,10 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
 import {
-  Note,
-  StarOutline,
-  Monographs,
   Trash,
+  Archive,
+  Bell,
+  BookOpen,
+  FileText,
+  Home,
+  Notebook as NotebookIcon,
+  Tag as TagIcon,
+  Star,
   Settings,
   Notebook2,
   Tag2,
@@ -33,7 +38,6 @@ import {
   Login,
   Circle,
   Icon,
-  Reminders,
   User,
   Pro,
   Documentation,
@@ -42,14 +46,24 @@ import {
   Rename,
   ExpandSidebar,
   HamburgerMenu,
-  Archive,
-  Home,
-  Notebook as NotebookIcon,
   Plus,
   SortBy,
-  Tag as TagIcon,
   InternalLink,
-  ClearTrash
+  ClearTrash,
+  Sliders,
+  ArrowCounterClockwise,
+  PencilSimple,
+  Backspace,
+  LinkHorizontal,
+  Ellipse,
+  MoonStars,
+  GearSix,
+  SignOut,
+  Question,
+  SignIn,
+  LinkBreak,
+  UserProfileIcon,
+  BoxArrowDown
 } from "../icons";
 import { SortableNavigationItem } from "./navigation-item";
 import {
@@ -70,6 +84,7 @@ import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
+import { useEditorStore } from "../../stores/editor-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -93,7 +108,7 @@ import { usePersistentState } from "../../hooks/use-persistent-state";
 import { MenuItem } from "@notesnook/ui";
 import { Color, createInternalLink, Notebook, Tag } from "@notesnook/core";
 import { handleDrop } from "../../common/drop-handler";
-import { Menu, useMenuStore, useMenuTrigger } from "../../hooks/use-menu";
+import { Menu, useMenuStore } from "../../hooks/use-menu";
 import { RenameColorDialog } from "../../dialogs/item-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
 import { showToast } from "../../utils/toast";
@@ -133,32 +148,42 @@ type Route = {
 };
 
 const routes: Route[] = [
-  { id: "notes", title: strings.routes.Notes(), path: "/notes", icon: Note },
+  {
+    id: "notes",
+    title: strings.routes.Notes(),
+    path: "/notes",
+    icon: FileText
+  },
   {
     id: "favorites",
     title: strings.routes.Favorites(),
     path: "/favorites",
-    icon: StarOutline
+    icon: Star
   },
   {
     id: "reminders",
     title: strings.routes.Reminders(),
     path: "/reminders",
-    icon: Reminders
+    icon: Bell
   },
   {
     id: "monographs",
     title: strings.routes.Monographs(),
     path: "/monographs",
-    icon: Monographs,
+    icon: BookOpen,
     loginRequired: true
   },
-  { id: "trash", title: strings.routes.Trash(), path: "/trash", icon: Trash },
   {
     id: "archive",
     title: strings.archive(),
     path: "/archive",
-    icon: Archive
+    icon: BoxArrowDown
+  },
+  {
+    id: "trash",
+    title: strings.routes.Trash(),
+    path: "/trash",
+    icon: Trash
   }
 ];
 
@@ -194,17 +219,17 @@ const tabs: NavigationTabItem[] = [
     title: strings.routes.Notebooks(),
     actions: [
       {
+        id: "notebooks-sort-button",
+        title: strings.sortBy(),
+        icon: Sliders,
+        onClick: () =>
+          showSortMenu("notebooks", () => useNotebookStore.getState().refresh())
+      },
+      {
         id: "create-notebook-button",
         title: CREATE_BUTTON_MAP.notebooks.title,
         icon: Plus,
         onClick: CREATE_BUTTON_MAP.notebooks.onClick
-      },
-      {
-        id: "notebooks-sort-button",
-        title: strings.sortBy(),
-        icon: SortBy,
-        onClick: () =>
-          showSortMenu("notebooks", () => useNotebookStore.getState().refresh())
       }
     ]
   },
@@ -214,17 +239,17 @@ const tabs: NavigationTabItem[] = [
     title: strings.routes.Tags(),
     actions: [
       {
+        id: "tags-sort-button",
+        title: strings.sortBy(),
+        icon: Sliders,
+        onClick: () =>
+          showSortMenu("tags", () => useTagStore.getState().refresh())
+      },
+      {
         id: "create-tag-button",
         title: CREATE_BUTTON_MAP.tags.title,
         icon: Plus,
         onClick: CREATE_BUTTON_MAP.tags.onClick
-      },
-      {
-        id: "tags-sort-button",
-        title: strings.sortBy(),
-        icon: SortBy,
-        onClick: () =>
-          showSortMenu("tags", () => useTagStore.getState().refresh())
       }
     ]
   }
@@ -276,9 +301,9 @@ function NavigationMenu({
         overflow: "hidden",
         bg: "background",
         borderRight: "1px solid var(--separator)",
-        pt: 1,
+        py: "spacing4",
         transition: "width 0.1s ease-in",
-        width: isNavPaneCollapsed ? (expanded ? 250 : 50) : "100%"
+        width: isNavPaneCollapsed ? (expanded ? 250 : 45) : "100%"
       }}
       onMouseEnter={() => {
         clearTimeout(mouseHoverTimeout.current);
@@ -308,20 +333,31 @@ function NavigationMenu({
       }}
     >
       {isCollapsed ? (
-        <Button
-          variant="secondary"
-          sx={{ p: 1, px: "small", bg: "transparent", mx: 1 }}
-          onClick={() => setExpanded(true)}
+        <Flex
+          sx={{
+            justifyContent: "center",
+            alignItems: "center",
+            mb: "spacing4",
+            px: "spacing4"
+          }}
         >
-          <HamburgerMenu size={16} color="icon" />
-        </Button>
+          <svg
+            style={{
+              width: 24,
+              height: 24
+            }}
+          >
+            <use href="#full-logo" />
+          </svg>
+        </Flex>
       ) : (
         <Flex
           sx={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            mx: 1
+            mb: "spacing4",
+            px: "spacing4"
           }}
         >
           <Flex
@@ -330,24 +366,23 @@ function NavigationMenu({
               flex: 1,
               flexDirection: "row",
               alignItems: "center",
-              gap: 1
+              gap: "8px"
             }}
           >
             <svg
               style={{
-                width: 20,
-                height: 20
+                width: 25,
+                height: 25
               }}
             >
               <use href="#full-logo" />
             </svg>
 
             <Text
-              variant="heading"
               sx={{
-                fontSize: 15,
-                fontWeight: "medium",
-                display: "block"
+                color: "heading",
+                fontSize: "20px",
+                fontWeight: 600
               }}
             >
               Notesnook
@@ -369,55 +404,90 @@ function NavigationMenu({
           </Flex>
         </Flex>
       )}
-      <Flex
-        sx={{
-          justifyContent: isCollapsed ? "center" : "space-between",
-          alignItems: "center",
-          borderTop: "1px solid var(--separator)",
-          borderBottom: "1px solid var(--separator)",
-          mt: 1,
-          mb: 1,
-          px: 1,
-          py: 1
-        }}
-      >
+      <Flex sx={{ flexDirection: "column", px: "spacing4" }}>
+        <Box bg="separator" sx={{ width: "100%", height: "1px" }} />
         <Flex
           sx={{
-            flexDirection: isCollapsed ? "column" : "row",
-            alignItems: isCollapsed ? "stretch" : "center",
-            gap: "small",
-            flex: 1
+            alignItems: "center",
+            justifyContent: "space-between",
+            my: "spacing3"
           }}
         >
-          {tabs.map((tab) => (
-            <TabItem
-              key={tab.id}
-              data-test-id={`tab-${tab.id}`}
-              title={tab.title}
-              icon={tab.icon}
-              selected={currentTab.id === tab.id}
-              onClick={() => {
-                if (isNavPaneCollapsed) setExpanded(true);
-                setNavigationTab(tab.id);
-              }}
-            />
-          ))}
-        </Flex>
-        {!isCollapsed && currentTab.actions.length > 0 ? (
-          <Flex sx={{ alignItems: "center" }}>
-            {currentTab.actions.map((action) => (
-              <Button
-                key={action.id}
-                variant="secondary"
-                sx={{ p: 1, bg: "transparent" }}
-                onClick={action.onClick}
-                title={action.title}
-                data-test-id={action.id}
-              >
-                <action.icon size={13} color="icon" />
-              </Button>
+          <Flex
+            sx={{
+              flexDirection: isCollapsed ? "column" : "row",
+              alignItems: "center",
+              gap: "spacing2"
+            }}
+          >
+            {tabs.map((tab) => (
+              <TabItem
+                key={tab.id}
+                data-test-id={`tab-${tab.id}`}
+                title={tab.title}
+                icon={tab.icon}
+                selected={currentTab.id === tab.id}
+                sx={{
+                  p: 0,
+                  width: isCollapsed ? "25px" : "34px",
+                  height: isCollapsed ? "25px" : "34px",
+                  borderRadius: isCollapsed ? "5px" : "6px"
+                }}
+                onClick={() => {
+                  if (isNavPaneCollapsed) setExpanded(true);
+                  setNavigationTab(tab.id);
+                }}
+              />
             ))}
           </Flex>
+          {!isCollapsed && currentTab.actions.length > 0 ? (
+            <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
+              {currentTab.actions.map((action) => (
+                <Button
+                  key={action.id}
+                  variant="tertiary"
+                  sx={{ p: 0, bg: "transparent" }}
+                  onClick={action.onClick}
+                  title={action.title}
+                  data-test-id={action.id}
+                >
+                  <action.icon size={15} color="icon-secondary" />
+                </Button>
+              ))}
+            </Flex>
+          ) : null}
+        </Flex>
+        <Box bg="separator" sx={{ width: "100%", height: "1px" }} />
+        {isCollapsed || currentTab.id === "home" ? (
+          <Button
+            variant="new_accent"
+            onClick={(e) => {
+              if (e.ctrlKey || e.metaKey) {
+                return useEditorStore.getState().addTab();
+              }
+
+              CREATE_BUTTON_MAP.notes.onClick();
+            }}
+            onAuxClick={() => useEditorStore.getState().addTab()}
+            data-test-id="create-note-button"
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "spacing4",
+              display: "flex",
+              my: "spacing4",
+              px: "spacing4",
+              py: isCollapsed ? "spacing4" : "spacing5",
+              borderRadius: isCollapsed ? "radius1" : "radius2",
+              fontSize: "sm",
+              fontWeight: 600,
+              width: isCollapsed ? "25px" : "100%",
+              height: isCollapsed ? "25px" : undefined
+            }}
+          >
+            <Plus size={15} color="accentForeground" />
+            {isCollapsed ? null : strings.newNote()}
+          </Button>
         ) : null}
       </Flex>
 
@@ -453,7 +523,13 @@ function NavigationMenu({
             thumbStyle={() => ({ width: 3 })}
             suppressScrollX={true}
           >
-            <Flex sx={{ flexDirection: "column", px: 1, gap: [1, 1, "small"] }}>
+            <Flex
+              sx={{
+                flexDirection: "column",
+                gap: isCollapsed ? "spacing2" : "spacing1",
+                px: "spacing4"
+              }}
+            >
               <Routes
                 isCollapsed={isCollapsed}
                 collapse={() => isNavPaneCollapsed && setExpanded(false)}
@@ -461,11 +537,6 @@ function NavigationMenu({
               <Colors
                 isCollapsed={isCollapsed}
                 collapse={() => isNavPaneCollapsed && setExpanded(false)}
-              />
-              <Box
-                bg="separator"
-                my={1}
-                sx={{ width: "100%", height: "0.8px", alignSelf: "center" }}
               />
               <Shortcuts
                 isCollapsed={isCollapsed}
@@ -529,6 +600,9 @@ function RouteItem({
   const [location] = useLocation();
   const trash = useTrashStore((store) => store.trash);
 
+  const selected =
+    item.path === "/" ? location === item.path : location.startsWith(item.path);
+
   return (
     <SortableNavigationItem
       key={item.id}
@@ -548,11 +622,7 @@ function RouteItem({
               : undefined
         });
       }}
-      selected={
-        item.path === "/"
-          ? location === item.path
-          : location.startsWith(item.path)
-      }
+      selected={selected}
       onClick={() => {
         navigateToRoute(item.path);
         context?.collapse();
@@ -565,13 +635,14 @@ function RouteItem({
                 key: "clear-trash",
                 title: strings.clearTrash(),
                 isDisabled: !trash || trash.length === 0,
-                icon: ClearTrash.path,
+                iconComponent: Trash,
                 onClick: async () => {
                   const ok = await ConfirmDialog.show({
                     title: strings.clearTrash(),
                     positiveButtonText: strings.clear(),
                     negativeButtonText: strings.cancel(),
-                    message: strings.clearTrashDesc()
+                    subtitle: strings.clearTrashDesc(),
+                    positiveButtonVariant: "new_error"
                   });
                   if (!ok) return;
 
@@ -613,7 +684,7 @@ function RouteItem({
         }
       ]}
     >
-      <ItemCount item={item} />
+      <ItemCount item={item} selected={selected} />
     </SortableNavigationItem>
   );
 }
@@ -628,20 +699,59 @@ function Colors({
   const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
   const colors = useAppStore((store) => store.colors);
   const hiddenColors = useAppStore((store) => store.hiddenColors);
+  const [showAllColors, setShowAllColors] = useState(
+    isCollapsed ? true : false
+  );
+  const visibleColors = customizableSidebar?.isAllowed
+    ? colors.filter((c) => !hiddenColors.includes(c.id))
+    : colors;
+  const hasMoreColors = visibleColors.length > 6;
 
+  if (colors.length === 0) return null;
   return (
-    <ReorderableList
-      items={
-        customizableSidebar?.isAllowed
-          ? colors.filter((c) => !hiddenColors.includes(c.id))
-          : colors
-      }
-      orderKey={`sidebarOrder:colors`}
-      order={() => db.settings.getSideBarOrder("colors")}
-      onOrderChanged={(order) => db.settings.setSideBarOrder("colors", order)}
-      renderItem={ColorItem}
-      context={{ collapse, isCollapsed }}
-    />
+    <>
+      <Box
+        bg="separator"
+        my={"spacing4"}
+        sx={{ width: "100%", height: "1px" }}
+      />
+      <ReorderableList
+        items={visibleColors}
+        visibleItemLimit={showAllColors ? undefined : 6}
+        orderKey={`sidebarOrder:colors`}
+        order={() => db.settings.getSideBarOrder("colors")}
+        onOrderChanged={(order) => db.settings.setSideBarOrder("colors", order)}
+        renderItem={ColorItem}
+        context={{ collapse, isCollapsed }}
+      />
+      {!isCollapsed && hasMoreColors ? (
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: "spacing2",
+            minHeight: "spacing5",
+            mt: "spacing3"
+          }}
+        >
+          <Text variant="body" sx={{ fontSize: "xs" }}>
+            {showAllColors ? "" : `+${visibleColors.length - 6} more`}
+          </Text>
+          <Button
+            onClick={() => setShowAllColors((expanded) => !expanded)}
+            sx={{
+              color: "accent",
+              fontSize: "xs",
+              fontWeight: "medium",
+              lineHeight: 1,
+              p: 0
+            }}
+          >
+            {showAllColors ? "View less" : "View all"}
+          </Button>
+        </Flex>
+      ) : null}
+    </>
   );
 }
 
@@ -661,7 +771,9 @@ function ColorItem({
       key={color.id}
       title={color.title}
       isCollapsed={context?.isCollapsed}
-      icon={Circle}
+      icon={Ellipse}
+      iconSize={10}
+      collapsedIconSize={10}
       selected={currentContext?.id === color.id}
       color={color.colorCode}
       onClick={() => {
@@ -675,7 +787,7 @@ function ColorItem({
           key: "rename-color",
           title: strings.renameColor(),
           onClick: () => RenameColorDialog.show(color),
-          icon: Rename.path
+          iconComponent: PencilSimple
         },
         {
           type: "button",
@@ -685,7 +797,7 @@ function ColorItem({
             await db.colors.remove(color.id);
             await useAppStore.getState().refreshNavItems();
           },
-          icon: Trash.path
+          iconComponent: Backspace
         },
         {
           type: "button",
@@ -699,7 +811,8 @@ function ColorItem({
               "text/html": `<a href="${link}">${color.title}</a>`,
               "text/markdown": `[${color.title}](${link})`
             });
-          }
+          },
+          iconComponent: LinkHorizontal
         },
         {
           type: "lazy-loader",
@@ -736,18 +849,25 @@ function Shortcuts({
   collapse: () => void;
 }) {
   const shortcuts = useAppStore((store) => store.shortcuts);
-
+  if (shortcuts.length === 0) return null;
   return (
-    <ReorderableList
-      items={shortcuts}
-      orderKey={`sidebarOrder:shortcuts`}
-      order={() => db.settings.getSideBarOrder("shortcuts")}
-      onOrderChanged={(order) =>
-        db.settings.setSideBarOrder("shortcuts", order)
-      }
-      context={{ isCollapsed, collapse }}
-      renderItem={ShortcutItem}
-    />
+    <>
+      <Box
+        bg="separator"
+        my={"spacing4"}
+        sx={{ width: "100%", height: "1px" }}
+      />
+      <ReorderableList
+        items={shortcuts}
+        orderKey={`sidebarOrder:shortcuts`}
+        order={() => db.settings.getSideBarOrder("shortcuts")}
+        onOrderChanged={(order) =>
+          db.settings.setSideBarOrder("shortcuts", order)
+        }
+        context={{ isCollapsed, collapse }}
+        renderItem={ShortcutItem}
+      />
+    </>
   );
 }
 
@@ -783,14 +903,10 @@ function ShortcutItem({
           ]
         },
         {
-          type: "separator",
-          key: "sep32"
-        },
-        {
           type: "button",
           key: "removeshortcut",
           title: strings.doActions.remove.shortcut(1),
-          icon: Trash.path,
+          iconComponent: LinkBreak,
           onClick: async () => {
             await db.shortcuts.remove(item.id);
             useAppStore.getState().refreshNavItems();
@@ -799,11 +915,12 @@ function ShortcutItem({
       ]}
       icon={
         item.type === "notebook"
-          ? Notebook2
+          ? NotebookIcon
           : item.type === "tag"
-          ? Tag2
+          ? TagIcon
           : Topic
       }
+      iconSize={14}
       selected={currentContext?.id === item.id}
       onDrop={(e) => handleDrop(e.dataTransfer, item)}
       onClick={async () => {
@@ -820,7 +937,13 @@ function ShortcutItem({
   );
 }
 
-function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
+function ItemCount({
+  item,
+  selected = false
+}: {
+  item: Route | Color | Notebook | Tag;
+  selected?: boolean;
+}) {
   const notes = useNoteStore((store) => store.notes);
   const reminders = useReminderStore((store) => store.reminders);
   const trash = useTrashStore((store) => store.trash);
@@ -853,7 +976,17 @@ function ItemCount({ item }: { item: Route | Color | Notebook | Tag }) {
       }
     })().then((c) => setCount(c || 0));
   }, [item, notes, trash, monographs, reminders]);
-  return <Text variant="subBody">{count}</Text>;
+  return (
+    <Text
+      variant="subBody"
+      sx={{
+        fontSize: "3xs",
+        color: selected ? "paragraph" : "paragraph-secondary"
+      }}
+    >
+      {count}
+    </Text>
+  );
 }
 
 function NavigationDropdown() {
@@ -889,7 +1022,7 @@ function NavigationDropdown() {
               type: "button",
               title: strings.toggleDarkLightMode(),
               key: "toggle-theme-mode",
-              icon: theme === "dark" ? LightMode.path : DarkMode.path,
+              iconComponent: MoonStars,
               onClick: () => {
                 setFollowSystemTheme(false);
                 toggleNightMode();
@@ -901,13 +1034,13 @@ function NavigationDropdown() {
               icon: Pro.path,
               key: "upgrade",
               onClick: () => BuyDialog.show({}),
-              isHidden: notLoggedIn || isSubscribed
+              isHidden: notLoggedIn || !isSubscribed
             },
             {
               type: "button",
               title: settings.title,
               key: settings.id,
-              icon: settings.icon.path,
+              iconComponent: GearSix,
               onClick: () => {
                 hashNavigate(settings.path);
               }
@@ -915,7 +1048,7 @@ function NavigationDropdown() {
             {
               type: "button",
               title: strings.helpAndSupport(),
-              icon: Documentation.path,
+              iconComponent: Question,
               key: "help-and-support",
               onClick: () => {
                 window.open("https://help.notesnook.com/", "_blank");
@@ -924,7 +1057,7 @@ function NavigationDropdown() {
             {
               type: "button",
               title: strings.login(),
-              icon: Login.path,
+              iconComponent: SignIn,
               key: "login",
               isHidden: !notLoggedIn,
               onClick: () => hardNavigate("/login")
@@ -932,7 +1065,7 @@ function NavigationDropdown() {
             {
               type: "button",
               title: strings.logout(),
-              icon: Logout.path,
+              iconComponent: SignOut,
               key: "logout",
               isHidden: notLoggedIn,
               onClick: () => logout()
@@ -949,9 +1082,8 @@ function NavigationDropdown() {
       }}
       data-test-id="profile-dropdown"
       sx={{
-        bg: "background-secondary",
-        size: 26,
-        borderRadius: 80,
+        size: 32,
+        borderRadius: "radius5",
         cursor: "pointer",
         position: "relative",
         border: "1px solid var(--border)",
@@ -960,14 +1092,26 @@ function NavigationDropdown() {
       }}
     >
       {!user || !user.id || !profile?.profilePicture ? (
-        <User size={14} color="icon" />
+        <Flex
+          sx={{
+            bg: "background-tertiary",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "radius5"
+          }}
+        >
+          <UserProfileIcon size={17} color="icon-secondary" />
+        </Flex>
       ) : (
         <Image
           sx={{
             width: "100%",
             height: "100%",
             objectFit: "contain",
-            borderRadius: 80
+            borderRadius: "radius5"
           }}
           src={profile.profilePicture}
         />
@@ -979,6 +1123,7 @@ function NavigationDropdown() {
 type ReorderableListProps<T> = {
   orderKey: string;
   items: T[];
+  visibleItemLimit?: number;
   context?: any;
   renderItem: (props: { item: T; context?: any }) => JSX.Element;
   onOrderChanged: (newOrder: string[]) => void;
@@ -991,6 +1136,7 @@ function ReorderableList<T extends { id: string }>(
   const {
     orderKey,
     items,
+    visibleItemLimit,
     renderItem: Item,
     onOrderChanged,
     context,
@@ -1012,6 +1158,9 @@ function ReorderableList<T extends { id: string }>(
   const orderedItems = customizableSidebar?.isAllowed
     ? orderItems(items, order)
     : items;
+  const renderedItems = visibleItemLimit
+    ? orderedItems.slice(0, visibleItemLimit)
+    : orderedItems;
 
   useEffect(() => {
     setOrder(_order());
@@ -1051,10 +1200,10 @@ function ReorderableList<T extends { id: string }>(
       }}
     >
       <SortableContext
-        items={orderedItems}
+        items={renderedItems}
         strategy={verticalListSortingStrategy}
       >
-        {orderedItems.map((item) => (
+        {renderedItems.map((item) => (
           <Item key={item.id} item={item} context={context} />
         ))}
 
@@ -1132,7 +1281,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
             useAppStore.getState().setHiddenColors([]);
           });
       },
-      icon: Reset.path
+      iconComponent: ArrowCounterClockwise
     },
     { type: "separator", key: "sep" },
     ...toMenuItems(
@@ -1143,7 +1292,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
           .setSideBarHiddenItems("routes", ids)
           .then(() => useAppStore.getState().setHiddenRoutes(ids)),
       customizableSidebar,
-      (item) => ({ icon: item.icon.path })
+      (item) => ({ iconComponent: item.icon })
     ),
     { type: "separator", key: "sep", isHidden: colors.length <= 0 },
     ...toMenuItems(
@@ -1155,7 +1304,7 @@ async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
           .then(() => useAppStore.getState().setHiddenColors(ids)),
       customizableSidebar,
       (item) => ({
-        icon: Circle.path,
+        iconComponent: Ellipse,
         styles: { icon: { color: item.colorCode } }
       })
     )

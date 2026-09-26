@@ -16,23 +16,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { strings } from "@notesnook/intl";
+import { useThemeColors } from "@notesnook/theme";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
-import { strings } from "@notesnook/intl";
+import { ScrollView } from "react-native-actions-sheet";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { db } from "../../../common/database";
+import { ToastManager, presentSheet } from "../../../services/event-manager";
+import { DefaultAppStyles } from "../../../utils/styles";
+import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import FormInput, {
   createFormRef,
   validators
 } from "../../ui/input/form-input";
-import Paragraph from "../../ui/typography/paragraph";
-import Heading from "../../ui/typography/heading";
-import { DefaultAppStyles } from "../../../utils/styles";
-import { AppFontSize } from "../../../utils/size";
-import { ToastManager, presentSheet } from "../../../services/event-manager";
-import { useThemeColors } from "@notesnook/theme";
 import { Pressable } from "../../ui/pressable";
-import { ScrollView } from "react-native-actions-sheet";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 const getExpiryOptions = () => [
   { label: strings.expiryOneDay(), value: 24 * 60 * 60 * 1000 },
@@ -94,7 +95,7 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
     <ScrollView
       contentContainerStyle={{
         paddingHorizontal: DefaultAppStyles.GAP,
-        gap: DefaultAppStyles.GAP_VERTICAL,
+        gap: DefaultAppStyles.GAP,
         paddingTop: DefaultAppStyles.GAP_VERTICAL,
         paddingBottom: DefaultAppStyles.GAP_VERTICAL * 2
       }}
@@ -102,60 +103,92 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: "flex-start",
+          gap: DefaultAppStyles.GAP_SMALL
         }}
       >
-        <Heading size={AppFontSize.xl}>{strings.createApiKey()}</Heading>
-      </View>
-
-      <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
-        <Paragraph size={AppFontSize.sm}>{strings.keyName()}</Paragraph>
-        <FormInput
-          name="keyName"
-          formRef={formRef}
-          placeholder={strings.exampleKeyName()}
-          validators={[validators.required(strings.enterKeyName())]}
-          onChangeText={() => {
-            formRef.current.setError("keyName", undefined);
-          }}
-          onSubmitEditing={handleCreate}
-        />
-      </View>
-
-      <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
-        <Paragraph size={AppFontSize.sm}>{strings.expiresIn()}</Paragraph>
         <View
           style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: DefaultAppStyles.GAP_SMALL
+            width: 32,
+            height: 32,
+            borderRadius: Radius.XS,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: colors.secondary.background
           }}
         >
-          {getExpiryOptions().map((option) => (
-            <Pressable
-              key={option.label}
-              onPress={() => setSelectedExpiry(option.value)}
-              type={
-                selectedExpiry === option.value ? "selected" : "transparent"
-              }
-              style={{
-                paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-                paddingHorizontal: DefaultAppStyles.GAP
-              }}
-            >
-              <Paragraph
-                size={AppFontSize.sm}
-                color={
-                  selectedExpiry === option.value
-                    ? colors.selected.paragraph
-                    : colors.primary.paragraph
-                }
+          <AppIcon
+            name="key"
+            iconFamily="notesnook"
+            size={16}
+            color={colors.primary.icon}
+          />
+        </View>
+        <View style={{ flex: 1, gap: DefaultAppStyles.GAP_VERTICAL_SMALL }}>
+          <Heading fontSize="XL" lineHeight="100%">
+            {strings.createApiKey()}
+          </Heading>
+          <Paragraph fontSize="SM" color={colors.secondary.paragraph}>
+            {strings.createApiKeyDesc()}
+          </Paragraph>
+        </View>
+      </View>
+
+      <FormInput
+        name="keyName"
+        formRef={formRef}
+        label={strings.keyName()}
+        placeholder={strings.exampleKeyName()}
+        validators={[validators.required(strings.enterKeyName())]}
+        containerStyle={{ borderRadius: Radius.XS }}
+        onChangeText={() => {
+          formRef.current.setError("keyName", undefined);
+        }}
+        onSubmitEditing={handleCreate}
+      />
+
+      <View style={{ height: 1, backgroundColor: colors.primary.border }} />
+
+      <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
+        <Heading fontSize="MD" lineHeight="100%">
+          {strings.expiresIn()}
+        </Heading>
+        <View style={{ gap: DefaultAppStyles.GAP_VERTICAL }}>
+          {getExpiryOptions().map((option) => {
+            const selected = selectedExpiry === option.value;
+            return (
+              <Pressable
+                key={option.label}
+                onPress={() => setSelectedExpiry(option.value)}
+                type={selected ? "selected" : "transparent"}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: Spacing.LEVEL_2,
+                  borderRadius: Radius.XS,
+                  borderWidth: selected ? 0 : 1,
+                  borderColor: colors.secondary.border
+                }}
               >
-                {option.label}
-              </Paragraph>
-            </Pressable>
-          ))}
+                <Heading
+                  fontFamily="MEDIUM"
+                  fontSize="SM"
+                  lineHeight="100%"
+                  color={
+                    selected ? colors.selected.heading : colors.secondary.heading
+                  }
+                >
+                  {option.label}
+                </Heading>
+                <AppIcon
+                  name={selected ? "radiobox-marked" : "radiobox-blank"}
+                  size={16}
+                  color={selected ? colors.selected.accent : colors.secondary.icon}
+                />
+              </Pressable>
+            );
+          })}
         </View>
       </View>
 
@@ -166,9 +199,6 @@ export default function AddApiKeySheet({ close, onAdd }: AddApiKeySheetProps) {
         loading={isCreating}
         disabled={isCreating}
         onPress={handleCreate}
-        style={{
-          marginTop: DefaultAppStyles.GAP_VERTICAL
-        }}
       />
     </ScrollView>
   );
