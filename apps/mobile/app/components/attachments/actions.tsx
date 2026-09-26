@@ -182,8 +182,9 @@ const Actions = ({
                   setAttachments();
                   eSendEvent(eDBItemUpdate, attachment.id);
                   ToastManager.show({
-                    message: `Attachment renamed to ${value}`,
-                    type: "success"
+                    message: strings.attachmentRenamedTo(value),
+                    type: "success",
+                    context: "local"
                   });
 
                   return true;
@@ -218,7 +219,8 @@ const Actions = ({
                 await db.attachments.remove(attachment.hash, false);
                 ToastManager.show({
                   type: "success",
-                  message: strings.attachmentDeleted()
+                  message: strings.attachmentDeleted(),
+                  context: "local"
                 });
                 setAttachments();
                 eSendEvent(eDBItemUpdate, attachment.id);

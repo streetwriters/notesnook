@@ -3189,5 +3189,13 @@ Continue without attachments?`,
     }),
   aboveContentWillAppendTo: () => t`Above content will append to`,
   clickOnNewNoteToCreateNote: () =>
-    t`. Click on "New note" to create a new note.`
+    t`. Click on "New note" to create a new note.`,
+  appendToNote: () => t`Append to a note`,
+  themeApplied: (name?: string) => t`${name || ""} applied successfully`,
+  remindInMin: (minutes: number | string) => t`Remind in ${minutes} min`,
+  attachmentRenamedTo: (name: string) => t`Attachment renamed to ${name}`,
+  cannotMoveNotebooksHere: () =>
+    t`You cannot move the selected notebook(s) here`,
+  unlockNoteToOpenInEditor: () => t`Unlock note to open it in editor.`,
+  unlockToAccessNotes: () => t`Unlock to access your notes`
 };

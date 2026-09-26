@@ -33,6 +33,11 @@ msgstr "\"Refunded"
 msgid "(empty block)"
 msgstr "(empty block)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr ""
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -1096,6 +1101,10 @@ msgstr "App will reload in {sec} seconds"
 msgid "Appearance"
 msgstr "Appearance"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr ""
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Applied as dark theme"
@@ -1229,6 +1238,10 @@ msgstr "Attachment preview failed"
 #: src/strings.ts:2193
 msgid "Attachment recheck cancelled"
 msgstr "Attachment recheck cancelled"
+
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr ""
 
 #: src/strings.ts:2111
 msgid "Attachment settings"
@@ -6289,6 +6302,10 @@ msgstr "Relogin to your account"
 msgid "Remembered your password?"
 msgstr "Remembered your password?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr ""
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Remind me"
@@ -8189,6 +8206,10 @@ msgstr "Unlock note to delete it"
 msgid "Unlock note to merge conflicts"
 msgstr "Unlock note to merge conflicts"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr ""
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
@@ -8196,6 +8217,10 @@ msgstr "Unlock the app with biometric authentication. This requires biometrics t
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Unlock this feature today"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr ""
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8898,6 +8923,10 @@ msgstr "You can use fallback 2FA method incase you are unable to login via prima
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "You can view & restore older versions of any note by going to its properties -> History."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr ""
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."
