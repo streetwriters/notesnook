@@ -33,6 +33,11 @@ msgstr "\"Повернено"
 msgid "(empty block)"
 msgstr "(порожній блок)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr "{0} успішно застосовано"
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -1096,6 +1101,10 @@ msgstr "Застосунок перезавантажиться через {sec}
 msgid "Appearance"
 msgstr "Вигляд"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr "Додати до нотатки"
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Застосовано як темну тему"
@@ -1229,6 +1238,10 @@ msgstr "Не вдалося показати попередній перегля
 #: src/strings.ts:2193
 msgid "Attachment recheck cancelled"
 msgstr "Повторну перевірку вкладень скасовано"
+
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr "Вкладення перейменовано на {name}"
 
 #: src/strings.ts:2111
 msgid "Attachment settings"
@@ -6289,6 +6302,10 @@ msgstr "Увійдіть до свого облікового запису зн�
 msgid "Remembered your password?"
 msgstr "Згадали свій пароль?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr "Нагадати через {minutes} хв"
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Нагадати мені"
@@ -8190,6 +8207,10 @@ msgstr "Розблокуйте нотатку, щоб видалити її"
 msgid "Unlock note to merge conflicts"
 msgstr "Розблокуйте нотатку, щоб об'єднати конфлікти"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr "Розблокуйте нотатку, щоб відкрити її в редакторі."
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Розблокуйте застосунок за допомогою біометрії. Для цього біометрію має бути увімкнено на вашому пристрої."
@@ -8197,6 +8218,10 @@ msgstr "Розблокуйте застосунок за допомогою бі
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Розблокуйте цю функцію сьогодні"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr "Розблокуйте для доступу до ваших нотаток"
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8905,6 +8930,10 @@ msgstr "Ви можете використати резервний метод 2
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Ви можете переглядати та відновлювати старіші версії будь-якої нотатки через її властивості -> Історія."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr "Ви не можете перемістити вибрані блокноти сюди"
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."

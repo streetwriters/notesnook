@@ -33,6 +33,11 @@ msgstr "\"Terugbetaald"
 msgid "(empty block)"
 msgstr "(leeg blok)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr "{0} succesvol toegepast"
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -1096,6 +1101,10 @@ msgstr "De app wordt over {sec} seconden opnieuw geladen"
 msgid "Appearance"
 msgstr "Weergave"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr "Toevoegen aan een notitie"
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Toegepast als donker thema"
@@ -1229,6 +1238,10 @@ msgstr "Voorbeeld van bijlage mislukt"
 #: src/strings.ts:2193
 msgid "Attachment recheck cancelled"
 msgstr "Opnieuw controleren van bijlagen geannuleerd"
+
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr "Bijlage hernoemd naar {name}"
 
 #: src/strings.ts:2111
 msgid "Attachment settings"
@@ -6289,6 +6302,10 @@ msgstr "Log opnieuw in op je account"
 msgid "Remembered your password?"
 msgstr "Weet je je wachtwoord weer?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr "Herinner over {minutes} min"
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Herinner mij"
@@ -8190,6 +8207,10 @@ msgstr "Ontgrendel de notitie om deze te verwijderen"
 msgid "Unlock note to merge conflicts"
 msgstr "Ontgrendel de notitie om conflicten samen te voegen"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr "Ontgrendel notitie om deze in de editor te openen."
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Ontgrendel de app met biometrische verificatie. Hiervoor moet biometrie op je apparaat zijn ingeschakeld."
@@ -8197,6 +8218,10 @@ msgstr "Ontgrendel de app met biometrische verificatie. Hiervoor moet biometrie 
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Ontgrendel deze functie vandaag nog"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr "Ontgrendel om toegang te krijgen tot je notities"
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8905,6 +8930,10 @@ msgstr "Je kunt de 2FA-reservemethode gebruiken als je niet kunt inloggen via de
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Je kunt oudere versies van elke notitie bekijken en herstellen via de eigenschappen -> Geschiedenis."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr "Je kunt de geselecteerde notitieboeken niet hierheen verplaatsen"
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."

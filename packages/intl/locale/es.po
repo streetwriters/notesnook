@@ -33,6 +33,11 @@ msgstr "\"Reembolsado"
 msgid "(empty block)"
 msgstr "(bloque vacío)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr "{0} aplicado correctamente"
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -1096,6 +1101,10 @@ msgstr "La aplicación se recargará en {sec} segundos"
 msgid "Appearance"
 msgstr "Apariencia"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr "Añadir a una nota"
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Aplicado como tema oscuro"
@@ -1229,6 +1238,10 @@ msgstr "Error en la vista previa del adjunto"
 #: src/strings.ts:2193
 msgid "Attachment recheck cancelled"
 msgstr "Comprobación de adjuntos cancelada"
+
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr "Adjunto renombrado a {name}"
 
 #: src/strings.ts:2111
 msgid "Attachment settings"
@@ -6289,6 +6302,10 @@ msgstr "Vuelve a iniciar sesión en tu cuenta"
 msgid "Remembered your password?"
 msgstr "¿Ya recuerdas tu contraseña?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr "Recordar en {minutes} min"
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Recuérdamelo"
@@ -8190,6 +8207,10 @@ msgstr "Desbloquea la nota para eliminarla"
 msgid "Unlock note to merge conflicts"
 msgstr "Desbloquea la nota para resolver los conflictos"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr "Desbloquea la nota para abrirla en el editor."
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Desbloquea la aplicación con autenticación biométrica. Requiere tener los datos biométricos activados en tu dispositivo."
@@ -8197,6 +8218,10 @@ msgstr "Desbloquea la aplicación con autenticación biométrica. Requiere tener
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Desbloquea esta función hoy"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr "Desbloquear para acceder a tus notas"
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8905,6 +8930,10 @@ msgstr "Puedes usar el método 2FA alternativo si no consigues iniciar sesión c
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Puedes ver y restaurar versiones anteriores de cualquier nota desde sus propiedades -> Historial."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr "No puedes mover los cuadernos seleccionados aquí"
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."

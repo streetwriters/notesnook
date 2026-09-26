@@ -869,7 +869,7 @@ export const useActions = ({
               mode: AuthMode.login
             });
           },
-          actionText: "Login"
+          actionText: strings.login()
         });
         return;
       }

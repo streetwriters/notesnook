@@ -99,7 +99,7 @@ const publishNote = async () => {
           mode: AuthMode.login
         });
       },
-      actionText: "Login"
+      actionText: strings.login()
     });
     return;
   }

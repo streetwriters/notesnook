@@ -33,6 +33,11 @@ msgstr "\"İade edildi"
 msgid "(empty block)"
 msgstr "(boş blok)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr "{0} başarıyla uygulandı"
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -1096,6 +1101,10 @@ msgstr "Uygulama {sec} saniye içinde yeniden yüklenecek"
 msgid "Appearance"
 msgstr "Görünüm"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr "Bir nota ekle"
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Koyu tema olarak uygulandı"
@@ -1229,6 +1238,10 @@ msgstr "Ek önizlemesi başarısız oldu"
 #: src/strings.ts:2193
 msgid "Attachment recheck cancelled"
 msgstr "Ek yeniden denetimi iptal edildi"
+
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr "Ek {name} olarak yeniden adlandırıldı"
 
 #: src/strings.ts:2111
 msgid "Attachment settings"
@@ -6289,6 +6302,10 @@ msgstr "Hesabınıza yeniden giriş yapın"
 msgid "Remembered your password?"
 msgstr "Parolanızı hatırladınız mı?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr "{minutes} dk sonra hatırlat"
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Bana hatırlat"
@@ -8190,6 +8207,10 @@ msgstr "Notu silmek için kilidini açın"
 msgid "Unlock note to merge conflicts"
 msgstr "Çakışmaları birleştirmek için notun kilidini açın"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr "Düzenleyicide açmak için notun kilidini açın."
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Uygulamayı biyometrik kimlik doğrulamayla açın. Bunun için cihazınızda biyometrinin etkin olması gerekir."
@@ -8197,6 +8218,10 @@ msgstr "Uygulamayı biyometrik kimlik doğrulamayla açın. Bunun için cihazın
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Bu özelliğin kilidini bugün açın"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr "Notlarınıza erişmek için kilidi açın"
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8905,6 +8930,10 @@ msgstr "Birincil yöntemle giriş yapamazsanız yedek 2FA yöntemini kullanabili
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Herhangi bir notun eski sürümlerini özellikleri -> Geçmiş bölümünden görüntüleyip geri yükleyebilirsiniz."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr "Seçilen not defterlerini buraya taşıyamazsınız"
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."

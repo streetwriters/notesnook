@@ -238,8 +238,8 @@ const useLockedNoteHandler = () => {
       try {
         if (!tabRef.current?.session?.noteLocked || !tabRef.current) return;
         const credentials = await BiometricService.getCredentials(
-          "Unlock note",
-          "Unlock note to open it in editor."
+          strings.unlockNote(),
+          strings.unlockNoteToOpenInEditor()
         );
 
         if (
