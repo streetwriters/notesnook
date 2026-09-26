@@ -125,71 +125,72 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           }
         }}
       >
-        {props.showCloseButton && (
-          <Close
-            sx={{
-              position: "absolute",
-              cursor: "pointer",
-              top: 0,
-              right: 20,
-              mt: 26,
-              zIndex: 999
-            }}
-            size={20}
-            onClick={props.onClose}
-          />
-        )}
-        {props.title || props.description ? (
-          <Flex
-            sx={{ flexDirection: "column", gap: "spacing4" }}
-            p="spacing7"
-            pb={0}
-          >
-            {props.title && (
-              <Flex
-                sx={{
-                  alignItems: "center",
-                  justifyContent:
-                    props.textAlignment === "center"
-                      ? "center"
-                      : "space-between"
-                }}
-              >
-                <Text
-                  variant="heading"
-                  data-test-id="dialog-title"
+        <Flex
+          sx={{
+            flexDirection: "row",
+            padding: "spacing7",
+            pb: 0,
+            gap: "spacing3"
+          }}
+        >
+          {props.title || props.description ? (
+            <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+              {props.title && (
+                <Flex
                   sx={{
-                    fontSize: "lg",
-                    fontWeight: 600,
-                    lineHeight: "100%",
+                    alignItems: "center",
+                    justifyContent:
+                      props.textAlignment === "center"
+                        ? "center"
+                        : "space-between"
+                  }}
+                >
+                  <Text
+                    variant="heading"
+                    data-test-id="dialog-title"
+                    sx={{
+                      fontSize: "lg",
+                      fontWeight: 600,
+                      lineHeight: "100%",
+                      textAlign: props.textAlignment || "left",
+                      color: "heading",
+                      overflowWrap: "anywhere",
+                      wordSpacing: "wrap"
+                    }}
+                  >
+                    {props.title}
+                  </Text>
+                  {props.titleAction}
+                </Flex>
+              )}
+              {props.description && (
+                <Text
+                  variant="body"
+                  sx={{
                     textAlign: props.textAlignment || "left",
-                    color: "heading",
+                    color: "paragraph",
+                    fontSize: "md",
+                    lineHeight: 1.4,
                     overflowWrap: "anywhere",
                     wordSpacing: "wrap"
                   }}
                 >
-                  {props.title}
+                  {props.description}
                 </Text>
-                {props.titleAction}
-              </Flex>
-            )}
-            {props.description && (
-              <Text
-                variant="body"
-                sx={{
-                  textAlign: props.textAlignment || "left",
-                  color: "paragraph",
-                  fontSize: "md",
-                  lineHeight: 1.4,
-                  overflowWrap: "anywhere",
-                  wordSpacing: "wrap"
-                }}
-              >
-                {props.description}
-              </Text>
-            )}
-          </Flex>
-        ) : null}
+              )}
+            </Flex>
+          ) : null}
+          {props.showCloseButton && (
+            <Close
+              sx={{
+                cursor: "pointer",
+                zIndex: 999
+              }}
+              size={16}
+              onClick={props.onClose}
+            />
+          )}
+        </Flex>
 
         {props.noScroll ? (
           <>{props.children}</>

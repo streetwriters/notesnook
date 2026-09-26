@@ -1135,7 +1135,8 @@ const CancelInfoDialog = DialogManager.register(function CancelInfoDialog(
     >
       <Flex
         sx={{
-          my: "spacing7",
+          mt: "spacing6",
+          mb: "spacing7",
           flexDirection: "column",
           gap: "spacing4",
           width: "100%"
