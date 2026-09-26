@@ -323,6 +323,7 @@ import SignInSvg from "@notesnook/icons/sign-in.svg?react";
 import UserSvg from "@notesnook/icons/user.svg?react";
 import ListSvg from "@notesnook/icons/list.svg?react";
 import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
+import CloseSvg from "@notesnook/icons/close.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -482,7 +483,6 @@ export const Export = createIcon(mdiExportVariant);
 export const AddToNotebook = createIcon(mdiBookPlusMultipleOutline);
 export const Expand = createIcon(mdiArrowExpandDown);
 export const Shortcut = createIcon(mdiArrowTopRightThick);
-export const Close = createIcon(mdiClose);
 export const Tag2 = createIcon(mdiPound);
 export const Pin = createIcon(mdiPinOutline);
 export const PinFilled = createIcon(mdiPin);
@@ -779,3 +779,4 @@ export const SignIn = createSvgIcon(SignInSvg);
 export const UserProfileIcon = createSvgIcon(UserSvg);
 export const List = createSvgIcon(ListSvg);
 export const CalendarDots = createSvgIcon(CalendarDotsSvg);
+export const Close = createSvgIcon(CloseSvg);
