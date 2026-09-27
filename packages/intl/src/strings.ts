@@ -3262,5 +3262,17 @@ Continue without attachments?`,
   moveLineDown: () => t`Move line down`,
   moveNodeUp: () => t`Move parent node up`,
   moveNodeDown: () => t`Move parent node down`,
-  clearCurrentLine: () => t`Clear current line`
+  clearCurrentLine: () => t`Clear current line`,
+  welcomeToNotesnookBeta: () => t`Welcome to Notesnook Beta!`,
+  highlightsWithStars: () => t`✨ Highlights ✨`,
+  welcomeToVersion: (version: string) => t`Welcome to v${version}`,
+  failedToGetInvoiceForTransaction: (error: string) =>
+    t`Failed to get invoice for this transaction: ${error}`,
+  noInvoiceFoundForTransaction: () => t`No invoice found for this transaction.`,
+  couldNotSubmitBugReport: () => t`Could not submit bug report.`,
+  invalidKeyForAttachment: () => t`Invalid key for attachment.`,
+  waitForPreviousDownloadToFinish: () =>
+    t`Please wait for the previous download to finish or cancel it.`,
+  checkingAttachmentsProgress: (current: number, total: number) =>
+    t`Checking attachments (${current}/${total})`
 };

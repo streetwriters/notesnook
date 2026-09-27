@@ -696,6 +696,10 @@ msgstr "/ місяць"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Головне ✨"
+
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Підсумки року {year}"
@@ -1828,6 +1832,10 @@ msgstr "Перевірка всіх вкладень"
 msgid "Checking attachments"
 msgstr "Перевірка вкладень"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Перевірка вкладень ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Перевірка нової версії"
@@ -2325,6 +2333,10 @@ msgstr "Не вдалося скинути пароль облікового з�
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "Не вдалося зберегти таблицю в csv"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "Не вдалося надіслати звіт про помилку."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -3526,6 +3538,10 @@ msgstr "Не вдалося експортувати вкладення: {path}.
 msgid "Failed to generate inbox keys"
 msgstr "Не вдалося згенерувати ключі вхідних"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "Не вдалося отримати рахунок для цієї транзакції: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "Не вдалося встановити тему."
@@ -4386,6 +4402,10 @@ msgstr "Недопустимий URL CORS-проксі"
 msgid "Invalid JSON"
 msgstr "Недійсний JSON"
 
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Недійсний ключ для вкладення."
+
 #: src/strings.ts:2461
 msgid "Invalid password"
 msgstr "Недопустимий пароль"
@@ -5220,6 +5240,10 @@ msgstr "Немає невдалих елементів вхідних"
 msgid "No headings found"
 msgstr "Заголовків не знайдено"
 
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "Рахунок для цієї транзакції не знайдено."
+
 #: src/strings.ts:3076
 msgid "No limit on notes"
 msgstr "Жодних обмежень щодо нотаток"
@@ -5939,6 +5963,10 @@ msgstr "Зачекайте, перш ніж запитувати новий ко
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Зачекайте, перш ніж запитувати ще один лист"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Будь ласка, зачекайте завершення попереднього завантаження або скасуйте його."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -8943,6 +8971,14 @@ msgstr "З поверненням!"
 #: src/strings.ts:2366
 msgid "Welcome to Notesnook {plan}"
 msgstr "Ласкаво просимо до Notesnook {plan}"
+
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "Ласкаво просимо до Notesnook Beta!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "Ласкаво просимо до v{version}"
 
 #: src/strings.ts:2587
 msgid "What are monographs?"
