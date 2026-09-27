@@ -76,7 +76,8 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
               body: requestData.body,
               userId: userstore.get().user?.id
             });
-            if (!response) throw new Error("Could not submit bug report.");
+            if (!response)
+              throw new Error(strings.couldNotSubmitBugReport());
             if ("error" in response) throw new Error(response.error);
 
             props.onClose(true);

@@ -696,6 +696,10 @@ msgstr "/ mes"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Novedades ✨"
+
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Resumen {year}"
@@ -1828,6 +1832,10 @@ msgstr "Comprobando todos los adjuntos"
 msgid "Checking attachments"
 msgstr "Comprobando archivos adjuntos"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Comprobando archivos adjuntos ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Buscando una nueva versión"
@@ -2325,6 +2333,10 @@ msgstr "No se pudo restablecer la contraseña de la cuenta."
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "No se pudo guardar la tabla en csv"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "No se pudo enviar el informe de error."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -3526,6 +3538,10 @@ msgstr "No se pudo exportar el adjunto: {path}. {message}"
 msgid "Failed to generate inbox keys"
 msgstr "No se pudieron generar las claves de la bandeja de entrada"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "No se pudo obtener la factura para esta transacción: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "No se pudo instalar el tema."
@@ -4386,6 +4402,10 @@ msgstr "URL del proxy CORS no válida"
 msgid "Invalid JSON"
 msgstr "JSON no válido"
 
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Clave no válida para el archivo adjunto."
+
 #: src/strings.ts:2461
 msgid "Invalid password"
 msgstr "Contraseña no válida"
@@ -5220,6 +5240,10 @@ msgstr "No hay elementos fallidos en la bandeja de entrada"
 msgid "No headings found"
 msgstr "No se encontraron encabezados"
 
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "No se encontró ninguna factura para esta transacción."
+
 #: src/strings.ts:3076
 msgid "No limit on notes"
 msgstr "Sin límite de notas"
@@ -5939,6 +5963,10 @@ msgstr "Espera un momento antes de solicitar un código nuevo"
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Espera un momento antes de solicitar otro correo"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Por favor, espera a que termine la descarga anterior o cancélala."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -8943,6 +8971,14 @@ msgstr "¡Bienvenido de nuevo!"
 #: src/strings.ts:2366
 msgid "Welcome to Notesnook {plan}"
 msgstr "Te damos la bienvenida a Notesnook {plan}"
+
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "¡Te damos la bienvenida a Notesnook Beta!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "Te damos la bienvenida a v{version}"
 
 #: src/strings.ts:2587
 msgid "What are monographs?"

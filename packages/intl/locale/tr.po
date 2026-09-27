@@ -696,6 +696,10 @@ msgstr "/ ay"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Öne Çıkanlar ✨"
+
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Özet {year}"
@@ -1828,6 +1832,10 @@ msgstr "Tüm ekler denetleniyor"
 msgid "Checking attachments"
 msgstr "Ekler denetleniyor"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Ekler kontrol ediliyor ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Yeni sürüm denetleniyor"
@@ -2325,6 +2333,10 @@ msgstr "Hesap şifresi sıfırlanamadı."
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "Tablo csv olarak kaydedilemedi"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "Hata raporu gönderilemedi."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -3526,6 +3538,10 @@ msgstr "Ek dosya dışa aktarılamadı: {path}. {message}"
 msgid "Failed to generate inbox keys"
 msgstr "Gelen kutusu anahtarları oluşturulamadı"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "Bu işlem için fatura alınamadı: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "Tema kurulamadı."
@@ -4386,6 +4402,10 @@ msgstr "Geçersiz CORS proxy adresi"
 msgid "Invalid JSON"
 msgstr "Geçersiz JSON"
 
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Ek için geçersiz anahtar."
+
 #: src/strings.ts:2461
 msgid "Invalid password"
 msgstr "Geçersiz parola"
@@ -5220,6 +5240,10 @@ msgstr "Başarısız gelen kutusu öğesi yok"
 msgid "No headings found"
 msgstr "Başlık bulunamadı"
 
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "Bu işlem için fatura bulunamadı."
+
 #: src/strings.ts:3076
 msgid "No limit on notes"
 msgstr "Notlarda sınır yok"
@@ -5939,6 +5963,10 @@ msgstr "Yeni bir kod istemeden önce lütfen bekleyin"
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Başka bir e-posta istemeden önce lütfen bekleyin"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Lütfen önceki indirmenin bitmesini bekleyin veya iptal edin."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -8943,6 +8971,14 @@ msgstr "Tekrar hoş geldiniz!"
 #: src/strings.ts:2366
 msgid "Welcome to Notesnook {plan}"
 msgstr "Notesnook {plan} planına hoş geldiniz"
+
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "Notesnook Beta'ya Hoş Geldiniz!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "v{version} sürümüne hoş geldiniz"
 
 #: src/strings.ts:2587
 msgid "What are monographs?"

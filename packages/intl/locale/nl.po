@@ -696,6 +696,10 @@ msgstr "/ maand"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Hoogtepunten ✨"
+
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Terugblik {year}"
@@ -1828,6 +1832,10 @@ msgstr "Alle bijlagen controleren"
 msgid "Checking attachments"
 msgstr "Bijlagen controleren"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Bijlagen controleren ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Controleren op een nieuwe versie"
@@ -2325,6 +2333,10 @@ msgstr "Kan accountwachtwoord niet resetten."
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "Kon tabel niet opslaan naar csv"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "Kan bugrapport niet verzenden."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -3526,6 +3538,10 @@ msgstr "Kan bijlage niet exporteren: {path}. {message}"
 msgid "Failed to generate inbox keys"
 msgstr "Kan inboxsleutels niet genereren"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "Kan factuur voor deze transactie niet ophalen: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "Kan thema niet installeren."
@@ -4386,6 +4402,10 @@ msgstr "Ongeldige CORS-proxy-URL"
 msgid "Invalid JSON"
 msgstr "Ongeldige JSON"
 
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Ongeldige sleutel voor bijlage."
+
 #: src/strings.ts:2461
 msgid "Invalid password"
 msgstr "Ongeldig wachtwoord"
@@ -5220,6 +5240,10 @@ msgstr "Geen mislukte inbox-items"
 msgid "No headings found"
 msgstr "Geen koppen gevonden"
 
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "Geen factuur gevonden voor deze transactie."
+
 #: src/strings.ts:3076
 msgid "No limit on notes"
 msgstr "Geen limiet op notities"
@@ -5939,6 +5963,10 @@ msgstr "Wacht even voordat je een nieuwe code aanvraagt"
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Wacht even voordat je nog een e-mail aanvraagt"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Wacht tot het vorige downloaden is voltooid of annuleer het."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -8943,6 +8971,14 @@ msgstr "Welkom terug!"
 #: src/strings.ts:2366
 msgid "Welcome to Notesnook {plan}"
 msgstr "Welkom bij Notesnook {plan}"
+
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "Welkom bij Notesnook Beta!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "Welkom bij v{version}"
 
 #: src/strings.ts:2587
 msgid "What are monographs?"

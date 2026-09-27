@@ -47,9 +47,7 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
 
   download = async (ids: string[]) => {
     if (this.get().status)
-      throw new Error(
-        "Please wait for the previous download to finish or cancel it."
-      );
+      throw new Error(strings.waitForPreviousDownloadToFinish());
 
     this.set({ status: { current: 0, total: ids.length } });
 
@@ -89,7 +87,7 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
         let i = 0;
         for (const id of ids) {
           report({
-            text: `Checking attachments (${++i}/${ids.length})`
+            text: strings.checkingAttachmentsProgress(++i, ids.length)
           });
           const attachment = await db.attachments.attachment(id);
           if (!attachment) continue;

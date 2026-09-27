@@ -696,6 +696,10 @@ msgstr "/ месяц"
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Главное ✨"
+
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
 msgstr "🎉 Итоги года {year}"
@@ -1828,6 +1832,10 @@ msgstr "Проверка всех вложений"
 msgid "Checking attachments"
 msgstr "Проверка вложений"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Проверка вложений ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Проверка новой версии"
@@ -2325,6 +2333,10 @@ msgstr "Не удалось сбросить пароль учетной зап�
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "Не удалось сохранить таблицу в csv"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "Не удалось отправить отчет об ошибке."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -3526,6 +3538,10 @@ msgstr "Не удалось экспортировать вложение: {path
 msgid "Failed to generate inbox keys"
 msgstr "Не удалось сгенерировать ключи входящих"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "Не удалось получить счет для этой транзакции: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "Не удалось установить тему."
@@ -4386,6 +4402,10 @@ msgstr "Недопустимый URL CORS-прокси"
 msgid "Invalid JSON"
 msgstr "Недействительный JSON"
 
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Недействительный ключ для вложения."
+
 #: src/strings.ts:2461
 msgid "Invalid password"
 msgstr "Недопустимый пароль"
@@ -5220,6 +5240,10 @@ msgstr "Нет неудачных элементов входящих"
 msgid "No headings found"
 msgstr "Заголовки не найдены"
 
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "Счет для этой транзакции не найден."
+
 #: src/strings.ts:3076
 msgid "No limit on notes"
 msgstr "Без ограничений по заметкам"
@@ -5939,6 +5963,10 @@ msgstr "Подождите, прежде чем запрашивать новы�
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Подождите, прежде чем запрашивать ещё одно письмо"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Пожалуйста, дождитесь завершения предыдущей загрузки или отмените ее."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -8943,6 +8971,14 @@ msgstr "С возвращением!"
 #: src/strings.ts:2366
 msgid "Welcome to Notesnook {plan}"
 msgstr "Добро пожаловать в Notesnook {plan}"
+
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "Добро пожаловать в бета-версию Notesnook!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "Добро пожаловать в v{version}"
 
 #: src/strings.ts:2587
 msgid "What are monographs?"
