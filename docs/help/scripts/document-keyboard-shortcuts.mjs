@@ -76,7 +76,8 @@ function getGroupedTableKeybindingsMarkdown() {
   const header = `| Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |`;
 
-  return CATEGORIES.map((category) => {
+  return CATEGORIES.map((categoryFn) => {
+    const category = typeof categoryFn === "function" ? categoryFn() : categoryFn;
     const webShortcuts =
       webKeybindings.find((g) => g.category === category)?.shortcuts || [];
     const desktopShortcuts =

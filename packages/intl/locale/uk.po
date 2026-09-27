@@ -656,6 +656,10 @@ msgstr "{type, select, upload {Надсилання} download {Завантаж�
 msgid "{type} does not match"
 msgstr "{type} не збігається"
 
+#: src/strings.ts:3213
+msgid "{used} of {total}"
+msgstr "{used} з {total}"
+
 #: src/strings.ts:1480
 msgid "{words, plural, one {# word} other {# words}}"
 msgstr "{words, plural, one {# слово} few {# слова} many {# слів} other {# слів}}"
@@ -848,6 +852,10 @@ msgstr "Додати коротку нотатку"
 msgid "Add a tag"
 msgstr "Додати тег"
 
+#: src/strings.ts:3218
+msgid "Add attachment"
+msgstr "Додати вкладення"
+
 #: src/strings.ts:506
 msgid "Add color"
 msgstr "Додати колір"
@@ -855,6 +863,10 @@ msgstr "Додати колір"
 #: src/strings.ts:2851
 msgid "Add discount"
 msgstr "Додати знижку"
+
+#: src/strings.ts:3241
+msgid "Add image"
+msgstr "Додати зображення"
 
 #: src/strings.ts:2824
 msgid "Add more"
@@ -1331,6 +1343,10 @@ msgstr "Автозапуск під час старту системи"
 #: src/strings.ts:2516
 msgid "Auto-generate keys"
 msgstr "Автоматично створювати ключі"
+
+#: src/strings.ts:3206
+msgid "Auto-save is disabled for large notes. Press Ctrl + S to save."
+msgstr "Автозбереження вимкнено для великих нотаток. Натисніть Ctrl + S для збереження."
 
 #: src/strings.ts:1119
 msgid "Automatic backups"
@@ -1912,6 +1928,10 @@ msgstr "Очистити кеш"
 msgid "Clear completed tasks"
 msgstr "Очистити виконані завдання"
 
+#: src/strings.ts:3265
+msgid "Clear current line"
+msgstr "Очистити поточний рядок"
+
 #: src/strings.ts:1660
 msgid "Clear data & reset account"
 msgstr "Очистити дані та скинути обліковий запис"
@@ -2013,6 +2033,10 @@ msgstr "Режим кліпу:"
 msgid "Close"
 msgstr "Закрити"
 
+#: src/strings.ts:3215
+msgid "Close active tab"
+msgstr "Закрити активну вкладку"
+
 #: src/strings.ts:1837
 msgid "Close all"
 msgstr "Закрити все"
@@ -2052,6 +2076,10 @@ msgstr "Код"
 #: src/strings.ts:2127
 msgid "Code block"
 msgstr "Блок коду"
+
+#: src/strings.ts:3209
+msgid "Code redeemed successfully"
+msgstr "Код успішно активовано"
 
 #: src/strings.ts:2065
 msgid "Code remove"
@@ -2591,6 +2619,10 @@ msgstr "Десятковий"
 #: src/strings.ts:2190
 msgid "Decrease {title}"
 msgstr "Зменшити {title}"
+
+#: src/strings.ts:3233
+msgid "Decrease font size"
+msgstr "Зменшити розмір шрифту"
 
 #: src/strings.ts:2752
 msgid "Decrypting your notes"
@@ -3917,6 +3949,10 @@ msgstr "Детальні налаштування синхронізації*"
 msgid "GROUP"
 msgstr "ГРУПА"
 
+#: src/strings.ts:3210
+msgid "Group {number}"
+msgstr "Група {number}"
+
 #: src/strings.ts:485
 msgid "Group & sort"
 msgstr "Групування та сортування"
@@ -4107,8 +4143,7 @@ msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "            working,"
 msgstr ""
-"If you didn't get an email from us or the confirmation link isn't\n"
-"            working,Якщо ви не отримали від нас листа або посилання підтвердження не\n"
+"Якщо ви не отримали від нас листа або посилання підтвердження не\n"
 "            працює,"
 
 #: src/strings.ts:206
@@ -4219,6 +4254,10 @@ msgstr "Невірний {type}"
 msgid "Increase {title}"
 msgstr "Збільшити {title}"
 
+#: src/strings.ts:3232
+msgid "Increase font size"
+msgstr "Збільшити розмір шрифту"
+
 #: src/strings.ts:2677
 msgid "Info"
 msgstr "Інформація"
@@ -4243,6 +4282,10 @@ msgstr "Вставити вбудовування"
 msgid "Insert an image"
 msgstr "Вставити зображення"
 
+#: src/strings.ts:3219
+msgid "Insert blockquote"
+msgstr "Вставити цитату"
+
 #: src/strings.ts:2085
 msgid "Insert column left"
 msgstr "Вставити стовпець ліворуч"
@@ -4251,9 +4294,57 @@ msgstr "Вставити стовпець ліворуч"
 msgid "Insert column right"
 msgstr "Вставити стовпець праворуч"
 
+#: src/strings.ts:3228
+msgid "Insert date"
+msgstr "Вставити дату"
+
+#: src/strings.ts:3230
+msgid "Insert date and time"
+msgstr "Вставити дату й час"
+
+#: src/strings.ts:3231
+msgid "Insert date and time with timezone"
+msgstr "Вставити дату й час із часовим поясом"
+
+#: src/strings.ts:3235
+msgid "Insert heading 1"
+msgstr "Вставити заголовок 1"
+
+#: src/strings.ts:3236
+msgid "Insert heading 2"
+msgstr "Вставити заголовок 2"
+
+#: src/strings.ts:3237
+msgid "Insert heading 3"
+msgstr "Вставити заголовок 3"
+
+#: src/strings.ts:3238
+msgid "Insert heading 4"
+msgstr "Вставити заголовок 4"
+
+#: src/strings.ts:3239
+msgid "Insert heading 5"
+msgstr "Вставити заголовок 5"
+
+#: src/strings.ts:3240
+msgid "Insert heading 6"
+msgstr "Вставити заголовок 6"
+
+#: src/strings.ts:3244
+msgid "Insert internal link"
+msgstr "Вставити внутрішнє посилання"
+
 #: src/strings.ts:2030
 msgid "Insert link"
 msgstr "Вставити посилання"
+
+#: src/strings.ts:3245
+msgid "Insert math block"
+msgstr "Вставити математичний блок"
+
+#: src/strings.ts:3234
+msgid "Insert paragraph"
+msgstr "Вставити абзац"
 
 #: src/strings.ts:2092
 msgid "Insert row above"
@@ -4262,6 +4353,10 @@ msgstr "Вставити рядок вище"
 #: src/strings.ts:2093
 msgid "Insert row below"
 msgstr "Вставити рядок нижче"
+
+#: src/strings.ts:3229
+msgid "Insert time"
+msgstr "Вставити час"
 
 #: src/strings.ts:1950
 msgid "Install update"
@@ -4466,6 +4561,7 @@ msgid "Licensed under {license}"
 msgstr "Ліцензовано на умовах {license}"
 
 #: src/strings.ts:2122
+#: src/strings.ts:3224
 msgid "Lift list item"
 msgstr "Зменшити відступ елемента списку"
 
@@ -4920,9 +5016,25 @@ msgstr "Перемістити стовпець ліворуч"
 msgid "Move column right"
 msgstr "Перемістити стовпець праворуч"
 
+#: src/strings.ts:3262
+msgid "Move line down"
+msgstr "Перемістити рядок вниз"
+
+#: src/strings.ts:3261
+msgid "Move line up"
+msgstr "Перемістити рядок вгору"
+
 #: src/strings.ts:859
 msgid "Move notebook"
 msgstr "Перемістити блокнот"
+
+#: src/strings.ts:3264
+msgid "Move parent node down"
+msgstr "Перемістити батьківський вузол вниз"
+
+#: src/strings.ts:3263
+msgid "Move parent node up"
+msgstr "Перемістити батьківський вузол вгору"
 
 #: src/strings.ts:2095
 msgid "Move row down"
@@ -4954,6 +5066,10 @@ msgstr "Ім'я обов'язкове."
 
 #: src/strings.ts:2219
 msgid "Navigate"
+msgstr "Навігація"
+
+#: src/strings.ts:3214
+msgid "Navigation"
 msgstr "Навігація"
 
 #: src/strings.ts:347
@@ -5439,6 +5555,14 @@ msgstr "Відкрити посилання"
 #: src/strings.ts:1706
 msgid "Open note"
 msgstr "Відкрити нотатку"
+
+#: src/strings.ts:3249
+msgid "Open search"
+msgstr "Відкрити пошук"
+
+#: src/strings.ts:3250
+msgid "Open search and replace"
+msgstr "Відкрити пошук і заміну"
 
 #: src/strings.ts:1281
 msgid "Open settings"
@@ -6384,6 +6508,10 @@ msgstr "Приберіть PIN блокування застосунку; бло
 msgid "Remove as default"
 msgstr "Прибрати як типовий"
 
+#: src/strings.ts:3243
+msgid "Remove formatting in selection"
+msgstr "Очистити форматування виділення"
+
 #: src/strings.ts:854
 msgid "Remove from all"
 msgstr "Прибрати з усіх"
@@ -6463,6 +6591,14 @@ msgstr "Запросити повернення коштів?"
 #: src/strings.ts:2795
 msgid "Requesting refund for your subscription"
 msgstr "Запит на повернення коштів за передплату"
+
+#: src/strings.ts:3207
+msgid "Resend"
+msgstr "Надіслати знову"
+
+#: src/strings.ts:3208
+msgid "Resend ({timer})"
+msgstr "Надіслати знову ({timer})"
 
 #: src/strings.ts:114
 msgid "Resend code in ({seconds})"
@@ -6836,6 +6972,10 @@ msgstr "Пошук у блокнотах"
 #: src/strings.ts:27
 msgid "Search in Notes"
 msgstr "Пошук у нотатках"
+
+#: src/strings.ts:3217
+msgid "Search in notes list view if editor is not focused"
+msgstr "Шукати в списку нотаток, якщо редактор не у фокусі"
 
 #: src/strings.ts:31
 msgid "Search in Reminders"
@@ -7288,6 +7428,7 @@ msgid "Silent"
 msgstr "Без звуку"
 
 #: src/strings.ts:2123
+#: src/strings.ts:3225
 msgid "Sink list item"
 msgstr "Збільшити відступ елемента списку"
 
@@ -7350,6 +7491,10 @@ msgstr "Перевірка правопису"
 #: src/strings.ts:2090
 msgid "Split cells"
 msgstr "Розділити клітинки"
+
+#: src/strings.ts:3223
+msgid "Split list item"
+msgstr "Розділити елемент списку"
 
 #: src/strings.ts:2803
 msgid "Square"
@@ -7422,6 +7567,10 @@ msgstr "Закреслений"
 #: src/strings.ts:2815
 msgid "Sub notebooks"
 msgstr "Вкладені блокноти"
+
+#: src/strings.ts:3211
+msgid "Subgroup {number}"
+msgstr "Підгрупа {number}"
 
 #: src/strings.ts:2024
 msgid "Subgroup 1"
@@ -7743,6 +7892,22 @@ msgstr "Перевірити з'єднання"
 msgid "Test connection before changing server urls"
 msgstr "Перевірте з'єднання перед зміною URL-адрес серверів"
 
+#: src/strings.ts:3255
+msgid "Text align center"
+msgstr "Вирівнювання по центру"
+
+#: src/strings.ts:3256
+msgid "Text align justify"
+msgstr "Вирівнювання за шириною"
+
+#: src/strings.ts:3257
+msgid "Text align left"
+msgstr "Вирівнювання по лівому краю"
+
+#: src/strings.ts:3258
+msgid "Text align right"
+msgstr "Вирівнювання по правому краю"
+
 #: src/strings.ts:2079
 msgid "Text color"
 msgstr "Колір тексту"
@@ -8029,6 +8194,26 @@ msgstr "Сьогодні, {time}"
 msgid "Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period."
 msgstr "Увімкніть або вимкніть автоподовження, щоб уникнути неочікуваних списань. Якщо ви не увімкнете його знову, наприкінці розрахункового періоду вас буде автоматично переведено на безкоштовний план."
 
+#: src/strings.ts:3220
+msgid "Toggle bold"
+msgstr "Жирний шрифт"
+
+#: src/strings.ts:3221
+msgid "Toggle bullet list"
+msgstr "Маркований список"
+
+#: src/strings.ts:3222
+msgid "Toggle check list"
+msgstr "Список із прапорцями"
+
+#: src/strings.ts:3226
+msgid "Toggle code"
+msgstr "Вбудований код"
+
+#: src/strings.ts:3227
+msgid "Toggle code block"
+msgstr "Блок коду"
+
 #: src/strings.ts:1665
 msgid "Toggle dark/light mode"
 msgstr "Перемкнути темний/світлий режим"
@@ -8037,13 +8222,53 @@ msgstr "Перемкнути темний/світлий режим"
 msgid "Toggle focus mode"
 msgstr "Перемкнути режим зосередження"
 
+#: src/strings.ts:3259
+msgid "Toggle highlight"
+msgstr "Виділення маркером"
+
 #: src/strings.ts:2147
 msgid "Toggle indentation mode"
 msgstr "Перемкнути режим відступів"
 
+#: src/strings.ts:3242
+msgid "Toggle italic"
+msgstr "Курсив"
+
+#: src/strings.ts:3246
+msgid "Toggle ordered list"
+msgstr "Нумерований список"
+
+#: src/strings.ts:3247
+msgid "Toggle outline list"
+msgstr "Багаторівневий список"
+
+#: src/strings.ts:3248
+msgid "Toggle outline list expand"
+msgstr "Розгорнути/згорнути список"
+
 #: src/strings.ts:2176
 msgid "Toggle replace"
 msgstr "Показати/сховати заміну"
+
+#: src/strings.ts:3251
+msgid "Toggle strike"
+msgstr "Закреслений текст"
+
+#: src/strings.ts:3252
+msgid "Toggle subscript"
+msgstr "Нижній індекс"
+
+#: src/strings.ts:3253
+msgid "Toggle superscript"
+msgstr "Верхній індекс"
+
+#: src/strings.ts:3254
+msgid "Toggle task list"
+msgstr "Список завдань"
+
+#: src/strings.ts:3260
+msgid "Toggle text color"
+msgstr "Колір тексту"
 
 #: src/strings.ts:2228
 msgid "Toggle theme"

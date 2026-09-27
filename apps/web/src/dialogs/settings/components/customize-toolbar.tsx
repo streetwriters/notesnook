@@ -441,7 +441,9 @@ function flatten(tools: ToolbarGroupDefinition[], depth = 0): TreeNode[] {
   for (const tool of tools) {
     if (Array.isArray(tool)) {
       const isSubgroup = depth > 0;
-      const groupTitle = `${isSubgroup ? "Subgroup" : "Group"} ${groupCount}`;
+      const groupTitle = isSubgroup
+        ? strings.subgroupNumber(groupCount)
+        : strings.groupNumber(groupCount);
 
       nodes.push(createGroup({ depth, title: groupTitle }));
       nodes.push(...flatten(tool as ToolbarGroupDefinition[], depth + 1));
@@ -704,7 +706,9 @@ function addGroup(items: TreeNode[]) {
 
   const newArray = items.slice();
   const groups = items.filter((t) => isGroup(t) && !isSubgroup(t));
-  const newGroup = createGroup({ title: `Group ${groups.length}` });
+  const newGroup = createGroup({
+    title: strings.groupNumber(groups.length)
+  });
   newArray.splice(insertIndex, 0, newGroup);
   return newArray;
 }

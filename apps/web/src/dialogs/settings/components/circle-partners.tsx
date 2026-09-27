@@ -157,7 +157,10 @@ export function CirclePartners() {
                         partnerId: partner.id,
                         code: result.code
                       });
-                      showToast("success", "Code redeemed successfully");
+                      showToast(
+                        "success",
+                        strings.codeRedeemedSuccessfully()
+                      );
                     }
                   }}
                 >
