@@ -139,9 +139,9 @@ export const osIntegrationRouter = t.router({
     config.backupDirectory = result.filePaths[0];
   }),
   setAppLanguage: t.procedure
-    .input(z.string())
+    .input(z.string().optional())
     .mutation(async ({ input: language }) => {
-      config.appLanguage = language;
+      config.appLanguage = language || "";
       await initLocale();
       setupDesktopIntegration(config.desktopSettings);
       setupJumplist();
