@@ -115,7 +115,7 @@ export function SubscriptionStatus() {
                       }`
                     : feature.total === Infinity
                     ? strings.unlimited()
-                    : `${feature.used} of ${feature.total}`}
+                    : strings.countOfTotal(feature.used, feature.total)}
                 </Text>
               </>
             ))}

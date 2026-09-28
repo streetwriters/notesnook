@@ -93,9 +93,7 @@ const restoreBackup = async (options: {
       !options.uri.endsWith(".nnbackup") &&
       !options.uri.endsWith(".nnbackupz")
     ) {
-      throw new Error(
-        `Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored.`
-      );
+      throw new Error(strings.invalidBackupFileSelected());
     }
 
     const isLegacyBackup = options.uri.endsWith(".nnbackup");

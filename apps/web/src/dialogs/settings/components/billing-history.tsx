@@ -204,8 +204,10 @@ export function BillingHistory() {
                             return showToast(
                               "error",
                               url instanceof Error
-                                ? `Failed to get invoice for this transaction: ${url.message}`
-                                : "No invoice found for this transaction."
+                                ? strings.failedToGetInvoiceForTransaction(
+                                    url.message
+                                  )
+                                : strings.noInvoiceFoundForTransaction()
                             );
                           window.open(url, "_blank");
                         }}

@@ -655,7 +655,7 @@ export const noteMenuItems: (
                 onClick: async () => {
                   await db.notes.setExpiryDate(null, ...ids);
                   store.refresh();
-                  showToast("success", "Expiry date removed");
+                  showToast("success", strings.expiryDateRemoved());
                 },
                 icon: Close.path
               }

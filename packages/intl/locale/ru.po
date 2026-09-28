@@ -33,6 +33,11 @@ msgstr "\"Возвращено"
 msgid "(empty block)"
 msgstr "(пустой блок)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr "{0} успешно применено"
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -651,6 +656,10 @@ msgstr "{type, select, upload {Отправка} download {Загрузка} syn
 msgid "{type} does not match"
 msgstr "{type} не совпадает"
 
+#: src/strings.ts:3213
+msgid "{used} of {total}"
+msgstr "{used} из {total}"
+
 #: src/strings.ts:1480
 msgid "{words, plural, one {# word} other {# words}}"
 msgstr "{words, plural, one {# слово} few {# слова} many {# слов} other {# слов}}"
@@ -686,6 +695,10 @@ msgstr "/ месяц"
 #: src/strings.ts:1649
 msgid "#notesnook"
 msgstr "#notesnook"
+
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Главное ✨"
 
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
@@ -843,6 +856,10 @@ msgstr "Добавить короткую заметку"
 msgid "Add a tag"
 msgstr "Добавить тег"
 
+#: src/strings.ts:3218
+msgid "Add attachment"
+msgstr "Добавить вложение"
+
 #: src/strings.ts:506
 msgid "Add color"
 msgstr "Добавить цвет"
@@ -850,6 +867,10 @@ msgstr "Добавить цвет"
 #: src/strings.ts:2851
 msgid "Add discount"
 msgstr "Добавить скидку"
+
+#: src/strings.ts:3241
+msgid "Add image"
+msgstr "Добавить изображение"
 
 #: src/strings.ts:2824
 msgid "Add more"
@@ -1096,6 +1117,10 @@ msgstr "Приложение перезагрузится через {sec} с"
 msgid "Appearance"
 msgstr "Оформление"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr "Добавить к заметке"
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Применено как тёмная тема"
@@ -1230,6 +1255,10 @@ msgstr "Не удалось показать предпросмотр вложе
 msgid "Attachment recheck cancelled"
 msgstr "Повторная проверка вложений отменена"
 
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr "Вложение переименовано в {name}"
+
 #: src/strings.ts:2111
 msgid "Attachment settings"
 msgstr "Настройки вложений"
@@ -1318,6 +1347,10 @@ msgstr "Автозапуск при старте системы"
 #: src/strings.ts:2516
 msgid "Auto-generate keys"
 msgstr "Автоматически создавать ключи"
+
+#: src/strings.ts:3206
+msgid "Auto-save is disabled for large notes. Press Ctrl + S to save."
+msgstr "Автосохранение отключено для больших заметок. Нажмите Ctrl + S для сохранения."
 
 #: src/strings.ts:1119
 msgid "Automatic backups"
@@ -1799,6 +1832,10 @@ msgstr "Проверка всех вложений"
 msgid "Checking attachments"
 msgstr "Проверка вложений"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Проверка вложений ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Проверка новой версии"
@@ -1898,6 +1935,10 @@ msgstr "Очистить кэш"
 #: src/strings.ts:2159
 msgid "Clear completed tasks"
 msgstr "Очистить выполненные задачи"
+
+#: src/strings.ts:3265
+msgid "Clear current line"
+msgstr "Очистить текущую строку"
 
 #: src/strings.ts:1660
 msgid "Clear data & reset account"
@@ -2000,6 +2041,10 @@ msgstr "Режим клипа:"
 msgid "Close"
 msgstr "Закрыть"
 
+#: src/strings.ts:3215
+msgid "Close active tab"
+msgstr "Закрыть активную вкладку"
+
 #: src/strings.ts:1837
 msgid "Close all"
 msgstr "Закрыть все"
@@ -2039,6 +2084,10 @@ msgstr "Код"
 #: src/strings.ts:2127
 msgid "Code block"
 msgstr "Блок кода"
+
+#: src/strings.ts:3209
+msgid "Code redeemed successfully"
+msgstr "Код успешно активирован"
 
 #: src/strings.ts:2065
 msgid "Code remove"
@@ -2257,6 +2306,10 @@ msgstr "Копирование файлов резервной копии в к�
 msgid "CORS bypass"
 msgstr "Обход CORS"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "Не удалось изменить пароль учётной записи пользователя."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "Не удалось очистить корзину."
@@ -2280,6 +2333,10 @@ msgstr "Не удалось сбросить пароль учетной зап�
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "Не удалось сохранить таблицу в csv"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "Не удалось отправить отчет об ошибке."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -2574,6 +2631,10 @@ msgstr "Десятичный"
 #: src/strings.ts:2190
 msgid "Decrease {title}"
 msgstr "Уменьшить {title}"
+
+#: src/strings.ts:3233
+msgid "Decrease font size"
+msgstr "Уменьшить размер шрифта"
 
 #: src/strings.ts:2752
 msgid "Decrypting your notes"
@@ -3477,6 +3538,10 @@ msgstr "Не удалось экспортировать вложение: {path
 msgid "Failed to generate inbox keys"
 msgstr "Не удалось сгенерировать ключи входящих"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "Не удалось получить счет для этой транзакции: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "Не удалось установить тему."
@@ -3900,6 +3965,10 @@ msgstr "Точные настройки синхронизации*"
 msgid "GROUP"
 msgstr "ГРУППА"
 
+#: src/strings.ts:3210
+msgid "Group {number}"
+msgstr "Группа {number}"
+
 #: src/strings.ts:485
 msgid "Group & sort"
 msgstr "Группировка и сортировка"
@@ -4090,8 +4159,7 @@ msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "            working,"
 msgstr ""
-"If you didn't get an email from us or the confirmation link isn't\n"
-"            working,Если вы не получили от нас письмо или ссылка подтверждения не\n"
+"Если вы не получили от нас письмо или ссылка подтверждения не\n"
 "            работает,"
 
 #: src/strings.ts:206
@@ -4202,6 +4270,10 @@ msgstr "Неверный {type}"
 msgid "Increase {title}"
 msgstr "Увеличить {title}"
 
+#: src/strings.ts:3232
+msgid "Increase font size"
+msgstr "Увеличить размер шрифта"
+
 #: src/strings.ts:2677
 msgid "Info"
 msgstr "Информация"
@@ -4226,6 +4298,10 @@ msgstr "Вставить встраивание"
 msgid "Insert an image"
 msgstr "Вставить изображение"
 
+#: src/strings.ts:3219
+msgid "Insert blockquote"
+msgstr "Вставить цитату"
+
 #: src/strings.ts:2085
 msgid "Insert column left"
 msgstr "Вставить столбец слева"
@@ -4234,9 +4310,57 @@ msgstr "Вставить столбец слева"
 msgid "Insert column right"
 msgstr "Вставить столбец справа"
 
+#: src/strings.ts:3228
+msgid "Insert date"
+msgstr "Вставить дату"
+
+#: src/strings.ts:3230
+msgid "Insert date and time"
+msgstr "Вставить дату и время"
+
+#: src/strings.ts:3231
+msgid "Insert date and time with timezone"
+msgstr "Вставить дату и время с часовым поясом"
+
+#: src/strings.ts:3235
+msgid "Insert heading 1"
+msgstr "Вставить заголовок 1"
+
+#: src/strings.ts:3236
+msgid "Insert heading 2"
+msgstr "Вставить заголовок 2"
+
+#: src/strings.ts:3237
+msgid "Insert heading 3"
+msgstr "Вставить заголовок 3"
+
+#: src/strings.ts:3238
+msgid "Insert heading 4"
+msgstr "Вставить заголовок 4"
+
+#: src/strings.ts:3239
+msgid "Insert heading 5"
+msgstr "Вставить заголовок 5"
+
+#: src/strings.ts:3240
+msgid "Insert heading 6"
+msgstr "Вставить заголовок 6"
+
+#: src/strings.ts:3244
+msgid "Insert internal link"
+msgstr "Вставить внутреннюю ссылку"
+
 #: src/strings.ts:2030
 msgid "Insert link"
 msgstr "Вставить ссылку"
+
+#: src/strings.ts:3245
+msgid "Insert math block"
+msgstr "Вставить математический блок"
+
+#: src/strings.ts:3234
+msgid "Insert paragraph"
+msgstr "Вставить абзац"
 
 #: src/strings.ts:2092
 msgid "Insert row above"
@@ -4245,6 +4369,10 @@ msgstr "Вставить строку выше"
 #: src/strings.ts:2093
 msgid "Insert row below"
 msgstr "Вставить строку ниже"
+
+#: src/strings.ts:3229
+msgid "Insert time"
+msgstr "Вставить время"
 
 #: src/strings.ts:1950
 msgid "Install update"
@@ -4262,6 +4390,10 @@ msgstr "Мгновенная синхронизация"
 msgid "Invalid {type}"
 msgstr "Недопустимый {type}"
 
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Выбран недействительный файл резервной копии. Можно восстановить только файлы .nnbackup и .nnbackupz."
+
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
 msgstr "Недопустимый URL CORS-прокси"
@@ -4269,6 +4401,10 @@ msgstr "Недопустимый URL CORS-прокси"
 #: src/strings.ts:2526
 msgid "Invalid JSON"
 msgstr "Недействительный JSON"
+
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Недействительный ключ для вложения."
 
 #: src/strings.ts:2461
 msgid "Invalid password"
@@ -4445,6 +4581,7 @@ msgid "Licensed under {license}"
 msgstr "Лицензировано на условиях {license}"
 
 #: src/strings.ts:2122
+#: src/strings.ts:3224
 msgid "Lift list item"
 msgstr "Уменьшить отступ элемента списка"
 
@@ -4899,9 +5036,25 @@ msgstr "Переместить столбец влево"
 msgid "Move column right"
 msgstr "Переместить столбец вправо"
 
+#: src/strings.ts:3262
+msgid "Move line down"
+msgstr "Переместить строку вниз"
+
+#: src/strings.ts:3261
+msgid "Move line up"
+msgstr "Переместить строку вверх"
+
 #: src/strings.ts:859
 msgid "Move notebook"
 msgstr "Переместить блокнот"
+
+#: src/strings.ts:3264
+msgid "Move parent node down"
+msgstr "Переместить родительский узел вниз"
+
+#: src/strings.ts:3263
+msgid "Move parent node up"
+msgstr "Переместить родительский узел вверх"
 
 #: src/strings.ts:2095
 msgid "Move row down"
@@ -4933,6 +5086,10 @@ msgstr "Имя обязательно."
 
 #: src/strings.ts:2219
 msgid "Navigate"
+msgstr "Навигация"
+
+#: src/strings.ts:3214
+msgid "Navigation"
 msgstr "Навигация"
 
 #: src/strings.ts:347
@@ -5082,6 +5239,10 @@ msgstr "Нет неудачных элементов входящих"
 #: src/strings.ts:1545
 msgid "No headings found"
 msgstr "Заголовки не найдены"
+
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "Счет для этой транзакции не найден."
 
 #: src/strings.ts:3076
 msgid "No limit on notes"
@@ -5418,6 +5579,14 @@ msgstr "Открыть ссылку"
 #: src/strings.ts:1706
 msgid "Open note"
 msgstr "Открыть заметку"
+
+#: src/strings.ts:3249
+msgid "Open search"
+msgstr "Открыть поиск"
+
+#: src/strings.ts:3250
+msgid "Open search and replace"
+msgstr "Открыть поиск и замену"
 
 #: src/strings.ts:1281
 msgid "Open settings"
@@ -5794,6 +5963,10 @@ msgstr "Подождите, прежде чем запрашивать новы�
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Подождите, прежде чем запрашивать ещё одно письмо"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Пожалуйста, дождитесь завершения предыдущей загрузки или отмените ее."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -6289,6 +6462,10 @@ msgstr "Войдите в свой аккаунт заново"
 msgid "Remembered your password?"
 msgstr "Вспомнили пароль?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr "Напомнить через {minutes} мин"
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Напомнить мне"
@@ -6358,6 +6535,10 @@ msgstr "Уберите PIN блокировки приложения; блоки
 #: src/strings.ts:819
 msgid "Remove as default"
 msgstr "Убрать как основной"
+
+#: src/strings.ts:3243
+msgid "Remove formatting in selection"
+msgstr "Очистить форматирование выделения"
 
 #: src/strings.ts:854
 msgid "Remove from all"
@@ -6438,6 +6619,14 @@ msgstr "Запросить возврат средств?"
 #: src/strings.ts:2795
 msgid "Requesting refund for your subscription"
 msgstr "Запрос на возврат средств за подписку"
+
+#: src/strings.ts:3207
+msgid "Resend"
+msgstr "Отправить повторно"
+
+#: src/strings.ts:3208
+msgid "Resend ({timer})"
+msgstr "Отправить повторно ({timer})"
 
 #: src/strings.ts:114
 msgid "Resend code in ({seconds})"
@@ -6811,6 +7000,10 @@ msgstr "Поиск в блокнотах"
 #: src/strings.ts:27
 msgid "Search in Notes"
 msgstr "Поиск в заметках"
+
+#: src/strings.ts:3217
+msgid "Search in notes list view if editor is not focused"
+msgstr "Искать в списке заметок, если редактор не в фокусе"
 
 #: src/strings.ts:31
 msgid "Search in Reminders"
@@ -7263,6 +7456,7 @@ msgid "Silent"
 msgstr "Без звука"
 
 #: src/strings.ts:2123
+#: src/strings.ts:3225
 msgid "Sink list item"
 msgstr "Увеличить отступ элемента списка"
 
@@ -7325,6 +7519,10 @@ msgstr "Проверка орфографии"
 #: src/strings.ts:2090
 msgid "Split cells"
 msgstr "Разделить ячейки"
+
+#: src/strings.ts:3223
+msgid "Split list item"
+msgstr "Разделить элемент списка"
 
 #: src/strings.ts:2803
 msgid "Square"
@@ -7397,6 +7595,10 @@ msgstr "Зачёркнутый"
 #: src/strings.ts:2815
 msgid "Sub notebooks"
 msgstr "Вложенные блокноты"
+
+#: src/strings.ts:3211
+msgid "Subgroup {number}"
+msgstr "Подгруппа {number}"
 
 #: src/strings.ts:2024
 msgid "Subgroup 1"
@@ -7718,6 +7920,22 @@ msgstr "Проверить соединение"
 msgid "Test connection before changing server urls"
 msgstr "Проверьте соединение перед изменением URL серверов"
 
+#: src/strings.ts:3255
+msgid "Text align center"
+msgstr "Выравнивание по центру"
+
+#: src/strings.ts:3256
+msgid "Text align justify"
+msgstr "Выравнивание по ширине"
+
+#: src/strings.ts:3257
+msgid "Text align left"
+msgstr "Выравнивание по левому краю"
+
+#: src/strings.ts:3258
+msgid "Text align right"
+msgstr "Выравнивание по правому краю"
+
 #: src/strings.ts:2079
 msgid "Text color"
 msgstr "Цвет текста"
@@ -8004,6 +8222,26 @@ msgstr "Сегодня, {time}"
 msgid "Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period."
 msgstr "Переключите автопродление, чтобы избежать неожиданных списаний. Если вы не включите его снова, в конце расчетного периода вы будете переведены на бесплатный тариф."
 
+#: src/strings.ts:3220
+msgid "Toggle bold"
+msgstr "Жирный шрифт"
+
+#: src/strings.ts:3221
+msgid "Toggle bullet list"
+msgstr "Маркированный список"
+
+#: src/strings.ts:3222
+msgid "Toggle check list"
+msgstr "Список с чекбоксами"
+
+#: src/strings.ts:3226
+msgid "Toggle code"
+msgstr "Встроенный код"
+
+#: src/strings.ts:3227
+msgid "Toggle code block"
+msgstr "Блок кода"
+
 #: src/strings.ts:1665
 msgid "Toggle dark/light mode"
 msgstr "Переключить тёмный/светлый режим"
@@ -8012,17 +8250,61 @@ msgstr "Переключить тёмный/светлый режим"
 msgid "Toggle focus mode"
 msgstr "Переключить режим фокусировки"
 
+#: src/strings.ts:3259
+msgid "Toggle highlight"
+msgstr "Выделение маркером"
+
 #: src/strings.ts:2147
 msgid "Toggle indentation mode"
 msgstr "Переключить режим отступов"
+
+#: src/strings.ts:3242
+msgid "Toggle italic"
+msgstr "Курсив"
+
+#: src/strings.ts:3246
+msgid "Toggle ordered list"
+msgstr "Нумерованный список"
+
+#: src/strings.ts:3247
+msgid "Toggle outline list"
+msgstr "Многоуровневый список"
+
+#: src/strings.ts:3248
+msgid "Toggle outline list expand"
+msgstr "Развернуть/свернуть список"
 
 #: src/strings.ts:2176
 msgid "Toggle replace"
 msgstr "Показать/скрыть замену"
 
+#: src/strings.ts:3251
+msgid "Toggle strike"
+msgstr "Зачёркнутый текст"
+
+#: src/strings.ts:3252
+msgid "Toggle subscript"
+msgstr "Нижний индекс"
+
+#: src/strings.ts:3253
+msgid "Toggle superscript"
+msgstr "Верхний индекс"
+
+#: src/strings.ts:3254
+msgid "Toggle task list"
+msgstr "Список задач"
+
+#: src/strings.ts:3260
+msgid "Toggle text color"
+msgstr "Цвет текста"
+
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Переключить тему"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "Срок действия токена истёк, попробуйте войти снова"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"
@@ -8190,6 +8472,10 @@ msgstr "Разблокируйте заметку, чтобы удалить е�
 msgid "Unlock note to merge conflicts"
 msgstr "Разблокируйте заметку, чтобы объединить конфликты"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr "Разблокируйте заметку, чтобы открыть её в редакторе."
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Разблокируйте приложение с помощью биометрии. Для этого биометрия должна быть включена на вашем устройстве."
@@ -8197,6 +8483,10 @@ msgstr "Разблокируйте приложение с помощью био
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Разблокируйте эту функцию сегодня"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr "Разблокируйте для доступа к вашим заметкам"
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8682,6 +8972,14 @@ msgstr "С возвращением!"
 msgid "Welcome to Notesnook {plan}"
 msgstr "Добро пожаловать в Notesnook {plan}"
 
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "Добро пожаловать в бета-версию Notesnook!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "Добро пожаловать в v{version}"
+
 #: src/strings.ts:2587
 msgid "What are monographs?"
 msgstr "Что такое монографии?"
@@ -8905,6 +9203,10 @@ msgstr "Вы можете использовать резервный метод
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Вы можете просматривать и восстанавливать более старые версии любой заметки через её свойства -> История."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr "Вы не можете переместить выбранные блокноты сюда"
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."

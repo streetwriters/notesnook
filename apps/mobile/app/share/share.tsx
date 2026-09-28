@@ -893,7 +893,7 @@ const ShareView = () => {
                   }}
                   allowFontScaling={false}
                   type={appendNoteId ? "transparent" : "plain"}
-                  title={`Append to a note`}
+                  title={strings.appendToNote()}
                   style={{
                     paddingHorizontal: 12,
                     height: 45,

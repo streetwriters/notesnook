@@ -33,6 +33,11 @@ msgstr "\"Reembolsado"
 msgid "(empty block)"
 msgstr "(bloco vazio)"
 
+#. placeholder {0}: name || ""
+#: src/strings.ts:3194
+msgid "{0} applied successfully"
+msgstr "{0} aplicado com sucesso"
+
 #. placeholder {0}: name || "File"
 #: src/strings.ts:463
 msgid "{0} downloaded"
@@ -651,6 +656,10 @@ msgstr "{type, select, upload {Enviando} download {Baixando} sync {Sincronizando
 msgid "{type} does not match"
 msgstr "{type} não corresponde"
 
+#: src/strings.ts:3213
+msgid "{used} of {total}"
+msgstr "{used} de {total}"
+
 #: src/strings.ts:1480
 msgid "{words, plural, one {# word} other {# words}}"
 msgstr "{words, plural, one {# palavra} other {# palavras}}"
@@ -686,6 +695,10 @@ msgstr "/ mês"
 #: src/strings.ts:1649
 msgid "#notesnook"
 msgstr "#notesnook"
+
+#: src/strings.ts:3267
+msgid "✨ Highlights ✨"
+msgstr "✨ Destaques ✨"
 
 #: src/strings.ts:3141
 msgid "🎉 Wrapped {year}"
@@ -843,6 +856,10 @@ msgstr "Adicionar uma nota curta"
 msgid "Add a tag"
 msgstr "Adicionar uma tag"
 
+#: src/strings.ts:3218
+msgid "Add attachment"
+msgstr "Adicionar anexo"
+
 #: src/strings.ts:506
 msgid "Add color"
 msgstr "Adicionar cor"
@@ -850,6 +867,10 @@ msgstr "Adicionar cor"
 #: src/strings.ts:2851
 msgid "Add discount"
 msgstr "Adicionar desconto"
+
+#: src/strings.ts:3241
+msgid "Add image"
+msgstr "Adicionar imagem"
 
 #: src/strings.ts:2824
 msgid "Add more"
@@ -1096,6 +1117,10 @@ msgstr "O app será recarregado em {sec} segundos"
 msgid "Appearance"
 msgstr "Aparência"
 
+#: src/strings.ts:3193
+msgid "Append to a note"
+msgstr "Anexar a uma nota"
+
 #: src/strings.ts:490
 msgid "Applied as dark theme"
 msgstr "Aplicado como tema escuro"
@@ -1230,6 +1255,10 @@ msgstr "Falha na visualização do anexo"
 msgid "Attachment recheck cancelled"
 msgstr "Reverificação de anexos cancelada"
 
+#: src/strings.ts:3196
+msgid "Attachment renamed to {name}"
+msgstr "Anexo renomeado para {name}"
+
 #: src/strings.ts:2111
 msgid "Attachment settings"
 msgstr "Configurações de anexos"
@@ -1318,6 +1347,10 @@ msgstr "Iniciar automaticamente ao ligar o sistema"
 #: src/strings.ts:2516
 msgid "Auto-generate keys"
 msgstr "Gerar chaves automaticamente"
+
+#: src/strings.ts:3206
+msgid "Auto-save is disabled for large notes. Press Ctrl + S to save."
+msgstr "O salvamento automático está desativado para notas grandes. Pressione Ctrl + S para salvar."
 
 #: src/strings.ts:1119
 msgid "Automatic backups"
@@ -1799,6 +1832,10 @@ msgstr "Verificando todos os anexos"
 msgid "Checking attachments"
 msgstr "Verificando anexos"
 
+#: src/strings.ts:3277
+msgid "Checking attachments ({current}/{total})"
+msgstr "Verificando anexos ({current}/{total})"
+
 #: src/strings.ts:336
 msgid "Checking for new version"
 msgstr "Verificando se há uma nova versão"
@@ -1898,6 +1935,10 @@ msgstr "Limpar cache"
 #: src/strings.ts:2159
 msgid "Clear completed tasks"
 msgstr "Limpar tarefas concluídas"
+
+#: src/strings.ts:3265
+msgid "Clear current line"
+msgstr "Limpar linha atual"
 
 #: src/strings.ts:1660
 msgid "Clear data & reset account"
@@ -2000,6 +2041,10 @@ msgstr "Modo de captura:"
 msgid "Close"
 msgstr "Fechar"
 
+#: src/strings.ts:3215
+msgid "Close active tab"
+msgstr "Fechar aba ativa"
+
 #: src/strings.ts:1837
 msgid "Close all"
 msgstr "Fechar tudo"
@@ -2039,6 +2084,10 @@ msgstr "Código"
 #: src/strings.ts:2127
 msgid "Code block"
 msgstr "Bloco de código"
+
+#: src/strings.ts:3209
+msgid "Code redeemed successfully"
+msgstr "Código resgatado com sucesso"
 
 #: src/strings.ts:2065
 msgid "Code remove"
@@ -2257,6 +2306,10 @@ msgstr "Copiando arquivos de backup para o cache"
 msgid "CORS bypass"
 msgstr "Ignorar CORS"
 
+#: src/strings.ts:3204
+msgid "Could not change user account password."
+msgstr "Não foi possível alterar a senha da conta de usuário."
+
 #: src/strings.ts:1822
 msgid "Could not clear trash."
 msgstr "Não foi possível esvaziar a lixeira."
@@ -2280,6 +2333,10 @@ msgstr "Não foi possível redefinir a senha da conta."
 #: src/strings.ts:2812
 msgid "Could not save table to csv"
 msgstr "Não foi possível salvar a tabela em csv"
+
+#: src/strings.ts:3272
+msgid "Could not submit bug report."
+msgstr "Não foi possível enviar o relatório de erro."
 
 #: src/strings.ts:508
 msgid "Could not unlock"
@@ -2574,6 +2631,10 @@ msgstr "Decimal"
 #: src/strings.ts:2190
 msgid "Decrease {title}"
 msgstr "Diminuir {title}"
+
+#: src/strings.ts:3233
+msgid "Decrease font size"
+msgstr "Diminuir tamanho da fonte"
 
 #: src/strings.ts:2752
 msgid "Decrypting your notes"
@@ -3477,6 +3538,10 @@ msgstr "Falha ao exportar anexo: {path}. {message}"
 msgid "Failed to generate inbox keys"
 msgstr "Falha ao gerar chaves da caixa de entrada"
 
+#: src/strings.ts:3270
+msgid "Failed to get invoice for this transaction: {error}"
+msgstr "Não foi possível obter a fatura para esta transação: {error}"
+
 #: src/strings.ts:1816
 msgid "Failed to install theme."
 msgstr "Não foi possível instalar o tema."
@@ -3900,6 +3965,10 @@ msgstr "Controles granulares de sincronização*"
 msgid "GROUP"
 msgstr "GRUPO"
 
+#: src/strings.ts:3210
+msgid "Group {number}"
+msgstr "Grupo {number}"
+
 #: src/strings.ts:485
 msgid "Group & sort"
 msgstr "Agrupar e ordenar"
@@ -4090,8 +4159,7 @@ msgid ""
 "If you didn't get an email from us or the confirmation link isn't\n"
 "            working,"
 msgstr ""
-"If you didn't get an email from us or the confirmation link isn't\n"
-"            working,Se você não recebeu um e-mail nosso ou o link de confirmação não\n"
+"Se você não recebeu um e-mail nosso ou o link de confirmação não\n"
 "            está funcionando,"
 
 #: src/strings.ts:206
@@ -4202,6 +4270,10 @@ msgstr "{type} incorreto"
 msgid "Increase {title}"
 msgstr "Aumentar {title}"
 
+#: src/strings.ts:3232
+msgid "Increase font size"
+msgstr "Aumentar tamanho da fonte"
+
 #: src/strings.ts:2677
 msgid "Info"
 msgstr "Informações"
@@ -4226,6 +4298,10 @@ msgstr "Inserir um item incorporado"
 msgid "Insert an image"
 msgstr "Inserir uma imagem"
 
+#: src/strings.ts:3219
+msgid "Insert blockquote"
+msgstr "Inserir citação em bloco"
+
 #: src/strings.ts:2085
 msgid "Insert column left"
 msgstr "Inserir coluna à esquerda"
@@ -4234,9 +4310,57 @@ msgstr "Inserir coluna à esquerda"
 msgid "Insert column right"
 msgstr "Inserir coluna à direita"
 
+#: src/strings.ts:3228
+msgid "Insert date"
+msgstr "Inserir data"
+
+#: src/strings.ts:3230
+msgid "Insert date and time"
+msgstr "Inserir data e hora"
+
+#: src/strings.ts:3231
+msgid "Insert date and time with timezone"
+msgstr "Inserir data e hora com fuso horário"
+
+#: src/strings.ts:3235
+msgid "Insert heading 1"
+msgstr "Inserir título 1"
+
+#: src/strings.ts:3236
+msgid "Insert heading 2"
+msgstr "Inserir título 2"
+
+#: src/strings.ts:3237
+msgid "Insert heading 3"
+msgstr "Inserir título 3"
+
+#: src/strings.ts:3238
+msgid "Insert heading 4"
+msgstr "Inserir título 4"
+
+#: src/strings.ts:3239
+msgid "Insert heading 5"
+msgstr "Inserir título 5"
+
+#: src/strings.ts:3240
+msgid "Insert heading 6"
+msgstr "Inserir título 6"
+
+#: src/strings.ts:3244
+msgid "Insert internal link"
+msgstr "Inserir link interno"
+
 #: src/strings.ts:2030
 msgid "Insert link"
 msgstr "Inserir link"
+
+#: src/strings.ts:3245
+msgid "Insert math block"
+msgstr "Inserir bloco matemático"
+
+#: src/strings.ts:3234
+msgid "Insert paragraph"
+msgstr "Inserir parágrafo"
 
 #: src/strings.ts:2092
 msgid "Insert row above"
@@ -4245,6 +4369,10 @@ msgstr "Inserir linha acima"
 #: src/strings.ts:2093
 msgid "Insert row below"
 msgstr "Inserir linha abaixo"
+
+#: src/strings.ts:3229
+msgid "Insert time"
+msgstr "Inserir hora"
 
 #: src/strings.ts:1950
 msgid "Install update"
@@ -4262,6 +4390,10 @@ msgstr "Sincronização instantânea"
 msgid "Invalid {type}"
 msgstr "{type} inválido"
 
+#: src/strings.ts:3202
+msgid "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored."
+msgstr "Arquivo de backup inválido selecionado. Somente arquivos .nnbackup e .nnbackupz podem ser restaurados."
+
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
 msgstr "URL de proxy CORS inválida"
@@ -4269,6 +4401,10 @@ msgstr "URL de proxy CORS inválida"
 #: src/strings.ts:2526
 msgid "Invalid JSON"
 msgstr "JSON inválido"
+
+#: src/strings.ts:3273
+msgid "Invalid key for attachment."
+msgstr "Chave inválida para o anexo."
 
 #: src/strings.ts:2461
 msgid "Invalid password"
@@ -4445,6 +4581,7 @@ msgid "Licensed under {license}"
 msgstr "Licenciado sob {license}"
 
 #: src/strings.ts:2122
+#: src/strings.ts:3224
 msgid "Lift list item"
 msgstr "Diminuir o recuo do item da lista"
 
@@ -4899,9 +5036,25 @@ msgstr "Mover a coluna para a esquerda"
 msgid "Move column right"
 msgstr "Mover a coluna para a direita"
 
+#: src/strings.ts:3262
+msgid "Move line down"
+msgstr "Mover linha para baixo"
+
+#: src/strings.ts:3261
+msgid "Move line up"
+msgstr "Mover linha para cima"
+
 #: src/strings.ts:859
 msgid "Move notebook"
 msgstr "Mover caderno"
+
+#: src/strings.ts:3264
+msgid "Move parent node down"
+msgstr "Mover nó pai para baixo"
+
+#: src/strings.ts:3263
+msgid "Move parent node up"
+msgstr "Mover nó pai para cima"
 
 #: src/strings.ts:2095
 msgid "Move row down"
@@ -4934,6 +5087,10 @@ msgstr "O nome é obrigatório."
 #: src/strings.ts:2219
 msgid "Navigate"
 msgstr "Navegar"
+
+#: src/strings.ts:3214
+msgid "Navigation"
+msgstr "Navegação"
 
 #: src/strings.ts:347
 msgid "Never"
@@ -5082,6 +5239,10 @@ msgstr "Nenhum item com falha na caixa de entrada"
 #: src/strings.ts:1545
 msgid "No headings found"
 msgstr "Nenhum título encontrado"
+
+#: src/strings.ts:3271
+msgid "No invoice found for this transaction."
+msgstr "Nenhuma fatura encontrada para esta transação."
 
 #: src/strings.ts:3076
 msgid "No limit on notes"
@@ -5418,6 +5579,14 @@ msgstr "Abrir link"
 #: src/strings.ts:1706
 msgid "Open note"
 msgstr "Abrir nota"
+
+#: src/strings.ts:3249
+msgid "Open search"
+msgstr "Abrir pesquisa"
+
+#: src/strings.ts:3250
+msgid "Open search and replace"
+msgstr "Abrir pesquisar e substituir"
 
 #: src/strings.ts:1281
 msgid "Open settings"
@@ -5794,6 +5963,10 @@ msgstr "Aguarde antes de solicitar um novo código"
 #: src/strings.ts:1436
 msgid "Please wait before requesting another email"
 msgstr "Aguarde antes de solicitar outro e-mail"
+
+#: src/strings.ts:3275
+msgid "Please wait for the previous download to finish or cancel it."
+msgstr "Aguarde até que o download anterior termine ou cancele-o."
 
 #: src/strings.ts:2876
 msgid "Please wait while we change your subscription plan..."
@@ -6289,6 +6462,10 @@ msgstr "Entre novamente na sua conta"
 msgid "Remembered your password?"
 msgstr "Lembrou sua senha?"
 
+#: src/strings.ts:3195
+msgid "Remind in {minutes} min"
+msgstr "Lembrar em {minutes} min"
+
 #: src/strings.ts:848
 msgid "Remind me"
 msgstr "Lembrar-me"
@@ -6358,6 +6535,10 @@ msgstr "Remova o PIN do bloqueio do app; o bloqueio será desativado se nenhum o
 #: src/strings.ts:819
 msgid "Remove as default"
 msgstr "Remover como padrão"
+
+#: src/strings.ts:3243
+msgid "Remove formatting in selection"
+msgstr "Remover formatação da seleção"
 
 #: src/strings.ts:854
 msgid "Remove from all"
@@ -6438,6 +6619,14 @@ msgstr "Solicitar reembolso?"
 #: src/strings.ts:2795
 msgid "Requesting refund for your subscription"
 msgstr "Solicitando reembolso da sua assinatura"
+
+#: src/strings.ts:3207
+msgid "Resend"
+msgstr "Reenviar"
+
+#: src/strings.ts:3208
+msgid "Resend ({timer})"
+msgstr "Reenviar ({timer})"
 
 #: src/strings.ts:114
 msgid "Resend code in ({seconds})"
@@ -6811,6 +7000,10 @@ msgstr "Pesquisar nos cadernos"
 #: src/strings.ts:27
 msgid "Search in Notes"
 msgstr "Pesquisar nas notas"
+
+#: src/strings.ts:3217
+msgid "Search in notes list view if editor is not focused"
+msgstr "Pesquisar na lista de notas se o editor não estiver focado"
 
 #: src/strings.ts:31
 msgid "Search in Reminders"
@@ -7263,6 +7456,7 @@ msgid "Silent"
 msgstr "Silencioso"
 
 #: src/strings.ts:2123
+#: src/strings.ts:3225
 msgid "Sink list item"
 msgstr "Aumentar o recuo do item da lista"
 
@@ -7325,6 +7519,10 @@ msgstr "Verificação ortográfica"
 #: src/strings.ts:2090
 msgid "Split cells"
 msgstr "Dividir células"
+
+#: src/strings.ts:3223
+msgid "Split list item"
+msgstr "Dividir item de lista"
 
 #: src/strings.ts:2803
 msgid "Square"
@@ -7397,6 +7595,10 @@ msgstr "Tachado"
 #: src/strings.ts:2815
 msgid "Sub notebooks"
 msgstr "Subcadernos"
+
+#: src/strings.ts:3211
+msgid "Subgroup {number}"
+msgstr "Subgrupo {number}"
 
 #: src/strings.ts:2024
 msgid "Subgroup 1"
@@ -7718,6 +7920,22 @@ msgstr "Testar conexão"
 msgid "Test connection before changing server urls"
 msgstr "Teste a conexão antes de alterar as URLs dos servidores"
 
+#: src/strings.ts:3255
+msgid "Text align center"
+msgstr "Centralizar texto"
+
+#: src/strings.ts:3256
+msgid "Text align justify"
+msgstr "Justificar texto"
+
+#: src/strings.ts:3257
+msgid "Text align left"
+msgstr "Alinhar texto à esquerda"
+
+#: src/strings.ts:3258
+msgid "Text align right"
+msgstr "Alinhar texto à direita"
+
 #: src/strings.ts:2079
 msgid "Text color"
 msgstr "Cor do texto"
@@ -8004,6 +8222,26 @@ msgstr "Hoje, {time}"
 msgid "Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period."
 msgstr "Alterne a renovação automática para evitar cobranças surpresa. Se você não reativar, será rebaixado automaticamente para o plano Gratuito ao final do período de faturamento."
 
+#: src/strings.ts:3220
+msgid "Toggle bold"
+msgstr "Alternar negrito"
+
+#: src/strings.ts:3221
+msgid "Toggle bullet list"
+msgstr "Alternar lista com marcadores"
+
+#: src/strings.ts:3222
+msgid "Toggle check list"
+msgstr "Alternar lista de verificação"
+
+#: src/strings.ts:3226
+msgid "Toggle code"
+msgstr "Alternar código"
+
+#: src/strings.ts:3227
+msgid "Toggle code block"
+msgstr "Alternar bloco de código"
+
 #: src/strings.ts:1665
 msgid "Toggle dark/light mode"
 msgstr "Alternar entre modo claro e escuro"
@@ -8012,17 +8250,61 @@ msgstr "Alternar entre modo claro e escuro"
 msgid "Toggle focus mode"
 msgstr "Alternar o modo foco"
 
+#: src/strings.ts:3259
+msgid "Toggle highlight"
+msgstr "Alternar destaque"
+
 #: src/strings.ts:2147
 msgid "Toggle indentation mode"
 msgstr "Alternar o modo de recuo"
+
+#: src/strings.ts:3242
+msgid "Toggle italic"
+msgstr "Alternar itálico"
+
+#: src/strings.ts:3246
+msgid "Toggle ordered list"
+msgstr "Alternar lista numerada"
+
+#: src/strings.ts:3247
+msgid "Toggle outline list"
+msgstr "Alternar lista de tópicos"
+
+#: src/strings.ts:3248
+msgid "Toggle outline list expand"
+msgstr "Expandir/recolher lista de tópicos"
 
 #: src/strings.ts:2176
 msgid "Toggle replace"
 msgstr "Mostrar/ocultar substituição"
 
+#: src/strings.ts:3251
+msgid "Toggle strike"
+msgstr "Alternar tachado"
+
+#: src/strings.ts:3252
+msgid "Toggle subscript"
+msgstr "Alternar subscrito"
+
+#: src/strings.ts:3253
+msgid "Toggle superscript"
+msgstr "Alternar sobrescrito"
+
+#: src/strings.ts:3254
+msgid "Toggle task list"
+msgstr "Alternar lista de tarefas"
+
+#: src/strings.ts:3260
+msgid "Toggle text color"
+msgstr "Alternar cor do texto"
+
 #: src/strings.ts:2228
 msgid "Toggle theme"
 msgstr "Alternar tema"
+
+#: src/strings.ts:3203
+msgid "Token expired, try logging in again"
+msgstr "Token expirado, tente fazer login novamente"
 
 #: src/strings.ts:2711
 msgid "Tomorrow"
@@ -8190,6 +8472,10 @@ msgstr "Desbloqueie a nota para excluí-la"
 msgid "Unlock note to merge conflicts"
 msgstr "Desbloqueie a nota para mesclar os conflitos"
 
+#: src/strings.ts:3199
+msgid "Unlock note to open it in editor."
+msgstr "Desbloqueie a nota para abri-la no editor."
+
 #: src/strings.ts:1109
 msgid "Unlock the app with biometric authentication. This requires biometrics to be enabled on your device."
 msgstr "Desbloqueie o app com autenticação biométrica. É preciso ter a biometria ativada no seu dispositivo."
@@ -8197,6 +8483,10 @@ msgstr "Desbloqueie o app com autenticação biométrica. É preciso ter a biome
 #: src/strings.ts:2756
 msgid "Unlock this feature today"
 msgstr "Desbloqueie este recurso hoje"
+
+#: src/strings.ts:3200
+msgid "Unlock to access your notes"
+msgstr "Desbloqueie para acessar suas notas"
 
 #: src/strings.ts:1766
 msgid "Unlock vault"
@@ -8682,6 +8972,14 @@ msgstr "Bem-vindo de volta!"
 msgid "Welcome to Notesnook {plan}"
 msgstr "Boas-vindas ao Notesnook {plan}"
 
+#: src/strings.ts:3266
+msgid "Welcome to Notesnook Beta!"
+msgstr "Boas-vindas ao Notesnook Beta!"
+
+#: src/strings.ts:3268
+msgid "Welcome to v{version}"
+msgstr "Boas-vindas à v{version}"
+
 #: src/strings.ts:2587
 msgid "What are monographs?"
 msgstr "O que são monografias?"
@@ -8905,6 +9203,10 @@ msgstr "Você pode usar o método 2FA alternativo caso não consiga entrar pelo 
 #: src/strings.ts:1342
 msgid "You can view & restore older versions of any note by going to its properties -> History."
 msgstr "Você pode ver e restaurar versões anteriores de qualquer nota indo em suas propriedades -> Histórico."
+
+#: src/strings.ts:3198
+msgid "You cannot move the selected notebook(s) here"
+msgstr "Você não pode mover os cadernos selecionados para cá"
 
 #: src/strings.ts:3023
 msgid "You cannot set a default notebook or tag on this plan."

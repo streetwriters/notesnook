@@ -664,7 +664,7 @@ const ThemeSetter = ({
         ? useThemeStore.getState().setDarkTheme(fullTheme)
         : useThemeStore.getState().setLightTheme(fullTheme);
       ToastManager.show({
-        heading: `${theme.name} applied successfully`,
+        heading: strings.themeApplied(theme.name || ""),
         type: "success",
         context: "global"
       });

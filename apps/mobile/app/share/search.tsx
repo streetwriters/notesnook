@@ -537,12 +537,12 @@ export const Search = ({
                 allowFontScaling={false}
               >
                 {searchKeyword
-                  ? `No results found for "${searchKeyword}"`
+                  ? strings.noResultsFound(searchKeyword)
                   : mode === "appendNote"
-                  ? "No notes"
+                  ? strings.emptyPlaceholders("note")
                   : mode === "selectTags"
-                  ? "No tags"
-                  : "No notebooks"}
+                  ? strings.emptyPlaceholders("tag")
+                  : strings.emptyPlaceholders("notebook")}
               </Text>
             </View>
           }

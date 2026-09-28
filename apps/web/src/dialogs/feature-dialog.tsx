@@ -53,63 +53,65 @@ type Feature = {
 };
 
 export type FeatureKeys = "confirmed" | "highlights";
-const features: Record<FeatureKeys, Feature> = {
-  confirmed: {
-    title: strings.emailConfirmed(),
-    subtitle: strings.confirmEmailThankyou(),
-    cta: {
-      title: strings.continue(),
-      icon: ArrowRight,
-      action: () => hardNavigate(getHomeRoute())
-    }
-  },
-  highlights: {
-    title: appVersion.isBeta
-      ? "Welcome to Notesnook Beta!"
-      : "✨ Highlights ✨",
-    subtitle: appVersion.isBeta
-      ? `v${appVersion.clean}-beta`
-      : `Welcome to v${appVersion.clean}`,
-    subFeatures: appVersion.isBeta
-      ? [
-          {
-            icon: Warn,
-            title: strings.notice(),
-            subtitle: (
-              <>
-                {strings.betaWarningDescription[0]()}{" "}
-                <Code text={strings.reportAnIssue()} />{" "}
-                {strings.betaWarningDescription[1]()}
-              </>
-            )
-          },
-          {
-            icon: Warn,
-            title: strings.notice2(),
-            subtitle: strings.betaSwitchingWarning()
-          }
-        ]
-      : [],
-    cta: {
-      title: strings.gotIt(),
-      icon: Checkmark,
-      action: () => {
-        Config.set(`${appVersion.numerical}:highlights`, true);
+function getFeatures(): Record<FeatureKeys, Feature> {
+  return {
+    confirmed: {
+      title: strings.emailConfirmed(),
+      subtitle: strings.confirmEmailThankyou(),
+      cta: {
+        title: strings.continue(),
+        icon: ArrowRight,
+        action: () => hardNavigate(getHomeRoute())
       }
     },
-    shouldShow: () => {
-      if (!features.highlights.subFeatures?.length) return false;
+    highlights: {
+      title: appVersion.isBeta
+        ? strings.welcomeToNotesnookBeta()
+        : strings.highlightsWithStars(),
+      subtitle: appVersion.isBeta
+        ? `v${appVersion.clean}-beta`
+        : strings.welcomeToVersion(appVersion.clean),
+      subFeatures: appVersion.isBeta
+        ? [
+            {
+              icon: Warn,
+              title: strings.notice(),
+              subtitle: (
+                <>
+                  {strings.betaWarningDescription[0]()}{" "}
+                  <Code text={strings.reportAnIssue()} />{" "}
+                  {strings.betaWarningDescription[1]()}
+                </>
+              )
+            },
+            {
+              icon: Warn,
+              title: strings.notice2(),
+              subtitle: strings.betaSwitchingWarning()
+            }
+          ]
+        : [],
+      cta: {
+        title: strings.gotIt(),
+        icon: Checkmark,
+        action: () => {
+          Config.set(`${appVersion.numerical}:highlights`, true);
+        }
+      },
+      shouldShow: () => {
+        if (!appVersion.isBeta) return false;
 
-      const key = `${appVersion.numerical}:highlights`;
-      const hasShownBefore = Config.get(key, false) as boolean;
-      const hasShownAny =
-        appVersion.isBeta || Config.has((k) => k.endsWith(":highlights"));
-      if (!hasShownAny) Config.set(key, true);
+        const key = `${appVersion.numerical}:highlights`;
+        const hasShownBefore = Config.get(key, false) as boolean;
+        const hasShownAny =
+          appVersion.isBeta || Config.has((k) => k.endsWith(":highlights"));
+        if (!hasShownAny) Config.set(key, true);
 
-      return hasShownAny && !IS_TESTING && !hasShownBefore;
+        return hasShownAny && !IS_TESTING && !hasShownBefore;
+      }
     }
-  }
-};
+  };
+}
 
 type FeatureDialogProps = BaseDialogProps<boolean> & {
   featureName: FeatureKeys;
@@ -119,6 +121,7 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
   props: FeatureDialogProps
 ) {
   const { featureName, onClose } = props;
+  const features = getFeatures();
   const feature = features[featureName];
   const isShown = feature && feature.shouldShow && feature.shouldShow();
 
