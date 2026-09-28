@@ -121,8 +121,10 @@ describe("Locale Detection & Resolution", () => {
       expect(resolveTargetLocale("tr", "en-US")).toBe("tr");
     });
 
-    it("should use systemLocale when saved language is empty or undefined", () => {
+    it("should use systemLocale when saved language is empty, auto, or system", () => {
       expect(resolveTargetLocale("", "de-AT")).toBe("de");
+      expect(resolveTargetLocale("auto", "fr-FR")).toBe("fr");
+      expect(resolveTargetLocale("system", "es-ES")).toBe("es");
       expect(resolveTargetLocale(undefined, "tr-TR")).toBe("tr");
       expect(resolveTargetLocale(null, "es-MX")).toBe("es");
     });
