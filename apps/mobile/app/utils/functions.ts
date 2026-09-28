@@ -35,6 +35,7 @@ import { useTagStore } from "../stores/use-tag-store";
 import { eUpdateNoteInEditor } from "./events";
 import { unlockVault } from "./unlock-vault";
 import { useTrashStore } from "../stores/use-trash-store";
+import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 
 export const valueLimiter = (value: number, min: number, max: number) => {
   return value < min ? min : value > max ? max : value;
@@ -90,6 +91,7 @@ async function deleteNotebook(id: string, deleteNotes: boolean) {
       await db.notes.moveToTrash(
         ...noteRelations.map((relation) => relation.toId)
       );
+      PinnedNotesWidget.updateNotes();
     }
   }
   await db.notebooks.moveToTrash(id);
@@ -151,6 +153,7 @@ export const deleteItems = async (
         true
       );
     }
+    PinnedNotesWidget.updateNotes();
   } else if (type === "notebook") {
     const result = await confirmDeleteAllNotes(itemIds, "notebook", context);
     if (!result.delete) return;
@@ -192,6 +195,7 @@ export const deleteItems = async (
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
+        PinnedNotesWidget.updateNotes();
         ToastManager.hide();
         if (type === "notebook") {
           useNotebookStore.getState().refresh();
