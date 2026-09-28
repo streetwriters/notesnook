@@ -679,7 +679,7 @@ function AuthenticatedAsCard({ user }: { user: User }) {
           textDecoration: "none"
         }}
       >
-        {strings.login()}
+        Log in
       </Button>
     </Flex>
   );
