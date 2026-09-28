@@ -32,9 +32,6 @@ export async function initLocale() {
 
   return initIntlLocale({
     getSavedLocale: () => Config.get<string>("appLanguage", ""),
-    onSaveLocale: (locale) => {
-      Config.set("appLanguage", locale);
-    },
     systemLocale: navLang ?? "en"
   });
 }
