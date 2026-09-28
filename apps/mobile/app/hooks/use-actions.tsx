@@ -279,6 +279,7 @@ export const useActions = ({
     close();
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
+    PinnedNotesWidget.updateNotes();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
       heading:
