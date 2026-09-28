@@ -59,6 +59,9 @@ export type InitLocaleSyncOptions = InitLocaleOptions;
 function resolveAndSaveLocale(options: InitLocaleOptions): string {
   const saved = options.getSavedLocale?.();
   const targetLang = resolveTargetLocale(saved, options.systemLocale);
+  console.info(
+    `[locale] initialized target="${targetLang}" (saved="${saved}", system="${options.systemLocale}")`
+  );
   if (!saved && options.onSaveLocale) {
     options.onSaveLocale(targetLang);
   }
