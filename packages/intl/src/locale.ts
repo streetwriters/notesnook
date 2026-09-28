@@ -50,21 +50,17 @@ async function getLocaleMessages(lang: string): Promise<Messages> {
 
 export type InitLocaleOptions = {
   getSavedLocale?: () => string | null | undefined;
-  onSaveLocale?: (locale: string) => void;
   systemLocale: string;
 };
 
 export type InitLocaleSyncOptions = InitLocaleOptions;
 
-function resolveAndSaveLocale(options: InitLocaleOptions): string {
+function resolveLocale(options: InitLocaleOptions): string {
   const saved = options.getSavedLocale?.();
   const targetLang = resolveTargetLocale(saved, options.systemLocale);
   console.info(
     `[locale] initialized target="${targetLang}" (saved="${saved}", system="${options.systemLocale}")`
   );
-  if (!saved && options.onSaveLocale) {
-    options.onSaveLocale(targetLang);
-  }
   return targetLang;
 }
 
@@ -74,7 +70,7 @@ function activateLocale(targetLang: string) {
 }
 
 export function initLocaleSync(options: InitLocaleOptions): string {
-  const targetLang = resolveAndSaveLocale(options);
+  const targetLang = resolveLocale(options);
   const messages = getLocaleMessagesSync(targetLang);
   defaultI18n.load({ [targetLang]: messages });
   activateLocale(targetLang);
@@ -82,7 +78,7 @@ export function initLocaleSync(options: InitLocaleOptions): string {
 }
 
 export async function initLocale(options: InitLocaleOptions): Promise<string> {
-  const targetLang = resolveAndSaveLocale(options);
+  const targetLang = resolveLocale(options);
   const messages = await getLocaleMessages(targetLang);
   defaultI18n.load({ [targetLang]: messages });
   activateLocale(targetLang);
