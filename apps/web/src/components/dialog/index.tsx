@@ -25,6 +25,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { Close, Loading } from "../icons";
 import { FlexScrollContainer } from "../scroll-container";
 import { ScopedThemeProvider } from "../theme-provider";
+import { mdToHtml } from "../../utils/md";
 
 ReactModal.setAppElement("#root");
 
@@ -174,9 +175,10 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
                     overflowWrap: "anywhere",
                     wordSpacing: "wrap"
                   }}
-                >
-                  {props.description}
-                </Text>
+                  dangerouslySetInnerHTML={{
+                    __html: mdToHtml(props.description)
+                  }}
+                />
               )}
             </Flex>
           ) : null}
