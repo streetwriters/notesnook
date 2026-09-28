@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "./overrides";
-import { app, BrowserWindow, nativeTheme, shell, dialog } from "electron";
+import {
+  app,
+  BrowserWindow,
+  nativeTheme,
+  shell,
+  dialog,
+  ipcMain
+} from "electron";
 import { isDevelopment } from "./utils";
 import { registerProtocol, PROTOCOL_URL } from "./utils/protocol";
 import { configureAutoUpdater } from "./utils/autoupdater";
@@ -74,7 +81,9 @@ process.on("unhandledRejection", (reason) => {
   console.error("unhandledRejection:", reason);
 });
 
-app.commandLine.appendSwitch("lang", "en-US");
+ipcMain.on("get-app-locale", (event) => {
+  event.returnValue = app.getLocale();
+});
 
 async function createWindow() {
   const cliOptions = await parseArguments(process.argv);
