@@ -38,7 +38,6 @@ import { verifyUserWithApplock } from "../functions";
 import PaywallSheet from "../../../components/sheets/paywall";
 import {
   AVAILABLE_LANGUAGES,
-  resolveTargetLocale,
   strings
 } from "@notesnook/intl";
 import { initLocale } from "../../../common/locale";
@@ -69,18 +68,13 @@ export const LanguagePicker = createSettingsPicker<
 >({
   getValue: () => {
     const saved = useSettingStore.getState().settings.appLanguage;
-    let systemLocale = "en";
-    try {
-      systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-    } catch (e) {
-      // ignore
-    }
-    return resolveTargetLocale(saved, systemLocale);
+    return saved || "auto";
   },
   updateValue: async (item) => {
     const lang = typeof item === "object" ? item.code : item;
-    const currentLang = useSettingStore.getState().settings.appLanguage;
-    if (lang === currentLang) return;
+    const currentLang = useSettingStore.getState().settings.appLanguage || "";
+    const newLang = lang === "auto" ? "" : lang;
+    if (newLang === currentLang) return;
 
     setTimeout(() => {
       presentDialog({
@@ -90,7 +84,7 @@ export const LanguagePicker = createSettingsPicker<
         negativeText: strings.cancel(),
         positivePress: async () => {
           eSendEvent(eCloseSimpleDialog);
-          SettingsService.setProperty("appLanguage", lang);
+          SettingsService.setProperty("appLanguage", newLang);
           initLocale();
           // restarting early causes appLanguage value to not get saved.
           setTimeout(() => RNRestart.restart(), 100);
@@ -101,11 +95,17 @@ export const LanguagePicker = createSettingsPicker<
   },
   formatValue: (item) => {
     const code = typeof item === "object" ? item.code : item;
+    if (code === "auto") {
+      return strings.auto();
+    }
     const found = AVAILABLE_LANGUAGES.find((l) => l.code === code);
     return found ? `${found.label} (${found.nativeLabel})` : code;
   },
   getItemKey: (item) => (typeof item === "object" ? item.code : item),
-  options: AVAILABLE_LANGUAGES,
+  options: [
+    { code: "auto", label: "Auto", nativeLabel: "Auto" },
+    ...AVAILABLE_LANGUAGES
+  ],
   compareValue: (current, item) =>
     current === (typeof item === "object" ? item.code : item),
   isFeatureAvailable: async () => true,

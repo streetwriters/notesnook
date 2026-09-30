@@ -28,8 +28,7 @@ import { TimeFormat, DayFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
 import {
   strings,
-  AVAILABLE_LANGUAGES,
-  getSupportedLocale
+  AVAILABLE_LANGUAGES
 } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import { ConfirmDialog } from "../confirm";
@@ -52,16 +51,9 @@ export const BehaviourSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             onSelectionChanged: async (value) => {
-              const currentLang = useSettingStore.getState().appLanguage;
-              let systemLocale = "en";
-              try {
-                systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-              } catch (e) {
-                // ignore
-              }
-              const effectiveCurrent =
-                currentLang || getSupportedLocale(systemLocale);
-              if (value === effectiveCurrent) return;
+              const currentLang = useSettingStore.getState().appLanguage || "";
+              const newLang = value === "auto" ? "" : value;
+              if (newLang === currentLang) return;
 
               const ok = await ConfirmDialog.show({
                 title: strings.changeLanguage(),
@@ -71,27 +63,29 @@ export const BehaviourSettings: SettingsGroup[] = [
               });
 
               if (ok) {
-                useSettingStore.getState().setAppLanguage(value);
+                useSettingStore.getState().setAppLanguage(newLang);
                 if (IS_DESKTOP_APP && desktop) {
-                  await desktop.integration.setAppLanguage.mutate(value);
+                  await desktop.integration.setAppLanguage.mutate(newLang);
                 }
                 window.location.reload();
               }
             },
             selectedOption: () => {
               const saved = useSettingStore.getState().appLanguage;
-              let systemLocale = "en";
-              try {
-                systemLocale = Intl.DateTimeFormat().resolvedOptions().locale;
-              } catch (e) {
-                // ignore
-              }
-              return saved || getSupportedLocale(systemLocale);
+              return saved || "auto";
             },
-            options: AVAILABLE_LANGUAGES.map((l) => ({
-              value: l.code,
-              title: `${l.label} (${l.nativeLabel})`
-            }))
+            options: [
+              {
+                value: "auto",
+                get title() {
+                  return strings.auto();
+                }
+              },
+              ...AVAILABLE_LANGUAGES.map((l) => ({
+                value: l.code,
+                title: `${l.label} (${l.nativeLabel})`
+              }))
+            ]
           }
         ]
       },

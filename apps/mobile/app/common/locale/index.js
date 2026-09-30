@@ -24,9 +24,6 @@ import * as RNLocalize from "react-native-localize";
 export function initLocale() {
   return initLocaleSync({
     getSavedLocale: () => SettingsService.getProperty("appLanguage"),
-    onSaveLocale: (locale) => {
-      SettingsService.setProperty("appLanguage", locale);
-    },
     systemLocale: RNLocalize.getLocales()[0]?.languageTag ?? "en"
   });
 }

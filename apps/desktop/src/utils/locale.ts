@@ -24,9 +24,6 @@ import { initLocale as initIntlLocale } from "@notesnook/intl";
 export async function initLocale() {
   return initIntlLocale({
     getSavedLocale: () => config.appLanguage,
-    onSaveLocale: (locale) => {
-      config.appLanguage = locale;
-    },
     systemLocale: app.getLocale() || "en"
   });
 }
