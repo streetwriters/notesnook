@@ -21,6 +21,8 @@ import { Flex, Text, Button } from "@theme-ui/components";
 import { ThemeUICSSObject } from "@theme-ui/core";
 import { Close, Icon } from "../icons";
 import { strings } from "@notesnook/intl";
+import { MenuItem } from "@notesnook/ui";
+import { useMenuTrigger } from "../../hooks/use-menu";
 
 type IconTagProps = {
   text: string;
@@ -29,6 +31,7 @@ type IconTagProps = {
   iconSize?: number;
   className?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
+  menuItems?: () => Promise<MenuItem[]> | MenuItem[];
   styles?: {
     icon?: ThemeUICSSObject;
     container?: ThemeUICSSObject;
@@ -48,12 +51,14 @@ function IconTag(props: IconTagProps) {
     iconSize = 11,
     className,
     onClick,
+    menuItems,
     onDismiss,
     styles,
     testId,
     highlight,
     selected
   } = props;
+  const { openMenu } = useMenuTrigger();
 
   return (
     <Flex
@@ -64,6 +69,13 @@ function IconTag(props: IconTagProps) {
           e.stopPropagation();
           onClick(e);
         }
+      }}
+      onContextMenu={async (e) => {
+        if (!menuItems) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        openMenu(await menuItems());
       }}
       title={title || text}
       sx={{

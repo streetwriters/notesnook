@@ -206,7 +206,6 @@ function EditorProperties(props: EditorPropertiesProps) {
               selected={activeTab === tab.id}
               onClick={() => useEditorStore.getState().setPropertiesTab(tab.id)}
               sx={{ width: "30px", height: "30px" }}
-              iconColor="icon-secondary"
             />
           ))}
         </Flex>
@@ -860,6 +859,14 @@ function ReferencedIn({
           >
             {item.title}
           </Text>
+          {/* {blocks.length > 0 && (
+            <Text
+              variant="subBody"
+              sx={{ ml: "auto", color: "paragraph-secondary" }}
+            >
+              {blocks.length}
+            </Text>
+          )} */}
         </Button>
       </Flex>
       {isExpanded
