@@ -1074,6 +1074,7 @@ function NavigationDropdown() {
           {
             position: {
               target: e.currentTarget,
+              isTargetAbsolute: true,
               location: "below",
               yOffset: 5
             }
