@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Switch, Text } from "@theme-ui/components";
+import { Flex, Text, Switch } from "@theme-ui/components";
 import { Icon } from "../icons";
 
 type ToggleProps = {
@@ -36,8 +36,8 @@ function Toggle(props: ToggleProps) {
         cursor: "pointer",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: 1,
-
+        gap: "spacing4",
+        borderRadius: "radius2",
         "& label": { width: "auto", flexShrink: 0 }
       }}
       data-test-id={props.testId}
@@ -46,15 +46,29 @@ function Toggle(props: ToggleProps) {
       <Flex
         sx={{
           alignItems: "center",
-          display: "flex"
+          display: "flex",
+          minWidth: 0,
+          gap: "spacing4"
         }}
         data-test-id={`toggle-state-${isOn ? "on" : "off"}`}
       >
-        <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
-        <Text
-          variant="body"
+        <Flex
           sx={{
-            color: "paragraph",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 24,
+            height: 24,
+            flexShrink: 0,
+            borderRadius: "radius1",
+            bg: "background-tertiary"
+          }}
+        >
+          <ToggleIcon size={15} />
+        </Flex>
+        <Text
+          sx={{
+            color: "heading",
+            fontSize: "xs",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap"
@@ -66,7 +80,7 @@ function Toggle(props: ToggleProps) {
       <Switch
         sx={{
           m: 0,
-          bg: isOn ? "accent" : "icon-secondary",
+          bg: isOn ? "accent" : "border",
           flexShrink: 0
         }}
         checked={isOn}

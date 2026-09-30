@@ -17,35 +17,47 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import {
-  Pin,
-  StarOutline,
-  Unlock,
-  Readonly,
-  SyncOff,
+  Star,
+  NoteLock,
   Circle,
   Checkmark,
-  ChevronDown,
-  ChevronRight,
-  LinkedTo,
-  ReferencedIn as ReferencedInIcon,
-  Note as NoteIcon,
-  Archive,
-  Edit,
-  SpellCheck
+  SpellCheck,
+  SquaresFour,
+  Table,
+  LinkHorizontal,
+  Copy,
+  ClockCounterClockwise,
+  Clock,
+  PencilSimple,
+  Plus,
+  Icon,
+  Notebook,
+  Tag,
+  FileDoc,
+  FileText,
+  CaretDown,
+  NotePin,
+  BoxArrowDown,
+  Cloud,
+  Bell,
+  Ellipse
 } from "../icons";
-import { Button, Flex, Text, FlexProps } from "@theme-ui/components";
+import { Button, Flex, Text, FlexProps, Box } from "@theme-ui/components";
+import { useThemeUI } from "@theme-ui/core";
 import {
   useEditorStore,
   ReadonlyEditorSession,
-  DefaultEditorSession
+  DefaultEditorSession,
+  PropertiesTabId
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import Toggle from "./toggle";
 import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
+import { CreateColorDialog } from "../../dialogs/create-color-dialog";
 import ScrollContainer from "../scroll-container";
 import {
   formatDate,
@@ -56,6 +68,7 @@ import {
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { ListItemWrapper } from "../list-container/list-profiles";
+import { copyNoteLink } from "../../common";
 import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
 import {
@@ -65,35 +78,68 @@ import {
   createInternalLink,
   highlightInternalLinks
 } from "@notesnook/core";
-import { VirtualizedTable } from "../virtualized-table";
-import { TextSlice } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { Theme } from "@notesnook/theme";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
+import { TabItem } from "../navigation-menu/tab-item";
+import TableOfContents from "../editor/table-of-contents";
+import IconTag from "../icon-tag";
+import { notebookMenuItems } from "../notebook";
+import { tagMenuItems } from "../tag";
+import { navigate } from "../../navigation";
+import { store as appStore } from "../../stores/app-store";
+
+const tabs = [
+  {
+    id: "properties",
+    icon: SquaresFour
+  },
+  {
+    id: "toc",
+    icon: Table
+  },
+  {
+    id: "note-links",
+    icon: LinkHorizontal
+  },
+  {
+    id: "note-history",
+    icon: ClockCounterClockwise
+  },
+  {
+    id: "attachments",
+    icon: FileDoc
+  },
+  {
+    id: "reminders",
+    icon: Bell
+  }
+] as const satisfies { id: PropertiesTabId; icon: Icon }[];
 
 const tools = [
-  { key: "pin", property: "pinned", icon: Pin, label: strings.pin() },
+  { key: "pin", property: "pinned", icon: NotePin, label: strings.pin() },
   {
     key: "favorite",
     property: "favorite",
-    icon: StarOutline,
+    icon: Star,
     label: strings.favorite()
   },
-  { key: "lock", icon: Unlock, label: strings.lock(), property: "locked" },
+  { key: "lock", icon: NoteLock, label: strings.lock(), property: "locked" },
   {
     key: "readonly",
-    icon: Readonly,
+    icon: PencilSimple,
     label: strings.readOnly(),
     property: "readonly"
   },
   {
     key: "archive",
-    icon: Archive,
+    icon: BoxArrowDown,
     label: strings.archive(),
     property: "archived"
   },
   {
     key: "local-only",
-    icon: SyncOff,
+    icon: Cloud,
     label: strings.disableSync(),
     property: "localOnly"
   },
@@ -109,6 +155,7 @@ const tools = [
 type MetadataItem<T extends "dateCreated" | "dateEdited"> = {
   key: T;
   label: string;
+  icon: Icon;
   value: (value: number) => string;
 };
 
@@ -116,30 +163,8 @@ type EditorPropertiesProps = {
   sessionId: string;
 };
 function EditorProperties(props: EditorPropertiesProps) {
-  const toggleProperties = useEditorStore((store) => store.toggleProperties);
+  const activeTab = useEditorStore((store) => store.propertiesTab);
   useSpellChecker((store) => store.enabled);
-  const dateFormat = useSettingStore((store) => store.dateFormat);
-  const timeFormat = useSettingStore((store) => store.timeFormat);
-  const metadataItems = [
-    {
-      key: "dateCreated",
-      label: strings.createdAt(),
-      value: (date: number) =>
-        formatDate(date || Date.now(), {
-          type: "date-time",
-          dateFormat,
-          timeFormat
-        })
-    } as MetadataItem<"dateCreated">,
-    {
-      key: "dateEdited",
-      label: strings.lastEditedAt(),
-      value: (date: number) =>
-        date
-          ? formatDate(date, { type: "date-time", dateFormat, timeFormat })
-          : "never"
-    } as MetadataItem<"dateEdited">
-  ];
   const session = useEditorStore((store) =>
     store.getSession(props.sessionId, [
       "default",
@@ -148,7 +173,7 @@ function EditorProperties(props: EditorPropertiesProps) {
       "diff"
     ])
   );
-  if (!session) return null;
+  if (!session || !activeTab) return null;
 
   return (
     <Flex
@@ -168,225 +193,448 @@ function EditorProperties(props: EditorPropertiesProps) {
           bg: "background",
           overflowY: "hidden",
           overflowX: "hidden",
-          flexDirection: "column"
+          flexDirection: "column",
+          py: "spacing4"
         }}
       >
-        <ScrollContainer>
-          {/* <Flex
-            sx={{
-              alignItems: "center",
-              gap: 1
-            }}
-          >
-            <ArrowLeft
-              data-test-id="properties-close"
-              onClick={() => toggleProperties(false)}
-              size={18}
-              sx={{ cursor: "pointer" }}
+        <Flex sx={{ gap: "spacing2", px: "spacing4" }}>
+          {tabs.map((tab) => (
+            <TabItem
+              key={tab.id}
+              icon={tab.icon}
+              selected={activeTab === tab.id}
+              onClick={() => useEditorStore.getState().setPropertiesTab(tab.id)}
+              sx={{ width: "30px", height: "30px" }}
             />
-            <Text variant="subtitle">{strings.properties()}</Text>
-          </Flex> */}
-          <Flex
-            data-test-id="general-section"
-            sx={{ flexDirection: "column", gap: 1 }}
-          >
-            <Section title="Properties">
-              <Flex sx={{ flexDirection: "column", gap: 1, px: 2, pt: 1 }}>
-                {session.type === "deleted" ||
-                session.type === "diff" ? null : (
-                  <>
-                    {tools.map((tool) =>
-                      "isHidden" in tool && tool.isHidden() ? null : (
-                        <Toggle
-                          {...tool}
-                          key={tool.key}
-                          isOn={
-                            tool.property === "locked"
-                              ? "locked" in session && !!session.locked
-                              : !!session.note[tool.property]
-                          }
-                          onToggle={() => changeToggleState(tool.key, session)}
-                          testId={`properties-${tool.key}`}
-                        />
-                      )
-                    )}
-                  </>
-                )}
-
-                {metadataItems.map((item) => (
-                  <Flex
-                    key={item.key}
-                    sx={{
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      py: "small"
-                    }}
-                  >
-                    <Text
-                      variant="body"
-                      sx={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis"
-                      }}
-                    >
-                      {item.label}
-                    </Text>
-
-                    {item.key === "dateCreated" ? (
-                      <Flex sx={{ alignItems: "center", gap: 1 }}>
-                        <Text
-                          data-test-id="date-created"
-                          className="selectable"
-                          variant="subBody"
-                          sx={{ fontSize: "body", flexShrink: 0 }}
-                        >
-                          {item.value(session.note[item.key])}
-                        </Text>
-                        <Edit
-                          size={14}
-                          sx={{ cursor: "pointer", color: "icon" }}
-                          onClick={() => {
-                            EditNoteCreationDateDialog.show({
-                              noteId: session.note.id,
-                              dateCreated: session.note.dateCreated,
-                              dateEdited: session.note.dateEdited
-                            });
-                          }}
-                          data-test-id="edit-date-created"
-                        />
-                      </Flex>
-                    ) : (
-                      <Text
-                        className="selectable"
-                        variant="subBody"
-                        sx={{ fontSize: "body", flexShrink: 0 }}
-                      >
-                        {item.value(session.note[item.key])}
-                      </Text>
-                    )}
-                  </Flex>
-                ))}
-                {session.type === "deleted" ||
-                session.type === "diff" ? null : (
-                  <Colors noteId={session.note.id} color={session.color} />
-                )}
-              </Flex>
-            </Section>
-            {session.type === "deleted" ? null : (
-              <>
-                {session.type === "diff" ? (
-                  <SessionHistory noteId={session.note.id} />
-                ) : (
-                  <>
-                    <InternalLinks noteId={session.note.id} />
-                    <Notebooks noteId={session.note.id} />
-                    <Reminders noteId={session.note.id} />
-                    <Attachments noteId={session.note.id} />
-                    <SessionHistory noteId={session.note.id} />
-                  </>
-                )}
-              </>
-            )}
-          </Flex>
-        </ScrollContainer>
+          ))}
+        </Flex>
+        <Box
+          sx={{
+            height: "1px",
+            my: "spacing4",
+            bg: "separator",
+            mx: "spacing4"
+          }}
+        />
+        {activeTab === "toc" ? (
+          <TableOfContents sessionId={session.id} />
+        ) : activeTab === "note-links" ? (
+          <ScrollContainer>
+            <InternalLinks key={session.note.id} noteId={session.note.id} />
+          </ScrollContainer>
+        ) : activeTab === "note-history" ? (
+          <ScrollContainer>
+            <SessionHistory noteId={session.note.id} />
+          </ScrollContainer>
+        ) : activeTab === "attachments" ? (
+          <ScrollContainer>
+            <Attachments noteId={session.note.id} />
+          </ScrollContainer>
+        ) : activeTab === "reminders" ? (
+          <ScrollContainer>
+            <Reminders noteId={session.note.id} />
+          </ScrollContainer>
+        ) : (
+          <ScrollContainer>
+            <Properties sessionId={session.id} />
+          </ScrollContainer>
+        )}
       </ScopedThemeProvider>
     </Flex>
   );
 }
 export default React.memo(EditorProperties);
 
-enum InternalLinksTabs {
-  LINKED_NOTES = 0,
-  REFERENCED_IN = 1
-}
-function InternalLinks({ noteId }: { noteId: string }) {
-  const [tabIndex, setTabIndex] = useState(InternalLinksTabs.LINKED_NOTES);
-  const [expandedId, setExpandedId] = useState<string>();
-
-  const result = usePromise(() => {
-    const links =
-      tabIndex === InternalLinksTabs.LINKED_NOTES
-        ? db.relations.from({ id: noteId, type: "note" }, "note")
-        : db.relations.to({ id: noteId, type: "note" }, "note");
-    return links.selector
-      .fields(["notes.id", "notes.title"])
-      .sorted(db.settings.getGroupOptions("notes"));
-  }, [tabIndex, noteId]);
+function Properties({ sessionId }: EditorPropertiesProps) {
+  const dateFormat = useSettingStore((store) => store.dateFormat);
+  const timeFormat = useSettingStore((store) => store.timeFormat);
+  const metadataItems = [
+    {
+      key: "dateCreated",
+      label: strings.createdAt(),
+      icon: Clock,
+      value: (date: number) =>
+        formatDate(date || Date.now(), {
+          type: "date-time",
+          dateFormat,
+          timeFormat
+        })
+    } as MetadataItem<"dateCreated">,
+    {
+      key: "dateEdited",
+      label: strings.lastEditedAt(),
+      icon: ClockCounterClockwise,
+      value: (date: number) =>
+        date
+          ? formatDate(date, { type: "date-time", dateFormat, timeFormat })
+          : "never"
+    } as MetadataItem<"dateEdited">
+  ];
+  const session = useEditorStore((store) =>
+    store.getSession(sessionId, ["default", "readonly", "deleted", "diff"])
+  );
+  if (!session) return null;
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
-      <Flex
+    <Flex
+      data-test-id="general-section"
+      sx={{ flexDirection: "column", px: "spacing4" }}
+    >
+      <Section title="Properties">
+        <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+          {session.type === "deleted" || session.type === "diff" ? null : (
+            <>
+              {tools.map((tool) =>
+                "isHidden" in tool && tool.isHidden() ? null : (
+                  <Toggle
+                    {...tool}
+                    key={tool.key}
+                    isOn={
+                      tool.property === "locked"
+                        ? "locked" in session && !!session.locked
+                        : !!session.note[tool.property]
+                    }
+                    onToggle={() => changeToggleState(tool.key, session)}
+                    testId={`properties-${tool.key}`}
+                  />
+                )
+              )}
+              <Flex
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "spacing4",
+                  borderRadius: "radius2",
+                  cursor: "pointer"
+                }}
+                data-test-id="properties-copy-link"
+              >
+                <Flex
+                  sx={{
+                    alignItems: "center",
+                    minWidth: 0,
+                    gap: "spacing4"
+                  }}
+                >
+                  <Flex
+                    sx={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 24,
+                      height: 24,
+                      flexShrink: 0,
+                      borderRadius: "radius1",
+                      bg: "background-tertiary"
+                    }}
+                  >
+                    <LinkHorizontal size={15} />
+                  </Flex>
+                  <Text
+                    sx={{
+                      color: "heading",
+                      fontSize: "xs",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    Copy note link
+                  </Text>
+                </Flex>
+                <CopyNoteLink note={session.note} />
+              </Flex>
+            </>
+          )}
+        </Flex>
+      </Section>
+      <Section
+        title="Metadata"
         sx={{
-          borderTop: "1px solid var(--border)",
-          borderBottom: "1px solid var(--border)",
-          py: 1,
-          px: 2,
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 1
+          borderTop: "1px solid var(--separator)",
+          mt: "spacing4",
+          pt: "spacing4"
         }}
       >
-        <Flex
-          sx={{
-            gap: 1
-          }}
-        >
-          {[LinkedTo, ReferencedInIcon].map((Icon, index) => (
-            <Button
-              key={index.toString()}
-              variant="secondary"
-              sx={{
-                p: 1,
-                color: tabIndex === index ? "accent-selected" : "paragraph",
-                bg: tabIndex === index ? "background-selected" : "transparent"
-              }}
-              onClick={() => {
-                setTabIndex(index);
-                setExpandedId(undefined);
-              }}
-            >
-              <Icon
-                size={16}
-                color={tabIndex === index ? "icon-selected" : "icon"}
-              />
-            </Button>
-          ))}
-        </Flex>
-        <Text variant="body" color="paragraph-secondary">
-          ({result.status === "fulfilled" ? result.value.length : 0}){" "}
-          {tabIndex === InternalLinksTabs.LINKED_NOTES
-            ? strings.linkedNotes()
-            : strings.referencedIn()}{" "}
-        </Text>
-      </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+          {metadataItems.map((item) => {
+            const MetadataIcon = item.icon;
 
-      {result.status === "fulfilled" &&
-        (result.value.length === 0 ? (
-          <Text variant="body" mx={2}>
-            {tabIndex === InternalLinksTabs.LINKED_NOTES
-              ? strings.notLinked()
-              : strings.notReferenced()}
-          </Text>
-        ) : (
-          <VirtualizedList
-            mode="dynamic"
-            estimatedSize={25}
-            getItemKey={(index) => result.value.key(index)}
-            items={result.value.placeholders}
-            context={{
-              items: result.value,
-              tabIndex,
-              noteId,
-              isExpanded: (id) => expandedId === id,
-              toggleExpand: (id) =>
-                setExpandedId((s) => (s === id ? undefined : id))
+            return (
+              <Flex
+                key={item.key}
+                sx={{
+                  alignItems: "center",
+                  gap: "spacing4",
+                  borderRadius: "radius2"
+                }}
+              >
+                <Flex
+                  sx={{
+                    alignSelf: "flex-start",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 24,
+                    height: 24,
+                    flexShrink: 0,
+                    borderRadius: "radius1",
+                    bg: "background-tertiary"
+                  }}
+                >
+                  <MetadataIcon size={15} />
+                </Flex>
+                <Flex
+                  sx={{
+                    alignItems: "flex-start",
+                    flexDirection: "column",
+                    flex: 1,
+                    minWidth: 0,
+                    gap: "spacing3"
+                  }}
+                >
+                  <Text
+                    sx={{
+                      color: "heading",
+                      fontSize: "xs",
+                      lineHeight: 1,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {item.label}
+                  </Text>
+                  <Text
+                    data-test-id={
+                      item.key === "dateCreated" ? "date-created" : undefined
+                    }
+                    className="selectable"
+                    sx={{
+                      color: "paragraph",
+                      fontSize: "3xs",
+                      lineHeight: 1,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {item.value(session.note[item.key])}
+                  </Text>
+                </Flex>
+                {item.key === "dateCreated" && (
+                  <PencilSimple
+                    size={15}
+                    sx={{ cursor: "pointer", color: "icon", flexShrink: 0 }}
+                    onClick={() => {
+                      EditNoteCreationDateDialog.show({
+                        noteId: session.note.id,
+                        dateCreated: session.note.dateCreated,
+                        dateEdited: session.note.dateEdited
+                      });
+                    }}
+                    data-test-id="edit-date-created"
+                  />
+                )}
+              </Flex>
+            );
+          })}
+        </Flex>
+      </Section>
+      {session.type === "deleted" || session.type === "diff" ? null : (
+        <>
+          <Section
+            title="Colors"
+            sx={{
+              borderTop: "1px solid var(--separator)",
+              mt: "spacing4",
+              pt: "spacing4"
             }}
-            renderItem={InternalLinkItem}
-          />
-        ))}
+          >
+            <Colors noteId={session.note.id} color={session.color} />
+          </Section>
+        </>
+      )}
+      {session.type === "deleted" || session.type === "diff" ? null : (
+        <>
+          <Tags noteId={session.note.id} />
+          <Notebooks noteId={session.note.id} />
+        </>
+      )}
     </Flex>
   );
 }
+
+function CopyNoteLink({ note }: { note: Note }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+
+    const timeout = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
+  return (
+    <Button
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: "spacing2",
+        flexShrink: 0,
+        color: "accent",
+        p: 0,
+        ":hover": {
+          bg: "transparent !important"
+        }
+      }}
+      onClick={async () => {
+        await copyNoteLink(note);
+        setCopied(true);
+      }}
+    >
+      <Copy size={12} color="accent" />
+      <Text sx={{ color: "accent", fontSize: "3xs", fontWeight: 500 }}>
+        {copied ? "Copied!" : "Copy"}
+      </Text>
+    </Button>
+  );
+}
+
+function InternalLinks({ noteId }: { noteId: string }) {
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
+  const { theme } = useThemeUI();
+  const itemGap = (theme as Theme).space?.spacing1;
+  const linkedNotes = usePromise(() => {
+    return db.relations
+      .from({ id: noteId, type: "note" }, "note")
+      .selector.fields(["notes.id", "notes.title"])
+      .sorted(db.settings.getGroupOptions("notes"));
+  }, [noteId]);
+  const referencedIn = usePromise(() => {
+    return db.relations
+      .to({ id: noteId, type: "note" }, "note")
+      .selector.fields(["notes.id", "notes.title"])
+      .sorted(db.settings.getGroupOptions("notes"));
+  }, [noteId]);
+
+  const toggleExpand = (key: string) =>
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+
+      return next;
+    });
+
+  const renderList = (
+    section: "linked" | "referenced",
+    result: typeof linkedNotes,
+    emptyText: string
+  ) => {
+    if (result.status !== "fulfilled") return null;
+    if (result.value.length === 0) {
+      return (
+        <Text
+          sx={{
+            color: "paragraph-secondary",
+            fontSize: "xs",
+            lineHeight: "100%"
+          }}
+        >
+          {emptyText}
+        </Text>
+      );
+    }
+
+    return (
+      <VirtualizedList
+        mode="dynamic"
+        estimatedSize={27}
+        itemGap={itemGap}
+        getItemKey={(index) => result.value.key(index)}
+        items={result.value.placeholders}
+        context={{
+          items: result.value,
+          noteId,
+          section,
+          isExpanded: (id) => expandedIds.has(`${section}:${id}`),
+          toggleExpand: (id) => toggleExpand(`${section}:${id}`)
+        }}
+        renderItem={InternalLinkItem}
+      />
+    );
+  };
+
+  return (
+    <Flex sx={{ flexDirection: "column", gap: "spacing4", px: "spacing4" }}>
+      <Section
+        title={strings.linkedNotes()}
+        headerAction={
+          linkedNotes.status === "fulfilled" && linkedNotes.value.length > 0 ? (
+            <Text
+              sx={{
+                fontSize: "3xs",
+                color: "heading-secondary",
+                fontWeight: 500,
+                lineHeight: "100%",
+                letterSpacing: "0.33px"
+              }}
+            >
+              {linkedNotes.value.length}
+            </Text>
+          ) : undefined
+        }
+      >
+        {renderList("linked", linkedNotes, strings.notLinked())}
+      </Section>
+      {linkedNotes.status === "fulfilled" && linkedNotes.value.length === 0 && (
+        <Box sx={{ height: "1px", width: "100%", bg: "separator" }} />
+      )}
+      <Section
+        title={strings.referencedIn()}
+        headerAction={
+          referencedIn.status === "fulfilled" &&
+          referencedIn.value.length > 0 ? (
+            <Text
+              sx={{
+                fontSize: "3xs",
+                color: "heading-secondary",
+                fontWeight: 500,
+                lineHeight: "100%",
+                letterSpacing: "0.33px"
+              }}
+            >
+              {referencedIn.value.length}
+            </Text>
+          ) : undefined
+        }
+      >
+        {referencedIn.status === "fulfilled" &&
+          referencedIn.value.length > 0 && (
+            <Box
+              sx={{
+                height: "1px",
+                width: "100%",
+                bg: "separator",
+                mb: "spacing4"
+              }}
+            />
+          )}
+        {renderList("referenced", referencedIn, strings.notReferenced())}
+      </Section>
+    </Flex>
+  );
+}
+
+type InternalLinkItemContext = {
+  items: VirtualizedGrouping<Note>;
+  noteId: string;
+  section: "linked" | "referenced";
+  isExpanded: (id: string) => boolean;
+  toggleExpand: (id: string) => void;
+};
 
 function InternalLinkItem({
   index,
@@ -394,29 +642,21 @@ function InternalLinkItem({
 }: {
   item: boolean;
   index: number;
-  context: {
-    items: VirtualizedGrouping<Note>;
-    tabIndex: InternalLinksTabs;
-    noteId: string;
-    isExpanded: (id: string) => boolean;
-    toggleExpand: (id: string) => void;
-  };
+  context: InternalLinkItemContext;
 }) {
-  const { items, tabIndex, noteId, isExpanded, toggleExpand } = context;
+  const { items, noteId, section, isExpanded, toggleExpand } = context;
   const item = useUnresolvedItem({ items, index, type: "note" });
 
   if (!item) return null;
 
-  if (tabIndex === InternalLinksTabs.LINKED_NOTES)
-    return (
-      <LinkedNote
-        item={item.item}
-        noteId={noteId}
-        isExpanded={isExpanded(item.item.id)}
-        toggleExpand={() => toggleExpand(item.item!.id)}
-      />
-    );
-  return (
+  return section === "linked" ? (
+    <LinkedNote
+      item={item.item}
+      noteId={noteId}
+      isExpanded={isExpanded(item.item.id)}
+      toggleExpand={() => toggleExpand(item.item!.id)}
+    />
+  ) : (
     <ReferencedIn
       item={item.item}
       noteId={noteId}
@@ -452,15 +692,14 @@ function LinkedNote({
           variant="menuitem"
           sx={{
             flex: 1,
-            p: 1,
-            mx: 2,
-            borderRadius: "default",
+            p: "spacing2",
+            borderRadius: "radius1",
             textAlign: "left",
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            gap: "small"
-            //  borderBottom: isExpanded ? "none" : "1px solid var(--border)"
+            gap: "spacing3",
+            bg: isExpanded ? "background-selected" : "transparent"
           }}
           onClick={() => useEditorStore.getState().openSession(item)}
         >
@@ -482,16 +721,32 @@ function LinkedNote({
                 toggleExpand();
               }}
             >
-              {isExpanded ? (
-                <ChevronDown size={14} />
-              ) : (
-                <ChevronRight size={14} />
-              )}
+              <CaretDown
+                size={11}
+                sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
+                color={isExpanded ? "icon-selected" : "icon"}
+              />
             </Button>
           ) : (
-            <NoteIcon size={14} />
+            <FileText size={13} color="paragraph-primary" />
           )}
-          <Text>{item.title}</Text>
+          <Text
+            sx={{
+              fontSize: "xs",
+              color: isExpanded ? "paragraph-selected" : "paragraph-primary"
+            }}
+          >
+            {item.title}
+          </Text>
+          {/* {linkedBlocks.status === "fulfilled" &&
+            linkedBlocks.value.length > 0 && (
+              <Text
+                variant="subBody"
+                sx={{ ml: "auto", color: "paragraph-secondary" }}
+              >
+                {linkedBlocks.value.length}
+              </Text>
+            )} */}
         </Button>
       </Flex>
       {isExpanded
@@ -501,11 +756,12 @@ function LinkedNote({
                 variant="menuitem"
                 sx={{
                   flex: 1,
-                  borderRadius: "default",
-                  p: 1,
-                  mx: 2,
-                  pl: 4,
-                  gap: 1,
+                  borderRadius: "radius1",
+                  px: "spacing2",
+                  py: "spacing3",
+                  pl: "spacing7",
+                  mt: "spacing1",
+                  gap: "spacing3",
                   textAlign: "left",
                   display: "flex",
                   alignItems: "center"
@@ -517,23 +773,24 @@ function LinkedNote({
                 }
               >
                 <Text
-                  variant="subBody"
                   sx={{
-                    bg: "background-secondary",
-                    p: "small",
+                    color: "paragraph",
+                    fontSize: "3xs",
+                    bg: "background-tertiary",
                     flexShrink: 0,
-                    px: 1,
-                    borderRadius: "default",
-                    alignSelf: "flex-start"
+                    py: "spacing1",
+                    px: "spacing2",
+                    borderRadius: "radius1",
+                    lineHeight: "100%"
                   }}
                 >
                   {block.type.toUpperCase()}
                 </Text>
                 <Text
-                  variant="body"
                   sx={{
-                    fontSize: "subBody",
-                    fontFamily: "monospace",
+                    color: "paragraph",
+                    fontSize: "xs",
+                    lineHeight: "100%",
                     whiteSpace: "pre-wrap"
                   }}
                 >
@@ -558,9 +815,17 @@ function ReferencedIn({
   toggleExpand: () => void;
   isExpanded: boolean;
 }) {
-  const [blocks, setBlocks] = useState<
-    { id: string; links: [TextSlice, TextSlice, TextSlice][] }[]
-  >([]);
+  const referencedBlocks = usePromise(async () => {
+    const blocks = await db.notes.contentBlocksWithLinks(item.id);
+    return blocks
+      .filter((b) => b.content.includes(createInternalLink("note", noteId)))
+      .map((block) => ({
+        id: block.id,
+        links: highlightInternalLinks(block, noteId)
+      }));
+  }, [item.id, noteId]);
+  const blocks =
+    referencedBlocks.status === "fulfilled" ? referencedBlocks.value : [];
 
   return (
     <>
@@ -569,48 +834,51 @@ function ReferencedIn({
           variant="menuitem"
           sx={{
             flex: 1,
-            p: 1,
-            mx: 2,
-            borderRadius: "default",
+            p: "spacing2",
+            borderRadius: "radius1",
             textAlign: "left",
             display: "flex",
             justifyContent: "start",
             alignItems: "center",
-            gap: "small"
+            gap: "spacing3",
+            bg: isExpanded ? "background-selected" : "transparent"
           }}
           onClick={() => useEditorStore.getState().openSession(item)}
         >
           <Button
             variant="secondary"
             sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
-            onClick={async (e) => {
+            onClick={(e) => {
               e.stopPropagation();
               if (isExpanded) return toggleExpand();
-              const blocks = await db.notes.contentBlocksWithLinks(item.id);
-              setBlocks(
-                blocks
-                  .filter((b) =>
-                    b.content.includes(createInternalLink("note", noteId))
-                  )
-                  .map((block) => ({
-                    id: block.id,
-                    links: highlightInternalLinks(block, noteId)
-                  }))
-              );
               toggleExpand();
             }}
           >
-            {isExpanded ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
+            <CaretDown
+              size={11}
+              sx={{ transform: isExpanded ? undefined : "rotate(-90deg)" }}
+            />
           </Button>
-          <Text variant="body">{item.title}</Text>
+          <Text
+            sx={{
+              fontSize: "xs",
+              color: isExpanded ? "paragraph-selected" : "paragraph-primary"
+            }}
+          >
+            {item.title}
+          </Text>
+          {/* {blocks.length > 0 && (
+            <Text
+              variant="subBody"
+              sx={{ ml: "auto", color: "paragraph-secondary" }}
+            >
+              {blocks.length}
+            </Text>
+          )} */}
         </Button>
       </Flex>
       {isExpanded
-        ? blocks.map((block) => (
+        ? blocks.map((block, blockIndex) => (
             <>
               {block.links.map((link, index) => (
                 <Button
@@ -618,15 +886,18 @@ function ReferencedIn({
                   variant="menuitem"
                   sx={{
                     flex: 1,
-                    borderRadius: "default",
-                    p: 1,
-                    mx: 2,
-                    pl: 4,
+                    borderRadius: "radius1",
+                    px: "spacing7",
+                    py: "spacing3",
+                    mt: "spacing1",
                     textAlign: "left",
                     whiteSpace: "pre-wrap",
                     display: "flex",
+                    alignItems: "center",
                     flexDirection: "row",
-                    gap: 2
+                    gap: "spacing3",
+                    width: "100%",
+                    fontSize: "xs"
                   }}
                   onClick={() =>
                     useEditorStore
@@ -634,18 +905,16 @@ function ReferencedIn({
                       .openSession(item, { activeBlockId: block.id })
                   }
                 >
-                  <Text variant="subBody">{index + 1}.</Text>
-                  <Text as="div" variant="body">
+                  <Text sx={{ color: "accent" }}>{blockIndex + 1}.</Text>
+                  <Text as="div" sx={{ color: "accent" }}>
                     {link.map((slice) =>
                       slice.highlighted ? (
                         <Text
                           key={slice.text}
                           as="span"
                           sx={{
-                            color: "accent-selected",
-                            fontWeight: "bold",
-                            textDecoration:
-                              "underline solid var(--accent-selected)"
+                            color: "accent",
+                            textDecoration: "underline solid var(--accent)"
                           }}
                         >
                           {slice.text}
@@ -666,16 +935,45 @@ function ReferencedIn({
 
 function Colors({ noteId, color }: { noteId: string; color?: string }) {
   const result = usePromise(() => db.colors.all.items(), [color]);
+  const addColor = () => {
+    CreateColorDialog.show({}).then((colorId) => {
+      if (colorId) noteStore.get().setColor(colorId, false, noteId);
+    });
+  };
+
   return (
     <Flex
       sx={{
-        cursor: "pointer",
-        justifyContent: "start",
-        gap: "small"
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 0
       }}
     >
+      <Button
+        aria-label="Add color"
+        onClick={addColor}
+        variant="secondary"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 25,
+          height: 25,
+          minHeight: 25,
+          flexShrink: 0,
+          p: 0,
+          cursor: "pointer",
+          borderRadius: "radius5",
+          bg: "background-tertiary",
+          color: "paragraph",
+          zIndex: result.status === "fulfilled" ? result.value.length + 1 : 1
+        }}
+        data-test-id="properties-add-color"
+      >
+        <Plus size={12} />
+      </Button>
       {result.status === "fulfilled" &&
-        result.value.map((c) => {
+        result.value.map((c, index) => {
           const isChecked = c.id === color;
           return (
             <Flex
@@ -686,20 +984,25 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
                 cursor: "pointer",
                 position: "relative",
                 alignItems: "center",
-                justifyContent: "space-between"
+                justifyContent: "center",
+                width: 25,
+                height: 25,
+                flexShrink: 0,
+                ml: "-8px",
+                zIndex: result.value.length - index
               }}
               data-test-id={`properties-${c.title}`}
             >
-              <Circle
+              <Ellipse
                 size={25}
                 color={c.colorCode}
                 data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}
               />
               {isChecked && (
                 <Checkmark
-                  color="white"
-                  size={18}
-                  sx={{ position: "absolute", left: "4px" }}
+                  color="paragraph"
+                  size={12}
+                  sx={{ position: "absolute" }}
                 />
               )}
             </Flex>
@@ -709,10 +1012,65 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
   );
 }
 
+function Tags({ noteId }: { noteId: string }) {
+  const result = usePromise(
+    async () =>
+      await db.relations
+        .to({ id: noteId, type: "note" }, "tag")
+        .selector.sorted(db.settings.getGroupOptions("tags")),
+    [noteId]
+  );
+
+  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
+
+  return (
+    <Section
+      title={strings.dataTypesPluralCamelCase.tag()}
+      sx={{
+        borderTop: "1px solid var(--separator)",
+        mt: "spacing4",
+        pt: "spacing4"
+      }}
+    >
+      <Flex sx={{ flexWrap: "wrap", gap: "spacing3" }}>
+        {result.value.placeholders.map((_, index) => (
+          <ResolvedItem
+            key={result.value.key(index)}
+            index={index}
+            items={result.value}
+            type="tag"
+          >
+            {({ item }) => (
+              <IconTag
+                icon={Tag}
+                iconSize={11}
+                text={item.title}
+                onClick={() => {
+                  appStore.get().setNavigationTab("tags");
+                  navigate(`/tags/${item.id}`);
+                }}
+                menuItems={() => tagMenuItems(item)}
+                styles={{
+                  container: {
+                    bg: "background-tertiary",
+                    px: "spacing3",
+                    py: "spacing2",
+                    ":hover": { bg: "hover" }
+                  }
+                }}
+              />
+            )}
+          </ResolvedItem>
+        ))}
+      </Flex>
+    </Section>
+  );
+}
+
 function Notebooks({ noteId }: { noteId: string }) {
   const result = usePromise(
-    () =>
-      db.relations
+    async () =>
+      await db.relations
         .to({ id: noteId, type: "note" }, "notebook")
         .selector.sorted(db.settings.getGroupOptions("notebooks")),
     [noteId]
@@ -723,9 +1081,44 @@ function Notebooks({ noteId }: { noteId: string }) {
   return (
     <Section
       title={strings.notebooks()}
-      sx={{ borderTop: "1px solid var(--border)" }}
+      sx={{
+        borderTop: "1px solid var(--separator)",
+        mt: "spacing4",
+        pt: "spacing4"
+      }}
     >
-      <VirtualizedList
+      <Flex sx={{ flexWrap: "wrap", gap: "spacing3" }}>
+        {result.value.placeholders.map((_, index) => (
+          <ResolvedItem
+            key={result.value.key(index)}
+            index={index}
+            items={result.value}
+            type="notebook"
+          >
+            {({ item }) => (
+              <IconTag
+                icon={Notebook}
+                iconSize={11}
+                text={item.title}
+                onClick={() => {
+                  appStore.get().setNavigationTab("notebooks");
+                  navigate(`/notebooks/${item.id}`);
+                }}
+                menuItems={() => notebookMenuItems(item)}
+                styles={{
+                  container: {
+                    bg: "background-tertiary",
+                    px: "spacing3",
+                    py: "spacing2",
+                    ":hover": { bg: "hover" }
+                  }
+                }}
+              />
+            )}
+          </ResolvedItem>
+        ))}
+      </Flex>
+      {/* <VirtualizedList
         style={{ marginTop: 5 }}
         mode="fixed"
         estimatedSize={25}
@@ -738,7 +1131,7 @@ function Notebooks({ noteId }: { noteId: string }) {
             )}
           </ResolvedItem>
         )}
-      />
+      /> */}
     </Section>
   );
 }
@@ -755,8 +1148,8 @@ function Reminders({ noteId }: { noteId: string }) {
 
   return (
     <Section
-      sx={{ borderTop: "1px solid var(--border)" }}
       title={strings.dataTypesPluralCamelCase.reminder()}
+      sx={{ px: "spacing4" }}
     >
       <VirtualizedList
         mode="fixed"
@@ -776,6 +1169,8 @@ function Reminders({ noteId }: { noteId: string }) {
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
+  const { theme } = useThemeUI();
+  const itemGap = (theme as Theme).space?.spacing1;
   const nonce = useAttachmentStore((store) => store.nonce);
   const result = usePromise(
     () =>
@@ -785,38 +1180,43 @@ function Attachments({ noteId }: { noteId: string }) {
     [noteId, nonce]
   );
 
-  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
+  // if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section
       title={strings.dataTypesPluralCamelCase.attachment()}
-      sx={{ borderTop: "1px solid var(--border)", mt: 1 }}
+      sx={{ px: "spacing4" }}
     >
-      <VirtualizedTable
-        estimatedSize={25}
-        getItemKey={(index) => result.value.key(index)}
-        items={result.value.placeholders}
-        style={{
-          tableLayout: "fixed",
-          width: "100%"
-        }}
-        header={
-          <tr>
-            <th style={{ width: "75%" }} />
-            <th style={{ width: "5%" }} />
-            <th style={{ width: "20%" }} />
-          </tr>
-        }
-        renderRow={({ index }) => (
-          <ResolvedItem index={index} type="attachment" items={result.value}>
-            {({ item }) => <ListItemWrapper item={item} compact />}
-          </ResolvedItem>
-        )}
-      />
+      {result.status !== "fulfilled" || result.value.length <= 0 ? (
+        <Text
+          sx={{
+            color: "paragraph-secondary",
+            fontSize: "xs",
+            lineHeight: "100%"
+          }}
+        >
+          No attached files here.
+        </Text>
+      ) : (
+        <VirtualizedList
+          mode="fixed"
+          estimatedSize={23}
+          itemGap={itemGap}
+          getItemKey={(index) => result.value.key(index)}
+          items={result.value.placeholders}
+          renderItem={({ index }) => (
+            <ResolvedItem index={index} type="attachment" items={result.value}>
+              {({ item }) => <ListItemWrapper item={item} compact />}
+            </ResolvedItem>
+          )}
+        />
+      )}
     </Section>
   );
 }
 function SessionHistory({ noteId }: { noteId: string }) {
+  const { theme } = useThemeUI();
+  const itemGap = (theme as Theme).space?.spacing1;
   const result = usePromise(
     () =>
       db.noteHistory
@@ -824,28 +1224,53 @@ function SessionHistory({ noteId }: { noteId: string }) {
         .sorted({ sortBy: "dateModified", sortDirection: "desc" }),
     [noteId]
   );
-  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
 
   return (
     <Section
       sx={{
-        borderTop: "1px solid var(--border)"
+        px: "spacing4"
       }}
       title={strings.noteHistory()}
-      subtitle={strings.noteHistoryNotice[0]()}
+      headerAction={
+        <Text
+          sx={{
+            px: "spacing2",
+            py: "spacing1",
+            borderRadius: "radius1",
+            bg: "background-tertiary",
+            color: "heading",
+            fontSize: "3xs",
+            lineHeight: 1
+          }}
+        >
+          Local only
+        </Text>
+      }
     >
-      <VirtualizedList
-        mode="dynamic"
-        estimatedSize={28}
-        style={{ marginLeft: 10, marginRight: 10, marginTop: 5 }}
-        getItemKey={(index) => result.value.key(index)}
-        items={result.value.placeholders}
-        renderItem={({ index }) => (
-          <ResolvedItem type="session" index={index} items={result.value}>
-            {({ item }) => <SessionItem noteId={noteId} session={item} />}
-          </ResolvedItem>
-        )}
-      />
+      {result.status !== "fulfilled" || result.value.length <= 0 ? (
+        <Text
+          sx={{
+            color: "paragraph-secondary",
+            fontSize: "xs",
+            lineHeight: "100%"
+          }}
+        >
+          No history items.
+        </Text>
+      ) : (
+        <VirtualizedList
+          mode="dynamic"
+          estimatedSize={28}
+          itemGap={itemGap}
+          getItemKey={(index) => result.value.key(index)}
+          items={result.value.placeholders}
+          renderItem={({ index }) => (
+            <ResolvedItem type="session" index={index} items={result.value}>
+              {({ item }) => <SessionItem noteId={noteId} session={item} />}
+            </ResolvedItem>
+          )}
+        />
+      )}
     </Section>
   );
 }
@@ -853,10 +1278,12 @@ function SessionHistory({ noteId }: { noteId: string }) {
 type SectionProps = {
   title?: string;
   subtitle?: string;
+  headerAction?: React.ReactNode;
 } & FlexProps;
 export function Section({
   title,
   subtitle,
+  headerAction,
   children,
   sx,
   ...otherProps
@@ -872,20 +1299,35 @@ export function Section({
       }}
       {...otherProps}
     >
-      {title || subtitle ? (
+      {title || subtitle || headerAction ? (
         <Flex
           sx={{
-            flexDirection: "column",
-            borderBottom: "1px solid var(--border)",
-            p: 2
+            ...(headerAction
+              ? {
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }
+              : { flexDirection: "column" }),
+            pb: "spacing4"
           }}
         >
-          {title && (
-            <Text variant="subBody" sx={{ fontWeight: "medium" }}>
-              {title.toUpperCase()}
-            </Text>
-          )}
-          {subtitle && <Text variant="subBody">{subtitle}</Text>}
+          <Flex sx={{ flexDirection: "column" }}>
+            {title && (
+              <Text
+                sx={{
+                  fontSize: "3xs",
+                  color: "heading-secondary",
+                  fontWeight: 500,
+                  letterSpacing: "0.33px",
+                  lineHeight: 1
+                }}
+              >
+                {title.toUpperCase()}
+              </Text>
+            )}
+            {subtitle && <Text variant="subBody">{subtitle}</Text>}
+          </Flex>
+          {headerAction}
         </Flex>
       ) : null}
       {children}
