@@ -62,6 +62,8 @@ export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
   const virtualizer = useVirtualizer({
     count: items.length,
     estimateSize: () => estimatedSize + (itemGap || 0),
+    measureElement: (element) =>
+      element.getBoundingClientRect().height + (itemGap || 0),
     getItemKey: (index) => getItemKey(index, items),
     getScrollElement: () =>
       scrollElement || containerRef.current?.closest(".ms-container") || null,
@@ -83,8 +85,7 @@ export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
         sx={{
           height: virtualizer.getTotalSize(),
           width: "100%",
-          position: "relative",
-          gap: itemGap
+          position: "relative"
         }}
         data-test-id="virtualized-list"
       >
