@@ -22,10 +22,7 @@ import { initLocale as initIntlLocale } from "@notesnook/intl";
 
 export async function initLocale() {
   const desktopLocale =
-    typeof window !== "undefined" &&
-    typeof (window as any).appLocale === "function"
-      ? (window as any).appLocale()
-      : undefined;
+    typeof window.appLocale === "function" ? window.appLocale() : undefined;
   const navLang =
     desktopLocale ||
     (typeof navigator !== "undefined" ? navigator.language : undefined);
