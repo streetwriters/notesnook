@@ -21,11 +21,14 @@ import Config from "../utils/config";
 import { initLocale as initIntlLocale } from "@notesnook/intl";
 
 export async function initLocale() {
+  const desktopLocale =
+    typeof window.appLocale === "function" ? window.appLocale() : undefined;
+  const navLang =
+    desktopLocale ||
+    (typeof navigator !== "undefined" ? navigator.language : undefined);
+
   return initIntlLocale({
     getSavedLocale: () => Config.get<string>("appLanguage", ""),
-    onSaveLocale: (locale) => {
-      Config.set("appLanguage", locale);
-    },
-    systemLocale: navigator.language ?? "en"
+    systemLocale: navLang ?? "en"
   });
 }
