@@ -35,6 +35,7 @@ import {
 import {
   getRoot,
   isReactNative,
+  logger,
   post,
   postAsyncWithTimeout,
   saveTheme
@@ -101,7 +102,7 @@ export type EditorController = {
   passwordInputRef: MutableRefObject<HTMLInputElement | null>;
   focusPassInput: () => void;
   blurPassInput: () => void;
-  scrollToSearchResult: (index: number) => void;
+  scrollToSearchResult: (target: number | string) => void;
   getContentDiv: () => HTMLElement | null;
 };
 export function useEditorController({
@@ -114,7 +115,7 @@ export function useEditorController({
   update: (
     scrollTop?: number,
     selection?: { to: number; from: number },
-    searchResultIndex?: number
+    searchResultIndex?: number | string
   ) => void;
   getTableOfContents: () => any[];
   scrollTo: (top: number) => void;
@@ -477,18 +478,22 @@ export function useEditorController({
     });
   };
 
-  const scrollToSearchResult = useCallback((index: number) => {
-    const marks = document.getElementsByTagName("nn-search-result");
-    if (marks.length > index) {
-      const mark = marks[index];
-      if (mark) {
-        mark.scrollIntoView({
-          behavior: "instant",
-          block: "start"
-        });
-      }
-    }
-  }, []);
+  const scrollToSearchResult = useCallback(
+    (target: number | string) => {
+      getContentDiv()?.classList.add("searching");
+      const mark =
+        typeof target === "string"
+          ? document.getElementById(target) ||
+            document.querySelector(`nn-search-result#${target}`)
+          : document.getElementsByTagName("nn-search-result")[target];
+
+      mark?.scrollIntoView({
+        behavior: "instant",
+        block: "start"
+      });
+    },
+    [getContentDiv]
+  );
 
   return {
     getTableOfContents: getTableOfContents,

@@ -277,7 +277,7 @@ const Tiptap = ({
     (
       scrollTop?: number,
       selection?: { to: number; from: number },
-      searchResultIndex?: number
+      searchResultIndex?: number | string
     ) => {
       setTick((tick) => tick + 1);
       globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(

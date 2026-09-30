@@ -197,7 +197,7 @@ globalThis.commands = {
   scrollIntoViewById: (id: string, tabId: string) => {
     return editorControllers[tabId]?.scrollIntoView(id) || [];
   },
-  scrollToSearchResult: (index: number, tabId: string) => {
+  scrollToSearchResult: (index: number | string, tabId: string) => {
     editorControllers[tabId]?.getContentDiv()?.classList.add("searching");
     editorControllers[tabId]?.scrollToSearchResult(index);
   }
