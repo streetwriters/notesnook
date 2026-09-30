@@ -43,7 +43,7 @@ export const SearchResult = (props: SearchResultProps) => {
     (state) => state.settings.searchListMode === "compact"
   );
 
-  const openNote = async (index?: number) => {
+  const openNote = async (target?: number | string) => {
     const note = await db.notes.note(props.item.id);
     eSendEvent(eOnLoadNote, {
       item: {
@@ -55,7 +55,7 @@ export const SearchResult = (props: SearchResultProps) => {
             }
           : undefined
       },
-      searchResultIndex: index
+      searchResultIndex: target
     });
     fluidTabsRef.current?.goToPage("editor");
   };
@@ -159,7 +159,8 @@ export const SearchResult = (props: SearchResultProps) => {
               for (let i = 0; i < index; i++) {
                 activeIndex += props.item.content[i].length;
               }
-              openNote(activeIndex);
+              const target = content[0]?.id ?? activeIndex;
+              openNote(target);
             }}
           >
             <Paragraph>
