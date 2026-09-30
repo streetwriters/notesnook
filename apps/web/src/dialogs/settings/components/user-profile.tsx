@@ -255,9 +255,9 @@ export function UserProfile({ minimal }: Props) {
               <Text variant="subBody" sx={{ flexShrink: 0 }}>
                 {formatBytes(user.storageUsed || 0)}/
                 {user.totalStorage === -1
-                  ? "Unlimited"
+                  ? strings.unlimited()
                   : formatBytes(user.totalStorage)}{" "}
-                used
+                {strings.used()}
               </Text>
             </Flex>
           ) : null}

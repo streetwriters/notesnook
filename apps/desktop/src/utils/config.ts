@@ -55,7 +55,8 @@ export const config = {
   backgroundColor: nativeTheme.themeSource === "dark" ? "#0f0f0f" : "#ffffff",
   windowControlsIconColor:
     nativeTheme.themeSource === "dark" ? "#ffffff" : "#000000",
-  backupDirectory: PATHS.backupsDirectory
+  backupDirectory: PATHS.backupsDirectory,
+  appLanguage: ""
 };
 
 type ConfigKey = keyof typeof config;

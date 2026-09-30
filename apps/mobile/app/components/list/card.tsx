@@ -22,6 +22,7 @@ import React from "react";
 import { Dimensions, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Message, useMessageStore } from "../../stores/use-message-store";
+import { getMessageById } from "../../services/message";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { Pressable } from "../ui/pressable";
@@ -41,8 +42,12 @@ export const Card = ({
   );
   const announcements = useMessageStore((state) => state.announcements);
   const fontScale = Dimensions.get("window").fontScale;
+  const localizedMessage =
+    customMessage ||
+    getMessageById(messageBoardState.id, (messageBoardState as Message).data);
 
   return !messageBoardState.visible ||
+    !localizedMessage ||
     (announcements && announcements.length) ? null : (
     <View
       style={{
@@ -52,7 +57,7 @@ export const Card = ({
       }}
     >
       <Pressable
-        onPress={messageBoardState.onPress}
+        onPress={localizedMessage.onPress}
         type="plain"
         style={{
           paddingVertical: DefaultAppStyles.GAP_VERTICAL,
@@ -81,31 +86,32 @@ export const Card = ({
             <Icon
               size={AppFontSize.xxxl}
               color={
-                messageBoardState.type === "error" ? colors.error.icon : color
+                localizedMessage.type === "error" ? colors.error.icon : color
               }
               allowFontScaling
-              name={messageBoardState.icon}
+              name={localizedMessage.icon}
             />
           </View>
 
           <View
             style={{
+              flex: 1,
               marginLeft: 10,
               marginRight: 10
             }}
           >
             <Paragraph
               style={{
-                flexWrap: "nowrap",
+                flexWrap: "wrap",
                 flexShrink: 1
               }}
               size={AppFontSize.sm}
               color={colors.primary.heading}
             >
-              {messageBoardState.actionText}
+              {localizedMessage.actionText}
             </Paragraph>
             <Paragraph color={colors.secondary.paragraph} size={AppFontSize.xs}>
-              {messageBoardState.message}
+              {localizedMessage.message}
             </Paragraph>
           </View>
         </View>

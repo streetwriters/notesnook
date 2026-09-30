@@ -428,15 +428,16 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                 borderRadius: defaultBorderRadius
               }}
             >
-              <View
+              <ScrollView
                 style={{
                   flexDirection: "row",
                   marginBottom:
                     recurringMode === "day" || recurringMode === "year"
                       ? 0
-                      : 12,
-                  alignItems: "center"
+                      : 12
                 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
               >
                 {Object.keys(RecurringModes).map((mode) => (
                   <Button
@@ -466,7 +467,7 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
                     }}
                   />
                 ))}
-              </View>
+              </ScrollView>
 
               <ScrollView showsHorizontalScrollIndicator={false} horizontal>
                 {recurringMode === RecurringModes.Daily ||

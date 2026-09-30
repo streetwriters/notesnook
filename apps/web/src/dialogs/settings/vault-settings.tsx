@@ -62,14 +62,54 @@ export const VaultSettings: SettingsGroup[] = [
           {
             type: "dropdown",
             options: [
-              { title: "1 minute", value: 1000 * 60 * 1 },
-              { title: "5 minutes", value: 1000 * 60 * 5 },
-              { title: "10 minutes", value: 1000 * 60 * 10 },
-              { title: "15 minutes", value: 1000 * 60 * 15 },
-              { title: "30 minutes", value: 1000 * 60 * 30 },
-              { title: "45 minutes", value: 1000 * 60 * 45 },
-              { title: "1 hour", value: 1000 * 60 * 60 },
-              { title: "Never", value: -1 }
+              {
+                get title() {
+                  return strings.minutes(1);
+                },
+                value: 1000 * 60 * 1
+              },
+              {
+                get title() {
+                  return strings.minutes(5);
+                },
+                value: 1000 * 60 * 5
+              },
+              {
+                get title() {
+                  return strings.minutes(10);
+                },
+                value: 1000 * 60 * 10
+              },
+              {
+                get title() {
+                  return strings.minutes(15);
+                },
+                value: 1000 * 60 * 15
+              },
+              {
+                get title() {
+                  return strings.minutes(30);
+                },
+                value: 1000 * 60 * 30
+              },
+              {
+                get title() {
+                  return strings.minutes(45);
+                },
+                value: 1000 * 60 * 45
+              },
+              {
+                get title() {
+                  return strings.hours(1);
+                },
+                value: 1000 * 60 * 60
+              },
+              {
+                get title() {
+                  return strings.never();
+                },
+                value: -1
+              }
             ],
             onSelectionChanged: async (value) => {
               await useAppStore.getState().setVaultLockAfter(parseInt(value));

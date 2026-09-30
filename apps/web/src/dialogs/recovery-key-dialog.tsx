@@ -40,7 +40,7 @@ export const RecoveryKeyDialog = DialogManager.register(
     const key = usePromise(() =>
       db.user.getMasterKey().then((key) => key?.key)
     );
-    const [copyText, setCopyText] = useState("Copy to clipboard");
+    const [copied, setCopied] = useState(false);
 
     return (
       <Dialog
@@ -105,9 +105,9 @@ export const RecoveryKeyDialog = DialogManager.register(
 
                       writeText(key.value)
                         .then(() => {
-                          setCopyText("Copied!");
+                          setCopied(true);
                           setTimeout(() => {
-                            setCopyText("Copy to clipboard");
+                            setCopied(false);
                           }, 2000);
                         })
                         .catch((e) => {
@@ -116,7 +116,7 @@ export const RecoveryKeyDialog = DialogManager.register(
                     }}
                     sx={{ fontSize: "body" }}
                   >
-                    {copyText}
+                    {copied ? strings.copied() : strings.copyToClipboard()}
                   </Button>
                   <Button
                     variant="secondary"

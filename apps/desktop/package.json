@@ -38,7 +38,6 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@lingui/core": "5.1.2",
     "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/ui": "file:../../packages/ui",
     "@trpc/client": "10.45.2",

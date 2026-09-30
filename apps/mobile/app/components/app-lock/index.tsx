@@ -133,7 +133,7 @@ const AppLocked = () => {
     useSettingStore.getState().setRequestBiometrics(true);
 
     const unlocked = await BiometricService.validateUser(
-      "Unlock to access your notes",
+      strings.unlockToAccessNotes(),
       ""
     );
     if (unlocked) {

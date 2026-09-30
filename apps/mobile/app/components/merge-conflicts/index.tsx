@@ -175,7 +175,7 @@ const MergeConflicts = () => {
               inputPlaceholder: strings.enterPassword(),
               title: strings.unlockIncomingNote(),
               paragraph: strings.unlockIncomingNoteDesc(),
-              positiveText: "Unlock",
+              positiveText: strings.unlock(),
               positivePress: async (password) => {
                 try {
                   noteContent = {

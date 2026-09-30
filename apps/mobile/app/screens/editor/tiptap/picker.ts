@@ -95,7 +95,7 @@ const file = async (fileOptions: PickerOptions) => {
     if (fileCopyUri.status === "error") {
       ToastManager.show({
         heading: strings.failToOpen(),
-        message: "Error copying file",
+        message: strings.errorCopyingFile(),
         type: "error",
         context: "global"
       });
@@ -116,7 +116,7 @@ const file = async (fileOptions: PickerOptions) => {
         fileOptions
       ))
     ) {
-      throw new Error("Failed to attach file");
+      throw new Error(strings.failedToAttachFile());
     }
 
     RNFetchBlob.fs.unlink(dirname(fileCopyUri.localUri)).catch((e) => {

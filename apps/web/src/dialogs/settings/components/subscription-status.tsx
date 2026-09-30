@@ -44,13 +44,13 @@ export function SubscriptionStatus() {
     title === "Free"
       ? ""
       : trial
-      ? `Your free trial is on-going. Your subscription will start on ${trialExpiryDate}.`
+      ? strings.trialOngoingStartsOn(trialExpiryDate || "")
       : user?.subscription.provider === SubscriptionProvider.GIFT_CARD
-      ? `Your subscription will expire on ${expiryDate}.`
+      ? strings.subExpiresOn(expiryDate || "")
       : autoRenew
-      ? `Your subscription will auto renew on ${expiryDate}.`
+      ? strings.subAutoRenewsOn(expiryDate || "")
       : expiryDate
-      ? `Your account will automatically downgrade to the Free plan on ${expiryDate}.`
+      ? strings.accountDowngradesFreeOn(expiryDate)
       : "";
 
   if (!user) return null;
@@ -110,12 +110,12 @@ export function SubscriptionStatus() {
                   {feature.id === "storage"
                     ? `${formatBytes(feature.used)}/${
                         feature.total === Infinity
-                          ? "Unlimited"
+                          ? strings.unlimited()
                           : formatBytes(feature.total)
                       }`
                     : feature.total === Infinity
-                    ? "Unlimited"
-                    : `${feature.used} of ${feature.total}`}
+                    ? strings.unlimited()
+                    : strings.countOfTotal(feature.used, feature.total)}
                 </Text>
               </>
             ))}

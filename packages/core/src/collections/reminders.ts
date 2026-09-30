@@ -30,6 +30,7 @@ import Database from "../api/index.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
+import { strings } from "@notesnook/intl";
 
 dayjs.extend(isTomorrow);
 dayjs.extend(isSameOrBefore);
@@ -132,16 +133,16 @@ export function formatReminderTime(
 ) {
   const { date } = reminder;
   let time = date;
-  let tag = "";
-  let text = "";
 
-  if (reminder.mode === "permanent") return `Ongoing`;
+  if (reminder.mode === "permanent") return strings.ongoing();
 
   if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
-    return `Snoozed until ${formatDate(reminder.snoozeUntil, {
-      timeFormat: options.timeFormat,
-      type: "time"
-    })}`;
+    return strings.snoozedUntil(
+      formatDate(reminder.snoozeUntil, {
+        timeFormat: options.timeFormat,
+        type: "time"
+      })
+    );
   }
 
   if (reminder.mode === "repeat") {
@@ -159,23 +160,26 @@ export function formatReminderTime(
     type: "date-time"
   });
 
+  let isPast = false;
+  let text = "";
+
   if (dayjs(time).isTomorrow()) {
-    tag = "Upcoming";
-    text = `Tomorrow, ${formattedTime}`;
+    isPast = false;
+    text = strings.reminderTomorrow(formattedTime);
   } else if (dayjs(time).isYesterday()) {
-    tag = "Last";
-    text = `Yesterday, ${formattedTime}`;
+    isPast = true;
+    text = strings.reminderYesterday(formattedTime);
   } else {
-    const isPast = dayjs(time).isSameOrBefore(dayjs());
-    tag = isPast ? "Last" : "Upcoming";
+    isPast = dayjs(time).isSameOrBefore(dayjs());
     if (dayjs(time).isToday()) {
-      text = `Today, ${formattedTime}`;
+      text = strings.reminderToday(formattedTime);
     } else {
       text = formattedDateTime;
     }
   }
 
-  return short ? text : `${tag}: ${text}`;
+  if (short) return text;
+  return isPast ? strings.reminderLast(text) : strings.reminderUpcoming(text);
 }
 
 export function isReminderToday(reminder: Reminder) {

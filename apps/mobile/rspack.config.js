@@ -109,7 +109,6 @@ module.exports = (env) => {
         "@mdi/js": path.join(__dirname, "node_modules/@mdi/js/mdi.js"),
         katex: path.join(__dirname, "node_modules/katex"),
         tinycolor2: path.join(__dirname, "node_modules/tinycolor2"),
-        "@lingui/core": path.join(__dirname, "node_modules/@lingui/core"),
         "@swc/helpers": path.join(__dirname, "node_modules/@swc/helpers"),
         "@messageformat/parser": path.join(
           __dirname,

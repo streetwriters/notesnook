@@ -529,14 +529,14 @@ type InboxItemHistoryErrorContextBase = {
 
 export type InboxItemsHistoryErrorContext =
   | (InboxItemHistoryErrorContextBase & {
-      message: "Decryption failed";
+      message: string;
     })
   | (InboxItemHistoryErrorContextBase & {
-      message: "Invalid JSON";
+      message: string;
       decryptedItem: string;
     })
   | (InboxItemHistoryErrorContextBase & {
-      message: "Validation failed";
+      message: string;
       parsedItem: Record<string, unknown>;
     });
 

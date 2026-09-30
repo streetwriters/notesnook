@@ -27,6 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { SidebarScroller } from "../components/sidebar-scroller";
+import { strings } from "@notesnook/intl";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
@@ -72,7 +73,7 @@ function Tags() {
       <Input
         ref={inputRef}
         variant="clean"
-        placeholder="Filter tags..."
+        placeholder={strings.filterTags()}
         sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
         onChange={debounce(async (e) => {
           const query = e.target.value.trim();

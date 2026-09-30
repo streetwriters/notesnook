@@ -16,8 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
 import {
   ScopedThemeProvider,
   THEME_COMPATIBILITY_VERSION,
@@ -144,11 +142,11 @@ export const withTheme = (
             if (theme) {
               theme.colorScheme === "dark"
                 ? useThemeStore.setState({
-                    darkTheme: theme
-                  })
+                  darkTheme: theme
+                })
                 : useThemeStore.setState({
-                    lightTheme: theme
-                  });
+                  lightTheme: theme
+                });
             }
           })
           .catch(() => {
@@ -179,11 +177,7 @@ export const withTheme = (
       }
     }, [colorScheme, darkTheme, lightTheme]);
 
-    return (
-      <I18nProvider i18n={i18n}>
-        <Element {...props} />
-      </I18nProvider>
-    );
+    return <Element {...props} />;
   };
 };
 

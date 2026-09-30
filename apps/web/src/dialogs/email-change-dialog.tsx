@@ -96,7 +96,7 @@ export const EmailChangeDialog = DialogManager.register(
 
               if (emailChangeState) {
                 if (!code || code.length < 6) {
-                  setError("Please enter a valid verification code.");
+                  setError(strings.enterSixDigitCode());
                   return;
                 }
 
@@ -113,7 +113,7 @@ export const EmailChangeDialog = DialogManager.register(
               if (!newEmail.trim() || !password.trim()) return;
 
               if (!password || !(await db.user.verifyPassword(password))) {
-                setError("Password is not correct.");
+                setError(strings.passwordIncorrect());
                 return;
               }
 

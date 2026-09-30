@@ -54,7 +54,8 @@ const DialogButtons = ({
         styles.container,
         {
           backgroundColor: colors.secondary.background,
-          height: 60,
+          minHeight: 60,
+          paddingVertical: 10,
           paddingHorizontal: DefaultAppStyles.GAP,
           borderTopWidth: 0.7,
           borderTopColor: getColorLinearShade(
@@ -69,7 +70,8 @@ const DialogButtons = ({
         <View
           style={{
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            flexShrink: 1
           }}
         >
           <Icon
@@ -88,12 +90,7 @@ const DialogButtons = ({
         <View />
       )}
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center"
-        }}
-      >
+      <View style={styles.buttonRow}>
         <Button
           onPress={onPressNegative}
           fontSize={AppFontSize.sm}
@@ -101,6 +98,7 @@ const DialogButtons = ({
           type="plain"
           bold
           title={negativeTitle}
+          style={{ flexShrink: 1 }}
         />
         {onPressPositive ? (
           <Button
@@ -108,7 +106,8 @@ const DialogButtons = ({
             fontSize={AppFontSize.sm}
             testID={notesnook.ids.default.dialog.yes}
             style={{
-              marginLeft: 10
+              marginLeft: 10,
+              flexShrink: 1
             }}
             bold
             type={positiveType || "transparent"}
@@ -128,5 +127,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     marginTop: DefaultAppStyles.GAP_VERTICAL
+  },
+  buttonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexShrink: 1,
+    justifyContent: "flex-end",
+    minWidth: 0
   }
 });

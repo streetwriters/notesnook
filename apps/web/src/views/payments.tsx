@@ -25,6 +25,7 @@ import { CheckoutEventNames, initializePaddle } from "@paddle/paddle-js";
 import { CLIENT_PADDLE_TOKEN } from "../dialogs/buy-dialog/paddle";
 import { Loader } from "../components/loader";
 import { IS_DEV } from "../dialogs/buy-dialog/helpers";
+import { strings } from "@notesnook/intl";
 
 function Payments() {
   const [{ _ptxn, priceId, email, quantity }] = useQueryParams();
@@ -84,7 +85,7 @@ function Payments() {
         justifyContent: "center"
       }}
     >
-      <Loader title="Loading" />
+      <Loader title={strings.loading()} />
     </Flex>
   ) : null;
 }

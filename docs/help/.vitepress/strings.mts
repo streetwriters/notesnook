@@ -16,8 +16,7 @@
  */
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { i18n } from "@lingui/core";
-import { strings, setI18nGlobal } from "@notesnook/intl";
+import { strings, setI18nGlobal, i18n } from "@notesnook/intl";
 
 const require = createRequire(import.meta.url);
 
@@ -38,8 +37,8 @@ const cache = new Map<string, string>();
  * A few catalogue entries are plural forms that take a count — quote those as
  * `{{notebooks:2}}` and the number is passed through.
  */
-export function resolveString(key: string, count?: number): string {
-  const cacheKey = count === undefined ? key : `${key}:${count}`;
+export function resolveString(key: string, param?: unknown): string {
+  const cacheKey = param === undefined ? key : `${key}:${param}`;
   const cached = cache.get(cacheKey);
   if (cached !== undefined) return cached;
 
@@ -53,9 +52,9 @@ export function resolveString(key: string, count?: number): string {
   let value: unknown;
   try {
     value =
-      count === undefined
+      param === undefined
         ? (entry as () => unknown)()
-        : (entry as (n: number) => unknown)(count);
+        : (entry as (n: unknown) => unknown)(param as unknown);
   } catch {
     throw new Error(
       `UI string "${key}" needs arguments. If it is a plural, quote it as ` +
@@ -94,7 +93,7 @@ export function buildReverseIndex(): Map<string, string[]> {
 /** Every key used across the docs this build, for reporting. */
 export const usedKeys = new Set<string>();
 
-const TOKEN = /\{\{\s*([A-Za-z][A-Za-z0-9_]*)(?::(\d+))?\s*\}\}/g;
+const TOKEN = /\{\{\s*([A-Za-z][A-Za-z0-9_]*)(?::(.+))?\s*\}\}/g;
 
 /**
  * markdown-it rule: swap `{{key}}` for the live string while parsing, so the
@@ -102,11 +101,16 @@ const TOKEN = /\{\{\s*([A-Za-z][A-Za-z0-9_]*)(?::(\d+))?\s*\}\}/g;
  */
 export function stringsMarkdownPlugin(md: any) {
   md.core.ruler.push("nn_ui_strings", (state: any) => {
-    const where = state.env?.relativePath ? ` in ${state.env.relativePath}` : "";
+    const where = state.env?.relativePath
+      ? ` in ${state.env.relativePath}`
+      : "";
     const swap = (text: string) =>
-      text.replace(TOKEN, (_match: string, key: string, count?: string) => {
+      text.replace(TOKEN, (_match: string, key: string, param?: string) => {
         try {
-          const value = resolveString(key, count ? Number(count) : undefined);
+          const value = resolveString(
+            key,
+            isNaN(Number(param)) ? param : Number(param)
+          );
           usedKeys.add(key);
           return value;
         } catch (error) {

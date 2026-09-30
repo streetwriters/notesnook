@@ -665,10 +665,10 @@ export function Editor(props: EditorProps) {
           if (autoSaveToast.show === false) return;
           const { hide } = showToast(
             "error",
-            "Auto-save is disabled for large notes. Press Ctrl + S to save.",
+            strings.autoSaveDisabledForLargeNotes(),
             [
               {
-                text: "Dismiss",
+                text: strings.dismiss(),
                 onClick: () => {
                   hide();
                 }

@@ -89,7 +89,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
               borderRadius: "default"
             }}
           >
-            Failed to download image: {error.toLowerCase()}.
+            {strings.failedToDownloadImage(error.toLowerCase())}
           </Text>
         ) : (
           <Text
@@ -102,8 +102,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
               borderRadius: "default"
             }}
           >
-            To protect your privacy, we will download the image &amp; add it to
-            your attachments.
+            {strings.imagePrivacyNotice()}
           </Text>
         )}
       </Flex>

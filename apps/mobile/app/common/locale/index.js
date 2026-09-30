@@ -17,11 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @type {import('@lingui/conf').LinguiConfig} */
+import { initLocaleSync } from "@notesnook/intl";
+import SettingsService from "../../services/settings";
+import * as RNLocalize from "react-native-localize";
 
-module.exports = {
-  locales: ["en", "cs", "fr"],
-  sourceLocale: "en",
-  format: "po",
-  compileNamespace: "ts"
-};
+export function initLocale() {
+  return initLocaleSync({
+    getSavedLocale: () => SettingsService.getProperty("appLanguage"),
+    systemLocale: RNLocalize.getLocales()[0]?.languageTag ?? "en"
+  });
+}
+

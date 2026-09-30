@@ -129,7 +129,7 @@ const ExportNotesSheet = ({
       id: notesnook.ids.dialogs.export.md
     },
     {
-      title: "Markdown + Frontmatter",
+      title: strings.markdownFrontmatter(),
       func: async () => {
         await exportNoteAs("md-frontmatter");
       },
@@ -137,7 +137,7 @@ const ExportNotesSheet = ({
       id: notesnook.ids.dialogs.export.md
     },
     {
-      title: "Plain Text",
+      title: strings.plainText(),
       func: async () => {
         await exportNoteAs("txt");
       },
