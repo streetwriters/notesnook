@@ -328,8 +328,6 @@ import CloseSvg from "@notesnook/icons/close.svg?react";
 import SquaresFourSvg from "@notesnook/icons/squares-four.svg?react";
 import TableSvg from "@notesnook/icons/table.svg?react";
 import SpellCheckSvg from "@notesnook/icons/spellcheck.svg?react";
-import LeftPanelCloseSvg from "@notesnook/icons/left-panel-close.svg?react";
-import LeftPanelOpenSvg from "@notesnook/icons/left-panel-open.svg?react";
 import CircleNotchSvg from "@notesnook/icons/circle-notch.svg?react";
 
 type MDIIconWrapperProps = {
@@ -798,6 +796,4 @@ export const Close = createSvgIcon(CloseSvg);
 export const SquaresFour = createSvgIcon(SquaresFourSvg);
 export const Table = createSvgIcon(TableSvg);
 export const SpellCheck = createSvgIcon(SpellCheckSvg);
-export const LeftPanelClose = createSvgIcon(LeftPanelCloseSvg);
-export const LeftPanelOpen = createSvgIcon(LeftPanelOpenSvg);
 export const Loading = createSvgIcon(CircleNotchSvg, true);

@@ -166,10 +166,11 @@ export const THEME_LIGHT: any = {
     editorSidebar: {
       primary: {
         background: "#F7F7F7",
-        icon: "#666666",
+        icon: "#181818",
         hover: "#DEDEDE"
       },
       secondary: {
+        icon: "#666666",
         background: "#EAE8E8"
       }
     }

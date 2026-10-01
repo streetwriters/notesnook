@@ -42,7 +42,8 @@ import {
   BoxArrowDown,
   Cloud,
   Bell,
-  Ellipse
+  Ellipse,
+  CloudSlash
 } from "../icons";
 import { Button, Flex, Text, FlexProps, Box } from "@theme-ui/components";
 import { useThemeUI } from "@theme-ui/core";
@@ -139,7 +140,7 @@ const tools = [
   },
   {
     key: "local-only",
-    icon: Cloud,
+    icon: CloudSlash,
     label: strings.disableSync(),
     property: "localOnly"
   },
@@ -205,6 +206,7 @@ function EditorProperties(props: EditorPropertiesProps) {
               selected={activeTab === tab.id}
               onClick={() => useEditorStore.getState().setPropertiesTab(tab.id)}
               sx={{ width: "30px", height: "30px" }}
+              iconColor="icon-secondary"
             />
           ))}
         </Flex>
