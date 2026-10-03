@@ -883,6 +883,9 @@ export const settingsGroups: SettingSection[] = [
             property: "colorScheme",
             icon: "brightness-6",
             modifer: () => {
+              SettingsService.set({
+                useSystemTheme: false
+              });
               useThemeStore.getState().setColorScheme();
             },
             getter: () => useThemeStore.getState().colorScheme === "dark"
