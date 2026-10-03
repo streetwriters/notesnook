@@ -324,6 +324,7 @@ import UserSvg from "@notesnook/icons/user.svg?react";
 import ListSvg from "@notesnook/icons/list.svg?react";
 import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
 import CloseSvg from "@notesnook/icons/close.svg?react";
+import CrownSvg from "@notesnook/icons/crown-simple.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -558,7 +559,6 @@ export const FileCabinet = createIcon(mdiFileCabinet);
 export const Emoticon = createIcon(mdiEmoticonOutline);
 export const Bold = createIcon(mdiFormatBold);
 export const Table = createIcon(mdiTable);
-export const Pro = createIcon(mdiCrownOutline);
 export const EncryptedBackup = createIcon(mdiDatabaseLockOutline);
 export const Accent = createIcon(mdiPaletteSwatchOutline);
 
@@ -780,3 +780,4 @@ export const UserProfileIcon = createSvgIcon(UserSvg);
 export const List = createSvgIcon(ListSvg);
 export const CalendarDots = createSvgIcon(CalendarDotsSvg);
 export const Close = createSvgIcon(CloseSvg);
+export const Pro = createSvgIcon(CrownSvg);
