@@ -17,26 +17,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { formatBytes } from "@notesnook/common";
+import { formatBytes, getFormattedDate } from "@notesnook/common";
 import { Attachment, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
-import { db } from "../../common/database";
+import { View } from "react-native";
+import { Radius, Spacing } from "../../common/design/spacing";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useDBItem } from "../../hooks/use-db-item";
-import { defaultBorderRadius, AppFontSize } from "../../utils/size";
-import { IconButton } from "../ui/icon-button";
-import { ProgressCircleComponent } from "../ui/svg/lazy";
+import AppIcon from "../ui/AppIcon";
+import { Pressable } from "../ui/pressable";
+import { ProgressBarComponent } from "../ui/svg/lazy";
+import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import Actions from "./actions";
-import { strings } from "@notesnook/intl";
-import { Pressable } from "../ui/pressable";
-import { DefaultAppStyles } from "../../utils/styles";
+import { IconButton } from "../ui/icon-button";
 
-function getFileExtension(filename: string) {
-  const ext = /^.+\.([^.]+)$/.exec(filename);
-  return ext == null ? "" : ext[1];
+function getAttachmentIcon(attachment: Attachment) {
+  const mimeType = attachment.mimeType || "";
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("video/")) return "video-camera";
+  if (mimeType.startsWith("audio/")) return "music-notes";
+  return "file-text";
 }
 
 export const AttachmentItem = ({
@@ -75,11 +78,15 @@ export const AttachmentItem = ({
       onPress={onPress}
       style={{
         flexDirection: "row",
-        marginVertical: 5,
+        alignItems: "center",
         justifyContent: "space-between",
-        padding: DefaultAppStyles.GAP,
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL,
-        minHeight: 45
+        gap: Spacing.LEVEL_2,
+        borderWidth: 1,
+        borderColor: colors.primary.border,
+        borderRadius: Radius.S,
+        paddingHorizontal: Spacing.LEVEL_2,
+        paddingVertical: Spacing.LEVEL_3,
+        marginBottom: Spacing.LEVEL_2
       }}
     >
       {!attachment ? null : (
@@ -89,107 +96,112 @@ export const AttachmentItem = ({
               flexShrink: 1,
               flexDirection: "row",
               alignItems: "center",
-              gap: 10
+              gap: Spacing.LEVEL_2
             }}
           >
             <View
               style={{
+                width: 40,
+                height: 40,
+                borderRadius: Radius.XS,
+                backgroundColor: colors.secondary.background,
                 justifyContent: "center",
-                alignItems: "center",
-                marginLeft: -5,
-                borderWidth: 1,
-                borderColor: colors.secondary.border,
-                paddingHorizontal: 2,
-                width: 30,
-                height: 30,
-                borderRadius: defaultBorderRadius
+                alignItems: "center"
               }}
             >
-              <Paragraph
-                adjustsFontSizeToFit
-                size={8}
-                color={colors.secondary.paragraph}
-                style={{
-                  maxWidth: 30
-                }}
-                numberOfLines={1}
-              >
-                {getFileExtension(attachment.filename).toUpperCase() ||
-                  attachment.mimeType.split("/")?.[1]?.toUpperCase()}
-              </Paragraph>
+              <AppIcon
+                name={getAttachmentIcon(attachment)}
+                iconFamily="notesnook"
+                size={20}
+                color={colors.primary.icon}
+              />
             </View>
 
             <View
               style={{
-                flexShrink: 1
+                flexShrink: 1,
+                width: "100%",
+                gap: Spacing.LEVEL_1
               }}
             >
-              <Paragraph
-                size={AppFontSize.sm}
-                style={{
-                  flexWrap: "wrap"
-                }}
-                numberOfLines={1}
+              <Heading
+                fontSize="MD"
                 lineBreakMode="middle"
-                color={colors.primary.paragraph}
+                color={colors.primary.heading}
               >
-                {attachment.filename}
-              </Paragraph>
+                book.pdf
+              </Heading>
 
-              {!hideWhenNotDownloading ? (
-                <Paragraph
-                  color={colors.secondary.paragraph}
-                  size={AppFontSize.xxs}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                {attachment.failed ? (
+                  <AppIcon
+                    size={13}
+                    name="alert-circle-outline"
+                    color={colors.error.paragraph}
+                  />
+                ) : null}
+                {!hideWhenNotDownloading ? (
+                  <Paragraph
+                    fontSize="XS"
+                    numberOfLines={1}
+                    color={colors.secondary.paragraph}
+                  >
+                    {getFormattedDate(attachment.dateModified)} |{" "}
+                    {formatBytes(attachment.size)}
+                  </Paragraph>
+                ) : null}
+              </View>
+
+              {currentProgress ? (
+                <View
+                  style={{
+                    width: "100%",
+                    gap: Spacing.LEVEL_0,
+                    flexGrow: 1
+                  }}
                 >
-                  {strings.fileSize()}: {formatBytes(attachment.size)}
-                </Paragraph>
+                  <ProgressBarComponent
+                    height={6}
+                    width={null}
+                    animated={true}
+                    useNativeDriver
+                    progress={currentProgress.value}
+                    unfilledColor={colors.secondary.background}
+                    color={colors.primary.accent}
+                    borderWidth={0}
+                  />
+                  <Paragraph color={colors.secondary.paragraph} fontSize="XS">
+                    {currentProgress.percent} |{" "}
+                    {currentProgress.type === "upload"
+                      ? strings.uploading()
+                      : strings.downloading()}
+                  </Paragraph>
+                </View>
               ) : null}
             </View>
           </View>
-
-          {currentProgress ? (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              onPress={() => {
-                if (encryption || !pressable) return;
-                db.fs().cancel(attachment.hash);
-                setCurrentProgress(undefined);
-              }}
-              style={{
-                justifyContent: "center",
-                marginLeft: 5,
-                marginTop: 5,
-                marginRight: -5
-              }}
-            >
-              <ProgressCircleComponent
-                size={AppFontSize.xxl}
-                progress={
-                  currentProgress?.value ? currentProgress?.value / 100 : 0
-                }
-                showsText
-                textStyle={{
-                  fontSize: 10
-                }}
-                color={colors.primary.accent}
-                formatText={(progress) => (progress * 100).toFixed(0)}
-                borderWidth={0}
-                thickness={2}
-              />
-            </TouchableOpacity>
-          ) : (
-            <>
-              {attachment.failed ? (
-                <IconButton
-                  onPress={onPress}
-                  name="alert-circle-outline"
-                  color={colors.error.paragraph}
-                />
-              ) : null}
-            </>
-          )}
         </>
       )}
+
+      <IconButton
+        color={colors.secondary.icon}
+        name="dots-three"
+        iconFamily="notesnook"
+        size={20}
+        onPress={onPress}
+        style={{
+          justifyContent: "center",
+          height: undefined,
+          width: undefined,
+          borderRadius: 100,
+          alignItems: "center"
+        }}
+      />
     </Pressable>
   );
 };

@@ -28,18 +28,18 @@ Object.defineProperty(global, "Buffer", {
   }
 });
 
-if (__DEV__ && Config.isTesting !== "true") {
-  const messages =
-    require("@notesnook/intl/dist/locales/$pseudo-LOCALE.json").messages;
-  i18n.load({
-    en: messages
-  });
-} else {
-  const messages = require("@notesnook/intl/dist/locales/$en.json").messages;
-  i18n.load({
-    en: messages
-  });
-}
+// if (!__DEV__ && Config.isTesting !== "true") {
+//   const messages =
+//     require("@notesnook/intl/dist/locales/$pseudo-LOCALE.json").messages;
+//   i18n.load({
+//     en: messages
+//   });
+// } else {
+const messages = require("@notesnook/intl/dist/locales/$en.json").messages;
+i18n.load({
+  en: messages
+});
+// }
 
 i18n.activate("en");
 setI18nGlobal(i18n);

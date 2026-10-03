@@ -55,7 +55,7 @@ import { ABYTES, streamablefs } from "../interfaces/fs";
 import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
-import { Home } from "../components/icons";
+import { House } from "../components/icons";
 import { MenuItem } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
@@ -254,7 +254,7 @@ export async function restoreBackupFile(backupFile: File) {
       if (hasAttachments) {
         const result = await ConfirmDialog.show({
           title: strings.loginToRestoreAttachments(),
-          message: strings.loginToRestoreAttachmentsDesc(),
+          subtitle: strings.loginToRestoreAttachmentsDesc(),
           positiveButtonText: strings.yes(),
           negativeButtonText: strings.no()
         });
@@ -466,7 +466,7 @@ export async function logout() {
       if (
         !(await ConfirmDialog.show({
           title: strings.failedToTakeBackup(),
-          message: strings.failedToTakeBackupMessage(),
+          subtitle: strings.failedToTakeBackupMessage(),
           negativeButtonText: strings.no(),
           positiveButtonText: strings.yes()
         }))
@@ -493,7 +493,7 @@ export function createSetDefaultHomepageMenuItem(
   return {
     key: "set-as-homepage",
     type: "button",
-    title: strings.setAsHomepage(),
+    title: "Set as homepage",
     isChecked: homepage?.id === id && homepage?.type === type,
     premium: !availability.isAllowed,
     onClick: withFeatureCheck(availability, async () => {
@@ -503,7 +503,7 @@ export function createSetDefaultHomepageMenuItem(
         useSettingStore.getState().setHomepage({ id, type });
       }
     }),
-    icon: Home.path
+    iconComponent: House
   } as MenuItem;
 }
 

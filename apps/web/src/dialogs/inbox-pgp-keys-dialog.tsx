@@ -81,7 +81,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
         if (initialKeys) {
           const ok = await ConfirmDialog.show({
             title: "Change Inbox PGP Keys",
-            message:
+            subtitle:
               "Changing Inbox PGP keys will delete all your unsynced inbox items. Are you sure?",
             positiveButtonText: "Yes",
             negativeButtonText: "No"

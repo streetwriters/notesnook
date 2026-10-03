@@ -1,0 +1,9 @@
+{
+  "iconSets": [
+    {
+      "inputDir": "../../packages/icons/svgs",
+      "fontFamily": "notesnook-icons",
+      "outputDir": "./fonts"
+    }
+  ]
+}

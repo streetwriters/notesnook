@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Button, Flex, Text, InputProps } from "@theme-ui/components";
-import { Input, Label } from "@theme-ui/components";
+import { Button, Flex, Text, InputProps, Input, Label } from "@notesnook/ui";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -32,6 +31,7 @@ type Action = {
   icon?: Icon;
   component?: JSX.Element;
   hidden?: boolean;
+  sx?: ThemeUIStyleObject;
 };
 export type FieldProps = InputProps & {
   label?: string;
@@ -78,10 +78,10 @@ function Field(props: FieldProps) {
   return (
     <Flex
       sx={{
-        m: "2px",
-        mr: "2px",
+        // m: "2px",
+        // mr: "2px",
         opacity: disabled ? 0.7 : 1,
-        gap: 1,
+        gap: "spacing4",
         ...sx,
         flexDirection: "column"
       }}
@@ -89,11 +89,11 @@ function Field(props: FieldProps) {
       <Label
         htmlFor={id}
         sx={{
-          fontSize: "subtitle",
-          fontWeight: "bold",
           fontFamily: "body",
-          color: "paragraph",
           flexDirection: "column",
+          fontSize: "xs",
+          color: "paragraph-secondary",
+          lineHeight: 1.2,
           ...styles?.label
         }}
       >
@@ -145,12 +145,16 @@ function Field(props: FieldProps) {
               bottom: 0,
               px: 2,
               cursor: "pointer",
-              borderTopRightRadius: "default",
-              borderBottomRightRadius: "default",
+              borderTopRightRadius: "radius2",
+              borderBottomRightRadius: "radius2",
               ":hover": { bg: "border" }
             }}
           >
-            {isPasswordVisible ? <PasswordVisible /> : <PasswordInvisible />}
+            {isPasswordVisible ? (
+              <PasswordVisible size={15} />
+            ) : (
+              <PasswordInvisible size={15} />
+            )}
           </Flex>
         )}
 
@@ -161,8 +165,8 @@ function Field(props: FieldProps) {
               top: 0,
               left: 0,
               height: "100%",
-              borderTopLeftRadius: "default",
-              borderBottomLeftRadius: "default",
+              borderTopLeftRadius: "radius2",
+              borderBottomLeftRadius: "radius2",
               overflow: "hidden"
             }}
           >
@@ -178,12 +182,13 @@ function Field(props: FieldProps) {
                   p: 0,
                   px: 1,
                   height: "100%",
-                  bg: "transparent",
+                  // bg: "transparent",
                   borderRadius: 0,
                   margin: 0,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
+                  ...action.sx
                 }}
                 disabled={action.disabled}
               >
@@ -204,8 +209,8 @@ function Field(props: FieldProps) {
               top: 0,
               right: 0,
               height: "100%",
-              borderTopRightRadius: "default",
-              borderBottomRightRadius: "default",
+              borderTopRightRadius: "radius2",
+              borderBottomRightRadius: "radius2",
               overflow: "hidden"
             }}
           >
@@ -221,12 +226,13 @@ function Field(props: FieldProps) {
                   p: 0,
                   px: 1,
                   height: "100%",
-                  bg: "transparent",
+                  // bg: "transparent",
                   borderRadius: 0,
                   margin: 0,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center"
+                  justifyContent: "center",
+                  ...action.sx
                 }}
                 disabled={action.disabled}
               >

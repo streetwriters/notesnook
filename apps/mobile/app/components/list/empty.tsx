@@ -21,13 +21,10 @@ import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
 import { notesnook } from "../../../e2e/test.ids";
-import { TTip, useTip } from "../../services/tip-manager";
+import { Spacing } from "../../common/design/spacing";
 import { RouteParams } from "../../stores/use-navigation-store";
-import { useSettingStore } from "../../stores/use-setting-store";
 import { AppFontSize } from "../../utils/size";
-import { Tip } from "../tip";
 import { Button } from "../ui/button";
-import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
@@ -58,22 +55,13 @@ export const Empty = React.memo(function Empty({
   screen
 }: EmptyListProps) {
   const { colors } = useThemeColors();
-  const introCompleted = useSettingStore(
-    (state) => state.settings.introCompleted
-  );
-  const tip = useTip(
-    screen === "Notes" && introCompleted
-      ? "first-note"
-      : placeholder?.type || ((dataType + "s") as any),
-    screen === "Notes" ? "notes" : "list"
-  );
 
   return (
     <View
       style={[
         {
           flex: 1,
-          width: "80%",
+          width: "100%",
           justifyContent: "center",
           alignSelf: "center"
         }
@@ -81,50 +69,53 @@ export const Empty = React.memo(function Empty({
     >
       {!loading ? (
         <>
-          <Tip
-            color={color}
-            tip={
-              screen !== "Search"
-                ? tip || ({ text: () => placeholder?.paragraph } as TTip)
-                : ({ text: () => placeholder?.paragraph } as TTip)
-            }
+          <View
             style={{
-              backgroundColor: "transparent",
-              paddingHorizontal: 0
+              alignItems: "center",
+              gap: Spacing.LEVEL_1
             }}
-          />
-          {placeholder?.button && (
-            <Button
-              testID={notesnook.buttons.add}
-              type="secondaryAccented"
-              title={placeholder?.button}
-              iconPosition="right"
-              icon="arrow-right"
-              onPress={placeholder?.action}
+          >
+            <Heading size={AppFontSize.md} color={colors.primary.heading}>
+              {placeholder?.title}
+            </Heading>
+            <Paragraph
               style={{
-                alignSelf: "flex-start"
+                textAlign: "center",
+                marginBottom: Spacing.LEVEL_2,
+                maxWidth: "80%"
               }}
-            />
-          )}
+              fontSize="SM"
+              color={colors.primary.paragraph}
+            >
+              {placeholder?.paragraph}
+            </Paragraph>
+
+            {placeholder?.button && (
+              <Button
+                testID={notesnook.buttons.add}
+                type="accent"
+                title={placeholder?.button}
+                iconPosition="right"
+                onPress={placeholder?.action}
+              />
+            )}
+          </View>
         </>
       ) : (
         <>
           <View
             style={{
               alignSelf: "center",
-              alignItems: "flex-start",
-              width: "100%"
+              alignItems: "center",
+              width: "100%",
+              gap: Spacing.LEVEL_2
             }}
           >
-            <Heading>{placeholder?.title}</Heading>
-            <Paragraph size={AppFontSize.sm} textBreakStrategy="balanced">
-              {placeholder?.loading}
-            </Paragraph>
-            <Seperator />
             <ActivityIndicator
               size={AppFontSize.lg}
               color={color || colors.primary.accent}
             />
+            <Paragraph>{placeholder?.loading}</Paragraph>
           </View>
         </>
       )}

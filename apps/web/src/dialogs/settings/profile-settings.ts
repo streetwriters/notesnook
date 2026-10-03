@@ -109,7 +109,7 @@ export const ProfileSettings: SettingsGroup[] = [
             action: async () => {
               const ok = await ConfirmDialog.show({
                 title: strings.deleteData(),
-                message: strings.deleteAccountDesc(),
+                subtitle: strings.deleteAccountDesc(),
                 positiveButtonText: strings.yes(),
                 negativeButtonText: strings.no()
               });

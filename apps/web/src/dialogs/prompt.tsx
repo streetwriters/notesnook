@@ -27,6 +27,7 @@ export type PromptDialogProps = BaseDialogProps<undefined | string> & {
   title: string;
   description?: string;
   defaultValue?: string;
+  label?: string;
 };
 
 export const PromptDialog = DialogManager.register(function PromptDialog(
@@ -49,11 +50,22 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
       }}
     >
       <Field
+        label={props.label}
+        placeholder={props.label}
         inputRef={inputRef}
         defaultValue={props.defaultValue}
         autoFocus
         onKeyUp={(e) => {
           if (e.key == "Enter") props.onClose(inputRef.current?.value || "");
+        }}
+        sx={{
+          mt: "spacing6",
+          mb: "spacing7",
+          input: {
+            fontSize: "sm",
+            px: "spacing4",
+            py: "spacing6"
+          }
         }}
       />
     </Dialog>

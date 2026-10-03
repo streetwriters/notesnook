@@ -176,7 +176,8 @@ async function exportAttachmentToFile(
 async function bulkExport(
   notes: FilteredSelector<Note>,
   type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
-  callback: (progress?: string) => void
+  callback: (progress?: string) => void,
+  signal?: AbortSignal
 ) {
   const totalNotes = await notes.count();
 
@@ -193,6 +194,11 @@ async function bulkExport(
     format: type,
     unlockVault: unlockVaultForNoteExport as () => Promise<boolean>
   })) {
+    if (signal?.aborted) {
+      RNFetchBlob.fs.unlink(cacheFolder).catch(() => {});
+      return;
+    }
+
     if (item instanceof Error) {
       DatabaseLogger.error(item);
       continue;
@@ -223,7 +229,8 @@ async function bulkExport(
 async function exportNote(
   note: Note,
   type: "txt" | "pdf" | "md" | "html" | "md-frontmatter",
-  callback: (progress?: string) => void
+  callback: (progress?: string) => void,
+  signal?: AbortSignal
 ) {
   const fileFuncions = await resolveFileFunctions(type);
 
@@ -239,6 +246,11 @@ async function exportNote(
     format: type,
     unlockVault: unlockVaultForNoteExport as () => Promise<boolean>
   })) {
+    if (signal?.aborted) {
+      RNFetchBlob.fs.unlink(cacheFolder).catch(() => {});
+      return;
+    }
+
     if (item instanceof Error) {
       DatabaseLogger.error(item);
       continue;

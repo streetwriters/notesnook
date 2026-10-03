@@ -21,7 +21,7 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/trash-store";
 import { showToast } from "../utils/toast";
 import useNavigate from "../hooks/use-navigate";
-import Placeholder from "../components/placeholders";
+import { ListPanePlaceholder } from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
@@ -45,7 +45,9 @@ function Trash() {
       group="trash"
       refresh={refresh}
       isSearching={!!filteredItems}
-      placeholder={<Placeholder context={filteredItems ? "search" : "trash"} />}
+      placeholder={
+        <ListPanePlaceholder variant={filteredItems ? "search" : "trash"} />
+      }
       items={filteredItems || items}
       button={{
         Icon: ClearTrash,
@@ -54,7 +56,7 @@ function Trash() {
             title: strings.clearTrash(),
             positiveButtonText: strings.clear(),
             negativeButtonText: strings.cancel(),
-            message: strings.clearTrashDesc()
+            subtitle: strings.clearTrashDesc()
           }).then(async (res) => {
             if (res) {
               try {

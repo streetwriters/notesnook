@@ -82,7 +82,7 @@ export const ChangePlanDialog = DialogManager.register(
             onPlanSelected={async (plan) => {
               const result = await ConfirmDialog.show({
                 title: "Confirm plan change",
-                message: `Your plan will be switched to ${
+                subtitle: `Your plan will be switched to ${
                   PLAN_METADATA[plan.plan].title
                 } plan. You will receive a credit for unused time on your previous subscription, and you will only pay the prorated amount for your new subscription.`,
                 positiveButtonText: "Confirm",

@@ -70,7 +70,7 @@ class NoteStore extends BaseStore<NoteStore> {
               ? "archive"
               : "notes"
           );
-
+    console.log("setting context", context);
     this.set({
       context,
       contextNotes: context

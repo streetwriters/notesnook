@@ -108,6 +108,9 @@ const run = async (
         false,
         error ? SyncStatus.Failed : SyncStatus.Passed
       );
+      useUserStore.setState({
+        lastSyncError: error ? error : undefined
+      });
       onCompleted?.(error ? SyncStatus.Failed : SyncStatus.Passed);
       if (pendingSync)
         Sync.run(

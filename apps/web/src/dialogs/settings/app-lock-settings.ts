@@ -328,7 +328,8 @@ async function registerCredential(type: CredentialType) {
       user?.email ||
       (await PromptDialog.show({
         title: strings.securityKeyUsername(),
-        description: strings.securityKeyUsernameDesc()
+        description: strings.securityKeyUsernameDesc(),
+        label: strings.securityKeyUsername()
       }));
     if (!username) return;
 

@@ -22,6 +22,10 @@ import { ColorValue, TextProps } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import EvilIcon from "react-native-vector-icons/EvilIcons";
 import { AppFontSize } from "../../../utils/size";
+import { createNanoIconSet } from "react-native-nano-icons";
+import glyphMap from "../../../../fonts/notesnook-icons.glyphmap.json";
+
+const NotesnookIcon = createNanoIconSet(glyphMap);
 
 export interface IconProps extends TextProps {
   /**
@@ -43,9 +47,9 @@ export interface IconProps extends TextProps {
    * Color of the icon
    *
    */
-  color?: ColorValue | number | undefined;
+  color?: ColorValue | ColorValue[] | number | undefined;
 
-  iconFamily?: "evilicons" | "material";
+  iconFamily?: "evilicons" | "material" | "notesnook";
 }
 
 export default function AppIcon({
@@ -55,6 +59,12 @@ export default function AppIcon({
   const { colors } = useThemeColors();
   return iconFamily === "evilicons" ? (
     <EvilIcon
+      size={AppFontSize.md}
+      color={colors.primary.icon}
+      {...(props as any)}
+    />
+  ) : iconFamily === "notesnook" ? (
+    <NotesnookIcon
       size={AppFontSize.md}
       color={colors.primary.icon}
       {...(props as any)}

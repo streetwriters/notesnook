@@ -30,7 +30,6 @@ import { useMenuStore } from "../../stores/use-menu-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { MenuItemsList } from "../../utils/menu-items";
-import { DefaultAppStyles } from "../../utils/styles";
 import ReorderableList from "../list/reorderable-list";
 import { MenuItemProperties } from "../sheets/menu-item-properties";
 import { Button } from "../ui/button";
@@ -38,6 +37,7 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { PinnedSection } from "./pinned-section";
 import { SideMenuHeader } from "./side-menu-header";
+import { Spacing } from "../../common/design/spacing";
 
 const pro = {
   title: strings.upgradePlan(),
@@ -64,6 +64,8 @@ export function SideMenuHome() {
     (state) => state.user?.subscription?.plan
   );
   const user = useUserStore.getState().user;
+  const colorNotes = useMenuStore((state) => state.colorNotes);
+  const menuPins = useMenuStore((state) => state.menuPins);
 
   return (
     <View
@@ -71,8 +73,7 @@ export function SideMenuHome() {
         height: "100%",
         width: "100%",
         backgroundColor: colors.primary.background,
-        gap: DefaultAppStyles.GAP,
-        paddingTop: DefaultAppStyles.GAP_VERTICAL
+        paddingTop: Spacing.LEVEL_1
       }}
     >
       <SideMenuHeader />
@@ -124,12 +125,33 @@ export function SideMenuHome() {
                     );
                   }}
                 />
+                {colorNotes.length > 0 && (
+                  <View
+                    style={{
+                      marginTop: Spacing.LEVEL_2,
+                      borderTopWidth: 1,
+                      borderTopColor: colors.primary.separator,
+                      marginBottom: Spacing.LEVEL_2
+                    }}
+                  />
+                )}
                 <ColorSection />
-                <PinnedSection />
+                {menuPins.length > 0 && (
+                  <View
+                    style={{
+                      marginTop: Spacing.LEVEL_2,
+                      borderTopWidth: 1,
+                      borderTopColor: colors.primary.separator,
+                      marginBottom: Spacing.LEVEL_2
+                    }}
+                  />
+                )}
+                {menuPins.length > 0 && <PinnedSection />}
               </>
             )}
             style={{
-              paddingHorizontal: DefaultAppStyles.GAP
+              paddingHorizontal: Spacing.LEVEL_3,
+              marginTop: Spacing.LEVEL_4
             }}
             nestedScrollEnabled={false}
           />
@@ -138,8 +160,8 @@ export function SideMenuHome() {
 
       <View
         style={{
-          paddingHorizontal: DefaultAppStyles.GAP,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL
+          paddingHorizontal: Spacing.LEVEL_3,
+          paddingVertical: Spacing.LEVEL_4
         }}
       >
         {dayjs().month() !== 11 ? (

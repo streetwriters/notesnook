@@ -33,6 +33,7 @@ import AddReminder from "../add-reminder";
 import { isFeatureAvailable } from "@notesnook/common";
 import { ToastManager } from "../../services/event-manager";
 import PaywallSheet from "../../components/sheets/paywall";
+import { Spacing } from "../../common/design/spacing";
 
 export const Reminders = ({
   navigation,
@@ -67,6 +68,9 @@ export const Reminders = ({
             title: route.name,
             route: route.name
           });
+        }}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
         }}
         id={route.name}
         onPressDefaultRightButton={async () => {
