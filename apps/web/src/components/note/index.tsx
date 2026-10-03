@@ -29,7 +29,6 @@ import {
   Note as NoteType,
   Notebook as NotebookItem,
   Tag as TagType,
-  createInternalLink,
   hosts,
   isReminderActive,
   isReminderToday
@@ -110,7 +109,7 @@ import ListItem from "../list-item";
 import { PublishDialog } from "../publish-view";
 import TimeAgo from "../time-ago";
 import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
-import { withFeatureCheck } from "../../common";
+import { copyNoteLink, withFeatureCheck } from "../../common";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 type NoteProps = NoteResolvedData & {
@@ -606,13 +605,8 @@ export const noteMenuItems: (
       key: "copy-link",
       title: strings.copyLink(),
       iconComponent: LinkHorizontal,
-      onClick: () => {
-        const link = createInternalLink("note", note.id);
-        writeToClipboard({
-          "text/plain": link,
-          "text/html": `<a href="${link}">${note.title}</a>`,
-          "text/markdown": `[${note.title}](${link})`
-        });
+      onClick: async () => {
+        await copyNoteLink(note);
         showToast("success", strings.linkCopied());
       }
     },

@@ -162,6 +162,17 @@ export const THEME_LIGHT: any = {
       secondary: {
         heading: "#A6A6A6"
       }
+    },
+    editorSidebar: {
+      primary: {
+        background: "#F7F7F7",
+        icon: "#181818",
+        hover: "#DEDEDE"
+      },
+      secondary: {
+        icon: "#666666",
+        background: "#EAE8E8"
+      }
     }
   }
 };

@@ -38,7 +38,12 @@ import { showToast } from "../utils/toast";
 import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { TaskManager } from "./task-manager";
-import { EVENTS, parseInternalLink } from "@notesnook/core";
+import {
+  EVENTS,
+  Note,
+  createInternalLink,
+  parseInternalLink
+} from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { User } from "@notesnook/core";
@@ -63,6 +68,7 @@ import { setToolbarPreset } from "./toolbar-config";
 import { useKeyStore } from "../interfaces/key-store";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
+import { writeToClipboard } from "../utils/clipboard";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -96,7 +102,6 @@ export async function introduceFeatures() {
 }
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
-
 export async function createBackup(
   options: {
     rescueMode?: boolean;
@@ -615,4 +620,13 @@ export async function handleInternalLink(url: string, openInNewTab?: boolean) {
   } else if (link.type === "color") {
     navigate(`/colors/${link.id}`);
   }
+}
+
+export async function copyNoteLink(note: Note) {
+  const link = createInternalLink("note", note.id);
+  await writeToClipboard({
+    "text/plain": link,
+    "text/html": `<a href="${link}">${note.title}</a>`,
+    "text/markdown": `[${note.title}](${link})`
+  });
 }
