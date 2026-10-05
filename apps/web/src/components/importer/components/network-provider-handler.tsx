@@ -29,6 +29,7 @@ import { useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
 import Accordion from "../../accordion";
 import { TransformResult } from "../types";
+import { strings } from "@notesnook/intl";
 
 type NetworkProviderHandlerProps = {
   provider: INetworkProvider<ProviderSettings>;
@@ -105,14 +106,16 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
     >
       {totalNoteCount ? (
         <>
-          <Text variant="title">Importing your notes from {provider.name}</Text>
+          <Text variant="title">
+            {strings.importingNotesFrom(provider.name)}
+          </Text>
           <Text variant="body" sx={{ mt: 4 }}>
-            Found {totalNoteCount} notes
+            {strings.foundNotes(totalNoteCount)}
           </Text>
           {logs.current.length > 0 && (
             <Accordion
               isClosed={false}
-              title="Logs"
+              title={strings.logs()}
               sx={{
                 border: "1px solid var(--border)",
                 mt: 2
@@ -141,11 +144,13 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         </>
       ) : (
         <>
-          <Text variant="title">Connect your {provider.name} account</Text>
+          <Text variant="title">
+            {strings.connectYourAccount(provider.name)}
+          </Text>
           <Text variant="body" sx={{ color: "fontTertiary", mt: [2, 0] }}>
-            Check out our step-by-step guide on{" "}
+            {strings.checkOutOurStepByStepGuideOn()}{" "}
             <a href={provider.helpLink} target="_blank" rel="noreferrer">
-              how to import from {provider.name}.
+              {strings.howToImportFrom(provider.name)}
             </a>
           </Text>
           <Button
@@ -153,7 +158,7 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
             onClick={onStartImport}
             sx={{ my: 4, alignSelf: "center" }}
           >
-            Start importing
+            {strings.startImporting()}
           </Button>
         </>
       )}

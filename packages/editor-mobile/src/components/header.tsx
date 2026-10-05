@@ -495,7 +495,7 @@ function Header({
                     color: "var(--nn_primary_paragraph)"
                   }}
                 >
-                  New note
+                  {strings.newNote()}
                 </span>
               </MenuItem>
 

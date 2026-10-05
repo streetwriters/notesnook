@@ -24,6 +24,7 @@ import { useThemeColors } from "@notesnook/theme";
 import { defaultBorderRadius, AppFontSize } from "../../../utils/size";
 import { Button, ButtonProps } from "../button";
 import { getFormattedReminderTime } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
 import { Reminder } from "@notesnook/core";
 import { DefaultAppStyles } from "../../../utils/styles";
 
@@ -45,8 +46,9 @@ export const ReminderTime = ({
     ? undefined
     : getFormattedReminderTime(reminder, props.short || false);
   const isTodayOrTomorrow =
-    (time?.includes("Today") || time?.includes("Tomorrow")) &&
-    !time?.includes("Last");
+    time &&
+    (time.includes(strings.today()) || time.includes(strings.tomorrow())) &&
+    !time.includes(strings.last());
   const isActive =
     checkIsActive && reminder ? isReminderActive(reminder) : true;
 

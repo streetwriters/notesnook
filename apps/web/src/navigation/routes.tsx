@@ -35,7 +35,7 @@ function defineRoute(route: RouteResult): RouteResult {
 const NOT_FOUND_ROUTE = defineRoute({
   key: "notFound",
   type: "notFound",
-  component: () => <div>Not found</div>
+  component: () => <div>{strings.notFound()}</div>
 });
 const routes = defineRoutes({
   "/notes": () => {

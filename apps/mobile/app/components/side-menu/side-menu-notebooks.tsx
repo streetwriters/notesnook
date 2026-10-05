@@ -170,7 +170,7 @@ export const SideMenuNotebooks = () => {
             }}
           >
             <TextInput
-              placeholder="Filter notebooks..."
+              placeholder={strings.filterNotebooks()}
               style={{
                 fontFamily: "Inter-Regular",
                 fontSize: AppFontSize.xs,

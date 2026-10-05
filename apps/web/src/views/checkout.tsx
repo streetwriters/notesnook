@@ -41,6 +41,7 @@ import { planToAvailability } from "@notesnook/common";
 import { FeatureCaption } from "../dialogs/buy-dialog/feature-caption";
 import { EVENTS } from "@notesnook/core";
 import { db } from "../common/db";
+import { strings } from "@notesnook/intl";
 
 export type Plan = z.infer<typeof PlanSchema>;
 
@@ -176,7 +177,7 @@ function Checkout() {
           sx={{ display: "flex", alignItems: "center", gap: 1 }}
         >
           <Support size={18} />
-          <span>Contact support</span>
+          <span>{strings.contactSupport()}</span>
         </Button>
       </Flex>
       <Flex sx={{ flex: 1 }}>
@@ -260,7 +261,7 @@ function Checkout() {
                     const user = useUserStore.getState().user;
                     setCustomer(user);
                     setCurrentStep(isUserSubscribed(user) ? 2 : 1);
-                  } else setError("Failed to create account.");
+                  } else setError(strings.failedToCreateAccount());
                 }}
               />
             ) : currentStep === 1 ? (
@@ -268,7 +269,7 @@ function Checkout() {
                 sx={{ flexDirection: "column", overflow: "hidden", flex: 1 }}
               >
                 <Text variant="heading" sx={{ mx: 2 }}>
-                  Final step, make the payment.
+                  {strings.finalStepMakePayment()}
                 </Text>
                 <Text
                   variant="body"
@@ -280,8 +281,7 @@ function Checkout() {
                     mb: 4
                   }}
                 >
-                  You are one step away from unlocking the full potential of
-                  Notesnook.
+                  {strings.oneStepAwayFromUnlocking()}
                 </Text>
                 <CheckoutDetails
                   user={customer}
@@ -309,7 +309,7 @@ function Checkout() {
               >
                 <CheckoutCompleted
                   onClose={() => hardNavigate("/notes")}
-                  buttonText="Start your journey"
+                  buttonText={strings.startYourJourney()}
                 />
               </Flex>
             ) : null}
@@ -367,7 +367,7 @@ function CheckoutSummaryMobile() {
         }}
       >
         <Text variant="title" sx={{}}>
-          Summary
+          {strings.summary()}
         </Text>
         <Box sx={{ my: 2, height: 1, bg: "separator" }} />
         <CheckoutPricing pricingInfo={pricingInfo} />
@@ -389,11 +389,11 @@ function CheckoutSummary() {
         }}
       >
         <Text variant="title" sx={{}}>
-          Summary
+          {strings.summary()}
         </Text>
         <Box sx={{ my: 2, height: 1, bg: "separator" }} />
         <Text variant="subtitle" sx={{}}>
-          {PLAN_METADATA[selectedPlan.plan].title} plan
+          {strings.planWithTitle(PLAN_METADATA[selectedPlan.plan].title)}
         </Text>
         <Flex
           sx={{

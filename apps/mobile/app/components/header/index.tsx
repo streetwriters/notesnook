@@ -126,7 +126,7 @@ export const Header = ({
         ) : hasSearch ? (
           <Paragraph>
             {selectionMode
-              ? `${selectedItemsList.length} selected`
+              ? strings.itemsSelected(selectedItemsList.length)
               : strings.searchInRoute(title)}
           </Paragraph>
         ) : (

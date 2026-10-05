@@ -197,7 +197,7 @@ export const deleteItems = async (
           useNotebookStore.getState().refresh();
         }
       },
-      actionText: "Undo"
+      actionText: strings.undo()
     });
   } else {
     ToastManager.show({

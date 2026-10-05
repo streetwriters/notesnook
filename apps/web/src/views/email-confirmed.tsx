@@ -62,7 +62,7 @@ function EmailConfirmed() {
             fontWeight: "heading"
           }}
         >
-          Huzzah!
+          {strings.huzzah()}
         </Text>
         <Text
           variant="heading"

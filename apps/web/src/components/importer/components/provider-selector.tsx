@@ -23,6 +23,7 @@ import {
   Providers
 } from "@notesnook-importer/core";
 import { Flex, Text } from "@theme-ui/components";
+import { strings } from "@notesnook/intl";
 
 type ProviderSelectorProps = {
   onProviderChanged: (provider: IProvider) => void;
@@ -39,18 +40,18 @@ export function ProviderSelector(props: ProviderSelectorProps) {
       }}
     >
       <Flex sx={{ flexDirection: "column", flex: 1 }}>
-        <Text variant="subtitle">Select a notes app to import from</Text>
+        <Text variant="subtitle">{strings.selectNotesAppToImportFrom()}</Text>
         <Text
           variant="body"
           as="div"
           sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
         >
-          Can&apos;t find your notes app in the list?{" "}
+          {strings.cantFindNotesApp()}{" "}
           <a
             href="https://github.com/streetwriters/notesnook-importer/issues/new"
             target="_blank"
           >
-            Send us a request.
+            {strings.sendUsARequest()}
           </a>
         </Text>
       </Flex>
@@ -70,7 +71,7 @@ export function ProviderSelector(props: ProviderSelectorProps) {
           props.onProviderChanged(ProviderFactory.getProvider(providerName));
         }}
       >
-        <option value="">Select notes app</option>
+        <option value="">{strings.selectNotesApp()}</option>
         {ProviderFactory.getAvailableProviders().map((provider) => (
           <option key={provider} value={provider}>
             {ProviderFactory.getProvider(provider as Providers).name}

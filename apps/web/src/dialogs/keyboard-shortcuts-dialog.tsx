@@ -22,15 +22,16 @@ import { Flex, Text } from "@theme-ui/components";
 import { DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
 import { isMac } from "../utils/platform";
-
-const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP, isMac());
+import { strings } from "@notesnook/intl";
 
 export const KeyboardShortcutsDialog = DialogManager.register(
   function KeyboardShortcutsDialog(props) {
+    const groupedKeybindings = getGroupedKeybindings(IS_DESKTOP_APP, isMac());
+
     return (
       <Dialog
         isOpen={true}
-        title={"Keyboard Shortcuts"}
+        title={strings.keyboardShortcuts()}
         width={750}
         onClose={() => props.onClose(false)}
       >

@@ -326,7 +326,7 @@ async function setupIOSCategories() {
               {
                 id: "REMINDER_SNOOZE",
                 foreground: false,
-                title: strings.remindMeIn() + ` ${reminderTime} min`,
+                title: strings.remindInMin(reminderTime || 5),
                 authenticationRequired: false
               }
             ]
@@ -337,7 +337,7 @@ async function setupIOSCategories() {
               {
                 id: "REMINDER_SNOOZE",
                 foreground: false,
-                title: strings.remindMeIn() + ` ${reminderTime} min`,
+                title: strings.remindInMin(reminderTime || 5),
                 authenticationRequired: false
               },
               {
@@ -403,7 +403,7 @@ async function scheduleNotification(
       const reminderTime = SettingsService.get().defaultSnoozeTime;
       const androidActions = [
         {
-          title: `Remind in ${reminderTime} min`,
+          title: strings.remindInMin(reminderTime || 5),
           pressAction: {
             id: "REMINDER_SNOOZE"
           }

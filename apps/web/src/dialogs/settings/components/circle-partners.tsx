@@ -128,9 +128,9 @@ export function CirclePartners() {
                           redeemedCode.code
                         )}
                       >
-                        Click here
+                        {strings.claimPromotion[0]()}
                       </Link>{" "}
-                      to directly claim the promotion.
+                      {strings.claimPromotion[1]()}
                     </Text>
                   ) : null}
                 </>
@@ -157,7 +157,10 @@ export function CirclePartners() {
                         partnerId: partner.id,
                         code: result.code
                       });
-                      showToast("success", "Code redeemed successfully");
+                      showToast(
+                        "success",
+                        strings.codeRedeemedSuccessfully()
+                      );
                     }
                   }}
                 >

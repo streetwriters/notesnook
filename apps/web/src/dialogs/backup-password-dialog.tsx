@@ -76,7 +76,7 @@ export const BackupPasswordDialog = DialogManager.register(
               if (await validate({ key, password })) {
                 onClose(true);
               } else {
-                setError("Wrong password.");
+                setError(strings.passwordIncorrect());
               }
             } catch (e) {
               setError((e as Error).message);

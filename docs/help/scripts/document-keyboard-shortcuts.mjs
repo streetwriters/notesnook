@@ -76,7 +76,8 @@ function getGroupedTableKeybindingsMarkdown() {
   const header = `| Description | Web | Windows/Linux | Mac |
 | --- | --- | --- | --- |`;
 
-  return CATEGORIES.map((category) => {
+  return CATEGORIES.map((categoryFn) => {
+    const category = typeof categoryFn === "function" ? categoryFn() : categoryFn;
     const webShortcuts =
       webKeybindings.find((g) => g.category === category)?.shortcuts || [];
     const desktopShortcuts =
@@ -85,16 +86,20 @@ function getGroupedTableKeybindingsMarkdown() {
     const mergedShortcuts = {};
 
     webShortcuts.forEach(({ description, keys }) => {
-      if (!mergedShortcuts[description]) {
-        mergedShortcuts[description] = {};
+      const desc =
+        typeof description === "function" ? description() : description;
+      if (!mergedShortcuts[desc]) {
+        mergedShortcuts[desc] = {};
       }
-      mergedShortcuts[description].web = keys;
+      mergedShortcuts[desc].web = keys;
     });
     desktopShortcuts.forEach(({ description, keys }) => {
-      if (!mergedShortcuts[description]) {
-        mergedShortcuts[description] = {};
+      const desc =
+        typeof description === "function" ? description() : description;
+      if (!mergedShortcuts[desc]) {
+        mergedShortcuts[desc] = {};
       }
-      mergedShortcuts[description].desktop = keys;
+      mergedShortcuts[desc].desktop = keys;
     });
 
     const rows = Object.entries(mergedShortcuts)

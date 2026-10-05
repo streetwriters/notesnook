@@ -99,7 +99,7 @@ const publishNote = async () => {
           mode: AuthMode.login
         });
       },
-      actionText: "Login"
+      actionText: strings.login()
     });
     return;
   }
@@ -857,7 +857,7 @@ export const useEditorEvents = (
 
             await sleep(500);
             presentSheet({
-              title: "Table saved to csv",
+              title: strings.tableSavedToCsv(),
               paragraph: strings.fileSaved(fileName, Platform.OS),
               icon: "download",
               context: "global",
@@ -868,7 +868,7 @@ export const useEditorEvents = (
           } catch (e) {
             ToastManager.show({
               type: "info",
-              message: "Could not save table to csv"
+              message: strings.couldNotSaveTableToCsv()
             });
             DatabaseLogger.error(e as Error);
           }

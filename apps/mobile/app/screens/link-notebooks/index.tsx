@@ -298,7 +298,8 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              height: 200
+              height: 200,
+              paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
             {loading ? (
@@ -307,7 +308,10 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
                 color={colors.primary.accent}
               />
             ) : (
-              <Paragraph color={colors.primary.icon}>
+              <Paragraph
+                color={colors.primary.icon}
+                style={{ textAlign: "center" }}
+              >
                 {strings.emptyPlaceholders("notebook")}
               </Paragraph>
             )}

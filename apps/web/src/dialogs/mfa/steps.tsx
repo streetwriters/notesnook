@@ -518,7 +518,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
             setError("");
           } else {
             setPhoneNumber("");
-            setError("Please enter a valid phone number with country code.");
+            setError(strings.enterValidPhone());
           }
         }}
         action={{
@@ -734,7 +734,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
           }, 100);
         }}
       >
-        Setup a fallback 2FA method
+        {strings.secondary2faMethod()}
       </Button>
     </Flex>
   );

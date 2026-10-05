@@ -47,9 +47,12 @@ export const SubscriptionSettings: SettingsGroup[] = [
     settings: [
       {
         key: "auto-renew",
-        title: "Auto renew",
-        description:
-          "Toggle auto renew to avoid any surprise charges. If you do not turn auto renew back on, you'll be automatically downgraded to the Free plan at the end of your billing period.",
+        get title() {
+          return strings.autoRenew();
+        },
+        get description() {
+          return strings.autoRenewDesc();
+        },
         isHidden: () => {
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
@@ -84,8 +87,12 @@ export const SubscriptionSettings: SettingsGroup[] = [
       },
       {
         key: "change-plan",
-        title: "Change plan",
-        description: "Change your subscription plan.",
+        get title() {
+          return strings.changePlan();
+        },
+        get description() {
+          return strings.changeSubPlan();
+        },
         isHidden: () => {
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
@@ -101,7 +108,9 @@ export const SubscriptionSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: "Change",
+            get title() {
+              return strings.change();
+            },
             variant: "secondary",
             action: async () => {
               ChangePlanDialog.show({});
@@ -145,8 +154,12 @@ export const SubscriptionSettings: SettingsGroup[] = [
       },
       {
         key: "cancel-trial",
-        title: "Cancel trial",
-        description: `Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.`,
+        get title() {
+          return strings.cancelTrialQuestion().replace("?", "");
+        },
+        get description() {
+          return strings.cancelTrialDesc();
+        },
         isHidden: () => {
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
@@ -160,26 +173,27 @@ export const SubscriptionSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: "Cancel",
+            get title() {
+              return strings.cancel();
+            },
             variant: "error",
             async action() {
               const cancelTrial = await ConfirmDialog.show({
-                title: "Cancel trial?",
-                message:
-                  "Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.",
-                negativeButtonText: "No",
-                positiveButtonText: "Yes"
+                title: strings.cancelTrialQuestion(),
+                message: strings.cancelTrialDesc(),
+                negativeButtonText: strings.no(),
+                positiveButtonText: strings.yes()
               });
               if (cancelTrial) {
                 await TaskManager.startTask({
                   type: "modal",
-                  title: "Cancelling your trial",
-                  subtitle: "Please wait...",
+                  title: strings.cancellingYourTrial(),
+                  subtitle: strings.pleaseWait(),
                   action: () => db.subscriptions.cancel()
                 })
                   .catch((e) => showToast("error", e.message))
                   .then(() =>
-                    showToast("success", "Your trial has been canceled.")
+                    showToast("success", strings.trialCanceled())
                   );
               }
             }
@@ -188,8 +202,12 @@ export const SubscriptionSettings: SettingsGroup[] = [
       },
       {
         key: "refund-subscription",
-        title: "Refund subscription",
-        description: `You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.`,
+        get title() {
+          return strings.refundSub();
+        },
+        get description() {
+          return strings.requestRefundDesc();
+        },
         isHidden: () => {
           const user = useUserStore.getState().user;
           const status = user?.subscription.status;
@@ -202,18 +220,19 @@ export const SubscriptionSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: "Refund",
+            get title() {
+              return strings.refundSub();
+            },
             async action() {
               const refundSubscription = await ConfirmDialog.show({
-                title: "Request refund?",
-                message:
-                  "You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.",
-                negativeButtonText: "No",
-                positiveButtonText: "Yes",
+                title: strings.requestRefundQuestion(),
+                message: strings.requestRefundDesc(),
+                negativeButtonText: strings.no(),
+                positiveButtonText: strings.yes(),
                 inputs: {
                   reason: {
-                    title: "Reason for refund",
-                    helpText: "Optional",
+                    title: strings.reasonForRefund(),
+                    helpText: strings.optional(),
                     multiline: true
                   }
                 }
@@ -221,8 +240,8 @@ export const SubscriptionSettings: SettingsGroup[] = [
               if (refundSubscription) {
                 const result = await TaskManager.startTask({
                   type: "modal",
-                  title: "Requesting refund for your subscription",
-                  subtitle: "Please wait...",
+                  title: strings.requestingRefundForSub(),
+                  subtitle: strings.pleaseWait(),
                   action: () =>
                     db.subscriptions.refund(refundSubscription.inputs?.reason)
                 });
@@ -232,7 +251,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
                 }
                 showToast(
                   "success",
-                  "Your refund request has been sent. If you are eligible for a refund, you'll receive your funds within 24 hours. Please wait at least 24 hours before reaching out to us in case there is any problem."
+                  strings.refundIssued()
                 );
               }
             },

@@ -23,7 +23,6 @@ import {
 import {
   InputRule,
   Node,
-  findParentNodeClosestToPos,
   mergeAttributes
 } from "@tiptap/core";
 import { Paragraph } from "../paragraph/index.js";
@@ -31,6 +30,7 @@ import { Heading, toggleNodesUnderPos } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
 import { Fragment } from "@tiptap/pm/model";
 import { hasPermission } from "../../types.js";
+import { strings } from "@notesnook/intl";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -144,7 +144,10 @@ export const Callout = Node.create({
           const start = selection.from;
           const end = selection.to;
 
-          const calloutTitle = attributes.type.toUpperCase();
+          const calloutTitle = (
+            (strings as Record<string, any>)[attributes.type]?.() ||
+            attributes.type
+          ).toUpperCase();
           const content = Fragment.from(
             selection.empty
               ? state.schema.node(Paragraph.name)
@@ -190,9 +193,9 @@ export const Callout = Node.create({
           const calloutType = (match[1] || "info") as CalloutType;
           const calloutTitle =
             match[2] ||
-            (CALLOUT_TYPES.includes(match[1] as CalloutType)
-              ? match[1].toUpperCase()
-              : match[1]);
+            (
+              (strings as Record<string, any>)[calloutType]?.() || calloutType
+            ).toUpperCase();
 
           const { tr } = state;
           const start = range.from;

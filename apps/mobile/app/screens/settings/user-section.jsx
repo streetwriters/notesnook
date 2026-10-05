@@ -305,9 +305,8 @@ const SettingsUserSection = ({ item }) => {
                   </Paragraph>
                   <Paragraph size={AppFontSize.xxs}>
                     {formatBytes(used)}/
-                    {total === -1
-                      ? "Unlimited"
-                      : formatBytes(total) + " " + strings.used()}
+                    {total === -1 ? strings.unlimited() : formatBytes(total)}{" "}
+                    {strings.used()}
                   </Paragraph>
                 </View>
                 <View
@@ -389,8 +388,7 @@ const SettingsUserSection = ({ item }) => {
                         user.subscription?.productId.includes("5year")
                       ) {
                         ToastManager.show({
-                          message:
-                            "You have made a one time purchase. To change your plan please contact support.",
+                          message: strings.contactSupportToChangePlan(),
                           type: "info"
                         });
                         return;

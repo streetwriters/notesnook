@@ -65,6 +65,11 @@ mergedConfig.resolver = {
       return context.resolveRequest(context, result, platform);
     }
 
+    if (moduleName === "@notesnook/intl") {
+      const result = require.resolve(moduleName); // gets CommonJS version
+      return context.resolveRequest(context, result, platform);
+    }
+
     if (moduleName.includes("zustand")) {
       const result = require.resolve(moduleName); // gets CommonJS version
       return context.resolveRequest(context, result, platform);

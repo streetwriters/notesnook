@@ -30,12 +30,18 @@ export const InboxSettings: SettingsGroup[] = [
   {
     key: "inbox",
     section: "inbox",
-    header: "Inbox",
+    get header() {
+      return strings.inbox();
+    },
     settings: [
       {
         key: "toggle-inbox",
-        title: "Enable Inbox API",
-        description: "Enable/disable Inbox API",
+        get title() {
+          return strings.enableInboxAPI();
+        },
+        get description() {
+          return strings.enableInboxAPIDesc();
+        },
         keywords: ["inbox"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
@@ -49,8 +55,12 @@ export const InboxSettings: SettingsGroup[] = [
       },
       {
         key: "show-inbox-pgp-keys",
-        title: "Inbox PGP Keys",
-        description: "View/edit your Inbox PGP keys",
+        get title() {
+          return strings.manageInboxKeys();
+        },
+        get description() {
+          return strings.manageInboxKeysDesc();
+        },
         keywords: ["inbox", "pgp", "keys"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
@@ -58,11 +68,13 @@ export const InboxSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: "Show",
+            get title() {
+              return strings.show();
+            },
             variant: "secondary",
             action: async () => {
               const ok = await showPasswordDialog({
-                title: "Authenticate to view/edit Inbox PGP keys",
+                title: strings.authenticateToViewEditInboxPgpKeys(),
                 inputs: {
                   password: {
                     label: strings.accountPassword(),
@@ -84,8 +96,12 @@ export const InboxSettings: SettingsGroup[] = [
       },
       {
         key: "failed-inbox-items",
-        title: strings.failedInboxItems(),
-        description: strings.failedInboxItemsDesc(),
+        get title() {
+          return strings.failedInboxItems();
+        },
+        get description() {
+          return strings.failedInboxItemsDesc();
+        },
         keywords: ["inbox", "failed", "items"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
@@ -93,7 +109,9 @@ export const InboxSettings: SettingsGroup[] = [
         components: [
           {
             type: "button",
-            title: strings.show(),
+            get title() {
+              return strings.show();
+            },
             variant: "secondary",
             action: () => {
               InboxHistoryDialog.show({});

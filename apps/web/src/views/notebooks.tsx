@@ -114,10 +114,10 @@ export function Notebooks() {
                 parent.id === "root"
                   ? notebooks
                   : await db.relations
-                      .from({ type: "notebook", id: parent.id }, "notebook")
-                      .selector.sorted(
-                        db.settings.getGroupOptions("notebooks")
-                      );
+                    .from({ type: "notebook", id: parent.id }, "notebook")
+                    .selector.sorted(
+                      db.settings.getGroupOptions("notebooks")
+                    );
               for (let i = 0; i < grouping.length; ++i) {
                 const notebook = await grouping.item(i);
                 if (!notebook.item) continue;
@@ -175,7 +175,7 @@ export function Notebooks() {
       <Input
         ref={inputRef}
         variant="clean"
-        placeholder="Filter notebooks..."
+        placeholder={strings.filterNotebooks()}
         sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
         onChange={debounce(async (e) => {
           const query = e.target.value.trim();

@@ -30,6 +30,7 @@ import { getToolbarElement } from "../utils/dom.js";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { ToolButton } from "../components/tool-button.js";
 import { findListItemType, isListActive } from "../../utils/list.js";
+import { strings } from "@notesnook/intl";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -136,20 +137,20 @@ export function NumberedList(props: ToolProps) {
       isActive={editor.isActive("orderedList")}
       onClick={onClick}
       subTypes={[
-        { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
-        { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },
-        { type: "lower-alpha", title: "Lower alpha", items: ["a", "b", "c"] },
+        { type: "decimal", title: strings.decimal(), items: ["1", "2", "3"] },
+        { type: "upper-alpha", title: strings.upperAlpha(), items: ["A", "B", "C"] },
+        { type: "lower-alpha", title: strings.lowerAlpha(), items: ["a", "b", "c"] },
         {
           type: "upper-roman",
-          title: "Upper Roman",
+          title: strings.upperRoman(),
           items: ["I", "II", "III"]
         },
         {
           type: "lower-roman",
-          title: "Lower Roman",
+          title: strings.lowerRoman(),
           items: ["i", "ii", "iii"]
         },
-        { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] }
+        { type: "lower-greek", title: strings.lowerGreek(), items: ["α", "β", "γ"] }
       ]}
     />
   );
@@ -170,9 +171,9 @@ export function BulletList(props: ToolProps) {
       onClick={onClick}
       isActive={editor.isActive("bulletList")}
       subTypes={[
-        { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
-        { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
-        { type: "square", title: "Lower alpha", items: ["a", "b", "c"] }
+        { type: "disc", title: strings.disc(), items: ["1", "2", "3"] },
+        { type: "circle", title: strings.circle(), items: ["A", "B", "C"] },
+        { type: "square", title: strings.square(), items: ["a", "b", "c"] }
       ]}
     />
   );

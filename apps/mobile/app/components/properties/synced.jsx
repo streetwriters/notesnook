@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { useUserStore } from "../../stores/use-user-store";
@@ -44,7 +45,7 @@ export const Synced = ({ item, close }) => {
       iconSize={AppFontSize.xs}
       icon="shield-key-outline"
       type="shade"
-      title="Encrypted and synced"
+      title={strings.noteSyncedNoticeHeading()}
       onPress={async () => {
         try {
           close();
