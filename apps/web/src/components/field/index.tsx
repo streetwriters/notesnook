@@ -239,7 +239,7 @@ function Field(props: FieldProps) {
                 {action.component ? (
                   action.component
                 ) : action.icon ? (
-                  <action.icon size={16} />
+                  <action.icon size={15} />
                 ) : null}
               </Button>
             ))}

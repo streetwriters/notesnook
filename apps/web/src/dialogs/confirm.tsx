@@ -194,8 +194,9 @@ export function showMultiDeleteConfirmation(length: number) {
     subtitle: strings.moveToTrashDesc(
       db.settings.getTrashCleanupInterval() || 7
     ),
-    positiveButtonText: strings.yes(),
-    negativeButtonText: strings.no()
+    positiveButtonText: strings.delete(),
+    negativeButtonText: strings.no(),
+    positiveButtonVariant: "new_error"
   });
 }
 

@@ -32,6 +32,7 @@ import Vault from "./vault";
 import { ExportStream } from "../utils/streams/export-stream";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
+import { ExportErrorsDialog } from "../dialogs/export-errors-dialog";
 import { db } from "./db";
 import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
 import { saveAs } from "file-saver";
@@ -118,15 +119,9 @@ export async function exportNotes(
     });
     return false;
   } else {
-    ConfirmDialog.show({
-      title: `Exported ${result.count} notes`,
-      subtitle:
-        result.errors.length > 0
-          ? `Export completed with ${result.errors.length} errors:
-
-${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
-          : "Export completed with 0 errors.",
-      positiveButtonText: strings.okay()
+    ExportErrorsDialog.show({
+      count: result.count,
+      errors: result.errors
     });
     return true;
   }
