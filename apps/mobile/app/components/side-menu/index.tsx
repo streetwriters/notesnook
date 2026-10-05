@@ -533,6 +533,9 @@ const TabBar = (props: SimpleTabBarProps) => {
                   <>
                     <IconButton
                       onPress={() => {
+                        SettingsService.set({
+                          useSystemTheme: false
+                        });
                         useThemeStore.getState().setColorScheme();
                       }}
                       style={{
