@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import {
   Star,
-  NoteLock,
+  Lock,
   Circle,
   Checkmark,
   SpellCheck,
@@ -125,7 +125,7 @@ const tools = [
     icon: Star,
     label: strings.favorite()
   },
-  { key: "lock", icon: NoteLock, label: strings.lock(), property: "locked" },
+  { key: "lock", icon: Lock, label: strings.lock(), property: "locked" },
   {
     key: "readonly",
     icon: PencilSimple,

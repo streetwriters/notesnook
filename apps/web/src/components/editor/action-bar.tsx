@@ -22,26 +22,39 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  Close,
+  CloudArrowUp,
+  CloudCheck,
+  Command,
   Cross,
+  DotsThree,
+  FileText,
   Icon,
+  LeftPanelClose,
+  LeftPanelOpen,
   Lock,
+  LockOpen,
+  MagnifyingGlass,
   NewTab,
   Note,
   NoteRemove,
+  PencilSimpleSlash,
   Pin,
   Plus,
   Properties,
   Publish,
   Published,
+  PushPinSimple,
   Readonly,
   Redo,
+  ScanDelete,
   Search,
   TableOfContents,
   Trash,
   Undo,
   Unlock
 } from "../icons";
-import { ScrollContainer } from "@notesnook/ui";
+import { Box, ScrollContainer } from "@notesnook/ui";
 import {
   SaveState,
   SessionType,
@@ -83,6 +96,7 @@ import { isMac } from "../../utils/platform";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { getDragData } from "../../utils/data-transfer";
 import { saveContent } from "./index";
+import { CommandPaletteDialog } from "../../dialogs/command-palette";
 
 type ToolButton = {
   title: string;
@@ -90,11 +104,20 @@ type ToolButton = {
   enabled?: boolean;
   hidden?: boolean;
   hideOnMobile?: boolean;
+  hideSeparator?: boolean;
   toggled?: boolean;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
-export function EditorActionBar() {
+type EditorActionBarProps = {
+  isSidebarCollapsed: boolean;
+  onSidebarToggle: () => void;
+};
+
+export function EditorActionBar({
+  isSidebarCollapsed,
+  onSidebarToggle
+}: EditorActionBarProps) {
   const { isMaximized, isFullscreen, hasNativeWindowControls } =
     useWindowControls();
   const activeTab = useEditorStore((store) => store.getActiveTab());
@@ -116,28 +139,8 @@ export function EditorActionBar() {
 
   const tools: ToolButton[] = [
     {
-      title: strings.newTab(),
-      icon: NewTab,
-      enabled: true,
-      onClick: () => useEditorStore.getState().addTab()
-    },
-    {
-      title: strings.undo(),
-      icon: Undo,
-      enabled: editorManager?.canUndo,
-      onClick: () => editorManager?.editor?.undo(),
-      hidden: activeSession?.type === "readonly"
-    },
-    {
-      title: strings.redo(),
-      icon: Redo,
-      enabled: editorManager?.canRedo,
-      onClick: () => editorManager?.editor?.redo(),
-      hidden: activeSession?.type === "readonly"
-    },
-    {
       title: isNotePublished ? strings.published() : strings.publish(),
-      icon: isNotePublished ? Published : Publish,
+      icon: isNotePublished ? CloudCheck : CloudArrowUp,
       hidden: !isLoggedIn,
       hideOnMobile: true,
       enabled:
@@ -155,7 +158,7 @@ export function EditorActionBar() {
     },
     {
       title: strings.search(),
-      icon: Search,
+      icon: MagnifyingGlass,
       enabled:
         activeSession &&
         activeSession.type !== "new" &&
@@ -166,7 +169,7 @@ export function EditorActionBar() {
     },
     {
       title: strings.properties(),
-      icon: Properties,
+      icon: DotsThree,
       enabled:
         activeSession &&
         activeSession.type !== "new" &&
@@ -186,11 +189,42 @@ export function EditorActionBar() {
       isMaximized,
       isTablet,
       isMobile
-    )
+    ).map((tool) => ({ ...tool, hideSeparator: true }))
   ];
 
   return (
     <>
+      {IS_DESKTOP_APP && isMac() && !isFullscreen && !hasNativeTitlebar && (
+        <Box
+          sx={{
+            alignSelf: "center",
+            mx: "spacing4",
+            width: "1px",
+            height: "13px",
+            backgroundColor: "separator"
+          }}
+        />
+      )}
+      <Button
+        sx={{
+          bg: "transparent",
+          flexShrink: 0,
+          borderRadius: "radius1",
+          alignSelf: "center",
+          width: "20px",
+          height: "20px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center"
+        }}
+        onClick={onSidebarToggle}
+      >
+        {isSidebarCollapsed ? (
+          <LeftPanelOpen size={15} />
+        ) : (
+          <LeftPanelClose size={15} />
+        )}
+      </Button>
       {isMobile ? (
         <Flex sx={{ flex: 1 }}>
           <Button
@@ -218,40 +252,92 @@ export function EditorActionBar() {
           mr:
             hasNativeWindowControls && !isMac() && !isMobile && !isTablet
               ? `calc(100vw - env(titlebar-area-width))`
-              : 1,
-          pl: 1,
-          borderLeft: "1px solid var(--border)",
-          borderBottom: "1px solid var(--border)",
-          flexShrink: 0
+              : 0,
+          ml: "spacing2",
+          gap: "spacing2",
+          flexShrink: 0,
+          my: "spacing3"
         }}
       >
-        {tools.map((tool) => (
-          <Button
-            data-test-id={tool.title}
-            disabled={!tool.enabled}
-            variant={tool.title === "Close" ? "error" : "secondary"}
-            title={tool.title}
-            key={tool.title}
+        <Button
+          data-test-id="command-palette"
+          title="Command"
+          onClick={() => CommandPaletteDialog.show({ isCommandMode: true })}
+          sx={{
+            gap: "spacing3",
+            p: "spacing2",
+            height: "25px",
+            borderRadius: "radius1",
+            bg: "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0
+          }}
+        >
+          <Command size={15} color="icon" />
+          <Text
             sx={{
-              p: 1,
-              alignItems: "center",
-              bg: tool.toggled ? "background-selected" : "transparent",
-              display: [
-                "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
-                tool.hidden ? "none" : "flex"
-              ],
-              flexShrink: 0,
-              "&:hover svg path": {
-                fill:
-                  tool.title === "Close"
-                    ? "var(--accentForeground-error) !important"
-                    : "var(--icon)"
-              }
+              color: "paragraph",
+              fontSize: "xs",
+              fontWeight: 500,
+              lineHeight: 1
             }}
-            onClick={tool.onClick}
           >
-            <tool.icon size={16} />
-          </Button>
+            Command
+          </Text>
+        </Button>
+        <Box
+          sx={{
+            width: "1px",
+            height: "13px",
+            backgroundColor: "separator"
+          }}
+        />
+        {tools.map((tool, index) => (
+          <React.Fragment key={tool.title}>
+            <Button
+              data-test-id={tool.title}
+              disabled={!tool.enabled}
+              variant={tool.title === "Close" ? "error" : "secondary"}
+              title={tool.title}
+              key={tool.title}
+              sx={{
+                borderRadius: "radius1",
+                width: "20px",
+                height: "20px",
+                justifyContent: "center",
+                alignItems: "center",
+                bg: tool.toggled ? "background-selected" : "transparent",
+                display: [
+                  "hideOnMobile" in tool && tool.hideOnMobile ? "none" : "flex",
+                  tool.hidden ? "none" : "flex"
+                ],
+                flexShrink: 0,
+                "&:hover svg path": {
+                  fill:
+                    tool.title === "Close"
+                      ? "var(--accentForeground-error) !important"
+                      : "var(--icon)"
+                }
+              }}
+              onClick={tool.onClick}
+            >
+              <tool.icon size={16} />
+            </Button>
+            {!tool.hidden &&
+              !tool.hideOnMobile &&
+              !tool.hideSeparator &&
+              index < tools.length - 1 && (
+                <Box
+                  sx={{
+                    width: "1px",
+                    height: "13px",
+                    backgroundColor: "separator"
+                  }}
+                />
+              )}
+          </React.Fragment>
         ))}
       </Flex>
     </>
@@ -270,43 +356,52 @@ const TabStrip = React.memo(function TabStrip() {
     <Flex sx={{ flex: 1 }}>
       <Flex
         sx={{
-          px: 1,
-          borderRight: "1px solid var(--border)",
-          borderBottom: "1px solid var(--border)",
+          px: "spacing4",
           alignItems: "center",
-          flexShrink: 0
+          flexShrink: 0,
+          gap: "spacing4",
+          my: "spacing3"
         }}
         onDoubleClick={(e) => e.stopPropagation()}
       >
         <Button
-          variant="accent"
-          {...CREATE_BUTTON_MAP.notes}
-          data-test-id={`create-new-note`}
-          sx={{
-            p: 1,
-            borderRadius: "100%",
-            mr: "small"
-          }}
-        >
-          <Plus size={16} color="accentForeground" />
-        </Button>
-        <Button
           disabled={!canGoBack}
           onClick={() => useEditorStore.getState().goBack()}
-          variant="secondary"
-          sx={{ p: 1, bg: "transparent" }}
+          sx={{
+            width: "20px",
+            height: "20px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: "1 !important",
+            "&:hover svg path": {
+              fill: canGoBack ? "var(--icon-selected) !important" : ""
+            }
+          }}
           data-test-id="go-back"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={15} color={canGoBack ? "icon" : "icon-disabled"} />
         </Button>
         <Button
           disabled={!canGoForward}
           onClick={() => useEditorStore.getState().goForward()}
-          variant="secondary"
-          sx={{ p: 1, bg: "transparent" }}
+          sx={{
+            width: "20px",
+            height: "20px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: "1 !important",
+            "&:hover svg path": {
+              fill: canGoBack ? "var(--icon-selected) !important" : ""
+            }
+          }}
           data-test-id="go-forward"
         >
-          <ArrowRight size={16} />
+          <ArrowRight
+            size={15}
+            color={canGoForward ? "icon" : "icon-disabled"}
+          />
         </Button>
       </Flex>
       <ScrollContainer
@@ -328,7 +423,9 @@ const TabStrip = React.memo(function TabStrip() {
         <Flex
           sx={{
             flex: 1,
-            height: "100%"
+            height: "100%",
+            gap: "spacing3",
+            py: "spacing3"
           }}
           onDoubleClick={async (e) => {
             e.stopPropagation();
@@ -456,9 +553,26 @@ const TabStrip = React.memo(function TabStrip() {
               );
             }}
           />
-          <div
-            style={{ width: "100%", borderBottom: "1px solid var(--border)" }}
-          />
+          {/* <Button
+            variant="secondary"
+            data-test-id="create-new-note"
+            title={strings.newTab()}
+            onClick={() => useEditorStore.getState().addTab()}
+            sx={{
+              width: "20px",
+              height: "20px",
+              p: 0,
+              borderRadius: "radius1",
+              bg: "hover",
+              alignSelf: "center",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexShrink: 0
+            }}
+          >
+            <Plus size={11} />
+          </Button> */}
         </Flex>
       </ScrollContainer>
     </Flex>
@@ -507,14 +621,14 @@ function Tab(props: TabProps) {
   const Icon = isLocked
     ? type === "locked"
       ? Lock
-      : Unlock
+      : LockOpen
     : type === "readonly"
-    ? Readonly
+    ? PencilSimpleSlash
     : type === "deleted"
     ? Trash
     : isUnsaved
-    ? NoteRemove
-    : Note;
+    ? ScanDelete
+    : FileText;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
   const activeTabRef = useRef<HTMLElement | null>(null);
@@ -550,20 +664,19 @@ function Tab(props: TabProps) {
         useEditorStore.getState().openSessionInTab(noteId, id);
       }}
       sx={{
-        height: "100%",
+        py: "spacing4",
+        px: "spacing3",
+        borderRadius: "radius2",
+
         cursor: "pointer",
-        pl: 2,
-        borderRight: "1px solid var(--border)",
-        borderBottom: isActive
-          ? "1px solid transparent"
-          : "1px solid var(--border)",
+
         ":last-of-type": { borderRight: 0 },
 
         transform: CSS.Transform.toString(transform),
         transition,
         visibility: active?.id === id ? "hidden" : "visible",
 
-        bg: isActive ? "background" : "transparent",
+        bg: isActive ? "background-tertiary" : "transparent",
         justifyContent: "space-between",
         alignItems: "center",
         flexShrink: 0,
@@ -571,7 +684,7 @@ function Tab(props: TabProps) {
           "& .closeTabButton": {
             opacity: 1
           },
-          bg: isActive ? "background" : "hover"
+          bg: isActive ? "background-tertiary" : "hover"
         }
       }}
       onContextMenu={(e) => {
@@ -670,36 +783,45 @@ function Tab(props: TabProps) {
         </Text>
       </Flex>
       {isPinned ? (
-        <Pin
+        <Button
+          variant="secondary"
           sx={{
-            borderRadius: "default",
-            flexShrink: 0,
-            ml: "small",
-            mr: 1,
-            "&:hover": {
-              bg: "hover-secondary"
-            }
-          }}
-          size={14}
-          onClick={onPin}
-        />
-      ) : (
-        <Cross
-          sx={{
-            borderRadius: "default",
-            flexShrink: 0,
+            ml: "spacing2",
+            bg: "transparent",
+            borderRadius: "radius1",
+            width: "15px",
+            height: "15px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             opacity: isActive || active?.id === id ? 1 : 0,
-            ml: "small",
-            mr: 1,
-            "&:hover": {
-              bg: "hover-secondary"
-            }
+            p: 0
+          }}
+          onClick={onPin}
+        >
+          <PushPinSimple size={11} />
+        </Button>
+      ) : (
+        <Button
+          variant="secondary"
+          sx={{
+            ml: "spacing2",
+            bg: "transparent",
+            borderRadius: "radius1",
+            width: "15px",
+            height: "15px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            opacity: isActive || active?.id === id ? 1 : 0,
+            p: 0
           }}
           onClick={onClose}
           className="closeTabButton"
           data-test-id={"tab-close-button"}
-          size={14}
-        />
+        >
+          <Close size={11} />
+        </Button>
       )}
     </Flex>
   );
