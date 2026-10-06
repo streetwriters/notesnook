@@ -28,6 +28,8 @@ import { ImageNode } from "../../extensions/image/index.js";
 import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
 import { Editor, getMarkAttributes } from "@tiptap/core";
 import { strings } from "@notesnook/intl";
+import { useState } from "react";
+import { test } from "linkifyjs";
 
 export type LinkPopupProps = {
   link?: LinkDefinition;
@@ -45,6 +47,16 @@ export function LinkPopup(props: LinkPopupProps) {
     isImageActive
   } = props;
   const link = useRefValue(_link);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDone = () => {
+    const href = link.current?.href?.trim();
+    if (!href || (!isInternalLink(href) && !test(href))) {
+      setError(strings.enterValidUrl());
+      return;
+    }
+    onDone(link.current);
+  };
 
   return (
     <Popup
@@ -52,14 +64,14 @@ export function LinkPopup(props: LinkPopupProps) {
       onClose={onClose}
       action={{
         title: isEditing ? strings.save() : strings.insert(),
-        onClick: () => onDone(link.current)
+        onClick: handleDone
       }}
     >
       <Flex
         sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}
         onKeyUp={(e) => {
           if (e.key === "Enter") {
-            onDone(link.current);
+            handleDone();
           }
         }}
       >
@@ -104,10 +116,25 @@ export function LinkPopup(props: LinkPopupProps) {
           autoFocus
           placeholder="https://example.com/"
           defaultValue={link.current?.href}
-          onChange={(e) =>
-            (link.current = { ...link.current, href: e.target.value })
-          }
+          variant={error ? "error" : undefined}
+          onChange={(e) => {
+            if (error) setError(null);
+            link.current = { ...link.current, href: e.target.value };
+          }}
         />
+        {error && (
+          <Text
+            variant={"error"}
+            sx={{
+              bg: "var(--background-error)",
+              p: 1,
+              mt: 2,
+              borderRadius: "default"
+            }}
+          >
+            {error}
+          </Text>
+        )}
       </Flex>
     </Popup>
   );
