@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Attachment, ImageAttributes, LinkAttributes } from "@notesnook/editor";
 import { Settings } from ".";
+import { useSafeAreaStore } from "../hooks/useSafeArea";
+import { useSettingsStore } from "../hooks/useSettings";
 
 globalThis.commands = {
   clearContent: (tabId: string) => {
@@ -90,21 +92,15 @@ globalThis.commands = {
   },
 
   setInsets: (insets: any) => {
-    if (typeof safeAreaController !== "undefined") {
-      safeAreaController.update(insets);
-    }
+    useSafeAreaStore.getState().setInsets(insets);
   },
 
   updateSettings: (settings?: Partial<Settings>) => {
-    if (typeof globalThis.settingsController !== "undefined") {
-      globalThis.settingsController.update(settings as Settings);
-    }
+    useSettingsStore.getState().setSettings(settings);
   },
 
   setSettings: (settings?: Partial<Settings>) => {
-    if (typeof globalThis.settingsController !== "undefined") {
-      globalThis.settingsController.update(settings as Settings);
-    }
+    useSettingsStore.getState().setSettings(settings);
   },
 
   setTags: async (tabId: string, tags: any) => {

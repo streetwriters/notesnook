@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { PropsWithChildren, useMemo } from "react";
 import { Theme, ThemeFactory, useThemeColors } from "@notesnook/theme";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
+import { useSettingsStore } from "../hooks/useSettings";
 
 const modifyToolbarTheme = (toolbarTheme: Theme) => {
   toolbarTheme.space = [0, 10, 12, 18];
@@ -30,8 +31,8 @@ const modifyToolbarTheme = (toolbarTheme: Theme) => {
     paddingX: "20px",
     borderBottomWidth: 0
   };
-  const fontScale = settingsController.previous?.fontScale
-    ? settingsController.previous?.fontScale
+  const fontScale = useSettingsStore.getState().settings.fontScale
+    ? useSettingsStore.getState().settings.fontScale
     : 1;
   toolbarTheme.iconSizes = {
     big: 20 * fontScale,
