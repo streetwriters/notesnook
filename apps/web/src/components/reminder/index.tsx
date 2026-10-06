@@ -168,7 +168,8 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
           title: strings.doActions.delete.reminder(items.length),
           subtitle: strings.irreverisibleAction(),
           positiveButtonText: strings.yes(),
-          negativeButtonText: strings.no()
+          negativeButtonText: strings.no(),
+          positiveButtonVariant: "new_error"
         }).then((result) => {
           result && Multiselect.moveRemindersToTrash(items);
         });
