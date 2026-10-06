@@ -27,66 +27,22 @@ const mobileDir = path.resolve(androidDir, "..");
 const rootDir = path.resolve(mobileDir, "..", "..");
 const prebuiltDir = path.join(androidDir, ".prebuilt-aars");
 
-// Library registry configuration
-// gradleProject: Gradle project name (defaults to lib name with @ stripped and / replaced with _)
-// filePrefix: Output file prefix (defaults to lib name with @ stripped and / replaced with -)
-// customFlagsProp: gradle.properties property key containing extra compile flags
-const ALL_LIBRARIES = {
-  "react-native-quick-sqlite": {
-    gradleProject: "react-native-quick-sqlite",
-    filePrefix: "react-native-quick-sqlite",
-    customFlagsProp: "quickSqliteFlags"
-  },
-  "react-native-fast-openpgp": {
-    gradleProject: "react-native-fast-openpgp",
-    filePrefix: "react-native-fast-openpgp"
-  },
-  "react-native-screens": {
-    gradleProject: "react-native-screens",
-    filePrefix: "react-native-screens"
-  },
-  "react-native-gesture-handler": {
-    gradleProject: "react-native-gesture-handler",
-    filePrefix: "react-native-gesture-handler"
-  },
-  "react-native-mmkv-storage": {
-    gradleProject: "react-native-mmkv-storage",
-    filePrefix: "react-native-mmkv-storage"
-  },
-  "@callstack/repack": {
-    gradleProject: "callstack_repack",
-    filePrefix: "callstack-repack"
-  },
-  "react-native-nitro-modules": {
-    gradleProject: "react-native-nitro-modules",
-    filePrefix: "react-native-nitro-modules"
-  },
-  "react-native-nitro-cloud-uploader": {
-    gradleProject: "react-native-nitro-cloud-uploader",
-    filePrefix: "react-native-nitro-cloud-uploader"
-  },
-  "react-native-worklets": {
-    gradleProject: "react-native-worklets",
-    filePrefix: "react-native-worklets"
-  },
-  "react-native-reanimated": {
-    gradleProject: "react-native-reanimated",
-    filePrefix: "react-native-reanimated"
-  }
-};
+// Load centralized prebuilt-libraries.json config (or generate if missing)
+const prebuiltConfigPath = path.join(androidDir, "prebuilt-libraries.json");
+let prebuiltConfig = null;
+if (fs.existsSync(prebuiltConfigPath)) {
+  try {
+    prebuiltConfig = JSON.parse(fs.readFileSync(prebuiltConfigPath, "utf8"));
+  } catch (e) {}
+}
 
-// All configured prebuilt libraries in dependency order
-const ACTIVE_LIBRARIES = [
-  "react-native-quick-sqlite",
-  "react-native-fast-openpgp",
-  "react-native-screens",
-  "react-native-gesture-handler",
-  "react-native-mmkv-storage",
-  "react-native-nitro-modules",
-  "react-native-nitro-cloud-uploader",
-  "react-native-worklets",
-  "react-native-reanimated"
-];
+if (!prebuiltConfig) {
+  const { generateConfig } = require("./generate-prebuilt-config");
+  prebuiltConfig = generateConfig();
+}
+
+const ALL_LIBRARIES = prebuiltConfig.libraries || {};
+const ACTIVE_LIBRARIES = prebuiltConfig.activeLibraries || Object.keys(ALL_LIBRARIES);
 
 function computeHash(libName) {
   const libConfig = ALL_LIBRARIES[libName] || {
@@ -311,6 +267,14 @@ if (require.main === module) {
   for (const lib of libsToBuild) {
     buildPrebuiltAar(lib, targetVariant);
   }
+
+  // Run ./gradlew clean as the final step
+  console.log("\n[CLEAN] Running ./gradlew clean as final step...");
+  execSync("./gradlew clean", {
+    cwd: androidDir,
+    stdio: "inherit"
+  });
+  console.log("[DONE] All prebuilt AARs compiled and workspace cleaned.");
 }
 
 module.exports = {
