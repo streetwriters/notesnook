@@ -32,7 +32,7 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 import { useEffect } from "react";
 import { getQueryParams, hardNavigate } from "../navigation";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
-import { ArrowUp, ChevronLeft, Lightning } from "../components/icons";
+import { ArrowUp, CaretRight, Lightning } from "../components/icons";
 import Star from "../assets/star.svg";
 import PlansFooter from "../assets/plans-footer.svg";
 
@@ -122,7 +122,7 @@ function Plans() {
               }}
             >
               Skip
-              <ChevronLeft size={14} color="heading" />
+              <CaretRight size={14} color="heading" />
             </Button>
             <Flex
               sx={{

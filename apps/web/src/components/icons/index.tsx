@@ -324,6 +324,7 @@ import UserSvg from "@notesnook/icons/user.svg?react";
 import ListSvg from "@notesnook/icons/list.svg?react";
 import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
 import CloseSvg from "@notesnook/icons/close.svg?react";
+import CaretLeftSvg from "@notesnook/icons/caret-left.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -696,7 +697,6 @@ export const PasswordVisible = createSvgIcon(EyeClosed);
 export const Chat = createSvgIcon(ChatIcon);
 export const Email = createSvgIcon(EnvelopeSimple);
 export const RecoveryCode = createSvgIcon(LockSimple);
-export const ChevronLeft = createSvgIcon(ChevronLeftIcon);
 export const ChevronRight = createSvgIcon(ChevronRightIcon);
 export const CaretDown = createSvgIcon(ChevronDownIcon);
 export const Clock = createSvgIcon(ClockIcon);
@@ -780,3 +780,4 @@ export const UserProfileIcon = createSvgIcon(UserSvg);
 export const List = createSvgIcon(ListSvg);
 export const CalendarDots = createSvgIcon(CalendarDotsSvg);
 export const Close = createSvgIcon(CloseSvg);
+export const CaretLeft = createSvgIcon(CaretLeftSvg);
