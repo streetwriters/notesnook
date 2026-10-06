@@ -34,7 +34,6 @@ import {
   MfaSms,
   MfaEmail,
   MfaRecoveryCode,
-  ChevronRight,
   Clock,
   Icon,
   Warn,
