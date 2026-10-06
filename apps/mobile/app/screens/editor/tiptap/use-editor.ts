@@ -1116,6 +1116,7 @@ export const useEditor = (
 
   const onLoad = useCallback(async () => {
     const isAppLoading = useSettingStore.getState().isAppLoading;
+    syncTabs();
     if (isAppLoading) {
       const sub = useSettingStore.subscribe((state) => {
         if (!state.isAppLoading) {
@@ -1126,6 +1127,7 @@ export const useEditor = (
       return;
     }
 
+    syncTabs();
     setTimeout(() => {
       postMessage(NativeEvents.theme, theme);
     });
@@ -1133,7 +1135,6 @@ export const useEditor = (
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
     await commands.setSettings();
-
     localTabState.current?.set(useTabStore.getState().currentTab!, {
       editedAt: 0
     });
