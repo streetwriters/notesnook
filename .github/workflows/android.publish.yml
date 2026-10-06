@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          lfs: true
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache

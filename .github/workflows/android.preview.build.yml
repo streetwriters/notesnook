@@ -33,6 +33,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          lfs: true
 
       - name: Setup Node
         uses: ./.github/actions/setup-node-with-cache
