@@ -10,6 +10,8 @@ import com.android.build.OutputFile
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
 
+apply from: new File(rootDir, "prebuilt-aars.gradle")
+
 react {
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '..'
@@ -256,8 +258,6 @@ dependencies {
     }
 
 }
-
-apply from: new File(rootDir, "prebuilt-aars.gradle")
 
 task deleteFiles(type: Delete) {
   delete './src/main/assets/static'

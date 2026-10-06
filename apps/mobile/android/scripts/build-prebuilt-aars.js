@@ -1,126 +1,167 @@
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
-const crypto = require('crypto');
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
+const crypto = require("crypto");
 
 // Resolve important directory paths relative to this script
-const androidDir = path.resolve(__dirname, '..');
-const mobileDir = path.resolve(androidDir, '..');
-const rootDir = path.resolve(mobileDir, '..', '..');
-const prebuiltDir = path.join(androidDir, '.prebuilt-aars');
+const androidDir = path.resolve(__dirname, "..");
+const mobileDir = path.resolve(androidDir, "..");
+const rootDir = path.resolve(mobileDir, "..", "..");
+const prebuiltDir = path.join(androidDir, ".prebuilt-aars");
 
 // Library registry configuration
 // gradleProject: Gradle project name (defaults to lib name with @ stripped and / replaced with _)
 // filePrefix: Output file prefix (defaults to lib name with @ stripped and / replaced with -)
 // customFlagsProp: gradle.properties property key containing extra compile flags
 const ALL_LIBRARIES = {
-  'react-native-quick-sqlite': {
-    gradleProject: 'react-native-quick-sqlite',
-    filePrefix: 'react-native-quick-sqlite',
-    customFlagsProp: 'quickSqliteFlags',
+  "react-native-quick-sqlite": {
+    gradleProject: "react-native-quick-sqlite",
+    filePrefix: "react-native-quick-sqlite",
+    customFlagsProp: "quickSqliteFlags"
   },
-  'react-native-fast-openpgp': {
-    gradleProject: 'react-native-fast-openpgp',
-    filePrefix: 'react-native-fast-openpgp',
+  "react-native-fast-openpgp": {
+    gradleProject: "react-native-fast-openpgp",
+    filePrefix: "react-native-fast-openpgp"
   },
-  'react-native-screens': {
-    gradleProject: 'react-native-screens',
-    filePrefix: 'react-native-screens',
+  "react-native-screens": {
+    gradleProject: "react-native-screens",
+    filePrefix: "react-native-screens"
   },
-  'react-native-gesture-handler': {
-    gradleProject: 'react-native-gesture-handler',
-    filePrefix: 'react-native-gesture-handler',
+  "react-native-gesture-handler": {
+    gradleProject: "react-native-gesture-handler",
+    filePrefix: "react-native-gesture-handler"
   },
-  'react-native-mmkv-storage': {
-    gradleProject: 'react-native-mmkv-storage',
-    filePrefix: 'react-native-mmkv-storage',
+  "react-native-mmkv-storage": {
+    gradleProject: "react-native-mmkv-storage",
+    filePrefix: "react-native-mmkv-storage"
   },
-  '@callstack/repack': {
-    gradleProject: 'callstack_repack',
-    filePrefix: 'callstack-repack',
+  "@callstack/repack": {
+    gradleProject: "callstack_repack",
+    filePrefix: "callstack-repack"
   },
-  'react-native-nitro-modules': {
-    gradleProject: 'react-native-nitro-modules',
-    filePrefix: 'react-native-nitro-modules',
+  "react-native-nitro-modules": {
+    gradleProject: "react-native-nitro-modules",
+    filePrefix: "react-native-nitro-modules"
   },
-  'react-native-nitro-cloud-uploader': {
-    gradleProject: 'react-native-nitro-cloud-uploader',
-    filePrefix: 'react-native-nitro-cloud-uploader',
+  "react-native-nitro-cloud-uploader": {
+    gradleProject: "react-native-nitro-cloud-uploader",
+    filePrefix: "react-native-nitro-cloud-uploader"
   },
-  'react-native-worklets': {
-    gradleProject: 'react-native-worklets',
-    filePrefix: 'react-native-worklets',
+  "react-native-worklets": {
+    gradleProject: "react-native-worklets",
+    filePrefix: "react-native-worklets"
   },
-  'react-native-reanimated': {
-    gradleProject: 'react-native-reanimated',
-    filePrefix: 'react-native-reanimated',
-  },
+  "react-native-reanimated": {
+    gradleProject: "react-native-reanimated",
+    filePrefix: "react-native-reanimated"
+  }
 };
 
 // All configured prebuilt libraries in dependency order
 const ACTIVE_LIBRARIES = [
-  'react-native-quick-sqlite',
-  'react-native-fast-openpgp',
-  'react-native-screens',
-  'react-native-gesture-handler',
-  'react-native-mmkv-storage',
-  'react-native-nitro-modules',
-  'react-native-nitro-cloud-uploader',
-  'react-native-worklets',
-  'react-native-reanimated',
+  "react-native-quick-sqlite",
+  "react-native-fast-openpgp",
+  "react-native-screens",
+  "react-native-gesture-handler",
+  "react-native-mmkv-storage",
+  "react-native-nitro-modules",
+  "react-native-nitro-cloud-uploader",
+  "react-native-worklets",
+  "react-native-reanimated"
 ];
 
 function computeHash(libName) {
   const libConfig = ALL_LIBRARIES[libName] || {
-    gradleProject: libName.replace(/^@/, '').replace(/\//g, '_'),
-    filePrefix: libName.replace(/^@/, '').replace(/\//g, '-'),
+    gradleProject: libName.replace(/^@/, "").replace(/\//g, "_"),
+    filePrefix: libName.replace(/^@/, "").replace(/\//g, "-")
   };
 
   // 1. Library version from its package.json
-  const libPkgPath = path.join(mobileDir, 'node_modules', libName, 'package.json');
+  const libPkgPath = path.join(
+    mobileDir,
+    "node_modules",
+    libName,
+    "package.json"
+  );
   if (!fs.existsSync(libPkgPath)) {
-    throw new Error(`Cannot find package.json for library: ${libName} at ${libPkgPath}`);
+    throw new Error(
+      `Cannot find package.json for library: ${libName} at ${libPkgPath}`
+    );
   }
-  const libVersion = JSON.parse(fs.readFileSync(libPkgPath, 'utf8')).version;
+  const libVersion = JSON.parse(fs.readFileSync(libPkgPath, "utf8")).version;
 
   // 2. React Native version
-  const rnPkgPath = path.join(mobileDir, 'node_modules', 'react-native', 'package.json');
+  const rnPkgPath = path.join(
+    mobileDir,
+    "node_modules",
+    "react-native",
+    "package.json"
+  );
   const rnVersion = fs.existsSync(rnPkgPath)
-    ? JSON.parse(fs.readFileSync(rnPkgPath, 'utf8')).version
-    : '';
+    ? JSON.parse(fs.readFileSync(rnPkgPath, "utf8")).version
+    : "";
 
   // 3. Flags and architectures from gradle.properties
-  const gradlePropsPath = path.join(androidDir, 'gradle.properties');
-  const gradleProps = fs.existsSync(gradlePropsPath) ? fs.readFileSync(gradlePropsPath, 'utf8') : '';
-  const newArch = (gradleProps.match(/^newArchEnabled\s*=\s*(.+)$/m) || [])[1]?.trim() || '';
-  const hermes = (gradleProps.match(/^hermesEnabled\s*=\s*(.+)$/m) || [])[1]?.trim() || '';
-  const archs = (gradleProps.match(/^reactNativeArchitectures\s*=\s*(.+)$/m) || [])[1]?.trim() || '';
+  const gradlePropsPath = path.join(androidDir, "gradle.properties");
+  const gradleProps = fs.existsSync(gradlePropsPath)
+    ? fs.readFileSync(gradlePropsPath, "utf8")
+    : "";
+  const newArch =
+    (gradleProps.match(/^newArchEnabled\s*=\s*(.+)$/m) || [])[1]?.trim() || "";
+  const hermes =
+    (gradleProps.match(/^hermesEnabled\s*=\s*(.+)$/m) || [])[1]?.trim() || "";
+  const archs =
+    (gradleProps.match(/^reactNativeArchitectures\s*=\s*(.+)$/m) ||
+      [])[1]?.trim() || "";
 
   // 4. NDK version from build.gradle
-  const buildGradlePath = path.join(androidDir, 'build.gradle');
-  const buildGradle = fs.existsSync(buildGradlePath) ? fs.readFileSync(buildGradlePath, 'utf8') : '';
+  const buildGradlePath = path.join(androidDir, "build.gradle");
+  const buildGradle = fs.existsSync(buildGradlePath)
+    ? fs.readFileSync(buildGradlePath, "utf8")
+    : "";
   const ndkMatch = buildGradle.match(/ndkVersion\s*=\s*['"]([^'"]+)['"]/);
-  const ndkVersion = ndkMatch ? ndkMatch[1] : '';
+  const ndkVersion = ndkMatch ? ndkMatch[1] : "";
 
   // 5. Library-specific custom flags if configured
-  let customFlags = '';
+  let customFlags = "";
   if (libConfig.customFlagsProp) {
-    const re = new RegExp(`^${libConfig.customFlagsProp}\\s*=\\s*(.+)$`, 'm');
-    customFlags = (gradleProps.match(re) || [])[1]?.trim() || '';
+    const re = new RegExp(`^${libConfig.customFlagsProp}\\s*=\\s*(.+)$`, "m");
+    customFlags = (gradleProps.match(re) || [])[1]?.trim() || "";
   }
 
   // 6. Relevant patch files from apps/mobile/patches
-  const patchesDir = path.join(mobileDir, 'patches');
-  const patchPrefix = libName.replace(/\//g, '+');
-  let patchContent = '';
+  const patchesDir = path.join(mobileDir, "patches");
+  const patchPrefix = libName.replace(/\//g, "+");
+  let patchContent = "";
   if (fs.existsSync(patchesDir)) {
-    const patchFiles = fs.readdirSync(patchesDir)
-      .filter((f) => f.startsWith(patchPrefix) && f.endsWith('.patch'))
+    const patchFiles = fs
+      .readdirSync(patchesDir)
+      .filter((f) => f.startsWith(patchPrefix) && f.endsWith(".patch"))
       .sort();
-    patchContent = patchFiles.map((f) => fs.readFileSync(path.join(patchesDir, f), 'utf8')).join('\n');
+    patchContent = patchFiles
+      .map((f) => fs.readFileSync(path.join(patchesDir, f), "utf8"))
+      .join("\n");
   }
 
-  const hash = crypto.createHash('sha1');
+  const hash = crypto.createHash("sha1");
   hash.update(`lib:${libName}@${libVersion}\n`);
   hash.update(`rn:${rnVersion}\n`);
   hash.update(`archs:${archs}\n`);
@@ -132,7 +173,7 @@ function computeHash(libName) {
   }
   hash.update(`patch:${patchContent}\n`);
 
-  return hash.digest('hex').substring(0, 8);
+  return hash.digest("hex").substring(0, 8);
 }
 
 function buildPrebuiltAar(libName, targetVariant) {
@@ -141,17 +182,21 @@ function buildPrebuiltAar(libName, targetVariant) {
   }
 
   const libConfig = ALL_LIBRARIES[libName] || {
-    gradleProject: libName.replace(/^@/, '').replace(/\//g, '_'),
-    filePrefix: libName.replace(/^@/, '').replace(/\//g, '-'),
+    gradleProject: libName.replace(/^@/, "").replace(/\//g, "_"),
+    filePrefix: libName.replace(/^@/, "").replace(/\//g, "-")
   };
 
   const hash = computeHash(libName);
-  const variants = targetVariant ? [targetVariant] : ['debug', 'release'];
+  const variants = targetVariant ? [targetVariant] : ["debug", "release"];
 
   // Read target ABIs
-  const gradlePropsPath = path.join(androidDir, 'gradle.properties');
-  const gradleProps = fs.existsSync(gradlePropsPath) ? fs.readFileSync(gradlePropsPath, 'utf8') : '';
-  const archs = (gradleProps.match(/^reactNativeArchitectures\s*=\s*(.+)$/m) || [])[1]?.trim() || 'armeabi-v7a,arm64-v8a,x86,x86_64';
+  const gradlePropsPath = path.join(androidDir, "gradle.properties");
+  const gradleProps = fs.existsSync(gradlePropsPath)
+    ? fs.readFileSync(gradlePropsPath, "utf8")
+    : "";
+  const archs =
+    (gradleProps.match(/^reactNativeArchitectures\s*=\s*(.+)$/m) ||
+      [])[1]?.trim() || "armeabi-v7a,arm64-v8a,x86,x86_64";
 
   for (const variant of variants) {
     const aarFileName = `${libConfig.filePrefix}-${variant}-${hash}.aar`;
@@ -167,38 +212,44 @@ function buildPrebuiltAar(libName, targetVariant) {
     console.log(`[BUILD] Running ${task} for ${libName} (hash: ${hash})...`);
 
     // Invalidate autolinking cache prior to build to avoid stale state
-    const autolinkCache = path.join(androidDir, 'build', 'generated', 'autolinking');
+    const autolinkCache = path.join(
+      androidDir,
+      "build",
+      "generated",
+      "autolinking"
+    );
     if (fs.existsSync(autolinkCache)) {
       fs.rmSync(autolinkCache, { recursive: true, force: true });
     }
 
-    execSync(
-      `./gradlew ${task} -PreactNativeArchitectures=${archs}`,
-      {
-        cwd: androidDir,
-        stdio: 'inherit',
-        env: {
-          ...process.env,
-          BUILDING_PREBUILT_AARS: 'true',
-        },
+    execSync(`./gradlew ${task} -PreactNativeArchitectures=${archs}`, {
+      cwd: androidDir,
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        BUILDING_PREBUILT_AARS: "true"
       }
-    );
+    });
 
     const aarOutputDir = path.join(
       mobileDir,
-      'node_modules',
+      "node_modules",
       libName,
-      'android',
-      'build',
-      'outputs',
-      'aar'
+      "android",
+      "build",
+      "outputs",
+      "aar"
     );
 
     if (!fs.existsSync(aarOutputDir)) {
-      throw new Error(`AAR output dir not found for ${libName} at ${aarOutputDir}`);
+      throw new Error(
+        `AAR output dir not found for ${libName} at ${aarOutputDir}`
+      );
     }
 
-    const aarFiles = fs.readdirSync(aarOutputDir).filter((f) => f.endsWith('.aar'));
+    const aarFiles = fs
+      .readdirSync(aarOutputDir)
+      .filter((f) => f.endsWith(".aar"));
     const matchedAar = aarFiles.find((f) => f.includes(variant)) || aarFiles[0];
     if (!matchedAar) {
       throw new Error(`No .aar file generated in ${aarOutputDir}`);
@@ -209,48 +260,48 @@ function buildPrebuiltAar(libName, targetVariant) {
   }
 
   // Refresh autolinking cache state and touch react-native.config.js
-  const autolinkCache = path.join(androidDir, 'build', 'generated', 'autolinking');
+  const autolinkCache = path.join(
+    androidDir,
+    "build",
+    "generated",
+    "autolinking"
+  );
   if (fs.existsSync(autolinkCache)) {
     fs.rmSync(autolinkCache, { recursive: true, force: true });
   }
-  const configPath = path.join(mobileDir, 'react-native.config.js');
+  const configPath = path.join(mobileDir, "react-native.config.js");
   if (fs.existsSync(configPath)) {
     const now = new Date();
     fs.utimesSync(configPath, now, now);
   }
 }
 
+function findPrebuiltAars() {
+  const result = {};
+  for (const lib of ACTIVE_LIBRARIES) {
+    try {
+      const hash = computeHash(lib);
+      const { filePrefix } = ALL_LIBRARIES[lib];
+      const debug = path.join(prebuiltDir, `${filePrefix}-debug-${hash}.aar`);
+      const release = path.join(
+        prebuiltDir,
+        `${filePrefix}-release-${hash}.aar`
+      );
+      if (fs.existsSync(debug) && fs.existsSync(release)) {
+        result[lib] = { debug, release };
+      }
+    } catch (e) {}
+  }
+  return result;
+}
+
 // CLI Handling
 if (require.main === module) {
   const args = process.argv.slice(2);
 
-  if (args[0] === '--hash-all') {
-    const result = {};
-    for (const lib of ACTIVE_LIBRARIES) {
-      try {
-        result[lib] = computeHash(lib);
-      } catch (e) {
-        result[lib] = '';
-      }
-    }
-    process.stdout.write(JSON.stringify(result) + '\n');
+  if (args[0] === "--aars") {
+    process.stdout.write(JSON.stringify(findPrebuiltAars()) + "\n");
     process.exit(0);
-  }
-
-  if (args[0] === '--hash') {
-    const libName = args[1];
-    if (!libName) {
-      console.error('Usage: node build-prebuilt-aars.js --hash <lib-name>');
-      process.exit(1);
-    }
-    try {
-      const hash = computeHash(libName);
-      process.stdout.write(hash + '\n');
-      process.exit(0);
-    } catch (err) {
-      console.error(err.message);
-      process.exit(1);
-    }
   }
 
   const targetLib = args[0];
@@ -266,5 +317,6 @@ module.exports = {
   ALL_LIBRARIES,
   ACTIVE_LIBRARIES,
   computeHash,
-  buildPrebuiltAar,
+  findPrebuiltAars,
+  buildPrebuiltAar
 };

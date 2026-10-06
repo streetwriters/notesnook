@@ -17,78 +17,43 @@ import org.gradle.api.initialization.Settings
 def isSettings = this instanceof Settings || hasProperty("settingsDir")
 
 if (isSettings) {
-    // In Settings context: synchronize autolinking cache and disabled flag with .prebuilt-aars state
     def prebuiltDir = new File(settingsDir, ".prebuilt-aars")
     def propVal = gradle.startParameter.projectProperties.get("usePrebuiltAars")
     if (propVal == null && settings.providers.gradleProperty("usePrebuiltAars").isPresent()) {
         propVal = settings.providers.gradleProperty("usePrebuiltAars").get()
     }
-    def disabledByProp = (propVal == "false")
+
+    def state = propVal == "false"
+        ? "disabled"
+        : (prebuiltDir.exists() ? (prebuiltDir.list()?.sort()?.join(",") ?: "empty") : "none")
 
     def autolinkDir = new File(settingsDir, "build/generated/autolinking")
-    def disabledMarker = new File(autolinkDir, ".prebuilt-disabled")
-
-    if (disabledByProp) {
-        if (!disabledMarker.exists()) {
-            autolinkDir.mkdirs()
-            disabledMarker.createNewFile()
-            autolinkDir.deleteDir()
-        }
-    } else {
-        if (disabledMarker.exists()) {
-            disabledMarker.delete()
-            autolinkDir.deleteDir()
-        }
-    }
-
-    def prebuiltState = prebuiltDir.exists() ? (prebuiltDir.list()?.sort()?.join(",") ?: "empty") : "none"
-    def markerFile = new File(autolinkDir, ".prebuilt-aars.marker")
-    if (!markerFile.exists() || markerFile.text != prebuiltState) {
+    def stateFile = new File(autolinkDir, ".prebuilt-aars.state")
+    if (!stateFile.exists() || stateFile.text != state) {
         autolinkDir.deleteDir()
-        markerFile.parentFile?.mkdirs()
-        markerFile.text = prebuiltState
+        autolinkDir.mkdirs()
+        stateFile.text = state
     }
 } else {
-    // In Project (app) context: add prebuilt dependencies and re-declare transitives
-    def propVal = project.hasProperty("usePrebuiltAars") ? project.findProperty("usePrebuiltAars") : gradle.startParameter.projectProperties.get("usePrebuiltAars")
-    def usePrebuilts = (propVal != "false")
-    def prebuiltDir = new File(rootDir, ".prebuilt-aars")
-
-    def allHashes = [:]
-    try {
-        def proc = ["node", "${rootDir}/scripts/build-prebuilt-aars.js", "--hash-all"].execute(null, rootDir)
-        def json = new groovy.json.JsonSlurper().parseText(proc.text.trim())
-        if (json instanceof Map) {
-            allHashes = json
-        }
-    } catch (Exception e) {
-        // Ignored, getAarHash will fallback per lib
+    def prebuiltConfiguration = "prebuiltAar"
+    configurations.maybeCreate(prebuiltConfiguration).with {
+        canBeResolved = false
+        canBeConsumed = false
     }
 
-    def getAarHash = { String libName ->
-        if (allHashes.containsKey(libName)) {
-            return allHashes[libName]
-        }
-        try {
-            def proc = ["node", "${rootDir}/scripts/build-prebuilt-aars.js", "--hash", libName].execute(null, rootDir)
-            return proc.text.trim()
-        } catch (Exception e) {
-            return ""
+    def autolinkingFile = new File(rootDir, "build/generated/autolinking/autolinking.json")
+    def prebuiltLibs = []
+    if (autolinkingFile.exists()) {
+        def autolinking = new groovy.json.JsonSlurper().parse(autolinkingFile)
+        autolinking.dependencies?.each { name, dep ->
+            if (dep?.platforms?.android?.dependencyConfiguration == prebuiltConfiguration) {
+                prebuiltLibs << name
+            }
         }
     }
 
-    // Configured prebuilt libraries and their transitive dependencies
     def prebuiltLibraries = [
-        "react-native-quick-sqlite": [
-            prefix: "react-native-quick-sqlite",
-            transitive: []
-        ],
-        "react-native-fast-openpgp": [
-            prefix: "react-native-fast-openpgp",
-            transitive: []
-        ],
         "react-native-screens": [
-            prefix: "react-native-screens",
             transitive: [
                 'androidx.appcompat:appcompat:1.6.1',
                 'androidx.fragment:fragment-ktx:1.6.1',
@@ -100,24 +65,17 @@ if (isSettings) {
             ]
         ],
         "react-native-gesture-handler": [
-            prefix: "react-native-gesture-handler",
             transitive: [
                 'androidx.core:core-ktx:1.8.0'
             ]
         ],
         "react-native-mmkv-storage": [
-            prefix: "react-native-mmkv-storage",
             transitive: [
                 'androidx.security:security-crypto:1.1.0-alpha03',
                 'com.google.code.gson:gson:2.8.6'
             ]
         ],
-        "react-native-nitro-modules": [
-            prefix: "react-native-nitro-modules",
-            transitive: []
-        ],
         "react-native-nitro-cloud-uploader": [
-            prefix: "react-native-nitro-cloud-uploader",
             transitive: [
                 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3',
                 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3',
@@ -126,7 +84,6 @@ if (isSettings) {
             ]
         ],
         "react-native-worklets": [
-            prefix: "react-native-worklets",
             transitive: [
                 'com.facebook.yoga:proguard-annotations:1.19.0',
                 'androidx.transition:transition:1.1.0',
@@ -134,7 +91,6 @@ if (isSettings) {
             ]
         ],
         "react-native-reanimated": [
-            prefix: "react-native-reanimated",
             transitive: [
                 'com.facebook.yoga:proguard-annotations:1.19.0',
                 'androidx.transition:transition:1.1.0',
@@ -143,33 +99,30 @@ if (isSettings) {
         ]
     ]
 
-    android {
-        packagingOptions {
-            pickFirst '**/libworklets.so'
-            pickFirst '**/libNitroModules.so'
+    if (!prebuiltLibs.isEmpty()) {
+        def proc = ["node", "${rootDir}/scripts/build-prebuilt-aars.js", "--aars"].execute(null, rootDir)
+        def aars = new groovy.json.JsonSlurper().parseText(proc.text.trim())
+
+        android {
+            packagingOptions {
+                pickFirst '**/libworklets.so'
+                pickFirst '**/libNitroModules.so'
+            }
         }
-    }
 
-    dependencies {
-        prebuiltLibraries.each { libName, config ->
-            def hash = getAarHash(libName)
-            def prefix = config.prefix
-            def debugAar = new File(prebuiltDir, "${prefix}-debug-${hash}.aar")
-            def releaseAar = new File(prebuiltDir, "${prefix}-release-${hash}.aar")
-
-            if (usePrebuilts && debugAar.exists() && releaseAar.exists()) {
-                debugImplementation files(debugAar)
-                releaseImplementation files(releaseAar)
-
-                // Re-declare external transitive dependencies
-                config.transitive.each { dep ->
-                    implementation dep
+        dependencies {
+            prebuiltLibs.each { libName ->
+                def aar = aars[libName]
+                if (aar == null) {
+                    throw new GradleException("[Prebuilt AAR] ${libName}: no AAR matches the current hash. Run ./gradlew clean to refresh autolinking.")
                 }
 
-                println "[Prebuilt AAR] ${libName}: Using prebuilt AAR (${prefix}-${hash})"
-            } else {
-                def reason = !usePrebuilts ? "disabled via -PusePrebuiltAars=false" : "AAR missing or hash mismatch (${hash})"
-                println "[Prebuilt AAR] ${libName}: Building from source (${reason})"
+                debugImplementation files(aar.debug)
+                releaseImplementation files(aar.release)
+                prebuiltLibraries[libName]?.transitive?.each { dep ->
+                    implementation dep
+                }
+                println "[Prebuilt AAR] ${libName}: Using prebuilt AAR"
             }
         }
     }
