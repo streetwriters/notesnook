@@ -18,6 +18,7 @@ build_cache/
 *.keystore
 !debug.keystore
 .kotlin/
+android/.prebuilt-aars/
 
 # Xcode
 #
