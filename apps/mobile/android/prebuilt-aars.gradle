@@ -52,52 +52,8 @@ if (isSettings) {
         }
     }
 
-    def prebuiltLibraries = [
-        "react-native-screens": [
-            transitive: [
-                'androidx.appcompat:appcompat:1.6.1',
-                'androidx.fragment:fragment-ktx:1.6.1',
-                'androidx.coordinatorlayout:coordinatorlayout:1.2.0',
-                'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0',
-                'com.google.android.material:material:1.13.0',
-                'androidx.core:core-ktx:1.8.0',
-                'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-            ]
-        ],
-        "react-native-gesture-handler": [
-            transitive: [
-                'androidx.core:core-ktx:1.8.0'
-            ]
-        ],
-        "react-native-mmkv-storage": [
-            transitive: [
-                'androidx.security:security-crypto:1.1.0-alpha03',
-                'com.google.code.gson:gson:2.8.6'
-            ]
-        ],
-        "react-native-nitro-cloud-uploader": [
-            transitive: [
-                'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3',
-                'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3',
-                'com.squareup.okhttp3:okhttp:4.12.0',
-                'androidx.core:core-ktx:1.12.0'
-            ]
-        ],
-        "react-native-worklets": [
-            transitive: [
-                'com.facebook.yoga:proguard-annotations:1.19.0',
-                'androidx.transition:transition:1.1.0',
-                'androidx.core:core:1.6.0'
-            ]
-        ],
-        "react-native-reanimated": [
-            transitive: [
-                'com.facebook.yoga:proguard-annotations:1.19.0',
-                'androidx.transition:transition:1.1.0',
-                'androidx.core:core:1.6.0'
-            ]
-        ]
-    ]
+    def configFile = new File(rootDir, "prebuilt-libraries.json")
+    def prebuiltConfig = configFile.exists() ? new groovy.json.JsonSlurper().parse(configFile) : null
 
     if (!prebuiltLibs.isEmpty()) {
         def proc = ["node", "${rootDir}/scripts/build-prebuilt-aars.js", "--aars"].execute(null, rootDir)
@@ -119,7 +75,7 @@ if (isSettings) {
 
                 debugImplementation files(aar.debug)
                 releaseImplementation files(aar.release)
-                prebuiltLibraries[libName]?.transitive?.each { dep ->
+                prebuiltConfig?.libraries?.get(libName)?.transitive?.each { dep ->
                     implementation dep
                 }
                 println "[Prebuilt AAR] ${libName}: Using prebuilt AAR"
