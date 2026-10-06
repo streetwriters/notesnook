@@ -71,7 +71,9 @@ const NotesPage = ({
   focusControl = true,
   rightButtons
 }: RouteProps<"NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes">) => {
-  const params = useRef<NotesScreenParams>(route?.params);
+  const params = useRef<NotesScreenParams>(
+    route?.params || ({} as NotesScreenParams)
+  );
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
   const [loadingNotes, setLoadingNotes] = useState(true);
   const isMonograph = route.name === "Monographs";
