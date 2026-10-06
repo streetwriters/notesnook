@@ -243,7 +243,7 @@ class Commands {
     return this.sendCommand("scrollIntoViewById", id, tabId);
   };
 
-  scrollToSearchResult = (index: number) => {
+  scrollToSearchResult = (index: number | string) => {
     const tabId = useTabStore.getState().currentTab;
     return this.sendCommand("scrollToSearchResult", index, tabId);
   };

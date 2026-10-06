@@ -563,7 +563,7 @@ export const useEditor = (
       session?: TabSessionItem;
       newTab?: boolean;
       refresh?: boolean;
-      searchResultIndex?: number;
+      searchResultIndex?: number | string;
       loadedFromEditor?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
