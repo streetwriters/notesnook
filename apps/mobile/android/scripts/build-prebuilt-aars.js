@@ -232,6 +232,27 @@ function buildPrebuiltAar(libName, targetVariant) {
   }
 }
 
+function isValidAar(filePath) {
+  if (!fs.existsSync(filePath)) return false;
+  try {
+    const stats = fs.statSync(filePath);
+    // Git LFS text pointer files are ~130 bytes. Real AAR archives are much larger.
+    if (stats.size < 1000) {
+      const content = fs.readFileSync(filePath, "utf8");
+      if (content.startsWith("version https://git-lfs.github.com/spec/v1")) {
+        try {
+          execSync("git lfs pull", { cwd: androidDir, stdio: "ignore" });
+        } catch (e) {}
+        const newStats = fs.statSync(filePath);
+        if (newStats.size < 1000) return false;
+      }
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 function findPrebuiltAars() {
   const result = {};
   for (const lib of ACTIVE_LIBRARIES) {
@@ -243,7 +264,7 @@ function findPrebuiltAars() {
         prebuiltDir,
         `${filePrefix}-release-${hash}.aar`
       );
-      if (fs.existsSync(debug) && fs.existsSync(release)) {
+      if (isValidAar(debug) && isValidAar(release)) {
         result[lib] = { debug, release };
       }
     } catch (e) {}
