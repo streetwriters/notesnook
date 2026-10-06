@@ -34,6 +34,10 @@ import SettingsService from "./settings";
 import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
+import { db } from "../common/database";
+import { Walkthrough } from "../components/walkthroughs";
+
+let isCheckingEmail = false;
 
 const APP_MESSAGE_BUILDERS: Record<
   MessageId,
@@ -94,7 +98,25 @@ const APP_MESSAGE_BUILDERS: Record<
     visible: true,
     message: strings.syncDisabled(),
     actionText: strings.syncDisabledActionText(),
-    onPress: () => {
+    onPress: async () => {
+      if (isCheckingEmail) return;
+      isCheckingEmail = true;
+      try {
+        const user = await db.user.fetchUser();
+        if (user?.isEmailConfirmed) {
+          clearMessage();
+          SettingsService.set({
+            userEmailConfirmed: true
+          });
+          Walkthrough.present("emailconfirmed", false, true);
+          return;
+        }
+      } catch (e) {
+        /* empty */
+      } finally {
+        isCheckingEmail = false;
+      }
+
       PremiumService.showVerifyEmailDialog();
     },
     data: {},
