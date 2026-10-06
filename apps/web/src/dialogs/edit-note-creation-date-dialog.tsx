@@ -30,7 +30,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { DayPicker } from "../components/day-picker";
 import Dialog from "../components/dialog";
 import Field from "../components/field";
-import { CalendarDots } from "../components/icons";
+import { CalendarDots, Clock } from "../components/icons";
 import { store as noteStore } from "../stores/note-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { setDateOnly, setTimeOnly } from "../utils/date-time";
@@ -166,11 +166,11 @@ export const EditNoteCreationDateDialog = DialogManager.register(
             label={strings.time()}
             required
             data-test-id="time-created-input"
-            // helpText={`${
-            //   db.settings.getTimeFormat() === "12-hour"
-            //     ? "hh:mm AM/PM"
-            //     : "hh:mm"
-            // }`}
+            placeholder={`${
+              db.settings.getTimeFormat() === "12-hour"
+                ? "hh:mm AM/PM"
+                : "hh:mm"
+            }`}
             validate={(t) => {
               const format =
                 db.settings.getTimeFormat() === "12-hour" ? "hh:mm a" : "HH:mm";
@@ -187,6 +187,7 @@ export const EditNoteCreationDateDialog = DialogManager.register(
                 py: "spacing6"
               }
             }}
+            rightActions={[{ icon: Clock }]}
           />
         </Flex>
       </Dialog>

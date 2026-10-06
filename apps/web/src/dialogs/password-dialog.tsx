@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
-import { Box, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import Field, { FieldProps } from "../components/field";
+import { Warning } from "../components/icons";
 import { Checkbox, Label } from "@theme-ui/components";
 import { mdToHtml } from "../utils/md";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -127,6 +128,7 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
             required
             type="password"
             placeholder={strings.enterYourPassword()}
+            variant={error ? "error" : input.variant}
           />
         ))}
 
@@ -154,9 +156,24 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
           : null}
 
         {error && (
-          <Text mt={1} variant={"error"}>
-            {error}
-          </Text>
+          <Flex
+            sx={{
+              alignItems: "center",
+              gap: "spacing3",
+              mt: "spacing4"
+            }}
+          >
+            <Warning size={13} color="icon-error" />
+            <Text
+              sx={{
+                fontSize: "xs",
+                fontWeight: 400,
+                color: "paragraph-error"
+              }}
+            >
+              {error}
+            </Text>
+          </Flex>
         )}
       </Box>
     </Dialog>

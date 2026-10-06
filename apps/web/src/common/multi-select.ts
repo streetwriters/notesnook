@@ -108,7 +108,8 @@ async function deleteAttachments(ids: string[]) {
       title: strings.doActions.permanentlyDelete.attachment(ids.length),
       subtitle: strings.irreverisibleAction(),
       negativeButtonText: strings.no(),
-      positiveButtonText: strings.yes()
+      positiveButtonText: strings.yes(),
+      positiveButtonVariant: "new_error"
     }))
   )
     return;

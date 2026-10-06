@@ -59,24 +59,24 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
       description={props.subtitle}
       onClose={() => {}}
     >
-      <Flex
-        sx={{
-          flexDirection: "column",
-          mt: "spacing6",
-          mb: "spacing7",
-          gap: "spacing7"
-        }}
-      >
-        <Text
+      {current > 0 ? (
+        <Flex
           sx={{
-            color: "paragraph-secondary",
-            fontSize: "xs",
-            lineHeight: 1.5
+            flexDirection: "column",
+            mt: "spacing6",
+            mb: "spacing7",
+            gap: "spacing7"
           }}
         >
-          {text}
-        </Text>
-        {current > 0 ? (
+          <Text
+            sx={{
+              color: "paragraph-secondary",
+              fontSize: "xs",
+              lineHeight: 1.5
+            }}
+          >
+            {text}
+          </Text>
           <Box>
             <Box
               sx={{ width: "100%", bg: "background-secondary", mb: "spacing3" }}
@@ -100,8 +100,10 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
               {current} {strings.of()} {total}
             </Text>
           </Box>
-        ) : null}
-      </Flex>
+        </Flex>
+      ) : (
+        <Box sx={{ mb: "spacing7" }} />
+      )}
     </Dialog>
   );
 });
