@@ -35,6 +35,7 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { deleteItems } from "../../utils/functions";
+import { PinnedNotesWidget } from "../../services/pinned-notes-widget";
 import { fluidTabsRef } from "../../utils/global-refs";
 import { updateNotebook } from "../../utils/notebooks";
 import { AppFontSize } from "../../utils/size";
@@ -87,6 +88,7 @@ export const SelectionHeader = React.memo(
       if (!selectedItemsList.length) return;
       await db.trash.restore(...selectedItemsList);
       Navigation.queueRoutesForUpdate();
+      PinnedNotesWidget.updateNotes();
 
       clearSelection();
       ToastManager.show({
