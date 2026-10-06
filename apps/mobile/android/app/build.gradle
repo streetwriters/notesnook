@@ -257,6 +257,8 @@ dependencies {
 
 }
 
+apply from: new File(rootDir, "prebuilt-aars.gradle")
+
 task deleteFiles(type: Delete) {
   delete './src/main/assets/static'
 }
