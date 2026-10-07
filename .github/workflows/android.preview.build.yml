@@ -79,7 +79,7 @@ jobs:
       - name: Build arm64-v8a apk
         run: |
           cd apps/mobile/android
-          ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PprBuildNumber=${{ steps.build-number.outputs.timestamp }}
+          ./gradlew :app:assembleRelease -PreactNativeArchitectures=arm64-v8a -PstagingReleaseBuild=true -PprBuildNumber=${{ steps.build-number.outputs.timestamp }}
 
       - name: Stage build artifact
         run: |
