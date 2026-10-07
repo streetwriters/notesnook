@@ -129,7 +129,19 @@ export const useDragState = create<DragState, any>(
     }),
     {
       name: "drag-state-storage", // unique name
-      getStorage: () => MMKV as unknown as StateStorage,
+      getStorage: () =>
+        ({
+          getItem(name: string) {
+            return MMKV.getString(name);
+          },
+          setItem(name: string, value: string) {
+            MMKV.setString(name, value);
+            return;
+          },
+          removeItem(name: string) {
+            MMKV.removeItem(name);
+          }
+        }) as unknown as StateStorage,
       onRehydrateStorage: () => {
         return () => {
           if (!useSettingStore.getState().isAppLoading) {

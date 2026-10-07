@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { parseInternalLink } from "@notesnook/core";
 import {
   ScopedThemeProvider,
   THEME_COMPATIBILITY_VERSION,
@@ -23,32 +24,31 @@ import {
 } from "@notesnook/theme";
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { Appearance, I18nManager, Linking, StatusBar } from "react-native";
+import Shortcuts from "react-native-actions-shortcuts";
+import RNBootSplash from "react-native-bootsplash";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppLocked from "./components/app-lock";
 import DialogProvider from "./components/dialog-provider";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
 import { Toast } from "./components/toast";
 import { useAppEvents } from "./hooks/use-app-events";
-import { NotePreviewConfigure } from "./screens/note-preview-configure";
-import { RootNavigation } from "./navigation/navigation-stack";
-import { themeTrpcClient } from "./screens/settings/theme-selector";
-import Notifications from "./services/notifications";
-import SettingsService from "./services/settings";
-import { TipManager } from "./services/tip-manager";
-import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
-import { useUserStore } from "./stores/use-user-store";
-import RNBootSplash from "react-native-bootsplash";
-import AppLocked from "./components/app-lock";
-import { useSettingStore } from "./stores/use-setting-store";
 import {
   initShortcutListener,
   launchNewNoteTab,
   registerAppShortcuts
 } from "./hooks/use-shortcut-manager";
-import Shortcuts from "react-native-actions-shortcuts";
-import { parseInternalLink } from "@notesnook/core";
+import { RootNavigation } from "./navigation/navigation-stack";
+import { NotePreviewConfigure } from "./screens/note-preview-configure";
+import { themeTrpcClient } from "./screens/settings/theme-selector";
+import Notifications from "./services/notifications";
+import SettingsService from "./services/settings";
+import { TipManager } from "./services/tip-manager";
+import { useSettingStore } from "./stores/use-setting-store";
+import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
+import { useUserStore } from "./stores/use-user-store";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
@@ -143,11 +143,11 @@ export const withTheme = (
             if (theme) {
               theme.colorScheme === "dark"
                 ? useThemeStore.setState({
-                  darkTheme: theme
-                })
+                    darkTheme: theme
+                  })
                 : useThemeStore.setState({
-                  lightTheme: theme
-                });
+                    lightTheme: theme
+                  });
             }
           })
           .catch(() => {

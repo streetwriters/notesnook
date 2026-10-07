@@ -16,12 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import Shortcuts, { ShortcutItem } from "react-native-actions-shortcuts";
-import { NativeEventEmitter, NativeModule, Platform } from "react-native";
-import deviceInfoModule from "react-native-device-info";
 import { strings } from "@notesnook/intl";
-import { useSettingStore } from "../stores/use-setting-store";
+import { NativeEventEmitter, NativeModule, Platform } from "react-native";
+import Shortcuts, { ShortcutItem } from "react-native-actions-shortcuts";
+import deviceInfoModule from "react-native-device-info";
 import { useTabStore } from "../screens/editor/tiptap/use-tab-store";
+import { useSettingStore } from "../stores/use-setting-store";
 
 const ShortcutsEmitter = new NativeEventEmitter(
   Shortcuts as unknown as NativeModule
