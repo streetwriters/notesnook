@@ -56,6 +56,8 @@ import {
 import { db } from "../../common/db";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
+import { store as notebookStore } from "../../stores/notebook-store";
+import { store as tagStore } from "../../stores/tag-store";
 import Toggle from "./toggle";
 import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
@@ -85,8 +87,6 @@ import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { TabItem } from "../navigation-menu/tab-item";
 import TableOfContents from "../editor/table-of-contents";
 import IconTag from "../icon-tag";
-import { notebookMenuItems } from "../notebook";
-import { tagMenuItems } from "../tag";
 import { navigate } from "../../navigation";
 import { store as appStore } from "../../stores/app-store";
 
@@ -1051,7 +1051,12 @@ function Tags({ noteId }: { noteId: string }) {
                   appStore.get().setNavigationTab("tags");
                   navigate(`/tags/${item.id}`);
                 }}
-                menuItems={() => tagMenuItems(item)}
+                onDismiss={async () => {
+                  await db.relations.unlink(item, { id: noteId, type: "note" });
+                  await tagStore.get().refresh();
+                  await noteStore.get().refresh();
+                  result.refresh();
+                }}
                 styles={{
                   container: {
                     bg: "background-tertiary",
@@ -1106,7 +1111,12 @@ function Notebooks({ noteId }: { noteId: string }) {
                   appStore.get().setNavigationTab("notebooks");
                   navigate(`/notebooks/${item.id}`);
                 }}
-                menuItems={() => notebookMenuItems(item)}
+                onDismiss={async () => {
+                  await db.relations.unlink(item, { id: noteId, type: "note" });
+                  await notebookStore.get().refresh();
+                  await noteStore.get().refresh();
+                  result.refresh();
+                }}
                 styles={{
                   container: {
                     bg: "background-tertiary",

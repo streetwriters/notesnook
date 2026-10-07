@@ -167,11 +167,17 @@ export const THEME_LIGHT: any = {
       primary: {
         background: "#F7F7F7",
         icon: "#181818",
-        hover: "#DEDEDE"
+        hover: "#DEDEDE",
+        border: "#E2E2E2",
+        separator: "#E7E7E7"
       },
       secondary: {
         icon: "#666666",
-        background: "#EAE8E8"
+        background: "#EAE8E8",
+        hover: "#D1D1D1"
+      },
+      selected: {
+        icon: "#181818"
       }
     }
   }
