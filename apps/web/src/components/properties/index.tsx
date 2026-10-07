@@ -740,15 +740,6 @@ function LinkedNote({
           >
             {item.title}
           </Text>
-          {/* {linkedBlocks.status === "fulfilled" &&
-            linkedBlocks.value.length > 0 && (
-              <Text
-                variant="subBody"
-                sx={{ ml: "auto", color: "paragraph-secondary" }}
-              >
-                {linkedBlocks.value.length}
-              </Text>
-            )} */}
         </Button>
       </Flex>
       {isExpanded
@@ -869,14 +860,6 @@ function ReferencedIn({
           >
             {item.title}
           </Text>
-          {/* {blocks.length > 0 && (
-            <Text
-              variant="subBody"
-              sx={{ ml: "auto", color: "paragraph-secondary" }}
-            >
-              {blocks.length}
-            </Text>
-          )} */}
         </Button>
       </Flex>
       {isExpanded
@@ -1130,20 +1113,6 @@ function Notebooks({ noteId }: { noteId: string }) {
           </ResolvedItem>
         ))}
       </Flex>
-      {/* <VirtualizedList
-        style={{ marginTop: 5 }}
-        mode="fixed"
-        estimatedSize={25}
-        getItemKey={(index) => result.value.key(index)}
-        items={result.value.placeholders}
-        renderItem={({ index }) => (
-          <ResolvedItem index={index} items={result.value} type="notebook">
-            {({ item, data }) => (
-              <ListItemWrapper item={item} data={data} compact />
-            )}
-          </ResolvedItem>
-        )}
-      /> */}
     </Section>
   );
 }
@@ -1303,10 +1272,7 @@ export function Section({
   return (
     <Flex
       sx={{
-        // borderRadius: "default",
         flexDirection: "column",
-        // bg: "background-secondary",
-        // border: "1px solid var(--border)",
         ...sx
       }}
       {...otherProps}

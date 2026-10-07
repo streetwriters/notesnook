@@ -70,27 +70,6 @@ function TableOfContents(props: TableOfContentsProps) {
   }, [sessionId, tableOfContents]);
 
   return (
-    // <Flex
-    //   sx={{
-    //     display: "flex",
-    //     top: TITLE_BAR_HEIGHT,
-    //     zIndex: 999,
-    //     height: "100%",
-    //     borderLeft: "1px solid",
-    //     borderLeftColor: "border"
-    //   }}
-    // >
-    //   <ScopedThemeProvider
-    //     scope="editorSidebar"
-    //     sx={{
-    //       flex: 1,
-    //       display: "flex",
-    //       bg: "background",
-    //       overflowY: "hidden",
-    //       overflowX: "hidden",
-    //       flexDirection: "column"
-    //     }}
-    //   >
     <Section title={strings.toc()} sx={{ flex: 1, px: "spacing4" }}>
       <Flex
         sx={{
@@ -231,8 +210,6 @@ function TableOfContents(props: TableOfContentsProps) {
         )}
       </Flex>
     </Section>
-    // {/* </ScopedThemeProvider> */}
-    // {/* </Flex> */}
   );
 }
 export default React.memo(TableOfContents);

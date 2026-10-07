@@ -153,17 +153,6 @@ export function EditorActionBar() {
         showPublishView(activeSession.note, e.target as HTMLElement);
       }
     },
-    // {
-    //         title: strings.toc(),
-//         icon: TableOfContents,
-//         enabled:
-//             activeSession &&
-//             activeSession.type !== "locked" &&
-//             activeSession.type !== "diff" &&
-//             activeSession.type !== "conflicted",
-//         onClick: () => useEditorStore.getState().toggleProperties("toc"),
-//         toggled: propertiesTab === "toc"
-    //     },
     {
       title: strings.search(),
       icon: Search,
@@ -184,11 +173,11 @@ export function EditorActionBar() {
         activeSession.type !== "locked" &&
         activeSession.type !== "conflicted",
       onClick: () =>
-useEditorStore
-.getState()
+        useEditorStore
+          .getState()
           .setPropertiesTab(
             propertiesTab === undefined ? "properties" : undefined
-),
+          ),
       toggled: propertiesTab !== undefined
     },
     ...getWindowControls(
