@@ -260,6 +260,7 @@ import BookmarkSvg from "@notesnook/icons/bookmark.svg?react";
 import PencilSimpleSvg from "@notesnook/icons/pencil-simple.svg?react";
 import ShoppingModeSvg from "@notesnook/icons/shopping-mode.svg?react";
 import FileTextSvg from "@notesnook/icons/file-text.svg?react";
+import ChecksSvg from "@notesnook/icons/checks.svg?react";
 import StarSvg from "@notesnook/icons/star.svg?react";
 import PlusSvg from "@notesnook/icons/plus.svg?react";
 import FunnelSvg from "@notesnook/icons/funnel.svg?react";
@@ -325,6 +326,10 @@ import ListSvg from "@notesnook/icons/list.svg?react";
 import CalendarDotsSvg from "@notesnook/icons/calendar-dots.svg?react";
 import CloseSvg from "@notesnook/icons/close.svg?react";
 import CaretLeftSvg from "@notesnook/icons/caret-left.svg?react";
+import SquaresFourSvg from "@notesnook/icons/squares-four.svg?react";
+import TableSvg from "@notesnook/icons/table.svg?react";
+import SpellCheckSvg from "@notesnook/icons/spellcheck.svg?react";
+import CircleNotchSvg from "@notesnook/icons/circle-notch.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -414,13 +419,24 @@ export function createIcon(path: string, rotate = false) {
 }
 
 export function createSvgIcon(
-  Component: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
+  Component: React.FunctionComponent<React.SVGProps<SVGSVGElement>>,
+  rotate = false
 ) {
   const NNIcon: Icon = function Icon(props) {
-    const { sx, size = 24, color = "icon", ...restProps } = props;
+    const {
+      sx,
+      size = 24,
+      color = "icon",
+      rotate: _rotate = rotate,
+      className,
+      ...restProps
+    } = props;
     return (
       <Flex
         {...restProps}
+        className={[_rotate ? "rotate" : undefined, className]
+          .filter(Boolean)
+          .join(" ")}
         sx={{
           justifyContent: "center",
           alignItems: "center",
@@ -447,7 +463,6 @@ export const Notes = createIcon(mdiNoteMultipleOutline);
 export const Minus = createIcon(mdiMinus);
 export const Notebooks = createIcon(mdiBookMultipleOutline);
 export const Notebook2 = createIcon(mdiNotebookOutline);
-export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
 export const ArrowTopRight = createIcon(mdiArrowTopRight);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
@@ -479,7 +494,6 @@ export const Restore = createIcon(mdiRecycle);
 export const Sync = createIcon(mdiSync);
 export const SyncOff = createIcon(mdiSyncOff);
 export const SyncError = createIcon(mdiSyncAlert);
-export const Loading = createIcon(mdiLoading, true);
 export const Export = createIcon(mdiExportVariant);
 export const AddToNotebook = createIcon(mdiBookPlusMultipleOutline);
 export const Expand = createIcon(mdiArrowExpandDown);
@@ -558,7 +572,6 @@ export const Harddisk = createIcon(mdiHarddisk);
 export const FileCabinet = createIcon(mdiFileCabinet);
 export const Emoticon = createIcon(mdiEmoticonOutline);
 export const Bold = createIcon(mdiFormatBold);
-export const Table = createIcon(mdiTable);
 export const Pro = createIcon(mdiCrownOutline);
 export const EncryptedBackup = createIcon(mdiDatabaseLockOutline);
 export const Accent = createIcon(mdiPaletteSwatchOutline);
@@ -678,7 +691,6 @@ export const ColorRemove = createIcon(mdiCloseCircleOutline);
 export const ExpandSidebar = createIcon(mdiArrowCollapseRight);
 export const HamburgerMenu = createIcon(mdiMenu);
 export const Inbox = createIcon(mdiInbox);
-export const SpellCheck = createIcon(mdiSpellcheck);
 export const ClearTrash = createIcon(mdiDeleteSweepOutline);
 export const CloseCircle = createIcon(mdiCloseCircle);
 
@@ -687,6 +699,7 @@ export const Home = createSvgIcon(HomeSvg);
 export const Notebook = createSvgIcon(BookmarkSvg);
 export const Tag = createSvgIcon(ShoppingModeSvg);
 export const FileText = createSvgIcon(FileTextSvg);
+export const Checks = createSvgIcon(ChecksSvg);
 export const Star = createSvgIcon(StarSvg);
 export const Bell = createSvgIcon(BellSvg);
 export const BookOpen = createSvgIcon(BookOpenSvg);
@@ -706,7 +719,7 @@ export const Cloud = createSvgIcon(CloudSvg);
 export const DeviceMobileCamera = createSvgIcon(DeviceMobileCameraSvg);
 export const FileDoc = createSvgIcon(FileSvg);
 export const Picture = createSvgIcon(ImageSvg);
-export const ArrowRightSvgIcon = createSvgIcon(ArrowRightSvg);
+export const ArrowRight = createSvgIcon(ArrowRightSvg);
 export const CheckCircle = createSvgIcon(CheckCircleSvg);
 export const CheckIcon = createSvgIcon(CheckSvg);
 export const KeyIcon = createSvgIcon(KeySvg);
@@ -781,3 +794,7 @@ export const List = createSvgIcon(ListSvg);
 export const CalendarDots = createSvgIcon(CalendarDotsSvg);
 export const Close = createSvgIcon(CloseSvg);
 export const CaretLeft = createSvgIcon(CaretLeftSvg);
+export const SquaresFour = createSvgIcon(SquaresFourSvg);
+export const Table = createSvgIcon(TableSvg);
+export const SpellCheck = createSvgIcon(SpellCheckSvg);
+export const Loading = createSvgIcon(CircleNotchSvg, true);

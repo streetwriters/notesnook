@@ -45,7 +45,7 @@ const [useMenuStore] = createStore<MenuStore>((set) => ({
   options: {
     blocking: false
   },
-  open: async (items, options) => {
+  open: async (items, options = {}) => {
     if (
       IS_DESKTOP_APP &&
       canShowNativeMenu(items) &&

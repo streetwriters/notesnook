@@ -99,13 +99,16 @@ export const inputVariants = {
   switch: {
     width: 34,
     height: 18,
+    display: "flex",
+    alignItems: "center",
     "& > div": {
-      width: 14,
-      height: 14
+      width: 10,
+      height: 10,
+      ml: "2px"
     },
     p: "2px !important",
     "input:checked ~ & > div": {
-      transform: "translateX(115%)"
+      transform: "translateX(160%)"
     }
   },
   input: defaultVariant,

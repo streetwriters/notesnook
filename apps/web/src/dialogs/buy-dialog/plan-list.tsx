@@ -25,7 +25,7 @@ import {
   FileDoc,
   Picture,
   CheckSvgIcon,
-  ArrowRightSvgIcon,
+  ArrowRight,
   ShieldCheck,
   CaretDown,
   CalendarBlank,
@@ -1055,7 +1055,7 @@ export function TestimonialsCarousel() {
               transform: "rotate(180deg)"
             }}
           >
-            <ArrowRightSvgIcon size={24} color="icon" />
+            <ArrowRight size={24} color="icon" />
           </Flex>
         </Flex>
         <Flex
@@ -1073,7 +1073,7 @@ export function TestimonialsCarousel() {
           }}
           onClick={goToNext}
         >
-          <ArrowRightSvgIcon size={24} color="icon" />
+          <ArrowRight size={24} color="icon" />
         </Flex>
       </Flex>
     </Flex>
