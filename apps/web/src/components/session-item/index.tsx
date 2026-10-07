@@ -37,34 +37,44 @@ export function SessionItem(props: SessionItemProps) {
     <Flex
       key={session.id}
       data-test-id={`session-item`}
-      py={1}
-      px={1}
       sx={{
-        borderRadius: "default",
+        alignItems: "center",
+        justifyContent: "space-between",
+        p: "spacing2",
+        borderRadius: "radius1",
         cursor: "pointer",
         bg: "transparent",
         ":hover": {
           bg: "hover"
-        },
-        alignItems: "center",
-        justifyContent: "space-between"
+        }
       }}
       title={strings.clickToPreview()}
       onClick={() =>
         useEditorStore.getState().openDiffSession(noteId, session.id)
       }
     >
-      <Text variant={"body"} data-test-id="title">
+      <Text
+        data-test-id="title"
+        sx={{
+          color: "paragraph",
+          fontSize: "xs",
+          lineHeight: 1,
+          whiteSpace: "nowrap"
+        }}
+      >
         {label}
       </Text>
       <Flex
         sx={{
-          fontSize: "subBody",
-          color: "paragraph-secondary",
+          alignItems: "center",
+          gap: "spacing2",
+          color: "paragraph",
+          fontSize: "3xs",
+          lineHeight: 1,
           flexShrink: 0
         }}
       >
-        {session.locked && <Lock size={14} data-test-id="locked" />}
+        {session.locked && <Lock size={11} data-test-id="locked" />}
         <TimeAgo live datetime={session.dateModified} locale={"en_short"} />
       </Flex>
     </Flex>
