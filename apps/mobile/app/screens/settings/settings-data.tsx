@@ -148,7 +148,8 @@ export function getSettingsGroups(): SettingSection[] {
             return (
               strings.subscriptionProviderInfo[
                 user?.subscription?.provider
-              ]?.title() || `Unknown provider id: ${user?.subscription?.provider}`
+              ]?.title() ||
+              `Unknown provider id: ${user?.subscription?.provider}`
             );
           },
           icon: "credit-card",
@@ -211,7 +212,7 @@ export function getSettingsGroups(): SettingSection[] {
                 : status === SubscriptionStatus.ACTIVE
                   ? strings.subRenewOn(expiryDate)
                   : status === SubscriptionStatus.CANCELED ||
-                    status === SubscriptionStatus.PAUSED
+                      status === SubscriptionStatus.PAUSED
                     ? strings.subEndsOn(expiryDate)
                     : status === SubscriptionStatus.EXPIRED
                       ? subscriptionDaysLeft.time < -3
@@ -232,7 +233,8 @@ export function getSettingsGroups(): SettingSection[] {
           },
           useHook: () =>
             useUserStore(
-              (state) => state.user?.subscription?.plan === SubscriptionPlan.FREE
+              (state) =>
+                state.user?.subscription?.plan === SubscriptionPlan.FREE
             ),
           icon: "gift",
           modifer: () => {
@@ -248,7 +250,9 @@ export function getSettingsGroups(): SettingSection[] {
                     name: "code",
                     placeholder: strings.code(),
                     ref: React.createRef<TextInput | null>(),
-                    validators: [validators.required(strings.giftCodeRequired())]
+                    validators: [
+                      validators.required(strings.giftCodeRequired())
+                    ]
                   }
                 ],
                 onFormSubmit: async (form) => {
@@ -1213,7 +1217,8 @@ export function getSettingsGroups(): SettingSection[] {
                 const _current = current as VaultStatusType;
                 return !_current?.exists || !_current?.isBiometryAvailable;
               },
-              getter: (current) => (current as VaultStatusType)?.biometryEnrolled,
+              getter: (current) =>
+                (current as VaultStatusType)?.biometryEnrolled,
               modifer: (current) => {
                 const _current = current as VaultStatusType;
                 const isRevoking = _current.biometryEnrolled;
@@ -1273,7 +1278,9 @@ export function getSettingsGroups(): SettingSection[] {
 
                 if (!SettingsService.getProperty("appLockEnabled")) {
                   if (
-                    !SettingsService.getProperty("appLockHasPasswordSecurity") &&
+                    !SettingsService.getProperty(
+                      "appLockHasPasswordSecurity"
+                    ) &&
                     (await BiometricService.isBiometryAvailable())
                   ) {
                     SettingsService.setProperty("biometricsAuthEnabled", true);
@@ -1337,7 +1344,9 @@ export function getSettingsGroups(): SettingSection[] {
                   ? strings.changeAppLockPinDesc()
                   : strings.changeAppLockPasswordDesc(),
               hidden: () => {
-                return !SettingsService.getProperty("appLockHasPasswordSecurity");
+                return !SettingsService.getProperty(
+                  "appLockHasPasswordSecurity"
+                );
               },
               property: "appLockHasPasswordSecurity",
               modifer: () => {
@@ -1355,7 +1364,9 @@ export function getSettingsGroups(): SettingSection[] {
                   ? strings.removeAppLockPinDesc()
                   : strings.removeAppLockPasswordDesc(),
               hidden: () => {
-                return !SettingsService.getProperty("appLockHasPasswordSecurity");
+                return !SettingsService.getProperty(
+                  "appLockHasPasswordSecurity"
+                );
               },
               property: "appLockHasPasswordSecurity",
               modifer: () => {
@@ -1870,11 +1881,13 @@ export function useSettingsGroups(): SettingSection[] {
   return React.useMemo(() => getSettingsGroups(), [appLanguage]);
 }
 
-export const settingsGroups: SettingSection[] = new Proxy([] as SettingSection[], {
-  get(target, prop, receiver) {
-    const groups = getSettingsGroups();
-    const value = Reflect.get(groups, prop, groups);
-    return typeof value === "function" ? value.bind(groups) : value;
+export const settingsGroups: SettingSection[] = new Proxy(
+  [] as SettingSection[],
+  {
+    get(target, prop, receiver) {
+      const groups = getSettingsGroups();
+      const value = Reflect.get(groups, prop, groups);
+      return typeof value === "function" ? value.bind(groups) : value;
+    }
   }
-});
-
+);
