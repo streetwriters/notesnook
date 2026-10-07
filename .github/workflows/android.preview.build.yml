@@ -73,6 +73,9 @@ jobs:
           cd apps/mobile
           npx tsc --noEmit
 
+      - name: Pull Git LFS files
+        run: git lfs pull
+
       - name: Build arm64-v8a apk
         run: |
           cd apps/mobile/android
