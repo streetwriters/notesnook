@@ -230,7 +230,19 @@ export function createNotebookTreeStores(
       }),
       {
         name: persistKey || "side-menu-notebook-expanded",
-        getStorage: () => MMKV as unknown as StateStorage
+        getStorage: () =>
+          ({
+            getItem(name: string) {
+              return MMKV.getString(name);
+            },
+            setItem(name: string, value: string) {
+              MMKV.setString(name, value);
+              return;
+            },
+            removeItem(name: string) {
+              MMKV.removeItem(name);
+            }
+          }) as unknown as StateStorage
       }
     )
   );
