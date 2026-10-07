@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -345,12 +345,22 @@ export function EditorActionBar({
 }
 
 const TabStrip = React.memo(function TabStrip() {
-  useEditorStore((store) => store.getActiveSession()); // otherwise the tab title won't update on opening a note
+  const activeSession = useEditorStore((store) => store.getActiveSession());
   const tabs = useEditorStore((store) => store.tabs);
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+
+  useEffect(() => {
+    if (!currentTab) return;
+
+    document.getElementById(`tab-${currentTab}`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest"
+    });
+  }, [activeSession, currentTab]);
 
   return (
     <Flex sx={{ flex: 1 }}>
@@ -407,7 +417,7 @@ const TabStrip = React.memo(function TabStrip() {
       <ScrollContainer
         className="tabsScroll"
         suppressScrollY
-        style={{ flex: 1, height: "100%" }}
+        style={{ flex: "0 1 auto", minWidth: 0, height: "100%" }}
         trackStyle={() => ({
           backgroundColor: "transparent",
           "--ms-track-size": "6px"
@@ -416,13 +426,14 @@ const TabStrip = React.memo(function TabStrip() {
         onWheel={(e) => {
           const scrollcontainer = document.querySelector(".tabsScroll");
           if (!scrollcontainer) return;
-          if (e.deltaY > 0) scrollcontainer.scrollLeft += 100;
-          else if (e.deltaY < 0) scrollcontainer.scrollLeft -= 100;
+          if (e.deltaX !== 0) return;
+
+          if (e.deltaY > 0) scrollcontainer.scrollLeft += e.deltaY;
+          else if (e.deltaY < 0) scrollcontainer.scrollLeft += e.deltaY;
         }}
       >
         <Flex
           sx={{
-            flex: 1,
             height: "100%",
             gap: "spacing3",
             py: "spacing3"
@@ -553,28 +564,30 @@ const TabStrip = React.memo(function TabStrip() {
               );
             }}
           />
-          {/* <Button
-            variant="secondary"
-            data-test-id="create-new-note"
-            title={strings.newTab()}
-            onClick={() => useEditorStore.getState().addTab()}
-            sx={{
-              width: "20px",
-              height: "20px",
-              p: 0,
-              borderRadius: "radius1",
-              bg: "hover",
-              alignSelf: "center",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexShrink: 0
-            }}
-          >
-            <Plus size={11} />
-          </Button> */}
         </Flex>
       </ScrollContainer>
+      <Button
+        variant="secondary"
+        data-test-id="create-new-note"
+        title={strings.newTab()}
+        onClick={() => useEditorStore.getState().addTab()}
+        sx={{
+          width: "20px",
+          height: "20px",
+          p: 0,
+          mx: "spacing3",
+          borderRadius: "radius1",
+          bg: "hover",
+          alignSelf: "center",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexShrink: 0
+        }}
+      >
+        <Plus size={11} />
+      </Button>
+      <Box sx={{ flex: 1, height: "100%" }} />
     </Flex>
   );
 });
@@ -631,25 +644,11 @@ function Tab(props: TabProps) {
     : FileText;
   const { attributes, listeners, setNodeRef, transform, transition, active } =
     useSortable({ id });
-  const activeTabRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (activeTabRef.current && isActive) {
-      const tab = activeTabRef.current;
-      tab.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest"
-      });
-    }
-  }, [isActive]);
 
   return (
     <Flex
-      ref={(el) => {
-        setNodeRef(el);
-        activeTabRef.current = el;
-      }}
+      ref={setNodeRef}
+      id={`tab-${id}`}
       className={`tab${isActive || active?.id === id ? " active" : ""}`}
       data-test-id={`tab-${id}`}
       onDragOver={(e) => {
