@@ -163,12 +163,12 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     length: nodes.length,
     reset: () => deselectAll?.(),
     deselect: (index) => {
-      const id = nodes[index].id;
+      const id = nodes[index]?.id;
       if (!id) return;
       onDeselect?.(id);
     },
     select: (index, toggleable) => {
-      const id = nodes[index].id;
+      const id = nodes[index]?.id;
       if (!id) return;
       if (toggleable && isSelected?.(id)) onDeselect?.(id);
       else onSelect?.(id);
@@ -181,7 +181,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       bulkSelect?.(ids);
     },
     focusItemAt: (index) => {
-      const id = nodes[index].id;
+      const id = nodes[index]?.id;
       if (!id || !list.current) return;
 
       waitForElement(list.current, index, `id_${id}`, (element) =>
@@ -190,7 +190,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     },
     skip: () => false,
     open: (index) => {
-      const id = nodes[index].id;
+      const id = nodes[index]?.id;
       if (!id || !list.current) return;
 
       waitForElement(list.current, index, `id_${id}`, (element) =>
