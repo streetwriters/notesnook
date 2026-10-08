@@ -83,9 +83,65 @@ export class Reminders implements ICollection {
       title: reminder.title,
       localOnly: reminder.localOnly,
       disabled: reminder.disabled,
-      snoozeUntil: reminder.snoozeUntil
+      snoozeUntil: reminder.snoozeUntil,
+      completedAt: reminder.completedAt
     });
     return id;
+  }
+
+  async markComplete(id: string) {
+    const reminder = await this.collection.get(id);
+    if (!reminder) return;
+    if (reminder.mode === "permanent") return;
+
+    if (reminder.mode === "once") {
+      return this.add({
+        id,
+        completedAt: Date.now()
+      });
+    }
+
+    // create a duplicate completed "once" reminder
+    await this.add({
+      type: "reminder",
+      dateCreated: Date.now(),
+      dateModified: Date.now(),
+      date: reminder.date,
+      description: reminder.description,
+      mode: "once",
+      priority: reminder.priority,
+      recurringMode: reminder.recurringMode,
+      selectedDays: reminder.selectedDays || [],
+      title: reminder.title,
+      localOnly: reminder.localOnly,
+      disabled: reminder.disabled,
+      snoozeUntil: undefined,
+      completedAt: Date.now()
+    });
+
+    // update original repeating reminder with the next occurrence date
+    const nextOccurenceDate = getUpcomingReminderTime(
+      reminder,
+      getUpcomingReminderTime(reminder)
+    );
+    await this.add({
+      id,
+      date: nextOccurenceDate
+    });
+  }
+
+  async markUncomplete(id: string) {
+    const reminder = await this.collection.get(id);
+    if (!reminder) return;
+    if (reminder.mode === "permanent") return;
+    if (reminder.mode === "repeat") {
+      throw new Error("Cannot mark a repeating reminder as uncomplete.");
+    }
+
+    return this.add({
+      id,
+      completedAt: undefined
+    });
   }
 
   // get raw() {
@@ -191,7 +247,7 @@ export function isReminderToday(reminder: Reminder) {
   return dayjs(time).isToday();
 }
 
-export function getUpcomingReminderTime(reminder: Reminder) {
+export function getUpcomingReminderTime(reminder: Reminder, from?: number) {
   if (reminder.mode === "once") return reminder.date;
 
   const isDay = reminder.recurringMode === "day";
@@ -202,15 +258,27 @@ export function getUpcomingReminderTime(reminder: Reminder) {
   // this is only the time (hour & minutes) unless it is a
   // yearly reminder
   const time = dayjs(reminder.date);
-  const now = dayjs();
-  const relativeTime = isYear
-    ? now
-        .clone()
-        .hour(time.hour())
-        .minute(time.minute())
-        .month(time.month())
-        .date(time.date())
-    : now.clone().hour(time.hour()).minute(time.minute());
+
+  /**
+   * Never look for occurrences before the reminder's start date. The 1ms
+   * offset keeps the start moment itself eligible as the first occurrence.
+   */
+  const now = from
+    ? dayjs(from)
+    : dayjs(Math.max(Date.now(), dayjs(reminder.date).valueOf() - 1));
+
+  const relativeTime = (
+    isYear
+      ? now
+          .clone()
+          .hour(time.hour())
+          .minute(time.minute())
+          .month(time.month())
+          .date(time.date())
+      : now.clone().hour(time.hour()).minute(time.minute())
+  )
+    .second(time.second())
+    .millisecond(time.millisecond());
 
   const isPast = relativeTime.isSameOrBefore(now);
 
@@ -259,24 +327,39 @@ export function getUpcomingReminderTime(reminder: Reminder) {
 }
 
 export function getUpcomingReminder(reminders: Reminder[]) {
-  const sorted = reminders.sort((a, b) => {
-    const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
-    const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
-    return !d1 || !d2 ? 0 : d2 - d1;
-  });
+  const now = Date.now();
+  const sorted = reminders
+    .filter((r) => r.mode !== "once" || r.date > now)
+    .sort((a, b) => {
+      const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
+      const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
+      return !d1 || !d2 ? 0 : d1 - d2;
+    });
   return sorted[0];
 }
 
-export function isReminderActive(reminder: Reminder) {
-  return (
-    !reminder.disabled &&
-    (reminder.mode !== "once" ||
-      reminder.date > Date.now() ||
-      (!!reminder.snoozeUntil && reminder.snoozeUntil > Date.now()))
-  );
+export type ReminderGroup = "Upcoming" | "Past" | "Completed";
+
+export function getReminderGroup(reminder: Reminder): ReminderGroup {
+  if (reminder.completedAt) return "Completed";
+  if (
+    reminder.mode !== "once" ||
+    reminder.date > Date.now() ||
+    (!!reminder.snoozeUntil && reminder.snoozeUntil > Date.now())
+  ) {
+    return "Upcoming";
+  }
+  return "Past";
 }
 
-export function createUpcomingReminderTimeQuery(unix = "now") {
+export function isReminderActive(reminder: Reminder) {
+  return !reminder.disabled && getReminderGroup(reminder) === "Upcoming";
+}
+
+export function createUpcomingReminderTimeQuery(now = "now") {
+  // mirrors getUpcomingReminderTime: never search before the start date.
+  const unix = sql`max(datetime(${now}), datetime(date / 1000 - 1, 'unixepoch'))`;
+
   const time = sql`time(date / 1000, 'unixepoch', 'localtime')`;
   const dateNow = sql`date(${unix}, 'localtime')`;
   const dateTime = sql`datetime(${dateNow} || ${time})`;
@@ -322,9 +405,28 @@ export function createUpcomingReminderTimeQuery(unix = "now") {
 `.$castTo<number>();
 }
 
+/**
+ * Mirrors getReminderGroup:
+ * 0 = Upcoming
+ * 1 = Past
+ * 2 = Completed
+ * */
+export function createReminderGroupQuery(now = "now") {
+  return sql`CASE
+    WHEN completedAt IS NOT NULL THEN 2
+    WHEN mode != 'once'
+      OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime')
+      OR (snoozeUntil IS NOT NULL
+        AND datetime(snoozeUntil / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime'))
+    THEN 0
+    ELSE 1
+  END`.$castTo<number>();
+}
+
 export function createIsReminderActiveQuery(now = "now") {
   return sql`IIF(
-    (disabled IS NULL OR disabled = 0)
+    completedAt IS NULL
+    AND (disabled IS NULL OR disabled = 0)
     AND (mode != 'once'
       OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime')
       OR (snoozeUntil IS NOT NULL
