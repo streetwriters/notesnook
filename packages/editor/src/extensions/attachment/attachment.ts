@@ -113,40 +113,37 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       insertAttachment:
         (...attachments) =>
-        ({ commands, state }) => {
+        ({ chain, state }) => {
           if (!hasPermission("insertAttachment") || attachments.length === 0) {
             return false;
           }
 
           const { $from } = state.selection;
           const selectedNode = state.doc.nodeAt($from.pos);
-          if (
+          const isSelectedAttachment =
             selectedNode &&
             [
               ImageNode.name,
               WebClipNode.name,
               AudioNode.name,
               this.name
-            ].includes(selectedNode.type.name)
-          ) {
-            console.log(
-              "Inserting attachment after the selected node",
-              selectedNode
-            );
-            return commands.insertContentAt(
-              $from.pos + selectedNode.nodeSize,
-              attachments.map((a) => ({
-                type: mimeToExtension(a.mime),
-                attrs: a
-              }))
-            );
-          }
-          return commands.insertContent(
-            attachments.map((a) => ({
+            ].includes(selectedNode.type.name);
+
+          const ch = chain();
+          let first = true;
+          for (const a of attachments) {
+            const content = {
               type: mimeToExtension(a.mime),
               attrs: a
-            }))
-          );
+            };
+            if (first && isSelectedAttachment) {
+              ch.insertContentAt($from.pos + selectedNode.nodeSize, content);
+              first = false;
+            } else {
+              ch.insertContent(content);
+            }
+          }
+          return ch.run();
         },
       removeAttachment:
         () =>
