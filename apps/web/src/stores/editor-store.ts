@@ -347,6 +347,18 @@ class EditorStore extends BaseStore<EditorStore> {
               (session) => (session.note = item)
             );
           }
+          // update the note content in all sessions
+          else if (
+            item.type === "tiptap" &&
+            !item.locked &&
+            (session.type === "default" || session.type === "readonly")
+          ) {
+            updateSession(session.id, [session.type], (session) => {
+              if (!session.content)
+                session.content = { type: "tiptap", data: item.data };
+              else session.content.data = item.data;
+            });
+          }
         }
         if (clearIds.length > 0) closeTabs(...clearIds);
       }
