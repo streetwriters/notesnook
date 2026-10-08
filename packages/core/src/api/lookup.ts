@@ -135,20 +135,22 @@ export default class Lookup {
     } = transformQuery(query);
 
     if (filters > 0) {
-      const tagIds = tagged
-        ? await this.db.tags.all.ids()
-        : tag?.length
-        ? await this.db.tags.all
-            .where((eb) => eb("tags.title", "in", tag))
-            .ids()
-        : [];
-      const colorIds = colored
-        ? await this.db.colors.all.ids()
-        : color?.length
-        ? await this.db.colors.all
-            .where((eb) => eb("colors.title", "in", color))
-            .ids()
-        : [];
+      const tagIds =
+        typeof tagged === "boolean"
+          ? await this.db.tags.all.ids()
+          : tag?.length
+          ? await this.db.tags.all
+              .where((eb) => eb("tags.title", "in", tag))
+              .ids()
+          : [];
+      const colorIds =
+        typeof colored === "boolean"
+          ? await this.db.colors.all.ids()
+          : color?.length
+          ? await this.db.colors.all
+              .where((eb) => eb("colors.title", "in", color))
+              .ids()
+          : [];
       const notebookIds =
         typeof in_notebook === "boolean"
           ? await this.db.notebooks.all.ids()
