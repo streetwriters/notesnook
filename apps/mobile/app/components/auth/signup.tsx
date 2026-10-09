@@ -42,6 +42,7 @@ import FormInput, { createFormRef, validators } from "../ui/input/form-input";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { AuthHeader } from "./header";
+import { hideAuth } from "./common";
 import { SignupContext } from "./signup-context";
 import { RouteParams } from "../../stores/use-navigation-store";
 import SettingsService from "../../services/settings";
@@ -102,6 +103,10 @@ export const Signup = ({
           state: route.params.state,
           context: "signup"
         });
+      } else {
+        // custom (self-hosted) servers have no paywall to go through,
+        // dismiss auth or the loading screen stays up forever
+        hideAuth();
       }
       return true;
     } catch (e) {
