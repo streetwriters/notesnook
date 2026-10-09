@@ -330,6 +330,7 @@ import SquaresFourSvg from "@notesnook/icons/squares-four.svg?react";
 import TableSvg from "@notesnook/icons/table.svg?react";
 import SpellCheckSvg from "@notesnook/icons/spellcheck.svg?react";
 import CircleNotchSvg from "@notesnook/icons/circle-notch.svg?react";
+import CrownSvg from "@notesnook/icons/crown-simple.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -572,7 +573,6 @@ export const Harddisk = createIcon(mdiHarddisk);
 export const FileCabinet = createIcon(mdiFileCabinet);
 export const Emoticon = createIcon(mdiEmoticonOutline);
 export const Bold = createIcon(mdiFormatBold);
-export const Pro = createIcon(mdiCrownOutline);
 export const EncryptedBackup = createIcon(mdiDatabaseLockOutline);
 export const Accent = createIcon(mdiPaletteSwatchOutline);
 
@@ -798,3 +798,4 @@ export const SquaresFour = createSvgIcon(SquaresFourSvg);
 export const Table = createSvgIcon(TableSvg);
 export const SpellCheck = createSvgIcon(SpellCheckSvg);
 export const Loading = createSvgIcon(CircleNotchSvg, true);
+export const Pro = createSvgIcon(CrownSvg);
