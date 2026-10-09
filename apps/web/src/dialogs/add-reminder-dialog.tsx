@@ -147,7 +147,6 @@ export const AddReminderDialog = DialogManager.register(
     const [priority, setPriority] = usePersistentState<
       ValueOf<typeof Priorities>
     >("reminders:default_priority", reminder?.priority ?? Priorities.VIBRATE);
-    console.log("reminder", reminder?.priority);
     const [date, setDate] = useState(dayjs(reminder?.date));
     const [title, setTitle] = useState<string>(
       note?.title ?? reminder?.title ?? ""
@@ -253,6 +252,7 @@ export const AddReminderDialog = DialogManager.register(
               data-test-id="title-input"
               styles={{
                 input: {
+                  height: "45px",
                   fontSize: "sm",
                   px: "spacing4",
                   py: "spacing6"
@@ -466,8 +466,8 @@ export const AddReminderDialog = DialogManager.register(
                     variant="secondary"
                     onClick={() => setShowMonthlyDays(true)}
                     sx={{
-                      height: "45px",
                       display: "flex",
+                      flex: 1,
                       justifyContent: "space-between",
                       alignItems: "center",
                       borderRadius: "radius2",
@@ -560,7 +560,7 @@ export const AddReminderDialog = DialogManager.register(
                 >
                   Select days
                 </Text>
-                <Flex sx={{ gap: "spacing3" }}>
+                <Flex sx={{ gap: "spacing3", alignItems: "stretch", flex: 1 }}>
                   {recurringModes
                     .find((item) => item.id === RecurringModes.WEEK)
                     ?.options.map((day, i) => (
@@ -579,7 +579,7 @@ export const AddReminderDialog = DialogManager.register(
                         sx={{
                           flex: 1,
                           minWidth: 0,
-                          height: "45px",
+                          height: "auto",
                           border: "1px solid",
                           borderColor: selectedDays.includes(day)
                             ? "transparent"
@@ -734,10 +734,10 @@ function ReminderSection(props: ReminderSectionProps) {
 
   return (
     <Box
+      as="fieldset"
       sx={{
         position: "relative",
-        // spacing7 (20px) plus 8px for the title offset
-        mt: "28px",
+        mt: "spacing7",
         p: "spacing6",
         border: "1px solid",
         borderColor: "border",
@@ -745,13 +745,9 @@ function ReminderSection(props: ReminderSectionProps) {
       }}
     >
       <Text
-        as="span"
+        as="legend"
         sx={{
-          position: "absolute",
-          top: "-8px",
-          left: "spacing6",
           px: "spacing1",
-          bg: "background",
           color: "accent",
           fontSize: "xs",
           fontWeight: 500,
