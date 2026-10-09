@@ -144,6 +144,7 @@ PODS:
     - React-RCTText (= 0.82.1)
     - React-RCTVibration (= 0.82.1)
   - React-callinvoker (0.82.1)
+  - React-Codegen (0.1.0)
   - React-Core (0.82.1):
     - boost
     - DoubleConversion
@@ -547,7 +548,6 @@ PODS:
     - RCT-Folly
     - RCT-Folly/Fabric
     - React-domnativemodule
-    - React-featureflags
     - React-featureflagsnativemodule
     - React-idlecallbacksnativemodule
     - React-jsi
@@ -2040,8 +2040,8 @@ PODS:
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
+    - React-Codegen
     - React-Core
-    - ReactCodegen
     - ReactCommon/turbomodule/core
   - react-native-html-to-pdf-lite (0.9.1):
     - React
@@ -2056,6 +2056,7 @@ PODS:
     - RCT-Folly/Fabric
     - RCTRequired
     - RCTTypeSafety
+    - React-Codegen
     - React-Core
     - React-debug
     - React-Fabric
@@ -2079,9 +2080,9 @@ PODS:
     - RCT-Folly
     - RCTRequired
     - RCTTypeSafety
+    - React-Codegen
     - React-Core
     - React-RCTFabric
-    - ReactCodegen
     - ReactCommon/turbomodule/core
   - react-native-mmkv-storage (12.0.1):
     - boost
@@ -2323,7 +2324,7 @@ PODS:
     - Yoga
   - react-native-share-extension (2.9.5):
     - React
-  - react-native-sodium (2.0.0-alpha.0):
+  - react-native-sodium (2.0.0-alpha.1):
     - Base64
     - React-Core
   - react-native-theme-switch-animation (0.6.0):
@@ -2799,7 +2800,6 @@ PODS:
     - hermes-engine
     - RCT-Folly
     - RCT-Folly/Fabric
-    - React-cxxreact
     - React-featureflags
     - React-hermes
     - React-jsi
@@ -2857,7 +2857,6 @@ PODS:
     - hermes-engine
     - RCT-Folly
     - RCT-Folly/Fabric
-    - React-cxxreact
     - React-jsi
     - React-jsiexecutor
     - React-performancetimeline
@@ -3173,6 +3172,34 @@ PODS:
     - Yoga
   - RNKeychain (4.0.5):
     - React
+  - RNLocalize (3.7.0):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNNotifee (7.4.12):
     - React-Core
     - RNNotifee/NotifeeCore (= 7.4.12)
@@ -3654,6 +3681,7 @@ DEPENDENCIES:
   - RNIap (from `../node_modules/react-native-iap`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
+  - RNLocalize (from `../node_modules/react-native-localize`)
   - "RNNotifee (from `../node_modules/@ammarahmed/notifee-react-native`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -3677,6 +3705,7 @@ SPEC REPOS:
     - MMKV
     - MMKVCore
     - pop
+    - React-Codegen
     - SDWebImage
     - SocketRocket
     - SSZipArchive
@@ -3923,6 +3952,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-crop-picker"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
+  RNLocalize:
+    :path: "../node_modules/react-native-localize"
   RNNotifee:
     :path: "../node_modules/@ammarahmed/notifee-react-native"
   RNReanimated:
@@ -3977,11 +4008,12 @@ SPEC CHECKSUMS:
   RCTTypeSafety: c693294e3993056955c3010eb1ebc574f1fcded6
   React: aeece948ccf155182ea86a2395786ed31cf21c61
   React-callinvoker: 05ad789505922d68c06cde1c8060e734df9fe182
+  React-Codegen: 4b8b4817cea7a54b83851d4c1f91f79aa73de30a
   React-Core: 956ac86b4d9b0c0fd9a14b9cc533aa297bb501c0
   React-CoreModules: 3a8d39778cf9eeca40e419814e875da1a8e29855
   React-cxxreact: db275765e1eb08f038599fb44114cf57ee0d18cd
   React-debug: 1dfa1d1cbd93bdaffa3b140190829f9fd9e27985
-  React-defaultsnativemodule: bfd4d6a815b28ff89cf0e8a2e424ebfe52d993ec
+  React-defaultsnativemodule: 35f353ba06901fb5e374bc56e750fde05cbb05b9
   React-domnativemodule: cf9e1b1b520ce0e66396c2744b3eb6d419711c13
   React-Fabric: c0b0c1ad70476d354b3da9fef96094f7b37804da
   React-FabricComponents: 8c6861c5233cf0d5685cee301a979313090e2f57
@@ -4015,11 +4047,11 @@ SPEC CHECKSUMS:
   react-native-fast-openpgp: 42a99ddfafbd132457cb7964062431fbaf666484
   react-native-fingerprint-scanner: d5e143a361f3f01858e9c45141ddcabc4fd57055
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
-  react-native-gzip: 84f94a9000c3163c0fbe8f2b2899dd1b8832f883
+  react-native-gzip: 794e0e964a0d9e1dfd1773fee938adb4d4310e26
   react-native-html-to-pdf-lite: d606d3b72d9696c7a6d1e5f5b7536783faacef14
-  react-native-image-resizer: f7809d00f870e16084dfbd874b047a7632651101
+  react-native-image-resizer: 290b045c34c69db7574e4d08aadfc4abe1ff5a99
   react-native-in-app-review: 1516ba69d60d58053b7eb3aaaf8d2a5a74af8b57
-  react-native-keep-awake: ac1367fb951b1437ddaf3d21665415674b7bceb0
+  react-native-keep-awake: a351e6f67006b47f316ae2b17ee8ee69386167f4
   react-native-mmkv-storage: e84980084e371a9c2230bbde071536a7e1539406
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
@@ -4030,7 +4062,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: c6e2edd1c1da07bdce287fa9d9e60c5f7b514616
   react-native-screenguard: 975d4612dce0c348b19b08a48aa23e9b68584d98
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
-  react-native-sodium: 3af198005f79911feb702701086195c091b9c827
+  react-native-sodium: bcea1f5e08a3f2ea918c96dce7b7964c8c9c196f
   react-native-theme-switch-animation: 449d6db7a760f55740505e7403ae8061debc9a7e
   react-native-upload: 7b7ad336c3db703b68a8c07cf38e9319ae90d695
   react-native-view-shot: 6c008e58f4720de58370848201c5d4a082c6d4ca
@@ -4059,11 +4091,11 @@ SPEC CHECKSUMS:
   React-RuntimeApple: 4136aee89257894955ef09e9f9ef74f0c27596be
   React-RuntimeCore: e9a743d7de4bbd741b16e10b26078d815d6513ab
   React-runtimeexecutor: 781e292362066af82fa2478d95c6b0e374421844
-  React-RuntimeHermes: 68bc8a05567426d01c2e765cf31f093f72cea37d
+  React-RuntimeHermes: 6ab3c2847516769fc860d711814f1735859cad74
   React-runtimescheduler: 824c83a5fd68b35396de6d4f2f9ae995daac861b
   React-timing: 1ebc7102dd52a3edcc63534686bb156e12648411
   React-utils: abf37b162f560cd0e3e5d037af30bb796512246d
-  React-webperformancenativemodule: c347972b7e24beb597d9cf4eab294273e405f6a3
+  React-webperformancenativemodule: 50a57c713a90d27ae3ab947a6c9c8859bcb49709
   ReactAppDependencyProvider: a45ef34bb22dc1c9b2ac1f74167d9a28af961176
   ReactCodegen: 878add6c7d8ff8cea87697c44d29c03b79b6f2d9
   ReactCommon: 804dc80944fa90b86800b43c871742ec005ca424
@@ -4080,6 +4112,7 @@ SPEC CHECKSUMS:
   RNIap: 61f183ac917792fae42b0326b1bef33598c1adf6
   RNImageCropPicker: 5fd4ceaead64d8c53c787e4e559004f97bc76df7
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
+  RNLocalize: 1aedbc2c15073861a364174919d23c31c5924b16
   RNNotifee: dea82c9ec44684eeeac9da85deb5eeb8ebe5937f
   RNReanimated: f1868b36f4b2b52a0ed00062cfda69506f75eaee
   RNScreens: ffbb0296608eb3560de641a711bbdb663ed1f6b4
@@ -4098,6 +4131,6 @@ SPEC CHECKSUMS:
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
   Yoga: 689c8e04277f3ad631e60fe2a08e41d411daf8eb
 
-PODFILE CHECKSUM: 61007f83b1537a154e3ba33b41631032498cb2a2
+PODFILE CHECKSUM: 9a8eafb3362e4e372f640a6638ed95dc350ad087
 
 COCOAPODS: 1.16.2
