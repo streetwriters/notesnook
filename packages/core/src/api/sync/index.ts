@@ -544,25 +544,16 @@ export class Sync {
     this.connection.on("SendItems", async (chunk) => {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
-      const keys = await this.db.user.getDataEncryptionKeys();
-      if (!keys || !keys.length) {
-        this.logger.error(
-          new Error("User encryption keys not generated. Please relogin.")
-        );
-        this.db.eventManager.publish(EVENTS.userSessionExpired);
-        return false;
+      try {
+        return await this.processIncomingChunk(chunk, options);
+      } catch (e) {
+        // one bad chunk (e.g. undecryptable with current keys) must not
+        // abort the whole sync - items stay unsynced and retry next time
+        this.logger.error(e, "Failed to process incoming chunk, skipping.", {
+          type: chunk?.type
+        });
+        return true;
       }
-      this.logger.info(
-        `Received chunk for type ${chunk.type} with ${chunk.items.length} items.`,
-        {
-          ids: chunk.items.map((i: any) => i.id)
-        }
-      );
-      await this.processChunk(chunk, keys, options);
-
-      sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
-
-      return true;
     });
 
     this.connection.on("SendMonographs", async (monographs: Monograph[]) => {
@@ -593,6 +584,31 @@ export class Sync {
         return true;
       }
     );
+  }
+
+  private async processIncomingChunk(
+    chunk: SyncTransferItem,
+    options: SyncOptions
+  ) {
+    const keys = await this.db.user.getDataEncryptionKeys();
+    if (!keys || !keys.length) {
+      this.logger.error(
+        new Error("User encryption keys not generated. Please relogin.")
+      );
+      this.db.eventManager.publish(EVENTS.userSessionExpired);
+      return false;
+    }
+    this.logger.info(
+      `Received chunk for type ${chunk.type} with ${chunk.items.length} items.`,
+      {
+        ids: chunk.items.map((i: any) => i.id)
+      }
+    );
+    await this.processChunk(chunk, keys, options);
+
+    sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
+
+    return true;
   }
 
   private async checkConnection() {
