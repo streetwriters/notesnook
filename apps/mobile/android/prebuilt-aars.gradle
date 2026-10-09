@@ -1,0 +1,85 @@
+/*
+ * Prebuilt Native AARs Integration for Notesnook Mobile
+ *
+ * HOW TO GENERATE AARs:
+ *   node apps/mobile/android/scripts/build-prebuilt-aars.js [lib-name] [variant]
+ *   e.g. node apps/mobile/android/scripts/build-prebuilt-aars.js react-native-quick-sqlite
+ *   Or to build all: node apps/mobile/android/scripts/build-prebuilt-aars.js
+ *
+ * HOW TO DISABLE PREBUILT AARs (FALLBACK TO SOURCE):
+ *   Pass `-PusePrebuiltAars=false` to any Gradle invocation:
+ *     ./gradlew assembleDebug -PusePrebuiltAars=false
+ *   Or set `usePrebuiltAars=false` in apps/mobile/android/gradle.properties
+ */
+
+import org.gradle.api.initialization.Settings
+
+def isSettings = this instanceof Settings || hasProperty("settingsDir")
+
+if (isSettings) {
+    def prebuiltDir = new File(settingsDir, ".prebuilt-aars")
+    def propVal = gradle.startParameter.projectProperties.get("usePrebuiltAars")
+    if (propVal == null && settings.providers.gradleProperty("usePrebuiltAars").isPresent()) {
+        propVal = settings.providers.gradleProperty("usePrebuiltAars").get()
+    }
+
+    def state = propVal == "false"
+        ? "disabled"
+        : (prebuiltDir.exists() ? (prebuiltDir.list()?.sort()?.join(",") ?: "empty") : "none")
+
+    def autolinkDir = new File(settingsDir, "build/generated/autolinking")
+    def stateFile = new File(autolinkDir, ".prebuilt-aars.state")
+    if (!stateFile.exists() || stateFile.text != state) {
+        autolinkDir.deleteDir()
+        autolinkDir.mkdirs()
+        stateFile.text = state
+    }
+} else {
+    def prebuiltConfiguration = "prebuiltAar"
+    configurations.maybeCreate(prebuiltConfiguration).with {
+        canBeResolved = false
+        canBeConsumed = false
+    }
+
+    def autolinkingFile = new File(rootDir, "build/generated/autolinking/autolinking.json")
+    def prebuiltLibs = []
+    if (autolinkingFile.exists()) {
+        def autolinking = new groovy.json.JsonSlurper().parse(autolinkingFile)
+        autolinking.dependencies?.each { name, dep ->
+            if (dep?.platforms?.android?.dependencyConfiguration == prebuiltConfiguration) {
+                prebuiltLibs << name
+            }
+        }
+    }
+
+    def configFile = new File(rootDir, "prebuilt-libraries.json")
+    def prebuiltConfig = configFile.exists() ? new groovy.json.JsonSlurper().parse(configFile) : null
+
+    if (!prebuiltLibs.isEmpty()) {
+        def proc = ["node", "${rootDir}/scripts/build-prebuilt-aars.js", "--aars"].execute(null, rootDir)
+        def aars = new groovy.json.JsonSlurper().parseText(proc.text.trim())
+
+        android {
+            packagingOptions {
+                pickFirst '**/libworklets.so'
+                pickFirst '**/libNitroModules.so'
+            }
+        }
+
+        dependencies {
+            prebuiltLibs.each { libName ->
+                def aar = aars[libName]
+                if (aar == null) {
+                    throw new GradleException("[Prebuilt AAR] ${libName}: no AAR matches the current hash. Run ./gradlew clean to refresh autolinking.")
+                }
+
+                debugImplementation files(aar.debug)
+                releaseImplementation files(aar.release)
+                prebuiltConfig?.libraries?.get(libName)?.transitive?.each { dep ->
+                    implementation dep
+                }
+                println "[Prebuilt AAR] ${libName}: Using prebuilt AAR"
+            }
+        }
+    }
+}

@@ -1,1 +1,2 @@
 * text=auto eol=lf
+*.aar filter=lfs diff=lfs merge=lfs -text
