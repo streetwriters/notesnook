@@ -520,6 +520,11 @@ function resolveFetchOptions(config?: Config): FetchOptions | undefined {
 function toAttributes(element: HTMLElement) {
   const attributes: Record<string, string> = {};
   for (const { name } of element.attributes) {
+    // documentElement's attributes are copied verbatim onto the already
+    // sanitized cloned body (see getPage() above), so event-handler
+    // attributes (onload, onerror, etc.) must be excluded here too or
+    // they would bypass cloneNode()'s stripping in clone.ts.
+    if (name.toLowerCase().startsWith("on")) continue;
     const value = element.getAttribute(name);
     if (!value) continue;
     attributes[name] = value;
