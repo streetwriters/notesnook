@@ -22,7 +22,7 @@ import Dialog from "../components/dialog";
 import Field from "../components/field";
 import { Box, Button, Flex, Label, Text } from "@theme-ui/components";
 import { ThemeUIStyleObject } from "@theme-ui/css";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useRef, useState } from "react";
 import { db } from "../common/db";
@@ -79,9 +79,6 @@ const RecurringModes = {
   DAY: "day"
 } as const;
 
-const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const WEEK_DAYS_MON = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
 const modes = [
   {
     id: Modes.ONCE,
@@ -134,7 +131,7 @@ export const AddReminderDialog = DialogManager.register(
     const { reminder, note } = props;
 
     const weekFormat = useSettingsStore((store) => store.weekFormat);
-    const weekDays = weekFormat === "Sun" ? WEEK_DAYS : WEEK_DAYS_MON;
+    const weekDays = getWeekDays(weekFormat);
     const [selectedDays, setSelectedDays] = useState<number[]>(
       reminder?.selectedDays ?? []
     );
@@ -170,11 +167,6 @@ export const AddReminderDialog = DialogManager.register(
           : null,
       [reminder?.id]
     );
-
-    const repeatsDaily =
-      (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
-      (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
-      recurringMode === RecurringModes.DAY;
 
     return (
       <Dialog
@@ -660,19 +652,12 @@ export const AddReminderDialog = DialogManager.register(
         <Box sx={{ my: "spacing7" }}>
           <Text sx={{ color: "paragraph", fontSize: "xs" }}>
             {mode === Modes.REPEAT
-              ? selectedDays.length === 0 &&
-                recurringMode !== RecurringModes.DAY
-                ? recurringMode === RecurringModes.WEEK
-                  ? strings.reminderRepeatStrings.week.selectDays()
-                  : strings.reminderRepeatStrings.month.selectDays()
-                : repeatsDaily
-                ? strings.reminderRepeatStrings.day(date.format(timeFormat()))
-                : strings.reminderRepeatStrings.repeats(
-                    1,
-                    recurringMode,
-                    getSelectedDaysText(selectedDays, recurringMode, weekDays),
-                    date.format(timeFormat())
-                  )
+              ? getReminderRepeatText(
+                  recurringMode,
+                  selectedDays,
+                  date,
+                  weekDays
+                )
               : strings.reminderStarts(
                   date.format(db.settings.getDateFormat()),
                   date.format(timeFormat())
@@ -858,12 +843,46 @@ function timeFormat() {
   return getTimeFormat(db.settings.getTimeFormat());
 }
 
+const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEK_DAYS_MON = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+export function getWeekDays(weekFormat: string) {
+  return weekFormat === "Sun" ? WEEK_DAYS : WEEK_DAYS_MON;
+}
+
+export function getReminderRepeatText(
+  recurringMode: ValueOf<typeof RecurringModes>,
+  selectedDays: number[],
+  date: Dayjs,
+  weekDays: string[]
+) {
+  const time = date.format(timeFormat());
+  const repeatsDaily =
+    (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
+    (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||
+    recurringMode === RecurringModes.DAY;
+
+  if (selectedDays.length === 0 && recurringMode !== RecurringModes.DAY)
+    return recurringMode === RecurringModes.WEEK
+      ? strings.reminderRepeatStrings.week.selectDays()
+      : strings.reminderRepeatStrings.month.selectDays();
+
+  if (repeatsDaily) return strings.reminderRepeatStrings.day(time);
+
+  return strings.reminderRepeatStrings.repeats(
+    1,
+    recurringMode,
+    getSelectedDaysText(selectedDays, recurringMode, weekDays),
+    time
+  );
+}
+
 function getSelectedDaysText(
   selectedDays: number[],
   recurringMode: ValueOf<typeof RecurringModes>,
-  weekDays: typeof WEEK_DAYS | typeof WEEK_DAYS_MON
+  weekDays: string[]
 ) {
-  const text = selectedDays
+  return [...selectedDays]
     .sort((a, b) => a - b)
     .map((day, index) => {
       const isLast = index === selectedDays.length - 1;
@@ -874,7 +893,6 @@ function getSelectedDaysText(
         : `${day}${nth(day)} ${joinWith}`;
     })
     .join("");
-  return text;
 }
 
 function nth(n: number) {

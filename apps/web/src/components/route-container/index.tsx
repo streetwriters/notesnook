@@ -26,7 +26,8 @@ import {
   SearchIcon,
   Sliders,
   ViewList,
-  List
+  List,
+  BellPlus
 } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -127,15 +128,7 @@ function useGroupingState(
   return { groupingKey, refresh, context, canToggleView };
 }
 
-function GroupOptions({
-  groupingKey,
-  refresh,
-  isSearching,
-  context,
-  canToggleView,
-  viewMode,
-  setViewMode
-}: {
+type HeaderActionsProps = {
   groupingKey: GroupingKey;
   refresh: () => void;
   isSearching: boolean;
@@ -143,7 +136,19 @@ function GroupOptions({
   canToggleView: boolean;
   viewMode: "compact" | "detailed" | undefined;
   setViewMode: (viewMode: "compact" | "detailed") => void;
-}) {
+  createReminder?: boolean;
+};
+
+function HeaderActions({
+  groupingKey,
+  refresh,
+  isSearching,
+  context,
+  canToggleView,
+  viewMode,
+  setViewMode,
+  createReminder
+}: HeaderActionsProps) {
   return (
     <Box
       sx={{
@@ -152,6 +157,17 @@ function GroupOptions({
         gap: "spacing4"
       }}
     >
+      {createReminder && (
+        <Button
+          variant="tertiary"
+          title={CREATE_BUTTON_MAP.reminders.title}
+          data-test-id="create-reminder-button"
+          onClick={CREATE_BUTTON_MAP.reminders.onClick}
+          sx={{ p: 0 }}
+        >
+          <BellPlus size={15} color="icon-secondary" />
+        </Button>
+      )}
       <Button
         variant="tertiary"
         title="Group and sort"
@@ -268,7 +284,7 @@ function Header(props: RouteContainerProps) {
               {headerTitle}
             </Text>
             {type !== "notFound" && hasItems && (
-              <GroupOptions
+              <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
                 isSearching={isSearching}
@@ -276,6 +292,7 @@ function Header(props: RouteContainerProps) {
                 canToggleView={canToggleView}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
+                createReminder={type === "reminders"}
               />
             )}
           </Box>
@@ -374,22 +391,13 @@ function Header(props: RouteContainerProps) {
                       useSearchStore.getState().resetSearch();
                     },
                     hidden: !query
-                  },
-                  ...(type === "reminders"
-                    ? [
-                        {
-                          icon: AddReminder,
-                          testId: "create-reminder-button",
-                          ...CREATE_BUTTON_MAP.reminders
-                        }
-                      ]
-                    : [])
+                  }
                 ]}
               />
             </Box>
 
             {type === "notebook" && hasItems && (
-              <GroupOptions
+              <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
                 isSearching={isSearching}
