@@ -58,6 +58,7 @@ import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { store as noteStore } from "../../stores/note-store";
 import { store as notebookStore } from "../../stores/notebook-store";
 import { store as tagStore } from "../../stores/tag-store";
+import { useStore as useReminderStore } from "../../stores/reminder-store";
 import Toggle from "./toggle";
 import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
@@ -71,6 +72,7 @@ import {
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { ScopedThemeProvider } from "../theme-provider";
 import { ListItemWrapper } from "../list-container/list-profiles";
+import ListContainer from "../list-container";
 import { copyNoteLink } from "../../common";
 import { VirtualizedList } from "../virtualized-list";
 import { SessionItem } from "../session-item";
@@ -89,6 +91,8 @@ import TableOfContents from "../editor/table-of-contents";
 import IconTag from "../icon-tag";
 import { navigate } from "../../navigation";
 import { store as appStore } from "../../stores/app-store";
+import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
+import UserManager from "../../../../../packages/core/dist/types/api/user-manager";
 
 const tabs = [
   {
@@ -233,9 +237,7 @@ function EditorProperties(props: EditorPropertiesProps) {
             <Attachments noteId={session.note.id} />
           </ScrollContainer>
         ) : activeTab === "reminders" ? (
-          <ScrollContainer>
-            <Reminders noteId={session.note.id} />
-          </ScrollContainer>
+          <Reminders noteId={session.note.id} />
         ) : (
           <ScrollContainer>
             <Properties sessionId={session.id} />
@@ -1118,35 +1120,94 @@ function Notebooks({ noteId }: { noteId: string }) {
 }
 
 function Reminders({ noteId }: { noteId: string }) {
-  const result = usePromise(
-    () =>
-      db.relations
-        .from({ id: noteId, type: "note" }, "reminder")
-        .selector.sorted(db.settings.getGroupOptions("reminders")),
-    [noteId]
-  );
-  if (result.status !== "fulfilled" || result.value.length <= 0) return null;
+  const reminders = useReminderStore((store) => store.activeSessionReminders);
+  const refresh = useReminderStore((store) => store.refresh);
+
+  useEffect(() => {
+    refresh();
+  }, [noteId]);
+
+  if (!reminders) return;
 
   return (
-    <Section
-      title={strings.dataTypesPluralCamelCase.reminder()}
-      sx={{ px: "spacing4" }}
-    >
-      <VirtualizedList
-        mode="fixed"
-        style={{ marginTop: 5, marginLeft: 10, marginRight: 10 }}
-        estimatedSize={48}
-        getItemKey={(index) => result.value.key(index)}
-        items={result.value.placeholders}
-        renderItem={({ index }) => (
-          <ResolvedItem index={index} items={result.value} type="reminder">
-            {({ item, data }) => (
-              <ListItemWrapper item={item} data={data} compact />
-            )}
-          </ResolvedItem>
-        )}
-      />
-    </Section>
+    <ListContainer
+      type="reminders"
+      group="reminders"
+      compact
+      items={reminders}
+      refresh={refresh}
+      sx={{
+        flex: 1,
+        px: "spacing4",
+        ".list-container-placeholder": {
+          p: 0
+        }
+      }}
+      placeholder={
+        <Section
+          title={strings.dataTypesPluralCamelCase.reminder()}
+          sx={{ flex: 1 }}
+        >
+          <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+            <Text
+              sx={{
+                color: "paragraph-secondary",
+                fontSize: "xs",
+                lineHeight: "100%"
+              }}
+            >
+              No reminders to show
+            </Text>
+            <Button
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "spacing3",
+                width: "fit-content",
+                p: 0
+              }}
+              onClick={async () => {
+                const note = await db.notes.note(noteId);
+                AddReminderDialog.show({ note });
+              }}
+            >
+              <Plus size={15} color="accent" />
+              <Text sx={{ color: "accent", fontWeight: 600, fontSize: "xs" }}>
+                Create reminder
+              </Text>
+            </Button>
+          </Flex>
+        </Section>
+      }
+      renderGroupHeader={(title, index) => (
+        <Section
+          title={title}
+          sx={{
+            ...(index > 0
+              ? {
+                  mt: "spacing4",
+                  pt: "spacing4",
+                  borderTop: "1px solid",
+                  borderTopColor: "separator"
+                }
+              : {})
+          }}
+          headerAction={
+            index === 0 ? (
+              <Button
+                sx={{ p: 0 }}
+                onClick={async () => {
+                  const note = await db.notes.note(noteId);
+                  AddReminderDialog.show({ note });
+                }}
+              >
+                <Plus size={15} color="accent" />
+              </Button>
+            ) : undefined
+          }
+        />
+      )}
+    />
   );
 }
 function Attachments({ noteId }: { noteId: string }) {
