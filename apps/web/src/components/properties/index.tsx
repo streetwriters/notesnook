@@ -31,6 +31,7 @@ import {
   ClockCounterClockwise,
   Clock,
   PencilSimple,
+  NoteReadonly,
   Plus,
   Icon,
   Notebook,
@@ -128,7 +129,7 @@ const tools = [
   { key: "lock", icon: NoteLock, label: strings.lock(), property: "locked" },
   {
     key: "readonly",
-    icon: PencilSimple,
+    icon: NoteReadonly,
     label: strings.readOnly(),
     property: "readonly"
   },
@@ -985,7 +986,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
               />
               {isChecked && (
                 <Checkmark
-                  color="paragraph"
+                  color="icon-selected"
                   size={12}
                   sx={{ position: "absolute" }}
                 />

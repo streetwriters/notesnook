@@ -59,13 +59,16 @@ export function SessionItem(props: SessionItemProps) {
           color: "paragraph",
           fontSize: "xs",
           lineHeight: 1,
-          whiteSpace: "nowrap"
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+          overflow: "hidden"
         }}
       >
         {label}
       </Text>
       <Flex
         sx={{
+          ml: "spacing2",
           alignItems: "center",
           gap: "spacing2",
           color: "paragraph",

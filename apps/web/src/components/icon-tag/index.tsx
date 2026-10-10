@@ -105,6 +105,7 @@ function IconTag(props: IconTagProps) {
         <Button
           variant="new_secondary"
           sx={{
+            flexShrink: 0,
             height: "15px",
             width: "15px",
             display: "flex",

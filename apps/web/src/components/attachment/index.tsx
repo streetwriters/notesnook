@@ -182,7 +182,6 @@ export function Attachment({
             sx={{
               color: "paragraph-primary",
               fontSize: "xs",
-              lineHeight: 1,
               minWidth: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -206,7 +205,6 @@ export function Attachment({
             sx={{
               color: "paragraph-primary",
               fontSize: "3xs",
-              lineHeight: 1,
               whiteSpace: "nowrap"
             }}
           >
@@ -461,6 +459,10 @@ const AttachmentMenuItems: (
           await db.fs().cancel(attachment.hash);
         } else await reuploadAttachment(attachment.type, attachment.hash);
       }
+    },
+    {
+      type: "separator",
+      key: "separator"
     },
     {
       type: "button",
