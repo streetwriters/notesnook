@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { isReminderActive } from "../collections/reminders.js";
+import { getReminderGroup } from "../collections/reminders.js";
 import {
   GroupHeader,
   GroupOptions,
@@ -91,7 +91,7 @@ export function createKeySelector(
 
     const date = new Date();
     if (item.type === "reminder")
-      return isReminderActive(item as Reminder) ? "Active" : "Inactive";
+      return getReminderGroup(item as Reminder);
     else if (options.groupBy === "abc")
       return getFirstCharacter(getTitle(item));
     else {
