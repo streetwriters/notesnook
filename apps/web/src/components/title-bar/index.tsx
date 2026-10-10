@@ -71,7 +71,7 @@ export function getWindowControls(
     }
   ];
 }
-export const TITLE_BAR_HEIGHT = 47;
+export const TITLE_BAR_HEIGHT = 45;
 export function TitleBar({
   isUnderlay = isMac(),
   force = false

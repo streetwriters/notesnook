@@ -130,13 +130,13 @@ async function createWindow() {
               : "default",
           frame: process.platform === "win32" || process.platform === "darwin",
           titleBarOverlay: {
-            height: 47,
+            height: 45,
             color: "#00000000",
             symbolColor: config.windowControlsIconColor
           },
           trafficLightPosition: {
             x: 10,
-            y: 15
+            y: 14
           }
         }),
 
