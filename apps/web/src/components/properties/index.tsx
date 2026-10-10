@@ -860,14 +860,6 @@ function ReferencedIn({
           >
             {item.title}
           </Text>
-          {/* {blocks.length > 0 && (
-            <Text
-              variant="subBody"
-              sx={{ ml: "auto", color: "paragraph-secondary" }}
-            >
-              {blocks.length}
-            </Text>
-          )} */}
         </Button>
       </Flex>
       {isExpanded
