@@ -30,10 +30,12 @@ import {
   FilteredSelector
 } from "@notesnook/core";
 import { store as noteStore } from "./note-store";
+import { useEditorStore } from "./editor-store";
 import { ReminderPreviewDialog } from "../dialogs/reminder-preview-dialog";
 
 class ReminderStore extends BaseStore<ReminderStore> {
   reminders: VirtualizedGrouping<Reminder> | undefined = undefined;
+  activeSessionReminders: VirtualizedGrouping<Reminder> | undefined = undefined;
 
   refresh = async (reset = true) => {
     const reminders = db.reminders.all;
@@ -42,6 +44,18 @@ class ReminderStore extends BaseStore<ReminderStore> {
         db.settings.getGroupOptions("reminders")
       )
     });
+
+    const activeSession = useEditorStore.getState().getActiveSession();
+    if (activeSession && "note" in activeSession) {
+      const noteId = activeSession.note.id;
+      const activeSessionReminders = await db.relations
+        .from({ id: noteId, type: "note" }, "reminder")
+        .selector.grouped(db.settings.getGroupOptions("reminders"));
+      this.set({
+        activeSessionReminders
+      });
+    }
+
     if (reset) {
       await resetReminders(reminders);
       await noteStore.refresh();
