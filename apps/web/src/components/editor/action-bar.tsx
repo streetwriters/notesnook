@@ -105,10 +105,7 @@ export function EditorActionBar() {
     activeSession?.id ? store.editors[activeSession?.id] : undefined
   );
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const arePropertiesVisible = useEditorStore(
-    (store) => store.arePropertiesVisible
-  );
-  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
+  const propertiesTab = useEditorStore((store) => store.propertiesTab);
   const monographs = useMonographStore((store) => store.monographs);
   const isNotePublished =
     activeSession &&
@@ -157,17 +154,6 @@ export function EditorActionBar() {
       }
     },
     {
-      title: strings.toc(),
-      icon: TableOfContents,
-      enabled:
-        activeSession &&
-        activeSession.type !== "locked" &&
-        activeSession.type !== "diff" &&
-        activeSession.type !== "conflicted",
-      onClick: () => useEditorStore.getState().toggleTableOfContents(),
-      toggled: isTOCVisible
-    },
-    {
       title: strings.search(),
       icon: Search,
       enabled:
@@ -186,8 +172,13 @@ export function EditorActionBar() {
         activeSession.type !== "new" &&
         activeSession.type !== "locked" &&
         activeSession.type !== "conflicted",
-      onClick: () => useEditorStore.getState().toggleProperties(),
-      toggled: arePropertiesVisible
+      onClick: () =>
+        useEditorStore
+          .getState()
+          .setPropertiesTab(
+            propertiesTab === undefined ? "properties" : undefined
+          ),
+      toggled: propertiesTab !== undefined
     },
     ...getWindowControls(
       hasNativeWindowControls,

@@ -69,7 +69,6 @@ import { debounce, debounceWithId } from "@notesnook/common";
 import { Freeze } from "react-freeze";
 import { UnlockView } from "../unlock";
 import DiffViewer from "../diff-viewer";
-import TableOfContents from "./table-of-contents";
 import { scrollIntoViewById } from "@notesnook/editor";
 import { IEditor } from "./types";
 import { EditorActionBar } from "./action-bar";
@@ -128,10 +127,7 @@ export default function TabsView() {
   const documentPreview = useEditorStore((store) => store.documentPreview);
   const activeTabId = useEditorStore((store) => store.activeTabId);
   const activeSession = useEditorStore((store) => store.getActiveSession());
-  const arePropertiesVisible = useEditorStore(
-    (store) => store.arePropertiesVisible
-  );
-  const isTOCVisible = useEditorStore((store) => store.isTOCVisible);
+  const propertiesTab = useEditorStore((store) => store.propertiesTab);
   const [dropRef, overlayRef] = useDragOverlay();
 
   return (
@@ -223,16 +219,11 @@ export default function TabsView() {
             </Pane>
           ) : null}
 
-          {isTOCVisible && activeSession ? (
-            <Pane id="table-of-contents-pane" initialSize={300} minSize={300}>
-              <TableOfContents sessionId={activeSession.id} />
-            </Pane>
-          ) : null}
-          {arePropertiesVisible &&
+          {propertiesTab !== undefined &&
             activeSession &&
             activeSession.type !== "new" &&
             activeSession.type !== "locked" && (
-              <Pane id="properties-pane" initialSize={250} minSize={250}>
+              <Pane id="properties-pane" initialSize={285} minSize={250}>
                 <Properties sessionId={activeSession.id} />
               </Pane>
             )}
@@ -613,7 +604,7 @@ export function Editor(props: EditorProps) {
           if (!useUserStore.getState().isLoggedIn) {
             ConfirmDialog.show({
               title: strings.notLoggedIn(),
-              message: strings.loginToUploadAttachments(),
+              subtitle: strings.loginToUploadAttachments(),
               positiveButtonText: strings.okay()
             });
             return;

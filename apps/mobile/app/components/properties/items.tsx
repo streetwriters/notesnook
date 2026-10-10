@@ -18,21 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Item } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React from "react";
 import { Dimensions, View } from "react-native";
 import SwiperFlatList from "react-native-swiper-flatlist";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { Action, ActionId, useActions } from "../../hooks/use-actions";
+import { Action, ActionId } from "../../hooks/use-actions";
 import { useStoredRef } from "../../hooks/use-stored-ref";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
-import { AppFontSize, defaultBorderRadius } from "../../utils/size";
+import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import AppIcon from "../ui/AppIcon";
-import { Button } from "../ui/button";
 import { Pressable } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
+import { Radius, Spacing } from "../../common/design/spacing";
 
 const TOP_BAR_ITEMS: ActionId[] = [
   "pin",
@@ -60,13 +60,22 @@ const BOTTOM_BAR_ITEMS: ActionId[] = [
   "duplicate",
   "launcher-shortcut",
   "expiry-date",
+  "disable-reminder",
   "trash"
+];
+
+const PREFERENCE_ITEMS: ActionId[] = [
+  "add-shortcut",
+  "pin",
+  "default-notebook",
+  "default-tag",
+  "default-homepage"
 ];
 
 const COLUMN_BAR_ITEMS: ActionId[] = [
   "select",
   "add-notebook",
-  "edit-notebook",
+  // "edit-notebook",
   "move-notes",
   "move-notebook",
   "edit-reminder",
@@ -78,7 +87,7 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "add-shortcut",
   "reorder",
   "rename-color",
-  "rename-tag",
+  // "rename-tag",
   "launcher-shortcut",
   "copy-id",
   "copy-link",
@@ -90,11 +99,13 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
 export const Items = ({
   item,
   close,
-  buttons
+  buttons,
+  actions
 }: {
   item: Item;
   close: () => void;
   buttons: Action[];
+  actions: Action[];
 }) => {
   const { colors } = useThemeColors();
   const topBarSorting = useStoredRef<{ [name: string]: number }>(
@@ -102,14 +113,12 @@ export const Items = ({
     {}
   );
   const dimensions = useSettingStore((state) => state.dimensions);
-  const actions = useActions({ item, close });
   const selectedActions = actions.filter((i) => !i.hidden);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const width = Math.min(dimensions.width, 600);
 
   const shouldShrink =
-    Dimensions.get("window").fontScale > 1 &&
-    Dimensions.get("window").width < 450;
+    Dimensions.get("window").fontScale > 1 && dimensions.width < 450;
 
   const columnItemsCount = deviceMode === "tablet" ? 7 : shouldShrink ? 4 : 5;
 
@@ -135,16 +144,23 @@ export const Items = ({
       BOTTOM_BAR_ITEMS.indexOf(a.id) > BOTTOM_BAR_ITEMS.indexOf(b.id) ? 1 : -1
     );
 
+  const preferenceItems = selectedActions
+    .filter((item) => PREFERENCE_ITEMS.indexOf(item.id) > -1)
+    .sort((a, b) =>
+      PREFERENCE_ITEMS.indexOf(a.id) > PREFERENCE_ITEMS.indexOf(b.id) ? 1 : -1
+    );
+
   const columnItems = selectedActions
-    .filter((item) => COLUMN_BAR_ITEMS.indexOf(item.id) > -1)
+    .filter(
+      (item) =>
+        COLUMN_BAR_ITEMS.indexOf(item.id) > -1 &&
+        PREFERENCE_ITEMS.indexOf(item.id) === -1
+    )
     .sort((a, b) =>
       COLUMN_BAR_ITEMS.indexOf(a.id) > COLUMN_BAR_ITEMS.indexOf(b.id) ? 1 : -1
     );
 
-  const topBarItemHeight = Math.min(
-    (width - (topBarItems.length * 10 + 14)) / topBarItems.length,
-    60
-  );
+  const actionItems = [...buttons, ...columnItems];
 
   const renderRowItem = React.useCallback(
     ({ item }: { item: Action }) => (
@@ -152,7 +168,7 @@ export const Items = ({
         key={item.id}
         style={{
           alignItems: "center",
-          width: columnItemWidth - 8,
+          width: columnItemWidth - 10,
           opacity: item.locked ? 0.5 : 1
         }}
       >
@@ -161,17 +177,18 @@ export const Items = ({
           type={item.checked ? "shade" : "secondary"}
           testID={"icon-" + item.id}
           style={{
-            height: columnItemWidth / 1.5,
-            width: columnItemWidth - 8,
+            width: columnItemWidth - 10,
+            paddingVertical: Spacing.LEVEL_2,
             borderRadius: 10,
             justifyContent: "center",
             alignItems: "center",
-            marginBottom: DDS.isTab ? 7 : 3.5
+            marginBottom: 6
           }}
         >
-          <Icon
+          <AppIcon
             allowFontScaling
             name={item.icon}
+            iconFamily="notesnook"
             size={
               DDS.isTab
                 ? AppFontSize.xxl
@@ -207,33 +224,79 @@ export const Items = ({
     ]
   );
 
-  const renderColumnItem = React.useCallback(
+  const renderPreferenceItem = React.useCallback(
     (item: Action) => (
-      <Button
+      <Pressable
         key={item.id}
-        buttonType={{
-          text: item.checked
-            ? item.activeColor || colors.primary.accent
-            : item.id === "delete" || item.id === "trash"
-              ? colors.error.paragraph
-              : colors.primary.paragraph
-        }}
-        testID={"icon-" + item.id}
         onPress={item.onPress}
-        title={item.title}
-        icon={item.icon}
-        type={item.checked ? "inverted" : "plain"}
-        fontSize={AppFontSize.sm}
+        type={item.checked ? "shade" : "transparent"}
+        testID={"icon-" + item.id}
         style={{
-          borderRadius: 0,
-          justifyContent: "flex-start",
-          alignSelf: "flex-start",
-          width: "100%",
-          opacity: item.locked ? 0.5 : 1
+          width: "48.5%",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: Spacing.LEVEL_1,
+          paddingVertical: Spacing.LEVEL_2,
+          paddingHorizontal: Spacing.LEVEL_2,
+          borderRadius: Radius.XS,
+          borderWidth: item.checked ? 0 : 1,
+          borderColor: colors.primary.border,
+          opacity: item.locked ? 0.7 : 1
         }}
-      />
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: Spacing.LEVEL_1,
+            flexShrink: 1
+          }}
+        >
+          <AppIcon
+            name={item.icon}
+            iconFamily="notesnook"
+            allowFontScaling
+            size={AppFontSize.md}
+            color={item.checked ? colors.primary.icon : colors.secondary.icon}
+          />
+          <Paragraph
+            numberOfLines={1}
+            fontSize="XS"
+            fontFamily="MEDIUM"
+            color={
+              item.checked
+                ? colors.primary.paragraph
+                : colors.secondary.paragraph
+            }
+            style={{ flexShrink: 1 }}
+          >
+            {item.title}
+          </Paragraph>
+        </View>
+
+        <AppIcon
+          name={item.checked ? "toggle-on" : "toggle-off"}
+          iconFamily="notesnook"
+          size={16}
+          color={
+            item.checked
+              ? [colors.primary.accent, colors.primary.background]
+              : [colors.disabled.icon, colors.primary.background]
+          }
+        />
+      </Pressable>
     ),
-    [colors.error.paragraph, colors.primary.accent, colors.primary.paragraph]
+    [
+      colors.disabled.icon,
+      colors.primary.accent,
+      colors.primary.background,
+      colors.primary.border,
+      colors.primary.icon,
+      colors.primary.paragraph,
+      colors.secondary.icon,
+      colors.secondary.paragraph
+    ]
   );
 
   const renderTopBarItem = React.useCallback(
@@ -253,7 +316,7 @@ export const Items = ({
           key={item.id}
           testID={"icon-" + item.id}
           style={{
-            width: columnItemWidth - 8,
+            width: columnItemWidth - 10,
             alignSelf: "flex-start",
             gap: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
@@ -261,24 +324,26 @@ export const Items = ({
           <View
             style={{
               height: columnItemWidth / 2,
-              width: columnItemWidth - DefaultAppStyles.GAP_SMALL,
+              width: 65,
               justifyContent: "center",
               alignItems: "center",
-              borderWidth: 1,
-              borderRadius: defaultBorderRadius,
-              borderColor: item.checked
-                ? item.activeColor || colors.primary.accent
-                : colors.primary.border,
-              overflow: "hidden"
+              backgroundColor: item.checked
+                ? colors.primary.shade
+                : colors.secondary.background,
+              borderRadius: Radius.XS,
+              overflow: "hidden",
+              paddingVertical: Spacing.LEVEL_2,
+              paddingHorizontal: Spacing.LEVEL_2
             }}
           >
-            <Icon
+            <AppIcon
               name={item.icon}
+              iconFamily="notesnook"
               allowFontScaling
-              size={DDS.isTab ? AppFontSize.xxl : AppFontSize.md + 4}
+              size={16}
               color={
                 item.checked
-                  ? item.activeColor || colors.primary.accent
+                  ? colors.primary.icon
                   : item.id === "delete" || item.id === "trash"
                     ? colors.error.icon
                     : colors.secondary.icon
@@ -310,7 +375,13 @@ export const Items = ({
 
           <Paragraph
             textBreakStrategy="simple"
-            size={AppFontSize.xxs}
+            fontSize="XXS"
+            fontFamily="MEDIUM"
+            color={
+              item.checked
+                ? colors.primary.paragraph
+                : colors.secondary.paragraph
+            }
             style={{ textAlign: "center" }}
           >
             {item.title}
@@ -321,8 +392,12 @@ export const Items = ({
     [
       colors.error.icon,
       colors.primary.accent,
-      colors.primary.border,
+      colors.primary.icon,
+      colors.primary.paragraph,
+      colors.primary.shade,
+      colors.secondary.background,
       colors.secondary.icon,
+      colors.secondary.paragraph,
       colors.static.orange,
       columnItemWidth,
       topBarSorting
@@ -339,11 +414,7 @@ export const Items = ({
   };
 
   return (
-    <View
-      style={{
-        gap: DefaultAppStyles.GAP
-      }}
-    >
+    <View>
       {item.type === "note" ? (
         <>
           <View>
@@ -352,22 +423,24 @@ export const Items = ({
               autoplay={false}
               showPagination
               paginationStyleItemActive={{
-                borderRadius: 2,
-                backgroundColor: colors.selected.background,
-                height: 6,
-                marginHorizontal: 2
+                borderRadius: 6,
+                backgroundColor: colors.selected.accent,
+                height: 5,
+                width: 20,
+                marginHorizontal: 3
               }}
               paginationStyleItemInactive={{
-                borderRadius: 2,
+                borderRadius: 6,
                 backgroundColor: colors.secondary.background,
-                height: 6,
-                marginHorizontal: 2
+                height: 5,
+                width: 14,
+                marginHorizontal: 3
               }}
               paginationStyle={{
                 position: "relative",
                 marginHorizontal: 2,
-                marginBottom: -10,
-                marginTop: 10
+                marginBottom: Spacing.LEVEL_0,
+                marginTop: Spacing.LEVEL_2
               }}
               contentContainerStyle={{
                 justifyContent: "flex-start",
@@ -380,7 +453,7 @@ export const Items = ({
                   style={{
                     flexDirection: "row",
                     paddingHorizontal: DefaultAppStyles.GAP,
-                    gap: 5,
+                    gap: Spacing.LEVEL_2,
                     width: width
                   }}
                 >
@@ -394,7 +467,7 @@ export const Items = ({
             style={{
               flexDirection: "row",
               flexWrap: "wrap",
-              gap: 5,
+              gap: Spacing.LEVEL_1,
               paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
@@ -402,9 +475,61 @@ export const Items = ({
           </View>
         </>
       ) : (
-        <View>
-          {buttons.map(renderColumnItem)}
-          {columnItems.map(renderColumnItem)}
+        <View
+          style={{
+            paddingHorizontal: DefaultAppStyles.GAP
+          }}
+        >
+          {preferenceItems.length > 0 ? (
+            <View style={{ gap: Spacing.LEVEL_2 }}>
+              <Paragraph
+                fontFamily="MEDIUM"
+                fontSize="SM"
+                color={colors.secondary.paragraph}
+              >
+                {strings.preferences()}
+              </Paragraph>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                {preferenceItems.map(renderPreferenceItem)}
+              </View>
+            </View>
+          ) : null}
+
+          <View
+            style={{
+              marginVertical: Spacing.LEVEL_3,
+              width: "100%",
+              borderBottomWidth: 1,
+              borderColor: colors.primary.separator
+            }}
+          />
+
+          {actionItems.length > 0 ? (
+            <View style={{ gap: Spacing.LEVEL_2 }}>
+              <Paragraph
+                fontFamily="MEDIUM"
+                fontSize="SM"
+                color={colors.secondary.paragraph}
+              >
+                {strings.actionsHeading()}
+              </Paragraph>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                {actionItems.map((item) => renderRowItem({ item }))}
+              </View>
+            </View>
+          ) : null}
         </View>
       )}
     </View>

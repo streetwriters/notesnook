@@ -1,0 +1,166 @@
+diff --git a/node_modules/react-native-ui-datepicker/lib/commonjs/components/time-picker/wheel-picker/wheel-picker.js b/node_modules/react-native-ui-datepicker/lib/commonjs/components/time-picker/wheel-picker/wheel-picker.js
+index 0140365..abecca4 100644
+--- a/node_modules/react-native-ui-datepicker/lib/commonjs/components/time-picker/wheel-picker/wheel-picker.js
++++ b/node_modules/react-native-ui-datepicker/lib/commonjs/components/time-picker/wheel-picker/wheel-picker.js
+@@ -32,6 +32,7 @@ const WheelPicker = ({
+   flatListProps = {}
+ }) => {
+   const momentumStarted = (0, _react.useRef)(false);
++  const isUserScrolling = (0, _react.useRef)(false);
+   const selectedIndex = options.findIndex(item => item.value === value);
+   const flatListRef = (0, _react.useRef)(null);
+   const [scrollY] = (0, _react.useState)(new _reactNative.Animated.Value(selectedIndex * itemHeight));
+@@ -58,11 +59,21 @@ const WheelPicker = ({
+       onChange(((_options$index = options[index]) === null || _options$index === void 0 ? void 0 : _options$index.value) || 0);
+     }
+   };
++  const handleScrollBeginDrag = () => {
++    isUserScrolling.current = true;
++  };
+   const handleMomentumScrollBegin = () => {
+     momentumStarted.current = true;
+   };
+   const handleMomentumScrollEnd = event => {
+     momentumStarted.current = false;
++    // Ignore momentum that wasn't started by a user drag (e.g. the FlatList
++    // settling onto initialScrollIndex on mount, or the scrollToIndex sync
++    // effect) — otherwise it can spuriously reset the value.
++    if (!isUserScrolling.current) {
++      return;
++    }
++    isUserScrolling.current = false;
+     handleScrollEnd(event);
+   };
+   const handleScrollEndDrag = event => {
+@@ -75,6 +86,7 @@ const WheelPicker = ({
+       // If momentum scroll hasn't started within the timeout,
+       // then it was a slow scroll that won't trigger momentum
+       if (!momentumStarted.current && offsetY !== undefined) {
++        isUserScrolling.current = false;
+         // Create a synthetic event with just the data we need
+         const syntheticEvent = {
+           nativeEvent: {
+@@ -130,6 +142,7 @@ const WheelPicker = ({
+     }], {
+       useNativeDriver: true
+     }),
++    onScrollBeginDrag: handleScrollBeginDrag,
+     onScrollEndDrag: handleScrollEndDrag,
+     onMomentumScrollBegin: handleMomentumScrollBegin,
+     onMomentumScrollEnd: handleMomentumScrollEnd,
+diff --git a/node_modules/react-native-ui-datepicker/lib/module/components/time-picker/wheel-picker/wheel-picker.js b/node_modules/react-native-ui-datepicker/lib/module/components/time-picker/wheel-picker/wheel-picker.js
+index 1c11309..8bd4ee8 100644
+--- a/node_modules/react-native-ui-datepicker/lib/module/components/time-picker/wheel-picker/wheel-picker.js
++++ b/node_modules/react-native-ui-datepicker/lib/module/components/time-picker/wheel-picker/wheel-picker.js
+@@ -23,6 +23,7 @@ const WheelPicker = ({
+   flatListProps = {}
+ }) => {
+   const momentumStarted = useRef(false);
++  const isUserScrolling = useRef(false);
+   const selectedIndex = options.findIndex(item => item.value === value);
+   const flatListRef = useRef(null);
+   const [scrollY] = useState(new Animated.Value(selectedIndex * itemHeight));
+@@ -49,11 +50,21 @@ const WheelPicker = ({
+       onChange(((_options$index = options[index]) === null || _options$index === void 0 ? void 0 : _options$index.value) || 0);
+     }
+   };
++  const handleScrollBeginDrag = () => {
++    isUserScrolling.current = true;
++  };
+   const handleMomentumScrollBegin = () => {
+     momentumStarted.current = true;
+   };
+   const handleMomentumScrollEnd = event => {
+     momentumStarted.current = false;
++    // Ignore momentum that wasn't started by a user drag (e.g. the FlatList
++    // settling onto initialScrollIndex on mount, or the scrollToIndex sync
++    // effect) — otherwise it can spuriously reset the value.
++    if (!isUserScrolling.current) {
++      return;
++    }
++    isUserScrolling.current = false;
+     handleScrollEnd(event);
+   };
+   const handleScrollEndDrag = event => {
+@@ -66,6 +77,7 @@ const WheelPicker = ({
+       // If momentum scroll hasn't started within the timeout,
+       // then it was a slow scroll that won't trigger momentum
+       if (!momentumStarted.current && offsetY !== undefined) {
++        isUserScrolling.current = false;
+         // Create a synthetic event with just the data we need
+         const syntheticEvent = {
+           nativeEvent: {
+@@ -121,6 +133,7 @@ const WheelPicker = ({
+     }], {
+       useNativeDriver: true
+     }),
++    onScrollBeginDrag: handleScrollBeginDrag,
+     onScrollEndDrag: handleScrollEndDrag,
+     onMomentumScrollBegin: handleMomentumScrollBegin,
+     onMomentumScrollEnd: handleMomentumScrollEnd,
+diff --git a/node_modules/react-native-ui-datepicker/src/components/time-picker/wheel-picker/wheel-picker.tsx b/node_modules/react-native-ui-datepicker/src/components/time-picker/wheel-picker/wheel-picker.tsx
+index a694882..a199982 100644
+--- a/node_modules/react-native-ui-datepicker/src/components/time-picker/wheel-picker/wheel-picker.tsx
++++ b/node_modules/react-native-ui-datepicker/src/components/time-picker/wheel-picker/wheel-picker.tsx
+@@ -56,6 +56,13 @@ const WheelPicker: React.FC<Props> = ({
+   flatListProps = {},
+ }) => {
+   const momentumStarted = useRef(false);
++  // Tracks whether the current scroll was initiated by the user dragging.
++  // Programmatic scrolls (initialScrollIndex settle on mount, and the
++  // scrollToIndex sync effect below) never fire onScrollBeginDrag, so this
++  // flag lets us ignore the scroll-end events they emit — those transient
++  // events can report contentOffset.y ≈ 0 and would otherwise snap the value
++  // to 0 (e.g. resetting the time to 00:00 when switching to the time view).
++  const isUserScrolling = useRef(false);
+   const selectedIndex = options.findIndex((item) => item.value === value);
+ 
+   const flatListRef = useRef<FlatList>(null);
+@@ -98,6 +105,10 @@ const WheelPicker: React.FC<Props> = ({
+     }
+   };
+ 
++  const handleScrollBeginDrag = () => {
++    isUserScrolling.current = true;
++  };
++
+   const handleMomentumScrollBegin = () => {
+     momentumStarted.current = true;
+   };
+@@ -106,12 +117,20 @@ const WheelPicker: React.FC<Props> = ({
+     event: NativeSyntheticEvent<NativeScrollEvent>
+   ) => {
+     momentumStarted.current = false;
++    // Ignore momentum that wasn't started by a user drag (e.g. the FlatList
++    // settling onto initialScrollIndex on mount, or the scrollToIndex sync
++    // effect) — otherwise it can spuriously reset the value.
++    if (!isUserScrolling.current) {
++      return;
++    }
++    isUserScrolling.current = false;
+     handleScrollEnd(event);
+   };
+ 
+   const handleScrollEndDrag = (
+     event: NativeSyntheticEvent<NativeScrollEvent>
+   ) => {
++    // A drag-end only ever comes from real user interaction.
+     // Capture the offset value immediately
+     const offsetY = event.nativeEvent.contentOffset?.y;
+ 
+@@ -120,6 +139,7 @@ const WheelPicker: React.FC<Props> = ({
+       // If momentum scroll hasn't started within the timeout,
+       // then it was a slow scroll that won't trigger momentum
+       if (!momentumStarted.current && offsetY !== undefined) {
++        isUserScrolling.current = false;
+         // Create a synthetic event with just the data we need
+         const syntheticEvent = {
+           nativeEvent: {
+@@ -178,6 +198,7 @@ const WheelPicker: React.FC<Props> = ({
+           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+           { useNativeDriver: true }
+         )}
++        onScrollBeginDrag={handleScrollBeginDrag}
+         onScrollEndDrag={handleScrollEndDrag}
+         onMomentumScrollBegin={handleMomentumScrollBegin}
+         onMomentumScrollEnd={handleMomentumScrollEnd}

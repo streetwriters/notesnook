@@ -106,7 +106,9 @@ export function buildVariants(
       themeScope[variant]?.[color] ||
       theme.scopes.base[variant]?.[color] ||
       defaultThemeScope[variant]?.[color] ||
-      defaultThemeBase[variant]?.[color]
+      defaultThemeBase[variant]?.[color] ||
+      themeScope.primary?.[color] ||
+      defaultThemeBase.primary?.[color]
     );
   }
 
@@ -126,6 +128,13 @@ export function buildVariants(
       ...theme.scopes.base.secondary,
       ...themeScope.secondary,
       shade: deriveShadeColor(getColor("secondary", "accent"))
+    },
+    tertiary: {
+      ...defaultThemeBase.tertiary,
+      ...defaultThemeScope.tertiary,
+      ...theme.scopes.base.tertiary,
+      ...themeScope.tertiary,
+      shade: deriveShadeColor(getColor("tertiary", "accent"))
     },
     disabled: {
       ...defaultThemeBase.disabled,

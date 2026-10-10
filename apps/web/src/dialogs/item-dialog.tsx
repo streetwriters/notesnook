@@ -36,6 +36,7 @@ type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
   subtitle?: string;
   defaultValue?: string;
+  placeholder?: string;
 };
 export const ItemDialog = DialogManager.register(function ItemDialog(
   props: ItemDialogProps
@@ -80,11 +81,21 @@ export const ItemDialog = DialogManager.register(function ItemDialog(
         <Field
           required
           label={strings.title()}
+          placeholder={props.placeholder}
           id="title"
           name="title"
           autoFocus
           data-test-id="title-input"
           defaultValue={props.defaultValue}
+          sx={{
+            mt: "spacing6",
+            mb: "spacing7",
+            input: {
+              fontSize: "sm",
+              px: "spacing4",
+              py: "spacing6"
+            }
+          }}
         />
         <ErrorText error={error?.message} />
       </Box>
@@ -97,7 +108,8 @@ export const CreateTagDialog = {
     if (!(await checkFeature("tags"))) return;
     await ItemDialog.show({
       title: strings.addTag(),
-      subtitle: strings.addTagDesc()
+      subtitle: strings.addTagDesc(),
+      placeholder: strings.enterTitle()
     }).then(async (title) => {
       if (
         !title ||

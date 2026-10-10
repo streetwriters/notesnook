@@ -165,7 +165,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
     case "email": {
       return ConfirmDialog.show({
         title: strings.yourSupportRequestHasBeenForwarded(),
-        message: strings.supportEmailMessage()
+        subtitle: strings.supportEmailMessage()
       });
     }
     case "discussion": {
@@ -173,7 +173,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
       return ConfirmDialog.show({
         title: strings.thankYouForFeedback(),
         positiveButtonText: strings.copyLink(),
-        message: strings.featureRequestMessage(url)
+        subtitle: strings.featureRequestMessage(url)
       }).then((result) => {
         result && writeText(url);
       });
@@ -183,7 +183,7 @@ function showIssueReportedDialog(response: IssueReportResponse) {
       return ConfirmDialog.show({
         title: strings.thankYouForReporting(),
         positiveButtonText: strings.copyLink(),
-        message: strings.bugReportMessage(url)
+        subtitle: strings.bugReportMessage(url)
       }).then((result) => {
         result && writeText(url);
       });

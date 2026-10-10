@@ -38,7 +38,12 @@ import { showToast } from "../utils/toast";
 import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
 import { TaskManager } from "./task-manager";
-import { EVENTS, parseInternalLink } from "@notesnook/core";
+import {
+  EVENTS,
+  Note,
+  createInternalLink,
+  parseInternalLink
+} from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { User } from "@notesnook/core";
@@ -55,7 +60,7 @@ import { ABYTES, streamablefs } from "../interfaces/fs";
 import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
-import { Home } from "../components/icons";
+import { House } from "../components/icons";
 import { MenuItem } from "@notesnook/ui";
 import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
@@ -63,6 +68,7 @@ import { setToolbarPreset } from "./toolbar-config";
 import { useKeyStore } from "../interfaces/key-store";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
+import { writeToClipboard } from "../utils/clipboard";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -96,7 +102,6 @@ export async function introduceFeatures() {
 }
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
-
 export async function createBackup(
   options: {
     rescueMode?: boolean;
@@ -254,7 +259,7 @@ export async function restoreBackupFile(backupFile: File) {
       if (hasAttachments) {
         const result = await ConfirmDialog.show({
           title: strings.loginToRestoreAttachments(),
-          message: strings.loginToRestoreAttachmentsDesc(),
+          subtitle: strings.loginToRestoreAttachmentsDesc(),
           positiveButtonText: strings.yes(),
           negativeButtonText: strings.no()
         });
@@ -466,7 +471,7 @@ export async function logout() {
       if (
         !(await ConfirmDialog.show({
           title: strings.failedToTakeBackup(),
-          message: strings.failedToTakeBackupMessage(),
+          subtitle: strings.failedToTakeBackupMessage(),
           negativeButtonText: strings.no(),
           positiveButtonText: strings.yes()
         }))
@@ -493,7 +498,7 @@ export function createSetDefaultHomepageMenuItem(
   return {
     key: "set-as-homepage",
     type: "button",
-    title: strings.setAsHomepage(),
+    title: "Set as homepage",
     isChecked: homepage?.id === id && homepage?.type === type,
     premium: !availability.isAllowed,
     onClick: withFeatureCheck(availability, async () => {
@@ -503,7 +508,7 @@ export function createSetDefaultHomepageMenuItem(
         useSettingStore.getState().setHomepage({ id, type });
       }
     }),
-    icon: Home.path
+    iconComponent: House
   } as MenuItem;
 }
 
@@ -615,4 +620,13 @@ export async function handleInternalLink(url: string, openInNewTab?: boolean) {
   } else if (link.type === "color") {
     navigate(`/colors/${link.id}`);
   }
+}
+
+export async function copyNoteLink(note: Note) {
+  const link = createInternalLink("note", note.id);
+  await writeToClipboard({
+    "text/plain": link,
+    "text/html": `<a href="${link}">${note.title}</a>`,
+    "text/markdown": `[${note.title}](${link})`
+  });
 }

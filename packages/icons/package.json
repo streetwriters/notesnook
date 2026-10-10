@@ -1,0 +1,11 @@
+{
+  "name": "@notesnook/icons",
+  "version": "2.1.3",
+  "main": "./svgs",
+  "exports": {
+    ".": "./svgs",
+    "./*": "./svgs/*"
+  },
+  "license": "GPL-3.0-or-later",
+  "sideEffects": false
+}

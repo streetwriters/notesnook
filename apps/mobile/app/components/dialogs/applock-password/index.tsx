@@ -16,9 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
+import { Radius, Spacing } from "../../../common/design/spacing";
 import { db } from "../../../common/database";
 import {
   clearAppLockVerificationCipher,
@@ -33,7 +35,7 @@ import {
   eSubscribeEvent
 } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
-import { useSettingStore } from "../../../stores/use-setting-store";
+import { PASSWORD_PLACEHOLDER } from "../../../utils/constants";
 import { getElevationStyle } from "../../../utils/elevation";
 import {
   eCloseAppLocKPasswordDailog,
@@ -42,59 +44,120 @@ import {
 import { AppFontSize } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import BaseDialog from "../../dialog/base-dialog";
-import DialogButtons from "../../dialog/dialog-buttons";
-import DialogHeader from "../../dialog/dialog-header";
 import { Toast } from "../../toast";
 import { Button } from "../../ui/button";
-import { IconButton } from "../../ui/icon-button";
-import Input from "../../ui/input";
-import Seperator from "../../ui/seperator";
-import { strings } from "@notesnook/intl";
-import { DefaultAppStyles } from "../../../utils/styles";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../ui/input/form-input";
+import Heading from "../../ui/typography/heading";
 
 export const AppLockPassword = () => {
   const { colors } = useThemeColors();
   const [mode, setMode] = useState<"create" | "change" | "remove">("create");
-  const [keyboardType, setKeyboardType] = useState<"pin" | "password">(
-    useSettingStore.getState().settings.applockKeyboardType === "default"
-      ? "password"
-      : "pin"
-  );
   const [visible, setVisible] = useState(false);
   const currentPasswordInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const confirmPasswordInputRef = useRef<TextInput>(null);
-  const values = useRef<{
-    currentPassword?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
-  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const formRef = useRef(
+    createFormRef({
+      currentPassword: "",
+      password: "",
+      confirmPassword: ""
+    })
+  );
   const [accountPass, setAccountPass] = useState(false);
+  const enableApplock = useRef(false);
 
   useEffect(() => {
     const subs = [
       eSubscribeEvent(
         eOpenAppLockPasswordDialog,
-        (mode: "create" | "change" | "remove") => {
+        (mode: "create" | "change" | "remove", _enableApplock = false) => {
           setMode(mode);
           setAccountPass(false);
           setVisible(true);
+          enableApplock.current = _enableApplock;
         }
       ),
       eSubscribeEvent(eCloseAppLocKPasswordDailog, () => {
-        values.current = {};
-        setVisible(false);
+        close();
       })
     ];
     return () => {
       subs.forEach((sub) => sub?.unsubscribe());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const close = () => {
-    values.current = {};
+    formRef.current.setValue("currentPassword", "");
+    formRef.current.setValue("password", "");
+    formRef.current.setValue("confirmPassword", "");
+    formRef.current.clearErrors();
     setVisible(false);
+  };
+
+  const onSubmit = async () => {
+    if (!formRef.current.validate()) return;
+
+    const currentPassword = formRef.current.getValue("currentPassword");
+    const password = formRef.current.getValue("password");
+
+    if (mode === "create") {
+      setAppLockVerificationCipher(password);
+      SettingsService.setProperty("appLockHasPasswordSecurity", true);
+      if (enableApplock.current) {
+        SettingsService.setProperty("appLockEnabled", true);
+      }
+    } else if (mode === "change") {
+      const isCurrentPasswordCorrect =
+        await validateAppLockPassword(currentPassword);
+
+      if (!isCurrentPasswordCorrect) {
+        formRef.current.setError(
+          "currentPassword",
+          strings.incorrect("password")
+        );
+        return;
+      }
+
+      await clearAppLockVerificationCipher();
+      SettingsService.setProperty("appLockHasPasswordSecurity", true);
+      await setAppLockVerificationCipher(password);
+    } else if (mode === "remove") {
+      const isCurrentPasswordCorrect = accountPass
+        ? await db.user.verifyPassword(password)
+        : await validateAppLockPassword(password);
+
+      if (!isCurrentPasswordCorrect) {
+        formRef.current.setError(
+          "password",
+          accountPass
+            ? strings.passwordIncorrect()
+            : strings.incorrect("password")
+        );
+        return;
+      }
+      clearAppLockVerificationCipher();
+      SettingsService.setProperty("appLockHasPasswordSecurity", false);
+
+      if (
+        !(await BiometricService.isBiometryAvailable()) ||
+        SettingsService.getProperty("biometricsAuthEnabled") === false
+      ) {
+        SettingsService.setProperty("appLockEnabled", false);
+        SettingsService.setPrivacyScreen(
+          SettingsService.getProperty("privacyScreen")
+        );
+        ToastManager.show({
+          message: strings.applockDisabled(),
+          type: "success"
+        });
+      }
+    }
+
+    close();
   };
 
   return !visible ? null : (
@@ -115,286 +178,132 @@ export const AppLockPassword = () => {
         style={{
           ...getElevationStyle(10),
           width: DDS.isTab ? 350 : "85%",
-          borderRadius: 10,
+          borderRadius: Radius.MD,
           backgroundColor: colors.primary.background,
-          paddingTop: 12
+          paddingHorizontal: Spacing.LEVEL_3,
+          paddingVertical: Spacing.LEVEL_4,
+          gap: Spacing.LEVEL_4
         }}
       >
-        <DialogHeader
-          title={strings.changeAppLockCredentials(mode, keyboardType)}
-          icon="shield"
-          padding={12}
-        />
-        <Seperator half />
+        <Heading fontSize="XL" lineHeight="100%">
+          {strings.changeAppLockCredentials(mode, "password")}
+        </Heading>
 
-        <View
-          style={{
-            paddingHorizontal: DefaultAppStyles.GAP
-          }}
-        >
+        <View style={{ gap: Spacing.LEVEL_2 }}>
           {mode === "change" ? (
-            <Input
+            <FormInput
+              name="currentPassword"
+              formRef={formRef}
+              label={strings.currentPassword()}
               fwdRef={currentPasswordInputRef}
               autoCapitalize="none"
-              onChangeText={(value) => {
-                values.current.currentPassword = value;
-              }}
-              onSubmit={() => {
-                passwordInputRef.current?.focus();
-              }}
-              defaultValue={values.current.currentPassword}
               autoComplete="password"
+              onSubmitEditing={() => passwordInputRef.current?.focus()}
               returnKeyLabel={strings.next()}
-              keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
               returnKeyType="next"
-              secureTextEntry={secureTextEntry}
-              placeholder={
-                keyboardType === "pin"
-                  ? strings.currentPin()
-                  : strings.currentPassword()
-              }
+              secureTextEntry
+              placeholder={PASSWORD_PLACEHOLDER}
+              containerStyle={{ borderRadius: Radius.XS }}
+              validators={[validators.required(strings.passwordRequired())]}
             />
           ) : null}
 
-          <Input
+          <FormInput
+            name="password"
+            formRef={formRef}
+            label={
+              mode === "change"
+                ? strings.newPassword()
+                : strings.enterPassword()
+            }
             fwdRef={passwordInputRef}
             autoCapitalize="none"
-            onChangeText={(value) => {
-              values.current.password = value;
-            }}
-            onSubmit={() => {
-              confirmPasswordInputRef.current?.focus();
-            }}
-            defaultValue={values.current.password}
-            keyboardType={
-              keyboardType === "pin" && !accountPass ? "number-pad" : "default"
-            }
             autoComplete="password"
+            onSubmitEditing={() => {
+              if (mode !== "remove") {
+                confirmPasswordInputRef.current?.focus();
+              } else {
+                onSubmit();
+              }
+            }}
             returnKeyLabel={
               mode !== "remove" ? strings.next() : strings.remove()
             }
             returnKeyType={mode !== "remove" ? "next" : "done"}
-            secureTextEntry={secureTextEntry}
-            buttonLeft={
-              accountPass ? null : (
-                <IconButton
-                  name={keyboardType === "password" ? "numeric" : "keyboard"}
-                  onPress={() => {
-                    setKeyboardType(
-                      keyboardType === "password" ? "pin" : "password"
-                    );
-                    setSecureTextEntry(false);
-                    setImmediate(() => {
-                      setSecureTextEntry(true);
-                    });
-                  }}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    marginRight: 5
-                  }}
-                  size={AppFontSize.lg}
-                />
-              )
-            }
-            placeholder={
-              accountPass
-                ? strings.enterAccountPassword()
-                : mode === "change"
-                  ? keyboardType === "pin"
-                    ? strings.newPin()
-                    : strings.newPassword()
-                  : `${
-                      keyboardType === "pin"
-                        ? strings.pin()
-                        : strings.password()
-                    }`
-            }
+            secureTextEntry
+            placeholder={PASSWORD_PLACEHOLDER}
+            containerStyle={{ borderRadius: Radius.XS }}
+            validators={[validators.required(strings.passwordRequired())]}
           />
 
           {mode !== "remove" ? (
-            <Input
-              fwdRef={confirmPasswordInputRef}
-              autoCapitalize="none"
-              onChangeText={(value) => {
-                values.current.confirmPassword = value;
-              }}
-              onSubmit={() => {
-                confirmPasswordInputRef.current?.focus();
-              }}
-              defaultValue={values.current.confirmPassword}
-              keyboardType={keyboardType === "pin" ? "number-pad" : "default"}
-              customValidator={() => values.current.password || ""}
-              validationType="confirmPassword"
-              autoComplete="password"
-              returnKeyLabel={strings.done()}
-              returnKeyType="done"
-              secureTextEntry={secureTextEntry}
-              placeholder={
-                keyboardType === "pin"
-                  ? strings.confirmPin()
+            <FormInput
+              name="confirmPassword"
+              formRef={formRef}
+              label={
+                mode === "change"
+                  ? strings.confirmNewPassword()
                   : strings.confirmPassword()
               }
+              fwdRef={confirmPasswordInputRef}
+              autoCapitalize="none"
+              autoComplete="password"
+              onSubmitEditing={() => onSubmit()}
+              returnKeyLabel={strings.done()}
+              returnKeyType="done"
+              secureTextEntry
+              placeholder={PASSWORD_PLACEHOLDER}
+              containerStyle={{ borderRadius: Radius.XS }}
+              validators={[
+                validators.required(strings.confirmPasswordRequired()),
+                validators.matchField("password", strings.passwordNotMatched())
+              ]}
             />
           ) : null}
 
           {mode === "remove" ? (
-            <>
-              <Button
-                icon={
-                  accountPass ? "checkbox-marked" : "checkbox-blank-outline"
-                }
-                onPress={() => {
-                  setSecureTextEntry(false);
-                  setAccountPass(!accountPass);
-                  setTimeout(() => {
-                    setSecureTextEntry(true);
-                  });
-                }}
-                iconSize={AppFontSize.lg}
-                type="plain"
-                iconColor={
-                  accountPass ? colors.primary.accent : colors.primary.icon
-                }
-                title={strings.useAccountPassword()}
-                style={{
-                  width: "100%",
-                  alignSelf: "flex-start",
-                  justifyContent: "flex-start",
-                  paddingHorizontal: 0,
-                  paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
-                }}
-              />
-            </>
+            <Button
+              icon={accountPass ? "checkbox" : "box-empty"}
+              iconFamily="notesnook"
+              onPress={() => setAccountPass(!accountPass)}
+              iconSize={AppFontSize.sm}
+              fontFamily="MEDIUM"
+              fontSize={AppFontSize.xs}
+              type="plain"
+              iconColor={
+                accountPass
+                  ? [colors.primary.accent, colors.primary.accentForeground]
+                  : colors.primary.icon
+              }
+              textStyle={{
+                color: colors.primary.paragraph
+              }}
+              title={strings.useAccountPassword()}
+              style={{
+                width: "100%",
+                alignSelf: "flex-start",
+                justifyContent: "flex-start",
+                paddingHorizontal: 0,
+                paddingVertical: 0
+              }}
+            />
           ) : null}
         </View>
 
-        <DialogButtons
-          onPressNegative={close}
-          onPressPositive={async () => {
-            if (mode === "create") {
-              if (!values.current.password || !values.current.confirmPassword) {
-                ToastManager.error(
-                  new Error(strings.allFieldsRequired()),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-
-              if (values.current.password !== values.current.confirmPassword) {
-                ToastManager.error(
-                  new Error(strings.mismatch(keyboardType)),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-              const password = values.current.password;
-              setAppLockVerificationCipher(password);
-              SettingsService.setProperty("appLockHasPasswordSecurity", true);
-            } else if (mode === "change") {
-              if (
-                !values.current.currentPassword ||
-                !values.current.password ||
-                !values.current.confirmPassword
-              ) {
-                ToastManager.error(
-                  new Error(strings.allFieldsRequired()),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-
-              if (values.current.password !== values.current.confirmPassword) {
-                ToastManager.error(
-                  new Error(strings.mismatch(keyboardType)),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-              const isCurrentPasswordCorrect = await validateAppLockPassword(
-                values.current.currentPassword
-              );
-
-              if (!isCurrentPasswordCorrect) {
-                ToastManager.error(
-                  new Error(strings.incorrect(keyboardType)),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-
-              const password = values.current.password;
-              await clearAppLockVerificationCipher();
-              SettingsService.setProperty("appLockHasPasswordSecurity", true);
-              await setAppLockVerificationCipher(password);
-            } else if (mode === "remove") {
-              if (!values.current.password) {
-                ToastManager.error(
-                  new Error(strings.allFieldsRequired()),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-
-              const isCurrentPasswordCorrect = accountPass
-                ? await db.user.verifyPassword(values.current.password)
-                : await validateAppLockPassword(values.current.password);
-
-              if (!isCurrentPasswordCorrect) {
-                ToastManager.error(
-                  new Error(
-                    accountPass
-                      ? strings.passwordIncorrect()
-                      : strings.incorrect(keyboardType)
-                  ),
-                  undefined,
-                  "local"
-                );
-                return;
-              }
-              clearAppLockVerificationCipher();
-              SettingsService.setProperty("appLockHasPasswordSecurity", false);
-
-              if (
-                !(await BiometricService.isBiometryAvailable()) ||
-                SettingsService.getProperty("biometricsAuthEnabled") === false
-              ) {
-                SettingsService.setProperty("appLockEnabled", false);
-                SettingsService.setPrivacyScreen(
-                  SettingsService.getProperty("privacyScreen")
-                );
-                ToastManager.show({
-                  message: strings.applockDisabled(),
-                  type: "success"
-                });
-              }
-            }
-
-            SettingsService.setProperty(
-              "applockKeyboardType",
-              keyboardType === "password" ? "default" : "numeric"
-            );
-
-            close();
-          }}
-          positiveTitle={
-            mode === "remove"
-              ? strings.remove()
-              : mode === "change"
-                ? strings.change()
-                : strings.save()
-          }
-          negativeTitle={strings.cancel()}
-          positiveType="transparent"
-          loading={false}
-          doneText=""
-        />
+        <View style={{ flexDirection: "row", gap: Spacing.LEVEL_2 }}>
+          <Button
+            title={strings.cancel()}
+            type="plain-outline"
+            onPress={close}
+            style={{ flex: 1, paddingVertical: Spacing.LEVEL_3 }}
+          />
+          <Button
+            title={mode === "remove" ? strings.remove() : strings.save()}
+            type="accent"
+            onPress={onSubmit}
+            style={{ flex: 1, paddingVertical: Spacing.LEVEL_3 }}
+          />
+        </View>
       </View>
 
       <Toast context="local" />
@@ -402,6 +311,9 @@ export const AppLockPassword = () => {
   );
 };
 
-AppLockPassword.present = (mode: "create" | "change" | "remove") => {
-  eSendEvent(eOpenAppLockPasswordDialog, mode);
+AppLockPassword.present = (
+  mode: "create" | "change" | "remove",
+  enableAppLock?: boolean
+) => {
+  eSendEvent(eOpenAppLockPasswordDialog, mode, enableAppLock);
 };

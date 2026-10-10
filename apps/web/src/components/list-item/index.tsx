@@ -36,6 +36,7 @@ type ListItemProps<TItem extends Item, TContext> = {
     heading: SchemeColors;
     accent: SchemeColors;
     background: SchemeColors;
+    backgroundSelected: SchemeColors;
   };
   isFocused?: boolean;
   isCompact?: boolean;
@@ -71,10 +72,11 @@ function ListItem<TItem extends Item, TContext>(
   props: ListItemProps<TItem, TContext>
 ) {
   const {
-    colors: { heading, background, accent } = {
+    colors: { heading, background, accent, backgroundSelected } = {
       heading: "heading",
       accent: "accent",
-      background: "background"
+      background: "background",
+      backgroundSelected: "background-secondary"
     },
     isFocused,
     isCompact,
@@ -135,7 +137,15 @@ function ListItem<TItem extends Item, TContext>(
 
         if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
-          menuItems = menuItems?.filter((i) => i.multiSelect === true);
+          const multiSelectItemsAndSeparators = menuItems?.filter(
+            (item) => item.type === "separator" || item.multiSelect === true
+          );
+          menuItems = multiSelectItemsAndSeparators?.filter(
+            (item, index, items) =>
+              item.type !== "separator" ||
+              (items[index - 1]?.multiSelect === true &&
+                items[index + 1]?.multiSelect === true)
+          );
         }
 
         if (!menuItems) return;
@@ -146,11 +156,11 @@ function ListItem<TItem extends Item, TContext>(
       }}
       tabIndex={-1}
       sx={{
-        px: 1,
-        py: isCompact ? 0 : 1,
-        pr: isCompact ? 10 : 0,
-        height: isCompact ? 25 : "inherit",
-        cursor: "pointer",
+        // px: 1,
+        // py: isCompact ? 0 : 1,
+        // pr: isCompact ? 10 : 0,
+        // height: isCompact ? 25 : "inherit",
+        // cursor: "pointer",
         position: "relative",
         overflow: "hidden",
         maxWidth: "100%",
@@ -161,11 +171,8 @@ function ListItem<TItem extends Item, TContext>(
 
         opacity: isDisabled ? 0.7 : 1,
 
-        backgroundColor: selected ? "background-selected" : background,
+        backgroundColor: selected ? backgroundSelected : background,
 
-        ":hover": {
-          backgroundColor: selected ? "hover-selected" : "hover"
-        },
         ":focus": {
           backgroundColor: selected ? "hover-selected" : "hover"
         },
@@ -175,7 +182,11 @@ function ListItem<TItem extends Item, TContext>(
           backgroundColor:
             isSelected || isFocused ? "background-selected" : background
         },
-        ...sx
+        ...sx,
+        ":hover": {
+          backgroundColor: selected ? "hover-selected" : "hover",
+          ...(sx as { ":hover"?: ThemeUIStyleObject })?.[":hover"]
+        }
       }}
       onKeyUp={(e) => {
         if (e.key !== "Enter") {
@@ -197,49 +208,58 @@ function ListItem<TItem extends Item, TContext>(
     >
       {!isCompact && props.header}
 
-      {typeof props.title === "string" ? (
-        <Text
-          dir="auto"
-          data-test-id={`title`}
-          variant={"body"}
-          sx={{
-            whiteSpace: "pre",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: isCompact ? "body" : "medium",
-            color:
-              selected && heading === "heading" ? `heading-selected` : heading,
-            display: "block"
-          }}
-        >
-          {props.title}
-        </Text>
-      ) : (
-        props.title
-      )}
+      <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+        {typeof props.title === "string" ? (
+          <Text
+            dir="auto"
+            data-test-id={`title`}
+            variant={"body"}
+            sx={{
+              whiteSpace: "pre",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              fontWeight: isCompact ? "body" : "medium",
+              color:
+                selected && heading === "heading"
+                  ? `heading-selected`
+                  : heading,
+              display: "block"
+            }}
+          >
+            {props.title}
+          </Text>
+        ) : (
+          props.title
+        )}
 
-      {!isCompact && props.body && (
-        <Text
-          as="p"
-          variant="body"
-          dir="auto"
-          data-test-id={`description`}
-          sx={{
-            mt: "small",
-            color: selected ? "paragraph-selected" : "paragraph",
-            lineHeight: `1.2rem`,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "pre-wrap",
-            position: "relative",
-            display: "-webkit-box",
-            WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical"
-          }}
-        >
-          {props.body}
-        </Text>
-      )}
+        {!isCompact &&
+          props.body &&
+          (typeof props.body === "string" ? (
+            <Text
+              as="p"
+              dir="auto"
+              data-test-id={`description`}
+              sx={{
+                color: "paragraph",
+                fontSize: "xs",
+                width: "100%",
+                lineHeight: "1.2rem",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "pre-wrap",
+                position: "relative",
+                display: "-webkit-box",
+                WebkitLineClamp: 4,
+                WebkitBoxOrient: "vertical"
+              }}
+            >
+              {props.body}
+            </Text>
+          ) : (
+            props.body
+          ))}
+      </Flex>
+
       {props.footer ? <>{props.footer}</> : null}
     </Flex>
   );

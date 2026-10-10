@@ -24,6 +24,7 @@ import { ToastManager } from "../../../services/event-manager";
 import { Button } from "../../ui/button";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
+import { useSettingStore } from "../../../stores/use-setting-store";
 export const ShareComponent = ({ uri, name, padding }) => {
   return (
     <View
@@ -36,6 +37,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
         type="accent"
         width="100%"
         onPress={async () => {
+          useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
           FileViewer.open(uri, {
             showOpenWithDialog: true,
             showAppsSuggestions: true
@@ -56,6 +58,7 @@ export const ShareComponent = ({ uri, name, padding }) => {
           marginTop: DefaultAppStyles.GAP_VERTICAL
         }}
         onPress={async () => {
+          useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
           FileViewer.open(uri, {
             showOpenWithDialog: true,
             showAppsSuggestions: true,
