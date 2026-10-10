@@ -223,7 +223,7 @@ export default function TabsView() {
             activeSession &&
             activeSession.type !== "new" &&
             activeSession.type !== "locked" && (
-              <Pane id="properties-pane" initialSize={250} minSize={250}>
+              <Pane id="properties-pane" initialSize={285} minSize={250}>
                 <Properties sessionId={activeSession.id} />
               </Pane>
             )}
