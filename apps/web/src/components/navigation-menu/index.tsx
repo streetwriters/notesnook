@@ -1020,9 +1020,10 @@ function NavigationDropdown() {
             },
             {
               type: "button",
-              title: strings.toggleDarkLightMode(),
+              title: strings.darkMode(),
               key: "toggle-theme-mode",
               iconComponent: MoonStars,
+              isChecked: theme === "dark",
               onClick: () => {
                 setFollowSystemTheme(false);
                 toggleNightMode();
