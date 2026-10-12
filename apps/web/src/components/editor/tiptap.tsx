@@ -339,7 +339,10 @@ function TipTap(props: TipTapProps) {
         if (ignoreEdit || preventSave || !editor.isEditable || !onChange)
           return;
 
-        if (!autoSave.current) return;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+          return;
+        }
 
         onChange(
           () => serializeDocumentHTML(editor.state.doc, editor.schema),
@@ -537,14 +540,15 @@ function TipTap(props: TipTapProps) {
   }, [editor]);
 
   useEffect(() => {
+    const update = (totalWords?: number) => {
+      autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+    };
+
+    update(useEditorManager.getState().editors[id]?.statistics?.words.total);
+
     const unsubscribe = useEditorManager.subscribe(
       (s) => s.editors[id]?.statistics?.words.total,
-      (totalWords) => {
-        autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
-        if (!autoSave.current) {
-          onAutoSaveDisabled();
-        }
-      }
+      update
     );
     return () => {
       unsubscribe();
