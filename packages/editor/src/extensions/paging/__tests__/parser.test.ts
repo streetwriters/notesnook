@@ -21,6 +21,7 @@ import { describe, expect, test } from "vitest";
 import { Editor, Node } from "@tiptap/core";
 import { DOMParser } from "@tiptap/pm/model";
 import StarterKit from "@tiptap/starter-kit";
+import { Paging } from "../index.js";
 import { Page } from "../page.js";
 import { installPagingParser } from "../parser.js";
 import { isPage } from "../split.js";
@@ -39,7 +40,12 @@ function paragraphs(n: number) {
 
 function schemaWithParser(pageSize = 20, thresholdBlocks = 10) {
   const editor = new Editor({
-    extensions: [StarterKit.configure({ document: false }), PagedDocument, Page]
+    extensions: [
+      StarterKit.configure({ document: false }),
+      PagedDocument,
+      Page,
+      Paging.configure({ enabled: false })
+    ]
   });
   installPagingParser(editor.schema, { pageSize, thresholdBlocks });
   return editor;

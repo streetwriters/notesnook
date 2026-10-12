@@ -18,9 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension } from "@tiptap/core";
+import { HeightMap } from "./height-map.js";
 import { installPagingParser } from "./parser.js";
 import { installFlatteningSerializer } from "./serializer.js";
 import { DEFAULT_PAGE_SIZE, countPages, toPages } from "./split.js";
+import { viewportPlugin } from "./viewport-plugin.js";
 
 /** Paging only engages for notes larger than this many top-level blocks. */
 const DEFAULT_THRESHOLD_BLOCKS = 100;
@@ -29,6 +31,10 @@ export type PagingOptions = {
   enabled: boolean;
   pageSize: number;
   thresholdBlocks: number;
+};
+
+export type PagingStorage = {
+  heights: HeightMap;
 };
 
 /**
@@ -49,6 +55,10 @@ export const Paging = Extension.create<PagingOptions>({
       pageSize: DEFAULT_PAGE_SIZE,
       thresholdBlocks: DEFAULT_THRESHOLD_BLOCKS
     };
+  },
+
+  addStorage(): PagingStorage {
+    return { heights: new HeightMap() };
   },
 
   onBeforeCreate() {
@@ -82,6 +92,11 @@ export const Paging = Extension.create<PagingOptions>({
         .setMeta("addToHistory", false)
         .setMeta("ignoreEdit", true)
     );
+  },
+
+  addProseMirrorPlugins() {
+    if (!this.options.enabled) return [];
+    return [viewportPlugin(this.storage.heights)];
   }
 });
 
@@ -96,3 +111,4 @@ export {
   isPage,
   toPages
 } from "./split.js";
+export { viewportKey } from "./viewport-plugin.js";
