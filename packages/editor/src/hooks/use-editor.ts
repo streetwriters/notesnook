@@ -61,7 +61,8 @@ export const useEditor = (
         // the state of the same view.
         editor.createView();
       }
-      if (oldIsFocused && !editor.isFocused) editor.commands.focus();
+      if (oldIsFocused && !editor.isFocused)
+        editor.commands.focus(null, { scrollIntoView: false });
       if (!firstRun) options.onCreate?.({ editor: editor });
 
       const { searchTerm, ...searchOptions } = useEditorSearchStore.getState();
