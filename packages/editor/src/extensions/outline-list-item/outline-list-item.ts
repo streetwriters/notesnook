@@ -30,6 +30,7 @@ import {
 import { OutlineList } from "../outline-list/outline-list.js";
 import { keybindings, tiptapKeys } from "@notesnook/common";
 import { Paragraph } from "../paragraph/paragraph.js";
+import { virtualizable } from "../paging/child-view.js";
 
 export interface ListItemOptions {
   HTMLAttributes: Record<string, unknown>;
@@ -134,7 +135,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   },
 
   addNodeView() {
-    return ({ node, getPos, editor }) => {
+    return virtualizable(({ node, getPos, editor }) => {
       const isNested = node.lastChild?.type.name === OutlineList.name;
 
       const li = document.createElement("li");
@@ -190,6 +191,6 @@ export const OutlineListItem = Node.create<ListItemOptions>({
           return true;
         }
       };
-    };
+    });
   }
 });
