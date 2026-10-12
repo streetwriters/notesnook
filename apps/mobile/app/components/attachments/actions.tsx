@@ -28,6 +28,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import downloadAttachment from "../../common/filesystem/download-attachment";
+import { resetUploadAttempts } from "../../common/filesystem/utils";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import picker from "../../screens/editor/tiptap/picker";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
@@ -84,6 +85,32 @@ const Actions = ({
     name?: string;
   }>({});
   const actions = [
+    ...(failed || !attachment.dateUploaded
+      ? [
+          {
+            name: strings.retry(),
+            onPress: async () => {
+              resetUploadAttempts(attachment.hash);
+              await db.attachments.markAsFailed(attachment.id);
+              setFailed(undefined);
+              await db.fs().queueUploads(
+                [
+                  {
+                    filename: attachment.hash,
+                    chunkSize: attachment.chunkSize
+                  }
+                ],
+                "manual-retry"
+              );
+              eSendEvent(eDBItemUpdate, attachment.id);
+              setAttachments();
+              close?.();
+              fwdRef.current?.hide();
+            },
+            icon: "reload"
+          }
+        ]
+      : []),
     {
       name: strings.network.download(),
       onPress: async () => {
@@ -135,6 +162,7 @@ const Actions = ({
           });
         } else {
           setFailed(undefined);
+          resetUploadAttempts(attachment.hash);
           db.attachments.markAsFailed(attachment.id);
           eSendEvent(eDBItemUpdate, attachment.id);
           ToastManager.show({
