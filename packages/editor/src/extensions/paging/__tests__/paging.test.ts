@@ -171,7 +171,10 @@ describe("paging", () => {
     await created();
 
     expect(countPages(editor.state.doc)).toBe(3);
-    const toc = getTableOfContents(editor.view.dom as HTMLElement);
+    const toc = getTableOfContents(
+      editor.state.doc,
+      editor.view.dom as HTMLElement
+    );
     expect(toc).toHaveLength(BLOCKS);
     expect(toc[0].title).toBe("Heading 0");
     editor.destroy();
