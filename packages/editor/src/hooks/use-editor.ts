@@ -62,7 +62,7 @@ export const useEditor = (
         editor.createView();
       }
       if (oldIsFocused && !editor.isFocused) editor.commands.focus();
-      options.onCreate?.({ editor: editor });
+      if (!firstRun) options.onCreate?.({ editor: editor });
 
       const { searchTerm, ...searchOptions } = useEditorSearchStore.getState();
       if (!searchOptions.isSearching) {
