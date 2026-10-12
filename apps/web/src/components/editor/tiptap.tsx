@@ -339,7 +339,10 @@ function TipTap(props: TipTapProps) {
         if (ignoreEdit || preventSave || !editor.isEditable || !onChange)
           return;
 
-        if (!autoSave.current) return;
+        if (!autoSave.current) {
+          onAutoSaveDisabled();
+          return;
+        }
 
         onChange(
           () => serializeDocumentHTML(editor.state.doc, editor.schema),
