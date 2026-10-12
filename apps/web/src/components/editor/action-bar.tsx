@@ -410,7 +410,7 @@ const TabStrip = React.memo(function TabStrip() {
       block: "nearest",
       inline: "nearest"
     });
-  }, [activeSession, currentTab]);
+  }, [activeSession?.id, currentTab]);
 
   return (
     <Flex sx={{ flex: 1 }}>
