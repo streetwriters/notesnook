@@ -38,6 +38,8 @@ import {
   getChangedNodes,
   LinkAttributes,
   fromFlatPosition,
+  getScrollAnchor,
+  restoreScrollAnchor,
   serializeDocumentHTML,
   toFlatPosition,
   type Selection
@@ -280,19 +282,19 @@ function TipTap(props: TipTapProps) {
       element: editorContainer(),
       editable: !readonly,
       content: content?.(),
-      autofocus: "start",
+      autofocus: false,
       onFocus,
       onCreate: async ({ editor }) => {
         if (oldNonce.current !== nonce)
-          editor.commands.focus("start", { scrollIntoView: true });
+          editor.commands.focus("start", { scrollIntoView: false });
         oldNonce.current = nonce;
 
-        const instance = toIEditor(editor as Editor);
-        if (onLoad) onLoad(instance);
+        const editorInstance = instance.current ?? toIEditor(editor as Editor);
+        if (onLoad) onLoad(editorInstance);
 
         const totalWords = getTotalWords(editor as Editor);
         useEditorManager.getState().setEditor(id, {
-          editor: instance,
+          editor: editorInstance,
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           statistics: {
@@ -517,6 +519,12 @@ function TipTap(props: TipTapProps) {
     [tiptapOptions]
   );
 
+  const instance = useRef<IEditor>();
+  useLayoutEffect(() => {
+    instance.current = toIEditor(editor as Editor);
+    useEditorManager.getState().setEditor(id, { editor: instance.current });
+  }, [editor, id]);
+
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (e.target !== editor.view.dom || !editor.state.selection.empty) return;
@@ -662,7 +670,7 @@ function TiptapWrapper(
       theme.scopes.base.primary.paragraph;
   }, [theme]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isHydrating) {
       onLoad?.();
       containerRef.current
@@ -795,7 +803,7 @@ function toIEditor(editor: Editor): IEditor {
       if (typeof position === "object")
         editor
           .chain()
-          .focus()
+          .focus(null, { scrollIntoView: scrollIntoView ?? true })
           .setTextSelection({
             from: fromFlatPosition(editor.state.doc, position.from),
             to: fromFlatPosition(editor.state.doc, position.to)
@@ -841,7 +849,9 @@ function toIEditor(editor: Editor): IEditor {
         from: toFlatPosition(editor.state.doc, from),
         to: toFlatPosition(editor.state.doc, to)
       };
-    }
+    },
+    getScrollAnchor: () => getScrollAnchor(editor.view),
+    restoreScrollAnchor: (anchor) => restoreScrollAnchor(editor.view, anchor)
   };
 }
 

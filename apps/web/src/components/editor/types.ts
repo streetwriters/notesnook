@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Attachment } from "@notesnook/editor";
+import { ScrollAnchor } from "@notesnook/editor";
 
 export const MAX_AUTO_SAVEABLE_WORDS = IS_TESTING ? 100 : 100_000;
 
@@ -53,4 +54,6 @@ export interface IEditor {
   startSearch: () => void;
   getContent: () => string;
   getSelection: () => { from: number; to: number };
+  getScrollAnchor: () => ScrollAnchor | undefined;
+  restoreScrollAnchor: (anchor: ScrollAnchor) => boolean;
 }
