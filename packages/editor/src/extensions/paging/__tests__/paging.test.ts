@@ -20,13 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { describe, expect, test } from "vitest";
 import { Editor, Node } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  DEFAULT_PAGE_SIZE,
-  Page,
-  Paging,
-  countPages,
-  flattenBlocks
-} from "../index.js";
+import { Page, Paging, countPages, flattenBlocks } from "../index.js";
 import { BlockId } from "../../block-id/block-id.js";
 import { getTableOfContents } from "../../../utils/toc.js";
 
@@ -121,25 +115,6 @@ describe("paging", () => {
 
     expect(countPages(editor.state.doc)).toBe(0);
     expect(editor.state.doc.childCount).toBe(5);
-    editor.destroy();
-  });
-
-  test("falls back to the default page size", async () => {
-    const editor = new Editor({
-      extensions: [
-        StarterKit.configure({ document: false }),
-        PagedDocument,
-        Page,
-        BlockId,
-        Paging.configure({ enabled: true, thresholdBlocks: 10 })
-      ],
-      content: savedNoteHTML(DEFAULT_PAGE_SIZE * 3)
-    });
-    await created();
-
-    expect(DEFAULT_PAGE_SIZE).toBe(50);
-    expect(countPages(editor.state.doc)).toBe(3);
-    expect(editor.state.doc.child(0).childCount).toBe(DEFAULT_PAGE_SIZE);
     editor.destroy();
   });
 

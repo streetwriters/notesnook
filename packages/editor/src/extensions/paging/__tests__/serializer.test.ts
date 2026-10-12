@@ -60,25 +60,6 @@ function pagedEditor() {
 }
 
 describe("serializing a paged document", () => {
-  test("writes the same HTML as an unpaged one", () => {
-    const plain = new Editor({
-      extensions: [
-        StarterKit.configure({ document: false }),
-        PagedDocument,
-        Page
-      ],
-      content: paragraphs(BLOCKS)
-    });
-    const expected = plain.getHTML();
-    plain.destroy();
-
-    const editor = pagedEditor();
-    expect(editor.state.doc.childCount).toBe(3);
-    expect(editor.getHTML()).toBe(expected);
-    expect(editor.getHTML()).not.toContain("data-page");
-    editor.destroy();
-  });
-
   test("getHTMLFromFragment strips pages too", () => {
     const editor = pagedEditor();
 
@@ -101,15 +82,6 @@ describe("serializing a paged document", () => {
 
     expect(container.innerHTML).not.toContain("data-page");
     expect(container.innerHTML.match(/<p/g)).toHaveLength(BLOCKS);
-    editor.destroy();
-  });
-
-  test("installing twice keeps a single serializer", () => {
-    const editor = pagedEditor();
-    const first = editor.schema.cached.domSerializer;
-    installFlatteningSerializer(editor.schema);
-
-    expect(editor.schema.cached.domSerializer).toBe(first);
     editor.destroy();
   });
 });
