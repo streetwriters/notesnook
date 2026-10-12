@@ -1038,6 +1038,14 @@ export function getSettingsGroups(): SettingSection[] {
               }
             },
             {
+              id: "editor-virtualization",
+              name: strings.editorVirtualization(),
+              description: strings.editorVirtualizationDesc(),
+              type: "switch",
+              property: "editorVirtualization",
+              icon: "page-next-outline"
+            },
+            {
               id: "default-font-size",
               name: strings.defaultFontSize(),
               description: strings.defaultFontSizeDesc(),
