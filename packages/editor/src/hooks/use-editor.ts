@@ -37,6 +37,7 @@ export const useEditor = (
   const editor = useMemo<Editor>(() => new Editor(options), []);
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<TiptapEditor>(editor);
+  const isFirstRun = useRef(true);
 
   useEffect(
     () => {
@@ -49,12 +50,17 @@ export const useEditor = (
       options.onBeforeCreate?.({ editor });
       const oldIsFocused = editor.isFocused;
 
-      destroyView(editor.view);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore instead of creating a new editor, we just create
-      // a new view. Due to some reason this is faster than resetting
-      // the state of the same view.
-      editor.createView();
+      const firstRun = isFirstRun.current;
+      if (firstRun) {
+        isFirstRun.current = false;
+      } else {
+        destroyView(editor.view);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore instead of creating a new editor, we just create
+        // a new view. Due to some reason this is faster than resetting
+        // the state of the same view.
+        editor.createView();
+      }
       if (oldIsFocused && !editor.isFocused) editor.commands.focus();
       options.onCreate?.({ editor: editor });
 
