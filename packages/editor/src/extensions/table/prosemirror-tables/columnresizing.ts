@@ -26,6 +26,7 @@ import {
   NodeView
 } from "prosemirror-view";
 import { tableNodeTypes } from "./schema.js";
+import { RenderedRange } from "../../paging/state.js";
 import { TableMap } from "./tablemap.js";
 import { TableView, updateColumnsOnResize } from "./tableview.js";
 import { cellAround, CellAttrs, getClientX, isTouchEvent } from "./util.js";
@@ -62,6 +63,7 @@ export type ColumnResizingOptions = {
       ) => NodeView)
     | null;
   showResizeHandleOnSelection?: boolean;
+  renderedRanges?: (state: EditorState) => RenderedRange[];
 };
 
 /**
@@ -76,7 +78,8 @@ export function columnResizing({
   cellMinWidth = 25,
   defaultCellMinWidth = 100,
   View = TableView,
-  showResizeHandleOnSelection = false
+  showResizeHandleOnSelection = false,
+  renderedRanges
 }: ColumnResizingOptions = {}): Plugin {
   const plugin = new Plugin<ResizeState>({
     key: columnResizingPluginKey,
@@ -92,8 +95,15 @@ export function columnResizing({
 
         return { dragging: false, decorations: DecorationSet.empty };
       },
-      apply(tr, prev, _, state) {
-        return createResizeState(tr, state, prev, showResizeHandleOnSelection);
+      apply(tr, prev, oldState, state) {
+        return createResizeState(
+          tr,
+          state,
+          oldState,
+          prev,
+          showResizeHandleOnSelection,
+          renderedRanges
+        );
       }
     },
     props: {
@@ -120,14 +130,16 @@ export function columnResizing({
 type ResizeState = {
   dragging: Dragging | false;
   decorations: DecorationSet;
-  builtFor?: { cell: number };
+  builtFor?: { cell: number; start: number; end: number };
 };
 
 function createResizeState(
   tr: Transaction,
   state: EditorState,
+  oldState: EditorState,
   prevState: ResizeState,
-  showResizeHandleOnSelection: boolean
+  showResizeHandleOnSelection: boolean,
+  renderedRanges?: ColumnResizingOptions["renderedRanges"]
 ): ResizeState {
   const action = tr.getMeta(columnResizingPluginKey);
   const copy: ResizeState = { ...prevState };
@@ -141,21 +153,35 @@ function createResizeState(
       copy.decorations = DecorationSet.empty;
       copy.builtFor = undefined;
     } else {
+      const rendered = renderedRangeAt(cell, tr, oldState, renderedRanges);
+      const start = rendered ? rendered.start : -1;
+      const end = rendered ? rendered.end : -1;
       const was = prevState.builtFor;
       const built =
-        was && tr.docChanged ? { cell: tr.mapping.map(was.cell) } : was;
-
+        was && tr.docChanged
+          ? {
+              cell: tr.mapping.map(was.cell),
+              start: was.start < 0 ? was.start : tr.mapping.map(was.start),
+              end: was.end < 0 ? was.end : tr.mapping.map(was.end)
+            }
+          : was;
       copy.builtFor = built;
-      if (!built || built.cell !== cell) {
+      if (
+        !built ||
+        built.cell !== cell ||
+        built.start !== start ||
+        built.end !== end
+      ) {
         const handles = createColumnResizeHandles(
           state,
           cell,
           prevState,
-          showResizeHandleOnSelection
+          showResizeHandleOnSelection,
+          rendered
         );
         if (handles) {
           copy.decorations = handles;
-          copy.builtFor = { cell };
+          copy.builtFor = { cell, start, end };
         }
       }
     }
@@ -164,6 +190,25 @@ function createResizeState(
   if (action && action.setDragging !== undefined)
     copy.dragging = action.setDragging;
   return copy;
+}
+
+/** The rendered run of the container holding `position`. */
+function renderedRangeAt(
+  position: number,
+  tr: Transaction,
+  oldState: EditorState,
+  renderedRanges?: ColumnResizingOptions["renderedRanges"]
+): { start: number; end: number } | null {
+  for (const range of renderedRanges?.(oldState) ?? []) {
+    const containerStart = tr.mapping.map(range.containerStart);
+    const containerEnd = tr.mapping.map(range.containerEnd);
+    if (position <= containerStart || position >= containerEnd) continue;
+    return {
+      start: tr.mapping.map(range.start),
+      end: tr.mapping.map(range.end)
+    };
+  }
+  return null;
 }
 
 function handleMouseDown(
@@ -371,7 +416,8 @@ export function createColumnResizeHandles(
   state: EditorState,
   activeCellPos: number,
   resizeState: ResizeState,
-  showResizeHandleOnSelection: boolean
+  showResizeHandleOnSelection: boolean,
+  rendered?: { start: number; end: number } | null
 ): DecorationSet | null {
   if (activeCellPos === -1) return null;
   const decorations = [];
@@ -384,8 +430,8 @@ export function createColumnResizeHandles(
   const totalCells = map.height * map.width;
   const cellIndex = map.map.indexOf(activeCell.pos - start);
 
-  const oldDecorations = resizeState.decorations.find();
-  if (oldDecorations.length === totalCells) {
+  const oldDecorations = rendered ? [] : resizeState.decorations.find();
+  if (!rendered && oldDecorations.length === totalCells) {
     const activeCellDecoration = oldDecorations.find(
       (c) => c.spec.index === cellIndex
     );
@@ -419,6 +465,12 @@ export function createColumnResizeHandles(
 
   const sizes = new Map<number, number>();
   table.forEach((row, rowOffset) => {
+    if (
+      rendered &&
+      (start + rowOffset >= rendered.end ||
+        start + rowOffset + row.nodeSize <= rendered.start)
+    )
+      return;
     row.forEach((cell, cellOffset) =>
       sizes.set(rowOffset + 1 + cellOffset, cell.nodeSize)
     );
