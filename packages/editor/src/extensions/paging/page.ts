@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
+import { HeightMap } from "./height-map.js";
+import { createPageView } from "./page-view.js";
 
 export const PAGE_NODE = "page";
 
@@ -37,5 +39,13 @@ export const Page = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     return ["div", mergeAttributes(HTMLAttributes, { "data-page": "true" }), 0];
+  },
+
+  addNodeView() {
+    return ({ node, decorations }) => {
+      const heights = (this.editor.storage.paging as { heights: HeightMap })
+        .heights;
+      return createPageView(node, decorations, heights);
+    };
   }
 });
