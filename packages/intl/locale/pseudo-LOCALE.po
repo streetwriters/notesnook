@@ -2216,7 +2216,7 @@ msgstr "Confirm password required"
 
 #: src/strings.ts:1378
 msgid "Confirm pin"
-msgstr "Confirm pin======="
+msgstr "Confirm pin"
 
 #: src/strings.ts:2873
 msgid "Confirm plan change"
@@ -5559,7 +5559,7 @@ msgstr "Ongoing"
 
 #: src/strings.ts:2935
 msgid "Only {extensions} files are supported."
-msgstr "<<<<<<< HEAD"
+msgstr ""
 
 #: src/strings.ts:3280
 msgid "Only render the part of a note that is currently on screen. Makes very large notes much faster to open, scroll and type in. While this is on, your browser's own find (Ctrl+F) only covers the visible part of a note, so use the editor's search instead. If you face any issues, please turn it off."
