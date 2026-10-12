@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Button, Flex, Text, Box, ScrollContainer } from "@notesnook/ui";
 import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -54,7 +54,6 @@ import {
   Undo,
   Unlock
 } from "../icons";
-import { Box, ScrollContainer } from "@notesnook/ui";
 import {
   SaveState,
   SessionType,
@@ -104,17 +103,18 @@ type ToolButton = {
   enabled?: boolean;
   hidden?: boolean;
   hideOnMobile?: boolean;
-  hideSeparator?: boolean;
   toggled?: boolean;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 
 type EditorActionBarProps = {
+  isMobileEditorActive: boolean;
   isSidebarCollapsed: boolean;
   onSidebarToggle: () => void;
 };
 
 export function EditorActionBar({
+  isMobileEditorActive,
   isSidebarCollapsed,
   onSidebarToggle
 }: EditorActionBarProps) {
@@ -182,26 +182,26 @@ export function EditorActionBar({
             propertiesTab === undefined ? "properties" : undefined
           ),
       toggled: propertiesTab !== undefined
-    },
-    ...getWindowControls(
-      hasNativeWindowControls,
-      isFullscreen,
-      isMaximized,
-      isTablet,
-      isMobile
-    ).map((tool) => ({ ...tool, hideSeparator: true }))
+    }
   ];
+  const windowControls = getWindowControls(
+    hasNativeWindowControls,
+    isFullscreen,
+    isMaximized,
+    isTablet,
+    isMobile
+  );
+  const areWindowControlsVisible = windowControls.some(
+    (control) => !control.hidden
+  );
 
   return (
     <>
       {IS_DESKTOP_APP && isMac() && !isFullscreen && !hasNativeTitlebar && (
-        <Box
+        <Separator
           sx={{
             alignSelf: "center",
-            mx: "spacing4",
-            width: "1px",
-            height: "13px",
-            backgroundColor: "separator"
+            mx: "spacing4"
           }}
         />
       )}
@@ -226,20 +226,25 @@ export function EditorActionBar({
         )}
       </Button>
       {isMobile ? (
-        <Flex sx={{ flex: 1 }}>
+        <Flex sx={{ flex: 1, ml: "spacing4" }}>
           <Button
-            variant={"secondary"}
+            disabled={!isMobileEditorActive}
             sx={{
-              height: "100%",
               bg: "transparent",
-              borderRadius: 0,
-              flexShrink: 0
+              flexShrink: 0,
+              borderRadius: "radius1",
+              alignSelf: "center",
+              width: "20px",
+              height: "20px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
             }}
             onClick={() =>
               AppEventManager.publish(AppEvents.toggleEditor, false)
             }
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={15} />
           </Button>
         </Flex>
       ) : (
@@ -249,6 +254,7 @@ export function EditorActionBar({
         sx={{
           alignItems: "center",
           justifyContent: "center",
+          // @ts-expect-error
           mr:
             hasNativeWindowControls && !isMac() && !isMobile && !isTablet
               ? `calc(100vw - env(titlebar-area-width))`
@@ -287,13 +293,7 @@ export function EditorActionBar({
             Command
           </Text>
         </Button>
-        <Box
-          sx={{
-            width: "1px",
-            height: "13px",
-            backgroundColor: "separator"
-          }}
-        />
+        <Separator />
         {tools.map((tool, index) => (
           <React.Fragment key={tool.title}>
             <Button
@@ -323,23 +323,73 @@ export function EditorActionBar({
               }}
               onClick={tool.onClick}
             >
-              <tool.icon size={16} />
+              <tool.icon size={15} />
             </Button>
             {!tool.hidden &&
-              !tool.hideOnMobile &&
-              !tool.hideSeparator &&
-              index < tools.length - 1 && (
-                <Box
+              index < tools.length - 1 &&
+              !tools[index + 1].hidden && (
+                <Separator
                   sx={{
-                    width: "1px",
-                    height: "13px",
-                    backgroundColor: "separator"
+                    display: [
+                      "hideOnMobile" in tool && tool.hideOnMobile
+                        ? "none"
+                        : "block",
+                      "block"
+                    ]
                   }}
                 />
               )}
           </React.Fragment>
         ))}
       </Flex>
+      {areWindowControlsVisible && (
+        <>
+          <Separator
+            sx={{
+              alignSelf: "center",
+              mr: "spacing4"
+            }}
+          />
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "spacing3",
+              flexShrink: 0,
+              my: "spacing3"
+            }}
+          >
+            {windowControls.map((tool, index) => (
+              <Button
+                data-test-id={tool.title}
+                disabled={!tool.enabled}
+                variant={tool.title === "Close" ? "error" : "secondary"}
+                title={tool.title}
+                key={tool.title}
+                sx={{
+                  borderRadius: "radius1",
+                  width: "20px",
+                  height: "20px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  bg: "transparent",
+                  display: tool.hidden ? "none" : "Flex",
+                  flexShrink: 0,
+                  "&:hover svg path": {
+                    fill:
+                      tool.title === "Close"
+                        ? "var(--accentForeground-error) !important"
+                        : "var(--icon)"
+                  }
+                }}
+                onClick={tool.onClick}
+              >
+                <tool.icon size={15} />
+              </Button>
+            ))}
+          </Flex>
+        </>
+      )}
     </>
   );
 }
@@ -403,7 +453,7 @@ const TabStrip = React.memo(function TabStrip() {
             alignItems: "center",
             opacity: "1 !important",
             "&:hover svg path": {
-              fill: canGoBack ? "var(--icon-selected) !important" : ""
+              fill: canGoForward ? "var(--icon-selected) !important" : ""
             }
           }}
           data-test-id="go-forward"
@@ -587,7 +637,6 @@ const TabStrip = React.memo(function TabStrip() {
       >
         <Plus size={11} />
       </Button>
-      <Box sx={{ flex: 1, height: "100%" }} />
     </Flex>
   );
 });
@@ -666,15 +715,10 @@ function Tab(props: TabProps) {
         py: "spacing4",
         px: "spacing3",
         borderRadius: "radius2",
-
         cursor: "pointer",
-
-        ":last-of-type": { borderRight: 0 },
-
         transform: CSS.Transform.toString(transform),
         transition,
         visibility: active?.id === id ? "hidden" : "visible",
-
         bg: isActive ? "background-tertiary" : "transparent",
         justifyContent: "space-between",
         alignItems: "center",
@@ -793,7 +837,6 @@ function Tab(props: TabProps) {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            opacity: isActive || active?.id === id ? 1 : 0,
             p: 0
           }}
           onClick={onPin}
@@ -888,5 +931,18 @@ function ReorderableList<T extends { id: string }>(
         </DragOverlay>
       </SortableContext>
     </DndContext>
+  );
+}
+
+function Separator({ sx }: { sx?: React.ComponentProps<typeof Box>["sx"] }) {
+  return (
+    <Box
+      sx={{
+        width: "1px",
+        height: "13px",
+        backgroundColor: "separator",
+        ...sx
+      }}
+    />
   );
 }

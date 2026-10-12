@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Suspense, useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Box, Flex } from "@theme-ui/components";
 import { ScopedThemeProvider } from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
@@ -55,8 +55,12 @@ new WebExtensionRelay();
 function App() {
   const isMobile = useMobile();
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const isNavPaneCollapsed = useStore((store) => store.isNavPaneCollapsed);
+  const [isMobileSideMenuOpen, setIsMobileSideMenuOpen] = useState(false);
+  const [isMobileEditorActive, setIsMobileEditorActive] = useState(false);
   const { isFocused } = useWindowFocus();
   const { isFullscreen } = useWindowControls();
+  const navPane = useRef<SplitPaneImperativeHandle>(null);
   const hasNativeTitlebar =
     useSettingStore.getState().desktopIntegrationSettings?.nativeTitlebar;
   console.timeEnd("loading app");
@@ -129,7 +133,49 @@ function App() {
           height: "100%"
         }}
       >
-        {isMobile ? <MobileAppContents /> : <DesktopAppContents />}
+        <ScopedThemeProvider scope="titleBar">
+          <Flex
+            className="editor-action-bar"
+            sx={{
+              position: "relative",
+              zIndex: 2,
+              height: TITLE_BAR_HEIGHT,
+              bg: "background",
+              px: "spacing4",
+              borderBottom: "1px solid",
+              borderColor: "border"
+            }}
+          >
+            <EditorActionBar
+              isMobileEditorActive={isMobileEditorActive}
+              isSidebarCollapsed={
+                isMobile ? !isMobileSideMenuOpen : isNavPaneCollapsed
+              }
+              onSidebarToggle={() => {
+                if (isMobile) {
+                  const nextOpenState = !isMobileSideMenuOpen;
+                  setIsMobileSideMenuOpen(nextOpenState);
+                  AppEventManager.publish(
+                    AppEvents.toggleSideMenu,
+                    nextOpenState
+                  );
+                } else if (isNavPaneCollapsed) {
+                  navPane.current?.reset(0);
+                } else {
+                  navPane.current?.collapse(0);
+                }
+              }}
+            />
+          </Flex>
+        </ScopedThemeProvider>
+        {isMobile ? (
+          <MobileAppContents
+            onSideMenuVisibilityChange={setIsMobileSideMenuOpen}
+            onEditorPaneVisibilityChange={setIsMobileEditorActive}
+          />
+        ) : (
+          <DesktopAppContents navPane={navPane} />
+        )}
         <Toaster
           containerClassName="toasts-container"
           containerStyle={{ bottom: STATUS_BAR_HEIGHT + 10 }}
@@ -141,12 +187,14 @@ function App() {
 
 export default App;
 
-function DesktopAppContents() {
+function DesktopAppContents({
+  navPane
+}: {
+  navPane: { current: SplitPaneImperativeHandle | null };
+}) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isListPaneVisible = useStore((store) => store.isListPaneVisible);
-  const isNavPanCollapsed = useStore((store) => store.isNavPaneCollapsed);
   const isTablet = useTablet();
-  const navPane = useRef<SplitPaneImperativeHandle>(null);
 
   useEffect(() => {
     if (isTablet) navPane.current?.collapse(0);
@@ -189,31 +237,6 @@ function DesktopAppContents() {
 
   return (
     <>
-      <ScopedThemeProvider scope="titleBar">
-        <Flex
-          className="editor-action-bar"
-          sx={{
-            position: "relative",
-            zIndex: 2,
-            height: TITLE_BAR_HEIGHT,
-            bg: "background",
-            px: "spacing4",
-            borderBottom: "1px solid",
-            borderColor: "border"
-          }}
-        >
-          <EditorActionBar
-            isSidebarCollapsed={isNavPanCollapsed}
-            onSidebarToggle={() => {
-              if (isNavPanCollapsed) {
-                navPane.current?.reset(0);
-              } else {
-                navPane.current?.collapse(0);
-              }
-            }}
-          />
-        </Flex>
-      </ScopedThemeProvider>
       <Flex
         variant="rowFill"
         sx={{
@@ -295,7 +318,13 @@ function DesktopAppContents() {
   );
 }
 
-function MobileAppContents() {
+function MobileAppContents({
+  onSideMenuVisibilityChange,
+  onEditorPaneVisibilityChange
+}: {
+  onSideMenuVisibilityChange: (isOpen: boolean) => void;
+  onEditorPaneVisibilityChange: (isActive: boolean) => void;
+}) {
   const { ref, slideToIndex } = useSlider({
     onSliding: (_e, { position }) => {
       const offset = 70;
@@ -315,8 +344,30 @@ function MobileAppContents() {
     onChange: (e, { slide, lastSlide }) => {
       slide.node.classList.add("pane-active");
       lastSlide?.node.classList.remove("pane-active");
+      onSideMenuVisibilityChange(
+        slide.node.classList.contains("mobile-nav-pane")
+      );
+      onEditorPaneVisibilityChange(
+        slide.node.classList.contains("mobile-editor-pane")
+      );
     }
   });
+
+  useEffect(() => {
+    if (ref.current) {
+      const activeSlide = Array.from(ref.current.children).find(
+        (node) =>
+          Math.round((node as HTMLElement).offsetLeft) ===
+          Math.round(ref.current!.scrollLeft)
+      );
+      onSideMenuVisibilityChange(
+        activeSlide?.classList.contains("mobile-nav-pane") ?? false
+      );
+      onEditorPaneVisibilityChange(
+        activeSlide?.classList.contains("mobile-editor-pane") ?? false
+      );
+    }
+  }, [onEditorPaneVisibilityChange, onSideMenuVisibilityChange, ref]);
 
   useEffect(() => {
     const toggleSideMenuEvent = AppEventManager.subscribe(

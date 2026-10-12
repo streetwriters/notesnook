@@ -28,10 +28,12 @@ type ValidSpaceValues =
   | "auto"
   | number;
 
+type RestrictedColor = ThemeColor | "transparent";
+
 export type RestrictedColorProps = {
-  color?: ThemeColor;
-  bg?: ThemeColor | (ThemeColor | null)[];
-  backgroundColor?: ThemeColor | (ThemeColor | null)[];
+  color?: RestrictedColor;
+  bg?: RestrictedColor | (RestrictedColor | null)[];
+  backgroundColor?: RestrictedColor | (RestrictedColor | null)[];
 };
 
 export type RestrictedSpaceProps = {
