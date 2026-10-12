@@ -540,14 +540,15 @@ function TipTap(props: TipTapProps) {
   }, [editor]);
 
   useEffect(() => {
+    const update = (totalWords?: number) => {
+      autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
+    };
+
+    update(useEditorManager.getState().editors[id]?.statistics?.words.total);
+
     const unsubscribe = useEditorManager.subscribe(
       (s) => s.editors[id]?.statistics?.words.total,
-      (totalWords) => {
-        autoSave.current = !totalWords || totalWords < MAX_AUTO_SAVEABLE_WORDS;
-        if (!autoSave.current) {
-          onAutoSaveDisabled();
-        }
-      }
+      update
     );
     return () => {
       unsubscribe();
