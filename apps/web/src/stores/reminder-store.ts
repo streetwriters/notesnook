@@ -83,7 +83,7 @@ async function resetReminders(reminders: FilteredSelector<Reminder>) {
     return;
 
   for await (const reminder of reminders.iterate()) {
-    if (reminder.disabled) continue;
+    if (reminder.disabled || reminder.completedAt) continue;
 
     // set a one time reminder at the snoozed date
     if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now()) {
