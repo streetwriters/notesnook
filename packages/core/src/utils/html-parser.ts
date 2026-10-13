@@ -365,24 +365,30 @@ const INLINE_TAGS = [
   "textarea",
   "time",
   "tt",
-  "var"
+  "var",
+  "u",
+  "s",
+  "mark",
+  "del",
+  "ins"
 ];
 
 export function extractMatchingBlocks(html: string, matchTagName: string) {
   const matches: string[] = [];
   let text = "";
-  let openedTag: string | undefined = undefined;
   let hasMatches = false;
+
+  function flush() {
+    if (hasMatches && text) matches.push(text);
+    text = "";
+    hasMatches = false;
+  }
 
   const parser = new Parser(
     {
       ontext: (data) => (text += data),
       onopentag(name, attributes) {
-        if (!INLINE_TAGS.includes(name) && name !== matchTagName) {
-          openedTag = name;
-          text = "";
-          hasMatches = false;
-        }
+        if (!INLINE_TAGS.includes(name) && name !== matchTagName) flush();
         if (name === matchTagName) {
           hasMatches = true;
           let tagString = `<${name}`;
@@ -395,13 +401,8 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
       },
       onclosetag(name) {
         if (name === "br") text += "\n";
-        if (name === openedTag) {
-          if (hasMatches) matches.push(text);
-          text = "";
-          hasMatches = false;
-          openedTag = undefined;
-        }
         if (name === matchTagName) text += `</${name}>`;
+        else if (!INLINE_TAGS.includes(name)) flush();
       }
     },
     {
@@ -410,7 +411,7 @@ export function extractMatchingBlocks(html: string, matchTagName: string) {
     }
   );
   parser.end(html);
-  if (hasMatches && text) matches.push(text);
+  flush();
 
   return matches;
 }
