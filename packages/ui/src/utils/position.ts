@@ -37,6 +37,7 @@ export type PositionOptions = {
   align?: "center" | "start" | "end";
   yOffset?: number;
   xOffset?: number;
+  gap?: number;
   yAnchor?: HTMLElement;
   parent?: HTMLElement | Element;
 };
@@ -61,6 +62,7 @@ export function getPosition(
     location = undefined,
     yOffset = 0,
     xOffset = 0,
+    gap = 0,
     align = "start",
     parent = document.body,
     yAnchor
@@ -79,17 +81,30 @@ export function getPosition(
 
   const position = { top: 0, left: 0 };
 
-  if (windowWidth - actualX < elementWidth) {
-    const xDiff = actualX - x;
-    position.left = windowWidth - elementWidth;
-    position.left -= xDiff;
-  } else {
-    position.left = x;
-  }
-
+  const xDiff = actualX - x;
   if (width && location === "right") {
-    position.left += width;
-  } else if (location === "left") position.left -= elementWidth;
+    // place to the right of the target, flipping to the left if there isn't
+    // enough space, and keep the element inside the window either way
+    const spaceRight = windowWidth - (actualX + width) - gap;
+    const spaceLeft = actualX - gap;
+    const fitsRight =
+      spaceRight >= elementWidth ||
+      (spaceLeft < elementWidth && spaceRight >= spaceLeft);
+    const actualLeft = fitsRight
+      ? actualX + width + gap
+      : actualX - elementWidth - gap;
+    const maxLeft = Math.max(0, windowWidth - elementWidth);
+    position.left = Math.min(Math.max(actualLeft, 0), maxLeft) - xDiff;
+  } else {
+    if (windowWidth - actualX < elementWidth) {
+      position.left = windowWidth - elementWidth;
+      position.left -= xDiff;
+    } else {
+      position.left = x;
+    }
+
+    if (location === "left") position.left -= elementWidth;
+  }
 
   if (actualY + elementHeight > windowHeight) {
     position.top =

@@ -86,7 +86,8 @@ export function Menu(props: MenuProps) {
 
       const { top, left } = getPosition(subMenuRef.current, {
         target: menuItemElement,
-        location: "right"
+        location: "right",
+        gap: 5 // TODO: should probably use a theme variable here
       });
       subMenuRef.current.style.top = `${top}px`;
       subMenuRef.current.style.left = `${left}px`;
@@ -168,7 +169,6 @@ export function Menu(props: MenuProps) {
             position: "absolute",
             width: "max-content",
             minWidth: 180,
-            ml: "spacing2",
             visibility: "hidden"
           }}
           items={focusedItem.menu.items}
