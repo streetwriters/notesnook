@@ -331,6 +331,13 @@ import TableSvg from "@notesnook/icons/table.svg?react";
 import SpellCheckSvg from "@notesnook/icons/spellcheck.svg?react";
 import CircleNotchSvg from "@notesnook/icons/circle-notch.svg?react";
 import CrownSvg from "@notesnook/icons/crown-simple.svg?react";
+import CheckboxSvg from "@notesnook/icons/checkbox.svg?react";
+import CheckboxUncheckedSvg from "@notesnook/icons/checkbox-unchecked.svg?react";
+import BellPlusSvg from "@notesnook/icons/bell-plus.svg?react";
+import VibrateSvg from "@notesnook/icons/vibrate.svg?react";
+import ArrowsClockwiseSvg from "@notesnook/icons/arrows-clockwise.svg?react";
+import BellSimpleSlashSvg from "@notesnook/icons/bell-simple-slash.svg?react";
+import CheckSquareSvg from "@notesnook/icons/check-square.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -627,7 +634,6 @@ export const Reminder = createIcon(mdiBellOutline);
 export const ReminderOff = createIcon(mdiBellCancelOutline);
 export const AddReminder = createIcon(mdiBellPlusOutline);
 export const Silent = createIcon(mdiBellOffOutline);
-export const Vibrate = createIcon(mdiVibrate);
 export const Loud = createIcon(mdiBellRingOutline);
 export const CustomToolbar = createIcon(mdiGestureTapButton);
 
@@ -799,3 +805,10 @@ export const Table = createSvgIcon(TableSvg);
 export const SpellCheck = createSvgIcon(SpellCheckSvg);
 export const Loading = createSvgIcon(CircleNotchSvg, true);
 export const Pro = createSvgIcon(CrownSvg);
+export const Checkbox = createSvgIcon(CheckboxSvg);
+export const CheckboxUnchecked = createSvgIcon(CheckboxUncheckedSvg);
+export const BellPlus = createSvgIcon(BellPlusSvg);
+export const BellSimpleSlash = createSvgIcon(BellSimpleSlashSvg);
+export const Vibrate = createSvgIcon(VibrateSvg);
+export const ArrowsClockwise = createSvgIcon(ArrowsClockwiseSvg);
+export const CheckSquare = createSvgIcon(CheckSquareSvg);
