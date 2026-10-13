@@ -23,7 +23,7 @@ import isToday from "dayjs/plugin/isToday.js";
 import isTomorrow from "dayjs/plugin/isTomorrow.js";
 import isYesterday from "dayjs/plugin/isYesterday.js";
 import { formatDate } from "../utils/date.js";
-import { getId } from "../utils/id.js";
+import { getId, makeId } from "../utils/id.js";
 import { ICollection } from "./collection.js";
 import { Reminder, TimeFormat } from "../types.js";
 import Database from "../api/index.js";
@@ -89,44 +89,69 @@ export class Reminders implements ICollection {
     return id;
   }
 
-  async markComplete(id: string) {
+  /**
+   * Completes a reminder. For a repeating reminder, this completes its
+   * current occurrence (the first one on or after `reminder.date`), records
+   * it as a completed one-time reminder, and moves `reminder.date` to the
+   * next occurrence, even if that is still in the past.
+   *
+   * @param occurrence a specific occurrence to complete instead (e.g. the one
+   * a notification was shown for). Occurrences before it are skipped.
+   */
+  async markComplete(id: string, occurrence?: number) {
     const reminder = await this.collection.get(id);
     if (!reminder) return;
     if (reminder.mode === "permanent") return;
 
     if (reminder.mode === "once") {
+      if (reminder.completedAt)
+        throw new Error("Reminder is already completed.");
+
       return this.add({
         id,
-        completedAt: Date.now()
+        completedAt: Date.now(),
+        snoozeUntil: undefined
       });
     }
 
-    // create a duplicate completed "once" reminder
+    const current = getUpcomingReminderTime(reminder, reminder.date - 1);
+    if (occurrence === undefined) occurrence = current;
+    else if (occurrence < current)
+      throw new Error("Reminder occurrence is already completed.");
+    else if (getUpcomingReminderTime(reminder, occurrence - 1) !== occurrence)
+      throw new Error("Invalid reminder occurrence.");
+
+    // create a duplicate completed "once" reminder. The id is derived from the
+    // occurrence so retrying after a partial failure doesn't duplicate it.
+    const duplicateId = makeId(`${id}${occurrence}`);
     await this.add({
+      id: duplicateId,
       type: "reminder",
       dateCreated: Date.now(),
       dateModified: Date.now(),
-      date: reminder.date,
+      date: occurrence,
       description: reminder.description,
       mode: "once",
       priority: reminder.priority,
-      recurringMode: reminder.recurringMode,
-      selectedDays: reminder.selectedDays || [],
       title: reminder.title,
       localOnly: reminder.localOnly,
-      disabled: reminder.disabled,
-      snoozeUntil: undefined,
       completedAt: Date.now()
     });
 
-    // update original repeating reminder with the next occurrence date
-    const nextOccurenceDate = getUpcomingReminderTime(
-      reminder,
-      getUpcomingReminderTime(reminder)
-    );
+    const relations = await this.db.relations
+      .to({ id, type: "reminder" })
+      .get();
+    for (const relation of relations) {
+      await this.db.relations.add(
+        { id: relation.fromId, type: relation.fromType },
+        { id: duplicateId, type: "reminder" }
+      );
+    }
+
     await this.add({
       id,
-      date: nextOccurenceDate
+      date: getUpcomingReminderTime(reminder, occurrence),
+      snoozeUntil: undefined
     });
   }
 
@@ -263,9 +288,7 @@ export function getUpcomingReminderTime(reminder: Reminder, from?: number) {
    * Never look for occurrences before the reminder's start date. The 1ms
    * offset keeps the start moment itself eligible as the first occurrence.
    */
-  const now = from
-    ? dayjs(from)
-    : dayjs(Math.max(Date.now(), dayjs(reminder.date).valueOf() - 1));
+  const now = dayjs(Math.max(from ?? Date.now(), reminder.date - 1));
 
   const relativeTime = (
     isYear
@@ -295,7 +318,7 @@ export function getUpcomingReminderTime(reminder: Reminder, from?: number) {
   if (!reminder.selectedDays || !reminder.selectedDays.length)
     return relativeTime.valueOf();
 
-  const sorted = reminder.selectedDays.sort((a, b) => a - b);
+  const sorted = [...reminder.selectedDays].sort((a, b) => a - b);
   const lastSelectedDay = sorted[sorted.length - 1];
   if (isWeek) {
     if (
@@ -326,22 +349,45 @@ export function getUpcomingReminderTime(reminder: Reminder, from?: number) {
   return relativeTime.valueOf();
 }
 
-export function getUpcomingReminder(reminders: Reminder[]) {
-  const now = Date.now();
-  const sorted = reminders
-    .filter((r) => r.mode !== "once" || r.date > now)
-    .sort((a, b) => {
-      const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
-      const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
-      return !d1 || !d2 ? 0 : d1 - d2;
-    });
-  return sorted[0];
+function getReminderTriggerTime(reminder: Reminder) {
+  if (reminder.snoozeUntil && reminder.snoozeUntil > Date.now())
+    return reminder.snoozeUntil;
+  return reminder.mode === "repeat"
+    ? getUpcomingReminderTime(reminder)
+    : reminder.date;
 }
 
-export type ReminderGroup = "Upcoming" | "Past" | "Completed";
+/**
+ * Returns the reminder that will trigger next, preferring enabled reminders
+ * over disabled ones. Past & completed reminders are never returned.
+ */
+export function getUpcomingReminder(reminders: Reminder[]) {
+  let upcoming:
+    | { reminder: Reminder; active: boolean; time: number }
+    | undefined;
+  const now = Date.now();
+  for (const reminder of reminders) {
+    if (reminder.completedAt) continue;
+
+    const time = getReminderTriggerTime(reminder);
+    if (reminder.mode === "once" && time <= now) continue;
+
+    const active = !reminder.disabled;
+    if (
+      !upcoming ||
+      (active && !upcoming.active) ||
+      (active === upcoming.active && time < upcoming.time)
+    )
+      upcoming = { reminder, active, time };
+  }
+  return upcoming?.reminder;
+}
+
+export type ReminderGroup = "Upcoming" | "Past" | "Disabled" | "Completed";
 
 export function getReminderGroup(reminder: Reminder): ReminderGroup {
   if (reminder.completedAt) return "Completed";
+  if (reminder.disabled) return "Disabled";
   if (
     reminder.mode !== "once" ||
     reminder.date > Date.now() ||
@@ -353,7 +399,7 @@ export function getReminderGroup(reminder: Reminder): ReminderGroup {
 }
 
 export function isReminderActive(reminder: Reminder) {
-  return !reminder.disabled && getReminderGroup(reminder) === "Upcoming";
+  return getReminderGroup(reminder) === "Upcoming";
 }
 
 export function createUpcomingReminderTimeQuery(now = "now") {
@@ -409,11 +455,13 @@ export function createUpcomingReminderTimeQuery(now = "now") {
  * Mirrors getReminderGroup:
  * 0 = Upcoming
  * 1 = Past
- * 2 = Completed
+ * 2 = Disabled
+ * 3 = Completed
  * */
 export function createReminderGroupQuery(now = "now") {
   return sql`CASE
-    WHEN completedAt IS NOT NULL THEN 2
+    WHEN completedAt IS NOT NULL THEN 3
+    WHEN disabled IS NOT NULL AND disabled = 1 THEN 2
     WHEN mode != 'once'
       OR datetime(date / 1000, 'unixepoch', 'localtime') > datetime(${now}, 'localtime')
       OR (snoozeUntil IS NOT NULL
