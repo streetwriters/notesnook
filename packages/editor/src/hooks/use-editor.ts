@@ -129,4 +129,5 @@ function destroyView(view: EditorView) {
   view.dispatchEvent = () => {};
   view.setProps = () => {};
   view.destroy();
+  delete (view.dom as HTMLElement & { editor?: unknown }).editor;
 }
