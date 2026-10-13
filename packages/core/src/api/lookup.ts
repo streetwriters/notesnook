@@ -380,11 +380,7 @@ export default class Lookup {
         }
 
         const resultsWithMissingTitle = results
-          .filter(
-            isQueryless
-              ? (r) => !r.title.length
-              : (r) => !r.title.length && r.content.length > 0
-          )
+          .filter((r) => !r.title.length)
           .map((r) => r.id);
 
         if (resultsWithMissingTitle.length > 0) {
@@ -532,7 +528,7 @@ export default class Lookup {
       eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
       queries: string[]
     ) {
-      const regex = buildRegex(queries);
+      const regex = `>[^<]*(${buildRegex(queries)})`;
       return eb
         .selectFrom("content")
         .where("content.locked", "!=", true)

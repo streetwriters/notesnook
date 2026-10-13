@@ -158,6 +158,58 @@ describe("notesWithHighlighting", () => {
       expect(item.item.content[0][0].suffix.includes("&nbsp;")).toBe(false);
     }));
 
+  test("search with a short query should not match html tags", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Hello world</p><p>This is <u>note</u></p><p>This is another <i>note</i></p>"
+      }
+    }).then(async ({ db }) => {
+      for (const query of ["p", "u"]) {
+        const filtered = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        expect(filtered.length).toBe(0);
+      }
+    }));
+
+  test("search with a short query should match text content", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Hello world</p><p>This is <u>note</u></p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "is",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+      const item = await filtered.item(0);
+      expect(item.item.title.length).toBeGreaterThan(0);
+      expect(item.item.content.length).toBeGreaterThan(0);
+    }));
+
+  test("search should keep matches next to underlined text", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Hello world</p><p>This is <u>note</u> here</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "This",
+        db.notes.all
+      );
+      const item = await filtered.item(0);
+      expect(item.item.title.length).toBeGreaterThan(0);
+      expect(item.item.content.length).toBe(1);
+    }));
+
   test("search notes with parentheses in query should load the item", () =>
     noteTest({
       title: "(with parantheses)"
