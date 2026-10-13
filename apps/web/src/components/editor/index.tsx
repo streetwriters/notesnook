@@ -143,17 +143,6 @@ export default function TabsView() {
           flexDirection: "column"
         }}
       >
-        <Flex
-          className="editor-action-bar"
-          sx={{
-            zIndex: 2,
-            height: TITLE_BAR_HEIGHT,
-            bg: "background-secondary"
-            // borderBottom: "1px solid var(--border)"
-          }}
-        >
-          <EditorActionBar />
-        </Flex>
         <SplitPane
           style={{
             position: "relative"

@@ -74,7 +74,7 @@ import {
   NoteExpiry,
   NoteFavorite,
   NoteLink,
-  NoteLock,
+  Lock,
   NotePin,
   NoteReadonly,
   Notebook,
@@ -261,9 +261,7 @@ function Note(props: NoteProps) {
                 locale="short"
               />
               {note.conflicted && <Alert size={11} color="icon-error" />}
-              {locked && (
-                <NoteLock size={11} color="icon" data-test-id="locked" />
-              )}
+              {locked && <Lock size={11} color="icon" data-test-id="locked" />}
               {note.readonly && <NoteReadonly size={11} color="icon" />}
               {note.favorite && (
                 <NoteFavorite
@@ -414,7 +412,7 @@ export const noteMenuItems: (
       //isDisabled: !isSynced,
       title: strings.lock(),
       isChecked: context?.locked,
-      iconComponent: NoteLock,
+      iconComponent: Lock,
       onClick: async () => {
         const { unlock, lock } = store.get();
         if (!context?.locked) {
@@ -959,7 +957,7 @@ function getMetadataItems(props: {
     note.localOnly && <SyncOff key="local-only" size={15} />,
     note.pinned && <NotePin key="pinned" size={15} color="icon" />,
     locked && (
-      <NoteLock key="locked" size={15} color="icon" data-test-id="locked" />
+      <Lock key="locked" size={15} color="icon" data-test-id="locked" />
     ),
     note.readonly && <NoteReadonly key="readonly" size={15} color="icon" />,
     note.favorite && (

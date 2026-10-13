@@ -179,6 +179,27 @@ export const THEME_LIGHT: any = {
       selected: {
         icon: "#181818"
       }
+    },
+    titleBar: {
+      primary: {
+        background: "#F7F7F7",
+        hover: "#E9E9E9",
+        paragraph: "#666666",
+        icon: "#666666",
+        separator: "#E5E5E5",
+        border: "#E5E5E5"
+      },
+      secondary: {
+        hover: "#E1DEDE"
+      },
+      disabled: {
+        icon: "#BCBCBC"
+      },
+      selected: {
+        background: "#EAE8E8",
+        paragraph: "#181818",
+        icon: "#181818"
+      }
     }
   }
 };
