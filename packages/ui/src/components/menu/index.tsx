@@ -68,9 +68,6 @@ export function Menu(props: MenuProps) {
   const focusedItem = items[focusIndex];
 
   const subMenuRef = useRef<HTMLDivElement>(null);
-  const [submenuLocation, setSubmenuLocation] = useState<"left" | "right">(
-    "right"
-  );
 
   useEffect(() => {
     const item = items[focusIndex];
@@ -87,24 +84,10 @@ export function Menu(props: MenuProps) {
     function repositionSubmenu() {
       if (!subMenuRef.current || !menuItemElement) return;
 
-      const menuItemRect = menuItemElement.getBoundingClientRect();
-      const submenuWidth = subMenuRef.current.offsetWidth;
-      const location =
-        menuItemRect.right + submenuWidth > document.body.clientWidth
-          ? "left"
-          : "right";
-      setSubmenuLocation(location);
-
       const { top, left } = getPosition(subMenuRef.current, {
         target: menuItemElement,
-        location,
-        xOffset:
-          location === "left"
-            ? Math.max(
-                0,
-                menuItemRect.left + submenuWidth - document.body.clientWidth
-              )
-            : 0
+        location: "right",
+        gap: 5 // TODO: should probably use a theme variable here
       });
       subMenuRef.current.style.top = `${top}px`;
       subMenuRef.current.style.left = `${left}px`;
@@ -186,7 +169,6 @@ export function Menu(props: MenuProps) {
             position: "absolute",
             width: "max-content",
             minWidth: 180,
-            ml: submenuLocation === "right" ? "spacing2" : "-spacing2",
             visibility: "hidden"
           }}
           items={focusedItem.menu.items}
