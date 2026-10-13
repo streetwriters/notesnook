@@ -47,6 +47,7 @@ export type FieldProps = InputProps & {
   action?: Action;
   rightActions?: Action[];
   leftActions?: Action[];
+  leftIcon?: Icon;
 };
 
 function Field(props: FieldProps) {
@@ -61,6 +62,7 @@ function Field(props: FieldProps) {
     inputRef,
     validate,
     disabled,
+    leftIcon: LeftIcon,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -86,31 +88,33 @@ function Field(props: FieldProps) {
         flexDirection: "column"
       }}
     >
-      <Label
-        htmlFor={id}
-        sx={{
-          fontFamily: "body",
-          flexDirection: "column",
-          fontSize: "xs",
-          color: "paragraph-secondary",
-          lineHeight: 1.2,
-          ...styles?.label
-        }}
-      >
-        {label}{" "}
-        {helpText && (
-          <Text
-            variant="subBody"
-            as="span"
-            sx={{
-              fontWeight: "normal",
-              ...styles?.helpText
-            }}
-          >
-            {helpText}
-          </Text>
-        )}
-      </Label>
+      {label && (
+        <Label
+          htmlFor={id}
+          sx={{
+            fontFamily: "body",
+            flexDirection: "column",
+            fontSize: "xs",
+            color: "paragraph-secondary",
+            lineHeight: 1.2,
+            ...styles?.label
+          }}
+        >
+          {label}{" "}
+          {helpText && (
+            <Text
+              variant="subBody"
+              as="span"
+              sx={{
+                fontWeight: "normal",
+                ...styles?.helpText
+              }}
+            >
+              {helpText}
+            </Text>
+          )}
+        </Label>
+      )}
 
       <Flex sx={{ position: "relative", flex: 1 }}>
         <Input
@@ -134,6 +138,20 @@ function Field(props: FieldProps) {
             if (isValid && inputProps.onChange) inputProps.onChange(e);
           }}
         />
+        {LeftIcon && (
+          <LeftIcon
+            size={15}
+            color="icon"
+            sx={{
+              left: "spacing4",
+              pointerEvents: "none",
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 1
+            }}
+          />
+        )}
         {type === "password" && (
           <Flex
             onClick={() => setIsPasswordVisible((s) => !s)}
