@@ -1,3 +1,16 @@
+diff --git a/node_modules/react-native-nitro-cloud-uploader/android/build.gradle b/node_modules/react-native-nitro-cloud-uploader/android/build.gradle
+index 89d0be6..8703e89 100644
+--- a/node_modules/react-native-nitro-cloud-uploader/android/build.gradle
++++ b/node_modules/react-native-nitro-cloud-uploader/android/build.gradle
+@@ -43,7 +43,7 @@ android {
+   namespace "com.margelo.nitro.nitroclouduploader"
+ 
+   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+-
++  ndkVersion getExtOrDefault("ndkVersion")
+   defaultConfig {
+     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
+     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
 diff --git a/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml b/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml
 index 9ea903a..e023649 100644
 --- a/node_modules/react-native-nitro-cloud-uploader/android/src/main/AndroidManifest.xml
