@@ -285,108 +285,87 @@ function Header(props: RouteContainerProps) {
         )}
         {hasItems && (
           <Flex sx={{ gap: "spacing6" }}>
-            <Box
+            <Field
+              inputRef={inputRef}
+              data-test-id="search-input"
+              leftIcon={!isMobile ? SearchIcon : undefined}
+              id="search"
+              name="search"
+              type="text"
+              variant="clean"
               sx={{
-                position: "relative",
-                flex: 1
+                gap: 0,
+                m: 0,
+                width: "100%",
+                height: "40px"
               }}
-            >
-              {!isMobile && (
-                <SearchIcon
-                  size={15}
-                  color="icon"
-                  sx={{
-                    left: "spacing4",
-                    pointerEvents: "none",
-                    position: "absolute",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    zIndex: 1
-                  }}
-                />
-              )}
-              <Field
-                inputRef={inputRef}
-                data-test-id="search-input"
-                id="search"
-                name="search"
-                type="text"
-                variant="clean"
-                sx={{
-                  gap: 0,
+              styles={{
+                input: {
                   m: 0,
-                  width: "100%",
-                  height: "40px"
-                }}
-                styles={{
-                  input: {
-                    m: 0,
-                    p: "spacing4",
-                    pl: "spacing10",
-                    fontSize: "xs",
-                    color: "paragraph",
-                    bg: "background-secondary",
-                    borderRadius: "dialog",
-                    "::placeholder": {
-                      color: "paragraph-secondary",
-                      textAlign: "start"
-                    },
-                    "& + .rightActions #search-action-button": {
-                      opacity: query ? 1 : 0
-                    },
-                    "&:focus + .rightActions #search-action-button": {
-                      opacity: 1
-                    }
-                  }
-                }}
-                defaultValue={query}
-                placeholder={strings.searchInRoute(headerTitle)}
-                onChange={debounce(
-                  (e) => useSearchStore.setState({ query: e.target.value }),
-                  250
-                )}
-                onKeyUp={(e) => {
-                  if (e.key === "Escape")
-                    useSearchStore.getState().resetSearch();
-                  else
-                    useSearchStore.setState({
-                      isSearching: true,
-                      searchType: type
-                    });
-                }}
-                leftActions={[
-                  {
-                    icon: Menu,
-                    hidden: !isMobile,
-                    id: "hamburger-menu",
-                    onClick: () => {
-                      AppEventManager.publish(AppEvents.toggleSideMenu, true);
-                    }
-                  }
-                ]}
-                rightActions={[
-                  {
-                    icon: Close,
-                    id: "search-action-button",
-                    testId: "search-button",
-                    onClick: () => {
-                      if (inputRef.current) inputRef.current.value = "";
-                      useSearchStore.getState().resetSearch();
-                    },
-                    hidden: !query
+                  p: "spacing4",
+                  pl: "spacing10",
+                  fontSize: "xs",
+                  color: "paragraph",
+                  bg: "background-secondary",
+                  borderRadius: "dialog",
+                  "::placeholder": {
+                    color: "paragraph-secondary",
+                    textAlign: "start"
                   },
-                  ...(type === "reminders"
-                    ? [
-                        {
-                          icon: AddReminder,
-                          testId: "create-reminder-button",
-                          ...CREATE_BUTTON_MAP.reminders
-                        }
-                      ]
-                    : [])
-                ]}
-              />
-            </Box>
+                  "& + .rightActions #search-action-button": {
+                    opacity: query ? 1 : 0
+                  },
+                  "&:focus + .rightActions #search-action-button": {
+                    opacity: 1
+                  }
+                }
+              }}
+              defaultValue={query}
+              placeholder={strings.searchInRoute(headerTitle)}
+              onChange={debounce(
+                (e) => useSearchStore.setState({ query: e.target.value }),
+                250
+              )}
+              onKeyUp={(e) => {
+                if (e.key === "Escape") useSearchStore.getState().resetSearch();
+                else
+                  useSearchStore.setState({
+                    isSearching: true,
+                    searchType: type
+                  });
+              }}
+              leftActions={[
+                {
+                  icon: Menu,
+                  hidden: !isMobile,
+                  id: "hamburger-menu",
+                  onClick: () => {
+                    AppEventManager.publish(AppEvents.toggleSideMenu, true);
+                  }
+                }
+              ]}
+              rightActions={[
+                {
+                  icon: Close,
+                  id: "search-action-button",
+                  testId: "search-button",
+                  onClick: () => {
+                    if (inputRef.current) inputRef.current.value = "";
+                    useSearchStore.getState().resetSearch();
+                  },
+                  hidden: !query
+                },
+                ...(type === "reminders"
+                  ? [
+                      {
+                        icon: AddReminder,
+                        testId: "create-reminder-button",
+                        ...CREATE_BUTTON_MAP.reminders
+                      }
+                    ]
+                  : [])
+              ]}
+            />
 
             {type === "notebook" && hasItems && (
               <GroupOptions

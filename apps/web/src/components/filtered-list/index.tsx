@@ -19,20 +19,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useRef, useState } from "react";
 import Field from "../field";
-import { Plus, Search } from "../icons";
+import { Close, Plus, SearchIcon } from "../icons";
 import { Button, Text } from "@theme-ui/components";
 import { VirtualizedList, VirtualizedListProps } from "../virtualized-list";
 import { strings } from "@notesnook/intl";
+import { Box } from "@notesnook/ui";
+import { useThemeUI } from "@theme-ui/core";
 
 type FilteredListProps<T> = {
-  placeholders: { filter: string; empty: string };
+  placeholders: { filter: string; empty: string; emptyList: string };
   filter: (query: string) => Promise<void>;
   onCreateNewItem: (title: string) => Promise<void>;
 } & VirtualizedListProps<T, unknown>;
 
 export function FilteredList<T>(props: FilteredListProps<T>) {
   const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
-
+  const { theme } = useThemeUI();
+  const itemGap = (theme as any).space?.spacing1;
   const [query, setQuery] = useState<string>();
   const noItemsFound = items.length <= 0 && query && query.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +63,15 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
         inputRef={inputRef}
         data-test-id={"filter-input"}
         autoFocus
-        sx={{ m: 0 }}
+        sx={{
+          mb: "spacing7",
+          input: {
+            pl: "spacing10",
+            py: "spacing6",
+            pr: "spacing4",
+            fontSize: "sm"
+          }
+        }}
         placeholder={
           items.length <= 0 ? placeholders.empty : placeholders.filter
         }
@@ -70,15 +81,39 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
             await _createNewItem(query);
           }
         }}
-        action={
-          items.length <= 0 && !!query
-            ? {
-                icon: Plus,
-                onClick: async () => await _createNewItem(query)
-              }
-            : { icon: Search, onClick: () => _filter(query) }
-        }
+        leftIcon={SearchIcon}
+        rightActions={[
+          {
+            icon: Close,
+            onClick: () => {
+              if (inputRef.current) inputRef.current.value = "";
+              _filter("");
+            },
+            hidden: !query
+          }
+        ]}
       />
+
+      {items.length <= 0 && !query && (
+        <Box
+          sx={{
+            height: "180px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Text
+            sx={{
+              color: "paragraph-secondary",
+              fontSize: "sm"
+            }}
+          >
+            {placeholders.emptyList}
+          </Text>
+        </Box>
+      )}
+
       {noItemsFound ? (
         <Button
           variant={"secondary"}
@@ -86,19 +121,23 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            py: 2,
             width: "100%",
-            mt: 1
+            p: "spacing4"
           }}
           onClick={async () => {
             await _createNewItem(query);
           }}
         >
-          <Text variant={"body"}>{`${strings.add()} "${query}"`}</Text>
-          <Plus size={16} color="accent" />
+          <Text
+            sx={{
+              color: "paragraph",
+              fontSize: "sm"
+            }}
+          >{`${strings.add()} "${query}"`}</Text>
+          <Plus size={15} color="icon" />
         </Button>
       ) : (
-        <VirtualizedList {...listProps} items={items} />
+        <VirtualizedList {...listProps} items={items} itemGap={itemGap} />
       )}
     </>
   );
