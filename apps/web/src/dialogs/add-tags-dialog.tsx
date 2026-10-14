@@ -75,7 +75,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
       description={strings.addTagsDesc()}
       onClose={() => onClose(false)}
       width={450}
-      sx={{ height: 434 }}
+      sx={{ minHeight: 434 }}
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
@@ -105,7 +105,6 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
             mode="fixed"
             estimatedSize={36}
             items={tags.placeholders}
-            itemGap={10}
             placeholders={{
               empty: "Add tags",
               filter: "Search or add tags",

@@ -35,7 +35,7 @@ type FilteredListProps<T> = {
 export function FilteredList<T>(props: FilteredListProps<T>) {
   const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
   const { theme } = useThemeUI();
-  const itemGap = (theme as any).space?.spacing1;
+  const itemGap = listProps.itemGap || (theme as any).space?.spacing1;
   const [query, setQuery] = useState<string>();
   const noItemsFound = items.length <= 0 && query && query.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -95,23 +95,18 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
       />
 
       {items.length <= 0 && !query && (
-        <Box
+        <Text
           sx={{
-            height: "180px",
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            height: "180px",
+            color: "paragraph-secondary",
+            fontSize: "sm"
           }}
         >
-          <Text
-            sx={{
-              color: "paragraph-secondary",
-              fontSize: "sm"
-            }}
-          >
-            {placeholders.emptyList}
-          </Text>
-        </Box>
+          {placeholders.emptyList}
+        </Text>
       )}
 
       {noItemsFound ? (
