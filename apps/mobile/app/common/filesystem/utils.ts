@@ -17,11 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hosts, RequestOptions } from "@notesnook/core";
+import {
+  hosts,
+  RequestOptions,
+  parseS3Error,
+  formatS3Error,
+  isTerminalError,
+  type S3Error
+} from "@notesnook/core";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { DatabaseLogger, db } from "../database";
+
+export { parseS3Error, formatS3Error, isTerminalError, type S3Error };
 
 export const ABYTES = 17;
 export const cacheDirOld = RNFetchBlob.fs.dirs.CacheDir;
@@ -37,34 +46,6 @@ export function getRandomId(prefix: string) {
     .replace("0.", prefix || "");
 }
 
-export function parseS3Error(data?: string) {
-  const xml = typeof data === "string" ? data : null;
-
-  const error = {
-    Code: "UNKNOWN",
-    Message: xml
-  };
-
-  try {
-    if (!xml) return error;
-    const doc = new DOMParser().parseFromString(xml, "text/xml");
-
-    const ErrorElement = doc.getElementsByTagName("Error")[0];
-    if (!ErrorElement) return error;
-
-    for (const child of ErrorElement.children) {
-      if (
-        child.textContent &&
-        (child.tagName === "Code" || child.tagName === "Message")
-      )
-        error[child.tagName] = child.textContent;
-    }
-    return error;
-  } catch (e) {
-    return error;
-  }
-}
-
 export function cancelable(
   operation: (
     filename: string,
@@ -75,7 +56,7 @@ export function cancelable(
   ) => Promise<boolean>
 ) {
   const cancelToken = {
-    cancel: async (reason?: string) => {}
+    cancel: async (reason?: string) => { }
   };
   return (filename: string, requestOptions: RequestOptions) => {
     return {

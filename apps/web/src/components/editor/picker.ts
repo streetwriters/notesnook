@@ -214,8 +214,7 @@ async function addAttachment(
 
   if (forceWrite || !exists) {
     if (forceWrite && exists) {
-      if (!(await db.fs().deleteFile(hash, false)))
-        throw new Error("Failed to delete attachment from server.");
+      await db.fs().deleteFile(hash, false).catch(() => false);
       await db.attachments.reset(exists.id);
     }
 

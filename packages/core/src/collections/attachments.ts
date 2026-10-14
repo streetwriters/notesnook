@@ -28,12 +28,25 @@ import {
 } from "../utils/filename.js";
 import { Cipher, DataFormat, SerializedKey } from "@notesnook/crypto";
 import { Output } from "../interfaces.js";
-import { Attachment } from "../types.js";
+import { Attachment, AttachmentFailure } from "../types.js";
 import Database from "../api/index.js";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
 import { logger } from "../logger.js";
+import {
+  formatFailureReason,
+  isTerminalError
+} from "../utils/s3-error.js";
+
+export const MAX_UPLOAD_ATTEMPTS = 5;
+
+export const UPLOAD_RETRY_DELAYS_MS = [
+  30 * 1000,
+  2 * 60 * 1000,
+  5 * 60 * 1000,
+  15 * 60 * 1000
+];
 
 export class Attachments implements ICollection {
   name = "attachments";
@@ -82,19 +95,22 @@ export class Attachments implements ICollection {
       async ({
         success,
         error,
-        filename
+        filename,
+        groupId
       }: {
         success: boolean;
         filename: string;
-        error: string;
+        error: string | Error;
+        groupId?: string;
       }) => {
         const attachment = await this.attachment(filename);
         if (!attachment) return;
         if (success) await this.markAsUploaded(attachment.id);
         else
-          await this.markAsFailed(
+          await this.recordUploadFailure(
             attachment.id,
-            error || "Failed to upload attachment."
+            error || "Failed to upload attachment.",
+            groupId === "manual-retry"
           );
       }
     );
@@ -377,11 +393,109 @@ export class Attachments implements ICollection {
     return attachment;
   }
 
-  markAsUploaded(id: string) {
-    return this.collection.update([id], {
-      dateUploaded: Date.now(),
-      failed: null
+  getFailure(attachment: Attachment): AttachmentFailure | undefined {
+    if (!attachment.failed) return undefined;
+    try {
+      const parsed = JSON.parse(attachment.failed);
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        typeof parsed.attempts === "number"
+      ) {
+        return parsed as AttachmentFailure;
+      }
+    } catch {}
+    return {
+      attempts: MAX_UPLOAD_ATTEMPTS,
+      reason: attachment.failed,
+      terminal: true
+    };
+  }
+
+  getFailureReason(attachment: Attachment): string | undefined {
+    if (!attachment.failed) return undefined;
+    const failure = this.getFailure(attachment);
+    return failure?.reason || attachment.failed;
+  }
+
+  isReadyForUpload(attachment: Attachment): boolean {
+    if (
+      attachment.dateUploaded ||
+      attachment.dateDeleted ||
+      (attachment as any).deleted
+    ) {
+      return false;
+    }
+    const failure = this.getFailure(attachment);
+    if (!failure) return true;
+    if (failure.terminal || failure.attempts >= MAX_UPLOAD_ATTEMPTS) return false;
+    if (failure.nextRetryAt && failure.nextRetryAt > Date.now()) return false;
+    return true;
+  }
+
+  async recordUploadFailure(
+    id: string,
+    error: unknown,
+    isManual = false
+  ): Promise<AttachmentFailure> {
+    const attachment = await this.attachment(id);
+    if (!attachment) throw new Error(`Attachment ${id} not found`);
+
+    const currentFailure = this.getFailure(attachment);
+    const terminal = isTerminalError(error);
+    const reason = formatFailureReason(error);
+
+    // Manual retries do not count towards the max attempt limit
+    const nextAttempts = terminal
+      ? MAX_UPLOAD_ATTEMPTS
+      : isManual
+      ? currentFailure?.attempts || 0
+      : (currentFailure?.attempts || 0) + 1;
+    let nextRetryAt: number | undefined;
+
+    if (!terminal && !isManual && nextAttempts < MAX_UPLOAD_ATTEMPTS) {
+      const delay =
+        UPLOAD_RETRY_DELAYS_MS[nextAttempts - 1] || 15 * 60 * 1000;
+      nextRetryAt = Date.now() + delay;
+    }
+
+    const failure: AttachmentFailure = {
+      attempts: nextAttempts,
+      reason,
+      terminal: terminal || nextAttempts >= MAX_UPLOAD_ATTEMPTS,
+      nextRetryAt
+    };
+
+    logger.debug("Attachment upload failed", {
+      hash: attachment.hash,
+      attempt: nextAttempts,
+      terminal: failure.terminal,
+      isManual,
+      reason
     });
+
+    await this.collection.update(
+      [id],
+      {
+        failed: JSON.stringify(failure),
+        synced: true
+      },
+      { modify: false }
+    );
+
+    return failure;
+  }
+
+  markAsUploaded(id: string) {
+    return this.collection.update(
+      [id],
+      {
+        dateUploaded: Date.now(),
+        failed: null,
+        synced: true
+      },
+      { modify: false }
+    );
   }
 
   reset(id: string) {
@@ -390,10 +504,30 @@ export class Attachments implements ICollection {
     });
   }
 
-  markAsFailed(id: string, reason?: string) {
-    return this.collection.update([id], {
-      failed: !reason ? null : reason
-    });
+  markAsFailed(id: string, reason?: string | AttachmentFailure) {
+    let failedVal: string | null = null;
+    if (reason) {
+      if (typeof reason === "string") {
+        failedVal = JSON.stringify({
+          attempts: MAX_UPLOAD_ATTEMPTS,
+          reason,
+          terminal: true
+        });
+      } else {
+        failedVal = JSON.stringify(reason);
+      }
+      logger.debug("Attachment marked failed", { id });
+    } else {
+      logger.debug("Attachment failure cleared for retry", { id });
+    }
+    return this.collection.update(
+      [id],
+      {
+        failed: failedVal,
+        synced: true
+      },
+      { modify: false }
+    );
   }
 
   async cacheAttachments(attachments?: FilteredSelector<Attachment>) {

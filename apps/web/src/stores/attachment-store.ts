@@ -26,7 +26,7 @@ import { checkAttachment } from "../common/attachments";
 import { showToast } from "../utils/toast";
 import { AttachmentStream } from "../utils/streams/attachment-stream";
 import { createWriteStream } from "../utils/stream-saver";
-import { Attachment } from "@notesnook/core";
+import { Attachment, EVENTS } from "@notesnook/core";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
 
@@ -176,4 +176,9 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
 const [useStore, store] = createStore<AttachmentStore>(
   (set, get) => new AttachmentStore(set, get)
 );
+
+db.eventManager.subscribe(EVENTS.fileUploaded, () => {
+  store.refresh();
+});
+
 export { useStore, store };

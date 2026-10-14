@@ -289,7 +289,11 @@ async function uploadFile(
     )
       await resetUpload(fileHandle);
     showError(error);
-    return false;
+    const errorMessage =
+      error.Code === "UNKNOWN"
+        ? error.Message
+        : `[${error.Code}] ${error.Message}`;
+    throw new Error(errorMessage);
   }
 }
 

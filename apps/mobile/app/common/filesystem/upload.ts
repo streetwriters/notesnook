@@ -29,7 +29,10 @@ import {
   cacheDir,
   checkUpload,
   FileSizeResult,
-  getUploadedFileSize
+  formatS3Error,
+  getUploadedFileSize,
+  isTerminalError,
+  parseS3Error
 } from "./utils";
 import Upload from "@ammarahmed/react-native-upload";
 import { CloudUploader } from "react-native-nitro-cloud-uploader";
@@ -59,8 +62,10 @@ async function initiateMultipartUpload(
   const response = await fetch(url, { headers });
 
   if (!response.ok) {
+    const errorBody = await response.text().catch(() => "");
+    const error = parseS3Error(errorBody || response.statusText);
     throw new Error(
-      `Failed to initiate multipart upload: ${response.statusText}`
+      `Failed to initiate multipart upload (${response.status}): ${formatS3Error(error)}`
     );
   }
 
@@ -154,6 +159,14 @@ async function multipartUploadFile(
       }),
       headers: { ...headers, "Content-Type": "application/json" }
     });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "");
+      const error = parseS3Error(errorBody || response.statusText);
+      throw new Error(
+        `Failed to complete multipart upload (${response.status}): ${formatS3Error(error)}`
+      );
+    }
 
     return response;
   } catch (error) {
@@ -267,10 +280,12 @@ export async function uploadFile(
 
       if (!uploaded) {
         const fileInfo = await RNFetchBlob.fs.stat(filePath);
+        const errorText = await result.text().catch(() => "");
+        const error = parseS3Error(errorText || result.statusText);
         throw new Error(
           `${status}, name: ${fileInfo.filename}, length: ${
             fileInfo.size
-          }, info: ${JSON.stringify(await result.text())}`
+          }, info: ${formatS3Error(error)}`
         );
       }
     } else {
@@ -278,6 +293,7 @@ export async function uploadFile(
       DatabaseLogger.info(
         `Using single-part upload for file: ${filename} (${fileInfo.size} bytes)`
       );
+
       const upload = Upload.create({
         customUploadId: filename,
         path: Platform.OS === "ios" ? "file://" + fileInfo.path : fileInfo.path,
@@ -332,10 +348,11 @@ export async function uploadFile(
 
       if (!uploaded) {
         const fileInfo = await RNFetchBlob.fs.stat(filePath);
+        const error = parseS3Error(result.responseBody || result.error);
         throw new Error(
           `${status}, name: ${fileInfo.filename}, length: ${
             fileInfo.size
-          }, info: ${JSON.stringify(result.error)}`
+          }, info: ${formatS3Error(error)}`
         );
       }
     }
@@ -356,10 +373,13 @@ export async function uploadFile(
     return uploaded;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
-    ToastManager.error(e as Error, "File upload failed");
-    DatabaseLogger.error(e, "File upload failed", {
+    const err = e as Error;
+    if (isTerminalError(err)) {
+      ToastManager.error(err, "File upload failed");
+    }
+    DatabaseLogger.error(err, "File upload failed", {
       filename
     });
-    return false;
+    throw err;
   }
 }
