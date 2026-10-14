@@ -22,6 +22,8 @@ import { isFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import {
   DocumentPickerOptions,
+  errorCodes,
+  isErrorWithCode,
   keepLocalCopy,
   KeepLocalCopyResponse,
   pick as pickFile
@@ -87,6 +89,13 @@ const file = async (fileOptions: PickerOptions) => {
       });
       fileCopyUri = result[0];
     } catch (e) {
+      if (
+        (isErrorWithCode(e) && e.code === errorCodes.OPERATION_CANCELED) ||
+        (e as Error)?.message?.toLowerCase().includes("canceled") ||
+        (e as Error)?.message?.toLowerCase().includes("cancelled")
+      ) {
+        return;
+      }
       DatabaseLogger.error(e as Error, "Error picking file");
       ToastManager.error(e as Error, "Error picking file");
       return;
@@ -385,9 +394,14 @@ export async function attachFile(
 
     if (options.reupload) {
       DatabaseLogger.log(`Deleting file before reupload. ${hash}`);
-      const deleted = await db.fs().deleteFile(hash, false);
-      if (!deleted)
-        throw new Error(`Failed to delete file before reupload. ${hash}`);
+      try {
+        await db.fs().deleteFile(hash, false);
+      } catch (e) {
+        DatabaseLogger.warn("Failed to delete file before reupload", {
+          hash,
+          error: (e as Error)?.message
+        });
+      }
     }
 
     if (!exists || options?.reupload) {
