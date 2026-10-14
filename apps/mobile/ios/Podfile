@@ -32,7 +32,10 @@ node_modules_path = nil
 
 target 'Notesnook' do
 
-  config = use_native_modules!
+  native_modules = list_native_modules!($default_command)
+  PrebuiltPods.setup(self, native_modules)
+
+  config = link_native_modules!(native_modules)
   rn_path = config[:reactNativePath]
   node_modules_path = File.expand_path('../node_modules', File.dirname(rn_path))
 
