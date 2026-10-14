@@ -28,7 +28,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
 import downloadAttachment from "../../common/filesystem/download-attachment";
-import { resetUploadAttempts } from "../../common/filesystem/utils";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import picker from "../../screens/editor/tiptap/picker";
 import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
@@ -79,7 +78,9 @@ const Actions = ({
   const contextId = attachment.hash;
   const [filename, setFilename] = useState(attachment.filename);
   const [currentProgress] = useAttachmentProgress(attachment);
-  const [failed, setFailed] = useState<string | undefined>(attachment.failed);
+  const [failed, setFailed] = useState<string | undefined>(
+    db.attachments.getFailureReason(attachment)
+  );
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState<{
     name?: string;
@@ -90,7 +91,6 @@ const Actions = ({
           {
             name: strings.retry(),
             onPress: async () => {
-              resetUploadAttempts(attachment.hash);
               await db.attachments.markAsFailed(attachment.id);
               setFailed(undefined);
               await db.fs().queueUploads(
@@ -162,8 +162,7 @@ const Actions = ({
           });
         } else {
           setFailed(undefined);
-          resetUploadAttempts(attachment.hash);
-          db.attachments.markAsFailed(attachment.id);
+          await db.attachments.markAsFailed(attachment.id);
           eSendEvent(eDBItemUpdate, attachment.id);
           ToastManager.show({
             heading: strings.fileCheckPassed(),
