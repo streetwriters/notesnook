@@ -20,6 +20,7 @@ build_cache/
 .kotlin/
 android/.prebuilt-aars/*
 !android/.prebuilt-aars/*.aar
+ios/.prebuilt-xcframeworks/.cache/
 
 # Xcode
 #
