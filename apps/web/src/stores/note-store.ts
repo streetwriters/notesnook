@@ -58,7 +58,8 @@ class NoteStore extends BaseStore<NoteStore> {
   };
 
   setContext = async (context?: Context) => {
-    this.set({ context, contextNotes: undefined });
+    if (!isSameContext(this.get().context, context))
+      this.set({ context, contextNotes: undefined });
     const groupOptions =
       context?.type === "notebook" ||
       context?.type === "tag" ||
@@ -173,4 +174,10 @@ export function notesFromContext(context: Context) {
     case "monographs":
       return db.monographs.all;
   }
+}
+
+function isSameContext(a?: Context, b?: Context) {
+  if (!a || !b) return a === b;
+  if (a.type !== b.type) return false;
+  return !("id" in a) || !("id" in b) || a.id === b.id;
 }
