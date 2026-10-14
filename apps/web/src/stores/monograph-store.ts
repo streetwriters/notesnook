@@ -50,7 +50,7 @@ class MonographStore extends BaseStore<MonographStore> {
       positiveButtonText: "Yes, unpublish",
       negativeButtonText: strings.cancel()
     });
-    if (!ok) return;
+    if (!ok) return false;
 
     await db.monographs.unpublish(noteId);
     await this.get().refresh();

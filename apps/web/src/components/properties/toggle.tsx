@@ -80,7 +80,7 @@ function Toggle(props: ToggleProps) {
       <Switch
         sx={{
           m: 0,
-          bg: isOn ? "accent" : "border",
+          bg: isOn ? "accent" : "icon-disabled",
           flexShrink: 0
         }}
         checked={isOn}
