@@ -6,6 +6,12 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 require_relative 'scripts/patch_fmt_consteval'
+require_relative 'scripts/prebuilt_pods'
+
+if ENV['NN_USE_PREBUILT_IOS'] != '0'
+  ENV['RCT_USE_PREBUILT_RNCORE'] ||= '1'
+  ENV['RCT_USE_RN_DEP'] ||= '1'
+end
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
@@ -39,6 +45,8 @@ target 'Notesnook' do
     :fabric_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+  PrebuiltPods.install_react_native_dependencies_shims(self)
 
   target 'NotesnookTests' do
 
