@@ -1,0 +1,43 @@
+{
+  "libraries": {
+    "react-native-reanimated": {
+      "pod": "RNReanimated",
+      "swift": false
+    },
+    "react-native-worklets": {
+      "pod": "RNWorklets",
+      "swift": false
+    },
+    "react-native-screens": {
+      "pod": "RNScreens",
+      "swift": false
+    },
+    "react-native-nitro-modules": {
+      "pod": "NitroModules",
+      "swift": true
+    },
+    "react-native-quick-sqlite": {
+      "pod": "react-native-quick-sqlite",
+      "swift": false,
+      "buildSettings": {
+        "GCC_PREPROCESSOR_DEFINITIONS": "SQLITE_CORE=1 SQLITE_ENABLE_FTS5=1 SQLITE3MC_OMIT_AES_HARDWARE_SUPPORT=1 HAVE_CIPHER_AES_128_CBC=0 HAVE_CIPHER_AES_256_CBC=0 HAVE_CIPHER_SQLCIPHER=0 HAVE_CIPHER_RC4=0 HAVE_CIPHER_CHACHA20=1 SQLITE_OMIT_PROGRESS_CALLBACK=1 SQLITE_MAX_EXPR_DEPTH=0 SQLITE_OMIT_DEPRECATED=1 SQLITE_LIKE_DOESNT_MATCH_BLOBS=1 SQLITE_DQS=0 SQLITE_DEFAULT_MEMSTATUS=0 SQLITE_USE_ALLOCA=1 SQLITE_ENABLE_REGEXP=1"
+      }
+    },
+    "react-native-mmkv-storage": {
+      "pod": "react-native-mmkv-storage",
+      "swift": false
+    },
+    "react-native-fast-openpgp": {
+      "pod": "react-native-fast-openpgp",
+      "swift": false
+    },
+    "react-native-gesture-handler": {
+      "pod": "RNGestureHandler",
+      "swift": false
+    },
+    "react-native-nitro-cloud-uploader": {
+      "pod": "NitroCloudUploader",
+      "swift": true
+    }
+  }
+}
