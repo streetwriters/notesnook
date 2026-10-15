@@ -625,6 +625,10 @@ export default class Backup {
             attachment.iv = item.iv;
             attachment.salt = item.salt;
             attachment.size = item.size;
+            attachment.chunkSize = item.chunkSize;
+            attachment.alg = item.alg;
+            delete attachment.dateUploaded;
+            delete attachment.failed;
           } else item.key = newKey;
           delete item.dateUploaded;
           delete item.failed;
