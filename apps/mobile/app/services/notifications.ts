@@ -600,7 +600,7 @@ async function displayNotification({
   }
 }
 
-function openSettingsDialog(context: string) {
+function openSettingsDialog(context = "global") {
   return new Promise<boolean>((resolve) => {
     presentDialog({
       title: strings.notificationsDisabled(),
@@ -644,16 +644,23 @@ function waitForAppFocusAfterSettings(timeoutMs = 120000): Promise<void> {
   });
 }
 
+async function hasPermission(): Promise<boolean> {
+  const permissionStatus = await notifee.getNotificationSettings();
+  if (Platform.OS === "android") {
+    return (
+      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
+      permissionStatus.android.alarm === 1
+    );
+  }
+  return permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED;
+}
+
 async function checkAndRequestPermissions(
   promptUser?: boolean
 ): Promise<boolean> {
   let permissionStatus = await notifee.getNotificationSettings();
   if (Platform.OS === "android") {
-    const hasNotificationPermission =
-      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED;
-    const hasAlarmPermission = permissionStatus.android.alarm === 1;
-
-    if (hasNotificationPermission && hasAlarmPermission) {
+    if (await hasPermission()) {
       return true;
     }
 
@@ -663,10 +670,13 @@ async function checkAndRequestPermissions(
 
     // Wait for user to return from exact alarm settings
     if (permissionStatus.android.alarm !== 1) {
-      const waitForAppFocus = waitForAppFocusAfterSettings();
-
-      await notifee.openAlarmPermissionSettings();
-      await waitForAppFocus;
+      try {
+        const waitForAppFocus = waitForAppFocusAfterSettings();
+        await notifee.openAlarmPermissionSettings();
+        await waitForAppFocus;
+      } catch (err) {
+        /* empty */
+      }
     }
     permissionStatus = await notifee.getNotificationSettings();
 
@@ -679,11 +689,15 @@ async function checkAndRequestPermissions(
     }
 
     if (promptUser) {
-      const openSettings = await openSettingsDialog("local");
+      const openSettings = await openSettingsDialog("global");
       if (openSettings) {
-        const waitForAppFocus = waitForAppFocusAfterSettings();
-        await notifee.openNotificationSettings();
-        await waitForAppFocus;
+        try {
+          const waitForAppFocus = waitForAppFocusAfterSettings();
+          await notifee.openNotificationSettings();
+          await waitForAppFocus;
+        } catch (err) {
+          /* empty */
+        }
         permissionStatus = await notifee.getNotificationSettings();
         const finalAuthorized =
           permissionStatus.authorizationStatus ===
@@ -705,7 +719,7 @@ async function checkAndRequestPermissions(
     return true;
   }
   if (promptUser) {
-    await openSettingsDialog("local");
+    await openSettingsDialog("global");
   }
   return false;
 }
