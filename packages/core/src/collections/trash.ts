@@ -96,32 +96,24 @@ export default class Trash {
       .subtract(duration, "days")
       .toDate()
       .getTime();
-    const expiredItems = await this.db
+    const noteIds = await this.db
       .sql()
-      .selectNoFrom((eb) => [
-        eb
-          .selectFrom("notes")
-          .where("type", "==", "trash")
-          .where("dateDeleted", "<=", maxMs)
-          .select("id")
-          .as("noteId"),
-        eb
-          .selectFrom("notebooks")
-          .where("type", "==", "trash")
-          .where("dateDeleted", "<=", maxMs)
-          .select("id")
-          .as("notebookId")
-      ])
+      .selectFrom("notes")
+      .where("type", "==", "trash")
+      .where("dateDeleted", "<=", maxMs)
+      .select("id")
       .execute();
-    const { noteIds, notebookIds } = expiredItems.reduce(
-      (ids, item) => {
-        if (item.noteId) ids.noteIds.push(item.noteId);
-        if (item.notebookId) ids.notebookIds.push(item.notebookId);
-        return ids;
-      },
-      { noteIds: [] as string[], notebookIds: [] as string[] }
+    const notebookIds = await this.db
+      .sql()
+      .selectFrom("notebooks")
+      .where("type", "==", "trash")
+      .where("dateDeleted", "<=", maxMs)
+      .select("id")
+      .execute();
+    await this._delete(
+      noteIds.map((n) => n.id),
+      notebookIds.map((n) => n.id)
     );
-    await this._delete(noteIds, notebookIds);
 
     await this.buildCache();
   }
