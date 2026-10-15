@@ -33,6 +33,7 @@ import {
   initializeDatabase,
   SqliteBooleanPlugin
 } from "../src/database/index.js";
+import { SYNC_COLLECTIONS_MAP } from "../src/api/sync/types.js";
 import { describe, expect, test } from "vitest";
 
 function createSchemaTestDatabase() {
@@ -126,6 +127,47 @@ describe("Schema migration recovery", () => {
 
       expect(migrationRow.rows).toHaveLength(1);
       expect(table.rows).toHaveLength(1);
+    } finally {
+      await db.destroy();
+    }
+  });
+
+  test("unsynced queries use the partial synced index", async () => {
+    const db = createSchemaTestDatabase();
+
+    try {
+      await initializeDatabase(db, new NNMigrationProvider(), "notesnook-test");
+
+      for (const table of ["notes", "content", "relations", "attachments"]) {
+        const plan = await sql<{ detail: string }>`
+          EXPLAIN QUERY PLAN
+          SELECT count(id) FROM ${sql.table(table)}
+          WHERE (synced IS NULL OR synced == 0)
+        `.execute(db);
+        expect(plan.rows.map((r) => r.detail).join("\n")).toContain(
+          `${table}_unsynced`
+        );
+      }
+    } finally {
+      await db.destroy();
+    }
+  });
+
+  test("every synced table has a partial unsynced index", async () => {
+    const db = createSchemaTestDatabase();
+
+    try {
+      await initializeDatabase(db, new NNMigrationProvider(), "notesnook-test");
+
+      const { rows } = await sql<{ name: string }>`
+        SELECT lower(name) AS name FROM sqlite_master WHERE type = 'index'
+      `.execute(db);
+      const indexes = new Set(rows.map((r) => r.name));
+
+      // a new synced table needs its own `<table>_unsynced` index
+      // (see the a-2026-10-16 migration).
+      for (const table of Object.values(SYNC_COLLECTIONS_MAP))
+        expect(indexes, table).toContain(`${table.toLowerCase()}_unsynced`);
     } finally {
       await db.destroy();
     }
