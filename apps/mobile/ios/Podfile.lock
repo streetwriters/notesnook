@@ -3178,7 +3178,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-screenguard: 4daf8cb9c41b1c5a37c1db285832c481459ed4de
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
-  react-native-sodium: 3af198005f79911feb702701086195c091b9c827
+  react-native-sodium: bcea1f5e08a3f2ea918c96dce7b7964c8c9c196f
   react-native-theme-switch-animation: eaa4470e7539e317c7612e60028d6ee902fe1183
   react-native-upload: 7b7ad336c3db703b68a8c07cf38e9319ae90d695
   react-native-view-shot: fb3c0774edb448f42705491802a455beac1502a2
@@ -3247,6 +3247,6 @@ SPEC CHECKSUMS:
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
   Yoga: 9a5a710cf47e32646c6d4689c74ce4c17f13ccdb
 
-PODFILE CHECKSUM: f443b090753caf78d0ec352d97a0dd2ee2e0bc22
+PODFILE CHECKSUM: 7aef99144f8ea221cbcbcde244b6bbb6ed476cc5
 
 COCOAPODS: 1.16.2
