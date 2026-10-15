@@ -69,7 +69,10 @@ const TRANSFORM_QUERY_TESTS: [string, string | undefined][] = [
   [">he", `">he"`],
   ["something<hello", `"something<hello"`],
   ["<", `"<"`],
-  [">", `">"`]
+  [">", `">"`],
+  ['a"b hello', `"a""b hello"`],
+  ['"foo', `"""foo"`],
+  ['foo"', `"foo"""`]
 ];
 
 for (const [input, expectedOutput] of TRANSFORM_QUERY_TESTS) {

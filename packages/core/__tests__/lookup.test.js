@@ -46,6 +46,15 @@ test("search notes", () =>
     expect(await db.lookup.notes("hb kb ch").ids()).toHaveLength(1);
   }));
 
+test("search notes with unbalanced quotes", () =>
+  noteTest({
+    content: { type: "tiptap", data: `<p>he said "hello" to the world</p>` }
+  }).then(async ({ db }) => {
+    expect(await db.lookup.notes('"hello').ids()).toHaveLength(1);
+    expect(await db.lookup.notes('hello"').ids()).toHaveLength(1);
+    expect(await db.lookup.notes('said "hello').ids()).toHaveLength(1);
+  }));
+
 test("search notes (remove diacritics)", () =>
   noteTest({
     content: {

@@ -143,7 +143,7 @@ function escapeSQLString(str: string): string {
     str.startsWith("%") ||
     str.endsWith("%");
   if (hasInvalidSymbol || isWildcard) {
-    return `"${str}"`;
+    return `"${str.replace(/"/g, '""')}"`;
   }
 
   // if (isWildcard) {
