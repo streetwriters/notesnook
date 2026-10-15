@@ -158,6 +158,32 @@ describe("notesWithHighlighting", () => {
       expect(item.item.content[0][0].suffix.includes("&nbsp;")).toBe(false);
     }));
 
+  test("search should return each matching note once with many matches", () =>
+    databaseTest().then(async (db) => {
+      const ids = [];
+      for (let i = 0; i < 2000; ++i)
+        ids.push(
+          await db.notes.add({
+            title: `cafe ${i}`,
+            content: { type: "tiptap", data: "<p>cafe</p>" }
+          })
+        );
+
+      for (const sortOptions of [
+        undefined,
+        { sortBy: "dateCreated", sortDirection: "asc" }
+      ]) {
+        const result = await db.lookup.notesWithHighlighting(
+          "cafe",
+          db.notes.all,
+          sortOptions
+        );
+        const found = await result.ids();
+        expect(found).toHaveLength(ids.length);
+        expect(new Set(found).size).toBe(ids.length);
+      }
+    }), 30000);
+
   test("search notes with parentheses in query should load the item", () =>
     noteTest({
       title: "(with parantheses)"
