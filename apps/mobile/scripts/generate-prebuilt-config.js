@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const fs = require("fs");
 const path = require("path");
 
-const scriptsDir = __dirname;
-const androidDir = path.resolve(scriptsDir, "..");
-const mobileDir = path.resolve(androidDir, "..");
+const mobileDir = path.resolve(__dirname, "..");
+const androidDir = path.join(mobileDir, "android");
+const iosDir = path.join(mobileDir, "ios");
 const outputFile = path.join(androidDir, "prebuilt-libraries.json");
+const iosOutputFile = path.join(iosDir, "prebuilt-libraries.json");
 
 // Known custom properties or manual flags
 const KNOWN_OVERRIDES = {
@@ -35,6 +36,12 @@ const KNOWN_OVERRIDES = {
   },
   "react-native-gesture-handler": {
     transitive: ["androidx.core:core-ktx:1.8.0"]
+  }
+};
+
+const KNOWN_IOS_OVERRIDES = {
+  "react-native-screens": {
+    swift: false
   }
 };
 
@@ -82,7 +89,73 @@ function hasCppNativeBuild(depAndroidDir) {
   return false;
 }
 
-function generateConfig() {
+function readJson(file) {
+  if (!fs.existsSync(file)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch (e) {
+    return {};
+  }
+}
+
+function findPodspec(depDir) {
+  if (!fs.existsSync(depDir)) return null;
+  const podspec = fs.readdirSync(depDir).find((f) => f.endsWith(".podspec"));
+  return podspec ? path.join(depDir, podspec) : null;
+}
+
+function hasSwiftSources(dir) {
+  if (!fs.existsSync(dir)) return false;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory() && hasSwiftSources(entryPath)) return true;
+    if (entry.isFile() && entry.name.endsWith(".swift")) return true;
+  }
+  return false;
+}
+
+function generateIosConfig(androidConfig) {
+  const existing = readJson(iosOutputFile).libraries || {};
+  const active = androidConfig.activeLibraries;
+  const ordered = [
+    ...Object.keys(existing).filter((name) => active.includes(name)),
+    ...active.filter((name) => !existing[name])
+  ];
+
+  const libraries = {};
+  for (const depName of ordered) {
+    const depDir = path.join(mobileDir, "node_modules", depName);
+    const podspec = findPodspec(depDir);
+    if (!podspec) continue;
+
+    const overrides = KNOWN_IOS_OVERRIDES[depName] || {};
+    const current = existing[depName] || {};
+    const swift =
+      current.swift ??
+      overrides.swift ??
+      hasSwiftSources(path.join(depDir, "ios"));
+
+    libraries[depName] = {
+      ...current,
+      pod: current.pod || overrides.pod || path.basename(podspec, ".podspec"),
+      swift
+    };
+  }
+
+  const finalConfig = { libraries };
+  fs.writeFileSync(iosOutputFile, JSON.stringify(finalConfig, null, 2) + "\n");
+  console.log(`[CONFIG] Generated ${iosOutputFile}`);
+  console.log(
+    `[CONFIG] iOS prebuilt pods: ${Object.keys(libraries).length} (${Object.values(
+      libraries
+    )
+      .map((lib) => lib.pod)
+      .join(", ")})`
+  );
+  return finalConfig;
+}
+
+function generateAndroidConfig() {
   const pkgJsonPath = path.join(mobileDir, "package.json");
   const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf8"));
   const allDeps = {
@@ -167,10 +240,18 @@ function generateConfig() {
   return finalConfig;
 }
 
+function generateConfig() {
+  const android = generateAndroidConfig();
+  const ios = generateIosConfig(android);
+  return { android, ios };
+}
+
 if (require.main === module) {
   generateConfig();
 }
 
 module.exports = {
-  generateConfig
+  generateConfig,
+  generateAndroidConfig,
+  generateIosConfig
 };

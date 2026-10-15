@@ -2,9 +2,9 @@
  * Prebuilt Native AARs Integration for Notesnook Mobile
  *
  * HOW TO GENERATE AARs:
- *   node apps/mobile/android/scripts/build-prebuilt-aars.js [lib-name] [variant]
- *   e.g. node apps/mobile/android/scripts/build-prebuilt-aars.js react-native-quick-sqlite
- *   Or to build all: node apps/mobile/android/scripts/build-prebuilt-aars.js
+ *   node apps/mobile/scripts/build-prebuilt-aars.js [lib-name] [variant]
+ *   e.g. node apps/mobile/scripts/build-prebuilt-aars.js react-native-quick-sqlite
+ *   Or to build all: node apps/mobile/scripts/build-prebuilt-aars.js
  *
  * HOW TO DISABLE PREBUILT AARs (FALLBACK TO SOURCE):
  *   Pass `-PusePrebuiltAars=false` to any Gradle invocation:
@@ -56,7 +56,7 @@ if (isSettings) {
     def prebuiltConfig = configFile.exists() ? new groovy.json.JsonSlurper().parse(configFile) : null
 
     if (!prebuiltLibs.isEmpty()) {
-        def proc = ["node", "${rootDir}/scripts/build-prebuilt-aars.js", "--aars"].execute(null, rootDir)
+        def proc = ["node", "${rootDir}/../scripts/build-prebuilt-aars.js", "--aars"].execute(null, rootDir)
         def aars = new groovy.json.JsonSlurper().parseText(proc.text.trim())
 
         android {

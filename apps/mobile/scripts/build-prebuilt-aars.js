@@ -22,8 +22,8 @@ const { execSync } = require("child_process");
 const crypto = require("crypto");
 
 // Resolve important directory paths relative to this script
-const androidDir = path.resolve(__dirname, "..");
-const mobileDir = path.resolve(androidDir, "..");
+const mobileDir = path.resolve(__dirname, "..");
+const androidDir = path.join(mobileDir, "android");
 const rootDir = path.resolve(mobileDir, "..", "..");
 const prebuiltDir = path.join(androidDir, ".prebuilt-aars");
 
@@ -38,7 +38,7 @@ if (fs.existsSync(prebuiltConfigPath)) {
 
 if (!prebuiltConfig) {
   const { generateConfig } = require("./generate-prebuilt-config");
-  prebuiltConfig = generateConfig();
+  prebuiltConfig = generateConfig().android;
 }
 
 const ALL_LIBRARIES = prebuiltConfig.libraries || {};

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 const fs = require("fs");
 const path = require("path");
-const { findPrebuiltAars } = require("./android/scripts/build-prebuilt-aars");
+const { findPrebuiltAars } = require("./scripts/build-prebuilt-aars");
 
 const isGithubRelease = false;
 const config = {

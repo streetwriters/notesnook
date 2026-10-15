@@ -30,7 +30,9 @@ const cacheDir = path.join(prebuiltDir, ".cache");
 const configPath = path.join(iosDir, "prebuilt-libraries.json");
 const buildDir = path.join(mobileDir, ".ios-prebuilt-build");
 
-const CONFIG = JSON.parse(fs.readFileSync(configPath, "utf8"));
+const CONFIG = fs.existsSync(configPath)
+  ? JSON.parse(fs.readFileSync(configPath, "utf8"))
+  : require("./generate-prebuilt-config").generateConfig().ios;
 const LIBRARIES = CONFIG.libraries || {};
 
 const CONFIGURATIONS = {
