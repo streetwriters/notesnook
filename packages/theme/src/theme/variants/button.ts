@@ -180,8 +180,8 @@ const error = createButtonVariant("accent-error", "accentForeground-error", {
 
 const newError: ThemeUIStyleObject = {
   ...newCreateButtonVariant("accent-error", "accentForeground", {
-    hover: { bg: "hover-secondary" },
-    active: { bg: "hover-secondary" }
+    hover: { bg: "hover-error" },
+    active: { bg: "hover-error" }
   })
 };
 
