@@ -33,16 +33,24 @@ import {
 import { DatabaseSchema, RawDatabaseSchema } from "../database/index.js";
 import {
   AnyColumnWithTable,
+  Expression,
   ExpressionBuilder,
   Kysely,
   SelectQueryBuilder,
+  SqlBool,
   sql
 } from "@streetwriters/kysely";
 import { FilteredSelector } from "../database/sql-collection.js";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
 import { logger } from "../logger.js";
 import { rebuildSearchIndex } from "../database/fts.js";
-import { QueryTokens, transformQuery } from "../utils/query-transformer.js";
+import {
+  QueryExpression,
+  QueryTokens,
+  hasShortTerms,
+  serializeExpression,
+  transformQuery
+} from "../utils/query-transformer.js";
 import { getSortSelectors, groupArray } from "../utils/grouping.js";
 import { fuzzy } from "../utils/fuzzy.js";
 import { extractMatchingBlocks } from "../utils/html-parser.js";
@@ -62,6 +70,12 @@ type FuzzySearchField<T> = {
   ignore?: boolean;
 };
 
+type SearchMatch = {
+  id: string;
+  rank: number;
+  type: "content" | "title";
+};
+
 const MATCH_TAG_NAME = "nn-search-result";
 const MATCH_TAG_REGEX = new RegExp(
   `<${MATCH_TAG_NAME}\\s+id="(.+?)">(.*?)<\\/${MATCH_TAG_NAME}>`,
@@ -78,7 +92,7 @@ export default class Lookup {
 
       const ftsResults: string[] =
         (await this.ftsQueryBuilder(
-          { content: content?.query, title: title?.query },
+          { content: content?.expression, title: title?.expression },
           excludedIds,
           notes
         )
@@ -92,18 +106,7 @@ export default class Lookup {
           })
           .then((r) => r.map((r) => r.id))) || [];
 
-      const regexMatches = await this.regexQueryBuilder(
-        {
-          content: filterSmallTokens(content?.tokens),
-          title: filterSmallTokens(title?.tokens)
-        },
-        (!!content || !!title) && ftsResults.length > 0 ? ftsResults : notes
-      )
-        ?.select("results.id")
-        .execute();
-      if (!regexMatches) return ftsResults;
-
-      return regexMatches.map((r) => r.id);
+      return ftsResults;
     }, notes || this.db.notes.all);
   }
 
@@ -221,7 +224,7 @@ export default class Lookup {
     console.time("gather matches");
     const ftsResults =
       (await this.ftsQueryBuilder(
-        { content: content?.query, title: title?.query },
+        { content: content?.expression, title: title?.expression },
         excludedIds,
         notes
       )
@@ -231,18 +234,6 @@ export default class Lookup {
           logger.error(e, `Error while searching`, { query });
           return [];
         })) || [];
-
-    const ftsIds = ftsResults.map((r) => r.id);
-    const regexMatches =
-      (await this.regexQueryBuilder(
-        {
-          content: filterSmallTokens(content?.tokens),
-          title: filterSmallTokens(title?.tokens)
-        },
-        (!!content || !!title) && ftsIds.length > 0 ? ftsIds : notes
-      )
-        ?.select(["results.id", "results.type", sql<number>`1`.as("rank")])
-        .execute()) || [];
     console.timeEnd("gather matches");
 
     console.time("sorting matches");
@@ -251,25 +242,24 @@ export default class Lookup {
       values: { id: string; types: string[]; rank: number }[];
     };
     let matches: Matches = { ids: [], values: [] };
-    for (const array of [ftsResults, regexMatches])
-      for (const { id, type, rank } of array) {
-        const index = matches.ids.indexOf(id);
-        const match =
-          index === -1
-            ? {
-                id,
-                types: [],
-                rank: 0
-              }
-            : matches.values[index];
-        match.types.push(type);
-        match.rank += rank || 0;
+    for (const { id, type, rank } of ftsResults) {
+      const index = matches.ids.indexOf(id);
+      const match =
+        index === -1
+          ? {
+              id,
+              types: [],
+              rank: 0
+            }
+          : matches.values[index];
+      match.types.push(type);
+      match.rank += rank || 0;
 
-        if (index === -1) {
-          matches.ids.push(id);
-          matches.values.push(match);
-        }
+      if (index === -1) {
+        matches.ids.push(id);
+        matches.values.push(match);
       }
+    }
 
     if (!sortOptions || sortOptions.sortBy === "relevance") {
       matches.values.sort(
@@ -432,8 +422,8 @@ export default class Lookup {
 
   private ftsQueryBuilder(
     queries: {
-      title?: string;
-      content?: string;
+      title?: QueryExpression;
+      content?: QueryExpression;
     },
     excludedIds: string[] = [],
     filter?: FilteredSelector<Note>
@@ -445,8 +435,43 @@ export default class Lookup {
     function buildTitleQuery(
       eb:
         | Kysely<RawDatabaseSchema>
-        | ExpressionBuilder<RawDatabaseSchema, never>
+        | ExpressionBuilder<RawDatabaseSchema, never>,
+      expression: QueryExpression
     ) {
+      if (hasShortTerms(expression))
+        return eb
+          .selectFrom("notes")
+          .$if(!!filter, (eb) =>
+            eb.where("id", "in", filter!.filter.select("id"))
+          )
+          .$if(excludedIds.length > 0, (eb) =>
+            eb.where("id", "not in", excludedIds)
+          )
+          .where("title", "is not", null)
+          .where("deleted", "is not", true)
+          .where((eb) =>
+            compileExpression(
+              eb,
+              expression,
+              (query) =>
+                eb(
+                  "notes.id",
+                  "in",
+                  eb
+                    .selectFrom("notes_fts")
+                    .where("title", "match", query)
+                    .select("id")
+                ),
+              (regex) => eb("notes.title", "regexp", sql<string>`${regex}`)
+            )
+          )
+          .select([
+            "id",
+            sql<number>`0`.as("rank"),
+            sql<string>`'title'`.as("type")
+          ])
+          .$castTo<SearchMatch>();
+
       return eb
         .selectFrom("notes_fts")
         .$if(!!filter, (eb) =>
@@ -455,16 +480,54 @@ export default class Lookup {
         .$if(excludedIds.length > 0, (eb) =>
           eb.where("id", "not in", excludedIds)
         )
-        .where("title", "match", queries.title)
+        .where("title", "match", serializeExpression(expression))
         .where("rank", "=", sql<number>`'bm25(1.0, 10.0)'`)
-        .select(["id", "rank", sql<string>`'title'`.as("type")]);
+        .select(["id", "rank", sql<string>`'title'`.as("type")])
+        .$castTo<SearchMatch>();
     }
 
     function buildContentQuery(
       eb:
         | Kysely<RawDatabaseSchema>
-        | ExpressionBuilder<RawDatabaseSchema, never>
+        | ExpressionBuilder<RawDatabaseSchema, never>,
+      expression: QueryExpression
     ) {
+      if (hasShortTerms(expression))
+        return eb
+          .selectFrom("content")
+          .$if(!!filter, (eb) =>
+            eb.where("noteId", "in", filter!.filter.select("id"))
+          )
+          .$if(excludedIds.length > 0, (eb) =>
+            eb.where("noteId", "not in", excludedIds)
+          )
+          .where("noteId", "is not", null)
+          .where("data", "is not", null)
+          .where("deleted", "is not", true)
+          .where("locked", "is not", true)
+          .where((eb) =>
+            compileExpression(
+              eb,
+              expression,
+              (query) =>
+                eb(
+                  "content.noteId",
+                  "in",
+                  eb
+                    .selectFrom("content_fts")
+                    .where("data", "match", query)
+                    .select("noteId")
+                ),
+              (regex) => eb("content.data", "regexp", sql<string>`${regex}`)
+            )
+          )
+          .select([
+            "noteId as id",
+            sql<number>`0`.as("rank"),
+            sql<string>`'content'`.as("type")
+          ])
+          .$castTo<SearchMatch>();
+
       return eb
         .selectFrom("content_fts")
         .$if(!!filter, (eb) =>
@@ -473,100 +536,26 @@ export default class Lookup {
         .$if(excludedIds.length > 0, (eb) =>
           eb.where("noteId", "not in", excludedIds)
         )
-        .where("data", "match", queries.content)
+        .where("data", "match", serializeExpression(expression))
         .where("rank", "=", sql<number>`'bm25(1.0, 1.0, 10.0)'`)
         .select(["noteId as id", "rank", sql<string>`'content'`.as("type")])
-        .$castTo<{
-          id: string;
-          rank: number;
-          type: "content" | "title";
-        }>();
+        .$castTo<SearchMatch>();
     }
 
     if (queries.content && queries.title)
       return db.selectFrom((eb) =>
-        buildTitleQuery(eb)
-          .unionAll((eb) => buildContentQuery(eb))
-          .as("results")
-      );
-    else if (queries.content)
-      return db.selectFrom((eb) => buildContentQuery(eb).as("results"));
-    else if (queries.title)
-      return db.selectFrom((eb) => buildTitleQuery(eb).as("results"));
-  }
-
-  private regexQueryBuilder(
-    queries: {
-      title?: string[];
-      content?: string[];
-    },
-    ids?: string[] | FilteredSelector<Note>
-  ) {
-    if (!queries.content?.length && !queries.title?.length) return;
-
-    const buildRegex = (queries: string[]) =>
-      queries
-        .filter((q) => q && q.length > 0)
-        .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-        .join("|");
-
-    function buildTitleQuery(
-      eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
-      queries: string[]
-    ) {
-      const regex = buildRegex(queries);
-      return eb
-        .selectFrom("notes")
-        .$if(!!ids, (eb) =>
-          eb.where(
-            "id",
-            "in",
-            Array.isArray(ids) ? ids! : ids!.filter.select("id")
-          )
-        )
-        .where("title", "regexp", sql<string>`${regex}`)
-        .select(["id", sql<string>`'title'`.as("type")]);
-    }
-
-    function buildContentQuery(
-      eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
-      queries: string[]
-    ) {
-      const regex = buildRegex(queries);
-      return eb
-        .selectFrom("content")
-        .where("content.locked", "!=", true)
-        .$if(!!ids, (eb) =>
-          eb.where(
-            "noteId",
-            "in",
-            Array.isArray(ids) ? ids! : ids!.filter.select("id")
-          )
-        )
-        .where("data", "regexp", sql<string>`${regex}`)
-        .select(["noteId as id", sql<string>`'content'`.as("type")])
-        .$castTo<{
-          id: string;
-          type: "content" | "title";
-        }>();
-    }
-
-    if (queries.content && queries.title)
-      return this.db.sql().selectFrom((eb) =>
         buildTitleQuery(eb, queries.title!)
           .unionAll((eb) => buildContentQuery(eb, queries.content!))
           .as("results")
       );
     else if (queries.content)
-      return this.db
-        .sql()
-        .selectFrom((eb) =>
-          buildContentQuery(eb, queries.content!).as("results")
-        );
+      return db.selectFrom((eb) =>
+        buildContentQuery(eb, queries.content!).as("results")
+      );
     else if (queries.title)
-      return this.db
-        .sql()
-        .selectFrom((eb) => buildTitleQuery(eb, queries.title!).as("results"));
+      return db.selectFrom((eb) =>
+        buildTitleQuery(eb, queries.title!).as("results")
+      );
   }
 
   notebooks(query: string) {
@@ -1155,13 +1144,6 @@ function getMatchScore(
   return score;
 }
 
-function filterSmallTokens(tokens: QueryTokens | undefined) {
-  if (!tokens) return;
-  return [...tokens.andTokens, ...tokens.orTokens].filter(
-    (token) => token.length < 3
-  );
-}
-
 function transformTokens(tokens: QueryTokens | undefined) {
   if (!tokens)
     return {
@@ -1186,6 +1168,33 @@ function transformTokens(tokens: QueryTokens | undefined) {
     notTokens,
     allTokens: [...andTokens, ...orTokens]
   };
+}
+
+/**
+ * Compiles a query expression containing short terms into an SQL
+ * expression. Short terms are matched as substrings using regex
+ * while everything else is matched using FTS.
+ */
+function compileExpression<DB, TB extends keyof DB>(
+  eb: ExpressionBuilder<DB, TB>,
+  expression: QueryExpression,
+  match: (query: string) => Expression<SqlBool>,
+  regex: (pattern: string) => Expression<SqlBool>
+): Expression<SqlBool> {
+  if (!hasShortTerms(expression)) return match(serializeExpression(expression));
+  if (expression.type === "term")
+    return regex(expression.value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+
+  const left = compileExpression(eb, expression.left, match, regex);
+  const right = compileExpression(eb, expression.right, match, regex);
+  switch (expression.type) {
+    case "AND":
+      return eb.and([left, right]);
+    case "OR":
+      return eb.or([left, right]);
+    case "NOT":
+      return eb.and([left, eb.not(right)]);
+  }
 }
 
 function createSearchResultTag(content: string, id: string) {
