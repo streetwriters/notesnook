@@ -24,9 +24,11 @@ const { execFileSync } = require("child_process");
 
 const mobileDir = path.resolve(__dirname, "..");
 const iosDir = path.join(mobileDir, "ios");
+const podsDir = path.join(iosDir, "Pods");
 const prebuiltDir = path.join(iosDir, ".prebuilt-xcframeworks");
 const cacheDir = path.join(prebuiltDir, ".cache");
 const configPath = path.join(iosDir, "prebuilt-libraries.json");
+const buildDir = path.join(mobileDir, ".ios-prebuilt-build");
 
 const CONFIG = JSON.parse(fs.readFileSync(configPath, "utf8"));
 const LIBRARIES = CONFIG.libraries || {};
@@ -38,15 +40,23 @@ const CONFIGURATIONS = {
 
 const DEFAULT_CONFIGURATIONS = ["debug", "release"];
 
-// The simulator architectures are compiled together so that create-xcframework
-// emits one ios-arm64_x86_64-simulator slice: two separate builds cannot both
-// claim the same platform identifier. The artifacts are shared by every checkout
-// and by CI, so they carry arm64 simulator even though this Podfile currently
-// excludes it.
 const SLICES = [
   { sdk: "iphoneos", archs: ["arm64"] },
   { sdk: "iphonesimulator", archs: ["x86_64", "arm64"] }
 ];
+
+const USAGE = `Notesnook iOS prebuilt xcframework builder
+
+Usage:
+  node scripts/build-prebuilt-ios.js --list
+  node scripts/build-prebuilt-ios.js --help
+  node scripts/build-prebuilt-ios.js [<npm-name>] [debug|release]
+
+Artifacts are built in .ios-prebuilt-build/, a disposable clone of ios/, so the
+working ios/ is never built against or modified.
+
+Commit ios/Podfile.lock only in the all-prebuilt state, built with the team Xcode version.
+`;
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
@@ -71,8 +81,6 @@ function xcodeVersion() {
   return match ? match[1] : out.trim();
 }
 
-// Resolved the same way the Podfile resolves them, so that an artifact built by
-// hand and an artifact looked up from `pod install` hash identically.
 function rnPrebuiltState() {
   if (process.env.NN_USE_PREBUILT_IOS === "0") {
     return { rncore: "0", rndep: "0" };
@@ -108,9 +116,6 @@ function podVersions(pods) {
     .join(",");
 }
 
-// The npm package's own podspec is what identifies the sources being replaced.
-// The lockfile checksum cannot be used: it changes as soon as the pod is swapped
-// for the prebuilt one, which would invalidate the artifact that caused the swap.
 function podspecContent(npmName) {
   const dir = path.join(mobileDir, "node_modules", npmName);
   if (!fs.existsSync(dir)) return "";
@@ -155,24 +160,59 @@ function isValidArtifact(file) {
   return fs.existsSync(file) && !isLfsPointer(file);
 }
 
-function buildSettingsFor(lib, config, slice) {
-  const settings = Object.assign({}, lib.buildSettings || {});
+function buildSettingsFor(lib, slice) {
+  const settings = {};
   if (lib.swift) {
     settings.BUILD_LIBRARY_FOR_DISTRIBUTION = "YES";
-    // NitroModules re-exports its own Objective-C++ module from Swift. Verifying
-    // the emitted module interface in isolation cannot see that module and fails
-    // with "underlying Objective-C module 'NitroModules' not found", even though
-    // the interface itself is correct and is what create-xcframework needs.
     settings.OTHER_SWIFT_FLAGS = "$(inherited) -no-verify-emitted-module-interface";
   }
-  // The Podfile excludes arm64 for the simulator, which would otherwise drop the
-  // slice this script exists to produce. Overriding the unconditional setting is
-  // enough to clear the conditional one as well.
   if (slice.sdk === "iphonesimulator") {
     settings.EXCLUDED_ARCHS = "";
     settings.ONLY_ACTIVE_ARCH = "NO";
   }
   return settings;
+}
+
+function snapshotRealState() {
+  const state = { markers: {}, react: {} };
+  const markers = [
+    path.join(podsDir, ".last_build_configuration"),
+    path.join(podsDir, "React-Core-prebuilt", ".last_build_configuration"),
+    path.join(podsDir, "ReactNativeDependencies", ".last_build_configuration")
+  ];
+  for (const marker of markers) {
+    if (fs.existsSync(marker)) state.markers[marker] = fs.readFileSync(marker, "utf8");
+  }
+  const frameworkDir = path.join(podsDir, "React-Core-prebuilt", "React.xcframework");
+  if (fs.existsSync(frameworkDir)) {
+    for (const slice of fs.readdirSync(frameworkDir)) {
+      const binary = path.join(frameworkDir, slice, "React.framework", "React");
+      if (fs.existsSync(binary)) state.react[binary] = fs.statSync(binary).size;
+    }
+  }
+  return JSON.stringify(state);
+}
+
+function cloneIos() {
+  fs.rmSync(buildDir, { recursive: true, force: true });
+  try {
+    execFileSync("cp", ["-c", "-R", iosDir, buildDir], { stdio: "inherit" });
+  } catch (e) {
+    execFileSync("cp", ["-R", iosDir, buildDir], { stdio: "inherit" });
+  }
+}
+
+function installClone() {
+  const env = Object.assign({}, process.env, {
+    NN_PREBUILT_THIRD_PARTY: "0",
+    RCT_USE_PREBUILT_RNCORE: "1",
+    RCT_USE_RN_DEP: "1"
+  });
+  execFileSync("pod", ["install"], { cwd: buildDir, stdio: "inherit", env });
+}
+
+function removeClone() {
+  fs.rmSync(buildDir, { recursive: true, force: true });
 }
 
 function build(npmName, config) {
@@ -206,14 +246,13 @@ function build(npmName, config) {
       "-derivedDataPath",
       derivedData
     ];
-    const settings = buildSettingsFor(lib, config, slice);
-    for (const [key, value] of Object.entries(settings)) {
+    for (const [key, value] of Object.entries(buildSettingsFor(lib, slice))) {
       args.push(`${key}=${value}`);
     }
     args.push("build");
 
     console.log(`[BUILD] ${pod} ${config} ${slice.sdk}/${slice.archs.join("+")}`);
-    execFileSync("xcodebuild", args, { cwd: iosDir, stdio: "inherit" });
+    execFileSync("xcodebuild", args, { cwd: buildDir, stdio: "inherit" });
 
     const productsDir = path.join(derivedData, "Build", "Products");
     const productName = fs
@@ -227,7 +266,7 @@ function build(npmName, config) {
     built.push({ slice, staticLib, podProducts });
   }
 
-  const publicHeaders = path.join(iosDir, "Pods", "Headers", "Public", pod);
+  const publicHeaders = path.join(buildDir, "Pods", "Headers", "Public", pod);
 
   const outDir = path.join(workDir, "out");
   fs.mkdirSync(outDir, { recursive: true });
@@ -274,8 +313,14 @@ function listArtifacts() {
   return result;
 }
 
-if (require.main === module) {
+function main() {
   const args = process.argv.slice(2);
+
+  if (args[0] === "--help" || args[0] === "-h") {
+    process.stdout.write(USAGE);
+    process.exit(0);
+  }
+
   if (args[0] === "--list") {
     process.stdout.write(JSON.stringify(listArtifacts()) + "\n");
     process.exit(0);
@@ -284,14 +329,51 @@ if (require.main === module) {
   const targetLib = args[0];
   const targetConfig = args[1];
   const libs = targetLib ? [targetLib] : Object.keys(LIBRARIES);
+  const jobs = [];
+
   for (const npmName of libs) {
     if (!LIBRARIES[npmName]) throw new Error(`Unknown library: ${npmName}`);
     const configs = targetConfig ? [targetConfig] : DEFAULT_CONFIGURATIONS;
+    const lib = LIBRARIES[npmName];
     for (const config of configs) {
       if (!CONFIGURATIONS[config]) throw new Error(`Unknown configuration: ${config}`);
-      build(npmName, config);
+      const target = path.join(prebuiltDir, artifactName(lib, config, computeHash(npmName)));
+      if (isValidArtifact(target)) {
+        console.log(`[SKIP] ${path.basename(target)} already exists`);
+        continue;
+      }
+      jobs.push([npmName, config]);
     }
   }
+
+  if (jobs.length === 0) return;
+
+  const before = snapshotRealState();
+  let failure = null;
+
+  try {
+    cloneIos();
+    installClone();
+    for (const [npmName, config] of jobs) build(npmName, config);
+  } catch (e) {
+    failure = e;
+  } finally {
+    removeClone();
+  }
+
+  const after = snapshotRealState();
+  if (before !== after) {
+    throw new Error(
+      `The artifact build modified the working ios/ state, which must never be built against.\n` +
+        `  before: ${before}\n  after:  ${after}`
+    );
+  }
+
+  if (failure) throw failure;
+}
+
+if (require.main === module) {
+  main();
 }
 
 module.exports = { computeHash, listArtifacts, LIBRARIES, artifactName, prebuiltDir, cacheDir };

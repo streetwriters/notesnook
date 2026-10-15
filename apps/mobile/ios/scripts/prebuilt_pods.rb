@@ -16,6 +16,10 @@ module PrebuiltPods
     ENV['NN_USE_PREBUILT_IOS'] == '0'
   end
 
+  def self.third_party_disabled?
+    ENV['NN_PREBUILT_THIRD_PARTY'] == '0'
+  end
+
   def self.node_executable
     return @node_executable if defined?(@node_executable) && @node_executable
 
@@ -32,7 +36,6 @@ module PrebuiltPods
     @libraries ||= File.exist?(CONFIG_PATH) ? JSON.parse(File.read(CONFIG_PATH))['libraries'] || {} : {}
   end
 
-  # Asks the Node build script which pods have a valid, current artifact.
   def self.available_artifacts
     return @available_artifacts if defined?(@available_artifacts)
 
@@ -46,10 +49,6 @@ module PrebuiltPods
     @available_artifacts
   end
 
-  # Both configurations must be present: a pod may only be swapped for a prebuilt
-  # binary when the Debug and the Release slice both exist, because React Native
-  # links a different React core per configuration and mixing the two crashes at
-  # runtime.
   def self.reason_available(pod, artifacts)
     configs = artifacts[pod]
     if configs.nil?
@@ -59,15 +58,10 @@ module PrebuiltPods
     end
   end
 
-  # The artifact filename carries the hash, so a marker keyed on that name is
-  # enough to skip re-extracting an unchanged zip while still re-extracting when
-  # a new artifact replaces an old one.
   def self.unzip_artifact(zip, destination)
     marker = File.join(destination, ".extracted-#{File.basename(zip)}")
     return if File.exist?(marker)
 
-    # A partial extraction would leave the previous artifacts' slices behind
-    # because an archive only overwrites what it contains.
     FileUtils.rm_rf(destination)
     FileUtils.mkdir_p(destination)
     system('unzip', '-oq', zip, '-d', destination) || raise(
@@ -80,10 +74,6 @@ module PrebuiltPods
     File.join(CACHE_ROOT, pod)
   end
 
-  # CocoaPods records `:path` verbatim in Podfile.lock, and the Podfile directory
-  # is what it resolves those paths against. Handing it an absolute path would
-  # bake this machine's checkout location into the lockfile and churn it on every
-  # other machine and on CI.
   def self.relative_pod_dir(pod)
     Pathname.new(pod_dir(pod)).relative_path_from(
       Pod::Config.instance.installation_root
@@ -96,13 +86,6 @@ module PrebuiltPods
     package && package[:podspec_path]
   end
 
-  # Swaps the configuration being built into the vendored xcframework. CocoaPods
-  # can only vendor one configuration, so the copy it installs into the build
-  # directory would otherwise always be that one. Replacing the vendored
-  # framework before it runs leaves CocoaPods to select the slice for the current
-  # platform and arch, and keeps Debug and Release from mixing React core ABIs.
-  # The copy is refreshed so that CocoaPods' own copy step is not skipped as up
-  # to date.
   def self.select_configuration_script(pod)
     <<~SH
       set -e
@@ -123,8 +106,6 @@ module PrebuiltPods
     SH
   end
 
-  # Rewrites the resolved podspec so that the prebuilt binary replaces the pod's
-  # sources, keeping dependencies and build settings intact.
   def self.prepare_prebuilt_pod(pod, podspec_path, artifacts)
     return nil unless podspec_path && File.exist?(podspec_path)
 
@@ -132,10 +113,6 @@ module PrebuiltPods
     target_dir = pod_dir(pod)
     FileUtils.mkdir_p(target_dir)
 
-    # A pod may already vendor binaries of its own (for example
-    # react-native-fast-openpgp vendors OpenPGPBridge.xcframework alongside its
-    # sources). Those must be preserved, but podspec file patterns have to stay
-    # relative to the pod root, so bring them into the prebuilt pod directory.
     pod_root = File.dirname(podspec_path)
     inherited_frameworks = Array(spec.attributes_hash['vendored_frameworks']).map do |path|
       source = File.expand_path(path, pod_root)
@@ -153,9 +130,6 @@ module PrebuiltPods
       unzip_artifact(artifacts[pod][config], File.join(target_dir, config))
     end
 
-    # CocoaPods resolves and validates the vendored xcframework at install time,
-    # so one configuration has to be in place before the first build. The script
-    # phase replaces it with whichever configuration Xcode is building.
     vendored_dir = File.join(target_dir, "#{pod}.xcframework")
     FileUtils.rm_rf(vendored_dir)
     FileUtils.cp_r(File.join(target_dir, 'debug', "#{pod}.xcframework"), vendored_dir)
@@ -180,14 +154,6 @@ module PrebuiltPods
     spec.subspecs.each { |subspec| strip_sources(subspec) }
   end
 
-  # Reading a podspec evaluates it, and third-party podspecs branch on the
-  # New Architecture environment at evaluation time. `install_modules_dependencies`
-  # also decides whether a pod depends on the source third-party pods or on the
-  # prebuilt ReactNativeDependencies pod at evaluation time. React Native only sets
-  # all of that inside `use_react_native!`, which runs after this file, so establish
-  # the same state first or podspecs are read as if the New Architecture were off.
-  # These assignments are idempotent, so the later ones from `use_react_native!`
-  # are no-ops.
   def self.ensure_react_native_prebuilt_state(native_modules)
     ENV['RCT_NEW_ARCH_ENABLED'] = '1'
     ENV['RCT_FABRIC_ENABLED'] = '1'
@@ -207,6 +173,7 @@ module PrebuiltPods
     return if disabled?
 
     ensure_react_native_prebuilt_state(native_modules)
+    return if third_party_disabled?
 
     artifacts = available_artifacts
     libraries.each do |npm_name, lib|
@@ -230,8 +197,6 @@ module PrebuiltPods
     end
   end
 
-  # Keeps third-party podspecs that hardcode `s.dependency "RCT-Folly"` resolvable
-  # when React Native's prebuilt dependencies omit the source pods.
   def self.rn_dependencies_prebuilt?
     return false if disabled?
     return false unless defined?(ReactNativeDependenciesUtils)

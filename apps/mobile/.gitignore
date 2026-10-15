@@ -21,6 +21,7 @@ build_cache/
 android/.prebuilt-aars/*
 !android/.prebuilt-aars/*.aar
 ios/.prebuilt-xcframeworks/.cache/
+.ios-prebuilt-build/
 
 # Xcode
 #
