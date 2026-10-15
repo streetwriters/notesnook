@@ -30,19 +30,20 @@ import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import {
-  SelectedCheck,
   SelectedReference,
   selectMultiple,
   useSelectionStore
 } from "./move-note-dialog";
 import { checkFeature } from "../common";
+import { Box } from "@notesnook/ui";
+import { Tag as TagIcon } from "../components/icons";
+import { Checkbox } from "../components/checkbox";
 
 type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
   props: AddTagsDialogProps
 ) {
   const { onClose, noteIds } = props;
-
   const [tags, setTags] = useState<VirtualizedGrouping<Tag> | undefined>(
     () => useStore.getState().tags
   );
@@ -74,6 +75,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
       description={strings.addTagsDesc()}
       onClose={() => onClose(false)}
       width={450}
+      sx={{ minHeight: 434 }}
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
@@ -96,50 +98,58 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         onClick: () => onClose(false)
       }}
     >
-      {tags && (
-        <FilteredList
-          getItemKey={(index) => tags.key(index)}
-          mode="fixed"
-          estimatedSize={30}
-          items={tags.placeholders}
-          sx={{ mt: 2 }}
-          itemGap={5}
-          placeholders={{
-            empty: strings.addATag(),
-            filter: strings.searchForTags()
-          }}
-          filter={async (query) => {
-            setTags(
-              query
-                ? await db.lookup.tags(query).sorted()
-                : useStore.getState().tags
-            );
-          }}
-          onCreateNewItem={async (title) => {
-            if (!(await checkFeature("tags", { type: "toast" }))) return;
+      <Box sx={{ my: "spacing7" }}>
+        {tags && (
+          <FilteredList
+            getItemKey={(index) => tags.key(index)}
+            mode="fixed"
+            estimatedSize={36}
+            items={tags.placeholders}
+            placeholders={{
+              empty: "Add tags",
+              filter: "Search or add tags",
+              emptyList: "No tags to show"
+            }}
+            filter={async (query) => {
+              setTags(
+                query
+                  ? await db.lookup.tags(query).sorted()
+                  : useStore.getState().tags
+              );
+            }}
+            onCreateNewItem={async (title) => {
+              if (!(await checkFeature("tags", { type: "toast" }))) return;
 
-            const tagId = await db.tags.add({ title });
-            if (!tagId) return;
-            await useStore.getState().refresh();
-            setTags(useStore.getState().tags);
-            const { selected, setSelected } = useSelectionStore.getState();
-            setSelected([...selected, { id: tagId, new: true, op: "add" }]);
-          }}
-          renderItem={({ index }) => {
-            return (
-              <ResolvedItem key={index} type="tag" items={tags} index={index}>
-                {({ item }) => <TagItem tag={item} />}
-              </ResolvedItem>
-            );
-          }}
-        />
-      )}
+              const tagId = await db.tags.add({ title });
+              if (!tagId) return;
+              await useStore.getState().refresh();
+              setTags(useStore.getState().tags);
+              const { selected, setSelected } = useSelectionStore.getState();
+              setSelected([...selected, { id: tagId, new: true, op: "add" }]);
+            }}
+            renderItem={({ index }) => {
+              return (
+                <ResolvedItem key={index} type="tag" items={tags} index={index}>
+                  {({ item }) => <TagItem tag={item} />}
+                </ResolvedItem>
+              );
+            }}
+          />
+        )}
+      </Box>
     </Dialog>
   );
 });
 
 function TagItem(props: { tag: Tag }) {
   const { tag } = props;
+  const selected = useSelectionStore((state) => state.selected);
+  const setSelected = useSelectionStore((state) => state.setSelected);
+  const isChecked = selected.find((item) => item.id === tag.id)?.op === "add";
+
+  function toggleSelection() {
+    setSelected(selectMultiple(tag, selected));
+  }
 
   return (
     <Flex
@@ -147,22 +157,40 @@ function TagItem(props: { tag: Tag }) {
       data-test-id="tag"
       sx={{
         cursor: "pointer",
-        justifyContent: "space-between",
         alignItems: "center",
-        bg: "var(--background-secondary)",
-        borderRadius: "default",
-        p: 1
+        bg: "background",
+        borderRadius: "radius1",
+        p: "spacing4",
+        ":hover": {
+          bg: "hover"
+        }
       }}
-      onClick={() => {
-        const { selected, setSelected } = useSelectionStore.getState();
-        setSelected(selectMultiple(tag, selected));
-      }}
+      onClick={toggleSelection}
     >
-      <Flex sx={{ alignItems: "center" }}>
-        <SelectedCheck size={18} item={tag} />
-        <Text className="title" data-test-id="tag-title" variant="body">
-          #{tag.title}
+      <Flex sx={{ alignItems: "center", gap: "spacing4", width: "100%" }}>
+        <TagIcon size={15} color="icon-secondary" />
+        <Text
+          className="title"
+          data-test-id="tag-title"
+          sx={{
+            flex: 1,
+            color: "paragraph",
+            fontSize: "xs",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden"
+          }}
+        >
+          {tag.title}
         </Text>
+        <Checkbox
+          size={16}
+          checked={isChecked}
+          onToggle={toggleSelection}
+          aria-label={tag.title}
+          checkboxUncheckedIconColor="icon-disabled"
+          data-test-id="tag-checkbox"
+        />
       </Flex>
     </Flex>
   );
