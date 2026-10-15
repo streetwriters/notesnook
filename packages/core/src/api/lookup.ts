@@ -380,11 +380,7 @@ export default class Lookup {
         }
 
         const resultsWithMissingTitle = results
-          .filter(
-            isQueryless
-              ? (r) => !r.title.length
-              : (r) => !r.title.length && r.content.length > 0
-          )
+          .filter((r) => !r.title.length)
           .map((r) => r.id);
 
         if (resultsWithMissingTitle.length > 0) {
@@ -504,10 +500,22 @@ export default class Lookup {
   ) {
     if (!queries.content?.length && !queries.title?.length) return;
 
+    // SQLite's regexp extension has no case-insensitive flag so we
+    // expand each letter into a [xX] character class instead.
     const buildRegex = (queries: string[]) =>
       queries
         .filter((q) => q && q.length > 0)
-        .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .map((q) =>
+          Array.from(q)
+            .map((c) => {
+              const lower = c.toLowerCase();
+              const upper = c.toUpperCase();
+              if (lower !== upper && lower.length === 1 && upper.length === 1)
+                return `[${lower}${upper}]`;
+              return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            })
+            .join("")
+        )
         .join("|");
 
     function buildTitleQuery(
@@ -532,7 +540,9 @@ export default class Lookup {
       eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
       queries: string[]
     ) {
-      const regex = buildRegex(queries);
+      // Only match text content: skip over tags and whole HTML entities
+      // so short queries don't match inside `<p>` or `&nbsp;`.
+      const regex = `(^|>)([^<&]|&[#a-zA-Z0-9]+;)*(${buildRegex(queries)})`;
       return eb
         .selectFrom("content")
         .where("content.locked", "!=", true)
