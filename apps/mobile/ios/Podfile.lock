@@ -2695,8 +2695,8 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - MMKV
-  - NitroCloudUploader (from `../node_modules/react-native-nitro-cloud-uploader`)
-  - NitroModules (from `../node_modules/react-native-nitro-modules`)
+  - NitroCloudUploader (from `.prebuilt-xcframeworks/.cache/NitroCloudUploader`)
+  - NitroModules (from `.prebuilt-xcframeworks/.cache/NitroModules`)
   - RCT-Folly (from `.prebuilt-xcframeworks/.cache/RCT-Folly`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -2740,7 +2740,7 @@ DEPENDENCIES:
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - "react-native-document-picker (from `../node_modules/@react-native-documents/picker`)"
-  - react-native-fast-openpgp (from `../node_modules/react-native-fast-openpgp`)
+  - react-native-fast-openpgp (from `.prebuilt-xcframeworks/.cache/react-native-fast-openpgp`)
   - "react-native-fingerprint-scanner (from `../node_modules/@ammarahmed/react-native-fingerprint-scanner`)"
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-gzip (from `../node_modules/react-native-gzip`)
@@ -2748,12 +2748,12 @@ DEPENDENCIES:
   - "react-native-image-resizer (from `../node_modules/@bam.tech/react-native-image-resizer`)"
   - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
-  - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
+  - react-native-mmkv-storage (from `.prebuilt-xcframeworks/.cache/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-notification-sounds (from `../node_modules/react-native-notification-sounds`)
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
-  - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
+  - react-native-quick-sqlite (from `.prebuilt-xcframeworks/.cache/react-native-quick-sqlite`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-screenguard (from `../node_modules/react-native-screenguard`)
@@ -2805,19 +2805,19 @@ DEPENDENCIES:
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNExitApp (from `../node_modules/react-native-exit-app`)
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
-  - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNGestureHandler (from `.prebuilt-xcframeworks/.cache/RNGestureHandler`)
   - RNIap (from `../node_modules/react-native-iap`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNLocalize (from `../node_modules/react-native-localize`)
   - "RNNotifee (from `../node_modules/@ammarahmed/notifee-react-native`)"
-  - RNReanimated (from `../node_modules/react-native-reanimated`)
+  - RNReanimated (from `.prebuilt-xcframeworks/.cache/RNReanimated`)
   - RNScreens (from `.prebuilt-xcframeworks/.cache/RNScreens`)
   - RNSecureRandom (from `../node_modules/react-native-securerandom`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNTooltips (from `../node_modules/react-native-tooltips`)
-  - RNWorklets (from `../node_modules/react-native-worklets`)
+  - RNWorklets (from `.prebuilt-xcframeworks/.cache/RNWorklets`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - SexyTooltip (from `https://github.com/ammarahm-ed/SexyTooltip.git`)
   - "toolbar-android (from `../node_modules/@react-native-community/toolbar-android`)"
@@ -2847,9 +2847,9 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-09-01-RNv0.82.0-265ef62ff3eb7289d17e366664ac0da82303e101
   NitroCloudUploader:
-    :path: "../node_modules/react-native-nitro-cloud-uploader"
+    :path: ".prebuilt-xcframeworks/.cache/NitroCloudUploader"
   NitroModules:
-    :path: "../node_modules/react-native-nitro-modules"
+    :path: ".prebuilt-xcframeworks/.cache/NitroModules"
   RCT-Folly:
     :path: ".prebuilt-xcframeworks/.cache/RCT-Folly"
   RCTDeprecation:
@@ -2935,7 +2935,7 @@ EXTERNAL SOURCES:
   react-native-document-picker:
     :path: "../node_modules/@react-native-documents/picker"
   react-native-fast-openpgp:
-    :path: "../node_modules/react-native-fast-openpgp"
+    :path: ".prebuilt-xcframeworks/.cache/react-native-fast-openpgp"
   react-native-fingerprint-scanner:
     :path: "../node_modules/@ammarahmed/react-native-fingerprint-scanner"
   react-native-get-random-values:
@@ -2951,7 +2951,7 @@ EXTERNAL SOURCES:
   react-native-keep-awake:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
-    :path: "../node_modules/react-native-mmkv-storage"
+    :path: ".prebuilt-xcframeworks/.cache/react-native-mmkv-storage"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-notification-sounds:
@@ -2961,7 +2961,7 @@ EXTERNAL SOURCES:
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-quick-sqlite:
-    :path: "../node_modules/react-native-quick-sqlite"
+    :path: ".prebuilt-xcframeworks/.cache/react-native-quick-sqlite"
   react-native-restart:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
@@ -3065,7 +3065,7 @@ EXTERNAL SOURCES:
   RNFileViewer:
     :path: "../node_modules/react-native-file-viewer"
   RNGestureHandler:
-    :path: "../node_modules/react-native-gesture-handler"
+    :path: ".prebuilt-xcframeworks/.cache/RNGestureHandler"
   RNIap:
     :path: "../node_modules/react-native-iap"
   RNImageCropPicker:
@@ -3077,7 +3077,7 @@ EXTERNAL SOURCES:
   RNNotifee:
     :path: "../node_modules/@ammarahmed/notifee-react-native"
   RNReanimated:
-    :path: "../node_modules/react-native-reanimated"
+    :path: ".prebuilt-xcframeworks/.cache/RNReanimated"
   RNScreens:
     :path: ".prebuilt-xcframeworks/.cache/RNScreens"
   RNSecureRandom:
@@ -3089,7 +3089,7 @@ EXTERNAL SOURCES:
   RNTooltips:
     :path: "../node_modules/react-native-tooltips"
   RNWorklets:
-    :path: "../node_modules/react-native-worklets"
+    :path: ".prebuilt-xcframeworks/.cache/RNWorklets"
   RNZipArchive:
     :path: "../node_modules/react-native-zip-archive"
   SexyTooltip:
@@ -3114,8 +3114,8 @@ SPEC CHECKSUMS:
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
   MMKV: 7b5df6a8bf785c6705cc490c541b9d8a957c4a64
   MMKVCore: 3f40b896e9ab522452df9df3ce983471aa2449ba
-  NitroCloudUploader: 4e572f722f8a409bcfa63b7edfeea093acc8260d
-  NitroModules: 948745c245b2b3c3689dab3faf5a59e6b8903c64
+  NitroCloudUploader: 25531d66b7d3b681459118fdd9f5e4516ea5eebc
+  NitroModules: 91d3a502cd4a2cbc1aa541ea2eb0922b9dbeb58e
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCT-Folly: 0ca9fa70222c6d0fbd4365819371966a3a25140e
   RCTDeprecation: c6b36da89aa26090c8684d29c2868dcca2cd4554
@@ -3160,7 +3160,7 @@ SPEC CHECKSUMS:
   react-native-config: 963b5efabc864cf69412e54b5de49b6a23e4af03
   react-native-date-picker: 72dddb0a4b6019b11af8bf0ceefe636685921a79
   react-native-document-picker: 936a9aa901feaaa7946c4ff10bbfe1ffc991be43
-  react-native-fast-openpgp: be7c8b96c2b4c04a7c6539579378efa1bb84819e
+  react-native-fast-openpgp: 73247d6987c45d8466e0f2c9cbe23d1f4193e4f3
   react-native-fingerprint-scanner: d5e143a361f3f01858e9c45141ddcabc4fd57055
   react-native-get-random-values: d16467cf726c618e9c7a8c3c39c31faa2244bbba
   react-native-gzip: 794e0e964a0d9e1dfd1773fee938adb4d4310e26
@@ -3168,12 +3168,12 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 780fa93b4cc0090adf39c0bce451202ddfb6a9c7
   react-native-in-app-review: 1516ba69d60d58053b7eb3aaaf8d2a5a74af8b57
   react-native-keep-awake: a351e6f67006b47f316ae2b17ee8ee69386167f4
-  react-native-mmkv-storage: 8aad1f9fd2bef57e46915a9da69d60435476d9cc
+  react-native-mmkv-storage: 95c8e88dff78ea796797e17eb6ff9eae8100b9f3
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pdf: 70836b3b48595c7f85a3aa2b5d122b175c455733
-  react-native-quick-sqlite: 75a3918a579006b1cebec3b84d986003630889a5
+  react-native-quick-sqlite: 41588741c066601d29ee2fb7a295e5cf46f62d23
   react-native-restart: f2a57ccec2e6481deb1f19958ac60c0813313784
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-screenguard: 4daf8cb9c41b1c5a37c1db285832c481459ed4de
@@ -3225,19 +3225,19 @@ SPEC CHECKSUMS:
   RNDeviceInfo: bcce8752b5043a623fe3c26789679b473f705d3c
   RNExitApp: 890cce29b4e01372c84b3b775f9a63f90d77de19
   RNFileViewer: 4b5d83358214347e4ab2d4ca8d5c1c90d869e251
-  RNGestureHandler: 338509367237221ad9c06e5e44d119425bb88326
+  RNGestureHandler: 54bdb31ffda9118419f6f94f0f5733e7c42c4177
   RNIap: 61f183ac917792fae42b0326b1bef33598c1adf6
   RNImageCropPicker: 7e6bd58550bcb942bfa48847247dbf62eda20c89
   RNKeychain: ffd0513e676445c637410b47249460cbf56bc9cb
   RNLocalize: 1e6eb4290e89502c3d2193d82dfb7de14a9e672b
   RNNotifee: dea82c9ec44684eeeac9da85deb5eeb8ebe5937f
-  RNReanimated: b57b6b6f059392904afb8297ec902327a76efce5
+  RNReanimated: 24978f1215c0b226ebd0b229418ff2be84b92f80
   RNScreens: 7ca1174fd30828f7877cd993f8f0bfae66fe5c01
   RNSecureRandom: b64d263529492a6897e236a22a2c4249aa1b53dc
   RNShare: 446a4a16e416c9daf64d381ed9196c3d972e71db
   RNSVG: 22a7852b45b4fa1d6ef91ebc1f895d23f239f587
   RNTooltips: 50ff94bd2bff84ef74279c9532d008f5fdcddb95
-  RNWorklets: 26ab97114df411e404cdf5432068dff7e5414881
+  RNWorklets: 074d6a98ae7e40284344b58645882ed0a70d9a0b
   RNZipArchive: 71befbdc20e7fbd4b64552a0b324ad0e8d0efefb
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
