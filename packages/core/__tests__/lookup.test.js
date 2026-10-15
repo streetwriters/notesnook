@@ -208,6 +208,40 @@ describe("notesWithHighlighting", () => {
       expect(filtered.length).toBe(1);
     }));
 
+  test("search with a short query should not match html entities", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Tom&nbsp;&amp; Jerry &lt;3</p>"
+      }
+    }).then(async ({ db }) => {
+      for (const query of ["sp", "nb", "am", "lt"]) {
+        const filtered = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        expect(filtered.length).toBe(0);
+      }
+    }));
+
+  test("search with a short query should match text after html entities", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>a&nbsp;&amp; sp</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "sp",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+      const item = await filtered.item(0);
+      expect(item.item.content.length).toBeGreaterThan(0);
+    }));
+
   test("search should keep matches next to underlined text", () =>
     noteTest({
       title: "Test note",
