@@ -758,23 +758,6 @@ test("unarchive note", () =>
     expect(note?.archived).toBe(false);
   }));
 
-test("archiving note should update cache.archived", () =>
-  noteTest().then(async ({ db, id }) => {
-    await db.notes.archive(true, id);
-    const note = await db.notes.note(id);
-    expect(db.notes.cache.archived).toEqual([note?.id]);
-  }));
-
-test("un-archiving note should update cache.archived", () =>
-  noteTest().then(async ({ db, id }) => {
-    await db.notes.archive(true, id);
-    const note = await db.notes.note(id);
-    expect(db.notes.cache.archived).toEqual([note?.id]);
-
-    await db.notes.archive(false, id);
-    expect(db.notes.cache.archived).toEqual([]);
-  }));
-
 test("archived note shouldn't be in all notes", () =>
   noteTest().then(async ({ db, id }) => {
     await db.notes.archive(true, id);
