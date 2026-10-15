@@ -516,7 +516,7 @@ export default class Lookup {
                 eb(
                   "content.data",
                   "regexp",
-                  sql<string>`${`(^|>)[^<]*(${regex})`}`
+                  sql<string>`${`(^|>)([^<&]|&[#a-zA-Z0-9]+;)*(${regex})`}`
                 )
             )
           )
