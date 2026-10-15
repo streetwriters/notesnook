@@ -16,30 +16,40 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
+  FeatureId,
   FeatureUsage,
   formatBytes,
   getFeature,
   getFeaturesUsage
 } from "@notesnook/common";
+import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import { ScrollView } from "react-native-actions-sheet";
+import { FontSizes } from "../../../common/design/font";
+import { Spacing, Radius } from "../../../common/design/spacing";
 import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import PremiumService from "../../../services/premium";
+import SettingsService from "../../../services/settings";
+import { useUserStore } from "../../../stores/use-user-store";
 import { eCloseSheet } from "../../../utils/events";
-import { AppFontSize } from "../../../utils/size";
-import { DefaultAppStyles } from "../../../utils/styles";
+import AppIcon from "../../ui/AppIcon";
 import { Button } from "../../ui/button";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { SubscriptionPlan, SubscriptionProvider } from "@notesnook/core";
-import { useUserStore } from "../../../stores/use-user-store";
-import PremiumService from "../../../services/premium";
-import SettingsService from "../../../services/settings";
+
+const FEATURE_ICONS: Partial<Record<FeatureId, string>> = {
+  storage: "cloud",
+  colors: "palette",
+  tags: "shopping-mode",
+  notebooks: "book-open",
+  activeReminders: "bell",
+  shortcuts: "arrow-square-out"
+};
 
 export function PlanLimits() {
   const { colors } = useThemeColors();
@@ -63,46 +73,99 @@ export function PlanLimits() {
   return (
     <ScrollView
       style={{
-        paddingHorizontal: DefaultAppStyles.GAP,
         width: "100%",
-        paddingVertical: DefaultAppStyles.GAP_VERTICAL
+        paddingHorizontal: Spacing.LEVEL_3,
+        paddingVertical: Spacing.LEVEL_4
       }}
       contentContainerStyle={{
-        gap: DefaultAppStyles.GAP_VERTICAL
+        gap: Spacing.LEVEL_3
       }}
     >
-      <Heading>{strings.planLimits()}</Heading>
-
-      {featureUsage?.map((item) => (
+      <View style={{ gap: Spacing.LEVEL_3, width: "100%" }}>
         <View
-          key={item.id}
           style={{
-            gap: DefaultAppStyles.GAP_VERTICAL_SMALL,
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: Spacing.LEVEL_1,
             width: "100%"
           }}
         >
           <View
             style={{
-              flexDirection: "row",
-              width: "100%",
-              justifyContent: "space-between"
+              width: 32,
+              height: 32,
+              borderRadius: Radius.XS,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: colors.secondary.background
             }}
           >
-            <Paragraph size={AppFontSize.sm}>
-              {getFeature(item.id).title}
-            </Paragraph>
-            <Paragraph size={AppFontSize.sm}>
-              {item.total === Infinity
-                ? strings.unlimited()
-                : item.id === "storage"
-                  ? `${formatBytes(item.used)}/${formatBytes(
-                      item.total
-                    )} ${strings.used()}`
-                  : `${item.used}/${item.total} ${strings.used()}`}
+            <AppIcon
+              name="chart-donut"
+              iconFamily="notesnook"
+              size={16}
+              color={colors.primary.icon}
+            />
+          </View>
+          <View style={{ flex: 1, gap: Spacing.LEVEL_1 }}>
+            <Heading fontSize="XL" lineHeight="100%">
+              {strings.planLimits()}
+            </Heading>
+            <Paragraph fontSize="SM" color={colors.primary.paragraph}>
+              {strings.planLimitsDesc()}
             </Paragraph>
           </View>
         </View>
-      ))}
+
+        <View
+          style={{ height: 1, backgroundColor: colors.primary.separator }}
+        />
+
+        <View style={{ gap: Spacing.LEVEL_2, width: "100%" }}>
+          {featureUsage?.map((item) => (
+            <View
+              key={item.id}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%"
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: Spacing.LEVEL_1
+                }}
+              >
+                <AppIcon
+                  name={FEATURE_ICONS[item.id] || "checkbox"}
+                  iconFamily="notesnook"
+                  size={16}
+                  color={colors.secondary.icon}
+                />
+                <Paragraph fontSize="SM" color={colors.primary.paragraph}>
+                  {getFeature(item.id).title}
+                </Paragraph>
+              </View>
+              <Paragraph
+                fontFamily="MEDIUM"
+                fontSize="XS"
+                color={colors.secondary.heading}
+              >
+                {item.total === Infinity
+                  ? strings.unlimited()
+                  : item.id === "storage"
+                    ? `${formatBytes(item.used)}/${formatBytes(
+                        item.total
+                      )} ${strings.used()}`
+                    : `${item.used}/${item.total} ${strings.used()}`}
+              </Paragraph>
+            </View>
+          ))}
+        </View>
+      </View>
 
       {((user?.subscription?.provider === SubscriptionProvider.PADDLE ||
         user?.subscription?.provider === SubscriptionProvider.STREETWRITERS ||
@@ -139,10 +202,10 @@ export function PlanLimits() {
             eSendEvent(eCloseSheet);
           }}
           type="accent"
-          fontSize={AppFontSize.xs}
+          fontSize={FontSizes.MD}
           style={{
             width: "100%",
-            marginTop: DefaultAppStyles.GAP_VERTICAL
+            borderRadius: Radius.S
           }}
         />
       )}

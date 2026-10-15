@@ -84,11 +84,7 @@ const routes = {
   },
   "/login": {
     component: () => import("./views/auth"),
-    props: { route: "login:email" }
-  },
-  "/login/password": {
-    component: () => import("./views/auth"),
-    props: { route: "login:email" }
+    props: { route: "login" }
   },
   "/recover": {
     component: () => import("./views/auth"),
@@ -96,11 +92,11 @@ const routes = {
   },
   "/login/mfa/code": {
     component: () => import("./views/auth"),
-    props: { route: "login:email" }
+    props: { route: "login" }
   },
   "/login/mfa/select": {
     component: () => import("./views/auth"),
-    props: { route: "login:email" }
+    props: { route: "login" }
   },
   default: { component: () => import("./app"), props: null }
 } as const;
@@ -111,8 +107,7 @@ const sessionExpiryExceptions: Routes[] = [
   "/account/recovery",
   "/sessionexpired",
   "/login/mfa/code",
-  "/login/mfa/select",
-  "/login/password"
+  "/login/mfa/select"
 ];
 
 function getRoute(): RouteWithPath<AuthProps> | RouteWithPath {

@@ -73,7 +73,12 @@ const routeNames = {
   AddReminder: "AddReminder",
   RelationsList: "RelationsList",
   PayWall: "PayWall",
-  Wrapped: "Wrapped"
+  Wrapped: "Wrapped",
+  Attachments: "Attachments",
+  References: "References",
+  NoteHistory: "NoteHistory",
+  NotePreview: "NotePreview",
+  AddReference: "AddReference"
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<

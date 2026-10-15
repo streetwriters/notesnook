@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Text, Button } from "@theme-ui/components";
 import { ThemeUICSSObject } from "@theme-ui/core";
 import { Close, Icon } from "../icons";
 import { strings } from "@notesnook/intl";
@@ -26,6 +26,8 @@ type IconTagProps = {
   text: string;
   title?: string;
   icon: Icon;
+  iconSize?: number;
+  className?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   styles?: {
     icon?: ThemeUICSSObject;
@@ -34,6 +36,7 @@ type IconTagProps = {
   };
   testId?: string;
   highlight?: boolean;
+  selected?: boolean;
   onDismiss?: () => void;
 };
 
@@ -42,15 +45,19 @@ function IconTag(props: IconTagProps) {
     icon: Icon,
     text,
     title,
+    iconSize = 11,
+    className,
     onClick,
     onDismiss,
     styles,
     testId,
-    highlight
+    highlight,
+    selected
   } = props;
 
   return (
     <Flex
+      className={className}
       data-test-id={testId}
       onClick={(e) => {
         if (onClick) {
@@ -60,64 +67,64 @@ function IconTag(props: IconTagProps) {
       }}
       title={title || text}
       sx={{
-        borderRadius: "default",
-        border: "1px solid",
-        borderColor: "border",
-        lineHeight: "initial",
-        ":hover": onClick
-          ? {
-              bg: "hover",
-              filter: "brightness(95%)"
-            }
-          : {},
-        maxWidth: "100%",
-        px: 1,
-        // mr: 1,
-        cursor: onClick ? "pointer" : "default",
-        overflow: "hidden",
-        ...styles?.container,
-        flexShrink: 0,
         alignItems: "center",
-        justifyContent: "center"
+        backgroundColor: selected
+          ? "background-tertiary"
+          : "background-secondary",
+        borderRadius: "26px",
+        cursor: onClick ? "pointer" : "default",
+        flexShrink: 0,
+        gap: "spacing2",
+        justifyContent: "center",
+        maxWidth: "100%",
+        overflow: "hidden",
+        px: "spacing2",
+        py: "spacing1",
+        ...styles?.container
       }}
-      bg="var(--background-secondary)"
-      py="2px"
     >
       <Icon
-        size={11}
-        color={highlight ? "accent" : "icon"}
-        sx={{ ...styles?.icon, flexShrink: 0 }}
+        size={iconSize}
+        color={highlight ? "accent" : "icon-secondary"}
+        sx={{ flexShrink: 0, ...styles?.icon }}
       />
       <Text
-        variant="body"
         sx={{
-          fontSize: 11,
-          ml: "2px",
-          p: 0,
+          color: highlight ? "accent" : "paragraph",
+          fontSize: "3xs",
+          fontWeight: "medium",
+          overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
-          overflow: "hidden",
-          color: highlight ? "accent" : "paragraph",
           ...styles?.text
         }}
       >
         {text}
       </Text>
       {onDismiss && (
-        <Close
-          size={12}
-          title={strings.remove()}
+        <Button
+          variant="new_secondary"
+          sx={{
+            flexShrink: 0,
+            height: "15px",
+            width: "15px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 0,
+            border: 0,
+            ml: "spacing1",
+            borderRadius: "radius1",
+            background: "transparent"
+          }}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onDismiss();
           }}
-          sx={{
-            ml: 1,
-            ":hover": { bg: "background-error" },
-            ":hover path": { fill: "var(--icon-error) !important" }
-          }}
-        />
+        >
+          <Close size={11} title={strings.remove()} />
+        </Button>
       )}
     </Flex>
   );

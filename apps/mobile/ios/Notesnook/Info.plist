@@ -99,6 +99,7 @@
 		<string>Inter-Bold.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
 		<string>EvilIcons.ttf</string>
+		<string>notesnook-icons.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

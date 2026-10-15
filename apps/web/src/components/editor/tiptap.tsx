@@ -216,7 +216,7 @@ function TipTap(props: TipTapProps) {
       if (claim === "insertAttachment") {
         ConfirmDialog.show({
           title: strings.notLoggedIn(),
-          message: strings.loginToUploadAttachments(),
+          subtitle: strings.loginToUploadAttachments(),
           positiveButtonText: strings.okay()
         });
         return;

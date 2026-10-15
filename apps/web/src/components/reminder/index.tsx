@@ -166,9 +166,10 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
       onClick: async () => {
         ConfirmDialog.show({
           title: strings.doActions.delete.reminder(items.length),
-          message: strings.irreverisibleAction(),
+          subtitle: strings.irreverisibleAction(),
           positiveButtonText: strings.yes(),
-          negativeButtonText: strings.no()
+          negativeButtonText: strings.no(),
+          positiveButtonVariant: "new_error"
         }).then((result) => {
           result && Multiselect.moveRemindersToTrash(items);
         });

@@ -28,6 +28,7 @@ import {
   ThemeLight
 } from "@notesnook/theme";
 import { ThemesRouter } from "../common/themes-router";
+import { THEME_DARK, THEME_LIGHT } from "../common/theme";
 
 type ColorScheme = "dark" | "light";
 class ThemeStore extends BaseStore<ThemeStore> {
@@ -109,18 +110,19 @@ function getTheme(colorScheme: ColorScheme) {
 }
 
 async function updateTheme(theme: ThemeDefinition) {
-  const { id, version } = theme;
-  try {
-    const updatedTheme = await ThemesRouter.updateTheme.query({
-      compatibilityVersion: THEME_COMPATIBILITY_VERSION,
-      id,
-      version
-    });
-    if (!updatedTheme) return theme;
-    return updatedTheme;
-  } catch (e) {
-    return theme;
-  }
+  // const { id, version } = theme;
+  // try {
+  //   const updatedTheme = await ThemesRouter.updateTheme.query({
+  //     compatibilityVersion: THEME_COMPATIBILITY_VERSION,
+  //     id,
+  //     version
+  //   });
+  //   if (!updatedTheme) return theme;
+  //   return updatedTheme;
+  // } catch (e) {
+  //   return theme;
+  // }
+  return theme.colorScheme === "dark" ? THEME_DARK : THEME_LIGHT;
 }
 
 function changeDesktopTheme(theme: ThemeDefinition, system: boolean) {

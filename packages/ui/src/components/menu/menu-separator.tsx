@@ -24,11 +24,10 @@ export function MenuSeparator() {
     <Box
       as="li"
       sx={{
-        width: "94%",
-        marginLeft: "3%",
+        width: "100%",
         height: "1px",
         bg: "separator",
-        my: 1,
+        my: "spacing3",
         alignSelf: "center"
       }}
     />

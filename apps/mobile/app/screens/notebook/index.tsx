@@ -20,6 +20,7 @@ import { resolveItems } from "@notesnook/common";
 import { Note, Notebook, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -28,20 +29,20 @@ import List from "../../components/list";
 import { NotebookHeader } from "../../components/list-items/headers/notebook-header";
 import { Properties } from "../../components/properties";
 import SelectionHeader from "../../components/selection-header";
+import { Notebooks } from "../../components/sheets/notebooks";
+import { getGroupOptions } from "../../hooks/use-group-options";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { eSendEvent, eSubscribeEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore, {
   NotebookScreenParams
 } from "../../stores/use-navigation-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { eUpdateNotebookRoute } from "../../utils/events";
+import { rootNavigatorRef } from "../../utils/global-refs";
 import { findRootNotebookId } from "../../utils/notebooks";
 import { openEditor, setOnFirstSave } from "../notes/common";
-import { View } from "react-native";
-import { Notebooks } from "../../components/sheets/notebooks";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { rootNavigatorRef } from "../../utils/global-refs";
-import { getGroupOptions } from "../../hooks/use-group-options";
+import { Spacing } from "../../common/design/spacing";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
@@ -166,6 +167,7 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
         rightButton={{
           name: "dots-vertical",
           onPress: () => {
+            if (!notebook) return;
             Properties.present(notebook);
           }
         }}
@@ -180,6 +182,9 @@ const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
             route: route.name,
             items: selector
           });
+        }}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
         }}
         id={notebook?.id}
       />
