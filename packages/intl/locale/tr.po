@@ -5900,8 +5900,8 @@ msgid "Please enter your vault password to continue"
 msgstr "Devam etmek için lütfen kasa parolanızı girin"
 
 #: src/strings.ts:1440
-msgid "Please grant notifications permission to add new reminders."
-msgstr "Yeni hatırlatıcı eklemek için lütfen bildirim iznini verin."
+msgid "Please grant notifications permission to receive reminder notifications."
+msgstr "Hatırlatıcı bildirimleri almak için lütfen bildirim iznini verin."
 
 #: src/strings.ts:2510
 msgid "Please login to download attachments."
