@@ -500,10 +500,22 @@ export default class Lookup {
   ) {
     if (!queries.content?.length && !queries.title?.length) return;
 
+    // SQLite's regexp extension has no case-insensitive flag so we
+    // expand each letter into a [xX] character class instead.
     const buildRegex = (queries: string[]) =>
       queries
         .filter((q) => q && q.length > 0)
-        .map((q) => q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .map((q) =>
+          Array.from(q)
+            .map((c) => {
+              const lower = c.toLowerCase();
+              const upper = c.toUpperCase();
+              if (lower !== upper && lower.length === 1 && upper.length === 1)
+                return `[${lower}${upper}]`;
+              return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            })
+            .join("")
+        )
         .join("|");
 
     function buildTitleQuery(

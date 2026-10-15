@@ -242,6 +242,36 @@ describe("notesWithHighlighting", () => {
       expect(item.item.content.length).toBeGreaterThan(0);
     }));
 
+  test("search with a short query should be case insensitive", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>IS here</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "is",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+    }));
+
+  test("search with a short query should match titles case insensitively", () =>
+    noteTest({
+      title: "AB title",
+      content: {
+        type: "tiptap",
+        data: "<p>nothing</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "ab",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+    }));
+
   test("search should keep matches next to underlined text", () =>
     noteTest({
       title: "Test note",
