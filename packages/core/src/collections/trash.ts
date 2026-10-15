@@ -318,11 +318,7 @@ export default class Trash {
   }
 
   private async subNotebooks(notebookIds: string[]) {
-    const ids = await withSubNotebooks(
-      this.db.sql(),
-      notebookIds,
-      this.userDeletedCache.notebooks
-    )
+    const ids = await withSubNotebooks(this.db.sql(), notebookIds, "user")
       .selectFrom("subNotebooks")
       .select("id")
       .where("id", "not in", notebookIds)

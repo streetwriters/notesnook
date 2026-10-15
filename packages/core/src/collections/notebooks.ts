@@ -19,11 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getId } from "../utils/id.js";
 import Database from "../api/index.js";
-import { Notebook, TrashOrItem, isTrashItem } from "../types.js";
+import { Notebook, TrashItem, TrashOrItem, isTrashItem } from "../types.js";
 import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { DatabaseSchema, isFalse } from "../database/index.js";
-import { Kysely, sql, Transaction } from "@streetwriters/kysely";
+import {
+  ExpressionBuilder,
+  Kysely,
+  sql,
+  Transaction
+} from "@streetwriters/kysely";
 import { deleteItems } from "../utils/array.js";
 
 export class Notebooks implements ICollection {
@@ -114,16 +119,12 @@ export class Notebooks implements ICollection {
   }
 
   async totalNotes(...ids: string[]) {
-    const result = await withSubNotebooks(
-      this.db.sql(),
-      ids,
-      this.db.trash.cache.notebooks
-    )
+    const result = await withSubNotebooks(this.db.sql(), ids)
       .selectFrom("relations")
       .innerJoin("subNotebooks", "subNotebooks.id", "relations.fromId")
       .where("toType", "==", "note")
       .where("fromType", "==", "notebook")
-      .where("toId", "not in", this.db.trash.cache.notes)
+      .where((eb) => eb.not(isTrashed(eb, "notes", "relations.toId")))
       .select((eb) => [
         "subNotebooks.rootId as id",
         eb.fn.count<number>("relations.toId").distinct().as("totalNotes")
@@ -138,16 +139,12 @@ export class Notebooks implements ICollection {
   }
 
   async notes(...ids: string[]) {
-    const result = await withSubNotebooks(
-      this.db.sql(),
-      ids,
-      this.db.trash.cache.notebooks
-    )
+    const result = await withSubNotebooks(this.db.sql(), ids)
       .selectFrom("relations")
       .innerJoin("subNotebooks", "subNotebooks.id", "relations.fromId")
       .where("toType", "==", "note")
       .where("fromType", "==", "notebook")
-      .where("toId", "not in", this.db.trash.cache.notes)
+      .where((eb) => eb.not(isTrashed(eb, "notes", "relations.toId")))
       .select("relations.toId as id")
       .distinct()
       .$narrowType<{ id: string }>()
@@ -186,7 +183,9 @@ export class Notebooks implements ICollection {
               .where("toType", "==", "notebook")
               .where("fromType", "==", "notebook")
               .whereRef("toId", "==", "subNotebooks.id")
-              .where("fromId", "not in", this.db.trash.cache.notebooks)
+              .where((eb) =>
+                eb.not(isTrashed(eb, "notebooks", "relations.fromId"))
+              )
               .$narrowType<{ id: string }>()
           )
       )
@@ -222,7 +221,7 @@ export class Notebooks implements ICollection {
 
   async moveToTrash(...ids: string[]) {
     await this.db.transaction(async (tr) => {
-      const query = withSubNotebooks(tr, ids, this.db.trash.cache.notebooks)
+      const query = withSubNotebooks(tr, ids)
         .selectFrom("subNotebooks")
         .select("id");
 
@@ -255,10 +254,36 @@ export class Notebooks implements ICollection {
   }
 }
 
+/**
+ * Checks against the items table instead of binding the trashed ids
+ * because there can be more ids than the max number of SQL variables.
+ */
+function isTrashed(
+  eb: ExpressionBuilder<DatabaseSchema, "relations">,
+  table: "notes" | "notebooks",
+  column: "relations.fromId" | "relations.toId",
+  deletedBy?: TrashItem["deletedBy"]
+) {
+  return eb.exists(
+    eb
+      .selectFrom(table)
+      .select(`${table}.id`)
+      .whereRef(`${table}.id`, "==", column)
+      .where(`${table}.type`, "==", "trash")
+      .$if(!!deletedBy, (eb) =>
+        eb.where(`${table}.deletedBy`, "==", deletedBy!)
+      )
+  );
+}
+
+/**
+ * @param deletedBy only exclude trashed sub notebooks deleted by
+ * (all trashed sub notebooks are excluded by default)
+ */
 export function withSubNotebooks(
   db: Kysely<DatabaseSchema> | Transaction<DatabaseSchema>,
   ids: string[],
-  excluded: string[]
+  deletedBy?: TrashItem["deletedBy"]
 ) {
   return db.withRecursive(`subNotebooks(id, path, rootId)`, (eb) =>
     eb
@@ -285,7 +310,9 @@ export function withSubNotebooks(
           .where("toType", "==", "notebook")
           .where("fromType", "==", "notebook")
           .whereRef("fromId", "==", "subNotebooks.id")
-          .where("toId", "not in", excluded)
+          .where((eb) =>
+            eb.not(isTrashed(eb, "notebooks", "relations.toId", deletedBy))
+          )
           // Use path to prevent cycles
           .where(
             "subNotebooks.path",
