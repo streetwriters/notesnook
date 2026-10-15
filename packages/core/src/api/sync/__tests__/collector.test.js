@@ -59,6 +59,41 @@ test("synced property should be true after getting collected by the collector", 
     expect(items[1].type).toBe("note");
   }));
 
+test("note with a future dateModified should be synced after getting collected", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const collector = new Collector(db);
+    const noteId = await db.notes.add(TEST_NOTE);
+    await db
+      .sql()
+      .updateTable("notes")
+      .set({ dateModified: Date.now() + 1000 * 60 * 60 * 24 })
+      .where("id", "=", noteId)
+      .execute();
+
+    await iteratorToArray(collector.collect(100, false));
+
+    expect(await collector.hasUnsyncedChanges()).toBe(false);
+  }));
+
+test("note modified while being collected should stay unsynced", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const collector = new Collector(db);
+    const noteId = await db.notes.add(TEST_NOTE);
+
+    for await (const _ of collector.collect(100, false)) {
+      await db
+        .sql()
+        .updateTable("notes")
+        .set({ title: "Edited", dateModified: Date.now() + 1, synced: false })
+        .where("id", "=", noteId)
+        .execute();
+    }
+
+    expect(await collector.hasUnsyncedChanges()).toBe(true);
+  }));
+
 test("edited note should get included in collector", () =>
   databaseTest().then(async (db) => {
     await loginFakeUser(db);
