@@ -117,7 +117,7 @@ export const THEME_LIGHT: any = {
         icon: "#F23E46",
         separator: "#E8E8E8",
         placeholder: "#a9a9a9",
-        hover: "#00000010",
+        hover: "#DA392D",
         backdrop: "#0000001a"
       },
       success: {
