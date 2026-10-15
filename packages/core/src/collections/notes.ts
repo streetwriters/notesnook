@@ -157,7 +157,7 @@ export class Notes implements ICollection {
         const titleFormat = this.db.settings.getTitleFormat();
         if (
           item.isGeneratedTitle &&
-          HEADLINE_REGEX.test(titleFormat) &&
+          titleFormat.includes("$headline$") &&
           headlineTitle &&
           currentNoteTitleFields?.title !== headlineTitle
         ) {

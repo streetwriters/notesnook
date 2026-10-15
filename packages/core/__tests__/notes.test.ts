@@ -184,6 +184,32 @@ test("note title with headline format should keep generating headline title unti
     expect(note?.title).toBe("not delicious anymore");
   }));
 
+test("note title with headline format should update on every headline change", () =>
+  noteTest().then(async ({ db }) => {
+    await db.settings.setTitleFormat("$headline$");
+    const id = await db.notes.add({
+      content: { type: TEST_NOTE.content.type, data: "<p>first</p>" }
+    });
+
+    // headline unchanged: should not affect the next title update
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>first</p><p>body</p>"
+      }
+    });
+    expect((await db.notes.note(id))?.title).toBe("first");
+
+    for (const headline of ["second", "third", "fourth"]) {
+      await db.notes.add({
+        id,
+        content: { type: TEST_NOTE.content.type, data: `<p>${headline}</p>` }
+      });
+      expect((await db.notes.note(id))?.title).toBe(headline);
+    }
+  }));
+
 [
   ["simple p tag", "<p>headline</p>", "headline"],
   ["across multiple tags", "<h1>title</h1><ol><li>list</li></ol>", "title"],
