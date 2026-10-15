@@ -193,6 +193,21 @@ describe("notesWithHighlighting", () => {
       expect(item.item.content.length).toBeGreaterThan(0);
     }));
 
+  test("search should match text before the first tag", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "Hello world<p>second line</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "wo",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+    }));
+
   test("search should keep matches next to underlined text", () =>
     noteTest({
       title: "Test note",

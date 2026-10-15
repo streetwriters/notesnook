@@ -528,7 +528,7 @@ export default class Lookup {
       eb: Kysely<DatabaseSchema> | ExpressionBuilder<DatabaseSchema, never>,
       queries: string[]
     ) {
-      const regex = `>[^<]*(${buildRegex(queries)})`;
+      const regex = `(^|>)[^<]*(${buildRegex(queries)})`;
       return eb
         .selectFrom("content")
         .where("content.locked", "!=", true)
