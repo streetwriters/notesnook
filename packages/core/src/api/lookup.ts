@@ -513,7 +513,11 @@ export default class Lookup {
                     .select("noteId")
                 ),
               (regex) =>
-                eb("content.data", "regexp", sql<string>`${`>[^<]*(${regex})`}`)
+                eb(
+                  "content.data",
+                  "regexp",
+                  sql<string>`${`(^|>)[^<]*(${regex})`}`
+                )
             )
           )
           .select([
