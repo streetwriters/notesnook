@@ -385,3 +385,29 @@ test("permanently deleted note should not have note fields", () =>
       "synced"
     ]);
   }));
+
+test("trash list should be sorted globally across batches", () =>
+  databaseTest().then(async (db) => {
+    const ids: string[] = [];
+    for (let i = 0; i < 510; i++)
+      ids.push(await db.notes.add({ title: `${510 - i}` }));
+    await db.trash.add("note", ids);
+    // app-deleted items are hidden from the list & must not affect headers
+    await db.trash.add("note", [await db.notes.add({ title: "zzz" })], "app");
+
+    const grouping = await db.trash.grouped({
+      groupBy: "abc",
+      sortBy: "title",
+      sortDirection: "asc"
+    });
+    const titles: string[] = [];
+    for (let i = 0; i < grouping.length; i++)
+      titles.push((await grouping.item(i)).item!.title);
+    expect(titles).toStrictEqual(
+      Array.from({ length: 510 }, (_, i) => `${i + 1}`)
+    );
+
+    for (const { index, group } of await grouping.groups!()) {
+      expect((await grouping.item(index)).group?.title).toBe(group.title);
+    }
+  }));

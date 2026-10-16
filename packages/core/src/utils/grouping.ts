@@ -59,16 +59,17 @@ export const getSortValue = (
   return item.dateCreated || 0;
 };
 
+const collator = new Intl.Collator(undefined, { numeric: true });
+
 export function getSortSelectors<T extends PartialGroupableItem>(
   options: SortOptions
 ) {
-  if (options.sortBy === "title")
+  if (options.sortBy === "title") {
     return {
-      asc: (a: T, b: T) =>
-        getTitle(a).localeCompare(getTitle(b), undefined, { numeric: true }),
-      desc: (a: T, b: T) =>
-        getTitle(b).localeCompare(getTitle(a), undefined, { numeric: true })
+      asc: (a: T, b: T) => collator.compare(getTitle(a), getTitle(b)),
+      desc: (a: T, b: T) => collator.compare(getTitle(b), getTitle(a))
     };
+  }
 
   return {
     asc: (a: T, b: T) => getSortValue(options, a) - getSortValue(options, b),
