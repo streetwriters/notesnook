@@ -58,3 +58,45 @@ test("remove orphaned attachments should remove only orphaned attachments", () =
     expect(await db.attachments.exists(hash1)).toBe(true);
     expect(await db.attachments.orphaned.count()).toBe(0);
   }));
+
+async function addFakeAttachment(
+  db: Awaited<ReturnType<typeof databaseTest>>,
+  hash: string,
+  mimeType: string
+) {
+  return db.attachments.add({
+    hash,
+    mimeType,
+    size: 10,
+    filename: hash,
+    iv: "iv",
+    salt: "salt",
+    alg: "xcha-stream",
+    hashType: "blake3",
+    chunkSize: 512,
+    key: await db.attachments.generateKey()
+  });
+}
+
+test("documents filter matches office documents", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const noteId = await db.notes.add({ title: "note" });
+    for (const [hash, mimeType] of [
+      [
+        "docx",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ],
+      ["pdf", "application/pdf"],
+      ["png", "image/png"]
+    ]) {
+      const id = await addFakeAttachment(db, hash, mimeType);
+      await db.relations.add(
+        { type: "note", id: noteId! },
+        { type: "attachment", id: id! }
+      );
+    }
+
+    expect(await db.attachments.documents.count()).toBe(2);
+    expect(await db.attachments.ofNote(noteId!, "documents").count()).toBe(2);
+  }));

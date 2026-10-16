@@ -66,3 +66,15 @@ test("parentId() returns undefined if notebook is not a subnotebook", () =>
   notebookTest().then(async ({ db, id }) => {
     expect(await db.notebooks.parentId(id)).toBeUndefined();
   }));
+
+test("total notes of a notebook excludes archived notes", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const noteId = await db.notes.add({ title: "note" });
+    await db.notes.addToNotebook(id, noteId);
+    await db.notes.archive(true, noteId);
+
+    expect(await db.notebooks.totalNotes(id)).toStrictEqual([0]);
+    expect(
+      await db.relations.from({ type: "notebook", id }, "note").count()
+    ).toBe(0);
+  }));

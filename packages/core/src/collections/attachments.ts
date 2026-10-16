@@ -31,8 +31,8 @@ import { Output } from "../interfaces.js";
 import { Attachment } from "../types.js";
 import Database from "../api/index.js";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
-import { isFalse } from "../database/index.js";
-import { sql } from "@streetwriters/kysely";
+import { DatabaseSchema, isFalse } from "../database/index.js";
+import { ExpressionBuilder, sql } from "@streetwriters/kysely";
 import { logger } from "../logger.js";
 
 export class Attachments implements ICollection {
@@ -317,7 +317,7 @@ export class Attachments implements ICollection {
               filters.push(eb("mimeType", "like", `audio/%`));
 
             if (types.includes("documents"))
-              filters.push(eb("mimeType", "in", DocumentMimeTypes));
+              filters.push(isDocumentMimeType(eb));
 
             if (types.includes("webclips"))
               filters.push(
@@ -520,8 +520,7 @@ export class Attachments implements ICollection {
 
   get documents() {
     return this.collection.createFilter<Attachment>(
-      (qb) =>
-        qb.where(isFalse("deleted")).where("mimeType", "in", DocumentMimeTypes),
+      (qb) => qb.where(isFalse("deleted")).where(isDocumentMimeType),
       this.db.options?.batchSize
     );
   }
@@ -634,4 +633,14 @@ function getAttachmentType(attachment: Attachment) {
     return "webclip";
   else if (attachment.mimeType.startsWith("image/")) return "image";
   else return "generic";
+}
+
+// DocumentMimeTypes holds prefixes (e.g. docx is
+// application/vnd.openxmlformats-officedocument.wordprocessingml.document)
+function isDocumentMimeType(
+  eb: ExpressionBuilder<DatabaseSchema, "attachments">
+) {
+  return eb.or(
+    DocumentMimeTypes.map((mimeType) => eb("mimeType", "like", `${mimeType}%`))
+  );
 }
