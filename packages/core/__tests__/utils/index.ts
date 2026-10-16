@@ -52,6 +52,9 @@ function databaseTest(type: "memory" | "persistent" = "memory") {
   const betterSqliteDb = BetterSQLite3(
     type === "persistent" ? dbPath : ":memory:"
   ).unsafeMode(true);
+  betterSqliteDb.function("natural_key", (str: string | null) =>
+    str ? str.replace(/\d+/g, (n) => n.padStart(10, "0")) : ""
+  );
   db.setup({
     storage: new NodeStorageInterface(),
     eventsource: EventSource,
