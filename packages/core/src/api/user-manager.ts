@@ -52,7 +52,7 @@ class UserManager {
   private keyManager: KeyManager;
   constructor(private readonly db: Database) {
     this.keyManager = new KeyManager(db);
-    this.tokenManager = new TokenManager(db.kv, db.eventManager);
+    this.tokenManager = db.tokenManager;
 
     EV.subscribe(EVENTS.userUnauthorized, async (url: string) => {
       if (url.includes("/connect/token") || !(await HealthCheck.auth())) return;
