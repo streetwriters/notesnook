@@ -428,28 +428,36 @@ export class Sync {
       return;
     }
 
-    const collection = this.db[collectionType].collection;
-    const localItems = await collection.records(chunk.items.map((i) => i.id));
-    let items: (MaybeDeletedItem<Item> | undefined)[] = [];
-    if (itemType === "content") {
-      items = deserialized.map((item) =>
-        this.merger.mergeContent(item, localItems[item.id])
+    // read, merge & write in one transaction so a local edit can't land
+    // in between and get overwritten by a merge based on a stale local item
+    const items = await this.db.transaction(async (tx) => {
+      const collection = tx[collectionType].collection;
+      const localItems = await collection.records(
+        chunk.items.map((i) => i.id)
       );
-    } else {
-      items =
-        itemType === "attachment"
-          ? await Promise.all(
-              deserialized.map((item) =>
-                this.merger.mergeAttachment(
-                  item as MaybeDeletedItem<Attachment>,
-                  localItems[item.id] as MaybeDeletedItem<Attachment>
+      let items: (MaybeDeletedItem<Item> | undefined)[] = [];
+      if (itemType === "content") {
+        items = deserialized.map((item) =>
+          this.merger.mergeContent(item, localItems[item.id])
+        );
+      } else {
+        items =
+          itemType === "attachment"
+            ? await Promise.all(
+                deserialized.map((item) =>
+                  this.merger.mergeAttachment(
+                    item as MaybeDeletedItem<Attachment>,
+                    localItems[item.id] as MaybeDeletedItem<Attachment>
+                  )
                 )
               )
-            )
-          : deserialized.map((item) =>
-              this.merger.mergeItem(item, localItems[item.id])
-            );
-    }
+            : deserialized.map((item) =>
+                this.merger.mergeItem(item, localItems[item.id])
+              );
+      }
+      await collection.put(items as any);
+      return items;
+    });
 
     if (itemType === "note" || itemType === "content") {
       items.forEach((item) =>
@@ -472,7 +480,6 @@ export class Sync {
     this.logger.debug(`Merged ${items.length} items for type ${itemType}`, {
       ids: items.map((i) => i?.id)
     });
-    await collection.put(items as any);
   }
 
   private async pushItem(deviceId: string, item: SyncTransferItem) {
