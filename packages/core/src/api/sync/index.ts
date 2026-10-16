@@ -290,6 +290,8 @@ export class Sync {
         this.logger.error(
           new Error(`Failed to send batch. Server returned falsy response.`)
         );
+        // stop here so the collector doesn't mark the rejected items as synced
+        break;
       }
     }
     this.logger.info(
