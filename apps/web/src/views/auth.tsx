@@ -52,7 +52,7 @@ import Config from "../utils/config";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { useTimer } from "../hooks/use-timer";
-import { AuthErrorText } from "../components/error-text";
+import { ErrorText } from "../components/error-text";
 import isEmail from "validator/lib/isEmail";
 import { AuthenticatorType, User } from "@notesnook/core";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
@@ -1363,7 +1363,7 @@ export function SubmitButton(props: SubmitButtonProps) {
   const { error } = useContext(AuthFormContext);
   return (
     <>
-      <AuthErrorText error={error} sx={{ mt: "spacing4", p: 0 }} />
+      <ErrorText error={error} sx={{ mt: "spacing4", p: 0 }} />
       <Button
         data-test-id="submitButton"
         type="submit"
