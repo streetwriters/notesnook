@@ -145,3 +145,22 @@ describe("sort tags by", () => {
       }));
   }
 });
+
+test("stream & iterate should not stop early when dateCreated is null", () =>
+  databaseTest().then(async (db) => {
+    for (let i = 0; i < 25; ++i) await db.tags.add({ title: `tag${i}` });
+    await db
+      .sql()
+      .updateTable("tags")
+      .set({ dateCreated: null as unknown as number })
+      .execute();
+
+    const streamed = [];
+    for await (const tag of db.tags.collection.stream(10)) streamed.push(tag);
+    expect(streamed).toHaveLength(25);
+
+    const iterated = [];
+    const selector = db.tags.collection.createFilter((qb) => qb, 10);
+    for await (const tag of selector.iterate()) iterated.push(tag);
+    expect(iterated).toHaveLength(25);
+  }));
