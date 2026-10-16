@@ -109746,7 +109746,7 @@ diff --git a/node_modules/react-native-quick-sqlite/cpp/sqliteBridge.cpp b/node_
 index 9ffe010..4a6f18f 100644
 --- a/node_modules/react-native-quick-sqlite/cpp/sqliteBridge.cpp
 +++ b/node_modules/react-native-quick-sqlite/cpp/sqliteBridge.cpp
-@@ -20,6 +20,38 @@
+@@ -20,6 +20,36 @@
  using namespace std;
  using namespace facebook;
  
@@ -109783,7 +109783,7 @@ index 9ffe010..4a6f18f 100644
  map<string, sqlite3 *> dbMap = map<string, sqlite3 *>();
  
  bool folder_exists(const std::string &foldername)
-@@ -90,12 +122,18 @@ SQLiteOPResult sqliteOpenDb(string const dbName, string const docPath)
+@@ -90,12 +120,18 @@ SQLiteOPResult sqliteOpenDb(string const dbName, string const docPath)
    int exit = 0;
    exit = sqlite3_open_v2(dbPath.c_str(), &db, sqlOpenFlags, nullptr);
  
@@ -109805,7 +109805,7 @@ index 9ffe010..4a6f18f 100644
    }
    else
    {
-@@ -103,9 +112,8 @@ SQLiteOPResult sqliteOpenDb(string const dbName, string const docPath)
+@@ -103,9 +139,8 @@ SQLiteOPResult sqliteOpenDb(string const dbName, string const docPath)
    }
  
    return SQLiteOPResult{
