@@ -244,4 +244,48 @@ describe("notesWithHighlighting", () => {
       expect(await bothTagResults.ids()).toEqual([note1Id, note2Id]);
       expect(await selector.ids()).toEqual([note1Id, note2Id, note3Id]);
     }));
+
+  test("tagged:false and colored:false should only return untagged and uncolored notes", () =>
+    databaseTest().then(async (db) => {
+      const taggedNoteId = await db.notes.add({ title: "tagged note" });
+      const coloredNoteId = await db.notes.add({ title: "colored note" });
+      const plainNoteId = await db.notes.add({ title: "plain note" });
+      const tagId = await db.tags.add({ title: "daily" });
+      const colorId = await db.colors.add({
+        title: "red",
+        colorCode: "#ff0000"
+      });
+      await db.relations.add(
+        { id: tagId, type: "tag" },
+        { id: taggedNoteId, type: "note" }
+      );
+      await db.relations.add(
+        { id: colorId, type: "color" },
+        { id: coloredNoteId, type: "note" }
+      );
+
+      const selector = db.notes.all;
+
+      const tagged = await db.lookup.notesWithHighlighting(
+        "tagged:true",
+        selector
+      );
+      expect(await tagged.ids()).toEqual([taggedNoteId]);
+      const untagged = await db.lookup.notesWithHighlighting(
+        "tagged:false",
+        selector
+      );
+      expect(await untagged.ids()).toEqual([coloredNoteId, plainNoteId]);
+
+      const colored = await db.lookup.notesWithHighlighting(
+        "colored:true",
+        selector
+      );
+      expect(await colored.ids()).toEqual([coloredNoteId]);
+      const uncolored = await db.lookup.notesWithHighlighting(
+        "colored:false",
+        selector
+      );
+      expect(await uncolored.ids()).toEqual([taggedNoteId, plainNoteId]);
+    }));
 });
