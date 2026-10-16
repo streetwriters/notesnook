@@ -326,6 +326,24 @@ test("sync should correctly select key based on keyVersion", () =>
     }
   }));
 
+test("chunks rejected by the server should not be marked as synced", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const { Sync } = await import("../index.ts");
+    const sync = new Sync(db);
+    sync.uploadAttachments = async () => {};
+    sync.pushItem = async () => false;
+
+    const noteId = await db.notes.add(TEST_NOTE);
+
+    await expect(sync.send("device")).rejects.toThrow(
+      /Failed to send all items/
+    );
+
+    expect((await db.notes.note(noteId)).synced).toBe(false);
+    expect(await new Collector(db).hasUnsyncedChanges()).toBe(true);
+  }));
+
 async function iteratorToArray(iterator) {
   let items = [];
   for await (const item of iterator) {
