@@ -24,6 +24,7 @@ import {
   TEST_NOTEBOOK2,
   databaseTest
 } from "./utils/index.ts";
+import { getId } from "../src/utils/id.ts";
 import { test, expect, describe } from "vitest";
 
 const content = {
@@ -44,6 +45,40 @@ test("search notes", () =>
 
     expect(await db.lookup.notes("note of the world").ids()).toHaveLength(1);
     expect(await db.lookup.notes("hb kb ch").ids()).toHaveLength(1);
+  }));
+
+test("search notes should exclude trashed notes when there are too many", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add({ title: "hello visible" });
+    const now = Date.now();
+    // more than SQLite's max number of SQL variables (32766)
+    for (let i = 0; i < 33000; i += 500) {
+      await db
+        .sql()
+        .insertInto("notes")
+        .values(
+          Array.from({ length: 500 }, () => ({
+            id: getId(),
+            type: "trash",
+            itemType: "note",
+            deletedBy: "user",
+            dateDeleted: now,
+            title: "hello trashed",
+            dateCreated: now,
+            dateEdited: now,
+            dateModified: now
+          }))
+        )
+        .execute();
+    }
+    await db.trash.buildCache();
+
+    expect(await db.lookup.notes("hello").ids()).toEqual([noteId]);
+    const results = await db.lookup.notesWithHighlighting(
+      "hello",
+      db.notes.all
+    );
+    expect(results.length).toBe(1);
   }));
 
 test("search notes (remove diacritics)", () =>

@@ -390,21 +390,11 @@ class RelationsArray<TType extends keyof RelatableTable> {
               ? this.reference.ids
               : this.reference.id
           )
-          .$if(
-            !!this.types?.includes("note" as TType) &&
-              this.db.trash.cache.notes.length > 0,
-            (b) => b.where("fromId", "not in", this.db.trash.cache.notes)
-          )
-          .$if(
-            !!this.types?.includes("note" as TType) &&
-              this.db.notes.cache.archived.length > 0 &&
-              this.reference.type !== "attachment",
-            (b) => b.where("fromId", "not in", this.db.notes.cache.archived)
-          )
-          .$if(
-            !!this.types?.includes("notebook" as TType) &&
-              this.db.trash.cache.notebooks.length > 0,
-            (b) => b.where("fromId", "not in", this.db.trash.cache.notebooks)
+          .$call(
+            this.excludeHidden(
+              "relations.fromId",
+              this.reference.type !== "attachment"
+            )
           )
           .select("relations.fromId as id")
           .$narrowType<{ id: string }>();
@@ -425,25 +415,59 @@ class RelationsArray<TType extends keyof RelatableTable> {
               ? this.reference.ids
               : this.reference.id
           )
-          .$if(
-            !!this.types?.includes("note" as TType) &&
-              this.db.trash.cache.notes.length > 0,
-            (b) => b.where("toId", "not in", this.db.trash.cache.notes)
-          )
-          .$if(
-            !!this.types?.includes("note" as TType) &&
-              this.db.notes.cache.archived.length > 0,
-            (b) => b.where("toId", "not in", this.db.notes.cache.archived)
-          )
-          .$if(
-            !!this.types?.includes("notebook" as TType) &&
-              this.db.trash.cache.notebooks.length > 0,
-            (b) => b.where("toId", "not in", this.db.trash.cache.notebooks)
-          )
+          .$call(this.excludeHidden("relations.toId", true))
           .select("relations.toId as id")
           .$narrowType<{ id: string }>();
       }
     };
+  }
+
+  /**
+   * Exclude relations to trashed notes & notebooks (and archived notes).
+   * We check against the items table instead of binding the ids because
+   * there can be more ids than the max number of SQL variables.
+   */
+  private excludeHidden(
+    column: "relations.fromId" | "relations.toId",
+    excludeArchived: boolean
+  ) {
+    return (
+      builder: SelectQueryBuilder<DatabaseSchema, "relations", unknown>
+    ) =>
+      builder
+        .$if(!!this.types?.includes("note" as TType), (b) =>
+          b.where((eb) =>
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("notes")
+                  .select("notes.id")
+                  .whereRef("notes.id", "==", column)
+                  .where((eb) =>
+                    excludeArchived
+                      ? eb.or([
+                          eb("notes.type", "==", "trash"),
+                          eb("notes.archived", "==", true)
+                        ])
+                      : eb("notes.type", "==", "trash")
+                  )
+              )
+            )
+          )
+        )
+        .$if(!!this.types?.includes("notebook" as TType), (b) =>
+          b.where((eb) =>
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("notebooks")
+                  .select("notebooks.id")
+                  .whereRef("notebooks.id", "==", column)
+                  .where("notebooks.type", "==", "trash")
+              )
+            )
+          )
+        );
   }
 }
 
