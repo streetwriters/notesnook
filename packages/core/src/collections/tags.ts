@@ -31,7 +31,6 @@ export class Tags implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "tags",
       db.eventManager,
       db.sanitizer
@@ -88,9 +87,9 @@ export class Tags implements ICollection {
   }
 
   async remove(...ids: string[]) {
-    await this.db.transaction(async () => {
-      await this.db.relations.unlinkOfType("tag", ids);
-      await this.collection.softDelete(ids);
+    await this.db.transaction(async (tx) => {
+      await tx.relations.unlinkOfType("tag", ids);
+      await tx.tags.collection.softDelete(ids);
     });
   }
 

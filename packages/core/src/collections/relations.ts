@@ -38,7 +38,6 @@ export class Relations implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "relations",
       db.eventManager,
       db.sanitizer

@@ -22,8 +22,12 @@ import { isCipher } from "../utils/crypto.js";
 import { FilteredSelector, SQLCollection } from "../database/sql-collection.js";
 import { HistorySession, isDeleted, Note, NoteContent } from "../types.js";
 import { makeSessionContentId } from "../utils/id.js";
+import { logger } from "../logger.js";
+import { sql } from "@streetwriters/kysely";
 import { ICollection } from "./collection.js";
 import { SessionContent } from "./session-content.js";
+
+const CLEANUP_INTERVAL = 60 * 60 * 1000;
 
 export class NoteHistory implements ICollection {
   name = "notehistory";
@@ -33,7 +37,6 @@ export class NoteHistory implements ICollection {
     this.sessionContent = new SessionContent(db);
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "notehistory",
       db.eventManager,
       db.sanitizer
@@ -43,6 +46,9 @@ export class NoteHistory implements ICollection {
   async init() {
     await this.collection.init();
     await this.sessionContent.init();
+
+    // run cleanup once for logged out users
+    if (!(await this.db.user.getUser())) this.cleanupInBackground();
   }
 
   // async get(noteId: string, order: "asc" | "desc" = "desc") {
@@ -102,36 +108,49 @@ export class NoteHistory implements ICollection {
 
     await this.sessionContent.add(sessionId, content, locked);
 
-    await this.cleanup(noteId);
-
     return sessionId;
   }
 
-  private async cleanup(noteId: string, limit?: number) {
-    limit = limit || (await this.db.options.maxNoteVersions());
+  private cleaning?: Promise<void>;
+  private lastCleanup = 0;
+  /**
+   * Trims the history of every note to the limit of the user's plan without
+   * blocking the caller. It runs at most once an hour and never twice at the
+   * same time. Call it when the plan is known to be up to date.
+   */
+  cleanupInBackground() {
+    if (this.cleaning || Date.now() - this.lastCleanup < CLEANUP_INTERVAL)
+      return this.cleaning;
+
+    this.lastCleanup = Date.now();
+    this.cleaning = this.cleanup()
+      .catch((e) => logger.error(e, "Failed to clean up note history"))
+      .finally(() => (this.cleaning = undefined));
+    return this.cleaning;
+  }
+
+  async cleanup() {
+    const limit = await this.db.options.maxNoteVersions();
     if (!limit) return;
-    const history = await this.db
-      .sql()
-      .selectFrom("notehistory")
-      .where("noteId", "==", noteId)
-      .orderBy(`dateModified desc`)
-      .select(["id", "sessionContentId"])
-      .offset(limit)
-      .limit(10)
-      .$narrowType<{ id: string; sessionContentId: string }>()
-      .execute();
 
-    for (const session of history) {
-      await this._remove(session);
-    }
+    await this.db.transaction(async (tx) => {
+      const overLimit = sql`(
+        SELECT id, sessionContentId FROM (
+          SELECT id, sessionContentId, row_number() OVER (
+            PARTITION BY noteId ORDER BY dateModified DESC
+          ) AS position
+          FROM notehistory
+        ) WHERE position > ${limit}
+      )`;
 
-    // const history = await this.get(noteId, "asc");
-    // if (history.length === 0 || history.length < limit) return;
-    // const deleteCount = history.length - limit;
-    // for (let i = 0; i < deleteCount; i++) {
-    //   const session = history[i];
-    //   await this._remove(session);
-    // }
+      // the contents have to go first, they are found through the sessions
+      await sql`DELETE FROM sessioncontent WHERE id IN (
+        SELECT sessionContentId FROM ${overLimit}
+      )`.execute(tx.sql());
+      await sql`DELETE FROM notehistory WHERE id IN (
+        SELECT id FROM ${overLimit}
+      )`.execute(tx.sql());
+    });
   }
 
   async content(sessionId: string) {
@@ -153,14 +172,14 @@ export class NoteHistory implements ICollection {
   }
 
   async clearSessions(...noteIds: string[]) {
-    await this.db.transaction(async () => {
-      const deletedIds = await this.db
+    await this.db.transaction(async (tx) => {
+      const deletedIds = await tx
         .sql()
         .deleteFrom("notehistory")
         .where("noteId", "in", noteIds)
         .returning("sessionContentId as sessionContentId")
         .execute();
-      await this.db
+      await tx
         .sql()
         .deleteFrom("sessioncontent")
         .where(
@@ -177,8 +196,10 @@ export class NoteHistory implements ICollection {
   }
 
   private async _remove(session: { id: string; sessionContentId: string }) {
-    await this.collection.delete([session.id]);
-    await this.sessionContent.remove(session.sessionContentId);
+    await this.db.transaction(async (tx) => {
+      await tx.noteHistory.collection.delete([session.id]);
+      await tx.noteHistory.sessionContent.remove(session.sessionContentId);
+    });
   }
 
   async restore(sessionId: string) {

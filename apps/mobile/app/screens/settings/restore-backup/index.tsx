@@ -157,7 +157,8 @@ const restoreBackup = async (options: {
 
       let count = 0;
       const skippedAttachments = new Set<string>();
-      await db.transaction(async () => {
+      // all files are restored or none
+      await db.transaction(async (tx) => {
         let passwordOrKey: PasswordOrKey | undefined = undefined;
         for (const path of extractedBackupFiles) {
           if (path === ".nnbackup" || path === "attachments") continue;
@@ -187,7 +188,7 @@ const restoreBackup = async (options: {
             throw new Error(strings.failedToDecryptBackup());
           }
 
-          const skipped = await db.backup.import(backup, {
+          const skipped = await tx.backup.import(backup, {
             ...passwordOrKey,
             attachmentsKey: attachmentsKey
           });
@@ -255,11 +256,11 @@ const restoreBackup = async (options: {
         throw new Error(strings.failedToDecryptBackup());
       }
 
-      await db.transaction(async () => {
-        updateProgress({
-          progress: strings.restoringBackup()
-        });
-        await db.backup.import(backup, {
+      updateProgress({
+        progress: strings.restoringBackup()
+      });
+      await db.transaction(async (tx) => {
+        await tx.backup.import(backup, {
           encryptionKey,
           password
         });
@@ -547,7 +548,8 @@ const BackupItem = ({
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >
-          {strings.createdOn()} {getFormattedDate(item?.lastModified, "date-time")}
+          {strings.createdOn()}{" "}
+          {getFormattedDate(item?.lastModified, "date-time")}
           {isLegacyBackup ? ` ${strings.legacyBackup()}` : ""} (
           {formatBytes((item as ReactNativeBlobUtilStat).size)})
         </Paragraph>

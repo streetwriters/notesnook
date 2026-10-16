@@ -319,7 +319,8 @@ export async function restoreBackupFile(backupFile: File) {
             "The backup file does not contain the verification .nnbackup file."
           );
 
-        await db.transaction(async () => {
+        // all files are restored or none
+        await db.transaction(async (tx) => {
           for (const entry of entries) {
             const backup = JSON.parse(await entry.text());
             if (backup.encrypted) {
@@ -327,7 +328,7 @@ export async function restoreBackupFile(backupFile: File) {
                 const result = await BackupPasswordDialog.show({
                   validate: async ({ password, key: encryptionKey }) => {
                     if (!password && !encryptionKey) return false;
-                    const skipped = await db.backup?.import(backup, {
+                    const skipped = await tx.backup?.import(backup, {
                       password,
                       encryptionKey,
                       attachmentsKey
@@ -338,17 +339,17 @@ export async function restoreBackupFile(backupFile: File) {
                     return true;
                   }
                 });
-                if (!result) break;
+                if (!result) throw new Error(strings.failedToDecryptBackup());
               } else
                 (
-                  await db.backup?.import(backup, {
+                  await tx.backup?.import(backup, {
                     password: cachedPassword,
                     encryptionKey: cachedKey,
                     attachmentsKey
                   })
                 )?.forEach((hash) => skippedAttachments.add(hash));
             } else {
-              (await db.backup?.import(backup, { attachmentsKey }))?.forEach(
+              (await tx.backup?.import(backup, { attachmentsKey }))?.forEach(
                 (hash) => skippedAttachments.add(hash)
               );
             }
