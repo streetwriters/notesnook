@@ -221,6 +221,54 @@ describe("format reminder time", () => {
     expect(formatReminderTime(reminder)).toBe("Upcoming: Today, 09:00 PM");
   });
 
+  test.each([
+    // [now, selectedDays, expected]
+    [new Date(2026, 3, 15, 5), [31], new Date(2026, 3, 30, 9)],
+    [new Date(2026, 3, 30, 10), [31], new Date(2026, 4, 31, 9)],
+    [new Date(2026, 0, 31, 10), [31], new Date(2026, 1, 28, 9)],
+    [new Date(2026, 0, 31, 10), [30, 31], new Date(2026, 1, 28, 9)],
+    [new Date(2026, 1, 20, 5), [15, 30], new Date(2026, 1, 28, 9)]
+  ])(
+    "monthly reminder [day beyond month length] (now: %s, days: %s)",
+    async (now, selectedDays, expected) => {
+      MockDate.set(now);
+      const reminder = {
+        recurringMode: "month",
+        date: new Date(0).setHours(9),
+        selectedDays,
+        mode: "repeat",
+        title: "Random reminder"
+      };
+
+      expect(getUpcomingReminderTime(reminder)).toBe(expected.getTime());
+      expect(await compareReminder(reminder)).toBe(true);
+    }
+  );
+
+  test.each([
+    // [recurringMode, selectedDays, expected]
+    ["month", [15, 5], new Date(2026, 3, 5, 9)],
+    ["month", [2, 1], new Date(2026, 4, 1, 9)],
+    ["week", [6, 5], new Date(2026, 3, 3, 9)],
+    ["week", [2, 1], new Date(2026, 3, 6, 9)]
+  ])(
+    "%sly reminder [unsorted selected days: %s]",
+    async (recurringMode, selectedDays, expected) => {
+      // Fri, 3 Apr 2026
+      MockDate.set(new Date(2026, 3, 3, 5));
+      const reminder = {
+        recurringMode,
+        date: new Date(0).setHours(9),
+        selectedDays,
+        mode: "repeat",
+        title: "Random reminder"
+      };
+
+      expect(await compareReminder(reminder)).toBe(true);
+      expect(getUpcomingReminderTime(reminder)).toBe(expected.getTime());
+    }
+  );
+
   test("today", async () => {
     const reminder = {
       date: new Date(2022, 5, 6, 8, 5).getTime(),
@@ -366,6 +414,69 @@ test("sorting reminders by dateEdited shouldn't throw", () =>
         .then((g) => g.item(0))
     ).resolves.toBeDefined();
   }));
+
+test("upcoming reminder time matches between js & sql", async () => {
+  const db = await databaseTest();
+  // simple seeded rng so failures are reproducible
+  let seed = 42;
+  const random = (n) => {
+    seed = (seed * 1103515245 + 12345) % 2147483648;
+    return (seed >>> 8) % n;
+  };
+
+  const mismatches = [];
+  for (let i = 0; i < 500; i++) {
+    const recurringMode = ["day", "week", "month", "year"][random(4)];
+    const now = new Date(
+      2024 + random(3),
+      random(12),
+      1 + random(31),
+      random(24),
+      random(60)
+    );
+    MockDate.set(now);
+
+    const selectedDays = Array.from({ length: random(4) }, () =>
+      recurringMode === "week" ? random(7) : 1 + random(31)
+    );
+    const reminder = {
+      recurringMode,
+      date: new Date(
+        2025,
+        random(12),
+        1 + random(31),
+        random(24),
+        random(60)
+      ).getTime(),
+      selectedDays: [...new Set(selectedDays)],
+      mode: "repeat",
+      title: "Random reminder"
+    };
+
+    const id = await db.reminders.add(reminder);
+    const { dueDate } = await db
+      .sql()
+      .selectFrom("reminders")
+      .select(
+        createUpcomingReminderTimeQuery(
+          dayjs().utc().format("YYYY-MM-DDTHH:mm")
+        ).as("dueDate")
+      )
+      .where("id", "=", id)
+      .executeTakeFirstOrThrow();
+    const expected = getUpcomingReminderTime(reminder);
+    if (dueDate !== expected)
+      mismatches.push({
+        now: now.toString(),
+        reminder,
+        sql: new Date(dueDate).toString(),
+        js: new Date(expected).toString()
+      });
+  }
+  MockDate.reset();
+
+  expect(mismatches).toEqual([]);
+});
 
 async function compareReminder(reminder) {
   const db = await databaseTest();

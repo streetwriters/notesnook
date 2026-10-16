@@ -198,68 +198,72 @@ export function isReminderToday(reminder: Reminder) {
 export function getUpcomingReminderTime(reminder: Reminder) {
   if (reminder.mode === "once") return reminder.date;
 
-  const isDay = reminder.recurringMode === "day";
-  const isWeek = reminder.recurringMode === "week";
-  const isMonth = reminder.recurringMode === "month";
-  const isYear = reminder.recurringMode === "year";
-
-  // this is only the time (hour & minutes) unless it is a
-  // yearly reminder
-  const time = dayjs(reminder.date);
   const now = dayjs();
-  const relativeTime = isYear
-    ? now
-        .clone()
-        .hour(time.hour())
-        .minute(time.minute())
+  const today = now.startOf("day");
+  // time of day at which the reminder fires
+  const time = dayjs(reminder.date);
+  const at = (date: dayjs.Dayjs) =>
+    date
+      .hour(time.hour())
+      .minute(time.minute())
+      .second(time.second())
+      .millisecond(0);
+  const isPastToday = at(today).isSameOrBefore(now);
+  // earliest date on which the reminder can still fire
+  const fromDate = isPastToday ? today.add(1, "day") : today;
+
+  // selected day of the month starting at `monthStart`, clamped to
+  // the last day of that month (e.g. 31st in April becomes the 30th)
+  const selectedDayOfMonth = (monthStart: dayjs.Dayjs, day: number) =>
+    monthStart.date(Math.min(day, monthStart.daysInMonth()));
+
+  const selectedDays = reminder.selectedDays || [];
+  let date: dayjs.Dayjs | undefined;
+  switch (reminder.recurringMode) {
+    case "day":
+      date = fromDate;
+      break;
+    case "week":
+      date = earliest(
+        selectedDays.map((day) => {
+          const candidate = fromDate.day(day);
+          return candidate.isBefore(fromDate)
+            ? candidate.add(1, "week")
+            : candidate;
+        })
+      );
+      break;
+    case "month": {
+      const thisMonth = today.startOf("month");
+      const nextMonth = thisMonth.add(1, "month");
+      date = earliest(
+        selectedDays.map((day) => {
+          const candidate = selectedDayOfMonth(thisMonth, day);
+          return candidate.isBefore(fromDate)
+            ? selectedDayOfMonth(nextMonth, day)
+            : candidate;
+        })
+      );
+      break;
+    }
+    case "year": {
+      const thisYear = today
+        .startOf("year")
         .month(time.month())
-        .date(time.date())
-    : now.clone().hour(time.hour()).minute(time.minute());
-
-  const isPast = relativeTime.isSameOrBefore(now);
-
-  if (isYear) {
-    if (isPast) return relativeTime.add(1, "year").valueOf();
-    else return relativeTime.valueOf();
-  }
-
-  if (isDay) {
-    if (isPast) return relativeTime.add(1, "day").valueOf();
-    else return relativeTime.valueOf();
-  }
-
-  if (!reminder.selectedDays || !reminder.selectedDays.length)
-    return relativeTime.valueOf();
-
-  const sorted = reminder.selectedDays.sort((a, b) => a - b);
-  const lastSelectedDay = sorted[sorted.length - 1];
-  if (isWeek) {
-    if (
-      now.day() > lastSelectedDay ||
-      (now.day() === lastSelectedDay && isPast)
-    )
-      return relativeTime.day(sorted[0]).add(1, "week").valueOf();
-    else {
-      for (const selectedDay of sorted) {
-        if (selectedDay > now.day() || (selectedDay === now.day() && !isPast))
-          return relativeTime.day(selectedDay).valueOf();
-      }
-    }
-  } else if (isMonth) {
-    if (
-      now.date() > lastSelectedDay ||
-      (now.date() === lastSelectedDay && isPast)
-    )
-      return relativeTime.date(sorted[0]).add(1, "month").valueOf();
-    else {
-      for (const selectedDay of sorted) {
-        if (selectedDay > now.date() || (now.date() === selectedDay && !isPast))
-          return relativeTime.date(selectedDay).valueOf();
-      }
+        .date(time.date());
+      date = thisYear.isBefore(fromDate) ? thisYear.add(1, "year") : thisYear;
+      break;
     }
   }
 
-  return relativeTime.valueOf();
+  return at(date || today).valueOf();
+}
+
+function earliest(dates: dayjs.Dayjs[]) {
+  return dates.reduce<dayjs.Dayjs | undefined>(
+    (min, date) => (!min || date.isBefore(min) ? date : min),
+    undefined
+  );
 }
 
 export function getUpcomingReminder(reminders: Reminder[]) {
@@ -281,48 +285,49 @@ export function isReminderActive(reminder: Reminder) {
 }
 
 export function createUpcomingReminderTimeQuery(unix = "now") {
+  const now = sql`datetime(${unix}, 'localtime')`;
+  const today = sql`date(${unix}, 'localtime')`;
+  // time of day at which the reminder fires
   const time = sql`time(date / 1000, 'unixepoch', 'localtime')`;
-  const dateNow = sql`date(${unix}, 'localtime')`;
-  const dateTime = sql`datetime(${dateNow} || ${time})`;
-  const dateTimeNow = sql`datetime(${unix}, 'localtime')`;
-  const weekDayNow = sql`CAST(strftime('%w', ${dateNow}) AS INTEGER)`;
-  const monthDayNow = sql`CAST(strftime('%d', ${dateNow}) AS INTEGER)`;
-  const lastSelectedDay = sql`(SELECT MAX(value) FROM json_each(selectedDays))`;
+  const isPastToday = sql`datetime(${today}, ${time}) <= ${now}`;
+  // earliest date on which the reminder can still fire
+  const fromDate = sql`date(${today}, IIF(${isPastToday}, '+1 day', '+0 day'))`;
 
-  const monthDate = sql`strftime('%m-%d%H:%M', date / 1000, 'unixepoch', 'localtime')`;
+  // selected day of the month starting at `monthStart`, clamped to
+  // the last day of that month (e.g. 31st in April becomes the 30th)
+  const selectedDayOfMonth = (monthStart: typeof today) =>
+    sql`date(${monthStart}, '+' || (MIN(value, CAST(strftime('%d', ${monthStart}, '+1 month', '-1 day') AS INTEGER)) - 1) || ' days')`;
+  const thisMonthDay = selectedDayOfMonth(
+    sql`date(${today}, 'start of month')`
+  );
+  const nextMonthDay = selectedDayOfMonth(
+    sql`date(${today}, 'start of month', '+1 month')`
+  );
+
+  const thisYearDate = sql`strftime('%Y-', ${today}) || strftime('%m-%d', date / 1000, 'unixepoch', 'localtime')`;
+
+  // 'weekday N' moves forward to the next date that is weekday N
+  // (or stays put if the date is already weekday N)
+  const weekly = sql`(SELECT MIN(date(${fromDate}, 'weekday ' || value)) FROM json_each(selectedDays))`;
+  const monthly = sql`(SELECT MIN(IIF(${thisMonthDay} >= ${fromDate}, ${thisMonthDay}, ${nextMonthDay})) FROM json_each(selectedDays))`;
+  const yearly = sql`IIF(date(${thisYearDate}) >= ${fromDate}, date(${thisYearDate}), date(${thisYearDate}, '+1 year'))`;
+
   return sql`CASE
-        WHEN mode = 'once' THEN date / 1000
-        WHEN recurringMode = 'year' THEN
-            strftime('%s',
-                strftime('%Y-', ${dateNow}) || ${monthDate},
-                IIF(datetime(strftime('%Y-', ${dateNow}) || ${monthDate}) <= ${dateTimeNow}, '+1 year', '+0 year'),
-                'utc'
-            )
-        WHEN recurringMode = 'day' THEN
-            strftime('%s',
-                ${dateNow} || ${time},
-                IIF(${dateTime} <= ${dateTimeNow}, '+1 day', '+0 day'),
-                'utc'
-            )
-        WHEN recurringMode = 'week' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN
-            CASE
-                WHEN ${weekDayNow} > ${lastSelectedDay}
-                OR (${weekDayNow} == ${lastSelectedDay} AND ${dateTime} <= ${dateTimeNow})
-                THEN
-                    strftime('%s', datetime(${dateNow}, ${time}, '+1 day', 'weekday ' || json_extract(selectedDays, '$[0]'), 'utc'))
-                ELSE
-                    strftime('%s', datetime(${dateNow}, ${time}, 'weekday ' || (SELECT value FROM json_each(selectedDays) WHERE value > ${weekDayNow} OR (value == ${weekDayNow} AND ${dateTime} > ${dateTimeNow})), 'utc'))
-            END
-        WHEN recurringMode = 'month' AND selectedDays IS NOT NULL AND json_array_length(selectedDays) > 0 THEN
-            CASE
-                WHEN ${monthDayNow} > ${lastSelectedDay}
-                OR (${monthDayNow} == ${lastSelectedDay} AND datetime(${dateNow} || ${time}) <= ${dateTimeNow})
-                THEN
-                    strftime('%s', strftime('%Y-%m-', ${dateNow}) || printf('%02d', json_extract(selectedDays, '$[0]')) || ${time}, '+1 month', 'utc')
-                ELSE strftime('%s', strftime('%Y-%m-', ${dateNow}) || (SELECT printf('%02d', value) FROM json_each(selectedDays) WHERE value > ${monthDayNow} OR (value == ${monthDayNow} AND ${dateTime} > ${dateTimeNow})) || ${time}, 'utc')
-            END
-        ELSE strftime('%s', ${dateNow} || ${time}, 'utc')
-    END * 1000
+        WHEN mode = 'once' THEN date / 1000 * 1000
+        ELSE strftime('%s',
+            COALESCE(
+                CASE recurringMode
+                    WHEN 'day' THEN ${fromDate}
+                    WHEN 'week' THEN ${weekly}
+                    WHEN 'month' THEN ${monthly}
+                    WHEN 'year' THEN ${yearly}
+                END,
+                ${today}
+            ),
+            ${time},
+            'utc'
+        ) * 1000
+    END
 `.$castTo<number>();
 }
 
