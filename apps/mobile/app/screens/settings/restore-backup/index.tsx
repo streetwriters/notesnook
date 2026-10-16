@@ -156,7 +156,8 @@ const restoreBackup = async (options: {
         : undefined;
 
       let count = 0;
-      await db.transaction(async () => {
+      // all files are restored or none
+      await db.transaction(async (tx) => {
         let passwordOrKey: PasswordOrKey | undefined = undefined;
         for (const path of extractedBackupFiles) {
           if (path === ".nnbackup" || path === "attachments") continue;
@@ -186,7 +187,7 @@ const restoreBackup = async (options: {
             throw new Error(strings.failedToDecryptBackup());
           }
 
-          await db.backup.import(backup, {
+          await tx.backup.import(backup, {
             ...passwordOrKey,
             attachmentsKey: attachmentsKey
           });
@@ -253,11 +254,11 @@ const restoreBackup = async (options: {
         throw new Error(strings.failedToDecryptBackup());
       }
 
-      await db.transaction(async () => {
-        updateProgress({
-          progress: strings.restoringBackup()
-        });
-        await db.backup.import(backup, {
+      updateProgress({
+        progress: strings.restoringBackup()
+      });
+      await db.transaction(async (tx) => {
+        await tx.backup.import(backup, {
           encryptionKey,
           password
         });

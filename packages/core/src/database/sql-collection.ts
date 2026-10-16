@@ -26,6 +26,7 @@ import {
   isDeleted
 } from "../types.js";
 import EventManager from "../utils/event-manager.js";
+import type Database from "../api/index.js";
 import {
   DatabaseAccessor,
   DatabaseCollection,
@@ -72,13 +73,31 @@ export class SQLCollection<
 {
   constructor(
     private readonly db: DatabaseAccessor,
-    _startTransaction: (
-      executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
-    ) => Promise<void>,
     public readonly type: TCollectionType,
     private readonly eventManager: EventManager,
     private readonly sanitizer: Sanitizer
   ) {}
+
+  /**
+   * Returns a copy of this collection that runs on another database, e.g. the
+   * scoped one passed to `db.transaction`.
+   */
+  scope(db: Database): this {
+    const scoped = Object.create(this);
+    scoped.db = db.sql;
+    scoped.eventManager = db.eventManager;
+    return Object.freeze(scoped);
+  }
+
+  /**
+   * Runs `executor` in a transaction. If we are already in one, joins it
+   * since transactions can't be nested.
+   */
+  private transaction(executor: (tx: Kysely<DatabaseSchema>) => Promise<void>) {
+    const db = this.db();
+    if (db.isTransaction) return executor(db);
+    return db.transaction().execute((tx) => executor(tx));
+  }
 
   async clear() {
     await this.db().deleteFrom(this.type).execute();
@@ -113,23 +132,21 @@ export class SQLCollection<
   }
 
   async softDelete(ids: string[]) {
-    await this.db()
-      .transaction()
-      .execute(async (tx) => {
-        for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-          await tx
-            .replaceInto<keyof DatabaseSchema>(this.type)
-            .values(
-              chunk.map((id) => ({
-                id,
-                deleted: true,
-                dateModified: Date.now(),
-                synced: false
-              }))
-            )
-            .execute();
-        }
-      });
+    await this.transaction(async (tx) => {
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+        await tx
+          .replaceInto<keyof DatabaseSchema>(this.type)
+          .values(
+            chunk.map((id) => ({
+              id,
+              deleted: true,
+              dateModified: Date.now(),
+              synced: false
+            }))
+          )
+          .execute();
+      }
+    });
     this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "softDelete",
       collection: this.type,
@@ -140,16 +157,14 @@ export class SQLCollection<
   async delete(ids: string[]) {
     if (ids.length <= 0) return;
 
-    await this.db()
-      .transaction()
-      .execute(async (tx) => {
-        for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-          await tx
-            .deleteFrom<keyof DatabaseSchema>(this.type)
-            .where("id", "in", chunk)
-            .execute();
-        }
-      });
+    await this.transaction(async (tx) => {
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+        await tx
+          .deleteFrom<keyof DatabaseSchema>(this.type)
+          .where("id", "in", chunk)
+          .execute();
+      }
+    });
     this.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       type: "delete",
       collection: this.type,
@@ -210,16 +225,14 @@ export class SQLCollection<
 
     if (entries.length <= 0) return [];
 
-    await this.db()
-      .transaction()
-      .execute(async (tx) => {
-        for (const chunk of toChunks(entries, MAX_SQL_PARAMETERS)) {
-          await tx
-            .replaceInto<keyof DatabaseSchema>(this.type)
-            .values(chunk)
-            .execute();
-        }
-      });
+    await this.transaction(async (tx) => {
+      for (const chunk of toChunks(entries, MAX_SQL_PARAMETERS)) {
+        await tx
+          .replaceInto<keyof DatabaseSchema>(this.type)
+          .values(chunk)
+          .execute();
+      }
+    });
     return entries;
   }
 
@@ -239,22 +252,20 @@ export class SQLCollection<
     const { sendEvent = true, modify = true, condition } = options;
     if (!this.sanitizer.sanitize(this.type, partial)) return;
 
-    await this.db()
-      .transaction()
-      .execute(async (tx) => {
-        for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-          await tx
-            .updateTable<keyof DatabaseSchema>(this.type)
-            .where("id", "in", chunk)
-            .$if(!!condition, (eb) => eb.where(condition!))
-            .set({
-              ...partial,
-              dateModified: modify ? Date.now() : undefined,
-              synced: partial.synced || false
-            })
-            .execute();
-        }
-      });
+    await this.transaction(async (tx) => {
+      for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
+        await tx
+          .updateTable<keyof DatabaseSchema>(this.type)
+          .where("id", "in", chunk)
+          .$if(!!condition, (eb) => eb.where(condition!))
+          .set({
+            ...partial,
+            dateModified: modify ? Date.now() : undefined,
+            synced: partial.synced || false
+          })
+          .execute();
+      }
+    });
     if (sendEvent) {
       this.eventManager.publish(EVENTS.databaseUpdated, <UpdateEvent>{
         type: "update",

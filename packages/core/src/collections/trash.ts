@@ -131,26 +131,33 @@ export default class Trash {
     ids: string[],
     deletedBy: TrashItem["deletedBy"] = "user"
   ) {
-    if (type === "note") {
-      await this.db.notes.collection.update(ids, {
-        type: "trash",
-        itemType: "note",
-        dateDeleted: Date.now(),
-        deletedBy
-      });
-      this.cache.notes.push(...ids);
-      if (deletedBy === "user" || deletedBy === "expired")
-        this.userDeletedCache.notes.push(...ids);
-    } else if (type === "notebook") {
-      await this.db.notebooks.collection.update(ids, {
-        type: "trash",
-        itemType: "notebook",
-        dateDeleted: Date.now(),
-        deletedBy
-      });
-      this.cache.notebooks.push(...ids);
-      if (deletedBy === "user") this.userDeletedCache.notebooks.push(...ids);
-    }
+    await this.db.transaction(async (tx) => {
+      if (type === "note") {
+        await tx.notes.collection.update(ids, {
+          type: "trash",
+          itemType: "note",
+          dateDeleted: Date.now(),
+          deletedBy
+        });
+        tx.afterCommit(() => {
+          this.cache.notes.push(...ids);
+          if (deletedBy === "user" || deletedBy === "expired")
+            this.userDeletedCache.notes.push(...ids);
+        });
+      } else if (type === "notebook") {
+        await tx.notebooks.collection.update(ids, {
+          type: "trash",
+          itemType: "notebook",
+          dateDeleted: Date.now(),
+          deletedBy
+        });
+        tx.afterCommit(() => {
+          this.cache.notebooks.push(...ids);
+          if (deletedBy === "user")
+            this.userDeletedCache.notebooks.push(...ids);
+        });
+      }
+    });
   }
 
   async delete(...ids: string[]) {
@@ -165,21 +172,29 @@ export default class Trash {
   private async _delete(noteIds: string[], notebookIds: string[]) {
     if (noteIds.length > 0) {
       for (const chunk of toChunks(noteIds, MAX_SQL_PARAMETERS)) {
-        await this.db.content.removeByNoteId(...chunk);
-        await this.db.noteHistory.clearSessions(...chunk);
-        await this.db.notes.remove(...chunk);
-        deleteItems(this.cache.notes, ...chunk);
-        deleteItems(this.userDeletedCache.notes, ...chunk);
+        await this.db.transaction(async (tx) => {
+          await tx.content.removeByNoteId(...chunk);
+          await tx.noteHistory.clearSessions(...chunk);
+          await tx.notes.remove(...chunk);
+          tx.afterCommit(() => {
+            deleteItems(this.cache.notes, ...chunk);
+            deleteItems(this.userDeletedCache.notes, ...chunk);
+          });
+        });
       }
     }
 
     if (notebookIds.length > 0) {
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
       for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
-        await this.db.notebooks.remove(...chunk);
-        await this.db.relations.unlinkOfType("notebook", chunk);
-        deleteItems(this.cache.notebooks, ...chunk);
-        deleteItems(this.userDeletedCache.notebooks, ...chunk);
+        await this.db.transaction(async (tx) => {
+          await tx.notebooks.remove(...chunk);
+          await tx.relations.unlinkOfType("notebook", chunk);
+          tx.afterCommit(() => {
+            deleteItems(this.cache.notebooks, ...chunk);
+            deleteItems(this.userDeletedCache.notebooks, ...chunk);
+          });
+        });
       }
     }
   }
@@ -191,33 +206,47 @@ export default class Trash {
     const notebookIds = ids.filter((id) => this.cache.notebooks.includes(id));
 
     if (noteIds.length > 0) {
-      await this.db.notes.collection.update(noteIds, {
-        type: "note",
-        dateDeleted: null,
-        itemType: null,
-        deletedBy: null
+      await this.db.transaction(async (tx) => {
+        await tx.notes.collection.update(noteIds, {
+          type: "note",
+          dateDeleted: null,
+          itemType: null,
+          deletedBy: null
+        });
+        tx.afterCommit(() => {
+          deleteItems(this.cache.notes, ...noteIds);
+          deleteItems(this.userDeletedCache.notes, ...noteIds);
+        });
       });
-      deleteItems(this.cache.notes, ...noteIds);
-      deleteItems(this.userDeletedCache.notes, ...noteIds);
     }
 
     if (notebookIds.length > 0) {
       const ids = [...notebookIds, ...(await this.subNotebooks(notebookIds))];
-      await this.db.notebooks.collection.update(ids, {
-        type: "notebook",
-        dateDeleted: null,
-        itemType: null,
-        deletedBy: null
+      await this.db.transaction(async (tx) => {
+        await tx.notebooks.collection.update(ids, {
+          type: "notebook",
+          dateDeleted: null,
+          itemType: null,
+          deletedBy: null
+        });
+        tx.afterCommit(() => {
+          deleteItems(this.cache.notebooks, ...ids);
+          deleteItems(this.userDeletedCache.notebooks, ...ids);
+        });
       });
-      deleteItems(this.cache.notebooks, ...ids);
-      deleteItems(this.userDeletedCache.notebooks, ...ids);
     }
   }
 
   async clear() {
-    await this._delete(this.cache.notes, this.cache.notebooks);
-    this.cache = { notebooks: [], notes: [] };
-    this.userDeletedCache = { notebooks: [], notes: [] };
+    await this.db.transaction(async (tx) => {
+      await tx.trash._delete(this.cache.notes, this.cache.notebooks);
+      tx.afterCommit(() => {
+        this.cache.notes = [];
+        this.cache.notebooks = [];
+        this.userDeletedCache.notes = [];
+        this.userDeletedCache.notebooks = [];
+      });
+    });
   }
 
   // synced(id: string) {

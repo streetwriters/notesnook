@@ -37,12 +37,17 @@ import { logger } from "../logger.js";
 
 export class Attachments implements ICollection {
   name = "attachments";
-  key?: SerializedKey;
+  private readonly state: { key?: SerializedKey } = {};
+  get key() {
+    return this.state.key;
+  }
+  set key(value: SerializedKey | undefined) {
+    this.state.key = value;
+  }
   readonly collection: SQLCollection<"attachments", Attachment>;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "attachments",
       db.eventManager,
       db.sanitizer

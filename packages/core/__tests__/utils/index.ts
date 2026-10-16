@@ -33,6 +33,16 @@ import { existsSync, mkdirSync } from "fs";
 import * as betterTrigram from "sqlite-better-trigram";
 import * as fts5Html from "sqlite3-fts5-html";
 import { getLoadablePath } from "sqlite-regex";
+import { AsyncLocalStorage } from "async_hooks";
+import { setTransactionScope } from "../../src/utils/transaction-scope.js";
+
+// Fail loudly if the root database is used inside `db.transaction` (it would
+// deadlock on the single sqlite connection).
+const transactionScope = new AsyncLocalStorage<true>();
+setTransactionScope({
+  run: (fn) => transactionScope.run(true, fn),
+  isActive: () => transactionScope.getStore() === true
+});
 
 const TEST_NOTEBOOK: Partial<Notebook> = {
   title: "Test Notebook",
