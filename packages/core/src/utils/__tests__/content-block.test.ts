@@ -39,6 +39,18 @@ describe("ContentBlock Utils", () => {
       expect(links[0].text).toBe("link");
     });
 
+    it("should handle link text containing |", () => {
+      const block: ContentBlock = {
+        type: "someType",
+        id: "someId",
+        content: "This is a test [[nn://note/123|a|b]]"
+      };
+      const links = extractInternalLinks(block);
+      expect(links).toHaveLength(1);
+      expect(links[0].id).toBe("123");
+      expect(links[0].text).toBe("a|b");
+    });
+
     it("should return an empty array if no internal links are present", () => {
       const block: ContentBlock = {
         type: "someType",
@@ -57,18 +69,6 @@ describe("ContentBlock Utils", () => {
       };
       const links = extractInternalLinks(block);
       expect(links).toHaveLength(0);
-    });
-
-    it("should extract internal links with '|' in id", () => {
-      const block: ContentBlock = {
-        type: "someType",
-        id: "someId",
-        content: "This is a test [[nn://note/myid|ofmyid|actualtext]]"
-      };
-      const links = extractInternalLinks(block);
-      expect(links).toHaveLength(1);
-      expect(links[0].id).toBe("myid|ofmyid");
-      expect(links[0].text).toBe("actualtext");
     });
   });
 
