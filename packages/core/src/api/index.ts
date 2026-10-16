@@ -76,7 +76,11 @@ import { Kysely, Transaction, sql } from "@streetwriters/kysely";
 import { CachedCollection } from "../database/cached-collection.js";
 import { Vaults } from "../collections/vaults.js";
 import { KVStorage } from "../database/kv.js";
-import { QueueValue } from "../utils/queue-value.js";
+import {
+  assertOutsideTransaction,
+  runInTransactionScope
+} from "../utils/transaction-scope.js";
+import { isScopeable, scopeTo } from "../database/scope.js";
 import { Sanitizer } from "../database/sanitizer.js";
 import { createTriggers, dropTriggers } from "../database/triggers.js";
 import { NNMigrationProvider } from "../database/migrations.js";
@@ -102,6 +106,18 @@ type Options = {
 
 // const DIFFERENCE_THRESHOLD = 20 * 1000;
 // const MAX_TIME_ERROR_FAILURES = 5;
+/**
+ * The database passed to `db.transaction`. All of its collections run on the
+ * transaction.
+ */
+export type TransactionDatabase = Database & {
+  /**
+   * Runs `effect` after the outermost transaction has committed, never if it
+   * rolls back.
+   */
+  afterCommit(effect: () => void): void;
+};
+
 class Database {
   isInitialized = false;
   eventManager = new EventManager();
@@ -153,7 +169,7 @@ class Database {
 
   private _sql?: Kysely<DatabaseSchema>;
   sql: DatabaseAccessor = () => {
-    // if (this._transaction) return this._transaction.value;
+    assertOutsideTransaction();
 
     if (!this._sql)
       throw new Error(
@@ -163,35 +179,97 @@ class Database {
   };
 
   private _kv = new KVStorage(this.databaseReady.promise);
-  kv: KVStorageAccessor = () => this._kv;
+  kv: KVStorageAccessor = () => {
+    assertOutsideTransaction();
+    return this._kv;
+  };
   private _config: ConfigStorage = new ConfigStorage(
     this.databaseReady.promise
   );
-  config: ConfigStorageAccessor = () => this._config;
-
-  private _transaction?: QueueValue<Transaction<DatabaseSchema>>;
-  transaction = async (
-    executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
-  ) => {
-    await executor(this.sql());
-    // if (this._transaction) {
-    //   await executor(this._transaction.use()).finally(() =>
-    //     this._transaction?.discard()
-    //   );
-    //   return;
-    // }
-
-    // return this.sql()
-    //   .transaction()
-    //   .execute(async (tr) => {
-    //     this._transaction = new QueueValue(
-    //       tr,
-    //       () => (this._transaction = undefined)
-    //     );
-    //     await executor(this._transaction.use());
-    //   })
-    //   .finally(() => this._transaction?.discard());
+  config: ConfigStorageAccessor = () => {
+    assertOutsideTransaction();
+    return this._config;
   };
+
+  /**
+   * Runs `executor` in a transaction. `tx` is a copy of this database whose
+   * collections all run on the transaction: use it instead of `db` for
+   * everything inside `executor`.
+   *
+   * ```ts
+   * await db.transaction(async (tx) => {
+   *   await tx.relations.unlinkOfType("tag", ids);
+   *   await tx.tags.collection.softDelete(ids);
+   * });
+   * ```
+   *
+   * `tx.afterCommit(effect)` runs `effect` once the transaction has committed
+   * (and never if it rolls back). Use it for everything that is not in the
+   * database, like in-memory caches. It exists only on `tx` so it is always
+   * clear which transaction an effect belongs to.
+   *
+   * Everything is committed if `executor` resolves and rolled back if it
+   * throws. `tx.transaction` joins the running transaction, so a nested
+   * executor commits or rolls back with it. Events and `afterCommit` effects
+   * are held back until the transaction has committed.
+   */
+  transaction = async <T = void>(
+    executor: (tx: TransactionDatabase) => Promise<T>
+  ): Promise<T> => {
+    const effects: (() => void)[] = [];
+    const result = await this.sql()
+      .transaction()
+      .execute((tr) =>
+        runInTransactionScope(() => executor(this.scope(tr, effects)))
+      );
+    this.runEffects(effects);
+    return result;
+  };
+
+  private runEffects(effects: (() => void)[]) {
+    for (const effect of effects) {
+      try {
+        effect();
+      } catch (e) {
+        logger.error(e, "Failed to run an after-commit effect");
+      }
+    }
+  }
+
+  private scope(tr: Transaction<DatabaseSchema>, effects: (() => void)[]) {
+    const tx = Object.create(this) as TransactionDatabase;
+    tx.sql = () => tr;
+    tx.afterCommit = (effect) => void effects.push(effect);
+
+    // events are only sent once the transaction is committed
+    const events: EventManager = Object.create(this.eventManager);
+    events.publish = (name, ...args) =>
+      tx.afterCommit(() => this.eventManager.publish(name, ...args));
+    tx.eventManager = events;
+
+    // kv & config live in the same database, so they must use the transaction
+    const kv = new KVStorage(Promise.resolve(tr));
+    const config = new ConfigStorage(Promise.resolve(tr));
+    tx.kv = () => kv;
+    tx.config = () => config;
+
+    // transactions can't be nested, so a nested one joins this one
+    tx.transaction = (executor) => executor(tx);
+
+    // Everything that was created with the database (collections, managers)
+    // is re-bound to `tx`, so nothing can be forgotten. Copies are made on
+    // first use, most transactions only touch a few of them.
+    for (const key of Object.keys(this)) {
+      if (!isScopeable((this as any)[key], this)) continue;
+      let scoped: object | undefined;
+      Object.defineProperty(tx, key, {
+        enumerable: true,
+        configurable: true,
+        get: () => (scoped ||= scopeTo((this as any)[key], tx))
+      });
+    }
+    return tx;
+  }
 
   options!: Options;
   eventSource?: EventSource | null;
@@ -300,6 +378,11 @@ class Database {
       this
     );
     this.eventManager.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
+    // the plan, which sets how much history to keep, is only certain once the
+    // user was fetched from the server
+    this.eventManager.subscribe(EVENTS.userFetched, () => {
+      this.noteHistory.cleanupInBackground();
+    });
     this.eventManager.subscribe(
       EVENTS.attachmentDeleted,
       async (attachment: Attachment) => {
