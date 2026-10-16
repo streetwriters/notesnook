@@ -86,7 +86,7 @@ export class HTMLRewriter {
           if (attr) {
             for (const key in attr) {
               if (!key) continue;
-              this.write(` ${key}="${attr[key]}"`);
+              this.write(` ${key}="${attr[key].replace(/"/g, "&quot;")}"`);
             }
           }
           this.currentTag = name;
@@ -104,9 +104,12 @@ export class HTMLRewriter {
 
           if (this.skippedTags.pop()) return;
 
-          if (!isImplied) this.closeTag();
+          // an implied close right after the open tag is a void or
+          // self-closing element; otherwise the element had content.
+          const selfClose = isImplied && this.currentTag !== null;
+          if (!selfClose) this.closeTag();
 
-          this.write(isImplied ? "/>" : `</${name}>`);
+          this.write(selfClose ? "/>" : `</${name}>`);
 
           if (this.currentTag) {
             this.currentTag = null;

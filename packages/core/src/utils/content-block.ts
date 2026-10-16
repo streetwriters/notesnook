@@ -27,8 +27,8 @@ export function extractInternalLinks(block: ContentBlock) {
   const links: InternalLinkWithOffset[] = [];
   for (const match of matches) {
     if (match.index === undefined) continue;
-    const url = match[1].slice(0, match[1].lastIndexOf("|"));
-    const text = match[1].slice(match[1].lastIndexOf("|") + 1);
+    const url = match[1].slice(0, match[1].indexOf("|"));
+    const text = match[1].slice(match[1].indexOf("|") + 1);
     const link = parseInternalLink(url);
     if (!link) continue;
     links.push({

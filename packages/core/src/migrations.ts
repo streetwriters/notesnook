@@ -657,7 +657,8 @@ function removeToxClassFromChecklist(html: string): string {
     : document.body.innerHTML;
 }
 
-const regex = /&lt;div class="table-container".*&lt;\/table&gt;&lt;\/div&gt;/gm;
+const regex =
+  /&lt;div class="table-container".*?&lt;\/table&gt;&lt;\/div&gt;/gm;
 function decodeWrappedTableHtml(html: string) {
   return html.replace(regex, (match) => {
     const html = decodeHTML5(match);
@@ -668,6 +669,12 @@ function decodeWrappedTableHtml(html: string) {
 const NEWLINE_REPLACEMENT_REGEX = /\n|<br>|<br\/>/gm;
 const PREBLOCK_REGEX = /(<pre.*?>)(.*?)(<\/pre>)/gm;
 const SPAN_REGEX = /<span class=.*?>(.*?)<\/span>/gm;
+
+function isEmpty(node: Node) {
+  return Array.from(node.childNodes).every(
+    (child) => child.nodeType === 3 && !child.textContent?.trim()
+  );
+}
 
 export function tinyToTiptap(html: string) {
   if (typeof html !== "string") return html;
@@ -703,7 +710,15 @@ export function tinyToTiptap(html: string) {
 
   const images = document.querySelectorAll("p > img");
   for (const image of images) {
-    image.parentElement?.replaceWith(image.cloneNode());
+    const paragraph = image.parentElement;
+    if (!paragraph) continue;
+
+    // split the paragraph around the image so sibling content is kept
+    const after = paragraph.cloneNode(false);
+    while (image.nextSibling) after.appendChild(image.nextSibling);
+    paragraph.after(image);
+    if (!isEmpty(after)) image.after(after);
+    if (isEmpty(paragraph)) paragraph.remove();
   }
 
   const bogus = document.querySelectorAll("[data-mce-bogus]");
