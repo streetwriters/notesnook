@@ -28,7 +28,7 @@ import {
   Loading,
   Lock,
   PasswordInvisible,
-  Refresh
+  Warning
 } from "../icons";
 import type { Icon } from "../icons";
 import { db } from "../../common/db";
@@ -47,19 +47,17 @@ import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../field";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
+import { ErrorText } from "../error-text";
 
 export const PublishDialog = DialogManager.register(function PublishDialog(
   props: BaseDialogProps<boolean> & { note: Note }
 ) {
   const { note, onClose } = props;
-  const resolvedMonograph = usePromise(
-    () => resolveMonograph(note.id),
-    [note.id]
-  );
-  const monograph =
-    resolvedMonograph.status === "rejected"
-      ? undefined
-      : resolvedMonograph.value;
+  const {
+    status: monographStatus,
+    monograph,
+    refresh: refreshMonograph
+  } = useResolvedMonograph(note.id);
 
   const [status, setStatus] = useState<{
     action: "publish" | "unpublish" | "analytics";
@@ -80,7 +78,12 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const [copied, setCopied] = useState(false);
+  const [showTitleRequiredError, setShowTitleRequiredError] =
+    useState(false);
+  const [showPasswordRequiredError, setShowPasswordRequiredError] =
+    useState(false);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
+  const isPasswordEnabled = monographFields.password !== undefined;
 
   const metadata = usePromise(async () => {
     if (!monograph) return { publishUrl: "", analytics: { totalViews: 0 } };
@@ -112,17 +115,13 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     };
   }, [note.id]);
 
-  function refreshMonograph() {
-    if (resolvedMonograph.status === "fulfilled") resolvedMonograph.refresh();
-  }
-
   useEffect(() => {
     const monographsUpdatedEvent = db.eventManager.subscribe(
       EVENTS.monographsUpdated,
       async (ids?: string[]) => {
         if (ids && ids.length > 0 && !ids.includes(note.id)) return;
 
-        refreshMonograph();
+        refreshMonograph?.();
 
         // if monograph has been unpublished, reset all the fields
         if (!(await db.monographs.get(note.id))) {
@@ -138,7 +137,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     return () => {
       monographsUpdatedEvent.unsubscribe();
     };
-  }, [note.id]);
+  }, [note.id, refreshMonograph]);
 
   async function handleUnpublish() {
     try {
@@ -146,7 +145,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
       const unpublished = await unpublishNote(note.id);
       if (unpublished === false) return;
 
-      refreshMonograph();
+      refreshMonograph?.();
       setMonographFields({
         title: note.title,
         password: undefined,
@@ -170,7 +169,13 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
       const title = monographFields.title;
 
       if (!title || title.trim().length === 0) {
-        showToast("error", "Title cannot be empty.");
+        setShowTitleRequiredError(true);
+        return;
+      }
+      setShowTitleRequiredError(false);
+
+      if (isPasswordEnabled && !monographFields.password) {
+        setShowPasswordRequiredError(true);
         return;
       }
 
@@ -178,7 +183,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         selfDestruct: monographFields.selfDestruct,
         password: monographFields.password
       });
-      refreshMonograph();
+      refreshMonograph?.();
       showToast("success", strings.actions.published.note(1));
     } catch (e) {
       console.error(e);
@@ -191,7 +196,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     }
   }
 
-  if (resolvedMonograph.status === "rejected") {
+  if (monographStatus === "rejected") {
     return (
       <Dialog
         isOpen={true}
@@ -206,7 +211,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         }}
         positiveButton={{
           text: strings.tryAgain(),
-          onClick: () => resolvedMonograph.refresh()
+          onClick: () => refreshMonograph?.()
         }}
       >
         <Text sx={{ color: "paragraph-error", m: "spacing7" }}>
@@ -216,63 +221,31 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     );
   }
 
-  if (resolvedMonograph.status == "pending") {
-    return (
-      <Dialog
-        isOpen={true}
-        title={strings.publishToTheWeb()}
-        description={strings.monographDesc()}
-        width={460}
-        noScroll
-        onClose={() => onClose(false)}
-        negativeButton={{
-          text: strings.cancel(),
-          onClick: () => onClose(false)
-        }}
-      >
-        <Loading
-          sx={{
-            m: "spacing7"
-          }}
-        />
-      </Dialog>
-    );
-  }
-
   const isChanged = monograph
     ? monograph.password !== monographFields.password ||
       monograph.title !== monographFields.title ||
       monograph.selfDestruct !== monographFields.selfDestruct
     : true;
-  const passwordEnabled = monographFields.password !== undefined;
-  const isPublishingOrUnpublishing =
-    status?.action === "publish" || status?.action === "unpublish";
+  const isLoading =
+    monographStatus === "pending" ||
+    status?.action === "publish" ||
+    status?.action === "unpublish";
 
   return (
     <Dialog
       isOpen={true}
-      title={strings.publishToTheWeb()}
+      title={monograph?.id ? "Edit monograph" : strings.publishToTheWeb()}
       description={strings.monographDesc()}
       width={460}
       onClose={() => onClose(false)}
-      negativeButton={
-        monograph?.id
-          ? {
-              text: strings.unpublish(),
-              variant: "new_error_bordered",
-              onClick: handleUnpublish,
-              disabled: !!status,
-              loading: status?.action === "unpublish"
-            }
-          : {
-              text: strings.cancel(),
-              onClick: () => onClose(false)
-            }
-      }
+      negativeButton={{
+        text: strings.cancel(),
+        onClick: () => onClose(false)
+      }}
       positiveButton={{
         text: monograph?.id ? strings.update() : strings.publish(),
         onClick: handlePublish,
-        disabled: !!status || !isChanged,
+        disabled: isLoading || status?.action === "analytics" || !isChanged,
         loading: status?.action === "publish"
       }}
     >
@@ -286,14 +259,22 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         <Field
           type="text"
           label={strings.title()}
+          required
+          aria-invalid={showTitleRequiredError}
+          variant={showTitleRequiredError ? "error" : undefined}
           placeholder={strings.enterTitle()}
           value={monographFields.title}
-          onChange={(event) =>
+          disabled={isLoading}
+          onChange={(event) => {
+            const title = event.currentTarget.value;
+            setShowTitleRequiredError(
+              (error) => error && !title.trim()
+            );
             setMonographFields((fields) => ({
               ...fields,
-              title: event.target.value
-            }))
-          }
+              title
+            }));
+          }}
           sx={{ width: "100%" }}
           styles={{
             input: {
@@ -303,31 +284,65 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
             }
           }}
         />
+        {showTitleRequiredError ? (
+          <ErrorText error={strings.titleIsRequired()} sx={{ mt: "spacing4" }} />
+        ) : null}
 
         {monograph?.id ? (
           <Flex
             sx={{
-              alignItems: "center",
+              flexDirection: "column",
               gap: "spacing4",
               mt: "spacing7",
               mb: "spacing4",
               p: "spacing4",
-              bg: "background-selected",
+              bg: "background-secondary",
               borderRadius: "radius2",
               minWidth: 0
             }}
           >
             <Flex
               sx={{
-                flexDirection: "column",
-                gap: "spacing3",
-                minWidth: 0,
-                flex: 1
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "spacing4",
+                minWidth: 0
               }}
             >
-              <Text sx={{ color: "heading", fontSize: "sm", fontWeight: 500 }}>
+              <Text sx={{ color: "heading", fontSize: "sm", fontWeight: 600 }}>
                 Published note link
               </Text>
+              <Button
+                variant="new_error_bordered"
+                onClick={handleUnpublish}
+                disabled={isLoading || status?.action === "analytics"}
+                sx={{
+                  flexShrink: 0,
+                  p: "spacing4",
+                  borderRadius: "radius2",
+                  fontSize: "xs",
+                  lineHeight: 1
+                }}
+              >
+                {status?.action === "unpublish" ? (
+                  <Loading size={13} color="currentColor" />
+                ) : (
+                  strings.unpublish()
+                )}
+              </Button>
+            </Flex>
+            <Flex
+              sx={{
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "spacing4",
+                minWidth: 0,
+                px: "spacing4",
+                py: "spacing3",
+                bg: "accentForeground",
+                borderRadius: "radius2"
+              }}
+            >
               <Link
                 as="a"
                 target="_blank"
@@ -340,7 +355,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                   fontFamily: "body",
                   display: "block",
                   minWidth: 0,
-                  color: "paragraph",
+                  color: "accent",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                   textDecoration: "none",
@@ -352,42 +367,36 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                   ? metadata.value.publishUrl
                   : monograph.publishUrl}
               </Link>
-            </Flex>
-            <Button
-              variant="new_accent"
-              className="copyPublishLink"
-              onClick={() => {
-                if (metadata.status !== "fulfilled") return;
+              <Button
+                variant="new_secondary"
+                className="copyPublishLink"
+                aria-label={copied ? strings.copied() : strings.copy()}
+                onClick={() => {
+                  if (metadata.status !== "fulfilled") return;
 
-                writeText(metadata.value.publishUrl);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }}
-              disabled={!("value" in metadata) || isPublishingOrUnpublishing}
-              sx={{
-                flexShrink: 0,
-                gap: "spacing3",
-                p: "spacing3",
-                borderRadius: "50px"
-              }}
-            >
-              {copied ? (
-                <Check size={13} color="accentForeground" />
-              ) : (
-                <Copy size={13} color="accentForeground" />
-              )}
-              <Text
+                  writeText(metadata.value.publishUrl);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                disabled={!("value" in metadata) || isLoading}
                 sx={{
-                  fontSize: "xs",
-                  fontWeight: 600,
-                  lineHeight: 1,
-                  letterSpacing: "-0.26px",
-                  color: "accentForeground"
+                  flexShrink: 0,
+                  width: 20,
+                  height: 20,
+                  p: 0,
+                  borderRadius: "radius1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
                 }}
               >
-                {copied ? strings.copied() : strings.copy()}
-              </Text>
-            </Button>
+                {copied ? (
+                  <Check size={13} color="accent" />
+                ) : (
+                  <Copy size={13} color="icon" />
+                )}
+              </Button>
+            </Flex>
           </Flex>
         ) : null}
 
@@ -416,7 +425,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                       </Text>
                       <Button
                         variant="tertiary"
-                        disabled={isPublishingOrUnpublishing}
+                        disabled={isLoading}
                         onClick={async () => {
                           try {
                             setStatus({ action: "analytics" });
@@ -461,21 +470,24 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
 
         <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
           <PasswordProtection
-            enabled={passwordEnabled}
-            disabled={isPublishingOrUnpublishing}
+            enabled={isPasswordEnabled}
+            disabled={isLoading}
             onToggle={() => {
+              setShowPasswordRequiredError(false);
               setMonographFields((fields) => ({
                 ...fields,
-                password: passwordEnabled ? undefined : ""
+                password: isPasswordEnabled ? undefined : ""
               }));
             }}
-            onChange={(password) =>
+            onChange={(password) => {
+              setShowPasswordRequiredError((error) => error && !password);
               setMonographFields((fields) => ({
                 ...fields,
                 password: password ?? ""
-              }))
-            }
+              }));
+            }}
             password={monographFields.password}
+            showPasswordRequiredError={showPasswordRequiredError}
           />
           <MonographRow
             icon={ClockCounterClockwise}
@@ -485,7 +497,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
               <Switch
                 aria-label={strings.monographSelfDestructHeading()}
                 title={strings.monographSelfDestructDesc()}
-                disabled={isPublishingOrUnpublishing}
+                disabled={isLoading}
                 checked={monographFields.selfDestruct}
                 onChange={() =>
                   setMonographFields((fields) => ({
@@ -565,13 +577,15 @@ function PasswordProtection({
   disabled,
   onToggle,
   onChange,
-  password
+  password,
+  showPasswordRequiredError: passwordError
 }: {
   enabled: boolean;
   disabled: boolean;
   onToggle: () => void;
   onChange: (password: string) => void;
   password: string | undefined;
+  showPasswordRequiredError: boolean;
 }) {
   const passwordSwitch = (
     <Switch
@@ -626,13 +640,15 @@ function PasswordProtection({
           </Flex>
           <Field
             type="password"
-            variant="clean"
+            variant={passwordError ? "error" : "clean"}
+            required
+            aria-invalid={passwordError}
             disabled={disabled}
             aria-label={strings.monographPassHeading()}
             placeholder="Enter your password"
             value={password ?? ""}
             onChange={(event) => onChange(event.currentTarget.value)}
-            sx={{ width: "100%", mt: "spacing3" }}
+            sx={{ width: "100%", mt: "spacing4" }}
             styles={{
               input: {
                 px: "spacing4",
@@ -641,6 +657,12 @@ function PasswordProtection({
               }
             }}
           />
+          {passwordError ? (
+            <ErrorText
+              error={strings.passwordRequired()}
+              sx={{ mt: "spacing4" }}
+            />
+          ) : null}
         </Flex>
       ) : (
         <Flex
@@ -674,6 +696,16 @@ type ResolvedMonograph = {
   title: string;
   publishUrl?: string;
 };
+
+function useResolvedMonograph(monographId: string) {
+  const result = usePromise(() => resolveMonograph(monographId), [monographId]);
+
+  return {
+    status: result.status,
+    monograph: result.status === "rejected" ? undefined : result.value,
+    refresh: result.status === "pending" ? undefined : result.refresh
+  };
+}
 
 async function resolveMonograph(
   monographId: string
