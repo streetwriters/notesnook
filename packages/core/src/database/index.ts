@@ -260,6 +260,11 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
         row.key.startsWith("profile"))
     )
       row.value = JSON.parse(row.value);
+    else if (
+      row.value &&
+      (row.key === "vault:lockAfter" || row.key === "trashCleanupInterval")
+    )
+      row.value = Number(row.value);
   },
   tiptap: (row) => {
     if (row.conflicted) row.conflicted = JSON.parse(row.conflicted);
@@ -278,6 +283,7 @@ const DataMappers: Partial<Record<ItemType, (row: any) => void>> = {
     if (row.password) row.password = JSON.parse(row.password);
   },
   trash: (row) => {
+    if (row.itemType === "note") row.conflicted = row.conflicted === 1;
     if (row.expiryDate) row.expiryDate = JSON.parse(row.expiryDate);
   }
 };

@@ -21,6 +21,7 @@ import {
   createIsReminderActiveQuery,
   createUpcomingReminderTimeQuery,
   formatReminderTime,
+  getUpcomingReminder,
   getUpcomingReminderTime,
   isReminderActive
 } from "../src/collections/reminders.ts";
@@ -394,3 +395,30 @@ async function compareReminder(reminder) {
     dayjs(getUpcomingReminderTime(reminder)).second(0).millisecond(0).valueOf()
   );
 }
+
+test("upcoming reminder is the soonest one", () => {
+  const now = Date.now();
+  const soon = { id: "soon", mode: "once", date: now + 1000 };
+  const later = { id: "later", mode: "once", date: now + 100000 };
+  const reminders = [later, soon];
+  expect(getUpcomingReminder(reminders).id).toBe("soon");
+  expect(reminders).toStrictEqual([later, soon]);
+});
+
+test("upcoming reminder prefers future reminders over past ones", () => {
+  const now = Date.now();
+  const past = { id: "past", mode: "once", date: now - 1000 };
+  const future = { id: "future", mode: "once", date: now + 100000 };
+  expect(getUpcomingReminder([past, future]).id).toBe("future");
+});
+
+test("upcoming reminder time doesn't mutate selectedDays", () => {
+  const reminder = {
+    mode: "repeat",
+    recurringMode: "week",
+    selectedDays: [3, 1],
+    date: Date.now()
+  };
+  getUpcomingReminderTime(reminder);
+  expect(reminder.selectedDays).toStrictEqual([3, 1]);
+});
