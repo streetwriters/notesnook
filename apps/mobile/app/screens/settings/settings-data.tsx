@@ -397,36 +397,53 @@ export function getSettingsGroups(): SettingSection[] {
                       positiveType: user.mfa.isEnabled
                         ? "errorShade"
                         : undefined,
-                      input: true,
-                      inputPlaceholder: "Enter account password",
-                      positivePress: async (password) => {
-                        const verified = await db.user.verifyPassword(password);
-                        if (!verified) {
-                          ToastManager.show({
-                            message: strings.passwordIncorrect(),
-                            type: "error"
-                          });
-                          return;
-                        }
-                        try {
-                          if (user.mfa.isEnabled) {
-                            await db.mfa.disable(password);
-                            ToastManager.show({
-                              heading: strings.twoFactorAuthDisabled(),
-                              type: "success"
-                            });
-                            useUserStore
-                              .getState()
-                              .setUser(await db.user.fetchUser());
-                            return;
+                      secureTextEntry: true,
+                      form: {
+                        formRef: createFormRef({
+                          password: ""
+                        }),
+                        items: [
+                          {
+                            name: "password",
+                            placeholder: strings.enterAccountPassword(),
+                            ref: React.createRef<TextInput | null>(),
+                            validators: [
+                              validators.required(strings.passwordRequired())
+                            ]
                           }
-                          sleep(500).then(() => {
-                            MFASheet.present();
-                          });
-                        } catch (e) {
-                          ToastManager.error(e as Error);
+                        ],
+                        onFormSubmit: async (form) => {
+                          const password = form.getValue("password");
+                          try {
+                            const verified =
+                              await db.user.verifyPassword(password);
+                            if (!verified) {
+                              form.setError(
+                                "password",
+                                strings.passwordIncorrect()
+                              );
+                              return false;
+                            }
+                            if (user.mfa.isEnabled) {
+                              await db.mfa.disable(password);
+                              ToastManager.show({
+                                heading: strings.twoFactorAuthDisabled(),
+                                type: "success"
+                              });
+                              useUserStore
+                                .getState()
+                                .setUser(await db.user.fetchUser());
+                              return true;
+                            }
+                            sleep(500).then(() => {
+                              MFASheet.present();
+                            });
+                            return true;
+                          } catch (e) {
+                            form.setError("password", (e as Error).message);
+                            return false;
+                          }
                         }
-                        return true;
                       }
                     });
                   },
