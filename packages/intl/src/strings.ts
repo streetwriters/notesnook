@@ -452,7 +452,6 @@ $day$: Current day (eg. Monday)`,
   accountIsSecure: () =>
     t`Your account is now 100% secure against unauthorized logins.`,
   twoFactorAuthEnabled: () => t`Two-factor authentication enabled`,
-  twoFactorAuthDisabled: () => t`Two-factor authentication disabled`,
   listOf: () => t`List of`,
   network: {
     downloading: (progress?: string | number) =>
@@ -3286,5 +3285,6 @@ Continue without attachments?`,
       : t`Last partial backup: ${date}`,
   twoFactorDisableWarning: () =>
     t`This will reset your current two-factor authentication setup. Do you want to proceed?`,
-  twoFactorEnable: () => t`Enable two factor authentication`
+  twoFactorEnable: () => t`Enable two factor authentication`,
+  twoFactorAuthDisabled: () => t`Two-factor authentication disabled`
 };
