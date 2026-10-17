@@ -183,12 +183,6 @@ export class Sync {
 
     this.logger.info("Starting sync", options);
 
-    this.connection.onclose((error = new Error("Connection closed.")) => {
-      this.db.eventManager.publish(EVENTS.syncAborted);
-      this.logger.error(error);
-      throw new Error("Connection closed.");
-    });
-
     const { deviceId } = await this.init(options.force);
     this.logger.info("Initialized sync", { deviceId });
 
@@ -199,7 +193,7 @@ export class Sync {
 
     if (
       (options.type === "send" || options.type === "full") &&
-      (await this.send(deviceId, options.force))
+      (await this.send(deviceId, options.force, options.type === "send"))
     )
       this.logger.info("New data sent");
 
@@ -269,8 +263,8 @@ export class Sync {
     }
   }
 
-  async send(deviceId: string, isForceSync?: boolean) {
-    await this.uploadAttachments();
+  async send(deviceId: string, isForceSync?: boolean, skipFailed?: boolean) {
+    await this.uploadAttachments(skipFailed);
 
     let done = 0;
     let total = 0;
@@ -333,8 +327,12 @@ export class Sync {
   /**
    * @private
    */
-  async uploadAttachments() {
-    const attachments = await this.db.attachments.pending.items();
+  async uploadAttachments(skipFailed?: boolean) {
+    // attachments that failed to upload are only retried on full syncs
+    // to avoid retrying them after every edit
+    const attachments = (await this.db.attachments.pending.items()).filter(
+      (a) => !skipFailed || !a.failed
+    );
     this.logger.info("Uploading attachments...", { total: attachments.length });
 
     await this.db.fs().queueUploads(
@@ -367,6 +365,8 @@ export class Sync {
     options: SyncOptions
   ) {
     const itemType = chunk.type;
+    if (chunk.items.length === 0) return;
+
     const decrypted: string[] = [];
 
     // Pre-group items by keyVersion for O(1) lookups
@@ -382,6 +382,17 @@ export class Sync {
         itemsByKeyVersion.set(keyVersion, [item]);
       }
       versionMap.set(item.id, item.v);
+    }
+
+    for (const [keyVersion, items] of itemsByKeyVersion) {
+      if (keys.some((k) => k.version === keyVersion)) continue;
+      this.logger.error(
+        new Error(
+          `No key found for key version ${keyVersion}. Skipping ${items.length} items.`
+        ),
+        undefined,
+        { ids: items.map((i) => i.id) }
+      );
     }
 
     for (const keyInfo of keys) {
@@ -516,6 +527,10 @@ export class Sync {
       .withHubProtocol(new JsonHubProtocol())
       .build();
     this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
+    this.connection.onclose((error = new Error("Connection closed.")) => {
+      this.db.eventManager.publish(EVENTS.syncAborted);
+      this.logger.error(error);
+    });
     this.connection.on("PushCompletedV2", (deviceId: string) =>
       this.onPushCompleted(deviceId)
     );
@@ -624,14 +639,14 @@ export class Sync {
 
 function promiseTimeout(ms: number, promise: Promise<unknown>) {
   // Create a promise that rejects in <ms> milliseconds
+  let id: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise((resolve, reject) => {
-    const id = setTimeout(() => {
-      clearTimeout(id);
+    id = setTimeout(() => {
       reject(new Error("Sync timed out in " + ms + "ms."));
     }, ms);
   });
   // Returns a race between our timeout and the passed in promise
-  return Promise.race([promise, timeout]);
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(id));
 }
 
 async function deserializeItem(
