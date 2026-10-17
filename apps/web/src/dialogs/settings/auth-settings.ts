@@ -107,9 +107,12 @@ export const AuthenticationSettings: SettingsGroup[] = [
             isToggled: () => !!useUserStore.getState().user?.mfa.isEnabled,
             toggle: async () => {
               if (useUserStore.getState().user?.mfa.isEnabled) {
-                await db.mfa.disable();
-                showToast("success", strings.twoFactorAuthDisabled());
-                await useUserStore.getState().refreshUser();
+                await verifyAccount(async (password) => {
+                  await db.mfa.disable(password);
+                  showToast("success", strings.twoFactorAuthDisabled());
+                  await useUserStore.getState().refreshUser();
+                  return true;
+                });
               } else {
                 await MultifactorDialog.show({});
                 await useUserStore.getState().refreshUser();
