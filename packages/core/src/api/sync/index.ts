@@ -25,7 +25,6 @@ import {
   SYNC_CHECK_IDS
 } from "../../common.js";
 import Constants from "../../utils/constants.js";
-import TokenManager from "../token-manager.js";
 import Collector from "./collector.js";
 import { type HubConnection } from "@microsoft/signalr";
 import Merger, { handleInboxItems } from "./merger.js";
@@ -488,7 +487,7 @@ export class Sync {
     const { HubConnectionBuilder, HttpTransportType, JsonHubProtocol } =
       await import("@microsoft/signalr");
 
-    const tokenManager = new TokenManager(this.db.kv, this.db.eventManager);
+    const tokenManager = this.db.tokenManager;
     this.connection = new HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
         accessTokenFactory: async () => {
