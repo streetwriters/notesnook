@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { describe, expect, test } from "vitest";
 import { Editor, Node, getHTMLFromFragment } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
+import { Paging } from "../index.js";
 import { Page } from "../page.js";
 import { installFlatteningSerializer } from "../serializer.js";
 import { toPages } from "../split.js";
@@ -44,7 +45,8 @@ function pagedEditor() {
     extensions: [
       StarterKit.configure({ document: false }),
       PagedDocument,
-      Page
+      Page,
+      Paging.configure({ enabled: false })
     ],
     content: paragraphs(BLOCKS)
   });
