@@ -643,7 +643,7 @@ export class FilteredSelector<T extends Item> {
           qb = qb.orderBy(
             options.sortBy !== "title"
               ? sql`substring(ltrim(title, ' \u00a0\r\n\t\v'), 1, 1) COLLATE NOCASE`
-              : sql`ltrim(title, ' \u00a0\r\n\t\v') COLLATE NOCASE`,
+              : sql`natural_key(ltrim(title, ' \u00a0\r\n\t\v')) COLLATE NOCASE`,
             options.sortDirection
           );
         } else {
