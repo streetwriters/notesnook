@@ -174,3 +174,19 @@ test("overwriting note with deleted note should update search index", () =>
 
     expect(await db.lookup.notes("title").ids()).not.toContain(id);
   }));
+
+test("updating content from null data should add it to search index", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({
+      title: "New note"
+    });
+
+    const contentId = await db.content.add({
+      data: "hello world",
+      noteId: id
+    });
+    await db.content.collection.update([contentId!], { data: null as any });
+    await db.content.collection.update([contentId!], { data: "amazing" });
+
+    expect(await db.lookup.notes("amazing").ids()).toContain(id);
+  }));

@@ -44,14 +44,17 @@ const TEST_NOTEBOOK2: Partial<Notebook> = {
   description: "Test Description 2"
 };
 
-function databaseTest(type: "memory" | "persistent" = "memory") {
+function databaseTest(
+  type: "memory" | "persistent" = "memory",
+  unsafeMode = true
+) {
   const dir = path.join(tmpdir(), "notesnook-tests-tmp");
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   const dbPath = path.join(dir, `notesnook-${getId()}.sql`);
   const db = new DB();
   const betterSqliteDb = BetterSQLite3(
     type === "persistent" ? dbPath : ":memory:"
-  ).unsafeMode(true);
+  ).unsafeMode(unsafeMode);
   db.setup({
     storage: new NodeStorageInterface(),
     eventsource: EventSource,
