@@ -231,7 +231,7 @@ export function getUpcomingReminderTime(reminder: Reminder) {
   if (!reminder.selectedDays || !reminder.selectedDays.length)
     return relativeTime.valueOf();
 
-  const sorted = reminder.selectedDays.sort((a, b) => a - b);
+  const sorted = reminder.selectedDays.slice().sort((a, b) => a - b);
   const lastSelectedDay = sorted[sorted.length - 1];
   if (isWeek) {
     if (
@@ -263,12 +263,17 @@ export function getUpcomingReminderTime(reminder: Reminder) {
 }
 
 export function getUpcomingReminder(reminders: Reminder[]) {
-  const sorted = reminders.sort((a, b) => {
-    const d1 = a.mode === "repeat" ? getUpcomingReminderTime(a) : a.date;
-    const d2 = b.mode === "repeat" ? getUpcomingReminderTime(b) : b.date;
-    return !d1 || !d2 ? 0 : d2 - d1;
-  });
-  return sorted[0];
+  const now = Date.now();
+  const withTime = reminders.map((reminder) => ({
+    reminder,
+    time: getUpcomingReminderTime(reminder) || 0
+  }));
+  // prefer the soonest future reminder, otherwise the most recent past one
+  const future = withTime
+    .filter((r) => r.time > now)
+    .sort((a, b) => a.time - b.time);
+  if (future.length) return future[0].reminder;
+  return withTime.sort((a, b) => b.time - a.time)[0]?.reminder;
 }
 
 export function isReminderActive(reminder: Reminder) {

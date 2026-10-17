@@ -52,7 +52,7 @@ export class Vaults implements ICollection {
       dateCreated: item.dateCreated || oldVault?.dateCreated || Date.now(),
       dateModified: item.dateModified || oldVault?.dateModified || Date.now(),
       title: item.title || oldVault?.title || "",
-      key: item.key,
+      key: item.key || oldVault?.key,
       type: "vault"
     });
     return id;

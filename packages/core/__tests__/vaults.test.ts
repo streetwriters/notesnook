@@ -48,3 +48,21 @@ test("remove all vaults", () =>
     expect(await db.vaults.all.count()).toBe(0);
     expect(await db.vaults.default()).toBeUndefined();
   }));
+
+test("updating a vault without key keeps the existing key", () =>
+  databaseTest().then(async (db) => {
+    const key = {
+      format: "base64" as const,
+      alg: "aes-256-gcm",
+      cipher: "key",
+      iv: "iv",
+      salt: "salt",
+      length: 16
+    };
+    const id = await db.vaults.add({ title: "Vault", key });
+    await db.vaults.add({ id, title: "Renamed" });
+
+    const vault = await db.vaults.vault(id);
+    expect(vault?.title).toBe("Renamed");
+    expect(vault?.key).toStrictEqual(key);
+  }));
