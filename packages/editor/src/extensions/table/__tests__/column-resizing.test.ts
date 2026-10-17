@@ -21,19 +21,21 @@ import StarterKit from "@tiptap/starter-kit";
 import TableRow from "@tiptap/extension-table-row";
 import { describe, expect, test, vi } from "vitest";
 import { TableMap } from "../prosemirror-tables/tablemap.js";
+import { BlockId } from "../../block-id/block-id.js";
 import TableCell from "../../table-cell/index.js";
 import TableHeader from "../../table-header/index.js";
 import { columnResizingPluginKey } from "../prosemirror-tables/columnresizing.js";
 import { Table } from "../index.js";
+import { Page, Paging } from "../../paging/index.js";
 
 const Document = Node.create({
   name: "doc",
   topNode: true,
-  content: "block+"
+  content: "(page | block)+"
 });
 
 function createEditor(rows: number) {
-  let html = `<p>intro</p><table><tbody>`;
+  let html = `<p data-block-id="p1">intro</p><table data-block-id="t1"><tbody>`;
   for (let i = 0; i < rows; i++)
     html += `<tr><td><p>Cell ${i}</p></td><td><p>Value ${i}</p></td></tr>`;
   html += "</tbody></table>";
@@ -45,7 +47,10 @@ function createEditor(rows: number) {
       TableRow,
       TableCell,
       TableHeader,
-      Document
+      Document,
+      Page,
+      BlockId,
+      Paging.configure({ enabled: true, pageSize: 50, thresholdBlocks: 100 })
     ],
     content: html
   });
@@ -79,6 +84,17 @@ describe("column resize handles", () => {
 
     editor.commands.setTextSelection(12);
     expect(handles(editor)).toBe(20);
+    editor.destroy();
+  });
+
+  test("a windowed table only gets handles for the rows on screen", async () => {
+    const editor = createEditor(2000);
+    await new Promise((r) => setTimeout(r, 0));
+
+    editor.commands.setTextSelection(12);
+    const built = handles(editor);
+    expect(built).toBeGreaterThan(0);
+    expect(built).toBeLessThan(200);
     editor.destroy();
   });
 
