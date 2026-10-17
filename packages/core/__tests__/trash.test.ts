@@ -409,3 +409,62 @@ test("permanently deleted note should not have note fields", () =>
       "synced"
     ]);
   }));
+
+test("adding the same note to trash twice should not inflate trash count", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    await db.trash.add("note", [noteId]);
+    await db.trash.add("note", [noteId]);
+
+    expect(db.trash.count()).toBe(1);
+  }));
+
+test("permanently deleting a note directly should clear its history", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add({
+      ...TEST_NOTE,
+      sessionId: Date.now().toString()
+    });
+    expect(await db.noteHistory.get(noteId).count()).toBe(1);
+
+    await db.notes.remove(noteId);
+
+    expect(await db.noteHistory.get(noteId).count()).toBe(0);
+  }));
+
+test("permanently deleting a note should not create inbox history tombstones", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+
+    await db.notes.remove(noteId);
+
+    const rows = await db
+      .sql()
+      .selectFrom("inboxitemshistory")
+      .selectAll()
+      .execute();
+    expect(rows).toHaveLength(0);
+  }));
+
+test("soft deleting ids that don't exist should not create tombstones", () =>
+  databaseTest().then(async (db) => {
+    await db.notes.collection.softDelete(["missing"]);
+
+    const rows = await db.sql().selectFrom("notes").selectAll().execute();
+    expect(rows).toHaveLength(0);
+  }));
+
+test("deleting a note's content should publish content ids", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    const note = await db.notes.note(noteId);
+    const events: any[] = [];
+    db.eventManager.subscribe("db:updated", (e: any) => {
+      if (e.collection === "content") events.push(e);
+    });
+
+    await db.content.removeByNoteId(noteId);
+
+    expect(events).toHaveLength(1);
+    expect(events[0].ids).toStrictEqual([note?.contentId]);
+  }));

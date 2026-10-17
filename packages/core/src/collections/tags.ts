@@ -90,6 +90,7 @@ export class Tags implements ICollection {
   async remove(...ids: string[]) {
     await this.db.transaction(async () => {
       await this.db.relations.unlinkOfType("tag", ids);
+      await this.db.shortcuts.removeByItemId(...ids);
       await this.collection.softDelete(ids);
     });
   }

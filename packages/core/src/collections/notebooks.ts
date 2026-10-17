@@ -237,6 +237,7 @@ export class Notebooks implements ICollection {
   async remove(...ids: string[]) {
     await this.db.transaction(async () => {
       await this.db.relations.unlinkOfType("notebook", ids);
+      await this.db.shortcuts.removeByItemId(...ids);
       await this.collection.softDelete(ids);
     });
   }

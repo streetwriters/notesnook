@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import dayjs from "dayjs";
 import Database from "../api/index.js";
-import { deleteItems, toChunks } from "../utils/array.js";
+import { addItems, deleteItems, toChunks } from "../utils/array.js";
 import { GroupOptions, TrashItem } from "../types.js";
 import { VirtualizedGrouping } from "../utils/virtualized-grouping.js";
 import {
@@ -130,9 +130,9 @@ export default class Trash {
         dateDeleted: Date.now(),
         deletedBy
       });
-      this.cache.notes.push(...ids);
+      addItems(this.cache.notes, ...ids);
       if (deletedBy === "user" || deletedBy === "expired")
-        this.userDeletedCache.notes.push(...ids);
+        addItems(this.userDeletedCache.notes, ...ids);
     } else if (type === "notebook") {
       await this.db.notebooks.collection.update(ids, {
         type: "trash",
@@ -140,8 +140,9 @@ export default class Trash {
         dateDeleted: Date.now(),
         deletedBy
       });
-      this.cache.notebooks.push(...ids);
-      if (deletedBy === "user") this.userDeletedCache.notebooks.push(...ids);
+      addItems(this.cache.notebooks, ...ids);
+      if (deletedBy === "user")
+        addItems(this.userDeletedCache.notebooks, ...ids);
     }
   }
 
@@ -157,8 +158,6 @@ export default class Trash {
   private async _delete(noteIds: string[], notebookIds: string[]) {
     if (noteIds.length > 0) {
       for (const chunk of toChunks(noteIds, MAX_SQL_PARAMETERS)) {
-        await this.db.content.removeByNoteId(...chunk);
-        await this.db.noteHistory.clearSessions(...chunk);
         await this.db.notes.remove(...chunk);
         deleteItems(this.cache.notes, ...chunk);
         deleteItems(this.userDeletedCache.notes, ...chunk);

@@ -83,14 +83,15 @@ export class SQLCachedCollection<
   }
 
   async softDelete(ids: string[]) {
-    ids.forEach((id) =>
+    for (const id of ids) {
+      if (!this.cache.has(id)) continue;
       this.cache.set(id, {
         id,
         deleted: true,
         dateModified: Date.now(),
         synced: false
-      })
-    );
+      });
+    }
     await this.collection.softDelete(ids);
   }
 
@@ -100,7 +101,11 @@ export class SQLCachedCollection<
   }
 
   count(): number {
-    return this.cache.size;
+    let count = 0;
+    for (const item of this.cache.values()) {
+      if (item && !isDeleted(item)) count++;
+    }
+    return count;
   }
 
   get(id: string): T | undefined {
@@ -122,7 +127,12 @@ export class SQLCachedCollection<
     for (const id of ids) {
       const item = this.cache.get(id);
       if (!item) continue;
-      this.cache.set(id, { ...item, ...partial, dateModified: Date.now() });
+      this.cache.set(id, {
+        ...item,
+        ...partial,
+        dateModified: Date.now(),
+        synced: partial.synced || false
+      });
     }
   }
 

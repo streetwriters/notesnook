@@ -333,3 +333,27 @@ test("vault password is cleared after specified time", () =>
 //     expect(await db.relations.from(vault, "note").has(id)).toBe(false);
 //     expect(decryptedContent.data).toBe("<p>hello world</p>");
 //   }));
+
+test("opening a locked note that needs migration should use a valid session id", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+    const content = await db.content.findByNoteId(id);
+    const decrypted = await db.vault.decryptContent(content, "password");
+    // simulate old content without block ids so it gets re-processed on open
+    const encrypted = await db
+      .storage()
+      .encrypt(
+        { password: "password" },
+        JSON.stringify(decrypted.data.replace(/ data-block-id="[^"]*"/g, ""))
+      );
+    await db.content.collection.update([content.id], { data: encrypted });
+
+    await db.vault.open(id, "password");
+
+    const sessions = await db.noteHistory.get(id).items();
+    expect(sessions.length).toBeGreaterThan(0);
+    for (const session of sessions) {
+      expect(session.id).not.toContain("function");
+    }
+  }));

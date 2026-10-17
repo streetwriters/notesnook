@@ -375,7 +375,7 @@ export default class Vault {
         decryptedContent,
         noteId,
         password,
-        `${Date.now}`
+        `${Date.now()}`
       );
     }
 

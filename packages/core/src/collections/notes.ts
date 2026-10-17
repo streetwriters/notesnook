@@ -491,6 +491,7 @@ export class Notes implements ICollection {
         await this.db.relations.unlinkOfType("note", ids);
         await this.collection.softDelete(ids);
         await this.db.content.removeByNoteId(...ids);
+        await this.db.noteHistory.clearSessions(...ids);
         await this.db.inboxItemsHistory.delete(ids);
       });
     }

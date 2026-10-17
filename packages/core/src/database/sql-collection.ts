@@ -119,13 +119,17 @@ export class SQLCollection<
         for (const chunk of toChunks(ids, MAX_SQL_PARAMETERS)) {
           await tx
             .replaceInto<keyof DatabaseSchema>(this.type)
-            .values(
-              chunk.map((id) => ({
-                id,
-                deleted: true,
-                dateModified: Date.now(),
-                synced: false
-              }))
+            .columns(["id", "dateModified", "deleted", "synced"])
+            .expression((eb) =>
+              eb
+                .selectFrom<keyof DatabaseSchema>(this.type)
+                .where("id", "in", chunk)
+                .select((eb) => [
+                  "id",
+                  eb.lit(Date.now()).as("dateModified"),
+                  eb.lit(1).as("deleted"),
+                  eb.lit(0).as("synced")
+                ])
             )
             .execute();
         }
