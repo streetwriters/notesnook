@@ -68,8 +68,7 @@ export const MAX_SQL_PARAMETERS = 200;
 export class SQLCollection<
   TCollectionType extends keyof DatabaseSchema,
   T extends DatabaseSchema[TCollectionType] = DatabaseSchema[TCollectionType]
-> implements DatabaseCollection<SQLiteItem<T>, true>
-{
+> implements DatabaseCollection<SQLiteItem<T>, true> {
   constructor(
     private readonly db: DatabaseAccessor,
     _startTransaction: (
@@ -78,13 +77,13 @@ export class SQLCollection<
     public readonly type: TCollectionType,
     private readonly eventManager: EventManager,
     private readonly sanitizer: Sanitizer
-  ) {}
+  ) { }
 
   async clear() {
     await this.db().deleteFrom(this.type).execute();
   }
 
-  async init() {}
+  async init() { }
 
   async upsert(item: SQLiteItem<T>) {
     if (!item.id) throw new Error("The item must contain the id field.");
@@ -297,6 +296,26 @@ export class SQLCollection<
             eb.or([eb("dateUploaded", ">", 0), eb("deleted", "==", true)])
           )
         )
+        // Relations shouldn't be created on the server before the attachment
+        // exists there. Keep them unsynced while an attachment is still
+        // waiting to be uploaded.
+        .$if(this.type === "relations", (eb) =>
+          eb.where((eb) =>
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("attachments")
+                  .select("attachments.id")
+                  .where(isFalse("dateUploaded"))
+                  .where((eb) => eb.and([
+                    eb("relations.toType", "==", "attachment"),
+                    eb("attachments.id", "==", eb.ref("relations.toId"))
+                  ])
+                  )
+              )
+            )
+          )
+        )
         .executeTakeFirst()) || {};
     return count || 0;
   }
@@ -321,6 +340,23 @@ export class SQLCollection<
         .$if(this.type === "attachments", (eb) =>
           eb.where((eb) =>
             eb.or([eb("dateUploaded", ">", 0), eb("deleted", "==", true)])
+          )
+        )
+        .$if(this.type === "relations", (eb) =>
+          eb.where((eb) =>
+            eb.not(
+              eb.exists(
+                eb
+                  .selectFrom("attachments")
+                  .select("attachments.id")
+                  .where(isFalse("dateUploaded"))
+                  .where((eb) => eb.and([
+                    eb("relations.toType", "==", "attachment"),
+                    eb("attachments.id", "==", eb.ref("relations.toId"))
+                  ])
+                  )
+              )
+            )
           )
         )
         .orderBy("id")
