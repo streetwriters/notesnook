@@ -191,6 +191,16 @@ export class Content implements ICollection {
   }
 
   async removeByNoteId(...ids: string[]) {
+    const contentIds = (
+      await this.db
+        .sql()
+        .selectFrom("content")
+        .where("noteId", "in", ids)
+        .select("id")
+        .execute()
+    ).map((c) => c.id);
+    if (contentIds.length <= 0) return;
+
     await this.db
       .sql()
       .replaceInto("content")
@@ -211,7 +221,7 @@ export class Content implements ICollection {
     this.db.eventManager.publish(EVENTS.databaseUpdated, <DeleteEvent>{
       collection: "content",
       type: "softDelete",
-      ids
+      ids: contentIds
     });
   }
 

@@ -148,6 +148,13 @@ export class Shortcuts implements ICollection {
     return this.collection.get(id);
   }
 
+  async removeByItemId(...itemIds: string[]) {
+    const ids = this.all
+      .filter((shortcut) => itemIds.includes(shortcut.itemId))
+      .map((shortcut) => shortcut.id);
+    if (ids.length > 0) await this.remove(...ids);
+  }
+
   async remove(...shortcutIds: string[]) {
     await this.collection.softDelete(shortcutIds);
     // await this.db

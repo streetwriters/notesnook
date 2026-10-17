@@ -65,3 +65,39 @@ test("remove shortcut", () =>
     await db.shortcuts.remove(shortcutId);
     expect(db.shortcuts.all).toHaveLength(0);
   }));
+
+test("removed shortcuts should not be counted", () =>
+  databaseTest().then(async (db) => {
+    const tagId = await db.tags.add({ title: "HELLO!" });
+    await db.shortcuts.add({ itemType: "tag", itemId: tagId });
+
+    await db.shortcuts.remove(tagId);
+    expect(db.shortcuts.collection.count()).toBe(0);
+  }));
+
+test("deleting a tag should remove its shortcut", () =>
+  databaseTest().then(async (db) => {
+    const tagId = await db.tags.add({ title: "HELLO!" });
+    await db.shortcuts.add({ itemType: "tag", itemId: tagId });
+
+    await db.tags.remove(tagId);
+    expect(db.shortcuts.all).toHaveLength(0);
+  }));
+
+test("deleting a notebook should remove its shortcut", () =>
+  notebookTest().then(async ({ db, id }) => {
+    await db.shortcuts.add({ itemType: "notebook", itemId: id });
+
+    await db.notebooks.remove(id);
+    expect(db.shortcuts.all).toHaveLength(0);
+  }));
+
+test("updating a cached item should mark it as unsynced", () =>
+  databaseTest().then(async (db) => {
+    const tagId = await db.tags.add({ title: "HELLO!" });
+    const id = await db.shortcuts.add({ itemType: "tag", itemId: tagId });
+    await db.shortcuts.collection.update([id], { synced: true });
+    await db.shortcuts.collection.update([id], { sortIndex: 1 });
+
+    expect(db.shortcuts.shortcut(id).synced).toBe(false);
+  }));
