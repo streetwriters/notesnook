@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { TemplateData } from "./index.js";
-import { formatDate } from "../date.js";
 
 export const buildMarkdown = (data: TemplateData) => `# ${data.title}
 
@@ -35,8 +34,8 @@ ${data.content}`;
 function buildFrontmatter(data: TemplateData) {
   const lines = [
     `title: ${JSON.stringify(data.title || "")}`,
-    `created_at: ${formatDate(data.dateCreated)}`,
-    `updated_at: ${formatDate(data.dateEdited)}`
+    `created_at: ${new Date(data.dateCreated).toISOString()}`,
+    `updated_at: ${new Date(data.dateEdited).toISOString()}`
   ];
   if (data.pinned) lines.push(`pinned: ${data.pinned}`);
   if (data.favorite) lines.push(`favorite: ${data.favorite}`);
