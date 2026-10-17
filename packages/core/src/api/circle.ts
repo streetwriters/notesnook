@@ -41,7 +41,9 @@ export class Circle {
   async redeem(partnerId: string): Promise<{ code?: string } | undefined> {
     const token = await this.db.tokenManager.getAccessToken();
     return http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/circle/redeem?partnerId=${partnerId}`,
+      `${hosts.SUBSCRIPTIONS_HOST}/circle/redeem?partnerId=${encodeURIComponent(
+        partnerId
+      )}`,
       token
     );
   }

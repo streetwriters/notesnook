@@ -210,9 +210,12 @@ export default class Subscriptions {
   async checkoutUrl(plan: SubscriptionPlan, period: Period) {
     const user = await this.db.user.getUser();
     if (!user) return;
-    return `${hosts.NOTESNOOK_HOST}/api/v2/checkout?userId=${user.id}&email=${
-      user.email
-    }&plan=${planToId(plan)}&period=${period}`;
+    return `${hosts.NOTESNOOK_HOST}/api/v2/checkout?${new URLSearchParams({
+      userId: user.id,
+      email: user.email,
+      plan: `${planToId(plan)}`,
+      period
+    })}`;
   }
 
   async preview(productId: string) {
