@@ -51,7 +51,7 @@ export function WebClipComponent(props: ReactNodeViewProps<WebClipAttributes>) {
       );
       doc.head.innerHTML += `<base target="_blank">`;
       const blob = new Blob([doc.documentElement.outerHTML], {
-        type: "text/html"
+        type: "text/html; charset=utf-8"
       });
       const blobUrl = URL.createObjectURL(blob);
       setSource(blobUrl);
