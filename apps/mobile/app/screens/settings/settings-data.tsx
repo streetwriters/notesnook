@@ -410,7 +410,7 @@ export function getSettingsGroups(): SettingSection[] {
                         }
                         try {
                           if (user.mfa.isEnabled) {
-                            await db.mfa.disable();
+                            await db.mfa.disable(password);
                             ToastManager.show({
                               heading: strings.twoFactorAuthDisabled(),
                               type: "success"
