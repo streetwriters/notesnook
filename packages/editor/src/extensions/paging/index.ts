@@ -101,6 +101,11 @@ export const Paging = Extension.create<PagingOptions>({
 });
 
 export { PAGE_NODE, Page } from "./page.js";
+export {
+  getScrollAnchor,
+  restoreScrollAnchor,
+  type ScrollAnchor
+} from "./anchor.js";
 export { fromFlatPosition, toFlatPosition } from "./positions.js";
 export { serializeDocumentHTML } from "./serialize.js";
 export {
