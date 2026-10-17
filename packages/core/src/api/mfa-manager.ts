@@ -19,21 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import http from "../utils/http.js";
 import constants from "../utils/constants.js";
-import TokenManager from "./token-manager.js";
+import Database from "./index.js";
 
 const ENDPOINTS = {
   setup: "/mfa",
   enable: "/mfa",
-  disable: "/mfa",
+  disable: "/mfa/disable",
   recoveryCodes: "/mfa/codes",
   send: "/mfa/send"
 };
 
 class MFAManager {
-  constructor(private readonly tokenManager: TokenManager) {}
+  constructor(private readonly db: Database) {}
 
   async setup(type: "app" | "sms" | "email", phoneNumber?: string) {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     return await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.setup}`,
@@ -64,7 +64,7 @@ class MFAManager {
     code: string,
     isFallback: boolean
   ) {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     return await http.patch(
       `${constants.AUTH_HOST}${ENDPOINTS.enable}`,
@@ -73,17 +73,20 @@ class MFAManager {
     );
   }
 
-  async disable() {
-    const token = await this.tokenManager.getAccessToken();
+  async disable(password: string) {
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
-    return await http.delete(
+    return await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.disable}`,
+      {
+        password: await this.db.user.hashPassword(password)
+      },
       token
     );
   }
 
   async codes() {
-    const token = await this.tokenManager.getAccessToken();
+    const token = await this.db.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
       `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}`,
@@ -92,7 +95,7 @@ class MFAManager {
   }
 
   async sendCode(method: "sms" | "email") {
-    const token = await this.tokenManager.getAccessToken([
+    const token = await this.db.tokenManager.getAccessToken([
       "IdentityServerApi",
       "auth:grant_types:mfa"
     ]);

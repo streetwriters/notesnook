@@ -197,7 +197,7 @@ class Database {
   eventSource?: EventSource | null;
 
   tokenManager = new TokenManager(this.kv, this.eventManager);
-  mfa = new MFAManager(this.tokenManager);
+  mfa = new MFAManager(this);
   subscriptions = new Subscriptions(this);
   circle = new Circle(this);
   offers = Offers;
