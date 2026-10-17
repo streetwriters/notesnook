@@ -3508,6 +3508,10 @@ msgstr "Edytuj swoje imię i nazwisko"
 msgid "Editor"
 msgstr "Edytor"
 
+#: src/strings.ts:3278
+msgid "Editor paging (experimental)"
+msgstr ""
+
 #: src/strings.ts:2883
 msgid "Education"
 msgstr "Edukacja"
@@ -6173,6 +6177,14 @@ msgstr "W toku"
 #: src/strings.ts:2935
 msgid "Only {extensions} files are supported."
 msgstr "Obsługiwane są tylko pliki {extensions}."
+
+#: src/strings.ts:3280
+msgid ""
+"Only render the part of a note that is currently on screen. Makes very large "
+"notes much faster to open, scroll and type in. While this is on, your "
+"browser's own find (Ctrl+F) only covers the visible part of a note, so use "
+"the editor's search instead. If you face any issues, please turn it off."
+msgstr ""
 
 #: src/strings.ts:142
 msgid "Open"
