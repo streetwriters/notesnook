@@ -269,6 +269,13 @@ export type AttachmentMetadata = {
   type: string;
 };
 
+export interface AttachmentFailure {
+  attempts: number;
+  nextRetryAt?: number;
+  reason: string;
+  terminal?: boolean;
+}
+
 export interface Attachment extends BaseItem<"attachment"> {
   iv: string;
   salt: string;

@@ -58,3 +58,88 @@ test("remove orphaned attachments should remove only orphaned attachments", () =
     expect(await db.attachments.exists(hash1)).toBe(true);
     expect(await db.attachments.orphaned.count()).toBe(0);
   }));
+
+test("attachment failure tracking and backoff logic", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+
+    const hash = await db.attachments.save(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "image/png",
+      "test.png"
+    );
+    if (!hash) throw new Error("Failed to create attachment");
+
+    const attachment = await db.attachments.attachment(hash);
+    if (!attachment) throw new Error("Attachment not found");
+
+    // 1. Fresh attachment is ready for upload
+    expect(db.attachments.isReadyForUpload(attachment)).toBe(true);
+    expect(db.attachments.getFailure(attachment)).toBeUndefined();
+    expect(db.attachments.getFailureReason(attachment)).toBeUndefined();
+
+    // 2. Record first failure (transient network error)
+    const fail1 = await db.attachments.recordUploadFailure(
+      attachment.id,
+      new Error("Network timeout")
+    );
+    expect(fail1.attempts).toBe(1);
+    expect(fail1.reason).toBe("Network timeout");
+    expect(fail1.terminal).toBe(false);
+    expect(fail1.nextRetryAt).toBeDefined();
+    expect(fail1.nextRetryAt!).toBeGreaterThan(Date.now());
+
+    // In cooldown, isReadyForUpload is false
+    const attAfterFail1 = await db.attachments.attachment(attachment.id);
+    expect(db.attachments.isReadyForUpload(attAfterFail1!)).toBe(false);
+    expect(db.attachments.getFailureReason(attAfterFail1!)).toBe(
+      "Network timeout"
+    );
+
+    // 3. Mark as uploaded clears failure
+    await db.attachments.markAsUploaded(attachment.id);
+    const attUploaded = await db.attachments.attachment(attachment.id);
+    expect(attUploaded?.failed).toBeNull();
+    expect(attUploaded?.dateUploaded).toBeDefined();
+    expect(db.attachments.isReadyForUpload(attUploaded!)).toBe(false);
+
+    // Reset uploaded to test terminal failure
+    await db.attachments.reset(attachment.id);
+    const attReset = await db.attachments.attachment(attachment.id);
+    expect(db.attachments.isReadyForUpload(attReset!)).toBe(true);
+
+    // 4. Record terminal failure (e.g. 403 Forbidden)
+    const failTerminal = await db.attachments.recordUploadFailure(
+      attachment.id,
+      new Error("403 Forbidden: Invalid bucket permission")
+    );
+    expect(failTerminal.terminal).toBe(true);
+    expect(failTerminal.attempts).toBe(5);
+    expect(failTerminal.nextRetryAt).toBeUndefined();
+
+    const attTerminal = await db.attachments.attachment(attachment.id);
+    expect(db.attachments.isReadyForUpload(attTerminal!)).toBe(false);
+
+    // 5. User manual retry / markAsFailed clears failure
+    await db.attachments.markAsFailed(attachment.id);
+    const attRetried = await db.attachments.attachment(attachment.id);
+    expect(attRetried?.failed).toBeNull();
+    expect(db.attachments.isReadyForUpload(attRetried!)).toBe(true);
+
+    // 7. Manual retry failure does not count towards attempts
+    await db.attachments.markAsFailed(attachment.id);
+    const failManual = await db.attachments.recordUploadFailure(
+      attachment.id,
+      new Error("Failed to fetch"),
+      true // isManual
+    );
+    expect(failManual.attempts).toBe(0);
+    expect(failManual.terminal).toBe(false);
+    expect(failManual.nextRetryAt).toBeUndefined();
+    expect(failManual.reason).toBe("Failed to fetch");
+
+    const attManual = await db.attachments.attachment(attachment.id);
+    expect(db.attachments.isReadyForUpload(attManual!)).toBe(true);
+    expect(db.attachments.getFailureReason(attManual!)).toBe("Failed to fetch");
+  }));
+

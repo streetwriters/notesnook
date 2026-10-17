@@ -22,6 +22,8 @@ import { isFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import {
   DocumentPickerOptions,
+  errorCodes,
+  isErrorWithCode,
   keepLocalCopy,
   KeepLocalCopyResponse,
   pick as pickFile
@@ -54,10 +56,17 @@ type PickerOptions = {
 
 const file = async (fileOptions: PickerOptions) => {
   try {
-    const options: DocumentPickerOptions = {
-      mode: "import",
-      allowMultiSelection: false
-    };
+    const options: DocumentPickerOptions =
+      Platform.OS === "android"
+        ? {
+            mode: "open",
+            requestLongTermAccess: false,
+            allowMultiSelection: false
+          }
+        : {
+            mode: "import",
+            allowMultiSelection: false
+          };
     await db.attachments.generateKey();
 
     let file;
@@ -65,7 +74,9 @@ const file = async (fileOptions: PickerOptions) => {
     let fileName;
     try {
       useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
-      file = (await pickFile(options))[0];
+      const pickedFiles = await pickFile(options);
+      file = pickedFiles[0];
+      if (!file) return;
       fileName = file.name ?? "attachment_" + Date.now();
       const result = await keepLocalCopy({
         files: [
@@ -78,8 +89,18 @@ const file = async (fileOptions: PickerOptions) => {
       });
       fileCopyUri = result[0];
     } catch (e) {
+      if (
+        (isErrorWithCode(e) && e.code === errorCodes.OPERATION_CANCELED) ||
+        (e as Error)?.message?.toLowerCase().includes("canceled") ||
+        (e as Error)?.message?.toLowerCase().includes("cancelled")
+      ) {
+        return;
+      }
       DatabaseLogger.error(e as Error, "Error picking file");
+      ToastManager.error(e as Error, "Error picking file");
       return;
+    } finally {
+      useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     }
 
     const featureResult = await isFeatureAvailable("fileSize", file.size || 0);
@@ -107,21 +128,19 @@ const file = async (fileOptions: PickerOptions) => {
       uri: uri,
       type: "url"
     });
-    if (
-      !(await attachFile(
-        uri,
-        hash,
-        file.type || "application/octet-stream",
-        fileName,
-        fileOptions
-      ))
-    ) {
+
+    const attached = await attachFile(
+      uri,
+      hash,
+      file.type || "application/octet-stream",
+      fileName,
+      fileOptions
+    );
+    if (!attached) {
       throw new Error(strings.failedToAttachFile());
     }
 
-    RNFetchBlob.fs.unlink(dirname(fileCopyUri.localUri)).catch((e) => {
-      console.log(e, "error");
-    });
+    RNFetchBlob.fs.unlink(dirname(fileCopyUri.localUri)).catch((e) => {});
 
     const isNewNote = fileOptions.noteId === undefined;
     const currentFileNoteId =
@@ -149,13 +168,12 @@ const file = async (fileOptions: PickerOptions) => {
       throw new Error("Failed to attach file, no tabId is set");
     }
   } catch (e) {
-    console.log("ERROR OCCURED HERE.", e);
     ToastManager.show({
-      heading: (e as Error).message,
+      heading: (e as Error).message || strings.failedToAttachFile(),
       type: "error",
       context: "global"
     });
-    DatabaseLogger.error(e);
+    DatabaseLogger.error(e as Error);
   }
 };
 
@@ -376,9 +394,14 @@ export async function attachFile(
 
     if (options.reupload) {
       DatabaseLogger.log(`Deleting file before reupload. ${hash}`);
-      const deleted = await db.fs().deleteFile(hash, false);
-      if (!deleted)
-        throw new Error(`Failed to delete file before reupload. ${hash}`);
+      try {
+        await db.fs().deleteFile(hash, false);
+      } catch (e) {
+        DatabaseLogger.warn("Failed to delete file before reupload", {
+          hash,
+          error: (e as Error)?.message
+        });
+      }
     }
 
     if (!exists || options?.reupload) {
@@ -403,6 +426,7 @@ export async function attachFile(
     await db.attachments.add(encryptionInfo);
     return true;
   } catch (e) {
+    ToastManager.error(e as Error, "Error encrypting/attaching file");
     DatabaseLogger.error(e);
     RNFetchBlob.fs.unlink(uri).catch((e) => {});
     return false;

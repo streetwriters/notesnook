@@ -335,10 +335,32 @@ export class Sync {
    */
   async uploadAttachments() {
     const attachments = await this.db.attachments.pending.items();
-    this.logger.info("Uploading attachments...", { total: attachments.length });
+    const eligible: Attachment[] = [];
+    for (const a of attachments) {
+      if (this.db.attachments.isReadyForUpload(a)) {
+        eligible.push(a);
+      } else {
+        const failure = this.db.attachments.getFailure(a);
+        if (failure?.terminal || (failure?.attempts && failure.attempts >= 5)) {
+          this.logger.debug(
+            `Skipping attachment ${a.hash}: terminal or reached max retries (${failure?.attempts}/5). Reason: ${failure?.reason}`
+          );
+        } else if (failure?.nextRetryAt && failure.nextRetryAt > Date.now()) {
+          const waitSec = Math.round((failure.nextRetryAt - Date.now()) / 1000);
+          this.logger.debug(
+            `Skipping attachment ${a.hash}: in retry cooldown (${waitSec}s remaining, attempt ${failure.attempts}/5)`
+          );
+        }
+      }
+    }
+    this.logger.info("Uploading attachments...", {
+      total: attachments.length,
+      eligible: eligible.length,
+      skipped: attachments.length - eligible.length
+    });
 
     await this.db.fs().queueUploads(
-      attachments.map<DownloadableFile>((a) => ({
+      eligible.map<DownloadableFile>((a) => ({
         filename: a.hash,
         chunkSize: a.chunkSize
       })),

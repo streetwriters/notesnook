@@ -37,6 +37,7 @@ import {
   References,
   Rename,
   Reupload,
+  Sync,
   Uploading
 } from "../icons";
 import { store, useStore } from "../../stores/attachment-store";
@@ -186,7 +187,22 @@ export function Attachment({
             <AttachmentError
               color={"icon-error"}
               size={16}
-              title={processing?.failed || item.failed}
+              sx={{ cursor: "pointer" }}
+              title={`${processing?.failed || db.attachments.getFailureReason(item) || strings.failed()} (${strings.retry()})`}
+              onClick={async (e) => {
+                e.stopPropagation();
+                await db.attachments.markAsFailed(item.id);
+                store.refresh();
+                await db.fs().queueUploads(
+                  [
+                    {
+                      filename: item.hash,
+                      chunkSize: item.chunkSize
+                    }
+                  ],
+                  "manual-retry"
+                );
+              }}
             />
           ) : processing?.working ? (
             <Loading size={16} />
@@ -213,6 +229,27 @@ export function Attachment({
             color={"accent"}
             size={16}
             title={strings.uploaded()}
+          />
+        ) : item.failed ? (
+          <AttachmentError
+            sx={{ flexShrink: 0, cursor: "pointer" }}
+            color={"icon-error"}
+            size={16}
+            title={`${processing?.failed || db.attachments.getFailureReason(item) || strings.failed()} (${strings.retry()})`}
+            onClick={async (e) => {
+              e.stopPropagation();
+              await db.attachments.markAsFailed(item.id);
+              store.refresh();
+              await db.fs().queueUploads(
+                [
+                  {
+                    filename: item.hash,
+                    chunkSize: item.chunkSize
+                  }
+                ],
+                "manual-retry"
+              );
+            }}
           />
         ) : (
           <Checkmark
@@ -362,6 +399,29 @@ const AttachmentMenuItems: (
         } else await saveAttachment(attachment.hash);
       }
     },
+    ...(attachment.failed || !attachment.dateUploaded
+      ? [
+          {
+            type: "button" as const,
+            key: "retry-upload",
+            title: strings.retry(),
+            icon: Sync.path,
+            onClick: async () => {
+              await db.attachments.markAsFailed(attachment.id);
+              store.refresh();
+              await db.fs().queueUploads(
+                [
+                  {
+                    filename: attachment.hash,
+                    chunkSize: attachment.chunkSize
+                  }
+                ],
+                "manual-retry"
+              );
+            }
+          }
+        ]
+      : []),
     {
       type: "button",
       key: "reupload",

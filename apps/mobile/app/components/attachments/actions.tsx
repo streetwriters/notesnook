@@ -78,12 +78,39 @@ const Actions = ({
   const contextId = attachment.hash;
   const [filename, setFilename] = useState(attachment.filename);
   const [currentProgress] = useAttachmentProgress(attachment);
-  const [failed, setFailed] = useState<string | undefined>(attachment.failed);
+  const [failed, setFailed] = useState<string | undefined>(
+    db.attachments.getFailureReason(attachment)
+  );
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState<{
     name?: string;
   }>({});
   const actions = [
+    ...(failed || !attachment.dateUploaded
+      ? [
+          {
+            name: strings.retry(),
+            onPress: async () => {
+              await db.attachments.markAsFailed(attachment.id);
+              setFailed(undefined);
+              await db.fs().queueUploads(
+                [
+                  {
+                    filename: attachment.hash,
+                    chunkSize: attachment.chunkSize
+                  }
+                ],
+                "manual-retry"
+              );
+              eSendEvent(eDBItemUpdate, attachment.id);
+              setAttachments();
+              close?.();
+              fwdRef.current?.hide();
+            },
+            icon: "reload"
+          }
+        ]
+      : []),
     {
       name: strings.network.download(),
       onPress: async () => {
@@ -135,7 +162,7 @@ const Actions = ({
           });
         } else {
           setFailed(undefined);
-          db.attachments.markAsFailed(attachment.id);
+          await db.attachments.markAsFailed(attachment.id);
           eSendEvent(eDBItemUpdate, attachment.id);
           ToastManager.show({
             heading: strings.fileCheckPassed(),
