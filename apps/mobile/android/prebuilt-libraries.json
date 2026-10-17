@@ -1,0 +1,108 @@
+{
+  "libraries": {
+    "@callstack/repack": {
+      "gradleProject": "callstack_repack",
+      "filePrefix": "callstack-repack",
+      "hasCpp": true,
+      "transitive": [
+        "com.squareup.okhttp3:okhttp:4.9.2",
+        "com.squareup.okhttp3:okhttp-urlconnection:4.9.2",
+        "com.nimbusds:nimbus-jose-jwt:9.48"
+      ]
+    },
+    "react-native-fast-openpgp": {
+      "gradleProject": "react-native-fast-openpgp",
+      "filePrefix": "react-native-fast-openpgp",
+      "hasCpp": true,
+      "transitive": []
+    },
+    "react-native-gesture-handler": {
+      "gradleProject": "react-native-gesture-handler",
+      "filePrefix": "react-native-gesture-handler",
+      "hasCpp": true,
+      "transitive": [
+        "androidx.appcompat:appcompat:1.7.0",
+        "androidx.core:core-ktx:1.16.0",
+        "androidx.core:core-ktx:1.8.0"
+      ]
+    },
+    "react-native-mmkv-storage": {
+      "gradleProject": "react-native-mmkv-storage",
+      "filePrefix": "react-native-mmkv-storage",
+      "hasCpp": true,
+      "transitive": [
+        "androidx.security:security-crypto:1.1.0-alpha03",
+        "com.google.code.gson:gson:2.8.6"
+      ]
+    },
+    "react-native-nitro-cloud-uploader": {
+      "gradleProject": "react-native-nitro-cloud-uploader",
+      "filePrefix": "react-native-nitro-cloud-uploader",
+      "hasCpp": true,
+      "transitive": [
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3",
+        "com.squareup.okhttp3:okhttp:4.12.0",
+        "androidx.core:core-ktx:1.12.0"
+      ]
+    },
+    "react-native-nitro-modules": {
+      "gradleProject": "react-native-nitro-modules",
+      "filePrefix": "react-native-nitro-modules",
+      "hasCpp": true,
+      "transitive": []
+    },
+    "react-native-quick-sqlite": {
+      "gradleProject": "react-native-quick-sqlite",
+      "filePrefix": "react-native-quick-sqlite",
+      "hasCpp": true,
+      "transitive": [],
+      "customFlagsProp": "quickSqliteFlags"
+    },
+    "react-native-reanimated": {
+      "gradleProject": "react-native-reanimated",
+      "filePrefix": "react-native-reanimated",
+      "hasCpp": true,
+      "transitive": [
+        "com.facebook.yoga:proguard-annotations:1.19.0",
+        "androidx.transition:transition:1.1.0",
+        "androidx.core:core:1.6.0"
+      ]
+    },
+    "react-native-screens": {
+      "gradleProject": "react-native-screens",
+      "filePrefix": "react-native-screens",
+      "hasCpp": true,
+      "transitive": [
+        "androidx.appcompat:appcompat:1.6.1",
+        "androidx.fragment:fragment-ktx:1.6.1",
+        "androidx.coordinatorlayout:coordinatorlayout:1.2.0",
+        "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
+        "com.google.android.material:material:1.13.0",
+        "androidx.core:core-ktx:1.8.0",
+        "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+      ]
+    },
+    "react-native-worklets": {
+      "gradleProject": "react-native-worklets",
+      "filePrefix": "react-native-worklets",
+      "hasCpp": true,
+      "transitive": [
+        "com.facebook.yoga:proguard-annotations:1.19.0",
+        "androidx.transition:transition:1.1.0",
+        "androidx.core:core:1.6.0"
+      ]
+    }
+  },
+  "activeLibraries": [
+    "react-native-fast-openpgp",
+    "react-native-gesture-handler",
+    "react-native-mmkv-storage",
+    "react-native-nitro-modules",
+    "react-native-nitro-cloud-uploader",
+    "react-native-quick-sqlite",
+    "react-native-worklets",
+    "react-native-reanimated",
+    "react-native-screens"
+  ]
+}

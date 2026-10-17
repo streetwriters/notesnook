@@ -19,8 +19,8 @@
     "e2e-android-debug": "detox test --configuration android.emu.debug --detectOpenHandles",
     "e2e-ios": "detox test -c ios.sim.release --detectOpenHandles",
     "bump": "node ./scripts/bump-version.mjs",
-    "release-android": "cd android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew assembleRelease --no-daemon",
-    "release-android-bundle": "cd android && ./gradlew bundleRelease --no-daemon",
+    "release-android": "cd android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew :app:assembleRelease --no-daemon",
+    "release-android-bundle": "cd android && ./gradlew :app:bundleRelease --no-daemon",
     "lint": "eslint --ext .js,.jsx,.tsx,.ts ./app"
   },
   "overrides": {

@@ -40,7 +40,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "26.1.1"
+          xcode-version: "26.6"
 
       - name: Setup iOS Platform
         run: |
