@@ -78,3 +78,16 @@ describe("day format", () => {
     ).toBe("Note Wed");
   });
 });
+
+test("$headline$ with replacement patterns is inserted literally", () => {
+  expect(
+    formatTitle(
+      "Note $headline$",
+      "[DD-MM-YYYY]",
+      "[hh:mm]",
+      "short",
+      "costs $& more $$ $'",
+      0
+    )
+  ).toBe("Note costs $& more $$ $'");
+});
