@@ -66,7 +66,7 @@ export class Content implements ICollection {
     await this.collection.init();
   }
 
-  async add(content: Partial<ContentItem>) {
+  async add(content: Partial<ContentItem> & { title?: string }) {
     if (typeof content.data === "object") {
       if ("data" in content.data && typeof content.data.data === "string")
         content.data = content.data.data;
@@ -134,6 +134,7 @@ export class Content implements ICollection {
         await this.db.noteHistory.add(content.sessionId, {
           noteId: content.noteId,
           type: content.type,
+          title: content.title,
           ...contentData
         });
       }
@@ -165,7 +166,10 @@ export class Content implements ICollection {
       await this.collection.upsert(contentItem);
 
       if (content.sessionId)
-        await this.db.noteHistory.add(content.sessionId, contentItem);
+        await this.db.noteHistory.add(content.sessionId, {
+          ...contentItem,
+          title: content.title
+        });
     } else return;
 
     return id;
@@ -372,6 +376,8 @@ export class Content implements ICollection {
     const toAdd = hashes.filter((hash) => {
       return hash && noteAttachments.every((a) => hash !== a.hash);
     });
+
+    if (toAdd.length === 0) return;
 
     const attachments = await this.db.attachments.all
       .fields(["attachments.id"])

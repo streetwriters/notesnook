@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { delay, noteTest, TEST_NOTE } from "./utils/index.ts";
-import { test, expect } from "vitest";
+import { test, expect, vi } from "vitest";
 
 // async function sessionTest(db, noteId) {
 //   let note = await db.notes.note(noteId).data;
@@ -357,4 +357,23 @@ test("note history item has consistent note and title data between sessions", ()
 
     expect(content.data).toBe(TEST_NOTE.content.data);
     expect(content.title).toBe("Test note updated");
+  }));
+
+test("saving a note with content adds one history entry with the title", () =>
+  noteTest().then(async ({ db, id }) => {
+    const add = vi.spyOn(db.noteHistory, "add");
+
+    await db.notes.add({
+      id,
+      title: "Hello",
+      content: TEST_NOTE.content,
+      sessionId: Date.now()
+    });
+
+    expect(add).toHaveBeenCalledOnce();
+    const sessions = await db.noteHistory.get(id).items();
+    expect(sessions).toHaveLength(1);
+    await expect(db.noteHistory.content(sessions[0].id)).resolves.toMatchObject(
+      { title: "Hello", ...TEST_NOTE.content }
+    );
   }));
