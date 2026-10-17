@@ -30,6 +30,12 @@ import { EditorView } from "prosemirror-view";
 export const Clipboard = Extension.create({
   name: "clipboard",
 
+  addOptions() {
+    return {
+      parseMarkdownOnPaste: true
+    };
+  },
+
   addProseMirrorPlugins() {
     return [
       new Plugin({
@@ -40,7 +46,14 @@ export const Clipboard = Extension.create({
             this.editor.schema
           ),
           transformCopied,
-          clipboardTextParser,
+          clipboardTextParser: (text, $context, plain, view) =>
+            clipboardTextParser(
+              text,
+              $context,
+              plain,
+              view,
+              this.options.parseMarkdownOnPaste
+            ),
           clipboardTextSerializer
         }
       })
