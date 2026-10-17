@@ -130,7 +130,8 @@ class UserManager {
       {
         email,
         grant_type: "email",
-        client_id: "notesnook"
+        client_id: "notesnook",
+        "mfa:optional": "true"
       }
     )) as Token;
 
@@ -156,7 +157,8 @@ class UserManager {
         grant_type: "mfa",
         client_id: "notesnook",
         "mfa:code": code,
-        "mfa:method": method
+        "mfa:method": method,
+        "mfa:optional": "true"
       },
       token.access_token
     );
@@ -332,14 +334,20 @@ class UserManager {
     await http.post(
       `${constants.API_HOST}${ENDPOINTS.deleteUser}`,
       {
-        password: await this.db.storage().hash(password, user.email, {
-          usesFallback: await this.usesFallbackPWHash(password)
-        })
+        password: await this.hashPassword(password)
       },
       token
     );
     await this.logout(false, "Account deleted.");
     return true;
+  }
+
+  async hashPassword(password: string) {
+    const user = await this.getUser();
+    if (!user) throw new Error("You are not logged in.");
+    return await this.db.storage().hash(password, user.email, {
+      usesFallback: await this.usesFallbackPWHash(password)
+    });
   }
 
   async fetchUser(): Promise<User | undefined> {
