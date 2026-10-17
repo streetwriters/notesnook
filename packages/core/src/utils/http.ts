@@ -215,12 +215,12 @@ function transformJson(data: JsonRequestBody) {
 function transformFormData(data: RequestBody) {
   if (data) {
     return Object.entries(data)
-      .map(([key, value]) =>
-        value
-          ? `${encodeURIComponent(key)}=${
-              value ? encodeURIComponent(value) : ""
-            }`
-          : ""
+      .filter(([, value]) => value !== undefined && value !== null)
+      .map(
+        ([key, value]) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(
+            value as string | number | boolean
+          )}`
       )
       .join("&");
   }

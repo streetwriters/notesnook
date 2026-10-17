@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import http from "../utils/http.js";
+import http, { RequestError } from "../utils/http.js";
 import constants from "../utils/constants.js";
 import { EVENTS } from "../common.js";
 import { withTimeout, Mutex } from "async-mutex";
@@ -181,8 +181,8 @@ async function getSafeToken<T>(
   } catch (e) {
     logger.error(e, errorMessage);
     if (
-      e instanceof Error &&
-      (e.message === "invalid_grant" || e.message === "invalid_client")
+      e instanceof RequestError &&
+      (e.code === "invalid_grant" || e.code === "invalid_client")
     ) {
       eventManager.publish(EVENTS.userSessionExpired);
     }
