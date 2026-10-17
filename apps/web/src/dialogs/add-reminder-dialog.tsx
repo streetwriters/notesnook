@@ -188,15 +188,6 @@ export const AddReminderDialog = DialogManager.register(
               recurringMode !== RecurringModes.YEAR &&
               !selectedDays.length),
           onClick: async () => {
-            if (!("Notification" in window))
-              showToast("warn", strings.remindersNotSupported());
-
-            const permissionResult = await Notification.requestPermission();
-            if (!IS_TESTING && permissionResult !== "granted") {
-              showToast("error", strings.noNotificationPermission());
-              return;
-            }
-
             if (mode !== Modes.REPEAT && date.isBefore(dayjs())) {
               showToast("error", strings.dateError());
               return;
@@ -208,6 +199,15 @@ export const AddReminderDialog = DialogManager.register(
                 strings.maximumReminderDate(getFormattedDate(MAX_DATE, "date"))
               );
               return;
+            }
+
+            if (!("Notification" in window)) {
+              showToast("warn", strings.remindersNotSupported());
+            } else {
+              const permissionResult = await Notification.requestPermission();
+              if (!IS_TESTING && permissionResult !== "granted") {
+                showToast("warn", strings.noNotificationPermission());
+              }
             }
 
             const id = await db.reminders.add({

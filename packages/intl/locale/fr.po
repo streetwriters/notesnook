@@ -5900,8 +5900,8 @@ msgid "Please enter your vault password to continue"
 msgstr "Veuillez saisir le mot de passe de votre coffre-fort pour continuer"
 
 #: src/strings.ts:1440
-msgid "Please grant notifications permission to add new reminders."
-msgstr "Veuillez accorder l'autorisation de notification pour ajouter de nouveaux rappels."
+msgid "Please grant notifications permission to receive reminder notifications."
+msgstr "Veuillez accorder l'autorisation de notification pour recevoir des notifications de rappel."
 
 #: src/strings.ts:2510
 msgid "Please login to download attachments."

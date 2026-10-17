@@ -33,7 +33,6 @@ import DatePicker from "react-native-date-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../common/database";
-import { Dialog } from "../../components/dialog";
 import { Header } from "../../components/header";
 import { Button } from "../../components/ui/button";
 import { ReminderTime } from "../../components/ui/reminder-time";
@@ -257,9 +256,6 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
 
       if (!date && reminderMode !== ReminderModes.Permanent) return;
 
-      if (!(await Notifications.checkAndRequestPermissions(true)))
-        throw new Error(strings.noNotificationPermission());
-
       date.setSeconds(0, 0);
 
       const reminderId = await db.reminders?.add({
@@ -285,7 +281,12 @@ export default function AddReminder(props: NavigationProps<"AddReminder">) {
           type: _reminder?.type
         });
       }
-      Notifications.scheduleNotification(_reminder as Reminder);
+
+      const hasPermission = await Notifications.checkAndRequestPermissions(true);
+      if (hasPermission) {
+        Notifications.scheduleNotification(_reminder as Reminder);
+      }
+
       Navigation.queueRoutesForUpdate();
       useRelationStore.getState().update();
       handleBackNavigation();

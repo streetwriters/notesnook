@@ -1437,7 +1437,7 @@ For example:
   unableToSend2faCode: () => t`Unable to send 2FA code`,
   emailOrPasswordIncorrect: () => t`Email or password incorrect`,
   noNotificationPermission: () =>
-    t`Please grant notifications permission to add new reminders.`,
+    t`Please grant notifications permission to receive reminder notifications.`,
   selectDayError: () => t`Please select the day to repeat the reminder on`,
   dateError: () => t`Reminder time cannot be earlier than the current time.`,
   failedToDecryptBackup: () => t`Failed to decrypt backup`,
