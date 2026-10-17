@@ -61,7 +61,6 @@ export class SessionContent implements ICollection {
       id: sessionContentItemId,
       compressed: false,
       localOnly: true,
-      locked: locked || false,
       dateCreated: Date.now(),
       dateModified: Date.now()
     };
@@ -90,6 +89,12 @@ export class SessionContent implements ICollection {
         }
       }
     }
+
+    // a title-only update must not downgrade a locked session
+    if (sessionItem.data !== undefined)
+      sessionItem.locked = isCipher(sessionItem.data);
+    else if (typeof locked === "boolean") sessionItem.locked = locked;
+    else if (!sessionContentExists) sessionItem.locked = false;
 
     if (sessionContentExists) {
       this.collection.update([sessionContentItemId], sessionItem);
