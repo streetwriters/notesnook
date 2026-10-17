@@ -19,12 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import createStore from "../common/store";
 import { db } from "../common/db";
-import BaseStore from "./index";
+import BaseStore, { GetState, SetState } from "./index";
 import { store as noteStore } from "./note-store";
-import { Note, VirtualizedGrouping, PublishOptions } from "@notesnook/core";
+import {
+  Note,
+  VirtualizedGrouping,
+  PublishOptions,
+  EVENTS
+} from "@notesnook/core";
 
 class MonographStore extends BaseStore<MonographStore> {
   monographs: VirtualizedGrouping<Note> | undefined = undefined;
+
+  constructor(set: SetState<MonographStore>, get: GetState<MonographStore>) {
+    super(set, get);
+    db.eventManager.subscribe(EVENTS.monographsUpdated, async () => {
+      await this.get().refresh();
+      await noteStore.refreshContext();
+    });
+  }
 
   refresh = async () => {
     const grouping = await db.monographs.all.grouped(
