@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node as ProsemirrorNode } from "@tiptap/pm/model";
+import { HeightIndex } from "./height-index.js";
 
 const DEFAULT_ESTIMATES: Record<string, number> = {
   paragraph: 24,
@@ -45,6 +46,7 @@ const RESIZE_THRESHOLD = 0.15;
 
 const PAGE_TYPE = "page";
 const TABLE_TYPE = "table";
+const TABLE_ROW_TYPE = "tableRow";
 
 const MIN_ROW_HEIGHT = 32;
 
@@ -67,6 +69,8 @@ type Measured = { height: number; characters: number };
 
 export class HeightMap {
   private measured = new Map<string, number>();
+  private sizes = new WeakMap<ProsemirrorNode, number>();
+  private indexes = new Map<string, HeightIndex & { childCount: number }>();
   private measurements = new Map<string, Measured>();
   private global: Measured = { height: 0, characters: 0 };
   private stale = false;
@@ -85,6 +89,7 @@ export class HeightMap {
     }
     if (!changed) return;
     this.estimates = new WeakMap();
+    this.indexes.clear();
     this.stale = true;
   }
 
@@ -119,6 +124,7 @@ export class HeightMap {
     if (stored) return stored;
 
     if (node.type.name === TABLE_TYPE) return this.table(node) || base;
+    if (node.type.name === TABLE_ROW_TYPE) return this.row(node);
 
     if (this.holdsBlocks(node)) {
       let total = 0;
@@ -168,18 +174,21 @@ export class HeightMap {
     return node.childCount > 0 && !!node.firstChild?.isBlock;
   }
 
-  /** Sum of the tallest cell in each row. */
+  /** Sum of the height of each row. */
   private table(node: ProsemirrorNode): number {
     let total = 0;
-    node.forEach((row) => {
-      let tallest = 0;
-      row.forEach((cell) => {
-        const height = this.estimate(cell);
-        if (height > tallest) tallest = height;
-      });
-      total += Math.max(MIN_ROW_HEIGHT, tallest);
-    });
+    node.forEach((row) => (total += this.estimate(row)));
     return total;
+  }
+
+  /** The cells within a row sit side by side, so the tallest one wins. */
+  private row(node: ProsemirrorNode): number {
+    let tallest = 0;
+    node.forEach((cell) => {
+      const height = this.estimate(cell);
+      if (height > tallest) tallest = height;
+    });
+    return Math.max(MIN_ROW_HEIGHT, tallest);
   }
 
   /** True once measurements have moved a ratio enough to resize placeholders. */
@@ -190,18 +199,30 @@ export class HeightMap {
   markPlaceholdersResized(): void {
     this.stale = false;
     this.estimates = new WeakMap();
+    this.indexes.clear();
   }
 
   heightFor(node: ProsemirrorNode): number {
     const blockId = node.attrs.blockId as string | undefined;
     if (blockId && this.measured.has(blockId))
       return this.measured.get(blockId) as number;
+    const size = this.sizes.get(node);
+    if (size !== undefined) return size;
     return this.estimate(node);
   }
 
   record(node: ProsemirrorNode, height: number): void {
+    if (!Number.isFinite(height) || height <= 0) return;
+
     const blockId = node.attrs.blockId as string | undefined;
-    if (!blockId || !Number.isFinite(height) || height <= 0) return;
+    if (!blockId) {
+      const measured = Math.round(height);
+      if (this.sizes.get(node) !== measured) {
+        this.sizes.set(node, measured);
+        this.indexes.clear();
+      }
+      return;
+    }
     this.measured.set(blockId, Math.round(height));
     this.estimates.delete(node);
 
@@ -223,6 +244,24 @@ export class HeightMap {
 
     const after = this.pixelsPerCharacterFor(node.type.name);
     if (Math.abs(after - before) / before > RESIZE_THRESHOLD) this.stale = true;
+  }
+
+  /** Where each child of a container sits, as a running total of the heights before it. */
+  runningHeights(id: string, container: ProsemirrorNode): HeightIndex {
+    const cached = this.indexes.get(id);
+    if (cached && cached.childCount === container.childCount) return cached;
+
+    const before = new Float64Array(container.childCount + 1);
+    let total = 0;
+    container.forEach((child, _offset, index) => {
+      before[index] = total;
+      total += this.heightFor(child);
+    });
+    before[container.childCount] = total;
+
+    const index = { before, total, childCount: container.childCount };
+    this.indexes.set(id, index);
+    return index;
   }
 
   toJSON(): Record<string, number> {
