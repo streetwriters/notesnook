@@ -102,6 +102,7 @@ import {
   eCloseSimpleDialog,
   eEditorReset,
   eLoginSessionExpired,
+  eMenuItemUpdate,
   eOnLoadNote,
   eOpenAnnouncementDialog,
   eUserLoggedIn,
@@ -591,7 +592,11 @@ export const useAppEvents = () => {
       eventManager?.subscribe(
         EVENTS.databaseSyncRequested,
         onRequestPartialSync
-      )
+      ),
+      eventManager?.subscribe(EVENTS.monographsUpdated, () => {
+        Navigation.queueRoutesForUpdate();
+        eSendEvent(eMenuItemUpdate);
+      })
     ];
 
     return () => {

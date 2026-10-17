@@ -23,6 +23,8 @@ import Database from "./index.js";
 import { Monograph, Note, isDeleted } from "../types.js";
 import { Cipher } from "@notesnook/crypto";
 import { isFalse } from "../database/index.js";
+import { logger } from "../logger.js";
+import { EVENTS } from "../common.js";
 
 type MonographApiRequestBase = Omit<
   Monograph,
@@ -153,6 +155,10 @@ export class Monographs {
       password: monograph.password,
       publishUrl: publishUrl
     });
+    this.db.eventManager.publish(EVENTS.monographsUpdated, [id]);
+    await this.db.syncer.notifyPushCompleted().catch((err: any) => {
+      logger.error(err, "Failed to notify push completed");
+    });
     return id;
   }
 
@@ -177,6 +183,10 @@ export class Monographs {
 
     this.monographs.splice(this.monographs.indexOf(noteId), 1);
     await this.db.monographsCollection.collection.softDelete([noteId]);
+    this.db.eventManager.publish(EVENTS.monographsUpdated, [noteId]);
+    await this.db.syncer.notifyPushCompleted().catch((err: any) => {
+      logger.error(err, "Failed to notify push completed");
+    });
   }
 
   get all() {
