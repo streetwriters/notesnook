@@ -167,6 +167,30 @@ test("permanently delete items older than 7 days", () =>
     expect(await db.trash.all()).toHaveLength(0);
   }));
 
+test("trash cleanup should delete all expired items", () =>
+  databaseTest().then(async (db) => {
+    const noteIds: string[] = [];
+    const notebookIds: string[] = [];
+    for (let i = 0; i < 5; i++) noteIds.push(await db.notes.add(TEST_NOTE));
+    for (let i = 0; i < 3; i++)
+      notebookIds.push((await db.notebooks.add(TEST_NOTEBOOK))!);
+
+    await db.notes.moveToTrash(...noteIds);
+    await db.notebooks.moveToTrash(...notebookIds);
+
+    const expired = dayjs().subtract(30, "days").toDate().getTime();
+    await db.notes.collection.update(noteIds, { dateDeleted: expired });
+    await db.notebooks.collection.update(notebookIds, {
+      dateDeleted: expired
+    });
+
+    expect(await db.trash.all()).toHaveLength(8);
+
+    await db.trash.cleanup();
+
+    expect(await db.trash.all()).toHaveLength(0);
+  }));
+
 test("trash cleanup should not delete items newer than 7 days", () =>
   databaseTest().then(async (db) => {
     const noteId = await db.notes.add(TEST_NOTE);
