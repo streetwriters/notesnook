@@ -90,21 +90,45 @@ export const AuthenticationSettings: SettingsGroup[] = [
     header: strings.twoFactorAuth(),
     key: "2fa",
     section: "auth",
+    onStateChange: (listener) =>
+      useUserStore.subscribe((s) => s.user?.mfa, listener),
     settings: [
       {
         key: "2fa-enabled",
-        title: strings.twoFactorAuthEnabled(),
-        description: strings.accountIsSecure(),
+        title: strings.twoFactorAuth(),
+        description: () =>
+          useUserStore.getState().user?.mfa.isEnabled
+            ? strings.accountIsSecure()
+            : strings.twoFactorAuthDesc(),
         keywords: [],
-        components: []
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => !!useUserStore.getState().user?.mfa.isEnabled,
+            toggle: async () => {
+              if (useUserStore.getState().user?.mfa.isEnabled) {
+                await verifyAccount(async (password) => {
+                  await db.mfa.disable(password);
+                  showToast("success", strings.twoFactorAuthDisabled());
+                  await useUserStore.getState().refreshUser();
+                  return true;
+                });
+              } else {
+                await MultifactorDialog.show({});
+                await useUserStore.getState().refreshUser();
+              }
+            }
+          }
+        ]
       },
       {
         key: "primary-2fa-method",
         title: strings.change2faMethod(),
         keywords: ["primary 2fa method"],
         description: strings.twoFactorAuthDesc(),
-        onStateChange: (listener) =>
-          useUserStore.subscribe((s) => s.user?.mfa.primaryMethod, listener),
+        isHidden: () =>
+          !useUserStore.getState().user?.mfa ||
+          !useUserStore.getState().user?.mfa.isEnabled,
         components: [
           {
             type: "button",
@@ -124,8 +148,9 @@ export const AuthenticationSettings: SettingsGroup[] = [
         title: strings.addFallback2faMethod(),
         description: strings.addFallback2faMethodDesc(),
         keywords: ["backup 2fa methods"],
-        onStateChange: (listener) =>
-          useUserStore.subscribe((s) => s.user?.mfa.secondaryMethod, listener),
+        isHidden: () =>
+          !useUserStore.getState().user?.mfa ||
+          !useUserStore.getState().user?.mfa.isEnabled,
         components: () => [
           {
             type: "button",
@@ -150,6 +175,9 @@ export const AuthenticationSettings: SettingsGroup[] = [
         title: strings.viewRecoveryCodes(),
         description: strings.viewRecoveryCodesDesc(),
         keywords: ["recovery codes"],
+        isHidden: () =>
+          !useUserStore.getState().user?.mfa ||
+          !useUserStore.getState().user?.mfa.isEnabled,
         components: [
           {
             type: "button",

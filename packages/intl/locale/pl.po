@@ -1132,6 +1132,14 @@ msgstr "12-godzinny"
 msgid "24-hour"
 msgstr "24-godzinny"
 
+#: src/strings.ts:916
+msgid "2FA backup codes copied!"
+msgstr ""
+
+#: src/strings.ts:920
+msgid "2FA backup codes saved!"
+msgstr ""
+
 #: src/strings.ts:1747
 msgid "2FA code is required()"
 msgstr "Kod 2FA jest wymagany()"
@@ -1420,8 +1428,8 @@ msgstr "Wszystkie narzędzia z tej grupy zostaną usunięte z paska narzędzi."
 msgid ""
 "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
 msgstr ""
-"Wszystkie kopie zapasowe są przechowywane w folderze 'Phone "
-"Storage/Notesnook/backups/'"
+"Wszystkie kopie zapasowe są przechowywane w folderze 'Phone Storage/"
+"Notesnook/backups/'"
 
 #: src/strings.ts:94
 msgid "Already have an account?"
@@ -3364,13 +3372,13 @@ msgstr "Nie masz dostępu do swojego numeru telefonu?"
 msgid "Don't have an account?"
 msgstr "Nie masz konta?"
 
+#: src/strings.ts:914
+msgid "Don't have your 2FA backup codes?"
+msgstr ""
+
 #: src/strings.ts:1678
 msgid "Don't have your account recovery key?"
 msgstr "Nie masz klucza odzyskiwania konta?"
-
-#: src/strings.ts:914
-msgid "Don't have your recovery codes?"
-msgstr "Nie masz kodów odzyskiwania?"
 
 #: src/strings.ts:1664
 msgid "Don't show again on this device?"
@@ -3604,6 +3612,10 @@ msgstr "Włącz wyrażenia regularne"
 msgid "Enable spell checker"
 msgstr "Włącz sprawdzanie pisowni"
 
+#: src/strings.ts:3280
+msgid "Enable two factor authentication"
+msgstr ""
+
 #: src/strings.ts:447
 msgid ""
 "Enable two-factor authentication to add an extra layer of security to your "
@@ -3643,6 +3655,10 @@ msgstr "Klucz szyfrowania"
 #: src/strings.ts:745
 msgid "End to end encrypted."
 msgstr "Szyfrowane end-to-end."
+
+#: src/strings.ts:915
+msgid "Enter 2FA backup code"
+msgstr ""
 
 #: src/strings.ts:356
 msgid "Enter 6 digit code"
@@ -3712,9 +3728,9 @@ msgstr "Wpisz hasło"
 msgid "Enter pin or password to enable app lock."
 msgstr "Wpisz PIN lub hasło, aby włączyć blokadę aplikacji."
 
-#: src/strings.ts:915
-msgid "Enter recovery code"
-msgstr "Wpisz kod odzyskiwania"
+#: src/strings.ts:106
+msgid "Enter the 2FA backup code to continue logging in"
+msgstr ""
 
 #: src/strings.ts:105
 msgid ""
@@ -3734,10 +3750,6 @@ msgstr ""
 #: src/strings.ts:2210
 msgid "Enter the gift code to redeem your subscription."
 msgstr "Wpisz kod podarunkowy, aby aktywować subskrypcję."
-
-#: src/strings.ts:106
-msgid "Enter the recovery code to continue logging in"
-msgstr "Wpisz kod odzyskiwania, aby kontynuować logowanie"
 
 #: src/strings.ts:2400
 msgid "Enter title"
@@ -3816,8 +3828,8 @@ msgid ""
 "Everything you do in Notesnook stays private. We use XChaCha20-Poly1305-IETF "
 "and Argon2 to encrypt your notes."
 msgstr ""
-"Wszystko, co robisz w Notesnook, pozostaje prywatne. Używamy "
-"XChaCha20-Poly1305-IETF i Argon2 do szyfrowania Twoich notatek."
+"Wszystko, co robisz w Notesnook, pozostaje prywatne. Używamy XChaCha20-"
+"Poly1305-IETF i Argon2 do szyfrowania Twoich notatek."
 
 #: src/strings.ts:2679
 msgid "Example"
@@ -4440,6 +4452,10 @@ msgstr "Zacznij bez kompromisów."
 msgid "Get this and so much more:"
 msgstr "Zyskaj to i wiele więcej:"
 
+#: src/strings.ts:357
+msgid "Getting 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:1728
 msgid "Getting encryption key..."
 msgstr "Pobieranie klucza szyfrowania..."
@@ -4451,10 +4467,6 @@ msgstr "Pobieranie informacji"
 #: src/strings.ts:2980
 msgid "Getting invoice"
 msgstr "Pobieranie faktury"
-
-#: src/strings.ts:357
-msgid "Getting recovery codes"
-msgstr "Pobieranie kodów odzyskiwania"
 
 #: src/strings.ts:2496
 msgid "Gift code required"
@@ -4641,6 +4653,10 @@ msgstr "Hura!"
 msgid "I already have an account"
 msgstr "Mam już konto"
 
+#: src/strings.ts:112
+msgid "I don't have 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:111
 msgid "I don't have access to authenticator app"
 msgstr "Nie mam dostępu do aplikacji uwierzytelniającej"
@@ -4653,13 +4669,9 @@ msgstr "Nie mam dostępu do e-maila"
 msgid "I don't have access to my phone"
 msgstr "Nie mam dostępu do telefonu"
 
-#: src/strings.ts:112
-msgid "I don't have recovery codes"
-msgstr "Nie mam kodów odzyskiwania"
-
 #: src/strings.ts:119
-msgid "I have a recovery code"
-msgstr "Mam kod odzyskiwania"
+msgid "I have a 2FA backup code"
+msgstr ""
 
 #: src/strings.ts:1729
 msgid "I have saved my key"
@@ -4975,8 +4987,8 @@ msgid ""
 "Invalid backup file selected. Only .nnbackup and .nnbackupz files can be "
 "restored."
 msgstr ""
-"Wybrano nieprawidłowy plik kopii zapasowej. Można przywrócić tylko pliki "
-".nnbackup i .nnbackupz."
+"Wybrano nieprawidłowy plik kopii zapasowej. Można przywrócić tylko "
+"pliki .nnbackup i .nnbackupz."
 
 #: src/strings.ts:1810
 msgid "Invalid CORS proxy url"
@@ -5001,10 +5013,8 @@ msgstr "Nieprawidłowa para kluczy PGP. Sprawdź klucze i spróbuj ponownie."
 #: src/strings.ts:2487
 msgid ""
 "Invalid recovery key. Make sure to input your account recovery key, not a "
-"2FA recovery code."
+"2FA backup code."
 msgstr ""
-"Nieprawidłowy klucz odzyskiwania. Upewnij się, że wpisujesz klucz "
-"odzyskiwania konta, a nie kod odzyskiwania 2FA."
 
 #: src/strings.ts:2979
 msgid "Invoice"
@@ -5384,11 +5394,11 @@ msgstr "Zaloguj się, aby szyfrować i synchronizować notatki"
 
 #: src/strings.ts:2392
 msgid ""
-"Login to upload attachments. [Read "
-"more](https://notesnook.com/help/faqs/login-to-upload-attachments)"
+"Login to upload attachments. [Read more](https://notesnook.com/help/faqs/"
+"login-to-upload-attachments)"
 msgstr ""
-"Zaloguj się, aby przesłać załączniki. [Dowiedz się "
-"więcej](https://notesnook.com/help/faqs/login-to-upload-attachments)"
+"Zaloguj się, aby przesłać załączniki. [Dowiedz się więcej](https://"
+"notesnook.com/help/faqs/login-to-upload-attachments)"
 
 #: src/strings.ts:492
 msgid "Login to your account"
@@ -5527,7 +5537,8 @@ msgstr "Scal komórki"
 msgid "Merge conflicts"
 msgstr "Konflikty scalania"
 
-#. placeholder {0}: progress ? `${progress?.collection}` : ""placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : ""
+#. placeholder {0}: progress ? `${progress?.collection}` : ""
+#. placeholder {1}: progress ? `(${progress.current}/${progress.total}) ` : ""
 #: src/strings.ts:219
 msgid "Migrating {0} {1}... please wait"
 msgstr "Migrowanie {0} {1}... poczekaj"
@@ -6440,8 +6451,8 @@ msgid "Please confirm your email to sync notes"
 msgstr "Potwierdź adres e-mail, aby synchronizować notatki"
 
 #: src/strings.ts:913
-msgid "Please confirm your identity by entering a recovery code."
-msgstr "Potwierdź swoją tożsamość, wpisując kod odzyskiwania."
+msgid "Please confirm your identity by entering a 2FA backup code."
+msgstr ""
 
 #: src/strings.ts:892
 msgid ""
@@ -7016,14 +7027,6 @@ msgstr "Polecane przez Privacy Guides"
 msgid "Recover your account"
 msgstr "Odzyskaj swoje konto"
 
-#: src/strings.ts:916
-msgid "Recovery codes copied!"
-msgstr "Skopiowano kody odzyskiwania!"
-
-#: src/strings.ts:920
-msgid "Recovery codes saved!"
-msgstr "Zapisano kody odzyskiwania!"
-
 #: src/strings.ts:80
 msgid ""
 "Recovery email has been sent to your email address. Please check your inbox "
@@ -7499,6 +7502,10 @@ msgstr "Zapisz"
 msgid "Save {savings}% by switching to {period} plan."
 msgstr "Zaoszczędź {savings}%, przechodząc na plan {period}."
 
+#: src/strings.ts:448
+msgid "Save 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:429
 msgid "Save a backup of your notes"
 msgstr "Zapisz kopię zapasową swoich notatek"
@@ -7531,10 +7538,6 @@ msgstr "Zapisz notatkę"
 msgid "Save QR code to gallery"
 msgstr "Zapisz kod QR w galerii"
 
-#: src/strings.ts:448
-msgid "Save recovery codes"
-msgstr "Zapisz kody odzyskiwania"
-
 #: src/strings.ts:625
 msgid "Save to file"
 msgstr "Zapisz do pliku"
@@ -7542,6 +7545,13 @@ msgstr "Zapisz do pliku"
 #: src/strings.ts:540
 msgid "Save to text file"
 msgstr "Zapisz do pliku tekstowego"
+
+#: src/strings.ts:450
+msgid ""
+"Save your 2FA backup codes in a safe place. You will need them to log into "
+"your account in case you lose access to your two-factor authentication "
+"methods."
+msgstr ""
 
 #: src/strings.ts:1264
 msgid "Save your account recovery key"
@@ -7562,15 +7572,6 @@ msgid ""
 msgstr ""
 "Przechowuj klucz odzyskiwania danych w bezpiecznym miejscu. Będzie potrzebny "
 "do odzyskania danych, jeśli zapomnisz hasła."
-
-#: src/strings.ts:450
-msgid ""
-"Save your recovery codes in a safe place. You will need them to recover your "
-"account in case you lose access to your two-factor authentication methods."
-msgstr ""
-"Przechowuj kody odzyskiwania w bezpiecznym miejscu. Będą potrzebne do "
-"odzyskania konta, jeśli stracisz dostęp do metod uwierzytelniania "
-"dwuskładnikowego."
 
 #: src/strings.ts:2191
 msgid "Saved"
@@ -8972,6 +8973,12 @@ msgstr ""
 "Ta nazwa użytkownika posłuży do rozróżniania poszczególnych poświadczeń w "
 "kluczu bezpieczeństwa. Upewnij się, że jest unikalna."
 
+#: src/strings.ts:3279
+msgid ""
+"This will reset your current two-factor authentication setup. Do you want to "
+"proceed?"
+msgstr ""
+
 #: src/strings.ts:3159
 msgid "thoughts"
 msgstr "myśli"
@@ -9222,6 +9229,10 @@ msgstr "Uwierzytelnianie dwuskładnikowe"
 #: src/strings.ts:445
 msgid "Two-factor authentication"
 msgstr "Uwierzytelnianie dwuskładnikowe"
+
+#: src/strings.ts:3281
+msgid "Two-factor authentication disabled"
+msgstr ""
 
 #: src/strings.ts:454
 msgid "Two-factor authentication enabled"
@@ -9673,6 +9684,10 @@ msgstr "Wibracja"
 msgid "Videos"
 msgstr "Filmy"
 
+#: src/strings.ts:964
+msgid "View 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:2244
 msgid "View all limits"
 msgstr "Zobacz wszystkie limity"
@@ -9701,21 +9716,15 @@ msgstr "Wyświetl nieudane elementy skrzynki odbiorczej i konteksty błędów"
 msgid "View receipt"
 msgstr "Zobacz potwierdzenie płatności"
 
-#: src/strings.ts:964
-msgid "View recovery codes"
-msgstr "Zobacz kody odzyskiwania"
-
 #: src/strings.ts:1954
 msgid "View source code"
 msgstr "Zobacz kod źródłowy"
 
 #: src/strings.ts:966
 msgid ""
-"View your recovery codes to recover your account in case you lose access to "
-"your two-factor authentication methods."
+"View your 2FA backup codes to log into your account in case you lose access "
+"to your two-factor authentication methods."
 msgstr ""
-"Zobacz kody odzyskiwania, aby móc odzyskać konto, jeśli stracisz dostęp do "
-"metod uwierzytelniania dwuskładnikowego."
 
 #: src/strings.ts:2393
 msgid "Views"
@@ -10114,8 +10123,8 @@ msgid ""
 "recommend that you save the above link for later reference.**\n"
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please "
-"[join our Discord community](https://go.notesnook.com/discord) for "
-"one-to-one support."
+"[join our Discord community](https://go.notesnook.com/discord) for one-to-"
+"one support."
 msgstr ""
 "You can track your bug report at [{url}]({url}).\n"
 "\n"
@@ -10123,17 +10132,16 @@ msgstr ""
 "recommend that you save the above link for later reference.**\n"
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please "
-"[join our Discord community](https://go.notesnook.com/discord) for "
-"one-to-one support.Postęp zgłoszenia błędu możesz śledzić pod adresem "
-"[{url}]({url}).\n"
+"[join our Discord community](https://go.notesnook.com/discord) for one-to-"
+"one support.Postęp zgłoszenia błędu możesz śledzić pod adresem [{url}]"
+"({url}).\n"
 "\n"
 "Pamiętaj, że odpowiemy na Twoje zgłoszenie pod powyższym linkiem. **Zalecamy "
 "zapisanie go na przyszłość.**\n"
 "\n"
 "Jeśli problem jest krytyczny (np. notatki się nie synchronizują, awarie "
-"itp.), [dołącz do naszej społeczności na "
-"Discordzie](https://go.notesnook.com/discord), aby uzyskać indywidualne "
-"wsparcie."
+"itp.), [dołącz do naszej społeczności na Discordzie](https://"
+"go.notesnook.com/discord), aby uzyskać indywidualne wsparcie."
 
 #: src/strings.ts:1881
 msgid ""
@@ -10249,14 +10257,14 @@ msgstr "Aby zmienić lub zresetować adresy URL serwerów, musisz się wylogowa�
 
 #: src/strings.ts:2506
 msgid ""
-"You need to login to restore attachments from a backup file. [Read "
-"more](https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).\n"
+"You need to login to restore attachments from a backup file. [Read more]"
+"(https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).\n"
 "  \n"
 "Continue without attachments?"
 msgstr ""
 "Musisz się zalogować, aby przywrócić załączniki z pliku kopii zapasowej. "
-"[Dowiedz się "
-"więcej](https://notesnook.com/help/faqs/login-to-restore-attachments-in-backup).\n"
+"[Dowiedz się więcej](https://notesnook.com/help/faqs/login-to-restore-"
+"attachments-in-backup).\n"
 "  \n"
 "Kontynuować bez załączników?"
 

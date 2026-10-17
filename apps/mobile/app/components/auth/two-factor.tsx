@@ -36,11 +36,13 @@ import Input from "../ui/input";
 import { Pressable } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { AuthenticatorType } from "@notesnook/core";
 
 type MFAInfo = {
-  primaryMethod: string;
-  secondaryMethod: string;
-  token: string;
+  primaryMethod: AuthenticatorType;
+  secondaryMethod?: AuthenticatorType;
+  phoneNumber?: string;
+  redirect: "mfa";
 };
 
 const TwoFactorVerification = ({
@@ -76,9 +78,7 @@ const TwoFactorVerification = ({
 
   const onNext = async () => {
     if (!code.current || code.current.length < 6) {
-      setError(
-        new Error(strings.validMfaCodeRequired())
-      );
+      setError(new Error(strings.validMfaCodeRequired()));
       return;
     }
 
