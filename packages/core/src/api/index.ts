@@ -68,7 +68,6 @@ import {
   DatabaseSchema,
   RawDatabaseSchema,
   SQLiteOptions,
-  changeDatabasePassword,
   createDatabase,
   initializeDatabase
 } from "../database/index.js";
@@ -263,13 +262,24 @@ class Database {
     await this.storage().clear();
 
     await dropTriggers(this.sql());
-    for (const statement of [
-      "PRAGMA writable_schema = 1",
-      "DELETE FROM sqlite_master",
-      "PRAGMA writable_schema = 0",
-      "VACUUM",
-      "PRAGMA integrity_check"
-    ]) {
+    // virtual tables must be dropped first so their shadow tables go with
+    // them (shadow tables can't be dropped directly in defensive mode)
+    for (const virtual of [true, false]) {
+      const { rows } = await sql<{ type: string; name: string }>`
+        SELECT type, name FROM sqlite_master
+        WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%'
+        AND (sql LIKE 'CREATE VIRTUAL TABLE%') = ${sql.lit(
+          virtual ? 1 : 0
+        )}`.execute(this.sql());
+      for (const { type, name } of rows) {
+        await sql
+          .raw(
+            `DROP ${type.toUpperCase()} IF EXISTS "${name.replace(/"/g, '""')}"`
+          )
+          .execute(this.sql());
+      }
+    }
+    for (const statement of ["VACUUM", "PRAGMA integrity_check"]) {
       await sql.raw(statement).execute(this.sql());
     }
 
@@ -281,11 +291,6 @@ class Database {
     await this.onInit(this.sql() as unknown as Kysely<RawDatabaseSchema>);
     await this.initCollections();
     return true;
-  }
-
-  async changePassword(password?: string) {
-    if (!this._sql) return;
-    await changeDatabasePassword(this._sql, password);
   }
 
   async init() {
