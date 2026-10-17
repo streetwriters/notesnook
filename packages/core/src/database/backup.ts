@@ -141,6 +141,7 @@ const invalidKeys = [
   "t",
   "v",
   "lastBackupTime",
+  "lastFullBackupTime",
   "lastSynced",
   // all indexes
   "notes",
@@ -196,11 +197,10 @@ export default class Backup {
   }
 
   async updateBackupTime(mode: "full" | "partial" = "partial") {
-    if (mode === "full") {
-      await this.db.kv().write("lastFullBackupTime", Date.now());
-    } else {
-      await this.db.kv().write("lastBackupTime", Date.now());
-    }
+    const now = Date.now();
+    // a full backup is a superset of a partial one
+    await this.db.kv().write("lastBackupTime", now);
+    if (mode === "full") await this.db.kv().write("lastFullBackupTime", now);
   }
 
   /**

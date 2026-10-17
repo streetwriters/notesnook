@@ -27,25 +27,31 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { desktop } from "../../common/desktop-bridge";
 import { formatDate } from "@notesnook/core";
-import { BACKUP_CRON_EXPRESSIONS, FULL_BACKUP_CRON_EXPRESSIONS } from "../../common/notices";
+import {
+  BACKUP_CRON_EXPRESSIONS,
+  FULL_BACKUP_CRON_EXPRESSIONS
+} from "../../common/notices";
 import { CronosExpression } from "cronosjs";
-import dayjs from "dayjs";
 
 function getNextBackupTime(
   offset: number,
-  lastBackupDate?: number,
-  isFull: boolean = false
+  type: "full" | "partial"
 ): number | undefined {
-  if (offset === 0 || !lastBackupDate) return undefined;
+  if (offset === 0) return undefined;
   try {
-    const cronString = isFull
-      ? FULL_BACKUP_CRON_EXPRESSIONS[offset as keyof typeof FULL_BACKUP_CRON_EXPRESSIONS]
-      : BACKUP_CRON_EXPRESSIONS[offset as keyof typeof BACKUP_CRON_EXPRESSIONS];
+    const cronString =
+      type === "full"
+        ? FULL_BACKUP_CRON_EXPRESSIONS[
+            offset as keyof typeof FULL_BACKUP_CRON_EXPRESSIONS
+          ]
+        : BACKUP_CRON_EXPRESSIONS[
+            offset as keyof typeof BACKUP_CRON_EXPRESSIONS
+          ];
 
     if (!cronString) return undefined;
 
     const expr = CronosExpression.parse(cronString);
-    const nextDate = expr.nextDate(new Date(lastBackupDate));
+    const nextDate = expr.nextDate(new Date());
     return nextDate ? nextDate.getTime() : undefined;
   } catch (e) {
     return undefined;
@@ -66,15 +72,24 @@ export const BackupExportSettings: SettingsGroup[] = [
         title: strings.backupNow(),
         description: () => {
           const s = useSettingStore.getState();
-          const partial = s.lastBackupTime || 0;
-          const full = s.lastFullBackupTime || 0;
-          const last = Math.max(partial, full);
-
-          if (!last) return strings.backupNowDesc();
-
-          const formattedDate = formatDate(last, { type: "date-time", dateFormat: s.dateFormat, timeFormat: s.timeFormat });
-          const backupStr = last === full ? strings.lastFullBackupOn(formattedDate) : strings.lastPartialBackupOn(formattedDate);
-          return `${strings.backupNowDesc()}\n${backupStr}`;
+          const formattedFullBackupTime = s.lastFullBackupTime
+            ? formatDate(s.lastFullBackupTime, {
+                type: "date-time",
+                dateFormat: s.dateFormat,
+                timeFormat: s.timeFormat
+              })
+            : strings.never();
+          const formattedPartialBackupTime = s.lastBackupTime
+            ? formatDate(s.lastBackupTime, {
+                type: "date-time",
+                dateFormat: s.dateFormat,
+                timeFormat: s.timeFormat
+              })
+            : strings.never();
+          return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
+            formattedFullBackupTime,
+            "full"
+          )}\n${strings.lastBackupOn(formattedPartialBackupTime, "partial")}`;
         },
         onStateChange: (listener) =>
           useSettingStore.subscribe(
@@ -121,18 +136,15 @@ export const BackupExportSettings: SettingsGroup[] = [
         title: strings.automaticBackups(),
         description: () => {
           const s = useSettingStore.getState();
-          const next = getNextBackupTime(
-            s.backupReminderOffset,
-            s.lastBackupTime,
-            false
-          );
+          const next = getNextBackupTime(s.backupReminderOffset, "partial");
           return next
             ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
                 formatDate(next, {
                   type: "date-time",
                   dateFormat: s.dateFormat,
                   timeFormat: s.timeFormat
-                })
+                }),
+                "partial"
               )}`
             : strings.automaticBackupsDesc();
         },
@@ -169,11 +181,7 @@ export const BackupExportSettings: SettingsGroup[] = [
         title: strings.automaticBackupsWithAttachments(),
         description: () => {
           const s = useSettingStore.getState();
-          const next = getNextBackupTime(
-            s.fullBackupReminderOffset,
-            s.lastFullBackupTime,
-            true
-          );
+          const next = getNextBackupTime(s.fullBackupReminderOffset, "full");
           const base = strings
             .automaticBackupsWithAttachmentsDesc()
             .join("\n\n");
@@ -183,7 +191,8 @@ export const BackupExportSettings: SettingsGroup[] = [
                   type: "date-time",
                   dateFormat: s.dateFormat,
                   timeFormat: s.timeFormat
-                })
+                }),
+                "full"
               )}`
             : base;
         },

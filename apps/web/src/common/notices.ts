@@ -21,6 +21,7 @@ import Config from "../utils/config";
 import { createBackup, verifyAccount } from "./index";
 import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
+import { useStore as useSettingStore } from "../stores/setting-store";
 import { Backup, User, Email, Warn, Icon } from "../components/icons";
 import dayjs from "dayjs";
 import { hardNavigate, hashNavigate } from "../navigation";
@@ -99,6 +100,7 @@ export async function shouldAddBackupNotice() {
   const lastBackupTime = await db.backup.lastBackupTime();
   if (!lastBackupTime) {
     await db.backup.updateBackupTime("partial");
+    await useSettingStore.getState().refreshBackupTime();
     return false;
   }
 
@@ -211,6 +213,7 @@ async function saveBackup(mode: "full" | "partial" = "partial") {
           text: strings.later(),
           onClick: async () => {
             await db.backup.updateBackupTime(mode);
+            await useSettingStore.getState().refreshBackupTime();
             openedToast?.hide();
             openedToast = null;
           },

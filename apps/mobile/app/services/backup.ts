@@ -168,11 +168,12 @@ function getNextBackupTime(
   if (type === "off" || type === "useroff" || type === "never" || !type) return;
   const lastBackupDate = SettingsService.getProperty(lastBackupDateType) as
     | number
+    | "never"
     | undefined;
-  if (!lastBackupDate) return;
+  if (typeof lastBackupDate !== "number" || !lastBackupDate) return;
   const interval =
     type === "daily" ? MS_DAY : type === "weekly" ? MS_WEEK : MONTH;
-  return lastBackupDate + interval;
+  return Math.max(Date.now(), lastBackupDate + interval);
 }
 
 let backupRunning = false;
