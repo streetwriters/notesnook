@@ -73,6 +73,7 @@ import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
 import {
   eAfterSync,
   eCloseSheet,
+  eCloseSimpleDialog,
   eOpenRecoveryKeyDialog
 } from "../../utils/events";
 import { sleep } from "../../utils/time";
@@ -373,6 +374,86 @@ export function getSettingsGroups(): SettingSection[] {
               sections: [
                 {
                   id: "enable-2fa",
+                  type: "switch",
+                  name: strings.twoFactorAuth(),
+                  useHook: () => useUserStore((state) => state.user),
+                  getter: (current) => !!(current as User)?.mfa?.isEnabled,
+                  modifer: async (current) => {
+                    const user =
+                      (current as User) || useUserStore.getState().user;
+                    if (!user?.mfa) return;
+
+                    presentDialog({
+                      title: !user.mfa.isEnabled
+                        ? strings.twoFactorEnable()
+                        : strings.twoFactorAuth(),
+                      paragraph: !user.mfa.isEnabled
+                        ? undefined
+                        : strings.verifySubDesc(),
+                      negativeText: strings.cancel(),
+                      positiveText: user.mfa.isEnabled
+                        ? strings.disable()
+                        : strings.enable(),
+                      positiveType: user.mfa.isEnabled
+                        ? "errorShade"
+                        : undefined,
+                      secureTextEntry: true,
+                      form: {
+                        formRef: createFormRef({
+                          password: ""
+                        }),
+                        items: [
+                          {
+                            name: "password",
+                            placeholder: strings.enterAccountPassword(),
+                            ref: React.createRef<TextInput | null>(),
+                            validators: [
+                              validators.required(strings.passwordRequired())
+                            ]
+                          }
+                        ],
+                        onFormSubmit: async (form) => {
+                          const password = form.getValue("password");
+                          try {
+                            const verified =
+                              await db.user.verifyPassword(password);
+                            if (!verified) {
+                              form.setError(
+                                "password",
+                                strings.passwordIncorrect()
+                              );
+                              return false;
+                            }
+                            if (user.mfa.isEnabled) {
+                              await db.mfa.disable(password);
+                              ToastManager.show({
+                                heading: strings.twoFactorAuthDisabled(),
+                                type: "success"
+                              });
+                              useUserStore
+                                .getState()
+                                .setUser(await db.user.fetchUser());
+                              return true;
+                            }
+                            sleep(500).then(() => {
+                              MFASheet.present();
+                            });
+                            return true;
+                          } catch (e) {
+                            form.setError("password", (e as Error).message);
+                            return false;
+                          }
+                        }
+                      }
+                    });
+                  },
+                  description: (current) =>
+                    (current as User)?.mfa?.isEnabled
+                      ? strings.accountIsSecure()
+                      : strings.twoFactorAuthDesc()
+                },
+                {
+                  id: "change-2fa-primary-method",
                   name: strings.change2faMethod(),
                   modifer: () => {
                     verifyUser("global", async () => {
@@ -380,6 +461,9 @@ export function getSettingsGroups(): SettingSection[] {
                     });
                   },
                   useHook: () => useUserStore((state) => state.user),
+                  hidden: (user) => {
+                    return !(user as User)?.mfa?.isEnabled;
+                  },
                   description: strings.change2faMethodDesc()
                 },
                 {

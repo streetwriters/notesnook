@@ -748,6 +748,14 @@ msgstr "12 saat"
 msgid "24-hour"
 msgstr "24 saat"
 
+#: src/strings.ts:916
+msgid "2FA backup codes copied!"
+msgstr ""
+
+#: src/strings.ts:920
+msgid "2FA backup codes saved!"
+msgstr ""
+
 #: src/strings.ts:1747
 msgid "2FA code is required()"
 msgstr "2FA kodu gerekli()"
@@ -2883,13 +2891,13 @@ msgstr "Telefon numaranıza erişemiyor musunuz?"
 msgid "Don't have an account?"
 msgstr "Hesabınız yok mu?"
 
+#: src/strings.ts:914
+msgid "Don't have your 2FA backup codes?"
+msgstr ""
+
 #: src/strings.ts:1678
 msgid "Don't have your account recovery key?"
 msgstr "Hesap kurtarma anahtarınız yok mu?"
-
-#: src/strings.ts:914
-msgid "Don't have your recovery codes?"
-msgstr "Kurtarma kodlarınız yok mu?"
 
 #: src/strings.ts:1664
 msgid "Don't show again on this device?"
@@ -3124,6 +3132,10 @@ msgstr "Düzenli ifadeleri etkinleştir"
 msgid "Enable spell checker"
 msgstr "Yazım denetimini etkinleştir"
 
+#: src/strings.ts:3280
+msgid "Enable two factor authentication"
+msgstr ""
+
 #: src/strings.ts:447
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "Hesabınıza ek bir güvenlik katmanı eklemek için iki faktörlü kimlik doğrulamayı etkinleştirin."
@@ -3159,6 +3171,10 @@ msgstr "Şifreleme anahtarı"
 #: src/strings.ts:745
 msgid "End to end encrypted."
 msgstr "Uçtan uca şifreli."
+
+#: src/strings.ts:915
+msgid "Enter 2FA backup code"
+msgstr ""
 
 #: src/strings.ts:356
 msgid "Enter 6 digit code"
@@ -3228,9 +3244,9 @@ msgstr "Parolayı girin"
 msgid "Enter pin or password to enable app lock."
 msgstr "Uygulama kilidini etkinleştirmek için bir PIN veya parola girin."
 
-#: src/strings.ts:915
-msgid "Enter recovery code"
-msgstr "Kurtarma kodunu girin"
+#: src/strings.ts:106
+msgid "Enter the 2FA backup code to continue logging in"
+msgstr ""
 
 #: src/strings.ts:105
 msgid "Enter the 6 digit code from your authenticator app to continue logging in"
@@ -3247,10 +3263,6 @@ msgstr "Girişe devam etmek için telefon numaranıza gönderilen 6 haneli kodu 
 #: src/strings.ts:2210
 msgid "Enter the gift code to redeem your subscription."
 msgstr "Aboneliğinizi kullanmak için hediye kodunu girin."
-
-#: src/strings.ts:106
-msgid "Enter the recovery code to continue logging in"
-msgstr "Girişe devam etmek için kurtarma kodunu girin"
 
 #: src/strings.ts:2400
 msgid "Enter title"
@@ -3897,6 +3909,10 @@ msgstr "Ödün vermeden başlayın."
 msgid "Get this and so much more:"
 msgstr "Bunu ve çok daha fazlasını edinin:"
 
+#: src/strings.ts:357
+msgid "Getting 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:1728
 msgid "Getting encryption key..."
 msgstr "Şifreleme anahtarı alınıyor..."
@@ -3908,10 +3924,6 @@ msgstr "Bilgiler alınıyor"
 #: src/strings.ts:2980
 msgid "Getting invoice"
 msgstr "Fatura alınıyor"
-
-#: src/strings.ts:357
-msgid "Getting recovery codes"
-msgstr "Kurtarma kodları alınıyor"
 
 #: src/strings.ts:2496
 msgid "Gift code required"
@@ -4090,6 +4102,10 @@ msgstr "Yaşasın!"
 msgid "I already have an account"
 msgstr "Zaten bir hesabım var"
 
+#: src/strings.ts:112
+msgid "I don't have 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:111
 msgid "I don't have access to authenticator app"
 msgstr "Kimlik doğrulama uygulamasına erişimim yok"
@@ -4102,13 +4118,9 @@ msgstr "E-postaya erişimim yok"
 msgid "I don't have access to my phone"
 msgstr "Telefonuma erişimim yok"
 
-#: src/strings.ts:112
-msgid "I don't have recovery codes"
-msgstr "Kurtarma kodlarım yok"
-
 #: src/strings.ts:119
-msgid "I have a recovery code"
-msgstr "Bir kurtarma kodum var"
+msgid "I have a 2FA backup code"
+msgstr ""
 
 #: src/strings.ts:1729
 msgid "I have saved my key"
@@ -4415,8 +4427,8 @@ msgid "Invalid PGP key pair. Please check your keys and try again."
 msgstr "Geçersiz PGP anahtar çifti. Lütfen anahtarlarınızı kontrol edip tekrar deneyin."
 
 #: src/strings.ts:2487
-msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
-msgstr "Geçersiz kurtarma anahtarı. 2FA kurtarma kodu değil, hesap kurtarma anahtarınızı girdiğinizden emin olun."
+msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA backup code."
+msgstr ""
 
 #: src/strings.ts:2979
 msgid "Invoice"
@@ -5818,8 +5830,8 @@ msgid "Please confirm your email to sync notes"
 msgstr "Notları eşitlemek için lütfen e-postanızı onaylayın"
 
 #: src/strings.ts:913
-msgid "Please confirm your identity by entering a recovery code."
-msgstr "Lütfen bir kurtarma kodu girerek kimliğinizi doğrulayın."
+msgid "Please confirm your identity by entering a 2FA backup code."
+msgstr ""
 
 #: src/strings.ts:892
 msgid "Please confirm your identity by entering the authentication code from your authenticator app."
@@ -6358,14 +6370,6 @@ msgstr "Privacy Guides tarafından öneriliyor"
 msgid "Recover your account"
 msgstr "Hesabınızı kurtarın"
 
-#: src/strings.ts:916
-msgid "Recovery codes copied!"
-msgstr "Kurtarma kodları kopyalandı!"
-
-#: src/strings.ts:920
-msgid "Recovery codes saved!"
-msgstr "Kurtarma kodları kaydedildi!"
-
 #: src/strings.ts:80
 msgid "Recovery email has been sent to your email address. Please check your inbox and follow the instructions to recover your account."
 msgstr "Kurtarma e-postası adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin ve hesabınızı kurtarmak için talimatları izleyin."
@@ -6821,6 +6825,10 @@ msgstr "Kaydet"
 msgid "Save {savings}% by switching to {period} plan."
 msgstr "{period} planına geçerek %{savings} tasarruf edin."
 
+#: src/strings.ts:448
+msgid "Save 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:429
 msgid "Save a backup of your notes"
 msgstr "Notlarınızın bir yedeğini kaydedin"
@@ -6853,10 +6861,6 @@ msgstr "Notu kaydet"
 msgid "Save QR code to gallery"
 msgstr "QR kodunu galeriye kaydet"
 
-#: src/strings.ts:448
-msgid "Save recovery codes"
-msgstr "Kurtarma kodlarını kaydet"
-
 #: src/strings.ts:625
 msgid "Save to file"
 msgstr "Dosyaya kaydet"
@@ -6864,6 +6868,10 @@ msgstr "Dosyaya kaydet"
 #: src/strings.ts:540
 msgid "Save to text file"
 msgstr "Metin dosyasına kaydet"
+
+#: src/strings.ts:450
+msgid "Save your 2FA backup codes in a safe place. You will need them to log into your account in case you lose access to your two-factor authentication methods."
+msgstr ""
 
 #: src/strings.ts:1264
 msgid "Save your account recovery key"
@@ -6876,10 +6884,6 @@ msgstr "Hesap kurtarma anahtarınızı güvenli bir yerde saklayın. Parolanız�
 #: src/strings.ts:954
 msgid "Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password."
 msgstr "Veri kurtarma anahtarınızı güvenli bir yerde saklayın. Parolanızı unutursanız verilerinizi kurtarmak için buna ihtiyacınız olacak."
-
-#: src/strings.ts:450
-msgid "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
-msgstr "Kurtarma kodlarınızı güvenli bir yerde saklayın. İki faktörlü kimlik doğrulama yöntemlerinize erişiminizi kaybederseniz hesabınızı kurtarmak için bunlara ihtiyacınız olacak."
 
 #: src/strings.ts:2191
 msgid "Saved"
@@ -8161,6 +8165,10 @@ msgstr "Bu not herkese açık bir adreste yayımlanacak."
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Bu kullanıcı adı, güvenlik anahtarınızdaki farklı kimlik bilgilerini ayırt etmek için kullanılacak. Benzersiz olduğundan emin olun."
 
+#: src/strings.ts:3279
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr ""
+
 #: src/strings.ts:3159
 msgid "thoughts"
 msgstr "düşünce"
@@ -8390,6 +8398,10 @@ msgstr "İki faktörlü kimlik doğrulama"
 #: src/strings.ts:445
 msgid "Two-factor authentication"
 msgstr "İki faktörlü kimlik doğrulama"
+
+#: src/strings.ts:3281
+msgid "Two-factor authentication disabled"
+msgstr ""
 
 #: src/strings.ts:454
 msgid "Two-factor authentication enabled"
@@ -8819,6 +8831,10 @@ msgstr "Titreşim"
 msgid "Videos"
 msgstr "Videolar"
 
+#: src/strings.ts:964
+msgid "View 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:2244
 msgid "View all limits"
 msgstr "Tüm sınırları görüntüle"
@@ -8847,17 +8863,13 @@ msgstr "Başarısız gelen kutusu öğelerini ve hata bağlamlarını görüntü
 msgid "View receipt"
 msgstr "Makbuzu görüntüle"
 
-#: src/strings.ts:964
-msgid "View recovery codes"
-msgstr "Kurtarma kodlarını görüntüle"
-
 #: src/strings.ts:1954
 msgid "View source code"
 msgstr "Kaynak kodunu görüntüle"
 
 #: src/strings.ts:966
-msgid "View your recovery codes to recover your account in case you lose access to your two-factor authentication methods."
-msgstr "İki faktörlü kimlik doğrulama yöntemlerinize erişiminizi kaybetmeniz durumunda hesabınızı kurtarmak için kurtarma kodlarınızı görüntüleyin."
+msgid "View your 2FA backup codes to log into your account in case you lose access to your two-factor authentication methods."
+msgstr ""
 
 #: src/strings.ts:2393
 msgid "Views"
