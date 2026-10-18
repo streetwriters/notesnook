@@ -64,7 +64,7 @@ export function formatTitle(
     .replace(DATE_REGEX, date)
     .replace(TIME_REGEX, time)
     .replace(DAY_REGEX, day)
-    .replace(HEADLINE_REGEX, headline || "")
+    .replace(HEADLINE_REGEX, () => headline || "")
     .replace(TIMESTAMP_REGEX, timestamp)
     .replace(TIMESTAMP_Z_REGEX, timestampWithTimeZone)
     .replace(COUNT_REGEX, `${totalNotes + 1}`);

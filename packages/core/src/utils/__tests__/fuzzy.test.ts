@@ -130,3 +130,10 @@ describe("lookup.fuzzy", () => {
     });
   });
 });
+
+test("sanitized query is tried when the raw query has no matches", () => {
+  const items = [{ id: "1", title: "hello world" }];
+  expect(fuzzy("hello-world", items, (i) => i.id, { title: 1 })).toStrictEqual(
+    items
+  );
+});
