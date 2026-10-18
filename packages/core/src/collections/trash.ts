@@ -262,43 +262,43 @@ export default class Trash {
   }
 
   async grouped(options: GroupOptions) {
-    const ids = [
-      ...this.userDeletedCache.notes,
-      ...this.userDeletedCache.notebooks
-    ];
     const selector = getSortSelectors(options)[options.sortDirection];
-    return new VirtualizedGrouping<TrashItem>(
-      ids.length,
-      this.db.options.batchSize,
-      () => Promise.resolve(ids),
-      async (start, end) => {
-        const slicedIds = ids.slice(start, end);
-        const noteIds = slicedIds.filter((id) =>
-          this.userDeletedCache.notes.includes(id)
-        );
-        const notebookIds = slicedIds.filter((id) =>
-          this.userDeletedCache.notebooks.includes(id)
-        );
-        const items = [
-          ...(await this.trashedNotes(noteIds)),
-          ...(await this.trashedNotebooks(notebookIds))
-        ];
-        items.sort(selector);
+    const items = (await this.userDeletedItems()).sort(selector);
 
+    return new VirtualizedGrouping<TrashItem>(
+      items.length,
+      this.db.options.batchSize,
+      async () => items.map((item) => item.id),
+      async (start, end) => {
+        const slicedItems = items.slice(start, end);
         return {
-          ids: slicedIds,
-          items
+          ids: slicedItems.map((item) => item.id),
+          items: slicedItems
         };
       },
       (items) => groupArray(items, createKeySelector(options)),
-      async () => {
-        const items = await this.all();
-        items.sort(selector);
-        return Array.from(
-          groupArray(items, createKeySelector(options)).values()
-        );
-      }
+      async () =>
+        Array.from(groupArray(items, createKeySelector(options)).values())
     );
+  }
+
+  private async userDeletedItems() {
+    return [
+      ...(await this.db
+        .sql()
+        .selectFrom("notes")
+        .where("type", "==", "trash")
+        .where("deletedBy", "in", ["user", "expired"])
+        .selectAll()
+        .execute()),
+      ...(await this.db
+        .sql()
+        .selectFrom("notebooks")
+        .where("type", "==", "trash")
+        .where("deletedBy", "==", "user")
+        .selectAll()
+        .execute())
+    ] as TrashItem[];
   }
 
   /**
