@@ -21,6 +21,7 @@ import { authenticator } from "otplib";
 import { databaseTest } from "../__tests__/utils/index.ts";
 import { login, USER } from "./utils.js";
 import { test, expect } from "vitest";
+import { EV, EVENTS } from "../src/common.js";
 
 // test("signup user and check for token", async () => {
 //   const db = new DB(StorageInterface);
@@ -115,6 +116,45 @@ test(
     }),
   30000
 );
+
+async function loginOnTwoDevices() {
+  const deviceA = await databaseTest();
+  const deviceB = await databaseTest();
+  await login(deviceA);
+  // TOTP codes can't be reused, wait for the next one
+  await new Promise((resolve) => setTimeout(resolve, 30000));
+  await login(deviceB);
+  const loggedOut = new Promise((resolve) =>
+    deviceB.eventManager.subscribe(EVENTS.userLoggedOut, resolve)
+  );
+  return { deviceA, deviceB, loggedOut };
+}
+
+test("logout from all other devices logs out the other device via SSE", async () => {
+  const { deviceA, deviceB, loggedOut } = await loginOnTwoDevices();
+
+  await deviceA.user.clearSessions(false);
+
+  await expect(loggedOut).resolves.toBe("Session revoked.");
+  await expect(deviceB.user.getUser()).resolves.toBeUndefined();
+
+  await deviceA.user.logout();
+}, 90000);
+
+test("logout from all other devices logs out an offline device on token refresh", async () => {
+  const { deviceA, deviceB, loggedOut } = await loginOnTwoDevices();
+  deviceB.disconnectSSE();
+
+  await deviceA.user.clearSessions(false);
+
+  await expect(deviceB.tokenManager._refreshToken(true)).rejects.toThrow();
+  EV.publish(EVENTS.userUnauthorized, "https://api.notesnook.com/users");
+
+  await expect(loggedOut).resolves.toMatch(/Your token has been revoked/);
+  await expect(deviceB.user.getUser()).resolves.toBeUndefined();
+
+  await deviceA.user.logout();
+}, 90000);
 
 // test("login user and delete user", async () => {
 //   const db = new DB(StorageInterface);

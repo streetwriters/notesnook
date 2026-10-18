@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { User } from "../types.js";
-import http from "../utils/http.js";
+import http, { RequestError } from "../utils/http.js";
 import constants from "../utils/constants.js";
 import TokenManager from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
@@ -60,8 +60,8 @@ class UserManager {
         await this.tokenManager._refreshToken(true);
       } catch (e) {
         if (
-          e instanceof Error &&
-          (e.message === "invalid_grant" || e.message === "invalid_client")
+          e instanceof RequestError &&
+          (e.code === "invalid_grant" || e.code === "invalid_client")
         ) {
           await this.logout(
             false,

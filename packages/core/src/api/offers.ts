@@ -24,7 +24,11 @@ import http from "../utils/http.js";
 export class Offers {
   static async getCode(promo: string, platform: "ios" | "android" | "web") {
     const result = await http.get(
-      `${hosts.SUBSCRIPTIONS_HOST}/offers?promoCode=${promo}&clientId=${CLIENT_ID}&platformId=${platform}`
+      `${hosts.SUBSCRIPTIONS_HOST}/offers?${new URLSearchParams({
+        promoCode: promo,
+        clientId: CLIENT_ID,
+        platformId: platform
+      })}`
     );
     return result.code;
   }
