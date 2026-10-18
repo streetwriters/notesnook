@@ -251,24 +251,18 @@ export default class Lookup {
       values: { id: string; types: string[]; rank: number }[];
     };
     let matches: Matches = { ids: [], values: [] };
+    const matchesById = new Map<string, Matches["values"][number]>();
     for (const array of [ftsResults, regexMatches])
       for (const { id, type, rank } of array) {
-        const index = matches.ids.indexOf(id);
-        const match =
-          index === -1
-            ? {
-                id,
-                types: [],
-                rank: 0
-              }
-            : matches.values[index];
-        match.types.push(type);
-        match.rank += rank || 0;
-
-        if (index === -1) {
+        let match = matchesById.get(id);
+        if (!match) {
+          match = { id, types: [], rank: 0 };
+          matchesById.set(id, match);
           matches.ids.push(id);
           matches.values.push(match);
         }
+        match.types.push(type);
+        match.rank += rank || 0;
       }
 
     if (!sortOptions || sortOptions.sortBy === "relevance") {
@@ -284,9 +278,9 @@ export default class Lookup {
         .items(matches.ids, sortOptions);
       const sorted: Matches = { ids: [], values: [] };
       for (const { id } of sortedNoteIds) {
-        const index = matches.ids.indexOf(id);
-        if (index === -1) continue;
-        sorted.values.push(matches.values[index]);
+        const match = matchesById.get(id);
+        if (!match) continue;
+        sorted.values.push(match);
         sorted.ids.push(id);
       }
       matches = sorted;
