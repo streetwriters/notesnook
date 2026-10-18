@@ -287,7 +287,9 @@ async function setupDatabase<Schema>(
   options: SQLiteOptions
 ) {
   if (options.password)
-    await sql`PRAGMA key = ${sql.ref(options.password)}`.execute(db);
+    await sql
+      .raw(`PRAGMA key = '${options.password.replace(/'/g, "''")}'`)
+      .execute(db);
   await sql`PRAGMA journal_mode = ${sql.raw(
     options.journalMode || "WAL"
   )}`.execute(db);
@@ -398,13 +400,6 @@ export async function createDatabase<Schema>(
     });
 
   return db;
-}
-
-export async function changeDatabasePassword(
-  db: Kysely<DatabaseSchema>,
-  password?: string
-) {
-  await sql`PRAGMA rekey = "${password ? password : ""}"`.execute(db);
 }
 
 export function isFalse<TB extends keyof DatabaseSchema>(

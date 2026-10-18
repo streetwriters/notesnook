@@ -79,28 +79,53 @@ export async function createTriggers(db: Kysely<RawDatabaseSchema>) {
     .after()
     .addEvent("update")
     .when((eb) =>
-      eb.and([
-        eb("old.noteId", "is not", null),
-        eb("old.data", "is not", null),
-        eb("old.deleted", "is not", true)
+      eb.or([
+        eb.and([
+          eb("old.noteId", "is not", null),
+          eb("old.data", "is not", null),
+          eb("old.deleted", "is not", true)
+        ]),
+        eb.and([
+          eb("new.noteId", "is not", null),
+          eb("new.data", "is not", null),
+          eb("new.deleted", "is not", true)
+        ])
       ])
     )
     .addQuery((c) =>
-      c.insertInto("content_fts").values({
-        content_fts: sql.lit("delete"),
-        rowid: sql.ref("old.rowid"),
-        id: sql.ref("old.id"),
-        data: sql`IIF(old.locked == 1, '', old.data)`,
-        noteId: sql.ref("old.noteId")
-      })
+      c
+        .insertInto("content_fts")
+        .columns(["content_fts", "rowid", "id", "data", "noteId"])
+        .expression(
+          c
+            .selectNoFrom([
+              sql.lit("delete").as("content_fts"),
+              sql.ref("old.rowid").as("rowid"),
+              sql.ref("old.id").as("id"),
+              sql`IIF(old.locked == 1, '', old.data)`.as("data"),
+              sql.ref("old.noteId").as("noteId")
+            ])
+            .where(
+              sql<boolean>`old.noteId IS NOT NULL AND old.data IS NOT NULL AND old.deleted IS NOT 1`
+            )
+        )
     )
     .addQuery((c) =>
-      c.insertInto("content_fts").values({
-        rowid: sql`new.rowid`,
-        id: sql`new.id`,
-        data: sql`IIF(new.locked == 1, '', new.data)`,
-        noteId: sql`new.noteId`
-      })
+      c
+        .insertInto("content_fts")
+        .columns(["rowid", "id", "data", "noteId"])
+        .expression(
+          c
+            .selectNoFrom([
+              sql`new.rowid`.as("rowid"),
+              sql`new.id`.as("id"),
+              sql`IIF(new.locked == 1, '', new.data)`.as("data"),
+              sql`new.noteId`.as("noteId")
+            ])
+            .where(
+              sql<boolean>`new.noteId IS NOT NULL AND new.data IS NOT NULL AND new.deleted IS NOT 1`
+            )
+        )
     )
     .execute();
 
