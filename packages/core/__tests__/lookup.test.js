@@ -184,6 +184,29 @@ describe("notesWithHighlighting", () => {
       expect(item.item).toBeDefined();
     }));
 
+  test("search should keep escaped html escaped in highlighted content", () =>
+    databaseTest().then(async (db) => {
+      await db.notes.add({
+        title: "escaped",
+        content: {
+          type: "tiptap",
+          data: `<p>&lt;img src=x onerror=alert(1)&gt; hello</p><p><a href="https://example.com/?a=1&amp;b=&quot;2&quot;">hello link</a></p>`
+        }
+      });
+
+      const filtered = await db.lookup.notesWithHighlighting(
+        "hello",
+        db.notes.all
+      );
+      const { item } = await filtered.item(0);
+      expect(item.rawContent).not.toContain("<img");
+      expect(item.rawContent).toContain("&lt;img src=x onerror=alert(1)&gt; ");
+      expect(item.rawContent).toContain(
+        `href="https://example.com/?a=1&amp;b=&quot;2&quot;"`
+      );
+      expect(item.content[0][0].prefix).toBe("<img src=x onerror=alert(1)> ");
+    }));
+
   test("search should be diacritic agnostic", () =>
     databaseTest().then(async (db) => {
       await db.notes.add({ title: "outdoor café" });

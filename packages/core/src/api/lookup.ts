@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { match } from "fuzzyjs";
-import { decodeHTML } from "entities";
+import { decodeHTML, escapeAttribute, escapeText } from "entities";
 import Database from "./index.js";
 import {
   HighlightedResult,
@@ -982,11 +982,14 @@ function highlightHtmlContent(html: string, queries: string[]): string {
     {
       ontext(text) {
         const normalizedText = removeDiacritics(text);
+        // text is decoded by the parser so it must be escaped again
+        // otherwise escaped text (e.g. &lt;) would turn into markup
         const highlighted = highlightRegexMatches(
           text,
           normalizedText,
           searchRegex,
-          matchIdCounter
+          matchIdCounter,
+          escapeText
         );
         matchIdCounter = highlighted.nextId;
 
@@ -1039,7 +1042,7 @@ function highlightHtmlContent(html: string, queries: string[]): string {
             continue;
           }
 
-          html += ` ${key}="${value}"`;
+          html += ` ${key}="${escapeAttribute(value)}"`;
         }
 
         html += `>${element.buffer}</${element.name}>`;
@@ -1193,7 +1196,8 @@ function highlightRegexMatches(
   text: string,
   normalizedText: string,
   regex: RegExp,
-  startId: number
+  startId: number,
+  encode: (text: string) => string = (text) => text
 ): { result: string; hasMatches: boolean; nextId: number } {
   let matchIdCounter = startId;
   let hasMatches = false;
@@ -1203,15 +1207,15 @@ function highlightRegexMatches(
 
   while ((m = regex.exec(normalizedText)) !== null) {
     hasMatches = true;
-    result += text.slice(lastIndex, m.index);
+    result += encode(text.slice(lastIndex, m.index));
     result += createSearchResultTag(
-      text.slice(m.index, m.index + m[0].length),
+      encode(text.slice(m.index, m.index + m[0].length)),
       `match-${++matchIdCounter}`
     );
     lastIndex = m.index + m[0].length;
   }
 
-  result += text.slice(lastIndex);
+  result += encode(text.slice(lastIndex));
   return { result, hasMatches, nextId: matchIdCounter };
 }
 
