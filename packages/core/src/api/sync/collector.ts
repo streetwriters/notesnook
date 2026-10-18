@@ -61,8 +61,8 @@ class Collector {
     for (const itemType of SYNC_ITEM_TYPES) {
       const collectionKey = SYNC_COLLECTIONS_MAP[itemType];
       const collection = this.db[collectionKey].collection;
-      let pushTimestamp = Date.now();
       for await (const chunk of collection.unsynced(chunkSize, isForceSync)) {
+        const modified = chunk.map((i) => [i.id, i.dateModified] as const);
         const { ids, items: syncableItems } = filterSyncableItems(chunk);
         if (!ids.length) continue;
         const ciphers = await this.db
@@ -78,19 +78,28 @@ class Collector {
         await this.db
           .sql()
           .updateTable(collection.type)
-          .where("id", "in", ids)
           // EDGE CASE:
           // Sometimes an item can get updated while it's being pushed.
           // The result is that its `synced` property becomes true even
           // though it's modification wasn't yet synced.
           // In order to prevent that, we only set the `synced` property
-          // to true for items that haven't been modified since we last ran
-          // the push. Everything else will be collected again in the next
-          // push.
-          .where("dateModified", "<=", pushTimestamp)
+          // to true for items whose `dateModified` is still the same as
+          // the one we pushed. Everything else will be collected again in
+          // the next push. Comparing against the pushed value (instead of
+          // the current time) also handles items with a `dateModified` in
+          // the future.
+          .where((eb) =>
+            eb.or(
+              modified.map(([id, dateModified]) =>
+                eb.and([
+                  eb("id", "=", id),
+                  eb("dateModified", "=", dateModified)
+                ])
+              )
+            )
+          )
           .set({ synced: true })
           .execute();
-        pushTimestamp = Date.now();
       }
     }
   }
