@@ -72,14 +72,11 @@ export default class Lookup {
 
   notes(query: string, notes?: FilteredSelector<Note>): SearchResults<Note> {
     return this.toSearchResults(async (limit, sortOptions) => {
-      const excludedIds = this.db.trash.cache.notes;
-
       const { content, title } = transformQuery(query);
 
       const ftsResults: string[] =
         (await this.ftsQueryBuilder(
           { content: content?.query, title: title?.query },
-          excludedIds,
           notes
         )
           ?.select(["results.id"])
@@ -113,7 +110,6 @@ export default class Lookup {
     sortOptions?: SortOptions
   ): Promise<VirtualizedGrouping<HighlightedResult>> {
     const db = this.db.sql() as unknown as Kysely<RawDatabaseSchema>;
-    const excludedIds = this.db.trash.cache.notes;
     const {
       content,
       title,
@@ -222,7 +218,6 @@ export default class Lookup {
     const ftsResults =
       (await this.ftsQueryBuilder(
         { content: content?.query, title: title?.query },
-        excludedIds,
         notes
       )
         ?.select(["id", "type", "rank"])
@@ -435,7 +430,6 @@ export default class Lookup {
       title?: string;
       content?: string;
     },
-    excludedIds: string[] = [],
     filter?: FilteredSelector<Note>
   ) {
     if (!queries.content && !queries.title) return;
@@ -452,9 +446,7 @@ export default class Lookup {
         .$if(!!filter, (eb) =>
           eb.where("id", "in", filter!.filter.select("id"))
         )
-        .$if(excludedIds.length > 0, (eb) =>
-          eb.where("id", "not in", excludedIds)
-        )
+        .where("id", "not in", (eb) => trashedNotes(eb))
         .where("title", "match", queries.title)
         .where("rank", "=", sql<number>`'bm25(1.0, 10.0)'`)
         .select(["id", "rank", sql<string>`'title'`.as("type")]);
@@ -470,9 +462,7 @@ export default class Lookup {
         .$if(!!filter, (eb) =>
           eb.where("noteId", "in", filter!.filter.select("id"))
         )
-        .$if(excludedIds.length > 0, (eb) =>
-          eb.where("noteId", "not in", excludedIds)
-        )
+        .where("noteId", "not in", (eb) => trashedNotes(eb))
         .where("data", "match", queries.content)
         .where("rank", "=", sql<number>`'bm25(1.0, 1.0, 10.0)'`)
         .select(["noteId as id", "rank", sql<string>`'content'`.as("type")])
@@ -1186,6 +1176,14 @@ function transformTokens(tokens: QueryTokens | undefined) {
     notTokens,
     allTokens: [...andTokens, ...orTokens]
   };
+}
+
+/**
+ * Trashed notes are looked up using a subquery instead of binding the ids
+ * because there can be more of them than the max number of SQL variables.
+ */
+function trashedNotes(eb: ExpressionBuilder<RawDatabaseSchema, any>) {
+  return eb.selectFrom("notes").where("type", "==", "trash").select("notes.id");
 }
 
 function createSearchResultTag(content: string, id: string) {

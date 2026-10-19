@@ -39,7 +39,6 @@ import { ICollection } from "./collection.js";
 import { SQLCollection } from "../database/sql-collection.js";
 import { isFalse } from "../database/index.js";
 import { logger } from "../logger.js";
-import { addItems, deleteItems } from "../utils/array.js";
 import { sql } from "@streetwriters/kysely";
 
 export type ExportOptions = {
@@ -52,7 +51,6 @@ export type ExportOptions = {
 
 export class Notes implements ICollection {
   name = "notes";
-  cache: { archived: string[] } = { archived: [] };
   /**
    * @internal
    */
@@ -71,13 +69,6 @@ export class Notes implements ICollection {
   async init() {
     await this.collection.init();
     this.totalNotes = await this.collection.count();
-    await this.buildCache();
-  }
-
-  async buildCache() {
-    this.cache.archived = [];
-    const archived = await this.archived.ids();
-    this.cache.archived = archived;
   }
 
   async add(
@@ -345,11 +336,6 @@ export class Notes implements ICollection {
   }
   async archive(state: boolean, ...ids: string[]) {
     await this.collection.update(ids, { archived: state });
-    if (state) {
-      addItems(this.cache.archived, ...ids);
-    } else {
-      deleteItems(this.cache.archived, ...ids);
-    }
   }
 
   async setExpiryDate(date: number | null, ...ids: string[]) {
