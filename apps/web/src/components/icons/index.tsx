@@ -344,6 +344,7 @@ import CloudCheckSvg from "@notesnook/icons/cloud-check.svg?react";
 import ScanDeleteSvg from "@notesnook/icons/scan-delete.svg?react";
 import CheckboxSvg from "@notesnook/icons/checkbox.svg?react";
 import CheckboxUncheckedSvg from "@notesnook/icons/checkbox-unchecked.svg?react";
+import CheckboxRemoveSvg from "@notesnook/icons/checkbox-remove.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -824,3 +825,4 @@ export const CloudCheck = createSvgIcon(CloudCheckSvg);
 export const ScanDelete = createSvgIcon(ScanDeleteSvg);
 export const Checkbox = createSvgIcon(CheckboxSvg);
 export const CheckboxUnchecked = createSvgIcon(CheckboxUncheckedSvg);
+export const CheckboxRemove = createSvgIcon(CheckboxRemoveSvg);

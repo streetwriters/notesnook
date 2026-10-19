@@ -22,7 +22,11 @@ import { Checkbox as CheckboxIcon, CheckboxUnchecked } from "./icons";
 
 type CheckboxProps = {
   checked: boolean;
-  onToggle: () => void;
+  onToggle?: (
+    event:
+      | React.MouseEvent<HTMLDivElement>
+      | React.KeyboardEvent<HTMLDivElement>
+  ) => void;
   "aria-label": string;
   "data-test-id"?: string;
   size?: number;
@@ -49,14 +53,18 @@ export function Checkbox(props: CheckboxProps) {
       tabIndex={0}
       data-test-id={dataTestId}
       onClick={(event) => {
+        if (!onToggle) return;
+
         event.stopPropagation();
-        onToggle();
+        onToggle(event);
       }}
       onKeyDown={(event) => {
+        if (!onToggle) return;
+
         if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
           event.stopPropagation();
-          onToggle();
+          onToggle(event);
         }
       }}
       sx={{
