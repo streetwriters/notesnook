@@ -30,6 +30,7 @@ import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import {
+  SelectedCheck,
   SelectedReference,
   selectMultiple,
   useSelectionStore
@@ -145,7 +146,6 @@ function TagItem(props: { tag: Tag }) {
   const { tag } = props;
   const selected = useSelectionStore((state) => state.selected);
   const setSelected = useSelectionStore((state) => state.setSelected);
-  const isChecked = selected.find((item) => item.id === tag.id)?.op === "add";
 
   function toggleSelection() {
     setSelected(selectMultiple(tag, selected));
@@ -183,14 +183,7 @@ function TagItem(props: { tag: Tag }) {
         >
           {tag.title}
         </Text>
-        <Checkbox
-          size={16}
-          checked={isChecked}
-          onToggle={toggleSelection}
-          aria-label={tag.title}
-          checkboxUncheckedIconColor="icon-disabled"
-          data-test-id="tag-checkbox"
-        />
+        <SelectedCheck item={tag} size={16} />
       </Flex>
     </Flex>
   );

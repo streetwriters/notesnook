@@ -27,7 +27,8 @@ import {
   CheckIntermediate,
   CheckRemove,
   CircleEmpty,
-  ChevronRight
+  ChevronRight,
+  CheckboxRemove
 } from "../components/icons";
 import { db } from "../common/db";
 import Dialog from "../components/dialog";
@@ -47,6 +48,7 @@ import {
   VirtualizedTree,
   VirtualizedTreeHandle
 } from "../components/virtualized-tree";
+import { Checkbox } from "../components/checkbox";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export type SelectedReference = {
@@ -338,8 +340,10 @@ export function NotebookItem(props: {
   const setSelected = useSelectionStore((store) => store.setSelected);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
 
-  const check: React.MouseEventHandler<HTMLDivElement> = useCallback(
-    (e) => {
+  const check = useCallback(
+    (
+      e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>
+    ) => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -424,28 +428,28 @@ export function SelectedCheck({
 }: {
   item?: { id: string };
   size?: number;
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
+  onClick?: (
+    event:
+      | React.MouseEvent<HTMLDivElement>
+      | React.KeyboardEvent<HTMLDivElement>
+  ) => void;
 }) {
   const selectedItems = useSelectionStore((store) => store.selected);
   const selectedItem =
     item && selectedItems[findSelectionIndex(item, selectedItems)];
 
-  return selectedItem?.op === "add" ? (
-    <CheckCircleOutline
+  if (selectedItem?.op === "remove") {
+    return <CheckboxRemove size={size} onClick={onClick} />;
+  }
+
+  return (
+    <Checkbox
+      onToggle={onClick}
       size={size}
-      sx={{ mr: 1 }}
-      color="accent"
-      onClick={onClick}
+      checked={selectedItem?.op === "add"}
+      aria-label="Select item"
+      checkboxUncheckedIconColor="icon-disabled"
     />
-  ) : selectedItem?.op === "remove" ? (
-    <CheckRemove
-      size={size}
-      sx={{ mr: 1 }}
-      color="icon-error"
-      onClick={onClick}
-    />
-  ) : (
-    <CircleEmpty size={size} sx={{ mr: 1, opacity: 0.4 }} onClick={onClick} />
   );
 }
 
