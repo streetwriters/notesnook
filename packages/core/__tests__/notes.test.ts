@@ -763,6 +763,53 @@ for (const group of groups) {
   }
 }
 
+for (const groupBy of ["default", "week", "month", "year", "abc"] as const) {
+  for (const sortBy of ["title", "dateCreated", "dateEdited"] as const) {
+    for (const sortDirection of ["asc", "desc"] as const) {
+      const options: GroupOptions = { groupBy, sortBy, sortDirection };
+      test(`items should be under their own group when grouped by ${groupBy}, sorted by ${sortBy} (${sortDirection})`, () =>
+        databaseTest().then(async (db) => {
+          // ages cross the recent/last week/older thresholds and calendar
+          // weeks; first letters alternate when ordered by date
+          const titles = [
+            "alpha",
+            "Bravo",
+            "apple",
+            "banana",
+            "Avocado",
+            "berry"
+          ];
+          const ages = [0, 6, 8, 13, 15, 400];
+          for (let i = 0; i < titles.length; i++) {
+            const date = dayjs().subtract(ages[i], "days").valueOf();
+            await db.notes.add({
+              title: titles[i],
+              dateCreated: date,
+              dateEdited: date
+            });
+          }
+
+          const keySelector = createKeySelector(options);
+          const grouping = await db.notes.all.grouped(options);
+          const headers: string[] = [];
+          let currentHeader = "";
+          for (let i = 0; i < grouping.length; i++) {
+            const { item, group } = await grouping.item(i);
+            if (group) {
+              headers.push(group.title);
+              currentHeader = group.title;
+            }
+            expect(keySelector(item!)).toBe(currentHeader);
+          }
+          expect(new Set(headers).size).toBe(headers.length);
+
+          const groups = (await grouping.groups!()).map((g) => g.group.title);
+          expect(groups).toStrictEqual(headers);
+        }));
+    }
+  }
+}
+
 test("get archived notes", () =>
   noteTest().then(async ({ db, id }) => {
     await db.notes.archive(true, id);
