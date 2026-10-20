@@ -5901,8 +5901,8 @@ msgid "Please enter your vault password to continue"
 msgstr "Please enter your vault password to continue"
 
 #: src/strings.ts:1440
-msgid "Please grant notifications permission to add new reminders."
-msgstr "Please grant notifications permission to add new reminders."
+msgid "Please grant notifications permission to receive reminder notifications."
+msgstr "Please grant notifications permission to receive reminder notifications."
 
 #: src/strings.ts:2510
 msgid "Please login to download attachments."
