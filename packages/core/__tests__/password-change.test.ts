@@ -31,16 +31,26 @@ const FULL_USER: any = {
   subscription: { appId: 0, cancelURL: null, expiry: 0, productId: null, provider: "none", start: 0, plan: "free", status: "trial", updateURL: null, googlePurchaseToken: null }
 };
 
-vi.mock("../src/utils/http.js", () => ({
+// the password change responds with the user and its rewrapped keys
+const server: { db?: any } = {};
+vi.mock("../src/utils/http.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/utils/http.js")>()),
   default: {
     get: vi.fn().mockResolvedValue(undefined),
     post: vi.fn().mockResolvedValue(undefined),
-    patch: { json: vi.fn().mockResolvedValue(undefined) },
+    patch: {
+      json: vi.fn(async (url: string, body: any) => {
+        if (!url.includes("/users/password/")) return;
+        const user = await server.db.user.getUser();
+        return { ...user, ...body.userKeys, revision: (user.revision ?? 0) + 1 };
+      })
+    },
     delete: vi.fn().mockResolvedValue(undefined)
   }
 }));
 
 async function setupLoggedInUser(db: any, password: string = "oldpassword") {
+  server.db = db;
   const salt = randomBytes(16).toString("base64");
   const user = { ...FULL_USER, salt };
   await db.user.setUser(user);

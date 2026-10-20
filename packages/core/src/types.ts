@@ -640,6 +640,14 @@ export type User = {
   inboxKeys?: { public: string; private: Cipher<"base64"> };
   dataEncryptionKey?: Cipher<"base64">;
   legacyDataEncryptionKey?: Cipher<"base64">;
+  /**
+   * Incremented by the server on every change to the user's keys.
+   */
+  revision?: number;
+  /**
+   * Keys of a password change that is in progress or failed midway.
+   */
+  pendingKeys?: UserKeys;
 
   marketingConsent?: boolean;
   storageUsed?: number;
@@ -665,6 +673,17 @@ export type User = {
     googlePurchaseToken: string | null;
   };
 };
+
+export type UserKeys = Partial<
+  Pick<
+    User,
+    | "attachmentsKey"
+    | "monographPasswordsKey"
+    | "inboxKeys"
+    | "dataEncryptionKey"
+    | "legacyDataEncryptionKey"
+  >
+>;
 
 export type Profile = {
   fullName?: string;
