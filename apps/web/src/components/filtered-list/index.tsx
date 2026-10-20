@@ -35,7 +35,7 @@ type FilteredListProps<T> = {
 export function FilteredList<T>(props: FilteredListProps<T>) {
   const { items, filter, onCreateNewItem, placeholders, ...listProps } = props;
   const { theme } = useThemeUI();
-  const itemGap = listProps.itemGap || (theme as any).space?.spacing1;
+  const itemGap = listProps.itemGap || (theme as any).space?.spacing3;
   const [query, setQuery] = useState<string>();
   const noItemsFound = items.length <= 0 && query && query.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
