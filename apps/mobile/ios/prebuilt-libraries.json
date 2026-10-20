@@ -1,0 +1,40 @@
+{
+  "libraries": {
+    "react-native-reanimated": {
+      "pod": "RNReanimated",
+      "swift": false
+    },
+    "react-native-worklets": {
+      "pod": "RNWorklets",
+      "swift": false
+    },
+    "react-native-screens": {
+      "pod": "RNScreens",
+      "swift": false
+    },
+    "react-native-nitro-modules": {
+      "pod": "NitroModules",
+      "swift": true
+    },
+    "react-native-quick-sqlite": {
+      "pod": "react-native-quick-sqlite",
+      "swift": false
+    },
+    "react-native-mmkv-storage": {
+      "pod": "react-native-mmkv-storage",
+      "swift": false
+    },
+    "react-native-fast-openpgp": {
+      "pod": "react-native-fast-openpgp",
+      "swift": false
+    },
+    "react-native-gesture-handler": {
+      "pod": "RNGestureHandler",
+      "swift": false
+    },
+    "react-native-nitro-cloud-uploader": {
+      "pod": "NitroCloudUploader",
+      "swift": true
+    }
+  }
+}

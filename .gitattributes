@@ -1,1 +1,3 @@
 * text=auto eol=lf
+*.aar filter=lfs diff=lfs merge=lfs -text
+apps/mobile/ios/.prebuilt-xcframeworks/*.zip filter=lfs diff=lfs merge=lfs -text
