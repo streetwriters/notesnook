@@ -38,7 +38,6 @@ import {
 import { checkFeature } from "../common";
 import { Box } from "@notesnook/ui";
 import { Tag as TagIcon } from "../components/icons";
-import { Checkbox } from "../components/checkbox";
 
 type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
@@ -146,6 +145,7 @@ function TagItem(props: { tag: Tag }) {
   const { tag } = props;
   const selected = useSelectionStore((state) => state.selected);
   const setSelected = useSelectionStore((state) => state.setSelected);
+  const isSelected = selected.some((s) => s.id === tag.id);
 
   function toggleSelection() {
     setSelected(selectMultiple(tag, selected));
@@ -158,7 +158,7 @@ function TagItem(props: { tag: Tag }) {
       sx={{
         cursor: "pointer",
         alignItems: "center",
-        bg: "background",
+        bg: isSelected ? "background-selected" : "background",
         borderRadius: "radius1",
         p: "spacing4",
         ":hover": {
@@ -168,14 +168,14 @@ function TagItem(props: { tag: Tag }) {
       onClick={toggleSelection}
     >
       <Flex sx={{ alignItems: "center", gap: "spacing4", width: "100%" }}>
-        <TagIcon size={15} color="icon-secondary" />
+        <TagIcon size={15} color={isSelected ? "icon-selected" : "icon"} />
         <Text
           className="title"
           data-test-id="tag-title"
           sx={{
             flex: 1,
-            color: "paragraph",
-            fontSize: "xs",
+            color: isSelected ? "paragraph-selected" : "paragraph",
+            fontSize: "sm",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             overflow: "hidden"
@@ -183,7 +183,7 @@ function TagItem(props: { tag: Tag }) {
         >
           {tag.title}
         </Text>
-        <SelectedCheck item={tag} size={16} />
+        <SelectedCheck item={tag} size={15} />
       </Flex>
     </Flex>
   );

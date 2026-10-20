@@ -22,11 +22,6 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import {
   Plus,
   ChevronDown,
-  Circle,
-  CheckCircleOutline,
-  CheckIntermediate,
-  CheckRemove,
-  CircleEmpty,
   ChevronRight,
   CheckboxRemove
 } from "../components/icons";
@@ -439,7 +434,13 @@ export function SelectedCheck({
     item && selectedItems[findSelectionIndex(item, selectedItems)];
 
   if (selectedItem?.op === "remove") {
-    return <CheckboxRemove size={size} onClick={onClick} />;
+    return (
+      <CheckboxRemove
+        size={size}
+        onClick={onClick}
+        color="backgroundSecondary-error"
+      />
+    );
   }
 
   return (
