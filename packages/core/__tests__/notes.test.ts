@@ -496,6 +496,28 @@ test("note's content should follow note's localOnly property", () =>
     expect(content?.localOnly).toBe(false);
   }));
 
+test("toggling localOnly should mark the note's content as unsynced", () =>
+  noteTest().then(async ({ db, id }) => {
+    const note = await db.notes.note(id);
+    const markSynced = () =>
+      db
+        .sql()
+        .updateTable("content")
+        .set({ synced: true })
+        .where("id", "=", note.contentId!)
+        .execute();
+    const isSynced = async () =>
+      (await db.content.get(note.contentId!))?.synced;
+
+    await markSynced();
+    await db.notes.localOnly(true, id);
+    expect(await isSynced()).toBe(false);
+
+    await markSynced();
+    await db.notes.localOnly(false, id);
+    expect(await isSynced()).toBe(false);
+  }));
+
 test("grouping items where item.title is empty or undefined shouldn't throw", () => {
   expect(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
