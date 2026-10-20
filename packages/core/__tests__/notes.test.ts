@@ -785,6 +785,41 @@ for (const group of groups) {
   }
 }
 
+test("natural sorting of numbered note titles", () =>
+  databaseTest().then(async (db) => {
+    const titles = [
+      "Lesson 10",
+      "Lesson 1",
+      "Lesson 2",
+      "10. Intro",
+      "1. Intro",
+      "2. Intro"
+    ];
+    for (const title of titles) {
+      await db.notes.add({ title });
+    }
+
+    const asc = await db.notes.all.grouped({
+      groupBy: "none",
+      sortBy: "title",
+      sortDirection: "asc"
+    });
+    const ascTitles: string[] = [];
+    for (let i = 0; i < asc.length; i++) {
+      const item = await asc.item(i);
+      if (item.item) ascTitles.push(item.item.title);
+    }
+
+    expect(ascTitles).toEqual([
+      "1. Intro",
+      "2. Intro",
+      "10. Intro",
+      "Lesson 1",
+      "Lesson 2",
+      "Lesson 10"
+    ]);
+  }));
+
 test("get archived notes", () =>
   noteTest().then(async ({ db, id }) => {
     await db.notes.archive(true, id);
