@@ -279,6 +279,8 @@ export async function deriveCryptoKeyFallback(data: SerializedKey) {
     MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
   } catch (e) {
     DatabaseLogger.error(e);
+    // the caller must know that the master key wasn't changed
+    throw e;
   }
 }
 
@@ -306,6 +308,8 @@ export async function deriveCryptoKey(data: SerializedKey) {
     MMKV.setMap(USER_KEY_CIPHER, userKeyCipher);
   } catch (e) {
     DatabaseLogger.error(e);
+    // the caller must know that the master key wasn't changed
+    throw e;
   }
 }
 
