@@ -22,7 +22,8 @@ import {
   SubscriptionPlan,
   SubscriptionProvider,
   SubscriptionStatus,
-  User
+  User,
+  formatDate
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
@@ -83,6 +84,14 @@ import { verifyUser, verifyUserWithApplock } from "./functions";
 import { logoutUser } from "./logout";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { useShallow } from "zustand/react/shallow";
+
+const formatBackupDate = (date: number) =>
+  formatDate(date, {
+    type: "date-time",
+    dateFormat: db.settings.getDateFormat(),
+    timeFormat: db.settings.getTimeFormat()
+  });
 
 export function getSettingsGroups(): SettingSection[] {
   return [
@@ -1417,7 +1426,16 @@ export function getSettingsGroups(): SettingSection[] {
             {
               id: "backup-now",
               name: strings.backupNow(),
-              description: strings.backupNowDesc(),
+              property: "lastBackupDate",
+              description: () => {
+                const last = SettingsService.get().lastBackupDate;
+                return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
+                  typeof last === "number" && last
+                    ? formatBackupDate(last)
+                    : strings.never(),
+                  "partial"
+                )}`;
+              },
               modifer: async () => {
                 const user = useUserStore.getState().user;
                 if (!user || SettingsService.getProperty("encryptedBackup")) {
@@ -1431,7 +1449,16 @@ export function getSettingsGroups(): SettingSection[] {
             {
               id: "backup-now-with-attachments",
               name: strings.backupNowWithAttachments(),
-              description: strings.backupNowWithAttachmentsDesc(),
+              property: "lastFullBackupDate",
+              description: () => {
+                const last = SettingsService.get().lastFullBackupDate;
+                return `${strings.backupNowWithAttachmentsDesc()}\n${strings.lastBackupOn(
+                  typeof last === "number" && last
+                    ? formatBackupDate(last)
+                    : strings.never(),
+                  "full"
+                )}`;
+              },
               hidden: () => !useUserStore.getState().user,
               modifer: async () => {
                 const user = useUserStore.getState().user;
@@ -1449,7 +1476,25 @@ export function getSettingsGroups(): SettingSection[] {
               id: "auto-backups",
               type: "component",
               name: strings.automaticBackups(),
-              description: strings.automaticBackupsDesc(),
+              useHook: () =>
+                useSettingStore(
+                  useShallow((state) => [
+                    state.settings.reminder,
+                    state.settings.lastBackupDate
+                  ])
+                ),
+              description: () => {
+                const next = BackupService.getNextBackupTime(
+                  SettingsService.get().reminder,
+                  "lastBackupDate"
+                );
+                return next
+                  ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
+                      formatBackupDate(next),
+                      "partial"
+                    )}`
+                  : strings.automaticBackupsDesc();
+              },
               component: "autobackups"
             },
             {
@@ -1457,9 +1502,28 @@ export function getSettingsGroups(): SettingSection[] {
               type: "component",
               hidden: () => !useUserStore.getState().user,
               name: strings.automaticBackupsWithAttachments(),
-              description: [
-                ...strings.automaticBackupsWithAttachmentsDesc()
-              ].join("\n"),
+              useHook: () =>
+                useSettingStore(
+                  useShallow((state) => [
+                    state.settings.fullBackupReminder,
+                    state.settings.lastFullBackupDate
+                  ])
+                ),
+              description: () => {
+                const next = BackupService.getNextBackupTime(
+                  SettingsService.get().fullBackupReminder,
+                  "lastFullBackupDate"
+                );
+                const base = [
+                  ...strings.automaticBackupsWithAttachmentsDesc()
+                ].join("\n");
+                return next
+                  ? `${base}\n${strings.nextBackupOn(
+                      formatBackupDate(next),
+                      "full"
+                    )}`
+                  : base;
+              },
               component: "autobackupsattachments"
             },
             {

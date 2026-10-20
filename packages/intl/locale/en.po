@@ -4513,6 +4513,14 @@ msgstr "Last"
 msgid "Last edited at"
 msgstr "Last edited at"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr "Last full backup: {date}"
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr "Last partial backup: {date}"
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Last used on"
@@ -5181,6 +5189,10 @@ msgstr "Newly created notes will be uncategorized"
 msgid "Next"
 msgstr "Next"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr "Next full backup: {date}"
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Next match"
@@ -5188,6 +5200,10 @@ msgstr "Next match"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Next month"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr "Next partial backup: {date}"
 
 #: src/strings.ts:2220
 msgid "Next tab"

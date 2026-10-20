@@ -3274,5 +3274,13 @@ Continue without attachments?`,
   waitForPreviousDownloadToFinish: () =>
     t`Please wait for the previous download to finish or cancel it.`,
   checkingAttachmentsProgress: (current: number, total: number) =>
-    t`Checking attachments (${current}/${total})`
+    t`Checking attachments (${current}/${total})`,
+  nextBackupOn: (date: string, type: "full" | "partial") =>
+    type === "full"
+      ? t`Next full backup: ${date}`
+      : t`Next partial backup: ${date}`,
+  lastBackupOn: (date: string, type: "full" | "partial") =>
+    type === "full"
+      ? t`Last full backup: ${date}`
+      : t`Last partial backup: ${date}`
 };
