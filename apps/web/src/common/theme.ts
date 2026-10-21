@@ -135,7 +135,16 @@ export const THEME_LIGHT: any = {
       }
     },
     statusBar: {
-      primary: { paragraph: "#5E5E5E", background: "#f7f7f7" }
+      primary: {
+        background: "#f7f7f7",
+        hover: "#e9e9e9",
+        icon: "#181818",
+        separator: "#d2d2d2",
+        border: "#EFEFEF"
+      },
+      error: {
+        icon: "#f23e46"
+      }
     },
     navigationMenu: {
       primary: {

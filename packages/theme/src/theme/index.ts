@@ -51,6 +51,7 @@ export type Theme = {
     dialog: number;
     large: number;
     small: number;
+    radius0: number;
     radius1: number;
     radius2: number;
     radius3: number;
@@ -100,6 +101,7 @@ export class ThemeFactory {
         large: 7,
         dialog: 10,
         small: 2.5,
+        radius0: 3,
         radius1: 5,
         radius2: 10,
         radius3: 15,
