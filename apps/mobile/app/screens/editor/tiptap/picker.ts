@@ -273,15 +273,27 @@ const handleImageResponse = async (
     const isPng = /(png)/g.test(image.mime);
     const isJpeg = /(jpeg|jpg)/g.test(image.mime);
     if (compress && (isPng || isJpeg)) {
-      image.path = await compressToFile(
-        Platform.OS === "ios" ? "file://" + image.path : image.path,
-        isPng ? "PNG" : "JPEG"
-      );
+      const preCompressed = result.compressedImages?.[image.path];
+      if (preCompressed) {
+        RNFetchBlob.fs
+          .unlink(image.path.replace("file://", ""))
+          .catch(() => {});
+        image.path =
+          Platform.OS === "ios"
+            ? preCompressed.uri.replace("file://", "")
+            : preCompressed.uri;
+        image.size = preCompressed.size;
+      } else {
+        image.path = await compressToFile(
+          Platform.OS === "ios" ? "file://" + image.path : image.path,
+          isPng ? "PNG" : "JPEG"
+        );
 
-      const stat = await RNFetchBlob.fs.stat(image.path.replace("file://", ""));
-      image.size = stat.size;
-      image.path =
-        Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
+        const stat = await RNFetchBlob.fs.stat(image.path.replace("file://", ""));
+        image.size = stat.size;
+        image.path =
+          Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
+      }
     }
 
     const featureResult = await isFeatureAvailable("fileSize", image.size || 0);
