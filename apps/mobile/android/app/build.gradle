@@ -142,7 +142,7 @@ android {
         if (project.hasProperty("prBuildNumber")) {
             versionCode Integer.parseInt(prBuildNumber())
         } else {
-            versionCode 3120
+            versionCode 3121
         }
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')
