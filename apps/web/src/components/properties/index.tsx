@@ -55,10 +55,10 @@ import {
 } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
+import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { store as noteStore } from "../../stores/note-store";
 import { store as notebookStore } from "../../stores/notebook-store";
 import { store as tagStore } from "../../stores/tag-store";
-import { useStore as useReminderStore } from "../../stores/reminder-store";
 import Toggle from "./toggle";
 import { EditNoteCreationDateDialog } from "../../dialogs/edit-note-creation-date-dialog";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
@@ -92,7 +92,7 @@ import IconTag from "../icon-tag";
 import { navigate } from "../../navigation";
 import { store as appStore } from "../../stores/app-store";
 import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
-import UserManager from "../../../../../packages/core/dist/types/api/user-manager";
+import { ListLoader } from "../loaders/list-loader";
 
 const tabs = [
   {
@@ -1120,22 +1120,24 @@ function Notebooks({ noteId }: { noteId: string }) {
 }
 
 function Reminders({ noteId }: { noteId: string }) {
-  const reminders = useReminderStore((store) => store.activeSessionReminders);
-  const refresh = useReminderStore((store) => store.refresh);
+  const reminders = useReminderStore((store) => store.reminders);
+  const result = usePromise(
+    async () =>
+      db.relations
+        .from({ id: noteId, type: "note" }, "reminder")
+        .selector.grouped(db.settings.getGroupOptions("reminders")),
+    [noteId, reminders]
+  );
 
-  useEffect(() => {
-    refresh();
-  }, [noteId]);
-
-  if (!reminders) return;
+  if (result.status !== "fulfilled") return <ListLoader />;
 
   return (
     <ListContainer
       type="reminders"
       group="reminders"
       compact
-      items={reminders}
-      refresh={refresh}
+      items={result.value}
+      refresh={result.refresh}
       sx={{
         flex: 1,
         px: "spacing4",
@@ -1168,7 +1170,8 @@ function Reminders({ noteId }: { noteId: string }) {
               }}
               onClick={async () => {
                 const note = await db.notes.note(noteId);
-                AddReminderDialog.show({ note });
+                await AddReminderDialog.show({ note });
+                result.refresh();
               }}
             >
               <Plus size={15} color="accent" />
@@ -1198,7 +1201,8 @@ function Reminders({ noteId }: { noteId: string }) {
                 sx={{ p: 0 }}
                 onClick={async () => {
                   const note = await db.notes.note(noteId);
-                  AddReminderDialog.show({ note });
+                  await AddReminderDialog.show({ note });
+                  result.refresh();
                 }}
               >
                 <Plus size={15} color="accent" />
