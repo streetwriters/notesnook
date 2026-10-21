@@ -212,8 +212,8 @@ const anchor: ThemeUIStyleObject = {
 
 const statusItem: ThemeUIStyleObject = {
   variant: "buttons.menuitem",
-  py: "small",
-  px: "small"
+  py: 0,
+  px: 0
 };
 
 const menuItem: ThemeUIStyleObject = {

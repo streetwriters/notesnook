@@ -17,24 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex } from "@notesnook/ui";
+import { StatusBarItem } from "./status-bar-item";
 import EditorFooter from "../editor/footer";
 import {
-  Circle,
-  Sync,
   Loading,
-  Update,
   SyncError,
-  Alert,
-  SyncOff,
   Icon,
-  Unlock,
-  CellphoneLock,
-  ConsoleLine
+  MobileLock,
+  LockOpen,
+  ArrowsClockwise,
+  WarningOctagon,
+  SyncDisabled,
+  ClockClockwise
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { hardNavigate, hashNavigate } from "../../navigation";
+import { hashNavigate } from "../../navigation";
 import { useAutoUpdater, UpdateStatus } from "../../hooks/use-auto-updater";
 import useStatus, { statusToString } from "../../hooks/use-status";
 import { ScopedThemeProvider } from "../theme-provider";
@@ -46,7 +45,6 @@ import { strings } from "@notesnook/intl";
 import { useVault } from "../../hooks/use-vault";
 import { useKeyStore } from "../../interfaces/key-store";
 import { STATUS_BAR_HEIGHT } from "../../common/constants";
-import { CommandPaletteDialog } from "../../dialogs/command-palette";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -63,102 +61,65 @@ function StatusBar() {
       bg="background"
       sx={{
         borderTop: "1px solid",
-        borderTopColor: "separator",
+        borderTopColor: "border-secondary",
         justifyContent: "space-between",
+        alignItems: "center",
         display: ["none", "flex", "flex"],
         flexShrink: 0,
+        px: "spacing4",
+        py: "spacing1",
         height: STATUS_BAR_HEIGHT
       }}
-      px={2}
     >
       {isFocusMode ? (
         <Flex />
       ) : (
-        <Flex sx={{ gap: "small" }}>
-          <Button
-            variant="statusitem"
-            onClick={() => CommandPaletteDialog.show({ isCommandMode: true })}
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex",
-              color: "paragraph",
-              height: "100%"
-            }}
-            title={"Open command palette"}
-          >
-            <ConsoleLine size={12} />
-          </Button>
+        <Flex sx={{ gap: "spacing3" }}>
           {isLoggedIn ? (
             <>
-              {user?.isEmailConfirmed ? (
-                <Circle
-                  size={7}
-                  color={"var(--icon-success)"}
-                  sx={{ p: "small" }}
-                  data-test-id="logged-in"
-                />
-              ) : (
-                <Button
-                  onClick={() => hashNavigate("/email/verify")}
-                  variant="statusitem"
-                  sx={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    display: "flex",
-                    height: "100%"
-                  }}
-                >
-                  <Circle
-                    size={7}
-                    color={"var(--icon-error)"}
-                    data-test-id="logged-in"
-                  />
-                  <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                    {strings.emailNotConfirmed()}
-                  </Text>
-                </Button>
-              )}
-
               <SyncStatus />
+              {!user?.isEmailConfirmed && (
+                <StatusBarItem
+                  variant="button"
+                  onClick={() => hashNavigate("/email/verify")}
+                  text={strings.emailNotConfirmed()}
+                />
+              )}
             </>
           ) : null}
           {activeCredentials().length > 0 && (
-            <Button
-              variant="statusitem"
+            <StatusBarItem
+              variant="button"
+              icon={MobileLock}
               onClick={relock}
-              sx={{
-                alignItems: "center",
-                justifyContent: "center",
-                display: "flex",
-                color: "paragraph",
-                height: "100%"
-              }}
               title={"Lock app"}
               data-test-id="lock-app"
-            >
-              <CellphoneLock size={12} />
-            </Button>
+            />
           )}
           {statuses?.map((status) => {
             const { key, icon: Icon } = status;
             return (
-              <Flex
+              <StatusBarItem
                 key={key}
-                ml={1}
-                sx={{ alignItems: "center", justifyContent: "center" }}
-              >
-                {Icon ? <Icon size={12} /> : <Loading size={12} />}
-                <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                  {statusToString(status)}
-                </Text>
-              </Flex>
+                variant="button"
+                icon={Icon || Loading}
+                text={statusToString(status)}
+              />
             );
           })}
 
-          {updateStatus && updateStatus.type !== "updated" && (
-            <Button
-              variant="statusitem"
+          {updateStatus && updateStatus?.type !== "updated" && (
+            <StatusBarItem
+              variant="button"
+              icon={ClockClockwise}
+              iconProps={{
+                rotate:
+                  updateStatus.type !== "completed" &&
+                  updateStatus.type !== "available",
+                rotateDirection: "counterclockwise",
+                color: updateStatus.type === "available" ? "accent" : "icon"
+              }}
+              text={statusToInfoText(updateStatus)}
               onClick={async () => {
                 if (updateStatus.type === "available") {
                   await showUpdateAvailableNotice(updateStatus);
@@ -168,47 +129,16 @@ function StatusBar() {
                   checkForUpdate();
                 }
               }}
-              sx={{
-                ml: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                display: "flex",
-                height: "100%"
-              }}
-            >
-              <Update
-                rotate={
-                  updateStatus.type !== "completed" &&
-                  updateStatus.type !== "available"
-                }
-                rotateDirection="counterclockwise"
-                color={
-                  updateStatus.type === "available" ? "accent" : "paragraph"
-                }
-                size={12}
-              />
-              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                {statusToInfoText(updateStatus)}
-              </Text>
-            </Button>
+            />
           )}
           {!isVaultLocked && (
-            <Button
-              variant="statusitem"
+            <StatusBarItem
+              variant="button"
+              icon={LockOpen}
+              text={strings.vaultUnlocked()}
               onClick={lockVault}
-              sx={{
-                alignItems: "center",
-                justifyContent: "center",
-                display: "flex",
-                height: "100%"
-              }}
               data-test-id="vault-unlocked"
-            >
-              <Unlock size={10} />
-              <Text variant="subBody" ml={1} sx={{ color: "paragraph" }}>
-                {strings.vaultUnlocked()}
-              </Text>
-            </Button>
+            />
           )}
         </Flex>
       )}
@@ -245,16 +175,15 @@ function SyncStatus() {
 
   if (!status) return null;
   return (
-    <Button
-      variant="statusitem"
-      onClick={() => (isSyncEnabled ? sync() : null)}
-      sx={{
-        alignItems: "center",
-        justifyContent: "center",
-        display: "flex",
-        color: "paragraph",
-        height: "100%"
+    <StatusBarItem
+      variant="button"
+      icon={status.icon}
+      iconProps={{
+        rotate: status.loading,
+        rotateDirection: "counterclockwise",
+        color: status.iconColor
       }}
+      onClick={() => (isSyncEnabled ? sync() : null)}
       title={
         (status.text
           ? status.text({ lastSynced, type: syncStatus.type })
@@ -262,14 +191,7 @@ function SyncStatus() {
         (syncStatus.progress ? ` (${syncStatus.progress})` : "")
       }
       data-test-id={`sync-status-${status.key}`}
-    >
-      <status.icon
-        size={12}
-        rotate={status.loading}
-        rotateDirection="counterclockwise"
-        color={status.iconColor}
-      />
-    </Button>
+    />
   );
 }
 
@@ -303,7 +225,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     key: "synced",
     isActive: (syncStatus) =>
       syncStatus === "synced" || syncStatus === "completed",
-    icon: Sync,
+    icon: ArrowsClockwise,
     text: ({ lastSynced }) =>
       lastSynced
         ? `Synced ${getTimeAgo(lastSynced, "en_short", { minInterval: 1000 })}`
@@ -313,7 +235,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
   {
     key: "syncing",
     isActive: (syncStatus) => syncStatus === "syncing",
-    icon: Sync,
+    icon: ArrowsClockwise,
     loading: true,
     text: ({ type }) => `${toTitleCase(type || "sync")}ing`,
     tooltip: "Syncing your notes..."
@@ -321,7 +243,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
   {
     key: "conflicts",
     isActive: (syncStatus) => syncStatus === "conflicts",
-    icon: Alert,
+    icon: WarningOctagon,
     iconColor: "var(--icon-error)",
     text: () => "Merge conflicts",
     tooltip: "Please resolve all merge conflicts and run the sync again."
@@ -329,7 +251,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
   {
     key: "emailNotConfirmed",
     isActive: (_syncStatus, user) => !user?.isEmailConfirmed,
-    icon: Alert,
+    icon: WarningOctagon,
     iconColor: "var(--icon-error)",
     text: () => "Sync disabled",
     tooltip: "Please confirm your email to start syncing."
@@ -345,7 +267,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
   {
     key: "offline",
     isActive: (syncStatus) => syncStatus === "offline",
-    icon: SyncOff,
+    icon: SyncDisabled,
     text: ({ lastSynced }) =>
       `Synced ${getTimeAgo(lastSynced, "en_short", {
         minInterval: 1000
@@ -356,7 +278,7 @@ const syncStatusFilters: SyncStatusFilter[] = [
     key: "disabled",
     iconColor: "var(--icon-disabled)",
     isActive: (syncStatus) => syncStatus === "disabled",
-    icon: SyncOff,
+    icon: SyncDisabled,
     text: () => "Sync disabled",
     tooltip: "Sync is disabled."
   }

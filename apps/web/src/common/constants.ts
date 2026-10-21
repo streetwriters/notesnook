@@ -26,4 +26,4 @@ export const SUBSCRIPTION_STATUS = {
   PREMIUM_CANCELED: 7
 } as const;
 
-export const STATUS_BAR_HEIGHT = 24 as const;
+export const STATUS_BAR_HEIGHT = 23 as const;
