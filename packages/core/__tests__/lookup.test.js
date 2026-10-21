@@ -158,6 +158,137 @@ describe("notesWithHighlighting", () => {
       expect(item.item.content[0][0].suffix.includes("&nbsp;")).toBe(false);
     }));
 
+  test("search with a short query should not match html tags", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Hello world</p><p>This is <u>note</u></p><p>This is another <i>note</i></p>"
+      }
+    }).then(async ({ db }) => {
+      for (const query of ["p", "u"]) {
+        const filtered = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        expect(filtered.length).toBe(0);
+      }
+    }));
+
+  test("search with a short query should match text content", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Hello world</p><p>This is <u>note</u></p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "is",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+      const item = await filtered.item(0);
+      expect(item.item.title.length).toBeGreaterThan(0);
+      expect(item.item.content.length).toBeGreaterThan(0);
+    }));
+
+  test("search should match text before the first tag", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "Hello world<p>second line</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "wo",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+    }));
+
+  test("search with a short query should not match html entities", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Tom&nbsp;&amp; Jerry &lt;3</p>"
+      }
+    }).then(async ({ db }) => {
+      for (const query of ["sp", "nb", "am", "lt"]) {
+        const filtered = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        expect(filtered.length).toBe(0);
+      }
+    }));
+
+  test("search with a short query should match text after html entities", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>a&nbsp;&amp; sp</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "sp",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+      const item = await filtered.item(0);
+      expect(item.item.content.length).toBeGreaterThan(0);
+    }));
+
+  test("search with a short query should be case insensitive", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>IS here</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "is",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+    }));
+
+  test("search with a short query should match titles case insensitively", () =>
+    noteTest({
+      title: "AB title",
+      content: {
+        type: "tiptap",
+        data: "<p>nothing</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "ab",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(1);
+    }));
+
+  test("search should keep matches next to underlined text", () =>
+    noteTest({
+      title: "Test note",
+      content: {
+        type: "tiptap",
+        data: "<p>Hello world</p><p>This is <u>note</u> here</p>"
+      }
+    }).then(async ({ db }) => {
+      const filtered = await db.lookup.notesWithHighlighting(
+        "This",
+        db.notes.all
+      );
+      const item = await filtered.item(0);
+      expect(item.item.title.length).toBeGreaterThan(0);
+      expect(item.item.content.length).toBe(1);
+    }));
+
   test("search notes with parentheses in query should load the item", () =>
     noteTest({
       title: "(with parantheses)"

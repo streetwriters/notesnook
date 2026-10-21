@@ -109,10 +109,11 @@ export const Search = ({ route, navigation }: NavigationProps<"Search">) => {
         } else {
           setSearchStatus(undefined);
         }
-        setLoading(false);
       } catch (e) {
         ToastManager.error(e as Error);
         DatabaseLogger.error(e);
+      } finally {
+        setLoading(false);
       }
     },
     [route.params?.items, route.params.type]
