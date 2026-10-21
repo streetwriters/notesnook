@@ -126,7 +126,7 @@ export function LinkPopup(props: LinkPopupProps) {
           autoFocus
           placeholder="https://example.com/"
           defaultValue={link.current?.href}
-          variant={error ? "error" : undefined}
+          variant={error ? "error" : "input"}
           onChange={(e) => {
             if (error) setError(null);
             link.current = { ...link.current, href: e.target.value };
