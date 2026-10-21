@@ -61,9 +61,22 @@ post.json = function (url: string, data: JsonRequestBody, token?: string) {
   );
 };
 
+const put = {
+  json(url: string, data: JsonRequestBody, token?: string) {
+    return bodyRequest(
+      url,
+      transformJson(data),
+      token,
+      "PUT",
+      "application/json"
+    );
+  }
+};
+
 export default {
   get,
   post,
+  put,
   delete: deleteRequest,
   patch
 };

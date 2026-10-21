@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { User } from "../types.js";
-import http from "../utils/http.js";
+import { User, UserKeys } from "../types.js";
+import http, { RequestError } from "../utils/http.js";
 import constants from "../utils/constants.js";
 import TokenManager from "./token-manager.js";
 import { EV, EVENTS } from "../common.js";
@@ -44,8 +44,31 @@ const ENDPOINTS = {
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
   resetUser: "/users/reset",
+  userKeys: "/users/keys",
+  commitPendingKeys: "/users/keys/pending/commit",
+  discardPendingKeys: "/users/keys/pending/discard",
+  inboxKeys: "/users/keys/inbox",
   activateTrial: "/subscriptions/trial"
 };
+
+const MASTER_KEY_CHANGE_TIMEOUT = 30 * 1000;
+
+function revisionQuery(revision?: number) {
+  return revision === undefined ? "" : `?revision=${revision}`;
+}
+
+/**
+ * Any one of the keys, to check which master key wrapped them.
+ */
+function anyWrappedKey(keys?: UserKeys) {
+  return (
+    keys?.dataEncryptionKey ||
+    keys?.legacyDataEncryptionKey ||
+    keys?.attachmentsKey ||
+    keys?.monographPasswordsKey ||
+    keys?.inboxKeys?.private
+  );
+}
 
 class UserManager {
   private tokenManager: TokenManager;
@@ -89,20 +112,19 @@ class UserManager {
       })
     );
 
-    const user = await this.fetchUser();
+    // stored by setMasterKey, so a failed signup stores nothing
+    const user = await this.getRemoteUser();
     if (!user) throw new Error("Failed to fetch user after signup.");
 
     await this.db.setLastSynced(0);
     await this.db.syncer.devices.register();
 
-    await this.db.storage().deriveCryptoKey({
-      password,
-      salt: user.salt
-    });
-
-    const masterKey = await this.getMasterKey();
-    if (!masterKey) throw new Error("User encryption key not generated.");
-    await this.updateUser({
+    // the keys are added before the master key is set so that the master key
+    // is never used without a data encryption key
+    const masterKey = await this.db
+      .storage()
+      .generateCryptoKey(password, user.salt);
+    const keys: UserKeys = {
       dataEncryptionKey: await this.keyManager.wrapKey(
         await this.db.crypto().generateRandomKey(),
         masterKey
@@ -115,9 +137,11 @@ class UserManager {
         await this.db.crypto().generateRandomKey(),
         masterKey
       )
-    });
+    };
+    const updatedUser = await this.addUserKeys(keys, user.revision);
+    await this.setMasterKey(updatedUser, { password });
 
-    this.db.eventManager.publish(EVENTS.userLoggedIn, user);
+    this.db.eventManager.publish(EVENTS.userLoggedIn, updatedUser);
   }
 
   async authenticateEmail(email: string) {
@@ -209,7 +233,8 @@ class UserManager {
           })
       );
 
-      const user = await this.fetchUser();
+      // stored by setMasterKey, so a failed login stores nothing
+      const user = await this.getRemoteUser();
       if (!user) throw new Error("Failed to fetch user.");
 
       if (!sessionExpired) {
@@ -217,17 +242,7 @@ class UserManager {
         await this.db.syncer.devices.register();
       }
 
-      if (usesFallback) {
-        await this.db.storage().deriveCryptoKeyFallback({
-          password,
-          salt: user.salt
-        });
-      } else {
-        await this.db.storage().deriveCryptoKey({
-          password,
-          salt: user.salt
-        });
-      }
+      await this.setMasterKey(user, { password, usesFallback });
       this.db.eventManager.publish(EVENTS.userLoggedIn, user);
     } catch (e) {
       await this.tokenManager.saveToken(token);
@@ -278,11 +293,45 @@ class UserManager {
   }
 
   setUser(user: User) {
-    return this.db.kv().write("user", user);
+    return this.db.kv().writeUser(user);
   }
 
   getUser() {
     return this.db.kv().read("user");
+  }
+
+  /**
+   * Stores the user before changing the master key, so the stored keys are
+   * never older than the master key: in between, unwrapping them fails
+   * instead of data getting encrypted with the wrong key.
+   */
+  private async setMasterKey(
+    user: User,
+    credentials: { password: string; usesFallback?: boolean }
+  ) {
+    // resolved before anything is stored so that a failed commit leaves
+    // this device as it was
+    const resolvedUser = user.pendingKeys
+      ? (await this.resolvePendingKeys(user, credentials)) || user
+      : user;
+
+    await this.db.kv().write("masterKeyChangeStartedAt", Date.now());
+    try {
+      await this.setUser(resolvedUser);
+      this.keyManager.clearCache();
+      const key = { password: credentials.password, salt: resolvedUser.salt };
+      if (credentials.usesFallback)
+        await this.db.storage().deriveCryptoKeyFallback(key);
+      else await this.db.storage().deriveCryptoKey(key);
+
+      // stored after the master key, so a key wrapped with the old master key
+      // is never sent with the new revision
+      if (resolvedUser.revision === undefined)
+        await this.db.kv().delete("masterKeyRevision");
+      else await this.db.kv().write("masterKeyRevision", resolvedUser.revision);
+    } finally {
+      await this.db.kv().delete("masterKeyChangeStartedAt");
+    }
   }
 
   /**
@@ -303,18 +352,45 @@ class UserManager {
     return true;
   }
 
-  private async updateUser(partial: Partial<User>) {
-    const user = await this.getUser();
-    if (!user) return;
-
+  /**
+   * Adds the keys the user doesn't have yet. The returned user has another
+   * device's keys where that device added them first.
+   * @param revision revision at which the master key that wrapped the keys
+   * was set
+   */
+  private async addUserKeys(keys: UserKeys, revision?: number): Promise<User> {
     const token = await this.tokenManager.getAccessToken();
-    await http.patch.json(
-      `${constants.API_HOST}${ENDPOINTS.user}`,
-      partial,
+    return await http.post.json(
+      `${constants.API_HOST}${ENDPOINTS.userKeys}${revisionQuery(revision)}`,
+      keys,
       token
     );
+  }
 
-    await this.setUser({ ...user, ...partial });
+  private async getRemoteUser(): Promise<User | undefined> {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    return await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
+  }
+
+  private deriveMasterKey(
+    salt: string,
+    credentials: { password: string; usesFallback?: boolean }
+  ) {
+    const storage = this.db.storage();
+    return credentials.usesFallback
+      ? storage.generateCryptoKeyFallback(credentials.password, salt)
+      : storage.generateCryptoKey(credentials.password, salt);
+  }
+
+  private canUnwrap(key: SerializedKey, cipher: Cipher<"base64">) {
+    return this.db
+      .storage()
+      .decrypt(key, cipher)
+      .then(
+        () => true,
+        () => false
+      );
   }
 
   async deleteUser(password: string) {
@@ -342,42 +418,82 @@ class UserManager {
     try {
       const token = await this.tokenManager.getAccessToken();
       if (!token) return;
-      const user = await http.get(
+      const fetchedUser: User | undefined = await http.get(
         `${constants.API_HOST}${ENDPOINTS.user}`,
         token
       );
-      if (user) {
-        await this.setUser(user);
-        if (
-          oldUser &&
-          (oldUser.subscription.plan !== user.subscription.plan ||
-            oldUser.subscription.status !== user.subscription.status ||
-            oldUser.subscription.provider !== user.subscription.provider)
-        ) {
-          await this.tokenManager._refreshToken(true);
-          this.db.eventManager.publish(
-            EVENTS.userSubscriptionUpdated,
-            user.subscription
-          );
-        }
-        if (oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed)
-          this.db.eventManager.publish(EVENTS.userEmailConfirmed);
-        this.db.eventManager.publish(EVENTS.userFetched, user);
-        return user;
-      } else {
-        return oldUser;
+      if (!fetchedUser) return oldUser;
+
+      await this.setUser(fetchedUser);
+      // keeps a newer stored user, e.g. from a password change
+      const user = await this.getUser();
+      // only missing if the user logged out while the request was in flight
+      if (!user) return;
+
+      if (
+        oldUser &&
+        (oldUser.subscription.plan !== user.subscription.plan ||
+          oldUser.subscription.status !== user.subscription.status ||
+          oldUser.subscription.provider !== user.subscription.provider)
+      ) {
+        await this.tokenManager._refreshToken(true);
+        this.db.eventManager.publish(
+          EVENTS.userSubscriptionUpdated,
+          user.subscription
+        );
       }
+      if (oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed)
+        this.db.eventManager.publish(EVENTS.userEmailConfirmed);
+      this.db.eventManager.publish(EVENTS.userFetched, user);
+      return user;
     } catch (e) {
       logger.error(e, "Error fetching user");
-      return oldUser;
+      return await this.getUser().catch(() => oldUser);
     }
   }
 
+  /**
+   * Resolves the keys of a password change that failed midway, using the
+   * password the user just logged in with: if it unwraps them, the password
+   * was changed and they are committed, otherwise they are discarded.
+   */
+  private async resolvePendingKeys(
+    user: User,
+    credentials: { password: string; usesFallback?: boolean }
+  ): Promise<User | undefined> {
+    const verifier = anyWrappedKey(user.pendingKeys);
+    if (!verifier) return;
+
+    const masterKey = await this.deriveMasterKey(user.salt, credentials);
+    const token = await this.tokenManager.getAccessToken();
+    const query = revisionQuery(user.revision);
+    if (await this.canUnwrap(masterKey, verifier))
+      return await http.post.json(
+        `${constants.API_HOST}${ENDPOINTS.commitPendingKeys}${query}`,
+        null,
+        token
+      );
+
+    // the current keys match this password, so discarding is only cleanup
+    // that the next login can retry
+    return await http.post
+      .json(
+        `${constants.API_HOST}${ENDPOINTS.discardPendingKeys}${query}`,
+        null,
+        token
+      )
+      .catch((e) => {
+        logger.error(e, "Could not discard pending keys.");
+      });
+  }
+
   changePassword(oldPassword: string, newPassword: string) {
-    return this.updatePassword("change", {
-      old_password: oldPassword,
-      new_password: newPassword
-    });
+    return this.retryIfKeysChanged(() =>
+      this.updatePassword("change", {
+        old_password: oldPassword,
+        new_password: newPassword
+      })
+    );
   }
 
   async changeMarketingConsent(enabled: boolean) {
@@ -398,10 +514,33 @@ class UserManager {
     newPassword: string;
     encryptionKey: SerializedKey;
   }) {
-    return this.updatePassword("reset", {
-      new_password: options.newPassword,
-      encryptionKey: options.encryptionKey
-    });
+    return this.retryIfKeysChanged(() =>
+      this.updatePassword("reset", {
+        new_password: options.newPassword,
+        encryptionKey: options.encryptionKey
+      })
+    );
+  }
+
+  /**
+   * The server rejects a password change made from an outdated copy of the
+   * user (`keys_changed`) and keys wrapped with an old master key
+   * (`password_changed`), so we fetch the user and try once more. A key
+   * wrapped with this device's master key from before a password change on
+   * another device is rejected again.
+   */
+  private async retryIfKeysChanged<T>(callback: () => Promise<T>) {
+    try {
+      return await callback();
+    } catch (e) {
+      if (
+        !(e instanceof RequestError) ||
+        (e.code !== "keys_changed" && e.code !== "password_changed")
+      )
+        throw e;
+      await this.fetchUser();
+      return await callback();
+    }
   }
 
   async resetPasswordWithoutRecoveryKey(newPassword: string) {
@@ -423,31 +562,18 @@ class UserManager {
 
     if (!(await this.resetUser())) throw new Error("Failed to reset user.");
 
-    await http.patch.json(
-      `${constants.API_HOST}/users/password/reset`,
+    const updatedUser = await this.patchPassword(
+      "reset",
       {
         newPassword: await this.db
           .storage()
           .hash(newPassword, user.email.toLowerCase()),
         userKeys: updateUserPayload
       },
-      token
+      token,
+      newMasterKey
     );
-
-    await this.db.storage().deriveCryptoKey({
-      password: newPassword,
-      salt: user.salt
-    });
-
-    this.keyManager.clearCache();
-    await this.setUser({
-      ...user,
-      ...updateUserPayload,
-      attachmentsKey: undefined,
-      monographPasswordsKey: undefined,
-      inboxKeys: undefined,
-      legacyDataEncryptionKey: undefined
-    });
+    await this.setMasterKey(updatedUser, { password: newPassword });
 
     return true;
   }
@@ -481,23 +607,43 @@ class UserManager {
     logger.info("legacy DEK exists: ", {
       legacyDataEncryptionKey: !!legacyDataEncryptionKey
     });
-    if (legacyDataEncryptionKey)
+    try {
+      if (legacyDataEncryptionKey)
+        keys.push({
+          key: await this.keyManager.unwrapKey(
+            legacyDataEncryptionKey,
+            masterKey
+          ),
+          version: KEY_VERSION.LEGACY
+        });
       keys.push({
-        key: await this.keyManager.unwrapKey(
-          legacyDataEncryptionKey,
-          masterKey
-        ),
-        version: KEY_VERSION.LEGACY
+        key: await this.keyManager.unwrapKey(dataEncryptionKey, masterKey),
+        version: KEY_VERSION.DEK
       });
-    keys.push({
-      key: await this.keyManager.unwrapKey(dataEncryptionKey, masterKey),
-      version: KEY_VERSION.DEK
-    });
+    } catch (e) {
+      // the stored keys are newer than the master key; unless the master key
+      // is being changed, the user has to log in with the new password
+      if (!(await this.isMasterKeyChanging()))
+        this.db.eventManager.publish(EVENTS.userSessionExpired);
+      throw e;
+    }
     logger.info("Keys:", {
       keys: keys.length,
       keyVersions: keys.map((k) => k.version)
     });
     return keys;
+  }
+
+  /**
+   * Whether the master key is being changed, in this or another tab.
+   */
+  private async isMasterKeyChanging() {
+    const startedAt = await this.db.kv().read("masterKeyChangeStartedAt");
+    // a change that is older was interrupted, e.g. by the app being closed
+    return (
+      startedAt !== undefined &&
+      Math.abs(Date.now() - startedAt) < MASTER_KEY_CHANGE_TIMEOUT
+    );
   }
 
   async getMasterKey(): Promise<SerializedKey | undefined> {
@@ -527,23 +673,36 @@ class UserManager {
     }
   ): Promise<UnwrapKeyReturnType<KeyTypeFromId<TId>> | undefined> {
     try {
-      const masterKey = await this.getMasterKey();
-      if (!masterKey) return;
+      return await this.retryIfKeysChanged(async () => {
+        // read before the master key, so that a master key change in between
+        // can only make the server reject the new key
+        const revision = await this.db.kv().read("masterKeyRevision");
+        const masterKey = await this.getMasterKey();
+        if (!masterKey) return;
 
-      const wrappedKey = await this.keyManager.get(id);
+        let wrappedKey = (await this.getUser())?.[id] as
+          | KeyTypeFromId<TId>
+          | undefined;
+        if (!wrappedKey) {
+          const user = await this.addUserKeys(
+            {
+              [id]: await this.keyManager.wrapKey(
+                await config.generateKey(),
+                masterKey
+              )
+            },
+            revision
+          );
+          await this.setUser(user);
+          wrappedKey = user[id] as KeyTypeFromId<TId> | undefined;
+          if (!wrappedKey) throw new Error("Key was not saved.");
+        }
 
-      if (!wrappedKey) {
-        const key = await config.generateKey();
-        await this.updateUser({
-          [id]: await this.keyManager.wrapKey(key, masterKey)
-        });
-        return key as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
-      }
-
-      return (await this.keyManager.unwrapKey(
-        wrappedKey,
-        masterKey
-      )) as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
+        return (await this.keyManager.unwrapKey(
+          wrappedKey,
+          masterKey
+        )) as UnwrapKeyReturnType<KeyTypeFromId<TId>>;
+      });
     } catch (e) {
       logger.error(e, `Could not get ${config.errorContext}.`);
       if (e instanceof Error)
@@ -584,32 +743,36 @@ class UserManager {
   async discardInboxKeys() {
     this.keyManager.clearCache();
 
-    const user = await this.getUser();
-    if (!user) return;
-
     const token = await this.tokenManager.getAccessToken();
-    await http.patch.json(
-      `${constants.API_HOST}${ENDPOINTS.user}`,
-      { inboxKeys: { public: null, private: null } },
-      token
+    if (!token) return;
+    await this.setUser(
+      await http.delete(`${constants.API_HOST}${ENDPOINTS.inboxKeys}`, token)
     );
-
-    await this.setUser({ ...user, inboxKeys: undefined });
   }
 
   async saveInboxKeys(keys: SerializedKeyPair) {
-    const userEncryptionKey = await this.getMasterKey();
-    if (!userEncryptionKey) return;
+    await this.retryIfKeysChanged(async () => {
+      // read before the master key, see getUserKey
+      const revision = await this.db.kv().read("masterKeyRevision");
+      const userEncryptionKey = await this.getMasterKey();
+      const token = await this.tokenManager.getAccessToken();
+      if (!userEncryptionKey || !token) return;
 
-    const updatePayload = {
-      inboxKeys: {
-        public: keys.publicKey,
-        private: await this.db
-          .storage()
-          .encrypt(userEncryptionKey, keys.privateKey)
-      }
-    };
-    await this.updateUser(updatePayload);
+      await this.setUser(
+        await http.put.json(
+          `${constants.API_HOST}${ENDPOINTS.inboxKeys}${revisionQuery(
+            revision
+          )}`,
+          {
+            public: keys.publicKey,
+            private: await this.db
+              .storage()
+              .encrypt(userEncryptionKey, keys.privateKey)
+          },
+          token
+        )
+      );
+    });
     this.keyManager.clearCache();
   }
 
@@ -703,12 +866,7 @@ class UserManager {
     }
 
     for (const verifier of verifiers) {
-      const decryptedData = await this.db
-        .storage()
-        .decrypt(key, verifier)
-        .then(() => true)
-        .catch(() => false);
-      if (!decryptedData)
+      if (!(await this.canUnwrap(key, verifier)))
         throw new Error(
           "Your data cannot be decrypted using the provided encryption key."
         );
@@ -727,7 +885,9 @@ class UserManager {
     if (!new_password) throw new Error("New password is required.");
 
     const token = await this.tokenManager.getAccessToken();
-    const user = await this.getUser();
+    let user = await this.getUser();
+    // stored by an older version, which can't tell if the keys are outdated
+    if (user && user.revision === undefined) user = await this.fetchUser();
     if (!token || !user) throw new Error("You are not logged in.");
 
     const { email, salt } = user;
@@ -804,27 +964,56 @@ class UserManager {
         })
       : null;
 
-    await http.patch.json(
-      `${constants.API_HOST}/users/password/${type}`,
+    const updatedUser = await this.patchPassword(
+      type,
       {
         oldPassword: oldPassword,
         newPassword: await this.db
           .storage()
           .hash(new_password, email.toLowerCase()),
-        userKeys: updateUserPayload
+        userKeys: updateUserPayload,
+        // lets the server reject keys rewrapped from an outdated user
+        revision: user.revision
       },
-      token
+      token,
+      newMasterKey
     );
-
-    await this.db.storage().deriveCryptoKey({
-      password: new_password,
-      salt
-    });
-
-    this.keyManager.clearCache();
-    await this.setUser({ ...user, ...updateUserPayload });
+    await this.setMasterKey(updatedUser, { password: new_password });
 
     return true;
+  }
+
+  /**
+   * Changes the password and returns the user with the rewrapped keys. A
+   * failed request (e.g. a lost response) might still have changed the
+   * password, so the user is fetched to check if its keys are rewrapped.
+   */
+  private async patchPassword(
+    type: "change" | "reset",
+    body: Record<string, unknown>,
+    token: string,
+    newMasterKey: SerializedKey
+  ): Promise<User> {
+    try {
+      return await http.patch.json(
+        `${constants.API_HOST}/users/password/${type}`,
+        body,
+        token
+      );
+    } catch (e) {
+      // rejected before anything was changed
+      if (
+        e instanceof RequestError &&
+        (e.code === "keys_changed" || e.code === "password_change_in_progress")
+      )
+        throw e;
+
+      const user = await this.getRemoteUser().catch(() => undefined);
+      const verifier = anyWrappedKey(user);
+      if (!user || !verifier || !(await this.canUnwrap(newMasterKey, verifier)))
+        throw e;
+      return user;
+    }
   }
 
   private async usesFallbackPWHash(password: string) {
