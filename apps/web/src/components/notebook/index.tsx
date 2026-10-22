@@ -137,12 +137,12 @@ export function Notebook(props: NotebookProps) {
             >
               {isExpanded ? (
                 <ChevronDown
-                  size={14}
+                  size={18}
                   color={isOpened ? "icon-selected" : "icon"}
                 />
               ) : (
                 <ChevronRight
-                  size={14}
+                  size={18}
                   color={isOpened ? "icon-selected" : "icon"}
                 />
               )}
