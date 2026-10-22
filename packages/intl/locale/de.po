@@ -4512,6 +4512,14 @@ msgstr "Zuletzt"
 msgid "Last edited at"
 msgstr "Zuletzt bearbeitet am"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr "Letzte vollständige Sicherung: {date}"
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr "Letzte Teilsicherung: {date}"
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Zuletzt verwendet am"
@@ -5180,6 +5188,10 @@ msgstr "Neu erstellte Notizen sind nicht kategorisiert"
 msgid "Next"
 msgstr "Weiter"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr "Nächste vollständige Sicherung: {date}"
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Nächster Treffer"
@@ -5187,6 +5199,10 @@ msgstr "Nächster Treffer"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Nächsten Monat"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr "Nächste Teilsicherung: {date}"
 
 #: src/strings.ts:2220
 msgid "Next tab"
