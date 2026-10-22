@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, FlexProps, Text } from "@theme-ui/components";
 
-import { Error as ErrorIcon } from "../icons";
+import { Error as ErrorIcon, Warning } from "../icons";
 
 type ErrorTextProps = { error?: string | Error | null | false } & FlexProps;
 export function ErrorText(props: ErrorTextProps) {
@@ -45,6 +45,45 @@ export function ErrorText(props: ErrorTextProps) {
         variant={"error"}
         ml={1}
         sx={{ whiteSpace: "pre-wrap" }}
+      >
+        {error instanceof Error ? (
+          <>
+            {error.name}: {error.message}
+            <br />
+            {error.stack}
+          </>
+        ) : (
+          error
+        )}
+      </Text>
+    </Flex>
+  );
+}
+
+export function AuthErrorText(props: ErrorTextProps) {
+  const { error, sx, ...restProps } = props;
+
+  if (!error) return null;
+  return (
+    <Flex
+      p={1}
+      sx={{
+        alignItems: "center",
+        overflowY: "auto",
+        ...sx
+      }}
+      {...restProps}
+    >
+      <Warning size={13} color="icon-error" />
+      <Text
+        className="selectable"
+        ml="spacing3"
+        sx={{
+          whiteSpace: "pre-wrap",
+          fontWeight: 400,
+          fontSize: "xs",
+          color: "paragraph-error"
+        }}
       >
         {error instanceof Error ? (
           <>

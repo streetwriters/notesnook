@@ -38,6 +38,7 @@ export interface UserStore {
   premium: boolean;
   lastSynced: string | number;
   syncing: boolean;
+  lastSyncError: Error | undefined;
   lastSyncStatus: SyncStatus;
   setUser: (user: User | null | undefined) => void;
   setPremium: (premium: boolean) => void;
@@ -56,6 +57,7 @@ export const useUserStore = create<UserStore>((set) => ({
   user: null,
   premium: false,
   lastSynced: "Never",
+  lastSyncError: undefined,
   syncing: false,
   appLocked: false,
   setUser: (user) => set({ user: user }),

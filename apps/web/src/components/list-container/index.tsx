@@ -211,7 +211,11 @@ function ListContainer(props: ListContainerProps) {
           {props.isLoading ? (
             <ListLoader />
           ) : (
-            <Flex variant="columnCenterFill" data-test-id="list-placeholder">
+            <Flex
+              sx={{ pt: "spacing6", px: "spacing6" }}
+              className="list-container-placeholder"
+              data-test-id="list-placeholder"
+            >
               {props.placeholder}
             </Flex>
           )}
@@ -318,7 +322,6 @@ function ItemRenderer({
   const {
     items,
     group,
-    refresh,
     focusedGroupIndex,
     focusGroup,
     selectItems,
@@ -364,13 +367,8 @@ function ItemRenderer({
     <>
       {resolvedItem.group && group ? (
         <GroupHeader
-          groupingKey={group}
-          isSearching={isSearching}
-          refresh={refresh}
           title={resolvedItem.group.title}
           isFocused={index === focusedGroupIndex}
-          index={index}
-          context={itemContext}
           onSelectGroup={async () => {
             if (!items.groups) return;
 

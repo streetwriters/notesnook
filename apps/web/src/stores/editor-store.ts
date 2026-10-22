@@ -173,6 +173,14 @@ export type DocumentPreview = {
   hash: string;
 };
 
+export type PropertiesTabId =
+  | "properties"
+  | "toc"
+  | "note-links"
+  | "note-history"
+  | "attachments"
+  | "reminders";
+
 export function isLockedSession(session: EditorSession): boolean {
   return (
     session.type === "locked" ||
@@ -212,9 +220,11 @@ class EditorStore extends BaseStore<EditorStore> {
   canGoForward = false;
   sessions: EditorSession[] = [];
 
-  arePropertiesVisible = false;
   documentPreview?: DocumentPreview;
-  isTOCVisible = Config.get("editor:toc", false);
+  propertiesTab: PropertiesTabId | undefined = Config.get(
+    "editor:properties",
+    undefined
+  );
   editorMargins = Config.get("editor:margins", true);
   history: string[] = [];
 
@@ -1235,23 +1245,9 @@ class EditorStore extends BaseStore<EditorStore> {
     this.updateSession(id, ["default", "new"], { saveState: saveState });
   };
 
-  toggleProperties = (toggleState?: boolean) => {
-    this.set((state) => {
-      state.arePropertiesVisible =
-        toggleState !== undefined ? toggleState : !state.arePropertiesVisible;
-    });
-    this.toggleTableOfContents(false);
-  };
-
-  toggleTableOfContents = (toggleState?: boolean) => {
-    const { isTOCVisible, arePropertiesVisible } = this.get();
-    const isTOCVisibleState =
-      toggleState !== undefined ? toggleState : !isTOCVisible;
-    this.set({
-      isTOCVisible: isTOCVisibleState,
-      arePropertiesVisible: isTOCVisibleState ? false : arePropertiesVisible
-    });
-    Config.set("editor:toc", isTOCVisibleState);
+  setPropertiesTab = (tab: PropertiesTabId | undefined) => {
+    this.set({ propertiesTab: tab });
+    Config.set("editor:properties", tab);
   };
 
   toggleEditorMargins = (toggleState?: boolean) => {
@@ -1356,7 +1352,6 @@ const useEditorStore = createPersistedStore(EditorStore, {
   name: "editor-sessions-v2",
   partialize: (state) => ({
     history: state.history,
-    arePropertiesVisible: state.arePropertiesVisible,
     editorMargins: state.editorMargins,
     tabs: state.tabs,
     activeTabId: state.activeTabId,

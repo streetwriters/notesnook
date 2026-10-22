@@ -18,7 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Flex, Image, Progress, Text } from "@theme-ui/components";
-import { Edit, User as UserIcon } from "../../../components/icons";
+import {
+  Edit,
+  User as UserIcon,
+  UserProfileIcon
+} from "../../../components/icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useSettingStore } from "../../../stores/setting-store";
 import { getObjectIdTimestamp } from "@notesnook/core";
@@ -104,7 +108,44 @@ export function UserProfile({ minimal }: Props) {
 
   const { title, trial } = getSubscriptionInfo(user);
 
-  if (!user || !user.id)
+  if (!user || !user.id) {
+    if (minimal)
+      return (
+        <Flex
+          sx={{
+            alignItems: "flex-start",
+            gap: "spacing3",
+            px: "spacing4"
+          }}
+        >
+          <Flex
+            variant="columnCenter"
+            sx={{
+              bg: "background-tertiary",
+              boxShadow: "0 4px 34px 0 rgba(0, 0, 0, 0.10)",
+              size: 25,
+              borderRadius: "12.5px"
+            }}
+          >
+            <UserProfileIcon size={15} color="icon-secondary" />
+          </Flex>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing1",
+              lineHeight: 1
+            }}
+          >
+            <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
+              {strings.loginMessage()}
+            </Text>
+            <Text sx={{ fontSize: "3xs", color: "paragraph" }}>
+              {strings.loginMessageActionText()}
+            </Text>
+          </Flex>
+        </Flex>
+      );
+
     return (
       <Flex
         sx={{
@@ -112,7 +153,7 @@ export function UserProfile({ minimal }: Props) {
           alignItems: "center",
           bg: "var(--background-secondary)",
           p: 1,
-          mb: minimal ? 0 : 4,
+          mb: 4,
           gap: 1
         }}
       >
@@ -120,17 +161,63 @@ export function UserProfile({ minimal }: Props) {
           variant="columnCenter"
           sx={{
             bg: "shade",
-            size: minimal ? 30 : 40,
+            size: 40,
             borderRadius: 80
           }}
         >
-          <UserIcon size={minimal ? 15 : 20} />
+          <UserIcon size={20} />
         </Flex>
         <Flex sx={{ flexDirection: "column" }}>
-          <Text variant={minimal ? "body" : "subtitle"}>
-            {strings.loginMessage()}
+          <Text variant="subtitle">{strings.loginMessage()}</Text>
+          <Text variant="subBody">{strings.loginMessageActionText()}</Text>
+        </Flex>
+      </Flex>
+    );
+  }
+
+  if (minimal)
+    return (
+      <Flex
+        sx={{
+          alignItems: "flex-start",
+          gap: "spacing3",
+          px: "spacing4"
+        }}
+      >
+        <Flex
+          variant="columnCenter"
+          sx={{
+            size: 25,
+            borderRadius: 80,
+            overflow: "hidden"
+          }}
+        >
+          {profile?.profilePicture ? (
+            <Image
+              sx={{ width: "100%", height: "100%", objectFit: "contain" }}
+              src={profile.profilePicture}
+            />
+          ) : (
+            <UserIcon size={20} />
+          )}
+        </Flex>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flex: 1,
+            gap: "spacing1",
+            fontSize: "3xs",
+            lineHeight: 1,
+            wordBreak: "break-word"
+          }}
+        >
+          <Text sx={{ color: "accent", fontSize: "3xs", fontWeight: 500 }}>
+            {`${title}${trial ? " (trial)" : ""}`}
           </Text>
-          <Text variant={"subBody"}>{strings.loginMessageActionText()}</Text>
+          <Text sx={{ fontSize: "3xs", color: "heading", fontWeight: 600 }}>
+            {profile?.fullName || strings.yourFullName()}
+          </Text>
+          <Text sx={{ fontSize: "3xs", color: "paragraph" }}>{user.email}</Text>
         </Flex>
       </Flex>
     );
@@ -215,7 +302,8 @@ export function UserProfile({ minimal }: Props) {
                   const fullName = await PromptDialog.show({
                     title: strings.editFullName(),
                     description: strings.setFullNameDesc(),
-                    defaultValue: profile?.fullName
+                    defaultValue: profile?.fullName,
+                    label: strings.enterFullName()
                   });
 
                   if (fullName === profile?.fullName) return;

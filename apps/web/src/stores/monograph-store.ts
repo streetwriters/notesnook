@@ -22,6 +22,8 @@ import { db } from "../common/db";
 import BaseStore from "./index";
 import { store as noteStore } from "./note-store";
 import { Note, VirtualizedGrouping, PublishOptions } from "@notesnook/core";
+import { ConfirmDialog } from "../dialogs/confirm";
+import { strings } from "@notesnook/intl";
 
 class MonographStore extends BaseStore<MonographStore> {
   monographs: VirtualizedGrouping<Note> | undefined = undefined;
@@ -41,6 +43,15 @@ class MonographStore extends BaseStore<MonographStore> {
   };
 
   unpublish = async (noteId: string) => {
+    const ok = await ConfirmDialog.show({
+      title: "Unpublish note?",
+      subtitle:
+        "Are you sure you want to unpublish this note? It will no longer be accessible via the public link.",
+      positiveButtonText: "Yes, unpublish",
+      negativeButtonText: strings.cancel()
+    });
+    if (!ok) return;
+
     await db.monographs.unpublish(noteId);
     await this.get().refresh();
     await noteStore.refreshContext();

@@ -40,6 +40,7 @@ import { sleep } from "../utils/time";
 import { ToastManager, eSendEvent, presentSheet } from "./event-manager";
 import SettingsService from "./settings";
 import { getCachePathForFile } from "../common/filesystem/io";
+import { useSettingStore } from "../stores/use-setting-store";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -120,7 +121,18 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
     actionText: strings.shareBackup(),
     actionsArray: [
       {
+        action: async () => {
+          eSendEvent(eCloseSheet);
+          SettingsService.set({
+            showBackupCompleteSheet: false
+          });
+        },
+        actionText: strings.neverAskAgain(),
+        type: "plain-outline"
+      },
+      {
         action: () => {
+          useSettingStore.getState().setAppDidEnterBackgroundForAction(true);
           if (Platform.OS === "ios") {
             Share.open({
               url: backupFilePath,
@@ -139,16 +151,6 @@ async function presentBackupCompleteSheet(backupFilePath: string) {
           }
         },
         actionText: strings.share()
-      },
-      {
-        action: async () => {
-          eSendEvent(eCloseSheet);
-          SettingsService.set({
-            showBackupCompleteSheet: false
-          });
-        },
-        actionText: strings.neverAskAgain(),
-        type: "secondary"
       }
     ]
   });
