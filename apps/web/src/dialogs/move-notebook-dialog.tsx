@@ -33,22 +33,29 @@ import {
 import { store as notebookStore, useStore } from "../stores/notebook-store";
 import { AddNotebookDialog } from "./add-notebook-dialog";
 import { NotebookItem, useSelectionStore } from "./move-note-dialog";
+import { SearchIcon, Close, Plus } from "../components/icons";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
   notebook: Notebook;
 };
+
+const notebookSortOptions = {
+  sortBy: "dateCreated",
+  sortDirection: "desc"
+} as const;
 
 export const MoveNotebookDialog = DialogManager.register(
   function MoveNotebookDialog({ onClose, notebook }: MoveNotebookDialogProps) {
     const setSelected = useSelectionStore((store) => store.setSelected);
     const refreshNotebooks = useStore((store) => store.refresh);
     const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
+    const [query, setQuery] = useState("");
     const [notebooks, setNotebooks] = useState<string[]>([]);
     const notebookId = notebook.id;
 
     useEffect(() => {
       db.notebooks.roots
-        .ids(db.settings.getGroupOptions("notebooks"))
+        .ids(notebookSortOptions)
         .then((ids) => setNotebooks(ids));
     }, []);
 
@@ -81,8 +88,9 @@ export const MoveNotebookDialog = DialogManager.register(
         title={`${strings.move()} ${notebook.title}`}
         description={strings.moveNotebookDesc()}
         onClose={() => _onClose(false)}
-        width={500}
+        width={700}
         noScroll
+        sx={{ minHeight: "553px" }}
         positiveButton={{
           text: strings.done(),
           onClick: async () => {
@@ -113,32 +121,53 @@ export const MoveNotebookDialog = DialogManager.register(
           id="subnotebooks"
           variant="columnFill"
           sx={{
-            height: "80vh",
-            px: 4
+            mx: "spacing7",
+            mt: "spacing6",
+            mb: "spacing7"
           }}
         >
           <Field
-            autoFocus
-            sx={{ m: 0, mb: 2 }}
-            styles={{
-              input: { p: "7.5px" }
+            sx={{
+              mb: "spacing4",
+              input: {
+                pl: "spacing10",
+                py: "spacing6",
+                pr: "spacing4",
+                fontSize: "sm"
+              }
             }}
             placeholder={strings.searchNotebooks()}
             onChange={async (e) => {
               const query = e.target.value.trim();
+              setQuery(query);
+
               const ids = await (query
-                ? db.lookup.notebooks(query).ids()
-                : db.notebooks.roots.ids(
-                    db.settings.getGroupOptions("notebooks")
-                  ));
+                ? db.lookup
+                    .notebooks(query)
+                    .sorted(notebookSortOptions)
+                    .then((results) => results.ids())
+                : db.notebooks.roots.ids(notebookSortOptions));
               setNotebooks(ids);
             }}
+            leftIcon={SearchIcon}
+            rightActions={[
+              {
+                icon: Close,
+                onClick: async () => {
+                  setNotebooks(
+                    await db.notebooks.roots.ids(notebookSortOptions)
+                  );
+                },
+                hidden: !query
+              }
+            ]}
           />
           {notebooks.length > 0 ? (
             <>
               <VirtualizedTree
                 rootId={"root"}
-                itemHeight={30}
+                itemHeight={40}
+                itemGap={10}
                 treeRef={treeRef}
                 getChildNodes={async ({ id, depth }) => {
                   const parentNotebookId = await db.notebooks.parentId(
@@ -168,7 +197,7 @@ export const MoveNotebookDialog = DialogManager.register(
 
                   const subNotebooks = await db.relations
                     .from({ type: "notebook", id }, "notebook")
-                    .resolve();
+                    .selector.items(undefined, notebookSortOptions);
 
                   for (const notebook of subNotebooks) {
                     if (notebook.id === notebookId) continue;
@@ -210,27 +239,43 @@ export const MoveNotebookDialog = DialogManager.register(
           ) : (
             <Flex
               sx={{
-                my: 2,
+                height: "170px",
                 flexDirection: "column",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                gap: "spacing4"
               }}
             >
-              <Text variant="body">{strings.notebooksEmpty()}</Text>
+              <Text
+                sx={{
+                  color: "paragraph-secondary",
+                  fontSize: "sm",
+                  lineHeight: "120%"
+                }}
+              >
+                {strings.notebooksEmpty()}
+              </Text>
               <Button
                 data-test-id="add-new-notebook"
-                variant="secondary"
-                sx={{ mt: 2 }}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "spacing3",
+                  color: "accent",
+                  fontWeight: 600,
+                  fontSize: "sm"
+                }}
                 onClick={() =>
                   AddNotebookDialog.show({}).then((res) =>
                     res
                       ? db.notebooks.roots
-                          .ids(db.settings.getGroupOptions("notebooks"))
+                          .ids(notebookSortOptions)
                           .then((ids) => setNotebooks(ids))
                       : null
                   )
                 }
               >
+                <Plus size={15} color="accent" />
                 {strings.addNotebook()}
               </Button>
             </Flex>
