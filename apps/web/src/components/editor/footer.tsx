@@ -17,22 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@notesnook/ui";
+import { StatusBarItem } from "../status-bar/status-bar-item";
 import { SaveState, useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import {
   Loading,
-  Saved,
-  NotSaved,
-  FocusMode,
   Plus,
   Minus,
-  EditorNormalWidth,
-  ExitFullscreen,
-  Fullscreen,
-  EditorFullWidth,
-  NormalMode,
-  Cross
+  SidebarSimple,
+  EditorMargins,
+  CornersIn,
+  CornersOut,
+  Eyeglasses,
+  EyeglassesEmpty,
+  Checks,
+  Asterisk
 } from "../icons";
 import {
   useEditorConfig,
@@ -46,14 +46,27 @@ import { EDITOR_ZOOM } from "./common";
 import { useWindowControls } from "../../hooks/use-window-controls";
 import { exitFullscreen } from "../../utils/fullscreen";
 import { useRef, useState } from "react";
-import { PopupPresenter } from "@notesnook/ui";
+import { Box, PopupPresenter } from "@notesnook/ui";
 import { saveContent } from "./index";
 
 const SAVE_STATE_ICON_MAP = {
-  "-1": NotSaved,
+  "-1": Asterisk,
   0: Loading,
-  1: Saved
+  1: Checks
 };
+
+function EditorFooterSeparator() {
+  return (
+    <Box
+      sx={{
+        width: "1px",
+        height: "10px",
+        bg: "separator",
+        mx: "spacing4"
+      }}
+    />
+  );
+}
 
 function EditorFooter() {
   const { isFullscreen } = useWindowControls();
@@ -76,7 +89,7 @@ function EditorFooter() {
       title: editorMargins
         ? strings.disableEditorMargins()
         : strings.enableEditorMargins(),
-      icon: editorMargins ? EditorNormalWidth : EditorFullWidth,
+      icon: editorMargins ? EditorMargins : SidebarSimple,
       enabled: true,
       hideOnMobile: true,
       onClick: () => useEditorStore.getState().toggleEditorMargins()
@@ -85,7 +98,7 @@ function EditorFooter() {
       title: isFullscreen
         ? strings.exitFullScreen()
         : strings.enterFullScreen(),
-      icon: isFullscreen ? ExitFullscreen : Fullscreen,
+      icon: isFullscreen ? CornersIn : CornersOut,
       enabled: true,
       hidden: !isFocusMode,
       hideOnMobile: true,
@@ -99,7 +112,7 @@ function EditorFooter() {
     },
     {
       title: isFocusMode ? strings.normalMode() : strings.focusMode(),
-      icon: isFocusMode ? FocusMode : NormalMode,
+      icon: isFocusMode ? EyeglassesEmpty : Eyeglasses,
       enabled: true,
       hideOnMobile: true,
       onClick: () => useAppStore.getState().toggleFocusMode()
@@ -107,7 +120,7 @@ function EditorFooter() {
   ];
 
   return (
-    <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 2 }}>
+    <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
       <Flex
         sx={{
           alignItems: "center",
@@ -117,86 +130,79 @@ function EditorFooter() {
         }}
       >
         {tools.map((tool) => (
-          <Button
-            data-test-id={tool.title}
-            disabled={!tool.enabled}
-            title={tool.title}
-            key={tool.title}
-            onClick={tool.onClick}
-            sx={{
-              py: 0,
-              px: 1,
-              height: "100%",
-              display: tool.hidden ? "none" : "block"
-            }}
-            variant="icon"
-          >
-            <tool.icon size={13} />
-          </Button>
+          <>
+            <StatusBarItem
+              variant="button"
+              data-test-id={tool.title}
+              disabled={!tool.enabled}
+              title={tool.title}
+              key={tool.title}
+              onClick={tool.onClick}
+              sx={{ display: tool.hidden ? "none" : "flex" }}
+              icon={tool.icon}
+            />
+            {!tool.hidden && <EditorFooterSeparator />}
+          </>
         ))}
-        <Button
-          variant="icon"
-          onClick={() =>
-            setEditorConfig({
-              zoom: Math.max(
-                EDITOR_ZOOM.MIN,
-                editorConfig.zoom - EDITOR_ZOOM.STEP
-              )
-            })
-          }
-          disabled={editorConfig.zoom <= EDITOR_ZOOM.MIN}
-          sx={{ py: 0, px: 1, height: "100%" }}
-        >
-          <Minus size={13} />
-        </Button>
-        <Button
-          title={strings.clickToReset(strings.zoom().toLocaleLowerCase())}
-          variant="statusitem"
-          onClick={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
-        >
-          <Text variant="subBody" sx={{ color: "paragraph" }}>
-            {editorConfig.zoom}%{" "}
-          </Text>
-        </Button>
-        <Button
-          variant="icon"
-          onClick={() =>
-            setEditorConfig({
-              zoom: Math.min(
-                EDITOR_ZOOM.MAX,
-                editorConfig.zoom + EDITOR_ZOOM.STEP
-              )
-            })
-          }
-          disabled={editorConfig.zoom >= EDITOR_ZOOM.MAX}
-          sx={{ py: 0, px: 1, height: "100%" }}
-        >
-          <Plus size={13} />
-        </Button>
+        <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+          <StatusBarItem
+            variant="button"
+            icon={Minus}
+            onClick={() =>
+              setEditorConfig({
+                zoom: Math.max(
+                  EDITOR_ZOOM.MIN,
+                  editorConfig.zoom - EDITOR_ZOOM.STEP
+                )
+              })
+            }
+            disabled={editorConfig.zoom <= EDITOR_ZOOM.MIN}
+          />
+          <StatusBarItem
+            variant="button"
+            title={strings.clickToReset(strings.zoom().toLocaleLowerCase())}
+            onClick={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
+            sx={{ width: "34px" }}
+            text={`${editorConfig.zoom}%`}
+          />
+          <StatusBarItem
+            variant="button"
+            icon={Plus}
+            onClick={() =>
+              setEditorConfig({
+                zoom: Math.min(
+                  EDITOR_ZOOM.MAX,
+                  editorConfig.zoom + EDITOR_ZOOM.STEP
+                )
+              })
+            }
+            disabled={editorConfig.zoom >= EDITOR_ZOOM.MAX}
+          />
+        </Flex>
       </Flex>
+      <EditorFooterSeparator />
       {statistics.words.total > MAX_AUTO_SAVEABLE_WORDS ? (
-        <Text
-          className="selectable"
-          variant="subBody"
-          sx={{ color: "paragraph" }}
-        >
-          {strings.autoSaveOff()}
-        </Text>
+        <>
+          <StatusBarItem
+            variant="text"
+            className="selectable"
+            text={strings.autoSaveOff()}
+          />
+          <EditorFooterSeparator />
+        </>
       ) : null}
-      <Button
+      <StatusBarItem
+        variant="button"
         className="selectable"
         data-test-id="editor-word-count"
-        variant="statusitem"
         ref={statisticsRef}
         onClick={() => setIsStatisticsPopupOpen(true)}
-      >
-        <Text variant="subBody" sx={{ color: "paragraph" }}>
-          {strings.totalWords(statistics.words.total)}
-          {statistics.words.selected
+        text={`${strings.totalWords(statistics.words.total)}${
+          statistics.words.selected
             ? ` (${strings.selectedWords(statistics.words.selected)})`
-            : ""}
-        </Text>
-      </Button>
+            : ""
+        }`}
+      />
       <PopupPresenter
         isOpen={isStatisticsPopupOpen}
         onClose={() => setIsStatisticsPopupOpen(false)}
@@ -205,67 +211,63 @@ function EditorFooter() {
           target: statisticsRef.current,
           location: "top",
           align: "center",
-          yOffset: 5
+          yOffset: 11
         }}
       >
         <Flex
           sx={{
             width: ["100%", "fit-content"],
+            minWidth: "120px",
             border: "1px solid",
-            borderColor: "border",
-            borderRadius: "dialog",
-            boxShadow: "0px 0px 15px 0px #00000011",
-            bg: "background-secondary",
+            borderColor: "border-secondary",
+            borderRadius: "radius2",
+            boxShadow: "0 4px 25px 0 rgba(0, 0, 0, 0.05)",
+            bg: "background",
             flexDirection: "column",
-            gap: 2,
-            pt: 2,
+            py: "spacing2",
             justifyContent: "center"
           }}
         >
           {Object.entries(statistics).map(([key, value]) => (
-            <Flex key={key} sx={{ justifyContent: "space-between", px: 4 }}>
-              <Text variant="body" sx={{ width: 100 }}>
+            <Flex
+              key={key}
+              sx={{
+                justifyContent: "space-between",
+                gap: "spacing4",
+                px: "spacing4",
+                py: "spacing3"
+              }}
+            >
+              <Text sx={{ fontSize: "xxs", color: "paragraph" }}>
                 {strings[key as keyof NoteStatistics]()}
               </Text>
-              <Text
-                variant="body"
-                sx={{ color: "paragraph", fontWeight: "bold" }}
-              >
+              <Text sx={{ color: "paragraph", fontSize: "xxs" }}>
                 {value.total}
                 {value.selected ? (
-                  <span style={{ fontWeight: "normal" }}>
-                    {" "}
-                    ({value.selected} selected)
-                  </span>
+                  <span> ({value.selected} selected)</span>
                 ) : (
                   ""
                 )}
               </Text>
             </Flex>
           ))}
-          <Button
-            data-test-id="dialog-no"
-            onClick={() => setIsStatisticsPopupOpen(false)}
-            color="paragraph"
-            variant="icon"
-          >
-            <Cross size={12} />
-          </Button>
         </Flex>
       </PopupPresenter>
+      <EditorFooterSeparator />
       {dateEdited > 0 ? (
-        <Text
+        <StatusBarItem
+          variant="text"
           className="selectable"
-          variant="subBody"
-          sx={{ color: "paragraph" }}
           data-test-id="editor-date-edited"
           title={dateEdited.toString()}
-        >
-          {getFormattedDate(dateEdited)}
-        </Text>
+          text={getFormattedDate(dateEdited)}
+        />
       ) : null}
+      <EditorFooterSeparator />
       {SaveStateIcon && (
-        <SaveStateIcon
+        <StatusBarItem
+          variant="button"
+          icon={SaveStateIcon}
           data-test-id={`editor-save-state-${
             saveState === SaveState.Saved
               ? "saved"
@@ -273,22 +275,24 @@ function EditorFooter() {
               ? "notsaved"
               : "loading"
           }`}
-          size={13}
-          color={
-            saveState === SaveState.Saved
-              ? "accent"
-              : saveState === SaveState.NotSaved
-              ? "icon-error"
-              : "paragraph"
-          }
+          iconProps={{
+            color:
+              saveState === SaveState.Saved
+                ? "accent"
+                : saveState === SaveState.NotSaved
+                ? "icon-error"
+                : "icon"
+          }}
           title={
             saveState === SaveState.NotSaved ? strings.clickToSave() : undefined
           }
           sx={{
-            height: "100%",
             cursor: saveState === SaveState.NotSaved ? "pointer" : "default",
             ":hover": {
-              bg: saveState === SaveState.NotSaved ? "hover" : "initial"
+              bg:
+                saveState === SaveState.NotSaved
+                  ? "hover"
+                  : "initial !important"
             }
           }}
           onClick={() => {
