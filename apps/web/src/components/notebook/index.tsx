@@ -129,7 +129,7 @@ export function Notebook(props: NotebookProps) {
           {isExpandable ? (
             <Button
               variant="secondary"
-              sx={{ bg: "transparent", p: "2px", borderRadius: 100 }}
+              sx={{ bg: "transparent", p: 0, borderRadius: 100 }}
               onClick={(e) => {
                 e.stopPropagation();
                 isExpanded ? collapse() : expand();
@@ -149,7 +149,7 @@ export function Notebook(props: NotebookProps) {
             </Button>
           ) : (
             <NotebookIcon
-              size={18}
+              size={14}
               color={isOpened ? "icon-selected" : "icon"}
             />
           )}
