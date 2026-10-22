@@ -117,13 +117,10 @@ function useAuthenticateUser({
           throw new Error("Missing code or userId in query params.");
         }
 
-        const accessToken = await db.tokenManager.getAccessToken();
-        if (!accessToken) {
-          await db.tokenManager.getAccessTokenFromAuthorizationCode(
-            userId,
-            code.replace(/ /gm, "+")
-          );
-        }
+        await db.tokenManager.getAccessTokenFromAuthorizationCode(
+          userId,
+          code.replace(/ /gm, "+")
+        );
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
