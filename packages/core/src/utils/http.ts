@@ -81,13 +81,21 @@ export default {
   patch
 };
 
+const MAX_AUTO_RETRY_DELAY = 10_000;
+
 async function request(url: string, method: "GET" | "DELETE", token?: string) {
-  return handleResponse(
-    await fetchWrapped(url, {
-      method,
-      headers: getHeaders(token)
-    })
-  );
+  const send = () => fetchWrapped(url, { method, headers: getHeaders(token) });
+  let response = await send();
+  const retryAfter = getRetryAfter(response);
+  if (
+    method === "GET" &&
+    retryAfter !== undefined &&
+    retryAfter <= MAX_AUTO_RETRY_DELAY
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, retryAfter));
+    response = await send();
+  }
+  return handleResponse(response);
 }
 
 async function bodyRequest(
@@ -152,7 +160,11 @@ export function errorTransformer(errorJson: {
   };
 }
 
-async function fetchWrapped(input: string, init: RequestInit, timeoutMs = 30000) {
+async function fetchWrapped(
+  input: string,
+  init: RequestInit,
+  timeoutMs = 30000
+) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -176,16 +188,33 @@ async function fetchWrapped(input: string, init: RequestInit, timeoutMs = 30000)
 
 async function handleResponse(response: Response) {
   try {
+    const status = response.status;
+    const retryAfter = getRetryAfter(response);
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       const json = await response.json();
       if (response.ok) {
         return json;
       }
-      throw new RequestError(errorTransformer(json));
+      throw new RequestError({ ...errorTransformer(json), status, retryAfter });
     } else {
-      if (response.status === 429)
-        throw new Error("You are being rate limited.");
+      if (status === 429)
+        throw new RequestError({
+          code: "rate_limited",
+          description: "You are being rate limited.",
+          data: undefined,
+          status,
+          retryAfter
+        });
+      if (status === 503)
+        throw new RequestError({
+          code: "service_unavailable",
+          description:
+            "Service is temporarily unavailable. Please try again later.",
+          data: undefined,
+          status,
+          retryAfter
+        });
 
       if (response.ok) return await response.text();
       else if (response.status === 401) {
@@ -210,11 +239,31 @@ async function handleResponse(response: Response) {
 export class RequestError extends Error {
   code: string;
   data: unknown;
-  constructor(error: { code: string; data: unknown; description: string }) {
+  status?: number;
+  retryAfter?: number;
+  constructor(error: {
+    code: string;
+    data: unknown;
+    description: string;
+    status?: number;
+    retryAfter?: number;
+  }) {
     super(error.description);
     this.code = error.code;
     this.data = error.data;
+    this.status = error.status;
+    this.retryAfter = error.retryAfter;
   }
+}
+
+function getRetryAfter(response: Response): number | undefined {
+  if (response.status !== 429 && response.status !== 503) return;
+  const header = response.headers.get("retry-after");
+  if (!header) return;
+  const seconds = Number(header);
+  if (!Number.isNaN(seconds)) return Math.max(0, seconds * 1000);
+  const date = Date.parse(header);
+  if (!Number.isNaN(date)) return Math.max(0, date - Date.now());
 }
 
 function getHeaders(token?: string | null) {
