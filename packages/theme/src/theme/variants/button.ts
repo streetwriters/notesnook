@@ -109,6 +109,15 @@ const newBordered: ThemeUIStyleObject = {
   borderColor: "border"
 };
 
+const newErrorBordered: ThemeUIStyleObject = {
+  ...newCreateButtonVariant("transparent", "paragraph-error", {
+    hover: { bg: "hover" },
+    active: { bg: "hover" }
+  }),
+  border: "1.5px solid",
+  borderColor: "border-error"
+};
+
 const newAnchor: ThemeUIStyleObject = {
   variant: "buttons.anchor",
   fontSize: "sm",
@@ -244,5 +253,6 @@ export const buttonVariants = {
   dialog,
   statusitem: statusItem,
   icon: menuItem,
-  menuitem: menuItem
+  menuitem: menuItem,
+  new_error_bordered: newErrorBordered
 };

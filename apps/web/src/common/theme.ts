@@ -88,7 +88,7 @@ export const THEME_LIGHT: any = {
         background: "#ffffff",
         border: "#E8E8E8",
         heading: "#212121",
-        icon: "#A6A6A6",
+        icon: "#D3D3D3",
         separator: "#E8E8E8",
         placeholder: "#a9a9a9",
         hover: "#00000010",
