@@ -21,13 +21,12 @@ import { PropsWithChildren, useEffect, useRef } from "react";
 import { Box, Button, Text, Flex } from "@notesnook/ui";
 import {
   Close,
-  AddReminder,
   Menu,
   SearchIcon,
   Sliders,
   ViewList,
   List,
-  BellPlus
+  Icon
 } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -40,22 +39,13 @@ import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 import { strings } from "@notesnook/intl";
 import { RouteResult } from "../../navigation/types";
-import { CREATE_BUTTON_MAP } from "../../common";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { Context } from "../list-container/types";
 
 export type RouteContainerButtons = {
-  search?: {
-    title: string;
-  };
-  back?: {
-    title: string;
-    onClick: () => void;
-  };
-  create?: {
-    title: string;
-    onClick: () => void;
-  };
+  title: string;
+  onClick: () => void;
+  icon: Icon;
 };
 
 export type RouteContainerProps = RouteResult & {
@@ -136,7 +126,7 @@ type HeaderActionsProps = {
   canToggleView: boolean;
   viewMode: "compact" | "detailed" | undefined;
   setViewMode: (viewMode: "compact" | "detailed") => void;
-  createReminder?: boolean;
+  routeButton?: RouteContainerButtons;
 };
 
 function HeaderActions({
@@ -147,7 +137,7 @@ function HeaderActions({
   canToggleView,
   viewMode,
   setViewMode,
-  createReminder
+  routeButton
 }: HeaderActionsProps) {
   return (
     <Box
@@ -157,15 +147,14 @@ function HeaderActions({
         gap: "spacing4"
       }}
     >
-      {createReminder && (
+      {routeButton && (
         <Button
           variant="tertiary"
-          title={CREATE_BUTTON_MAP.reminders.title}
-          data-test-id="create-reminder-button"
-          onClick={CREATE_BUTTON_MAP.reminders.onClick}
+          title={routeButton.title}
+          onClick={routeButton.onClick}
           sx={{ p: 0 }}
         >
-          <BellPlus size={15} color="icon-secondary" />
+          <routeButton.icon size={15} color="icon-secondary" />
         </Button>
       )}
       <Button
@@ -292,7 +281,7 @@ function Header(props: RouteContainerProps) {
                 canToggleView={canToggleView}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
-                createReminder={type === "reminders"}
+                routeButton={props.buttons}
               />
             )}
           </Box>
@@ -405,6 +394,7 @@ function Header(props: RouteContainerProps) {
                 canToggleView={canToggleView}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
+                routeButton={props.buttons}
               />
             )}
           </Flex>
