@@ -52,7 +52,7 @@ import {
 } from "../../dialogs/add-reminder-dialog";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
-import { ReminderCheckbox } from "./reminder-checkbox";
+import { Checkbox } from "../checkbox";
 import dayjs from "dayjs";
 
 const PRIORITY_ICON_MAP = {
@@ -117,10 +117,15 @@ function Reminder(props: ReminderProps) {
             }}
           >
             <Flex sx={{ alignItems: "center", gap: "spacing4", minWidth: 0 }}>
-              <ReminderCheckbox
+              <Checkbox
                 checked={completed}
                 onToggle={toggleCompleted}
+                aria-label={
+                  completed ? "Mark reminder incomplete" : "Mark reminder complete"
+                }
+                data-test-id="reminder-complete"
                 size={15}
+                checkboxUncheckedIconColor="border"
                 checkboxUncheckedIconClassname="reminder-checkbox-unchecked-icon"
               />
               <Text

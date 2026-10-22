@@ -17,44 +17,60 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex } from "@theme-ui/components";
-import { Checkbox, CheckboxUnchecked } from "../icons";
+import { Checkbox as CheckboxIcon, CheckboxUnchecked } from "./icons";
 
-type ReminderCheckboxProps = {
+type CheckboxProps = {
   checked: boolean;
-  onToggle: () => void;
+  onToggle?: (
+    event:
+      | React.MouseEvent<HTMLDivElement>
+      | React.KeyboardEvent<HTMLDivElement>
+  ) => void;
+  "aria-label": string;
+  "data-test-id"?: string;
   size?: number;
+  checkboxUncheckedIconColor: string;
   checkboxUncheckedIconClassname?: string;
 };
 
-export function ReminderCheckbox(props: ReminderCheckboxProps) {
+export function Checkbox(props: CheckboxProps) {
   const {
     checked,
     onToggle,
+    "aria-label": ariaLabel,
+    "data-test-id": dataTestId,
     size = 18,
+    checkboxUncheckedIconColor,
     checkboxUncheckedIconClassname
   } = props;
 
+  const Icon = checked ? CheckboxIcon : CheckboxUnchecked;
+
   return (
-    <Flex
+    <Icon
       role="checkbox"
       aria-checked={checked}
-      aria-label={
-        checked ? "Mark reminder incomplete" : "Mark reminder complete"
-      }
+      aria-label={ariaLabel}
       tabIndex={0}
-      data-test-id="reminder-complete"
+      data-test-id={dataTestId}
       onClick={(event) => {
+        if (!onToggle) return;
+
         event.stopPropagation();
-        onToggle();
+        onToggle(event);
       }}
       onKeyDown={(event) => {
+        if (!onToggle) return;
+
         if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
           event.stopPropagation();
-          onToggle();
+          onToggle(event);
         }
       }}
+      size={size}
+      color={checked ? "accent" : checkboxUncheckedIconColor}
+      className={checked ? undefined : checkboxUncheckedIconClassname}
       sx={{
         alignItems: "center",
         cursor: "pointer",
@@ -65,16 +81,6 @@ export function ReminderCheckbox(props: ReminderCheckboxProps) {
           outlineColor: "accent"
         }
       }}
-    >
-      {checked ? (
-        <Checkbox size={size} color="accent" />
-      ) : (
-        <CheckboxUnchecked
-          size={size}
-          color="border"
-          className={checkboxUncheckedIconClassname}
-        />
-      )}
-    </Flex>
+    />
   );
 }
