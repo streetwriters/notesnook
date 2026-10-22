@@ -19,7 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { MaybeDeletedItem, isDeleted } from "../types.js";
 import EventManager from "../utils/event-manager.js";
-import { DatabaseAccessor, DatabaseCollection, DatabaseSchema } from "./index.js";
+import type Database from "../api/index.js";
+import {
+  DatabaseAccessor,
+  DatabaseCollection,
+  DatabaseSchema
+} from "./index.js";
 import { SQLCollection } from "./sql-collection.js";
 import { Kysely } from "@streetwriters/kysely";
 import { Sanitizer } from "./sanitizer.js";
@@ -35,20 +40,21 @@ export class SQLCachedCollection<
 
   constructor(
     sql: DatabaseAccessor,
-    startTransaction: (
-      executor: (tr: Kysely<DatabaseSchema>) => Promise<void>
-    ) => Promise<void>,
     public type: TCollectionType,
     eventManager: EventManager,
     sanitizer: Sanitizer
   ) {
-    this.collection = new SQLCollection(
-      sql,
-      startTransaction,
-      type,
-      eventManager,
-      sanitizer
-    );
+    this.collection = new SQLCollection(sql, type, eventManager, sanitizer);
+  }
+
+  /**
+   * Returns a copy that runs on another database (see `SQLCollection.scope`).
+   * The cache is shared with the original.
+   */
+  scope(db: Database): this {
+    const scoped = Object.create(this);
+    scoped.collection = this.collection.scope(db);
+    return Object.freeze(scoped);
   }
 
   async init() {

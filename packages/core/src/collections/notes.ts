@@ -25,7 +25,7 @@ import {
   formatTitle
 } from "../utils/title-format.js";
 import { clone } from "../utils/clone.js";
-import { EMPTY_CONTENT } from "./content.js";
+import { EMPTY_CONTENT, PreparedContent } from "./content.js";
 import { buildFromTemplate } from "../utils/templates/index.js";
 import {
   Note,
@@ -57,11 +57,9 @@ export class Notes implements ICollection {
    * @internal
    */
   collection: SQLCollection<"notes", TrashOrItem<Note>>;
-  totalNotes = 0;
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "notes",
       db.eventManager,
       db.sanitizer
@@ -70,7 +68,6 @@ export class Notes implements ICollection {
 
   async init() {
     await this.collection.init();
-    this.totalNotes = await this.collection.count();
     await this.buildCache();
   }
 
@@ -92,33 +89,48 @@ export class Notes implements ICollection {
     if (!isUpdating && !item.content && !item.contentId && !item.title)
       throw new Error("Note must have a title or content.");
 
-    await this.db.transaction(async () => {
-      let contentId = item.contentId;
-      let dateEdited = item.dateEdited;
-      let headline = item.headline;
-      let headlineTitle = "";
+    let preparedContent:
+      | {
+          headline: string;
+          headlineTitle: string;
+          dateEdited: number;
+          content: PreparedContent;
+        }
+      | undefined;
+    if (item.content && item.content.data && item.content.type) {
+      logger.debug("saving content", { id });
+      const { type, data } = item.content;
 
-      if (item.content && item.content.data && item.content.type) {
-        logger.debug("saving content", { id });
-        const { type, data } = item.content;
+      const content = await getContentFromData(type, data);
+      if (!content) throw new Error("Invalid content type.");
 
-        const content = await getContentFromData(type, data);
-        if (!content) throw new Error("Invalid content type.");
-
-        headline = content.toHeadline();
-        headlineTitle = content.toTitle();
-        dateEdited = Date.now();
-        contentId = await this.db.content.add({
+      const dateEdited = Date.now();
+      preparedContent = {
+        headline: content.toHeadline(),
+        headlineTitle: content.toTitle(),
+        dateEdited,
+        content: await this.db.content.prepare({
           noteId: id,
           sessionId: item.sessionId,
-          id: contentId,
+          id: item.contentId,
           dateEdited,
           type,
           data,
           ...(item.localOnly !== undefined ? { localOnly: item.localOnly } : {})
-        });
+        })
+      };
+    }
+
+    await this.db.transaction(async (tx) => {
+      let contentId = item.contentId;
+      let dateEdited = preparedContent?.dateEdited || item.dateEdited;
+      const headline = preparedContent?.headline ?? item.headline;
+      const headlineTitle = preparedContent?.headlineTitle || "";
+
+      if (preparedContent) {
+        contentId = await tx.content.addPrepared(preparedContent.content);
       } else if (contentId && item.localOnly !== undefined) {
-        await this.db.content.add({
+        await tx.content.add({
           id: contentId,
           localOnly: !!item.localOnly
         });
@@ -131,19 +143,20 @@ export class Notes implements ICollection {
 
       if (!isUpdating || item.title === "") {
         item.isGeneratedTitle = !Boolean(item.title);
+        const titleFormat = this.db.settings.getTitleFormat();
         item.title =
           item.title ||
           formatTitle(
-            this.db.settings.getTitleFormat(),
+            titleFormat,
             this.db.settings.getDateFormat(),
             this.db.settings.getTimeFormat(),
             this.db.settings.getDayFormat(),
             headlineTitle,
-            this.totalNotes
+            titleFormat.includes("$count$") ? await tx.notes.all.count() : 0
           );
       }
 
-      const currentNoteTitleFields = await this.db
+      const currentNoteTitleFields = await tx
         .sql()
         .selectFrom("notes")
         .select(["isGeneratedTitle", "title"])
@@ -167,7 +180,7 @@ export class Notes implements ICollection {
       }
 
       if (isUpdating) {
-        await this.collection.update([id], {
+        await tx.notes.collection.update([id], {
           title: item.title,
           headline: headline,
           contentId,
@@ -185,7 +198,7 @@ export class Notes implements ICollection {
           isGeneratedTitle: item.isGeneratedTitle
         });
       } else {
-        await this.collection.upsert({
+        await tx.notes.collection.upsert({
           id,
           type: "note",
           contentId,
@@ -205,11 +218,10 @@ export class Notes implements ICollection {
 
           isGeneratedTitle: item.isGeneratedTitle
         });
-        this.totalNotes++;
       }
 
       if (item.sessionId && typeof item.title === "string") {
-        await this.db.noteHistory.add(item.sessionId, {
+        await tx.noteHistory.add(item.sessionId, {
           title: item.title,
           noteId: id
         });
@@ -344,12 +356,13 @@ export class Notes implements ICollection {
     return this.collection.update(ids, { favorite: state });
   }
   async archive(state: boolean, ...ids: string[]) {
-    await this.collection.update(ids, { archived: state });
-    if (state) {
-      addItems(this.cache.archived, ...ids);
-    } else {
-      deleteItems(this.cache.archived, ...ids);
-    }
+    await this.db.transaction(async (tx) => {
+      await tx.notes.collection.update(ids, { archived: state });
+      tx.afterCommit(() => {
+        if (state) addItems(this.cache.archived, ...ids);
+        else deleteItems(this.cache.archived, ...ids);
+      });
+    });
   }
 
   async setExpiryDate(date: number | null, ...ids: string[]) {
@@ -365,9 +378,9 @@ export class Notes implements ICollection {
     return this.collection.update(ids, { readonly: state });
   }
   async localOnly(state: boolean, ...ids: string[]) {
-    await this.db.transaction(async () => {
-      await this.collection.update(ids, { localOnly: state });
-      await this.db.content.updateByNoteId({ localOnly: state }, ...ids);
+    await this.db.transaction(async (tx) => {
+      await tx.notes.collection.update(ids, { localOnly: state });
+      await tx.content.updateByNoteId({ localOnly: state }, ...ids);
     });
   }
   spellcheck(state: boolean, ...ids: string[]) {
@@ -487,15 +500,13 @@ export class Notes implements ICollection {
     if (moveToTrash) {
       await this.db.trash.add("note", ids);
     } else {
-      await this.db.transaction(async () => {
-        await this.db.relations.unlinkOfType("note", ids);
-        await this.collection.softDelete(ids);
-        await this.db.content.removeByNoteId(...ids);
-        await this.db.inboxItemsHistory.delete(ids);
+      await this.db.transaction(async (tx) => {
+        await tx.relations.unlinkOfType("note", ids);
+        await tx.notes.collection.softDelete(ids);
+        await tx.content.removeByNoteId(...ids);
+        await tx.inboxItemsHistory.delete(ids);
       });
     }
-
-    this.totalNotes = Math.max(0, this.totalNotes - ids.length);
   }
 
   async addToNotebook(notebookId: string, ...noteIds: string[]) {
@@ -508,9 +519,9 @@ export class Notes implements ICollection {
   }
 
   async removeFromNotebook(notebookId: string, ...noteIds: string[]) {
-    await this.db.transaction(async () => {
+    await this.db.transaction(async (tx) => {
       for (const noteId of noteIds) {
-        await this.db.relations.unlink(
+        await tx.relations.unlink(
           { id: notebookId, type: "notebook" },
           { type: "note", id: noteId }
         );
