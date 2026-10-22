@@ -950,7 +950,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
           p: 0,
           cursor: "pointer",
           borderRadius: "radius5",
-          bg: "background-tertiary",
+          bg: "background-secondary",
           color: "paragraph",
           zIndex: result.status === "fulfilled" ? result.value.length + 1 : 1
         }}
