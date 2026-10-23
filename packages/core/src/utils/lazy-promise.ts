@@ -18,17 +18,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export class LazyPromise<T> {
-  private _promise: Promise<T>;
+  private _promise!: Promise<T>;
   private _resolve?: (result: T) => void;
+  private _reject?: (reason?: unknown) => void;
+  private rejected = false;
   constructor() {
-    this._promise = new Promise((resolve) => (this._resolve = resolve));
+    this.create();
+  }
+
+  /**
+   * Replaces a rejected promise with a new pending one so callers can wait
+   * for a retry.
+   */
+  reset() {
+    if (this.rejected) this.create();
   }
 
   resolve(result: T) {
     this._resolve?.(result);
   }
 
+  reject(reason?: unknown) {
+    this.rejected = true;
+    this._reject?.(reason);
+  }
+
   get promise() {
     return this._promise;
+  }
+
+  private create() {
+    this.rejected = false;
+    this._promise = new Promise((resolve, reject) => {
+      this._resolve = resolve;
+      this._reject = reject;
+    });
+    // avoid unhandled rejections when nobody is waiting
+    this._promise.catch(() => {});
   }
 }

@@ -122,3 +122,23 @@ test("group spanning multiple batches (up)", async (t) => {
   t.expect((await grouping.item(140 - 28)).group).toBeDefined();
   t.expect((await grouping.item(110)).group).toBeUndefined();
 });
+
+test("jumping down shows header when the previous item is in another group", async (t) => {
+  const items = ["A", "A", "B", "B", "A", "A"].map((group, i) => ({
+    group,
+    id: `${i}`
+  }));
+  const grouping = new VirtualizedGrouping<{ group: string; id: string }>(
+    items.length,
+    2,
+    async () => items.map((i) => i.id),
+    async (start, end) => ({
+      ids: items.slice(start, end).map((i) => i.id),
+      items: items.slice(start, end)
+    }),
+    (items) => groupArray(items, (item) => item.group)
+  );
+
+  await grouping.item(0);
+  t.expect((await grouping.item(4)).group?.title).toBe("A");
+});

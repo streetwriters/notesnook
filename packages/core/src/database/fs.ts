@@ -181,7 +181,7 @@ export class FileStorage {
             filename: file.filename,
             groupId
           });
-          await file.operation;
+          await upload.operation;
           continue;
         }
 

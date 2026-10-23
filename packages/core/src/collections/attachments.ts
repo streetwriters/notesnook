@@ -21,7 +21,6 @@ import { ICollection } from "./collection.js";
 import { getId } from "../utils/id.js";
 import { EVENTS } from "../common.js";
 import dataurl from "../utils/dataurl.js";
-import dayjs from "dayjs";
 import {
   DocumentMimeTypes,
   getFileNameWithExtension
@@ -455,20 +454,6 @@ export class Attachments implements ICollection {
       noteId,
       { readOnDownload: true }
     );
-  }
-
-  async cleanup() {
-    const now = dayjs().unix();
-    const ids: string[] = [];
-    for await (const attachment of this.deleted.iterate()) {
-      if (dayjs(attachment.dateDeleted).add(7, "days").unix() < now) continue;
-
-      const isDeleted = await this.db.fs().deleteFile(attachment.hash);
-      if (!isDeleted) continue;
-
-      ids.push(attachment.id);
-    }
-    await this.collection.softDelete(ids);
   }
 
   get pending() {
