@@ -361,6 +361,12 @@ import AsteriskSvg from "@notesnook/icons/asterisk.svg?react";
 import SyncDisabledSvg from "@notesnook/icons/sync-disabled.svg?react";
 import WarningOctagonSvg from "@notesnook/icons/warning-octagon.svg?react";
 import CheckboxRemoveSvg from "@notesnook/icons/checkbox-remove.svg?react";
+import SunDimSvg from "@notesnook/icons/sun-dim.svg?react";
+import ArrowUpRightSvg from "@notesnook/icons/arrow-up-right.svg?react";
+import ArrowDownLeftSvg from "@notesnook/icons/arrow-down-left.svg?react";
+import PaperclipHorizontalSvg from "@notesnook/icons/paperclip-horizontal.svg?react";
+import ArrowBendUpLeftSvg from "@notesnook/icons/arrow-bend-up-left.svg?react";
+import ArrowBendUpRightSvg from "@notesnook/icons/arrow-bend-up-right.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -856,3 +862,9 @@ export const Asterisk = createSvgIcon(AsteriskSvg);
 export const SyncDisabled = createSvgIcon(SyncDisabledSvg);
 export const WarningOctagon = createSvgIcon(WarningOctagonSvg);
 export const CheckboxRemove = createSvgIcon(CheckboxRemoveSvg);
+export const SunDim = createSvgIcon(SunDimSvg);
+export const ArrowUpRight = createSvgIcon(ArrowUpRightSvg);
+export const ArrowDownLeft = createSvgIcon(ArrowDownLeftSvg);
+export const PaperclipHorizontal = createSvgIcon(PaperclipHorizontalSvg);
+export const ArrowBendUpLeft = createSvgIcon(ArrowBendUpLeftSvg);
+export const ArrowBendUpRight = createSvgIcon(ArrowBendUpRightSvg);
