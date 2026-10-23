@@ -34,7 +34,7 @@ import {
 import { db } from "../../common/db";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
-import { Cross } from "../../components/icons";
+import { Close } from "../../components/icons";
 import { CustomScrollbarsVirtualList } from "../../components/list-container";
 import { useEditorStore } from "../../stores/editor-store";
 import { strings } from "@notesnook/intl";
@@ -50,6 +50,7 @@ import {
   addRecentCommand
 } from "./commands";
 import { escapeUTF8 } from "entities";
+import Field from "../../components/field";
 
 type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
@@ -108,7 +109,8 @@ export const CommandPaletteDialog = DialogManager.register(
         }}
         noScroll
         sx={{
-          fontFamily: "body"
+          fontFamily: "body",
+          minHeight: "553px"
         }}
       >
         <Flex
@@ -117,8 +119,8 @@ export const CommandPaletteDialog = DialogManager.register(
             overflow: "hidden",
             height: 400,
             '[data-viewport-type="element"]': {
-              width: "calc(100% - 10px) !important",
-              px: 1
+              // width: "calc(100% - 10px) !important"
+              // px: 1
             }
           }}
           onKeyDown={(e) => {
@@ -172,7 +174,7 @@ export const CommandPaletteDialog = DialogManager.register(
             }
           }}
         >
-          <Input
+          <Field
             autoFocus
             variant="clean"
             placeholder={
@@ -181,12 +183,15 @@ export const CommandPaletteDialog = DialogManager.register(
                 : strings.searchForNotesNotebooksAndTags()
             }
             sx={{
-              m: 0,
-              marginTop: 0,
-              mr: 0,
-              px: 2,
-              borderRadius: 0,
-              borderBottom: "1px solid var(--border)"
+              px: "spacing7",
+              pb: "spacing6",
+              // mb: "spacing6",
+              borderBottom: "1px solid var(--separator)",
+              input: {
+                px: "spacing4",
+                py: "spacing6",
+                fontSize: "sm"
+              }
             }}
             onChange={debounce((e) => {
               setQuery(e.target.value);
@@ -200,28 +205,37 @@ export const CommandPaletteDialog = DialogManager.register(
                 <div
                   className="footer"
                   style={{
-                    height: "5px"
+                    height: "15px"
                   }}
                 />
               ),
               EmptyPlaceholder: () => (
-                <Text
+                <Flex
                   sx={{
-                    px: 1
+                    height: "90%",
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
-                  variant="subBody"
                 >
-                  {query ? strings.noResultsFound(query) : ""}
-                </Text>
+                  <Text
+                    sx={{
+                      color: "paragraph-secondary",
+                      fontSize: "sm"
+                    }}
+                  >
+                    {query ? strings.noResultsFound(query) : ""}
+                  </Text>
+                </Flex>
               ),
               TopItemList: ({ style, ...props }) => (
-                <div
+                <Box
+                  as="div"
                   className="top-item-list"
                   {...props}
-                  style={{
-                    ...style,
-                    width: "calc(100% - 10px) !important",
-                    padding: "0px 5px"
+                  sx={{
+                    ...style
+                    // width: "calc(100% - 10px) !important"
+                    // padding: "0px 5px"
                   }}
                 />
               )
@@ -241,14 +255,23 @@ export const CommandPaletteDialog = DialogManager.register(
               return (
                 <Box
                   sx={{
-                    width: "100%",
-                    py: 1,
+                    // width: "100%",
+                    // py: 1,
                     bg: "background",
-                    px: 1
+                    px: "spacing7",
+                    pt: "spacing6",
+                    pb: "spacing4"
+                    // px: 1
                   }}
                 >
                   <Text
-                    variant="subBody"
+                    // variant="subBody"
+                    sx={{
+                      color: "heading-secondary",
+                      fontSize: "3xs",
+                      fontWeight: 500,
+                      letterSpacing: "0.33px"
+                    }}
                     dangerouslySetInnerHTML={{ __html: label }}
                   />
                 </Box>
@@ -276,34 +299,54 @@ export const CommandPaletteDialog = DialogManager.register(
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    py: 1,
-                    px: 1,
-                    borderRadius: "default",
+                    py: "spacing2",
+                    px: "spacing2",
+                    mx: "spacing7",
+                    borderRadius: "radius1",
                     bg:
                       index === selected
                         ? "background-selected"
                         : "transparent",
                     ":hover:not(:disabled):not(:active)": {
-                      bg: index === selected ? "hover-selected" : "hover"
+                      bg: index === selected ? "hover-selected" : "hover",
+                      ".command-icon": {
+                        bg: "hover-secondary"
+                      }
                     }
                   }}
                 >
                   <Flex
                     sx={{
-                      gap: 1
+                      gap: "spacing3",
+                      alignItems: "center"
                     }}
                   >
                     {command.icon && (
-                      <command.icon
-                        size={14}
-                        color={index === selected ? "icon-selected" : "icon"}
-                      />
+                      <Box
+                        className="command-icon"
+                        sx={{
+                          bg: "background-secondary",
+                          width: "25px",
+                          height: "25px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "radius1"
+                        }}
+                      >
+                        <command.icon
+                          size={13}
+                          color={index === selected ? "icon-selected" : "icon"}
+                        />
+                      </Box>
                     )}
                     <Text
                       variant="body"
                       sx={{
                         textOverflow: "ellipsis",
-                        overflow: "hidden"
+                        overflow: "hidden",
+                        color: "paragraph",
+                        fontSize: "xs"
                       }}
                       dangerouslySetInnerHTML={{
                         __html: command.title
@@ -322,11 +365,15 @@ export const CommandPaletteDialog = DialogManager.register(
                       variant="secondary"
                       sx={{
                         bg: "transparent",
-                        p: "small",
-                        borderRadius: 100
+                        borderRadius: "radius1",
+                        width: "20px",
+                        height: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
                       }}
                     >
-                      <Cross size={12} />
+                      <Close size={13} />
                     </Button>
                   )}
                 </Flex>
@@ -338,10 +385,10 @@ export const CommandPaletteDialog = DialogManager.register(
           sx={{
             flexDirection: "row",
             bg: "background-secondary",
-            px: 2,
-            py: 2,
-            gap: 3,
-            borderTop: "1px solid var(--border)",
+            px: "spacing7",
+            py: "spacing4",
+            gap: "spacing5",
+            // borderTop: "1px solid var(--border)",
             justifyContent: "end",
             alignItems: "center"
           }}
@@ -353,11 +400,15 @@ export const CommandPaletteDialog = DialogManager.register(
                 sx={{
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: 1
+                  gap: "spacing2"
                 }}
               >
-                <Text variant="body">{key.description}</Text>
-                <Text variant="subBody">{key.key}</Text>
+                <Text sx={{ color: "paragraph", fontSize: "3xs" }}>
+                  {key.description}
+                </Text>
+                <Text sx={{ color: "paragraph-secondary", fontSize: "3xs" }}>
+                  {key.key}
+                </Text>
               </Flex>
             );
           })}
