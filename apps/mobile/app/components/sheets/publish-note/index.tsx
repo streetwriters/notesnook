@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Note } from "@notesnook/core";
+import { Note, EVENTS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import Clipboard from "@react-native-clipboard/clipboard";
@@ -196,6 +196,22 @@ const PublishNoteSheet = ({
     }
     setPublishLoading(false);
   };
+
+  useEffect(() => {
+    const sub = db.eventManager.subscribe(
+      EVENTS.monographsUpdated,
+      async (ids?: string[]) => {
+        if (note?.id && (!ids || ids.length === 0 || ids.includes(note.id))) {
+          await monographData.execute();
+          Navigation.queueRoutesForUpdate();
+          eSendEvent(eMenuItemUpdate);
+        }
+      }
+    );
+    return () => {
+      sub.unsubscribe();
+    };
+  }, [note?.id, monographData]);
 
   const monographMetadata =
     monographData.result?.metadata ?? lastMonographDataResult.current;

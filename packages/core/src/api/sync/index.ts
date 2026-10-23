@@ -146,6 +146,10 @@ export default class SyncManager {
   async stop() {
     await this.sync.cancel();
   }
+
+  async notifyPushCompleted() {
+    await this.sync.notifyPushCompleted();
+  }
 }
 
 export class Sync {
@@ -158,6 +162,7 @@ export class Sync {
   devices;
   private conflictedNoteIds: string[] = [];
   private uncachedAttachments: DownloadableFile[] = [];
+  private currentSyncOptions: SyncOptions = { type: "full" };
 
   constructor(private readonly db: Database) {
     this.collector = new Collector(db);
@@ -172,6 +177,7 @@ export class Sync {
   }
 
   async start(options: SyncOptions) {
+    this.currentSyncOptions = options;
     await this.createConnection(options);
     if (!this.connection) return;
 
@@ -350,12 +356,36 @@ export class Sync {
    * @private
    */
   async onPushCompleted(deviceId: string) {
+    const localDeviceId = await this.devices.get();
+    if (localDeviceId && deviceId === localDeviceId) return;
     this.db.eventManager.publish(
       EVENTS.databaseSyncRequested,
       true,
       false,
       deviceId
     );
+  }
+
+  async notifyPushCompleted() {
+    try {
+      if (!this.connection) {
+        await this.createConnection({ type: "send" });
+      }
+      await this.checkConnection();
+      let deviceId = await this.devices.get();
+      if (!deviceId) {
+        await this.devices.register();
+        deviceId = await this.devices.get();
+      }
+      if (deviceId && this.connection?.state === HubConnectionState.Connected) {
+        await this.connection.send("PushCompletedV2", deviceId);
+      }
+    } catch (err) {
+      this.logger.error(
+        err as Error,
+        "Failed to broadcast PushCompletedV2"
+      );
+    }
   }
 
   async processChunk(
@@ -481,7 +511,7 @@ export class Sync {
     return (await this.connection?.invoke("PushItems", deviceId, item)) === 1;
   }
 
-  private async createConnection(options: SyncOptions) {
+  async createConnection(options: SyncOptions = { type: "full" }) {
     if (this.connection) return;
 
     const { HubConnectionBuilder, HttpTransportType, JsonHubProtocol } =
@@ -559,7 +589,7 @@ export class Sync {
           ids: chunk.items.map((i: any) => i.id)
         }
       );
-      await this.processChunk(chunk, keys, options);
+      await this.processChunk(chunk, keys, this.currentSyncOptions || options);
 
       sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
 
@@ -570,6 +600,12 @@ export class Sync {
       if (this.connection?.state !== HubConnectionState.Connected) return false;
 
       const ids = monographs.map((m) => m.id);
+      const localIds = await this.db.monographsCollection.all.ids();
+      const removedIds = localIds.filter((id) => !ids.includes(id));
+      if (removedIds.length > 0) {
+        await this.db.monographsCollection.collection.softDelete(removedIds);
+      }
+
       await this.db.monographsCollection.collection.put(
         monographs.map((m) => ({
           ...m,
@@ -577,7 +613,8 @@ export class Sync {
         }))
       );
       await this.db.monographs.refresh().catch(this.logger.error);
-      this.db.eventManager.publish(EVENTS.monographsUpdated, ids);
+      const allAffectedIds = Array.from(new Set([...ids, ...removedIds]));
+      this.db.eventManager.publish(EVENTS.monographsUpdated, allAffectedIds);
 
       return true;
     });
