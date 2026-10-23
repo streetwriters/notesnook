@@ -24,6 +24,22 @@ type CloneNodeOptions = {
   styles?: boolean;
 };
 
+// Removes every "on*" event-handler attribute (onload, onerror, onclick,
+// onpointerover, etc.) instead of matching against a fixed list of names,
+// so newly introduced handler attributes are stripped too. Runs on the
+// root node itself as well as all of its descendants, since querySelectorAll
+// only reaches descendants.
+function removeEventHandlerAttributes(root: HTMLElement) {
+  const elements: Element[] = [root, ...Array.from(root.querySelectorAll("*"))];
+  for (const element of elements) {
+    for (const attribute of Array.from(element.attributes)) {
+      if (attribute.name.toLowerCase().startsWith("on")) {
+        element.removeAttribute(attribute.name);
+      }
+    }
+  }
+}
+
 export function cloneNode(node: HTMLElement, options: CloneNodeOptions) {
   node = node.cloneNode(true) as HTMLElement;
   const images = node.querySelectorAll("img");
@@ -44,5 +60,8 @@ export function cloneNode(node: HTMLElement, options: CloneNodeOptions) {
 
   const invalidElements = node.querySelectorAll(INVALID_ELEMENTS.join(","));
   for (const element of invalidElements) element.remove();
+
+  removeEventHandlerAttributes(node);
+
   return node;
 }
