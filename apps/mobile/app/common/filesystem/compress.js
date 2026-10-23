@@ -63,7 +63,7 @@ export async function compressToBase64(path, type) {
   });
 }
 
-export async function compressToFile(path, type) {
+export async function compressImage(path, type) {
   const response = await ImageResizer.createResizedImage(
     path,
     1920,
@@ -78,6 +78,11 @@ export async function compressToFile(path, type) {
       onlyScaleDown: true
     }
   );
+  return response;
+}
+
+export async function compressToFile(path, type) {
+  const response = await compressImage(path, type);
   RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
     /* empty */
   });
