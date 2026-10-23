@@ -86,31 +86,33 @@ function Field(props: FieldProps) {
         flexDirection: "column"
       }}
     >
-      <Label
-        htmlFor={id}
-        sx={{
-          fontFamily: "body",
-          flexDirection: "column",
-          fontSize: "xs",
-          color: "paragraph-secondary",
-          lineHeight: 1.2,
-          ...styles?.label
-        }}
-      >
-        {label}{" "}
-        {helpText && (
-          <Text
-            variant="subBody"
-            as="span"
-            sx={{
-              fontWeight: "normal",
-              ...styles?.helpText
-            }}
-          >
-            {helpText}
-          </Text>
-        )}
-      </Label>
+      {label && (
+        <Label
+          htmlFor={id}
+          sx={{
+            fontFamily: "body",
+            flexDirection: "column",
+            fontSize: "xs",
+            color: "paragraph-secondary",
+            lineHeight: 1.2,
+            ...styles?.label
+          }}
+        >
+          {label}{" "}
+          {helpText && (
+            <Text
+              variant="subBody"
+              as="span"
+              sx={{
+                fontWeight: "normal",
+                ...styles?.helpText
+              }}
+            >
+              {helpText}
+            </Text>
+          )}
+        </Label>
+      )}
 
       <Flex sx={{ position: "relative", flex: 1 }}>
         <Input

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
+import { createElement, type ComponentProps } from "react";
 import { escapeUTF8 } from "entities";
 import { db } from "../../common/db";
 import {
@@ -35,7 +36,13 @@ import {
   Reminder as ReminderIcon,
   Tag as TagIcon,
   FocusMode,
-  NormalMode
+  NormalMode,
+  Close,
+  FileText,
+  Bell,
+  BookOpen,
+  Trash,
+  ArrowSquareOut
 } from "../../components/icons";
 import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
@@ -46,7 +53,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
 import { noteMenuItems } from "../../components/note";
-import { MenuItem } from "@notesnook/ui";
+import { MenuIconComponent, MenuItem } from "@notesnook/ui";
 import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";
@@ -99,7 +106,7 @@ const staticCommands: Command[] = [
   {
     id: "notes",
     title: strings.dataTypesPluralCamelCase.note(),
-    icon: ArrowTopRight,
+    icon: FileText,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/");
@@ -118,7 +125,7 @@ const staticCommands: Command[] = [
   {
     id: "tags",
     title: strings.dataTypesPluralCamelCase.tag(),
-    icon: ArrowTopRight,
+    icon: TagIcon,
     action: () => useAppStore.getState().setNavigationTab("tags"),
     group: strings.navigate(),
     type: "command"
@@ -137,7 +144,7 @@ const staticCommands: Command[] = [
   {
     id: "reminders",
     title: strings.dataTypesPluralCamelCase.reminder(),
-    icon: ArrowTopRight,
+    icon: Bell,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/reminders");
@@ -148,7 +155,7 @@ const staticCommands: Command[] = [
   {
     id: "monographs",
     title: strings.dataTypesPluralCamelCase.monograph(),
-    icon: ArrowTopRight,
+    icon: BookOpen,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/monographs");
@@ -159,7 +166,7 @@ const staticCommands: Command[] = [
   {
     id: "trash",
     title: strings.trash(),
-    icon: ArrowTopRight,
+    icon: Trash,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/trash");
@@ -186,7 +193,7 @@ const staticCommands: Command[] = [
   {
     id: "keyboard-shortcuts",
     title: "Keyboard shortcuts",
-    icon: ArrowTopRight,
+    icon: ArrowSquareOut,
     action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),
     type: "command"
@@ -418,7 +425,7 @@ function getEditorCommands(): Command[] {
     {
       id: "close-tab",
       title: strings.closeCurrentTab(),
-      icon: Radar,
+      icon: Close,
       action: () => useEditorStore.getState().closeActiveTab(),
       group: strings.editor(),
       type: "command"
@@ -426,7 +433,7 @@ function getEditorCommands(): Command[] {
     {
       id: "close-all-tabs",
       title: strings.closeAllTabs(),
-      icon: Radar,
+      icon: Close,
       action: () => useEditorStore.getState().closeAllTabs(),
       group: strings.editor(),
       type: "command"
@@ -513,7 +520,9 @@ function menuItemToCommands(
   }
 
   if (!menuItem.onClick) return commands;
-  const _Icon = menuItem.icon ? createIcon(menuItem.icon) : undefined;
+  const _Icon = menuItem.iconComponent
+    ? createMenuIcon(menuItem.iconComponent)
+    : undefined;
   commands.push({
     id: idSuffix ? `${menuItem.key}-${idSuffix}` : menuItem.key,
     title: menuItem.title,
@@ -524,6 +533,18 @@ function menuItemToCommands(
     excludeFromRecents: true
   });
   return commands;
+}
+
+function createMenuIcon(Component: MenuIconComponent): Icon {
+  const MenuIcon: Icon = (props) =>
+    createElement(Component, {
+      size: typeof props.size === "number" ? props.size : undefined,
+      color: props.color,
+      sx: props.sx as ComponentProps<MenuIconComponent>["sx"]
+    });
+  MenuIcon.isReactComponent = true;
+  MenuIcon.path = "";
+  return MenuIcon;
 }
 
 async function getCommandTitle({ id, type }: RecentCommand) {
