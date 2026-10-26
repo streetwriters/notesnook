@@ -16,10 +16,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useIsFeatureAvailable } from "@notesnook/common";
+import { formatBytes, useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Image,
   Platform,
@@ -28,6 +28,8 @@ import {
   View
 } from "react-native";
 import { Image as ImageType } from "react-native-image-crop-picker";
+import RNFetchBlob from "react-native-blob-util";
+import { compressImage } from "../../../common/filesystem/compress";
 import { presentSheet, ToastManager } from "../../../services/event-manager";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
 import { DefaultAppStyles } from "../../../utils/styles";
@@ -37,18 +39,101 @@ import { Notice } from "../../ui/notice";
 import Paragraph from "../../ui/typography/paragraph";
 import SettingsService from "../../../services/settings";
 
+export type CompressedImageResult = {
+  uri: string;
+  size: number;
+};
+
+export type AttachImageResult = {
+  compress: boolean;
+  compressedImages?: Record<string, CompressedImageResult>;
+};
+
 export default function AttachImage({
   response,
   onAttach,
-  close
+  close: _close
 }: {
   response: ImageType[];
-  onAttach: ({ compress }: { compress: boolean }) => void;
+  onAttach: (result: AttachImageResult) => void;
   close: ((ctx?: string | undefined) => void) | undefined;
 }) {
   const fullQualityImagesResult = useIsFeatureAvailable("fullQualityImages");
   const { colors } = useThemeColors();
   const [compress, setCompress] = useState(true);
+  const [compressedMap, setCompressedMap] = useState<
+    Record<string, CompressedImageResult>
+  >({});
+  const [isCompressing, setIsCompressing] = useState(true);
+  const createdTempFilesRef = useRef<string[]>([]);
+  const confirmedRef = useRef(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    setIsCompressing(true);
+
+    const runCompression = async () => {
+      for (const item of response) {
+        const isPng = /(png)/i.test(item.mime || item.path);
+        const isJpeg = /(jpeg|jpg)/i.test(item.mime || item.path);
+
+        if (isPng || isJpeg) {
+          try {
+            const inputPath =
+              Platform.OS === "ios" && !item.path.startsWith("file://")
+                ? "file://" + item.path
+                : item.path;
+
+            const res = await compressImage(inputPath, isPng ? "PNG" : "JPEG");
+            if (!isMounted) {
+              RNFetchBlob.fs
+                .unlink(res.uri.replace("file://", ""))
+                .catch(() => { });
+              return;
+            }
+
+            createdTempFilesRef.current.push(res.uri.replace("file://", ""));
+            if (isMounted) {
+              setCompressedMap((prev) => ({
+                ...prev,
+                [item.path]: {
+                  uri: res.uri,
+                  size: res.size
+                }
+              }));
+            }
+          } catch (e) {
+            console.error("Failed to pre-compress image", e);
+          }
+        }
+      }
+
+      if (isMounted) {
+        setIsCompressing(false);
+      }
+    };
+
+    runCompression();
+
+    const tempFiles = createdTempFilesRef.current;
+    return () => {
+      isMounted = false;
+      if (!confirmedRef.current) {
+        for (const tempPath of tempFiles) {
+          RNFetchBlob.fs.unlink(tempPath).catch(() => { });
+        }
+      }
+    };
+  }, [response]);
+
+  const totalSize = useMemo(() => {
+    return response.reduce((acc, item) => {
+      const size = compress
+        ? (compressedMap[item.path]?.size ?? item.size ?? 0)
+        : (item.size ?? 0);
+      return acc + size;
+    }, 0);
+  }, [response, compress, compressedMap]);
 
   return (
     <View
@@ -68,35 +153,90 @@ export default function AttachImage({
           paddingHorizontal: DefaultAppStyles.GAP_SMALL
         }}
       >
-        <Paragraph
+        <View
           style={{
-            color: colors.primary.paragraph,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
             marginBottom: DefaultAppStyles.GAP_VERTICAL_SMALL
           }}
         >
-          {strings.attachImageHeading(response?.length || 1)}
-        </Paragraph>
-        <ScrollView horizontal>
-          {response?.map?.((item) => (
-            <TouchableOpacity key={item.filename} activeOpacity={0.9}>
-              <Image
-                source={{
-                  uri:
-                    Platform.OS === "ios"
-                      ? item.sourceURL || item.path
-                      : item.path
-                }}
+          <Paragraph
+            style={{
+              color: colors.primary.paragraph
+            }}
+          >
+            {strings.attachImageHeading(response?.length || 1)}
+          </Paragraph>
+          <Paragraph
+            size={AppFontSize.xs}
+            style={{
+              color: colors.secondary.paragraph
+            }}
+          >
+            {isCompressing && compress
+              ? `${strings.compressing()}...`
+              : formatBytes(totalSize)}
+          </Paragraph>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {response?.map?.((item) => {
+            const itemSize = compress
+              ? (compressedMap[item.path]?.size ?? item.size)
+              : item.size;
+
+            return (
+              <TouchableOpacity
+                key={item.filename || item.path}
+                activeOpacity={0.9}
                 style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: defaultBorderRadius,
-                  backgroundColor: "black",
                   marginRight: 6
                 }}
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          ))}
+              >
+                <Image
+                  source={{
+                    uri:
+                      Platform.OS === "ios"
+                        ? item.sourceURL || item.path
+                        : item.path
+                  }}
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: defaultBorderRadius,
+                    backgroundColor: "black"
+                  }}
+                  resizeMode="cover"
+                />
+                {itemSize && response.length > 1 ? (
+                  <View
+                    style={{
+                      position: "absolute",
+                      bottom: 4,
+                      left: 4,
+                      right: 4,
+                      backgroundColor: "rgba(0,0,0,0.65)",
+                      borderRadius: 4,
+                      paddingHorizontal: 4,
+                      paddingVertical: 2,
+                      alignItems: "center"
+                    }}
+                  >
+                    <Paragraph
+                      size={AppFontSize.xxs}
+                      style={{ color: "#ffffff" }}
+                      numberOfLines={1}
+                    >
+                      {isCompressing && compress && !compressedMap[item.path]
+                        ? `${strings.compressing()}...`
+                        : formatBytes(itemSize)}
+                    </Paragraph>
+                  </View>
+                ) : null}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
@@ -184,9 +324,15 @@ export default function AttachImage({
         title={strings.attachImageHeading(response?.length || 1)}
         type="accent"
         width="100%"
+        loading={isCompressing && compress}
+        disabled={isCompressing && compress}
         onPress={() => {
+          if (compress) {
+            confirmedRef.current = true;
+          }
           onAttach({
-            compress
+            compress,
+            compressedImages: compress ? compressedMap : undefined
           });
         }}
       />
@@ -195,12 +341,7 @@ export default function AttachImage({
 }
 
 AttachImage.present = (response: ImageType[], context?: string) => {
-  return new Promise<
-    | {
-        compress: boolean;
-      }
-    | undefined
-  >((resolve) => {
+  return new Promise<AttachImageResult | undefined>((resolve) => {
     let resolved = false;
 
     const imageCompressionSetting =
@@ -215,7 +356,7 @@ AttachImage.present = (response: ImageType[], context?: string) => {
 
     presentSheet({
       context: context,
-      component: (ref, close, update) => (
+      component: (ref, close, _update) => (
         <AttachImage
           response={response}
           close={close}
