@@ -211,7 +211,22 @@ module.exports = {
     base: "core24",
     core24: {
       confinement: "strict",
-      autoStart: false
+      autoStart: false,
+      // the default plugs add browser-support with allow-sandbox, which the Snap Store holds for manual review
+      plugs: [
+        "desktop",
+        "desktop-legacy",
+        "home",
+        "x11",
+        "wayland",
+        "unity7",
+        "browser-support",
+        "network",
+        "gsettings",
+        "audio-playback",
+        "pulseaudio",
+        "opengl"
+      ]
     }
   },
   extraResources: ["app-update.yml", "./assets/**"],
