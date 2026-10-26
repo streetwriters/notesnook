@@ -51,7 +51,7 @@ export async function findTheme(
       compatibilityVersion: { eq: compatibilityVersion }
     }
   });
-  return results.hits[0].document as CompiledThemeDefinition;
+  return results.hits[0]?.document as CompiledThemeDefinition | undefined;
 }
 
 export async function updateTotalInstalls(
