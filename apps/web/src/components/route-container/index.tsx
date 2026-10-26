@@ -42,7 +42,7 @@ import { RouteResult } from "../../navigation/types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { Context } from "../list-container/types";
 
-export type RouteContainerButtons = {
+export type RouteContainerButton = {
   title: string;
   onClick: () => void;
   icon: Icon;
@@ -126,7 +126,7 @@ type HeaderActionsProps = {
   canToggleView: boolean;
   viewMode: "compact" | "detailed" | undefined;
   setViewMode: (viewMode: "compact" | "detailed") => void;
-  routeButton?: RouteContainerButtons;
+  routeButton?: RouteContainerButton;
 };
 
 function HeaderActions({
