@@ -255,6 +255,11 @@ jobs:
         if: inputs.publish-snap
         run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
 
+      # core24 snaps are built by snapcraft inside an LXD container
+      - name: Setup LXD
+        uses: canonical/setup-lxd@v1
+        if: inputs.publish-snap
+
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v3
         if: inputs.publish-snap
