@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { execFile } from "child_process";
 import { promisify } from "util";
 import fs from "node:fs";
-import { readdir, readFile } from "fs/promises";
+import { readdir, readFile, rm } from "fs/promises";
 import path from "path";
 import {
   InstallsCounter,
@@ -51,11 +51,17 @@ const THEME_COMPATIBILITY_VERSIONS: ThemeCompatibilityVersion[] = [1];
 const execFileAsync = promisify(execFile);
 const GIT_TIMEOUT = 60 * 1000;
 let currentSync: Promise<void> | undefined;
+let isCurrentSyncFull = false;
 
-export function syncThemes(onlyIfChanged = false) {
+export function syncThemes(onlyIfChanged = false): Promise<void> {
   // concurrent git pulls fail on index.lock, so piggyback on the running sync
-  if (!currentSync)
-    currentSync = sync(onlyIfChanged).finally(() => (currentSync = undefined));
+  if (currentSync) {
+    if (onlyIfChanged || isCurrentSyncFull) return currentSync;
+    // the running check-only sync may skip the rebuild, so queue a full one
+    return currentSync.catch(() => {}).then(() => syncThemes());
+  }
+  isCurrentSyncFull = !onlyIfChanged;
+  currentSync = sync(onlyIfChanged).finally(() => (currentSync = undefined));
   return currentSync;
 }
 
@@ -75,13 +81,28 @@ async function hasUpstreamChanges() {
   return remote.split(/\s/)[0] !== local;
 }
 
+// a failed clone/pull can leave the repo unusable (e.g. index.lock), so re-clone next time
+async function resetOnFailure(promise: Promise<unknown>) {
+  try {
+    await promise;
+  } catch (e) {
+    await rm(THEME_REPO_DIR_PATH, { recursive: true, force: true });
+    throw e;
+  }
+}
+
 async function sync(onlyIfChanged: boolean) {
   if (!fs.existsSync(THEME_REPO_DIR_PATH)) {
-    await git(["clone", THEMES_REPO_URL], path.dirname(THEME_REPO_DIR_PATH));
+    await resetOnFailure(
+      git(
+        ["clone", "--quiet", THEMES_REPO_URL],
+        path.dirname(THEME_REPO_DIR_PATH)
+      )
+    );
     console.log(`Cloned github repo to path ${THEME_REPO_DIR_PATH}`);
   } else {
     if (onlyIfChanged && !(await hasUpstreamChanges())) return;
-    console.log(await git(["pull"], THEME_REPO_DIR_PATH));
+    await resetOnFailure(git(["pull", "--quiet"], THEME_REPO_DIR_PATH));
     console.log(`Synced github repo ${THEMES_REPO_URL}`);
   }
   await generateThemesMetadata();

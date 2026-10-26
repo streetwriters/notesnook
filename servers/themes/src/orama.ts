@@ -16,7 +16,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Orama, SearchParams, create, search, update } from "@orama/orama";
+import {
+  Orama,
+  SearchParams,
+  create,
+  getByID,
+  search,
+  update
+} from "@orama/orama";
 import { CompiledThemeDefinition, ThemeMetadata } from "./sync";
 import { ThemeQuerySchema } from "./schemas";
 
@@ -62,12 +69,12 @@ export async function findTheme(
   return results.hits[0]?.document as CompiledThemeDefinition | undefined;
 }
 
-export async function updateTotalInstalls(
-  theme: CompiledThemeDefinition,
-  totalInstalls: number
-) {
-  if (!ThemesDatabase) await initializeDatabase();
-  await update(ThemesDatabase!, theme.id, { ...theme, totalInstalls });
+export async function updateTotalInstalls(id: string, totalInstalls: number) {
+  const db = ThemesDatabase || (await initializeDatabase());
+  // re-read so a theme updated by a sync isn't overwritten with a stale copy
+  const theme = await getByID(db, id);
+  if (!theme) return;
+  await update(db, id, { ...theme, totalInstalls });
 }
 
 export async function getThemes(query: (typeof ThemeQuerySchema)["_type"]) {

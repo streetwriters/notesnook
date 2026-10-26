@@ -41,10 +41,9 @@ export const ThemesAPI = router({
       if (!theme) return;
 
       if (userId) {
-        updateTotalInstalls(
-          theme,
-          await InstallsCounter.increment(theme.id, userId)
-        ).catch((e) => console.error("Failed to update total installs:", e));
+        InstallsCounter.increment(theme.id, userId)
+          .then((totalInstalls) => updateTotalInstalls(theme.id, totalInstalls))
+          .catch((e) => console.error("Failed to update total installs:", e));
       }
       return theme;
     }),
