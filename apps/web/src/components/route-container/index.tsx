@@ -127,6 +127,7 @@ type HeaderActionsProps = {
   viewMode: "compact" | "detailed" | undefined;
   setViewMode: (viewMode: "compact" | "detailed") => void;
   routeButton?: RouteContainerButton;
+  hasItems: boolean;
 };
 
 function HeaderActions({
@@ -137,7 +138,8 @@ function HeaderActions({
   canToggleView,
   viewMode,
   setViewMode,
-  routeButton
+  routeButton,
+  hasItems
 }: HeaderActionsProps) {
   return (
     <Box
@@ -157,21 +159,23 @@ function HeaderActions({
           <routeButton.icon size={15} color="icon-secondary" />
         </Button>
       )}
-      <Button
-        variant="tertiary"
-        title="Group and sort"
-        data-test-id={`${groupingKey}-sort-button`}
-        onClick={() =>
-          showGroupOptionsMenu(groupingKey, refresh, {
-            isSearching,
-            context
-          })
-        }
-        sx={{ p: 0 }}
-      >
-        <Sliders size={15} color="icon-secondary" />
-      </Button>
-      {canToggleView && viewMode && (
+      {hasItems && (
+        <Button
+          variant="tertiary"
+          title="Group and sort"
+          data-test-id={`${groupingKey}-sort-button`}
+          onClick={() =>
+            showGroupOptionsMenu(groupingKey, refresh, {
+              isSearching,
+              context
+            })
+          }
+          sx={{ p: 0 }}
+        >
+          <Sliders size={15} color="icon-secondary" />
+        </Button>
+      )}
+      {hasItems && canToggleView && viewMode && (
         <Button
           variant="tertiary"
           title={
@@ -272,7 +276,7 @@ function Header(props: RouteContainerProps) {
             >
               {headerTitle}
             </Text>
-            {type !== "notFound" && hasItems && (
+            {type !== "notFound" && (
               <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
@@ -282,6 +286,7 @@ function Header(props: RouteContainerProps) {
                 viewMode={viewMode}
                 setViewMode={setViewMode}
                 routeButton={props.buttons}
+                hasItems={hasItems}
               />
             )}
           </Box>
@@ -395,6 +400,7 @@ function Header(props: RouteContainerProps) {
                 viewMode={viewMode}
                 setViewMode={setViewMode}
                 routeButton={props.buttons}
+                hasItems={hasItems}
               />
             )}
           </Flex>
