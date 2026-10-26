@@ -184,6 +184,10 @@ module.exports = {
     executableName: linuxExecutableName,
     mimeTypes: ["x-scheme-handler/nn"],
     desktop: {
+      // electron-builder writes the action sections but not the Actions key
+      entry: {
+        Actions: "new-note;new-notebook;new-reminder;"
+      },
       desktopActions: {
         "new-note": {
           Name: "New note",
