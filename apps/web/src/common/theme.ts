@@ -73,7 +73,7 @@ export const THEME_LIGHT: any = {
         accentForeground: "#ffffff",
         paragraph: "#777",
         background: "#EAE8E8",
-        border: "#E8E8E8",
+        border: "#BFBFBF",
         heading: "#666",
         icon: "#777",
         separator: "#E8E8E8",

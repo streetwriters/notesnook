@@ -21,12 +21,12 @@ import { PropsWithChildren, useEffect, useRef } from "react";
 import { Box, Button, Text, Flex } from "@notesnook/ui";
 import {
   Close,
-  AddReminder,
   Menu,
   SearchIcon,
   Sliders,
   ViewList,
-  List
+  List,
+  Icon
 } from "../icons";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -39,22 +39,13 @@ import { debounce, usePromise } from "@notesnook/common";
 import Field from "../field";
 import { strings } from "@notesnook/intl";
 import { RouteResult } from "../../navigation/types";
-import { CREATE_BUTTON_MAP } from "../../common";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { Context } from "../list-container/types";
 
-export type RouteContainerButtons = {
-  search?: {
-    title: string;
-  };
-  back?: {
-    title: string;
-    onClick: () => void;
-  };
-  create?: {
-    title: string;
-    onClick: () => void;
-  };
+export type RouteContainerButton = {
+  title: string;
+  onClick: () => void;
+  icon: Icon;
 };
 
 export type RouteContainerProps = RouteResult & {
@@ -127,15 +118,7 @@ function useGroupingState(
   return { groupingKey, refresh, context, canToggleView };
 }
 
-function GroupOptions({
-  groupingKey,
-  refresh,
-  isSearching,
-  context,
-  canToggleView,
-  viewMode,
-  setViewMode
-}: {
+type HeaderActionsProps = {
   groupingKey: GroupingKey;
   refresh: () => void;
   isSearching: boolean;
@@ -143,7 +126,21 @@ function GroupOptions({
   canToggleView: boolean;
   viewMode: "compact" | "detailed" | undefined;
   setViewMode: (viewMode: "compact" | "detailed") => void;
-}) {
+  routeButton?: RouteContainerButton;
+  hasItems: boolean;
+};
+
+function HeaderActions({
+  groupingKey,
+  refresh,
+  isSearching,
+  context,
+  canToggleView,
+  viewMode,
+  setViewMode,
+  routeButton,
+  hasItems
+}: HeaderActionsProps) {
   return (
     <Box
       sx={{
@@ -152,21 +149,33 @@ function GroupOptions({
         gap: "spacing4"
       }}
     >
-      <Button
-        variant="tertiary"
-        title="Group and sort"
-        data-test-id={`${groupingKey}-sort-button`}
-        onClick={() =>
-          showGroupOptionsMenu(groupingKey, refresh, {
-            isSearching,
-            context
-          })
-        }
-        sx={{ p: 0 }}
-      >
-        <Sliders size={15} color="icon-secondary" />
-      </Button>
-      {canToggleView && viewMode && (
+      {routeButton && (
+        <Button
+          variant="tertiary"
+          title={routeButton.title}
+          onClick={routeButton.onClick}
+          sx={{ p: 0 }}
+        >
+          <routeButton.icon size={15} color="icon-secondary" />
+        </Button>
+      )}
+      {hasItems && (
+        <Button
+          variant="tertiary"
+          title="Group and sort"
+          data-test-id={`${groupingKey}-sort-button`}
+          onClick={() =>
+            showGroupOptionsMenu(groupingKey, refresh, {
+              isSearching,
+              context
+            })
+          }
+          sx={{ p: 0 }}
+        >
+          <Sliders size={15} color="icon-secondary" />
+        </Button>
+      )}
+      {hasItems && canToggleView && viewMode && (
         <Button
           variant="tertiary"
           title={
@@ -267,8 +276,8 @@ function Header(props: RouteContainerProps) {
             >
               {headerTitle}
             </Text>
-            {type !== "notFound" && hasItems && (
-              <GroupOptions
+            {type !== "notFound" && (
+              <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
                 isSearching={isSearching}
@@ -276,6 +285,8 @@ function Header(props: RouteContainerProps) {
                 canToggleView={canToggleView}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
+                routeButton={props.buttons}
+                hasItems={hasItems}
               />
             )}
           </Box>
@@ -374,22 +385,13 @@ function Header(props: RouteContainerProps) {
                       useSearchStore.getState().resetSearch();
                     },
                     hidden: !query
-                  },
-                  ...(type === "reminders"
-                    ? [
-                        {
-                          icon: AddReminder,
-                          testId: "create-reminder-button",
-                          ...CREATE_BUTTON_MAP.reminders
-                        }
-                      ]
-                    : [])
+                  }
                 ]}
               />
             </Box>
 
             {type === "notebook" && hasItems && (
-              <GroupOptions
+              <HeaderActions
                 groupingKey={groupingKey}
                 refresh={refresh}
                 isSearching={isSearching}
@@ -397,6 +399,8 @@ function Header(props: RouteContainerProps) {
                 canToggleView={canToggleView}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
+                routeButton={props.buttons}
+                hasItems={hasItems}
               />
             )}
           </Flex>

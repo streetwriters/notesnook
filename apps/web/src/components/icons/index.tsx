@@ -342,6 +342,13 @@ import MagnifyingGlassSvg from "@notesnook/icons/magnifying-glass.svg?react";
 import DotsThreeSvg from "@notesnook/icons/dots-three.svg?react";
 import CloudCheckSvg from "@notesnook/icons/cloud-check.svg?react";
 import ScanDeleteSvg from "@notesnook/icons/scan-delete.svg?react";
+import CheckboxSvg from "@notesnook/icons/checkbox.svg?react";
+import CheckboxUncheckedSvg from "@notesnook/icons/checkbox-unchecked.svg?react";
+import BellPlusSvg from "@notesnook/icons/bell-plus.svg?react";
+import VibrateSvg from "@notesnook/icons/vibrate.svg?react";
+import ArrowsClockwiseSvg from "@notesnook/icons/arrows-clockwise.svg?react";
+import BellSimpleSlashSvg from "@notesnook/icons/bell-simple-slash.svg?react";
+import CheckSquareSvg from "@notesnook/icons/check-square.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -636,7 +643,6 @@ export const Reminder = createIcon(mdiBellOutline);
 export const ReminderOff = createIcon(mdiBellCancelOutline);
 export const AddReminder = createIcon(mdiBellPlusOutline);
 export const Silent = createIcon(mdiBellOffOutline);
-export const Vibrate = createIcon(mdiVibrate);
 export const Loud = createIcon(mdiBellRingOutline);
 export const CustomToolbar = createIcon(mdiGestureTapButton);
 
@@ -820,3 +826,10 @@ export const MagnifyingGlass = createSvgIcon(MagnifyingGlassSvg);
 export const DotsThree = createSvgIcon(DotsThreeSvg);
 export const CloudCheck = createSvgIcon(CloudCheckSvg);
 export const ScanDelete = createSvgIcon(ScanDeleteSvg);
+export const Checkbox = createSvgIcon(CheckboxSvg);
+export const CheckboxUnchecked = createSvgIcon(CheckboxUncheckedSvg);
+export const BellPlus = createSvgIcon(BellPlusSvg);
+export const BellSimpleSlash = createSvgIcon(BellSimpleSlashSvg);
+export const Vibrate = createSvgIcon(VibrateSvg);
+export const ArrowsClockwise = createSvgIcon(ArrowsClockwiseSvg);
+export const CheckSquare = createSvgIcon(CheckSquareSvg);
