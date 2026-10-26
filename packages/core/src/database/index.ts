@@ -202,7 +202,7 @@ export type DatabaseAccessor<TSchema = DatabaseSchema> = () =>
   | Kysely<TSchema>
   | Transaction<TSchema>;
 
-export type LazyDatabaseAccessor<TSchema = DatabaseSchema> = Promise<
+export type LazyDatabaseAccessor<TSchema = DatabaseSchema> = () => Promise<
   Kysely<TSchema> | Transaction<TSchema>
 >;
 

@@ -108,20 +108,6 @@ export class Notes implements ICollection {
         headline = content.toHeadline();
         headlineTitle = content.toTitle();
         dateEdited = Date.now();
-        contentId = await this.db.content.add({
-          noteId: id,
-          sessionId: item.sessionId,
-          id: contentId,
-          dateEdited,
-          type,
-          data,
-          ...(item.localOnly !== undefined ? { localOnly: item.localOnly } : {})
-        });
-      } else if (contentId && item.localOnly !== undefined) {
-        await this.db.content.add({
-          id: contentId,
-          localOnly: !!item.localOnly
-        });
       }
 
       if (typeof item.title !== "undefined") {
@@ -166,6 +152,26 @@ export class Notes implements ICollection {
           item.title = currentNoteTitleFields?.title || "Untitled";
       }
 
+      if (item.content && item.content.data && item.content.type) {
+        const { type, data } = item.content;
+        contentId = await this.db.content.add({
+          noteId: id,
+          sessionId: item.sessionId,
+          // saved in the same history entry as the content
+          title: item.title,
+          id: contentId,
+          dateEdited,
+          type,
+          data,
+          ...(item.localOnly !== undefined ? { localOnly: item.localOnly } : {})
+        });
+      } else if (contentId && item.localOnly !== undefined) {
+        await this.db.content.add({
+          id: contentId,
+          localOnly: !!item.localOnly
+        });
+      }
+
       if (isUpdating) {
         await this.collection.update([id], {
           title: item.title,
@@ -208,7 +214,11 @@ export class Notes implements ICollection {
         this.totalNotes++;
       }
 
-      if (item.sessionId && typeof item.title === "string") {
+      if (
+        item.sessionId &&
+        typeof item.title === "string" &&
+        !(item.content && item.content.data && item.content.type)
+      ) {
         await this.db.noteHistory.add(item.sessionId, {
           title: item.title,
           noteId: id

@@ -110,13 +110,6 @@ export class VirtualizedGrouping<T> {
     batchIndex: number,
     operate?: BatchOperator<T>
   ): Promise<Batch<T>> {
-    const [lastBatchIndex, lastBatch] = lastInMap(this.cache) || [];
-
-    const direction =
-      lastBatchIndex !== undefined && lastBatchIndex < batchIndex
-        ? "down"
-        : "up";
-
     const start = batchIndex * this.batchSize;
     const end = start + this.batchSize;
 
@@ -126,26 +119,18 @@ export class VirtualizedGrouping<T> {
     if (items.length > this.batchSize)
       throw new Error("Got more items than the batch size.");
 
-    if (direction === "down") {
-      const [, firstGroup] = groups ? firstInMap(groups) : [];
-      const group = lastBatch?.groups
-        ? lastInMap(lastBatch.groups)[1]
+    // hide the first header if it continues the group of the previous item
+    const prevGroups =
+      this.groupItems && start > 0
+        ? this.cache.get(batchIndex - 1)?.groups ||
+          this.groupItems((await this.fetchItems(start - 1, start)).items)
         : undefined;
 
-      if (group && firstGroup && group.group.title === firstGroup.group.title)
-        firstGroup.hidden = true;
-    } else {
-      const prevGroups =
-        this.groupItems && start > 0
-          ? this.groupItems((await this.fetchItems(start - 1, start)).items)
-          : undefined;
-
-      if (prevGroups && groups) {
-        const [, prevGroup] = lastInMap(prevGroups);
-        const [, group] = firstInMap(groups);
-        if (group && prevGroup?.group.title === group?.group.title)
-          group.hidden = true;
-      }
+    if (prevGroups && groups) {
+      const [, prevGroup] = lastInMap(prevGroups);
+      const [, group] = firstInMap(groups);
+      if (group && prevGroup?.group.title === group?.group.title)
+        group.hidden = true;
     }
 
     const batch = {
