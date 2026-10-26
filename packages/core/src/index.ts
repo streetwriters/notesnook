@@ -33,7 +33,8 @@ export {
   getUpcomingReminderTime,
   formatReminderTime,
   isReminderToday,
-  isReminderActive
+  isReminderActive,
+  getReminderGroup
 } from "./collections/reminders.js";
 export * from "./logger.js";
 export * from "./api/debug.js";
