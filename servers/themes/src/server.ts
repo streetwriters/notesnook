@@ -31,10 +31,16 @@ const HOST = process.env.HOST || "localhost";
 server.listen(PORT, HOST);
 console.log(`Server started successfully on: http://${HOST}:${PORT}/`);
 
-syncThemes();
-setInterval(() => {
-  syncThemes();
-}, 1000 * 60 * 60); // every hour
+function sync(onlyIfChanged?: boolean) {
+  syncThemes(onlyIfChanged).catch((e) =>
+    console.error("Failed to sync themes:", e)
+  );
+}
+sync();
+// each replica polls on its own since a webhook would only reach one of them
+setInterval(() => sync(true), 1000 * 60); // every minute
+// full rebuild also refreshes install counts written by other replicas
+setInterval(sync, 1000 * 60 * 60); // every hour
 
 if (import.meta.hot) {
   import.meta.hot.on("vite:beforeFullReload", () => {
