@@ -52,28 +52,36 @@ const execFileAsync = promisify(execFile);
 const GIT_TIMEOUT = 60 * 1000;
 let currentSync: Promise<void> | undefined;
 
-export function syncThemes() {
+export function syncThemes(onlyIfChanged = false) {
   // concurrent git pulls fail on index.lock, so piggyback on the running sync
   if (!currentSync)
-    currentSync = sync().finally(() => (currentSync = undefined));
+    currentSync = sync(onlyIfChanged).finally(() => (currentSync = undefined));
   return currentSync;
 }
 
 async function git(args: string[], cwd: string) {
-  const { stdout, stderr } = await execFileAsync("git", args, {
+  const { stdout } = await execFileAsync("git", args, {
     cwd,
     timeout: GIT_TIMEOUT
   });
-  if (stderr.trim()) console.log(stderr.trim());
-  if (stdout.trim()) console.log(stdout.trim());
+  return stdout.trim();
 }
 
-async function sync() {
+async function hasUpstreamChanges() {
+  const [remote, local] = await Promise.all([
+    git(["ls-remote", "origin", "HEAD"], THEME_REPO_DIR_PATH),
+    git(["rev-parse", "HEAD"], THEME_REPO_DIR_PATH)
+  ]);
+  return remote.split(/\s/)[0] !== local;
+}
+
+async function sync(onlyIfChanged: boolean) {
   if (!fs.existsSync(THEME_REPO_DIR_PATH)) {
     await git(["clone", THEMES_REPO_URL], path.dirname(THEME_REPO_DIR_PATH));
     console.log(`Cloned github repo to path ${THEME_REPO_DIR_PATH}`);
   } else {
-    await git(["pull"], THEME_REPO_DIR_PATH);
+    if (onlyIfChanged && !(await hasUpstreamChanges())) return;
+    console.log(await git(["pull"], THEME_REPO_DIR_PATH));
     console.log(`Synced github repo ${THEMES_REPO_URL}`);
   }
   await generateThemesMetadata();

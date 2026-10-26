@@ -21,22 +21,25 @@ import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { ThemesAPI } from "./api";
 import { syncThemes } from "./sync";
 import cors from "cors";
-import { createContext } from "./trpc";
 
 const server = createHTTPServer({
   middleware: cors(),
-  router: ThemesAPI,
-  createContext
+  router: ThemesAPI
 });
 const PORT = parseInt(process.env.PORT || "9000");
 const HOST = process.env.HOST || "localhost";
 server.listen(PORT, HOST);
 console.log(`Server started successfully on: http://${HOST}:${PORT}/`);
 
-function sync() {
-  syncThemes().catch((e) => console.error("Failed to sync themes:", e));
+function sync(onlyIfChanged?: boolean) {
+  syncThemes(onlyIfChanged).catch((e) =>
+    console.error("Failed to sync themes:", e)
+  );
 }
 sync();
+// each replica polls on its own since a webhook would only reach one of them
+setInterval(() => sync(true), 1000 * 60); // every minute
+// full rebuild also refreshes install counts written by other replicas
 setInterval(sync, 1000 * 60 * 60); // every hour
 
 if (import.meta.hot) {

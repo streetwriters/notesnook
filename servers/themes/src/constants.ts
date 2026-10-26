@@ -26,11 +26,8 @@ import { KVCounter } from "./counter/kv";
 const env = readSecrets([
   "CLOUDFLARE_ACCOUNT_ID",
   "CLOUDFLARE_AUTH_TOKEN",
-  "CLOUDFLARE_INSTALLS_KV_NAMESPACE_ID",
-  "THEMES_SYNC_TOKEN"
+  "CLOUDFLARE_INSTALLS_KV_NAMESPACE_ID"
 ]);
-
-export const SYNC_TOKEN = env.THEMES_SYNC_TOKEN;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

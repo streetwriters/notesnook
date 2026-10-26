@@ -20,12 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { z } from "zod";
 import { InstallsCounter } from "./constants";
 import { findTheme, getThemes, updateTotalInstalls } from "./orama";
-import { syncThemes } from "./sync";
 import { publicProcedure, router } from "./trpc";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
 import { ThemeQuerySchema } from "./schemas";
-import { TRPCError } from "@trpc/server";
-import { SYNC_TOKEN } from "./constants";
 
 export const ThemesAPI = router({
   themes: publicProcedure.input(ThemeQuerySchema).query(async ({ input }) => {
@@ -63,12 +60,6 @@ export const ThemesAPI = router({
       const theme = await findTheme(id, compatibilityVersion);
       if (theme && theme.version !== version) return theme;
     }),
-  sync: publicProcedure.query(({ ctx }) => {
-    if (SYNC_TOKEN && ctx.authorization !== `Bearer ${SYNC_TOKEN}`)
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    syncThemes().catch((e) => console.error("Failed to sync themes:", e));
-    return true;
-  }),
   health: publicProcedure.query(() => {
     return "Healthy";
   })
