@@ -22,7 +22,16 @@ import { ThemeQuerySchema } from "./schemas";
 
 export let ThemesDatabase: Orama | null = null;
 export async function initializeDatabase(): Promise<Orama> {
-  ThemesDatabase = await create({
+  ThemesDatabase = await createDatabase();
+  return ThemesDatabase;
+}
+
+export function setDatabase(db: Orama) {
+  ThemesDatabase = db;
+}
+
+export function createDatabase(): Promise<Orama> {
+  return create({
     schema: {
       id: "string",
       name: "string",
@@ -35,7 +44,6 @@ export async function initializeDatabase(): Promise<Orama> {
     },
     id: "notesnook-themes"
   });
-  return ThemesDatabase;
 }
 
 export async function findTheme(

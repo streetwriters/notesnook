@@ -26,7 +26,7 @@ import {
   THEME_REPO_DIR_PATH
 } from "./constants";
 import { insertMultiple } from "@orama/orama";
-import { initializeDatabase } from "./orama";
+import { createDatabase, setDatabase } from "./orama";
 import {
   ThemeCompatibilityVersion,
   ThemeDefinition,
@@ -66,7 +66,7 @@ export async function syncThemes() {
 
 async function generateThemesMetadata() {
   const themeDefinitions: CompiledThemeDefinition[] = [];
-  const db = await initializeDatabase();
+  const db = await createDatabase();
 
   const THEMES_PATH = path.join(THEME_REPO_DIR_PATH, "themes");
   const themes = await readdir(THEMES_PATH);
@@ -107,5 +107,6 @@ async function generateThemesMetadata() {
     theme.totalInstalls = installs[theme.id] || 0;
   }
   await insertMultiple(db, themeDefinitions);
+  setDatabase(db);
   console.log("Metadata generated and cached.");
 }
