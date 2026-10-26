@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { RouteContainerButtons } from "../components/route-container";
+import { RouteContainerButton } from "../components/route-container";
 
 export type RouteResult = {
   key: string;
@@ -35,7 +35,7 @@ export type RouteResult = {
     | React.ReactNode
     | React.MemoExoticComponent<React.FunctionComponent>;
   props?: any;
-  buttons?: RouteContainerButtons;
+  buttons?: RouteContainerButton;
   noCache?: boolean;
 };
 
