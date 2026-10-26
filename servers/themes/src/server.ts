@@ -21,10 +21,12 @@ import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import { ThemesAPI } from "./api";
 import { syncThemes } from "./sync";
 import cors from "cors";
+import { createContext } from "./trpc";
 
 const server = createHTTPServer({
   middleware: cors(),
-  router: ThemesAPI
+  router: ThemesAPI,
+  createContext
 });
 const PORT = parseInt(process.env.PORT || "9000");
 const HOST = process.env.HOST || "localhost";

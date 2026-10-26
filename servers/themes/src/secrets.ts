@@ -35,6 +35,6 @@ export function readSecret(name: string): string | undefined {
   if (value) return value;
   const file = process.env[`${name}_FILE`];
   if (file) {
-    return readFileSync(file, "utf-8");
+    return readFileSync(file, "utf-8").trim();
   }
 }

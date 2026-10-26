@@ -16,7 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { execSync } from "child_process";
+import { execFile } from "child_process";
+import { promisify } from "util";
 import fs from "node:fs";
 import { readdir, readFile } from "fs/promises";
 import path from "path";
@@ -47,18 +48,32 @@ export type ThemeMetadata = Omit<
 
 const THEME_COMPATIBILITY_VERSIONS: ThemeCompatibilityVersion[] = [1];
 
-export async function syncThemes() {
+const execFileAsync = promisify(execFile);
+const GIT_TIMEOUT = 60 * 1000;
+let currentSync: Promise<void> | undefined;
+
+export function syncThemes() {
+  // concurrent git pulls fail on index.lock, so piggyback on the running sync
+  if (!currentSync)
+    currentSync = sync().finally(() => (currentSync = undefined));
+  return currentSync;
+}
+
+async function git(args: string[], cwd: string) {
+  const { stdout, stderr } = await execFileAsync("git", args, {
+    cwd,
+    timeout: GIT_TIMEOUT
+  });
+  if (stderr.trim()) console.log(stderr.trim());
+  if (stdout.trim()) console.log(stdout.trim());
+}
+
+async function sync() {
   if (!fs.existsSync(THEME_REPO_DIR_PATH)) {
-    execSync(`git clone ${THEMES_REPO_URL}`, {
-      stdio: [0, 1, 2],
-      cwd: path.dirname(THEME_REPO_DIR_PATH)
-    });
+    await git(["clone", THEMES_REPO_URL], path.dirname(THEME_REPO_DIR_PATH));
     console.log(`Cloned github repo to path ${THEME_REPO_DIR_PATH}`);
   } else {
-    execSync(`git pull`, {
-      stdio: [0, 1, 2],
-      cwd: THEME_REPO_DIR_PATH
-    });
+    await git(["pull"], THEME_REPO_DIR_PATH);
     console.log(`Synced github repo ${THEMES_REPO_URL}`);
   }
   await generateThemesMetadata();

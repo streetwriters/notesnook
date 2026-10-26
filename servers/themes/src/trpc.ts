@@ -18,12 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { initTRPC } from "@trpc/server";
+import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
 
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
  */
-const t = initTRPC.create();
+export function createContext({ req }: CreateHTTPContextOptions) {
+  return { authorization: req.headers.authorization };
+}
+
+const t = initTRPC.context<typeof createContext>().create();
 
 /**
  * Export reusable router and procedure helpers
