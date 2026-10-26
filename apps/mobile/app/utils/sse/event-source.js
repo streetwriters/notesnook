@@ -61,7 +61,7 @@ export default class EventSource {
     this.message = EventEmitter.addListener("message", (ev) => {
       const { message } = ev;
       const eventData = { data: message };
-      this.onmessage(eventData);
+      this.onmessage?.(eventData);
     });
 
     // the native side gave up after a 401/403 instead of retrying
