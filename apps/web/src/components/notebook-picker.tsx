@@ -61,20 +61,41 @@ export function NotebookPicker(props: {
   const excludedParentId = useRef<string>();
   const searchId = useRef(0);
   const isMultiselect = useRef(false);
+  const expandedIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const { setSelected } = useRelationChangesStore.getState();
     let cancelled = false;
-    initialSelection().then((selected) => {
+    const loadId = searchId.current;
+    (async function () {
+      const selected = await initialSelection();
+      const ancestorIds = new Set<string>();
+      for (const { id } of selected) {
+        for (const crumb of await db.notebooks.breadcrumbs(id)) {
+          if (crumb.id !== id) ancestorIds.add(crumb.id);
+        }
+      }
+
+      if (excludeId) {
+        excludedIds.current = new Set([
+          excludeId,
+          ...(await db.notebooks.subNotebookIds(excludeId))
+        ]);
+        excludedParentId.current = await db.notebooks.parentId(excludeId);
+      }
+      const roots = await db.notebooks.roots.ids(notebookSortOptions);
       if (cancelled) return;
+
       setSelected(selected);
       isMultiselect.current = !!multiSelectable && selected.length > 1;
-    });
+      expandedIds.current = ancestorIds;
+      if (loadId === searchId.current) setNotebooks(roots);
+    })();
     return () => {
       cancelled = true;
       setSelected([]);
     };
-  }, [initialSelection, multiSelectable]);
+  }, [excludeId, initialSelection, multiSelectable]);
 
   const select = useCallback(
     (notebook: Notebook, isCtrlPressed: boolean) => {
@@ -89,19 +110,6 @@ export function NotebookPicker(props: {
     },
     [multiSelectable]
   );
-
-  useEffect(() => {
-    (async function () {
-      if (excludeId) {
-        excludedIds.current = new Set([
-          excludeId,
-          ...(await db.notebooks.subNotebookIds(excludeId))
-        ]);
-        excludedParentId.current = await db.notebooks.parentId(excludeId);
-      }
-      setNotebooks(await db.notebooks.roots.ids(notebookSortOptions));
-    })();
-  }, [excludeId]);
 
   useEffect(() => {
     treeRef.current?.refresh();
@@ -175,7 +183,8 @@ export function NotebookPicker(props: {
                 id: notebook.id,
                 data: notebook,
                 depth: depth + 1,
-                hasChildren: childrenCount > 0
+                hasChildren: childrenCount > 0,
+                expanded: expandedIds.current.has(notebook.id)
               };
             };
 
