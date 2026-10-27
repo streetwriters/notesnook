@@ -1715,15 +1715,15 @@ For example:
   clearCacheConfirmDesc:
     () => t`Clearing attachments cache will perform the following actions:
 
-- Downloaded images & files: **cleared**
-- Pending uploads: **cleared**
+- Downloaded images & files: cleared
+- Pending uploads: cleared
 - Uploaded images & files: _unaffected_
 
 All attachments will be downloaded & cached again on access.
 
 ---
 
-**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**`,
+Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.`,
   cacheCleared: () => t`Attachments cache cleared!`,
   gettingEncryptionKey: () => t`Getting encryption key...`,
   keyBackedUp: () => t`I have saved my key`,
@@ -1871,7 +1871,7 @@ All attachments will be downloaded & cached again on access.
     url: string
   ) => t`You can track your bug report at [${url}](${url}).
 
-Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**
+Please note that we will respond to your bug report on the link above. We recommend that you save the above link for later reference.
 
 If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.`,
   supportEmailMessage: () =>
@@ -1880,7 +1880,7 @@ If your issue is critical (e.g. notes not syncing, crashes etc.), please [join o
     url: string
   ) => t`You can track your feature request at [${url}](${url}).
 
-Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**`,
+Please note that we will respond to your feature request on the link above. We recommend that you save the above link for later reference.`,
 
   thankYouPrivacy: () =>
     t`Thank you. You are the proof that privacy always comes first.`,
@@ -2015,7 +2015,7 @@ Use this if changes made on this device are not appearing on other devices. This
 Force pull:
 Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.
 
-**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**`,
+These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.`,
   checkingAttachments: () => t`Checking attachments`,
   orderId: () => t`Order ID`,
   amount: () => t`Amount`,
@@ -2031,7 +2031,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   editLink: () => t`Edit link`,
   insert: () => t`Insert`,
   moveToTrashDesc: (interval: number) =>
-    t`These items will be **kept in your Trash for ${interval} days** after which they will be permanently deleted.`,
+    t`These items will be kept in your Trash for ${interval} days after which they will be permanently deleted.`,
   editNotebookDesc: (notebookTitle: string) =>
     t`You are editing "${notebookTitle}".`,
   newNotebookDesc: () => t`Notebooks are the best way to organize your notes.`,
@@ -2582,7 +2582,7 @@ Continue without attachments?`,
   versionDeleted: () => actions.deleted.version(1),
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
-    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
+    t`Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
   alignment: () => t`Alignment`,
   whatAreMonographs: () => t`What are monographs?`,
   webTips: [

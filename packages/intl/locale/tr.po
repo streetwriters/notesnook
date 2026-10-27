@@ -1976,26 +1976,26 @@ msgstr "Kasayı boşalt"
 msgid ""
 "Clearing attachments cache will perform the following actions:\n"
 "\n"
-"- Downloaded images & files: **cleared**\n"
-"- Pending uploads: **cleared**\n"
+"- Downloaded images & files: cleared\n"
+"- Pending uploads: cleared\n"
 "- Uploaded images & files: _unaffected_\n"
 "\n"
 "All attachments will be downloaded & cached again on access.\n"
 "\n"
 "---\n"
 "\n"
-"**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
+"Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently."
 msgstr ""
 "\n"
-"- İndirilen görseller ve dosyalar: **temizlenir**\n"
-"- Bekleyen yüklemeler: **temizlenir**\n"
+"- İndirilen görseller ve dosyalar: temizlenir\n"
+"- Bekleyen yüklemeler: temizlenir\n"
 "- Yüklenmiş görseller ve dosyalar: _etkilenmez_\n"
 "\n"
 "Tüm ekler erişildiğinde yeniden indirilip önbelleğe alınır.\n"
 "\n"
 "---\n"
 "\n"
-"**Bunu yalnızca sorun giderme amacıyla kullanın. Sorunlar devam ediyorsa, kalıcı olarak çözebilmemiz için support@streetwriters.co adresinden bize ulaşmanızı öneririz.**"
+"Bunu yalnızca sorun giderme amacıyla kullanın. Sorunlar devam ediyorsa, kalıcı olarak çözebilmemiz için support@streetwriters.co adresinden bize ulaşmanızı öneririz."
 
 #: src/strings.ts:2027
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
@@ -3787,7 +3787,7 @@ msgid ""
 "Force pull:\n"
 "Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n"
 "\n"
-"**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**"
+"These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 msgstr ""
 "Zorla gönder:\n"
 "Bu cihazda yapılan değişiklikler diğer cihazlarda görünmüyorsa bunu kullanın. Sunucudaki veriler bu cihazdaki verilerle değiştirilir.\n"
@@ -3795,7 +3795,7 @@ msgstr ""
 "Zorla çek:\n"
 "Diğer cihazlardaki değişiklikler bu cihazda görünmüyorsa bunu kullanın. Bu cihazdaki veriler sunucudaki en güncel verilerle değiştirilir.\n"
 "\n"
-"**Bunlar yalnızca sorun giderme için kullanılmalıdır. Eşitleme için düzenli kullanmak önerilmez ve beklenmedik veri kaybına ve başka sorunlara yol açar. Eşitlemeyle ilgili kalıcı sorunlar yaşıyorsanız lütfen support@streetwriters.co adresinden bize bildirin.**"
+"Bunlar yalnızca sorun giderme için kullanılmalıdır. Eşitleme için düzenli kullanmak önerilmez ve beklenmedik veri kaybına ve başka sorunlara yol açar. Eşitlemeyle ilgili kalıcı sorunlar yaşıyorsanız lütfen support@streetwriters.co adresinden bize bildirin."
 
 #: src/strings.ts:2776
 msgid "forever"
@@ -4512,6 +4512,14 @@ msgstr "Son"
 msgid "Last edited at"
 msgstr "Son düzenleme"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr "Son tam yedekleme: {date}"
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr "Son kısmi yedekleme: {date}"
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Son kullanım"
@@ -5180,6 +5188,10 @@ msgstr "Yeni oluşturulan notlar kategorisiz olacak"
 msgid "Next"
 msgstr "İleri"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr "Sonraki tam yedekleme: {date}"
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Sonraki eşleşme"
@@ -5187,6 +5199,10 @@ msgstr "Sonraki eşleşme"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Gelecek ay"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr "Sonraki kısmi yedekleme: {date}"
 
 #: src/strings.ts:2220
 msgid "Next tab"
@@ -8065,8 +8081,8 @@ msgid "There are no blocks in this note."
 msgstr "Bu notta blok yok."
 
 #: src/strings.ts:2034
-msgid "These items will be **kept in your Trash for {interval} days** after which they will be permanently deleted."
-msgstr "Bu öğeler **{interval} gün boyunca çöp kutunuzda tutulacak**, sonrasında kalıcı olarak silinecek."
+msgid "These items will be kept in your Trash for {interval} days after which they will be permanently deleted."
+msgstr "Bu öğeler {interval} gün boyunca çöp kutunuzda tutulacak, sonrasında kalıcı olarak silinecek."
 
 #: src/strings.ts:1755
 msgid "This action is IRREVERSIBLE."
@@ -8736,8 +8752,8 @@ msgid "Using {instance} (v{version})"
 msgstr "{instance} kullanılıyor (v{version})"
 
 #: src/strings.ts:2585
-msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
-msgstr "Notesnook'u hesap olmadan kullanmak, notlarınızı cihazlar arasında **EŞİTLEMEZ** ve cihazınıza erişiminizi kaybederseniz veya uygulamayı kaldırırsanız veri kaybına yol açabilir. Notlarınızı düzenli olarak yedeklediğinizden emin olun."
+msgid "Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
+msgstr "Notesnook'u hesap olmadan kullanmak, notlarınızı cihazlar arasında EŞİTLEMEZ ve cihazınıza erişiminizi kaybederseniz veya uygulamayı kaldırırsanız veri kaybına yol açabilir. Notlarınızı düzenli olarak yedeklediğinizden emin olun."
 
 #: src/strings.ts:2049
 msgid "Using official Notesnook instance"
@@ -9170,17 +9186,17 @@ msgstr "Yeni bir nota başlamak için uygulamanın herhangi bir yerinde sola kay
 msgid ""
 "You can track your bug report at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
+"Please note that we will respond to your bug report on the link above. We recommend that you save the above link for later reference.\n"
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support."
 msgstr ""
 "You can track your bug report at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
+"Please note that we will respond to your bug report on the link above. We recommend that you save the above link for later reference.\n"
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.Hata raporunuzu [{url}]({url}) adresinden takip edebilirsiniz.\n"
 "\n"
-"Hata raporunuza yukarıdaki bağlantı üzerinden yanıt vereceğimizi lütfen unutmayın. **Bu bağlantıyı ileride başvurmak üzere kaydetmenizi öneririz.**\n"
+"Hata raporunuza yukarıdaki bağlantı üzerinden yanıt vereceğimizi lütfen unutmayın. Bu bağlantıyı ileride başvurmak üzere kaydetmenizi öneririz.\n"
 "\n"
 "Sorununuz kritikse (ör. notların eşitlenmemesi, çökmeler vb.), birebir destek için [Discord topluluğumuza katılın](https://go.notesnook.com/discord)."
 
@@ -9188,13 +9204,13 @@ msgstr ""
 msgid ""
 "You can track your feature request at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**"
+"Please note that we will respond to your feature request on the link above. We recommend that you save the above link for later reference."
 msgstr ""
 "You can track your feature request at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**Özellik isteğinizi [{url}]({url}) adresinden takip edebilirsiniz.\n"
+"Please note that we will respond to your feature request on the link above. We recommend that you save the above link for later reference.Özellik isteğinizi [{url}]({url}) adresinden takip edebilirsiniz.\n"
 "\n"
-"İsteğinize yukarıdaki bağlantı üzerinden yanıt vereceğimizi lütfen unutmayın. **Bu bağlantıyı ileride başvurmak üzere kaydetmenizi öneririz.**"
+"İsteğinize yukarıdaki bağlantı üzerinden yanıt vereceğimizi lütfen unutmayın. Bu bağlantıyı ileride başvurmak üzere kaydetmenizi öneririz."
 
 #: src/strings.ts:962
 msgid "You can use fallback 2FA method incase you are unable to login via primary method"

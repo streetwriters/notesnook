@@ -1976,26 +1976,26 @@ msgstr "Kluis legen"
 msgid ""
 "Clearing attachments cache will perform the following actions:\n"
 "\n"
-"- Downloaded images & files: **cleared**\n"
-"- Pending uploads: **cleared**\n"
+"- Downloaded images & files: cleared\n"
+"- Pending uploads: cleared\n"
 "- Uploaded images & files: _unaffected_\n"
 "\n"
 "All attachments will be downloaded & cached again on access.\n"
 "\n"
 "---\n"
 "\n"
-"**Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently.**"
+"Only use this for troubleshooting purposes. If you are having persistent issues, it is recommended that you reach out to us via support@streetwriters.co so we can help you resolve it permanently."
 msgstr ""
 "\n"
-"- Gedownloade afbeeldingen en bestanden: **gewist**\n"
-"- Uploads in behandeling: **gewist**\n"
+"- Gedownloade afbeeldingen en bestanden: gewist\n"
+"- Uploads in behandeling: gewist\n"
 "- Geüploade afbeeldingen en bestanden: _niet beïnvloed_\n"
 "\n"
 "Alle bijlagen worden bij gebruik opnieuw gedownload en gecached.\n"
 "\n"
 "---\n"
 "\n"
-"**Gebruik dit alleen voor probleemoplossing. Als je aanhoudende problemen hebt, raden we aan contact met ons op te nemen via support@streetwriters.co zodat we dit definitief kunnen oplossen.**"
+"Gebruik dit alleen voor probleemoplossing. Als je aanhoudende problemen hebt, raden we aan contact met ons op te nemen via support@streetwriters.co zodat we dit definitief kunnen oplossen."
 
 #: src/strings.ts:2027
 msgid "Clearing trash will permanently delete all the items in your trash. This action is IRREVERSIBLE."
@@ -3787,7 +3787,7 @@ msgid ""
 "Force pull:\n"
 "Use this if changes from other devices are not appearing on this device. This will overwrite the data on this device with the latest data from the server.\n"
 "\n"
-"**These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co.**"
+"These must only be used for troubleshooting. Using them regularly for sync is not recommended and will lead to unexpected data loss and other issues. If you are having persistent issues with sync, please report them to us at support@streetwriters.co."
 msgstr ""
 "Geforceerd verzenden:\n"
 "Gebruik dit als wijzigingen op dit apparaat niet op andere apparaten verschijnen. Hiermee worden de gegevens op de server overschreven met die van dit apparaat.\n"
@@ -3795,7 +3795,7 @@ msgstr ""
 "Geforceerd ophalen:\n"
 "Gebruik dit als wijzigingen van andere apparaten niet op dit apparaat verschijnen. Hiermee worden de gegevens op dit apparaat overschreven met de nieuwste gegevens van de server.\n"
 "\n"
-"**Deze opties zijn alleen bedoeld voor probleemoplossing. Ze regelmatig gebruiken voor synchronisatie wordt afgeraden en leidt tot onverwacht gegevensverlies en andere problemen. Als je aanhoudende synchronisatieproblemen hebt, meld deze dan bij support@streetwriters.co.**"
+"Deze opties zijn alleen bedoeld voor probleemoplossing. Ze regelmatig gebruiken voor synchronisatie wordt afgeraden en leidt tot onverwacht gegevensverlies en andere problemen. Als je aanhoudende synchronisatieproblemen hebt, meld deze dan bij support@streetwriters.co."
 
 #: src/strings.ts:2776
 msgid "forever"
@@ -4512,6 +4512,14 @@ msgstr "Laatste"
 msgid "Last edited at"
 msgstr "Laatst bewerkt op"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr "Laatste volledige back-up: {date}"
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr "Laatste gedeeltelijke back-up: {date}"
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Laatst gebruikt op"
@@ -5180,6 +5188,10 @@ msgstr "Nieuw aangemaakte notities worden niet gecategoriseerd"
 msgid "Next"
 msgstr "Volgende"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr "Volgende volledige back-up: {date}"
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Volgende resultaat"
@@ -5187,6 +5199,10 @@ msgstr "Volgende resultaat"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Volgende maand"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr "Volgende gedeeltelijke back-up: {date}"
 
 #: src/strings.ts:2220
 msgid "Next tab"
@@ -8065,8 +8081,8 @@ msgid "There are no blocks in this note."
 msgstr "Er zijn geen blokken in deze notitie."
 
 #: src/strings.ts:2034
-msgid "These items will be **kept in your Trash for {interval} days** after which they will be permanently deleted."
-msgstr "Deze items worden **{interval} dagen in je prullenbak bewaard**, daarna worden ze permanent verwijderd."
+msgid "These items will be kept in your Trash for {interval} days after which they will be permanently deleted."
+msgstr "Deze items worden {interval} dagen in je prullenbak bewaard, daarna worden ze permanent verwijderd."
 
 #: src/strings.ts:1755
 msgid "This action is IRREVERSIBLE."
@@ -8736,8 +8752,8 @@ msgid "Using {instance} (v{version})"
 msgstr "Gebruikt {instance} (v{version})"
 
 #: src/strings.ts:2585
-msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
-msgstr "Notesnook gebruiken zonder account zal je notities **NIET** synchroniseren tussen apparaten en kan leiden tot gegevensverlies als je de toegang tot je apparaat verliest of de app verwijdert. Zorg ervoor dat je regelmatig een back-up maakt van je notities."
+msgid "Using Notesnook without an account will NOT sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
+msgstr "Notesnook gebruiken zonder account zal je notities NIET synchroniseren tussen apparaten en kan leiden tot gegevensverlies als je de toegang tot je apparaat verliest of de app verwijdert. Zorg ervoor dat je regelmatig een back-up maakt van je notities."
 
 #: src/strings.ts:2049
 msgid "Using official Notesnook instance"
@@ -9170,17 +9186,17 @@ msgstr "Je kunt overal in de app naar links vegen om een nieuwe notitie te begin
 msgid ""
 "You can track your bug report at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
+"Please note that we will respond to your bug report on the link above. We recommend that you save the above link for later reference.\n"
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support."
 msgstr ""
 "You can track your bug report at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your bug report on the link above. **We recommend that you save the above link for later reference.**\n"
+"Please note that we will respond to your bug report on the link above. We recommend that you save the above link for later reference.\n"
 "\n"
 "If your issue is critical (e.g. notes not syncing, crashes etc.), please [join our Discord community](https://go.notesnook.com/discord) for one-to-one support.Je kunt je bugrapport volgen op [{url}]({url}).\n"
 "\n"
-"Let op: we reageren op je bugrapport via de bovenstaande link. **We raden aan deze link op te slaan voor later.**\n"
+"Let op: we reageren op je bugrapport via de bovenstaande link. We raden aan deze link op te slaan voor later.\n"
 "\n"
 "Als je probleem kritiek is (bijv. notities die niet synchroniseren, crashes enz.), [word dan lid van onze Discord-community](https://go.notesnook.com/discord) voor persoonlijke ondersteuning."
 
@@ -9188,13 +9204,13 @@ msgstr ""
 msgid ""
 "You can track your feature request at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**"
+"Please note that we will respond to your feature request on the link above. We recommend that you save the above link for later reference."
 msgstr ""
 "You can track your feature request at [{url}]({url}).\n"
 "\n"
-"Please note that we will respond to your feature request on the link above. **We recommend that you save the above link for later reference.**Je kunt je functieverzoek volgen op [{url}]({url}).\n"
+"Please note that we will respond to your feature request on the link above. We recommend that you save the above link for later reference.Je kunt je functieverzoek volgen op [{url}]({url}).\n"
 "\n"
-"Let op: we reageren op je functieverzoek via de bovenstaande link. **We raden aan deze link op te slaan voor later.**"
+"Let op: we reageren op je functieverzoek via de bovenstaande link. We raden aan deze link op te slaan voor later."
 
 #: src/strings.ts:962
 msgid "You can use fallback 2FA method incase you are unable to login via primary method"
