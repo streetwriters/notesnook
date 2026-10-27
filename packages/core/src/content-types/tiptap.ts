@@ -240,7 +240,7 @@ export class Tiptap {
           id: node.attribs[ATTRIBUTES.blockId],
           type: node.tagName.toLowerCase(),
           content: convertHtmlToTxt(
-            sliceWithoutNestedLists(this.data, node),
+            this.data.slice(node.startIndex || 0, node.endIndex || 0),
             false
           )
         }))
@@ -379,30 +379,6 @@ export class Tiptap {
       internalLinks
     };
   }
-}
-
-const isList = (node: Element) =>
-  node.tagName === "ul" || node.tagName === "ol";
-
-/**
- * Nested lists are blocks of their own so we exclude them from
- * the parent list's content to avoid overlapping blocks.
- */
-function sliceWithoutNestedLists(html: string, node: Element) {
-  const start = node.startIndex || 0;
-  const end = node.endIndex || 0;
-  if (!isList(node)) return html.slice(start, end);
-
-  let result = "";
-  let cursor = start;
-  for (const list of findAll(isList, node.childNodes)) {
-    if (list.startIndex === null || list.endIndex === null) continue;
-    // skip lists nested inside an already excluded list
-    if (list.startIndex < cursor) continue;
-    result += html.slice(cursor, list.startIndex);
-    cursor = list.endIndex + 1;
-  }
-  return result + html.slice(cursor, end);
 }
 
 function convertHtmlToTxt(html: string, wrap = true) {

@@ -91,15 +91,14 @@ test("search ignores empty tokens", () => {
   expect(tiptap.search(" hello")).toBe(true);
 });
 
-test("blocks of nested lists don't include the nested list's content", () => {
+test("list blocks include their nested lists' content", () => {
+  // the editor only assigns block ids to top-level blocks so nested lists have none
   const tiptap = new Tiptap(
-    `<ul data-block-id="ul1"><li><p data-block-id="p1">parent</p><ul data-block-id="ul2"><li><p data-block-id="p2">child</p></li></ul></li><li><p data-block-id="p3">sibling</p></li></ul>`
+    `<ul data-block-id="ul1"><li><p>parent</p><ul><li><p>child</p></li></ul></li><li><p>sibling</p></li></ul>`
   );
   const blocks = tiptap.extract("blocks").blocks;
-  const ul1 = blocks.find((b) => b.id === "ul1");
-  const ul2 = blocks.find((b) => b.id === "ul2");
-  expect(ul1.content).toContain("parent");
-  expect(ul1.content).toContain("sibling");
-  expect(ul1.content).not.toContain("child");
-  expect(ul2.content).toContain("child");
+  expect(blocks).toHaveLength(1);
+  expect(blocks[0].content).toContain("parent");
+  expect(blocks[0].content).toContain("child");
+  expect(blocks[0].content).toContain("sibling");
 });
