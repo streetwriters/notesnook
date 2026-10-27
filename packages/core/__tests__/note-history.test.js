@@ -156,7 +156,8 @@ test("auto clear sessions if they exceed the limit", () =>
 
     expect(await db.noteHistory.get(id).count()).toBe(2);
 
-    await db.noteHistory.cleanup(id, 1);
+    db.options.maxNoteVersions = async () => 1;
+    await db.noteHistory.cleanup();
 
     const sessions = await db.noteHistory.get(id).items();
     expect(sessions).toHaveLength(1);

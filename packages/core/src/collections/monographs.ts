@@ -30,7 +30,6 @@ export class Monographs implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "monographs",
       db.eventManager,
       db.sanitizer
