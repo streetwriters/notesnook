@@ -60,22 +60,35 @@ export function NotebookPicker(props: {
   const excludedIds = useRef<Set<string>>(new Set());
   const excludedParentId = useRef<string>();
   const searchId = useRef(0);
+  const isMultiselect = useRef(false);
 
   useEffect(() => {
-    const { setSelected, setIsMultiselect } =
-      useRelationChangesStore.getState();
+    const { setSelected } = useRelationChangesStore.getState();
     let cancelled = false;
     initialSelection().then((selected) => {
       if (cancelled) return;
       setSelected(selected);
-      setIsMultiselect(!!multiSelectable && selected.length > 1);
+      isMultiselect.current = !!multiSelectable && selected.length > 1;
     });
     return () => {
       cancelled = true;
       setSelected([]);
-      setIsMultiselect(false);
     };
   }, [initialSelection, multiSelectable]);
+
+  const select = useCallback(
+    (notebook: Notebook, isCtrlPressed: boolean) => {
+      const { selected, setSelected } = useRelationChangesStore.getState();
+      if (multiSelectable && isCtrlPressed) isMultiselect.current = true;
+
+      setSelected(
+        isMultiselect.current
+          ? selectMultiple(notebook, selected)
+          : selectSingle(notebook, selected)
+      );
+    },
+    [multiSelectable]
+  );
 
   useEffect(() => {
     (async function () {
@@ -201,7 +214,7 @@ export function NotebookPicker(props: {
                 });
                 return true;
               }}
-              multiSelectable={multiSelectable}
+              onSelect={select}
             />
           )}
         />
@@ -287,7 +300,7 @@ export function NotebookItem(props: {
   toggle: () => void;
   depth: number;
   onCreateSubNotebook: (title: string) => Promise<boolean>;
-  multiSelectable?: boolean;
+  onSelect: (notebook: Notebook, isCtrlPressed: boolean) => void;
 }) {
   const {
     notebook,
@@ -296,14 +309,9 @@ export function NotebookItem(props: {
     depth,
     isExpandable,
     onCreateSubNotebook,
-    multiSelectable
+    onSelect
   } = props;
 
-  const setIsMultiselect = useRelationChangesStore(
-    (store) => store.setIsMultiselect
-  );
-  const setSelected = useRelationChangesStore((store) => store.setSelected);
-  const isMultiselect = useRelationChangesStore((store) => store.isMultiselect);
   const isSelected = useRelationChangesStore((store) =>
     store.selected.some((item) => item.id === notebook.id && item.op === "add")
   );
@@ -328,19 +336,9 @@ export function NotebookItem(props: {
     ) => {
       e.stopPropagation();
       e.preventDefault();
-
-      const { selected } = useRelationChangesStore.getState();
-
-      const isCtrlPressed = e.ctrlKey || e.metaKey;
-      if (isCtrlPressed) setIsMultiselect(true);
-
-      if (multiSelectable && (isMultiselect || isCtrlPressed)) {
-        setSelected(selectMultiple(notebook, selected));
-      } else {
-        setSelected(selectSingle(notebook, selected));
-      }
+      onSelect(notebook, e.ctrlKey || e.metaKey);
     },
-    [isMultiselect, multiSelectable, notebook, setIsMultiselect, setSelected]
+    [notebook, onSelect]
   );
 
   const createSubNotebook = async () => {

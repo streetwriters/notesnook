@@ -27,15 +27,11 @@ export type RelationChange = {
 
 interface IRelationChangesStore {
   selected: RelationChange[];
-  isMultiselect: boolean;
   setSelected(refs: RelationChange[]): void;
-  setIsMultiselect(state: boolean): void;
 }
 export const useRelationChangesStore = create<IRelationChangesStore>((set) => ({
   selected: [],
-  isMultiselect: false,
-  setSelected: (selected) => set({ selected: selected.slice() }),
-  setIsMultiselect: (isMultiselect) => set({ isMultiselect })
+  setSelected: (selected) => set({ selected: selected.slice() })
 }));
 
 function createSelection(item: { id: string }): RelationChange {
@@ -56,6 +52,7 @@ export function selectMultiple(
   topic: { id: string },
   selected: RelationChange[]
 ) {
+  selected = selected.map((ref) => ({ ...ref }));
   const index = findSelectionIndex(topic, selected);
   const isSelected = index > -1;
   const item = selected[index];
@@ -72,6 +69,7 @@ export function selectMultiple(
 }
 
 export function selectSingle(topic: { id: string }, array: RelationChange[]) {
+  array = array.map((ref) => ({ ...ref }));
   const selected: RelationChange[] = array.filter((ref) => !ref.new);
 
   const index = findSelectionIndex(topic, array);
