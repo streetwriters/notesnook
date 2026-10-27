@@ -239,10 +239,9 @@ export function showClearSessionsConfirmation() {
 
 export function showUnpublishConfirmation() {
   return ConfirmDialog.show({
-    title: "Unpublish note?",
-    subtitle:
-      "Are you sure you want to unpublish this note? It will no longer be accessible via the public link.",
-    positiveButtonText: "Yes, unpublish",
+    title: strings.doActions.unpublish.note(1),
+    subtitle: strings.unpublishNoteConfirm(),
+    positiveButtonText: strings.yesUnpublish(),
     negativeButtonText: strings.cancel()
   });
 }
