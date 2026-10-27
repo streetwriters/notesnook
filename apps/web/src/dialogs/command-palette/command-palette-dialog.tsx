@@ -24,7 +24,7 @@ import {
   usePromise
 } from "@notesnook/common";
 import { EVENTS, fuzzy, Note, Notebook, Reminder, Tag } from "@notesnook/core";
-import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   GroupedVirtuoso,
@@ -223,15 +223,8 @@ export const CommandPaletteDialog = DialogManager.register(
                   </Text>
                 </Flex>
               ),
-              TopItemList: ({ style, ...props }) => (
-                <Box
-                  as="div"
-                  className="top-item-list"
-                  {...props}
-                  sx={{
-                    ...style
-                  }}
-                />
+              TopItemList: ({ ...props }) => (
+                <Box as="div" className="top-item-list" {...props} />
               )
             }}
             groupCounts={

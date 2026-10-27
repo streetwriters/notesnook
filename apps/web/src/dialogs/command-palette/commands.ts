@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { createElement, type ComponentProps } from "react";
 import { escapeUTF8 } from "entities";
 import { db } from "../../common/db";
 import {
@@ -59,7 +58,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { AttachmentsDialog } from "../attachments-dialog";
 import { CreateColorDialog } from "../create-color-dialog";
 import { noteMenuItems } from "../../components/note";
-import { MenuIconComponent, MenuItem } from "@notesnook/ui";
+import { MenuItem } from "@notesnook/ui";
 import { notebookMenuItems } from "../../components/notebook";
 import { tagMenuItems } from "../../components/tag";
 import { useEditorManager } from "../../components/editor/manager";
