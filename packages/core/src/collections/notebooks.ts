@@ -124,6 +124,9 @@ export class Notebooks implements ICollection {
       .where("toType", "==", "note")
       .where("fromType", "==", "notebook")
       .where("toId", "not in", this.db.trash.cache.notes)
+      .where("toId", "not in", (eb) =>
+        eb.selectFrom("notes").where("archived", "==", true).select("id")
+      )
       .select((eb) => [
         "subNotebooks.rootId as id",
         eb.fn.count<number>("relations.toId").distinct().as("totalNotes")

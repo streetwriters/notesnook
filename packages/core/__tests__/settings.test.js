@@ -73,3 +73,36 @@ for (const type of GROUP_OPTIONS_BY_ID_TESTS) {
       expect(result).toMatchObject(defaultOptions);
     }));
 }
+
+test("setting group options by id doesn't leak into defaults", () =>
+  databaseTest().then(async (db) => {
+    const groupOptions = {
+      groupBy: "none",
+      sortBy: "title",
+      sortDirection: "asc"
+    };
+    await db.settings.setGroupOptionsById(
+      "notebook1",
+      "notebook",
+      groupOptions
+    );
+    await db.settings.setGroupOptionsById(
+      "notebook1",
+      "notebook",
+      groupOptions
+    );
+
+    const db2 = await databaseTest();
+    expect(
+      db2.settings.getGroupOptionsById("notebook1", "notebook")
+    ).not.toStrictEqual(groupOptions);
+  }));
+
+test("numeric settings are numbers after reload", () =>
+  databaseTest().then(async (db) => {
+    await db.settings.setVaultLockAfter(1000);
+    await db.settings.setTrashCleanupInterval(30);
+    await db.settings.init();
+    expect(db.settings.getVaultLockAfter()).toBe(1000);
+    expect(db.settings.getTrashCleanupInterval()).toBe(30);
+  }));

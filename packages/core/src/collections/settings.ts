@@ -167,9 +167,10 @@ export class Settings implements ICollection {
         ? "groupOptions:notes:tags"
         : "groupOptions:notes:colors";
 
-    const groupOptionsMap = this.get(groupOptionsKey);
-    groupOptionsMap[id] = groupOptions;
-    return this.set(groupOptionsKey, groupOptionsMap);
+    return this.set(groupOptionsKey, {
+      ...this.get(groupOptionsKey),
+      [id]: groupOptions
+    });
   }
 
   getGroupOptionsById(id: string, type: GroupingByIdKey) {

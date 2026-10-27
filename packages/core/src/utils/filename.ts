@@ -53,7 +53,7 @@ export const DocumentMimeTypes = [
 ];
 
 export function isDocument(mime: string) {
-  return DocumentMimeTypes.some((a) => a.startsWith(mime));
+  return DocumentMimeTypes.some((a) => mime.startsWith(a));
 }
 
 export const WebClipMimeType = "application/vnd.notesnook.web-clip";

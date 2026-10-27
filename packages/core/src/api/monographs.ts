@@ -46,31 +46,31 @@ export type PublishOptions = {
   selfDestruct?: boolean;
 };
 export class Monographs {
-  monographs: string[] = [];
+  monographs = new Set<string>();
   constructor(private readonly db: Database) {}
 
   async clear() {
-    this.monographs = [];
+    this.monographs.clear();
     await this.db.monographsCollection.collection.clear();
   }
 
   async refresh() {
     const ids = await this.db.monographsCollection.all.ids();
-    this.monographs = ids;
+    this.monographs = new Set(ids);
   }
 
   /**
    * Check if note is published.
    */
   isPublished(noteId: string) {
-    return this.monographs && this.monographs.indexOf(noteId) > -1;
+    return this.monographs.has(noteId);
   }
 
   /**
    * Get note published monograph id
    */
   monograph(noteId: string) {
-    return this.monographs[this.monographs.indexOf(noteId)];
+    return this.monographs.has(noteId) ? noteId : undefined;
   }
 
   /**
@@ -79,7 +79,7 @@ export class Monographs {
   async publish(noteId: string, title: string, opts: PublishOptions = {}) {
     if (title === "") throw new Error("Title cannot be empty.");
 
-    if (!this.monographs.length) await this.refresh();
+    if (!this.monographs.size) await this.refresh();
 
     const update = !!this.isPublished(noteId);
 
@@ -144,7 +144,7 @@ export class Monographs {
       token
     );
 
-    this.monographs.push(id);
+    this.monographs.add(id);
     await this.db.monographsCollection.add({
       id,
       title: monograph.title,
@@ -160,7 +160,7 @@ export class Monographs {
    * Unpublish a note
    */
   async unpublish(noteId: string) {
-    if (!this.monographs.length) await this.refresh();
+    if (!this.monographs.size) await this.refresh();
 
     const user = await this.db.user.getUser();
     const token = await this.db.tokenManager.getAccessToken();
@@ -175,7 +175,7 @@ export class Monographs {
       token
     );
 
-    this.monographs.splice(this.monographs.indexOf(noteId), 1);
+    this.monographs.delete(noteId);
     await this.db.monographsCollection.collection.softDelete([noteId]);
   }
 
@@ -185,7 +185,7 @@ export class Monographs {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
-          .where("id", "in", this.monographs),
+          .where("id", "in", Array.from(this.monographs)),
       this.db.options?.batchSize
     );
   }

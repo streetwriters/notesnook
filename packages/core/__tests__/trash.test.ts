@@ -435,3 +435,12 @@ test("trash list should be sorted globally across batches", () =>
       expect((await grouping.item(index)).group?.title).toBe(group.title);
     }
   }));
+
+test("trashed notes have boolean conflicted", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({ title: "note" });
+    await db.notes.moveToTrash(id!);
+
+    const [item] = await db.trash.all();
+    expect(item.conflicted).toBe(false);
+  }));
