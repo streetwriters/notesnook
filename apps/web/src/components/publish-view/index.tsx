@@ -32,7 +32,6 @@ import {
 } from "../icons";
 import type { Icon } from "../icons";
 import { db } from "../../common/db";
-import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
 import { EVENTS } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
@@ -49,6 +48,7 @@ import Field from "../field";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { showUnpublishConfirmation } from "../../dialogs/confirm";
 import { useForm, UseFormRegisterReturn } from "react-hook-form";
+import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
 
 export const PublishDialog = DialogManager.register(function PublishDialog(
   props: BaseDialogProps<boolean> & { note: Note }
@@ -61,10 +61,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   } = useResolvedMonograph(note.id);
 
   const [isUnpublishing, setIsUnpublishing] = useState(false);
-  const [processingStatus, setProcessingStatus] = useState<{
-    total?: number;
-    current: number;
-  }>();
+  const processingStatus = useImageDownloadProgress(note.id);
   const {
     register,
     handleSubmit,
@@ -76,7 +73,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   });
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard();
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
   const isPasswordEnabled = watch("passwordEnabled");
   const isSelfDestructEnabled = watch("selfDestruct");
@@ -87,21 +84,6 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   }, [monograph?.id]);
   const metadataValue = "value" in metadata ? metadata.value : undefined;
   const publishUrl = metadataValue?.publishUrl ?? monograph?.publishUrl;
-
-  useEffect(() => {
-    const fileDownloadedEvent = db.eventManager.subscribe(
-      EVENTS.fileDownloaded,
-      ({ total, current, groupId }) => {
-        if (!groupId || !groupId.includes(note.id)) return;
-        if (current === total) setProcessingStatus(undefined);
-        else setProcessingStatus({ total, current });
-      }
-    );
-
-    return () => {
-      fileDownloadedEvent.unsubscribe();
-    };
-  }, [note.id]);
 
   useEffect(() => {
     const monographsUpdatedEvent = db.eventManager.subscribe(
@@ -310,13 +292,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                 variant="new_secondary"
                 className="copyPublishLink"
                 aria-label={copied ? strings.copied() : strings.copy()}
-                onClick={() => {
-                  if (!publishUrl) return;
-
-                  writeText(publishUrl);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
+                onClick={() => publishUrl && copy(publishUrl)}
                 disabled={!publishUrl || isLoading}
                 sx={{
                   flexShrink: 0,
@@ -629,6 +605,30 @@ function formValuesFrom(monograph: ResolvedMonograph): PublishFormValues {
     password: monograph.password ?? "",
     selfDestruct: monograph.selfDestruct
   };
+}
+
+function useImageDownloadProgress(noteId: string) {
+  const [progress, setProgress] = useState<{
+    total?: number;
+    current: number;
+  }>();
+
+  useEffect(() => {
+    const fileDownloadedEvent = db.eventManager.subscribe(
+      EVENTS.fileDownloaded,
+      ({ total, current, groupId }) => {
+        if (!groupId || !groupId.includes(noteId)) return;
+        if (current === total) setProgress(undefined);
+        else setProgress({ total, current });
+      }
+    );
+
+    return () => {
+      fileDownloadedEvent.unsubscribe();
+    };
+  }, [noteId]);
+
+  return progress;
 }
 
 function useResolvedMonograph(monographId: string) {
