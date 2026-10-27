@@ -19,45 +19,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text } from "@theme-ui/components";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
-import Field from "../components/field";
-import {
-  TreeNode,
-  VirtualizedTree,
-  VirtualizedTreeHandle
-} from "../components/virtualized-tree";
 import { store as notebookStore, useStore } from "../stores/notebook-store";
-import { AddNotebookDialog } from "./add-notebook-dialog";
-import { NotebookItem, useSelectionStore } from "./move-note-dialog";
-import { SearchIcon, Close, Plus } from "../components/icons";
+import { useSelectionStore } from "../stores/relation-changes-store";
+import { NotebookPicker } from "../components/notebook-picker";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
   notebook: Notebook;
 };
 
-const notebookSortOptions = {
-  sortBy: "dateCreated",
-  sortDirection: "desc"
-} as const;
-
 export const MoveNotebookDialog = DialogManager.register(
   function MoveNotebookDialog({ onClose, notebook }: MoveNotebookDialogProps) {
     const setSelected = useSelectionStore((store) => store.setSelected);
     const refreshNotebooks = useStore((store) => store.refresh);
-    const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
-    const [query, setQuery] = useState("");
-    const [notebooks, setNotebooks] = useState<string[]>([]);
     const notebookId = notebook.id;
-
-    useEffect(() => {
-      db.notebooks.roots
-        .ids(notebookSortOptions)
-        .then((ids) => setNotebooks(ids));
-    }, []);
 
     useEffect(() => {
       (async function () {
@@ -68,10 +46,6 @@ export const MoveNotebookDialog = DialogManager.register(
         }
       })();
     }, [notebookId, refreshNotebooks, setSelected]);
-
-    useEffect(() => {
-      treeRef.current?.refresh();
-    }, [notebooks]);
 
     const _onClose = useCallback(
       (result: boolean) => {
@@ -117,170 +91,7 @@ export const MoveNotebookDialog = DialogManager.register(
           onClick: () => _onClose(false)
         }}
       >
-        <Flex
-          id="subnotebooks"
-          variant="columnFill"
-          sx={{
-            mx: "spacing7",
-            mt: "spacing6",
-            mb: "spacing7"
-          }}
-        >
-          <Field
-            sx={{
-              mb: "spacing4",
-              input: {
-                pl: "spacing10",
-                py: "spacing6",
-                pr: "spacing4",
-                fontSize: "sm"
-              }
-            }}
-            placeholder={strings.searchNotebooks()}
-            onChange={async (e) => {
-              const query = e.target.value.trim();
-              setQuery(query);
-
-              const ids = await (query
-                ? db.lookup
-                    .notebooks(query)
-                    .sorted(notebookSortOptions)
-                    .then((results) => results.ids())
-                : db.notebooks.roots.ids(notebookSortOptions));
-              setNotebooks(ids);
-            }}
-            leftIcon={SearchIcon}
-            rightActions={[
-              {
-                icon: Close,
-                onClick: async () => {
-                  setNotebooks(
-                    await db.notebooks.roots.ids(notebookSortOptions)
-                  );
-                },
-                hidden: !query
-              }
-            ]}
-          />
-          {notebooks.length > 0 ? (
-            <>
-              <VirtualizedTree
-                rootId={"root"}
-                itemHeight={40}
-                itemGap={10}
-                treeRef={treeRef}
-                getChildNodes={async ({ id, depth }) => {
-                  const parentNotebookId = await db.notebooks.parentId(
-                    notebookId
-                  );
-                  const nodes: TreeNode<Notebook>[] = [];
-                  if (id === "root") {
-                    for (const id of notebooks) {
-                      if (id === notebookId) continue;
-                      const notebook = (await db.notebooks.notebook(id))!;
-                      const childrenCount = await db.relations
-                        .from(notebook, "notebook")
-                        .count();
-                      const isParent = parentNotebookId === notebook.id;
-                      nodes.push({
-                        data: notebook,
-                        depth: depth + 1,
-                        id,
-                        parentId: "root",
-                        hasChildren: isParent
-                          ? childrenCount !== 1
-                          : childrenCount > 0
-                      });
-                    }
-                    return nodes;
-                  }
-
-                  const subNotebooks = await db.relations
-                    .from({ type: "notebook", id }, "notebook")
-                    .selector.items(undefined, notebookSortOptions);
-
-                  for (const notebook of subNotebooks) {
-                    if (notebook.id === notebookId) continue;
-
-                    const childrenCount = await db.relations
-                      .from(notebook, "notebook")
-                      .count();
-                    const isParent = parentNotebookId === notebook.id;
-
-                    nodes.push({
-                      parentId: id,
-                      id: notebook.id,
-                      data: notebook,
-                      depth: depth + 1,
-                      hasChildren: isParent
-                        ? childrenCount !== 1
-                        : childrenCount > 0
-                    });
-                  }
-
-                  return nodes;
-                }}
-                renderItem={({ item, expanded, index, collapse, expand }) => (
-                  <NotebookItem
-                    notebook={item.data}
-                    depth={item.depth}
-                    isExpandable={item.hasChildren}
-                    isExpanded={expanded}
-                    toggle={expanded ? collapse : expand}
-                    onCreateItem={() => {
-                      treeRef.current?.refreshItem(index, item.data, {
-                        expand: true
-                      });
-                    }}
-                  />
-                )}
-              />
-            </>
-          ) : (
-            <Flex
-              sx={{
-                height: "170px",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "spacing4"
-              }}
-            >
-              <Text
-                sx={{
-                  color: "paragraph-secondary",
-                  fontSize: "sm",
-                  lineHeight: "120%"
-                }}
-              >
-                {strings.notebooksEmpty()}
-              </Text>
-              <Button
-                data-test-id="add-new-notebook"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "spacing3",
-                  color: "accent",
-                  fontWeight: 600,
-                  fontSize: "sm"
-                }}
-                onClick={() =>
-                  AddNotebookDialog.show({}).then((res) =>
-                    res
-                      ? db.notebooks.roots
-                          .ids(notebookSortOptions)
-                          .then((ids) => setNotebooks(ids))
-                      : null
-                  )
-                }
-              >
-                <Plus size={15} color="accent" />
-                {strings.addNotebook()}
-              </Button>
-            </Flex>
-          )}
-        </Flex>
+        <NotebookPicker excludeId={notebookId} />
       </Dialog>
     );
   }

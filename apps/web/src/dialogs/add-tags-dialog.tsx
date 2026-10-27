@@ -29,12 +29,12 @@ import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { SelectedCheck } from "../components/selected-check";
 import {
-  SelectedCheck,
   SelectedReference,
   selectMultiple,
   useSelectionStore
-} from "./move-note-dialog";
+} from "../stores/relation-changes-store";
 import { checkFeature } from "../common";
 import { Box } from "@notesnook/ui";
 import { Tag as TagIcon } from "../components/icons";
