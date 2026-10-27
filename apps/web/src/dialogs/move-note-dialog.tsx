@@ -435,11 +435,7 @@ export function SelectedCheck({
 
   if (selectedItem?.op === "remove") {
     return (
-      <CheckboxRemove
-        size={size}
-        onClick={onClick}
-        color="backgroundSecondary-error"
-      />
+      <CheckboxRemove size={size} onClick={onClick} color="accent-error" />
     );
   }
 

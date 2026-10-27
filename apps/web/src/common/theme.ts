@@ -112,7 +112,6 @@ export const THEME_LIGHT: any = {
         accentForeground: "#ffffff",
         paragraph: "#F23E46",
         background: "#FFEDEE",
-        backgroundSecondary: "#F23E46",
         border: "#F7999D",
         heading: "#f54b42",
         icon: "#F23E46",
