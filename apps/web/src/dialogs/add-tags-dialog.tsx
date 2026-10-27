@@ -29,12 +29,12 @@ import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { SelectedCheck } from "../components/selected-check";
 import {
-  SelectedCheck,
-  SelectedReference,
+  RelationChange,
   selectMultiple,
-  useSelectionStore
-} from "./move-note-dialog";
+  useRelationChangesStore
+} from "../stores/relation-changes-store";
 import { checkFeature } from "../common";
 import { Box } from "@notesnook/ui";
 import { Tag as TagIcon } from "../components/icons";
@@ -56,7 +56,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         return;
       }
 
-      const selected: SelectedReference[] = [];
+      const selected: RelationChange[] = [];
       const selectedTags = await db.relations
         .to({ type: "note", ids: noteIds }, "tag")
         .get();
@@ -64,7 +64,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         if (selected.findIndex((a) => a.id === r.fromId) > -1) return;
         selected.push({ id: r.fromId, op: "add", new: false });
       });
-      useSelectionStore.getState().setSelected(selected);
+      useRelationChangesStore.getState().setSelected(selected);
     })();
   }, []);
 
@@ -79,7 +79,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
-          const { selected } = useSelectionStore.getState();
+          const { selected } = useRelationChangesStore.getState();
           for (const id of noteIds) {
             for (const item of selected) {
               const tagRef: ItemReference = { type: "tag", id: item.id };
@@ -124,7 +124,8 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
               if (!tagId) return;
               await useStore.getState().refresh();
               setTags(useStore.getState().tags);
-              const { selected, setSelected } = useSelectionStore.getState();
+              const { selected, setSelected } =
+                useRelationChangesStore.getState();
               setSelected([...selected, { id: tagId, new: true, op: "add" }]);
             }}
             renderItem={({ index }) => {
@@ -143,8 +144,8 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
 
 function TagItem(props: { tag: Tag }) {
   const { tag } = props;
-  const selected = useSelectionStore((state) => state.selected);
-  const setSelected = useSelectionStore((state) => state.setSelected);
+  const selected = useRelationChangesStore((state) => state.selected);
+  const setSelected = useRelationChangesStore((state) => state.setSelected);
   const selectedItem = selected.find((s) => s.id === tag.id);
   const isHighlighted = !!selectedItem && selectedItem.op !== "remove";
 

@@ -212,6 +212,19 @@ export class Notebooks implements ICollection {
     return notebook;
   }
 
+  async subNotebookIds(id: string) {
+    const result = await withSubNotebooks(
+      this.db.sql(),
+      [id],
+      this.db.trash.cache.notebooks
+    )
+      .selectFrom("subNotebooks")
+      .where("id", "!=", id)
+      .select("id")
+      .execute();
+    return result.map((i) => i.id);
+  }
+
   find(title: string) {
     return this.all.find((eb) => eb("notebooks.title", "==", title));
   }
