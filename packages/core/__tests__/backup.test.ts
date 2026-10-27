@@ -20,49 +20,78 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { expect, test } from "vitest";
 import { databaseTest, loginFakeUser } from "./utils";
+import Database from "../src/api/index.js";
 
-test("restoring a backup attachment with a different key should reset upload state", () =>
+async function restoreWithDifferentKey(
+  db: Database,
+  local: { dateUploaded?: number; fileExists: boolean }
+) {
+  await loginFakeUser(db);
+
+  const hash = await db.attachments.save(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEEAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+    "image/png",
+    "test.png"
+  );
+  if (!hash) throw new Error("Failed to create attachment");
+  const attachment = await db.attachments.attachment(hash);
+  if (!attachment) throw new Error("Failed to find attachment");
+  await db.attachments.collection.update([attachment.id], {
+    dateUploaded: local.dateUploaded,
+    chunkSize: 1
+  });
+  if (!local.fileExists) await db.fs().deleteFile(hash, true);
+
+  const attachmentsKey = await db.user?.getAttachmentsKey();
+  if (!attachmentsKey) throw new Error("Missing attachments key");
+  const backupKey = await db
+    .storage()
+    .encrypt(attachmentsKey, JSON.stringify({ iv: "a", salt: "b", key: "c" }));
+
+  const skipped = await (db.backup as any).migrateData(
+    [
+      {
+        ...attachment,
+        key: backupKey,
+        iv: "new-iv",
+        salt: "new-salt",
+        chunkSize: 4096,
+        dateUploaded: undefined
+      }
+    ],
+    6.0,
+    attachmentsKey
+  );
+
+  return {
+    skipped,
+    original: attachment,
+    restored: await db.attachments.attachment(hash)
+  };
+}
+
+test("restoring a backup attachment with a different key should keep the uploaded local attachment", () =>
   databaseTest().then(async (db) => {
-    await loginFakeUser(db);
-
-    const hash = await db.attachments.save(
-      "iVBORw0KGgoAAAANSUhEUgAAAAEEAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
-      "image/png",
-      "test.png"
-    );
-    if (!hash) throw new Error("Failed to create attachment");
-    const local = await db.attachments.attachment(hash);
-    if (!local) throw new Error("Failed to find attachment");
-    await db.attachments.collection.update([local.id], {
-      dateUploaded: Date.now(),
-      chunkSize: 1
+    const dateUploaded = Date.now();
+    const { skipped, original, restored } = await restoreWithDifferentKey(db, {
+      dateUploaded,
+      fileExists: true
     });
 
-    const attachmentsKey = await db.user?.getAttachmentsKey();
-    if (!attachmentsKey) throw new Error("Missing attachments key");
-    const backupKey = await db
-      .storage()
-      .encrypt(
-        attachmentsKey,
-        JSON.stringify({ iv: "a", salt: "b", key: "c" })
-      );
+    expect(skipped).toEqual([original.hash]);
+    expect(restored?.key).toEqual(original.key);
+    expect(restored?.iv).toBe(original.iv);
+    expect(restored?.chunkSize).toBe(1);
+    expect(restored?.dateUploaded).toBe(dateUploaded);
+  }));
 
-    await (db.backup as any).migrateData(
-      [
-        {
-          ...local,
-          key: backupKey,
-          iv: "new-iv",
-          salt: "new-salt",
-          chunkSize: 4096,
-          dateUploaded: undefined
-        }
-      ],
-      6.0,
-      attachmentsKey
-    );
+test("restoring a backup attachment with a different key should adopt the backup key if local file is unavailable", () =>
+  databaseTest().then(async (db) => {
+    const { skipped, restored } = await restoreWithDifferentKey(db, {
+      fileExists: false
+    });
 
-    const restored = await db.attachments.attachment(hash);
+    expect(skipped).toEqual([]);
     expect(restored?.iv).toBe("new-iv");
     expect(restored?.chunkSize).toBe(4096);
     expect(restored?.dateUploaded).toBeFalsy();
