@@ -47,7 +47,8 @@ import {
   PaperclipHorizontal,
   Sliders,
   ArrowBendUpLeft,
-  ArrowBendUpRight
+  ArrowBendUpRight,
+  createIcon
 } from "../../components/icons";
 import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
@@ -271,7 +272,7 @@ const staticCommands: Command[] = [
           propertiesTab === undefined ? "properties" : undefined
         );
     },
-    group: strings.general(),
+    group: strings.editor(),
     type: "command"
   }
 ];
@@ -540,8 +541,10 @@ function menuItemToCommands(
   }
 
   if (!menuItem.onClick) return commands;
-  const _Icon = menuItem.iconComponent
-    ? createMenuIcon(menuItem.iconComponent)
+  const _Icon = menuItem.icon
+    ? createIcon(menuItem.icon)
+    : menuItem.iconComponent
+    ? (menuItem.iconComponent as Icon)
     : undefined;
   commands.push({
     id: idSuffix ? `${menuItem.key}-${idSuffix}` : menuItem.key,
@@ -553,18 +556,6 @@ function menuItemToCommands(
     excludeFromRecents: true
   });
   return commands;
-}
-
-function createMenuIcon(Component: MenuIconComponent): Icon {
-  const MenuIcon: Icon = (props) =>
-    createElement(Component, {
-      size: typeof props.size === "number" ? props.size : undefined,
-      color: props.color,
-      sx: props.sx as ComponentProps<MenuIconComponent>["sx"]
-    });
-  MenuIcon.isReactComponent = true;
-  MenuIcon.path = "";
-  return MenuIcon;
 }
 
 async function getCommandTitle({ id, type }: RecentCommand) {
