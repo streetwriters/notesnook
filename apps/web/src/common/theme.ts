@@ -64,7 +64,7 @@ export const THEME_LIGHT: any = {
         icon: "#666666",
         separator: "#E8E8E8",
         placeholder: "#999999",
-        hover: "#dbdbdb",
+        hover: "#e1e1e1",
         backdrop: "#0000001a",
         buttonForeground: "#181818"
       },
