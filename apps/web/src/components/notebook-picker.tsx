@@ -39,7 +39,7 @@ import { SelectedCheck } from "./selected-check";
 import {
   selectMultiple,
   selectSingle,
-  useSelectionStore
+  useRelationChangesStore
 } from "../stores/relation-changes-store";
 
 const notebookSortOptions = {
@@ -257,10 +257,12 @@ export function NotebookItem(props: {
     multiSelectable
   } = props;
 
-  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
-  const setSelected = useSelectionStore((store) => store.setSelected);
-  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
-  const isSelected = useSelectionStore((store) =>
+  const setIsMultiselect = useRelationChangesStore(
+    (store) => store.setIsMultiselect
+  );
+  const setSelected = useRelationChangesStore((store) => store.setSelected);
+  const isMultiselect = useRelationChangesStore((store) => store.isMultiselect);
+  const isSelected = useRelationChangesStore((store) =>
     store.selected.some((item) => item.id === notebook.id && item.op === "add")
   );
   const [isAddingSubNotebook, setIsAddingSubNotebook] = useState(false);
@@ -285,7 +287,7 @@ export function NotebookItem(props: {
       e.stopPropagation();
       e.preventDefault();
 
-      const { selected } = useSelectionStore.getState();
+      const { selected } = useRelationChangesStore.getState();
 
       const isCtrlPressed = e.ctrlKey || e.metaKey;
       if (isCtrlPressed) setIsMultiselect(true);

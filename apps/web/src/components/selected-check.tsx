@@ -21,7 +21,7 @@ import { CheckboxRemove } from "./icons";
 import { Checkbox } from "./checkbox";
 import {
   findSelectionIndex,
-  useSelectionStore
+  useRelationChangesStore
 } from "../stores/relation-changes-store";
 
 export function SelectedCheck({
@@ -37,7 +37,7 @@ export function SelectedCheck({
       | React.KeyboardEvent<HTMLDivElement>
   ) => void;
 }) {
-  const selectedItems = useSelectionStore((store) => store.selected);
+  const selectedItems = useRelationChangesStore((store) => store.selected);
   const selectedItem =
     item && selectedItems[findSelectionIndex(item, selectedItems)];
 

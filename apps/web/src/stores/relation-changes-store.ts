@@ -19,26 +19,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { create } from "zustand";
 
-export type SelectedReference = {
+export type RelationChange = {
   id: string;
   new: boolean;
   op: "add" | "remove";
 };
 
-interface ISelectionStore {
-  selected: SelectedReference[];
+interface IRelationChangesStore {
+  selected: RelationChange[];
   isMultiselect: boolean;
-  setSelected(refs: SelectedReference[]): void;
+  setSelected(refs: RelationChange[]): void;
   setIsMultiselect(state: boolean): void;
 }
-export const useSelectionStore = create<ISelectionStore>((set) => ({
+export const useRelationChangesStore = create<IRelationChangesStore>((set) => ({
   selected: [],
   isMultiselect: false,
   setSelected: (selected) => set({ selected: selected.slice() }),
   setIsMultiselect: (isMultiselect) => set({ isMultiselect })
 }));
 
-function createSelection(item: { id: string }): SelectedReference {
+function createSelection(item: { id: string }): RelationChange {
   return {
     id: item.id,
     op: "add",
@@ -54,7 +54,7 @@ export function findSelectionIndex(
 
 export function selectMultiple(
   topic: { id: string },
-  selected: SelectedReference[]
+  selected: RelationChange[]
 ) {
   const index = findSelectionIndex(topic, selected);
   const isSelected = index > -1;
@@ -71,11 +71,8 @@ export function selectMultiple(
   return selected;
 }
 
-export function selectSingle(
-  topic: { id: string },
-  array: SelectedReference[]
-) {
-  const selected: SelectedReference[] = array.filter((ref) => !ref.new);
+export function selectSingle(topic: { id: string }, array: RelationChange[]) {
+  const selected: RelationChange[] = array.filter((ref) => !ref.new);
 
   const index = findSelectionIndex(topic, array);
   const item = array[index];

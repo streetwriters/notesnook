@@ -24,7 +24,7 @@ import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
 import { store as notebookStore, useStore } from "../stores/notebook-store";
-import { useSelectionStore } from "../stores/relation-changes-store";
+import { useRelationChangesStore } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
@@ -33,14 +33,14 @@ type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
 
 export const MoveNotebookDialog = DialogManager.register(
   function MoveNotebookDialog({ onClose, notebook }: MoveNotebookDialogProps) {
-    const setSelected = useSelectionStore((store) => store.setSelected);
+    const setSelected = useRelationChangesStore((store) => store.setSelected);
     const refreshNotebooks = useStore((store) => store.refresh);
     const notebookId = notebook.id;
 
     useEffect(() => {
       (async function () {
         const parentNotebookId = await db.notebooks.parentId(notebookId);
-        const selected = useSelectionStore.getState().selected[0];
+        const selected = useRelationChangesStore.getState().selected[0];
         if (!selected && parentNotebookId) {
           setSelected([{ id: parentNotebookId, new: false, op: "add" }]);
         }
@@ -68,7 +68,7 @@ export const MoveNotebookDialog = DialogManager.register(
         positiveButton={{
           text: strings.done(),
           onClick: async () => {
-            const { selected } = useSelectionStore.getState();
+            const { selected } = useRelationChangesStore.getState();
             for (const item of selected) {
               if (item.op === "remove") {
                 await db.relations.unlink(

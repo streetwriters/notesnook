@@ -28,8 +28,8 @@ import { isMac } from "../utils/platform";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import {
-  SelectedReference,
-  useSelectionStore
+  RelationChange,
+  useRelationChangesStore
 } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";
 
@@ -39,13 +39,15 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   onClose,
   noteIds
 }: MoveNoteDialogProps) {
-  const setSelected = useSelectionStore((store) => store.setSelected);
-  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
+  const setSelected = useRelationChangesStore((store) => store.setSelected);
+  const setIsMultiselect = useRelationChangesStore(
+    (store) => store.setIsMultiselect
+  );
   const refreshNotebooks = useStore((store) => store.refresh);
 
   useEffect(() => {
     (async function () {
-      const selected: SelectedReference[] = useSelectionStore
+      const selected: RelationChange[] = useRelationChangesStore
         .getState()
         .selected.slice();
 
@@ -92,7 +94,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
-          const { selected } = useSelectionStore.getState();
+          const { selected } = useRelationChangesStore.getState();
           for (const item of selected) {
             try {
               if (item.op === "remove") {
