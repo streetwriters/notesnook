@@ -66,3 +66,33 @@ test("parentId() returns undefined if notebook is not a subnotebook", () =>
   notebookTest().then(async ({ db, id }) => {
     expect(await db.notebooks.parentId(id)).toBeUndefined();
   }));
+
+test("subNotebookIds() returns all nested subnotebooks", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const childId = await db.notebooks.add({ title: "Child" });
+    const grandChildId = await db.notebooks.add({ title: "Grand child" });
+    await db.notebooks.add({ title: "Unrelated" });
+    await db.relations.add(
+      { type: "notebook", id },
+      { type: "notebook", id: childId }
+    );
+    await db.relations.add(
+      { type: "notebook", id: childId },
+      { type: "notebook", id: grandChildId }
+    );
+
+    const ids = await db.notebooks.subNotebookIds(id);
+    expect(ids.sort()).toStrictEqual([childId, grandChildId].sort());
+  }));
+
+test("subNotebookIds() skips trashed subnotebooks", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const childId = await db.notebooks.add({ title: "Child" });
+    await db.relations.add(
+      { type: "notebook", id },
+      { type: "notebook", id: childId }
+    );
+    await db.notebooks.moveToTrash(childId);
+
+    expect(await db.notebooks.subNotebookIds(id)).toStrictEqual([]);
+  }));
