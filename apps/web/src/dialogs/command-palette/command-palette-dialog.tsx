@@ -109,19 +109,14 @@ export const CommandPaletteDialog = DialogManager.register(
         }}
         noScroll
         sx={{
-          fontFamily: "body",
-          minHeight: "553px"
+          fontFamily: "body"
         }}
       >
         <Flex
           variant="columnFill"
           sx={{
             overflow: "hidden",
-            height: 400,
-            '[data-viewport-type="element"]': {
-              // width: "calc(100% - 10px) !important"
-              // px: 1
-            }
+            height: "min(500px, 60vh)"
           }}
           onKeyDown={(e) => {
             if (commands.status !== "fulfilled") return;
@@ -235,8 +230,6 @@ export const CommandPaletteDialog = DialogManager.register(
                   {...props}
                   sx={{
                     ...style
-                    // width: "calc(100% - 10px) !important"
-                    // padding: "0px 5px"
                   }}
                 />
               )
@@ -256,17 +249,13 @@ export const CommandPaletteDialog = DialogManager.register(
               return (
                 <Box
                   sx={{
-                    // width: "100%",
-                    // py: 1,
                     bg: "background",
                     px: "spacing7",
                     pt: "spacing6",
                     pb: "spacing4"
-                    // px: 1
                   }}
                 >
                   <Text
-                    // variant="subBody"
                     sx={{
                       color: "heading-secondary",
                       fontSize: "3xs",
@@ -389,7 +378,6 @@ export const CommandPaletteDialog = DialogManager.register(
             px: "spacing7",
             py: "spacing4",
             gap: "spacing5",
-            // borderTop: "1px solid var(--border)",
             justifyContent: "end",
             alignItems: "center"
           }}
