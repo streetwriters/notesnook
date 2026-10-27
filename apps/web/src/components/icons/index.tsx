@@ -360,6 +360,7 @@ import EyeglassesEmptySvg from "@notesnook/icons/eyeglasses-empty.svg?react";
 import AsteriskSvg from "@notesnook/icons/asterisk.svg?react";
 import SyncDisabledSvg from "@notesnook/icons/sync-disabled.svg?react";
 import WarningOctagonSvg from "@notesnook/icons/warning-octagon.svg?react";
+import CheckboxRemoveSvg from "@notesnook/icons/checkbox-remove.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -854,3 +855,4 @@ export const EyeglassesEmpty = createSvgIcon(EyeglassesEmptySvg);
 export const Asterisk = createSvgIcon(AsteriskSvg);
 export const SyncDisabled = createSvgIcon(SyncDisabledSvg);
 export const WarningOctagon = createSvgIcon(WarningOctagonSvg);
+export const CheckboxRemove = createSvgIcon(CheckboxRemoveSvg);
