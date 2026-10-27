@@ -112,6 +112,7 @@ async function deleteAttachments(ids: string[]) {
   )
     return;
 
+  let deleted = 0;
   await TaskManager.startTask({
     type: "status",
     id: "deleteAttachments",
@@ -127,11 +128,12 @@ async function deleteAttachments(ids: string[]) {
           current: i,
           total: ids.length
         });
-        await attachmentStore.permanentDelete(attachment);
+        if (await attachmentStore.permanentDelete(attachment)) deleted++;
       }
     }
   });
-  showToast("success", strings.actions.deleted.attachment(ids.length));
+  if (deleted > 0)
+    showToast("success", strings.actions.deleted.attachment(deleted));
 }
 
 async function moveRemindersToTrash(ids: string[]) {
