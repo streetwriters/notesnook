@@ -1,4 +1,10 @@
-name: Preview @notesnook/desktop
+name: Notesnook Desktop Preview Build
+
+# UNTRUSTED stage for fork PRs. Runs on `pull_request`, so fork code gets a
+# read-only GITHUB_TOKEN and NO repository secrets. The signed + notarized
+# macOS build only runs for same-repo PRs; fork PRs get an ad-hoc signed dmg
+# instead so fork code is never signed with our Developer ID. The PR comment is
+# posted by desktop.preview.publish.yml in the trusted `workflow_run` context.
 
 on:
   pull_request:
@@ -9,11 +15,15 @@ on:
       - "apps/web/**"
       - "packages/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/desktop.preview.yml"
+      - ".github/workflows/desktop.preview.build.yml"
+      - ".github/workflows/desktop.preview.publish.yml"
+
+concurrency:
+  group: desktop-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     name: Build
     runs-on: ubuntu-22.04
     steps:
@@ -48,8 +58,21 @@ jobs:
           name: build
           path: apps/web/build/**/*
 
+      - name: Stage PR metadata
+        run: |
+          mkdir -p "$RUNNER_TEMP/pr-meta"
+          echo "PR_NUMBER=${{ github.event.pull_request.number }}" > "$RUNNER_TEMP/pr-meta/pr-meta.env"
+
+      - name: Upload PR metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-preview-meta
+          path: ${{ runner.temp }}/pr-meta
+          retention-days: 1
+
   build-macos:
     name: Build for macOS
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     needs: build
     runs-on: macos-14
     outputs:
@@ -114,6 +137,52 @@ jobs:
 
       - name: Upload dmg artifact
         id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: apps/desktop/output/*.dmg
+
+  # Fork PRs get no signing secrets: ad-hoc sign (required to launch on Apple
+  # silicon) without hardened runtime, which ad-hoc signatures can't satisfy.
+  build-macos-unsigned:
+    name: Build for macOS (unsigned)
+    if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+    needs: build
+    runs-on: macos-14
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install setuptools
+        run: brew install python-setuptools
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build dmg
+        run: |
+          npm run tx @notesnook/desktop:release
+          cd apps/desktop
+          yarn electron-builder --config=electron-builder.config.js --mac dmg --arm64 -p never -c.mac.identity=- -c.mac.hardenedRuntime=false -c.mac.notarize=false
+
+      - name: Upload dmg artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
@@ -255,49 +324,3 @@ jobs:
         with:
           name: windows-build
           path: apps/desktop/output/*.exe
-
-  post-pr-comment:
-    name: Post PR comment with preview URLs
-    needs:
-      [build, build-macos, build-linux-x64, build-linux-arm64, build-windows]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Post or update PR comment
-        uses: actions/github-script@v6
-        env:
-          macos_artifact_url: ${{ needs.build-macos.outputs.macos-artifact-url }}
-          linux_x64_artifact_url: ${{ needs.build-linux-x64.outputs.linux-x64-artifact-url }}
-          linux_arm64_artifact_url: ${{ needs.build-linux-arm64.outputs.linux-arm64-artifact-url }}
-          windows_artifact_url: ${{ needs.build-windows.outputs.windows-artifact-url }}
-        with:
-          script: |
-            const marker = '<!-- desktop-preview-comment -->';
-            const prNumber = context.issue.number;
-            const previewUrl = [
-              { platform: 'macOS', url: process.env.macos_artifact_url },
-              { platform: 'Linux x64', url: process.env.linux_x64_artifact_url },
-              { platform: 'Linux arm64', url: process.env.linux_arm64_artifact_url },
-              { platform: 'Windows x64', url: process.env.windows_artifact_url },
-            ].filter(u => u.url).map(u => `- [${u.platform}](${u.url})`).join('\n');
-            const body = `${marker}\n**Desktop Previews**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.GITHUB_SHA}\n`;
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-            const existing = comments.find(c => c.body && c.body.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body,
-              });
-            }

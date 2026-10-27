@@ -1,0 +1,100 @@
+name: Notesnook Web Preview Publish
+
+# TRUSTED stage. Runs via `workflow_run` after the build workflow finishes, so
+# it has the base repo's secrets and a write-scoped token. It downloads the
+# static build the PR produced and deploys it to Cloudflare Pages alongside the
+# BASE repo's Pages Functions, then posts the PR comment. It never executes
+# fork code.
+
+on:
+  workflow_run:
+    workflows: ["Notesnook Web Preview Build"]
+    types: [completed]
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout base repo (trusted)
+        uses: actions/checkout@v5
+        # No `ref` -> default branch. Only the Pages Functions are needed.
+        with:
+          sparse-checkout: |
+            .github/actions
+            apps/web/functions
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-preview-build
+          path: ${{ runner.temp }}/artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load & verify PR metadata
+        id: meta
+        uses: ./.github/actions/verify-pr-meta
+        with:
+          meta-file: ${{ runner.temp }}/artifact/pr-meta.env
+
+      - name: Deploy to Cloudflare Pages
+        working-directory: ./apps/web
+        env:
+          PR_NUMBER: ${{ steps.meta.outputs.pr-number }}
+          HEAD_SHA: ${{ steps.meta.outputs.head-sha }}
+        run: |
+          set -euo pipefail
+          mv "$RUNNER_TEMP/artifact/build" ./build
+          # An advanced-mode worker in the output would replace the trusted
+          # functions/ with fork code running on our Cloudflare account.
+          rm -rf ./build/_worker.js
+          BRANCH="pr-$PR_NUMBER-$(echo "$HEAD_SHA" | cut -c1-7)"
+          echo "Deploying branch: $BRANCH"
+          DEPLOY_OUT=$(npx --yes wrangler pages deploy --project-name=notesnook-app --branch="$BRANCH" ./build 2>&1) || { echo "$DEPLOY_OUT"; exit 1; }
+          echo "$DEPLOY_OUT"
+          PREVIEW_URL=$(printf "%s" "$DEPLOY_OUT" | grep -Eo 'https?://[^ ]+' | head -1 || true)
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "WARNING: could not parse preview URL from wrangler output"
+          fi
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_ENV
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        env:
+          preview_url: ${{ env.preview_url }}
+          PR_NUMBER: ${{ steps.meta.outputs.pr-number }}
+          HEAD_SHA: ${{ steps.meta.outputs.head-sha }}
+        with:
+          script: |
+            const marker = '<!-- pages-preview-comment -->';
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!prNumber) return;
+            const previewUrl = process.env.preview_url || '';
+            const body = `${marker}\n**Cloudflare Pages Preview**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.HEAD_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
