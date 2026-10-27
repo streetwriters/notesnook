@@ -249,6 +249,25 @@ describe("notesWithHighlighting", () => {
       expect(item.content[0][0].prefix).toBe("<img src=x onerror=alert(1)> ");
     }));
 
+  test("search notes with unbalanced quotes should highlight the match", () =>
+    noteTest({
+      title: "quotes",
+      content: {
+        type: "tiptap",
+        data: `<p>he said "hello" to the world</p>`
+      }
+    }).then(async ({ db }) => {
+      for (const query of ['"hello', 'hello"']) {
+        const filtered = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        const item = await filtered.item(0);
+        expect(item.item).toBeDefined();
+        expect(item.item.content.length).toBeGreaterThan(0);
+      }
+    }));
+
   test("search notes with short terms in boolean queries", () =>
     databaseTest().then(async (db) => {
       await db.notes.add({

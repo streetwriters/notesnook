@@ -1144,6 +1144,13 @@ function getMatchScore(
   return score;
 }
 
+// tokens are escaped as FTS5 strings (e.g. `"hello` becomes `"""hello"`)
+function unquoteToken(token: string) {
+  if (token.length < 2 || !token.startsWith('"') || !token.endsWith('"'))
+    return token;
+  return token.slice(1, -1).replace(/""/g, '"');
+}
+
 function transformTokens(tokens: QueryTokens | undefined) {
   if (!tokens)
     return {
@@ -1154,13 +1161,13 @@ function transformTokens(tokens: QueryTokens | undefined) {
     };
 
   const andTokens = tokens.andTokens.map((t) =>
-    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
+    removeDiacritics(unquoteToken(t).toLowerCase())
   );
   const orTokens = tokens.orTokens.map((t) =>
-    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
+    removeDiacritics(unquoteToken(t).toLowerCase())
   );
   const notTokens = tokens.notTokens.map((t) =>
-    removeDiacritics(t.replace(/"(.+)"/g, "$1").toLowerCase())
+    removeDiacritics(unquoteToken(t).toLowerCase())
   );
   return {
     andTokens,
