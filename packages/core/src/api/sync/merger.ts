@@ -65,6 +65,7 @@ class Merger {
       localItem.deletedBy === "expired"
     ) {
       if (
+        remoteItem.expiryDate &&
         remoteItem.expiryDate.dateModified > localItem.expiryDate.dateModified
       ) {
         localItem.expiryDate = remoteItem.expiryDate;
