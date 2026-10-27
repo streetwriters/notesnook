@@ -255,6 +255,32 @@ test("restoring a corrupted locked session should restore it as ciphertext", () 
     ).toMatchObject(editedContent);
   }));
 
+test("reading a corrupted locked session should return ciphertext", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = await db.notes.note(id);
+    const editedContent = { type: "tiptap", data: "<p>hello world</p>" };
+    await db.vault.save({
+      ...note,
+      content: editedContent,
+      sessionId: "lockedsession"
+    });
+    const [session] = await db.noteHistory.get(id).items();
+    await db
+      .sql()
+      .updateTable("sessioncontent")
+      .set({ locked: false })
+      .where("id", "==", session.sessionContentId)
+      .execute();
+
+    const lockedContent = await db.noteHistory.content(session.id);
+    expect(
+      await db.vault.decryptContent(lockedContent, "password")
+    ).toMatchObject(editedContent);
+  }));
+
 test("locking an old note should clear its history", () =>
   noteTest({ ...TEST_NOTE, sessionId: "notesession" }).then(
     async ({ db, id }) => {

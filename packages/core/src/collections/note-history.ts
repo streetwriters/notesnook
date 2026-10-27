@@ -25,17 +25,6 @@ import { makeSessionContentId } from "../utils/id.js";
 import { ICollection } from "./collection.js";
 import { SessionContent } from "./session-content.js";
 
-// sessions corrupted by an earlier bug hold ciphertext as a JSON string
-function parseCipher(data: unknown) {
-  if (typeof data !== "string" || !data.startsWith("{")) return;
-  try {
-    const parsed = JSON.parse(data);
-    return isCipher(parsed) ? parsed : undefined;
-  } catch {
-    return;
-  }
-}
-
 export class NoteHistory implements ICollection {
   name = "notehistory";
   sessionContent;
@@ -199,7 +188,6 @@ export class NoteHistory implements ICollection {
     const content = await this.sessionContent.get(session.sessionContentId);
     const note = await this.db.notes.note(session.noteId);
     if (!note || !content) return;
-    content.data = parseCipher(content.data) || content.data;
 
     if (isCipher(content.data)) {
       const sessionId = `${Date.now()}`;
