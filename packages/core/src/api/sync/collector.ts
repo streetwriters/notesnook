@@ -87,7 +87,21 @@ class Collector {
           // to true for items that haven't been modified since we last ran
           // the push. Everything else will be collected again in the next
           // push.
-          .where("dateModified", "<=", pushTimestamp)
+          .where((eb) =>
+            eb.or([
+              eb("dateModified", "<=", pushTimestamp),
+              // Items modified while the device clock was ahead would never
+              // pass the check above and sync would keep pushing them forever.
+              ...chunk
+                .filter((item) => item.dateModified > pushTimestamp)
+                .map((item) =>
+                  eb.and([
+                    eb("id", "==", item.id),
+                    eb("dateModified", "==", item.dateModified)
+                  ])
+                )
+            ])
+          )
           .set({ synced: true })
           .execute();
         pushTimestamp = Date.now();
