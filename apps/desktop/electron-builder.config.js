@@ -96,6 +96,16 @@ module.exports = {
     "node_modules/sodium-native/package.json"
   ],
   afterPack: "./scripts/removeLocales.js",
+  electronFuses: {
+    runAsNode: false,
+    enableCookieEncryption: true,
+    enableNodeOptionsEnvironmentVariable: false,
+    enableNodeCliInspectArguments: false,
+    enableEmbeddedAsarIntegrityValidation: true,
+    onlyLoadAppFromAsar: true,
+    loadBrowserProcessSpecificV8Snapshot: false,
+    grantFileProtocolExtraPrivileges: false
+  },
   protocols: [{ name: "Notesnook", schemes: ["nn"] }],
   mac: {
     bundleVersion: "240",
