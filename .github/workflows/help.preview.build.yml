@@ -1,0 +1,57 @@
+name: Notesnook Help Preview Build
+
+# UNTRUSTED stage. Runs on `pull_request`, so fork code is checked out and
+# compiled with a read-only GITHUB_TOKEN and NO repository secrets. Uploading to
+# Cloudflare and the PR comment happen in help.preview.publish.yml, which runs
+# in the trusted `workflow_run` context and never executes fork code. Because
+# no secrets are exposed here, the build runs automatically for every PR
+# (including forks) with no authorization gate.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "docs/help/**"
+      - ".github/workflows/help.preview.build.yml"
+      - ".github/workflows/help.preview.publish.yml"
+
+concurrency:
+  group: help-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install dependencies
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=help
+
+      - name: Build help
+        run: npm run build:help
+
+      - name: Stage build artifact
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/artifact"
+          cp -R docs/help/.vitepress/dist "$RUNNER_TEMP/artifact/dist"
+          echo "PR_NUMBER=${{ github.event.pull_request.number }}" > "$RUNNER_TEMP/artifact/pr-meta.env"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: help-preview-build
+          path: ${{ runner.temp }}/artifact
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
