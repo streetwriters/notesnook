@@ -55,12 +55,22 @@ export function NotebookPicker(props: {
   const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
   const [query, setQuery] = useState("");
   const [notebooks, setNotebooks] = useState<string[]>([]);
+  const excludedIds = useRef<Set<string>>(new Set());
+  const excludedParentId = useRef<string>();
+  const searchId = useRef(0);
 
   useEffect(() => {
-    db.notebooks.roots
-      .ids(notebookSortOptions)
-      .then((ids) => setNotebooks(ids));
-  }, []);
+    (async function () {
+      if (excludeId) {
+        excludedIds.current = new Set([
+          excludeId,
+          ...(await db.notebooks.subNotebookIds(excludeId))
+        ]);
+        excludedParentId.current = await db.notebooks.parentId(excludeId);
+      }
+      setNotebooks(await db.notebooks.roots.ids(notebookSortOptions));
+    })();
+  }, [excludeId]);
 
   useEffect(() => {
     treeRef.current?.refresh();
@@ -92,6 +102,7 @@ export function NotebookPicker(props: {
         leftIcon={SearchIcon}
         onChange={async (e) => {
           setQuery(e.target.value);
+          const id = ++searchId.current;
           const query = e.target.value.trim();
           const ids = await (query
             ? db.lookup
@@ -99,14 +110,16 @@ export function NotebookPicker(props: {
                 .sorted(notebookSortOptions)
                 .then((results) => results.ids())
             : db.notebooks.roots.ids(notebookSortOptions));
-          setNotebooks(ids);
+          if (id === searchId.current) setNotebooks(ids);
         }}
         rightActions={[
           {
             icon: Close,
             onClick: async () => {
               setQuery("");
-              setNotebooks(await db.notebooks.roots.ids(notebookSortOptions));
+              const id = ++searchId.current;
+              const ids = await db.notebooks.roots.ids(notebookSortOptions);
+              if (id === searchId.current) setNotebooks(ids);
             },
             hidden: !query.trim()
           }
@@ -118,9 +131,6 @@ export function NotebookPicker(props: {
           itemGap={7}
           treeRef={treeRef}
           getChildNodes={async ({ id, depth }) => {
-            const excludedParentId = excludeId
-              ? await db.notebooks.parentId(excludeId)
-              : undefined;
             const toNode = async (
               notebook: Notebook,
               parentId: string
@@ -128,7 +138,7 @@ export function NotebookPicker(props: {
               let childrenCount = await db.relations
                 .from(notebook, "notebook")
                 .count();
-              if (notebook.id === excludedParentId) childrenCount--;
+              if (notebook.id === excludedParentId.current) childrenCount--;
               return {
                 parentId,
                 id: notebook.id,
@@ -141,7 +151,7 @@ export function NotebookPicker(props: {
             const nodes: TreeNode<Notebook>[] = [];
             if (id === "root") {
               for (const id of notebooks) {
-                if (id === excludeId) continue;
+                if (excludedIds.current.has(id)) continue;
                 const notebook = (await db.notebooks.notebook(id))!;
                 nodes.push(await toNode(notebook, "root"));
               }
@@ -153,7 +163,7 @@ export function NotebookPicker(props: {
               .selector.items(undefined, notebookSortOptions);
 
             for (const notebook of subNotebooks) {
-              if (notebook.id === excludeId) continue;
+              if (excludedIds.current.has(notebook.id)) continue;
               nodes.push(await toNode(notebook, id));
             }
 
