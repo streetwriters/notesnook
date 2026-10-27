@@ -145,7 +145,8 @@ function TagItem(props: { tag: Tag }) {
   const { tag } = props;
   const selected = useSelectionStore((state) => state.selected);
   const setSelected = useSelectionStore((state) => state.setSelected);
-  const isSelected = selected.some((s) => s.id === tag.id);
+  const selectedItem = selected.find((s) => s.id === tag.id);
+  const isHighlighted = !!selectedItem && selectedItem.op !== "remove";
 
   function toggleSelection() {
     setSelected(selectMultiple(tag, selected));
@@ -158,7 +159,7 @@ function TagItem(props: { tag: Tag }) {
       sx={{
         cursor: "pointer",
         alignItems: "center",
-        bg: isSelected ? "background-selected" : "background",
+        bg: isHighlighted ? "background-selected" : "background",
         borderRadius: "radius1",
         p: "spacing4",
         ":hover": {
@@ -168,13 +169,13 @@ function TagItem(props: { tag: Tag }) {
       onClick={toggleSelection}
     >
       <Flex sx={{ alignItems: "center", gap: "spacing4", width: "100%" }}>
-        <TagIcon size={15} color={isSelected ? "icon-selected" : "icon"} />
+        <TagIcon size={15} color={isHighlighted ? "icon-selected" : "icon"} />
         <Text
           className="title"
           data-test-id="tag-title"
           sx={{
             flex: 1,
-            color: isSelected ? "paragraph-selected" : "paragraph",
+            color: isHighlighted ? "paragraph-selected" : "paragraph",
             fontSize: "sm",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
