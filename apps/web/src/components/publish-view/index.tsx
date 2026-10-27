@@ -47,8 +47,8 @@ import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../field";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
-import { ErrorText } from "../error-text";
 import { showUnpublishConfirmation } from "../../dialogs/confirm";
+import { useForm, UseFormRegisterReturn } from "react-hook-form";
 
 export const PublishDialog = DialogManager.register(function PublishDialog(
   props: BaseDialogProps<boolean> & { note: Note }
@@ -60,45 +60,33 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     refresh: refreshMonograph
   } = useResolvedMonograph(note.id);
 
-  const [status, setStatus] = useState<{
-    action: "publish" | "unpublish";
-  }>();
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<{
     total?: number;
     current: number;
   }>();
-  const [monographFields, setMonographFields] = useState<{
-    title: string;
-    password?: string;
-    selfDestruct: boolean;
-  }>({
-    title: note.title,
-    password: undefined,
-    selfDestruct: false
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isDirty, isSubmitting }
+  } = useForm<PublishFormValues>({
+    // the form resets whenever these change, including after unpublishing
+    values: monograph ? formValuesFrom(monograph) : defaultFormValues(note)
   });
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const [copied, setCopied] = useState(false);
-  const [showTitleRequiredError, setShowTitleRequiredError] = useState(false);
-  const [showPasswordRequiredError, setShowPasswordRequiredError] =
-    useState(false);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
-  const isPasswordEnabled = monographFields.password !== undefined;
+  const isPasswordEnabled = watch("passwordEnabled");
+  const isSelfDestructEnabled = watch("selfDestruct");
 
   const metadata = usePromise(async () => {
-    if (!monograph) return { publishUrl: "", analytics: { totalViews: 0 } };
+    if (!monograph) return;
     return await db.monographs.metadata(monograph.id);
   }, [monograph?.id]);
-
-  useEffect(() => {
-    if (!monograph) return;
-
-    setMonographFields({
-      title: monograph.title,
-      password: monograph.password,
-      selfDestruct: !!monograph.selfDestruct
-    });
-  }, [monograph]);
+  const metadataValue = "value" in metadata ? metadata.value : undefined;
+  const publishUrl = metadataValue?.publishUrl ?? monograph?.publishUrl;
 
   useEffect(() => {
     const fileDownloadedEvent = db.eventManager.subscribe(
@@ -115,40 +103,27 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     };
   }, [note.id]);
 
-  const resetMonographFields = useCallback(() => {
-    setMonographFields({
-      title: note.title,
-      password: undefined,
-      selfDestruct: false
-    });
-  }, [note.title]);
-
   useEffect(() => {
     const monographsUpdatedEvent = db.eventManager.subscribe(
       EVENTS.monographsUpdated,
-      async (ids?: string[]) => {
+      (ids?: string[]) => {
         if (ids && ids.length > 0 && !ids.includes(note.id)) return;
-
         refreshMonograph();
-
-        // if monograph has been unpublished, reset all the fields
-        if (!(await db.monographs.get(note.id))) resetMonographFields();
       }
     );
 
     return () => {
       monographsUpdatedEvent.unsubscribe();
     };
-  }, [note.id, refreshMonograph, resetMonographFields]);
+  }, [note.id, refreshMonograph]);
 
   async function handleUnpublish() {
     if (!(await showUnpublishConfirmation())) return;
 
     try {
-      setStatus({ action: "unpublish" });
+      setIsUnpublishing(true);
       await unpublishNote(note.id);
       refreshMonograph();
-      resetMonographFields();
       showToast("success", strings.actions.unpublished.note(1));
     } catch (e) {
       console.error(e);
@@ -157,29 +132,15 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         `${strings.actionErrors.unpublished.note(1)}: ` + (e as Error).message
       );
     } finally {
-      setStatus(undefined);
+      setIsUnpublishing(false);
     }
   }
 
-  async function handlePublish() {
+  async function handlePublish(values: PublishFormValues) {
     try {
-      const title = monographFields.title;
-
-      if (!title || title.trim().length === 0) {
-        setShowTitleRequiredError(true);
-        return;
-      }
-      setShowTitleRequiredError(false);
-
-      if (isPasswordEnabled && !monographFields.password) {
-        setShowPasswordRequiredError(true);
-        return;
-      }
-
-      setStatus({ action: "publish" });
-      await publishNote(note.id, title, {
-        selfDestruct: monographFields.selfDestruct,
-        password: monographFields.password
+      await publishNote(note.id, values.title, {
+        selfDestruct: values.selfDestruct,
+        password: values.passwordEnabled ? values.password : undefined
       });
       refreshMonograph();
       showToast("success", strings.actions.published.note(1));
@@ -189,8 +150,6 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         "error",
         `${strings.actionErrors.published.note(1)}: ${(e as Error).message}`
       );
-    } finally {
-      setStatus(undefined);
     }
   }
 
@@ -219,16 +178,10 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     );
   }
 
-  const isChanged = monograph
-    ? monograph.password !== monographFields.password ||
-      monograph.title !== monographFields.title ||
-      monograph.selfDestruct !== monographFields.selfDestruct
-    : true;
-  const isLoading =
+  const isInitialLoad =
     (monographStatus === "pending" && !monograph) ||
-    (metadata.status === "pending" && !("value" in metadata)) ||
-    status?.action === "publish" ||
-    status?.action === "unpublish";
+    (metadata.status === "pending" && !("value" in metadata));
+  const isLoading = isInitialLoad || isSubmitting || isUnpublishing;
 
   return (
     <Dialog
@@ -243,12 +196,16 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
       }}
       positiveButton={{
         text: monograph?.id ? strings.update() : strings.publish(),
-        onClick: handlePublish,
-        disabled: isLoading || !isChanged,
-        loading: status?.action === "publish"
+        type: "submit",
+        form: "publishForm",
+        disabled: isLoading || (!!monograph && !isDirty),
+        loading: isSubmitting
       }}
     >
       <Flex
+        as="form"
+        id="publishForm"
+        onSubmit={handleSubmit(handlePublish)}
         sx={{
           flexDirection: "column",
           mt: "spacing4",
@@ -258,20 +215,12 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         <Field
           type="text"
           label={strings.title()}
-          required
-          aria-invalid={showTitleRequiredError}
-          variant={showTitleRequiredError ? "error" : undefined}
           placeholder={strings.enterTitle()}
-          value={monographFields.title}
           disabled={isLoading}
-          onChange={(event) => {
-            const title = event.currentTarget.value;
-            setShowTitleRequiredError((error) => error && !title.trim());
-            setMonographFields((fields) => ({
-              ...fields,
-              title
-            }));
-          }}
+          error={errors.title?.message}
+          {...register("title", {
+            validate: (title) => !!title.trim() || strings.titleIsRequired()
+          })}
           sx={{ width: "100%" }}
           styles={{
             input: {
@@ -281,12 +230,6 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
             }
           }}
         />
-        {showTitleRequiredError ? (
-          <ErrorText
-            error={strings.titleIsRequired()}
-            sx={{ mt: "spacing4" }}
-          />
-        ) : null}
 
         {monograph?.id ? (
           <Flex
@@ -313,6 +256,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                 Published note link
               </Text>
               <Button
+                type="button"
                 variant="new_error_bordered"
                 onClick={handleUnpublish}
                 disabled={isLoading}
@@ -324,7 +268,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                   lineHeight: 1
                 }}
               >
-                {status?.action === "unpublish" ? (
+                {isUnpublishing ? (
                   <Loading size={13} color="currentColor" />
                 ) : (
                   strings.unpublish()
@@ -346,11 +290,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
               <Link
                 as="a"
                 target="_blank"
-                href={
-                  metadata.status === "fulfilled"
-                    ? metadata.value.publishUrl
-                    : "#"
-                }
+                href={publishUrl ?? "#"}
                 sx={{
                   fontFamily: "body",
                   display: "block",
@@ -363,22 +303,21 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                   fontSize: "xs"
                 }}
               >
-                {metadata.status === "fulfilled"
-                  ? metadata.value.publishUrl
-                  : monograph.publishUrl}
+                {publishUrl}
               </Link>
               <Button
+                type="button"
                 variant="new_secondary"
                 className="copyPublishLink"
                 aria-label={copied ? strings.copied() : strings.copy()}
                 onClick={() => {
-                  if (metadata.status !== "fulfilled") return;
+                  if (!publishUrl) return;
 
-                  writeText(metadata.value.publishUrl);
+                  writeText(publishUrl);
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2000);
                 }}
-                disabled={!("value" in metadata) || isLoading}
+                disabled={!publishUrl || isLoading}
                 sx={{
                   flexShrink: 0,
                   width: 20,
@@ -419,12 +358,13 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
               action={
                 monographAnalytics?.isAllowed ? (
                   <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
-                    {"value" in metadata && metadata.value ? (
+                    {metadataValue ? (
                       <Text sx={{ fontSize: "xs", color: "heading" }}>
-                        {metadata.value.analytics.totalViews}
+                        {metadataValue.analytics.totalViews}
                       </Text>
                     ) : null}
                     <Button
+                      type="button"
                       variant="tertiary"
                       disabled={isLoading}
                       onClick={() =>
@@ -439,6 +379,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                   </Flex>
                 ) : monographAnalytics ? (
                   <Button
+                    type="button"
                     variant="anchor"
                     onClick={() =>
                       UpgradeDialog.show({ feature: monographAnalytics })
@@ -465,22 +406,14 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
           <PasswordProtection
             enabled={isPasswordEnabled}
             disabled={isLoading}
-            onToggle={() => {
-              setShowPasswordRequiredError(false);
-              setMonographFields((fields) => ({
-                ...fields,
-                password: isPasswordEnabled ? undefined : ""
-              }));
-            }}
-            onChange={(password) => {
-              setShowPasswordRequiredError((error) => error && !password);
-              setMonographFields((fields) => ({
-                ...fields,
-                password: password ?? ""
-              }));
-            }}
-            password={monographFields.password}
-            showPasswordRequiredError={showPasswordRequiredError}
+            switchProps={register("passwordEnabled")}
+            inputProps={register("password", {
+              validate: (password, values) =>
+                !values.passwordEnabled ||
+                !!password.trim() ||
+                strings.passwordRequired()
+            })}
+            error={errors.password?.message}
           />
           <MonographRow
             icon={ClockCounterClockwise}
@@ -491,17 +424,11 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
                 aria-label={strings.monographSelfDestructHeading()}
                 title={strings.monographSelfDestructDesc()}
                 disabled={isLoading}
-                checked={monographFields.selfDestruct}
-                onChange={() =>
-                  setMonographFields((fields) => ({
-                    ...fields,
-                    selfDestruct: !fields.selfDestruct
-                  }))
-                }
+                {...register("selfDestruct")}
                 sx={{
                   m: 0,
                   flexShrink: 0,
-                  bg: monographFields.selfDestruct ? "accent" : "icon-disabled"
+                  bg: isSelfDestructEnabled ? "accent" : "icon-disabled"
                 }}
               />
             }
@@ -568,25 +495,22 @@ function MonographRow({
 function PasswordProtection({
   enabled,
   disabled,
-  onToggle,
-  onChange,
-  password,
-  showPasswordRequiredError: passwordError
+  switchProps,
+  inputProps,
+  error
 }: {
   enabled: boolean;
   disabled: boolean;
-  onToggle: () => void;
-  onChange: (password: string) => void;
-  password: string | undefined;
-  showPasswordRequiredError: boolean;
+  switchProps: UseFormRegisterReturn;
+  inputProps: UseFormRegisterReturn;
+  error?: string;
 }) {
   const passwordSwitch = (
     <Switch
       aria-label={strings.monographPassHeading()}
       title={strings.monographPassDesc()}
       disabled={disabled}
-      checked={enabled}
-      onChange={onToggle}
+      {...switchProps}
       sx={{
         m: 0,
         flexShrink: 0,
@@ -633,14 +557,12 @@ function PasswordProtection({
           </Flex>
           <Field
             type="password"
-            variant={passwordError ? "error" : "clean"}
-            required
-            aria-invalid={passwordError}
+            variant="clean"
             disabled={disabled}
             aria-label={strings.monographPassHeading()}
             placeholder="Enter your password"
-            value={password ?? ""}
-            onChange={(event) => onChange(event.currentTarget.value)}
+            error={error}
+            {...inputProps}
             sx={{ width: "100%", mt: "spacing4" }}
             styles={{
               input: {
@@ -650,12 +572,6 @@ function PasswordProtection({
               }
             }}
           />
-          {passwordError ? (
-            <ErrorText
-              error={strings.passwordRequired()}
-              sx={{ mt: "spacing4" }}
-            />
-          ) : null}
         </Flex>
       ) : (
         <Flex
@@ -689,6 +605,31 @@ type ResolvedMonograph = {
   title: string;
   publishUrl?: string;
 };
+
+type PublishFormValues = {
+  title: string;
+  passwordEnabled: boolean;
+  password: string;
+  selfDestruct: boolean;
+};
+
+function defaultFormValues(note: Note): PublishFormValues {
+  return {
+    title: note.title,
+    passwordEnabled: false,
+    password: "",
+    selfDestruct: false
+  };
+}
+
+function formValuesFrom(monograph: ResolvedMonograph): PublishFormValues {
+  return {
+    title: monograph.title,
+    passwordEnabled: monograph.password !== undefined,
+    password: monograph.password ?? "",
+    selfDestruct: monograph.selfDestruct
+  };
+}
 
 function useResolvedMonograph(monographId: string) {
   const result = usePromise(() => resolveMonograph(monographId), [monographId]);

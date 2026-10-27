@@ -17,11 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { forwardRef, useId, useState } from "react";
 import { Button, Flex, Text, InputProps, Input, Label } from "@notesnook/ui";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { ErrorText } from "../error-text";
 
 type Action = {
   id?: string;
@@ -36,6 +37,7 @@ type Action = {
 export type FieldProps = InputProps & {
   label?: string;
   helpText?: string;
+  error?: string;
   inputRef?: React.Ref<HTMLInputElement>;
   ["data-test-id"]?: string;
   validate?: (text: string) => boolean;
@@ -50,11 +52,15 @@ export type FieldProps = InputProps & {
   leftIcon?: Icon;
 };
 
-function Field(props: FieldProps) {
+const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
+  props,
+  ref
+) {
   const {
     label,
     styles,
     helpText,
+    error,
     action,
     sx,
     id,
@@ -68,6 +74,7 @@ function Field(props: FieldProps) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const colorScheme = useThemeStore((state) => state.colorScheme);
   const [isValid, setIsValid] = useState(true);
+  const errorId = useId();
   const rightActions = props.rightActions
     ? props.rightActions.filter((a) => !a.hidden)
     : action && !action.hidden
@@ -119,8 +126,10 @@ function Field(props: FieldProps) {
       <Flex sx={{ position: "relative", flex: 1 }}>
         <Input
           {...inputProps}
-          variant={isValid ? inputProps.variant || "input" : "error"}
-          ref={inputRef}
+          variant={isValid && !error ? inputProps.variant || "input" : "error"}
+          aria-invalid={error ? true : inputProps["aria-invalid"]}
+          aria-describedby={error ? errorId : inputProps["aria-describedby"]}
+          ref={ref || inputRef}
           id={id}
           type={isPasswordVisible ? "text" : type || "text"}
           sx={{
@@ -264,8 +273,9 @@ function Field(props: FieldProps) {
           </Flex>
         ) : null}
       </Flex>
+      <ErrorText id={errorId} error={error} />
     </Flex>
   );
-}
+});
 
 export default Field;

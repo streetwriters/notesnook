@@ -73,6 +73,7 @@
     "react-dropzone": "^14.2.3",
     "react-error-boundary": "^4.0.12",
     "react-freeze": "^1.0.4",
+    "react-hook-form": "7.90.0",
     "react-hot-toast": "^2.4.1",
     "react-loading-skeleton": "^3.3.1",
     "react-modal": "3.16.3",
