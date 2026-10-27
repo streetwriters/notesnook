@@ -23,13 +23,20 @@ import {
   Plus,
   ChevronDown,
   ChevronRight,
-  CheckboxRemove
+  Check,
+  Close,
+  CheckboxRemove,
+  CaretDown,
+  CaretRight,
+  SearchIcon
 } from "../components/icons";
 import { db } from "../common/db";
+import { checkFeature } from "../common";
 import Dialog from "../components/dialog";
 import { useStore } from "../stores/notebook-store";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
+import { store as appStore } from "../stores/app-store";
 import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
 import { create } from "zustand";
@@ -46,6 +53,12 @@ import {
 import { Checkbox } from "../components/checkbox";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
+
+const notebookSortOptions = {
+  sortBy: "dateCreated",
+  sortDirection: "desc"
+} as const;
+
 export type SelectedReference = {
   id: string;
   new: boolean;
@@ -74,11 +87,12 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
   const refreshNotebooks = useStore((store) => store.refresh);
   const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
+  const [query, setQuery] = useState("");
   const [notebooks, setNotebooks] = useState<string[]>([]);
 
   useEffect(() => {
     db.notebooks.roots
-      .ids(db.settings.getGroupOptions("notebooks"))
+      .ids(notebookSortOptions)
       .then((ids) => setNotebooks(ids));
   }, []);
 
@@ -129,8 +143,9 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
       title={strings.selectNotebooks()}
       description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
       onClose={() => _onClose(false)}
-      width={500}
+      width={700}
       noScroll
+      sx={{ minHeight: "553px" }}
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
@@ -173,48 +188,51 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         id="subnotebooks"
         variant="columnFill"
         sx={{
-          height: "80vh",
+          // height: "80vh",
           px: 4
         }}
       >
         <Field
           autoFocus
-          sx={{ m: 0, mb: 2 }}
-          styles={{
-            input: { p: "7.5px" }
+          sx={{
+            my: "spacing7",
+            input: {
+              pl: "spacing10",
+              py: "spacing6",
+              pr: "spacing4",
+              fontSize: "sm"
+            }
           }}
+          value={query}
           placeholder={strings.searchNotebooks()}
+          leftIcon={SearchIcon}
           onChange={async (e) => {
+            setQuery(e.target.value);
             const query = e.target.value.trim();
             const ids = await (query
-              ? db.lookup.notebooks(query).ids()
-              : db.notebooks.roots.ids(
-                  db.settings.getGroupOptions("notebooks")
-                ));
+              ? db.lookup
+                  .notebooks(query)
+                  .sorted(notebookSortOptions)
+                  .then((results) => results.ids())
+              : db.notebooks.roots.ids(notebookSortOptions));
             setNotebooks(ids);
           }}
+          rightActions={[
+            {
+              icon: Close,
+              onClick: async () => {
+                setQuery("");
+                setNotebooks(await db.notebooks.roots.ids(notebookSortOptions));
+              },
+              hidden: !query.trim()
+            }
+          ]}
         />
-        {isMultiselect && (
-          <Button
-            variant="anchor"
-            onClick={() => {
-              const originalSelection: SelectedReference[] = useSelectionStore
-                .getState()
-                .selected.filter((a) => !a.new)
-                .map((s) => ({ ...s, op: "add" }));
-              setSelected(originalSelection);
-              setIsMultiselect(originalSelection.length > 1);
-            }}
-            sx={{ textDecoration: "none", mb: 2 }}
-          >
-            {strings.resetSelection()}
-          </Button>
-        )}
         {notebooks.length > 0 ? (
           <>
             <VirtualizedTree
               rootId={"root"}
-              itemHeight={30}
+              itemGap={7}
               treeRef={treeRef}
               getChildNodes={async ({ id, depth }) => {
                 const nodes: TreeNode<Notebook>[] = [];
@@ -237,7 +255,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
 
                 const subNotebooks = await db.relations
                   .from({ type: "notebook", id }, "notebook")
-                  .resolve();
+                  .selector.items(undefined, notebookSortOptions);
 
                 for (const notebook of subNotebooks) {
                   const hasChildren =
@@ -273,27 +291,43 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
         ) : (
           <Flex
             sx={{
-              my: 2,
+              height: "100%",
               flexDirection: "column",
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              gap: "spacing4"
             }}
           >
-            <Text variant="body">{strings.notebooksEmpty()}</Text>
+            <Text
+              sx={{
+                color: "paragraph-secondary",
+                fontSize: "sm",
+                lineHeight: "120%"
+              }}
+            >
+              {strings.notebooksEmpty()}
+            </Text>
             <Button
               data-test-id="add-new-notebook"
-              variant="secondary"
-              sx={{ mt: 2 }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "spacing3",
+                color: "accent",
+                fontWeight: 600,
+                fontSize: "sm"
+              }}
               onClick={() =>
                 AddNotebookDialog.show({}).then((res) =>
                   res
                     ? db.notebooks.roots
-                        .ids(db.settings.getGroupOptions("notebooks"))
+                        .ids(notebookSortOptions)
                         .then((ids) => setNotebooks(ids))
                     : null
                 )
               }
             >
+              <Plus size={15} color="accent" />
               {strings.addNotebook()}
             </Button>
           </Flex>
@@ -303,15 +337,11 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   );
 });
 
-function calculateIndentation(
-  expandable: boolean,
-  depth: number,
-  base: number
-) {
-  if (expandable && depth > 0) return depth * 18 + base;
-  else if (depth === 0) return 0;
-  else return depth * 24 + base;
+function calculateIndentation(depth: number, base: number) {
+  if (depth === 0) return 0;
+  else return depth * base;
 }
+
 export function NotebookItem(props: {
   notebook: Notebook;
   isExpanded: boolean;
@@ -334,6 +364,23 @@ export function NotebookItem(props: {
   const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
   const setSelected = useSelectionStore((store) => store.setSelected);
   const isMultiselect = useSelectionStore((store) => store.isMultiselect);
+  const isSelected = useSelectionStore((store) =>
+    store.selected.some((item) => item.id === notebook.id && item.op === "add")
+  );
+  const [isAddingSubNotebook, setIsAddingSubNotebook] = useState(false);
+  const [subNotebookTitle, setSubNotebookTitle] = useState("");
+  const pendingAddRef = useRef(false);
+
+  useEffect(() => {
+    if (pendingAddRef.current && isExpanded) {
+      pendingAddRef.current = false;
+      return;
+    }
+
+    pendingAddRef.current = false;
+    setIsAddingSubNotebook(false);
+    setSubNotebookTitle("");
+  }, [isExpanded]);
 
   const check = useCallback(
     (
@@ -356,63 +403,235 @@ export function NotebookItem(props: {
     [isMultiselect, multiSelectable, notebook, setIsMultiselect, setSelected]
   );
 
+  const createSubNotebook = async () => {
+    const title = subNotebookTitle.trim();
+    if (!title) {
+      showToast("error", strings.titleIsRequired());
+      return;
+    }
+
+    try {
+      const id = await db.notebooks.add({ title });
+      if (!id) return;
+
+      await db.relations.add(
+        { type: "notebook", id: notebook.id },
+        { type: "notebook", id }
+      );
+      await notebookStore.refresh();
+      await noteStore.refresh();
+      await appStore.refreshNavItems();
+
+      showToast("success", strings.actions.created.notebook(1));
+      setIsAddingSubNotebook(false);
+      setSubNotebookTitle("");
+      onCreateItem();
+    } catch (e) {
+      if (e instanceof Error) showToast("error", e.message);
+      console.error(e);
+    }
+  };
+
+  const cancelSubNotebook = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsAddingSubNotebook(false);
+    setSubNotebookTitle("");
+  };
+
   return (
-    <Flex
-      as="li"
-      data-test-id="notebook"
-      // as="summary"
-      sx={{
-        cursor: "pointer",
-        justifyContent: "space-between",
-        alignItems: "center",
-        bg: depth === 0 ? "var(--background-secondary)" : "transparent",
-        borderRadius: "default",
-        p: depth === 0 ? 1 : 0,
-        height: depth === 0 ? "30px" : "auto",
-        ml: `${calculateIndentation(isExpandable, depth, 5)}px`,
-        mb: depth === 0 ? 1 : 2
-      }}
-      onClick={(e) => {
-        if (!isExpandable) {
-          check(e);
-          return;
-        }
-        e.stopPropagation();
-        e.preventDefault();
-        toggle();
-      }}
-    >
-      <Flex sx={{ alignItems: "center" }}>
-        {isExpandable ? (
-          isExpanded ? (
-            <ChevronDown data-test-id="collapse-notebook" size={18} />
-          ) : (
-            <ChevronRight data-test-id="expand-notebook" size={18} />
-          )
-        ) : null}
-        <SelectedCheck size={18} item={notebook} onClick={check} />
-        <Text className="title" data-test-id="notebook-title" variant="body">
-          {notebook.title}
-        </Text>
-      </Flex>
-      <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
-        <Button
-          variant="secondary"
-          data-test-id="add-sub-notebook"
-          sx={{ p: "small" }}
+    <>
+      <Flex
+        as="li"
+        data-test-id="notebook"
+        // as="summary"
+        sx={{
+          flex: 1,
+          cursor: "pointer",
+          justifyContent: "space-between",
+          alignItems: "center",
+          bg: isSelected ? "background-selected" : "background",
+          borderRadius: "radius2",
+          height: "40px",
+          padding: "spacing4",
+          ml: `${calculateIndentation(depth, 20)}px`,
+          ':hover [data-test-id="add-sub-notebook"], :focus-within [data-test-id="add-sub-notebook"]':
+            {
+              opacity: 1
+            },
+          ":hover": {
+            bg: isSelected ? "hover-selected" : "hover"
+          }
+        }}
+        onClick={(e) => {
+          if (!isExpandable) {
+            check(e);
+            return;
+          }
+          e.stopPropagation();
+          e.preventDefault();
+          toggle();
+        }}
+      >
+        <Flex sx={{ alignItems: "center", gap: "spacing4", minWidth: 0 }}>
+          <SelectedCheck size={15} item={notebook} onClick={check} />
+          <Text
+            className="title"
+            data-test-id="notebook-title"
+            sx={{
+              color: isSelected ? "paragraph-selected" : "paragraph",
+              fontSize: "sm",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              overflow: "hidden"
+            }}
+          >
+            {notebook.title}
+          </Text>
+        </Flex>
+        <Flex
+          data-test-id="notebook-tools"
+          sx={{ alignItems: "center", gap: "spacing3", flexShrink: 0 }}
         >
-          <Plus
-            size={18}
-            title={strings.newNotebook()}
+          <Button
+            data-test-id="add-sub-notebook"
+            variant="secondary"
+            sx={{
+              width: "20px",
+              height: "20px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexShrink: 0,
+              bg: "transparent",
+              opacity: 0,
+              transition: "opacity 120ms ease",
+              borderRadius: "radius0"
+            }}
             onClick={async (e) => {
               e.stopPropagation();
-              await AddNotebookDialog.show({ parentId: notebook.id });
-              onCreateItem();
+              if (!(await checkFeature("notebooks"))) return;
+
+              if (isExpandable && !isExpanded) {
+                pendingAddRef.current = true;
+                toggle();
+              }
+              setSubNotebookTitle("");
+              setIsAddingSubNotebook(true);
+            }}
+          >
+            <Plus size={15} title={strings.newNotebook()} />
+          </Button>
+          {isExpandable ? (
+            <Button
+              variant="secondary"
+              sx={{
+                width: "20px",
+                height: "20px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexShrink: 0,
+                bg: "transparent",
+                borderRadius: "radius0"
+              }}
+            >
+              {isExpanded ? (
+                <CaretDown
+                  data-test-id="collapse-notebook"
+                  size={15}
+                  color={isSelected ? "icon-selected" : "icon"}
+                />
+              ) : (
+                <CaretRight
+                  data-test-id="expand-notebook"
+                  size={15}
+                  color={isSelected ? "icon-selected" : "icon"}
+                />
+              )}
+            </Button>
+          ) : null}
+        </Flex>
+      </Flex>
+      {isAddingSubNotebook && (
+        <Flex
+          as="li"
+          data-test-id="sub-notebook-editor"
+          sx={{
+            ml: `${calculateIndentation(depth + 1, 20)}px`,
+            flexDirection: "row",
+            mt: "spacing3",
+            gap: "spacing4",
+            listStyle: "none",
+            alignItems: "center"
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Field
+            autoFocus
+            placeholder={strings.enterNotebookTitle()}
+            value={subNotebookTitle}
+            onChange={(e) => setSubNotebookTitle(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createSubNotebook();
+              } else if (e.key === "Escape") {
+                setIsAddingSubNotebook(false);
+                setSubNotebookTitle("");
+              }
+            }}
+            sx={{ flex: 1, m: 0, gap: "spacing2" }}
+            styles={{
+              input: {
+                fontSize: "sm",
+                px: "spacing5",
+                py: "spacing6",
+                height: "45px"
+              }
             }}
           />
-        </Button>
-      </Flex>
-    </Flex>
+          <Flex sx={{ gap: "spacing3" }}>
+            <Button
+              aria-label={strings.submit()}
+              title={strings.submit()}
+              disabled={!subNotebookTitle.trim()}
+              onClick={(e) => {
+                e.stopPropagation();
+                createSubNotebook();
+              }}
+              sx={{
+                width: "20px",
+                height: "20px",
+                p: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "radius0"
+              }}
+            >
+              <Check size={15} color="accent" />
+            </Button>
+            <Button
+              aria-label={strings.cancel()}
+              title={strings.cancel()}
+              onClick={cancelSubNotebook}
+              sx={{
+                width: "20px",
+                height: "20px",
+                p: 0,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "radius0"
+              }}
+            >
+              <Close size={15} color="icon" />
+            </Button>
+          </Flex>
+        </Flex>
+      )}
+    </>
   );
 }
 
