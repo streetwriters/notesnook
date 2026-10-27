@@ -245,6 +245,11 @@ const Actions = ({
                   });
                 return true;
               } catch (e) {
+                ToastManager.error(
+                  e as Error,
+                  strings.failedToDelete(),
+                  "local"
+                );
                 return false;
               }
             }
