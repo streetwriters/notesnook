@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Notebook } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
-import { store as notebookStore, useStore } from "../stores/notebook-store";
+import { store as notebookStore } from "../stores/notebook-store";
 import { useRelationChangesStore } from "../stores/relation-changes-store";
 import { NotebookPicker } from "../components/notebook-picker";
 
@@ -33,27 +33,14 @@ type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
 
 export const MoveNotebookDialog = DialogManager.register(
   function MoveNotebookDialog({ onClose, notebook }: MoveNotebookDialogProps) {
-    const setSelected = useRelationChangesStore((store) => store.setSelected);
-    const refreshNotebooks = useStore((store) => store.refresh);
     const notebookId = notebook.id;
 
-    useEffect(() => {
-      (async function () {
-        const parentNotebookId = await db.notebooks.parentId(notebookId);
-        const selected = useRelationChangesStore.getState().selected[0];
-        if (!selected && parentNotebookId) {
-          setSelected([{ id: parentNotebookId, new: false, op: "add" }]);
-        }
-      })();
-    }, [notebookId, refreshNotebooks, setSelected]);
-
-    const _onClose = useCallback(
-      (result: boolean) => {
-        setSelected([]);
-        onClose(result);
-      },
-      [setSelected, onClose]
-    );
+    const initialSelection = useCallback(async () => {
+      const parentNotebookId = await db.notebooks.parentId(notebookId);
+      return parentNotebookId
+        ? [{ id: parentNotebookId, new: false, op: "add" as const }]
+        : [];
+    }, [notebookId]);
 
     return (
       <Dialog
@@ -61,7 +48,7 @@ export const MoveNotebookDialog = DialogManager.register(
         isOpen={true}
         title={`${strings.move()} ${notebook.title}`}
         description={strings.moveNotebookDesc()}
-        onClose={() => _onClose(false)}
+        onClose={() => onClose(false)}
         width={700}
         noScroll
         sx={{ minHeight: "553px" }}
@@ -83,15 +70,18 @@ export const MoveNotebookDialog = DialogManager.register(
               }
             }
             await notebookStore.refresh();
-            _onClose(true);
+            onClose(true);
           }
         }}
         negativeButton={{
           text: strings.cancel(),
-          onClick: () => _onClose(false)
+          onClick: () => onClose(false)
         }}
       >
-        <NotebookPicker excludeId={notebookId} />
+        <NotebookPicker
+          excludeId={notebookId}
+          initialSelection={initialSelection}
+        />
       </Dialog>
     );
   }

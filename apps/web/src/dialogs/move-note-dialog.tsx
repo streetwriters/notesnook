@@ -17,10 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { db } from "../common/db";
 import Dialog from "../components/dialog";
-import { useStore } from "../stores/notebook-store";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
@@ -39,47 +38,25 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   onClose,
   noteIds
 }: MoveNoteDialogProps) {
-  const setSelected = useRelationChangesStore((store) => store.setSelected);
-  const setIsMultiselect = useRelationChangesStore(
-    (store) => store.setIsMultiselect
-  );
-  const refreshNotebooks = useStore((store) => store.refresh);
+  const initialSelection = useCallback(async () => {
+    const selected: RelationChange[] = [];
+    for (const { fromId: notebookId } of await db.relations
+      .to({ type: "note", ids: noteIds }, "notebook")
+      .get()) {
+      const isSelected =
+        selected.findIndex((item) => item.id === notebookId) > -1;
+      if (isSelected) continue;
 
-  useEffect(() => {
-    (async function () {
-      const selected: RelationChange[] = useRelationChangesStore
-        .getState()
-        .selected.slice();
-
-      for (const { fromId: notebookId } of await db.relations
-        .to({ type: "note", ids: noteIds }, "notebook")
-        .get()) {
-        const isSelected =
-          selected.findIndex((item) => item.id === notebookId) > -1;
-        if (isSelected) continue;
-
-        if (await notebookHasNotes(notebookId, noteIds)) {
-          selected.push({
-            id: notebookId,
-            op: "add",
-            new: false
-          });
-        }
+      if (await notebookHasNotes(notebookId, noteIds)) {
+        selected.push({
+          id: notebookId,
+          op: "add",
+          new: false
+        });
       }
-
-      setSelected(selected);
-      setIsMultiselect(selected.length > 1);
-    })();
-  }, [noteIds, refreshNotebooks, setSelected, setIsMultiselect]);
-
-  const _onClose = useCallback(
-    (result: boolean) => {
-      setSelected([]);
-      setIsMultiselect(false);
-      onClose(result);
-    },
-    [setSelected, setIsMultiselect, onClose]
-  );
+    }
+    return selected;
+  }, [noteIds]);
 
   return (
     <Dialog
@@ -87,7 +64,7 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
       isOpen={true}
       title={strings.selectNotebooks()}
       description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
-      onClose={() => _onClose(false)}
+      onClose={() => onClose(false)}
       width={700}
       noScroll
       sx={{ minHeight: "553px" }}
@@ -121,15 +98,15 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
             );
           }
 
-          _onClose(true);
+          onClose(true);
         }
       }}
       negativeButton={{
         text: strings.cancel(),
-        onClick: () => _onClose(false)
+        onClick: () => onClose(false)
       }}
     >
-      <NotebookPicker multiSelectable />
+      <NotebookPicker multiSelectable initialSelection={initialSelection} />
     </Dialog>
   );
 });

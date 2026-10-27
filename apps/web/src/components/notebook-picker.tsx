@@ -37,6 +37,7 @@ import {
 } from "./virtualized-tree";
 import { SelectedCheck } from "./selected-check";
 import {
+  RelationChange,
   selectMultiple,
   selectSingle,
   useRelationChangesStore
@@ -50,14 +51,31 @@ const notebookSortOptions = {
 export function NotebookPicker(props: {
   excludeId?: string;
   multiSelectable?: boolean;
+  initialSelection: () => Promise<RelationChange[]>;
 }) {
-  const { excludeId, multiSelectable } = props;
+  const { excludeId, multiSelectable, initialSelection } = props;
   const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
   const [query, setQuery] = useState("");
   const [notebooks, setNotebooks] = useState<string[]>([]);
   const excludedIds = useRef<Set<string>>(new Set());
   const excludedParentId = useRef<string>();
   const searchId = useRef(0);
+
+  useEffect(() => {
+    const { setSelected, setIsMultiselect } =
+      useRelationChangesStore.getState();
+    let cancelled = false;
+    initialSelection().then((selected) => {
+      if (cancelled) return;
+      setSelected(selected);
+      setIsMultiselect(!!multiSelectable && selected.length > 1);
+    });
+    return () => {
+      cancelled = true;
+      setSelected([]);
+      setIsMultiselect(false);
+    };
+  }, [initialSelection, multiSelectable]);
 
   useEffect(() => {
     (async function () {
@@ -176,10 +194,12 @@ export function NotebookPicker(props: {
               isExpandable={item.hasChildren}
               isExpanded={expanded}
               toggle={expanded ? collapse : expand}
-              onCreateItem={() => {
+              onCreateSubNotebook={async (title) => {
+                if (!(await addSubNotebook(item.data.id, title))) return false;
                 treeRef.current?.refreshItem(index, item.data, {
                   expand: true
                 });
+                return true;
               }}
               multiSelectable={multiSelectable}
             />
@@ -233,6 +253,28 @@ export function NotebookPicker(props: {
   );
 }
 
+async function addSubNotebook(parentId: string, title: string) {
+  try {
+    const id = await db.notebooks.add({ title });
+    if (!id) return false;
+
+    await db.relations.add(
+      { type: "notebook", id: parentId },
+      { type: "notebook", id }
+    );
+    await notebookStore.refresh();
+    await noteStore.refresh();
+    await appStore.refreshNavItems();
+
+    showToast("success", strings.actions.created.notebook(1));
+    return true;
+  } catch (e) {
+    if (e instanceof Error) showToast("error", e.message);
+    console.error(e);
+    return false;
+  }
+}
+
 function calculateIndentation(depth: number, base: number) {
   if (depth === 0) return 0;
   else return depth * base;
@@ -244,7 +286,7 @@ export function NotebookItem(props: {
   isExpandable: boolean;
   toggle: () => void;
   depth: number;
-  onCreateItem: () => void;
+  onCreateSubNotebook: (title: string) => Promise<boolean>;
   multiSelectable?: boolean;
 }) {
   const {
@@ -253,7 +295,7 @@ export function NotebookItem(props: {
     toggle,
     depth,
     isExpandable,
-    onCreateItem,
+    onCreateSubNotebook,
     multiSelectable
   } = props;
 
@@ -308,25 +350,9 @@ export function NotebookItem(props: {
       return;
     }
 
-    try {
-      const id = await db.notebooks.add({ title });
-      if (!id) return;
-
-      await db.relations.add(
-        { type: "notebook", id: notebook.id },
-        { type: "notebook", id }
-      );
-      await notebookStore.refresh();
-      await noteStore.refresh();
-      await appStore.refreshNavItems();
-
-      showToast("success", strings.actions.created.notebook(1));
+    if (await onCreateSubNotebook(title)) {
       setIsAddingSubNotebook(false);
       setSubNotebookTitle("");
-      onCreateItem();
-    } catch (e) {
-      if (e instanceof Error) showToast("error", e.message);
-      console.error(e);
     }
   };
 
