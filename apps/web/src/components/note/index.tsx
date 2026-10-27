@@ -46,7 +46,10 @@ import { Multiselect } from "../../common/multi-select";
 import Vault from "../../common/vault";
 import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
 import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
-import { ConfirmDialog } from "../../dialogs/confirm";
+import {
+  ConfirmDialog,
+  showUnpublishConfirmation
+} from "../../dialogs/confirm";
 import { CreateColorDialog } from "../../dialogs/create-color-dialog";
 import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
 import { navigate } from "../../navigation";
@@ -533,6 +536,7 @@ export const noteMenuItems: (
                 title: strings.unpublish(),
                 iconComponent: CloudSlash,
                 onClick: async () => {
+                  if (!(await showUnpublishConfirmation())) return;
                   await useMonographStore.getState().unpublish(note.id);
                 }
               }

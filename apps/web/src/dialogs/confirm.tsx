@@ -237,6 +237,16 @@ export function showClearSessionsConfirmation() {
   });
 }
 
+export function showUnpublishConfirmation() {
+  return ConfirmDialog.show({
+    title: "Unpublish note?",
+    subtitle:
+      "Are you sure you want to unpublish this note? It will no longer be accessible via the public link.",
+    positiveButtonText: "Yes, unpublish",
+    negativeButtonText: strings.cancel()
+  });
+}
+
 export async function showUpdateAvailableNotice({
   version
 }: {

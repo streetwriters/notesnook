@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Flex, Text, Button, Link, Switch } from "@theme-ui/components";
 import {
   ArrowCounterClockwise,
@@ -48,6 +48,7 @@ import Dialog from "../../components/dialog";
 import Field from "../field";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { ErrorText } from "../error-text";
+import { showUnpublishConfirmation } from "../../dialogs/confirm";
 
 export const PublishDialog = DialogManager.register(function PublishDialog(
   props: BaseDialogProps<boolean> & { note: Note }
@@ -60,7 +61,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   } = useResolvedMonograph(note.id);
 
   const [status, setStatus] = useState<{
-    action: "publish" | "unpublish" | "analytics";
+    action: "publish" | "unpublish";
   }>();
   const [processingStatus, setProcessingStatus] = useState<{
     total?: number;
@@ -78,8 +79,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const [copied, setCopied] = useState(false);
-  const [showTitleRequiredError, setShowTitleRequiredError] =
-    useState(false);
+  const [showTitleRequiredError, setShowTitleRequiredError] = useState(false);
   const [showPasswordRequiredError, setShowPasswordRequiredError] =
     useState(false);
   const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
@@ -115,42 +115,40 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
     };
   }, [note.id]);
 
+  const resetMonographFields = useCallback(() => {
+    setMonographFields({
+      title: note.title,
+      password: undefined,
+      selfDestruct: false
+    });
+  }, [note.title]);
+
   useEffect(() => {
     const monographsUpdatedEvent = db.eventManager.subscribe(
       EVENTS.monographsUpdated,
       async (ids?: string[]) => {
         if (ids && ids.length > 0 && !ids.includes(note.id)) return;
 
-        refreshMonograph?.();
+        refreshMonograph();
 
         // if monograph has been unpublished, reset all the fields
-        if (!(await db.monographs.get(note.id))) {
-          setMonographFields({
-            title: note.title,
-            password: undefined,
-            selfDestruct: false
-          });
-        }
+        if (!(await db.monographs.get(note.id))) resetMonographFields();
       }
     );
 
     return () => {
       monographsUpdatedEvent.unsubscribe();
     };
-  }, [note.id, refreshMonograph]);
+  }, [note.id, refreshMonograph, resetMonographFields]);
 
   async function handleUnpublish() {
+    if (!(await showUnpublishConfirmation())) return;
+
     try {
       setStatus({ action: "unpublish" });
-      const unpublished = await unpublishNote(note.id);
-      if (unpublished === false) return;
-
-      refreshMonograph?.();
-      setMonographFields({
-        title: note.title,
-        password: undefined,
-        selfDestruct: false
-      });
+      await unpublishNote(note.id);
+      refreshMonograph();
+      resetMonographFields();
       showToast("success", strings.actions.unpublished.note(1));
     } catch (e) {
       console.error(e);
@@ -165,7 +163,6 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
 
   async function handlePublish() {
     try {
-      setStatus({ action: "publish" });
       const title = monographFields.title;
 
       if (!title || title.trim().length === 0) {
@@ -179,11 +176,12 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         return;
       }
 
+      setStatus({ action: "publish" });
       await publishNote(note.id, title, {
         selfDestruct: monographFields.selfDestruct,
         password: monographFields.password
       });
-      refreshMonograph?.();
+      refreshMonograph();
       showToast("success", strings.actions.published.note(1));
     } catch (e) {
       console.error(e);
@@ -211,7 +209,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
         }}
         positiveButton={{
           text: strings.tryAgain(),
-          onClick: () => refreshMonograph?.()
+          onClick: () => refreshMonograph()
         }}
       >
         <Text sx={{ color: "paragraph-error", m: "spacing7" }}>
@@ -227,7 +225,8 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
       monograph.selfDestruct !== monographFields.selfDestruct
     : true;
   const isLoading =
-    monographStatus === "pending" ||
+    (monographStatus === "pending" && !monograph) ||
+    (metadata.status === "pending" && !("value" in metadata)) ||
     status?.action === "publish" ||
     status?.action === "unpublish";
 
@@ -245,7 +244,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
       positiveButton={{
         text: monograph?.id ? strings.update() : strings.publish(),
         onClick: handlePublish,
-        disabled: isLoading || status?.action === "analytics" || !isChanged,
+        disabled: isLoading || !isChanged,
         loading: status?.action === "publish"
       }}
     >
@@ -267,9 +266,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
           disabled={isLoading}
           onChange={(event) => {
             const title = event.currentTarget.value;
-            setShowTitleRequiredError(
-              (error) => error && !title.trim()
-            );
+            setShowTitleRequiredError((error) => error && !title.trim());
             setMonographFields((fields) => ({
               ...fields,
               title
@@ -285,7 +282,10 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
           }}
         />
         {showTitleRequiredError ? (
-          <ErrorText error={strings.titleIsRequired()} sx={{ mt: "spacing4" }} />
+          <ErrorText
+            error={strings.titleIsRequired()}
+            sx={{ mt: "spacing4" }}
+          />
         ) : null}
 
         {monograph?.id ? (
@@ -315,7 +315,7 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
               <Button
                 variant="new_error_bordered"
                 onClick={handleUnpublish}
-                disabled={isLoading || status?.action === "analytics"}
+                disabled={isLoading}
                 sx={{
                   flexShrink: 0,
                   p: "spacing4",
@@ -418,32 +418,25 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
               description="Views on your published note"
               action={
                 monographAnalytics?.isAllowed ? (
-                  metadata.status === "fulfilled" ? (
-                    <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+                  <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+                    {"value" in metadata && metadata.value ? (
                       <Text sx={{ fontSize: "xs", color: "heading" }}>
                         {metadata.value.analytics.totalViews}
                       </Text>
-                      <Button
-                        variant="tertiary"
-                        disabled={isLoading}
-                        onClick={async () => {
-                          try {
-                            setStatus({ action: "analytics" });
-                            metadata.refresh();
-                          } finally {
-                            setStatus(undefined);
-                          }
-                        }}
-                      >
-                        <ArrowCounterClockwise
-                          size={13}
-                          rotate={status?.action === "analytics"}
-                        />
-                      </Button>
-                    </Flex>
-                  ) : (
-                    <Loading size={14} />
-                  )
+                    ) : null}
+                    <Button
+                      variant="tertiary"
+                      disabled={isLoading}
+                      onClick={() =>
+                        metadata.status !== "pending" && metadata.refresh()
+                      }
+                    >
+                      <ArrowCounterClockwise
+                        size={13}
+                        rotate={metadata.status === "pending"}
+                      />
+                    </Button>
+                  </Flex>
                 ) : monographAnalytics ? (
                   <Button
                     variant="anchor"
@@ -699,11 +692,14 @@ type ResolvedMonograph = {
 
 function useResolvedMonograph(monographId: string) {
   const result = usePromise(() => resolveMonograph(monographId), [monographId]);
+  const refresh = useCallback(() => {
+    if ("refresh" in result) result.refresh();
+  }, [result]);
 
   return {
     status: result.status,
     monograph: result.status === "rejected" ? undefined : result.value,
-    refresh: result.status === "pending" ? undefined : result.refresh
+    refresh
   };
 }
 
