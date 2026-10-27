@@ -302,20 +302,6 @@ function Header(props: RouteContainerProps) {
                 flex: 1
               }}
             >
-              {!isMobile && (
-                <SearchIcon
-                  size={15}
-                  color="icon"
-                  sx={{
-                    left: "spacing4",
-                    pointerEvents: "none",
-                    position: "absolute",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    zIndex: 1
-                  }}
-                />
-              )}
               <Field
                 inputRef={inputRef}
                 data-test-id="search-input"
@@ -323,6 +309,7 @@ function Header(props: RouteContainerProps) {
                 name="search"
                 type="text"
                 variant="clean"
+                leftIcon={!isMobile ? SearchIcon : undefined}
                 sx={{
                   gap: 0,
                   m: 0,
