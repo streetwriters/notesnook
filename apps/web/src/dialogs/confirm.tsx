@@ -237,6 +237,15 @@ export function showClearSessionsConfirmation() {
   });
 }
 
+export function showUnpublishConfirmation() {
+  return ConfirmDialog.show({
+    title: strings.doActions.unpublish.note(1),
+    subtitle: strings.unpublishNoteConfirm(),
+    positiveButtonText: strings.yesUnpublish(),
+    negativeButtonText: strings.cancel()
+  });
+}
+
 export async function showUpdateAvailableNotice({
   version
 }: {

@@ -3338,6 +3338,10 @@ msgstr ""
 msgid "Failed to load API keys. Please try again."
 msgstr ""
 
+#: src/strings.ts:3069
+msgid "Failed to load monograph. Please try again."
+msgstr ""
+
 #: src/strings.ts:997
 msgid "Failed to open"
 msgstr ""

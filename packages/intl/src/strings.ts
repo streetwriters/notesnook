@@ -3065,5 +3065,6 @@ Continue without attachments?`,
     t`An error occured during sync. please try again in a moment.`,
   youAreOffline: () => t`You are offline`,
   groupCreated: () => t`Group created`,
-  groupDeleted: () => t`Group deleted`
+  groupDeleted: () => t`Group deleted`,
+  failedToLoadMonograph: () => t`Failed to load monograph. Please try again.`
 };

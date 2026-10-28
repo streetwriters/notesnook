@@ -3349,6 +3349,10 @@ msgstr "Failed to install theme."
 msgid "Failed to load API keys. Please try again."
 msgstr "Failed to load API keys. Please try again."
 
+#: src/strings.ts:3069
+msgid "Failed to load monograph. Please try again."
+msgstr "Failed to load monograph. Please try again."
+
 #: src/strings.ts:997
 msgid "Failed to open"
 msgstr "Failed to open"

@@ -22,6 +22,7 @@ import { Flex, FlexProps, Text } from "@theme-ui/components";
 import { Error as ErrorIcon, Warning } from "../icons";
 
 type ErrorTextProps = { error?: string | Error | null | false } & FlexProps;
+
 export function ErrorText(props: ErrorTextProps) {
   const { error, sx, ...restProps } = props;
 
@@ -66,7 +67,6 @@ export function AuthErrorText(props: ErrorTextProps) {
   if (!error) return null;
   return (
     <Flex
-      p={1}
       sx={{
         alignItems: "center",
         overflowY: "auto",
