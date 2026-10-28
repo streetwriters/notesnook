@@ -22,7 +22,7 @@ import { Button, Flex, Text, InputProps, Input, Label } from "@notesnook/ui";
 import { ThemeUIStyleObject } from "@theme-ui/css";
 import { PasswordVisible, PasswordInvisible, Icon } from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { ErrorText } from "../error-text";
+import { AuthErrorText } from "../error-text";
 
 type Action = {
   id?: string;
@@ -273,7 +273,7 @@ const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
           </Flex>
         ) : null}
       </Flex>
-      <ErrorText id={errorId} error={error} />
+      <AuthErrorText id={errorId} error={error} />
     </Flex>
   );
 });
