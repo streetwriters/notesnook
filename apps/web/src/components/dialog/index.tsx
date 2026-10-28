@@ -263,7 +263,7 @@ export function DialogButton({
         py: "spacing6"
       }}
     >
-      {loading ? <Loading size={16} color="accent" /> : text}
+      {loading ? <Loading size={16} color={"currentColor"} /> : text}
     </Button>
   );
 }

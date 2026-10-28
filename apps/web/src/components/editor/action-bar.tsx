@@ -85,7 +85,7 @@ import { useWindowControls } from "../../hooks/use-window-controls";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
-import { showPublishView } from "../publish-view";
+import { PublishDialog } from "../publish-view";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
@@ -146,14 +146,14 @@ export function EditorActionBar({
       enabled:
         activeSession &&
         (activeSession.type === "default" || activeSession.type === "readonly"),
-      onClick: (e) => {
+      onClick: () => {
         if (
           !activeSession ||
           (activeSession.type !== "default" &&
             activeSession.type !== "readonly")
         )
           return;
-        showPublishView(activeSession.note, e.target as HTMLElement);
+        PublishDialog.show({ note: activeSession.note });
       }
     },
     {
