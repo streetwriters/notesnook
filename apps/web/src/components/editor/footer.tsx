@@ -255,15 +255,17 @@ function EditorFooter() {
       </PopupPresenter>
       <EditorFooterSeparator />
       {dateEdited > 0 ? (
-        <StatusBarItem
-          variant="text"
-          className="selectable"
-          data-test-id="editor-date-edited"
-          title={dateEdited.toString()}
-          text={getFormattedDate(dateEdited)}
-        />
+        <>
+          <StatusBarItem
+            variant="text"
+            className="selectable"
+            data-test-id="editor-date-edited"
+            title={dateEdited.toString()}
+            text={getFormattedDate(dateEdited)}
+          />
+          <EditorFooterSeparator />
+        </>
       ) : null}
-      <EditorFooterSeparator />
       {SaveStateIcon && (
         <StatusBarItem
           variant="button"
