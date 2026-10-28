@@ -39,6 +39,8 @@ import { checkFeature } from "../common";
 import { Box } from "@notesnook/ui";
 import { Tag as TagIcon } from "../components/icons";
 
+const TAG_ITEM_HEIGHT = 35;
+
 type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
   props: AddTagsDialogProps
@@ -47,6 +49,8 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
   const [tags, setTags] = useState<VirtualizedGrouping<Tag> | undefined>(
     () => useStore.getState().tags
   );
+  const selected = useRelationChangesStore((state) => state.selected);
+  const hasChanges = selected.some((item) => item.new || item.op === "remove");
 
   useEffect(() => {
     (async function () {
@@ -78,6 +82,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
       sx={{ minHeight: 434 }}
       positiveButton={{
         text: strings.done(),
+        disabled: !hasChanges,
         onClick: async () => {
           const { selected } = useRelationChangesStore.getState();
           for (const id of noteIds) {
@@ -103,7 +108,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
           <FilteredList
             getItemKey={(index) => tags.key(index)}
             mode="fixed"
-            estimatedSize={36}
+            estimatedSize={TAG_ITEM_HEIGHT}
             items={tags.placeholders}
             placeholders={{
               empty: "Add tags",
@@ -160,6 +165,7 @@ function TagItem(props: { tag: Tag }) {
       sx={{
         cursor: "pointer",
         alignItems: "center",
+        height: `${TAG_ITEM_HEIGHT}px`,
         bg: isHighlighted ? "background-selected" : "background",
         borderRadius: "radius1",
         p: "spacing4",
@@ -167,6 +173,7 @@ function TagItem(props: { tag: Tag }) {
           bg: "hover"
         }
       }}
+      title={tag.title}
       onClick={toggleSelection}
     >
       <Flex sx={{ alignItems: "center", gap: "spacing4", width: "100%" }}>
