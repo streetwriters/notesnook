@@ -215,7 +215,11 @@ async function createWindow() {
   });
 
   nativeTheme.on("updated", () => {
-    setupTray();
+    if (
+      config.desktopSettings.closeToSystemTray ||
+      config.desktopSettings.minimizeToSystemTray
+    )
+      setupTray();
     setupJumplist();
   });
 
