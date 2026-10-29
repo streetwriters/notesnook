@@ -90,8 +90,7 @@ export function createKeySelector(
     else if ("conflicted" in item && item.conflicted) return "Conflicted";
 
     const date = new Date();
-    if (item.type === "reminder")
-      return getReminderGroup(item as Reminder);
+    if (item.type === "reminder") return getReminderGroup(item as Reminder);
     else if (options.groupBy === "abc")
       return getFirstCharacter(getTitle(item));
     else {
@@ -122,7 +121,8 @@ export function createKeySelector(
 
 export function groupArray<T>(
   items: T[],
-  keySelector: GroupKeySelectorFunction<T>
+  keySelector: GroupKeySelectorFunction<T>,
+  includeCounts = false
 ): Map<number, { index: number; group: GroupHeader }> {
   const groups = new Map<
     string,
@@ -133,14 +133,22 @@ export function groupArray<T>(
     const item = items[i];
     const groupTitle = keySelector(item);
     const group = groups.get(groupTitle);
-    if (typeof group === "undefined")
+    if (typeof group === "undefined") {
       groups.set(groupTitle, [
         i,
         {
           index: i,
-          group: { id: groupTitle, title: groupTitle, type: "header" }
+          group: {
+            id: groupTitle,
+            title: groupTitle,
+            type: "header",
+            ...(includeCounts ? { count: 1 } : {})
+          }
         }
       ]);
+    } else if (includeCounts) {
+      group[1].group.count = (group[1].group.count ?? 0) + 1;
+    }
   }
   return new Map(groups.values());
 }

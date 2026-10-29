@@ -38,9 +38,10 @@ class ReminderStore extends BaseStore<ReminderStore> {
   refresh = async (reset = true) => {
     const reminders = db.reminders.all;
     this.set({
-      reminders: await reminders.grouped(
-        db.settings.getGroupOptions("reminders")
-      )
+      reminders: await reminders.grouped({
+        ...db.settings.getGroupOptions("reminders"),
+        includeCounts: true
+      })
     });
 
     if (reset) {
