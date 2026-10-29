@@ -106,15 +106,7 @@ export function getPosition(
     if (location === "left") position.left -= elementWidth;
   }
 
-  if (actualY + elementHeight > windowHeight) {
-    position.top =
-      target === "mouse"
-        ? windowHeight - elementHeight
-        : windowHeight - elementHeight - actualY + y;
-  } else {
-    position.top = y;
-  }
-
+  position.top = y;
   if (height) {
     if (location === "below") position.top += height;
     else if (location === "top") position.top = y - elementHeight;
@@ -131,20 +123,22 @@ export function getPosition(
     position.left -= elementWidth - width;
   }
 
-  // Adjust menu height
-  if (elementHeight > windowHeight - position.top) {
-    element.style.maxHeight = `${windowHeight - 20}px`;
-  }
-
   if (yAnchor) {
     const anchorY = getElementPosition(yAnchor, isTargetAbsolute);
     position.top = anchorY.y - elementHeight;
   }
 
-  position.top = isTargetAbsolute && position.top < 0 ? 0 : position.top;
   position.left = isTargetAbsolute && position.left < 0 ? 0 : position.left;
   position.top += location === "below" ? yOffset : -yOffset;
   position.left += xOffset;
+
+  const yDiff = actualY - y;
+  const maxHeight = Math.max(0, windowHeight);
+  if (elementHeight > maxHeight) {
+    element.style.maxHeight = `${maxHeight}px`;
+  }
+  const maxTop = Math.max(0, windowHeight - element.offsetHeight);
+  position.top = Math.min(Math.max(position.top + yDiff, 0), maxTop) - yDiff;
 
   return position;
 }
