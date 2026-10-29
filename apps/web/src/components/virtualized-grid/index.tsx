@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { Box } from "@theme-ui/components";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type VirtualizedGridProps<T> = {
   virtualizerRef?: React.MutableRefObject<
@@ -49,6 +49,15 @@ export function VirtualizedGrid<T>(props: VirtualizedGridProps<T>) {
     onEndReached
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
+  const [measuredOffset, setMeasuredOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    if (scrollMargin !== undefined) return;
+    if (containerRef.current) {
+      const offset = containerRef.current.offsetTop || 0;
+      setMeasuredOffset((prev) => (prev !== offset ? offset : prev));
+    }
+  }, [scrollMargin]);
 
   const virtualizer = useVirtualizer({
     lanes: columns,
@@ -57,7 +66,7 @@ export function VirtualizedGrid<T>(props: VirtualizedGridProps<T>) {
     getItemKey,
     getScrollElement: () =>
       scrollElement || containerRef.current?.closest(".ms-container") || null,
-    scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0
+    scrollMargin: scrollMargin ?? measuredOffset
   });
 
   useEffect(() => {
