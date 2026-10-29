@@ -68,7 +68,7 @@ export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
       const offset = containerRef.current.offsetTop || 0;
       setMeasuredOffset((prev) => (prev !== offset ? offset : prev));
     }
-  }, [scrollMargin]);
+  });
 
   const virtualizer = useVirtualizer({
     count: items.length,

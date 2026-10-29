@@ -57,7 +57,7 @@ export function VirtualizedGrid<T>(props: VirtualizedGridProps<T>) {
       const offset = containerRef.current.offsetTop || 0;
       setMeasuredOffset((prev) => (prev !== offset ? offset : prev));
     }
-  }, [scrollMargin]);
+  });
 
   const virtualizer = useVirtualizer({
     lanes: columns,
