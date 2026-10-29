@@ -67,6 +67,7 @@ export type GroupHeader = {
   type: "header";
   id: string;
   title: string;
+  count?: number;
 };
 
 export type Collections = {
