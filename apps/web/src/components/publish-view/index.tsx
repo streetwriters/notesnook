@@ -441,6 +441,10 @@ function MonographStats({
               onClick={() =>
                 UpgradeDialog.show({ feature: monographAnalytics })
               }
+              sx={{
+                fontWeight: 500,
+                fontSize: "xs"
+              }}
             >
               {strings.upgrade()}
             </Button>
