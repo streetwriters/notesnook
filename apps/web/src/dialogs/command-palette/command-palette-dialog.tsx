@@ -220,7 +220,9 @@ export const CommandPaletteDialog = DialogManager.register(
                       fontSize: "sm"
                     }}
                   >
-                    {query ? strings.noResultsFound(query) : ""}
+                    {query
+                      ? strings.noResultsFound(query)
+                      : "No recent searches"}
                   </Text>
                 </Flex>
               ),
@@ -311,6 +313,7 @@ export const CommandPaletteDialog = DialogManager.register(
                       <Box
                         className="command-icon"
                         sx={{
+                          flexShrink: 0,
                           bg: "background-secondary",
                           width: "25px",
                           height: "25px",

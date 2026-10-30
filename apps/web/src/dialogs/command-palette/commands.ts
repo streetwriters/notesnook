@@ -26,8 +26,6 @@ import {
   Icon,
   Plus,
   Notebook as NotebookIcon,
-  Note as NoteIcon,
-  Reminder as ReminderIcon,
   Tag as TagIcon,
   Eyeglasses,
   EyeglassesEmpty,
@@ -99,10 +97,10 @@ export const commandActions = {
 
 export const commandIcons = {
   command: (command: BaseCommand) => getCommandById(command.id)?.icon,
-  note: NoteIcon,
+  note: FileText,
   notebook: NotebookIcon,
   tag: TagIcon,
-  reminder: ReminderIcon
+  reminder: Bell
 };
 
 const RECENT_COMMANDS_SAVE_KEY = "commandPalette:recent";
