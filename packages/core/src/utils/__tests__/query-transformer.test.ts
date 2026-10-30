@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { expect, test } from "vitest";
-import { transformQuery } from "../query-transformer.js";
+import { serializeExpression, transformQuery } from "../query-transformer.js";
 
 const TRANSFORM_QUERY_TESTS: [string, string | undefined][] = [
   ["hello world", `hello AND world`],
@@ -69,7 +69,17 @@ const TRANSFORM_QUERY_TESTS: [string, string | undefined][] = [
   [">he", `">he"`],
   ["something<hello", `"something<hello"`],
   ["<", `"<"`],
-  [">", `">"`]
+  [">", `">"`],
+  ["ab OR hello", `ab OR hello`],
+  ["hello ab OR world", `hello AND ab OR world`],
+  ["hello NOT ab", `hello NOT ab`],
+  ['a"b hello', `"a""b hello"`],
+  ['"foo', `"""foo"`],
+  ['foo"', `"foo"""`],
+  ['"" OR hello', `hello`],
+  ['hello OR ""', `hello`],
+  ['"" NOT hello', ``],
+  ['hello NOT ""', `hello`]
 ];
 
 for (const [input, expectedOutput] of TRANSFORM_QUERY_TESTS) {
@@ -110,4 +120,34 @@ test("should separate repeated quoted tag filters", () => {
     "one two",
     "three four"
   ]);
+});
+
+test("should parse query with FTS5 operator precedence", () => {
+  const term = (value: string) => ({ type: "term", value });
+  expect(
+    transformQuery("hello OR ab world NOT foo").content?.expression
+  ).toEqual({
+    type: "OR",
+    left: term("hello"),
+    right: {
+      type: "AND",
+      left: term("ab"),
+      right: { type: "NOT", left: term("world"), right: term("foo") }
+    }
+  });
+});
+
+test("should add parentheses when serializing nested expressions", () => {
+  const term = (value: string) => ({ type: "term" as const, value });
+  expect(
+    serializeExpression({
+      type: "AND",
+      left: { type: "OR", left: term("foo"), right: term("bar") },
+      right: {
+        type: "NOT",
+        left: term("baz"),
+        right: { type: "OR", left: term("qux"), right: term("quux") }
+      }
+    })
+  ).toBe("(foo OR bar) AND baz NOT (qux OR quux)");
 });

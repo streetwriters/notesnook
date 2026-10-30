@@ -46,6 +46,48 @@ test("search notes", () =>
     expect(await db.lookup.notes("hb kb ch").ids()).toHaveLength(1);
   }));
 
+test("search notes with unbalanced quotes", () =>
+  noteTest({
+    content: { type: "tiptap", data: `<p>he said "hello" to the world</p>` }
+  }).then(async ({ db }) => {
+    expect(await db.lookup.notes('"hello').ids()).toHaveLength(1);
+    expect(await db.lookup.notes('hello"').ids()).toHaveLength(1);
+    expect(await db.lookup.notes('said "hello').ids()).toHaveLength(1);
+  }));
+
+test("search notes with short terms in boolean queries", () =>
+  databaseTest().then(async (db) => {
+    const notes = {
+      world: await db.notes.add({
+        title: "first",
+        content: { type: "tiptap", data: "<p>hello world</p>" }
+      }),
+      onyx: await db.notes.add({
+        title: "second",
+        content: { type: "tiptap", data: "<p>the onyx stone</p>" }
+      }),
+      helloOnyx: await db.notes.add({
+        title: "third",
+        content: { type: "tiptap", data: "<p>hello onyx</p>" }
+      }),
+      title: await db.notes.add({
+        title: "yx in title",
+        content: { type: "tiptap", data: "<p>nothing here</p>" }
+      })
+    };
+    const search = async (query) => (await db.lookup.notes(query).ids()).sort();
+    const ids = (...keys) => keys.map((key) => notes[key]).sort();
+
+    expect(await search("yx")).toEqual(ids("onyx", "helloOnyx", "title"));
+    expect(await search("yx OR world")).toEqual(
+      ids("world", "onyx", "helloOnyx", "title")
+    );
+    expect(await search("yx hello")).toEqual(ids("helloOnyx"));
+    expect(await search("hello NOT yx")).toEqual(ids("world"));
+    expect(await search("yx NOT stone")).toEqual(ids("helloOnyx", "title"));
+    expect(await search("hello yx OR stone")).toEqual(ids("onyx", "helloOnyx"));
+  }));
+
 test("search notes (remove diacritics)", () =>
   noteTest({
     content: {
@@ -205,6 +247,49 @@ describe("notesWithHighlighting", () => {
         `href="https://example.com/?a=1&amp;b=&quot;2&quot;"`
       );
       expect(item.content[0][0].prefix).toBe("<img src=x onerror=alert(1)> ");
+    }));
+
+  test("search notes with unbalanced quotes should highlight the match", () =>
+    noteTest({
+      title: "quotes",
+      content: {
+        type: "tiptap",
+        data: `<p>he said "hello" to the world</p>`
+      }
+    }).then(async ({ db }) => {
+      for (const query of ['"hello', 'hello"']) {
+        const filtered = await db.lookup.notesWithHighlighting(
+          query,
+          db.notes.all
+        );
+        const item = await filtered.item(0);
+        expect(item.item).toBeDefined();
+        expect(item.item.content.length).toBeGreaterThan(0);
+      }
+    }));
+
+  test("search notes with short terms in boolean queries", () =>
+    databaseTest().then(async (db) => {
+      await db.notes.add({
+        title: "first",
+        content: { type: "tiptap", data: "<p>hello world</p>" }
+      });
+      await db.notes.add({
+        title: "second",
+        content: { type: "tiptap", data: "<p>the onyx stone</p>" }
+      });
+
+      const filtered = await db.lookup.notesWithHighlighting(
+        "yx OR world",
+        db.notes.all
+      );
+      expect(filtered.length).toBe(2);
+      const matches = [];
+      for (let i = 0; i < filtered.length; i++) {
+        const { item } = await filtered.item(i);
+        matches.push(item.content[0][0].match);
+      }
+      expect(matches.sort()).toEqual(["world", "yx"]);
     }));
 
   test("search should be diacritic agnostic", () =>
