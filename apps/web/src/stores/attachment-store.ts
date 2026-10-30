@@ -152,11 +152,14 @@ class AttachmentStore extends BaseStore<AttachmentStore> {
             silent: true
           });
         }
+        return true;
       }
+      return false;
     } catch (e) {
       console.error(e);
       if (e instanceof Error)
         showToast("error", `${strings.failedToDelete()}: ${e.message}`);
+      return false;
     } finally {
       this._changeWorkingStatus(attachment.hash);
     }
