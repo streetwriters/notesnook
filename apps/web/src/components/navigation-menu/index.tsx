@@ -1171,3 +1171,18 @@ function navigateToRoute(path: string) {
   useAppStore.getState().toggleListPane(true);
   navigate(path);
 }
+
+export function dispatchSyntheticDropToNavMenuItem(
+  x: number,
+  y: number,
+  dataTransfer: DataTransfer
+) {
+  const element = document.elementFromPoint(x, y);
+  if (!element) return false;
+
+  const navMenu = element.closest("#navigation-menu");
+  if (!navMenu) return false;
+
+  element.dispatchEvent(new DragEvent("drop", { bubbles: true, dataTransfer }));
+  return true;
+}
