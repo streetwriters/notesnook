@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Virtualizer, useVirtualizer } from "@tanstack/react-virtual";
 import { Box, BoxProps } from "@theme-ui/components";
-import React, { useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 
 export type VirtualizedListProps<T, C> = {
   virtualizerRef?: React.MutableRefObject<
@@ -41,6 +41,7 @@ export type VirtualizedListProps<T, C> = {
   itemGap?: number;
   overscan?: number;
 } & BoxProps;
+
 export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
   const {
     items,
@@ -57,7 +58,17 @@ export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
     context,
     ...containerProps
   } = props;
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const [measuredOffset, setMeasuredOffset] = useState(0);
+
+  useLayoutEffect(() => {
+    if (scrollMargin !== undefined) return;
+    if (containerRef.current) {
+      const offset = containerRef.current.offsetTop || 0;
+      setMeasuredOffset((prev) => (prev !== offset ? offset : prev));
+    }
+  });
 
   const virtualizer = useVirtualizer({
     count: items.length,
@@ -65,7 +76,7 @@ export function VirtualizedList<T, C>(props: VirtualizedListProps<T, C>) {
     getItemKey: (index) => getItemKey(index, items),
     getScrollElement: () =>
       scrollElement || containerRef.current?.closest(".ms-container") || null,
-    scrollMargin: scrollMargin || containerRef.current?.offsetTop || 0,
+    scrollMargin: scrollMargin ?? measuredOffset,
     overscan
   });
 
