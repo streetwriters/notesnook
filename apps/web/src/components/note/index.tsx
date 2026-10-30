@@ -538,6 +538,7 @@ export const noteMenuItems: (
                 onClick: async () => {
                   if (!(await showUnpublishConfirmation())) return;
                   await useMonographStore.getState().unpublish(note.id);
+                  showToast("success", strings.actions.unpublished.note(1));
                 }
               }
             ]
