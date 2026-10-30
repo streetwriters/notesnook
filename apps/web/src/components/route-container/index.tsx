@@ -144,6 +144,7 @@ function HeaderActions({
   return (
     <Box
       sx={{
+        flexShrink: 0,
         alignItems: "center",
         display: "flex",
         gap: "spacing4"
@@ -156,7 +157,7 @@ function HeaderActions({
           onClick={routeButton.onClick}
           sx={{ p: 0 }}
         >
-          <routeButton.icon size={15} color="icon-secondary" />
+          <routeButton.icon size={15} />
         </Button>
       )}
       {hasItems && (
@@ -172,7 +173,7 @@ function HeaderActions({
           }
           sx={{ p: 0 }}
         >
-          <Sliders size={15} color="icon-secondary" />
+          <Sliders size={15} />
         </Button>
       )}
       {hasItems && canToggleView && viewMode && (
@@ -189,11 +190,7 @@ function HeaderActions({
           }
           sx={{ p: 0 }}
         >
-          {viewMode === "compact" ? (
-            <List size={15} color="icon-secondary" />
-          ) : (
-            <ViewList size={15} color="icon-secondary" />
-          )}
+          {viewMode === "compact" ? <List size={15} /> : <ViewList size={15} />}
         </Button>
       )}
     </Box>
@@ -234,6 +231,8 @@ function Header(props: RouteContainerProps) {
   const headerTitle =
     titlePromise.status === "fulfilled" ? titlePromise.value || type : type;
 
+  if (type === "notebook" && !hasItems) return null;
+
   return (
     <Box
       sx={{
@@ -260,7 +259,9 @@ function Header(props: RouteContainerProps) {
             sx={{
               alignItems: "center",
               display: "flex",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              gap: "spacing2",
+              height: hasItems ? "20px" : "32px"
             }}
           >
             <Text
@@ -268,10 +269,10 @@ function Header(props: RouteContainerProps) {
                 color: "heading",
                 fontSize: "lg",
                 fontWeight: "bold",
-                lineHeight: "100%",
-                height: hasItems ? "20px" : "32px",
-                display: "flex",
-                alignItems: "center"
+                minWidth: 0,
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden"
               }}
             >
               {headerTitle}
