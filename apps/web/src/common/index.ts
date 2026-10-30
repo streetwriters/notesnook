@@ -276,6 +276,7 @@ export async function restoreBackupFile(backupFile: File) {
         const attachments: ZipEntry[] = [];
         let attachmentsKey: SerializedKey | Cipher<"base64"> | undefined;
         let filesProcessed = 0;
+        const skippedAttachments = new Set<string>();
 
         let isValid = false;
         for await (const entry of createUnzipIterator(backupFile)) {
@@ -304,11 +305,12 @@ export async function restoreBackupFile(backupFile: File) {
                 const result = await BackupPasswordDialog.show({
                   validate: async ({ password, key: encryptionKey }) => {
                     if (!password && !encryptionKey) return false;
-                    await db.backup?.import(backup, {
+                    const skipped = await db.backup?.import(backup, {
                       password,
                       encryptionKey,
                       attachmentsKey
                     });
+                    skipped?.forEach((hash) => skippedAttachments.add(hash));
                     cachedPassword = password;
                     cachedKey = encryptionKey;
                     return true;
@@ -316,13 +318,17 @@ export async function restoreBackupFile(backupFile: File) {
                 });
                 if (!result) break;
               } else
-                await db.backup?.import(backup, {
-                  password: cachedPassword,
-                  encryptionKey: cachedKey,
-                  attachmentsKey
-                });
+                (
+                  await db.backup?.import(backup, {
+                    password: cachedPassword,
+                    encryptionKey: cachedKey,
+                    attachmentsKey
+                  })
+                )?.forEach((hash) => skippedAttachments.add(hash));
             } else {
-              await db.backup?.import(backup, { attachmentsKey });
+              (await db.backup?.import(backup, { attachmentsKey }))?.forEach(
+                (hash) => skippedAttachments.add(hash)
+              );
             }
 
             report({
@@ -345,7 +351,7 @@ export async function restoreBackupFile(backupFile: File) {
           });
 
           const attachment = await db.attachments.attachment(hash);
-          if (!attachment) continue;
+          if (!attachment || skippedAttachments.has(hash)) continue;
 
           await streamablefs.deleteFile(attachment.hash);
           const handle = await streamablefs.createFile(
