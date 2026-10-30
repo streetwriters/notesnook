@@ -190,6 +190,97 @@ test("save a locked note should add a locked session to note history", () =>
     expect(unlockedContent).toMatchObject(editedContent);
   }));
 
+test("renaming a locked note should not unlock its history session", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = await db.notes.note(id);
+    const editedContent = { type: "tiptap", data: "<p>hello world</p>" };
+    await db.vault.save({
+      ...note,
+      content: editedContent,
+      sessionId: "lockedsession"
+    });
+    await db.notes.add({
+      id,
+      title: "renamed",
+      sessionId: "lockedsession"
+    });
+
+    const sessions = await db.noteHistory.get(id).items();
+    expect(sessions).toHaveLength(1);
+
+    const lockedContent = await db.noteHistory.content(sessions[0].id);
+    expect(lockedContent.title).toBe("renamed");
+    const unlockedContent = await db.vault.decryptContent(
+      lockedContent,
+      "password"
+    );
+    expect(unlockedContent).toMatchObject(editedContent);
+
+    await db.noteHistory.restore(sessions[0].id);
+    const restored = await db.content.get((await db.notes.note(id)).contentId);
+    expect(restored.locked).toBe(true);
+    expect(
+      await db.vault.decryptContent(restored, "password")
+    ).toMatchObject(editedContent);
+  }));
+
+test("restoring a corrupted locked session should restore it as ciphertext", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = await db.notes.note(id);
+    const editedContent = { type: "tiptap", data: "<p>hello world</p>" };
+    await db.vault.save({
+      ...note,
+      content: editedContent,
+      sessionId: "lockedsession"
+    });
+    const [session] = await db.noteHistory.get(id).items();
+    await db
+      .sql()
+      .updateTable("sessioncontent")
+      .set({ locked: false })
+      .where("id", "==", session.sessionContentId)
+      .execute();
+
+    await db.noteHistory.restore(session.id);
+    const restored = await db.content.get((await db.notes.note(id)).contentId);
+    expect(restored.locked).toBe(true);
+    expect(
+      await db.vault.decryptContent(restored, "password")
+    ).toMatchObject(editedContent);
+  }));
+
+test("reading a corrupted locked session should return ciphertext", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = await db.notes.note(id);
+    const editedContent = { type: "tiptap", data: "<p>hello world</p>" };
+    await db.vault.save({
+      ...note,
+      content: editedContent,
+      sessionId: "lockedsession"
+    });
+    const [session] = await db.noteHistory.get(id).items();
+    await db
+      .sql()
+      .updateTable("sessioncontent")
+      .set({ locked: false })
+      .where("id", "==", session.sessionContentId)
+      .execute();
+
+    const lockedContent = await db.noteHistory.content(session.id);
+    expect(
+      await db.vault.decryptContent(lockedContent, "password")
+    ).toMatchObject(editedContent);
+  }));
+
 test("locking an old note should clear its history", () =>
   noteTest({ ...TEST_NOTE, sessionId: "notesession" }).then(
     async ({ db, id }) => {
