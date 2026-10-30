@@ -534,13 +534,15 @@ export class FilteredSelector<T extends Item> {
     else if (options.sortBy !== "dueDate" && options.sortBy !== "relevance")
       fields.push(options.sortBy);
 
+    const items = await this.filter
+      .select(fields)
+      .$call(this.buildSortExpression(options, true))
+      .execute();
     return Array.from(
       groupArray(
-        await this.filter
-          .select(fields)
-          .$call(this.buildSortExpression(options, true))
-          .execute(),
-        createKeySelector(options)
+        items,
+        createKeySelector(options),
+        options.includeCounts
       ).values()
     );
   }

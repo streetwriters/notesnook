@@ -670,6 +670,49 @@ describe("reminder groups", () => {
     });
     expect(groups.map((g) => g.group.title)).toEqual(GROUPS);
   });
+
+  test("group counts include reminders outside the loaded batch", async () => {
+    MockDate.reset();
+    const db = await databaseTest();
+    const options = {
+      groupBy: "default",
+      sortBy: "dueDate",
+      sortDirection: "asc",
+      includeCounts: true
+    };
+    expect(await db.reminders.all.groups(options)).toEqual([]);
+
+    for (const reminder of [
+      once("2099-01-01 09:00"),
+      once("2099-01-02 09:00"),
+      once("2099-01-03 09:00"),
+      once("2000-01-01 09:00"),
+      once("2099-01-01 09:00", { disabled: true }),
+      once("2099-01-01 09:00", { completedAt: Date.now() }),
+      once("2099-01-02 09:00", { completedAt: Date.now() })
+    ]) {
+      await db.reminders.add(reminder);
+    }
+
+    const grouping = await db.reminders.collection
+      .createFilter((query) => query, 2)
+      .grouped(options);
+    expect((await grouping.item(0)).group).not.toHaveProperty("count");
+    const groups = await grouping.groups();
+    expect(groups.map(({ group }) => [group.title, group.count])).toEqual([
+      ["Upcoming", 3],
+      ["Past", 1],
+      ["Disabled", 1],
+      ["Completed", 2]
+    ]);
+
+    const completedGroups = await db.reminders.collection
+      .createFilter((query) => query.where("completedAt", "is not", null))
+      .groups(options);
+    expect(
+      completedGroups.map(({ group }) => [group.title, group.count])
+    ).toEqual([["Completed", 2]]);
+  });
 });
 
 describe("getUpcomingReminder", () => {

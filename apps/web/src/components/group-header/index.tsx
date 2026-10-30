@@ -28,7 +28,8 @@ import {
   OrderAlphabeticalAscending,
   OrderAlphabeticalDescending,
   OrderNumericAscending,
-  OrderNumericDescending
+  OrderNumericDescending,
+  Ellipse
 } from "../icons";
 import { useEffect, useRef } from "react";
 import { Flex, Text } from "@theme-ui/components";
@@ -38,6 +39,7 @@ import { MenuButtonItem, MenuItem } from "@notesnook/ui";
 import { strings } from "@notesnook/intl";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import type { Context } from "../list-container/types";
+import { usePromise } from "@notesnook/common";
 
 type GroupingMenuOptions = {
   groupOptions: GroupOptions;
@@ -281,9 +283,21 @@ type GroupHeaderProps = {
   onJump: (index: number) => void;
   onSelectGroup: () => void;
   isFocused: boolean;
+  showGroupCounts?: boolean;
 };
 function GroupHeader(props: GroupHeaderProps) {
-  const { title, groups, onJump, onSelectGroup, isFocused } = props;
+  const { title, showGroupCounts, groups, onJump, onSelectGroup, isFocused } =
+    props;
+  const groupItems = usePromise(async () => {
+    if (!showGroupCounts) return [];
+    return await groups();
+  }, [groups, showGroupCounts]);
+
+  const count =
+    showGroupCounts && "value" in groupItems
+      ? groupItems.value?.find((item) => item.group.title === title)?.group
+          .count
+      : undefined;
 
   const groupHeaderRef = useRef<HTMLDivElement>(null);
   const { openMenu } = useMenuTrigger();
@@ -302,8 +316,10 @@ function GroupHeader(props: GroupHeaderProps) {
         }
         e.stopPropagation();
 
-        const groupItems = await groups();
-        const items: MenuItem[] = groupItems.map(({ group, index }) => {
+        const resolvedGroupItems =
+          (showGroupCounts && "value" in groupItems && groupItems.value) ||
+          (await groups());
+        const items: MenuItem[] = resolvedGroupItems.map(({ group, index }) => {
           const groupTitle = group.title.toString();
           return {
             type: "button",
@@ -347,16 +363,32 @@ function GroupHeader(props: GroupHeaderProps) {
       tabIndex={0}
       data-test-id="group-header"
     >
-      <Text
-        data-test-id="title"
-        sx={{
-          fontSize: "xs",
-          fontWeight: 400,
-          color: title === "Conflicted" ? "error" : "accent"
-        }}
-      >
-        {title}
-      </Text>
+      <Flex sx={{ gap: "spacing3", alignItems: "center" }}>
+        <Text
+          data-test-id="title"
+          sx={{
+            fontSize: "xs",
+            fontWeight: 400,
+            color: title === "Conflicted" ? "error" : "accent"
+          }}
+        >
+          {title}
+        </Text>
+        {count !== undefined && (
+          <>
+            <Ellipse size={4} color="accent" />
+            <Text
+              sx={{
+                fontSize: "xs",
+                fontWeight: 400,
+                color: "accent"
+              }}
+            >
+              {count}
+            </Text>
+          </>
+        )}
+      </Flex>
     </Flex>
   );
 }

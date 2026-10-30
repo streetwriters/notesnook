@@ -41,6 +41,7 @@ export type SortOptions = {
 
 export type GroupOptions = SortOptions & {
   groupBy: "none" | "abc" | "year" | "month" | "week" | "default";
+  includeCounts?: boolean;
 };
 
 export type GroupedItems<T> = (T | GroupHeader)[];
@@ -67,6 +68,7 @@ export type GroupHeader = {
   type: "header";
   id: string;
   title: string;
+  count?: number;
 };
 
 export type Collections = {

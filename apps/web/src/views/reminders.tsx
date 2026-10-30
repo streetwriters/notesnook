@@ -44,6 +44,7 @@ function Reminders() {
         group="reminders"
         refresh={refresh}
         items={filteredItems || reminders}
+        showGroupCounts
         isSearching={!!filteredItems}
         placeholder={
           <ListPanePlaceholder
