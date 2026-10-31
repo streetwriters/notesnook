@@ -391,6 +391,7 @@ export interface Reminder extends BaseItem<"reminder"> {
   localOnly?: boolean;
   disabled?: boolean;
   snoozeUntil?: number;
+  completedAt?: number;
 }
 
 export type ContentType = "tiptap" | "tiny";

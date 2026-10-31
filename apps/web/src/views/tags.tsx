@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/tag-store";
-import Placeholder from "../components/placeholders";
+import { SidebarPlaceholder } from "../components/placeholders";
 import { db } from "../common/db";
 import { ListLoader } from "../components/loaders/list-loader";
 import { Flex, Input } from "@theme-ui/components";
@@ -27,6 +27,7 @@ import { useEffect, useRef, useState } from "react";
 import { debounce } from "@notesnook/common";
 import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { SidebarScroller } from "../components/sidebar-scroller";
+import { Funnel } from "../components/icons";
 
 function Tags() {
   const tags = useStore((store) => store.tags);
@@ -55,32 +56,52 @@ function Tags() {
       id="tags"
       sx={{
         flex: 1,
-        '[data-viewport-type="element"]': {
-          px: 1,
-          width: `calc(100% - ${2 * 6}px) !important`
-        }
+        mt: "spacing4"
       }}
     >
       <ListContainer
         type="tags"
         refresh={refresh}
         items={items}
-        placeholder={<Placeholder context="tags" />}
+        placeholder={<SidebarPlaceholder variant="tags" />}
+        sx={{
+          ".list-container-placeholder": {
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }
+        }}
         header={<></>}
         Scroller={SidebarScroller}
       />
-      <Input
-        ref={inputRef}
-        variant="clean"
-        placeholder="Filter tags..."
-        sx={{ borderTop: "1px solid var(--border)", mx: 0 }}
-        onChange={debounce(async (e) => {
-          const query = e.target.value.trim();
-          setFilteredTags(
-            query ? await db.lookup.tags(query).sorted() : undefined
-          );
-        }, 300)}
-      />
+      <Flex
+        sx={{
+          alignItems: "center",
+          borderTop: "1px solid var(--separator)",
+          mx: "spacing4",
+          pt: "spacing4"
+        }}
+      >
+        <Input
+          ref={inputRef}
+          variant="clean"
+          placeholder="Filter tags..."
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            p: 0,
+            fontSize: "xs",
+            color: "paragraph"
+          }}
+          onChange={debounce(async (e) => {
+            const query = e.target.value.trim();
+            setFilteredTags(
+              query ? await db.lookup.tags(query).sorted() : undefined
+            );
+          }, 300)}
+        />
+        <Funnel size={13} color="icon-secondary" />
+      </Flex>
     </Flex>
   );
 }

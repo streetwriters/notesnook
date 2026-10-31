@@ -29,6 +29,7 @@ import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
+import { Flex } from "@notesnook/ui";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -84,7 +85,7 @@ export const AddNotebookDialog = DialogManager.register(
         }
         onClose={() => onClose(false)}
         positiveButton={{
-          text: props.edit ? strings.save() : strings.create(),
+          text: props.edit ? strings.save() : strings.submit(),
           onClick: onSubmit
         }}
         negativeButton={{
@@ -92,31 +93,54 @@ export const AddNotebookDialog = DialogManager.register(
           onClick: () => onClose(false)
         }}
       >
-        <Field
-          defaultValue={title.current}
-          data-test-id="title-input"
-          autoFocus
-          required
-          label={strings.title()}
-          name="title"
-          id="title"
-          onChange={(e) => (title.current = e.target.value)}
-          onKeyUp={async (e) => {
-            if (e.key === "Enter") {
-              await onSubmit();
-            }
+        <Flex
+          sx={{
+            flexDirection: "column",
+            mt: "spacing6",
+            mb: "spacing7",
+            gap: "spacing4"
           }}
-        />
-        <Field
-          data-test-id="description-input"
-          label={strings.description()}
-          name="description"
-          id="description"
-          onChange={(e) => (description.current = e.target.value)}
-          defaultValue={description.current}
-          helpText={strings.optional()}
-          sx={{ mt: 1 }}
-        />
+        >
+          <Field
+            defaultValue={title.current}
+            data-test-id="title-input"
+            autoFocus
+            required
+            label={strings.title()}
+            placeholder={strings.enterNotebookTitle()}
+            name="title"
+            id="title"
+            onChange={(e) => (title.current = e.target.value)}
+            onKeyUp={async (e) => {
+              if (e.key === "Enter") {
+                await onSubmit();
+              }
+            }}
+            sx={{
+              input: {
+                px: "spacing4",
+                py: "spacing6",
+                fontSize: "sm"
+              }
+            }}
+          />
+          <Field
+            data-test-id="description-input"
+            label={`${strings.description()} (${strings.optional()})`}
+            placeholder={strings.enterNotebookDescription()}
+            name="description"
+            id="description"
+            onChange={(e) => (description.current = e.target.value)}
+            defaultValue={description.current}
+            sx={{
+              input: {
+                px: "spacing4",
+                py: "spacing6",
+                fontSize: "sm"
+              }
+            }}
+          />
+        </Flex>
       </Dialog>
     );
   },

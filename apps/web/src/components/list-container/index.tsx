@@ -73,6 +73,7 @@ type ListContainerProps = {
   context?: Context;
   refresh: () => void;
   header?: JSX.Element;
+  renderGroupHeader?: (title: string, index: number) => JSX.Element;
   placeholder: JSX.Element;
   isLoading?: boolean;
   isSearching?: boolean;
@@ -91,6 +92,7 @@ function ListContainer(props: ListContainerProps) {
     context,
     refresh,
     header,
+    renderGroupHeader,
     button,
     compact,
     sx,
@@ -211,7 +213,11 @@ function ListContainer(props: ListContainerProps) {
           {props.isLoading ? (
             <ListLoader />
           ) : (
-            <Flex variant="columnCenterFill" data-test-id="list-placeholder">
+            <Flex
+              sx={{ pt: "spacing6", px: "spacing6" }}
+              className="list-container-placeholder"
+              data-test-id="list-placeholder"
+            >
               {props.placeholder}
             </Flex>
           )}
@@ -238,6 +244,7 @@ function ListContainer(props: ListContainerProps) {
               increaseViewportBy={{ top: 200, bottom: 200 }}
               context={{
                 header,
+                renderGroupHeader,
                 items,
                 group,
                 refresh,
@@ -292,6 +299,7 @@ export default ListContainer;
 
 type ListContext = {
   header?: JSX.Element;
+  renderGroupHeader?: (title: string, index: number) => JSX.Element;
   items: VirtualizedGrouping<Item>;
   group: GroupingKey | undefined;
   refresh: () => void;
@@ -318,7 +326,7 @@ function ItemRenderer({
   const {
     items,
     group,
-    refresh,
+    renderGroupHeader,
     focusedGroupIndex,
     focusGroup,
     selectItems,
@@ -362,15 +370,12 @@ function ItemRenderer({
 
   return (
     <>
-      {resolvedItem.group && group ? (
+      {resolvedItem.group && group && renderGroupHeader ? (
+        renderGroupHeader(resolvedItem.group.title, index)
+      ) : resolvedItem.group && group ? (
         <GroupHeader
-          groupingKey={group}
-          isSearching={isSearching}
-          refresh={refresh}
           title={resolvedItem.group.title}
           isFocused={index === focusedGroupIndex}
-          index={index}
-          context={itemContext}
           onSelectGroup={async () => {
             if (!items.groups) return;
 

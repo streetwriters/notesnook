@@ -17,11 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState } from "react";
-import { Flex, Text, Button, Link, Switch, Input } from "@theme-ui/components";
-import { Loading, Refresh } from "../icons";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
+import {
+  Flex,
+  Text,
+  Button,
+  Link,
+  Switch,
+  SwitchProps
+} from "@theme-ui/components";
+import {
+  ArrowCounterClockwise,
+  Check,
+  Clock,
+  ClockCounterClockwise,
+  Copy,
+  Loading,
+  Lock,
+  PasswordInvisible
+} from "../icons";
+import type { Icon } from "../icons";
 import { db } from "../../common/db";
-import { writeText } from "clipboard-polyfill";
 import { showToast } from "../../utils/toast";
 import { EVENTS } from "@notesnook/core";
 import { useStore } from "../../stores/monograph-store";
@@ -32,452 +48,543 @@ import {
   useIsFeatureAvailable,
   usePromise
 } from "@notesnook/common";
-import { createRoot, Root } from "react-dom/client";
-import { PopupPresenter } from "@notesnook/ui";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
+import Field from "../field";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
+import { showUnpublishConfirmation } from "../../dialogs/confirm";
+import { useForm, UseFormRegisterReturn } from "react-hook-form";
+import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
 
-type PublishViewProps = {
-  note: Note;
-  monograph?: ResolvedMonograph;
-  onClose: (result: boolean) => void;
-};
-function PublishView(props: PublishViewProps) {
+export const PublishDialog = DialogManager.register(function PublishDialog(
+  props: BaseDialogProps<boolean> & { note: Note }
+) {
   const { note, onClose } = props;
-  const [selfDestruct, setSelfDestruct] = useState(
-    props.monograph?.selfDestruct
-  );
-  const [status, setStatus] = useState<{
-    action: "publish" | "unpublish" | "analytics";
-  }>();
-  const [processingStatus, setProcessingStatus] = useState<{
-    total?: number;
-    current: number;
-  }>();
-  const passwordInput = useRef<HTMLInputElement>(null);
-  const titleInput = useRef<HTMLInputElement>(null);
+  const {
+    status: monographStatus,
+    monograph,
+    refresh: refreshMonograph
+  } = useResolvedMonograph(note.id);
+
+  const [isUnpublishing, setIsUnpublishing] = useState(false);
+  const processingStatus = useImageDownloadProgress(note.id);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isDirty, isSubmitting }
+  } = useForm<PublishFormValues>({
+    // the form resets whenever these change, including after unpublishing
+    values: monograph ? formValuesFrom(monograph) : defaultFormValues(note)
+  });
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
-  const [monograph, setMonograph] = useState(props.monograph);
-  const [copied, setCopied] = useState(false);
-  const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
+  const isPasswordEnabled = watch("passwordEnabled");
+  const isSelfDestructEnabled = watch("selfDestruct");
+
   const metadata = usePromise(async () => {
-    if (!monograph) return { publishUrl: "", analytics: { totalViews: 0 } };
+    if (!monograph) return;
     return await db.monographs.metadata(monograph.id);
   }, [monograph?.id]);
-
-  useEffect(() => {
-    const fileDownloadedEvent = db.eventManager.subscribe(
-      EVENTS.fileDownloaded,
-      ({ total, current, groupId }) => {
-        if (!groupId || !groupId.includes(note.id)) return;
-        if (current === total) setProcessingStatus(undefined);
-        else setProcessingStatus({ total, current });
-      }
-    );
-
-    return () => {
-      fileDownloadedEvent.unsubscribe();
-    };
-  }, [note.id]);
+  const metadataValue = "value" in metadata ? metadata.value : undefined;
+  const publishUrl = metadataValue?.publishUrl ?? monograph?.publishUrl;
 
   useEffect(() => {
     const monographsUpdatedEvent = db.eventManager.subscribe(
       EVENTS.monographsUpdated,
-      async (ids?: string[]) => {
+      (ids?: string[]) => {
         if (ids && ids.length > 0 && !ids.includes(note.id)) return;
-
-        const m = await resolveMonograph(note.id);
-        setMonograph(m);
-
-        // if monograph has been unpublished, reset all the fields
-        if (!m) {
-          setSelfDestruct(false);
-          if (titleInput.current) titleInput.current.value = note.title;
-          if (passwordInput.current) passwordInput.current.value = "";
-        }
+        refreshMonograph();
       }
     );
 
     return () => {
       monographsUpdatedEvent.unsubscribe();
     };
-  }, [note.id]);
+  }, [note.id, refreshMonograph]);
 
-  return (
-    <>
-      {monograph?.id ? (
-        <Flex
-          sx={{
-            border: "1px solid var(--border)",
-            borderRadius: "default",
-            alignItems: "center",
-            justifyContent: "space-between"
-          }}
-        >
-          <Link
-            variant="text.body"
-            as="a"
-            target="_blank"
-            href={
-              metadata.status === "fulfilled" ? metadata.value.publishUrl : "#"
-            }
-            sx={{
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              textDecoration: "none",
-              overflow: "hidden",
-              px: 1,
-              opacity: metadata.status === "fulfilled" ? 1 : 0.8
-            }}
-          >
-            {metadata.status === "fulfilled"
-              ? metadata.value.publishUrl
-              : monograph?.publishUrl}
-          </Link>
-          <Button
-            variant="secondary"
-            className="copyPublishLink"
-            sx={{ flexShrink: 0, m: 0, color: copied ? "accent" : "initial" }}
-            onClick={() => {
-              if (metadata.status !== "fulfilled") return;
-              writeText(metadata.value.publishUrl);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }}
-            disabled={copied}
-          >
-            {copied ? strings.copied() : strings.copy()}
-          </Button>
-        </Flex>
-      ) : null}
-      <Flex
-        sx={{
-          flexDirection: "column",
-          border: "1px solid var(--border)",
-          borderRadius: "default"
-        }}
-      >
-        <Flex
-          sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 1,
-            height: 30,
+  async function handleUnpublish() {
+    if (!(await showUnpublishConfirmation())) return;
 
-            "& label": { width: "auto", flexShrink: 0 }
-          }}
-        >
-          <Text variant="body">{strings.title()}</Text>
-          <Input
-            ref={titleInput}
-            type="text"
-            variant="clean"
-            placeholder={strings.enterTitle()}
-            defaultValue={monograph ? monograph.title : note.title}
-            sx={{ textAlign: "right", p: 0 }}
-          />
-        </Flex>
-        {monograph?.publishedAt ? (
-          <Flex
-            sx={{
-              alignItems: "center",
-              justifyContent: "space-between",
-              px: 1,
-              height: 30
-            }}
-          >
-            <Text variant="body">{strings.publishedAt()}</Text>
-            <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-              {getFormattedDate(monograph?.publishedAt, "date-time")}
-            </Text>
-          </Flex>
-        ) : null}
-        {monograph?.id && !selfDestruct ? (
-          <Flex
-            sx={{
-              alignItems: "center",
-              justifyContent: "space-between",
-              px: 1,
-              height: 30
-            }}
-          >
-            <Text variant="body">{strings.views()}</Text>
-            {monographAnalytics?.isAllowed ? (
-              metadata.status === "fulfilled" ? (
-                <Flex sx={{ alignItems: "center", gap: 1 }}>
-                  <Text
-                    variant="body"
-                    sx={{
-                      color: "paragraph-secondary"
-                    }}
-                  >
-                    {metadata.value.analytics.totalViews}
-                  </Text>
-                  <Button
-                    variant="tertiary"
-                    onClick={async () => {
-                      try {
-                        setStatus({ action: "analytics" });
-                        metadata.refresh();
-                      } finally {
-                        setStatus(undefined);
-                      }
-                    }}
-                  >
-                    <Refresh
-                      size={14}
-                      rotate={status?.action === "analytics"}
-                    />
-                  </Button>
-                </Flex>
-              ) : (
-                <Loading size={14} />
-              )
-            ) : monographAnalytics ? (
-              <Button
-                variant="anchor"
-                onClick={() =>
-                  UpgradeDialog.show({ feature: monographAnalytics })
-                }
-              >
-                {strings.upgrade()}
-              </Button>
-            ) : null}
-          </Flex>
-        ) : null}
-        <Flex
-          sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            cursor: "pointer",
-            px: 1,
-            height: 30,
+    try {
+      setIsUnpublishing(true);
+      await unpublishNote(note.id);
+      refreshMonograph();
+      showToast("success", strings.actions.unpublished.note(1));
+    } catch (e) {
+      console.error(e);
+      showToast(
+        "error",
+        `${strings.actionErrors.unpublished.note(1)}: ` + (e as Error).message
+      );
+    } finally {
+      setIsUnpublishing(false);
+    }
+  }
 
-            "& label": { width: "auto", flexShrink: 0 }
-          }}
-          onClick={() => setSelfDestruct((s) => !s)}
-          title={strings.monographSelfDestructDesc()}
-        >
-          <Text variant="body">{strings.monographSelfDestructHeading()}</Text>
-          <Switch
-            sx={{
-              m: 0,
-              bg: selfDestruct ? "accent" : "icon-secondary",
-              flexShrink: 0
-            }}
-            checked={selfDestruct}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </Flex>
+  async function handlePublish(values: PublishFormValues) {
+    try {
+      await publishNote(note.id, values.title, {
+        selfDestruct: values.selfDestruct,
+        password: values.passwordEnabled ? values.password : undefined
+      });
+      refreshMonograph();
+      showToast("success", strings.actions.published.note(1));
+    } catch (e) {
+      console.error(e);
+      showToast(
+        "error",
+        `${strings.actionErrors.published.note(1)}: ${(e as Error).message}`
+      );
+    }
+  }
 
-        <Flex
-          sx={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            px: 1,
-            height: 30,
+  const loadFailed = monographStatus === "rejected";
+  const isInitialLoad =
+    (monographStatus === "pending" && !monograph) ||
+    (metadata.status === "pending" && !("value" in metadata));
+  const isLoading = isInitialLoad || isSubmitting || isUnpublishing;
 
-            "& label": { width: "auto", flexShrink: 0 }
-          }}
-          title={strings.monographPassDesc()}
-        >
-          <Text variant="body">{strings.monographPassHeading()}</Text>
-          <Input
-            ref={passwordInput}
-            type="password"
-            variant="clean"
-            placeholder={strings.noPassword()}
-            defaultValue={monograph?.password}
-            sx={{ textAlign: "right", p: 0 }}
-          />
-        </Flex>
-      </Flex>
-
-      <Flex
-        sx={{
-          flexDirection: "column",
-          border: "1px solid var(--border)",
-          borderRadius: "default",
-          overflow: "hidden"
-        }}
-      >
-        {monograph?.id && (
-          <Button
-            variant="errorSecondary"
-            onClick={async () => {
-              try {
-                setStatus({ action: "unpublish" });
-                await unpublishNote(note.id);
-                onClose(true);
-                showToast("success", strings.actions.unpublished.note(1));
-              } catch (e) {
-                console.error(e);
-                showToast(
-                  "error",
-                  `${strings.actionErrors.unpublished.note(1)}: ` +
-                    (e as Error).message
-                );
-              } finally {
-                setStatus(undefined);
-              }
-            }}
-            sx={{ textAlign: "left", borderRadius: "none" }}
-            disabled={!!status}
-          >
-            {status?.action === "unpublish" ? (
-              <Loading size={16} />
-            ) : (
-              strings.unpublish()
-            )}
-          </Button>
-        )}
-        <Button
-          variant={monograph?.id ? "secondary" : "accentSecondary"}
-          onClick={async () => {
-            try {
-              setStatus({ action: "publish" });
-              const password = passwordInput.current?.value;
-              const title = titleInput.current?.value;
-
-              if (!title || title.trim().length === 0) {
-                showToast("error", "Title cannot be empty.");
-                return;
-              }
-
-              await publishNote(note.id, title, {
-                selfDestruct,
-                password
-              });
-              setMonograph(await resolveMonograph(note.id));
-              showToast("success", strings.actions.published.note(1));
-            } catch (e) {
-              console.error(e);
-              showToast(
-                "error",
-                `${strings.actionErrors.published.note(1)}: ${
-                  (e as Error).message
-                }`
-              );
-            } finally {
-              setStatus(undefined);
-            }
-          }}
-          sx={{ textAlign: "left", borderRadius: "none" }}
-          disabled={!!status}
-        >
-          {status?.action === "publish" ? (
-            <Loading size={16} />
-          ) : monograph?.id ? (
-            strings.update()
-          ) : (
-            strings.publish()
-          )}
-        </Button>
-      </Flex>
-      {processingStatus ? (
-        <Text variant="subBody">
-          {strings.downloadingImages()} {processingStatus.current}/
-          {processingStatus.total || "?"}
-        </Text>
-      ) : null}
-    </>
-  );
-}
-
-export default PublishView;
-
-let root: Root | null = null;
-
-function close() {
-  root?.unmount();
-  root = null;
-}
-
-export async function showPublishView(note: Note, target?: HTMLElement) {
-  const rootElement = document.getElementById("dialogContainer");
-  if (!rootElement) return;
-
-  if (root) return close();
-
-  const monograph = await resolveMonograph(note.id);
-
-  root = createRoot(rootElement);
-  root.render(
-    <PopupPresenter
-      isOpen
-      onClose={() => close()}
-      position={{
-        target,
-        location: "below",
-        isTargetAbsolute: true,
-        yOffset: 10,
-        xOffset: -10
-      }}
-      sx={{
-        boxShadow: "0px 0px 15px 0px #00000011"
-      }}
-      scope="dialog"
-    >
-      <Flex
-        p={2}
-        sx={{
-          flexDirection: "column",
-          gap: 1,
-          bg: "background",
-          width: ["100%", 350, 350],
-          border: "1px solid",
-          borderColor: "border",
-          borderRadius: "dialog",
-          overflow: "hidden"
-        }}
-      >
-        <Text variant="subtitle">{strings.publishToTheWeb()}</Text>
-        <Text variant="subBody">{strings.monographDesc()}</Text>
-        <PublishView
-          note={note}
-          monograph={monograph}
-          onClose={() => close()}
-        />
-      </Flex>
-    </PopupPresenter>
-  );
-}
-
-export const PublishDialog = DialogManager.register(function PublishDialog(
-  props: BaseDialogProps<boolean> & { note: Note }
-) {
-  const monograph = usePromise(
-    () => resolveMonograph(props.note.id),
-    [props.note.id]
-  );
-
-  if (monograph.status !== "fulfilled") return null;
   return (
     <Dialog
       isOpen={true}
-      title={strings.publishToTheWeb()}
+      title={
+        monograph ? strings.editPublishedMonograph() : strings.publishToTheWeb()
+      }
       description={strings.monographDesc()}
-      width={400}
-      onClose={() => props.onClose(false)}
+      width={460}
+      noScroll={loadFailed}
+      onClose={() => onClose(false)}
+      negativeButton={{
+        text: strings.cancel(),
+        onClick: () => onClose(false)
+      }}
+      positiveButton={
+        loadFailed
+          ? { text: strings.tryAgain(), onClick: refreshMonograph }
+          : {
+              text: monograph ? strings.update() : strings.publish(),
+              type: "submit",
+              form: "publishForm",
+              disabled: isLoading || (!!monograph && !isDirty),
+              loading: isSubmitting
+            }
+      }
     >
-      <Flex
-        sx={{
-          flexDirection: "column",
-          gap: 1,
-          mb: 3
-        }}
-      >
-        <PublishView
-          note={props.note}
-          monograph={monograph.value}
-          onClose={props.onClose}
-        />
-      </Flex>
+      {loadFailed ? (
+        <Text sx={{ color: "paragraph-error", m: "spacing7" }}>
+          {strings.failedToLoadMonograph()}
+        </Text>
+      ) : (
+        <Flex
+          as="form"
+          id="publishForm"
+          onSubmit={handleSubmit(handlePublish)}
+          sx={{
+            flexDirection: "column",
+            mt: "spacing4",
+            mb: "spacing7"
+          }}
+        >
+          <Field
+            type="text"
+            label={strings.title()}
+            placeholder={strings.enterTitle()}
+            disabled={isLoading}
+            error={errors.title?.message}
+            {...register("title", {
+              validate: (title) => !!title.trim() || strings.titleIsRequired()
+            })}
+            sx={{ width: "100%" }}
+            styles={{
+              input: {
+                px: "spacing5",
+                py: "spacing6",
+                fontSize: "sm"
+              }
+            }}
+          />
+
+          {monograph ? (
+            <>
+              <PublishedLinkCard
+                url={publishUrl}
+                disabled={isLoading}
+                isUnpublishing={isUnpublishing}
+                onUnpublish={handleUnpublish}
+              />
+              <MonographStats
+                publishedAt={monograph.publishedAt}
+                views={metadataValue?.analytics.totalViews}
+                isRefreshing={metadata.status === "pending"}
+                disabled={isLoading}
+                onRefresh={() =>
+                  metadata.status !== "pending" && metadata.refresh()
+                }
+              />
+            </>
+          ) : null}
+
+          <Flex
+            sx={{
+              height: "1px",
+              bg: "separator",
+              mb: "spacing6",
+              mt: monograph ? "spacing6" : "spacing7"
+            }}
+          />
+
+          <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+            <PasswordProtection
+              enabled={isPasswordEnabled}
+              disabled={isLoading}
+              switchProps={register("passwordEnabled")}
+              inputProps={register("password", {
+                validate: (password, values) =>
+                  !values.passwordEnabled ||
+                  !!password.trim() ||
+                  strings.passwordRequired()
+              })}
+              error={errors.password?.message}
+            />
+            <MonographRow
+              icon={ClockCounterClockwise}
+              title={strings.monographSelfDestructHeading()}
+              description={strings.deleteAfterViewing()}
+              action={
+                <ToggleSwitch
+                  isOn={isSelfDestructEnabled}
+                  aria-label={strings.monographSelfDestructHeading()}
+                  title={strings.monographSelfDestructDesc()}
+                  disabled={isLoading}
+                  {...register("selfDestruct")}
+                />
+              }
+            />
+          </Flex>
+
+          {processingStatus ? (
+            <Text variant="subBody">
+              {strings.downloadingImages()} {processingStatus.current}/
+              {processingStatus.total || "?"}
+            </Text>
+          ) : null}
+        </Flex>
+      )}
     </Dialog>
   );
 });
+
+function PublishedLinkCard({
+  url,
+  disabled,
+  isUnpublishing,
+  onUnpublish
+}: {
+  url?: string;
+  disabled: boolean;
+  isUnpublishing: boolean;
+  onUnpublish: () => void;
+}) {
+  const { copied, copy } = useCopyToClipboard();
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing4",
+        mt: "spacing7",
+        mb: "spacing4",
+        p: "spacing4",
+        bg: "background-secondary",
+        borderRadius: "radius2",
+        minWidth: 0
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "spacing4",
+          minWidth: 0
+        }}
+      >
+        <Text sx={{ color: "heading", fontSize: "sm", fontWeight: 600 }}>
+          {strings.publishedNoteLink()}
+        </Text>
+        <Button
+          type="button"
+          variant="new_error_bordered"
+          onClick={onUnpublish}
+          disabled={disabled}
+          sx={{
+            flexShrink: 0,
+            p: "spacing4",
+            borderRadius: "radius2",
+            fontSize: "xs",
+            lineHeight: 1
+          }}
+        >
+          {isUnpublishing ? (
+            <Loading size={13} color="currentColor" />
+          ) : (
+            strings.unpublish()
+          )}
+        </Button>
+      </Flex>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "spacing4",
+          minWidth: 0,
+          px: "spacing4",
+          py: "spacing3",
+          bg: "accentForeground",
+          borderRadius: "radius2"
+        }}
+      >
+        <Link
+          as="a"
+          target="_blank"
+          href={url ?? "#"}
+          sx={{
+            fontFamily: "body",
+            display: "block",
+            minWidth: 0,
+            color: "accent",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            textDecoration: "none",
+            overflow: "hidden",
+            fontSize: "xs"
+          }}
+        >
+          {url}
+        </Link>
+        <Button
+          type="button"
+          variant="new_secondary"
+          className="copyPublishLink"
+          aria-label={copied ? strings.copied() : strings.copy()}
+          onClick={() => url && copy(url)}
+          disabled={!url || disabled}
+          sx={{
+            flexShrink: 0,
+            width: 20,
+            height: 20,
+            p: 0,
+            borderRadius: "radius1",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          {copied ? (
+            <Check size={13} color="accent" />
+          ) : (
+            <Copy size={13} color="icon" />
+          )}
+        </Button>
+      </Flex>
+    </Flex>
+  );
+}
+
+function MonographStats({
+  publishedAt,
+  views,
+  isRefreshing,
+  disabled,
+  onRefresh
+}: {
+  publishedAt?: number;
+  views?: number;
+  isRefreshing: boolean;
+  disabled: boolean;
+  onRefresh: () => void;
+}) {
+  const monographAnalytics = useIsFeatureAvailable("monographAnalytics");
+
+  return (
+    <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+      {publishedAt ? (
+        <MonographRow
+          icon={Clock}
+          title={strings.publishedAt()}
+          description={getFormattedDate(publishedAt, "date-time")}
+        />
+      ) : null}
+      <MonographRow
+        icon={PasswordInvisible}
+        title={strings.views()}
+        description={strings.viewsOnPublishedNote()}
+        action={
+          monographAnalytics?.isAllowed ? (
+            <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+              {views !== undefined ? (
+                <Text sx={{ fontSize: "xs", color: "heading" }}>{views}</Text>
+              ) : null}
+              <Button
+                type="button"
+                variant="tertiary"
+                disabled={disabled}
+                onClick={onRefresh}
+              >
+                <ArrowCounterClockwise size={13} rotate={isRefreshing} />
+              </Button>
+            </Flex>
+          ) : monographAnalytics ? (
+            <Button
+              type="button"
+              variant="anchor"
+              onClick={() =>
+                UpgradeDialog.show({ feature: monographAnalytics })
+              }
+              sx={{
+                fontWeight: 500,
+                fontSize: "xs"
+              }}
+            >
+              {strings.upgrade()}
+            </Button>
+          ) : null
+        }
+      />
+    </Flex>
+  );
+}
+
+function MonographRow({
+  icon: IconComponent,
+  title,
+  description,
+  action,
+  children
+}: {
+  icon: Icon;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  children?: React.ReactNode;
+}) {
+  return (
+    <Flex
+      sx={{
+        alignItems: children ? "flex-start" : "center",
+        gap: "spacing4",
+        minWidth: 0,
+        "& label": { width: "auto", flexShrink: 0 }
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          width: 32,
+          height: 32,
+          flexShrink: 0,
+          bg: "background-secondary",
+          borderRadius: "radius1"
+        }}
+      >
+        <IconComponent size={15} />
+      </Flex>
+      <Flex sx={{ flexDirection: "column", flex: 1, minWidth: 0 }}>
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "spacing4",
+            minWidth: 0
+          }}
+        >
+          <Flex sx={{ flexDirection: "column", gap: "spacing3", minWidth: 0 }}>
+            <Text sx={{ fontWeight: 500, color: "heading", fontSize: "sm" }}>
+              {title}
+            </Text>
+            {description ? (
+              <Text sx={{ color: "paragraph", fontSize: "xs" }}>
+                {description}
+              </Text>
+            ) : null}
+          </Flex>
+          {action}
+        </Flex>
+        {children}
+      </Flex>
+    </Flex>
+  );
+}
+
+const ToggleSwitch = forwardRef<
+  HTMLInputElement,
+  SwitchProps & { isOn: boolean }
+>(function ToggleSwitch({ isOn, sx, ...props }, ref) {
+  return (
+    <Switch
+      ref={ref}
+      {...props}
+      sx={{
+        m: 0,
+        flexShrink: 0,
+        bg: isOn ? "accent" : "icon-disabled",
+        ...sx
+      }}
+    />
+  );
+});
+
+function PasswordProtection({
+  enabled,
+  disabled,
+  switchProps,
+  inputProps,
+  error
+}: {
+  enabled: boolean;
+  disabled: boolean;
+  switchProps: UseFormRegisterReturn;
+  inputProps: UseFormRegisterReturn;
+  error?: string;
+}) {
+  return (
+    <MonographRow
+      icon={Lock}
+      title={strings.monographPassHeading()}
+      description={enabled ? undefined : strings.secureYourNote()}
+      action={
+        <ToggleSwitch
+          isOn={enabled}
+          aria-label={strings.monographPassHeading()}
+          title={strings.monographPassDesc()}
+          disabled={disabled}
+          {...switchProps}
+        />
+      }
+    >
+      {enabled ? (
+        <Field
+          type="password"
+          variant="clean"
+          disabled={disabled}
+          aria-label={strings.monographPassHeading()}
+          placeholder={strings.enterYourPassword()}
+          error={error}
+          {...inputProps}
+          sx={{ width: "100%", mt: "spacing4" }}
+          styles={{
+            input: {
+              px: "spacing4",
+              py: "spacing6",
+              fontSize: "sm"
+            }
+          }}
+        />
+      ) : null}
+    </MonographRow>
+  );
+}
 
 type ResolvedMonograph = {
   id: string;
@@ -487,6 +594,68 @@ type ResolvedMonograph = {
   title: string;
   publishUrl?: string;
 };
+
+type PublishFormValues = {
+  title: string;
+  passwordEnabled: boolean;
+  password: string;
+  selfDestruct: boolean;
+};
+
+function defaultFormValues(note: Note): PublishFormValues {
+  return {
+    title: note.title,
+    passwordEnabled: false,
+    password: "",
+    selfDestruct: false
+  };
+}
+
+function formValuesFrom(monograph: ResolvedMonograph): PublishFormValues {
+  return {
+    title: monograph.title,
+    passwordEnabled: monograph.password !== undefined,
+    password: monograph.password ?? "",
+    selfDestruct: monograph.selfDestruct
+  };
+}
+
+function useImageDownloadProgress(noteId: string) {
+  const [progress, setProgress] = useState<{
+    total?: number;
+    current: number;
+  }>();
+
+  useEffect(() => {
+    const fileDownloadedEvent = db.eventManager.subscribe(
+      EVENTS.fileDownloaded,
+      ({ total, current, groupId }) => {
+        if (!groupId || !groupId.includes(noteId)) return;
+        if (current === total) setProgress(undefined);
+        else setProgress({ total, current });
+      }
+    );
+
+    return () => {
+      fileDownloadedEvent.unsubscribe();
+    };
+  }, [noteId]);
+
+  return progress;
+}
+
+function useResolvedMonograph(monographId: string) {
+  const result = usePromise(() => resolveMonograph(monographId), [monographId]);
+  const refresh = useCallback(() => {
+    if ("refresh" in result) result.refresh();
+  }, [result]);
+
+  return {
+    status: result.status,
+    monograph: result.status === "rejected" ? undefined : result.value,
+    refresh
+  };
+}
 
 async function resolveMonograph(
   monographId: string

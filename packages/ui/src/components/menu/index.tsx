@@ -86,7 +86,8 @@ export function Menu(props: MenuProps) {
 
       const { top, left } = getPosition(subMenuRef.current, {
         target: menuItemElement,
-        location: "right"
+        location: "right",
+        gap: 5 // TODO: should probably use a theme variable here
       });
       subMenuRef.current.style.top = `${top}px`;
       subMenuRef.current.style.left = `${left}px`;
@@ -167,6 +168,7 @@ export function Menu(props: MenuProps) {
           sx={{
             position: "absolute",
             width: "max-content",
+            minWidth: 180,
             visibility: "hidden"
           }}
           items={focusedItem.menu.items}
@@ -193,38 +195,41 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
       tabIndex={-1}
       sx={{
         bg: "background",
-        py: 1,
         display: "flex",
         flexDirection: "column",
         position: "relative",
         listStyle: "none",
         padding: 0,
         margin: 0,
-        borderRadius: "default",
+        borderRadius: "radius2",
         boxShadow: "menu",
-        border: "1px solid var(--border)",
+        border: "1px solid var(--border-secondary)",
         minWidth: 220,
+        maxWidth: "min(95vw, 350px)",
+        width: "max-content",
+        py: "spacing4",
         maxHeight: "80vh",
         ...sx
       }}
       {...flexProps}
     >
       {title && (
-        <Text
-          data-test-id="menu-title"
-          sx={{
-            fontFamily: "body",
-            fontSize: "subtitle",
-            color: "accent",
-            py: "8px",
-            px: 3,
-            borderBottom: "1px solid",
-            borderBottomColor: "border",
-            wordWrap: "break-word"
-          }}
-        >
-          {title}
-        </Text>
+        <>
+          <Text
+            data-test-id="menu-title"
+            sx={{
+              fontFamily: "body",
+              fontSize: "xxs",
+              color: "accent",
+              py: "spacing1",
+              px: "spacing4",
+              wordWrap: "break-word"
+            }}
+          >
+            {title}
+          </Text>
+          <MenuSeparator key={title} />
+        </>
       )}
       <ScrollContainer suppressScrollX>{children}</ScrollContainer>
       {/* <FlexScrollContainer>{children}</FlexScrollContainer> */}

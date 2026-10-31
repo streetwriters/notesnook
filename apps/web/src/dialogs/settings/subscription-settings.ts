@@ -165,7 +165,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
             async action() {
               const cancelTrial = await ConfirmDialog.show({
                 title: "Cancel trial?",
-                message:
+                subtitle:
                   "Cancel your trial to stop all future charges permanently. You will be immediately downgraded to the Free plan.",
                 negativeButtonText: "No",
                 positiveButtonText: "Yes"
@@ -206,7 +206,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
             async action() {
               const refundSubscription = await ConfirmDialog.show({
                 title: "Request refund?",
-                message:
+                subtitle:
                   "You will only be issued a refund if you are eligible as per our refund policy. Your account will immediately be downgraded to Basic and your funds will be transferred to your account within 24 hours.",
                 negativeButtonText: "No",
                 positiveButtonText: "Yes",

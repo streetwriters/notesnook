@@ -23,19 +23,29 @@ import { db } from "../../common/db";
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowTopRight,
-  createIcon,
   Icon,
   Plus,
-  Radar,
-  Redo,
-  Undo,
   Notebook as NotebookIcon,
-  Note as NoteIcon,
-  Reminder as ReminderIcon,
   Tag as TagIcon,
-  FocusMode,
-  NormalMode
+  Eyeglasses,
+  EyeglassesEmpty,
+  Close,
+  FileText,
+  Bell,
+  BookOpen,
+  Trash,
+  ArrowSquareOut,
+  SunDim,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Star,
+  GearSix,
+  Question,
+  PaperclipHorizontal,
+  Sliders,
+  ArrowBendUpLeft,
+  ArrowBendUpRight,
+  createIcon
 } from "../../components/icons";
 import { trashMenuItems } from "../../components/trash-item";
 import { hashNavigate, navigate } from "../../navigation";
@@ -87,10 +97,10 @@ export const commandActions = {
 
 export const commandIcons = {
   command: (command: BaseCommand) => getCommandById(command.id)?.icon,
-  note: NoteIcon,
+  note: FileText,
   notebook: NotebookIcon,
   tag: TagIcon,
-  reminder: ReminderIcon
+  reminder: Bell
 };
 
 const RECENT_COMMANDS_SAVE_KEY = "commandPalette:recent";
@@ -99,7 +109,7 @@ const staticCommands: Command[] = [
   {
     id: "notes",
     title: strings.dataTypesPluralCamelCase.note(),
-    icon: ArrowTopRight,
+    icon: FileText,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/");
@@ -110,7 +120,7 @@ const staticCommands: Command[] = [
   {
     id: "notebooks",
     title: strings.dataTypesPluralCamelCase.notebook(),
-    icon: ArrowTopRight,
+    icon: NotebookIcon,
     action: () => useAppStore.getState().setNavigationTab("notebooks"),
     group: strings.navigate(),
     type: "command"
@@ -118,7 +128,7 @@ const staticCommands: Command[] = [
   {
     id: "tags",
     title: strings.dataTypesPluralCamelCase.tag(),
-    icon: ArrowTopRight,
+    icon: TagIcon,
     action: () => useAppStore.getState().setNavigationTab("tags"),
     group: strings.navigate(),
     type: "command"
@@ -126,7 +136,7 @@ const staticCommands: Command[] = [
   {
     id: "favorites",
     title: strings.dataTypesPluralCamelCase.favorite(),
-    icon: ArrowTopRight,
+    icon: Star,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/favorites");
@@ -137,7 +147,7 @@ const staticCommands: Command[] = [
   {
     id: "reminders",
     title: strings.dataTypesPluralCamelCase.reminder(),
-    icon: ArrowTopRight,
+    icon: Bell,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/reminders");
@@ -148,7 +158,7 @@ const staticCommands: Command[] = [
   {
     id: "monographs",
     title: strings.dataTypesPluralCamelCase.monograph(),
-    icon: ArrowTopRight,
+    icon: BookOpen,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/monographs");
@@ -159,7 +169,7 @@ const staticCommands: Command[] = [
   {
     id: "trash",
     title: strings.trash(),
-    icon: ArrowTopRight,
+    icon: Trash,
     action: () => {
       useAppStore.getState().setNavigationTab("home");
       navigate("/trash");
@@ -170,7 +180,7 @@ const staticCommands: Command[] = [
   {
     id: "settings",
     title: strings.settings(),
-    icon: ArrowTopRight,
+    icon: GearSix,
     action: () => hashNavigate("/settings", { replace: true }),
     group: strings.navigate(),
     type: "command"
@@ -178,7 +188,7 @@ const staticCommands: Command[] = [
   {
     id: "help",
     title: strings.helpAndSupport(),
-    icon: ArrowTopRight,
+    icon: Question,
     action: () => (window.location.href = "https://help.notesnook.com"),
     group: strings.navigate(),
     type: "command"
@@ -186,7 +196,7 @@ const staticCommands: Command[] = [
   {
     id: "keyboard-shortcuts",
     title: "Keyboard shortcuts",
-    icon: ArrowTopRight,
+    icon: ArrowSquareOut,
     action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),
     type: "command"
@@ -194,7 +204,7 @@ const staticCommands: Command[] = [
   {
     id: "attachment-manager",
     title: strings.attachmentManager(),
-    icon: ArrowTopRight,
+    icon: PaperclipHorizontal,
     action: () => AttachmentsDialog.show({}),
     group: strings.navigate(),
     type: "command"
@@ -242,9 +252,24 @@ const staticCommands: Command[] = [
   {
     id: "toggle-theme",
     title: strings.toggleTheme(),
-    icon: Radar,
+    icon: SunDim,
     action: () => useThemeStore.getState().toggleColorScheme(),
     group: strings.general(),
+    type: "command"
+  },
+  {
+    id: "toggle-properties-panel",
+    title: "Toggle properties panel",
+    icon: Sliders,
+    action: () => {
+      const propertiesTab = useEditorStore.getState().propertiesTab;
+      useEditorStore
+        .getState()
+        .setPropertiesTab(
+          propertiesTab === undefined ? "properties" : undefined
+        );
+    },
+    group: strings.editor(),
     type: "command"
   }
 ];
@@ -402,7 +427,7 @@ function getEditorCommands(): Command[] {
     {
       id: "next-tab",
       title: strings.nextTab(),
-      icon: ArrowTopRight,
+      icon: ArrowUpRight,
       action: () => useEditorStore.getState().focusNextTab(),
       group: strings.editor(),
       type: "command"
@@ -410,7 +435,7 @@ function getEditorCommands(): Command[] {
     {
       id: "previous-tab",
       title: strings.previousTab(),
-      icon: ArrowTopRight,
+      icon: ArrowDownLeft,
       action: () => useEditorStore.getState().focusPreviousTab(),
       group: strings.editor(),
       type: "command"
@@ -418,7 +443,7 @@ function getEditorCommands(): Command[] {
     {
       id: "close-tab",
       title: strings.closeCurrentTab(),
-      icon: Radar,
+      icon: Close,
       action: () => useEditorStore.getState().closeActiveTab(),
       group: strings.editor(),
       type: "command"
@@ -426,7 +451,7 @@ function getEditorCommands(): Command[] {
     {
       id: "close-all-tabs",
       title: strings.closeAllTabs(),
-      icon: Radar,
+      icon: Close,
       action: () => useEditorStore.getState().closeAllTabs(),
       group: strings.editor(),
       type: "command"
@@ -438,7 +463,7 @@ function getEditorCommands(): Command[] {
       {
         id: "undo",
         title: strings.undo(),
-        icon: Undo,
+        icon: ArrowBendUpLeft,
         action: () => editor.editor?.undo(),
         group: strings.editor(),
         type: "command",
@@ -447,7 +472,7 @@ function getEditorCommands(): Command[] {
       {
         id: "redo",
         title: strings.redo(),
-        icon: Redo,
+        icon: ArrowBendUpRight,
         action: () => editor.editor?.redo(),
         group: strings.editor(),
         type: "command",
@@ -481,7 +506,7 @@ function getEditorCommands(): Command[] {
   commands.push({
     id: "toggle-focus-mode",
     title: strings.toggleFocusMode(),
-    icon: isFocusMode ? FocusMode : NormalMode,
+    icon: isFocusMode ? EyeglassesEmpty : Eyeglasses,
     action: () => useAppStore.getState().toggleFocusMode(),
     group: strings.editor(),
     type: "command"
@@ -513,7 +538,11 @@ function menuItemToCommands(
   }
 
   if (!menuItem.onClick) return commands;
-  const _Icon = menuItem.icon ? createIcon(menuItem.icon) : undefined;
+  const _Icon = menuItem.icon
+    ? createIcon(menuItem.icon)
+    : menuItem.iconComponent
+    ? (menuItem.iconComponent as Icon)
+    : undefined;
   commands.push({
     id: idSuffix ? `${menuItem.key}-${idSuffix}` : menuItem.key,
     title: menuItem.title,

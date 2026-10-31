@@ -17,113 +17,46 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Flex, Text } from "@theme-ui/components";
-import {
-  Plus,
-  ChevronDown,
-  Circle,
-  CheckCircleOutline,
-  CheckIntermediate,
-  CheckRemove,
-  CircleEmpty,
-  ChevronRight
-} from "../components/icons";
+import { useCallback } from "react";
 import { db } from "../common/db";
 import Dialog from "../components/dialog";
-import { useStore } from "../stores/notebook-store";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
 import { isMac } from "../utils/platform";
-import { create } from "zustand";
-import { Notebook } from "@notesnook/core";
-import Field from "../components/field";
-import { AddNotebookDialog } from "./add-notebook-dialog";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import {
-  TreeNode,
-  VirtualizedTree,
-  VirtualizedTreeHandle
-} from "../components/virtualized-tree";
+  RelationChange,
+  useRelationChangesStore
+} from "../stores/relation-changes-store";
+import { NotebookPicker } from "../components/notebook-picker";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
-export type SelectedReference = {
-  id: string;
-  new: boolean;
-  op: "add" | "remove";
-};
-
-interface ISelectionStore {
-  selected: SelectedReference[];
-  isMultiselect: boolean;
-  setSelected(refs: SelectedReference[]): void;
-  setIsMultiselect(state: boolean): void;
-}
-export const useSelectionStore = create<ISelectionStore>((set) => ({
-  selected: [],
-  isMultiselect: false,
-  setSelected: (selected) => set({ selected: selected.slice() }),
-  setIsMultiselect: (isMultiselect) => set({ isMultiselect })
-}));
 
 export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
   onClose,
   noteIds
 }: MoveNoteDialogProps) {
-  const setSelected = useSelectionStore((store) => store.setSelected);
-  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
-  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
-  const refreshNotebooks = useStore((store) => store.refresh);
-  const treeRef = useRef<VirtualizedTreeHandle<Notebook>>(null);
-  const [notebooks, setNotebooks] = useState<string[]>([]);
+  const initialSelection = useCallback(async () => {
+    const selected: RelationChange[] = [];
+    for (const { fromId: notebookId } of await db.relations
+      .to({ type: "note", ids: noteIds }, "notebook")
+      .get()) {
+      const isSelected =
+        selected.findIndex((item) => item.id === notebookId) > -1;
+      if (isSelected) continue;
 
-  useEffect(() => {
-    db.notebooks.roots
-      .ids(db.settings.getGroupOptions("notebooks"))
-      .then((ids) => setNotebooks(ids));
-  }, []);
-
-  useEffect(() => {
-    (async function () {
-      const selected: SelectedReference[] = useSelectionStore
-        .getState()
-        .selected.slice();
-
-      for (const { fromId: notebookId } of await db.relations
-        .to({ type: "note", ids: noteIds }, "notebook")
-        .get()) {
-        const isSelected =
-          selected.findIndex((item) => item.id === notebookId) > -1;
-        if (isSelected) continue;
-
-        if (await notebookHasNotes(notebookId, noteIds)) {
-          selected.push({
-            id: notebookId,
-            op: "add",
-            new: false
-          });
-        }
+      if (await notebookHasNotes(notebookId, noteIds)) {
+        selected.push({
+          id: notebookId,
+          op: "add",
+          new: false
+        });
       }
-
-      setSelected(selected);
-      setIsMultiselect(selected.length > 1);
-    })();
-  }, [noteIds, refreshNotebooks, setSelected, setIsMultiselect]);
-
-  useEffect(() => {
-    treeRef.current?.refresh();
-  }, [notebooks]);
-
-  const _onClose = useCallback(
-    (result: boolean) => {
-      setSelected([]);
-      setIsMultiselect(false);
-      onClose(result);
-    },
-    [setSelected, setIsMultiselect, onClose]
-  );
+    }
+    return selected;
+  }, [noteIds]);
 
   return (
     <Dialog
@@ -131,13 +64,14 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
       isOpen={true}
       title={strings.selectNotebooks()}
       description={strings.selectNotebooksDesktopDesc(isMac() ? "Cmd" : "Ctrl")}
-      onClose={() => _onClose(false)}
-      width={500}
+      onClose={() => onClose(false)}
+      width={700}
       noScroll
+      sx={{ minHeight: "553px" }}
       positiveButton={{
         text: strings.done(),
         onClick: async () => {
-          const { selected } = useSelectionStore.getState();
+          const { selected } = useRelationChangesStore.getState();
           for (const item of selected) {
             try {
               if (item.op === "remove") {
@@ -164,341 +98,21 @@ export const MoveNoteDialog = DialogManager.register(function MoveNoteDialog({
             );
           }
 
-          _onClose(true);
+          onClose(true);
         }
       }}
       negativeButton={{
         text: strings.cancel(),
-        onClick: () => _onClose(false)
+        onClick: () => onClose(false)
       }}
     >
-      <Flex
-        id="subnotebooks"
-        variant="columnFill"
-        sx={{
-          height: "80vh",
-          px: 4
-        }}
-      >
-        <Field
-          autoFocus
-          sx={{ m: 0, mb: 2 }}
-          styles={{
-            input: { p: "7.5px" }
-          }}
-          placeholder={strings.searchNotebooks()}
-          onChange={async (e) => {
-            const query = e.target.value.trim();
-            const ids = await (query
-              ? db.lookup.notebooks(query).ids()
-              : db.notebooks.roots.ids(
-                  db.settings.getGroupOptions("notebooks")
-                ));
-            setNotebooks(ids);
-          }}
-        />
-        {isMultiselect && (
-          <Button
-            variant="anchor"
-            onClick={() => {
-              const originalSelection: SelectedReference[] = useSelectionStore
-                .getState()
-                .selected.filter((a) => !a.new)
-                .map((s) => ({ ...s, op: "add" }));
-              setSelected(originalSelection);
-              setIsMultiselect(originalSelection.length > 1);
-            }}
-            sx={{ textDecoration: "none", mb: 2 }}
-          >
-            {strings.resetSelection()}
-          </Button>
-        )}
-        {notebooks.length > 0 ? (
-          <>
-            <VirtualizedTree
-              rootId={"root"}
-              itemHeight={30}
-              treeRef={treeRef}
-              getChildNodes={async ({ id, depth }) => {
-                const nodes: TreeNode<Notebook>[] = [];
-                if (id === "root") {
-                  for (const id of notebooks) {
-                    const notebook = (await db.notebooks.notebook(id))!;
-                    const children = await db.relations
-                      .from(notebook, "notebook")
-                      .count();
-                    nodes.push({
-                      data: notebook,
-                      depth: depth + 1,
-                      hasChildren: children > 0,
-                      id,
-                      parentId: "root"
-                    });
-                  }
-                  return nodes;
-                }
-
-                const subNotebooks = await db.relations
-                  .from({ type: "notebook", id }, "notebook")
-                  .resolve();
-
-                for (const notebook of subNotebooks) {
-                  const hasChildren =
-                    (await db.relations.from(notebook, "notebook").count()) > 0;
-                  nodes.push({
-                    parentId: id,
-                    id: notebook.id,
-                    data: notebook,
-                    depth: depth + 1,
-                    hasChildren
-                  });
-                }
-
-                return nodes;
-              }}
-              renderItem={({ item, expanded, index, collapse, expand }) => (
-                <NotebookItem
-                  notebook={item.data}
-                  depth={item.depth}
-                  isExpandable={item.hasChildren}
-                  isExpanded={expanded}
-                  toggle={expanded ? collapse : expand}
-                  onCreateItem={() => {
-                    treeRef.current?.refreshItem(index, item.data, {
-                      expand: true
-                    });
-                  }}
-                  multiSelectable
-                />
-              )}
-            />
-          </>
-        ) : (
-          <Flex
-            sx={{
-              my: 2,
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text variant="body">{strings.notebooksEmpty()}</Text>
-            <Button
-              data-test-id="add-new-notebook"
-              variant="secondary"
-              sx={{ mt: 2 }}
-              onClick={() =>
-                AddNotebookDialog.show({}).then((res) =>
-                  res
-                    ? db.notebooks.roots
-                        .ids(db.settings.getGroupOptions("notebooks"))
-                        .then((ids) => setNotebooks(ids))
-                    : null
-                )
-              }
-            >
-              {strings.addNotebook()}
-            </Button>
-          </Flex>
-        )}
-      </Flex>
+      <NotebookPicker multiSelectable initialSelection={initialSelection} />
     </Dialog>
   );
 });
-
-function calculateIndentation(
-  expandable: boolean,
-  depth: number,
-  base: number
-) {
-  if (expandable && depth > 0) return depth * 18 + base;
-  else if (depth === 0) return 0;
-  else return depth * 24 + base;
-}
-export function NotebookItem(props: {
-  notebook: Notebook;
-  isExpanded: boolean;
-  isExpandable: boolean;
-  toggle: () => void;
-  depth: number;
-  onCreateItem: () => void;
-  multiSelectable?: boolean;
-}) {
-  const {
-    notebook,
-    isExpanded,
-    toggle,
-    depth,
-    isExpandable,
-    onCreateItem,
-    multiSelectable
-  } = props;
-
-  const setIsMultiselect = useSelectionStore((store) => store.setIsMultiselect);
-  const setSelected = useSelectionStore((store) => store.setSelected);
-  const isMultiselect = useSelectionStore((store) => store.isMultiselect);
-
-  const check: React.MouseEventHandler<HTMLDivElement> = useCallback(
-    (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      const { selected } = useSelectionStore.getState();
-
-      const isCtrlPressed = e.ctrlKey || e.metaKey;
-      if (isCtrlPressed) setIsMultiselect(true);
-
-      if (multiSelectable && (isMultiselect || isCtrlPressed)) {
-        setSelected(selectMultiple(notebook, selected));
-      } else {
-        setSelected(selectSingle(notebook, selected));
-      }
-    },
-    [isMultiselect, multiSelectable, notebook, setIsMultiselect, setSelected]
-  );
-
-  return (
-    <Flex
-      as="li"
-      data-test-id="notebook"
-      // as="summary"
-      sx={{
-        cursor: "pointer",
-        justifyContent: "space-between",
-        alignItems: "center",
-        bg: depth === 0 ? "var(--background-secondary)" : "transparent",
-        borderRadius: "default",
-        p: depth === 0 ? 1 : 0,
-        height: depth === 0 ? "30px" : "auto",
-        ml: `${calculateIndentation(isExpandable, depth, 5)}px`,
-        mb: depth === 0 ? 1 : 2
-      }}
-      onClick={(e) => {
-        if (!isExpandable) {
-          check(e);
-          return;
-        }
-        e.stopPropagation();
-        e.preventDefault();
-        toggle();
-      }}
-    >
-      <Flex sx={{ alignItems: "center" }}>
-        {isExpandable ? (
-          isExpanded ? (
-            <ChevronDown data-test-id="collapse-notebook" size={18} />
-          ) : (
-            <ChevronRight data-test-id="expand-notebook" size={18} />
-          )
-        ) : null}
-        <SelectedCheck size={18} item={notebook} onClick={check} />
-        <Text className="title" data-test-id="notebook-title" variant="body">
-          {notebook.title}
-        </Text>
-      </Flex>
-      <Flex data-test-id="notebook-tools" sx={{ alignItems: "center" }}>
-        <Button
-          variant="secondary"
-          data-test-id="add-sub-notebook"
-          sx={{ p: "small" }}
-        >
-          <Plus
-            size={18}
-            title={strings.newNotebook()}
-            onClick={async (e) => {
-              e.stopPropagation();
-              await AddNotebookDialog.show({ parentId: notebook.id });
-              onCreateItem();
-            }}
-          />
-        </Button>
-      </Flex>
-    </Flex>
-  );
-}
-
-export function SelectedCheck({
-  item,
-  size = 20,
-  onClick
-}: {
-  item?: { id: string };
-  size?: number;
-  onClick?: React.MouseEventHandler<HTMLDivElement>;
-}) {
-  const selectedItems = useSelectionStore((store) => store.selected);
-  const selectedItem =
-    item && selectedItems[findSelectionIndex(item, selectedItems)];
-
-  return selectedItem?.op === "add" ? (
-    <CheckCircleOutline
-      size={size}
-      sx={{ mr: 1 }}
-      color="accent"
-      onClick={onClick}
-    />
-  ) : selectedItem?.op === "remove" ? (
-    <CheckRemove
-      size={size}
-      sx={{ mr: 1 }}
-      color="icon-error"
-      onClick={onClick}
-    />
-  ) : (
-    <CircleEmpty size={size} sx={{ mr: 1, opacity: 0.4 }} onClick={onClick} />
-  );
-}
-
-function createSelection(item: { id: string }): SelectedReference {
-  return {
-    id: item.id,
-    op: "add",
-    new: true
-  };
-}
-
-function findSelectionIndex(ref: { id: string }, array: { id: string }[]) {
-  return array.findIndex((a) => a.id === ref.id);
-}
 
 function notebookHasNotes(notebookId: string, noteIds: string[]) {
   return db.relations
     .from({ type: "notebook", id: notebookId }, "note")
     .has(...noteIds);
-}
-
-export function selectMultiple(
-  topic: { id: string },
-  selected: SelectedReference[]
-) {
-  const index = findSelectionIndex(topic, selected);
-  const isSelected = index > -1;
-  const item = selected[index];
-
-  if (isSelected) {
-    // we remove new topics & toggle old ones
-    if (item.new) selected.splice(index, 1);
-    else item.op = item.op === "add" ? "remove" : "add";
-  } else {
-    selected.push(createSelection(topic));
-  }
-
-  return selected;
-}
-
-function selectSingle(topic: { id: string }, array: SelectedReference[]) {
-  const selected: SelectedReference[] = array.filter((ref) => !ref.new);
-
-  const index = findSelectionIndex(topic, array);
-  const item = array[index];
-  const isSelected = index > -1;
-
-  if (isSelected && !item.new) {
-    item.op = item.op === "add" ? "remove" : "add";
-  } else if (!isSelected) {
-    selected.forEach((a) => (a.op = "remove"));
-    selected.push(createSelection(topic));
-  }
-
-  return selected;
 }

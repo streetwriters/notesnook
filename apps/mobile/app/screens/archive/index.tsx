@@ -29,6 +29,8 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { db } from "../../common/database";
 import { strings } from "@notesnook/intl";
 import { useArchived } from "../../stores/use-archived-store";
+import LineSeparator from "../../components/ui/seperator/line-separator";
+import { Spacing } from "../../common/design/spacing";
 
 export const Archive = ({ navigation, route }: NavigationProps<"Archive">) => {
   const [archive, loading, refresh] = useArchived();
@@ -53,6 +55,9 @@ export const Archive = ({ navigation, route }: NavigationProps<"Archive">) => {
         canGoBack={false}
         hasSearch={true}
         id={route.name}
+        style={{
+          paddingHorizontal: Spacing.LEVEL_2
+        }}
         onSearch={() => {
           Navigation.push("Search", {
             placeholder: strings.searchInRoute(route.name),
@@ -63,6 +68,7 @@ export const Archive = ({ navigation, route }: NavigationProps<"Archive">) => {
           });
         }}
       />
+      <LineSeparator paddingVertical={Spacing.LEVEL_3} />
       <DelayLayout wait={loading}>
         <List
           data={archive}
