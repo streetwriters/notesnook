@@ -50,6 +50,7 @@ export type FieldProps = InputProps & {
   rightActions?: Action[];
   leftActions?: Action[];
   leftIcon?: Icon;
+  rightIcon?: Icon;
 };
 
 const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
@@ -69,6 +70,7 @@ const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
     validate,
     disabled,
     leftIcon: LeftIcon,
+    rightIcon: RightIcon,
     ...inputProps
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -153,6 +155,20 @@ const Field = forwardRef<HTMLInputElement, FieldProps>(function Field(
             color="icon"
             sx={{
               left: "spacing4",
+              pointerEvents: "none",
+              position: "absolute",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 1
+            }}
+          />
+        )}
+        {RightIcon && (
+          <RightIcon
+            size={15}
+            color="icon"
+            sx={{
+              right: "spacing4",
               pointerEvents: "none",
               position: "absolute",
               top: "50%",
