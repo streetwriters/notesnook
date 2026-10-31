@@ -274,7 +274,7 @@ export class Sync {
 
     let done = 0;
     let total = 0;
-    for await (const item of this.collector.collect(100, isForceSync)) {
+    for await (const item of this.collector.collect(1000, isForceSync)) {
       total += item.items.length;
       const result = await this.pushItem(deviceId, item);
       this.logger.info(`Batch sent for type ${item.type}`, {

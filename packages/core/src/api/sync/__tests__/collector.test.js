@@ -82,11 +82,17 @@ test("note modified while being collected should stay unsynced", () =>
     const collector = new Collector(db);
     const noteId = await db.notes.add(TEST_NOTE);
 
+    // each edit gets its own dateModified, as two edits in the same millisecond would look unchanged
+    let edits = 0;
     for await (const _ of collector.collect(100, false)) {
       await db
         .sql()
         .updateTable("notes")
-        .set({ title: "Edited", dateModified: Date.now() + 1, synced: false })
+        .set({
+          title: "Edited",
+          dateModified: Date.now() + ++edits,
+          synced: false
+        })
         .where("id", "=", noteId)
         .execute();
     }
@@ -386,3 +392,35 @@ async function iteratorToArray(iterator) {
   }
   return items;
 }
+
+test("collected items should be batched across fetches up to the item limit", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const collector = new Collector(db);
+    for (let i = 0; i < 250; ++i) await db.notes.add({ title: `note ${i}` });
+
+    const notes = (await iteratorToArray(collector.collect(200, false)))
+      .filter((batch) => batch.type === "note")
+      .map((batch) => batch.items.length);
+
+    expect(notes).toStrictEqual([200, 50]);
+    expect(await iteratorToArray(collector.collect(200, false))).toHaveLength(
+      0
+    );
+  }));
+
+test("collected items should be batched up to the size limit", () =>
+  databaseTest().then(async (db) => {
+    await loginFakeUser(db);
+    const collector = new Collector(db);
+    for (let i = 0; i < 3; ++i) await db.notes.add({ title: `note ${i}` });
+
+    const notes = (await iteratorToArray(collector.collect(1000, false, 1)))
+      .filter((batch) => batch.type === "note")
+      .map((batch) => batch.items.length);
+
+    expect(notes).toStrictEqual([1, 1, 1]);
+    expect(await iteratorToArray(collector.collect(1000, false))).toHaveLength(
+      0
+    );
+  }));
