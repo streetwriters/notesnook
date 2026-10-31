@@ -115,6 +115,10 @@ export function NotebookPicker(props: {
     treeRef.current?.refresh();
   }, [notebooks]);
 
+  const visibleNotebooks = notebooks.filter(
+    (id) => !excludedIds.current.has(id)
+  );
+
   return (
     <Flex
       id="subnotebooks"
@@ -164,7 +168,7 @@ export function NotebookPicker(props: {
           }
         ]}
       />
-      {notebooks.length > 0 ? (
+      {visibleNotebooks.length > 0 ? (
         <VirtualizedTree
           rootId={"root"}
           itemGap={7}
