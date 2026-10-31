@@ -206,6 +206,8 @@ export const Link = Mark.create<LinkOptions>({
         find: linkRegex,
         type: this.type,
         getAttributes: (match) => {
+          // reset in case of previous matches
+          regExp.lastIndex = 0;
           return {
             href: regExp.exec(match[0])?.[1]
           };
