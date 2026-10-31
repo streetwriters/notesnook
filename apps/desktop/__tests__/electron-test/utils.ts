@@ -150,6 +150,8 @@ export async function buildApp(version?: string) {
       `--config electron-builder.config.js`,
       `--c.extraMetadata.productName=${productName}`,
       `--c.compression=store`,
+      // Playwright attaches to the app via --inspect
+      `--c.electronFuses.enableNodeCliInspectArguments=true`,
       "--publish=never"
     ];
     if (version) args.push(`--c.extraMetadata.version=${version}`);
