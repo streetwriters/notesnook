@@ -28,7 +28,7 @@ class TagStore extends BaseStore<TagStore> {
 
   refresh = async () => {
     this.set({
-      tags: await db.tags.all.grouped(db.settings.getGroupOptions("tags"))
+      tags: await db.tags.all.sorted(db.settings.getGroupOptions("tags"))
     });
   };
 }

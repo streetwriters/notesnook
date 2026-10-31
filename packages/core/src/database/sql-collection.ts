@@ -42,6 +42,7 @@ import {
   AnyColumnWithTable,
   ExpressionOrFactory,
   Kysely,
+  RawBuilder,
   SelectQueryBuilder,
   SqlBool,
   sql
@@ -55,14 +56,8 @@ import {
   createUpcomingReminderTimeQuery
 } from "../collections/reminders.js";
 
-const formats = {
-  month: "%Y-%m",
-  year: "%Y",
-  week: "%Y-%W",
-  abc: null,
-  default: "%Y-%W",
-  none: null
-} satisfies Record<GroupOptions["groupBy"], string | null>;
+const formats = { month: "%Y-%m", year: "%Y", week: "%Y-%W" };
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const MAX_SQL_PARAMETERS = 200;
 
 export class SQLCollection<
@@ -539,7 +534,7 @@ export class FilteredSelector<T extends Item> {
     }
 
     if (options.groupBy === "abc") fields.push("title");
-    else if (options.sortBy === "title" && options.groupBy !== "none")
+    else if (!isSortByDate(options) && options.groupBy !== "none")
       fields.push("dateCreated");
     else if (options.sortBy !== "dueDate" && options.sortBy !== "relevance")
       fields.push(options.sortBy);
@@ -619,11 +614,8 @@ export class FilteredSelector<T extends Item> {
   private buildSortExpression(options: GroupOptions, hasDueDate?: boolean) {
     sanitizeSortOptions(this.type, options);
 
-    const sortBy: Set<SortOptions["sortBy"]> = new Set();
-    sortBy.add(options.sortBy);
-    if (options.groupBy === "abc") sortBy.add("title");
-    else if (options.sortBy === "title" && options.groupBy !== "none")
-      sortBy.add("dateCreated");
+    const groupKey =
+      this.type !== "reminders" ? buildGroupKey(options) : undefined;
 
     return <T>(
       qb: SelectQueryBuilder<DatabaseSchema, keyof DatabaseSchema, T>
@@ -638,49 +630,58 @@ export class FilteredSelector<T extends Item> {
           "desc"
         );
 
-      for (const item of sortBy) {
-        if (item === "title") {
-          qb = qb.orderBy(
-            options.sortBy !== "title"
-              ? sql`substring(ltrim(title, ' \u00a0\r\n\t\v'), 1, 1) COLLATE NOCASE`
-              : sql`natural_key(ltrim(title, ' \u00a0\r\n\t\v')) COLLATE NOCASE`,
-            options.sortDirection
-          );
-        } else {
-          const timeFormat = isGroupOptions(options)
-            ? formats[options.groupBy]
-            : null;
-          if (!timeFormat || isSortByDate(options)) {
-            if (item === "dueDate") {
-              if (hasDueDate)
-                qb = qb.orderBy(item as any, options.sortDirection);
-              else
-                qb = qb.orderBy(
-                  (qb) => qb.parens(createUpcomingReminderTimeQuery()),
-                  options.sortDirection
-                );
-            } else if (item !== "relevance")
-              qb = qb.orderBy(item, options.sortDirection);
-            continue;
-          }
+      // order by group first so items of the same group stay together
+      if (groupKey) qb = qb.orderBy(...groupKey);
 
-          qb = qb.orderBy(
-            sql`strftime('${sql.raw(timeFormat)}', ${sql.raw(
-              item
-            )} / 1000, 'unixepoch', 'localtime')`,
-            options.sortDirection
-          );
-        }
-      }
+      if (options.sortBy === "title")
+        qb = qb.orderBy(
+          sql`natural_key(ltrim(title, ' \u00a0\r\n\t\v')) COLLATE NOCASE`,
+          options.sortDirection
+        );
+      else if (options.sortBy === "dueDate" && hasDueDate)
+        qb = qb.orderBy("dueDate" as any, options.sortDirection);
+      else if (options.sortBy === "dueDate")
+        qb = qb.orderBy(
+          (qb) => qb.parens(createUpcomingReminderTimeQuery()),
+          options.sortDirection
+        );
+      else if (options.sortBy !== "relevance")
+        qb = qb.orderBy(options.sortBy, options.sortDirection);
       return qb;
     };
   }
 }
 
-function isGroupOptions(
-  options: SortOptions | GroupOptions
-): options is GroupOptions {
-  return "groupBy" in options;
+// must match the group keys in `createKeySelector`
+function buildGroupKey(
+  options: GroupOptions
+): [RawBuilder<unknown>, "asc" | "desc"] | undefined {
+  const { groupBy, sortBy } = options;
+  if (groupBy === "abc")
+    return sortBy === "title"
+      ? undefined
+      : [
+          sql`substring(ltrim(title, ' \u00a0\r\n\t\v'), 1, 1) COLLATE NOCASE`,
+          "asc"
+        ];
+
+  // date sorts already keep date groups together
+  if (groupBy === "none" || sortBy === "relevance" || isSortByDate(options))
+    return;
+
+  if (groupBy === "default") {
+    const lastWeek = Date.now() - WEEK_MS;
+    return [
+      sql`CASE WHEN dateCreated > ${lastWeek} THEN 2 WHEN dateCreated > ${
+        lastWeek - WEEK_MS
+      } THEN 1 ELSE 0 END`,
+      "desc"
+    ];
+  }
+  return [
+    sql`strftime(${formats[groupBy]}, dateCreated / 1000, 'unixepoch', 'localtime')`,
+    "desc"
+  ];
 }
 
 function isSortByDate(options: SortOptions | GroupOptions) {
