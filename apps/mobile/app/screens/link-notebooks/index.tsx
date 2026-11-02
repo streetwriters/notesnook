@@ -328,7 +328,7 @@ const LinkNotebooks = (props: NavigationProps<"LinkNotebooks">) => {
               justifyContent: "center",
               alignItems: "center",
               height: 200,
-              paddingHorizontal: DefaultAppStyles.GAP
+              paddingHorizontal: Spacing.LEVEL_3
             }}
           >
             {loading ? (

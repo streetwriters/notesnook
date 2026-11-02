@@ -82,7 +82,7 @@ const Intro = () => {
 
           {item.user ? (
             <Paragraph fontFamily="MEDIUM" fontSize="XL">
-              {item.user}
+              {item.user()}
             </Paragraph>
           ) : null}
 

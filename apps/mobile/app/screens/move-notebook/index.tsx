@@ -351,7 +351,7 @@ export const MoveNotebook = (props: NavigationProps<"MoveNotebook">) => {
               justifyContent: "center",
               alignItems: "center",
               height: 200,
-              paddingHorizontal: DefaultAppStyles.GAP
+              paddingHorizontal: Spacing.LEVEL_3
             }}
           >
             <Text

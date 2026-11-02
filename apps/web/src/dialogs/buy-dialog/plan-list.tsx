@@ -573,6 +573,7 @@ function OneTimePricing(props: PricingProps) {
 }
 
 export function ComparePlans() {
+  const rows = getFeaturesTable();
   const plans = [
     SubscriptionPlan.FREE,
     SubscriptionPlan.ESSENTIAL,

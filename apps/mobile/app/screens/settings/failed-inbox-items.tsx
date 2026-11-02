@@ -212,12 +212,9 @@ export const FailedInboxItems = () => {
 
                       return true;
                     }
-
-                    return true;
-                  }
-                });
+                  });
+                }
               }
-            }
             : undefined
         }
       />

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Notebook as NotebookType, VirtualizedGrouping } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { Box, Flex, Input } from "@notesnook/ui";
 import { useEffect, useRef, useState } from "react";
 import { db } from "../common/db";

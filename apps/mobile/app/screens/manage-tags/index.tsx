@@ -400,7 +400,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
                   height: 200,
                   justifyContent: "center",
                   alignItems: "center",
-                  paddingHorizontal: DefaultAppStyles.GAP
+                  paddingHorizontal: Spacing.LEVEL_3
                 }}
               >
                 <Heading size={50} color={colors.secondary.heading}>
