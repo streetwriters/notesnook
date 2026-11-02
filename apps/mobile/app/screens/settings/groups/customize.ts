@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { strings } from "@notesnook/intl";
 import { Appearance } from "react-native";
 import { db } from "../../../common/database";
+import AppLanguage, {
+  formatAppLanguage
+} from "../../../components/sheets/app-language";
 import DateFormat from "../../../components/sheets/date-format";
 import TrashInterval from "../../../components/sheets/trash-interval";
 import SettingsService from "../../../services/settings";
@@ -29,7 +32,7 @@ import { ToastManager } from "../../../services/event-manager";
 import { useDragState } from "../components/editor/state";
 import { SettingSection } from "../types";
 
-export const customizeGroup: SettingSection = {
+export const getCustomizeGroup = (): SettingSection => ({
   id: "customize",
   name: strings.customization(),
   sections: [
@@ -103,6 +106,25 @@ export const customizeGroup: SettingSection = {
       name: strings.behavior(),
       description: strings.behaviorDesc(),
       sections: [
+        {
+          id: "language-group",
+          type: "group",
+          name: strings.language(),
+          sections: [
+            {
+              id: "app-language",
+              name: strings.selectLanguage(),
+              description: () =>
+                formatAppLanguage(SettingsService.get().appLanguage),
+              property: "appLanguage",
+              icon: "translate",
+              isModal: true,
+              modifer: () => {
+                AppLanguage.present();
+              }
+            }
+          ]
+        },
         {
           id: "navigation-group",
           type: "group",
@@ -360,4 +382,4 @@ export const customizeGroup: SettingSection = {
       headerBottomBorder: true
     }
   ]
-};
+});

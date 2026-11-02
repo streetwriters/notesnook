@@ -25,7 +25,7 @@ import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { SettingSection } from "../types";
 
-export const productivityGroup: SettingSection = {
+export const getProductivityGroup = (): SettingSection => ({
   id: "productivity",
   name: strings.productivity(),
   sections: [
@@ -136,4 +136,4 @@ export const productivityGroup: SettingSection = {
       ]
     }
   ]
-};
+});

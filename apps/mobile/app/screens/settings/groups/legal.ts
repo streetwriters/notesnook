@@ -21,7 +21,7 @@ import { strings } from "@notesnook/intl";
 import { Linking } from "react-native";
 import { SettingSection } from "../types";
 
-export const legalGroup: SettingSection = {
+export const getLegalGroup = (): SettingSection => ({
   id: "legal",
   name: strings.legal(),
   sections: [
@@ -64,4 +64,4 @@ export const legalGroup: SettingSection = {
       headerBottomBorder: true
     }
   ]
-};
+});

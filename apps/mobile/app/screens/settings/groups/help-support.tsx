@@ -25,7 +25,7 @@ import DownloadLogs from "../../../components/sheets/download-logs";
 import { Issue } from "../../../components/sheets/github/issue";
 import { ToastManager, presentSheet } from "../../../services/event-manager";
 import { SettingSection } from "../types";
-export const helpSupportGroup: SettingSection = {
+export const getHelpSupportGroup = (): SettingSection => ({
   id: "help-support",
   name: strings.helpAndSupport(),
   sections: [
@@ -83,4 +83,4 @@ export const helpSupportGroup: SettingSection = {
       }
     }
   ]
-};
+});

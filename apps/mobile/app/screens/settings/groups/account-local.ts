@@ -33,7 +33,7 @@ import { eSendEvent } from "../../../services/event-manager";
 import { eAfterSync } from "../../../utils/events";
 import { SettingSection } from "../types";
 
-export const accountLocalGroup: SettingSection = {
+export const getAccountLocalGroup = (): SettingSection => ({
   id: "account-local",
   name: strings.account(),
   useHook: () => useUserStore((state) => state.user),
@@ -51,7 +51,7 @@ export const accountLocalGroup: SettingSection = {
           title: strings.deleteData(),
           paragraph: strings.irreverisibleAction(),
           positiveType: "errorShade",
-          positiveText: "Delete data",
+          positiveText: strings.deleteData(),
           positivePress: async () => {
             await PremiumService.setPremiumStatus();
             await BiometricService.resetCredentials();
@@ -72,4 +72,4 @@ export const accountLocalGroup: SettingSection = {
       }
     }
   ]
-};
+});

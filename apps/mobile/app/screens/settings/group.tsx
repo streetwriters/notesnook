@@ -33,7 +33,19 @@ import { useThemeColors } from "@notesnook/theme";
 import { SectionGroup } from "./section-group";
 import { Spacing } from "../../common/design/spacing";
 import LineSeparator from "../../components/ui/seperator/line-separator";
+import { useSettingsData } from "./settings-data";
 const keyExtractor = (item: SettingSection) => item.id;
+const findSection = (
+  sections: SettingSection[] | undefined,
+  id: string
+): SettingSection | undefined => {
+  if (!sections) return;
+  for (const section of sections) {
+    if (section.id === id) return section;
+    const found = findSection(section.sections, id);
+    if (found) return found;
+  }
+};
 const AnimatedKeyboardAvoidingFlatList = Animated.createAnimatedComponent(
   KeyboardAwareFlatList
 );
@@ -43,6 +55,10 @@ const Group = ({
   route
 }: NativeStackScreenProps<RouteParams, "SettingsGroup">) => {
   const { colors } = useThemeColors();
+  const settingsGroups = useSettingsData();
+  const currentGroup = findSection(settingsGroups, route.params.id);
+  const title = currentGroup?.name || route.params.name;
+  const sections = currentGroup?.sections || route.params.sections;
   useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().setFocusedRouteId("Settings");
@@ -57,7 +73,7 @@ const Group = ({
     index: number;
   }) =>
     item.type === "group" ? (
-      <SectionGroup item={item} isLast={!route.params.sections?.[index + 1]} />
+      <SectionGroup item={item} isLast={!sections?.[index + 1]} />
     ) : (
       <SectionItem item={item} />
     );
@@ -67,7 +83,7 @@ const Group = ({
       {route.params.hideHeader ? null : (
         <Header
           renderedInRoute="Settings"
-          title={route.params.name as string}
+          title={title as string}
           canGoBack={true}
           style={{
             backgroundColor: "transparent"
@@ -86,13 +102,13 @@ const Group = ({
             flex: 1
           }}
         >
-          {!route.params.sections && route.params.component
+          {!sections && route.params.component
             ? components[route.params.component]
             : null}
 
-          {route.params.sections ? (
+          {sections ? (
             <AnimatedKeyboardAvoidingFlatList
-              data={route.params.sections}
+              data={sections}
               ListHeaderComponent={
                 route.params.component
                   ? components[route.params.component]

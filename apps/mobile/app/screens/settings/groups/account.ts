@@ -56,7 +56,7 @@ import { logoutUser } from "../logout";
 import { SettingSection } from "../types";
 import RecoveryKeySheet from "../../../components/sheets/recovery-key";
 
-export const accountGroup: SettingSection = {
+export const getAccountGroup = (): SettingSection => ({
   id: "account",
   name: strings.account(),
   useHook: () => useUserStore((state) => state.user),
@@ -338,6 +338,7 @@ export const accountGroup: SettingSection = {
                   title: strings.clearCacheConfirm(),
                   paragraph: strings.clearCacheConfirmDesc(),
                   positiveText: strings.clear(),
+                  negativeText: strings.cancel(),
                   positivePress: async () => {
                     filesystem.clearCache();
                     ToastManager.show({
@@ -422,9 +423,8 @@ export const accountGroup: SettingSection = {
                         setTimeout(async () => {
                           try {
                             startProgress({
-                              title: "Deleting account",
-                              paragraph:
-                                "Please wait while we delete your account"
+                              title: strings.deletingAccount(),
+                              paragraph: strings.deletingAccountDesc()
                             });
                             await db.user?.deleteUser(value);
                             DatabaseLogger.info("User account deleted");
@@ -719,4 +719,4 @@ export const accountGroup: SettingSection = {
       ]
     }
   ]
-};
+});

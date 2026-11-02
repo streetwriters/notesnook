@@ -38,7 +38,7 @@ import {
 import { verifyUserWithApplock } from "../verify-user";
 import { SettingSection } from "../types";
 
-export const privacySecurityGroup: SettingSection = {
+export const getPrivacySecurityGroup = (): SettingSection => ({
   id: "privacy-security",
   name: strings.privacyAndSecurity(),
   sections: [
@@ -382,4 +382,4 @@ export const privacySecurityGroup: SettingSection = {
       ]
     }
   ]
-};
+});

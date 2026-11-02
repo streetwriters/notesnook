@@ -17,32 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import React from "react";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import { SettingSection } from "../types";
-import { accountLocalGroup } from "./account-local";
-import { accountGroup } from "./account";
-import { customizeGroup } from "./customize";
-import { privacySecurityGroup } from "./privacy-security";
-import { backRestoreGroup } from "./back-restore";
-import { productivityGroup } from "./productivity";
-import { helpSupportGroup } from "./help-support";
-import { communityGroup } from "./community";
-import { legalGroup } from "./legal";
-import { aboutGroup } from "./about";
+import { getAccountLocalGroup } from "./account-local";
+import { getAccountGroup } from "./account";
+import { getCustomizeGroup } from "./customize";
+import { getPrivacySecurityGroup } from "./privacy-security";
+import { getBackRestoreGroup } from "./back-restore";
+import { getProductivityGroup } from "./productivity";
+import { getHelpSupportGroup } from "./help-support";
+import { getCommunityGroup } from "./community";
+import { getLegalGroup } from "./legal";
+import { getAboutGroup } from "./about";
+
+export const getSettingsGroups = (): SettingSection[] => [
+  getAccountLocalGroup(),
+  getAccountGroup(),
+  getCustomizeGroup(),
+  getPrivacySecurityGroup(),
+  getBackRestoreGroup(),
+  getProductivityGroup(),
+  getHelpSupportGroup(),
+  getCommunityGroup(),
+  getLegalGroup(),
+  getAboutGroup()
+];
 
 export const useSettingsData = () => {
-  return React.useMemo<SettingSection[]>(
-    () => [
-      accountLocalGroup,
-      accountGroup,
-      customizeGroup,
-      privacySecurityGroup,
-      backRestoreGroup,
-      productivityGroup,
-      helpSupportGroup,
-      communityGroup,
-      legalGroup,
-      aboutGroup
-    ],
-    []
-  );
+  const appLanguage = useSettingStore((state) => state.settings.appLanguage);
+  return React.useMemo(() => getSettingsGroups(), [appLanguage]);
 };

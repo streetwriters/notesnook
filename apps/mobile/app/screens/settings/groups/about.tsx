@@ -25,7 +25,7 @@ import { Update } from "../../../components/sheets/update";
 import { presentSheet } from "../../../services/event-manager";
 import { SettingSection } from "../types";
 
-export const aboutGroup: SettingSection = {
+export const getAboutGroup = (): SettingSection => ({
   id: "about",
   name: strings.about(),
   sections: [
@@ -86,4 +86,4 @@ export const aboutGroup: SettingSection = {
       description: getVersion()
     }
   ]
-};
+});

@@ -21,7 +21,7 @@ import { strings } from "@notesnook/intl";
 import { Linking } from "react-native";
 import { SettingSection } from "../types";
 
-export const communityGroup: SettingSection = {
+export const getCommunityGroup = (): SettingSection => ({
   id: "community",
   name: strings.community(),
   sections: [
@@ -73,4 +73,4 @@ export const communityGroup: SettingSection = {
       description: strings.joinDiscordDesc()
     }
   ]
-};
+});

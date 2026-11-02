@@ -27,7 +27,7 @@ import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../../common/database";
-import { ToastManager, eSendEvent } from "../../../../services/event-manager";
+import { ToastManager } from "../../../../services/event-manager";
 import SettingsService from "../../../../services/settings";
 import {
   Settings,
@@ -35,13 +35,9 @@ import {
 } from "../../../../stores/use-setting-store";
 import { useUserStore } from "../../../../stores/use-user-store";
 import { MenuItemsList } from "../../../../utils/menu-items";
-import { AVAILABLE_LANGUAGES, strings } from "@notesnook/intl";
-import { initLocale } from "../../../../common/locale";
+import { strings } from "@notesnook/intl";
 import { isFeatureAvailable } from "@notesnook/common";
 import PaywallSheet from "../../../../components/sheets/paywall";
-import RNRestart from "react-native-restart";
-import { presentDialog } from "../../../../components/dialog/functions";
-import { eCloseSimpleDialog } from "../../../../utils/events";
 
 const DAY_FORMATS = ["long", "short"];
 const DayFormatFormats = {
@@ -54,60 +50,6 @@ const WeekFormatNames = {
   Sun: "Sunday",
   Mon: "Monday"
 };
-
-export const LanguagePicker = createSettingsPicker<
-  {
-    code: string;
-    label: string;
-    nativeLabel: string;
-  },
-  string
->({
-  getValue: () => {
-    const saved = useSettingStore.getState().settings.appLanguage;
-    return saved || "auto";
-  },
-  updateValue: async (item) => {
-    const lang = typeof item === "object" ? item.code : item;
-    const currentLang = useSettingStore.getState().settings.appLanguage || "";
-    const newLang = lang === "auto" ? "" : lang;
-    if (newLang === currentLang) return;
-
-    setTimeout(() => {
-      presentDialog({
-        title: strings.changeLanguage(),
-        paragraph: strings.restartAppToApplyChanges(),
-        positiveText: strings.restartNow(),
-        negativeText: strings.cancel(),
-        positivePress: async () => {
-          eSendEvent(eCloseSimpleDialog);
-          SettingsService.setProperty("appLanguage", newLang);
-          initLocale();
-          // restarting early causes appLanguage value to not get saved.
-          setTimeout(() => RNRestart.restart(), 100);
-          return true;
-        }
-      });
-    }, 300);
-  },
-  formatValue: (item) => {
-    const code = typeof item === "object" ? item.code : item;
-    if (code === "auto") {
-      return strings.auto();
-    }
-    const found = AVAILABLE_LANGUAGES.find((l) => l.code === code);
-    return found ? `${found.label} (${found.nativeLabel})` : code;
-  },
-  getItemKey: (item) => (typeof item === "object" ? item.code : item),
-  options: [
-    { code: "auto", label: "Auto", nativeLabel: "Auto" },
-    ...AVAILABLE_LANGUAGES
-  ],
-  compareValue: (current, item) =>
-    current === (typeof item === "object" ? item.code : item),
-  isFeatureAvailable: async () => true,
-  isOptionAvailable: async () => true
-});
 
 export const FontPicker = createSettingsPicker<
   ReturnType<typeof getFonts>[0],

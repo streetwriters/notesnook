@@ -2005,6 +2005,7 @@ Please note that we will respond to your feature request on the link above. **We
     t`Use native OS titlebar instead of replacing it with a custom one. Requires app restart for changes to take effect.`,
   spellCheck: () => t`Spell check`,
   enableSpellChecker: () => t`Enable spell checker`,
+  language: () => t`Language`,
   languages: () => t`Languages`,
   spellCheckerLanguagesDescription: () =>
     t`Select the languages the spell checker should check in.`,

@@ -17,12 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { formatDate } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import ExportNotesSheet from "../../../components/sheets/export-notes";
 import BackupService from "../../../services/backup";
 import SettingsService from "../../../services/settings";
 import { useUserStore } from "../../../stores/use-user-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
+import { useShallow } from "zustand/react/shallow";
+import { db } from "../../../common/database";
 import { ToastManager } from "../../../services/event-manager";
 import { verifyUser } from "../verify-user";
 import { SettingSection } from "../types";
@@ -30,7 +34,14 @@ import { restoreBackup } from "../restore-backup";
 import { keepLocalCopy, pick } from "@react-native-documents/picker";
 import * as ScopedStorage from "react-native-scoped-storage";
 
-export const backRestoreGroup: SettingSection = {
+const formatBackupDate = (date: number) =>
+  formatDate(date, {
+    type: "date-time",
+    dateFormat: db.settings.getDateFormat(),
+    timeFormat: db.settings.getTimeFormat()
+  });
+
+export const getBackRestoreGroup = (): SettingSection => ({
   id: "back-restore",
   name: strings.backupRestore(),
   sections: [
@@ -50,7 +61,16 @@ export const backRestoreGroup: SettingSection = {
             {
               id: "backup-now",
               name: strings.backupNow(),
-              description: strings.backupNowDesc(),
+              property: "lastBackupDate",
+              description: () => {
+                const last = SettingsService.get().lastBackupDate;
+                return `${strings.backupNowDesc()}\n${strings.lastBackupOn(
+                  typeof last === "number" && last
+                    ? formatBackupDate(last)
+                    : strings.never(),
+                  "partial"
+                )}`;
+              },
               icon: "clock-counter-clockwise",
               iconFamily: "notesnook",
               modifer: async () => {
@@ -66,7 +86,16 @@ export const backRestoreGroup: SettingSection = {
             {
               id: "backup-now-with-attachments",
               name: strings.fullBackup(),
-              description: strings.backupNowWithAttachmentsDesc(),
+              property: "lastFullBackupDate",
+              description: () => {
+                const last = SettingsService.get().lastFullBackupDate;
+                return `${strings.backupNowWithAttachmentsDesc()}\n${strings.lastBackupOn(
+                  typeof last === "number" && last
+                    ? formatBackupDate(last)
+                    : strings.never(),
+                  "full"
+                )}`;
+              },
               icon: "cloud-check",
               iconFamily: "notesnook",
               hidden: () => !useUserStore.getState().user,
@@ -95,7 +124,25 @@ export const backRestoreGroup: SettingSection = {
               icon: "clock",
               iconFamily: "notesnook",
               name: strings.automaticBackups(),
-              description: strings.automaticBackupsDesc(),
+              useHook: () =>
+                useSettingStore(
+                  useShallow((state) => [
+                    state.settings.reminder,
+                    state.settings.lastBackupDate
+                  ])
+                ),
+              description: () => {
+                const next = BackupService.getNextBackupTime(
+                  SettingsService.get().reminder,
+                  "lastBackupDate"
+                );
+                return next
+                  ? `${strings.automaticBackupsDesc()}\n${strings.nextBackupOn(
+                      formatBackupDate(next),
+                      "partial"
+                    )}`
+                  : strings.automaticBackupsDesc();
+              },
               component: "autobackups"
             },
             {
@@ -105,9 +152,28 @@ export const backRestoreGroup: SettingSection = {
               iconFamily: "notesnook",
               hidden: () => !useUserStore.getState().user,
               name: strings.automaticFullBackup(),
-              description: [
-                ...strings.automaticBackupsWithAttachmentsDesc()
-              ].join("\n"),
+              useHook: () =>
+                useSettingStore(
+                  useShallow((state) => [
+                    state.settings.fullBackupReminder,
+                    state.settings.lastFullBackupDate
+                  ])
+                ),
+              description: () => {
+                const next = BackupService.getNextBackupTime(
+                  SettingsService.get().fullBackupReminder,
+                  "lastFullBackupDate"
+                );
+                const base = [
+                  ...strings.automaticBackupsWithAttachmentsDesc()
+                ].join("\n");
+                return next
+                  ? `${base}\n${strings.nextBackupOn(
+                      formatBackupDate(next),
+                      "full"
+                    )}`
+                  : base;
+              },
               component: "autobackupsattachments"
             }
           ]
@@ -316,4 +382,4 @@ export const backRestoreGroup: SettingSection = {
       }
     }
   ]
-};
+});
