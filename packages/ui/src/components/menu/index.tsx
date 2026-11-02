@@ -204,6 +204,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
         boxShadow: "menu",
         border: "1px solid var(--border)",
         minWidth: 220,
+        maxWidth: "min(95vw, 350px)",
         maxHeight: "80vh",
         ...sx
       }}

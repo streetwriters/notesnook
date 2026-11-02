@@ -35,6 +35,7 @@ import { Text } from "@theme-ui/components";
 import { EV, EVENTS } from "@notesnook/core";
 import { useEffect, useState } from "react";
 import { isAuthRoute } from "./navigation/auth-routes";
+import { strings } from "@notesnook/intl";
 
 export async function startApp(children?: React.ReactNode) {
   const rootElement = document.getElementById("root");
@@ -147,8 +148,8 @@ function RouteWrapper(props: {
         </svg>
         <Text variant="body" sx={{ fontFamily: "monospace" }}>
           {isMigrating
-            ? "Migrating database. This might take a while."
-            : "Decrypting your notes"}
+            ? strings.migratingDatabaseNotice()
+            : strings.decryptingNotes()}
         </Text>
       </div>
     );

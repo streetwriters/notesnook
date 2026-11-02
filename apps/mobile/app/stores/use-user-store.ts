@@ -72,7 +72,7 @@ export const useUserStore = create<UserStore>((set) => ({
           SettingsService.setProperty("appLockEnabled", false);
           setTimeout(() => {
             presentDialog({
-              title: "App Lock Disabled",
+              title: strings.appLockDisabled(),
               paragraph: feature?.error,
               positiveText: strings.upgrade(),
               negativeText: strings.cancel(),

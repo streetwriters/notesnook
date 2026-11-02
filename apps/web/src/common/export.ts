@@ -112,20 +112,20 @@ export async function exportNotes(
   });
   if (result instanceof Error) {
     ConfirmDialog.show({
-      title: `Export failed`,
+      title: strings.exportFailed(),
       message: result.stack || result.message,
       positiveButtonText: strings.okay()
     });
     return false;
   } else {
     ConfirmDialog.show({
-      title: `Exported ${result.count} notes`,
+      title: strings.exportSuccessHeading(result.count),
       message:
         result.errors.length > 0
-          ? `Export completed with ${result.errors.length} errors:
+          ? `${strings.exportCompletedWithErrors(result.errors.length)}:
 
 ${result.errors.map((e, i) => `${i + 1}. ${e.message}`).join("\n")}`
-          : "Export completed with 0 errors.",
+          : strings.exportCompletedSuccessfully(),
       positiveButtonText: strings.okay()
     });
     return true;

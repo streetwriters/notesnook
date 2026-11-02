@@ -63,6 +63,7 @@ import { SearchReplace } from "./extensions/search-replace/index.js";
 import { Table } from "./extensions/table/index.js";
 import TableCell from "./extensions/table-cell/index.js";
 import { TaskItemNode } from "./extensions/task-item/index.js";
+import { DragDrop } from "./extensions/drag-drop/index.js";
 import { TaskListNode } from "./extensions/task-list/index.js";
 import TextDirection from "./extensions/text-direction/index.js";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip/index.js";
@@ -283,6 +284,7 @@ const useTiptap = (
         OrderedList.configure({ keepMarks: true, keepAttributes: true }),
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
+        DragDrop,
         Link.extend({
           inclusive: true
         }).configure({
@@ -363,6 +365,7 @@ const useTiptap = (
             CodeBlock.name,
             Table.name,
             Blockquote.name,
+            Callout.name,
             ...LIST_NODE_TYPES
           ]
         }),
@@ -422,7 +425,13 @@ const useTiptap = (
       timeFormat,
       editorProps,
       copyToClipboard,
-      createInternalLink
+      createInternalLink,
+      dayFormat,
+      doubleSpacedLines,
+      enableFontLigatures,
+      getLinkData,
+      downloadCsvTable,
+      options.placeholder
     ]
   );
 

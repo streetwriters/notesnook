@@ -16,8 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
+import { parseInternalLink } from "@notesnook/core";
 import {
   ScopedThemeProvider,
   THEME_COMPATIBILITY_VERSION,
@@ -25,31 +24,31 @@ import {
 } from "@notesnook/theme";
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { Appearance, I18nManager, Linking, StatusBar } from "react-native";
+import Shortcuts from "react-native-actions-shortcuts";
+import RNBootSplash from "react-native-bootsplash";
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import AppLocked from "./components/app-lock";
 import DialogProvider from "./components/dialog-provider";
 import { withErrorBoundry } from "./components/exception-handler";
 import GlobalSafeAreaProvider from "./components/globalsafearea";
 import { Toast } from "./components/toast";
 import { useAppEvents } from "./hooks/use-app-events";
-import { NotePreviewConfigure } from "./screens/note-preview-configure";
-import { RootNavigation } from "./navigation/navigation-stack";
-import { themeTrpcClient } from "./screens/settings/theme-selector";
-import Notifications from "./services/notifications";
-import SettingsService from "./services/settings";
-import { TipManager } from "./services/tip-manager";
-import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
-import { useUserStore } from "./stores/use-user-store";
-import RNBootSplash from "react-native-bootsplash";
-import AppLocked from "./components/app-lock";
-import { useSettingStore } from "./stores/use-setting-store";
 import {
   initShortcutListener,
   launchNewNoteTab,
   registerAppShortcuts
 } from "./hooks/use-shortcut-manager";
-import Shortcuts from "react-native-actions-shortcuts";
+import { RootNavigation } from "./navigation/navigation-stack";
+import { NotePreviewConfigure } from "./screens/note-preview-configure";
+import { themeTrpcClient } from "./screens/settings/theme-selector";
+import Notifications from "./services/notifications";
+import SettingsService from "./services/settings";
+import { TipManager } from "./services/tip-manager";
+import { useSettingStore } from "./stores/use-setting-store";
+import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
+import { useUserStore } from "./stores/use-user-store";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
@@ -59,19 +58,21 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-const App = (props: { configureMode: "note-preview" }) => {
+const App = (props: { configureMode?: "note-preview" }) => {
   useAppEvents();
-  //@ts-ignore
-  globalThis["IS_MAIN_APP_RUNNING"] = true;
+  if (!props.configureMode) {
+    //@ts-ignore
+    globalThis["IS_MAIN_APP_RUNNING"] = true;
+  }
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
 
   useEffect(() => {
-    if (introCompleted) {
+    if (introCompleted && !props.configureMode) {
       registerAppShortcuts();
     }
-  }, [introCompleted]);
+  }, [introCompleted, props.configureMode]);
 
   useEffect(() => {
     RNBootSplash.hide({ fade: true });
@@ -80,14 +81,16 @@ const App = (props: { configureMode: "note-preview" }) => {
     SettingsService.setPrivacyScreen(
       SettingsService.getProperty("privacyScreen")
     );
-    setTimeout(async () => {
-      await Notifications.get();
-      if (SettingsService.get().notifNotes) {
-        Notifications.pinQuickNote();
-      }
-      TipManager.init();
-    }, 100);
-  }, []);
+    if (!props.configureMode) {
+      setTimeout(async () => {
+        await Notifications.get();
+        if (SettingsService.get().notifNotes) {
+          Notifications.pinQuickNote();
+        }
+        TipManager.init();
+      }, 100);
+    }
+  }, [props.configureMode]);
 
   return (
     <SafeAreaProvider>
@@ -179,30 +182,37 @@ export const withTheme = (
       }
     }, [colorScheme, darkTheme, lightTheme]);
 
-    return (
-      <I18nProvider i18n={i18n}>
-        <Element {...props} />
-      </I18nProvider>
-    );
+    return <Element {...props} />;
   };
 };
 
 export const withStartupBoundry = (
-  Element: (props: PropsWithChildren) => JSX.Element
+  Element: (
+    props: PropsWithChildren & { configureMode?: "note-preview" }
+  ) => JSX.Element
 ) => {
-  return function AppWithStartupBoundary(props: PropsWithChildren) {
+  return function AppWithStartupBoundary(
+    props: PropsWithChildren & { configureMode?: "note-preview" }
+  ) {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
       async function init() {
         try {
+          if (props.configureMode === "note-preview") {
+            return;
+          }
+
           const [url, shortcut] = await Promise.all([
             Linking.getInitialURL(),
             Shortcuts.getInitialShortcut()
           ]);
-          console.log(url, shortcut);
-          if (shortcut?.type === "notesnook.action.newnote") {
-            launchNewNoteTab();
+          const parsedLink = url ? parseInternalLink(url) : undefined;
+          if (
+            shortcut?.type === "notesnook.action.newnote" ||
+            parsedLink?.type === "note"
+          ) {
+            launchNewNoteTab(parsedLink?.id);
           }
           useSettingStore.setState({
             initialUrl: url,
@@ -216,7 +226,7 @@ export const withStartupBoundry = (
       }
 
       init();
-    }, []);
+    }, [props.configureMode]);
 
     if (!ready) return null;
 

@@ -25,7 +25,7 @@ import Navigation, { NavigationProps } from "../../services/navigation";
 import useNavigationStore, {
   NotesScreenParams
 } from "../../stores/use-navigation-store";
-import { PLACEHOLDER_DATA, openEditor } from "./common";
+import { getPlaceholderData, openEditor } from "./common";
 import { getGroupOptions } from "../../hooks/use-group-options";
 export const ColoredNotes = ({
   navigation,
@@ -36,7 +36,7 @@ export const ColoredNotes = ({
       navigation={navigation}
       route={route}
       get={ColoredNotes.get}
-      placeholder={PLACEHOLDER_DATA}
+      placeholder={getPlaceholderData()}
       onPressFloatingButton={openEditor}
       canGoBack={route.params?.canGoBack}
       focusControl={true}

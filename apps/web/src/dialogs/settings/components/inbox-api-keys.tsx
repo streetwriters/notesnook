@@ -44,7 +44,7 @@ export function InboxApiKeys() {
     return (
       <Flex sx={{ alignItems: "center", gap: 2, py: 3 }}>
         <Loading size={16} />
-        <Text variant="body">Loading API keys...</Text>
+        <Text variant="body">{strings.loadingApiKeys()}</Text>
       </Flex>
     );
   }
@@ -53,9 +53,9 @@ export function InboxApiKeys() {
     return (
       <Flex sx={{ alignItems: "center", gap: 2, py: 3 }}>
         <Text variant="body" sx={{ color: "error" }}>
-          Failed to load API keys. Please try again.
+          {strings.failedToLoadApiKeys()}
         </Text>
-        <Button onClick={() => apiKeysPromise.refresh()}>Retry</Button>
+        <Button onClick={() => apiKeysPromise.refresh()}>{strings.retry()}</Button>
       </Flex>
     );
   }
@@ -67,16 +67,15 @@ export function InboxApiKeys() {
       <Flex sx={{ flexDirection: "column", gap: 3 }}>
         <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
           <Text variant="body" sx={{ fontWeight: "bold" }}>
-            API Keys
+            {strings.viewAPIKeys()}
           </Text>
           <Button
             variant="accent"
             onClick={() => {
               if (apiKeys.length >= 10) {
                 ConfirmDialog.show({
-                  title: "API Keys Limit Reached",
-                  subtitle:
-                    "Cannot create more than 10 api keys at a time. Please revoke some existing keys before creating new ones.",
+                  title: strings.apiKeysLimitReached(),
+                  subtitle: strings.apiKeysLimitReachedMessage(),
                   positiveButtonText: strings.ok()
                 });
               } else {
@@ -86,7 +85,7 @@ export function InboxApiKeys() {
               }
             }}
           >
-            Create Key
+            {strings.createKey()}
           </Button>
         </Flex>
 
@@ -102,7 +101,7 @@ export function InboxApiKeys() {
             }}
           >
             <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-              Create your first api key to get started.
+              {strings.createFirstApiKey()}
             </Text>
           </Box>
         ) : (
@@ -138,7 +137,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
 
   async function viewKey() {
     const result = await showPasswordDialog({
-      title: "Authenticate to view API key",
+      title: strings.authenticateToViewApiKey(),
       inputs: {
         password: {
           label: strings.accountPassword(),
@@ -161,7 +160,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
       setCopied(true);
     } catch (error) {
       console.error("Failed to copy to clipboard:", error);
-      showToast("error", "Failed to copy to clipboard");
+      showToast("error", strings.failedToCopyToClipboard());
     }
   }
 
@@ -225,7 +224,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
                   borderRadius: "default"
                 }}
               >
-                EXPIRED
+                {strings.expired().toUpperCase()}
               </Text>
             )}
           </Flex>
@@ -233,17 +232,16 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           <Flex sx={{ mb: 1, flexDirection: "column" }}>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
               {apiKey.lastUsedAt
-                ? `Last used on ${getFormattedDate(apiKey.lastUsedAt)}`
-                : "Never used"}
+                ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt)}`
+                : strings.neverUsed()}
             </Text>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-              Created on {getFormattedDate(apiKey.dateCreated)}
+              {strings.createdOn()} {getFormattedDate(apiKey.dateCreated)}
             </Text>
             <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
               {apiKey.expiryDate === -1
-                ? "Never expires"
-                : `${isApiKeyExpired ? "Expired" : "Expires"} on
-              ${getFormattedDate(apiKey.expiryDate)}`}
+                ? strings.neverExpires()
+                : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${getFormattedDate(apiKey.expiryDate)}`}
             </Text>
           </Flex>
         </Box>
@@ -292,10 +290,10 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           disabled={isRevoking}
           onClick={async () => {
             const ok = await ConfirmDialog.show({
-              title: `Revoke Inbox API Key - ${apiKey.name}`,
-              message: `Are you sure you want to revoke the key "${apiKey.name}"? All inbox actions using this key will stop working immediately.`,
-              positiveButtonText: "Revoke",
-              negativeButtonText: "Cancel"
+              title: strings.revokeInboxApiKey(apiKey.name),
+              message: strings.revokeApiKeyConfirmation(apiKey.name),
+              positiveButtonText: strings.revoke(),
+              negativeButtonText: strings.cancel()
             });
             if (!ok) return;
 
@@ -303,10 +301,10 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
               setIsRevoking(true);
               await db.inboxApiKeys.revoke(apiKey.key);
               onRevoke();
-              showToast("success", "API key revoked");
+              showToast("success", strings.apiKeyRevoked());
             } catch (error) {
               console.error("Failed to revoke inbox API key:", error);
-              showToast("error", "Failed to revoke API key");
+              showToast("error", strings.failedToRevokeApiKey());
             } finally {
               setIsRevoking(false);
             }
@@ -323,12 +321,12 @@ type AddApiKeyDialogProps = BaseDialogProps<boolean> & {
   onAdd: () => void;
 };
 
-const EXPIRY_OPTIONS = [
-  { label: "1 day", value: 24 * 60 * 60 * 1000 },
-  { label: "1 week", value: 7 * 24 * 60 * 60 * 1000 },
-  { label: "1 month", value: 30 * 24 * 60 * 60 * 1000 },
-  { label: "1 year", value: 365 * 24 * 60 * 60 * 1000 },
-  { label: "Never", value: -1 }
+const getExpiryOptions = () => [
+  { label: strings.expiryOneDay(), value: 24 * 60 * 60 * 1000 },
+  { label: strings.expiryOneWeek(), value: 7 * 24 * 60 * 60 * 1000 },
+  { label: strings.expiryOneMonth(), value: 30 * 24 * 60 * 60 * 1000 },
+  { label: strings.expiryOneYear(), value: 365 * 24 * 60 * 60 * 1000 },
+  { label: strings.never(), value: -1 }
 ];
 
 const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
@@ -337,13 +335,13 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
   const { onClose, onAdd } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedExpiry, setSelectedExpiry] = useState(EXPIRY_OPTIONS[2].value);
+  const [selectedExpiry, setSelectedExpiry] = useState(getExpiryOptions()[2].value);
 
   async function onSubmit() {
     try {
       setIsCreating(true);
       if (!inputRef.current || !inputRef.current.value.trim()) {
-        showToast("error", "Please enter a key name");
+        showToast("error", strings.enterKeyName());
         return;
       }
       await db.inboxApiKeys.create(inputRef.current.value, selectedExpiry);
@@ -352,10 +350,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
     } catch (error) {
       console.error("Failed to create inbox API key:", error);
       const message = error instanceof Error ? error.message : "";
-      showToast(
-        "error",
-        `Failed to create API key${message ? `: ${message}` : ""}`
-      );
+      showToast("error", strings.failedToCreateApiKey(message));
     } finally {
       setIsCreating(false);
     }
@@ -364,16 +359,16 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
   return (
     <Dialog
       isOpen={true}
-      title="Create Inbox API Key"
-      description="The API key allows you to access NN's inbox functionality."
+      title={strings.createApiKey()}
+      description={strings.createInboxApiKeyDescription()}
       onClose={() => onClose(false)}
       positiveButton={{
-        text: isCreating ? "Creating..." : "Create",
+        text: isCreating ? strings.creating() : strings.createKey(),
         onClick: onSubmit,
         disabled: isCreating
       }}
       negativeButton={{
-        text: "Cancel",
+        text: strings.cancel(),
         onClick: () => onClose(false)
       }}
     >
@@ -381,8 +376,8 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
         <Field
           inputRef={inputRef}
           autoFocus
-          label="Key name"
-          placeholder="e.g., Todo integration"
+          label={strings.keyName()}
+          placeholder={strings.exampleKeyName()}
           onKeyUp={async (e) => {
             if (e.key === "Enter") {
               await onSubmit();
@@ -392,7 +387,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
         />
         <Flex sx={{ flexDirection: "column" }}>
           <Text variant="subtitle" sx={{ mb: 2, fontWeight: "bold" }}>
-            Expires in
+            {strings.expiresIn()}
           </Text>
           <Select
             value={String(selectedExpiry)}
@@ -411,7 +406,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
               }
             }}
           >
-            {EXPIRY_OPTIONS.map((option) => (
+            {getExpiryOptions().map((option) => (
               <option key={option.label} value={option.value}>
                 {option.label}
               </option>

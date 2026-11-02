@@ -179,13 +179,13 @@ const staticCommands: Command[] = [
     id: "help",
     title: strings.helpAndSupport(),
     icon: ArrowTopRight,
-    action: () => (window.location.href = "https://help.notesnook.com"),
+    action: () => (window.location.href = "https://notesnook.com/help"),
     group: strings.navigate(),
     type: "command"
   },
   {
     id: "keyboard-shortcuts",
-    title: "Keyboard shortcuts",
+    title: strings.keyboardShortcuts(),
     icon: ArrowTopRight,
     action: () => KeyboardShortcutsDialog.show({}),
     group: strings.navigate(),

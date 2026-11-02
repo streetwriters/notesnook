@@ -188,17 +188,17 @@ export const tagMenuItems: (
     {
       type: "button",
       key: "copyid",
-      title: "Copy ID",
+      title: strings.copyId(),
       icon: Copy.path,
       onClick: async () => {
         try {
           await writeToClipboard({
             "text/plain": tag.id
           });
-          showToast("success", "Tag ID copied to clipboard");
+          showToast("success", strings.tagIdCopied());
         } catch (e) {
           console.error(e);
-          showToast("error", "Failed to copy Tag ID");
+          showToast("error", strings.failedToCopyToClipboard());
         }
       },
       isHidden: !settingStore.get().isInboxEnabled

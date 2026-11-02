@@ -27,7 +27,7 @@ import { IStorage } from "../src/interfaces.js";
 import { randomBytes } from "crypto";
 
 export class NodeStorageInterface implements IStorage {
-  storage = {};
+  storage: Record<string, unknown> = {};
   crypto = new NNCrypto();
 
   async removeMulti(keys: string[]): Promise<void> {
@@ -49,7 +49,7 @@ export class NodeStorageInterface implements IStorage {
   async readMulti<T>(keys: string[]): Promise<[string, T][]> {
     const result: [string, T][] = [];
     keys.forEach((key) => {
-      result.push([key, this.storage[key]]);
+      result.push([key, this.storage[key] as T]);
     });
     return result;
   }
@@ -58,7 +58,7 @@ export class NodeStorageInterface implements IStorage {
     key: string,
     isArray?: boolean | undefined
   ): Promise<T | undefined> {
-    return this.storage[key];
+    return this.storage[key] as T | undefined;
   }
 
   async remove(key: string): Promise<void> {
@@ -98,7 +98,11 @@ export class NodeStorageInterface implements IStorage {
     await this.write(`userEncryptionKey`, keyData.key);
   }
 
-  async hash(password: string, email: string): Promise<string> {
+  async hash(
+    password: string,
+    email: string,
+    options?: { usesFallback?: boolean }
+  ): Promise<string> {
     const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
     return await this.crypto.hash(password, `${APP_SALT}${email}`);
   }
@@ -113,19 +117,34 @@ export class NodeStorageInterface implements IStorage {
     password: string,
     salt?: string | undefined
   ): Promise<SerializedKey> {
-    return { password, salt: salt || randomBytes(16).toString("base64") };
+    const finalSalt = salt || randomBytes(16).toString("base64");
+    return await this.crypto.exportKey(password, finalSalt);
   }
 
-  generateCryptoKeyPair(): Promise<SerializedKeyPair> {
-    throw new Error("Method not implemented.");
+  async generatePGPKeyPair(): Promise<SerializedKeyPair> {
+    return await this.crypto.exportKeyPair();
   }
-  generateCryptoKeyFallback(
+
+  async generateCryptoKeyFallback(
     password: string,
     salt?: string
   ): Promise<SerializedKey> {
+    return this.generateCryptoKey(password, salt);
+  }
+
+  async deriveCryptoKeyFallback(_credentials: SerializedKey): Promise<void> {}
+
+  async decryptPGPMessage(
+    _privateKeyArmored: string,
+    _encryptedMessage: string
+  ): Promise<string> {
     throw new Error("Method not implemented.");
   }
-  deriveCryptoKeyFallback(credentials: SerializedKey): Promise<void> {
-    throw new Error("Method not implemented.");
+
+  async validatePGPKeyPair(_keys: SerializedKeyPair): Promise<{
+    isValid: boolean;
+    message: string;
+  }> {
+    return { isValid: true, message: "ok" };
   }
 }

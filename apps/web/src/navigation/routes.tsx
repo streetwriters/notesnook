@@ -35,7 +35,7 @@ function defineRoute(route: RouteResult): RouteResult {
 const NOT_FOUND_ROUTE = defineRoute({
   key: "notFound",
   type: "notFound",
-  component: () => <div>Not found</div>
+  component: () => <div>{strings.notFound()}</div>
 });
 const routes = defineRoutes({
   "/notes": () => {
@@ -107,7 +107,7 @@ const routes = defineRoutes({
   "/archive": () => {
     useNoteStore.getState().setContext({ type: "archive" });
     return defineRoute({
-      key: "notes",
+      key: "archive",
       title: strings.archive(),
       type: "notes",
       component: Notes

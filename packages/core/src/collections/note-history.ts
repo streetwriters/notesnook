@@ -189,7 +189,7 @@ export class NoteHistory implements ICollection {
     const note = await this.db.notes.note(session.noteId);
     if (!note || !content) return;
 
-    if (session.locked && isCipher(content.data)) {
+    if (isCipher(content.data)) {
       const sessionId = `${Date.now()}`;
       await this.db.content.add({
         id: note.contentId,

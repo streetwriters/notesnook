@@ -160,6 +160,22 @@ async function updateNextBackupTime(type: "full" | "partial") {
     [type === "full" ? "lastFullBackupDate" : "lastBackupDate"]: Date.now()
   });
 }
+
+function getNextBackupTime(
+  type: "daily" | "off" | "useroff" | "weekly" | "monthly" | "never",
+  lastBackupDateType: "lastBackupDate" | "lastFullBackupDate" = "lastBackupDate"
+): number | undefined {
+  if (type === "off" || type === "useroff" || type === "never" || !type) return;
+  const lastBackupDate = SettingsService.getProperty(lastBackupDateType) as
+    | number
+    | "never"
+    | undefined;
+  if (typeof lastBackupDate !== "number" || !lastBackupDate) return;
+  const interval =
+    type === "daily" ? MS_DAY : type === "weekly" ? MS_WEEK : MONTH;
+  return Math.max(Date.now(), lastBackupDate + interval);
+}
+
 let backupRunning = false;
 /**
  * @param {boolean=} progress
@@ -180,7 +196,7 @@ async function run(
       startProgress({
         title: strings.backingUpData(backupType),
         paragraph: strings.backupDataDesc(),
-        progress: "Backup in progress...",
+        progress: strings.backupInProgress(),
         canHideProgress: true
       });
     }
@@ -217,7 +233,7 @@ async function run(
     startProgress({
       title: strings.backingUpData(backupType),
       paragraph: strings.backupDataDesc(),
-      progress: "Preparing backup...",
+      progress: strings.preparingBackup(),
       canHideProgress: true
     });
   }
@@ -248,7 +264,7 @@ async function run(
     })) {
       if (file.type === "file") {
         updateProgress({
-          progress: `Writing backup chunk of size... ${file?.data?.length}`
+          progress: strings.writingBackupChunk(file?.data?.length || 0)
         });
         await RNFetchBlob.fs.writeFile(
           `${zipSourceFolder}/${file.path}`,
@@ -257,7 +273,7 @@ async function run(
         );
       } else if (file.type === "attachment") {
         updateProgress({
-          progress: `Saving attachments in backup... ${file.hash}`
+          progress: strings.savingAttachmentsInBackup(file.hash)
         });
         if (await FileStorage.exists(file.hash)) {
           await RNFetchBlob.fs
@@ -275,7 +291,7 @@ async function run(
     DatabaseLogger.info(`Backup complete: ${backupType}. Creating zip file...`);
 
     updateProgress({
-      progress: "Creating backup zip file..."
+      progress: strings.creatingBackupZip()
     });
 
     await zip(zipSourceFolder, zipOutputFile);
@@ -404,7 +420,9 @@ const checkAndRun = async () => {
   if (await checkBackupRequired(settings?.reminder)) {
     try {
       await run();
-    } catch (e) {}
+    } catch (e) {
+      /* empty */
+    }
   }
 };
 
@@ -413,7 +431,8 @@ const BackupService = {
   run,
   checkAndRun,
   getDirectoryAndroid,
-  checkBackupDirExists
+  checkBackupDirExists,
+  getNextBackupTime
 };
 
 export default BackupService;

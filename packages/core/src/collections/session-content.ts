@@ -25,6 +25,17 @@ import Database from "../api/index.js";
 import { NoteContent, SessionContentItem, isDeleted } from "../types.js";
 import { SQLCollection } from "../database/sql-collection.js";
 
+// sessions corrupted by an earlier bug hold ciphertext as a JSON string
+function parseCipher(data: unknown) {
+  if (typeof data !== "string" || !data.startsWith("{")) return;
+  try {
+    const parsed = JSON.parse(data);
+    return isCipher(parsed) ? parsed : undefined;
+  } catch {
+    return;
+  }
+}
+
 export class SessionContent implements ICollection {
   name = "sessioncontent";
   readonly collection: SQLCollection<"sessioncontent", SessionContentItem>;
@@ -61,7 +72,6 @@ export class SessionContent implements ICollection {
       id: sessionContentItemId,
       compressed: false,
       localOnly: true,
-      locked: locked || false,
       dateCreated: Date.now(),
       dateModified: Date.now()
     };
@@ -91,6 +101,12 @@ export class SessionContent implements ICollection {
       }
     }
 
+    // a title-only update must not downgrade a locked session
+    if (sessionItem.data !== undefined)
+      sessionItem.locked = isCipher(sessionItem.data);
+    else if (typeof locked === "boolean") sessionItem.locked = locked;
+    else if (!sessionContentExists) sessionItem.locked = false;
+
     if (sessionContentExists) {
       this.collection.update([sessionContentItemId], sessionItem);
     } else {
@@ -118,11 +134,12 @@ export class SessionContent implements ICollection {
       await this.collection.upsert(session);
     }
 
+    const data =
+      session.compressed && !isCipher(session.data)
+        ? await compressor.decompress(session.data)
+        : session.data;
     return {
-      data:
-        session.compressed && !isCipher(session.data)
-          ? await compressor.decompress(session.data)
-          : session.data,
+      data: parseCipher(data) || data,
       type: session.contentType,
       title: session.title
     };

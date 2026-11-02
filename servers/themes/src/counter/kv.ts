@@ -38,6 +38,13 @@ export class KVCounter {
 
   async increment(key: string, uid: string) {
     return await this.mutex.runExclusive(async () => {
+      if (!(key in this.installs)) {
+        const installs = await readMulti(this.client, this.config, [key]);
+        // writing without the existing set would overwrite it in KV
+        if (!(key in installs))
+          throw new Error(`Could not read installs for ${key}`);
+        this.installs[key] = installs[key];
+      }
       const existing = this.installs[key] || [];
       const installsSet = Array.from(new Set([...existing, uid]));
       await write(this.client, this.config, key, installsSet);
@@ -48,36 +55,46 @@ export class KVCounter {
 
   async counts(keys: string[]): Promise<Record<string, number>> {
     const result: Record<string, number> = {};
-    const installs = await readMulti(this.client, this.config, keys);
-    for (const [key, value] of Object.entries(installs)) {
-      result[key] = value?.length ?? 0;
+    // keys whose read failed keep their previously known installs
+    this.installs = {
+      ...this.installs,
+      ...(await readMulti(this.client, this.config, keys))
+    };
+    for (const key of keys) {
+      result[key] = this.installs[key]?.length ?? 0;
     }
-    this.installs = installs;
     return result;
   }
 }
 
+const BULK_GET_LIMIT = 100;
 async function readMulti(
   client: Cloudflare,
   config: WorkersKVRESTConfig,
   keys: string[]
 ): Promise<Record<string, string[] | null>> {
-  try {
-    const response = await client.kv.namespaces.bulkGet(config.namespaceId, {
-      account_id: config.cfAccountId,
-      keys,
-      type: "json",
-      withMetadata: false
-    });
-    const result: Record<string, string[]> = {};
-    for (const [key, value] of Object.entries(response?.values || {})) {
-      result[key] = value;
+  const result: Record<string, string[] | null> = {};
+  for (let i = 0; i < keys.length; i += BULK_GET_LIMIT) {
+    const chunk = keys.slice(i, i + BULK_GET_LIMIT);
+    try {
+      const response = await client.kv.namespaces.bulkGet(config.namespaceId, {
+        account_id: config.cfAccountId,
+        keys: chunk,
+        type: "json",
+        withMetadata: false
+      });
+      const values = (response?.values || {}) as Record<
+        string,
+        string[] | null
+      >;
+      for (const key of chunk) {
+        result[key] = values[key] ?? null;
+      }
+    } catch (e) {
+      console.error("Failed to read installs from KV:", e);
     }
-    return result;
-  } catch (e) {
-    console.error(e);
-    return {};
   }
+  return result;
 }
 
 function write<T>(

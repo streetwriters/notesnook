@@ -58,9 +58,9 @@ export const openNote = async (
   }
 
   if (isTrash) {
-    if (!note.contentId) return;
-
-    const content = await db.content.get(note.contentId as string);
+    const content = note.contentId
+      ? await db.content.get(note.contentId)
+      : undefined;
     presentSheet({
       component: <NotePreview note={item} content={content} />
     });

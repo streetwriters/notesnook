@@ -172,13 +172,17 @@ export const MoveNotes = (props: NavigationProps<"MoveNotes">) => {
               style={{
                 minHeight: 100,
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                paddingHorizontal: DefaultAppStyles.GAP
               }}
             >
               {loading ? (
                 <ActivityIndicator size="large" color={colors.primary.accent} />
               ) : (
-                <Paragraph color={colors.secondary.paragraph}>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  style={{ textAlign: "center" }}
+                >
                   {strings.emptyPlaceholders("note")}
                 </Paragraph>
               )}

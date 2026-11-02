@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   EmotionThemeProvider,
+  FixedThemeProvider,
   ThemeScopes,
   themeToCSS,
   useThemeEngineStore
@@ -91,6 +92,27 @@ export function BaseThemeProvider(
         {children}
       </EmotionThemeProvider>
     </>
+  );
+}
+
+export function FixedColorSchemeThemeProvider(
+  props: PropsWithChildren<
+    {
+      injectCssVars?: boolean;
+      scope?: keyof ThemeScopes;
+      colorScheme: "light" | "dark";
+    } & Omit<BoxProps, "variant">
+  >
+) {
+  const { children, scope = "base", ...restProps } = props;
+  const theme = useThemeStore((store) =>
+    props.colorScheme === "dark" ? store.darkTheme : store.lightTheme
+  );
+
+  return (
+    <FixedThemeProvider {...restProps} scope={scope} theme={theme}>
+      {children}
+    </FixedThemeProvider>
   );
 }
 

@@ -28,6 +28,7 @@ import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
+import { DefaultAppStyles } from "../../../utils/styles";
 export const Progress = () => {
   const { colors } = useThemeColors();
   const { progress } = useSyncProgress();
@@ -48,12 +49,15 @@ export const Progress = () => {
         width: "100%",
         justifyContent: "center",
         alignItems: "center",
+        paddingHorizontal: DefaultAppStyles.GAP,
         paddingTop: 25,
         paddingBottom: 15
       }}
     >
       <Heading size={AppFontSize.lg}>{strings.syncingHeading()}</Heading>
-      <Paragraph>{strings.syncingDesc()}</Paragraph>
+      <Paragraph style={{ textAlign: "center" }}>
+        {strings.syncingDesc()}
+      </Paragraph>
       <Seperator />
       <View
         style={{

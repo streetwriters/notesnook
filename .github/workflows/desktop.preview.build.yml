@@ -1,0 +1,326 @@
+name: Notesnook Desktop Preview Build
+
+# UNTRUSTED stage for fork PRs. Runs on `pull_request`, so fork code gets a
+# read-only GITHUB_TOKEN and NO repository secrets. The signed + notarized
+# macOS build only runs for same-repo PRs; fork PRs get an ad-hoc signed dmg
+# instead so fork code is never signed with our Developer ID. The PR comment is
+# posted by desktop.preview.publish.yml in the trusted `workflow_run` context.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: [master, beta]
+    paths:
+      - "apps/desktop/**"
+      - "apps/web/**"
+      - "packages/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/desktop.preview.build.yml"
+      - ".github/workflows/desktop.preview.publish.yml"
+
+concurrency:
+  group: desktop-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Generate desktop build (stable)
+        run: npm run tx @notesnook/web:build:desktop
+
+      - name: Build desktop bundle
+        working-directory: ./apps/desktop
+        run: npm run bundle
+
+      - name: Archive build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: apps/web/build/**/*
+
+      - name: Stage PR metadata
+        run: |
+          mkdir -p "$RUNNER_TEMP/pr-meta"
+          echo "PR_NUMBER=${{ github.event.pull_request.number }}" > "$RUNNER_TEMP/pr-meta/pr-meta.env"
+
+      - name: Upload PR metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-preview-meta
+          path: ${{ runner.temp }}/pr-meta
+          retention-days: 1
+
+  build-macos:
+    name: Build for macOS
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    needs: build
+    runs-on: macos-14
+    outputs:
+      macos-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install setuptools
+        run: brew install python-setuptools
+
+      - name: Setup notarization
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/desktop
+        run: |
+          echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
+          echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+          echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Install provisioning profile
+        run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
+        working-directory: ./apps/desktop
+
+      - name: Build dmg
+        env:
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+          APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+          APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
+          APPLE_API_ISSUER: ${{ secrets.api_key_issuer_id }}
+          CSC_FOR_PULL_REQUEST: true
+        run: |
+          npm run tx @notesnook/desktop:release
+          cd apps/desktop
+          yarn electron-builder --config=electron-builder.config.js --mac dmg --arm64 -p never
+
+      - name: Upload dmg artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: apps/desktop/output/*.dmg
+
+  # Fork PRs get no signing secrets: ad-hoc sign (required to launch on Apple
+  # silicon) without hardened runtime, which ad-hoc signatures can't satisfy.
+  build-macos-unsigned:
+    name: Build for macOS (unsigned)
+    if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+    needs: build
+    runs-on: macos-14
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install setuptools
+        run: brew install python-setuptools
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+        working-directory: ./apps/desktop
+
+      - name: Build dmg
+        run: |
+          npm run tx @notesnook/desktop:release
+          cd apps/desktop
+          yarn electron-builder --config=electron-builder.config.js --mac dmg --arm64 -p never -c.mac.identity=- -c.mac.hardenedRuntime=false -c.mac.notarize=false
+
+      - name: Upload dmg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: apps/desktop/output/*.dmg
+
+  build-linux-x64:
+    name: Build for Linux x64
+    needs: build
+    runs-on: ubuntu-22.04
+    outputs:
+      linux-x64-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu x64 sqlite-better-trigram
+          npm i --cpu x64 sqlite3-fts5-html
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npm run tx @notesnook/desktop:release
+
+      - name: Build AppImage
+        run: yarn electron-builder --config=electron-builder.config.js --linux AppImage:x64 -p never
+        working-directory: ./apps/desktop
+
+      - name: Upload AppImage artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-build
+          path: apps/desktop/output/*.AppImage
+
+  build-linux-arm64:
+    name: Build for Linux arm64
+    needs: build
+    runs-on: ubuntu-22.04-arm
+    outputs:
+      linux-arm64-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu arm64 sqlite3-fts5-html
+        working-directory: ./apps/desktop
+
+      - name: Build Electron wrapper
+        run: npm run tx @notesnook/desktop:release
+
+      - name: Build AppImage
+        run: yarn electron-builder --config=electron-builder.config.js --linux AppImage:arm64 -p never
+        working-directory: ./apps/desktop
+
+      - name: Upload AppImage artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64-build
+          path: apps/desktop/output/*.AppImage
+
+  build-windows:
+    name: Build for Windows
+    needs: build
+    runs-on: windows-2022
+    outputs:
+      windows-artifact-url: ${{ steps.artifact-upload-step.outputs.artifact-url }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=desktop
+
+      - name: Install sqlite-better-trigram for all arch
+        run: |
+          npm i --cpu arm64 sqlite-better-trigram
+          npm i --cpu x64 sqlite-better-trigram
+
+          npm i --cpu arm64 sqlite3-fts5-html
+          npm i --cpu x64 sqlite3-fts5-html
+        working-directory: ./apps/desktop
+
+      - name: Build
+        run: node scripts/execute.mjs @notesnook/desktop:release
+
+      - name: Publish
+        env:
+          NOTESNOOK_STAGING: true
+        run: yarn electron-builder --config=electron-builder.config.js --win nsis:x64 --publish never
+        working-directory: ./apps/desktop
+
+      - name: Upload exe artifact
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: apps/desktop/output/*.exe

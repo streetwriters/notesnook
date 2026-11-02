@@ -387,8 +387,8 @@ export const Signup = ({
       ) : (
         <>
           <Loading
-            title={"Setting up your account..."}
-            description="Your account is almost ready, please wait..."
+            title={strings.settingUpAccount()}
+            description={strings.accountAlmostReady()}
           />
         </>
       )}

@@ -1,0 +1,5 @@
+.vitepress/dist
+.vitepress/cache
+contents/v*/
+.vitepress/sidebars/generated.mjs
+.wrangler

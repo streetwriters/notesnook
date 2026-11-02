@@ -26,7 +26,12 @@ import {
 import dayjs from "dayjs";
 import { TimeFormat, DayFormat } from "@notesnook/core";
 import { TrashCleanupInterval } from "@notesnook/core";
-import { strings } from "@notesnook/intl";
+import {
+  strings,
+  AVAILABLE_LANGUAGES
+} from "@notesnook/intl";
+import { desktop } from "../../common/desktop-bridge";
+import { ConfirmDialog } from "../confirm";
 import { checkFeature } from "../../common";
 
 export const BehaviourSettings: SettingsGroup[] = [
@@ -35,6 +40,55 @@ export const BehaviourSettings: SettingsGroup[] = [
     section: "behaviour",
     header: strings.general(),
     settings: [
+      {
+        key: "app-language",
+        title: strings.selectLanguage(),
+        description: strings.changeLanguage(),
+        keywords: ["language", "locale", "select language", "change language"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.appLanguage, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: async (value) => {
+              const currentLang = useSettingStore.getState().appLanguage || "";
+              const newLang = value === "auto" ? "" : value;
+              if (newLang === currentLang) return;
+
+              const ok = await ConfirmDialog.show({
+                title: strings.changeLanguage(),
+                message: strings.restartAppToApplyChanges(),
+                positiveButtonText: strings.restartNow(),
+                negativeButtonText: strings.cancel()
+              });
+
+              if (ok) {
+                useSettingStore.getState().setAppLanguage(newLang);
+                if (IS_DESKTOP_APP && desktop) {
+                  await desktop.integration.setAppLanguage.mutate(newLang);
+                }
+                window.location.reload();
+              }
+            },
+            selectedOption: () => {
+              const saved = useSettingStore.getState().appLanguage;
+              return saved || "auto";
+            },
+            options: [
+              {
+                value: "auto",
+                get title() {
+                  return strings.auto();
+                }
+              },
+              ...AVAILABLE_LANGUAGES.map((l) => ({
+                value: l.code,
+                title: `${l.label} (${l.nativeLabel})`
+              }))
+            ]
+          }
+        ]
+      },
       {
         key: "default-sidebar-tab",
         title: strings.defaultSidebarTab(),
@@ -156,8 +210,18 @@ export const BehaviourSettings: SettingsGroup[] = [
               useSettingStore.getState().setDayFormat(value as DayFormat),
             selectedOption: () => useSettingStore.getState().dayFormat,
             options: [
-              { value: "short", title: "Short (Mon, Tue)" },
-              { value: "long", title: "Long (Monday, Tuesday)" }
+              {
+                value: "short",
+                get title() {
+                  return strings.dayFormatShort();
+                }
+              },
+              {
+                value: "long",
+                get title() {
+                  return strings.dayFormatLong();
+                }
+              }
             ]
           }
         ]
@@ -176,8 +240,18 @@ export const BehaviourSettings: SettingsGroup[] = [
               useSettingStore.getState().setWeekFormat(value as WeekFormat),
             selectedOption: () => useSettingStore.getState().weekFormat,
             options: [
-              { value: "Sun", title: "Sunday" },
-              { value: "Mon", title: "Monday" }
+              {
+                value: "Sun",
+                get title() {
+                  return strings.sunday();
+                }
+              },
+              {
+                value: "Mon",
+                get title() {
+                  return strings.monday();
+                }
+              }
             ]
           }
         ]

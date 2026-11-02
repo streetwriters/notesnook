@@ -104,30 +104,10 @@ declare global {
    */
   var editorControllers: Record<string, EditorController | undefined>;
 
-  var settingsController: {
-    update: (settings: Settings) => void;
-    previous: Settings;
-    set?: Dispatch<SetStateAction<Settings>>;
-  };
-
   var premiumController: {
     update: (premium: boolean) => void;
     previous: boolean;
     set?: Dispatch<SetStateAction<boolean>>;
-  };
-
-  var safeAreaController: {
-    update: (insets: SafeAreaType) => void;
-    reset: () => void;
-    previous: SafeAreaType;
-    set?: Dispatch<
-      SetStateAction<{
-        top: number;
-        bottom: number;
-        left: number;
-        right: number;
-      }>
-    >;
   };
 
   var editorTitles: Record<string, RefObject<HTMLTextAreaElement> | undefined>;

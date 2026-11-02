@@ -297,12 +297,20 @@ function EditorView({
           item.type === "tiptap" && item.noteId === session.note.id;
         const isNote = item.type === "note" && item.id === session.note.id;
         if (isContent && lastChangedTime.current < item.dateModified) {
-          if (!item.locked) return editor.updateContent(item.data);
+          if (!item.locked) {
+            if (!session.content)
+              session.content = { type: "tiptap", data: item.data };
+            else session.content.data = item.data;
+            return editor.updateContent(item.data);
+          }
 
           const result = await db.vault
             .decryptContent(item)
             .catch(() => db.eventManager.publish(EVENTS.vaultLocked));
           if (!result) return;
+          if (!session.content)
+            session.content = { type: "tiptap", data: result.data };
+          else session.content.data = result.data;
           editor.updateContent(result.data);
         } else if (isNote && session.note.title !== item.title) {
           AppEventManager.publish(AppEvents.changeNoteTitle, {
@@ -665,10 +673,10 @@ export function Editor(props: EditorProps) {
           if (autoSaveToast.show === false) return;
           const { hide } = showToast(
             "error",
-            "Auto-save is disabled for large notes. Press Ctrl + S to save.",
+            strings.autoSaveDisabledForLargeNotes(),
             [
               {
-                text: "Dismiss",
+                text: strings.dismiss(),
                 onClick: () => {
                   hide();
                 }

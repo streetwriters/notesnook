@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { z } from "zod";
 import { InstallsCounter } from "./constants";
 import { findTheme, getThemes, updateTotalInstalls } from "./orama";
-import { syncThemes } from "./sync";
 import { publicProcedure, router } from "./trpc";
 import { THEME_COMPATIBILITY_VERSION } from "@notesnook/theme";
 import { ThemeQuerySchema } from "./schemas";
@@ -42,10 +41,9 @@ export const ThemesAPI = router({
       if (!theme) return;
 
       if (userId) {
-        updateTotalInstalls(
-          theme,
-          await InstallsCounter.increment(theme.id, userId)
-        );
+        InstallsCounter.increment(theme.id, userId)
+          .then((totalInstalls) => updateTotalInstalls(theme.id, totalInstalls))
+          .catch((e) => console.error("Failed to update total installs:", e));
       }
       return theme;
     }),
@@ -61,10 +59,6 @@ export const ThemesAPI = router({
       const theme = await findTheme(id, compatibilityVersion);
       if (theme && theme.version !== version) return theme;
     }),
-  sync: publicProcedure.query(() => {
-    syncThemes();
-    return true;
-  }),
   health: publicProcedure.query(() => {
     return "Healthy";
   })

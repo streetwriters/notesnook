@@ -167,7 +167,7 @@ const ReminderItem = React.memo(
           </View>
         </View>
 
-        {selectionMode === "note" || selectionMode === "trash" ? (
+        {selectionMode === "reminder" || selectionMode === "trash" ? (
           <>
             <View
               style={{

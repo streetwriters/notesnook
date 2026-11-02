@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { expect, test } from "vitest";
-import { transformQuery } from "../query-transformer.js";
+import { serializeExpression, transformQuery } from "../query-transformer.js";
 
 const TRANSFORM_QUERY_TESTS: [string, string | undefined][] = [
   ["hello world", `hello AND world`],
@@ -69,7 +69,17 @@ const TRANSFORM_QUERY_TESTS: [string, string | undefined][] = [
   [">he", `">he"`],
   ["something<hello", `"something<hello"`],
   ["<", `"<"`],
-  [">", `">"`]
+  [">", `">"`],
+  ["ab OR hello", `ab OR hello`],
+  ["hello ab OR world", `hello AND ab OR world`],
+  ["hello NOT ab", `hello NOT ab`],
+  ['a"b hello', `"a""b hello"`],
+  ['"foo', `"""foo"`],
+  ['foo"', `"foo"""`],
+  ['"" OR hello', `hello`],
+  ['hello OR ""', `hello`],
+  ['"" NOT hello', ``],
+  ['hello NOT ""', `hello`]
 ];
 
 for (const [input, expectedOutput] of TRANSFORM_QUERY_TESTS) {
@@ -77,3 +87,67 @@ for (const [input, expectedOutput] of TRANSFORM_QUERY_TESTS) {
     expect(transformQuery(input).content?.query).toBe(expectedOutput);
   });
 }
+
+test("should remove syntax quotes from multi-word tag filters", () => {
+  expect(transformQuery('tag:"the diary"').tag).toEqual(["the diary"]);
+});
+
+test("should preserve multiple exact tag filter values", () => {
+  expect(transformQuery('tag:"the diary" title:journal tag:work').tag).toEqual([
+    "the diary",
+    "work"
+  ]);
+});
+
+test("should remove syntax quotes from multi-word color filters", () => {
+  expect(transformQuery('color:"deep blue"').color).toEqual(["deep blue"]);
+});
+
+test("should remove syntax quotes added for punctuation in exact filters", () => {
+  expect(transformQuery("tag:foo-bar").tag).toEqual(["foo-bar"]);
+});
+
+test("should separate repeated tag filters", () => {
+  expect(transformQuery("tag:one tag:two").tag).toEqual(["one", "two"]);
+});
+
+test("should separate repeated color filters", () => {
+  expect(transformQuery("color:red color:blue").color).toEqual(["red", "blue"]);
+});
+
+test("should separate repeated quoted tag filters", () => {
+  expect(transformQuery('tag:"one two" tag:"three four"').tag).toEqual([
+    "one two",
+    "three four"
+  ]);
+});
+
+test("should parse query with FTS5 operator precedence", () => {
+  const term = (value: string) => ({ type: "term", value });
+  expect(
+    transformQuery("hello OR ab world NOT foo").content?.expression
+  ).toEqual({
+    type: "OR",
+    left: term("hello"),
+    right: {
+      type: "AND",
+      left: term("ab"),
+      right: { type: "NOT", left: term("world"), right: term("foo") }
+    }
+  });
+});
+
+test("should add parentheses when serializing nested expressions", () => {
+  const term = (value: string) => ({ type: "term" as const, value });
+  expect(
+    serializeExpression({
+      type: "AND",
+      left: { type: "OR", left: term("foo"), right: term("bar") },
+      right: {
+        type: "NOT",
+        left: term("baz"),
+        right: { type: "OR", left: term("qux"), right: term("quux") }
+      }
+    })
+  ).toBe("(foo OR bar) AND baz NOT (qux OR quux)");
+});

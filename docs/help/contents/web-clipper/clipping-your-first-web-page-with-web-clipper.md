@@ -1,46 +1,51 @@
 ---
 title: Clipping your first webpage with web clipper
-description: Clip web pages & save interesting things you find on the web with Notesnook web clipper in a private & secure way.
+pageTitle: How do I clip a web page into Notesnook?
+description: Connect the Notesnook Web Clipper to the web app, choose what part of a page to clip and in what mode, then file the clip into a note, notebook or tag.
+keywords:
+  - notesnook web clipper
+  - clip web page to notes
+  - save article to notes app
+schema: howto
 ---
 
 # Clipping your first webpage with web clipper
 
-## Connecting the with the web app
+## Connect the web clipper to the Notesnook app
 
 Before you can clip pages, you must connect the web clipper with the Notesnook web app. The web clipper works completely offline and relies on the web app to sync & save your clips.
 
 1. Activate the web clipper by clicking on the Notesnook icon in your browser toolbar
 
-   > info Pin the Notesnook Web Clipper to toolbar
-   >
-   > Modern browsers group all extensions under their Extensions dropdown by default. It is recommended that you `Pin to toolbar` the Notesnook Web Clipper.
-   >
-   > # [Chrome](#/tab/chrome)
-   >
-   > ![How to pin the Notesnook Web Clipper to toolbar in Chrome](/static/web-clipper/chrome-pin-to-toolbar.gif)
-   >
-   > # [Firefox](#/tab/firefox)
-   >
-   > ![How to pin the Notesnook Web Clipper to toolbar in Firefox](/static/web-clipper/firefox-pin-to-toolbar.gif)
-   >
-   > ***
+   ::: info Pin the Notesnook Web Clipper to toolbar
+   Modern browsers group all extensions under their Extensions dropdown by default. It is recommended that you `Pin to toolbar` the Notesnook Web Clipper.
 
-2. Click on `Connect to Notesnook`
+   :::tabs
+   == Chrome
+   ![How to pin the Notesnook Web Clipper to toolbar in Chrome](/static/web-clipper/chrome-pin-to-toolbar.gif)
+   == Firefox
+   ![How to pin the Notesnook Web Clipper to toolbar in Firefox](/static/web-clipper/firefox-pin-to-toolbar.gif)
+
+   :::
+
+2. Click `Connect with Notesnook`
 3. Notesnook web app will open in a new tab in the background. Wait a few seconds and the web clipper should automatically connect.
-   > error What to do if the web clipper doesn't connect?
-   >
-   > There are a few things you can do to troubleshoot:
-   >
-   > 1. Make sure you are logged in on the Notesnook web app
-   > 2. Make sure you have the Notesnook web app opened in the background
-   > 3. The web clipper doesn't yet support multiple browser windows so make sure there aren't any additional browser windows opened in the background.
-   > 4. Try restarting the browser
+
+   ::: details What to do if the web clipper doesn't connect?
+   There are a few things you can do to troubleshoot:
+
+   1. Make sure you are logged in on the Notesnook web app
+   2. Make sure you have the Notesnook web app opened in the background
+   3. The web clipper doesn't yet support multiple browser windows so make sure there aren't any additional browser windows opened in the background.
+   4. Try restarting the browser
+
+:::
 
 ## Selecting the clipping area
 
 The [web clipper](https://notesnook.com/notesnook-web-clipper) provides a few options to help you clip exactly the part of the page you need:
 
-![Notesnook Web Clipper clipping area options](/static/web-clipper/clipping-area.png)
+![The clipping area options in the Notesnook Web Clipper](/static/web-clipper/clipping-area.png)
 
 ### Full page
 
@@ -59,15 +64,15 @@ The `Visible area` mode clips only the nodes that fit in the viewport. Any nodes
 The `Selected nodes` mode allows you to select exactly which nodes you want to clip:
 
 1. Select the `Selected nodes` mode from the Notesnook Web Clipper
-2. You should now see a small popup in the bottom-right corner of the page
-   ![](/static/web-clipper/selected-nodes-popup.png)
-3. Click on all the nodes you want to clip (they can be in any part of the screen).
-   > info
-   >
-   > The web clipper stacks all the selected nodes vertically during final processing.
-4. Clicking again on the selected nodes will deselect them.
-5. Once you are done, click on the Clip button
-6. Activate the Notesnook Web Clipper and save your clip.
+2. You should now see a small popup in the bottom-right corner of the page.
+
+![The selected-nodes popup shown in the bottom-right corner of the page](/static/web-clipper/selected-nodes-popup.png)
+
+3. Click all the nodes you want to clip (they can be in any part of the screen).
+   ::: info
+   The web clipper stacks all the selected nodes vertically during final processing.
+
+::: 4. Clicking again on the selected nodes will deselect them. 5. Once you are done, click the Clip button 6. Activate the Notesnook Web Clipper and save your clip.
 
 ## Selecting the clipping mode
 
@@ -83,53 +88,59 @@ The clipping mode controls how the final clip should look.
 
 ### Screenshot
 
-> info Uses attachment storage
->
-> The `Screenshot` mode will use some of your monthly attachment storage for each page clipped.
+::: info Requires a signed-in account
+`Screenshot` and `Complete with styles` are offered only while you are **logged in** to the Notesnook web app. Clip while signed out and the clipper falls back to `Simplified`. Both modes use some of your [monthly attachment storage](/plans-and-limits) for every page you clip.
+
+:::
 
 `Screenshot` mode includes all the styles + images but the final result is saved as an image i.e. it is non-interactive.
 
 ### Complete with styles
 
-> info Uses attachment storage
->
-> The `Complete with styles` mode will use some of your monthly attachment storage for each page clipped.
-
 `Complete with styles` mode saves all images, styles & everything on the page to retain the maximum amount of information. The final result appears as an embed in the Notesnook editor which is fully interactive.
 
-![](/static/web-clipper/web-clip-embed.gif)
+![A web clip embedded in a Notesnook note, scrollable and fully interactive](/static/web-clipper/web-clip-embed.gif)
 
 ## Organizing your web clip
 
 The Notesnook Web Clipper offers 3 easy ways to organize your web clips (all of which are completely optional):
 
-![](/static/web-clipper/organize-web-clip.png)
+![The Notesnook Web Clipper options for appending to a note, adding to a notebook, or assigning tags](/static/web-clipper/organize-web-clip.png)
 
-### [Append to note](#/tab/append-to-note)
-
+:::tabs
+== Append to note
 You can choose to append your web clip to an existing note and it'll be automatically added at the bottom of that note:
 
-1. Click on `Select a note to append to`
+1. Click `Select a note to append to`
 2. Select the note you want to append to
 
-### [Add to notebook](#/tab/add-to-notebook)
+== Add to notebook
 
-> info
->
-> You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
-
-1. Click on `Select a notebook`
+1. Click `Select a notebook`
 2. Select the notebook you want to add the web clip to
 
-### [Assign tags](#/tab/assign-tags)
+::: info
+You can only assign the web clip to an existing notebook. Creating new notebooks is not supported from inside the web clipper.
 
-1. Click on `Assign a tag`
+== Assign tags
+
+1. Click `Assign a tag`
 2. Select the tag you want to assign (you can assign multiple tags)
 3. You can also create & assign a new tag by typing in the search bar
-   ![](/static/web-clipper/assign-a-tag.gif)
 
----
+   ![Assigning a tag to a web clip from the web clipper](/static/web-clipper/assign-a-tag.gif)
+
+:::
 
 ## Saving your web clip
 
-1. Click on the `Save` button to save & sync your web clip.
+1. Click the `{{save}}` button to save & sync your web clip.
+
+<GetNotesnook title="Clip the web into notes only you can read" text="The Notesnook Web Clipper saves pages straight into your encrypted notes — no third-party server sees what you save. It's free, open source, and works in Chrome, Firefox and Edge." />
+
+## Related pages
+
+- [Installing the web clipper](/web-clipper/installation) — Chromium and Firefox setup
+- [Web clipper troubleshooting](/web-clipper/troubleshooting) — when the clipper can't connect
+- [Attachments & files](/attachments-and-files) — where clips are stored and what they count against
+- [Plans & limits](/plans-and-limits) — monthly storage on each plan

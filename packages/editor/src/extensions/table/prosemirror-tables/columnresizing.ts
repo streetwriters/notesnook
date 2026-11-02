@@ -120,6 +120,7 @@ export function columnResizing({
 type ResizeState = {
   dragging: Dragging | false;
   decorations: DecorationSet;
+  builtFor?: { cell: number };
 };
 
 function createResizeState(
@@ -138,15 +139,24 @@ function createResizeState(
     const cell = edgeCell(state, state.selection.from, "right");
     if (cell === -1) {
       copy.decorations = DecorationSet.empty;
+      copy.builtFor = undefined;
     } else {
-      const handles = createColumnResizeHandles(
-        state,
-        cell,
-        prevState,
-        showResizeHandleOnSelection
-      );
-      if (handles) {
-        copy.decorations = handles;
+      const was = prevState.builtFor;
+      const built =
+        was && tr.docChanged ? { cell: tr.mapping.map(was.cell) } : was;
+
+      copy.builtFor = built;
+      if (!built || built.cell !== cell) {
+        const handles = createColumnResizeHandles(
+          state,
+          cell,
+          prevState,
+          showResizeHandleOnSelection
+        );
+        if (handles) {
+          copy.decorations = handles;
+          copy.builtFor = { cell };
+        }
       }
     }
   }
@@ -407,9 +417,18 @@ export function createColumnResizeHandles(
     return null;
   }
 
+  const sizes = new Map<number, number>();
+  table.forEach((row, rowOffset) => {
+    row.forEach((cell, cellOffset) =>
+      sizes.set(rowOffset + 1 + cellOffset, cell.nodeSize)
+    );
+  });
+
   for (let i = 0; i < totalCells; i++) {
     const cellPos = map.map[i];
-    const pos = start + cellPos + table.nodeAt(cellPos)!.nodeSize - 1;
+    const size = sizes.get(cellPos);
+    if (size === undefined) continue;
+    const pos = start + cellPos + size - 1;
     decorations.push(
       Decoration.widget(
         pos,

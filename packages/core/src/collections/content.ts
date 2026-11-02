@@ -222,7 +222,8 @@ export class Content implements ICollection {
       .where("noteId", "in", ids)
       .set({
         ...partial,
-        dateModified: Date.now()
+        dateModified: Date.now(),
+        synced: false
       })
       .execute();
 

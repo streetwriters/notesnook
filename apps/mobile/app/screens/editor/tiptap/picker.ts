@@ -95,7 +95,7 @@ const file = async (fileOptions: PickerOptions) => {
     if (fileCopyUri.status === "error") {
       ToastManager.show({
         heading: strings.failToOpen(),
-        message: "Error copying file",
+        message: strings.errorCopyingFile(),
         type: "error",
         context: "global"
       });
@@ -116,17 +116,24 @@ const file = async (fileOptions: PickerOptions) => {
         fileOptions
       ))
     ) {
-      throw new Error("Failed to attach file");
+      throw new Error(strings.failedToAttachFile());
     }
 
     RNFetchBlob.fs.unlink(dirname(fileCopyUri.localUri)).catch((e) => {
       console.log(e, "error");
     });
 
+    const isNewNote = fileOptions.noteId === undefined;
+    const currentFileNoteId =
+      fileOptions.tabId !== undefined
+        ? useTabStore.getState().getNoteIdForTab(fileOptions.tabId)
+        : undefined;
+
+    const isSameNote = currentFileNoteId === fileOptions.noteId;
+
     if (
       fileOptions.tabId !== undefined &&
-      useTabStore.getState().getNoteIdForTab(fileOptions.tabId) ===
-        fileOptions.noteId
+      (isSameNote || isNewNote)
     ) {
       editorController.current?.commands.insertAttachment(
         {
@@ -152,6 +159,19 @@ const file = async (fileOptions: PickerOptions) => {
   }
 };
 
+const onImagePickerError = (e: unknown) => {
+  const error = e as Error & { code?: string };
+  if (error?.code === "E_PICKER_CANCELLED") return;
+
+  DatabaseLogger.error(error);
+  ToastManager.show({
+    heading: strings.failToOpen(),
+    message: error?.message,
+    type: "error",
+    context: "global"
+  });
+};
+
 const camera = async (options: PickerOptions) => {
   try {
     await db.attachments.generateKey();
@@ -165,15 +185,13 @@ const camera = async (options: PickerOptions) => {
       writeTempFile: true,
       compressImageQuality: 1
     })
-      .then((response) => {
+      .then((response) =>
         handleImageResponse(
           Array.isArray(response) ? response : [response],
           options
-        );
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+        )
+      )
+      .catch(onImagePickerError);
   } catch (e) {
     ToastManager.show({
       heading: (e as Error).message,
@@ -201,7 +219,7 @@ const gallery = async (options: PickerOptions) => {
           options
         )
       )
-      .catch((e) => {});
+      .catch(onImagePickerError);
   } catch (e) {
     useSettingStore.getState().setAppDidEnterBackgroundForAction(false);
     ToastManager.show({
@@ -245,6 +263,7 @@ const handleImageResponse = async (
   response: Image[],
   options: PickerOptions
 ) => {
+  const isNewNote = options.noteId === undefined;
   const result = await AttachImage.present(response, options.context);
 
   if (!result) return;
@@ -295,9 +314,16 @@ const handleImageResponse = async (
 
     RNFetchBlob.fs.unlink(uri).catch((e) => {});
 
+    const currentNoteId =
+      options.tabId !== undefined
+        ? useTabStore.getState().getNoteIdForTab(options.tabId)
+        : undefined;
+
+    const isSameNote = currentNoteId === options.noteId;
+
     if (
       options.tabId !== undefined &&
-      useTabStore.getState().getNoteIdForTab(options.tabId) === options.noteId
+      (isSameNote || isNewNote)
     ) {
       editorController.current?.commands.insertImage(
         {

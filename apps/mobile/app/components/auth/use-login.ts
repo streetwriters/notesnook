@@ -92,7 +92,9 @@ export const useLogin = (
                     eSendEvent(eCloseSimpleDialog, "two_factor_verify");
                     setLoading(false);
                     setStep(LoginSteps.emailAuth);
-                    ToastManager.error(new Error("Token expired, try logging in again"));
+                    ToastManager.error(
+                      new Error(strings.tokenExpiredTryLoggingIn())
+                    );
                   } else {
                     onerror(e as Error);
                   }

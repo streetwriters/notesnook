@@ -50,6 +50,7 @@ import {
   addRecentCommand
 } from "./commands";
 import { escapeUTF8 } from "entities";
+import { truncateString } from "../../common";
 
 type CommandPaletteDialogProps = BaseDialogProps<boolean> & {
   isCommandMode: boolean;
@@ -249,7 +250,9 @@ export const CommandPaletteDialog = DialogManager.register(
                 >
                   <Text
                     variant="subBody"
-                    dangerouslySetInnerHTML={{ __html: label }}
+                    dangerouslySetInnerHTML={{
+                      __html: truncateString(label, 200)
+                    }}
                   />
                 </Box>
               );
@@ -306,7 +309,9 @@ export const CommandPaletteDialog = DialogManager.register(
                         overflow: "hidden"
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: command.title
+                        __html: query
+                          ? command.title
+                          : truncateString(command.title, 200)
                       }}
                     />
                   </Flex>
@@ -323,7 +328,8 @@ export const CommandPaletteDialog = DialogManager.register(
                       sx={{
                         bg: "transparent",
                         p: "small",
-                        borderRadius: 100
+                        borderRadius: 100,
+                        flexShrink: 0
                       }}
                     >
                       <Cross size={12} />

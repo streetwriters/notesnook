@@ -65,7 +65,7 @@ import { AppFontSize } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { DefaultAppStyles } from "../../utils/styles";
 import PaywallSheet from "../../components/sheets/paywall";
-const mfaMethods: MFAMethod[] = [
+const getMfaMethods = (): MFAMethod[] => [
   {
     id: "app",
     title: strings.mfaAuthAppTitle(),
@@ -112,8 +112,8 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   const featureAvailable = useIsFeatureAvailable("sms2FA");
 
   const getMethods = () => {
-    if (!recovery) return mfaMethods;
-    return mfaMethods.filter((m) => m.id !== user?.mfa?.primaryMethod);
+    if (!recovery) return getMfaMethods();
+    return getMfaMethods().filter((m) => m.id !== user?.mfa?.primaryMethod);
   };
 
   return (

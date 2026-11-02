@@ -49,6 +49,7 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { NotePreviewWidget } from "../../../services/note-preview-widget";
+import { PinnedNotesWidget } from "../../../services/pinned-notes-widget";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
@@ -502,6 +503,9 @@ export const useEditor = (
         timers.current.onsave = setTimeout(async () => {
           if (!id || !note) return;
           NotePreviewWidget.updateNote(id, note);
+          if (note.pinned) {
+            PinnedNotesWidget.updateNotes();
+          }
         }, 500);
 
         return id;
@@ -559,7 +563,7 @@ export const useEditor = (
       session?: TabSessionItem;
       newTab?: boolean;
       refresh?: boolean;
-      searchResultIndex?: number;
+      searchResultIndex?: number | string;
       loadedFromEditor?: boolean;
     }) => {
       loadNoteMutex.runExclusive(async () => {
@@ -749,12 +753,13 @@ export const useEditor = (
           await postMessage(NativeEvents.title, item.title, tabId);
           overlay(false);
 
+          const updatedTab = useTabStore.getState().getTab(tabId!);
           await postMessage(
             NativeEvents.html,
             {
               data: currentContents.current[item.id]?.data || "",
-              scrollTop: tab?.session?.scrollTop,
-              selection: tab?.session?.selection,
+              scrollTop: updatedTab?.session?.scrollTop,
+              selection: updatedTab?.session?.selection,
               searchResultIndex: event.searchResultIndex
             },
             tabId,
@@ -1111,6 +1116,7 @@ export const useEditor = (
 
   const onLoad = useCallback(async () => {
     const isAppLoading = useSettingStore.getState().isAppLoading;
+    syncTabs();
     if (isAppLoading) {
       const sub = useSettingStore.subscribe((state) => {
         if (!state.isAppLoading) {
@@ -1121,6 +1127,7 @@ export const useEditor = (
       return;
     }
 
+    syncTabs();
     setTimeout(() => {
       postMessage(NativeEvents.theme, theme);
     });
@@ -1128,7 +1135,6 @@ export const useEditor = (
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
     await commands.setSettings();
-
     localTabState.current?.set(useTabStore.getState().currentTab!, {
       editedAt: 0
     });

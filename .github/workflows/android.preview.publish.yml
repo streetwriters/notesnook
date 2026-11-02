@@ -12,11 +12,17 @@ on:
 
 jobs:
   publish:
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
+      - name: Checkout base repo (trusted)
+        uses: actions/checkout@v5
+        # No `ref` -> default branch. Only the shared actions are needed.
+        with:
+          sparse-checkout: .github/actions
+
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
@@ -25,8 +31,11 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Load PR metadata
-        run: cat "$RUNNER_TEMP/artifact/pr-meta.env" >> "$GITHUB_ENV"
+      - name: Load & verify PR metadata
+        id: meta
+        uses: ./.github/actions/verify-pr-meta
+        with:
+          meta-file: ${{ runner.temp }}/artifact/pr-meta.env
 
       - name: Publish to Firebase
         id: firebase-output
@@ -36,12 +45,14 @@ jobs:
           serviceCredentialsFileContent: ${{ secrets.QA_SERVICE_ACCOUNT }}
           groups: testers
           file: ${{ runner.temp }}/artifact/app-preview.apk
-          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ env.PR_NUMBER }}
+          releaseNotes: Preview for https://github.com/${{ github.repository }}/pull/${{ steps.meta.outputs.pr-number }}
 
       - name: Post or update PR comment
         uses: actions/github-script@v7
         env:
           preview_url: ${{ steps.firebase-output.outputs.TESTING_URI }}
+          PR_NUMBER: ${{ steps.meta.outputs.pr-number }}
+          HEAD_SHA: ${{ steps.meta.outputs.head-sha }}
         with:
           script: |
             const marker = '<!-- android-preview-comment -->';

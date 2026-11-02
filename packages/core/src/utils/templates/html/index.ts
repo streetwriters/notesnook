@@ -97,6 +97,9 @@ async function preprocessHTML(templateData: TemplateData) {
 
   const codeblocks = doc.querySelectorAll("pre > code");
   if (codeblocks.length) {
+    // stop Prism from auto-highlighting the host document on import
+    const globalScope = globalThis as { Prism?: { manual?: boolean } };
+    if (!globalScope.Prism) globalScope.Prism = { manual: true };
     const { default: prismjs } = await import("prismjs");
     // const { loadLanguage } = await import("./languages/index.js");
     (prismjs as any).register = (syntax: (syntax: any) => void) => {

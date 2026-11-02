@@ -1,0 +1,28 @@
+# Cloudflare Pages redirects. This file is copied to the root of the deployed
+# site by VitePress along with everything else in contents/public/.
+#
+# The legacy docgen site gave every section directory a landing page, generated
+# from a README.md that contained nothing but an H1. The VitePress rewrite
+# dropped those stubs, so their URLs started 404ing. Every *article* slug came
+# across unchanged — only these section indexes moved — so each one is sent to
+# the page that now leads its cluster (see STYLE.md, "Internal linking
+# clusters") rather than to the home page, which would be a soft 404.
+#
+# 301 = permanent, so search engines transfer the old URL's ranking to the target.
+
+/organizing-notes     /organizing-notes/organize-notes-using-notebooks   301
+/organizing-notes/    /organizing-notes/organize-notes-using-notebooks   301
+/rich-text-editor     /rich-text-editor/rich-text-editor-toolbar         301
+/rich-text-editor/    /rich-text-editor/rich-text-editor-toolbar         301
+/custom-themes        /custom-themes/using-themes                        301
+/custom-themes/       /custom-themes/using-themes                        301
+/mobile-integration   /mobile-integration/home-screen-widgets            301
+/mobile-integration/  /mobile-integration/home-screen-widgets            301
+/desktop-integration  /desktop-integration/auto-start-on-system-startup  301
+/desktop-integration/ /desktop-integration/auto-start-on-system-startup  301
+/web-clipper          /web-clipper/installation                          301
+/web-clipper/         /web-clipper/installation                          301
+/inbox-api            /inbox-api/getting-started                         301
+/inbox-api/           /inbox-api/getting-started                         301
+/faqs                 /docs                                              301
+/faqs/                /docs                                              301

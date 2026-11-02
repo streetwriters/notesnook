@@ -36,9 +36,9 @@ export function ImportResult(props: ImportResultProps) {
   if (result.totalNotes <= 0) {
     return (
       <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
-        <Text variant="title">Import unsuccessful</Text>
+        <Text variant="title">{strings.importUnsuccessful()}</Text>
         <Text variant="body" sx={{ mt: 2 }}>
-          We failed to import the selected files. Please try again.
+          {strings.failedToImportSelectedFiles()}
         </Text>
         {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
         <Button
@@ -46,7 +46,7 @@ export function ImportResult(props: ImportResultProps) {
           onClick={onReset}
           sx={{ alignSelf: "center", mt: 2, px: 4 }}
         >
-          Start over
+          {strings.startOver()}
         </Button>
       </Flex>
     );
@@ -56,8 +56,9 @@ export function ImportResult(props: ImportResultProps) {
     <>
       <CheckCircleOutline color="accent" />
       <Text variant="body" my={2} sx={{ textAlign: "center" }}>
-        {strings.importCompleted()}. {props.result.totalNotes} notes
-        successfully imported. {strings.errorsOccured(result.errors.length)}
+        {strings.importCompleted()}.{" "}
+        {strings.notesSuccessfullyImported(props.result.totalNotes)}{" "}
+        {strings.errorsOccured(result.errors.length)}
       </Text>
       <Button
         variant="secondary"

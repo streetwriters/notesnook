@@ -1,1 +1,0 @@
-# Organizing notes

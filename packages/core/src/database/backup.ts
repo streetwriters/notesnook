@@ -141,6 +141,7 @@ const invalidKeys = [
   "t",
   "v",
   "lastBackupTime",
+  "lastFullBackupTime",
   "lastSynced",
   // all indexes
   "notes",
@@ -191,8 +192,15 @@ export default class Backup {
     return this.db.kv().read("lastBackupTime");
   }
 
-  async updateBackupTime() {
-    await this.db.kv().write("lastBackupTime", Date.now());
+  lastFullBackupTime() {
+    return this.db.kv().read("lastFullBackupTime");
+  }
+
+  async updateBackupTime(mode: "full" | "partial" = "partial") {
+    const now = Date.now();
+    // a full backup is a superset of a partial one
+    await this.db.kv().write("lastBackupTime", now);
+    if (mode === "full") await this.db.kv().write("lastFullBackupTime", now);
   }
 
   /**
@@ -274,7 +282,7 @@ export default class Backup {
     if (bufferLength > 0 || buffer.length > 0)
       throw new Error("Buffer not empty.");
 
-    await this.updateBackupTime();
+    await this.updateBackupTime("partial");
   }
 
   async *export(options: {
@@ -346,7 +354,7 @@ export default class Backup {
 
     if (backupState.buffer.length > 0) yield* this.bufferToFile(backupState);
     if (mode === "partial") {
-      await this.updateBackupTime();
+      await this.updateBackupTime("partial");
       return;
     }
 
@@ -379,7 +387,7 @@ export default class Backup {
       }
     }
 
-    await this.updateBackupTime();
+    await this.updateBackupTime("full");
   }
 
   private async *backupCollection<T, B extends boolean>(
@@ -511,7 +519,7 @@ export default class Backup {
       : typeof data === "object"
       ? Object.values(data)
       : [];
-    await this.migrateData(
+    return await this.migrateData(
       normalizedData,
       backup.version === 6.1 && isLegacyBackup(normalizedData)
         ? 5.9
@@ -553,6 +561,7 @@ export default class Backup {
     attachmentsKey?: SerializedKey
   ) {
     const queue: Partial<Record<CollectionName, MaybeDeletedItem<Item>[]>> = {};
+    const skippedAttachments: string[] = [];
     for (let item of data) {
       // we do not want to restore deleted items
       if (
@@ -614,7 +623,17 @@ export default class Backup {
           attachment.key.cipher === item.key.cipher &&
           attachment.key.salt === item.key.salt;
 
-        if (attachmentsKey && !isSameKey) {
+        if (
+          attachmentsKey &&
+          !isSameKey &&
+          attachment &&
+          (attachment.dateUploaded ||
+            (await this.db.fs().exists(attachment.hash)))
+        ) {
+          // the server won't overwrite an uploaded file & other devices may have
+          // it cached, so we must keep the local key and file.
+          skippedAttachments.push(attachment.hash);
+        } else if (attachmentsKey && !isSameKey) {
           const newKey = await this.db.attachments.encryptKey(
             JSON.parse(
               await this.db.storage().decrypt(attachmentsKey, item.key)
@@ -625,6 +644,10 @@ export default class Backup {
             attachment.iv = item.iv;
             attachment.salt = item.salt;
             attachment.size = item.size;
+            attachment.chunkSize = item.chunkSize;
+            attachment.alg = item.alg;
+            delete attachment.dateUploaded;
+            delete attachment.failed;
           } else item.key = newKey;
           delete item.dateUploaded;
           delete item.failed;
@@ -706,6 +729,7 @@ export default class Backup {
 
       await collection.put(items as any[]);
     }
+    return skippedAttachments;
   }
 
   private validate(backup: LegacyBackupFile | BackupFile) {

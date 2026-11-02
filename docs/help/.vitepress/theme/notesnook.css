@@ -1,0 +1,628 @@
+/**
+ * Notesnook design tokens applied to VitePress.
+ *
+ * Values come from @notesnook/theme (default-light / default-dark v2.1) and
+ * apps/web:
+ *   accent            #008837            packages/theme default themes
+ *   radii             2.5 / 5 / 7 / 10   packages/theme/src/theme/index.ts
+ *   space scale       6 / 10 / 15 / 20   packages/theme/src/theme/index.ts
+ *   shadows           menu / dialog      packages/theme/src/theme/index.ts
+ *   fonts             Inter, Fira Code   apps/web/src/app.css
+ *
+ * Notesnook's UI is flat: 5px radii, hairline borders, hover fills instead of
+ * cards, and a single accent used sparingly. This file keeps VitePress in that
+ * register rather than layering a second design language on top of it.
+ */
+
+/* ========================================================================== */
+/* Tokens                                                                     */
+/* ========================================================================== */
+
+:root {
+  /* Notesnook primitives */
+  --nn-accent: #008837;
+  --nn-accent-foreground: #ffffff;
+  --nn-shade: #0088371a; /* alpha(accent, .1) */
+
+  --nn-radius-small: 2.5px;
+  --nn-radius-default: 5px;
+  --nn-radius-large: 7px;
+  --nn-radius-dialog: 10px;
+  --nn-radius-button: 10px;
+
+  --nn-space-1: 6px;
+  --nn-space-2: 10px;
+  --nn-space-3: 15px;
+  --nn-space-4: 20px;
+  --nn-space-5: 25px;
+
+  --nn-static-orange: #ff9800;
+
+  /* Typography */
+  --vp-font-family-base: "Inter", "Noto Sans", Frutiger, Calibri, Myriad, Arial,
+    Ubuntu, Helvetica, -apple-system, BlinkMacSystemFont, sans-serif;
+  --vp-font-family-mono: "Fira Code", "Fira Mono", Hack, Menlo, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* Layout — a help site reads better slightly narrower than VitePress' default */
+  --vp-layout-max-width: 1440px;
+  --vp-sidebar-width: 288px;
+  --vp-nav-height: 60px;
+}
+
+/* ------------------------------- light ---------------------------------- */
+:root {
+  --vp-c-brand-1: #008837;
+  --vp-c-brand-2: #008837e6; /* app button hover  — alpha(accent, .9) */
+  --vp-c-brand-3: #008837cc; /* app button active — alpha(accent, .8) */
+  --vp-c-brand-soft: var(--nn-shade);
+
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f7f7f7;
+  --vp-c-bg-soft: #f7f7f7;
+  --vp-c-bg-elv: #ffffff;
+
+  --vp-c-divider: #e8e8e8;
+  --vp-c-border: #e8e8e8;
+  --vp-c-gutter: #e8e8e8;
+
+  --vp-c-text-1: #202020; /* heading */
+  --vp-c-text-2: #505050; /* paragraph */
+  --vp-c-text-3: #777777; /* paragraph-secondary */
+
+  --nn-hover: #eeeeee;
+  --nn-selected-bg: #eeeeee;
+  --nn-selected-fg: #212121;
+  --nn-code-bg: #f7f7f7;
+  --nn-shadow-menu: 0px 0px 10px 0px #00000022;
+  --nn-shadow-dialog: 0px 0px 25px 5px #0000004e;
+
+  --vp-c-tip-1: #4f8a10;
+  --vp-c-tip-soft: #4f8a101a;
+  --vp-c-danger-1: #f54b42;
+  --vp-c-danger-soft: #f54b421a;
+  --vp-c-warning-1: #b26a00; /* darkened static orange for AA on white */
+  --vp-c-warning-soft: #ff98001f;
+}
+
+/* -------------------------------- dark ---------------------------------- */
+.dark {
+  /* #008837 is only 3.06:1 on the app's #181818, so text-bearing brand steps
+     are lightened for readability. Solid accent fills stay exactly #008837. */
+  --vp-c-brand-1: #00b34a;
+  --vp-c-brand-2: #00c853;
+  --vp-c-brand-3: #008837;
+  --vp-c-brand-soft: #00883733;
+
+  --vp-c-bg: #181818;
+  --vp-c-bg-alt: #202020;
+  --vp-c-bg-soft: #202020;
+  --vp-c-bg-elv: #202020;
+
+  --vp-c-divider: #383838;
+  --vp-c-border: #2b2b2b;
+  --vp-c-gutter: #2b2b2b;
+
+  --vp-c-text-1: #e3e3e3;
+  --vp-c-text-2: #d3d3d3;
+  --vp-c-text-3: #818589;
+
+  --nn-hover: #2b2b2b;
+  --nn-selected-bg: #494949;
+  --nn-selected-fg: #fbfbfb;
+  --nn-code-bg: #202020;
+  --nn-shadow-menu: 0px 0px 10px 0px #00000078;
+  --nn-shadow-dialog: 0px 0px 25px 5px #000000aa;
+
+  --vp-c-tip-1: #7bb32e;
+  --vp-c-tip-soft: #4f8a1033;
+  --vp-c-danger-1: #f76b64;
+  --vp-c-danger-soft: #f54b4226;
+  --vp-c-warning-1: #ffa726;
+  --vp-c-warning-soft: #ff980026;
+}
+
+/* --------------------------- derived bindings ---------------------------- */
+:root,
+.dark {
+  --vp-button-brand-bg: var(--nn-accent);
+  --vp-button-brand-text: var(--nn-accent-foreground);
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-hover-bg: #008837e6;
+  --vp-button-brand-hover-text: var(--nn-accent-foreground);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-active-bg: #008837cc;
+  --vp-button-brand-active-text: var(--nn-accent-foreground);
+
+  --vp-code-bg: var(--nn-code-bg);
+  --vp-code-block-bg: var(--nn-code-bg);
+  --vp-code-copy-code-bg: var(--nn-code-bg);
+  --vp-code-copy-code-hover-bg: var(--nn-hover);
+
+  --vp-shadow-1: var(--nn-shadow-menu);
+  --vp-shadow-2: var(--nn-shadow-menu);
+  --vp-shadow-3: var(--nn-shadow-menu);
+  --vp-shadow-4: var(--nn-shadow-dialog);
+  --vp-shadow-5: var(--nn-shadow-dialog);
+
+  --vp-custom-block-tip-bg: var(--vp-c-tip-soft);
+  --vp-custom-block-warning-bg: var(--vp-c-warning-soft);
+  --vp-custom-block-danger-bg: var(--vp-c-danger-soft);
+  --vp-custom-block-info-bg: var(--vp-c-bg-alt);
+  --vp-custom-block-details-bg: var(--vp-c-bg-alt);
+}
+
+/* ========================================================================== */
+/* Base                                                                       */
+/* ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: #00883766;
+  color: var(--nn-selected-fg);
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4 {
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+.vp-doc h1 {
+  font-size: 32px;
+  line-height: 1.25;
+  margin-bottom: var(--nn-space-3);
+}
+
+/* The app never underlines its own separators heavily — keep section rules
+   hairline and give sections room to breathe. */
+.vp-doc h2 {
+  margin-top: 44px;
+  padding-top: var(--nn-space-4);
+  border-top: 1px solid var(--vp-c-divider);
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.vp-doc h3 {
+  margin-top: 28px;
+  font-size: 17px;
+}
+
+.vp-doc p,
+.vp-doc li {
+  line-height: 1.7;
+}
+
+.vp-doc a {
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+.vp-doc a:hover {
+  text-decoration: underline;
+}
+
+/* ========================================================================== */
+/* Navigation & sidebar — modelled on the app's navigation menu               */
+/* ========================================================================== */
+
+.VPNav {
+  backdrop-filter: saturate(160%) blur(12px);
+}
+
+.VPNavBar:not(.home.top) {
+  background-color: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
+}
+
+.VPSidebar {
+  background-color: var(--vp-c-bg-alt) !important;
+  padding-top: var(--nn-space-3);
+}
+
+.VPSidebarItem.level-0 > .item > .text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-3);
+}
+
+/* Flat rows with a hover fill — same treatment as list items in the app. */
+.VPSidebarItem.is-link > .item .link,
+.VPSidebarItem .item > .link {
+  border-radius: var(--nn-radius-default);
+}
+
+/* The hover fill bleeds left of the label so item text keeps the same left edge
+   as the group headers and the nav logo (32px), instead of sitting 10px in. */
+.VPSidebarItem.level-1 .item,
+.VPSidebarItem.level-2 .item,
+.VPSidebarItem.level-3 .item {
+  border-radius: var(--nn-radius-default);
+  margin-left: calc(var(--nn-space-2) * -1);
+  padding-left: var(--nn-space-2);
+  padding-right: var(--nn-space-1);
+  transition: background-color 100ms ease-out;
+}
+
+.VPSidebarItem.level-1:not(.is-active) .item:hover,
+.VPSidebarItem.level-2:not(.is-active) .item:hover,
+.VPSidebarItem.level-3:not(.is-active) .item:hover {
+  background-color: var(--nn-hover);
+}
+
+.VPSidebarItem.is-active > .item {
+  background-color: var(--nn-selected-bg);
+}
+
+.VPSidebarItem.is-active > .item > .indicator {
+  background-color: var(--nn-accent);
+}
+
+.VPSidebarItem.is-active > .item .link .text {
+  color: var(--nn-selected-fg);
+  font-weight: 600;
+}
+
+.VPSidebarItem .text {
+  font-size: 14px;
+}
+
+/* ========================================================================== */
+/* Buttons                                                                    */
+/* ========================================================================== */
+
+/* One radius for every button on the site. `!important` is needed because the
+   default theme's own button rules carry a scoped [data-v-*] attribute, which
+   outranks a plain class selector. */
+.VPButton,
+.VPButton.small,
+.VPButton.medium,
+.VPButton.big,
+.VPNavBarSearchButton,
+.DocSearch-Button,
+.VPNavBarHamburger,
+.VPLocalNav button,
+.VPBackToTop,
+.VPSidebarItem .caret,
+.VPLocalSearchBox button,
+.VPDocFooter button,
+[class*="language-"] > button.copy,
+[class*="language-"] > span.lang + button,
+.vp-doc button {
+  border-radius: var(--nn-radius-button) !important;
+}
+
+/* ========================================================================== */
+/* Home page                                                                  */
+/* ========================================================================== */
+
+.VPHero .image-bg {
+  display: none;
+}
+
+/* The default theme nudges the hero image up and left by 32px to optically
+   centre it against the blurred `image-bg` circle behind it. We hide that
+   circle, so the nudge has nothing left to compensate for — it just lifts the
+   logo above the middle of the text column, leaving it centred on the heading
+   and tagline with the action buttons hanging below. Dropping the transform
+   centres it against the whole column: heading, tagline and actions. */
+@media (min-width: 960px) {
+  .VPHero .image-container {
+    transform: none;
+  }
+}
+
+.VPHero .image-container img {
+  max-width: 208px;
+  max-height: 208px;
+  border-radius: 44px;
+  box-shadow: var(--nn-shadow-dialog);
+}
+
+.VPHome .VPFeature {
+  border-radius: var(--nn-radius-large);
+  border-color: var(--vp-c-divider);
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+
+.VPHome .VPFeature:hover {
+  border-color: var(--nn-accent);
+  background-color: var(--vp-c-bg-alt);
+}
+
+/* ========================================================================== */
+/* Custom blocks                                                              */
+/* ========================================================================== */
+
+.vp-doc .custom-block {
+  border-radius: var(--nn-radius-large);
+  border: 1px solid var(--vp-c-divider);
+  border-left-width: 3px;
+  padding: var(--nn-space-3) var(--nn-space-4);
+  font-size: 15px;
+}
+
+.vp-doc .custom-block .custom-block-title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.vp-doc .custom-block p {
+  line-height: 1.65;
+}
+
+.vp-doc .custom-block.info {
+  border-color: var(--vp-c-divider);
+  border-left-color: var(--vp-c-text-3);
+}
+
+.vp-doc .custom-block.tip {
+  border-color: var(--vp-c-tip-soft);
+  border-left-color: var(--vp-c-tip-1);
+}
+
+.vp-doc .custom-block.warning {
+  border-color: var(--vp-c-warning-soft);
+  border-left-color: var(--vp-c-warning-1);
+}
+
+.vp-doc .custom-block.danger {
+  border-color: var(--vp-c-danger-soft);
+  border-left-color: var(--vp-c-danger-1);
+}
+
+.vp-doc .custom-block.details {
+  border-left-color: var(--vp-c-text-3);
+}
+
+.vp-doc .custom-block img {
+  margin-top: var(--nn-space-2);
+}
+
+/* ========================================================================== */
+/* Platform tabs (vitepress-plugin-tabs)                                      */
+/* ========================================================================== */
+
+.vp-doc .plugin-tabs {
+  border-radius: var(--nn-radius-large);
+  border: 1px solid var(--vp-c-divider);
+  background-color: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.vp-doc .plugin-tabs--tab-list {
+  background-color: var(--vp-c-bg-alt);
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding: var(--nn-space-1) var(--nn-space-1) 0;
+}
+
+.vp-doc .plugin-tabs--tab {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--vp-c-text-2);
+  padding: var(--nn-space-1) var(--nn-space-2);
+  border-radius: var(--nn-radius-default) var(--nn-radius-default) 0 0;
+  transition: color 100ms ease-out, background-color 100ms ease-out;
+}
+
+.vp-doc .plugin-tabs--tab:hover {
+  background-color: var(--nn-hover);
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc .plugin-tabs--tab[aria-selected="true"] {
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+  background-color: var(--vp-c-bg);
+}
+
+.vp-doc .plugin-tabs--tab::after {
+  background-color: transparent;
+  height: 2px;
+}
+
+.vp-doc .plugin-tabs--tab[aria-selected="true"]::after {
+  background-color: var(--nn-accent);
+}
+
+.vp-doc .plugin-tabs--content {
+  padding: var(--nn-space-4);
+}
+
+.vp-doc .plugin-tabs--content > :first-child {
+  margin-top: 0;
+}
+
+.vp-doc .plugin-tabs--content > :last-child {
+  margin-bottom: 0;
+}
+
+/* Nested tabs inside a custom block should not double up on chrome. */
+.vp-doc .custom-block .plugin-tabs {
+  background-color: var(--vp-c-bg);
+}
+
+/* ========================================================================== */
+/* Media, code, tables                                                        */
+/* ========================================================================== */
+
+.vp-doc img {
+  border-radius: var(--nn-radius-large);
+  border: 1px solid var(--vp-c-divider);
+  max-width: 100%;
+}
+
+/* The CSS reset makes every image `display: block`, which breaks the line when a
+   UI glyph is referenced mid-sentence ("press the ⋯ button"). An image sharing
+   its *line* with text is treated as a glyph — inline, sized to the text,
+   unframed. An image on its own line stays a block, even when it sits inside a
+   numbered step whose text is on the line above. */
+.vp-doc img.inline-glyph {
+  display: inline-block;
+  vertical-align: text-bottom;
+  max-height: 1.5em;
+  width: auto;
+  margin: 0 2px;
+  border: none;
+  border-radius: var(--nn-radius-small);
+}
+
+/* ---------------------------- task lists -------------------------------- */
+
+.vp-doc .contains-task-list {
+  padding-left: 0;
+  list-style: none;
+}
+
+.vp-doc .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.vp-doc .task-list-item-checkbox {
+  appearance: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 6px 0 0;
+  border: 1.5px solid var(--vp-c-divider);
+  border-radius: var(--nn-radius-small);
+  background-color: var(--vp-c-bg);
+}
+
+.vp-doc .task-list-item-checkbox:checked {
+  border-color: var(--nn-accent);
+  background-color: var(--nn-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-size: 12px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.vp-doc .task-list-item label {
+  cursor: default;
+}
+
+.vp-doc img[src$=".svg"] {
+  border: none;
+}
+
+.vp-doc [class*="language-"] {
+  border-radius: var(--nn-radius-large);
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc code {
+  font-size: 0.875em;
+  border-radius: var(--nn-radius-small);
+  padding: 3px 5px;
+}
+
+.vp-doc :not(pre) > code {
+  color: var(--vp-c-text-1);
+  background-color: var(--vp-c-bg-alt);
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: var(--nn-radius-default);
+  border: 1px solid var(--vp-c-divider);
+  border-bottom-width: 2px;
+  background-color: var(--vp-c-bg-alt);
+  font-family: var(--vp-font-family-mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+  border-radius: var(--nn-radius-large);
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.vp-doc th,
+.vp-doc td {
+  border: none;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc tr:last-child td {
+  border-bottom: none;
+}
+
+.vp-doc tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+.vp-doc tr:hover td {
+  background-color: var(--nn-hover);
+}
+
+.vp-doc th {
+  background-color: var(--vp-c-bg-alt);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+/* ========================================================================== */
+/* Search, footer nav                                                         */
+/* ========================================================================== */
+
+.VPLocalSearchBox .search-bar {
+  border-radius: var(--nn-radius-default);
+  border: 1.5px solid var(--vp-c-divider);
+}
+
+.VPLocalSearchBox .search-bar:focus-within {
+  border-color: var(--nn-accent);
+  border-width: 2px;
+}
+
+.VPLocalSearchBox .result {
+  border-radius: var(--nn-radius-default);
+}
+
+.pager-link {
+  border-radius: var(--nn-radius-large);
+  border-color: var(--vp-c-divider);
+  transition: background-color 100ms ease-out, border-color 100ms ease-out;
+}
+
+.pager-link:hover {
+  background-color: var(--vp-c-bg-alt);
+  border-color: var(--nn-accent);
+}
+
+.VPDocFooter .edit-link-button {
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .vp-doc h1 {
+    font-size: 27px;
+  }
+  .vp-doc h2 {
+    font-size: 20px;
+  }
+  .vp-doc .plugin-tabs--content,
+  .vp-doc .custom-block {
+    padding: var(--nn-space-3);
+  }
+}

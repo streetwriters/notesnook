@@ -97,16 +97,19 @@ type WebviewResponseData = {
 
 export const getResponse = async (
   type: string,
-  waitFor = 300
+  waitFor = 500
 ): Promise<WebviewResponseData | false> => {
   return new Promise((resolve) => {
+    let timeout: NodeJS.Timeout | undefined = undefined;
     const callback = (data: WebviewResponseData) => {
+      clearTimeout(timeout);
       eUnSubscribeEvent(type, callback);
       resolve(data);
     };
     eSubscribeEvent(type, callback);
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       eUnSubscribeEvent(type, callback);
+      console.log(type, "failed call");
       resolve(false);
     }, waitFor);
   });
@@ -117,12 +120,14 @@ export const waitForEvent = async (
   waitFor = 300
 ): Promise<any> => {
   return new Promise((resolve) => {
+    let timeout: NodeJS.Timeout | undefined = undefined;
     const callback = (data: any) => {
+      clearTimeout(timeout);
       eUnSubscribeEvent(type, callback);
       resolve(data);
     };
     eSubscribeEvent(type, callback);
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       eUnSubscribeEvent(type, callback);
       resolve(false);
     }, waitFor);

@@ -25,6 +25,7 @@ import { ToolProps } from "../types.js";
 import { getToolbarElement } from "../utils/dom.js";
 import { ToolId } from "../tools/index.js";
 import { ToolbarGroup } from "./toolbar-group.js";
+import { strings } from "@notesnook/intl";
 
 type MoreToolsProps = ToolProps & {
   popupId: string;
@@ -101,6 +102,7 @@ export function MoreTools(props: MoreToolsProps) {
             toggled={isPinned}
             onClick={togglePinned}
             icon="pin"
+            title={isPinned ? strings.unpin() : strings.pin()}
             variant="small"
           />
         )}

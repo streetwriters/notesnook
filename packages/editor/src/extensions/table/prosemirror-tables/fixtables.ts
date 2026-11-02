@@ -1,8 +1,26 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 // This file defines helpers for normalizing tables, making sure no
 // cells overlap (which can happen, if you have the wrong col- and
 // rowspans) and that each row has the same width. Uses the problems
 // reported by `TableMap`.
-
 import { Node } from "prosemirror-model";
 import { EditorState, PluginKey, Transaction } from "prosemirror-state";
 import { tableNodeTypes, TableRole } from "./schema.js";
@@ -29,14 +47,51 @@ export function fixTables(
   oldState?: EditorState
 ): Transaction | undefined {
   let tr: Transaction | undefined;
-  const check = (node: Node, pos: number) => {
-    if (node.type.spec.tableRole == "table")
-      tr = fixTable(state, node, pos, tr);
+  const check = (node: Node, pos: number, was?: Node) => {
+    if (node.type.spec.tableRole != "table") return;
+    if (was && wellFormed.get(was) && sameShape(was, node)) {
+      wellFormed.set(node, true);
+      return;
+    }
+    tr = fixTable(state, node, pos, tr);
   };
-  if (!oldState) state.doc.descendants(check);
+  if (!oldState) state.doc.descendants((node, pos) => check(node, pos));
   else if (oldState.doc != state.doc)
     changedDescendants(oldState.doc, state.doc, 0, check);
   return tr;
+}
+
+/**
+ * Tables already found to be well formed. Checking one properly means walking
+ * every cell, which is far too much to do on every keystroke, so a table that
+ * was sound last time and has not changed shape since is taken on trust.
+ */
+const wellFormed = new WeakMap<Node, boolean>();
+
+/**
+ * Whether two versions of a table have the same cells in the same places.
+ *
+ * What can be wrong with a table -- a cell missing, two cells laid over each
+ * other -- follows entirely from that, so a table whose shape has not moved has
+ * nothing new to fix. Typing in a cell leaves every row but one untouched, so
+ * this is mostly pointer comparisons, where working the answer out from the
+ * table itself means walking every cell of it on every keystroke.
+ */
+function sameShape(before: Node, after: Node): boolean {
+  if (before.childCount != after.childCount) return false;
+  for (let row = 0; row < after.childCount; row++) {
+    const was = before.child(row);
+    const now = after.child(row);
+    if (was == now) continue;
+    if (was.childCount != now.childCount) return false;
+    for (let cell = 0; cell < now.childCount; cell++) {
+      const before = was.child(cell).attrs;
+      const after = now.child(cell).attrs;
+      if (before.colspan != after.colspan || before.rowspan != after.rowspan)
+        return false;
+    }
+  }
+  return true;
 }
 
 // Fix the given table, if necessary. Will append to the transaction
@@ -48,7 +103,10 @@ export function fixTable(
   tr: Transaction | undefined
 ): Transaction | undefined {
   const map = TableMap.get(table);
-  if (!map.problems) return tr;
+  if (!map.problems) {
+    wellFormed.set(table, true);
+    return tr;
+  }
   if (!tr) tr = state.tr;
 
   // Track which rows we must add cells to, so that we can adjust that

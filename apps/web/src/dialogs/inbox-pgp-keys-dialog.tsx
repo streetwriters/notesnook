@@ -26,6 +26,7 @@ import Field from "../components/field";
 import { showToast } from "../utils/toast";
 import { SerializedKeyPair } from "@notesnook/crypto";
 import { ConfirmDialog } from "./confirm";
+import { strings } from "@notesnook/intl";
 
 type InboxPGPKeysDialogProps = BaseDialogProps<boolean> & {
   keys?: SerializedKeyPair | null;
@@ -49,10 +50,10 @@ export const InboxPGPKeysDialog = DialogManager.register(
       try {
         setIsLoading(true);
         await db.user.getInboxKeys();
-        showToast("success", "Inbox keys generated");
+        showToast("success", strings.inboxKeysGenerated());
         onClose(true);
       } catch (error) {
-        showToast("error", "Failed to generate inbox keys");
+        showToast("error", strings.failedToGenerateInboxKeys());
         console.error(error);
       } finally {
         setIsLoading(false);
@@ -63,7 +64,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
       const trimmedPublicKey = publicKey.trim();
       const trimmedPrivateKey = privateKey.trim();
       if (!trimmedPublicKey || !trimmedPrivateKey) {
-        showToast("error", "Both public and private keys are required");
+        showToast("error", strings.publicAndPrivateKeysRequired());
         return;
       }
 
@@ -80,11 +81,10 @@ export const InboxPGPKeysDialog = DialogManager.register(
 
         if (initialKeys) {
           const ok = await ConfirmDialog.show({
-            title: "Change Inbox PGP Keys",
-            message:
-              "Changing Inbox PGP keys will delete all your unsynced inbox items. Are you sure?",
-            positiveButtonText: "Yes",
-            negativeButtonText: "No"
+            title: strings.changeInboxPgpKeys(),
+            message: strings.changingInboxPgpKeysNotice(),
+            positiveButtonText: strings.yes(),
+            negativeButtonText: strings.no()
           });
           if (!ok) return;
         }
@@ -93,10 +93,10 @@ export const InboxPGPKeysDialog = DialogManager.register(
           publicKey: trimmedPublicKey,
           privateKey: trimmedPrivateKey
         });
-        showToast("success", "Inbox keys saved");
+        showToast("success", strings.inboxKeysSaved());
         onClose(true);
       } catch (error) {
-        showToast("error", "Failed to save inbox keys");
+        showToast("error", strings.failedToSaveInboxKeys());
         console.error(error);
       } finally {
         setIsLoading(false);
@@ -107,16 +107,16 @@ export const InboxPGPKeysDialog = DialogManager.register(
       return (
         <Dialog
           isOpen={true}
-          title="Setup Inbox PGP Keys"
+          title={strings.setupInboxPgpKeys()}
           width={500}
           negativeButton={{
-            text: "Cancel",
+            text: strings.cancel(),
             onClick: () => onClose(false)
           }}
         >
           <Flex sx={{ flexDirection: "column", gap: 3 }}>
             <Text sx={{ fontSize: "body", color: "paragraph" }}>
-              Choose how you want to set up your Inbox PGP keys:
+              {strings.setupInboxPgpKeysDescription()}
             </Text>
             <Flex sx={{ flexDirection: "column", gap: 2 }}>
               <Button
@@ -125,7 +125,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
                 disabled={isLoading}
                 sx={{ width: "100%" }}
               >
-                {isLoading ? "Generating..." : "Auto-generate keys"}
+                {isLoading ? strings.generating() : strings.autoGenerateKeys()}
               </Button>
               <Text
                 sx={{
@@ -134,7 +134,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
                   textAlign: "center"
                 }}
               >
-                Or
+                {strings.or()}
               </Text>
               <Button
                 variant="secondary"
@@ -142,7 +142,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
                 disabled={isLoading}
                 sx={{ width: "100%" }}
               >
-                Provide your own keys
+                {strings.provideOwnKeys()}
               </Button>
             </Flex>
           </Flex>
@@ -153,21 +153,21 @@ export const InboxPGPKeysDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
-        title="Inbox PGP Keys"
+        title={strings.manageInboxKeys()}
         width={600}
         positiveButton={{
-          text: isLoading ? "Saving..." : "Save",
+          text: isLoading ? strings.saving() : strings.save(),
           onClick: handleSave,
           disabled: isLoading || !hasChanges
         }}
         negativeButton={{
-          text: "Cancel",
+          text: strings.cancel(),
           onClick: () => onClose(false)
         }}
       >
         <Flex sx={{ flexDirection: "column", gap: 3 }}>
           <Field
-            label="Public Key"
+            label={strings.publicKeyLabel()}
             id="publicKey"
             name="publicKey"
             as="textarea"
@@ -180,11 +180,11 @@ export const InboxPGPKeysDialog = DialogManager.register(
               minHeight: 150,
               resize: "vertical"
             }}
-            placeholder="Enter your PGP public key..."
+            placeholder={strings.enterPgpPublicKey()}
             disabled={isLoading}
           />
           <Field
-            label="Private Key"
+            label={strings.privateKeyLabel()}
             id="privateKey"
             name="privateKey"
             as="textarea"
@@ -197,7 +197,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
               minHeight: 150,
               resize: "vertical"
             }}
-            placeholder="Enter your PGP private key..."
+            placeholder={strings.enterPgpPrivateKey()}
             disabled={isLoading}
           />
         </Flex>

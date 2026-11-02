@@ -58,6 +58,9 @@ class SQLite {
     this.sqlite = require("better-sqlite3-multiple-ciphers")(
       this.filePath
     ).unsafeMode(true);
+    this.sqlite.function("natural_key", (str: string | null) =>
+      str ? str.replace(/\d+/g, (n) => n.padStart(10, "0")) : ""
+    );
   }
 
   /**

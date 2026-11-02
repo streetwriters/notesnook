@@ -1,8 +1,98 @@
 diff --git a/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt b/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt
-index 70149d2..fc917f3 100644
+index 70149d2..cc2b272 100644
 --- a/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt
 +++ b/node_modules/react-native-iap/android/src/play/java/com/dooboolab/rniap/RNIapModule.kt
-@@ -604,7 +604,7 @@ class RNIapModule(
+@@ -15,10 +15,8 @@ import com.android.billingclient.api.GetBillingConfigParams
+ import com.android.billingclient.api.GetBillingConfigParams.Builder
+ import com.android.billingclient.api.ProductDetails
+ import com.android.billingclient.api.Purchase
+-import com.android.billingclient.api.PurchaseHistoryRecord
+ import com.android.billingclient.api.PurchasesUpdatedListener
+ import com.android.billingclient.api.QueryProductDetailsParams
+-import com.android.billingclient.api.QueryPurchaseHistoryParams
+ import com.android.billingclient.api.QueryPurchasesParams
+ import com.facebook.react.bridge.Arguments
+ import com.facebook.react.bridge.LifecycleEventListener
+@@ -38,11 +36,14 @@ import com.facebook.react.module.annotations.ReactModule
+ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+ import com.google.android.gms.common.ConnectionResult
+ import com.google.android.gms.common.GoogleApiAvailability
++import com.android.billingclient.api.PendingPurchasesParams
+ 
+ @ReactModule(name = RNIapModule.TAG)
+ class RNIapModule(
+     private val reactContext: ReactApplicationContext,
+-    private val builder: BillingClient.Builder = BillingClient.newBuilder(reactContext).enablePendingPurchases(),
++   private val builder: BillingClient.Builder = BillingClient.newBuilder(reactContext).enablePendingPurchases(
++    PendingPurchasesParams.newBuilder().enableOneTimeProducts().build(),
++),
+     private val googleApiAvailability: GoogleApiAvailability = GoogleApiAvailability.getInstance(),
+ ) : ReactContextBaseJavaModule(reactContext),
+     PurchasesUpdatedListener {
+@@ -275,8 +276,10 @@ class RNIapModule(
+                     .setProductList(skuList)
+                     .build()
+ 
+-            billingClient.queryProductDetailsAsync(params) { billingResult, skuDetailsList ->
+-                if (!isValidResult(billingResult, promise)) return@queryProductDetailsAsync
++            billingClient.queryProductDetailsAsync(params) { billingResult, queryProductDetailsResult ->
++               if (!isValidResult(billingResult, promise)) return@queryProductDetailsAsync
++
++                val skuDetailsList = queryProductDetailsResult.productDetailsList
+ 
+                 val items = Arguments.createArray()
+                 for (skuDetails in skuDetailsList) {
+@@ -553,43 +556,12 @@ class RNIapModule(
+         type: String,
+         promise: Promise,
+     ) {
+-        ensureConnection(
+-            promise,
+-        ) { billingClient ->
+-            billingClient.queryPurchaseHistoryAsync(
+-                QueryPurchaseHistoryParams
+-                    .newBuilder()
+-                    .setProductType(
+-                        if (type == "subs") BillingClient.ProductType.SUBS else BillingClient.ProductType.INAPP,
+-                    ).build(),
+-            ) { billingResult: BillingResult, purchaseHistoryRecordList: MutableList<PurchaseHistoryRecord>? ->
+-
+-                if (!isValidResult(billingResult, promise)) return@queryPurchaseHistoryAsync
+-
+-                Log.d(TAG, purchaseHistoryRecordList.toString())
+-                val items = Arguments.createArray()
+-                purchaseHistoryRecordList?.forEach { purchase ->
+-                    val item = Arguments.createMap()
+-                    // Add both field names for compatibility
+-                    item.putString("productId", purchase.products[0])
+-                    item.putString("id", purchase.products[0])
+-                    val products = Arguments.createArray()
+-                    purchase.products.forEach { products.pushString(it) }
+-                    item.putArray("productIds", products)
+-                    item.putArray("ids", products)
+-                    item.putDouble("transactionDate", purchase.purchaseTime.toDouble())
+-                    item.putString("transactionReceipt", purchase.originalJson)
+-                    item.putString("purchaseToken", purchase.purchaseToken)
+-                    item.putString("purchaseTokenAndroid", purchase.purchaseToken)
+-                    item.putString("dataAndroid", purchase.originalJson)
+-                    item.putString("signatureAndroid", purchase.signature)
+-                    item.putString("developerPayload", purchase.developerPayload.orEmpty())
+-                    item.putString("platform", "android")
+-                    items.pushMap(item)
+-                }
+-                promise.safeResolve(items)
+-            }
+-        }
++        promise.safeReject(
++            "E_UNSUPPORTED",
++            "getPurchaseHistoryByType is no longer supported since Play Billing Library 8 " +
++                "removed queryPurchaseHistoryAsync. Use getAvailableItemsByType for active " +
++                "purchases, or reconstruct history server-side.",
++        )
+     }
+ 
+     @ReactMethod
+@@ -604,7 +576,7 @@ class RNIapModule(
          isOfferPersonalized: Boolean, // New parameter in V5
          promise: Promise,
      ) {

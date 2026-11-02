@@ -160,7 +160,18 @@ function TagItem(props: { tag: Tag }) {
     >
       <Flex sx={{ alignItems: "center" }}>
         <SelectedCheck size={18} item={tag} />
-        <Text className="title" data-test-id="tag-title" variant="body">
+        <Text
+          className="title"
+          data-test-id="tag-title"
+          variant="body"
+          title={tag.title}
+          sx={{
+            minWidth: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap"
+          }}
+        >
           #{tag.title}
         </Text>
       </Flex>

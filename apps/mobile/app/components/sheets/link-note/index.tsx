@@ -350,7 +350,10 @@ export default function LinkNote(props: {
                   alignItems: "center"
                 }}
               >
-                <Paragraph color={colors.secondary.paragraph}>
+                <Paragraph
+                  color={colors.secondary.paragraph}
+                  style={{ textAlign: "center" }}
+                >
                   {blockLinking?.error}
                 </Paragraph>
                 <Button

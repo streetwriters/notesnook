@@ -280,7 +280,7 @@ export class Attachments implements ICollection {
     const linkedNotes = await this.db.relations.to(attachment, "note").get();
     return (
       (await this.db.relations
-        .to({ ids: linkedNotes.map((n) => n.toId), type: "note" }, "vault")
+        .to({ ids: linkedNotes.map((n) => n.fromId), type: "note" }, "vault")
         .count()) <= 0
     );
   }

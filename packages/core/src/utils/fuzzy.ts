@@ -32,7 +32,6 @@ export function fuzzy<T>(
   } = {}
 ): T[] {
   const results = fuzzyMatch(query, items, getIdentifier, fields, options);
-  if (results.size === 0) return [];
 
   // if the query contains spaces & other non-alphanumeric characters, then we
   // should search again with a sanitized query to catch more matches.

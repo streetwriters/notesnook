@@ -106,6 +106,7 @@ export type Settings = {
   defaultLineHeight: number;
   imageCompression: "ask-every-time" | "enabled" | "disabled";
   keepScreenOn?: boolean;
+  appLanguage?: string;
 };
 
 type DimensionsType = {
@@ -206,7 +207,7 @@ export const defaultSettings: SettingStore["settings"] = {
   colorScheme: "light",
   lighTheme: ThemeLight,
   darkTheme: ThemeDark,
-  markdownShortcuts: true,
+  markdownShortcuts: false,
   biometricsAuthEnabled: false,
   appLockHasPasswordSecurity: false,
   backgroundSync: true,
@@ -264,7 +265,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     set({
       dayFormat: db.settings.getDayFormat(),
       timeFormat: db.settings.getTimeFormat(),
-      dateFormat: db.settings?.getTimeFormat(),
+      dateFormat: db.settings?.getDateFormat(),
       weekFormat: db.settings.getWeekFormat(),
       vaultLockAfter: db.settings.getVaultLockAfter(),
       inboxEnabled: await db.user.hasInboxKeys()

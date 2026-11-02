@@ -1,3 +1,5 @@
 .swc
 locales
-generated/*.ts
+src/generated/
+generated/
+timestamp-*.mjs

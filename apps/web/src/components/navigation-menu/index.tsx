@@ -483,7 +483,7 @@ function NavigationMenu({
             hardNavigate("/wrapped");
           }}
         >
-          🎉 Wrapped {new Date().getFullYear()}
+          {strings.wrappedTitle(new Date().getFullYear())}
         </Button>
       ) : null}
     </ScopedThemeProvider>
@@ -918,7 +918,7 @@ function NavigationDropdown() {
               icon: Documentation.path,
               key: "help-and-support",
               onClick: () => {
-                window.open("https://help.notesnook.com/", "_blank");
+                window.open("https://notesnook.com/help/", "_blank");
               }
             },
             {

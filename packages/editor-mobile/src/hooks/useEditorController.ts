@@ -35,6 +35,7 @@ import {
 import {
   getRoot,
   isReactNative,
+  logger,
   post,
   postAsyncWithTimeout,
   saveTheme
@@ -101,7 +102,7 @@ export type EditorController = {
   passwordInputRef: MutableRefObject<HTMLInputElement | null>;
   focusPassInput: () => void;
   blurPassInput: () => void;
-  scrollToSearchResult: (index: number) => void;
+  scrollToSearchResult: (target: number | string) => void;
   getContentDiv: () => HTMLElement | null;
 };
 export function useEditorController({
@@ -114,7 +115,7 @@ export function useEditorController({
   update: (
     scrollTop?: number,
     selection?: { to: number; from: number },
-    searchResultIndex?: number
+    searchResultIndex?: number | string
   ) => void;
   getTableOfContents: () => any[];
   scrollTo: (top: number) => void;
@@ -139,6 +140,7 @@ export function useEditorController({
     wordCounter: null,
     scroll: null
   });
+  const hasRestored = useRef(false);
 
   if (!tabRef.current.session?.noteId && loading) {
     setTimeout(() => {
@@ -300,6 +302,7 @@ export function useEditorController({
 
   const scroll = useCallback(
     (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      if (!hasRestored.current) return;
       const value = _event.currentTarget.scrollTop;
       if (timers.current.scroll !== null) clearTimeout(timers.current.scroll);
       timers.current.scroll = setTimeout(() => {
@@ -367,6 +370,7 @@ export function useEditorController({
             }
 
             scrollTo?.(value.scrollTop || 0);
+            hasRestored.current = true;
             setLoading(false);
             countWords(0);
           }
@@ -376,12 +380,16 @@ export function useEditorController({
         case "native:html":
           if (htmlContentRef.current === value.data) {
             setLoading(false);
+            if (value.searchResultIndex !== undefined) {
+              scrollToSearchResult(value.searchResultIndex);
+            }
             break;
           }
           htmlContentRef.current = value.data;
           logger("info", "LOADING NOTE HTML");
           if (!editor) break;
           update(value.scrollTop, value.selection, value.searchResultIndex);
+          hasRestored.current = true;
           setTimeout(() => {
             countWords(0);
           }, 300);
@@ -470,18 +478,22 @@ export function useEditorController({
     });
   };
 
-  const scrollToSearchResult = useCallback((index: number) => {
-    const marks = document.getElementsByTagName("nn-search-result");
-    if (marks.length > index) {
-      const mark = marks[index];
-      if (mark) {
-        mark.scrollIntoView({
-          behavior: "instant",
-          block: "start"
-        });
-      }
-    }
-  }, []);
+  const scrollToSearchResult = useCallback(
+    (target: number | string) => {
+      getContentDiv()?.classList.add("searching");
+      const mark =
+        typeof target === "string"
+          ? document.getElementById(target) ||
+            document.querySelector(`nn-search-result#${target}`)
+          : document.getElementsByTagName("nn-search-result")[target];
+
+      mark?.scrollIntoView({
+        behavior: "instant",
+        block: "start"
+      });
+    },
+    [getContentDiv]
+  );
 
   return {
     getTableOfContents: getTableOfContents,

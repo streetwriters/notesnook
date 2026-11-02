@@ -32,11 +32,6 @@ import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
 import { getSubscriptionInfo } from "./settings/components/user-profile";
 
-const PLACEHOLDERS = {
-  title: strings.issueTitlePlaceholder(),
-  body: strings.issuePlaceholder()
-};
-
 type IssueDialogProps = BaseDialogProps<boolean>;
 export const IssueDialog = DialogManager.register(function IssueDialog(
   props: IssueDialogProps
@@ -81,7 +76,8 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
               body: requestData.body,
               userId: userstore.get().user?.id
             });
-            if (!response) throw new Error("Could not submit bug report.");
+            if (!response)
+              throw new Error(strings.couldNotSubmitBugReport());
             if ("error" in response) throw new Error(response.error);
 
             props.onClose(true);
@@ -99,7 +95,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           label={strings.title()}
           id="title"
           name="title"
-          placeholder={PLACEHOLDERS.title}
+          placeholder={strings.issueTitlePlaceholder()}
           autoFocus
         />
         <Field
@@ -109,7 +105,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           label={strings.description()}
           id="body"
           name="body"
-          placeholder={PLACEHOLDERS.body}
+          placeholder={strings.issuePlaceholder()}
           sx={{ mt: 1 }}
           styles={{
             input: {

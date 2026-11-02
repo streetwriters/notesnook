@@ -137,12 +137,12 @@ export function Notebook(props: NotebookProps) {
             >
               {isExpanded ? (
                 <ChevronDown
-                  size={14}
+                  size={18}
                   color={isOpened ? "icon-selected" : "icon"}
                 />
               ) : (
                 <ChevronRight
-                  size={14}
+                  size={18}
                   color={isOpened ? "icon-selected" : "icon"}
                 />
               )}
@@ -309,17 +309,17 @@ export const notebookMenuItems: (
     {
       type: "button",
       key: "copyid",
-      title: "Copy ID",
+      title: strings.copyId(),
       icon: Copy.path,
       onClick: async () => {
         try {
           await writeToClipboard({
             "text/plain": notebook.id
           });
-          showToast("success", "Notebook ID copied to clipboard");
+          showToast("success", strings.notebookIdCopied());
         } catch (e) {
           console.error(e);
-          showToast("error", "Failed to copy Notebook ID");
+          showToast("error", strings.failedToCopyToClipboard());
         }
       },
       isHidden: !settingStore.get().isInboxEnabled

@@ -93,9 +93,7 @@ const restoreBackup = async (options: {
       !options.uri.endsWith(".nnbackup") &&
       !options.uri.endsWith(".nnbackupz")
     ) {
-      throw new Error(
-        `Invalid backup file selected. Only .nnbackup and .nnbackupz files can be restored.`
-      );
+      throw new Error(strings.invalidBackupFileSelected());
     }
 
     const isLegacyBackup = options.uri.endsWith(".nnbackup");
@@ -158,6 +156,7 @@ const restoreBackup = async (options: {
         : undefined;
 
       let count = 0;
+      const skippedAttachments = new Set<string>();
       await db.transaction(async () => {
         let passwordOrKey: PasswordOrKey | undefined = undefined;
         for (const path of extractedBackupFiles) {
@@ -188,10 +187,11 @@ const restoreBackup = async (options: {
             throw new Error(strings.failedToDecryptBackup());
           }
 
-          await db.backup.import(backup, {
+          const skipped = await db.backup.import(backup, {
             ...passwordOrKey,
             attachmentsKey: attachmentsKey
           });
+          skipped?.forEach((hash) => skippedAttachments.add(hash));
         }
       });
 
@@ -200,13 +200,14 @@ const restoreBackup = async (options: {
       for (const path of extractedAttachments) {
         if (path === ".attachments_key") continue;
         updateProgress({
-          progress: `Restoring attachments (${count++}/${
+          progress: strings.restoringAttachmentsCount(
+            count++,
             extractedAttachments.length
-          })`
+          )
         });
         const hash = path;
         const attachment = await db.attachments.attachment(hash as string);
-        if (!attachment) continue;
+        if (!attachment || skippedAttachments.has(hash)) continue;
 
         await deleteCacheFileByName(hash);
         await RNFetchBlob.fs.cp(
@@ -381,7 +382,7 @@ export const RestoreBackup = () => {
               });
 
               if (fileCopy[0].status === "error") {
-                ToastManager.error(new Error("File copy error"));
+                ToastManager.error(new Error(strings.fileCopyError()));
                 return;
               }
 
@@ -546,13 +547,13 @@ const BackupItem = ({
           color={colors.secondary.paragraph}
           style={{ width: "100%", maxWidth: "100%" }}
         >
-          Created on {getFormattedDate(item?.lastModified, "date-time")}
-          {isLegacyBackup ? "(Legacy backup)" : ""} (
+          {strings.createdOn()} {getFormattedDate(item?.lastModified, "date-time")}
+          {isLegacyBackup ? ` ${strings.legacyBackup()}` : ""} (
           {formatBytes((item as ReactNativeBlobUtilStat).size)})
         </Paragraph>
       </View>
       <Button
-        title="Restore"
+        title={strings.restore()}
         type="secondaryAccented"
         style={{
           paddingHorizontal: DefaultAppStyles.GAP,

@@ -360,7 +360,8 @@ const ListNoteItem = ({
           style={{
             justifyContent: "center",
             alignItems: "center",
-            width: "100%"
+            width: "100%",
+            paddingHorizontal: DefaultAppStyles.GAP
           }}
         >
           {loading ? (
@@ -373,7 +374,10 @@ const ListNoteItem = ({
               {listType === "linkedNotes" ? (
                 <>
                   {linkedBlocks.length === 0 ? (
-                    <Paragraph color={colors.secondary.paragraph}>
+                    <Paragraph
+                      color={colors.secondary.paragraph}
+                      style={{ textAlign: "center" }}
+                    >
                       {strings.noBlocksLinked()}
                     </Paragraph>
                   ) : (
@@ -383,7 +387,10 @@ const ListNoteItem = ({
               ) : (
                 <>
                   {noteInternalLinks.length === 0 ? (
-                    <Paragraph color={colors.secondary.paragraph}>
+                    <Paragraph
+                      color={colors.secondary.paragraph}
+                      style={{ textAlign: "center" }}
+                    >
                       {strings.noReferencesFound()}
                     </Paragraph>
                   ) : (

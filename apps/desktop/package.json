@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "3.4.5",
+  "version": "3.4.11",
   "appAppleId": "1544027013",
   "private": true,
   "main": "./dist/cjs/index.js",
@@ -38,7 +38,6 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@lingui/core": "5.1.2",
     "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/ui": "file:../../packages/ui",
     "@trpc/client": "10.45.2",

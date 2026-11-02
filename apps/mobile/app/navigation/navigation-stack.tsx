@@ -307,10 +307,14 @@ export const RootNavigation = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
-
   const initialShortcut = React.useRef(
     useSettingStore.getState().pendingShortcut
-  ).current;
+  );
+  const initialUrl = React.useMemo(() => {
+    return useSettingStore.getState().initialUrl
+      ? parseInternalLink(useSettingStore.getState().initialUrl!)
+      : undefined;
+  }, []);
 
   const reminderFeature = useIsFeatureAvailable("activeReminders");
   const clearSelection = useSelectionStore((state) => state.clearSelection);
@@ -366,7 +370,6 @@ export const RootNavigation = () => {
           fluidTabsRef.current.goToPage("editor", true);
         } else {
           launchNewNoteTab();
-
           rootNavigatorRef.current?.navigate("FluidPanelsView" as any, {
             initialPage: "editor"
           });
@@ -379,7 +382,7 @@ export const RootNavigation = () => {
 
   const initialRouteName = !introCompleted
     ? "Welcome"
-    : initialShortcut?.type === "notesnook.action.newreminder"
+    : initialShortcut.current?.type === "notesnook.action.newreminder"
       ? "AddReminder"
       : "FluidPanelsView";
 
@@ -416,7 +419,8 @@ export const RootNavigation = () => {
           }}
           initialParams={{
             initialPage:
-              initialShortcut?.type === "notesnook.action.newnote"
+              initialShortcut.current?.type === "notesnook.action.newnote" ||
+              initialUrl?.type === "note"
                 ? "editor"
                 : undefined
           }}

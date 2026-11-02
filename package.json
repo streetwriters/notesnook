@@ -7,6 +7,7 @@
     "clean": "node scripts/clean.mjs",
     "build": "npm run tx -- build --all --exclude=mobile,web,monograph,theme-builder,vericrypt",
     "build:web": "npm run tx web:build",
+    "build:help": "npm run tx help:build",
     "build:vericrypt": "npm run tx vericrypt:build",
     "build:test:web": "npm run tx web:build:test",
     "build:beta:web": "npm run tx web:build:beta",
@@ -84,7 +85,8 @@
       "packages/*",
       "apps/*",
       "extensions/*",
-      "servers/*"
+      "servers/*",
+      "docs/*"
     ],
     "tasks": [
       {

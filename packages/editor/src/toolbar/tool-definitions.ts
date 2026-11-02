@@ -127,7 +127,7 @@ const tools = (): Record<ToolId, ToolDefinition> => ({
   },
   alignment: {
     icon: "alignCenter",
-    title: strings.alignCenter()
+    title: strings.alignment()
   },
   textDirection: {
     icon: "ltr",
@@ -397,6 +397,13 @@ export const READONLY_MOBILE_STATIC_TOOLBAR_GROUPS: ToolbarDefinition = [
     "webclipSettings",
     "previewAttachment"
   ]
+];
+
+export const READONLY_MOBILE_TOOLBAR_NODES = [
+  "image",
+  "attachment",
+  "webclip",
+  "link"
 ];
 
 const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {

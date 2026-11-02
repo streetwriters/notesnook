@@ -39,7 +39,12 @@ module PatchFmtConsteval
     header = File.join(pods_root.to_s, 'fmt', 'include', 'fmt', 'base.h')
 
     unless File.exist?(header)
-      Pod::UI.warn "fmt: #{header} not found, skipping consteval patch."
+      fmt_source_pod = File.directory?(File.join(pods_root.to_s, 'fmt'))
+      if fmt_source_pod
+        Pod::UI.warn "fmt: #{header} not found, skipping consteval patch."
+      else
+        Pod::UI.puts 'fmt: prebuilt, consteval patch not needed.'
+      end
       return
     end
 

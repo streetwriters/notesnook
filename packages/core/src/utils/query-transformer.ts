@@ -38,6 +38,12 @@ type FieldPhraseNode = {
   value: QueryNode;
 };
 
+type FieldToken = {
+  field?: string;
+  fieldOccurrence?: number;
+  token: string;
+};
+
 type OperatorNode = {
   type: "AND" | "OR" | "NOT";
 };
@@ -77,6 +83,8 @@ const SUPPORTED_FIELDS = {
   in_notebook: (ast) => parseBooleanField("in_notebook", ast)
 } satisfies Record<string, (ast: (QueryNode | FieldPhraseNode)[]) => unknown>;
 
+const ARRAY_FIELDS = ["tag", "color"];
+
 function isFieldSupported(field: string) {
   return field in SUPPORTED_FIELDS;
 }
@@ -101,8 +109,13 @@ function parseArrayField(
       (a): a is FieldPhraseNode =>
         a.type === "field_phrase" && a.field === field
     )
-    .map((a) => generateSQL(a.value));
+    .map((a) => unquoteExactValue(generateSQL(a.value)));
   return values.length > 0 ? values : null;
+}
+
+function unquoteExactValue(value: string) {
+  if (!value.startsWith('"') || !value.endsWith('"')) return value;
+  return value.slice(1, -1).replace(/""/g, '"');
 }
 
 function parseDateField(
@@ -130,7 +143,7 @@ function escapeSQLString(str: string): string {
     str.startsWith("%") ||
     str.endsWith("%");
   if (hasInvalidSymbol || isWildcard) {
-    return `"${str}"`;
+    return `"${str.replace(/"/g, '""')}"`;
   }
 
   // if (isWildcard) {
@@ -146,13 +159,23 @@ function escapeSQLString(str: string): string {
   return str.replace(/"/g, '""');
 }
 
-function tokenizeWithFields(
-  query: string
-): Array<{ field?: string; token: string }> {
-  const tokens: Array<{ field?: string; token: string }> = [];
+function tokenizeWithFields(query: string): FieldToken[] {
+  const tokens: FieldToken[] = [];
   let buffer = "";
   let isQuoted = false;
   let currentField: string | undefined = undefined;
+  let fieldOccurrence = 0;
+
+  const pushToken = () => {
+    if (buffer.length > 0) {
+      tokens.push({
+        field: currentField,
+        fieldOccurrence: currentField ? fieldOccurrence : undefined,
+        token: buffer
+      });
+      buffer = "";
+    }
+  };
 
   for (let i = 0; i < query.length; ++i) {
     const char = query[i];
@@ -160,15 +183,13 @@ function tokenizeWithFields(
       isQuoted = !isQuoted;
     }
     if (char === " " && !isQuoted) {
-      if (buffer.length > 0) {
-        tokens.push({ field: currentField, token: buffer });
-        buffer = "";
-      }
+      pushToken();
     } else if (char === ":" && !isQuoted) {
       // Check for field
       const maybeField = buffer.trim().toLowerCase();
       if (isFieldSupported(maybeField)) {
         currentField = maybeField;
+        fieldOccurrence++;
         buffer = "";
       } else {
         buffer += char;
@@ -177,24 +198,31 @@ function tokenizeWithFields(
       buffer += char;
     }
   }
-  if (buffer.length > 0) tokens.push({ field: currentField, token: buffer });
+  pushToken();
 
   return tokens;
 }
 
 // Helper: group tokens by field
-function groupTokensByField(tokens: Array<{ field?: string; token: string }>) {
+function groupTokensByField(tokens: FieldToken[]) {
   const groups: Array<{ field?: string; tokens: string[] }> = [];
   let currentField: string | undefined = undefined;
+  let currentOccurrence: number | undefined = undefined;
   let currentTokens: string[] = [];
 
-  for (const { field, token } of tokens) {
-    if (field !== currentField) {
+  for (const { field, fieldOccurrence, token } of tokens) {
+    const isArrayField = ARRAY_FIELDS.includes(field || "");
+    const shouldStartNewGroup =
+      field !== currentField ||
+      (isArrayField && fieldOccurrence !== currentOccurrence);
+
+    if (shouldStartNewGroup) {
       if (currentTokens.length > 0) {
         groups.push({ field: currentField, tokens: currentTokens });
         currentTokens = [];
       }
       currentField = field;
+      currentOccurrence = fieldOccurrence;
     }
     currentTokens.push(token);
   }
@@ -276,6 +304,107 @@ function generateSQL(ast: QueryNode): string {
     .join(" ");
 }
 
+export type QueryTerm = { type: "term"; value: string };
+export type QueryExpression =
+  | QueryTerm
+  | {
+      type: OperatorNode["type"];
+      left: QueryExpression;
+      right: QueryExpression;
+    };
+
+// same as FTS5: NOT binds tighter than AND which binds tighter than OR
+const PRECEDENCE: Record<OperatorNode["type"], number> = {
+  OR: 1,
+  AND: 2,
+  NOT: 3
+};
+
+/**
+ * Terms shorter than 3 characters cannot be matched as substrings
+ * by the trigram tokenizer.
+ */
+function isShortTerm(term: QueryTerm) {
+  return term.value.length < 3;
+}
+
+export function hasShortTerms(expression: QueryExpression): boolean {
+  if (expression.type === "term") return isShortTerm(expression);
+  return hasShortTerms(expression.left) || hasShortTerms(expression.right);
+}
+
+export function serializeExpression(expression: QueryExpression): string {
+  if (expression.type === "term") return expression.value;
+
+  const precedence = PRECEDENCE[expression.type];
+  const serialize = (child: QueryExpression, needsParens: boolean) =>
+    needsParens
+      ? `(${serializeExpression(child)})`
+      : serializeExpression(child);
+  const left = serialize(
+    expression.left,
+    expression.left.type !== "term" &&
+      PRECEDENCE[expression.left.type] < precedence
+  );
+  // operators are left associative so the right operand
+  // needs parentheses even if it has the same precedence
+  const right = serialize(
+    expression.right,
+    expression.right.type !== "term" &&
+      PRECEDENCE[expression.right.type] <= precedence
+  );
+  return `${left} ${expression.type} ${right}`;
+}
+
+function buildExpression(ast: QueryNode): QueryExpression | undefined {
+  // words in a phrase are ANDed together
+  const items: (QueryTerm | undefined | OperatorNode["type"])[] = [];
+  for (const child of ast.children) {
+    if (child.type === "phrase") {
+      child.value.forEach((value, index) => {
+        if (index > 0) items.push("AND");
+        // an empty phrase ("") cannot match anything so we drop it
+        items.push(value === '""' ? undefined : { type: "term", value });
+      });
+    } else if (
+      child.type === "AND" ||
+      child.type === "OR" ||
+      child.type === "NOT"
+    ) {
+      items.push(child.type);
+    }
+  }
+  if (items.length === 0) return;
+
+  // items alternate between terms & operators (guaranteed by
+  // transformQueryNode) so we can use simple precedence climbing.
+  let index = 0;
+  const parse = (minPrecedence: number): QueryExpression | undefined => {
+    let left: QueryExpression | undefined = items[index++] as
+      | QueryTerm
+      | undefined;
+    while (index < items.length) {
+      const operator = items[index] as OperatorNode["type"];
+      const precedence = PRECEDENCE[operator];
+      if (precedence < minPrecedence) break;
+      index++;
+      left = combine(operator, left, parse(precedence + 1));
+    }
+    return left;
+  };
+  return parse(1);
+}
+
+function combine(
+  operator: OperatorNode["type"],
+  left: QueryExpression | undefined,
+  right: QueryExpression | undefined
+): QueryExpression | undefined {
+  if (!left) return operator === "NOT" ? undefined : right;
+  if (!right) return left;
+  return { type: operator, left, right };
+}
+
 // Main transformer: returns (QueryNode | FieldPhraseNode)[]
 export function transformQuery(query: string): {
   [K in keyof typeof SUPPORTED_FIELDS]?: ReturnType<
@@ -316,9 +445,12 @@ export function transformQuery(query: string): {
 }
 
 function serializeQuery(node: QueryNode | FieldPhraseNode) {
+  const ast = node.type === "query" ? node : node.value;
+  const expression = buildExpression(ast);
   return {
-    query: generateSQL(node.type === "query" ? node : node.value),
-    tokens: tokenizeAst(node.type === "query" ? node : node.value)
+    query: expression ? serializeExpression(expression) : "",
+    expression,
+    tokens: tokenizeAst(ast)
   };
 }
 

@@ -99,7 +99,7 @@ const publishNote = async () => {
           mode: AuthMode.login
         });
       },
-      actionText: "Login"
+      actionText: strings.login()
     });
     return;
   }
@@ -209,7 +209,6 @@ export const useEditorEvents = (
     };
   }, [editor, editor.commands, editor.postMessage]);
   useEffect(() => {
-    if (loading) return;
     if (typeof defaultFontFamily === "object") {
       SettingsService.set({
         defaultFontFamily: (defaultFontFamily as any).id
@@ -231,9 +230,9 @@ export const useEditorEvents = (
           ? parseInt(defaultFontSize)
           : defaultFontSize,
       fontFamily: SettingsService.get().defaultFontFamily,
-      dateFormat: db.settings?.getDateFormat(),
-      timeFormat: db.settings?.getTimeFormat(),
-      dayFormat: db.settings?.getDayFormat(),
+      dateFormat: dateFormat,
+      timeFormat: timeFormat,
+      dayFormat: dayFormat,
       fontScale,
       markdownShortcuts,
       features,
@@ -400,13 +399,6 @@ export const useEditorEvents = (
         return onBackPress();
       }
 
-      if (
-        editorMessage.sessionId !== editor.sessionId.current &&
-        editorMessage.type !== NativeEvents.status
-      ) {
-        return;
-      }
-
       const noteId = useTabStore
         .getState()
         .getNoteIdForTab(editorMessage.tabId);
@@ -539,7 +531,13 @@ export const useEditorEvents = (
         case EditorEvents.getLinkData: {
           const url = (editorMessage.value as any)?.url as string;
           const link = parseInternalLink(url);
-          if (!link) return;
+          if (!link) {
+            editor.postMessage(NativeEvents.resolve, {
+              resolverId: editorMessage.resolverId,
+              data: undefined
+            });
+            return;
+          }
           switch (link.type) {
             case "note":
             case "notebook":
@@ -688,6 +686,10 @@ export const useEditorEvents = (
         }
         case EditorEvents.copyToClipboard: {
           Clipboard.setString(editorMessage.value as string);
+          ToastManager.show({
+            message: strings.linkCopied(),
+            type: "success"
+          });
           break;
         }
         case EditorEvents.saveScroll: {
@@ -855,7 +857,7 @@ export const useEditorEvents = (
 
             await sleep(500);
             presentSheet({
-              title: "Table saved to csv",
+              title: strings.tableSavedToCsv(),
               paragraph: strings.fileSaved(fileName, Platform.OS),
               icon: "download",
               context: "global",
@@ -866,7 +868,7 @@ export const useEditorEvents = (
           } catch (e) {
             ToastManager.show({
               type: "info",
-              message: "Could not save table to csv"
+              message: strings.couldNotSaveTableToCsv()
             });
             DatabaseLogger.error(e as Error);
           }

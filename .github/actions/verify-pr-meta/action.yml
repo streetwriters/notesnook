@@ -1,0 +1,38 @@
+name: "Verify PR metadata"
+description: "Loads the PR number from a preview build artifact and verifies it against the triggering workflow_run"
+
+# The artifact is written by fork-controlled workflow code, so only a numeric
+# PR number is taken from it, and the API must confirm that PR is the one whose
+# branch triggered this run. The commit comes from the trusted event payload.
+
+inputs:
+  meta-file:
+    description: "Path to the pr-meta.env file from the build artifact"
+    required: true
+
+outputs:
+  pr-number:
+    description: "Verified PR number"
+    value: ${{ steps.meta.outputs.PR_NUMBER }}
+  head-sha:
+    description: "Head commit of the triggering run"
+    value: ${{ steps.meta.outputs.HEAD_SHA }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Load & verify PR metadata
+      id: meta
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        META_FILE: ${{ inputs.meta-file }}
+        RUN_HEAD: ${{ github.event.workflow_run.head_repository.full_name }}:${{ github.event.workflow_run.head_branch }}
+        RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      run: |
+        set -euo pipefail
+        PR_NUMBER="$(grep -m1 -E '^PR_NUMBER=[0-9]{1,10}$' "$META_FILE" | cut -d= -f2)"
+        PR_HEAD="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.repo.full_name + ":" + .head.ref')"
+        [ "$PR_HEAD" = "$RUN_HEAD" ] || { echo "::error::PR #$PR_NUMBER does not belong to $RUN_HEAD"; exit 1; }
+        echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+        echo "HEAD_SHA=$RUN_HEAD_SHA" >> "$GITHUB_OUTPUT"

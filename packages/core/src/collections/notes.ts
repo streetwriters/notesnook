@@ -157,7 +157,7 @@ export class Notes implements ICollection {
         const titleFormat = this.db.settings.getTitleFormat();
         if (
           item.isGeneratedTitle &&
-          HEADLINE_REGEX.test(titleFormat) &&
+          titleFormat.includes("$headline$") &&
           headlineTitle &&
           currentNoteTitleFields?.title !== headlineTitle
         ) {
@@ -285,6 +285,7 @@ export class Notes implements ICollection {
         qb
           .where(isFalse("dateDeleted"))
           .where(isFalse("deleted"))
+          .where(isFalse("archived"))
           .where("pinned", "==", true),
       this.db.options?.batchSize
     );

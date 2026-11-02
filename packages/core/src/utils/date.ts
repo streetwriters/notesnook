@@ -21,22 +21,84 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat.js";
 import timezone from "dayjs/plugin/timezone.js";
 import { TimeFormat, DayFormat } from "../types.js";
+import { i18n } from "@notesnook/intl";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(timezone);
 
-export function getWeekGroupFromTimestamp(timestamp: number) {
+export function formatMonthGroup(date: Date, locale?: string): string {
+  try {
+    return new Intl.DateTimeFormat(locale || i18n.locale || undefined, {
+      month: "long",
+      year: "numeric"
+    }).format(date);
+  } catch {
+    return `${MONTHS_FULL[date.getMonth()]} ${date.getFullYear()}`;
+  }
+}
+
+export function getWeekGroupFromTimestamp(timestamp: number, locale?: string) {
   const date = new Date(timestamp);
   const { start, end } = getWeek(date);
 
-  const startMonth =
-    start.month !== end.month ? " " + MONTHS_SHORT[start.month] : "";
-  const startYear = start.year !== end.year ? ", " + start.year : "";
+  const startDate = new Date(start.year, start.month, start.day);
+  const endDate = new Date(end.year, end.month, end.day);
+  const targetLocale = locale || i18n.locale || undefined;
 
-  const startDate = `${start.day}${startMonth}${startYear}`;
-  const endDate = `${end.day} ${MONTHS_SHORT[end.month]}, ${end.year}`;
+  try {
+    const fullFormatter = new Intl.DateTimeFormat(targetLocale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
 
-  return `${startDate} - ${endDate}`;
+    if (
+      "formatRange" in fullFormatter &&
+      typeof (fullFormatter as any).formatRange === "function"
+    ) {
+      return (fullFormatter as any).formatRange(startDate, endDate);
+    }
+
+    const isSameMonth = start.month === end.month && start.year === end.year;
+
+    if (!isSameMonth) {
+      const startHasYear = start.year !== end.year;
+      const startFormatter = new Intl.DateTimeFormat(targetLocale, {
+        month: "short",
+        day: "numeric",
+        ...(startHasYear ? { year: "numeric" } : {})
+      });
+      return `${startFormatter.format(startDate)} – ${fullFormatter.format(endDate)}`;
+    }
+
+    const startMonthDay = new Intl.DateTimeFormat(targetLocale, {
+      month: "short",
+      day: "numeric"
+    }).format(startDate);
+    const startDay = new Intl.DateTimeFormat(targetLocale, {
+      day: "numeric"
+    }).format(startDate);
+
+    // If day appears after month in this locale (e.g. "Jun 22"), put month first: "Jun 22 – 28, 2024"
+    if (startMonthDay.indexOf(startDay) > 0) {
+      const endDay = new Intl.DateTimeFormat(targetLocale, {
+        day: "numeric"
+      }).format(endDate);
+      return `${startMonthDay} – ${endDay}, ${end.year}`;
+    }
+
+    // Otherwise day comes first (e.g. "22 juin"): "22 – 28 juin 2024"
+    return `${startDay} – ${fullFormatter.format(endDate)}`;
+  } catch {
+    const startMonth =
+      start.month !== end.month ? " " + MONTHS_SHORT[start.month] : "";
+    const startYear = start.year !== end.year ? ", " + start.year : "";
+
+    const startFormatted = `${start.day}${startMonth}${startYear}`;
+    const endFormatted = `${end.day} ${MONTHS_SHORT[end.month]}, ${end.year}`;
+
+    return `${startFormatted} - ${endFormatted}`;
+  }
 }
 
 const MS_IN_HOUR = 3600000;

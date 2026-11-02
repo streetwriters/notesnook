@@ -21,6 +21,7 @@ import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { db } from "../../common/database";
+import { strings } from "@notesnook/intl";
 import { Header } from "../../components/header";
 import Input from "../../components/ui/input";
 import Paragraph from "../../components/ui/typography/paragraph";
@@ -120,7 +121,7 @@ export const NotePreviewConfigure = () => {
     >
       <Header
         canGoBack
-        title="Select a note"
+        title={strings.selectANote()}
         onLeftMenuButtonPress={() => {
           NotesnookModule.cancelAndFinish();
         }}
@@ -133,7 +134,7 @@ export const NotePreviewConfigure = () => {
         }}
       >
         <Input
-          placeholder="Search for notes"
+          placeholder={strings.searchForNotes()}
           containerStyle={{
             height: 50
           }}

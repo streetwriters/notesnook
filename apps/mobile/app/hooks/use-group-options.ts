@@ -54,15 +54,13 @@ export function useGroupOptions(
   const [groupOptions, setGroupOptions] = useState(
     getGroupOptions(groupingKey, id, type)
   );
-  console.log(groupingKey, id, type, groupOptions, "options");
   const groupOptionsRef = useRef(groupOptions);
   groupOptionsRef.current = groupOptions;
 
   useEffect(() => {
     const onUpdate = (_groupingKey: string, _id?: string, _type?: string) => {
-      if (_groupingKey !== groupingKey) return;
-      if (_id && _type && _id !== id && _type !== type) return;
-
+      if (_groupingKey !== groupingKey || _type !== type) return;
+      if (_id && _type && _id !== id) return;
       const options = getGroupOptions(groupingKey, id, type);
       if (!options) return;
       if (
@@ -70,9 +68,7 @@ export function useGroupOptions(
         groupOptionsRef.current?.sortBy !== options.sortBy ||
         groupOptionsRef.current?.sortDirection !== options?.sortDirection
       ) {
-        console.log("onUpdate", _id, _type);
         setGroupOptions({ ...options });
-        Navigation.queueRoutesForUpdate();
       }
     };
 

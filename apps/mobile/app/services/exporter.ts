@@ -200,7 +200,7 @@ async function bulkExport(
 
     if (item.type === "note") {
       currentProgress += 1;
-      callback(`Exporting notes (${currentProgress}/${totalNotes})`);
+      callback(strings.exportingNotesCount(currentProgress, totalNotes));
       try {
         await exportNoteToFile(item, type, mkdir, writeFile);
       } catch (e) {
@@ -208,7 +208,7 @@ async function bulkExport(
       }
     } else if (item.type === "attachment") {
       currentAttachmentProgress += 1;
-      callback(`Downloading attachments (${currentAttachmentProgress})`);
+      callback(strings.downloadingAttachmentsCount(currentAttachmentProgress));
       try {
         await exportAttachmentToFile(item, mkdir, cacheFolder);
       } catch (e) {
@@ -245,7 +245,7 @@ async function exportNote(
     }
 
     if (item.type === "note") {
-      callback(`Exporting note`);
+      callback(strings.exportingNote(note.title || ""));
       try {
         noteItem = item;
         await exportNoteToFile(item, type, mkdir, writeFile);
@@ -254,7 +254,7 @@ async function exportNote(
       }
     } else if (item.type === "attachment") {
       currentAttachmentProgress += 1;
-      callback(`Downloading attachments (${currentAttachmentProgress})`);
+      callback(strings.downloadingAttachmentsCount(currentAttachmentProgress));
       try {
         hasAttachments = true;
         await exportAttachmentToFile(item, mkdir, cacheFolder);
@@ -281,14 +281,14 @@ async function createZip(
   const fileName = `nn-export-${totalNotes}-${type}-${Date.now()}.zip`;
   const dir = path;
   try {
-    callback("Creating zip");
+    callback(strings.creatingZip());
     const zipOutputPath =
       Platform.OS === "ios"
         ? join(path, fileName)
         : join(RNFetchBlob.fs.dirs.CacheDir, fileName);
     await zip(cacheFolder, zipOutputPath);
 
-    callback("Saving zip file");
+    callback(strings.savingZipFile());
     if (Platform.OS === "android") {
       const file = await ScopedStorage.createFile(
         path,

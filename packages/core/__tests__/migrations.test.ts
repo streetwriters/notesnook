@@ -89,6 +89,19 @@ test("[5.3] decode wrapped table html entities", () =>
     );
   }));
 
+test("[5.3] decode only the wrapped table html entities", () =>
+  databaseTest().then(async (db) => {
+    const item = {
+      type: "tiny",
+      dateEdited: Date.now(),
+      data: `&lt;div class="table-container"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;<p>&lt;b&gt;</p>&lt;div class="table-container"&gt;&lt;table&gt;&lt;/table&gt;&lt;/div&gt;`
+    };
+    expect(await migrateItem(item, 5.3, 5.4, "tiny", db, "local")).toBe(true);
+    expect(item.data).toBe(
+      `<div class="table-container"><table></table></div><p>&lt;b&gt;</p><div class="table-container"><table></table></div>`
+    );
+  }));
+
 describe.concurrent("[5.4] convert tiny to tiptap", () => {
   const cases = [
     {
@@ -105,6 +118,11 @@ describe.concurrent("[5.4] convert tiny to tiptap", () => {
       name: "move images out of paragraphs",
       from: `<p><img src="hello.jpg" /></p>`,
       to: `<img src="hello.jpg">`
+    },
+    {
+      name: "keep text around images when moving them out of paragraphs",
+      from: `<p>before<img src="hello.jpg" />after</p>`,
+      to: `<p>before</p><img src="hello.jpg"><p>after</p>`
     },
     {
       name: "replace [data-mce-bogus] elements",

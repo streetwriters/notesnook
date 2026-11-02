@@ -43,7 +43,7 @@ export const SearchResult = (props: SearchResultProps) => {
     (state) => state.settings.searchListMode === "compact"
   );
 
-  const openNote = async (index?: number) => {
+  const openNote = async (target?: number | string) => {
     const note = await db.notes.note(props.item.id);
     eSendEvent(eOnLoadNote, {
       item: {
@@ -55,33 +55,34 @@ export const SearchResult = (props: SearchResultProps) => {
             }
           : undefined
       },
-      searchResultIndex: index
+      searchResultIndex: target
     });
     fluidTabsRef.current?.goToPage("editor");
   };
 
   return (
-    <Pressable
+    <View
       style={{
         alignSelf: "flex-start",
         alignItems: "flex-start",
         paddingHorizontal: DefaultAppStyles.GAP,
         paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL,
-        borderRadius: 0
+        width: "100%"
       }}
-      onLongPress={async () => {
-        const note = await db.notes.note(props.item.id);
-        Properties.present(note);
-      }}
-      onPress={async () => openNote()}
     >
-      <View
+      <Pressable
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          width: "100%"
+          width: "100%",
+          borderRadius: 0
         }}
+        onLongPress={async () => {
+          const note = await db.notes.note(props.item.id);
+          Properties.present(note);
+        }}
+        onPress={async () => openNote()}
       >
         <View
           style={{
@@ -131,7 +132,7 @@ export const SearchResult = (props: SearchResultProps) => {
             {props.item.content.length}
           </Paragraph>
         ) : null}
-      </View>
+      </Pressable>
 
       {expanded &&
         !compactMode &&
@@ -155,15 +156,16 @@ export const SearchResult = (props: SearchResultProps) => {
             }}
             onPress={() => {
               let activeIndex = 0;
-              for (let i = 0; i <= index; i++) {
+              for (let i = 0; i < index; i++) {
                 activeIndex += props.item.content[i].length;
               }
-              openNote(activeIndex);
+              const target = content[0]?.id ?? activeIndex;
+              openNote(target);
             }}
           >
             <Paragraph>
-              {content.map((match, index) => (
-                <React.Fragment key={props.item.id + index + "src"}>
+              {content.map((match, matchIndex) => (
+                <React.Fragment key={props.item.id + matchIndex + "src"}>
                   {match.prefix}
                   <Paragraph
                     size={AppFontSize.sm}
@@ -180,6 +182,6 @@ export const SearchResult = (props: SearchResultProps) => {
             </Paragraph>
           </Pressable>
         ))}
-    </Pressable>
+    </View>
   );
 };

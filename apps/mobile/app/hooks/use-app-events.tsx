@@ -82,6 +82,7 @@ import {
 } from "../services/message";
 import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
+import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -188,6 +189,7 @@ const onAppOpenedFromURL = async (event: {
         const note = await db.notes.note(id);
         if (note) {
           editorState().initialLoadCalled = true;
+          Navigation.navigate("FluidPanelsView", { initialPage: "editor" });
           eSendEvent(eOnLoadNote, {
             item: note
           });
@@ -580,6 +582,7 @@ export const useAppEvents = () => {
     // (most obviously after the user clears app data). Nothing can run at that moment, so the
     // first launch afterwards is the earliest chance to put them right.
     NotePreviewWidget.updateNotes();
+    PinnedNotesWidget.updateNotes();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;
@@ -801,8 +804,8 @@ export const useAppEvents = () => {
         )
           return;
         startProgress({
-          title: "Migrating Data",
-          paragraph: "Please wait while we migrate your data",
+          title: strings.migratingData(),
+          paragraph: strings.migratingDataDesc(),
           canHideProgress: false,
           fillBackground: true
         });

@@ -33,7 +33,6 @@ import {
 } from "./utils";
 import { NavigationMenuModel } from "./navigation-menu.model";
 import { AppModel } from "./app.model";
-import { getAppFromPage } from "../../../desktop/__tests__/electron-test/utils";
 import { readFile } from "node:fs/promises";
 
 export class SettingsViewModel {
@@ -135,6 +134,10 @@ export class SettingsViewModel {
     };
 
     if (IS_DESKTOP_TESTS) {
+      const { getAppFromPage } = await import(
+        "../../../desktop/__tests__/electron-test/utils"
+      );
+
       await saveBackup();
       const toast = new AppModel(this.page).toasts.toasts.locator(
         getTestId("toast-message")

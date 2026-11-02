@@ -21,7 +21,6 @@ import { describe, expect, test } from "vitest";
 import {
   createEditor,
   h,
-  p,
   checkList,
   checkListItem
 } from "../../../../test-utils/index.js";
@@ -36,7 +35,7 @@ describe("check list item", () => {
    */
   test("inline image as first child in check list item", async () => {
     const el = checkList(
-      checkListItem([p(["item 1"])]),
+      checkListItem(["item 1"]),
       checkListItem([h("img", [], { src: "image.png" })])
     );
 

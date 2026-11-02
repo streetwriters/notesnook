@@ -10,6 +10,8 @@ import com.android.build.OutputFile
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.taskdefs.condition.Os
 
+apply from: new File(rootDir, "prebuilt-aars.gradle")
+
 react {
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '..'
@@ -140,7 +142,7 @@ android {
         if (project.hasProperty("prBuildNumber")) {
             versionCode Integer.parseInt(prBuildNumber())
         } else {
-            versionCode 3114
+            versionCode 3121
         }
         versionName getNpmVersion()
         testBuildType System.getProperty('testBuildType', 'debug')

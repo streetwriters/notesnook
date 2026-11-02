@@ -90,7 +90,7 @@ export const ThemeDetailsDialog = DialogManager.register(
                 variant="text.subBody"
                 sx={{ fontSize: "subtitle", color: "accent" }}
               >
-                Source
+                {strings.source()}
               </Link>
             )}
           </Flex>

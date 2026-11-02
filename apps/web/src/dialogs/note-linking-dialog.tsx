@@ -211,7 +211,7 @@ export const NoteLinkingDialog = DialogManager.register(
                     }
                     variant="anchor"
                   >
-                    Upgrade now
+                    {strings.upgradeNow()}
                   </Button>
                   .
                 </Text>

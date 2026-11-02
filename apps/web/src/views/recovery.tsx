@@ -30,7 +30,6 @@ import { ErrorText } from "../components/error-text";
 import { EVENTS, User } from "@notesnook/core";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
-import { useKeyStore } from "../interfaces/key-store";
 
 type RecoveryMethodType = "key" | "reset";
 type RecoveryMethodsFormData = Record<string, unknown>;
@@ -105,8 +104,8 @@ function useAuthenticateUser({
   code,
   userId
 }: {
-  code: string;
-  userId: string;
+  code?: string;
+  userId?: string;
 }) {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [user, setUser] = useState<User>();
@@ -114,13 +113,14 @@ function useAuthenticateUser({
     async function authenticateUser() {
       setIsAuthenticating(true);
       try {
-        const accessToken = await db.tokenManager.getAccessToken();
-        if (!accessToken) {
-          await db.tokenManager.getAccessTokenFromAuthorizationCode(
-            userId,
-            code.replace(/ /gm, "+")
-          );
+        if (!code || !userId) {
+          throw new Error("Missing code or userId in query params.");
         }
+
+        await db.tokenManager.getAccessTokenFromAuthorizationCode(
+          userId,
+          code.replace(/ /gm, "+")
+        );
         const user = await db.user.fetchUser();
         setUser(user);
       } catch (e) {
@@ -181,7 +181,7 @@ function Recovery(props: RecoveryProps) {
                 }}
                 variant={"body"}
               >
-                {strings.authenticatedAs(user?.email)}
+                {user?.email ? strings.authenticatedAs(user.email) : ""}
               </Text>
               <Button
                 sx={{
@@ -334,16 +334,25 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         subtitle: strings.keyRecoveryProgressDesc()
       }}
       onSubmit={async (form) => {
+        const user = await db.user.getUser();
+        if (!user) throw new Error(strings.notLoggedIn());
+
         const recoveryKey = form.recoveryKey;
-        if (recoveryKey.length < 40) {
+        if (
+          !(await db
+            .storage()
+            .encrypt({ key: recoveryKey, salt: user.salt }, "test")
+            .then(() => true)
+            .catch(() => false))
+        ) {
           throw new Error(strings.invalidRecoveryKey());
         }
 
-        setProgress(0);
+        await db.user.verifyEncryptionKey({
+          key: recoveryKey,
+          salt: user.salt
+        });
 
-        const user = await db.user.getUser();
-        if (!user) throw new Error(strings.notLoggedIn());
-        await useKeyStore.getState().setValue("userEncryptionKey", recoveryKey);
         navigate("new", form);
       }}
     >
@@ -356,16 +365,19 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         autoFocus
         defaultValue={formData?.recoveryKey || ""}
       />
-      <Flex sx={{ gap: 1 }}>
+      <Flex sx={{ gap: 1, mt: 3 }}>
         <Button
           variant="secondary"
           type="button"
-          sx={{ mt: 50, borderRadius: 50 }}
+          sx={{ flex: 1, py: 2, fontSize: "subtitle" }}
           onClick={() => navigate("methods")}
         >
           {strings.back()}
         </Button>
-        <SubmitButton text={strings.startAccountRecovery()} />
+        <SubmitButton
+          text={strings.startAccountRecovery()}
+          sx={{ flex: 1, mt: 0 }}
+        />
       </Flex>
 
       <Button
@@ -405,29 +417,33 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
         subtitle: strings.resetPasswordWait()
       }}
       onSubmit={async (form) => {
-        try {
-          setProgress(0);
+        setProgress(0);
+        const user = await db.user.getUser();
+        if (!user) throw new Error(strings.notLoggedIn());
 
-          if (form.password !== form.confirmPassword)
-            throw new Error("Passwords do not match.");
+        if (form.password !== form.confirmPassword)
+          throw new Error(strings.passwordNotMatched());
 
-          if (formData?.userResetRequired && !(await db.user.resetUser()))
-            throw new Error("Failed to reset user.");
-
-          if (!(await db.user.resetPassword(form.password)))
-            throw new Error("Could not reset account password.");
+        if (formData?.userResetRequired) {
+          if (!(await db.user.resetPasswordWithoutRecoveryKey(form.password)))
+            throw new Error(strings.couldNotResetAccountPassword());
 
           navigate("final");
-        } catch (e) {
-          if ((e as Error).message === "invalid input") {
-            console.error(e);
-            throw new Error(
-              "Password reset failed because of invalid recovery key"
-            );
-          }
-
-          throw e;
+          return;
         }
+
+        if (!formData?.recoveryKey)
+          throw new Error(strings.recoveryKeyRequired());
+
+        if (
+          !(await db.user.resetPassword({
+            encryptionKey: { key: formData?.recoveryKey, salt: user.salt },
+            newPassword: form.password
+          }))
+        )
+          throw new Error(strings.couldNotResetAccountPassword());
+
+        navigate("final");
       }}
     >
       {(form?: NewPasswordFormData) => (
@@ -447,11 +463,11 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             label={strings.confirmPassword()}
             defaultValue={form?.confirmPassword}
           />
-          <Flex sx={{ gap: 1 }}>
+          <Flex sx={{ gap: 1, mt: 3 }}>
             <Button
               variant="secondary"
               type="button"
-              sx={{ mt: 50, borderRadius: 50 }}
+              sx={{ flex: 1, py: 2, fontSize: "subtitle" }}
               onClick={() =>
                 navigate(
                   formData?.userResetRequired ? "methods" : "method:key",
@@ -461,7 +477,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
             >
               {strings.back()}
             </Button>
-            <SubmitButton text={strings.continue()} />
+            <SubmitButton text={strings.continue()} sx={{ flex: 1, mt: 0 }} />
           </Flex>
         </>
       )}
@@ -539,31 +555,41 @@ export function RecoveryForm<T extends RecoveryRoutes>(
         }
       }}
       sx={{
-        flex: 1,
         flexDirection: "column",
+        size: "100%",
         alignItems: "center",
-        justifyContent: "center",
-        width: ["95%", 420],
-        alignSelf: "center"
+        justifyContent: "center"
       }}
     >
-      <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
-        {title}
-      </Text>
-      <Text
-        variant="body"
-        mt={2}
-        mb={35}
+      <Flex
         sx={{
-          fontSize: "title",
-          textAlign: "center",
-          color: "var(--paragraph-secondary)"
+          flexDirection: "column",
+          width: ["95%", "95%", "550px"],
+          background: "var(--background)",
+          p: 6,
+          my: 10,
+          borderRadius: "15px",
+          border: "1px solid var(--border)",
+          boxShadow: "0px 0px 10px 0px #00000019"
         }}
       >
-        {subtitle}
-      </Text>
-      {typeof children === "function" ? children(form) : children}
-      <ErrorText error={error} sx={{ mt: 2 }} />
+        <Text variant={"heading"} sx={{ fontSize: 32 }}>
+          {title}
+        </Text>
+        <Text
+          variant="body"
+          mt={2}
+          mb={2}
+          sx={{
+            fontSize: "title",
+            color: "var(--paragraph-secondary)"
+          }}
+        >
+          {subtitle}
+        </Text>
+        {typeof children === "function" ? children(form) : children}
+        <ErrorText error={error} sx={{ mt: 2 }} />
+      </Flex>
     </Flex>
   );
 }

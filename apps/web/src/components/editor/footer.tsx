@@ -235,7 +235,7 @@ function EditorFooter() {
                 {value.selected ? (
                   <span style={{ fontWeight: "normal" }}>
                     {" "}
-                    ({value.selected} selected)
+                    ({strings.selectedWords(value.selected)})
                   </span>
                 ) : (
                   ""

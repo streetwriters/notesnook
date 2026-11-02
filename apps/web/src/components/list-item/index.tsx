@@ -30,6 +30,7 @@ import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
 import { Item } from "@notesnook/core";
 import { setDragData } from "../../utils/data-transfer";
+import { strings } from "@notesnook/intl";
 
 type ListItemProps<TItem extends Item, TContext> = {
   colors?: {
@@ -134,7 +135,7 @@ function ListItem<TItem extends Item, TContext>(
         let menuItems = await props.menuItems?.(item, selectedItems, context);
 
         if (selectedItems.length > 1) {
-          title = `${selectedItems.length} items selected`;
+          title = strings.itemsSelected(selectedItems.length);
           menuItems = menuItems?.filter((i) => i.multiSelect === true);
         }
 

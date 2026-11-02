@@ -34,9 +34,16 @@ import SettingsService from "./settings";
 import { Update } from "../components/sheets/update";
 import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
+import { db } from "../common/database";
+import { Walkthrough } from "../components/walkthroughs";
 
-const APP_MESSAGES: Message[] = [
-  {
+let isCheckingEmail = false;
+
+const APP_MESSAGE_BUILDERS: Record<
+  MessageId,
+  (data?: object) => Message
+> = {
+  "rate-app": () => ({
     visible: true,
     message: strings.rateAppMessage(),
     actionText: strings.rateAppActionText(Platform.OS),
@@ -47,8 +54,8 @@ const APP_MESSAGES: Message[] = [
     icon: "star",
     type: "normal",
     id: "rate-app"
-  },
-  {
+  }),
+  "recovery-key": () => ({
     visible: true,
     message: strings.recoveryKeyMessage(),
     actionText: strings.recoveryKeyMessageActionText(),
@@ -72,8 +79,8 @@ const APP_MESSAGES: Message[] = [
     icon: "key",
     type: "normal",
     id: "recovery-key"
-  },
-  {
+  }),
+  "log-in": () => ({
     visible: true,
     message: strings.loginMessage(),
     actionText: strings.loginMessageActionText(),
@@ -86,41 +93,93 @@ const APP_MESSAGES: Message[] = [
     icon: "account-outline",
     type: "normal",
     id: "log-in"
-  },
-  {
+  }),
+  "confirm-email": () => ({
     visible: true,
     message: strings.syncDisabled(),
     actionText: strings.syncDisabledActionText(),
-    onPress: () => {
+    onPress: async () => {
+      if (isCheckingEmail) return;
+      isCheckingEmail = true;
+      try {
+        const user = await db.user.fetchUser();
+        if (user?.isEmailConfirmed) {
+          clearMessage();
+          SettingsService.set({
+            userEmailConfirmed: true
+          });
+          Walkthrough.present("emailconfirmed", false, true);
+          return;
+        }
+      } catch (e) {
+        /* empty */
+      } finally {
+        isCheckingEmail = false;
+      }
+
       PremiumService.showVerifyEmailDialog();
     },
     data: {},
     icon: "email",
     type: "error",
     id: "confirm-email"
-  }
-];
+  }),
+  "app-update": (data) => {
+    const version = (data as { version?: GithubVersionInfo | CheckVersionResponse } | undefined)?.version;
+    return {
+      visible: true,
+      message: strings.newUpdateMessage(),
+      actionText: strings.newUpdateActionText(),
+      onPress: () => {
+        if (version) {
+          presentSheet({
+            component: (ref) => <Update version={version} fwdRef={ref} />
+          });
+        }
+      },
+      data: data || {},
+      icon: "update",
+      type: "normal",
+      id: "app-update"
+    };
+  },
+  none: () => ({}) as Message
+};
 
-function showMessageById(id: MessageId) {
-  useMessageStore
-    .getState()
-    .setMessage(APP_MESSAGES.find((m) => m.id === id) as Message);
+export function setMessageById(id: MessageId, data?: object) {
+  useMessageStore.getState().setMessage({
+    ...useMessageStore.getState().message,
+    visible: id !== "none",
+    id,
+    data: data || {}
+  });
+}
+
+export function getMessageById(
+  id: MessageId,
+  data?: object
+): Message | null {
+  const builder = APP_MESSAGE_BUILDERS[id];
+  if (builder && id !== "none") {
+    return builder(data);
+  }
+  return null;
 }
 
 export function setRateAppMessage() {
-  showMessageById("rate-app");
+  setMessageById("rate-app");
 }
 
 export function setRecoveryKeyMessage() {
-  showMessageById("recovery-key");
+  setMessageById("recovery-key");
 }
 
 export function setLoginMessage() {
-  showMessageById("log-in");
+  setMessageById("log-in");
 }
 
 export function setEmailVerifyMessage() {
-  showMessageById("confirm-email");
+  setMessageById("confirm-email");
 }
 
 export function clearMessage() {
@@ -130,26 +189,9 @@ export function clearMessage() {
   });
 }
 
-const updateAvailableMessage = (
-  version: GithubVersionInfo | CheckVersionResponse
-) =>
-  ({
-    visible: true,
-    message: strings.newUpdateMessage(),
-    actionText: strings.newUpdateActionText(),
-    onPress: () => {
-      presentSheet({
-        component: (ref) => <Update version={version} fwdRef={ref} />
-      });
-    },
-    data: {},
-    icon: "update",
-    type: "normal",
-    id: "app-update"
-  }) as Message;
-
 export function setUpdateAvailableMessage(
   version: GithubVersionInfo | CheckVersionResponse
 ) {
-  useMessageStore.getState().setMessage(updateAvailableMessage(version));
+  setMessageById("app-update", { version });
 }
+

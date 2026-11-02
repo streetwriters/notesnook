@@ -29,19 +29,11 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { Flex } from "@theme-ui/components";
 import TipTap, { type TipTapProps } from "./tiptap";
 import { ScopedThemeProvider } from "../theme-provider";
-import { setI18nGlobal, Messages } from "@notesnook/intl";
-import { i18n } from "@lingui/core";
+import { initLocale } from "@notesnook/intl";
 
-const locale = import.meta.env.DEV
-  ? import("@notesnook/intl/locales/$pseudo-LOCALE.json")
-  : import("@notesnook/intl/locales/$en.json");
-locale.then(({ default: locale }) => {
-  i18n.load({
-    en: locale.messages as unknown as Messages
-  });
-  i18n.activate("en");
+initLocale({
+  systemLocale: typeof navigator !== "undefined" ? navigator.language : "en"
 });
-setI18nGlobal(i18n);
 
 export type EditorType = typeof Editor;
 

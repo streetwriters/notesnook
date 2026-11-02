@@ -71,7 +71,10 @@ export const EmailVerificationDialog = DialogManager.register(
         description={strings.confirmEmailDesc()}
         onClose={() => props.onClose(false)}
         positiveButton={{
-          text: canSendAgain || isSending ? "Resend" : `Resend (${resetTimer})`,
+          text:
+            canSendAgain || isSending
+              ? strings.resend()
+              : strings.resendWithTimer(resetTimer),
           onClick: async () => {
             setIsSending(true);
             try {

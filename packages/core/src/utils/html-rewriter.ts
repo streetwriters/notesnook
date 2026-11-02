@@ -34,6 +34,7 @@ export class HTMLRewriter {
   private transformed = "";
   private currentTag: string | null = null;
   private ignoreIndex: number | null = null;
+  private skippedTags: boolean[] = [];
   private parser: Parser;
 
   constructor(
@@ -50,6 +51,7 @@ export class HTMLRewriter {
       {
         onreset: () => {
           this.transformed = "";
+          this.skippedTags = [];
         },
         oncomment: () => this.write("<!--"),
         oncommentend: () => this.write("-->"),
@@ -70,18 +72,21 @@ export class HTMLRewriter {
             if (result === false) {
               this.ignoreIndex = 0;
               return;
-            } else if (result === null) return;
-            else if (result) {
+            } else if (result === null) {
+              this.skippedTags.push(true);
+              return;
+            } else if (result) {
               name = result.name;
               attr = result.attr;
             }
           }
 
+          this.skippedTags.push(false);
           this.write(`<${name}`);
           if (attr) {
             for (const key in attr) {
               if (!key) continue;
-              this.write(` ${key}="${attr[key]}"`);
+              this.write(` ${key}="${attr[key].replace(/"/g, "&quot;")}"`);
             }
           }
           this.currentTag = name;
@@ -97,9 +102,14 @@ export class HTMLRewriter {
             return;
           }
 
-          if (!isImplied) this.closeTag();
+          if (this.skippedTags.pop()) return;
 
-          this.write(isImplied ? "/>" : `</${name}>`);
+          // an implied close right after the open tag is a void or
+          // self-closing element; otherwise the element had content.
+          const selfClose = isImplied && this.currentTag !== null;
+          if (!selfClose) this.closeTag();
+
+          this.write(selfClose ? "/>" : `</${name}>`);
 
           if (this.currentTag) {
             this.currentTag = null;

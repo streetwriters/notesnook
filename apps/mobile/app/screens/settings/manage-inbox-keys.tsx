@@ -382,7 +382,10 @@ const InboxKeysList = () => {
           width: "100%"
         }}
       >
-        <Paragraph color={colors.error.paragraph}>
+        <Paragraph
+          color={colors.error.paragraph}
+          style={{ textAlign: "center" }}
+        >
           {strings.failedToLoadApiKeys()}
         </Paragraph>
         <Button
@@ -417,7 +420,10 @@ const InboxKeysList = () => {
             justifyContent: "center"
           }}
         >
-          <Paragraph color={colors.secondary.paragraph}>
+          <Paragraph
+            color={colors.secondary.paragraph}
+            style={{ textAlign: "center" }}
+          >
             {strings.createFirstApiKey()}
           </Paragraph>
 
@@ -602,7 +608,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
                 size={AppFontSize.xxs}
                 style={{ fontWeight: "bold" }}
               >
-                EXPIRED
+                {strings.expired().toUpperCase()}
               </Paragraph>
             </View>
           )}

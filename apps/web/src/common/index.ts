@@ -151,8 +151,8 @@ export async function createBackup(
               const file = output;
               report({
                 text: background
-                  ? `Creating backup (${file.path})`
-                  : `Saving file ${file.path}`
+                  ? strings.creatingBackupNamed(file.path)
+                  : strings.savingFile(file.path)
               });
               controller.enqueue({
                 path: file.path,
@@ -161,8 +161,8 @@ export async function createBackup(
             } else if (output.type === "attachment") {
               report({
                 text: background
-                  ? `Creating backup (${output.hash})`
-                  : `Saving attachment ${output.hash}`,
+                  ? strings.creatingBackupNamed(output.hash)
+                  : strings.savingAttachment(output.hash),
                 total: output.total,
                 current: output.current
               });
@@ -195,6 +195,7 @@ export async function createBackup(
         ? `${strings.backupSavedAt(path.join(backupDirectory, filePath))}`
         : strings.backupSuccess()
     );
+    await useSettingStore.getState().refreshBackupTime();
     return true;
   }
   return false;
@@ -275,6 +276,7 @@ export async function restoreBackupFile(backupFile: File) {
         const attachments: ZipEntry[] = [];
         let attachmentsKey: SerializedKey | Cipher<"base64"> | undefined;
         let filesProcessed = 0;
+        const skippedAttachments = new Set<string>();
 
         let isValid = false;
         for await (const entry of createUnzipIterator(backupFile)) {
@@ -303,11 +305,12 @@ export async function restoreBackupFile(backupFile: File) {
                 const result = await BackupPasswordDialog.show({
                   validate: async ({ password, key: encryptionKey }) => {
                     if (!password && !encryptionKey) return false;
-                    await db.backup?.import(backup, {
+                    const skipped = await db.backup?.import(backup, {
                       password,
                       encryptionKey,
                       attachmentsKey
                     });
+                    skipped?.forEach((hash) => skippedAttachments.add(hash));
                     cachedPassword = password;
                     cachedKey = encryptionKey;
                     return true;
@@ -315,13 +318,17 @@ export async function restoreBackupFile(backupFile: File) {
                 });
                 if (!result) break;
               } else
-                await db.backup?.import(backup, {
-                  password: cachedPassword,
-                  encryptionKey: cachedKey,
-                  attachmentsKey
-                });
+                (
+                  await db.backup?.import(backup, {
+                    password: cachedPassword,
+                    encryptionKey: cachedKey,
+                    attachmentsKey
+                  })
+                )?.forEach((hash) => skippedAttachments.add(hash));
             } else {
-              await db.backup?.import(backup, { attachmentsKey });
+              (await db.backup?.import(backup, { attachmentsKey }))?.forEach(
+                (hash) => skippedAttachments.add(hash)
+              );
             }
 
             report({
@@ -344,7 +351,7 @@ export async function restoreBackupFile(backupFile: File) {
           });
 
           const attachment = await db.attachments.attachment(hash);
-          if (!attachment) continue;
+          if (!attachment || skippedAttachments.has(hash)) continue;
 
           await streamablefs.deleteFile(attachment.hash);
           const handle = await streamablefs.createFile(
@@ -615,4 +622,8 @@ export async function handleInternalLink(url: string, openInNewTab?: boolean) {
   } else if (link.type === "color") {
     navigate(`/colors/${link.id}`);
   }
+}
+
+export function truncateString(str: string, maxLength = 100) {
+  return str.length > maxLength ? str.substring(0, maxLength) + "..." : str;
 }

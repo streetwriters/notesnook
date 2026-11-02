@@ -184,6 +184,32 @@ test("note title with headline format should keep generating headline title unti
     expect(note?.title).toBe("not delicious anymore");
   }));
 
+test("note title with headline format should update on every headline change", () =>
+  noteTest().then(async ({ db }) => {
+    await db.settings.setTitleFormat("$headline$");
+    const id = await db.notes.add({
+      content: { type: TEST_NOTE.content.type, data: "<p>first</p>" }
+    });
+
+    // headline unchanged: should not affect the next title update
+    await db.notes.add({
+      id,
+      content: {
+        type: TEST_NOTE.content.type,
+        data: "<p>first</p><p>body</p>"
+      }
+    });
+    expect((await db.notes.note(id))?.title).toBe("first");
+
+    for (const headline of ["second", "third", "fourth"]) {
+      await db.notes.add({
+        id,
+        content: { type: TEST_NOTE.content.type, data: `<p>${headline}</p>` }
+      });
+      expect((await db.notes.note(id))?.title).toBe(headline);
+    }
+  }));
+
 [
   ["simple p tag", "<p>headline</p>", "headline"],
   ["across multiple tags", "<h1>title</h1><ol><li>list</li></ol>", "title"],
@@ -470,6 +496,28 @@ test("note's content should follow note's localOnly property", () =>
     expect(content?.localOnly).toBe(false);
   }));
 
+test("toggling localOnly should mark the note's content as unsynced", () =>
+  noteTest().then(async ({ db, id }) => {
+    const note = await db.notes.note(id);
+    const markSynced = () =>
+      db
+        .sql()
+        .updateTable("content")
+        .set({ synced: true })
+        .where("id", "=", note.contentId!)
+        .execute();
+    const isSynced = async () =>
+      (await db.content.get(note.contentId!))?.synced;
+
+    await markSynced();
+    await db.notes.localOnly(true, id);
+    expect(await isSynced()).toBe(false);
+
+    await markSynced();
+    await db.notes.localOnly(false, id);
+    expect(await isSynced()).toBe(false);
+  }));
+
 test("grouping items where item.title is empty or undefined shouldn't throw", () => {
   expect(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -734,6 +782,88 @@ for (const group of groups) {
         }
         expect(items).toMatchSnapshot();
       }));
+  }
+}
+
+test("natural sorting of numbered note titles", () =>
+  databaseTest().then(async (db) => {
+    const titles = [
+      "Lesson 10",
+      "Lesson 1",
+      "Lesson 2",
+      "10. Intro",
+      "1. Intro",
+      "2. Intro"
+    ];
+    for (const title of titles) {
+      await db.notes.add({ title });
+    }
+
+    const asc = await db.notes.all.grouped({
+      groupBy: "none",
+      sortBy: "title",
+      sortDirection: "asc"
+    });
+    const ascTitles: string[] = [];
+    for (let i = 0; i < asc.length; i++) {
+      const item = await asc.item(i);
+      if (item.item) ascTitles.push(item.item.title);
+    }
+
+    expect(ascTitles).toEqual([
+      "1. Intro",
+      "2. Intro",
+      "10. Intro",
+      "Lesson 1",
+      "Lesson 2",
+      "Lesson 10"
+    ]);
+  }));
+
+for (const groupBy of ["default", "week", "month", "year", "abc"] as const) {
+  for (const sortBy of ["title", "dateCreated", "dateEdited"] as const) {
+    for (const sortDirection of ["asc", "desc"] as const) {
+      const options: GroupOptions = { groupBy, sortBy, sortDirection };
+      test(`items should be under their own group when grouped by ${groupBy}, sorted by ${sortBy} (${sortDirection})`, () =>
+        databaseTest().then(async (db) => {
+          // ages cross the recent/last week/older thresholds and calendar
+          // weeks; first letters alternate when ordered by date
+          const titles = [
+            "alpha",
+            "Bravo",
+            "apple",
+            "banana",
+            "Avocado",
+            "berry"
+          ];
+          const ages = [0, 6, 8, 13, 15, 400];
+          for (let i = 0; i < titles.length; i++) {
+            const date = dayjs().subtract(ages[i], "days").valueOf();
+            await db.notes.add({
+              title: titles[i],
+              dateCreated: date,
+              dateEdited: date
+            });
+          }
+
+          const keySelector = createKeySelector(options);
+          const grouping = await db.notes.all.grouped(options);
+          const headers: string[] = [];
+          let currentHeader = "";
+          for (let i = 0; i < grouping.length; i++) {
+            const { item, group } = await grouping.item(i);
+            if (group) {
+              headers.push(group.title);
+              currentHeader = group.title;
+            }
+            expect(keySelector(item!)).toBe(currentHeader);
+          }
+          expect(new Set(headers).size).toBe(headers.length);
+
+          const groups = (await grouping.groups!()).map((g) => g.group.title);
+          expect(groups).toStrictEqual(headers);
+        }));
+    }
   }
 }
 

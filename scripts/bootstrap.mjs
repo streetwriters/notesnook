@@ -38,7 +38,8 @@ const scopes = {
   core: "packages/core",
   editor: "packages/editor",
   themes: "servers/themes",
-  themebuilder: "apps/theme-builder"
+  themebuilder: "apps/theme-builder",
+  help: "docs/help"
 };
 // packages that we should run npm rebuild for
 const POSTINSTALL_WHITELIST = [

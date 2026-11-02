@@ -30,7 +30,7 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import { Color, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { checkFeature } from "../common";
+import { checkFeature, truncateString } from "../common";
 
 type ItemDialogProps = BaseDialogProps<false | string> & {
   title: string;
@@ -118,7 +118,7 @@ export const EditTagDialog = {
   show: (tag: Tag) =>
     ItemDialog.show({
       title: strings.doActions.edit.tag(1),
-      subtitle: strings.editingTagDesc(tag.title),
+      subtitle: strings.editingTagDesc(truncateString(tag.title)),
       defaultValue: tag.title
     }).then(async (title) => {
       if (
@@ -140,7 +140,7 @@ export const RenameColorDialog = {
   show: (color: Color) =>
     ItemDialog.show({
       title: strings.renameColor(),
-      subtitle: strings.renameColorDesc(color.title),
+      subtitle: strings.renameColorDesc(truncateString(color.title)),
       defaultValue: color.title
     }).then(async (title) => {
       if (

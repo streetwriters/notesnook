@@ -379,6 +379,7 @@ async function multiPartUploadFile(
 
   onUploadProgress();
   const queue = newQueue(4);
+  const uploads: Promise<void>[] = [];
   for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
     const from = i * UPLOAD_PART_REQUIRED_CHUNKS;
     const length = Math.min(
@@ -386,7 +387,7 @@ async function multiPartUploadFile(
       UPLOAD_PART_REQUIRED_CHUNKS
     );
     const url = parts[i];
-    queue.add(async () => {
+    const upload = queue.add(async () => {
       const blob = await fileHandle.readChunks(
         i * UPLOAD_PART_REQUIRED_CHUNKS,
         length
@@ -406,7 +407,6 @@ async function multiPartUploadFile(
         .catch((e) => {
           throw new WrappedError(`Failed to upload part at offset ${i}`, e);
         });
-
       if (!response.headers.etag || typeof response.headers.etag !== "string")
         throw new Error(
           `Failed to upload part at offset ${i}: invalid etag. ETag: ${response.headers.etag}`
@@ -418,8 +418,13 @@ async function multiPartUploadFile(
       await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
       await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
     });
+    uploads.push(upload);
   }
-  await queue.done();
+  try {
+    await Promise.all(uploads);
+  } finally {
+    queue.clear();
+  }
 
   await axios
     .post(

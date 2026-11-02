@@ -88,14 +88,23 @@ export function FilteredList<T>(props: FilteredListProps<T>) {
             alignItems: "center",
             py: 2,
             width: "100%",
-            mt: 1
+            mt: 1,
+            minWidth: 0
           }}
           onClick={async () => {
             await _createNewItem(query);
           }}
         >
-          <Text variant={"body"}>{`${strings.add()} "${query}"`}</Text>
-          <Plus size={16} color="accent" />
+          <Text
+            variant={"body"}
+            sx={{
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >{`${strings.add()} "${query}"`}</Text>
+          <Plus size={16} color="accent" sx={{ flexShrink: 0 }} />
         </Button>
       ) : (
         <VirtualizedList {...listProps} items={items} />

@@ -28,7 +28,7 @@ import { store as appStore } from "../stores/app-store";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { checkFeature } from "../common";
+import { checkFeature, truncateString } from "../common";
 
 type AddNotebookDialogProps = BaseDialogProps<boolean> & {
   parentId?: string;
@@ -79,7 +79,7 @@ export const AddNotebookDialog = DialogManager.register(
         title={props.edit ? strings.editNotebook() : strings.newNotebook()}
         description={
           props.edit && notebook?.title
-            ? strings.editNotebookDesc(notebook.title)
+            ? strings.editNotebookDesc(truncateString(notebook.title))
             : strings.newNotebookDesc()
         }
         onClose={() => onClose(false)}

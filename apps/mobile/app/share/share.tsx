@@ -28,6 +28,7 @@ import {
   useIsFeatureAvailable
 } from "@notesnook/common";
 import { isImage } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -124,17 +125,23 @@ const defaultNote: DefaultNote = {
 const modes = {
   1: {
     type: "text",
-    title: "Plain text",
+    get title() {
+      return strings.plainText();
+    },
     icon: "card-text-outline"
   },
   2: {
     type: "clip",
-    title: "Web clip",
+    get title() {
+      return strings.webClip();
+    },
     icon: "web"
   },
   3: {
     type: "link",
-    title: "Link",
+    get title() {
+      return strings.link();
+    },
     icon: "link"
   }
 };
@@ -353,7 +360,7 @@ const ShareView = () => {
       const note = await db.notes.note(appendNoteId);
       if (!note) {
         useShareStore.getState().setAppendNote(null);
-        Alert.alert("The note you are trying to append to has been deleted.");
+        Alert.alert(strings.noteToAppendDeleted());
         setLoading(false);
         return;
       }
@@ -531,7 +538,7 @@ const ShareView = () => {
             }}
           >
             <ActivityIndicator color={colors.primary.accent} />
-            <Paragraph>Loading clip...</Paragraph>
+            <Paragraph>{strings.loadingClip()}</Paragraph>
           </View>
         ) : (
           <ScrollView>
@@ -576,11 +583,11 @@ const ShareView = () => {
                         }}
                         allowFontScaling={false}
                       >
-                        Save note
+                        {strings.saveNote()}
                       </Heading>
                     ) : (
                       <TextInput
-                        placeholder="Enter note title"
+                        placeholder={strings.enterNoteTitle()}
                         ref={inputRef}
                         allowFontScaling={false}
                         style={{
@@ -603,7 +610,7 @@ const ShareView = () => {
                       />
                     )}
                     <Button
-                      title="Done"
+                      title={strings.done()}
                       type="accent"
                       loading={loading}
                       onPress={onPress}
@@ -624,7 +631,7 @@ const ShareView = () => {
                         color={colors.primary.paragraph}
                         allowFontScaling={false}
                       >
-                        Attaching {rawFiles.length} file(s):
+                        {strings.attachingFilesCount(rawFiles.length)}
                       </Paragraph>
                       <ScrollView horizontal>
                         {rawFiles.map((item) =>
@@ -699,7 +706,7 @@ const ShareView = () => {
                           marginTop: 6
                         }}
                       >
-                        Tap to remove an attachment.
+                        {strings.tapToRemoveAttachment()}
                       </Paragraph>
                       {rawFiles.some((item) => isImage(item.type)) ? (
                         <TouchableOpacity
@@ -711,9 +718,11 @@ const ShareView = () => {
                             width: "100%",
                             marginTop: 6
                           }}
-                          onPress={() => {
-                            if (fullQualityImages?.isAllowed) {
-                              setCompress(!compress);
+                          onPress={async () => {
+                            const feature =
+                              await isFeatureAvailable("fullQualityImages");
+                            if (feature?.isAllowed) {
+                              setCompress((prev) => !prev);
                             }
                           }}
                         >
@@ -736,11 +745,12 @@ const ShareView = () => {
                             style={{
                               flexShrink: 1,
                               marginLeft: 3,
-                              fontSize: 12
+                              fontSize: 12,
+                              color: colors.primary.paragraph
                             }}
                             allowFontScaling={false}
                           >
-                            Compress image(s) (recommended)
+                            {strings.compressImagesRecommended()}
                           </Text>
                         </TouchableOpacity>
                       ) : null}
@@ -781,7 +791,7 @@ const ShareView = () => {
                               <ActivityIndicator
                                 color={colors.primary.accent}
                               />
-                              <Paragraph>Preparing web clip...</Paragraph>
+                              <Paragraph>{strings.preparingWebClip()}</Paragraph>
                             </>
                           ) : null}
                         </>
@@ -817,7 +827,7 @@ const ShareView = () => {
                       }}
                       allowFontScaling={false}
                     >
-                      Clip Mode:
+                      {strings.clipMode()}
                     </Paragraph>
                     {rawData.value && isURL(rawData.value) ? (
                       <Button
@@ -865,7 +875,7 @@ const ShareView = () => {
                     useShareStore.getState().setAppendNote(null);
                   }}
                   type={!appendNoteId ? "transparent" : "plain"}
-                  title="New note"
+                  title={strings.newNote()}
                   allowFontScaling={false}
                   style={{
                     paddingHorizontal: 12,
@@ -885,7 +895,7 @@ const ShareView = () => {
                   }}
                   allowFontScaling={false}
                   type={appendNoteId ? "transparent" : "plain"}
-                  title={`Append to a note`}
+                  title={strings.appendToNote()}
                   style={{
                     paddingHorizontal: 12,
                     height: 45,
@@ -954,7 +964,7 @@ const AppendNote = ({
         flexWrap: "wrap"
       }}
     >
-      Above content will append to{" "}
+      {strings.aboveContentWillAppendTo()}{" "}
       <Paragraph
         size={AppFontSize.xs}
         style={{
@@ -964,8 +974,8 @@ const AppendNote = ({
         allowFontScaling={false}
       >
         {`"${item.title}"`}
-      </Paragraph>{" "}
-      . Click on {'"New note"'} to create a new note.
+      </Paragraph>
+      {strings.clickOnNewNoteToCreateNote()}
     </Paragraph>
   );
 };

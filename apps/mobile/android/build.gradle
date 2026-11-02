@@ -13,6 +13,7 @@ buildscript {
         androidXCore = "1.7.0"
         androidXBrowser = "1.0.0"
         ndkVersion = "27.1.12297006"
+        playBillingSdkVersion = "8.0.0"
     }
     
     repositories {
@@ -39,5 +40,14 @@ allprojects {
         google()
         mavenCentral()
         maven { url 'https://www.jitpack.io' }
+    }
+}
+
+// Pin the ndkVersion for all subprojects
+subprojects { subproject ->
+    ["com.android.application", "com.android.library"].each { pluginId ->
+        subproject.plugins.withId(pluginId) {
+            subproject.android.ndkVersion = rootProject.ext.ndkVersion
+        }
     }
 }

@@ -6,6 +6,12 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 require_relative 'scripts/patch_fmt_consteval'
+require_relative 'scripts/prebuilt_pods'
+
+if ENV['NN_USE_PREBUILT_IOS'] != '0'
+  ENV['RCT_USE_PREBUILT_RNCORE'] ||= '1'
+  ENV['RCT_USE_RN_DEP'] ||= '1'
+end
 
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
@@ -26,7 +32,10 @@ node_modules_path = nil
 
 target 'Notesnook' do
 
-  config = use_native_modules!
+  native_modules = list_native_modules!($default_command)
+  PrebuiltPods.setup(self, native_modules)
+
+  config = link_native_modules!(native_modules)
   rn_path = config[:reactNativePath]
   node_modules_path = File.expand_path('../node_modules', File.dirname(rn_path))
 
@@ -39,6 +48,8 @@ target 'Notesnook' do
     :fabric_enabled => true,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+  PrebuiltPods.install_react_native_dependencies_shims(self)
 
   target 'NotesnookTests' do
 
@@ -75,7 +86,6 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
   target.build_configurations.each do |config|
       config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
-      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
   installer.pods_project.targets.each do |target|
@@ -92,20 +102,4 @@ post_install do |installer|
           end
         end
       end
-
-  # Embed the active iOS build config xcconfig as the project-level base configuration.
-  # CocoaPods only manages target-level base configurations, so the project-level one
-  # is safe to set here and will survive future pod installs.
-  # To switch environments: update ios-build.active.xcconfig, then re-run pod install.
-  # active_xcconfig_rel_path = 'build-configs/ios-build.active.xcconfig'
-  # user_project = installer.aggregate_targets.first.user_project
-  # xcconfig_ref = user_project.files.find { |f| f.path&.end_with?('ios-build.active.xcconfig') }
-  # if xcconfig_ref.nil?
-  #   xcconfig_ref = user_project.main_group.new_file(active_xcconfig_rel_path, :project)
-  #   xcconfig_ref.last_known_file_type = 'text.xcconfig'
-  # end
-  # user_project.build_configurations.each do |config|
-  #   config.base_configuration_reference = xcconfig_ref
-  # end
-  # user_project.save
 end

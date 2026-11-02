@@ -69,6 +69,19 @@ export function useThemeColors(scope?: keyof ThemeScopes): ThemeScope {
   return currentTheme;
 }
 
+export function getThemeScope(
+  scope: keyof ThemeScopes,
+  theme: ThemeDefinition
+): ThemeScope {
+  const themeScope = theme.scopes[scope] || theme.scopes.base;
+  const currentTheme = {
+    colors: buildVariants(scope, theme, themeScope),
+    isDark: theme.colorScheme === "dark",
+    scope
+  };
+  return currentTheme;
+}
+
 export const useCurrentThemeScope = () => useContext(ThemeScopeContext);
 export const ScopedThemeProvider = ThemeScopeContext.Provider;
 export const THEME_COMPATIBILITY_VERSION: ThemeCompatibilityVersion = 1;

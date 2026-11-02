@@ -45,7 +45,9 @@ import { getGroupOptions } from "../../hooks/use-group-options";
 
 const NotebookScreen = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [notes, setNotes] = useState<VirtualizedGrouping<Note>>();
-  const params = useRef<NotebookScreenParams>(route?.params);
+  const params = useRef<NotebookScreenParams>(
+    route?.params || ({} as NotebookScreenParams)
+  );
   const isAppLoading = useSettingStore((state) => state.isAppLoading);
   const [notebook, setNotebook] = useState<Notebook | undefined>(
     params.current.item

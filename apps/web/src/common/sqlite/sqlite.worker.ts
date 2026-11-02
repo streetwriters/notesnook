@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { SQLiteAPI, SQLiteCompatibleType } from "./sqlite-types";
-import { Factory, SQLITE_ROW, SQLiteError } from "./sqlite-api";
+import { Factory, SQLITE_ROW, SQLITE_UTF8, SQLiteError } from "./sqlite-api";
 import { expose, transfer } from "comlink";
 import type { RunMode } from "./type";
 import { QueryResult } from "@streetwriters/kysely";
@@ -76,6 +76,23 @@ class _SQLiteWorker {
       name,
       undefined,
       `multipleciphers-${this.vfs.name}`
+    );
+
+    this.sqlite.create_function(
+      this.db,
+      "natural_key",
+      1,
+      SQLITE_UTF8,
+      0,
+      (context: number, values: Uint32Array) => {
+        const val =
+          values && values.length > 0 ? this.sqlite.value(values[0]) : null;
+        const natural =
+          typeof val === "string"
+            ? val.replace(/\d+/g, (n) => n.padStart(10, "0"))
+            : val;
+        this.sqlite.result(context, natural as SQLiteCompatibleType);
+      }
     );
   }
 

@@ -29,6 +29,7 @@ import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
 import * as openpgp from "openpgp";
 import { InboxPGPKeysDialog } from "../dialogs/inbox-pgp-keys-dialog";
+import { strings } from "@notesnook/intl";
 
 export const HostIds = [
   "API_HOST",
@@ -61,6 +62,9 @@ class SettingStore extends BaseStore<SettingStore> {
   isFullOfflineMode = Config.get("fullOfflineMode", false);
   serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
 
+  lastBackupTime?: number;
+  lastFullBackupTime?: number;
+
   zoomFactor = 1.0;
   privacyMode = false;
   customDns = true;
@@ -92,12 +96,20 @@ class SettingStore extends BaseStore<SettingStore> {
   isPortable = false;
   proxyRules?: string;
   isInboxEnabled = false;
+  appLanguage = Config.get<string>("appLanguage", "");
 
   init = () => {
     db.eventManager.subscribe(EVENTS.userFetched, async () => {
       this.set({
         isInboxEnabled: await db.user.hasInboxKeys()
       });
+    });
+  };
+
+  refreshBackupTime = async () => {
+    this.set({
+      lastBackupTime: await db.backup.lastBackupTime(),
+      lastFullBackupTime: await db.backup.lastFullBackupTime()
     });
   };
 
@@ -110,6 +122,7 @@ class SettingStore extends BaseStore<SettingStore> {
       titleFormat: db.settings.getTitleFormat(),
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
+      appLanguage: Config.get<string>("appLanguage", ""),
       isFlatpak: await desktop?.integration.isFlatpak.query(),
       isSnap: await desktop?.integration.isSnap.query(),
       isPortable: await desktop?.integration.isPortable.query(),
@@ -123,6 +136,7 @@ class SettingStore extends BaseStore<SettingStore> {
       isInboxEnabled: await db.user.hasInboxKeys(),
       backupStorageLocation: await desktop?.integration.backupDirectory.query()
     });
+    await this.refreshBackupTime();
   };
 
   setDateFormat = async (dateFormat: string) => {
@@ -191,6 +205,11 @@ class SettingStore extends BaseStore<SettingStore> {
   setImageCompression = (imageCompression: ImageCompressionOptions) => {
     this.set({ imageCompression });
     Config.set("imageCompression", imageCompression);
+  };
+
+  setAppLanguage = (appLanguage: string) => {
+    this.set({ appLanguage });
+    Config.set("appLanguage", appLanguage);
   };
 
   setDesktopIntegration = async (settings: DesktopIntegration) => {
@@ -300,11 +319,10 @@ class SettingStore extends BaseStore<SettingStore> {
     try {
       if (isInboxEnabled) {
         const ok = await ConfirmDialog.show({
-          title: "Disable Inbox API",
-          message:
-            "Disabling will delete all your unsynced inbox items. Additionally, disabling will revoke all existing API keys, they will no longer work. Are you sure?",
-          positiveButtonText: "Yes",
-          negativeButtonText: "No"
+          title: strings.disableInboxApi(),
+          message: strings.disableInboxApiWarning(),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
         });
         if (!ok) return;
 

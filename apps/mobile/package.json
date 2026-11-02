@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "3.4.8",
+  "version": "3.4.15",
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
@@ -19,8 +19,8 @@
     "e2e-android-debug": "detox test --configuration android.emu.debug --detectOpenHandles",
     "e2e-ios": "detox test -c ios.sim.release --detectOpenHandles",
     "bump": "node ./scripts/bump-version.mjs",
-    "release-android": "cd android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew assembleRelease --no-daemon",
-    "release-android-bundle": "cd android && ./gradlew bundleRelease --no-daemon",
+    "release-android": "cd android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew :app:assembleRelease --no-daemon",
+    "release-android-bundle": "cd android && ./gradlew :app:bundleRelease --no-daemon",
     "lint": "eslint --ext .js,.jsx,.tsx,.ts ./app"
   },
   "overrides": {
@@ -33,7 +33,7 @@
     "@ammarahmed/react-native-eventsource": "1.1.0",
     "@ammarahmed/react-native-fingerprint-scanner": "^5.0.1",
     "@ammarahmed/react-native-share-extension": "^2.9.5",
-    "@ammarahmed/react-native-sodium": "^1.6.8",
+    "@ammarahmed/react-native-sodium": "^2.0.0-alpha.1",
     "@ammarahmed/react-native-upload": "^6.33.0",
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@bam.tech/react-native-image-resizer": "3.0.11",
@@ -42,8 +42,6 @@
     "@formatjs/intl-locale": "4.0.0",
     "@formatjs/intl-pluralrules": "5.2.14",
     "@legendapp/list": "^2.0.14",
-    "@lingui/core": "5.1.2",
-    "@lingui/react": "5.1.2",
     "@mdi/js": "^6.7.96",
     "@messageformat/parser": "^5.1.1",
     "@notesnook/common": "file:../../packages/common",
@@ -116,6 +114,7 @@
     "react-native-in-app-review": "4.4.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-keychain": "4.0.5",
+    "react-native-localize": "^3.7.0",
     "react-native-material-menu": "^2.0.0",
     "react-native-mmkv-storage": "^12.0.1",
     "react-native-modal-datetime-picker": "14.0.0",
@@ -130,6 +129,7 @@
     "react-native-quick-sqlite": "^8.2.7",
     "react-native-reanimated": "^4.2.0",
     "react-native-reanimated-progress-bar": "1.0.1",
+    "react-native-restart": "^0.0.28",
     "react-native-safe-area-context": "^5.6.1",
     "react-native-scoped-storage": "^1.9.5",
     "react-native-screenguard": "^2.0.0-beta5",

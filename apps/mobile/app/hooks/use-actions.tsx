@@ -60,6 +60,7 @@ import {
 } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
+import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
@@ -144,7 +145,7 @@ export type Action = {
   locked?: boolean;
 };
 
-export const Default_Drag_Action: Action = {
+export const getDefaultDragAction = (): Action => ({
   id: "reorder",
   title: strings.reorder(),
   icon: "sort-ascending",
@@ -167,7 +168,7 @@ export const Default_Drag_Action: Action = {
     });
     eSendEvent(eCloseSheet);
   }
-};
+});
 
 function isNotePinnedInNotifications(item: Item) {
   const pinned = Notifications.getPinnedNotes();
@@ -278,12 +279,13 @@ export const useActions = ({
     close();
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
+    PinnedNotesWidget.updateNotes();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
       heading:
         type === "note"
-          ? "Note restored from trash"
-          : "Notebook restored from trash",
+          ? strings.noteRestoredFromTrash()
+          : strings.notebookRestoredFromTrash(),
       type: "success"
     });
   }
@@ -293,6 +295,7 @@ export const useActions = ({
     if (item.type === "note") {
       await db.notes.pin(!item?.pinned, item.id);
       setItem((await db.notes.note(item.id)) as Item);
+      PinnedNotesWidget.updateNotes();
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
       setItem((await db.notebooks.notebook(item.id)) as Item);
@@ -359,7 +362,7 @@ export const useActions = ({
       },
       input: true,
       defaultValue: item.title,
-      inputPlaceholder: "Enter title of tag",
+      inputPlaceholder: strings.enterTagTitle(),
       positiveText: strings.save()
     });
   }
@@ -742,9 +745,9 @@ export const useActions = ({
           isHomepage
             ? undefined
             : {
-                id: item.id,
-                type: item.type
-              }
+              id: item.id,
+              type: item.type
+            }
         );
       }
     });
@@ -869,7 +872,7 @@ export const useActions = ({
               mode: AuthMode.login
             });
           },
-          actionText: "Login"
+          actionText: strings.login()
         });
         return;
       }
@@ -1188,6 +1191,7 @@ export const useActions = ({
           setItem((await db.notes.note(item.id)) as Item);
           Navigation.queueRoutesForUpdate();
           useArchivedStore.getState().refresh();
+          PinnedNotesWidget.updateNotes();
         },
         checked: item.archived,
         isToggle: true

@@ -25,6 +25,7 @@ import { formatBytes } from "@notesnook/common";
 import { ArrowDown, ArrowLeft, Loading } from "../components/icons";
 import { hardNavigate } from "../navigation";
 import { MonthlyActivityHeatmap } from "../components/monthly-activity-heatmap";
+import { strings } from "@notesnook/intl";
 
 function formatNumber(num: number) {
   return num.toLocaleString();
@@ -156,7 +157,7 @@ function WelcomeSlide({ loading }: { loading: boolean }) {
           animation: "slideUp 1s ease-out 0.2s both"
         }}
       >
-        Your {new Date().getFullYear()} Wrapped
+        {strings.yourYearWrapped(new Date().getFullYear())}
       </Text>
 
       {loading ? (
@@ -175,7 +176,7 @@ function WelcomeSlide({ loading }: { loading: boolean }) {
               animation: "fadeIn 1s ease-out 0.4s both"
             }}
           >
-            Let&apos;s look back at your year in Notesnook
+            {strings.letsLookBackAtYourYearInNotesnook()}
           </Text>
           <Text
             variant="body"
@@ -187,7 +188,7 @@ function WelcomeSlide({ loading }: { loading: boolean }) {
               animation: "fadeIn 1s ease-out 0.4s both"
             }}
           >
-            Scroll down to explore
+            {strings.scrollDownToExplore()}
           </Text>
           <ArrowDown sx={{ mt: 2 }} color="paragraph-secondary" />
         </>
@@ -209,7 +210,7 @@ function TotalNotesSlide({ count }: { count: number }) {
               animation: "fadeIn 0.8s ease-out"
             }}
           >
-            You created
+            {strings.youCreated()}
           </Text>
           <Text
             variant="heading"
@@ -230,7 +231,7 @@ function TotalNotesSlide({ count }: { count: number }) {
               animation: "fadeIn 0.8s ease-out 0.4s both"
             }}
           >
-            notes this year
+            {strings.notesThisYear()}
           </Text>
         </Flex>
         <Flex
@@ -252,17 +253,17 @@ function TotalNotesSlide({ count }: { count: number }) {
               lineHeight: 1.8
             }}
           >
-            That&apos;s <strong>{formatNumber(count)}</strong>
+            {strings.thats()} <strong>{formatNumber(count)}</strong>
             <br />
-            ideas
+            {strings.wrappedIdeas()}
             <br />
-            thoughts
+            {strings.wrappedThoughts()}
             <br />
-            memories.
+            {strings.wrappedMemories()}
             <br />
-            100% encrypted.
+            {strings.hundredPercentEncrypted()}
             <br />
-            100% yours.
+            {strings.hundredPercentYours()}
           </Text>
         </Flex>
       </Flex>
@@ -295,7 +296,7 @@ function TotalWordsSlide({ count }: { count: number }) {
           animation: "fadeIn 0.8s ease-out"
         }}
       >
-        You wrote a total of
+        {strings.youWroteATotalOf()}
       </Text>
       <Text
         variant="heading"
@@ -316,7 +317,7 @@ function TotalWordsSlide({ count }: { count: number }) {
           animation: "fadeIn 0.8s ease-out 0.4s both"
         }}
       >
-        words this year
+        {strings.wordsThisYear()}
       </Text>
       {tagline ? (
         <Text
@@ -358,7 +359,7 @@ function ActivityStatsSlide({
               fontSize: ["1.2rem", "1.5rem"]
             }}
           >
-            Your most productive month was
+            {strings.yourMostProductiveMonthWas()}
           </Text>
           <Flex
             sx={{
@@ -380,7 +381,7 @@ function ActivityStatsSlide({
               sx={{ fontSize: "1rem" }}
               color="paragraph-secondary"
             >
-              {formatNumber(mostNotesCreatedInMonth.count)} notes
+              {strings.notes(mostNotesCreatedInMonth.count)}
             </Text>
           </Flex>
         </>
@@ -394,7 +395,7 @@ function ActivityStatsSlide({
               mt: 5
             }}
           >
-            Your favorite day to write was
+            {strings.yourFavoriteDayToWriteWas()}
           </Text>
           <Flex
             sx={{
@@ -416,7 +417,7 @@ function ActivityStatsSlide({
               sx={{ fontSize: "1rem" }}
               color="paragraph-secondary"
             >
-              {formatNumber(mostNotesCreatedInDay.count)} notes
+              {strings.notes(mostNotesCreatedInDay.count)}
             </Text>
           </Flex>
         </>
@@ -461,7 +462,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
           textDecorationColor: "border"
         }}
       >
-        NOTESNOOK WRAPPED {new Date().getFullYear()}
+        {strings.notesnookWrappedYear(new Date().getFullYear())}
       </Text>
       <Flex
         sx={{
@@ -490,32 +491,32 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
               {
                 icon: "📝",
                 count: stats.totalNotes,
-                label: "Notes"
+                label: strings.routes.Notes()
               },
               {
                 icon: "🎨",
                 count: stats.totalColors,
-                label: "Colors"
+                label: strings.colors()
               },
               {
                 icon: "📚",
                 count: stats.totalNotebooks,
-                label: "Notebooks"
+                label: strings.routes.Notebooks()
               },
               {
                 icon: "🏷️",
                 count: stats.totalTags,
-                label: "Tags"
+                label: strings.routes.Tags()
               },
               {
                 icon: "📂",
                 count: stats.totalAttachments,
-                label: "Files"
+                label: strings.attachments()
               },
               {
                 icon: "☁️",
                 count: stats.totalMonographs,
-                label: "Monographs"
+                label: strings.routes.Monographs()
               }
             ].map(({ icon, count, label }) => (
               <Flex
@@ -556,17 +557,19 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
             }}
           >
             <Text sx={{ fontSize: "1rem", fontWeight: "bold" }}>
-              Fun facts of the year
+              {strings.funFactsOfTheYear()}
             </Text>
             {stats.mostNotesCreatedInMonth && (
               <Text sx={{ fontSize: "0.9rem", color: "fontTertiary" }}>
-                📅 Your most productive month was{" "}
+                {"📅 "}
+                {strings.yourMostProductiveMonthWas()}{" "}
                 <Text as="strong">{stats.mostNotesCreatedInMonth.month}</Text>
               </Text>
             )}
             {stats.mostNotesCreatedInDay && (
               <Text sx={{ fontSize: "0.9rem", color: "fontTertiary" }}>
-                🗓️ Your favorite day to write was{" "}
+                {"🗓️ "}
+                {strings.yourFavoriteDayToWriteWas()}{" "}
                 <Text as="strong">{stats.mostNotesCreatedInDay.day}</Text>
               </Text>
             )}
@@ -578,10 +581,10 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
                   maxWidth: 340
                 }}
               >
-                📝 Your longest note was{" "}
+                {"📝 "}
+                {strings.yourLongestNoteWas()}{" "}
                 <Text as="strong">
-                  {formatNumber(stats.largestNote.length)}
-                  {" words"}
+                  {strings.wordsCount(stats.largestNote.length)}
                 </Text>
               </Text>
             )}
@@ -593,7 +596,8 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
                   maxWidth: 340
                 }}
               >
-                🔗 Your largest attachment was{" "}
+                {"🔗 "}
+                {strings.yourLargestAttachmentWas()}{" "}
                 <strong>{formatBytes(stats.largestAttachment.size)}</strong>
               </Text>
             )}
@@ -626,7 +630,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
               {formatNumber(stats.totalWords)}
             </Text>
             <Text sx={{ fontSize: "1rem", color: "fontTertiary" }}>
-              Words Written
+              {strings.wordsWritten()}
             </Text>
           </Flex>
 
@@ -647,7 +651,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
                 textAlign: "center"
               }}
             >
-              Notes per month
+              {strings.notesPerMonth()}
             </Text>
           </Flex>
         </Flex>
@@ -657,7 +661,7 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
         color="paragraph-secondary"
         sx={{ mt: 2, borderTop: "1px solid var(--border)", pt: 2 }}
       >
-        Generated 100% locally on your device.
+        {strings.generatedLocallyOnDevice()}
       </Text>
     </Slide>
   );
@@ -768,7 +772,7 @@ export default function Wrapped() {
       >
         <Flex sx={{ alignItems: "center", gap: 1, justifyContent: "center" }}>
           <ArrowLeft size={16} />
-          <Text variant="body">Go back to app</Text>
+          <Text variant="body">{strings.goBackToApp()}</Text>
         </Flex>
       </Button>
     </>

@@ -350,7 +350,8 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
                   width: "100%",
                   height: 200,
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
+                  paddingHorizontal: DefaultAppStyles.GAP
                 }}
               >
                 <Heading size={50} color={colors.secondary.heading}>
@@ -359,6 +360,7 @@ const ManageTags = (props: NavigationProps<"ManageTags">) => {
                 <Paragraph
                   textBreakStrategy="balanced"
                   color={colors.secondary.paragraph}
+                  style={{ textAlign: "center" }}
                 >
                   {strings.emptyPlaceholders("tag")}
                 </Paragraph>

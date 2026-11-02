@@ -82,7 +82,7 @@ export const ChangePassword = () => {
       );
 
       if (!passwordChanged) {
-        throw new Error("Could not change user account password.");
+        throw new Error(strings.couldNotChangePassword());
       }
 
       ToastManager.show({

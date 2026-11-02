@@ -121,6 +121,7 @@ function Field(props: FieldProps) {
           type={isPasswordVisible ? "text" : type || "text"}
           sx={{
             flex: 1,
+            pr: rightActions.length > 0 ? 20 : undefined,
             ...styles?.input,
             pointerEvents: disabled ? "none" : "all",
             ":disabled": {

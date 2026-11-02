@@ -258,7 +258,7 @@ export const useTabStore = create<TabStore, any>(
 
         const sessionId =
           oldSessionId &&
-            tabSessionHistory.currentSessionId(tabId) === oldSessionId
+          tabSessionHistory.currentSessionId(tabId) === oldSessionId
             ? oldSessionId
             : tabSessionHistory.add(tabId, oldSessionId);
 
@@ -389,7 +389,7 @@ export const useTabStore = create<TabStore, any>(
       focusPreviewTab: (
         noteId: string,
         options: Omit<Partial<TabItem>, "id" | "noteId">
-      ) => { },
+      ) => {},
 
       removeTab: (id: string) => {
         const index = get().tabs.findIndex((t) => t.id === id);
@@ -508,7 +508,19 @@ export const useTabStore = create<TabStore, any>(
     }),
     {
       name: "tabs-storage-v5",
-      getStorage: () => MMKV as unknown as StateStorage,
+      getStorage: () =>
+        ({
+          getItem(name: string) {
+            return MMKV.getString(name);
+          },
+          setItem(name: string, value: string) {
+            MMKV.setString(name, value);
+            return;
+          },
+          removeItem(name: string) {
+            MMKV.removeItem(name);
+          }
+        }) as unknown as StateStorage,
       onRehydrateStorage: () => {
         return (state) => {
           history.history = state?.historyNew || [];

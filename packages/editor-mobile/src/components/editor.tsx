@@ -37,8 +37,8 @@ import {
   useState
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
-import { useSafeArea } from "../hooks/useSafeArea";
-import { useSettings } from "../hooks/useSettings";
+import { useSafeAreaStore } from "../hooks/useSafeArea";
+import { useSettingsStore } from "../hooks/useSettings";
 import { TabItem, useTabContext, useTabStore } from "../hooks/useTabStore";
 import { postAsyncWithTimeout, Settings } from "../utils";
 import { EditorEvents } from "../utils/editor-events";
@@ -79,7 +79,7 @@ const Tiptap = ({
     undo,
     redo
   });
-  const insets = useSafeArea();
+  const insets = useSafeAreaStore((state) => state.insets);
   tabRef.current = tab;
   valueRef.current = {
     undo,
@@ -277,7 +277,7 @@ const Tiptap = ({
     (
       scrollTop?: number,
       selection?: { to: number; from: number },
-      searchResultIndex?: number
+      searchResultIndex?: number | string
     ) => {
       setTick((tick) => tick + 1);
       globalThis.editorControllers[tabRef.current.id]?.setTitlePlaceholder(
@@ -302,9 +302,10 @@ const Tiptap = ({
   const controller = useEditorController({
     update,
     getTableOfContents: () => {
-      return !containerRef.current
+      const editor = editors[tab.id];
+      return !containerRef.current || !editor
         ? []
-        : getTableOfContents(containerRef.current);
+        : getTableOfContents(editor.state.doc, containerRef.current);
     },
     scrollTop: () => containerRef.current?.scrollTop || 0,
     scrollTo: (top) => {
@@ -956,7 +957,15 @@ const Tiptap = ({
         </div>
 
         <TiptapEditorWrapper
-          key={tick + tab.id + "-editor"}
+          key={[
+            tick,
+            tab.id,
+            settings.doubleSpacedLines ? "ds" : "ss",
+            settings.dateFormat,
+            settings.timeFormat,
+            settings.dayFormat,
+            tab.session?.readonly ? "readonly" : "edit"
+          ].join("-")}
           options={tiptapOptions}
           settings={settings}
           onEditorUpdate={(editor) => {
@@ -978,7 +987,7 @@ const Tiptap = ({
 };
 
 const TiptapProvider = (): JSX.Element => {
-  const settings = useSettings();
+  const settings = useSettingsStore((state) => state.settings);
   const { colors } = useThemeColors("editor");
   const contentRef = useRef<HTMLElement>();
 

@@ -156,8 +156,8 @@ export function TablePopup(props: TablePopupProps) {
         >
           <InlineInput
             containerProps={{ sx: { mr: 1, flexShrink: 1 } }}
-            label="columns"
-            placeholder={`${cellLocation.column} columns`}
+            label={strings.columns()}
+            placeholder={strings.totalColumns(cellLocation.column)}
             type="number"
             value={cellLocation.column}
             onChange={(e) => {
@@ -169,8 +169,8 @@ export function TablePopup(props: TablePopupProps) {
           />
           <InlineInput
             containerProps={{ sx: { flexShrink: 1 } }}
-            label="rows"
-            placeholder={`${cellLocation.row} rows`}
+            label={strings.rows()}
+            placeholder={strings.totalRows(cellLocation.row)}
             type="number"
             value={cellLocation.row}
             onChange={(e) => {

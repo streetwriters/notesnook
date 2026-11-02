@@ -29,7 +29,7 @@ export const ThemeQuerySchema = z.object({
       })
     )
     .optional(),
-  limit: z.number(),
-  cursor: z.number().default(0),
+  limit: z.number().int().min(1).max(100),
+  cursor: z.number().int().min(0).default(0),
   compatibilityVersion: z.number().default(THEME_COMPATIBILITY_VERSION)
 });

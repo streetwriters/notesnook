@@ -24,6 +24,7 @@ import { ipcRenderer, contextBridge } from "electron";
 declare global {
   var os: () => "mas" | typeof process.platform;
   var electronTRPC: any;
+  var appLocale: () => string;
 }
 
 const electronTRPC = {
@@ -34,6 +35,8 @@ const electronTRPC = {
 };
 
 const os = () => (MAC_APP_STORE ? "mas" : process.platform);
+const appLocale = () => ipcRenderer.sendSync("get-app-locale");
 
 contextBridge.exposeInMainWorld("electronTRPC", electronTRPC);
 contextBridge.exposeInMainWorld("os", os);
+contextBridge.exposeInMainWorld("appLocale", appLocale);

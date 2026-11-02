@@ -57,6 +57,14 @@ test("remove attachments with particular hash", async () => {
   expect(result).not.toContain(`d3eab72e94e3cd35`);
 });
 
+test("search result tags are removed along with their closing tags", async () => {
+  const tiptap = new Tiptap(
+    `<p>hello <nn-search-result>wor</nn-search-result>ld</p><p><nn-search-result><b>bold</b></nn-search-result></p>`
+  );
+  const result = await tiptap.postProcess(async () => undefined);
+  expect(result.data).toBe(`<p>hello world</p><p><b>bold</b></p>`);
+});
+
 const HTMLS = {
   tables: `<table style="border-collapse: collapse; width: 811px;" border="1"><tbody><tr><td style="width: 81.375px;">Goal</td><td style="width: 708.625px;">To introduce various features of the app to the user and to convert a user on trial or basic plan to upgrade.</td></tr><tr><td style="width: 81.375px;">Frequency</td><td style="width: 708.625px;">1/week or 2/week</td></tr><tr><td style="width: 81.375px;">Types</td><td style="width: 708.625px;">Feature intro, upgrade promo, one time emails</td></tr><tr><td style="width: 81.375px;"></td><td style="width: 708.625px;"></td></tr></tbody></table><h2>Emails</h2><h3>Feature intro</h3><p>Features:</p><ol style="list-style-type: decimal;"><li>Web clipper on mobile</li><li>Pin any note to notification</li><li>Take notes from notifications</li><li>App lock</li><li>Importer</li><li>Encrypted attachments</li><li>Session history &amp; automatic backups</li><li>Note publishing</li><li>Note exports</li><li>Collapsible headers</li></ol><h3>Promos</h3><ol style="list-style-type: decimal;"><li>Trial about to end</li><li>Trial ending (with option to request an extension)</li><li>Try free for 14 days</li></ol><h3>One time</h3><ol style="list-style-type: decimal;"><li>End-of-month progress report</li><li>What's coming/roadmap</li><li>What we are working on</li><li>Join the community</li></ol>`,
   tables2: `<h1>Note 8/6/22, 10:48 AM</h1>
@@ -84,3 +92,21 @@ for (const html in HTMLS) {
     expect(tiptap.toTXT()).toMatchSnapshot(`html-to-txt-${html}.txt`);
   });
 }
+
+test("search ignores empty tokens", () => {
+  const tiptap = new Tiptap("<p>hello world</p>");
+  expect(tiptap.search("zzz ")).toBe(false);
+  expect(tiptap.search(" hello")).toBe(true);
+});
+
+test("list blocks include their nested lists' content", () => {
+  // the editor only assigns block ids to top-level blocks so nested lists have none
+  const tiptap = new Tiptap(
+    `<ul data-block-id="ul1"><li><p>parent</p><ul><li><p>child</p></li></ul></li><li><p>sibling</p></li></ul>`
+  );
+  const blocks = tiptap.extract("blocks").blocks;
+  expect(blocks).toHaveLength(1);
+  expect(blocks[0].content).toContain("parent");
+  expect(blocks[0].content).toContain("child");
+  expect(blocks[0].content).toContain("sibling");
+});

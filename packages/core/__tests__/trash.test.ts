@@ -167,6 +167,30 @@ test("permanently delete items older than 7 days", () =>
     expect(await db.trash.all()).toHaveLength(0);
   }));
 
+test("trash cleanup should delete all expired items", () =>
+  databaseTest().then(async (db) => {
+    const noteIds: string[] = [];
+    const notebookIds: string[] = [];
+    for (let i = 0; i < 5; i++) noteIds.push(await db.notes.add(TEST_NOTE));
+    for (let i = 0; i < 3; i++)
+      notebookIds.push((await db.notebooks.add(TEST_NOTEBOOK))!);
+
+    await db.notes.moveToTrash(...noteIds);
+    await db.notebooks.moveToTrash(...notebookIds);
+
+    const expired = dayjs().subtract(30, "days").toDate().getTime();
+    await db.notes.collection.update(noteIds, { dateDeleted: expired });
+    await db.notebooks.collection.update(notebookIds, {
+      dateDeleted: expired
+    });
+
+    expect(await db.trash.all()).toHaveLength(8);
+
+    await db.trash.cleanup();
+
+    expect(await db.trash.all()).toHaveLength(0);
+  }));
+
 test("trash cleanup should not delete items newer than 7 days", () =>
   databaseTest().then(async (db) => {
     const noteId = await db.notes.add(TEST_NOTE);
@@ -384,4 +408,30 @@ test("permanently deleted note should not have note fields", () =>
       "id",
       "synced"
     ]);
+  }));
+
+test("trash list should be sorted globally across batches", () =>
+  databaseTest().then(async (db) => {
+    const ids: string[] = [];
+    for (let i = 0; i < 510; i++)
+      ids.push(await db.notes.add({ title: `${510 - i}` }));
+    await db.trash.add("note", ids);
+    // app-deleted items are hidden from the list & must not affect headers
+    await db.trash.add("note", [await db.notes.add({ title: "zzz" })], "app");
+
+    const grouping = await db.trash.grouped({
+      groupBy: "abc",
+      sortBy: "title",
+      sortDirection: "asc"
+    });
+    const titles: string[] = [];
+    for (let i = 0; i < grouping.length; i++)
+      titles.push((await grouping.item(i)).item!.title);
+    expect(titles).toStrictEqual(
+      Array.from({ length: 510 }, (_, i) => `${i + 1}`)
+    );
+
+    for (const { index, group } of await grouping.groups!()) {
+      expect((await grouping.item(index)).group?.title).toBe(group.title);
+    }
   }));

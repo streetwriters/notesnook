@@ -1,0 +1,88 @@
+name: Notesnook Desktop Preview Publish
+
+# TRUSTED stage. Runs via `workflow_run` after the build workflow finishes, so
+# it has a write-scoped token. It only looks up the build's artifacts through
+# the API and posts the PR comment. It never checks out or executes fork code.
+
+on:
+  workflow_run:
+    workflows: ["Notesnook Desktop Preview Build"]
+    types: [completed]
+
+jobs:
+  post-pr-comment:
+    name: Post PR comment with preview URLs
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout base repo (trusted)
+        uses: actions/checkout@v5
+        # No `ref` -> default branch. Only the shared actions are needed.
+        with:
+          sparse-checkout: .github/actions
+
+      - name: Download PR metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: desktop-preview-meta
+          path: ${{ runner.temp }}/artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load & verify PR metadata
+        id: meta
+        uses: ./.github/actions/verify-pr-meta
+        with:
+          meta-file: ${{ runner.temp }}/artifact/pr-meta.env
+
+      - name: Post or update PR comment
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.meta.outputs.pr-number }}
+          HEAD_SHA: ${{ steps.meta.outputs.head-sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        with:
+          script: |
+            const marker = '<!-- desktop-preview-comment -->';
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!prNumber) return;
+            const runId = Number(process.env.RUN_ID);
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+            });
+            const urlFor = (name) => {
+              const artifact = artifacts.find(a => a.name === name);
+              return artifact && `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}/artifacts/${artifact.id}`;
+            };
+            const previewUrl = [
+              { platform: 'macOS', url: urlFor('macos-build') },
+              { platform: 'Linux x64', url: urlFor('linux-x64-build') },
+              { platform: 'Linux arm64', url: urlFor('linux-arm64-build') },
+              { platform: 'Windows x64', url: urlFor('windows-build') },
+            ].filter(u => u.url).map(u => `- [${u.platform}](${u.url})`).join('\n');
+            const body = `${marker}\n**Desktop Previews**\n\n${previewUrl || 'Preview URL unavailable — check workflow logs.'}\n\nCommit: ${process.env.HEAD_SHA}\n`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
