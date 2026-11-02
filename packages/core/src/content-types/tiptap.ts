@@ -102,7 +102,7 @@ export class Tiptap {
   // }
 
   search(query: string) {
-    const tokens = query.toLowerCase().split(splitter);
+    const tokens = query.toLowerCase().split(splitter).filter(Boolean);
     const lowercase = this.toTXT().toLowerCase();
     return tokens.some((token) => lowercase.indexOf(token) > -1);
   }

@@ -92,3 +92,21 @@ for (const html in HTMLS) {
     expect(tiptap.toTXT()).toMatchSnapshot(`html-to-txt-${html}.txt`);
   });
 }
+
+test("search ignores empty tokens", () => {
+  const tiptap = new Tiptap("<p>hello world</p>");
+  expect(tiptap.search("zzz ")).toBe(false);
+  expect(tiptap.search(" hello")).toBe(true);
+});
+
+test("list blocks include their nested lists' content", () => {
+  // the editor only assigns block ids to top-level blocks so nested lists have none
+  const tiptap = new Tiptap(
+    `<ul data-block-id="ul1"><li><p>parent</p><ul><li><p>child</p></li></ul></li><li><p>sibling</p></li></ul>`
+  );
+  const blocks = tiptap.extract("blocks").blocks;
+  expect(blocks).toHaveLength(1);
+  expect(blocks[0].content).toContain("parent");
+  expect(blocks[0].content).toContain("child");
+  expect(blocks[0].content).toContain("sibling");
+});
