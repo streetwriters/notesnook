@@ -198,7 +198,7 @@ export const BuyPlan = (props: {
 
               <Heading color={colors.primary.accent} fontSize="SM">
                 {hasTrialOffer
-                  ? "Free"
+                  ? strings.free()
                   : pricingPlans.getStandardPrice(
                       pricingPlans.selectedProduct as RNIap.Subscription
                     )}

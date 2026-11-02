@@ -222,7 +222,7 @@ export const CommandPaletteDialog = DialogManager.register(
                   >
                     {query
                       ? strings.noResultsFound(query)
-                      : "No recent searches"}
+                      : strings.noRecentSearches()}
                   </Text>
                 </Flex>
               ),

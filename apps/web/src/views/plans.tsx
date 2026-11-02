@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { SubscriptionPlan } from "@notesnook/core";
 import {
   ComparePlans,
@@ -121,7 +122,7 @@ function Plans() {
                 gap: "spacing4"
               }}
             >
-              Skip
+              {strings.skip()}
               <CaretRight size={14} color="heading" />
             </Button>
             <Flex
@@ -136,7 +137,7 @@ function Plans() {
                 variant="heading"
                 sx={{ fontSize: "4xl", textAlign: "center" }}
               >
-                Notesnook Plans
+                {strings.notesnookPlansTitle()}
               </Text>
               <Text
                 variant="body"
@@ -148,11 +149,9 @@ function Plans() {
                   fontWeight: 400
                 }}
               >
-                Choose a plan that fits your workflow and keep your notes secure
-                across every device.
+                {strings.notesnookPlansDesc[0]()}
                 <br />
-                Enjoy powerful privacy-focused features designed for
-                distraction-free writing and organization.
+                {strings.notesnookPlansDesc[1]()}
               </Text>
             </Flex>
             <PlansList
@@ -264,7 +263,7 @@ function PlansCTA() {
                 whiteSpace: "nowrap"
               }}
             >
-              UNLOCK THE FULL POWER OF NOTESNOOK
+              {strings.unlockFullPowerOfNotesnook().toUpperCase()}
             </Text>
           </Flex>
           <Flex
@@ -289,7 +288,7 @@ function PlansCTA() {
                   color: inverseHeading
                 }}
               >
-                Your notes deserve more than basic storage
+                {strings.notesDeserveMoreThanStorage()}
               </Text>
               <Text
                 sx={{
@@ -298,8 +297,7 @@ function PlansCTA() {
                   lineHeight: 1.5
                 }}
               >
-                Unlock encrypted syncing, larger storage, premium productivity
-                features, and everything you need to write with confidence.
+                {strings.notesDeserveMoreThanStorageDesc()}
               </Text>
             </Flex>
             <Button
@@ -317,7 +315,7 @@ function PlansCTA() {
                 gap: "spacing3"
               }}
             >
-              Choose your plan
+              {strings.chooseYourPlan()}
               <ArrowUp size={15} color="accentForeground" />
             </Button>
           </Flex>
@@ -378,7 +376,7 @@ function PlansCTA() {
                 whiteSpace: "nowrap"
               }}
             >
-              Privacy policy
+              {strings.privacyPolicy()}
             </Text>
             <Text
               as="a"
@@ -393,7 +391,7 @@ function PlansCTA() {
                 whiteSpace: "nowrap"
               }}
             >
-              Terms of service
+              {strings.tos()}
             </Text>
           </Flex>
         </Flex>

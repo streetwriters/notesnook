@@ -98,11 +98,8 @@ export const NotesnookCircle = () => {
             gap: Spacing.LEVEL_0
           }}
         >
-          <Heading fontSize="XL">Partner offers</Heading>
-          <Paragraph>
-            Get exclusive discounts from our trusted partners who share our
-            commitment to privacy and user freedom.
-          </Paragraph>
+          <Heading fontSize="XL">{strings.partnerOffers()}</Heading>
+          <Paragraph>{strings.partnerOffersDesc()}</Paragraph>
         </View>
 
         {!isFree && !isOnTrial ? null : (
@@ -255,7 +252,7 @@ const Partner = ({
                     color={colors.secondary.paragraph}
                     size={AppFontSize.xs}
                   >
-                    Discount code
+                    {strings.discountCode()}
                   </Paragraph>
                   <Paragraph
                     size={AppFontSize.xxs}

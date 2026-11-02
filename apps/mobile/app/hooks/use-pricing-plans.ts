@@ -38,22 +38,30 @@ export const PlanOverView = {
   free: {
     storage: `50 MB`,
     fileSize: `1 MB`,
-    hdImages: "No"
+    get hdImages() {
+      return strings.no();
+    }
   },
   essential: {
     storage: `1 GB`,
     fileSize: `100 MB`,
-    hdImages: "No"
+    get hdImages() {
+      return strings.no();
+    }
   },
   pro: {
     storage: `10 GB`,
     fileSize: `1 GB`,
-    hdImages: "Yes"
+    get hdImages() {
+      return strings.yes();
+    }
   },
   believer: {
     storage: `25 GB`,
     fileSize: `5 GB`,
-    hdImages: "Yes"
+    get hdImages() {
+      return strings.yes();
+    }
   }
 };
 

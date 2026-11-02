@@ -98,6 +98,13 @@ const CHECKOUT_STEP = {
   COMPLETE: "Complete"
 } as const;
 
+const getCheckoutStepTitle = (step: CheckoutStep) =>
+  ({
+    [CHECKOUT_STEP.ACCOUNT]: strings.account(),
+    [CHECKOUT_STEP.PAYMENT]: strings.payment(),
+    [CHECKOUT_STEP.COMPLETE]: strings.complete()
+  }[step]);
+
 type CheckoutStep = (typeof CHECKOUT_STEP)[keyof typeof CHECKOUT_STEP];
 
 function Checkout() {
@@ -216,7 +223,7 @@ function Checkout() {
           </Flex>
         </Flex>
         <Button variant="new_bordered" sx={{ px: "spacing6" }}>
-          Contact
+          {strings.contact()}
         </Button>
       </Flex>
       {currentStep === CHECKOUT_STEP.COMPLETE ? (
@@ -305,7 +312,7 @@ function Checkout() {
                         fontWeight: 500
                       }}
                     >
-                      {step}
+                      {getCheckoutStepTitle(step)}
                     </Text>
                   </Flex>
                   {index <
@@ -443,23 +450,23 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
   const features = [
     {
       icon: <Cloud size={15} color="icon" />,
-      title: "Cloud Storage",
+      title: strings.cloudStorageTitle(),
       value: storageCaption
     },
     {
       icon: <ShieldCheck size={15} color="icon" />,
-      title: "Encryption",
-      value: "AES-256 Zero Know"
+      title: strings.encryption(),
+      value: strings.encryptionValue()
     },
     {
       icon: <DeviceMobileCamera size={15} color="icon" />,
-      title: "Device Sync",
-      value: "Unlimited Sync"
+      title: strings.deviceSync(),
+      value: strings.unlimitedSync()
     },
     {
       icon: <Info size={15} color="icon" />,
-      title: "VIP Support",
-      value: "Prioritized Priority"
+      title: strings.vipSupport(),
+      value: strings.prioritizedSupport()
     }
   ];
 
@@ -516,7 +523,7 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
                 lineHeight: 1
               }}
             >
-              Payment Confirmed!
+              {strings.paymentConfirmed()}
             </Text>
             <Text
               sx={{
@@ -526,9 +533,7 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
                 lineHeight: 1.5
               }}
             >
-              Your premium workspace is ready. Enjoy secure note-taking,
-              seamless syncing, and a distraction-free writing experience across
-              all your devices.
+              {strings.paymentConfirmedDesc()}
             </Text>
           </Flex>
         </Flex>
@@ -551,7 +556,7 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
                 lineHeight: 1
               }}
             >
-              Active Membership
+              {strings.activeMembership()}
             </Text>
             <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
               <Box
@@ -570,11 +575,10 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
                   lineHeight: 1
                 }}
               >
-                {
+                {strings.planWithTitle(
                   PLAN_METADATA[selectedPlan.plan as keyof typeof PLAN_METADATA]
                     .title
-                }{" "}
-                Plan
+                )}
               </Text>
             </Flex>
           </Flex>
@@ -627,7 +631,7 @@ function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
           fontSize: "sm"
         }}
       >
-        Start taking notes securely
+        {strings.startTakingNotesSecurely()}
       </Button>
     </Flex>
   );
@@ -659,7 +663,7 @@ function CheckoutSummaryMobile() {
           lineHeight: "100%"
         }}
       >
-        Payment Summary
+        {strings.paymentSummary()}
       </Text>
       <SummaryContent
         selectedPlan={selectedPlan}
@@ -699,7 +703,7 @@ function CheckoutSummary() {
           lineHeight: "100%"
         }}
       >
-        Payment Summary
+        {strings.paymentSummary()}
       </Text>
       <Flex
         sx={{
@@ -773,8 +777,9 @@ function SummaryContent(props: SummaryContentProps) {
             lineHeight: "100%"
           }}
         >
-          {PLAN_METADATA[selectedPlan.plan as keyof typeof PLAN_METADATA].title}{" "}
-          Plan
+          {strings.planWithTitle(
+            PLAN_METADATA[selectedPlan.plan as keyof typeof PLAN_METADATA].title
+          )}
         </Text>
         <Text
           sx={{
@@ -852,7 +857,7 @@ function SummaryContent(props: SummaryContentProps) {
               fontWeight: 400
             }}
           >
-            Today
+            {strings.today()}
           </Text>
           <Text
             sx={{
@@ -904,9 +909,9 @@ function SummaryContent(props: SummaryContentProps) {
               }}
             >
               {pricingInfo.period === "monthly"
-                ? "Next Month"
+                ? strings.nextMonth()
                 : pricingInfo.period === "yearly"
-                ? "Next Year"
+                ? strings.nextYear()
                 : dayjs()
                     .add(pricingInfo.period === "5-year" ? 5 : 1, "year")
                     .add(price.trial_period?.frequency || 0, "days")
@@ -936,7 +941,7 @@ function SummaryContent(props: SummaryContentProps) {
             lineHeight: "100%"
           }}
         >
-          Total for today
+          {strings.totalForToday()}
         </Text>
         <Text
           sx={{
@@ -955,7 +960,7 @@ function SummaryContent(props: SummaryContentProps) {
       <Field
         key={couponCode ? "applied" : "empty"}
         inputRef={couponInputRef}
-        placeholder="Enter coupon code"
+        placeholder={strings.enterCouponCode()}
         defaultValue={couponCode ?? couponInputValue}
         disabled={!!couponCode}
         onChange={(e) => setCouponInputValue(e.target.value)}
@@ -1033,9 +1038,9 @@ function SummaryContent(props: SummaryContentProps) {
                 {isApplyingCoupon ? (
                   <Loading size={18} />
                 ) : couponCode ? (
-                  "Remove"
+                  strings.remove()
                 ) : (
-                  "Apply"
+                  strings.apply()
                 )}
               </Button>
             )

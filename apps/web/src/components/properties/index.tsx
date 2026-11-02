@@ -343,7 +343,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
                       whiteSpace: "nowrap"
                     }}
                   >
-                    Copy note link
+                    {strings.copyNoteLink()}
                   </Text>
                 </Flex>
                 <CopyNoteLink note={session.note} />
@@ -353,7 +353,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
         </Flex>
       </Section>
       <Section
-        title="Metadata"
+        title={strings.metadata()}
         sx={{
           borderTop: "1px solid var(--separator)",
           mt: "spacing4",
@@ -447,7 +447,7 @@ function Properties({ sessionId }: EditorPropertiesProps) {
       {session.type === "deleted" || session.type === "diff" ? null : (
         <>
           <Section
-            title="Colors"
+            title={strings.colors()}
             sx={{
               borderTop: "1px solid var(--separator)",
               mt: "spacing4",
@@ -498,7 +498,7 @@ function CopyNoteLink({ note }: { note: Note }) {
     >
       <Copy size={12} color="accent" />
       <Text sx={{ color: "accent", fontSize: "3xs", fontWeight: 500 }}>
-        {copied ? "Copied!" : "Copy"}
+        {copied ? strings.copied() : strings.copy()}
       </Text>
     </Button>
   );
@@ -938,7 +938,7 @@ function Colors({ noteId, color }: { noteId: string; color?: string }) {
       }}
     >
       <Button
-        aria-label="Add color"
+        aria-label={strings.addColor()}
         onClick={addColor}
         variant="secondary"
         sx={{
@@ -1159,7 +1159,7 @@ function Reminders({ noteId }: { noteId: string }) {
                 lineHeight: "100%"
               }}
             >
-              No reminders to show
+              {strings.noRemindersToShow()}
             </Text>
             <Button
               sx={{
@@ -1177,7 +1177,7 @@ function Reminders({ noteId }: { noteId: string }) {
             >
               <Plus size={15} color="accent" />
               <Text sx={{ color: "accent", fontWeight: 600, fontSize: "xs" }}>
-                Create reminder
+                {strings.createReminder()}
               </Text>
             </Button>
           </Flex>
@@ -1242,7 +1242,7 @@ function Attachments({ noteId }: { noteId: string }) {
             lineHeight: "100%"
           }}
         >
-          No attached files here.
+          {strings.noAttachedFiles()}
         </Text>
       ) : (
         <VirtualizedList
@@ -1290,7 +1290,7 @@ function SessionHistory({ noteId }: { noteId: string }) {
             lineHeight: 1
           }}
         >
-          Local only
+          {strings.localOnly()}
         </Text>
       }
     >
@@ -1302,7 +1302,7 @@ function SessionHistory({ noteId }: { noteId: string }) {
             lineHeight: "100%"
           }}
         >
-          No history items.
+          {strings.noHistoryItems()}
         </Text>
       ) : (
         <VirtualizedList

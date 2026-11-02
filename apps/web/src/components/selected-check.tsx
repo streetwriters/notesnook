@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { CheckboxRemove } from "./icons";
 import { Checkbox } from "./checkbox";
 import {
@@ -52,7 +53,7 @@ export function SelectedCheck({
       onToggle={onClick}
       size={size}
       checked={selectedItem?.op === "add"}
-      aria-label="Select item"
+      aria-label={strings.selectItem()}
       checkboxUncheckedIconColor="icon-disabled"
     />
   );

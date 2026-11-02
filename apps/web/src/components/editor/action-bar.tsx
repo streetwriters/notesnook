@@ -267,7 +267,7 @@ export function EditorActionBar({
       >
         <Button
           data-test-id="command-palette"
-          title="Command"
+          title={strings.command()}
           onClick={() => CommandPaletteDialog.show({ isCommandMode: true })}
           sx={{
             gap: "spacing3",

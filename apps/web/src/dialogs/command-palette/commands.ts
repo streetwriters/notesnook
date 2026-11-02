@@ -259,7 +259,7 @@ const staticCommands: Command[] = [
   },
   {
     id: "toggle-properties-panel",
-    title: "Toggle properties panel",
+    title: strings.togglePropertiesPanel(),
     icon: Sliders,
     action: () => {
       const propertiesTab = useEditorStore.getState().propertiesTab;

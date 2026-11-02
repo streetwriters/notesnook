@@ -322,7 +322,9 @@ const NoteItem = ({
                     }
                   }}
                 >
-                  {showMore ? "Show less" : `+${hiddenCount} ${strings.more()}`}
+                  {showMore
+                    ? strings.showLess()
+                    : `+${hiddenCount} ${strings.more()}`}
                 </Heading>
               );
             })()}

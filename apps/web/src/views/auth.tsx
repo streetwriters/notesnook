@@ -323,14 +323,14 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
   return (
     <AuthForm
       type="signup"
-      title={"Create an account"}
+      title={strings.createAnAccount()}
       canSkip={canSkip}
       showAgreement
       subtitle={
         <SubtitleWithAction
           text={strings.alreadyHaveAccount()}
           action={{
-            text: "Log in",
+            text: strings.logIn(),
             onClick: () => navigate("login")
           }}
         />
@@ -536,7 +536,7 @@ function RecoverySuccessCard({ email }: { email: string }) {
               textAlign: "center"
             }}
           >
-            Recovery email sent!
+            {strings.recoveryEmailSent()}
           </Text>
           <Text
             sx={{
@@ -582,8 +582,7 @@ function RecoverySuccessCard({ email }: { email: string }) {
               flex: "1 1 auto"
             }}
           >
-            Please check your inbox and follow the instructions to recover your
-            account.
+            {strings.checkInboxToRecoverAccount()}
           </Text>
         </Flex>
       </Flex>
@@ -623,7 +622,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
               <SubtitleWithAction
                 text={strings.rememberedYourPassword()}
                 action={{
-                  text: "Log in",
+                  text: strings.logIn(),
                   onClick: () => navigate("login")
                 }}
               />
@@ -761,12 +760,12 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       type="mfa:code"
       title={
         selectedMethod === "email"
-          ? "Check your email"
+          ? strings.checkYourEmail()
           : selectedMethod === "sms"
-          ? "Check your phone"
+          ? strings.checkYourPhone()
           : selectedMethod === "recoveryCode"
-          ? "Recovery code"
-          : "Authenticator app"
+          ? strings.recoveryCodeTitle()
+          : strings.authenticatorApp()
       }
       subtitle={texts.subtitle}
       openURL={openURL}
@@ -795,7 +794,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                   fontWeight: 400
                 }}
               >
-                Confirmation code
+                {strings.confirmationCode()}
               </Label>
               <OtpInput
                 length={6}
@@ -809,7 +808,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
           )}
           <SubmitButton
             loading={options?.loading}
-            text={options?.loading ? "Verifying" : strings.submit()}
+            text={options?.loading ? strings.verifying() : strings.submit()}
           />
           <Flex
             sx={{
@@ -851,7 +850,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                           color: "heading"
                         }}
                       >
-                        {"Didn't receive code?"}
+                        {strings.didntReceiveCode()}
                       </Text>
                       {!enabled && (
                         <Text
@@ -952,25 +951,25 @@ const MFAMethods: MFAMethod[] = [
     type: "app",
     title: strings.sendCode(),
     icon: MfaAuthenticator,
-    description: "Use the authenticator app"
+    description: strings.useAuthenticatorApp()
   },
   {
     type: "sms",
     title: strings.sendCodeSms(),
     icon: Chat,
-    description: "Text message to my registered number"
+    description: strings.textMessageToRegisteredNumber()
   },
   {
     type: "email",
     title: strings.sendCodeEmail(),
     icon: Email,
-    description: "Verify via registered inbox"
+    description: strings.verifyViaRegisteredInbox()
   },
   {
     type: "recoveryCode",
     title: strings.recoveryCode(),
     icon: RecoveryCode,
-    description: "Use my original emergency key"
+    description: strings.useOriginalEmergencyKey()
   }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {

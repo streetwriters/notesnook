@@ -339,7 +339,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
                       fontSize="XXS"
                       fontFamily="MEDIUM"
                     >
-                      Pro
+                      {strings.pro()}
                     </Paragraph>
                   ) : null}
                 </View>

@@ -187,28 +187,28 @@ function RecoveryKeySheet({ close }: RecoveryKeySheetProps) {
       id: "copy-clipboard",
       icon: "recovery-key-copy",
       title: strings.copyToClipboard(),
-      subtitle: "Copy the recovery key to your clipboard",
+      subtitle: strings.copyRecoveryKeyDesc(),
       onPress: copyToClipboard
     },
     {
       id: "save-qr",
       icon: "recovery-key-qr-code",
       title: strings.saveQRCode(),
-      subtitle: "Save the QR code to your gallery",
+      subtitle: strings.saveQRCodeDesc(),
       onPress: saveQRCODE
     },
     {
       id: "save-text",
       icon: "recovery-key-file",
       title: strings.saveAsText(),
-      subtitle: "Save the recovery key to a text file",
+      subtitle: strings.saveAsTextDesc(),
       onPress: saveToTextFile
     },
     {
       id: "share-cloud",
       icon: "recovery-key-cloud-arrow-down",
       title: strings.shareToCloud(),
-      subtitle: "Securely save the recovery key to cloud",
+      subtitle: strings.shareToCloudDesc(),
       onPress: shareFile
     }
   ];

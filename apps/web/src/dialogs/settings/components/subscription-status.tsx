@@ -133,7 +133,7 @@ export function SubscriptionStatus() {
                 const giftCode = await PromptDialog.show({
                   title: strings.redeemGiftCode(),
                   description: strings.redeemGiftCodeDesc(),
-                  label: "Enter gift code"
+                  label: strings.enterGiftCode()
                 });
                 if (giftCode) {
                   await TaskManager.startTask({

@@ -422,7 +422,9 @@ const TabBar = (props: SimpleTabBarProps) => {
                         icon="plus"
                         testID="sidebar-add-button"
                         label={
-                          props.navigationState.index === 1 ? "Notebook" : "Tag"
+                          props.navigationState.index === 1
+                            ? strings.dataTypesCamelCase.notebook()
+                            : strings.dataTypesCamelCase.tag()
                         }
                         onPress={async () => {
                           if (props.navigationState.index === 1) {
@@ -451,7 +453,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                                   {
                                     label: strings.enterTitle(),
                                     name: "title",
-                                    placeholder: "e.g. journal",
+                                    placeholder: strings.tagTitlePlaceholder(),
                                     ref: React.createRef(),
                                     validators: [
                                       validators.required(
@@ -497,7 +499,7 @@ const TabBar = (props: SimpleTabBarProps) => {
                             : "sort-descending"
                         }
                         testID="sidebar-sort-button"
-                        label="Sort"
+                        label={strings.sort()}
                         onPress={() => {
                           presentSheet({
                             component: (
@@ -531,7 +533,11 @@ const TabBar = (props: SimpleTabBarProps) => {
                       <TabBarButton
                         icon={isDark ? "dark-mode-outline" : "sun"}
                         testID="sidebar-theme-button"
-                        label={isDark ? "Dark Mode" : "Light Mode"}
+                        label={
+                          isDark
+                            ? strings.darkModeTitle()
+                            : strings.lightModeTitle()
+                        }
                         onPress={() => {
                           SettingsService.set({
                             useSystemTheme: false

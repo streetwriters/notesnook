@@ -239,7 +239,7 @@ const NotePreview = (props: NavigationProps<"NotePreview">) => {
                 } catch (e) {
                   ToastManager.error(
                     e as Error,
-                    "Failed to load history preview",
+                    strings.failedToLoadHistoryPreview(),
                     "local"
                   );
                 }

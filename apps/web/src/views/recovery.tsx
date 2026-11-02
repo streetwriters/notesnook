@@ -181,8 +181,8 @@ function Recovery(props: RecoveryProps) {
     return (
       <AuthContainer>
         <Loader
-          title="Authenticating user"
-          text="Please wait while you are authenticated."
+          title={strings.authenticatingUser()}
+          text={strings.pleaseWaitLogin()}
         />
       </AuthContainer>
     );
@@ -555,7 +555,12 @@ function Final() {
   };
 
   if (isLoading)
-    return <Loader title="Getting encryption key" text="Please wait..." />;
+    return (
+      <Loader
+        title={strings.gettingEncryptionKey()}
+        text={strings.pleaseWait()}
+      />
+    );
 
   return (
     <RecoveryForm
@@ -602,7 +607,7 @@ function Final() {
                 whiteSpace: "nowrap"
               }}
             >
-              Password reset successful
+              {strings.passwordResetSuccessful()}
             </Text>
             <Text
               sx={{
@@ -613,7 +618,7 @@ function Final() {
                 lineHeight: "1.4"
               }}
             >
-              Your password has been updated
+              {strings.yourPasswordHasBeenUpdated()}
             </Text>
           </Flex>
           <SaveRecoveryKey recoveryKey={recoveryKey} />
@@ -627,7 +632,7 @@ function Final() {
             width: "100%"
           }}
         >
-          Go to login
+          {strings.goToLogin()}
         </Button>
       </Flex>
     </RecoveryForm>
@@ -692,7 +697,7 @@ function AuthenticatedAsCard({ user }: { user: User }) {
           textDecoration: "none"
         }}
       >
-        Log in
+        {strings.logIn()}
       </Button>
     </Flex>
   );

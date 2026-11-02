@@ -99,7 +99,7 @@ export const CreateColorDialog = DialogManager.register(
             id="color"
             name="color"
             data-test-id="color-input"
-            placeholder="Select color"
+            placeholder={strings.selectColor()}
             onChange={(e) => {
               const value = e.target.value;
               if (colorPickerRef.current && validateHexColor(value)) {

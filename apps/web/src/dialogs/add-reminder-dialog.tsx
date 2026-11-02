@@ -41,10 +41,10 @@ import {
   useIsFeatureAvailable,
   usePromise
 } from "@notesnook/common";
-import { MONTHS_FULL, getTimeFormat } from "@notesnook/core";
+import { getTimeFormat } from "@notesnook/core";
 import { Note, Reminder } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
-import { strings } from "@notesnook/intl";
+import { i18n, strings } from "@notesnook/intl";
 import { checkFeature } from "../common";
 import { setTimeOnly, setDateOnly } from "../utils/date-time";
 import Skeleton from "react-loading-skeleton";
@@ -233,14 +233,14 @@ export const AddReminderDialog = DialogManager.register(
           onClick: () => props.onClose(false)
         }}
       >
-        <ReminderSection title="Reminder details">
+        <ReminderSection title={strings.reminderDetails()}>
           <Flex sx={{ gap: "spacing6", flexDirection: "column" }}>
             <Field
               id="title"
               label={strings.title()}
               required
               value={title}
-              placeholder="What needs to be done?"
+              placeholder={strings.reminderTitlePlaceholder()}
               data-test-id="title-input"
               styles={{
                 input: {
@@ -259,7 +259,7 @@ export const AddReminderDialog = DialogManager.register(
               id="description"
               label={`${strings.description()} (${strings.optional()})`}
               data-test-id="description-input"
-              placeholder="Add some details"
+              placeholder={strings.reminderDetailsPlaceholder()}
               value={description}
               styles={{
                 input: {
@@ -279,7 +279,7 @@ export const AddReminderDialog = DialogManager.register(
             />
           </Flex>
         </ReminderSection>
-        <ReminderSection title="Repeat">
+        <ReminderSection title={strings.reminderModes("repeat")}>
           <Flex sx={{ gap: "spacing4", alignItems: "center" }}>
             {modes.map((m) => (
               <ReminderRadioButton
@@ -331,7 +331,7 @@ export const AddReminderDialog = DialogManager.register(
           ) : null}
         </ReminderSection>
 
-        <ReminderSection title="Schedule">
+        <ReminderSection title={strings.schedule()}>
           <Flex
             sx={{
               gap: "spacing6",
@@ -342,7 +342,7 @@ export const AddReminderDialog = DialogManager.register(
               <>
                 <Field
                   id="date"
-                  label="Select date"
+                  label={strings.selectDate()}
                   required
                   inputRef={dateInputRef}
                   data-test-id="date-input"
@@ -407,9 +407,9 @@ export const AddReminderDialog = DialogManager.register(
               <Flex sx={{ flex: 1, gap: "spacing6" }}>
                 <ReminderSelect
                   id="month"
-                  label="Select month"
+                  label={strings.selectMonth()}
                   value={`${dayjs(date).month()}`}
-                  options={MONTHS_FULL.map((month, index) => ({
+                  options={getMonthNames().map((month, index) => ({
                     value: `${index}`,
                     title: month
                   }))}
@@ -419,7 +419,7 @@ export const AddReminderDialog = DialogManager.register(
                 />
                 <ReminderSelect
                   id="day"
-                  label="Select date"
+                  label={strings.selectDate()}
                   value={`${dayjs(date).date()}`}
                   options={new Array(dayjs(date).daysInMonth())
                     .fill("0")
@@ -451,7 +451,7 @@ export const AddReminderDialog = DialogManager.register(
                       lineHeight: 1.2
                     }}
                   >
-                    Select day
+                    {strings.selectDay()}
                   </Text>
                   <Button
                     ref={monthlyDaysRef}
@@ -471,10 +471,8 @@ export const AddReminderDialog = DialogManager.register(
                     }}
                   >
                     {selectedDays.length
-                      ? `${selectedDays.length} ${
-                          selectedDays.length === 1 ? "day" : "days"
-                        } of every month`
-                      : "Select day"}
+                      ? strings.daysOfEveryMonth(selectedDays.length)
+                      : strings.selectDay()}
                     <CaretDown size={13} color="icon" />
                   </Button>
                 </Flex>
@@ -550,7 +548,7 @@ export const AddReminderDialog = DialogManager.register(
                     lineHeight: 1.2
                   }}
                 >
-                  Select days
+                  {strings.reminderSelectDays()}
                 </Text>
                 <Flex sx={{ gap: "spacing3", alignItems: "stretch", flex: 1 }}>
                   {recurringModes
@@ -598,7 +596,7 @@ export const AddReminderDialog = DialogManager.register(
             ) : null}
             <Field
               id="time"
-              label={"Enter time"}
+              label={strings.enterTime()}
               required
               data-test-id="time-input"
               sx={{
@@ -633,7 +631,7 @@ export const AddReminderDialog = DialogManager.register(
             />
           </Flex>
         </ReminderSection>
-        <ReminderSection title="Alert mode">
+        <ReminderSection title={strings.alertMode()}>
           <Flex sx={{ gap: 2 }}>
             {priorities.map((p) => (
               <ReminderRadioButton
@@ -843,11 +841,22 @@ function timeFormat() {
   return getTimeFormat(db.settings.getTimeFormat());
 }
 
-const WEEK_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const WEEK_DAYS_MON = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const WEEK_DAYS = [0, 1, 2, 3, 4, 5, 6] as const;
+const WEEK_DAYS_MON = [1, 2, 3, 4, 5, 6, 0] as const;
 
 export function getWeekDays(weekFormat: string) {
-  return weekFormat === "Sun" ? WEEK_DAYS : WEEK_DAYS_MON;
+  return (weekFormat === "Sun" ? WEEK_DAYS : WEEK_DAYS_MON).map((day) =>
+    strings.weekDayNamesShort[day]()
+  );
+}
+
+function getMonthNames() {
+  const formatter = new Intl.DateTimeFormat(i18n.locale || undefined, {
+    month: "long"
+  });
+  return Array.from({ length: 12 }, (_, month) =>
+    formatter.format(new Date(2000, month, 1))
+  );
 }
 
 export function getReminderRepeatText(

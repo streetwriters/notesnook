@@ -29,10 +29,10 @@ import listPaneEmptyMonographView from "../../assets/list-pane-empty-monograph-v
 import listPaneEmptyReminderView from "../../assets/list-pane-empty-reminder-view.svg";
 import listPaneEmptyTagView from "../../assets/list-pane-empty-tag-view.svg";
 
-const SIDEBAR_PLACEHOLDER_VARIANTS = {
+const getSidebarPlaceholderVariants = () => ({
   notebooks: {
-    title: "No notebooks yet",
-    text: "Start organizing your ideas, notes, and thoughts. ",
+    title: strings.noNotebooksYet(),
+    text: strings.notebooksEmptyBody(),
     button: {
       ...CREATE_BUTTON_MAP.notebooks,
       icon: Plus,
@@ -40,22 +40,22 @@ const SIDEBAR_PLACEHOLDER_VARIANTS = {
     }
   },
   tags: {
-    title: "No tags yet",
-    text: "Create your first tag to start organizing your workspace.",
+    title: strings.noTagsYet(),
+    text: strings.tagsEmptyBody(),
     button: {
       ...CREATE_BUTTON_MAP.tags,
       icon: Plus,
-      title: "Add tag"
+      title: strings.addTag()
     }
   }
-};
+});
 
 export function SidebarPlaceholder({
   variant
 }: {
-  variant: keyof typeof SIDEBAR_PLACEHOLDER_VARIANTS;
+  variant: keyof ReturnType<typeof getSidebarPlaceholderVariants>;
 }) {
-  const { title, text, button } = SIDEBAR_PLACEHOLDER_VARIANTS[variant];
+  const { title, text, button } = getSidebarPlaceholderVariants()[variant];
 
   return (
     <Flex
@@ -120,90 +120,92 @@ export function SidebarPlaceholder({
   );
 }
 
-const LIST_PANE_PLACEHOLDER_VARIANTS = {
-  home: {
-    image: listPaneEmptyHomeView,
-    title: "Create your first note.",
-    description: (
-      <>
-        Click the{" "}
-        <Text as="span" sx={{ color: "accent" }}>
-          New Note
-        </Text>{" "}
-        button in the sidebar to get started.
-      </>
-    )
-  },
-  favorite: {
-    image: listPaneEmptyFavoriteView,
-    title: "No favorites yet",
-    description: "Mark important notes by adding them to favorites."
-  },
-  trash: {
-    image: listPaneEmptyTrashView,
-    title: "Trash is empty",
-    description: "All the deleted items will be shown here."
-  },
-  archive: {
-    image: listPaneEmptyArchiveView,
-    title: "No archives currently",
-    description: "Keep your workspace clean by archiving old notes."
-  },
-  monographs: {
-    image: listPaneEmptyMonographView,
-    title: "What are monographs?",
-    description: (
-      <>
-        Turn your notes into published, publication-ready documents.{" "}
-        <Text
-          as="span"
-          sx={{ color: "accent", cursor: "pointer" }}
-          onClick={() =>
-            window.open(
-              "https://notesnook.com/help/publish-notes-with-monographs",
-              "_blank"
-            )
-          }
-        >
-          Learn more
-        </Text>
-      </>
-    )
-  },
-  reminders: {
-    image: listPaneEmptyReminderView,
-    title: "No reminders today",
-    description: "Tap the + button on top to add one."
-  },
-  tag: {
-    image: listPaneEmptyTagView,
-    title: "No notes in this tag",
-    description: "Notes added to this tag will appear here."
-  },
-  /**
-   * TODO: implement a proper placeholder for the search view.
-   */
-  search: {
-    image: listPaneEmptyHomeView,
-    title: "Create your first note.",
-    description: (
-      <>
-        Click the{" "}
-        <Text as="span" sx={{ color: "accent" }}>
-          New Note
-        </Text>{" "}
-        button in the sidebar to get started.
-      </>
-    )
-  }
-} as const;
+const getListPanePlaceholderVariants = () =>
+  ({
+    home: {
+      image: listPaneEmptyHomeView,
+      title: strings.createYourFirstNote(),
+      description: (
+        <>
+          {strings.createFirstNoteHint[0]()}{" "}
+          <Text as="span" sx={{ color: "accent" }}>
+            {strings.newNote()}
+          </Text>{" "}
+          {strings.createFirstNoteHint[1]()}
+        </>
+      )
+    },
+    favorite: {
+      image: listPaneEmptyFavoriteView,
+      title: strings.noFavoritesYet(),
+      description: strings.noFavoritesYetDesc()
+    },
+    trash: {
+      image: listPaneEmptyTrashView,
+      title: strings.trashIsEmpty(),
+      description: strings.trashIsEmptyDesc()
+    },
+    archive: {
+      image: listPaneEmptyArchiveView,
+      title: strings.noArchivesYet(),
+      description: strings.noArchivesYetDesc()
+    },
+    monographs: {
+      image: listPaneEmptyMonographView,
+      title: strings.whatAreMonographs(),
+      description: (
+        <>
+          {strings.monographsEmptyDesc()}{" "}
+          <Text
+            as="span"
+            sx={{ color: "accent", cursor: "pointer" }}
+            onClick={() =>
+              window.open(
+                "https://notesnook.com/help/publish-notes-with-monographs",
+                "_blank"
+              )
+            }
+          >
+            {strings.learnMore()}
+          </Text>
+        </>
+      )
+    },
+    reminders: {
+      image: listPaneEmptyReminderView,
+      title: strings.noRemindersToday(),
+      description: strings.noRemindersTodayDesc()
+    },
+    tag: {
+      image: listPaneEmptyTagView,
+      title: strings.noNotesInTag(),
+      description: strings.noNotesInTagDesc()
+    },
+    /**
+     * TODO: implement a proper placeholder for the search view.
+     */
+    search: {
+      image: listPaneEmptyHomeView,
+      title: strings.createYourFirstNote(),
+      description: (
+        <>
+          {strings.createFirstNoteHint[0]()}{" "}
+          <Text as="span" sx={{ color: "accent" }}>
+            {strings.newNote()}
+          </Text>{" "}
+          {strings.createFirstNoteHint[1]()}
+        </>
+      )
+    }
+  } as const);
 
 export function ListPanePlaceholder({
   variant
 }: {
-  variant: keyof typeof LIST_PANE_PLACEHOLDER_VARIANTS;
+  variant: keyof ReturnType<typeof getListPanePlaceholderVariants>;
 }) {
-  const { image, title, description } = LIST_PANE_PLACEHOLDER_VARIANTS[variant];
+  const { image, title, description } =
+    getListPanePlaceholderVariants()[variant];
 
   return (
     <Flex

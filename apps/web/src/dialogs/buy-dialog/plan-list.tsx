@@ -80,7 +80,9 @@ const testimonial = {
   username: "camflint",
   image: Cameron,
   name: "Cameron Flint",
-  role: "Verified User",
+  get role() {
+    return strings.verifiedUser();
+  },
   link: "https://twitter.com/camflint/status/1481061416434286592",
   text: "I'm pretty impressed at the progress @notesnook are making on their app — particularly in respect to how performant the app runs and behaves, despite the overhead of end-to-end encrypting user data."
 };
@@ -274,7 +276,7 @@ export function PlansList(props: PlansListProps) {
                   lineHeight: 1
                 }}
               >
-                Cancel anytime
+                {strings.cancelAnytimeShort()}
               </Text>
               <Text
                 sx={{
@@ -284,7 +286,7 @@ export function PlansList(props: PlansListProps) {
                   lineHeight: 1
                 }}
               >
-                14-day money back guarantee
+                {strings.moneyBackGuarantee14Days()}
               </Text>
             </Flex>
           </Flex>
@@ -306,7 +308,7 @@ export function PlansList(props: PlansListProps) {
                 whiteSpace: "nowrap"
               }}
             >
-              Learn more
+              {strings.learnMore()}
             </Text>
             <CaretDown
               sx={{
@@ -425,7 +427,7 @@ export function Footer() {
               textAlign: "center"
             }}
           >
-            Frequently Asked Questions
+            {strings.frequentlyAskedQuestions()}
           </Text>
           <Text
             variant="body"
@@ -436,9 +438,7 @@ export function Footer() {
               lineHeight: "1.5"
             }}
           >
-            Find answers to common questions about Notesnook, including
-            features, syncing, privacy, and more. Learn more about how the app
-            works and get clarity.
+            {strings.faqDescription()}
           </Text>
         </Flex>
         <Flex
@@ -539,16 +539,16 @@ function RecurringPricing(props: PricingProps) {
         {isZero
           ? strings.forever()
           : plan.period === "monthly"
-            ? ""
-            : plan.period === "yearly"
-              ? strings.billedAnnually(
-                  `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
-                )
-              : plan.period === "5-year"
-                ? strings.billedEvery5Years(
-                    `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
-                  )
-                : ""}
+          ? ""
+          : plan.period === "yearly"
+          ? strings.billedAnnually(
+              `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+            )
+          : plan.period === "5-year"
+          ? strings.billedEvery5Years(
+              `${getCurrencySymbol(plan.currency)}${plan.price.gross}`
+            )
+          : ""}
       </Text>
     </>
   );
@@ -657,7 +657,7 @@ export function ComparePlans() {
           }}
           id="compare-plans"
         >
-          Compare Plans
+          {strings.comparePlans()}
         </Text>
         <Text
           sx={{
@@ -669,9 +669,7 @@ export function ComparePlans() {
             maxWidth: 712
           }}
         >
-          Choose the plan that fits your workflow and unlock features for secure
-          note taking. Compare storage, syncing, privacy, and productivity
-          features to find the experience
+          {strings.comparePlansDescription()}
         </Text>
       </Flex>
       <Flex
@@ -910,8 +908,7 @@ export function TestimonialsCarousel() {
             lineHeight: "1.5"
           }}
         >
-          See how people use Notesnook to organize ideas, manage daily work, and
-          stay focused with a calm and secure writing experience.
+          {strings.testimonialsDescription()}
         </Text>
       </Flex>
       <Flex
@@ -1129,8 +1126,8 @@ const CancelInfoDialog = DialogManager.register(function CancelInfoDialog(
   return (
     <Dialog
       isOpen={true}
-      title="Cancel anytime, hassle-free"
-      description="You're in control. Cancel at anytime, no cancellation fees, no penalties ever. "
+      title={strings.cancelAnytimeHassleFree()}
+      description={strings.cancelAnytimeHassleFreeDesc()}
       showCloseButton={true}
       onClose={() => props.onClose(false)}
       width={550}
@@ -1146,18 +1143,18 @@ const CancelInfoDialog = DialogManager.register(function CancelInfoDialog(
       >
         <CancelInfoCard
           icon={CalendarBlank}
-          title="Cancel anytime"
-          description="Your subscription will remain active until the end of your current billing period. You won't be charged again unless you renew."
+          title={strings.cancelAnytimeShort()}
+          description={strings.cancelAnytimeInfo()}
         />
         <CancelInfoCard
           icon={Prohibit}
-          title="No cancellation fees"
-          description="We don't charge any fees for canceling your plan. You only pay for the subscription period you've already purchased."
+          title={strings.noCancellationFees()}
+          description={strings.noCancellationFeesDesc()}
         />
         <CancelInfoCard
           icon={HandCoins}
-          title="Refund policy"
-          description="If you're not satisfied, you can request a refund by contacting our support team within 14 days of your purchase, subject to our refund policy."
+          title={strings.refundPolicy()}
+          description={strings.refundPolicyDesc()}
         />
       </Flex>
     </Dialog>
@@ -1313,8 +1310,8 @@ function PlanCard({
                 }}
               >
                 {plan.discount?.type === "regional"
-                  ? `${plan.discount.amount}% OFF`
-                  : "Recommended"}
+                  ? strings.percentOff(`${plan.discount.amount}`).toUpperCase()
+                  : strings.recommended()}
               </Text>
             )}
           </Flex>
@@ -1398,7 +1395,7 @@ function PlanCard({
             fontSize: "md"
           }}
         >
-          Select Plan
+          {strings.selectPlan()}
         </Button>
       )}
     </Flex>

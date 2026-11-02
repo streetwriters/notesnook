@@ -121,7 +121,9 @@ function Reminder(props: ReminderProps) {
                 checked={completed}
                 onToggle={toggleCompleted}
                 aria-label={
-                  completed ? "Mark reminder incomplete" : "Mark reminder complete"
+                  completed
+                    ? strings.markReminderIncomplete()
+                    : strings.markReminderComplete()
                 }
                 data-test-id="reminder-complete"
                 size={15}
@@ -312,7 +314,7 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
     {
       type: "button",
       key: "mark-complete",
-      title: "Mark as completed",
+      title: strings.markAsCompleted(),
       isChecked: Boolean(reminder.completedAt),
       iconComponent: CheckSquare,
       onClick: async () => {

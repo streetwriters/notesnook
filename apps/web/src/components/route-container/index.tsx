@@ -163,7 +163,7 @@ function HeaderActions({
       {hasItems && (
         <Button
           variant="tertiary"
-          title="Group and sort"
+          title={strings.groupAndSort()}
           data-test-id={`${groupingKey}-sort-button`}
           onClick={() =>
             showGroupOptionsMenu(groupingKey, refresh, {

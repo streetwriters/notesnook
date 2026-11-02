@@ -120,7 +120,7 @@ export const PrivacySettings: SettingsGroup[] = [
                   "corsProxy",
                   "https://cors.notesnook.com"
                 ),
-                label: "Enter proxy URL"
+                label: strings.enterProxyUrl()
               });
               if (!result) return;
               try {

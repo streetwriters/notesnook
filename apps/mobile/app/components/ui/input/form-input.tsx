@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { RefObject, useEffect, useMemo, useState } from "react";
 import {
@@ -199,7 +200,7 @@ export const validators = {
       : message || `Must be at least ${length} characters`,
 
   number:
-    (message = "Please enter a valid number") =>
+    (message = strings.enterValidNumber()) =>
     (value: string) =>
       !value?.trim() || !Number.isNaN(Number(value)) ? undefined : message,
 

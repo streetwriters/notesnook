@@ -747,7 +747,7 @@ function Colors({
               p: 0
             }}
           >
-            {showAllColors ? "View less" : "View all"}
+            {showAllColors ? strings.viewLess() : strings.viewAll()}
           </Button>
         </Flex>
       ) : null}

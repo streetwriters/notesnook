@@ -3127,8 +3127,7 @@ Continue without attachments?`,
   defaultNotebookAndTag: () => t`Default Notebook & Tag`,
   recurringReminders: () => t`Recurring Reminders`,
   pinNoteInNotification: () => t`Pin Note in Notification`,
-  createNoteFromNotificationDrawer: () =>
-    t`Create Note from Notifications`,
+  createNoteFromNotificationDrawer: () => t`Create Note from Notifications`,
   customHomepage: () => t`Custom Homepage`,
   customToolbarPreset: () => t`Custom Toolbar Preset`,
   disableTrashCleanup: () => t`Disable Trash Cleanup`,
@@ -3570,5 +3569,168 @@ Continue without attachments?`,
   youAreOffline: () => t`You are offline`,
   groupCreated: () => t`Group created`,
   groupDeleted: () => t`Group deleted`,
-  failedToLoadMonograph: () => t`Failed to load monograph. Please try again.`
+  failedToLoadMonograph: () => t`Failed to load monograph. Please try again.`,
+  createYourFirstNote: () => t`Create your first note.`,
+  createFirstNoteHint: {
+    0: () => t`Click the`,
+    1: () => t`button in the sidebar to get started.`
+  },
+  noFavoritesYet: () => t`No favorites yet`,
+  noFavoritesYetDesc: () =>
+    t`Mark important notes by adding them to favorites.`,
+  trashIsEmpty: () => t`Trash is empty`,
+  trashIsEmptyDesc: () => t`All the deleted items will be shown here.`,
+  noArchivesYet: () => t`No archives currently`,
+  noArchivesYetDesc: () => t`Keep your workspace clean by archiving old notes.`,
+  monographsEmptyDesc: () =>
+    t`Turn your notes into published, publication-ready documents.`,
+  noRemindersToday: () => t`No reminders today`,
+  noRemindersTodayDesc: () => t`Tap the + button on top to add one.`,
+  noNotesInTag: () => t`No notes in this tag`,
+  noNotesInTagDesc: () => t`Notes added to this tag will appear here.`,
+  createAnAccount: () => t`Create an account`,
+  logIn: () => t`Log in`,
+  checkYourEmail: () => t`Check your email`,
+  checkYourPhone: () => t`Check your phone`,
+  confirmationCode: () => t`Confirmation code`,
+  verifying: () => t`Verifying`,
+  didntReceiveCode: () => t`Didn't receive code?`,
+  useAuthenticatorApp: () => t`Use the authenticator app`,
+  textMessageToRegisteredNumber: () => t`Text message to my registered number`,
+  verifyViaRegisteredInbox: () => t`Verify via registered inbox`,
+  useOriginalEmergencyKey: () => t`Use my original emergency key`,
+  checkInboxToRecoverAccount: () =>
+    t`Please check your inbox and follow the instructions to recover your account.`,
+  passwordResetSuccessful: () => t`Password reset successful`,
+  yourPasswordHasBeenUpdated: () => t`Your password has been updated`,
+  goToLogin: () => t`Go to login`,
+  verifiedUser: () => t`Verified User`,
+  moneyBackGuarantee14Days: () => t`14-day money back guarantee`,
+  faqDescription: () =>
+    t`Find answers to common questions about Notesnook, including features, syncing, privacy, and more. Learn more about how the app works and get clarity.`,
+  comparePlansDescription: () =>
+    t`Choose the plan that fits your workflow and unlock features for secure note taking. Compare storage, syncing, privacy, and productivity features to find the experience`,
+  testimonialsDescription: () =>
+    t`See how people use Notesnook to organize ideas, manage daily work, and stay focused with a calm and secure writing experience.`,
+  cancelAnytimeHassleFree: () => t`Cancel anytime, hassle-free`,
+  cancelAnytimeHassleFreeDesc: () =>
+    t`You're in control. Cancel at anytime, no cancellation fees, no penalties ever.`,
+  cancelAnytimeInfo: () =>
+    t`Your subscription will remain active until the end of your current billing period. You won't be charged again unless you renew.`,
+  noCancellationFees: () => t`No cancellation fees`,
+  noCancellationFeesDesc: () =>
+    t`We don't charge any fees for canceling your plan. You only pay for the subscription period you've already purchased.`,
+  refundPolicy: () => t`Refund policy`,
+  refundPolicyDesc: () =>
+    t`If you're not satisfied, you can request a refund by contacting our support team within 14 days of your purchase, subject to our refund policy.`,
+  skip: () => t`Skip`,
+  notesnookPlansDesc: {
+    0: () =>
+      t`Choose a plan that fits your workflow and keep your notes secure across every device.`,
+    1: () =>
+      t`Enjoy powerful privacy-focused features designed for distraction-free writing and organization.`
+  },
+  unlockFullPowerOfNotesnook: () => t`Unlock the full power of Notesnook`,
+  notesDeserveMoreThanStorage: () =>
+    t`Your notes deserve more than basic storage`,
+  notesDeserveMoreThanStorageDesc: () =>
+    t`Unlock encrypted syncing, larger storage, premium productivity features, and everything you need to write with confidence.`,
+  chooseYourPlan: () => t`Choose your plan`,
+  notesnookPlansTitle: () => t`Notesnook Plans`,
+  payment: () => t`Payment`,
+  complete: () => t`Complete`,
+  contact: () => t`Contact`,
+  cloudStorageTitle: () => t`Cloud Storage`,
+  encryption: () => t`Encryption`,
+  encryptionValue: () => t`AES-256 Zero Knowledge`,
+  deviceSync: () => t`Device Sync`,
+  unlimitedSync: () => t`Unlimited Sync`,
+  vipSupport: () => t`VIP Support`,
+  prioritizedSupport: () => t`Prioritized Support`,
+  paymentConfirmed: () => t`Payment Confirmed!`,
+  paymentConfirmedDesc: () =>
+    t`Your premium workspace is ready. Enjoy secure note-taking, seamless syncing, and a distraction-free writing experience across all your devices.`,
+  activeMembership: () => t`Active Membership`,
+  startTakingNotesSecurely: () => t`Start taking notes securely`,
+  enterCouponCode: () => t`Enter coupon code`,
+  apply: () => t`Apply`,
+  reminderDetails: () => t`Reminder details`,
+  schedule: () => t`Schedule`,
+  selectMonth: () => t`Select month`,
+  selectDay: () => t`Select day`,
+  enterTime: () => t`Enter time`,
+  daysOfEveryMonth: (count: number) =>
+    plural(count, {
+      one: "# day of every month",
+      other: "# days of every month"
+    }),
+  saveYourRecoveryKey: () => t`Save Your Recovery Key`,
+  saveQRImage: () => t`Save QR image`,
+  downloaded: () => t`Downloaded!`,
+  downloadTextFile: () => t`Download text file`,
+  copyNoteLink: () => t`Copy note link`,
+  metadata: () => t`Metadata`,
+  noRemindersToShow: () => t`No reminders to show`,
+  noAttachedFiles: () => t`No attached files here.`,
+  localOnly: () => t`Local only`,
+  noHistoryItems: () => t`No history items.`,
+  markReminderIncomplete: () => t`Mark reminder incomplete`,
+  markReminderComplete: () => t`Mark reminder complete`,
+  markAsCompleted: () => t`Mark as completed`,
+  searchOrAddTags: () => t`Search or add tags`,
+  noTagsToShow: () => t`No tags to show`,
+  viewLess: () => t`View less`,
+  viewAll: () => t`View all`,
+  selectItem: () => t`Select item`,
+  privacySimplified: () => t`Privacy Simplified.`,
+  privacySimplifiedDesc: () =>
+    t`Write notes with absolute freedom. No spying, no tracking, no backdoor access. Just you and your thoughts.`,
+  command: () => t`Command`,
+  selectColor: () => t`Select color`,
+  noteExpiryDateDesc: () =>
+    t`This note will automatically be deleted on the selected date.`,
+  togglePropertiesPanel: () => t`Toggle properties panel`,
+  noRecentSearches: () => t`No recent searches`,
+  enterGiftCode: () => t`Enter gift code`,
+  enterProxyUrl: () => t`Enter proxy URL`,
+  setAsHomepageTitle: () => t`Set as homepage`,
+  copyRecoveryKeyDesc: () => t`Copy the recovery key to your clipboard`,
+  saveQRCodeDesc: () => t`Save the QR code to your gallery`,
+  saveAsTextDesc: () => t`Save the recovery key to a text file`,
+  shareToCloudDesc: () => t`Securely save the recovery key to cloud`,
+  lastSynced: () => t`Last synced`,
+  preferencesAndAppLock: () => t`Preferences & app lock`,
+  responseWithin24Hours: () => t`Response within 24 hours`,
+  couldNotOpenEmailApp: () => t`Could not open email app`,
+  tutorialsAndHelpCenter: () => t`Tutorials & help center`,
+  signOutFromThisDevice: () => t`Sign out from this device`,
+  tagTitlePlaceholder: () => t`e.g. journal`,
+  darkModeTitle: () => t`Dark Mode`,
+  lightModeTitle: () => t`Light Mode`,
+  notebookTitlePlaceholder: () => t`e.g. My Notebook`,
+  notebookDescriptionPlaceholder: () => t`e.g. This is My Notebook`,
+  free: () => t`Free`,
+  awarded: () => t`Awarded`,
+  endsOn: (date: string) => t`Ends ${date}`,
+  renewsOn: (date: string) => t`Renews ${date}`,
+  partnerOffers: () => t`Partner offers`,
+  partnerOffersDesc: () =>
+    t`Get exclusive discounts from our trusted partners who share our commitment to privacy and user freedom.`,
+  failedToLoadHistoryPreview: () => t`Failed to load history preview`,
+  showLess: () => t`Show less`,
+  enterValidNumber: () => t`Please enter a valid number`,
+  bugFixesAndImprovements: () => t`Bug fixes and performance improvements`,
+  mfaAppCodeHelpText: () =>
+    t`After putting the above code in authenticator app, the app will display a code that you can enter below.`,
+  mfaSmsCodeHelpText: () =>
+    t`You will receive a 2FA code on your phone number which you can enter below`,
+  mfaEmailCodeHelpText: () =>
+    t`You will receive a 2FA code on your email address which you can enter below`,
+  notebooksMovedToTrashDesc: (count: number) =>
+    plural(count, {
+      one: "The selected notebook will be moved to trash. You can restore it later.",
+      other:
+        "The selected notebooks will be moved to trash. You can restore them later."
+    }),
+  changeServer: () => t`Change server`
 };

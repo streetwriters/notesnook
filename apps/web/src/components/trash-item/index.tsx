@@ -95,7 +95,7 @@ function TrashItem(props: TrashItemProps) {
               className="trash-chip"
               icon={Note}
               selected={isSelected || isOpened}
-              text={"Note"}
+              text={strings.note()}
               iconSize={12}
               styles={{
                 icon: { color: "icon-secondary" },
@@ -113,7 +113,7 @@ function TrashItem(props: TrashItemProps) {
               className="trash-chip"
               icon={Notebook}
               selected={isSelected || isOpened}
-              text={"Notebook"}
+              text={strings.dataTypesCamelCase.notebook()}
               iconSize={12}
               styles={{
                 icon: { color: "icon-secondary" },

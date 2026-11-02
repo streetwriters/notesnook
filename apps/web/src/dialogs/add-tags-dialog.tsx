@@ -106,9 +106,9 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
             estimatedSize={36}
             items={tags.placeholders}
             placeholders={{
-              empty: "Add tags",
-              filter: "Search or add tags",
-              emptyList: "No tags to show"
+              empty: strings.addTags(),
+              filter: strings.searchOrAddTags(),
+              emptyList: strings.noTagsToShow()
             }}
             filter={async (query) => {
               setTags(

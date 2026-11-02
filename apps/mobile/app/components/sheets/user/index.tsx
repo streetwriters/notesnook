@@ -68,11 +68,13 @@ export const UserSheet = () => {
   const syncSubtitle = !user
     ? strings.notLoggedIn()
     : syncing
-      ? `${strings.syncing()}${progress ? ` (${progress.current})` : ""}${isOffline ? ` (${strings.offline()})` : ""}`
+      ? `${strings.syncing()}${progress ? ` (${progress.current})` : ""}${
+          isOffline ? ` (${strings.offline()})` : ""
+        }`
       : lastSyncStatus === SyncStatus.Failed
         ? `${strings.syncFailed()}${isOffline ? ` (${strings.offline()})` : ""}`
         : canShowLastSyncedTime
-          ? `Last synced${isOffline ? ` (${strings.offline()})` : ""}`
+          ? `${strings.lastSynced()}${isOffline ? ` (${strings.offline()})` : ""}`
           : strings.never();
 
   const actionItems = [
@@ -91,7 +93,7 @@ export const UserSheet = () => {
       key: "settings",
       icon: "user-sheet-settings",
       title: strings.settings(),
-      subtitle: "Preferences & app lock",
+      subtitle: strings.preferencesAndAppLock(),
       onPress: () => {
         ref.current?.hide();
         Navigation.navigate("Settings");
@@ -101,7 +103,7 @@ export const UserSheet = () => {
       key: "support",
       icon: "user-sheet-support",
       title: strings.emailSupport(),
-      subtitle: "Response within 24 hours",
+      subtitle: strings.responseWithin24Hours(),
       onPress: () => {
         Clipboard.setString("support@streetwriters.co");
         ToastManager.show({
@@ -113,7 +115,7 @@ export const UserSheet = () => {
         setTimeout(() => {
           Linking.openURL("mailto:support@streetwriters.co").catch((e) => {
             ToastManager.show({
-              message: "Could not open email app",
+              message: strings.couldNotOpenEmailApp(),
               type: "error",
               context: "local"
             });
@@ -125,7 +127,7 @@ export const UserSheet = () => {
       key: "documentation",
       icon: "user-sheet-docs",
       title: strings.documentation(),
-      subtitle: "Tutorials & help center",
+      subtitle: strings.tutorialsAndHelpCenter(),
       onPress: async () => {
         Linking.openURL("https://docs.notesnook.com");
       }
@@ -134,7 +136,7 @@ export const UserSheet = () => {
       key: "logout",
       icon: "user-sheet-logout",
       title: strings.logout(),
-      subtitle: "Sign out from this device",
+      subtitle: strings.signOutFromThisDevice(),
       onPress: async () => {
         ref.current?.hide();
         await sleep(300);

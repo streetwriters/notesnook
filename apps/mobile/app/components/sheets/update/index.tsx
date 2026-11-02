@@ -85,7 +85,7 @@ export const Update = ({ version: appVersion }: UpdateProps) => {
   const [version, setVersion] = useState<VersionInfo | undefined>(appVersion);
   let notes = version?.notes
     ? version.notes.replace("Thank you for using Notesnook!", "").split("- ")
-    : ["Bug fixes and performance improvements"];
+    : [strings.bugFixesAndImprovements()];
   notes = notes?.map((n) => n.replace(/\n|<br>/g, ""));
   const isGithubRelease = Config.GITHUB_RELEASE === "true";
 

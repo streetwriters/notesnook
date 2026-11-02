@@ -97,7 +97,7 @@ function AuthContainer(props) {
                     fontSize: "2xl"
                   }}
                 >
-                  Privacy Simplified.
+                  {strings.privacySimplified()}
                 </Text>
               </Flex>
               <Text
@@ -107,8 +107,7 @@ function AuthContainer(props) {
                   fontSize: "md"
                 }}
               >
-                Write notes with absolute freedom. No spying, no tracking, no
-                backdoor access. Just you and your thoughts.
+                {strings.privacySimplifiedDesc()}
               </Text>
             </Flex>
             <Image
@@ -310,7 +309,7 @@ function AuthContainer(props) {
               variant="new_anchor"
               onClick={() => SettingsDialog.show({ activeSection: "servers" })}
             >
-              {"Change server"}
+              {strings.changeServer()}
             </Button>
           </Flex>
         </Box>

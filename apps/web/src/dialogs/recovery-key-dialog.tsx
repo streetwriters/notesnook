@@ -51,9 +51,7 @@ export const RecoveryKeyDialog = DialogManager.register(
         testId="recovery-key-dialog"
         isOpen={true}
         title={strings.saveRecoveryKey()}
-        description={
-          "Save your account recovery key in a safe place. You will need it to recover your account in case you forget your password"
-        }
+        description={strings.saveRecoveryKeyDesc()}
         width={500}
         positiveButton={{
           text: strings.keyBackedUp(),
@@ -165,7 +163,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
               color: "accent"
             }}
           >
-            Save Your Recovery Key
+            {strings.saveYourRecoveryKey()}
           </Text>
         </Flex>
         <Flex
@@ -216,7 +214,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 color: "accent"
               }}
             >
-              {activeButton === "copy" ? "Copied!" : "Copy"}
+              {activeButton === "copy" ? strings.copied() : strings.copy()}
             </Text>
           </Flex>
         </Flex>
@@ -295,7 +293,9 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 color: "heading"
               }}
             >
-              {activeButton === "copyQR" ? "Copied!" : "Copy to clipboard"}
+              {activeButton === "copyQR"
+                ? strings.copied()
+                : strings.copyToClipboard()}
             </Text>
           </Button>
           <Button
@@ -334,7 +334,9 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
                 color: "heading"
               }}
             >
-              {activeButton === "saveQR" ? "Saved!" : "Save QR image"}
+              {activeButton === "saveQR"
+                ? strings.saved()
+                : strings.saveQRImage()}
             </Text>
           </Button>
           <Button
@@ -374,8 +376,8 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
               }}
             >
               {activeButton === "download"
-                ? "Downloaded!"
-                : "Download text file"}
+                ? strings.downloaded()
+                : strings.downloadTextFile()}
             </Text>
           </Button>
         </Flex>

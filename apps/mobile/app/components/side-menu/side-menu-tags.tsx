@@ -241,7 +241,7 @@ export const SideMenuTags = () => {
           {
             label: strings.enterTitle(),
             name: "title",
-            placeholder: "e.g. journal",
+            placeholder: strings.tagTitlePlaceholder(),
             ref: React.createRef(),
             validators: [validators.required(strings.titleIsRequired())],
             inputProps: {
@@ -257,9 +257,9 @@ export const SideMenuTags = () => {
             });
             useTagStore.getState().refresh();
             ToastManager.show({
-                                                  message: strings.actions.created.tag(1),
-                                                  type: "success",
-                                                });
+              message: strings.actions.created.tag(1),
+              type: "success"
+            });
             return true;
           } catch (e) {
             form.setError("title", (e as Error).message);

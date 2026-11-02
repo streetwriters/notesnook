@@ -58,11 +58,11 @@ const getBillingSubtitle = (user) => {
   const isAnnual = user.subscription.productId?.includes("yearly");
   const billingLabel =
     user?.subscription?.provider === SubscriptionProvider.STREETWRITERS
-      ? "Awarded"
+      ? strings.awarded()
       : isAnnual
-        ? "Billed annually"
+        ? strings.billingType.annual()
         : user.subscription.productId?.includes("monthly")
-          ? "Billed monthly"
+          ? strings.billingType.monthly()
           : null;
 
   if (!user.subscription.expiry) return billingLabel;
@@ -73,12 +73,10 @@ const getBillingSubtitle = (user) => {
     user.subscription.status === SubscriptionStatus.PAUSED ||
     user.subscription.status === SubscriptionStatus.EXPIRED ||
     user?.subscription?.provider === SubscriptionProvider.STREETWRITERS
-      ? "Ends"
-      : "Renews";
+      ? strings.endsOn
+      : strings.renewsOn;
 
-  return [billingLabel, `${renewalLabel} ${expiryLabel}`]
-    .filter(Boolean)
-    .join(" • ");
+  return [billingLabel, renewalLabel(expiryLabel)].filter(Boolean).join(" • ");
 };
 
 const SettingsUserSection = ({ item }) => {

@@ -345,7 +345,7 @@ export const useActions = ({
           {
             label: strings.enterTitle(),
             name: "title",
-            placeholder: "e.g. journal",
+            placeholder: strings.tagTitlePlaceholder(),
             ref: React.createRef(),
             validators: [validators.required(strings.titleIsRequired())],
             inputProps: {

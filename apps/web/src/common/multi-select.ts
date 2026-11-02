@@ -71,7 +71,7 @@ async function moveNotebooksToTrash(ids: string[]) {
 
   const result = await ConfirmDialog.show({
     title: strings.doActions.delete.notebook(ids.length),
-    positiveButtonText: "Confirm",
+    positiveButtonText: strings.confirm(),
     positiveButtonVariant: "new_error",
     negativeButtonText: strings.cancel(),
     checks: {

@@ -265,10 +265,9 @@ export const MFASetup = ({
   }, [authenticatorDetails.sharedKey, methodId, user?.email]);
 
   const codeHelpText = {
-    app: "After putting the above code in authenticator app, the app will display a code that you can enter below.",
-    sms: "You will receive a 2FA code on your phone number which you can enter below",
-    email:
-      "You will receive a 2FA code on your email address which you can enter below"
+    app: strings.mfaAppCodeHelpText(),
+    sms: strings.mfaSmsCodeHelpText(),
+    email: strings.mfaEmailCodeHelpText()
   };
 
   const targetValidators =

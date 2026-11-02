@@ -55,7 +55,7 @@ export const NoteExpiryDateDialog = DialogManager.register(
       <Dialog
         isOpen={true}
         title={strings.setExpiry()}
-        description="This note will automatically be deleted on the selected date."
+        description={strings.noteExpiryDateDesc()}
         onClose={() => onClose(false)}
         width={400}
         positiveButton={{

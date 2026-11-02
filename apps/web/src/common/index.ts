@@ -505,7 +505,7 @@ export function createSetDefaultHomepageMenuItem(
   return {
     key: "set-as-homepage",
     type: "button",
-    title: "Set as homepage",
+    title: strings.setAsHomepageTitle(),
     isChecked: homepage?.id === id && homepage?.type === type,
     premium: !availability.isAllowed,
     onClick: withFeatureCheck(availability, async () => {
