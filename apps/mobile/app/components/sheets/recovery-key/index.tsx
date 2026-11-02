@@ -332,12 +332,14 @@ function RecoveryKeySheet({ close }: RecoveryKeySheetProps) {
               }}
             >
               <Paragraph
-                size={AppFontSize.sm}
+                size={AppFontSize.md}
                 color={colors.primary.paragraph}
                 selectable
                 style={{
-                  lineHeight: AppFontSize.sm * 1.2,
-                  flexShrink: 1
+                  lineHeight: AppFontSize.md * 1.2,
+                  flexShrink: 1,
+                  letterSpacing: 0.5,
+                  fontFamily: "monospace"
                 }}
               >
                 {key || ""}
