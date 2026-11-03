@@ -37,6 +37,7 @@ import { strings } from "@notesnook/intl";
 import { SchemeColors, Theme } from "@notesnook/theme";
 import { MenuItem } from "@notesnook/ui";
 import { alpha } from "@theme-ui/color";
+import { ThemeUIStyleObject } from "@theme-ui/css";
 import { useThemeUI } from "@theme-ui/core";
 import { Flex, Text } from "@theme-ui/components";
 import React from "react";
@@ -120,6 +121,7 @@ type NoteProps = NoteResolvedData & {
   context?: Context;
   date: number;
   compact?: boolean;
+  sx?: ThemeUIStyleObject;
 };
 
 function Note(props: NoteProps) {
@@ -133,7 +135,8 @@ function Note(props: NoteProps) {
     date,
     reminder,
     compact,
-    context
+    context,
+    sx
   } = props;
   const note = item;
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
@@ -218,7 +221,8 @@ function Note(props: NoteProps) {
         gap: "spacing4",
         ":hover": {
           ".note-chip": { backgroundColor: "background-tertiary" }
-        }
+        },
+        ...sx
       }}
       context={{ color, locked }}
       menuItems={noteMenuItems}

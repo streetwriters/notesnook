@@ -1130,7 +1130,7 @@ function Reminders({ noteId }: { noteId: string }) {
     [noteId, reminders]
   );
 
-  if (result.status !== "fulfilled") return <ListLoader />;
+  if (!("value" in result) || result.value === undefined) return <ListLoader />;
 
   return (
     <ListContainer
@@ -1138,7 +1138,7 @@ function Reminders({ noteId }: { noteId: string }) {
       group="reminders"
       compact
       items={result.value}
-      refresh={result.refresh}
+      refresh={result.status === "fulfilled" ? result.refresh : () => {}}
       sx={{
         flex: 1,
         px: "spacing4",
@@ -1162,17 +1162,22 @@ function Reminders({ noteId }: { noteId: string }) {
               {strings.noRemindersToShow()}
             </Text>
             <Button
+              variant="new_anchor"
               sx={{
                 display: "flex",
                 alignItems: "center",
                 gap: "spacing3",
                 width: "fit-content",
-                p: 0
+                p: 0,
+                textDecoration: "none"
               }}
               onClick={async () => {
                 const note = await db.notes.note(noteId);
                 await AddReminderDialog.show({ note });
-                result.refresh();
+
+                if (result.status === "fulfilled") {
+                  result.refresh();
+                }
               }}
             >
               <Plus size={15} color="accent" />
