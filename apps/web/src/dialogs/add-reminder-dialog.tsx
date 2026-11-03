@@ -696,7 +696,7 @@ export const AddReminderDialog = DialogManager.register(
                     fontSize: "xs"
                   }}
                 >
-                  {strings.note()} {strings.references()}:
+                  Note reference
                 </Text>
                 {referencedNotes.value.map((item) => (
                   <NoteItem
@@ -704,6 +704,12 @@ export const AddReminderDialog = DialogManager.register(
                     item={item}
                     date={item.dateCreated}
                     compact
+                    sx={{
+                      borderRadius: "radius2",
+                      border: "1px solid",
+                      borderColor: "border",
+                      bg: "background"
+                    }}
                   />
                 ))}
               </Flex>

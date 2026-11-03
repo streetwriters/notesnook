@@ -54,6 +54,7 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { strings } from "@notesnook/intl";
 import { Checkbox } from "../checkbox";
 import dayjs from "dayjs";
+import { showToast } from "../../utils/toast";
 
 const PRIORITY_ICON_MAP = {
   silent: BellSimpleSlash,
@@ -92,8 +93,10 @@ function Reminder(props: ReminderProps) {
   async function toggleCompleted() {
     if (completed) {
       await db.reminders.markUncomplete(reminder.id);
+      showToast("success", "Reminder marked incomplete");
     } else {
       await db.reminders.markComplete(reminder.id);
+      showToast("success", "Reminder completed");
     }
     await store.refresh();
   }
