@@ -279,6 +279,7 @@ export const useActions = ({
     close();
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
+    useRelationStore.getState().update();
     PinnedNotesWidget.updateNotes();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
@@ -1190,6 +1191,7 @@ export const useActions = ({
           db.notes.archive(!item.archived, item.id);
           setItem((await db.notes.note(item.id)) as Item);
           Navigation.queueRoutesForUpdate();
+          useRelationStore.getState().update();
           useArchivedStore.getState().refresh();
           PinnedNotesWidget.updateNotes();
         },

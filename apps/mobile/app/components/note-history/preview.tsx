@@ -26,6 +26,7 @@ import { useTabStore } from "../../screens/editor/tiptap/use-tab-store";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { ToastManager, eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import { useRelationStore } from "../../stores/use-relation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { PinnedNotesWidget } from "../../services/pinned-notes-widget";
@@ -75,6 +76,7 @@ export default function NotePreview({
     if (note && note.type === "trash") {
       await db.trash.restore(note.id);
       Navigation.queueRoutesForUpdate();
+      useRelationStore.getState().update();
       PinnedNotesWidget.updateNotes();
       useSelectionStore.getState().setSelectionMode();
       ToastManager.show({

@@ -32,6 +32,7 @@ import { db } from "../../common/database";
 import { ToastManager } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
+import { useRelationStore } from "../../stores/use-relation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { deleteItems } from "../../utils/functions";
@@ -88,6 +89,7 @@ export const SelectionHeader = React.memo(
       if (!selectedItemsList.length) return;
       await db.trash.restore(...selectedItemsList);
       Navigation.queueRoutesForUpdate();
+      useRelationStore.getState().update();
       PinnedNotesWidget.updateNotes();
 
       clearSelection();

@@ -24,6 +24,7 @@ import { db } from "../../../common/database";
 import NotebookScreen from "../../../screens/notebook";
 import { ToastManager } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
+import { useRelationStore } from "../../../stores/use-relation-store";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useTrashStore } from "../../../stores/use-trash-store";
 import { presentDialog } from "../../dialog/functions";
@@ -43,6 +44,7 @@ export const openNotebook = (item: Notebook | BaseTrashItem<Notebook>) => {
       positivePress: async () => {
         await db.trash.restore(item.id);
         Navigation.queueRoutesForUpdate();
+        useRelationStore.getState().update();
         useSelectionStore.getState().setSelectionMode(undefined);
         ToastManager.show({
           heading: strings.notebookRestored(),
