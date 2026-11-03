@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-import { expect, test } from "vitest";
-import { databaseTest, loginFakeUser } from "./utils";
+import { expect, test, vi } from "vitest";
+import { databaseTest, loginFakeUser, TEST_NOTE } from "./utils";
 import Database from "../src/api/index.js";
+import { FileStorage } from "../src/database/fs.js";
 
 async function restoreWithDifferentKey(
   db: Database,
@@ -96,3 +97,94 @@ test("restoring a backup attachment with a different key should adopt the backup
     expect(restored?.chunkSize).toBe(4096);
     expect(restored?.dateUploaded).toBeFalsy();
   }));
+
+const IMAGE =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEEAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+async function exportBackup(db: Database, mode: "full" | "partial") {
+  const files: any[] = [];
+  for await (const file of db.backup.export({
+    type: "node",
+    encrypt: false,
+    mode
+  }))
+    files.push(file);
+  const keyFile = files.find((f) => f.path === "attachments/.attachments_key");
+  return {
+    attachmentsKey: keyFile ? JSON.parse(keyFile.data) : undefined,
+    backups: files
+      .filter(
+        (f) =>
+          f.type === "file" &&
+          f.path !== ".nnbackup" &&
+          !f.path.startsWith("attachments/")
+      )
+      .map((f) => JSON.parse(f.data))
+  };
+}
+
+async function importBackup(
+  db: Database,
+  { attachmentsKey, backups }: Awaited<ReturnType<typeof exportBackup>>
+) {
+  const skipped: string[] = [];
+  for (const backup of backups)
+    skipped.push(...((await db.backup.import(backup, { attachmentsKey })) || []));
+  return skipped;
+}
+
+async function createAccountWithAttachment() {
+  const db = await databaseTest();
+  await loginFakeUser(db);
+  const noteId = await db.notes.add(TEST_NOTE);
+  const hash = await db.attachments.save(IMAGE, "image/png", "test.png");
+  if (!hash) throw new Error("Failed to create attachment");
+  return { db, noteId, hash };
+}
+
+test("restoring a partial backup from another account should skip its attachments", async () => {
+  const { db: other, noteId, hash } = await createAccountWithAttachment();
+  const db = await databaseTest();
+  await loginFakeUser(db);
+
+  const skipped = await importBackup(db, await exportBackup(other, "partial"));
+
+  expect(skipped).toEqual([hash]);
+  expect(await db.notes.note(noteId)).toBeDefined();
+  expect(await db.attachments.attachment(hash)).toBeUndefined();
+});
+
+test("restoring a full backup with an undecryptable attachment key should restore everything else", async () => {
+  const { db: other, hash } = await createAccountWithAttachment();
+  const db = await databaseTest();
+  await loginFakeUser(db);
+  await db.attachments.collection.upsert(
+    (await other.attachments.attachment(hash))!
+  );
+  const noteId = await db.notes.add({ ...TEST_NOTE, title: "local note" });
+
+  const target = await databaseTest();
+  await loginFakeUser(target);
+  const skipped = await importBackup(target, await exportBackup(db, "full"));
+
+  expect(skipped).toEqual([hash]);
+  expect(await target.notes.note(noteId)).toBeDefined();
+  expect(await target.attachments.attachment(hash)).toBeUndefined();
+});
+
+test("restoring a full backup should re-upload an attachment whose file is lost everywhere", async () => {
+  const { db, hash } = await createAccountWithAttachment();
+  const attachment = (await db.attachments.attachment(hash))!;
+  await db.attachments.collection.update([attachment.id], {
+    dateUploaded: Date.now()
+  });
+  const backup = await exportBackup(db, "full");
+  await db.fs().deleteFile(hash, true);
+  vi.spyOn(FileStorage.prototype, "getUploadedFileSize").mockResolvedValue(0);
+
+  const skipped = await importBackup(db, backup);
+
+  expect(skipped).toEqual([]);
+  expect((await db.attachments.attachment(hash))?.dateUploaded).toBeFalsy();
+  vi.restoreAllMocks();
+});
