@@ -153,6 +153,7 @@ export const AddReminderDialog = DialogManager.register(
     );
     const [showCalendar, setShowCalendar] = useState(false);
     const [showMonthlyDays, setShowMonthlyDays] = useState(false);
+    const [isReminderDateValid, setIsReminderDateValid] = useState(true);
     const refresh = useStore((state) => state.refresh);
     const theme = useThemeStore((store) => store.colorScheme);
     const dateInputRef = useRef<HTMLInputElement>(null);
@@ -180,6 +181,7 @@ export const AddReminderDialog = DialogManager.register(
           text: reminder ? strings.save() : strings.add(),
           disabled:
             !title ||
+            !isReminderDateValid ||
             (mode !== Modes.ONCE &&
               recurringMode !== RecurringModes.DAY &&
               recurringMode !== RecurringModes.YEAR &&
@@ -225,6 +227,7 @@ export const AddReminderDialog = DialogManager.register(
             }
 
             refresh();
+            showToast("success", "Reminder created!");
             props.onClose(true);
           }
         }}
@@ -362,9 +365,15 @@ export const AddReminderDialog = DialogManager.register(
                       py: "spacing6"
                     }
                   }}
-                  validate={(t) =>
-                    dayjs(t, db.settings.getDateFormat(), true).isValid()
-                  }
+                  validate={(t) => {
+                    const isValid = dayjs(
+                      t,
+                      db.settings.getDateFormat(),
+                      true
+                    ).isValid();
+                    setIsReminderDateValid(isValid);
+                    return isValid;
+                  }}
                   defaultValue={date.format(db.settings.getDateFormat())}
                   onChange={(e) =>
                     setDate((d) => setDateOnly(e.target.value, d))
@@ -501,7 +510,7 @@ export const AddReminderDialog = DialogManager.register(
                     boxShadow: "0px 5px 20px 0px rgba(0, 0, 0, 0.14)"
                   }}
                 >
-                  {new Array(30).fill(0).map((_, index) => {
+                  {new Array(31).fill(0).map((_, index) => {
                     const day = index + 1;
                     const selected = selectedDays.includes(day);
                     return (
@@ -605,7 +614,7 @@ export const AddReminderDialog = DialogManager.register(
                 flex: 1,
                 alignSelf: "flex-start"
               }}
-              action={{ icon: Clock }}
+              rightIcon={Clock}
               placeholder={
                 db.settings.getTimeFormat() === "12-hour"
                   ? "hh:mm AM/PM"
@@ -615,7 +624,8 @@ export const AddReminderDialog = DialogManager.register(
                 input: {
                   height: "45px",
                   fontSize: "sm",
-                  px: "spacing4",
+                  pr: "spacing10",
+                  pl: "spacing4",
                   py: "spacing6"
                 }
               }}
@@ -624,7 +634,9 @@ export const AddReminderDialog = DialogManager.register(
                   db.settings.getTimeFormat() === "12-hour"
                     ? "hh:mm a"
                     : "HH:mm";
-                return dayjs(t.toLowerCase(), format, true).isValid();
+                const isValid = dayjs(t.toLowerCase(), format, true).isValid();
+                setIsReminderDateValid(isValid);
+                return isValid;
               }}
               defaultValue={date.format(
                 getTimeFormat(db.settings.getTimeFormat())
@@ -777,6 +789,10 @@ function ReminderRadioButton(props: ReminderRadioButtonProps) {
         alignItems: "center",
         bg: selected ? "background-selected" : "transparent",
         gap: "spacing4",
+        cursor: premium ? "not-allowed" : "pointer",
+        ":hover:not(:disabled):not(:active)": {
+          background: premium ? "transparent" : "hover"
+        },
         ...sx
       }}
     >
@@ -857,6 +873,13 @@ export function getReminderRepeatText(
   weekDays: string[]
 ) {
   const time = date.format(timeFormat());
+
+  if (recurringMode === RecurringModes.YEAR) {
+    return strings.reminderRepeatStrings.year(
+      `${date.format(db.settings.getDateFormat())} at ${time}`
+    );
+  }
+
   const repeatsDaily =
     (selectedDays.length === 7 && recurringMode === RecurringModes.WEEK) ||
     (selectedDays.length === 31 && recurringMode === RecurringModes.MONTH) ||

@@ -121,7 +121,9 @@ function Reminder(props: ReminderProps) {
                 checked={completed}
                 onToggle={toggleCompleted}
                 aria-label={
-                  completed ? "Mark reminder incomplete" : "Mark reminder complete"
+                  completed
+                    ? "Mark reminder incomplete"
+                    : "Mark reminder complete"
                 }
                 data-test-id="reminder-complete"
                 size={15}
@@ -195,7 +197,6 @@ function Reminder(props: ReminderProps) {
               ml: "spacing8",
               color: "paragraph",
               fontSize: "xs",
-              lineHeight: 1,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap"
