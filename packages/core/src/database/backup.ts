@@ -613,88 +613,11 @@ export default class Backup {
       if (!itemType || itemType === "topic" || itemType === "settings")
         continue;
 
-      if (item.type === "attachment" && (item.metadata?.hash || item.hash)) {
-        const attachment = await this.db.attachments.attachment(
-          item.metadata?.hash || item.hash
-        );
-        const isSameKey =
-          !!attachment &&
-          attachment.key.iv === item.key.iv &&
-          attachment.key.cipher === item.key.cipher &&
-          attachment.key.salt === item.key.salt;
-
-        if (
-          attachmentsKey &&
-          !isSameKey &&
-          attachment &&
-          (attachment.dateUploaded ||
-            (await this.db.fs().exists(attachment.hash)))
-        ) {
-          // the server won't overwrite an uploaded file & other devices may have
-          // it cached, so we must keep the local key and file.
-          skippedAttachments.push(attachment.hash);
-        } else if (attachmentsKey && !isSameKey) {
-          const newKey = await this.db.attachments.encryptKey(
-            JSON.parse(
-              await this.db.storage().decrypt(attachmentsKey, item.key)
-            )
-          );
-          if (attachment) {
-            attachment.key = newKey;
-            attachment.iv = item.iv;
-            attachment.salt = item.salt;
-            attachment.size = item.size;
-            attachment.chunkSize = item.chunkSize;
-            attachment.alg = item.alg;
-            delete attachment.dateUploaded;
-            delete attachment.failed;
-          } else item.key = newKey;
-          delete item.dateUploaded;
-          delete item.failed;
-        }
-
-        if (attachment) {
-          if (
-            attachmentsKey &&
-            isSameKey &&
-            !(await this.db.fs().exists(attachment.hash)) &&
-            (await this.db.fs().getUploadedFileSize(attachment.hash)) <= 0
-          ) {
-            delete item.dateUploaded;
-            delete item.failed;
-          }
-
-          const isNewGeneric =
-            item.metadata?.type === "application/octet-stream" ||
-            item.mimeType === "application/octet-stream";
-          const isOldGeneric =
-            attachment.mimeType === "application/octet-stream";
-          item = {
-            ...attachment,
-            mimeType:
-              // we keep whichever mime type is more specific
-              isNewGeneric && !isOldGeneric
-                ? attachment.mimeType
-                : item.metadata?.type || item.mimeType,
-            filename:
-              // we keep the filename based on which item's mime type we kept
-              isNewGeneric && !isOldGeneric
-                ? attachment.filename
-                : item.metadata?.filename || item.filename
-          };
-          for (const noteId of item.noteIds || []) {
-            await this.db.relations.add(
-              {
-                id: noteId,
-                type: "note"
-              },
-              attachment
-            );
-          }
-        } else {
-          delete item.dateUploaded;
-          delete item.failed;
-        }
+      if (item.type === "attachment") {
+        const result = await this.restoreAttachment(item, attachmentsKey);
+        if (result.skipFile) skippedAttachments.push(item.hash);
+        if (!result.attachment) continue;
+        item = result.attachment;
       }
 
       const collectionKey: CollectionName =
@@ -732,6 +655,80 @@ export default class Backup {
     return skippedAttachments;
   }
 
+  private async restoreAttachment(
+    item: Attachment,
+    attachmentsKey?: SerializedKey
+  ): Promise<{ attachment?: Attachment; skipFile?: boolean }> {
+    const local = await this.db.attachments.attachment(item.hash);
+
+    if (!attachmentsKey) {
+      if (local) return { attachment: mergeAttachmentInfo(local, item) };
+      if (await this.isOwnAttachmentKey(item.key))
+        return { attachment: withoutUploadState(item) };
+      return skipAttachment(item);
+    }
+
+    if (local && isSameKey(local, item)) {
+      const attachment = mergeAttachmentInfo(local, item);
+      return {
+        attachment: (await this.hasFile(local.hash))
+          ? attachment
+          : withoutUploadState(attachment)
+      };
+    }
+
+    const key = await this.reencryptBackupKey(item.key, attachmentsKey);
+    if (!local)
+      return key
+        ? { attachment: withoutUploadState({ ...item, key }) }
+        : skipAttachment(item);
+
+    // the server won't overwrite an uploaded file & other devices may have
+    // it cached, so we must keep the local key and file.
+    if (!key || local.dateUploaded || (await this.db.fs().exists(local.hash)))
+      return { attachment: mergeAttachmentInfo(local, item), skipFile: true };
+
+    return {
+      attachment: withoutUploadState({
+        ...mergeAttachmentInfo(local, item),
+        key,
+        iv: item.iv,
+        salt: item.salt,
+        size: item.size,
+        chunkSize: item.chunkSize,
+        alg: item.alg
+      })
+    };
+  }
+
+  private async reencryptBackupKey(
+    key: Cipher<"base64">,
+    attachmentsKey: SerializedKey
+  ) {
+    const decrypted = await this.db
+      .storage()
+      .decrypt(attachmentsKey, key)
+      .catch(() => undefined);
+    if (!decrypted) return;
+    return await this.db.attachments.encryptKey(JSON.parse(decrypted));
+  }
+
+  private async isOwnAttachmentKey(key: Cipher<"base64">) {
+    const attachmentsKey = await this.db.user.getAttachmentsKey();
+    if (!attachmentsKey) return true;
+    return !!(await this.db
+      .storage()
+      .decrypt(attachmentsKey, key)
+      .catch(() => undefined));
+  }
+
+  private async hasFile(hash: string) {
+    return (
+      (await this.db.fs().exists(hash)) ||
+      (await this.db.fs().getUploadedFileSize(hash)) > 0
+    );
+  }
+
   private validate(backup: LegacyBackupFile | BackupFile) {
     return (
       !!backup.date &&
@@ -758,4 +755,33 @@ export default class Backup {
       }
     }
   }
+}
+
+function isSameKey(a: Attachment, b: Attachment) {
+  return (
+    a.key.iv === b.key.iv &&
+    a.key.cipher === b.key.cipher &&
+    a.key.salt === b.key.salt
+  );
+}
+
+function withoutUploadState(attachment: Attachment): Attachment {
+  const { dateUploaded: _dateUploaded, failed: _failed, ...rest } = attachment;
+  return rest;
+}
+
+function skipAttachment(item: Attachment) {
+  logger.warn("Skipping attachment with an undecryptable key", {
+    hash: item.hash
+  });
+  return { skipFile: true };
+}
+
+function mergeAttachmentInfo(local: Attachment, item: Attachment): Attachment {
+  const keepLocal =
+    item.mimeType === "application/octet-stream" &&
+    local.mimeType !== "application/octet-stream";
+  return keepLocal
+    ? local
+    : { ...local, mimeType: item.mimeType, filename: item.filename };
 }
