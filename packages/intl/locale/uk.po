@@ -4512,6 +4512,14 @@ msgstr "Минулі"
 msgid "Last edited at"
 msgstr "Останнє редагування"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr ""
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Останнє використання"
@@ -5180,6 +5188,10 @@ msgstr "Нові нотатки будуть без категорії"
 msgid "Next"
 msgstr "Далі"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Наступний збіг"
@@ -5187,6 +5199,10 @@ msgstr "Наступний збіг"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Наступного місяця"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr ""
 
 #: src/strings.ts:2220
 msgid "Next tab"
@@ -5300,6 +5316,10 @@ msgstr "Немає"
 #: src/strings.ts:1832
 msgid "Normal mode"
 msgstr "Звичайний режим"
+
+#: src/strings.ts:3287
+msgid "Not enough storage space available. Free up some space and try again."
+msgstr ""
 
 #: src/strings.ts:3135
 msgid "Not found"

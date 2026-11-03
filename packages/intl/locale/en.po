@@ -5318,6 +5318,10 @@ msgstr "None"
 msgid "Normal mode"
 msgstr "Normal mode"
 
+#: src/strings.ts:3287
+msgid "Not enough storage space available. Free up some space and try again."
+msgstr "Not enough storage space available. Free up some space and try again."
+
 #: src/strings.ts:3135
 msgid "Not found"
 msgstr "Not found"
