@@ -113,7 +113,7 @@ export const AuthenticationSettings: SettingsGroup[] = [
                   await useUserStore.getState().refreshUser();
                   return true;
                 });
-              } else {
+              } else if (await verifyAccount()) {
                 await MultifactorDialog.show({});
                 await useUserStore.getState().refreshUser();
               }
