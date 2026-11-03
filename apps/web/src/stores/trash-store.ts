@@ -23,6 +23,7 @@ import BaseStore from "./index";
 import { store as appStore } from "./app-store";
 import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
+import { store as tagStore } from "./tag-store";
 import { TrashItem, VirtualizedGrouping } from "@notesnook/core";
 import { showToast } from "../utils/toast";
 import { strings } from "@notesnook/intl";
@@ -49,6 +50,7 @@ class TrashStore extends BaseStore<TrashStore> {
     await appStore.refreshNavItems();
     await noteStore.refresh();
     await notebookStore.refresh();
+    await tagStore.refresh();
   };
 
   clear = async () => {

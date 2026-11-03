@@ -21,6 +21,8 @@ import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as appStore } from "./app-store";
 import { store as trashStore } from "./trash-store";
+import { store as tagStore } from "./tag-store";
+import { store as notebookStore } from "./notebook-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import Config from "../utils/config";
@@ -85,6 +87,8 @@ class NoteStore extends BaseStore<NoteStore> {
     await db.notes.moveToTrash(...ids);
     await this.refresh();
     await trashStore.refresh();
+    await tagStore.refresh();
+    await notebookStore.refresh();
   };
 
   pin = async (state: boolean, ...ids: string[]) => {
@@ -100,6 +104,8 @@ class NoteStore extends BaseStore<NoteStore> {
   archive = async (state: boolean, ...ids: string[]) => {
     await db.notes.archive(state, ...ids);
     await this.refresh();
+    await tagStore.refresh();
+    await notebookStore.refresh();
   };
 
   spellcheck = async (state: boolean, ...ids: string[]) => {
