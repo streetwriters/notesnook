@@ -26,28 +26,44 @@ const equalPairs = [
     `<div>hello   \n\n\n\n\n</div>\n\n\n\n\n\n`,
     `<div>hello</div>`
   ],
-  ["ignore html structure", `<p><b>hello</b>world</p>`, "<p>helloworld</p>"],
   [
-    "ignore attributes",
-    `<p id="ignored"><b id="ignored">hello</b>world</p>`,
-    "<p>helloworld</p>"
+    "ignore non-semantic attributes",
+    `<p id="ignored" class="one" data-extra="x">hello world</p>`,
+    `<p>hello world</p>`
   ],
   [
-    "ignore empty tags",
-    "<div>helloworld</div><p></p>",
-    "<div>helloworld</div>"
+    "same formatting preserved",
+    `<p><strong>hello</strong> world</p>`,
+    `<p><strong>hello</strong> world</p>`
   ],
-  ["ignore br", "<p>hello<br/>world</p><p><br/><br/></p>", "<p>helloworld</p>"],
+  [
+    "same list structure",
+    `<ul><li><p>item one</p></li><li><p>item two</p></li></ul>`,
+    `<ul><li><p>item one</p></li><li><p>item two</p></li></ul>`
+  ],
+  [
+    "ignore trailing empty paragraph",
+    `<div>helloworld</div><p></p>`,
+    `<div>helloworld</div>`
+  ],
+  [
+    "ignore tiptap empty paragraph placeholder",
+    `<div>helloworld</div><p><br/></p>`,
+    `<div>helloworld</div>`
+  ],
+  ["ignore deeply nested empty tags", `<ul><li></li></ul>`, ``],
   [
     "image with same src",
     `<img src="./img.jpeg" />`,
     `<img id="hello" class="diff" src="./img.jpeg" />`
   ],
   [
-    "link with same href",
-    `<a href="google.com" />`,
-    `<a id="hello" class="diff" href="google.com" />`
-  ]
+    "link with same href and text",
+    `<a href="google.com">click here</a>`,
+    `<a id="hello" class="diff" href="google.com">click here</a>`
+  ],
+  ["case insensitive tags", `<P>hello</P>`, `<p>hello</p>`],
+  ["whitespace inside semantic tags", `<p>hello   \n\n</p>`, `<p>hello</p>`]
 ];
 
 describe("pairs should be equal", () => {
@@ -72,7 +88,57 @@ const inequalPairs = [
     `<a href="brave.com" />`,
     `<a id="hello" class="diff" href="google.com" />`
   ],
-  ["non-string", {}, {}]
+  ["non-string", {}, {}],
+  // formatting differences
+  ["bold vs no bold", `<p><b>hello</b>world</p>`, `<p>helloworld</p>`],
+  ["bold vs italic", `<p><strong>hello</strong></p>`, `<p><em>hello</em></p>`],
+  ["strikethrough vs underline", `<p><s>hello</s></p>`, `<p><u>hello</u></p>`],
+  ["code vs plain text", `<p><code>hello</code></p>`, `<p>hello</p>`],
+  // structural differences
+  ["heading vs paragraph", `<h1>Title</h1>`, `<p>Title</p>`],
+  ["different heading level", `<h1>Title</h1>`, `<h2>Title</h2>`],
+  [
+    "ordered vs unordered list",
+    `<ul><li>item</li></ul>`,
+    `<ol><li>item</li></ol>`
+  ],
+  [
+    "list item reordering",
+    `<ol><li><p>first</p></li><li><p>second</p></li></ol>`,
+    `<ol><li><p>second</p></li><li><p>first</p></li></ol>`
+  ],
+  [
+    "blockquote vs paragraph",
+    `<blockquote><p>quoted</p></blockquote>`,
+    `<p>quoted</p>`
+  ],
+  [
+    "br creates structural difference via text splitting",
+    `<p>hello<br/>world</p>`,
+    `<p>helloworld</p>`
+  ],
+  [
+    "hr is a meaningful structural element",
+    `<p>above</p><hr/><p>below</p>`,
+    `<p>above</p><p>below</p>`
+  ],
+  // separator prevents text-node concatenation collisions
+  [
+    "adjacent paragraphs do not collide with single paragraph",
+    `<p>foo</p><p>bar</p>`,
+    `<p>foobar</p>`
+  ],
+  [
+    "href value does not collide with adjacent text",
+    `<a href="abc">def</a>ghi`,
+    `<p>abcdef</p><a href="">ghi</a>`
+  ],
+  // link text difference
+  [
+    "link text changed with same href",
+    `<a href="google.com">click here</a>`,
+    `<a href="google.com">go there</a>`
+  ]
 ];
 
 describe("pairs should not be equal", () => {
