@@ -80,6 +80,28 @@ describe.concurrent("merge item synchronously", (test) => {
 
       expect(merged).toBeUndefined();
     }));
+
+  test("keep expired local note if remote note has no expiry date", () =>
+    databaseTest().then(async (db) => {
+      await loginFakeUser(db);
+      const merger = new Merger(db);
+
+      const merged = merger.mergeItem(
+        {
+          type: "note",
+          dateModified: Date.now() - 1000
+        },
+        {
+          type: "trash",
+          itemType: "note",
+          deletedBy: "expired",
+          dateModified: Date.now(),
+          expiryDate: { dateModified: Date.now(), value: Date.now() }
+        }
+      );
+
+      expect(merged).toBeUndefined();
+    }));
 });
 
 describe.concurrent("merge content", (test) => {
