@@ -113,3 +113,14 @@ test("notebook notes should exclude trashed notes when there are too many", () =
     expect(await db.notebooks.totalNotes(notebookId)).toEqual([1]);
     expect(await db.notebooks.notes(notebookId)).toEqual([noteId]);
   }));
+
+test("notebook note count should exclude archived notes", () =>
+  databaseTest().then(async (db) => {
+    const notebookId = await db.notebooks.add({ title: "notebook" });
+    const noteId = await db.notes.add({ title: "visible" });
+    const archivedId = await db.notes.add({ title: "archived" });
+    await db.notes.addToNotebook(notebookId, noteId, archivedId);
+    await db.notes.archive(true, archivedId);
+
+    expect(await db.notebooks.totalNotes(notebookId)).toEqual([1]);
+  }));

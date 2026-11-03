@@ -124,7 +124,22 @@ export class Notebooks implements ICollection {
       .innerJoin("subNotebooks", "subNotebooks.id", "relations.fromId")
       .where("toType", "==", "note")
       .where("fromType", "==", "notebook")
-      .where((eb) => eb.not(isTrashed(eb, "notes", "relations.toId")))
+      .where((eb) =>
+        eb.not(
+          eb.exists(
+            eb
+              .selectFrom("notes")
+              .select("notes.id")
+              .whereRef("notes.id", "==", "relations.toId")
+              .where((eb) =>
+                eb.or([
+                  eb("notes.type", "==", "trash"),
+                  eb("notes.archived", "==", true)
+                ])
+              )
+          )
+        )
+      )
       .select((eb) => [
         "subNotebooks.rootId as id",
         eb.fn.count<number>("relations.toId").distinct().as("totalNotes")
