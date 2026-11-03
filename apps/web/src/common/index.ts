@@ -37,7 +37,7 @@ import {
 import { showToast } from "../utils/toast";
 import { readFile, showFilePicker } from "../utils/file-picker";
 import { logger } from "../utils/logger";
-import { TaskManager } from "./task-manager";
+import { ProgressReportCallback, TaskManager } from "./task-manager";
 import { EVENTS, parseInternalLink } from "@notesnook/core";
 import { createWritableStream } from "./desktop-bridge";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
@@ -130,7 +130,6 @@ export async function createBackup(
   const ext = "nnbackupz";
   const filePath = `${filename}.${ext}`;
 
-  const encoder = new TextEncoder();
   const error = await TaskManager.startTask<Error | void>({
     type: background ? "status" : "modal",
     id: "creating-backup",
@@ -139,44 +138,23 @@ export async function createBackup(
     action: async (report) => {
       const { createZipStream } = await import("../utils/streams/zip-stream");
       const writeStream = await createWritableStream(filePath);
-      await new ReadableStream<ZipFile>({
-        start() {},
-        async pull(controller) {
-          for await (const output of db.backup!.export({
-            type: "web",
-            encrypt: encryptedBackups,
-            mode
-          })) {
-            if (output.type === "file") {
-              const file = output;
-              report({
-                text: background
-                  ? strings.creatingBackupNamed(file.path)
-                  : strings.savingFile(file.path)
-              });
-              controller.enqueue({
-                path: file.path,
-                data: encoder.encode(file.data)
-              });
-            } else if (output.type === "attachment") {
-              report({
-                text: background
-                  ? strings.creatingBackupNamed(output.hash)
-                  : strings.savingAttachment(output.hash),
-                total: output.total,
-                current: output.current
-              });
-              const handle = await streamablefs.readFile(output.hash);
-              if (!handle) continue;
-              controller.enqueue({
-                path: output.path,
-                data: handle.readable
-              });
-            }
+      const files = backupToZipFiles(
+        { encrypt: encryptedBackups, mode, background },
+        report
+      );
+      await new ReadableStream<ZipFile>(
+        {
+          async pull(controller) {
+            const { value, done } = await files.next();
+            if (done) controller.close();
+            else controller.enqueue(value);
+          },
+          async cancel() {
+            await files.return(undefined);
           }
-          controller.close();
-        }
-      })
+        },
+        { highWaterMark: 0 }
+      )
         .pipeThrough(createZipStream())
         .pipeTo(writeStream);
     }
@@ -199,6 +177,50 @@ export async function createBackup(
     return true;
   }
   return false;
+}
+
+async function* backupToZipFiles(
+  options: {
+    encrypt?: boolean;
+    mode?: "full" | "partial";
+    background?: boolean;
+  },
+  report: ProgressReportCallback
+): AsyncGenerator<ZipFile> {
+  const { encrypt, mode, background } = options;
+  const encoder = new TextEncoder();
+  for await (const output of db.backup.export({
+    type: "web",
+    encrypt,
+    mode
+  })) {
+    if (output.type === "file") {
+      const file = output;
+      report({
+        text: background
+          ? strings.creatingBackupNamed(file.path)
+          : strings.savingFile(file.path)
+      });
+      yield {
+        path: file.path,
+        data: encoder.encode(file.data)
+      };
+    } else if (output.type === "attachment") {
+      report({
+        text: background
+          ? strings.creatingBackupNamed(output.hash)
+          : strings.savingAttachment(output.hash),
+        total: output.total,
+        current: output.current
+      });
+      const handle = await streamablefs.readFile(output.hash);
+      if (!handle) continue;
+      yield {
+        path: output.path,
+        data: handle.readable
+      };
+    }
+  }
 }
 
 export async function selectBackupFile() {

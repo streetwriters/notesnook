@@ -31,7 +31,8 @@ export default class FileHandle {
 
   get readable() {
     return new ReadableStream(
-      new FileStreamSource(this.storage, this.file, this.chunks)
+      new FileStreamSource(this.storage, this.file, this.chunks),
+      { highWaterMark: 0 }
     );
   }
 

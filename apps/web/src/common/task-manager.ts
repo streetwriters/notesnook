@@ -53,7 +53,7 @@ type TaskProgress = {
   text: string;
 };
 
-type ProgressReportCallback = (progress: TaskProgress) => void;
+export type ProgressReportCallback = (progress: TaskProgress) => void;
 
 export class TaskManager {
   static async startTask<T>(task: TaskDefinition<T>): Promise<T | Error> {
