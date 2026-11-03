@@ -197,7 +197,6 @@ function Reminder(props: ReminderProps) {
               ml: "spacing8",
               color: "paragraph",
               fontSize: "xs",
-              lineHeight: 1,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap"
