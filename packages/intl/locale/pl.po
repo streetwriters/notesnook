@@ -5323,6 +5323,10 @@ msgstr "Brak"
 msgid "Normal mode"
 msgstr "Tryb normalny"
 
+#: src/strings.ts:3287
+msgid "Not enough storage space available. Free up some space and try again."
+msgstr ""
+
 #: src/strings.ts:3135
 msgid "Not found"
 msgstr "Nie znaleziono"
