@@ -17,6 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  computePosition,
+  flip,
+  offset,
+  shift,
+  size,
+  Placement,
+  ReferenceElement
+} from "@floating-ui/dom";
+
 type PositionData = {
   x: number;
   y: number;
@@ -26,7 +36,7 @@ type PositionData = {
   height?: number;
 };
 
-const mousePosition: PositionData = { x: 0, y: 0, actualX: 0, actualY: 0 };
+const mousePosition = { x: 0, y: 0 };
 let mouseMoveListenerAttached = false;
 attachMouseMoveListener();
 
@@ -41,10 +51,10 @@ export type PositionOptions = {
   yAnchor?: HTMLElement;
   parent?: HTMLElement | Element;
 };
-export function getPosition(
+export async function getPosition(
   node: Node,
   options: PositionOptions
-): { top: number; left: number } {
+): Promise<{ top: number; left: number }> {
   attachMouseMoveListener();
 
   let element: HTMLElement;
@@ -58,120 +68,89 @@ export function getPosition(
 
   const {
     target = "mouse",
-    isTargetAbsolute = false,
     location = undefined,
     yOffset = 0,
     xOffset = 0,
     gap = 0,
     align = "start",
-    parent = document.body,
+    parent,
     yAnchor
   } = options || {};
 
-  const { x, y, width, height, actualX, actualY } =
-    target === "mouse" || target === null
-      ? mousePosition
-      : getElementPosition(target, isTargetAbsolute);
+  const side = location === "below" || !location ? "bottom" : location;
+  const placement = (
+    align === "center" ? side : `${side}-${align}`
+  ) as Placement;
+  const isVertical = side === "bottom" || side === "top";
+  const boundary =
+    parent && parent !== document.body ? parent : "clippingAncestors";
+  const padding = 10;
 
-  const elementWidth = element.offsetWidth;
-  const elementHeight = element.offsetHeight;
-
-  const windowWidth = parent.clientWidth;
-  const windowHeight = parent.clientHeight;
-
-  const position = { top: 0, left: 0 };
-
-  const xDiff = actualX - x;
-  if (width && location === "right") {
-    // place to the right of the target, flipping to the left if there isn't
-    // enough space, and keep the element inside the window either way
-    const spaceRight = windowWidth - (actualX + width) - gap;
-    const spaceLeft = actualX - gap;
-    const fitsRight =
-      spaceRight >= elementWidth ||
-      (spaceLeft < elementWidth && spaceRight >= spaceLeft);
-    const actualLeft = fitsRight
-      ? actualX + width + gap
-      : actualX - elementWidth - gap;
-    const maxLeft = Math.max(0, windowWidth - elementWidth);
-    position.left = Math.min(Math.max(actualLeft, 0), maxLeft) - xDiff;
-  } else {
-    if (windowWidth - actualX < elementWidth) {
-      position.left = windowWidth - elementWidth;
-      position.left -= xDiff;
-    } else {
-      position.left = x;
+  element.style.maxHeight = "";
+  const { x, y } = await computePosition(
+    getReference(target, yAnchor),
+    element,
+    {
+      placement,
+      strategy:
+        getComputedStyle(element).position === "fixed" ? "fixed" : "absolute",
+      middleware: [
+        offset(({ rects }) =>
+          isVertical
+            ? {
+                mainAxis: location
+                  ? yOffset
+                  : -rects.reference.height - yOffset,
+                crossAxis: xOffset
+              }
+            : {
+                mainAxis: gap + (side === "left" ? -xOffset : xOffset),
+                crossAxis: -yOffset
+              }
+        ),
+        flip({ boundary }),
+        shift({ boundary, padding }),
+        size({
+          boundary,
+          padding,
+          apply({ availableHeight, rects, elements }) {
+            if (rects.floating.height > availableHeight)
+              elements.floating.style.maxHeight = `${Math.max(
+                0,
+                availableHeight
+              )}px`;
+          }
+        })
+      ]
     }
+  );
 
-    if (location === "left") position.left -= elementWidth;
-  }
-
-  if (actualY + elementHeight > windowHeight) {
-    position.top =
-      target === "mouse"
-        ? windowHeight - elementHeight
-        : windowHeight - elementHeight - actualY + y;
-  } else {
-    position.top = y;
-  }
-
-  if (height) {
-    if (location === "below") position.top += height;
-    else if (location === "top") position.top = y - elementHeight;
-  }
-
-  if (width && target !== "mouse" && align === "center" && elementWidth > 0) {
-    position.left -= (elementWidth - width) / 2;
-  } else if (
-    width &&
-    target !== "mouse" &&
-    align === "end" &&
-    elementWidth > 0
-  ) {
-    position.left -= elementWidth - width;
-  }
-
-  // Adjust menu height
-  if (elementHeight > windowHeight - position.top) {
-    element.style.maxHeight = `${windowHeight - 20}px`;
-  }
-
-  if (yAnchor) {
-    const anchorY = getElementPosition(yAnchor, isTargetAbsolute);
-    position.top = anchorY.y - elementHeight;
-  }
-
-  position.top = isTargetAbsolute && position.top < 0 ? 0 : position.top;
-  position.left = isTargetAbsolute && position.left < 0 ? 0 : position.left;
-  position.top += location === "below" ? yOffset : -yOffset;
-  position.left += xOffset;
-
-  return position;
+  return { top: y, left: x };
 }
 
-function getMousePosition(e: MouseEvent) {
-  let posx = 0;
-  let posy = 0;
-
-  if (!e && window.event) e = window.event as MouseEvent;
-
-  if (e.pageX || e.pageY) {
-    posx = e.pageX;
-    posy = e.pageY;
-  } else if (e.clientX || e.clientY) {
-    posx =
-      e.clientX +
-      document.body.scrollLeft +
-      document.documentElement.scrollLeft;
-    posy =
-      e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+function getReference(
+  target: PositionOptions["target"],
+  yAnchor?: HTMLElement
+): ReferenceElement {
+  if (!target || target === "mouse") {
+    const { x, y } = mousePosition;
+    return {
+      getBoundingClientRect: () => new DOMRect(x, y, 0, 0)
+    };
   }
-
+  if (!yAnchor) return target;
   return {
-    x: posx,
-    y: posy,
-    actualY: posy,
-    actualX: posx
+    contextElement: target,
+    getBoundingClientRect: () => {
+      const targetRect = target.getBoundingClientRect();
+      const anchorRect = yAnchor.getBoundingClientRect();
+      return new DOMRect(
+        targetRect.x,
+        anchorRect.y,
+        targetRect.width,
+        anchorRect.height
+      );
+    }
   };
 }
 
@@ -199,11 +178,8 @@ export function getElementPosition(
 function attachMouseMoveListener() {
   if (mouseMoveListenerAttached || !("window" in globalThis)) return;
   window.addEventListener("mousemove", (e) => {
-    const { x, y, actualX, actualY } = getMousePosition(e);
-    mousePosition.x = x;
-    mousePosition.y = y;
-    mousePosition.actualX = actualX;
-    mousePosition.actualY = actualY;
+    mousePosition.x = e.clientX;
+    mousePosition.y = e.clientY;
   });
   mouseMoveListenerAttached = true;
 }
