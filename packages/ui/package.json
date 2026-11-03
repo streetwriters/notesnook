@@ -20,6 +20,7 @@
     "url": "git://github.com/streetwriters/notesnook.git"
   },
   "dependencies": {
+    "@floating-ui/dom": "1.8.0",
     "@notesnook/icons": "file:../icons",
     "@notesnook/theme": "file:../theme"
   },

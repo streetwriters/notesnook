@@ -194,22 +194,17 @@ function TableRowToolbar(props: TableToolbarProps) {
       }
       rowToolsRef.current.style.display = "flex";
 
-      const pos = getPosition(rowToolsRef.current, {
-        location: "left",
+      const rowTools = rowToolsRef.current;
+      getPosition(rowTools, {
+        location: textDirection ? "right" : "left",
         target: currentRow,
         align: "start",
-        xOffset: -5,
+        xOffset: textDirection ? 5 : -5,
         yOffset: -3
+      }).then(({ top, left }) => {
+        rowTools.style.top = `${top}px`;
+        rowTools.style.left = `${left}px`;
       });
-
-      rowToolsRef.current.style.top = `${pos.top}px`;
-      if (textDirection) {
-        rowToolsRef.current.style.right = `${pos.left}px`;
-        rowToolsRef.current.style.left = `unset`;
-      } else {
-        rowToolsRef.current.style.left = `${pos.left}px`;
-        rowToolsRef.current.style.right = `unset`;
-      }
     }
 
     editor.on("selectionUpdate", onSelectionUpdate);
@@ -273,18 +268,17 @@ function TableColumnToolbar(props: TableToolbarProps) {
       }
       columnToolsRef.current.style.display = "flex";
 
-      const pos = getPosition(columnToolsRef.current, {
+      const columnTools = columnToolsRef.current;
+      getPosition(columnTools, {
         location: "top",
         align: "center",
         target: currentCell as HTMLElement,
         yAnchor: table.current,
         yOffset: 2
+      }).then(({ top, left }) => {
+        columnTools.style.left = `${left}px`;
+        columnTools.style.top = `${top}px`;
       });
-
-      const scrollLeft = table.current?.parentElement?.scrollLeft || 0;
-
-      columnToolsRef.current.style.left = `${pos.left - scrollLeft}px`;
-      columnToolsRef.current.style.top = `${pos.top}px`;
     }
 
     const scrollContainer = table?.current?.parentElement;

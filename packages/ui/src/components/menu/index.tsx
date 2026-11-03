@@ -84,13 +84,15 @@ export function Menu(props: MenuProps) {
     function repositionSubmenu() {
       if (!subMenuRef.current || !menuItemElement) return;
 
-      const { top, left } = getPosition(subMenuRef.current, {
+      const subMenu = subMenuRef.current;
+      getPosition(subMenu, {
         target: menuItemElement,
         location: "right",
         gap: 5 // TODO: should probably use a theme variable here
+      }).then(({ top, left }) => {
+        subMenu.style.top = `${top}px`;
+        subMenu.style.left = `${left}px`;
       });
-      subMenuRef.current.style.top = `${top}px`;
-      subMenuRef.current.style.left = `${left}px`;
     }
 
     repositionSubmenu();
