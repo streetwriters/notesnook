@@ -3282,5 +3282,7 @@ Continue without attachments?`,
   lastBackupOn: (date: string, type: "full" | "partial") =>
     type === "full"
       ? t`Last full backup: ${date}`
-      : t`Last partial backup: ${date}`
+      : t`Last partial backup: ${date}`,
+  notEnoughStorageSpace: () =>
+    t`Not enough storage space available. Free up some space and try again.`
 };

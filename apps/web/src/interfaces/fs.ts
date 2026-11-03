@@ -86,28 +86,35 @@ export async function writeEncryptedFile(
   });
 
   const { iv, stream } = await NNCrypto.createEncryptionStream(key);
-  await file
-    .stream()
-    .pipeThrough(
-      new ChunkedStream(
-        CHUNK_SIZE,
-        isFeatureSupported("opfs") ? "copy" : "nocopy"
-      )
-    )
-    .pipeThrough(new IntoChunks(file.size))
-    .pipeThrough(stream)
-    .pipeThrough(
-      new ProgressStream((totalRead, done) =>
-        reportProgress(
-          {
-            total: file.size,
-            loaded: done ? file.size : totalRead
-          },
-          { type: "encrypt", hash, file }
+  try {
+    await file
+      .stream()
+      .pipeThrough(
+        new ChunkedStream(
+          CHUNK_SIZE,
+          isFeatureSupported("opfs") ? "copy" : "nocopy"
         )
       )
-    )
-    .pipeTo(fileHandle.writeable);
+      .pipeThrough(new IntoChunks(file.size))
+      .pipeThrough(stream)
+      .pipeThrough(
+        new ProgressStream((totalRead, done) =>
+          reportProgress(
+            {
+              total: file.size,
+              loaded: done ? file.size : totalRead
+            },
+            { type: "encrypt", hash, file }
+          )
+        )
+      )
+      .pipeTo(fileHandle.writeable);
+  } catch (e) {
+    await fileHandle.delete();
+    if (e instanceof Error && e.name === "QuotaExceededError")
+      throw new Error(strings.notEnoughStorageSpace());
+    throw e;
+  }
 
   if (!(await exists(fileHandle))) {
     await fileHandle.delete();
