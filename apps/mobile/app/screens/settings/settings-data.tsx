@@ -396,9 +396,7 @@ export function getSettingsGroups(): SettingSection[] {
                       title: !user.mfa.isEnabled
                         ? strings.twoFactorEnable()
                         : strings.twoFactorAuth(),
-                      paragraph: !user.mfa.isEnabled
-                        ? undefined
-                        : strings.verifySubDesc(),
+                      paragraph: strings.enterAccountPasswordDesc(),
                       negativeText: strings.cancel(),
                       positiveText: user.mfa.isEnabled
                         ? strings.disable()
