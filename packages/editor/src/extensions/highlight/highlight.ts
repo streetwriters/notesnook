@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "@tiptap/extension-text-style";
 import { Extension } from "@tiptap/core";
+import { colord } from "colord";
 import { config } from "../../utils/config.js";
 import { tiptapKeys } from "@notesnook/common";
 
@@ -70,9 +71,14 @@ export const Highlight = Extension.create<HighlightOptions>({
                 return {};
               }
 
-              return {
-                style: `background-color: ${attributes.backgroundColor}`
-              };
+              const style = `background-color: ${attributes.backgroundColor}`;
+
+              if (attributes.color) return { style };
+
+              const textColor = colord(attributes.backgroundColor).isDark()
+                ? "#ffffff"
+                : "#000000";
+              return { style: `${style}; color: ${textColor}` };
             }
           }
         }
