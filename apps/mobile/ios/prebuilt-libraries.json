@@ -12,10 +12,6 @@
       "pod": "RNScreens",
       "swift": false
     },
-    "react-native-nitro-modules": {
-      "pod": "NitroModules",
-      "swift": true
-    },
     "react-native-quick-sqlite": {
       "pod": "react-native-quick-sqlite",
       "swift": false
@@ -31,10 +27,6 @@
     "react-native-gesture-handler": {
       "pod": "RNGestureHandler",
       "swift": false
-    },
-    "react-native-nitro-cloud-uploader": {
-      "pod": "NitroCloudUploader",
-      "swift": true
     }
   }
 }
