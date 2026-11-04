@@ -24,6 +24,7 @@ import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
+import { MMKV } from "../database/mmkv";
 import { createCacheDir } from "./io";
 import {
   cacheDir,
@@ -32,7 +33,6 @@ import {
   getUploadedFileSize
 } from "./utils";
 import Upload from "@ammarahmed/react-native-upload";
-import { CloudUploader } from "react-native-nitro-cloud-uploader";
 import { useUserStore } from "../../stores/use-user-store";
 import { sleep } from "../../utils/time";
 import { isFeatureAvailable } from "@notesnook/common";
@@ -41,6 +41,38 @@ import { strings } from "@notesnook/intl";
 // Upload constants
 const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
 const MINIMUM_MULTIPART_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+
+// S3 error codes meaning the saved upload ID or its parts are no longer valid,
+// so the next attempt has to start a new multipart upload.
+const RESET_UPLOAD_ERRORS = [
+  "NoSuchKey",
+  "NoSuchUpload",
+  "IncompleteBody",
+  "InternalError",
+  "InvalidObjectState",
+  "InvalidPart",
+  "InvalidPartOrder",
+  "SignatureDoesNotMatch"
+];
+
+interface StoredMultipartSession {
+  uploadId: string;
+  etags: string[];
+}
+
+const getMultipartSessionKey = (filename: string) =>
+  `s3_multipart_upload_${filename}`;
+
+class MultipartInitiateError extends Error {
+  // true when the server explicitly rejected the request (4xx or data.error)
+  constructor(
+    message: string,
+    public readonly rejected: boolean
+  ) {
+    super(message);
+    this.name = "MultipartInitiateError";
+  }
+}
 
 interface InitiateMultipartResponse {
   uploadId: string;
@@ -51,23 +83,25 @@ interface InitiateMultipartResponse {
 async function initiateMultipartUpload(
   filename: string,
   fileSize: number,
-  headers: Record<string, string>
+  headers: Record<string, string>,
+  existingUploadId = ""
 ): Promise<InitiateMultipartResponse> {
   const totalParts = Math.ceil(fileSize / CHUNK_SIZE);
 
-  const url = `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${totalParts}&uploadId=`;
+  const url = `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${totalParts}&uploadId=${existingUploadId}`;
   const response = await fetch(url, { headers });
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to initiate multipart upload: ${response.statusText}`
+    throw new MultipartInitiateError(
+      `Failed to initiate multipart upload: ${response.statusText}`,
+      response.status >= 400 && response.status < 500
     );
   }
 
   const data = await response.json();
 
   if (data.error) {
-    throw new Error(data.error);
+    throw new MultipartInitiateError(data.error, true);
   }
 
   if (!data.uploadId || !data.parts) {
@@ -86,28 +120,87 @@ async function multipartUploadFile(
   filePath: string,
   fileSize: number,
   requestOptions: RequestOptions,
-  cancelToken: { cancel: (reason?: string) => Promise<void> }
+  cancelToken: { cancel: (reason?: string) => Promise<void> },
+  displayName: string
 ): Promise<Response> {
   const { headers } = requestOptions;
+  const sessionKey = getMultipartSessionKey(filename);
 
   try {
-    const uploadData = await initiateMultipartUpload(
-      filename,
-      fileSize,
-      headers
-    );
+    const savedSession = MMKV.getMap<StoredMultipartSession>(sessionKey);
+    const savedUploadId = savedSession?.uploadId || "";
+    let currentEtags: string[] = savedSession?.etags || [];
+
+    let uploadData: InitiateMultipartResponse;
+    try {
+      uploadData = await initiateMultipartUpload(
+        filename,
+        fileSize,
+        headers,
+        savedUploadId
+      );
+    } catch (e) {
+      // Discard the saved session only if the server rejected it. Network
+      // errors and 5xx keep it so the next attempt can resume.
+      if (savedUploadId && (e as MultipartInitiateError).rejected === true)
+        MMKV.removeItem(sessionKey);
+      throw e;
+    }
     const { uploadId, parts } = uploadData;
+
+    // Discard the saved etags if the server gave us a new session or the
+    // part count changed.
+    if (
+      (savedUploadId && uploadId !== savedUploadId) ||
+      currentEtags.length !== parts.length
+    ) {
+      currentEtags = [];
+      MMKV.removeItem(sessionKey);
+    }
+
+    // Remember the upload ID even if no part finishes.
+    MMKV.setMap(sessionKey, { uploadId, etags: currentEtags });
+
+    const uploadedParts = currentEtags.filter(Boolean).length;
+    if (uploadedParts > 0) {
+      DatabaseLogger.info(
+        `Resuming multipart upload for ${filename}: ${uploadedParts}/${parts.length} parts already uploaded`
+      );
+    }
 
     DatabaseLogger.info(
       `Starting upload for ${filename} with ${parts.length} parts`
     );
 
+    const upload = Upload.createMultipartS3({
+      uploadId,
+      path: filePath,
+      parts,
+      maxParallel: 3,
+      appGroup: IOS_APPGROUPID,
+      existingEtags: currentEtags.length > 0 ? currentEtags : undefined,
+      resumable: false,
+      notification: {
+        filename: displayName,
+        enabled: true,
+        enableRingTone: true,
+        autoClear: true
+      }
+    });
+
+    let cancelled = false;
     cancelToken.cancel = async () => {
+      cancelled = true;
+      MMKV.removeItem(sessionKey);
       useAttachmentStore.getState().remove(filename);
-      await CloudUploader.cancelUpload(uploadId);
+      await upload.cancel();
     };
 
-    CloudUploader.addListener("upload-progress", (event) => {
+    upload.onProgress((event) => {
+      if (!cancelled && event.etags && event.etags.length === parts.length) {
+        currentEtags = event.etags;
+        MMKV.setMap(sessionKey, { uploadId, etags: currentEtags });
+      }
       useAttachmentStore
         .getState()
         .setProgress(
@@ -123,16 +216,8 @@ async function multipartUploadFile(
         }, chunk: ${event.chunkIndex}, progress: ${event.progress}`
       );
     });
-    // CloudUploader handles chunking and uploading all parts internally
-    const result = await CloudUploader.startUpload(
-      filename,
-      filePath,
-      parts,
-      3, // maxParallel
-      true // showNotification
-    );
-
-    CloudUploader.removeListener("upload-progress");
+    // Upload handles chunking and uploading all parts internally
+    const result = await upload.start();
 
     if (!result.success) {
       throw new Error("Failed to upload multipart file");
@@ -155,10 +240,21 @@ async function multipartUploadFile(
       headers: { ...headers, "Content-Type": "application/json" }
     });
 
+    // The completion request ends this multipart session whether or not it
+    // succeeded, so a retry starts a new session instead of reusing this upload ID.
+    MMKV.removeItem(sessionKey);
+
     return response;
   } catch (error) {
     DatabaseLogger.error(error, "Multipart upload failed", { filename });
-    CloudUploader.removeListener("upload-progress");
+    const errorText = error instanceof Error ? error.message : String(error);
+    if (
+      RESET_UPLOAD_ERRORS.some((code) => errorText.includes(code)) ||
+      // iOS errors don't include the S3 code; NoSuchUpload/NoSuchKey are 404s
+      /HTTP (status )?404\b/.test(errorText)
+    ) {
+      MMKV.removeItem(sessionKey);
+    }
     useAttachmentStore.getState().remove(filename);
     throw error;
   }
@@ -224,6 +320,10 @@ export async function uploadFile(
     }
 
     let attachmentInfo = await db.attachments.attachment(filename);
+    const displayName =
+      attachmentInfo && isImage(attachmentInfo?.mimeType)
+        ? "image"
+        : attachmentInfo?.filename || "file";
 
     DatabaseLogger.info(
       `Starting upload of ${filename} at path: ${fileInfo.path} ${fileInfo.size}`
@@ -260,7 +360,8 @@ export async function uploadFile(
         filePath,
         fileInfo.size,
         requestOptions,
-        cancelToken
+        cancelToken,
+        displayName
       );
       const status = result.status || 0;
       uploaded = status >= 200 && status < 300;
@@ -289,10 +390,7 @@ export async function uploadFile(
         },
         appGroup: IOS_APPGROUPID,
         notification: {
-          filename:
-            attachmentInfo && isImage(attachmentInfo?.mimeType)
-              ? "image"
-              : attachmentInfo?.filename || "file",
+          filename: displayName,
           enabled: true,
           enableRingTone: true,
           autoClear: true
@@ -321,11 +419,11 @@ export async function uploadFile(
             break;
         }
       });
-      const result = await upload.start();
       cancelToken.cancel = async () => {
         useAttachmentStore.getState().remove(filename);
         upload.cancel();
       };
+      const result = await upload.start();
 
       const status = result.responseCode || 0;
       uploaded = status >= 200 && status < 300;
