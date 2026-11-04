@@ -188,6 +188,23 @@ test("change vault password", () =>
     await expect(db.vault.open(id, "newPassword")).resolves.toBeDefined();
   }));
 
+test("saving a locked note while changing vault password should use the new password", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    await Promise.all([
+      db.vault.changePassword("password", "newPassword"),
+      db.vault.save({
+        id,
+        content: { type: "tiptap", data: "<p>edited during change</p>" }
+      })
+    ]);
+
+    const note = await db.vault.open(id, "newPassword");
+    expect(note.content.data).toContain("edited during change");
+  }));
+
 test("changing vault password without a vault should throw", () =>
   noteTest().then(async ({ db }) => {
     await expect(
