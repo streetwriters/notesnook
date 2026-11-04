@@ -30,6 +30,8 @@ import { TaskScheduler } from "../utils/task-scheduler";
 import { RecoveryKeyDialog } from "../dialogs/recovery-key-dialog";
 import { strings } from "@notesnook/intl";
 import { SettingsDialog } from "../dialogs/settings";
+import { CronosExpression } from "cronosjs";
+import { logger } from "../utils/logger";
 
 export type NoticeType = "autoBackupsOff" | "login" | "email" | "recoverykey";
 
@@ -53,37 +55,12 @@ export const FULL_BACKUP_CRON_EXPRESSIONS = {
 };
 
 export async function scheduleBackups() {
-  const backupInterval = Config.get("backupReminderOffset", 0);
-
   await TaskScheduler.stop("automatic-backups");
-  if (!backupInterval) return false;
+  await TaskScheduler.register("automatic-backups", "0 0 * * * *", () => {
+    runOverdueBackups().catch(logger.error);
+  });
 
-  console.log("Scheduling automatic backups");
-  await TaskScheduler.register(
-    "automatic-backups",
-    BACKUP_CRON_EXPRESSIONS[backupInterval],
-    () => {
-      console.log("Backing up automatically");
-      saveBackup();
-    }
-  );
-}
-
-export async function scheduleFullBackups() {
-  const backupInterval = Config.get("fullBackupReminderOffset", 0);
-
-  await TaskScheduler.stop("automatic-full-backups");
-  if (!backupInterval) return false;
-
-  console.log("Scheduling automatic full backups");
-  await TaskScheduler.register(
-    "automatic-full-backups",
-    FULL_BACKUP_CRON_EXPRESSIONS[backupInterval],
-    () => {
-      console.log("Backing up automatically");
-      saveBackup("full");
-    }
-  );
+  await runOverdueBackups();
 }
 
 export async function shouldAddAutoBackupsDisabledNotice() {
@@ -104,9 +81,47 @@ export async function shouldAddBackupNotice() {
     return false;
   }
 
-  const offsetToDays = backupInterval === 1 ? 1 : backupInterval === 2 ? 7 : 30;
+  return isBackupDue(BACKUP_CRON_EXPRESSIONS[backupInterval], lastBackupTime);
+}
 
-  return dayjs(lastBackupTime).add(offsetToDays, "d").isBefore(dayjs());
+export async function shouldRunFullBackup() {
+  const backupInterval = Config.get("fullBackupReminderOffset", 0);
+  if (!backupInterval) return false;
+
+  const lastFullBackupTime = await db.backup.lastFullBackupTime();
+  if (!lastFullBackupTime) return true;
+
+  return isBackupDue(
+    FULL_BACKUP_CRON_EXPRESSIONS[backupInterval],
+    lastFullBackupTime
+  );
+}
+
+function isBackupDue(expression: string, lastBackupTime: number) {
+  const nextBackupTime = CronosExpression.parse(expression).nextDate(
+    new Date(lastBackupTime)
+  );
+  return !!nextBackupTime && nextBackupTime.getTime() <= Date.now();
+}
+
+let isRunningOverdueBackup = false;
+let lastBackupAttemptTime = 0;
+export async function runOverdueBackups(retryAfter = 0) {
+  if (isRunningOverdueBackup) return;
+  if (Date.now() - lastBackupAttemptTime < retryAfter) return;
+  isRunningOverdueBackup = true;
+  try {
+    const mode = (await shouldRunFullBackup())
+      ? "full"
+      : (await shouldAddBackupNotice())
+      ? "partial"
+      : undefined;
+    if (!mode) return;
+    lastBackupAttemptTime = Date.now();
+    await saveBackup(mode);
+  } finally {
+    isRunningOverdueBackup = false;
+  }
 }
 
 export async function shouldAddRecoveryKeyBackupNotice() {
@@ -177,9 +192,6 @@ export async function resetNotices() {
 
   if (await shouldAddAutoBackupsDisabledNotice()) {
     notices.push({ type: "autoBackupsOff", priority: 3 });
-  }
-  if (await shouldAddBackupNotice()) {
-    await saveBackup();
   }
   if (await shouldAddLoginNotice()) {
     notices.push({ type: "login", priority: 1 });
