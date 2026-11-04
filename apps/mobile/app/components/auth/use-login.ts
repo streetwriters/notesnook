@@ -68,7 +68,7 @@ export const useLogin = (
             formRef.current.getValue("email")
           );
 
-          if (mfaInfo) {
+          if (mfaInfo.redirect === "mfa") {
             TwoFactorVerification.present(
               async (mfa: any, callback: (success: boolean) => void, onerror: (e: Error) => void) => {
                 try {
@@ -107,6 +107,11 @@ export const useLogin = (
                 setStep(LoginSteps.emailAuth);
               }
             );
+          } else if (mfaInfo.redirect === "password") {
+            setStep(LoginSteps.passwordAuth);
+            setTimeout(() => {
+              passwordInputRef.current?.focus();
+            }, 500);
           } else {
             finishWithError(new Error(strings.unableToSend2faCode()));
           }

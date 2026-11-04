@@ -24,6 +24,7 @@ import { withTimeout, Mutex } from "async-mutex";
 import { logger } from "../logger.js";
 import { KVStorageAccessor } from "../interfaces.js";
 import EventManager from "../utils/event-manager.js";
+import { AuthenticatorType } from "../types.js";
 
 export type Token = {
   access_token: string;
@@ -31,6 +32,11 @@ export type Token = {
   expires_in: number;
   scope: string;
   refresh_token: string;
+  additional_data?: {
+    primaryMethod: AuthenticatorType;
+    secondaryMethod?: AuthenticatorType;
+    phoneNumber?: string;
+  };
 };
 
 type Scope = (typeof SCOPES)[number];

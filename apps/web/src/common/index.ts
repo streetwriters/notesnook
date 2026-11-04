@@ -437,7 +437,9 @@ async function restoreWithProgress(
   });
 }
 
-export async function verifyAccount() {
+export async function verifyAccount(
+  onVerified?: (password: string) => Promise<boolean>
+) {
   if (!(await db.user?.getUser())?.email) return true;
   return await showPasswordDialog({
     title: strings.verifyItsYou(),
@@ -449,7 +451,10 @@ export async function verifyAccount() {
       }
     },
     validate: async ({ password }) => {
-      return !!password && (await db.user?.verifyPassword(password));
+      if (!!password && (await db.user?.verifyPassword(password))) {
+        return onVerified ? await onVerified(password) : true;
+      }
+      return false;
     }
   });
 }
