@@ -62,7 +62,6 @@ if (isSettings) {
         android {
             packagingOptions {
                 pickFirst '**/libworklets.so'
-                pickFirst '**/libNitroModules.so'
             }
         }
 
