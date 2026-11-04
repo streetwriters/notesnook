@@ -1,0 +1,22 @@
+diff --git a/node_modules/@ammarahmed/react-native-eventsource/android/src/main/java/com/github/jonnybgod/RNEventSource/RNEventSourceModule.java b/node_modules/@ammarahmed/react-native-eventsource/android/src/main/java/com/github/jonnybgod/RNEventSource/RNEventSourceModule.java
+index d874cde..e7947b3 100644
+--- a/node_modules/@ammarahmed/react-native-eventsource/android/src/main/java/com/github/jonnybgod/RNEventSource/RNEventSourceModule.java
++++ b/node_modules/@ammarahmed/react-native-eventsource/android/src/main/java/com/github/jonnybgod/RNEventSource/RNEventSourceModule.java
+@@ -201,6 +201,17 @@ public class RNEventSourceModule extends ReactContextBaseJavaModule {
+       @WorkerThread
+       @Override
+       public boolean onRetryError(ServerSentEvent sse, Throwable throwable, Response response) {
++        // retrying with the same (expired or revoked) token fails forever; let JS refresh it and reconnect
++        if (response != null && (response.code() == 401 || response.code() == 403)) {
++          WritableMap map = new WritableNativeMap();
++          map.putInt("status", response.code());
++          if (reactContext.hasActiveCatalystInstance()) {
++            reactContext
++                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
++                    .emit("error", map);
++          }
++          return false;
++        }
+         return true; // True to retry, false otherwise
+       }
+ 
