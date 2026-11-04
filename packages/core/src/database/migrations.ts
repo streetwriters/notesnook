@@ -496,6 +496,34 @@ export class NNMigrationProvider implements MigrationProvider {
             .addColumn("errorContext", "text")
             .execute();
         }
+      },
+      "a-2026-10-16": {
+        async up(db) {
+          const UNSYNCED_INDEX_TABLES = [
+            "settings",
+            "attachments",
+            "content",
+            "notebooks",
+            "shortcuts",
+            "reminders",
+            "relations",
+            "tags",
+            "colors",
+            "notes",
+            "vaults",
+            "inboxitemshistory"
+          ] as const;
+
+          for (const table of UNSYNCED_INDEX_TABLES) {
+            await db.schema
+              .createIndex(`${table}_unsynced`)
+              .ifNotExists()
+              .on(table)
+              .column("id")
+              .where(sql<boolean>`synced IS NULL OR synced == 0`)
+              .execute();
+          }
+        }
       }
     };
   }
