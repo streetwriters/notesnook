@@ -47,7 +47,6 @@ const KNOWN_IOS_OVERRIDES = {
 
 // Dependency ordering: key must be built after dependency
 const DEPENDENCIES = {
-  "react-native-nitro-cloud-uploader": ["react-native-nitro-modules"],
   "react-native-reanimated": ["react-native-worklets"]
 };
 
@@ -221,7 +220,7 @@ function generateAndroidConfig() {
     activeLibraries = activeLibraries.filter((name) => libraries[name]);
   }
 
-  // Topological sorting for dependencies (e.g., nitro-modules before nitro-cloud-uploader)
+  // Topological sorting for dependencies (e.g., worklets before reanimated)
   activeLibraries.sort((a, b) => {
     if (DEPENDENCIES[b]?.includes(a)) return -1;
     if (DEPENDENCIES[a]?.includes(b)) return 1;
