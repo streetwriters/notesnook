@@ -17,18 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { db } from "../../common/database";
-import ManageTags from "../../screens/manage-tags";
 import { TaggedNotes } from "../../screens/notes/tagged";
 import { AppFontSize } from "../../utils/size";
 import { DefaultAppStyles } from "../../utils/styles";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import { ColorTags } from "./color-tags";
+import { Spacing } from "../../common/design/spacing";
 
 export const Tags = ({ item, close }) => {
   const { colors } = useThemeColors();
@@ -37,32 +36,9 @@ export const Tags = ({ item, close }) => {
     <View
       style={{
         flexDirection: "row",
-        flexWrap: "wrap",
-        alignItems: "center",
-        paddingHorizontal: DefaultAppStyles.GAP,
-        alignSelf: "center",
-        justifyContent: "space-between",
         width: "100%"
       }}
     >
-      <Button
-        onPress={async () => {
-          ManageTags.present([item.id]);
-          close();
-        }}
-        buttonType={{
-          text: colors.primary.accent
-        }}
-        title={strings.addTag()}
-        type="secondary"
-        icon="plus"
-        iconPosition="right"
-        fontSize={AppFontSize.xs}
-        style={{
-          paddingHorizontal: DefaultAppStyles.GAP_SMALL,
-          paddingVertical: DefaultAppStyles.GAP_VERTICAL_SMALL
-        }}
-      />
       <ColorTags item={item} />
     </View>
   ) : null;

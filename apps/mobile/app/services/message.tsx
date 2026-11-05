@@ -20,13 +20,13 @@ import React from "react";
 import { strings } from "@notesnook/intl";
 import { Platform } from "react-native";
 import { AuthMode } from "../components/auth/common";
-import { verifyUser } from "../screens/settings/functions";
+import { verifyUser } from "../screens/settings/verify-user";
 import {
   Message,
   MessageId,
   useMessageStore
 } from "../stores/use-message-store";
-import { eOpenRateDialog, eOpenRecoveryKeyDialog } from "../utils/events";
+import { eOpenRateDialog } from "../utils/events";
 import { eSendEvent, presentSheet } from "./event-manager";
 import Navigation from "./navigation";
 import PremiumService from "./premium";
@@ -36,6 +36,7 @@ import { GithubVersionInfo } from "../utils/github-version";
 import { CheckVersionResponse } from "react-native-check-version";
 import { db } from "../common/database";
 import { Walkthrough } from "../components/walkthroughs";
+import RecoveryKeySheet from "../components/sheets/recovery-key";
 
 let isCheckingEmail = false;
 
@@ -61,9 +62,9 @@ const APP_MESSAGE_BUILDERS: Record<
     actionText: strings.recoveryKeyMessageActionText(),
     onPress: () => {
       verifyUser(
-        null,
+        undefined,
         () => {
-          eSendEvent(eOpenRecoveryKeyDialog);
+          RecoveryKeySheet.present();
         },
         false,
         async () => {

@@ -23,6 +23,9 @@ import { BaseThemeProvider } from "../theme-provider";
 import { strings } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import {
+  Close,
+  CopySimple,
+  Minus,
   WindowClose,
   WindowMaximize,
   WindowMinimize,
@@ -43,14 +46,15 @@ export function getWindowControls(
   return [
     {
       title: strings.minimize(),
-      icon: WindowMinimize,
+      icon: Minus,
       hidden: hasNativeWindowControls || isFullscreen,
       enabled: true,
       onClick: () => desktop?.window.minimze.mutate()
     },
     {
       title: isMaximized ? strings.restore() : strings.maximize(),
-      icon: isMaximized ? WindowRestore : WindowMaximize,
+      // icon: isMaximized ? WindowRestore : WindowMaximize,
+      icon: CopySimple,
       enabled: true,
       hidden: hasNativeWindowControls || isFullscreen,
       onClick: () =>
@@ -60,14 +64,14 @@ export function getWindowControls(
     },
     {
       title: strings.close(),
-      icon: WindowClose,
+      icon: Close,
       hidden: hasNativeWindowControls || isFullscreen,
       enabled: true,
       onClick: () => window.close()
     }
   ];
 }
-export const TITLE_BAR_HEIGHT = 37;
+export const TITLE_BAR_HEIGHT = 45;
 export function TitleBar({
   isUnderlay = isMac(),
   force = false

@@ -82,7 +82,7 @@ export const InboxPGPKeysDialog = DialogManager.register(
         if (initialKeys) {
           const ok = await ConfirmDialog.show({
             title: strings.changeInboxPgpKeys(),
-            message: strings.changingInboxPgpKeysNotice(),
+            subtitle: strings.changingInboxPgpKeysNotice(),
             positiveButtonText: strings.yes(),
             negativeButtonText: strings.no()
           });

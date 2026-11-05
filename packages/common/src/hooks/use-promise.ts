@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DependencyList, useEffect, useState } from "react";
+import { DependencyList, useCallback, useEffect, useState } from "react";
 
 export type PromiseResult<T> =
   | PromisePendingResult<T>
@@ -60,33 +60,32 @@ export function usePromise<T>(
   deps: DependencyList = []
 ): PromiseResult<T> {
   const [result, setResult] = useState<PromiseResult<T>>({ status: "pending" });
+  const [version, setVersion] = useState(0);
+  const refresh = useCallback(() => setVersion((v) => v + 1), []);
 
-  useEffect(
-    function effect() {
-      if (result.status !== "pending") {
-        setResult((s) => ({
-          ...s,
-          status: "pending"
-        }));
+  useEffect(() => {
+    if (result.status !== "pending") {
+      setResult((s) => ({
+        ...s,
+        status: "pending"
+      }));
+    }
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    async function handlePromise() {
+      const [promiseResult] = await Promise.allSettled([factory(signal)]);
+
+      if (!signal.aborted) {
+        setResult({ ...promiseResult, refresh });
       }
+    }
 
-      const controller = new AbortController();
-      const { signal } = controller;
+    handlePromise();
 
-      async function handlePromise() {
-        const [promiseResult] = await Promise.allSettled([factory(signal)]);
-
-        if (!signal.aborted) {
-          setResult({ ...promiseResult, refresh: effect });
-        }
-      }
-
-      handlePromise();
-
-      return () => controller.abort();
-    },
-    [...deps]
-  );
+    return () => controller.abort();
+  }, [...deps, version]);
 
   return result;
 }

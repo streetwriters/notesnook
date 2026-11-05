@@ -509,7 +509,7 @@ const Sidebar = memo(
                     if (
                       await ConfirmDialog.show({
                         title: strings.clearCacheConfirm(),
-                        message: strings.clearCacheConfirmDesc(),
+                        subtitle: strings.clearCacheConfirmDesc(),
                         negativeButtonText: strings.no(),
                         positiveButtonText: strings.yes()
                       })

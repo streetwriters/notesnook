@@ -291,7 +291,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           onClick={async () => {
             const ok = await ConfirmDialog.show({
               title: strings.revokeInboxApiKey(apiKey.name),
-              message: strings.revokeApiKeyConfirmation(apiKey.name),
+              subtitle: strings.revokeApiKeyConfirmation(apiKey.name),
               positiveButtonText: strings.revoke(),
               negativeButtonText: strings.cancel()
             });

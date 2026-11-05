@@ -320,7 +320,7 @@ class SettingStore extends BaseStore<SettingStore> {
       if (isInboxEnabled) {
         const ok = await ConfirmDialog.show({
           title: strings.disableInboxApi(),
-          message: strings.disableInboxApiWarning(),
+          subtitle: strings.disableInboxApiWarning(),
           positiveButtonText: strings.yes(),
           negativeButtonText: strings.no()
         });

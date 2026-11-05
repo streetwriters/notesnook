@@ -29,23 +29,28 @@ import { VirtualizedGrouping } from "@notesnook/core";
 import { ResolvedItem } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
+import { SelectedCheck } from "../components/selected-check";
 import {
-  SelectedCheck,
-  SelectedReference,
+  RelationChange,
   selectMultiple,
-  useSelectionStore
-} from "./move-note-dialog";
+  useRelationChangesStore
+} from "../stores/relation-changes-store";
 import { checkFeature } from "../common";
+import { Box } from "@notesnook/ui";
+import { Tag as TagIcon } from "../components/icons";
+
+const TAG_ITEM_HEIGHT = 35;
 
 type AddTagsDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
   props: AddTagsDialogProps
 ) {
   const { onClose, noteIds } = props;
-
   const [tags, setTags] = useState<VirtualizedGrouping<Tag> | undefined>(
     () => useStore.getState().tags
   );
+  const selected = useRelationChangesStore((state) => state.selected);
+  const hasChanges = selected.some((item) => item.new || item.op === "remove");
 
   useEffect(() => {
     (async function () {
@@ -55,7 +60,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         return;
       }
 
-      const selected: SelectedReference[] = [];
+      const selected: RelationChange[] = [];
       const selectedTags = await db.relations
         .to({ type: "note", ids: noteIds }, "tag")
         .get();
@@ -63,7 +68,7 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         if (selected.findIndex((a) => a.id === r.fromId) > -1) return;
         selected.push({ id: r.fromId, op: "add", new: false });
       });
-      useSelectionStore.getState().setSelected(selected);
+      useRelationChangesStore.getState().setSelected(selected);
     })();
   }, []);
 
@@ -74,10 +79,12 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
       description={strings.addTagsDesc()}
       onClose={() => onClose(false)}
       width={450}
+      sx={{ minHeight: 434 }}
       positiveButton={{
         text: strings.done(),
+        disabled: !hasChanges,
         onClick: async () => {
-          const { selected } = useSelectionStore.getState();
+          const { selected } = useRelationChangesStore.getState();
           for (const id of noteIds) {
             for (const item of selected) {
               const tagRef: ItemReference = { type: "tag", id: item.id };
@@ -96,50 +103,60 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
         onClick: () => onClose(false)
       }}
     >
-      {tags && (
-        <FilteredList
-          getItemKey={(index) => tags.key(index)}
-          mode="fixed"
-          estimatedSize={30}
-          items={tags.placeholders}
-          sx={{ mt: 2 }}
-          itemGap={5}
-          placeholders={{
-            empty: strings.addATag(),
-            filter: strings.searchForTags()
-          }}
-          filter={async (query) => {
-            setTags(
-              query
-                ? await db.lookup.tags(query).sorted()
-                : useStore.getState().tags
-            );
-          }}
-          onCreateNewItem={async (title) => {
-            if (!(await checkFeature("tags", { type: "toast" }))) return;
+      <Box sx={{ my: "spacing7" }}>
+        {tags && (
+          <FilteredList
+            getItemKey={(index) => tags.key(index)}
+            mode="fixed"
+            estimatedSize={TAG_ITEM_HEIGHT}
+            items={tags.placeholders}
+            placeholders={{
+              empty: strings.addTags(),
+              filter: strings.searchOrAddTags(),
+              emptyList: strings.noTagsToShow()
+            }}
+            filter={async (query) => {
+              setTags(
+                query
+                  ? await db.lookup.tags(query).sorted()
+                  : useStore.getState().tags
+              );
+            }}
+            onCreateNewItem={async (title) => {
+              if (!(await checkFeature("tags", { type: "toast" }))) return;
 
-            const tagId = await db.tags.add({ title });
-            if (!tagId) return;
-            await useStore.getState().refresh();
-            setTags(useStore.getState().tags);
-            const { selected, setSelected } = useSelectionStore.getState();
-            setSelected([...selected, { id: tagId, new: true, op: "add" }]);
-          }}
-          renderItem={({ index }) => {
-            return (
-              <ResolvedItem key={index} type="tag" items={tags} index={index}>
-                {({ item }) => <TagItem tag={item} />}
-              </ResolvedItem>
-            );
-          }}
-        />
-      )}
+              const tagId = await db.tags.add({ title });
+              if (!tagId) return;
+              await useStore.getState().refresh();
+              setTags(useStore.getState().tags);
+              const { selected, setSelected } =
+                useRelationChangesStore.getState();
+              setSelected([...selected, { id: tagId, new: true, op: "add" }]);
+            }}
+            renderItem={({ index }) => {
+              return (
+                <ResolvedItem key={index} type="tag" items={tags} index={index}>
+                  {({ item }) => <TagItem tag={item} />}
+                </ResolvedItem>
+              );
+            }}
+          />
+        )}
+      </Box>
     </Dialog>
   );
 });
 
 function TagItem(props: { tag: Tag }) {
   const { tag } = props;
+  const selected = useRelationChangesStore((state) => state.selected);
+  const setSelected = useRelationChangesStore((state) => state.setSelected);
+  const selectedItem = selected.find((s) => s.id === tag.id);
+  const isHighlighted = !!selectedItem && selectedItem.op !== "remove";
+
+  function toggleSelection() {
+    setSelected(selectMultiple(tag, selected));
+  }
 
   return (
     <Flex
@@ -147,33 +164,37 @@ function TagItem(props: { tag: Tag }) {
       data-test-id="tag"
       sx={{
         cursor: "pointer",
-        justifyContent: "space-between",
         alignItems: "center",
-        bg: "var(--background-secondary)",
-        borderRadius: "default",
-        p: 1
+        height: `${TAG_ITEM_HEIGHT}px`,
+        bg: isHighlighted ? "background-selected" : "background",
+        borderRadius: "radius1",
+        p: "spacing4",
+        ":hover": {
+          bg: "hover"
+        }
       }}
-      onClick={() => {
-        const { selected, setSelected } = useSelectionStore.getState();
-        setSelected(selectMultiple(tag, selected));
-      }}
+      title={tag.title}
+      onClick={toggleSelection}
     >
-      <Flex sx={{ alignItems: "center" }}>
-        <SelectedCheck size={18} item={tag} />
+      <Flex sx={{ alignItems: "center", gap: "spacing4", width: "100%" }}>
+        <TagIcon size={15} color={isHighlighted ? "icon-selected" : "icon"} />
         <Text
           className="title"
           data-test-id="tag-title"
-          variant="body"
           title={tag.title}
           sx={{
+            flex: 1,
             minWidth: 0,
-            overflow: "hidden",
+            color: isHighlighted ? "paragraph-selected" : "paragraph",
+            fontSize: "sm",
             textOverflow: "ellipsis",
-            whiteSpace: "nowrap"
+            whiteSpace: "nowrap",
+            overflow: "hidden"
           }}
         >
-          #{tag.title}
+          {tag.title}
         </Text>
+        <SelectedCheck item={tag} size={15} />
       </Flex>
     </Flex>
   );
