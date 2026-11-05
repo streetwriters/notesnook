@@ -73,6 +73,7 @@ import { isTablet } from "react-native-device-info";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { DefaultAppStyles } from "../utils/styles";
 import { encodeHTML5 } from "entities";
+import { dismissAndResetKeyboard } from "../utils/keyboard";
 
 const getLinkPreview = (url: string) => {
   return getPreviewData(url, 5000);
@@ -340,9 +341,13 @@ const ShareView = () => {
         DatabaseLogger.error(e);
       }
     })();
+    return () => {
+      dismissAndResetKeyboard();
+    };
   }, [loadData]);
 
   const close = async () => {
+    dismissAndResetKeyboard();
     setNote({ ...defaultNote });
     setLoadingExtension(true);
     ShareExtension.close();
