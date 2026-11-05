@@ -389,10 +389,9 @@ export function NotebookItem(props: {
           height: "40px",
           padding: "spacing4",
           ml: `${calculateIndentation(depth, 20)}px`,
-          ':hover [data-test-id="add-sub-notebook"], :focus-within [data-test-id="add-sub-notebook"]':
-            {
-              opacity: 1
-            },
+          "&:hover .add-sub-notebook, &:focus-within .add-sub-notebook": {
+            opacity: 1
+          },
           ":hover": {
             bg: isSelected ? "hover-selected" : "hover"
           }
@@ -431,6 +430,7 @@ export function NotebookItem(props: {
         >
           <Button
             data-test-id="add-sub-notebook"
+            className="add-sub-notebook"
             variant="secondary"
             sx={{
               width: "20px",
