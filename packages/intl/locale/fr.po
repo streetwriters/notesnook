@@ -6151,6 +6151,10 @@ msgstr "Historique de la note"
 msgid "Note locked"
 msgstr "Note verrouillée"
 
+#: src/strings.ts:3736
+msgid "Note reference"
+msgstr ""
+
 #: src/strings.ts:819
 msgid "Note restored from history"
 msgstr "Note restaurée depuis l'historique"

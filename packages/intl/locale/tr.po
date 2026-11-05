@@ -6151,6 +6151,10 @@ msgstr "Not geçmişi"
 msgid "Note locked"
 msgstr "Not kilitlendi"
 
+#: src/strings.ts:3736
+msgid "Note reference"
+msgstr ""
+
 #: src/strings.ts:819
 msgid "Note restored from history"
 msgstr "Not geçmişten geri yüklendi"

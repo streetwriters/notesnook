@@ -6153,6 +6153,10 @@ msgstr "Historia notatki"
 msgid "Note locked"
 msgstr "Zablokowano notatkę"
 
+#: src/strings.ts:3736
+msgid "Note reference"
+msgstr ""
+
 #: src/strings.ts:819
 msgid "Note restored from history"
 msgstr "Przywrócono notatkę z historii"

@@ -3732,5 +3732,6 @@ Continue without attachments?`,
       other:
         "The selected notebooks will be moved to trash. You can restore them later."
     }),
-  changeServer: () => t`Change server`
+  changeServer: () => t`Change server`,
+  noteReference: () => t`Note reference`
 };

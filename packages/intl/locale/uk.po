@@ -6151,6 +6151,10 @@ msgstr "Історія нотатки"
 msgid "Note locked"
 msgstr "Нотатку заблоковано"
 
+#: src/strings.ts:3736
+msgid "Note reference"
+msgstr ""
+
 #: src/strings.ts:819
 msgid "Note restored from history"
 msgstr "Нотатку відновлено з історії"

@@ -694,7 +694,7 @@ export const AddReminderDialog = DialogManager.register(
                     fontSize: "xs"
                   }}
                 >
-                  Note reference
+                  {strings.noteReference()}
                 </Text>
                 {referencedNotes.value.map((item) => (
                   <NoteItem

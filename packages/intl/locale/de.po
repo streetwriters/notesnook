@@ -6151,6 +6151,10 @@ msgstr "Notizverlauf"
 msgid "Note locked"
 msgstr "Notiz gesperrt"
 
+#: src/strings.ts:3736
+msgid "Note reference"
+msgstr ""
+
 #: src/strings.ts:819
 msgid "Note restored from history"
 msgstr "Notiz aus dem Verlauf wiederhergestellt"

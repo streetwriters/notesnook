@@ -1208,7 +1208,9 @@ function Reminders({ noteId }: { noteId: string }) {
                 onClick={async () => {
                   const note = await db.notes.note(noteId);
                   await AddReminderDialog.show({ note });
-                  result.refresh();
+                  if (result.status === "fulfilled") {
+                    result.refresh();
+                  }
                 }}
               >
                 <Plus size={15} color="accent" />
