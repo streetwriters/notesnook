@@ -22,14 +22,12 @@ import { isImage } from "@notesnook/core";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { DatabaseLogger, db } from "../common/database";
+import { santizeUri } from "../common/filesystem/utils";
 import { IOS_APPGROUPID } from "./constants";
-import { compressToFile } from "../common/filesystem/compress";
-
-const santizeUri = (uri) => {
-  uri = decodeURI(uri);
-  uri = Platform.OS === "ios" ? uri.replace("file:///", "/") : uri;
-  return uri;
-};
+import {
+  getCompressionType,
+  resolveCompressedImage
+} from "../common/filesystem/compress";
 
 export async function attachFile(uri, hash, type, filename, options) {
   try {
@@ -103,13 +101,18 @@ async function createNotes(bundle) {
   for (const file of bundle.files) {
     let uri = Platform.OS === "ios" ? santizeUri(file.value) : `${file.value}`;
 
-    const isPng = /(png)/g.test(file.type);
-    const isJpeg = /(jpeg|jpg)/g.test(file.type);
+    const type = getCompressionType(file.type);
+    let size = file.size;
 
-    if ((isPng || isJpeg) && compress) {
-      uri = await compressToFile("file://" + uri, isPng ? "PNG" : "JPEG");
-
-      uri = `${uri.replace("file://", "")}`;
+    if (type && compress) {
+      const res = await resolveCompressedImage(
+        "file://" + uri,
+        type,
+        bundle.compressedImages?.[file.value],
+        file.size
+      );
+      uri = res.uri.replace("file://", "");
+      size = res.size;
     }
 
     const hash = await Sodium.hashFile({
@@ -125,9 +128,9 @@ async function createNotes(bundle) {
 
     if (attached) {
       if (isImage(file.type)) {
-        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" />`;
+        content = `<img data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${size}" />`;
       } else {
-        content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${file.size}" /></p>`;
+        content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${size}" /></p>`;
       }
       const note = await db.notes.note(id);
       const rawContent = await db.content.get(note?.contentId);

@@ -63,7 +63,29 @@ export async function compressToBase64(path, type) {
   });
 }
 
-export async function compressToFile(path, type) {
+/**
+ * @typedef {{ uri: string; size: number; original?: boolean }} CompressedImageResult
+ * `original` is set when compression did not make the image smaller and the
+ * original file was kept.
+ */
+
+/**
+ * Get the compression type for a mime type or file path.
+ * @param {string | undefined} mimeOrPath
+ * @returns {"PNG" | "JPEG" | undefined}
+ */
+export function getCompressionType(mimeOrPath) {
+  if (!mimeOrPath) return undefined;
+  if (/png/i.test(mimeOrPath)) return "PNG";
+  if (/jpe?g/i.test(mimeOrPath)) return "JPEG";
+  return undefined;
+}
+
+/**
+ * @param {string} path file:// prefixed path
+ * @param {"PNG" | "JPEG"} type
+ */
+export async function compressImage(path, type) {
   const response = await ImageResizer.createResizedImage(
     path,
     1920,
@@ -78,8 +100,61 @@ export async function compressToFile(path, type) {
       onlyScaleDown: true
     }
   );
+  return response;
+}
+
+export async function compressToFile(path, type) {
+  const response = await compressImage(path, type);
   RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
     /* empty */
   });
   return response.uri;
+}
+
+/**
+ * Get the final compressed image for a file, reusing a pre-compressed result
+ * if there is one. The original file is deleted unless it is kept because
+ * compression did not make it smaller.
+ * @param {string} path file:// prefixed path of the original image
+ * @param {"PNG" | "JPEG"} type
+ * @param {CompressedImageResult} [preCompressed]
+ * @param {number} [originalSize] size of the original, read from disk if not given
+ * @returns {Promise<CompressedImageResult>}
+ */
+export async function resolveCompressedImage(
+  path,
+  type,
+  preCompressed,
+  originalSize
+) {
+  if (preCompressed) {
+    if (!preCompressed.original) {
+      RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
+        /* empty */
+      });
+    }
+    return preCompressed;
+  }
+
+  const res = await compressImage(path, type);
+  let size = originalSize;
+  if (!size) {
+    try {
+      size = (await RNFetchBlob.fs.stat(path.replace("file://", ""))).size;
+    } catch (e) {
+      /* empty */
+    }
+  }
+
+  if (size && res.size >= size) {
+    RNFetchBlob.fs.unlink(res.uri.replace("file://", "")).catch(() => {
+      /* empty */
+    });
+    return { uri: path, size, original: true };
+  }
+
+  RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
+    /* empty */
+  });
+  return { uri: res.uri, size: res.size };
 }

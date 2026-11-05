@@ -32,7 +32,10 @@ import RNFetchBlob from "react-native-blob-util";
 import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
-import { compressToFile } from "../../../common/filesystem/compress";
+import {
+  getCompressionType,
+  resolveCompressedImage
+} from "../../../common/filesystem/compress";
 import { santizeUri } from "../../../common/filesystem/utils";
 import AttachImage from "../../../components/dialogs/attach-image-dialog";
 import { ToastManager } from "../../../services/event-manager";
@@ -269,19 +272,28 @@ const handleImageResponse = async (
   if (!result) return;
   const compress = result.compress;
 
-  for (const image of response) {
-    const isPng = /(png)/g.test(image.mime);
-    const isJpeg = /(jpeg|jpg)/g.test(image.mime);
-    if (compress && (isPng || isJpeg)) {
-      image.path = await compressToFile(
-        Platform.OS === "ios" ? "file://" + image.path : image.path,
-        isPng ? "PNG" : "JPEG"
-      );
+  // Delete pre-compressed images that will not be used.
+  const discardUnused = (from: number) => {
+    for (const image of response.slice(from)) {
+      const entry = result.compressedImages?.[image.path];
+      if (entry && !entry.original) {
+        RNFetchBlob.fs.unlink(entry.uri.replace("file://", "")).catch(() => {});
+      }
+    }
+  };
 
-      const stat = await RNFetchBlob.fs.stat(image.path.replace("file://", ""));
-      image.size = stat.size;
+  for (const [index, image] of response.entries()) {
+    const type = getCompressionType(image.mime || image.path);
+    if (compress && type) {
+      const res = await resolveCompressedImage(
+        Platform.OS === "ios" ? "file://" + image.path : image.path,
+        type,
+        result.compressedImages?.[image.path],
+        image.size
+      );
       image.path =
-        Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
+        Platform.OS === "ios" ? res.uri.replace("file://", "") : res.uri;
+      image.size = res.size;
     }
 
     const featureResult = await isFeatureAvailable("fileSize", image.size || 0);
@@ -291,6 +303,7 @@ const handleImageResponse = async (
         message: featureResult.error,
         type: "error"
       });
+      discardUnused(index + 1);
       return;
     }
 
@@ -310,7 +323,10 @@ const handleImageResponse = async (
         ? fileName.replace(/HEIC|HEIF/, "jpeg")
         : fileName;
 
-    if (!(await attachFile(uri, hash, image.mime, fileName, options))) return;
+    if (!(await attachFile(uri, hash, image.mime, fileName, options))) {
+      discardUnused(index + 1);
+      return;
+    }
 
     RNFetchBlob.fs.unlink(uri).catch((e) => {});
 

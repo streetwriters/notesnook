@@ -30,7 +30,13 @@ import {
 import { isImage } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -61,7 +67,10 @@ import Paragraph from "../components/ui/typography/paragraph";
 import { useDBItem } from "../hooks/use-db-item";
 import { eSendEvent } from "../services/event-manager";
 import { eOnLoadNote } from "../utils/events";
+import { santizeUri } from "../common/filesystem/utils";
 import { NoteBundle } from "../utils/note-bundle";
+import { usePreCompressedImages } from "../hooks/use-pre-compressed-images";
+import { ImageSizeBadge } from "../components/attachments/image-size-badge";
 import { defaultBorderRadius, AppFontSize } from "../utils/size";
 import { AddNotebooks } from "./add-notebooks";
 import { AddTags } from "./add-tags";
@@ -180,6 +189,20 @@ const ShareView = () => {
   const insets = useSafeAreaInsets();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [compress, setCompress] = useState(true);
+  const preCompressItems = useMemo(
+    () =>
+      rawFiles.map((file) => ({
+        key: file.value,
+        path:
+          "file://" +
+          (Platform.OS === "ios" ? santizeUri(file.value) : file.value),
+        mime: file.type ?? "",
+        size: file.size
+      })),
+    [rawFiles]
+  );
+  const preCompressed = usePreCompressedImages(preCompressItems);
+  const isCompressing = preCompressed.isCompressing && compress;
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event: KeyboardEvent) => {
     const height =
@@ -347,6 +370,7 @@ const ShareView = () => {
   }, [loadData]);
 
   const close = async () => {
+    preCompressed.dispose();
     dismissAndResetKeyboard();
     setNote({ ...defaultNote });
     setLoadingExtension(true);
@@ -394,8 +418,14 @@ const ShareView = () => {
         note: noteData,
         notebooks: useShareStore.getState().selectedNotebooks,
         tags: useShareStore.getState().selectedTags,
-        compress
+        compress,
+        compressedImages: compress ? preCompressed.compressed : undefined
       });
+      if (compress) {
+        preCompressed.confirm();
+      } else {
+        preCompressed.dispose();
+      }
 
       if (!globalThis["IS_MAIN_APP_RUNNING"]) {
         await db.sync({ type: "send", force: false });
@@ -460,10 +490,11 @@ const ShareView = () => {
     if (index > -1) {
       setRawFiles((state) => {
         const files = [...state];
-        files.splice(index);
+        files.splice(index, 1);
         return files;
       });
       RNFetchBlob.fs.unlink(item.value).catch(console.log);
+      preCompressed.release(item.value);
     }
   };
 
@@ -618,7 +649,8 @@ const ShareView = () => {
                     <Button
                       title={strings.done()}
                       type="accent"
-                      loading={loading}
+                      loading={loading || isCompressing}
+                      disabled={isCompressing}
                       onPress={onPress}
                       allowFontScaling={false}
                     />
@@ -632,20 +664,48 @@ const ShareView = () => {
                         backgroundColor: colors.secondary.background
                       }}
                     >
-                      <Paragraph
-                        style={{ marginBottom: 6 }}
-                        color={colors.primary.paragraph}
-                        allowFontScaling={false}
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: 6
+                        }}
                       >
-                        {strings.attachingFilesCount(rawFiles.length)}
-                      </Paragraph>
+                        <Paragraph
+                          color={colors.primary.paragraph}
+                          allowFontScaling={false}
+                        >
+                          {strings.attachingFilesCount(rawFiles.length)}
+                        </Paragraph>
+                        <Paragraph
+                          size={AppFontSize.xs}
+                          color={colors.secondary.paragraph}
+                          allowFontScaling={false}
+                        >
+                          {isCompressing
+                            ? `${strings.compressing()}...`
+                            : formatBytes(
+                                preCompressed.totalSize(
+                                  preCompressItems,
+                                  compress
+                                )
+                              )}
+                        </Paragraph>
+                      </View>
                       <ScrollView horizontal>
-                        {rawFiles.map((item) =>
-                          isImage(item.type) || item.value?.endsWith(".png") ? (
+                        {rawFiles.map((item) => {
+                          const itemSize = preCompressed.getSize(
+                            { key: item.value, size: item.size },
+                            compress
+                          );
+                          return isImage(item.type) ||
+                            item.value?.endsWith(".png") ? (
                             <TouchableOpacity
                               onPress={() => onRemoveFile(item)}
                               key={item.name}
                               activeOpacity={0.9}
+                              style={{ marginRight: 6 }}
                             >
                               <Image
                                 source={{
@@ -658,10 +718,16 @@ const ShareView = () => {
                                   width: 100,
                                   height: 100,
                                   borderRadius: defaultBorderRadius,
-                                  backgroundColor: "black",
-                                  marginRight: 6
+                                  backgroundColor: "black"
                                 }}
                                 resizeMode="cover"
+                              />
+                              <ImageSizeBadge
+                                size={itemSize}
+                                pending={
+                                  compress &&
+                                  preCompressed.isPending(item.value)
+                                }
                               />
                             </TouchableOpacity>
                           ) : (
@@ -700,8 +766,8 @@ const ShareView = () => {
                                 {item.size ? `(${formatBytes(item.size)})` : ""}
                               </Paragraph>
                             </TouchableOpacity>
-                          )
-                        )}
+                          );
+                        })}
                       </ScrollView>
 
                       <Paragraph
