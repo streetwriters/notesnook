@@ -74,6 +74,7 @@ type ListContainerProps = {
   refresh: () => void;
   header?: JSX.Element;
   renderGroupHeader?: (title: string, index: number) => JSX.Element;
+  showGroupCounts?: boolean;
   placeholder: JSX.Element;
   isLoading?: boolean;
   isSearching?: boolean;
@@ -93,6 +94,7 @@ function ListContainer(props: ListContainerProps) {
     refresh,
     header,
     renderGroupHeader,
+    showGroupCounts,
     button,
     compact,
     sx,
@@ -245,6 +247,7 @@ function ListContainer(props: ListContainerProps) {
               context={{
                 header,
                 renderGroupHeader,
+                showGroupCounts,
                 items,
                 group,
                 refresh,
@@ -300,6 +303,7 @@ export default ListContainer;
 type ListContext = {
   header?: JSX.Element;
   renderGroupHeader?: (title: string, index: number) => JSX.Element;
+  showGroupCounts?: boolean;
   items: VirtualizedGrouping<Item>;
   group: GroupingKey | undefined;
   refresh: () => void;
@@ -327,6 +331,7 @@ function ItemRenderer({
     items,
     group,
     renderGroupHeader,
+    showGroupCounts,
     focusedGroupIndex,
     focusGroup,
     selectItems,
@@ -375,6 +380,7 @@ function ItemRenderer({
       ) : resolvedItem.group && group ? (
         <GroupHeader
           title={resolvedItem.group.title}
+          showGroupCounts={showGroupCounts}
           isFocused={index === focusedGroupIndex}
           onSelectGroup={async () => {
             if (!items.groups) return;

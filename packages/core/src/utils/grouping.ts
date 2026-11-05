@@ -141,7 +141,7 @@ export function groupArray<T>(
     const item = items[i];
     const groupTitle = keySelector(item);
     const group = groups.get(groupTitle);
-    if (typeof group === "undefined")
+    if (typeof group === "undefined") {
       groups.set(groupTitle, [
         i,
         {
@@ -151,10 +151,14 @@ export function groupArray<T>(
             get title() {
               return keySelector(item);
             },
-            type: "header"
+            type: "header",
+            count: 1
           }
         }
       ]);
+    } else {
+      group[1].group.count = (group[1].group.count ?? 0) + 1;
+    }
   }
   return new Map(groups.values());
 }
