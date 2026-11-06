@@ -21,6 +21,7 @@
         tools:node="remove" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.USE_FULL_SCREEN_INTENT"
@@ -234,6 +235,14 @@
 
 
         <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />
+
+        <service
+            android:name="com.appfolio.uploader.MultipartUploadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+        <service
+            android:name="com.appfolio.uploader.MultipartCompletionService"
+            android:exported="false" />
 
         <service
             android:name="com.streetwriters.notesnook.BootTaskService"
