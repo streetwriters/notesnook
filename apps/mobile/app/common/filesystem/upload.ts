@@ -121,6 +121,7 @@ async function multipartUploadFile(
   fileSize: number,
   requestOptions: RequestOptions,
   cancelToken: { cancel: (reason?: string) => Promise<void> },
+  cancelState: { cancelled: boolean },
   displayName: string
 ): Promise<Response> {
   const { headers } = requestOptions;
@@ -188,16 +189,19 @@ async function multipartUploadFile(
       }
     });
 
-    let cancelled = false;
     cancelToken.cancel = async () => {
-      cancelled = true;
+      cancelState.cancelled = true;
       MMKV.removeItem(sessionKey);
       useAttachmentStore.getState().remove(filename);
       await upload.cancel();
     };
 
     upload.onProgress((event) => {
-      if (!cancelled && event.etags && event.etags.length === parts.length) {
+      if (
+        !cancelState.cancelled &&
+        event.etags &&
+        event.etags.length === parts.length
+      ) {
         currentEtags = event.etags;
         MMKV.setMap(sessionKey, { uploadId, etags: currentEtags });
       }
@@ -246,14 +250,16 @@ async function multipartUploadFile(
 
     return response;
   } catch (error) {
-    DatabaseLogger.error(error, "Multipart upload failed", { filename });
-    const errorText = error instanceof Error ? error.message : String(error);
-    if (
-      RESET_UPLOAD_ERRORS.some((code) => errorText.includes(code)) ||
-      // iOS errors don't include the S3 code; NoSuchUpload/NoSuchKey are 404s
-      /HTTP (status )?404\b/.test(errorText)
-    ) {
-      MMKV.removeItem(sessionKey);
+    if (!cancelState.cancelled) {
+      DatabaseLogger.error(error, "Multipart upload failed", { filename });
+      const errorText = error instanceof Error ? error.message : String(error);
+      if (
+        RESET_UPLOAD_ERRORS.some((code) => errorText.includes(code)) ||
+        // iOS errors don't include the S3 code; NoSuchUpload/NoSuchKey are 404s
+        /HTTP (status )?404\b/.test(errorText)
+      ) {
+        MMKV.removeItem(sessionKey);
+      }
     }
     useAttachmentStore.getState().remove(filename);
     throw error;
@@ -271,6 +277,7 @@ export async function uploadFile(
   const { url, headers } = requestOptions;
   await createCacheDir();
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
+  const cancelState = { cancelled: false };
 
   try {
     let filePath = `${cacheDir}/${filename}`;
@@ -361,6 +368,7 @@ export async function uploadFile(
         fileInfo.size,
         requestOptions,
         cancelToken,
+        cancelState,
         displayName
       );
       const status = result.status || 0;
@@ -420,6 +428,7 @@ export async function uploadFile(
         }
       });
       cancelToken.cancel = async () => {
+        cancelState.cancelled = true;
         useAttachmentStore.getState().remove(filename);
         upload.cancel();
       };
@@ -454,6 +463,10 @@ export async function uploadFile(
     return uploaded;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
+    if (cancelState.cancelled) {
+      DatabaseLogger.info("Upload cancelled", { filename });
+      return false;
+    }
     ToastManager.error(e as Error, "File upload failed");
     DatabaseLogger.error(e, "File upload failed", {
       filename
