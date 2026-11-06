@@ -24,12 +24,11 @@ export type EventManagerSubscription = {
 export type EventHandler = (...args: any[]) => any;
 
 export type EventProperties = {
-  name: string;
   once?: boolean;
 };
 
 export class EventManager {
-  public _registry: Map<EventHandler, EventProperties>;
+  public _registry: Map<string, Map<EventHandler, EventProperties>>;
   constructor() {
     this._registry = new Map();
   }
@@ -44,30 +43,36 @@ export class EventManager {
 
   subscribe(name: string, handler: EventHandler, once = false) {
     if (!name || !handler) throw new Error("name and handler are required.");
-    this._registry.set(handler, { name, once });
+    this.handlers(name).set(handler, { once });
     return { unsubscribe: () => this.unsubscribe(name, handler) };
   }
 
   subscribeSingle(name: string, handler: EventHandler) {
     if (!name || !handler) throw new Error("name and handler are required.");
-    this._registry.forEach((props, handler) => {
-      if (props.name === name) this._registry.delete(handler);
-    });
-    this._registry.set(handler, { name, once: false });
+    this.handlers(name).clear();
+    this.handlers(name).set(handler, { once: false });
     return { unsubscribe: () => this.unsubscribe(name, handler) };
   }
 
-  unsubscribe(_name: string, handler: EventHandler) {
-    return this._registry.delete(handler);
+  unsubscribe(name: string, handler: EventHandler) {
+    return !!this._registry.get(name)?.delete(handler);
   }
 
   publish(name: string, ...args: any[]) {
-    this._registry.forEach((props, handler) => {
-      if (props.name === name) {
-        handler(...args);
-        if (props.once) this._registry.delete(handler);
+    const handlers = this._registry.get(name);
+    if (!handlers) return;
+    for (const [handler, props] of Array.from(handlers)) {
+      // skip handlers unsubscribed by an earlier handler
+      if (!handlers.has(handler)) continue;
+      if (props.once) handlers.delete(handler);
+      try {
+        const result = handler(...args);
+        if (result instanceof Promise)
+          result.catch((e) => onHandlerError(name, e));
+      } catch (e) {
+        onHandlerError(name, e);
       }
-    });
+    }
   }
 
   async publishWithResult<T = unknown>(
@@ -75,11 +80,9 @@ export class EventManager {
     ...args: any[]
   ): Promise<T[] | boolean> {
     const handlers: EventHandler[] = [];
-    this._registry.forEach((props, handler) => {
-      if (props.name === name) {
-        handlers.push(handler);
-        if (props.once) this._registry.delete(handler);
-      }
+    this._registry.get(name)?.forEach((props, handler, map) => {
+      handlers.push(handler);
+      if (props.once) map.delete(handler);
     });
 
     if (handlers.length <= 0) return true;
@@ -87,9 +90,20 @@ export class EventManager {
   }
 
   remove(...names: string[]) {
-    this._registry.forEach((props, handler) => {
-      if (names.includes(props.name)) this._registry.delete(handler);
-    });
+    for (const name of names) this._registry.delete(name);
   }
+
+  private handlers(name: string) {
+    let handlers = this._registry.get(name);
+    if (!handlers) {
+      handlers = new Map();
+      this._registry.set(name, handlers);
+    }
+    return handlers;
+  }
+}
+
+function onHandlerError(name: string, error: unknown) {
+  console.error(`Error in "${name}" event handler.`, error);
 }
 export default EventManager;
