@@ -82,12 +82,15 @@ export class Attachments implements ICollection {
       async ({
         success,
         error,
-        filename
+        filename,
+        canceled
       }: {
         success: boolean;
         filename: string;
         error: string;
+        canceled?: boolean;
       }) => {
+        if (canceled) return;
         const attachment = await this.attachment(filename);
         if (!attachment) return;
         if (success) await this.markAsUploaded(attachment.id);
@@ -211,6 +214,8 @@ export class Attachments implements ICollection {
     if (!localOnly && !(await this.canDetach(attachment)))
       throw new Error("This attachment is inside a locked note.");
 
+    await this.db.fs().cancelFile(attachment.hash);
+
     if (
       await this.db
         .fs()
@@ -245,6 +250,10 @@ export class Attachments implements ICollection {
     const remoteHashes = detachable
       .filter((a) => !localOnly && !!a.dateUploaded)
       .map((a) => a.hash);
+
+    for (const attachment of detachable) {
+      await this.db.fs().cancelFile(attachment.hash);
+    }
 
     if (localOnlyHashes.length > 0) {
       await this.db.fs().bulkDeleteFiles(localOnlyHashes, true);

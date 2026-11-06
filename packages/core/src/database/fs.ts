@@ -36,6 +36,7 @@ export type DownloadableFile = {
 export type QueueItem = DownloadableFile & {
   cancel?: (reason?: string) => Promise<void>;
   operation?: Promise<boolean>;
+  canceled?: boolean;
 };
 
 export class FileStorage {
@@ -217,6 +218,7 @@ export class FileStorage {
         this.eventManager.publish(EVENTS.fileUploaded, {
           error,
           success: result,
+          canceled: !!file.canceled,
           total,
           current: ++current,
           groupId,
@@ -295,6 +297,20 @@ export class FileStorage {
           canceled: true
         });
       }
+    }
+  }
+
+  async cancelFile(filename: string) {
+    const queues = [
+      { files: this.uploads, groups: this.groups.uploads },
+      { files: this.downloads, groups: this.groups.downloads }
+    ];
+    for (const queue of queues) {
+      const file = queue.files.get(filename);
+      if (!file) continue;
+      file.canceled = true;
+      await file.cancel?.("Operation canceled.");
+      for (const group of queue.groups.values()) group.delete(filename);
     }
   }
 
