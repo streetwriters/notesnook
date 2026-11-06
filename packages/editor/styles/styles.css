@@ -657,6 +657,21 @@ p > *::selection {
   border-left: 1px solid var(--hover);
 }
 
+.outline-list > li.nested::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40px;
+  width: 40px;
+  height: 1lh;
+  cursor: pointer;
+}
+
+.outline-list[dir="rtl"] > li.nested::after {
+  left: unset;
+  right: -40px;
+}
+
 /* IMAGE */
 
 .image-view-content-wrap.ProseMirror-selectednode .resizer::before {
@@ -804,6 +819,7 @@ p > *::selection {
   position: absolute;
   top: calc((1lh - 18px) / 2);
   right: 0px;
+  margin: 0;
   cursor: pointer;
   content: "";
   background-size: 18px;
@@ -824,6 +840,22 @@ p > *::selection {
 .ProseMirror div.callout > :first-child[dir="rtl"]::after {
   right: unset;
   left: 0px;
+}
+
+.ProseMirror div.callout > :first-child::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -11px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.ProseMirror div.callout > :first-child[dir="rtl"]::before {
+  right: unset;
+  left: -11px;
 }
 
 .ProseMirror div.callout.collapsed > :first-child::after  {
@@ -915,13 +947,14 @@ del.diffdel {
   cursor: pointer;
   content: "";
   background-size: var(--icon-size, 18px);
-  width: var(--icon-size, 18px);
+  width: 40px;
   height: var(--icon-size, 18px);
+  margin-inline-end: calc(var(--icon-size, 18px) - 40px);
 
   background-color: var(--icon);
   mask: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMjQgMjQiPjxwYXRoIGZpbGw9IiM4ODg4ODgiIGQ9Ik03LjQxIDguNThMMTIgMTMuMTdsNC41OS00LjU5TDE4IDEwbC02IDZsLTYtNmwxLjQxLTEuNDJaIi8+PC9zdmc+)
     no-repeat 50% 50%;
-  mask-size: cover;
+  mask-size: var(--icon-size, 18px);
 
   transform: rotate(0);
   transition: transform 250ms ease, opacity 200ms ease;
