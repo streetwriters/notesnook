@@ -20,6 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { tiptapKeys } from "@notesnook/common";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 import { Editor, Extension } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
 type FontSizeOptions = {
   types: string[];
@@ -104,6 +106,56 @@ export const FontSize = Extension.create<FontSizeOptions>({
         return true;
       }
     };
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("fontSizeCaretFix"),
+        props: {
+          decorations: (state) => {
+            const { selection, storedMarks } = state;
+
+            if (!selection.empty || !storedMarks) {
+              return null;
+            }
+
+            const textStyleMark = storedMarks.find(
+              (m) => m.type.name === "textStyle"
+            );
+            if (!textStyleMark || !textStyleMark.attrs.fontSize) {
+              return null;
+            }
+
+            const span = document.createElement("span");
+            span.textContent = "\u200b";
+            span.style.fontSize = textStyleMark.attrs.fontSize;
+            if (textStyleMark.attrs.fontFamily) {
+              span.style.fontFamily = textStyleMark.attrs.fontFamily;
+            }
+            span.style.display = "inline";
+            span.style.overflow = "hidden";
+            span.style.pointerEvents = "none";
+            span.style.userSelect = "none";
+            span.setAttribute("contenteditable", "false");
+
+            console.log(
+              "editor font size caret plugin",
+              textStyleMark,
+              storedMarks,
+              span
+            );
+
+            return DecorationSet.create(state.doc, [
+              Decoration.widget(selection.from, span, {
+                side: -1,
+                stopEvent: () => true
+              })
+            ]);
+          }
+        }
+      })
+    ];
   }
 });
 
