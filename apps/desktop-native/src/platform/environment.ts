@@ -39,6 +39,7 @@ export interface Environment {
   isMacStoreApp: boolean;
   hasNativeTitlebar: boolean;
   backupsDirectory: string;
+  tempDirectory: string;
   locale: string | undefined;
   features: Record<
     | "opfs"

@@ -45,6 +45,9 @@ export const environment: Environment = {
   get backupsDirectory() {
     return `${paths.documents}/Notesnook/backups`;
   },
+  get tempDirectory() {
+    return paths.temp;
+  },
   locale: undefined,
   features: {
     opfs: false,
