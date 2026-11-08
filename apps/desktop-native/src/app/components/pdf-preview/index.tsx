@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useMemo } from "react";
-import { Button, Flex, Text, WebView } from "@ui";
-import { Close } from "../icons";
+import { strings } from "@notesnook/intl";
+import { files, shell } from "@platform";
+import { Button, Flex, Text } from "@ui";
+import { Close, Download } from "../icons";
+import { saveAttachment } from "../../common/attachments";
+import { showToast } from "../../utils/toast";
 
 export type PdfPreviewProps = {
   fileUrl: string | Uint8Array;
@@ -27,23 +30,37 @@ export type PdfPreviewProps = {
   hash?: string;
 };
 
-function toBase64(bytes: Uint8Array) {
-  let binary = "";
-  const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk)
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-  return btoa(binary);
+async function saveBytes(bytes: Uint8Array) {
+  const file = await files.create("document.pdf");
+  await file.write(bytes);
+  await file.close();
+}
+
+function base64ToBytes(base64: string) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }
 
 export function PdfPreview(props: PdfPreviewProps) {
-  const { fileUrl, onClose } = props;
-  const uri = useMemo(
-    () =>
-      typeof fileUrl === "string"
-        ? fileUrl
-        : `data:application/pdf;base64,${toBase64(fileUrl)}`,
-    [fileUrl]
-  );
+  const { fileUrl, onClose, hash } = props;
+
+  async function download() {
+    try {
+      if (hash) return await saveAttachment(hash);
+      if (typeof fileUrl !== "string") return await saveBytes(fileUrl);
+      const prefix = "base64,";
+      const index = fileUrl.indexOf(prefix);
+      if (fileUrl.startsWith("data:") && index > -1)
+        return await saveBytes(
+          base64ToBytes(fileUrl.slice(index + prefix.length))
+        );
+      shell.openUrl(fileUrl);
+    } catch (e) {
+      showToast("error", (e as Error).message);
+    }
+  }
 
   return (
     <Flex testID="pdf-preview" sx={{ flex: 1, flexDirection: "column" }}>
@@ -61,8 +78,28 @@ export function PdfPreview(props: PdfPreviewProps) {
           </Button>
         </Flex>
       ) : null}
-      <WebView testID="pdf-webview" source={{ uri }} sx={{ flex: 1 }} />
-      {!uri ? <Text>No file</Text> : null}
+      <Flex
+        sx={{
+          flex: 1,
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "spacing6"
+        }}
+      >
+        <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+          PDF preview isn&apos;t available yet
+        </Text>
+        <Button
+          testID="pdf-download"
+          variant="secondary"
+          onPress={download}
+          sx={{ flexDirection: "row", gap: "spacing3", alignItems: "center" }}
+        >
+          <Download size={15} color="icon" />
+          <Text>{strings.network.download()}</Text>
+        </Button>
+      </Flex>
     </Flex>
   );
 }
