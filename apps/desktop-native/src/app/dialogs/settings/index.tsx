@@ -59,6 +59,7 @@ import {
   Sync
 } from "../../components/icons";
 import { NavigationItem } from "../../components/navigation-menu/navigation-item";
+import { hashNavigate } from "../../navigation";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { AppearanceSettings } from "./appearance-settings";
 import { AppLockSettings } from "./app-lock-settings";
@@ -312,6 +313,11 @@ function SettingsSideBar(props: {
   onSearch: (query: string) => void;
 }) {
   useUserStore((store) => store.isLoggedIn);
+
+  useEffect(() => {
+    hashNavigate(`/settings/${props.route}` as never, { notify: false });
+  }, [props.route]);
+
   return (
     <ThemeScope scope="navigationMenu">
       <Flex sx={{ width: 240, flexShrink: 0, bg: "background" }}>
@@ -322,6 +328,7 @@ function SettingsSideBar(props: {
           <Flex sx={{ flexDirection: "column", gap: 2, overflow: "hidden" }}>
             <Input
               testID="settings-search"
+              autoFocus
               placeholder={strings.search()}
               onChangeText={props.onSearch}
               sx={{ m: 1, bg: "background", py: "7px" }}

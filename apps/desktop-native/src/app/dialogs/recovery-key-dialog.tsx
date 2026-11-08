@@ -226,8 +226,8 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
       </Flex>
       <Flex
         sx={{
-          flexDirection: "column",
-          gap: "spacing3",
+          flexDirection: "row",
+          gap: "spacing4",
           bg: "background-secondary",
           p: "spacing4",
           borderRadius: "radius2",
@@ -236,11 +236,10 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
       >
         <Flex
           sx={{
-            alignSelf: "center",
             bg: "background",
             border: "1px solid",
             borderColor: "border-secondary",
-            p: 1
+            flexShrink: 0
           }}
         >
           <QRCode
@@ -250,31 +249,43 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
             ecLevel="M"
           />
         </Flex>
-        <ActionButton
-          icon={Copy}
-          text={
-            activeButton === "copyQR"
-              ? strings.copied()
-              : strings.copyToClipboard()
-          }
-          onPress={handleCopyQRCode}
-        />
-        <ActionButton
-          icon={FloppyDisk}
-          text={
-            activeButton === "saveQR" ? strings.saved() : strings.saveQRImage()
-          }
-          onPress={handleDownloadQRCode}
-        />
-        <ActionButton
-          icon={Download}
-          text={
-            activeButton === "download"
-              ? strings.downloaded()
-              : strings.downloadTextFile()
-          }
-          onPress={handleSaveToFile}
-        />
+        <Flex
+          sx={{
+            flex: 1,
+            flexDirection: "column",
+            gap: "spacing3",
+            justifyContent: "center",
+            minWidth: 0
+          }}
+        >
+          <ActionButton
+            icon={Copy}
+            text={
+              activeButton === "copyQR"
+                ? strings.copied()
+                : strings.copyToClipboard()
+            }
+            onPress={handleCopyQRCode}
+          />
+          <ActionButton
+            icon={FloppyDisk}
+            text={
+              activeButton === "saveQR"
+                ? strings.saved()
+                : strings.saveQRImage()
+            }
+            onPress={handleDownloadQRCode}
+          />
+          <ActionButton
+            icon={Download}
+            text={
+              activeButton === "download"
+                ? strings.downloaded()
+                : strings.downloadTextFile()
+            }
+            onPress={handleSaveToFile}
+          />
+        </Flex>
       </Flex>
     </Flex>
   );

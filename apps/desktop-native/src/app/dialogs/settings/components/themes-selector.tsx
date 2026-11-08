@@ -256,6 +256,7 @@ function ThemeItem(props: ThemeItemProps) {
 
   return (
     <Flex
+      group="theme-item"
       onPress={async () => {
         if (await ThemeDetailsDialog.show({ theme })) {
           await setTheme(theme);
@@ -298,7 +299,11 @@ function ThemeItem(props: ThemeItemProps) {
         ) : (
           <Button
             variant="secondary"
-            sx={{ bg: "background" }}
+            sx={{
+              bg: "background",
+              opacity: 0,
+              ":group-hover": { group: "theme-item", style: { opacity: 1 } }
+            }}
             onPress={() => setTheme(theme)}
             disabled={isApplying}
           >

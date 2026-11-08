@@ -27,14 +27,11 @@ import {
   Progress,
   Text,
   ThemeScope,
+  useWindowSize,
   VirtualList
 } from "@ui";
 import { store, useStore } from "../stores/attachment-store";
-import {
-  formatBytes,
-  usePromise,
-  useResolvedItem
-} from "@notesnook/common";
+import { formatBytes, usePromise, useResolvedItem } from "@notesnook/common";
 import {
   ChevronDown,
   ChevronUp,
@@ -132,6 +129,7 @@ export const AttachmentsDialog = DialogManager.register(
       id: "filename",
       direction: "asc"
     });
+    const { width: windowWidth } = useWindowSize();
     const currentRoute = useRef<Route>("all");
     const download = useStore((store) => store.download);
 
@@ -156,7 +154,13 @@ export const AttachmentsDialog = DialogManager.register(
         noScroll
         sx={{ bg: "transparent" }}
       >
-        <Flex sx={{ flexDirection: "row", height: 560, overflow: "hidden" }}>
+        <Flex
+          sx={{
+            flexDirection: "row",
+            height: windowWidth * 0.8,
+            overflow: "hidden"
+          }}
+        >
           <Sidebar
             onDownloadAll={async () =>
               download(
