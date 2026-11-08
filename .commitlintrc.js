@@ -17,7 +17,7 @@ const SCOPES = [
   "vericrypt",
   "monograph",
   "desktop",
-  "desktop-native",
+  "desktopnative",
   "crypto",
   "editor",
   "logger",

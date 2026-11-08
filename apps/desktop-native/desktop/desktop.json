@@ -1,0 +1,13 @@
+{
+  "$schema": "../node_modules/@react-native-gpui/cli/desktop.schema.json",
+  "productName": "Notesnook",
+  "identifier": "org.streetwriters.notesnook.native",
+  "icon": "assets/icon.png",
+  "window": { "title": "Notesnook", "width": 1280, "height": 800 },
+  "bundle": {
+    "targets": "all",
+    "macos": {
+      "minimumSystemVersion": "13.0"
+    }
+  }
+}
