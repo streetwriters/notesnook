@@ -34,6 +34,7 @@ export interface DatabaseHost {
   createStorage(persistence: DatabasePersistence): Promise<IStorage>;
   getDatabaseKey(): Promise<string>;
   disableAppLock(): Promise<void>;
+  delete(): Promise<void>;
   eventSource: unknown;
   compression: Compression;
 }

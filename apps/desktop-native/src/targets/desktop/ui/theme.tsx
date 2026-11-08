@@ -21,6 +21,7 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 import {
   getThemeScope,
   ThemeFactory,
+  ThemeDark,
   ThemeLight,
   type Theme,
   type ThemeDefinition
@@ -87,11 +88,23 @@ export function DesktopThemeProvider(props: {
   );
 }
 
-export function ThemeScope({ scope, children }: ThemeScopeProps) {
+export function ThemeScope({
+  scope,
+  colorScheme,
+  theme,
+  children
+}: ThemeScopeProps) {
   const parent = useThemeContext();
+  const definition =
+    theme ??
+    (colorScheme === "dark"
+      ? ThemeDark
+      : colorScheme === "light"
+      ? ThemeLight
+      : parent.definition);
   const value = useMemo(
-    () => createThemeContext(parent.definition, scope),
-    [parent.definition, scope]
+    () => createThemeContext(definition, scope),
+    [definition, scope]
   );
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

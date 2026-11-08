@@ -24,7 +24,7 @@ import type {
   ReactNode,
   RefAttributes
 } from "react";
-import type { Theme } from "@notesnook/theme";
+import type { Theme, ThemeDefinition } from "@notesnook/theme";
 import type {
   ContextMenuEvent,
   FocusEvent,
@@ -177,6 +177,17 @@ export interface ColorPickerProps extends BaseProps {
   onChange: (value: string) => void;
 }
 
+export interface QRCodeProps extends BaseProps {
+  value: string;
+  size: number;
+  ecLevel?: "L" | "M" | "Q" | "H";
+}
+
+export interface QRCodeHandle {
+  toSVG(): string;
+  toPNG(): Promise<Uint8Array>;
+}
+
 export interface SelectOption {
   value: string | number;
   title: string;
@@ -191,6 +202,8 @@ export interface SelectProps extends BaseProps {
 
 export interface ThemeScopeProps {
   scope: ThemeScopeName;
+  colorScheme?: "light" | "dark";
+  theme?: ThemeDefinition;
   children?: ReactNode;
 }
 
@@ -211,6 +224,9 @@ export declare const Textarea: Primitive<TextareaProps>;
 export declare const Checkbox: Primitive<CheckboxProps>;
 export declare const Radio: Primitive<RadioProps>;
 export declare const Select: Primitive<SelectProps>;
+export declare const QRCode: ForwardRefExoticComponent<
+  QRCodeProps & RefAttributes<QRCodeHandle>
+>;
 export declare const ColorPicker: Primitive<ColorPickerProps>;
 export declare const Switch: Primitive<SwitchProps>;
 export declare const Slider: Primitive<SliderProps>;

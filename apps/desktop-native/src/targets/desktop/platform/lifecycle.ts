@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import NetInfo from "@react-native-community/netinfo";
-import { restart as restartApp } from "@react-native-gpui/system";
+import { getIdleTime, restart as restartApp } from "@react-native-gpui/system";
 import { AppState, DevSettings } from "react-native";
 import type { Lifecycle } from "../../../platform";
 
@@ -63,8 +63,18 @@ export const lifecycle: Lifecycle = {
     const state = await NetInfo.fetch();
     return state.isInternetReachable !== false && !!state.isConnected;
   },
-  startIdleDetection() {
-    throw new Error("startIdleDetection is not implemented on desktop yet");
+  startIdleDetection(ms, onTrigger) {
+    let triggered = false;
+    const timer = setInterval(async () => {
+      const idle = (await getIdleTime()) * 1000;
+      if (idle >= ms && !triggered) {
+        triggered = true;
+        onTrigger();
+      } else if (idle < ms) {
+        triggered = false;
+      }
+    }, 1000);
+    return () => clearInterval(timer);
   },
   async restart() {
     await restartApp();
