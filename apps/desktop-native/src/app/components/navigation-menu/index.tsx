@@ -17,40 +17,67 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useResolvedItem } from "@notesnook/common";
-import type {
-  Color,
-  Notebook,
-  Tag,
-  VirtualizedGrouping
-} from "@notesnook/core";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  FeatureResult,
+  isFeatureAvailable,
+  useIsFeatureAvailable
+} from "@notesnook/common";
+import { createInternalLink } from "@notesnook/core";
+import type { Color, Notebook, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { shell } from "@platform";
 import {
   Box,
   Button,
   dataColor,
   Flex,
+  Image,
+  ScrollContainer,
   Text,
-  VirtualList,
+  type MenuItem,
   type UIElement
 } from "@ui";
 import { db } from "../../common/db";
 import { Notebooks } from "../../views/notebooks";
-import { SettingsDialog } from "../../dialogs/settings";
-import { FilterField } from "./filter-field";
-import { CREATE_BUTTON_MAP } from "../../common";
-import { navigate, usePathname } from "../../navigation";
+import Tags from "../../views/tags";
+import {
+  CREATE_BUTTON_MAP,
+  createSetDefaultHomepageMenuItem,
+  logout,
+  withFeatureCheck
+} from "../../common";
+import {
+  getCurrentPath,
+  hardNavigate,
+  hashNavigate,
+  navigate,
+  usePathname
+} from "../../navigation";
+import { isMobile } from "../../hooks/use-mobile";
+import { Menu } from "../../hooks/use-menu";
+import { usePersistentState } from "../../hooks/use-persistent-state";
+import { isUserSubscribed } from "../../hooks/use-is-user-premium";
+import { shouldShowWrapped } from "../../utils/should-show-wrapped";
+import { writeToClipboard } from "../../utils/clipboard";
+import { showToast } from "../../utils/toast";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
+import { useStore as useSearchStore } from "../../stores/search-store";
+import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { useMenuStore } from "../menu";
+import { ConfirmDialog } from "../../dialogs/confirm";
+import { RenameColorDialog } from "../../dialogs/item-dialog";
+import { BuyDialog } from "../../dialogs/buy-dialog";
 import {
+  ArrowCounterClockwise,
+  Backspace,
   Bell,
   BookOpen,
   BoxArrowDown,
@@ -58,21 +85,26 @@ import {
   FileText,
   GearSix,
   Home,
+  LinkBreak,
+  LinkHorizontal,
   MoonStars,
   Notebook as NotebookIcon,
+  PencilSimple,
   Plus,
+  Pro,
   Question,
   SignIn,
   SignOut,
   Sliders,
   Star,
   Tag as TagIcon,
+  Topic,
   Trash,
   UserProfileIcon,
   type Icon
 } from "../icons";
+import { showSortMenu } from "../group-header";
 import { UserProfileMinimal } from "../user-profile";
-import ListItem from "../list-item";
 import { Logo } from "./logo";
 import { NavigationItem } from "./navigation-item";
 import { TabItem } from "./tab-item";
@@ -96,7 +128,10 @@ function tabs(): NavigationTabItem[] {
           id: "notebooks-sort-button",
           title: strings.sortBy(),
           icon: Sliders,
-          onPress: () => undefined
+          onPress: () =>
+            showSortMenu("notebooks", () =>
+              useNotebookStore.getState().refresh()
+            )
         },
         {
           id: "create-notebook-button",
@@ -115,7 +150,8 @@ function tabs(): NavigationTabItem[] {
           id: "tags-sort-button",
           title: strings.sortBy(),
           icon: Sliders,
-          onPress: () => undefined
+          onPress: () =>
+            showSortMenu("tags", () => useTagStore.getState().refresh())
         },
         {
           id: "create-tag-button",
@@ -295,6 +331,12 @@ export function NavigationMenu() {
 
       <Flex
         testID="navigation-menu"
+        onContextMenu={async (event) => {
+          event.preventDefault();
+          Menu.openMenu(await getSidebarItemsAsMenuItems(), {
+            position: { x: event.pageX, y: event.pageY }
+          });
+        }}
         sx={{
           flex: 1,
           overflow: "hidden",
@@ -304,8 +346,20 @@ export function NavigationMenu() {
       >
         {currentTab.id === "home" ? <HomeTab /> : null}
         {currentTab.id === "notebooks" ? <Notebooks /> : null}
-        {currentTab.id === "tags" ? <TagsTab /> : null}
+        {currentTab.id === "tags" ? <Tags /> : null}
       </Flex>
+      {currentTab.id === "home" && shouldShowWrapped() ? (
+        <Button
+          variant="accent"
+          testID="wrapped-button"
+          onPress={() => hardNavigate("/wrapped")}
+          sx={{ m: 2 }}
+        >
+          <Text sx={{ color: "accentForeground" }}>
+            {strings.wrappedTitle(new Date().getFullYear())}
+          </Text>
+        </Button>
+      ) : null}
     </Flex>
   );
 }
@@ -314,8 +368,9 @@ function ProfileButton() {
   const element = useRef<UIElement>(null);
   const colorScheme = useThemeStore((store) => store.colorScheme);
   const user = useUserStore((store) => store.user);
+  const profile = useSettingStore((store) => store.profile);
+  const isSubscribed = useMemo(() => isUserSubscribed(user), [user]);
   const notLoggedIn = !user || !user.id;
-  const openMenu = useMenuStore((store) => store.open);
   return (
     <Button
       ref={element}
@@ -323,7 +378,7 @@ function ProfileButton() {
       variant="secondary"
       onPress={() =>
         element.current?.measureInWindow((x, y, width, height) =>
-          openMenu(
+          Menu.openMenu(
             [
               {
                 type: "popup",
@@ -337,40 +392,51 @@ function ProfileButton() {
                 key: "toggle-theme-mode",
                 iconComponent: MoonStars,
                 isChecked: colorScheme === "dark",
-                onClick: () =>
-                  useThemeStore.setState({
-                    colorScheme: colorScheme === "dark" ? "light" : "dark"
-                  })
+                onClick: () => {
+                  useThemeStore.getState().setFollowSystemTheme(false);
+                  useThemeStore.getState().toggleColorScheme();
+                }
+              },
+              {
+                type: "button",
+                title: strings.upgradeToPro(),
+                iconComponent: Pro,
+                key: "upgrade",
+                onClick: () => BuyDialog.show({}),
+                isHidden: notLoggedIn || !isSubscribed
               },
               {
                 type: "button",
                 title: strings.routes.Settings(),
                 key: "settings",
                 iconComponent: GearSix,
-                onClick: () => SettingsDialog.show({})
+                onClick: () => hashNavigate("/settings")
               },
               {
                 type: "button",
                 title: strings.helpAndSupport(),
                 iconComponent: Question,
-                key: "help-and-support"
+                key: "help-and-support",
+                onClick: () => shell.openUrl("https://notesnook.com/help/")
               },
               {
                 type: "button",
                 title: strings.login(),
                 iconComponent: SignIn,
                 key: "login",
-                isHidden: !notLoggedIn
+                isHidden: !notLoggedIn,
+                onClick: () => hardNavigate("/login")
               },
               {
                 type: "button",
                 title: strings.logout(),
                 iconComponent: SignOut,
                 key: "logout",
-                isHidden: notLoggedIn
+                isHidden: notLoggedIn,
+                onClick: () => logout()
               }
             ],
-            { x, y, width, height }
+            { position: { x, y, width, height } }
           )
         )
       }
@@ -384,23 +450,141 @@ function ProfileButton() {
         p: 0
       }}
     >
-      <Flex
-        sx={{
-          bg: "background-tertiary",
-          width: "100%",
-          height: "100%",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: "radius5"
-        }}
-      >
-        <UserProfileIcon size={17} color="icon-secondary" />
-      </Flex>
+      {!user || !user.id || !profile?.profilePicture ? (
+        <Flex
+          sx={{
+            bg: "background-tertiary",
+            width: "100%",
+            height: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "radius5"
+          }}
+        >
+          <UserProfileIcon size={17} color="icon-secondary" />
+        </Flex>
+      ) : (
+        <Image
+          src={profile.profilePicture}
+          resizeMode="contain"
+          sx={{ width: "100%", height: "100%", borderRadius: "radius5" }}
+        />
+      )}
     </Button>
   );
 }
 
-function ItemCount(props: { item: RouteEntry | Color; selected?: boolean }) {
+type SectionContext = { collapse: () => void };
+
+function navigateToRoute(path: string) {
+  if (!isMobile() && getCurrentPath() === path) {
+    if (useSearchStore.getState().isSearching)
+      return useSearchStore.getState().resetSearch();
+    return useAppStore.getState().toggleListPane();
+  }
+  useAppStore.getState().toggleListPane(true);
+  navigate(path, { notify: true });
+}
+
+function orderItems<T extends { id: string }>(items: T[], order: string[]) {
+  const sorted: T[] = [];
+  order.forEach((id) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    sorted.push(item);
+  });
+  sorted.push(...items.filter((i) => !order.includes(i.id)));
+  return sorted;
+}
+
+function toMenuItems<T extends { id: string; title: string }>(
+  items: T[],
+  hiddenIds: string[],
+  onHiddenIdsUpdated: (ids: string[]) => void,
+  customizableSidebar: FeatureResult<"customizableSidebar">,
+  extraProps?: (item: T) => Partial<MenuItem>
+): MenuItem[] {
+  return items.map((item) => ({
+    ...extraProps?.(item),
+    type: "button",
+    key: item.id,
+    title: item.title,
+    isChecked: !hiddenIds.includes(item.id),
+    premium: !customizableSidebar.isAllowed,
+    onClick: withFeatureCheck(customizableSidebar, async () => {
+      const copy = hiddenIds.slice();
+      const index = copy.indexOf(item.id);
+      if (index > -1) copy.splice(index, 1);
+      else copy.push(item.id);
+      onHiddenIdsUpdated(copy);
+    })
+  })) as MenuItem[];
+}
+
+async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
+  const customizableSidebar = await isFeatureAvailable("customizableSidebar");
+  const colors = useAppStore.getState().colors;
+  const hiddenColors = customizableSidebar.isAllowed
+    ? useAppStore.getState().hiddenColors
+    : [];
+  const hiddenRoutes = customizableSidebar.isAllowed
+    ? useAppStore.getState().hiddenRoutes
+    : [];
+  return [
+    {
+      key: "reset-sidebar",
+      type: "button",
+      title: strings.resetSidebar(),
+      onClick: () => {
+        db.settings
+          .setSideBarHiddenItems("routes", [])
+          .then(() => db.settings.setSideBarHiddenItems("colors", []))
+          .then(() => db.settings.setSideBarOrder("colors", []))
+          .then(() => db.settings.setSideBarOrder("routes", []))
+          .then(() => db.settings.setSideBarOrder("shortcuts", []))
+          .then(() => {
+            useAppStore.getState().setHiddenRoutes([]);
+            useAppStore.getState().setHiddenColors([]);
+          });
+      },
+      iconComponent: ArrowCounterClockwise
+    },
+    { type: "separator", key: "sep" },
+    ...toMenuItems(
+      orderItems(routes(), db.settings.getSideBarOrder("routes")),
+      hiddenRoutes,
+      (ids) =>
+        db.settings
+          .setSideBarHiddenItems("routes", ids)
+          .then(() => useAppStore.getState().setHiddenRoutes(ids)),
+      customizableSidebar,
+      (item) => ({ iconComponent: item.icon })
+    ),
+    { type: "separator", key: "sep-colors", isHidden: colors.length <= 0 },
+    ...toMenuItems(
+      orderItems(colors, db.settings.getSideBarOrder("colors")),
+      hiddenColors,
+      (ids) =>
+        db.settings
+          .setSideBarHiddenItems("colors", ids)
+          .then(() => useAppStore.getState().setHiddenColors(ids)),
+      customizableSidebar,
+      (item) => ({ iconComponent: createColorIcon(item.colorCode) })
+    )
+  ] as MenuItem[];
+}
+
+function createColorIcon(colorCode: string): Icon {
+  const color = dataColor(colorCode);
+  return function ColorIcon(props) {
+    return <Ellipse {...props} color={color} />;
+  };
+}
+
+function ItemCount(props: {
+  item: RouteEntry | Color | Notebook | Tag;
+  selected?: boolean;
+}) {
   const notes = useNoteStore((store) => store.notes);
   const reminders = useReminderStore((store) => store.reminders);
   const trash = useTrashStore((store) => store.trash);
@@ -410,22 +594,27 @@ function ItemCount(props: { item: RouteEntry | Color; selected?: boolean }) {
 
   useEffect(() => {
     (async function () {
-      if ("type" in item) return db.colors.count(item.id);
-      switch (item.id) {
-        case "notes":
-          return notes?.length || 0;
-        case "favorites":
-          return db.notes.favorites.count();
-        case "reminders":
-          return reminders?.length || 0;
-        case "trash":
-          return trash?.length || 0;
-        case "monographs":
-          return monographs?.length || 0;
-        case "archive":
-          return db.notes.archived.count();
-        default:
-          return 0;
+      if ("type" in item) {
+        if (item.type === "color") return db.colors.count(item.id);
+        else if (item.type === "notebook" || item.type === "tag")
+          return db.relations.from(item, "note").count();
+      } else {
+        switch (item.id) {
+          case "notes":
+            return notes?.length || 0;
+          case "favorites":
+            return db.notes.favorites.count();
+          case "reminders":
+            return reminders?.length || 0;
+          case "trash":
+            return trash?.length || 0;
+          case "monographs":
+            return monographs?.length || 0;
+          case "archive":
+            return db.notes.archived.count();
+          default:
+            return 0;
+        }
       }
     })().then((c) => setCount(c || 0));
   }, [item, notes, trash, monographs, reminders]);
@@ -443,200 +632,342 @@ function ItemCount(props: { item: RouteEntry | Color; selected?: boolean }) {
   );
 }
 
-function HomeTab() {
-  const pathname = usePathname();
-  const colors = useAppStore((store) => store.colors);
-  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
+function Routes({ collapse }: SectionContext) {
+  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
+  const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const [order] = usePersistentState<string[]>(
+    "sidebarOrder:routes",
+    db.settings.getSideBarOrder("routes")
+  );
+  const visible = routes()
+    .filter(
+      customizableSidebar?.isAllowed
+        ? (r) => !hiddenRoutes.includes(r.id)
+        : () => true
+    )
+    .filter((r) => (r.loginRequired ? isLoggedIn : true));
+  const ordered = customizableSidebar?.isAllowed
+    ? orderItems(visible, order)
+    : visible;
+  return (
+    <>
+      {ordered.map((item) => (
+        <RouteItem key={item.id} item={item} collapse={collapse} />
+      ))}
+    </>
+  );
+}
+
+function RouteItem({
+  item,
+  collapse
+}: SectionContext & {
+  item: RouteEntry;
+}) {
+  const pathname = usePathname();
+  const trash = useTrashStore((store) => store.trash);
+  const selected =
+    item.path === "/" ? pathname === item.path : pathname.startsWith(item.path);
+
+  return (
+    <NavigationItem
+      title={item.title}
+      icon={item.icon}
+      selected={selected}
+      onPress={() => {
+        navigateToRoute(item.path);
+        collapse();
+      }}
+      menuItems={[
+        ...(item.id === "trash"
+          ? [
+              {
+                type: "button" as const,
+                key: "clear-trash",
+                title: strings.clearTrash(),
+                isDisabled: !trash || trash.length === 0,
+                iconComponent: Trash,
+                onClick: async () => {
+                  const ok = await ConfirmDialog.show({
+                    title: strings.clearTrash(),
+                    positiveButtonText: strings.clear(),
+                    negativeButtonText: strings.cancel(),
+                    subtitle: strings.clearTrashDesc(),
+                    positiveButtonVariant: "new_error"
+                  });
+                  if (!ok) return;
+
+                  try {
+                    await useTrashStore.getState().clear();
+                    showToast("success", strings.trashCleared());
+                  } catch (e) {
+                    if (e instanceof Error)
+                      showToast(
+                        "error",
+                        `${strings.couldNotClearTrash()} ${strings.error()}: ${
+                          e.message
+                        }`
+                      );
+                  }
+                }
+              }
+            ]
+          : []),
+        {
+          type: "lazy-loader",
+          key: "sidebar-homepage-loader",
+          items: async () => [
+            createSetDefaultHomepageMenuItem(
+              item.id,
+              "route",
+              await isFeatureAvailable("customHomepage")
+            )
+          ]
+        },
+        { type: "separator", key: "sep32" },
+        {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
+          items: getSidebarItemsAsMenuItems
+        }
+      ]}
+    >
+      <ItemCount item={item} selected={selected} />
+    </NavigationItem>
+  );
+}
+
+function Colors({ collapse }: SectionContext) {
+  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
+  const colors = useAppStore((store) => store.colors);
+  const hiddenColors = useAppStore((store) => store.hiddenColors);
+  const [showAllColors, setShowAllColors] = useState(false);
+  const [order] = usePersistentState<string[]>(
+    "sidebarOrder:colors",
+    db.settings.getSideBarOrder("colors")
+  );
+  const visibleColors = customizableSidebar?.isAllowed
+    ? colors.filter((c: Color) => !hiddenColors.includes(c.id))
+    : colors;
+  const ordered = customizableSidebar?.isAllowed
+    ? orderItems<Color>(visibleColors, order)
+    : visibleColors;
+  const hasMoreColors = ordered.length > 6;
+  const rendered = showAllColors ? ordered : ordered.slice(0, 6);
+
+  if (colors.length === 0) return null;
+  return (
+    <>
+      <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
+      {rendered.map((color: Color) => (
+        <ColorItem key={color.id} color={color} collapse={collapse} />
+      ))}
+      {hasMoreColors ? (
+        <Flex
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: "spacing2",
+            minHeight: 13,
+            mt: "spacing3"
+          }}
+        >
+          <Text variant="body" sx={{ fontSize: "xs" }}>
+            {showAllColors ? "" : `+${ordered.length - 6} more`}
+          </Text>
+          <Button
+            onPress={() => setShowAllColors((expanded) => !expanded)}
+            sx={{
+              color: "accent",
+              fontSize: "xs",
+              fontWeight: "medium",
+              lineHeight: 1,
+              p: 0
+            }}
+          >
+            <Text
+              sx={{ color: "accent", fontSize: "xs", fontWeight: "medium" }}
+            >
+              {showAllColors ? strings.viewLess() : strings.viewAll()}
+            </Text>
+          </Button>
+        </Flex>
+      ) : null}
+    </>
+  );
+}
+
+function ColorItem({ color, collapse }: SectionContext & { color: Color }) {
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "color" ? store.context : null
+  );
+  return (
+    <NavigationItem
+      title={color.title}
+      icon={Ellipse}
+      iconSize={10}
+      selected={currentContext?.id === color.id}
+      color={dataColor(color.colorCode)}
+      onPress={() => {
+        navigateToRoute(`/colors/${color.id}`);
+        collapse();
+      }}
+      menuItems={[
+        {
+          type: "button",
+          key: "rename-color",
+          title: strings.renameColor(),
+          onClick: () => RenameColorDialog.show(color),
+          iconComponent: PencilSimple
+        },
+        {
+          type: "button",
+          key: "remove-color",
+          title: strings.removeColor(),
+          onClick: async () => {
+            await db.colors.remove(color.id);
+            await useAppStore.getState().refreshNavItems();
+          },
+          iconComponent: Backspace
+        },
+        {
+          type: "button",
+          key: "copy-link",
+          title: strings.copyLink(),
+          onClick: () => {
+            const link = createInternalLink("color", color.id);
+            writeToClipboard({
+              "text/plain": link,
+              "text/html": `<a href="${link}">${color.title}</a>`,
+              "text/markdown": `[${color.title}](${link})`
+            });
+          },
+          iconComponent: LinkHorizontal
+        },
+        {
+          type: "lazy-loader",
+          key: "sidebar-homepage-loader",
+          items: async () => [
+            createSetDefaultHomepageMenuItem(
+              color.id,
+              color.type,
+              await isFeatureAvailable("customHomepage")
+            )
+          ]
+        },
+        { type: "separator", key: "sep32" },
+        {
+          type: "lazy-loader",
+          key: "sidebar-items-loader",
+          items: getSidebarItemsAsMenuItems
+        }
+      ]}
+    >
+      <ItemCount item={color} />
+    </NavigationItem>
+  );
+}
+
+function Shortcuts({ collapse }: SectionContext) {
+  const shortcuts = useAppStore((store) => store.shortcuts);
+  const [order] = usePersistentState<string[]>(
+    "sidebarOrder:shortcuts",
+    db.settings.getSideBarOrder("shortcuts")
+  );
+  if (shortcuts.length === 0) return null;
+  const ordered = orderItems<Notebook | Tag>(shortcuts, order);
+  return (
+    <>
+      <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
+      {ordered.map((item) => (
+        <ShortcutItem key={item.id} item={item} collapse={collapse} />
+      ))}
+    </>
+  );
+}
+
+function ShortcutItem({
+  item,
+  collapse
+}: SectionContext & { item: Notebook | Tag }) {
+  const currentContext = useNoteStore((store) =>
+    store.context?.type === "tag" || store.context?.type === "notebook"
+      ? store.context
+      : null
+  );
+
+  return (
+    <NavigationItem
+      title={item.title}
+      menuItems={[
+        {
+          type: "lazy-loader",
+          key: "sidebar-homepage-loader",
+          items: async () => [
+            createSetDefaultHomepageMenuItem(
+              item.id,
+              item.type,
+              await isFeatureAvailable("customHomepage")
+            )
+          ]
+        },
+        {
+          type: "button",
+          key: "removeshortcut",
+          title: strings.doActions.remove.shortcut(1),
+          iconComponent: LinkBreak,
+          onClick: async () => {
+            await db.shortcuts.remove(item.id);
+            useAppStore.getState().refreshNavItems();
+          }
+        }
+      ]}
+      icon={
+        item.type === "notebook"
+          ? NotebookIcon
+          : item.type === "tag"
+          ? TagIcon
+          : Topic
+      }
+      iconSize={14}
+      selected={currentContext?.id === item.id}
+      onPress={() => {
+        navigateToRoute(
+          item.type === "notebook"
+            ? `/notebooks/${item.id}`
+            : `/tags/${item.id}`
+        );
+        collapse();
+      }}
+    >
+      <ItemCount item={item} />
+    </NavigationItem>
+  );
+}
+
+function HomeTab() {
+  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
 
   useEffect(() => {
     refreshNavItems();
   }, [refreshNavItems]);
 
   return (
-    <Flex
-      testID="home-tab"
-      sx={{ flexDirection: "column", gap: "spacing1", px: "spacing4" }}
-    >
-      {routes()
-        .filter((entry) => (entry.loginRequired ? isLoggedIn : true))
-        .map((entry) => {
-          const selected = pathname.startsWith(entry.path);
-          return (
-            <NavigationItem
-              key={entry.id}
-              title={entry.title}
-              icon={entry.icon}
-              selected={selected}
-              onPress={() => navigate(entry.path, { notify: true })}
-            >
-              <ItemCount item={entry} selected={selected} />
-            </NavigationItem>
-          );
-        })}
-      {colors.length > 0 ? (
-        <Box
-          sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }}
-        />
-      ) : null}
-      {colors.map((color: Color) => (
-        <NavigationItem
-          key={color.id}
-          title={color.title}
-          icon={Ellipse}
-          iconSize={10}
-          color={dataColor(color.colorCode)}
-          selected={pathname === `/colors/${color.id}`}
-          onPress={() => navigate(`/colors/${color.id}`, { notify: true })}
-        >
-          <ItemCount item={color} />
-        </NavigationItem>
-      ))}
-    </Flex>
+    <ScrollContainer>
+      <Flex
+        testID="home-tab"
+        sx={{ flexDirection: "column", gap: "spacing1", px: "spacing4" }}
+      >
+        <Routes collapse={noop} />
+        <Colors collapse={noop} />
+        <Shortcuts collapse={noop} />
+      </Flex>
+    </ScrollContainer>
   );
 }
 
-function useNoteCount(item: Notebook | Tag | undefined) {
-  const [count, setCount] = useState(0);
-  const notes = useNoteStore((store) => store.notes);
-  useEffect(() => {
-    if (!item) return;
-    db.relations
-      .from(item, "note")
-      .count()
-      .then((value) => setCount(value || 0));
-  }, [item, notes]);
-  return count;
-}
-
-function NavigationListRow<T extends Notebook | Tag>(props: {
-  index: number;
-  items: VirtualizedGrouping<T>;
-  kind: "notebook" | "tag";
-}) {
-  const pathname = usePathname();
-  const resolved = useResolvedItem({ index: props.index, items: props.items });
-  const item = resolved?.item as T | undefined;
-  const totalNotes = useNoteCount(item);
-  if (!item) return <Box sx={{ height: 33 }} />;
-  const path = `/${props.kind}s/${item.id}`;
-  const isOpened = pathname === path;
-  const RowIcon = props.kind === "notebook" ? NotebookIcon : TagIcon;
-  return (
-    <ListItem
-      item={item}
-      isCompact
-      isFocused={isOpened}
-      onPress={() => navigate(path, { notify: true })}
-      sx={{
-        borderRadius: "radius1",
-        pr: "spacing2",
-        pl: "spacing2",
-        py: "spacing4",
-        mb: props.kind === "notebook" ? "spacing1" : undefined
-      }}
-      title={
-        <Flex
-          sx={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "spacing3",
-            minWidth: 0
-          }}
-        >
-          {props.kind === "notebook" ? (
-            <Box sx={{ width: 11, height: 11 }} />
-          ) : null}
-          <RowIcon size={13} color={isOpened ? "icon-selected" : "icon"} />
-          <Text
-            testID="title"
-            variant="body"
-            numberOfLines={1}
-            sx={{
-              color: isOpened ? "paragraph-selected" : "paragraph",
-              fontWeight: "normal",
-              fontSize: "xs",
-              minWidth: 0
-            }}
-          >
-            {item.title}
-          </Text>
-        </Flex>
-      }
-      footer={
-        <Text
-          variant="subBody"
-          sx={{
-            fontSize: "3xs",
-            lineHeight: 1,
-            color: isOpened ? "paragraph" : "paragraph-secondary"
-          }}
-        >
-          {totalNotes}
-        </Text>
-      }
-    />
-  );
-}
-
-function NavigationList<T extends Notebook | Tag>(props: {
-  kind: "notebook" | "tag";
-  items: VirtualizedGrouping<T> | undefined;
-  empty: string;
-  filter: string;
-}) {
-  const { items, kind } = props;
-  const itemKey = useCallback(
-    (index: number) => items?.key(index) ?? `${index}`,
-    [items]
-  );
-  const renderItem = useCallback(
-    (index: number) =>
-      items ? (
-        <NavigationListRow index={index} items={items} kind={kind} />
-      ) : null,
-    [items, kind]
-  );
-  return (
-    <>
-      <Box sx={{ flex: 1, mt: "spacing4" }}>
-        {!items || items.length === 0 ? (
-          <Flex sx={{ p: "spacing6" }}>
-            <Text
-              testID={`${kind}s-empty`}
-              sx={{ color: "paragraph-secondary" }}
-            >
-              {props.empty}
-            </Text>
-          </Flex>
-        ) : (
-          <Flex testID={`${kind}s-list`} sx={{ flex: 1, px: "spacing4" }}>
-            <VirtualList
-              count={items.length}
-              itemKey={itemKey}
-              estimatedItemSize={33}
-              renderItem={renderItem}
-            />
-          </Flex>
-        )}
-      </Box>
-      <FilterField placeholder={props.filter} />
-    </>
-  );
-}
-
-function TagsTab() {
-  const tags = useTagStore((store) => store.tags);
-  const refresh = useTagStore((store) => store.refresh);
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-  return (
-    <NavigationList
-      kind="tag"
-      items={tags}
-      empty={strings.noTagsYet()}
-      filter={strings.filterTags()}
-    />
-  );
+function noop() {
+  return undefined;
 }
