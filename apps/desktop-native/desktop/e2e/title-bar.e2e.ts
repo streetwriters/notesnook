@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
-import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 
 let app: DesktopApp;
 
@@ -28,15 +29,18 @@ afterAll(async () => {
 
 const desktop = path.resolve(__dirname, "..");
 
-test("the window is configured with a hidden system title bar and Electron's traffic light position", () => {
+test("the window is configured with a hidden system title bar and Electron's traffic light position, and the build embeds them", () => {
   const config = JSON.parse(
     readFileSync(path.join(desktop, "desktop.json"), "utf8")
   );
   expect(config.window.titleBar).toBe("hidden");
   expect(config.window.trafficLightPosition).toEqual({ x: 10, y: 14 });
-  const main = readFileSync(path.join(desktop, "src/main.rs"), "utf8");
-  expect(main).toContain("WindowTitleBar::Hidden");
-  expect(main).toContain(".traffic_light_position(10.0, 14.0)");
+  const autolink = readFileSync(
+    path.join(desktop, "autolink/src/lib.rs"),
+    "utf8"
+  );
+  expect(autolink).toContain('"titleBar":"hidden"');
+  expect(autolink).toContain('"trafficLightPosition":{"x":10,"y":14}');
 });
 
 test("the app fills the whole window, so no system title bar takes space above it", async () => {
