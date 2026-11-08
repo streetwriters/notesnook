@@ -12,7 +12,8 @@
     "test:e2e": "RN_GPUI_TEST_BUNDLE=$PWD/desktop/build/index.bundle RN_GPUI_TEST_BINARY=$PWD/desktop/build/target/debug/react-native-gpui--notesnook-desktop-native vitest run --config desktop/vitest.e2e.config.ts",
     "build:test": "react-native-gpui run-desktop --features test-driver --no-launch --port 8171",
     "bundle": "react-native bundle --platform desktop --entry-file index.js --bundle-output desktop/build/index.bundle --assets-dest desktop/build/assets --dev true",
-    "parity": "node tools/parity/run.mjs"
+    "parity": "node tools/parity/run.mjs",
+    "tsc:web": "tsc --noEmit -p src/targets/web/tsconfig.json"
   },
   "dependencies": {
     "@ammarahmed/react-native-sodium": "file:../../../../../Projects/react-native/gpui-modules/tgz/ammarahmed-react-native-sodium-2.0.0-alpha.2.tgz",
@@ -59,6 +60,7 @@
     "css-to-react-native": "3.2.0",
     "dayjs": "^1.11.13",
     "fflate": "^0.8.3",
+    "hotkeys-js": "^3.13.7",
     "mutative": "^1.3.0",
     "openpgp": "6.3.2",
     "qrcode-generator": "^1.4.4",

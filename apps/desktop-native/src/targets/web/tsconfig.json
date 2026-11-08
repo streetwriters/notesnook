@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "baseUrl": "../../..",
+    "paths": {
+      "@ui": ["./src/ui/index.ts"],
+      "@ui/*": ["./src/ui/*"],
+      "@platform": ["./src/platform/index.ts"],
+      "@platform/*": ["./src/platform/*"]
+    }
+  },
+  "include": ["./**/*", "../../ui", "../../platform"],
+  "exclude": []
+}
