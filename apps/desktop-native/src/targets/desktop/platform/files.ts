@@ -34,7 +34,7 @@ function nameOf(path: string) {
   return path.split(/[\\/]/).pop() ?? path;
 }
 
-function toPickedFile(path: string, size: number): PickedFile {
+export function toPickedFile(path: string, size: number): PickedFile {
   const name = nameOf(path);
   const extension = name.includes(".") ? name.split(".").pop()! : "";
   return {

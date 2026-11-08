@@ -36,6 +36,7 @@ import type {
   PressEvent,
   SxProp
 } from "../../../../ui";
+import { toPickedFile } from "../../platform/files";
 import { useThemeContext } from "../theme";
 import { breakpointOf, resolveSx, type ResolvedStyle } from "./resolve";
 
@@ -257,6 +258,7 @@ export function useStyled(
       dragOverStyle: resolved.dragOverStyle,
       draggable: props.draggable || undefined,
       droppable: props.droppable || undefined,
+      acceptsFiles: props.onDropFiles ? true : undefined,
       onDragStart: props.onDragStart
         ? () => DragDrop.setPayload(props.onDragStart?.())
         : props.draggable
@@ -274,9 +276,28 @@ export function useStyled(
       onDragLeave: props.onDragLeave
         ? (e: unknown) => props.onDragLeave?.(drag(e))
         : undefined,
-      onDrop: props.onDrop
-        ? (e: unknown) => props.onDrop?.(drag(e))
-        : undefined,
+      onDrop:
+        props.onDrop || props.onDropFiles
+          ? (e: any) => {
+              const files: { path: string; size: number }[] =
+                e?.nativeEvent?.files ?? [];
+              if (files.length > 0 && props.onDropFiles) {
+                const accepted = props.acceptsFiles?.map((extension) =>
+                  extension.replace(/^\./, "").toLowerCase()
+                );
+                const picked = files
+                  .filter(
+                    (file) =>
+                      !accepted ||
+                      accepted.includes(
+                        file.path.split(".").pop()?.toLowerCase() ?? ""
+                      )
+                  )
+                  .map((file) => toPickedFile(file.path, file.size));
+                if (picked.length > 0) props.onDropFiles(picked);
+              } else props.onDrop?.(drag(e));
+            }
+          : undefined,
       groupHoverStyle: resolved.groupHoverStyle,
       groupActiveStyle: resolved.groupActiveStyle,
       onContextMenu: props.onContextMenu
