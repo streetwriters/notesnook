@@ -24,6 +24,29 @@ async function launch(initialProps: Record<string, unknown>) {
   return app;
 }
 
+async function layoutKey(app: DesktopApp) {
+  const frames = await Promise.all(
+    ["pane-nav-pane", "global-split-pane-sash-0", "pane-list-pane"].map(
+      async (id) => (await app.query("testID", id, true))[0]?.frame
+    )
+  );
+  return JSON.stringify(frames);
+}
+
+async function settled(app: DesktopApp) {
+  let previous = "";
+  await vi.waitFor(
+    async () => {
+      await app.waitForIdle();
+      const current = await layoutKey(app);
+      const stable = current === previous && !current.includes("null");
+      previous = current;
+      expect(stable).toBe(true);
+    },
+    { timeout: 20000, interval: 200 }
+  );
+}
+
 async function width(app: DesktopApp, testID: string) {
   const [node] = await app.query("testID", testID, true);
   return node.frame.width as number;
@@ -35,6 +58,7 @@ test("a resized split pane keeps its size across a restart", async () => {
     seed: [{ title: "Persisted note" }]
   });
   try {
+    await settled(first);
     expect(await width(first, "pane-nav-pane")).toBeCloseTo(250, 0);
     const [sash] = await first.query(
       "testID",

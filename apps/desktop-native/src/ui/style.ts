@@ -22,6 +22,17 @@ import type { Theme, ThemeColor } from "@notesnook/theme";
 type ThemeSpace = Theme["space"];
 
 export type ColorToken = ThemeColor | "transparent";
+
+declare const dataColorBrand: unique symbol;
+export type DataColor = string & { readonly [dataColorBrand]: true };
+export type ColorValue = ColorToken | DataColor;
+
+/**
+ * Colours that come from user data (a note's colour, a colour tag) are not
+ * theme tokens. `dataColor` is the only way to make one: it accepts a hex
+ * colour (#rgb, #rgba, #rrggbb or #rrggbbaa) and throws for anything else.
+ */
+export declare function dataColor(hex: string): DataColor;
 export type SpaceToken =
   | Exclude<keyof ThemeSpace, keyof Array<unknown> | "small" | "auto">
   | "small"
@@ -53,9 +64,9 @@ export type Transform = {
 }[];
 
 export type ColorProps = {
-  color?: ColorToken;
-  bg?: ColorToken | (ColorToken | null)[];
-  backgroundColor?: ColorToken | (ColorToken | null)[];
+  color?: ColorValue;
+  bg?: ColorValue | (ColorValue | null)[];
+  backgroundColor?: ColorValue | (ColorValue | null)[];
 };
 
 type SpaceKeys =
@@ -96,7 +107,7 @@ export type SpaceProps = {
 };
 
 export type StateStyle = ColorProps & {
-  borderColor?: ColorToken;
+  borderColor?: ColorValue;
   opacity?: number;
   boxShadow?: ShadowToken;
   transform?: Transform;
@@ -164,13 +175,13 @@ type AppearanceProps = {
   borderRight?: Border;
   borderBottom?: Border;
   borderLeft?: Border;
-  borderColor?: ColorToken;
-  borderTopColor?: ColorToken;
-  borderRightColor?: ColorToken;
-  borderBottomColor?: ColorToken;
-  borderLeftColor?: ColorToken;
+  borderColor?: ColorValue;
+  borderTopColor?: ColorValue;
+  borderRightColor?: ColorValue;
+  borderBottomColor?: ColorValue;
+  borderLeftColor?: ColorValue;
   borderWidth?: number;
-  outlineColor?: ColorToken;
+  outlineColor?: ColorValue;
   outlineWidth?: number;
   outlineOffset?: number;
   outlineStyle?: "solid" | "dashed" | "dotted";

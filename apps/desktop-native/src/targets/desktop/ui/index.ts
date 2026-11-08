@@ -23,3 +23,4 @@ export { VirtualList } from "./lists";
 export * from "./overlays";
 export * from "./primitives";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
+export { dataColor } from "./style/data-color";

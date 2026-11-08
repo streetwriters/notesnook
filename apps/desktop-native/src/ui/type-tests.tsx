@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { SxProp } from "./style";
+import { dataColor } from "./style";
 import { Pane, SplitPane } from "./layout";
 import { VirtualList } from "./lists";
 import { Box, Button, Flex, Grid, Input, Text, ThemeScope } from "./primitives";
@@ -75,6 +76,16 @@ export const unsupportedUnit: SxProp = {
 export const unsupportedDisplay: SxProp = {
   // @ts-expect-error only flex and none are display values
   display: "block"
+};
+
+export const dataColors: SxProp = {
+  bg: dataColor("#ff0000"),
+  borderLeftColor: dataColor("#00ff00")
+};
+
+export const rawColorString: SxProp = {
+  // @ts-expect-error a raw string is not a colour value, use dataColor
+  bg: "#ff0000"
 };
 
 export const outline: SxProp = {

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { memo } from "react";
 import { formatDate, type NoteResolvedData } from "@notesnook/common";
 import type { Note as NoteType } from "@notesnook/core";
-import { Flex, Text, type SxProp } from "@ui";
+import { dataColor, Flex, Text, type SxProp } from "@ui";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { Calendar, Circle, Lock } from "../icons";
@@ -38,6 +38,7 @@ type NoteProps = NoteResolvedData & {
 function Note(props: NoteProps) {
   const { tags, color, notebooks, locked, item, date, compact, sx } = props;
   const note = item;
+  const primary = color ? dataColor(color.colorCode) : undefined;
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const hasMetadata =
@@ -50,7 +51,7 @@ function Note(props: NoteProps) {
       item={note}
       title={
         <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
-          {color ? <Circle size={10} color="accent" /> : null}
+          {primary ? <Circle size={10} color={primary} /> : null}
           <Text
             testID="title"
             numberOfLines={1}
@@ -74,7 +75,9 @@ function Note(props: NoteProps) {
         borderBottom: "1px solid",
         borderBottomColor: "border",
         borderLeft: "2px solid",
-        borderLeftColor: isOpened ? "accent-selected" : "transparent",
+        borderLeftColor: isOpened
+          ? primary ?? "accent-selected"
+          : "transparent",
         ...sx
       }}
       header={

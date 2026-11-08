@@ -35,7 +35,7 @@ import type {
 import type {
   ColorProps,
   IconSizeToken,
-  ColorToken,
+  ColorValue,
   SpaceProps,
   SxProp,
   ThemeScopeName
@@ -165,7 +165,7 @@ export interface IconProps extends BaseProps {
   path?: string;
   svg?: string;
   size?: IconSizeToken;
-  color?: ColorToken;
+  color?: ColorValue;
   rotate?: number;
 }
 
