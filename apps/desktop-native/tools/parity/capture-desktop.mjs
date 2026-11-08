@@ -58,13 +58,16 @@ try {
   }
   await app.mouseMove({ x: 2, y: 2 });
   await app.waitForIdle();
-  const locate = (spec) =>
-    typeof spec === "string"
-      ? app.getByTestId(spec).first()
-      : app.getByTestId(spec.id).nth(spec.nth ?? 0);
+  const locate = async (spec) => {
+    if (typeof spec === "string")
+      return (await app.query("testID", spec, true))[0];
+    const matches = await app.query("testID", spec.id, true);
+    matches.sort((a, b) => a.frame.y - b.frame.y || a.frame.x - b.frame.x);
+    return matches[spec.nth ?? 0];
+  };
   for (const step of scenario.steps ?? []) {
-    if (step.click) await locate(step.click).click();
-    if (step.hover) await locate(step.hover).hover();
+    if (step.click) await app.click((await locate(step.click)).tag);
+    if (step.hover) await app.hover((await locate(step.hover)).tag);
     await app.waitForIdle();
   }
   if (!scenario.keepPointer) await app.mouseMove({ x: 2, y: 2 });

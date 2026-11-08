@@ -81,11 +81,6 @@ export default function ListContainer(props: ListContainerProps) {
     };
   }, []);
 
-  const idAt = useCallback(
-    (index: number) => items.cacheItem(index)?.item?.id,
-    [items]
-  );
-
   const selectRange = useCallback(
     async (from: number, to: number) => {
       const ids = await items.ids();
@@ -138,9 +133,11 @@ export default function ListContainer(props: ListContainerProps) {
           selectRange(anchor.current, index);
         } else {
           anchor.current = index;
-          const id = idAt(index);
           selectionStore.toggleSelectionMode(true);
-          if (id) selectionStore.setSelectedItems([id]);
+          items.ids().then((ids) => {
+            const id = ids[index];
+            if (id) selectionStore.setSelectedItems([id]);
+          });
         }
         event.preventDefault();
       };
@@ -166,7 +163,7 @@ export default function ListContainer(props: ListContainerProps) {
           return;
       }
     },
-    [idAt, items, selectRange]
+    [items, selectRange]
   );
 
   const renderItem = useCallback(

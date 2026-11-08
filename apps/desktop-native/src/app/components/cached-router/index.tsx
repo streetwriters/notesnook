@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo, useEffect, useRef, type ComponentType } from "react";
+import { Activity, memo, useEffect, useRef, type ComponentType } from "react";
 import { Flex } from "@ui";
 import useRoutes from "../../hooks/use-routes";
 import { getHomeRoute, navigate, NavigationEvents } from "../../navigation";
@@ -41,8 +41,6 @@ function CachedRouter() {
       }
     }
   });
-  // TEMPORARY: react-freeze wedges the runtime with 2+ frozen routes (RNGPUI_GAPS.md).
-  // Go back to <Freeze> as web does once the runtime is fixed.
   const cached = useRef<
     Record<string, { Component: ComponentType<any>; props: any }>
   >({});
@@ -72,18 +70,17 @@ function CachedRouter() {
       type={routeResult.type}
     >
       {Object.entries(cached.current).map(([key, { Component, props }]) => (
-        <Flex
+        <Activity
           key={key}
-          testID={`route-${key}`}
-          sx={{
-            display: key === routeResult.key ? "flex" : "none",
-            flexDirection: "column",
-            flex: 1,
-            overflow: "hidden"
-          }}
+          mode={key === routeResult.key ? "visible" : "hidden"}
         >
-          <Component key={key} {...props} />
-        </Flex>
+          <Flex
+            testID={`route-${key}`}
+            sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
+          >
+            <Component key={key} {...props} />
+          </Flex>
+        </Activity>
       ))}
     </RouteContainer>
   );

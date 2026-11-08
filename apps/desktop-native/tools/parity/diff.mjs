@@ -54,6 +54,8 @@ function analyse(maskIds, maskRects, heatmapFile) {
       if (!map.has(element.id)) map.set(element.id, []);
       map.get(element.id).push(element);
     }
+    for (const list of map.values())
+      list.sort((a, b) => a.y - b.y || a.x - b.x);
     return map;
   };
   const webById = group(web.elements);
