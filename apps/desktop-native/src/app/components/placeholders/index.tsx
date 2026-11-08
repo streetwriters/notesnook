@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Flex, Icon, Text } from "@ui";
+import { Button, Flex, Icon, Text } from "@ui";
+import { Plus } from "../icons";
+import { CREATE_BUTTON_MAP } from "../../common";
 import { illustrations } from "./illustrations.generated";
 
 type Variant =
@@ -133,6 +135,100 @@ export function ListPanePlaceholder({ variant }: { variant: Variant }) {
           {description}
         </Text>
       </Flex>
+    </Flex>
+  );
+}
+
+const getSidebarPlaceholderVariants = () => ({
+  notebooks: {
+    title: strings.noNotebooksYet(),
+    text: strings.notebooksEmptyBody(),
+    button: {
+      ...CREATE_BUTTON_MAP.notebooks,
+      icon: Plus,
+      title: strings.createNotebook()
+    }
+  },
+  tags: {
+    title: strings.noTagsYet(),
+    text: strings.tagsEmptyBody(),
+    button: {
+      ...CREATE_BUTTON_MAP.tags,
+      icon: Plus,
+      title: strings.addTag()
+    }
+  }
+});
+
+export function SidebarPlaceholder({
+  variant
+}: {
+  variant: keyof ReturnType<typeof getSidebarPlaceholderVariants>;
+}) {
+  const { title, text, button } = getSidebarPlaceholderVariants()[variant];
+
+  return (
+    <Flex
+      testID={`${variant}-placeholder`}
+      sx={{
+        flexDirection: "column",
+        gap: "spacing6",
+        px: "spacing4",
+        width: "100%",
+        alignItems: "center"
+      }}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing3",
+          width: "100%"
+        }}
+      >
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "md",
+            fontWeight: "heading",
+            color: "heading",
+            lineHeight: 1,
+            textAlign: "center"
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          variant="body"
+          sx={{
+            width: 208,
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1.2,
+            textAlign: "center"
+          }}
+        >
+          {text}
+        </Text>
+      </Flex>
+      <Button
+        onPress={button.onClick}
+        sx={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "spacing3",
+          color: "accent",
+          fontSize: "sm",
+          fontWeight: 600,
+          lineHeight: 1
+        }}
+      >
+        <button.icon size={15} color="accent" />
+        <Text sx={{ color: "accent", fontSize: "sm", fontWeight: 600 }}>
+          {button.title}
+        </Text>
+      </Button>
     </Flex>
   );
 }

@@ -17,12 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { MenuItem } from "@ui";
+import { useEffect, useState } from "react";
+import type { MenuItem, SxProp } from "@ui";
 import { Box, Button, Flex, Text, ThemeScope } from "@ui";
-import { Check } from "../icons";
+import { CaretRight, Check, Pro } from "../icons";
 import { useMenuStore } from "./store";
 
 export { useMenuStore } from "./store";
+
+type MenuButtonItem = Extract<MenuItem, { type: "button" }>;
 
 function Separator() {
   return (
@@ -39,18 +42,28 @@ function Separator() {
 }
 
 function MenuButton(props: {
-  item: Extract<MenuItem, { type: "button" }>;
+  item: MenuButtonItem;
   onClose: () => void;
+  isSubmenuOpen?: boolean;
+  onHover?: () => void;
+  onOpenSubmenu?: () => void;
 }) {
   const { item } = props;
   const dangerous = item.variant === "dangerous";
   const IconComponent = item.iconComponent;
+  const hasSubmenu = !!item.menu;
   return (
     <Button
       testID={`menu-button-${item.key}`}
       variant="menuitem"
+      title={item.tooltip}
       disabled={item.isDisabled}
+      onHoverIn={props.onHover}
       onPress={() => {
+        if (hasSubmenu) {
+          props.onOpenSubmenu?.();
+          return;
+        }
         item.onClick?.();
         props.onClose();
       }}
@@ -60,7 +73,8 @@ function MenuButton(props: {
         justifyContent: "space-between",
         px: "spacing4",
         py: "spacing3",
-        minHeight: 29
+        minHeight: 29,
+        bg: props.isSubmenuOpen ? "hover" : undefined
       }}
     >
       <Flex
@@ -92,18 +106,140 @@ function MenuButton(props: {
           {item.title}
         </Text>
       </Flex>
-      {item.isChecked ? (
-        <Flex
-          testID="toggle-state-on"
-          sx={{ ml: 4, flexShrink: 0, flexDirection: "row", gap: 1 }}
-        >
-          <Check
-            size={13}
-            color={dangerous ? "icon-error" : "icon-secondary"}
-          />
-        </Flex>
-      ) : null}
+      <Flex
+        sx={{
+          ml: 4,
+          flexShrink: 0,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "spacing2"
+        }}
+      >
+        {item.modifier ? (
+          <Text sx={{ color: "paragraph-secondary", fontSize: "xxs", ml: 4 }}>
+            {item.modifier}
+          </Text>
+        ) : null}
+        {item.premium ? <Pro size={13} color="accent" /> : null}
+        {item.isChecked ? (
+          <Flex testID="toggle-state-on">
+            <Check
+              size={13}
+              color={dangerous ? "icon-error" : "icon-secondary"}
+            />
+          </Flex>
+        ) : null}
+        {hasSubmenu ? <CaretRight size={13} color="icon-secondary" /> : null}
+      </Flex>
     </Button>
+  );
+}
+
+function LazyItems(props: {
+  loader: () => Promise<MenuItem[]>;
+  onClose: () => void;
+}) {
+  const [items, setItems] = useState<MenuItem[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    props.loader().then((loaded) => {
+      if (!cancelled) setItems(loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return <MenuItems items={items} onClose={props.onClose} />;
+}
+
+function MenuPanel(props: {
+  items: MenuItem[];
+  title?: string;
+  onClose: () => void;
+  sx?: SxProp;
+}) {
+  const { title, items, onClose } = props;
+  return (
+    <Flex
+      testID="menu-container"
+      onPress={(event) => event.stopPropagation()}
+      sx={{
+        bg: "background",
+        flexDirection: "column",
+        borderRadius: "radius2",
+        boxShadow: "menu",
+        border: "1px solid",
+        borderColor: "border-secondary",
+        minWidth: 220,
+        py: "spacing4",
+        ...props.sx
+      }}
+    >
+      {title ? (
+        <>
+          <Text
+            testID="menu-title"
+            sx={{
+              color: "accent",
+              fontSize: "xxs",
+              py: "spacing1",
+              px: "spacing4"
+            }}
+          >
+            {title}
+          </Text>
+          <Separator />
+        </>
+      ) : null}
+      <MenuItems items={items} onClose={onClose} />
+    </Flex>
+  );
+}
+
+function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
+  const { items, onClose } = props;
+  const [openKey, setOpenKey] = useState<string>();
+  return (
+    <>
+      {items.map((item) => {
+        if (item.isHidden) return null;
+        if (item.type === "separator") return <Separator key={item.key} />;
+        if (item.type === "lazy-loader")
+          return (
+            <LazyItems key={item.key} loader={item.items} onClose={onClose} />
+          );
+        if (item.type === "popup") {
+          const Popup = item.component;
+          return <Popup key={item.key} onClick={onClose} />;
+        }
+        const isOpen = openKey === item.key && !!item.menu;
+        return (
+          <Box key={item.key} sx={{ position: "relative" }}>
+            <MenuButton
+              item={item}
+              onClose={onClose}
+              isSubmenuOpen={isOpen}
+              onHover={() => setOpenKey(item.menu ? item.key : undefined)}
+              onOpenSubmenu={() => setOpenKey(item.key)}
+            />
+            {isOpen && item.menu ? (
+              <MenuPanel
+                items={item.menu.items}
+                title={item.menu.title}
+                onClose={onClose}
+                sx={{
+                  position: "absolute",
+                  left: "100%",
+                  top: 0,
+                  zIndex: 1001
+                }}
+              />
+            ) : null}
+          </Box>
+        );
+      })}
+    </>
   );
 }
 
@@ -119,6 +255,10 @@ export function MenuHost() {
       <Box
         testID="menu-backdrop"
         onPress={close}
+        onContextMenu={(event) => {
+          event.preventDefault();
+          close();
+        }}
         sx={{
           position: "absolute",
           top: 0,
@@ -128,51 +268,16 @@ export function MenuHost() {
           zIndex: 1000
         }}
       >
-        <Flex
-          testID="menu-container"
-          onPress={(event) => event.stopPropagation()}
+        <MenuPanel
+          items={items}
+          title={title}
+          onClose={close}
           sx={{
             position: "absolute",
             top: anchor.y + anchor.height + 5,
-            left: anchor.x,
-            bg: "background",
-            flexDirection: "column",
-            borderRadius: "radius2",
-            boxShadow: "menu",
-            border: "1px solid",
-            borderColor: "border-secondary",
-            minWidth: 220,
-            py: "spacing4"
+            left: anchor.x
           }}
-        >
-          {title ? (
-            <>
-              <Text
-                testID="menu-title"
-                sx={{
-                  color: "accent",
-                  fontSize: "xxs",
-                  py: "spacing1",
-                  px: "spacing4"
-                }}
-              >
-                {title}
-              </Text>
-              <Separator />
-            </>
-          ) : null}
-          {items.map((item) => {
-            if (item.isHidden) return null;
-            if (item.type === "separator") return <Separator key={item.key} />;
-            if (item.type === "button")
-              return <MenuButton key={item.key} item={item} onClose={close} />;
-            if (item.type === "popup") {
-              const Popup = item.component;
-              return <Popup key={item.key} onClick={close} />;
-            }
-            return null;
-          })}
-        </Flex>
+        />
       </Box>
     </ThemeScope>
   );

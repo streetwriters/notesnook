@@ -18,8 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { ReactNode } from "react";
-import { Flex, Text, type ColorValue } from "@ui";
+import {
+  Flex,
+  Text,
+  type ColorValue,
+  type ContextMenuEvent,
+  type MenuItem
+} from "@ui";
 import type { Icon } from "../icons";
+import { Menu } from "../../hooks/use-menu";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 
 export function NavigationItem(props: {
   title: string;
@@ -28,13 +36,29 @@ export function NavigationItem(props: {
   color?: ColorValue;
   selected?: boolean;
   onPress?: () => void;
+  menuItems?: MenuItem[];
   children?: ReactNode;
 }) {
-  const { icon: RowIcon, iconSize = 13, selected } = props;
+  const { icon: RowIcon, iconSize = 13, selected, menuItems } = props;
   return (
     <Flex
       testID="navigation-item"
-      onPress={props.onPress}
+      title={props.title}
+      onPress={() => {
+        AppEventManager.publish(AppEvents.toggleSideMenu, false);
+        props.onPress?.();
+      }}
+      onContextMenu={
+        menuItems
+          ? (event: ContextMenuEvent) => {
+              event.preventDefault();
+              event.stopPropagation();
+              Menu.openMenu(menuItems, {
+                position: { x: event.pageX, y: event.pageY }
+              });
+            }
+          : undefined
+      }
       sx={{
         borderRadius: "radius1",
         px: "spacing2",

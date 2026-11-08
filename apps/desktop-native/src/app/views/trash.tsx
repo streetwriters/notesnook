@@ -17,14 +17,65 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@ui";
+import { strings } from "@notesnook/intl";
+import { db } from "../common/db";
+import ListContainer from "../components/list-container";
+import { ListLoader } from "../components/loaders/list-loader";
+import { ListPanePlaceholder } from "../components/placeholders";
+import { ClearTrash } from "../components/icons";
+import { ConfirmDialog } from "../dialogs/confirm";
+import useNavigate from "../hooks/use-navigate";
+import { useSearch } from "../hooks/use-search";
+import { useStore, store } from "../stores/trash-store";
+import { showToast } from "../utils/toast";
 
-export default function Trash() {
+function Trash() {
+  useNavigate("trash", store.refresh);
+  const items = useStore((store) => store.trash);
+  const refresh = useStore((store) => store.refresh);
+  const clearTrash = useStore((store) => store.clear);
+  const filteredItems = useSearch("trash", (query, sortOptions) =>
+    db.lookup.trash(query).sorted(sortOptions)
+  );
+
+  if (!items) return <ListLoader />;
   return (
-    <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text testID="trash-view" sx={{ color: "paragraph-secondary" }}>
-        Trash is not implemented on desktop yet
-      </Text>
-    </Flex>
+    <ListContainer
+      type="trash"
+      group="trash"
+      refresh={refresh}
+      isSearching={!!filteredItems}
+      placeholder={
+        <ListPanePlaceholder variant={filteredItems ? "search" : "trash"} />
+      }
+      items={filteredItems || items}
+      button={{
+        Icon: ClearTrash,
+        onClick: function () {
+          ConfirmDialog.show({
+            title: strings.clearTrash(),
+            positiveButtonText: strings.clear(),
+            negativeButtonText: strings.cancel(),
+            subtitle: strings.clearTrashDesc()
+          }).then(async (res) => {
+            if (res) {
+              try {
+                await clearTrash();
+                showToast("success", strings.trashCleared());
+              } catch (e) {
+                if (e instanceof Error)
+                  showToast(
+                    "error",
+                    `${strings.couldNotClearTrash()} ${strings.error()}: ${
+                      e.message
+                    }`
+                  );
+              }
+            }
+          });
+        }
+      }}
+    />
   );
 }
+export default Trash;

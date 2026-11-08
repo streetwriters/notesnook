@@ -17,15 +17,107 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { memo } from "react";
-import { formatDate, type NoteResolvedData } from "@notesnook/common";
-import type { Note as NoteType } from "@notesnook/core";
-import { dataColor, Flex, Text, type SxProp } from "@ui";
+import { memo, type ReactNode } from "react";
+import {
+  areFeaturesAvailable,
+  exportContent,
+  formatDate,
+  getFormattedReminderTime,
+  type NoteResolvedData
+} from "@notesnook/common";
+import {
+  hosts,
+  isReminderActive,
+  isReminderToday,
+  type Color,
+  type Note as NoteType,
+  type Notebook as NotebookItem,
+  type Tag as TagType
+} from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { shell } from "@platform";
+import {
+  dataColor,
+  Flex,
+  Text,
+  type ColorValue,
+  type MenuItem,
+  type SxProp
+} from "@ui";
+import { db } from "../../common/db";
+import { exportNote, exportNotes } from "../../common/export";
+import { Multiselect } from "../../common/multi-select";
+import Vault from "../../common/vault";
+import { copyNoteLink, withFeatureCheck } from "../../common";
+import { AddReminderDialog } from "../../dialogs/add-reminder-dialog";
+import { AddTagsDialog } from "../../dialogs/add-tags-dialog";
+import {
+  ConfirmDialog,
+  showUnpublishConfirmation
+} from "../../dialogs/confirm";
+import { CreateColorDialog } from "../../dialogs/create-color-dialog";
+import { MoveNoteDialog } from "../../dialogs/move-note-dialog";
+import { NoteExpiryDateDialog } from "../../dialogs/note-expiry-date-dialog";
+import { navigate } from "../../navigation";
 import { useEditorStore } from "../../stores/editor-store";
+import { useStore as useMonographStore } from "../../stores/monograph-store";
+import { store } from "../../stores/note-store";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { store as selectionStore } from "../../stores/selection-store";
+import { store as tagStore } from "../../stores/tag-store";
+import { store as userstore } from "../../stores/user-store";
+import { store as appStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
-import { Circle, Lock, NoteCalendar, NoteFavorite, NotePin } from "../icons";
-import ListItem from "../list-item";
+import { writeToClipboard } from "../../utils/clipboard";
+import { showToast } from "../../utils/toast";
+import {
+  Alert,
+  ArrowSquareOut,
+  AttachmentError,
+  Backspace,
+  Bell,
+  BoxArrowDown,
+  Circle,
+  ClockClockwise,
+  Cloud,
+  CloudArrowUp,
+  CloudSlash,
+  Copy,
+  Duplicate,
+  FileHtml,
+  FilePdf,
+  Hourglass,
+  LinkBreak,
+  LinkHorizontal,
+  LinkSimple,
+  Lock,
+  Markdown,
+  Notebook,
+  NoteBell,
+  NoteCalendar,
+  NoteExpiry,
+  NoteFavorite,
+  NoteLink,
+  NotePin,
+  NoteReadonly,
+  Palette,
+  PencilSimple,
+  Plus,
+  Printer,
+  Star,
+  SyncOff,
+  Tabs,
+  Tag as TagIcon,
+  TextAa,
+  Trash,
+  Upload,
+  type Icon
+} from "../icons";
 import type { Context } from "../list-container/types";
+import IconTag from "../icon-tag";
+import ListItem from "../list-item";
+import { PublishDialog } from "../publish-view";
+import TimeAgo from "../time-ago";
 
 type NoteProps = NoteResolvedData & {
   item: NoteType;
@@ -36,19 +128,48 @@ type NoteProps = NoteResolvedData & {
   sx?: SxProp;
 };
 
+const FALLBACK_PRIMARY = "accent-selected";
+
+function toDataColor(colorCode: string | undefined, alpha = ""): ColorValue {
+  if (!colorCode || !/^#[0-9a-f]{6}$/i.test(colorCode)) return FALLBACK_PRIMARY;
+  return dataColor(colorCode + alpha);
+}
+
 function Note(props: NoteProps) {
-  const { tags, color, notebooks, locked, item, date, compact, sx } = props;
+  const {
+    tags,
+    color,
+    notebooks,
+    attachments,
+    locked,
+    item,
+    date,
+    reminder,
+    compact,
+    context,
+    sx
+  } = props;
   const note = item;
-  const primary = color ? dataColor(color.colorCode) : undefined;
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
+  const primary: ColorValue = toDataColor(color?.colorCode);
   const dateFormat = useSettingStore((store) => store.dateFormat);
-  const hasMetadata =
-    !compact &&
-    (note.pinned ||
-      locked ||
-      note.favorite ||
-      (tags?.items.length ?? 0) > 0 ||
-      (notebooks?.items.length ?? 0) > 0);
+  const isSelected = useSelectionStore((store) =>
+    store.selectedItems.includes(item.id)
+  );
+  const metadataItems = compact
+    ? []
+    : getMetadataItems({
+        note,
+        context,
+        locked,
+        attachments,
+        notebooks,
+        tags,
+        reminder,
+        primary,
+        isSelected: isSelected || isOpened
+      });
+  const hasMetadata = metadataItems.length > 0;
 
   return (
     <ListItem
@@ -57,8 +178,15 @@ function Note(props: NoteProps) {
       isCompact={compact}
       item={note}
       title={
-        <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
-          {primary ? <Circle size={10} color={primary} /> : null}
+        <Flex
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "spacing3",
+            minWidth: 0
+          }}
+        >
+          {color ? <Circle size={10} color={primary} /> : null}
           <Text
             testID="title"
             numberOfLines={1}
@@ -74,7 +202,21 @@ function Note(props: NoteProps) {
         </Flex>
       }
       body={!compact && note.headline ? note.headline : undefined}
-      onPress={() => useEditorStore.getState().openSession(note)}
+      onKeyPress={async (e) => {
+        if (e.key === "Delete") {
+          await Multiselect.moveNotesToTrash(
+            selectionStore.get().selectedItems
+          );
+        }
+      }}
+      colors={{
+        accent: primary,
+        heading: color ? primary : "heading",
+        background: "background",
+        backgroundSelected: color
+          ? toDataColor(color.colorCode, "1a")
+          : "background-secondary"
+      }}
       sx={{
         py: "spacing4",
         px: "spacing6",
@@ -83,95 +225,829 @@ function Note(props: NoteProps) {
         borderBottom: "1px solid",
         borderBottomColor: "border",
         borderLeft: "2px solid",
-        borderLeftColor: isOpened
-          ? primary ?? "accent-selected"
-          : "transparent",
+        borderLeftColor: isOpened ? primary : "transparent",
         ...sx
       }}
+      context={{ color, locked }}
+      menuItems={noteMenuItems}
+      onPress={() => useEditorStore.getState().openSession(note)}
+      onMiddleClick={() =>
+        useEditorStore.getState().openSession(note, { openInNewTab: true })
+      }
       header={
-        hasMetadata ? (
+        compact || !hasMetadata ? undefined : (
           <Flex
             sx={{
+              flexDirection: "row",
               alignItems: "center",
               flexWrap: "wrap",
               gap: "spacing2",
               minWidth: 0
             }}
           >
-            {note.pinned ? <NotePin size={15} color="icon" /> : null}
-            {locked ? <Lock size={15} color="icon" testID="locked" /> : null}
-            {note.favorite ? (
-              <NoteFavorite
-                testID="favorite"
-                size={15}
-                color={dataColor("#E5C131")}
-              />
-            ) : null}
-            {notebooks?.items.map((notebook) => (
-              <Chip key={notebook.id} text={notebook.title} />
-            ))}
-            {tags?.items.map((tag) => (
-              <Chip key={tag.id} text={`#${tag.title}`} />
-            ))}
+            {metadataItems}
           </Flex>
-        ) : undefined
+        )
       }
       footer={
         <Flex
           sx={{
+            flexDirection: "row",
             alignItems: "center",
             flexShrink: 0,
             gap: "spacing2",
             justifyContent: compact ? "flex-end" : "flex-start"
           }}
         >
-          {locked && compact ? <Lock size={11} color="icon" /> : null}
-          {compact ? null : <NoteCalendar size={12} color="icon-secondary" />}
-          <Text
-            sx={{
-              color: "paragraph-secondary",
-              fontSize: "3xs",
-              fontWeight: "medium"
-            }}
-          >
-            {formatDate(date, { type: "date", dateFormat })}
-          </Text>
+          {compact ? (
+            <>
+              <TimeAgo
+                sx={{
+                  color: "paragraph-secondary",
+                  fontSize: "3xs",
+                  fontWeight: "medium",
+                  whiteSpace: "nowrap"
+                }}
+                live={true}
+                datetime={date}
+                locale="short"
+              />
+              {note.conflicted && <Alert size={11} color="icon-error" />}
+              {locked && <Lock size={11} color="icon" testID="locked" />}
+              {note.readonly && <NoteReadonly size={11} color="icon" />}
+              {note.favorite && (
+                <NoteFavorite
+                  testID="favorite"
+                  size={11}
+                  color={dataColor("#E5C131")}
+                />
+              )}
+              {note.expiryDate?.value ? (
+                <NoteExpiry size={11} color="paragraph-secondary" />
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Flex
+                sx={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: "spacing3"
+                }}
+              >
+                <NoteCalendar size={12} color="icon-secondary" />
+                <Text
+                  sx={{
+                    color: "paragraph-secondary",
+                    fontSize: "3xs",
+                    fontWeight: "medium"
+                  }}
+                >
+                  {formatDate(date, { type: "date", dateFormat })}
+                </Text>
+              </Flex>
+              {note.expiryDate?.value && (
+                <IconTag
+                  icon={NoteExpiry}
+                  selected={isSelected || isOpened}
+                  text={formatDate(note.expiryDate.value, {
+                    type: "date",
+                    dateFormat
+                  })}
+                  iconSize={12}
+                  styles={{
+                    icon: { color: "icon-secondary" },
+                    text: { color: "paragraph-secondary" }
+                  }}
+                />
+              )}
+            </>
+          )}
         </Flex>
       }
     />
   );
 }
 
-function Chip({ text }: { text: string }) {
+export default memo(Note, function (prevProps, nextProps) {
+  const prevItem = prevProps.item;
+  const nextItem = nextProps.item;
   return (
-    <Flex
-      sx={{
-        alignItems: "center",
-        px: "spacing3",
-        py: 1,
-        borderRadius: "small",
-        bg: "background-secondary"
-      }}
-    >
-      <Text
-        numberOfLines={1}
-        sx={{ color: "paragraph-secondary", fontSize: "3xs" }}
-      >
-        {text}
-      </Text>
-    </Flex>
-  );
-}
-
-export default memo(Note, function (prev, next) {
-  return (
-    prev.compact === next.compact &&
-    prev.date === next.date &&
-    prev.item.dateModified === next.item.dateModified &&
-    prev.item.title === next.item.title &&
-    prev.item.headline === next.item.headline &&
-    prev.tags?.dateEdited === next.tags?.dateEdited &&
-    prev.notebooks?.dateEdited === next.notebooks?.dateEdited &&
-    prev.locked === next.locked
+    prevProps.compact === nextProps.compact &&
+    prevProps.date === nextProps.date &&
+    prevItem.dateModified === nextItem.dateModified &&
+    prevProps.notebooks?.dateEdited === nextProps.notebooks?.dateEdited &&
+    prevProps.tags?.dateEdited === nextProps.tags?.dateEdited &&
+    prevProps.reminder?.dateModified === nextProps.reminder?.dateModified &&
+    prevProps.attachments?.failed === nextProps.attachments?.failed &&
+    prevProps.attachments?.total === nextProps.attachments?.total &&
+    prevProps.locked === nextProps.locked &&
+    prevProps.color?.id === nextProps.color?.id &&
+    prevItem.expiryDate?.value === nextItem.expiryDate?.value
   );
 });
+
+function createColorIcon(colorCode: string): Icon {
+  const color = toDataColor(colorCode);
+  return function ColorIcon(props) {
+    return <Circle {...props} color={color} />;
+  };
+}
+
+const getFormats = () => [
+  {
+    type: "pdf" as const,
+    title: "PDF",
+    icon: FilePdf
+  },
+  {
+    type: "md" as const,
+    title: "Markdown",
+    icon: Markdown
+  },
+  {
+    type: "md-frontmatter" as const,
+    title: strings.markdownFrontmatter(),
+    icon: Markdown
+  },
+  {
+    type: "html" as const,
+    title: "HTML",
+    icon: FileHtml
+  },
+  {
+    type: "txt" as const,
+    title: strings.textFormat(),
+    icon: TextAa
+  }
+];
+
+export const noteMenuItems: (
+  note: NoteType,
+  ids?: string[],
+  context?: { color?: Color; locked?: boolean }
+) => Promise<MenuItem[]> = async (note, ids = [], context) => {
+  const features = await areFeaturesAvailable(["expiringNotes"]);
+  return [
+    {
+      type: "button",
+      key: "openinnewtab",
+      title: strings.openInNewTab(),
+      iconComponent: Tabs,
+      onClick: () =>
+        useEditorStore.getState().openSession(note.id, { openInNewTab: true })
+    },
+    {
+      type: "button",
+      key: "pin",
+      title: strings.pin(),
+      isChecked: note.pinned,
+      iconComponent: NotePin,
+      onClick: () => store.pin(!note.pinned, ...ids),
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "readonly",
+      title: strings.readOnly(),
+      isChecked: note.readonly,
+      iconComponent: NoteReadonly,
+      onClick: () => store.readonly(!note.readonly, ...ids),
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "favorite",
+      title: strings.favorite(),
+      isChecked: note.favorite,
+      iconComponent: Star,
+      onClick: () => store.favorite(!note.favorite, ...ids),
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "lock",
+      title: strings.lock(),
+      isChecked: context?.locked,
+      iconComponent: Lock,
+      onClick: async () => {
+        const { unlock, lock } = store.get();
+        if (!context?.locked) {
+          if (await lock(note.id)) showToast("success", strings.noteLocked());
+        } else if (await unlock(note.id)) {
+          showToast("success", strings.noteUnlocked());
+        }
+      }
+    },
+    {
+      type: "button",
+      key: "remind-me",
+      title: strings.remindMe(),
+      iconComponent: Bell,
+      onClick: async () => {
+        await AddReminderDialog.show({ note });
+      }
+    },
+    {
+      type: "button",
+      key: "archive",
+      title: strings.archive(),
+      isChecked: note.archived,
+      iconComponent: BoxArrowDown,
+      onClick: () => store.archive(!note.archived, ...ids),
+      multiSelect: true
+    },
+    { key: "sep1", type: "separator" },
+    {
+      type: "button",
+      key: "notebooks",
+      title: strings.notebooks(),
+      iconComponent: Notebook,
+      menu: { items: notebooksMenuItems(ids) },
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "colors",
+      title: strings.assignColor(),
+      iconComponent: Palette,
+
+      multiSelect: true,
+      menu: { items: colorsToMenuItems(context?.color, ids) }
+    },
+    {
+      type: "button",
+      key: "add-tags",
+      title: strings.dataTypesPluralCamelCase.tag(),
+      iconComponent: TagIcon,
+      multiSelect: true,
+      menu: { items: tagsMenuItems(ids) }
+    },
+    { key: "sep2", type: "separator" },
+    {
+      type: "button",
+      key: "print",
+      title: strings.print(),
+      iconComponent: Printer,
+      onClick: async () => {
+        await exportNote(note, {
+          format: "pdf"
+        });
+      }
+    },
+    {
+      type: "button",
+      key: "publish",
+      isDisabled: !db.monographs.isPublished(note.id) && context?.locked,
+      iconComponent: CloudArrowUp,
+      title: strings.publish(),
+      menu: db.monographs.isPublished(note.id)
+        ? {
+            items: [
+              {
+                type: "button",
+                key: "open",
+                title: strings.open(),
+                iconComponent: ArrowSquareOut,
+                onClick: async () => {
+                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
+                  shell.openUrl(url);
+                }
+              },
+              {
+                type: "button",
+                key: "copy-link",
+                title: strings.copyLink(),
+                iconComponent: Copy,
+                onClick: async () => {
+                  const url = `${hosts.MONOGRAPH_HOST}/${note.id}`;
+                  await writeToClipboard({
+                    "text/plain": url,
+                    "text/html": `<a href="${url}">${note.title}</a>`,
+                    "text/markdown": `[${note.title}](${url})`
+                  });
+                  showToast("success", strings.linkCopied());
+                }
+              },
+              {
+                type: "button",
+                key: "update",
+                title: strings.update(),
+                iconComponent: ClockClockwise,
+                onClick: () => {
+                  PublishDialog.show({ note });
+                }
+              },
+              {
+                type: "separator",
+                key: "sep"
+              },
+              {
+                type: "button",
+                key: "unpublish",
+                title: strings.unpublish(),
+                iconComponent: CloudSlash,
+                onClick: async () => {
+                  if (!(await showUnpublishConfirmation())) return;
+                  await useMonographStore.getState().unpublish(note.id);
+                  showToast("success", strings.actions.unpublished.note(1));
+                }
+              }
+            ]
+          }
+        : undefined,
+      onClick: () => PublishDialog.show({ note })
+    },
+    {
+      type: "button",
+      key: "export",
+      title: strings.exportAs(),
+      iconComponent: Upload,
+      menu: {
+        items: getFormats().map((format) => ({
+          type: "button",
+          key: format.type,
+          title: format.title,
+          tooltip: strings.exportAs(format.title),
+          iconComponent: format.icon,
+          isDisabled: format.type === "pdf" && ids.length > 1,
+          multiSelect: true,
+          onClick: async () => {
+            if (ids.length === 1) {
+              return await exportNote(note, {
+                format: format.type
+              });
+            }
+
+            await exportNotes(
+              format.type,
+              db.notes.exportable.where((eb) => eb("id", "in", ids))
+            );
+          }
+        }))
+      },
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "copy",
+      title: strings.copyAs(),
+      iconComponent: Copy,
+      menu: {
+        items: [
+          {
+            type: "button",
+            key: "copy-as-text",
+            tooltip: strings.copyAs(strings.textFormat()),
+            title: strings.textFormat(),
+            iconComponent: TextAa,
+            onClick: () => copyNote(note.id, "txt")
+          },
+          {
+            type: "button",
+            key: "copy-as-markdown",
+            tooltip: strings.copyAs("Markdown"),
+            title: "Markdown",
+            iconComponent: Markdown,
+            onClick: () => copyNote(note.id, "md")
+          }
+        ]
+      }
+    },
+    {
+      type: "button",
+      key: "copy-link",
+      title: strings.copyLink(),
+      iconComponent: LinkHorizontal,
+      onClick: async () => {
+        await copyNoteLink(note);
+        showToast("success", strings.linkCopied());
+      }
+    },
+    {
+      type: "button",
+      key: "duplicate",
+      title: strings.duplicate(),
+      iconComponent: Duplicate,
+      onClick: () => store.get().duplicate(...ids),
+      multiSelect: true
+    },
+    {
+      type: "button",
+      key: "local-only",
+      isHidden: !userstore.get().isLoggedIn,
+      title: strings.syncOff(),
+      isChecked: note.localOnly,
+      iconComponent: note.localOnly ? CloudSlash : Cloud,
+      onClick: async () => {
+        if (
+          note.localOnly ||
+          (await ConfirmDialog.show({
+            title: strings.syncOffConfirm(ids.length),
+            subtitle: strings.syncOffDesc(ids.length),
+            positiveButtonText: strings.continue(),
+            negativeButtonText: strings.cancel()
+          }))
+        )
+          await store.localOnly(!note.localOnly, ...ids);
+      },
+      multiSelect: true
+    },
+    { key: "sep3", type: "separator" },
+    note.expiryDate?.value
+      ? {
+          type: "button",
+          key: "expiry-date",
+          title: strings.expiryDate(),
+          iconComponent: Hourglass,
+          menu: {
+            items: [
+              {
+                type: "button",
+                key: "change",
+                title: strings.change(),
+                onClick: async () => {
+                  await NoteExpiryDateDialog.show({
+                    noteId: note.id,
+                    expiryDate: note.expiryDate?.value
+                  });
+                },
+                iconComponent: PencilSimple
+              },
+              {
+                type: "button",
+                key: "remove",
+                title: strings.remove(),
+                onClick: async () => {
+                  await db.notes.setExpiryDate(null, ...ids);
+                  store.refresh();
+                  showToast("success", strings.expiryDateRemoved());
+                },
+                iconComponent: Backspace
+              }
+            ]
+          }
+        }
+      : {
+          type: "button",
+          key: "expiry-date",
+          title: strings.setExpiry(),
+          iconComponent: Hourglass,
+          premium: !features.expiringNotes.isAllowed,
+          onClick: withFeatureCheck(features.expiringNotes, async () => {
+            await NoteExpiryDateDialog.show({
+              noteId: note.id
+            });
+          })
+        },
+    {
+      type: "button",
+      key: "movetotrash",
+      title: strings.moveToTrash(),
+      variant: "dangerous",
+      iconComponent: Trash,
+      isDisabled: ids.length === 1 && db.monographs.isPublished(note.id),
+      onClick: () => Multiselect.moveNotesToTrash(ids, ids.length > 1),
+      multiSelect: true
+    }
+  ];
+};
+
+function colorsToMenuItems(
+  noteColor: Color | undefined,
+  ids: string[]
+): MenuItem[] {
+  return [
+    {
+      key: "new-color",
+      type: "button",
+      title: strings.addColor(),
+      iconComponent: Plus,
+      onClick: async () => {
+        const id = await CreateColorDialog.show({});
+        if (!id) return;
+        await store.get().setColor(id, noteColor?.id === id, ...ids);
+      }
+    },
+    {
+      key: "colors",
+      type: "lazy-loader",
+      async items() {
+        const colors = await db.colors.all.items();
+        const menuItems: MenuItem[] = [];
+        if (colors.length > 0)
+          menuItems.push({ type: "separator", key: "sep" });
+        menuItems.push(
+          ...colors.map((color) => {
+            const isChecked = !!noteColor && noteColor.id === color.id;
+            return {
+              type: "button",
+              key: color.id,
+              title: color.title,
+              iconComponent: createColorIcon(color.colorCode),
+              isChecked,
+              onClick: () => store.setColor(color.id, isChecked, ...ids)
+            } satisfies MenuItem;
+          })
+        );
+        return menuItems;
+      }
+    }
+  ];
+}
+
+function notebooksMenuItems(ids: string[]): MenuItem[] {
+  return [
+    {
+      type: "button",
+      key: "link-notebooks",
+      title: strings.linkNotebooks(),
+      iconComponent: LinkSimple,
+      onClick: () => MoveNoteDialog.show({ noteIds: ids })
+    },
+    {
+      type: "lazy-loader",
+      key: "notebooks-lazy-loader",
+      async items() {
+        const notebooks: Map<string, NotebookItem> = new Map();
+        const notebookShortcuts: Map<string, NotebookItem> = new Map();
+
+        const linkedNotebooks = await db.relations
+          .to({ ids, type: "note" }, "notebook")
+          .resolve();
+        linkedNotebooks.forEach((nb) => notebooks.set(nb.id, nb));
+
+        for (const notebook of await db.shortcuts.resolved("notebooks")) {
+          if (notebooks.has(notebook.id)) continue;
+          notebookShortcuts.set(notebook.id, notebook);
+        }
+
+        const menuItems: MenuItem[] = [];
+        if (notebooks.size > 0)
+          menuItems.push({
+            type: "button",
+            key: "remove-from-all-notebooks",
+            title: strings.unlinkFromAll(),
+            iconComponent: LinkBreak,
+            onClick: async () => {
+              await db.notes.removeFromAllNotebooks(...ids);
+              store.refresh();
+            }
+          });
+
+        if (notebookShortcuts.size > 0 || notebooks.size > 0)
+          menuItems.push({ key: "sep3", type: "separator" });
+
+        if (notebookShortcuts.size > 0) {
+          notebookShortcuts.forEach((notebook) => {
+            menuItems.push({
+              type: "button",
+              key: notebook.id,
+              title: notebook.title,
+              iconComponent: Notebook,
+              isChecked: false,
+              onClick: async () => {
+                await db.notes.addToNotebook(notebook.id, ...ids);
+                store.refresh();
+              }
+            });
+          });
+
+          if (notebooks.size > 0)
+            menuItems.push({ key: "sep2", type: "separator" });
+        }
+
+        notebooks.forEach((notebook) => {
+          menuItems.push({
+            type: "button",
+            key: notebook.id,
+            title: notebook.title,
+            iconComponent: Notebook,
+            isChecked: true,
+            onClick: async () => {
+              await db.notes.removeFromNotebook(notebook.id, ...ids);
+              store.refresh();
+            }
+          });
+        });
+        return menuItems;
+      }
+    }
+  ];
+}
+
+function tagsMenuItems(ids: string[]): MenuItem[] {
+  return [
+    {
+      type: "button",
+      key: "assign-tags",
+      title: strings.addTag(),
+      iconComponent: Plus,
+      onClick: () => AddTagsDialog.show({ noteIds: ids })
+    },
+    {
+      type: "lazy-loader",
+      key: "tags-lazy-loader",
+      async items() {
+        const tags: Map<string, TagType> = new Map();
+        const tagShortcuts: Map<string, TagType> = new Map();
+
+        const linkedTags = await db.relations
+          .to({ ids, type: "note" }, "tag")
+          .resolve();
+        linkedTags.forEach((tag) => tags.set(tag.id, tag));
+
+        for (const tag of await db.shortcuts.resolved("tags")) {
+          if (tags.has(tag.id)) continue;
+          tagShortcuts.set(tag.id, tag);
+        }
+
+        const menuItems: MenuItem[] = [];
+        if (tags.size > 0)
+          menuItems.push(
+            {
+              type: "button",
+              key: "remove-from-all-tags",
+              title: strings.removeFromAll(),
+              iconComponent: Backspace,
+              onClick: async () => {
+                for (const id of ids) {
+                  await db.relations.to({ id, type: "note" }, "tag").unlink();
+                }
+                tagStore.get().refresh();
+                await store.get().refresh();
+              }
+            },
+            { key: "sep", type: "separator" }
+          );
+
+        if (tagShortcuts.size > 0) {
+          tagShortcuts.forEach((tag) => {
+            menuItems.push({
+              type: "button",
+              key: tag.id,
+              title: tag.title,
+              iconComponent: TagIcon,
+              isChecked: false,
+              onClick: async () => {
+                for (const id of ids) {
+                  await db.relations.add(tag, { id, type: "note" });
+                }
+                await tagStore.get().refresh();
+                await store.get().refresh();
+              }
+            });
+          });
+
+          if (tags.size > 0) menuItems.push({ key: "sep2", type: "separator" });
+        }
+
+        tags.forEach((tag) => {
+          menuItems.push({
+            type: "button",
+            key: tag.id,
+            title: tag.title,
+            iconComponent: TagIcon,
+            isChecked: true,
+            onClick: async () => {
+              for (const id of ids) {
+                await db.relations.unlink(tag, { id, type: "note" });
+              }
+              await tagStore.get().refresh();
+              await store.get().refresh();
+            }
+          });
+        });
+        return menuItems;
+      }
+    }
+  ];
+}
+
+async function copyNote(noteId: string, format: "md" | "txt") {
+  try {
+    const note = await db.notes?.note(noteId);
+    if (!note) throw new Error(strings.noteDoesNotExist());
+
+    const result = await exportContent(note, {
+      format,
+      disableTemplate: true,
+      unlockVault: Vault.unlockVault
+    });
+    if (!result) throw new Error(strings.couldNotConvertNote(format));
+
+    await writeToClipboard({ "text/plain": result });
+    showToast("success", strings.noteCopied());
+  } catch (e) {
+    if (e instanceof Error)
+      showToast("error", `${strings.failedToCopyNote()}: ${e.message}.`);
+  }
+}
+
+function getMetadataItems(props: {
+  note: NoteType;
+  context?: Context;
+  locked?: boolean;
+  attachments?: NoteResolvedData["attachments"];
+  notebooks?: NoteResolvedData["notebooks"];
+  tags?: NoteResolvedData["tags"];
+  reminder?: NoteResolvedData["reminder"];
+  primary: ColorValue;
+  isSelected: boolean;
+}): ReactNode[] {
+  const {
+    note,
+    context,
+    locked,
+    attachments,
+    notebooks,
+    tags,
+    reminder,
+    primary,
+    isSelected
+  } = props;
+  return [
+    note.conflicted && <Alert key="conflicted" size={15} color="icon-error" />,
+    note.localOnly && <SyncOff key="local-only" size={15} color="icon" />,
+    note.pinned && <NotePin key="pinned" size={15} color="icon" />,
+    locked && <Lock key="locked" size={15} color="icon" testID="locked" />,
+    note.readonly && <NoteReadonly key="readonly" size={15} color="icon" />,
+    note.favorite && (
+      <NoteFavorite
+        key="favorite"
+        testID="favorite"
+        size={15}
+        color={dataColor("#E5C131")}
+      />
+    ),
+    attachments?.total ? (
+      <Flex
+        key="attachments-total"
+        sx={{ flexDirection: "row", alignItems: "center", gap: "spacing1" }}
+      >
+        <NoteLink size={14} color="icon" />
+        <Text sx={{ color: "heading", fontSize: "xs" }}>
+          {attachments.total}
+        </Text>
+      </Flex>
+    ) : null,
+    attachments?.failed ? (
+      <Flex
+        key="attachments-failed"
+        title={strings.errorsInAttachments(attachments.failed)}
+        sx={{ flexDirection: "row", alignItems: "center", gap: "spacing1" }}
+      >
+        <AttachmentError size={13} color="icon-error" />
+        <Text sx={{ color: "paragraph", fontSize: "xs" }}>
+          {attachments.failed}
+        </Text>
+      </Flex>
+    ) : null,
+    ...(context?.type !== "notebook"
+      ? notebooks?.items.map((notebook) => (
+          <IconTag
+            selected={isSelected}
+            key={notebook.id}
+            icon={Notebook}
+            iconSize={12}
+            text={notebook.title}
+            onClick={() => {
+              appStore.get().setNavigationTab("notebooks");
+              navigate(`/notebooks/${notebook.id}`);
+            }}
+          />
+        )) ?? []
+      : []),
+    ...(tags?.items.map((tag) => (
+      <IconTag
+        key={tag.id}
+        selected={isSelected}
+        testId="tag-item"
+        icon={TagIcon}
+        text={tag.title}
+        title={strings.goToTag(tag.title)}
+        onClick={() => {
+          if (!tag.id) return showToast("error", strings.tagNotFound());
+
+          appStore.get().setNavigationTab("tags");
+          navigate(`/tags/${tag.id}`);
+        }}
+      />
+    )) ?? []),
+    reminder && isReminderActive(reminder) && (
+      <IconTag
+        key="reminder"
+        icon={NoteBell}
+        selected={isSelected}
+        iconSize={13}
+        text={getFormattedReminderTime(reminder, true)}
+        title={reminder.title}
+        styles={
+          isReminderToday(reminder)
+            ? { icon: { color: primary }, text: { color: primary } }
+            : undefined
+        }
+      />
+    )
+  ].filter(Boolean);
+}

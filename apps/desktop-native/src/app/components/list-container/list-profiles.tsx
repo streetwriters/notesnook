@@ -20,9 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { GroupingKey, Item } from "@notesnook/core";
 import { getSortValue } from "@notesnook/core";
 import { isNoteResolvedData } from "@notesnook/common";
-import { Text } from "@ui";
 import { db } from "../../common/db";
 import Note from "../note";
+import Tag from "../tag";
+import TrashItem from "../trash-item";
+import Reminder from "../reminder";
+import { Attachment } from "../attachment";
+import { Notebook } from "../notebook";
 import SearchResult from "../search-result";
 import type { Context } from "./types";
 
@@ -52,12 +56,32 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
       );
     case "searchResult":
       return <SearchResult item={item} />;
-    default:
+    case "trash":
       return (
-        <Text sx={{ p: "spacing4", color: "paragraph-secondary" }}>
-          {`${item.type} items are not implemented on desktop yet`}
-        </Text>
+        <TrashItem index={index} item={item} date={getDate(item, group)} />
       );
+    case "notebook":
+      return (
+        <Notebook
+          index={index}
+          item={item}
+          totalNotes={typeof data === "number" ? data : 0}
+        />
+      );
+    case "reminder":
+      return <Reminder index={index} item={item} compact={compact} />;
+    case "tag":
+      return (
+        <Tag
+          index={index}
+          item={item}
+          totalNotes={typeof data === "number" ? data : 0}
+        />
+      );
+    case "attachment":
+      return <Attachment item={item} compact={compact} />;
+    default:
+      return null;
   }
 }
 
