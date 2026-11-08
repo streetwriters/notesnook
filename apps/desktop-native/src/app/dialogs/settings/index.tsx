@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { strings } from "@notesnook/intl";
+import { debounce, useIsFeatureAvailable } from "@notesnook/common";
+import { withFeatureCheck } from "../../common";
 import { environment } from "@platform";
 import {
   Button,
@@ -413,6 +415,7 @@ function SettingItem(props: { item: Setting }) {
   const { item } = props;
   const [state, setState] = useState<unknown>();
   const [workIndex, setWorkIndex] = useState<number>();
+  const feature = useIsFeatureAvailable(item.featureId);
 
   useEffect(() => {
     if (!item.onStateChange) return;
@@ -464,9 +467,17 @@ function SettingItem(props: { item: Setting }) {
         }}
       >
         <Flex sx={{ flexDirection: "column", flex: 1 }}>
-          <Text variant="body" sx={{ fontWeight: "medium", color: "heading" }}>
-            {item.title}
-          </Text>
+          <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
+            <Text
+              variant="body"
+              sx={{ fontWeight: "medium", color: "heading" }}
+            >
+              {item.title}
+            </Text>
+            {feature && !feature.isAllowed ? (
+              <Pro size={14} color="accent" />
+            ) : null}
+          </Flex>
           {description ? (
             <Text variant="body" sx={{ mt: 1, color: "paragraph" }}>
               {plain(description)}
@@ -489,7 +500,9 @@ function SettingItem(props: { item: Setting }) {
                     key={index}
                     disabled={workIndex === index}
                     variant={component.variant}
-                    onPress={() => workWithLoading(index, component.action)}
+                    onPress={withFeatureCheck(feature, () =>
+                      workWithLoading(index, component.action)
+                    )}
                   >
                     {workIndex === index ? (
                       <Loading size={18} />
@@ -504,11 +517,22 @@ function SettingItem(props: { item: Setting }) {
                     key={index}
                     disabled={workIndex === index}
                     checked={component.isToggled()}
-                    onChange={() => workWithLoading(index, component.toggle)}
+                    onChange={withFeatureCheck(feature, () =>
+                      workWithLoading(index, component.toggle)
+                    )}
                   />
                 );
               case "dropdown":
-                return <SelectComponent key={index} {...component} />;
+                return (
+                  <SelectComponent
+                    key={index}
+                    {...component}
+                    onSelectionChanged={withFeatureCheck(
+                      feature,
+                      (value: string) => component.onSelectionChanged(value)
+                    )}
+                  />
+                );
               case "input":
                 return component.inputType === "number" ? (
                   <NumberInput
@@ -523,7 +547,7 @@ function SettingItem(props: { item: Setting }) {
                     key={index}
                     type="text"
                     defaultValue={component.defaultValue()}
-                    onChangeText={component.onChange}
+                    onChangeText={debounce(component.onChange, 500)}
                     sx={{ width: 250, mr: 1 }}
                   />
                 );
