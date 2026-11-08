@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { scenarios } from "./scenarios.mjs";
+import { extras, scenarios } from "./scenarios.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const webDir = path.resolve(here, "../../../web");
@@ -33,8 +33,13 @@ if (await offline.count()) {
   await page.waitForTimeout(10000);
 }
 await page.evaluate(
-  async ({ seed, scheme }) => {
+  async ({ seed, scheme, extras }) => {
     const { db } = await import("/common/db.ts");
+    for (const notebook of extras.notebooks)
+      await db.notebooks.add({ title: notebook.title });
+    for (const tag of extras.tags) await db.tags.add({ title: tag.title });
+    for (const color of extras.colors)
+      await db.colors.add({ title: color.title, colorCode: color.colorCode });
     for (const note of seed)
       await db.notes.add({
         title: note.title,
@@ -45,22 +50,27 @@ await page.evaluate(
       });
     const { store } = await import("/stores/note-store.ts");
     await store.refresh();
+    const appStore = await import("/stores/app-store.ts");
+    await appStore.store.refreshNavItems();
     const theme = await import("/stores/theme-store.ts");
     theme.store.setColorScheme(scheme);
   },
-  { seed, scheme }
+  { seed, scheme, extras }
 );
 await page.waitForTimeout(3000);
 await page.mouse.move(2, 2);
 await page.waitForTimeout(500);
 
+const target = (spec) =>
+  typeof spec === "string"
+    ? page.locator(`[data-test-id="${spec}"]`).first()
+    : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
 for (const step of scenario.steps ?? []) {
-  if (step.click) {
-    await page.locator(`[data-test-id="${step.click}"]`).first().click();
-    await page.waitForTimeout(800);
-  }
+  if (step.click) await target(step.click).click();
+  if (step.hover) await target(step.hover).hover();
+  await page.waitForTimeout(800);
 }
-await page.mouse.move(2, 2);
+if (!scenario.keepPointer) await page.mouse.move(2, 2);
 await page.waitForTimeout(300);
 
 const elements = await page.evaluate(() => {
@@ -71,6 +81,7 @@ const elements = await page.evaluate(() => {
   const out = [];
   for (const el of document.querySelectorAll("[data-test-id]")) {
     const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) continue;
     const cs = getComputedStyle(el);
     out.push({
       id: el.getAttribute("data-test-id"),

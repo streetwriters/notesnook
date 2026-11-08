@@ -6653,9 +6653,11 @@ name = "rn-gpui-svg"
 version = "0.1.0"
 dependencies = [
  "gpui",
+ "image",
  "react-native-gpui",
  "rn-gpui-sys",
  "serde_json",
+ "smallvec",
 ]
 
 [[package]]

@@ -98,7 +98,7 @@ function MenuButton(props: {
           sx={{ ml: 4, flexShrink: 0, flexDirection: "row", gap: 1 }}
         >
           <Check
-            size={15}
+            size={13}
             color={dangerous ? "icon-error" : "icon-secondary"}
           />
         </Flex>

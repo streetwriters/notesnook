@@ -25,6 +25,15 @@ export function shellSeed(now) {
   });
 }
 
+export const extras = {
+  notebooks: [{ title: "Work" }, { title: "Personal" }, { title: "Recipes" }],
+  tags: [{ title: "urgent" }, { title: "ideas" }, { title: "later" }],
+  colors: [
+    { title: "Red", colorCode: "#f44336" },
+    { title: "Blue", colorCode: "#2196f3" }
+  ]
+};
+
 export const scenarios = {
   shell: {
     size: [1200, 800],
@@ -52,6 +61,29 @@ export const scenarios = {
 scenarios.userMenu = {
   ...scenarios.shell,
   steps: [{ click: "profile-dropdown" }]
+};
+
+scenarios.notebooksTab = {
+  ...scenarios.shell,
+  steps: [{ click: "tab-notebooks" }]
+};
+scenarios.tagsTab = {
+  ...scenarios.shell,
+  steps: [{ click: "tab-tags" }]
+};
+scenarios.navHover = {
+  ...scenarios.shell,
+  steps: [{ hover: { id: "navigation-item", nth: 1 } }],
+  keepPointer: true
+};
+scenarios.listSelected = {
+  ...scenarios.shell,
+  steps: [{ click: { id: "list-item", nth: 1 } }]
+};
+scenarios.listHover = {
+  ...scenarios.shell,
+  steps: [{ hover: { id: "list-item", nth: 2 } }],
+  keepPointer: true
 };
 
 export const TEXT_SCORE_THRESHOLD = 0.1;

@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { scenarios } from "./scenarios.mjs";
+import { extras, scenarios } from "./scenarios.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(here, "../..");
@@ -34,7 +34,10 @@ const app = await launchApp({
     seed,
     resetConfig: true,
     initialColorScheme: scheme,
-    titleBarInset: 0
+    titleBarInset: 0,
+    seedNotebooks: extras.notebooks,
+    seedTags: extras.tags,
+    seedColors: extras.colors
   },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-"))
@@ -55,13 +58,16 @@ try {
   }
   await app.mouseMove({ x: 2, y: 2 });
   await app.waitForIdle();
+  const locate = (spec) =>
+    typeof spec === "string"
+      ? app.getByTestId(spec).first()
+      : app.getByTestId(spec.id).nth(spec.nth ?? 0);
   for (const step of scenario.steps ?? []) {
-    if (step.click) {
-      await app.getByTestId(step.click).click();
-      await app.waitForIdle();
-    }
+    if (step.click) await locate(step.click).click();
+    if (step.hover) await locate(step.hover).hover();
+    await app.waitForIdle();
   }
-  await app.mouseMove({ x: 2, y: 2 });
+  if (!scenario.keepPointer) await app.mouseMove({ x: 2, y: 2 });
   await app.waitForIdle();
 
   const tree = await app.tree();
