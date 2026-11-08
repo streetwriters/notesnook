@@ -9,9 +9,8 @@
     "desktop": "react-native run-desktop",
     "tsc": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "test:e2e": "npm run bundle:test && RN_GPUI_DEV_PORT=1 RN_GPUI_TEST_BUNDLE=$PWD/desktop/build/index.bundle RN_GPUI_TEST_BINARY=$PWD/desktop/build/target/debug/react-native-gpui--notesnook-desktop-native vitest run --config desktop/vitest.e2e.config.ts",
-    "build:test": "react-native-gpui run-desktop --features test-driver --no-launch --port 8171",
-    "bundle:test": "react-native bundle --platform desktop --entry-file index.js --bundle-output desktop/build/index.bundle --assets-dest desktop/build/assets --dev true"
+    "test:e2e": "RN_GPUI_TEST_BUNDLE=$PWD/desktop/build/index.bundle RN_GPUI_TEST_BINARY=$PWD/desktop/build/target/debug/react-native-gpui--notesnook-desktop-native vitest run --config desktop/vitest.e2e.config.ts",
+    "build:test": "react-native-gpui run-desktop --features test-driver --no-launch --port 8171"
   },
   "dependencies": {
     "@ammarahmed/react-native-sodium": "file:../../../../../Projects/react-native/gpui-modules/tgz/ammarahmed-react-native-sodium-2.0.0-alpha.2.tgz",
