@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
+import type { getPreviewColors } from "@notesnook/theme";
 import { Dialog, Flex, Text } from "@ui";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { LinkText } from "./components/link-text";
-import { ThemePreview } from "./components/theme-preview";
+import { ThemePreview } from "../components/theme-preview";
 
 export type ThemeMetadata = {
   id: string;
@@ -35,7 +36,7 @@ export type ThemeMetadata = {
   homepage?: string;
   sourceURL?: string;
   colorScheme?: "dark" | "light";
-  previewColors?: { accent: string; paragraph: string; background: string };
+  previewColors: ReturnType<typeof getPreviewColors>;
 };
 
 export type ThemeDetailsDialogProps = BaseDialogProps<boolean> & {

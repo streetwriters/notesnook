@@ -30,7 +30,7 @@ import { debounce } from "@notesnook/common";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { ThemesRouter } from "../../../common/themes-router";
-import { ThemePreview } from "../../components/theme-preview";
+import { ThemePreview } from "../../../components/theme-preview";
 import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
 import { VirtualizedGrid } from "../../../components/virtualized-grid";
@@ -46,9 +46,7 @@ const COLOR_SCHEMES = [
   { id: "light", title: strings.light() }
 ] as const;
 
-type ThemeItemData = ThemeMetadata & {
-  previewColors?: { accent: string; paragraph: string; background: string };
-};
+type ThemeItemData = ThemeMetadata;
 
 export function ThemesSelector() {
   const [searchQuery, setSearchQuery] = useState<string>();
