@@ -17,4 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { default as Accordion } from "../../components/accordion";
+import { useState, type ReactNode } from "react";
+import { Flex, Text, type SxProp } from "@ui";
+import { CaretDown, CaretRight } from "../../components/icons";
+
+export function Accordion(props: {
+  title: string;
+  isClosed?: boolean;
+  sx?: SxProp;
+  children?: ReactNode;
+}) {
+  const [closed, setClosed] = useState(!!props.isClosed);
+  return (
+    <Flex sx={{ flexDirection: "column", ...props.sx }}>
+      <Flex
+        onPress={() => setClosed((c) => !c)}
+        sx={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          p: 1
+        }}
+      >
+        <Text variant="subtitle">{props.title}</Text>
+        {closed ? <CaretRight size={16} /> : <CaretDown size={16} />}
+      </Flex>
+      {closed ? null : props.children}
+    </Flex>
+  );
+}

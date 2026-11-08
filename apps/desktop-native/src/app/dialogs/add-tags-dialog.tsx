@@ -105,7 +105,6 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
           <FilteredList
             getItemKey={(index) => tags.key(index)}
             estimatedSize={TAG_ITEM_HEIGHT}
-            sx={{ height: 280 }}
             items={tags.placeholders}
             placeholders={{
               empty: strings.addTags(),
