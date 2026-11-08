@@ -31,7 +31,7 @@ import { useEffect, useRef, useState } from "react";
 import { LinkText } from "../../../dialogs/components/link-text";
 import { importNote } from "../../../utils/importer";
 import { PromptDialog } from "../../../dialogs/prompt";
-import { Accordion } from "../../../dialogs/components/accordion";
+import Accordion from "../../accordion";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
 import { strings } from "@notesnook/intl";

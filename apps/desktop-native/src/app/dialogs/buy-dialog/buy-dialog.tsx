@@ -41,7 +41,7 @@ import { Period, SubscriptionPlan, User } from "@notesnook/core";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import dayjs from "dayjs";
 import { PromptDialog } from "../prompt";
-import { IconTag } from "../components/icon-tag";
+import IconTag from "../../components/icon-tag";
 import { usePromise } from "@notesnook/common";
 import { getCurrencySymbol } from "../../common/currencies";
 import { environment } from "@platform";

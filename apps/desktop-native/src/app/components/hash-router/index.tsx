@@ -17,27 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@ui";
-import type { Icon } from "../../components/icons";
+import { memo, type ReactNode } from "react";
+import useHashRoutes from "../../hooks/use-hash-routes";
+import hashroutes from "../../navigation/hash-routes";
 
-export function IconTag(props: { icon: Icon; text: string }) {
-  const { icon: TagIcon, text } = props;
-  return (
-    <Flex
-      sx={{
-        flexDirection: "row",
-        alignItems: "center",
-        bg: "background-secondary",
-        borderRadius: "default",
-        px: 1,
-        py: "2px",
-        mr: 1
-      }}
-    >
-      <TagIcon size={12} color="icon" />
-      <Text variant="subBody" sx={{ ml: "2px", color: "paragraph" }}>
-        {text}
-      </Text>
-    </Flex>
-  );
+function HashRouter(props: { children?: ReactNode }) {
+  useHashRoutes(hashroutes);
+  return <>{props.children}</>;
 }
+export default memo(HashRouter, () => true);

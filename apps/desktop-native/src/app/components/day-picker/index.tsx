@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import dayjs from "dayjs";
 import { Flex, Text, type SxProp } from "@ui";
-import { CaretLeft, CaretRight } from "../../components/icons";
+import { CaretLeft, CaretRight } from "../icons";
 import { strings } from "@notesnook/intl";
 
 type DayPickerProps = {

@@ -33,8 +33,8 @@ import {
 } from "../stores/relation-changes-store";
 import { checkFeature } from "../common";
 import { Tag as TagIcon } from "../components/icons";
-import { FilteredList } from "./components/filtered-list";
-import { SelectedCheck } from "./components/selected-check";
+import { FilteredList } from "../components/filtered-list";
+import { SelectedCheck } from "../components/selected-check";
 
 const TAG_ITEM_HEIGHT = 35;
 

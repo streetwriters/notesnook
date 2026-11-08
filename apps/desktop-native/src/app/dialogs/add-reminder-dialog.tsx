@@ -39,7 +39,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { checkFeature } from "../common";
 import { setTimeOnly, setDateOnly } from "../utils/date-time";
 import { Field } from "./components/field";
-import { DayPicker } from "./components/day-picker";
+import { DayPicker } from "../components/day-picker";
 import { InlinePopup } from "./components/inline-popup";
 import { NoteReference } from "./components/note-reference";
 import { Fieldset, ReminderRadioButton } from "./components/radio-button";

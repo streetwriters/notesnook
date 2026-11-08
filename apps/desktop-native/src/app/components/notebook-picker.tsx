@@ -21,28 +21,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Flex, ScrollContainer, Text } from "@ui";
 import { strings } from "@notesnook/intl";
 import type { Notebook } from "@notesnook/core";
-import {
-  CaretDown,
-  CaretRight,
-  Check,
-  Close,
-  Plus,
-  SearchIcon
-} from "../../components/icons";
-import { db } from "../../common/db";
-import { checkFeature } from "../../common";
-import { store as noteStore } from "../../stores/note-store";
-import { store as notebookStore } from "../../stores/notebook-store";
-import { store as appStore } from "../../stores/app-store";
-import { showToast } from "../../utils/toast";
+import { CaretDown, CaretRight, Check, Close, Plus, SearchIcon } from "./icons";
+import { db } from "../common/db";
+import { checkFeature } from "../common";
+import { store as noteStore } from "../stores/note-store";
+import { store as notebookStore } from "../stores/notebook-store";
+import { store as appStore } from "../stores/app-store";
+import { showToast } from "../utils/toast";
 import {
   RelationChange,
   selectMultiple,
   selectSingle,
   useRelationChangesStore
-} from "../../stores/relation-changes-store";
-import { AddNotebookDialog } from "../add-notebook-dialog";
-import { Field } from "./field";
+} from "../stores/relation-changes-store";
+import { AddNotebookDialog } from "../dialogs/add-notebook-dialog";
+import Field from "./field";
 import { SelectedCheck } from "./selected-check";
 
 const notebookSortOptions = {
@@ -203,7 +196,7 @@ export function NotebookPicker(props: {
         rightActions={[
           {
             icon: Close,
-            onPress: async () => {
+            onClick: async () => {
               setQuery("");
               setFieldKey((k) => k + 1);
               const id = ++searchId.current;

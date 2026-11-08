@@ -17,12 +17,641 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ReactNode } from "react";
-import { notImplemented } from "../common/not-implemented";
+import { useEffect, useMemo, useState } from "react";
+import type { User } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
+import { Button, Flex, Radio, ScrollContainer, Text } from "@ui";
+import { hardNavigate, useQueryParams } from "../navigation";
+import { db } from "../common/db";
+import { Loader } from "../components/loader";
+import { showToast } from "../utils/toast";
+import AuthContainer from "../components/auth-container";
+import {
+  AuthField,
+  AuthFormContainer,
+  SubmitButton,
+  type AuthFormContainerProps
+} from "./auth";
+import Config from "../utils/config";
+import {
+  CaretRight,
+  CheckCircle,
+  CheckIcon,
+  KeyIcon,
+  Trash
+} from "../components/icons";
+import { SaveRecoveryKey } from "../dialogs/recovery-key-dialog";
 
-export default function Recovery(_props: {
-  children?: ReactNode;
-}): JSX.Element | null {
-  notImplemented("Recovery")();
-  return null;
+type RecoveryMethodType = "key" | "reset";
+type RecoveryMethodsFormData = Record<string, unknown>;
+
+type RecoveryKeyFormData = {
+  recoveryKey: string;
+};
+
+type NewPasswordFormData = {
+  userResetRequired?: boolean;
+  password: string;
+  confirmPassword: string;
+  recoveryKey?: string;
+};
+
+type RecoveryFormData = {
+  methods: RecoveryMethodsFormData;
+  "method:key": RecoveryKeyFormData;
+  "method:reset": NewPasswordFormData;
+  new: NewPasswordFormData;
+  final: RecoveryMethodsFormData;
+};
+
+type BaseFormData = RecoveryMethodsFormData;
+
+type NavigateFunction = <TRoute extends RecoveryRoutes>(
+  route: TRoute,
+  formData?: Partial<RecoveryFormData[TRoute]>
+) => void;
+type BaseRecoveryComponentProps<TRoute extends RecoveryRoutes> = {
+  navigate: NavigateFunction;
+  formData?: Partial<RecoveryFormData[TRoute]>;
+  user: User;
+};
+type RecoveryRoutes =
+  | "methods"
+  | "method:key"
+  | "method:reset"
+  | "new"
+  | "final";
+type RecoveryProps = { route: RecoveryRoutes };
+
+type RecoveryComponent<TRoute extends RecoveryRoutes> = (
+  props: BaseRecoveryComponentProps<TRoute>
+) => JSX.Element;
+
+function getRouteComponent<TRoute extends RecoveryRoutes>(
+  route: TRoute
+): RecoveryComponent<TRoute> | undefined {
+  switch (route) {
+    case "methods":
+      return RecoveryMethods as RecoveryComponent<TRoute>;
+    case "method:key":
+      return RecoveryKeyMethod as RecoveryComponent<TRoute>;
+    case "method:reset":
+    case "new":
+      return NewPassword as RecoveryComponent<TRoute>;
+    case "final":
+      return Final as RecoveryComponent<TRoute>;
+  }
+  return undefined;
+}
+
+function useAuthenticateUser({
+  code,
+  userId
+}: {
+  code?: string;
+  userId?: string;
+}) {
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [user, setUser] = useState<User>();
+  useEffect(() => {
+    async function authenticateUser() {
+      if (!code || !userId) {
+        openURL("/");
+        return;
+      }
+
+      setIsAuthenticating(true);
+      try {
+        if (!code || !userId) {
+          throw new Error("Missing code or userId in query params.");
+        }
+
+        await db.tokenManager.getAccessTokenFromAuthorizationCode(
+          userId,
+          code.replace(/ /gm, "+")
+        );
+        const user = await db.user.fetchUser();
+        setUser(user);
+      } catch (e) {
+        console.error(e);
+        showToast("error", strings.biometricsAuthFailed());
+        openURL("/");
+      } finally {
+        setIsAuthenticating(false);
+      }
+    }
+
+    authenticateUser();
+  }, [code, userId]);
+  return { isAuthenticating, user };
+}
+
+function Recovery(props: RecoveryProps) {
+  const [route, setRoute] = useState(props.route);
+  const [storedFormData, setStoredFormData] = useState<
+    BaseFormData | undefined
+  >();
+
+  const [{ code, userId }] = useQueryParams();
+  const { isAuthenticating, user } = useAuthenticateUser({ code, userId });
+  const Route = useMemo(() => getRouteComponent(route), [route]);
+  if (isAuthenticating || !user)
+    return (
+      <AuthContainer>
+        <Loader
+          title={strings.authenticatingUser()}
+          text={strings.pleaseWaitLogin()}
+        />
+      </AuthContainer>
+    );
+
+  return (
+    <AuthContainer>
+      <ScrollContainer sx={{ flex: 1 }}>
+        {Route && (
+          <Route
+            navigate={(route, formData) => {
+              setStoredFormData(formData);
+              setRoute(route);
+            }}
+            formData={storedFormData}
+            user={user}
+          />
+        )}
+      </ScrollContainer>
+    </AuthContainer>
+  );
+}
+export default Recovery;
+
+type RecoveryMethod = {
+  type: RecoveryMethodType;
+  title: () => string;
+  testId: string;
+  description: () => string;
+  isDangerous?: boolean;
+};
+
+const recoveryMethods: RecoveryMethod[] = [
+  {
+    type: "key",
+    testId: "step-recovery-key",
+    title: () => strings.recoveryKeyMethod(),
+    description: () => strings.recoveryKeyMethodDesc()
+  },
+  {
+    type: "reset",
+    testId: "step-reset-account",
+    title: () => strings.clearDataAndResetMethod(),
+    description: () => strings.clearDataAndResetMethodDesc(),
+    isDangerous: true
+  }
+];
+
+function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
+  const { navigate, user } = props;
+  const [selected, setSelected] = useState(0);
+
+  if (isSessionExpired()) {
+    navigate("new");
+    return null;
+  }
+
+  return (
+    <RecoveryForm
+      testId="step-recovery-methods"
+      type="methods"
+      title={strings.chooseRecoveryMethod()}
+      subtitle={strings.chooseRecoveryMethodDesc()}
+      onSubmit={async () => {
+        const selectedMethod = recoveryMethods[selected].type;
+        navigate(`method:${selectedMethod}`, {
+          userResetRequired: selectedMethod === "reset"
+        });
+      }}
+    >
+      {recoveryMethods.map((method, index) => (
+        <Flex
+          key={method.testId}
+          testID={method.testId}
+          sx={{
+            alignItems: "center",
+            px: "spacing5",
+            py: "spacing6",
+            border: "1px solid",
+            borderColor: index === selected ? "accent" : "border",
+            bg: index === selected ? "background-selected" : "background",
+            borderRadius: "radius2",
+            cursor: "pointer",
+            mt: index === 0 ? 0 : "spacing4"
+          }}
+          onPress={() => setSelected(index)}
+        >
+          <Flex
+            sx={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "space-between",
+              minWidth: 0,
+              gap: "spacing4"
+            }}
+          >
+            <Flex sx={{ gap: "spacing3", alignItems: "flex-start" }}>
+              <Flex
+                sx={{
+                  bg: "background-secondary",
+                  borderRadius: 5,
+                  width: 30,
+                  height: 30,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}
+              >
+                {method.type === "key" ? (
+                  <KeyIcon size={15} color="icon" />
+                ) : (
+                  <Trash size={15} color="icon-error" />
+                )}
+              </Flex>
+              <Flex
+                sx={{
+                  flexDirection: "column",
+                  gap: "spacing3",
+                  flex: 1,
+                  minWidth: 0
+                }}
+              >
+                <Text
+                  variant={"body"}
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "sm",
+                    color: "heading",
+                    whiteSpace: "nowrap"
+                  }}
+                >
+                  {method.title()}
+                </Text>
+                <Text
+                  variant={"body"}
+                  sx={{
+                    fontWeight: 400,
+                    fontSize: "xs",
+                    color: "paragraph",
+                    lineHeight: 1.3
+                  }}
+                >
+                  {method.description()}
+                </Text>
+              </Flex>
+            </Flex>
+            <Radio
+              checked={index === selected}
+              onChange={() => setSelected(index)}
+              sx={{ flexShrink: 0, ml: 10 }}
+            />
+          </Flex>
+        </Flex>
+      ))}
+      <SubmitButton text={strings.continue()} />
+      <AuthenticatedAsCard user={user} />
+    </RecoveryForm>
+  );
+}
+
+function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
+  const { navigate, formData, user } = props;
+
+  return (
+    <RecoveryForm
+      testId="step-recovery-key"
+      type="method:key"
+      title={strings.accountRecovery()}
+      subtitle={strings.accountRecoveryWithKey()}
+      onSubmit={async (form) => {
+        const user = await db.user.getUser();
+        if (!user) throw new Error(strings.notLoggedIn());
+
+        const recoveryKey = form.recoveryKey;
+        if (
+          !(await db
+            .storage()
+            .encrypt({ key: recoveryKey, salt: user.salt }, "test")
+            .then(() => true)
+            .catch(() => false))
+        ) {
+          throw new Error(strings.invalidRecoveryKey());
+        }
+
+        await db.user.verifyEncryptionKey({
+          key: recoveryKey,
+          salt: user.salt
+        });
+
+        navigate("new", form);
+      }}
+    >
+      <AuthField
+        id="recoveryKey"
+        type="password"
+        label={strings.enterRecoveryKey()}
+        autoFocus
+        defaultValue={formData?.recoveryKey || ""}
+      />
+      <SubmitButton text={strings.continue()} />
+
+      <AuthenticatedAsCard user={user} />
+      <Button
+        variant="secondary"
+        onPress={() => navigate("methods")}
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "spacing7",
+          p: "spacing5",
+          mt: "spacing6",
+          borderRadius: "radius2",
+          width: "100%"
+        }}
+      >
+        <Flex sx={{ alignItems: "center", gap: "spacing4", flex: 1 }}>
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              width: 32,
+              height: 32,
+              bg: "background-tertiary",
+              borderRadius: "radius1"
+            }}
+          >
+            <KeyIcon size={15} color="icon" />
+          </Flex>
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              textAlign: "left"
+            }}
+          >
+            Don’t have account recovery key?
+          </Text>
+        </Flex>
+        <CaretRight size={13} color="icon" />
+      </Button>
+    </RecoveryForm>
+  );
+}
+
+function NewPassword(props: BaseRecoveryComponentProps<"new">) {
+  const { navigate, formData, user } = props;
+
+  return (
+    <RecoveryForm
+      testId="step-new-password"
+      type="new"
+      title={strings.resetAccountPassword()}
+      subtitle={strings.accountPassDesc()}
+      onSubmit={async (form) => {
+        const user = await db.user.getUser();
+        if (!user) throw new Error(strings.notLoggedIn());
+
+        if (form.password !== form.confirmPassword)
+          throw new Error(strings.passwordNotMatched());
+
+        if (formData?.userResetRequired) {
+          if (!(await db.user.resetPasswordWithoutRecoveryKey(form.password)))
+            throw new Error(strings.couldNotResetAccountPassword());
+
+          navigate("final");
+          return;
+        }
+
+        if (!formData?.recoveryKey)
+          throw new Error(strings.recoveryKeyRequired());
+
+        if (
+          !(await db.user.resetPassword({
+            encryptionKey: { key: formData?.recoveryKey, salt: user.salt },
+            newPassword: form.password
+          }))
+        )
+          throw new Error(strings.couldNotResetAccountPassword());
+
+        navigate("final");
+      }}
+    >
+      {(form, options) => (
+        <>
+          <AuthField
+            id="password"
+            type="password"
+            label={strings.newPassword()}
+            defaultValue={form?.password}
+          />
+          <AuthField
+            id="confirmPassword"
+            type="password"
+            label={strings.confirmPassword()}
+            defaultValue={form?.confirmPassword}
+          />
+          <SubmitButton
+            loading={options?.loading}
+            text={
+              options?.loading
+                ? strings.resettingAccountPassword()
+                : strings.continue()
+            }
+          />
+          <AuthenticatedAsCard user={user} />
+        </>
+      )}
+    </RecoveryForm>
+  );
+}
+
+function Final() {
+  const [recoveryKey, setRecoveryKey] = useState<string>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    db.user
+      .getMasterKey()
+      .then((key) => setRecoveryKey(key?.key))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const handleGoToLogin = async () => {
+    if (isSessionExpired()) {
+      openURL("/sessionexpired");
+    } else {
+      await db.user.clearSessions(true);
+      openURL("/login");
+    }
+  };
+
+  if (isLoading)
+    return (
+      <Loader
+        title={strings.gettingEncryptionKey()}
+        text={strings.pleaseWait()}
+      />
+    );
+
+  return (
+    <RecoveryForm
+      testId="step-new-password"
+      type="new"
+      title={""}
+      subtitle={<></>}
+      onSubmit={async () => undefined}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing8",
+          alignItems: "center"
+        }}
+      >
+        <Flex
+          sx={{
+            flexDirection: "column",
+            gap: "spacing6",
+            alignItems: "center",
+            bg: "background",
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "radius4",
+            p: "spacing7",
+            boxShadow: "menu",
+            width: "100%"
+          }}
+        >
+          <CheckCircle size={40} color="accent" />
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "spacing3",
+              alignItems: "center",
+              width: "100%"
+            }}
+          >
+            <Text
+              sx={{
+                fontSize: "md",
+                fontWeight: 600,
+                color: "heading",
+                whiteSpace: "nowrap"
+              }}
+            >
+              {strings.passwordResetSuccessful()}
+            </Text>
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph",
+                fontWeight: 400,
+                textAlign: "center",
+                lineHeight: 1.4
+              }}
+            >
+              {strings.yourPasswordHasBeenUpdated()}
+            </Text>
+          </Flex>
+          <SaveRecoveryKey recoveryKey={recoveryKey} />
+        </Flex>
+
+        <Button
+          variant="new_accent"
+          onPress={handleGoToLogin}
+          sx={{
+            width: "100%"
+          }}
+        >
+          {strings.goToLogin()}
+        </Button>
+      </Flex>
+    </RecoveryForm>
+  );
+}
+
+function AuthenticatedAsCard({ user }: { user: User }) {
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "spacing4",
+        p: "spacing5",
+        mt: "spacing6",
+        bg: "background-secondary",
+        borderRadius: "radius2"
+      }}
+    >
+      <Flex sx={{ alignItems: "center", gap: "spacing3", minWidth: 0 }}>
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            width: 32,
+            height: 32,
+            bg: "background-tertiary",
+            borderRadius: "radius1"
+          }}
+        >
+          <CheckIcon size={15} color="icon" />
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3", minWidth: 0 }}>
+          <Text
+            sx={{
+              color: "heading",
+              fontSize: "sm",
+              fontWeight: 500,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            Authenticated as {user.email}
+          </Text>
+          <Text sx={{ color: "paragraph", fontSize: "xs", lineHeight: 1 }}>
+            {strings.rememberedYourPassword()}
+          </Text>
+        </Flex>
+      </Flex>
+      <Button
+        variant="new_anchor"
+        onPress={() => openURL("/login")}
+        sx={{
+          flexShrink: 0,
+          color: "accent",
+          fontSize: "xs",
+          fontWeight: 500,
+          p: 0,
+          textDecorationLine: "none"
+        }}
+      >
+        {strings.logIn()}
+      </Button>
+    </Flex>
+  );
+}
+
+function RecoveryForm<T extends RecoveryRoutes>(
+  props: AuthFormContainerProps<T, RecoveryFormData>
+) {
+  return <AuthFormContainer {...props} />;
+}
+
+function openURL(url: string) {
+  hardNavigate(url);
+}
+
+function isSessionExpired() {
+  return Config.get("sessionExpired", false);
 }

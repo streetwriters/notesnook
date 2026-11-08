@@ -26,7 +26,7 @@ import { db } from "../../../common/db";
 import { writeToClipboard } from "../../../utils/clipboard";
 import { showToast } from "../../../utils/toast";
 import { TaskManager } from "../../../common/task-manager";
-import { ErrorText } from "../../components/error-text";
+import { ErrorText } from "../../../components/error-text";
 
 type Column = { id: string; title: string; width: number };
 

@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useRef, useState, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
 import type { GroupingKey } from "@notesnook/core";
+import { usePromise } from "@notesnook/common";
 import { Box, Button, Flex, Input, Text } from "@ui";
+import { showGroupOptionsMenu } from "../group-header";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
@@ -90,16 +92,29 @@ function useGroupingState(
       : noteContext?.type === "archive"
       ? "archive"
       : "notes";
+  const refresh =
+    type === "reminders"
+      ? useReminderStore.getState().refresh
+      : type === "trash"
+      ? useTrashStore.getState().refresh
+      : routeKey === "home"
+      ? useNoteStore.getState().refresh
+      : useNoteStore.getState().refreshContext;
+  const context =
+    type === "notebook" || type === "notes" ? noteContext : undefined;
   const canToggleView =
     groupingKey === "home" ||
     groupingKey === "notes" ||
     groupingKey === "favorites" ||
     groupingKey === "archive";
-  return { groupingKey, canToggleView };
+  return { groupingKey, refresh, context, canToggleView };
 }
 
 function HeaderActions(props: {
   groupingKey: GroupingKey;
+  refresh: () => void;
+  isSearching: boolean;
+  context: Context | undefined;
   canToggleView: boolean;
   viewMode: "compact" | "detailed" | undefined;
   setViewMode: (viewMode: "compact" | "detailed") => void;
@@ -131,6 +146,13 @@ function HeaderActions(props: {
         <Button
           testID={`${groupingKey}-sort-button`}
           variant="tertiary"
+          title={strings.groupAndSort()}
+          onPress={() =>
+            showGroupOptionsMenu(groupingKey, props.refresh, {
+              isSearching: props.isSearching,
+              context: props.context
+            })
+          }
           sx={{ p: 0 }}
         >
           <Sliders size={15} />
@@ -154,14 +176,20 @@ function HeaderActions(props: {
 
 function Header(props: RouteContainerProps) {
   const { type, routeKey } = props;
-  const title = typeof props.title === "string" ? props.title : undefined;
+  const titlePromise = usePromise<string | undefined>(
+    () => (typeof props.title === "string" ? props.title : props.title?.()),
+    [props.title]
+  );
+  const title =
+    titlePromise.status === "fulfilled" ? titlePromise.value : undefined;
+  const isSearching = useSearchStore((store) => store.isSearching);
   const query = useSearchStore((store) => store.query);
   const [inputKey, setInputKey] = useState(0);
   const noteContext = useNoteStore((store) => store.context);
   const viewMode = useNoteStore((store) => store.viewMode);
   const setViewMode = useNoteStore((store) => store.setViewMode);
   const hasItems = useHasItems(type, routeKey);
-  const { groupingKey, canToggleView } = useGroupingState(
+  const { groupingKey, refresh, context, canToggleView } = useGroupingState(
     type,
     routeKey,
     noteContext
@@ -209,6 +237,9 @@ function Header(props: RouteContainerProps) {
             {type !== "notFound" ? (
               <HeaderActions
                 groupingKey={groupingKey}
+                refresh={refresh}
+                isSearching={isSearching}
+                context={context}
                 canToggleView={canToggleView}
                 viewMode={viewMode}
                 setViewMode={setViewMode}
@@ -304,6 +335,19 @@ function Header(props: RouteContainerProps) {
                 }}
               />
             </Flex>
+            {type === "notebook" ? (
+              <HeaderActions
+                groupingKey={groupingKey}
+                refresh={refresh}
+                isSearching={isSearching}
+                context={context}
+                canToggleView={canToggleView}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                routeButton={props.buttons}
+                hasItems={hasItems}
+              />
+            ) : null}
           </Flex>
         )}
       </Flex>

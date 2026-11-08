@@ -24,7 +24,7 @@ import { Clock, Refresh } from "../components/icons";
 import { getFormattedReminderTime, usePromise } from "@notesnook/common";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { IconTag } from "./components/icon-tag";
+import IconTag from "../components/icon-tag";
 import { NoteReference } from "./components/note-reference";
 
 export type ReminderPreviewDialogProps = BaseDialogProps<false> & {
