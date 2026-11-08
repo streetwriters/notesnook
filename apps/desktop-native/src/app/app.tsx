@@ -26,6 +26,7 @@ import {
   ThemeScope,
   TitleBar,
   type SplitPaneHandle,
+  PopoverHost,
   type UIElement
 } from "@ui";
 import { ActionBar } from "./components/action-bar";
@@ -144,6 +145,7 @@ export function App(props: { titleBarInset?: number }) {
       <StatusBar />
       <MenuHost />
       <DialogHost />
+      <PopoverHost />
     </Flex>
   );
 }

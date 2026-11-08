@@ -31,4 +31,6 @@ export interface Lifecycle {
   isOnline(): boolean;
   waitForInternet(): Promise<boolean>;
   startIdleDetection(ms: number, onTrigger: () => void): Unsubscribe;
+  restart(): Promise<void>;
+  reload(): void;
 }
