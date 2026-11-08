@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useEffect } from "react";
 import { View } from "react-native";
 import type * as Contract from "../../../ui/dialog";
 import { Close, Loading } from "../../../app/components/icons";
@@ -69,7 +70,13 @@ export function Dialog(props: Contract.DialogProps) {
       ...props.sx
     } as never
   });
-  if (props.isOpen === false) return null;
+  const isOpen = props.isOpen !== false;
+  const onOpen = props.onOpen;
+  useEffect(() => {
+    if (isOpen) onOpen?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+  if (!isOpen) return null;
 
   return (
     <ThemeScope scope="dialog">
