@@ -46,6 +46,7 @@ import { FeatureCaption } from "./feature-caption";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { getCurrencySymbol } from "../../common/currencies";
 import { DialogManager } from "../../common/dialog-manager";
+import Accordion from "../../components/accordion";
 
 type PlansListProps = {
   selectedPlan?: string | null;
@@ -810,5 +811,52 @@ export function ComparePlans() {
 }
 
 export function Footer() {
-  return null;
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing13",
+        p: "spacing14",
+        alignItems: "center"
+      }}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing6",
+          alignItems: "center"
+        }}
+      >
+        <Text variant="heading" sx={{ fontSize: "2xl", textAlign: "center" }}>
+          {strings.frequentlyAskedQuestions()}
+        </Text>
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "sm",
+            color: "paragraph",
+            textAlign: "center",
+            lineHeight: 1.5
+          }}
+        >
+          {strings.faqDescription()}
+        </Text>
+      </Flex>
+      <Flex sx={{ flexDirection: "column", gap: "spacing6", width: "100%" }}>
+        {strings.checkoutFaqs.map((faq, index) => (
+          <Accordion
+            key={faq.question()}
+            title={faq.question()}
+            isClosed={index !== 0}
+            variant="faq"
+            titleSx={{ fontSize: "lg" }}
+          >
+            <Text sx={{ fontSize: "sm", color: "paragraph", lineHeight: 1.5 }}>
+              {faq.answer()}
+            </Text>
+          </Accordion>
+        ))}
+      </Flex>
+    </Flex>
+  );
 }
