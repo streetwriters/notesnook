@@ -23,7 +23,8 @@ const CJS_PACKAGES = new Set([
   "@notesnook/logger",
   "@notesnook/theme",
   "@notesnook/intl",
-  "@streetwriters/kysely"
+  "@streetwriters/kysely",
+  "@zip.js/zip.js"
 ]);
 
 module.exports = mergeConfig(base, {
