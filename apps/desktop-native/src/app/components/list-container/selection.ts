@@ -21,6 +21,8 @@ import { createContext, useContext } from "react";
 import type { PressEvent } from "@ui";
 
 export type ListSelection = {
+  focusedIndex: number;
+  register: (index: number, open: () => void) => () => void;
   onItemPress: (
     index: number,
     id: string,

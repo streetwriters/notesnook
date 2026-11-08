@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Item } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import {
@@ -93,7 +93,21 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
       ? store.selectedItems.length > 1 && isInSelection
       : isInSelection;
   });
+  const isCursor =
+    selection !== undefined &&
+    props.index !== undefined &&
+    selection.focusedIndex === props.index;
   const selected = isSelected || isFocused || isMenuTarget;
+
+  const onPressRef = useRef(props.onPress);
+  onPressRef.current = props.onPress;
+  useEffect(() => {
+    if (!selection || props.index === undefined) return;
+    return selection.register(props.index, () =>
+      onPressRef.current?.(undefined as never)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection, props.index]);
 
   const openContextMenu = async (event: ContextMenuEvent) => {
     event.preventDefault();
@@ -158,7 +172,11 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
         maxWidth: "100%",
         overflow: "hidden",
         opacity: isDisabled ? 0.7 : 1,
-        bg: selected ? colors.backgroundSelected : colors.background,
+        bg: selected
+          ? colors.backgroundSelected
+          : isCursor
+          ? "hover"
+          : colors.background,
         ":hover": { bg: selected ? "hover-selected" : "hover" },
         ...props.sx
       }}

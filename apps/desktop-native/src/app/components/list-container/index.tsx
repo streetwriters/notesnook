@@ -32,13 +32,13 @@ import {
   Button,
   Flex,
   VirtualList,
-  type KeyEvent,
   type PressEvent,
   type SxProp,
   type VirtualListHandle
 } from "@ui";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { store as selectionStore } from "../../stores/selection-store";
+import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 import { ListSelectionContext, type ListSelection } from "./selection";
 import GroupHeader from "../group-header";
 import Announcements from "../announcements";
@@ -75,8 +75,8 @@ type ListContainerProps = {
 export default function ListContainer(props: ListContainerProps) {
   const { type, group, items, context, header, compact, isSearching } = props;
   const list = useRef<VirtualListHandle>(null);
-  const anchor = useRef<number | undefined>(undefined);
-  const focused = useRef(0);
+  const openers = useRef(new Map<number, () => void>());
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
   useEffect(() => {
@@ -101,89 +101,70 @@ export default function ListContainer(props: ListContainerProps) {
     };
   }, []);
 
-  const selectRange = useCallback(
-    async (from: number, to: number) => {
-      const ids = await items.ids();
-      const [start, end] = from <= to ? [from, to] : [to, from];
-      selectionStore.setSelectedItems(ids.slice(start, end + 1));
-    },
+  const idAt = useCallback(
+    (index: number) => items.cacheItem(index)?.item?.id,
     [items]
   );
 
+  const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
+    length: items.length,
+    reset: () => selectionStore.toggleSelectionMode(false),
+    deselect: (index) => {
+      const id = idAt(index);
+      if (id) selectionStore.deselectItem(id);
+    },
+    select: (index, toggleable) => {
+      const id = idAt(index);
+      if (!id) return;
+      if (toggleable && selectionStore.isSelected(id))
+        selectionStore.deselectItem(id);
+      else selectionStore.selectItem(id);
+    },
+    bulkSelect: async (indices) => {
+      const ids =
+        indices.length === items.length
+          ? await items.ids()
+          : (indices.map((i) => idAt(i)).filter(Boolean) as string[]);
+      selectionStore.setSelectedItems(ids);
+    },
+    focusItemAt: (index) => {
+      setFocusedIndex(index);
+      list.current?.scrollToIndex({ index });
+    },
+    skip: () => false,
+    open: (index) => openers.current.get(index)?.()
+  });
+
   const selection = useMemo<ListSelection>(
     () => ({
+      focusedIndex,
+      register: (index, open) => {
+        openers.current.set(index, open);
+        return () => {
+          if (openers.current.get(index) === open)
+            openers.current.delete(index);
+        };
+      },
       onItemPress: (
         index: number,
-        id: string,
+        _id: string,
         event: PressEvent,
         open: () => void
       ) => {
-        focused.current = index;
-        if (event.shiftKey && anchor.current !== undefined) {
-          selectionStore.toggleSelectionMode(true);
-          selectRange(anchor.current, index);
-          return;
-        }
-        if (event.metaKey || event.ctrlKey) {
-          anchor.current = index;
-          if (!selectionStore.get().isSelectionMode)
-            selectionStore.toggleSelectionMode(true);
-          if (selectionStore.isSelected(id)) selectionStore.deselectItem(id);
-          else selectionStore.selectItem(id);
-          return;
-        }
-        anchor.current = index;
-        selectionStore.toggleSelectionMode(false);
-        open();
+        onMouseUp(
+          {
+            button: event.button,
+            ctrlKey: event.ctrlKey,
+            metaKey: event.metaKey,
+            shiftKey: event.shiftKey
+          },
+          index
+        );
+        setFocusedIndex(index);
+        if (!event.metaKey && !event.shiftKey && !event.ctrlKey) open();
       }
     }),
-    [selectRange]
-  );
-
-  const onKeyDown = useCallback(
-    (event: KeyEvent) => {
-      const last = items.length - 1;
-      const move = (to: number) => {
-        const index = Math.max(0, Math.min(last, to));
-        focused.current = index;
-        list.current?.scrollToIndex({ index, align: "center" });
-        if (event.shiftKey) {
-          if (anchor.current === undefined) anchor.current = index;
-          selectionStore.toggleSelectionMode(true);
-          selectRange(anchor.current, index);
-        } else {
-          anchor.current = index;
-          selectionStore.toggleSelectionMode(true);
-          items.ids().then((ids) => {
-            const id = ids[index];
-            if (id) selectionStore.setSelectedItems([id]);
-          });
-        }
-        event.preventDefault();
-      };
-      switch (event.key) {
-        case "ArrowDown":
-          return move(focused.current + 1);
-        case "ArrowUp":
-          return move(focused.current - 1);
-        case "Home":
-          return move(0);
-        case "End":
-          return move(last);
-        case "Escape":
-          selectionStore.toggleSelectionMode(false);
-          anchor.current = undefined;
-          return;
-        case "a":
-          if (event.metaKey || event.ctrlKey) {
-            selectionStore.toggleSelectionMode(true);
-            selectRange(0, last);
-            event.preventDefault();
-          }
-          return;
-      }
-    },
-    [items, selectRange]
+    [onMouseUp, focusedIndex]
   );
 
   const renderItem = useCallback(
@@ -270,7 +251,10 @@ export default function ListContainer(props: ListContainerProps) {
           ref={list}
           testID="virtual-list"
           onKeyDown={onKeyDown}
-          onBlur={() => setFocusedGroupIndex(-1)}
+          onBlur={() => {
+            setFocusedGroupIndex(-1);
+            setFocusedIndex(-1);
+          }}
           count={items.length}
           itemKey={itemKey}
           renderItem={renderItem}
