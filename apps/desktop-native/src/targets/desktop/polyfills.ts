@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "react-native-url-polyfill/auto";
+import "web-streams-polyfill/polyfill";
 import { Buffer } from "buffer";
 
 if (!globalThis.Buffer) globalThis.Buffer = Buffer;

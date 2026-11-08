@@ -84,6 +84,7 @@
     "snarkdown": "^2.0.0",
     "url": "^0.11.4",
     "w3c-keyname": "^2.2.8",
+    "web-streams-polyfill": "^4.2.0",
     "wouter": "2.12.1",
     "xxhashjs": "^0.2.2",
     "zustand": "^4.5.5",
