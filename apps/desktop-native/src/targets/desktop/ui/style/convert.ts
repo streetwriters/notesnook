@@ -150,6 +150,67 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
 
 const SIDES = ["Top", "Right", "Bottom", "Left"];
 
+const FLEX_NUMBER = /^-?\d*\.?\d+$/;
+
+function flexBasis(token: string): number | string | undefined {
+  if (token === "auto" || token === "content") return "auto";
+  const px = PX.exec(token);
+  if (px) return parseFloat(px[1]);
+  if (/^-?\d*\.?\d+%$/.test(token)) return token;
+  if (token === "0") return 0;
+  return undefined;
+}
+
+export function expandFlex(
+  value: unknown
+): Record<string, unknown> | undefined {
+  if (typeof value === "number")
+    return { flexGrow: value, flexShrink: 1, flexBasis: "0%" };
+  if (typeof value !== "string") return undefined;
+  const tokens = value.trim().split(/\s+/);
+  if (tokens.length === 1) {
+    const [token] = tokens;
+    if (token === "none")
+      return { flexGrow: 0, flexShrink: 0, flexBasis: "auto" };
+    if (token === "auto")
+      return { flexGrow: 1, flexShrink: 1, flexBasis: "auto" };
+    if (token === "initial")
+      return { flexGrow: 0, flexShrink: 1, flexBasis: "auto" };
+    if (FLEX_NUMBER.test(token))
+      return { flexGrow: parseFloat(token), flexShrink: 1, flexBasis: "0%" };
+    const basis = flexBasis(token);
+    if (basis === undefined) return undefined;
+    return { flexGrow: 1, flexShrink: 1, flexBasis: basis };
+  }
+  if (tokens.length === 2) {
+    if (!FLEX_NUMBER.test(tokens[0])) return undefined;
+    const grow = parseFloat(tokens[0]);
+    if (FLEX_NUMBER.test(tokens[1]))
+      return {
+        flexGrow: grow,
+        flexShrink: parseFloat(tokens[1]),
+        flexBasis: "0%"
+      };
+    const basis = flexBasis(tokens[1]);
+    if (basis === undefined) return undefined;
+    return { flexGrow: grow, flexShrink: 1, flexBasis: basis };
+  }
+  if (
+    tokens.length === 3 &&
+    FLEX_NUMBER.test(tokens[0]) &&
+    FLEX_NUMBER.test(tokens[1])
+  ) {
+    const basis = flexBasis(tokens[2]);
+    if (basis === undefined) return undefined;
+    return {
+      flexGrow: parseFloat(tokens[0]),
+      flexShrink: parseFloat(tokens[1]),
+      flexBasis: basis
+    };
+  }
+  return undefined;
+}
+
 export function convertDeclarations(
   declarations: Declarations
 ): ConvertedStyle {
@@ -167,6 +228,12 @@ export function convertDeclarations(
         if (value === "none") style.display = "none";
         else if (value === "flex") isFlex = true;
         continue;
+      case "flex": {
+        const expanded = expandFlex(value);
+        if (expanded) Object.assign(style, expanded);
+        else style.flex = value;
+        continue;
+      }
       case "textOverflow":
         ellipsis = value === "ellipsis";
         continue;

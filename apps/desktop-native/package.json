@@ -15,7 +15,8 @@
     "parity": "node tools/parity/run.mjs",
     "check:testids": "node tools/check-testids.mjs",
     "gen:assets": "node tools/gen-assets.mjs",
-    "tsc:web": "tsc --noEmit -p src/targets/web/tsconfig.json"
+    "tsc:web": "tsc --noEmit -p src/targets/web/tsconfig.json",
+    "test:unit": "vitest run --config vitest.unit.config.ts"
   },
   "dependencies": {
     "@ammarahmed/react-native-sodium": "file:../../../../../Projects/react-native/gpui-modules/tgz/ammarahmed-react-native-sodium-2.0.0-alpha.2.tgz",
