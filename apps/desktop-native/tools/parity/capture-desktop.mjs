@@ -88,10 +88,13 @@ try {
     }
     if (step.clickText) {
       const entry = (await app.query("testID", "title", true)).find(
-        (candidate) => candidate.text === step.clickText
+        (candidate) =>
+          candidate.text === step.clickText &&
+          (step.in !== "nav" || candidate.frame.x < 250)
       );
       await app.click(entry.tag);
     }
+    if (step.press) await app.press(step.press);
     if (step.hover) await app.hover((await locate(step.hover)).tag);
     await new Promise((resolve) => setTimeout(resolve, 800));
     await app.waitForIdle();

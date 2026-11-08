@@ -175,4 +175,106 @@ scenarios.settingsAppearance = {
   ]
 };
 
+const openSettings = [
+  { click: "profile-dropdown" },
+  { click: "menu-button-settings" }
+];
+
+const SETTINGS_SECTIONS = {
+  settingsProfile: "Profile",
+  settingsBehaviour: "Behaviour",
+  settingsEditor: "Editor",
+  settingsDesktopIntegration: "Desktop integration",
+  settingsNotifications: "Notifications",
+  settingsServers: "Servers",
+  settingsBackupExport: "Backup & export",
+  settingsImporter: "Notesnook Importer",
+  settingsAppLock: "App lock",
+  settingsVault: "Vault",
+  settingsPrivacy: "Privacy",
+  settingsLegal: "Legal",
+  settingsSupport: "Help and support",
+  settingsAbout: "About"
+};
+
+for (const [name, title] of Object.entries(SETTINGS_SECTIONS))
+  scenarios[name] = {
+    ...scenarios.shell,
+    steps: [...openSettings, { clickText: title }]
+  };
+
+scenarios.settingsFirstSection = {
+  ...scenarios.shell,
+  steps: openSettings
+};
+
+scenarios.settingsSearch = {
+  ...scenarios.shell,
+  steps: [...openSettings, { type: { id: "settings-search", text: "theme" } }]
+};
+
+scenarios.settingsEscape = {
+  ...scenarios.shell,
+  steps: [...openSettings, { press: "escape" }]
+};
+
+scenarios.dialogAddNotebook = {
+  ...scenarios.shell,
+  steps: [{ click: "tab-notebooks" }, { click: "create-notebook-button" }]
+};
+
+scenarios.dialogAddNotebookFilled = {
+  ...scenarios.shell,
+  steps: [
+    { click: "tab-notebooks" },
+    { click: "create-notebook-button" },
+    { type: { id: "title-input", text: "Projects" } }
+  ]
+};
+
+scenarios.dialogAddNotebookEscape = {
+  ...scenarios.shell,
+  steps: [
+    { click: "tab-notebooks" },
+    { click: "create-notebook-button" },
+    { press: "escape" }
+  ]
+};
+
+scenarios.dialogCreateTag = {
+  ...scenarios.shell,
+  steps: [{ click: "tab-tags" }, { click: "create-tag-button" }]
+};
+
+scenarios.dialogCreateTagFilled = {
+  ...scenarios.shell,
+  steps: [
+    { click: "tab-tags" },
+    { click: "create-tag-button" },
+    { type: { id: "title-input", text: "groceries" } }
+  ]
+};
+
+scenarios.dialogAddReminder = {
+  ...scenarios.shell,
+  steps: [
+    { clickText: "Reminders", in: "nav" },
+    { click: "reminders-action-button" }
+  ]
+};
+
+scenarios.dialogAddReminderRepeat = {
+  ...scenarios.dialogAddReminder,
+  steps: [
+    { clickText: "Reminders", in: "nav" },
+    { click: "reminders-action-button" },
+    { click: "mode-repeat" }
+  ]
+};
+
+scenarios.dialogCommandPalette = {
+  ...scenarios.shell,
+  steps: [{ click: "command-palette" }]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

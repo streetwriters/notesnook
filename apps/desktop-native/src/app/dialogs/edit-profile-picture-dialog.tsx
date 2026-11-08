@@ -18,8 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Button, Dialog, Flex, Slider, Text } from "@ui";
-import { AvatarEditor, type AvatarEditorRef } from "./components/avatar-editor";
+import {
+  AvatarEditor,
+  Button,
+  Dialog,
+  Flex,
+  Slider,
+  Text,
+  type AvatarEditorHandle
+} from "@ui";
+
 import { Profile } from "@notesnook/core";
 import { User } from "../components/icons";
 import { showFilePicker } from "../utils/file-picker";
@@ -57,7 +65,7 @@ export const EditProfilePictureDialog = DialogManager.register(
       profile?.profilePicture
     );
     const [picked, setPicked] = useState<string>();
-    const profileRef = useRef<AvatarEditorRef>(null);
+    const profileRef = useRef<AvatarEditorHandle>(null);
     const [scale, setScale] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [clearProfilePicture, setClearProfilePicture] = useState(false);

@@ -27,7 +27,7 @@ import { CalendarDots } from "../../components/icons";
 import { setDateOnly } from "../../utils/date-time";
 import { DayPicker } from "../../components/day-picker";
 import { Field } from "./field";
-import { InlinePopup } from "./inline-popup";
+import { AnchoredPopover } from "./anchored-popover";
 
 dayjs.extend(customParseFormat);
 
@@ -61,7 +61,7 @@ export function DateField(props: {
         defaultValue={props.date.format(db.settings.getDateFormat())}
         onChangeText={(text) => props.onChange((d) => setDateOnly(text, d))}
       />
-      <InlinePopup
+      <AnchoredPopover
         isOpen={showCalendar}
         onClose={() => setShowCalendar(false)}
         anchorRef={anchorRef}
@@ -78,7 +78,7 @@ export function DateField(props: {
             setShowCalendar(false);
           }}
         />
-      </InlinePopup>
+      </AnchoredPopover>
     </Flex>
   );
 }
