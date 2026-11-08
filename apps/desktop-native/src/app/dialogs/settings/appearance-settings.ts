@@ -22,6 +22,7 @@ import { environment } from "@platform";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import type { SettingsGroup } from "./types";
+import { ThemesSelector } from "./components/themes-selector";
 
 export const AppearanceSettings: SettingsGroup[] = [
   {
@@ -89,6 +90,11 @@ export const AppearanceSettings: SettingsGroup[] = [
             }
           }
         ]
+      },
+      {
+        key: "themes",
+        title: strings.selectTheme(),
+        components: [{ type: "custom", component: ThemesSelector }]
       }
     ]
   }

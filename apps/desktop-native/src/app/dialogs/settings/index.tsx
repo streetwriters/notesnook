@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { strings } from "@notesnook/intl";
 import { environment } from "@platform";
 import {
@@ -511,20 +511,12 @@ function SettingItem(props: { item: Setting }) {
                 return <SelectComponent key={index} {...component} />;
               case "input":
                 return component.inputType === "number" ? (
-                  <Input
+                  <NumberInput
                     key={component.defaultValue()}
-                    type="number"
-                    defaultValue={String(component.defaultValue())}
-                    onChangeText={(text) => {
-                      const value = Number(text);
-                      if (
-                        Number.isFinite(value) &&
-                        value >= component.min &&
-                        value <= component.max
-                      )
-                        component.onChange(value);
-                    }}
-                    sx={{ width: 80 }}
+                    min={component.min}
+                    max={component.max}
+                    defaultValue={component.defaultValue()}
+                    onChange={component.onChange}
                   />
                 ) : (
                   <Input
@@ -575,5 +567,67 @@ export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
         onSelectionChanged(value);
       }}
     />
+  );
+}
+
+function NumberInput(props: {
+  min: number;
+  max: number;
+  defaultValue: number;
+  onChange: (value: number) => void;
+}) {
+  const { min, max, defaultValue, onChange } = props;
+  const [isInputValid, setIsInputValid] = useState(true);
+  const [inputKey, setInputKey] = useState(0);
+  const text = useRef(String(defaultValue));
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const clampAndCommit = () => {
+    const raw = Number(text.current);
+    const clamped =
+      Number.isNaN(raw) || raw < min ? min : raw > max ? max : raw;
+    text.current = String(clamped);
+    setInputKey((k) => k + 1);
+    setIsInputValid(true);
+    onChange(clamped);
+  };
+
+  return (
+    <Flex sx={{ flexDirection: "column", alignItems: "flex-end" }}>
+      <Input
+        key={inputKey}
+        type="number"
+        defaultValue={text.current}
+        onChangeText={(value) => {
+          text.current = value;
+          if (timer.current) clearTimeout(timer.current);
+          timer.current = setTimeout(() => {
+            const number = Number(value);
+            const isValid =
+              value.trim() !== "" &&
+              !Number.isNaN(number) &&
+              number >= min &&
+              number <= max;
+            setIsInputValid(isValid);
+            if (isValid) onChange(number);
+          }, 500);
+        }}
+        onBlur={clampAndCommit}
+        sx={{
+          width: 80,
+          mr: 1,
+          outlineColor: isInputValid ? undefined : "accent-error",
+          outlineWidth: isInputValid ? undefined : 2
+        }}
+      />
+      {!isInputValid && (
+        <Text
+          variant="subBody"
+          sx={{ fontSize: 11, color: "paragraph-error", mt: 1, mr: 1 }}
+        >
+          {strings.valueMustBeBetween(min, max)}
+        </Text>
+      )}
+    </Flex>
   );
 }
