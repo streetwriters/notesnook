@@ -39,7 +39,8 @@ const app = await launchApp({
       ? []
       : scenario.notebooks ?? extras.notebooks,
     seedTags: scenario.noExtras ? [] : extras.tags,
-    seedColors: scenario.noExtras ? [] : extras.colors
+    seedColors: scenario.noExtras ? [] : extras.colors,
+    seedReminders: scenario.reminders ?? []
   },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-")),
@@ -94,6 +95,10 @@ try {
       );
       await app.click(entry.tag);
     }
+    if (step.rightClick)
+      await app.click((await locate(step.rightClick)).tag, {
+        button: "right"
+      });
     if (step.press) await app.press(step.press);
     if (step.hover) await app.hover((await locate(step.hover)).tag);
     await new Promise((resolve) => setTimeout(resolve, 800));

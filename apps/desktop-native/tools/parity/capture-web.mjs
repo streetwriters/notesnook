@@ -64,7 +64,7 @@ if (await offline.count()) {
   await page.waitForTimeout(10000);
 }
 await page.evaluate(
-  async ({ seed, scheme, extras, noExtras }) => {
+  async ({ seed, scheme, extras, noExtras, reminders }) => {
     const { db } = await import("/common/db.ts");
     const addNotebook = async (notebook, parentId) => {
       const id = await db.notebooks.add({ title: notebook.title });
@@ -82,13 +82,48 @@ await page.evaluate(
     if (!noExtras)
       for (const color of extras.colors)
         await db.colors.add({ title: color.title, colorCode: color.colorCode });
-    for (const note of seed)
-      await db.notes.add({
+    for (const note of seed) {
+      const id = await db.notes.add({
         title: note.title,
         content: { type: "tiptap", data: `<p>${note.content}</p>` },
         favorite: note.favorite,
         dateCreated: note.dateCreated,
         dateEdited: note.dateEdited
+      });
+      if (!id) continue;
+      if (note.pinned) await db.notes.pin(true, id);
+      if (note.archived) await db.notes.archive(true, id);
+      for (const title of note.tags ?? []) {
+        const tagId = await db.tags.add({ title });
+        if (tagId)
+          await db.relations.add(
+            { type: "tag", id: tagId },
+            { type: "note", id }
+          );
+      }
+      if (note.color) {
+        const colorId = await db.colors.add({
+          title: note.color,
+          colorCode: note.color
+        });
+        if (colorId)
+          await db.relations.add(
+            { type: "color", id: colorId },
+            { type: "note", id }
+          );
+      }
+      if (note.trashed) await db.notes.moveToTrash(id);
+    }
+    for (const reminder of reminders)
+      await db.reminders.add({
+        title: reminder.title,
+        description: reminder.description,
+        date: reminder.date ?? Date.now() + 24 * 60 * 60 * 1000,
+        mode: reminder.mode ?? "once",
+        recurringMode: reminder.recurringMode,
+        selectedDays: reminder.selectedDays ?? [],
+        priority: reminder.priority ?? "vibrate",
+        disabled: reminder.disabled ?? false
       });
     const { store } = await import("/stores/note-store.ts");
     await store.refresh();
@@ -101,7 +136,10 @@ await page.evaluate(
     seed,
     scheme,
     extras: { ...extras, notebooks: scenario.notebooks ?? extras.notebooks },
-    noExtras: !!scenario.noExtras
+    noExtras: !!scenario.noExtras,
+    reminders: (scenario.reminders ?? []).map((reminder) =>
+      typeof reminder === "function" ? reminder(Date.now()) : reminder
+    )
   }
 );
 await page.waitForTimeout(3000);
@@ -127,6 +165,7 @@ for (const step of scenario.steps ?? []) {
     await page.keyboard.type(step.type.text);
     await page.waitForTimeout(2500);
   }
+  if (step.rightClick) await target(step.rightClick).click({ button: "right" });
   if (step.press)
     await page.keyboard.press(
       { escape: "Escape", enter: "Enter" }[step.press] ?? step.press

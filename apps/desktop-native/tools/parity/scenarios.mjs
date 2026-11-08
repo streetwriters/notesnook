@@ -277,4 +277,216 @@ scenarios.dialogCommandPalette = {
   steps: [{ click: "command-palette" }]
 };
 
+const NOW_MS = Date.now();
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const viewSeed = (now) => [
+  {
+    title: "Pinned plan",
+    content: "A pinned and favorite note with a short body.",
+    pinned: true,
+    favorite: true,
+    tags: ["urgent"],
+    dateEdited: now - HOUR,
+    dateCreated: now - HOUR
+  },
+  {
+    title: "Grocery list",
+    content: "Milk, eggs and bread for the week.",
+    tags: ["ideas"],
+    color: "#f44336",
+    dateEdited: now - 2 * HOUR,
+    dateCreated: now - 2 * HOUR
+  },
+  {
+    title: "Travel itinerary",
+    content: "Flights and hotels for the trip.",
+    favorite: true,
+    dateEdited: now - 3 * DAY_MS,
+    dateCreated: now - 3 * DAY_MS
+  },
+  {
+    title: "Old archive",
+    content: "An archived note.",
+    archived: true,
+    dateEdited: now - 40 * DAY_MS,
+    dateCreated: now - 40 * DAY_MS
+  },
+  {
+    title: "Deleted draft",
+    content: "A trashed note.",
+    trashed: true,
+    dateEdited: now - 5 * DAY_MS,
+    dateCreated: now - 5 * DAY_MS
+  }
+];
+
+const viewReminders = [
+  {
+    title: "Pay rent",
+    description: "Monthly rent",
+    mode: "repeat",
+    recurringMode: "month",
+    selectedDays: [1],
+    date: NOW_MS + DAY_MS
+  },
+  { title: "Call mom", mode: "once", date: NOW_MS + 2 * DAY_MS },
+  {
+    title: "Dentist",
+    mode: "once",
+    date: NOW_MS + 7 * DAY_MS,
+    disabled: true
+  }
+];
+
+const views = {
+  ...scenarios.shell,
+  seed: viewSeed,
+  reminders: viewReminders
+};
+
+const navRoute = (title) => ({ clickText: title, in: "nav" });
+
+scenarios.viewNotes = { ...views };
+scenarios.viewFavorites = { ...views, steps: [navRoute("Favorites")] };
+scenarios.viewArchive = { ...views, steps: [navRoute("Archive")] };
+scenarios.viewTrash = { ...views, steps: [navRoute("Trash")] };
+scenarios.viewReminders = { ...views, steps: [navRoute("Reminders")] };
+scenarios.viewColor = { ...views, steps: [navRoute("Red")] };
+scenarios.viewTags = { ...views, steps: [{ click: "tab-tags" }] };
+scenarios.viewTagNotes = {
+  ...views,
+  steps: [{ click: "tab-tags" }, navRoute("urgent")]
+};
+scenarios.viewNotebooksList = { ...views, steps: [{ click: "tab-notebooks" }] };
+
+for (const [name, title] of Object.entries({
+  emptyFavorites: "Favorites",
+  emptyArchive: "Archive",
+  emptyTrash: "Trash",
+  emptyReminders: "Reminders",
+  emptyMonographs: "Monographs"
+}))
+  scenarios[name] = {
+    ...scenarios.shell,
+    seed: () => [],
+    noExtras: true,
+    steps: [navRoute(title)]
+  };
+
+scenarios.emptyNotebooks = {
+  ...scenarios.shell,
+  seed: () => [],
+  noExtras: true,
+  notebooks: [],
+  steps: [{ click: "tab-notebooks" }]
+};
+scenarios.emptyTags = {
+  ...scenarios.shell,
+  seed: () => [],
+  noExtras: true,
+  notebooks: [],
+  steps: [{ click: "tab-tags" }]
+};
+
+scenarios.sortMenuOpen = { ...views, steps: [{ click: "home-sort-button" }] };
+scenarios.groupByMenuOpen = {
+  ...views,
+  steps: [{ click: "home-sort-button" }, { click: "menu-button-groupBy" }]
+};
+scenarios.groupedByNone = {
+  ...views,
+  steps: [
+    { click: "home-sort-button" },
+    { click: "menu-button-groupBy" },
+    { click: "menu-button-none" }
+  ]
+};
+scenarios.sortedByTitle = {
+  ...views,
+  steps: [
+    { click: "home-sort-button" },
+    { click: "menu-button-sortBy" },
+    { click: "menu-button-title" }
+  ]
+};
+scenarios.orderAscending = {
+  ...views,
+  steps: [
+    { click: "home-sort-button" },
+    { click: "menu-button-sortDirection" },
+    { click: "menu-button-asc" }
+  ]
+};
+scenarios.jumpToGroupMenu = { ...views, steps: [{ click: "group-header" }] };
+scenarios.compactViewNotes = {
+  ...views,
+  steps: [{ click: "home-view-mode-button" }]
+};
+
+scenarios.contextMenuNote = {
+  ...views,
+  steps: [{ rightClick: { id: "list-item", nth: 1 } }]
+};
+scenarios.contextMenuNotebook = {
+  ...views,
+  steps: [
+    { click: "tab-notebooks" },
+    { rightClick: { id: "list-item", nth: 0 } }
+  ]
+};
+scenarios.contextMenuTag = {
+  ...views,
+  steps: [{ click: "tab-tags" }, { rightClick: { id: "list-item", nth: 0 } }]
+};
+scenarios.contextMenuReminder = {
+  ...views,
+  steps: [navRoute("Reminders"), { rightClick: { id: "list-item", nth: 0 } }]
+};
+scenarios.contextMenuTrash = {
+  ...views,
+  steps: [navRoute("Trash"), { rightClick: { id: "list-item", nth: 0 } }]
+};
+scenarios.contextMenuNavigationItem = {
+  ...views,
+  steps: [{ rightClick: { id: "navigation-item", nth: 0 } }]
+};
+
+for (const [name, prefix] of [
+  ["Note", []],
+  ["Reminder", [navRoute("Reminders")]],
+  ["Trash", [navRoute("Trash")]],
+  ["Notebook", [{ click: "tab-notebooks" }]],
+  ["Tag", [{ click: "tab-tags" }]]
+]) {
+  scenarios[`list${name}Selected`] = {
+    ...views,
+    steps: [...prefix, { click: { id: "list-item", nth: 0 } }]
+  };
+  scenarios[`list${name}Hover`] = {
+    ...views,
+    steps: [...prefix, { hover: { id: "list-item", nth: 0 } }],
+    keepPointer: true
+  };
+  scenarios[`list${name}Focus`] = {
+    ...views,
+    steps: [
+      ...prefix,
+      { click: { id: "list-item", nth: 0 } },
+      { press: "down" }
+    ]
+  };
+}
+
+scenarios.groupHeaderHover = {
+  ...views,
+  steps: [{ hover: { id: "group-header", nth: 0 } }],
+  keepPointer: true
+};
+
+scenarios.sidebarCustomizeMenu = {
+  ...views,
+  steps: [{ rightClick: { id: "navigation-item", nth: 1 } }]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;
