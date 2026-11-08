@@ -140,27 +140,8 @@ export interface StyledResult {
   nativeProps: Record<string, unknown>;
 }
 
-// TEMPORARY: press events carry no modifier keys in the runtime (RNGPUI_GAPS.md).
-let lastModifiers = { shift: false, ctrl: false, alt: false, meta: false };
-
-export function recordModifiers(event: any) {
-  const native = event?.nativeEvent ?? {};
-  lastModifiers = {
-    shift: !!native.shiftKey,
-    ctrl: !!native.ctrlKey,
-    alt: !!native.altKey,
-    meta: !!native.metaKey
-  };
-}
-
 function press(event: any): PressEvent {
-  const native = {
-    ...(event?.nativeEvent ?? {}),
-    shiftKey: lastModifiers.shift,
-    ctrlKey: lastModifiers.ctrl,
-    altKey: lastModifiers.alt,
-    metaKey: lastModifiers.meta
-  };
+  const native = event?.nativeEvent ?? {};
   return {
     button: "primary",
     detail: 1,

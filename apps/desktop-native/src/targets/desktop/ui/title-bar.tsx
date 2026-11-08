@@ -28,7 +28,10 @@ const AnyView = View as any;
 
 export const TITLE_BAR_HEIGHT = 45;
 
-export function TitleBar({ underlay = true }: Contract.TitleBarProps) {
+export function TitleBar({
+  underlay = true,
+  children
+}: Contract.TitleBarProps) {
   const { colors, definition } = useThemeContext();
   const { isFullscreen } = useWindowControls();
   const isMac = environment.os === "macOS";
@@ -40,7 +43,9 @@ export function TitleBar({ underlay = true }: Contract.TitleBarProps) {
         title=""
         appearance={definition.colorScheme === "dark" ? "dark" : "light"}
         style={{ backgroundColor: colors.background }}
-      />
+      >
+        {children}
+      </NativeTitleBar>
     );
 
   return (
@@ -55,6 +60,8 @@ export function TitleBar({ underlay = true }: Contract.TitleBarProps) {
         height: TITLE_BAR_HEIGHT,
         zIndex: 1
       }}
-    />
+    >
+      {children}
+    </AnyView>
   );
 }

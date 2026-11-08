@@ -43,7 +43,6 @@ import { useThemeContext } from "./theme";
 import {
   InheritedTextStyle,
   pressHandler,
-  recordModifiers,
   useInheritedTextStyle,
   useStyled,
   wrapChildren
@@ -104,7 +103,6 @@ function Container(
         {...nativeProps}
         style={style}
         onPress={onPress}
-        onPointerDown={recordModifiers}
       >
         {content}
       </PressableComponent>
@@ -212,7 +210,6 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
         disabled={disabled}
         style={style}
         onPress={disabled ? undefined : onPress}
-        onPointerDown={recordModifiers}
       >
         <InheritedTextStyle.Provider value={textStyle}>
           {wrapChildren(children, textStyle)}

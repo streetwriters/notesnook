@@ -63,6 +63,7 @@ export declare const TITLE_BAR_HEIGHT: number;
 
 export interface TitleBarProps {
   underlay?: boolean;
+  children?: ReactNode;
 }
 
 export declare function TitleBar(props: TitleBarProps): JSX.Element | null;

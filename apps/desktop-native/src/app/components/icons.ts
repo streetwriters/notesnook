@@ -50,7 +50,16 @@ import {
   mdiBackupRestore,
   mdiNoteTextOutline,
   mdiTune,
-  mdiDotsHorizontal
+  mdiDotsHorizontal,
+  mdiDockLeft,
+  mdiArrowLeft,
+  mdiArrowRight,
+  mdiClose,
+  mdiAppleKeyboardCommand,
+  mdiDotsVertical,
+  mdiFileDocumentOutline,
+  mdiPinOutline,
+  mdiPageLayoutSidebarLeft
 } from "@mdi/js";
 import { Icon as UIIcon, type IconProps } from "@ui";
 
@@ -95,3 +104,12 @@ export const Book = icon(mdiBookOutline);
 export const Home = icon(mdiHomeOutline);
 export const Sliders = icon(mdiTune);
 export const More = icon(mdiDotsHorizontal);
+export const LeftPanelClose = icon(mdiDockLeft);
+export const LeftPanelOpen = icon(mdiPageLayoutSidebarLeft);
+export const ArrowLeft = icon(mdiArrowLeft);
+export const ArrowRight = icon(mdiArrowRight);
+export const Close = icon(mdiClose);
+export const Command = icon(mdiAppleKeyboardCommand);
+export const DotsVertical = icon(mdiDotsVertical);
+export const FileText = icon(mdiFileDocumentOutline);
+export const PushPin = icon(mdiPinOutline);
