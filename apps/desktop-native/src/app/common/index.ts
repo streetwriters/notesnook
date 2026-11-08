@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { databaseHost, environment, type PickedFile } from "@platform";
+import { environment, type PickedFile } from "@platform";
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash, navigate } from "../navigation";
 import { db } from "./db";
@@ -68,6 +68,7 @@ import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 import { setToolbarPreset } from "./toolbar-config";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
+import { useKeyStore } from "../interfaces/key-store";
 import { writeToClipboard } from "../utils/clipboard";
 
 export const CREATE_BUTTON_MAP = {
@@ -561,7 +562,7 @@ export async function resetFeatures() {
     "defaultNotebookAndTag"
   ]);
   if (!features.appLock.isAllowed) {
-    await databaseHost.disableAppLock();
+    await useKeyStore.getState().disable();
   }
 
   if (!features.customHomepage.isAllowed)
