@@ -17,11 +17,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented, type NotImplemented } from "../common/not-implemented";
+import type { ReactNode } from "react";
+import { Flex, type SxProp } from "@ui";
 
-export const AddNotebookDialog: NotImplemented =
-  notImplemented("AddNotebookDialog");
-export type AddNotebookDialog = any;
-export const EditNotebookDialog: NotImplemented =
-  notImplemented("EditNotebookDialog");
-export type EditNotebookDialog = any;
+export function InlinePopup(props: {
+  isOpen: boolean;
+  sx?: SxProp;
+  children?: ReactNode;
+}) {
+  if (!props.isOpen) return null;
+  return (
+    <Flex
+      sx={{
+        position: "absolute",
+        top: "100%",
+        left: 0,
+        zIndex: 100,
+        mt: "10px",
+        bg: "background",
+        border: "1px solid",
+        borderColor: "border",
+        borderRadius: "radius2",
+        boxShadow: "menu",
+        ...props.sx
+      }}
+    >
+      {props.children}
+    </Flex>
+  );
+}

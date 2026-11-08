@@ -171,11 +171,29 @@ const PasswordDialog = DialogManager.register(function PasswordDialog<
   );
 });
 
+type ShowPasswordDialogProps<TInputId extends string> = {
+  title: string;
+  subtitle?: string;
+  message?: string;
+  inputs: Record<TInputId, FieldProps>;
+  validate: (passwords: Record<TInputId, string>) => Promise<boolean>;
+};
+
+export function showPasswordDialog<TInputId extends string>(
+  props: ShowPasswordDialogProps<TInputId> & { checks?: undefined }
+): Promise<boolean>;
 export function showPasswordDialog<
   TInputId extends string,
   TCheckId extends string
->(props: Omit<PasswordDialogProps<TInputId, TCheckId>, "onClose">) {
-  return PasswordDialog.show(props) as Promise<
-    string extends TCheckId ? boolean : false | Record<TCheckId, boolean>
-  >;
+>(
+  props: ShowPasswordDialogProps<TInputId> & {
+    checks: Record<TCheckId, Check>;
+  }
+): Promise<false | Record<TCheckId, boolean>>;
+export function showPasswordDialog(
+  props: ShowPasswordDialogProps<string> & { checks?: Record<string, Check> }
+) {
+  return PasswordDialog.show(
+    props as Omit<PasswordDialogProps<string, string>, "onClose">
+  );
 }

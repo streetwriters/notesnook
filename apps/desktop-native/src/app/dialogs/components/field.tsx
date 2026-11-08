@@ -61,6 +61,8 @@ export type FieldProps = Omit<InputProps, "sx"> & {
   leftIcon?: Icon;
   rightIcon?: Icon;
   required?: boolean;
+  autoComplete?: string;
+  name?: string;
 };
 
 const inputBase: SxProp = {
@@ -134,6 +136,8 @@ export const Field = forwardRef<UIElement, FieldProps>(function Field(
     leftIcon: LeftIcon,
     rightIcon: RightIcon,
     required: _required,
+    autoComplete: _autoComplete,
+    name: _name,
     rightActions: rightActionsProp,
     leftActions: leftActionsProp,
     onChangeText,
