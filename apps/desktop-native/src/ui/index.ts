@@ -17,5 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+export * from "./events";
 export * from "./hooks";
+export * from "./primitives";
+export * from "./style";
 export * from "./overlays";
