@@ -4,6 +4,7 @@ import path from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { navClick, listTitles } from "./nav";
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.now();
@@ -52,7 +53,7 @@ afterAll(async () => {
 });
 
 async function titles() {
-  const matches = await app.query("testID", "title", true);
+  const matches = await listTitles(app);
   return matches.map((match: { text?: string }) => match.text);
 }
 
@@ -89,7 +90,7 @@ async function routeTitle() {
 }
 
 test("navigating between sections changes the route and the list", async () => {
-  await app.getByTestId("nav-favorites").click();
+  await navClick(app, "Favorites");
   await vi.waitFor(async () => expect(await routeTitle()).toBe("Favorites"), {
     timeout: 15000,
     interval: 300
@@ -99,7 +100,7 @@ test("navigating between sections changes the route and the list", async () => {
     { timeout: 15000, interval: 300 }
   );
 
-  await app.getByTestId("nav-notes").click();
+  await navClick(app, "Notes");
   await vi.waitFor(async () => expect(await routeTitle()).toBe("Notes"), {
     timeout: 15000,
     interval: 300
@@ -109,12 +110,12 @@ test("navigating between sections changes the route and the list", async () => {
     { timeout: 15000, interval: 300 }
   );
 
-  await app.getByTestId("nav-trash").click();
+  await navClick(app, "Trash");
   await vi.waitFor(async () => expect(await routeTitle()).toBe("Trash"), {
     timeout: 15000,
     interval: 300
   });
-  await app.getByTestId("nav-notes").click();
+  await navClick(app, "Notes");
   await vi.waitFor(async () => expect(await routeTitle()).toBe("Notes"), {
     timeout: 15000,
     interval: 300
@@ -138,8 +139,8 @@ async function windowPixel(x: number, y: number) {
 }
 
 test("pressing a note marks it as selected", async () => {
-  const [title] = await app.query("testID", "title", true);
-  const target = (await app.query("testID", "title", true)).find(
+  const [title] = await listTitles(app);
+  const target = (await listTitles(app)).find(
     (match: { text?: string }) => match.text === "Today note 2"
   );
   expect(target).toBeDefined();

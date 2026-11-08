@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { navClick, navVisible, listTitles } from "./nav";
 
 const NOW = Date.now();
 const seed = [1, 2, 3, 4].map((n) => ({
@@ -45,28 +46,31 @@ const visible = async (id: string) =>
   (await app.query("testID", id, true)).length > 0;
 
 test("the home tab lists the routes and colours", async () => {
-  await vi.waitFor(async () => expect(await visible("nav-notes")).toBe(true), {
-    timeout: 20000,
-    interval: 300
-  });
   await vi.waitFor(
-    async () => expect(await visible("nav-color-Red")).toBe(true),
+    async () => expect(await navVisible(app, "Notes")).toBe(true),
+    {
+      timeout: 20000,
+      interval: 300
+    }
+  );
+  await vi.waitFor(
+    async () => expect(await navVisible(app, "Red")).toBe(true),
     { timeout: 20000, interval: 300 }
   );
   expect(await visible("create-note-button")).toBe(true);
-  expect(await visible("nav-app-name")).toBe(true);
+  expect(await app.getByText("Notesnook").count()).toBeGreaterThan(0);
 });
 
 test("the notebooks and tags tabs list their items and navigate", async () => {
   await app.getByTestId("tab-notebooks").click();
   await vi.waitFor(
     async () => {
-      expect(await visible("notebook-Work")).toBe(true);
-      expect(await visible("notebook-Home")).toBe(true);
+      expect(await navVisible(app, "Work")).toBe(true);
+      expect(await navVisible(app, "Home")).toBe(true);
     },
     { timeout: 20000, interval: 300 }
   );
-  await app.getByTestId("notebook-Work").click();
+  await navClick(app, "Work");
   await vi.waitFor(
     async () =>
       expect(await app.getByTestId("route-title").textContent()).toBe("Work"),
@@ -81,11 +85,14 @@ test("the notebooks and tags tabs list their items and navigate", async () => {
   );
 
   await app.getByTestId("tab-tags").click();
-  await vi.waitFor(async () => expect(await visible("tag-urgent")).toBe(true), {
-    timeout: 20000,
-    interval: 300
-  });
-  await app.getByTestId("tag-urgent").click();
+  await vi.waitFor(
+    async () => expect(await navVisible(app, "#urgent")).toBe(true),
+    {
+      timeout: 20000,
+      interval: 300
+    }
+  );
+  await navClick(app, "#urgent");
   await vi.waitFor(
     async () =>
       expect(await app.getByTestId("route-title").textContent()).toBe(
@@ -95,7 +102,7 @@ test("the notebooks and tags tabs list their items and navigate", async () => {
   );
 
   await app.getByTestId("tab-home").click();
-  await app.getByTestId("nav-notes").click();
+  await navClick(app, "Notes");
   await vi.waitFor(
     async () =>
       expect(await app.getByTestId("route-title").textContent()).toBe("Notes"),
@@ -113,7 +120,7 @@ async function windowPixel(x: number, y: number) {
 }
 
 async function rowBackground(title: string) {
-  const match = (await app.query("testID", "title", true)).find(
+  const match = (await listTitles(app)).find(
     (entry: { text?: string }) => entry.text === title
   );
   expect(match, title).toBeDefined();
@@ -125,7 +132,7 @@ test("arrow keys move the selection through the list", async () => {
     async () =>
       expect(
         (
-          await app.query("testID", "title", true)
+          await listTitles(app)
         ).some((m: { text?: string }) => m.text === "Keyed note 1")
       ).toBe(true),
     { timeout: 20000, interval: 300 }

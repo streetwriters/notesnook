@@ -28,7 +28,7 @@ export function App() {
       testID="app"
       sx={{ flexDirection: "column", flex: 1, bg: "background" }}
     >
-      <TitleBar />
+      <TitleBar underlay={false} />
       <SplitPane
         testID="global-split-pane"
         direction="vertical"

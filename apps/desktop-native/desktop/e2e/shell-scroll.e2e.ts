@@ -2,6 +2,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
+import { listTitles } from "./nav";
 import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
 
 const COUNT = 2000;
@@ -39,7 +40,7 @@ afterAll(async () => {
 test("a 2,000 note list scrolls and renders the notes it reaches", async () => {
   await vi.waitFor(
     async () => {
-      const titles = (await app.query("testID", "title", true)).map(
+      const titles = (await listTitles(app)).map(
         (match: { text?: string }) => match.text
       );
       expect(titles.length).toBeGreaterThan(5);
@@ -50,7 +51,7 @@ test("a 2,000 note list scrolls and renders the notes it reaches", async () => {
   const steps: { step: number; ms: number; drawMs: number; views: number }[] =
     [];
   const visible = async () =>
-    (await app.query("testID", "title", true))
+    (await listTitles(app))
       .map((match: { text?: string }) => match.text ?? "")
       .filter((text: string) => text.startsWith("Scroll note"));
   const firstScreen = await visible();

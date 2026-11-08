@@ -41,10 +41,7 @@ export function TabItem(props: {
         ":hover": { bg: props.selected ? "hover-selected" : "hover" }
       }}
     >
-      <TabIcon
-        size="medium"
-        color={props.selected ? "icon-selected" : "icon"}
-      />
+      <TabIcon size={15} color={props.selected ? "icon-selected" : "icon"} />
     </Flex>
   );
 }

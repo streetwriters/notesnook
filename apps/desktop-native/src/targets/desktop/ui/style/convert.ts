@@ -192,6 +192,11 @@ export function convertDeclarations(
   if (style.flexShrink === undefined && style.flex === undefined)
     style.flexShrink = 1;
   if (nowrap || ellipsis) converted.numberOfLines = 1;
+  if (
+    typeof style.lineHeight === "string" &&
+    /^[\d.]+%$/.test(style.lineHeight)
+  )
+    style.lineHeight = parseFloat(style.lineHeight) / 100;
   if (typeof style.lineHeight === "number" && style.lineHeight < 5) {
     const fontSize = typeof style.fontSize === "number" ? style.fontSize : 16;
     style.lineHeight = style.lineHeight * fontSize;

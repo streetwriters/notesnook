@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test, vi } from "vitest";
+import { listTitles } from "./nav";
 import { launchApp } from "@react-native-gpui/testing";
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -46,12 +47,7 @@ test.skipIf(!out)(
           { timeout: 60000, interval: 500 }
         );
         await vi.waitFor(
-          async () =>
-            expect(
-              (
-                await app.query("testID", "title", true)
-              ).length
-            ).toBeGreaterThan(5),
+          async () => expect((await listTitles(app)).length).toBeGreaterThan(5),
           { timeout: 30000, interval: 500 }
         );
         await app.mouseMove({ x: 4, y: 4 });

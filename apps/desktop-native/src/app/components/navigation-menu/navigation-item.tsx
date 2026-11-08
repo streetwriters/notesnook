@@ -22,45 +22,59 @@ import { Flex, Text, type ColorValue } from "@ui";
 import type { Icon } from "../icons";
 
 export function NavigationItem(props: {
-  testID: string;
   title: string;
-  icon: Icon;
-  iconColor?: ColorValue;
-  selected: boolean;
+  icon?: Icon;
+  iconSize?: number;
+  color?: ColorValue;
+  selected?: boolean;
   onPress?: () => void;
   children?: ReactNode;
 }) {
-  const RowIcon = props.icon;
+  const { icon: RowIcon, iconSize = 13, selected } = props;
   return (
     <Flex
-      testID={props.testID}
+      testID="navigation-item"
       onPress={props.onPress}
       sx={{
-        alignItems: "center",
-        gap: "spacing4",
-        px: "spacing5",
+        borderRadius: "radius1",
+        px: "spacing2",
         py: "spacing4",
-        borderRadius: "default",
-        bg: props.selected ? "background-selected" : "transparent",
-        ":hover": { bg: props.selected ? "hover-selected" : "hover" }
+        alignItems: "center",
+        flexDirection: "row",
+        bg: selected ? "background-selected" : "transparent",
+        ":hover": { bg: selected ? "hover-selected" : "hover" }
       }}
     >
-      <RowIcon
-        size="medium"
-        color={props.iconColor ?? (props.selected ? "icon-selected" : "icon")}
-      />
-      <Text
-        testID={`${props.testID}-title`}
-        numberOfLines={1}
+      <Flex
         sx={{
+          p: 0,
           flex: 1,
-          fontSize: "sm",
-          fontWeight: props.selected ? "bold" : "body",
-          color: props.selected ? "paragraph-selected" : "paragraph"
+          alignItems: "center",
+          justifyContent: "flex-start",
+          flexDirection: "row"
         }}
       >
-        {props.title}
-      </Text>
+        {RowIcon ? (
+          <RowIcon
+            size={iconSize}
+            color={props.color ?? (selected ? "icon-selected" : "icon")}
+          />
+        ) : null}
+        <Text
+          testID="title"
+          variant="body"
+          numberOfLines={1}
+          sx={{
+            fontSize: "xs",
+            fontWeight: "normal",
+            color: selected ? "paragraph-selected" : "paragraph",
+            pr: "spacing1",
+            ml: "spacing3"
+          }}
+        >
+          {props.title}
+        </Text>
+      </Flex>
       {props.children}
     </Flex>
   );
