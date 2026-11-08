@@ -41,4 +41,5 @@ export interface Files {
   pick(options: PickOptions): Promise<PickedFile[]>;
   create(filename: string): Promise<WritableFile>;
   createAt(path: string): Promise<WritableFile>;
+  readBytes(path: string): Promise<Uint8Array>;
 }

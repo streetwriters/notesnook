@@ -25,6 +25,10 @@ export type CryptoKey = {
 export type Algorithm = string | Record<string, unknown>;
 
 export interface SubtleCryptoLike {
+  digest(
+    algorithm: string | { name: string },
+    data: ArrayBuffer | Uint8Array
+  ): Promise<ArrayBuffer>;
   importKey(
     format: string,
     keyData: ArrayBuffer | Uint8Array,

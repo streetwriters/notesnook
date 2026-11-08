@@ -84,5 +84,6 @@ export const files: Files = {
     if (!path) throw new Error("No file was selected");
     return open(path);
   },
-  createAt: (path) => open(path)
+  createAt: (path) => open(path),
+  readBytes: async (path) => new Uint8Array(await fs.promises.readFile(path))
 };

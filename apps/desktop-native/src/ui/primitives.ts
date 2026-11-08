@@ -208,6 +208,12 @@ export interface QRCodeProps extends BaseProps {
   value: string;
   size: number;
   ecLevel?: "L" | "M" | "Q" | "H";
+  logo?: {
+    src: string;
+    width: number;
+    height: number;
+    padding?: "square" | "circle";
+  };
 }
 
 export interface QRCodeHandle {

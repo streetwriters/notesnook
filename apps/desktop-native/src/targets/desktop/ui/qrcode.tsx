@@ -24,6 +24,7 @@ import {
   manipulateAsync,
   SaveFormat
 } from "@react-native-gpui/image-manipulator";
+import { Image, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import type * as Contract from "../../../ui/primitives";
 import { useThemeContext } from "./theme";
@@ -74,6 +75,31 @@ export const QRCode = forwardRef<Contract.QRCodeHandle, Contract.QRCodeProps>(
       [xml, size]
     );
 
-    return <SvgXml xml={xml} width={size} height={size} />;
+    const { logo } = props;
+    return (
+      <View style={{ width: size, height: size }}>
+        <SvgXml xml={xml} width={size} height={size} />
+        {logo ? (
+          <View
+            style={{
+              position: "absolute",
+              left: (size - logo.width) / 2,
+              top: (size - logo.height) / 2,
+              width: logo.width,
+              height: logo.height,
+              backgroundColor: "#ffffff",
+              borderRadius: logo.padding === "circle" ? logo.width / 2 : 0,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <Image
+              source={{ uri: logo.src }}
+              style={{ width: logo.width - 6, height: logo.height - 6 }}
+            />
+          </View>
+        ) : null}
+      </View>
+    );
   }
 );

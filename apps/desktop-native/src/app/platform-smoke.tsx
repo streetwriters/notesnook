@@ -128,12 +128,8 @@ const checks: Check[] = [
   {
     name: "digest",
     run: async () => {
-      const subtle = crypto.subtle as unknown as {
-        digest?: (algorithm: string, data: Uint8Array) => Promise<ArrayBuffer>;
-      };
-      assert(subtle.digest, "subtle.digest is not part of the contract");
       equal(
-        hex(await subtle.digest("SHA-256", encoder.encode("abc"))),
+        hex(await crypto.subtle.digest("SHA-256", encoder.encode("abc"))),
         "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
         "sha-256"
       );
@@ -263,6 +259,11 @@ const checks: Check[] = [
       const file = await files.createAt(path);
       await file.write(encoder.encode("platform smoke"));
       await file.close();
+      equal(
+        new TextDecoder().decode(await files.readBytes(path)),
+        "platform smoke",
+        "read back"
+      );
     }
   },
   {
