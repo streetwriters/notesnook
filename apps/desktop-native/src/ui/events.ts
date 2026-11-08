@@ -60,7 +60,7 @@ export type Key =
   | "PageUp"
   | "PageDown"
   | " "
-  | (string & {});
+  | (string & NonNullable<unknown>);
 
 export interface KeyEvent extends UIEvent, Modifiers {
   key: Key;

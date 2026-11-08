@@ -171,7 +171,12 @@ export interface IconProps extends BaseProps {
 
 export interface ThemeScopeProps {
   scope: ThemeScopeName;
-  variant?: "primary" | "secondary" | "selected" | "error" | (string & {});
+  variant?:
+    | "primary"
+    | "secondary"
+    | "selected"
+    | "error"
+    | (string & NonNullable<unknown>);
   children?: ReactNode;
 }
 
