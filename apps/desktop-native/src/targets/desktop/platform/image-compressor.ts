@@ -31,13 +31,24 @@ function naturalWidth(uri: string) {
   );
 }
 
+async function sourceUri(file: {
+  uri: string;
+  type: string;
+  bytes: () => Promise<Uint8Array>;
+}) {
+  if (file.uri) return file.uri;
+  const bytes = await file.bytes();
+  return `data:${file.type};base64,${Buffer.from(bytes).toString("base64")}`;
+}
+
 export const imageCompressor: ImageCompressor = {
   async compress(file, { maxWidth, quality }) {
+    const uri = await sourceUri(file);
     const width =
       typeof maxWidth === "function"
-        ? maxWidth(await naturalWidth(file.uri))
+        ? maxWidth(await naturalWidth(uri))
         : maxWidth;
-    const result = await manipulateAsync(file.uri, [{ resize: { width } }], {
+    const result = await manipulateAsync(uri, [{ resize: { width } }], {
       compress: quality,
       format: SaveFormat.JPEG
     });
