@@ -39,6 +39,7 @@ import { useEffect } from "react";
 import { getQueryParams, hardNavigate } from "../navigation";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
 import { ArrowUp, CaretRight, Lightning } from "../components/icons";
+import { SvgImage } from "../components/svg-image";
 
 function toColor(value: string): ColorValue {
   return /^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(value)
@@ -78,6 +79,30 @@ function Plans() {
             gap: "spacing13"
           }}
         >
+          <SvgImage
+            name="star"
+            width={43}
+            height={43}
+            sx={{ position: "absolute", top: 72, left: 146 }}
+          />
+          <SvgImage
+            name="star"
+            width={25}
+            height={25}
+            sx={{ position: "absolute", top: 61, left: 959 }}
+          />
+          <SvgImage
+            name="star"
+            width={43}
+            height={43}
+            sx={{ position: "absolute", top: 266, right: 229 }}
+          />
+          <SvgImage
+            name="star"
+            width={64}
+            height={64}
+            sx={{ position: "absolute", bottom: -30, right: 73 }}
+          />
           <Button
             onPress={() => openURL("/")}
             variant="new_bordered"
@@ -187,6 +212,17 @@ function PlansCTA(props: { onChoosePlan: () => void }) {
           py: "spacing14"
         }}
       >
+        <SvgImage
+          name="plans-footer"
+          width={572}
+          height={572}
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 100,
+            transform: [{ scale: 1.6 }]
+          }}
+        />
         <Flex
           sx={{
             position: "relative",

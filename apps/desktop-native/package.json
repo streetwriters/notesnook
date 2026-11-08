@@ -14,6 +14,7 @@
     "bundle": "react-native bundle --platform desktop --entry-file index.js --bundle-output desktop/build/index.bundle --assets-dest desktop/build/assets --dev true",
     "parity": "node tools/parity/run.mjs",
     "check:testids": "node tools/check-testids.mjs",
+    "gen:assets": "node tools/gen-assets.mjs",
     "tsc:web": "tsc --noEmit -p src/targets/web/tsconfig.json"
   },
   "dependencies": {

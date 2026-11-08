@@ -57,6 +57,7 @@ import { strings } from "@notesnook/intl";
 import { withFeatureCheck } from "../../common";
 import { useIsFeatureAvailable } from "@notesnook/common";
 import { useStepSubmit } from "./submit";
+import { SvgImage } from "../../components/svg-image";
 
 export type Steps = typeof steps;
 export type FallbackSteps = typeof fallbackSteps;
@@ -677,6 +678,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
         justifyContent: "center"
       }}
     >
+      <SvgImage name="mfa" width={120} height={120} />
       <Text
         variant="heading"
         sx={{ mt: 2, fontSize: "subheading", textAlign: "center" }}
@@ -729,6 +731,7 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
         justifyContent: "center"
       }}
     >
+      <SvgImage name="fallback2fa" width={200} height={200} />
       <Text
         variant="heading"
         sx={{ mt: 2, fontSize: "subheading", textAlign: "center" }}

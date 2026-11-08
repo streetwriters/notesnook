@@ -45,6 +45,7 @@ import IconTag from "../../components/icon-tag";
 import { usePromise } from "@notesnook/common";
 import { getCurrencySymbol } from "../../common/currencies";
 import { environment } from "@platform";
+import { SvgImage } from "../../components/svg-image";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
@@ -219,6 +220,7 @@ export function CheckoutDetails({
 function AlreadyPremium() {
   return (
     <Flex sx={{ flexDirection: "column" }}>
+      <SvgImage name="rocket" width={200} height={200} />
       <Text variant="heading" sx={{ mt: 4, textAlign: "center" }}>
         Notesnook
       </Text>
@@ -236,7 +238,8 @@ export function CheckoutCompleted(props: {
   const { onClose, buttonText } = props;
 
   return (
-    <Flex sx={{ flexDirection: "column" }}>
+    <Flex sx={{ flexDirection: "column", alignItems: "center" }}>
+      <SvgImage name="rocket" width={200} height={200} />
       <Text variant="heading" sx={{ mt: 4, textAlign: "center" }}>
         {strings.youAreAwesome()}
       </Text>

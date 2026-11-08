@@ -47,6 +47,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { getCurrencySymbol } from "../../common/currencies";
 import { DialogManager } from "../../common/dialog-manager";
 import Accordion from "../../components/accordion";
+import { SvgImage } from "../../components/svg-image";
 
 type PlansListProps = {
   selectedPlan?: string | null;
@@ -682,9 +683,40 @@ export function ComparePlans() {
         flexDirection: "column",
         alignItems: "center",
         gap: "spacing13",
-        p: "spacing14"
+        p: "spacing14",
+        position: "relative"
       }}
     >
+      <SvgImage
+        name="star"
+        width={28}
+        height={28}
+        sx={{ position: "absolute", top: 60, right: 256 }}
+      />
+      <SvgImage
+        name="star"
+        width={45}
+        height={45}
+        sx={{ position: "absolute", top: 123, left: 127 }}
+      />
+      <SvgImage
+        name="star"
+        width={45}
+        height={45}
+        sx={{ position: "absolute", top: "35%", left: 26 }}
+      />
+      <SvgImage
+        name="star"
+        width={45}
+        height={45}
+        sx={{ position: "absolute", top: "70%", right: 10 }}
+      />
+      <SvgImage
+        name="star"
+        width={32}
+        height={32}
+        sx={{ position: "absolute", bottom: 85, left: 362 }}
+      />
       <Flex
         sx={{
           flexDirection: "column",
@@ -817,9 +849,22 @@ export function Footer() {
         flexDirection: "column",
         gap: "spacing13",
         p: "spacing14",
-        alignItems: "center"
+        alignItems: "center",
+        position: "relative"
       }}
     >
+      <SvgImage
+        name="star"
+        width={46}
+        height={46}
+        sx={{ position: "absolute", top: 36, right: 183 }}
+      />
+      <SvgImage
+        name="star"
+        width={28}
+        height={28}
+        sx={{ position: "absolute", bottom: 8, left: 36 }}
+      />
       <Flex
         sx={{
           flexDirection: "column",

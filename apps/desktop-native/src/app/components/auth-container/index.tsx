@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ReactNode } from "react";
 import { strings } from "@notesnook/intl";
-import { Box, Button, Flex, Icon, Text } from "@ui";
+import { Box, Button, Flex, Icon, Image, Text } from "@ui";
+import { rasterAssets } from "../../assets/raster.generated";
 import { SettingsDialog } from "../../dialogs/settings";
 import { authWaves } from "./auth-art.generated";
 
@@ -87,6 +88,11 @@ function AuthContainer(props: { children?: ReactNode }) {
                 {strings.privacySimplifiedDesc()}
               </Text>
             </Flex>
+            <Image
+              src={rasterAssets["auth/notesnook-phone.png"]}
+              resizeMode="contain"
+              sx={{ alignSelf: "center", width: "85%", aspectRatio: 1 }}
+            />
           </Flex>
           <Box
             sx={{
