@@ -67,6 +67,11 @@ export type BootOptions = {
   initialHash?: string;
 };
 
+async function ensureTag(title: string) {
+  const existing = await db.tags.find(title);
+  return existing ? existing.id : await db.tags.add({ title });
+}
+
 async function seedOthers(options: BootOptions) {
   const addNotebook = async (notebook: SeedNotebook, parentId?: string) => {
     const id = await db.notebooks.add({ title: notebook.title });
@@ -81,8 +86,7 @@ async function seedOthers(options: BootOptions) {
   };
   for (const notebook of options.seedNotebooks ?? [])
     await addNotebook(notebook);
-  for (const tag of options.seedTags ?? [])
-    await db.tags.add({ title: tag.title });
+  for (const tag of options.seedTags ?? []) await ensureTag(tag.title);
   for (const color of options.seedColors ?? [])
     await db.colors.add({ title: color.title, colorCode: color.colorCode });
   for (const reminder of options.seedReminders ?? [])
@@ -114,7 +118,7 @@ async function seedNotes(notes: SeedNote[]) {
     if (note.pinned) await db.notes.pin(true, id);
     if (note.archived) await db.notes.archive(true, id);
     for (const title of note.tags ?? []) {
-      const tagId = await db.tags.add({ title });
+      const tagId = await ensureTag(title);
       if (tagId)
         await db.relations.add(
           { type: "tag", id: tagId },
