@@ -15,8 +15,12 @@ afterAll(async () => {
   await app.close();
 });
 
-test("shows the placeholder", async () => {
-  await app.waitForIdle({ ignore: ["animations"] });
-  const tree = JSON.stringify(await app.tree());
-  expect(tree).toContain("Notesnook");
+test("boots the database and reads the user state", async () => {
+  const state = app.getByTestId("boot-state");
+  await expect
+    .poll(async () => state.textContent(), { timeout: 60000 })
+    .toMatch(/^(Logged out|Logged in as .+)$/);
+  await expect(app.getByTestId("boot-info").textContent()).resolves.toMatch(
+    /^Notesnook \d+\.\d+\.\d+ \((online|offline)\)$/
+  );
 });

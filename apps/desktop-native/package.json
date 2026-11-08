@@ -9,8 +9,9 @@
     "desktop": "react-native run-desktop",
     "tsc": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
-    "test:e2e": "RN_GPUI_TEST_BUNDLE=$PWD/desktop/build/index.bundle RN_GPUI_TEST_BINARY=$PWD/desktop/build/target/debug/react-native-gpui--notesnook-desktop-native vitest run --config desktop/vitest.e2e.config.ts",
-    "build:test": "react-native-gpui run-desktop --features test-driver --no-launch --no-packager"
+    "test:e2e": "npm run bundle:test && RN_GPUI_DEV_PORT=1 RN_GPUI_TEST_BUNDLE=$PWD/desktop/build/index.bundle RN_GPUI_TEST_BINARY=$PWD/desktop/build/target/debug/react-native-gpui--notesnook-desktop-native vitest run --config desktop/vitest.e2e.config.ts",
+    "build:test": "react-native-gpui run-desktop --features test-driver --no-launch --port 8171",
+    "bundle:test": "react-native bundle --platform desktop --entry-file index.js --bundle-output desktop/build/index.bundle --assets-dest desktop/build/assets --dev true"
   },
   "dependencies": {
     "@ammarahmed/react-native-sodium": "file:../../../../../Projects/react-native/gpui-modules/tgz/ammarahmed-react-native-sodium-2.0.0-alpha.2.tgz",
@@ -33,6 +34,7 @@
     "@react-native-gpui/hermes": "file:../../../../../react-native-gpui-desktop-native/packages/hermes",
     "@react-native-gpui/keychain": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-keychain-0.0.1.tgz",
     "@react-native-gpui/netinfo": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-netinfo-0.0.1.tgz",
+    "@react-native-gpui/openpgp": "file:../../../../react-native/gpui-modules/tgz/react-native-gpui-openpgp-0.0.1.tgz",
     "@react-native-gpui/reanimated": "file:../../../../../react-native-gpui-desktop-native/modules/reanimated",
     "@react-native-gpui/svg": "file:../../../../../react-native-gpui-desktop-native/modules/svg",
     "@react-native-gpui/worklets": "file:../../../../../react-native-gpui-desktop-native/modules/worklets",
@@ -49,6 +51,7 @@
     "react-native": "0.87.1",
     "react-native-device-info": "^14.1.1",
     "react-native-get-random-values": "^1.11.0",
+    "react-native-gzip": "file:../../../../react-native/gpui-modules/tgz/react-native-gzip-1.1.0.tgz",
     "react-native-keychain": "11.0.0",
     "react-native-mmkv-storage": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-mmkv-storage-13.0.1.tgz",
     "react-native-quick-sqlite": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-quick-sqlite-8.2.7.tgz",
@@ -57,6 +60,7 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-worklets": "~0.13.0",
     "snarkdown": "^2.0.0",
+    "url": "^0.11.4",
     "w3c-keyname": "^2.2.8",
     "wouter": "^2.12.1",
     "zustand": "^4.5.5",

@@ -18,14 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export function unimplemented<T extends object>(name: string): T {
-  return new Proxy({} as T, {
+  const fail = () => {
+    throw new Error(`${name} is not implemented on desktop yet`);
+  };
+  return new Proxy(fail, {
     get(_target, property) {
       if (property === "then" || typeof property === "symbol") return undefined;
-      return () => {
-        throw new Error(
-          `${name}.${String(property)} is not implemented on desktop yet`
-        );
-      };
-    }
-  });
+      return unimplemented(`${name}.${String(property)}`);
+    },
+    apply: fail,
+    construct: fail
+  }) as unknown as T;
 }

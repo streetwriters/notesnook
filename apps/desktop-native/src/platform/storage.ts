@@ -22,8 +22,6 @@ export interface Config {
   set<T>(key: string, value: T): T;
   remove(key: string): void;
   clear(): void;
-  all<T>(): Record<string, T>;
-  has(predicate: (key: string) => boolean): boolean;
   logout(): void;
 }
 

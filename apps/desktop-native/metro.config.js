@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const { mergeConfig } = require("@react-native/metro-config");
 const { makeMetroConfig } = require("@react-native-gpui/core/metro.config");
@@ -9,6 +10,11 @@ const targetAliases = {
   "@ui": path.join(target, "ui"),
   "@platform": path.join(target, "platform")
 };
+
+const packageNodeModules = fs
+  .readdirSync(packagesDir)
+  .map((name) => path.join(packagesDir, name, "node_modules"))
+  .filter((dir) => fs.existsSync(dir));
 
 const CJS_PACKAGES = new Set([
   "@tanstack/query-core",
@@ -23,8 +29,18 @@ const CJS_PACKAGES = new Set([
 module.exports = mergeConfig(base, {
   watchFolders: [...base.watchFolders, packagesDir],
   resolver: {
+    resolverMainFields: ["react-native", "browser", "main"],
+    sourceExts: [...base.resolver.sourceExts, "cjs"],
+    nodeModulesPaths: [
+      ...base.resolver.nodeModulesPaths,
+      ...packageNodeModules
+    ],
     resolveRequest: (context, moduleName, platform) => {
-      if (moduleName === "react-dom" || moduleName === "crypto") {
+      if (
+        moduleName === "react-dom" ||
+        moduleName === "crypto" ||
+        moduleName === "node:crypto"
+      ) {
         return { type: "empty" };
       }
       for (const [alias, dir] of Object.entries(targetAliases)) {

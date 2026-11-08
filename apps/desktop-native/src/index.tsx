@@ -16,15 +16,45 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { Text, View } from "react-native";
+
 import "./targets/desktop";
-import { Root } from "./app/root";
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { boot, type BootState } from "./app/boot";
+
+type Status =
+  | BootState
+  | { status: "loading" }
+  | { status: "error"; message: string };
 
 export default function App() {
+  const [state, setState] = useState<Status>({ status: "loading" });
+
+  useEffect(() => {
+    boot()
+      .then(setState)
+      .catch((e: Error) => setState({ status: "error", message: e.message }));
+  }, []);
+
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Notesnook</Text>
-      <Root />
+      <Text testID="boot-state">
+        {state.status === "loading"
+          ? "Loading"
+          : state.status === "error"
+          ? `Error: ${state.message}`
+          : state.user
+          ? `Logged in as ${state.user.email}`
+          : "Logged out"}
+      </Text>
+      {state.status === "ready" ? (
+        <Text testID="boot-info">
+          {`Notesnook ${state.version} (${
+            state.online ? "online" : "offline"
+          })`}
+        </Text>
+      ) : null}
     </View>
   );
 }
