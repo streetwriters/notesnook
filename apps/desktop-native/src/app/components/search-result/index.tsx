@@ -19,11 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo, useState } from "react";
 import type { HighlightedResult, Match as TMatch } from "@notesnook/core";
-import { Button, Flex, Text } from "@ui";
+import { Button, Flex, Text, type MenuItem } from "@ui";
 import ListItem from "../list-item";
 import { ChevronDown, ChevronRight } from "../icons";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import { noteMenuItems } from "../note";
+import { db } from "../../common/db";
 
 type SearchResultProps = {
   item: HighlightedResult;
@@ -41,8 +43,14 @@ function SearchResult(props: SearchResultProps) {
     <Flex sx={{ flexDirection: "column" }}>
       <ListItem
         isFocused={isOpened}
-        isCompact={isCompact}
         item={item}
+        menuItems={menuItems}
+        onMiddleClick={() => {
+          useEditorStore.getState().openSession(item.id, {
+            openInNewTab: true,
+            rawContent: item.rawContent
+          });
+        }}
         onPress={() => {
           useEditorStore.getState().openSession(item.id, {
             rawContent: item.rawContent,
@@ -57,7 +65,10 @@ function SearchResult(props: SearchResultProps) {
               <Button
                 testID="search-result-expand"
                 variant="secondary"
-                onPress={() => setIsExpanded((expanded) => !expanded)}
+                onPress={(event) => {
+                  event.stopPropagation();
+                  setIsExpanded((expanded) => !expanded);
+                }}
                 sx={{
                   bg: "transparent",
                   p: 0,
@@ -108,7 +119,7 @@ function SearchResult(props: SearchResultProps) {
             </Flex>
           </Flex>
         }
-        sx={{ my: "small", borderRadius: "radius1", mx: 1 }}
+        sx={{ my: "small", borderRadius: "default", mx: 1 }}
       />
       {isExpanded && !isCompact
         ? item.content.map((match, index) => (
@@ -116,6 +127,14 @@ function SearchResult(props: SearchResultProps) {
               key={`${item.id}${index}`}
               isFocused={false}
               item={item}
+              menuItems={menuItems}
+              onMiddleClick={() => {
+                useEditorStore.getState().openSession(item.id, {
+                  openInNewTab: true,
+                  rawContent: item.rawContent,
+                  activeSearchResultId: match[0].id
+                });
+              }}
               onPress={() => {
                 useEditorStore.getState().openSession(item.id, {
                   rawContent: item.rawContent,
@@ -127,7 +146,10 @@ function SearchResult(props: SearchResultProps) {
                 <Text
                   testID="title"
                   variant="body"
-                  sx={{ color: isOpened ? "paragraph-selected" : "paragraph" }}
+                  sx={{
+                    color: isOpened ? "paragraph-selected" : "paragraph",
+                    whiteSpace: "pre-wrap"
+                  }}
                 >
                   {match.map((part) => (
                     <Match key={part.id} match={part} />
@@ -164,4 +186,27 @@ function Match({ match }: { match: TMatch }) {
       {match.suffix ? <Text>{match.suffix}</Text> : null}
     </>
   );
+}
+
+async function menuItems(
+  item: HighlightedResult,
+  ids?: string[]
+): Promise<MenuItem[]> {
+  const note = await db.notes.note(item.id);
+  if (!note) return [];
+
+  const colors = await db.relations
+    .to({ type: "note", id: item.id }, "color")
+    .resolve();
+  return noteMenuItems(note, ids, {
+    locked: !!(
+      await db
+        .sql()
+        .selectFrom("content")
+        .where("noteId", "in", [note.id])
+        .select(["noteId", "locked"])
+        .executeTakeFirst()
+    )?.locked,
+    color: colors[0]
+  });
 }

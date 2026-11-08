@@ -103,7 +103,7 @@ export function ListPanePlaceholder({ variant }: { variant: Variant }) {
         width: "100%"
       }}
     >
-      <Icon svg={illustrations[image]} size={230} />
+      <Icon svg={illustrations[image]} size={image === "home" ? 230 : 210} />
       <Flex
         sx={{
           flexDirection: "column",

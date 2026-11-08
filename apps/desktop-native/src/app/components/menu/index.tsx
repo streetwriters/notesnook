@@ -19,8 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect, useState } from "react";
 import type { MenuItem, SxProp } from "@ui";
-import { Box, Button, Flex, Text, ThemeScope } from "@ui";
+import { Box, Button, dataColor, Flex, Icon, Text, ThemeScope } from "@ui";
 import { CaretRight, Check, Pro } from "../icons";
+import { environment } from "@platform";
 import { useMenuStore } from "./store";
 
 export { useMenuStore } from "./store";
@@ -41,9 +42,30 @@ function Separator() {
   );
 }
 
+function translateModifier(modifier: string) {
+  const os = environment.os;
+  if (os === "Android" || os === "iOS") return "";
+  const isMacOS = os === "macOS";
+  return modifier
+    .split("-")
+    .map((p) => {
+      if (isMacOS)
+        return p === "Mod"
+          ? "\u2318"
+          : p === "Alt"
+          ? "\u2325"
+          : p === "Shift"
+          ? "\u21E7"
+          : p;
+      return p === "Mod" ? "Ctrl" : p;
+    })
+    .join(isMacOS ? "" : "+");
+}
+
 function MenuButton(props: {
   item: MenuButtonItem;
   onClose: () => void;
+  isFocused?: boolean;
   isSubmenuOpen?: boolean;
   onHover?: () => void;
   onOpenSubmenu?: () => void;
@@ -56,7 +78,7 @@ function MenuButton(props: {
     <Button
       testID={`menu-button-${item.key}`}
       variant="menuitem"
-      title={item.tooltip}
+      title={item.tooltip || item.title}
       disabled={item.isDisabled}
       onHoverIn={props.onHover}
       onPress={() => {
@@ -74,7 +96,10 @@ function MenuButton(props: {
         px: "spacing4",
         py: "spacing3",
         minHeight: 29,
-        bg: props.isSubmenuOpen ? "hover" : undefined
+        bg:
+          props.isFocused || props.isSubmenuOpen
+            ? "background-selected"
+            : undefined
       }}
     >
       <Flex
@@ -88,6 +113,12 @@ function MenuButton(props: {
       >
         {IconComponent ? (
           <IconComponent
+            size={13}
+            color={dangerous ? "icon-error" : "icon-secondary"}
+          />
+        ) : item.icon ? (
+          <Icon
+            path={item.icon}
             size={13}
             color={dangerous ? "icon-error" : "icon-secondary"}
           />
@@ -106,31 +137,44 @@ function MenuButton(props: {
           {item.title}
         </Text>
       </Flex>
-      <Flex
-        sx={{
-          ml: 4,
-          flexShrink: 0,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "spacing2"
-        }}
-      >
-        {item.modifier ? (
-          <Text sx={{ color: "paragraph-secondary", fontSize: "xxs", ml: 4 }}>
-            {item.modifier}
-          </Text>
-        ) : null}
-        {item.premium ? <Pro size={13} color="accent" /> : null}
-        {item.isChecked ? (
-          <Flex testID="toggle-state-on">
+      {item.isChecked || hasSubmenu || item.modifier || item.premium ? (
+        <Flex
+          testID={`toggle-state-${item.isChecked ? "on" : "off"}`}
+          sx={{
+            ml: 4,
+            flexShrink: 0,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 1
+          }}
+        >
+          {item.premium ? <Pro size={13} color={dataColor("#D7C131")} /> : null}
+          {item.modifier ? (
+            <Text
+              sx={{
+                fontFamily: "body",
+                fontSize: "subBody",
+                color: "paragraph-secondary",
+                mr: item.isChecked || hasSubmenu ? 1 : 19
+              }}
+            >
+              {translateModifier(item.modifier)}
+            </Text>
+          ) : null}
+          {item.isChecked ? (
             <Check
               size={13}
               color={dangerous ? "icon-error" : "icon-secondary"}
             />
-          </Flex>
-        ) : null}
-        {hasSubmenu ? <CaretRight size={13} color="icon-secondary" /> : null}
-      </Flex>
+          ) : null}
+          {hasSubmenu ? (
+            <CaretRight
+              size={13}
+              color={dangerous ? "icon-error" : "icon-secondary"}
+            />
+          ) : null}
+        </Flex>
+      ) : null}
     </Button>
   );
 }
@@ -172,6 +216,7 @@ function MenuPanel(props: {
         border: "1px solid",
         borderColor: "border-secondary",
         minWidth: 220,
+        maxWidth: 350,
         py: "spacing4",
         ...props.sx
       }}
@@ -200,6 +245,7 @@ function MenuPanel(props: {
 function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
   const { items, onClose } = props;
   const [openKey, setOpenKey] = useState<string>();
+  const [focusKey, setFocusKey] = useState<string>();
   return (
     <>
       {items.map((item) => {
@@ -220,7 +266,11 @@ function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
               item={item}
               onClose={onClose}
               isSubmenuOpen={isOpen}
-              onHover={() => setOpenKey(item.menu ? item.key : undefined)}
+              isFocused={focusKey === item.key}
+              onHover={() => {
+                setFocusKey(item.isDisabled ? undefined : item.key);
+                setOpenKey(item.menu ? item.key : undefined);
+              }}
               onOpenSubmenu={() => setOpenKey(item.key)}
             />
             {isOpen && item.menu ? (

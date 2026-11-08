@@ -213,6 +213,8 @@ function EditorProperties(props: EditorPropertiesProps) {
               key={tab.id}
               testID={`properties-tab-${tab.id}`}
               icon={tab.icon}
+              size={30}
+              iconColor="icon-secondary"
               selected={activeTab === tab.id}
               onPress={() => useEditorStore.getState().setPropertiesTab(tab.id)}
             />
