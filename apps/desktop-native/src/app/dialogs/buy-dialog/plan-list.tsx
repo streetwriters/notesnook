@@ -27,11 +27,16 @@ import {
   ShieldCheck,
   CaretDown,
   CalendarBlank,
+  Check,
   Prohibit,
   HandCoins,
   type Icon
 } from "../../components/icons";
-import { getFeature, planToAvailability } from "@notesnook/common";
+import {
+  getFeature,
+  getFeaturesTable,
+  planToAvailability
+} from "@notesnook/common";
 import { Plan } from "./types";
 import { PERIOD_METADATA, PLAN_METADATA, usePlans } from "./plans";
 import { useState } from "react";
@@ -656,7 +661,152 @@ function PlanCard({
   );
 }
 export function ComparePlans() {
-  return null;
+  const rows = getFeaturesTable();
+  const plans = [
+    SubscriptionPlan.FREE,
+    SubscriptionPlan.ESSENTIAL,
+    SubscriptionPlan.PRO,
+    SubscriptionPlan.BELIEVER
+  ];
+  const cellSx = {
+    flex: 1,
+    minWidth: 0,
+    px: "spacing7",
+    py: "spacing6"
+  } as const;
+
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "spacing13",
+        p: "spacing14"
+      }}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing6"
+        }}
+      >
+        <Text
+          sx={{
+            fontSize: "2xl",
+            textAlign: "center",
+            color: "heading",
+            fontWeight: 600
+          }}
+        >
+          {strings.comparePlans()}
+        </Text>
+        <Text
+          sx={{
+            fontSize: "sm",
+            fontWeight: 400,
+            color: "paragraph",
+            textAlign: "center",
+            lineHeight: 1.5,
+            maxWidth: 712
+          }}
+        >
+          {strings.comparePlansDescription()}
+        </Text>
+      </Flex>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          width: "100%",
+          bg: "background",
+          borderRadius: "radius6",
+          p: "spacing7"
+        }}
+      >
+        <Flex
+          sx={{
+            flexDirection: "row",
+            bg: "background-selected",
+            borderRadius: 16,
+            py: "spacing3"
+          }}
+        >
+          <Flex sx={cellSx}>
+            <Text
+              variant="body"
+              sx={{ fontWeight: 600, fontSize: "lg", color: "heading" }}
+            >
+              Features
+            </Text>
+          </Flex>
+          {plans.map((plan) => (
+            <Flex key={plan} sx={cellSx}>
+              <Text
+                variant="body"
+                sx={{ fontWeight: 600, fontSize: "lg", color: "heading" }}
+              >
+                {PLAN_METADATA[plan].title}
+              </Text>
+            </Flex>
+          ))}
+        </Flex>
+        {rows.map((feature, rowIndex) => (
+          <Flex
+            key={feature[0]}
+            sx={{
+              flexDirection: "row",
+              bg: rowIndex % 2 === 0 ? "background" : "background-secondary",
+              py: "spacing3",
+              borderRadius: rowIndex % 2 === 1 ? 16 : 0
+            }}
+          >
+            <Flex sx={cellSx}>
+              <Text
+                variant="body"
+                sx={{ fontWeight: 500, fontSize: "md", color: "heading" }}
+              >
+                {feature[0]}
+              </Text>
+            </Flex>
+            {feature.slice(1).map((limit, index) => {
+              const caption = (limit as { caption: boolean | string | number })
+                .caption;
+              return (
+                <Flex key={index} sx={cellSx}>
+                  {typeof caption === "boolean" ? (
+                    caption ? (
+                      <Check size={20} color="accent" />
+                    ) : (
+                      <Text
+                        variant="body"
+                        sx={{ fontSize: 18, color: "paragraph" }}
+                      >
+                        -
+                      </Text>
+                    )
+                  ) : caption === "infinity" ? (
+                    <Text
+                      variant="body"
+                      sx={{ fontSize: 18, color: "paragraph" }}
+                    >
+                      {"\u221e"}
+                    </Text>
+                  ) : (
+                    <Text
+                      variant="body"
+                      sx={{ fontSize: "sm", color: "paragraph" }}
+                    >
+                      {caption}
+                    </Text>
+                  )}
+                </Flex>
+              );
+            })}
+          </Flex>
+        ))}
+      </Flex>
+    </Flex>
+  );
 }
 
 export function Footer() {

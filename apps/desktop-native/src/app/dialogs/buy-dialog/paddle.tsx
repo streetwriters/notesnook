@@ -99,7 +99,9 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   const appliedCouponCode = useRef<string | undefined>(undefined);
   const checkoutDataRef = useRef<CheckoutEventsData | undefined>(undefined);
   const checkoutRef = useRef<WebViewHandle>(null);
-  const addressRef = useRef<CheckoutEventsCustomerAddress | undefined>(undefined);
+  const addressRef = useRef<CheckoutEventsCustomerAddress | undefined>(
+    undefined
+  );
 
   const reloadCheckout = useCallback(() => {
     if (!checkoutDataRef.current) return;
