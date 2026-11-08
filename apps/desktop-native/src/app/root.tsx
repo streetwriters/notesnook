@@ -30,6 +30,8 @@ import { ErrorBoundary, GlobalErrorHandler } from "./components/error-boundary";
 import { Logo } from "./components/navigation-menu/logo";
 import { useKeyStore } from "./interfaces/key-store";
 import { usePathname } from "./navigation";
+import { hashNavigate } from "./navigation";
+import { environment } from "@platform";
 
 export type RootProps = BootOptions & {
   screen?: "app" | "demo";
@@ -48,6 +50,20 @@ export function Root(props: RootProps) {
       .catch((e: Error) => setState({ status: "error", message: e.message }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (state.status !== "ready" || !environment.isDev) return;
+    if (!bootOptions.initialHash) return;
+    const timer = setTimeout(
+      () =>
+        hashNavigate(
+          bootOptions.initialHash as Parameters<typeof hashNavigate>[0]
+        ),
+      800
+    );
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.status]);
 
   if (screen === "demo") return <Demo state={state} {...props} />;
   if (state.status === "ready")
