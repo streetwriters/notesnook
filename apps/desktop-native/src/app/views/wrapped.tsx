@@ -33,6 +33,7 @@ import {
 import { db } from "../common/db";
 import { ArrowDown, ArrowLeft, Loading } from "../components/icons";
 import { hardNavigate } from "../navigation";
+import { Logo } from "../components/navigation-menu/logo";
 import { MonthlyActivityHeatmap } from "../components/monthly-activity-heatmap";
 
 function formatNumber(num: number) {
@@ -364,6 +365,9 @@ function SummarySlide({ stats }: { stats: WrappedStats }) {
         p: 5
       }}
     >
+      <Flex sx={{ position: "absolute", bottom: 20, right: 20 }}>
+        <Logo size={20} />
+      </Flex>
       <Text
         variant="heading"
         sx={{

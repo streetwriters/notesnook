@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Radio, ScrollContainer, Text } from "@ui";
+import { Box, Button, Flex, ScrollContainer, Text } from "@ui";
 import { hardNavigate, useQueryParams } from "../navigation";
 import { db } from "../common/db";
 import { Loader } from "../components/loader";
@@ -306,11 +306,25 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
                 </Text>
               </Flex>
             </Flex>
-            <Radio
-              checked={index === selected}
-              onChange={() => setSelected(index)}
-              sx={{ flexShrink: 0, ml: 10 }}
-            />
+            <Flex
+              sx={{
+                width: 16,
+                height: 16,
+                borderRadius: 8,
+                flexShrink: 0,
+                ml: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid",
+                borderColor: index === selected ? "accent" : "paragraph"
+              }}
+            >
+              {index === selected ? (
+                <Box
+                  sx={{ width: 8, height: 8, borderRadius: 4, bg: "accent" }}
+                />
+              ) : null}
+            </Flex>
           </Flex>
         </Flex>
       ))}

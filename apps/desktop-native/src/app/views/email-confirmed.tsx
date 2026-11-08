@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect } from "react";
 import { strings } from "@notesnook/intl";
 import { shell } from "@platform";
-import { Flex, ScrollContainer, Text } from "@ui";
+import { dataColor, Flex, ScrollContainer, Text } from "@ui";
 import { hardNavigate, useQueryParams } from "../navigation";
 import {
   Chat as Discord,
@@ -106,16 +106,19 @@ export default EmailConfirmed;
 const social = [
   {
     title: "Discord",
+    hoverColor: "#7289da",
     icon: Discord,
     link: "https://discord.com/invite/zQBK97EE22"
   },
   {
     title: "Twitter",
+    hoverColor: "#1da1f2",
     icon: Twitter,
     link: "https://twitter.com/notesnook"
   },
   {
     title: "Reddit",
+    hoverColor: "#ff4500",
     icon: Reddit,
     link: "https://reddit.com/r/Notesnook"
   }
@@ -147,7 +150,11 @@ function BlogPromoBanner() {
             onPress={() => shell.openUrl(account.link)}
             size={30}
             color="icon"
-            sx={{ mr: 1, cursor: "pointer" }}
+            sx={{
+              mr: 1,
+              cursor: "pointer",
+              ":hover": { color: dataColor(account.hoverColor) }
+            }}
           />
         ))}
       </Flex>
