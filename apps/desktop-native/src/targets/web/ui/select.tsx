@@ -24,7 +24,9 @@ export function Select(props: Contract.SelectProps) {
     <select
       data-test-id={props.testID}
       value={props.value}
-      onChange={(event) => props.onChange?.(event.target.value)}
+      onChange={(event) =>
+        props.onChange?.((event.target as unknown as { value: string }).value)
+      }
     >
       {props.options.map((option) => (
         <option

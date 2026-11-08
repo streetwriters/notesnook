@@ -25,7 +25,9 @@ export function ColorPicker(props: Contract.ColorPickerProps) {
       type="color"
       data-test-id={props.testID}
       value={props.value}
-      onChange={(event) => props.onChange(event.target.value)}
+      onChange={(event) =>
+        props.onChange((event.target as unknown as { value: string }).value)
+      }
     />
   );
 }
