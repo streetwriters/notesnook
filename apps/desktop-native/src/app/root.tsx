@@ -23,6 +23,7 @@ import { strings } from "@notesnook/intl";
 import { Flex, Text } from "@ui";
 import { boot, type BootOptions } from "./boot";
 import { Demo, type Status } from "./demo";
+import { PlatformSmoke } from "./platform-smoke";
 import { getPersistence, getRoute } from "./bootstrap";
 import AppLock from "./views/app-lock";
 import { BaseThemeProvider } from "./components/theme-provider";
@@ -32,7 +33,7 @@ import { useKeyStore } from "./interfaces/key-store";
 import { usePathname } from "./navigation";
 
 export type RootProps = BootOptions & {
-  screen?: "app" | "demo";
+  screen?: "app" | "demo" | "platform";
   titleBarInset?: number;
   colorScheme: "light" | "dark";
   onToggleColorScheme: () => void;
@@ -50,6 +51,8 @@ export function Root(props: RootProps) {
   }, []);
 
   if (screen === "demo") return <Demo state={state} {...props} />;
+  if (screen === "platform" && state.status === "ready")
+    return <PlatformSmoke />;
   if (state.status === "ready")
     return (
       <ErrorBoundary>
