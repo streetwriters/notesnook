@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import type { ReactNode } from "react";
 import { Item } from "@notesnook/core";
 import { Flex, Text, type ColorToken, type SxProp } from "@ui";
+import { useListSelection } from "../list-container/selection";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 type ListItemColors = {
@@ -35,6 +36,7 @@ type ListItemProps = {
   isCompact?: boolean;
   isDisabled?: boolean;
   item: Item;
+  index?: number;
   onPress?: () => void;
   title: string | ReactNode;
   header?: ReactNode;
@@ -58,6 +60,7 @@ export default function ListItem(props: ListItemProps) {
     isDisabled,
     item
   } = props;
+  const selection = useListSelection();
   const isSelected = useSelectionStore((store) => {
     const isInSelection = store.selectedItems.includes(item.id);
     return isFocused
@@ -69,7 +72,13 @@ export default function ListItem(props: ListItemProps) {
   return (
     <Flex
       testID={`list-item-${item.id}`}
-      onPress={props.onPress}
+      onPress={(event) => {
+        if (selection && props.index !== undefined)
+          selection.onItemPress(props.index, item.id, event, () =>
+            props.onPress?.()
+          );
+        else props.onPress?.();
+      }}
       sx={{
         flexDirection: isCompact ? "row" : "column",
         justifyContent: isCompact ? "space-between" : "center",

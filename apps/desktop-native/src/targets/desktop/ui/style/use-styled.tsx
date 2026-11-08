@@ -140,8 +140,26 @@ export interface StyledResult {
   nativeProps: Record<string, unknown>;
 }
 
-function press(event: any): PressEvent {
+let lastModifiers = { shift: false, ctrl: false, alt: false, meta: false };
+
+export function recordModifiers(event: any) {
   const native = event?.nativeEvent ?? {};
+  lastModifiers = {
+    shift: !!native.shiftKey,
+    ctrl: !!native.ctrlKey,
+    alt: !!native.altKey,
+    meta: !!native.metaKey
+  };
+}
+
+function press(event: any): PressEvent {
+  const native = {
+    ...(event?.nativeEvent ?? {}),
+    shiftKey: lastModifiers.shift,
+    ctrlKey: lastModifiers.ctrl,
+    altKey: lastModifiers.alt,
+    metaKey: lastModifiers.meta
+  };
   return {
     button: "primary",
     detail: 1,
@@ -160,7 +178,7 @@ function press(event: any): PressEvent {
   };
 }
 
-function key(event: any): KeyEvent {
+export function key(event: any): KeyEvent {
   const native = event?.nativeEvent ?? event ?? {};
   return {
     key: native.key,

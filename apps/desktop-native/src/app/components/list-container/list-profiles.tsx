@@ -31,15 +31,17 @@ type ListItemWrapperProps = {
   data?: unknown;
   context?: Context;
   compact?: boolean;
+  index?: number;
 };
 
 export function ListItemWrapper(props: ListItemWrapperProps) {
-  const { group, compact, context, item, data } = props;
+  const { group, compact, context, item, data, index } = props;
 
   switch (item.type) {
     case "note":
       return (
         <Note
+          index={index}
           compact={compact}
           item={item}
           date={getDate(item, group)}

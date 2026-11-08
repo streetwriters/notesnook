@@ -34,6 +34,7 @@ import {
   TextInput,
   View
 } from "react-native";
+import Animated from "react-native-reanimated";
 import Svg, { Path, SvgXml } from "react-native-svg";
 import { shell } from "@platform";
 import type * as Contract from "../../../ui/primitives";
@@ -42,6 +43,7 @@ import { useThemeContext } from "./theme";
 import {
   InheritedTextStyle,
   pressHandler,
+  recordModifiers,
   useInheritedTextStyle,
   useStyled,
   wrapChildren
@@ -51,6 +53,9 @@ const AnyView = View as any;
 const AnyPressable = Pressable as any;
 const AnyText = NativeText as any;
 const AnyInput = TextInput as any;
+const AnimatedView = Animated.View as any;
+const AnimatedText = Animated.Text as any;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable) as any;
 
 function useElementRef(ref: ForwardedRef<UIElement>) {
   const inner = useRef<{ focus?: () => void; blur?: () => void }>(null);
@@ -77,8 +82,10 @@ function Container(
     variantGroup: "variants",
     defaults
   });
-  const ViewComponent = AnyView;
-  const PressableComponent = AnyPressable;
+  const ViewComponent = resolved.animated ? AnimatedView : AnyView;
+  const PressableComponent = resolved.animated
+    ? AnimatedPressable
+    : AnyPressable;
   const inner = useElementRef(ref);
   const onPress = pressHandler(props);
   const content = textStyle ? (
@@ -97,6 +104,7 @@ function Container(
         {...nativeProps}
         style={style}
         onPress={onPress}
+        onPointerDown={recordModifiers}
       >
         {content}
       </PressableComponent>
@@ -161,7 +169,7 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
   });
   const inner = useElementRef(ref);
   const onPress = pressHandler(props);
-  const TextComponent = AnyText;
+  const TextComponent = resolved.animated ? AnimatedText : AnyText;
   return (
     <TextComponent
       ref={inner}
@@ -192,7 +200,9 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
     const onPress = pressHandler(props);
     const style = { ...viewStyle };
     for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
-    const ButtonComponent = AnyPressable;
+    const ButtonComponent = resolved.animated
+      ? AnimatedPressable
+      : AnyPressable;
     return (
       <ButtonComponent
         ref={inner}
@@ -202,6 +212,7 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
         disabled={disabled}
         style={style}
         onPress={disabled ? undefined : onPress}
+        onPointerDown={recordModifiers}
       >
         <InheritedTextStyle.Provider value={textStyle}>
           {wrapChildren(children, textStyle)}

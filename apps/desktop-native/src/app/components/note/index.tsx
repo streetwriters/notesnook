@@ -31,6 +31,7 @@ type NoteProps = NoteResolvedData & {
   item: NoteType;
   context?: Context;
   date: number;
+  index?: number;
   compact?: boolean;
   sx?: SxProp;
 };
@@ -46,6 +47,7 @@ function Note(props: NoteProps) {
 
   return (
     <ListItem
+      index={props.index}
       isFocused={isOpened}
       isCompact={compact}
       item={note}

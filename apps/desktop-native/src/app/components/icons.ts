@@ -48,7 +48,9 @@ import {
   mdiBellOutline,
   mdiTagOutline,
   mdiBackupRestore,
-  mdiNoteTextOutline
+  mdiNoteTextOutline,
+  mdiTune,
+  mdiDotsHorizontal
 } from "@mdi/js";
 import { Icon as UIIcon, type IconProps } from "@ui";
 
@@ -90,3 +92,6 @@ export const Tag = icon(mdiTagOutline);
 export const Tags = icon(mdiPoundBox);
 export const Trash = icon(mdiTrashCanOutline);
 export const Book = icon(mdiBookOutline);
+export const Home = icon(mdiHomeOutline);
+export const Sliders = icon(mdiTune);
+export const More = icon(mdiDotsHorizontal);

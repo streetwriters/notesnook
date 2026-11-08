@@ -17,12 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, type ReactNode } from "react";
 import type { GroupingKey, Item, VirtualizedGrouping } from "@notesnook/core";
 import { useResolvedItem } from "@notesnook/common";
-import { Box, Flex, VirtualList, type VirtualListHandle } from "@ui";
+import {
+  Box,
+  Flex,
+  VirtualList,
+  type KeyEvent,
+  type PressEvent,
+  type VirtualListHandle
+} from "@ui";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { store as selectionStore } from "../../stores/selection-store";
+import { ListSelectionContext, type ListSelection } from "./selection";
 import GroupHeader from "../group-header";
 import {
   getListItemDefaultHeight,
@@ -48,6 +56,8 @@ type ListContainerProps = {
 export default function ListContainer(props: ListContainerProps) {
   const { type, group, items, context, header, compact, isSearching } = props;
   const list = useRef<VirtualListHandle>(null);
+  const anchor = useRef<number | undefined>(undefined);
+  const focused = useRef(0);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
@@ -70,6 +80,94 @@ export default function ListContainer(props: ListContainerProps) {
       selectionStore.toggleSelectionMode(false);
     };
   }, []);
+
+  const idAt = useCallback(
+    (index: number) => items.cacheItem(index)?.item?.id,
+    [items]
+  );
+
+  const selectRange = useCallback(
+    async (from: number, to: number) => {
+      const ids = await items.ids();
+      const [start, end] = from <= to ? [from, to] : [to, from];
+      selectionStore.setSelectedItems(ids.slice(start, end + 1));
+    },
+    [items]
+  );
+
+  const selection = useMemo<ListSelection>(
+    () => ({
+      onItemPress: (
+        index: number,
+        id: string,
+        event: PressEvent,
+        open: () => void
+      ) => {
+        focused.current = index;
+        if (event.shiftKey && anchor.current !== undefined) {
+          selectionStore.toggleSelectionMode(true);
+          selectRange(anchor.current, index);
+          return;
+        }
+        if (event.metaKey || event.ctrlKey) {
+          anchor.current = index;
+          if (!selectionStore.get().isSelectionMode)
+            selectionStore.toggleSelectionMode(true);
+          if (selectionStore.isSelected(id)) selectionStore.deselectItem(id);
+          else selectionStore.selectItem(id);
+          return;
+        }
+        anchor.current = index;
+        selectionStore.toggleSelectionMode(false);
+        open();
+      }
+    }),
+    [selectRange]
+  );
+
+  const onKeyDown = useCallback(
+    (event: KeyEvent) => {
+      const last = items.length - 1;
+      const move = (to: number) => {
+        const index = Math.max(0, Math.min(last, to));
+        focused.current = index;
+        list.current?.scrollToIndex({ index, align: "center" });
+        if (event.shiftKey) {
+          if (anchor.current === undefined) anchor.current = index;
+          selectionStore.toggleSelectionMode(true);
+          selectRange(anchor.current, index);
+        } else {
+          anchor.current = index;
+          const id = idAt(index);
+          selectionStore.toggleSelectionMode(true);
+          if (id) selectionStore.setSelectedItems([id]);
+        }
+        event.preventDefault();
+      };
+      switch (event.key) {
+        case "ArrowDown":
+          return move(focused.current + 1);
+        case "ArrowUp":
+          return move(focused.current - 1);
+        case "Home":
+          return move(0);
+        case "End":
+          return move(last);
+        case "Escape":
+          selectionStore.toggleSelectionMode(false);
+          anchor.current = undefined;
+          return;
+        case "a":
+          if (event.metaKey || event.ctrlKey) {
+            selectionStore.toggleSelectionMode(true);
+            selectRange(0, last);
+            event.preventDefault();
+          }
+          return;
+      }
+    },
+    [idAt, items, selectRange]
+  );
 
   const renderItem = useCallback(
     (index: number) => (
@@ -98,20 +196,24 @@ export default function ListContainer(props: ListContainerProps) {
     );
 
   return (
-    <Flex
-      testID={`${type}-list`}
-      sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
-    >
-      <VirtualList
-        ref={list}
-        count={items.length}
-        itemKey={itemKey}
-        renderItem={renderItem}
-        estimatedItemSize={getListItemDefaultHeight(group, compact)}
-        header={header}
-        overscan={400}
-      />
-    </Flex>
+    <ListSelectionContext.Provider value={selection}>
+      <Flex
+        testID={`${type}-list`}
+        sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
+      >
+        <VirtualList
+          ref={list}
+          testID="virtual-list"
+          onKeyDown={onKeyDown}
+          count={items.length}
+          itemKey={itemKey}
+          renderItem={renderItem}
+          estimatedItemSize={getListItemDefaultHeight(group, compact)}
+          header={header}
+          overscan={400}
+        />
+      </Flex>
+    </ListSelectionContext.Provider>
   );
 }
 
@@ -169,6 +271,7 @@ function ItemRenderer(props: {
       ) : null}
       <ListItemWrapper
         key={resolvedItem.item.id}
+        index={index}
         item={resolvedItem.item}
         data={resolvedItem.data}
         context={context}

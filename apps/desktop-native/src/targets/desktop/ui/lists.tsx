@@ -28,7 +28,7 @@ import {
 import { View } from "react-native";
 import type * as Contract from "../../../ui/lists";
 import { Flex } from "./primitives";
-import { useStyled } from "./style/use-styled";
+import { key as keyEvent, useStyled } from "./style/use-styled";
 
 const AnyView = View as any;
 
@@ -78,7 +78,14 @@ export const VirtualList = forwardRef<
       focusable
       onKeyDown={
         props.onKeyDown
-          ? (event: any) => props.onKeyDown?.(event.nativeEvent ?? event)
+          ? (event: any) => {
+              if (
+                event.target?.__nativeTag !== undefined &&
+                event.target.__nativeTag !== event.currentTarget?.__nativeTag
+              )
+                return;
+              props.onKeyDown?.(keyEvent(event));
+            }
           : undefined
       }
       onBlur={props.onBlur}

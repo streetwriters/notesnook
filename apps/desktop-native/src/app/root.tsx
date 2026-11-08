@@ -30,11 +30,11 @@ export type RootProps = BootOptions & {
 };
 
 export function Root(props: RootProps) {
-  const { screen = "app", seed, resetConfig } = props;
+  const { screen = "app", ...bootOptions } = props;
   const [state, setState] = useState<Status>({ status: "loading" });
 
   useEffect(() => {
-    boot({ seed, resetConfig })
+    boot(bootOptions)
       .then(setState)
       .catch((e: Error) => setState({ status: "error", message: e.message }));
     // eslint-disable-next-line react-hooks/exhaustive-deps

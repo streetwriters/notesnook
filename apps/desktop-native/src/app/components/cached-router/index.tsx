@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { memo, useEffect, useRef, type ComponentType } from "react";
-import { Freeze } from "react-freeze";
 import { Flex } from "@ui";
 import useRoutes from "../../hooks/use-routes";
 import { getHomeRoute, navigate, NavigationEvents } from "../../navigation";
@@ -42,7 +41,9 @@ function CachedRouter() {
       }
     }
   });
-  const cached = useRef<Record<string, ComponentType<any>>>({});
+  const cached = useRef<
+    Record<string, { Component: ComponentType<any>; props: any }>
+  >({});
 
   useEffect(() => {
     if (!routeResult) return;
@@ -55,8 +56,11 @@ function CachedRouter() {
     !cached.current[routeResult.key] ||
     routeResult.noCache
   )
-    cached.current[routeResult.key] =
-      routeResult.component as ComponentType<any>;
+    cached.current[routeResult.key] = {
+      Component: routeResult.component as ComponentType<any>,
+      props: routeResult.props
+    };
+  else cached.current[routeResult.key].props = routeResult.props;
 
   return (
     <RouteContainer
@@ -64,15 +68,19 @@ function CachedRouter() {
       buttons={routeResult.buttons}
       routeKey={routeResult.key}
     >
-      {Object.entries(cached.current).map(([key, Component]) => (
-        <Freeze key={key} freeze={key !== routeResult.key}>
-          <Flex
-            testID={`route-${key}`}
-            sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
-          >
-            <Component key={key} {...routeResult.props} />
-          </Flex>
-        </Freeze>
+      {Object.entries(cached.current).map(([key, { Component, props }]) => (
+        <Flex
+          key={key}
+          testID={`route-${key}`}
+          sx={{
+            display: key === routeResult.key ? "flex" : "none",
+            flexDirection: "column",
+            flex: 1,
+            overflow: "hidden"
+          }}
+        >
+          <Component key={key} {...props} />
+        </Flex>
       ))}
     </RouteContainer>
   );

@@ -38,8 +38,20 @@ export type SeedNote = {
 
 export type BootOptions = {
   seed?: SeedNote[];
+  seedNotebooks?: { title: string }[];
+  seedTags?: { title: string }[];
+  seedColors?: { title: string; colorCode: string }[];
   resetConfig?: boolean;
 };
+
+async function seedOthers(options: BootOptions) {
+  for (const notebook of options.seedNotebooks ?? [])
+    await db.notebooks.add({ title: notebook.title });
+  for (const tag of options.seedTags ?? [])
+    await db.tags.add({ title: tag.title });
+  for (const color of options.seedColors ?? [])
+    await db.colors.add({ title: color.title, colorCode: color.colorCode });
+}
 
 async function seedNotes(notes: SeedNote[]) {
   for (const note of notes) {
@@ -61,6 +73,7 @@ export async function boot(options: BootOptions = {}): Promise<BootState> {
   await initLocale();
   await initializeDatabase("db");
   if (environment.isDev && options.seed) await seedNotes(options.seed);
+  if (environment.isDev) await seedOthers(options);
   const user = await db.user.getUser();
   return {
     status: "ready",
