@@ -41,6 +41,8 @@ function CachedRouter() {
       }
     }
   });
+  // TEMPORARY: react-freeze wedges the runtime with 2+ frozen routes (RNGPUI_GAPS.md).
+  // Go back to <Freeze> as web does once the runtime is fixed.
   const cached = useRef<
     Record<string, { Component: ComponentType<any>; props: any }>
   >({});

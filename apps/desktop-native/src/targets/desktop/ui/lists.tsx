@@ -79,6 +79,7 @@ export const VirtualList = forwardRef<
       onKeyDown={
         props.onKeyDown
           ? (event: any) => {
+              // TEMPORARY: the runtime dispatches one key press per focusable node in the chain (RNGPUI_GAPS.md).
               if (
                 event.target?.__nativeTag !== undefined &&
                 event.target.__nativeTag !== event.currentTarget?.__nativeTag

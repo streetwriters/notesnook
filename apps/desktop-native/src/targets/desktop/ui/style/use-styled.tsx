@@ -140,6 +140,7 @@ export interface StyledResult {
   nativeProps: Record<string, unknown>;
 }
 
+// TEMPORARY: press events carry no modifier keys in the runtime (RNGPUI_GAPS.md).
 let lastModifiers = { shift: false, ctrl: false, alt: false, meta: false };
 
 export function recordModifiers(event: any) {
