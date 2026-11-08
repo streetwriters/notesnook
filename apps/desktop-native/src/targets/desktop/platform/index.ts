@@ -28,6 +28,7 @@ import { environment } from "./environment";
 import { files } from "./files";
 import { history } from "./history";
 import { integration } from "./integration";
+import { keyboard } from "./keyboard";
 import { lifecycle } from "./lifecycle";
 import { notifications } from "./notifications";
 import { shell } from "./shell";
@@ -44,6 +45,7 @@ export {
   files,
   history,
   integration,
+  keyboard,
   lifecycle,
   notifications,
   shell,
@@ -53,7 +55,6 @@ export {
 
 export const attachmentFiles =
   unimplemented<Contract.AttachmentFiles>("attachmentFiles");
-export const keyboard = unimplemented<Contract.Keyboard>("keyboard");
 export const spellChecker =
   unimplemented<Contract.SpellChecker>("spellChecker");
 
