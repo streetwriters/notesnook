@@ -166,4 +166,13 @@ scenarios.longContent = {
   ]
 };
 
+scenarios.settingsAppearance = {
+  ...scenarios.shell,
+  steps: [
+    { click: "profile-dropdown" },
+    { click: "menu-button-settings" },
+    { clickText: "Appearance" }
+  ]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

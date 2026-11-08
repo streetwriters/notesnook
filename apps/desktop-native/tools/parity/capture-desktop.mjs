@@ -86,6 +86,12 @@ try {
       await app.typeText(input.tag, step.type.text);
       await new Promise((resolve) => setTimeout(resolve, 2500));
     }
+    if (step.clickText) {
+      const entry = (await app.query("testID", "title", true)).find(
+        (candidate) => candidate.text === step.clickText
+      );
+      await app.click(entry.tag);
+    }
     if (step.hover) await app.hover((await locate(step.hover)).tag);
     await new Promise((resolve) => setTimeout(resolve, 800));
     await app.waitForIdle();

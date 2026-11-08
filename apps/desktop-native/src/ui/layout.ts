@@ -69,3 +69,13 @@ export interface TitleBarProps {
 }
 
 export declare function TitleBar(props: TitleBarProps): JSX.Element | null;
+
+export interface ScrollContainerProps {
+  sx?: SxProp;
+  testID?: string;
+  children?: ReactNode;
+}
+
+export declare function ScrollContainer(
+  props: ScrollContainerProps
+): JSX.Element;

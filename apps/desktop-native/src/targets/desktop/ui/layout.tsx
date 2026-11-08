@@ -28,12 +28,13 @@ import {
   useState,
   type ReactElement
 } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import type * as Contract from "../../../ui/layout";
 import { config } from "../platform/config";
 import { useStyled } from "./style/use-styled";
 
 const AnyView = View as any;
+const AnyScrollView = ScrollView as any;
 
 export function Pane(_props: Contract.PaneProps): JSX.Element | null {
   return null;
@@ -290,5 +291,17 @@ function PaneView({
     >
       {pane.children}
     </AnyView>
+  );
+}
+
+export function ScrollContainer(props: Contract.ScrollContainerProps) {
+  const { viewStyle, nativeProps } = useStyled({
+    sx: props.sx,
+    testID: props.testID
+  });
+  return (
+    <AnyScrollView {...nativeProps} style={viewStyle}>
+      {props.children}
+    </AnyScrollView>
   );
 }

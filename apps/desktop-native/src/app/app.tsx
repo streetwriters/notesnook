@@ -30,6 +30,7 @@ import {
 } from "@ui";
 import { ActionBar } from "./components/action-bar";
 import { MenuHost } from "./components/menu";
+import { DialogHost } from "./common/dialog-manager";
 import { useEditorStore } from "./stores/editor-store";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
@@ -142,6 +143,7 @@ export function App(props: { titleBarInset?: number }) {
       </SplitPane>
       <StatusBar />
       <MenuHost />
+      <DialogHost />
     </Flex>
   );
 }

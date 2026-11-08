@@ -127,6 +127,12 @@ for (const step of scenario.steps ?? []) {
     await page.keyboard.type(step.type.text);
     await page.waitForTimeout(2500);
   }
+  if (step.clickText)
+    await page
+      .locator('[data-test-id="settings-navigation-menu"]')
+      .getByText(step.clickText, { exact: true })
+      .first()
+      .click();
   if (step.hover) await target(step.hover).hover();
   await page.waitForTimeout(800);
 }
@@ -139,7 +145,9 @@ if (process.env.PARITY_DUMP)
   console.log(
     await page.evaluate(() => {
       const describe = (el) =>
-        `${el.tagName}.${el.className?.toString().slice(0, 30)}:${(el.textContent || "").slice(0, 16)}`;
+        `${el.tagName}.${el.className?.toString().slice(0, 30)}:${(
+          el.textContent || ""
+        ).slice(0, 16)}`;
       return JSON.stringify({
         active: describe(document.activeElement),
         hover: [...document.querySelectorAll(":hover")].map(describe).slice(-3),

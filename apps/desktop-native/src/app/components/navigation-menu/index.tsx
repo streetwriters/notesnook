@@ -38,6 +38,7 @@ import {
 } from "@ui";
 import { db } from "../../common/db";
 import { Notebooks } from "../../views/notebooks";
+import { SettingsDialog } from "../../dialogs/settings";
 import { FilterField } from "./filter-field";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { navigate, usePathname } from "../../navigation";
@@ -348,7 +349,8 @@ function ProfileButton() {
                 type: "button",
                 title: strings.routes.Settings(),
                 key: "settings",
-                iconComponent: GearSix
+                iconComponent: GearSix,
+                onClick: () => SettingsDialog.show({})
               },
               {
                 type: "button",

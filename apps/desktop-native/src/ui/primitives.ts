@@ -172,6 +172,18 @@ export interface IconProps extends BaseProps {
   rotate?: number;
 }
 
+export interface SelectOption {
+  value: string | number;
+  title: string;
+  disabled?: boolean;
+}
+
+export interface SelectProps extends BaseProps {
+  options: SelectOption[];
+  value?: string | number;
+  onChange?: (value: string) => void;
+}
+
 export interface ThemeScopeProps {
   scope: ThemeScopeName;
   children?: ReactNode;
@@ -193,6 +205,7 @@ export declare const Input: Primitive<InputProps>;
 export declare const Textarea: Primitive<TextareaProps>;
 export declare const Checkbox: Primitive<CheckboxProps>;
 export declare const Radio: Primitive<RadioProps>;
+export declare const Select: Primitive<SelectProps>;
 export declare const Switch: Primitive<SwitchProps>;
 export declare const Slider: Primitive<SliderProps>;
 export declare const Progress: Primitive<ProgressProps>;

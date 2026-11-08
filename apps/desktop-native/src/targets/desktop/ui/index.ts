@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+export { Dialog, DialogButton } from "./dialog";
 export * from "./hooks";
-export { Pane, SplitPane } from "./layout";
+export { Pane, ScrollContainer, SplitPane } from "./layout";
 export { VirtualList } from "./lists";
 export * from "./overlays";
 export * from "./primitives";
+export { Select } from "./select";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "./style/data-color";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./title-bar";
