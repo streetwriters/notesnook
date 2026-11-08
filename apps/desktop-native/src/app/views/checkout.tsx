@@ -17,12 +17,1002 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ReactNode } from "react";
-import { notImplemented } from "../common/not-implemented";
+import { useEffect, useState } from "react";
+import { EVENTS } from "@notesnook/core";
+import { getFeature, planToAvailability } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import dayjs from "dayjs";
+import { Box, Button, Flex, Text } from "@ui";
+import Field from "../components/field";
+import { Logo } from "../components/navigation-menu/logo";
+import { hardNavigate, useQueryParams } from "../navigation";
+import {
+  ArrowLeft,
+  Cloud,
+  CheckCircle,
+  CheckCircleSuccess,
+  Coupon,
+  DeviceMobileCamera,
+  Info,
+  Loading,
+  ShieldCheck
+} from "../components/icons";
+import { HeadlessAuth } from "./auth";
+import { CheckoutDetails } from "../dialogs/buy-dialog/buy-dialog";
+import { useCheckoutStore } from "../dialogs/buy-dialog/store";
+import { useStore as useUserStore } from "../stores/user-store";
+import {
+  FEATURE_HIGHLIGHTS,
+  formatPrice,
+  toPricingInfo
+} from "../dialogs/buy-dialog/helpers";
+import { PERIOD_METADATA, PLAN_METADATA } from "../dialogs/buy-dialog/plans";
+import { db } from "../common/db";
+import type { Plan } from "../dialogs/buy-dialog/types";
 
-export default function Checkout(_props: {
-  children?: ReactNode;
-}): JSX.Element | null {
-  notImplemented("Checkout")();
-  return null;
+export type { Plan };
+
+function parsePlan(
+  value: unknown
+):
+  | { success: true; data: Plan & { customer?: { id: string; email: string } } }
+  | { success: false } {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    typeof (value as Plan).id !== "string" ||
+    typeof (value as Plan).plan !== "number" ||
+    typeof (value as Plan).currency !== "string" ||
+    typeof (value as Plan).country !== "string" ||
+    !(value as Plan).price
+  )
+    return { success: false };
+  return {
+    success: true,
+    data: value as Plan & { customer?: { id: string; email: string } }
+  };
+}
+
+const CHECKOUT_STEP = {
+  ACCOUNT: "Account",
+  PAYMENT: "Payment",
+  COMPLETE: "Complete"
+} as const;
+
+const getCheckoutStepTitle = (step: CheckoutStep) =>
+  ({
+    [CHECKOUT_STEP.ACCOUNT]: strings.account(),
+    [CHECKOUT_STEP.PAYMENT]: strings.payment(),
+    [CHECKOUT_STEP.COMPLETE]: strings.complete()
+  }[step]);
+
+type CheckoutStep = (typeof CHECKOUT_STEP)[keyof typeof CHECKOUT_STEP];
+
+function Checkout() {
+  const [{ plan }] = useQueryParams();
+  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+
+  const [currentStep, setCurrentStep] = useState<CheckoutStep>(
+    CHECKOUT_STEP.ACCOUNT
+  );
+  const [error, setError] = useState<string>();
+  const [customer, setCustomer] = useState<{ id: string; email: string }>();
+
+  useEffect(() => {
+    useUserStore.getState().init();
+  }, []);
+
+  useEffect(() => {
+    if (!plan) return;
+
+    const pricingInfo = parsePlan(
+      JSON.parse(Buffer.from(plan, "base64").toString("utf-8"))
+    );
+    if (!pricingInfo.success) {
+      hardNavigate("/");
+      return;
+    }
+    useCheckoutStore.getState().selectPlan(pricingInfo.data);
+    useCheckoutStore
+      .getState()
+      .updatePrice(
+        toPricingInfo(pricingInfo.data, useUserStore.getState().user)
+      );
+    useCheckoutStore.getState().applyCoupon(pricingInfo.data.discount?.code);
+    if (pricingInfo.data.customer) {
+      setCustomer(pricingInfo.data.customer);
+      // TODO setCurrentStep(CHECKOUT_STEP.PAYMENT);
+      setCurrentStep(CHECKOUT_STEP.COMPLETE);
+    }
+  }, [plan]);
+
+  useEffect(() => {
+    if (currentStep === CHECKOUT_STEP.COMPLETE) {
+      const event = db.eventManager.subscribe(
+        EVENTS.userSubscriptionUpdated,
+        () => {
+          hardNavigate("/notes#/welcome");
+        }
+      );
+      return () => {
+        event.unsubscribe();
+      };
+    }
+  }, [currentStep]);
+
+  if (!plan) {
+    hardNavigate("/");
+    return null;
+  }
+
+  return (
+    <Flex
+      sx={{
+        bg: "background",
+        flexDirection: "column",
+        height: "100%",
+        gap: "spacing7"
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: "1px solid",
+          borderBottomColor: "border",
+          px: "spacing13",
+          py: "spacing8"
+        }}
+      >
+        <Flex sx={{ alignItems: "center", gap: "spacing7" }}>
+          {currentStep === CHECKOUT_STEP.COMPLETE ? null : (
+            <Button>
+              <ArrowLeft
+                size={20}
+                color="icon"
+                onPress={() => hardNavigate("/plans")}
+              />
+            </Button>
+          )}
+          <Flex
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "spacing4"
+            }}
+          >
+            <Logo size={30} />
+            <Text
+              sx={{
+                fontSize: "2xl",
+                color: "heading",
+                fontWeight: 600,
+                lineHeight: 1.2,
+                letterSpacing: -0.88
+              }}
+            >
+              Notesnook
+            </Text>
+          </Flex>
+        </Flex>
+        <Button variant="new_bordered" sx={{ px: "spacing6" }}>
+          {strings.contact()}
+        </Button>
+      </Flex>
+      {currentStep === CHECKOUT_STEP.COMPLETE ? (
+        <Flex
+          sx={{
+            flex: 1,
+            justifyContent: "center",
+            my: "spacing9"
+          }}
+        >
+          <CheckoutSuccessCard
+            selectedPlan={selectedPlan}
+            onClose={() => hardNavigate("/notes")}
+          />
+        </Flex>
+      ) : (
+        <Flex
+          sx={{
+            flex: 1,
+            px: "spacing13",
+            gap: "spacing10"
+          }}
+        >
+          <Flex
+            sx={{
+              flex: 1,
+              flexDirection: "column",
+              gap: "spacing11",
+              bg: "background",
+              border: "1px solid",
+              borderColor: "border-secondary",
+              borderRadius: "radius4",
+              boxShadow: "menu",
+              px: "spacing9",
+              py: "spacing11"
+            }}
+          >
+            <Flex
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "spacing7"
+              }}
+            >
+              {[
+                CHECKOUT_STEP.ACCOUNT,
+                CHECKOUT_STEP.PAYMENT,
+                CHECKOUT_STEP.COMPLETE
+              ].map((step, index) => (
+                <>
+                  <Flex
+                    key={step}
+                    sx={{ alignItems: "center", gap: "spacing4" }}
+                  >
+                    <Flex
+                      sx={{
+                        bg:
+                          currentStep >= step
+                            ? "accent"
+                            : "background-secondary",
+                        height: 24,
+                        width: 24,
+                        borderRadius: 100,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0
+                      }}
+                    >
+                      <Text
+                        sx={{
+                          fontSize: "sm",
+                          fontWeight: 600,
+                          color:
+                            currentStep >= step
+                              ? "accentForeground"
+                              : "heading-secondary",
+                          textAlign: "center"
+                        }}
+                      >
+                        {index + 1}
+                      </Text>
+                    </Flex>
+                    <Text
+                      sx={{
+                        color: "heading",
+                        fontSize: "sm",
+                        fontWeight: 500
+                      }}
+                    >
+                      {getCheckoutStepTitle(step)}
+                    </Text>
+                  </Flex>
+                  {index <
+                  [
+                    CHECKOUT_STEP.ACCOUNT,
+                    CHECKOUT_STEP.PAYMENT,
+                    CHECKOUT_STEP.COMPLETE
+                  ].length -
+                    1 ? (
+                    <Box
+                      sx={{
+                        display: ["none", "none", "flex"],
+                        height: 2,
+                        width: 100,
+                        bg: "separator"
+                      }}
+                    />
+                  ) : null}
+                </>
+              ))}
+            </Flex>
+
+            <Flex
+              sx={{
+                flex: 1,
+                position: "relative",
+                overflow: "hidden"
+              }}
+            >
+              {currentStep === CHECKOUT_STEP.ACCOUNT ? (
+                <HeadlessAuth
+                  route="signup"
+                  canSkip={false}
+                  isolated
+                  openURL={async (url, ctx) => {
+                    if (ctx?.authenticated) {
+                      await useUserStore.getState().init();
+                      const user = useUserStore.getState().user;
+                      setCustomer(user);
+                      setCurrentStep(
+                        CHECKOUT_STEP.COMPLETE
+                        // TODO: isUserSubscribed(user)
+                        //   ? CHECKOUT_STEP.COMPLETE
+                        //   : CHECKOUT_STEP.PAYMENT
+                      );
+                    } else setError(strings.failedToCreateAccount());
+                  }}
+                />
+              ) : currentStep === CHECKOUT_STEP.PAYMENT ? (
+                <Flex
+                  sx={{ flexDirection: "column", overflow: "hidden", flex: 1 }}
+                >
+                  <Text
+                    sx={{ color: "heading", fontSize: "2xl", fontWeight: 600 }}
+                  >
+                    {strings.finalStepMakePayment()}
+                  </Text>
+                  <Text
+                    variant="body"
+                    sx={{
+                      fontSize: "sm",
+                      color: "paragraph",
+                      mt: "spacing3",
+                      mb: "spacing11"
+                    }}
+                  >
+                    {strings.oneStepAwayFromUnlocking()}
+                  </Text>
+                  <CheckoutDetails
+                    user={customer}
+                    onComplete={() => {
+                      setCurrentStep(CHECKOUT_STEP.COMPLETE);
+                    }}
+                  />
+                </Flex>
+              ) : null}
+            </Flex>
+          </Flex>
+          <Flex
+            sx={{
+              display: ["none", "none", "flex"],
+              // width: "300px",
+              flexBasis: "30%",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              bg: "background"
+            }}
+          >
+            <CheckoutSummary />
+          </Flex>
+        </Flex>
+      )}
+
+      {currentStep === CHECKOUT_STEP.COMPLETE ? null : (
+        <Flex
+          sx={{
+            display: ["flex", "flex", "none"],
+            width: "100%",
+            bg: "background",
+            zIndex: 999,
+            p: 3,
+            flexDirection: "column"
+          }}
+        >
+          <CheckoutSummaryMobile />
+        </Flex>
+      )}
+    </Flex>
+  );
+}
+export default Checkout;
+
+type CheckoutSuccessCardProps = {
+  selectedPlan?: Plan;
+  onClose: () => void;
+};
+
+function CheckoutSuccessCard(props: CheckoutSuccessCardProps) {
+  const { selectedPlan, onClose } = props;
+
+  if (!selectedPlan) return null;
+
+  const storageCaption =
+    getFeature("storage").availability[planToAvailability(selectedPlan.plan)]
+      .caption;
+
+  const features = [
+    {
+      icon: <Cloud size={15} color="icon" />,
+      title: strings.cloudStorageTitle(),
+      value: storageCaption
+    },
+    {
+      icon: <ShieldCheck size={15} color="icon" />,
+      title: strings.encryption(),
+      value: strings.encryptionValue()
+    },
+    {
+      icon: <DeviceMobileCamera size={15} color="icon" />,
+      title: strings.deviceSync(),
+      value: strings.unlimitedSync()
+    },
+    {
+      icon: <Info size={15} color="icon" />,
+      title: strings.vipSupport(),
+      value: strings.prioritizedSupport()
+    }
+  ];
+
+  return (
+    <Flex
+      sx={{
+        width: "100%",
+        maxWidth: "562px",
+        height: "auto",
+        flexDirection: "column",
+        gap: "spacing6",
+        alignItems: "center",
+        justifyContent: "center",
+        bg: "background",
+        border: "1px solid",
+        borderColor: "border",
+        borderRadius: "radius4",
+        boxShadow: "menu",
+        p: "spacing7"
+      }}
+    >
+      <Flex
+        sx={{
+          width: "100%",
+          flexDirection: "column",
+          gap: "spacing7",
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+      >
+        <Flex
+          sx={{
+            width: "100%",
+            flexDirection: "column",
+            gap: "spacing11",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <CheckCircleSuccess size={60} color="accent" />
+          <Flex
+            sx={{
+              width: "100%",
+              flexDirection: "column",
+              gap: "spacing6",
+              alignItems: "center",
+              textAlign: "center"
+            }}
+          >
+            <Text
+              sx={{
+                color: "heading",
+                fontSize: "2xl",
+                fontWeight: 600,
+                lineHeight: 1
+              }}
+            >
+              {strings.paymentConfirmed()}
+            </Text>
+            <Text
+              sx={{
+                color: "paragraph",
+                fontSize: "sm",
+                fontWeight: 400,
+                lineHeight: 1.5
+              }}
+            >
+              {strings.paymentConfirmedDesc()}
+            </Text>
+          </Flex>
+        </Flex>
+        <Flex
+          sx={{
+            width: "100%",
+            flexDirection: "column",
+            gap: "spacing6",
+            bg: "background-secondary",
+            p: "spacing7",
+            borderRadius: "radius4"
+          }}
+        >
+          <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
+            <Text
+              sx={{
+                color: "heading",
+                fontSize: "lg",
+                fontWeight: 600,
+                lineHeight: 1
+              }}
+            >
+              {strings.activeMembership()}
+            </Text>
+            <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: 100,
+                  bg: "accent"
+                }}
+              />
+              <Text
+                sx={{
+                  color: "accent",
+                  fontSize: "sm",
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                {strings.planWithTitle(
+                  PLAN_METADATA[selectedPlan.plan as keyof typeof PLAN_METADATA]
+                    .title
+                )}
+              </Text>
+            </Flex>
+          </Flex>
+          <Box sx={{ height: 1, width: "100%", bg: "separator" }} />
+          <Flex sx={{ width: "100%", flexWrap: "wrap", rowGap: "spacing6" }}>
+            {features.map((feature) => (
+              <Flex
+                key={feature.title}
+                sx={{
+                  width: ["100%", "50%"],
+                  gap: "spacing4",
+                  alignItems: "flex-start"
+                }}
+              >
+                {feature.icon}
+                <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+                  <Text
+                    sx={{
+                      color: "paragraph",
+                      fontSize: "xs",
+                      fontWeight: 400,
+                      lineHeight: 1
+                    }}
+                  >
+                    {feature.title}
+                  </Text>
+                  <Text
+                    sx={{
+                      color: "heading",
+                      fontSize: "sm",
+                      fontWeight: 500,
+                      lineHeight: 1
+                    }}
+                  >
+                    {feature.value}
+                  </Text>
+                </Flex>
+              </Flex>
+            ))}
+          </Flex>
+        </Flex>
+      </Flex>
+      <Button
+        variant="new_accent"
+        onPress={onClose}
+        sx={{
+          width: "100%",
+          px: "spacing4",
+          py: "spacing5",
+          fontSize: "sm"
+        }}
+      >
+        {strings.startTakingNotesSecurely()}
+      </Button>
+    </Flex>
+  );
+}
+
+function CheckoutSummaryMobile() {
+  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
+  const isApplyingCoupon = useCheckoutStore((state) => state.isApplyingCoupon);
+  const couponCode = useCheckoutStore((state) => state.couponCode);
+  const applyCoupon = useCheckoutStore((state) => state.applyCoupon);
+  const setIsApplyingCoupon = useCheckoutStore(
+    (state) => state.setIsApplyingCoupon
+  );
+
+  if (!selectedPlan || !pricingInfo) return null;
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing8"
+      }}
+    >
+      <Text
+        sx={{
+          fontSize: "sm",
+          fontWeight: 400,
+          color: "heading-secondary",
+          lineHeight: 1
+        }}
+      >
+        {strings.paymentSummary()}
+      </Text>
+      <SummaryContent
+        selectedPlan={selectedPlan}
+        pricingInfo={pricingInfo}
+        isApplyingCoupon={isApplyingCoupon}
+        couponCode={couponCode}
+        applyCoupon={applyCoupon}
+        setIsApplyingCoupon={setIsApplyingCoupon}
+      />
+    </Flex>
+  );
+}
+
+function CheckoutSummary() {
+  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
+  const isApplyingCoupon = useCheckoutStore((state) => state.isApplyingCoupon);
+  const couponCode = useCheckoutStore((state) => state.couponCode);
+  const applyCoupon = useCheckoutStore((state) => state.applyCoupon);
+  const setIsApplyingCoupon = useCheckoutStore(
+    (state) => state.setIsApplyingCoupon
+  );
+
+  if (!selectedPlan || !pricingInfo) return null;
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        gap: "spacing8"
+      }}
+    >
+      <Text
+        sx={{
+          fontSize: "sm",
+          fontWeight: 400,
+          color: "heading-secondary",
+          lineHeight: 1
+        }}
+      >
+        {strings.paymentSummary()}
+      </Text>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing8",
+          bg: "background",
+          border: "1px solid",
+          borderColor: "border-secondary",
+          borderRadius: "radius4",
+          boxShadow: "menu",
+          px: "spacing9",
+          py: "spacing11"
+        }}
+      >
+        <SummaryContent
+          selectedPlan={selectedPlan}
+          pricingInfo={pricingInfo}
+          isApplyingCoupon={isApplyingCoupon}
+          couponCode={couponCode}
+          applyCoupon={applyCoupon}
+          setIsApplyingCoupon={setIsApplyingCoupon}
+        />
+      </Flex>
+    </Flex>
+  );
+}
+
+type SummaryContentProps = {
+  selectedPlan: Plan;
+  pricingInfo: NonNullable<
+    ReturnType<typeof useCheckoutStore.getState>["pricingInfo"]
+  >;
+  isApplyingCoupon: boolean;
+  couponCode?: string;
+  applyCoupon: (code?: string) => void;
+  setIsApplyingCoupon: (v: boolean) => void;
+};
+
+function SummaryContent(props: SummaryContentProps) {
+  const {
+    selectedPlan,
+    pricingInfo,
+    isApplyingCoupon,
+    couponCode,
+    applyCoupon,
+    setIsApplyingCoupon
+  } = props;
+  const { price } = pricingInfo;
+
+  const [couponInputValue, setCouponInputValue] = useState("");
+
+  // keep the displayed value in sync when a coupon gets applied/removed elsewhere
+  useEffect(() => {
+    if (couponCode) setCouponInputValue(couponCode);
+  }, [couponCode]);
+
+  return (
+    <>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing3",
+          alignItems: "flex-start"
+        }}
+      >
+        <Text
+          sx={{
+            fontSize: "2xl",
+            fontWeight: 600,
+            color: "heading",
+            lineHeight: 1
+          }}
+        >
+          {strings.planWithTitle(
+            PLAN_METADATA[selectedPlan.plan as keyof typeof PLAN_METADATA].title
+          )}
+        </Text>
+        <Text
+          sx={{
+            fontWeight: 400,
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1
+          }}
+        >
+          {PERIOD_METADATA[selectedPlan.period].title} Billing
+        </Text>
+      </Flex>
+
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing7",
+          mt: "spacing11"
+        }}
+      >
+        {FEATURE_HIGHLIGHTS.map((feature) => {
+          const caption: string | number | boolean =
+            feature.availability[planToAvailability(selectedPlan.plan)].caption;
+          return (
+            <Flex
+              key={feature.id}
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                sx={{
+                  fontSize: "sm",
+                  color: "paragraph",
+                  lineHeight: 1,
+                  fontWeight: 400
+                }}
+              >
+                {feature.title}
+              </Text>
+              {typeof caption === "boolean" || caption === "infinity" ? (
+                <CheckCircle size={20} color="accent" />
+              ) : (
+                <Text
+                  sx={{
+                    fontSize: "sm",
+                    color: "heading",
+                    lineHeight: 1,
+                    fontWeight: 500
+                  }}
+                >
+                  {caption}
+                </Text>
+              )}
+            </Flex>
+          );
+        })}
+      </Flex>
+
+      <Box sx={{ height: 1, bg: "separator" }} />
+
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing7"
+        }}
+      >
+        <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+          <Text
+            sx={{
+              fontSize: "sm",
+              color: "paragraph",
+              lineHeight: 1,
+              fontWeight: 400
+            }}
+          >
+            {strings.today()}
+          </Text>
+          <Text
+            sx={{
+              fontSize: "sm",
+              fontWeight: 600,
+              color: "accent",
+              lineHeight: 1
+            }}
+          >
+            {price.trial_period
+              ? formatPrice(0, price.currency)
+              : price.subtotal}
+          </Text>
+        </Flex>
+
+        {price.trial_period ? (
+          <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+            <Text
+              sx={{
+                fontSize: "sm",
+                fontWeight: 400,
+                color: "paragraph",
+                lineHeight: 1
+              }}
+            >
+              After {price.trial_period.frequency} days
+            </Text>
+            <Text
+              sx={{
+                fontSize: "sm",
+                fontWeight: 500,
+                color: "heading",
+                lineHeight: 1
+              }}
+            >
+              {price.subtotal}
+            </Text>
+          </Flex>
+        ) : null}
+
+        {pricingInfo.recurringPrice ? (
+          <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph-secondary",
+                lineHeight: 1,
+                fontWeight: 400
+              }}
+            >
+              {pricingInfo.period === "monthly"
+                ? strings.nextMonth()
+                : pricingInfo.period === "yearly"
+                ? strings.nextYear()
+                : dayjs()
+                    .add(pricingInfo.period === "5-year" ? 5 : 1, "year")
+                    .add(price.trial_period?.frequency || 0, "days")
+                    .format("YYYY-MM-DD")}
+            </Text>
+            <Text
+              sx={{
+                fontSize: "sm",
+                color: "paragraph-secondary",
+                lineHeight: 1
+              }}
+            >
+              {pricingInfo.recurringPrice.subtotal}
+            </Text>
+          </Flex>
+        ) : null}
+      </Flex>
+
+      <Box sx={{ height: 1, bg: "separator" }} />
+
+      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Text
+          sx={{
+            fontSize: "md",
+            fontWeight: 500,
+            color: "heading",
+            lineHeight: 1
+          }}
+        >
+          {strings.totalForToday()}
+        </Text>
+        <Text
+          sx={{
+            fontSize: "lg",
+            fontWeight: 600,
+            color: "heading",
+            lineHeight: 1
+          }}
+        >
+          {price.trial_period ? formatPrice(0, price.currency) : price.total}
+        </Text>
+      </Flex>
+
+      <Box sx={{ height: 1, bg: "separator" }} />
+
+      <Field
+        key={couponCode ? "applied" : "empty"}
+        placeholder={strings.enterCouponCode()}
+        disabled={!!couponCode}
+        value={couponInputValue}
+        onChangeText={setCouponInputValue}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && couponInputValue.trim()) {
+            setIsApplyingCoupon(true);
+            applyCoupon(couponInputValue.trim());
+          }
+        }}
+        sx={{
+          border: "1px solid",
+          borderColor: "border",
+          borderRadius: "radius2",
+          height: 45,
+          overflow: "hidden",
+          gap: 0
+        }}
+        styles={{
+          input: {
+            border: "none",
+            bg: "transparent",
+            fontSize: "sm",
+            color: "paragraph",
+            pl: "38px",
+            pr: "85px",
+            lineHeight: 1
+          }
+        }}
+        leftActions={[
+          {
+            testId: "coupon-icon",
+            disabled: true,
+            sx: {
+              width: "38px",
+              pl: "spacing5",
+              pr: "spacing4",
+              justifyContent: "flex-start",
+              bg: "transparent"
+            },
+            component: <Coupon size={15} color="icon" />
+          }
+        ]}
+        rightActions={[
+          {
+            testId: couponCode ? "remove-coupon-button" : "apply-coupon-button",
+            disabled:
+              isApplyingCoupon || (!couponCode && !couponInputValue.trim()),
+            onClick: () => {
+              setIsApplyingCoupon(true);
+              if (couponCode) {
+                applyCoupon(undefined);
+                setCouponInputValue("");
+              } else {
+                applyCoupon(couponInputValue.trim());
+              }
+            },
+            sx: {
+              // width: "85px",
+              // minWidth: "85px",
+              px: 0,
+              bg: "accent",
+              borderRadius: "radius2"
+            },
+            component: (
+              <Button
+                variant="new_accent"
+                sx={{
+                  fontSize: "sm",
+                  fontWeight: 600,
+                  p: "spacing6",
+                  lineHeight: 1,
+                  borderRadius: "radius2"
+                }}
+              >
+                {isApplyingCoupon ? (
+                  <Loading size={18} />
+                ) : couponCode ? (
+                  strings.remove()
+                ) : (
+                  strings.apply()
+                )}
+              </Button>
+            )
+          }
+        ]}
+      />
+    </>
+  );
 }
