@@ -22,6 +22,9 @@ import type { PickedFile } from "./files";
 export interface ImageCompressor {
   compress(
     file: PickedFile,
-    options: { maxWidth: number; quality: number }
+    options: {
+      maxWidth: number | ((naturalWidth: number) => number);
+      quality: number;
+    }
   ): Promise<Uint8Array>;
 }
