@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test, vi } from "vitest";
 import { listTitles } from "./nav";
-import { launchApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.now();

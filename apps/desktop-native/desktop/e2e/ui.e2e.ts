@@ -1,6 +1,7 @@
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
-import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 import { THEME_DARK, THEME_LIGHT } from "../../src/app/common/theme";
 
 let app: DesktopApp;
@@ -42,11 +43,19 @@ function near(actual: number[], hex: string, tolerance = 3) {
 }
 
 async function expectColor(testID: string, hex: string, atX = 0.5, atY = 0.5) {
+  let stable = 0;
   await expect
-    .poll(async () => near(await color(testID, atX, atY), hex), {
-      message: `${testID} should be ${hex}`,
-      timeout: 5000
-    })
+    .poll(
+      async () => {
+        stable = near(await color(testID, atX, atY), hex) ? stable + 1 : 0;
+        return stable >= 2;
+      },
+      {
+        message: `${testID} should be ${hex}`,
+        timeout: 5000,
+        interval: 100
+      }
+    )
     .toBe(true);
 }
 

@@ -2,7 +2,8 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, test, vi } from "vitest";
-import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 
 const dataDir = mkdtempSync(path.join(tmpdir(), "notesnook-e2e-"));
 

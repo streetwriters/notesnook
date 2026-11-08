@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 
 let app: DesktopApp;
 

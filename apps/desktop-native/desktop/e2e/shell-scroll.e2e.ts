@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { listTitles } from "./nav";
-import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 
 const COUNT = 2000;
 const DAY = 24 * 60 * 60 * 1000;

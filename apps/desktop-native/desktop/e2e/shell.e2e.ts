@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
-import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { type DesktopApp } from "@react-native-gpui/testing";
+import { launchApp } from "./launch";
 import { groupHeaderTitles, listTitles, navClick } from "./nav";
 
 const DAY = 24 * 60 * 60 * 1000;
