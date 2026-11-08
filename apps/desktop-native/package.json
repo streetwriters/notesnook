@@ -78,7 +78,9 @@
     "@react-native/babel-preset": "0.87.1",
     "@react-native/metro-config": "0.87.1",
     "@react-native/typescript-config": "0.87.1",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^19.2.3",
+    "pngjs": "^7.0.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }

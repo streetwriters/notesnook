@@ -17,7 +17,107 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useEffect, useRef, useState } from "react";
+import { Box, Button, Flex, Input, Text } from "@ui";
+import { boot, type BootState } from "./boot";
 
-export function Root() {
-  return null;
+type Status =
+  | BootState
+  | { status: "loading" }
+  | { status: "error"; message: string };
+
+export function Root(props: {
+  colorScheme: "light" | "dark";
+  onToggleColorScheme: () => void;
+}) {
+  const renders = useRef(0);
+  renders.current++;
+  const [state, setState] = useState<Status>({ status: "loading" });
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    boot()
+      .then(setState)
+      .catch((e: Error) => setState({ status: "error", message: e.message }));
+  }, []);
+
+  return (
+    <Flex
+      testID="root"
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 3,
+        flex: 1,
+        bg: "background"
+      }}
+    >
+      <Text testID="title" sx={{ fontSize: "heading", color: "heading" }}>
+        Notesnook
+      </Text>
+      <Text testID="boot-state" sx={{ color: "paragraph" }}>
+        {state.status === "loading"
+          ? "Loading"
+          : state.status === "error"
+          ? `Error: ${state.message}`
+          : state.user
+          ? `Logged in as ${state.user.email}`
+          : "Logged out"}
+      </Text>
+      {state.status === "ready" ? (
+        <Text testID="boot-info" sx={{ color: "paragraph-secondary" }}>
+          {`Notesnook ${state.version} (${
+            state.online ? "online" : "offline"
+          })`}
+        </Text>
+      ) : null}
+      <Flex
+        group="row"
+        testID="row"
+        sx={{
+          alignItems: "center",
+          gap: 2,
+          p: 2,
+          width: 280,
+          borderRadius: "default",
+          bg: "background-secondary",
+          ":hover": { bg: "hover" }
+        }}
+      >
+        <Text sx={{ color: "paragraph", flex: 1 }}>Hover this row</Text>
+        <Box
+          testID="row-action"
+          sx={{
+            width: 20,
+            height: 20,
+            borderRadius: "small",
+            bg: "accent",
+            opacity: 0,
+            ":group-hover": { group: "row", style: { opacity: 1 } }
+          }}
+        />
+      </Flex>
+      <Button
+        testID="toggle-scheme"
+        onPress={props.onToggleColorScheme}
+        sx={{ px: 3, py: 2 }}
+      >
+        {`Switch to ${props.colorScheme === "dark" ? "light" : "dark"}`}
+      </Button>
+      <Input
+        testID="input"
+        placeholder="Type here"
+        value={text}
+        onChangeText={setText}
+        sx={{ width: 280 }}
+      />
+      <Text testID="echo" sx={{ color: "paragraph" }}>
+        {text}
+      </Text>
+      <Text testID="renders" sx={{ color: "paragraph-secondary" }}>
+        {`renders: ${renders.current}`}
+      </Text>
+    </Flex>
+  );
 }

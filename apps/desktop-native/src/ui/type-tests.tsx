@@ -86,7 +86,7 @@ export const elements = [
   <Text key="3" variant="body" color="paragraph" />,
   <Button key="4" variant="accent" onPress={(e) => e.stopPropagation()} />,
   <Input key="5" onChangeText={(text) => text.length} />,
-  <ThemeScope key="6" scope="navigationMenu" variant="secondary" />,
+  <ThemeScope key="6" scope="navigationMenu" />,
   // @ts-expect-error className is not part of the contract
   <Box key="7" className="selectable" />,
   // @ts-expect-error inline style is not part of the contract

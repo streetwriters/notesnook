@@ -17,12 +17,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Appearance, Dimensions, useWindowDimensions } from "react-native";
+import { useColorScheme } from "react-native";
 import type * as Contract from "../../../ui/hooks";
 
-export const useMediaQuery: typeof Contract.useMediaQuery = () => {
-  throw new Error("useMediaQuery is not implemented on desktop yet");
+function evaluate(
+  query: string,
+  width: number,
+  scheme: string | null | undefined
+) {
+  return query
+    .split(/\band\b/)
+    .map((part) => part.trim().replace(/^\(|\)$/g, ""))
+    .every((condition) => {
+      const [name, value] = condition.split(":").map((v) => v.trim());
+      switch (name) {
+        case "min-width":
+          return width >= parseFloat(value);
+        case "max-width":
+          return width <= parseFloat(value);
+        case "prefers-color-scheme":
+          return (scheme ?? "light") === value;
+        default:
+          return false;
+      }
+    });
+}
+
+export const useMediaQuery: typeof Contract.useMediaQuery = (query) => {
+  const { width } = useWindowDimensions();
+  const scheme = useColorScheme();
+  return evaluate(query, width, scheme);
 };
 
-export const matchMediaQuery: typeof Contract.matchMediaQuery = () => {
-  throw new Error("matchMediaQuery is not implemented on desktop yet");
-};
+export const matchMediaQuery: typeof Contract.matchMediaQuery = (query) =>
+  evaluate(query, Dimensions.get("window").width, Appearance.getColorScheme());

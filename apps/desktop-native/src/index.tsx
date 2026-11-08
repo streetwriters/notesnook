@@ -18,43 +18,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "./targets/desktop";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
-import { boot, type BootState } from "./app/boot";
-
-type Status =
-  | BootState
-  | { status: "loading" }
-  | { status: "error"; message: string };
+import { useState } from "react";
+import { ThemeDark, ThemeLight } from "@notesnook/theme";
+import { Root } from "./app/root";
+import { DesktopThemeProvider } from "./targets/desktop/ui";
 
 export default function App() {
-  const [state, setState] = useState<Status>({ status: "loading" });
-
-  useEffect(() => {
-    boot()
-      .then(setState)
-      .catch((e: Error) => setState({ status: "error", message: e.message }));
-  }, []);
-
+  const [colorScheme, setColorScheme] = useState<"light" | "dark">("light");
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Notesnook</Text>
-      <Text testID="boot-state">
-        {state.status === "loading"
-          ? "Loading"
-          : state.status === "error"
-          ? `Error: ${state.message}`
-          : state.user
-          ? `Logged in as ${state.user.email}`
-          : "Logged out"}
-      </Text>
-      {state.status === "ready" ? (
-        <Text testID="boot-info">
-          {`Notesnook ${state.version} (${
-            state.online ? "online" : "offline"
-          })`}
-        </Text>
-      ) : null}
-    </View>
+    <DesktopThemeProvider
+      theme={colorScheme === "dark" ? ThemeDark : ThemeLight}
+    >
+      <Root
+        colorScheme={colorScheme}
+        onToggleColorScheme={() =>
+          setColorScheme((scheme) => (scheme === "dark" ? "light" : "dark"))
+        }
+      />
+    </DesktopThemeProvider>
   );
 }

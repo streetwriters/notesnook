@@ -9,6 +9,6 @@ export default mergeConfig(
   defineConfig(desktopPreset),
   defineConfig({
     root: projectRoot,
-    test: { include: ['desktop/e2e/**/*.e2e.ts'] },
+    test: { include: ['desktop/e2e/**/*.e2e.ts'], fileParallelism: false },
   }),
 );

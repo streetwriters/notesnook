@@ -19,3 +19,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export * from "./hooks";
 export * from "./overlays";
+export * from "./primitives";
+export { DesktopThemeProvider, ThemeScope } from "./theme";
