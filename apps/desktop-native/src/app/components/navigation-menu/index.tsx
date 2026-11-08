@@ -598,6 +598,7 @@ function FilterField(props: { placeholder: string }) {
           flex: 1,
           minWidth: 0,
           p: 0,
+          height: 16,
           fontSize: "xs",
           color: "paragraph"
         }}

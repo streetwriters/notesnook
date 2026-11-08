@@ -173,6 +173,10 @@ export function convertDeclarations(
       case "whiteSpace":
         nowrap = value === "nowrap";
         continue;
+      case "background":
+        if (typeof value === "string" && !/gradient|url\(/.test(value))
+          style.backgroundColor = value;
+        continue;
       case "userSelect":
         converted.selectable = value !== "none";
         continue;
