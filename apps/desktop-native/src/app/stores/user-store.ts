@@ -1,0 +1,183 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import createStore from "../common/store";
+import { db } from "../common/db";
+import BaseStore from "./index";
+import { EVENTS } from "@notesnook/core";
+import Config from "../utils/config";
+import { hashNavigate } from "../navigation";
+import { AuthenticatorType, User } from "@notesnook/core";
+import { ConfirmDialog } from "../dialogs/confirm";
+import { OnboardingDialog } from "../dialogs/onboarding-dialog";
+import { strings } from "@notesnook/intl";
+import { isUserSubscribed } from "../hooks/use-is-user-premium";
+import { resetFeatures } from "../common";
+
+class UserStore extends BaseStore<UserStore> {
+  isLoggedIn?: boolean;
+  isLoggingIn = false;
+  isSigningIn = false;
+
+  user?: User = undefined;
+  counter = 0;
+
+  private _pendingLogin?: {
+    email: string;
+    password: string;
+    sessionExpired: boolean;
+  };
+
+  init = () => {
+    db.eventManager.subscribe(EVENTS.userSessionExpired, async () => {
+      Config.set("sessionExpired", true);
+      window.location.replace("/sessionexpired");
+    });
+
+    db.user.getUser().then((user) => {
+      if (!user?.email) {
+        this.set({ isLoggedIn: false });
+        return;
+      }
+      this.set({
+        user,
+        isLoggedIn: true
+      });
+      if (Config.get("sessionExpired"))
+        db.eventManager.publish(EVENTS.userSessionExpired);
+    });
+
+    if (Config.get("sessionExpired")) return;
+
+    db.eventManager.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      (subscription) => {
+        const wasSubscribed = isUserSubscribed();
+        this.refreshUser();
+        this.set((state) => {
+          if (!state.user) return;
+          state.user.subscription = subscription;
+        });
+        if (!wasSubscribed && isUserSubscribed()) OnboardingDialog.show({});
+        resetFeatures();
+      }
+    );
+
+    db.eventManager.subscribe(EVENTS.userEmailConfirmed, () => {
+      hashNavigate("/confirmed");
+    });
+
+    db.eventManager.subscribe(EVENTS.userLoggedOut, async (reason) => {
+      this.set((state) => {
+        state.user = undefined;
+        state.isLoggedIn = false;
+      });
+      Config.logout();
+      if (reason) {
+        await ConfirmDialog.show({
+          title: strings.loggedOut(),
+          subtitle: reason,
+          negativeButtonText: strings.okay()
+        });
+      }
+    });
+
+    return db.user.fetchUser().then(async (user) => {
+      if (!user) return false;
+
+      this.set({
+        user,
+        isLoggedIn: true
+      });
+
+      return true;
+    });
+  };
+
+  refreshUser = async () => {
+    return db.user.fetchUser().then((user) => {
+      this.set({ user });
+    });
+  };
+
+  login = async (
+    form:
+      | { email: string; password: string }
+      | { email: string }
+      | { code: string; method: AuthenticatorType | "recoveryCode" },
+    skipInit = false,
+    sessionExpired = false
+  ) => {
+    this.set((state) => (state.isLoggingIn = true));
+
+    try {
+      if ("email" in form && "password" in form) {
+        this._pendingLogin = {
+          email: form.email,
+          password: form.password,
+          sessionExpired: Config.get("sessionExpired", false)
+        };
+        return await db.user.authenticateEmail(form.email);
+      } else if ("email" in form) {
+        return await db.user.authenticateEmail(form.email);
+      } else if ("code" in form) {
+        const { code, method } = form;
+        await db.user.authenticateMultiFactorCode(code, method);
+
+        if (this._pendingLogin) {
+          const {
+            email,
+            password,
+            sessionExpired: sessExp
+          } = this._pendingLogin;
+          this._pendingLogin = undefined;
+          await db.user.authenticatePassword(
+            email,
+            password,
+            undefined,
+            sessExp
+          );
+        }
+
+        Config.set("encryptBackups", true);
+        if (skipInit) return true;
+        return this.init();
+      }
+    } finally {
+      this.set((state) => (state.isLoggingIn = false));
+    }
+  };
+
+  signup = (form: { email: string; password: string }) => {
+    this.set((state) => (state.isSigningIn = true));
+    return db.user
+      .signup(form.email.toLowerCase(), form.password)
+      .then(() => {
+        return this.init();
+      })
+      .finally(() => {
+        this.set((state) => (state.isSigningIn = false));
+      });
+  };
+}
+
+const [useStore, store] = createStore<UserStore>(
+  (set, get) => new UserStore(set, get)
+);
+export { useStore, store };

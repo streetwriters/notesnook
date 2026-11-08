@@ -1,0 +1,351 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { DesktopIntegration, PATHS } from "@notesnook/desktop";
+import { db } from "../common/db";
+import { desktop } from "../common/desktop-bridge";
+import createStore from "../common/store";
+import Config from "../utils/config";
+import BaseStore from "./index";
+import { TimeFormat, DayFormat, WeekFormat, EVENTS } from "@notesnook/core";
+import { Profile, TrashCleanupInterval } from "@notesnook/core";
+import { showToast } from "../utils/toast";
+import { ConfirmDialog } from "../dialogs/confirm";
+import * as openpgp from "openpgp";
+import { InboxPGPKeysDialog } from "../dialogs/inbox-pgp-keys-dialog";
+import { strings } from "@notesnook/intl";
+
+export const HostIds = [
+  "API_HOST",
+  "AUTH_HOST",
+  "SSE_HOST",
+  "MONOGRAPH_HOST"
+] as const;
+export type HostId = (typeof HostIds)[number];
+
+export enum ImageCompressionOptions {
+  ASK_EVERY_TIME,
+  ENABLE,
+  DISABLE
+}
+
+export type HomePage = {
+  type: "notebook" | "tag" | "color" | "route";
+  id: string;
+};
+
+class SettingStore extends BaseStore<SettingStore> {
+  encryptBackups = Config.get("encryptBackups", false);
+  backupReminderOffset = Config.get("backupReminderOffset", 0);
+  fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
+  backupStorageLocation = PATHS.backupsDirectory;
+  doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
+  markdownShortcuts = Config.get("markdownShortcuts", false);
+  fontLigatures = Config.get("fontLigatures", false);
+  notificationsSettings = Config.get("notifications", { reminder: true });
+  isFullOfflineMode = Config.get("fullOfflineMode", false);
+  serverUrls: Partial<Record<HostId, string>> = Config.get("serverUrls", {});
+
+  lastBackupTime?: number;
+  lastFullBackupTime?: number;
+
+  zoomFactor = 1.0;
+  privacyMode = false;
+  customDns = true;
+  hideNoteTitle = Config.get("hideNoteTitle", false);
+  dateFormat = "DD-MM-YYYY";
+  timeFormat: TimeFormat = "12-hour";
+  dayFormat: DayFormat = "short";
+  weekFormat: WeekFormat = "Sun";
+  titleFormat = "Note $date$ $time$";
+  profile?: Profile;
+
+  trashCleanupInterval: TrashCleanupInterval = 7;
+  homepage = Config.get<HomePage>("homepage-v2", {
+    type: "route",
+    id: "notes"
+  });
+  defaultSidebarTab = Config.get<"home" | "notebooks" | "tags">(
+    "sidebarTab",
+    "home"
+  );
+  imageCompression = Config.get(
+    "imageCompression",
+    ImageCompressionOptions.ASK_EVERY_TIME
+  );
+  desktopIntegrationSettings?: DesktopIntegration;
+  autoUpdates = false;
+  isFlatpak = false;
+  isSnap = false;
+  isPortable = false;
+  proxyRules?: string;
+  isInboxEnabled = false;
+  appLanguage = Config.get<string>("appLanguage", "");
+
+  init = () => {
+    db.eventManager.subscribe(EVENTS.userFetched, async () => {
+      this.set({
+        isInboxEnabled: await db.user.hasInboxKeys()
+      });
+    });
+  };
+
+  refreshBackupTime = async () => {
+    this.set({
+      lastBackupTime: await db.backup.lastBackupTime(),
+      lastFullBackupTime: await db.backup.lastFullBackupTime()
+    });
+  };
+
+  refresh = async () => {
+    this.set({
+      dateFormat: db.settings.getDateFormat(),
+      timeFormat: db.settings.getTimeFormat(),
+      weekFormat: db.settings.getWeekFormat(),
+      dayFormat: db.settings.getDayFormat(),
+      titleFormat: db.settings.getTitleFormat(),
+      trashCleanupInterval: db.settings.getTrashCleanupInterval(),
+      profile: db.settings.getProfile(),
+      appLanguage: Config.get<string>("appLanguage", ""),
+      isFlatpak: await desktop?.integration.isFlatpak.query(),
+      isSnap: await desktop?.integration.isSnap.query(),
+      isPortable: await desktop?.integration.isPortable.query(),
+      desktopIntegrationSettings:
+        await desktop?.integration.desktopIntegration.query(),
+      privacyMode: await desktop?.integration.privacyMode.query(),
+      customDns: await desktop?.integration.customDns.query(),
+      zoomFactor: await desktop?.integration.zoomFactor.query(),
+      autoUpdates: await desktop?.updater.autoUpdates.query(),
+      proxyRules: await desktop?.integration.proxyRules.query(),
+      isInboxEnabled: await db.user.hasInboxKeys(),
+      backupStorageLocation: await desktop?.integration.backupDirectory.query()
+    });
+    await this.refreshBackupTime();
+  };
+
+  setDateFormat = async (dateFormat: string) => {
+    await db.settings.setDateFormat(dateFormat);
+    this.set({ dateFormat });
+  };
+
+  setTimeFormat = async (timeFormat: TimeFormat) => {
+    await db.settings.setTimeFormat(timeFormat);
+    this.set({ timeFormat });
+  };
+
+  setDayFormat = async (dayFormat: DayFormat) => {
+    await db.settings.setDayFormat(dayFormat);
+    this.set({ dayFormat });
+  };
+
+  setWeekFormat = async (weekFormat: WeekFormat) => {
+    await db.settings.setWeekFormat(weekFormat);
+    this.set({ weekFormat });
+  };
+
+  setTitleFormat = async (titleFormat: string) => {
+    await db.settings.setTitleFormat(titleFormat);
+    this.set({ titleFormat });
+  };
+
+  setTrashCleanupInterval = async (
+    trashCleanupInterval: TrashCleanupInterval
+  ) => {
+    await db.settings.setTrashCleanupInterval(trashCleanupInterval);
+    this.set({ trashCleanupInterval });
+  };
+
+  setZoomFactor = async (zoomFactor: number) => {
+    await desktop?.integration.setZoomFactor.mutate(zoomFactor);
+    this.set({ zoomFactor });
+  };
+
+  setProxyRules = async (proxyRules: string) => {
+    await desktop?.integration.setProxyRules.mutate(proxyRules);
+    this.set({ proxyRules });
+  };
+
+  setEncryptBackups = (encryptBackups: boolean) => {
+    this.set({ encryptBackups });
+    Config.set("encryptBackups", encryptBackups);
+  };
+
+  setHomepage = (homepage?: HomePage) => {
+    this.set({ homepage });
+    Config.set(
+      "homepage-v2",
+      homepage || {
+        type: "route",
+        id: "notes"
+      }
+    );
+  };
+
+  setDefaultSidebarTab = (defaultSidebarTab: "home" | "notebooks" | "tags") => {
+    this.set({ defaultSidebarTab });
+    Config.set("sidebarTab", defaultSidebarTab);
+  };
+
+  setImageCompression = (imageCompression: ImageCompressionOptions) => {
+    this.set({ imageCompression });
+    Config.set("imageCompression", imageCompression);
+  };
+
+  setAppLanguage = (appLanguage: string) => {
+    this.set({ appLanguage });
+    Config.set("appLanguage", appLanguage);
+  };
+
+  setDesktopIntegration = async (settings: DesktopIntegration) => {
+    const { desktopIntegrationSettings } = this.get();
+
+    await desktop?.integration.setDesktopIntegration.mutate({
+      ...desktopIntegrationSettings,
+      ...settings
+    });
+    this.set({
+      desktopIntegrationSettings:
+        await desktop?.integration.desktopIntegration.query()
+    });
+  };
+
+  setNotificationSettings = (settings: { reminder: boolean }) => {
+    const { notificationsSettings } = this.get();
+    Config.set("notifications", { ...notificationsSettings, ...settings });
+
+    this.set({ notificationsSettings: Config.get("notifications") });
+  };
+
+  toggleEncryptBackups = () => {
+    const encryptBackups = this.get().encryptBackups;
+    this.setEncryptBackups(!encryptBackups);
+  };
+
+  setBackupReminderOffset = (offset: number) => {
+    Config.set("backupReminderOffset", offset);
+    this.set({ backupReminderOffset: offset });
+  };
+
+  setFullBackupReminderOffset = (offset: number) => {
+    Config.set("fullBackupReminderOffset", offset);
+    this.set({ fullBackupReminderOffset: offset });
+  };
+
+  toggleDoubleSpacedParagraphs = () => {
+    const doubleSpacedParagraphs = this.get().doubleSpacedParagraphs;
+    this.set(
+      (state) => (state.doubleSpacedParagraphs = !doubleSpacedParagraphs)
+    );
+    Config.set("doubleSpacedLines", !doubleSpacedParagraphs);
+  };
+
+  toggleMarkdownShortcuts = (toggleState?: boolean) => {
+    const markdownShortcuts = this.get().markdownShortcuts;
+    this.set(
+      (state) => (state.markdownShortcuts = toggleState ?? !markdownShortcuts)
+    );
+    Config.set("markdownShortcuts", !markdownShortcuts);
+  };
+
+  toggleFontLigatures = (toggleState?: boolean) => {
+    const fontLigatures = this.get().fontLigatures;
+    this.set((state) => (state.fontLigatures = toggleState ?? !fontLigatures));
+    Config.set("fontLigatures", !fontLigatures);
+  };
+
+  togglePrivacyMode = async () => {
+    const privacyMode = this.get().privacyMode;
+    this.set({ privacyMode: !privacyMode });
+    await desktop?.integration.setPrivacyMode.mutate({ enabled: !privacyMode });
+  };
+
+  toggleCustomDns = async () => {
+    const customDns = this.get().customDns;
+    this.set({ customDns: !customDns });
+    await desktop?.integration.setCustomDns.mutate(!customDns);
+  };
+
+  toggleHideTitle = async () => {
+    const { hideNoteTitle } = this.get();
+    this.set({ hideNoteTitle: !hideNoteTitle });
+    Config.set("hideNoteTitle", !hideNoteTitle);
+  };
+
+  toggleAutoUpdates = async () => {
+    const autoUpdates = this.get().autoUpdates;
+    this.set({ autoUpdates: !autoUpdates });
+    await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
+  };
+
+  toggleFullOfflineMode = (toggleState?: boolean) => {
+    const state = toggleState ?? !this.get().isFullOfflineMode;
+    this.set({ isFullOfflineMode: state });
+    Config.set("fullOfflineMode", state);
+
+    if (!state) db.fs().cancel("offline-mode");
+    else db.attachments.cacheAttachments();
+  };
+
+  setServerUrls = (urls?: Partial<Record<HostId, string>>) => {
+    if (!urls) {
+      Config.set("serverUrls", {});
+      this.set({ serverUrls: {} });
+      return;
+    }
+    const serverUrls = this.get().serverUrls;
+    this.set({ serverUrls: { ...serverUrls, ...urls } });
+    Config.set("serverUrls", { ...serverUrls, ...urls });
+  };
+
+  toggleInbox = async () => {
+    const { isInboxEnabled } = this.get();
+
+    try {
+      if (isInboxEnabled) {
+        const ok = await ConfirmDialog.show({
+          title: strings.disableInboxApi(),
+          subtitle: strings.disableInboxApiWarning(),
+          positiveButtonText: strings.yes(),
+          negativeButtonText: strings.no()
+        });
+        if (!ok) return;
+
+        await db.inboxItemsHistory.deleteFailed();
+        await db.user.discardInboxKeys();
+        this.set({ isInboxEnabled: false });
+
+        return;
+      }
+
+      const ok = await InboxPGPKeysDialog.show({ keys: null });
+      if (ok) {
+        this.set({ isInboxEnabled: true });
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        showToast("error", e.message);
+      }
+    }
+  };
+}
+
+const [useStore, store] = createStore<SettingStore>(
+  (set, get) => new SettingStore(set, get)
+);
+export { useStore, store };
