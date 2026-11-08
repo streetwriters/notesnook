@@ -18,69 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { crypto } from "@platform";
 
-export type CryptoKey = {
-  readonly type: string;
-  readonly usages: string[];
-};
+export type { Algorithm, CryptoKey, SubtleCryptoLike } from "@platform";
 
-type Algorithm = string | Record<string, unknown>;
-
-export interface SubtleCryptoLike {
-  importKey(
-    format: string,
-    keyData: ArrayBuffer | Uint8Array,
-    algorithm: Algorithm,
-    extractable: boolean,
-    usages: string[]
-  ): Promise<CryptoKey>;
-  exportKey(format: string, key: CryptoKey): Promise<ArrayBuffer>;
-  generateKey(
-    algorithm: Algorithm,
-    extractable: boolean,
-    usages: string[]
-  ): Promise<CryptoKey>;
-  deriveKey(
-    algorithm: Algorithm,
-    baseKey: CryptoKey,
-    derivedKeyType: Algorithm,
-    extractable: boolean,
-    usages: string[]
-  ): Promise<CryptoKey>;
-  deriveBits(
-    algorithm: Algorithm,
-    baseKey: CryptoKey,
-    length: number
-  ): Promise<ArrayBuffer>;
-  wrapKey(
-    format: string,
-    key: CryptoKey,
-    wrappingKey: CryptoKey,
-    algorithm: Algorithm
-  ): Promise<ArrayBuffer>;
-  unwrapKey(
-    format: string,
-    wrappedKey: ArrayBuffer,
-    unwrappingKey: CryptoKey,
-    unwrapAlgorithm: Algorithm,
-    unwrappedKeyAlgorithm: Algorithm,
-    extractable: boolean,
-    usages: string[]
-  ): Promise<CryptoKey>;
-  encrypt(
-    algorithm: Algorithm,
-    key: CryptoKey,
-    data: ArrayBuffer | Uint8Array
-  ): Promise<ArrayBuffer>;
-  decrypt(
-    algorithm: Algorithm,
-    key: CryptoKey,
-    data: ArrayBuffer | Uint8Array
-  ): Promise<ArrayBuffer>;
-}
-
-export const subtle: SubtleCryptoLike = (
-  crypto as unknown as { subtle: SubtleCryptoLike }
-).subtle;
+export const subtle = crypto.subtle;
 
 export function randomBytes(length: number) {
   return crypto.getRandomValues(new Uint8Array(length));

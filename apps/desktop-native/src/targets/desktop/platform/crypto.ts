@@ -22,6 +22,9 @@ import XXH from "xxhashjs";
 import type { Crypto } from "../../../platform";
 
 export const crypto: Crypto = {
+  get subtle() {
+    return globalThis.crypto.subtle as unknown as Crypto["subtle"];
+  },
   getRandomValues: (array) => globalThis.crypto.getRandomValues(array as any),
   async xxh64(data) {
     const bytes =
