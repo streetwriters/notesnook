@@ -114,14 +114,17 @@ try {
       width: frame.width,
       height: frame.height,
       background: argb(props.backgroundColor ?? 0),
-      color: null,
-      borderColor: null,
+      color: isText ? argb(props.textColor ?? 0) : null,
+      borderColor:
+        (props.borderWidths?.top ?? 0) > 0
+          ? argb(props.borderColors?.top ?? 0)
+          : null,
       borderWidth: props.borderWidths?.top ?? 0,
       fontFamily: fragment?.fontFamily ?? null,
       fontSize: fragment?.fontSize ?? null,
       fontWeight: fragment?.fontWeight ?? null,
-      lineHeight: null,
-      letterSpacing: null,
+      lineHeight: fragment?.lineHeight || null,
+      letterSpacing: fragment ? fragment.letterSpacing ?? 0 : null,
       text: (props.text ?? "").slice(0, 40)
     });
   }

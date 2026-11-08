@@ -31,7 +31,21 @@ export const scenarios = {
     scale: 2,
     schemes: ["light", "dark"],
     route: "/notes",
-    seed: shellSeed
+    seed: shellSeed,
+    mask: {
+      reason: "editor and editor footer are deferred",
+      ids: [
+        "editor-title",
+        "tags",
+        "editor-tag-input",
+        "Disable editor margins",
+        "Enter fullscreen",
+        "Focus mode",
+        "editor-word-count",
+        "editor-save-state-notsaved"
+      ],
+      rects: [{ x: 630, y: 45, width: 570, height: 755 }]
+    }
   }
 };
 
