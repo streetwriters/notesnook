@@ -40,7 +40,7 @@ import { checkFeature } from "../common";
 import { setTimeOnly, setDateOnly } from "../utils/date-time";
 import { Field } from "./components/field";
 import { DayPicker } from "../components/day-picker";
-import { InlinePopup } from "./components/inline-popup";
+import { AnchoredPopover } from "./components/anchored-popover";
 import { NoteReference } from "./components/note-reference";
 import { Fieldset, ReminderRadioButton } from "./components/radio-button";
 
@@ -342,7 +342,7 @@ export const AddReminderDialog = DialogManager.register(
                   defaultValue={date.format(db.settings.getDateFormat())}
                   onChangeText={(text) => setDate((d) => setDateOnly(text, d))}
                 />
-                <InlinePopup
+                <AnchoredPopover
                   isOpen={showCalendar}
                   onClose={() => setShowCalendar(false)}
                   anchorRef={dateAnchorRef}
@@ -359,7 +359,7 @@ export const AddReminderDialog = DialogManager.register(
                       setShowCalendar(false);
                     }}
                   />
-                </InlinePopup>
+                </AnchoredPopover>
               </Flex>
             ) : recurringMode === RecurringModes.YEAR ? (
               <Flex sx={{ flex: 1, gap: "spacing6", flexDirection: "row" }}>
@@ -430,7 +430,7 @@ export const AddReminderDialog = DialogManager.register(
                   </Text>
                   <CaretDown size={13} color="icon" />
                 </Flex>
-                <InlinePopup
+                <AnchoredPopover
                   isOpen={showMonthlyDays}
                   onClose={() => setShowMonthlyDays(false)}
                   anchorRef={monthlyAnchorRef}
@@ -473,7 +473,7 @@ export const AddReminderDialog = DialogManager.register(
                       </Flex>
                     );
                   })}
-                </InlinePopup>
+                </AnchoredPopover>
               </Flex>
             ) : null}
             {mode === Modes.REPEAT && recurringMode === RecurringModes.WEEK ? (
