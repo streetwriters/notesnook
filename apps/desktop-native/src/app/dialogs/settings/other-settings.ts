@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { clipboard, environment, shell } from "@platform";
+import { clipboard, shell } from "@platform";
 import { getReleaseTrack, setReleaseTrack } from "./platform-gaps";
 import { SettingComponent, SettingsGroup } from "./types";
 import { appVersion } from "../../utils/version";
@@ -28,7 +28,6 @@ import { clearLogs, downloadLogs } from "../../utils/logger";
 import { useAutoUpdateStore } from "../../hooks/use-auto-updater";
 import { IssueDialog } from "../issue-dialog";
 import { strings } from "@notesnook/intl";
-import { TaskManager } from "../../common/task-manager";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 
 export const AboutSettings: SettingsGroup[] = [

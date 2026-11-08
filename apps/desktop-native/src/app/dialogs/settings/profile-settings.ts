@@ -19,18 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { reloadApp } from "./platform-gaps";
 import { strings } from "@notesnook/intl";
-import { createBackup, logout, verifyAccount } from "../../common";
+import { logout, verifyAccount } from "../../common";
 import { db } from "../../common/db";
-import { TaskManager } from "../../common/task-manager";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { logger } from "../../utils/logger";
 import { showToast } from "../../utils/toast";
 import { AttachmentsDialog } from "../attachments-dialog";
 import {
   ConfirmDialog,
-  showClearSessionsConfirmation,
-  showLogoutConfirmation
+  showClearSessionsConfirmation
 } from "../confirm";
 import { EmailChangeDialog } from "../email-change-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";

@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState, useEffect } from "react";
-import { Box, Button, Flex, Input, Text, Select } from "@theme-ui/components";
+import { Button, Dialog, Flex, Input, Select, Text } from "@ui";
+import { clipboard } from "@platform";
 import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
@@ -29,9 +30,8 @@ import {
   Check,
   PasswordInvisible
 } from "../../../components/icons";
-import Field from "../../../components/field";
+import { Field } from "../../components/field";
 import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
-import Dialog from "../../../components/dialog";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
 import { showPasswordDialog } from "../../password-dialog";
@@ -42,7 +42,7 @@ export function InboxApiKeys() {
 
   if (apiKeysPromise.status === "pending") {
     return (
-      <Flex sx={{ alignItems: "center", gap: 2, py: 3 }}>
+      <Flex sx={{ alignItems: "center", flexDirection: "row", gap: 2, py: 3 }}>
         <Loading size={16} />
         <Text variant="body">{strings.loadingApiKeys()}</Text>
       </Flex>
@@ -51,11 +51,11 @@ export function InboxApiKeys() {
 
   if (apiKeysPromise.status === "rejected") {
     return (
-      <Flex sx={{ alignItems: "center", gap: 2, py: 3 }}>
-        <Text variant="body" sx={{ color: "error" }}>
+      <Flex sx={{ alignItems: "center", flexDirection: "row", gap: 2, py: 3 }}>
+        <Text variant="body" sx={{ color: "paragraph-error" }}>
           {strings.failedToLoadApiKeys()}
         </Text>
-        <Button onClick={() => apiKeysPromise.refresh()}>
+        <Button onPress={() => apiKeysPromise.refresh()}>
           {strings.retry()}
         </Button>
       </Flex>
@@ -65,15 +65,21 @@ export function InboxApiKeys() {
   const apiKeys = apiKeysPromise.value || [];
 
   return (
-    <Box>
+    <Flex>
       <Flex sx={{ flexDirection: "column", gap: 3 }}>
-        <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Flex
+          sx={{
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center"
+          }}
+        >
           <Text variant="body" sx={{ fontWeight: "bold" }}>
             {strings.viewAPIKeys()}
           </Text>
           <Button
             variant="accent"
-            onClick={() => {
+            onPress={() => {
               if (apiKeys.length >= 10) {
                 ConfirmDialog.show({
                   title: strings.apiKeysLimitReached(),
@@ -92,10 +98,9 @@ export function InboxApiKeys() {
         </Flex>
 
         {apiKeys.length === 0 ? (
-          <Box
+          <Flex
             sx={{
               p: 4,
-              textAlign: "center",
               border: "1px dashed",
               borderColor: "border",
               borderRadius: "default",
@@ -105,9 +110,9 @@ export function InboxApiKeys() {
             <Text variant="body" sx={{ color: "paragraph-secondary" }}>
               {strings.createFirstApiKey()}
             </Text>
-          </Box>
+          </Flex>
         ) : (
-          <Box>
+          <Flex>
             {apiKeys.map((key, i) => (
               <ApiKeyItem
                 key={key.key}
@@ -116,10 +121,10 @@ export function InboxApiKeys() {
                 isAtEnd={i === apiKeys.length - 1}
               />
             ))}
-          </Box>
+          </Flex>
         )}
       </Flex>
-    </Box>
+    </Flex>
   );
 }
 
@@ -158,7 +163,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
   async function copyToClipboard() {
     if (!viewing) return;
     try {
-      await navigator.clipboard.writeText(apiKey.key);
+      await clipboard.write({ "text/plain": apiKey.key });
       setCopied(true);
     } catch (error) {
       console.error("Failed to copy to clipboard:", error);
@@ -195,22 +200,25 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
     apiKey.expiryDate === -1 ? false : Date.now() > apiKey.expiryDate;
 
   return (
-    <Box
+    <Flex
       sx={{
         px: 1,
         py: 2,
-        borderBottom: isAtEnd ? "" : "1px solid",
-        borderColor: "border"
+        borderBottom: isAtEnd ? "none" : "1px solid",
+        borderBottomColor: "border"
       }}
     >
       <Flex
         sx={{
           justifyContent: "space-between",
+          flexDirection: "row",
           alignItems: "center"
         }}
       >
-        <Box sx={{ flex: 1 }}>
-          <Flex sx={{ alignItems: "center", gap: 2, mb: 2 }}>
+        <Flex sx={{ flex: 1 }}>
+          <Flex
+            sx={{ alignItems: "center", flexDirection: "row", gap: 2, mb: 2 }}
+          >
             <Text variant="body" sx={{ fontWeight: "bold" }}>
               {apiKey.name}
             </Text>
@@ -218,7 +226,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
               <Text
                 variant="subBody"
                 sx={{
-                  py: 0.8,
+                  py: 1,
                   px: 1,
                   bg: "accent-error",
                   color: "background",
@@ -250,7 +258,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
                   } ${getFormattedDate(apiKey.expiryDate)}`}
             </Text>
           </Flex>
-        </Box>
+        </Flex>
         <Input
           readOnly
           value={
@@ -269,7 +277,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           }}
         />
         {!viewing && (
-          <Button variant="icon" onClick={() => viewKey()}>
+          <Button variant="icon" onPress={() => viewKey()}>
             <PasswordInvisible size={14} />
           </Button>
         )}
@@ -280,13 +288,13 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
               sx={{
                 color: "accent",
                 fontFamily: "monospace",
-                width: "30px",
+                width: 30,
                 textAlign: "center"
               }}
             >
               {secondsLeft}s
             </Text>
-            <Button variant="icon" onClick={() => copyToClipboard()}>
+            <Button variant="icon" onPress={() => copyToClipboard()}>
               {copied ? <Check size={14} /> : <Copy size={14} />}
             </Button>
           </>
@@ -294,7 +302,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
         <Button
           variant="icon"
           disabled={isRevoking}
-          onClick={async () => {
+          onPress={async () => {
             const ok = await ConfirmDialog.show({
               title: strings.revokeInboxApiKey(apiKey.name),
               subtitle: strings.revokeApiKeyConfirmation(apiKey.name),
@@ -319,7 +327,7 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
           <Trash size={16} color="accent-error" />
         </Button>
       </Flex>
-    </Box>
+    </Flex>
   );
 }
 
@@ -339,7 +347,7 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
   props: AddApiKeyDialogProps
 ) {
   const { onClose, onAdd } = props;
-  const inputRef = useRef<HTMLInputElement>(null);
+  const name = useRef("");
   const [isCreating, setIsCreating] = useState(false);
   const [selectedExpiry, setSelectedExpiry] = useState(
     getExpiryOptions()[2].value
@@ -348,11 +356,11 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
   async function onSubmit() {
     try {
       setIsCreating(true);
-      if (!inputRef.current || !inputRef.current.value.trim()) {
+      if (!name.current.trim()) {
         showToast("error", strings.enterKeyName());
         return;
       }
-      await db.inboxApiKeys.create(inputRef.current.value, selectedExpiry);
+      await db.inboxApiKeys.create(name.current, selectedExpiry);
       onAdd();
       onClose(true);
     } catch (error) {
@@ -382,15 +390,11 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
     >
       <Flex sx={{ flexDirection: "column", gap: 2 }}>
         <Field
-          inputRef={inputRef}
           autoFocus
           label={strings.keyName()}
           placeholder={strings.exampleKeyName()}
-          onKeyUp={async (e) => {
-            if (e.key === "Enter") {
-              await onSubmit();
-            }
-          }}
+          onChangeText={(text) => (name.current = text)}
+          onSubmit={() => onSubmit()}
           required
         />
         <Flex sx={{ flexDirection: "column" }}>
@@ -399,27 +403,12 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
           </Text>
           <Select
             value={String(selectedExpiry)}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSelectedExpiry(Number(value));
-            }}
-            sx={{
-              color: "var(--paragraph)",
-              bg: "background-secondary",
-              border: "1px solid",
-              borderColor: "border",
-              padding: "5px",
-              "& + svg": {
-                fill: "var(--paragraph)"
-              }
-            }}
-          >
-            {getExpiryOptions().map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
+            onChange={(value) => setSelectedExpiry(Number(value))}
+            options={getExpiryOptions().map((option) => ({
+              title: option.label,
+              value: String(option.value)
+            }))}
+          />
         </Flex>
       </Flex>
     </Dialog>

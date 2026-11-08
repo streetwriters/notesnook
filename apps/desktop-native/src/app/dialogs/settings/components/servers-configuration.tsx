@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, Text } from "@theme-ui/components";
-import Field from "../../../components/field";
+import { Button, Flex, Text } from "@ui";
+import { Field } from "../../components/field";
+import { reloadApp } from "../platform-gaps";
 import { useState } from "react";
 import { HostId, HostIds, useStore } from "../../../stores/setting-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
-import { ErrorText } from "../../../components/error-text";
+import { ErrorText } from "../../components/error-text";
 import { TaskManager } from "../../../common/task-manager";
 import { isServerCompatible } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -89,7 +90,7 @@ export function ServersConfiguration() {
   );
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   return (
-    <>
+    <Flex sx={{ flexDirection: "column" }}>
       {isLoggedIn ? (
         <ErrorText
           error={strings.logoutToChangeServerUrls()}
@@ -104,11 +105,11 @@ export function ServersConfiguration() {
             label={`${server.title} URL`}
             helpText={server.description}
             placeholder={`e.g. ${server.example}`}
-            validate={(text) => URL.canParse(text)}
+            validate={(text) => /^[a-z][a-z0-9+.-]*:\/\/[^\s/]+/i.test(text)}
             defaultValue={urls[server.host]}
-            onChange={(e) =>
+            onChangeText={(text) =>
               setUrls((s) => {
-                s[server.host] = e.target.value;
+                s[server.host] = text;
                 return s;
               })
             }
@@ -117,10 +118,10 @@ export function ServersConfiguration() {
         <ErrorText error={error} />
         {success === true ? (
           <Text
-            className="selectable"
-            variant={"error"}
-            ml={1}
+            selectable
+            variant="error"
             sx={{
+              ml: 1,
               whiteSpace: "pre-wrap",
               bg: "shade",
               color: "accent",
@@ -132,11 +133,18 @@ export function ServersConfiguration() {
             {strings.connectedToServer()}
           </Text>
         ) : null}
-        <Flex sx={{ mt: 1, justifyContent: "end", gap: 1 }}>
+        <Flex
+          sx={{
+            mt: 1,
+            justifyContent: "flex-end",
+            flexDirection: "row",
+            gap: 1
+          }}
+        >
           <Button
             variant="accent"
             disabled={!success}
-            onClick={async () => {
+            onPress={async () => {
               if (!success || isLoggedIn) return;
               useStore.getState().setServerUrls(urls);
               await TaskManager.startTask({
@@ -146,7 +154,7 @@ export function ServersConfiguration() {
                 action() {
                   return new Promise((resolve) => {
                     setTimeout(() => {
-                      window.location.reload();
+                      reloadApp();
                       resolve(undefined);
                     }, 5000);
                   });
@@ -159,7 +167,7 @@ export function ServersConfiguration() {
           <Button
             disabled={isLoggedIn}
             variant="secondary"
-            onClick={async () => {
+            onPress={async () => {
               setError(undefined);
               try {
                 for (const host of HostIds) {
@@ -192,7 +200,7 @@ export function ServersConfiguration() {
           <Button
             disabled={isLoggedIn}
             variant="errorSecondary"
-            onClick={async () => {
+            onPress={async () => {
               if (isLoggedIn) return;
               useStore.getState().setServerUrls();
               await TaskManager.startTask({
@@ -202,7 +210,7 @@ export function ServersConfiguration() {
                 action() {
                   return new Promise((resolve) => {
                     setTimeout(() => {
-                      window.location.reload();
+                      reloadApp();
                       resolve(undefined);
                     }, 5000);
                   });
@@ -214,6 +222,6 @@ export function ServersConfiguration() {
           </Button>
         </Flex>
       </Flex>
-    </>
+    </Flex>
   );
 }

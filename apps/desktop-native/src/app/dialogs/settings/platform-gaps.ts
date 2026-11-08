@@ -17,20 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const missing = (name: string) => () => {
-  throw new Error(`${name} is not implemented on desktop yet`);
-};
+import { integration, lifecycle, updater } from "@platform";
 
-export const restartApp: () => void = missing("lifecycle.restart");
-export const reloadApp: () => void = missing("lifecycle.reload");
-export const selectBackupDirectory: () => Promise<string | undefined> = missing(
-  "integration.selectBackupDirectory"
-);
-export const setAppLanguage: (language: string) => Promise<void> = missing(
-  "integration.setAppLanguage"
-);
-export const getReleaseTrack: () => Promise<"stable" | "beta"> = missing(
-  "updater.getReleaseTrack"
-);
-export const setReleaseTrack: (track: "stable" | "beta") => Promise<void> =
-  missing("updater.setReleaseTrack");
+export const restartApp = () => lifecycle.restart();
+export const reloadApp = () => lifecycle.reload();
+export const selectBackupDirectory = () => integration.selectBackupDirectory();
+export const setAppLanguage = (language: string) =>
+  integration.setAppLanguage(language);
+export const getReleaseTrack = () => updater.getReleaseTrack();
+export const setReleaseTrack = (track: "stable" | "beta") =>
+  updater.setReleaseTrack(track);
