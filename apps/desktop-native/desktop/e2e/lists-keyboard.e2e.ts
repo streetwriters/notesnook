@@ -52,7 +52,7 @@ describe("keyboard list navigation", () => {
   test("enter opens the focused note in the editor", async () => {
     await app.press("enter");
     await settle(async () =>
-      expect(await count(app, "editor-title")).toBeGreaterThan(0)
+      expect(await count(app, "tab-title")).toBeGreaterThan(0)
     );
   });
 
