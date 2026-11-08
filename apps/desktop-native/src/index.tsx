@@ -24,9 +24,13 @@ import { Root, type RootProps } from "./app/root";
 import { DesktopThemeProvider } from "./targets/desktop/ui";
 
 export default function App(
-  props: Omit<RootProps, "colorScheme" | "onToggleColorScheme">
+  props: Omit<RootProps, "colorScheme" | "onToggleColorScheme"> & {
+    initialColorScheme?: "light" | "dark";
+  }
 ) {
-  const [colorScheme, setColorScheme] = useState<"light" | "dark">("light");
+  const [colorScheme, setColorScheme] = useState<"light" | "dark">(
+    props.initialColorScheme ?? "light"
+  );
   return (
     <DesktopThemeProvider
       theme={colorScheme === "dark" ? ThemeDark : ThemeLight}

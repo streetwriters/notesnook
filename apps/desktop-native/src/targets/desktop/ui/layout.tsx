@@ -90,7 +90,6 @@ export const SplitPane = forwardRef<
   );
   const [total, setTotal] = useState(0);
   const [dragging, setDragging] = useState<number | undefined>();
-  const origin = useRef(0);
   const expanded = useRef<Record<string, number>>({});
   const onChange = useRef(props.onChange);
   onChange.current = props.onChange;
@@ -160,17 +159,32 @@ export const SplitPane = forwardRef<
     [autoSaveId, commit, panes, sizes]
   );
 
-  const drag = (position: number) => {
-    if (dragging === undefined) return;
-    const before = sizes
-      .slice(0, dragging)
-      .reduce<number>((sum, size) => sum + (size ?? 0), 0);
-    const wanted = position - before - sashSize * dragging;
-    const pane = panes[dragging];
-    if (sizes[dragging] === undefined) return;
+  const gesture = useRef<{ start: number; size: number } | undefined>(
+    undefined
+  );
+
+  const drag = (index: number, position: number) => {
+    const start = gesture.current;
+    if (!start) return;
     commit(
-      sizes.map((size, i) => (i === dragging ? clamp(pane, wanted) : size))
+      sizes.map((size, i) =>
+        i === index
+          ? clamp(panes[index], start.size + position - start.start)
+          : size
+      )
     );
+  };
+
+  const endGesture = () => {
+    gesture.current = undefined;
+    setDragging(undefined);
+  };
+
+  const pointerPosition = (event: any) => {
+    const pointer = event.nativeEvent ?? event;
+    return horizontal
+      ? pointer.clientX ?? pointer.pageX
+      : pointer.clientY ?? pointer.pageY;
   };
 
   const items: JSX.Element[] = [];
@@ -202,9 +216,10 @@ export const SplitPane = forwardRef<
           }}
           onPointerDown={(event: any) => {
             if (!resizable) return;
-            origin.current = horizontal
-              ? event.nativeEvent.pageX - event.nativeEvent.locationX
-              : event.nativeEvent.pageY - event.nativeEvent.locationY;
+            gesture.current = {
+              start: pointerPosition(event),
+              size: sizes[index] ?? 0
+            };
             setDragging(index);
           }}
         />
@@ -216,6 +231,11 @@ export const SplitPane = forwardRef<
     <AnyView
       {...nativeProps}
       style={viewStyle}
+      onPointerMove={(event: any) => {
+        if (dragging !== undefined) drag(dragging, pointerPosition(event));
+      }}
+      onPointerUp={endGesture}
+      onPointerCancel={endGesture}
       onLayout={(event: any) =>
         setTotal(
           horizontal
@@ -225,28 +245,6 @@ export const SplitPane = forwardRef<
       }
     >
       {items}
-      {dragging !== undefined ? (
-        <AnyView
-          testID="split-pane-drag-overlay"
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            cursor: horizontal ? "col-resize" : "row-resize"
-          }}
-          onPointerMove={(event: any) =>
-            drag(
-              horizontal
-                ? event.nativeEvent.locationX
-                : event.nativeEvent.locationY
-            )
-          }
-          onPointerUp={() => setDragging(undefined)}
-          onPointerLeave={() => setDragging(undefined)}
-        />
-      ) : null}
     </AnyView>
   );
 });

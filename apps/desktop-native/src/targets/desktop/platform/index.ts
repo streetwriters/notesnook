@@ -27,6 +27,7 @@ import { environment } from "./environment";
 import { files } from "./files";
 import { history } from "./history";
 import { lifecycle } from "./lifecycle";
+import { windowControls } from "./window";
 
 export {
   compression,
@@ -36,7 +37,8 @@ export {
   environment,
   files,
   history,
-  lifecycle
+  lifecycle,
+  windowControls
 };
 
 export const attachmentFiles =
@@ -50,8 +52,6 @@ export const shell = unimplemented<Contract.Shell>("shell");
 export const spellChecker =
   unimplemented<Contract.SpellChecker>("spellChecker");
 export const updater = unimplemented<Contract.Updater>("updater");
-export const windowControls =
-  unimplemented<Contract.WindowControls>("windowControls");
 
 export type * from "../../../platform";
 
