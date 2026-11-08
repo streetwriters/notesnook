@@ -100,18 +100,27 @@ export const outlineShorthand: SxProp = {
 };
 
 export const stateOutline: SxProp = {
-  // @ts-expect-error outlines in state styles are not supported yet
-  ":focus-visible": { outlineColor: "accent" }
+  ":focus-visible": { outlineColor: "accent", outlineWidth: 2 }
 };
 
-export const transition: SxProp = {
-  // @ts-expect-error transitions are not supported until they work on desktop
-  transition: { property: "opacity", duration: 100 }
+export const motion: SxProp = {
+  opacity: 0,
+  transition: { property: ["opacity", "transform"], duration: 200 },
+  animation: {
+    keyframes: { from: { opacity: 0 }, to: { opacity: 1 } },
+    duration: 300,
+    iterationCount: "infinite"
+  }
 };
 
-export const animation: SxProp = {
-  // @ts-expect-error animations are not supported until they work on desktop
-  animation: { keyframes: {}, duration: 100 }
+export const transitionOnState: SxProp = {
+  // @ts-expect-error state styles change instantly, they take no transition
+  ":hover": { transition: { property: "opacity", duration: 100 } }
+};
+
+export const animatedProperty: SxProp = {
+  // @ts-expect-error only opacity, transform and colours animate
+  transition: { property: "width", duration: 100 }
 };
 
 export const stateWithLayout: SxProp = {

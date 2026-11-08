@@ -35,6 +35,8 @@ export function Demo(props: {
   renders.current++;
   const { state } = props;
   const [text, setText] = useState("");
+  const [faded, setFaded] = useState(false);
+  const [shown, setShown] = useState(false);
 
   return (
     <Flex
@@ -132,6 +134,53 @@ export function Demo(props: {
           />
         ))}
       </Grid>
+      <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
+        <Flex
+          testID="fade-parent"
+          sx={{ width: 40, height: 40, bg: "background" }}
+        >
+          <Box
+            testID="fade"
+            sx={{
+              width: 40,
+              height: 40,
+              bg: "accent",
+              opacity: faded ? 1 : 0,
+              transition: {
+                property: "opacity",
+                duration: 1000,
+                easing: "linear"
+              }
+            }}
+          />
+        </Flex>
+        <Button testID="toggle-fade" onPress={() => setFaded((v) => !v)}>
+          Fade
+        </Button>
+        <Flex
+          testID="spin-parent"
+          sx={{ width: 40, height: 40, bg: "background" }}
+        >
+          {shown ? (
+            <Box
+              testID="spin"
+              sx={{
+                width: 40,
+                height: 40,
+                bg: "accent",
+                animation: {
+                  keyframes: { from: { opacity: 0 }, to: { opacity: 1 } },
+                  duration: 1000,
+                  easing: "linear"
+                }
+              }}
+            />
+          ) : null}
+        </Flex>
+        <Button testID="toggle-spin" onPress={() => setShown((v) => !v)}>
+          Show
+        </Button>
+      </Flex>
       <Text testID="renders" sx={{ color: "paragraph-secondary" }}>
         {`renders: ${renders.current}`}
       </Text>

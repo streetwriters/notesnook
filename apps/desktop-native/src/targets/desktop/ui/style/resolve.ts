@@ -21,14 +21,19 @@ import { css } from "@theme-ui/css";
 import type { SxProp } from "../../../../ui";
 import type { ThemeContextValue } from "../theme";
 import {
+  convertAnimation,
   convertDeclarations,
   convertStateDeclarations,
-  type Declarations
+  convertTransition,
+  type AnimationInput,
+  type Declarations,
+  type TransitionInput
 } from "./convert";
 import { normalizeVariant } from "./variants";
 
 export interface ResolvedStyle {
   style: Record<string, unknown>;
+  animated?: boolean;
   numberOfLines?: number;
   selectable?: boolean;
   hoverStyle?: Record<string, unknown>;
@@ -108,13 +113,17 @@ function groupEntries(sx: SxProp) {
   const own: Record<string, unknown> = {};
   let groupHover: { group: string; style: Declarations } | undefined;
   let groupActive: { group: string; style: Declarations } | undefined;
+  let transition: TransitionInput | undefined;
+  let animation: AnimationInput | undefined;
   for (const key in sx) {
     const value = (sx as Record<string, unknown>)[key];
     if (key === ":group-hover") groupHover = value as typeof groupHover;
     else if (key === ":group-active") groupActive = value as typeof groupActive;
+    else if (key === "transition") transition = value as TransitionInput;
+    else if (key === "animation") animation = value as AnimationInput;
     else own[key] = value;
   }
-  return { own, groupHover, groupActive };
+  return { own, groupHover, groupActive, transition, animation };
 }
 
 function compute(
@@ -129,7 +138,8 @@ function compute(
           options.variant
         ]
       : undefined;
-  const { own, groupHover, groupActive } = groupEntries(sx);
+  const { own, groupHover, groupActive, transition, animation } =
+    groupEntries(sx);
   const merged = { ...normalizeVariant(variants, colors), ...own };
   const themed = css(merged as never)(theme as never) as Declarations;
 
@@ -154,8 +164,18 @@ function compute(
   }
 
   const converted = convertDeclarations(base);
+  if (transition) Object.assign(converted.style, convertTransition(transition));
+  if (animation)
+    Object.assign(
+      converted.style,
+      convertAnimation(
+        animation,
+        (frame) => css(frame as never)(theme as never) as Declarations
+      )
+    );
   const resolved: ResolvedStyle = {
     style: converted.style,
+    animated: transition || animation ? true : undefined,
     numberOfLines: converted.numberOfLines,
     selectable: converted.selectable
   };

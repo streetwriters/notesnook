@@ -110,6 +110,28 @@ test("the input reports its text", async () => {
     .toBe("hello");
 });
 
+test("a transition changes the value over time", async () => {
+  await expectColor("fade-parent", DARK.background);
+  await app.getByTestId("toggle-fade").click();
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  const midway = await color("fade-parent");
+  expect(near(midway, DARK.background, 6), `midway ${midway}`).toBe(false);
+  expect(near(midway, "#008837", 6), `midway ${midway}`).toBe(false);
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await expectColor("fade-parent", "#008837");
+});
+
+test("a keyframe animation changes the value over time", async () => {
+  await expectColor("spin-parent", DARK.background);
+  await app.getByTestId("toggle-spin").click();
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  const midway = await color("spin-parent");
+  expect(near(midway, DARK.background, 6), `midway ${midway}`).toBe(false);
+  expect(near(midway, "#008837", 6), `midway ${midway}`).toBe(false);
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  await expectColor("spin-parent", "#008837");
+});
+
 test("outline colour and width are painted outside the box", async () => {
   await expectColor("outline-parent", "#008837", 0.225, 0.5);
 });

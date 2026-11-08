@@ -29,10 +29,6 @@ export interface ConvertedStyle {
 
 const SHORTHANDS = new Set([
   "border",
-  "borderTop",
-  "borderRight",
-  "borderBottom",
-  "borderLeft",
   "flex",
   "margin",
   "padding",
@@ -51,10 +47,67 @@ const STATE_PROPERTIES = new Set([
   "borderLeftColor",
   "opacity",
   "boxShadow",
-  "transform"
+  "transform",
+  "outlineColor",
+  "outlineWidth",
+  "outlineOffset"
 ]);
 
+const EASINGS: Record<string, string> = {
+  linear: "linear",
+  ease: "ease",
+  "ease-in": "ease-in",
+  "ease-out": "ease-out",
+  "ease-in-out": "ease-in-out"
+};
+
+export interface TransitionInput {
+  property: string | string[];
+  duration: number;
+  delay?: number;
+  easing?: string;
+}
+
+export function convertTransition(transition: TransitionInput) {
+  return {
+    transitionProperty: transition.property,
+    transitionDuration: `${transition.duration}ms`,
+    transitionDelay: `${transition.delay ?? 0}ms`,
+    transitionTimingFunction: EASINGS[transition.easing ?? "ease"] ?? "ease"
+  };
+}
+
+export interface AnimationInput {
+  keyframes: Record<string, Declarations>;
+  duration: number;
+  delay?: number;
+  iterationCount?: number | "infinite";
+  easing?: string;
+}
+
+export function convertAnimation(
+  animation: AnimationInput,
+  resolveKeyframe: (frame: Declarations) => Declarations
+) {
+  const animationName: Record<string, Declarations> = {};
+  for (const stop in animation.keyframes) {
+    animationName[stop] = convertStateDeclarations(
+      resolveKeyframe(animation.keyframes[stop])
+    );
+  }
+  return {
+    animationName,
+    animationDuration: `${animation.duration}ms`,
+    animationDelay: `${animation.delay ?? 0}ms`,
+    animationIterationCount: animation.iterationCount ?? 1,
+    animationTimingFunction: EASINGS[animation.easing ?? "ease"] ?? "ease"
+  };
+}
+
 const PX = /^(-?\d+(?:\.\d+)?)px$/;
+const SIDE_BORDER = /^(?:borderTop|borderRight|borderBottom|borderLeft)$/;
+const SIDE_BORDER_VALUE =
+  /^(\d+(?:\.\d+)?)px\s+(?:solid|dashed|dotted)(?:\s+(\S.*))?$/;
 const parseCache = new Map<string, [string, unknown][]>();
 
 function convertValue(key: string, value: unknown): [string, unknown][] {
@@ -65,7 +118,15 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
 
   let result: [string, unknown][];
   const px = PX.exec(value);
-  if (px) result = [[key, parseFloat(px[1])]];
+  const sideBorder = SIDE_BORDER.test(key)
+    ? SIDE_BORDER_VALUE.exec(value)
+    : null;
+  if (sideBorder) {
+    result = [[`${key}Width`, parseFloat(sideBorder[1])]];
+    if (sideBorder[2]) result.push([`${key}Color`, sideBorder[2]]);
+  } else if (key === "border" && value === "none")
+    result = [[`borderWidth`, 0]];
+  else if (px) result = [[key, parseFloat(px[1])]];
   else if (SHORTHANDS.has(key) && /[\s]/.test(value)) {
     try {
       result = Object.entries(
@@ -115,6 +176,8 @@ export function convertDeclarations(
         continue;
       case "wordBreak":
       case "outline":
+      case "transition":
+      case "animation":
         continue;
       case "overflowX":
       case "overflowY":
