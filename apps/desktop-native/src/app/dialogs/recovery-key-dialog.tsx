@@ -28,6 +28,7 @@ import {
   type QRCodeHandle
 } from "@ui";
 import { clipboard, files } from "@platform";
+import { rasterAssets } from "../assets/raster.generated";
 import { db } from "../common/db";
 import Config from "../utils/config";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -247,6 +248,12 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
             value={recoveryKey || ""}
             size={150}
             ecLevel="M"
+            logo={{
+              src: rasterAssets["notesnook-logo.png"],
+              width: 40,
+              height: 40,
+              padding: "square"
+            }}
           />
         </Flex>
         <Flex
