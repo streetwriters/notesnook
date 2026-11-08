@@ -35,7 +35,7 @@ export const ImporterSettings: SettingsGroup[] = [
         components: [
           {
             type: "custom",
-            component: Importer as never
+            component: Importer
           }
         ]
       }

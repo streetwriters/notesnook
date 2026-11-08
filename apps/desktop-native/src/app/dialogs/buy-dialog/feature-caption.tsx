@@ -17,10 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  notImplemented,
-  type NotImplemented
-} from "../../common/not-implemented";
+import { Text } from "@ui";
+import { Check, Cross } from "../../components/icons";
 
-export const UpgradeDialog: NotImplemented = notImplemented("UpgradeDialog");
-export type UpgradeDialog = any;
+export function FeatureCaption({
+  caption
+}: {
+  caption: boolean | number | string;
+}) {
+  return typeof caption === "boolean" ? (
+    caption ? (
+      <Check size={14} />
+    ) : (
+      <Cross size={14} />
+    )
+  ) : (
+    <Text>{caption === "infinity" ? "∞" : caption}</Text>
+  );
+}

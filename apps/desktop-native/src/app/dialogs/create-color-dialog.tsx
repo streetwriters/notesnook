@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useRef, useState } from "react";
-import { Dialog, Flex, dataColor } from "@ui";
+import { ColorPicker, Dialog, Flex } from "@ui";
 import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
@@ -30,7 +30,8 @@ type CreateColorDialogProps = BaseDialogProps<string | false>;
 export const CreateColorDialog = DialogManager.register(
   function CreateColorDialog(props: CreateColorDialogProps) {
     const title = useRef("");
-    const [color, setColor] = useState("");
+    const [color, setColor] = useState("#666666");
+    const [fieldKey, setFieldKey] = useState(0);
 
     const onSubmit = async () => {
       if (!title.current.trim() || !color) return;
@@ -80,8 +81,10 @@ export const CreateColorDialog = DialogManager.register(
             onSubmit={() => onSubmit()}
           />
           <Field
+            key={fieldKey}
             required
             label={strings.color()}
+            defaultValue={color}
             id="color"
             testID="color-input"
             placeholder={strings.selectColor()}
@@ -90,28 +93,14 @@ export const CreateColorDialog = DialogManager.register(
             rightActions={[
               {
                 component: (
-                  <Flex
-                    sx={{
-                      width: 40,
-                      height: 33,
-                      mx: "spacing4",
-                      border: "1px solid",
-                      borderColor: "border",
-                      borderRadius: "radius1"
+                  <ColorPicker
+                    value={validateHexColor(color) ? color : "#666666"}
+                    onChange={(value) => {
+                      setColor(value);
+                      setFieldKey((k) => k + 1);
                     }}
-                  >
-                    <Flex
-                      sx={{
-                        m: "spacing1",
-                        width: 33,
-                        height: 25,
-                        borderRadius: "radius1",
-                        bg: validateHexColor(color)
-                          ? dataColor(color)
-                          : "transparent"
-                      }}
-                    />
-                  </Flex>
+                    sx={{ width: 40, height: 33, mx: "spacing4" }}
+                  />
                 ),
                 sx: { px: 0 }
               }

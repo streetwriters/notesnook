@@ -17,24 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState } from "react";
 import {
-  transform,
-  type IFile,
-  type IFileProvider,
-  type ProviderSettings
+  IFile,
+  IFileProvider,
+  ProviderSettings,
+  transform
 } from "@notesnook-importer/core";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
-import { shell, type PickedFile } from "@platform";
-import { xxhash64 } from "../../../utils/xxhash";
 import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { files as platformFiles, type PickedFile } from "@platform";
+import { xxhash64 } from "../xxhash";
+import { useEffect, useRef, useState } from "react";
+import { LinkText } from "../../../dialogs/components/link-text";
 import { importNote } from "../../../utils/importer";
-import { showFilePicker } from "../../../utils/file-picker";
 import { PromptDialog } from "../../../dialogs/prompt";
-import Accordion from "../../accordion";
-import type { TransformResult } from "../types";
+import { Accordion } from "../../../dialogs/components/accordion";
+import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
+import { strings } from "@notesnook/intl";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
@@ -60,20 +60,22 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
     total: 0
   });
   const [totalNoteCount, setTotalNoteCount] = useState(0);
-  const [, setCounter] = useState<number>(0);
+  const [_, setCounter] = useState<number>(0);
   const logs = useRef<LogMessage[]>([]);
+
+  const onSelectFiles = async () => {
+    const picked = await platformFiles.pick({
+      acceptedFileTypes: (provider?.supportedExtensions || [])
+        .concat([".zip"])
+        .join(","),
+      multiple: true
+    });
+    if (picked.length) setFiles((files) => [...picked, ...files]);
+  };
 
   useEffect(() => {
     setFiles([]);
   }, [provider]);
-
-  async function pickFiles() {
-    const acceptedFileTypes = (provider?.supportedExtensions || [])
-      .concat([".zip"])
-      .join(",");
-    const picked = await showFilePicker({ acceptedFileTypes, multiple: true });
-    if (picked.length) setFiles((files) => [...picked, ...files]);
-  }
 
   async function onStartImport() {
     let totalNotes = 0;
@@ -131,21 +133,30 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
     };
 
     setTotalNoteCount(0);
-    setFilesProgress({ total: files.length, done: 0 });
+    setFilesProgress({
+      total: files.length,
+      done: 0
+    });
 
     for (const file of files) {
-      setFilesProgress((p) => ({ ...p, done: p.done + 1 }));
+      setFilesProgress((p) => ({
+        ...p,
+        done: p.done + 1
+      }));
 
       const providerFile: IFile = {
         name: file.name,
         modifiedAt: Date.now(),
         size: file.size,
-        data: new File([await file.bytes()], file.name, { type: file.type })
+        data: file as unknown as File
       };
       errors.push(...(await transform(provider, [providerFile], settings)));
     }
     await useAppStore.getState().refresh();
-    onTransformFinished({ totalNotes, errors });
+    onTransformFinished({
+      totalNotes,
+      errors
+    });
   }
 
   if (filesProgress.done) {
@@ -161,24 +172,25 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           <Accordion
             title={strings.logs()}
             isClosed={false}
-            sx={{ border: "1px solid", borderColor: "border", mt: 2 }}
+            sx={{
+              border: "1px solid",
+              borderColor: "border",
+              mt: 2
+            }}
           >
-            <ScrollContainer sx={{ maxHeight: 250 }}>
-              <Flex sx={{ flexDirection: "column", p: 2 }}>
-                {logs.current.map((c, index) => (
-                  <Text
-                    key={index.toString()}
-                    variant="body"
-                    sx={{
-                      fontFamily: "monospace",
-                      color:
-                        c.type === "error" ? "paragraph-error" : "paragraph"
-                    }}
-                  >
-                    [{getFormattedDate(c.date, "date-time")}] {c.text}
-                  </Text>
-                ))}
-              </Flex>
+            <ScrollContainer>
+              <Text
+                variant="body"
+                selectable
+                sx={{ fontFamily: "monospace", p: 2, whiteSpace: "pre-wrap" }}
+              >
+                {logs.current
+                  .map(
+                    (c) =>
+                      `[${getFormattedDate(c.date, "date-time")}] ${c.text}`
+                  )
+                  .join("\n")}
+              </Text>
             </ScrollContainer>
           </Accordion>
         )}
@@ -196,16 +208,12 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
       >
         {strings.checkOutOurStepByStepGuideOn()}{" "}
-        <Text
-          onPress={() => shell.openUrl(provider.helpLink)}
-          sx={{ color: "accent", textDecorationLine: "underline" }}
-        >
+        <LinkText href={provider.helpLink}>
           {strings.howToImportFrom(provider?.name)}
-        </Text>
+        </LinkText>
       </Text>
       <Flex
-        testID="import-dropzone"
-        onPress={pickFiles}
+        onPress={onSelectFiles}
         sx={{
           justifyContent: "center",
           alignItems: "center",
@@ -222,18 +230,21 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           {strings.dragDropFilesHere()}
         </Text>
         <Text variant="subBody" sx={{ textAlign: "center" }}>
-          {strings.onlySupportedExtensions(
+          {`${strings.onlySupportedExtensions(
             provider?.supportedExtensions.join(", ")
-          )}{" "}
-          {provider?.supportedExtensions.includes(".zip")
-            ? null
-            : strings.canAlsoSelectZipFiles(
-                provider?.supportedExtensions.join(", ")
-              )}
-          {provider.examples
-            ? `\n${strings.forExampleExtensions(provider.examples.join(", "))}`
-            : null}
+          )} ${
+            provider?.supportedExtensions.includes(".zip")
+              ? ""
+              : strings.canAlsoSelectZipFiles(
+                  provider?.supportedExtensions.join(", ")
+                )
+          }`}
         </Text>
+        {provider.examples ? (
+          <Text variant="subBody" sx={{ textAlign: "center" }}>
+            {strings.forExampleExtensions(provider.examples.join(", "))}
+          </Text>
+        ) : null}
       </Flex>
 
       {files.length > 0 ? (
@@ -251,8 +262,17 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
             <Flex sx={{ flexDirection: "column" }}>
               {files.map((file, index) => (
                 <Flex
-                  key={file.name + index}
-                  title={strings.clickToRemove()}
+                  key={file.name}
+                  sx={{
+                    p: 2,
+                    bg: index % 2 ? "transparent" : "background-secondary",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    cursor: "pointer",
+                    ":hover": {
+                      bg: "hover"
+                    }
+                  }}
                   onPress={() => {
                     setFiles((files) => {
                       const _files = files.slice();
@@ -260,15 +280,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
                       return _files;
                     });
                   }}
-                  sx={{
-                    flexDirection: "row",
-                    p: 2,
-                    bg: index % 2 ? "transparent" : "background-secondary",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    cursor: "pointer",
-                    ":hover": { bg: "hover" }
-                  }}
+                  title={strings.clickToRemove()}
                 >
                   <Text variant="body">{file.name}</Text>
                   <Text variant="body">{formatBytes(file.size)}</Text>
@@ -280,7 +292,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       ) : null}
 
       {!!files.length && (
-        <>
+        <Flex sx={{ flexDirection: "column" }}>
           <Text
             variant="body"
             sx={{
@@ -314,9 +326,9 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
             sx={{ alignSelf: "center", mt: 2, px: 4 }}
             onPress={onStartImport}
           >
-            {strings.startImporting()}
+            <Text>{strings.startImporting()}</Text>
           </Button>
-        </>
+        </Flex>
       )}
     </Flex>
   );

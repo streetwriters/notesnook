@@ -22,6 +22,7 @@ import { Dialog, Flex, Text } from "@ui";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { LinkText } from "./components/link-text";
+import { ThemePreview } from "./components/theme-preview";
 
 export type ThemeMetadata = {
   id: string;
@@ -33,6 +34,8 @@ export type ThemeMetadata = {
   license: string;
   homepage?: string;
   sourceURL?: string;
+  colorScheme?: "dark" | "light";
+  previewColors?: { accent: string; paragraph: string; background: string };
 };
 
 export type ThemeDetailsDialogProps = BaseDialogProps<boolean> & {
@@ -60,6 +63,7 @@ export const ThemeDetailsDialog = DialogManager.register(
           onClick: () => onClose(false)
         }}
       >
+        <ThemePreview theme={theme} />
         <Flex sx={{ flexDirection: "column", mt: 2 }}>
           <Flex sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}>
             <Text variant="heading">{theme.name}</Text>

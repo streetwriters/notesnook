@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { IProvider } from "@notesnook-importer/core";
+import { IProvider } from "@notesnook-importer/core";
 import { strings } from "@notesnook/intl";
 import { Button, Flex, Text } from "@ui";
 import { CheckCircleOutline } from "../../icons";
-import type { TransformResult } from "../types";
+import { TransformResult } from "../types";
 import { ImportErrors } from "./import-errors";
 
 type ImportResultProps = {
@@ -46,14 +46,14 @@ export function ImportResult(props: ImportResultProps) {
           onPress={onReset}
           sx={{ alignSelf: "center", mt: 2, px: 4 }}
         >
-          {strings.startOver()}
+          <Text>{strings.startOver()}</Text>
         </Button>
       </Flex>
     );
   }
 
   return (
-    <>
+    <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
       <CheckCircleOutline color="accent" />
       <Text variant="body" sx={{ my: 2, textAlign: "center" }}>
         {strings.importCompleted()}.{" "}
@@ -65,16 +65,11 @@ export function ImportResult(props: ImportResultProps) {
         sx={{ alignSelf: "center" }}
         onPress={onReset}
       >
-        {strings.startOver()}
+        <Text>{strings.startOver()}</Text>
       </Button>
       {result.errors.length > 0 && (
         <Flex
-          sx={{
-            flexDirection: "column",
-            my: 1,
-            bg: "background-error",
-            p: 1
-          }}
+          sx={{ my: 1, bg: "background-error", p: 1, flexDirection: "column" }}
         >
           {result.errors.map((error) => (
             <Text
@@ -87,6 +82,6 @@ export function ImportResult(props: ImportResultProps) {
           ))}
         </Flex>
       )}
-    </>
+    </Flex>
   );
 }

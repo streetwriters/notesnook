@@ -22,7 +22,7 @@ import { useState } from "react";
 import { ProviderSelector } from "./components/provider-selector";
 import { FileProviderHandler } from "./components/file-provider-handler";
 import { ImportResult } from "./components/import-result";
-import type { IProvider } from "@notesnook-importer/core";
+import { IProvider } from "@notesnook-importer/core";
 import { NetworkProviderHandler } from "./components/network-provider-handler";
 import { TransformResult } from "./types";
 
@@ -48,7 +48,7 @@ export function Importer() {
           }}
         />
         {selectedProvider ? (
-          <>
+          <Flex sx={{ flexDirection: "column" }}>
             {selectedProvider.type === "file" ? (
               <FileProviderHandler
                 key={instanceKey}
@@ -62,10 +62,10 @@ export function Importer() {
                 onTransformFinished={setTransformResult}
               />
             ) : null}
-          </>
+          </Flex>
         ) : null}
         {transformResult && selectedProvider ? (
-          <>
+          <Flex sx={{ flexDirection: "column" }}>
             <ImportResult
               result={transformResult}
               provider={selectedProvider}
@@ -74,7 +74,7 @@ export function Importer() {
                 setInstanceKey(`${Math.random()}`);
               }}
             />
-          </>
+          </Flex>
         ) : null}
       </Flex>
     </Flex>

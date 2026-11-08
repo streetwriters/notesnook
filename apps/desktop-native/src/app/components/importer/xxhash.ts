@@ -17,11 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  notImplemented,
-  type NotImplemented
-} from "../../common/not-implemented";
+import { notImplemented } from "../../common/not-implemented";
 
-export const RecoveryCodesDialog: NotImplemented = notImplemented(
-  "RecoveryCodesDialog"
-);
+export const xxhash64 = ((..._args: unknown[]) =>
+  notImplemented("xxhash64")()) as unknown as (
+  data: string | Uint8Array
+) => Promise<string>;

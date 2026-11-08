@@ -17,23 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { ReactNode } from "react";
-import { Flex, type SxProp } from "@ui";
+import type { ReactNode, RefObject } from "react";
+import { Popover, type SxProp, type UIElement } from "@ui";
 
 export function InlinePopup(props: {
   isOpen: boolean;
+  onClose: () => void;
+  anchorRef: RefObject<UIElement | null>;
   sx?: SxProp;
   children?: ReactNode;
 }) {
-  if (!props.isOpen) return null;
   return (
-    <Flex
+    <Popover
+      isOpen={props.isOpen}
+      onClose={props.onClose}
+      anchorRef={props.anchorRef}
+      placement="bottom-start"
       sx={{
-        position: "absolute",
-        top: "100%",
-        left: 0,
-        zIndex: 100,
-        mt: "10px",
         bg: "background",
         border: "1px solid",
         borderColor: "border",
@@ -43,6 +43,6 @@ export function InlinePopup(props: {
       }}
     >
       {props.children}
-    </Flex>
+    </Popover>
   );
 }

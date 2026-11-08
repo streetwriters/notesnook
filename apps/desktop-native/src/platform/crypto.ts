@@ -19,4 +19,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export interface Crypto {
   getRandomValues<T extends ArrayBufferView>(array: T): T;
+  xxh64(data: string | Uint8Array): Promise<string>;
 }

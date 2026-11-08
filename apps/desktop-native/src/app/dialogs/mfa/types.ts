@@ -17,7 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented, type NotImplemented } from "../common/not-implemented";
+import type { FunctionComponent } from "react";
+import { AuthenticatorType } from "@notesnook/core";
+import type { Icon } from "../../components/icons";
 
-export const AttachmentsDialog: NotImplemented =
-  notImplemented("AttachmentsDialog");
+export type Authenticator = {
+  type: AuthenticatorType;
+  title: string;
+  subtitle: string;
+  icon: Icon;
+  recommended?: boolean;
+};
+
+export type StepComponentProps<T extends OnNextFunction> = {
+  onNext: T;
+  onClose?: (result: boolean) => void;
+  onError?: (error: string) => void;
+};
+
+export type StepComponent<T extends OnNextFunction> = FunctionComponent<
+  StepComponentProps<T>
+>;
+
+export type SubmitCodeFunction = (code: string) => void;
+export type OnNextFunction = (...args: never[]) => void;

@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { strings } from "@notesnook/intl";
-import { shell } from "@platform";
 import { Button, Flex, Text } from "@ui";
-import Accordion from "../../accordion";
+import { shell } from "@platform";
+import { Accordion } from "../../../dialogs/components/accordion";
+import { strings } from "@notesnook/intl";
 
 type ImportErrorsProps = {
   errors: Error[];
@@ -32,13 +32,13 @@ export function ImportErrors(props: ImportErrorsProps) {
       isClosed={false}
       title={strings.errorsOccured(props.errors.length)}
       sx={{ bg: "background-error", borderRadius: "default", mt: 2 }}
-      color="paragraph-error"
     >
       <Flex sx={{ flexDirection: "column", px: 2, pb: 2 }}>
         {props.errors.map((error, index) => (
           <Text
             key={index}
             variant="body"
+            selectable
             sx={{ color: "paragraph-error", my: 1, fontFamily: "monospace" }}
           >
             {index + 1}. {error.message}
@@ -53,7 +53,7 @@ export function ImportErrors(props: ImportErrorsProps) {
             )
           }
         >
-          {strings.sendUsABugReport()}
+          <Text>{strings.sendUsABugReport()}</Text>
         </Button>
       </Flex>
     </Accordion>

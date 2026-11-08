@@ -17,10 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  notImplemented,
-  type NotImplemented
-} from "../../common/not-implemented";
+import { useEffect } from "react";
 
-export const ChangePlanDialog: NotImplemented =
-  notImplemented("ChangePlanDialog");
+let currentSubmit: (() => void) | undefined;
+
+export function useStepSubmit(submit: () => void) {
+  useEffect(() => {
+    currentSubmit = submit;
+    return () => {
+      if (currentSubmit === submit) currentSubmit = undefined;
+    };
+  }, [submit]);
+}
+
+export function submitStep() {
+  currentSubmit?.();
+}

@@ -18,8 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "@react-native-gpui/crypto";
+import XXH from "xxhashjs";
 import type { Crypto } from "../../../platform";
 
 export const crypto: Crypto = {
-  getRandomValues: (array) => globalThis.crypto.getRandomValues(array as any)
+  getRandomValues: (array) => globalThis.crypto.getRandomValues(array as any),
+  async xxh64(data) {
+    const bytes =
+      typeof data === "string" ? new TextEncoder().encode(data) : data;
+    const hash = XXH.h64(
+      bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteOffset + bytes.byteLength
+      ) as ArrayBuffer,
+      0
+    );
+    return hash.toString(16).padStart(16, "0");
+  }
 };

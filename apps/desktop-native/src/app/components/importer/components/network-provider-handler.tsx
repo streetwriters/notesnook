@@ -17,34 +17,46 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState } from "react";
 import {
-  transform,
-  type INetworkProvider,
-  type ProviderSettings
+  INetworkProvider,
+  ProviderSettings,
+  transform
 } from "@notesnook-importer/core";
-import { strings } from "@notesnook/intl";
-import { xxhash64 } from "../../../utils/xxhash";
 import { Button, Flex, ScrollContainer, Text } from "@ui";
-import { shell } from "@platform";
+import { xxhash64 } from "../xxhash";
+import { LinkText } from "../../../dialogs/components/link-text";
+import { useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
-import Accordion from "../../accordion";
-import type { TransformResult } from "../types";
+import { Accordion } from "../../../dialogs/components/accordion";
+import { TransformResult } from "../types";
+import { strings } from "@notesnook/intl";
 
 type NetworkProviderHandlerProps = {
   provider: INetworkProvider<ProviderSettings>;
   onTransformFinished: (result: TransformResult) => void;
 };
 
+type Progress = {
+  total: number;
+  done: number;
+};
+
+function getProviderSettings(
+  provider: INetworkProvider<ProviderSettings>,
+  settings: ProviderSettings
+) {
+  return settings;
+}
+
 export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
   const { provider, onTransformFinished } = props;
   const [totalNoteCount, setTotalNoteCount] = useState(0);
-  const [, setCounter] = useState<number>(0);
+  const [_, setCounter] = useState<number>(0);
   const logs = useRef<string[]>([]);
 
   async function onStartImport() {
     let totalNotes = 0;
-    const settings: ProviderSettings = {
+    const settings = getProviderSettings(provider, {
       clientType: "browser",
       hasher: { type: "xxh64", hash: xxhash64 },
       storage: {
@@ -73,18 +85,28 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
       reporter: () => {
         setTotalNoteCount(++totalNotes);
       }
-    };
+    });
+    if (!settings) return;
 
     setTotalNoteCount(0);
 
     const errors = await transform(provider, settings);
-    onTransformFinished({ totalNotes, errors });
+    console.log(errors);
+    onTransformFinished({
+      totalNotes,
+      errors
+    });
   }
 
   return (
-    <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "stretch"
+      }}
+    >
       {totalNoteCount ? (
-        <>
+        <Flex sx={{ flexDirection: "column" }}>
           <Text variant="title">
             {strings.importingNotesFrom(provider.name)}
           </Text>
@@ -95,41 +117,43 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
             <Accordion
               isClosed={false}
               title={strings.logs()}
-              sx={{ border: "1px solid", borderColor: "border", mt: 2 }}
+              sx={{
+                border: "1px solid",
+                borderColor: "border",
+                mt: 2
+              }}
             >
-              <ScrollContainer sx={{ maxHeight: 250 }}>
+              <ScrollContainer>
                 <Text
                   variant="body"
-                  sx={{ fontFamily: "monospace", p: 2, whiteSpace: "pre" }}
+                  selectable
+                  sx={{ fontFamily: "monospace", p: 2, whiteSpace: "pre-wrap" }}
                 >
                   {logs.current.join("\n")}
                 </Text>
               </ScrollContainer>
             </Accordion>
           )}
-        </>
+        </Flex>
       ) : (
-        <>
+        <Flex sx={{ flexDirection: "column" }}>
           <Text variant="title">
             {strings.connectYourAccount(provider.name)}
           </Text>
-          <Text variant="body" sx={{ color: "paragraph-secondary", mt: 0 }}>
+          <Text variant="body" sx={{ color: "paragraph-secondary", mt: 2 }}>
             {strings.checkOutOurStepByStepGuideOn()}{" "}
-            <Text
-              onPress={() => shell.openUrl(provider.helpLink)}
-              sx={{ color: "accent", textDecorationLine: "underline" }}
-            >
+            <LinkText href={provider.helpLink}>
               {strings.howToImportFrom(provider.name)}
-            </Text>
+            </LinkText>
           </Text>
           <Button
             variant="accent"
             onPress={onStartImport}
             sx={{ my: 4, alignSelf: "center" }}
           >
-            {strings.startImporting()}
+            <Text>{strings.startImporting()}</Text>
           </Button>
-        </>
+        </Flex>
       )}
     </Flex>
   );

@@ -17,8 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
-import { Dialog, Flex, ScrollContainer, Text, dataColor } from "@ui";
+import { useRef, useState } from "react";
+import {
+  Dialog,
+  Flex,
+  QRCode,
+  ScrollContainer,
+  Text,
+  dataColor,
+  type QRCodeHandle
+} from "@ui";
 import { clipboard, files } from "@platform";
 import { db } from "../common/db";
 import Config from "../utils/config";
@@ -28,6 +36,7 @@ import { strings } from "@notesnook/intl";
 import {
   Copy,
   Download,
+  FloppyDisk,
   RecoveryKeyShieldCheck,
   type Icon
 } from "../components/icons";
@@ -110,6 +119,7 @@ function ActionButton(props: {
 
 export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
   const [activeButton, setActiveButton] = useState<string | null>(null);
+  const qrRef = useRef<QRCodeHandle>(null);
 
   function flash(key: string) {
     setActiveButton(key);
@@ -129,6 +139,21 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
     await file.write(new TextEncoder().encode(recoveryKey));
     await file.close();
     flash("download");
+  };
+
+  const handleCopyQRCode = async () => {
+    if (recoveryKey) await clipboard.write({ "text/plain": recoveryKey });
+    flash("copyQR");
+  };
+
+  const handleDownloadQRCode = async () => {
+    if (!qrRef.current) return;
+    const email = (await db.user.getUser())?.email || "user";
+    const png = await qrRef.current.toPNG();
+    const file = await files.create(`${email}-notesnook-recoverykey.png`);
+    await file.write(png);
+    await file.close();
+    flash("saveQR");
   };
 
   return (
@@ -209,6 +234,38 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
           width: "100%"
         }}
       >
+        <Flex
+          sx={{
+            alignSelf: "center",
+            bg: "background",
+            border: "1px solid",
+            borderColor: "border-secondary",
+            p: 1
+          }}
+        >
+          <QRCode
+            ref={qrRef}
+            value={recoveryKey || ""}
+            size={150}
+            ecLevel="M"
+          />
+        </Flex>
+        <ActionButton
+          icon={Copy}
+          text={
+            activeButton === "copyQR"
+              ? strings.copied()
+              : strings.copyToClipboard()
+          }
+          onPress={handleCopyQRCode}
+        />
+        <ActionButton
+          icon={FloppyDisk}
+          text={
+            activeButton === "saveQR" ? strings.saved() : strings.saveQRImage()
+          }
+          onPress={handleDownloadQRCode}
+        />
         <ActionButton
           icon={Download}
           text={

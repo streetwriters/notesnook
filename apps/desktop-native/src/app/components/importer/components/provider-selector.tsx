@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  IProvider,
   ProviderFactory,
-  type IProvider,
-  type Providers
+  Providers
 } from "@notesnook-importer/core";
-import { strings } from "@notesnook/intl";
-import { shell } from "@platform";
 import { Flex, Select, Text } from "@ui";
+import { strings } from "@notesnook/intl";
+import { LinkText } from "../../../dialogs/components/link-text";
 
 type ProviderSelectorProps = {
   onProviderChanged: (provider: IProvider) => void;
@@ -47,34 +47,26 @@ export function ProviderSelector(props: ProviderSelectorProps) {
           sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
         >
           {strings.cantFindNotesApp()}{" "}
-          <Text
-            onPress={() =>
-              shell.openUrl(
-                "https://github.com/streetwriters/notesnook-importer/issues/new"
-              )
-            }
-            sx={{ color: "accent", textDecorationLine: "underline" }}
-          >
+          <LinkText href="https://github.com/streetwriters/notesnook-importer/issues/new">
             {strings.sendUsARequest()}
-          </Text>
+          </LinkText>
         </Text>
       </Flex>
       <Select
-        testID="provider-selector"
         options={[
           { value: "", title: strings.selectNotesApp() },
           ...ProviderFactory.getAvailableProviders().map((provider) => ({
-            value: provider,
+            value: provider as string,
             title: ProviderFactory.getProvider(provider as Providers).name
           }))
         ]}
+        value=""
         onChange={(value) => {
           if (value === "") return;
           props.onProviderChanged(
             ProviderFactory.getProvider(value as Providers)
           );
         }}
-        sx={{ minWidth: 200 }}
       />
     </Flex>
   );
