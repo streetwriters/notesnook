@@ -36,7 +36,7 @@
     "@react-native-gpui/clipboard": "file:../../../../react-native/gpui-modules/tgz/react-native-gpui-clipboard-0.0.1.tgz",
     "@react-native-gpui/codegen": "file:../../../../../react-native-gpui-desktop-native/packages/codegen",
     "@react-native-gpui/core": "file:../../../../../react-native-gpui-desktop-native/packages/core",
-    "@react-native-gpui/crypto": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-crypto-0.1.0.tgz",
+    "@react-native-gpui/crypto": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-crypto-0.1.1.tgz",
     "@react-native-gpui/device-info": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-device-info-0.0.1.tgz",
     "@react-native-gpui/fs": "file:../../../../../react-native-gpui-desktop-native/modules/fs",
     "@react-native-gpui/hermes": "file:../../../../../react-native-gpui-desktop-native/packages/hermes",
