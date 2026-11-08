@@ -22,3 +22,12 @@ import { notImplemented, type NotImplemented } from "../common/not-implemented";
 export const CreateTagDialog: NotImplemented =
   notImplemented("CreateTagDialog");
 export type CreateTagDialog = any;
+
+export const EditTagDialog: NotImplemented =
+  notImplemented("EditTagDialog");
+
+export const RenameColorDialog: NotImplemented =
+  notImplemented("RenameColorDialog");
+
+export const ItemDialog: NotImplemented =
+  notImplemented("ItemDialog");

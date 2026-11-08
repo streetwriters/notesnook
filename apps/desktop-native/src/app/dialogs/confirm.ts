@@ -32,3 +32,12 @@ export type showMultiDeleteConfirmation = any;
 export const showMultiPermanentDeleteConfirmation: NotImplemented =
   notImplemented("showMultiPermanentDeleteConfirmation");
 export type showMultiPermanentDeleteConfirmation = any;
+
+export const showUnpublishConfirmation: NotImplemented =
+  notImplemented("showUnpublishConfirmation");
+
+export const showClearSessionsConfirmation: NotImplemented =
+  notImplemented("showClearSessionsConfirmation");
+
+export const showUpdateAvailableNotice: NotImplemented =
+  notImplemented("showUpdateAvailableNotice");
