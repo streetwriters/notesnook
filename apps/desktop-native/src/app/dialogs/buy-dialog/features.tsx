@@ -17,10 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  notImplemented,
-  type NotImplemented
-} from "../../common/not-implemented";
-
-export const ChangePlanDialog: NotImplemented =
-  notImplemented("ChangePlanDialog");
+export function Features() {
+  return null;
+}
