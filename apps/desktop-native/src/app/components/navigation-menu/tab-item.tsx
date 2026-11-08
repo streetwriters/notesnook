@@ -24,6 +24,7 @@ export function TabItem(props: {
   testID: string;
   icon: Icon;
   selected: boolean;
+  isCollapsed?: boolean;
   onPress: () => void;
 }) {
   const TabIcon = props.icon;
@@ -34,9 +35,9 @@ export function TabItem(props: {
       sx={{
         alignItems: "center",
         justifyContent: "center",
-        width: 34,
-        height: 34,
-        borderRadius: 6,
+        width: props.isCollapsed ? 25 : 34,
+        height: props.isCollapsed ? 25 : 34,
+        borderRadius: props.isCollapsed ? 5 : 6,
         bg: props.selected ? "background-selected" : "transparent",
         ":hover": { bg: props.selected ? "hover-selected" : "hover" }
       }}

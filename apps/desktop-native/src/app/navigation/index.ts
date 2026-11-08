@@ -158,6 +158,7 @@ export function hardNavigate(route: string, search?: string) {
     hash: history.location.hash,
     search: search ?? history.location.search
   });
+  NavigationEvents.publish("popstate");
 }
 
 export function usePathname() {

@@ -52,10 +52,12 @@ import {
   hardNavigate,
   hashNavigate,
   navigate,
+  NavigationEvents,
   usePathname
 } from "../../navigation";
 import { isMobile } from "../../hooks/use-mobile";
 import { Menu } from "../../hooks/use-menu";
+import { useMenuStore } from "../menu/store";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { shouldShowWrapped } from "../../utils/should-show-wrapped";
@@ -82,6 +84,7 @@ import {
   BookOpen,
   BoxArrowDown,
   Ellipse,
+  ExpandSidebar,
   FileText,
   GearSix,
   Home,
@@ -213,7 +216,32 @@ function Separator() {
   return <Box sx={{ width: "100%", height: 1, bg: "separator" }} />;
 }
 
-export function NavigationMenu() {
+export function NavigationMenu(props: {
+  onExpand?: () => void;
+  canExpand?: boolean;
+}) {
+  const { onExpand, canExpand = true } = props;
+  const isNavPaneCollapsed = useAppStore((store) => store.isNavPaneCollapsed);
+  const [expanded, setExpanded] = useState(false);
+  const isCollapsed = isNavPaneCollapsed && !expanded;
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    if (isNavPaneCollapsed) setExpanded(false);
+  }, [isNavPaneCollapsed]);
+
+  useEffect(() => {
+    const event = NavigationEvents.subscribe("onNavigate", () => {
+      if (!useAppStore.getState().isNavPaneCollapsed) return;
+      setExpanded(false);
+    });
+    return () => {
+      event.unsubscribe();
+    };
+  }, []);
+
   const navigationTab = useAppStore((store) => store.navigationTab);
   const setNavigationTab = useAppStore((store) => store.setNavigationTab);
   const allTabs = tabs();
@@ -223,41 +251,97 @@ export function NavigationMenu() {
   return (
     <Flex
       testID="navigation-menu-root"
+      onHoverIn={() => clearTimeout(hoverTimeout.current)}
+      onHoverOut={() => {
+        clearTimeout(hoverTimeout.current);
+        if (!isNavPaneCollapsed) return;
+        hoverTimeout.current = setTimeout(() => {
+          if (Menu.isOpen()) {
+            const unsubscribe = useMenuStore.subscribe((state) => {
+              if (state.items) return;
+              unsubscribe();
+              setExpanded(false);
+            });
+            return;
+          }
+          setExpanded(false);
+        }, 500);
+      }}
       sx={{
         flexDirection: "column",
         flex: 1,
+        ...(isNavPaneCollapsed
+          ? {
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              zIndex: 3,
+              width: expanded ? 250 : 45
+            }
+          : {}),
         bg: "background",
         borderRight: "1px solid",
         borderRightColor: "separator",
         py: "spacing4"
       }}
     >
-      <Flex
-        sx={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: "spacing4",
-          px: "spacing4"
-        }}
-      >
+      {isCollapsed ? (
         <Flex
           sx={{
-            flex: 1,
-            flexDirection: "row",
+            justifyContent: "center",
             alignItems: "center",
-            gap: 8
+            mb: "spacing4",
+            px: "spacing4"
           }}
         >
-          <Logo size={25} />
-          <Text sx={{ color: "heading", fontSize: 20, fontWeight: 600 }}>
-            Notesnook
-          </Text>
+          <Logo size={24} />
         </Flex>
-        <Flex sx={{ gap: "small", alignItems: "center" }}>
-          <ProfileButton />
+      ) : (
+        <Flex
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: "spacing4",
+            px: "spacing4"
+          }}
+        >
+          <Flex
+            sx={{
+              flex: 1,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8
+            }}
+          >
+            <Logo size={25} />
+            <Text sx={{ color: "heading", fontSize: 20, fontWeight: 600 }}>
+              Notesnook
+            </Text>
+          </Flex>
+          <Flex
+            sx={{
+              flexDirection: "row",
+              gap: "small",
+              alignItems: "center"
+            }}
+          >
+            {isNavPaneCollapsed ? (
+              <Button
+                variant="secondary"
+                title={strings.expandSidebar()}
+                disabled={!canExpand}
+                onPress={onExpand}
+                sx={{ p: 1, bg: "transparent" }}
+              >
+                <ExpandSidebar size={13} color="icon" />
+              </Button>
+            ) : null}
+            <ProfileButton />
+          </Flex>
         </Flex>
-      </Flex>
+      )}
       <Flex sx={{ flexDirection: "column", px: "spacing4" }}>
         <Separator />
         <Flex
@@ -269,7 +353,11 @@ export function NavigationMenu() {
           }}
         >
           <Flex
-            sx={{ flexDirection: "row", alignItems: "center", gap: "spacing2" }}
+            sx={{
+              flexDirection: isCollapsed ? "column" : "row",
+              alignItems: "center",
+              gap: "spacing2"
+            }}
           >
             {allTabs.map((tab) => (
               <TabItem
@@ -277,11 +365,15 @@ export function NavigationMenu() {
                 testID={`tab-${tab.id}`}
                 icon={tab.icon}
                 selected={currentTab.id === tab.id}
-                onPress={() => setNavigationTab(tab.id)}
+                isCollapsed={isCollapsed}
+                onPress={() => {
+                  if (isNavPaneCollapsed) setExpanded(true);
+                  setNavigationTab(tab.id);
+                }}
               />
             ))}
           </Flex>
-          {currentTab.actions.length > 0 ? (
+          {!isCollapsed && currentTab.actions.length > 0 ? (
             <Flex
               sx={{
                 flexDirection: "row",
@@ -304,7 +396,7 @@ export function NavigationMenu() {
           ) : null}
         </Flex>
         <Separator />
-        {currentTab.id === "home" ? (
+        {isCollapsed || currentTab.id === "home" ? (
           <Button
             testID="create-note-button"
             variant="new_accent"
@@ -316,15 +408,16 @@ export function NavigationMenu() {
               gap: "spacing4",
               my: "spacing4",
               px: "spacing4",
-              py: "spacing5",
-              borderRadius: "radius2",
+              py: isCollapsed ? "spacing4" : "spacing5",
+              borderRadius: isCollapsed ? "radius1" : "radius2",
               fontSize: "sm",
               fontWeight: 600,
-              width: "100%"
+              width: isCollapsed ? 25 : "100%",
+              height: isCollapsed ? 25 : undefined
             }}
           >
             <Plus size={15} color="accentForeground" />
-            {strings.newNote()}
+            {isCollapsed ? null : strings.newNote()}
           </Button>
         ) : null}
       </Flex>
@@ -344,11 +437,16 @@ export function NavigationMenu() {
           justifyContent: "space-between"
         }}
       >
-        {currentTab.id === "home" ? <HomeTab /> : null}
-        {currentTab.id === "notebooks" ? <Notebooks /> : null}
-        {currentTab.id === "tags" ? <Tags /> : null}
+        {isCollapsed || currentTab.id === "home" ? (
+          <HomeTab
+            isCollapsed={isCollapsed}
+            collapse={() => isNavPaneCollapsed && setExpanded(false)}
+          />
+        ) : null}
+        {!isCollapsed && currentTab.id === "notebooks" ? <Notebooks /> : null}
+        {!isCollapsed && currentTab.id === "tags" ? <Tags /> : null}
       </Flex>
-      {currentTab.id === "home" && shouldShowWrapped() ? (
+      {currentTab.id === "home" && !isCollapsed && shouldShowWrapped() ? (
         <Button
           variant="accent"
           testID="wrapped-button"
@@ -474,7 +572,7 @@ function ProfileButton() {
   );
 }
 
-type SectionContext = { collapse: () => void };
+type SectionContext = { collapse: () => void; isCollapsed?: boolean };
 
 function navigateToRoute(path: string) {
   if (!isMobile() && getCurrentPath() === path) {
@@ -632,7 +730,7 @@ function ItemCount(props: {
   );
 }
 
-function Routes({ collapse }: SectionContext) {
+function Routes({ collapse, isCollapsed }: SectionContext) {
   const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
   const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
@@ -653,7 +751,12 @@ function Routes({ collapse }: SectionContext) {
   return (
     <>
       {ordered.map((item) => (
-        <RouteItem key={item.id} item={item} collapse={collapse} />
+        <RouteItem
+          key={item.id}
+          item={item}
+          collapse={collapse}
+          isCollapsed={isCollapsed}
+        />
       ))}
     </>
   );
@@ -661,7 +764,8 @@ function Routes({ collapse }: SectionContext) {
 
 function RouteItem({
   item,
-  collapse
+  collapse,
+  isCollapsed
 }: SectionContext & {
   item: RouteEntry;
 }) {
@@ -674,6 +778,7 @@ function RouteItem({
     <NavigationItem
       title={item.title}
       icon={item.icon}
+      isCollapsed={isCollapsed}
       selected={selected}
       onPress={() => {
         navigateToRoute(item.path);
@@ -738,7 +843,7 @@ function RouteItem({
   );
 }
 
-function Colors({ collapse }: SectionContext) {
+function Colors({ collapse, isCollapsed }: SectionContext) {
   const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
   const colors = useAppStore((store) => store.colors);
   const hiddenColors = useAppStore((store) => store.hiddenColors);
@@ -761,7 +866,12 @@ function Colors({ collapse }: SectionContext) {
     <>
       <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
       {rendered.map((color: Color) => (
-        <ColorItem key={color.id} color={color} collapse={collapse} />
+        <ColorItem
+          key={color.id}
+          color={color}
+          collapse={collapse}
+          isCollapsed={isCollapsed}
+        />
       ))}
       {hasMoreColors ? (
         <Flex
@@ -799,13 +909,18 @@ function Colors({ collapse }: SectionContext) {
   );
 }
 
-function ColorItem({ color, collapse }: SectionContext & { color: Color }) {
+function ColorItem({
+  color,
+  collapse,
+  isCollapsed
+}: SectionContext & { color: Color }) {
   const currentContext = useNoteStore((store) =>
     store.context?.type === "color" ? store.context : null
   );
   return (
     <NavigationItem
       title={color.title}
+      isCollapsed={isCollapsed}
       icon={Ellipse}
       iconSize={10}
       selected={currentContext?.id === color.id}
@@ -870,7 +985,7 @@ function ColorItem({ color, collapse }: SectionContext & { color: Color }) {
   );
 }
 
-function Shortcuts({ collapse }: SectionContext) {
+function Shortcuts({ collapse, isCollapsed }: SectionContext) {
   const shortcuts = useAppStore((store) => store.shortcuts);
   const [order] = usePersistentState<string[]>(
     "sidebarOrder:shortcuts",
@@ -882,7 +997,12 @@ function Shortcuts({ collapse }: SectionContext) {
     <>
       <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
       {ordered.map((item) => (
-        <ShortcutItem key={item.id} item={item} collapse={collapse} />
+        <ShortcutItem
+          key={item.id}
+          item={item}
+          collapse={collapse}
+          isCollapsed={isCollapsed}
+        />
       ))}
     </>
   );
@@ -890,7 +1010,8 @@ function Shortcuts({ collapse }: SectionContext) {
 
 function ShortcutItem({
   item,
-  collapse
+  collapse,
+  isCollapsed
 }: SectionContext & { item: Notebook | Tag }) {
   const currentContext = useNoteStore((store) =>
     store.context?.type === "tag" || store.context?.type === "notebook"
@@ -901,6 +1022,7 @@ function ShortcutItem({
   return (
     <NavigationItem
       title={item.title}
+      isCollapsed={isCollapsed}
       menuItems={[
         {
           type: "lazy-loader",
@@ -947,7 +1069,7 @@ function ShortcutItem({
   );
 }
 
-function HomeTab() {
+function HomeTab(props: { isCollapsed?: boolean; collapse: () => void }) {
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
 
   useEffect(() => {
@@ -960,14 +1082,10 @@ function HomeTab() {
         testID="home-tab"
         sx={{ flexDirection: "column", gap: "spacing1", px: "spacing4" }}
       >
-        <Routes collapse={noop} />
-        <Colors collapse={noop} />
-        <Shortcuts collapse={noop} />
+        <Routes collapse={props.collapse} isCollapsed={props.isCollapsed} />
+        <Colors collapse={props.collapse} isCollapsed={props.isCollapsed} />
+        <Shortcuts collapse={props.collapse} isCollapsed={props.isCollapsed} />
       </Flex>
     </ScrollContainer>
   );
-}
-
-function noop() {
-  return undefined;
 }

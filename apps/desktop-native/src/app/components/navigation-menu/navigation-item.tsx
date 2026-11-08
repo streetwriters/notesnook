@@ -35,11 +35,18 @@ export function NavigationItem(props: {
   iconSize?: number;
   color?: ColorValue;
   selected?: boolean;
+  isCollapsed?: boolean;
   onPress?: () => void;
   menuItems?: MenuItem[];
   children?: ReactNode;
 }) {
-  const { icon: RowIcon, iconSize = 13, selected, menuItems } = props;
+  const {
+    icon: RowIcon,
+    iconSize = 13,
+    selected,
+    menuItems,
+    isCollapsed
+  } = props;
   return (
     <Flex
       testID="navigation-item"
@@ -62,7 +69,7 @@ export function NavigationItem(props: {
       sx={{
         borderRadius: "radius1",
         px: "spacing2",
-        py: "spacing4",
+        py: isCollapsed ? "spacing2" : "spacing4",
         alignItems: "center",
         flexDirection: "row",
         bg: selected ? "background-selected" : "transparent",
@@ -74,32 +81,34 @@ export function NavigationItem(props: {
           p: 0,
           flex: 1,
           alignItems: "center",
-          justifyContent: "flex-start",
+          justifyContent: isCollapsed ? "center" : "flex-start",
           flexDirection: "row"
         }}
       >
         {RowIcon ? (
           <RowIcon
-            size={iconSize}
+            size={isCollapsed ? 15 : iconSize}
             color={props.color ?? (selected ? "icon-selected" : "icon")}
           />
         ) : null}
-        <Text
-          testID="title"
-          variant="body"
-          numberOfLines={1}
-          sx={{
-            fontSize: "xs",
-            fontWeight: "normal",
-            color: selected ? "paragraph-selected" : "paragraph",
-            pr: "spacing1",
-            ml: "spacing3"
-          }}
-        >
-          {props.title}
-        </Text>
+        {isCollapsed ? null : (
+          <Text
+            testID="title"
+            variant="body"
+            numberOfLines={1}
+            sx={{
+              fontSize: "xs",
+              fontWeight: "normal",
+              color: selected ? "paragraph-selected" : "paragraph",
+              pr: "spacing1",
+              ml: "spacing3"
+            }}
+          >
+            {props.title}
+          </Text>
+        )}
       </Flex>
-      {props.children}
+      {isCollapsed ? null : props.children}
     </Flex>
   );
 }
