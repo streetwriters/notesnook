@@ -23,6 +23,7 @@ import {
   type Notebook as NotebookType
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { useRef } from "react";
 import { Box, Button, Flex, Text, type MenuItem, type PressEvent } from "@ui";
 import ListItem from "../list-item";
 import {
@@ -53,6 +54,8 @@ import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useNotesStore } from "../../stores/note-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { store as settingStore } from "../../stores/setting-store";
+import { handleDrop } from "../../common/drop-handler";
+import { useDragHandler } from "../../hooks/use-drag-handler";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
 
@@ -86,6 +89,10 @@ export function Notebook(props: NotebookProps) {
     select = () => {}
   } = props;
   const context = useNotesStore((store) => store.context);
+  const dragTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
+  const { isDragEntering, isDragLeaving } = useDragHandler(`id_${item.id}`);
   const isOpened = context?.type === "notebook" && context.id === item.id;
   const contextNotes = useNotesStore((store) => store.contextNotes);
   const currentContext = isOpened ? contextNotes : null;
@@ -96,6 +103,19 @@ export function Notebook(props: NotebookProps) {
       isFocused={isOpened}
       isCompact
       item={item}
+      draggable
+      onDragEnter={(event) => {
+        if (!isDragEntering(event)) return;
+        dragTimeout.current = setTimeout(() => expand(), 700);
+      }}
+      onDragLeave={(event) => {
+        if (!isDragLeaving(event)) return;
+        clearTimeout(dragTimeout.current);
+      }}
+      onDrop={(event) => {
+        clearTimeout(dragTimeout.current);
+        handleDrop(event.payload, item);
+      }}
       menuItems={notebookMenuItems}
       context={{ refresh, isRoot: depth === 0 }}
       onKeyPress={async (e) => {

@@ -23,6 +23,7 @@ import {
   Text,
   type ColorValue,
   type ContextMenuEvent,
+  type DragEvent,
   type MenuItem
 } from "@ui";
 import type { Icon } from "../icons";
@@ -36,6 +37,7 @@ export function NavigationItem(props: {
   color?: ColorValue;
   selected?: boolean;
   isCollapsed?: boolean;
+  onDrop?: (event: DragEvent) => void;
   onPress?: () => void;
   menuItems?: MenuItem[];
   children?: ReactNode;
@@ -45,11 +47,14 @@ export function NavigationItem(props: {
     iconSize = 13,
     selected,
     menuItems,
-    isCollapsed
+    isCollapsed,
+    onDrop
   } = props;
   return (
     <Flex
       testID="navigation-item"
+      droppable={!!onDrop}
+      onDrop={onDrop}
       title={props.title}
       onPress={() => {
         AppEventManager.publish(AppEvents.toggleSideMenu, false);
@@ -73,7 +78,8 @@ export function NavigationItem(props: {
         alignItems: "center",
         flexDirection: "row",
         bg: selected ? "background-selected" : "transparent",
-        ":hover": { bg: selected ? "hover-selected" : "hover" }
+        ":hover": { bg: selected ? "hover-selected" : "hover" },
+        ":drag-over": { bg: selected ? "hover-selected" : "hover" }
       }}
     >
       <Flex

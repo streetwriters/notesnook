@@ -26,7 +26,7 @@ import { useStore as useNotebookStore } from "../stores/notebook-store";
 import { useStore as useTagStore } from "../stores/tag-store";
 
 export async function handleDrop(
-  dataTransfer: DataTransfer,
+  dragPayload: unknown,
   item:
     | ItemReference
     | Context
@@ -34,8 +34,8 @@ export async function handleDrop(
 ) {
   if (!item.type) return;
 
-  const noteIds = getDragData(dataTransfer, "note");
-  const notebookIds = getDragData(dataTransfer, "notebook");
+  const noteIds = getDragData(dragPayload, "note");
+  const notebookIds = getDragData(dragPayload, "notebook");
   const {
     setColor,
     favorite,

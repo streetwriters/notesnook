@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { DragEvent } from "@ui";
+
 export function useDragHandler(_id: string) {
   return {
-    isDragEntering: () => false,
-    isDragLeaving: () => false
+    isDragEntering: (_event: DragEvent) => true,
+    isDragLeaving: (_event: DragEvent) => true
   };
 }

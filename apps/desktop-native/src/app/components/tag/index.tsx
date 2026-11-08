@@ -35,6 +35,7 @@ import {
 } from "../../common";
 import { EditTagDialog } from "../../dialogs/item-dialog";
 import { showToast } from "../../utils/toast";
+import { handleDrop } from "../../common/drop-handler";
 import { writeToClipboard } from "../../utils/clipboard";
 import {
   ArrowCounterClockwise,
@@ -123,6 +124,7 @@ function Tag(props: TagProps) {
         }
       }}
       menuItems={tagMenuItems}
+      onDrop={(event) => handleDrop(event.payload, item)}
       onPress={() => {
         navigate(`/tags/${id}`);
       }}
