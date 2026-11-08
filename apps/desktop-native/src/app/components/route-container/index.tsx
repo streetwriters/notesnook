@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
 import type { GroupingKey } from "@notesnook/core";
 import { Box, Button, Flex, Input, Text } from "@ui";
@@ -25,7 +25,14 @@ import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
-import { List, SearchIcon, Sliders, ViewList, type Icon } from "../icons";
+import {
+  Close,
+  List,
+  SearchIcon,
+  Sliders,
+  ViewList,
+  type Icon
+} from "../icons";
 import type { Context } from "../list-container/types";
 
 export type RouteContainerButton = {
@@ -149,6 +156,7 @@ function Header(props: RouteContainerProps) {
   const { type, routeKey } = props;
   const title = typeof props.title === "string" ? props.title : undefined;
   const query = useSearchStore((store) => store.query);
+  const [inputKey, setInputKey] = useState(0);
   const noteContext = useNoteStore((store) => store.context);
   const viewMode = useNoteStore((store) => store.viewMode);
   const setViewMode = useNoteStore((store) => store.setViewMode);
@@ -216,10 +224,21 @@ function Header(props: RouteContainerProps) {
           <Flex sx={{ flexDirection: "row", gap: "spacing6" }}>
             <Flex sx={{ flex: 1, flexDirection: "row", height: 40 }}>
               <Input
+                key={inputKey}
                 testID="search-input"
                 variant="clean"
                 defaultValue={query}
                 placeholder={strings.searchInRoute(headerTitle)}
+                onKeyUp={(event) => {
+                  if (event.key === "Escape") {
+                    useSearchStore.getState().resetSearch();
+                    setInputKey((key) => key + 1);
+                  } else
+                    useSearchStore.setState({
+                      isSearching: true,
+                      searchType: type
+                    });
+                }}
                 onChangeText={(text) => {
                   clearTimeout(debounce.current);
                   debounce.current = setTimeout(
@@ -239,6 +258,39 @@ function Header(props: RouteContainerProps) {
                   borderRadius: "dialog"
                 }}
               />
+              {query ? (
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    height: "100%",
+                    borderTopRightRadius: "radius2",
+                    borderBottomRightRadius: "radius2",
+                    overflow: "hidden"
+                  }}
+                >
+                  <Button
+                    testID="search-button"
+                    variant="secondary"
+                    onPress={() => {
+                      useSearchStore.getState().resetSearch();
+                      setInputKey((key) => key + 1);
+                    }}
+                    sx={{
+                      p: 0,
+                      px: "6px",
+                      height: "100%",
+                      borderRadius: 0,
+                      m: 0,
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    <Close size={15} />
+                  </Button>
+                </Flex>
+              ) : null}
               <SearchIcon
                 size={15}
                 color="icon"
