@@ -19,7 +19,7 @@ fs.mkdirSync(outDir, { recursive: true });
 const [width, height] = scenario.size;
 const browser = await chromium.launch({
   channel: "chrome",
-  headless: false,
+  headless: true,
   args: [`--force-device-scale-factor=${scenario.scale}`]
 });
 const context = await browser.newContext({
