@@ -16,13 +16,44 @@ const scenario = scenarios[scenarioName];
 const seed = JSON.parse(fs.readFileSync(seedFile, "utf8"));
 fs.mkdirSync(outDir, { recursive: true });
 
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+const [width, height] = scenario.size;
+const browser = await chromium.launch({
+  channel: "chrome",
+  headless: false,
+  args: [`--force-device-scale-factor=${scenario.scale}`]
+});
 const context = await browser.newContext({
-  viewport: { width: scenario.size[0], height: scenario.size[1] },
-  deviceScaleFactor: scenario.scale,
+  viewport: null,
   colorScheme: scheme
 });
 const page = await context.newPage();
+const cdp = await context.newCDPSession(page);
+const { windowId } = await cdp.send("Browser.getWindowForTarget");
+let outerWidth = width;
+let outerHeight = height + 120;
+async function fitViewport() {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    await cdp.send("Browser.setWindowBounds", {
+      windowId,
+      bounds: { windowState: "normal", width: outerWidth, height: outerHeight }
+    });
+    await page.waitForTimeout(300);
+    const inner = await page.evaluate(() => ({
+      w: window.innerWidth,
+      h: window.innerHeight,
+      dpr: window.devicePixelRatio
+    }));
+    if (inner.dpr !== scenario.scale)
+      throw new Error(
+        `devicePixelRatio is ${inner.dpr}, expected ${scenario.scale}`
+      );
+    if (inner.w === width && inner.h === height) return;
+    outerWidth += width - inner.w;
+    outerHeight += height - inner.h;
+  }
+  throw new Error("could not size the viewport to " + width + "x" + height);
+}
+await fitViewport();
 await page.goto(baseUrl, { waitUntil: "load" });
 await page.waitForTimeout(6000);
 const offline = page.getByText("Use offline");
@@ -81,6 +112,8 @@ for (const step of scenario.steps ?? []) {
 if (!scenario.keepPointer) await page.mouse.move(2, 2);
 await page.waitForTimeout(300);
 
+await fitViewport();
+await page.waitForTimeout(500);
 const elements = await page.evaluate(() => {
   const rgba = (value) => {
     const m = value.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0, 0];
@@ -128,6 +161,7 @@ const textRects = await page.evaluate(() => {
   return rects;
 });
 
+await fitViewport();
 let shot = await page.screenshot();
 for (let attempt = 0; attempt < 6; attempt++) {
   await page.waitForTimeout(700);
