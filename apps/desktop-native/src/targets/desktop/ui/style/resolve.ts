@@ -79,6 +79,36 @@ function optionsKey(options: ResolveOptions) {
   }`;
 }
 
+type TransformPart = Record<string, number | string>;
+
+function transformToCss(parts: TransformPart[]) {
+  return parts
+    .flatMap((part) =>
+      Object.entries(part).map(([name, value]) =>
+        typeof value === "number"
+          ? name.startsWith("scale")
+            ? `${name}(${value})`
+            : `${name}(${value}px)`
+          : `${name}(${value})`
+      )
+    )
+    .join(" ");
+}
+
+function withCssTransform<T extends object>(style: T): T {
+  const transform = (style as { transform?: unknown }).transform;
+  if (
+    Array.isArray(transform) &&
+    transform.length > 0 &&
+    typeof transform[0] === "object"
+  )
+    return {
+      ...style,
+      transform: transformToCss(transform as TransformPart[])
+    };
+  return style;
+}
+
 export function resolveSx(
   sx: SxProp | undefined,
   context: ThemeContextValue,
@@ -141,7 +171,9 @@ function compute(
   const { own, groupHover, groupActive, transition, animation } =
     groupEntries(sx);
   const merged = { ...normalizeVariant(variants, colors), ...own };
-  const themed = css(merged as never)(theme as never) as Declarations;
+  const themed = css(withCssTransform(merged) as never)(
+    theme as never
+  ) as Declarations;
 
   const base: Declarations = {};
   const states: Partial<Record<keyof typeof STATE_KEYS, Declarations>> = {};
@@ -170,7 +202,8 @@ function compute(
       converted.style,
       convertAnimation(
         animation,
-        (frame) => css(frame as never)(theme as never) as Declarations
+        (frame) =>
+          css(withCssTransform(frame) as never)(theme as never) as Declarations
       )
     );
   const resolved: ResolvedStyle = {
@@ -186,7 +219,9 @@ function compute(
   const resolveGroup = (entry: { group: string; style: Declarations }) => ({
     group: entry.group,
     style: convertStateDeclarations(
-      css(entry.style as never)(theme as never) as Declarations
+      css(withCssTransform(entry.style) as never)(
+        theme as never
+      ) as Declarations
     )
   });
   if (groupHover) resolved.groupHoverStyle = resolveGroup(groupHover);

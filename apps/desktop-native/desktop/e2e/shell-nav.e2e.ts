@@ -169,3 +169,29 @@ test("a modifier click selects several notes", async () => {
     { timeout: 10000, interval: 300 }
   );
 });
+
+test("the view mode button switches the list between detailed and compact rows", async () => {
+  await app.press("escape");
+  await app.waitForIdle();
+  const height = async () => {
+    const [row] = await app.query("testID", "list-item", true);
+    return row.frame.height;
+  };
+  const detailed = await height();
+  await app.getByTestId("home-view-mode-button").click();
+  await vi.waitFor(
+    async () => expect(await height()).toBeLessThan(detailed - 40),
+    {
+      timeout: 10000,
+      interval: 300
+    }
+  );
+  await app.getByTestId("home-view-mode-button").click();
+  await vi.waitFor(
+    async () => expect(await height()).toBeGreaterThan(detailed - 5),
+    {
+      timeout: 10000,
+      interval: 300
+    }
+  );
+});

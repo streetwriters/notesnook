@@ -492,8 +492,11 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
     ? context.colors[props.color] ?? props.color
     : context.colors.icon;
   const transform = props.rotate
-    ? [{ rotate: `${props.rotate}deg` }]
-    : undefined;
+    ? [
+        ...((viewStyle.transform as any[]) ?? []),
+        { rotate: `${props.rotate}deg` }
+      ]
+    : viewStyle.transform;
   return (
     <AnyView
       {...nativeProps}

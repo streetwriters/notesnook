@@ -239,16 +239,18 @@ function Header(props: RouteContainerProps) {
                   borderRadius: "dialog"
                 }}
               />
-              <Box
+              <SearchIcon
+                size={15}
+                color="icon"
                 sx={{
                   position: "absolute",
                   left: 10,
-                  top: 12.5,
-                  pointerEvents: "none"
+                  top: 20,
+                  transform: [{ translateY: -7.5 }],
+                  pointerEvents: "none",
+                  zIndex: 1
                 }}
-              >
-                <SearchIcon size={15} color="icon" />
-              </Box>
+              />
             </Flex>
           </Flex>
         )}

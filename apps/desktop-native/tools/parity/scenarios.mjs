@@ -86,4 +86,14 @@ scenarios.listHover = {
   keepPointer: true
 };
 
+scenarios.compactList = {
+  ...scenarios.shell,
+  steps: [{ click: "home-view-mode-button" }]
+};
+scenarios.emptyList = {
+  ...scenarios.shell,
+  seed: () => [],
+  noExtras: true
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

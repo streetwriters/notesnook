@@ -33,13 +33,15 @@ if (await offline.count()) {
   await page.waitForTimeout(10000);
 }
 await page.evaluate(
-  async ({ seed, scheme, extras }) => {
+  async ({ seed, scheme, extras, noExtras }) => {
     const { db } = await import("/common/db.ts");
     for (const notebook of extras.notebooks)
       await db.notebooks.add({ title: notebook.title });
-    for (const tag of extras.tags) await db.tags.add({ title: tag.title });
-    for (const color of extras.colors)
-      await db.colors.add({ title: color.title, colorCode: color.colorCode });
+    if (!noExtras)
+      for (const tag of extras.tags) await db.tags.add({ title: tag.title });
+    if (!noExtras)
+      for (const color of extras.colors)
+        await db.colors.add({ title: color.title, colorCode: color.colorCode });
     for (const note of seed)
       await db.notes.add({
         title: note.title,
@@ -55,7 +57,7 @@ await page.evaluate(
     const theme = await import("/stores/theme-store.ts");
     theme.store.setColorScheme(scheme);
   },
-  { seed, scheme, extras }
+  { seed, scheme, extras, noExtras: !!scenario.noExtras }
 );
 await page.waitForTimeout(3000);
 await page.mouse.move(2, 2);

@@ -70,3 +70,20 @@ fs.writeFileSync(
   out
 );
 console.log(`${lines.length} icons, ${svgFiles.size} svg files, ${mdi.size} mdi paths`);
+
+const assetsDir = path.join(root, "apps/web/src/assets");
+const illustrations = fs
+  .readdirSync(assetsDir)
+  .filter((file) => /^list-pane-empty-.*\.svg$/.test(file))
+  .sort()
+  .map((file) => {
+    const key = file.replace(/^list-pane-empty-/, "").replace(/-view\.svg$/, "");
+    return `  ${JSON.stringify(key)}: ${JSON.stringify(
+      fs.readFileSync(path.join(assetsDir, file), "utf8").replace(/\n/g, "")
+    )}`;
+  });
+fs.writeFileSync(
+  path.join(here, "../src/app/components/placeholders/illustrations.generated.ts"),
+  `export const illustrations: Record<string, string> = {\n${illustrations.join(",\n")}\n};\n`
+);
+console.log(`${illustrations.length} illustrations`);

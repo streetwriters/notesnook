@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Flex, Text } from "@ui";
+import { Flex, Icon, Text } from "@ui";
+import { illustrations } from "./illustrations.generated";
 
 type Variant =
   | "home"
@@ -30,32 +31,108 @@ type Variant =
   | "trash"
   | "reminders";
 
-function textFor(variant: Variant) {
+function content(variant: Variant) {
+  const accent = (text: string) => <Text sx={{ color: "accent" }}>{text}</Text>;
+  const home = {
+    image: "home",
+    title: strings.createYourFirstNote(),
+    description: (
+      <>
+        {strings.createFirstNoteHint[0]()} {accent(strings.newNote())}{" "}
+        {strings.createFirstNoteHint[1]()}
+      </>
+    )
+  };
   switch (variant) {
     case "favorite":
-      return strings.favoritesEmpty();
+      return {
+        image: "favorite",
+        title: strings.noFavoritesYet(),
+        description: strings.noFavoritesYetDesc()
+      };
+    case "trash":
+      return {
+        image: "trash",
+        title: strings.trashIsEmpty(),
+        description: strings.trashIsEmptyDesc()
+      };
+    case "archive":
+      return {
+        image: "archive",
+        title: strings.noArchivesYet(),
+        description: strings.noArchivesYetDesc()
+      };
     case "monographs":
-      return strings.monographsEmpty();
-    case "tag":
-      return strings.tagsEmpty();
+      return {
+        image: "monograph",
+        title: strings.whatAreMonographs(),
+        description: (
+          <>
+            {strings.monographsEmptyDesc()} {accent(strings.learnMore())}
+          </>
+        )
+      };
     case "reminders":
-      return strings.remindersEmpty();
-    case "search":
-      return strings.noResultsFound();
+      return {
+        image: "reminder",
+        title: strings.noRemindersToday(),
+        description: strings.noRemindersTodayDesc()
+      };
+    case "tag":
+      return {
+        image: "tag",
+        title: strings.noNotesInTag(),
+        description: strings.noNotesInTagDesc()
+      };
     default:
-      return strings.notesEmpty();
+      return home;
   }
 }
 
 export function ListPanePlaceholder({ variant }: { variant: Variant }) {
+  const { image, title, description } = content(variant);
   return (
-    <Flex sx={{ flexDirection: "column", width: "100%", alignItems: "center" }}>
-      <Text
-        testID="placeholder-text"
-        sx={{ color: "paragraph", fontSize: "sm" }}
+    <Flex
+      testID="list-placeholder"
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "spacing7",
+        width: "100%"
+      }}
+    >
+      <Icon svg={illustrations[image]} size={230} />
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "spacing3"
+        }}
       >
-        {textFor(variant)}
-      </Text>
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "md",
+            fontWeight: 600,
+            color: "heading",
+            lineHeight: 1,
+            textAlign: "center"
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          sx={{
+            maxWidth: 250,
+            fontSize: "sm",
+            color: "paragraph",
+            lineHeight: 1.2,
+            textAlign: "center"
+          }}
+        >
+          {description}
+        </Text>
+      </Flex>
     </Flex>
   );
 }

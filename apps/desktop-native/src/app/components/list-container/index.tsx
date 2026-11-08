@@ -206,6 +206,7 @@ export default function ListContainer(props: ListContainerProps) {
           itemKey={itemKey}
           renderItem={renderItem}
           estimatedItemSize={getListItemDefaultHeight(group, compact)}
+          extraData={compact}
           header={header}
           overscan={400}
         />

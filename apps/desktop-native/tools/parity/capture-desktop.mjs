@@ -35,9 +35,9 @@ const app = await launchApp({
     resetConfig: true,
     initialColorScheme: scheme,
     titleBarInset: 0,
-    seedNotebooks: extras.notebooks,
-    seedTags: extras.tags,
-    seedColors: extras.colors
+    seedNotebooks: scenario.noExtras ? [] : extras.notebooks,
+    seedTags: scenario.noExtras ? [] : extras.tags,
+    seedColors: scenario.noExtras ? [] : extras.colors
   },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-"))
@@ -53,7 +53,11 @@ try {
   await app.setWindowSize(scenario.size[0], scenario.size[1]);
   const deadline = Date.now() + 60000;
   while (Date.now() < deadline) {
-    if ((await app.query("testID", "title", true)).length >= 5) break;
+    if (
+      seed.length === 0 ||
+      (await app.query("testID", "title", true)).length >= 5
+    )
+      break;
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
   await app.mouseMove({ x: 2, y: 2 });

@@ -89,6 +89,7 @@ export const VirtualList = forwardRef<
         keyExtractor={keyExtractor}
         renderItem={render}
         estimatedItemSize={estimatedItemSize}
+        extraData={props.extraData}
         drawDistance={overscan}
         initialScrollIndex={props.initialScrollIndex}
         ListHeaderComponent={header ? <Flex>{header}</Flex> : undefined}

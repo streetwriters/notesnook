@@ -40,6 +40,7 @@ export interface VirtualListProps {
   renderItem: (index: number) => ReactNode;
   itemKey: (index: number) => string;
   estimatedItemSize: number;
+  extraData?: unknown;
   header?: ReactNode;
   overscan?: number;
   initialScrollIndex?: number;
