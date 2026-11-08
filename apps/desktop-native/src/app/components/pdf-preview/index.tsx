@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { files, shell } from "@platform";
+import { environment, files, shell } from "@platform";
 import { Button, Flex, Text } from "@ui";
 import { Close, Download } from "../icons";
 import { saveAttachment } from "../../common/attachments";
@@ -43,8 +43,36 @@ function base64ToBytes(base64: string) {
   return bytes;
 }
 
+async function getBytes(fileUrl: string | Uint8Array) {
+  if (typeof fileUrl !== "string") return fileUrl;
+  const prefix = "base64,";
+  const index = fileUrl.indexOf(prefix);
+  if (fileUrl.startsWith("data:") && index > -1)
+    return base64ToBytes(fileUrl.slice(index + prefix.length));
+  return undefined;
+}
+
 export function PdfPreview(props: PdfPreviewProps) {
   const { fileUrl, onClose, hash } = props;
+
+  async function openExternally() {
+    try {
+      if (typeof fileUrl === "string" && !fileUrl.startsWith("data:")) {
+        if (fileUrl.startsWith("/") || fileUrl.startsWith("file://"))
+          return await shell.openPath(fileUrl.replace(/^file:\/\//, ""));
+        return shell.openUrl(fileUrl);
+      }
+      const bytes = await getBytes(fileUrl);
+      if (!bytes) return;
+      const path = `${environment.tempDirectory}/${hash || "document"}.pdf`;
+      const file = await files.createAt(path);
+      await file.write(bytes);
+      await file.close();
+      await shell.openPath(path);
+    } catch (e) {
+      showToast("error", (e as Error).message);
+    }
+  }
 
   async function download() {
     try {
@@ -61,12 +89,6 @@ export function PdfPreview(props: PdfPreviewProps) {
       showToast("error", (e as Error).message);
     }
   }
-
-  const localPath =
-    typeof fileUrl === "string" &&
-    (fileUrl.startsWith("/") || fileUrl.startsWith("file://"))
-      ? fileUrl.replace(/^file:\/\//, "")
-      : undefined;
 
   return (
     <Flex testID="pdf-preview" sx={{ flex: 1, flexDirection: "column" }}>
@@ -105,15 +127,13 @@ export function PdfPreview(props: PdfPreviewProps) {
           <Download size={15} color="icon" />
           <Text>{strings.network.download()}</Text>
         </Button>
-        {localPath ? (
-          <Button
-            testID="pdf-open-external"
-            variant="secondary"
-            onPress={() => shell.openPath(localPath)}
-          >
-            <Text>{strings.open()}</Text>
-          </Button>
-        ) : null}
+        <Button
+          testID="pdf-open-external"
+          variant="secondary"
+          onPress={openExternally}
+        >
+          <Text>{strings.open()}</Text>
+        </Button>
       </Flex>
     </Flex>
   );
