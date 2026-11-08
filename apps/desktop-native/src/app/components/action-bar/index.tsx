@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { memo } from "react";
 import { strings } from "@notesnook/intl";
 import { Box, Button, Flex, Text } from "@ui";
-import { environment } from "@platform";
 import {
   ArrowLeft,
   ArrowRight,
@@ -46,26 +45,20 @@ import {
   useEditorStore,
   type SessionType
 } from "../../stores/editor-store";
-import { useWindowControls } from "../../hooks/use-window-controls";
-
-const TRAFFIC_LIGHTS_WIDTH = 78;
 
 function Separator() {
   return <Box sx={{ width: 1, height: 13, bg: "separator" }} />;
 }
 
 export function ActionBar(props: {
-  leadingInset?: number;
   isSidebarCollapsed: boolean;
   onSidebarToggle: () => void;
 }) {
-  const { isFullscreen } = useWindowControls();
   const activeTab = useEditorStore((store) => store.getActiveTab());
   const activeSession = useEditorStore((store) =>
     activeTab ? store.getSession(activeTab.sessionId) : undefined
   );
   const propertiesTab = useEditorStore((store) => store.propertiesTab);
-  const isMac = environment.os === "macOS";
   const sessionType = activeSession?.type;
   const canSearch =
     activeSession !== undefined &&
@@ -107,17 +100,6 @@ export function ActionBar(props: {
 
   return (
     <>
-      {(props.leadingInset ??
-        (isMac && !isFullscreen ? TRAFFIC_LIGHTS_WIDTH : 0)) > 0 ? (
-        <Box
-          sx={{
-            width:
-              props.leadingInset ??
-              (isMac && !isFullscreen ? TRAFFIC_LIGHTS_WIDTH : 0),
-            flexShrink: 0
-          }}
-        />
-      ) : null}
       <Button
         testID="sidebar-toggle"
         variant="tertiary"

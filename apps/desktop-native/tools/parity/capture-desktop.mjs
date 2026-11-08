@@ -33,8 +33,8 @@ const app = await launchApp({
   initialProps: {
     seed,
     resetConfig: true,
-    initialColorScheme: scheme,
     titleBarInset: 0,
+    initialColorScheme: scheme,
     seedNotebooks: scenario.noExtras ? [] : extras.notebooks,
     seedTags: scenario.noExtras ? [] : extras.tags,
     seedColors: scenario.noExtras ? [] : extras.colors

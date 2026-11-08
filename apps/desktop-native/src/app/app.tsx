@@ -24,7 +24,6 @@ import {
   SplitPane,
   Text,
   ThemeScope,
-  TITLE_BAR_HEIGHT,
   TitleBar,
   type SplitPaneHandle
 } from "@ui";
@@ -50,27 +49,22 @@ export function App(props: { titleBarInset?: number }) {
       sx={{ flexDirection: "column", flex: 1, bg: "background" }}
     >
       <ThemeScope scope="titleBar">
-        <TitleBar underlay={false}>
-          <Flex
-            testID="editor-action-bar"
-            sx={{
-              flexDirection: "row",
-              height: TITLE_BAR_HEIGHT,
-              bg: "background",
-              px: "spacing4",
-              borderBottom: "1px solid",
-              borderBottomColor: "border"
+        <TitleBar
+          trafficLightInset={props.titleBarInset}
+          sx={{
+            bg: "background",
+            px: "spacing4",
+            borderBottom: "1px solid",
+            borderBottomColor: "border"
+          }}
+        >
+          <ActionBar
+            isSidebarCollapsed={isNavPaneCollapsed}
+            onSidebarToggle={() => {
+              if (isNavPaneCollapsed) navPane.current?.expand(0);
+              else navPane.current?.collapse(0);
             }}
-          >
-            <ActionBar
-              leadingInset={props.titleBarInset}
-              isSidebarCollapsed={isNavPaneCollapsed}
-              onSidebarToggle={() => {
-                if (isNavPaneCollapsed) navPane.current?.expand(0);
-                else navPane.current?.collapse(0);
-              }}
-            />
-          </Flex>
+          />
         </TitleBar>
       </ThemeScope>
       <SplitPane

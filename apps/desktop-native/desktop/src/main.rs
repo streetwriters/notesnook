@@ -15,7 +15,9 @@ fn main() {
         env!("RN_GPUI_APP_ID"),
     )
     .window_title(env!("RN_GPUI_APP_NAME"))
-    .window_size(1280.0, 800.0);
+    .window_size(1280.0, 800.0)
+    .title_bar(react_native_gpui::WindowTitleBar::Hidden)
+    .traffic_light_position(10.0, 14.0);
 
     react_native_gpui::run_with(config);
 }

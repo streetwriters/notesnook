@@ -62,7 +62,9 @@ export declare function Pane(props: PaneProps): JSX.Element | null;
 export declare const TITLE_BAR_HEIGHT: number;
 
 export interface TitleBarProps {
-  underlay?: boolean;
+  height?: number;
+  trafficLightInset?: number;
+  sx?: SxProp;
   children?: ReactNode;
 }
 

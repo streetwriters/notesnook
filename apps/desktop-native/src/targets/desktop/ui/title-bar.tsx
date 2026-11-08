@@ -17,51 +17,40 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { View } from "react-native";
 import { TitleBar as NativeTitleBar } from "@react-native-gpui/core/desktop";
 import { environment } from "@platform";
 import type * as Contract from "../../../ui/layout";
 import { useWindowControls } from "../../../app/hooks/use-window-controls";
+import { useStyled } from "./style/use-styled";
 import { useThemeContext } from "./theme";
-
-const AnyView = View as any;
 
 export const TITLE_BAR_HEIGHT = 45;
 
 export function TitleBar({
-  underlay = true,
+  height = TITLE_BAR_HEIGHT,
+  trafficLightInset,
+  sx,
   children
 }: Contract.TitleBarProps) {
-  const { colors, definition } = useThemeContext();
+  const { definition } = useThemeContext();
   const { isFullscreen } = useWindowControls();
+  const { viewStyle } = useStyled({ sx });
   const isMac = environment.os === "macOS";
-  if (isMac && isFullscreen) return null;
-
-  if (!isMac)
-    return (
-      <NativeTitleBar
-        title=""
-        appearance={definition.colorScheme === "dark" ? "dark" : "light"}
-        style={{ backgroundColor: colors.background }}
-      >
-        {children}
-      </NativeTitleBar>
-    );
+  const { paddingLeft = 0, ...rest } = viewStyle as Record<string, unknown>;
+  const inset = trafficLightInset ?? (isMac && !isFullscreen ? 78 : 0);
 
   return (
-    <AnyView
-      desktopDragRegion
-      testID="title-bar"
-      style={{
-        position: underlay ? "absolute" : "relative",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: TITLE_BAR_HEIGHT,
-        zIndex: 1
-      }}
+    <NativeTitleBar
+      title=""
+      appearance={definition.colorScheme === "dark" ? "dark" : "light"}
+      trafficLightInset={0}
+      style={[
+        { height, gap: 0, paddingRight: 0 },
+        rest as never,
+        { paddingLeft: inset + (paddingLeft as number) }
+      ]}
     >
       {children}
-    </AnyView>
+    </NativeTitleBar>
   );
 }
