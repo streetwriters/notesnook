@@ -644,7 +644,7 @@ function ReorderableList<T extends { id: string }>(
         onOrderChanged(newOrder);
       }}
       renderItem={(item, state) => (
-        <Flex sx={{ opacity: state.isDragging ? 0.4 : 1 }}>
+        <Flex sx={{ width: "100%", opacity: state.isDragging ? 0.4 : 1 }}>
           {renderItem(item)}
         </Flex>
       )}

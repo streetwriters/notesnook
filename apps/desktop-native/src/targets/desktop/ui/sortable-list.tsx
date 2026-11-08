@@ -39,6 +39,7 @@ export function SortableList<T extends Contract.SortableItem>(
       {items.map((item, index) => (
         <Flex
           key={item.id}
+          sx={direction === "vertical" ? { width: "100%" } : undefined}
           draggable
           droppable
           onDragStart={() => {
