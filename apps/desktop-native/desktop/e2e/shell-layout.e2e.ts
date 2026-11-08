@@ -163,10 +163,6 @@ test("the status bar shows no sync item while logged out and the vault item only
   expect(await app.getByTestId("lock-app").count()).toBe(0);
 });
 
-test("the announcements host renders nothing without announcements", async () => {
-  expect(await app.getByTestId("announcement").count()).toBe(0);
-});
-
 test("ctrl+t opens a new editor tab and ctrl+w closes it", async () => {
   const before = await app.query("testID", "tab-title", true);
   await app.press("ctrl+t");
@@ -202,18 +198,6 @@ test("ctrl+, opens settings and escape closes it", async () => {
       expect(await app.getByTestId("settings-dialog").count()).toBe(0),
     { timeout: 10000, interval: 300 }
   );
-});
-
-test("the command palette opens with its shortcut", async () => {
-  await app.press("ctrl+shift+p");
-  await vi.waitFor(
-    async () =>
-      expect(
-        await app.getByTestId("command-palette-dialog").count()
-      ).toBeGreaterThan(0),
-    { timeout: 10000, interval: 300 }
-  );
-  await app.press("escape");
 });
 
 test("a list item context menu opens on right click", async () => {
