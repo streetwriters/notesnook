@@ -115,8 +115,6 @@ export function convertDeclarations(
         continue;
       case "wordBreak":
       case "outline":
-      case "transition":
-      case "animation":
         continue;
       case "overflowX":
       case "overflowY":

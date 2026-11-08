@@ -19,5 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { notImplemented, type NotImplemented } from "../common/not-implemented";
 
-export const NavigationTabItem: NotImplemented = notImplemented("NavigationTabItem");
+export const NavigationTabItem: NotImplemented =
+  notImplemented("NavigationTabItem");
 export type NavigationTabItem = any;

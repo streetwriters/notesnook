@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { SxProp } from "./style";
-import { Box, Button, Flex, Input, Text, ThemeScope } from "./primitives";
+import { Box, Button, Flex, Grid, Input, Text, ThemeScope } from "./primitives";
 
 export const valid: SxProp = {
   display: "flex",
@@ -75,6 +75,32 @@ export const unsupportedDisplay: SxProp = {
   display: "block"
 };
 
+export const outline: SxProp = {
+  outlineColor: "accent",
+  outlineWidth: 2,
+  outlineOffset: 1
+};
+
+export const outlineShorthand: SxProp = {
+  // @ts-expect-error use outlineColor and outlineWidth
+  outline: "2px solid"
+};
+
+export const stateOutline: SxProp = {
+  // @ts-expect-error outlines in state styles are not supported yet
+  ":focus-visible": { outlineColor: "accent" }
+};
+
+export const transition: SxProp = {
+  // @ts-expect-error transitions are not supported until they work on desktop
+  transition: { property: "opacity", duration: 100 }
+};
+
+export const animation: SxProp = {
+  // @ts-expect-error animations are not supported until they work on desktop
+  animation: { keyframes: {}, duration: 100 }
+};
+
 export const stateWithLayout: SxProp = {
   // @ts-expect-error state styles only change visual properties
   ":hover": { width: 10 }
@@ -87,6 +113,11 @@ export const elements = [
   <Button key="4" variant="accent" onPress={(e) => e.stopPropagation()} />,
   <Input key="5" onChangeText={(text) => text.length} />,
   <ThemeScope key="6" scope="navigationMenu" />,
+  <Grid key="10" columns={7} gap={1} rowGap={2} />,
+  // @ts-expect-error grids are equal columns, not template strings
+  <Grid key="11" columns="1fr 1fr" />,
+  // @ts-expect-error columns is required
+  <Grid key="12" />,
   // @ts-expect-error className is not part of the contract
   <Box key="7" className="selectable" />,
   // @ts-expect-error inline style is not part of the contract

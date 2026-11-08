@@ -21,9 +21,14 @@ import { notImplemented, type NotImplemented } from "../common/not-implemented";
 
 export const ConfirmDialog: NotImplemented = notImplemented("ConfirmDialog");
 export type ConfirmDialog = any;
-export const showLogoutConfirmation: NotImplemented = notImplemented("showLogoutConfirmation");
+export const showLogoutConfirmation: NotImplemented = notImplemented(
+  "showLogoutConfirmation"
+);
 export type showLogoutConfirmation = any;
-export const showMultiDeleteConfirmation: NotImplemented = notImplemented("showMultiDeleteConfirmation");
+export const showMultiDeleteConfirmation: NotImplemented = notImplemented(
+  "showMultiDeleteConfirmation"
+);
 export type showMultiDeleteConfirmation = any;
-export const showMultiPermanentDeleteConfirmation: NotImplemented = notImplemented("showMultiPermanentDeleteConfirmation");
+export const showMultiPermanentDeleteConfirmation: NotImplemented =
+  notImplemented("showMultiPermanentDeleteConfirmation");
 export type showMultiPermanentDeleteConfirmation = any;

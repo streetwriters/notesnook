@@ -19,5 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { notImplemented, type NotImplemented } from "../common/not-implemented";
 
-export const EmailVerificationDialog: NotImplemented = notImplemented("EmailVerificationDialog");
+export const EmailVerificationDialog: NotImplemented = notImplemented(
+  "EmailVerificationDialog"
+);
 export type EmailVerificationDialog = any;

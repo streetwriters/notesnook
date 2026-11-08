@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { notImplemented, type NotImplemented } from "../common/not-implemented";
 
-export const AddNotebookDialog: NotImplemented = notImplemented("AddNotebookDialog");
+export const AddNotebookDialog: NotImplemented =
+  notImplemented("AddNotebookDialog");
 export type AddNotebookDialog = any;
-export const EditNotebookDialog: NotImplemented = notImplemented("EditNotebookDialog");
+export const EditNotebookDialog: NotImplemented =
+  notImplemented("EditNotebookDialog");
 export type EditNotebookDialog = any;

@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { notImplemented, type NotImplemented } from "../common/not-implemented";
 
-export const AddReminderDialog: NotImplemented = notImplemented("AddReminderDialog");
+export const AddReminderDialog: NotImplemented =
+  notImplemented("AddReminderDialog");
 export type AddReminderDialog = any;
-export const EditReminderDialog: NotImplemented = notImplemented("EditReminderDialog");
+export const EditReminderDialog: NotImplemented =
+  notImplemented("EditReminderDialog");
 export type EditReminderDialog = any;

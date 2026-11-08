@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  Children,
   forwardRef,
+  useState,
   useImperativeHandle,
   useRef,
   type ForwardedRef,
@@ -71,10 +73,12 @@ function Container(
   ref: ForwardedRef<UIElement>
 ) {
   const { children, defaults } = props;
-  const { viewStyle, textStyle, nativeProps } = useStyled(props, {
+  const { resolved, viewStyle, textStyle, nativeProps } = useStyled(props, {
     variantGroup: "variants",
     defaults
   });
+  const ViewComponent = AnyView;
+  const PressableComponent = AnyPressable;
   const inner = useElementRef(ref);
   const onPress = pressHandler(props);
   const content = textStyle ? (
@@ -88,19 +92,24 @@ function Container(
   for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
   if (onPress)
     return (
-      <AnyPressable
+      <PressableComponent
         ref={inner}
         {...nativeProps}
         style={style}
         onPress={onPress}
       >
         {content}
-      </AnyPressable>
+      </PressableComponent>
     );
   return (
-    <AnyView ref={inner} {...nativeProps} style={style}>
+    <ViewComponent
+      ref={inner}
+      {...nativeProps}
+      style={style}
+      onLayout={(props as { onLayout?: unknown }).onLayout}
+    >
       {content}
-    </AnyView>
+    </ViewComponent>
   );
 }
 
@@ -115,8 +124,27 @@ export const Grid = forwardRef<UIElement, Contract.GridProps>(function Grid(
   props,
   ref
 ) {
+  const { columns, children } = props;
+  const [width, setWidth] = useState(0);
+  const { resolved } = useStyled(props, { variantGroup: "variants" });
+  const columnGap =
+    (resolved.style.columnGap as number | undefined) ??
+    (resolved.style.gap as number | undefined) ??
+    0;
+  const cellWidth =
+    width > 0
+      ? (width - columnGap * (columns - 1)) / columns
+      : (`${100 / columns}%` as const);
   return Container(
-    { ...props, defaults: { display: "flex", flexWrap: "wrap" } },
+    {
+      ...props,
+      defaults: { display: "flex", flexWrap: "wrap" },
+      onLayout: (event: { nativeEvent: { layout: { width: number } } }) =>
+        setWidth(event.nativeEvent.layout.width),
+      children: Children.map(children, (child) => (
+        <View style={{ width: cellWidth }}>{child}</View>
+      ))
+    } as Contract.BoxProps,
     ref
   );
 });
@@ -133,8 +161,9 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
   });
   const inner = useElementRef(ref);
   const onPress = pressHandler(props);
+  const TextComponent = AnyText;
   return (
-    <AnyText
+    <TextComponent
       ref={inner}
       {...nativeProps}
       style={{ ...inherited, ...viewStyle }}
@@ -143,14 +172,14 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
       onPress={onPress}
     >
       {children}
-    </AnyText>
+    </TextComponent>
   );
 });
 
 export const Button = forwardRef<UIElement, Contract.ButtonProps>(
   function Button(props, ref) {
     const { children, disabled } = props;
-    const { viewStyle, textStyle, nativeProps } = useStyled(props, {
+    const { resolved, viewStyle, textStyle, nativeProps } = useStyled(props, {
       variantGroup: "buttons",
       defaultVariant: "primary",
       defaults: {
@@ -163,8 +192,9 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
     const onPress = pressHandler(props);
     const style = { ...viewStyle };
     for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
+    const ButtonComponent = AnyPressable;
     return (
-      <AnyPressable
+      <ButtonComponent
         ref={inner}
         {...nativeProps}
         focusable={nativeProps.focusable ?? true}
@@ -176,7 +206,7 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
         <InheritedTextStyle.Provider value={textStyle}>
           {wrapChildren(children, textStyle)}
         </InheritedTextStyle.Provider>
-      </AnyPressable>
+      </ButtonComponent>
     );
   }
 );

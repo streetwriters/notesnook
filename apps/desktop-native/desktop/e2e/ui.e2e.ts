@@ -6,7 +6,7 @@ let app: DesktopApp;
 
 beforeAll(async () => {
   app = await launchApp({
-    disableAnimations: true,
+    disableAnimations: false,
     timeout: 180000,
     logFile: process.env.RN_GPUI_E2E_LOG
   });
@@ -107,4 +107,26 @@ test("the input reports its text", async () => {
   await expect
     .poll(async () => app.getByTestId("echo").textContent())
     .toBe("hello");
+});
+
+test("outline colour and width are painted outside the box", async () => {
+  await expectColor("outline-parent", "#008837", 0.225, 0.5);
+});
+
+test("a grid lays out equal columns with the gap between them", async () => {
+  const frames = [];
+  for (let index = 0; index < 6; index++) {
+    const [node] = await app.query("testID", `grid-${index}`, true);
+    frames.push(node.frame);
+  }
+  const [grid] = await app.query("testID", "grid", true);
+  const width = frames[0].width;
+  for (const frame of frames)
+    expect(Math.abs(frame.width - width)).toBeLessThan(1);
+  expect(frames[3].x).toBeCloseTo(frames[0].x, 0);
+  expect(frames[4].x).toBeCloseTo(frames[1].x, 0);
+  expect(Math.abs(frames[1].x - (frames[0].x + width) - 6)).toBeLessThan(1);
+  expect(Math.abs(frames[2].x - (frames[1].x + width) - 6)).toBeLessThan(1);
+  expect(frames[3].y).toBeGreaterThan(frames[0].y + frames[0].height);
+  expect(Math.abs(width * 3 + 12 - grid.frame.width)).toBeLessThan(1);
 });

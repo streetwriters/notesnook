@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import { Box, Button, Flex, Input, Text } from "@ui";
+import { Box, Button, Flex, Grid, Input, Text } from "@ui";
 import { boot, type BootState } from "./boot";
 
 type Status =
@@ -115,6 +115,28 @@ export function Root(props: {
       <Text testID="echo" sx={{ color: "paragraph" }}>
         {text}
       </Text>
+      <Flex sx={{ alignItems: "center", gap: 2 }}>
+        <Flex testID="outline-parent" sx={{ p: 2, bg: "background" }}>
+          <Box
+            testID="outline-box"
+            sx={{
+              width: 20,
+              height: 20,
+              outlineColor: "accent",
+              outlineWidth: 2
+            }}
+          />
+        </Flex>
+      </Flex>
+      <Grid testID="grid" columns={3} gap={1} sx={{ width: 280 }}>
+        {[0, 1, 2, 3, 4, 5].map((index) => (
+          <Box
+            key={index}
+            testID={`grid-${index}`}
+            sx={{ height: 20, bg: "accent" }}
+          />
+        ))}
+      </Grid>
       <Text testID="renders" sx={{ color: "paragraph-secondary" }}>
         {`renders: ${renders.current}`}
       </Text>

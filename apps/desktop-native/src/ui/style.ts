@@ -52,39 +52,6 @@ export type Transform = {
   rotate?: `${number}deg`;
 }[];
 
-export type AnimatableProperty =
-  | "opacity"
-  | "transform"
-  | "backgroundColor"
-  | "color"
-  | "borderColor";
-
-export type TransitionSpec = {
-  property: AnimatableProperty | AnimatableProperty[];
-  duration: number;
-  delay?: number;
-  easing?: "linear" | "ease" | "ease-in" | "ease-out" | "ease-in-out";
-};
-
-export type Keyframes = Partial<
-  Record<
-    "from" | "to" | `${number}%`,
-    {
-      opacity?: number;
-      transform?: Transform;
-      bg?: ColorToken;
-    }
-  >
->;
-
-export type AnimationSpec = {
-  keyframes: Keyframes;
-  duration: number;
-  delay?: number;
-  iterationCount?: number | "infinite";
-  easing?: TransitionSpec["easing"];
-};
-
 export type ColorProps = {
   color?: ColorToken;
   bg?: ColorToken | (ColorToken | null)[];
@@ -203,6 +170,10 @@ type AppearanceProps = {
   borderBottomColor?: ColorToken;
   borderLeftColor?: ColorToken;
   borderWidth?: number;
+  outlineColor?: ColorToken;
+  outlineWidth?: number;
+  outlineOffset?: number;
+  outlineStyle?: "solid" | "dashed" | "dotted";
   boxShadow?: ShadowToken;
   transform?: Transform;
   cursor?: "default" | "pointer" | "text" | "not-allowed" | "grab" | "move";
@@ -234,18 +205,12 @@ type StateKeys = {
   ":group-active"?: GroupStateStyle;
 };
 
-type MotionProps = {
-  transition?: TransitionSpec;
-  animation?: AnimationSpec;
-};
-
 export type SxProp = ColorProps &
   SpaceProps &
   LayoutProps &
   AppearanceProps &
   TextStyleProps &
-  StateKeys &
-  MotionProps;
+  StateKeys;
 
 export type ThemeScopeName =
   | "base"

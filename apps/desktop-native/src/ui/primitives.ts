@@ -71,7 +71,7 @@ export interface BoxProps extends BaseProps {
 export interface FlexProps extends BoxProps {}
 
 export interface GridProps extends BoxProps {
-  columns?: number | (number | null)[];
+  columns: number;
 }
 
 export interface TextProps extends BaseProps {
