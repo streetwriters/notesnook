@@ -24,7 +24,7 @@ import type {
 } from "@notesnook/core";
 import { debounce } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
-import { Box, Flex, Text } from "@ui";
+import { Box, Flex } from "@ui";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
 import { store as selectionStore } from "../stores/selection-store";
@@ -34,6 +34,8 @@ import {
   type TreeNode,
   type VirtualizedTreeHandle
 } from "../components/virtualized-tree";
+import { ListLoader } from "../components/loaders/list-loader";
+import { SidebarPlaceholder } from "../components/placeholders";
 import { FilterField } from "../components/navigation-menu/filter-field";
 
 type NotebookNodeData = { notebook: NotebookType; totalNotes: number };
@@ -119,14 +121,17 @@ export function Notebooks() {
   return (
     <>
       <Box sx={{ flex: 1, mt: "spacing4" }}>
-        {!notebooks ? null : notebooks.length === 0 ? (
-          <Flex sx={{ p: "spacing6" }}>
-            <Text
-              testID="notebooks-empty"
-              sx={{ color: "paragraph-secondary" }}
-            >
-              {strings.noNotebooksYet()}
-            </Text>
+        {!notebooks ? (
+          <ListLoader />
+        ) : notebooks.length === 0 ? (
+          <Flex
+            sx={{
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%"
+            }}
+          >
+            <SidebarPlaceholder variant="notebooks" />
           </Flex>
         ) : (
           <Flex testID="notebooks-list" sx={{ flex: 1, px: "spacing4" }}>
@@ -157,6 +162,17 @@ export function Notebooks() {
                   item={node.data.notebook}
                   isExpanded={expanded}
                   totalNotes={node.data.totalNotes}
+                  refresh={async () => {
+                    const notebook = await db.notebooks.notebook(node.id);
+                    const totalNotes = await db.relations
+                      .from(node.data.notebook, "note")
+                      .count();
+                    treeRef.current?.refreshItem(
+                      index,
+                      notebook ? { notebook, totalNotes } : undefined,
+                      { expand: true }
+                    );
+                  }}
                   collapse={collapse}
                   expand={expand}
                   select={select}

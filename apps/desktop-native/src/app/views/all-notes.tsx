@@ -24,6 +24,7 @@ import { ListLoader } from "../components/loaders/list-loader";
 import { ListPanePlaceholder } from "../components/placeholders";
 import useNavigate from "../hooks/use-navigate";
 import { useSearch } from "../hooks/use-search";
+import { useEditorStore } from "../stores/editor-store";
 import { useStore } from "../stores/note-store";
 
 function Home() {
@@ -62,6 +63,9 @@ function Home() {
       placeholder={
         <ListPanePlaceholder variant={filteredItems ? "search" : "home"} />
       }
+      button={{
+        onClick: () => useEditorStore.getState().newSession()
+      }}
     />
   );
 }

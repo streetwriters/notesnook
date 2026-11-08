@@ -23,6 +23,7 @@ import { ListLoader } from "../components/loaders/list-loader";
 import ListContainer from "../components/list-container";
 import { ListPanePlaceholder } from "../components/placeholders";
 import { useSearch } from "../hooks/use-search";
+import { useEditorStore } from "../stores/editor-store";
 import {
   notesFromContext,
   useStore as useNotesStore
@@ -75,6 +76,9 @@ function Notes(props: NotesProps) {
           }
         />
       }
+      button={{
+        onClick: () => useEditorStore.getState().newSession()
+      }}
       header={header}
     />
   );
