@@ -27,6 +27,7 @@ type CheckboxProps = {
   testID?: string;
   size?: number;
   checkboxUncheckedIconColor: ColorValue;
+  uncheckedGroupHoverColor?: ColorValue;
 };
 
 export function Checkbox(props: CheckboxProps) {
@@ -64,6 +65,14 @@ export function Checkbox(props: CheckboxProps) {
         cursor: "pointer",
         flexShrink: 0,
         borderRadius: 5,
+        ...(!checked && props.uncheckedGroupHoverColor
+          ? {
+              ":group-hover": {
+                group: "list-item",
+                style: { color: props.uncheckedGroupHoverColor }
+              }
+            }
+          : {}),
         ":focus-visible": { outlineColor: "accent", outlineWidth: 2 }
       }}
     />

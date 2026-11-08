@@ -158,6 +158,7 @@ function Reminder(props: ReminderProps) {
                 testID="reminder-complete"
                 size={15}
                 checkboxUncheckedIconColor="border"
+                uncheckedGroupHoverColor="border-tertiary"
               />
               <Text
                 testID="title"

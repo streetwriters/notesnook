@@ -341,7 +341,7 @@ function GroupHeader(props: GroupHeaderProps) {
         groupHeaderRef.current?.measureInWindow((x, y, width, height) =>
           Menu.openMenu(items, {
             title: strings.jumpToGroup(),
-            position: { x, y, width, height }
+            position: { x, y, width, height: height + 5 }
           })
         );
       }}
