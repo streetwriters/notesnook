@@ -143,9 +143,9 @@ async function installSoftAuthenticator(pin: string) {
 
 export async function boot(options: BootOptions = {}): Promise<BootState> {
   if (environment.isDev && options.resetConfig) config.clear();
-  if (environment.isDev && options.initialPath)
+  if (environment.isDev && (options.initialPath || options.initialHash))
     history.replace({
-      path: options.initialPath,
+      path: options.initialPath ?? getCurrentPath(),
       hash: options.initialHash ?? "",
       search: ""
     });
