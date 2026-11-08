@@ -19,6 +19,14 @@ const RESTRICTED_PACKAGES = [
 ];
 
 const TARGET_PATHS = ["**/targets", "**/targets/**"];
+const OTHER_APPS = [
+  "**/apps/web",
+  "**/apps/web/**",
+  "**/apps/mobile",
+  "**/apps/mobile/**",
+  "**/apps/desktop",
+  "**/apps/desktop/**"
+];
 
 module.exports = {
   overrides: [
@@ -37,6 +45,10 @@ module.exports = {
               {
                 group: TARGET_PATHS,
                 message: "Shared code must not import a target directly."
+              },
+              {
+                group: OTHER_APPS,
+                message: "Shared code must not import from another app."
               }
             ]
           }
@@ -48,7 +60,9 @@ module.exports = {
           { name: "navigator", message: "Use @platform." },
           { name: "localStorage", message: "Use @platform." },
           { name: "sessionStorage", message: "Use @platform." },
-          { name: "location", message: "Use @platform." }
+          { name: "location", message: "Use @platform." },
+          { name: "self", message: "Use @platform." },
+          { name: "globalThis", message: "Use @platform." }
         ],
         "no-restricted-syntax": [
           "error",
