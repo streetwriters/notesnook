@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { MenuItem } from "@ui";
-import { Box, Button, Flex, Text } from "@ui";
+import { Box, Button, Flex, Text, ThemeScope } from "@ui";
 import { Check } from "../icons";
 import { useMenuStore } from "./store";
 
@@ -93,8 +93,14 @@ function MenuButton(props: {
         </Text>
       </Flex>
       {item.isChecked ? (
-        <Flex sx={{ ml: 4, flexShrink: 0, flexDirection: "row", gap: 1 }}>
-          <Check color={dangerous ? "icon-error" : "icon-secondary"} />
+        <Flex
+          testID="toggle-state-on"
+          sx={{ ml: 4, flexShrink: 0, flexDirection: "row", gap: 1 }}
+        >
+          <Check
+            size={15}
+            color={dangerous ? "icon-error" : "icon-secondary"}
+          />
         </Flex>
       ) : null}
     </Button>
@@ -109,63 +115,65 @@ export function MenuHost() {
   if (!items || !anchor) return null;
 
   return (
-    <Box
-      testID="menu-backdrop"
-      onPress={close}
-      sx={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 100
-      }}
-    >
-      <Flex
-        testID="menu-container"
-        onPress={(event) => event.stopPropagation()}
+    <ThemeScope scope="contextMenu">
+      <Box
+        testID="menu-backdrop"
+        onPress={close}
         sx={{
           position: "absolute",
-          top: anchor.y + anchor.height + 5,
-          left: anchor.x,
-          bg: "background",
-          flexDirection: "column",
-          borderRadius: "radius2",
-          boxShadow: "menu",
-          border: "1px solid",
-          borderColor: "border-secondary",
-          minWidth: 220,
-          py: "spacing4"
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 100
         }}
       >
-        {title ? (
-          <>
-            <Text
-              testID="menu-title"
-              sx={{
-                color: "accent",
-                fontSize: "xxs",
-                py: "spacing1",
-                px: "spacing4"
-              }}
-            >
-              {title}
-            </Text>
-            <Separator />
-          </>
-        ) : null}
-        {items.map((item) => {
-          if (item.isHidden) return null;
-          if (item.type === "separator") return <Separator key={item.key} />;
-          if (item.type === "button")
-            return <MenuButton key={item.key} item={item} onClose={close} />;
-          if (item.type === "popup") {
-            const Popup = item.component;
-            return <Popup key={item.key} onClick={close} />;
-          }
-          return null;
-        })}
-      </Flex>
-    </Box>
+        <Flex
+          testID="menu-container"
+          onPress={(event) => event.stopPropagation()}
+          sx={{
+            position: "absolute",
+            top: anchor.y + anchor.height + 5,
+            left: anchor.x,
+            bg: "background",
+            flexDirection: "column",
+            borderRadius: "radius2",
+            boxShadow: "menu",
+            border: "1px solid",
+            borderColor: "border-secondary",
+            minWidth: 220,
+            py: "spacing4"
+          }}
+        >
+          {title ? (
+            <>
+              <Text
+                testID="menu-title"
+                sx={{
+                  color: "accent",
+                  fontSize: "xxs",
+                  py: "spacing1",
+                  px: "spacing4"
+                }}
+              >
+                {title}
+              </Text>
+              <Separator />
+            </>
+          ) : null}
+          {items.map((item) => {
+            if (item.isHidden) return null;
+            if (item.type === "separator") return <Separator key={item.key} />;
+            if (item.type === "button")
+              return <MenuButton key={item.key} item={item} onClose={close} />;
+            if (item.type === "popup") {
+              const Popup = item.component;
+              return <Popup key={item.key} onClick={close} />;
+            }
+            return null;
+          })}
+        </Flex>
+      </Box>
+    </ThemeScope>
   );
 }
