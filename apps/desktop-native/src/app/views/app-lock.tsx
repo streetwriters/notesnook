@@ -52,6 +52,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
   const [isUnlocking, setIsUnlocking] = useState(false);
 
   const [password, setPassword] = useState("");
+  const [pin, setPin] = useState("");
   const windowTitle = useRef(getDocumentTitle());
 
   const unlockWithPassword = useCallback(
@@ -209,27 +210,47 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                   );
                 case "securityKey":
                   return (
-                    <Button
+                    <Flex
                       key={credential.id}
-                      variant="secondary"
-                      onPress={async () => {
-                        setError(undefined);
-                        setIsUnlocking(true);
-                        try {
-                          const { encryptionKey } =
-                            await WebAuthn.getEncryptionKey(credential.config);
-                          await useKeyStore
-                            .getState()
-                            .unlock({ ...credential, key: encryptionKey });
-                        } catch (e) {
-                          setError((e as Error).message);
-                        } finally {
-                          setIsUnlocking(false);
-                        }
+                      sx={{
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                        width: ["95%", "95%", "25%"]
                       }}
                     >
-                      {strings.unlockWithSecurityKey()}
-                    </Button>
+                      <Field
+                        testID="app-lock-security-key-pin"
+                        type="password"
+                        value={pin}
+                        onChangeText={setPin}
+                        placeholder="PIN"
+                        sx={{ width: "100%" }}
+                      />
+                      <Button
+                        variant="secondary"
+                        onPress={async () => {
+                          setError(undefined);
+                          setIsUnlocking(true);
+                          try {
+                            const { encryptionKey } =
+                              await WebAuthn.getEncryptionKey(
+                                credential.config,
+                                pin
+                              );
+                            await useKeyStore
+                              .getState()
+                              .unlock({ ...credential, key: encryptionKey });
+                          } catch (e) {
+                            setError((e as Error).message);
+                          } finally {
+                            setIsUnlocking(false);
+                          }
+                        }}
+                      >
+                        {strings.unlockWithSecurityKey()}
+                      </Button>
+                    </Flex>
                   );
               }
             })}

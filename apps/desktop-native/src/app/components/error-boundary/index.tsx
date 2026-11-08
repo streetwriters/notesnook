@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
-import { shell } from "@platform";
+import { databaseHost, shell } from "@platform";
 import { Button, Flex, ScrollContainer, Text } from "@ui";
 import { ErrorText } from "../error-text";
 import { db } from "../../common/db";
-import { notImplemented } from "../../common/not-implemented";
+import { useKeyStore } from "../../interfaces/key-store";
 import { getDeviceInfo } from "../../utils/platform";
 import { writeToClipboard } from "../../utils/clipboard";
 
@@ -216,5 +216,6 @@ function errorToString(error: unknown) {
 }
 
 async function resetDatabase() {
-  notImplemented("resetDatabase")();
+  await useKeyStore.getState().clear();
+  await databaseHost.delete();
 }
