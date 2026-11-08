@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment } from "@platform";
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
@@ -33,7 +34,7 @@ class AnnouncementStore extends BaseStore {
   dialogAnnouncements = [];
 
   refresh = async () => {
-    if (IS_TESTING) return;
+    if (environment.isTesting) return;
 
     try {
       const inlineAnnouncements = [];
@@ -77,8 +78,10 @@ export { useStore, store };
 
 export const allowedPlatforms = [
   "all",
-  PLATFORM,
-  ...(window.os ? [window.os()] : [])
+  environment.platform,
+  ...(environment.os
+    ? [{ macOS: "darwin", Windows: "win32", Linux: "linux" }[environment.os]]
+    : [])
 ];
 
 async function shouldShowAnnouncement(announcement) {
