@@ -644,7 +644,7 @@ function ReorderableList<T extends { id: string }>(
         onOrderChanged(newOrder);
       }}
       renderItem={(item, state) => (
-        <Flex sx={{ width: "100%", opacity: state.isDragging ? 0.4 : 1 }}>
+        <Flex sx={{ opacity: state.isDragging ? 0.4 : 1 }}>
           {renderItem(item)}
         </Flex>
       )}
@@ -1154,12 +1154,7 @@ function HomeTab(props: { isCollapsed?: boolean; collapse: () => void }) {
     <ScrollContainer>
       <Flex
         testID="home-tab"
-        sx={{
-          flexDirection: "column",
-          gap: "spacing1",
-          px: "spacing4",
-          width: "100%"
-        }}
+        sx={{ flexDirection: "column", gap: "spacing1", px: "spacing4" }}
       >
         <Routes collapse={props.collapse} isCollapsed={props.isCollapsed} />
         <Colors collapse={props.collapse} isCollapsed={props.isCollapsed} />
