@@ -277,4 +277,54 @@ scenarios.dialogCommandPalette = {
   steps: [{ click: "command-palette" }]
 };
 
+
+const shellMask = {
+  reason: "editor and editor footer are deferred",
+  ids: ["editor-title", "editor-word-count"],
+  rects: [{ x: 630, y: 45, width: 570, height: 755 }]
+};
+
+scenarios.tablet = {
+  ...scenarios.shell,
+  size: [800, 700],
+  mask: { ...shellMask, rects: [] }
+};
+
+scenarios.mobile = {
+  ...scenarios.shell,
+  size: [420, 800],
+  mask: { reason: "editor is deferred", ids: [], rects: [] }
+};
+
+scenarios.navCollapsed = {
+  ...scenarios.shell,
+  steps: [{ click: "sidebar-toggle" }],
+  mask: shellMask
+};
+
+scenarios.navCollapsedHover = {
+  ...scenarios.shell,
+  steps: [{ click: "sidebar-toggle" }, { hover: "navigation-menu-root" }],
+  keepPointer: true,
+  mask: shellMask
+};
+
+for (const [name, route] of [
+  ["signup", "/signup"],
+  ["login", "/login"],
+  ["recover", "/recover"],
+  ["sessionExpired", "/sessionexpired"]
+]) {
+  scenarios[name] = {
+    size: [1200, 800],
+    scale: 2,
+    schemes: ["light", "dark"],
+    route,
+    initialPath: route,
+    seed: () => [],
+    noExtras: true,
+    mask: { reason: "no live data on the auth pages", ids: [], rects: [] }
+  };
+}
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

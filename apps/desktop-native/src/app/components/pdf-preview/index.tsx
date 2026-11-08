@@ -62,6 +62,12 @@ export function PdfPreview(props: PdfPreviewProps) {
     }
   }
 
+  const localPath =
+    typeof fileUrl === "string" &&
+    (fileUrl.startsWith("/") || fileUrl.startsWith("file://"))
+      ? fileUrl.replace(/^file:\/\//, "")
+      : undefined;
+
   return (
     <Flex testID="pdf-preview" sx={{ flex: 1, flexDirection: "column" }}>
       {onClose ? (
@@ -99,6 +105,15 @@ export function PdfPreview(props: PdfPreviewProps) {
           <Download size={15} color="icon" />
           <Text>{strings.network.download()}</Text>
         </Button>
+        {localPath ? (
+          <Button
+            testID="pdf-open-external"
+            variant="secondary"
+            onPress={() => shell.openPath(localPath)}
+          >
+            <Text>{strings.open()}</Text>
+          </Button>
+        ) : null}
       </Flex>
     </Flex>
   );

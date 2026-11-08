@@ -34,6 +34,8 @@ const app = await launchApp({
     seed,
     resetConfig: true,
     titleBarInset: 0,
+    initialPath: scenario.initialPath,
+    initialHash: scenario.initialHash,
     initialColorScheme: scheme,
     seedNotebooks: scenario.noExtras
       ? []

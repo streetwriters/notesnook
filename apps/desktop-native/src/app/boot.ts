@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { config, environment, lifecycle } from "@platform";
+import { config, environment, history, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
 import { initLocale } from "./common/locale";
+import { getCurrentPath } from "./navigation";
 
 export type BootState = {
   status: "ready";
@@ -44,6 +45,8 @@ export type BootOptions = {
   seedTags?: { title: string }[];
   seedColors?: { title: string; colorCode: string }[];
   resetConfig?: boolean;
+  initialPath?: string;
+  initialHash?: string;
 };
 
 async function seedOthers(options: BootOptions) {
@@ -83,8 +86,16 @@ async function seedNotes(notes: SeedNote[]) {
 
 export async function boot(options: BootOptions = {}): Promise<BootState> {
   if (environment.isDev && options.resetConfig) config.clear();
+  if (environment.isDev && options.initialPath)
+    history.replace({
+      path: options.initialPath,
+      hash: options.initialHash ?? "",
+      search: ""
+    });
   await initLocale();
-  await initializeDatabase("db");
+  await initializeDatabase(
+    getCurrentPath().startsWith("/account/recovery") ? "memory" : "db"
+  );
   if (environment.isDev && options.seed) await seedNotes(options.seed);
   if (environment.isDev) await seedOthers(options);
   const user = await db.user.getUser();
