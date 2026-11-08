@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@ammarahmed/react-native-sodium": "file:../../../../../Projects/react-native/gpui-modules/tgz/ammarahmed-react-native-sodium-2.0.0-alpha.2.tgz",
+    "@formatjs/intl-locale": "4.0.0",
+    "@formatjs/intl-pluralrules": "5.2.14",
     "@hazae41/foras": "^2.1.4",
     "@legendapp/list": "3.7.2",
     "@mdi/js": "7.4.47",
