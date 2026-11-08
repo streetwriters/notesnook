@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export type Language = { code: string; name: string };
+export type SpellRange = { start: number; length: number };
 
 export interface SpellChecker {
   isEnabled(): Promise<boolean>;
@@ -27,4 +28,8 @@ export interface SpellChecker {
   setLanguages(languages: string[]): Promise<void>;
   getWords(): Promise<string[]>;
   deleteWord(word: string): Promise<void>;
+  check(text: string): Promise<SpellRange[]>;
+  suggest(word: string): Promise<string[]>;
+  learn(word: string): Promise<void>;
+  ignore(word: string): Promise<void>;
 }

@@ -35,6 +35,7 @@ import { lifecycle } from "./lifecycle";
 import { notifications } from "./notifications";
 import { safeStorage } from "./safe-storage";
 import { shell } from "./shell";
+import { spellChecker } from "./spell-checker";
 import { updater } from "./updater";
 import { webauthn } from "./webauthn";
 import { windowControls } from "./window";
@@ -56,6 +57,7 @@ export {
   notifications,
   safeStorage,
   shell,
+  spellChecker,
   updater,
   webauthn,
   windowControls
@@ -63,8 +65,6 @@ export {
 
 export const attachmentFiles =
   unimplemented<Contract.AttachmentFiles>("attachmentFiles");
-export const spellChecker =
-  unimplemented<Contract.SpellChecker>("spellChecker");
 
 export type * from "../../../platform";
 
