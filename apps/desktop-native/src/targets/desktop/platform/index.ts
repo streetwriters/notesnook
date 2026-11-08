@@ -33,6 +33,7 @@ import { keyboard } from "./keyboard";
 import { kvStore } from "./kv-store";
 import { lifecycle } from "./lifecycle";
 import { notifications } from "./notifications";
+import { safeStorage } from "./safe-storage";
 import { shell } from "./shell";
 import { updater } from "./updater";
 import { webauthn } from "./webauthn";
@@ -53,6 +54,7 @@ export {
   kvStore,
   lifecycle,
   notifications,
+  safeStorage,
   shell,
   updater,
   webauthn,
@@ -82,6 +84,7 @@ export const contract: typeof Contract = {
   kvStore,
   lifecycle,
   notifications,
+  safeStorage,
   shell,
   spellChecker,
   updater,

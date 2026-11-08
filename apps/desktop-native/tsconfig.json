@@ -3,14 +3,32 @@
   "compilerOptions": {
     "jsx": "react-native",
     "noEmit": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@ui": ["./src/ui/index.ts"],
-      "@ui/*": ["./src/ui/*"],
-      "@platform": ["./src/platform/index.ts"],
-      "@platform/*": ["./src/platform/*"]
+      "@ui": [
+        "./src/ui/index.ts"
+      ],
+      "@ui/*": [
+        "./src/ui/*"
+      ],
+      "@platform": [
+        "./src/platform/index.ts"
+      ],
+      "@platform/*": [
+        "./src/platform/*"
+      ]
     }
   },
-  "include": ["src", "index.js", "react-native-gpui-env.d.ts"],
-  "exclude": ["node_modules", "desktop"]
+  "include": [
+    "src",
+    "index.js",
+    "react-native-gpui-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "desktop",
+    "src/targets/web"
+  ]
 }
