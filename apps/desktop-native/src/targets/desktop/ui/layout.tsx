@@ -204,25 +204,36 @@ export const SplitPane = forwardRef<
       items.push(
         <AnyView
           key={`sash-${index}`}
-          testID={`${props.testID ?? "split-pane"}-sash-${index}`}
           style={{
-            [horizontal ? "width" : "height"]: sashSize,
-            cursor: resizable
-              ? horizontal
-                ? "col-resize"
-                : "row-resize"
-              : undefined,
-            flexShrink: 0
+            [horizontal ? "width" : "height"]: 0,
+            flexShrink: 0,
+            zIndex: 1,
+            overflow: "visible"
           }}
-          onPointerDown={(event: any) => {
-            if (!resizable) return;
-            gesture.current = {
-              start: pointerPosition(event),
-              size: sizes[index] ?? 0
-            };
-            setDragging(index);
-          }}
-        />
+        >
+          <AnyView
+            testID={`${props.testID ?? "split-pane"}-sash-${index}`}
+            style={{
+              position: "absolute",
+              ...(horizontal
+                ? { top: 0, bottom: 0, left: -sashSize / 2, width: sashSize }
+                : { left: 0, right: 0, top: -sashSize / 2, height: sashSize }),
+              cursor: resizable
+                ? horizontal
+                  ? "col-resize"
+                  : "row-resize"
+                : undefined
+            }}
+            onPointerDown={(event: any) => {
+              if (!resizable) return;
+              gesture.current = {
+                start: pointerPosition(event),
+                size: sizes[index] ?? 0
+              };
+              setDragging(index);
+            }}
+          />
+        </AnyView>
       );
     }
   });
