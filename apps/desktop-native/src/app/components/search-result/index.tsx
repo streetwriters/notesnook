@@ -50,7 +50,9 @@ function SearchResult(props: SearchResultProps) {
           });
         }}
         title={
-          <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
+          <Flex
+            sx={{ flexDirection: "row", alignItems: "center", gap: "small" }}
+          >
             {isExpandable && !isCompact ? (
               <Button
                 testID="search-result-expand"

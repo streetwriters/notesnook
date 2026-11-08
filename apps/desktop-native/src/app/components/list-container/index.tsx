@@ -181,6 +181,10 @@ export default function ListContainer(props: ListContainerProps) {
     [items, group, compact, context, isSearching, props.showGroupCounts]
   );
   const itemKey = useCallback((index: number) => items.key(index), [items]);
+  const listData = useMemo(
+    () => ({ compact, items, isSearching, context, group }),
+    [compact, items, isSearching, context, group]
+  );
 
   if (!items.length && props.placeholder)
     return (
@@ -206,7 +210,7 @@ export default function ListContainer(props: ListContainerProps) {
           itemKey={itemKey}
           renderItem={renderItem}
           estimatedItemSize={getListItemDefaultHeight(group, compact)}
-          extraData={compact}
+          extraData={listData}
           header={header}
           overscan={400}
         />

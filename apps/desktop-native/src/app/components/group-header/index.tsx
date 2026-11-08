@@ -38,12 +38,14 @@ export default function GroupHeader(props: {
       <Flex
         sx={{ flexDirection: "row", gap: "spacing3", alignItems: "center" }}
       >
-        <Text
-          testID="title"
-          sx={{ fontSize: "xs", fontWeight: 400, color: "accent" }}
-        >
-          {props.title}
-        </Text>
+        {props.title ? (
+          <Text
+            testID="title"
+            sx={{ fontSize: "xs", fontWeight: 400, color: "accent" }}
+          >
+            {props.title}
+          </Text>
+        ) : null}
       </Flex>
     </Flex>
   );
