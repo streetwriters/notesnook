@@ -25,7 +25,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { Dialog } from "@ui";
 import { store as notebookStore } from "../stores/notebook-store";
 import { useRelationChangesStore } from "../stores/relation-changes-store";
-import { NotebookPicker } from "./components/notebook-picker";
+import { NotebookPicker } from "../components/notebook-picker";
 
 type MoveNotebookDialogProps = BaseDialogProps<boolean> & {
   notebook: Notebook;

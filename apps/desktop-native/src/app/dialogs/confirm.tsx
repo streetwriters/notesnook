@@ -25,7 +25,7 @@ import { db } from "../common/db";
 import { getChangelog } from "../utils/version";
 import { downloadUpdate } from "../utils/updater";
 import { strings } from "@notesnook/intl";
-import { ErrorText } from "./components/error-text";
+import { ErrorText } from "../components/error-text";
 import { Field } from "./components/field";
 import { MarkdownText } from "./components/markdown-text";
 

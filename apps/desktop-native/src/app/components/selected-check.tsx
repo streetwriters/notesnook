@@ -29,11 +29,11 @@ import {
 export function SelectedCheck({
   item,
   size = 20,
-  onClick
+  onPress
 }: {
   item?: { id: string };
   size?: number;
-  onClick?: () => void;
+  onPress?: (ctrl: boolean) => void;
 }) {
   const selectedItems = useRelationChangesStore((store) => store.selected);
   const selectedItem =
@@ -45,7 +45,7 @@ export function SelectedCheck({
         size={size}
         onPress={(event: PressEvent) => {
           event.stopPropagation();
-          onClick?.();
+          onPress?.(event.ctrlKey || event.metaKey);
         }}
         color="accent-error"
       />
@@ -54,7 +54,7 @@ export function SelectedCheck({
 
   return (
     <Checkbox
-      onToggle={onClick}
+      onToggle={onPress}
       size={size}
       checked={selectedItem?.op === "add"}
       aria-label={strings.selectItem()}

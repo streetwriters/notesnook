@@ -25,7 +25,7 @@ import { getFormattedDate } from "@notesnook/common";
 import { db } from "../../common/db";
 import { CalendarDots } from "../../components/icons";
 import { setDateOnly } from "../../utils/date-time";
-import { DayPicker } from "./day-picker";
+import { DayPicker } from "../../components/day-picker";
 import { Field } from "./field";
 import { InlinePopup } from "./inline-popup";
 

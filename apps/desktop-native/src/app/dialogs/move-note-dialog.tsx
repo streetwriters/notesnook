@@ -30,7 +30,7 @@ import {
   RelationChange,
   useRelationChangesStore
 } from "../stores/relation-changes-store";
-import { NotebookPicker } from "./components/notebook-picker";
+import { NotebookPicker } from "../components/notebook-picker";
 
 type MoveNoteDialogProps = BaseDialogProps<boolean> & { noteIds: string[] };
 

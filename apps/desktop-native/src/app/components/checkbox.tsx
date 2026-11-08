@@ -22,7 +22,7 @@ import { Checkbox as CheckboxIcon, CheckboxUnchecked } from "./icons";
 
 type CheckboxProps = {
   checked: boolean;
-  onToggle?: () => void;
+  onToggle?: (ctrl: boolean) => void;
   "aria-label"?: string;
   testID?: string;
   size?: number;
@@ -47,14 +47,14 @@ export function Checkbox(props: CheckboxProps) {
       onPress={(event) => {
         if (!onToggle) return;
         event.stopPropagation();
-        onToggle();
+        onToggle(event.ctrlKey || event.metaKey);
       }}
       onKeyDown={(event) => {
         if (!onToggle) return;
         if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
           event.stopPropagation();
-          onToggle();
+          onToggle(false);
         }
       }}
       size={size}

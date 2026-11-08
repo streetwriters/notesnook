@@ -23,7 +23,7 @@ import { useStore as useUserStore } from "../stores/user-store";
 import { db } from "../common/db";
 import { useState } from "react";
 import { useSessionState } from "../hooks/use-session-state";
-import { Accordion } from "./components/accordion";
+import Accordion from "../components/accordion";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { showToast } from "../utils/toast";

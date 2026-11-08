@@ -23,7 +23,7 @@ import { reloadApp } from "../platform-gaps";
 import { useState } from "react";
 import { HostId, HostIds, useStore } from "../../../stores/setting-store";
 import { useStore as useUserStore } from "../../../stores/user-store";
-import { ErrorText } from "../../components/error-text";
+import { ErrorText } from "../../../components/error-text";
 import { TaskManager } from "../../../common/task-manager";
 import { isServerCompatible } from "@notesnook/core";
 import { strings } from "@notesnook/intl";

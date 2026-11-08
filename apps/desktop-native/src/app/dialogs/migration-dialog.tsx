@@ -26,7 +26,7 @@ import { db } from "../common/db";
 import { TaskManager } from "../common/task-manager";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
-import { ErrorText } from "./components/error-text";
+import { ErrorText } from "../components/error-text";
 import { LinkText } from "./components/link-text";
 
 type MigrationProgressEvent = {

@@ -24,7 +24,7 @@ import { usePromise } from "@notesnook/common";
 import { db } from "../../../common/db";
 import { writeToClipboard } from "../../../utils/clipboard";
 import { showToast } from "../../../utils/toast";
-import { ErrorText } from "../../components/error-text";
+import { ErrorText } from "../../../components/error-text";
 import { LinkText } from "../../components/link-text";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";

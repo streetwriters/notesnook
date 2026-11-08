@@ -27,7 +27,7 @@ import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
 import { getSubscriptionInfo } from "./settings/components/user-profile";
-import { ErrorText } from "./components/error-text";
+import { ErrorText } from "../components/error-text";
 import { Field } from "./components/field";
 import { LinkText } from "./components/link-text";
 

@@ -36,6 +36,7 @@ import { useEditorStore } from "./stores/editor-store";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
 import { StatusBar } from "./components/status-bar";
+import HashRouter from "./components/hash-router";
 
 function EditorPlaceholder() {
   const element = useRef<UIElement>(null);
@@ -138,7 +139,9 @@ export function App(props: { titleBarInset?: number }) {
         </Pane>
         <Pane id="editor-pane">
           <ThemeScope scope="editor">
-            <EditorPlaceholder />
+            <HashRouter>
+              <EditorPlaceholder />
+            </HashRouter>
           </ThemeScope>
         </Pane>
       </SplitPane>
