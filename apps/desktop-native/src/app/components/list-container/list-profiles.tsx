@@ -23,6 +23,7 @@ import { isNoteResolvedData } from "@notesnook/common";
 import { Text } from "@ui";
 import { db } from "../../common/db";
 import Note from "../note";
+import SearchResult from "../search-result";
 import type { Context } from "./types";
 
 type ListItemWrapperProps = {
@@ -49,6 +50,8 @@ export function ListItemWrapper(props: ListItemWrapperProps) {
           {...(isNoteResolvedData(data) ? data : {})}
         />
       );
+    case "searchResult":
+      return <SearchResult item={item} />;
     default:
       return (
         <Text sx={{ p: "spacing4", color: "paragraph-secondary" }}>
