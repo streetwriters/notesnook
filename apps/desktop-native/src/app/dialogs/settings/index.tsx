@@ -498,6 +498,7 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <Button
                     key={index}
+                    testID={`setting-${item.key}-button-${index}`}
                     disabled={workIndex === index}
                     variant={component.variant}
                     onPress={withFeatureCheck(feature, () =>
@@ -515,6 +516,7 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <Switch
                     key={index}
+                    testID={`setting-${item.key}-toggle-${index}`}
                     disabled={workIndex === index}
                     checked={component.isToggled()}
                     onChange={withFeatureCheck(feature, () =>

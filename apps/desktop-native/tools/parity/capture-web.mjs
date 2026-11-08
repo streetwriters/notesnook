@@ -127,9 +127,17 @@ for (const step of scenario.steps ?? []) {
     await page.keyboard.type(step.type.text);
     await page.waitForTimeout(2500);
   }
+  if (step.press)
+    await page.keyboard.press(
+      { escape: "Escape", enter: "Enter" }[step.press] ?? step.press
+    );
   if (step.clickText)
     await page
-      .locator('[data-test-id="settings-navigation-menu"]')
+      .locator(
+        step.in === "nav"
+          ? '[data-test-id="navigation-menu"]'
+          : '[data-test-id="settings-navigation-menu"]'
+      )
       .getByText(step.clickText, { exact: true })
       .first()
       .click();
