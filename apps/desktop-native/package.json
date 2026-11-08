@@ -8,7 +8,7 @@
     "start": "react-native start",
     "desktop": "react-native run-desktop",
     "tsc": "tsc --noEmit",
-    "lint": "eslint src",
+    "lint": "eslint src --ext .ts,.tsx",
     "test:e2e": "RN_GPUI_TEST_BUNDLE=$PWD/desktop/build/index.bundle RN_GPUI_TEST_BINARY=$PWD/desktop/build/target/debug/react-native-gpui--notesnook-desktop-native vitest run --config desktop/vitest.e2e.config.ts",
     "build:test": "react-native-gpui run-desktop --features test-driver --no-launch --no-packager"
   },
