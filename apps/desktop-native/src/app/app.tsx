@@ -29,6 +29,7 @@ import {
   type SplitPaneHandle
 } from "@ui";
 import { ActionBar } from "./components/action-bar";
+import { MenuHost } from "./components/menu";
 import { useEditorStore } from "./stores/editor-store";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
@@ -125,6 +126,7 @@ export function App(props: { titleBarInset?: number }) {
         </Pane>
       </SplitPane>
       <StatusBar />
+      <MenuHost />
     </Flex>
   );
 }

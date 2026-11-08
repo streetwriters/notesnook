@@ -55,6 +55,14 @@ try {
   }
   await app.mouseMove({ x: 2, y: 2 });
   await app.waitForIdle();
+  for (const step of scenario.steps ?? []) {
+    if (step.click) {
+      await app.getByTestId(step.click).click();
+      await app.waitForIdle();
+    }
+  }
+  await app.mouseMove({ x: 2, y: 2 });
+  await app.waitForIdle();
 
   const tree = await app.tree();
   const nodes = [];

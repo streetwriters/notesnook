@@ -21,6 +21,7 @@ import "./targets/desktop";
 import { useState } from "react";
 import { THEME_DARK, THEME_LIGHT } from "./app/common/theme";
 import { Root, type RootProps } from "./app/root";
+import { useStore as useThemeStore } from "./app/stores/theme-store";
 import { DesktopThemeProvider } from "./targets/desktop/ui";
 
 export default function App(
@@ -28,9 +29,11 @@ export default function App(
     initialColorScheme?: "light" | "dark";
   }
 ) {
-  const [colorScheme, setColorScheme] = useState<"light" | "dark">(
-    props.initialColorScheme ?? "light"
-  );
+  useState(() => {
+    if (props.initialColorScheme)
+      useThemeStore.setState({ colorScheme: props.initialColorScheme });
+  });
+  const colorScheme = useThemeStore((store) => store.colorScheme);
   return (
     <DesktopThemeProvider
       theme={colorScheme === "dark" ? THEME_DARK : THEME_LIGHT}
@@ -39,7 +42,9 @@ export default function App(
         {...props}
         colorScheme={colorScheme}
         onToggleColorScheme={() =>
-          setColorScheme((scheme) => (scheme === "dark" ? "light" : "dark"))
+          useThemeStore.setState({
+            colorScheme: colorScheme === "dark" ? "light" : "dark"
+          })
         }
       />
     </DesktopThemeProvider>

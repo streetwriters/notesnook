@@ -54,6 +54,15 @@ await page.waitForTimeout(3000);
 await page.mouse.move(2, 2);
 await page.waitForTimeout(500);
 
+for (const step of scenario.steps ?? []) {
+  if (step.click) {
+    await page.locator(`[data-test-id="${step.click}"]`).first().click();
+    await page.waitForTimeout(800);
+  }
+}
+await page.mouse.move(2, 2);
+await page.waitForTimeout(300);
+
 const elements = await page.evaluate(() => {
   const rgba = (value) => {
     const m = value.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0, 0];
@@ -77,7 +86,8 @@ const elements = await page.evaluate(() => {
       fontSize: parseFloat(cs.fontSize),
       fontWeight: Number(cs.fontWeight),
       lineHeight: cs.lineHeight === "normal" ? null : parseFloat(cs.lineHeight),
-      letterSpacing: cs.letterSpacing === "normal" ? 0 : parseFloat(cs.letterSpacing),
+      letterSpacing:
+        cs.letterSpacing === "normal" ? 0 : parseFloat(cs.letterSpacing),
       text: (el.textContent || "").trim().slice(0, 40)
     });
   }

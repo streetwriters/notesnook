@@ -207,10 +207,12 @@ export function convertDeclarations(
     /^[\d.]+%$/.test(style.lineHeight)
   )
     style.lineHeight = parseFloat(style.lineHeight) / 100;
-  if (typeof style.lineHeight === "number" && style.lineHeight < 5) {
-    const fontSize = typeof style.fontSize === "number" ? style.fontSize : 16;
-    style.lineHeight = style.lineHeight * fontSize;
-  }
+  if (
+    typeof style.lineHeight === "number" &&
+    style.lineHeight < 5 &&
+    typeof style.fontSize === "number"
+  )
+    style.lineHeight = style.lineHeight * style.fontSize;
   if (typeof style.fontWeight === "number")
     style.fontWeight = String(style.fontWeight);
   return converted;

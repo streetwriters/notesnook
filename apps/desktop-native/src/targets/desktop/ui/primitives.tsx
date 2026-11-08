@@ -49,6 +49,17 @@ import {
 } from "./style/use-styled";
 
 const AnyView = View as any;
+
+function resolveLineHeight(style: Record<string, any>) {
+  if (typeof style.lineHeight === "number" && style.lineHeight < 5)
+    return {
+      ...style,
+      lineHeight:
+        style.lineHeight *
+        (typeof style.fontSize === "number" ? style.fontSize : 16)
+    };
+  return style;
+}
 const AnyPressable = Pressable as any;
 const AnyText = NativeText as any;
 const AnyInput = TextInput as any;
@@ -57,12 +68,19 @@ const AnimatedText = Animated.Text as any;
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable) as any;
 
 function useElementRef(ref: ForwardedRef<UIElement>) {
-  const inner = useRef<{ focus?: () => void; blur?: () => void }>(null);
+  const inner = useRef<{
+    focus?: () => void;
+    blur?: () => void;
+    measureInWindow?: (
+      callback: (x: number, y: number, width: number, height: number) => void
+    ) => void;
+  }>(null);
   useImperativeHandle(
     ref,
     () => ({
       focus: () => inner.current?.focus?.(),
-      blur: () => inner.current?.blur?.()
+      blur: () => inner.current?.blur?.(),
+      measureInWindow: (callback) => inner.current?.measureInWindow?.(callback)
     }),
     []
   );
@@ -172,7 +190,7 @@ export const Text = forwardRef<UIElement, Contract.TextProps>(function Text(
     <TextComponent
       ref={inner}
       {...nativeProps}
-      style={{ ...inherited, ...viewStyle }}
+      style={resolveLineHeight({ ...inherited, ...viewStyle })}
       numberOfLines={numberOfLines ?? resolved.numberOfLines}
       selectable={selectable ?? resolved.selectable}
       onPress={onPress}

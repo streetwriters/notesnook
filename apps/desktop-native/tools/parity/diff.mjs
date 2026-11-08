@@ -10,20 +10,26 @@ const { PNG } = createRequire(path.join(here, "../../package.json"))("pngjs");
 const [scenarioName, dir] = process.argv.slice(2);
 const scenario = scenarios[scenarioName];
 const scale = scenario.scale;
-const read = (name) => JSON.parse(fs.readFileSync(path.join(dir, name), "utf8"));
+const read = (name) =>
+  JSON.parse(fs.readFileSync(path.join(dir, name), "utf8"));
 const web = read("web-map.json");
 const desktop = read("desktop-map.json");
 
 const webPng = PNG.sync.read(fs.readFileSync(path.join(dir, "web.png")));
-const desktopPng = PNG.sync.read(fs.readFileSync(path.join(dir, "desktop.png")));
+const desktopPng = PNG.sync.read(
+  fs.readFileSync(path.join(dir, "desktop.png"))
+);
 const width = Math.min(webPng.width, desktopPng.width);
 const height = Math.min(webPng.height, desktopPng.height);
 
 const px = (value) => Math.round(value * scale);
 const closeEnough = (a, b) =>
-  a.slice(0, 3).every((channel, i) => Math.round(channel) === Math.round(b[i])) &&
+  a
+    .slice(0, 3)
+    .every((channel, i) => Math.round(channel) === Math.round(b[i])) &&
   Math.abs(a[3] - b[3]) < 0.01;
-const sameColor = (a, b) => (a[3] === 0 && b[3] === 0 ? true : closeEnough(a, b));
+const sameColor = (a, b) =>
+  a[3] === 0 && b[3] === 0 ? true : closeEnough(a, b);
 
 const yiq = (r, g, b) => [
   r * 0.29889531 + g * 0.58662247 + b * 0.11448223,
@@ -33,7 +39,9 @@ const yiq = (r, g, b) => [
 const delta = (a, b) => {
   const [y1, i1, q1] = yiq(a[0], a[1], a[2]);
   const [y2, i2, q2] = yiq(b[0], b[1], b[2]);
-  return 0.5053 * (y1 - y2) ** 2 + 0.299 * (i1 - i2) ** 2 + 0.1957 * (q1 - q2) ** 2;
+  return (
+    0.5053 * (y1 - y2) ** 2 + 0.299 * (i1 - i2) ** 2 + 0.1957 * (q1 - q2) ** 2
+  );
 };
 const maxDelta = 35215 * TEXT_SCORE_THRESHOLD ** 2;
 
@@ -60,9 +68,17 @@ function analyse(maskIds, maskRects, heatmapFile) {
   for (const [id, webElements] of webById) {
     const desktopElements = desktopById.get(id) ?? [];
     if (desktopElements.length < webElements.length)
-      missingOnDesktop.push({ id, web: webElements.length, desktop: desktopElements.length });
+      missingOnDesktop.push({
+        id,
+        web: webElements.length,
+        desktop: desktopElements.length
+      });
     if (desktopElements.length > webElements.length)
-      extraOnDesktop.push({ id, web: webElements.length, desktop: desktopElements.length });
+      extraOnDesktop.push({
+        id,
+        web: webElements.length,
+        desktop: desktopElements.length
+      });
     const count = Math.min(webElements.length, desktopElements.length);
     for (let index = 0; index < count; index++) {
       const w = webElements[index];
@@ -73,7 +89,9 @@ function analyse(maskIds, maskRects, heatmapFile) {
         if (px(w[key]) !== px(d[key])) deltas[key] = px(d[key]) - px(w[key]);
       if (Object.keys(deltas).length)
         geometry.push({
-          id, index, text: w.text,
+          id,
+          index,
+          text: w.text,
           web: [w.x, w.y, w.width, w.height].map((v) => +v.toFixed(2)),
           desktop: [d.x, d.y, d.width, d.height].map((v) => +v.toFixed(2)),
           deltaDevicePx: deltas
@@ -81,25 +99,43 @@ function analyse(maskIds, maskRects, heatmapFile) {
       const colorDiffs = {};
       if (!sameColor(w.background, d.background))
         colorDiffs.background = [w.background, d.background];
-      if (d.color && !sameColor(w.color, d.color)) colorDiffs.color = [w.color, d.color];
-      if (d.borderColor && w.borderWidth > 0 && !sameColor(w.borderColor, d.borderColor))
+      if (d.color && !sameColor(w.color, d.color))
+        colorDiffs.color = [w.color, d.color];
+      if (
+        d.borderColor &&
+        w.borderWidth > 0 &&
+        !sameColor(w.borderColor, d.borderColor)
+      )
         colorDiffs.borderColor = [w.borderColor, d.borderColor];
-      if (Object.keys(colorDiffs).length) colors.push({ id, index, ...colorDiffs });
+      if (Object.keys(colorDiffs).length)
+        colors.push({ id, index, ...colorDiffs });
       if (d.fontSize !== null) {
         const diffs = {};
-        if (w.fontFamily !== d.fontFamily) diffs.fontFamily = [w.fontFamily, d.fontFamily];
-        if (w.fontSize !== d.fontSize) diffs.fontSize = [w.fontSize, d.fontSize];
-        if (w.fontWeight !== d.fontWeight) diffs.fontWeight = [w.fontWeight, d.fontWeight];
-        if (w.lineHeight !== null && d.lineHeight !== null && Math.abs(w.lineHeight - d.lineHeight) > 0.01)
+        if (w.fontFamily !== d.fontFamily)
+          diffs.fontFamily = [w.fontFamily, d.fontFamily];
+        if (w.fontSize !== d.fontSize)
+          diffs.fontSize = [w.fontSize, d.fontSize];
+        if (w.fontWeight !== d.fontWeight)
+          diffs.fontWeight = [w.fontWeight, d.fontWeight];
+        if (
+          w.lineHeight !== null &&
+          d.lineHeight !== null &&
+          Math.abs(w.lineHeight - d.lineHeight) > 0.01
+        )
           diffs.lineHeight = [w.lineHeight, d.lineHeight];
-        if (d.letterSpacing !== null && Math.abs((w.letterSpacing ?? 0) - d.letterSpacing) > 0.01)
+        if (
+          d.letterSpacing !== null &&
+          Math.abs((w.letterSpacing ?? 0) - d.letterSpacing) > 0.01
+        )
           diffs.letterSpacing = [w.letterSpacing, d.letterSpacing];
-        if (Object.keys(diffs).length) textStyle.push({ id, index, text: w.text, ...diffs });
+        if (Object.keys(diffs).length)
+          textStyle.push({ id, index, text: w.text, ...diffs });
       }
     }
   }
   for (const [id, desktopElements] of desktopById)
-    if (!webById.has(id)) extraOnDesktop.push({ id, web: 0, desktop: desktopElements.length });
+    if (!webById.has(id))
+      extraOnDesktop.push({ id, web: 0, desktop: desktopElements.length });
 
   const mask = new Uint8Array(width * height);
   const outside = new Uint8Array(width * height);
@@ -107,10 +143,15 @@ function analyse(maskIds, maskRects, heatmapFile) {
     const x0 = Math.max(0, Math.floor(rect.x * scale) - pad);
     const y0 = Math.max(0, Math.floor(rect.y * scale) - pad);
     const x1 = Math.min(width, Math.ceil((rect.x + rect.width) * scale) + pad);
-    const y1 = Math.min(height, Math.ceil((rect.y + rect.height) * scale) + pad);
-    for (let y = y0; y < y1; y++) target.fill(1, y * width + x0, y * width + x1);
+    const y1 = Math.min(
+      height,
+      Math.ceil((rect.y + rect.height) * scale) + pad
+    );
+    for (let y = y0; y < y1; y++)
+      target.fill(1, y * width + x0, y * width + x1);
   };
-  for (const rect of [...web.textRects, ...desktop.textRects]) fill(mask, rect, 1);
+  for (const rect of [...web.textRects, ...desktop.textRects])
+    fill(mask, rect, 1);
   for (const rect of maskRects) fill(outside, rect, 0);
 
   const heat = new PNG({ width, height });
@@ -171,7 +212,11 @@ function analyse(maskIds, maskRects, heatmapFile) {
       textPixelsTotal: textPixels,
       textScore: textPixels ? +(textDiff / textPixels).toFixed(4) : 0
     },
-    missingOnDesktop, extraOnDesktop, geometry, colors, textStyle
+    missingOnDesktop,
+    extraOnDesktop,
+    geometry,
+    colors,
+    textStyle
   };
 }
 
@@ -183,14 +228,21 @@ fs.writeFileSync(
   path.join(dir, "summary.json"),
   JSON.stringify(
     {
-      scenario: scenarioName, scale, threshold: TEXT_SCORE_THRESHOLD,
+      scenario: scenarioName,
+      scale,
+      threshold: TEXT_SCORE_THRESHOLD,
       windowPixels: [width, height],
       mask: { reason: mask.reason, ids: mask.ids, rects: mask.rects },
-      masked: masked.summary, unmasked: unmasked.summary,
-      missingOnDesktop: masked.missingOnDesktop, extraOnDesktop: masked.extraOnDesktop,
-      geometry: masked.geometry, colors: masked.colors, textStyle: masked.textStyle
+      masked: masked.summary,
+      unmasked: unmasked.summary,
+      missingOnDesktop: masked.missingOnDesktop,
+      extraOnDesktop: masked.extraOnDesktop,
+      geometry: masked.geometry,
+      colors: masked.colors,
+      textStyle: masked.textStyle
     },
-    null, 1
+    null,
+    1
   )
 );
 
@@ -207,26 +259,47 @@ const line = (title, s) => [
 const lines = [
   `# Parity: ${scenarioName} (${path.basename(dir)})`,
   "",
-  `Window ${width}x${height} device px, scale ${scale}. Mask: ${mask.reason ?? "none"}.`,
+  `Window ${width}x${height} device px, scale ${scale}. Mask: ${
+    mask.reason ?? "none"
+  }.`,
   "",
   ...line("Masked (the bar)", masked.summary),
   ...line("Unmasked (reference)", unmasked.summary),
   "## Ids missing on desktop (masked view)",
-  ...masked.missingOnDesktop.map((m) => `- ${m.id} (web ${m.web}, desktop ${m.desktop})`),
-  "",
-  "## Ids only on desktop",
-  ...masked.extraOnDesktop.map((m) => `- ${m.id} (web ${m.web}, desktop ${m.desktop})`),
-  "",
-  "## Geometry mismatches",
-  ...masked.geometry.slice(0, 80).map(
-    (g) => `- ${g.id}[${g.index}] web ${g.web.join(",")} desktop ${g.desktop.join(",")} delta ${JSON.stringify(g.deltaDevicePx)}`
+  ...masked.missingOnDesktop.map(
+    (m) => `- ${m.id} (web ${m.web}, desktop ${m.desktop})`
   ),
   "",
+  "## Ids only on desktop",
+  ...masked.extraOnDesktop.map(
+    (m) => `- ${m.id} (web ${m.web}, desktop ${m.desktop})`
+  ),
+  "",
+  "## Geometry mismatches",
+  ...masked.geometry
+    .slice(0, 80)
+    .map(
+      (g) =>
+        `- ${g.id}[${g.index}] web ${g.web.join(",")} desktop ${g.desktop.join(
+          ","
+        )} delta ${JSON.stringify(g.deltaDevicePx)}`
+    ),
+  "",
   "## Colour mismatches",
-  ...masked.colors.slice(0, 40).map((c) => `- ${c.id}[${c.index}] ${JSON.stringify(c)}`),
+  ...masked.colors
+    .slice(0, 40)
+    .map((c) => `- ${c.id}[${c.index}] ${JSON.stringify(c)}`),
   "",
   "## Text style mismatches",
-  ...masked.textStyle.slice(0, 40).map((t) => `- ${t.id}[${t.index}] ${JSON.stringify(t)}`)
+  ...masked.textStyle
+    .slice(0, 40)
+    .map((t) => `- ${t.id}[${t.index}] ${JSON.stringify(t)}`)
 ];
 fs.writeFileSync(path.join(dir, "summary.md"), lines.join("\n") + "\n");
-console.log(JSON.stringify({ masked: masked.summary, unmasked: unmasked.summary }, null, 1));
+console.log(
+  JSON.stringify(
+    { masked: masked.summary, unmasked: unmasked.summary },
+    null,
+    1
+  )
+);

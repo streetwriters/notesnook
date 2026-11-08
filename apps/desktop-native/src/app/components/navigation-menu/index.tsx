@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useResolvedItem } from "@notesnook/common";
 import type {
   Color,
@@ -26,7 +26,15 @@ import type {
   VirtualizedGrouping
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Box, Button, dataColor, Flex, Text, VirtualList } from "@ui";
+import {
+  Box,
+  Button,
+  dataColor,
+  Flex,
+  Text,
+  VirtualList,
+  type UIElement
+} from "@ui";
 import { db } from "../../common/db";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { navigate, usePathname } from "../../navigation";
@@ -37,16 +45,23 @@ import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
 import { useStore as useMonographStore } from "../../stores/monograph-store";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { useMenuStore } from "../menu";
 import {
   Bell,
   BookOpen,
   BoxArrowDown,
   Ellipse,
   FileText,
+  GearSix,
   Home,
+  MoonStars,
   Notebook as NotebookIcon,
   Plus,
+  Question,
+  SignIn,
+  SignOut,
   Sliders,
   Star,
   Tag as TagIcon,
@@ -54,6 +69,7 @@ import {
   UserProfileIcon,
   type Icon
 } from "../icons";
+import { UserProfileMinimal } from "../user-profile";
 import { Logo } from "./logo";
 import { NavigationItem } from "./navigation-item";
 import { TabItem } from "./tab-item";
@@ -292,10 +308,68 @@ export function NavigationMenu() {
 }
 
 function ProfileButton() {
+  const element = useRef<UIElement>(null);
+  const colorScheme = useThemeStore((store) => store.colorScheme);
+  const user = useUserStore((store) => store.user);
+  const notLoggedIn = !user || !user.id;
+  const openMenu = useMenuStore((store) => store.open);
   return (
     <Button
+      ref={element}
       testID="profile-dropdown"
       variant="secondary"
+      onPress={() =>
+        element.current?.measureInWindow((x, y, width, height) =>
+          openMenu(
+            [
+              {
+                type: "popup",
+                key: "profile",
+                component: UserProfileMinimal
+              },
+              { type: "separator", key: "sep" },
+              {
+                type: "button",
+                title: strings.darkMode(),
+                key: "toggle-theme-mode",
+                iconComponent: MoonStars,
+                isChecked: colorScheme === "dark",
+                onClick: () =>
+                  useThemeStore.setState({
+                    colorScheme: colorScheme === "dark" ? "light" : "dark"
+                  })
+              },
+              {
+                type: "button",
+                title: strings.routes.Settings(),
+                key: "settings",
+                iconComponent: GearSix
+              },
+              {
+                type: "button",
+                title: strings.helpAndSupport(),
+                iconComponent: Question,
+                key: "help-and-support"
+              },
+              {
+                type: "button",
+                title: strings.login(),
+                iconComponent: SignIn,
+                key: "login",
+                isHidden: !notLoggedIn
+              },
+              {
+                type: "button",
+                title: strings.logout(),
+                iconComponent: SignOut,
+                key: "logout",
+                isHidden: notLoggedIn
+              }
+            ],
+            { x, y, width, height }
+          )
+        )
+      }
       sx={{
         width: 32,
         height: 32,

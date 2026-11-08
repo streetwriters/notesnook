@@ -49,4 +49,9 @@ export const scenarios = {
   }
 };
 
+scenarios.userMenu = {
+  ...scenarios.shell,
+  steps: [{ click: "profile-dropdown" }]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

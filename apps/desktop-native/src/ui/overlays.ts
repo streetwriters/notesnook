@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { IconProps } from "./primitives";
 import type { ComponentType } from "react";
 
 export type MenuItemTypes = "button" | "separator" | "popup" | "lazy-loader";
@@ -41,7 +42,7 @@ export type MenuButtonItem = BaseMenuItem<"button"> & {
   onClick?: () => void;
   title: string;
   icon?: string;
-  iconComponent?: ComponentType<{ size?: number; color?: string }>;
+  iconComponent?: ComponentType<Omit<IconProps, "path" | "svg">>;
   tooltip?: string;
   isDisabled?: boolean;
   isChecked?: boolean;
