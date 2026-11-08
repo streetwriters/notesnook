@@ -24,7 +24,7 @@ import type {
   ReactNode,
   RefAttributes
 } from "react";
-import type { Theme } from "@notesnook/theme";
+import type { Theme, ThemeDefinition } from "@notesnook/theme";
 import type {
   ContextMenuEvent,
   FocusEvent,
@@ -202,6 +202,8 @@ export interface SelectProps extends BaseProps {
 
 export interface ThemeScopeProps {
   scope: ThemeScopeName;
+  colorScheme?: "light" | "dark";
+  theme?: ThemeDefinition;
   children?: ReactNode;
 }
 
