@@ -32,6 +32,7 @@ import {
   dataColor,
   Flex,
   Text,
+  Input,
   VirtualList,
   type UIElement
 } from "@ui";
@@ -54,6 +55,7 @@ import {
   BoxArrowDown,
   Ellipse,
   FileText,
+  Funnel,
   GearSix,
   Home,
   MoonStars,
@@ -70,6 +72,7 @@ import {
   type Icon
 } from "../icons";
 import { UserProfileMinimal } from "../user-profile";
+import ListItem from "../list-item";
 import { Logo } from "./logo";
 import { NavigationItem } from "./navigation-item";
 import { TabItem } from "./tab-item";
@@ -492,24 +495,161 @@ function HomeTab() {
   );
 }
 
-function ItemRow<T extends Notebook | Tag>(props: {
+function useNoteCount(item: Notebook | Tag | undefined) {
+  const [count, setCount] = useState(0);
+  const notes = useNoteStore((store) => store.notes);
+  useEffect(() => {
+    if (!item) return;
+    db.relations
+      .from(item, "note")
+      .count()
+      .then((value) => setCount(value || 0));
+  }, [item, notes]);
+  return count;
+}
+
+function NavigationListRow<T extends Notebook | Tag>(props: {
   index: number;
   items: VirtualizedGrouping<T>;
-  icon: Icon;
-  pathPrefix: string;
+  kind: "notebook" | "tag";
 }) {
   const pathname = usePathname();
   const resolved = useResolvedItem({ index: props.index, items: props.items });
   const item = resolved?.item as T | undefined;
-  if (!item) return <Box sx={{ height: 34 }} />;
-  const path = `${props.pathPrefix}/${item.id}`;
+  const totalNotes = useNoteCount(item);
+  if (!item) return <Box sx={{ height: 33 }} />;
+  const path = `/${props.kind}s/${item.id}`;
+  const isOpened = pathname === path;
+  const RowIcon = props.kind === "notebook" ? NotebookIcon : TagIcon;
   return (
-    <NavigationItem
-      title={item.type === "tag" ? `#${item.title}` : item.title}
-      icon={props.icon}
-      selected={pathname === path}
+    <ListItem
+      item={item}
+      isCompact
+      isFocused={isOpened}
       onPress={() => navigate(path, { notify: true })}
+      sx={{
+        borderRadius: "radius1",
+        pr: "spacing2",
+        pl: "spacing2",
+        py: "spacing4",
+        mb: props.kind === "notebook" ? "spacing1" : undefined
+      }}
+      title={
+        <Flex
+          sx={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "spacing3",
+            minWidth: 0
+          }}
+        >
+          {props.kind === "notebook" ? (
+            <Box sx={{ width: 11, height: 11 }} />
+          ) : null}
+          <RowIcon size={13} color={isOpened ? "icon-selected" : "icon"} />
+          <Text
+            testID="title"
+            variant="body"
+            numberOfLines={1}
+            sx={{
+              color: isOpened ? "paragraph-selected" : "paragraph",
+              fontWeight: "normal",
+              fontSize: "xs",
+              minWidth: 0
+            }}
+          >
+            {item.title}
+          </Text>
+        </Flex>
+      }
+      footer={
+        <Text
+          variant="subBody"
+          sx={{
+            fontSize: "3xs",
+            lineHeight: 1,
+            color: isOpened ? "paragraph" : "paragraph-secondary"
+          }}
+        >
+          {totalNotes}
+        </Text>
+      }
     />
+  );
+}
+
+function FilterField(props: { placeholder: string }) {
+  return (
+    <Flex
+      sx={{
+        flexDirection: "row",
+        alignItems: "center",
+        borderTop: "1px solid",
+        borderTopColor: "separator",
+        mx: "spacing4",
+        pt: "spacing4"
+      }}
+    >
+      <Input
+        testID="filter-input"
+        variant="clean"
+        placeholder={props.placeholder}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          p: 0,
+          fontSize: "xs",
+          color: "paragraph"
+        }}
+      />
+      <Funnel size={13} color="icon-secondary" />
+    </Flex>
+  );
+}
+
+function NavigationList<T extends Notebook | Tag>(props: {
+  kind: "notebook" | "tag";
+  items: VirtualizedGrouping<T> | undefined;
+  empty: string;
+  filter: string;
+}) {
+  const { items, kind } = props;
+  const itemKey = useCallback(
+    (index: number) => items?.key(index) ?? `${index}`,
+    [items]
+  );
+  const renderItem = useCallback(
+    (index: number) =>
+      items ? (
+        <NavigationListRow index={index} items={items} kind={kind} />
+      ) : null,
+    [items, kind]
+  );
+  return (
+    <>
+      <Box sx={{ flex: 1, mt: "spacing4" }}>
+        {!items || items.length === 0 ? (
+          <Flex sx={{ p: "spacing6" }}>
+            <Text
+              testID={`${kind}s-empty`}
+              sx={{ color: "paragraph-secondary" }}
+            >
+              {props.empty}
+            </Text>
+          </Flex>
+        ) : (
+          <Flex testID={`${kind}s-list`} sx={{ flex: 1, px: "spacing4" }}>
+            <VirtualList
+              count={items.length}
+              itemKey={itemKey}
+              estimatedItemSize={33}
+              renderItem={renderItem}
+            />
+          </Flex>
+        )}
+      </Box>
+      <FilterField placeholder={props.filter} />
+    </>
   );
 }
 
@@ -519,39 +659,13 @@ function NotebooksTab() {
   useEffect(() => {
     refresh();
   }, [refresh]);
-  const itemKey = useCallback(
-    (index: number) => notebooks?.key(index) ?? `${index}`,
-    [notebooks]
-  );
-  const renderItem = useCallback(
-    (index: number) =>
-      notebooks ? (
-        <ItemRow
-          index={index}
-          items={notebooks}
-          icon={NotebookIcon}
-          pathPrefix="/notebooks"
-        />
-      ) : null,
-    [notebooks]
-  );
-  if (!notebooks || notebooks.length === 0)
-    return (
-      <Flex sx={{ p: "spacing6" }}>
-        <Text testID="notebooks-empty" sx={{ color: "paragraph-secondary" }}>
-          {strings.noNotebooksYet()}
-        </Text>
-      </Flex>
-    );
   return (
-    <Flex testID="notebooks-tab" sx={{ flex: 1, px: "spacing4" }}>
-      <VirtualList
-        count={notebooks.length}
-        itemKey={itemKey}
-        estimatedItemSize={34}
-        renderItem={renderItem}
-      />
-    </Flex>
+    <NavigationList
+      kind="notebook"
+      items={notebooks}
+      empty={strings.noNotebooksYet()}
+      filter={strings.filterNotebooks()}
+    />
   );
 }
 
@@ -561,33 +675,12 @@ function TagsTab() {
   useEffect(() => {
     refresh();
   }, [refresh]);
-  const itemKey = useCallback(
-    (index: number) => tags?.key(index) ?? `${index}`,
-    [tags]
-  );
-  const renderItem = useCallback(
-    (index: number) =>
-      tags ? (
-        <ItemRow index={index} items={tags} icon={TagIcon} pathPrefix="/tags" />
-      ) : null,
-    [tags]
-  );
-  if (!tags || tags.length === 0)
-    return (
-      <Flex sx={{ p: "spacing6" }}>
-        <Text testID="tags-empty" sx={{ color: "paragraph-secondary" }}>
-          {strings.noTagsYet()}
-        </Text>
-      </Flex>
-    );
   return (
-    <Flex testID="tags-tab" sx={{ flex: 1, px: "spacing4" }}>
-      <VirtualList
-        count={tags.length}
-        itemKey={itemKey}
-        estimatedItemSize={34}
-        renderItem={renderItem}
-      />
-    </Flex>
+    <NavigationList
+      kind="tag"
+      items={tags}
+      empty={strings.noTagsYet()}
+      filter={strings.filterTags()}
+    />
   );
 }

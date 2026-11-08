@@ -242,12 +242,12 @@ function Header(props: RouteContainerProps) {
               <Box
                 sx={{
                   position: "absolute",
-                  left: 12,
-                  top: 13,
+                  left: 10,
+                  top: 12.5,
                   pointerEvents: "none"
                 }}
               >
-                <SearchIcon size={14} color="icon" />
+                <SearchIcon size={15} color="icon" />
               </Box>
             </Flex>
           </Flex>
