@@ -34,7 +34,7 @@ import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
 import { StatusBar } from "./components/status-bar";
 
-export function App() {
+export function App(props: { titleBarInset?: number }) {
   const navPane = useRef<SplitPaneHandle>(null);
   const [isNavPaneCollapsed, setIsNavPaneCollapsed] = useState(false);
 
@@ -62,6 +62,7 @@ export function App() {
             }}
           >
             <ActionBar
+              leadingInset={props.titleBarInset}
               isSidebarCollapsed={isNavPaneCollapsed}
               onSidebarToggle={() => {
                 if (isNavPaneCollapsed) navPane.current?.expand(0);

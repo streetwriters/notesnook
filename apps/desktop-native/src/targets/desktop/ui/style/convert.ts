@@ -148,6 +148,8 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
   return result;
 }
 
+const SIDES = ["Top", "Right", "Bottom", "Left"];
+
 export function convertDeclarations(
   declarations: Declarations
 ): ConvertedStyle {
@@ -184,8 +186,16 @@ export function convertDeclarations(
         style.overflow = value;
         continue;
     }
-    for (const [convertedKey, convertedValue] of convertValue(key, value))
-      style[convertedKey] = convertedValue;
+    for (const [convertedKey, convertedValue] of convertValue(key, value)) {
+      if (
+        (convertedKey === "padding" || convertedKey === "margin") &&
+        typeof convertedValue === "number"
+      ) {
+        for (const side of SIDES)
+          style[`${convertedKey}${side}`] = convertedValue;
+        delete style[convertedKey];
+      } else style[convertedKey] = convertedValue;
+    }
   }
 
   if (isFlex && style.flexDirection === undefined) style.flexDirection = "row";

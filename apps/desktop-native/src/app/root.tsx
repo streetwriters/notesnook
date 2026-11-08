@@ -25,12 +25,13 @@ import { Demo, type Status } from "./demo";
 
 export type RootProps = BootOptions & {
   screen?: "app" | "demo";
+  titleBarInset?: number;
   colorScheme: "light" | "dark";
   onToggleColorScheme: () => void;
 };
 
 export function Root(props: RootProps) {
-  const { screen = "app", ...bootOptions } = props;
+  const { screen = "app", titleBarInset, ...bootOptions } = props;
   const [state, setState] = useState<Status>({ status: "loading" });
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export function Root(props: RootProps) {
   }, []);
 
   if (screen === "demo") return <Demo state={state} {...props} />;
-  if (state.status === "ready") return <App />;
+  if (state.status === "ready") return <App titleBarInset={titleBarInset} />;
   return (
     <Flex
       sx={{

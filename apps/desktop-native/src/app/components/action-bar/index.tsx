@@ -55,6 +55,7 @@ function Separator() {
 }
 
 export function ActionBar(props: {
+  leadingInset?: number;
   isSidebarCollapsed: boolean;
   onSidebarToggle: () => void;
 }) {
@@ -106,8 +107,16 @@ export function ActionBar(props: {
 
   return (
     <>
-      {isMac && !isFullscreen ? (
-        <Box sx={{ width: TRAFFIC_LIGHTS_WIDTH, flexShrink: 0 }} />
+      {(props.leadingInset ??
+        (isMac && !isFullscreen ? TRAFFIC_LIGHTS_WIDTH : 0)) > 0 ? (
+        <Box
+          sx={{
+            width:
+              props.leadingInset ??
+              (isMac && !isFullscreen ? TRAFFIC_LIGHTS_WIDTH : 0),
+            flexShrink: 0
+          }}
+        />
       ) : null}
       <Button
         testID="sidebar-toggle"
@@ -367,7 +376,7 @@ function Tab(props: {
         ":hover": { bg: isActive ? "background-tertiary" : "hover" }
       }}
     >
-      <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
+      <Flex sx={{ flexDirection: "row", alignItems: "center", flexShrink: 0 }}>
         <TabIcon
           testID={isUnsaved ? "tab-icon-unsaved" : "tab-icon"}
           size={14}
@@ -386,6 +395,7 @@ function Tab(props: {
           sx={{
             maxWidth: 120,
             ml: 1,
+            flexShrink: 0,
             color: isActive ? "paragraph-selected" : "paragraph-secondary"
           }}
         >

@@ -18,7 +18,10 @@ const seed = JSON.parse(fs.readFileSync(seedFile, "utf8"));
 fs.mkdirSync(outDir, { recursive: true });
 
 process.env.RN_GPUI_TEST_PROJECT = appDir;
-process.env.RN_GPUI_TEST_BUNDLE ??= path.join(appDir, "desktop/build/index.bundle");
+process.env.RN_GPUI_TEST_BUNDLE ??= path.join(
+  appDir,
+  "desktop/build/index.bundle"
+);
 process.env.RN_GPUI_TEST_BINARY ??= path.join(
   appDir,
   "desktop/build/target/debug/react-native-gpui--notesnook-desktop-native"
@@ -27,7 +30,12 @@ process.env.RN_GPUI_TEST_BINARY ??= path.join(
 const app = await launchApp({
   disableAnimations: true,
   timeout: 120000,
-  initialProps: { seed, resetConfig: true, initialColorScheme: scheme },
+  initialProps: {
+    seed,
+    resetConfig: true,
+    initialColorScheme: scheme,
+    titleBarInset: 0
+  },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-"))
   }
@@ -60,13 +68,24 @@ try {
     const dump = async (node, depth, abs) => {
       const props = await app.getProps(node.tag);
       const f = props.frame;
+      if (process.env.PARITY_PROPS) console.log(JSON.stringify(props));
       console.log(
-        `${"  ".repeat(depth)}${node.component} ${node.testID || ""} [${f.x},${f.y},${f.width},${f.height}] ${props.text ? JSON.stringify(props.text) : ""}`
+        `${"  ".repeat(depth)}${node.component} ${node.testID || ""} [${f.x},${
+          f.y
+        },${f.width},${f.height}] ${
+          props.text ? JSON.stringify(props.text) : ""
+        }`
       );
       for (const child of node.children ?? []) await dump(child, depth + 1);
     };
     const find = (node) =>
-      node.testID === process.env.PARITY_DUMP
+      (
+        process.env.PARITY_DUMP.endsWith("*")
+          ? (node.testID || "").startsWith(
+              process.env.PARITY_DUMP.slice(0, -1)
+            ) && (node.testID || "").length > 20
+          : node.testID === process.env.PARITY_DUMP
+      )
         ? node
         : (node.children ?? []).map(find).find(Boolean);
     const root = find(tree);
