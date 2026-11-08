@@ -48,6 +48,8 @@ import { environment } from "@platform";
 
 type BuyDialogProps = BaseDialogProps<false> & {
   couponCode?: string;
+  coupon?: string;
+  plan?: string;
   onShowPlans?: () => void;
   onCheckoutComplete?: () => void;
   onClose: () => void;
@@ -56,7 +58,8 @@ type BuyDialogProps = BaseDialogProps<false> & {
 export const BuyDialog = DialogManager.register(function BuyDialog(
   props: BuyDialogProps
 ) {
-  const { onClose, onShowPlans, onCheckoutComplete, couponCode } = props;
+  const { onClose, onShowPlans, onCheckoutComplete } = props;
+  const couponCode = props.couponCode ?? props.coupon;
 
   const applyCoupon = useCheckoutStore((store) => store.applyCoupon);
   const user = useUserStore((store) => store.user);

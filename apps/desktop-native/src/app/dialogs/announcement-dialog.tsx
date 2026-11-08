@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback } from "react";
 import { Dialog, Flex } from "@ui";
-import { AnnouncementBody } from "./components/announcement-body";
+import AnnouncementBody from "../components/announcements/body";
 import { store as announcementStore } from "../stores/announcement-store";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 
