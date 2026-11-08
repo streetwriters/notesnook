@@ -91,3 +91,10 @@ export interface PopoverProps {
 
 export declare function Popover(props: PopoverProps): JSX.Element | null;
 export declare function PopoverHost(): JSX.Element | null;
+
+export interface DragPayload {
+  ghost?: ReactNode;
+  [key: string]: unknown;
+}
+
+export declare function DragGhostHost(): JSX.Element | null;

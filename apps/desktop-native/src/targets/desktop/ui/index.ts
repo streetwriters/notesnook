@@ -19,9 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export { AvatarEditor } from "./avatar-editor";
 export { Dialog, DialogButton } from "./dialog";
+export { DragGhostHost } from "./drag-ghost";
 export * from "./hooks";
 export { Pane, ScrollContainer, SplitPane } from "./layout";
 export { VirtualList } from "./lists";
+export { SortableList } from "./sortable-list";
 export * from "./overlays";
 export * from "./primitives";
 export { ColorPicker } from "./color-picker";

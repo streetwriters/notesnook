@@ -26,6 +26,7 @@ import {
   ThemeScope,
   TitleBar,
   type SplitPaneHandle,
+  DragGhostHost,
   PopoverHost,
   type UIElement
 } from "@ui";
@@ -142,6 +143,7 @@ export function App(props: { titleBarInset?: number }) {
       <MenuHost />
       <DialogHost />
       <PopoverHost />
+      <DragGhostHost />
       <LightboxHost />
     </Flex>
   );

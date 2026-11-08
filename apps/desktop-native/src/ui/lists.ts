@@ -53,3 +53,31 @@ export interface VirtualListProps {
 export declare const VirtualList: ForwardRefExoticComponent<
   VirtualListProps & RefAttributes<VirtualListHandle>
 >;
+
+export interface SortableItem {
+  id: string;
+  group?: string;
+}
+
+export interface SortableMove {
+  activeId: string;
+  overId: string;
+  index: number;
+  group?: string;
+}
+
+export interface SortableListProps<T extends SortableItem> {
+  items: T[];
+  renderItem: (
+    item: T,
+    state: { isDragging: boolean; isOver: boolean }
+  ) => ReactNode;
+  onMove: (move: SortableMove) => void;
+  direction?: "vertical" | "horizontal";
+  sx?: SxProp;
+  testID?: string;
+}
+
+export declare function SortableList<T extends SortableItem>(
+  props: SortableListProps<T>
+): JSX.Element;
