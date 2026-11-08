@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
-import { Button, Dialog, Flex, Image, Text } from "@ui";
+import { useRef, useState } from "react";
+import { Button, Dialog, Flex, Slider, Text } from "@ui";
+import { AvatarEditor, type AvatarEditorRef } from "./components/avatar-editor";
 import { Profile } from "@notesnook/core";
 import { User } from "../components/icons";
 import { showFilePicker } from "../utils/file-picker";
@@ -56,6 +57,8 @@ export const EditProfilePictureDialog = DialogManager.register(
       profile?.profilePicture
     );
     const [picked, setPicked] = useState<string>();
+    const profileRef = useRef<AvatarEditorRef>(null);
+    const [scale, setScale] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [clearProfilePicture, setClearProfilePicture] = useState(false);
     const profilePicture = picked || original;
@@ -73,8 +76,11 @@ export const EditProfilePictureDialog = DialogManager.register(
           onClick: async () => {
             setIsLoading(true);
             try {
-              const pic = picked
-                ? picked
+              const pic = profileRef.current
+                ? await profileRef.current.getScaledImage({
+                    type: "image/jpeg",
+                    quality: 0.8
+                  })
                 : clearProfilePicture
                 ? undefined
                 : profile?.profilePicture;
@@ -99,24 +105,17 @@ export const EditProfilePictureDialog = DialogManager.register(
       >
         <Flex sx={{ flexDirection: "column" }}>
           {profilePicture ? (
-            <Flex
-              sx={{
-                width: 150,
-                height: 150,
-                borderRadius: 150,
-                overflow: "hidden",
-                alignSelf: "center"
-              }}
-            >
-              <Image
-                src={profilePicture}
-                resizeMode="cover"
-                sx={{
-                  width: 150,
-                  height: 150
-                }}
-              />
-            </Flex>
+            <AvatarEditor
+              ref={profileRef}
+              image={profilePicture}
+              width={256}
+              height={256}
+              border={1}
+              borderRadius={256}
+              color={[255, 255, 255]}
+              scale={scale}
+              style={{ width: 150, height: 150 }}
+            />
           ) : (
             <Flex
               sx={{
@@ -150,6 +149,7 @@ export const EditProfilePictureDialog = DialogManager.register(
                 });
                 if (!file) return;
                 const bytes = await file.bytes();
+                setScale(1);
                 setPicked(
                   `data:${file.type || "image/jpeg"};base64,${toBase64(bytes)}`
                 );
@@ -178,6 +178,15 @@ export const EditProfilePictureDialog = DialogManager.register(
               </Button>
             ) : null}
           </Flex>
+          {profilePicture ? (
+            <Slider
+              max={5}
+              min={1}
+              step={0.1}
+              value={scale}
+              onChange={setScale}
+            />
+          ) : null}
         </Flex>
       </Dialog>
     );

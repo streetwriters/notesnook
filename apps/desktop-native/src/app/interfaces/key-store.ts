@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { kvStore } from "@platform";
+import { kvStore, safeStorage } from "@platform";
 import type { SecurityKeyConfig } from "../utils/webauthn";
 import { IKVStore, MemoryKVStore, PlatformKVStore } from "./key-value";
 import { subtle, randomBytes, type CryptoKey } from "./subtle";
@@ -408,12 +408,20 @@ class KeyStore extends BaseStore<KeyStore> {
     if (this.#key) return this.#key;
     if (this.get().isLocked) throw new Error("Key store is locked.");
 
-    const storedKey = await this.#metadataStore.get<ArrayBuffer>(this.#keyId);
+    const storedKey = await this.#metadataStore.get<Uint8Array | ArrayBuffer>(
+      this.#keyId
+    );
     if (!storedKey) return this.storeKey();
+
+    const bytes =
+      storedKey instanceof Uint8Array ? storedKey : new Uint8Array(storedKey);
+    const raw = (await safeStorage.isEncryptionAvailable())
+      ? fromBase64(await safeStorage.decryptString(bytes))
+      : bytes;
 
     return subtle.importKey(
       "raw",
-      storedKey,
+      raw,
       { name: "AES-GCM", length: 256 },
       true,
       ["encrypt", "decrypt"]
@@ -428,9 +436,12 @@ class KeyStore extends BaseStore<KeyStore> {
         "decrypt"
       ]));
 
+    const raw = new Uint8Array(await subtle.exportKey("raw", key));
     await this.#metadataStore.set(
       this.#keyId,
-      await subtle.exportKey("raw", key)
+      (await safeStorage.isEncryptionAvailable())
+        ? await safeStorage.encryptString(toBase64(raw))
+        : raw
     );
     return key;
   };
@@ -654,3 +665,34 @@ const createKeyStore = (name: string) =>
 const [useKeyStore] = createKeyStore("KeyChain");
 export { useKeyStore };
 export type IKeyStore = typeof KeyStore.prototype;
+
+const B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+function toBase64(bytes: Uint8Array) {
+  let out = "";
+  for (let i = 0; i < bytes.length; i += 3) {
+    const a = bytes[i];
+    const b = bytes[i + 1];
+    const c = bytes[i + 2];
+    out += B64[a >> 2] + B64[((a & 3) << 4) | ((b ?? 0) >> 4)];
+    out += b === undefined ? "=" : B64[((b & 15) << 2) | ((c ?? 0) >> 6)];
+    out += c === undefined ? "=" : B64[c & 63];
+  }
+  return out;
+}
+
+function fromBase64(text: string) {
+  const clean = text.replace(/=+$/, "");
+  const out: number[] = [];
+  let bits = 0;
+  let value = 0;
+  for (const ch of clean) {
+    value = (value << 6) | B64.indexOf(ch);
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      out.push((value >> bits) & 255);
+    }
+  }
+  return new Uint8Array(out);
+}
