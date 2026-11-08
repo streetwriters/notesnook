@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, afterEach } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import {
   clickMenu,
@@ -9,7 +9,8 @@ import {
   openTab,
   rightClick,
   settle,
-  startViews
+  startViews,
+  resetUi
 } from "./views";
 import { count, expectClosed, expectDialog } from "./dialogs";
 
@@ -23,12 +24,16 @@ afterAll(async () => {
   await app.close();
 });
 
+afterEach(async () => {
+  await resetUi(app);
+});
+
 describe("note context menu", () => {
   test("a note offers the full set of note actions", async () => {
     await goTo(app, "Notes");
     await rightClick(app, "Grocery list");
     await expectMenu(app, [
-      "open",
+      "openinnewtab",
       "pin",
       "favorite",
       "colors",

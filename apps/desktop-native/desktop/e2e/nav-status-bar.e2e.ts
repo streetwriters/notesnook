@@ -1,7 +1,7 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, afterEach } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { count, settle } from "./dialogs";
-import { startViews } from "./views";
+import { startViews, resetUi } from "./views";
 
 let app: DesktopApp;
 
@@ -11,6 +11,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+});
+
+afterEach(async () => {
+  await resetUi(app);
 });
 
 describe("status bar", () => {

@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, afterEach } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import {
   count,
@@ -7,7 +7,8 @@ import {
   goTo,
   listTexts,
   settle,
-  startViews
+  startViews,
+  resetUi
 } from "./views";
 import { typeInto } from "./dialogs";
 
@@ -20,6 +21,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+});
+
+afterEach(async () => {
+  await resetUi(app);
 });
 
 describe("search", () => {

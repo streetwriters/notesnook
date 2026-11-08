@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, afterEach } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { navVisible } from "./nav";
 import {
@@ -7,7 +7,8 @@ import {
   expectMenu,
   openTab,
   settle,
-  startViews
+  startViews,
+  resetUi
 } from "./views";
 import {
   clickId,
@@ -31,6 +32,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+});
+
+afterEach(async () => {
+  await resetUi(app);
 });
 
 const rowFor = async (title: string) => {

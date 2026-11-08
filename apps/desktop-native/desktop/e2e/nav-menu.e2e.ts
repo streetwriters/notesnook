@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, afterEach } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { navClick, navVisible } from "./nav";
 import {
@@ -7,7 +7,8 @@ import {
   expectMenu,
   settle,
   startViews,
-  openTab
+  openTab,
+  resetUi
 } from "./views";
 import { clickId, count } from "./dialogs";
 
@@ -19,6 +20,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+});
+
+afterEach(async () => {
+  await resetUi(app);
 });
 
 describe("navigation tabs", () => {

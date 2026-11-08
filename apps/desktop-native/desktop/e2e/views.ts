@@ -218,3 +218,14 @@ export async function groupHeaderTexts(app: DesktopApp) {
     )
     .map((entry: { text?: string }) => entry.text);
 }
+
+export async function resetUi(app: DesktopApp) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const open =
+      (await count(app, "menu-container")) +
+      (await count(app, "dialog-backdrop"));
+    if (open === 0) return;
+    await app.press("escape");
+    await app.waitForIdle();
+  }
+}

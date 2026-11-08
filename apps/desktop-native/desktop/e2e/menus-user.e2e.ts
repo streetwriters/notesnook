@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, afterEach } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import {
   clickMenu,
@@ -6,7 +6,8 @@ import {
   expectMenu,
   expectNoMenuItems,
   startViews,
-  windowPixel
+  windowPixel,
+  resetUi
 } from "./views";
 import { clickId, expectDialog, expectClosed, settle } from "./dialogs";
 
@@ -18,6 +19,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await app.close();
+});
+
+afterEach(async () => {
+  await resetUi(app);
 });
 
 describe("user menu while logged out", () => {
