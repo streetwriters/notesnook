@@ -73,7 +73,7 @@ test("the notebooks and tags tabs list their items and navigate", async () => {
   await navClick(app, "Work");
   await vi.waitFor(
     async () =>
-      expect(await app.getByTestId("notebook-header-title").textContent()).toBe(
+      expect(await app.getByTestId("notebook-title").textContent()).toBe(
         "Work"
       ),
     { timeout: 20000, interval: 300 }

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import "./targets/desktop/platform/intl-plural-rules";
 import "./targets/desktop";
 import { useState } from "react";
 import { THEME_DARK, THEME_LIGHT } from "./app/common/theme";

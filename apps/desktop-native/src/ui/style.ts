@@ -232,7 +232,7 @@ type TextStyleProps = {
   fontFamily?: FontFamilyToken;
   fontWeight?: FontWeightToken;
   fontStyle?: "normal" | "italic";
-  lineHeight?: number | `${number}px` | "body" | "heading";
+  lineHeight?: number | `${number}px` | `${number}%` | "body" | "heading";
   letterSpacing?: number;
   textAlign?: "left" | "center" | "right" | "justify";
   textDecorationLine?: "none" | "underline" | "line-through";

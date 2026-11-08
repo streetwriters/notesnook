@@ -17,43 +17,103 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { useEffect, useState } from "react";
 import type { Notebook } from "@notesnook/core";
-import { Flex, Text } from "@ui";
+import { formatDate } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import { Button, Flex, Text } from "@ui";
+import { useStore as useAppStore } from "../stores/app-store";
+import { useStore as useSettingStore } from "../stores/setting-store";
+import {
+  LinkBreak,
+  LinkSimple,
+  NoteCalendar,
+  Notebook as NotebookIcon,
+  PencilSimple
+} from "./icons";
 
 export function NotebookHeader(props: {
   notebook: Notebook;
   totalNotes: number;
 }) {
   const { notebook, totalNotes } = props;
+  const shortcuts = useAppStore((store) => store.shortcuts);
+  const addToShortcuts = useAppStore((store) => store.addToShortcuts);
+  const dateFormat = useSettingStore((store) => store.dateFormat);
+  const [isShortcut, setIsShortcut] = useState(false);
+
+  useEffect(() => {
+    setIsShortcut(shortcuts.findIndex((p) => p.id === notebook.id) > -1);
+  }, [shortcuts, notebook.id]);
+
   return (
     <Flex
       testID="notebook-header"
       sx={{
         flexDirection: "column",
-        gap: "spacing3",
+        mt: "spacing6",
+        gap: "spacing7",
         px: "spacing6",
         py: "spacing4",
-        borderBottom: "1px solid",
-        borderBottomColor: "separator"
+        bg: "background-selected"
       }}
     >
-      <Text
-        testID="notebook-header-title"
-        sx={{ color: "heading", fontSize: "md", fontWeight: "heading" }}
+      <Flex sx={{ flexDirection: "column", gap: "spacing6" }}>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+          <Flex
+            sx={{ flexDirection: "row", alignItems: "center", gap: "spacing3" }}
+          >
+            <NotebookIcon size={17} color="icon" />
+            <Text
+              testID="notebook-title"
+              sx={{ fontSize: "md", fontWeight: 500, color: "heading" }}
+            >
+              {notebook.title}
+            </Text>
+          </Flex>
+          {notebook.description ? (
+            <Text sx={{ fontSize: "3xs", fontWeight: 400, color: "paragraph" }}>
+              {notebook.description}
+            </Text>
+          ) : null}
+        </Flex>
+      </Flex>
+      <Flex
+        sx={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}
       >
-        {notebook.title}
-      </Text>
-      {notebook.description ? (
-        <Text sx={{ color: "paragraph", fontSize: "xs" }}>
-          {notebook.description}
-        </Text>
-      ) : null}
-      <Text
-        testID="notebook-header-count"
-        sx={{ color: "paragraph-secondary", fontSize: "3xs" }}
-      >
-        {`${totalNotes} notes`}
-      </Text>
+        <Flex
+          sx={{ flexDirection: "row", alignItems: "center", gap: "spacing2" }}
+        >
+          <NoteCalendar size={13} color="icon-secondary" />
+          <Text
+            sx={{ fontSize: "3xs", color: "paragraph", lineHeight: "125%" }}
+          >
+            {formatDate(notebook.dateEdited, { type: "date", dateFormat })}
+          </Text>
+          <Text sx={{ fontSize: "3xs", color: "icon-disabled" }}>•</Text>
+          <Text sx={{ fontSize: "3xs", color: "paragraph" }}>
+            {strings.notes(totalNotes || 0)}
+          </Text>
+        </Flex>
+        <Flex
+          sx={{ flexDirection: "row", alignItems: "center", gap: "spacing4" }}
+        >
+          <Button
+            variant="icon"
+            sx={{ p: 0 }}
+            onPress={() => addToShortcuts(notebook)}
+          >
+            {isShortcut ? <LinkBreak size={15} /> : <LinkSimple size={15} />}
+          </Button>
+          <Button variant="icon" sx={{ p: 0 }}>
+            <PencilSimple size={15} />
+          </Button>
+        </Flex>
+      </Flex>
     </Flex>
   );
 }
