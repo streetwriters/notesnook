@@ -49,6 +49,15 @@ export interface UIElement {
   ): void;
 }
 
+export interface DroppedFile {
+  name: string;
+  size: number;
+  type: string;
+  uri: string;
+  text(): Promise<string>;
+  bytes(): Promise<Uint8Array>;
+}
+
 export interface DragEvent {
   payload: unknown;
   x: number;
@@ -80,6 +89,8 @@ export interface BaseProps extends SpaceProps, ColorProps {
   onDragOver?: (event: DragEvent) => void;
   onDragLeave?: (event: DragEvent) => void;
   onDrop?: (event: DragEvent) => void;
+  acceptsFiles?: string[];
+  onDropFiles?: (files: DroppedFile[]) => void;
 }
 
 export interface BoxProps extends BaseProps {
