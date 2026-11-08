@@ -23,6 +23,10 @@ export const shell: Shell = {
   openUrl(url) {
     window.open(url, "_blank", "noopener");
   },
+  async openPath(path) {
+    window.open(path, "_blank", "noopener");
+  },
+  async showItemInFolder() {},
   async printHtml(title, html) {
     const frame = document.createElement("iframe");
     frame.style.display = "none";

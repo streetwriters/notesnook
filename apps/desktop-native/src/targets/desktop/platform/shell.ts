@@ -18,11 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Linking } from "react-native";
+import fs from "@react-native-gpui/fs";
 import type { Shell } from "../../../platform";
 
 export const shell: Shell = {
   openUrl(url) {
     Linking.openURL(url).catch(() => {});
+  },
+  async openPath(path) {
+    await fs.promises.openExternal(path);
+  },
+  async showItemInFolder(path) {
+    await fs.promises.reveal(path);
   },
   async printHtml() {
     return false;

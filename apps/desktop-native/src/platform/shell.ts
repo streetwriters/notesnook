@@ -19,5 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 export interface Shell {
   openUrl(url: string): void;
+  openPath(path: string): Promise<void>;
+  showItemInFolder(path: string): Promise<void>;
   printHtml(title: string, html: string): Promise<boolean>;
 }
