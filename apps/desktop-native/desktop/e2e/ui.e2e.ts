@@ -153,3 +153,13 @@ test("a grid lays out equal columns with the gap between them", async () => {
   expect(frames[3].y).toBeGreaterThan(frames[0].y + frames[0].height);
   expect(Math.abs(width * 3 + 12 - grid.frame.width)).toBeLessThan(1);
 });
+
+test("each font weight resolves to its own Inter face", async () => {
+  const widths: number[] = [];
+  for (const weight of [400, 500, 600, 700]) {
+    const [node] = await app.query("testID", `weight-${weight}`, true);
+    widths.push(node.frame.width);
+  }
+  for (let index = 1; index < widths.length; index++)
+    expect(widths[index]).toBeGreaterThan(widths[index - 1]);
+});

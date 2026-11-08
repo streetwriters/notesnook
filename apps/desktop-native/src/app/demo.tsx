@@ -125,6 +125,17 @@ export function Demo(props: {
           />
         </Flex>
       </Flex>
+      <Flex testID="weights" sx={{ flexDirection: "column", gap: 1 }}>
+        {[400, 500, 600, 700].map((weight) => (
+          <Text
+            key={weight}
+            testID={`weight-${weight}`}
+            sx={{ fontSize: "md", fontWeight: weight, alignSelf: "flex-start" }}
+          >
+            Travel itinerary
+          </Text>
+        ))}
+      </Flex>
       <Grid testID="grid" columns={3} gap={1} sx={{ width: 280 }}>
         {[0, 1, 2, 3, 4, 5].map((index) => (
           <Box
