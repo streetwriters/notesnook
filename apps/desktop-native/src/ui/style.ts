@@ -272,5 +272,7 @@ export type ThemeScopeName =
   | "list"
   | "contextMenu"
   | "editor"
+  | "editorToolbar"
+  | "editorSidebar"
   | "dialog"
   | "sheet";
