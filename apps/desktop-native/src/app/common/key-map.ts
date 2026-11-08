@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import hotkeys from "hotkeys-js";
+import { environment, keyboard, type KeyEvent } from "@platform";
 import { useEditorStore } from "../stores/editor-store";
 import { useStore as useSearchStore } from "../stores/search-store";
 import { useEditorManager } from "../components/editor/manager";
@@ -27,14 +27,12 @@ import { getKeybinding, keybindings } from "@notesnook/common";
 import { KeyboardShortcutsDialog } from "../dialogs/keyboard-shortcuts-dialog";
 import { isMac } from "../utils/platform";
 
-function isInEditor(e: KeyboardEvent) {
-  return (
-    e.target instanceof HTMLElement && !!e.target?.closest(".editor-container")
-  );
+function isInEditor(e: KeyEvent) {
+  return e.inEditor;
 }
 
 const actions: Partial<
-  Record<keyof typeof keybindings, (() => void) | ((e: KeyboardEvent) => void)>
+  Record<keyof typeof keybindings, (() => void) | ((e: KeyEvent) => void)>
 > = {
   nextTab: () => useEditorStore.getState().focusNextTab(),
   previousTab: () => useEditorStore.getState().focusPreviousTab(),
@@ -49,7 +47,7 @@ const actions: Partial<
     useEditorStore.getState().closeActiveTab();
   },
   closeAllTabs: () => useEditorStore.getState().closeAllTabs(),
-  searchInNotes: (e: KeyboardEvent) => {
+  searchInNotes: (e: KeyEvent) => {
     if (isInEditor(e)) {
       const activeSession = useEditorStore.getState().getActiveSession();
       if (activeSession?.type === "readonly") {
@@ -83,19 +81,15 @@ const actions: Partial<
 };
 
 export function registerKeyMap() {
-  hotkeys.filter = function () {
-    return true;
-  };
-
   Object.entries(actions).forEach(([id, action]) => {
     const keys = getKeybinding(
       id as keyof typeof keybindings,
-      IS_DESKTOP_APP,
+      environment.isDesktopApp,
       isMac()
     );
     if (!keys || keys.length === 0) return;
 
-    hotkeys(keys.join(","), (e) => {
+    keyboard.register(keys, (e) => {
       e.preventDefault();
       action(e);
     });

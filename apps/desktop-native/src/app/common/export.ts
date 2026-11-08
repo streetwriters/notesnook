@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { TaskManager } from "./task-manager";
-import { createWriteStream } from "../utils/stream-saver";
+import { createWriteStream, saveBytes } from "../utils/stream-saver";
+import { shell } from "@platform";
 import { FilteredSelector } from "@notesnook/core";
 import { Note } from "@notesnook/core";
 import { fromAsyncIterator } from "../utils/stream";
@@ -35,7 +36,6 @@ import { ConfirmDialog } from "../dialogs/confirm";
 import { ExportErrorsDialog } from "../dialogs/export-errors-dialog";
 import { db } from "./db";
 import { toAsyncIterator } from "@notesnook-importer/core/dist/src/utils/stream";
-import { saveAs } from "file-saver";
 import { strings } from "@notesnook/intl";
 
 export async function exportToPDF(
@@ -44,42 +44,7 @@ export async function exportToPDF(
 ): Promise<boolean> {
   if (!content) return false;
 
-  return new Promise<boolean>((resolve) => {
-    const iframe = document.createElement("iframe");
-
-    iframe.srcdoc = content;
-    iframe.style.position = "fixed";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "0";
-    iframe.loading = "eager";
-    iframe.sandbox.add("allow-same-origin", "allow-modals");
-
-    iframe.onload = async () => {
-      if (!iframe.contentWindow) return;
-      if (iframe.contentDocument) iframe.contentDocument.title = title;
-      iframe.contentWindow.onbeforeunload = () => closePrint(false);
-      iframe.contentWindow.onafterprint = () => closePrint(true);
-
-      if (
-        iframe.contentDocument &&
-        !!iframe.contentDocument.querySelector(".math-block,.math-inline")
-      ) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-
-      iframe.contentWindow.print();
-    };
-
-    function closePrint(result: boolean) {
-      document.body.removeChild(iframe);
-      resolve(result);
-    }
-
-    document.body.appendChild(iframe);
-  });
+  return shell.printHtml(title, content);
 }
 
 export async function exportNotes(
@@ -182,9 +147,9 @@ export async function exportNote(
       } else {
         for await (const file of toAsyncIterator(stream)) {
           if (typeof file.data === "string")
-            saveAs(new Blob([Buffer.from(file.data, "utf-8")]), file.path);
+            await saveBytes(file.path, file.data);
           else if (file.data instanceof Uint8Array)
-            saveAs(new Blob([file.data]), file.path);
+            await saveBytes(file.path, file.data);
           else await file.data.pipeTo(await createWriteStream(file.path));
         }
       }

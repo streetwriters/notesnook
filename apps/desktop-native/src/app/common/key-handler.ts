@@ -21,12 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 import { base, keyName } from "w3c-keyname";
+import { environment, type KeyEvent } from "@platform";
 
 export type Command = () => boolean;
-const mac =
-  typeof navigator != "undefined"
-    ? /Mac|iP(hone|[oa]d)/.test(navigator.platform)
-    : false;
+const mac = environment.os === "macOS" || environment.os === "iOS";
 
 function normalizeKeyName(name: string) {
   const parts = name.split(/-(?!$)/);
@@ -57,7 +55,7 @@ function normalize(map: { [key: string]: Command }) {
   return copy;
 }
 
-function modifiers(name: string, event: KeyboardEvent, shift: boolean) {
+function modifiers(name: string, event: KeyEvent, shift: boolean) {
   if (event.altKey) name = "Alt-" + name;
   if (event.ctrlKey) name = "Ctrl-" + name;
   if (event.metaKey) name = "Meta-" + name;
@@ -70,10 +68,10 @@ function modifiers(name: string, event: KeyboardEvent, shift: boolean) {
 // handler](#view.EditorProps.handleKeyDown) that handles them.
 export function keydownHandler(
   bindings: Record<string, Command>
-): (event: KeyboardEvent) => boolean {
+): (event: KeyEvent) => boolean {
   const map = normalize(bindings);
   return function (event) {
-    const name = keyName(event),
+    const name = keyName(event as unknown as KeyboardEvent),
       isChar = name.length == 1 && name != " ";
     let baseName: string;
     const direct = map[modifiers(name, event, !isChar)];

@@ -21,10 +21,8 @@ import { strings } from "@notesnook/intl";
 import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
 import { db } from "./db";
-import { checkUpload, decryptFile, saveFile } from "../interfaces/fs";
-import { ScopedThemeProvider } from "../components/theme-provider";
+import { checkUpload, decryptFile, saveFile } from "./fs";
 import { Lightbox } from "../components/lightbox";
-import ReactDOM from "react-dom";
 import { Attachment } from "@notesnook/core";
 
 async function download(hash: string, groupId?: string) {
@@ -125,8 +123,7 @@ export async function checkAttachment(hash: string) {
     await checkUpload(hash, attachment.chunkSize, attachment.size);
     await db.attachments.markAsFailed(attachment.id);
   } catch (e) {
-    const reason =
-      e instanceof Error ? e.message : strings.unknownError();
+    const reason = e instanceof Error ? e.message : strings.unknownError();
     await db.attachments.markAsFailed(attachment.id, reason);
     return { failed: reason };
   }
@@ -134,9 +131,6 @@ export async function checkAttachment(hash: string) {
 }
 
 export async function previewImageAttachment(attachment: Attachment) {
-  const container = document.getElementById("dialogContainer");
-  if (!(container instanceof HTMLElement)) return;
-
   const dataurl = await downloadAttachment(
     attachment.hash,
     "base64",
@@ -146,15 +140,5 @@ export async function previewImageAttachment(attachment: Attachment) {
     return showToast("error", strings.imagePreviewFailed());
   }
 
-  ReactDOM.render(
-    <ScopedThemeProvider>
-      <Lightbox
-        image={dataurl}
-        onClose={() => {
-          ReactDOM.unmountComponentAtNode(container);
-        }}
-      />
-    </ScopedThemeProvider>,
-    container
-  );
+  Lightbox.show({ image: dataurl });
 }

@@ -17,20 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import NetworkCheckWorker from "./network-check.worker.ts?worker";
-import type { NetworkCheck as NetworkWorker } from "./network-check.worker";
-import { wrap, Remote } from "comlink";
+import { lifecycle } from "@platform";
 
 export class NetworkCheck {
-  private worker!: globalThis.Worker;
-  private network!: Remote<NetworkWorker>;
-
-  constructor() {
-    this.worker = new NetworkCheckWorker();
-    this.network = wrap<NetworkWorker>(this.worker);
-  }
-
   waitForInternet() {
-    return this.network.waitForInternet();
+    return lifecycle.waitForInternet();
   }
 }

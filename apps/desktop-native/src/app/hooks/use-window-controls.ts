@@ -16,9 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import { useEffect, useState } from "react";
-import { desktop } from "../common/desktop-bridge";
+import { environment, windowControls } from "@platform";
 import { getPlatform } from "../utils/platform";
 
 export function useWindowControls() {
@@ -26,32 +25,23 @@ export function useWindowControls() {
   const [isFullscreen, setIsFullscreen] = useState<boolean>();
 
   useEffect(() => {
-    const event = desktop?.window.onWindowStateChanged.subscribe(undefined, {
-      onData(value) {
-        setIsMaximized(value.maximized);
-        setIsFullscreen(value.fullscreen);
-      }
+    windowControls.getState().then((state) => {
+      setIsMaximized(state.maximized);
+      setIsFullscreen(state.fullscreen);
     });
-    desktop?.window.maximized.query().then((value) => setIsMaximized(value));
-    desktop?.window.fullscreen.query().then((value) => setIsFullscreen(value));
-
-    function onFullscreenChange() {
-      setIsFullscreen(!!document.fullscreenElement);
-    }
-    document.addEventListener("fullscreenchange", onFullscreenChange);
-    return () => {
-      event?.unsubscribe();
-      document.removeEventListener("fullscreenchange", onFullscreenChange);
-    };
+    return windowControls.onStateChanged((state) => {
+      setIsMaximized(state.maximized);
+      setIsFullscreen(state.fullscreen);
+    });
   }, []);
 
   return {
     isMaximized,
     isFullscreen,
     hasNativeWindowControls:
-      !IS_DESKTOP_APP ||
-      hasNativeTitlebar ||
-      getPlatform() === "darwin" ||
-      getPlatform() === "win32"
+      !environment.isDesktopApp ||
+      environment.hasNativeTitlebar ||
+      getPlatform() === "macOS" ||
+      getPlatform() === "Windows"
   };
 }

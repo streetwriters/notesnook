@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { navigate } from "../navigation";
 
 import createStore from "../common/store";
 import { db } from "../common/db";
@@ -47,7 +48,7 @@ class UserStore extends BaseStore<UserStore> {
   init = () => {
     db.eventManager.subscribe(EVENTS.userSessionExpired, async () => {
       Config.set("sessionExpired", true);
-      window.location.replace("/sessionexpired");
+      navigate("/sessionexpired", { replace: true, notify: true });
     });
 
     db.user.getUser().then((user) => {

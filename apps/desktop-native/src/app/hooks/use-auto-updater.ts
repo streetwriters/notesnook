@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment } from "@platform";
 import { useEffect } from "react";
 import { checkForUpdate } from "../utils/updater";
 import { AppEventManager, AppEvents } from "../common/app-events";
@@ -70,7 +71,7 @@ export function useAutoUpdater() {
     }
 
     function updateNotAvailable() {
-      if (IS_DESKTOP_APP) changeStatus({ type: "updated" });
+      if (environment.isDesktopApp) changeStatus({ type: "updated" });
       else changeStatus();
     }
 

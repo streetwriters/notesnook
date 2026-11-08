@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { writeText } from "clipboard-polyfill";
+import { clipboard } from "@platform";
 import { useCallback, useEffect, useState } from "react";
 
 export function useCopyToClipboard(resetAfter = 2000) {
@@ -32,7 +32,7 @@ export function useCopyToClipboard(resetAfter = 2000) {
 
   const copy = useCallback(async (text: string) => {
     try {
-      await writeText(text);
+      await clipboard.write({ "text/plain": text });
       setCopiedAt(Date.now());
     } catch (e) {
       console.error(e);

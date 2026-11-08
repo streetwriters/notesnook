@@ -17,70 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { getDefaultPresets, ToolbarGroupDefinition } from "@notesnook/editor";
-import { db } from "./db";
-import { CURRENT_TOOLBAR_VERSION, migrateToolbar } from "@notesnook/common";
-import { strings } from "@notesnook/intl";
+import { notImplemented } from "./not-implemented";
 
-const defaultPresets = getDefaultPresets();
 export type PresetId = "default" | "minimal" | "custom";
 export type Preset = {
   id: PresetId;
   title: string;
-  tools: ToolbarGroupDefinition[];
-  editable?: boolean;
-};
-const presets: Record<PresetId, Preset> = {
-  default: {
-    id: "default",
-    title: strings.default(),
-    tools: defaultPresets.default
-  },
-  minimal: {
-    id: "minimal",
-    title: strings.minimal(),
-    tools: defaultPresets.minimal
-  },
-  custom: { id: "custom", title: strings.custom(), tools: [], editable: true }
+  tools: unknown[];
+  editor?: unknown;
 };
 
-export async function getCurrentPreset() {
-  let preset = db.settings.getToolbarConfig("desktop");
-  if (!preset) return presets.default;
-  preset = await migrateToolbar("desktop", preset);
-
-  switch (preset.preset as PresetId) {
-    case "custom":
-      presets.custom.tools = preset.config || [];
-      return presets.custom;
-    case "minimal":
-      return presets.minimal;
-    default:
-    case "default":
-      return presets.default;
-  }
-}
-
-export function getAllPresets() {
-  return Object.values(presets);
-}
-
-export function getPreset(id: PresetId) {
-  return presets[id];
-}
-
-export function getPresetTools(preset: Preset) {
-  return preset.tools;
-}
-
-export async function setToolbarPreset(
-  id: PresetId,
-  tools?: ToolbarGroupDefinition[]
-) {
-  const currentPreset = await getCurrentPreset();
-  await db.settings.setToolbarConfig("desktop", {
-    version: CURRENT_TOOLBAR_VERSION,
-    preset: id,
-    config: id === "custom" ? tools : currentPreset.tools
-  });
-}
+export const getCurrentPreset: () => Promise<Preset> =
+  notImplemented("getCurrentPreset");
+export const getAllPresets: () => Preset[] = notImplemented("getAllPresets");
+export const getPreset: (id: PresetId) => Preset = notImplemented("getPreset");
+export const getPresetTools: (preset: Preset) => unknown[] =
+  notImplemented("getPresetTools");
+export const setToolbarPreset: (id: PresetId) => Promise<void> =
+  notImplemented("setToolbarPreset");

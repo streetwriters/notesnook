@@ -17,10 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { PickedFile } from "@platform";
 import { Deflate, Inflate } from "./fflate-shim";
 import {
   Entry,
   TextWriter,
+  Uint8ArrayReader,
   Uint8ArrayWriter,
   ZipReader,
   configure
@@ -28,19 +30,17 @@ import {
 
 configure({ Deflate, Inflate });
 
-export async function* createUnzipIterator(file: File) {
-  const reader = new ZipReader(file.stream());
+export async function* createUnzipIterator(file: PickedFile) {
+  const reader = new ZipReader(new Uint8ArrayReader(await file.bytes()));
   for await (const entry of reader.getEntriesGenerator()) {
     yield new ZipEntry(entry);
   }
   await reader.close();
 }
 
-export class ZipEntry extends Blob {
+export class ZipEntry {
   private ts = new TransformStream();
-  constructor(public readonly entry: Entry) {
-    super();
-  }
+  constructor(public readonly entry: Entry) {}
 
   stream(): ReadableStream<Uint8Array> {
     this.entry.getData?.(this.ts.writable);
@@ -64,14 +64,6 @@ export class ZipEntry extends Blob {
   async arrayBuffer(): Promise<ArrayBuffer> {
     const writer = new Uint8ArrayWriter();
     await this.entry.getData?.(writer);
-    return (await writer.getData()).buffer;
-  }
-
-  slice(
-    _start?: number | undefined,
-    _end?: number | undefined,
-    _contentType?: string | undefined
-  ): Blob {
-    throw new Error("Slice is not supported.");
+    return (await writer.getData()).buffer as ArrayBuffer;
   }
 }

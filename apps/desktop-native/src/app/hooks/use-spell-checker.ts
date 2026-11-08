@@ -17,11 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { desktop } from "../common/desktop-bridge";
+import { spellChecker, type Language } from "@platform";
 import BaseStore from "../stores";
 import createStore from "../common/store";
 
-export type Language = { code: string; name: string };
+export type { Language };
 
 class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
   languages: Language[] = [];
@@ -31,31 +31,30 @@ class SpellCheckerStore extends BaseStore<SpellCheckerStore> {
 
   toggleSpellChecker = async () => {
     const enabled = this.get().enabled;
-    await desktop?.spellChecker.toggle.mutate({ enabled: !enabled });
+    await spellChecker.setEnabled(!enabled);
     this.set({
       enabled: !enabled
     });
   };
 
   setLanguages = async (languages: string[]) => {
-    await desktop?.spellChecker.setLanguages.mutate(languages);
+    await spellChecker.setLanguages(languages);
     this.set({
-      enabledLanguages: await desktop?.spellChecker.enabledLanguages.query()
+      enabledLanguages: await spellChecker.getEnabledLanguages()
     });
   };
 
   refresh = async () => {
     this.set({
-      enabledLanguages:
-        (await desktop?.spellChecker.enabledLanguages.query()) || [],
-      languages: (await desktop?.spellChecker.languages.query()) || [],
-      enabled: await desktop?.spellChecker.isEnabled.query(),
-      words: (await desktop?.spellChecker.words.query()) || []
+      enabledLanguages: await spellChecker.getEnabledLanguages(),
+      languages: await spellChecker.getLanguages(),
+      enabled: await spellChecker.isEnabled(),
+      words: await spellChecker.getWords()
     });
   };
 
   deleteWord = async (word: string) => {
-    await desktop?.spellChecker.deleteWord.mutate(word);
+    await spellChecker.deleteWord(word);
     await this.get().refresh();
   };
 }

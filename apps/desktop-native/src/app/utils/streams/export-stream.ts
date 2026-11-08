@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ExportableItem } from "@notesnook/common";
 import { db } from "../../common/db";
 import { ZipFile } from "./zip-stream";
-import { streamingDecryptFile } from "../../interfaces/fs";
+import { streamingDecryptFile } from "../../common/fs";
 import { strings } from "@notesnook/intl";
 
 export class ExportStream extends TransformStream<
@@ -67,7 +67,10 @@ export class ExportStream extends TransformStream<
             });
           } catch (e) {
             if (e instanceof Error) {
-              e.message = strings.failedToExportAttachment(item.path, e.message);
+              e.message = strings.failedToExportAttachment(
+                item.path,
+                e.message
+              );
               handleError(e);
             }
           }

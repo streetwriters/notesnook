@@ -17,19 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import TaskSchedulerWorker from "./task-scheduler.worker.ts?worker";
-import type {
-  TaskScheduler as TaskSchedulerType,
-  TaskSchedulerEvent
-} from "./task-scheduler.worker";
-import { wrap, Remote } from "comlink";
+import { CronosExpression, CronosTask, validate } from "cronosjs";
 import { showToast } from "./toast";
 import { logger } from "./logger";
-import { validate } from "cronosjs";
 import { strings } from "@notesnook/intl";
 
-let worker: globalThis.Worker | undefined;
-let scheduler: Remote<TaskSchedulerType> | undefined;
+const tasks = new Map<string, CronosTask>();
 
 export class TaskScheduler {
   static async register(id: string, time: string, action: () => void) {
@@ -38,24 +31,14 @@ export class TaskScheduler {
       return;
     }
 
-    init();
-
-    worker?.addEventListener("message", function handler(ev) {
-      const { data } = ev as MessageEvent<TaskSchedulerEvent>;
-      if (data.id !== id) return;
-
-      switch (data.type) {
-        case "task-run":
-          action();
-          break;
-        case "task-stop":
-        case "task-end":
-          worker?.removeEventListener("message", handler);
-          break;
-      }
-    });
     try {
-      await scheduler?.registerTask(id, time);
+      TaskScheduler.stopSync(id);
+      const task = new CronosTask(
+        CronosExpression.parse(time, { strict: true })
+      );
+      task.on("run", action);
+      task.start();
+      tasks.set(id, task);
     } catch (e) {
       showToast(
         "error",
@@ -66,23 +49,21 @@ export class TaskScheduler {
     }
   }
 
+  private static stopSync(id: string) {
+    tasks.get(id)?.stop();
+    tasks.delete(id);
+  }
+
   static async stop(id: string) {
-    await scheduler?.stop(id);
+    TaskScheduler.stopSync(id);
   }
 
   static async stopAll() {
-    await scheduler?.stopAll();
-    worker?.terminate();
+    for (const id of [...tasks.keys()]) TaskScheduler.stopSync(id);
   }
 
   static async stopAllWithPrefix(prefix: string) {
-    await scheduler?.stopAllWithPrefix(prefix);
+    for (const id of [...tasks.keys()])
+      if (id.startsWith(prefix)) TaskScheduler.stopSync(id);
   }
-}
-
-function init() {
-  if (worker) return;
-
-  worker = new TaskSchedulerWorker();
-  if (worker) scheduler = wrap<TaskSchedulerType>(worker);
 }

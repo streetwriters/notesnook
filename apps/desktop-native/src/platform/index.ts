@@ -17,4 +17,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export {};
+import type { AttachmentFiles } from "./fs";
+import type { Clipboard } from "./clipboard";
+import type { Compression } from "./compression";
+import type { Config } from "./storage";
+import type { Crypto } from "./crypto";
+import type { DatabaseHost } from "./database";
+import type { Environment } from "./environment";
+import type { Files } from "./files";
+import type { Integration } from "./integration";
+import type { Keyboard } from "./keyboard";
+import type { Lifecycle } from "./lifecycle";
+import type { Notifications } from "./notifications";
+import type { Shell } from "./shell";
+import type { SpellChecker } from "./spell-checker";
+import type { Updater } from "./updater";
+import type { WindowControls } from "./window";
+
+export type * from "./clipboard";
+export type * from "./compression";
+export type * from "./crypto";
+export type * from "./database";
+export type * from "./environment";
+export type * from "./files";
+export type * from "./fs";
+export type * from "./integration";
+export type * from "./keyboard";
+export type * from "./lifecycle";
+export type * from "./notifications";
+export type * from "./shell";
+export type * from "./spell-checker";
+export type * from "./storage";
+export type * from "./updater";
+export type * from "./window";
+
+export declare const attachmentFiles: AttachmentFiles;
+export declare const clipboard: Clipboard;
+export declare const compression: Compression;
+export declare const config: Config;
+export declare const crypto: Crypto;
+export declare const databaseHost: DatabaseHost;
+export declare const environment: Environment;
+export declare const files: Files;
+export declare const integration: Integration;
+export declare const keyboard: Keyboard;
+export declare const lifecycle: Lifecycle;
+export declare const notifications: Notifications;
+export declare const shell: Shell;
+export declare const spellChecker: SpellChecker;
+export declare const updater: Updater;
+export declare const windowControls: WindowControls;

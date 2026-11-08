@@ -19,27 +19,89 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useState } from "react";
 import { EventManager } from "@notesnook/core";
+import { windowControls } from "@platform";
 import Config from "../utils/config";
 import type { HashRoute } from "./hash-routes";
 import type { ReplaceParametersInPath } from "./types";
 import { HomePage } from "../stores/setting-store";
+
+type HistoryEntry = {
+  path: string;
+  hash: string;
+  search: string;
+  state: { replace?: boolean } | null;
+};
+
+const entries: HistoryEntry[] = [
+  { path: "/", hash: "", search: "", state: null }
+];
+let index = 0;
+
+function current() {
+  return entries[index];
+}
+
+function pushEntry(entry: HistoryEntry) {
+  entries.splice(index + 1);
+  entries.push(entry);
+  index = entries.length - 1;
+}
+
+export const navigationHistory = {
+  get state() {
+    return current().state;
+  },
+  back() {
+    if (index <= 0) return;
+    index--;
+    NavigationEvents.publish("hashchange", { notify: true });
+  }
+};
+
+export function encodeQuery(query: Record<string, string>) {
+  return Object.entries(query)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join("&");
+}
+
+export function decodeQuery(querystring: string) {
+  const result: Record<string, string> = {};
+  for (const pair of querystring.replace(/^\?/, "").split("&")) {
+    if (!pair) continue;
+    const separator = pair.indexOf("=");
+    const key = separator < 0 ? pair : pair.slice(0, separator);
+    const value = separator < 0 ? "" : pair.slice(separator + 1);
+    result[decodeURIComponent(key)] = decodeURIComponent(value);
+  }
+  return result;
+}
 
 export function navigate(
   url: string,
   options: {
     notify?: boolean;
     replace?: boolean;
-    query?: URLSearchParams;
+    query?: Record<string, string>;
   } = {}
 ) {
   const { notify, query, replace } = options;
-  if (query !== null && typeof query === "object")
-    url += "?" + query.toString();
-  if (replace)
-    window.history.replaceState(null, "", makeURL(url, getCurrentHash()));
-  else window.history.pushState(null, "", makeURL(url, getCurrentHash()));
+  const separator = url.indexOf("?");
+  const path = separator < 0 ? url : url.slice(0, separator);
+  let search = separator < 0 ? current().search : url.slice(separator);
+  if (query) search = `?${encodeQuery(query)}`;
+  const entry: HistoryEntry = {
+    path,
+    hash: current().hash,
+    search,
+    state: null
+  };
+  if (replace) entries[index] = entry;
+  else pushEntry(entry);
 
-  if (notify) dispatchEvent(new PopStateEvent("popstate"));
+  if (notify) NavigationEvents.publish("popstate");
 }
 
 type HashNavigateOptions = {
@@ -57,12 +119,16 @@ export function hashNavigate<TPath extends HashRoute>(
   let url: string = path;
   if (addNonce) url += `/${++lastNonce}`;
 
-  if (replace) window.history.replaceState({ replace }, "", `#${url}`);
-  else window.history.pushState({ replace }, "", `#${url}`);
+  const entry: HistoryEntry = {
+    path: current().path,
+    hash: `#${url}`,
+    search: current().search,
+    state: { replace }
+  };
+  if (replace) entries[index] = entry;
+  else pushEntry(entry);
 
-  const event = new HashChangeEvent("hashchange");
-  (event as any).notify = notify;
-  dispatchEvent(event);
+  NavigationEvents.publish("hashchange", { notify });
 }
 
 export function useQueryParams(parseFn = parseQuery) {
@@ -71,11 +137,11 @@ export function useQueryParams(parseFn = parseQuery) {
 }
 
 function parseQuery(querystring: string): Partial<Record<string, string>> {
-  return Object.fromEntries(new URLSearchParams(querystring).entries());
+  return decodeQuery(querystring);
 }
 
 export function getQueryString() {
-  return window.location.search;
+  return current().search;
 }
 
 export function getQueryParams() {
@@ -85,11 +151,11 @@ export function getQueryParams() {
 }
 
 export function getCurrentPath() {
-  return window.location.pathname || "/";
+  return current().path || "/";
 }
 
 export function getCurrentHash() {
-  return window.location.hash;
+  return current().hash;
 }
 
 export const NavigationEvents = new EventManager();
@@ -117,12 +183,9 @@ export function extendHomeRoute(route: string) {
 }
 
 export function hardNavigate(route: string, search?: string) {
-  window.open(makeURL(route, getCurrentHash(), search), "_self");
-}
-
-export function makeURL(route: string, hash?: string, search?: string) {
-  const url = new URL(route, window.location.origin);
-  if (!url.hash) url.hash = hash || getCurrentHash();
-  url.search = search || getQueryString();
-  return url;
+  navigate(route, {
+    replace: true,
+    query: search ? decodeQuery(search) : undefined
+  });
+  windowControls.reload();
 }

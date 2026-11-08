@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { crypto } from "@platform";
+
 export function generatePassword() {
-  return window.crypto
+  return crypto
     .getRandomValues(new BigUint64Array(4))
     .reduce((prev, curr, index) => {
       const char =
@@ -26,6 +28,6 @@ export function generatePassword() {
       return prev + char;
     }, "")
     .split("")
-    .sort(() => 128 - window.crypto.getRandomValues(new Uint8Array(1))[0])
+    .sort(() => 128 - crypto.getRandomValues(new Uint8Array(1))[0])
     .join("");
 }

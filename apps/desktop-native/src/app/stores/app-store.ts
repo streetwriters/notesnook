@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { lifecycle } from "@platform";
 
 import createStore from "../common/store";
 import { db } from "../common/db";
@@ -73,7 +74,7 @@ class AppStore extends BaseStore<AppStore> {
   isSyncEnabled = Config.get("syncEnabled", true);
   isRealtimeSyncEnabled = Config.get("isRealtimeSyncEnabled", true);
   syncStatus: SyncStatus = {
-    key: navigator.onLine ? "disabled" : "offline",
+    key: lifecycle.isOnline() ? "disabled" : "offline",
     progress: null,
     type: undefined
   };
@@ -203,7 +204,7 @@ class AppStore extends BaseStore<AppStore> {
 
   toggleFocusMode = () => {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
-    if (document.fullscreenElement) exitFullscreen();
+    exitFullscreen();
     const session = useEditorStore.getState().getActiveSession();
     const editor = session && useEditorManager.getState().getEditor(session.id);
     if (editor) editor.editor?.focus();
@@ -304,7 +305,7 @@ class AppStore extends BaseStore<AppStore> {
         options,
         syncing: this.isSyncing(),
         syncDisabled: !this.get().isSyncEnabled,
-        offline: !navigator.onLine
+        offline: !lifecycle.isOnline()
       });
       if (this.isSyncing()) pendingSync = options;
       return;
@@ -348,7 +349,7 @@ class AppStore extends BaseStore<AppStore> {
         if (
           err?.message?.indexOf("Failed to fetch") > -1 ||
           err?.message?.indexOf("Could not connect to the Sync server.") > -1 ||
-          !navigator.onLine ||
+          !lifecycle.isOnline() ||
           !(await networkCheck.waitForInternet())
         )
           return;

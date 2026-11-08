@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment } from "@platform";
 import Config from "../utils/config";
 import { createBackup, verifyAccount } from "./index";
 import { db } from "./db";
@@ -199,9 +200,9 @@ function isIgnored(key: keyof typeof NoticesData) {
 
 let openedToast: { hide: () => void } | null = null;
 async function saveBackup(mode: "full" | "partial" = "partial") {
-  if (IS_TESTING) return;
+  if (environment.isTesting) return;
 
-  if (IS_DESKTOP_APP) {
+  if (environment.isDesktopApp) {
     await createBackup({ noVerify: true, mode, background: true });
   } else {
     if (openedToast !== null) return;

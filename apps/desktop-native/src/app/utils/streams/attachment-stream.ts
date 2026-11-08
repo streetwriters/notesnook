@@ -23,7 +23,7 @@ import { showToast } from "../toast";
 import { makeUniqueFilename } from "./utils";
 import { ZipFile } from "./zip-stream";
 import { logger } from "../logger";
-import { decryptFile } from "../../interfaces/fs";
+import { decryptFile } from "../../common/fs";
 
 export const METADATA_FILENAME = "metadata.json";
 const GROUP_ID = "all-attachments";
@@ -80,7 +80,7 @@ export class AttachmentStream extends ReadableStream<ZipFile> {
                   : attachment.filename;
               controller.enqueue({
                 path: makeUniqueFilename(filePath, counters),
-                data: new Uint8Array(await file.arrayBuffer())
+                data: file
               });
             } else {
               throw new Error(

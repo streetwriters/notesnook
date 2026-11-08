@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useLocation } from "wouter";
 import makeMatcher from "wouter/matcher";
-import { navigate, getHomeRoute } from "../navigation";
+import { navigate } from "../navigation";
 import { Params, RouteResult, Routes } from "../navigation/types";
 import { useEffect, useState } from "react";
 

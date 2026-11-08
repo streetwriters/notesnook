@@ -18,22 +18,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState, useEffect } from "react";
-import { hashNavigate } from "../navigation";
+import {
+  decodeQuery,
+  getCurrentHash,
+  hashNavigate,
+  NavigationEvents
+} from "../navigation";
 
 // returns the current hash location in a normalized form
 // (excluding the leading '#' symbol)
 const currentLocation = () => {
-  const location = window.location.hash.replace(/^#/, "") || "/";
-  let end: number | undefined = location.indexOf("?");
-  if (end <= -1) end = undefined;
-  return location.substring(0, end);
+  const location = getCurrentHash().replace(/^#/, "") || "/";
+  const end = location.indexOf("?");
+  return end <= -1 ? location : location.substring(0, end);
 };
 
 const currentQuery = () => {
-  const location = window.location.hash.replace(/^#/, "") || "/";
-  return Object.fromEntries(
-    new URLSearchParams(location.substring(location.indexOf("?"))).entries()
-  );
+  const location = getCurrentHash().replace(/^#/, "") || "/";
+  const start = location.indexOf("?");
+  return start <= -1 ? {} : decodeQuery(location.substring(start));
 };
 
 type HashLocation = { location: string; update: boolean };
@@ -45,21 +48,20 @@ export default function useHashLocation() {
   const [queryParams, setQueryParams] = useState(currentQuery());
 
   useEffect(() => {
-    // this function is called whenever the hash changes
-    const handler = (e: HashChangeEvent) => {
-      const event = e as HashChangeEvent & { notify: boolean };
-
-      const update = event.notify === undefined ? true : event.notify;
-      setLoc({
-        location: currentLocation(),
-        update
-      });
-      setQueryParams(currentQuery());
+    const subscription = NavigationEvents.subscribe(
+      "hashchange",
+      (event: { notify?: boolean }) => {
+        const update = event.notify === undefined ? true : event.notify;
+        setLoc({
+          location: currentLocation(),
+          update
+        });
+        setQueryParams(currentQuery());
+      }
+    );
+    return () => {
+      subscription.unsubscribe();
     };
-
-    // subscribe to hash changes
-    window.addEventListener("hashchange", handler);
-    return () => window.removeEventListener("hashchange", handler);
   }, []);
   return [loc, queryParams, hashNavigate] as const;
 }

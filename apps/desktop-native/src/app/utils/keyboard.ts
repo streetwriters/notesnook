@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { EventManager } from "@notesnook/core";
+import { keyboard } from "@platform";
 
 const KeyboardEventManager = new EventManager();
 
@@ -29,12 +30,8 @@ const GlobalKeyboard = {
     KeyboardEventManager.unsubscribe(name, handler)
 };
 
-// window.addEventListener("keydown", (e) => {
-//   // KeyboardEventManager.publish("keydown", e);
-// });
-
-window.addEventListener("keyup", (e) => {
-  KeyboardEventManager.publish("keyup", e);
+keyboard.onKeyUp((event) => {
+  KeyboardEventManager.publish("keyup", event);
 });
 
 export { GlobalKeyboard, KeyboardEventManager };

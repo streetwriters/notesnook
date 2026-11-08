@@ -16,25 +16,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import { useEffect, useState } from "react";
+import { lifecycle } from "@platform";
 
 export function useWindowFocus() {
   const [isFocused, setIsFocused] = useState<boolean>(true);
 
   useEffect(() => {
-    function onFocus() {
-      setIsFocused(true);
-    }
-    function onBlur() {
-      setIsFocused(false);
-    }
-    window.addEventListener("focus", onFocus);
-    window.addEventListener("blur", onBlur);
-    return () => {
-      document.removeEventListener("focus", onFocus);
-      document.removeEventListener("blur", onBlur);
-    };
+    return lifecycle.onVisibilityChanged((status) => {
+      if (status === "focus") setIsFocused(true);
+      else if (status === "blur") setIsFocused(false);
+    });
   }, []);
 
   return {

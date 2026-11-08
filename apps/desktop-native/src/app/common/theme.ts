@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ThemeDefinition } from "@notesnook/theme";
-
 export const THEME_LIGHT: any = {
   $schema:
     "https://raw.githubusercontent.com/streetwriters/notesnook-themes/main/schemas/v1.schema.json",

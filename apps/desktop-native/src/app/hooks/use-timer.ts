@@ -23,7 +23,7 @@ import { useSessionState } from "./use-session-state";
 export function useTimer(id: string, duration: number) {
   const [seconds, setSeconds] = useSessionState(id, duration);
   const [enabled, setEnabled] = useSessionState(`${id}.canSendAgain`, true);
-  const interval = useRef<number>();
+  const interval = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (!enabled) {

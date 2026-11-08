@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { createPickedFile } from "./picked-file";
 
 import {
   ContentType,
@@ -25,7 +26,7 @@ import {
 import { Notebook as NotebookType } from "@notesnook/core";
 import { SerializedKey } from "@notesnook/crypto";
 import { db } from "../common/db";
-import { writeEncryptedFile } from "../interfaces/fs";
+import { writeEncryptedFile } from "../common/fs";
 
 type EncryptedAttachmentFields = Awaited<
   ReturnType<typeof writeEncryptedFile>
@@ -73,9 +74,7 @@ async function processAttachments(attachments: Note["attachments"]) {
     const exists = await db.attachments?.exists(hash);
     if (exists) continue;
 
-    const file = new File([data], filename, {
-      type: "application/octet-stream"
-    });
+    const file = createPickedFile(data, filename, "application/octet-stream");
     const key = await db.attachments?.generateKey();
     const cipherData = await writeEncryptedFile(file, key, hash);
     map[hash] = { ...cipherData, key };

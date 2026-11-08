@@ -20,14 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
-import { desktop } from "../common/desktop-bridge";
-import {
-  THEME_COMPATIBILITY_VERSION,
-  ThemeDark,
-  ThemeDefinition,
-  ThemeLight
-} from "@notesnook/theme";
-import { ThemesRouter } from "../common/themes-router";
+import { integration } from "@platform";
+import { ThemeDark, ThemeDefinition, ThemeLight } from "@notesnook/theme";
 import { THEME_DARK, THEME_LIGHT } from "../common/theme";
 
 type ColorScheme = "dark" | "light";
@@ -80,7 +74,7 @@ class ThemeStore extends BaseStore<ThemeStore> {
   setFollowSystemTheme = async (followSystemTheme: boolean) => {
     this.set({ followSystemTheme });
     Config.set("followSystemTheme", followSystemTheme);
-    await desktop?.integration.changeTheme.mutate({
+    await integration.changeTheme({
       theme: followSystemTheme ? "system" : this.get().colorScheme
     });
   };
@@ -127,7 +121,7 @@ async function updateTheme(theme: ThemeDefinition) {
 }
 
 function changeDesktopTheme(theme: ThemeDefinition, system: boolean) {
-  return desktop?.integration.changeTheme.mutate({
+  return integration.changeTheme({
     theme: system ? "system" : theme.colorScheme,
     backgroundColor: theme.scopes.base.primary.background,
     windowControlsIconColor: theme.scopes.base.primary.icon

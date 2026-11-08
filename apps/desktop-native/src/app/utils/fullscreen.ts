@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { windowControls } from "@platform";
+
 export function exitFullscreen() {
-  if (!document.fullscreenElement) return;
-  document.exitFullscreen();
+  if (!windowControls.isFullscreen()) return;
+  windowControls.exitFullscreen();
 }

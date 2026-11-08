@@ -17,9 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DesktopIntegration, PATHS } from "@notesnook/desktop";
+import {
+  integration,
+  updater,
+  environment,
+  type DesktopIntegration
+} from "@platform";
 import { db } from "../common/db";
-import { desktop } from "../common/desktop-bridge";
 import createStore from "../common/store";
 import Config from "../utils/config";
 import BaseStore from "./index";
@@ -27,7 +31,6 @@ import { TimeFormat, DayFormat, WeekFormat, EVENTS } from "@notesnook/core";
 import { Profile, TrashCleanupInterval } from "@notesnook/core";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "../dialogs/confirm";
-import * as openpgp from "openpgp";
 import { InboxPGPKeysDialog } from "../dialogs/inbox-pgp-keys-dialog";
 import { strings } from "@notesnook/intl";
 
@@ -54,7 +57,7 @@ class SettingStore extends BaseStore<SettingStore> {
   encryptBackups = Config.get("encryptBackups", false);
   backupReminderOffset = Config.get("backupReminderOffset", 0);
   fullBackupReminderOffset = Config.get("fullBackupReminderOffset", 0);
-  backupStorageLocation = PATHS.backupsDirectory;
+  backupStorageLocation = environment.backupsDirectory;
   doubleSpacedParagraphs = Config.get("doubleSpacedLines", true);
   markdownShortcuts = Config.get("markdownShortcuts", false);
   fontLigatures = Config.get("fontLigatures", false);
@@ -123,18 +126,17 @@ class SettingStore extends BaseStore<SettingStore> {
       trashCleanupInterval: db.settings.getTrashCleanupInterval(),
       profile: db.settings.getProfile(),
       appLanguage: Config.get<string>("appLanguage", ""),
-      isFlatpak: await desktop?.integration.isFlatpak.query(),
-      isSnap: await desktop?.integration.isSnap.query(),
-      isPortable: await desktop?.integration.isPortable.query(),
-      desktopIntegrationSettings:
-        await desktop?.integration.desktopIntegration.query(),
-      privacyMode: await desktop?.integration.privacyMode.query(),
-      customDns: await desktop?.integration.customDns.query(),
-      zoomFactor: await desktop?.integration.zoomFactor.query(),
-      autoUpdates: await desktop?.updater.autoUpdates.query(),
-      proxyRules: await desktop?.integration.proxyRules.query(),
+      isFlatpak: await integration.isFlatpak(),
+      isSnap: await integration.isSnap(),
+      isPortable: await integration.isPortable(),
+      desktopIntegrationSettings: await integration.getDesktopIntegration(),
+      privacyMode: await integration.getPrivacyMode(),
+      customDns: await integration.getCustomDns(),
+      zoomFactor: await integration.getZoomFactor(),
+      autoUpdates: await updater.getAutoUpdates(),
+      proxyRules: await integration.getProxyRules(),
       isInboxEnabled: await db.user.hasInboxKeys(),
-      backupStorageLocation: await desktop?.integration.backupDirectory.query()
+      backupStorageLocation: await integration.getBackupDirectory()
     });
     await this.refreshBackupTime();
   };
@@ -172,12 +174,12 @@ class SettingStore extends BaseStore<SettingStore> {
   };
 
   setZoomFactor = async (zoomFactor: number) => {
-    await desktop?.integration.setZoomFactor.mutate(zoomFactor);
+    await integration.setZoomFactor(zoomFactor);
     this.set({ zoomFactor });
   };
 
   setProxyRules = async (proxyRules: string) => {
-    await desktop?.integration.setProxyRules.mutate(proxyRules);
+    await integration.setProxyRules(proxyRules);
     this.set({ proxyRules });
   };
 
@@ -215,13 +217,12 @@ class SettingStore extends BaseStore<SettingStore> {
   setDesktopIntegration = async (settings: DesktopIntegration) => {
     const { desktopIntegrationSettings } = this.get();
 
-    await desktop?.integration.setDesktopIntegration.mutate({
+    await integration.setDesktopIntegration({
       ...desktopIntegrationSettings,
       ...settings
     });
     this.set({
-      desktopIntegrationSettings:
-        await desktop?.integration.desktopIntegration.query()
+      desktopIntegrationSettings: await integration.getDesktopIntegration()
     });
   };
 
@@ -272,13 +273,13 @@ class SettingStore extends BaseStore<SettingStore> {
   togglePrivacyMode = async () => {
     const privacyMode = this.get().privacyMode;
     this.set({ privacyMode: !privacyMode });
-    await desktop?.integration.setPrivacyMode.mutate({ enabled: !privacyMode });
+    await integration.setPrivacyMode(!privacyMode);
   };
 
   toggleCustomDns = async () => {
     const customDns = this.get().customDns;
     this.set({ customDns: !customDns });
-    await desktop?.integration.setCustomDns.mutate(!customDns);
+    await integration.setCustomDns(!customDns);
   };
 
   toggleHideTitle = async () => {
@@ -290,7 +291,7 @@ class SettingStore extends BaseStore<SettingStore> {
   toggleAutoUpdates = async () => {
     const autoUpdates = this.get().autoUpdates;
     this.set({ autoUpdates: !autoUpdates });
-    await desktop?.updater.toggleAutoUpdates.mutate({ enabled: !autoUpdates });
+    await updater.setAutoUpdates(!autoUpdates);
   };
 
   toggleFullOfflineMode = (toggleState?: boolean) => {

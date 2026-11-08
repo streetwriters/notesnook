@@ -17,15 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment } from "@platform";
 import Config from "../utils/config";
 import { initLocale as initIntlLocale } from "@notesnook/intl";
 
 export async function initLocale() {
-  const desktopLocale =
-    typeof window.appLocale === "function" ? window.appLocale() : undefined;
-  const navLang =
-    desktopLocale ||
-    (typeof navigator !== "undefined" ? navigator.language : undefined);
+  const navLang = environment.locale;
 
   return initIntlLocale({
     getSavedLocale: () => Config.get<string>("appLanguage", ""),

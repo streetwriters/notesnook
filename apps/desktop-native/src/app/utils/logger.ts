@@ -20,39 +20,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { initialize, logger as _logger, logManager } from "@notesnook/core";
 import { LogMessage, NoopLogger, format } from "@notesnook/logger";
 import { ZipFile } from "./streams/zip-stream";
-import { createWriteStream } from "./stream-saver";
 import { sanitizeFilename } from "@notesnook/common";
-import { createDialect } from "../common/sqlite";
-import { isFeatureSupported } from "./feature-check";
+import { databaseHost, environment, files } from "@platform";
 
 let logger: typeof _logger = new NoopLogger();
 async function initializeLogger() {
-  const multiTab = !!globalThis.SharedWorker && isFeatureSupported("opfs");
   await initialize(
     {
-      dialect: (name, init) =>
-        createDialect({
+      dialect: (name) =>
+        databaseHost.createDialect({
           name,
-          init,
-          async: !isFeatureSupported("opfs"),
-          multiTab,
           encrypted: false
         }),
-      ...(IS_DESKTOP_APP || isFeatureSupported("opfs")
-        ? { journalMode: "WAL", lockingMode: "exclusive" }
-        : {
-            journalMode: "MEMORY",
-            lockingMode: "exclusive"
-          }),
+      journalMode: databaseHost.journalMode,
+      lockingMode: databaseHost.lockingMode,
       tempStore: "memory",
       synchronous: "normal",
       pageSize: 8192,
       cacheSize: -32000,
-      skipInitialization: !IS_DESKTOP_APP && multiTab
+      skipInitialization: false
     },
     false
   );
-  logger = _logger.scope("notesnook-web");
+  logger = _logger.scope(`notesnook-${environment.platform}`);
 }
 
 async function downloadLogs() {
@@ -61,6 +51,7 @@ async function downloadLogs() {
   const allLogs = await logManager.get();
   let i = 0;
   const textEncoder = new TextEncoder();
+  const file = await files.create("notesnook-logs.zip");
   await new ReadableStream<ZipFile>({
     pull(controller) {
       const log = allLogs[i++];
@@ -77,7 +68,13 @@ async function downloadLogs() {
     }
   })
     .pipeThrough(createZipStream())
-    .pipeTo(await createWriteStream("notesnook-logs.zip"));
+    .pipeTo(
+      new WritableStream<Uint8Array>({
+        write: (chunk) => file.write(chunk),
+        close: () => file.close(),
+        abort: () => file.abort()
+      })
+    );
 }
 
 async function clearLogs() {

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment } from "@platform";
 import { create } from "zustand";
 import {
   subscribeWithSelector,
@@ -40,7 +41,7 @@ export function createStore<T>(
           return store;
         },
         {
-          strict: import.meta.env.DEV,
+          strict: environment.isDev,
           mark: (target, { mutable, immutable }) => {
             if (!target || typeof target !== "object") return mutable;
             return immutable;
@@ -72,7 +73,7 @@ export function createPersistedStore<T extends object>(
             return store;
           },
           {
-            strict: import.meta.env.DEV,
+            strict: environment.isDev,
             mark: (target, { mutable, immutable }) => {
               if (!target || typeof target !== "object") return mutable;
               return immutable;

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { hashNavigate } from ".";
+import { hashNavigate, navigationHistory } from ".";
 import { defineHashRoutes } from "./types";
 import {
   AddNotebookDialog,
@@ -82,5 +82,5 @@ export type HashRoute = keyof typeof hashroutes;
 
 function afterAction() {
   hashNavigate("/", { replace: true, notify: false });
-  if (!history.state.replace) history.back();
+  if (!navigationHistory.state?.replace) navigationHistory.back();
 }

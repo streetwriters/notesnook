@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { databaseHost, environment, type PickedFile } from "@platform";
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash, navigate } from "../navigation";
 import { db } from "./db";
@@ -44,7 +45,7 @@ import {
   createInternalLink,
   parseInternalLink
 } from "@notesnook/core";
-import { createWritableStream } from "./desktop-bridge";
+import { createWritableStream } from "../utils/stream-saver";
 import { FeatureDialog, FeatureKeys } from "../dialogs/feature-dialog";
 import { User } from "@notesnook/core";
 import { LegacyBackupFile } from "@notesnook/core";
@@ -56,16 +57,15 @@ import { Cipher, SerializedKey } from "@notesnook/crypto";
 import { ChunkedStream } from "../utils/streams/chunked-stream";
 import { isFeatureSupported } from "../utils/feature-check";
 import { strings } from "@notesnook/intl";
-import { ABYTES, streamablefs } from "../interfaces/fs";
+import { ABYTES, streamablefs } from "./fs";
 import { type ZipEntry } from "../utils/streams/unzip-stream";
 import { ZipFile } from "../utils/streams/zip-stream";
 import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { House } from "../components/icons";
-import { MenuItem } from "@notesnook/ui";
+import type { MenuItem } from "@ui";
 import { showFeatureNotAllowedToast } from "./toasts";
 import { UpgradeDialog } from "../dialogs/buy-dialog/upgrade-dialog";
 import { setToolbarPreset } from "./toolbar-config";
-import { useKeyStore } from "../interfaces/key-store";
 import { TaskScheduler } from "../utils/task-scheduler";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
 import { writeToClipboard } from "../utils/clipboard";
@@ -92,7 +92,7 @@ export const CREATE_BUTTON_MAP = {
 
 export async function introduceFeatures() {
   const hash = getCurrentHash().replace("#", "");
-  if (!!hash || IS_TESTING) return;
+  if (!!hash || environment.isTesting) return;
   const features: FeatureKeys[] = [];
   for (const feature of features) {
     if (!Config.get(`feature:${feature}`)) {
@@ -196,7 +196,7 @@ export async function createBackup(
     const backupDirectory = useSettingStore.getState().backupStorageLocation;
     showToast(
       "success",
-      IS_DESKTOP_APP
+      environment.isDesktopApp
         ? `${strings.backupSavedAt(path.join(backupDirectory, filePath))}`
         : strings.backupSuccess()
     );
@@ -221,7 +221,7 @@ export async function importBackup() {
   return true;
 }
 
-export async function restoreBackupFile(backupFile: File) {
+export async function restoreBackupFile(backupFile: PickedFile) {
   const isLegacy = !backupFile.name.endsWith(".nnbackupz");
 
   if (isLegacy) {
@@ -561,7 +561,7 @@ export async function resetFeatures() {
     "defaultNotebookAndTag"
   ]);
   if (!features.appLock.isAllowed) {
-    await useKeyStore.getState().disable();
+    await databaseHost.disableAppLock();
   }
 
   if (!features.customHomepage.isAllowed)

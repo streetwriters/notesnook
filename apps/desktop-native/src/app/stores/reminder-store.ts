@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment, notifications, windowControls } from "@platform";
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import { TaskScheduler } from "../utils/task-scheduler";
 import dayjs from "dayjs";
 import Config from "../utils/config";
-import { desktop } from "../common/desktop-bridge";
 import {
   Reminder,
   VirtualizedGrouping,
@@ -63,10 +63,7 @@ export { useStore, store };
 async function resetReminders(reminders: FilteredSelector<Reminder>) {
   await TaskScheduler.stopAllWithPrefix("reminder:");
 
-  if (
-    !IS_TESTING &&
-    (!("Notification" in window) || Notification.permission !== "granted")
-  )
+  if (!environment.isTesting && !(await notifications.isPermissionGranted()))
     return;
 
   for await (const reminder of reminders.iterate()) {
@@ -97,44 +94,23 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
   return TaskScheduler.register(`reminder:${id}`, cron, async () => {
     if (!Config.get("reminderNotifications", true)) return;
 
-    if (IS_TESTING) {
-      window.confirm("Reminder activated!");
-      return;
-    }
+    const shown = await notifications.show({
+      title: reminder.title,
+      body: reminder.description ?? "",
+      silent: reminder.priority === "silent",
+      timeoutType: reminder.priority === "urgent" ? "never" : "default",
+      urgency:
+        reminder.priority === "urgent"
+          ? "critical"
+          : reminder.priority === "vibrate"
+          ? "normal"
+          : "low",
+      tag: id
+    });
 
-    if (IS_DESKTOP_APP) {
-      const tag = await desktop?.integration.showNotification.query({
-        title: reminder.title,
-        body: reminder.description ?? "",
-        silent: reminder.priority === "silent",
-        timeoutType: reminder.priority === "urgent" ? "never" : "default",
-        urgency:
-          reminder.priority === "urgent"
-            ? "critical"
-            : reminder.priority === "vibrate"
-            ? "normal"
-            : "low",
-        tag: id
-      });
-
-      if (tag) {
-        await desktop?.integration.bringToFront.query();
-        await ReminderPreviewDialog.show({ reminder });
-      }
-    } else {
-      const notification = new Notification(reminder.title, {
-        body: reminder.description,
-        // vibrate: reminder.priority === "vibrate" ? 200 : undefined,
-        silent: reminder.priority === "silent",
-        tag: id,
-        // renotify: true,
-        requireInteraction: true
-      });
-
-      notification.onclick = function () {
-        window.focus();
-        ReminderPreviewDialog.show({ reminder });
-      };
+    if (shown) {
+      windowControls.focus();
+      await ReminderPreviewDialog.show({ reminder });
     }
 
     store.refresh(false);

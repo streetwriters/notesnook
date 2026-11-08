@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { shell } from "@platform";
 import { useEffect, useRef, useState } from "react";
 import { CREATE_BUTTON_MAP } from "../common";
 import { ArrowTopRight, Icon, Plus } from "../components/icons";
@@ -74,7 +75,9 @@ export class TipManager {
       Config.set("tipState", tipState);
     }
 
-    const tipsForCtx = getTips().filter((tip) => tip.contexts.indexOf(context) > -1);
+    const tipsForCtx = getTips().filter(
+      (tip) => tip.contexts.indexOf(context) > -1
+    );
     return tipsForCtx.sample();
   }
 }
@@ -110,8 +113,7 @@ export const useTip = (
   const text =
     typeof activeTip.text === "function" ? activeTip.text() : activeTip.text;
   const titleSource = defaultTip?.title || tip?.title;
-  const title =
-    typeof titleSource === "function" ? titleSource() : titleSource;
+  const title = typeof titleSource === "function" ? titleSource() : titleSource;
   const button = defaultTip?.button || tip?.button;
 
   return { title, text, button };
@@ -133,9 +135,8 @@ const getDefaultTips = (): Record<
       title: strings.whatAreMonographs(),
       icon: ArrowTopRight,
       onClick() {
-        window.open(
-          "https://notesnook.com/help/publish-notes-with-monographs",
-          "_blank"
+        shell.openUrl(
+          "https://notesnook.com/help/publish-notes-with-monographs"
         );
       }
     }

@@ -17,12 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { environment, windowControls } from "@platform";
+
 export const setDocumentTitle = (title?: string) => {
-  if (!title) document.title = APP_TITLE;
-  else document.title = `${title} - ${APP_TITLE}`;
+  if (!title) windowControls.setTitle(environment.appTitle);
+  else windowControls.setTitle(`${title} - ${environment.appTitle}`);
 };
 
 export const getDocumentTitle = () => {
-  if (document.title === APP_TITLE) return "";
-  return document.title.replace(` - ${APP_TITLE}`, "");
+  const title = windowControls.getTitle();
+  if (title === environment.appTitle) return "";
+  return title.replace(` - ${environment.appTitle}`, "");
 };
