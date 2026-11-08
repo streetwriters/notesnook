@@ -26,7 +26,9 @@ import { databaseHost } from "./database";
 import { environment } from "./environment";
 import { files } from "./files";
 import { history } from "./history";
+import { integration } from "./integration";
 import { lifecycle } from "./lifecycle";
+import { updater } from "./updater";
 import { windowControls } from "./window";
 
 export {
@@ -37,21 +39,21 @@ export {
   environment,
   files,
   history,
+  integration,
   lifecycle,
+  updater,
   windowControls
 };
 
 export const attachmentFiles =
   unimplemented<Contract.AttachmentFiles>("attachmentFiles");
 export const clipboard = unimplemented<Contract.Clipboard>("clipboard");
-export const integration = unimplemented<Contract.Integration>("integration");
 export const keyboard = unimplemented<Contract.Keyboard>("keyboard");
 export const notifications =
   unimplemented<Contract.Notifications>("notifications");
 export const shell = unimplemented<Contract.Shell>("shell");
 export const spellChecker =
   unimplemented<Contract.SpellChecker>("spellChecker");
-export const updater = unimplemented<Contract.Updater>("updater");
 
 export type * from "../../../platform";
 

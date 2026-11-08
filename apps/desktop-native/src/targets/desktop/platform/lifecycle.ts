@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import NetInfo from "@react-native-community/netinfo";
-import { AppState } from "react-native";
+import { AppState, DevSettings } from "react-native";
 import type { Lifecycle } from "../../../platform";
 
 NetInfo.configure({ reachabilityShouldRun: () => false });
@@ -64,5 +64,11 @@ export const lifecycle: Lifecycle = {
   },
   startIdleDetection() {
     throw new Error("startIdleDetection is not implemented on desktop yet");
+  },
+  async restart() {
+    throw new Error("restart is not implemented on desktop yet");
+  },
+  reload() {
+    DevSettings.reload();
   }
 };

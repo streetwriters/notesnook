@@ -18,7 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { IconProps } from "./primitives";
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode, RefObject } from "react";
+import type { UIElement } from "./primitives";
+import type { SxProp } from "./style";
 
 export type MenuItemTypes = "button" | "separator" | "popup" | "lazy-loader";
 export type BaseMenuItem<TType extends MenuItemTypes> = {
@@ -71,3 +73,21 @@ export declare function showToast(
   actions?: ToastAction[],
   hideAfter?: number
 ): { hide: () => void };
+
+export type PopoverPlacement =
+  | "bottom-start"
+  | "bottom-end"
+  | "top-start"
+  | "top-end";
+
+export interface PopoverProps {
+  isOpen: boolean;
+  onClose: () => void;
+  anchorRef: RefObject<UIElement | null>;
+  placement?: PopoverPlacement;
+  sx?: SxProp;
+  children?: ReactNode;
+}
+
+export declare function Popover(props: PopoverProps): JSX.Element | null;
+export declare function PopoverHost(): JSX.Element | null;

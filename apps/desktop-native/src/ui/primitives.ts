@@ -172,6 +172,11 @@ export interface IconProps extends BaseProps {
   rotate?: number;
 }
 
+export interface ColorPickerProps extends BaseProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
 export interface SelectOption {
   value: string | number;
   title: string;
@@ -206,6 +211,7 @@ export declare const Textarea: Primitive<TextareaProps>;
 export declare const Checkbox: Primitive<CheckboxProps>;
 export declare const Radio: Primitive<RadioProps>;
 export declare const Select: Primitive<SelectProps>;
+export declare const ColorPicker: Primitive<ColorPickerProps>;
 export declare const Switch: Primitive<SwitchProps>;
 export declare const Slider: Primitive<SliderProps>;
 export declare const Progress: Primitive<ProgressProps>;
