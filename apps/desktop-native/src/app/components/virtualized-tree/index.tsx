@@ -26,7 +26,7 @@ import {
   type ReactNode,
   type Ref
 } from "react";
-import { VirtualList } from "@ui";
+import { VirtualList, type PressEvent } from "@ui";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 
 export type VirtualizedTreeHandle<T> = {
@@ -59,9 +59,15 @@ type TreeViewProps<T> = {
     expanded: boolean;
     expand: () => void;
     collapse: () => void;
+    select: (event?: PressEvent) => void;
   }) => ReactNode;
   saveKey?: string;
   testID?: string;
+  onSelect?: (id: string) => void;
+  onDeselect?: (id: string) => void;
+  bulkSelect?: (ids: string[]) => void;
+  deselectAll?: () => void;
+  isSelected?: (id: string) => boolean;
 };
 
 export function VirtualizedTree<T>(props: TreeViewProps<T>) {
@@ -73,8 +79,14 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     getChildNodes,
     treeRef,
     saveKey,
-    testID
+    testID,
+    onSelect,
+    onDeselect,
+    bulkSelect,
+    deselectAll,
+    isSelected
   } = props;
+  const cursor = useRef(0);
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setPersistedIds] = usePersistentState<ExpandedIds>(
     saveKey,
@@ -156,6 +168,23 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     });
   }, [rootId]);
 
+  const select = (index: number, event?: PressEvent) => {
+    const id = nodes[index]?.id;
+    if (!id) return;
+    if (event?.ctrlKey || event?.metaKey) {
+      if (isSelected?.(id)) onDeselect?.(id);
+      else onSelect?.(id);
+    } else if (event?.shiftKey) {
+      const start = Math.min(cursor.current, index);
+      const end = Math.max(cursor.current, index);
+      bulkSelect?.(nodes.slice(start, end + 1).map((n) => n.id));
+    } else {
+      deselectAll?.();
+      onSelect?.(id);
+    }
+    cursor.current = index;
+  };
+
   const extraData = useMemo(
     () => ({ nodes, expandedIds }),
     [nodes, expandedIds]
@@ -175,6 +204,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
           <Node
             item={node}
             index={index}
+            select={(event) => select(index, event)}
             expanded={nodes[index + 1]?.parentId === node.id}
             collapse={() => {
               setExpandedIds({ ...expandedRef.current, [node.id]: false });

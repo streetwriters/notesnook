@@ -25,7 +25,8 @@ import {
   Text,
   ThemeScope,
   TitleBar,
-  type SplitPaneHandle
+  type SplitPaneHandle,
+  type UIElement
 } from "@ui";
 import { ActionBar } from "./components/action-bar";
 import { MenuHost } from "./components/menu";
@@ -33,6 +34,38 @@ import { useEditorStore } from "./stores/editor-store";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
 import { StatusBar } from "./components/status-bar";
+
+function EditorPlaceholder() {
+  const element = useRef<UIElement>(null);
+  const opened = useRef(false);
+  const sessionId = useEditorStore((store) => store.getActiveTab()?.sessionId);
+
+  useEffect(() => {
+    if (!opened.current) {
+      opened.current = true;
+      return;
+    }
+    element.current?.focus();
+  }, [sessionId]);
+
+  return (
+    <Flex
+      ref={element}
+      testID="editor-placeholder"
+      onFocus={() => {}}
+      sx={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        bg: "background"
+      }}
+    >
+      <Text sx={{ color: "paragraph-secondary" }}>
+        The editor is not implemented on desktop yet
+      </Text>
+    </Flex>
+  );
+}
 
 export function App(props: { titleBarInset?: number }) {
   const navPane = useRef<SplitPaneHandle>(null);
@@ -103,19 +136,7 @@ export function App(props: { titleBarInset?: number }) {
         </Pane>
         <Pane id="editor-pane">
           <ThemeScope scope="editor">
-            <Flex
-              testID="editor-placeholder"
-              sx={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-                bg: "background"
-              }}
-            >
-              <Text sx={{ color: "paragraph-secondary" }}>
-                The editor is not implemented on desktop yet
-              </Text>
-            </Flex>
+            <EditorPlaceholder />
           </ThemeScope>
         </Pane>
       </SplitPane>

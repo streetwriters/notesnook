@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { Notebook as NotebookType } from "@notesnook/core";
-import { Box, Button, Flex, Text } from "@ui";
+import { Box, Button, Flex, Text, type PressEvent } from "@ui";
 import ListItem from "../list-item";
 import { CaretDown, Notebook as NotebookIcon } from "../icons";
 import { navigate } from "../../navigation";
@@ -36,6 +36,7 @@ type NotebookProps = {
   expand?: () => void;
   collapse?: () => void;
   refresh?: () => void;
+  select?: (event?: PressEvent) => void;
   depth?: number;
 };
 
@@ -47,7 +48,8 @@ export function Notebook(props: NotebookProps) {
     isExpanded = false,
     expand = () => {},
     collapse = () => {},
-    depth = 0
+    depth = 0,
+    select = () => {}
   } = props;
   const context = useNotesStore((store) => store.context);
   const isOpened = context?.type === "notebook" && context.id === item.id;
@@ -59,7 +61,10 @@ export function Notebook(props: NotebookProps) {
       isFocused={isOpened}
       isCompact
       item={item}
-      onPress={() => navigate(`/notebooks/${item.id}`, { notify: true })}
+      onPress={(event) => {
+        select(event);
+        navigate(`/notebooks/${item.id}`, { notify: true });
+      }}
       title={
         <Flex
           sx={{
@@ -73,7 +78,11 @@ export function Notebook(props: NotebookProps) {
             <Button
               testID="notebook-expand"
               variant="secondary"
-              onPress={() => (isExpanded ? collapse() : expand())}
+              onPress={(event) => {
+                select(event);
+                if (isExpanded) collapse();
+                else expand();
+              }}
               sx={{
                 bg: "transparent",
                 p: 0,

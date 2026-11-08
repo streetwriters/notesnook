@@ -122,6 +122,11 @@ for (const step of scenario.steps ?? []) {
   if (step.click) await target(step.click).click();
   if (step.expand !== undefined)
     await page.locator("#notebooks button").nth(step.expand).click();
+  if (step.type) {
+    await target(step.type.id).click();
+    await page.keyboard.type(step.type.text);
+    await page.waitForTimeout(2500);
+  }
   if (step.hover) await target(step.hover).hover();
   await page.waitForTimeout(800);
 }
@@ -131,7 +136,52 @@ await page.waitForTimeout(300);
 await fitViewport();
 await page.waitForTimeout(500);
 if (process.env.PARITY_DUMP)
-  console.log(await page.evaluate(() => { const a = document.activeElement; return `${a?.tagName} ${a?.id} ${a?.className} ${a?.textContent?.slice(0, 30)} ${a?.parentElement?.className}`; }));
+  console.log(
+    await page.evaluate(() => {
+      const describe = (el) =>
+        `${el.tagName}.${el.className?.toString().slice(0, 30)}:${(el.textContent || "").slice(0, 16)}`;
+      return JSON.stringify({
+        active: describe(document.activeElement),
+        hover: [...document.querySelectorAll(":hover")].map(describe).slice(-3),
+        focusWithin: [...document.querySelectorAll(":focus-within")]
+          .map(describe)
+          .slice(-3),
+        focusVisible: [...document.querySelectorAll(":focus-visible")].map(
+          describe
+        ),
+        rules: (() => {
+          const rows = [
+            ...document.querySelectorAll('[data-test-id="list-item"]')
+          ].filter((el) => /^(Plans|Reports)/.test(el.textContent || ""));
+          const out = [];
+          for (const row of rows) {
+            out.push(`${row.textContent.slice(0, 6)} class=${row.className}`);
+            const cls = [...row.classList];
+            for (const sheet of document.styleSheets) {
+              let list = [];
+              try {
+                list = [...sheet.cssRules];
+              } catch {}
+              for (const rule of list)
+                if (rule.cssText && cls.some((c) => rule.cssText.includes(c)))
+                  out.push(rule.cssText.slice(0, 400));
+            }
+          }
+          return out;
+        })(),
+        rows: [...document.querySelectorAll('[data-test-id="list-item"]')]
+          .slice(0, 6)
+          .map((el) => ({
+            t: (el.textContent || "").slice(0, 10),
+            bg: getComputedStyle(el).backgroundColor,
+            focus: el.matches(":focus"),
+            hover: el.matches(":hover"),
+            fw: el.matches(":focus-within"),
+            fv: el.matches(":focus-visible")
+          }))
+      });
+    })
+  );
 const elements = await page.evaluate(() => {
   const rgba = (value) => {
     const m = value.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0, 0];

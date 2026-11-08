@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ReactNode } from "react";
 import { Item } from "@notesnook/core";
-import { Flex, Text, type ColorToken, type SxProp } from "@ui";
+import { Flex, Text, type ColorToken, type PressEvent, type SxProp } from "@ui";
 import { useListSelection } from "../list-container/selection";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 
@@ -37,7 +37,7 @@ type ListItemProps = {
   isDisabled?: boolean;
   item: Item;
   index?: number;
-  onPress?: () => void;
+  onPress?: (event: PressEvent) => void;
   title: string | ReactNode;
   header?: ReactNode;
   body?: string;
@@ -75,9 +75,9 @@ export default function ListItem(props: ListItemProps) {
       onPress={(event) => {
         if (selection && props.index !== undefined)
           selection.onItemPress(props.index, item.id, event, () =>
-            props.onPress?.()
+            props.onPress?.(event)
           );
-        else props.onPress?.();
+        else props.onPress?.(event);
       }}
       sx={{
         flexDirection: isCompact ? "row" : "column",

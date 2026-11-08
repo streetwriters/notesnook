@@ -79,7 +79,14 @@ try {
           await locate({ id: "notebook-expand", nth: step.expand })
         ).tag
       );
+    if (step.type) {
+      const input = await locate(step.type.id);
+      await app.click(input.tag);
+      await app.typeText(input.tag, step.type.text);
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+    }
     if (step.hover) await app.hover((await locate(step.hover)).tag);
+    await new Promise((resolve) => setTimeout(resolve, 800));
     await app.waitForIdle();
   }
   if (!scenario.keepPointer) await app.mouseMove({ x: 2, y: 2 });

@@ -117,4 +117,14 @@ scenarios.notebookTree = {
   steps: [{ click: "tab-notebooks" }, { expand: 0 }, { expand: 1 }]
 };
 
+scenarios.search = {
+  ...scenarios.shell,
+  steps: [{ type: { id: "search-input", text: "short body" } }]
+};
+
+scenarios.searchEmpty = {
+  ...scenarios.shell,
+  steps: [{ type: { id: "search-input", text: "zzzqq" } }]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

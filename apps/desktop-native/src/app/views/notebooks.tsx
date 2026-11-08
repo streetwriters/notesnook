@@ -27,6 +27,7 @@ import { strings } from "@notesnook/intl";
 import { Box, Flex, Text } from "@ui";
 import { db } from "../common/db";
 import { store, useStore } from "../stores/notebook-store";
+import { store as selectionStore } from "../stores/selection-store";
 import { Notebook } from "../components/notebook";
 import {
   VirtualizedTree,
@@ -134,13 +135,18 @@ export function Notebooks() {
               itemHeight={33}
               treeRef={treeRef}
               saveKey="notebook-tree"
+              deselectAll={() => selectionStore.toggleSelectionMode(false)}
+              bulkSelect={selectionStore.setSelectedItems}
+              isSelected={selectionStore.isSelected}
+              onDeselect={selectionStore.deselectItem}
+              onSelect={selectionStore.selectItem}
               getChildNodes={getChildNodes}
               renderItem={({
                 collapse,
                 expand,
                 expanded,
-                index,
-                item: node
+                item: node,
+                select
               }) => (
                 <Notebook
                   key={node.id}
@@ -151,6 +157,7 @@ export function Notebooks() {
                   totalNotes={node.data.totalNotes}
                   collapse={collapse}
                   expand={expand}
+                  select={select}
                 />
               )}
             />
