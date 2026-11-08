@@ -5,6 +5,7 @@ module.exports = function (api) {
   return {
     presets: ["module:@react-native/babel-preset"],
     plugins: [
+      "@babel/plugin-transform-export-namespace-from",
       "module:@react-native-gpui/core/babel-plugin-node-addons",
       "react-native-worklets/plugin"
     ],
