@@ -17,19 +17,63 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Pane, SplitPane, Text, ThemeScope, TitleBar } from "@ui";
+import { useEffect, useRef, useState } from "react";
+import {
+  Flex,
+  Pane,
+  SplitPane,
+  Text,
+  ThemeScope,
+  TITLE_BAR_HEIGHT,
+  TitleBar,
+  type SplitPaneHandle
+} from "@ui";
+import { ActionBar } from "./components/action-bar";
+import { useEditorStore } from "./stores/editor-store";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
 import { StatusBar } from "./components/status-bar";
 
 export function App() {
+  const navPane = useRef<SplitPaneHandle>(null);
+  const [isNavPaneCollapsed, setIsNavPaneCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (useEditorStore.getState().tabs.length === 0)
+      useEditorStore.getState().newSession();
+  }, []);
+
   return (
     <Flex
       testID="app"
       sx={{ flexDirection: "column", flex: 1, bg: "background" }}
     >
-      <TitleBar underlay={false} />
+      <ThemeScope scope="titleBar">
+        <TitleBar underlay={false}>
+          <Flex
+            testID="editor-action-bar"
+            sx={{
+              flexDirection: "row",
+              height: TITLE_BAR_HEIGHT,
+              bg: "background",
+              px: "spacing4",
+              borderBottom: "1px solid",
+              borderBottomColor: "border"
+            }}
+          >
+            <ActionBar
+              isSidebarCollapsed={isNavPaneCollapsed}
+              onSidebarToggle={() => {
+                if (isNavPaneCollapsed) navPane.current?.expand(0);
+                else navPane.current?.collapse(0);
+              }}
+            />
+          </Flex>
+        </TitleBar>
+      </ThemeScope>
       <SplitPane
+        ref={navPane}
+        onChange={(sizes) => setIsNavPaneCollapsed(sizes[0] === 0)}
         testID="global-split-pane"
         direction="vertical"
         autoSaveId="global-panel-group"

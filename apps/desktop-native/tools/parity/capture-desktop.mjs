@@ -56,6 +56,22 @@ try {
   };
   walk(tree);
 
+  if (process.env.PARITY_DUMP) {
+    const dump = async (node, depth, abs) => {
+      const props = await app.getProps(node.tag);
+      const f = props.frame;
+      console.log(
+        `${"  ".repeat(depth)}${node.component} ${node.testID || ""} [${f.x},${f.y},${f.width},${f.height}] ${props.text ? JSON.stringify(props.text) : ""}`
+      );
+      for (const child of node.children ?? []) await dump(child, depth + 1);
+    };
+    const find = (node) =>
+      node.testID === process.env.PARITY_DUMP
+        ? node
+        : (node.children ?? []).map(find).find(Boolean);
+    const root = find(tree);
+    if (root) await dump(root, 0);
+  }
   const elements = [];
   const textRects = [];
   for (const node of nodes) {

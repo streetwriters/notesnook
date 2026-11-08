@@ -268,6 +268,7 @@ export type ThemeScopeName =
   | "base"
   | "navigationMenu"
   | "statusBar"
+  | "titleBar"
   | "list"
   | "contextMenu"
   | "editor"
