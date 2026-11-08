@@ -32,7 +32,6 @@ import {
 import { store, useStore } from "../stores/attachment-store";
 import {
   formatBytes,
-  getFormattedDate,
   usePromise,
   useResolvedItem
 } from "@notesnook/common";
@@ -59,6 +58,7 @@ import type {
   Attachment as AttachmentType,
   VirtualizedGrouping
 } from "@notesnook/core";
+import { Attachment } from "../components/attachment";
 import { Multiselect } from "../common/multi-select";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { ConfirmDialog } from "./confirm";
@@ -329,54 +329,13 @@ function AttachmentRow(props: {
     type: "attachment"
   });
   if (!item) return null;
-  const attachment = item.item;
-  const FileIcon = getFileIcon(attachment.type);
-  const isSelected = props.isSelected(attachment.id);
   return (
-    <Flex
-      testID="attachment"
-      onPress={() => props.select(attachment.id)}
-      sx={{
-        flexDirection: "row",
-        alignItems: "center",
-        height: 30,
-        bg: isSelected ? "background-selected" : "transparent",
-        ":hover": { bg: isSelected ? "hover-selected" : "hover" }
-      }}
-    >
-      <Flex sx={{ width: 24 }}>
-        <Checkbox
-          sx={{ width: 18, height: 18 }}
-          checked={isSelected}
-          onChange={() => props.select(attachment.id)}
-        />
-      </Flex>
-      <Flex
-        sx={{
-          flex: 65,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 1,
-          px: 1,
-          minWidth: 0
-        }}
-      >
-        <FileIcon size={16} />
-        <Text variant="body" numberOfLines={1}>
-          {attachment.filename}
-        </Text>
-      </Flex>
-      <Flex sx={{ flex: 15, px: 1 }}>
-        <Text variant="subBody">{formatBytes(attachment.size)}</Text>
-      </Flex>
-      <Flex sx={{ flex: 20, px: 1 }}>
-        <Text variant="subBody">
-          {attachment.dateUploaded
-            ? getFormattedDate(attachment.dateUploaded, "date")
-            : "-"}
-        </Text>
-      </Flex>
-    </Flex>
+    <Attachment
+      key={item.item.id}
+      item={item.item}
+      isSelected={props.isSelected(item.item.id)}
+      onSelected={() => props.select(item.item.id)}
+    />
   );
 }
 

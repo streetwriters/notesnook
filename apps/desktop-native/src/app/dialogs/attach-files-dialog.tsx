@@ -138,7 +138,7 @@ export const AttachFilesDialog = DialogManager.register(
           pending.slice(i, i + 8).map(async ({ state, index }) => {
             try {
               const compressed = await imageCompressor.compress(state.file, {
-                maxWidth: 1920,
+                maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
                 quality: 0.7
               });
               const compressedFile = createPickedFile(
