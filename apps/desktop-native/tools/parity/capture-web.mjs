@@ -122,7 +122,14 @@ const textRects = await page.evaluate(() => {
   return rects;
 });
 
-fs.writeFileSync(path.join(outDir, "web.png"), await page.screenshot());
+let shot = await page.screenshot();
+for (let attempt = 0; attempt < 6; attempt++) {
+  await page.waitForTimeout(700);
+  const next = await page.screenshot();
+  if (next.equals(shot)) break;
+  shot = next;
+}
+fs.writeFileSync(path.join(outDir, "web.png"), shot);
 fs.writeFileSync(
   path.join(outDir, "web-map.json"),
   JSON.stringify({ elements, textRects }, null, 1)

@@ -149,7 +149,15 @@ try {
       text: (props.text ?? "").slice(0, 40)
     });
   }
-  fs.writeFileSync(path.join(outDir, "desktop.png"), await app.screenshot());
+  let shot = await app.screenshot();
+  for (let attempt = 0; attempt < 6; attempt++) {
+    await app.waitForIdle();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const next = await app.screenshot();
+    if (next.equals(shot)) break;
+    shot = next;
+  }
+  fs.writeFileSync(path.join(outDir, "desktop.png"), shot);
   fs.writeFileSync(
     path.join(outDir, "desktop-map.json"),
     JSON.stringify({ elements, textRects }, null, 1)
