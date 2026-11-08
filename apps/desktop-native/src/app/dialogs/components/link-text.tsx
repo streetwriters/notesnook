@@ -17,8 +17,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented, type NotImplemented } from "../common/not-implemented";
+import type { ReactNode } from "react";
+import { Text, type SxProp } from "@ui";
+import { shell } from "@platform";
 
-export const MigrationDialog: NotImplemented =
-  notImplemented("MigrationDialog");
-export type MigrationDialog = any;
+export function LinkText(props: {
+  href: string;
+  children?: ReactNode;
+  sx?: SxProp;
+}) {
+  return (
+    <Text
+      onPress={() => shell.openUrl(props.href)}
+      sx={{
+        color: "accent",
+        cursor: "pointer",
+        textDecorationLine: "underline",
+        ...props.sx
+      }}
+    >
+      {props.children}
+    </Text>
+  );
+}
