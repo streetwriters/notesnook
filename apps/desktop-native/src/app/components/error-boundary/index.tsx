@@ -21,6 +21,7 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
 import { databaseHost, shell } from "@platform";
 import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { Logo } from "../navigation-menu/logo";
 import { ErrorText } from "../error-text";
 import { db } from "../../common/db";
 import { useKeyStore } from "../../interfaces/key-store";
@@ -81,6 +82,7 @@ export function ErrorComponent({ error, resetErrorBoundary }: FallbackProps) {
           }}
         >
           <Flex sx={{ width: ["95%", "50%"], flexDirection: "column" }}>
+            <Logo size={60} />
             <Text
               variant="heading"
               sx={{

@@ -18,7 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Button, Flex, Text, type ColorValue, type PressEvent } from "@ui";
+import {
+  Button,
+  Flex,
+  Text,
+  type ColorValue,
+  type PressEvent,
+  type SxProp
+} from "@ui";
 import { Close, type Icon } from "../icons";
 
 type IconTagProps = {
@@ -35,6 +42,7 @@ type IconTagProps = {
   highlight?: boolean;
   selected?: boolean;
   chip?: boolean;
+  containerSx?: SxProp;
   onDismiss?: () => void;
 };
 
@@ -50,7 +58,8 @@ function IconTag(props: IconTagProps) {
     testId,
     highlight,
     selected,
-    chip = true
+    chip = true,
+    containerSx
   } = props;
 
   return (
@@ -85,7 +94,8 @@ function IconTag(props: IconTagProps) {
                 style: { bg: "background-tertiary" }
               }
             }
-          : {})
+          : {}),
+        ...containerSx
       }}
     >
       <IconComponent

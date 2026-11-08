@@ -1034,6 +1034,12 @@ function Tags({ noteId }: { noteId: string }) {
                   appStore.get().setNavigationTab("tags");
                   navigate(`/tags/${item.id}`);
                 }}
+                containerSx={{
+                  bg: "background-tertiary",
+                  px: "spacing3",
+                  py: "spacing2",
+                  ":hover": { bg: "hover" }
+                }}
                 onDismiss={async () => {
                   await db.relations.unlink(item, { id: noteId, type: "note" });
                   await tagStore.get().refresh();
@@ -1086,6 +1092,12 @@ function Notebooks({ noteId }: { noteId: string }) {
                 onClick={() => {
                   appStore.get().setNavigationTab("notebooks");
                   navigate(`/notebooks/${item.id}`);
+                }}
+                containerSx={{
+                  bg: "background-tertiary",
+                  px: "spacing3",
+                  py: "spacing2",
+                  ":hover": { bg: "hover" }
                 }}
                 onDismiss={async () => {
                   await db.relations.unlink(item, { id: noteId, type: "note" });
