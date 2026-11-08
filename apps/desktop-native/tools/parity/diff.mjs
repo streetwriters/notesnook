@@ -45,6 +45,71 @@ const delta = (a, b) => {
 };
 const maxDelta = 35215 * TEXT_SCORE_THRESHOLD ** 2;
 
+const INK_TOLERANCE = 0.03;
+const OVER_LEVELS = 25;
+const OVER_SHARE_LIMIT = 0.01;
+
+function dominant(png, x0, y0, x1, y1) {
+  const counts = new Map();
+  for (let y = y0; y < y1; y++)
+    for (let x = x0; x < x1; x++) {
+      const o = (y * png.width + x) * 4;
+      const key =
+        (png.data[o] << 16) | (png.data[o + 1] << 8) | png.data[o + 2];
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+  let best = 0;
+  let bestCount = -1;
+  for (const [key, count] of counts)
+    if (count > bestCount) {
+      best = key;
+      bestCount = count;
+    }
+  return [(best >> 16) & 255, (best >> 8) & 255, best & 255];
+}
+
+function textMetrics(w, d) {
+  const x0 = Math.max(0, Math.floor(Math.min(w.x, d.x) * scale) - 1);
+  const y0 = Math.max(0, Math.floor(Math.min(w.y, d.y) * scale) - 1);
+  const x1 = Math.min(
+    width,
+    Math.ceil(Math.max(w.x + w.width, d.x + d.width) * scale) + 1
+  );
+  const y1 = Math.min(
+    height,
+    Math.ceil(Math.max(w.y + w.height, d.y + d.height) * scale) + 1
+  );
+  if (x1 <= x0 || y1 <= y0) return undefined;
+  const wb = dominant(webPng, x0, y0, x1, y1);
+  const db = dominant(desktopPng, x0, y0, x1, y1);
+  let inkWeb = 0;
+  let inkDesktop = 0;
+  let over = 0;
+  for (let y = y0; y < y1; y++)
+    for (let x = x0; x < x1; x++) {
+      const a = (y * webPng.width + x) * 4;
+      const b = (y * desktopPng.width + x) * 4;
+      let wi = 0;
+      let di = 0;
+      let big = false;
+      for (let c = 0; c < 3; c++) {
+        wi += Math.abs(webPng.data[a + c] - wb[c]);
+        di += Math.abs(desktopPng.data[b + c] - db[c]);
+        if (Math.abs(webPng.data[a + c] - desktopPng.data[b + c]) > OVER_LEVELS)
+          big = true;
+      }
+      inkWeb += wi;
+      inkDesktop += di;
+      if (big) over++;
+    }
+  const area = (x1 - x0) * (y1 - y0);
+  return {
+    inkRatio: inkWeb ? +(inkDesktop / inkWeb).toFixed(4) : null,
+    overShare: +(over / area).toFixed(4),
+    area
+  };
+}
+
 function analyse(maskIds, maskRects, heatmapFile) {
   const ids = new Set(maskIds);
   const group = (elements) => {
@@ -65,6 +130,7 @@ function analyse(maskIds, maskRects, heatmapFile) {
   const geometry = [];
   const colors = [];
   const textStyle = [];
+  const textElements = [];
   let matched = 0;
 
   for (const [id, webElements] of webById) {
@@ -111,6 +177,10 @@ function analyse(maskIds, maskRects, heatmapFile) {
         colorDiffs.borderColor = [w.borderColor, d.borderColor];
       if (Object.keys(colorDiffs).length)
         colors.push({ id, index, ...colorDiffs });
+      if (d.fontSize !== null && w.text) {
+        const metrics = textMetrics(w, d);
+        if (metrics) textElements.push({ id, index, text: w.text, ...metrics });
+      }
       if (d.fontSize !== null) {
         const diffs = {};
         if (w.fontFamily !== d.fontFamily)
@@ -212,8 +282,16 @@ function analyse(maskIds, maskRects, heatmapFile) {
       nonTextPixelsTotal: nonTextTotal,
       textPixelsDifferent: textDiff,
       textPixelsTotal: textPixels,
-      textScore: textPixels ? +(textDiff / textPixels).toFixed(4) : 0
+      textScore: textPixels ? +(textDiff / textPixels).toFixed(4) : 0,
+      textElements: textElements.length,
+      textElementsOutside: textElements.filter(
+        (t) =>
+          t.inkRatio === null ||
+          Math.abs(t.inkRatio - 1) > INK_TOLERANCE ||
+          t.overShare > OVER_SHARE_LIMIT
+      ).length
     },
+    textElements,
     missingOnDesktop,
     extraOnDesktop,
     geometry,
@@ -255,6 +333,7 @@ const line = (title, s) => [
   `- Colour mismatches (background, text, border): ${s.colorMismatches}`,
   `- Text style mismatches (family, size, weight, line height, letter spacing): ${s.textStyleMismatches}`,
   `- Non-text pixels different: ${s.nonTextPixelsDifferent} of ${s.nonTextPixelsTotal}`,
+  `- Text elements outside the rule (ink within 3%, at most 1% of the crop over 25 levels): ${s.textElementsOutside} of ${s.textElements}`,
   `- Text pixels over threshold ${TEXT_SCORE_THRESHOLD}: ${s.textPixelsDifferent} of ${s.textPixelsTotal} (score ${s.textScore})`,
   ""
 ];
@@ -291,6 +370,22 @@ const lines = [
   ...masked.colors
     .slice(0, 40)
     .map((c) => `- ${c.id}[${c.index}] ${JSON.stringify(c)}`),
+  "",
+  "## Text elements outside the rule",
+  ...masked.textElements
+    .filter(
+      (t) =>
+        t.inkRatio === null ||
+        Math.abs(t.inkRatio - 1) > INK_TOLERANCE ||
+        t.overShare > OVER_SHARE_LIMIT
+    )
+    .slice(0, 60)
+    .map(
+      (t) =>
+        `- ${t.id}[${t.index}] ${JSON.stringify(t.text)} ink ${
+          t.inkRatio
+        } over ${t.overShare}`
+    ),
   "",
   "## Text style mismatches",
   ...masked.textStyle

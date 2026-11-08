@@ -96,4 +96,9 @@ scenarios.emptyList = {
   noExtras: true
 };
 
+scenarios.notebookOpen = {
+  ...scenarios.shell,
+  steps: [{ click: "tab-notebooks" }, { click: { id: "list-item", nth: 0 } }]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;
