@@ -65,9 +65,13 @@ ${svgEntries.join(",\n")}
 
 ${lines.join("\n")}
 `;
+const header = fs
+  .readFileSync(path.join(here, "../src/app/components/icon-factory.ts"), "utf8")
+  .split("*/")[0]
+  .concat("*/\n\n");
 fs.writeFileSync(
   path.join(here, "../src/app/components/icons.generated.ts"),
-  out
+  header + out
 );
 console.log(`${lines.length} icons, ${svgFiles.size} svg files, ${mdi.size} mdi paths`);
 
@@ -84,6 +88,6 @@ const illustrations = fs
   });
 fs.writeFileSync(
   path.join(here, "../src/app/components/placeholders/illustrations.generated.ts"),
-  `export const illustrations: Record<string, string> = {\n${illustrations.join(",\n")}\n};\n`
+  `${header}export const illustrations: Record<string, string> = {\n${illustrations.join(",\n")}\n};\n`
 );
 console.log(`${illustrations.length} illustrations`);

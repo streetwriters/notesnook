@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useState } from "react";
-import { useWindowDimensions } from "react-native";
 import { strings } from "@notesnook/intl";
 import { environment } from "@platform";
 import {
@@ -30,7 +29,8 @@ import {
   Select,
   Switch,
   Text,
-  ThemeScope
+  ThemeScope,
+  useWindowSize
 } from "@ui";
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import {
@@ -175,7 +175,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
   );
   const [query, setQuery] = useState("");
   const groups = query ? searchGroups(query) : groupsOf(route);
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth } = useWindowSize();
 
   return (
     <Dialog

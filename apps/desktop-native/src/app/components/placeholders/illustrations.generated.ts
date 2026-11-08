@@ -1,3 +1,21 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 export const illustrations: Record<string, string> = {
   archive:
     '<svg width="210" height="210" viewBox="0 0 210 210" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="105" cy="105" r="82.5" stroke="#EFEFEF"/><circle cx="105" cy="105" r="104.5" stroke="#EFEFEF"/><circle cx="104.5" cy="104.5" r="65.5" fill="#008836" fill-opacity="0.05"/><circle cx="105" cy="105" r="49" fill="#008836" fill-opacity="0.05"/><circle cx="105" cy="105" r="36" fill="#008836" fill-opacity="0.06"/><circle cx="104.5" cy="104.5" r="22.5" fill="#008836"/><g clip-path="url(#clip0_6188_21627)"><path d="M113.25 100.833V112.75H96.75V100.833" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M115.083 96.25H94.916V100.833H115.083V96.25Z" stroke="white" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M103.166 104.5H106.833" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_6188_21627"><rect width="22" height="22" fill="white" transform="translate(94 93.5)"/></clipPath></defs></svg>',

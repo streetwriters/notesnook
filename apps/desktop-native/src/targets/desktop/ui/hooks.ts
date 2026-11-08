@@ -52,3 +52,8 @@ export const useMediaQuery: typeof Contract.useMediaQuery = (query) => {
 
 export const matchMediaQuery: typeof Contract.matchMediaQuery = (query) =>
   evaluate(query, Dimensions.get("window").width, Appearance.getColorScheme());
+
+export const useWindowSize: typeof Contract.useWindowSize = () => {
+  const { width, height } = useWindowDimensions();
+  return { width, height };
+};

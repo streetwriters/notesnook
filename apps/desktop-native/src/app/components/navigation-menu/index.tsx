@@ -32,7 +32,6 @@ import {
   dataColor,
   Flex,
   Text,
-  Input,
   VirtualList,
   type UIElement
 } from "@ui";
@@ -44,7 +43,6 @@ import { CREATE_BUTTON_MAP } from "../../common";
 import { navigate, usePathname } from "../../navigation";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
-import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useTagStore } from "../../stores/tag-store";
 import { useStore as useTrashStore } from "../../stores/trash-store";
@@ -58,7 +56,6 @@ import {
   BoxArrowDown,
   Ellipse,
   FileText,
-  Funnel,
   GearSix,
   Home,
   MoonStars,
