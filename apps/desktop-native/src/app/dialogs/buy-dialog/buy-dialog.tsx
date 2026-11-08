@@ -280,6 +280,7 @@ function SelectedPlan(props: SelectedPlanProps) {
           gap: 1,
           mt: 2,
           borderBottom: "1px solid",
+          borderBottomColor: "border",
           mb: 2,
           pb: 2
         }}
@@ -373,6 +374,7 @@ export function CheckoutPricing(props: CheckoutPricingProps) {
           flexDirection: "column",
           gap: 1,
           borderBottom: "1px solid",
+          borderBottomColor: "border",
           mb: 2,
           pb: 2
         }}
