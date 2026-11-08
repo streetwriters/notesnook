@@ -25,10 +25,7 @@ import { showPasswordDialog } from "../../dialogs/password-dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { showToast } from "../../utils/toast";
 import { AttachmentsDialog } from "../attachments-dialog";
-import {
-  ConfirmDialog,
-  showClearSessionsConfirmation
-} from "../confirm";
+import { ConfirmDialog, showClearSessionsConfirmation } from "../confirm";
 import { EmailChangeDialog } from "../email-change-dialog";
 import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { UserProfile } from "./components/user-profile";
