@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "./targets/desktop";
 import { useState } from "react";
-import { ThemeDark, ThemeLight } from "@notesnook/theme";
+import { THEME_DARK, THEME_LIGHT } from "./app/common/theme";
 import { Root, type RootProps } from "./app/root";
 import { DesktopThemeProvider } from "./targets/desktop/ui";
 
@@ -33,7 +33,7 @@ export default function App(
   );
   return (
     <DesktopThemeProvider
-      theme={colorScheme === "dark" ? ThemeDark : ThemeLight}
+      theme={colorScheme === "dark" ? THEME_DARK : THEME_LIGHT}
     >
       <Root
         {...props}

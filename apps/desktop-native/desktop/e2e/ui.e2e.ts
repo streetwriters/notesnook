@@ -1,6 +1,7 @@
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
+import { THEME_DARK, THEME_LIGHT } from "../../src/app/common/theme";
 
 let app: DesktopApp;
 
@@ -67,8 +68,17 @@ async function renders() {
   return app.getByTestId("renders").textContent();
 }
 
-const LIGHT = { background: "#ffffff", secondary: "#f7f7f7", hover: "#eeeeee" };
-const DARK = { background: "#181818", secondary: "#202020", hover: "#2b2b2b" };
+const hex = (value: string) =>
+  /^#[0-9a-f]{3}$/i.test(value)
+    ? `#${[...value.slice(1)].map((c) => c + c).join("")}`.toLowerCase()
+    : value.toLowerCase();
+const tokens = (theme: any) => ({
+  background: hex(theme.scopes.base.primary.background),
+  secondary: hex(theme.scopes.base.secondary.background),
+  hover: hex(theme.scopes.base.primary.hover)
+});
+const LIGHT = tokens(THEME_LIGHT);
+const DARK = tokens(THEME_DARK);
 
 test("theme tokens resolve to the light theme", async () => {
   await expectColor("root", LIGHT.background, 0.05, 0.05);
