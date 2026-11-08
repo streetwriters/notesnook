@@ -146,10 +146,12 @@ export function Notebooks() {
                 expand,
                 expanded,
                 item: node,
+                index,
                 select
               }) => (
                 <Notebook
                   key={node.id}
+                  index={index}
                   depth={node.depth}
                   isExpandable={node.hasChildren}
                   item={node.data.notebook}

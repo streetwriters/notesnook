@@ -26,7 +26,12 @@ import {
   type ReactNode,
   type Ref
 } from "react";
-import { VirtualList, type PressEvent } from "@ui";
+import { VirtualList, type PressEvent, type VirtualListHandle } from "@ui";
+import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
+import {
+  ListSelectionContext,
+  type ListSelection
+} from "../list-container/selection";
 import { usePersistentState } from "../../hooks/use-persistent-state";
 
 export type VirtualizedTreeHandle<T> = {
@@ -86,7 +91,9 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     deselectAll,
     isSelected
   } = props;
-  const cursor = useRef(0);
+  const list = useRef<VirtualListHandle>(null);
+  const openers = useRef(new Map<number, () => void>());
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const [nodes, setNodes] = useState<TreeNode<T>[]>([]);
   const [expandedIds, setPersistedIds] = usePersistentState<ExpandedIds>(
     saveKey,
@@ -168,22 +175,61 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
     });
   }, [rootId]);
 
-  const select = (index: number, event?: PressEvent) => {
-    const id = nodes[index]?.id;
-    if (!id) return;
-    if (event?.ctrlKey || event?.metaKey) {
-      if (isSelected?.(id)) onDeselect?.(id);
+  const { onMouseUp, onKeyDown } = useKeyboardListNavigation({
+    length: nodes.length,
+    reset: () => deselectAll?.(),
+    deselect: (index) => {
+      const id = nodes[index]?.id;
+      if (!id) return;
+      onDeselect?.(id);
+    },
+    select: (index, toggleable) => {
+      const id = nodes[index]?.id;
+      if (!id) return;
+      if (toggleable && isSelected?.(id)) onDeselect?.(id);
       else onSelect?.(id);
-    } else if (event?.shiftKey) {
-      const start = Math.min(cursor.current, index);
-      const end = Math.max(cursor.current, index);
-      bulkSelect?.(nodes.slice(start, end + 1).map((n) => n.id));
-    } else {
-      deselectAll?.();
-      onSelect?.(id);
-    }
-    cursor.current = index;
-  };
+    },
+    bulkSelect: (indices) => {
+      const ids =
+        indices.length === nodes.length
+          ? nodes.map((c) => c.id)
+          : (indices.map((i) => nodes[i]?.id).filter(Boolean) as string[]);
+      bulkSelect?.(ids);
+    },
+    focusItemAt: (index) => {
+      setFocusedIndex(index);
+      list.current?.scrollToIndex({ index });
+    },
+    skip: () => false,
+    open: (index) => openers.current.get(index)?.()
+  });
+
+  const selection = useMemo<ListSelection>(
+    () => ({
+      focusedIndex,
+      register: (index, open) => {
+        openers.current.set(index, open);
+        return () => {
+          if (openers.current.get(index) === open)
+            openers.current.delete(index);
+        };
+      },
+      onItemPress: (index, _id, event, open) => {
+        onMouseUp(
+          {
+            button: event.button,
+            ctrlKey: event.ctrlKey,
+            metaKey: event.metaKey,
+            shiftKey: event.shiftKey
+          },
+          index
+        );
+        setFocusedIndex(index);
+        if (!event.metaKey && !event.shiftKey && !event.ctrlKey) open();
+      }
+    }),
+    [focusedIndex, onMouseUp]
+  );
 
   const extraData = useMemo(
     () => ({ nodes, expandedIds }),
@@ -191,55 +237,60 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   );
 
   return (
-    <VirtualList
-      testID={testID}
-      count={nodes.length}
-      itemKey={(index) => nodes[index]?.id ?? `${index}`}
-      estimatedItemSize={itemHeight + itemGap}
-      extraData={extraData}
-      renderItem={(index) => {
-        const node = nodes[index];
-        if (!node) return null;
-        return (
-          <Node
-            item={node}
-            index={index}
-            select={(event) => select(index, event)}
-            expanded={nodes[index + 1]?.parentId === node.id}
-            collapse={() => {
-              setExpandedIds({ ...expandedRef.current, [node.id]: false });
-              setNodes((tree) => {
-                const removeIds: string[] = [];
-                for (const treeNode of tree) {
-                  if (
-                    treeNode.parentId &&
-                    (treeNode.parentId === node.id ||
-                      removeIds.includes(treeNode.parentId))
-                  )
-                    removeIds.push(treeNode.id);
-                }
-                return tree.filter((n) => !removeIds.includes(n.id));
-              });
-            }}
-            expand={async () => {
-              const { children } = await fetchChildren(
-                node,
-                expandedRef.current,
-                getChildNodes
-              );
-              setExpandedIds({ ...expandedRef.current, [node.id]: true });
-              setNodes((tree) => {
-                if (tree.some((n) => n.parentId === node.id)) return tree;
-                const copy = tree.slice();
-                const at = copy.findIndex((n) => n.id === node.id);
-                copy.splice(at + 1, 0, ...children);
-                return copy;
-              });
-            }}
-          />
-        );
-      }}
-    />
+    <ListSelectionContext.Provider value={selection}>
+      <VirtualList
+        ref={list}
+        onKeyDown={onKeyDown}
+        onBlur={() => setFocusedIndex(-1)}
+        testID={testID}
+        count={nodes.length}
+        itemKey={(index) => nodes[index]?.id ?? `${index}`}
+        estimatedItemSize={itemHeight + itemGap}
+        extraData={extraData}
+        renderItem={(index) => {
+          const node = nodes[index];
+          if (!node) return null;
+          return (
+            <Node
+              item={node}
+              index={index}
+              select={() => undefined}
+              expanded={nodes[index + 1]?.parentId === node.id}
+              collapse={() => {
+                setExpandedIds({ ...expandedRef.current, [node.id]: false });
+                setNodes((tree) => {
+                  const removeIds: string[] = [];
+                  for (const treeNode of tree) {
+                    if (
+                      treeNode.parentId &&
+                      (treeNode.parentId === node.id ||
+                        removeIds.includes(treeNode.parentId))
+                    )
+                      removeIds.push(treeNode.id);
+                  }
+                  return tree.filter((n) => !removeIds.includes(n.id));
+                });
+              }}
+              expand={async () => {
+                const { children } = await fetchChildren(
+                  node,
+                  expandedRef.current,
+                  getChildNodes
+                );
+                setExpandedIds({ ...expandedRef.current, [node.id]: true });
+                setNodes((tree) => {
+                  if (tree.some((n) => n.parentId === node.id)) return tree;
+                  const copy = tree.slice();
+                  const at = copy.findIndex((n) => n.id === node.id);
+                  copy.splice(at + 1, 0, ...children);
+                  return copy;
+                });
+              }}
+            />
+          );
+        }}
+      />
+    </ListSelectionContext.Provider>
   );
 }
 
