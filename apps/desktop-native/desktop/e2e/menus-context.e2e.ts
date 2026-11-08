@@ -60,6 +60,7 @@ describe("note context menu", () => {
   test("add tags opens the add tags dialog", async () => {
     await rightClick(app, "Grocery list");
     await clickMenu(app, "add-tags");
+    await clickMenu(app, "assign-tags");
     await expectDialog(app, "dialog");
     await app.press("escape");
     await expectClosed(app, "dialog");
