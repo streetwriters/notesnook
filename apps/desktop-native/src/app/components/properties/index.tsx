@@ -198,7 +198,7 @@ function EditorProperties(props: EditorPropertiesProps) {
       }}
     >
       <ScopedThemeProvider
-        scope="editor"
+        scope="editorSidebar"
         sx={{
           flex: 1,
           bg: "background",

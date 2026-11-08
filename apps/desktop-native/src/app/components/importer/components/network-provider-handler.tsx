@@ -27,7 +27,7 @@ import { xxhash64 } from "../xxhash";
 import { LinkText } from "../../../dialogs/components/link-text";
 import { useRef, useState } from "react";
 import { importNote } from "../../../utils/importer";
-import { Accordion } from "../../../dialogs/components/accordion";
+import Accordion from "../../accordion";
 import { TransformResult } from "../types";
 import { strings } from "@notesnook/intl";
 

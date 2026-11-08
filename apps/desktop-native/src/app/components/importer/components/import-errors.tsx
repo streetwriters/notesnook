@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Button, Flex, Text } from "@ui";
 import { shell } from "@platform";
-import { Accordion } from "../../../dialogs/components/accordion";
+import Accordion from "../../accordion";
 import { strings } from "@notesnook/intl";
 
 type ImportErrorsProps = {
