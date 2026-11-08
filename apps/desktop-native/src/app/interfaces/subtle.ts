@@ -79,8 +79,8 @@ export interface SubtleCryptoLike {
 }
 
 export const subtle: SubtleCryptoLike = (
-  globalThis as unknown as { crypto: { subtle: SubtleCryptoLike } }
-).crypto.subtle;
+  crypto as unknown as { subtle: SubtleCryptoLike }
+).subtle;
 
 export function randomBytes(length: number) {
   return crypto.getRandomValues(new Uint8Array(length));
