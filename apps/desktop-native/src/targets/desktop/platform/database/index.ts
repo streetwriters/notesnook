@@ -24,7 +24,8 @@ import {
 } from "@streetwriters/kysely";
 import type { DatabaseHost } from "../../../../platform";
 import { compression } from "../compression";
-import { getDatabaseKey } from "./encryption";
+import { open } from "react-native-quick-sqlite";
+import { clearDatabaseKey, getDatabaseKey } from "./encryption";
 import { RNSqliteDriver } from "./sqlite.kysely";
 import { Storage } from "./storage";
 
@@ -51,6 +52,10 @@ export const databaseHost: DatabaseHost = {
   getDatabaseKey: async () => (await getDatabaseKey()) as string,
   disableAppLock: async () => {
     throw new Error("App lock is not implemented on desktop yet");
+  },
+  async delete() {
+    open({ name: "notesnook" }).delete();
+    clearDatabaseKey();
   },
   eventSource: UnsupportedEventSource,
   compression
