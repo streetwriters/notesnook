@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { View } from "react-native";
 import { TitleBar as NativeTitleBar } from "@react-native-gpui/core/desktop";
 import { environment } from "@platform";
 import type * as Contract from "../../../ui/layout";
@@ -50,7 +51,9 @@ export function TitleBar({
         { paddingLeft: inset + (paddingLeft as number) }
       ]}
     >
-      {children}
+      <View style={{ flex: 1, flexDirection: "row", alignSelf: "stretch" }}>
+        {children}
+      </View>
     </NativeTitleBar>
   );
 }
