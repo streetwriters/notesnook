@@ -21,6 +21,8 @@ import NetInfo from "@react-native-community/netinfo";
 import { AppState } from "react-native";
 import type { Lifecycle } from "../../../platform";
 
+NetInfo.configure({ reachabilityShouldRun: () => false });
+
 let online = true;
 NetInfo.fetch().then((state) => {
   online = !!state.isInternetReachable || !!state.isConnected;

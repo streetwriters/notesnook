@@ -63,6 +63,12 @@ await page.waitForTimeout(3000);
 await page.mouse.move(2, 2);
 await page.waitForTimeout(500);
 
+await page.addStyleTag({
+  content:
+    "*, *::before, *::after { caret-color: transparent !important; animation: none !important; transition: none !important; }"
+});
+await page.evaluate(() => document.fonts.ready);
+
 const target = (spec) =>
   typeof spec === "string"
     ? page.locator(`[data-test-id="${spec}"]`).first()
