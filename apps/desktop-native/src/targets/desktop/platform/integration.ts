@@ -18,6 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Appearance, Linking } from "react-native";
+import {
+  isContentProtected,
+  setContentProtected,
+  setLaunchAtLogin
+} from "@react-native-gpui/system";
 import fs, { dialog } from "@react-native-gpui/fs";
 import type { DesktopIntegration, Integration } from "../../../platform";
 import { config } from "./config";
@@ -40,14 +45,23 @@ export const integration: Integration = {
   getDesktopIntegration: async () =>
     config.get<DesktopIntegration>(KEYS.desktopIntegration, {}),
   async setDesktopIntegration(settings) {
-    config.set(KEYS.desktopIntegration, {
+    const next = {
       ...config.get<DesktopIntegration>(KEYS.desktopIntegration, {}),
       ...settings
-    });
+    };
+    config.set(KEYS.desktopIntegration, next);
+    if (
+      settings.autoStart !== undefined ||
+      settings.startMinimized !== undefined
+    )
+      await setLaunchAtLogin(!!next.autoStart, {
+        hidden: !!next.startMinimized
+      });
   },
-  getPrivacyMode: async () => config.get<boolean>(KEYS.privacyMode, false),
+  getPrivacyMode: () => isContentProtected(),
   async setPrivacyMode(enabled) {
     config.set(KEYS.privacyMode, enabled);
+    await setContentProtected(enabled);
   },
   getCustomDns: async () => config.get<boolean>(KEYS.customDns, true),
   async setCustomDns(enabled) {

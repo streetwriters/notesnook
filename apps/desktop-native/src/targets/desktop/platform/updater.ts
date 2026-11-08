@@ -17,31 +17,62 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  addListener,
+  cancelDownload,
+  checkForUpdates,
+  configure,
+  downloadUpdate,
+  installUpdate
+} from "@react-native-gpui/updater";
 import type { Updater, UpdaterEvents } from "../../../platform";
 import { config } from "./config";
 
-const listeners = new Set<UpdaterEvents>();
+function track(): "stable" | "beta" {
+  return config.get<"stable" | "beta">("releaseTrack", "stable");
+}
+
+function apply() {
+  const channel = track() === "stable" ? "latest" : "beta";
+  configure({
+    feedUrl: `https://notesnook.com/api/v1/releases/darwin/${channel}`,
+    channel,
+    allowDowngrade: track() === "stable"
+  });
+}
 
 export const updater: Updater = {
   async check() {
-    listeners.forEach((listener) => listener.onChecking?.());
-    listeners.forEach((listener) => listener.onNotAvailable?.());
+    apply();
+    await checkForUpdates();
   },
-  async download() {},
-  async install() {},
+  async download() {
+    await downloadUpdate();
+  },
+  async install() {
+    await installUpdate();
+  },
   getAutoUpdates: async () => config.get<boolean>("autoUpdates", true),
   async setAutoUpdates(enabled) {
     config.set("autoUpdates", enabled);
+    if (!enabled) cancelDownload();
   },
-  getReleaseTrack: async () =>
-    config.get<"stable" | "beta">("releaseTrack", "stable"),
-  async setReleaseTrack(track) {
-    config.set("releaseTrack", track);
+  getReleaseTrack: async () => track(),
+  async setReleaseTrack(next) {
+    config.set("releaseTrack", next);
+    apply();
   },
-  subscribe(events) {
-    listeners.add(events);
-    return () => {
-      listeners.delete(events);
-    };
+  subscribe(events: UpdaterEvents) {
+    const subscriptions = [
+      addListener("checking", () => events.onChecking?.()),
+      addListener("available", (info) => events.onAvailable?.(info)),
+      addListener("not-available", () => events.onNotAvailable?.()),
+      addListener("progress", ({ percent }) =>
+        events.onDownloadProgress?.({ percent })
+      ),
+      addListener("downloaded", (info) => events.onDownloaded?.(info)),
+      addListener("error", ({ message }) => events.onError?.(message))
+    ];
+    return () => subscriptions.forEach((subscription) => subscription.remove());
   }
 };
