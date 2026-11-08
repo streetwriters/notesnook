@@ -78,7 +78,11 @@ export async function startViews(extra: Record<string, unknown> = {}) {
 
 export async function goTo(app: DesktopApp, route: string) {
   await clickId(app, "tab-home");
-  await navClick(app, route);
+  const current = await app.getByTestId("route-title").count();
+  const isCurrent =
+    current > 0 &&
+    (await app.getByTestId("route-title").textContent()) === route;
+  if (!isCurrent) await navClick(app, route);
   await settle(async () =>
     expect(await app.getByTestId("route-title").textContent()).toBe(route)
   );
