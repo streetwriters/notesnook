@@ -26,9 +26,11 @@ import {
   type ReactNode
 } from "react";
 import { Dimensions, Text as NativeText } from "react-native";
+import { DragDrop } from "@react-native-gpui/core/desktop";
 import type {
   BaseProps,
   ContextMenuEvent,
+  DragEvent,
   HoverEvent,
   KeyEvent,
   PressEvent,
@@ -194,6 +196,17 @@ function hover(event: any): HoverEvent {
   };
 }
 
+function drag(event: any): DragEvent {
+  const native = event?.nativeEvent ?? event ?? {};
+  return {
+    payload: DragDrop.getPayload(),
+    x: native.x ?? 0,
+    y: native.y ?? 0,
+    pageX: native.pageX ?? 0,
+    pageY: native.pageY ?? 0
+  };
+}
+
 function contextMenu(event: any): ContextMenuEvent {
   const native = event?.nativeEvent ?? event ?? {};
   return {
@@ -241,6 +254,29 @@ export function useStyled(
       activeStyle: resolved.activeStyle,
       focusStyle: resolved.focusStyle,
       focusVisibleStyle: resolved.focusVisibleStyle,
+      dragOverStyle: resolved.dragOverStyle,
+      draggable: props.draggable || undefined,
+      droppable: props.droppable || undefined,
+      onDragStart: props.onDragStart
+        ? () => DragDrop.setPayload(props.onDragStart?.())
+        : props.draggable
+        ? () => DragDrop.setPayload(undefined)
+        : undefined,
+      onDragEnd: props.onDragEnd
+        ? (e: any) => props.onDragEnd?.({ dropped: !!e?.nativeEvent?.dropped })
+        : undefined,
+      onDragEnter: props.onDragEnter
+        ? (e: unknown) => props.onDragEnter?.(drag(e))
+        : undefined,
+      onDragOver: props.onDragOver
+        ? (e: unknown) => props.onDragOver?.(drag(e))
+        : undefined,
+      onDragLeave: props.onDragLeave
+        ? (e: unknown) => props.onDragLeave?.(drag(e))
+        : undefined,
+      onDrop: props.onDrop
+        ? (e: unknown) => props.onDrop?.(drag(e))
+        : undefined,
       groupHoverStyle: resolved.groupHoverStyle,
       groupActiveStyle: resolved.groupActiveStyle,
       onContextMenu: props.onContextMenu

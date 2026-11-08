@@ -40,6 +40,7 @@ export interface ResolvedStyle {
   activeStyle?: Record<string, unknown>;
   focusStyle?: Record<string, unknown>;
   focusVisibleStyle?: Record<string, unknown>;
+  dragOverStyle?: Record<string, unknown>;
   groupHoverStyle?: { group: string; style: Record<string, unknown> };
   groupActiveStyle?: { group: string; style: Record<string, unknown> };
 }
@@ -57,7 +58,8 @@ const STATE_KEYS = {
   ":hover": "hoverStyle",
   ":active": "activeStyle",
   ":focus": "focusStyle",
-  ":focus-visible": "focusVisibleStyle"
+  ":focus-visible": "focusVisibleStyle",
+  ":drag-over": "dragOverStyle"
 } as const;
 
 export function breakpointOf(width: number, breakpoints: string[]) {

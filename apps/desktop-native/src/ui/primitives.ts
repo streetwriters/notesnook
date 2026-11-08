@@ -49,6 +49,14 @@ export interface UIElement {
   ): void;
 }
 
+export interface DragEvent {
+  payload: unknown;
+  x: number;
+  y: number;
+  pageX: number;
+  pageY: number;
+}
+
 export interface BaseProps extends SpaceProps, ColorProps {
   sx?: SxProp;
   id?: string;
@@ -64,6 +72,14 @@ export interface BaseProps extends SpaceProps, ColorProps {
   onBlur?: (event: FocusEvent) => void;
   onKeyDown?: (event: KeyEvent) => void;
   onKeyUp?: (event: KeyEvent) => void;
+  draggable?: boolean;
+  onDragStart?: () => unknown;
+  onDragEnd?: (event: { dropped: boolean }) => void;
+  droppable?: boolean;
+  onDragEnter?: (event: DragEvent) => void;
+  onDragOver?: (event: DragEvent) => void;
+  onDragLeave?: (event: DragEvent) => void;
+  onDrop?: (event: DragEvent) => void;
 }
 
 export interface BoxProps extends BaseProps {

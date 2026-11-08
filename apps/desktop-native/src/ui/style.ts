@@ -247,6 +247,7 @@ type StateKeys = {
   ":active"?: StateStyle;
   ":focus"?: StateStyle;
   ":focus-visible"?: StateStyle;
+  ":drag-over"?: StateStyle;
   ":group-hover"?: GroupStateStyle;
   ":group-active"?: GroupStateStyle;
 };
