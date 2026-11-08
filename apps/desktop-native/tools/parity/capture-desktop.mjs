@@ -42,7 +42,8 @@ const app = await launchApp({
     seedColors: scenario.noExtras ? [] : extras.colors
   },
   env: {
-    RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-"))
+    RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-")),
+    RN_GPUI_TEST_DISPLAY: process.env.RN_GPUI_TEST_DISPLAY ?? "main"
   }
 });
 

@@ -127,4 +127,43 @@ scenarios.searchEmpty = {
   steps: [{ type: { id: "search-input", text: "zzzqq" } }]
 };
 
+const LONG_WORDS =
+  "supercalifragilisticexpialidocious-unbroken-token-without-any-space-to-wrap-at-all";
+const LONG_SENTENCE =
+  "This note has a body that is much longer than the list can show, so the headline has to be cut off after a few lines. ".repeat(
+    6
+  );
+
+scenarios.longContent = {
+  ...scenarios.shell,
+  seed: (now) => [
+    {
+      title:
+        "A very long note title that keeps going well past the width of the list pane so it must be cut with an ellipsis",
+      content: LONG_SENTENCE,
+      favorite: true,
+      dateEdited: now - HOUR,
+      dateCreated: now - HOUR
+    },
+    {
+      title: LONG_WORDS,
+      content: LONG_WORDS.repeat(3),
+      dateEdited: now - 2 * HOUR,
+      dateCreated: now - 2 * HOUR
+    },
+    {
+      title: "Short title",
+      content: LONG_SENTENCE,
+      dateEdited: now - 3 * HOUR,
+      dateCreated: now - 3 * HOUR
+    },
+    {
+      title: "Accents and symbols: café, naïve, 日本語, emoji 🙂",
+      content: "Ünïcödé body with 日本語 text and an emoji 🙂 at the end.",
+      dateEdited: now - 4 * HOUR,
+      dateCreated: now - 4 * HOUR
+    }
+  ]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

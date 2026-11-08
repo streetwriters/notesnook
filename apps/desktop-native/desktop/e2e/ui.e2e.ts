@@ -11,7 +11,8 @@ beforeAll(async () => {
     disableAnimations: false,
     initialProps: { screen: "demo" },
     timeout: 180000,
-    logFile: process.env.RN_GPUI_E2E_LOG
+    logFile: process.env.RN_GPUI_E2E_LOG,
+    env: { RN_GPUI_TEST_DISPLAY: "main" }
   });
   await vi.waitFor(
     async () => {
