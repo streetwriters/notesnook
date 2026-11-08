@@ -17,8 +17,574 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text } from "@ui";
+import { useEffect, useState } from "react";
+import { Button, Flex, Icon, Radio, SortableList, Text } from "@ui";
+import { getId } from "@notesnook/core";
+import { useIsFeatureAvailable } from "@notesnook/common";
+import { strings } from "@notesnook/intl";
+import {
+  getAllTools,
+  getToolDefinition
+} from "../../../common/toolbar-definitions";
+import { Icons } from "../../../common/toolbar-icons";
+import type {
+  ToolbarDefinition,
+  ToolbarGroupDefinition,
+  ToolId
+} from "../../../common/toolbar-types";
+import {
+  getAllPresets,
+  getCurrentPreset,
+  getPreset,
+  getPresetTools,
+  Preset,
+  PresetId,
+  setToolbarPreset
+} from "../../../common/toolbar-config";
+import { showToast } from "../../../utils/toast";
+import { Pro } from "../../../components/icons";
+import { checkFeature } from "../../../common";
+
+function arrayMove<T>(array: T[], from: number, to: number) {
+  const copy = array.slice();
+  const [item] = copy.splice(from, 1);
+  copy.splice(to, 0, item);
+  return copy;
+}
 
 export function CustomizeToolbar() {
-  return <Text variant="body">Not implemented on desktop yet</Text>;
+  const [items, setItems] = useState<TreeNode[]>([]);
+  const [currentPreset, setCurrentPreset] = useState<Preset>();
+  const customToolbarPreset = useIsFeatureAvailable("customToolbarPreset");
+
+  useEffect(() => {
+    if (!currentPreset) return;
+    const items = flatten(getPresetTools(currentPreset));
+    items.push(createTrash());
+    items.push(...flatten([getDisabledTools(items)]).slice(1));
+    setItems(items);
+  }, [currentPreset]);
+
+  useEffect(() => {
+    (async () => {
+      const preset = await getCurrentPreset();
+      setCurrentPreset(preset);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!currentPreset || !items.length) return;
+      const tools = unflatten(items).slice(0, -1);
+      await setToolbarPreset(
+        currentPreset.id,
+        tools as ToolbarGroupDefinition[]
+      );
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
+  if (!currentPreset) return null;
+  return (
+    <Flex sx={{ flexDirection: "column" }}>
+      <Flex
+        sx={{
+          py: 2,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <Flex sx={{ flexDirection: "row", gap: 2 }}>
+          {getAllPresets().map((preset) => (
+            <Flex
+              key={preset.id}
+              testID={`toolbar-preset-${preset.id}`}
+              onPress={() => {
+                if (preset.id === "custom" && !customToolbarPreset?.isAllowed)
+                  return;
+                setCurrentPreset(getPreset(preset.id as PresetId));
+              }}
+              sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}
+            >
+              <Radio
+                checked={preset.id === currentPreset.id}
+                disabled={
+                  preset.id === "custom" && !customToolbarPreset?.isAllowed
+                }
+                onChange={() =>
+                  setCurrentPreset(getPreset(preset.id as PresetId))
+                }
+              />
+              <Text variant="body">{preset.title}</Text>
+              {preset.id === "custom" && !customToolbarPreset?.isAllowed ? (
+                <Pro color="accent" size={18} />
+              ) : null}
+            </Flex>
+          ))}
+        </Flex>
+        {currentPreset.editable && (
+          <Button
+            variant="secondary"
+            testID="toolbar-add-group"
+            sx={{ flexShrink: 0, p: 1 }}
+            title={strings.createAGroup()}
+            onPress={() => {
+              setItems(addGroup);
+              showToast("success", strings.groupAdded());
+            }}
+          >
+            <Icon path={Icons.plus} color="paragraph" size={18} />
+          </Button>
+        )}
+      </Flex>
+
+      <SortableList
+        items={items}
+        onMove={async ({ activeId, overId }) => {
+          if (activeId === overId) return;
+          if (
+            !customToolbarPreset ||
+            !(await checkFeature(customToolbarPreset))
+          )
+            return;
+          if (currentPreset.id !== "custom")
+            setCurrentPreset({
+              ...getPreset("custom"),
+              tools: getPresetTools(currentPreset)
+            });
+          const activeItem = items.find((item) => item.id === activeId);
+          if (!activeItem) return;
+          if (isGroup(activeItem) || isSubgroup(activeItem))
+            setItems(moveGroup(items, activeId, overId));
+          else setItems(moveItem(items, activeId, overId));
+        }}
+        renderItem={(item, state) => {
+          const deleted = isDeleted(items, item);
+          const hasSubGroup =
+            isGroup(item) &&
+            !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+          const canAddSubGroup =
+            currentPreset.editable && !deleted && !hasSubGroup;
+          const canRemoveGroup = currentPreset.editable && !deleted;
+          const canRemoveItem = currentPreset.editable && !deleted;
+
+          return (
+            <TreeNodeComponent
+              key={item.id}
+              item={item}
+              isDragging={state.isDragging}
+              onAddSubGroup={
+                canAddSubGroup
+                  ? () => {
+                      setItems((items) => addSubGroup(items, item.id));
+                      showToast("success", strings.subgroupAdded());
+                    }
+                  : undefined
+              }
+              onRemoveGroup={
+                canRemoveGroup
+                  ? (group) => setItems(removeGroup(items, group.id))
+                  : undefined
+              }
+              onRemoveItem={
+                canRemoveItem
+                  ? (item) => setItems(removeItem(items, item.id))
+                  : undefined
+              }
+            />
+          );
+        }}
+      />
+    </Flex>
+  );
+}
+
+type TreeNodeComponentProps = {
+  item: TreeNode;
+  isDragging?: boolean;
+  onRemoveGroup?: (item: TreeNode) => void;
+  onAddSubGroup?: () => void;
+  onRemoveItem?: (item: TreeNode) => void;
+};
+
+function TreeNodeComponent(props: TreeNodeComponentProps) {
+  const { item, isDragging, onRemoveGroup, onRemoveItem, onAddSubGroup } =
+    props;
+  const isDraggable = !isTrash(item);
+  const group = isGroup(item) || isSubgroup(item);
+
+  return (
+    <Flex
+      testID={`toolbar-node-${item.id}`}
+      draggable={isDraggable}
+      droppable
+      sx={{
+        flexDirection: "row",
+        p: 1,
+        mb: 1,
+        ml: item.depth * 15,
+        alignItems: "center",
+        justifyContent: "space-between",
+        bg: "background-secondary",
+        borderRadius: "default",
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isDraggable ? "grab" : "default"
+      }}
+    >
+      <Flex sx={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+        {group ? (
+          isDraggable ? (
+            <Icon path={Icons.dragHandle} size={18} color="accent" />
+          ) : null
+        ) : item.icon ? (
+          <Icon
+            path={(Icons as Record<string, string>)[item.icon]}
+            size={16}
+            color="icon"
+          />
+        ) : null}
+        <Text
+          variant="body"
+          sx={{ ml: 1, color: group ? "accent" : undefined }}
+        >
+          {item.title}
+        </Text>
+      </Flex>
+      <Flex sx={{ flexDirection: "row", alignItems: "center" }}>
+        {group && isGroup(item) && onAddSubGroup && (
+          <Button
+            variant="secondary"
+            sx={{ p: "small", mr: 1 }}
+            onPress={() => onAddSubGroup()}
+          >
+            <Icon path={Icons.plus} size={16} color="icon" />
+          </Button>
+        )}
+        {(group ? onRemoveGroup : onRemoveItem) && (
+          <Button
+            variant="secondary"
+            sx={{ p: "small" }}
+            onPress={() => (group ? onRemoveGroup : onRemoveItem)?.(item)}
+          >
+            <Icon path={Icons.delete} size={16} color="icon" />
+          </Button>
+        )}
+      </Flex>
+    </Flex>
+  );
+}
+
+type TreeNodeType = "group" | "item";
+type BaseTreeNode<Type extends TreeNodeType> = {
+  type: Type;
+  id: string;
+  title: string;
+  depth: number;
+};
+
+export type Subgroup = BaseTreeNode<"group"> & {
+  collapsed?: boolean;
+};
+
+export type Group = BaseTreeNode<"group">;
+
+export type Item = BaseTreeNode<"item"> & {
+  toolId: ToolId;
+  icon: string;
+  collapsed?: boolean;
+};
+
+export type TreeNode = Group | Item | Subgroup;
+
+function flatten(tools: ToolbarGroupDefinition[], depth = 0): TreeNode[] {
+  const nodes: TreeNode[] = [];
+  let groupCount = 1;
+  for (const tool of tools) {
+    if (Array.isArray(tool)) {
+      const isSubgroup = depth > 0;
+      const groupTitle = isSubgroup
+        ? strings.subgroupNumber(groupCount)
+        : strings.groupNumber(groupCount);
+
+      nodes.push(createGroup({ depth, title: groupTitle }));
+      nodes.push(...flatten(tool as ToolbarGroupDefinition[], depth + 1));
+      ++groupCount;
+    } else {
+      const { icon, title } = getToolDefinition(tool);
+      nodes.push(createItem({ toolId: tool, depth, title, icon }));
+    }
+  }
+  return nodes;
+}
+
+function unflatten(items: TreeNode[]): ToolbarDefinition {
+  const tools: ToolbarDefinition = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (isGroup(item) || isSubgroup(item)) {
+      const group = getGroup(items, item.id);
+      if (!group) continue;
+      tools.push(unflatten(group.items.slice(1)) as ToolbarGroupDefinition);
+
+      // skip all the group's items
+      i += group.items.length - 1;
+    } else {
+      (tools as ToolbarGroupDefinition).push(item.toolId);
+    }
+  }
+  return tools;
+}
+
+function createGroup(config: Partial<Group>): Group {
+  return {
+    type: "group",
+    id: getId(),
+    depth: 0,
+    title: strings.group(),
+    ...config
+  };
+}
+
+function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
+  return {
+    type: "item",
+    id: getId(),
+    depth: 0,
+    title: "",
+    icon: "",
+    ...config
+  };
+}
+
+function createTrash() {
+  return createGroup({
+    id: "trash",
+    depth: 0,
+    title: strings.disabled()
+  });
+}
+
+function moveGroup(
+  items: TreeNode[],
+  fromId: string,
+  toId: string
+): TreeNode[] {
+  const newArray = items.slice();
+  const fromGroup = getGroup(items, fromId);
+  const toGroup = getGroup(items, toId);
+
+  if (!fromGroup || !toGroup || !canMoveGroup(fromGroup, toGroup)) return items;
+
+  newArray.splice(fromGroup.index, fromGroup.items.length);
+  const newIndex =
+    // if we are moving the group upwards
+    fromGroup.index > toGroup.index
+      ? toGroup.index
+      : toGroup.index + toGroup.items.length - fromGroup.items.length;
+
+  newArray.splice(
+    newIndex,
+    0,
+    ...fromGroup.items.map((item) => {
+      if (item.depth) item.depth = toGroup.item.depth + 1;
+      return item;
+    })
+  );
+  return newArray;
+}
+
+function canMoveGroup(
+  fromGroup: ResolvedGroup,
+  toGroup: ResolvedGroup
+): boolean {
+  const hasOtherGroups =
+    toGroup.items.filter((item) => isGroup(item) || isSubgroup(item)).length >
+    1;
+
+  // 1 group can contain only 1 subgroup
+  if (isSubgroup(fromGroup.item) && hasOtherGroups) return false;
+
+  return true;
+}
+
+export function moveItem(
+  items: TreeNode[],
+  fromId: string,
+  toId: string
+): TreeNode[] {
+  const fromIndex = items.findIndex((i) => i.id === fromId);
+  const toIndex = items.findIndex((i) => i.id === toId);
+
+  const fromItem = items[fromIndex];
+  const toItem = items[toIndex];
+
+  if (!fromItem || !isItem(fromItem)) return items;
+
+  const movingToGroup = isGroup(toItem) || isSubgroup(toItem);
+
+  // calculate the correct depth based on where the item is being moved
+  if (movingToGroup) {
+    // if moving to a group/subgroup, set depth to group's depth + 1
+    fromItem.depth = toItem.depth + 1;
+  } else {
+    // if moving to another item, set depth to match the target item's depth
+    fromItem.depth = toItem.depth;
+  }
+
+  const newArray = arrayMove(items, fromIndex, toIndex);
+
+  // do not allow moving an item if there's no group over it
+  const itemGroup = getItemGroup(newArray, fromItem);
+  if (!isGroup(itemGroup) && !isSubgroup(itemGroup)) return items;
+
+  return newArray;
+}
+
+function removeGroup(items: TreeNode[], groupId: string): TreeNode[] {
+  const newArray = items.slice();
+  const fromGroup = getGroup(items, groupId);
+  const toGroup = getGroup(items, "trash");
+
+  if (!fromGroup || !toGroup) return items;
+
+  newArray.splice(fromGroup.index, fromGroup.items.length);
+  const newIndex =
+    // if we are moving the group upwards
+    fromGroup.index > toGroup.index
+      ? toGroup.index
+      : toGroup.index + toGroup.items.length - fromGroup.items.length;
+
+  newArray.splice(
+    newIndex,
+    0,
+    ...fromGroup.items
+      .filter((item) => isItem(item))
+      .map((item) => {
+        item.depth = toGroup.item.depth + 1;
+        return item;
+      })
+  );
+  return newArray;
+}
+
+function removeItem(items: TreeNode[], itemId: string): TreeNode[] {
+  const toGroup = getGroup(items, "trash");
+  if (!toGroup) return items;
+
+  return moveItem(
+    items,
+    itemId,
+    toGroup.items.length > 0
+      ? toGroup.items[toGroup.items.length - 1].id
+      : toGroup.item.id
+  );
+}
+
+function isCollapsed(item: TreeNode, activeItem: TreeNode): boolean {
+  // if a group is selected, we collapse everything else.
+  if (isGroup(activeItem) && (isSubgroup(item) || isItem(item))) {
+    return true;
+  }
+
+  // if a subgroup is selected, we collapse only the items.
+  if (isSubgroup(activeItem) && isItem(item)) return true;
+
+  if (item.id === activeItem.id) return true;
+
+  return false;
+}
+
+function isSubgroup(item: TreeNode): item is Subgroup {
+  return item.type === "group" && item.depth > 0;
+}
+
+function isGroup(item: TreeNode): item is Group {
+  return item.type === "group" && item.depth === 0;
+}
+
+function isItem(item: TreeNode): item is Item {
+  return item.type === "item";
+}
+
+function isTrash(item: TreeNode): boolean {
+  return item.id === "trash";
+}
+
+function isDeleted(items: TreeNode[], item: TreeNode): boolean {
+  const group = getItemGroup(items, item);
+  return group.id === "trash";
+}
+
+function getItemGroup(items: TreeNode[], item: TreeNode) {
+  const index = items.findIndex((i) => i.id === item.id);
+  for (let i = index; i >= 0; --i) {
+    const item = items[i];
+    if (isGroup(item) || isSubgroup(item)) return item;
+  }
+  return items[0];
+}
+
+type ResolvedGroup = {
+  index: number;
+  item: Group;
+  items: TreeNode[];
+};
+function getGroup(items: TreeNode[], groupId: string): ResolvedGroup | null {
+  const index = items.findIndex((item) => item.id === groupId);
+  const group = items.at(index);
+  if (!group) return null;
+  if (!isGroup(group) && !isSubgroup(group)) return null;
+
+  const nextGroupIndex = items.findIndex(
+    (item, i) => i > index && (item.depth === 0 || item.depth < group.depth)
+  );
+  return {
+    index,
+    item: group,
+    items: items.slice(
+      index,
+      nextGroupIndex < 0 ? items.length : nextGroupIndex
+    )
+  };
+}
+
+function addSubGroup(items: TreeNode[], groupId: string) {
+  const group = getGroup(items, groupId);
+  if (!group) return items;
+  const newArray = items.slice();
+  newArray.splice(
+    group.index + group.items.length,
+    0,
+    createGroup({ title: strings.subgroupOne(), depth: 1 })
+  );
+  return newArray;
+}
+
+function addGroup(items: TreeNode[]) {
+  let insertIndex = items.length;
+  const trashIndex = items.findIndex((item) => isTrash(item));
+  if (trashIndex > -1) insertIndex = trashIndex;
+
+  const newArray = items.slice();
+  const groups = items.filter((t) => isGroup(t) && !isSubgroup(t));
+  const newGroup = createGroup({
+    title: strings.groupNumber(groups.length)
+  });
+  newArray.splice(insertIndex, 0, newGroup);
+  return newArray;
+}
+
+function getDisabledTools(tools: TreeNode[]) {
+  const allTools = getAllTools();
+  const disabled: ToolbarGroupDefinition = [];
+  const items: Item[] = tools.filter((t) => isItem(t)) as Item[];
+  for (const key in allTools) {
+    const tool = allTools[key as ToolId];
+    if (tool.conditional) continue;
+
+    const isDisabled = items.findIndex((t) => t.toolId === key);
+    if (isDisabled === -1 && key !== "none") disabled.push(key as ToolId);
+  }
+  return disabled;
 }

@@ -145,7 +145,7 @@ export async function boot(options: BootOptions = {}): Promise<BootState> {
   if (environment.isDev && options.resetConfig) config.clear();
   if (environment.isDev && (options.initialPath || options.initialHash))
     history.replace({
-      path: options.initialPath ?? history.location.path,
+      path: options.initialPath ?? getCurrentPath(),
       hash: options.initialHash ?? "",
       search: ""
     });

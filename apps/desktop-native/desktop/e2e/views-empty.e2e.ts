@@ -28,10 +28,14 @@ describe.each(["Notes", "Favorites", "Archive", "Trash", "Reminders"])(
 
 test("the notebooks tab shows its empty state", async () => {
   await openTab(app, "notebooks");
-  await settle(async () => expect(await count(app, "notebooks-empty")).toBe(1));
+  await settle(async () =>
+    expect(await count(app, "notebooks-placeholder")).toBe(1)
+  );
 });
 
 test("the tags tab shows an empty placeholder", async () => {
   await clickId(app, "tab-tags");
-  await settle(async () => expect(await count(app, "list-item")).toBe(0));
+  await settle(async () =>
+    expect(await count(app, "tags-placeholder")).toBe(1)
+  );
 });

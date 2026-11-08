@@ -51,7 +51,7 @@ describe("command palette navigation", () => {
     await app.press("shift-enter");
     await expectClosed(app, "dialog");
     await settle(async () =>
-      expect(await count(app, "editor-title")).toBeGreaterThan(0)
+      expect(await count(app, "tab-title")).toBeGreaterThan(0)
     );
   });
 });
