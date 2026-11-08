@@ -67,7 +67,6 @@ export const AddTagsDialog = DialogManager.register(function AddTagsDialog(
       });
       useRelationChangesStore.getState().setSelected(selected);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
