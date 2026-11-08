@@ -95,7 +95,6 @@ export function ListPanePlaceholder({ variant }: { variant: Variant }) {
   const { image, title, description } = content(variant);
   return (
     <Flex
-      testID="list-placeholder"
       sx={{
         flexDirection: "column",
         alignItems: "center",
