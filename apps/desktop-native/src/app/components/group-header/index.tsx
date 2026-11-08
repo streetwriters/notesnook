@@ -28,22 +28,23 @@ export default function GroupHeader(props: {
     <Flex
       testID="group-header"
       sx={{
+        flexDirection: "row",
         alignItems: "center",
+        justifyContent: "space-between",
         px: "spacing6",
-        py: "spacing3",
-        bg: "background"
+        my: "spacing6"
       }}
     >
-      <Text
-        testID="group-header-title"
-        sx={{
-          color: "accent",
-          fontSize: "xs",
-          fontWeight: "bold"
-        }}
+      <Flex
+        sx={{ flexDirection: "row", gap: "spacing3", alignItems: "center" }}
       >
-        {props.title}
-      </Text>
+        <Text
+          testID="title"
+          sx={{ fontSize: "xs", fontWeight: 400, color: "accent" }}
+        >
+          {props.title}
+        </Text>
+      </Flex>
     </Flex>
   );
 }

@@ -69,6 +69,7 @@ function CachedRouter() {
       title={routeResult.title}
       buttons={routeResult.buttons}
       routeKey={routeResult.key}
+      type={routeResult.type}
     >
       {Object.entries(cached.current).map(([key, { Component, props }]) => (
         <Flex

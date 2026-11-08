@@ -37,6 +37,7 @@ export type SpaceToken =
   | Exclude<keyof ThemeSpace, keyof Array<unknown> | "small" | "auto">
   | "small"
   | "auto"
+  | `${number}px`
   | number;
 export type RadiusToken = keyof Theme["radii"] | number;
 export type FontSizeToken = keyof Theme["fontSizes"] | number;

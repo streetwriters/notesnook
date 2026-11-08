@@ -71,7 +71,7 @@ export default function ListItem(props: ListItemProps) {
 
   return (
     <Flex
-      testID={`list-item-${item.id}`}
+      testID="list-item"
       onPress={(event) => {
         if (selection && props.index !== undefined)
           selection.onItemPress(props.index, item.id, event, () =>
@@ -121,7 +121,7 @@ export default function ListItem(props: ListItemProps) {
               color: "paragraph",
               fontSize: "xs",
               width: "100%",
-              lineHeight: 1.4
+              lineHeight: 19.2
             }}
           >
             {props.body}

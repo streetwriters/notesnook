@@ -23,7 +23,7 @@ import type { Note as NoteType } from "@notesnook/core";
 import { dataColor, Flex, Text, type SxProp } from "@ui";
 import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
-import { Calendar, Circle, Lock } from "../icons";
+import { Circle, Lock, NoteCalendar, NoteFavorite, NotePin } from "../icons";
 import ListItem from "../list-item";
 import type { Context } from "../list-container/types";
 
@@ -43,7 +43,12 @@ function Note(props: NoteProps) {
   const isOpened = useEditorStore((store) => store.isNoteOpen(item.id));
   const dateFormat = useSettingStore((store) => store.dateFormat);
   const hasMetadata =
-    !compact && ((tags?.items.length ?? 0) > 0 || notebooks?.items.length);
+    !compact &&
+    (note.pinned ||
+      locked ||
+      note.favorite ||
+      (tags?.items.length ?? 0) > 0 ||
+      (notebooks?.items.length ?? 0) > 0);
 
   return (
     <ListItem
@@ -73,6 +78,7 @@ function Note(props: NoteProps) {
       sx={{
         py: "spacing4",
         px: "spacing6",
+        pl: 13,
         gap: "spacing4",
         borderBottom: "1px solid",
         borderBottomColor: "border",
@@ -92,6 +98,15 @@ function Note(props: NoteProps) {
               minWidth: 0
             }}
           >
+            {note.pinned ? <NotePin size={15} color="icon" /> : null}
+            {locked ? <Lock size={15} color="icon" testID="locked" /> : null}
+            {note.favorite ? (
+              <NoteFavorite
+                testID="favorite"
+                size={15}
+                color={dataColor("#E5C131")}
+              />
+            ) : null}
             {notebooks?.items.map((notebook) => (
               <Chip key={notebook.id} text={notebook.title} />
             ))}
@@ -110,10 +125,9 @@ function Note(props: NoteProps) {
             justifyContent: compact ? "flex-end" : "flex-start"
           }}
         >
-          {locked ? <Lock size={11} color="icon" /> : null}
-          {compact ? null : <Calendar size={12} color="icon-secondary" />}
+          {locked && compact ? <Lock size={11} color="icon" /> : null}
+          {compact ? null : <NoteCalendar size={12} color="icon-secondary" />}
           <Text
-            testID="date"
             sx={{
               color: "paragraph-secondary",
               fontSize: "3xs",

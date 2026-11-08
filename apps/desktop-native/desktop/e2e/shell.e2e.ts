@@ -4,7 +4,7 @@ import path from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { launchApp, type DesktopApp } from "@react-native-gpui/testing";
-import { navClick, listTitles } from "./nav";
+import { groupHeaderTitles, listTitles, navClick } from "./nav";
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.now();
@@ -123,7 +123,7 @@ test("navigating between sections changes the route and the list", async () => {
 });
 
 test("the list shows group headers in date order", async () => {
-  const headers = await app.query("testID", "group-header-title", true);
+  const headers = await groupHeaderTitles(app);
   expect(headers.length).toBeGreaterThanOrEqual(2);
   const texts = headers.map((header: { text?: string }) => header.text);
   expect(new Set(texts).size).toBe(texts.length);
