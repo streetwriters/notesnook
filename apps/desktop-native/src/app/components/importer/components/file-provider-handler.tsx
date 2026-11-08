@@ -213,6 +213,11 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
         </LinkText>
       </Text>
       <Flex
+        droppable
+        acceptsFiles={(provider?.supportedExtensions || []).concat([".zip"])}
+        onDropFiles={(dropped) =>
+          setFiles((files) => [...(dropped as PickedFile[]), ...files])
+        }
         onPress={onSelectFiles}
         sx={{
           justifyContent: "center",
