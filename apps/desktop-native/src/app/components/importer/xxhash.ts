@@ -17,9 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented } from "../../common/not-implemented";
+import { crypto } from "@platform";
 
-export const xxhash64 = ((..._args: unknown[]) =>
-  notImplemented("xxhash64")()) as unknown as (
-  data: string | Uint8Array
-) => Promise<string>;
+export const xxhash64 = (data: string | Uint8Array) => crypto.xxh64(data);
