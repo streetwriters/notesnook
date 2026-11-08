@@ -346,6 +346,7 @@ export const AddReminderDialog = DialogManager.register(
                   isOpen={showCalendar}
                   onClose={() => setShowCalendar(false)}
                   anchorRef={dateAnchorRef}
+                  sx={{ borderRadius: "dialog" }}
                 >
                   <DayPicker
                     sx={{ p: 2, width: 300 }}

@@ -29,6 +29,7 @@ import {
   Dialog,
   Flex,
   Text,
+  useWindowSize,
   VirtualList,
   type VirtualListHandle
 } from "@ui";
@@ -98,6 +99,7 @@ export const CommandPaletteDialog = DialogManager.register(
   function CommandPaletteDialog(props: CommandPaletteDialogProps) {
     const [selected, setSelected] = useState<number>(0);
     const [query, setQuery] = useState<string>("");
+    const { height: windowHeight } = useWindowSize();
     const listRef = useRef<VirtualListHandle>(null);
     const { search: dbSearch } = useDatabaseFuzzySearch();
     const defaultCommands = useRef<Command[] | undefined>(undefined);
@@ -162,7 +164,11 @@ export const CommandPaletteDialog = DialogManager.register(
         noScroll
       >
         <Flex
-          sx={{ flexDirection: "column", height: 500, overflow: "hidden" }}
+          sx={{
+            flexDirection: "column",
+            height: Math.min(500, windowHeight * 0.6),
+            overflow: "hidden"
+          }}
           onKeyDown={(e) => {
             if (commands.status !== "fulfilled") return;
             if (e.key === "Delete") {
@@ -224,7 +230,7 @@ export const CommandPaletteDialog = DialogManager.register(
               borderBottom: "1px solid",
               borderBottomColor: "separator"
             }}
-            styles={{ input: { pl: 30 } }}
+            styles={{ input: { pl: "spacing10", pr: "spacing4" } }}
             onChangeText={debounce((text: string) => {
               setQuery(text);
             }, 100)}
@@ -261,7 +267,16 @@ export const CommandPaletteDialog = DialogManager.register(
                         pb: "spacing4"
                       }}
                     >
-                      <HighlightedText html={truncateString(row.label, 200)} />
+                      <Text
+                        sx={{
+                          color: "heading-secondary",
+                          fontSize: "3xs",
+                          fontWeight: 500,
+                          letterSpacing: 0.33
+                        }}
+                      >
+                        {decodeHTML(truncateString(row.label, 200))}
+                      </Text>
                     </Flex>
                   );
                 const { command, index } = row;

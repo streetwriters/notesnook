@@ -65,6 +65,7 @@ export function DateField(props: {
         isOpen={showCalendar}
         onClose={() => setShowCalendar(false)}
         anchorRef={anchorRef}
+        sx={{ borderRadius: "dialog" }}
       >
         <DayPicker
           sx={{ p: 2, width: 300 }}

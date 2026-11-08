@@ -211,7 +211,15 @@ export function UserProfile({ minimal }: Props) {
         }}
       >
         <Avatar size={25} iconSize={20} picture={profile?.profilePicture} />
-        <Flex sx={{ flexDirection: "column", flex: 1, gap: "spacing1" }}>
+        <Flex
+          sx={{
+            flexDirection: "column",
+            flex: 1,
+            gap: "spacing1",
+            lineHeight: 1,
+            wordBreak: "break-word"
+          }}
+        >
           <Text sx={{ color: "accent", fontSize: "3xs", fontWeight: 500 }}>
             {`${title}${trial ? " (trial)" : ""}`}
           </Text>

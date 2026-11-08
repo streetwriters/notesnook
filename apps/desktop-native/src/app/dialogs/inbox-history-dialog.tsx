@@ -20,7 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useState } from "react";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { InboxItemsHistoryErrorContext } from "@notesnook/core";
-import { Button, Dialog, dataColor, Flex, ScrollContainer, Text } from "@ui";
+import {
+  Button,
+  Dialog,
+  dataColor,
+  Flex,
+  ScrollContainer,
+  Text,
+  useWindowSize
+} from "@ui";
 import { clipboard } from "@platform";
 import { strings } from "@notesnook/intl";
 import { db } from "../common/db";
@@ -152,6 +160,7 @@ const dash = "—";
 
 export const InboxHistoryDialog = DialogManager.register(
   function InboxHistoryDialog(props: InboxHistoryDialogProps) {
+    const { height: windowHeight } = useWindowSize();
     const result = usePromise(() => db.inboxItemsHistory.failed.items());
 
     async function deleteItem(id: string) {
@@ -203,7 +212,7 @@ export const InboxHistoryDialog = DialogManager.register(
         ) : result.value.length === 0 ? (
           <Text sx={{ p: 3 }}>{strings.noFailedInboxItems()}</Text>
         ) : (
-          <ScrollContainer sx={{ maxHeight: 500 }}>
+          <ScrollContainer sx={{ maxHeight: windowHeight * 0.7 }}>
             <Flex sx={{ p: 2, flexDirection: "column" }}>
               <Flex sx={{ flexDirection: "row" }}>
                 {getColumns().map((col, index) => (

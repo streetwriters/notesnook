@@ -217,6 +217,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
   return (
     <Flex
       testID={`toolbar-node-${item.id}`}
+      group="toolbar-node"
       draggable={isDraggable}
       droppable
       sx={{
@@ -255,7 +256,12 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         {group && isGroup(item) && onAddSubGroup && (
           <Button
             variant="secondary"
-            sx={{ p: "small", mr: 1 }}
+            sx={{
+              p: "small",
+              mr: 1,
+              opacity: 0,
+              ":group-hover": { group: "toolbar-node", style: { opacity: 1 } }
+            }}
             onPress={() => onAddSubGroup()}
           >
             <Icon path={Icons.plus} size={16} color="icon" />
@@ -264,7 +270,11 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         {(group ? onRemoveGroup : onRemoveItem) && (
           <Button
             variant="secondary"
-            sx={{ p: "small" }}
+            sx={{
+              p: "small",
+              opacity: 0,
+              ":group-hover": { group: "toolbar-node", style: { opacity: 1 } }
+            }}
             onPress={() => (group ? onRemoveGroup : onRemoveItem)?.(item)}
           >
             <Icon path={Icons.delete} size={16} color="icon" />
