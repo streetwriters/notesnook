@@ -23,6 +23,7 @@ import { Box, Button, dataColor, Flex, Icon, Text, ThemeScope } from "@ui";
 import { CaretRight, Check, Pro } from "../icons";
 import { environment } from "@platform";
 import { useMenuStore } from "./store";
+import { useEscape } from "../../hooks/use-escape";
 
 export { useMenuStore } from "./store";
 
@@ -298,6 +299,7 @@ export function MenuHost() {
   const anchor = useMenuStore((store) => store.anchor);
   const title = useMenuStore((store) => store.title);
   const close = useMenuStore((store) => store.close);
+  useEscape(close, !!items && !!anchor);
   if (!items || !anchor) return null;
 
   return (

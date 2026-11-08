@@ -41,7 +41,6 @@ describe("note context menu", () => {
       "add-tags",
       "lock",
       "readonly",
-      "local-only",
       "export",
       "duplicate",
       "movetotrash"
