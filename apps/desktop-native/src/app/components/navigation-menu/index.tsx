@@ -1154,7 +1154,12 @@ function HomeTab(props: { isCollapsed?: boolean; collapse: () => void }) {
     <ScrollContainer>
       <Flex
         testID="home-tab"
-        sx={{ flexDirection: "column", gap: "spacing1", px: "spacing4" }}
+        sx={{
+          flexDirection: "column",
+          gap: "spacing1",
+          px: "spacing4",
+          width: "100%"
+        }}
       >
         <Routes collapse={props.collapse} isCollapsed={props.isCollapsed} />
         <Colors collapse={props.collapse} isCollapsed={props.isCollapsed} />
