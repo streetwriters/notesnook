@@ -58,3 +58,11 @@ export declare const SplitPane: ForwardRefExoticComponent<
   SplitPaneProps & RefAttributes<SplitPaneHandle>
 >;
 export declare function Pane(props: PaneProps): JSX.Element | null;
+
+export declare const TITLE_BAR_HEIGHT: number;
+
+export interface TitleBarProps {
+  underlay?: boolean;
+}
+
+export declare function TitleBar(props: TitleBarProps): JSX.Element | null;

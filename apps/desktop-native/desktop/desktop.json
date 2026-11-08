@@ -3,7 +3,16 @@
   "productName": "Notesnook",
   "identifier": "org.streetwriters.notesnook.native",
   "icon": "assets/icon.png",
-  "window": { "title": "Notesnook", "width": 1280, "height": 800 },
+  "window": {
+    "title": "Notesnook",
+    "width": 1280,
+    "height": 800,
+    "titleBar": "hidden",
+    "trafficLightPosition": {
+      "x": 10,
+      "y": 14
+    }
+  },
   "bundle": {
     "targets": "all",
     "macos": {

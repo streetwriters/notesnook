@@ -24,3 +24,4 @@ export * from "./overlays";
 export * from "./primitives";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "./style/data-color";
+export { TITLE_BAR_HEIGHT, TitleBar } from "./title-bar";

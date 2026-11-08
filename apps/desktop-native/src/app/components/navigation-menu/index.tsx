@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { Flex, Text } from "@ui";
+import { Flex, Text, TITLE_BAR_HEIGHT } from "@ui";
 import { navigate, usePathname } from "../../navigation";
 import {
   Archive,
@@ -85,7 +85,8 @@ export function NavigationMenu() {
         bg: "background",
         borderRight: "1px solid",
         borderRightColor: "separator",
-        py: "spacing4"
+        pt: TITLE_BAR_HEIGHT,
+        pb: "spacing4"
       }}
     >
       <Flex sx={{ flexDirection: "column", flex: 1, gap: "spacing1" }}>

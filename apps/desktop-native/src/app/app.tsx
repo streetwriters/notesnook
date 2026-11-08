@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Pane, SplitPane, Text, ThemeScope } from "@ui";
+import { Flex, Pane, SplitPane, Text, ThemeScope, TitleBar } from "@ui";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
 import { StatusBar } from "./components/status-bar";
@@ -28,6 +28,7 @@ export function App() {
       testID="app"
       sx={{ flexDirection: "column", flex: 1, bg: "background" }}
     >
+      <TitleBar />
       <SplitPane
         testID="global-split-pane"
         direction="vertical"
