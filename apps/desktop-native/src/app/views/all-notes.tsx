@@ -1,0 +1,68 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { memo, useEffect } from "react";
+import { db } from "../common/db";
+import ListContainer from "../components/list-container";
+import { ListLoader } from "../components/loaders/list-loader";
+import { ListPanePlaceholder } from "../components/placeholders";
+import useNavigate from "../hooks/use-navigate";
+import { useSearch } from "../hooks/use-search";
+import { useStore } from "../stores/note-store";
+
+function Home() {
+  const notes = useStore((store) => store.notes);
+  const isCompact = useStore((store) => store.viewMode === "compact");
+  const refresh = useStore((store) => store.refresh);
+  const setContext = useStore((store) => store.setContext);
+  const filteredItems = useSearch(
+    "notes",
+    async (query, sortOptions) => {
+      if (useStore.getState().context) return;
+      return await db.lookup.notesWithHighlighting(
+        query,
+        db.notes.all,
+        sortOptions
+      );
+    },
+    [notes]
+  );
+
+  useNavigate("home", setContext);
+
+  useEffect(() => {
+    useStore.getState().refresh();
+  }, []);
+
+  if (!notes) return <ListLoader />;
+  return (
+    <ListContainer
+      type="home"
+      group="home"
+      compact={isCompact}
+      refresh={refresh}
+      items={filteredItems || notes}
+      isSearching={!!filteredItems}
+      placeholder={
+        <ListPanePlaceholder variant={filteredItems ? "search" : "home"} />
+      }
+    />
+  );
+}
+export default memo(Home, () => true);

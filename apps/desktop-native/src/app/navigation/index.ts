@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EventManager } from "@notesnook/core";
 import { history } from "@platform";
 import Config from "../utils/config";
@@ -158,4 +158,17 @@ export function hardNavigate(route: string, search?: string) {
     hash: history.location.hash,
     search: search ?? history.location.search
   });
+}
+
+export function usePathname() {
+  const [pathname, setPathname] = useState(getCurrentPath());
+  useEffect(() => {
+    const subscription = NavigationEvents.subscribe("popstate", () =>
+      setPathname(getCurrentPath())
+    );
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  return pathname;
 }

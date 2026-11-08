@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useLocation } from "wouter";
 import makeMatcher from "wouter/matcher";
-import { navigate } from "../navigation";
+import { navigate, usePathname } from "../navigation";
 import { Params, RouteResult, Routes } from "../navigation/types";
 import { useEffect, useState } from "react";
 
@@ -30,7 +29,7 @@ export default function useRoutes<T extends string>(
     fallbackRoute?: string;
   }
 ) {
-  const [location] = useLocation();
+  const location = usePathname();
   const [result, setResult] = useState<RouteResult>();
 
   useEffect(() => {

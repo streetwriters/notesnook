@@ -17,6 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented } from "../common/not-implemented";
+import { Flex, Text } from "@ui";
 
-export default notImplemented("reminders");
+export default function GroupHeader(props: {
+  title: string;
+  showGroupCounts?: boolean;
+  isFocused?: boolean;
+}) {
+  return (
+    <Flex
+      testID="group-header"
+      sx={{
+        alignItems: "center",
+        px: "spacing6",
+        py: "spacing3",
+        bg: "background"
+      }}
+    >
+      <Text
+        testID="group-header-title"
+        sx={{
+          color: "accent",
+          fontSize: "xs",
+          fontWeight: "bold"
+        }}
+      >
+        {props.title}
+      </Text>
+    </Flex>
+  );
+}

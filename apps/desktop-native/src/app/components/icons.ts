@@ -17,29 +17,76 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented, type NotImplemented } from "../common/not-implemented";
+import { createElement, type ComponentType } from "react";
+import {
+  mdiAccountOutline,
+  mdiAlertCircleOutline,
+  mdiAlertOutline,
+  mdiArchiveOutline,
+  mdiArrowTopRightThick,
+  mdiBellPlusOutline,
+  mdiBookOutline,
+  mdiCalendarOutline,
+  mdiCheckCircleOutline,
+  mdiChevronDown,
+  mdiCircle,
+  mdiCloudSyncOutline,
+  mdiCogOutline,
+  mdiEmailOutline,
+  mdiHomeOutline,
+  mdiInformationOutline,
+  mdiLockOutline,
+  mdiMagnify,
+  mdiNotebookOutline,
+  mdiPlus,
+  mdiPoundBox,
+  mdiStarOutline,
+  mdiSync,
+  mdiSyncOff,
+  mdiTrashCanOutline,
+  mdiUpdate,
+  mdiBellOutline,
+  mdiTagOutline,
+  mdiBackupRestore,
+  mdiNoteTextOutline
+} from "@mdi/js";
+import { Icon as UIIcon, type IconProps } from "@ui";
 
-export const ArrowTopRight: NotImplemented = notImplemented("ArrowTopRight");
-export type ArrowTopRight = any;
-export const Backup: NotImplemented = notImplemented("Backup");
-export type Backup = any;
-export const BellPlus: NotImplemented = notImplemented("BellPlus");
-export type BellPlus = any;
-export const Email: NotImplemented = notImplemented("Email");
-export type Email = any;
-export const Error: NotImplemented = notImplemented("Error");
-export type Error = any;
-export const House: NotImplemented = notImplemented("House");
-export type House = any;
-export const Icon: NotImplemented = notImplemented("Icon");
-export type Icon = any;
-export const Info: NotImplemented = notImplemented("Info");
-export type Info = any;
-export const Plus: NotImplemented = notImplemented("Plus");
-export type Plus = any;
-export const Success: NotImplemented = notImplemented("Success");
-export type Success = any;
-export const User: NotImplemented = notImplemented("User");
-export type User = any;
-export const Warn: NotImplemented = notImplemented("Warn");
-export type Warn = any;
+export type Icon = ComponentType<Omit<IconProps, "path" | "svg">>;
+
+function icon(path: string): Icon {
+  const Component: Icon = (props) => createElement(UIIcon, { ...props, path });
+  return Component;
+}
+
+export const ArrowTopRight = icon(mdiArrowTopRightThick);
+export const Backup = icon(mdiBackupRestore);
+export const BellPlus = icon(mdiBellPlusOutline);
+export const Bell = icon(mdiBellOutline);
+export const Email = icon(mdiEmailOutline);
+export const Error = icon(mdiAlertCircleOutline);
+export const House = icon(mdiHomeOutline);
+export const Info = icon(mdiInformationOutline);
+export const Plus = icon(mdiPlus);
+export const Success = icon(mdiCheckCircleOutline);
+export const User = icon(mdiAccountOutline);
+export const Warn = icon(mdiAlertOutline);
+export const Alert = icon(mdiAlertOutline);
+export const Archive = icon(mdiArchiveOutline);
+export const Calendar = icon(mdiCalendarOutline);
+export const ChevronDown = icon(mdiChevronDown);
+export const Circle = icon(mdiCircle);
+export const Cloud = icon(mdiCloudSyncOutline);
+export const Lock = icon(mdiLockOutline);
+export const Note = icon(mdiNoteTextOutline);
+export const Notebook = icon(mdiNotebookOutline);
+export const Reminder = icon(mdiUpdate);
+export const Search = icon(mdiMagnify);
+export const Settings = icon(mdiCogOutline);
+export const Star = icon(mdiStarOutline);
+export const Sync = icon(mdiSync);
+export const SyncOff = icon(mdiSyncOff);
+export const Tag = icon(mdiTagOutline);
+export const Tags = icon(mdiPoundBox);
+export const Trash = icon(mdiTrashCanOutline);
+export const Book = icon(mdiBookOutline);

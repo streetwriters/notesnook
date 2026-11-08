@@ -17,8 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented, type NotImplemented } from "../common/not-implemented";
+import { Flex, Text } from "@ui";
 
-export const NavigationTabItem: NotImplemented =
-  notImplemented("NavigationTabItem");
-export type NavigationTabItem = any;
+export default function Reminders() {
+  return (
+    <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text testID="reminders-view" sx={{ color: "paragraph-secondary" }}>
+        Reminders is not implemented on desktop yet
+      </Text>
+    </Flex>
+  );
+}

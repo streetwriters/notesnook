@@ -7,6 +7,7 @@ let app: DesktopApp;
 beforeAll(async () => {
   app = await launchApp({
     disableAnimations: false,
+    initialProps: { screen: "demo" },
     timeout: 180000,
     logFile: process.env.RN_GPUI_E2E_LOG
   });

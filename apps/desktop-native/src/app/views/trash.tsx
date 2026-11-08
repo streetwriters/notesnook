@@ -17,6 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented } from "../common/not-implemented";
+import { Flex, Text } from "@ui";
 
-export default notImplemented("notes");
+export default function Trash() {
+  return (
+    <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text testID="trash-view" sx={{ color: "paragraph-secondary" }}>
+        Trash is not implemented on desktop yet
+      </Text>
+    </Flex>
+  );
+}

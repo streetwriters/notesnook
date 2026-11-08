@@ -22,7 +22,6 @@ import {
   SqliteIntrospector,
   SqliteQueryCompiler
 } from "@streetwriters/kysely";
-import { paths } from "@react-native-gpui/fs";
 import type { DatabaseHost } from "../../../../platform";
 import { compression } from "../compression";
 import { getDatabaseKey } from "./encryption";
@@ -40,8 +39,7 @@ export const databaseHost: DatabaseHost = {
     createDriver: () =>
       new RNSqliteDriver({
         async: true,
-        dbName: name,
-        location: paths.appData
+        dbName: name
       }),
     createAdapter: () => new SqliteAdapter(),
     createIntrospector: (db) => new SqliteIntrospector(db),

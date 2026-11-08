@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { environment, lifecycle } from "@platform";
+import { config, environment, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
 import { initLocale } from "./common/locale";
 
@@ -28,9 +28,39 @@ export type BootState = {
   user?: { email: string };
 };
 
-export async function boot(): Promise<BootState> {
+export type SeedNote = {
+  title: string;
+  content?: string;
+  dateCreated?: number;
+  dateEdited?: number;
+  favorite?: boolean;
+};
+
+export type BootOptions = {
+  seed?: SeedNote[];
+  resetConfig?: boolean;
+};
+
+async function seedNotes(notes: SeedNote[]) {
+  for (const note of notes) {
+    await db.notes.add({
+      title: note.title,
+      content: {
+        type: "tiptap",
+        data: `<p>${note.content ?? note.title}</p>`
+      },
+      favorite: note.favorite,
+      dateCreated: note.dateCreated,
+      dateEdited: note.dateEdited
+    });
+  }
+}
+
+export async function boot(options: BootOptions = {}): Promise<BootState> {
+  if (environment.isDev && options.resetConfig) config.clear();
   await initLocale();
   await initializeDatabase("db");
+  if (environment.isDev && options.seed) await seedNotes(options.seed);
   const user = await db.user.getUser();
   return {
     status: "ready",

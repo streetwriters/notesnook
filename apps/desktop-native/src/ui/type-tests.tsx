@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { SxProp } from "./style";
+import { Pane, SplitPane } from "./layout";
+import { VirtualList } from "./lists";
 import { Box, Button, Flex, Grid, Input, Text, ThemeScope } from "./primitives";
 
 export const valid: SxProp = {
@@ -113,6 +115,21 @@ export const elements = [
   <Button key="4" variant="accent" onPress={(e) => e.stopPropagation()} />,
   <Input key="5" onChangeText={(text) => text.length} />,
   <ThemeScope key="6" scope="navigationMenu" />,
+  <SplitPane key="13" direction="vertical" autoSaveId="global">
+    <Pane id="nav" initialSize={250} minSize={50} snapSize={150} />
+    <Pane id="editor" />
+  </SplitPane>,
+  <VirtualList
+    key="14"
+    count={10}
+    itemKey={(index) => `${index}`}
+    renderItem={() => null}
+    estimatedItemSize={40}
+  />,
+  // @ts-expect-error a list needs its item size estimate
+  <VirtualList key="15" count={1} itemKey={() => ""} renderItem={() => null} />,
+  // @ts-expect-error pane sizes are numbers
+  <Pane key="16" id="x" initialSize="250px" />,
   <Grid key="10" columns={7} gap={1} rowGap={2} />,
   // @ts-expect-error grids are equal columns, not template strings
   <Grid key="11" columns="1fr 1fr" />,

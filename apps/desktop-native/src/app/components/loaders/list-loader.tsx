@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented, type NotImplemented } from "../common/not-implemented";
+import { Flex, Text } from "@ui";
 
-export const RouteContainerButton: NotImplemented = notImplemented(
-  "RouteContainerButton"
-);
-export type RouteContainerButton = any;
+export function ListLoader() {
+  return (
+    <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text sx={{ color: "paragraph-secondary" }}>Loading</Text>
+    </Flex>
+  );
+}

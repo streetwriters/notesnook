@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Platform, TurboModuleRegistry } from "react-native";
+import { Platform } from "react-native";
+import DeviceInfo from "react-native-device-info";
 import { paths } from "@react-native-gpui/fs";
 import type { Environment, OperatingSystem } from "../../../platform";
 
@@ -26,14 +27,6 @@ const OPERATING_SYSTEMS: Record<string, OperatingSystem> = {
   windows: "Windows",
   linux: "Linux"
 };
-
-// Temporary workaround: react-native-device-info reports "unknown" on desktop
-// because its platform whitelist does not include it. Replace with
-// deviceInfo.appVersion and getSystemVersion() once the device-info adapter
-// overrides that whitelist.
-const deviceInfo = TurboModuleRegistry.getEnforcing<{
-  getConstants(): { appVersion: string; systemVersion: string };
-}>("RNDeviceInfo").getConstants();
 
 const os = OPERATING_SYSTEMS[Platform.OS] ?? null;
 
@@ -44,7 +37,7 @@ export const environment: Environment = {
   isDev: __DEV__,
   isBeta: false,
   appTitle: "Notesnook",
-  version: deviceInfo.appVersion,
+  version: DeviceInfo.getVersion(),
   gitHash: "unknown",
   os,
   isMacStoreApp: false,
@@ -62,6 +55,6 @@ export const environment: Environment = {
     transferableStreams: false
   },
   describe() {
-    return `OS: ${os ?? Platform.OS} ${deviceInfo.systemVersion}`;
+    return `OS: ${os ?? Platform.OS} ${DeviceInfo.getSystemVersion()}`;
   }
 };

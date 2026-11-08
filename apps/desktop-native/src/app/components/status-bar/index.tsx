@@ -17,6 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { notImplemented } from "../common/not-implemented";
+import { Flex, Text } from "@ui";
+import { useStore as useAppStore } from "../../stores/app-store";
 
-export default notImplemented("all-notes");
+export function StatusBar() {
+  const syncStatus = useAppStore((store) => store.syncStatus.key);
+  return (
+    <Flex
+      testID="status-bar"
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        px: "spacing6",
+        py: "spacing2",
+        bg: "background",
+        borderTop: "1px solid",
+        borderTopColor: "separator"
+      }}
+    >
+      <Text
+        testID="status-sync"
+        sx={{ color: "paragraph-secondary", fontSize: "3xs" }}
+      >
+        {syncStatus}
+      </Text>
+    </Flex>
+  );
+}
