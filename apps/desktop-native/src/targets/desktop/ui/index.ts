@@ -25,6 +25,7 @@ export * from "./overlays";
 export * from "./primitives";
 export { ColorPicker } from "./color-picker";
 export { Popover, PopoverHost } from "./popover";
+export { QRCode } from "./qrcode";
 export { Select } from "./select";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "./style/data-color";

@@ -27,12 +27,15 @@ import { databaseHost } from "./database";
 import { environment } from "./environment";
 import { files } from "./files";
 import { history } from "./history";
+import { imageCompressor } from "./image-compressor";
 import { integration } from "./integration";
 import { keyboard } from "./keyboard";
+import { kvStore } from "./kv-store";
 import { lifecycle } from "./lifecycle";
 import { notifications } from "./notifications";
 import { shell } from "./shell";
 import { updater } from "./updater";
+import { webauthn } from "./webauthn";
 import { windowControls } from "./window";
 
 export {
@@ -44,12 +47,15 @@ export {
   environment,
   files,
   history,
+  imageCompressor,
   integration,
   keyboard,
+  kvStore,
   lifecycle,
   notifications,
   shell,
   updater,
+  webauthn,
   windowControls
 };
 
@@ -70,12 +76,15 @@ export const contract: typeof Contract = {
   environment,
   files,
   history,
+  imageCompressor,
   integration,
   keyboard,
+  kvStore,
   lifecycle,
   notifications,
   shell,
   spellChecker,
   updater,
+  webauthn,
   windowControls
 };
