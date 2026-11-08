@@ -1,0 +1,327 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { environment } from "@platform";
+import { reloadApp, setAppLanguage } from "./platform-gaps";
+import { DATE_FORMATS, WeekFormat } from "@notesnook/core";
+import { SettingsGroup } from "./types";
+import {
+  ImageCompressionOptions,
+  useStore as useSettingStore
+} from "../../stores/setting-store";
+import dayjs from "dayjs";
+import { TimeFormat, DayFormat } from "@notesnook/core";
+import { TrashCleanupInterval } from "@notesnook/core";
+import { strings, AVAILABLE_LANGUAGES } from "@notesnook/intl";
+import { ConfirmDialog } from "../confirm";
+import { checkFeature } from "../../common";
+
+export const BehaviourSettings: SettingsGroup[] = [
+  {
+    key: "general",
+    section: "behaviour",
+    header: strings.general(),
+    settings: [
+      {
+        key: "app-language",
+        title: strings.selectLanguage(),
+        description: strings.changeLanguage(),
+        keywords: ["language", "locale", "select language", "change language"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.appLanguage, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: async (value) => {
+              const currentLang = useSettingStore.getState().appLanguage || "";
+              const newLang = value === "auto" ? "" : value;
+              if (newLang === currentLang) return;
+
+              const ok = await ConfirmDialog.show({
+                title: strings.changeLanguage(),
+                message: strings.restartAppToApplyChanges(),
+                positiveButtonText: strings.restartNow(),
+                negativeButtonText: strings.cancel()
+              });
+
+              if (ok) {
+                useSettingStore.getState().setAppLanguage(newLang);
+                if (environment.isDesktopApp) {
+                  await setAppLanguage(newLang);
+                }
+                reloadApp();
+              }
+            },
+            selectedOption: () => {
+              const saved = useSettingStore.getState().appLanguage;
+              return saved || "auto";
+            },
+            options: [
+              {
+                value: "auto",
+                get title() {
+                  return strings.auto();
+                }
+              },
+              ...AVAILABLE_LANGUAGES.map((l) => ({
+                value: l.code,
+                title: `${l.label} (${l.nativeLabel})`
+              }))
+            ]
+          }
+        ]
+      },
+      {
+        key: "default-sidebar-tab",
+        title: strings.defaultSidebarTab(),
+        description: strings.defaultSidebarTabDesc(),
+        keywords: ["default sidebar tab"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.defaultSidebarTab, listener),
+        featureId: "defaultSidebarTab",
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setDefaultSidebarTab(value as any),
+            selectedOption: () => useSettingStore.getState().defaultSidebarTab,
+            options: [
+              { value: "home", title: strings.routes.Notes() },
+              { value: "notebooks", title: strings.routes.Notebooks() },
+              { value: "tags", title: strings.routes.Tags() }
+            ]
+          }
+        ]
+      },
+      {
+        key: "image-compression",
+        title: strings.imageCompression(),
+        description: strings.imageCompressionDesc(),
+        keywords: ["compress images", "image quality"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.imageCompression, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: async (value) => {
+              if (
+                value === ImageCompressionOptions.DISABLE.toString() &&
+                !(await checkFeature("fullQualityImages"))
+              )
+                return;
+
+              useSettingStore.getState().setImageCompression(parseInt(value));
+            },
+            selectedOption: () =>
+              useSettingStore.getState().imageCompression.toString(),
+            options: [
+              {
+                value: ImageCompressionOptions.ASK_EVERY_TIME.toString(),
+                title: strings.askEveryTime()
+              },
+              {
+                value: ImageCompressionOptions.ENABLE.toString(),
+                title: strings.enableRecommended()
+              },
+              {
+                value: ImageCompressionOptions.DISABLE.toString(),
+                title: strings.disable()
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    key: "date-time",
+    section: "behaviour",
+    header: strings.dateAndTime(),
+    settings: [
+      {
+        key: "date-format",
+        title: strings.dateFormat(),
+        description: strings.dateFormatDesc(),
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.dateFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setDateFormat(value),
+            selectedOption: () => useSettingStore.getState().dateFormat,
+            options: DATE_FORMATS.map((a) => ({
+              value: a,
+              title: `${a} (${dayjs(Date.now()).format(a)})`
+            }))
+          }
+        ]
+      },
+      {
+        key: "time-format",
+        title: strings.timeFormat(),
+        description: strings.timeFormatDesc(),
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.timeFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setTimeFormat(value as TimeFormat),
+            selectedOption: () => useSettingStore.getState().timeFormat,
+            options: [
+              { value: "12-hour", title: "12h" },
+              { value: "24-hour", title: "24h" }
+            ]
+          }
+        ]
+      },
+      {
+        key: "day-format",
+        title: strings.dayFormat(),
+        description: strings.dayFormatDesc(),
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.dayFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setDayFormat(value as DayFormat),
+            selectedOption: () => useSettingStore.getState().dayFormat,
+            options: [
+              {
+                value: "short",
+                get title() {
+                  return strings.dayFormatShort();
+                }
+              },
+              {
+                value: "long",
+                get title() {
+                  return strings.dayFormatLong();
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        key: "week-format",
+        title: strings.weekFormat(),
+        description: strings.weekFormatDesc(),
+        keywords: [],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.weekFormat, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: (value) =>
+              useSettingStore.getState().setWeekFormat(value as WeekFormat),
+            selectedOption: () => useSettingStore.getState().weekFormat,
+            options: [
+              {
+                value: "Sun",
+                get title() {
+                  return strings.sunday();
+                }
+              },
+              {
+                value: "Mon",
+                get title() {
+                  return strings.monday();
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    key: "trash",
+    section: "behaviour",
+    header: strings.trash(),
+    settings: [
+      {
+        key: "trash-cleanup-interval",
+        title: strings.clearTrashInterval(),
+        description: strings.clearTrashIntervalDesc(),
+        keywords: ["clear trash", "trash cleanup interval"],
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.trashCleanupInterval, listener),
+        components: [
+          {
+            type: "dropdown",
+            onSelectionChanged: async (value) => {
+              if (
+                value === "-1" &&
+                !(await checkFeature("disableTrashCleanup"))
+              )
+                return;
+
+              useSettingStore
+                .getState()
+                .setTrashCleanupInterval(
+                  parseInt(value) as TrashCleanupInterval
+                );
+            },
+            selectedOption: () =>
+              useSettingStore.getState().trashCleanupInterval.toString(),
+            options: [
+              { value: "1", title: strings.daily() },
+              { value: "7", title: strings.days(7) },
+              { value: "30", title: strings.days(30) },
+              { value: "365", title: strings.days(365) },
+              { value: "-1", title: strings.never() }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    key: "desktop-app",
+    section: "behaviour",
+    header: strings.desktopApp(),
+    isHidden: () => !environment.isDesktopApp,
+    settings: [
+      {
+        key: "auto-updates",
+        title: strings.automaticUpdates(),
+        description: strings.automaticUpdatesDesc(),
+        onStateChange: (listener) =>
+          useSettingStore.subscribe((s) => s.autoUpdates, listener),
+        isHidden: () =>
+          useSettingStore.getState().isFlatpak ||
+          useSettingStore.getState().isSnap ||
+          useSettingStore.getState().isPortable,
+        components: [
+          {
+            type: "toggle",
+            isToggled: () => useSettingStore.getState().autoUpdates,
+            toggle: () => useSettingStore.getState().toggleAutoUpdates()
+          }
+        ]
+      }
+    ]
+  }
+];

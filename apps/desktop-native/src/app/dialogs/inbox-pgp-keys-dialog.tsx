@@ -1,0 +1,213 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Button, Dialog, Flex, Text } from "@ui";
+
+import { useState } from "react";
+import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { db } from "../common/db";
+import { Field } from "./components/field";
+import { showToast } from "../utils/toast";
+import { SerializedKeyPair } from "@notesnook/crypto";
+import { ConfirmDialog } from "./confirm";
+import { strings } from "@notesnook/intl";
+
+type InboxPGPKeysDialogProps = BaseDialogProps<boolean> & {
+  keys?: SerializedKeyPair | null;
+};
+
+export const InboxPGPKeysDialog = DialogManager.register(
+  function InboxPGPKeysDialog(props: InboxPGPKeysDialogProps) {
+    const { keys: initialKeys, onClose } = props;
+    const [mode, setMode] = useState<"choose" | "edit">(
+      initialKeys ? "edit" : "choose"
+    );
+    const [publicKey, setPublicKey] = useState(initialKeys?.publicKey || "");
+    const [privateKey, setPrivateKey] = useState(initialKeys?.privateKey || "");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const hasChanges =
+      publicKey !== (initialKeys?.publicKey || "") ||
+      privateKey !== (initialKeys?.privateKey || "");
+
+    async function handleAutoGenerate() {
+      try {
+        setIsLoading(true);
+        await db.user.getInboxKeys();
+        showToast("success", strings.inboxKeysGenerated());
+        onClose(true);
+      } catch (error) {
+        showToast("error", strings.failedToGenerateInboxKeys());
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    async function handleSave() {
+      const trimmedPublicKey = publicKey.trim();
+      const trimmedPrivateKey = privateKey.trim();
+      if (!trimmedPublicKey || !trimmedPrivateKey) {
+        showToast("error", strings.publicAndPrivateKeysRequired());
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const result = await db.storage().validatePGPKeyPair({
+          publicKey: trimmedPublicKey,
+          privateKey: trimmedPrivateKey
+        });
+        if (!result.isValid) {
+          showToast("error", result.message);
+          return;
+        }
+
+        if (initialKeys) {
+          const ok = await ConfirmDialog.show({
+            title: strings.changeInboxPgpKeys(),
+            subtitle: strings.changingInboxPgpKeysNotice(),
+            positiveButtonText: strings.yes(),
+            negativeButtonText: strings.no()
+          });
+          if (!ok) return;
+        }
+
+        await db.user.saveInboxKeys({
+          publicKey: trimmedPublicKey,
+          privateKey: trimmedPrivateKey
+        });
+        showToast("success", strings.inboxKeysSaved());
+        onClose(true);
+      } catch (error) {
+        showToast("error", strings.failedToSaveInboxKeys());
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (mode === "choose") {
+      return (
+        <Dialog
+          isOpen={true}
+          title={strings.setupInboxPgpKeys()}
+          width={500}
+          negativeButton={{
+            text: strings.cancel(),
+            onClick: () => onClose(false)
+          }}
+        >
+          <Flex sx={{ flexDirection: "column", gap: 3 }}>
+            <Text sx={{ fontSize: "body", color: "paragraph" }}>
+              {strings.setupInboxPgpKeysDescription()}
+            </Text>
+            <Flex sx={{ flexDirection: "column", gap: 2 }}>
+              <Button
+                variant="secondary"
+                onPress={handleAutoGenerate}
+                disabled={isLoading}
+                sx={{ width: "100%" }}
+              >
+                <Text>
+                  {isLoading
+                    ? strings.generating()
+                    : strings.autoGenerateKeys()}
+                </Text>
+              </Button>
+              <Text
+                sx={{
+                  fontSize: "body",
+                  color: "paragraph",
+                  textAlign: "center"
+                }}
+              >
+                {strings.or()}
+              </Text>
+              <Button
+                variant="secondary"
+                onPress={() => setMode("edit")}
+                disabled={isLoading}
+                sx={{ width: "100%" }}
+              >
+                {strings.provideOwnKeys()}
+              </Button>
+            </Flex>
+          </Flex>
+        </Dialog>
+      );
+    }
+
+    return (
+      <Dialog
+        isOpen={true}
+        title={strings.manageInboxKeys()}
+        width={600}
+        positiveButton={{
+          text: isLoading ? strings.saving() : strings.save(),
+          onClick: handleSave,
+          disabled: isLoading || !hasChanges
+        }}
+        negativeButton={{
+          text: strings.cancel(),
+          onClick: () => onClose(false)
+        }}
+      >
+        <Flex sx={{ flexDirection: "column", gap: 3 }}>
+          <Field
+            label={strings.publicKeyLabel()}
+            id="publicKey"
+            name="publicKey"
+            as="textarea"
+            required
+            value={publicKey}
+            onChangeText={setPublicKey}
+            styles={{
+              input: {
+                fontFamily: "monospace",
+                fontSize: "body",
+                minHeight: 150
+              }
+            }}
+            placeholder={strings.enterPgpPublicKey()}
+            disabled={isLoading}
+          />
+          <Field
+            label={strings.privateKeyLabel()}
+            id="privateKey"
+            name="privateKey"
+            as="textarea"
+            required
+            value={privateKey}
+            onChangeText={setPrivateKey}
+            styles={{
+              input: {
+                fontFamily: "monospace",
+                fontSize: "body",
+                minHeight: 150
+              }
+            }}
+            placeholder={strings.enterPgpPrivateKey()}
+            disabled={isLoading}
+          />
+        </Flex>
+      </Dialog>
+    );
+  }
+);

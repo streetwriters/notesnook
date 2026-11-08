@@ -215,7 +215,7 @@ export const notebookMenuItems: (
       title: strings.newNotebook(),
       iconComponent: Plus,
       onClick: () =>
-        AddNotebookDialog.show({ parentId: notebook.id }).then((res: boolean) =>
+        AddNotebookDialog.show({ parentId: notebook.id }).then((res) =>
           res ? context?.refresh?.() : null
         )
     },

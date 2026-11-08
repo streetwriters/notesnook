@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type * as Contract from "../../../platform";
 import { unimplemented } from "./unimplemented";
+import { clipboard } from "./clipboard";
 import { compression } from "./compression";
 import { config } from "./config";
 import { crypto } from "./crypto";
@@ -26,10 +27,15 @@ import { databaseHost } from "./database";
 import { environment } from "./environment";
 import { files } from "./files";
 import { history } from "./history";
+import { integration } from "./integration";
 import { lifecycle } from "./lifecycle";
+import { notifications } from "./notifications";
+import { shell } from "./shell";
+import { updater } from "./updater";
 import { windowControls } from "./window";
 
 export {
+  clipboard,
   compression,
   config,
   crypto,
@@ -37,21 +43,19 @@ export {
   environment,
   files,
   history,
+  integration,
   lifecycle,
+  notifications,
+  shell,
+  updater,
   windowControls
 };
 
 export const attachmentFiles =
   unimplemented<Contract.AttachmentFiles>("attachmentFiles");
-export const clipboard = unimplemented<Contract.Clipboard>("clipboard");
-export const integration = unimplemented<Contract.Integration>("integration");
 export const keyboard = unimplemented<Contract.Keyboard>("keyboard");
-export const notifications =
-  unimplemented<Contract.Notifications>("notifications");
-export const shell = unimplemented<Contract.Shell>("shell");
 export const spellChecker =
   unimplemented<Contract.SpellChecker>("spellChecker");
-export const updater = unimplemented<Contract.Updater>("updater");
 
 export type * from "../../../platform";
 

@@ -38,5 +38,7 @@ export interface Updater {
   install(): Promise<void>;
   getAutoUpdates(): Promise<boolean>;
   setAutoUpdates(enabled: boolean): Promise<void>;
+  getReleaseTrack(): Promise<"stable" | "beta">;
+  setReleaseTrack(track: "stable" | "beta"): Promise<void>;
   subscribe(events: UpdaterEvents): Unsubscribe;
 }

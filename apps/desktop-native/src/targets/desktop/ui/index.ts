@@ -23,6 +23,8 @@ export { Pane, ScrollContainer, SplitPane } from "./layout";
 export { VirtualList } from "./lists";
 export * from "./overlays";
 export * from "./primitives";
+export { ColorPicker } from "./color-picker";
+export { Popover, PopoverHost } from "./popover";
 export { Select } from "./select";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "./style/data-color";

@@ -358,16 +358,19 @@ const AttachmentMenuItems: (
         if (attachment.mimeType.startsWith("image")) {
           await previewImageAttachment(attachment);
         } else if (attachment.mimeType === PDFMimeType) {
-          const blob = await downloadAttachment(
+          const base64 = await downloadAttachment(
             attachment.hash,
-            "blob",
+            "base64",
             attachment.id
           );
-          if (!blob) {
+          if (!base64) {
             return showToast("error", strings.attachmentPreviewFailed());
           }
 
-          PdfPreviewDialog.show({ blob, hash: attachment.hash });
+          PdfPreviewDialog.show({
+            url: `data:${PDFMimeType};base64,${base64}`,
+            hash: attachment.hash
+          });
         }
       }
     },

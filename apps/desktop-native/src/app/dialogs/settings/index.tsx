@@ -59,6 +59,27 @@ import {
 import { NavigationItem } from "../../components/navigation-menu/navigation-item";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { AppearanceSettings } from "./appearance-settings";
+import { AppLockSettings } from "./app-lock-settings";
+import { AuthenticationSettings } from "./auth-settings";
+import { BackupExportSettings } from "./backup-export-settings";
+import { BehaviourSettings } from "./behaviour-settings";
+import { DesktopIntegrationSettings } from "./desktop-integration-settings";
+import { EditorSettings } from "./editor-settings";
+import { ImporterSettings } from "./importer-settings";
+import { InboxSettings } from "./inbox-settings";
+import { NotesnookCircleSettings } from "./notesnook-circle-settings";
+import { NotificationsSettings } from "./notifications-settings";
+import {
+  AboutSettings,
+  LegalSettings,
+  SupportSettings
+} from "./other-settings";
+import { PrivacySettings } from "./privacy-settings";
+import { ProfileSettings } from "./profile-settings";
+import { ServersSettings } from "./servers-settings";
+import { SubscriptionSettings } from "./subscription-settings";
+import { SyncSettings } from "./sync-settings";
+import { VaultSettings } from "./vault-settings";
 import type {
   DropdownSettingComponent,
   Section,
@@ -159,7 +180,28 @@ const sectionGroups: SectionGroup[] = [
   }
 ];
 
-const SettingsGroups: SettingsGroup[] = [...AppearanceSettings];
+const SettingsGroups: SettingsGroup[] = [
+  ...ProfileSettings,
+  ...AuthenticationSettings,
+  ...SyncSettings,
+  ...AppearanceSettings,
+  ...BehaviourSettings,
+  ...DesktopIntegrationSettings,
+  ...NotificationsSettings,
+  ...BackupExportSettings,
+  ...ImporterSettings,
+  ...AppLockSettings,
+  ...VaultSettings,
+  ...PrivacySettings,
+  ...EditorSettings,
+  ...LegalSettings,
+  ...SupportSettings,
+  ...AboutSettings,
+  ...SubscriptionSettings,
+  ...ServersSettings,
+  ...InboxSettings,
+  ...NotesnookCircleSettings
+];
 
 function findSection(key: SectionKeys): Section | undefined {
   for (const group of sectionGroups)

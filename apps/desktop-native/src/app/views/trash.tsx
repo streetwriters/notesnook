@@ -57,7 +57,7 @@ function Trash() {
             positiveButtonText: strings.clear(),
             negativeButtonText: strings.cancel(),
             subtitle: strings.clearTrashDesc()
-          }).then(async (res: boolean) => {
+          }).then(async (res) => {
             if (res) {
               try {
                 await clearTrash();

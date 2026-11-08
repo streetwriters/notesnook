@@ -342,7 +342,7 @@ const menuItems: (reminder: ReminderType, items?: string[]) => MenuItem[] = (
           positiveButtonText: strings.yes(),
           negativeButtonText: strings.no(),
           positiveButtonVariant: "new_error"
-        }).then((result: boolean) => {
+        }).then((result) => {
           result && Multiselect.moveRemindersToTrash(items);
         });
       },

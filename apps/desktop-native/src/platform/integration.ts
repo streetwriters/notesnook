@@ -48,6 +48,8 @@ export interface Integration {
   getProxyRules(): Promise<string>;
   setProxyRules(proxyRules: string): Promise<void>;
   getBackupDirectory(): Promise<string>;
+  selectBackupDirectory(): Promise<string | undefined>;
+  setAppLanguage(language: string): Promise<void>;
   changeTheme(change: ThemeChange): Promise<void>;
   getSystemTheme(): Promise<"light" | "dark">;
   onSystemThemeChanged(handler: (theme: "light" | "dark") => void): Unsubscribe;
