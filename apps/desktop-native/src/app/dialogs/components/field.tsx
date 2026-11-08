@@ -33,7 +33,10 @@ import {
   PasswordVisible,
   type Icon
 } from "../../components/icons";
-import { AuthErrorText } from "./error-text";
+import { AuthErrorText } from "../../components/error-text";
+import BaseField, {
+  type FieldProps as BaseFieldProps
+} from "../../components/field";
 
 export type FieldAction = {
   id?: string;
@@ -117,7 +120,7 @@ function ActionButtons(props: {
   );
 }
 
-export const Field = forwardRef<UIElement, FieldProps>(function Field(
+const TextareaField = forwardRef<UIElement, FieldProps>(function TextareaField(
   props,
   ref
 ) {
@@ -281,6 +284,40 @@ export const Field = forwardRef<UIElement, FieldProps>(function Field(
       <AuthErrorText error={error} />
     </Flex>
   );
+});
+
+export const Field = forwardRef<UIElement, FieldProps>(function Field(
+  props,
+  ref
+) {
+  if (props.as === "textarea") return <TextareaField {...props} ref={ref} />;
+
+  const {
+    as: _as,
+    rows: _rows,
+    required: _required,
+    autoComplete: _autoComplete,
+    name: _name,
+    onChangeText,
+    action,
+    rightActions,
+    leftActions,
+    styles,
+    ...rest
+  } = props;
+  const mapAction = (a: FieldAction) => ({
+    ...a,
+    onClick: () => a.onPress?.()
+  });
+  const baseProps: BaseFieldProps = {
+    ...rest,
+    onChange: onChangeText,
+    action: action ? mapAction(action) : undefined,
+    rightActions: rightActions?.map(mapAction),
+    leftActions: leftActions?.map(mapAction),
+    styles: { ...styles, input: { ...inputBase, ...styles?.input } }
+  } as BaseFieldProps;
+  return <BaseField {...baseProps} ref={ref} />;
 });
 
 export default Field;
