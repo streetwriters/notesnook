@@ -26,6 +26,7 @@ import {
   ArrowsClockwise,
   ClockClockwise,
   LockOpen,
+  MobileLock,
   Loading,
   SyncDisabled,
   SyncError,
@@ -43,6 +44,7 @@ import useStatus, { statusToString } from "../../hooks/use-status";
 import { checkForUpdate, installUpdate } from "../../utils/updater";
 import { showUpdateAvailableNotice } from "../../dialogs/confirm";
 import { useVault } from "../../hooks/use-vault";
+import { useKeyStore } from "../../interfaces/key-store";
 import { STATUS_BAR_HEIGHT } from "../../common/constants";
 
 export { STATUS_BAR_HEIGHT };
@@ -54,6 +56,7 @@ export function StatusBar() {
   const updateStatus = useAutoUpdater();
   const isFocusMode = useAppStore((state) => state.isFocusMode);
   const { isVaultLocked, lockVault } = useVault();
+  const { activeCredentials, relock } = useKeyStore();
 
   return (
     <ThemeScope scope="statusBar">
@@ -88,6 +91,15 @@ export function StatusBar() {
                 )}
               </>
             ) : null}
+            {activeCredentials().length > 0 && (
+              <StatusBarItem
+                variant="button"
+                icon={MobileLock}
+                onPress={relock}
+                title={strings.lock()}
+                testID="lock-app"
+              />
+            )}
             {statuses?.map((status) => {
               const { key, icon: StatusIcon } = status;
               return (

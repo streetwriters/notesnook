@@ -22,7 +22,7 @@ import { EVENTS } from "@notesnook/core";
 import { getFeature, planToAvailability } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import dayjs from "dayjs";
-import { Box, Button, Flex, ScrollContainer, Text } from "@ui";
+import { Box, Button, Flex, Text } from "@ui";
 import Field from "../components/field";
 import { Logo } from "../components/navigation-menu/logo";
 import { hardNavigate, useQueryParams } from "../navigation";
@@ -46,7 +46,6 @@ import {
   formatPrice,
   toPricingInfo
 } from "../dialogs/buy-dialog/helpers";
-import { isUserSubscribed } from "../hooks/use-is-user-premium";
 import { PERIOD_METADATA, PLAN_METADATA } from "../dialogs/buy-dialog/plans";
 import { db } from "../common/db";
 import type { Plan } from "../dialogs/buy-dialog/types";
