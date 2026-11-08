@@ -23,11 +23,9 @@ export const CreateTagDialog: NotImplemented =
   notImplemented("CreateTagDialog");
 export type CreateTagDialog = any;
 
-export const EditTagDialog: NotImplemented =
-  notImplemented("EditTagDialog");
+export const EditTagDialog: NotImplemented = notImplemented("EditTagDialog");
 
 export const RenameColorDialog: NotImplemented =
   notImplemented("RenameColorDialog");
 
-export const ItemDialog: NotImplemented =
-  notImplemented("ItemDialog");
+export const ItemDialog: NotImplemented = notImplemented("ItemDialog");

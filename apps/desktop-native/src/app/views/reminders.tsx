@@ -17,14 +17,41 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Flex, Text } from "@ui";
+import { db } from "../common/db";
+import { hashNavigate } from "../navigation";
+import ListContainer from "../components/list-container";
+import { ListLoader } from "../components/loaders/list-loader";
+import { ListPanePlaceholder } from "../components/placeholders";
+import useNavigate from "../hooks/use-navigate";
+import { useSearch } from "../hooks/use-search";
+import { useStore, store } from "../stores/reminder-store";
 
-export default function Reminders() {
+function Reminders() {
+  useNavigate("reminders", () => store.refresh());
+  const reminders = useStore((state) => state.reminders);
+  const refresh = useStore((state) => state.refresh);
+  const filteredItems = useSearch(
+    "reminders",
+    (query, sortOptions) => db.lookup.reminders(query).sorted(sortOptions),
+    [reminders]
+  );
+
+  if (!reminders) return <ListLoader />;
   return (
-    <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text testID="reminders-view" sx={{ color: "paragraph-secondary" }}>
-        Reminders is not implemented on desktop yet
-      </Text>
-    </Flex>
+    <ListContainer
+      type="reminders"
+      group="reminders"
+      refresh={refresh}
+      items={filteredItems || reminders}
+      showGroupCounts
+      isSearching={!!filteredItems}
+      placeholder={
+        <ListPanePlaceholder variant={filteredItems ? "search" : "reminders"} />
+      }
+      button={{
+        onClick: () => hashNavigate("/reminders/create")
+      }}
+    />
   );
 }
+export default Reminders;

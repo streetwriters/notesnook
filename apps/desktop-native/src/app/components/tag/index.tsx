@@ -29,7 +29,10 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import { Multiselect } from "../../common/multi-select";
-import { createSetDefaultHomepageMenuItem, withFeatureCheck } from "../../common";
+import {
+  createSetDefaultHomepageMenuItem,
+  withFeatureCheck
+} from "../../common";
 import { EditTagDialog } from "../../dialogs/item-dialog";
 import { showToast } from "../../utils/toast";
 import { writeToClipboard } from "../../utils/clipboard";

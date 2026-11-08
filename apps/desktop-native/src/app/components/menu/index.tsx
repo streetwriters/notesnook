@@ -116,9 +116,7 @@ function MenuButton(props: {
         }}
       >
         {item.modifier ? (
-          <Text
-            sx={{ color: "paragraph-secondary", fontSize: "xxs", ml: 4 }}
-          >
+          <Text sx={{ color: "paragraph-secondary", fontSize: "xxs", ml: 4 }}>
             {item.modifier}
           </Text>
         ) : null}

@@ -17,21 +17,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode
+} from "react";
 import type { GroupingKey, Item, VirtualizedGrouping } from "@notesnook/core";
 import { useResolvedItem } from "@notesnook/common";
 import {
   Box,
+  Button,
   Flex,
   VirtualList,
   type KeyEvent,
   type PressEvent,
+  type SxProp,
   type VirtualListHandle
 } from "@ui";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { store as selectionStore } from "../../stores/selection-store";
 import { ListSelectionContext, type ListSelection } from "./selection";
 import GroupHeader from "../group-header";
+import Announcements from "../announcements";
+import { ListLoader } from "../loaders/list-loader";
+import { Plus, type Icon } from "../icons";
 import {
   getListItemDefaultHeight,
   getListItemPlaceholderData,
@@ -47,10 +59,17 @@ type ListContainerProps = {
   context?: Context;
   refresh: () => void;
   header?: ReactNode;
+  renderGroupHeader?: (title: string, index: number) => ReactNode;
   showGroupCounts?: boolean;
   placeholder: ReactNode;
   isLoading?: boolean;
   isSearching?: boolean;
+  button?: {
+    Icon?: Icon;
+    onClick: () => void;
+  };
+  sx?: SxProp;
+  placeholderSx?: SxProp;
 };
 
 export default function ListContainer(props: ListContainerProps) {
@@ -58,6 +77,7 @@ export default function ListContainer(props: ListContainerProps) {
   const list = useRef<VirtualListHandle>(null);
   const anchor = useRef<number | undefined>(undefined);
   const focused = useRef(0);
+  const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
 
   useEffect(() => {
     const event = AppEventManager.subscribe(
@@ -176,23 +196,62 @@ export default function ListContainer(props: ListContainerProps) {
         context={context}
         isSearching={isSearching}
         showGroupCounts={props.showGroupCounts}
+        renderGroupHeader={props.renderGroupHeader}
+        focusedGroupIndex={focusedGroupIndex}
+        focusGroup={setFocusedGroupIndex}
+        scrollToIndex={(index) => list.current?.scrollToIndex({ index })}
       />
     ),
-    [items, group, compact, context, isSearching, props.showGroupCounts]
+    [
+      items,
+      group,
+      compact,
+      context,
+      isSearching,
+      props.showGroupCounts,
+      props.renderGroupHeader,
+      focusedGroupIndex
+    ]
   );
   const itemKey = useCallback((index: number) => items.key(index), [items]);
   const listData = useMemo(
-    () => ({ compact, items, isSearching, context, group }),
-    [compact, items, isSearching, context, group]
+    () => ({
+      compact,
+      items,
+      isSearching,
+      context,
+      group,
+      focusedGroupIndex
+    }),
+    [compact, items, isSearching, context, group, focusedGroupIndex]
   );
 
   if (!items.length && props.placeholder)
     return (
-      <Flex sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          flex: 1,
+          overflow: "hidden",
+          ...props.sx
+        }}
+      >
         {header}
-        <Flex testID="list-placeholder" sx={{ pt: "spacing6", px: "spacing6" }}>
-          {props.placeholder}
-        </Flex>
+        {props.isLoading ? (
+          <ListLoader />
+        ) : (
+          <Flex
+            testID="list-placeholder"
+            sx={{
+              flexDirection: "row",
+              pt: "spacing6",
+              px: "spacing6",
+              ...props.placeholderSx
+            }}
+          >
+            {props.placeholder}
+          </Flex>
+        )}
       </Flex>
     );
 
@@ -200,20 +259,54 @@ export default function ListContainer(props: ListContainerProps) {
     <ListSelectionContext.Provider value={selection}>
       <Flex
         testID={`${type}-list`}
-        sx={{ flexDirection: "column", flex: 1, overflow: "hidden" }}
+        sx={{
+          flexDirection: "column",
+          flex: 1,
+          overflow: "hidden",
+          ...props.sx
+        }}
       >
         <VirtualList
           ref={list}
           testID="virtual-list"
           onKeyDown={onKeyDown}
+          onBlur={() => setFocusedGroupIndex(-1)}
           count={items.length}
           itemKey={itemKey}
           renderItem={renderItem}
           estimatedItemSize={getListItemDefaultHeight(group, compact)}
           extraData={listData}
-          header={header}
+          header={header ?? <Announcements />}
           overscan={400}
         />
+        {props.button ? (
+          <Button
+            variant="accent"
+            testID={`${group}-action-button`}
+            onPress={props.button.onClick}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              display: ["flex", "none", "none"],
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 100,
+              p: 0,
+              m: 0,
+              mb: 2,
+              mr: 2,
+              width: 45,
+              height: 45
+            }}
+          >
+            {props.button.Icon ? (
+              <props.button.Icon color="accentForeground" />
+            ) : (
+              <Plus color="accentForeground" />
+            )}
+          </Button>
+        ) : null}
       </Flex>
     </ListSelectionContext.Provider>
   );
@@ -227,6 +320,10 @@ function ItemRenderer(props: {
   context?: Context;
   isSearching?: boolean;
   showGroupCounts?: boolean;
+  renderGroupHeader?: (title: string, index: number) => ReactNode;
+  focusedGroupIndex: number;
+  focusGroup: (index: number) => void;
+  scrollToIndex: (index: number) => void;
 }) {
   const { index, items, group, compact, context, isSearching } = props;
   const resolvedItem = useResolvedItem({ index, items });
@@ -265,10 +362,31 @@ function ItemRenderer(props: {
 
   return (
     <>
-      {resolvedItem.group && group ? (
+      {resolvedItem.group && group && props.renderGroupHeader ? (
+        props.renderGroupHeader(resolvedItem.group.title, index)
+      ) : resolvedItem.group && group ? (
         <GroupHeader
           title={resolvedItem.group.title}
           showGroupCounts={props.showGroupCounts}
+          isFocused={index === props.focusedGroupIndex}
+          onSelectGroup={async () => {
+            if (!items.groups) return;
+            const groups = await items.groups();
+            const groupIndex = groups.findIndex((g) => g.index === index);
+            if (groupIndex < 0) return;
+            const nextGroupIndex =
+              groups[groupIndex + 1]?.index || items.length;
+            const ids = await items.ids();
+            selectionStore.setSelectedItems([
+              ...selectionStore.get().selectedItems,
+              ...ids.slice(index, nextGroupIndex)
+            ]);
+          }}
+          groups={async () => (items.groups ? items.groups() : [])}
+          onJump={(groupStart) => {
+            props.scrollToIndex(groupStart);
+            props.focusGroup(groupStart);
+          }}
         />
       ) : null}
       <ListItemWrapper
@@ -277,7 +395,7 @@ function ItemRenderer(props: {
         item={resolvedItem.item}
         data={resolvedItem.data}
         context={context}
-        group={isSearching ? undefined : group}
+        group={isSearching ? "search" : group}
         compact={compact}
       />
     </>
