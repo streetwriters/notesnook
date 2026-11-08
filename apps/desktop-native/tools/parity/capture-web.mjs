@@ -66,8 +66,17 @@ if (await offline.count()) {
 await page.evaluate(
   async ({ seed, scheme, extras, noExtras }) => {
     const { db } = await import("/common/db.ts");
-    for (const notebook of extras.notebooks)
-      await db.notebooks.add({ title: notebook.title });
+    const addNotebook = async (notebook, parentId) => {
+      const id = await db.notebooks.add({ title: notebook.title });
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      if (parentId)
+        await db.relations.add(
+          { type: "notebook", id: parentId },
+          { type: "notebook", id }
+        );
+      for (const child of notebook.children ?? []) await addNotebook(child, id);
+    };
+    for (const notebook of extras.notebooks) await addNotebook(notebook);
     if (!noExtras)
       for (const tag of extras.tags) await db.tags.add({ title: tag.title });
     if (!noExtras)
@@ -88,7 +97,12 @@ await page.evaluate(
     const theme = await import("/stores/theme-store.ts");
     theme.store.setColorScheme(scheme);
   },
-  { seed, scheme, extras, noExtras: !!scenario.noExtras }
+  {
+    seed,
+    scheme,
+    extras: { ...extras, notebooks: scenario.notebooks ?? extras.notebooks },
+    noExtras: !!scenario.noExtras
+  }
 );
 await page.waitForTimeout(3000);
 await page.mouse.move(2, 2);
@@ -106,6 +120,8 @@ const target = (spec) =>
     : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
 for (const step of scenario.steps ?? []) {
   if (step.click) await target(step.click).click();
+  if (step.expand !== undefined)
+    await page.locator("#notebooks button").nth(step.expand).click();
   if (step.hover) await target(step.hover).hover();
   await page.waitForTimeout(800);
 }
@@ -114,6 +130,8 @@ await page.waitForTimeout(300);
 
 await fitViewport();
 await page.waitForTimeout(500);
+if (process.env.PARITY_DUMP)
+  console.log(await page.evaluate(() => { const a = document.activeElement; return `${a?.tagName} ${a?.id} ${a?.className} ${a?.textContent?.slice(0, 30)} ${a?.parentElement?.className}`; }));
 const elements = await page.evaluate(() => {
   const rgba = (value) => {
     const m = value.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0, 0];

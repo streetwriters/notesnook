@@ -282,14 +282,11 @@ export function pressHandler(props: BaseProps) {
   return (event: unknown) => {
     const now = Date.now();
     const pressEvent = press(event);
-    if (now - lastPress < 400) {
-      lastPress = 0;
-      pressEvent.detail = 2;
-      props.onDoubleClick?.(pressEvent);
-      return;
-    }
-    lastPress = now;
+    const isDouble = now - lastPress < 400;
+    lastPress = isDouble ? 0 : now;
+    if (isDouble) pressEvent.detail = 2;
     props.onPress?.(pressEvent);
+    if (isDouble) props.onDoubleClick?.(pressEvent);
   };
 }
 

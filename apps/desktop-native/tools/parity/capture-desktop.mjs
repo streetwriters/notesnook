@@ -35,7 +35,9 @@ const app = await launchApp({
     resetConfig: true,
     titleBarInset: 0,
     initialColorScheme: scheme,
-    seedNotebooks: scenario.noExtras ? [] : extras.notebooks,
+    seedNotebooks: scenario.noExtras
+      ? []
+      : scenario.notebooks ?? extras.notebooks,
     seedTags: scenario.noExtras ? [] : extras.tags,
     seedColors: scenario.noExtras ? [] : extras.colors
   },
@@ -71,6 +73,12 @@ try {
   };
   for (const step of scenario.steps ?? []) {
     if (step.click) await app.click((await locate(step.click)).tag);
+    if (step.expand !== undefined)
+      await app.click(
+        (
+          await locate({ id: "notebook-expand", nth: step.expand })
+        ).tag
+      );
     if (step.hover) await app.hover((await locate(step.hover)).tag);
     await app.waitForIdle();
   }

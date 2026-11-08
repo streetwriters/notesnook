@@ -101,4 +101,20 @@ scenarios.notebookOpen = {
   steps: [{ click: "tab-notebooks" }, { click: { id: "list-item", nth: 0 } }]
 };
 
+scenarios.notebookTree = {
+  ...scenarios.shell,
+  notebooks: [
+    {
+      title: "Work",
+      children: [
+        { title: "Plans", children: [{ title: "Quarter one" }] },
+        { title: "Reports" }
+      ]
+    },
+    { title: "Personal" },
+    { title: "Recipes" }
+  ],
+  steps: [{ click: "tab-notebooks" }, { expand: 0 }, { expand: 1 }]
+};
+
 export const TEXT_SCORE_THRESHOLD = 0.1;

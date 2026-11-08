@@ -37,6 +37,8 @@ import {
   type UIElement
 } from "@ui";
 import { db } from "../../common/db";
+import { Notebooks } from "../../views/notebooks";
+import { FilterField } from "./filter-field";
 import { CREATE_BUTTON_MAP } from "../../common";
 import { navigate, usePathname } from "../../navigation";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -303,7 +305,7 @@ export function NavigationMenu() {
         }}
       >
         {currentTab.id === "home" ? <HomeTab /> : null}
-        {currentTab.id === "notebooks" ? <NotebooksTab /> : null}
+        {currentTab.id === "notebooks" ? <Notebooks /> : null}
         {currentTab.id === "tags" ? <TagsTab /> : null}
       </Flex>
     </Flex>
@@ -578,36 +580,6 @@ function NavigationListRow<T extends Notebook | Tag>(props: {
   );
 }
 
-function FilterField(props: { placeholder: string }) {
-  return (
-    <Flex
-      sx={{
-        flexDirection: "row",
-        alignItems: "center",
-        borderTop: "1px solid",
-        borderTopColor: "separator",
-        mx: "spacing4",
-        pt: "spacing4"
-      }}
-    >
-      <Input
-        testID="filter-input"
-        variant="clean"
-        placeholder={props.placeholder}
-        sx={{
-          flex: 1,
-          minWidth: 0,
-          p: 0,
-          height: 16,
-          fontSize: "xs",
-          color: "paragraph"
-        }}
-      />
-      <Funnel size={13} color="icon-secondary" />
-    </Flex>
-  );
-}
-
 function NavigationList<T extends Notebook | Tag>(props: {
   kind: "notebook" | "tag";
   items: VirtualizedGrouping<T> | undefined;
@@ -651,22 +623,6 @@ function NavigationList<T extends Notebook | Tag>(props: {
       </Box>
       <FilterField placeholder={props.filter} />
     </>
-  );
-}
-
-function NotebooksTab() {
-  const notebooks = useNotebookStore((store) => store.notebooks);
-  const refresh = useNotebookStore((store) => store.refresh);
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-  return (
-    <NavigationList
-      kind="notebook"
-      items={notebooks}
-      empty={strings.noNotebooksYet()}
-      filter={strings.filterNotebooks()}
-    />
   );
 }
 

@@ -36,17 +36,30 @@ export type SeedNote = {
   favorite?: boolean;
 };
 
+export type SeedNotebook = { title: string; children?: SeedNotebook[] };
+
 export type BootOptions = {
   seed?: SeedNote[];
-  seedNotebooks?: { title: string }[];
+  seedNotebooks?: SeedNotebook[];
   seedTags?: { title: string }[];
   seedColors?: { title: string; colorCode: string }[];
   resetConfig?: boolean;
 };
 
 async function seedOthers(options: BootOptions) {
+  const addNotebook = async (notebook: SeedNotebook, parentId?: string) => {
+    const id = await db.notebooks.add({ title: notebook.title });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    if (!id) return;
+    if (parentId)
+      await db.relations.add(
+        { type: "notebook", id: parentId },
+        { type: "notebook", id }
+      );
+    for (const child of notebook.children ?? []) await addNotebook(child, id);
+  };
   for (const notebook of options.seedNotebooks ?? [])
-    await db.notebooks.add({ title: notebook.title });
+    await addNotebook(notebook);
   for (const tag of options.seedTags ?? [])
     await db.tags.add({ title: tag.title });
   for (const color of options.seedColors ?? [])

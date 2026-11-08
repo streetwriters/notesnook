@@ -500,7 +500,12 @@ export const Icon = forwardRef<UIElement, Contract.IconProps>(function Icon(
   return (
     <AnyView
       {...nativeProps}
-      style={{ ...viewStyle, width: pixels, height: pixels, transform }}
+      style={{
+        ...viewStyle,
+        width: pixels,
+        height: pixels,
+        ...(transform ? { transform } : null)
+      }}
     >
       {props.svg ? (
         <SvgXml xml={props.svg} width={pixels} height={pixels} color={color} />

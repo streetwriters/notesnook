@@ -17,6 +17,7 @@ export async function navVisible(app: DesktopApp, title: string) {
 export async function navClick(app: DesktopApp, title: string) {
   const match = await find(app, title);
   if (!match) throw new Error(`no navigation item "${title}"`);
+  await app.waitForIdle();
   await app.click(match.tag);
 }
 
