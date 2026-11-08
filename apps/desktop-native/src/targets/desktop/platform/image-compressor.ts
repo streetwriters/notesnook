@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { Image } from "react-native";
 import fs from "@react-native-gpui/fs";
 import {
   manipulateAsync,
@@ -24,13 +25,22 @@ import {
 } from "@react-native-gpui/image-manipulator";
 import type { ImageCompressor } from "../../../platform";
 
+function naturalWidth(uri: string) {
+  return new Promise<number>((resolve, reject) =>
+    Image.getSize(uri, (width) => resolve(width), reject)
+  );
+}
+
 export const imageCompressor: ImageCompressor = {
   async compress(file, { maxWidth, quality }) {
-    const result = await manipulateAsync(
-      file.uri,
-      [{ resize: { width: maxWidth } }],
-      { compress: quality, format: SaveFormat.JPEG }
-    );
+    const width =
+      typeof maxWidth === "function"
+        ? maxWidth(await naturalWidth(file.uri))
+        : maxWidth;
+    const result = await manipulateAsync(file.uri, [{ resize: { width } }], {
+      compress: quality,
+      format: SaveFormat.JPEG
+    });
     return new Uint8Array(
       await fs.promises.readFile(result.uri.replace(/^file:\/\//, ""))
     );

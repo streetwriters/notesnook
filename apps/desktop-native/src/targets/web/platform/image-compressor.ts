@@ -24,7 +24,9 @@ export const imageCompressor: ImageCompressor = {
     const bitmap = await createImageBitmap(
       new Blob([(await file.bytes()) as BlobPart], { type: file.type })
     );
-    const scale = Math.min(1, maxWidth / bitmap.width);
+    const limit =
+      typeof maxWidth === "function" ? maxWidth(bitmap.width) : maxWidth;
+    const scale = Math.min(1, limit / bitmap.width);
     const canvas = document.createElement("canvas");
     canvas.width = Math.round(bitmap.width * scale);
     canvas.height = Math.round(bitmap.height * scale);
