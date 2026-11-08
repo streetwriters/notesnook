@@ -86,7 +86,7 @@ test("a 2,000 note list scrolls and renders the notes it reaches", async () => {
     renderedViewsMedian: [...steps].map((e) => e.views).sort((a, b) => a - b)[
       Math.floor(steps.length / 2)
     ],
-    steps
+    stepDetails: steps
   };
   if (process.env.SCROLL_PERF_OUT)
     writeFileSync(
