@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
-import { notImplemented } from "../../common/not-implemented";
+import { Importer } from "../../components/importer";
 import { strings } from "@notesnook/intl";
 
 export const ImporterSettings: SettingsGroup[] = [
@@ -35,7 +35,7 @@ export const ImporterSettings: SettingsGroup[] = [
         components: [
           {
             type: "custom",
-            component: notImplemented("Importer") as never
+            component: Importer as never
           }
         ]
       }

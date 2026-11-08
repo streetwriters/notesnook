@@ -27,6 +27,7 @@ export type VirtualizedListProps<T, C> = {
   context?: C;
   renderItem: (props: { item: T; index: number; context: C }) => ReactNode;
   itemGap?: number;
+  mode?: "fixed" | "dynamic";
   overscan?: number;
   header?: ReactNode;
   testID?: string;
