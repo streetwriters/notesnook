@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import dayjs, { type Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Dialog, Flex, Select, Text } from "@ui";
+import { Dialog, Flex, Select, Text, type UIElement } from "@ui";
 import { notifications, environment } from "@platform";
 import {
   getFormattedDate,
@@ -141,6 +141,8 @@ export const AddReminderDialog = DialogManager.register(
     >("reminders:default_priority", reminder?.priority ?? Priorities.VIBRATE);
     const [date, setDate] = useState(dayjs(reminder?.date));
     const [dateKey, setDateKey] = useState(0);
+    const dateAnchorRef = useRef<UIElement>(null);
+    const monthlyAnchorRef = useRef<UIElement>(null);
     const [title, setTitle] = useState<string>(
       note?.title ?? reminder?.title ?? ""
     );
@@ -314,7 +316,7 @@ export const AddReminderDialog = DialogManager.register(
         <Fieldset title={strings.schedule()}>
           <Flex sx={{ gap: "spacing6", flexDirection: "row" }}>
             {mode === Modes.ONCE ? (
-              <Flex sx={{ flex: 1, position: "relative" }}>
+              <Flex ref={dateAnchorRef} sx={{ flex: 1 }}>
                 <Field
                   key={dateKey}
                   id="date"
@@ -340,7 +342,11 @@ export const AddReminderDialog = DialogManager.register(
                   defaultValue={date.format(db.settings.getDateFormat())}
                   onChangeText={(text) => setDate((d) => setDateOnly(text, d))}
                 />
-                <InlinePopup isOpen={showCalendar} sx={{ top: 70 }}>
+                <InlinePopup
+                  isOpen={showCalendar}
+                  onClose={() => setShowCalendar(false)}
+                  anchorRef={dateAnchorRef}
+                >
                   <DayPicker
                     sx={{ p: 2, width: 300 }}
                     selected={dayjs(date).toDate()}
@@ -391,8 +397,7 @@ export const AddReminderDialog = DialogManager.register(
                   flex: 1,
                   minWidth: 0,
                   flexDirection: "column",
-                  gap: "spacing4",
-                  position: "relative"
+                  gap: "spacing4"
                 }}
               >
                 <Text
@@ -405,6 +410,7 @@ export const AddReminderDialog = DialogManager.register(
                   {strings.selectDay()}
                 </Text>
                 <Flex
+                  ref={monthlyAnchorRef}
                   onPress={() => setShowMonthlyDays((s) => !s)}
                   sx={{
                     flex: 1,
@@ -426,8 +432,9 @@ export const AddReminderDialog = DialogManager.register(
                 </Flex>
                 <InlinePopup
                   isOpen={showMonthlyDays}
+                  onClose={() => setShowMonthlyDays(false)}
+                  anchorRef={monthlyAnchorRef}
                   sx={{
-                    top: 70,
                     width: 307,
                     px: "spacing3",
                     py: "spacing6",

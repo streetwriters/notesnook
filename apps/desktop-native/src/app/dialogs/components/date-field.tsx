@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { Flex } from "@ui";
+import { Flex, type UIElement } from "@ui";
 import { getFormattedDate } from "@notesnook/common";
 import { db } from "../../common/db";
 import { CalendarDots } from "../../components/icons";
@@ -43,8 +43,9 @@ export function DateField(props: {
 }) {
   const [showCalendar, setShowCalendar] = useState(false);
   const [key, setKey] = useState(0);
+  const anchorRef = useRef<UIElement>(null);
   return (
-    <Flex sx={{ position: "relative", flexDirection: "column" }}>
+    <Flex ref={anchorRef} sx={{ flexDirection: "column" }}>
       <Field
         key={key}
         id={props.id}
@@ -60,7 +61,11 @@ export function DateField(props: {
         defaultValue={props.date.format(db.settings.getDateFormat())}
         onChangeText={(text) => props.onChange((d) => setDateOnly(text, d))}
       />
-      <InlinePopup isOpen={showCalendar} sx={{ top: 60 }}>
+      <InlinePopup
+        isOpen={showCalendar}
+        onClose={() => setShowCalendar(false)}
+        anchorRef={anchorRef}
+      >
         <DayPicker
           sx={{ p: 2, width: 300 }}
           selected={props.date.toDate()}
