@@ -33,6 +33,7 @@ import {
   Flex,
   VirtualList,
   type PressEvent,
+  type DragEvent,
   type SxProp,
   type VirtualListHandle
 } from "@ui";
@@ -70,6 +71,7 @@ type ListContainerProps = {
   };
   sx?: SxProp;
   placeholderSx?: SxProp;
+  onDrop?: (event: DragEvent) => void;
 };
 
 export default function ListContainer(props: ListContainerProps) {
@@ -240,6 +242,8 @@ export default function ListContainer(props: ListContainerProps) {
     <ListSelectionContext.Provider value={selection}>
       <Flex
         testID={`${type}-list`}
+        droppable={!!props.onDrop}
+        onDrop={props.onDrop}
         sx={{
           flexDirection: "column",
           flex: 1,

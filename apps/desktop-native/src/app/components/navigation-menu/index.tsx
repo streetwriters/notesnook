@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   FeatureResult,
   isFeatureAvailable,
@@ -34,14 +34,17 @@ import {
   Flex,
   Image,
   ScrollContainer,
+  SortableList,
   Text,
   type MenuItem,
   type UIElement
 } from "@ui";
 import { db } from "../../common/db";
+import { handleDrop } from "../../common/drop-handler";
 import { Notebooks } from "../../views/notebooks";
 import Tags from "../../views/tags";
 import {
+  checkFeature,
   CREATE_BUTTON_MAP,
   createSetDefaultHomepageMenuItem,
   logout,
@@ -584,6 +587,71 @@ function navigateToRoute(path: string) {
   navigate(path, { notify: true });
 }
 
+type ReorderableListProps<T> = {
+  orderKey: string;
+  items: T[];
+  visibleItemLimit?: number;
+  renderItem: (item: T) => ReactNode;
+  onOrderChanged: (newOrder: string[]) => void;
+  order: () => string[];
+};
+
+function ReorderableList<T extends { id: string }>(
+  props: ReorderableListProps<T>
+) {
+  const {
+    orderKey,
+    items,
+    visibleItemLimit,
+    renderItem,
+    onOrderChanged,
+    order: _order
+  } = props;
+  const [order, setOrder] = usePersistentState<string[]>(orderKey, _order());
+  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
+  const orderedItems = customizableSidebar?.isAllowed
+    ? orderItems(items, order)
+    : items;
+  const renderedItems = visibleItemLimit
+    ? orderedItems.slice(0, visibleItemLimit)
+    : orderedItems;
+
+  useEffect(() => {
+    setOrder(_order());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <SortableList
+      items={renderedItems}
+      onMove={async ({ activeId, overId }) => {
+        if (
+          !customizableSidebar ||
+          !(await checkFeature(customizableSidebar)) ||
+          activeId === overId
+        )
+          return;
+        const transitionOrder =
+          order.length === 0 || order.length !== orderedItems.length
+            ? orderedItems.map((i) => i.id)
+            : order;
+        const newIndex = transitionOrder.indexOf(overId);
+        const oldIndex = transitionOrder.indexOf(activeId);
+        if (newIndex < 0 || oldIndex < 0) return;
+        const newOrder = transitionOrder.slice();
+        newOrder.splice(newIndex, 0, newOrder.splice(oldIndex, 1)[0]);
+        setOrder(newOrder);
+        onOrderChanged(newOrder);
+      }}
+      renderItem={(item, state) => (
+        <Flex sx={{ opacity: state.isDragging ? 0.4 : 1 }}>
+          {renderItem(item)}
+        </Flex>
+      )}
+    />
+  );
+}
+
 function orderItems<T extends { id: string }>(items: T[], order: string[]) {
   const sorted: T[] = [];
   order.forEach((id) => {
@@ -734,10 +802,6 @@ function Routes({ collapse, isCollapsed }: SectionContext) {
   const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
   const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const [order] = usePersistentState<string[]>(
-    "sidebarOrder:routes",
-    db.settings.getSideBarOrder("routes")
-  );
   const visible = routes()
     .filter(
       customizableSidebar?.isAllowed
@@ -745,20 +809,16 @@ function Routes({ collapse, isCollapsed }: SectionContext) {
         : () => true
     )
     .filter((r) => (r.loginRequired ? isLoggedIn : true));
-  const ordered = customizableSidebar?.isAllowed
-    ? orderItems(visible, order)
-    : visible;
   return (
-    <>
-      {ordered.map((item) => (
-        <RouteItem
-          key={item.id}
-          item={item}
-          collapse={collapse}
-          isCollapsed={isCollapsed}
-        />
-      ))}
-    </>
+    <ReorderableList
+      items={visible}
+      orderKey="sidebarOrder:routes"
+      order={() => db.settings.getSideBarOrder("routes")}
+      onOrderChanged={(order) => db.settings.setSideBarOrder("routes", order)}
+      renderItem={(item) => (
+        <RouteItem item={item} collapse={collapse} isCollapsed={isCollapsed} />
+      )}
+    />
   );
 }
 
@@ -780,6 +840,18 @@ function RouteItem({
       icon={item.icon}
       isCollapsed={isCollapsed}
       selected={selected}
+      onDrop={(event) =>
+        handleDrop(event.payload, {
+          type:
+            item.path === "/trash"
+              ? "trash"
+              : item.path === "/favorites"
+              ? "favorites"
+              : item.path == "/archive"
+              ? "archive"
+              : undefined
+        })
+      }
       onPress={() => {
         navigateToRoute(item.path);
         collapse();
@@ -848,31 +920,29 @@ function Colors({ collapse, isCollapsed }: SectionContext) {
   const colors = useAppStore((store) => store.colors);
   const hiddenColors = useAppStore((store) => store.hiddenColors);
   const [showAllColors, setShowAllColors] = useState(false);
-  const [order] = usePersistentState<string[]>(
-    "sidebarOrder:colors",
-    db.settings.getSideBarOrder("colors")
-  );
   const visibleColors = customizableSidebar?.isAllowed
     ? colors.filter((c: Color) => !hiddenColors.includes(c.id))
     : colors;
-  const ordered = customizableSidebar?.isAllowed
-    ? orderItems<Color>(visibleColors, order)
-    : visibleColors;
-  const hasMoreColors = ordered.length > 6;
-  const rendered = showAllColors ? ordered : ordered.slice(0, 6);
+  const hasMoreColors = visibleColors.length > 6;
 
   if (colors.length === 0) return null;
   return (
     <>
       <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
-      {rendered.map((color: Color) => (
-        <ColorItem
-          key={color.id}
-          color={color}
-          collapse={collapse}
-          isCollapsed={isCollapsed}
-        />
-      ))}
+      <ReorderableList
+        items={visibleColors as Color[]}
+        visibleItemLimit={showAllColors ? undefined : 6}
+        orderKey="sidebarOrder:colors"
+        order={() => db.settings.getSideBarOrder("colors")}
+        onOrderChanged={(order) => db.settings.setSideBarOrder("colors", order)}
+        renderItem={(color) => (
+          <ColorItem
+            color={color}
+            collapse={collapse}
+            isCollapsed={isCollapsed}
+          />
+        )}
+      />
       {hasMoreColors ? (
         <Flex
           sx={{
@@ -885,7 +955,7 @@ function Colors({ collapse, isCollapsed }: SectionContext) {
           }}
         >
           <Text variant="body" sx={{ fontSize: "xs" }}>
-            {showAllColors ? "" : `+${ordered.length - 6} more`}
+            {showAllColors ? "" : `+${visibleColors.length - 6} more`}
           </Text>
           <Button
             onPress={() => setShowAllColors((expanded) => !expanded)}
@@ -924,6 +994,7 @@ function ColorItem({
       icon={Ellipse}
       iconSize={10}
       selected={currentContext?.id === color.id}
+      onDrop={(event) => handleDrop(event.payload, color)}
       color={dataColor(color.colorCode)}
       onPress={() => {
         navigateToRoute(`/colors/${color.id}`);
@@ -987,23 +1058,25 @@ function ColorItem({
 
 function Shortcuts({ collapse, isCollapsed }: SectionContext) {
   const shortcuts = useAppStore((store) => store.shortcuts);
-  const [order] = usePersistentState<string[]>(
-    "sidebarOrder:shortcuts",
-    db.settings.getSideBarOrder("shortcuts")
-  );
   if (shortcuts.length === 0) return null;
-  const ordered = orderItems<Notebook | Tag>(shortcuts, order);
   return (
     <>
       <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
-      {ordered.map((item) => (
-        <ShortcutItem
-          key={item.id}
-          item={item}
-          collapse={collapse}
-          isCollapsed={isCollapsed}
-        />
-      ))}
+      <ReorderableList
+        items={shortcuts as (Notebook | Tag)[]}
+        orderKey="sidebarOrder:shortcuts"
+        order={() => db.settings.getSideBarOrder("shortcuts")}
+        onOrderChanged={(order) =>
+          db.settings.setSideBarOrder("shortcuts", order)
+        }
+        renderItem={(item) => (
+          <ShortcutItem
+            item={item}
+            collapse={collapse}
+            isCollapsed={isCollapsed}
+          />
+        )}
+      />
     </>
   );
 }
@@ -1055,6 +1128,7 @@ function ShortcutItem({
       }
       iconSize={14}
       selected={currentContext?.id === item.id}
+      onDrop={(event) => handleDrop(event.payload, item)}
       onPress={() => {
         navigateToRoute(
           item.type === "notebook"

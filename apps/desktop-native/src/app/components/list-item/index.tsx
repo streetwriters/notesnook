@@ -25,6 +25,7 @@ import {
   Text,
   type ColorValue,
   type ContextMenuEvent,
+  type DragEvent,
   type KeyEvent,
   type MenuItem,
   type PressEvent,
@@ -36,6 +37,7 @@ import {
   useStore as useSelectionStore
 } from "../../stores/selection-store";
 import { Menu } from "../../hooks/use-menu";
+import { setDragData } from "../../utils/data-transfer";
 import { useMenuStore } from "../menu/store";
 
 type ListItemColors = {
@@ -53,6 +55,10 @@ type ListItemProps<TItem extends Item = Item, TContext = unknown> = {
   item: TItem;
   index?: number;
   onPress?: (event: PressEvent) => void;
+  draggable?: boolean;
+  onDragEnter?: (event: DragEvent) => void;
+  onDragLeave?: (event: DragEvent) => void;
+  onDrop?: (event: DragEvent) => void;
   onMiddleClick?: () => void;
   onKeyPress?: (event: KeyEvent) => void;
   context?: TContext;
@@ -149,6 +155,21 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
   return (
     <Flex
       testID="list-item"
+      draggable={props.draggable}
+      onDragStart={
+        props.draggable
+          ? () => {
+              let selectedItems = selectionStore.get().selectedItems;
+              if (selectedItems.findIndex((i) => i === item.id) === -1)
+                selectedItems = [item.id];
+              return setDragData(item.type, selectedItems);
+            }
+          : undefined
+      }
+      droppable={!!props.onDrop}
+      onDragEnter={props.onDragEnter}
+      onDragLeave={props.onDragLeave}
+      onDrop={props.onDrop}
       group="list-item"
       onContextMenu={openContextMenu}
       onKeyUp={(event) => {
@@ -178,6 +199,7 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
           ? "hover"
           : colors.background,
         ":hover": { bg: selected ? "hover-selected" : "hover" },
+        ":drag-over": { bg: selected ? "hover-selected" : "hover" },
         ...props.sx
       }}
     >

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ReactNode } from "react";
 import { db } from "../common/db";
+import { handleDrop } from "../common/drop-handler";
 import { ListLoader } from "../components/loaders/list-loader";
 import ListContainer from "../components/list-container";
 import { ListPanePlaceholder } from "../components/placeholders";
@@ -61,6 +62,7 @@ function Notes(props: NotesProps) {
       compact={isCompact}
       context={context}
       items={filteredItems || contextNotes}
+      onDrop={(event) => handleDrop(event.payload, context)}
       isSearching={!!filteredItems}
       placeholder={
         <ListPanePlaceholder

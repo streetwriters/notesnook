@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo } from "react";
 import { strings } from "@notesnook/intl";
-import { Box, Button, Flex, Text } from "@ui";
+import { Box, Button, Flex, SortableList, Text, type DragEvent } from "@ui";
+import { getDragData } from "../../utils/data-transfer";
 import {
   ArrowLeft,
   ArrowRight,
@@ -256,6 +257,13 @@ const TabStrip = memo(function TabStrip() {
       </Flex>
       <Flex
         testID="tabs"
+        droppable
+        onDoubleClick={() => useEditorStore.getState().addTab()}
+        onDrop={(event) => {
+          const noteId = getDragData(event.payload, "note")?.[0];
+          if (!noteId) return;
+          useEditorStore.getState().openSession(noteId, { openInNewTab: true });
+        }}
         sx={{
           flexDirection: "row",
           flexShrink: 1,
@@ -265,34 +273,54 @@ const TabStrip = memo(function TabStrip() {
           py: "spacing3"
         }}
       >
-        {tabs.map((tab) => {
-          const session = useEditorStore.getState().getSession(tab.sessionId);
-          if (!session) return null;
-          const isUnsaved =
-            session.type === "default" &&
-            session.saveState === SaveState.NotSaved;
-          return (
-            <Tab
-              key={tab.sessionId}
-              id={tab.id}
-              title={
-                session.title ||
-                ("note" in session ? session.note.title : strings.untitled())
-              }
-              isUnsaved={isUnsaved}
-              isActive={tab.id === currentTab}
-              isPinned={!!tab.pinned}
-              isLocked={isLockedSession(session)}
-              type={session.type}
-              onFocus={() => {
-                if (tab.id !== currentTab)
-                  useEditorStore.getState().activateSession(tab.sessionId);
-              }}
-              onClose={() => useEditorStore.getState().closeTabs(tab.id)}
-              onPin={() => useEditorStore.getState().pinTab(tab.id)}
-            />
-          );
-        })}
+        <SortableList
+          direction="horizontal"
+          items={tabs}
+          onMove={({ activeId, overId }) => {
+            const from = tabs.findIndex((t) => t.id === activeId);
+            const to = tabs.findIndex((t) => t.id === overId);
+            if (from < 0 || to < 0 || from === to) return;
+            const next = useEditorStore.getState().tabs.slice();
+            const isToPinned = next[to].pinned;
+            const [fromTab] = next.splice(from, 1);
+            if (isToPinned) fromTab.pinned = true;
+            else if (fromTab.pinned) fromTab.pinned = false;
+            next.splice(to, 0, fromTab);
+            useEditorStore.setState({ tabs: next });
+          }}
+          renderItem={(tab) => {
+            const session = useEditorStore.getState().getSession(tab.sessionId);
+            if (!session) return null;
+            const isUnsaved =
+              session.type === "default" &&
+              session.saveState === SaveState.NotSaved;
+            return (
+              <Tab
+                id={tab.id}
+                title={
+                  session.title ||
+                  ("note" in session ? session.note.title : strings.untitled())
+                }
+                isUnsaved={isUnsaved}
+                isActive={tab.id === currentTab}
+                isPinned={!!tab.pinned}
+                isLocked={isLockedSession(session)}
+                type={session.type}
+                onFocus={() => {
+                  if (tab.id !== currentTab)
+                    useEditorStore.getState().activateSession(tab.sessionId);
+                }}
+                onClose={() => useEditorStore.getState().closeTabs(tab.id)}
+                onPin={() => useEditorStore.getState().pinTab(tab.id)}
+                onDrop={(event) => {
+                  const noteId = getDragData(event.payload, "note")?.[0];
+                  if (!noteId) return;
+                  useEditorStore.getState().openSessionInTab(noteId, tab.id);
+                }}
+              />
+            );
+          }}
+        />
       </Flex>
       <Button
         testID="create-new-note"
@@ -328,6 +356,7 @@ function Tab(props: {
   onFocus: () => void;
   onClose: () => void;
   onPin: () => void;
+  onDrop?: (event: DragEvent) => void;
 }) {
   const { isActive, isPinned, isLocked, isUnsaved, type } = props;
   const TabIcon: Icon = isLocked
@@ -345,6 +374,8 @@ function Tab(props: {
     <Flex
       testID={`tab-${props.id}`}
       group="tab"
+      droppable
+      onDrop={props.onDrop}
       onPress={props.onFocus}
       sx={{
         flexDirection: "row",
