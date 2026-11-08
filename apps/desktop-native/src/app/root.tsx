@@ -22,6 +22,8 @@ import { Flex, Text } from "@ui";
 import { App } from "./app";
 import { boot, type BootOptions } from "./boot";
 import { Demo, type Status } from "./demo";
+import { hashNavigate } from "./navigation";
+import { environment } from "@platform";
 
 export type RootProps = BootOptions & {
   screen?: "app" | "demo";
@@ -40,6 +42,20 @@ export function Root(props: RootProps) {
       .catch((e: Error) => setState({ status: "error", message: e.message }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (state.status !== "ready" || !environment.isDev) return;
+    if (!bootOptions.initialHash) return;
+    const timer = setTimeout(
+      () =>
+        hashNavigate(
+          bootOptions.initialHash as Parameters<typeof hashNavigate>[0]
+        ),
+      800
+    );
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.status]);
 
   if (screen === "demo") return <Demo state={state} {...props} />;
   if (state.status === "ready") return <App titleBarInset={titleBarInset} />;

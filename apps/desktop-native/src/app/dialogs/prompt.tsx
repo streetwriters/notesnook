@@ -50,6 +50,7 @@ export const PromptDialog = DialogManager.register(function PromptDialog(
       }}
     >
       <Field
+        testID="prompt-input"
         label={props.label}
         placeholder={props.label}
         defaultValue={props.defaultValue}

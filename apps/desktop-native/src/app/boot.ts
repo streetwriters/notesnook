@@ -34,6 +34,22 @@ export type SeedNote = {
   dateCreated?: number;
   dateEdited?: number;
   favorite?: boolean;
+  pinned?: boolean;
+  archived?: boolean;
+  trashed?: boolean;
+  color?: string;
+  tags?: string[];
+};
+
+export type SeedReminder = {
+  title: string;
+  description?: string;
+  date?: number;
+  mode?: "once" | "repeat" | "permanent";
+  recurringMode?: "day" | "week" | "month" | "year";
+  selectedDays?: number[];
+  priority?: "silent" | "vibrate" | "urgent";
+  disabled?: boolean;
 };
 
 export type SeedNotebook = { title: string; children?: SeedNotebook[] };
@@ -43,6 +59,9 @@ export type BootOptions = {
   seedNotebooks?: SeedNotebook[];
   seedTags?: { title: string }[];
   seedColors?: { title: string; colorCode: string }[];
+  seedReminders?: SeedReminder[];
+  softAuthenticatorPin?: string;
+  initialHash?: string;
   resetConfig?: boolean;
 };
 
@@ -64,11 +83,22 @@ async function seedOthers(options: BootOptions) {
     await db.tags.add({ title: tag.title });
   for (const color of options.seedColors ?? [])
     await db.colors.add({ title: color.title, colorCode: color.colorCode });
+  for (const reminder of options.seedReminders ?? [])
+    await db.reminders.add({
+      title: reminder.title,
+      description: reminder.description,
+      date: reminder.date ?? Date.now() + 24 * 60 * 60 * 1000,
+      mode: reminder.mode ?? "once",
+      recurringMode: reminder.recurringMode,
+      selectedDays: reminder.selectedDays ?? [],
+      priority: reminder.priority ?? "vibrate",
+      disabled: reminder.disabled ?? false
+    });
 }
 
 async function seedNotes(notes: SeedNote[]) {
   for (const note of notes) {
-    await db.notes.add({
+    const id = await db.notes.add({
       title: note.title,
       content: {
         type: "tiptap",
@@ -78,7 +108,35 @@ async function seedNotes(notes: SeedNote[]) {
       dateCreated: note.dateCreated,
       dateEdited: note.dateEdited
     });
+    if (!id) continue;
+    if (note.pinned) await db.notes.pin(true, id);
+    if (note.archived) await db.notes.archive(true, id);
+    for (const title of note.tags ?? []) {
+      const tagId = await db.tags.add({ title });
+      if (tagId)
+        await db.relations.add(
+          { type: "tag", id: tagId },
+          { type: "note", id }
+        );
+    }
+    if (note.color) {
+      const colorId = await db.colors.add({
+        title: note.color,
+        colorCode: note.color
+      });
+      if (colorId)
+        await db.relations.add(
+          { type: "color", id: colorId },
+          { type: "note", id }
+        );
+    }
+    if (note.trashed) await db.notes.moveToTrash(id);
   }
+}
+
+async function installSoftAuthenticator(pin: string) {
+  const webauthn = await import("@react-native-gpui/webauthn");
+  await webauthn.installSoftAuthenticator(pin);
 }
 
 export async function boot(options: BootOptions = {}): Promise<BootState> {
@@ -87,6 +145,8 @@ export async function boot(options: BootOptions = {}): Promise<BootState> {
   await initializeDatabase("db");
   if (environment.isDev && options.seed) await seedNotes(options.seed);
   if (environment.isDev) await seedOthers(options);
+  if (environment.isDev && options.softAuthenticatorPin)
+    await installSoftAuthenticator(options.softAuthenticatorPin);
   const user = await db.user.getUser();
   return {
     status: "ready",
