@@ -30,6 +30,7 @@ export const databaseHost =
   unimplemented<Contract.DatabaseHost>("databaseHost");
 export const environment = unimplemented<Contract.Environment>("environment");
 export const files = unimplemented<Contract.Files>("files");
+export const history = unimplemented<Contract.History>("history");
 export const integration = unimplemented<Contract.Integration>("integration");
 export const keyboard = unimplemented<Contract.Keyboard>("keyboard");
 export const lifecycle = unimplemented<Contract.Lifecycle>("lifecycle");
@@ -53,6 +54,7 @@ export const contract: typeof Contract = {
   databaseHost,
   environment,
   files,
+  history,
   integration,
   keyboard,
   lifecycle,

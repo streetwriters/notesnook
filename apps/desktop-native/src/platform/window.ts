@@ -32,5 +32,4 @@ export interface WindowControls {
   exitFullscreen(): void;
   isFullscreen(): boolean;
   focus(): void;
-  reload(): void;
 }
