@@ -27,13 +27,18 @@ export class Debug {
   static async report(reportData: {
     title: string;
     body: string;
-    userId?: string;
+    accessToken?: string;
+    /** A contact address, required when there is no access token. */
+    email?: string;
   }): Promise<IssueReportResponse | undefined> {
-    const { title, body, userId } = reportData;
+    const { title, body, accessToken, email } = reportData;
     const response = await fetch(`${hosts.ISSUES_HOST}/create/notesnook`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body, userId })
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+      },
+      body: JSON.stringify({ title, body, email })
     });
     const json = await response.json();
     if (!response.ok) return json;
