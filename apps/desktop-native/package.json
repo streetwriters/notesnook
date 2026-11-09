@@ -48,6 +48,7 @@
     "@react-native-gpui/keychain": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-keychain-0.0.1.tgz",
     "@react-native-gpui/netinfo": "file:../../../../../Projects/react-native/gpui-modules/tgz/react-native-gpui-netinfo-0.0.1.tgz",
     "@react-native-gpui/notifications": "file:../../../../../react-native-gpui-desktop-native/modules/notifications",
+    "@react-native-gpui/pdf": "file:../../../../../react-native-gpui-desktop-native/modules/pdf",
     "@react-native-gpui/openpgp": "file:../../../../react-native/gpui-modules/tgz/react-native-gpui-openpgp-0.0.1.tgz",
     "@react-native-gpui/reanimated": "file:../../../../../react-native-gpui-desktop-native/modules/reanimated",
     "@react-native-gpui/spellcheck": "file:../../../../../react-native-gpui-desktop-native/modules/spellcheck",

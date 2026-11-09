@@ -443,6 +443,27 @@ const checks: Check[] = [
     }
   },
   {
+    name: "pdf",
+    run: async () => {
+      const path = `${environment.tempDirectory}/platform-smoke.pdf`;
+      const file = await files.createAt(path);
+      await file.write(
+        encoder.encode(
+          "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 300]>>endobj\ntrailer<</Root 1 0 R/Size 4>>\n%%EOF\n"
+        )
+      );
+      await file.close();
+      const { createPdfEngine } = await import("@react-native-gpui/pdf");
+      const engine = createPdfEngine();
+      const document = await engine.open(
+        { kind: "layerFile", basePath: path },
+        { scope: ["*"] }
+      );
+      const layout = await document.pages.list();
+      equal(layout.pageCount, 1, "page count");
+    }
+  },
+  {
     name: "webauthn",
     run: async () => {
       const available = await webauthn.isAvailable();

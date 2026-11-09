@@ -11,6 +11,14 @@ const targetAliases = {
   "@platform": path.join(target, "platform")
 };
 
+const pdfModuleRoot = path.dirname(
+  require.resolve("@react-native-gpui/pdf/package.json")
+);
+const linkedModulesNodeModules = path.resolve(
+  pdfModuleRoot,
+  "../../node_modules"
+);
+
 const packageNodeModules = fs
   .readdirSync(packagesDir)
   .map((name) => path.join(packagesDir, name, "node_modules"))
@@ -27,14 +35,15 @@ const CJS_PACKAGES = new Set([
   "@zip.js/zip.js"
 ]);
 
-module.exports = mergeConfig(base, {
+const config = mergeConfig(base, {
   watchFolders: [...base.watchFolders, packagesDir],
   resolver: {
     resolverMainFields: ["react-native", "browser", "main"],
     sourceExts: [...base.resolver.sourceExts, "cjs"],
     nodeModulesPaths: [
       ...base.resolver.nodeModulesPaths,
-      ...packageNodeModules
+      ...packageNodeModules,
+      linkedModulesNodeModules
     ],
     resolveRequest: (context, moduleName, platform) => {
       if (
@@ -78,3 +87,5 @@ module.exports = mergeConfig(base, {
     }
   }
 });
+
+module.exports = require("@react-native-gpui/pdf/metro.cjs")(config);

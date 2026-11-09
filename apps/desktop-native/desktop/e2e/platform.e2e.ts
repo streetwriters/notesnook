@@ -45,6 +45,7 @@ const checks = [
   "lifecycle",
   "integration",
   "updater",
+  "pdf",
   "webauthn",
   "database",
   "environment"
