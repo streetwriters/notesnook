@@ -262,7 +262,10 @@ export default function ListContainer(props: ListContainerProps) {
           count={items.length}
           itemKey={itemKey}
           renderItem={renderItem}
-          estimatedItemSize={getListItemDefaultHeight(group, compact)}
+          estimatedItemSize={getListItemDefaultHeight(
+            isSearching ? "search" : group,
+            compact
+          )}
           extraData={listData}
           header={header ?? <Announcements />}
           overscan={200}
