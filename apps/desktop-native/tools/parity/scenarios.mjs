@@ -259,7 +259,7 @@ scenarios.dialogAddReminder = {
   ...scenarios.shell,
   steps: [
     { clickText: "Reminders", in: "nav" },
-    { click: "reminders-action-button" }
+    { click: "route-action" }
   ]
 };
 
@@ -267,7 +267,7 @@ scenarios.dialogAddReminderRepeat = {
   ...scenarios.dialogAddReminder,
   steps: [
     { clickText: "Reminders", in: "nav" },
-    { click: "reminders-action-button" },
+    { click: "route-action" },
     { click: "mode-repeat" }
   ]
 };

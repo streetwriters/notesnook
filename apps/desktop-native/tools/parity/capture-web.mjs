@@ -153,7 +153,9 @@ await page.addStyleTag({
 await page.evaluate(() => document.fonts.ready);
 
 const target = (spec) =>
-  typeof spec === "string"
+  spec === "route-action"
+    ? page.locator('[data-test-id="routeHeader"] button').first()
+    : typeof spec === "string"
     ? page.locator(`[data-test-id="${spec}"]`).first()
     : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
 for (const step of scenario.steps ?? []) {
@@ -284,6 +286,68 @@ const textRects = await page.evaluate(() => {
   return rects;
 });
 
+const textNodes = await page.evaluate(() => {
+  const out = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const describe = (el) => {
+    const cs = getComputedStyle(el);
+    const id = el.getAttribute("data-test-id");
+    return `${el.tagName.toLowerCase()}${id ? `[${id}]` : ""}@${cs.fontSize}`;
+  };
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const text = node.textContent.trim();
+    if (!text) continue;
+    const parent = node.parentElement;
+    if (!parent) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const r = range.getClientRects()[0];
+    if (!r || r.width === 0 || r.height === 0) continue;
+    const cs = getComputedStyle(parent);
+    const chain = [];
+    for (let el = parent; el && chain.length < 8; el = el.parentElement)
+      chain.push(describe(el));
+    out.push({
+      text: text.slice(0, 40),
+      x: r.x,
+      y: r.y,
+      width: r.width,
+      height: r.height,
+      fontFamily: cs.fontFamily.split(",")[0].replaceAll('"', "").trim(),
+      fontSize: parseFloat(cs.fontSize),
+      fontWeight: Number(cs.fontWeight),
+      lineHeight: cs.lineHeight === "normal" ? null : parseFloat(cs.lineHeight),
+      chain
+    });
+  }
+  return out;
+});
+
+const inputs = await page.evaluate(() =>
+  [...document.querySelectorAll("input, textarea")]
+    .map((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return null;
+      const cs = getComputedStyle(el);
+      const ph = getComputedStyle(el, "::placeholder");
+      const shown = el.value ? cs : ph;
+      return {
+        text: el.value || el.placeholder || "",
+        isPlaceholder: !el.value,
+        x: r.x,
+        y: r.y,
+        width: r.width,
+        height: r.height,
+        fontFamily: shown.fontFamily.split(",")[0].replaceAll('"', "").trim(),
+        fontSize: parseFloat(shown.fontSize),
+        fontWeight: Number(shown.fontWeight),
+        id: el.getAttribute("data-test-id")
+      };
+    })
+    .filter(Boolean)
+);
+
 await fitViewport();
 let shot = await page.screenshot();
 for (let attempt = 0; attempt < 6; attempt++) {
@@ -295,6 +359,6 @@ for (let attempt = 0; attempt < 6; attempt++) {
 fs.writeFileSync(path.join(outDir, "web.png"), shot);
 fs.writeFileSync(
   path.join(outDir, "web-map.json"),
-  JSON.stringify({ elements, textRects }, null, 1)
+  JSON.stringify({ elements, textRects, textNodes, inputs }, null, 1)
 );
 await browser.close();

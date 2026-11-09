@@ -158,6 +158,8 @@ try {
   }
   const elements = [];
   const textRects = [];
+  const textNodes = [];
+  const inputs = [];
   for (const node of nodes) {
     const isText = node.component === "Paragraph";
     if (!node.testID && !isText) continue;
@@ -171,6 +173,35 @@ try {
         width: frame.width,
         height: frame.height
       });
+    if (isText && frame.width > 0 && fragment)
+      textNodes.push({
+        text: (props.text ?? "").trim().slice(0, 40),
+        x: frame.x,
+        y: frame.y,
+        width: frame.width,
+        height: frame.height,
+        fontFamily: fragment.fontFamily,
+        fontSize: fragment.fontSize,
+        fontWeight: fragment.fontWeight,
+        lineHeight: fragment.lineHeight || null
+      });
+    if (node.component === "TextInput") {
+      const input = await app.getProps(node.tag);
+      const shown = input.paragraphFragments?.[0];
+      if (shown && input.frame.width > 0)
+        inputs.push({
+          text: input.text || shown.text,
+          isPlaceholder: !input.text,
+          x: input.frame.x,
+          y: input.frame.y,
+          width: input.frame.width,
+          height: input.frame.height,
+          fontFamily: shown.fontFamily,
+          fontSize: shown.fontSize,
+          fontWeight: shown.fontWeight,
+          id: node.testID ?? null
+        });
+    }
     if (!node.testID) continue;
     elements.push({
       id: node.testID,
@@ -204,7 +235,7 @@ try {
   fs.writeFileSync(path.join(outDir, "desktop.png"), shot);
   fs.writeFileSync(
     path.join(outDir, "desktop-map.json"),
-    JSON.stringify({ elements, textRects }, null, 1)
+    JSON.stringify({ elements, textRects, textNodes, inputs }, null, 1)
   );
 } finally {
   await app.close();
