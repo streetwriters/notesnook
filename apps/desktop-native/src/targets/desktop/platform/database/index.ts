@@ -24,16 +24,11 @@ import {
 } from "@streetwriters/kysely";
 import type { DatabaseHost } from "../../../../platform";
 import { compression } from "../compression";
+import EventSource from "@ammarahmed/react-native-eventsource";
 import { open } from "react-native-quick-sqlite";
 import { clearDatabaseKey, getDatabaseKey } from "./encryption";
 import { RNSqliteDriver } from "./sqlite.kysely";
 import { Storage } from "./storage";
-
-class UnsupportedEventSource {
-  constructor() {
-    throw new Error("EventSource is not implemented on desktop yet");
-  }
-}
 
 export const databaseHost: DatabaseHost = {
   createDialect: ({ name }) => ({
@@ -57,6 +52,6 @@ export const databaseHost: DatabaseHost = {
     open({ name: "notesnook" }).delete();
     clearDatabaseKey();
   },
-  eventSource: UnsupportedEventSource,
+  eventSource: EventSource,
   compression
 };
