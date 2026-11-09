@@ -139,14 +139,18 @@ test("the app lock gate shows the unlock screen when a credential exists", async
   await open("/notes", { seedAppLockPassword: "password" });
   await waitForId("app-lock-password");
   expect(await app!.getByTestId("app").count()).toBe(0);
-  await app!.getByTestId("app-lock-password").fill("wrong");
+  await app!.getByTestId("app-lock-password").type("wrong");
   await app!.press("enter");
   await vi.waitFor(
     async () =>
-      expect(await app!.getByText("Wrong password").count()).toBeGreaterThan(0),
+      expect(
+        await app!.getByText("Wrong password", { exact: false }).count()
+      ).toBeGreaterThan(0),
     { timeout: 20000 }
   );
-  await app!.getByTestId("app-lock-password").fill("password");
+  await app!.getByTestId("app-lock-password").click();
+  for (let i = 0; i < "wrong".length; i++) await app!.press("backspace");
+  await app!.getByTestId("app-lock-password").type("password");
   await app!.press("enter");
   await waitForId("app");
 });
