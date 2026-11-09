@@ -21,6 +21,7 @@ import { memo } from "react";
 import { strings } from "@notesnook/intl";
 import { Box, Button, Flex, SortableList, Text, type DragEvent } from "@ui";
 import { getDragData } from "../../utils/data-transfer";
+import { CommandPaletteDialog } from "../../dialogs/command-palette";
 import {
   ArrowLeft,
   ArrowRight,
@@ -138,6 +139,8 @@ export function ActionBar(props: {
         <Button
           testID="command-palette"
           variant="tertiary"
+          title={strings.command()}
+          onPress={() => CommandPaletteDialog.show({ isCommandMode: true })}
           sx={{
             flexDirection: "row",
             gap: "spacing3",
