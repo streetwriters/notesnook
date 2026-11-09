@@ -94,7 +94,8 @@ await page.evaluate(
       if (note.pinned) await db.notes.pin(true, id);
       if (note.archived) await db.notes.archive(true, id);
       for (const title of note.tags ?? []) {
-        const tagId = await db.tags.add({ title });
+        const tagId =
+          (await db.tags.find(title))?.id ?? (await db.tags.add({ title }));
         if (tagId)
           await db.relations.add(
             { type: "tag", id: tagId },

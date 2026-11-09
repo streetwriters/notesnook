@@ -36,11 +36,13 @@ describe("sort and group menu", () => {
     await closeMenu(app);
   });
 
-  test("grouping by none removes the group headers", async () => {
+  test("grouping by none keeps only the pinned and all headers like web", async () => {
     await clickId(app, "home-sort-button");
     await clickMenu(app, "groupBy");
     await clickMenu(app, "none");
-    await settle(async () => expect(await count(app, "group-header")).toBe(0));
+    await settle(async () =>
+      expect(await groupHeaderTexts(app)).toEqual(["Pinned", "All"])
+    );
   });
 
   test("grouping by default brings the headers back", async () => {
@@ -75,7 +77,7 @@ describe("sort and group menu", () => {
     await clickMenu(app, "asc");
     await settle(async () => {
       const titles = (await listTexts(app)).filter(
-        (title): title is string => !!title
+        (title): title is string => !!title && title !== "Pinned plan"
       );
       expect(titles).toEqual([...titles].sort((a, b) => a.localeCompare(b)));
     });

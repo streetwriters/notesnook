@@ -216,6 +216,10 @@ export async function groupHeaderTexts(app: DesktopApp) {
               header.frame.y + header.frame.height + 0.5
         )
     )
+    .sort(
+      (a: { frame: { y: number } }, b: { frame: { y: number } }) =>
+        a.frame.y - b.frame.y
+    )
     .map((entry: { text?: string }) => entry.text);
 }
 

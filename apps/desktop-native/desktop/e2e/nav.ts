@@ -54,7 +54,9 @@ async function listPaneTitles(app: DesktopApp) {
 
 export async function listTitles(app: DesktopApp) {
   const { titles, headers } = await listPaneTitles(app);
-  return titles.filter((t) => !headers.some((h) => inside(t.frame, h.frame)));
+  return titles
+    .filter((t) => !headers.some((h) => inside(t.frame, h.frame)))
+    .sort((a, b) => a.frame.y - b.frame.y);
 }
 
 export async function groupHeaderTitles(app: DesktopApp) {
