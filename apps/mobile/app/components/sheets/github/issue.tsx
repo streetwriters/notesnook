@@ -77,9 +77,9 @@ export const Issue = ({
     try {
       setLoading(true);
       issueReportResponse.current = await Debug.report({
-        title: title.current,
+        title: formRef.current.getValue("title"),
         body:
-          body.current +
+          formRef.current.getValue("body") +
           `\n${defaultBody || ""}` +
           `\n_______________
 **Device information:**
