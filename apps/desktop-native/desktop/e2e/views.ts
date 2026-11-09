@@ -180,7 +180,7 @@ export async function rowBackground(app: DesktopApp, title: string) {
   return windowPixel(app, match.frame.x - 6, match.frame.y + 8);
 }
 
-export async function isRowSelected(app: DesktopApp, title: string) {
+async function hasRowMarker(app: DesktopApp, title: string, marker: string) {
   const entry = await titleEntry(app, title);
   const rows: { frame: { y: number; height: number } }[] = await app.query(
     "testID",
@@ -195,7 +195,7 @@ export async function isRowSelected(app: DesktopApp, title: string) {
   if (!row) return false;
   const markers: { frame: { y: number } }[] = await app.query(
     "testID",
-    "list-item-selected",
+    marker,
     true
   );
   return markers.some(
@@ -204,6 +204,12 @@ export async function isRowSelected(app: DesktopApp, title: string) {
       marker.frame.y <= row.frame.y + row.frame.height
   );
 }
+
+export const isRowSelected = (app: DesktopApp, title: string) =>
+  hasRowMarker(app, title, "list-item-selected");
+
+export const isRowCursor = (app: DesktopApp, title: string) =>
+  hasRowMarker(app, title, "list-item-cursor");
 
 export async function waitUntil(check: () => Promise<boolean>) {
   await vi.waitFor(async () => expect(await check()).toBe(true), {

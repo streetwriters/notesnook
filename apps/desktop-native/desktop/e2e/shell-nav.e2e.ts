@@ -1,4 +1,3 @@
-import { PNG } from "pngjs";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -6,6 +5,7 @@ import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { launchApp } from "./launch";
 import { navClick, navVisible, listTitles } from "./nav";
+import { isRowCursor, isRowSelected, waitUntil } from "./views";
 
 const NOW = Date.now();
 const seed = [1, 2, 3, 4].map((n) => ({
@@ -121,23 +121,6 @@ test("the notebooks and tags tabs list their items and navigate", async () => {
   );
 });
 
-async function windowPixel(x: number, y: number) {
-  const image = PNG.sync.read(await app.screenshot());
-  const size = await app.getWindowSize();
-  const scale = image.width / size.width;
-  const offset =
-    (Math.round(y * scale) * image.width + Math.round(x * scale)) * 4;
-  return Array.from(image.data.subarray(offset, offset + 3));
-}
-
-async function rowBackground(title: string) {
-  const match = (await listTitles(app)).find(
-    (entry: { text?: string }) => entry.text === title
-  );
-  expect(match, title).toBeDefined();
-  return windowPixel(match.frame.x - 6, match.frame.y + match.frame.height / 2);
-}
-
 test("arrow keys move the selection through the list", async () => {
   await vi.waitFor(
     async () =>
@@ -154,13 +137,7 @@ test("arrow keys move the selection through the list", async () => {
   await app.press("down");
   await app.mouseMove({ x: 4, y: 4 });
   await app.waitForIdle();
-  await vi.waitFor(
-    async () => {
-      const second = await rowBackground("Keyed note 3");
-      expect(second, `row below ${second}`).toEqual([247, 247, 247]);
-    },
-    { timeout: 10000, interval: 300 }
-  );
+  await waitUntil(() => isRowCursor(app, "Keyed note 3"));
 });
 
 test("a modifier click selects several notes", async () => {
@@ -170,13 +147,8 @@ test("a modifier click selects several notes", async () => {
   await app.getByText("Keyed note 4").click({ modifiers: { platform: true } });
   await app.mouseMove({ x: 4, y: 4 });
   await app.waitForIdle();
-  await vi.waitFor(
-    async () => {
-      expect(await rowBackground("Keyed note 3")).toEqual([247, 247, 247]);
-      expect(await rowBackground("Keyed note 4")).toEqual([247, 247, 247]);
-    },
-    { timeout: 10000, interval: 300 }
-  );
+  await waitUntil(() => isRowSelected(app, "Keyed note 3"));
+  await waitUntil(() => isRowSelected(app, "Keyed note 4"));
 });
 
 test("the view mode button switches the list between detailed and compact rows", async () => {

@@ -211,6 +211,12 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}
+      {environment.isDev && isCursor ? (
+        <Box
+          testID="list-item-cursor"
+          sx={{ position: "absolute", width: 0, height: 0 }}
+        />
+      ) : null}
       {!isCompact ? props.header : null}
       <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
         {typeof props.title === "string" ? (

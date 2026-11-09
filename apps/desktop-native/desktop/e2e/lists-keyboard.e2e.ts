@@ -5,7 +5,7 @@ import {
   count,
   ctrlClick,
   goTo,
-  isRowSelected,
+  isRowCursor,
   listTexts,
   plainClick,
   settle,
@@ -36,13 +36,13 @@ describe("keyboard list navigation", () => {
     await plainClick(app, "Pinned plan");
     await app.press("down");
     await app.mouseMove({ x: 4, y: 4 });
-    await waitUntil(() => isRowSelected(app, "Grocery list"));
+    await waitUntil(() => isRowCursor(app, "Grocery list"));
   });
 
   test("arrow up moves it back", async () => {
     await app.press("up");
     await app.mouseMove({ x: 4, y: 4 });
-    await waitUntil(() => isRowSelected(app, "Pinned plan"));
+    await waitUntil(() => isRowCursor(app, "Pinned plan"));
   });
 
   test("arrow down past the last note wraps to the first, like web", async () => {
@@ -51,7 +51,7 @@ describe("keyboard list navigation", () => {
     const rows = (await listTexts(app)).filter(Boolean).length;
     for (let index = 0; index < rows; index++) await app.press("down");
     await app.mouseMove({ x: 4, y: 4 });
-    await waitUntil(() => isRowSelected(app, "Pinned plan"));
+    await waitUntil(() => isRowCursor(app, "Pinned plan"));
   });
 
   test("enter opens the focused note in the editor", async () => {

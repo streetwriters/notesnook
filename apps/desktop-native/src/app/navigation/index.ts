@@ -67,7 +67,7 @@ export function navigate(
     query?: Record<string, string>;
   } = {}
 ) {
-  const { notify, query, replace } = options;
+  const { query, replace } = options;
   const separator = url.indexOf("?");
   const path = separator < 0 ? url : url.slice(0, separator);
   let search = separator < 0 ? history.location.search : url.slice(separator);
@@ -76,7 +76,7 @@ export function navigate(
   if (replace) history.replace(location);
   else history.push(location);
 
-  if (notify) NavigationEvents.publish("popstate");
+  NavigationEvents.publish("popstate");
 }
 
 type HashNavigateOptions = {
