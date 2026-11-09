@@ -265,7 +265,7 @@ export default function ListContainer(props: ListContainerProps) {
           estimatedItemSize={getListItemDefaultHeight(group, compact)}
           extraData={listData}
           header={header ?? <Announcements />}
-          overscan={400}
+          overscan={200}
         />
         {props.button ? (
           <Button
