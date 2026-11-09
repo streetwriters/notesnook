@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { MenuItem } from "@ui";
+import { getPointerPosition, type MenuItem } from "@ui";
 import { useMenuStore, type MenuAnchor } from "../components/menu/store";
 
 export type MenuPosition = { x: number; y: number };
@@ -27,10 +27,11 @@ export type MenuOptions = {
   position?: MenuPosition | MenuAnchor;
 };
 
-const DEFAULT_ANCHOR: MenuAnchor = { x: 320, y: 120, width: 0, height: 0 };
-
 function toAnchor(position?: MenuPosition | MenuAnchor): MenuAnchor {
-  if (!position) return DEFAULT_ANCHOR;
+  if (!position) {
+    const pointer = getPointerPosition();
+    return { x: pointer.x, y: pointer.y, width: 0, height: -5 };
+  }
   if ("width" in position) return position;
   return { x: position.x, y: position.y, width: 0, height: -5 };
 }

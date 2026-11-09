@@ -143,8 +143,18 @@ export interface StyledResult {
   nativeProps: Record<string, unknown>;
 }
 
+export const lastPointer = { x: 320, y: 120 };
+
+function rememberPointer(native: { pageX?: number; pageY?: number }) {
+  if (typeof native.pageX === "number" && typeof native.pageY === "number") {
+    lastPointer.x = native.pageX;
+    lastPointer.y = native.pageY;
+  }
+}
+
 function press(event: any): PressEvent {
   const native = event?.nativeEvent ?? {};
+  rememberPointer(native);
   return {
     button: "primary",
     detail: 1,
@@ -183,6 +193,7 @@ export function key(event: any): KeyEvent {
 
 function hover(event: any): HoverEvent {
   const native = event?.nativeEvent ?? event ?? {};
+  rememberPointer(native);
   return {
     pageX: native.pageX ?? 0,
     pageY: native.pageY ?? 0,
@@ -210,6 +221,10 @@ function drag(event: any): DragEvent {
 
 function contextMenu(event: any): ContextMenuEvent {
   const native = event?.nativeEvent ?? event ?? {};
+  rememberPointer({
+    pageX: native.pageX ?? native.x,
+    pageY: native.pageY ?? native.y
+  });
   return {
     pageX: native.pageX ?? native.x ?? 0,
     pageY: native.pageY ?? native.y ?? 0,

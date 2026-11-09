@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Appearance, Dimensions, useWindowDimensions } from "react-native";
 import { useColorScheme } from "react-native";
 import type * as Contract from "../../../ui/hooks";
+import { lastPointer } from "./style/use-styled";
 
 function evaluate(
   query: string,
@@ -57,3 +58,8 @@ export const useWindowSize: typeof Contract.useWindowSize = () => {
   const { width, height } = useWindowDimensions();
   return { width, height };
 };
+
+export const getPointerPosition: typeof Contract.getPointerPosition = () => ({
+  x: lastPointer.x,
+  y: lastPointer.y
+});

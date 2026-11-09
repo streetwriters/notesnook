@@ -330,13 +330,17 @@ export function MenuHost() {
     if (!items) setSize(undefined);
   }, [items]);
   if (!items || !anchor) return null;
-  const margin = 8;
+  const margin = 10;
+  const height = size?.height ?? 0;
+  const below = anchor.y + anchor.height + 5;
+  const above = anchor.y - height - 5;
+  const belowOverflow = Math.max(0, below + height + margin - viewport.height);
+  const aboveOverflow = Math.max(0, margin - above);
+  const placed =
+    belowOverflow > 0 && aboveOverflow <= belowOverflow ? above : below;
   const top = Math.max(
     margin,
-    Math.min(
-      anchor.y + anchor.height + 5,
-      viewport.height - (size?.height ?? 0) - margin
-    )
+    Math.min(placed, viewport.height - height - margin)
   );
   const left = Math.max(
     margin,
