@@ -11,7 +11,8 @@
     "trafficLightPosition": {
       "x": 10,
       "y": 14
-    }
+    },
+    "visible": false
   },
   "bundle": {
     "targets": "all",

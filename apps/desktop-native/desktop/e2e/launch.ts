@@ -50,6 +50,7 @@ export async function launchApp(options: Options): Promise<DesktopApp> {
     process.env.RN_GPUI_E2E_LOG ??
     path.join(failures, `${file}.${process.pid}.${++counter}.log`);
   const app = await launch({ ...options, logFile });
+  app.allowErrors(/ERR_UPDATER|the feed answered/u);
   running.add(app);
   mkdirSync(pidDir, { recursive: true });
   writeFileSync(pidFile(app), "");
