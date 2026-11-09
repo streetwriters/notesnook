@@ -30,7 +30,8 @@ import {
   cacheDir,
   checkUpload,
   FileSizeResult,
-  getUploadedFileSize
+  getUploadedFileSize,
+  parseS3Error
 } from "./utils";
 import Upload from "@ammarahmed/react-native-upload";
 import NetInfo from "@react-native-community/netinfo";
@@ -105,6 +106,19 @@ function getServerErrorMessage(body?: string | null): string | undefined {
   }
 }
 
+// Readable message from a JSON ({ error | message }) or S3 XML (<Message>)
+// response body. The XML may be prefixed (e.g. "HTTP 403: <Error>...").
+function getReadableErrorMessage(body?: string | null): string | undefined {
+  const serverMessage = getServerErrorMessage(body);
+  if (serverMessage) return serverMessage;
+  const start = body ? body.indexOf("<Error") : -1;
+  if (!body || start === -1) return undefined;
+  const xml = body.slice(start);
+  const message = parseS3Error(xml).Message;
+  // parseS3Error falls back to the raw input when it finds no <Message>
+  return message && message !== xml ? message : undefined;
+}
+
 interface StoredMultipartSession {
   uploadId: string;
   etags: string[];
@@ -142,8 +156,15 @@ async function initiateMultipartUpload(
   const response = await fetch(url, { headers });
 
   if (!response.ok) {
+    let body: string | undefined;
+    try {
+      body = await response.text();
+    } catch {
+      // ignore, fall back to the status code
+    }
     throw new MultipartInitiateError(
-      `Failed to initiate multipart upload: ${response.statusText}`,
+      getReadableErrorMessage(body) ??
+        `Failed to initiate multipart upload (HTTP ${response.status})`,
       response.status >= 400 && response.status < 500
     );
   }
@@ -359,7 +380,10 @@ export async function uploadFile(
     const fileInfo = await RNFetchBlob.fs.stat(filePath);
 
     const remoteFileSize = await getUploadedFileSize(filename);
-    if (remoteFileSize === FileSizeResult.Error) return false;
+    if (remoteFileSize === FileSizeResult.Error)
+      throw new Error(
+        "Could not verify the file on the server. Please try again."
+      );
 
     const featureResult = await isFeatureAvailable(
       "fileSize",
@@ -440,7 +464,7 @@ export async function uploadFile(
         DatabaseLogger.error(new Error(details), "Multipart upload rejected", {
           filename
         });
-        throw new Error(getServerErrorMessage(body) ?? details);
+        throw new Error(getReadableErrorMessage(body) ?? details);
       }
     } else {
       // Use single-part upload for smaller files
@@ -507,7 +531,9 @@ export async function uploadFile(
         DatabaseLogger.error(new Error(details), "Upload rejected", {
           filename
         });
-        throw new Error(getServerErrorMessage(result.responseBody) ?? details);
+        throw new Error(
+          getReadableErrorMessage(result.responseBody) ?? details
+        );
       }
     }
 
@@ -544,7 +570,15 @@ export async function uploadFile(
       });
       return false;
     }
-    ToastManager.error(e as Error, "File upload failed");
+    const readableMessage = getReadableErrorMessage(
+      e instanceof Error ? e.message : String(e)
+    );
+    let toastError = e as Error;
+    if (readableMessage) {
+      toastError = new Error(readableMessage);
+      toastError.stack = (e as Error)?.stack;
+    }
+    ToastManager.error(toastError, "File upload failed");
     DatabaseLogger.error(e, "File upload failed", {
       filename
     });
