@@ -153,12 +153,20 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
     props;
   const inputRef = useRef<UIElement>(null);
   const [value, setValue] = useState("");
+  const [generation, setGeneration] = useState(0);
   const { openMenu, closeMenu } = useMenuTrigger();
 
+  const skipOpen = useRef(false);
+  const latestText = useRef("");
   const reset = useCallback(() => {
     setValue("");
+    setGeneration((current) => current + 1);
+    latestText.current = "";
     closeMenu();
-    inputRef.current?.focus();
+    skipOpen.current = true;
+    setTimeout(() => {
+      skipOpen.current = false;
+    }, 200);
   }, [closeMenu]);
 
   const onOpenMenu = useCallback(
@@ -179,8 +187,10 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
 
   return (
     <Input
+      key={generation}
       ref={inputRef}
       testID="editor-tag-input"
+      autoFocus={generation > 0}
       disabled={props.disabled}
       value={value}
       placeholder={strings.addATag()}
@@ -193,6 +203,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
         alignSelf: "flex-start"
       }}
       onFocus={async () => {
+        if (skipOpen.current) return;
         if (!value.trim()) onOpenMenu(await defaultItems(), "");
       }}
       onPress={async () => {
@@ -201,8 +212,10 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
       onChangeText={async (text) => {
         setValue(text);
         const trimmed = text.trim();
+        latestText.current = trimmed;
         if (!trimmed) return closeMenu();
-        onOpenMenu(await filter(trimmed), trimmed);
+        const filtered = await filter(trimmed);
+        if (latestText.current === trimmed) onOpenMenu(filtered, trimmed);
       }}
       onSubmit={(text) => {
         const trimmed = text.trim();

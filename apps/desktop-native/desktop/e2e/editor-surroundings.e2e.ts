@@ -77,6 +77,35 @@ describe("the properties panel", () => {
   });
 });
 
+describe("properties round trips through the database", () => {
+  const stateOn = async () =>
+    (await app.query("testID", "toggle-state-on", true)).length;
+
+  test("pin and favorite flip their state and stay after the panel is reopened", async () => {
+    await settle(async () =>
+      expect(await count(app, "properties-pin")).toBe(1)
+    );
+    const before = await stateOn();
+    await clickId(app, "properties-pin");
+    await settle(async () => expect(await stateOn()).toBe(before + 1));
+    await clickId(app, "properties-favorite");
+    await settle(async () => expect(await stateOn()).toBe(before + 2));
+    await clickId(app, "Properties");
+    await settle(async () =>
+      expect(await count(app, "properties-pin")).toBe(0)
+    );
+    await clickId(app, "Properties");
+    await settle(async () => expect(await stateOn()).toBe(before + 2));
+  });
+
+  test("a tag typed into the header is added to the note", async () => {
+    expect(await count(app, "tag")).toBe(0);
+    await typeInto(app, "editor-tag-input", "work");
+    await app.press("enter");
+    await settle(async () => expect(await count(app, "tag")).toBe(1));
+  });
+});
+
 describe("focus mode", () => {
   test("hides the navigation and list and comes back", async () => {
     const lists = async () => await count(app, "navigation-menu");
