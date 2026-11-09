@@ -15,7 +15,7 @@ import { dataSections } from "./settings-sections";
 let app: DesktopApp;
 
 beforeAll(async () => {
-  app = await start();
+  app = await start({ seedUser: { plan: "pro" } });
   await openSettings(app);
 });
 
