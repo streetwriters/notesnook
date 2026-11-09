@@ -22,18 +22,24 @@ const browser = await chromium.launch({
   headless: true,
   args: [`--force-device-scale-factor=${scenario.scale}`]
 });
-const context = await browser.newContext({
-  viewport: null,
-  colorScheme: scheme
-});
+const narrow = width < 500;
+const context = await browser.newContext(
+  narrow
+    ? {
+        viewport: { width, height },
+        deviceScaleFactor: scenario.scale,
+        colorScheme: scheme
+      }
+    : { viewport: null, colorScheme: scheme }
+);
 const page = await context.newPage();
 if (process.env.PARITY_WEB_DEBUG) {
   page.on("console", (m) => console.log("web:", m.type(), m.text().slice(0, 300)));
   page.on("response", (r) => r.status() >= 400 && console.log("web http", r.status(), r.url().slice(0, 200)));
   page.on("pageerror", (e) => console.log("web pageerror:", String(e).slice(0, 400)));
 }
-const cdp = await context.newCDPSession(page);
-const { windowId } = await cdp.send("Browser.getWindowForTarget");
+const cdp = narrow ? undefined : await context.newCDPSession(page);
+const { windowId } = narrow ? {} : await cdp.send("Browser.getWindowForTarget");
 let outerWidth = width;
 let outerHeight = height + 120;
 async function fitViewport() {
@@ -58,7 +64,7 @@ async function fitViewport() {
   }
   throw new Error("could not size the viewport to " + width + "x" + height);
 }
-await fitViewport();
+if (!narrow) await fitViewport();
 await page.goto(baseUrl, { waitUntil: "load" });
 await page.waitForTimeout(6000);
 const offline = page.getByText("Use offline");
@@ -108,9 +114,13 @@ await page.evaluate(
           );
       }
       if (note.color) {
+        const known = extras.colors.find(
+          (candidate) =>
+            candidate.colorCode === note.color || candidate.title === note.color
+        );
         const colorId = await db.colors.add({
-          title: note.color,
-          colorCode: note.color
+          title: known ? known.title : note.color,
+          colorCode: known ? known.colorCode : note.color
         });
         if (colorId)
           await db.relations.add(
@@ -230,7 +240,14 @@ for (const step of scenario.steps ?? []) {
   if (step.rightClick) await target(step.rightClick).click({ button: "right" });
   if (step.press)
     await page.keyboard.press(
-      { escape: "Escape", enter: "Enter", backspace: "Backspace" }[step.press] ?? step.press
+      {
+        escape: "Escape",
+        enter: "Enter",
+        backspace: "Backspace",
+        down: "ArrowDown",
+        up: "ArrowUp",
+        tab: "Tab"
+      }[step.press] ?? step.press
     );
   if (step.clickText)
     await page
@@ -248,7 +265,7 @@ for (const step of scenario.steps ?? []) {
 if (!scenario.keepPointer) await page.mouse.move(2, 2);
 await page.waitForTimeout(300);
 
-await fitViewport();
+if (!narrow) await fitViewport();
 await page.waitForTimeout(500);
 if (process.env.PARITY_DUMP)
   console.log(
@@ -408,7 +425,7 @@ const inputs = await page.evaluate(() =>
     .filter(Boolean)
 );
 
-await fitViewport();
+if (!narrow) await fitViewport();
 if (process.env.PARITY_WEB_DUMP)
   console.log(
     JSON.stringify(

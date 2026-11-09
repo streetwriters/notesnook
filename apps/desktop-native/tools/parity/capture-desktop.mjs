@@ -123,6 +123,31 @@ try {
         if (entry || Date.now() > deadline) break;
         await new Promise((resolve) => setTimeout(resolve, 250));
       }
+      for (let attempt = 0; attempt < 12; attempt++) {
+        const [menu] = await app.query(
+          "testID",
+          "settings-navigation-menu",
+          true
+        );
+        if (!menu) break;
+        const current = (await app.query("testID", "title", true)).find(
+          (candidate) => candidate.text === step.clickText
+        );
+        if (!current) break;
+        const top = menu.frame.y;
+        const bottom = menu.frame.y + menu.frame.height;
+        const entryBottom = current.frame.y + current.frame.height;
+        if (current.frame.y >= top && entryBottom <= bottom) {
+          entry = current;
+          break;
+        }
+        const dy =
+          current.frame.y < top
+            ? current.frame.y - top - 40
+            : entryBottom - bottom + 40;
+        await app.scroll(menu.tag, 0, -dy);
+        await app.waitForIdle();
+      }
       await app.click(entry.tag);
     }
     if (step.rightClick)

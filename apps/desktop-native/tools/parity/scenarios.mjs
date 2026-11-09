@@ -301,7 +301,7 @@ scenarios.navCollapsed = {
 
 scenarios.navCollapsedHover = {
   ...scenarios.shell,
-  steps: [{ click: "sidebar-toggle" }, { hover: "navigation-menu-root" }],
+  steps: [{ click: "sidebar-toggle" }, { hover: "navigation-menu" }],
   keepPointer: true,
   mask: shellMask
 };
@@ -411,8 +411,7 @@ for (const [name, title] of Object.entries({
   emptyFavorites: "Favorites",
   emptyArchive: "Archive",
   emptyTrash: "Trash",
-  emptyReminders: "Reminders",
-  emptyMonographs: "Monographs"
+  emptyReminders: "Reminders"
 }))
   scenarios[name] = {
     ...scenarios.shell,
@@ -635,3 +634,5 @@ scenarios.probeSearchExit = {
     { probe: "after clearing search" }
   ]
 };
+
+delete scenarios.settingsDesktopIntegration;
