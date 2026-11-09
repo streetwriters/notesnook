@@ -26,4 +26,5 @@ export * from "./lists";
 export * from "./primitives";
 export * from "./style";
 export * from "./webview";
+export * from "./pdf";
 export * from "./overlays";

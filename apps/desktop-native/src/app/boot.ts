@@ -76,6 +76,7 @@ export type BootOptions = {
   disableNetwork?: boolean;
   seedConfig?: Record<string, unknown>;
   simulateMigrationMs?: number;
+  openPdf?: { base64: string; hash?: string };
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -259,6 +260,14 @@ async function run(options: BootOptions) {
   );
   if (environment.isDev && options.seed) await seedNotes(options.seed);
   if (environment.isDev) await seedOthers(options);
+  if (environment.isDev && options.openPdf) {
+    const { base64, hash } = options.openPdf;
+    const { PdfPreviewDialog } = await import("./dialogs/pdf-preview-dialog");
+    PdfPreviewDialog.show({
+      url: `data:application/pdf;base64,${base64}`,
+      hash: hash ?? "e2e-pdf"
+    });
+  }
   if (environment.isDev && options.seedUser) await seedUser(options.seedUser);
   if (environment.isDev && options.softAuthenticatorPin)
     await installSoftAuthenticator(options.softAuthenticatorPin);

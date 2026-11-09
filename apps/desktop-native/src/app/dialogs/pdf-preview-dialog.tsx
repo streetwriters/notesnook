@@ -17,9 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Dialog, Flex, Text } from "@ui";
-import { strings } from "@notesnook/intl";
+import { Dialog } from "@ui";
+import { Suspense, lazy } from "react";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
+import { Loading } from "../components/icons";
+
+const PdfPreview = lazy(() => import("../components/pdf-preview"));
 
 type PdfPreviewDialogProps = BaseDialogProps<boolean> & {
   url: string;
@@ -27,7 +30,7 @@ type PdfPreviewDialogProps = BaseDialogProps<boolean> & {
 };
 
 export const PdfPreviewDialog = DialogManager.register(
-  function PdfPreviewDialog({ onClose }: PdfPreviewDialogProps) {
+  function PdfPreviewDialog({ onClose, url, hash }: PdfPreviewDialogProps) {
     return (
       <Dialog
         isOpen={true}
@@ -36,16 +39,14 @@ export const PdfPreviewDialog = DialogManager.register(
         noScroll
         sx={{ py: 1 }}
         onClose={() => onClose(false)}
-        negativeButton={{
-          text: strings.close(),
-          onClick: () => onClose(false)
-        }}
       >
-        <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <Text variant="body">
-            PDF preview is not available on desktop yet
-          </Text>
-        </Flex>
+        <Suspense fallback={<Loading />}>
+          <PdfPreview
+            fileUrl={url}
+            hash={hash}
+            onClose={() => onClose(false)}
+          />
+        </Suspense>
       </Dialog>
     );
   }
