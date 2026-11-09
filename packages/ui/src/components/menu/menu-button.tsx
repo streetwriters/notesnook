@@ -115,7 +115,6 @@ export function MenuButton(props: MenuButtonProps) {
               textAlign: "left",
               fontSize: "xxs",
               fontWeight: 400,
-              lineHeight: 1,
               minWidth: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
