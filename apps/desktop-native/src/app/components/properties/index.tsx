@@ -95,11 +95,15 @@ import { ListLoader } from "../loaders/list-loader";
 import { copyNoteLink } from "../../common";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { navigate } from "../../navigation";
-import { notImplemented } from "../../common/not-implemented";
 
 function TableOfContents(_props: { sessionId: string }) {
-  notImplemented("TableOfContents")();
-  return null;
+  return (
+    <Flex sx={{ p: 4 }}>
+      <Text variant="body" sx={{ color: "paragraph-secondary" }}>
+        {strings.noHeadingsFound()}
+      </Text>
+    </Flex>
+  );
 }
 
 const tabs = [

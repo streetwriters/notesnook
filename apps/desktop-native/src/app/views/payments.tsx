@@ -22,14 +22,15 @@ import { strings } from "@notesnook/intl";
 import { Flex } from "@ui";
 import { hardNavigate, useQueryParams } from "../navigation";
 import { Loader } from "../components/loader";
-import { notImplemented } from "../common/not-implemented";
+import { showToast } from "../utils/toast";
 
 function Payments() {
   const [{ _ptxn, priceId }] = useQueryParams();
 
   useEffect(() => {
     if (!_ptxn && !priceId) return hardNavigate("/notes");
-    notImplemented("PaddleCheckoutOverlay")();
+    showToast("error", "Checkout is not available on desktop yet");
+    hardNavigate("/notes");
   }, [_ptxn, priceId]);
 
   return (
