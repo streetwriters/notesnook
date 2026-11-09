@@ -217,6 +217,7 @@ export const CommandPaletteDialog = DialogManager.register(
           }}
         >
           <Field
+            testID="command-palette-input"
             autoFocus
             variant="clean"
             placeholder={

@@ -86,7 +86,7 @@ describe("command palette dialog", () => {
 
   test("typing filters notes and enter opens one", async () => {
     await openCommandPalette(app);
-    await typeInto(app, "dialog", "Apple");
+    await typeInto(app, "command-palette-input", "Apple");
     await settle(async () =>
       expect((await texts(app)).some((text) => text?.startsWith("Apple"))).toBe(
         true

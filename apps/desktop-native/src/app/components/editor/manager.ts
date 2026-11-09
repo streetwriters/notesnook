@@ -17,11 +17,123 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
-  notImplemented,
-  type NotImplemented
-} from "../../common/not-implemented";
+import createStore from "../../common/store";
+import BaseStore from "../../stores";
+import Config from "../../utils/config";
 
-export const useEditorManager: NotImplemented =
-  notImplemented("useEditorManager");
-export type useEditorManager = any;
+type EditorConfig = {
+  fontFamily: string;
+  fontSize: number;
+  zoom: number;
+  lineHeight: number;
+};
+
+type NoteStatistics = {
+  words: { total: number };
+  characters: { total: number };
+  paragraphs: { total: number };
+  spaces: { total: number };
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IEditor = Record<string, (...args: any[]) => any>;
+
+type EditorContext = {
+  editor?: IEditor;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  statistics?: NoteStatistics;
+  tableOfContents?: unknown[];
+};
+
+const EDITOR_ZOOM_DEFAULT = 100;
+const EDITOR_LINE_HEIGHT_DEFAULT = 1.2;
+
+class EditorManager extends BaseStore<EditorManager> {
+  activeEditorId?: string;
+  editorConfig: EditorConfig = Config.get("editorConfig", {
+    fontFamily: "sans-serif",
+    fontSize: 14,
+    zoom: EDITOR_ZOOM_DEFAULT,
+    lineHeight: EDITOR_LINE_HEIGHT_DEFAULT
+  });
+  editors: Record<string, EditorContext | undefined> = {};
+
+  getEditor = (id: string): EditorContext | undefined => {
+    return this.get().editors[id];
+  };
+
+  setEditor = (id: string, editor?: EditorContext) => {
+    this.set((state) => {
+      if (!editor) delete state.editors[id];
+      else state.editors[id] = editor;
+      state.activeEditorId = editor
+        ? id
+        : id === state.activeEditorId
+        ? undefined
+        : state.activeEditorId;
+    });
+  };
+
+  updateEditor = (
+    id: string,
+    partial:
+      | Partial<EditorContext>
+      | ((oldState: EditorContext) => Partial<EditorContext>)
+  ) => {
+    this.set((state) => {
+      const oldState = state.editors[id];
+      if (!oldState) return;
+      state.activeEditorId = id;
+      const newPartialState =
+        typeof partial === "function" ? partial(oldState) : partial;
+      state.editors[id] = { ...oldState, ...newPartialState };
+    });
+  };
+
+  setEditorConfig = (config: Partial<EditorConfig>) => {
+    const oldConfig = this.get().editorConfig;
+    this.set({
+      editorConfig: Config.set("editorConfig", {
+        ...oldConfig,
+        ...config
+      })
+    });
+  };
+}
+
+const [useEditorManager] = createStore<EditorManager>(
+  (set, get) => new EditorManager(set, get)
+);
+
+export { useEditorManager };
+
+export function useEditor(id: string) {
+  return useEditorManager((store) => store.editors[id]);
+}
+
+export function useNoteStatistics(): NoteStatistics {
+  return useEditorManager(
+    (store) =>
+      (store.activeEditorId &&
+        store.editors[store.activeEditorId]?.statistics) || {
+        words: { total: 0 },
+        characters: { total: 0 },
+        paragraphs: { total: 0 },
+        spaces: { total: 0 }
+      }
+  );
+}
+
+export function useEditorConfig() {
+  const editorConfig = useEditorManager((store) => store.editorConfig);
+  const setEditorConfig = useEditorManager((store) => store.setEditorConfig);
+  return { editorConfig, setEditorConfig };
+}
+
+export const editorConfig = () => useEditorManager.getState().editorConfig;
+
+export const onEditorConfigChange = <T>(
+  selector: (editorConfig: EditorConfig) => T,
+  listener: (selectedState: T, previousSelectedState: T) => void
+) => useEditorManager.subscribe((s) => selector(s.editorConfig), listener);
