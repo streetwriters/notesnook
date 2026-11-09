@@ -750,6 +750,14 @@ msgstr "12-godzinny"
 msgid "24-hour"
 msgstr "24-godzinny"
 
+#: src/strings.ts:916
+msgid "2FA backup codes copied!"
+msgstr ""
+
+#: src/strings.ts:920
+msgid "2FA backup codes saved!"
+msgstr ""
+
 #: src/strings.ts:1747
 msgid "2FA code is required()"
 msgstr "Kod 2FA jest wymagany()"
@@ -2885,13 +2893,13 @@ msgstr "Nie masz dostępu do swojego numeru telefonu?"
 msgid "Don't have an account?"
 msgstr "Nie masz konta?"
 
+#: src/strings.ts:914
+msgid "Don't have your 2FA backup codes?"
+msgstr ""
+
 #: src/strings.ts:1678
 msgid "Don't have your account recovery key?"
 msgstr "Nie masz klucza odzyskiwania konta?"
-
-#: src/strings.ts:914
-msgid "Don't have your recovery codes?"
-msgstr "Nie masz kodów odzyskiwania?"
 
 #: src/strings.ts:1664
 msgid "Don't show again on this device?"
@@ -3126,6 +3134,10 @@ msgstr "Włącz wyrażenia regularne"
 msgid "Enable spell checker"
 msgstr "Włącz sprawdzanie pisowni"
 
+#: src/strings.ts:3288
+msgid "Enable two factor authentication"
+msgstr ""
+
 #: src/strings.ts:447
 msgid "Enable two-factor authentication to add an extra layer of security to your account."
 msgstr "Włącz uwierzytelnianie dwuskładnikowe, aby dodać dodatkową warstwę zabezpieczeń konta."
@@ -3161,6 +3173,10 @@ msgstr "Klucz szyfrowania"
 #: src/strings.ts:745
 msgid "End to end encrypted."
 msgstr "Szyfrowane end-to-end."
+
+#: src/strings.ts:915
+msgid "Enter 2FA backup code"
+msgstr ""
 
 #: src/strings.ts:356
 msgid "Enter 6 digit code"
@@ -3230,9 +3246,9 @@ msgstr "Wpisz hasło"
 msgid "Enter pin or password to enable app lock."
 msgstr "Wpisz PIN lub hasło, aby włączyć blokadę aplikacji."
 
-#: src/strings.ts:915
-msgid "Enter recovery code"
-msgstr "Wpisz kod odzyskiwania"
+#: src/strings.ts:106
+msgid "Enter the 2FA backup code to continue logging in"
+msgstr ""
 
 #: src/strings.ts:105
 msgid "Enter the 6 digit code from your authenticator app to continue logging in"
@@ -3249,10 +3265,6 @@ msgstr "Wpisz 6-cyfrowy kod wysłany na Twój numer telefonu, aby kontynuować l
 #: src/strings.ts:2210
 msgid "Enter the gift code to redeem your subscription."
 msgstr "Wpisz kod podarunkowy, aby aktywować subskrypcję."
-
-#: src/strings.ts:106
-msgid "Enter the recovery code to continue logging in"
-msgstr "Wpisz kod odzyskiwania, aby kontynuować logowanie"
 
 #: src/strings.ts:2400
 msgid "Enter title"
@@ -3899,6 +3911,10 @@ msgstr "Zacznij bez kompromisów."
 msgid "Get this and so much more:"
 msgstr "Zyskaj to i wiele więcej:"
 
+#: src/strings.ts:357
+msgid "Getting 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:1728
 msgid "Getting encryption key..."
 msgstr "Pobieranie klucza szyfrowania..."
@@ -3910,10 +3926,6 @@ msgstr "Pobieranie informacji"
 #: src/strings.ts:2980
 msgid "Getting invoice"
 msgstr "Pobieranie faktury"
-
-#: src/strings.ts:357
-msgid "Getting recovery codes"
-msgstr "Pobieranie kodów odzyskiwania"
 
 #: src/strings.ts:2496
 msgid "Gift code required"
@@ -4092,6 +4104,10 @@ msgstr "Hura!"
 msgid "I already have an account"
 msgstr "Mam już konto"
 
+#: src/strings.ts:112
+msgid "I don't have 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:111
 msgid "I don't have access to authenticator app"
 msgstr "Nie mam dostępu do aplikacji uwierzytelniającej"
@@ -4104,13 +4120,9 @@ msgstr "Nie mam dostępu do e-maila"
 msgid "I don't have access to my phone"
 msgstr "Nie mam dostępu do telefonu"
 
-#: src/strings.ts:112
-msgid "I don't have recovery codes"
-msgstr "Nie mam kodów odzyskiwania"
-
 #: src/strings.ts:119
-msgid "I have a recovery code"
-msgstr "Mam kod odzyskiwania"
+msgid "I have a 2FA backup code"
+msgstr ""
 
 #: src/strings.ts:1729
 msgid "I have saved my key"
@@ -4417,8 +4429,8 @@ msgid "Invalid PGP key pair. Please check your keys and try again."
 msgstr "Nieprawidłowa para kluczy PGP. Sprawdź klucze i spróbuj ponownie."
 
 #: src/strings.ts:2487
-msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA recovery code."
-msgstr "Nieprawidłowy klucz odzyskiwania. Upewnij się, że wpisujesz klucz odzyskiwania konta, a nie kod odzyskiwania 2FA."
+msgid "Invalid recovery key. Make sure to input your account recovery key, not a 2FA backup code."
+msgstr ""
 
 #: src/strings.ts:2979
 msgid "Invoice"
@@ -4513,6 +4525,14 @@ msgstr "Ostatnie"
 #: src/strings.ts:2029
 msgid "Last edited at"
 msgstr "Ostatnia edycja"
+
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr ""
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr ""
 
 #: src/strings.ts:2469
 msgid "Last used on"
@@ -5182,6 +5202,10 @@ msgstr "Nowo utworzone notatki nie będą skategoryzowane"
 msgid "Next"
 msgstr "Dalej"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Następne dopasowanie"
@@ -5189,6 +5213,10 @@ msgstr "Następne dopasowanie"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "W następnym miesiącu"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr ""
 
 #: src/strings.ts:2220
 msgid "Next tab"
@@ -5820,8 +5848,8 @@ msgid "Please confirm your email to sync notes"
 msgstr "Potwierdź adres e-mail, aby synchronizować notatki"
 
 #: src/strings.ts:913
-msgid "Please confirm your identity by entering a recovery code."
-msgstr "Potwierdź swoją tożsamość, wpisując kod odzyskiwania."
+msgid "Please confirm your identity by entering a 2FA backup code."
+msgstr ""
 
 #: src/strings.ts:892
 msgid "Please confirm your identity by entering the authentication code from your authenticator app."
@@ -6360,14 +6388,6 @@ msgstr "Polecane przez Privacy Guides"
 msgid "Recover your account"
 msgstr "Odzyskaj swoje konto"
 
-#: src/strings.ts:916
-msgid "Recovery codes copied!"
-msgstr "Skopiowano kody odzyskiwania!"
-
-#: src/strings.ts:920
-msgid "Recovery codes saved!"
-msgstr "Zapisano kody odzyskiwania!"
-
 #: src/strings.ts:80
 msgid "Recovery email has been sent to your email address. Please check your inbox and follow the instructions to recover your account."
 msgstr "E-mail odzyskiwania został wysłany na Twój adres. Sprawdź skrzynkę odbiorczą i postępuj zgodnie z instrukcjami, aby odzyskać konto."
@@ -6823,6 +6843,10 @@ msgstr "Zapisz"
 msgid "Save {savings}% by switching to {period} plan."
 msgstr "Zaoszczędź {savings}%, przechodząc na plan {period}."
 
+#: src/strings.ts:448
+msgid "Save 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:429
 msgid "Save a backup of your notes"
 msgstr "Zapisz kopię zapasową swoich notatek"
@@ -6855,10 +6879,6 @@ msgstr "Zapisz notatkę"
 msgid "Save QR code to gallery"
 msgstr "Zapisz kod QR w galerii"
 
-#: src/strings.ts:448
-msgid "Save recovery codes"
-msgstr "Zapisz kody odzyskiwania"
-
 #: src/strings.ts:625
 msgid "Save to file"
 msgstr "Zapisz do pliku"
@@ -6866,6 +6886,10 @@ msgstr "Zapisz do pliku"
 #: src/strings.ts:540
 msgid "Save to text file"
 msgstr "Zapisz do pliku tekstowego"
+
+#: src/strings.ts:450
+msgid "Save your 2FA backup codes in a safe place. You will need them to log into your account in case you lose access to your two-factor authentication methods."
+msgstr ""
 
 #: src/strings.ts:1264
 msgid "Save your account recovery key"
@@ -6878,10 +6902,6 @@ msgstr "Przechowuj klucz odzyskiwania konta w bezpiecznym miejscu. Będzie potrz
 #: src/strings.ts:954
 msgid "Save your data recovery key in a safe place. You will need it to recover your data in case you forget your password."
 msgstr "Przechowuj klucz odzyskiwania danych w bezpiecznym miejscu. Będzie potrzebny do odzyskania danych, jeśli zapomnisz hasła."
-
-#: src/strings.ts:450
-msgid "Save your recovery codes in a safe place. You will need them to recover your account in case you lose access to your two-factor authentication methods."
-msgstr "Przechowuj kody odzyskiwania w bezpiecznym miejscu. Będą potrzebne do odzyskania konta, jeśli stracisz dostęp do metod uwierzytelniania dwuskładnikowego."
 
 #: src/strings.ts:2191
 msgid "Saved"
@@ -8163,6 +8183,10 @@ msgstr "Ta notatka zostanie opublikowana pod publicznym adresem URL."
 msgid "This username will be used to distinguish between different credentials in your security key. Make sure it is unique."
 msgstr "Ta nazwa użytkownika posłuży do rozróżniania poszczególnych poświadczeń w kluczu bezpieczeństwa. Upewnij się, że jest unikalna."
 
+#: src/strings.ts:3287
+msgid "This will reset your current two-factor authentication setup. Do you want to proceed?"
+msgstr ""
+
 #: src/strings.ts:3159
 msgid "thoughts"
 msgstr "myśli"
@@ -8392,6 +8416,10 @@ msgstr "Uwierzytelnianie dwuskładnikowe"
 #: src/strings.ts:445
 msgid "Two-factor authentication"
 msgstr "Uwierzytelnianie dwuskładnikowe"
+
+#: src/strings.ts:3289
+msgid "Two-factor authentication disabled"
+msgstr ""
 
 #: src/strings.ts:454
 msgid "Two-factor authentication enabled"
@@ -8821,6 +8849,10 @@ msgstr "Wibracja"
 msgid "Videos"
 msgstr "Filmy"
 
+#: src/strings.ts:964
+msgid "View 2FA backup codes"
+msgstr ""
+
 #: src/strings.ts:2244
 msgid "View all limits"
 msgstr "Zobacz wszystkie limity"
@@ -8849,17 +8881,13 @@ msgstr "Wyświetl nieudane elementy skrzynki odbiorczej i konteksty błędów"
 msgid "View receipt"
 msgstr "Zobacz potwierdzenie płatności"
 
-#: src/strings.ts:964
-msgid "View recovery codes"
-msgstr "Zobacz kody odzyskiwania"
-
 #: src/strings.ts:1954
 msgid "View source code"
 msgstr "Zobacz kod źródłowy"
 
 #: src/strings.ts:966
-msgid "View your recovery codes to recover your account in case you lose access to your two-factor authentication methods."
-msgstr "Zobacz kody odzyskiwania, aby móc odzyskać konto, jeśli stracisz dostęp do metod uwierzytelniania dwuskładnikowego."
+msgid "View your 2FA backup codes to log into your account in case you lose access to your two-factor authentication methods."
+msgstr ""
 
 #: src/strings.ts:2393
 msgid "Views"
