@@ -260,7 +260,7 @@ function Reminder(props: ReminderProps) {
           >
             {reminderDate}
           </Text>
-          {!compact && reminder.mode === "repeat" && reminder.recurringMode && (
+          {reminder.mode === "repeat" && reminder.recurringMode && (
             <Flex
               data-test-id="recurring-mode"
               sx={{ alignItems: "center", gap: "spacing3", width: "100%" }}
