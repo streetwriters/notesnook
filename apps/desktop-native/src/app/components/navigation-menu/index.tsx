@@ -597,6 +597,7 @@ type ReorderableListProps<T> = {
   renderItem: (item: T) => ReactNode;
   onOrderChanged: (newOrder: string[]) => void;
   order: () => string[];
+  gap?: "spacing1" | "spacing2";
 };
 
 function ReorderableList<T extends { id: string }>(
@@ -608,7 +609,8 @@ function ReorderableList<T extends { id: string }>(
     visibleItemLimit,
     renderItem,
     onOrderChanged,
-    order: _order
+    order: _order,
+    gap
   } = props;
   const isReady = useDatabaseReady();
   const [order, setOrder] = usePersistentState<string[]>(
@@ -629,6 +631,7 @@ function ReorderableList<T extends { id: string }>(
 
   return (
     <SortableList
+      sx={{ gap }}
       items={renderedItems}
       onMove={async ({ activeId, overId }) => {
         if (
@@ -846,6 +849,7 @@ function Routes({ collapse, isCollapsed }: SectionContext) {
     .filter((r) => (r.loginRequired ? isLoggedIn : true));
   return (
     <ReorderableList
+      gap={isCollapsed ? "spacing2" : "spacing1"}
       items={visible}
       orderKey="sidebarOrder:routes"
       order={() => db.settings.getSideBarOrder("routes")}
@@ -966,6 +970,7 @@ function Colors({ collapse, isCollapsed }: SectionContext) {
     <>
       <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
       <ReorderableList
+        gap={isCollapsed ? "spacing2" : "spacing1"}
         items={visibleColors as Color[]}
         visibleItemLimit={showAllColors ? undefined : 6}
         orderKey="sidebarOrder:colors"
@@ -1029,6 +1034,7 @@ function ColorItem({
       isCollapsed={isCollapsed}
       icon={Ellipse}
       iconSize={10}
+      collapsedIconSize={10}
       selected={currentContext?.id === color.id}
       onDrop={(event) => handleDrop(event.payload, color)}
       color={dataColor(color.colorCode)}
@@ -1099,6 +1105,7 @@ function Shortcuts({ collapse, isCollapsed }: SectionContext) {
     <>
       <Box sx={{ width: "100%", height: 1, bg: "separator", my: "spacing4" }} />
       <ReorderableList
+        gap={isCollapsed ? "spacing2" : "spacing1"}
         items={shortcuts as (Notebook | Tag)[]}
         orderKey="sidebarOrder:shortcuts"
         order={() => db.settings.getSideBarOrder("shortcuts")}
@@ -1191,7 +1198,11 @@ function HomeTab(props: { isCollapsed?: boolean; collapse: () => void }) {
     <ScrollContainer>
       <Flex
         testID="home-tab"
-        sx={{ flexDirection: "column", gap: "spacing1", px: "spacing4" }}
+        sx={{
+          flexDirection: "column",
+          gap: props.isCollapsed ? "spacing2" : "spacing1",
+          px: "spacing4"
+        }}
       >
         <Routes collapse={props.collapse} isCollapsed={props.isCollapsed} />
         <Colors collapse={props.collapse} isCollapsed={props.isCollapsed} />

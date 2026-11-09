@@ -64,7 +64,7 @@ if (await offline.count()) {
   await page.waitForTimeout(10000);
 }
 await page.evaluate(
-  async ({ seed, scheme, extras, noExtras, reminders }) => {
+  async ({ seed, scheme, extras, noExtras, reminders, proUser }) => {
     const { db } = await import("/common/db.ts");
     const addNotebook = async (notebook, parentId) => {
       const id = await db.notebooks.add({ title: notebook.title });
@@ -126,6 +126,31 @@ await page.evaluate(
         priority: reminder.priority ?? "vibrate",
         disabled: reminder.disabled ?? false
       });
+    if (proUser) {
+      const now = Date.now();
+      await db.user.setUser({
+        id: "e2e-user",
+        email: "e2e@example.com",
+        isEmailConfirmed: true,
+        mfa: {
+          isEnabled: false,
+          primaryMethod: "email",
+          remainingValidCodes: 0
+        },
+        subscription: {
+          appId: 0,
+          cancelURL: null,
+          expiry: now + 365 * 24 * 60 * 60 * 1000,
+          productId: null,
+          provider: 0,
+          start: now,
+          plan: 2,
+          status: 0,
+          updateURL: null,
+          googlePurchaseToken: null
+        }
+      });
+    }
     const { store } = await import("/stores/note-store.ts");
     await store.refresh();
     const appStore = await import("/stores/app-store.ts");
@@ -138,6 +163,7 @@ await page.evaluate(
     scheme,
     extras: { ...extras, notebooks: scenario.notebooks ?? extras.notebooks },
     noExtras: !!scenario.noExtras,
+    proUser: !!scenario.proUser,
     reminders: (scenario.reminders ?? []).map((reminder) =>
       typeof reminder === "function" ? reminder(Date.now()) : reminder
     )
@@ -160,7 +186,8 @@ const target = (spec) =>
     ? page.locator(`[data-test-id="${spec}"]`).first()
     : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
 for (const step of scenario.steps ?? []) {
-  if (step.click) await target(step.click).click();
+  if (step.click === "sidebar-toggle") await page.mouse.click(20, 22);
+  else if (step.click) await target(step.click).click();
   if (step.expand !== undefined)
     await page.locator("#notebooks button").nth(step.expand).click();
   if (step.type) {

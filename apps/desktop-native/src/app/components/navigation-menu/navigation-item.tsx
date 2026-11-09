@@ -34,6 +34,7 @@ export function NavigationItem(props: {
   title: string;
   icon?: Icon;
   iconSize?: number;
+  collapsedIconSize?: number;
   color?: ColorValue;
   selected?: boolean;
   isCollapsed?: boolean;
@@ -45,6 +46,7 @@ export function NavigationItem(props: {
   const {
     icon: RowIcon,
     iconSize = 13,
+    collapsedIconSize = 15,
     selected,
     menuItems,
     isCollapsed,
@@ -93,7 +95,7 @@ export function NavigationItem(props: {
       >
         {RowIcon ? (
           <RowIcon
-            size={isCollapsed ? 15 : iconSize}
+            size={isCollapsed ? collapsedIconSize : iconSize}
             color={props.color ?? (selected ? "icon-selected" : "icon")}
           />
         ) : null}

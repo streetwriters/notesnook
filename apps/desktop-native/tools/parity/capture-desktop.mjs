@@ -42,7 +42,8 @@ const app = await launchApp({
       : scenario.notebooks ?? extras.notebooks,
     seedTags: scenario.noExtras ? [] : extras.tags,
     seedColors: scenario.noExtras ? [] : extras.colors,
-    seedReminders: scenario.reminders ?? []
+    seedReminders: scenario.reminders ?? [],
+    seedUser: scenario.proUser ? { plan: "pro" } : undefined
   },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-")),

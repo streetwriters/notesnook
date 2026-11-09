@@ -257,14 +257,12 @@ scenarios.dialogCreateTagFilled = {
 
 scenarios.dialogAddReminder = {
   ...scenarios.shell,
-  steps: [
-    { clickText: "Reminders", in: "nav" },
-    { click: "route-action" }
-  ]
+  steps: [{ clickText: "Reminders", in: "nav" }, { click: "route-action" }]
 };
 
 scenarios.dialogAddReminderRepeat = {
   ...scenarios.dialogAddReminder,
+  proUser: true,
   steps: [
     { clickText: "Reminders", in: "nav" },
     { click: "route-action" },
