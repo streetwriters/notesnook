@@ -64,7 +64,7 @@ describe("multi select", () => {
 
   test("select all selects every note", async () => {
     await app.press("escape");
-    await plainClick(app, "Grocery list");
+    await ctrlClick(app, "Grocery list");
     await app.press("mod-a");
     await waitUntil(() => isRowSelected(app, "Pinned plan"));
     await waitUntil(() => isRowSelected(app, "Travel itinerary"));

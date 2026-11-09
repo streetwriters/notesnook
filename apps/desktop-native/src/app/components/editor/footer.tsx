@@ -95,7 +95,6 @@ export default function EditorFooter() {
       title: editorMargins
         ? strings.disableEditorMargins()
         : strings.enableEditorMargins(),
-      testID: "editor-margins",
       icon: editorMargins ? EditorMargins : SidebarSimple,
       hidden: false,
       onPress: () => useEditorStore.getState().toggleEditorMargins()
@@ -104,7 +103,6 @@ export default function EditorFooter() {
       title: isFullscreen
         ? strings.exitFullScreen()
         : strings.enterFullScreen(),
-      testID: "editor-fullscreen",
       icon: isFullscreen ? CornersIn : CornersOut,
       hidden: !isFocusMode,
       onPress: () =>
@@ -114,7 +112,6 @@ export default function EditorFooter() {
     },
     {
       title: isFocusMode ? strings.normalMode() : strings.focusMode(),
-      testID: "editor-focus-mode",
       icon: isFocusMode ? EyeglassesEmpty : Eyeglasses,
       hidden: false,
       onPress: () => useAppStore.getState().toggleFocusMode()
@@ -137,7 +134,7 @@ export default function EditorFooter() {
             <Flex key={tool.title} sx={{ alignItems: "center" }}>
               <StatusBarItem
                 variant="button"
-                testID={tool.testID}
+                testID={tool.title}
                 title={tool.title}
                 onPress={tool.onPress}
                 icon={tool.icon}

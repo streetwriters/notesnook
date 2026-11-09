@@ -61,7 +61,7 @@ function Header(props: HeaderProps) {
 
   return (
     <Flex
-      testID="tags"
+      testID="editor-tags"
       sx={{
         alignItems: "center",
         flexWrap: "wrap",

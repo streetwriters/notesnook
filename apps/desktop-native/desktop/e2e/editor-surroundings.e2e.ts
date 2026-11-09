@@ -21,7 +21,7 @@ describe("opening a note", () => {
   test("the editor area has the title box, the tag row and an empty body", async () => {
     await clickId(app, "create-new-note");
     await settle(async () => expect(await count(app, "editor-title")).toBe(1));
-    expect(await count(app, "tags")).toBe(1);
+    expect(await count(app, "editor-tags")).toBe(1);
     expect(await count(app, "editor-body")).toBe(1);
     expect(await count(app, "editor-tabs-view")).toBe(1);
   });
@@ -110,12 +110,12 @@ describe("focus mode", () => {
   test("hides the navigation and list and comes back", async () => {
     const lists = async () => await count(app, "navigation-menu");
     expect(await lists()).toBeGreaterThan(0);
-    await clickId(app, "editor-focus-mode");
+    await clickId(app, "Focus mode");
     await settle(async () => expect(await lists()).toBe(0));
-    expect(await count(app, "editor-fullscreen")).toBe(1);
-    await clickId(app, "editor-focus-mode");
+    expect(await count(app, "Enter fullscreen")).toBe(1);
+    await clickId(app, "Normal mode");
     await settle(async () => expect(await lists()).toBeGreaterThan(0));
-    expect(await count(app, "editor-fullscreen")).toBe(0);
+    expect(await count(app, "Enter fullscreen")).toBe(0);
   });
 });
 
