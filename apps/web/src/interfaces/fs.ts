@@ -380,7 +380,9 @@ async function multiPartUploadFile(
   onUploadProgress();
   const queue = newQueue(4);
   const uploads: Promise<void>[] = [];
-  for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
+  const completedParts = new Set(uploadedChunks.map((c) => c.PartNumber));
+  for (let i = 0; i < TOTAL_PARTS; ++i) {
+    if (completedParts.has(i + 1)) continue;
     const from = i * UPLOAD_PART_REQUIRED_CHUNKS;
     const length = Math.min(
       fileHandle.chunks.length - from,
