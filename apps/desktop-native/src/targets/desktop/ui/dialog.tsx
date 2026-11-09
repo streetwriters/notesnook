@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useEffect } from "react";
 import { useEscape } from "../../../app/hooks/use-escape";
-import { View } from "react-native";
+import { Pressable } from "react-native";
 import type * as Contract from "../../../ui/dialog";
 import { Close, Loading } from "../../../app/components/icons";
 import { Button, Flex, Text } from "./primitives";
@@ -27,7 +27,7 @@ import { ScrollContainer } from "./layout";
 import { ThemeScope, useThemeContext } from "./theme";
 import { useStyled } from "./style/use-styled";
 
-const AnyView = View as any;
+const AnyPressable = Pressable as any;
 
 export function DialogButton(props: Contract.DialogButtonProps) {
   const { disabled, onClick, loading, text, variant, testID, sx } = props;
@@ -97,8 +97,9 @@ export function Dialog(props: Contract.DialogProps) {
           justifyContent: "center"
         }}
       >
-        <AnyView
+        <AnyPressable
           testID={props.testID ?? "dialog"}
+          focusable={false}
           onPress={(event: { stopPropagation?: () => void }) =>
             event.stopPropagation?.()
           }
@@ -220,7 +221,7 @@ export function Dialog(props: Contract.DialogProps) {
             </Flex>
           ) : null}
           {props.footer}
-        </AnyView>
+        </AnyPressable>
       </Flex>
     </ThemeScope>
   );
