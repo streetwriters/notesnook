@@ -27,7 +27,7 @@ import {
   pick as pickFile
 } from "@react-native-documents/picker";
 import { basename, dirname } from "pathe";
-import { Platform } from "react-native";
+import { Image as RNImage, Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
 import { DatabaseLogger, db } from "../../../common/database";
@@ -131,10 +131,7 @@ const file = async (fileOptions: PickerOptions) => {
 
     const isSameNote = currentFileNoteId === fileOptions.noteId;
 
-    if (
-      fileOptions.tabId !== undefined &&
-      (isSameNote || isNewNote)
-    ) {
+    if (fileOptions.tabId !== undefined && (isSameNote || isNewNote)) {
       editorController.current?.commands.insertAttachment(
         {
           hash: hash,
@@ -321,10 +318,7 @@ const handleImageResponse = async (
 
     const isSameNote = currentNoteId === options.noteId;
 
-    if (
-      options.tabId !== undefined &&
-      (isSameNote || isNewNote)
-    ) {
+    if (options.tabId !== undefined && (isSameNote || isNewNote)) {
       editorController.current?.commands.insertImage(
         {
           hash: hash,
@@ -407,6 +401,69 @@ export async function attachFile(
     RNFetchBlob.fs.unlink(uri).catch((e) => {});
     return false;
   }
+}
+
+export async function attachPastedImages(
+  files: { path: string; mime?: string; filename?: string }[]
+) {
+  if (!files?.length) return;
+  const user = await db.user.getUser();
+  if (!user) {
+    ToastManager.show({
+      heading: strings.loginRequired(),
+      type: "error"
+    });
+    return;
+  }
+  if (!user?.isEmailConfirmed) {
+    PremiumService.showVerifyEmailDialog();
+    return;
+  }
+
+  const images: Image[] = [];
+  for (const file of files) {
+    const absolute = file.path.replace(/^file:\/\//, "");
+    const uri = absolute.startsWith("/") ? `file://${absolute}` : file.path;
+    const mime =
+      file.mime && file.mime.startsWith("image/") ? file.mime : "image/jpeg";
+    let size = 0;
+    try {
+      const stat = await RNFetchBlob.fs.stat(absolute);
+      size = Number(stat.size) || 0;
+    } catch (e) {
+      DatabaseLogger.error(e as Error, "Error reading pasted image");
+      continue;
+    }
+    const data = await RNFetchBlob.fs.readFile(absolute, "base64");
+    const dimensions = await new Promise<{ width: number; height: number }>(
+      (resolve) => {
+        RNImage.getSize(
+          uri,
+          (width, height) => resolve({ width, height }),
+          () => resolve({ width: 0, height: 0 })
+        );
+      }
+    );
+    images.push({
+      path: uri,
+      mime,
+      filename: file.filename || "image",
+      size,
+      data,
+      width: dimensions.width,
+      height: dimensions.height
+    } as Image);
+  }
+  if (!images.length) return;
+
+  const tabId = useTabStore.getState().currentTab;
+  const noteId = useTabStore.getState().getNoteIdForTab(tabId);
+  await handleImageResponse(images, {
+    noteId,
+    tabId,
+    type: "image",
+    reupload: false
+  });
 }
 
 export default {

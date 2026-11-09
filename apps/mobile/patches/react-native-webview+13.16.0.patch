@@ -1,0 +1,93 @@
+diff --git a/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebView.java b/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebView.java
+index 80c6803..86564d8 100644
+--- a/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebView.java
++++ b/node_modules/react-native-webview/android/src/main/java/com/reactnativecommunity/webview/RNCWebView.java
+@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
+ import android.graphics.Rect;
+ import android.net.Uri;
+ import android.text.TextUtils;
++import android.os.Build;
+ import android.view.ActionMode;
+ import android.view.Menu;
+ import android.view.MenuItem;
+ import android.view.MotionEvent;
+ import android.view.View;
++import android.view.inputmethod.EditorInfo;
++import android.view.inputmethod.InputConnection;
+ import android.webkit.JavascriptInterface;
+ import android.webkit.ValueCallback;
+ import android.webkit.WebChromeClient;
+@@ -17,6 +20,10 @@ import android.webkit.WebViewClient;
+ 
+ import androidx.annotation.NonNull;
+ import androidx.annotation.Nullable;
++import androidx.core.view.OnReceiveContentListener;
++import androidx.core.view.ViewCompat;
++import androidx.core.view.inputmethod.EditorInfoCompat;
++import androidx.core.view.inputmethod.InputConnectionCompat;
+ import androidx.webkit.JavaScriptReplyProxy;
+ import androidx.webkit.WebMessageCompat;
+ import androidx.webkit.WebViewCompat;
+@@ -49,6 +56,24 @@ import java.util.Map;
+ import java.util.Set;
+ 
+ public class RNCWebView extends WebView implements LifecycleEventListener {
++    /**
++     * Image MIME types plus the text types a contenteditable already accepts.
++     * Samsung Keyboard disables clipboard images unless the focused field
++     * advertises an image type on {@link EditorInfo#contentMimeTypes}.
++     */
++    public static final String[] KEYBOARD_CONTENT_MIME_TYPES = new String[] {
++            "text/plain",
++            "text/html",
++            "text/*",
++            "image/png",
++            "image/jpeg",
++            "image/jpg",
++            "image/gif",
++            "image/webp",
++            "image/*"
++    };
++
++    public static volatile @Nullable OnReceiveContentListener keyboardImageListener;
+     protected @Nullable
+     String injectedJS;
+     protected @Nullable
+@@ -89,6 +114,37 @@ public class RNCWebView extends WebView implements LifecycleEventListener {
+         super(reactContext);
+         mMessagingJSModule = ((ThemedReactContext) this.getContext()).getReactApplicationContext().getJSModule(RNCWebViewMessagingModule.class);
+         progressChangedFilter = new ProgressChangedFilter();
++        ViewCompat.setOnReceiveContentListener(
++                this,
++                KEYBOARD_CONTENT_MIME_TYPES,
++                (view, payload) -> {
++                    OnReceiveContentListener listener = keyboardImageListener;
++                    if (listener == null) return payload;
++                    return listener.onReceiveContent(view, payload);
++                });
++    }
++
++    @Override
++    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
++        InputConnection connection = super.onCreateInputConnection(outAttrs);
++        if (outAttrs != null) {
++            String[] existing = EditorInfoCompat.getContentMimeTypes(outAttrs);
++            String[] merged = mergeMimeTypes(existing, KEYBOARD_CONTENT_MIME_TYPES);
++            EditorInfoCompat.setContentMimeTypes(outAttrs, merged);
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
++                outAttrs.contentMimeTypes = merged;
++            }
++        }
++        if (connection == null || outAttrs == null) return connection;
++        return InputConnectionCompat.createWrapper(this, connection, outAttrs);
++    }
++
++    private static String[] mergeMimeTypes(@Nullable String[] existing, @NonNull String[] extra) {
++        if (existing == null || existing.length == 0) return extra;
++        java.util.LinkedHashSet<String> merged = new java.util.LinkedHashSet<>();
++        java.util.Collections.addAll(merged, existing);
++        java.util.Collections.addAll(merged, extra);
++        return merged.toArray(new String[0]);
+     }
+ 
+     public void setBasicAuthCredential(RNCBasicAuthCredential credential) {
