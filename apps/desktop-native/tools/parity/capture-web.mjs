@@ -212,10 +212,25 @@ for (const step of scenario.steps ?? []) {
     await page.keyboard.type(step.type.text);
     await page.waitForTimeout(2500);
   }
+  if (step.wheel) await page.mouse.move(step.wheel.x, step.wheel.y).then(() => page.mouse.wheel(0, step.wheel.dy));
+  if (step.probe)
+    console.log(
+      "PROBE",
+      step.probe,
+      JSON.stringify(
+        await page.evaluate(() => {
+          const out = [];
+          for (const el of document.querySelectorAll("*"))
+            if (el.scrollTop > 0 && el.scrollHeight > el.clientHeight + 50)
+              out.push({ tag: el.tagName, id: el.getAttribute("data-test-id") || el.id || el.className.toString().slice(0, 30), top: Math.round(el.scrollTop) });
+          return out;
+        })
+      )
+    );
   if (step.rightClick) await target(step.rightClick).click({ button: "right" });
   if (step.press)
     await page.keyboard.press(
-      { escape: "Escape", enter: "Enter" }[step.press] ?? step.press
+      { escape: "Escape", enter: "Enter", backspace: "Backspace" }[step.press] ?? step.press
     );
   if (step.clickText)
     await page

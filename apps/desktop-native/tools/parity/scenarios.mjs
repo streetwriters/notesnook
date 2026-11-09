@@ -612,3 +612,26 @@ scenarios.pdfPreview = {
     rects: [{ x: 0, y: 60, width: 1200, height: 740 }]
   }
 };
+
+scenarios.probeSearchExit = {
+  ...scenarios.shell,
+  seed: (now) =>
+    Array.from({ length: 60 }, (_, index) => ({
+      title: `Note ${index} apple`,
+      content: `Body of note number ${index} about things`,
+      dateEdited: now - index * 60000,
+      dateCreated: now - index * 60000
+    })),
+  steps: [
+    { wheel: { x: 400, y: 400, dy: 900 } },
+    { probe: "after scroll" },
+    { type: { id: "search-input", text: "apple" } },
+    { probe: "while searching" },
+    { press: "backspace" },
+    { press: "backspace" },
+    { press: "backspace" },
+    { press: "backspace" },
+    { press: "backspace" },
+    { probe: "after clearing search" }
+  ]
+};
