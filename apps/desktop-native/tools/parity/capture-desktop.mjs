@@ -50,6 +50,18 @@ const app = await launchApp({
   }
 });
 
+const killApp = () => {
+  try {
+    if (app.pid) process.kill(app.pid, "SIGKILL");
+  } catch {}
+};
+process.on("exit", killApp);
+for (const signal of ["SIGINT", "SIGTERM"])
+  process.on(signal, () => {
+    killApp();
+    process.exit(1);
+  });
+
 const argb = (value) => {
   const v = value >>> 0;
   return [(v >>> 16) & 255, (v >>> 8) & 255, v & 255, ((v >>> 24) & 255) / 255];

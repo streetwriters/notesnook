@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { afterEach, expect } from "vitest";
+import { afterAll, afterEach, expect } from "vitest";
 import {
   launchApp as launch,
   type DesktopApp
@@ -10,6 +10,27 @@ type Options = Parameters<typeof launch>[0];
 
 const failures = path.resolve(__dirname, "../build/e2e-failures");
 const running = new Set<DesktopApp>();
+
+function killAll() {
+  for (const app of running) {
+    try {
+      if (app.pid) process.kill(app.pid, "SIGKILL");
+    } catch {}
+  }
+}
+
+process.on("exit", killAll);
+for (const signal of ["SIGINT", "SIGTERM"] as const)
+  process.on(signal, () => {
+    killAll();
+    process.exit(1);
+  });
+
+afterAll(async () => {
+  await Promise.all([...running].map((app) => app.close().catch(() => {})));
+  killAll();
+  running.clear();
+});
 let counter = 0;
 
 const slug = (value: string) => value.replace(/[^a-z0-9]+/gi, "-").slice(0, 80);
