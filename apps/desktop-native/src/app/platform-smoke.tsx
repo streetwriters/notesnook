@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  attachmentFiles,
   clipboard,
   config,
   crypto,
@@ -264,6 +265,122 @@ const checks: Check[] = [
         "platform smoke",
         "read back"
       );
+    }
+  },
+  {
+    name: "attachments",
+    run: async () => {
+      const key = await (
+        await databaseHost.createStorage("db")
+      ).generateCryptoKey("platform-smoke-attachments");
+      const { storage, streamablefs } = attachmentFiles;
+
+      async function roundTrip(data: Uint8Array, name: string, type: string) {
+        const hash = await crypto.xxh64(data);
+        const meta = await attachmentFiles.writeEncryptedFile(
+          createPickedFile(data, name, type),
+          key,
+          hash
+        );
+        equal(meta.alg, "xcha-stream", "alg");
+        equal(meta.size, data.byteLength, "size");
+        assert(await storage.exists(hash), "exists after write");
+        const handle = await streamablefs.readFile(hash);
+        assert(handle, "handle");
+        const encryptedSize = await handle.size();
+        equal(
+          encryptedSize,
+          data.byteLength + handle.chunks.length * 17,
+          "encrypted size"
+        );
+        const fileMetadata = {
+          key,
+          iv: meta.iv,
+          name,
+          type,
+          isUploaded: false
+        };
+        const decrypted = await attachmentFiles.decryptFile(hash, fileMetadata);
+        assert(decrypted, "decrypt");
+        equal(hex(decrypted), hex(data), `${name} decrypted`);
+
+        const stream = await attachmentFiles.streamingDecryptFile(
+          hash,
+          fileMetadata
+        );
+        assert(stream, "stream");
+        const reader = stream.getReader();
+        const parts: Uint8Array[] = [];
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          parts.push(value);
+        }
+        equal(
+          hex(
+            parts.reduce((all, part) => {
+              const next = new Uint8Array(all.length + part.length);
+              next.set(all);
+              next.set(part, all.length);
+              return next;
+            }, new Uint8Array(0))
+          ),
+          hex(data),
+          `${name} streamed`
+        );
+
+        const saved = `${environment.tempDirectory}/platform-smoke-${hash}`;
+        const target = await files.createAt(saved);
+        const saveStream = await attachmentFiles.streamingDecryptFile(
+          hash,
+          fileMetadata
+        );
+        assert(saveStream, "save stream");
+        const saveReader = saveStream.getReader();
+        for (;;) {
+          const { done, value } = await saveReader.read();
+          if (done) break;
+          await target.write(value);
+        }
+        await target.close();
+        equal(hex(await files.readBytes(saved)), hex(data), `${name} saved`);
+
+        const base64 = await storage.readEncrypted(hash, key, {
+          ...meta,
+          outputType: "base64"
+        });
+        equal(base64, Buffer.from(data).toString("base64"), `${name} base64`);
+        const raw = await storage.readEncrypted(hash, key, {
+          ...meta,
+          outputType: "uint8array"
+        });
+        assert(raw, "uint8array");
+        equal(hex(raw as Uint8Array), hex(data), `${name} readEncrypted`);
+
+        await storage.deleteFile(hash);
+        assert(!(await storage.exists(hash)), "deleted");
+        equal((await storage.bulkExists([hash])).length, 1, "bulkExists");
+      }
+
+      await roundTrip(PNG_1X1, "pixel.png", "image/png");
+
+      const big = new Uint8Array(1300 * 1024);
+      for (let i = 0; i < big.length; i++) big[i] = (i * 31 + (i >> 8)) & 255;
+      await roundTrip(big, "big.bin", "application/octet-stream");
+
+      const text = encoder.encode("attachment text");
+      const hash = await crypto.xxh64(text);
+      const meta = await attachmentFiles.writeEncryptedFile(
+        createPickedFile(text, "a.txt", "text/plain"),
+        key,
+        hash
+      );
+      equal(
+        await storage.readEncrypted(hash, key, { ...meta, outputType: "text" }),
+        "attachment text",
+        "text"
+      );
+      await storage.deleteFile(hash);
     }
   },
   {

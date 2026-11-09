@@ -37,6 +37,7 @@ const checks = [
   "hkdf",
   "imagecompressor",
   "files",
+  "attachments",
   "clipboard",
   "notifications",
   "spellchecker",

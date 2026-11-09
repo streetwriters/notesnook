@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type * as Contract from "../../../platform";
-import { unimplemented } from "./unimplemented";
+import { attachmentFiles } from "./attachment-files";
 import { clipboard } from "./clipboard";
 import { compression } from "./compression";
 import { config } from "./config";
@@ -41,6 +41,7 @@ import { webauthn } from "./webauthn";
 import { windowControls } from "./window";
 
 export {
+  attachmentFiles,
   clipboard,
   compression,
   config,
@@ -62,9 +63,6 @@ export {
   webauthn,
   windowControls
 };
-
-export const attachmentFiles =
-  unimplemented<Contract.AttachmentFiles>("attachmentFiles");
 
 export type * from "../../../platform";
 
