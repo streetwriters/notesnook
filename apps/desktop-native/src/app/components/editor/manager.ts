@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { EditorHandle, EditorHeading, EditorStatistics } from "@ui";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
 import Config from "../../utils/config";
@@ -28,22 +29,16 @@ type EditorConfig = {
   lineHeight: number;
 };
 
-type NoteStatistics = {
-  words: { total: number };
-  characters: { total: number };
-  paragraphs: { total: number };
-  spaces: { total: number };
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IEditor = Record<string, (...args: any[]) => any>;
+export type NoteStatistics = EditorStatistics;
+export type IEditor = EditorHandle;
+export type TOCItem = EditorHeading;
 
 type EditorContext = {
   editor?: IEditor;
   canUndo?: boolean;
   canRedo?: boolean;
   statistics?: NoteStatistics;
-  tableOfContents?: unknown[];
+  tableOfContents?: TOCItem[];
 };
 
 const EDITOR_ZOOM_DEFAULT = 100;

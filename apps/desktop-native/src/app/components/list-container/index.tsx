@@ -26,7 +26,7 @@ import {
   type ReactNode
 } from "react";
 import type { GroupingKey, Item, VirtualizedGrouping } from "@notesnook/core";
-import { useResolvedItem } from "@notesnook/common";
+import { useResolvedItem } from "../../hooks/use-resolved-item";
 import {
   Box,
   Button,

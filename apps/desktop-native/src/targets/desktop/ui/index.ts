@@ -32,6 +32,7 @@ export { QRCode } from "./qrcode";
 export { Select } from "./select";
 export { WebView } from "./webview";
 export { PdfViewer } from "./pdf";
+export { EditorSurface } from "./editor";
 export { DesktopThemeProvider, ThemeScope } from "./theme";
 export { dataColor } from "./style/data-color";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./title-bar";

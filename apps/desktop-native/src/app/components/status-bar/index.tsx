@@ -22,6 +22,7 @@ import type { User } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Flex, ThemeScope, type ColorValue } from "@ui";
 import { StatusBarItem } from "./status-bar-item";
+import EditorFooter from "../editor/footer";
 import {
   ArrowsClockwise,
   ClockClockwise,
@@ -147,7 +148,7 @@ export function StatusBar() {
             )}
           </Flex>
         )}
-        <Flex />
+        <EditorFooter />
       </Flex>
     </ThemeScope>
   );
