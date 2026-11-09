@@ -70,12 +70,15 @@ import { TaskScheduler } from "../utils/task-scheduler";
 import { path } from "@notesnook-importer/core/dist/src/utils/path";
 import { useKeyStore } from "../interfaces/key-store";
 import { writeToClipboard } from "../utils/clipboard";
+import { whenDatabaseReady } from "../stores/boot-store";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: strings.addItem("note"),
-    onClick: () => useEditorStore.getState().newSession(),
-    onAuxClick: () => useEditorStore.getState().addTab()
+    onClick: () =>
+      whenDatabaseReady().then(() => useEditorStore.getState().newSession()),
+    onAuxClick: () =>
+      whenDatabaseReady().then(() => useEditorStore.getState().addTab())
   },
   notebooks: {
     title: strings.addItem("notebook"),

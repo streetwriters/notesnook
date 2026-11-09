@@ -25,6 +25,7 @@ import routes from "../../navigation/routes";
 import { store as selectionStore } from "../../stores/selection-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
 import RouteContainer from "../route-container";
+import { useDatabaseReady } from "../../stores/boot-store";
 
 function CachedRouter() {
   const [routeResult, location] = useRoutes(routes, {
@@ -41,6 +42,7 @@ function CachedRouter() {
       }
     }
   });
+  const isDatabaseReady = useDatabaseReady();
   const cached = useRef<
     Record<string, { Component: ComponentType<any>; props: any }>
   >({});
@@ -69,7 +71,7 @@ function CachedRouter() {
       routeKey={routeResult.key}
       type={routeResult.type}
     >
-      {Object.entries(cached.current).map(([key, { Component, props }]) => (
+      {Object.entries(isDatabaseReady ? cached.current : {}).map(([key, { Component, props }]) => (
         <Activity
           key={key}
           mode={key === routeResult.key ? "visible" : "hidden"}

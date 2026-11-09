@@ -20,10 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   FeatureResult,
-  isFeatureAvailable,
-  useIsFeatureAvailable
+  isFeatureAvailable
 } from "@notesnook/common";
-import { createInternalLink } from "@notesnook/core";
+import { createInternalLink, EVENTS } from "@notesnook/core";
 import type { Color, Notebook, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { shell } from "@platform";
@@ -66,7 +65,9 @@ import { isUserSubscribed } from "../../hooks/use-is-user-premium";
 import { shouldShowWrapped } from "../../utils/should-show-wrapped";
 import { writeToClipboard } from "../../utils/clipboard";
 import { showToast } from "../../utils/toast";
+import Config from "../../utils/config";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useDatabaseReady, whenDatabaseReady } from "../../stores/boot-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
@@ -227,6 +228,7 @@ export function NavigationMenu(props: {
   const isNavPaneCollapsed = useAppStore((store) => store.isNavPaneCollapsed);
   const [expanded, setExpanded] = useState(false);
   const isCollapsed = isNavPaneCollapsed && !expanded;
+  const isDatabaseReady = useDatabaseReady();
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
   );
@@ -446,8 +448,12 @@ export function NavigationMenu(props: {
             collapse={() => isNavPaneCollapsed && setExpanded(false)}
           />
         ) : null}
-        {!isCollapsed && currentTab.id === "notebooks" ? <Notebooks /> : null}
-        {!isCollapsed && currentTab.id === "tags" ? <Tags /> : null}
+        {isDatabaseReady && !isCollapsed && currentTab.id === "notebooks" ? (
+          <Notebooks />
+        ) : null}
+        {isDatabaseReady && !isCollapsed && currentTab.id === "tags" ? (
+          <Tags />
+        ) : null}
       </Flex>
       {currentTab.id === "home" && !isCollapsed && shouldShowWrapped() ? (
         <Button
@@ -607,9 +613,13 @@ function ReorderableList<T extends { id: string }>(
     onOrderChanged,
     order: _order
   } = props;
-  const [order, setOrder] = usePersistentState<string[]>(orderKey, _order());
-  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
-  const orderedItems = customizableSidebar?.isAllowed
+  const isReady = useDatabaseReady();
+  const [order, setOrder] = usePersistentState<string[]>(
+    orderKey,
+    isReady ? _order() : []
+  );
+  const customizableSidebar = useCustomizableSidebar();
+  const orderedItems = (customizableSidebar?.isAllowed ?? true)
     ? orderItems(items, order)
     : items;
   const renderedItems = visibleItemLimit
@@ -617,9 +627,9 @@ function ReorderableList<T extends { id: string }>(
     : orderedItems;
 
   useEffect(() => {
-    setOrder(_order());
+    if (isReady) setOrder(_order());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isReady]);
 
   return (
     <SortableList
@@ -688,6 +698,7 @@ function toMenuItems<T extends { id: string; title: string }>(
 }
 
 async function getSidebarItemsAsMenuItems(): Promise<MenuItem[]> {
+  await whenDatabaseReady();
   const customizableSidebar = await isFeatureAvailable("customizableSidebar");
   const colors = useAppStore.getState().colors;
   const hiddenColors = customizableSidebar.isAllowed
@@ -751,14 +762,16 @@ function ItemCount(props: {
   item: RouteEntry | Color | Notebook | Tag;
   selected?: boolean;
 }) {
+  const isReady = useDatabaseReady();
   const notes = useNoteStore((store) => store.notes);
   const reminders = useReminderStore((store) => store.reminders);
   const trash = useTrashStore((store) => store.trash);
   const monographs = useMonographStore((store) => store.monographs);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number>();
   const { item } = props;
 
   useEffect(() => {
+    if (!isReady) return;
     (async function () {
       if ("type" in item) {
         if (item.type === "color") return db.colors.count(item.id);
@@ -767,44 +780,68 @@ function ItemCount(props: {
       } else {
         switch (item.id) {
           case "notes":
-            return notes?.length || 0;
+            return notes?.length;
           case "favorites":
             return db.notes.favorites.count();
           case "reminders":
-            return reminders?.length || 0;
+            return reminders?.length;
           case "trash":
-            return trash?.length || 0;
+            return trash?.length;
           case "monographs":
-            return monographs?.length || 0;
+            return monographs?.length;
           case "archive":
             return db.notes.archived.count();
           default:
             return 0;
         }
       }
-    })().then((c) => setCount(c || 0));
-  }, [item, notes, trash, monographs, reminders]);
+    })().then((c) => setCount(c));
+  }, [isReady, item, notes, trash, monographs, reminders]);
 
   return (
     <Text
+      testID="item-count"
       variant="subBody"
       sx={{
         fontSize: "3xs",
         color: props.selected ? "paragraph" : "paragraph-secondary"
       }}
     >
-      {count}
+      {count === undefined ? "" : count}
     </Text>
   );
 }
 
+function useCustomizableSidebar() {
+  const isReady = useDatabaseReady();
+  const [result, setResult] = useState<FeatureResult<"customizableSidebar">>();
+
+  useEffect(() => {
+    if (!isReady) return;
+    const update = () =>
+      isFeatureAvailable("customizableSidebar").then(setResult);
+    update();
+    const subscription = db.eventManager.subscribe(
+      EVENTS.userSubscriptionUpdated,
+      update
+    );
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [isReady]);
+
+  return result;
+}
+
 function Routes({ collapse, isCollapsed }: SectionContext) {
-  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
+  const customizableSidebar = useCustomizableSidebar();
   const hiddenRoutes = useAppStore((store) => store.hiddenRoutes);
-  const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const isLoggedIn =
+    useUserStore((store) => store.isLoggedIn) ??
+    Config.get<boolean>("isLoggedIn", false);
   const visible = routes()
     .filter(
-      customizableSidebar?.isAllowed
+      (customizableSidebar?.isAllowed ?? true)
         ? (r) => !hiddenRoutes.includes(r.id)
         : () => true
     )
@@ -916,11 +953,11 @@ function RouteItem({
 }
 
 function Colors({ collapse, isCollapsed }: SectionContext) {
-  const customizableSidebar = useIsFeatureAvailable("customizableSidebar");
+  const customizableSidebar = useCustomizableSidebar();
   const colors = useAppStore((store) => store.colors);
   const hiddenColors = useAppStore((store) => store.hiddenColors);
   const [showAllColors, setShowAllColors] = useState(false);
-  const visibleColors = customizableSidebar?.isAllowed
+  const visibleColors = (customizableSidebar?.isAllowed ?? true)
     ? colors.filter((c: Color) => !hiddenColors.includes(c.id))
     : colors;
   const hasMoreColors = visibleColors.length > 6;
@@ -1145,10 +1182,11 @@ function ShortcutItem({
 
 function HomeTab(props: { isCollapsed?: boolean; collapse: () => void }) {
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
+  const isReady = useDatabaseReady();
 
   useEffect(() => {
-    refreshNavItems();
-  }, [refreshNavItems]);
+    if (isReady) refreshNavItems();
+  }, [isReady, refreshNavItems]);
 
   return (
     <ScrollContainer>

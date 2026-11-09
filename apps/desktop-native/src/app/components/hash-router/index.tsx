@@ -19,10 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo, type ReactNode } from "react";
 import useHashRoutes from "../../hooks/use-hash-routes";
+import { useDatabaseReady } from "../../stores/boot-store";
 import hashroutes from "../../navigation/hash-routes";
 
-function HashRouter(props: { children?: ReactNode }) {
+function HashRoutes() {
   useHashRoutes(hashroutes);
-  return <>{props.children}</>;
+  return null;
+}
+
+function HashRouter(props: { children?: ReactNode }) {
+  const isDatabaseReady = useDatabaseReady();
+  return (
+    <>
+      {isDatabaseReady ? <HashRoutes /> : null}
+      {props.children}
+    </>
+  );
 }
 export default memo(HashRouter, () => true);

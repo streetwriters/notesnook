@@ -44,6 +44,7 @@ import AppEffects from "./app-effects";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { NavigationEvents } from "./navigation";
 import { useStore } from "./stores/app-store";
+import { useDatabaseReady } from "./stores/boot-store";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import useSlider from "./hooks/use-slider";
@@ -83,6 +84,7 @@ function EditorPlaceholder() {
 
 export function App(props: { titleBarInset?: number }) {
   const isMobile = useMobile();
+  const isDatabaseReady = useDatabaseReady();
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isNavPaneCollapsed = useStore((store) => store.isNavPaneCollapsed);
   const [isMobileSideMenuOpen, setIsMobileSideMenuOpen] = useState(false);
@@ -103,7 +105,7 @@ export function App(props: { titleBarInset?: number }) {
       testID="app"
       sx={{ flexDirection: "column", flex: 1, bg: "background" }}
     >
-      <AppEffects />
+      {isDatabaseReady ? <AppEffects /> : null}
       <ThemeScope scope="titleBar">
         <TitleBar
           trafficLightInset={props.titleBarInset}

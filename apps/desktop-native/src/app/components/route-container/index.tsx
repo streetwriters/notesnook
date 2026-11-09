@@ -17,12 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { strings } from "@notesnook/intl";
 import type { GroupingKey } from "@notesnook/core";
 import { usePromise } from "@notesnook/common";
 import { Box, Button, Flex, Input, Text } from "@ui";
 import { showGroupOptionsMenu } from "../group-header";
+import Config from "../../utils/config";
+import { useDatabaseReady } from "../../stores/boot-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useReminderStore } from "../../stores/reminder-store";
 import { useStore as useSearchStore } from "../../stores/search-store";
@@ -61,18 +63,30 @@ export default function RouteContainer(props: RouteContainerProps) {
 }
 
 function useHasItems(type?: string, routeKey?: string) {
-  const hasNoteItems = useNoteStore((store) =>
-    Boolean((routeKey === "home" ? store.notes : store.contextNotes)?.length)
-  );
+  const hasNoteItems = useNoteStore((store) => {
+    const items = routeKey === "home" ? store.notes : store.contextNotes;
+    return items ? items.length > 0 : undefined;
+  });
   const hasReminderItems = useReminderStore((store) =>
-    Boolean(store.reminders?.length)
+    store.reminders ? store.reminders.length > 0 : undefined
   );
-  const hasTrashItems = useTrashStore((store) => Boolean(store.trash?.length));
-  return type === "reminders"
-    ? hasReminderItems
-    : type === "trash"
-    ? hasTrashItems
-    : hasNoteItems;
+  const hasTrashItems = useTrashStore((store) =>
+    store.trash ? store.trash.length > 0 : undefined
+  );
+  const actual =
+    type === "reminders"
+      ? hasReminderItems
+      : type === "trash"
+      ? hasTrashItems
+      : hasNoteItems;
+  const cacheKey = `hasItems:${routeKey}:${type}`;
+  const cached = Config.get<boolean>(cacheKey, false);
+
+  useEffect(() => {
+    if (actual !== undefined && actual !== cached) Config.set(cacheKey, actual);
+  }, [actual, cached, cacheKey]);
+
+  return actual ?? cached;
 }
 
 function useGroupingState(
@@ -122,6 +136,7 @@ function HeaderActions(props: {
   hasItems: boolean;
 }) {
   const { groupingKey, viewMode, routeButton, hasItems } = props;
+  const isDatabaseReady = useDatabaseReady();
   const RouteIcon = routeButton?.icon;
   return (
     <Flex
@@ -136,6 +151,7 @@ function HeaderActions(props: {
         <Button
           testID="route-action"
           variant="tertiary"
+          disabled={!isDatabaseReady}
           onPress={routeButton.onClick}
           sx={{ p: 0 }}
         >
@@ -146,6 +162,7 @@ function HeaderActions(props: {
         <Button
           testID={`${groupingKey}-sort-button`}
           variant="tertiary"
+          disabled={!isDatabaseReady}
           title={strings.groupAndSort()}
           onPress={() =>
             showGroupOptionsMenu(groupingKey, props.refresh, {
@@ -162,6 +179,7 @@ function HeaderActions(props: {
         <Button
           testID={`${groupingKey}-view-mode-button`}
           variant="tertiary"
+          disabled={!isDatabaseReady}
           onPress={() =>
             props.setViewMode(viewMode === "compact" ? "detailed" : "compact")
           }
@@ -176,9 +194,15 @@ function HeaderActions(props: {
 
 function Header(props: RouteContainerProps) {
   const { type, routeKey } = props;
+  const isDatabaseReady = useDatabaseReady();
   const titlePromise = usePromise<string | undefined>(
-    () => (typeof props.title === "string" ? props.title : props.title?.()),
-    [props.title]
+    () =>
+      typeof props.title === "string"
+        ? props.title
+        : isDatabaseReady
+        ? props.title?.()
+        : undefined,
+    [props.title, isDatabaseReady]
   );
   const title =
     titlePromise.status === "fulfilled" ? titlePromise.value : undefined;
