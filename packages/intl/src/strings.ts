@@ -3282,5 +3282,8 @@ Continue without attachments?`,
   lastBackupOn: (date: string, type: "full" | "partial") =>
     type === "full"
       ? t`Last full backup: ${date}`
-      : t`Last partial backup: ${date}`
+      : t`Last partial backup: ${date}`,
+  uploadFailed: () => t`File upload failed`,
+  uploadNetworkError: () =>
+    t`The upload was interrupted by a network problem. It will retry automatically when your connection is back.`
 };

@@ -33,6 +33,7 @@ import {
   getUploadedFileSize
 } from "./utils";
 import Upload from "@ammarahmed/react-native-upload";
+import NetInfo from "@react-native-community/netinfo";
 import { useUserStore } from "../../stores/use-user-store";
 import { sleep } from "../../utils/time";
 import { isFeatureAvailable } from "@notesnook/common";
@@ -54,6 +55,55 @@ const RESET_UPLOAD_ERRORS = [
   "InvalidPartOrder",
   "SignatureDoesNotMatch"
 ];
+
+const NETWORK_ERROR_PATTERNS = [
+  "unable to resolve host",
+  "no address associated with hostname",
+  "unknownhost",
+  "timeout",
+  "timed out",
+  "connection abort",
+  "failed to connect",
+  "network request failed",
+  "connection reset",
+  "econnreset",
+  "socketexception",
+  "network is unreachable",
+  "internet connection appears to be offline",
+  "network connection was lost",
+  "not connected to the internet",
+  "specified hostname could not be found",
+  "could not connect to the server"
+];
+
+function isNetworkError(e: unknown): boolean {
+  const message = (e instanceof Error ? e.message : String(e)).toLowerCase();
+  return NETWORK_ERROR_PATTERNS.some((pattern) => message.includes(pattern));
+}
+
+async function isNetworkFailure(e: unknown): Promise<boolean> {
+  try {
+    const state = await NetInfo.fetch();
+    // isInternetReachable can be null (unknown), which is not treated as offline
+    if (!state.isConnected || state.isInternetReachable === false) return true;
+  } catch {
+    // fall back to matching the error message
+  }
+  return isNetworkError(e);
+}
+
+function getServerErrorMessage(body?: string | null): string | undefined {
+  if (!body) return undefined;
+  try {
+    const data = JSON.parse(body);
+    const message = data?.error || data?.message;
+    return typeof message === "string" && message.length > 0
+      ? message
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 interface StoredMultipartSession {
   uploadId: string;
@@ -251,8 +301,15 @@ async function multipartUploadFile(
     return response;
   } catch (error) {
     if (!cancelState.cancelled) {
-      DatabaseLogger.error(error, "Multipart upload failed", { filename });
       const errorText = error instanceof Error ? error.message : String(error);
+      if (await isNetworkFailure(error)) {
+        DatabaseLogger.warn("Multipart upload interrupted by network error", {
+          filename,
+          error: errorText
+        });
+      } else {
+        DatabaseLogger.error(error, "Multipart upload failed", { filename });
+      }
       if (
         RESET_UPLOAD_ERRORS.some((code) => errorText.includes(code)) ||
         // iOS errors don't include the S3 code; NoSuchUpload/NoSuchKey are 404s
@@ -376,11 +433,14 @@ export async function uploadFile(
 
       if (!uploaded) {
         const fileInfo = await RNFetchBlob.fs.stat(filePath);
-        throw new Error(
-          `${status}, name: ${fileInfo.filename}, length: ${
-            fileInfo.size
-          }, info: ${JSON.stringify(await result.text())}`
-        );
+        const body = await result.text();
+        const details = `${status}, name: ${fileInfo.filename}, length: ${
+          fileInfo.size
+        }, info: ${JSON.stringify(body)}`;
+        DatabaseLogger.error(new Error(details), "Multipart upload rejected", {
+          filename
+        });
+        throw new Error(getServerErrorMessage(body) ?? details);
       }
     } else {
       // Use single-part upload for smaller files
@@ -439,11 +499,15 @@ export async function uploadFile(
 
       if (!uploaded) {
         const fileInfo = await RNFetchBlob.fs.stat(filePath);
-        throw new Error(
-          `${status}, name: ${fileInfo.filename}, length: ${
-            fileInfo.size
-          }, info: ${JSON.stringify(result.error)}`
-        );
+        const details = `${status}, name: ${fileInfo.filename}, length: ${
+          fileInfo.size
+        }, info: ${JSON.stringify(result.error)}, body: ${JSON.stringify(
+          result.responseBody
+        )}`;
+        DatabaseLogger.error(new Error(details), "Upload rejected", {
+          filename
+        });
+        throw new Error(getServerErrorMessage(result.responseBody) ?? details);
       }
     }
 
@@ -465,6 +529,19 @@ export async function uploadFile(
     useAttachmentStore.getState().remove(filename);
     if (cancelState.cancelled) {
       DatabaseLogger.info("Upload cancelled", { filename });
+      return false;
+    }
+    if (await isNetworkFailure(e)) {
+      DatabaseLogger.warn("File upload interrupted by network error", {
+        filename,
+        error: e instanceof Error ? e.message : String(e)
+      });
+      ToastManager.show({
+        heading: strings.uploadFailed(),
+        message: strings.uploadNetworkError(),
+        type: "error",
+        context: "global"
+      });
       return false;
     }
     ToastManager.error(e as Error, "File upload failed");
