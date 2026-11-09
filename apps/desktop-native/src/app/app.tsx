@@ -22,19 +22,18 @@ import {
   Flex,
   Pane,
   SplitPane,
-  Text,
   ThemeScope,
   TitleBar,
   type SplitPaneHandle,
   DragGhostHost,
   PopoverHost,
-  ToastHost,
-  type UIElement
+  ToastHost
 } from "@ui";
 import { ActionBar } from "./components/action-bar";
 import { MenuHost } from "./components/menu";
 import { DialogHost } from "./common/dialog-manager";
 import { useEditorStore } from "./stores/editor-store";
+import TabsView from "./components/editor";
 import CachedRouter from "./components/cached-router";
 import { NavigationMenu } from "./components/navigation-menu";
 import { StatusBar } from "./components/status-bar";
@@ -49,38 +48,6 @@ import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import useSlider from "./hooks/use-slider";
 import { useWindowFocus } from "./hooks/use-window-focus";
-
-function EditorPlaceholder() {
-  const element = useRef<UIElement>(null);
-  const opened = useRef(false);
-  const sessionId = useEditorStore((store) => store.getActiveTab()?.sessionId);
-
-  useEffect(() => {
-    if (!opened.current) {
-      opened.current = true;
-      return;
-    }
-    element.current?.focus();
-  }, [sessionId]);
-
-  return (
-    <Flex
-      ref={element}
-      testID="editor-placeholder"
-      onFocus={() => {}}
-      sx={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        bg: "background"
-      }}
-    >
-      <Text sx={{ color: "paragraph-secondary" }}>
-        The editor is not implemented on desktop yet
-      </Text>
-    </Flex>
-  );
-}
 
 export function App(props: { titleBarInset?: number }) {
   const isMobile = useMobile();
@@ -250,7 +217,7 @@ function DesktopAppContents(props: {
       <Pane id="editor-pane">
         <ThemeScope scope="editor">
           <HashRouter>
-            <EditorPlaceholder />
+            <TabsView />
           </HashRouter>
         </ThemeScope>
       </Pane>
@@ -304,7 +271,7 @@ function MobileAppContents(props: {
       {index === 2 ? (
         <ThemeScope scope="editor">
           <HashRouter>
-            <EditorPlaceholder />
+            <TabsView />
           </HashRouter>
         </ThemeScope>
       ) : null}

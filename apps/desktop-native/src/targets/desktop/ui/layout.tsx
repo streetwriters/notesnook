@@ -95,6 +95,23 @@ export const SplitPane = forwardRef<
     readPaneSizes(autoSaveId, panes)
   );
   const [total, setTotal] = useState(0);
+  const latest = useRef(sizes);
+  const paneIds = panes.map((pane) => pane.id);
+  const knownIds = useRef(paneIds);
+  const knownSizes = useRef<Record<string, number | undefined>>({});
+  if (knownIds.current.join("|") !== paneIds.join("|")) {
+    knownIds.current.forEach((id, index) => {
+      knownSizes.current[id] = sizes[index];
+    });
+    knownIds.current = paneIds;
+    const next = panes.map((pane) =>
+      pane.id in knownSizes.current
+        ? knownSizes.current[pane.id]
+        : readPaneSizes(autoSaveId, [pane])[0]
+    );
+    latest.current = next;
+    setSizes(next);
+  }
   const expanded = useRef<Record<string, number>>({});
   const onChange = useRef(props.onChange);
   onChange.current = props.onChange;
@@ -109,7 +126,6 @@ export const SplitPane = forwardRef<
     }
   );
 
-  const latest = useRef(sizes);
   const frame = useRef<ReturnType<typeof requestAnimationFrame> | undefined>(
     undefined
   );
@@ -158,6 +174,7 @@ export const SplitPane = forwardRef<
     ref,
     () => ({
       collapse: (index) => {
+        if (!panes[index]) return;
         const current = sizes[index];
         const min = panes[index].min;
         if (current === undefined || current === min) return;
@@ -166,6 +183,7 @@ export const SplitPane = forwardRef<
         commit(sizes.map((size, i) => (i === index ? min : size)));
       },
       expand: (index) => {
+        if (!panes[index]) return;
         const size =
           expanded.current[panes[index].id] ??
           config.get<number | undefined>(
@@ -174,14 +192,18 @@ export const SplitPane = forwardRef<
           panes[index].initial;
         commit(sizes.map((s, i) => (i === index ? size : s)));
       },
-      reset: (index) =>
-        commit(sizes.map((s, i) => (i === index ? panes[index].initial : s))),
-      isCollapsed: (index) => sizes[index] === panes[index].min,
+      reset: (index) => {
+        if (!panes[index]) return;
+        commit(sizes.map((s, i) => (i === index ? panes[index].initial : s)));
+      },
+      isCollapsed: (index) =>
+        !!panes[index] && sizes[index] === panes[index].min,
       hasExpandedSize: (index) =>
-        expanded.current[panes[index].id] !== undefined ||
-        config.get<number | undefined>(
-          `csp:${autoSaveId}-${panes[index].id}:expanded`
-        ) !== undefined
+        !!panes[index] &&
+        (expanded.current[panes[index].id] !== undefined ||
+          config.get<number | undefined>(
+            `csp:${autoSaveId}-${panes[index].id}:expanded`
+          ) !== undefined)
     }),
     [autoSaveId, commit, panes, sizes]
   );

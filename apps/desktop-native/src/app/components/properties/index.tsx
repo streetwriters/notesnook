@@ -95,16 +95,7 @@ import { ListLoader } from "../loaders/list-loader";
 import { copyNoteLink } from "../../common";
 import { useSpellChecker } from "../../hooks/use-spell-checker";
 import { navigate } from "../../navigation";
-
-function TableOfContents(_props: { sessionId: string }) {
-  return (
-    <Flex sx={{ p: 4 }}>
-      <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-        {strings.noHeadingsFound()}
-      </Text>
-    </Flex>
-  );
-}
+import TableOfContents from "../editor/table-of-contents";
 
 const tabs = [
   {

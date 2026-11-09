@@ -35,7 +35,7 @@ const SHELL = [
   "routeHeader",
   "route-title",
   "status-bar",
-  "editor-placeholder"
+  "editor-tabs-view"
 ];
 
 let app: DesktopApp | undefined;

@@ -63,7 +63,7 @@ test("the shell shows the navigation, list and editor panes and the status bar",
     "navigation-menu",
     "global-split-pane",
     "pane-list-pane",
-    "editor-placeholder",
+    "editor-tabs-view",
     "status-bar"
   ])
     expect(await app.getByTestId(id).count(), id).toBeGreaterThan(0);
