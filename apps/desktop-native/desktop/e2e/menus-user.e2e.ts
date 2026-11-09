@@ -39,6 +39,7 @@ describe("user menu while logged out", () => {
 
   test("dark mode flips the theme", async () => {
     const before = (await windowPixel(app, 600, 600))[0];
+    await clickId(app, "profile-dropdown");
     await clickMenu(app, "toggle-theme-mode");
     await settle(async () =>
       expect((await windowPixel(app, 600, 600))[0]).not.toBe(before)

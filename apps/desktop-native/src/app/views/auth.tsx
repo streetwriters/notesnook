@@ -596,20 +596,13 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
               {strings.accountRecoverHelpText()}
               {"\n"}
             </Text>
-            <Text
-              sx={{
-                fontSize: "sm",
-                color: "paragraph-secondary"
+            <SubtitleWithAction
+              text={strings.rememberedYourPassword()}
+              action={{
+                text: strings.logIn(),
+                onClick: () => navigate("login")
               }}
-            >
-              <SubtitleWithAction
-                text={strings.rememberedYourPassword()}
-                action={{
-                  text: strings.logIn(),
-                  onClick: () => navigate("login")
-                }}
-              />
-            </Text>
+            />
           </>
         )
       }
@@ -1171,18 +1164,30 @@ export function AuthFormContainer<
         >
           {title}
         </Text>
-        <Text
-          sx={{
-            mt: "spacing3",
-            mb: "spacing7",
-            fontSize: "sm",
-            textAlign: "left",
-            color: "paragraph",
-            fontWeight: 400
-          }}
-        >
-          {subtitle}
-        </Text>
+        {typeof subtitle === "string" ? (
+          <Text
+            sx={{
+              mt: "spacing3",
+              mb: "spacing7",
+              fontSize: "sm",
+              textAlign: "left",
+              color: "paragraph",
+              fontWeight: 400
+            }}
+          >
+            {subtitle}
+          </Text>
+        ) : (
+          <Flex
+            sx={{
+              flexDirection: "column",
+              mt: "spacing3",
+              mb: "spacing7"
+            }}
+          >
+            {subtitle}
+          </Flex>
+        )}
         {typeof children === "function"
           ? children(form, { loading: isSubmitting })
           : children}
@@ -1249,8 +1254,17 @@ type SubtitleWithActionProps = {
 };
 function SubtitleWithAction(props: SubtitleWithActionProps) {
   return (
-    <>
-      {props.text}{" "}
+    <Flex sx={{ flexDirection: "row", alignItems: "center", gap: "spacing2" }}>
+      <Text
+        sx={{
+          fontSize: "sm",
+          textAlign: "left",
+          color: "paragraph",
+          fontWeight: 400
+        }}
+      >
+        {props.text}
+      </Text>
       <Button
         variant="new_anchor"
         sx={{
@@ -1263,7 +1277,7 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
       >
         {props.action.text}
       </Button>
-    </>
+    </Flex>
   );
 }
 
