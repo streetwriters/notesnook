@@ -21,6 +21,8 @@ import { config, environment, history, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
 import { initLocale } from "./common/locale";
 import { getCurrentPath } from "./navigation";
+import { DEFAULT_ITERATIONS, useKeyStore } from "./interfaces/key-store";
+import { randomBytes } from "./interfaces/subtle";
 
 export type BootState = {
   status: "ready";
@@ -62,6 +64,7 @@ export type BootOptions = {
   seedColors?: { title: string; colorCode: string }[];
   seedReminders?: SeedReminder[];
   softAuthenticatorPin?: string;
+  seedAppLockPassword?: string;
   resetConfig?: boolean;
   initialPath?: string;
   initialHash?: string;
@@ -140,6 +143,19 @@ async function seedNotes(notes: SeedNote[]) {
   }
 }
 
+async function seedAppLock(password: string) {
+  const store = useKeyStore.getState();
+  await store.init({ persistence: "db" });
+  const credential = { type: "password", id: "password" } as const;
+  await store.register({
+    ...credential,
+    salt: randomBytes(16),
+    iterations: DEFAULT_ITERATIONS
+  });
+  await store.activate({ ...credential, password });
+  store.relock();
+}
+
 async function installSoftAuthenticator(pin: string) {
   const webauthn = await import("@react-native-gpui/webauthn");
   await webauthn.installSoftAuthenticator(pin);
@@ -161,6 +177,8 @@ export async function boot(options: BootOptions = {}): Promise<BootState> {
   if (environment.isDev) await seedOthers(options);
   if (environment.isDev && options.softAuthenticatorPin)
     await installSoftAuthenticator(options.softAuthenticatorPin);
+  if (environment.isDev && options.seedAppLockPassword)
+    await seedAppLock(options.seedAppLockPassword);
   const user = await db.user.getUser();
   return {
     status: "ready",
