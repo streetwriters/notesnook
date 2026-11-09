@@ -18,6 +18,9 @@
     "targets": "all",
     "macos": {
       "minimumSystemVersion": "13.0"
-    }
+    },
+    "resources": [
+      "../node_modules/@react-native-gpui/pdf/THIRD_PARTY_NOTICES.md"
+    ]
   }
 }
