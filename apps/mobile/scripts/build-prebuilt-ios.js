@@ -278,7 +278,7 @@ function build(npmName, config) {
     const headersDir = path.join(workDir, "headers", `${slice.sdk}-${slice.archs.join("_")}`);
     fs.mkdirSync(headersDir, { recursive: true });
     if (fs.existsSync(publicHeaders)) {
-      execFileSync("cp", ["-R", `${publicHeaders}/.`, headersDir]);
+      execFileSync("cp", ["-RL", `${publicHeaders}/.`, headersDir]);
     }
     if (lib.swift) {
       const swiftmodule = path.join(podProducts, `${pod}.swiftmodule`);
