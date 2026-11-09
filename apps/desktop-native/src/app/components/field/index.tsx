@@ -178,6 +178,7 @@ const Field = forwardRef<UIElement, FieldProps>(function Field(props, ref) {
           sx={{
             fontFamily: "body",
             flexDirection: "column",
+            alignItems: "flex-start",
             fontSize: "xs",
             color: "paragraph-secondary",
             lineHeight: 1.2,
@@ -188,6 +189,7 @@ const Field = forwardRef<UIElement, FieldProps>(function Field(props, ref) {
             sx={{
               fontSize: "xs",
               color: "paragraph-secondary",
+              textAlign: "left",
               ...styles?.label
             }}
           >
