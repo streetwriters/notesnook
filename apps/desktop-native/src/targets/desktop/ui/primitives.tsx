@@ -28,6 +28,7 @@ import {
 } from "react";
 import {
   Image as NativeImage,
+  PixelRatio,
   Pressable,
   Switch as NativeSwitch,
   Text as NativeText,
@@ -48,6 +49,17 @@ import {
   useStyled,
   wrapChildren
 } from "./style/use-styled";
+
+const INTER_ASCENT = 0.96875;
+const INTER_DESCENT = 0.2412;
+
+function normalLineHeight(fontSize: number) {
+  const scale = PixelRatio.get();
+  return (
+    Math.round(INTER_ASCENT * fontSize * scale) / scale +
+    Math.round(INTER_DESCENT * fontSize * scale) / scale
+  );
+}
 
 const AnyView = View as any;
 
@@ -304,11 +316,16 @@ function TextField(
   const inner = useElementRef(ref);
   const fields: Record<string, unknown> = { ...nativeProps };
   delete fields.focusable;
+  const style = { ...viewStyle };
+  if (!props.multiline && style.lineHeight === undefined)
+    style.lineHeight = normalLineHeight(
+      typeof style.fontSize === "number" ? style.fontSize : 16
+    );
   return (
     <AnyInput
       ref={inner}
       {...fields}
-      style={viewStyle}
+      style={resolveLineHeight(style)}
       value={props.value}
       defaultValue={props.defaultValue}
       placeholder={props.placeholder}

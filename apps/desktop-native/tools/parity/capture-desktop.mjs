@@ -80,12 +80,20 @@ try {
   }
   await app.mouseMove({ x: 2, y: 2 });
   await app.waitForIdle();
-  const locate = async (spec) => {
+  const locateOnce = async (spec) => {
     if (typeof spec === "string")
       return (await app.query("testID", spec, true))[0];
     const matches = await app.query("testID", spec.id, true);
     matches.sort((a, b) => a.frame.y - b.frame.y || a.frame.x - b.frame.x);
     return matches[spec.nth ?? 0];
+  };
+  const locate = async (spec) => {
+    const deadline = Date.now() + 20000;
+    for (;;) {
+      const found = await locateOnce(spec);
+      if (found || Date.now() > deadline) return found;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
   };
   for (const step of scenario.steps ?? []) {
     if (step.click) await app.click((await locate(step.click)).tag);
