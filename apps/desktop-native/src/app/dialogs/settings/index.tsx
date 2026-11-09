@@ -220,7 +220,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
   );
   const [query, setQuery] = useState("");
   const groups = query ? searchGroups(query) : groupsOf(route);
-  const { width: windowWidth } = useWindowSize();
+  const { width: windowWidth, height: windowHeight } = useWindowSize();
 
   return (
     <Dialog
@@ -234,7 +234,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
       <Flex
         sx={{
           flexDirection: "row",
-          height: windowWidth * 0.8,
+          height: Math.min(windowWidth * 0.8, windowHeight * 0.7),
           overflow: "hidden"
         }}
       >

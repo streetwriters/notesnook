@@ -118,17 +118,30 @@ export async function openSettings(app: DesktopApp) {
 }
 
 export async function chooseSection(app: DesktopApp, title: string) {
-  await settle(async () => {
-    const entries = await app.query("testID", "title", true);
-    expect(
-      entries.some((entry: { text?: string }) => entry.text === title)
-    ).toBe(true);
-  });
-  const entry = (await app.query("testID", "title", true)).find(
-    (candidate: { text?: string }) => candidate.text === title
-  );
-  if (!entry) throw new Error("title not found");
-  await app.click(entry.tag);
+  const find = async () =>
+    (await app.query("testID", "title", true)).find(
+      (candidate: { text?: string }) => candidate.text === title
+    );
+  await settle(async () => expect(await find()).toBeDefined());
+  for (let attempt = 0; attempt < 12; attempt++) {
+    const entry = await find();
+    const [menu] = await app.query("testID", "settings-navigation-menu", true);
+    if (!entry) throw new Error("title not found");
+    const bottom = menu.frame.y + menu.frame.height;
+    const top = menu.frame.y;
+    const entryBottom = entry.frame.y + entry.frame.height;
+    if (entry.frame.y >= top && entryBottom <= bottom) {
+      await app.click(entry.tag);
+      return;
+    }
+    const dy =
+      entry.frame.y < top
+        ? entry.frame.y - top - 40
+        : entryBottom - bottom + 40;
+    await app.scroll(menu.tag, 0, -dy);
+    await app.waitForIdle();
+  }
+  throw new Error(`could not scroll "${title}" into view`);
 }
 
 export async function expectSettings(app: DesktopApp, keys: string[]) {
