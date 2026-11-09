@@ -28,7 +28,11 @@ import {
   useState,
   type ReactElement
 } from "react";
-import { ScrollView, View } from "react-native";
+import {
+  experimental_LayoutConformance as LayoutConformance,
+  ScrollView,
+  View
+} from "react-native";
 import type * as Contract from "../../../ui/layout";
 import { config } from "../platform/config";
 import { useStyled } from "./style/use-styled";
@@ -304,4 +308,8 @@ export function ScrollContainer(props: Contract.ScrollContainerProps) {
       {props.children}
     </AnyScrollView>
   );
+}
+
+export function LayoutRoot(props: Contract.LayoutRootProps) {
+  return <LayoutConformance mode="strict">{props.children}</LayoutConformance>;
 }

@@ -21,7 +21,7 @@ export { AvatarEditor } from "./avatar-editor";
 export { Dialog, DialogButton } from "./dialog";
 export { DragGhostHost } from "./drag-ghost";
 export * from "./hooks";
-export { Pane, ScrollContainer, SplitPane } from "./layout";
+export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
 export { VirtualList } from "./lists";
 export { SortableList } from "./sortable-list";
 export * from "./overlays";

@@ -79,3 +79,9 @@ export interface ScrollContainerProps {
 export declare function ScrollContainer(
   props: ScrollContainerProps
 ): JSX.Element;
+
+export interface LayoutRootProps {
+  children?: ReactNode;
+}
+
+export declare function LayoutRoot(props: LayoutRootProps): JSX.Element;

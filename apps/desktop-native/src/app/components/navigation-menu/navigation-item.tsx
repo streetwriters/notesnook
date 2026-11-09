@@ -72,7 +72,6 @@ export function NavigationItem(props: {
           : undefined
       }
       sx={{
-        width: "100%",
         borderRadius: "radius1",
         px: "spacing2",
         py: isCollapsed ? "spacing2" : "spacing4",
