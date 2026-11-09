@@ -69,6 +69,7 @@ export type BootOptions = {
   softAuthenticatorPin?: string;
   seedAppLockPassword?: string;
   seedAppLockSecurityKey?: boolean;
+  seedUser?: { email?: string; plan?: "free" | "pro" };
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -189,6 +190,32 @@ async function seedAppLock(options: BootOptions) {
   store.relock();
 }
 
+async function seedUser(options: NonNullable<BootOptions["seedUser"]>) {
+  const now = Date.now();
+  await db.user.setUser({
+    id: "e2e-user",
+    email: options.email ?? "e2e@example.com",
+    isEmailConfirmed: true,
+    mfa: {
+      isEnabled: false,
+      primaryMethod: "email",
+      remainingValidCodes: 0
+    },
+    subscription: {
+      appId: 0,
+      cancelURL: null,
+      expiry: now + 365 * 24 * 60 * 60 * 1000,
+      productId: null,
+      provider: 0,
+      start: now,
+      plan: options.plan === "free" ? 0 : 2,
+      status: 0,
+      updateURL: null,
+      googlePurchaseToken: null
+    }
+  } as unknown as Parameters<typeof db.user.setUser>[0]);
+}
+
 async function installSoftAuthenticator(pin: string) {
   const webauthn = await import("@react-native-gpui/webauthn");
   await webauthn.installSoftAuthenticator(pin);
@@ -215,6 +242,7 @@ async function run(options: BootOptions) {
   );
   if (environment.isDev && options.seed) await seedNotes(options.seed);
   if (environment.isDev) await seedOthers(options);
+  if (environment.isDev && options.seedUser) await seedUser(options.seedUser);
   if (environment.isDev && options.softAuthenticatorPin)
     await installSoftAuthenticator(options.softAuthenticatorPin);
   if (
