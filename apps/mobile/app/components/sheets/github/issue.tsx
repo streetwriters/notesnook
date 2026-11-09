@@ -28,7 +28,7 @@ import { eSendEvent, ToastManager } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useUserStore } from "../../../stores/use-user-store";
 import { openLinkInBrowser } from "../../../utils/functions";
-import { defaultBorderRadius, AppFontSize } from "../../../utils/size/index";
+import { AppFontSize } from "../../../utils/size/index";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
@@ -38,6 +38,10 @@ import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
 import Config from "react-native-config";
 import { db } from "../../../common/database";
+import FormInput, {
+  createFormRef,
+  validators
+} from "../../ui/input/form-input";
 import { eCloseSheet } from "../../../utils/events";
 
 export const Issue = ({
@@ -52,7 +56,13 @@ export const Issue = ({
   const { colors } = useThemeColors();
   const body = useStoredRef("issueBody", "");
   const title = useStoredRef("issueTitle", defaultTitle);
-  const email = useRef("");
+  const formRef = useRef(
+    createFormRef({
+      title: title.current || "",
+      body: body.current || "",
+      email: ""
+    })
+  );
   const [done, setDone] = useState(false);
   const user = useUserStore((state) => state.user);
   const [loading, setLoading] = useState(false);
@@ -62,10 +72,7 @@ export const Issue = ({
 
   const onPress = async () => {
     if (loading) return;
-    if (!title.current || !body.current) return;
-    if (title.current?.trim() === "" || body.current?.trim().length === 0)
-      return;
-    if (!user && !email.current.trim()) return;
+    if (!formRef.current.validate()) return;
 
     try {
       setLoading(true);
@@ -83,7 +90,7 @@ Pro: ${PremiumService.get()}
 Logged in: ${user ? "yes" : "no"}
 Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
         accessToken: user ? await db.tokenManager.getAccessToken() : undefined,
-        email: user ? undefined : email.current.trim()
+        email: user ? undefined : formRef.current.getValue("email").trim()
       });
       if (!issueReportResponse.current) {
         setLoading(false);
@@ -200,47 +207,39 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
 
           <Seperator half />
 
-          <TextInput
+          <FormInput
+            name="title"
+            formRef={formRef}
             placeholder={strings.title()}
             onChangeText={(v) => (title.current = v)}
-            defaultValue={title.current}
-            style={{
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              borderRadius: defaultBorderRadius,
-              padding: DefaultAppStyles.GAP,
-              fontFamily: "Inter-Regular",
-              marginBottom: DefaultAppStyles.GAP_VERTICAL,
-              fontSize: AppFontSize.md,
-              color: colors.primary.heading
-            }}
-            placeholderTextColor={colors.primary.placeholder}
+            fontSize={AppFontSize.md}
+            marginBottom={DefaultAppStyles.GAP_VERTICAL}
+            validators={[validators.required(strings.titleIsRequired())]}
           />
 
           {!user ? (
-            <TextInput
+            <FormInput
+              name="email"
+              formRef={formRef}
               placeholder={strings.enterEmailAddress()}
-              onChangeText={(v) => (email.current = v)}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
               autoComplete="email"
               textContentType="emailAddress"
-              style={{
-                borderWidth: 1,
-                borderColor: colors.primary.border,
-                borderRadius: defaultBorderRadius,
-                padding: DefaultAppStyles.GAP,
-                fontFamily: "Inter-Regular",
-                marginBottom: DefaultAppStyles.GAP_VERTICAL,
-                fontSize: AppFontSize.md,
-                color: colors.primary.heading
-              }}
-              placeholderTextColor={colors.primary.placeholder}
+              fontSize={AppFontSize.md}
+              marginBottom={DefaultAppStyles.GAP_VERTICAL}
+              validators={[
+                validators.required(strings.emailRequired()),
+                validators.email(strings.enterValidEmail())
+              ]}
             />
           ) : null}
 
-          <TextInput
-            ref={bodyRef}
+          <FormInput
+            name="body"
+            formRef={formRef}
+            fwdRef={bodyRef}
             multiline
             placeholder={strings.issuePlaceholder()}
             numberOfLines={5}
@@ -259,18 +258,11 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
                 });
               }
             }}
-            style={{
-              borderWidth: 1,
-              borderColor: colors.primary.border,
-              borderRadius: defaultBorderRadius,
-              padding: DefaultAppStyles.GAP,
-              fontFamily: "Inter-Regular",
-              maxHeight: 200,
-              fontSize: AppFontSize.sm,
-              marginBottom: 2.5,
-              color: colors.primary.paragraph
-            }}
-            placeholderTextColor={colors.primary.placeholder}
+            inputStyle={{ maxHeight: 200 }}
+            marginBottom={2.5}
+            validators={[
+              validators.required(strings.issueDescriptionRequired())
+            ]}
           />
           <Paragraph
             size={AppFontSize.xs}
