@@ -157,12 +157,14 @@ function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
   }, [isMigrating, markContentReady]);
 
   useEffect(() => {
-    const started = EV.subscribe(EVENTS.migrationStarted, (name) =>
-      setIsMigrating(name === "notesnook")
-    );
-    const finished = EV.subscribe(EVENTS.migrationFinished, () =>
-      setIsMigrating(false)
-    );
+    const started = EV.subscribe(EVENTS.migrationStarted, (name) => {
+      logStartup(`migration started: ${String(name)}`);
+      setIsMigrating(name === "notesnook");
+    });
+    const finished = EV.subscribe(EVENTS.migrationFinished, () => {
+      logStartup("migration finished");
+      setIsMigrating(false);
+    });
     return () => {
       started.unsubscribe();
       finished.unsubscribe();
