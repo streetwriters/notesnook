@@ -75,12 +75,17 @@ afterEach(async (context) => {
 
 export async function waitForShellContent(app: DesktopApp) {
   await vi.waitFor(
-    async () =>
+    async () => {
       expect(
-        (
-          await app.query("testID", "navigation-item", true)
-        ).length
-      ).toBeGreaterThan(0),
+        (await app.query("testID", "navigation-item", true)).length
+      ).toBeGreaterThan(0);
+      const counts: { text?: string }[] = await app.query(
+        "testID",
+        "item-count",
+        true
+      );
+      expect(counts.some((count) => !!count.text)).toBe(true);
+    },
     { timeout: 60000, interval: 300 }
   );
 }
