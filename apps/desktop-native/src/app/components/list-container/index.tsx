@@ -252,6 +252,7 @@ export default function ListContainer(props: ListContainerProps) {
         }}
       >
         <VirtualList
+          key={isSearching ? "search" : "list"}
           ref={list}
           testID="virtual-list"
           onKeyDown={onKeyDown}

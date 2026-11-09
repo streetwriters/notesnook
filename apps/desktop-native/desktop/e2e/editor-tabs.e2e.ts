@@ -57,17 +57,17 @@ describe("tabs", () => {
     });
   });
 
-  test.skip("dragging a tab onto another reorders them", async () => {
+  test("dragging a tab onto another reorders them", async () => {
     const found: { tag: number; testID: string }[] = [];
-    const walk = (node: any) => {
+    const walk = (node: any, parent?: any) => {
       if (
         node.testID?.startsWith("tab-") &&
         !/^tab-(title|icon|icon-unsaved|close-button|home|notebooks|tags)$/.test(
           node.testID
         )
       )
-        found.push({ tag: node.tag, testID: node.testID });
-      (node.children ?? []).forEach(walk);
+        found.push({ tag: parent?.tag ?? node.tag, testID: node.testID });
+      (node.children ?? []).forEach((child: any) => walk(child, node));
     };
     walk(await app.tree());
     const titles = await tabs();
