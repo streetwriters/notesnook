@@ -39,6 +39,7 @@ import {
 } from "@platform";
 import { Button, Flex, ScrollContainer, Text } from "@ui";
 import { createPickedFile } from "./utils/picked-file";
+import { assertSecureRandom } from "./utils/secure-random";
 
 type Check = { name: string; run: () => Promise<void> };
 
@@ -110,6 +111,7 @@ const checks: Check[] = [
   {
     name: "random",
     run: async () => {
+      assertSecureRandom();
       const a = crypto.getRandomValues(new Uint8Array(32));
       const b = crypto.getRandomValues(new Uint8Array(32));
       assert(hex(a) !== hex(b), "two random buffers are equal");

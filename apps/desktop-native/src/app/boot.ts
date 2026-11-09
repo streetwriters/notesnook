@@ -26,6 +26,7 @@ import { randomBytes } from "./interfaces/subtle";
 import { setDatabaseFailed, setDatabaseReady } from "./stores/boot-store";
 import Config from "./utils/config";
 import { setNetworkDisabled } from "./utils/network-policy";
+import { assertSecureRandom } from "./utils/secure-random";
 import { logStartup } from "./utils/startup";
 
 export type BootState = {
@@ -269,6 +270,7 @@ async function run(options: BootOptions) {
 
 export async function boot(options: BootOptions = {}): Promise<void> {
   try {
+    assertSecureRandom();
     const { status: _status, ...state } = await run(options);
     logStartup("database ready");
     setDatabaseReady(state);
