@@ -17,6 +17,8 @@ async function waitForIdle() {
     await new Promise((resolve) => setTimeout(resolve, 5000));
 }
 
+const cleaner = path.join(here, "../../scripts/clean-build.mjs");
+spawnSync("node", [cleaner, "--ensure", "25"], { stdio: "inherit" });
 const failures = [];
 for (const name of names)
   for (const scheme of ["light", "dark"]) {
@@ -29,6 +31,7 @@ for (const name of names)
     console.log(`${name} ${scheme}: ${result.status === 0 ? "ok" : "FAILED"}`);
     if (result.status !== 0) failures.push(`${name} ${scheme}`);
   }
+spawnSync("node", [cleaner], { stdio: "inherit" });
 console.log(failures.length ? `failed: ${failures.join(", ")}` : "all ok");
 fs.writeFileSync(
   path.join(here, "../../../../.local/parity/run-all.done"),
