@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { afterAll, afterEach, expect } from "vitest";
 import {
@@ -9,6 +9,12 @@ import {
 type Options = Parameters<typeof launch>[0];
 
 const failures = path.resolve(__dirname, "../build/e2e-failures");
+const pidDir = path.resolve(__dirname, "../build/e2e-pids");
+const pidFile = (app: DesktopApp) =>
+  path.join(
+    pidDir,
+    `${process.env.RN_GPUI_E2E_RUN ?? process.ppid}-${app.pid}`
+  );
 const running = new Set<DesktopApp>();
 
 function killAll() {
@@ -16,6 +22,7 @@ function killAll() {
     try {
       if (app.pid) process.kill(app.pid, "SIGKILL");
     } catch {}
+    rmSync(pidFile(app), { force: true });
   }
 }
 
@@ -44,6 +51,8 @@ export async function launchApp(options: Options): Promise<DesktopApp> {
     path.join(failures, `${file}.${process.pid}.${++counter}.log`);
   const app = await launch({ ...options, logFile });
   running.add(app);
+  mkdirSync(pidDir, { recursive: true });
+  writeFileSync(pidFile(app), "");
   return app;
 }
 
