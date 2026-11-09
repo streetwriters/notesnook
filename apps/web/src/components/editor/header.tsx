@@ -179,6 +179,7 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
   }, []);
 
   const reset = useCallback(() => {
+    arrowDown.current = false;
     clearInput();
     closeMenu();
     if (inputRef.current) inputRef.current.focus();
@@ -209,6 +210,10 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
   useEffect(() => {
     closeMenu();
   }, [sessionId, closeMenu]);
+
+  useEffect(() => {
+    if (!isOpen) arrowDown.current = false;
+  }, [isOpen]);
 
   return (
     <Input
