@@ -62,6 +62,14 @@ test("the home tab lists the routes and colours", async () => {
   expect(await app.getByText("Notesnook").count()).toBeGreaterThan(0);
 });
 
+test("every navigation item takes the full width of the navigation pane", async () => {
+  const [root] = await app.query("testID", "navigation-menu-root", true);
+  const items = await app.query("testID", "navigation-item", true);
+  expect(items.length).toBeGreaterThan(5);
+  for (const item of items)
+    expect(item.frame.width).toBeGreaterThanOrEqual(root.frame.width - 30);
+});
+
 test("the notebooks and tags tabs list their items and navigate", async () => {
   await app.getByTestId("tab-notebooks").click();
   await vi.waitFor(

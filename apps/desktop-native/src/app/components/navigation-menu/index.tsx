@@ -18,10 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import {
-  FeatureResult,
-  isFeatureAvailable
-} from "@notesnook/common";
+import { FeatureResult, isFeatureAvailable } from "@notesnook/common";
 import { createInternalLink, EVENTS } from "@notesnook/core";
 import type { Color, Notebook, Tag } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
@@ -619,9 +616,8 @@ function ReorderableList<T extends { id: string }>(
     isReady ? _order() : []
   );
   const customizableSidebar = useCustomizableSidebar();
-  const orderedItems = (customizableSidebar?.isAllowed ?? true)
-    ? orderItems(items, order)
-    : items;
+  const orderedItems =
+    customizableSidebar?.isAllowed ?? true ? orderItems(items, order) : items;
   const renderedItems = visibleItemLimit
     ? orderedItems.slice(0, visibleItemLimit)
     : orderedItems;
@@ -654,7 +650,9 @@ function ReorderableList<T extends { id: string }>(
         onOrderChanged(newOrder);
       }}
       renderItem={(item, state) => (
-        <Flex sx={{ opacity: state.isDragging ? 0.4 : 1 }}>
+        <Flex
+          sx={{ flexDirection: "column", opacity: state.isDragging ? 0.4 : 1 }}
+        >
           {renderItem(item)}
         </Flex>
       )}
@@ -841,7 +839,7 @@ function Routes({ collapse, isCollapsed }: SectionContext) {
     Config.get<boolean>("isLoggedIn", false);
   const visible = routes()
     .filter(
-      (customizableSidebar?.isAllowed ?? true)
+      customizableSidebar?.isAllowed ?? true
         ? (r) => !hiddenRoutes.includes(r.id)
         : () => true
     )
@@ -957,9 +955,10 @@ function Colors({ collapse, isCollapsed }: SectionContext) {
   const colors = useAppStore((store) => store.colors);
   const hiddenColors = useAppStore((store) => store.hiddenColors);
   const [showAllColors, setShowAllColors] = useState(false);
-  const visibleColors = (customizableSidebar?.isAllowed ?? true)
-    ? colors.filter((c: Color) => !hiddenColors.includes(c.id))
-    : colors;
+  const visibleColors =
+    customizableSidebar?.isAllowed ?? true
+      ? colors.filter((c: Color) => !hiddenColors.includes(c.id))
+      : colors;
   const hasMoreColors = visibleColors.length > 6;
 
   if (colors.length === 0) return null;
