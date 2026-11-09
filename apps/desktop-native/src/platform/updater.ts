@@ -33,6 +33,7 @@ export interface UpdaterEvents {
 }
 
 export interface Updater {
+  isConfigured?(): boolean;
   check(): Promise<void>;
   download(): Promise<void>;
   install(): Promise<void>;

@@ -22,7 +22,11 @@ import { getReleaseTrack, setReleaseTrack } from "./platform-gaps";
 import { SettingComponent, SettingsGroup } from "./types";
 import { appVersion } from "../../utils/version";
 import { showToast } from "../../utils/toast";
-import { checkForUpdate, downloadUpdate } from "../../utils/updater";
+import {
+  checkForUpdate,
+  downloadUpdate,
+  isUpdaterConfigured
+} from "../../utils/updater";
 import { isMacStoreApp } from "../../utils/platform";
 import { clearLogs, downloadLogs } from "../../utils/logger";
 import { useAutoUpdateStore } from "../../hooks/use-auto-updater";
@@ -43,6 +47,8 @@ export const AboutSettings: SettingsGroup[] = [
           const status = useAutoUpdateStore.getState().status;
           if (status?.type === "available")
             return strings.newVersionAvailable(status.version);
+          if (!isUpdaterConfigured())
+            return `${appVersion.formatted} · Updates are not configured yet`;
           return appVersion.formatted;
         },
         onStateChange: (listener) =>
@@ -65,6 +71,7 @@ export const AboutSettings: SettingsGroup[] = [
           ) {
             return [copyVersionButton];
           }
+          if (!isUpdaterConfigured()) return [copyVersionButton];
 
           return [
             status?.type === "available"

@@ -27,22 +27,26 @@ import {
 } from "@react-native-gpui/updater";
 import type { Updater, UpdaterEvents } from "../../../platform";
 import { config } from "./config";
+import { UPDATE_FEED_URL } from "./update-feed";
 
 function track(): "stable" | "beta" {
   return config.get<"stable" | "beta">("releaseTrack", "stable");
 }
 
 function apply() {
+  if (!UPDATE_FEED_URL) return;
   const channel = track() === "stable" ? "latest" : "beta";
   configure({
-    feedUrl: `https://notesnook.com/api/v1/releases/darwin/${channel}`,
+    feedUrl: `${UPDATE_FEED_URL.replace(/\/$/u, "")}/${channel}`,
     channel,
     allowDowngrade: track() === "stable"
   });
 }
 
 export const updater: Updater = {
+  isConfigured: () => !!UPDATE_FEED_URL,
   async check() {
+    if (!UPDATE_FEED_URL) return;
     apply();
     await checkForUpdates();
   },
@@ -52,7 +56,8 @@ export const updater: Updater = {
   async install() {
     await installUpdate();
   },
-  getAutoUpdates: async () => config.get<boolean>("autoUpdates", true),
+  getAutoUpdates: async () =>
+    !!UPDATE_FEED_URL && config.get<boolean>("autoUpdates", true),
   async setAutoUpdates(enabled) {
     config.set("autoUpdates", enabled);
     if (!enabled) cancelDownload();
