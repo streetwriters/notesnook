@@ -6771,6 +6771,7 @@ dependencies = [
  "rn-gpui-clipboard",
  "rn-gpui-crypto",
  "rn-gpui-device-info",
+ "rn-gpui-event-source",
  "rn-gpui-fs",
  "rn-gpui-gzip",
  "rn-gpui-image-manipulator",
@@ -6824,6 +6825,15 @@ dependencies = [
  "libc",
  "rn-gpui-module",
  "rn-gpui-module-build",
+]
+
+[[package]]
+name = "rn-gpui-event-source"
+version = "0.1.0"
+dependencies = [
+ "rn-gpui-module",
+ "rn-gpui-module-build",
+ "ureq",
 ]
 
 [[package]]

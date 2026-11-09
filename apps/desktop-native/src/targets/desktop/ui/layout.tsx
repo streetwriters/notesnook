@@ -21,6 +21,7 @@ import {
   Children,
   forwardRef,
   isValidElement,
+  memo,
   useCallback,
   useImperativeHandle,
   useMemo,
@@ -109,15 +110,29 @@ export const SplitPane = forwardRef<
     }
   );
 
-  const commit = useCallback(
+  const latest = useRef(sizes);
+  const frame = useRef<ReturnType<typeof requestAnimationFrame> | undefined>(
+    undefined
+  );
+  const pending = useRef<(number | undefined)[] | undefined>(undefined);
+
+  const persist = useCallback(
     (next: (number | undefined)[]) => {
+      if (!autoSaveId) return;
+      next.forEach((size, index) => {
+        const key = `csp:${autoSaveId}-${panes[index].id}`;
+        if (size === undefined) config.remove(key);
+        else config.set(key, size);
+      });
+    },
+    [autoSaveId, panes]
+  );
+
+  const commit = useCallback(
+    (next: (number | undefined)[], options: { persist?: boolean } = {}) => {
+      latest.current = next;
       setSizes(next);
-      if (autoSaveId)
-        next.forEach((size, index) => {
-          const key = `csp:${autoSaveId}-${panes[index].id}`;
-          if (size === undefined) config.remove(key);
-          else config.set(key, size);
-        });
+      if (options.persist !== false) persist(next);
       const fixed = next.reduce<number>((sum, size) => sum + (size ?? 0), 0);
       onChange.current?.(
         next.map((size) =>
@@ -125,8 +140,15 @@ export const SplitPane = forwardRef<
         )
       );
     },
-    [autoSaveId, panes, total]
+    [persist, total]
   );
+
+  const flush = useCallback(() => {
+    frame.current = undefined;
+    const next = pending.current;
+    pending.current = undefined;
+    if (next) commit(next, { persist: false });
+  }, [commit]);
 
   const clamp = (pane: PaneState, size: number) => {
     if (pane.snap > 0 && size < pane.snap) return 0;
@@ -171,16 +193,26 @@ export const SplitPane = forwardRef<
   const drag = (index: number, position: number) => {
     const start = gesture.current;
     if (!start) return;
-    commit(
-      sizes.map((size, i) =>
-        i === index
-          ? clamp(panes[index], start.size + position - start.start)
-          : size
-      )
+    pending.current = latest.current.map((size, i) =>
+      i === index
+        ? clamp(panes[index], start.size + position - start.start)
+        : size
     );
+    if (frame.current === undefined)
+      frame.current = requestAnimationFrame(flush);
   };
 
   const endGesture = () => {
+    if (frame.current !== undefined) {
+      cancelAnimationFrame(frame.current);
+      frame.current = undefined;
+    }
+    if (pending.current) {
+      const next = pending.current;
+      pending.current = undefined;
+      commit(next, { persist: false });
+    }
+    if (gesture.current) persist(latest.current);
     gesture.current = undefined;
     setDragging(undefined);
   };
@@ -265,7 +297,7 @@ export const SplitPane = forwardRef<
   );
 });
 
-function PaneView({
+const PaneView = memo(function PaneView({
   horizontal,
   size,
   pane
@@ -296,7 +328,7 @@ function PaneView({
       {pane.children}
     </AnyView>
   );
-}
+});
 
 export function ScrollContainer(props: Contract.ScrollContainerProps) {
   const { viewStyle, nativeProps } = useStyled({
