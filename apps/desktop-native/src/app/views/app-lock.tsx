@@ -44,11 +44,12 @@ import { useWindowReveal } from "../components/window-reveal";
 export default function AppLock(props: PropsWithChildren<unknown>) {
   const credentials = useKeyStore((store) => store.activeCredentials());
   const isLocked = useKeyStore((store) => store.isLocked);
+  const isInitialized = useKeyStore((store) => store.isInitialized);
   const _lockAfter = useKeyStore((store) => store.secrets.lockAfter);
   const lockAfter = usePromise(async () => {
-    if (isLocked) return null;
+    if (isLocked || !isInitialized) return null;
     return (await useKeyStore.getState().getValue("lockAfter")) || 0;
-  }, [isLocked, _lockAfter]);
+  }, [isLocked, isInitialized, _lockAfter]);
 
   const [error, setError] = useState<string>();
   const [isUnlocking, setIsUnlocking] = useState(false);

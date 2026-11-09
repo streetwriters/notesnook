@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -34,13 +35,20 @@ export function WindowRevealProvider(
   props: PropsWithChildren<{ failed?: boolean }>
 ) {
   const revealed = useRef(false);
-  const reveal = useRef<() => void>(() => undefined);
+  const requested = useRef(false);
+  const mounted = useRef(false);
+  const perform = useRef<() => void>(() => undefined);
+
+  const request = useCallback(() => {
+    requested.current = true;
+    if (mounted.current) perform.current();
+  }, []);
 
   useEffect(() => {
     if (windowControls.startedHidden()) return;
-    const timer = setTimeout(() => reveal.current(), REVEAL_TIMEOUT);
+    const timer = setTimeout(() => perform.current(), REVEAL_TIMEOUT);
     let frame: ReturnType<typeof requestAnimationFrame> | undefined;
-    reveal.current = () => {
+    perform.current = () => {
       if (revealed.current) return;
       revealed.current = true;
       clearTimeout(timer);
@@ -50,21 +58,20 @@ export function WindowRevealProvider(
         });
       });
     };
+    mounted.current = true;
+    if (requested.current) perform.current();
     return () => {
+      mounted.current = false;
       clearTimeout(timer);
       if (frame !== undefined) cancelAnimationFrame(frame);
     };
   }, []);
 
   useEffect(() => {
-    if (props.failed) reveal.current();
-  }, [props.failed]);
+    if (props.failed) request();
+  }, [props.failed, request]);
 
-  return (
-    <Context.Provider value={() => reveal.current()}>
-      {props.children}
-    </Context.Provider>
-  );
+  return <Context.Provider value={request}>{props.children}</Context.Provider>;
 }
 
 export function useWindowReveal() {

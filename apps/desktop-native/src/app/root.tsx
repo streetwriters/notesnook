@@ -21,10 +21,14 @@ import { useEffect, useState } from "react";
 import { EV, EVENTS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Flex, Text } from "@ui";
-import { boot, type BootOptions } from "./boot";
+import { boot, prepareBoot, type BootOptions } from "./boot";
 import { Demo, type Status } from "./demo";
 import { PlatformSmoke } from "./platform-smoke";
 import { getPersistence, getRoute } from "./bootstrap";
+import { useStore as useNoteStore } from "./stores/note-store";
+import { useBootStore } from "./stores/boot-store";
+import Config from "./utils/config";
+import { logStartup } from "./utils/startup";
 import AppLock from "./views/app-lock";
 import { BaseThemeProvider } from "./components/theme-provider";
 import { ErrorBoundary, GlobalErrorHandler } from "./components/error-boundary";
@@ -44,39 +48,66 @@ export type RootProps = BootOptions & {
 };
 
 export function Root(props: RootProps) {
-  const [state, setState] = useState<Status>({ status: "loading" });
+  const status = useBootStore((store) => store.status);
   return (
-    <WindowRevealProvider failed={state.status === "error"}>
-      <RootContent {...props} state={state} setState={setState} />
+    <WindowRevealProvider failed={status === "error"}>
+      <RootContent {...props} />
     </WindowRevealProvider>
   );
 }
 
-function RootContent(
-  props: RootProps & {
-    state: Status;
-    setState: (state: Status) => void;
-  }
-) {
-  const {
-    screen = "app",
-    titleBarInset,
-    state,
-    setState,
-    ...bootOptions
-  } = props;
+function RootContent(props: RootProps) {
+  const { screen = "app", titleBarInset, ...bootOptions } = props;
+  const state = useBootStore();
+  useState(() => prepareBoot(bootOptions));
+  usePathname();
+  const persistence = getPersistence(
+    getRoute({
+      isLoggedIn:
+        state.status === "ready"
+          ? !!state.user
+          : Config.get("isLoggedIn", false)
+    }).path
+  );
 
   useEffect(() => {
-    boot(bootOptions)
-      .then(setState)
-      .catch((e: Error) => setState({ status: "error", message: e.message }));
+    useKeyStore
+      .getState()
+      .init({ persistence })
+      .catch((e: unknown) => console.error("key store init failed", e));
+  }, [persistence]);
+
+  useEffect(() => {
+    logStartup("shell committed");
+    const unsubscribe = useNoteStore.subscribe(
+      (store) => store.notes,
+      (notes) => {
+        if (!notes) return;
+        logStartup("notes loaded");
+        unsubscribe();
+      }
+    );
+    boot(bootOptions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (screen === "demo") return <Demo {...props} state={state} />;
+  const demoState: Status =
+    state.status === "ready"
+      ? {
+          status: "ready",
+          version: state.version ?? "",
+          online: !!state.online,
+          user: state.user
+        }
+      : state.status === "error"
+      ? { status: "error", message: state.message ?? "" }
+      : { status: "loading" };
+
+  if (screen === "demo") return <Demo {...props} state={demoState} />;
   if (screen === "platform" && state.status === "ready")
     return <PlatformSmoke />;
-  if (state.status === "ready")
+  if (screen === "platform") return null;
+  if (state.status !== "error")
     return (
       <ErrorBoundary>
         <GlobalErrorHandler>
@@ -85,7 +116,11 @@ function RootContent(
           >
             <AppLock>
               <RouteWrapper
-                isLoggedIn={!!state.user}
+                isLoggedIn={
+                  state.status === "ready"
+                    ? !!state.user
+                    : Config.get("isLoggedIn", false)
+                }
                 titleBarInset={titleBarInset}
               />
             </AppLock>
@@ -93,7 +128,6 @@ function RootContent(
         </GlobalErrorHandler>
       </ErrorBoundary>
     );
-  if (state.status !== "error") return null;
   return (
     <Flex
       sx={{
@@ -113,16 +147,14 @@ function RootContent(
 function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
   usePathname();
   const [isMigrating, setIsMigrating] = useState(false);
-  const [isKeyStoreReady, setIsKeyStoreReady] = useState(false);
   const { route, path } = getRoute({ isLoggedIn: props.isLoggedIn });
-  const persistence = getPersistence(path);
   const { Component } = route;
   const routeProps = route.props;
   const markContentReady = useWindowReveal();
 
   useEffect(() => {
-    if (!isMigrating && isKeyStoreReady) markContentReady();
-  }, [isMigrating, isKeyStoreReady, markContentReady]);
+    if (!isMigrating) markContentReady();
+  }, [isMigrating, markContentReady]);
 
   useEffect(() => {
     const started = EV.subscribe(EVENTS.migrationStarted, (name) =>
@@ -137,15 +169,7 @@ function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
     };
   }, []);
 
-  useEffect(() => {
-    useKeyStore
-      .getState()
-      .init({ persistence })
-      .catch((e: unknown) => console.error("key store init failed", e))
-      .finally(() => setIsKeyStoreReady(true));
-  }, [persistence]);
-
-  if (isMigrating || !isKeyStoreReady)
+  if (isMigrating)
     return (
       <Flex
         sx={{
@@ -159,9 +183,7 @@ function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
       >
         <Logo size={120} />
         <Text variant="body" sx={{ fontFamily: "monospace" }}>
-          {isMigrating
-            ? strings.migratingDatabaseNotice()
-            : strings.decryptingNotes()}
+          {strings.migratingDatabaseNotice()}
         </Text>
       </Flex>
     );

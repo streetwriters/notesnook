@@ -23,6 +23,7 @@ import { IKVStore, MemoryKVStore, PlatformKVStore } from "./key-value";
 import { subtle, randomBytes, type CryptoKey } from "./subtle";
 import BaseStore, { GetState, SetState } from "../stores";
 import createStore from "../common/store";
+import Config from "../utils/config";
 import { strings } from "@notesnook/intl";
 
 // Key chain credentials:
@@ -132,10 +133,12 @@ class KeyStore extends BaseStore<KeyStore> {
   #keyId = "key";
   #wrappingKeyId = "wrappingKey";
   #key?: CryptoKey;
+  #persistent = true;
 
   credentials: SerializableCredential[] = [];
   secrets: Record<string, EncryptedData> = {};
-  isLocked = false;
+  isLocked = Config.get("appLockEnabled", false);
+  isInitialized = false;
 
   constructor(
     private readonly dbName: string,
@@ -150,6 +153,7 @@ class KeyStore extends BaseStore<KeyStore> {
   init = async (
     config: { persistence: "memory" | "db" } = { persistence: "db" }
   ) => {
+    this.#persistent = config.persistence !== "memory";
     this.#metadataStore =
       config.persistence !== "memory"
         ? new PlatformKVStore(kvStore.create(`${this.dbName}-metadata`))
@@ -163,11 +167,9 @@ class KeyStore extends BaseStore<KeyStore> {
     const secrets = Object.fromEntries(
       await this.#secretStore.entries<EncryptedData>()
     );
-    this.set({
-      credentials,
-      secrets,
-      isLocked: credentials.some((c) => c.active)
-    });
+    const isLocked = credentials.some((c) => c.active);
+    this.set({ credentials, secrets, isLocked, isInitialized: true });
+    this.syncLockFlag();
   };
 
   register = async (credential: CredentialWithoutSecret) => {
@@ -383,6 +385,7 @@ class KeyStore extends BaseStore<KeyStore> {
     await this.#secretStore?.clear();
     this.#key = undefined;
     this.set({ credentials: [], secrets: {}, isLocked: false });
+    this.syncLockFlag();
   };
 
   private update = async (
@@ -394,6 +397,15 @@ class KeyStore extends BaseStore<KeyStore> {
     if (index <= -1) return;
     this.set((s) => patch(s.credentials[index]));
     await this.#metadataStore.set("credentials", this.get().credentials);
+    this.syncLockFlag();
+  };
+
+  private syncLockFlag = () => {
+    if (!this.#persistent) return;
+    Config.set(
+      "appLockEnabled",
+      this.get().credentials.some((c) => c.active)
+    );
   };
 
   private resetCredentials = async () => {
@@ -402,6 +414,7 @@ class KeyStore extends BaseStore<KeyStore> {
     }
     await this.#metadataStore.delete("credentials");
     this.set({ credentials: [] });
+    this.syncLockFlag();
   };
 
   private getKey = async () => {

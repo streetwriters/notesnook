@@ -181,4 +181,11 @@ class UserStore extends BaseStore<UserStore> {
 const [useStore, store] = createStore<UserStore>(
   (set, get) => new UserStore(set, get)
 );
+useStore.subscribe(
+  (state) => state.isLoggedIn,
+  (isLoggedIn) => {
+    if (isLoggedIn !== undefined) Config.set("isLoggedIn", isLoggedIn);
+  }
+);
+
 export { useStore, store };

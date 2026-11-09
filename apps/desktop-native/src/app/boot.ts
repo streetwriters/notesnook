@@ -19,10 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { config, environment, history, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
-import { initLocale } from "./common/locale";
+import { initLocaleSync } from "./common/locale";
 import { getCurrentPath } from "./navigation";
 import { DEFAULT_ITERATIONS, useKeyStore } from "./interfaces/key-store";
 import { randomBytes } from "./interfaces/subtle";
+import { setDatabaseFailed, setDatabaseReady } from "./stores/boot-store";
+import Config from "./utils/config";
+import { logStartup } from "./utils/startup";
 
 export type BootState = {
   status: "ready";
@@ -66,6 +69,7 @@ export type BootOptions = {
   softAuthenticatorPin?: string;
   seedAppLockPassword?: string;
   resetConfig?: boolean;
+  delayDatabaseMs?: number;
   initialPath?: string;
   initialHash?: string;
 };
@@ -161,7 +165,7 @@ async function installSoftAuthenticator(pin: string) {
   await webauthn.installSoftAuthenticator(pin);
 }
 
-export async function boot(options: BootOptions = {}): Promise<BootState> {
+export function prepareBoot(options: BootOptions) {
   if (environment.isDev && options.resetConfig) config.clear();
   if (environment.isDev && (options.initialPath || options.initialHash))
     history.replace({
@@ -169,7 +173,12 @@ export async function boot(options: BootOptions = {}): Promise<BootState> {
       hash: options.initialHash ?? "",
       search: ""
     });
-  await initLocale();
+  initLocaleSync();
+}
+
+async function run(options: BootOptions) {
+  if (environment.isDev && options.delayDatabaseMs)
+    await new Promise((resolve) => setTimeout(resolve, options.delayDatabaseMs));
   await initializeDatabase(
     getCurrentPath().startsWith("/account/recovery") ? "memory" : "db"
   );
@@ -180,10 +189,21 @@ export async function boot(options: BootOptions = {}): Promise<BootState> {
   if (environment.isDev && options.seedAppLockPassword)
     await seedAppLock(options.seedAppLockPassword);
   const user = await db.user.getUser();
+  Config.set("isLoggedIn", !!user);
   return {
     status: "ready",
     version: environment.version,
     online: await lifecycle.waitForInternet(),
     user: user ? { email: user.email } : undefined
-  };
+  } satisfies BootState;
+}
+
+export async function boot(options: BootOptions = {}): Promise<void> {
+  try {
+    const { status: _status, ...state } = await run(options);
+    logStartup("database ready");
+    setDatabaseReady(state);
+  } catch (e) {
+    setDatabaseFailed(e instanceof Error ? e.message : String(e));
+  }
 }

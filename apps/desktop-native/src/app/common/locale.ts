@@ -19,7 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { environment } from "@platform";
 import Config from "../utils/config";
-import { initLocale as initIntlLocale } from "@notesnook/intl";
+import {
+  initLocale as initIntlLocale,
+  initLocaleSync as initIntlLocaleSync
+} from "@notesnook/intl";
 
 export async function initLocale() {
   const navLang = environment.locale;
@@ -27,5 +30,12 @@ export async function initLocale() {
   return initIntlLocale({
     getSavedLocale: () => Config.get<string>("appLanguage", ""),
     systemLocale: navLang ?? "en"
+  });
+}
+
+export function initLocaleSync() {
+  return initIntlLocaleSync({
+    getSavedLocale: () => Config.get<string>("appLanguage", ""),
+    systemLocale: environment.locale ?? "en"
   });
 }

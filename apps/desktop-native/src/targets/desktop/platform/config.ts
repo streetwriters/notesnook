@@ -36,7 +36,8 @@ const KEPT_ON_LOGOUT = [
   "colorScheme",
   "followSystemTheme",
   "doubleSpacedLines",
-  "appLanguage"
+  "appLanguage",
+  "appLockEnabled"
 ];
 
 function set<T>(key: string, value: T) {
