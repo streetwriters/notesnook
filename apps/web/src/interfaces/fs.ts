@@ -251,7 +251,10 @@ async function uploadFile(
   // if file already exists on the server, we just return true
   // we don't reupload the file i.e. overwriting is not possible.
   const uploadedFileSize = await getUploadedFileSize(filename);
-  if (uploadedFileSize === -1) return false;
+  if (uploadedFileSize === -1) {
+    if (navigator.onLine === false) showNetworkError();
+    return false;
+  }
   if (uploadedFileSize > 0 && uploadedFileSize === (await fileHandle.size()))
     return true;
 
@@ -275,6 +278,10 @@ async function uploadFile(
     console.error(e);
     reportProgress(undefined, { type: "upload", hash: filename });
     const error = toS3Error(e);
+    if (isNetworkError(e)) {
+      showNetworkError();
+      return false;
+    }
     if (
       [
         "NoSuchKey",
@@ -830,6 +837,23 @@ function showError(error: S3Error, message?: string) {
   showToast(
     "error",
     error.Code === "UNKNOWN" ? message : `[${error.Code}] ${message}`
+  );
+}
+
+function isNetworkError(e: unknown): boolean {
+  if (e instanceof WrappedError) return isNetworkError(e.error);
+  if (navigator.onLine === false) return true;
+  return (
+    axios.isAxiosError(e) &&
+    (e.code === "ERR_NETWORK" || !e.response) &&
+    !axios.isCancel(e)
+  );
+}
+
+function showNetworkError() {
+  showToast(
+    "error",
+    `${strings.uploadFailed()}: ${strings.uploadNetworkError()}`
   );
 }
 
