@@ -336,6 +336,9 @@ export function PdfPreview(props: PdfPreviewProps) {
       >
         <PdfViewer
           fit={initialZoom}
+          pageGap={8}
+          padding={10}
+          pageShadow
           ref={controller}
           source={source}
           onStateChange={setState}

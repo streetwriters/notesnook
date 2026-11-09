@@ -51,6 +51,9 @@ export interface PdfViewerProps {
   fit?: "width" | "page" | number;
   backgroundColor?: string;
   pageBackground?: string;
+  pageGap?: number;
+  padding?: number;
+  pageShadow?: boolean;
   onStateChange?: (state: PdfViewerState) => void;
   sx?: SxProp;
   testID?: string;

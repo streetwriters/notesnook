@@ -43,6 +43,9 @@ export const PdfViewer = forwardRef<
       fit={props.fit}
       backgroundColor={props.backgroundColor ?? theme.colors.background}
       pageBackground={props.pageBackground}
+      pageGap={props.pageGap}
+      padding={props.padding}
+      pageShadow={props.pageShadow}
       onStateChange={props.onStateChange}
       style={viewStyle}
     />
