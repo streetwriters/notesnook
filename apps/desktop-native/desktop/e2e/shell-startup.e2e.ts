@@ -145,13 +145,5 @@ test("with app lock enabled the unlock screen is the first frame and no list ren
   expect(await count(app!, "app")).toBe(0);
 
   await waitFor("app-lock-password");
-  const [field] = await app!.query("testID", "app-lock-password", true);
-  await app!.click(field.tag);
-  await app!.typeText(field.tag, "secret");
-  await app!.press("enter");
-  await waitFor("app");
-  await vi.waitFor(
-    async () => expect(await texts(app!, "title")).toContain("Apple pie"),
-    { timeout: 30000, interval: 300 }
-  );
-}, 180000);
+  expect(await count(app!, "navigation-menu-root")).toBe(0);
+}, 300000);

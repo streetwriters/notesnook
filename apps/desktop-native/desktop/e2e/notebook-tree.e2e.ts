@@ -33,6 +33,11 @@ beforeAll(async () => {
     async () => expect(await app.getByTestId("app").count()).toBeGreaterThan(0),
     { timeout: 90000, interval: 500 }
   );
+  await vi.waitFor(
+    async () =>
+      expect(await app.getByTestId("tab-notebooks").count()).toBeGreaterThan(0),
+    { timeout: 30000, interval: 200 }
+  );
   await app.getByTestId("tab-notebooks").click();
   await app.waitForIdle();
 });
