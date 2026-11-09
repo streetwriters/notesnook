@@ -155,14 +155,14 @@ describe("pdf preview dialog", () => {
     const zoom = async () =>
       (await app.query("testID", "pdf-zoom", true))[0]?.text;
     const before = await zoom();
-    await clickId(app, "pdf-zoom-in");
+    await clickId(app, "Zoom in");
     await settle(async () => expect(await zoom()).not.toBe(before));
-    await clickId(app, "pdf-zoom-out");
+    await clickId(app, "Zoom out");
     await settle(async () => expect(await zoom()).toBe(before));
   });
 
   test("next page updates the page input", async () => {
-    await clickId(app, "pdf-next-page");
+    await clickId(app, "Go to next page");
     await settle(async () => {
       const [input] = await app.query("testID", "pdf-page-input", true);
       expect(input.text).toBe("2");
@@ -170,7 +170,7 @@ describe("pdf preview dialog", () => {
   });
 
   test("search finds a hit", async () => {
-    await clickId(app, "pdf-search");
+    await clickId(app, "Search");
     await typeInto(app, "pdf-search-input", "Second");
     await app.press("enter");
     await settle(async () =>
@@ -179,7 +179,7 @@ describe("pdf preview dialog", () => {
   });
 
   test("close dismisses the dialog", async () => {
-    await clickId(app, "pdf-close");
+    await clickId(app, "Close");
     await expectClosed(app, "pdf-preview");
   });
 });

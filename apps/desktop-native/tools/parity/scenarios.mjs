@@ -563,3 +563,52 @@ scenarios.editorFocus = {
   steps: [openFirstNote, { click: "Focus mode" }],
   mask: editorMask
 };
+
+export function fixturePdfBase64() {
+  const pages = [
+    "Hello first page",
+    "Second page here",
+    "Third page here",
+    "Fourth page here",
+    "Fifth page here",
+    "Sixth page here"
+  ];
+  const objects = [];
+  const kids = pages.map((_, i) => `${4 + i * 2} 0 R`).join(" ");
+  objects.push("<</Type/Catalog/Pages 2 0 R>>");
+  objects.push(`<</Type/Pages/Kids[${kids}]/Count ${pages.length}>>`);
+  objects.push("<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>");
+  pages.forEach((text, i) => {
+    const content = `BT /F1 24 Tf 40 150 Td (${text}) Tj ET`;
+    objects.push(
+      `<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 300]/Resources<</Font<</F1 3 0 R>>>>/Contents ${
+        5 + i * 2
+      } 0 R>>`
+    );
+    objects.push(`<</Length ${content.length}>>stream\n${content}\nendstream`);
+  });
+  let out = "%PDF-1.4\n";
+  const offsets = [];
+  objects.forEach((body, i) => {
+    offsets.push(out.length);
+    out += `${i + 1} 0 obj\n${body}\nendobj\n`;
+  });
+  const xref = out.length;
+  out += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const offset of offsets)
+    out += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  out += `trailer<</Size ${objects.length + 1}/Root 1 0 R>>\nstartxref\n${xref}\n%%EOF\n`;
+  return Buffer.from(out, "latin1").toString("base64");
+}
+
+scenarios.pdfPreview = {
+  ...scenarios.shell,
+  openPdf: true,
+  steps: [],
+  mask: {
+    reason:
+      "the PDF page canvas is rendered by different engines; only the toolbar is compared",
+    ids: [],
+    rects: [{ x: 0, y: 60, width: 1200, height: 740 }]
+  }
+};

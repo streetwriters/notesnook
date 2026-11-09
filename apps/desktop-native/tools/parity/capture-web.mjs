@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { extras, scenarios } from "./scenarios.mjs";
+import { extras, fixturePdfBase64, scenarios } from "./scenarios.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const webDir = path.resolve(here, "../../../web");
@@ -190,6 +190,16 @@ const target = (spec) =>
     : typeof spec === "string"
     ? page.locator(`[data-test-id="${spec}"]`).first()
     : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
+if (scenario.openPdf) {
+  await page.evaluate(async (base64) => {
+    const { PdfPreviewDialog } = await import("/dialogs/pdf-preview-dialog.tsx");
+    PdfPreviewDialog.show({
+      url: `data:application/pdf;base64,${base64}`,
+      hash: "parity-pdf"
+    });
+  }, fixturePdfBase64());
+  await page.waitForTimeout(4000);
+}
 if (process.env.PARITY_WEB_DEBUG)
   await page.screenshot({ path: process.env.PARITY_WEB_DEBUG });
 for (const step of scenario.steps ?? []) {

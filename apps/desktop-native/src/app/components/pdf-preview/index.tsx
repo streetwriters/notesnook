@@ -98,6 +98,11 @@ export function PdfPreview(props: PdfPreviewProps) {
     []
   );
   const restored = useRef(false);
+  const initialZoom = useMemo(
+    () => (hash && getPdfConfig(hash).scale) || 1,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const source = useMemo(() => {
     if (typeof fileUrl === "string" && !fileUrl.startsWith("data:")) {
@@ -111,8 +116,6 @@ export function PdfPreview(props: PdfPreviewProps) {
     if (state?.status !== "ready" || restored.current || !hash) return;
     restored.current = true;
     const saved = getPdfConfig(hash);
-    if (saved.scale && saved.scale !== 1)
-      controller.current?.setZoom(saved.scale);
     if (saved.page > 1) controller.current?.goToPage(saved.page);
   }, [state?.status, hash]);
 
@@ -162,7 +165,7 @@ export function PdfPreview(props: PdfPreviewProps) {
       <Flex sx={{ p: 1, pt: 0, justifyContent: "space-between" }}>
         <ToolbarGroup>
           <ToolbarButton
-            testID="pdf-search"
+            testID={strings.search()}
             icon={Search}
             title={strings.search()}
             onPress={() => {
@@ -171,7 +174,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             }}
           />
           <ToolbarButton
-            testID="pdf-previous-page"
+            testID={strings.goToPreviousPage()}
             icon={ChevronUp}
             disabled={!ready || state.page <= 1}
             title={strings.goToPreviousPage()}
@@ -185,13 +188,21 @@ export function PdfPreview(props: PdfPreviewProps) {
               const page = parseInt(text, 10);
               if (page >= 1) controller.current?.goToPage(page);
             }}
-            sx={{ width: 45, mr: 1, px: 1, py: "2px" }}
+            sx={{
+              width: 45,
+              mr: 1,
+              px: 1,
+              py: "2px",
+              bg: "background",
+              border: "1.5px solid",
+              borderColor: "border"
+            }}
           />
           <Text variant="body" sx={{ mr: 1 }}>
             / {state?.pageCount ?? 0}
           </Text>
           <ToolbarButton
-            testID="pdf-next-page"
+            testID={strings.goToNextPage()}
             icon={ChevronDown}
             disabled={!ready || state.page >= state.pageCount}
             title={strings.goToNextPage()}
@@ -200,7 +211,7 @@ export function PdfPreview(props: PdfPreviewProps) {
         </ToolbarGroup>
         <ToolbarGroup>
           <ToolbarButton
-            testID="pdf-zoom-out"
+            testID={strings.zoomOut()}
             icon={ZoomOut}
             title={strings.zoomOut()}
             onPress={() => controller.current?.zoomOut()}
@@ -209,7 +220,7 @@ export function PdfPreview(props: PdfPreviewProps) {
             {`${Math.round((state?.zoom ?? 1) * 100)}%`}
           </Text>
           <ToolbarButton
-            testID="pdf-zoom-in"
+            testID={strings.zoomIn()}
             icon={ZoomIn}
             title={strings.zoomIn()}
             onPress={() => controller.current?.zoomIn()}
@@ -217,13 +228,13 @@ export function PdfPreview(props: PdfPreviewProps) {
         </ToolbarGroup>
         <ToolbarGroup>
           <ToolbarButton
-            testID="pdf-download"
+            testID={strings.network.download()}
             icon={Download}
             title={strings.network.download()}
             onPress={download}
           />
           <ToolbarButton
-            testID="pdf-fullscreen"
+            testID={strings.enterFullScreen()}
             icon={fullscreen ? ExitFullscreen : Fullscreen}
             title={strings.enterFullScreen()}
             onPress={() =>
@@ -234,7 +245,7 @@ export function PdfPreview(props: PdfPreviewProps) {
           />
           {onClose ? (
             <ToolbarButton
-              testID="pdf-close"
+              testID={strings.close()}
               icon={Close}
               title={strings.close()}
               onPress={onClose}
@@ -324,6 +335,7 @@ export function PdfPreview(props: PdfPreviewProps) {
         }}
       >
         <PdfViewer
+          fit={initialZoom}
           ref={controller}
           source={source}
           onStateChange={setState}

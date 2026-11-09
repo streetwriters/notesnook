@@ -48,6 +48,9 @@ export interface PdfViewerHandle {
 
 export interface PdfViewerProps {
   source: PdfSource;
+  fit?: "width" | "page" | number;
+  backgroundColor?: string;
+  pageBackground?: string;
   onStateChange?: (state: PdfViewerState) => void;
   sx?: SxProp;
   testID?: string;

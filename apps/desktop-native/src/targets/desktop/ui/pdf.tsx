@@ -24,11 +24,13 @@ import {
 } from "@react-native-gpui/pdf";
 import type * as Contract from "../../../ui/pdf";
 import { useStyled } from "./style/use-styled";
+import { useThemeContext } from "./theme";
 
 export const PdfViewer = forwardRef<
   Contract.PdfViewerHandle,
   Contract.PdfViewerProps
 >(function PdfViewer(props, ref) {
+  const theme = useThemeContext();
   const { viewStyle, nativeProps } = useStyled(
     { sx: props.sx, testID: props.testID },
     { defaults: { flex: 1 } }
@@ -38,6 +40,9 @@ export const PdfViewer = forwardRef<
       {...nativeProps}
       controllerRef={ref as Ref<PdfViewerController>}
       source={props.source}
+      fit={props.fit}
+      backgroundColor={props.backgroundColor ?? theme.colors.background}
+      pageBackground={props.pageBackground}
       onStateChange={props.onStateChange}
       style={viewStyle}
     />

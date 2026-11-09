@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { extras, scenarios } from "./scenarios.mjs";
+import { extras, fixturePdfBase64, scenarios } from "./scenarios.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(here, "../..");
@@ -43,7 +43,8 @@ const app = await launchApp({
     seedTags: scenario.noExtras ? [] : extras.tags,
     seedColors: scenario.noExtras ? [] : extras.colors,
     seedReminders: scenario.reminders ?? [],
-    seedUser: scenario.proUser ? { plan: "pro" } : undefined
+    seedUser: scenario.proUser ? { plan: "pro" } : undefined,
+    openPdf: scenario.openPdf ? { base64: fixturePdfBase64() } : undefined
   },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "parity-")),
