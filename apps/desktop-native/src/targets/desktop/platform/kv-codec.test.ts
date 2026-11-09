@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { describe, expect, test } from "vitest";
-import { decode, encode } from "./kv-codec";
+import { decode, encode, stringifyJsonOnly } from "./kv-codec";
 
 describe("kv codec", () => {
   test("an ArrayBuffer round trips as an ArrayBuffer", () => {
@@ -57,6 +57,151 @@ describe("kv codec", () => {
   test("plain values are unchanged", () => {
     expect(decode(encode({ a: [1, "b", null, true] }))).toEqual({
       a: [1, "b", null, true]
+    });
+  });
+
+  describe("every binary shape the key store persists", () => {
+    const subtle = globalThis.crypto.subtle;
+    const random = (length: number) =>
+      globalThis.crypto.getRandomValues(new Uint8Array(length));
+
+    test("the credential list: password salt and security key config", () => {
+      const source = [
+        {
+          type: "password",
+          id: "password",
+          salt: random(16),
+          iterations: 600000,
+          active: true
+        },
+        {
+          type: "securityKey",
+          id: "securityKey",
+          active: false,
+          config: {
+            firstSalt: random(32),
+            label: "Security key",
+            rawId: random(16).buffer,
+            transports: ["usb"]
+          }
+        }
+      ];
+      const value = decode<typeof source>(encode(source));
+      const password = value[0] as (typeof source)[0] & { salt: Uint8Array };
+      expect(password.salt).toBeInstanceOf(Uint8Array);
+      expect(Array.from(password.salt)).toEqual(
+        Array.from(source[0].salt as Uint8Array)
+      );
+      expect((password as { iterations: number }).iterations).toBe(600000);
+      const key = value[1] as {
+        config: {
+          firstSalt: Uint8Array;
+          rawId: ArrayBuffer;
+          transports: string[];
+          label: string;
+        };
+      };
+      expect(key.config.firstSalt).toBeInstanceOf(Uint8Array);
+      expect(key.config.rawId).toBeInstanceOf(ArrayBuffer);
+      expect(Array.from(key.config.firstSalt)).toEqual(
+        Array.from(
+          (source[1] as { config: { firstSalt: Uint8Array } }).config.firstSalt
+        )
+      );
+      expect(key.config.transports).toEqual(["usb"]);
+      expect(key.config.label).toBe("Security key");
+    });
+
+    test("an AES-KW wrapped database key unwraps after a round trip", async () => {
+      const wrapping = await subtle.generateKey(
+        { name: "AES-KW", length: 256 },
+        true,
+        ["wrapKey", "unwrapKey"]
+      );
+      const secret = await subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+      const wrapped = await subtle.wrapKey("raw", secret, wrapping, "AES-KW");
+      const stored = decode<ArrayBuffer>(encode(wrapped));
+      expect(stored).toBeInstanceOf(ArrayBuffer);
+      const unwrapped = await subtle.unwrapKey(
+        "raw",
+        stored,
+        wrapping,
+        "AES-KW",
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+      expect(
+        Array.from(new Uint8Array(await subtle.exportKey("raw", unwrapped)))
+      ).toEqual(
+        Array.from(new Uint8Array(await subtle.exportKey("raw", secret)))
+      );
+    });
+
+    test("an encrypted secret {iv, cipher} decrypts after a round trip", async () => {
+      const key = await subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+      const iv = random(12);
+      const plain = new TextEncoder().encode(JSON.stringify({ value: 15 }));
+      const cipher = await subtle.encrypt({ name: "AES-GCM", iv }, key, plain);
+      const stored = decode<{ iv: Uint8Array; cipher: ArrayBuffer }>(
+        encode({ iv, cipher })
+      );
+      expect(stored.iv).toBeInstanceOf(Uint8Array);
+      expect(stored.cipher).toBeInstanceOf(ArrayBuffer);
+      const decrypted = await subtle.decrypt(
+        { name: "AES-GCM", iv: stored.iv as Uint8Array<ArrayBuffer> },
+        key,
+        stored.cipher
+      );
+      expect(new TextDecoder().decode(decrypted)).toBe(
+        JSON.stringify({ value: 15 })
+      );
+    });
+
+    test("the safeStorage wrapped master key stays a Uint8Array", () => {
+      const ciphertext = new TextEncoder().encode(
+        JSON.stringify({ iv: "aa", cipher: "bb", salt: "cc" })
+      );
+      const stored = decode<Uint8Array>(encode(ciphertext));
+      expect(stored).toBeInstanceOf(Uint8Array);
+      expect(new TextDecoder().decode(stored)).toBe(
+        new TextDecoder().decode(ciphertext)
+      );
+    });
+
+    test("an empty ArrayBuffer default secret survives", () => {
+      const stored = decode<ArrayBuffer>(encode(new ArrayBuffer(0)));
+      expect(stored).toBeInstanceOf(ArrayBuffer);
+      expect(stored.byteLength).toBe(0);
+    });
+
+    test("a value written by the old encoder (an ArrayBuffer stored as {}) is not silently accepted as bytes", () => {
+      const legacy = decode<unknown>(JSON.stringify({}));
+      expect(legacy).not.toBeInstanceOf(ArrayBuffer);
+      expect(legacy).not.toBeInstanceOf(Uint8Array);
+    });
+  });
+
+  describe("Config values", () => {
+    test("json values stringify unchanged", () => {
+      expect(
+        JSON.parse(stringifyJsonOnly({ a: [1, "b", null, true], n: 2.5 }))
+      ).toEqual({ a: [1, "b", null, true], n: 2.5 });
+    });
+
+    test("binary values are rejected instead of being silently corrupted", () => {
+      expect(() => stringifyJsonOnly(new Uint8Array([1]))).toThrow(/binary/);
+      expect(() => stringifyJsonOnly({ k: new ArrayBuffer(2) })).toThrow(
+        /binary/
+      );
     });
   });
 });

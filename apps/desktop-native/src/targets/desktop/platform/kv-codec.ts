@@ -42,6 +42,16 @@ export function encode(value: unknown) {
   });
 }
 
+export function stringifyJsonOnly(value: unknown) {
+  return JSON.stringify(value, (key, item) => {
+    if (item instanceof ArrayBuffer || ArrayBuffer.isView(item))
+      throw new TypeError(
+        `Config value "${key}" is binary; store binary data in a kvStore instead`
+      );
+    return item;
+  });
+}
+
 export function decode<T>(text: string): T {
   return JSON.parse(text, (_key, item) => {
     if (!item || typeof item !== "object") return item;
