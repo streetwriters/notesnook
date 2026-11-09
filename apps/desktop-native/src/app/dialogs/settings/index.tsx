@@ -535,6 +535,7 @@ function SettingItem(props: { item: Setting }) {
                 return (
                   <SelectComponent
                     key={index}
+                    testID={`setting-${item.key}-dropdown-${index}`}
                     {...component}
                     onSelectionChanged={withFeatureCheck(
                       feature,
@@ -583,7 +584,9 @@ function SettingItem(props: { item: Setting }) {
   );
 }
 
-export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
+export function SelectComponent(
+  props: Omit<DropdownSettingComponent, "type"> & { testID?: string }
+) {
   const { onSelectionChanged, options } = props;
   const [selected, setSelected] = useState<string | number>();
 
@@ -593,6 +596,7 @@ export function SelectComponent(props: Omit<DropdownSettingComponent, "type">) {
 
   return (
     <Select
+      testID={props.testID}
       options={options}
       value={selected}
       onChange={(value) => {

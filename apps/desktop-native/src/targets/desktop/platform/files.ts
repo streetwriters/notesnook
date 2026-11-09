@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import fs, { dialog } from "@react-native-gpui/fs";
 import type { Files, PickedFile, WritableFile } from "../../../platform";
+import { integration } from "./integration";
 
 const MIME_TYPES: Record<string, string> = {
   json: "application/json",
@@ -84,6 +85,11 @@ export const files: Files = {
     if (!path) throw new Error("No file was selected");
     return open(path);
   },
-  createAt: (path) => open(path),
+  async createAt(path) {
+    if (path.startsWith("/")) return open(path);
+    const directory = await integration.getBackupDirectory();
+    await fs.promises.mkdir(directory, { recursive: true });
+    return open(`${directory.replace(/\/$/u, "")}/${path}`);
+  },
   readBytes: async (path) => new Uint8Array(await fs.promises.readFile(path))
 };

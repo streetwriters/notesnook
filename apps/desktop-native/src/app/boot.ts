@@ -72,6 +72,7 @@ export type BootOptions = {
   seedAppLockSecurityKey?: boolean;
   seedUser?: { email?: string; plan?: "free" | "pro" };
   disableNetwork?: boolean;
+  seedConfig?: Record<string, unknown>;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -226,6 +227,9 @@ async function installSoftAuthenticator(pin: string) {
 export function prepareBoot(options: BootOptions) {
   if (environment.isDev && options.disableNetwork) setNetworkDisabled(true);
   if (environment.isDev && options.resetConfig) config.clear();
+  if (environment.isDev)
+    for (const [key, value] of Object.entries(options.seedConfig ?? {}))
+      config.set(key, value);
   if (environment.isDev && (options.initialPath || options.initialHash))
     history.replace({
       path: options.initialPath ?? getCurrentPath(),

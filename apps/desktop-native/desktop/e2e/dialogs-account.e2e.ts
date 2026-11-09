@@ -1,4 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { mkdtempSync, readdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import {
   chooseSection,
@@ -11,11 +14,17 @@ import {
   start,
   typeInto
 } from "./dialogs";
+import { clickMenu } from "./views";
 
 let app: DesktopApp;
+const backupDirectory = mkdtempSync(
+  path.join(tmpdir(), "notesnook-e2e-backup-")
+);
 
 beforeAll(async () => {
-  app = await start();
+  app = await start({
+    seedConfig: { backupStorageLocation: backupDirectory }
+  });
   await openSettings(app);
 });
 
@@ -69,7 +78,11 @@ describe("confirm dialog (delete local data)", () => {
 describe("progress and prompt dialogs", () => {
   test("backup creation shows no stuck progress dialog afterwards", async () => {
     await chooseSection(app, "Backup & export");
-    await clickId(app, "setting-create-backup-button-0");
+    await clickId(app, "setting-create-backup-dropdown-0");
+    await clickMenu(app, "partial");
+    await settle(async () =>
+      expect(readdirSync(backupDirectory).length).toBeGreaterThan(0)
+    );
     await settle(async () =>
       expect(await count(app, "progress-dialog")).toBe(0)
     );
