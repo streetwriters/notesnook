@@ -105,11 +105,10 @@ export function Dialog(props: Contract.DialogProps) {
           }
           style={{
             ...viewStyle,
-            boxShadow: `0px 4px 34px 0px ${
+            boxShadow:
               definition.colorScheme === "dark"
-                ? "#000000aa"
-                : "rgba(0, 0, 0, 0.1)"
-            }`
+                ? undefined
+                : "0px 4px 34px 0px rgba(0, 0, 0, 0.1)"
           }}
         >
           <Flex

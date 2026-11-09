@@ -111,11 +111,17 @@ try {
       await new Promise((resolve) => setTimeout(resolve, 2500));
     }
     if (step.clickText) {
-      const entry = (await app.query("testID", "title", true)).find(
-        (candidate) =>
-          candidate.text === step.clickText &&
-          (step.in !== "nav" || candidate.frame.x < 250)
-      );
+      const deadline = Date.now() + 20000;
+      let entry;
+      for (;;) {
+        entry = (await app.query("testID", "title", true)).find(
+          (candidate) =>
+            candidate.text === step.clickText &&
+            (step.in !== "nav" || candidate.frame.x < 250)
+        );
+        if (entry || Date.now() > deadline) break;
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      }
       await app.click(entry.tag);
     }
     if (step.rightClick)
