@@ -17,10 +17,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type * as Contract from "../../../ui/overlays";
-
 export type * from "../../../ui/overlays";
 
-export const showToast: typeof Contract.showToast = () => {
-  throw new Error("showToast is not implemented on desktop yet");
-};
+export { showToast, ToastHost } from "./toast";

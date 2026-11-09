@@ -74,6 +74,8 @@ export declare function showToast(
   hideAfter?: number
 ): { hide: () => void };
 
+export declare function ToastHost(): JSX.Element | null;
+
 export type PopoverPlacement =
   | "bottom-start"
   | "bottom-end"

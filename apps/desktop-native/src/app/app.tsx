@@ -28,6 +28,7 @@ import {
   type SplitPaneHandle,
   DragGhostHost,
   PopoverHost,
+  ToastHost,
   type UIElement
 } from "@ui";
 import { ActionBar } from "./components/action-bar";
@@ -143,6 +144,7 @@ export function App(props: { titleBarInset?: number }) {
       <MenuHost />
       <DialogHost />
       <PopoverHost />
+      <ToastHost />
       <DragGhostHost />
       <LightboxHost />
     </Flex>

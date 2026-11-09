@@ -17,9 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
-import type { MenuItem, SxProp } from "@ui";
-import { Box, Button, dataColor, Flex, Icon, Text, ThemeScope } from "@ui";
+import { useEffect, useRef, useState } from "react";
+import type { MenuItem, SxProp, UIElement } from "@ui";
+import {
+  Box,
+  Button,
+  dataColor,
+  Flex,
+  Icon,
+  Text,
+  ThemeScope,
+  useWindowSize
+} from "@ui";
 import { CaretRight, Check, Pro } from "../icons";
 import { environment } from "@platform";
 import { useMenuStore } from "./store";
@@ -202,11 +211,26 @@ function MenuPanel(props: {
   items: MenuItem[];
   title?: string;
   onClose: () => void;
+  onSize?: (size: { width: number; height: number }) => void;
   sx?: SxProp;
 }) {
-  const { title, items, onClose } = props;
+  const { title, items, onClose, onSize } = props;
+  const element = useRef<UIElement>(null);
+  useEffect(() => {
+    if (!onSize) return;
+    const frame = setTimeout(
+      () =>
+        element.current?.measureInWindow((_x, _y, width, height) =>
+          onSize({ width, height })
+        ),
+      0
+    );
+    return () => clearTimeout(frame);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
   return (
     <Flex
+      ref={element}
       testID="menu-container"
       onPress={(event) => event.stopPropagation()}
       sx={{
@@ -299,8 +323,25 @@ export function MenuHost() {
   const anchor = useMenuStore((store) => store.anchor);
   const title = useMenuStore((store) => store.title);
   const close = useMenuStore((store) => store.close);
+  const viewport = useWindowSize();
+  const [size, setSize] = useState<{ width: number; height: number }>();
   useEscape(close, !!items && !!anchor);
+  useEffect(() => {
+    if (!items) setSize(undefined);
+  }, [items]);
   if (!items || !anchor) return null;
+  const margin = 8;
+  const top = Math.max(
+    margin,
+    Math.min(
+      anchor.y + anchor.height + 5,
+      viewport.height - (size?.height ?? 0) - margin
+    )
+  );
+  const left = Math.max(
+    margin,
+    Math.min(anchor.x, viewport.width - (size?.width ?? 0) - margin)
+  );
 
   return (
     <ThemeScope scope="contextMenu">
@@ -324,10 +365,11 @@ export function MenuHost() {
           items={items}
           title={title}
           onClose={close}
+          onSize={setSize}
           sx={{
             position: "absolute",
-            top: anchor.y + anchor.height + 5,
-            left: anchor.x
+            top,
+            left
           }}
         />
       </Box>
