@@ -26,4 +26,13 @@ for (const scheme of schemes) {
   run("capture-web.mjs", [scenarioName, scheme, dir, seedFile]);
   run("capture-desktop.mjs", [scenarioName, scheme, dir, seedFile]);
   run("diff.mjs", [scenarioName, dir]);
+  const summary = JSON.parse(
+    fs.readFileSync(path.join(dir, "summary.json"), "utf8")
+  ).masked;
+  if (summary.nonTextPixelsDifferent / summary.nonTextPixelsTotal > 0.5) {
+    console.log(`${scenarioName} ${scheme}: state mismatch, capturing again`);
+    run("capture-web.mjs", [scenarioName, scheme, dir, seedFile]);
+    run("capture-desktop.mjs", [scenarioName, scheme, dir, seedFile]);
+    run("diff.mjs", [scenarioName, dir]);
+  }
 }
