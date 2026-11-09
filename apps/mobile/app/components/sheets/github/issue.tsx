@@ -37,6 +37,7 @@ import Paragraph from "../../ui/typography/paragraph";
 import { strings } from "@notesnook/intl";
 import { DefaultAppStyles } from "../../../utils/styles";
 import Config from "react-native-config";
+import { db } from "../../../common/database";
 import { eCloseSheet } from "../../../utils/events";
 
 export const Issue = ({
@@ -51,6 +52,7 @@ export const Issue = ({
   const { colors } = useThemeColors();
   const body = useStoredRef("issueBody", "");
   const title = useStoredRef("issueTitle", defaultTitle);
+  const email = useRef("");
   const [done, setDone] = useState(false);
   const user = useUserStore((state) => state.user);
   const [loading, setLoading] = useState(false);
@@ -63,6 +65,7 @@ export const Issue = ({
     if (!title.current || !body.current) return;
     if (title.current?.trim() === "" || body.current?.trim().length === 0)
       return;
+    if (!user && !email.current.trim()) return;
 
     try {
       setLoading(true);
@@ -79,12 +82,24 @@ Device: ${getBrand() || ""}-${getModel() || ""}-${getSystemVersion() || ""}
 Pro: ${PremiumService.get()}
 Logged in: ${user ? "yes" : "no"}
 Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
-        userId: user?.id
+        accessToken: user ? await db.tokenManager.getAccessToken() : undefined,
+        email: user ? undefined : email.current.trim()
       });
       if (!issueReportResponse.current) {
         setLoading(false);
         ToastManager.show({
           heading: strings.failedToReportIssueOnGithub(),
+          type: "error",
+          context: "local"
+        });
+        return;
+      }
+      if ("error" in issueReportResponse.current) {
+        const { error } = issueReportResponse.current;
+        issueReportResponse.current = undefined;
+        setLoading(false);
+        ToastManager.show({
+          heading: error,
           type: "error",
           context: "local"
         });
@@ -201,6 +216,28 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
             }}
             placeholderTextColor={colors.primary.placeholder}
           />
+
+          {!user ? (
+            <TextInput
+              placeholder={strings.enterEmailAddress()}
+              onChangeText={(v) => (email.current = v)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              textContentType="emailAddress"
+              style={{
+                borderWidth: 1,
+                borderColor: colors.primary.border,
+                borderRadius: defaultBorderRadius,
+                padding: DefaultAppStyles.GAP,
+                fontFamily: "Inter-Regular",
+                marginBottom: DefaultAppStyles.GAP_VERTICAL,
+                fontSize: AppFontSize.md,
+                color: colors.primary.heading
+              }}
+              placeholderTextColor={colors.primary.placeholder}
+            />
+          ) : null}
 
           <TextInput
             ref={bodyRef}
