@@ -407,6 +407,7 @@ const ShareView = () => {
   };
 
   const changeMode = async (value: number) => {
+    if (value === mode) return;
     setMode(value);
 
     setLoading(true);
