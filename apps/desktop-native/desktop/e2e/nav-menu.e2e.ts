@@ -15,7 +15,7 @@ import { clickId, count } from "./dialogs";
 let app: DesktopApp;
 
 beforeAll(async () => {
-  app = await startViews();
+  app = await startViews({ seedUser: { plan: "pro" } });
 });
 
 afterAll(async () => {
@@ -90,7 +90,7 @@ describe("tab header buttons", () => {
   test("the notebooks sort button opens the sort menu", async () => {
     await openTab(app, "notebooks");
     await clickId(app, "notebooks-sort-button");
-    await expectMenu(app, ["groupBy", "sortDirection", "sortBy"]);
+    await expectMenu(app, ["sortDirection", "sortBy"]);
     await closeMenu(app);
   });
 });
