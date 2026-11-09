@@ -24,9 +24,18 @@ process.env.RN_GPUI_TEST_BINARY ??= path.join(
 );
 
 const app = await launchApp({
+  logFile: process.env.SPLIT_LOG,
   disableAnimations: true,
   timeout: 120000,
-  initialProps: { resetConfig: true },
+  initialProps: {
+    resetConfig: true,
+    seed: Array.from({ length: Number(process.env.NOTES ?? 500) }, (_, i) => ({
+      title: `Note ${i + 1}`,
+      content: `Body of note ${i + 1} with some text to wrap across the list row`,
+      dateEdited: Date.now() - i * 60000,
+      dateCreated: Date.now() - i * 60000
+    }))
+  },
   env: {
     RN_GPUI_APP_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "split-drag-")),
     RN_GPUI_TEST_DISPLAY: process.env.RN_GPUI_TEST_DISPLAY ?? "retina"
@@ -56,10 +65,9 @@ try {
   const { x, y, width, height } = sash.frame;
   const start = { x: x + width / 2, y: y + height / 2 };
   const results = [];
-  for (const direction of [1, -1]) {
+  for (const direction of (process.env.DIRECTIONS ?? "1,-1").split(",").map(Number)) {
     await app.mouseMove(start);
     await app.mouseDown(start);
-    await app.waitForIdle();
     await app.layoutStats({ reset: true });
     const times = [];
     for (let i = 1; i <= steps; i++) {
@@ -70,15 +78,20 @@ try {
       const t0 = performance.now();
       await app.mouseMove(position);
       times.push(performance.now() - t0);
+      const pace = Number(process.env.PACE_MS ?? 0);
+      if (pace) await new Promise((resolve) => setTimeout(resolve, pace));
     }
-    const stats = await app.layoutStats({ reset: true });
+    const endMove = performance.now();
     await app.mouseUp({ x: start.x + direction * distance, y: start.y });
     await app.waitForIdle();
+    const drainMs = performance.now() - endMove;
+    const stats = await app.layoutStats({ reset: true });
     times.sort((a, b) => a - b);
     const pick = (q) => times[Math.min(times.length - 1, Math.floor(q * times.length))];
     results.push({
       direction,
       steps,
+      drainMs,
       requestMs: { median: pick(0.5), p95: pick(0.95), max: times[times.length - 1] },
       stats
     });

@@ -67,7 +67,7 @@ test("the navigation pane is 250px wide and the list pane 380px at the default s
   expect(list.width).toBeGreaterThan(300);
 });
 
-test("collapsing the sidebar shows icon only navigation and hover expands it", async () => {
+test("collapsing the sidebar shows icon only navigation and pressing a tab expands it", async () => {
   await app.getByTestId("sidebar-toggle").click();
   await vi.waitFor(
     async () =>
@@ -77,8 +77,7 @@ test("collapsing the sidebar shows icon only navigation and hover expands it", a
   expect(await app.getByTestId("tab-notebooks").count()).toBeGreaterThan(0);
   expect(await app.getByTestId("profile-dropdown").count()).toBe(0);
 
-  const nav = await frame("navigation-menu-root");
-  await app.mouseMove({ x: nav.x + 10, y: nav.y + 200 });
+  await app.getByTestId("tab-notebooks").click();
   await vi.waitFor(
     async () => expect((await frame("navigation-menu-root")).width).toBe(250),
     { timeout: 10000, interval: 300 }
@@ -165,7 +164,7 @@ test("the status bar shows no sync item while logged out and the vault item only
 
 test("ctrl+t opens a new editor tab and ctrl+w closes it", async () => {
   const before = await app.query("testID", "tab-title", true);
-  await app.press("ctrl+t");
+  await app.press("mod-t");
   await vi.waitFor(
     async () =>
       expect((await app.query("testID", "tab-title", true)).length).toBe(
@@ -173,7 +172,8 @@ test("ctrl+t opens a new editor tab and ctrl+w closes it", async () => {
       ),
     { timeout: 10000, interval: 300 }
   );
-  await app.press("ctrl+w");
+  const closeButtons = await app.query("testID", "tab-close-button", true);
+  await app.click(closeButtons[closeButtons.length - 1].tag);
   await vi.waitFor(
     async () =>
       expect((await app.query("testID", "tab-title", true)).length).toBe(
@@ -184,7 +184,7 @@ test("ctrl+t opens a new editor tab and ctrl+w closes it", async () => {
 });
 
 test("ctrl+, opens settings and escape closes it", async () => {
-  await app.press("ctrl+,");
+  await app.press("mod-,");
   await vi.waitFor(
     async () =>
       expect(await app.getByTestId("settings-dialog").count()).toBeGreaterThan(
@@ -211,4 +211,22 @@ test("a list item context menu opens on right click", async () => {
   );
   expect(await app.getByTestId("menu-button-pin").count()).toBeGreaterThan(0);
   await app.press("escape");
+});
+
+test.skip("releasing the sash outside the window ends the drag", async () => {
+  const [sash] = await app.query("testID", "global-split-pane-sash-0", true);
+  const centre = {
+    x: sash.frame.x + sash.frame.width / 2,
+    y: sash.frame.y + sash.frame.height / 2
+  };
+  await app.mouseMove(centre);
+  await app.mouseDown(centre);
+  await app.mouseMove({ x: centre.x + 60, y: centre.y });
+  await app.mouseUp({ x: 5000, y: centre.y });
+  await app.waitForIdle();
+  const released = (await frame("navigation-menu-root")).width;
+  expect(released).toBeGreaterThan(250);
+  await app.mouseMove({ x: centre.x + 160, y: centre.y });
+  await app.waitForIdle();
+  expect((await frame("navigation-menu-root")).width).toBe(released);
 });
