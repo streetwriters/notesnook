@@ -24,7 +24,10 @@ import { rasterAssets } from "../../assets/raster.generated";
 import { SettingsDialog } from "../../dialogs/settings";
 import { authWaves } from "./auth-art.generated";
 
-function AuthContainer(props: { children?: ReactNode }) {
+function AuthContainer(props: {
+  children?: ReactNode;
+  showChangeServer?: boolean;
+}) {
   return (
     <Flex
       testID="auth-container"
@@ -103,21 +106,25 @@ function AuthContainer(props: { children?: ReactNode }) {
           >
             <Icon svg={authWaves} size={1100} rotate={-34.33} />
           </Box>
-          <Flex
-            sx={{
-              position: "absolute",
-              bottom: 20,
-              right: 30,
-              zIndex: 1
-            }}
-          >
-            <Button
-              variant="new_anchor"
-              onPress={() => SettingsDialog.show({ activeSection: "servers" })}
+          {props.showChangeServer === false ? null : (
+            <Flex
+              sx={{
+                position: "absolute",
+                bottom: 20,
+                right: 30,
+                zIndex: 1
+              }}
             >
-              <Text sx={{ color: "accent" }}>{strings.changeServer()}</Text>
-            </Button>
-          </Flex>
+              <Button
+                variant="new_anchor"
+                onPress={() =>
+                  SettingsDialog.show({ activeSection: "servers" })
+                }
+              >
+                <Text sx={{ color: "accent" }}>{strings.changeServer()}</Text>
+              </Button>
+            </Flex>
+          )}
         </Box>
       </Box>
       {props.children}

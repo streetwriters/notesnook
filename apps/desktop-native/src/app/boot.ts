@@ -68,6 +68,7 @@ export type BootOptions = {
   seedReminders?: SeedReminder[];
   softAuthenticatorPin?: string;
   seedAppLockPassword?: string;
+  seedAppLockSecurityKey?: boolean;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -147,16 +148,44 @@ async function seedNotes(notes: SeedNote[]) {
   }
 }
 
-async function seedAppLock(password: string) {
+async function seedAppLock(options: BootOptions) {
   const store = useKeyStore.getState();
   await store.init({ persistence: "db" });
-  const credential = { type: "password", id: "password" } as const;
-  await store.register({
-    ...credential,
-    salt: randomBytes(16),
-    iterations: DEFAULT_ITERATIONS
-  });
-  await store.activate({ ...credential, password });
+  if (options.seedAppLockPassword) {
+    const credential = { type: "password", id: "password" } as const;
+    await store.register({
+      ...credential,
+      salt: randomBytes(16),
+      iterations: DEFAULT_ITERATIONS
+    });
+    await store.activate({
+      ...credential,
+      password: options.seedAppLockPassword
+    });
+  }
+  if (options.seedAppLockSecurityKey) {
+    const credential = {
+      type: "securityKey",
+      id: "securityKey",
+      config: {
+        firstSalt: new Uint8Array(32),
+        label: "Security key",
+        rawId: new Uint8Array(16).buffer,
+        transports: [] as string[]
+      }
+    } as const;
+    await store.register(credential);
+    await (
+      store as unknown as {
+        update: (
+          query: { type: "securityKey"; id: string },
+          patch: (c: { active?: boolean }) => void
+        ) => Promise<void>;
+      }
+    ).update(credential, (c) => {
+      c.active = true;
+    });
+  }
   store.relock();
 }
 
@@ -178,7 +207,9 @@ export function prepareBoot(options: BootOptions) {
 
 async function run(options: BootOptions) {
   if (environment.isDev && options.delayDatabaseMs)
-    await new Promise((resolve) => setTimeout(resolve, options.delayDatabaseMs));
+    await new Promise((resolve) =>
+      setTimeout(resolve, options.delayDatabaseMs)
+    );
   await initializeDatabase(
     getCurrentPath().startsWith("/account/recovery") ? "memory" : "db"
   );
@@ -186,8 +217,11 @@ async function run(options: BootOptions) {
   if (environment.isDev) await seedOthers(options);
   if (environment.isDev && options.softAuthenticatorPin)
     await installSoftAuthenticator(options.softAuthenticatorPin);
-  if (environment.isDev && options.seedAppLockPassword)
-    await seedAppLock(options.seedAppLockPassword);
+  if (
+    environment.isDev &&
+    (options.seedAppLockPassword || options.seedAppLockSecurityKey)
+  )
+    await seedAppLock(options);
   const user = await db.user.getUser();
   Config.set("isLoggedIn", !!user);
   return {

@@ -1055,6 +1055,7 @@ export type AuthFormContainerProps<
   TFormData extends Record<TType, Record<string, any>>
 > = {
   testId?: string;
+  titleTestID?: string;
   title: string;
   subtitle: string | JSX.Element;
   type: TType;
@@ -1080,6 +1081,7 @@ export function AuthFormContainer<
 >(props: AuthFormContainerProps<TType, TFormData>) {
   const {
     title,
+    titleTestID,
     subtitle,
     children,
     canSkip,
@@ -1159,6 +1161,7 @@ export function AuthFormContainer<
           </Text>
         </Flex>
         <Text
+          testID={titleTestID}
           sx={{
             fontSize: "xl",
             textAlign: "left",
@@ -1264,6 +1267,25 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
   );
 }
 
+export const authFieldProps = {
+  sx: { mt: 2, width: "100%", gap: "spacing3" },
+  styles: {
+    label: {
+      fontSize: "xs",
+      fontWeight: 400,
+      color: "paragraph-secondary"
+    },
+    input: {
+      color: "paragraph",
+      fontSize: "xs",
+      borderRadius: "radius2",
+      bg: "background-secondary",
+      py: "spacing6",
+      px: "spacing4"
+    }
+  }
+} as const;
+
 export function AuthField(
   props: Omit<FieldProps, "id"> & { id: string; defaultValue?: string }
 ) {
@@ -1282,22 +1304,7 @@ export function AuthField(
       value={values[id] ?? defaultValue ?? ""}
       onChangeText={(text) => setValue(id, text)}
       onSubmit={() => submit()}
-      sx={{ mt: 2, width: "100%", gap: "spacing3" }}
-      styles={{
-        label: {
-          fontSize: "xs",
-          fontWeight: 400,
-          color: "paragraph-secondary"
-        },
-        input: {
-          color: "paragraph",
-          fontSize: "xs",
-          borderRadius: "radius2",
-          bg: "background-secondary",
-          py: "spacing6",
-          px: "spacing4"
-        }
-      }}
+      {...authFieldProps}
     />
   );
 }
