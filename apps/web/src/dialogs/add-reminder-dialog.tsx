@@ -159,15 +159,18 @@ export const AddReminderDialog = DialogManager.register(
     const dateInputRef = useRef<HTMLInputElement>(null);
     const monthlyDaysRef = useRef<HTMLButtonElement>(null);
     const repeatModeAvailability = useIsFeatureAvailable("recurringReminders");
-    const referencedNotes = usePromise(
-      () =>
-        reminder?.id
-          ? db.relations
-              .to({ id: reminder.id, type: "reminder" }, "note")
-              .resolve()
-          : null,
-      [reminder?.id]
-    );
+    const referencedNotes = usePromise(async () => {
+      if (!reminder?.id) return null;
+      const notes = await db.relations
+        .to({ id: reminder.id, type: "reminder" }, "note")
+        .resolve();
+      return Promise.all(
+        notes.map(async (note) => ({
+          note,
+          color: (await db.relations.to(note, "color").resolve(1))[0]
+        }))
+      );
+    }, [reminder?.id]);
 
     return (
       <Dialog
@@ -696,11 +699,12 @@ export const AddReminderDialog = DialogManager.register(
                 >
                   {strings.noteReference()}
                 </Text>
-                {referencedNotes.value.map((item) => (
+                {referencedNotes.value.map(({ note, color }) => (
                   <NoteItem
-                    key={item.id}
-                    item={item}
-                    date={item.dateCreated}
+                    key={note.id}
+                    item={note}
+                    color={color}
+                    date={note.dateCreated}
                     compact
                     sx={{
                       borderRadius: "radius2",
