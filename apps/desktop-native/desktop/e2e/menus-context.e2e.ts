@@ -8,6 +8,7 @@ import {
   goTo,
   openTab,
   rightClick,
+  navRightClick,
   settle,
   startViews,
   resetUi
@@ -81,13 +82,13 @@ describe("notebook context menu", () => {
     await settle(async () =>
       expect(await count(app, "notebooks-list")).toBe(1)
     );
-    await rightClick(app, "Work");
+    await navRightClick(app, "Work");
     await expectMenu(app, ["add", "edit", "move", "shortcut", "movetotrash"]);
     await closeMenu(app);
   });
 
   test("edit opens the add notebook dialog in edit mode", async () => {
-    await rightClick(app, "Work");
+    await navRightClick(app, "Work");
     await clickMenu(app, "edit");
     await expectDialog(app, "add-notebook-dialog", "Edit notebook");
     await app.press("escape");
@@ -99,13 +100,13 @@ describe("tag context menu", () => {
   test("a tag offers edit, shortcut and delete", async () => {
     await openTab(app, "tags");
     await settle(async () => expect(await count(app, "tags")).toBe(1));
-    await rightClick(app, "urgent");
+    await navRightClick(app, "urgent");
     await expectMenu(app, ["edit", "shortcut", "delete"]);
     await closeMenu(app);
   });
 
   test("edit opens the item dialog prefilled with the tag title", async () => {
-    await rightClick(app, "urgent");
+    await navRightClick(app, "urgent");
     await clickMenu(app, "edit");
     await expectDialog(app, "item-dialog");
     await app.press("escape");

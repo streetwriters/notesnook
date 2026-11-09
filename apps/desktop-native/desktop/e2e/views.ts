@@ -1,10 +1,10 @@
 import { PNG } from "pngjs";
 import { expect, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
-import { listTitles, navClick } from "./nav";
+import { listTitles, navClick, navRightClick } from "./nav";
 import { clickId, count, settle, start, texts } from "./dialogs";
 
-export { clickId, count, settle, texts, navClick, listTitles };
+export { clickId, count, settle, texts, navClick, navRightClick, listTitles };
 
 const NOW = Date.now();
 const DAY = 24 * 60 * 60 * 1000;

@@ -14,11 +14,27 @@ export async function navVisible(app: DesktopApp, title: string) {
   return (await find(app, title)) !== undefined;
 }
 
+async function waitForNav(app: DesktopApp, title: string) {
+  const deadline = Date.now() + 8000;
+  for (;;) {
+    const match = await find(app, title);
+    if (match) return match;
+    if (Date.now() > deadline) throw new Error(`no navigation item "${title}"`);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+}
+
 export async function navClick(app: DesktopApp, title: string) {
-  const match = await find(app, title);
-  if (!match) throw new Error(`no navigation item "${title}"`);
+  const match = await waitForNav(app, title);
   await app.waitForIdle();
   await app.click(match.tag);
+}
+
+export async function navRightClick(app: DesktopApp, title: string) {
+  const match = await waitForNav(app, title);
+  await app.waitForIdle();
+  await app.click(match.tag, { button: "right" });
+  await app.waitForIdle();
 }
 
 type Frame = { x: number; y: number; width: number; height: number };
