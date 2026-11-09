@@ -4512,6 +4512,14 @@ msgstr "Último"
 msgid "Last edited at"
 msgstr "Última edición el"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr ""
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Último uso el"
@@ -5180,6 +5188,10 @@ msgstr "Las notas nuevas quedarán sin categorizar"
 msgid "Next"
 msgstr "Siguiente"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Coincidencia siguiente"
@@ -5187,6 +5199,10 @@ msgstr "Coincidencia siguiente"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "El próximo mes"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr ""
 
 #: src/strings.ts:2220
 msgid "Next tab"
@@ -5300,6 +5316,10 @@ msgstr "Ninguno"
 #: src/strings.ts:1832
 msgid "Normal mode"
 msgstr "Modo normal"
+
+#: src/strings.ts:3287
+msgid "Not enough storage space available. Free up some space and try again."
+msgstr ""
 
 #: src/strings.ts:3135
 msgid "Not found"

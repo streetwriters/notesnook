@@ -192,6 +192,9 @@ class _SQLiteWorker {
     }
     if (!this.db) throw new Error("Database is not opened.");
 
+    if (sql === "rollback" && this.sqlite.get_autocommit(this.db))
+      return { rows: [] };
+
     const rows = (await this.exec(sql, mode, parameters)) as R[];
     if (mode === "query") return { rows };
 
