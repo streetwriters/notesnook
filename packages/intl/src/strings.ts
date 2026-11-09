@@ -3283,5 +3283,10 @@ Continue without attachments?`,
     type === "full"
       ? t`Last full backup: ${date}`
       : t`Last partial backup: ${date}`,
-  issueDescriptionRequired: () => t`Description is required`
+  issueDescriptionRequired: () => t`Description is required`,
+  publishedNotesNotMovedToTrash: (count: number) =>
+    plural(count, {
+      one: `# published note was not moved to trash. Unpublish it to delete it.`,
+      other: `# published notes were not moved to trash. Unpublish them to delete them.`
+    })
 };

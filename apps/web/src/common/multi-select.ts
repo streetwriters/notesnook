@@ -37,19 +37,26 @@ import { strings } from "@notesnook/intl";
 import { checkFeature } from ".";
 
 async function moveNotesToTrash(ids: string[], confirm = true) {
-  if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
+  const items = ids.filter((id) => !db.monographs.isPublished(id));
+  const publishedCount = ids.length - items.length;
+
+  if (!items.length) {
+    if (publishedCount > 0)
+      showToast("warn", strings.publishedNotesNotMovedToTrash(publishedCount));
+    return;
+  }
+
+  if (confirm && !(await showMultiDeleteConfirmation(items.length))) return;
 
   const vault = await db.vaults.default();
   if (vault) {
     const lockedIds = await db.relations.from(vault, "note").get();
     if (
-      ids.some((id) => lockedIds.findIndex((s) => s.toId === id) > -1) &&
+      items.some((id) => lockedIds.findIndex((s) => s.toId === id) > -1) &&
       !(await Vault.unlockVault())
     )
       return;
   }
-
-  const items = ids.filter((id) => !db.monographs.isPublished(id));
 
   await TaskManager.startTask({
     type: "status",
@@ -64,6 +71,9 @@ async function moveNotesToTrash(ids: string[], confirm = true) {
   });
 
   showToast("success", strings.actions.movedToTrash.note(items.length));
+
+  if (publishedCount > 0)
+    showToast("warn", strings.publishedNotesNotMovedToTrash(publishedCount));
 }
 
 async function moveNotebooksToTrash(ids: string[]) {
