@@ -22,10 +22,11 @@ import Field from "../components/field";
 import Dialog from "../components/dialog";
 import { useState } from "react";
 import { writeText } from "clipboard-polyfill";
-import { store as userstore } from "../stores/user-store";
+import { useStore as useUserStore } from "../stores/user-store";
 
 import { ErrorText } from "../components/error-text";
 import { Debug, IssueReportResponse } from "@notesnook/core";
+import { db } from "../common/db";
 import { ConfirmDialog } from "./confirm";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
@@ -38,6 +39,8 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
+  const user = useUserStore((s) => s.user);
+  const isLoggedIn = !!user;
 
   return (
     <Dialog
@@ -74,10 +77,12 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
             const response = await Debug.report({
               title: requestData.title,
               body: requestData.body,
-              userId: userstore.get().user?.id
+              accessToken: isLoggedIn
+                ? await db.tokenManager.getAccessToken()
+                : undefined,
+              email: isLoggedIn ? undefined : requestData.email?.trim()
             });
-            if (!response)
-              throw new Error(strings.couldNotSubmitBugReport());
+            if (!response) throw new Error(strings.couldNotSubmitBugReport());
             if ("error" in response) throw new Error(response.error);
 
             props.onClose(true);
@@ -98,6 +103,17 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           placeholder={strings.issueTitlePlaceholder()}
           autoFocus
         />
+        {!isLoggedIn && (
+          <Field
+            required
+            type="email"
+            label={strings.email()}
+            id="email"
+            name="email"
+            placeholder={strings.enterEmailAddress()}
+            sx={{ mt: 1 }}
+          />
+        )}
         <Field
           as="textarea"
           required

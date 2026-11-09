@@ -3282,5 +3282,6 @@ Continue without attachments?`,
   lastBackupOn: (date: string, type: "full" | "partial") =>
     type === "full"
       ? t`Last full backup: ${date}`
-      : t`Last partial backup: ${date}`
+      : t`Last partial backup: ${date}`,
+  issueDescriptionRequired: () => t`Description is required`
 };

@@ -2774,6 +2774,10 @@ msgstr "Deleting tags"
 msgid "Description"
 msgstr "Description"
 
+#: src/strings.ts:3286
+msgid "Description is required"
+msgstr "Description is required"
+
 #: src/strings.ts:1909
 msgid "Desktop app"
 msgstr "Desktop app"
