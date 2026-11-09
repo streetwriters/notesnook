@@ -110,6 +110,42 @@ function textMetrics(w, d) {
   };
 }
 
+const sameText = (a, b) => {
+  const left = (a.text ?? "").trim();
+  const right = (b.text ?? "").trim();
+  if (!left || !right) return false;
+  const length = Math.min(left.length, right.length, 12);
+  return left.slice(0, length) === right.slice(0, length);
+};
+
+function pairElements(webList, desktopList) {
+  const used = new Set();
+  const pairs = [];
+  const loose = [];
+  for (const w of webList) {
+    let best = -1;
+    let bestDistance = Infinity;
+    desktopList.forEach((d, index) => {
+      if (used.has(index) || !sameText(w, d)) return;
+      const distance = Math.abs(d.x - w.x) + Math.abs(d.y - w.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    });
+    if (best >= 0) {
+      used.add(best);
+      pairs.push([w, desktopList[best]]);
+    } else if (!(w.text ?? "").trim()) loose.push(w);
+  }
+  const rest = desktopList.filter(
+    (d, index) => !used.has(index) && !(d.text ?? "").trim()
+  );
+  for (let index = 0; index < Math.min(loose.length, rest.length); index++)
+    pairs.push([loose[index], rest[index]]);
+  return pairs;
+}
+
 function analyse(maskIds, maskRects, heatmapFile) {
   const ids = new Set(maskIds);
   const group = (elements) => {
@@ -126,6 +162,7 @@ function analyse(maskIds, maskRects, heatmapFile) {
   const webById = group(web.elements);
   const desktopById = group(desktop.elements);
   const missingOnDesktop = [];
+  const unpairedText = [];
   const extraOnDesktop = [];
   const geometry = [];
   const colors = [];
@@ -147,10 +184,17 @@ function analyse(maskIds, maskRects, heatmapFile) {
         web: webElements.length,
         desktop: desktopElements.length
       });
-    const count = Math.min(webElements.length, desktopElements.length);
-    for (let index = 0; index < count; index++) {
-      const w = webElements[index];
-      const d = desktopElements[index];
+    const pairs = pairElements(webElements, desktopElements);
+    const paired = new Set(pairs.map((pair) => pair[0]));
+    for (const w of webElements)
+      if (
+        !paired.has(w) &&
+        (w.text ?? "").trim() &&
+        desktopElements.some((d) => d.fontSize !== null)
+      )
+        unpairedText.push({ id, text: w.text.slice(0, 24) });
+    for (let index = 0; index < pairs.length; index++) {
+      const [w, d] = pairs[index];
       matched++;
       const deltas = {};
       for (const key of ["x", "y", "width", "height"])
@@ -278,6 +322,7 @@ function analyse(maskIds, maskRects, heatmapFile) {
       geometryMismatches: geometry.length,
       colorMismatches: colors.length,
       textStyleMismatches: textStyle.length,
+      unpairedText: unpairedText.length,
       nonTextPixelsDifferent: nonTextDiff,
       nonTextPixelsTotal: nonTextTotal,
       textPixelsDifferent: textDiff,
