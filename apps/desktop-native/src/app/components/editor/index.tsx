@@ -233,6 +233,7 @@ function EditorView({ session }: { session: EditableSession }) {
             px: 6
           }}
         >
+          <Flex testID="editor-toolbar" sx={{ height: 34, flexShrink: 0 }} />
           <TitleBox id={session.id} readonly={readonly} />
           <Header id={session.id} readonly={readonly} />
           <EditorSurface

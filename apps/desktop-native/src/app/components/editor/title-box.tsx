@@ -90,6 +90,7 @@ function TitleBox(props: TitleBoxProps) {
   return (
     <Textarea
       testID="editor-title"
+      variant="clean"
       value={title}
       placeholder={strings.noteTitle()}
       readOnly={readonly}
@@ -100,11 +101,10 @@ function TitleBox(props: TitleBoxProps) {
         px: 0,
         fontFamily:
           editorConfig.fontFamily === "monospace" ? "monospace" : "heading",
-        fontSize: 25,
+        fontSize: 28.8,
+        lineHeight: 35,
         fontWeight: "heading",
-        width: "100%",
-        borderWidth: 0,
-        bg: "transparent"
+        width: "100%"
       }}
       onChangeText={(text) => {
         const submitted = /[\r\n]/.test(text);

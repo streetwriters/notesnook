@@ -97,7 +97,7 @@ export function StatusBarItem(props: StatusBarItemProps) {
         height: 15,
         borderRadius: "radius0",
         gap: "spacing3",
-        ...(hasText ? { fontSize: "3xs", p: "spacing1" } : { width: 15 }),
+        ...(hasText ? { fontSize: "3xs", px: "spacing1", py: 0 } : { width: 15 }),
         ...sx
       }}
     >
@@ -112,7 +112,12 @@ export function StatusBarItem(props: StatusBarItemProps) {
           }
         />
       ) : null}
-      {StatusIcon && hasText ? <Text sx={TEXT_STYLE}>{text}</Text> : text}
+      {hasText &&
+      (StatusIcon || typeof text === "string" || typeof text === "number") ? (
+        <Text sx={TEXT_STYLE}>{text}</Text>
+      ) : (
+        text
+      )}
     </Button>
   );
 }

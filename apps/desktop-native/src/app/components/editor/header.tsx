@@ -66,7 +66,7 @@ function Header(props: HeaderProps) {
         alignItems: "center",
         flexWrap: "wrap",
         gap: "spacing2",
-        py: "spacing2",
+        minHeight: 30,
         opacity: !noteId ? 0.5 : 1
       }}
     >
@@ -195,9 +195,8 @@ export function Autosuggest<T>(props: AutosuggestProps<T>) {
       value={value}
       placeholder={strings.addATag()}
       sx={{
-        width: 120,
-        borderWidth: 0,
-        bg: "transparent",
+        width: 136,
+        height: 30,
         p: 0,
         fontSize: "body",
         alignSelf: "flex-start"

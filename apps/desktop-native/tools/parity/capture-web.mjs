@@ -27,6 +27,11 @@ const context = await browser.newContext({
   colorScheme: scheme
 });
 const page = await context.newPage();
+if (process.env.PARITY_WEB_DEBUG) {
+  page.on("console", (m) => console.log("web:", m.type(), m.text().slice(0, 300)));
+  page.on("response", (r) => r.status() >= 400 && console.log("web http", r.status(), r.url().slice(0, 200)));
+  page.on("pageerror", (e) => console.log("web pageerror:", String(e).slice(0, 400)));
+}
 const cdp = await context.newCDPSession(page);
 const { windowId } = await cdp.send("Browser.getWindowForTarget");
 let outerWidth = width;
@@ -185,6 +190,8 @@ const target = (spec) =>
     : typeof spec === "string"
     ? page.locator(`[data-test-id="${spec}"]`).first()
     : page.locator(`[data-test-id="${spec.id}"]`).nth(spec.nth ?? 0);
+if (process.env.PARITY_WEB_DEBUG)
+  await page.screenshot({ path: process.env.PARITY_WEB_DEBUG });
 for (const step of scenario.steps ?? []) {
   if (step.click === "sidebar-toggle") await page.mouse.click(20, 22);
   else if (step.click) await target(step.click).click();

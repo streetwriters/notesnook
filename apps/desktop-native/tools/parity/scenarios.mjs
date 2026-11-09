@@ -537,3 +537,29 @@ scenarios.sidebarCustomizeMenu = {
 };
 
 export const TEXT_SCORE_THRESHOLD = 0.1;
+
+const editorMask = {
+  reason: "the editor toolbar and body are native later",
+  ids: ["tags"],
+  rects: [
+    { x: 630, y: 45, width: 570, height: 34 },
+    { x: 630, y: 160, width: 570, height: 620 }
+  ]
+};
+const openFirstNote = { click: { id: "list-item", nth: 0 } };
+
+scenarios.editorOpen = {
+  ...scenarios.shell,
+  steps: [openFirstNote],
+  mask: editorMask
+};
+scenarios.editorProperties = {
+  ...scenarios.shell,
+  steps: [openFirstNote, { click: "Properties" }],
+  mask: editorMask
+};
+scenarios.editorFocus = {
+  ...scenarios.shell,
+  steps: [openFirstNote, { click: "Focus mode" }],
+  mask: editorMask
+};

@@ -55,7 +55,7 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooterSeparator() {
-  return <Box sx={{ width: 1, height: 13, bg: "separator", mx: "spacing2" }} />;
+  return <Box sx={{ width: 1, height: 10, bg: "separator", mx: "spacing4" }} />;
 }
 
 function useStatistics(): NoteStatistics {
