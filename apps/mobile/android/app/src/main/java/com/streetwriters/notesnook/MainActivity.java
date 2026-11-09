@@ -24,10 +24,19 @@ public class MainActivity extends ReactActivity {
     RNBootSplash.init(this, R.style.BootTheme);
 
     super.onCreate(null);
+    WindowBoundsSync.install(this, getReactHost());
+    WindowBoundsSync.sync(this, getReactHost());
     if (BuildConfig.DEBUG) {
       WebView.setWebContentsDebuggingEnabled(true);
     }
 
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    WindowBoundsSync.install(this, getReactHost());
+    WindowBoundsSync.sync(this, getReactHost());
   }
 
   /**
@@ -53,6 +62,9 @@ public class MainActivity extends ReactActivity {
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     getReactHost().onConfigurationChanged(this);
+    // Runs after React Native re-reads the application display metrics,
+    // which otherwise stay at the full display size inside a pop-up window.
+    WindowBoundsSync.sync(this, getReactHost());
     Intent intent = new Intent("onConfigurationChanged");
     intent.putExtra("newConfig", newConfig);
     this.sendBroadcast(intent);

@@ -29,7 +29,13 @@ import React, {
   useRef,
   useState
 } from "react";
-import { LayoutChangeEvent, Platform, View } from "react-native";
+import {
+  DeviceEventEmitter,
+  Dimensions,
+  LayoutChangeEvent,
+  Platform,
+  View
+} from "react-native";
 import Orientation, {
   OrientationType,
   useDeviceOrientationChange
@@ -61,13 +67,14 @@ import {
   eOpenFullscreenEditor,
   eUnlockNote
 } from "../utils/events";
-import { valueLimiter } from "../utils/functions";
 import { fluidTabsRef } from "../utils/global-refs";
+import {
+  computePaneLayout,
+  windowConstrainedSize
+} from "../utils/responsive-layout";
 import { AppNavigationStack } from "./navigation-stack";
 import type { PaneWidths } from "../screens/editor/wrapper";
 import { NavigationProps } from "../services/navigation";
-
-const MOBILE_SIDEBAR_SIZE = 0.85;
 
 let SideMenu: any = null;
 let EditorWrapper: any = null;
@@ -90,16 +97,21 @@ export const FluidPanelsView = React.memo(
     );
     const appLoading = useSettingStore((state) => state.isAppLoading);
     const [isLoading, setIsLoading] = useState(false);
-    const availableWidth =
+    const availableWidth = Math.max(
+      0,
       dimensions.width -
-      (orientation === "LANDSCAPE-LEFT" || Platform.OS === "android"
-        ? insets.left
-        : 0) -
-      (orientation === "LANDSCAPE-RIGHT" || Platform.OS === "android"
-        ? insets.right
-        : 0);
+        (orientation === "LANDSCAPE-LEFT" || Platform.OS === "android"
+          ? insets.left
+          : 0) -
+        (orientation === "LANDSCAPE-RIGHT" || Platform.OS === "android"
+          ? insets.right
+          : 0)
+    );
 
     useDeviceOrientationChange((o) => {
+      // Android pop-up windows have their own aspect ratio. The physical
+      // fold orientation must not keep a tall window on the landscape layout.
+      if (Platform.OS === "android") return;
       if (
         o !== OrientationType.UNKNOWN &&
         o !== OrientationType["FACE-UP"] &&
@@ -183,7 +195,9 @@ export const FluidPanelsView = React.memo(
     ]);
 
     const setDeviceMode = React.useCallback(
-      (current: string | null, size: { width: number; height: number }) => {
+      (current: string | null, _size: { width: number; height: number }) => {
+        const previous = useSettingStore.getState().deviceMode;
+        if (previous === current) return;
         setDeviceModeState(current);
 
         if (fullscreen && current === "mobile") {
@@ -200,12 +214,16 @@ export const FluidPanelsView = React.memo(
                 fluidTabsRef.current?.closeDrawer(false);
               }
               break;
-            case "mobile":
+            case "mobile": {
+              const noteOpen = !!useTabStore
+                .getState()
+                .getNoteIdForTab(useTabStore.getState().currentTab);
               fluidTabsRef.current?.goToPage(
-                fluidTabsRef.current?.page(),
+                noteOpen ? "editor" : fluidTabsRef.current?.page() || "home",
                 false
               );
               break;
+            }
           }
         }, 0);
       },
@@ -214,89 +232,124 @@ export const FluidPanelsView = React.memo(
 
     const checkDeviceType = React.useCallback(
       (size: { width: number; height: number }) => {
-        if (DDS.width === size.width && orientation === DDS.orientation) return;
-        DDS.setSize(size, orientation);
+        if (!size?.width || !size?.height) return;
+        const windowOrientation =
+          size.width > size.height ? "LANDSCAPE-RIGHT" : "PORTRAIT";
+        DDS.setSize(size, windowOrientation);
         const nextDeviceMode = DDS.isLargeTablet()
           ? "tablet"
           : DDS.isSmallTab
-            ? "smallTablet"
-            : "mobile";
+          ? "smallTablet"
+          : "mobile";
         setDeviceMode(nextDeviceMode, size);
       },
-      [orientation, setDeviceMode]
+      [setDeviceMode]
     );
 
     useEffect(() => {
-      if (orientation !== "UNKNOWN") {
-        checkDeviceType(dimensions);
+      if (orientation === "UNKNOWN") return;
+      const width = availableWidth > 48 ? availableWidth : dimensions.width;
+      checkDeviceType({ width, height: dimensions.height });
+    }, [orientation, dimensions, availableWidth, checkDeviceType]);
+
+    const layoutSizeRef = useRef({ width: 0, height: 0 });
+    const reportedSizeRef = useRef({
+      width: Dimensions.get("window").width,
+      height: Dimensions.get("window").height
+    });
+
+    const publishWindowSize = useCallback(() => {
+      const width = windowConstrainedSize(
+        layoutSizeRef.current.width,
+        reportedSizeRef.current.width
+      );
+      const height = windowConstrainedSize(
+        layoutSizeRef.current.height,
+        reportedSizeRef.current.height
+      );
+      if (width < 48 || height < 48) return;
+      const current = useSettingStore.getState().dimensions;
+      if (
+        Math.abs(current.width - width) < 0.5 &&
+        Math.abs(current.height - height) < 0.5
+      ) {
+        return;
       }
-    }, [orientation, dimensions, checkDeviceType]);
+      setDimensions({ width, height });
+      if (Platform.OS === "android") {
+        setOrientation(
+          width > height
+            ? OrientationType["LANDSCAPE-RIGHT"]
+            : OrientationType.PORTRAIT
+        );
+      }
+    }, [setDimensions]);
+
+    useEffect(() => {
+      const onReported = (size?: { width?: number; height?: number }) => {
+        if (!size?.width || !size?.height) return;
+        reportedSizeRef.current = { width: size.width, height: size.height };
+        publishWindowSize();
+      };
+      const boundsSub = DeviceEventEmitter.addListener(
+        "nnWindowBounds",
+        onReported
+      );
+      const dimensionsSub = Dimensions.addEventListener(
+        "change",
+        ({ window }) => {
+          onReported(window);
+        }
+      );
+      return () => {
+        boundsSub.remove();
+        dimensionsSub.remove();
+      };
+    }, [publishWindowSize]);
 
     const _onLayout = React.useCallback(
       (event: LayoutChangeEvent) => {
         const size = event?.nativeEvent?.layout;
-        setDimensions({
-          width: size.width,
-          height: size.height
-        });
-        if (size.width > size.height) {
+        if (!size) return;
+        layoutSizeRef.current = { width: size.width, height: size.height };
+        if (Platform.OS !== "android" && size.width > size.height) {
           setOrientation(OrientationType["LANDSCAPE-RIGHT"]);
-        } else {
-          setOrientation(OrientationType["PORTRAIT"]);
+        } else if (Platform.OS !== "android") {
+          setOrientation(OrientationType.PORTRAIT);
         }
+        publishWindowSize();
       },
-      [setDimensions]
+      [publishWindowSize]
     );
 
-    const PANE_OFFSET = useMemo(() => {
-      const smallTabletSidebar = valueLimiter(availableWidth * 0.3, 300, 450);
-      const smallTabletList = valueLimiter(availableWidth * 0.3, 300, 450);
-
-      return {
-        mobile: {
-          sidebar: availableWidth * MOBILE_SIDEBAR_SIZE,
-          list: availableWidth + availableWidth * MOBILE_SIDEBAR_SIZE,
-          editor: availableWidth * 2 + availableWidth * MOBILE_SIDEBAR_SIZE
-        },
-        smallTablet: {
-          sidebar: fullscreen ? 0 : smallTabletSidebar,
-          list: fullscreen ? 0 : smallTabletSidebar + smallTabletList,
-          editor: fullscreen
-            ? 0
-            : smallTabletSidebar +
-              smallTabletList +
-              availableWidth -
-              smallTabletList
-        },
-        tablet: {
-          sidebar: 0,
-          list: 0,
-          editor: 0
-        }
-      };
-    }, [availableWidth, fullscreen]);
-
-    const PANE_WIDTHS: PaneWidths = useMemo(() => {
-      const smallTabletSidebar = valueLimiter(availableWidth * 0.3, 300, 450);
-      const smallTabletList = valueLimiter(availableWidth * 0.3, 300, 450);
-      return {
-        mobile: {
-          sidebar: availableWidth * MOBILE_SIDEBAR_SIZE,
-          list: availableWidth,
-          editor: availableWidth
-        },
-        smallTablet: {
-          sidebar: smallTabletSidebar,
-          list: smallTabletList,
-          editor: availableWidth - smallTabletList
-        },
-        tablet: {
-          sidebar: availableWidth * 0.22,
-          list: availableWidth * 0.3,
-          editor: availableWidth * 0.48
-        }
-      };
-    }, [availableWidth]);
+    const paneLayouts = useMemo(
+      () => ({
+        mobile: computePaneLayout("mobile", availableWidth, fullscreen),
+        smallTablet: computePaneLayout(
+          "smallTablet",
+          availableWidth,
+          fullscreen
+        ),
+        tablet: computePaneLayout("tablet", availableWidth, fullscreen)
+      }),
+      [availableWidth, fullscreen]
+    );
+    const PANE_OFFSET = useMemo(
+      () => ({
+        mobile: paneLayouts.mobile.offsets,
+        smallTablet: paneLayouts.smallTablet.offsets,
+        tablet: paneLayouts.tablet.offsets
+      }),
+      [paneLayouts]
+    );
+    const PANE_WIDTHS: PaneWidths = useMemo(
+      () => ({
+        mobile: paneLayouts.mobile.widths,
+        smallTablet: paneLayouts.smallTablet.widths,
+        tablet: paneLayouts.tablet.widths
+      }),
+      [paneLayouts]
+    );
 
     const onScroll = React.useCallback(
       (scrollOffset: number) => {

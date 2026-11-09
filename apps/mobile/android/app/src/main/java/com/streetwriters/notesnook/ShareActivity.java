@@ -29,6 +29,21 @@ public class ShareActivity extends ReactActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(null);
+        WindowBoundsSync.install(this, getReactHost());
+        WindowBoundsSync.sync(this, getReactHost());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        WindowBoundsSync.install(this, getReactHost());
+        WindowBoundsSync.sync(this, getReactHost());
+    }
+
+    @Override
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        WindowBoundsSync.sync(this, getReactHost());
     }
 
     @Override
