@@ -86,6 +86,6 @@ export async function waitForShellContent(app: DesktopApp) {
       );
       expect(counts.some((count) => !!count.text)).toBe(true);
     },
-    { timeout: 60000, interval: 300 }
+    { timeout: 60000, interval: 1000 }
   );
 }
