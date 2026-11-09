@@ -97,30 +97,37 @@ export function Fieldset(props: {
 }) {
   return (
     <Flex
-      sx={{
-        position: "relative",
-        flexDirection: "column",
-        mt: "spacing7",
-        p: "spacing6",
-        border: "1px solid",
-        borderColor: "border",
-        borderRadius: "radius3",
-        ...props.sx
-      }}
+      sx={{ position: "relative", flexDirection: "column", mt: "spacing7" }}
     >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          mt: 7.25,
+          p: "spacing6",
+          border: "1px solid",
+          borderColor: "border",
+          borderRadius: "radius3",
+          ...props.sx
+        }}
+      >
+        <Flex sx={{ height: 7.25 }} />
+        {props.children}
+      </Flex>
       <Text
         sx={{
+          position: "absolute",
+          top: 0,
+          left: 15,
           px: "spacing1",
+          bg: "background",
           color: "accent",
           fontSize: "xs",
           fontWeight: 500,
-          lineHeight: 1.2,
-          mb: "spacing4"
+          lineHeight: 14.5
         }}
       >
         {props.title}
       </Text>
-      {props.children}
     </Flex>
   );
 }
