@@ -61,15 +61,15 @@ describe("hash routes open dialogs", () => {
 
   test("/buy opens the plan selection dialog", async () => {
     app = await start({ initialHash: "#/buy" });
+    await expectDialog(app, "dialog");
     await settle(async () =>
-      expect(await count(app!, "checkout-plan")).toBeGreaterThan(0)
+      expect(await app!.getByText("Select a plan").count()).toBeGreaterThan(0)
     );
   });
 
-  test("/confirmed opens the email confirmed feature dialog", async () => {
+  test("/confirmed opens the feature dialog and closes it again because the feature has no shouldShow, like web", async () => {
     app = await start({ initialHash: "#/confirmed" });
-    await settle(async () =>
-      expect(await count(app!, "dialog")).toBeGreaterThan(0)
-    );
+    await settle(async () => expect(await count(app!, "dialog")).toBe(0));
+    expect(await count(app!, "app")).toBeGreaterThan(0);
   });
 });
