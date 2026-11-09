@@ -202,7 +202,7 @@ function EditorProperties(props: EditorPropertiesProps) {
           py: "spacing4"
         }}
       >
-        <Flex sx={{ gap: "spacing2", px: "spacing4" }}>
+        <Flex sx={{ gap: "spacing2", px: "spacing4", flexShrink: 0 }}>
           {tabs.map((tab) => (
             <TabItem
               key={tab.id}

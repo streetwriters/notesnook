@@ -384,6 +384,36 @@ const inputs = await page.evaluate(() =>
 );
 
 await fitViewport();
+if (process.env.PARITY_WEB_DUMP)
+  console.log(
+    JSON.stringify(
+      await page.evaluate((testId) => {
+        const target = document.querySelector(`[data-test-id="${testId}"]`);
+        const out = [];
+        let node = target;
+        for (let depth = 0; node && depth < 4; depth++) {
+          const parent = node.parentElement;
+          if (!parent) break;
+          for (const child of parent.children) {
+            const r = child.getBoundingClientRect();
+            const cs = getComputedStyle(child);
+            out.push({
+              depth,
+              tag: child.tagName,
+              id: child.getAttribute("data-test-id") || child.id || "",
+              x: r.x, y: r.y, w: r.width, h: r.height,
+              mt: cs.marginTop, mb: cs.marginBottom, pt: cs.paddingTop, pb: cs.paddingBottom,
+              box: cs.boxSizing, lh: cs.lineHeight, fs: cs.fontSize
+            });
+          }
+          node = parent;
+        }
+        return out;
+      }, process.env.PARITY_WEB_DUMP),
+      null,
+      1
+    )
+  );
 let shot = await page.screenshot();
 for (let attempt = 0; attempt < 6; attempt++) {
   await page.waitForTimeout(700);

@@ -271,7 +271,8 @@ const TabStrip = memo(function TabStrip() {
           flexDirection: "row",
           flexShrink: 1,
           minWidth: 0,
-          height: "100%",
+          height: 44,
+          alignSelf: "center",
           gap: "spacing3",
           py: "spacing3"
         }}

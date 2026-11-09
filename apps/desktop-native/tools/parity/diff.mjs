@@ -136,13 +136,24 @@ function pairElements(webList, desktopList) {
     if (best >= 0) {
       used.add(best);
       pairs.push([w, desktopList[best]]);
-    } else if (!(w.text ?? "").trim()) loose.push(w);
+    } else loose.push(w);
   }
-  const rest = desktopList.filter(
-    (d, index) => !used.has(index) && !(d.text ?? "").trim()
-  );
-  for (let index = 0; index < Math.min(loose.length, rest.length); index++)
-    pairs.push([loose[index], rest[index]]);
+  for (const w of loose) {
+    let best = -1;
+    let bestDistance = 12;
+    desktopList.forEach((d, index) => {
+      if (used.has(index) || (d.text ?? "").trim()) return;
+      const distance = Math.abs(d.x - w.x) + Math.abs(d.y - w.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    });
+    if (best >= 0) {
+      used.add(best);
+      pairs.push([w, desktopList[best]]);
+    }
+  }
   return pairs;
 }
 
