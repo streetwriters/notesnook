@@ -19,24 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useState } from "react";
 import { strings } from "@notesnook/intl";
-import { Box, Button, Flex, Text } from "@ui";
+import { Button, Flex, Text } from "@ui";
 import Field from "../field";
-import { Loading } from "../icons";
-import AuthContainer from "../auth-container";
 import { AuthErrorText } from "../error-text";
-import {
-  AuthField,
-  AuthFormContainer,
-  authFieldProps,
-  SubmitButton
-} from "../../views/auth";
+import { ArrowRight, Loading } from "../icons";
+import { Logo } from "../navigation-menu/logo";
+import { authFieldProps } from "../../views/auth";
 import {
   useKeyStore,
   type CredentialWithoutSecret
 } from "../../interfaces/key-store";
 import { WebAuthn } from "../../utils/webauthn";
 
-type UnlockFormData = { unlock: { password?: string } };
+type SecurityKeyCredential = Extract<
+  CredentialWithoutSecret,
+  { type: "securityKey" }
+>;
 
 function describeError(e: unknown) {
   if (typeof e === "string") return e;
@@ -54,83 +52,52 @@ function describeError(e: unknown) {
     : message || strings.wrongPassword();
 }
 
-function SecurityKeyUnlock(props: {
-  credential: Extract<CredentialWithoutSecret, { type: "securityKey" }>;
-  separated: boolean;
+function SubmitArrow(props: {
+  testID: string;
+  loading: boolean;
+  onPress: () => void;
 }) {
-  const { credential, separated } = props;
-  const [pin, setPin] = useState("");
-  const [error, setError] = useState<string>();
-  const [isUnlocking, setIsUnlocking] = useState(false);
-
-  const unlock = async () => {
-    setError(undefined);
-    setIsUnlocking(true);
-    try {
-      const { encryptionKey } = await WebAuthn.getEncryptionKey(
-        credential.config,
-        pin
-      );
-      await useKeyStore
-        .getState()
-        .unlock({ ...credential, key: encryptionKey });
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setIsUnlocking(false);
-    }
-  };
-
   return (
-    <Flex
-      testID="app-lock-security-key"
-      sx={{ flexDirection: "column", width: "100%" }}
+    <Button
+      testID={props.testID}
+      variant="new_accent"
+      disabled={props.loading}
+      onPress={props.onPress}
+      sx={{
+        width: 40,
+        height: 40,
+        borderRadius: 100,
+        p: 0,
+        flexShrink: 0,
+        alignItems: "center",
+        justifyContent: "center"
+      }}
     >
-      {separated ? (
-        <Flex
-          sx={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "spacing4",
-            mt: "spacing8"
-          }}
-        >
-          <Box sx={{ flex: 1, height: 1, bg: "separator" }} />
-          <Text sx={{ fontSize: "xs", color: "paragraph-secondary" }}>
-            {strings.or()}
-          </Text>
-          <Box sx={{ flex: 1, height: 1, bg: "separator" }} />
-        </Flex>
-      ) : null}
-      <Field
-        {...authFieldProps}
-        testID="app-lock-security-key-pin"
-        type="password"
-        label="PIN"
-        placeholder="PIN"
-        value={pin}
-        onChangeText={setPin}
-        onSubmit={unlock}
-        autoFocus={!separated}
-      />
-      <AuthErrorText error={error} sx={{ mt: "spacing4", p: 0 }} />
-      <Button
-        testID="app-lock-security-key-submit"
-        variant={separated ? "new_bordered" : "new_accent"}
-        disabled={isUnlocking}
-        onPress={unlock}
-        sx={{ mt: "spacing8", width: "100%" }}
-      >
-        {isUnlocking ? (
-          <Loading
-            color={separated ? "icon" : "accentForeground"}
-            size={15}
-            sx={{ mr: "spacing6" }}
-          />
-        ) : null}
-        {strings.unlockWithSecurityKey()}
-      </Button>
-    </Flex>
+      {props.loading ? (
+        <Loading color="accentForeground" size={16} />
+      ) : (
+        <ArrowRight color="accentForeground" size={16} />
+      )}
+    </Button>
+  );
+}
+
+function QuietButton(props: {
+  testID: string;
+  text: string;
+  onPress: () => void;
+}) {
+  return (
+    <Button
+      testID={props.testID}
+      variant="new_anchor"
+      onPress={props.onPress}
+      sx={{ mt: "spacing6" }}
+    >
+      <Text sx={{ fontSize: "xs", color: "paragraph-secondary" }}>
+        {props.text}
+      </Text>
+    </Button>
   );
 }
 
@@ -140,60 +107,148 @@ export function UnlockScreen(props: {
   const password = props.credentials.find(
     (credential) => credential.type === "password"
   );
-  const securityKeys = props.credentials.filter(
-    (
-      credential
-    ): credential is Extract<
-      CredentialWithoutSecret,
-      { type: "securityKey" }
-    > => credential.type === "securityKey"
+  const securityKey = props.credentials.find(
+    (credential): credential is SecurityKeyCredential =>
+      credential.type === "securityKey"
   );
+  const [mode, setMode] = useState<"password" | "securityKey" | "choose">(
+    password ? "password" : "choose"
+  );
+  const [value, setValue] = useState("");
+  const [error, setError] = useState<string>();
+  const [isUnlocking, setIsUnlocking] = useState(false);
+
+  const switchMode = (next: "password" | "securityKey") => {
+    setMode(next);
+    setValue("");
+    setError(undefined);
+  };
+
+  const unlock = async () => {
+    setError(undefined);
+    if (mode === "password" && password) {
+      if (!value) {
+        setError(strings.passwordIsRequired());
+        return;
+      }
+      setIsUnlocking(true);
+      await useKeyStore
+        .getState()
+        .unlock({ ...password, password: value })
+        .catch((e) => setError(describeError(e)))
+        .finally(() => setIsUnlocking(false));
+    } else if (mode === "securityKey" && securityKey) {
+      setIsUnlocking(true);
+      try {
+        const { encryptionKey } = await WebAuthn.getEncryptionKey(
+          securityKey.config,
+          value
+        );
+        await useKeyStore
+          .getState()
+          .unlock({ ...securityKey, key: encryptionKey });
+      } catch (e) {
+        setError((e as Error).message);
+      } finally {
+        setIsUnlocking(false);
+      }
+    }
+  };
 
   return (
-    <AuthContainer showChangeServer={false}>
-      <AuthFormContainer<"unlock", UnlockFormData>
-        type="unlock"
-        title={strings.unlockNotes()}
-        titleTestID="unlock-note-title"
-        subtitle={strings.verifyItsYou()}
-        onSubmit={async (form) => {
-          if (!password) return;
-          if (!form.password) throw new Error(strings.passwordIsRequired());
-          await useKeyStore
-            .getState()
-            .unlock({ ...password, password: form.password })
-            .catch((e) => {
-              throw new Error(describeError(e));
-            });
+    <Flex
+      testID="unlock-screen"
+      sx={{
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        bg: "background",
+        px: "spacing8"
+      }}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+          maxWidth: 340
         }}
       >
-        {(_, options) => (
-          <>
-            {password ? (
-              <>
-                <AuthField
-                  id="password"
-                  testID="app-lock-password"
-                  type="password"
-                  label={strings.enterPassword()}
-                  autoFocus
-                />
-                <SubmitButton
-                  loading={options?.loading}
-                  text={strings.unlock()}
-                />
-              </>
-            ) : null}
-            {securityKeys.map((credential) => (
-              <SecurityKeyUnlock
-                key={credential.id}
-                credential={credential}
-                separated={!!password}
+        <Logo size={36} />
+        <Text
+          testID="unlock-note-title"
+          sx={{
+            mt: "spacing8",
+            mb: "spacing9",
+            fontSize: "xl",
+            fontWeight: 600,
+            color: "heading",
+            textAlign: "center"
+          }}
+        >
+          {strings.unlockNotes()}
+        </Text>
+
+        {mode === "choose" ? null : (
+          <Flex
+            sx={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "spacing4",
+              width: "100%"
+            }}
+          >
+            <Flex sx={{ flex: 1 }}>
+              <Field
+                key={mode}
+                testID={
+                  mode === "password"
+                    ? "app-lock-password"
+                    : "app-lock-security-key-pin"
+                }
+                type="password"
+                placeholder={
+                  mode === "password" ? strings.enterPassword() : "PIN"
+                }
+                autoFocus
+                value={value}
+                onChangeText={setValue}
+                onSubmit={unlock}
+                sx={{ width: "100%" }}
+                styles={authFieldProps.styles}
               />
-            ))}
-          </>
+            </Flex>
+            <SubmitArrow
+              testID="app-lock-submit"
+              loading={isUnlocking}
+              onPress={unlock}
+            />
+          </Flex>
         )}
-      </AuthFormContainer>
-    </AuthContainer>
+
+        {error ? (
+          <AuthErrorText
+            error={error}
+            sx={{ mt: "spacing4", p: 0, alignSelf: "flex-start" }}
+          />
+        ) : null}
+
+        {securityKey && mode !== "securityKey" ? (
+          <QuietButton
+            testID="app-lock-use-security-key"
+            text={strings.unlockWithSecurityKey()}
+            onPress={() => switchMode("securityKey")}
+          />
+        ) : null}
+        {password && mode === "securityKey" ? (
+          <QuietButton
+            testID="app-lock-use-password"
+            text={strings.enterPassword()}
+            onPress={() => switchMode("password")}
+          />
+        ) : null}
+      </Flex>
+    </Flex>
   );
 }

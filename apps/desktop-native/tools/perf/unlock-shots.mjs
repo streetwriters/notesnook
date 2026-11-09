@@ -14,7 +14,10 @@ const { launchApp } = await import(
 );
 
 process.env.RN_GPUI_TEST_PROJECT = appDir;
-process.env.RN_GPUI_TEST_BUNDLE ??= path.join(appDir, "desktop/build/index-unlock.bundle");
+process.env.RN_GPUI_TEST_BUNDLE ??= path.join(
+  appDir,
+  "desktop/build/index-unlock.bundle"
+);
 process.env.RN_GPUI_TEST_BINARY ??= path.join(
   appDir,
   "desktop/build/target/debug/react-native-gpui--notesnook-desktop-native"
@@ -77,25 +80,31 @@ for (const scheme of ["light", "dark"]) {
         await sleep(30);
         await save("busy");
         for (let i = 0; i < 40; i++) {
-          if ((await app.getByText("Wrong password").count()) > 0) break;
+          if (
+            (await app.getByText("Wrong password", { exact: false }).count()) >
+            0
+          )
+            break;
           await sleep(150);
         }
         await app.waitForIdle();
         await sleep(300);
         await save("wrong-password");
       }
-      if (seed.seedAppLockSecurityKey && !seed.seedAppLockPassword) {
+      if (seed.seedAppLockSecurityKey) {
+        await app.getByTestId("app-lock-use-security-key").click();
+        await app.waitForIdle();
+        await sleep(500);
+        await save("security-key-pin");
         await app.getByTestId("app-lock-security-key-pin").type("1234");
         await app.press("enter");
         for (let i = 0; i < 40; i++) {
-          if ((await app.query("testID", "app-lock-security-key", true)).length === 0) break;
-          const texts = await app.query("testID", "error-text", true);
-          if (texts.length) break;
+          if ((await app.query("testID", "error-text", true)).length > 0) break;
           await sleep(150);
         }
         await app.waitForIdle();
         await sleep(300);
-        await save("error");
+        await save("security-key-error");
       }
     } finally {
       await app.close();
