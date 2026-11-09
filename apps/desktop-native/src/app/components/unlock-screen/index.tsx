@@ -111,9 +111,8 @@ export function UnlockScreen(props: {
     (credential): credential is SecurityKeyCredential =>
       credential.type === "securityKey"
   );
-  const [mode, setMode] = useState<"password" | "securityKey" | "choose">(
-    password ? "password" : "choose"
-  );
+  const [selected, setMode] = useState<"password" | "securityKey">();
+  const mode = selected ?? (password ? "password" : "choose");
   const [value, setValue] = useState("");
   const [error, setError] = useState<string>();
   const [isUnlocking, setIsUnlocking] = useState(false);
