@@ -22,6 +22,7 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import Config from "../utils/config";
+import { isNetworkDisabled } from "../utils/network-policy";
 import { isUserSubscribed } from "../hooks/use-is-user-premium";
 import { appVersion } from "../utils/version";
 import { findItemAndDelete, SubscriptionStatus } from "@notesnook/core";
@@ -34,7 +35,7 @@ class AnnouncementStore extends BaseStore {
   dialogAnnouncements = [];
 
   refresh = async () => {
-    if (environment.isTesting) return;
+    if (environment.isTesting || isNetworkDisabled()) return;
 
     try {
       const inlineAnnouncements = [];

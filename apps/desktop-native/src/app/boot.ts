@@ -25,6 +25,7 @@ import { DEFAULT_ITERATIONS, useKeyStore } from "./interfaces/key-store";
 import { randomBytes } from "./interfaces/subtle";
 import { setDatabaseFailed, setDatabaseReady } from "./stores/boot-store";
 import Config from "./utils/config";
+import { setNetworkDisabled } from "./utils/network-policy";
 import { logStartup } from "./utils/startup";
 
 export type BootState = {
@@ -70,6 +71,7 @@ export type BootOptions = {
   seedAppLockPassword?: string;
   seedAppLockSecurityKey?: boolean;
   seedUser?: { email?: string; plan?: "free" | "pro" };
+  disableNetwork?: boolean;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -222,6 +224,7 @@ async function installSoftAuthenticator(pin: string) {
 }
 
 export function prepareBoot(options: BootOptions) {
+  if (environment.isDev && options.disableNetwork) setNetworkDisabled(true);
   if (environment.isDev && options.resetConfig) config.clear();
   if (environment.isDev && (options.initialPath || options.initialHash))
     history.replace({

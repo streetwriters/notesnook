@@ -18,9 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { environment, updater } from "@platform";
+import { isNetworkDisabled } from "./network-policy";
 
 export async function checkForUpdate(checkOnDesktop = true) {
-  if (environment.isDesktopApp && checkOnDesktop) {
+  if (environment.isDesktopApp && checkOnDesktop && !isNetworkDisabled()) {
     await updater.check().catch(console.error);
   }
 }
