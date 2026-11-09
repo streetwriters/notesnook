@@ -11,12 +11,24 @@ import {
   start,
   typeInto
 } from "./dialogs";
+import { waitForShellContent } from "./launch";
 
 const PIN = "1234";
+const PASSWORD = "correct horse";
 let app: DesktopApp;
 
 beforeAll(async () => {
-  app = await start({ softAuthenticatorPin: PIN });
+  app = await start(
+    {
+      softAuthenticatorPin: PIN,
+      seedUser: { plan: "pro" },
+      seedAppLockPassword: PASSWORD
+    },
+    false
+  );
+  await typeInto(app, "app-lock-password", PASSWORD);
+  await clickId(app, "app-lock-submit");
+  await waitForShellContent(app);
   await openSettings(app);
   await chooseSection(app, "App lock");
 });
@@ -32,32 +44,38 @@ describe("app lock with the soft authenticator", () => {
     );
   });
 
-  test("registering a security key asks for a name then the key PIN", async () => {
+  test("registering a security key asks for the app lock password then the key PIN", async () => {
     await clickId(app, "setting-security-key-button-0");
-    await expectDialog(app, "dialog");
-    await typeInto(app, "prompt-input", "tester");
+    await typeInto(app, "password", PASSWORD);
     await clickId(app, "dialog-yes");
-    await settle(async () =>
-      expect(await count(app, "password-dialog")).toBe(0)
-    );
+    await settle(async () => expect(await count(app, "pin")).toBe(1));
     await typeInto(app, "pin", PIN);
     await clickId(app, "dialog-yes");
     await expectClosed(app, "password-dialog");
   });
 
-  test("a wrong PIN shows the retries message and keeps the dialog open", async () => {
+  test("a wrong PIN shows the retries message and closes the PIN dialog", async () => {
+    app.allowErrors(/ERR_WEBAUTHN_PIN_INVALID/u);
     await clickId(app, "setting-security-key-button-0");
     await typeInto(app, "pin", "0000");
     await clickId(app, "dialog-yes");
     await settle(async () =>
-      expect(await count(app, "password-dialog")).toBe(1)
+      expect(
+        await app.getByText("the PIN is wrong", { exact: false }).count()
+      ).toBeGreaterThan(0)
     );
-    await clickId(app, "dialog-no");
+    await expectClosed(app, "password-dialog");
   });
 
   test("locking the app shows the unlock view and the PIN unlocks it", async () => {
+    await clickId(app, "setting-security-key-button-0");
+    await typeInto(app, "pin", PIN);
+    await clickId(app, "dialog-yes");
+    await expectClosed(app, "password-dialog");
     await app.press("escape");
+    await expectClosed(app, "settings-dialog");
     await clickId(app, "lock-app");
+    await clickId(app, "app-lock-use-security-key");
     await settle(async () =>
       expect(await count(app, "app-lock-security-key-pin")).toBe(1)
     );

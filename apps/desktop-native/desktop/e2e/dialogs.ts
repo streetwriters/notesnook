@@ -18,7 +18,8 @@ export const seedNotes = [
 }));
 
 export async function start(
-  initialProps: Record<string, unknown> = {}
+  initialProps: Record<string, unknown> = {},
+  waitForShell = true
 ): Promise<DesktopApp> {
   const app = await launchApp({
     disableAnimations: true,
@@ -32,7 +33,7 @@ export async function start(
     async () => expect(await app.getByTestId("app").count()).toBeGreaterThan(0),
     { timeout: 90000, interval: 500 }
   );
-  await waitForShellContent(app);
+  if (waitForShell) await waitForShellContent(app);
   return app;
 }
 
