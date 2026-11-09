@@ -3,6 +3,7 @@ import { type DesktopApp } from "@react-native-gpui/testing";
 import {
   clickId,
   count,
+  ctrlClick,
   goTo,
   isRowSelected,
   listTexts,
@@ -44,14 +45,13 @@ describe("keyboard list navigation", () => {
     await waitUntil(() => isRowSelected(app, "Pinned plan"));
   });
 
-  test("end jumps to the last note and home to the first", async () => {
-    await app.press("end");
-    const titles = (await listTexts(app)).filter(Boolean);
-    await waitUntil(() =>
-      isRowSelected(app, titles[titles.length - 1] as string)
-    );
-    await app.press("home");
-    await waitUntil(() => isRowSelected(app, titles[0] as string));
+  test("arrow down past the last note wraps to the first, like web", async () => {
+    await app.press("escape");
+    await plainClick(app, "Pinned plan");
+    const rows = (await listTexts(app)).filter(Boolean).length;
+    for (let index = 0; index < rows; index++) await app.press("down");
+    await app.mouseMove({ x: 4, y: 4 });
+    await waitUntil(() => isRowSelected(app, "Pinned plan"));
   });
 
   test("enter opens the focused note in the editor", async () => {
@@ -61,10 +61,13 @@ describe("keyboard list navigation", () => {
     );
   });
 
-  test("delete on a focused note asks nothing and moves it to the trash", async () => {
+  test("delete moves the selected notes to the trash", async () => {
     await clickId(app, "tab-home");
-    await plainClick(app, "Travel itinerary");
+    await app.press("escape");
+    await plainClick(app, "Pinned plan");
+    await ctrlClick(app, "Travel itinerary");
     await app.press("delete");
+    await clickId(app, "dialog-yes");
     await settle(async () =>
       expect(await listTexts(app)).not.toContain("Travel itinerary")
     );

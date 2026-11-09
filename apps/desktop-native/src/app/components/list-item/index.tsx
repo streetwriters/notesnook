@@ -20,7 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Item } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
+import { environment } from "@platform";
 import {
+  Box,
   Flex,
   Text,
   type ColorValue,
@@ -203,6 +205,12 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
         ...props.sx
       }}
     >
+      {environment.isDev && selected ? (
+        <Box
+          testID="list-item-selected"
+          sx={{ position: "absolute", width: 0, height: 0 }}
+        />
+      ) : null}
       {!isCompact ? props.header : null}
       <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
         {typeof props.title === "string" ? (

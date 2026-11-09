@@ -181,14 +181,28 @@ export async function rowBackground(app: DesktopApp, title: string) {
 }
 
 export async function isRowSelected(app: DesktopApp, title: string) {
-  await app.mouseMove({ x: 4, y: 4 });
-  await app.waitForIdle();
-  const selected = await rowBackground(app, title);
-  const [plain] = await listTexts(app).then((all) =>
-    all.filter((candidate) => candidate && candidate !== title)
+  const entry = await titleEntry(app, title);
+  const rows: { frame: { y: number; height: number } }[] = await app.query(
+    "testID",
+    "list-item",
+    true
   );
-  const reference = plain ? await rowBackground(app, plain) : [255, 255, 255];
-  return selected.join(",") !== reference.join(",");
+  const row = rows.find(
+    (candidate) =>
+      entry.frame.y >= candidate.frame.y &&
+      entry.frame.y <= candidate.frame.y + candidate.frame.height
+  );
+  if (!row) return false;
+  const markers: { frame: { y: number } }[] = await app.query(
+    "testID",
+    "list-item-selected",
+    true
+  );
+  return markers.some(
+    (marker) =>
+      marker.frame.y >= row.frame.y - 1 &&
+      marker.frame.y <= row.frame.y + row.frame.height
+  );
 }
 
 export async function waitUntil(check: () => Promise<boolean>) {
