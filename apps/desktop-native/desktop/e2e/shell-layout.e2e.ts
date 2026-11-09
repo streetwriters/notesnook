@@ -49,6 +49,15 @@ beforeAll(async () => {
     async () => expect(await app.getByTestId("app").count()).toBeGreaterThan(0),
     { timeout: 90000, interval: 500 }
   );
+  await vi.waitFor(
+    async () =>
+      expect(
+        (
+          await app.query("testID", "navigation-item", true)
+        ).length
+      ).toBeGreaterThan(0),
+    { timeout: 60000, interval: 300 }
+  );
 });
 
 afterAll(async () => {
@@ -213,6 +222,13 @@ test("a list item context menu opens on right click", async () => {
 });
 
 test("releasing the sash outside the window ends the drag", async () => {
+  await app.press("escape");
+  await app.waitForIdle();
+  await app.setWindowSize(1200, 800);
+  await vi.waitFor(
+    async () => expect((await frame("navigation-menu-root")).width).toBe(250),
+    { timeout: 10000, interval: 300 }
+  );
   const [sash] = await app.query("testID", "global-split-pane-sash-0", true);
   const centre = {
     x: sash.frame.x + sash.frame.width / 2,
