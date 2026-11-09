@@ -31,7 +31,15 @@ export interface KeyEvent {
   preventDefault(): void;
 }
 
+export interface KeyboardOptions {
+  allowInTextInput?: boolean;
+}
+
 export interface Keyboard {
   onKeyUp(handler: (event: KeyEvent) => void): Unsubscribe;
-  register(keys: string[], handler: (event: KeyEvent) => void): Unsubscribe;
+  register(
+    keys: string[],
+    handler: (event: KeyEvent) => void,
+    options?: KeyboardOptions
+  ): Unsubscribe;
 }

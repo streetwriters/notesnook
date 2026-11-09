@@ -25,12 +25,16 @@ let unsubscribe: (() => void) | undefined;
 
 function attach() {
   if (unsubscribe) return;
-  unsubscribe = keyboard.register(["escape"], (event) => {
-    const top = stack[stack.length - 1];
-    if (!top) return;
-    event.preventDefault();
-    top.current();
-  });
+  unsubscribe = keyboard.register(
+    ["escape"],
+    (event) => {
+      const top = stack[stack.length - 1];
+      if (!top) return;
+      event.preventDefault();
+      top.current();
+    },
+    { allowInTextInput: true }
+  );
 }
 
 function detach() {

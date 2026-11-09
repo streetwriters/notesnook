@@ -77,14 +77,19 @@ export const keyboard: Keyboard = {
   onKeyUp() {
     return () => {};
   },
-  register(keys, handler) {
+  register(keys, handler, options) {
     const removers = keys.map((keyString) => {
       const { combo } = convert(keyString);
       const id = `keymap:${++counter}:${combo}`;
-      Shortcut.register({ id, keys: combo });
+      Shortcut.register({
+        id,
+        keys: combo,
+        allowInTextInput: options?.allowInTextInput === true
+      });
       const remove = Shortcut.addHandler(id, () => handler(toEvent(keyString)));
       return () => {
         remove();
+        Shortcut.unregister(id);
       };
     });
     return () => removers.forEach((remove) => remove());
