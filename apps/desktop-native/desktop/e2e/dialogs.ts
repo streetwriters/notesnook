@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { expect, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
-import { launchApp } from "./launch";
+import { launchApp, waitForShellContent } from "./launch";
 
 const NOW = Date.now();
 
@@ -32,6 +32,7 @@ export async function start(
     async () => expect(await app.getByTestId("app").count()).toBeGreaterThan(0),
     { timeout: 90000, interval: 500 }
   );
+  await waitForShellContent(app);
   return app;
 }
 

@@ -1,6 +1,6 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { afterAll, afterEach, expect } from "vitest";
+import { afterAll, afterEach, expect, vi } from "vitest";
 import {
   launchApp as launch,
   type DesktopApp
@@ -69,3 +69,15 @@ afterEach(async (context) => {
     } catch {}
   }
 });
+
+export async function waitForShellContent(app: DesktopApp) {
+  await vi.waitFor(
+    async () =>
+      expect(
+        (
+          await app.query("testID", "navigation-item", true)
+        ).length
+      ).toBeGreaterThan(0),
+    { timeout: 60000, interval: 300 }
+  );
+}

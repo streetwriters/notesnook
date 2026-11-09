@@ -4,7 +4,7 @@ import path from "node:path";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
-import { launchApp } from "./launch";
+import { launchApp, waitForShellContent } from "./launch";
 
 let app: DesktopApp;
 
@@ -21,6 +21,7 @@ beforeAll(async () => {
     async () => expect(await app.getByTestId("app").count()).toBeGreaterThan(0),
     { timeout: 90000, interval: 500 }
   );
+  await waitForShellContent(app);
 });
 
 afterAll(async () => {
