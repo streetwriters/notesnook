@@ -18,7 +18,10 @@ for (const dir of dirs) {
     pool.forEach((d, index) => {
       if (!d.text || !(w.text.startsWith(d.text) || d.text.startsWith(w.text)))
         return;
-      const distance = Math.abs(d.x - w.x) + Math.abs(d.y - w.y);
+      const distance =
+        Math.abs(d.x - w.x) +
+        Math.abs(d.y - w.y) +
+        (d.text === w.text ? 0 : 10000);
       if (distance < bestDistance) {
         bestDistance = distance;
         best = index;

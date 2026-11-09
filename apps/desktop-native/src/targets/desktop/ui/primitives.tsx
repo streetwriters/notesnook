@@ -44,6 +44,7 @@ import {
   InheritedTextStyle,
   pressHandler,
   useInheritedTextStyle,
+  useMergedTextStyle,
   useStyled,
   wrapChildren
 } from "./style/use-styled";
@@ -105,8 +106,9 @@ function Container(
     : AnyPressable;
   const inner = useElementRef(ref);
   const onPress = pressHandler(props);
+  const mergedTextStyle = useMergedTextStyle(textStyle);
   const content = textStyle ? (
-    <InheritedTextStyle.Provider value={textStyle}>
+    <InheritedTextStyle.Provider value={mergedTextStyle}>
       {children}
     </InheritedTextStyle.Provider>
   ) : (
@@ -213,6 +215,7 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
       }
     });
     const inner = useElementRef(ref);
+    const mergedTextStyle = useMergedTextStyle(textStyle);
     const onPress = pressHandler(props);
     const style = { ...viewStyle };
     for (const textKey of Object.keys(textStyle ?? {})) delete style[textKey];
@@ -229,8 +232,8 @@ export const Button = forwardRef<UIElement, Contract.ButtonProps>(
         style={style}
         onPress={disabled ? undefined : onPress}
       >
-        <InheritedTextStyle.Provider value={textStyle}>
-          {wrapChildren(children, textStyle)}
+        <InheritedTextStyle.Provider value={mergedTextStyle}>
+          {wrapChildren(children, mergedTextStyle)}
         </InheritedTextStyle.Provider>
       </ButtonComponent>
     );

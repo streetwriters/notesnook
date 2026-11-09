@@ -347,6 +347,14 @@ export function pressHandler(props: BaseProps) {
   };
 }
 
+export function useMergedTextStyle(own: Style | undefined): Style | undefined {
+  const inherited = useContext(InheritedTextStyle);
+  return useMemo(
+    () => (own ? { ...inherited, ...own } : inherited),
+    [inherited, own]
+  );
+}
+
 export function useInheritedTextStyle(): Style | undefined {
   return useContext(InheritedTextStyle);
 }
