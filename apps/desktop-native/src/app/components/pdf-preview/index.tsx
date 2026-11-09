@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { files, shell } from "@platform";
+import { files, keyboard, shell, windowControls } from "@platform";
 import {
   Button,
   Flex,
@@ -34,6 +34,8 @@ import {
   ChevronUp,
   Close,
   Download,
+  ExitFullscreen,
+  Fullscreen,
   Search,
   ZoomIn,
   ZoomOut,
@@ -90,6 +92,11 @@ export function PdfPreview(props: PdfPreviewProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [pageText, setPageText] = useState("");
+  const [fullscreen, setFullscreen] = useState(windowControls.isFullscreen());
+  useEffect(
+    () => windowControls.onStateChanged((s) => setFullscreen(s.fullscreen)),
+    []
+  );
   const restored = useRef(false);
 
   const source = useMemo(() => {
@@ -129,6 +136,8 @@ export function PdfPreview(props: PdfPreviewProps) {
       showToast("error", (e as Error).message);
     }
   }
+
+  useEffect(() => keyboard.register(["mod+c"], () => void copySelection()), []);
 
   async function copySelection() {
     const text = await controller.current?.getSelectedText();
@@ -213,6 +222,16 @@ export function PdfPreview(props: PdfPreviewProps) {
             title={strings.network.download()}
             onPress={download}
           />
+          <ToolbarButton
+            testID="pdf-fullscreen"
+            icon={fullscreen ? ExitFullscreen : Fullscreen}
+            title={strings.enterFullScreen()}
+            onPress={() =>
+              fullscreen
+                ? windowControls.exitFullscreen()
+                : windowControls.enterFullscreen()
+            }
+          />
           {onClose ? (
             <ToolbarButton
               testID="pdf-close"
@@ -258,7 +277,8 @@ export function PdfPreview(props: PdfPreviewProps) {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            mx: 2
+            width: "100%",
+            px: 2
           }}
         >
           <Text variant="heading" sx={{ fontSize: 28, textAlign: "center" }}>
@@ -298,10 +318,7 @@ export function PdfPreview(props: PdfPreviewProps) {
         </Flex>
       ) : null}
       <Flex
-        onKeyDown={(event) => {
-          if (event.key === "c" && (event.metaKey || event.ctrlKey))
-            copySelection();
-        }}
+        testID="pdf-viewer"
         sx={{
           flex: state?.status === "locked" || state?.status === "error" ? 0 : 1
         }}

@@ -57,6 +57,11 @@ export const windowControls: WindowControls = {
       subscription?.remove();
     };
   },
+  enterFullscreen() {
+    main()
+      .then((window) => window.setFullscreen(true))
+      .catch(console.error);
+  },
   exitFullscreen() {
     main()
       .then((window) => window.setFullscreen(false))

@@ -29,6 +29,7 @@ export interface WindowControls {
   getTitle(): string;
   getState(): Promise<WindowState>;
   onStateChanged(handler: (state: WindowState) => void): Unsubscribe;
+  enterFullscreen(): void;
   exitFullscreen(): void;
   isFullscreen(): boolean;
   focus(): void;
