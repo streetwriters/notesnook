@@ -83,6 +83,16 @@ try {
     }
     const endMove = performance.now();
     await app.mouseUp({ x: start.x + direction * distance, y: start.y });
+    if (process.env.TIMERS) {
+      const seen = new Set();
+      for (let i = 0; i < 60; i++) {
+        const status = await app.request("idleStatus");
+        for (const line of JSON.stringify(status).match(/timer \d+: [^"]*/g) ?? [])
+          seen.add(line);
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+      console.log("TIMERS", JSON.stringify([...seen]));
+    }
     await app.waitForIdle();
     const drainMs = performance.now() - endMove;
     const stats = await app.layoutStats({ reset: true });

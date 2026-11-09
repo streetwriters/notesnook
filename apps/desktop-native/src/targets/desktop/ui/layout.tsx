@@ -95,7 +95,6 @@ export const SplitPane = forwardRef<
     readPaneSizes(autoSaveId, panes)
   );
   const [total, setTotal] = useState(0);
-  const [dragging, setDragging] = useState<number | undefined>();
   const expanded = useRef<Record<string, number>>({});
   const onChange = useRef(props.onChange);
   onChange.current = props.onChange;
@@ -151,7 +150,7 @@ export const SplitPane = forwardRef<
   }, [commit]);
 
   const clamp = (pane: PaneState, size: number) => {
-    if (pane.snap > 0 && size < pane.snap) return 0;
+    if (pane.snap > 0 && size < pane.snap) return pane.min;
     return Math.max(pane.min, Math.min(pane.max, size));
   };
 
@@ -160,10 +159,11 @@ export const SplitPane = forwardRef<
     () => ({
       collapse: (index) => {
         const current = sizes[index];
-        if (current === undefined || current === 0) return;
+        const min = panes[index].min;
+        if (current === undefined || current === min) return;
         expanded.current[panes[index].id] = current;
         config.set(`csp:${autoSaveId}-${panes[index].id}:expanded`, current);
-        commit(sizes.map((size, i) => (i === index ? 0 : size)));
+        commit(sizes.map((size, i) => (i === index ? min : size)));
       },
       expand: (index) => {
         const size =
@@ -176,7 +176,7 @@ export const SplitPane = forwardRef<
       },
       reset: (index) =>
         commit(sizes.map((s, i) => (i === index ? panes[index].initial : s))),
-      isCollapsed: (index) => sizes[index] === 0,
+      isCollapsed: (index) => sizes[index] === panes[index].min,
       hasExpandedSize: (index) =>
         expanded.current[panes[index].id] !== undefined ||
         config.get<number | undefined>(
@@ -186,9 +186,9 @@ export const SplitPane = forwardRef<
     [autoSaveId, commit, panes, sizes]
   );
 
-  const gesture = useRef<{ start: number; size: number } | undefined>(
-    undefined
-  );
+  const gesture = useRef<
+    { start: number; size: number; index: number } | undefined
+  >(undefined);
 
   const drag = (index: number, position: number) => {
     const start = gesture.current;
@@ -214,7 +214,6 @@ export const SplitPane = forwardRef<
     }
     if (gesture.current) persist(latest.current);
     gesture.current = undefined;
-    setDragging(undefined);
   };
 
   const pointerPosition = (event: any) => {
@@ -265,9 +264,9 @@ export const SplitPane = forwardRef<
               if (!resizable) return;
               gesture.current = {
                 start: pointerPosition(event),
-                size: sizes[index] ?? 0
+                size: sizes[index] ?? 0,
+                index
               };
-              setDragging(index);
             }}
           />
         </AnyView>
@@ -280,7 +279,8 @@ export const SplitPane = forwardRef<
       {...nativeProps}
       style={viewStyle}
       onPointerMove={(event: any) => {
-        if (dragging !== undefined) drag(dragging, pointerPosition(event));
+        if (gesture.current)
+          drag(gesture.current.index, pointerPosition(event));
       }}
       onPointerUp={endGesture}
       onPointerCancel={endGesture}

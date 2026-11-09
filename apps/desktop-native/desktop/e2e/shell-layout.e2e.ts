@@ -172,8 +172,7 @@ test("ctrl+t opens a new editor tab and ctrl+w closes it", async () => {
       ),
     { timeout: 10000, interval: 300 }
   );
-  const closeButtons = await app.query("testID", "tab-close-button", true);
-  await app.click(closeButtons[closeButtons.length - 1].tag);
+  await app.press("mod-w");
   await vi.waitFor(
     async () =>
       expect((await app.query("testID", "tab-title", true)).length).toBe(
@@ -213,7 +212,7 @@ test("a list item context menu opens on right click", async () => {
   await app.press("escape");
 });
 
-test.skip("releasing the sash outside the window ends the drag", async () => {
+test("releasing the sash outside the window ends the drag", async () => {
   const [sash] = await app.query("testID", "global-split-pane-sash-0", true);
   const centre = {
     x: sash.frame.x + sash.frame.width / 2,
