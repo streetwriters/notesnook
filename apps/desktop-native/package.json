@@ -19,7 +19,7 @@
     "test:unit": "vitest run --config vitest.unit.config.ts"
   },
   "dependencies": {
-    "@ammarahmed/react-native-eventsource": "file:../../../../react-native/gpui-modules/tgz/ammarahmed-react-native-eventsource-1.2.0.tgz",
+    "@ammarahmed/react-native-eventsource": "file:../../../../react-native/gpui-modules/tgz/ammarahmed-react-native-eventsource-1.2.1.tgz",
     "@ammarahmed/react-native-sodium": "file:../../../../../Projects/react-native/gpui-modules/tgz/ammarahmed-react-native-sodium-2.0.0-alpha.2.tgz",
     "@formatjs/intl-locale": "4.0.0",
     "@formatjs/intl-pluralrules": "5.2.14",
