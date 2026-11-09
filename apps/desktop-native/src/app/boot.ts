@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EV, EVENTS } from "@notesnook/core";
 import { config, environment, history, lifecycle } from "@platform";
 import { db, initializeDatabase } from "./common/db";
 import { initLocaleSync } from "./common/locale";
@@ -74,6 +75,7 @@ export type BootOptions = {
   seedUser?: { email?: string; plan?: "free" | "pro" };
   disableNetwork?: boolean;
   seedConfig?: Record<string, unknown>;
+  simulateMigrationMs?: number;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -245,6 +247,13 @@ async function run(options: BootOptions) {
     await new Promise((resolve) =>
       setTimeout(resolve, options.delayDatabaseMs)
     );
+  if (environment.isDev && options.simulateMigrationMs) {
+    EV.publish(EVENTS.migrationStarted, "notesnook");
+    await new Promise((resolve) =>
+      setTimeout(resolve, options.simulateMigrationMs)
+    );
+    EV.publish(EVENTS.migrationFinished, "notesnook");
+  }
   await initializeDatabase(
     getCurrentPath().startsWith("/account/recovery") ? "memory" : "db"
   );

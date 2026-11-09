@@ -329,14 +329,14 @@ export async function initializeDatabase<Schema>(
       db,
       provider: migrationProvider
     });
-    const needsMigration = await migrator
-      .getMigrations()
-      .then((m) => m.some((m) => !m.executedAt));
+    const known = await migrator.getMigrations();
+    const needsMigration = known.some((m) => !m.executedAt);
     if (!needsMigration) return db;
 
-    EV.publish(EVENTS.migrationStarted, name);
+    const isUpgrade = known.some((m) => !!m.executedAt);
+    if (isUpgrade) EV.publish(EVENTS.migrationStarted, name);
     const { error, results } = await migrator.migrateToLatest();
-    EV.publish(EVENTS.migrationFinished, name);
+    if (isUpgrade) EV.publish(EVENTS.migrationFinished, name);
 
     if (error)
       throw error instanceof Error ? error : new Error(JSON.stringify(error));

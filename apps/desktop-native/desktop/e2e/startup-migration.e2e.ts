@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
 import { launchApp, waitForShellContent } from "./launch";
 
@@ -12,11 +12,19 @@ const migrations = (label: string) =>
     .split("\n")
     .filter((line) => line.includes("migration started"));
 
-async function launch(label: string) {
+const overlays = (label: string) =>
+  readFileSync(logOf(label), "utf8")
+    .split("\n")
+    .filter((line) => line.includes("migration overlay shown"));
+
+async function launch(
+  label: string,
+  initialProps: Record<string, unknown> = {}
+) {
   const app = await launchApp({
     disableAnimations: true,
     timeout: 180000,
-    initialProps: {},
+    initialProps,
     env: { RN_GPUI_APP_DATA_DIR: dataDir },
     logFile: logOf(label)
   });
@@ -35,10 +43,12 @@ async function watchForOverlay(app: DesktopApp, milliseconds: number) {
 }
 
 describe("the migrating database overlay", () => {
-  test("a new profile migrates once", async () => {
+  test("a new profile creates its database without showing the overlay", async () => {
     const app = await launch("first");
-    expect(migrations("first").length).toBe(1);
+    await watchForOverlay(app, 3000);
+    expect(migrations("first")).toEqual([]);
     await app.close();
+    expect(overlays("first")).toEqual([]);
   });
 
   test("the second launch of the same profile never shows it", async () => {
@@ -46,6 +56,7 @@ describe("the migrating database overlay", () => {
     await watchForOverlay(app, 3000);
     expect(migrations("second")).toEqual([]);
     await app.close();
+    expect(overlays("second")).toEqual([]);
   });
 
   test("a JS reload never shows it either", async () => {
@@ -57,5 +68,18 @@ describe("the migrating database overlay", () => {
     }
     expect(migrations("reload")).toEqual([]);
     await app.close();
+  });
+
+  test("a migration that lasts longer than 300 ms shows it", async () => {
+    const app = await launch("slow", { simulateMigrationMs: 2000 });
+    await app.close();
+    expect(overlays("slow").length).toBe(1);
+  });
+
+  test("a migration shorter than 300 ms never shows it", async () => {
+    const app = await launch("quick", { simulateMigrationMs: 100 });
+    await watchForOverlay(app, 2000);
+    await app.close();
+    expect(overlays("quick")).toEqual([]);
   });
 });

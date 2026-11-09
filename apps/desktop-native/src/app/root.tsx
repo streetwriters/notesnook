@@ -28,6 +28,7 @@ import { getPersistence, getRoute } from "./bootstrap";
 import { useStore as useNoteStore } from "./stores/note-store";
 import { useBootStore } from "./stores/boot-store";
 import Config from "./utils/config";
+import { createMigrationOverlay } from "./utils/migration-overlay";
 import { logStartup } from "./utils/startup";
 import AppLock from "./views/app-lock";
 import { BaseThemeProvider } from "./components/theme-provider";
@@ -157,15 +158,20 @@ function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
   }, [isMigrating, markContentReady]);
 
   useEffect(() => {
+    const overlay = createMigrationOverlay((visible) => {
+      if (visible) logStartup("migration overlay shown");
+      setIsMigrating(visible);
+    });
     const started = EV.subscribe(EVENTS.migrationStarted, (name) => {
       logStartup(`migration started: ${String(name)}`);
-      setIsMigrating(name === "notesnook");
+      if (name === "notesnook") overlay.start();
     });
     const finished = EV.subscribe(EVENTS.migrationFinished, () => {
       logStartup("migration finished");
-      setIsMigrating(false);
+      overlay.finish();
     });
     return () => {
+      overlay.dispose();
       started.unsubscribe();
       finished.unsubscribe();
     };

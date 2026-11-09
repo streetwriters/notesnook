@@ -34,6 +34,7 @@ import {
   SqliteBooleanPlugin
 } from "../src/database/index.js";
 import { describe, expect, test } from "vitest";
+import { EV, EVENTS } from "../src/common.js";
 
 function createSchemaTestDatabase() {
   const sqlite = BetterSQLite3(":memory:").unsafeMode(true);
@@ -127,6 +128,50 @@ describe("Schema migration recovery", () => {
       expect(migrationRow.rows).toHaveLength(1);
       expect(table.rows).toHaveLength(1);
     } finally {
+      await db.destroy();
+    }
+  });
+
+  test("creating a new database does not announce a migration", async () => {
+    const db = createSchemaTestDatabase();
+    const events: string[] = [];
+    const started = EV.subscribe(EVENTS.migrationStarted, () =>
+      events.push("started")
+    );
+    const finished = EV.subscribe(EVENTS.migrationFinished, () =>
+      events.push("finished")
+    );
+
+    try {
+      await initializeDatabase(db, new NNMigrationProvider(), "notesnook-test");
+      expect(events).toEqual([]);
+    } finally {
+      started.unsubscribe();
+      finished.unsubscribe();
+      await db.destroy();
+    }
+  });
+
+  test("upgrading an existing database announces the migration", async () => {
+    const db = createSchemaTestDatabase();
+    const events: string[] = [];
+    const started = EV.subscribe(EVENTS.migrationStarted, () =>
+      events.push("started")
+    );
+    const finished = EV.subscribe(EVENTS.migrationFinished, () =>
+      events.push("finished")
+    );
+
+    try {
+      const { provider } = await createMigrationProviderBefore("a-2026-04-06");
+      await initializeDatabase(db, provider, "notesnook-test");
+      expect(events).toEqual([]);
+
+      await initializeDatabase(db, new NNMigrationProvider(), "notesnook-test");
+      expect(events).toEqual(["started", "finished"]);
+    } finally {
+      started.unsubscribe();
+      finished.unsubscribe();
       await db.destroy();
     }
   });
