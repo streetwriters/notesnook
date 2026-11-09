@@ -250,7 +250,7 @@ export const SettingsDialog = DialogManager.register(function SettingsDialog(
           testID="settings-content"
           sx={{ flex: 1, bg: "background", p: 20 }}
         >
-          <Flex sx={{ flexDirection: "column", gap: 20 }}>
+          <Flex sx={{ flexDirection: "column", gap: 20, pt: 20 }}>
             {groups.length > 0 ? (
               groups.map((group, index) => (
                 <SettingsGroupComponent

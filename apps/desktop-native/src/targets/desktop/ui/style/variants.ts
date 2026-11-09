@@ -31,7 +31,10 @@ function resolveVariables(value: unknown, colors: Record<string, string>) {
   const stripped = value.replace(/\s*!important\s*$/, "");
   const match = /^var\(--([\w-]+)\)$/.exec(stripped);
   if (match) return colors[match[1]] ?? stripped;
-  return stripped;
+  return stripped.replace(
+    /var\(--([\w-]+)\)/g,
+    (whole, name: string) => colors[name] ?? whole
+  );
 }
 
 export function normalizeVariant(

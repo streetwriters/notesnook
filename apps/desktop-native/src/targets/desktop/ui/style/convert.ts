@@ -48,6 +48,7 @@ const STATE_PROPERTIES = new Set([
   "opacity",
   "boxShadow",
   "transform",
+  "outline",
   "outlineColor",
   "outlineWidth",
   "outlineOffset"
@@ -146,6 +147,25 @@ function convertValue(key: string, value: unknown): [string, unknown][] {
 
   parseCache.set(cacheKey, result);
   return result;
+}
+
+const OUTLINE = /^(\d+(?:\.\d+)?)px\s+(?:solid|dashed|dotted)\s+(\S.*)$/;
+const CSS_VAR = /^var\(--([a-z0-9-]+)\)(?:\s*!important)?$/;
+
+export function convertOutline(value: unknown): [string, unknown][] {
+  if (typeof value !== "string") return [];
+  const text = value.trim();
+  if (text === "none" || /^\d+(?:\.\d+)?px\s+none\b/.test(text))
+    return [["outlineWidth", 0]];
+  const match = OUTLINE.exec(text);
+  if (!match) return [];
+  const color = match[2].trim();
+  const variable = CSS_VAR.exec(color);
+  return [
+    ["outlineWidth", parseFloat(match[1])],
+    ["outlineColor", variable ? variable[1] : color],
+    ["outlineOffset", 0]
+  ];
 }
 
 const SIDES = ["Top", "Right", "Bottom", "Left"];
@@ -247,8 +267,12 @@ export function convertDeclarations(
       case "userSelect":
         converted.selectable = value !== "none";
         continue;
+      case "outline": {
+        for (const [outlineKey, outlineValue] of convertOutline(value))
+          style[outlineKey] = outlineValue;
+        continue;
+      }
       case "wordBreak":
-      case "outline":
       case "transition":
       case "animation":
         continue;

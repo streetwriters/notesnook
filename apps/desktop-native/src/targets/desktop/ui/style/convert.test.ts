@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { describe, expect, test } from "vitest";
-import { convertDeclarations, expandFlex } from "./convert";
+import { convertDeclarations, convertOutline, expandFlex } from "./convert";
 
 describe("flex shorthand", () => {
   test("a bare number is grow with a 0% basis", () => {
@@ -109,5 +109,28 @@ describe("flex shorthand", () => {
       flexBasis: "0%"
     });
     expect(style.flex).toBeUndefined();
+  });
+});
+
+describe("outline shorthand", () => {
+  test("width, style and a theme variable become outline props", () => {
+    expect(convertOutline("2px solid var(--accent)")).toEqual([
+      ["outlineWidth", 2],
+      ["outlineColor", "accent"],
+      ["outlineOffset", 0]
+    ]);
+  });
+
+  test("none removes the outline", () => {
+    expect(convertOutline("none")).toEqual([["outlineWidth", 0]]);
+    expect(convertOutline("1.5px none")).toEqual([["outlineWidth", 0]]);
+  });
+
+  test("a literal colour is kept", () => {
+    expect(convertOutline("1px solid #ff0000")).toEqual([
+      ["outlineWidth", 1],
+      ["outlineColor", "#ff0000"],
+      ["outlineOffset", 0]
+    ]);
   });
 });
