@@ -31,6 +31,10 @@ import { ErrorBoundary, GlobalErrorHandler } from "./components/error-boundary";
 import { Logo } from "./components/navigation-menu/logo";
 import { useKeyStore } from "./interfaces/key-store";
 import { usePathname } from "./navigation";
+import {
+  useWindowReveal,
+  WindowRevealProvider
+} from "./components/window-reveal";
 
 export type RootProps = BootOptions & {
   screen?: "app" | "demo" | "platform";
@@ -40,8 +44,27 @@ export type RootProps = BootOptions & {
 };
 
 export function Root(props: RootProps) {
-  const { screen = "app", titleBarInset, ...bootOptions } = props;
   const [state, setState] = useState<Status>({ status: "loading" });
+  return (
+    <WindowRevealProvider failed={state.status === "error"}>
+      <RootContent {...props} state={state} setState={setState} />
+    </WindowRevealProvider>
+  );
+}
+
+function RootContent(
+  props: RootProps & {
+    state: Status;
+    setState: (state: Status) => void;
+  }
+) {
+  const {
+    screen = "app",
+    titleBarInset,
+    state,
+    setState,
+    ...bootOptions
+  } = props;
 
   useEffect(() => {
     boot(bootOptions)
@@ -50,7 +73,7 @@ export function Root(props: RootProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (screen === "demo") return <Demo state={state} {...props} />;
+  if (screen === "demo") return <Demo {...props} state={state} />;
   if (screen === "platform" && state.status === "ready")
     return <PlatformSmoke />;
   if (state.status === "ready")
@@ -70,6 +93,7 @@ export function Root(props: RootProps) {
         </GlobalErrorHandler>
       </ErrorBoundary>
     );
+  if (state.status !== "error") return null;
   return (
     <Flex
       sx={{
@@ -80,7 +104,7 @@ export function Root(props: RootProps) {
       }}
     >
       <Text testID="boot-state" sx={{ color: "paragraph" }}>
-        {state.status === "error" ? `Error: ${state.message}` : "Loading"}
+        {`Error: ${state.message}`}
       </Text>
     </Flex>
   );
@@ -94,6 +118,11 @@ function RouteWrapper(props: { isLoggedIn: boolean; titleBarInset?: number }) {
   const persistence = getPersistence(path);
   const { Component } = route;
   const routeProps = route.props;
+  const markContentReady = useWindowReveal();
+
+  useEffect(() => {
+    if (!isMigrating && isKeyStoreReady) markContentReady();
+  }, [isMigrating, isKeyStoreReady, markContentReady]);
 
   useEffect(() => {
     const started = EV.subscribe(EVENTS.migrationStarted, (name) =>

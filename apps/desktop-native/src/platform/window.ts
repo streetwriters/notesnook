@@ -32,4 +32,6 @@ export interface WindowControls {
   exitFullscreen(): void;
   isFullscreen(): boolean;
   focus(): void;
+  show(): Promise<void>;
+  startedHidden(): boolean;
 }

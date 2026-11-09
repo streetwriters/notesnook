@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
+  Fragment,
   useCallback,
   useEffect,
   useRef,
@@ -38,6 +39,7 @@ import {
   type CredentialWithoutSecret
 } from "../interfaces/key-store";
 import { DialogManager } from "../common/dialog-manager";
+import { useWindowReveal } from "../components/window-reveal";
 
 export default function AppLock(props: PropsWithChildren<unknown>) {
   const credentials = useKeyStore((store) => store.activeCredentials());
@@ -50,6 +52,11 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
 
   const [error, setError] = useState<string>();
   const [isUnlocking, setIsUnlocking] = useState(false);
+  const markContentReady = useWindowReveal();
+
+  useEffect(() => {
+    if (isLocked) markContentReady();
+  }, [isLocked, markContentReady]);
 
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
@@ -187,7 +194,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
               switch (credential.type) {
                 case "password":
                   return (
-                    <>
+                    <Fragment key={credential.id}>
                       <Field
                         value={password}
                         onChangeText={setPassword}
@@ -206,7 +213,7 @@ export default function AppLock(props: PropsWithChildren<unknown>) {
                       >
                         {strings.continue()}
                       </Button>
-                    </>
+                    </Fragment>
                   );
                 case "securityKey":
                   return (

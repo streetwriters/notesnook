@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { DesktopWindow } from "@react-native-gpui/core/desktop";
+import { App, DesktopWindow } from "@react-native-gpui/core/desktop";
 import type { WindowControls, WindowState } from "../../../platform";
 
 let mainWindow: Promise<DesktopWindow> | undefined;
@@ -67,5 +67,11 @@ export const windowControls: WindowControls = {
     main()
       .then((window) => window.focus())
       .catch(console.error);
-  }
+  },
+  async show() {
+    const window = await main();
+    await window.show();
+    await window.focus();
+  },
+  startedHidden: () => App.launchArgs().includes("--hidden")
 };
