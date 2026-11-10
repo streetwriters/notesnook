@@ -182,7 +182,7 @@ export async function htmlToPdf(
         files: note.files,
         fonts: APP_FONTS,
         title: title || undefined,
-        systemFonts: "auto",
+        systemFonts: "fallback",
         timeoutMs: TIMEOUT_MS
       });
       return new Uint8Array(result.pdf!);
