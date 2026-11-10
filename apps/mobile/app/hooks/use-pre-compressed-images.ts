@@ -17,190 +17,99 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { useCallback, useEffect, useRef, useState } from "react";
-import RNFetchBlob from "react-native-blob-util";
 import {
+  CompressedImage,
   compressImage,
-  getCompressionType
+  getCompressionType,
+  unlinkFile
 } from "../common/filesystem/compress";
-
-export type CompressedImageResult = {
-  uri: string;
-  size: number;
-  /** Compression did not reduce the size so the original file was kept. */
-  original?: boolean;
-};
 
 export type PreCompressItem = {
   key: string;
   /** file:// prefixed input path */
   path: string;
-  /** mime type or path used to detect png/jpeg. */
+  /** mime type used to detect png/jpeg. */
   mime?: string;
   size?: number;
 };
-
-const unlink = (path: string) =>
-  RNFetchBlob.fs.unlink(path.replace("file://", "")).catch(() => {
-    /* empty */
-  });
-
-export function getImageSize(
-  item: { key: string; size?: number },
-  compressed: Record<string, CompressedImageResult>,
-  compress: boolean
-) {
-  return compress ? (compressed[item.key]?.size ?? item.size) : item.size;
-}
-
-export function getTotalImageSize(
-  items: { key: string; size?: number }[],
-  compressed: Record<string, CompressedImageResult>,
-  compress: boolean
-) {
-  return items.reduce(
-    (acc, item) => acc + (getImageSize(item, compressed, compress) ?? 0),
-    0
-  );
-}
 
 /**
  * Compresses png/jpeg images one at a time in the background so their final
  * size can be shown before they are attached. Every key is compressed once;
  * items added later are queued too.
  */
-export function usePreCompressedImages(items: PreCompressItem[]) {
-  const [compressed, setCompressed] = useState<
-    Record<string, CompressedImageResult>
+export function usePreCompressedImages(
+  items: PreCompressItem[],
+  enabled: boolean
+) {
+  // null = failed to compress. A key that is not in results is still pending.
+  const [results, setResults] = useState<
+    Record<string, CompressedImage | null>
   >({});
-  const [settled, setSettled] = useState<Record<string, boolean>>({});
-  const seenRef = useRef(new Set<string>());
-  const queueRef = useRef<PreCompressItem[]>([]);
-  const runningRef = useRef(false);
-  const releasedRef = useRef(new Set<string>());
-  const tempFilesRef = useRef<Record<string, string>>({});
-  const confirmedRef = useRef(false);
-  const disposedRef = useRef(false);
-
-  const processQueue = useCallback(async () => {
-    if (runningRef.current) return;
-    runningRef.current = true;
-    while (queueRef.current.length > 0 && !disposedRef.current) {
-      const item = queueRef.current.shift() as PreCompressItem;
-      try {
-        const res = await compressImage(
-          item.path,
-          getCompressionType(item.mime ?? item.path) as "PNG" | "JPEG"
-        );
-        const isDiscarded = () =>
-          disposedRef.current || releasedRef.current.has(item.key);
-        if (isDiscarded()) {
-          unlink(res.uri);
-          continue;
-        }
-
-        let originalSize = item.size;
-        if (!originalSize) {
-          try {
-            originalSize = (
-              await RNFetchBlob.fs.stat(item.path.replace("file://", ""))
-            ).size;
-          } catch (e) {
-            /* empty */
-          }
-          if (isDiscarded()) {
-            unlink(res.uri);
-            continue;
-          }
-        }
-
-        let entry: CompressedImageResult = { uri: res.uri, size: res.size };
-        if (originalSize && res.size >= originalSize) {
-          unlink(res.uri);
-          entry = { uri: item.path, size: originalSize, original: true };
-        } else {
-          tempFilesRef.current[item.key] = res.uri.replace("file://", "");
-        }
-        setCompressed((prev) => ({ ...prev, [item.key]: entry }));
-      } catch (e) {
-        console.error("Failed to pre-compress image", e);
-      }
-      if (!disposedRef.current) {
-        setSettled((prev) => ({ ...prev, [item.key]: true }));
-      }
-    }
-    runningRef.current = false;
-  }, []);
+  const started = useRef(new Set<string>());
+  const temp = useRef(new Map<string, string>());
+  const queue = useRef(Promise.resolve());
+  const disposed = useRef(false);
+  const handedOff = useRef(false);
 
   useEffect(() => {
     for (const item of items) {
-      if (
-        !getCompressionType(item.mime ?? item.path) ||
-        seenRef.current.has(item.key)
-      )
-        continue;
-      seenRef.current.add(item.key);
-      queueRef.current.push(item);
+      const type = getCompressionType(item.mime);
+      if (!type || started.current.has(item.key)) continue;
+      started.current.add(item.key);
+      queue.current = queue.current.then(async () => {
+        if (disposed.current) return;
+        const res = await compressImage(item.path, type, item.size).catch(
+          (e) => {
+            console.error("Failed to pre-compress image", e);
+            return null;
+          }
+        );
+        if (disposed.current) {
+          if (res && !res.original) unlinkFile(res.uri);
+          return;
+        }
+        if (res && !res.original) temp.current.set(item.key, res.uri);
+        setResults((prev) => ({ ...prev, [item.key]: res }));
+      });
     }
-    processQueue();
-  }, [items, processQueue]);
+  }, [items]);
 
   const dispose = useCallback(() => {
-    disposedRef.current = true;
-    queueRef.current = [];
-    if (confirmedRef.current) return;
-    for (const key in tempFilesRef.current) {
-      unlink(tempFilesRef.current[key]);
-    }
-    tempFilesRef.current = {};
+    disposed.current = true;
+    if (!handedOff.current) temp.current.forEach(unlinkFile);
   }, []);
 
   useEffect(() => dispose, [dispose]);
 
-  const release = useCallback((key: string) => {
-    releasedRef.current.add(key);
-    queueRef.current = queueRef.current.filter((item) => item.key !== key);
-    if (tempFilesRef.current[key]) {
-      unlink(tempFilesRef.current[key]);
-      delete tempFilesRef.current[key];
-    }
-    setCompressed((prev) => {
-      if (!(key in prev)) return prev;
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
-  }, []);
-
-  /** The results were handed off to the consumer, don't delete them. */
-  const confirm = useCallback(() => {
-    confirmedRef.current = true;
-    disposedRef.current = true;
-    queueRef.current = [];
-  }, []);
-
-  const isPending = (key: string) => {
-    const item = items.find((item) => item.key === key);
-    return (
-      !disposedRef.current &&
-      !!item &&
-      !!getCompressionType(item.mime ?? item.path) &&
-      !settled[key] &&
-      !releasedRef.current.has(key)
-    );
-  };
-
-  const isCompressing = items.some((item) => isPending(item.key));
+  const isPending = (item: PreCompressItem) =>
+    enabled && !!getCompressionType(item.mime) && !(item.key in results);
+  const sizeOf = (item: PreCompressItem) =>
+    (enabled && results[item.key]?.size) || item.size || 0;
 
   return {
-    compressed,
     isPending,
-    isCompressing,
-    release,
-    confirm,
-    dispose,
-    getSize: (item: { key: string; size?: number }, compress: boolean) =>
-      getImageSize(item, compressed, compress),
-    totalSize: (list: { key: string; size?: number }[], compress: boolean) =>
-      getTotalImageSize(list, compressed, compress)
+    sizeOf,
+    isCompressing: items.some(isPending),
+    totalSize: items.reduce((total, item) => total + sizeOf(item), 0),
+    /**
+     * Hand the results off to the consumer, which becomes responsible for the
+     * temp files. Temp files that are not handed off are deleted.
+     */
+    take: () => {
+      handedOff.current = true;
+      disposed.current = true;
+      const taken: Record<string, CompressedImage> = {};
+      for (const item of items) {
+        const res = results[item.key];
+        if (res) taken[item.key] = res;
+      }
+      // Delete temp files of removed items or not yet in state.
+      temp.current.forEach((uri, key) => {
+        if (taken[key]?.uri !== uri) unlinkFile(uri);
+      });
+      return taken;
+    },
+    dispose
   };
 }
