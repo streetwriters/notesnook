@@ -27,6 +27,7 @@ import {
   Grid,
   ScrollContainer,
   Text,
+  useThemeColor,
   useWindowSize,
   type SxProp
 } from "@ui";
@@ -61,8 +62,32 @@ const SLIDE_IN: SxProp = {
   }
 };
 
-function Slide({ children, sx }: SlideProps) {
+function patternStyle(pattern: SlideProps["pattern"], color: string): SxProp {
+  switch (pattern) {
+    case "dots":
+      return {
+        experimental_backgroundImage: `radial-gradient(circle, ${color} 1px, transparent 1px)`,
+        experimental_backgroundSize: "20px 20px",
+        experimental_backgroundPosition: "center"
+      };
+    case "grid":
+      return {
+        experimental_backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`,
+        experimental_backgroundSize: "30px 30px",
+        experimental_backgroundPosition: "center"
+      };
+    case "diagonal":
+      return {
+        experimental_backgroundImage: `repeating-linear-gradient(-45deg, transparent, transparent 20px, ${color} 20px, ${color} 21px)`
+      };
+    default:
+      return {};
+  }
+}
+
+function Slide({ children, sx, pattern }: SlideProps) {
   const { height } = useWindowSize();
+  const border = useThemeColor("border");
   return (
     <Flex
       sx={{
@@ -72,7 +97,8 @@ function Slide({ children, sx }: SlideProps) {
         justifyContent: "center",
         alignItems: "center",
         p: 4,
-        position: "relative"
+        position: "relative",
+        ...patternStyle(pattern, border)
       }}
     >
       <Flex

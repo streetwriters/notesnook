@@ -17,7 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { ColorToken } from "./style";
+
 export declare function useMediaQuery(query: string): boolean;
 export declare function matchMediaQuery(query: string): boolean;
 export declare function useWindowSize(): { width: number; height: number };
 export declare function getPointerPosition(): { x: number; y: number };
+export declare function useThemeColor(token: ColorToken): string;

@@ -21,6 +21,7 @@ import { Appearance, Dimensions, useWindowDimensions } from "react-native";
 import { useColorScheme } from "react-native";
 import type * as Contract from "../../../ui/hooks";
 import { lastPointer } from "./style/use-styled";
+import { useThemeContext } from "./theme";
 
 function evaluate(
   query: string,
@@ -63,3 +64,6 @@ export const getPointerPosition: typeof Contract.getPointerPosition = () => ({
   x: lastPointer.x,
   y: lastPointer.y
 });
+
+export const useThemeColor: typeof Contract.useThemeColor = (token) =>
+  useThemeContext().colors[token] ?? "transparent";

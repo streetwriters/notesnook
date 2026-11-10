@@ -200,6 +200,9 @@ type LayoutProps = {
 
 type AppearanceProps = {
   opacity?: number;
+  experimental_backgroundImage?: string;
+  experimental_backgroundSize?: string;
+  experimental_backgroundPosition?: string;
   borderRadius?: Responsive<RadiusToken>;
   borderTopLeftRadius?: RadiusToken;
   borderTopRightRadius?: RadiusToken;
