@@ -200,7 +200,15 @@ const SETTINGS_SECTIONS = {
 for (const [name, title] of Object.entries(SETTINGS_SECTIONS))
   scenarios[name] = {
     ...scenarios.shell,
-    steps: [...openSettings, { clickText: title }]
+    steps: [
+      ...openSettings,
+      { clickText: title },
+      ...(["Vault", "Privacy", "Legal", "Help and support", "About"].includes(
+        title
+      )
+        ? [{ scrollNav: true }]
+        : [])
+    ]
   };
 
 scenarios.settingsFirstSection = {
@@ -636,3 +644,13 @@ scenarios.probeSearchExit = {
 };
 
 delete scenarios.settingsDesktopIntegration;
+
+scenarios.probeFocus = {
+  ...scenarios.listNoteFocus,
+  steps: [
+    { click: { id: "list-item", nth: 0 } },
+    { active: "after click" },
+    { press: "down" },
+    { active: "after down" }
+  ]
+};

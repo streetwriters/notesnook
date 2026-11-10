@@ -237,6 +237,23 @@ for (const step of scenario.steps ?? []) {
         })
       )
     );
+  if (step.active)
+    console.log(
+      "ACTIVE",
+      step.active,
+      await page.evaluate(() => {
+        const el = document.activeElement;
+        return el ? `${el.tagName}.${(el.className || "").toString().slice(0, 40)}#${el.id} [${el.getAttribute("data-test-id") || ""}]` : "none";
+      })
+    );
+  if (step.scrollNav)
+    await page.evaluate(() => {
+      const root = document.querySelector('[data-test-id="settings-navigation-menu"]');
+      const nodes = [root, ...(root ? root.querySelectorAll("*") : [])];
+      for (const node of nodes)
+        if (node && node.scrollHeight > node.clientHeight + 4)
+          node.scrollTop = node.scrollHeight;
+    });
   if (step.rightClick) await target(step.rightClick).click({ button: "right" });
   if (step.press)
     await page.keyboard.press(

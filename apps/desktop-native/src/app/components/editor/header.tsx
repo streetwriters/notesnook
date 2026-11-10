@@ -65,8 +65,7 @@ function Header(props: HeaderProps) {
       sx={{
         alignItems: "center",
         flexWrap: "wrap",
-        gap: "spacing2",
-        minHeight: 30,
+        minHeight: 36,
         opacity: !noteId ? 0.5 : 1
       }}
     >
@@ -76,6 +75,8 @@ function Header(props: HeaderProps) {
           key={tag.id}
           text={tag.title}
           icon={TagIcon}
+          styles={{ text: { fontSize: "body" } }}
+          containerSx={{ height: 36, mr: 6 }}
           onClick={() => {
             useAppStore.getState().setNavigationTab("tags");
             navigate(`/tags/${tag.id}`);

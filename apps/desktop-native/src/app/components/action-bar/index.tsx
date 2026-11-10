@@ -411,6 +411,7 @@ function Tab(props: {
           numberOfLines={1}
           sx={{
             maxWidth: 120,
+            height: 14.5,
             ml: 1,
             flexShrink: 0,
             color: isActive ? "paragraph-selected" : "paragraph-secondary"

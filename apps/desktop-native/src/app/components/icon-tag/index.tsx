@@ -36,7 +36,7 @@ type IconTagProps = {
   onClick?: (event: PressEvent) => void;
   styles?: {
     icon?: { color?: ColorValue };
-    text?: { color?: ColorValue };
+    text?: { color?: ColorValue; fontSize?: SxProp["fontSize"] };
   };
   testId?: string;
   highlight?: boolean;
@@ -106,7 +106,7 @@ function IconTag(props: IconTagProps) {
         numberOfLines={1}
         sx={{
           color: styles?.text?.color ?? (highlight ? "accent" : "paragraph"),
-          fontSize: "3xs",
+          fontSize: styles?.text?.fontSize ?? "3xs",
           fontWeight: "medium"
         }}
       >

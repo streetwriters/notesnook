@@ -31,6 +31,7 @@ import { strings } from "@notesnook/intl";
 import {
   Button,
   EditorSurface,
+  type EditorHandle,
   Flex,
   Pane,
   Progress,
@@ -201,6 +202,19 @@ function EditorView({ session }: { session: EditableSession }) {
     };
   }, [session]);
 
+  const editor = useEditorManager((store) => store.editors[session.id]?.editor);
+  const focusKey = "note" in session ? session.note?.id : session.id;
+  useEffect(() => {
+    editor?.focus();
+  }, [editor, focusKey]);
+
+  const sessionId = session.id;
+  const onReady = useCallback(
+    (handle: EditorHandle) =>
+      useEditorManager.getState().setEditor(sessionId, { editor: handle }),
+    [sessionId]
+  );
+
   const getContent = useCallback(() => {
     const data = session.content?.data;
     return typeof data === "string" ? data : undefined;
@@ -285,11 +299,7 @@ function EditorView({ session }: { session: EditableSession }) {
                 .getState()
                 .updateEditor(session.id, { canUndo, canRedo })
             }
-            onReady={(handle) =>
-              useEditorManager
-                .getState()
-                .setEditor(session.id, { editor: handle })
-            }
+            onReady={onReady}
             onPreviewDocument={(hash) =>
               useEditorStore.setState({ documentPreview: { hash } })
             }

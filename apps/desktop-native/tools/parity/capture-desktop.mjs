@@ -150,6 +150,11 @@ try {
       }
       await app.click(entry.tag);
     }
+    if (step.scrollNav) {
+      const [menu] = await app.query("testID", "settings-navigation-menu", true);
+      if (menu) await app.scroll(menu.tag, 0, -5000);
+      await app.waitForIdle();
+    }
     if (step.rightClick)
       await app.click((await locate(step.rightClick)).tag, {
         button: "right"
