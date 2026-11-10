@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from "react";
 import { Image, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import fs from "@react-native-gpui/fs";
@@ -72,10 +78,24 @@ export const AvatarEditor = forwardRef<
     style = { width: width + border * 2, height: height + border * 2 }
   } = props;
   const [natural, setNatural] = useState<{ width: number; height: number }>();
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const drag = useRef<
+    { x: number; y: number; originX: number; originY: number } | undefined
+  >(undefined);
   const canvas = width + border * 2;
   const factor = style.width / canvas;
+  const cover = natural
+    ? Math.max(width / natural.width, height / natural.height) * scale
+    : 1;
+  const shownWidth = natural ? natural.width * cover * factor : 0;
+  const shownHeight = natural ? natural.height * cover * factor : 0;
+  const limitX = Math.max(0, (shownWidth - style.width) / 2);
+  const limitY = Math.max(0, (shownHeight - style.height) / 2);
+  const clampedX = Math.max(-limitX, Math.min(limitX, pan.x));
+  const clampedY = Math.max(-limitY, Math.min(limitY, pan.y));
 
   useEffect(() => {
+    setPan({ x: 0, y: 0 });
     setNatural(undefined);
     Image.getSize(
       toUri(image),
@@ -89,16 +109,30 @@ export const AvatarEditor = forwardRef<
     () => ({
       async getScaledImage({ quality }) {
         if (!natural) throw new Error("The image has not loaded yet");
-        const cover = Math.max(width / natural.width, height / natural.height);
-        const visibleWidth = width / (cover * scale);
-        const visibleHeight = height / (cover * scale);
+        const fit = Math.max(width / natural.width, height / natural.height);
+        const visibleWidth = width / (fit * scale);
+        const visibleHeight = height / (fit * scale);
+        const sourceX = clampedX / (factor * fit * scale);
+        const sourceY = clampedY / (factor * fit * scale);
         const result = await manipulateAsync(
           toUri(image),
           [
             {
               crop: {
-                originX: Math.max(0, (natural.width - visibleWidth) / 2),
-                originY: Math.max(0, (natural.height - visibleHeight) / 2),
+                originX: Math.max(
+                  0,
+                  Math.min(
+                    natural.width - visibleWidth,
+                    (natural.width - visibleWidth) / 2 - sourceX
+                  )
+                ),
+                originY: Math.max(
+                  0,
+                  Math.min(
+                    natural.height - visibleHeight,
+                    (natural.height - visibleHeight) / 2 - sourceY
+                  )
+                ),
                 width: Math.min(natural.width, visibleWidth),
                 height: Math.min(natural.height, visibleHeight)
               }
@@ -111,15 +145,35 @@ export const AvatarEditor = forwardRef<
         return `data:image/jpeg;base64,${result.base64}`;
       }
     }),
-    [image, natural, scale, width, height]
+    [image, natural, scale, width, height, clampedX, clampedY, factor]
   );
 
-  const cover = natural
-    ? Math.max(width / natural.width, height / natural.height) * scale
-    : 1;
   return (
     <AnyView
       testID={props.testID}
+      onPointerDown={(event: {
+        nativeEvent: { pageX: number; pageY: number };
+      }) => {
+        drag.current = {
+          x: event.nativeEvent.pageX,
+          y: event.nativeEvent.pageY,
+          originX: clampedX,
+          originY: clampedY
+        };
+      }}
+      onPointerMove={(event: {
+        nativeEvent: { pageX: number; pageY: number };
+      }) => {
+        const start = drag.current;
+        if (!start) return;
+        setPan({
+          x: start.originX + event.nativeEvent.pageX - start.x,
+          y: start.originY + event.nativeEvent.pageY - start.y
+        });
+      }}
+      onPointerUp={() => {
+        drag.current = undefined;
+      }}
       style={{
         width: style.width,
         height: style.height,
@@ -132,10 +186,10 @@ export const AvatarEditor = forwardRef<
           source={{ uri: toUri(image) }}
           style={{
             position: "absolute",
-            width: natural.width * cover * factor,
-            height: natural.height * cover * factor,
-            left: (style.width - natural.width * cover * factor) / 2,
-            top: (style.height - natural.height * cover * factor) / 2
+            width: shownWidth,
+            height: shownHeight,
+            left: (style.width - shownWidth) / 2 + clampedX,
+            top: (style.height - shownHeight) / 2 + clampedY
           }}
         />
       ) : null}

@@ -17,51 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { deflateSync } from "node:zlib";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { type DesktopApp } from "@react-native-gpui/testing";
+import { png } from "./png";
 import { clickId, count, settle, start } from "./dialogs";
-
-function png() {
-  const size = 64;
-  const raw = Buffer.alloc((size * 3 + 1) * size);
-  for (let y = 0; y < size; y++)
-    for (let x = 0; x < size; x++) {
-      const at = y * (size * 3 + 1) + 1 + x * 3;
-      raw[at] = x * 4;
-      raw[at + 1] = y * 4;
-      raw[at + 2] = 128;
-    }
-  const crcTable = Array.from({ length: 256 }, (_, n) => {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-    return c >>> 0;
-  });
-  const crc = (buffer: Buffer) => {
-    let c = 0xffffffff;
-    for (const byte of buffer) c = crcTable[(c ^ byte) & 255] ^ (c >>> 8);
-    return (c ^ 0xffffffff) >>> 0;
-  };
-  const chunk = (type: string, data: Buffer) => {
-    const body = Buffer.concat([Buffer.from(type), data]);
-    const out = Buffer.alloc(body.length + 8);
-    out.writeUInt32BE(data.length, 0);
-    body.copy(out, 4);
-    out.writeUInt32BE(crc(body), body.length + 4);
-    return out;
-  };
-  const header = Buffer.alloc(13);
-  header.writeUInt32BE(size, 0);
-  header.writeUInt32BE(size, 4);
-  header[8] = 8;
-  header[9] = 2;
-  return Buffer.concat([
-    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
-    chunk("IHDR", header),
-    chunk("IDAT", deflateSync(raw)),
-    chunk("IEND", Buffer.alloc(0))
-  ]).toString("base64");
-}
 
 let app: DesktopApp;
 

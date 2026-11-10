@@ -78,6 +78,7 @@ export type BootOptions = {
   simulateMigrationMs?: number;
   openPdf?: { base64: string; hash?: string };
   openLightbox?: { image: string };
+  openAvatarEditor?: { image: string };
   attachmentBench?: import("./dev/attachment-bench").AttachmentBench;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
@@ -268,6 +269,14 @@ async function run(options: BootOptions) {
     PdfPreviewDialog.show({
       url: `data:application/pdf;base64,${base64}`,
       hash: hash ?? "e2e-pdf"
+    });
+  }
+  if (environment.isDev && options.openAvatarEditor) {
+    const { EditProfilePictureDialog } = await import(
+      "./dialogs/edit-profile-picture-dialog"
+    );
+    EditProfilePictureDialog.show({
+      profile: { profilePicture: options.openAvatarEditor.image }
     });
   }
   if (environment.isDev && options.openLightbox) {
