@@ -54,6 +54,7 @@
     "@react-native-gpui/spellcheck": "file:../../../../../react-native-gpui-desktop-native/modules/spellcheck",
     "@react-native-gpui/svg": "file:../../../../../react-native-gpui-desktop-native/modules/svg",
     "@react-native-gpui/system": "file:../../../../../react-native-gpui-desktop-native/modules/system",
+    "@react-native-gpui/typst": "file:../../../../../react-native-gpui-desktop-native/modules/typst",
     "@react-native-gpui/updater": "file:../../../../../react-native-gpui-desktop-native/modules/updater",
     "@react-native-gpui/webauthn": "file:../../../../../react-native-gpui-desktop-native/modules/webauthn",
     "@react-native-gpui/webview": "file:../../../../react-native/gpui-modules/tgz/react-native-gpui-webview-0.0.1.tgz",

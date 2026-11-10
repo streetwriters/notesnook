@@ -46,6 +46,16 @@ interface Context {
   math: MathConverter | null;
 }
 
+const IGNORED_TAGS = new Set([
+  "head",
+  "title",
+  "meta",
+  "link",
+  "base",
+  "noscript",
+  "template"
+]);
+
 const BLOCK_TAGS = new Set([
   "p",
   "div",
@@ -100,7 +110,11 @@ function render(items: Item[]): string {
     if (item.kind === "text") {
       let text = item.text;
       const last = out[out.length - 1];
-      if (text.startsWith(" ") && last?.kind === "text" && last.text.endsWith(" ")) {
+      if (
+        text.startsWith(" ") &&
+        last?.kind === "text" &&
+        last.text.endsWith(" ")
+      ) {
         text = text.slice(1);
       }
       if (text === "") continue;
@@ -119,7 +133,9 @@ function render(items: Item[]): string {
     if (last.text === "") out.pop();
     else break;
   }
-  return out.map((i) => (i.kind === "text" ? textRun(i.text) : i.code)).join("");
+  return out
+    .map((i) => (i.kind === "text" ? textRun(i.text) : i.code))
+    .join("");
 }
 
 function wrap(fn: string, items: Item[]): Item[] {
@@ -162,6 +178,7 @@ async function inlineNode(node: HtmlNode, ctx: Context): Promise<Item[]> {
     return text === "" ? [] : [{ kind: "text", text }];
   }
   const tag = node.tag;
+  if (IGNORED_TAGS.has(tag)) return [];
   const classes = classesOf(node);
   switch (tag) {
     case "br":
@@ -183,27 +200,45 @@ async function inlineNode(node: HtmlNode, ctx: Context): Promise<Item[]> {
     case "sup":
       return wrap("super", await inlineNodes(node.children, ctx));
     case "mark": {
-      const fill = color(node.attrs["data-color"] ?? parseStyle(node.attrs.style)["background-color"]) ?? 'rgb("#fff59d")';
-      return wrap(`highlight(fill: ${fill})`, await inlineNodes(node.children, ctx));
+      const fill =
+        color(
+          node.attrs["data-color"] ??
+            parseStyle(node.attrs.style)["background-color"]
+        ) ?? 'rgb("#fff59d")';
+      return wrap(
+        `highlight(fill: ${fill})`,
+        await inlineNodes(node.children, ctx)
+      );
     }
     case "code": {
       const text = textContent(node);
       return text === ""
         ? []
-        : [{ kind: "code", code: `#box(fill: luma(240), inset: (x: 2pt), outset: (y: 2pt), radius: 2pt)[#raw(${literal(text)})]` }];
+        : [
+            {
+              kind: "code",
+              code: `#box(fill: luma(240), inset: (x: 2pt), outset: (y: 2pt), radius: 2pt)[#raw(${literal(
+                text
+              )})]`
+            }
+          ];
     }
     case "a": {
       const href = (node.attrs.href ?? "").trim();
       const inner = await inlineNodes(node.children, ctx);
       if (!href || /^\s*javascript:/i.test(href)) return inner;
       const body = render(inner);
-      return body === "" ? [] : [{ kind: "code", code: `#link(${literal(href)})[${body}]` }];
+      return body === ""
+        ? []
+        : [{ kind: "code", code: `#link(${literal(href)})[${body}]` }];
     }
     case "img":
       return [{ kind: "code", code: await image(node, ctx, true) }];
     case "span": {
-      if (classes.includes("math-inline")) return [mathItem(textContent(node), false, ctx)];
-      if (node.attrs["data-hash"] !== undefined) return [{ kind: "code", code: attachment(node, ctx) }];
+      if (classes.includes("math-inline"))
+        return [mathItem(textContent(node), false, ctx)];
+      if (node.attrs["data-hash"] !== undefined)
+        return [{ kind: "code", code: attachment(node, ctx) }];
       return styled(node, await inlineNodes(node.children, ctx));
     }
     case "input":
@@ -219,16 +254,24 @@ function mathItem(latex: string, display: boolean, ctx: Context): Item {
   const converted =
     ctx.options.math === "raw" ? undefined : toTypstMath(latex, ctx.math);
   if (converted !== undefined) {
-    return { kind: "code", code: display ? `$ ${converted} $` : `$${converted}$` };
+    return {
+      kind: "code",
+      code: display ? `$ ${converted} $` : `$${converted}$`
+    };
   }
   ctx.warnings.push("math-not-converted");
   const raw = `#raw(${literal(latex.trim())}${display ? ", block: true" : ""})`;
   if (!display) {
-    return { kind: "code", code: `#box(fill: rgb("#fff3cd"), inset: (x: 3pt), radius: 2pt)[${raw}]` };
+    return {
+      kind: "code",
+      code: `#box(fill: rgb("#fff3cd"), inset: (x: 3pt), radius: 2pt)[${raw}]`
+    };
   }
   return {
     kind: "code",
-    code: `#block(fill: rgb("#fff3cd"), stroke: (dash: "dashed", paint: luma(160)), inset: 8pt, width: 100%)[#text(size: 0.8em, fill: luma(110))[${textRun("LaTeX (not converted)")}] \\ ${raw}]`
+    code: `#block(fill: rgb("#fff3cd"), stroke: (dash: "dashed", paint: luma(160)), inset: 8pt, width: 100%)[#text(size: 0.8em, fill: luma(110))[${textRun(
+      "LaTeX (not converted)"
+    )}] \\ ${raw}]`
   };
 }
 
@@ -238,7 +281,9 @@ function attachment(node: ElementNode, ctx: Context): string {
   const name = node.attrs["data-filename"] ?? described?.name ?? "attachment";
   const size = Number(node.attrs["data-size"] ?? described?.size ?? NaN);
   const label = Number.isFinite(size) ? `${name} (${formatSize(size)})` : name;
-  return `#box(fill: luma(240), inset: (x: 4pt, y: 2pt), radius: 2pt)[#text(size: 0.9em)[${textRun("Attachment: " + label)}]]`;
+  return `#box(fill: luma(240), inset: (x: 4pt, y: 2pt), radius: 2pt)[#text(size: 0.9em)[${textRun(
+    "Attachment: " + label
+  )}]]`;
 }
 
 function formatSize(bytes: number): string {
@@ -247,11 +292,17 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-async function image(node: ElementNode, ctx: Context, inline: boolean): Promise<string> {
+async function image(
+  node: ElementNode,
+  ctx: Context,
+  inline: boolean
+): Promise<string> {
   const alt = node.attrs.alt ?? "";
   const placeholder = (why: string) => {
     ctx.warnings.push(`image-${why}`);
-    return `#text(fill: luma(120))[${textRun(`[image${alt ? ": " + alt : ""}]`)}]`;
+    return `#text(fill: luma(120))[${textRun(
+      `[image${alt ? ": " + alt : ""}]`
+    )}]`;
   };
   if (!ctx.options.resolveImage) return placeholder("unavailable");
   if (ctx.images >= LIMITS.maxImages) return placeholder("limit");
@@ -277,7 +328,12 @@ async function image(node: ElementNode, ctx: Context, inline: boolean): Promise<
   const widthPt = Math.min(Math.max(shown, 8), 2000);
   const dpi = ctx.options.dpi ?? 200;
   const targetPixels = Math.ceil((widthPt / 72) * dpi);
-  if (ctx.options.prepareImage && data.width && data.width > targetPixels * 1.25 && extension !== "svg") {
+  if (
+    ctx.options.prepareImage &&
+    data.width &&
+    data.width > targetPixels * 1.25 &&
+    extension !== "svg"
+  ) {
     try {
       data = await ctx.options.prepareImage(data, { maxWidth: targetPixels });
     } catch {
@@ -285,12 +341,15 @@ async function image(node: ElementNode, ctx: Context, inline: boolean): Promise<
     }
   }
   const finalExt = IMAGE_TYPES[data.mime.toLowerCase()] ?? extension;
-  if (ctx.imageBytes + data.bytes.byteLength > LIMITS.maxTotalImageBytes) return placeholder("total");
+  if (ctx.imageBytes + data.bytes.byteLength > LIMITS.maxTotalImageBytes)
+    return placeholder("total");
   const name = `img-${ctx.images}.${finalExt}`;
   ctx.images += 1;
   ctx.imageBytes += data.bytes.byteLength;
   ctx.files[name] = data.bytes;
-  const body = `#layout(size => image(${literal(name)}, width: calc.min(${widthPt.toFixed(1)}pt, size.width), fit: "contain"))`;
+  const body = `#layout(size => image(${literal(
+    name
+  )}, width: calc.min(${widthPt.toFixed(1)}pt, size.width), fit: "contain"))`;
   return inline ? `#box[${body}]` : body;
 }
 
@@ -304,7 +363,11 @@ function alignOf(node: ElementNode): string | undefined {
 }
 
 function directionOf(node: ElementNode): "ltr" | "rtl" | undefined {
-  const value = (node.attrs.dir ?? parseStyle(node.attrs.style).direction ?? "").toLowerCase();
+  const value = (
+    node.attrs.dir ??
+    parseStyle(node.attrs.style).direction ??
+    ""
+  ).toLowerCase();
   return value === "rtl" ? "rtl" : value === "ltr" ? "ltr" : undefined;
 }
 
@@ -327,10 +390,16 @@ async function blocks(nodes: HtmlNode[], ctx: Context): Promise<string[]> {
     if (body !== "") out.push(body);
   };
   for (const node of nodes) {
+    if (node.type === "element" && IGNORED_TAGS.has(node.tag)) continue;
     if (node.type === "element" && BLOCK_TAGS.has(node.tag)) {
       await flush();
       out.push(...(await block(node, ctx)));
-    } else if (node.type === "element" && node.tag === "span" && node.attrs["data-hash"] === undefined && classesOf(node).includes("math-block")) {
+    } else if (
+      node.type === "element" &&
+      node.tag === "span" &&
+      node.attrs["data-hash"] === undefined &&
+      classesOf(node).includes("math-block")
+    ) {
       await flush();
       out.push(mathBlock(node, ctx));
     } else loose.push(node);
@@ -348,7 +417,11 @@ async function content(nodes: HtmlNode[], ctx: Context): Promise<string> {
   return (await blocks(nodes, ctx)).join("\n\n");
 }
 
-async function listItems(list: ElementNode, ctx: Context, task: boolean): Promise<string[]> {
+async function listItems(
+  list: ElementNode,
+  ctx: Context,
+  task: boolean
+): Promise<string[]> {
   const items: string[] = [];
   for (const child of list.children) {
     if (child.type !== "element" || child.tag !== "li") continue;
@@ -356,7 +429,9 @@ async function listItems(list: ElementNode, ctx: Context, task: boolean): Promis
     if (task) {
       const checked = classesOf(child).includes("checked");
       const box = checked
-        ? `#box(width: 0.85em, height: 0.85em, fill: luma(60), radius: 2pt, baseline: 0.1em)[#align(center + horizon)[#text(size: 0.65em, fill: white, font: "DejaVu Sans Mono")[${textRun("✓")}]]]`
+        ? `#box(width: 0.85em, height: 0.85em, fill: luma(60), radius: 2pt, baseline: 0.1em)[#align(center + horizon)[#text(size: 0.65em, fill: white, font: "DejaVu Sans Mono")[${textRun(
+            "✓"
+          )}]]]`
         : `#box(width: 0.85em, height: 0.85em, stroke: 0.8pt + luma(60), radius: 2pt, baseline: 0.1em)`;
       items.push(`[${box} #h(0.4em) ${body}]`);
     } else items.push(`[${body}]`);
@@ -379,17 +454,22 @@ async function block(node: ElementNode, ctx: Context): Promise<string[]> {
     case "h5":
     case "h6": {
       const body = render(await inlineNodes(node.children, ctx));
-      return body === "" ? [] : [paragraphWrap(node, `#heading(level: ${tag[1]})[${body}]`)];
+      return body === ""
+        ? []
+        : [paragraphWrap(node, `#heading(level: ${tag[1]})[${body}]`)];
     }
     case "ul":
     case "ol": {
-      const task = classes.includes("checklist") || classes.includes("task-list");
+      const task =
+        classes.includes("checklist") || classes.includes("task-list");
       const items = await listItems(node, ctx, task);
       if (items.length === 0) return [];
-      if (task) return [`#list(marker: none, tight: false, ${items.join(", ")})`];
+      if (task)
+        return [`#list(marker: none, tight: false, ${items.join(", ")})`];
       if (tag === "ol") {
         const start = parseInt(node.attrs.start ?? "1", 10);
-        const first = Number.isFinite(start) && start >= 0 && start < 100000 ? start : 1;
+        const first =
+          Number.isFinite(start) && start >= 0 && start < 100000 ? start : 1;
         return [`#enum(start: ${first}, tight: false, ${items.join(", ")})`];
       }
       return [`#list(tight: false, ${items.join(", ")})`];
@@ -404,10 +484,22 @@ async function block(node: ElementNode, ctx: Context): Promise<string[]> {
       return ["#line(length: 100%, stroke: 0.5pt + luma(180))"];
     case "pre": {
       const code = textContent(node).replace(/\n$/, "");
-      const lang = classes.find((c) => c.startsWith("language-"))?.slice(9) ??
-        (node.children[0]?.type === "element" ? classesOf(node.children[0]).find((c) => c.startsWith("language-"))?.slice(9) : undefined);
-      const language = lang && /^[a-zA-Z0-9+#_-]{1,30}$/.test(lang) && lang !== "text" ? `, lang: ${literal(lang)}` : "";
-      return [`#block(fill: luma(246), inset: 8pt, radius: 3pt, width: 100%, breakable: true)[#raw(${literal(code)}, block: true${language})]`];
+      const lang =
+        classes.find((c) => c.startsWith("language-"))?.slice(9) ??
+        (node.children[0]?.type === "element"
+          ? classesOf(node.children[0])
+              .find((c) => c.startsWith("language-"))
+              ?.slice(9)
+          : undefined);
+      const language =
+        lang && /^[a-zA-Z0-9+#_-]{1,30}$/.test(lang) && lang !== "text"
+          ? `, lang: ${literal(lang)}`
+          : "";
+      return [
+        `#block(fill: luma(246), inset: 8pt, radius: 3pt, width: 100%, breakable: true)[#raw(${literal(
+          code
+        )}, block: true${language})]`
+      ];
     }
     case "table":
       return [await table(node, ctx)];
@@ -416,7 +508,11 @@ async function block(node: ElementNode, ctx: Context): Promise<string[]> {
     case "video": {
       const src = node.attrs.src ?? node.attrs["data-src"];
       const label = textRun(`[${tag === "iframe" ? "embedded content" : tag}]`);
-      return [src ? `#link(${literal(src)})[${label}]` : `#text(fill: luma(120))[${label}]`];
+      return [
+        src
+          ? `#link(${literal(src)})[${label}]`
+          : `#text(fill: luma(120))[${label}]`
+      ];
     }
     case "div": {
       if (classes.includes("callout")) return [await callout(node, ctx)];
@@ -455,25 +551,43 @@ async function table(node: ElementNode, ctx: Context): Promise<string> {
     let headers = 0;
     let count = 0;
     for (const cell of row.children) {
-      if (cell.type !== "element" || (cell.tag !== "td" && cell.tag !== "th")) continue;
-      const colspan = Math.min(Math.max(parseInt(cell.attrs.colspan ?? "1", 10) || 1, 1), 50);
-      const rowspan = Math.min(Math.max(parseInt(cell.attrs.rowspan ?? "1", 10) || 1, 1), 200);
+      if (cell.type !== "element" || (cell.tag !== "td" && cell.tag !== "th"))
+        continue;
+      const colspan = Math.min(
+        Math.max(parseInt(cell.attrs.colspan ?? "1", 10) || 1, 1),
+        50
+      );
+      const rowspan = Math.min(
+        Math.max(parseInt(cell.attrs.rowspan ?? "1", 10) || 1, 1),
+        200
+      );
       width += colspan;
       count += 1;
       if (cell.tag === "th") headers += 1;
       const body = (await content(cell.children, ctx)) || "#h(0pt)";
-      const args = [colspan > 1 ? `colspan: ${colspan}` : "", rowspan > 1 ? `rowspan: ${rowspan}` : ""].filter(Boolean);
+      const args = [
+        colspan > 1 ? `colspan: ${colspan}` : "",
+        rowspan > 1 ? `rowspan: ${rowspan}` : ""
+      ].filter(Boolean);
       const bold = cell.tag === "th" ? `#strong[${body}]` : body;
-      rowCells.push(args.length ? `table.cell(${args.join(", ")})[${bold}]` : `[${bold}]`);
+      rowCells.push(
+        args.length ? `table.cell(${args.join(", ")})[${bold}]` : `[${bold}]`
+      );
     }
     columns = Math.max(columns, width);
     cells.push(rowCells);
     headerRow.push(count > 0 && headers === count);
   }
   const head = headerRow[0] && cells[0].length > 0;
-  const lines = cells.map((row, index) => (head && index === 0 ? `table.header(${row.join(", ")})` : row.join(", ")));
-  const spec = Array.from({ length: Math.min(columns, 60) }, () => "1fr").join(", ");
-  return `#table(columns: (${spec}), stroke: 0.5pt + luma(180), inset: 6pt, ${lines.filter(Boolean).join(",\n  ")})`;
+  const lines = cells.map((row, index) =>
+    head && index === 0 ? `table.header(${row.join(", ")})` : row.join(", ")
+  );
+  const spec = Array.from({ length: Math.min(columns, 60) }, () => "1fr").join(
+    ", "
+  );
+  return `#table(columns: (${spec}), stroke: 0.5pt + luma(180), inset: 6pt, ${lines
+    .filter(Boolean)
+    .join(",\n  ")})`;
 }
 
 function preamble(options: PrintDocumentOptions): string {
@@ -481,7 +595,9 @@ function preamble(options: PrintDocumentOptions): string {
   const body = [...fonts, literal("DejaVu Sans Mono")].join(", ");
   const mono = literal(options.monoFont ?? "DejaVu Sans Mono");
   const paper = options.paper ?? "a4";
-  const margin = /^\d+(\.\d+)?(cm|mm|pt|in)$/.test(options.margin ?? "") ? options.margin : "2cm";
+  const margin = /^\d+(\.\d+)?(cm|mm|pt|in)$/.test(options.margin ?? "")
+    ? options.margin
+    : "2cm";
   const size = Math.min(Math.max(options.fontSize ?? 11, 6), 48);
   const dir = options.direction ?? "ltr";
   return [
@@ -508,7 +624,8 @@ export async function noteToTypst(
   try {
     root = parseHtml(html);
   } catch (error) {
-    if (error instanceof HtmlError) throw new ConvertError("html", error.message);
+    if (error instanceof HtmlError)
+      throw new ConvertError("html", error.message);
     throw error;
   }
   const ctx: Context = {
@@ -521,7 +638,11 @@ export async function noteToTypst(
   };
   const parts = [preamble(options)];
   if (options.title) {
-    parts.push(`#align(center)[#text(size: 1.9em, weight: "bold")[${textRun(options.title)}]]\n#v(0.5em)`);
+    parts.push(
+      `#align(center)[#text(size: 1.9em, weight: "bold")[${textRun(
+        options.title
+      )}]]\n#v(0.5em)`
+    );
   }
   parts.push(await content(root.children, ctx));
   const source = parts.join("\n\n") + "\n";

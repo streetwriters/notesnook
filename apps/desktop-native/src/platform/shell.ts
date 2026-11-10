@@ -21,5 +21,10 @@ export interface Shell {
   openUrl(url: string): void;
   openPath(path: string): Promise<void>;
   showItemInFolder(path: string): Promise<void>;
-  printHtml(title: string, html: string): Promise<boolean>;
+  printHtml(
+    title: string,
+    html: string,
+    options?: { outputPath?: string }
+  ): Promise<boolean>;
+  htmlToPdf(title: string, html: string): Promise<Uint8Array | undefined>;
 }

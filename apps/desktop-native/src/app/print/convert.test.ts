@@ -152,6 +152,14 @@ describe("conversion", () => {
     expect(out).toContain("Attachment: a.pdf (2 KB)");
   });
 
+  test("a whole document keeps its body and drops the head", async () => {
+    const out = await body(
+      "<!DOCTYPE html><html><head><title>Ignore me</title><style>p{}</style></head><body><p>Body text</p></body></html>"
+    );
+    expect(out).toContain('#"Body text"');
+    expect(out).not.toContain("Ignore me");
+  });
+
   test("a note over the size limit is refused", async () => {
     const huge = "<p>" + "x".repeat(MAX_HTML_BYTES - 10) + "</p>";
     await expect(noteToTypst(huge + huge.slice(0, 100))).rejects.toBeInstanceOf(ConvertError);
