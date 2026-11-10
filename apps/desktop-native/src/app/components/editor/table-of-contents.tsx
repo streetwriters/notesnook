@@ -49,7 +49,7 @@ function TableOfContents(props: TableOfContentsProps) {
       >
         {headings.length <= 0 ? (
           <Text
-            sx={{ color: "paragraph-secondary", fontSize: "xs" }}
+            sx={{ color: "paragraph-secondary", fontSize: "xs", lineHeight: 1 }}
             testID="table-of-contents-empty"
           >
             {strings.noHeadingsFound()}.

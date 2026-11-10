@@ -1132,6 +1132,7 @@ function Reminders({ noteId }: { noteId: string }) {
         flex: 1,
         px: "spacing4"
       }}
+      placeholderSx={{ pt: 0, px: 0 }}
       placeholder={
         <Section
           title={strings.dataTypesPluralCamelCase.reminder()}
@@ -1151,8 +1152,8 @@ function Reminders({ noteId }: { noteId: string }) {
               variant="new_anchor"
               sx={{
                 alignItems: "center",
+                alignSelf: "flex-start",
                 gap: "spacing3",
-
                 p: 0,
                 textDecorationLine: "none"
               }}

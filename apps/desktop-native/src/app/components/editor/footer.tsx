@@ -162,7 +162,7 @@ export default function EditorFooter() {
             testID="editor-zoom"
             title={strings.clickToReset(strings.zoom().toLocaleLowerCase())}
             onPress={() => setEditorConfig({ zoom: EDITOR_ZOOM.DEFAULT })}
-            sx={{ width: 34, overflow: "visible" }}
+            sx={{ width: 34, px: 0, overflow: "visible" }}
             text={`${editorConfig.zoom}%`}
           />
           <StatusBarItem
