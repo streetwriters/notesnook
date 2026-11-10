@@ -20,6 +20,8 @@ beforeAll(async () => {
   app = await startViews();
   await goTo(app, "Notes");
   await plainClick(app, "Grocery list");
+  await app.waitForIdle();
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 });
 
 afterAll(async () => {
