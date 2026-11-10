@@ -35,7 +35,7 @@ import {
   type Tag as TagType
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { shell } from "@platform";
+import { environment, shell } from "@platform";
 import {
   dataColor,
   Flex,
@@ -356,11 +356,15 @@ function createColorIcon(colorCode: string): Icon {
 }
 
 const getFormats = () => [
-  {
-    type: "pdf" as const,
-    title: "PDF",
-    icon: FilePdf
-  },
+  ...(environment.features.print
+    ? [
+        {
+          type: "pdf" as const,
+          title: "PDF",
+          icon: FilePdf
+        }
+      ]
+    : []),
   {
     type: "md" as const,
     title: "Markdown",
@@ -488,6 +492,7 @@ export const noteMenuItems: (
     {
       type: "button",
       key: "print",
+      isHidden: !environment.features.print,
       title: strings.print(),
       iconComponent: Printer,
       onClick: async () => {

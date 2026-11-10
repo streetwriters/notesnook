@@ -49,6 +49,17 @@ describe("note context menu", () => {
     await closeMenu(app);
   });
 
+  test("print and export as PDF are not offered until printing ships", async () => {
+    await goTo(app, "Notes");
+    await rightClick(app, "Grocery list");
+    await expectMenu(app, ["export"]);
+    await expectNoMenuItems(app, ["print"]);
+    await clickMenu(app, "export");
+    await expectMenu(app, ["md", "html", "txt"]);
+    await expectNoMenuItems(app, ["pdf"]);
+    await closeMenu(app);
+  });
+
   test("pin toggles the pinned state", async () => {
     await rightClick(app, "Grocery list");
     await clickMenu(app, "pin");

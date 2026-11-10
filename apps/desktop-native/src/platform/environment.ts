@@ -47,7 +47,8 @@ export interface Environment {
     | "indexedDB"
     | "clonableCryptoKey"
     | "applePaySupported"
-    | "transferableStreams",
+    | "transferableStreams"
+    | "print",
     boolean
   >;
   describe(): string;

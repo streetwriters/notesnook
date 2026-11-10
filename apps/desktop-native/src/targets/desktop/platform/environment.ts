@@ -55,7 +55,8 @@ export const environment: Environment = {
     indexedDB: false,
     clonableCryptoKey: true,
     applePaySupported: false,
-    transferableStreams: false
+    transferableStreams: false,
+    print: false
   },
   describe() {
     return `OS: ${os ?? Platform.OS} ${DeviceInfo.getSystemVersion()}`;
