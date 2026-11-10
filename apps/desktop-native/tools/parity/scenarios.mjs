@@ -307,7 +307,14 @@ scenarios.tablet = {
 scenarios.mobile = {
   ...scenarios.shell,
   size: [420, 800],
-  mask: { reason: "editor is deferred", ids: [], rects: [] }
+  mask: {
+    reason: "the editor toolbar and body are native later",
+    ids: [],
+    rects: [
+      { x: 0, y: 45, width: 420, height: 45 },
+      { x: 0, y: 180, width: 420, height: 620 }
+    ]
+  }
 };
 
 scenarios.navCollapsed = {

@@ -84,6 +84,7 @@ export function App(props: { titleBarInset?: number }) {
           }}
         >
           <ActionBar
+            isMobileEditorActive={isMobileEditorActive}
             isSidebarCollapsed={
               isMobile ? !isMobileSideMenuOpen : isNavPaneCollapsed
             }
@@ -109,7 +110,7 @@ export function App(props: { titleBarInset?: number }) {
       ) : (
         <DesktopAppContents navPane={navPane} isFocusMode={isFocusMode} />
       )}
-      <StatusBar />
+      {isMobile ? null : <StatusBar />}
       <MenuHost />
       <DialogHost />
       <PopoverHost />

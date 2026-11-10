@@ -88,7 +88,7 @@ function Header(props: HeaderProps) {
           }
         />
       ))}
-      {!readonly && activeSession ? (
+      {!readonly ? (
         <Autosuggest
           sessionId={id}
           disabled={!noteId}

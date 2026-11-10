@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { memo } from "react";
+import { AppEventManager, AppEvents } from "../../common/app-events";
+import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
 import { Box, Button, Flex, SortableList, Text, type DragEvent } from "@ui";
 import { getDragData } from "../../utils/data-transfer";
@@ -54,8 +56,10 @@ function Separator() {
 
 export function ActionBar(props: {
   isSidebarCollapsed: boolean;
+  isMobileEditorActive?: boolean;
   onSidebarToggle: () => void;
 }) {
+  const isMobile = useMobile();
   const activeTab = useEditorStore((store) => store.getActiveTab());
   const activeSession = useEditorStore((store) =>
     activeTab ? store.getSession(activeTab.sessionId) : undefined
@@ -124,7 +128,33 @@ export function ActionBar(props: {
           <LeftPanelClose size={15} />
         )}
       </Button>
-      <TabStrip />
+      {isMobile ? (
+        <Flex sx={{ flex: 1, ml: "spacing4" }}>
+          <Button
+            testID="mobile-editor-back"
+            variant="tertiary"
+            disabled={!props.isMobileEditorActive}
+            onPress={() =>
+              AppEventManager.publish(AppEvents.toggleEditor, false)
+            }
+            sx={{
+              bg: "transparent",
+              flexShrink: 0,
+              borderRadius: "radius1",
+              alignSelf: "center",
+              width: 20,
+              height: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              p: 0
+            }}
+          >
+            <ArrowLeft size={15} />
+          </Button>
+        </Flex>
+      ) : (
+        <TabStrip />
+      )}
       <Flex
         sx={{
           flexDirection: "row",

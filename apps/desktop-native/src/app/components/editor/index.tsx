@@ -61,6 +61,7 @@ import Header from "./header";
 import TitleBox from "./title-box";
 import { saveContent } from "./save-content";
 import { useEditorManager } from "./manager";
+import useMobile from "../../hooks/use-mobile";
 
 export { saveContent };
 
@@ -164,6 +165,7 @@ const MemoizedEditorView = memo(EditorView, (prev, next) => {
 
 function EditorView({ session }: { session: EditableSession }) {
   const lastChangedTime = useRef(0);
+  const isMobile = useMobile();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const editorMargins = useEditorStore((store) => store.editorMargins);
 
@@ -244,7 +246,7 @@ function EditorView({ session }: { session: EditableSession }) {
             width: "100%",
             flex: 1,
             flexDirection: "column",
-            px: 6
+            px: isMobile ? 2 : 6
           }}
         >
           <Flex testID="editor-toolbar" sx={{ height: 34, flexShrink: 0 }} />

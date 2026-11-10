@@ -7744,6 +7744,7 @@ dependencies = [
  "futures",
  "objc2 0.6.5",
  "objc2-foundation 0.3.2",
+ "react-native-gpui",
  "rn-gpui-module",
  "rn-gpui-module-build",
  "typst",
