@@ -255,6 +255,7 @@ for (const step of scenario.steps ?? []) {
         return el ? `HOVER[${hovered}] ${el.tagName}.${(el.className || "").toString().slice(0, 40)}#${el.id} [${el.getAttribute("data-test-id") || ""}]` : "none";
       })
     );
+  if (step.clickAt) await page.mouse.click(step.clickAt.x, step.clickAt.y);
   if (step.scrollNav)
     await page.evaluate(() => {
       const root = document.querySelector('[data-test-id="settings-navigation-menu"]');
@@ -371,6 +372,33 @@ const elements = await page.evaluate(() => {
       text: (el.textContent || "").trim().slice(0, 40)
     });
   }
+  for (const input of document.querySelectorAll("label input[type=checkbox]")) {
+    const track = input.parentElement?.querySelector(":scope > div");
+    const thumb = track?.querySelector(":scope > div");
+    for (const [id, el] of [["switch-track", track], ["switch-thumb", thumb]]) {
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      const cs = getComputedStyle(el);
+      out.push({
+        id,
+        x: r.x,
+        y: r.y,
+        width: r.width,
+        height: r.height,
+        background: rgba(cs.backgroundColor),
+        color: rgba(cs.color),
+        borderColor: rgba(cs.borderTopColor),
+        borderWidth: parseFloat(cs.borderTopWidth),
+        fontFamily: null,
+        fontSize: null,
+        fontWeight: null,
+        lineHeight: null,
+        letterSpacing: null,
+        text: ""
+      });
+    }
+  }
   return out;
 });
 
@@ -452,6 +480,30 @@ const inputs = await page.evaluate(() =>
 );
 
 if (!narrow) await fitViewport();
+if (process.env.PARITY_WEB_TREE)
+  console.log(
+    "TREE",
+    JSON.stringify(
+      await page.evaluate((testId) => {
+        const root = document.querySelector(`[data-test-id="${testId}"]`);
+        const out = [];
+        const walk = (node, depth) => {
+          const r = node.getBoundingClientRect();
+          const cs = getComputedStyle(node);
+          out.push({
+            d: depth,
+            tag: node.tagName,
+            cls: (node.getAttribute("class") || "").slice(0, 24),
+            x: +r.x.toFixed(2), y: +r.y.toFixed(2), w: +r.width.toFixed(2), h: +r.height.toFixed(2),
+            bg: cs.backgroundColor, br: cs.borderRadius, tr: cs.transform, bd: cs.border.slice(0, 40), op: cs.opacity
+          });
+          for (const child of node.children) walk(child, depth + 1);
+        };
+        if (root) walk(root, 0);
+        return out;
+      }, process.env.PARITY_WEB_TREE)
+    )
+  );
 if (process.env.PARITY_WEB_DUMP)
   console.log(
     JSON.stringify(

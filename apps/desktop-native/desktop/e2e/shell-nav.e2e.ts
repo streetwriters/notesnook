@@ -131,7 +131,7 @@ test("arrow keys move the selection through the list", async () => {
       ).toBe(true),
     { timeout: 20000, interval: 300 }
   );
-  await app.getByText("Keyed note 2").click();
+  await app.getByText("Keyed note 2").click({ modifiers: { platform: true } });
   await app.mouseMove({ x: 4, y: 4 });
   await app.waitForIdle();
   await app.press("down");

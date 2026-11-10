@@ -153,6 +153,12 @@ try {
       }
       await app.click(entry.tag);
     }
+    if (step.clickAt) {
+      const point = { x: step.clickAt.x, y: step.clickAt.y };
+      await app.mouseMove(point);
+      await app.mouseDown(point);
+      await app.mouseUp(point);
+    }
     if (step.scrollNav) {
       const [menu] = await app.query("testID", "settings-navigation-menu", true);
       if (menu) await app.scroll(menu.tag, 0, -5000);

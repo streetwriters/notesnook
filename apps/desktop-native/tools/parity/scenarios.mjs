@@ -696,3 +696,20 @@ scenarios.probeTagMenu = {
   ...scenarios.contextMenuTag,
   steps: [...scenarios.contextMenuTag.steps, { active: "after menu" }]
 };
+
+const propertiesTabs = {
+  Toc: 976,
+  Links: 1011,
+  History: 1046,
+  Attachments: 1081,
+  Reminders: 1116
+};
+for (const [name, x] of Object.entries(propertiesTabs))
+  scenarios[`editorProperties${name}`] = {
+    ...scenarios.editorProperties,
+    steps: [
+      openFirstNote,
+      { click: "Properties" },
+      { clickAt: { x, y: 70 } }
+    ]
+  };

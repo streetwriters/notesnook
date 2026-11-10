@@ -29,7 +29,6 @@ import {
 import {
   Image as NativeImage,
   Pressable,
-  Switch as NativeSwitch,
   Text as NativeText,
   TextInput,
   View
@@ -407,20 +406,49 @@ export const Radio = forwardRef<UIElement, Contract.RadioProps>(function Radio(
 export const Switch = forwardRef<UIElement, Contract.SwitchProps>(
   function Switch(props, ref) {
     const context = useThemeContext();
-    const { nativeProps } = useStyled(props);
+    const { viewStyle, nativeProps } = useStyled(props);
     const inner = useElementRef(ref);
+    const checked = !!props.checked;
+    const background =
+      (viewStyle as { backgroundColor?: string } | undefined)
+        ?.backgroundColor ??
+      (checked ? context.colors.accent : context.colors["icon-disabled"]);
     return (
-      <NativeSwitch
+      <Pressable
         ref={inner as never}
         {...(nativeProps as object)}
-        value={props.checked}
+        accessibilityRole="switch"
+        accessibilityState={{ checked, disabled: !!props.disabled }}
         disabled={props.disabled}
-        onValueChange={props.onChange}
-        trackColor={{
-          false: context.colors.disabled,
-          true: context.colors.accent
+        onPress={(event) => {
+          event.stopPropagation();
+          props.onChange?.(!checked);
         }}
-      />
+        testID="switch-track"
+        style={[
+          viewStyle as object,
+          {
+            width: 34,
+            height: 18,
+            borderRadius: 18,
+            backgroundColor: background,
+            opacity: props.disabled ? 0.5 : 1
+          }
+        ]}
+      >
+        <View
+          testID="switch-thumb"
+          style={{
+            position: "absolute",
+            top: 4,
+            left: checked ? 20 : 4,
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: "#ffffff"
+          }}
+        />
+      </Pressable>
     );
   }
 );

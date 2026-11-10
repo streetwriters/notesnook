@@ -135,7 +135,16 @@ let app: DesktopApp;
 
 beforeAll(async () => {
   app = await start({
-    openPdf: { base64: buildPdf(["Hello first page", "Second page here"]) }
+    openPdf: {
+      base64: buildPdf([
+        "Hello first page",
+        "Second page here",
+        "Third page here",
+        "Fourth page here",
+        "Fifth page here",
+        "Sixth page here"
+      ])
+    }
   });
 });
 
@@ -147,7 +156,7 @@ describe("pdf preview dialog", () => {
   test("opens the document with its page count", async () => {
     await settle(async () => expect(await count(app, "pdf-preview")).toBe(1));
     await settle(async () =>
-      expect(await app.getByText("/ 2", { exact: false }).count()).toBe(1)
+      expect(await app.getByText("/ 6", { exact: false }).count()).toBe(1)
     );
   });
 
@@ -170,7 +179,7 @@ describe("pdf preview dialog", () => {
   });
 
   test("search finds a hit", async () => {
-    await clickId(app, "Search");
+    await clickId(app, "Search", 1);
     await typeInto(app, "pdf-search-input", "Second");
     await app.press("enter");
     await settle(async () =>
