@@ -131,6 +131,59 @@ test("a tablet sized window collapses the navigation pane", async () => {
   );
 });
 
+test("swiping sideways in a phone sized window moves between the panes", async () => {
+  await app.setWindowSize(420, 800);
+  await vi.waitFor(
+    async () =>
+      expect(await app.getByTestId("mobile-contents").count()).toBeGreaterThan(
+        0
+      ),
+    { timeout: 10000, interval: 300 }
+  );
+  const wait = () => new Promise((resolve) => setTimeout(resolve, 250));
+  const swipe = async (from: number, to: number) => {
+    const y = 90;
+    await app.mouseMove({ x: from, y });
+    await app.mouseDown({ x: from, y });
+    await wait();
+    await app.mouseMove({ x: (from + to) / 2, y });
+    await app.mouseMove({ x: to, y });
+    await app.mouseUp({ x: to, y });
+    await wait();
+  };
+  await swipe(100, 300);
+  await vi.waitFor(
+    async () =>
+      expect(
+        await app.getByTestId("navigation-menu-root").count()
+      ).toBeGreaterThan(0),
+    { timeout: 10000, interval: 300 }
+  );
+  await swipe(300, 100);
+  await vi.waitFor(
+    async () =>
+      expect(await app.getByTestId("navigation-menu-root").count()).toBe(0),
+    { timeout: 10000, interval: 300 }
+  );
+  expect(await app.getByTestId("virtual-list").count()).toBeGreaterThan(0);
+  const [list] = await app.query("testID", "virtual-list", true);
+  await app.scroll(list.tag, 200, 0);
+  await vi.waitFor(
+    async () =>
+      expect(
+        await app.getByTestId("navigation-menu-root").count()
+      ).toBeGreaterThan(0),
+    { timeout: 10000, interval: 300 }
+  );
+  await swipe(300, 100);
+  await vi.waitFor(
+    async () =>
+      expect(await app.getByTestId("navigation-menu-root").count()).toBe(0),
+    { timeout: 10000, interval: 300 }
+  );
+  await app.setWindowSize(1200, 800);
+});
+
 test("a phone sized window shows one pane at a time", async () => {
   await app.setWindowSize(420, 800);
   await vi.waitFor(

@@ -226,6 +226,9 @@ function DesktopAppContents(props: {
   );
 }
 
+const SWIPE_DISTANCE = 60;
+const WHEEL_SWIPE_DISTANCE = 150;
+
 function MobileAppContents(props: {
   onSideMenuVisibilityChange: (isOpen: boolean) => void;
   onEditorPaneVisibilityChange: (isActive: boolean) => void;
@@ -253,8 +256,50 @@ function MobileAppContents(props: {
     };
   }, [slideToIndex]);
 
+  const swipe = useRef<{ x: number; y: number } | undefined>(undefined);
+  const wheel = useRef({ x: 0, y: 0, at: 0, lockedUntil: 0 });
+
   return (
-    <Flex testID="mobile-contents" sx={{ flex: 1, overflow: "hidden" }}>
+    <Flex
+      testID="mobile-contents"
+      onWheel={(event) => {
+        if (index === 2) return;
+        const now = Date.now();
+        const state = wheel.current;
+        if (now < state.lockedUntil) return;
+        if (now - state.at > 250) {
+          state.x = 0;
+          state.y = 0;
+        }
+        state.at = now;
+        state.x += event.deltaX;
+        state.y += event.deltaY;
+        if (
+          Math.abs(state.x) < WHEEL_SWIPE_DISTANCE ||
+          Math.abs(state.x) < Math.abs(state.y) * 2
+        )
+          return;
+        state.lockedUntil = now + 700;
+        slideToIndex(Math.max(0, Math.min(2, index + (state.x > 0 ? 1 : -1))));
+        state.x = 0;
+        state.y = 0;
+      }}
+      onPointerDown={(event) => {
+        swipe.current =
+          index === 2 ? undefined : { x: event.pageX, y: event.pageY };
+      }}
+      onPointerUp={(event) => {
+        const start = swipe.current;
+        swipe.current = undefined;
+        if (!start) return;
+        const dx = event.pageX - start.x;
+        const dy = event.pageY - start.y;
+        if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dx) < Math.abs(dy) * 2)
+          return;
+        slideToIndex(Math.max(0, Math.min(2, index + (dx < 0 ? 1 : -1))));
+      }}
+      sx={{ flex: 1, overflow: "hidden" }}
+    >
       {index === 0 ? (
         <ThemeScope scope="navigationMenu">
           <Flex sx={{ flex: 1 }}>

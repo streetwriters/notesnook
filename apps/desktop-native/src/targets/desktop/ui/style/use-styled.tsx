@@ -338,6 +338,14 @@ export function useStyled(
       onPointerLeave: props.onHoverOut
         ? (e: unknown) => props.onHoverOut?.(hover(e))
         : undefined,
+      onWheel: props.onWheel
+        ? (e: any) =>
+            props.onWheel?.({
+              deltaX: e?.nativeEvent?.deltaX ?? 0,
+              deltaY: e?.nativeEvent?.deltaY ?? 0,
+              preventDefault: () => e?.preventDefault?.()
+            })
+        : undefined,
       onPointerDown: props.onPointerDown
         ? (e: unknown) => props.onPointerDown?.(pointer(e))
         : undefined,

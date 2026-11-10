@@ -66,6 +66,12 @@ export interface PointerMoveEvent {
   buttons: number;
 }
 
+export interface WheelEvent {
+  deltaX: number;
+  deltaY: number;
+  preventDefault(): void;
+}
+
 export interface DragEvent {
   payload: unknown;
   x: number;
@@ -85,6 +91,7 @@ export interface BaseProps extends SpaceProps, ColorProps {
   onContextMenu?: (event: ContextMenuEvent) => void;
   onHoverIn?: (event: HoverEvent) => void;
   onHoverOut?: (event: HoverEvent) => void;
+  onWheel?: (event: WheelEvent) => void;
   onPointerDown?: (event: PointerMoveEvent) => void;
   onPointerMove?: (event: PointerMoveEvent) => void;
   onPointerUp?: (event: PointerMoveEvent) => void;
