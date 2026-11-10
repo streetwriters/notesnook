@@ -85,6 +85,10 @@ msgstr "{count, plural, one {# note importée avec succès.} other {# notes impo
 msgid "{count, plural, one {# note} other {# notes}}"
 msgstr "{count, plural, one {# note} other {# notes}}"
 
+#: src/strings.ts:3287
+msgid "{count, plural, one {# published note was not moved to trash. Unpublish it to delete it.} other {# published notes were not moved to trash. Unpublish them to delete them.}}"
+msgstr ""
+
 #: src/strings.ts:2667
 msgid "{count, plural, one {# row} other {# rows}}"
 msgstr "{count, plural, one {# ligne} other {# lignes}}"
