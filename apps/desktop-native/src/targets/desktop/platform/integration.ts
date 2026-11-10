@@ -32,7 +32,9 @@ import {
   applyTheme,
   applyZoom,
   beep,
-  onLaunchRequest
+  installMenus,
+  onLaunchRequest,
+  watchZoom
 } from "./desktop-shell";
 import { environment } from "./environment";
 
@@ -128,6 +130,8 @@ export const integration: Integration = {
       config.get<DesktopIntegration>(KEYS.desktopIntegration, {})
     );
     await applyZoom(config.get<number>(KEYS.zoomFactor, 1));
+    await installMenus();
+    await watchZoom((zoomFactor) => config.set(KEYS.zoomFactor, zoomFactor));
     if (config.get<boolean>(KEYS.privacyMode, false))
       await setContentProtected(true);
     await applyNetwork(networkSettings());

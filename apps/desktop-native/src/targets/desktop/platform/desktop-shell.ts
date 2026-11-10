@@ -17,7 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { App, DesktopWindow, Network, Tray } from "@react-native-gpui/core/desktop";
+import {
+  App,
+  DesktopWindow,
+  Menu,
+  Network,
+  Tray
+} from "@react-native-gpui/core/desktop";
 import { strings } from "@notesnook/intl";
 import type {
   DesktopIntegration,
@@ -124,7 +130,9 @@ async function removeTray() {
 }
 
 export async function applyDesktopIntegration(settings: DesktopIntegration) {
-  const useTray = !!(settings.closeToSystemTray || settings.minimizeToSystemTray);
+  const useTray = !!(
+    settings.closeToSystemTray || settings.minimizeToSystemTray
+  );
   minimizeListener?.remove();
   minimizeListener = undefined;
   if (useTray) await installTray(!!settings.closeToSystemTray);
@@ -168,4 +176,50 @@ export async function applyNetwork(options: {
 
 export function beep() {
   return App.beep();
+}
+
+export async function installMenus() {
+  await Menu.setApplicationMenu([
+    { type: "role", role: "appMenu" },
+    { type: "role", role: "editMenu" },
+    {
+      type: "submenu",
+      label: strings.zoom(),
+      items: [
+        { type: "role", role: "zoomIn" },
+        { type: "role", role: "zoomOut" },
+        { type: "role", role: "resetZoom" }
+      ]
+    },
+    { type: "role", role: "windowMenu" },
+    { type: "role", role: "helpMenu" }
+  ]);
+  await Menu.setDockMenu([
+    {
+      id: "dock-new-note",
+      label: strings.newNote(),
+      onPress: () => emit({ type: "create", item: "note" })
+    },
+    {
+      id: "dock-new-notebook",
+      label: strings.newNotebook(),
+      onPress: () => emit({ type: "create", item: "notebook" })
+    }
+  ]);
+}
+
+export async function watchZoom(save: (zoomFactor: number) => void) {
+  const window = await main();
+  let last = (await window.getState()).zoomFactor;
+  const subscription = window.addListener("stateChange", () => {
+    window
+      .getState()
+      .then((state) => {
+        if (state.zoomFactor === last) return;
+        last = state.zoomFactor;
+        save(state.zoomFactor);
+      })
+      .catch(console.error);
+  });
+  return () => subscription.remove();
 }

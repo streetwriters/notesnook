@@ -18,32 +18,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import * as Keychain from "react-native-keychain";
+import * as SecureStorage from "@react-native-gpui/secure-storage";
 import type { SafeStorage } from "../../../platform";
-import { decrypt, encrypt } from "./database/encryption";
-import { generateSecureRandom } from "./database/random";
+import { decrypt } from "./database/encryption";
 
 const SERVER = "notesnook-desktop:safe-storage";
 
-async function getKey() {
+async function legacyKey() {
   const stored = await Keychain.getInternetCredentials(SERVER);
-  if (stored) return stored.password;
-  const key = Array.from(await generateSecureRandom(32), (byte) =>
-    byte.toString(16).padStart(2, "0")
-  ).join("");
-  await Keychain.setInternetCredentials(SERVER, "notesnook", key, {});
-  return key;
+  if (!stored) throw new Error("The legacy safe storage key is missing.");
+  return stored.password;
 }
 
+const SERVICE = "safe-storage";
+const LEGACY_JSON = 0x7b;
+
 export const safeStorage: SafeStorage = {
-  async isEncryptionAvailable() {
-    return true;
-  },
-  async encryptString(plainText) {
-    const cipher = await encrypt({ password: await getKey() }, plainText);
-    return new TextEncoder().encode(JSON.stringify(cipher));
-  },
+  isEncryptionAvailable: () => SecureStorage.isAvailable(),
+  encryptString: (plainText) => SecureStorage.encryptString(SERVICE, plainText),
   async decryptString(data) {
-    const cipher = JSON.parse(new TextDecoder().decode(data));
-    return (await decrypt({ password: await getKey() }, cipher)) as string;
+    if (data[0] === LEGACY_JSON) {
+      const cipher = JSON.parse(new TextDecoder().decode(data));
+      return (await decrypt({ password: await legacyKey() }, cipher)) as string;
+    }
+    return SecureStorage.decryptString(SERVICE, data);
   }
 };
