@@ -299,7 +299,8 @@ function TextField(
   const context = useThemeContext();
   const { viewStyle, nativeProps } = useStyled(props, {
     variantGroup: "forms",
-    defaultVariant: variant
+    defaultVariant: variant,
+    defaults: { p: 2 }
   });
   const inner = useElementRef(ref);
   const fields: Record<string, unknown> = { ...nativeProps };

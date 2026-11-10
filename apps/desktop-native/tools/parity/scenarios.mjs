@@ -200,6 +200,15 @@ const SETTINGS_SECTIONS = {
 for (const [name, title] of Object.entries(SETTINGS_SECTIONS))
   scenarios[name] = {
     ...scenarios.shell,
+    mask: {
+      ...scenarios.shell.mask,
+      reason:
+        "the desktop settings sidebar has an extra Desktop integration section (shifts every item below it)",
+      rects: [
+        ...(scenarios.shell.mask.rects ?? []),
+        { x: 160, y: 190, width: 180, height: 560 }
+      ]
+    },
     steps: [
       ...openSettings,
       { clickText: title },
