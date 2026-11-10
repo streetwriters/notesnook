@@ -25,24 +25,56 @@ import { DatabaseLogger, db } from "../common/database";
 import { santizeUri } from "../common/filesystem/utils";
 import { IOS_APPGROUPID } from "./constants";
 import {
+  CompressedImage,
+  compressImage,
   getCompressionType,
-  resolveCompressedImage
+  unlinkFile
 } from "../common/filesystem/compress";
+import type { ShareItem } from "@ammarahmed/react-native-share-extension";
 
-export async function attachFile(uri, hash, type, filename, options) {
+type AttachFileOptions = {
+  type?: "base64" | "url" | "cache";
+  hash?: string;
+  appGroupId?: string;
+  reupload?: boolean;
+  id?: string;
+};
+
+export type NoteBundle = {
+  note: {
+    id?: string;
+    title?: string;
+    sessionId?: number | string;
+    content?: { type: string; data?: string };
+  };
+  notebooks?: string[];
+  tags?: string[];
+  files: ShareItem[];
+  compress?: boolean;
+  /** Pre-compressed results, keyed by file value. */
+  compressedImages?: Record<string, CompressedImage>;
+};
+
+export async function attachFile(
+  uri: string,
+  hash: string,
+  type: string,
+  filename: string,
+  options: AttachFileOptions
+) {
   try {
-    let exists = await db.attachments.exists(hash);
-    let encryptionInfo;
+    const exists = await db.attachments.exists(hash);
+    let encryptionInfo: Parameters<typeof db.attachments.add>[0];
     if (options?.hash && options.hash !== hash) return false;
 
     if (!exists || options?.reupload) {
-      let key = await db.attachments.generateKey();
+      const key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
         type: options.type || "url",
         hash: hash,
         appGroupId: options.appGroupId
-      });
+      } as Parameters<typeof Sodium.encryptFile>[1]);
       encryptionInfo.mimeType = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = "xcha-stream";
@@ -52,7 +84,7 @@ export async function attachFile(uri, hash, type, filename, options) {
     } else {
       encryptionInfo = { hash: hash };
     }
-    await db.attachments.add(encryptionInfo, options?.id);
+    await db.attachments.add(encryptionInfo);
     return true;
   } catch (e) {
     if (Platform.OS === "ios")
@@ -65,9 +97,11 @@ export async function attachFile(uri, hash, type, filename, options) {
   }
 }
 
-async function createNotes(bundle) {
+async function createNotes(bundle: NoteBundle) {
   const sessionId = bundle.note.sessionId;
-  const id = await db.notes.add(bundle.note);
+  const id = await db.notes.add(
+    bundle.note as Parameters<typeof db.notes.add>[0]
+  );
 
   if (!bundle.notebooks || !bundle.notebooks.length) {
     const defaultNotebook = db.settings?.getDefaultNotebook();
@@ -105,12 +139,11 @@ async function createNotes(bundle) {
     let size = file.size;
 
     if (type && compress) {
-      const res = await resolveCompressedImage(
-        "file://" + uri,
-        type,
-        bundle.compressedImages?.[file.value],
-        file.size
-      );
+      const path = "file://" + uri;
+      const res =
+        bundle.compressedImages?.[file.value] ??
+        (await compressImage(path, type, file.size));
+      if (!res.original) unlinkFile(path);
       uri = res.uri.replace("file://", "");
       size = res.size;
     }
@@ -133,14 +166,16 @@ async function createNotes(bundle) {
         content = `<p><span data-hash="${hash}" data-mime="${file.type}" data-filename="${file.name}" data-size="${size}" /></p>`;
       }
       const note = await db.notes.note(id);
-      const rawContent = await db.content.get(note?.contentId);
+      const rawContent = note?.contentId
+        ? await db.content.get(note.contentId)
+        : undefined;
       await db.notes.add({
         id: id,
         content: {
           type: "tiptap",
           data: rawContent?.data ? rawContent?.data + content : content
         },
-        sessionId: sessionId
+        sessionId: sessionId as string | undefined
       });
     }
   }
