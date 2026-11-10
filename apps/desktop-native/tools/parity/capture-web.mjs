@@ -67,13 +67,21 @@ async function fitViewport() {
 if (!narrow) await fitViewport();
 await page.goto(baseUrl, { waitUntil: "load" });
 await page.waitForTimeout(6000);
+const authPage = !!scenario.initialPath;
+if (authPage && scenario.initialPath !== "/signup") {
+  await page.goto(baseUrl + scenario.initialPath.slice(1), {
+    waitUntil: "load"
+  });
+  await page.waitForTimeout(6000);
+}
 const offline = page.getByText("Use offline");
-if (await offline.count()) {
+if (!authPage && (await offline.count())) {
   await offline.first().click();
   await page.waitForTimeout(1000);
   await page.getByText("I understand").click();
   await page.waitForTimeout(10000);
 }
+if (!authPage)
 await page.evaluate(
   async ({ seed, scheme, extras, noExtras, reminders, proUser }) => {
     const { db } = await import("/common/db.ts");
