@@ -195,13 +195,12 @@ const ShareView = () => {
         path:
           "file://" +
           (Platform.OS === "ios" ? santizeUri(file.value) : file.value),
-        mime: file.type ?? "",
+        mime: file.type,
         size: file.size
       })),
     [rawFiles]
   );
-  const preCompressed = usePreCompressedImages(preCompressItems);
-  const isCompressing = preCompressed.isCompressing && compress;
+  const preCompressed = usePreCompressedImages(preCompressItems, compress);
   globalThis["IS_SHARE_EXTENSION"] = true;
   const onKeyboardDidShow = (event: KeyboardEvent) => {
     const height =
@@ -414,13 +413,8 @@ const ShareView = () => {
         notebooks: useShareStore.getState().selectedNotebooks,
         tags: useShareStore.getState().selectedTags,
         compress,
-        compressedImages: compress ? preCompressed.compressed : undefined
+        compressedImages: compress ? preCompressed.take() : undefined
       });
-      if (compress) {
-        preCompressed.confirm();
-      } else {
-        preCompressed.dispose();
-      }
 
       if (!globalThis["IS_MAIN_APP_RUNNING"]) {
         await db.sync({ type: "send", force: false });
@@ -488,7 +482,6 @@ const ShareView = () => {
         return files;
       });
       RNFetchBlob.fs.unlink(item.value).catch(console.log);
-      preCompressed.release(item.value);
     }
   };
 
@@ -643,8 +636,7 @@ const ShareView = () => {
                     <Button
                       title={strings.done()}
                       type="accent"
-                      loading={loading || isCompressing}
-                      disabled={isCompressing}
+                      loading={loading}
                       onPress={onPress}
                       allowFontScaling={false}
                     />
@@ -677,22 +669,14 @@ const ShareView = () => {
                           color={colors.secondary.paragraph}
                           allowFontScaling={false}
                         >
-                          {isCompressing
+                          {preCompressed.isCompressing
                             ? `${strings.compressing()}...`
-                            : formatBytes(
-                                preCompressed.totalSize(
-                                  preCompressItems,
-                                  compress
-                                )
-                              )}
+                            : formatBytes(preCompressed.totalSize)}
                         </Paragraph>
                       </View>
                       <ScrollView horizontal>
-                        {rawFiles.map((item) => {
-                          const itemSize = preCompressed.getSize(
-                            { key: item.value, size: item.size },
-                            compress
-                          );
+                        {rawFiles.map((item, index) => {
+                          const preItem = preCompressItems[index];
                           return isImage(item.type) ||
                             item.value?.endsWith(".png") ? (
                             <TouchableOpacity
@@ -717,11 +701,8 @@ const ShareView = () => {
                                 resizeMode="cover"
                               />
                               <ImageSizeBadge
-                                size={itemSize}
-                                pending={
-                                  compress &&
-                                  preCompressed.isPending(item.value)
-                                }
+                                size={preCompressed.sizeOf(preItem)}
+                                pending={preCompressed.isPending(preItem)}
                               />
                             </TouchableOpacity>
                           ) : (
