@@ -33,8 +33,9 @@ import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import {
+  compressImage,
   getCompressionType,
-  resolveCompressedImage
+  unlinkFile
 } from "../../../common/filesystem/compress";
 import { santizeUri } from "../../../common/filesystem/utils";
 import AttachImage from "../../../components/dialogs/attach-image-dialog";
@@ -277,20 +278,19 @@ const handleImageResponse = async (
     for (const image of response.slice(from)) {
       const entry = result.compressedImages?.[image.path];
       if (entry && !entry.original) {
-        RNFetchBlob.fs.unlink(entry.uri.replace("file://", "")).catch(() => {});
+        unlinkFile(entry.uri);
       }
     }
   };
 
   for (const [index, image] of response.entries()) {
-    const type = getCompressionType(image.mime || image.path);
+    const type = getCompressionType(image.mime);
     if (compress && type) {
-      const res = await resolveCompressedImage(
-        Platform.OS === "ios" ? "file://" + image.path : image.path,
-        type,
-        result.compressedImages?.[image.path],
-        image.size
-      );
+      const path = Platform.OS === "ios" ? "file://" + image.path : image.path;
+      const res =
+        result.compressedImages?.[image.path] ??
+        (await compressImage(path, type, image.size));
+      if (!res.original) unlinkFile(path);
       image.path =
         Platform.OS === "ios" ? res.uri.replace("file://", "") : res.uri;
       image.size = res.size;

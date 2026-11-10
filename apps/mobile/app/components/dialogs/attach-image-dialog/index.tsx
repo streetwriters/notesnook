@@ -28,10 +28,8 @@ import {
   View
 } from "react-native";
 import { Image as ImageType } from "react-native-image-crop-picker";
-import {
-  CompressedImageResult,
-  usePreCompressedImages
-} from "../../../hooks/use-pre-compressed-images";
+import { CompressedImage } from "../../../common/filesystem/compress";
+import { usePreCompressedImages } from "../../../hooks/use-pre-compressed-images";
 import { ImageSizeBadge } from "../../attachments/image-size-badge";
 import { presentSheet, ToastManager } from "../../../services/event-manager";
 import { AppFontSize, defaultBorderRadius } from "../../../utils/size";
@@ -42,11 +40,9 @@ import { Notice } from "../../ui/notice";
 import Paragraph from "../../ui/typography/paragraph";
 import SettingsService from "../../../services/settings";
 
-export type { CompressedImageResult };
-
 export type AttachImageResult = {
   compress: boolean;
-  compressedImages?: Record<string, CompressedImageResult>;
+  compressedImages?: Record<string, CompressedImage>;
 };
 
 export default function AttachImage({
@@ -55,7 +51,6 @@ export default function AttachImage({
 }: {
   response: ImageType[];
   onAttach: (result: AttachImageResult) => void;
-  close: ((ctx?: string | undefined) => void) | undefined;
 }) {
   const fullQualityImagesResult = useIsFeatureAvailable("fullQualityImages");
   const { colors } = useThemeColors();
@@ -68,14 +63,12 @@ export default function AttachImage({
           Platform.OS === "ios" && !item.path.startsWith("file://")
             ? "file://" + item.path
             : item.path,
-        mime: item.mime || item.path,
+        mime: item.mime,
         size: item.size
       })),
     [response]
   );
-  const preCompressed = usePreCompressedImages(items);
-  const isCompressing = preCompressed.isCompressing && compress;
-  const totalSize = preCompressed.totalSize(items, compress);
+  const preCompressed = usePreCompressedImages(items, compress);
 
   return (
     <View
@@ -116,18 +109,15 @@ export default function AttachImage({
               color: colors.secondary.paragraph
             }}
           >
-            {isCompressing
+            {preCompressed.isCompressing
               ? `${strings.compressing()}...`
-              : formatBytes(totalSize)}
+              : formatBytes(preCompressed.totalSize)}
           </Paragraph>
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {response?.map?.((item) => {
-            const itemSize = preCompressed.getSize(
-              { key: item.path, size: item.size },
-              compress
-            );
+          {response?.map?.((item, index) => {
+            const preItem = items[index];
 
             return (
               <TouchableOpacity
@@ -154,8 +144,8 @@ export default function AttachImage({
                 />
                 {response.length > 1 ? (
                   <ImageSizeBadge
-                    size={itemSize}
-                    pending={compress && preCompressed.isPending(item.path)}
+                    size={preCompressed.sizeOf(preItem)}
+                    pending={preCompressed.isPending(preItem)}
                   />
                 ) : null}
               </TouchableOpacity>
@@ -248,15 +238,10 @@ export default function AttachImage({
         title={strings.attachImageHeading(response?.length || 1)}
         type="accent"
         width="100%"
-        loading={isCompressing}
-        disabled={isCompressing}
         onPress={() => {
-          if (compress) {
-            preCompressed.confirm();
-          }
           onAttach({
             compress,
-            compressedImages: compress ? preCompressed.compressed : undefined
+            compressedImages: compress ? preCompressed.take() : undefined
           });
         }}
       />
@@ -283,7 +268,6 @@ AttachImage.present = (response: ImageType[], context?: string) => {
       component: (ref, close) => (
         <AttachImage
           response={response}
-          close={close}
           onAttach={(result) => {
             resolved = true;
 
