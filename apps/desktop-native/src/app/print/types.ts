@@ -36,7 +36,7 @@ export interface PrintDocumentOptions {
   margin?: string;
   fontSize?: number;
   bodyFonts?: string[];
-  monoFont?: string;
+  monoFonts?: string[];
   direction?: "ltr" | "rtl";
   dpi?: number;
   math?: "convert" | "raw";

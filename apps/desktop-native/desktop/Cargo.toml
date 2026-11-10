@@ -28,6 +28,27 @@ split-debuginfo = "packed"
 lto = "fat"
 codegen-units = 1
 
+[profile.release.package.typst]
+opt-level = "s"
+
+[profile.release.package.typst-layout]
+opt-level = "s"
+
+[profile.release.package.typst-library]
+opt-level = "s"
+
+[profile.release.package.typst-eval]
+opt-level = "s"
+
+[profile.release.package.typst-realize]
+opt-level = "s"
+
+[profile.release.package.typst-syntax]
+opt-level = "s"
+
+[profile.release.package.typst-pdf]
+opt-level = "s"
+
 [build-dependencies]
 rn-gpui-module-build = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui-module-build" }
 serde_json = "1"

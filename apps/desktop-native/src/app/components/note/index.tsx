@@ -46,6 +46,7 @@ import {
 } from "@ui";
 import { db } from "../../common/db";
 import { exportNote, exportNotes } from "../../common/export";
+import { exportNotePdf, printNote } from "../../common/print-export";
 import { Multiselect } from "../../common/multi-select";
 import Vault from "../../common/vault";
 import { copyNoteLink, withFeatureCheck } from "../../common";
@@ -491,9 +492,7 @@ export const noteMenuItems: (
       title: strings.print(),
       iconComponent: Printer,
       onClick: async () => {
-        await exportNote(note, {
-          format: "pdf"
-        });
+        await printNote(note);
       }
     },
     {
@@ -575,6 +574,7 @@ export const noteMenuItems: (
           multiSelect: true,
           onClick: async () => {
             if (ids.length === 1) {
+              if (format.type === "pdf") return await exportNotePdf(note);
               return await exportNote(note, {
                 format: format.type
               });
