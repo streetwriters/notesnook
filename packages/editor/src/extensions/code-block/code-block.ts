@@ -555,6 +555,22 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
                 exitOnTripleEnter(this.editor, $from)
               ) {
                 event.preventDefault();
+                // PM's beforeinput is skipped, so cancel the patched
+                // prosemirror-view Android Enter fallback ourselves
+                const input = (
+                  view as unknown as {
+                    input?: {
+                      lastAndroidEnter?: number;
+                      androidEnterFallbackTimeout?: ReturnType<
+                        typeof setTimeout
+                      >;
+                    };
+                  }
+                ).input;
+                if (input) {
+                  clearTimeout(input.androidEnterFallbackTimeout);
+                  input.lastAndroidEnter = 0;
+                }
                 return true;
               }
 
