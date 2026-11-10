@@ -22,19 +22,38 @@ import {
   SaveFormat,
   manipulateAsync
 } from "@react-native-gpui/image-manipulator";
+import { getFontConfig } from "@notesnook/theme";
 import { compile, print, TypstError } from "@react-native-gpui/typst";
 import { noteToTypst } from "../../../app/print";
 import type { ImageData, ImageRequest } from "../../../app/print";
 
-const BODY_FONTS = [
-  "Inter",
-  "Helvetica Neue",
-  "Helvetica",
-  "Segoe UI",
-  "Arial",
-  "Noto Sans",
-  "DejaVu Sans"
-];
+const GENERIC_FONTS = new Set([
+  "sans-serif",
+  "serif",
+  "monospace",
+  "-apple-system",
+  "blinkmacsystemfont"
+]);
+
+function families(stack: string): string[] {
+  return stack
+    .split(",")
+    .map((name) => name.trim().replace(/^["']|["']$/g, ""))
+    .filter((name) => name && !GENERIC_FONTS.has(name.toLowerCase()));
+}
+
+const { body, monospace } = getFontConfig().fonts;
+const BODY_FONTS = families(body);
+const MONO_FONTS = families(monospace);
+
+const APP_FONTS = [
+  "Regular",
+  "Bold",
+  "Italic",
+  "BoldItalic",
+  "Medium",
+  "SemiBold"
+].map((style) => ({ path: `file://assets/fonts/Inter-${style}.ttf` }));
 
 const TIMEOUT_MS = 120_000;
 
@@ -144,6 +163,7 @@ async function build(title: string, html: string, math: "convert" | "raw") {
   return noteToTypst(html, {
     title: title || undefined,
     bodyFonts: BODY_FONTS,
+    monoFonts: MONO_FONTS,
     math,
     resolveImage,
     prepareImage
@@ -160,6 +180,7 @@ export async function htmlToPdf(
     try {
       const result = await compile(note.source, {
         files: note.files,
+        fonts: APP_FONTS,
         title: title || undefined,
         systemFonts: "auto",
         timeoutMs: TIMEOUT_MS

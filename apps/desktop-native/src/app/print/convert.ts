@@ -593,7 +593,8 @@ async function table(node: ElementNode, ctx: Context): Promise<string> {
 function preamble(options: PrintDocumentOptions): string {
   const fonts = (options.bodyFonts ?? []).map(literal);
   const body = [...fonts, literal("DejaVu Sans Mono")].join(", ");
-  const mono = literal(options.monoFont ?? "DejaVu Sans Mono");
+  const monoList = [...(options.monoFonts ?? []), "DejaVu Sans Mono"];
+  const mono = `(${monoList.map(literal).join(", ")})`;
   const paper = options.paper ?? "a4";
   const margin = /^\d+(\.\d+)?(cm|mm|pt|in)$/.test(options.margin ?? "")
     ? options.margin
