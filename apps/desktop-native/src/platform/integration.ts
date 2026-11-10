@@ -27,6 +27,10 @@ export interface DesktopIntegration {
   nativeTitlebar?: boolean;
 }
 
+export type LaunchRequest =
+  | { type: "create"; item: "note" | "notebook" | "reminder" }
+  | { type: "open"; item: "note" | "notebook"; id: string };
+
 export interface ThemeChange {
   theme: "system" | "light" | "dark";
   backgroundColor?: string;
@@ -54,4 +58,7 @@ export interface Integration {
   getSystemTheme(): Promise<"light" | "dark">;
   onSystemThemeChanged(handler: (theme: "light" | "dark") => void): Unsubscribe;
   onOpenLink(handler: (url: string) => void): Unsubscribe;
+  onLaunchRequest(handler: (request: LaunchRequest) => void): Unsubscribe;
+  start(): Promise<void>;
+  beep(): Promise<void>;
 }

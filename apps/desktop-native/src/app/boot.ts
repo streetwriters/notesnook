@@ -77,6 +77,7 @@ export type BootOptions = {
   seedConfig?: Record<string, unknown>;
   simulateMigrationMs?: number;
   openPdf?: { base64: string; hash?: string };
+  attachmentBench?: import("./dev/attachment-bench").AttachmentBench;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
   initialPath?: string;
@@ -269,6 +270,12 @@ async function run(options: BootOptions) {
     });
   }
   if (environment.isDev && options.seedUser) await seedUser(options.seedUser);
+  if (environment.isDev && options.attachmentBench) {
+    const bench = options.attachmentBench;
+    void import("./dev/attachment-bench").then((m) =>
+      m.runAttachmentBench(bench)
+    );
+  }
   if (environment.isDev && options.softAuthenticatorPin)
     await installSoftAuthenticator(options.softAuthenticatorPin);
   if (

@@ -523,6 +523,7 @@ function request(
             .slice(index + 1)
             .trim();
       }
+      console.log("XHRHDRS", method, xhr.status, JSON.stringify(xhr.getAllResponseHeaders()), Object.keys(headers).join());
       const result = {
         status: xhr.status,
         headers,

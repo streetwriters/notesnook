@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect } from "react";
 import { EVENTS } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { environment, integration } from "@platform";
+import { environment, integration, type LaunchRequest } from "@platform";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useEditorStore } from "./stores/editor-store";
@@ -37,7 +37,7 @@ import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { registerKeyMap } from "./common/key-map";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
-import { hashNavigate } from "./navigation";
+import { hashNavigate, navigate } from "./navigation";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
@@ -65,6 +65,7 @@ export default function AppEffects() {
       (async function () {
         await initEditorStore();
         attachListeners();
+        integration.start().catch(console.error);
         await resetFeatures();
         await refreshNavItems();
         await updateLastSynced();
@@ -222,8 +223,16 @@ function attachListeners() {
   return [
     AppEventManager.subscribe(AppEvents.onCreateItem, onCreateItem),
     AppEventManager.subscribe(AppEvents.onOpenLink, handleInternalLink),
-    integration.onOpenLink((url) => handleInternalLink(url))
+    integration.onOpenLink((url) => handleInternalLink(url)),
+    integration.onLaunchRequest(handleLaunchRequest)
   ];
+}
+
+function handleLaunchRequest(request: LaunchRequest) {
+  if (request.type === "create") return onCreateItem(request.item);
+  if (request.item === "note")
+    useEditorStore.getState().openSession(request.id);
+  else navigate(`/notebooks/${request.id}`, { replace: true });
 }
 
 async function onCreateItem(itemType: string) {
