@@ -24,7 +24,9 @@ import {
   Network,
   Tray
 } from "@react-native-gpui/core/desktop";
+import { setJumpList } from "@react-native-gpui/system";
 import { strings } from "@notesnook/intl";
+import { environment } from "./environment";
 import type {
   DesktopIntegration,
   LaunchRequest,
@@ -194,6 +196,7 @@ export async function installMenus() {
     { type: "role", role: "windowMenu" },
     { type: "role", role: "helpMenu" }
   ]);
+  await installJumpList();
   await Menu.setDockMenu([
     {
       id: "dock-new-note",
@@ -206,6 +209,27 @@ export async function installMenus() {
       onPress: () => emit({ type: "create", item: "notebook" })
     }
   ]);
+}
+
+async function installJumpList() {
+  if (environment.os !== "Windows") return;
+  await setJumpList([
+    {
+      title: strings.newNote(),
+      args: ["new", "note"],
+      description: strings.createNewNote()
+    },
+    {
+      title: strings.newNotebook(),
+      args: ["new", "notebook"],
+      description: strings.createNewNotebook()
+    },
+    {
+      title: strings.newReminder(),
+      args: ["new", "reminder"],
+      description: strings.addNewReminder()
+    }
+  ]).catch(console.error);
 }
 
 export async function watchZoom(save: (zoomFactor: number) => void) {
