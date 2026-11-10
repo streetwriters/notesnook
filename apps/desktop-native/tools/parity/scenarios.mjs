@@ -691,3 +691,8 @@ for (const name of [
   "listTagFocus"
 ])
   if (scenarios[name]) scenarios[name].keepPointer = true;
+
+scenarios.probeTagMenu = {
+  ...scenarios.contextMenuTag,
+  steps: [...scenarios.contextMenuTag.steps, { active: "after menu" }]
+};

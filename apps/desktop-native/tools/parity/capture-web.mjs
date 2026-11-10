@@ -251,7 +251,8 @@ for (const step of scenario.steps ?? []) {
       step.active,
       await page.evaluate(() => {
         const el = document.activeElement;
-        return el ? `${el.tagName}.${(el.className || "").toString().slice(0, 40)}#${el.id} [${el.getAttribute("data-test-id") || ""}]` : "none";
+        const hovered = [...document.querySelectorAll(":hover")].map((h) => h.getAttribute("data-test-id") || h.tagName).join(">") + " | menu bgs: " + [...document.querySelectorAll("[data-test-id^=menu-button]")].map((b) => b.getAttribute("data-test-id") + "=" + getComputedStyle(b).backgroundColor + (b.matches(":hover") ? "(hover)" : "") + (b === document.activeElement ? "(focus)" : "")).join(", ") + " | delete: class=" + (document.querySelector("[data-test-id=menu-button-delete]")?.className || "") + " fw=" + document.querySelector("[data-test-id=menu-button-delete]")?.matches(":focus-within") + " dis=" + document.querySelector("[data-test-id=menu-button-delete]")?.disabled + " tab=" + document.querySelector("[data-test-id=menu-button-delete]")?.tabIndex + " aria=" + document.querySelector("[data-test-id=menu-button-delete]")?.getAttribute("aria-selected");
+        return el ? `HOVER[${hovered}] ${el.tagName}.${(el.className || "").toString().slice(0, 40)}#${el.id} [${el.getAttribute("data-test-id") || ""}]` : "none";
       })
     );
   if (step.scrollNav)
