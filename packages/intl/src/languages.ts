@@ -34,7 +34,8 @@ export const AVAILABLE_LANGUAGES: Language[] = [
   { code: "pt-BR", label: "Portuguese (Brazil)", nativeLabel: "Português (Brasil)" },
   { code: "ru", label: "Russian", nativeLabel: "Русский" },
   { code: "tr", label: "Turkish", nativeLabel: "Türkçe" },
-  { code: "uk", label: "Ukrainian", nativeLabel: "Українська" }
+  { code: "uk", label: "Ukrainian", nativeLabel: "Українська" },
+  { code: "zh-CN", label: "Chinese (Simplified)", nativeLabel: "简体中文" }
 ];
 
 /**
