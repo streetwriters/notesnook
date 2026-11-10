@@ -481,6 +481,15 @@ if (process.env.PARITY_WEB_DUMP)
       1
     )
   );
+await page
+  .waitForFunction(
+    () =>
+      document.getAnimations().every((animation) => animation.playState !== "running"),
+    undefined,
+    { timeout: 10000 }
+  )
+  .catch(() => {});
+await page.waitForTimeout(500);
 let shot = await page.screenshot();
 for (let attempt = 0; attempt < 6; attempt++) {
   await page.waitForTimeout(700);
