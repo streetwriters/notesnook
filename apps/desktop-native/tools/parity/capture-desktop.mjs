@@ -83,8 +83,11 @@ try {
   await app.mouseMove({ x: 2, y: 2 });
   await app.waitForIdle();
   const locateOnce = async (spec) => {
-    if (typeof spec === "string")
-      return (await app.query("testID", spec, true))[0];
+    if (typeof spec === "string") {
+      const matches = await app.query("testID", spec, true);
+      matches.sort((a, b) => a.frame.y - b.frame.y || a.frame.x - b.frame.x);
+      return matches[0];
+    }
     const matches = await app.query("testID", spec.id, true);
     matches.sort((a, b) => a.frame.y - b.frame.y || a.frame.x - b.frame.x);
     return matches[spec.nth ?? 0];
