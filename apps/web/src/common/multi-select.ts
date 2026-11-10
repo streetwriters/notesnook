@@ -39,15 +39,10 @@ import { checkFeature } from ".";
 async function moveNotesToTrash(ids: string[], confirm = true) {
   if (confirm && !(await showMultiDeleteConfirmation(ids.length))) return;
 
-  const vault = await db.vaults.default();
-  if (vault) {
-    const lockedIds = await db.relations.from(vault, "note").get();
-    if (
-      ids.some((id) => lockedIds.findIndex((s) => s.toId === id) > -1) &&
-      !(await Vault.unlockVault())
-    )
-      return;
-  }
+  const hasLockedNotes =
+    ids.length > 0 &&
+    (await db.relations.to({ type: "note", ids }, "vault").count()) > 0;
+  if (hasLockedNotes && !(await Vault.unlockVault())) return;
 
   const items = ids.filter((id) => !db.monographs.isPublished(id));
 

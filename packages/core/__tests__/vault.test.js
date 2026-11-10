@@ -94,6 +94,20 @@ test("locked note is not favorited", () =>
     expect(note.favorite).toBeFalsy();
   }));
 
+test("locked archived note is returned when querying its vault relation", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+    await db.notes.archive(true, id);
+
+    const otherId = await db.notes.add(TEST_NOTE);
+
+    expect(
+      await db.relations.to({ type: "note", ids: [id, otherId] }, "vault").get()
+    ).toMatchObject([{ fromType: "vault", toId: id }]);
+    expect(await db.vaults.itemExists({ type: "note", id })).toBe(true);
+  }));
+
 test("unlock a note", () =>
   noteTest().then(async ({ db, id }) => {
     await db.vault.create("password");
