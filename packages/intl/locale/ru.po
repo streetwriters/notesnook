@@ -3671,6 +3671,10 @@ msgstr "Превышен лимит размера файла. Перейдит�
 msgid "File too big"
 msgstr "Файл слишком большой"
 
+#: src/strings.ts:3287
+msgid "File upload failed"
+msgstr "Не удалось отправить файл"
+
 #: src/strings.ts:3182
 msgid "files totaling {storage}"
 msgstr "файлов общим объемом {storage}"
@@ -8051,6 +8055,10 @@ msgstr "Напоминание начнётся {date} в {time}."
 #: src/strings.ts:1891
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "Ключ безопасности для разблокировки приложения. Это самый надёжный метод."
+
+#: src/strings.ts:3289
+msgid "The upload was interrupted by a network problem. It will retry automatically when your connection is back."
+msgstr "Отправка была прервана из-за проблемы с сетью. Повторная попытка будет выполнена автоматически после восстановления соединения."
 
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
