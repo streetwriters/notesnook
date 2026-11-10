@@ -38,8 +38,5 @@ export const shell: Shell = {
     frame.contentWindow?.print();
     frame.remove();
     return true;
-  },
-  async htmlToPdf() {
-    return undefined;
   }
 };

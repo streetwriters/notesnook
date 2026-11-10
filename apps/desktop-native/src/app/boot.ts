@@ -25,7 +25,6 @@ import { getCurrentPath } from "./navigation";
 import { DEFAULT_ITERATIONS, useKeyStore } from "./interfaces/key-store";
 import { randomBytes } from "./interfaces/subtle";
 import { setDatabaseFailed, setDatabaseReady } from "./stores/boot-store";
-import { configurePrintExport } from "./common/print-export";
 import Config from "./utils/config";
 import { setNetworkDisabled } from "./utils/network-policy";
 import { assertSecureRandom } from "./utils/secure-random";
@@ -79,8 +78,6 @@ export type BootOptions = {
   simulateMigrationMs?: number;
   openPdf?: { base64: string; hash?: string };
   resetConfig?: boolean;
-  printOutputPath?: string;
-  exportDirectory?: string;
   delayDatabaseMs?: number;
   initialPath?: string;
   initialHash?: string;
@@ -234,11 +231,6 @@ async function installSoftAuthenticator(pin: string) {
 export function prepareBoot(options: BootOptions) {
   if (environment.isDev && options.disableNetwork) setNetworkDisabled(true);
   if (environment.isDev && options.resetConfig) config.clear();
-  if (environment.isDev && (options.printOutputPath || options.exportDirectory))
-    configurePrintExport({
-      printOutputPath: options.printOutputPath,
-      exportDirectory: options.exportDirectory
-    });
   if (environment.isDev)
     for (const [key, value] of Object.entries(options.seedConfig ?? {}))
       config.set(key, value);

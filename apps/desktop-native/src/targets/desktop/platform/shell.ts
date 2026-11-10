@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Linking } from "react-native";
 import fs from "@react-native-gpui/fs";
 import type { Shell } from "../../../platform";
-import { htmlToPdf, printPdf } from "./pdf";
 
 export const shell: Shell = {
   openUrl(url) {
@@ -32,8 +31,7 @@ export const shell: Shell = {
   async showItemInFolder(path) {
     await fs.promises.reveal(path);
   },
-  async printHtml(title, html, options) {
-    return printPdf(title, await htmlToPdf(title, html), options?.outputPath);
-  },
-  htmlToPdf
+  async printHtml() {
+    return false;
+  }
 };
