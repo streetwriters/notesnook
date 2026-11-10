@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import type { KeyEvent, MenuItem, SxProp, UIElement } from "@ui";
+import type { MenuItem, SxProp, UIElement } from "@ui";
 import {
   Box,
   Button,
@@ -31,7 +31,7 @@ import {
   useWindowSize
 } from "@ui";
 import { CaretRight, Check, Pro } from "../icons";
-import { environment } from "@platform";
+import { environment, keyboard } from "@platform";
 import { useMenuStore } from "./store";
 import { useEscape } from "../../hooks/use-escape";
 
@@ -213,7 +213,6 @@ function MenuPanel(props: {
   title?: string;
   onClose: () => void;
   onSize?: (size: { width: number; height: number }) => void;
-  autoFocus?: boolean;
   onLeave?: () => void;
   maxHeight?: number;
   sx?: SxProp;
@@ -226,7 +225,7 @@ function MenuPanel(props: {
     <MenuItems
       items={items}
       onClose={onClose}
-      autoFocus={props.autoFocus}
+      navigation
       onLeave={props.onLeave}
     />
   );
@@ -288,10 +287,29 @@ function MenuPanel(props: {
   );
 }
 
+type MenuNavigator = { handle: (key: string) => boolean };
+const navigators: MenuNavigator[] = [];
+let detachKeys: (() => void) | undefined;
+
+const NAVIGATION_KEYS = ["up", "down", "left", "right", "home", "end", "enter"];
+
+function attachKeys() {
+  if (detachKeys) return;
+  detachKeys = keyboard.register(
+    NAVIGATION_KEYS,
+    (event) => {
+      const top = navigators[navigators.length - 1];
+      if (!top) return;
+      if (top.handle(event.key)) event.preventDefault();
+    },
+    { allowInTextInput: true }
+  );
+}
+
 function MenuItems(props: {
   items: MenuItem[];
   onClose: () => void;
-  autoFocus?: boolean;
+  navigation?: boolean;
   onLeave?: () => void;
 }) {
   const { items, onClose } = props;
@@ -302,14 +320,6 @@ function MenuItems(props: {
     focusRef.current = key;
     setFocusKeyState(key);
   };
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
-  const element = useRef<UIElement>(null);
-  useEffect(() => {
-    if (!props.autoFocus) return;
-    const timer = setTimeout(() => element.current?.focus(), 30);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const navigable = items.filter(
     (item): item is MenuButtonItem =>
       item.type === "button" && !item.isHidden && !item.isDisabled
@@ -320,54 +330,62 @@ function MenuItems(props: {
     setFocusKey(target.key);
     setOpenKey(undefined);
   };
-  const onKeyDown = (event: KeyEvent) => {
+  const handle = (key: string) => {
     const index = navigable.findIndex((item) => item.key === focusRef.current);
     const focused = navigable[index];
-    switch (event.key) {
-      case "ArrowDown":
+    switch (key) {
+      case "down":
         move(index < 0 ? 0 : index + 1);
-        break;
-      case "ArrowUp":
+        return true;
+      case "up":
         move(index < 0 ? navigable.length - 1 : index - 1);
-        break;
-      case "Home":
+        return true;
+      case "home":
         move(0);
-        break;
-      case "End":
+        return true;
+      case "end":
         move(navigable.length - 1);
-        break;
-      case "ArrowRight":
-        if (!focused?.menu) return;
-        setKeyboardOpen(true);
+        return true;
+      case "right":
+        if (!focused?.menu) return false;
         setOpenKey(focused.key);
-        break;
-      case "ArrowLeft":
-        if (!props.onLeave) return;
+        return true;
+      case "left":
+        if (!props.onLeave) return false;
         props.onLeave();
-        break;
-      case "Enter":
-      case " ":
-        if (!focused) return;
-        if (focused.menu) {
-          setKeyboardOpen(true);
-          setOpenKey(focused.key);
-        } else {
+        return true;
+      case "enter":
+        if (!focused) return false;
+        if (focused.menu) setOpenKey(focused.key);
+        else {
           focused.onClick?.();
           onClose();
         }
-        break;
+        return true;
       default:
-        return;
+        return false;
     }
-    event.preventDefault();
   };
+  const handleRef = useRef(handle);
+  handleRef.current = handle;
+  useEffect(() => {
+    if (!props.navigation) return;
+    const navigator: MenuNavigator = {
+      handle: (key) => handleRef.current(key)
+    };
+    navigators.push(navigator);
+    attachKeys();
+    return () => {
+      const index = navigators.indexOf(navigator);
+      if (index >= 0) navigators.splice(index, 1);
+      if (navigators.length === 0) {
+        detachKeys?.();
+        detachKeys = undefined;
+      }
+    };
+  }, [props.navigation]);
   return (
-    <Flex
-      ref={element}
-      testID="menu-items"
-      onKeyDown={onKeyDown}
-      sx={{ flexDirection: "column" }}
-    >
+    <>
       {environment.isDev && focusKey ? (
         <Box
           testID={`menu-cursor-${focusKey}`}
@@ -396,7 +414,6 @@ function MenuItems(props: {
               onHover={() => {
                 setFocusKey(item.isDisabled ? undefined : item.key);
                 setOpenKey(item.menu ? item.key : undefined);
-                setKeyboardOpen(false);
               }}
               onOpenSubmenu={() => setOpenKey(item.key)}
             />
@@ -405,12 +422,7 @@ function MenuItems(props: {
                 items={item.menu.items}
                 title={item.menu.title}
                 onClose={onClose}
-                autoFocus={keyboardOpen}
-                onLeave={() => {
-                  setOpenKey(undefined);
-                  setKeyboardOpen(false);
-                  element.current?.focus();
-                }}
+                onLeave={() => setOpenKey(undefined)}
                 sx={{
                   position: "absolute",
                   left: "100%",
@@ -422,7 +434,7 @@ function MenuItems(props: {
           </Box>
         );
       })}
-    </Flex>
+    </>
   );
 }
 
@@ -478,7 +490,6 @@ export function MenuHost() {
           title={title}
           onClose={close}
           onSize={setSize}
-          autoFocus
           maxHeight={viewport.height * 0.8}
           sx={{
             position: "absolute",
