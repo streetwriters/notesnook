@@ -283,6 +283,7 @@ export const Image = forwardRef<UIElement, Contract.ImageProps>(function Image(
       ref={inner as never}
       {...(nativeProps as object)}
       source={{ uri: props.src }}
+      onLoad={props.onLoad}
       resizeMode={props.resizeMode}
       accessibilityLabel={props.alt}
       style={viewStyle as never}

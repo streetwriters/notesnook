@@ -58,6 +58,14 @@ export interface DroppedFile {
   bytes(): Promise<Uint8Array>;
 }
 
+export interface PointerMoveEvent {
+  x: number;
+  y: number;
+  pageX: number;
+  pageY: number;
+  buttons: number;
+}
+
 export interface DragEvent {
   payload: unknown;
   x: number;
@@ -77,6 +85,9 @@ export interface BaseProps extends SpaceProps, ColorProps {
   onContextMenu?: (event: ContextMenuEvent) => void;
   onHoverIn?: (event: HoverEvent) => void;
   onHoverOut?: (event: HoverEvent) => void;
+  onPointerDown?: (event: PointerMoveEvent) => void;
+  onPointerMove?: (event: PointerMoveEvent) => void;
+  onPointerUp?: (event: PointerMoveEvent) => void;
   onFocus?: (event: FocusEvent) => void;
   onBlur?: (event: FocusEvent) => void;
   onKeyDown?: (event: KeyEvent) => void;
@@ -131,6 +142,7 @@ export interface ImageProps extends BaseProps {
   src: string;
   alt?: string;
   resizeMode?: "cover" | "contain" | "stretch";
+  onLoad?: () => void;
 }
 
 export interface InputProps extends BaseProps {

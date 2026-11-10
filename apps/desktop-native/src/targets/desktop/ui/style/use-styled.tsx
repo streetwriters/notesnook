@@ -32,6 +32,7 @@ import type {
   ContextMenuEvent,
   DragEvent,
   HoverEvent,
+  PointerMoveEvent,
   KeyEvent,
   PressEvent,
   SxProp
@@ -191,6 +192,18 @@ export function key(event: any): KeyEvent {
   };
 }
 
+function pointer(event: any): PointerMoveEvent {
+  const native = event?.nativeEvent ?? event ?? {};
+  rememberPointer(native);
+  return {
+    x: native.locationX ?? 0,
+    y: native.locationY ?? 0,
+    pageX: native.pageX ?? 0,
+    pageY: native.pageY ?? 0,
+    buttons: native.buttons ?? 0
+  };
+}
+
 function hover(event: any): HoverEvent {
   const native = event?.nativeEvent ?? event ?? {};
   rememberPointer(native);
@@ -324,6 +337,15 @@ export function useStyled(
         : undefined,
       onPointerLeave: props.onHoverOut
         ? (e: unknown) => props.onHoverOut?.(hover(e))
+        : undefined,
+      onPointerDown: props.onPointerDown
+        ? (e: unknown) => props.onPointerDown?.(pointer(e))
+        : undefined,
+      onPointerMove: props.onPointerMove
+        ? (e: unknown) => props.onPointerMove?.(pointer(e))
+        : undefined,
+      onPointerUp: props.onPointerUp
+        ? (e: unknown) => props.onPointerUp?.(pointer(e))
         : undefined,
       onFocus: props.onFocus as never,
       onBlur: props.onBlur as never,

@@ -23,6 +23,7 @@ import { strings } from "@notesnook/intl";
 import {
   Box,
   Button,
+  dataColor,
   Flex,
   Image,
   type KeyEvent,
@@ -34,6 +35,7 @@ import {
   Reset,
   RotateACW,
   RotateCW,
+  Loading,
   ZoomIn,
   ZoomOut,
   type Icon
@@ -72,6 +74,11 @@ function LightboxView(props: LightboxProps) {
     images
   } = props;
   const container = useRef<UIElement>(null);
+  const drag = useRef<
+    { x: number; y: number; ox: number; oy: number } | undefined
+  >(undefined);
+  const [moving, setMoving] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState({ x: 0, y: 0, zoom: 1, rotate: 0 });
   const [current, setCurrent] = useState(props.startIndex ?? 0);
   const multi = !!images?.length;
@@ -82,6 +89,9 @@ function LightboxView(props: LightboxProps) {
   }, []);
 
   const image = multi ? images?.[current]?.url ?? "" : props.image ?? "";
+  useEffect(() => {
+    setLoading(true);
+  }, [image]);
   if (!image) return null;
 
   const shouldShowReset = !!x || !!y || zoom !== 1 || rotate !== 0;
@@ -262,26 +272,65 @@ function LightboxView(props: LightboxProps) {
           position: "relative"
         }}
       >
+        {moving ? (
+          <Box
+            testID="lightbox-moving"
+            sx={{ position: "absolute", width: 0, height: 0 }}
+          />
+        ) : null}
+        {loading ? (
+          <Flex
+            testID="lightbox-loading"
+            sx={{ position: "absolute", alignSelf: "center" }}
+          >
+            <Loading color={dataColor("#ffffff")} size={60} />
+          </Flex>
+        ) : null}
         <Box
-          onPress={(e) => e.stopPropagation()}
-          onDoubleClick={() => shockZoom()}
+          testID="lightbox-image"
+          onPointerDown={(e) => {
+            if (zoom <= 1) return;
+            drag.current = { x: e.pageX, y: e.pageY, ox: x, oy: y };
+            setMoving(true);
+          }}
+          onPointerMove={(e) => {
+            const start = drag.current;
+            if (!start) return;
+            setView((v) => ({
+              ...v,
+              x: start.ox + e.pageX - start.x,
+              y: start.oy + e.pageY - start.y
+            }));
+          }}
+          onPointerUp={() => {
+            drag.current = undefined;
+            setMoving(false);
+          }}
           sx={{
+            cursor: zoom > 1 ? (moving ? "move" : "grab") : "default",
             transform: [
               { translateX: x },
               { translateY: y },
               { scale: zoom },
               { rotate: `${rotate}deg` }
             ],
-            transition: { property: "transform", duration: 100 },
+            transition: { property: "transform", duration: moving ? 0 : 100 },
             minWidth: 100,
             minHeight: 100
           }}
         >
-          <Image
-            src={image}
-            resizeMode="contain"
-            sx={{ width: "80%", height: "80%" }}
-          />
+          <Box
+            onPress={(e) => e.stopPropagation()}
+            onDoubleClick={() => shockZoom()}
+            sx={{ minWidth: 100, minHeight: 100 }}
+          >
+            <Image
+              src={image}
+              onLoad={() => setLoading(false)}
+              resizeMode="contain"
+              sx={{ width: "80%", height: "80%" }}
+            />
+          </Box>
         </Box>
       </Flex>
     </Flex>
