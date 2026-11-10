@@ -49,6 +49,18 @@ interface SlideProps {
   sx?: SxProp;
 }
 
+const SLIDE_IN: SxProp = {
+  animation: {
+    keyframes: {
+      from: { opacity: 0, transform: [{ translateY: 40 }] },
+      to: { opacity: 1, transform: [{ translateY: 0 }] }
+    },
+    duration: 800,
+    iterationCount: 1,
+    easing: "ease-out"
+  }
+};
+
 function Slide({ children, sx }: SlideProps) {
   const { height } = useWindowSize();
   return (
@@ -68,6 +80,7 @@ function Slide({ children, sx }: SlideProps) {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          ...SLIDE_IN,
           ...sx
         }}
       >
