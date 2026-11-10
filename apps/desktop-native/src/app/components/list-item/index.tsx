@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Item } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { environment } from "@platform";
@@ -40,7 +40,6 @@ import {
 } from "../../stores/selection-store";
 import { Menu } from "../../hooks/use-menu";
 import { setDragData } from "../../utils/data-transfer";
-import { useMenuStore } from "../menu/store";
 
 type ListItemColors = {
   heading: ColorValue;
@@ -94,7 +93,6 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     item
   } = props;
   const selection = useListSelection();
-  const [isMenuTarget, setIsMenuTarget] = useState(false);
   const isSelected = useSelectionStore((store) => {
     const isInSelection = store.selectedItems.includes(item.id);
     return isFocused
@@ -105,7 +103,7 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     selection !== undefined &&
     props.index !== undefined &&
     selection.focusedIndex === props.index;
-  const selected = isSelected || isFocused || isMenuTarget;
+  const selected = isSelected || isFocused;
 
   const onPressRef = useRef(props.onPress);
   onPressRef.current = props.onPress;
@@ -142,15 +140,9 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
     }
     if (!menuItems.length) return;
 
-    setIsMenuTarget(true);
     Menu.openMenu(menuItems, {
       title,
       position: { x: event.pageX, y: event.pageY }
-    });
-    const unsubscribe = useMenuStore.subscribe((state) => {
-      if (state.items) return;
-      unsubscribe();
-      setIsMenuTarget(false);
     });
   };
 

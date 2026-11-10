@@ -663,3 +663,24 @@ scenarios.probeFocus = {
     { active: "after down" }
   ]
 };
+
+for (const name of [
+  "notebookOpen",
+  "notebookTree",
+  "viewTagNotes",
+  "jumpToGroupMenu",
+  "contextMenuNote",
+  "contextMenuNotebook",
+  "contextMenuTag",
+  "contextMenuReminder",
+  "contextMenuTrash",
+  "listReminderSelected",
+  "listReminderFocus",
+  "listTrashSelected",
+  "listTrashFocus",
+  "listNotebookSelected",
+  "listNotebookFocus",
+  "listTagSelected",
+  "listTagFocus"
+])
+  if (scenarios[name]) scenarios[name].keepPointer = true;
