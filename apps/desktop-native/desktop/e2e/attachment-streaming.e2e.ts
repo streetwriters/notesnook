@@ -191,8 +191,9 @@ describe("attachment streaming", () => {
           ? JSON.parse(readFileSync(statusPath, "utf8"))
           : undefined;
         if (status && status.phase !== phase) {
+          if (status.phase === "error")
+            throw new Error(`${phase}: ${status.message}`);
           phase = status.phase;
-          if (phase === "error") throw new Error(status.message);
           peaks[phase] = { start: rssKb(pid), peak: rssKb(pid) };
         }
         last = status?.phase ?? "";

@@ -54,6 +54,8 @@ import {
   sodiumCacheDirectory
 } from "./attachment-math";
 
+const UPLOAD_CONCURRENCY = 1;
+
 type RequestOptionsWithSignal = RequestOptions & { signal: AbortSignal };
 
 type UploadAdditionalData = {
@@ -686,7 +688,7 @@ async function multiPartUploadFile(
     await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
   };
   const workers = Array.from(
-    { length: Math.min(4, pending.length) },
+    { length: Math.min(UPLOAD_CONCURRENCY, pending.length) },
     async () => {
       for (
         let next = pending.shift();

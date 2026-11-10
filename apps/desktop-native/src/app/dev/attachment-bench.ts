@@ -99,7 +99,7 @@ export async function runAttachmentBench(options: AttachmentBench) {
     await target.close();
     await status("done");
   } catch (e) {
-    await status("error", {
+    await status("error", { 
       message: e instanceof Error ? e.message : String(e)
     });
   }

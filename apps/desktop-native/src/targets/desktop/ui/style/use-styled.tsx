@@ -265,6 +265,7 @@ export function useStyled(
     const nativeProps: Record<string, unknown> = {
       testID: props.testID,
       nativeID: props.id,
+      tooltip: props.title || undefined,
       group: props.group,
       hoverStyle: resolved.hoverStyle,
       activeStyle: resolved.activeStyle,
