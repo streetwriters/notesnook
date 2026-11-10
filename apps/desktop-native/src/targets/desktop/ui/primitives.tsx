@@ -424,20 +424,33 @@ export const Switch = forwardRef<UIElement, Contract.SwitchProps>(
           event.stopPropagation();
           props.onChange?.(!checked);
         }}
-        testID="switch-track"
         style={[
           viewStyle as object,
           {
             width: 34,
             height: 18,
             borderRadius: 18,
-            backgroundColor: background,
+            backgroundColor: "transparent",
             opacity: props.disabled ? 0.5 : 1
           }
         ]}
       >
         <View
+          testID="switch-track"
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 34,
+            height: 18,
+            borderRadius: 18,
+            backgroundColor: background
+          }}
+        />
+        <View
           testID="switch-thumb"
+          pointerEvents="none"
           style={{
             position: "absolute",
             top: 4,
