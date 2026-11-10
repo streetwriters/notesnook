@@ -21,7 +21,7 @@
     },
     "resources": [
       "../node_modules/@react-native-gpui/pdf/THIRD_PARTY_NOTICES.md",
-      "../THIRD_PARTY_NOTICES-app.md"
+      "../THIRD_PARTY_NOTICES.md"
     ]
   }
 }
