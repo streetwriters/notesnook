@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useRef, useState } from "react";
-import type { MenuItem, SxProp, UIElement } from "@ui";
+import type { KeyEvent, MenuItem, SxProp, UIElement } from "@ui";
 import {
   Box,
   Button,
@@ -26,6 +26,7 @@ import {
   Flex,
   Icon,
   Text,
+  ScrollContainer,
   ThemeScope,
   useWindowSize
 } from "@ui";
@@ -212,9 +213,23 @@ function MenuPanel(props: {
   title?: string;
   onClose: () => void;
   onSize?: (size: { width: number; height: number }) => void;
+  autoFocus?: boolean;
+  onLeave?: () => void;
+  maxHeight?: number;
   sx?: SxProp;
 }) {
   const { title, items, onClose, onSize } = props;
+  const scrollable =
+    props.maxHeight !== undefined &&
+    !items.some((item) => item.type === "button" && !!item.menu);
+  const list = (
+    <MenuItems
+      items={items}
+      onClose={onClose}
+      autoFocus={props.autoFocus}
+      onLeave={props.onLeave}
+    />
+  );
   const element = useRef<UIElement>(null);
   useEffect(() => {
     if (!onSize) return;
@@ -262,17 +277,103 @@ function MenuPanel(props: {
           <Separator />
         </>
       ) : null}
-      <MenuItems items={items} onClose={onClose} />
+      {scrollable ? (
+        <ScrollContainer sx={{ maxHeight: (props.maxHeight ?? 0) - 40 }}>
+          {list}
+        </ScrollContainer>
+      ) : (
+        list
+      )}
     </Flex>
   );
 }
 
-function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
+function MenuItems(props: {
+  items: MenuItem[];
+  onClose: () => void;
+  autoFocus?: boolean;
+  onLeave?: () => void;
+}) {
   const { items, onClose } = props;
   const [openKey, setOpenKey] = useState<string>();
-  const [focusKey, setFocusKey] = useState<string>();
+  const [focusKey, setFocusKeyState] = useState<string>();
+  const focusRef = useRef<string | undefined>(undefined);
+  const setFocusKey = (key: string | undefined) => {
+    focusRef.current = key;
+    setFocusKeyState(key);
+  };
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const element = useRef<UIElement>(null);
+  useEffect(() => {
+    if (!props.autoFocus) return;
+    const timer = setTimeout(() => element.current?.focus(), 30);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const navigable = items.filter(
+    (item): item is MenuButtonItem =>
+      item.type === "button" && !item.isHidden && !item.isDisabled
+  );
+  const move = (to: number) => {
+    const target = navigable[(to + navigable.length) % navigable.length];
+    if (!target) return;
+    setFocusKey(target.key);
+    setOpenKey(undefined);
+  };
+  const onKeyDown = (event: KeyEvent) => {
+    const index = navigable.findIndex((item) => item.key === focusRef.current);
+    const focused = navigable[index];
+    switch (event.key) {
+      case "ArrowDown":
+        move(index < 0 ? 0 : index + 1);
+        break;
+      case "ArrowUp":
+        move(index < 0 ? navigable.length - 1 : index - 1);
+        break;
+      case "Home":
+        move(0);
+        break;
+      case "End":
+        move(navigable.length - 1);
+        break;
+      case "ArrowRight":
+        if (!focused?.menu) return;
+        setKeyboardOpen(true);
+        setOpenKey(focused.key);
+        break;
+      case "ArrowLeft":
+        if (!props.onLeave) return;
+        props.onLeave();
+        break;
+      case "Enter":
+      case " ":
+        if (!focused) return;
+        if (focused.menu) {
+          setKeyboardOpen(true);
+          setOpenKey(focused.key);
+        } else {
+          focused.onClick?.();
+          onClose();
+        }
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+  };
   return (
-    <>
+    <Flex
+      ref={element}
+      testID="menu-items"
+      onKeyDown={onKeyDown}
+      sx={{ flexDirection: "column" }}
+    >
+      {environment.isDev && focusKey ? (
+        <Box
+          testID={`menu-cursor-${focusKey}`}
+          sx={{ position: "absolute", width: 0, height: 0 }}
+        />
+      ) : null}
       {items.map((item) => {
         if (item.isHidden) return null;
         if (item.type === "separator") return <Separator key={item.key} />;
@@ -295,6 +396,7 @@ function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
               onHover={() => {
                 setFocusKey(item.isDisabled ? undefined : item.key);
                 setOpenKey(item.menu ? item.key : undefined);
+                setKeyboardOpen(false);
               }}
               onOpenSubmenu={() => setOpenKey(item.key)}
             />
@@ -303,6 +405,12 @@ function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
                 items={item.menu.items}
                 title={item.menu.title}
                 onClose={onClose}
+                autoFocus={keyboardOpen}
+                onLeave={() => {
+                  setOpenKey(undefined);
+                  setKeyboardOpen(false);
+                  element.current?.focus();
+                }}
                 sx={{
                   position: "absolute",
                   left: "100%",
@@ -314,7 +422,7 @@ function MenuItems(props: { items: MenuItem[]; onClose: () => void }) {
           </Box>
         );
       })}
-    </>
+    </Flex>
   );
 }
 
@@ -370,6 +478,8 @@ export function MenuHost() {
           title={title}
           onClose={close}
           onSize={setSize}
+          autoFocus
+          maxHeight={viewport.height * 0.8}
           sx={{
             position: "absolute",
             top,

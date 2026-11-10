@@ -29,6 +29,13 @@ afterEach(async () => {
   await resetUi(app);
 });
 
+async function pressSlowly(key: string, times = 1) {
+  for (let index = 0; index < times; index++) {
+    await app.press(key);
+    await new Promise((resolve) => setTimeout(resolve, 120));
+  }
+}
+
 describe("note context menu", () => {
   test("a note offers the full set of note actions", async () => {
     await goTo(app, "Notes");
@@ -57,6 +64,39 @@ describe("note context menu", () => {
     await clickMenu(app, "export");
     await expectMenu(app, ["md", "html", "txt"]);
     await expectNoMenuItems(app, ["pdf"]);
+    await closeMenu(app);
+  });
+
+  test("arrow keys move through the items and enter runs the focused one", async () => {
+    await goTo(app, "Notes");
+    await rightClick(app, "Grocery list");
+    await expectMenu(app, ["pin"]);
+    await app.mouseMove({ x: 2, y: 2 });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    await pressSlowly("down", 2);
+    await pressSlowly("enter");
+    await expectNoMenuItems(app, ["pin"]);
+    await settle(async () => {
+      const entries = await app.query("testID", "group-header", true);
+      expect(entries.length).toBeGreaterThan(0);
+    });
+  });
+
+  test("right arrow opens a submenu and left arrow closes it", async () => {
+    await rightClick(app, "Grocery list");
+    await expectMenu(app, ["export"]);
+    await app.mouseMove({ x: 2, y: 2 });
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    for (let index = 0; index < 15; index++) {
+      if ((await count(app, "menu-cursor-export")) > 0) break;
+      await pressSlowly("down");
+    }
+    expect(await count(app, "menu-cursor-export")).toBe(1);
+    await pressSlowly("right");
+    await expectMenu(app, ["md", "html", "txt"]);
+    await pressSlowly("left");
+    await expectNoMenuItems(app, ["md"]);
+    await expectMenu(app, ["export"]);
     await closeMenu(app);
   });
 
