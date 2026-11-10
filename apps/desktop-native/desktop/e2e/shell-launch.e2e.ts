@@ -32,14 +32,16 @@ afterEach(async () => {
   app = undefined;
 });
 
-async function start(args: string[]) {
+async function start(args: string[], seedConfig?: Record<string, unknown>) {
   app = await launchApp({
     disableAnimations: true,
     timeout: 180000,
     args,
-    initialProps: { resetConfig: true },
+    initialProps: { resetConfig: true, seedConfig },
     env: {
-      RN_GPUI_APP_DATA_DIR: mkdtempSync(path.join(tmpdir(), "notesnook-launch-"))
+      RN_GPUI_APP_DATA_DIR: mkdtempSync(
+        path.join(tmpdir(), "notesnook-launch-")
+      )
     }
   });
   await waitForShellContent(app);
@@ -71,5 +73,35 @@ describe("launch arguments", () => {
     const running = await start([]);
     expect(await count(running, "add-notebook-dialog")).toBe(0);
     expect(await count(running, "add-reminder-dialog")).toBe(0);
+  });
+});
+
+describe("tray", () => {
+  test("there is no tray icon without a tray setting", async () => {
+    const running = await start([]);
+    expect((await running.trayState()).installed).toBe(false);
+  });
+
+  test("closing to the tray installs the icon with show, new note, new notebook and quit", async () => {
+    const running = await start([], {
+      desktopIntegration: { closeToSystemTray: true }
+    });
+    await settle(async () =>
+      expect((await running.trayState()).installed).toBe(true)
+    );
+    const state = await running.trayState();
+    expect(state.hasMenu).toBe(true);
+    expect(state.hideWindowOnClose).toBe(true);
+    expect(state.menuItems?.length).toBe(6);
+  });
+
+  test("minimizing to the tray installs the icon without hiding on close", async () => {
+    const running = await start([], {
+      desktopIntegration: { minimizeToSystemTray: true }
+    });
+    await settle(async () =>
+      expect((await running.trayState()).installed).toBe(true)
+    );
+    expect((await running.trayState()).hideWindowOnClose).toBe(false);
   });
 });
