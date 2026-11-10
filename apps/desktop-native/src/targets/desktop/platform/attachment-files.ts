@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Sodium from "@ammarahmed/react-native-sodium";
-import fs, { download, paths } from "@react-native-gpui/fs";
+import fs, { download, paths, upload } from "@react-native-gpui/fs";
 import { StreamableFS } from "@notesnook/streamable-fs";
 import type { FileHandle } from "@notesnook/streamable-fs";
 import {
@@ -54,7 +54,7 @@ import {
   sodiumCacheDirectory
 } from "./attachment-math";
 
-const UPLOAD_CONCURRENCY = 1;
+const UPLOAD_CONCURRENCY = 2;
 
 type RequestOptionsWithSignal = RequestOptions & { signal: AbortSignal };
 
@@ -79,10 +79,22 @@ class HttpError extends Error {
   }
 }
 
+async function readIntoBuffer(path: string) {
+  const handle = await fs.promises.open(path, "r");
+  try {
+    const { size } = await handle.stat();
+    const buffer = new Uint8Array(size);
+    const { bytesRead } = await handle.read(buffer, 0, size, 0);
+    return bytesRead === size ? buffer : buffer.slice(0, bytesRead);
+  } finally {
+    await handle.close();
+  }
+}
+
 const fsStore = {
   mkdir: (path: string, options: { recursive: boolean }) =>
     fs.promises.mkdir(path, options),
-  readFile: (path: string) => fs.promises.readFile(path),
+  readFile: readIntoBuffer,
   writeFile: (path: string, data: Uint8Array) =>
     fs.promises.writeFile(path, data),
   readdir: (path: string) => fs.promises.readdir(path),
@@ -519,8 +531,11 @@ function request(
       cleanup();
       const headers: Record<string, string> = {};
       for (const line of (xhr.getAllResponseHeaders() || "").split(/\r?\n/)) {
-        const m = /^\d+: ([^,]+),(.*)$/.exec(line);
-        if (m) headers[m[1].trim().toLowerCase()] = m[2].trim();
+        const index = line.indexOf(":");
+        if (index > 0)
+          headers[line.slice(0, index).trim().toLowerCase()] = line
+            .slice(index + 1)
+            .trim();
       }
       const result = {
         status: xhr.status,
@@ -542,26 +557,54 @@ function request(
   });
 }
 
-async function readChunksAsBytes(
+async function writeChunksToFile(
   handle: FileHandle,
   from: number,
-  length: number
+  length: number,
+  path: string
 ) {
-  const parts: Uint8Array[] = [];
+  const out = await fs.promises.open(path, "w");
   let total = 0;
-  for (let i = from; i < from + length; ++i) {
-    const chunk = await handle.readChunk(i);
-    if (!chunk) throw new Error(`No data found for chunk at offset ${i}.`);
-    parts.push(chunk);
-    total += chunk.length;
+  try {
+    for (let i = from; i < from + length; ++i) {
+      const chunk = await handle.readChunk(i);
+      if (!chunk) throw new Error(`No data found for chunk at offset ${i}.`);
+      await out.write(chunk);
+      total += chunk.length;
+    }
+  } finally {
+    await out.close();
   }
-  const out = new Uint8Array(total);
-  let offset = 0;
-  for (const part of parts) {
-    out.set(part, offset);
-    offset += part.length;
+  return total;
+}
+
+async function uploadChunks(
+  handle: FileHandle,
+  from: number,
+  length: number,
+  url: string,
+  options: {
+    headers?: Record<string, string>;
+    signal?: AbortSignal;
+    onProgress?: (sent: number) => void;
   }
-  return out;
+) {
+  const temp = `${paths.temp}/upload-${randomId()}`;
+  try {
+    const size = await writeChunksToFile(handle, from, length, temp);
+    const response = await upload(url, temp, {
+      headers: options.headers,
+      signal: options.signal,
+      onProgress: options.onProgress
+        ? (sent) => options.onProgress?.(sent)
+        : undefined
+    });
+    if (!isSuccessStatusCode(response.status))
+      throw new HttpError(response.status, response.body);
+    return { size, headers: response.headers, status: response.status };
+  } finally {
+    await removeQuietly(temp);
+  }
 }
 
 async function getUploadedFileSize(filename: string) {
@@ -607,17 +650,21 @@ async function singlePartUploadFile(
   requestOptions: RequestOptionsWithSignal
 ) {
   const { url, headers, signal } = requestOptions;
-  const body = await readChunksAsBytes(fileHandle, 0, fileHandle.chunks.length);
-  const response = await request("PUT", url, {
-    headers: { ...headers, "Content-Type": "" },
-    body,
-    signal,
-    onUploadProgress: (loaded) =>
-      reportProgress(
-        { total: fileHandle.file.size + ABYTES, loaded },
-        { type: "upload", hash: filename }
-      )
-  });
+  const response = await uploadChunks(
+    fileHandle,
+    0,
+    fileHandle.chunks.length,
+    url,
+    {
+      headers: { ...headers, "Content-Type": "" },
+      signal,
+      onProgress: (loaded) =>
+        reportProgress(
+          { total: fileHandle.file.size + ABYTES, loaded },
+          { type: "upload", hash: filename }
+        )
+    }
+  );
   return isSuccessStatusCode(response.status);
 }
 
@@ -668,10 +715,8 @@ async function multiPartUploadFile(
       fileHandle.chunks.length - from,
       UPLOAD_PART_REQUIRED_CHUNKS
     );
-    const body = await readChunksAsBytes(fileHandle, from, length);
-    const response = await request("PUT", parts[i], {
+    const response = await uploadChunks(fileHandle, from, length, parts[i], {
       headers: { "Content-Type": "" },
-      body,
       signal
     }).catch((e) => {
       throw new WrappedError(`Failed to upload part at offset ${i}`, e);
@@ -681,7 +726,7 @@ async function multiPartUploadFile(
       throw new Error(
         `Failed to upload part at offset ${i}: invalid etag. ETag: ${etag}`
       );
-    uploadedBytes += body.length;
+    uploadedBytes += response.size;
     report();
     uploadedChunks.push({ PartNumber: i + 1, ETag: JSON.parse(etag) });
     await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);

@@ -77,6 +77,7 @@ export type BootOptions = {
   seedConfig?: Record<string, unknown>;
   simulateMigrationMs?: number;
   openPdf?: { base64: string; hash?: string };
+  openLightbox?: { image: string };
   attachmentBench?: import("./dev/attachment-bench").AttachmentBench;
   resetConfig?: boolean;
   delayDatabaseMs?: number;
@@ -268,6 +269,10 @@ async function run(options: BootOptions) {
       url: `data:application/pdf;base64,${base64}`,
       hash: hash ?? "e2e-pdf"
     });
+  }
+  if (environment.isDev && options.openLightbox) {
+    const { Lightbox } = await import("./components/lightbox");
+    Lightbox.show({ image: options.openLightbox.image });
   }
   if (environment.isDev && options.seedUser) await seedUser(options.seedUser);
   if (environment.isDev && options.attachmentBench) {
