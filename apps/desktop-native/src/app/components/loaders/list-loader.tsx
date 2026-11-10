@@ -19,7 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { memo } from "react";
 import { getRandomArbitrary } from "@notesnook/common";
-import { Box, Flex } from "@ui";
+import { Box, Flex, type SxProp } from "@ui";
+
+const SHIMMER: SxProp = {
+  animation: {
+    keyframes: {
+      from: { opacity: 1 },
+      "50%": { opacity: 0.45 },
+      to: { opacity: 1 }
+    },
+    duration: 1500,
+    iterationCount: "infinite",
+    easing: "ease-in-out"
+  }
+};
 
 const Lines = [1, 2].map(() => getRandomArbitrary(40, 90));
 
@@ -27,6 +40,7 @@ function Bone(props: {
   height: number;
   width: number | `${number}%`;
   circle?: boolean;
+  shimmer?: boolean;
   ml?: number;
   mb?: number;
 }) {
@@ -38,7 +52,8 @@ function Bone(props: {
         bg: "background-secondary",
         borderRadius: props.circle ? props.height : 4,
         ml: props.ml,
-        mb: props.mb
+        mb: props.mb,
+        ...(props.shimmer ? SHIMMER : undefined)
       }}
     />
   );
@@ -50,8 +65,8 @@ export const ListLoader = memo(function ListLoader() {
       {Lines.map((width) => (
         <Box key={width} sx={{ py: 2, px: 1 }}>
           <Bone height={16} width={`${width}%`} mb={5} />
-          <Bone height={12} width="100%" />
-          <Bone height={12} width="100%" />
+          <Bone height={12} width="100%" shimmer />
+          <Bone height={12} width="100%" shimmer />
           <Flex sx={{ flexDirection: "row" }}>
             <Bone height={10} width={50} />
             <Bone height={10} width={10} circle ml={5} />
