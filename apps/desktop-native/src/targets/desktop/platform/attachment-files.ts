@@ -517,13 +517,9 @@ function request(
       cleanup();
       const headers: Record<string, string> = {};
       for (const line of (xhr.getAllResponseHeaders() || "").split(/\r?\n/)) {
-        const index = line.indexOf(":");
-        if (index > 0)
-          headers[line.slice(0, index).trim().toLowerCase()] = line
-            .slice(index + 1)
-            .trim();
+        const m = /^\d+: ([^,]+),(.*)$/.exec(line);
+        if (m) headers[m[1].trim().toLowerCase()] = m[2].trim();
       }
-      console.log("XHRHDRS", method, xhr.status, JSON.stringify(xhr.getAllResponseHeaders()), Object.keys(headers).join());
       const result = {
         status: xhr.status,
         headers,

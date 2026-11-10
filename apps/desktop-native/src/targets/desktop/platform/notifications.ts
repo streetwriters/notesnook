@@ -17,11 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { App } from "@react-native-gpui/core/desktop";
 import {
   getPermission,
+  onEvent,
   requestPermission,
   show
 } from "@react-native-gpui/notifications";
+import { environment } from "./environment";
 import type { Notifications } from "../../../platform";
 
 export const notifications: Notifications = {
@@ -32,12 +35,26 @@ export const notifications: Notifications = {
     return (await requestPermission()) === "granted";
   },
   async show(options) {
+    const outcome = new Promise<boolean>((resolve) => {
+      const subscription = onEvent((event) => {
+        if (event.notification.id !== options.tag) return;
+        if (event.type === "press" || event.type === "action") {
+          subscription.remove();
+          resolve(true);
+        } else if (event.type === "dismiss") {
+          subscription.remove();
+          resolve(false);
+        }
+      });
+    });
     await show({
       id: options.tag,
       title: options.title,
       body: options.body,
       silent: options.silent
     });
-    return true;
+    if (options.urgency === "critical" && environment.os !== "Linux")
+      App.beep().catch(() => {});
+    return outcome;
   }
 };
