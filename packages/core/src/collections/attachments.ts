@@ -386,7 +386,8 @@ export class Attachments implements ICollection {
 
   reset(id: string) {
     return this.collection.update([id], {
-      dateUploaded: null
+      dateUploaded: null,
+      failed: null
     });
   }
 
