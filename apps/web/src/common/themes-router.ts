@@ -21,7 +21,10 @@ import type { ThemesRouter as ThemesRouterType } from "@notesnook/themes-server"
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 
-export const THEME_SERVER_URL = "https://themes-api.notesnook.com";
+export const THEME_SERVER_URL =
+  import.meta.env.NN_THEME_SERVER_URL ||
+  "https://themes-api.notesnook.com";
+
 export const ThemesRouter = createTRPCProxyClient<ThemesRouterType>({
   links: [
     httpBatchLink({
