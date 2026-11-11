@@ -780,6 +780,34 @@ class EditorStore extends BaseStore<EditorStore> {
         options
       );
     } else if (isLocked && note.type !== "trash") {
+      // if the vault is already unlocked, open the note directly instead
+      // of asking for the password again.
+      const unlockedNote = db.vault.unlocked
+        ? await db.vault.open(note.id).catch(() => undefined)
+        : undefined;
+      const tags = unlockedNote?.content
+        ? await db.notes.tags(note.id)
+        : undefined;
+      // the vault might have been locked while we were decrypting the note
+      if (unlockedNote?.content && tags && db.vault.unlocked) {
+        this.addSession(
+          {
+            type: note.readonly ? "readonly" : "default",
+            locked: true,
+            id: sessionId,
+            note,
+            saveState: SaveState.Saved,
+            sessionId: `${Date.now()}`,
+            tags,
+            content: unlockedNote.content,
+            activeBlockId: options.activeBlockId,
+            tabId
+          },
+          options
+        );
+        return;
+      }
+
       this.addSession(
         {
           type: "locked",
