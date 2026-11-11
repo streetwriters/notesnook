@@ -26,22 +26,42 @@ export function useWindowControls() {
   const [isFullscreen, setIsFullscreen] = useState<boolean>();
 
   useEffect(() => {
+    let syncTimeout: number | undefined;
+    // fullscreen/maximize events can arrive out of order during window
+    // state transitions leaving us with a stale value, so we re-query
+    // the actual window state whenever the window is focused or resized.
+    function syncWindowState() {
+      clearTimeout(syncTimeout);
+      syncTimeout = window.setTimeout(() => {
+        desktop?.window.maximized
+          .query()
+          .then((value) => setIsMaximized(value));
+        desktop?.window.fullscreen
+          .query()
+          .then((value) => setIsFullscreen(value));
+      }, 100);
+    }
+
     const event = desktop?.window.onWindowStateChanged.subscribe(undefined, {
       onData(value) {
         setIsMaximized(value.maximized);
         setIsFullscreen(value.fullscreen);
       }
     });
-    desktop?.window.maximized.query().then((value) => setIsMaximized(value));
-    desktop?.window.fullscreen.query().then((value) => setIsFullscreen(value));
+    syncWindowState();
 
     function onFullscreenChange() {
       setIsFullscreen(!!document.fullscreenElement);
     }
     document.addEventListener("fullscreenchange", onFullscreenChange);
+    window.addEventListener("focus", syncWindowState);
+    window.addEventListener("resize", syncWindowState);
     return () => {
+      clearTimeout(syncTimeout);
       event?.unsubscribe();
       document.removeEventListener("fullscreenchange", onFullscreenChange);
+      window.removeEventListener("focus", syncWindowState);
+      window.removeEventListener("resize", syncWindowState);
     };
   }, []);
 
