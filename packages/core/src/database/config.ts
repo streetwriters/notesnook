@@ -26,7 +26,7 @@ export class ConfigStorage {
   }
 
   async getItem(name: string): Promise<unknown | undefined> {
-    const result = await this.db.then((db) =>
+    const result = await this.db().then((db) =>
       db
         .selectFrom("config")
         .where("name", "==", name)
@@ -39,7 +39,7 @@ export class ConfigStorage {
   }
 
   async setItem(name: string, value: unknown) {
-    await this.db.then((db) =>
+    await this.db().then((db) =>
       db
         .replaceInto("config")
         .values({
@@ -52,12 +52,12 @@ export class ConfigStorage {
   }
 
   async removeItem(name: string) {
-    await this.db.then((db) =>
+    await this.db().then((db) =>
       db.deleteFrom("config").where("name", "==", name).execute()
     );
   }
 
   async clear() {
-    await this.db.then((db) => db.deleteFrom("config").execute());
+    await this.db().then((db) => db.deleteFrom("config").execute());
   }
 }

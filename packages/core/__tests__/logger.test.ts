@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { initialize, logManager, logger } from "../src/logger.js";
 import { SqliteDialect } from "@streetwriters/kysely";
 import BetterSQLite3 from "better-sqlite3-multiple-ciphers";
@@ -82,5 +82,31 @@ describe("Logger", () => {
     const logsAfterDeletion = await logManager?.get();
     expect(logsAfterDeletion).toBeDefined();
     expect(logsAfterDeletion?.length).toBe(0);
+  });
+
+  it("should keep logs that failed to write", async () => {
+    await initializeLogger();
+    const writer = (logManager as any).writer;
+    const insertInto = vi
+      .spyOn(writer.db, "insertInto")
+      .mockImplementationOnce(() => {
+        throw new Error("write failed");
+      });
+    logger.log("Test message");
+    await expect(writer.flush()).rejects.toThrow("write failed");
+    insertInto.mockRestore();
+
+    await writer.flush();
+    const logs = await logManager?.get();
+    expect(logs?.[0].logs[0].message).toBe("Test message");
+  });
+
+  it("should stop flushing after close", async () => {
+    await initializeLogger();
+    const writer = (logManager as any).writer;
+    const flush = vi.spyOn(writer, "flush");
+    await logManager?.close();
+    await delay(500);
+    expect(flush).not.toHaveBeenCalled();
   });
 });

@@ -61,7 +61,6 @@ import {
   StorageAccessor
 } from "../interfaces.js";
 import TokenManager from "./token-manager.js";
-import { Attachment } from "../types.js";
 import { Settings } from "../collections/settings.js";
 import {
   DatabaseAccessor,
@@ -162,10 +161,10 @@ class Database {
     return this._sql;
   };
 
-  private _kv = new KVStorage(this.databaseReady.promise);
+  private _kv = new KVStorage(() => this.databaseReady.promise);
   kv: KVStorageAccessor = () => this._kv;
   private _config: ConfigStorage = new ConfigStorage(
-    this.databaseReady.promise
+    () => this.databaseReady.promise
   );
   config: ConfigStorageAccessor = () => this._config;
 
@@ -300,23 +299,23 @@ class Database {
       this
     );
     this.eventManager.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
-    this.eventManager.subscribe(
-      EVENTS.attachmentDeleted,
-      async (attachment: Attachment) => {
-        await this.fs().cancel(attachment.hash);
-      }
-    );
     this.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.clear();
       await this.fs().clear();
       this.disconnectSSE();
     });
 
-    this._sql = (await createDatabase<RawDatabaseSchema>("notesnook", {
-      ...this.options.sqliteOptions,
-      migrationProvider: new NNMigrationProvider(),
-      onInit: (db) => this.onInit(db)
-    })) as unknown as Kysely<DatabaseSchema>;
+    this.databaseReady.reset();
+    try {
+      this._sql = (await createDatabase<RawDatabaseSchema>("notesnook", {
+        ...this.options.sqliteOptions,
+        migrationProvider: new NNMigrationProvider(),
+        onInit: (db) => this.onInit(db)
+      })) as unknown as Kysely<DatabaseSchema>;
+    } catch (e) {
+      this.databaseReady.reject(e);
+      throw e;
+    }
     this.databaseReady.resolve(this._sql);
 
     await this.sanitizer.init();

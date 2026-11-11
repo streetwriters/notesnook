@@ -33,6 +33,7 @@ import { SQLiteOptions, createDatabase } from "./database/index.js";
 import { toChunks } from "./utils/array.js";
 
 const WEEK = 86400000 * 7;
+const MAX_QUEUED_LOGS = 10000;
 
 // Database logger reporter:
 // 1. Log to new key on every instance
@@ -91,19 +92,29 @@ class DatabaseLogWriter {
   private queue: LogMessageWithDate[] = [];
   private hasCleared = false;
 
+  private interval: ReturnType<typeof setInterval>;
+
   constructor(private readonly db: Kysely<LogDatabaseSchema>) {
-    setInterval(
+    this.interval = setInterval(
       () => {
-        setTimeout(() => {
-          if (!this.hasCleared) {
-            this.hasCleared = true;
-            this.rotate();
+        setTimeout(async () => {
+          try {
+            if (!this.hasCleared) {
+              this.hasCleared = true;
+              await this.rotate();
+            }
+            await this.flush();
+          } catch (e) {
+            console.error("Failed to write logs to database.", e);
           }
-          this.flush();
         });
       },
       process.env.NODE_ENV === "test" ? 200 : 10000
     );
+  }
+
+  stop() {
+    clearInterval(this.interval);
   }
 
   push(message: LogMessage) {
@@ -118,8 +129,17 @@ class DatabaseLogWriter {
     if (this.queue.length === 0) return;
     const queueCopy = this.queue.slice();
     this.queue = [];
-    for (const chunk of toChunks(queueCopy, 1000)) {
-      await this.db.insertInto("logs").values(chunk).execute();
+    const chunks = toChunks(queueCopy, 1000);
+    for (let i = 0; i < chunks.length; ++i) {
+      try {
+        await this.db.insertInto("logs").values(chunks[i]).execute();
+      } catch (e) {
+        // put the unwritten logs back so the next flush can retry them
+        this.queue = [...chunks.slice(i).flat(), ...this.queue].slice(
+          -MAX_QUEUED_LOGS
+        );
+        throw e;
+      }
     }
   }
 
@@ -130,7 +150,10 @@ class DatabaseLogWriter {
 }
 
 class DatabaseLogManager {
-  constructor(private readonly db: Kysely<LogDatabaseSchema>) {}
+  constructor(
+    private readonly db: Kysely<LogDatabaseSchema>,
+    private readonly writer: DatabaseLogWriter
+  ) {}
 
   async get() {
     const logs = await this.db
@@ -170,6 +193,7 @@ class DatabaseLogManager {
   }
 
   close() {
+    this.writer.stop();
     return this.db.destroy();
   }
 }
@@ -183,7 +207,8 @@ async function initialize(
     migrationProvider: new NNLogsMigrationProvider()
   });
 
-  const reporters: ILogReporter[] = [new DatabaseLogReporter(db)];
+  const reporter = new DatabaseLogReporter(db);
+  const reporters: ILogReporter[] = [reporter];
   if (process.env.NODE_ENV !== "production" && !disableConsoleLogs)
     reporters.push(consoleReporter);
   const instance = new Logger({
@@ -192,7 +217,7 @@ async function initialize(
   });
   if (logger instanceof NoopLogger) logger.replaceWith(instance);
   logger = instance;
-  logManager = new DatabaseLogManager(db);
+  logManager = new DatabaseLogManager(db, reporter.writer);
 }
 
 let logger: ILogger = new NoopLogger();

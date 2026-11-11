@@ -58,7 +58,7 @@ export class KVStorage {
   }
 
   async read<T extends keyof KV>(key: T): Promise<KV[T] | undefined> {
-    const result = await this.db.then((db) =>
+    const result = await this.db().then((db) =>
       db
         .selectFrom("kv")
         .where("key", "==", key)
@@ -71,7 +71,7 @@ export class KVStorage {
   }
 
   async write<T extends keyof KV>(key: T, value: KV[T]) {
-    await this.db.then((db) =>
+    await this.db().then((db) =>
       db
         .replaceInto("kv")
         .values({
@@ -114,12 +114,12 @@ export class KVStorage {
   }
 
   async delete<T extends keyof KV>(key: T) {
-    await this.db.then((db) =>
+    await this.db().then((db) =>
       db.deleteFrom("kv").where("key", "==", key).execute()
     );
   }
 
   async clear() {
-    await this.db.then((db) => db.deleteFrom("kv").execute());
+    await this.db().then((db) => db.deleteFrom("kv").execute());
   }
 }
