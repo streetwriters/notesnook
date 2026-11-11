@@ -110,6 +110,7 @@ import {
 import { getGithubVersion } from "../utils/github-version";
 import { fluidTabsRef } from "../utils/global-refs";
 import { sleep } from "../utils/time";
+import { dismissAndResetKeyboard } from "../utils/keyboard";
 import useFeatureManager from "./use-feature-manager";
 
 const onCheckSyncStatus = async (type: SyncStatusEvent) => {
@@ -869,6 +870,7 @@ export const useAppEvents = () => {
 
     const onAppStateChanged = async (state: AppStateStatus) => {
       if (state === "active") {
+        dismissAndResetKeyboard();
         notifee.setBadgeCount(0);
         updateStatusBarColor();
         expiringNotesTimer();
