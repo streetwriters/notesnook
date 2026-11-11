@@ -39,6 +39,8 @@ jobs:
           npm run bootstrap -- --scope=web
 
       - name: Build web
+        env:
+          QA_MOCKS: "true"
         run: npm run build:web
 
       - name: Stage build artifact
