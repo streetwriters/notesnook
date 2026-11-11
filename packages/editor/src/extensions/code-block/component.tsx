@@ -156,7 +156,7 @@ export function CodeblockComponent(
             title={strings.changeLanguage()}
           >
             <Text variant={"subBody"} spellCheck={false}>
-              {languageDefinition?.title || "Plaintext"}
+              {languageDefinition?.title || "Plain text"}
             </Text>
           </Button>
 
@@ -214,7 +214,7 @@ export function CodeblockComponent(
         title={strings.selectLanguage()}
       >
         <LanguageSelector
-          selectedLanguage={languageDefinition?.filename || "Plaintext"}
+          selectedLanguage={languageDefinition?.filename || "plaintext"}
           onLanguageSelected={(language) => {
             config.set("codeBlockLanguage", language);
             updateAttributes(
