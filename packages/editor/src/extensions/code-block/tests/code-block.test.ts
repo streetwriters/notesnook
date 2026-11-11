@@ -324,3 +324,161 @@ test("Toggling from a codeblock should make codeblock disappear", async () => {
   expect(codeBlockNodes).toHaveLength(0);
   expect(paragraphNodes).toHaveLength(2);
 });
+
+test("exit codeblock on triple enter via beforeinput (Android simulation)", async () => {
+  const editorElement = document.createElement("div");
+  const { editor } = createEditor({
+    element: editorElement,
+    initialContent: "<pre><code>const a = 1;</code></pre>",
+    extensions: {
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
+    }
+  });
+
+  editor.commands.setTextSelection(editor.state.doc.nodeSize - 2);
+
+  // 1st Enter (inserts \n)
+  editor.commands.insertContent("\n");
+  // 2nd Enter (inserts \n)
+  editor.commands.insertContent("\n");
+
+  // 3rd Enter dispatches beforeinput on Android
+  const beforeInputEvent = new InputEvent("beforeinput", {
+    inputType: "insertParagraph",
+    cancelable: true,
+    bubbles: true
+  });
+  editor.view.dom.dispatchEvent(beforeInputEvent);
+
+  expect(beforeInputEvent.defaultPrevented).toBe(true);
+
+  const docJSON = editor.state.doc.toJSON();
+  const content = docJSON.content;
+
+  expect(content).toHaveLength(2);
+  expect(content[0].type).toBe("codeblock");
+  expect(content[0].content?.[0].text).toBe("const a = 1;");
+  expect(content[1].type).toBe("paragraph");
+  expect(editor.state.selection.$from.parent.type.name).toBe("paragraph");
+});
+
+test("exit empty codeblock on triple enter via beforeinput (Android simulation)", async () => {
+  const editorElement = document.createElement("div");
+  const { editor } = createEditor({
+    element: editorElement,
+    initialContent: "<pre><code></code></pre>",
+    extensions: {
+      codeblock: CodeBlock,
+      codeBlock: false,
+      code: false
+    }
+  });
+
+  editor.commands.setTextSelection(editor.state.doc.nodeSize - 2);
+
+  editor.commands.insertContent("\n");
+  editor.commands.insertContent("\n");
+
+  const beforeInputEvent = new InputEvent("beforeinput", {
+    inputType: "insertLineBreak",
+    cancelable: true,
+    bubbles: true
+  });
+  editor.view.dom.dispatchEvent(beforeInputEvent);
+
+  expect(beforeInputEvent.defaultPrevented).toBe(true);
+
+  const docJSON = editor.state.doc.toJSON();
+  const content = docJSON.content;
+
+  expect(content).toHaveLength(2);
+  expect(content[0].type).toBe("codeblock");
+  expect(content[0].content).toBeUndefined();
+  expect(content[1].type).toBe("paragraph");
+  expect(editor.state.selection.$from.parent.type.name).toBe("paragraph");
+});
+
+test("cancel pending Android Enter fallback after exiting codeblock on triple enter", async () => {
+  vi.useFakeTimers();
+  try {
+    const editorElement = document.createElement("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      initialContent: "<pre><code>const a = 1;</code></pre>",
+      extensions: {
+        codeblock: CodeBlock,
+        codeBlock: false,
+        code: false
+      }
+    });
+
+    editor.commands.setTextSelection(editor.state.doc.nodeSize - 2);
+    editor.commands.insertContent("\n");
+    editor.commands.insertContent("\n");
+
+    // simulate the fallback armed by the patched prosemirror-view keydown
+    // handler (the `android` flag is computed at load, so we can't drive it)
+    const input = (
+      editor.view as unknown as {
+        input: {
+          lastAndroidEnter: number;
+          androidEnterFallbackTimeout: ReturnType<typeof setTimeout>;
+        };
+      }
+    ).input;
+    const stamp = Date.now();
+    const fallback = vi.fn(() => editor.commands.splitBlock());
+    input.lastAndroidEnter = stamp;
+    input.androidEnterFallbackTimeout = setTimeout(() => {
+      if (input.lastAndroidEnter === stamp) fallback();
+    }, 200);
+
+    const beforeInputEvent = new InputEvent("beforeinput", {
+      inputType: "insertParagraph",
+      cancelable: true,
+      bubbles: true
+    });
+    editor.view.dom.dispatchEvent(beforeInputEvent);
+    vi.advanceTimersByTime(300);
+
+    expect(fallback).not.toHaveBeenCalled();
+    const content = editor.state.doc.toJSON().content;
+    expect(content).toHaveLength(2);
+    expect(content[0].type).toBe("codeblock");
+    expect(content[1].type).toBe("paragraph");
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+test("do not exit codeblock on beforeinput when exitOnTripleEnter is false", async () => {
+  const editorElement = document.createElement("div");
+  const { editor } = createEditor({
+    element: editorElement,
+    initialContent: "<pre><code>const a = 1;\n\n</code></pre>",
+    extensions: {
+      codeblock: CodeBlock.configure({ exitOnTripleEnter: false }),
+      codeBlock: false,
+      code: false
+    }
+  });
+
+  editor.commands.setTextSelection(editor.state.doc.nodeSize - 2);
+
+  const beforeInputEvent = new InputEvent("beforeinput", {
+    inputType: "insertParagraph",
+    cancelable: true,
+    bubbles: true
+  });
+  editor.view.dom.dispatchEvent(beforeInputEvent);
+
+  expect(beforeInputEvent.defaultPrevented).toBe(false);
+
+  const docJSON = editor.state.doc.toJSON();
+  const content = docJSON.content;
+
+  expect(content).toHaveLength(1);
+  expect(content[0].type).toBe("codeblock");
+});
