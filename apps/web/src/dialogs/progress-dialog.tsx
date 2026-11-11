@@ -59,27 +59,51 @@ export const ProgressDialog = DialogManager.register(function ProgressDialog<T>(
       description={props.subtitle}
       onClose={() => {}}
     >
-      <Flex sx={{ flexDirection: "column" }}>
-        <Text variant="body">{text}</Text>
-        {current > 0 ? (
-          <>
-            <Text variant="subBody">
+      {current > 0 ? (
+        <Flex
+          sx={{
+            flexDirection: "column",
+            mt: "spacing6",
+            mb: "spacing7",
+            gap: "spacing7"
+          }}
+        >
+          <Text
+            sx={{
+              color: "paragraph-secondary",
+              fontSize: "xs",
+              lineHeight: 1.5
+            }}
+          >
+            {text}
+          </Text>
+          <Box>
+            <Box
+              sx={{ width: "100%", bg: "background-secondary", mb: "spacing3" }}
+            >
+              <Box
+                sx={{
+                  borderRadius: "150px",
+                  alignSelf: "start",
+                  bg: "accent",
+                  height: "7px",
+                  width: `${(current / total) * 100}%`
+                }}
+              />
+            </Box>
+            <Text
+              sx={{
+                fontSize: "xs",
+                color: "paragraph-secondary"
+              }}
+            >
               {current} {strings.of()} {total}
             </Text>
-            <Box
-              sx={{
-                alignSelf: "start",
-                my: 1,
-                bg: "accent",
-                height: "2px",
-                width: `${(current / total) * 100}%`
-              }}
-            />
-          </>
-        ) : (
-          <Flex my={1} />
-        )}
-      </Flex>
+          </Box>
+        </Flex>
+      ) : (
+        <Box sx={{ mb: "spacing7" }} />
+      )}
     </Dialog>
   );
 });

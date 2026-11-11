@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* eslint-disable no-inner-declarations */
 import { isFeatureAvailable, useAreFeaturesAvailable } from "@notesnook/common";
+import dayjs from "dayjs";
 import {
   Color,
   createInternalLink,
@@ -36,15 +37,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { InteractionManager, Platform } from "react-native";
 import Share from "react-native-share";
 import { DatabaseLogger, db } from "../common/database";
-import { AttachmentDialog } from "../components/attachments";
 import { AuthMode } from "../components/auth/common";
 import { presentDialog } from "../components/dialog/functions";
-import NoteHistory from "../components/note-history";
 import { AddNotebookSheet } from "../components/sheets/add-notebook";
 import ExportNotesSheet from "../components/sheets/export-notes";
 import PaywallSheet from "../components/sheets/paywall";
 import PublishNoteSheet from "../components/sheets/publish-note";
-import { ReferencesList } from "../components/sheets/references";
 import { useSideBarDraggingStore } from "../components/side-menu/dragging-store";
 import { ButtonProps } from "../components/ui/button";
 import AddReminder from "../screens/add-reminder";
@@ -54,7 +52,6 @@ import {
   eSendEvent,
   eSubscribeEvent,
   openVault,
-  presentSheet,
   ToastManager,
   VaultRequestType
 } from "../services/event-manager";
@@ -80,7 +77,8 @@ import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { sleep } from "../utils/time";
 
-import DatePickerComponent from "../components/date-picker";
+import { presentDateTimePicker } from "../components/date-time-picker";
+import { createFormRef, validators } from "../components/ui/input/form-input";
 
 export type ActionId =
   | "select"
@@ -305,8 +303,6 @@ export const useActions = ({
 
   async function createMenuShortcut() {
     if (item.type !== "notebook" && item.type !== "tag") return;
-
-    close();
     try {
       if (isPinnedToMenu) {
         await db.shortcuts.remove(item.id);
@@ -337,32 +333,46 @@ export const useActions = ({
 
   async function renameTag() {
     if (item.type !== "tag") return;
-
     close();
     await sleep(300);
     presentDialog({
       title: strings.renameTag(),
-      positivePress: async (value: string) => {
-        if (!value || value === "" || value.trimStart().length == 0) return;
-        try {
-          await db.tags.add({
-            id: item.id,
-            title: value
-          });
-          eSendEvent(Navigation.routeNames.TaggedNotes);
-          InteractionManager.runAfterInteractions(() => {
-            useTagStore.getState().refresh();
-            useMenuStore.getState().setMenuPins();
-            Navigation.queueRoutesForUpdate();
-            useRelationStore.getState().update();
-          });
-        } catch (e) {
-          ToastManager.error(e as Error, undefined, "local");
+      form: {
+        formRef: createFormRef({
+          title: item.title
+        }),
+        items: [
+          {
+            label: strings.enterTitle(),
+            name: "title",
+            placeholder: strings.tagTitlePlaceholder(),
+            ref: React.createRef(),
+            validators: [validators.required(strings.titleIsRequired())],
+            inputProps: {
+              autoCapitalize: "none"
+            }
+          }
+        ],
+        onFormSubmit: async (form) => {
+          try {
+            await db.tags.add({
+              id: item.id,
+              title: form.getValue("title")
+            });
+            eSendEvent(Navigation.routeNames.TaggedNotes);
+            InteractionManager.runAfterInteractions(() => {
+              useTagStore.getState().refresh();
+              useMenuStore.getState().setMenuPins();
+              Navigation.queueRoutesForUpdate();
+              useRelationStore.getState().update();
+            });
+            return true;
+          } catch (e) {
+            form.setError("title", (e as Error).message);
+            return false;
+          }
         }
       },
-      input: true,
-      defaultValue: item.title,
-      inputPlaceholder: strings.enterTagTitle(),
       positiveText: strings.save()
     });
   }
@@ -419,6 +429,10 @@ export const useActions = ({
       presentDialog({
         title: strings.doActions.delete.unknown(item.type, 1),
         paragraph: strings.actionConfirmations.delete.unknown(item.type, 1),
+        icon: "warning-circle",
+        centered: true,
+        iconFamily: "notesnook",
+        iconType: "error",
         positivePress: async () => {
           if (item.type === "reminder") {
             await db.reminders.remove(item.id);
@@ -435,9 +449,19 @@ export const useActions = ({
             Navigation.queueRoutesForUpdate();
             useRelationStore.getState().update();
           });
+          const actions = strings.actions.deleted;
+          ToastManager.show({
+            message:
+              item.type === "reminder"
+                ? actions.reminder(1)
+                : item.type === "tag"
+                  ? actions.tag(1)
+                  : actions.color(1),
+            type: "success"
+          });
         },
         positiveText: strings.delete(),
-        positiveType: "errorShade"
+        positiveType: "accent"
       });
       return;
     }
@@ -491,7 +515,7 @@ export const useActions = ({
     actions.push({
       id: "rename-tag",
       title: strings.rename(),
-      icon: "square-edit-outline",
+      icon: "mode-edit",
       onPress: renameTag
     });
   }
@@ -500,7 +524,7 @@ export const useActions = ({
     actions.push({
       id: "rename-color",
       title: strings.rename(),
-      icon: "square-edit-outline",
+      icon: "mode-edit",
       onPress: renameColor
     });
   }
@@ -509,10 +533,8 @@ export const useActions = ({
     actions.push(
       {
         id: "disable-reminder",
-        title: !item.disabled
-          ? strings.turnOffReminder()
-          : strings.turnOnReminder(),
-        icon: !item.disabled ? "bell-off-outline" : "bell",
+        title: !item.disabled ? strings.disable() : strings.enable(),
+        icon: !item.disabled ? "bell-z" : "bell",
         onPress: async () => {
           close();
           await db.reminders.add({
@@ -527,7 +549,7 @@ export const useActions = ({
       {
         id: "edit-reminder",
         title: strings.editReminder(),
-        icon: "pencil",
+        icon: "pencil-simple",
         onPress: async () => {
           AddReminder.present(item);
           close();
@@ -547,7 +569,7 @@ export const useActions = ({
       {
         id: "delete",
         title: strings.delete(),
-        icon: "delete",
+        icon: "trash-alt",
         onPress: deleteTrashItem
       }
     );
@@ -557,10 +579,8 @@ export const useActions = ({
     actions.push(
       {
         id: "add-shortcut",
-        title: isPinnedToMenu
-          ? strings.removeShortcut()
-          : strings.addShortcut(),
-        icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
+        title: strings.addShortcut(),
+        icon: "arrow-square-out",
         onPress: createMenuShortcut,
         isToggle: true,
         checked: isPinnedToMenu,
@@ -568,12 +588,9 @@ export const useActions = ({
       },
       {
         id: "default-tag",
-        title:
-          defaultTag === item.id
-            ? strings.removeAsDefault()
-            : strings.setAsDefault(),
+        title: strings.setAsDefault(),
         hidden: item.type !== "tag",
-        icon: "pound",
+        icon: "check",
         onPress: async () => {
           if (defaultTag === item.id) {
             await db.settings.setDefaultTag(undefined);
@@ -595,7 +612,6 @@ export const useActions = ({
             await db.settings.setDefaultTag(item.id);
             setDefaultTag(item.id);
           }
-          close();
         },
         checked: defaultTag === item.id,
         locked: !features?.defaultNotebookAndTag.isAllowed
@@ -608,7 +624,7 @@ export const useActions = ({
       {
         id: "add-notebook",
         title: strings.addNotebook(),
-        icon: "plus",
+        icon: "bookmark",
         onPress: async () => {
           if (features && !features.notebooks.isAllowed) {
             ToastManager.show({
@@ -646,7 +662,7 @@ export const useActions = ({
             ? strings.removeAsDefault()
             : strings.setAsDefault(),
         hidden: item.type !== "notebook",
-        icon: "notebook",
+        icon: "check",
         onPress: async () => {
           if (defaultNotebook === item.id) {
             await db.settings.setDefaultNotebook(undefined);
@@ -671,7 +687,6 @@ export const useActions = ({
             await db.settings.setDefaultNotebook(notebook.id);
             setDefaultNotebook(notebook.id);
           }
-          close();
         },
         checked: defaultNotebook === item.id,
 
@@ -681,7 +696,7 @@ export const useActions = ({
         id: "move-notes",
         title: strings.addNotes(),
         hidden: item.type !== "notebook",
-        icon: "text",
+        icon: "file-text",
         onPress: () => {
           close();
           Navigation.navigate("MoveNotes", {
@@ -692,7 +707,7 @@ export const useActions = ({
       {
         id: "move-notebook",
         title: strings.moveNotebookFix(),
-        icon: "arrow-right-bold-box-outline",
+        icon: "drive-file-move",
         onPress: () => {
           close();
           Navigation.navigate("MoveNotebook", {
@@ -707,7 +722,7 @@ export const useActions = ({
     actions.push({
       id: "pin",
       title: item.pinned ? strings.unpin() : strings.pin(),
-      icon: item.pinned ? "pin-off-outline" : "pin-outline",
+      icon: "pin",
       onPress: pinItem,
       isToggle: true,
       checked: item.pinned,
@@ -722,8 +737,8 @@ export const useActions = ({
   ) {
     actions.push({
       id: "default-homepage",
-      title: isHomepage ? strings.unsetAsHomepage() : strings.setAsHomepage(),
-      icon: "home-outline",
+      title: strings.setAsHomepage(),
+      icon: "house",
       isToggle: true,
       checked: isHomepage,
       onPress: async () => {
@@ -755,13 +770,11 @@ export const useActions = ({
 
   if (item.type === "note") {
     async function openHistory() {
-      presentSheet({
-        component: (ref) => <NoteHistory fwdRef={ref} note={item as Note} />
-      });
+      Navigation.navigate("NoteHistory", { note: item as Note });
     }
 
     async function showAttachments() {
-      AttachmentDialog.present(item as Note);
+      Navigation.navigate("Attachments", { note: item as Note });
     }
 
     async function exportNote() {
@@ -940,6 +953,7 @@ export const useActions = ({
           requestType: VaultRequestType.PermanentUnlock,
           item: item,
           title: strings.unlockNote(),
+          paragraph: strings.thisNoteLocked(),
           buttonTitle: strings.unlock()
         });
         return;
@@ -961,7 +975,8 @@ export const useActions = ({
               requestType: VaultRequestType.CreateVault,
               item: item,
               title: strings.createVault(),
-              buttonTitle: strings.lock()
+              buttonTitle: strings.lock(),
+              positiveButtonType: "accent"
             });
             break;
           case VAULT_ERRORS.vaultLocked:
@@ -969,7 +984,8 @@ export const useActions = ({
               requestType: VaultRequestType.LockNote,
               item: item,
               title: strings.lockNote(),
-              buttonTitle: strings.lock()
+              buttonTitle: strings.lock(),
+              positiveButtonType: "accent"
             });
             break;
         }
@@ -1017,7 +1033,7 @@ export const useActions = ({
       {
         id: "favorite",
         title: !item.favorite ? strings.favorite() : strings.unfavorite(),
-        icon: item.favorite ? "star-off" : "star-outline",
+        icon: "star",
         onPress: addToFavorites,
         isToggle: true,
         checked: item.favorite,
@@ -1056,19 +1072,19 @@ export const useActions = ({
       {
         id: "attachments",
         title: strings.attachedFiles(),
-        icon: "attachment",
+        icon: "paperclip",
         onPress: showAttachments
       },
       {
         id: "history",
         title: strings.history(),
-        icon: "history",
+        icon: "clock-counter-clockwise",
         onPress: openHistory
       },
       {
         id: "reminders",
         title: strings.dataTypesPluralCamelCase.reminder(),
-        icon: "clock-outline",
+        icon: "clock",
         onPress: async () => {
           close();
           RelationsList.present({
@@ -1076,6 +1092,8 @@ export const useActions = ({
             referenceType: "reminder",
             relationType: "from",
             title: strings.dataTypesPluralCamelCase.reminder(),
+            listEmptyTitle: strings.noRemindersFound(),
+            listEmptyParagraph: strings.reminderPlaceholder(),
             onAdd: async () => {
               if (features && !features.activeReminders.isAllowed) {
                 ToastManager.show({
@@ -1098,40 +1116,40 @@ export const useActions = ({
       {
         id: "copy",
         title: strings.copy(),
-        icon: "content-copy",
+        icon: "copy",
         onPress: copyContent
       },
       {
         id: "share",
         title: strings.share(),
-        icon: "share-variant",
+        icon: "share",
         onPress: shareNote
       },
       {
         id: "read-only",
         title: strings.readOnly(),
-        icon: "pencil-lock",
+        icon: "pencil-simple-slash",
         onPress: toggleReadyOnlyMode,
         checked: item.readonly
       },
       {
         id: "local-only",
         title: strings.syncOff(),
-        icon: "sync-off",
+        icon: "sync-disabled",
         onPress: toggleLocalOnly,
         checked: item.localOnly
       },
       {
         id: "duplicate",
         title: strings.duplicate(),
-        icon: "content-duplicate",
+        icon: "duplicate",
         onPress: duplicateNote
       },
 
       {
         id: "add-reminder",
         title: strings.remindMe(),
-        icon: "clock-plus-outline",
+        icon: "bell",
         onPress: async () => {
           close();
           await sleep(100);
@@ -1141,14 +1159,14 @@ export const useActions = ({
       {
         id: "lock-unlock",
         title: locked ? strings.unlock() : strings.lock(),
-        icon: locked ? "lock-open-outline" : "key-outline",
+        icon: "lock",
         onPress: addToVault,
         checked: locked
       },
       {
         id: "publish",
         title: isPublished ? strings.published() : strings.publish(),
-        icon: "cloud-upload-outline",
+        icon: "cloud-upload",
         checked: isPublished,
         onPress: publishNote
       },
@@ -1163,21 +1181,22 @@ export const useActions = ({
       {
         id: "notebooks",
         title: strings.addToNotebook(),
-        icon: "book-outline",
+        icon: "bookmark",
         onPress: addTo
       },
-      {
-        id: "add-tag",
-        title: strings.addTags(),
-        icon: "pound",
-        onPress: addTo
-      },
+      // {
+      //   id: "add-tag",
+      //   title: strings.addTags(),
+      //   icon: "pound",
+      //   onPress: addTo
+      // },
       {
         id: "references",
         title: strings.references(),
-        icon: "vector-link",
+        icon: "link-alt",
         onPress: () => {
-          ReferencesList.present({
+          close();
+          Navigation.navigate("References", {
             reference: item as ItemReference
           });
         }
@@ -1229,26 +1248,26 @@ export const useActions = ({
               return;
             }
 
-            presentDialog({
+            presentDateTimePicker({
               context: "properties",
-              component: (close) => (
-                <DatePickerComponent
-                  onCancel={() => close?.()}
-                  onConfirm={async (date) => {
-                    close?.();
-                    await db.notes.setExpiryDate(date.getTime(), item.id);
-                    Navigation.queueRoutesForUpdate();
-                    eSendEvent(eMenuItemUpdate);
-                    ToastManager.show({
-                      message: strings.expiryDateSet(),
-                      type: "success",
-                      context: "local"
-                    });
+              mode: "date",
+              title: strings.setExpiry(),
+              description: strings.setExpiryDesc(),
+              confirmText: strings.setExpiry(),
+              date: dayjs().add(1, "week").toDate(),
+              minDate: dayjs().add(1, "day").toDate(),
+              onConfirm: async (date) => {
+                await db.notes.setExpiryDate(date.getTime(), item.id);
+                Navigation.queueRoutesForUpdate();
+                eSendEvent(eMenuItemUpdate);
+                ToastManager.show({
+                  message: strings.expiryDateSet(),
+                  type: "success",
+                  context: "local"
+                });
 
-                    setItem((await db.notes.note(item.id)) as Item);
-                  }}
-                />
-              )
+                setItem((await db.notes.note(item.id)) as Item);
+              }
             });
           }
         }
@@ -1276,7 +1295,7 @@ export const useActions = ({
         item.type !== "notebook" && item.type !== "note"
           ? strings.doActions.delete.unknown(item.type, 1)
           : strings.moveToTrash(),
-      icon: "delete-outline",
+      icon: "trash-alt",
       type: "error",
       onPress: deleteItem,
       locked: isPublished
@@ -1293,7 +1312,7 @@ export const useActions = ({
     actions.push({
       id: "launcher-shortcut",
       title: strings.addToHome(),
-      icon: "cellphone-arrow-down",
+      icon: "home",
       locked: !features?.androidLauncherShortcuts.isAllowed,
       onPress: async () => {
         if (features && !features?.androidLauncherShortcuts.isAllowed) {

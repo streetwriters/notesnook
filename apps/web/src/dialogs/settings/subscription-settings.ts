@@ -180,7 +180,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
             async action() {
               const cancelTrial = await ConfirmDialog.show({
                 title: strings.cancelTrialQuestion(),
-                message: strings.cancelTrialDesc(),
+                subtitle: strings.cancelTrialDesc(),
                 negativeButtonText: strings.no(),
                 positiveButtonText: strings.yes()
               });
@@ -226,7 +226,7 @@ export const SubscriptionSettings: SettingsGroup[] = [
             async action() {
               const refundSubscription = await ConfirmDialog.show({
                 title: strings.requestRefundQuestion(),
-                message: strings.requestRefundDesc(),
+                subtitle: strings.requestRefundDesc(),
                 negativeButtonText: strings.no(),
                 positiveButtonText: strings.yes(),
                 inputs: {

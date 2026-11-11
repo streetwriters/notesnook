@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createButtonVariant } from "@notesnook/theme";
+import { createButtonVariant, ThemeColor } from "@notesnook/theme";
 import { Button, Flex, FlexProps } from "@theme-ui/components";
 import { Icon } from "../icons";
 
@@ -26,12 +26,13 @@ type TabItemProps = {
   title?: string;
   selected?: boolean;
   onClick?: () => void;
+  iconColor?: ThemeColor;
 };
 
 export function TabItem(props: TabItemProps & FlexProps) {
   const {
     icon: Icon,
-    color,
+    iconColor = "icon",
     title,
     selected,
     onClick,
@@ -65,7 +66,7 @@ export function TabItem(props: TabItemProps & FlexProps) {
         if (onClick) onClick();
       }}
     >
-      <Icon size={16} color={color || (selected ? "icon-selected" : "icon")} />
+      <Icon size={15} color={selected ? "icon-selected" : iconColor} />
     </Flex>
   );
 }

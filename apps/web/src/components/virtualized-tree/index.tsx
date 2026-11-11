@@ -50,6 +50,7 @@ type TreeViewProps<T> = {
   treeRef?: React.Ref<VirtualizedTreeHandle<T>> | null;
   rootId: string;
   itemHeight?: number;
+  itemGap?: number;
   getChildNodes: (parent: TreeNode<T>) => Promise<TreeNode<T>[]>;
   renderItem: (props: {
     item: TreeNode<T>;
@@ -75,6 +76,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
   const {
     rootId,
     itemHeight,
+    itemGap,
     renderItem: Node,
     getChildNodes,
     treeRef,
@@ -217,10 +219,13 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
       ref={list}
       totalCount={nodes.length}
       computeItemKey={(i) => nodes[i].id}
-      fixedItemHeight={itemHeight}
+      fixedItemHeight={
+        itemHeight !== undefined ? itemHeight + (itemGap || 0) : undefined
+      }
       onKeyDown={(e) => onKeyDown(e.nativeEvent)}
       context={{
-        onMouseUp
+        onMouseUp,
+        itemGap
       }}
       components={{
         Scroller: (Scroller as any) || CustomScrollbarsVirtualList,
@@ -277,6 +282,7 @@ export function VirtualizedTree<T>(props: TreeViewProps<T>) {
 
 type ListContext = {
   onMouseUp: (e: MouseEvent, index: number) => void;
+  itemGap?: number;
 };
 function VirtuosoItem({
   item: _item,
@@ -288,6 +294,10 @@ function VirtuosoItem({
   return (
     <div
       {...props}
+      style={{
+        ...props.style,
+        paddingBottom: context?.itemGap
+      }}
       onMouseUp={(e) =>
         context?.onMouseUp(e.nativeEvent, props["data-item-index"])
       }

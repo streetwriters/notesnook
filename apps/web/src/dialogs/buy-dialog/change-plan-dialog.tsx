@@ -82,7 +82,7 @@ export const ChangePlanDialog = DialogManager.register(
             onPlanSelected={async (plan) => {
               const result = await ConfirmDialog.show({
                 title: strings.confirmPlanChange(),
-                message: strings.planSwitchedConfirmation(
+                subtitle: strings.planSwitchedConfirmation(
                   PLAN_METADATA[plan.plan].title
                 ),
                 positiveButtonText: strings.confirm(),
