@@ -1,0 +1,33 @@
+diff --git a/node_modules/prosemirror-commands/dist/index.cjs b/node_modules/prosemirror-commands/dist/index.cjs
+index 2fc5595..12bfbbc 100644
+--- a/node_modules/prosemirror-commands/dist/index.cjs
++++ b/node_modules/prosemirror-commands/dist/index.cjs
+@@ -452,8 +452,8 @@ function deleteBarrier(state, $cut, dispatch) {
+ 
+       wrap = prosemirrorModel.Fragment.from(before.copy(wrap));
+       var tr = state.tr.step(new prosemirrorTransform.ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new prosemirrorModel.Slice(wrap, 1, 0), conn.length, true));
+-      var joinAt = end + 2 * conn.length;
+-      if (prosemirrorTransform.canJoin(tr.doc, joinAt)) tr.join(joinAt);
++      var $joinAt = tr.doc.resolve(end + 2 * conn.length);
++      if ($joinAt.nodeAfter && $joinAt.nodeAfter.type == before.type && prosemirrorTransform.canJoin(tr.doc, $joinAt.pos)) tr.join($joinAt.pos);
+       dispatch(tr.scrollIntoView());
+     }
+ 
+diff --git a/node_modules/prosemirror-commands/dist/index.js b/node_modules/prosemirror-commands/dist/index.js
+index 04effa1..f895d57 100644
+--- a/node_modules/prosemirror-commands/dist/index.js
++++ b/node_modules/prosemirror-commands/dist/index.js
+@@ -506,9 +506,10 @@ function deleteBarrier(state, $cut, dispatch) {
+                 wrap = Fragment.from(conn[i].create(null, wrap));
+             wrap = Fragment.from(before.copy(wrap));
+             let tr = state.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap, 1, 0), conn.length, true));
+-            let joinAt = end + 2 * conn.length;
+-            if (canJoin(tr.doc, joinAt))
+-                tr.join(joinAt);
++            let $joinAt = tr.doc.resolve(end + 2 * conn.length);
++            if ($joinAt.nodeAfter && $joinAt.nodeAfter.type == before.type &&
++                canJoin(tr.doc, $joinAt.pos))
++                tr.join($joinAt.pos);
+             dispatch(tr.scrollIntoView());
+         }
+         return true;
