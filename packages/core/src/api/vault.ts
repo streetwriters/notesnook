@@ -23,6 +23,7 @@ import { EVENTS } from "../common.js";
 import { isCipher } from "../utils/crypto.js";
 import { Note, NoteContent } from "../types.js";
 import { logger } from "../logger.js";
+import { Mutex } from "async-mutex";
 
 export const VAULT_ERRORS = {
   noVault: "ERR_NO_VAULT",
@@ -34,6 +35,7 @@ export default class Vault {
   private vaultPassword?: string;
   private erasureTimeout = 0;
   private key = "svvaads1212#2123";
+  private mutex = new Mutex();
 
   private get password() {
     return this.vaultPassword;
@@ -105,6 +107,12 @@ export default class Vault {
   }
 
   async changePassword(oldPassword: string, newPassword: string) {
+    await this.mutex.runExclusive(() =>
+      this._changePassword(oldPassword, newPassword)
+    );
+  }
+
+  private async _changePassword(oldPassword: string, newPassword: string) {
     const vault = await this.db.vaults.default();
     if (!vault) throw new Error(VAULT_ERRORS.noVault);
 
@@ -145,6 +153,7 @@ export default class Vault {
           .storage()
           .encrypt({ password: newPassword }, this.key)
       });
+      this.password = newPassword;
     }
   }
 
@@ -241,7 +250,9 @@ export default class Vault {
     if (!note) return;
     // roll over erase timer
     this.startEraser();
-    return await this.lockNote(note, await this.getVaultPassword());
+    return await this.mutex.runExclusive(async () =>
+      this.lockNote(note, await this.getVaultPassword())
+    );
   }
 
   async exists(vaultKey?: Cipher<"base64">) {
