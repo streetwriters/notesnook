@@ -12,6 +12,7 @@ import { initLocale } from "./app/common/locale";
 OpenPGP.useJSI = false;
 initLocale();
 
+const testchange = 1;
 let domParser;
 Object.defineProperty(global, "DOMParser", {
   get: () => {
