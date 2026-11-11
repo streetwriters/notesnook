@@ -1,5 +1,5 @@
 diff --git a/node_modules/@tiptap/core/dist/index.cjs b/node_modules/@tiptap/core/dist/index.cjs
-index 61b4f6c..77e2367 100644
+index 61b4f6c..b059a2e 100644
 --- a/node_modules/@tiptap/core/dist/index.cjs
 +++ b/node_modules/@tiptap/core/dist/index.cjs
 @@ -304,45 +304,59 @@ function getNodeType(nameOrType, schema) {
@@ -216,12 +216,16 @@ index 61b4f6c..77e2367 100644
  };
  
  const liftListItem = typeOrName => ({ state, dispatch }) => {
-@@ -3097,7 +3113,13 @@ const splitBlock = ({ keepMarks = true } = {}) => ({ tr, state: state$1, dispatc
+@@ -3097,7 +3113,17 @@ const splitBlock = ({ keepMarks = true } = {}) => ({ tr, state: state$1, dispatc
              if (selection instanceof state.TextSelection) {
                  tr.deleteSelection();
              }
 -            tr.split(tr.mapping.map($from.pos), 1, types);
-+            const splitPos = tr.mapping.map($from.pos);
++            // After deleting a selection that spans whole blocks, the mapped $from
++            // can land between blocks; split at the cursor left by the deletion.
++            const splitPos = selection instanceof state.TextSelection && !selection.empty
++                ? tr.selection.from
++                : tr.mapping.map($from.pos);
 +            if (canSplit(tr.doc, splitPos, 1, types)) {
 +                tr.split(splitPos, 1, types);
 +            }
@@ -231,7 +235,7 @@ index 61b4f6c..77e2367 100644
              if (deflt && !atEnd && !$from.parentOffset && $from.parent.type !== deflt) {
                  const first = tr.mapping.map($from.before());
                  const $first = tr.doc.resolve(first);
-@@ -3653,16 +3675,19 @@ const Keymap = Extension.create({
+@@ -3653,16 +3679,19 @@ const Keymap = Extension.create({
              new state.Plugin({
                  key: new state.PluginKey('clearDocument'),
                  appendTransaction: (transactions, oldState, newState) => {
@@ -254,7 +258,7 @@ index 61b4f6c..77e2367 100644
                          return;
                      }
                      const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
-@@ -4183,50 +4208,61 @@ class Editor extends EventEmitter {
+@@ -4183,50 +4212,61 @@ class Editor extends EventEmitter {
       * Creates a ProseMirror view.
       */
      createView() {
@@ -361,7 +365,7 @@ index 61b4f6c..77e2367 100644
      /**
       * Creates all node views.
 diff --git a/node_modules/@tiptap/core/dist/index.js b/node_modules/@tiptap/core/dist/index.js
-index 03323f5..f391882 100644
+index 03323f5..0b0d8eb 100644
 --- a/node_modules/@tiptap/core/dist/index.js
 +++ b/node_modules/@tiptap/core/dist/index.js
 @@ -302,47 +302,62 @@ function getNodeType(nameOrType, schema) {
@@ -580,12 +584,16 @@ index 03323f5..f391882 100644
  };
  
  const liftListItem = typeOrName => ({ state, dispatch }) => {
-@@ -3095,7 +3112,13 @@ const splitBlock = ({ keepMarks = true } = {}) => ({ tr, state, dispatch, editor
+@@ -3095,7 +3112,17 @@ const splitBlock = ({ keepMarks = true } = {}) => ({ tr, state, dispatch, editor
              if (selection instanceof TextSelection) {
                  tr.deleteSelection();
              }
 -            tr.split(tr.mapping.map($from.pos), 1, types);
-+            const splitPos = tr.mapping.map($from.pos);
++            // After deleting a selection that spans whole blocks, the mapped $from
++            // can land between blocks; split at the cursor left by the deletion.
++            const splitPos = selection instanceof TextSelection && !selection.empty
++                ? tr.selection.from
++                : tr.mapping.map($from.pos);
 +            if (canSplit(tr.doc, splitPos, 1, types)) {
 +                tr.split(splitPos, 1, types);
 +            }
@@ -595,7 +603,7 @@ index 03323f5..f391882 100644
              if (deflt && !atEnd && !$from.parentOffset && $from.parent.type !== deflt) {
                  const first = tr.mapping.map($from.before());
                  const $first = tr.doc.resolve(first);
-@@ -3651,16 +3674,19 @@ const Keymap = Extension.create({
+@@ -3651,16 +3678,19 @@ const Keymap = Extension.create({
              new Plugin({
                  key: new PluginKey('clearDocument'),
                  appendTransaction: (transactions, oldState, newState) => {
@@ -618,7 +626,7 @@ index 03323f5..f391882 100644
                          return;
                      }
                      const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
-@@ -4181,6 +4207,14 @@ class Editor extends EventEmitter {
+@@ -4181,6 +4211,14 @@ class Editor extends EventEmitter {
       * Creates a ProseMirror view.
       */
      createView() {
@@ -633,7 +641,7 @@ index 03323f5..f391882 100644
          let doc;
          try {
              doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: this.options.enableContentCheck });
-@@ -4203,22 +4237,25 @@ class Editor extends EventEmitter {
+@@ -4203,22 +4241,25 @@ class Editor extends EventEmitter {
              // Content is invalid, but attempt to create it anyway, stripping out the invalid parts
              doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: false });
          }
@@ -672,7 +680,7 @@ index 03323f5..f391882 100644
          // Let’s store the editor instance in the DOM element.
          // So we’ll have access to it for tests.
 diff --git a/node_modules/@tiptap/core/dist/index.umd.js b/node_modules/@tiptap/core/dist/index.umd.js
-index d5ce8fd..987ef0b 100644
+index d5ce8fd..070901d 100644
 --- a/node_modules/@tiptap/core/dist/index.umd.js
 +++ b/node_modules/@tiptap/core/dist/index.umd.js
 @@ -389,7 +389,7 @@
@@ -761,12 +769,16 @@ index d5ce8fd..987ef0b 100644
    };
  
    const liftListItem = typeOrName => ({ state, dispatch }) => {
-@@ -3093,7 +3092,13 @@
+@@ -3093,7 +3092,17 @@
                if (selection instanceof state.TextSelection) {
                    tr.deleteSelection();
                }
 -              tr.split(tr.mapping.map($from.pos), 1, types);
-+              const splitPos = tr.mapping.map($from.pos);
++              // After deleting a selection that spans whole blocks, the mapped $from
++              // can land between blocks; split at the cursor left by the deletion.
++              const splitPos = selection instanceof state.TextSelection && !selection.empty
++                  ? tr.selection.from
++                  : tr.mapping.map($from.pos);
 +              if (canSplit(tr.doc, splitPos, 1, types)) {
 +                tr.split(splitPos, 1, types);
 +              }
@@ -776,7 +788,7 @@ index d5ce8fd..987ef0b 100644
                if (deflt && !atEnd && !$from.parentOffset && $from.parent.type !== deflt) {
                    const first = tr.mapping.map($from.before());
                    const $first = tr.doc.resolve(first);
-@@ -3649,16 +3654,19 @@
+@@ -3649,16 +3658,19 @@
                new state.Plugin({
                    key: new state.PluginKey('clearDocument'),
                    appendTransaction: (transactions, oldState, newState) => {
@@ -799,7 +811,7 @@ index d5ce8fd..987ef0b 100644
                            return;
                        }
                        const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
-@@ -4179,6 +4187,13 @@ img.ProseMirror-separator {
+@@ -4179,6 +4191,13 @@ img.ProseMirror-separator {
         * Creates a ProseMirror view.
         */
        createView() {
@@ -813,7 +825,7 @@ index d5ce8fd..987ef0b 100644
            let doc;
            try {
                doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: this.options.enableContentCheck });
-@@ -4201,22 +4216,18 @@ img.ProseMirror-separator {
+@@ -4201,22 +4220,18 @@ img.ProseMirror-separator {
                // Content is invalid, but attempt to create it anyway, stripping out the invalid parts
                doc = createDocument(this.options.content, this.schema, this.options.parseOptions, { errorOnInvalidContent: false });
            }
