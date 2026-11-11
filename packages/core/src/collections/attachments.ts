@@ -35,6 +35,9 @@ import { isFalse } from "../database/index.js";
 import { sql } from "@streetwriters/kysely";
 import { logger } from "../logger.js";
 
+const MAX_UPLOAD_RETRIES = 5;
+const UPLOAD_RETRY_BASE_DELAY = 60 * 1000;
+
 export class Attachments implements ICollection {
   name = "attachments";
   key?: SerializedKey;
@@ -98,6 +101,82 @@ export class Attachments implements ICollection {
           );
       }
     );
+
+    db.eventManager.subscribe(
+      EVENTS.fileUploaded,
+      async ({
+        success,
+        canceled,
+        filename
+      }: {
+        success: boolean;
+        canceled?: boolean;
+        filename: string;
+      }) => {
+        if (canceled) return;
+        const retries = (await this.db.kv().read("uploadRetries")) || {};
+        if (success) {
+          if (!retries[filename]) return;
+          delete retries[filename];
+        } else {
+          const attempts = (retries[filename]?.attempts || 0) + 1;
+          retries[filename] = {
+            attempts,
+            nextRetryAt:
+              Date.now() + UPLOAD_RETRY_BASE_DELAY * 2 ** (attempts - 1)
+          };
+        }
+        await this.db.kv().write("uploadRetries", retries);
+      }
+    );
+  }
+
+  /**
+   * Filters the pending attachments down to the ones that are due for an
+   * automatic upload attempt: never tried, or failed fewer than
+   * MAX_UPLOAD_RETRIES times and past their backoff time. Also drops retry
+   * state of attachments that are no longer pending.
+   */
+  async getDueUploads(attachments: Attachment[]): Promise<Attachment[]> {
+    const retries = (await this.db.kv().read("uploadRetries")) || {};
+    const pending = new Set(attachments.map((a) => a.hash));
+    const kept: typeof retries = {};
+    for (const hash in retries) {
+      if (pending.has(hash)) kept[hash] = retries[hash];
+    }
+    if (Object.keys(kept).length !== Object.keys(retries).length)
+      await this.db.kv().write("uploadRetries", kept);
+
+    return attachments.filter((a) => {
+      const entry = kept[a.hash];
+      return (
+        !entry ||
+        (entry.attempts <= MAX_UPLOAD_RETRIES &&
+          entry.nextRetryAt <= Date.now())
+      );
+    });
+  }
+
+  /**
+   * Manually retries the upload of an attachment right away. This is a single
+   * attempt: the automatic retries are marked as exhausted first, so if the
+   * upload fails there are no further automatic retries. The attachment hash
+   * is used as the upload group id so that db.fs().cancel(hash) cancels it.
+   */
+  async retryUpload(hash: string) {
+    const attachment = await this.attachment(hash);
+    if (!attachment || attachment.dateUploaded) return;
+
+    const retries = (await this.db.kv().read("uploadRetries")) || {};
+    retries[attachment.hash] = { attempts: MAX_UPLOAD_RETRIES, nextRetryAt: 0 };
+    await this.db.kv().write("uploadRetries", retries);
+
+    await this.db
+      .fs()
+      .queueUploads(
+        [{ filename: attachment.hash, chunkSize: attachment.chunkSize }],
+        attachment.hash
+      );
   }
 
   async init() {

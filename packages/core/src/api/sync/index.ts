@@ -334,7 +334,9 @@ export class Sync {
    * @private
    */
   async uploadAttachments() {
-    const attachments = await this.db.attachments.pending.items();
+    const attachments = await this.db.attachments.getDueUploads(
+      await this.db.attachments.pending.items()
+    );
     this.logger.info("Uploading attachments...", { total: attachments.length });
 
     await this.db.fs().queueUploads(
