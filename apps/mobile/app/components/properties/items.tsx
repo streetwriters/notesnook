@@ -251,9 +251,7 @@ export const Items = ({
           paddingHorizontal: Spacing.LEVEL_2,
           borderRadius: Radius.XS,
           borderWidth: item.checked ? 1 : 1,
-          borderColor: item.checked
-            ? colors.selected.background
-            : colors.primary.border,
+          borderColor: item.checked ? "transparent" : colors.secondary.border,
           opacity: item.locked ? 0.7 : 1
         }}
       >
@@ -301,12 +299,11 @@ export const Items = ({
       colors.disabled.icon,
       colors.primary.accent,
       colors.primary.background,
-      colors.primary.border,
       colors.primary.heading,
       colors.primary.icon,
+      colors.secondary.border,
       colors.secondary.heading,
-      colors.secondary.icon,
-      colors.selected.background
+      colors.secondary.icon
     ]
   );
 
