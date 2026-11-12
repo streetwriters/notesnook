@@ -191,6 +191,7 @@ export const NotebookItem = ({
             style={{
               flexDirection: "row",
               alignItems: "center",
+              flexShrink: 1,
               gap: Spacing.LEVEL_1
             }}
           >
@@ -240,6 +241,7 @@ export const NotebookItem = ({
                 isFocused ? colors.selected.paragraph : colors.primary.paragraph
               }
               fontSize="SM"
+              style={{ flexShrink: 1 }}
             >
               {notebook?.title}
             </Paragraph>
