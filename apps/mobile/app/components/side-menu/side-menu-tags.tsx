@@ -21,7 +21,7 @@ import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, TextInput, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
 import { useDBItem, useTotalNotes } from "../../hooks/use-db-item";
 import { TaggedNotes } from "../../screens/notes/tagged";
@@ -84,12 +84,26 @@ const TagItem = (props: {
                 id: "select",
                 title: strings.select(),
                 icon: "check-square",
+                checkedState: {
+                  subscribe: useSideMenuTagsSelectionStore.subscribe,
+                  get: () => {
+                    const s = useSideMenuTagsSelectionStore.getState();
+                    return !!s.enabled && s.selection[item.id] === "selected";
+                  }
+                },
                 onPress: () => {
                   const store = useSideMenuTagsSelectionStore;
-                  store.setState({
-                    enabled: true,
-                    selection: {}
-                  });
+                  const s = store.getState();
+                  if (s.enabled && s.selection[item.id] === "selected") {
+                    s.markAs(item, "deselected");
+                    if (store.getState().getSelectedItemIds().length === 0) {
+                      store.setState({ enabled: false });
+                    }
+                    return;
+                  }
+                  if (!s.enabled) {
+                    store.setState({ enabled: true, selection: {} });
+                  }
                   store.getState().markAs(item, "selected");
                 }
               }
@@ -178,7 +192,11 @@ const TagItem = (props: {
             </>
           )}
         </Pressable>
-      ) : null}
+      ) : (
+        <View style={{ padding: Spacing.LEVEL_1 }}>
+          <Paragraph size={AppFontSize.sm}> </Paragraph>
+        </View>
+      )}
     </View>
   );
 };
@@ -204,6 +222,7 @@ export const SideMenuTags = () => {
 
         if (allSelected) {
           useSideMenuTagsSelectionStore.getState().setSelection({});
+          useSideMenuTagsSelectionStore.setState({ enabled: false });
         } else {
           useSideMenuTagsSelectionStore.getState().setSelection(
             tags.reduce((acc: any, tag) => {
@@ -284,11 +303,10 @@ export const SideMenuTags = () => {
     [filteredTags]
   );
   return (
-    <View
-      style={{
-        width: "100%",
-        height: "100%"
-      }}
+    <KeyboardAvoidingView
+      style={{ height: "100%" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? 64 : 0}
     >
       {!tags || tags?.placeholders.length === 0 ? (
         <SideMenuListEmpty
@@ -301,9 +319,11 @@ export const SideMenuTags = () => {
       ) : (
         <>
           <LegendList
+            style={{ flex: 1 }}
             data={filteredTags?.placeholders || []}
             extraData={filteredTags}
             bounces={false}
+            keyboardShouldPersistTaps="handled"
             estimatedItemSize={35}
             bouncesZoom={false}
             overScrollMode="never"
@@ -364,6 +384,6 @@ export const SideMenuTags = () => {
           </View>
         </>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
