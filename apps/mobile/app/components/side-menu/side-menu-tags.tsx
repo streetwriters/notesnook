@@ -192,7 +192,11 @@ const TagItem = (props: {
             </>
           )}
         </Pressable>
-      ) : null}
+      ) : (
+        <View style={{ padding: Spacing.LEVEL_1 }}>
+          <Paragraph size={AppFontSize.sm}> </Paragraph>
+        </View>
+      )}
     </View>
   );
 };
