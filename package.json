@@ -17,7 +17,6 @@
     "start:vericrypt": "npm run tx vericrypt:start",
     "start:desktop": "npm run tx desktop:start",
     "start:desktop-native": "npm run tx desktop-native:desktop",
-    "prepare:desktop-native": "npm --prefix apps/desktop-native run hermes:fetch",
     "build:desktop-native": "npm run tx desktop-native:build",
     "build:test:desktop-native": "npm run tx desktop-native:build:test",
     "test:desktop-native": "npm run tx desktop-native:test:e2e",

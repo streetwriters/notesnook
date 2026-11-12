@@ -37,12 +37,6 @@ npm install
 npm run bootstrap -- --scope=desktop-native
 ```
 
-The bootstrap installs without running install scripts, so download the Hermes engine once after every fresh install:
-
-```bash
-npm run prepare:desktop-native
-```
-
 ### Running the app
 
 ```bash
@@ -50,7 +44,7 @@ npm run prepare:desktop-native
 npm run start:desktop-native
 ```
 
-The first build compiles the Rust side and takes several minutes; later builds are incremental. The native runtime itself is downloaded prebuilt.
+The first run downloads the Hermes engine for your machine, and the first build compiles the Rust side, which takes several minutes; later builds are incremental. The native runtime itself is downloaded prebuilt.
 
 On macOS every rebuilt app is signed ad hoc, so the keychain asks again for each item the app stored. Set `APPLE_SIGNING_IDENTITY` to a signing identity, such as your Apple Development certificate, and choose "Always Allow" once:
 
