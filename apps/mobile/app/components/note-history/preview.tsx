@@ -87,7 +87,7 @@ export default function NotePreview({
     if (session) {
       await db.noteHistory.restore(session.id);
       if (useTabStore.getState().hasTabForNote(session?.noteId)) {
-        const note = editorController.current.note.current[session?.noteId];
+        const note = await db.notes.note(session?.noteId);
         if (note) {
           eSendEvent(eOnLoadNote, {
             item: note,
