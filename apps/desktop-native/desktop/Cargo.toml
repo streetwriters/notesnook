@@ -29,7 +29,7 @@ lto = "fat"
 codegen-units = 1
 
 [build-dependencies]
-rn-gpui-module-build = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui-module-build" }
+rn-gpui-module-build = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui-module-build" }
 serde_json = "1"
 
 [features]
@@ -37,16 +37,16 @@ visual-capture = ["react-native-gpui/visual-capture"]
 test-driver = ["react-native-gpui/test-driver"]
 
 [dependencies]
-rn-gpui-module = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui-module" }
+rn-gpui-module = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui-module" }
 rn-gpui-autolink = { path = "autolink" }
-react-native-gpui = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui" }
+react-native-gpui = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui" }
 
 [patch.crates-io]
 # Managed by @react-native-gpui/cli autolink; do not edit between these markers.
-react-native-gpui = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui" }
-rn-gpui-sys = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui-sys" }
-rn-gpui-module = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui-module" }
-rn-gpui-module-build = { path = "../../../../../../react-native-gpui-desktop-native/packages/core/ReactGpui/rn-gpui-module-build" }
-gpui = { git = "https://github.com/streetwriters/gpui-fast", rev = "5392403" }
-gpui_platform = { git = "https://github.com/streetwriters/gpui-fast", rev = "5392403" }
+react-native-gpui = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui" }
+rn-gpui-sys = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui-sys" }
+rn-gpui-module = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui-module" }
+rn-gpui-module-build = { path = "../node_modules/@react-native-gpui/core/ReactGpui/rn-gpui-module-build" }
+gpui = { git = "https://github.com/streetwriters/gpui-fast", rev = "3ad00a0" }
+gpui_platform = { git = "https://github.com/streetwriters/gpui-fast", rev = "3ad00a0" }
 # End managed by autolink.

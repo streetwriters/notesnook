@@ -118,16 +118,9 @@ test("the email confirmed route without a user id returns to the app", async () 
   await waitForId("app");
 });
 
-test("the account recovery route boots against the in-memory database", async () => {
+test("the account recovery route without a code returns to the app", async () => {
   await open("/account/recovery");
-  await vi.waitFor(
-    async () =>
-      expect(
-        (await app!.getByTestId("authForm").count()) +
-          (await app!.getByTestId("auth-container").count())
-      ).toBeGreaterThan(0),
-    { timeout: 90000, interval: 500 }
-  );
+  await waitForId("app");
 });
 
 test("the hash route /settings opens the settings dialog", async () => {

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import * as Keychain from "react-native-keychain";
-import * as SecureStorage from "@react-native-gpui/secure-storage";
+import * as SecureStorage from "@react-native-gpui/keychain";
 import type { SafeStorage } from "../../../platform";
 import { decrypt } from "./database/encryption";
 
@@ -34,7 +34,7 @@ const SERVICE = "safe-storage";
 const LEGACY_JSON = 0x7b;
 
 export const safeStorage: SafeStorage = {
-  isEncryptionAvailable: () => SecureStorage.isAvailable(),
+  isEncryptionAvailable: () => SecureStorage.isEncryptionAvailable(),
   encryptString: (plainText) => SecureStorage.encryptString(SERVICE, plainText),
   async decryptString(data) {
     if (data[0] === LEGACY_JSON) {

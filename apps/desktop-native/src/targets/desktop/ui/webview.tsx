@@ -26,7 +26,7 @@ export const WebView = forwardRef<
   Contract.WebViewHandle,
   Contract.WebViewProps
 >(function WebView(props, ref) {
-  const native = useRef<NativeWebView>(null);
+  const native = useRef<NativeWebView<object>>(null);
   const { viewStyle, nativeProps } = useStyled(
     { sx: props.sx, testID: props.testID },
     { defaults: { flex: 1 } }
@@ -43,7 +43,7 @@ export const WebView = forwardRef<
   );
 
   return (
-    <NativeWebView
+    <NativeWebView<object>
       ref={native}
       testID={nativeProps.testID as string | undefined}
       style={viewStyle as never}
