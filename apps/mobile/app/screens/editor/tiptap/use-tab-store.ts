@@ -230,6 +230,7 @@ export function resetTabStore() {
     ...DEFAULT_TABS
   });
   TabSessionStorage.storage.clearStore();
+  syncTabs();
 }
 
 export const useTabStore = create<TabStore, any>(
