@@ -109,7 +109,8 @@ export const SideMenuNotebooks = () => {
 
         if (allSelected) {
           useSideMenuNotebookSelectionStore.setState({
-            selection: {}
+            selection: {},
+            enabled: false
           });
           return;
         }
@@ -280,6 +281,7 @@ const NotebookItemWrapper = React.memo(
           selected={selected}
           selectionEnabled={selectionEnabled}
           selectionStore={useSideMenuNotebookSelectionStore}
+          canDisableSelectionMode
           onItemUpdate={onItemUpdate}
           focused={focused}
           onPress={() => {

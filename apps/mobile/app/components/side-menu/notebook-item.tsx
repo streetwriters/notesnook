@@ -144,10 +144,7 @@ export const NotebookItem = ({
 
               if (selected) {
                 state.markAs(item.notebook, "deselected");
-                return;
-              }
-
-              if (!state.multiSelect) {
+              } else if (!state.multiSelect) {
                 const keys = Object.keys(state.selection);
                 const nextState: any = {};
                 for (const key in keys) {
