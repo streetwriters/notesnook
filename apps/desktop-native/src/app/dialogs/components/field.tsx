@@ -230,6 +230,7 @@ export const Field = forwardRef<UIElement, FieldProps>(function Field(
               left: 8,
               top: 0,
               bottom: 0,
+              alignItems: "center",
               justifyContent: "center",
               pointerEvents: "none"
             }}
@@ -244,6 +245,7 @@ export const Field = forwardRef<UIElement, FieldProps>(function Field(
               right: 8,
               top: 0,
               bottom: 0,
+              alignItems: "center",
               justifyContent: "center",
               pointerEvents: "none"
             }}
