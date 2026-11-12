@@ -84,12 +84,26 @@ const TagItem = (props: {
                 id: "select",
                 title: strings.select(),
                 icon: "check-square",
+                checkedState: {
+                  subscribe: useSideMenuTagsSelectionStore.subscribe,
+                  get: () => {
+                    const s = useSideMenuTagsSelectionStore.getState();
+                    return !!s.enabled && s.selection[item.id] === "selected";
+                  }
+                },
                 onPress: () => {
                   const store = useSideMenuTagsSelectionStore;
-                  store.setState({
-                    enabled: true,
-                    selection: {}
-                  });
+                  const s = store.getState();
+                  if (s.enabled && s.selection[item.id] === "selected") {
+                    s.markAs(item, "deselected");
+                    if (store.getState().getSelectedItemIds().length === 0) {
+                      store.setState({ enabled: false });
+                    }
+                    return;
+                  }
+                  if (!s.enabled) {
+                    store.setState({ enabled: true, selection: {} });
+                  }
                   store.getState().markAs(item, "selected");
                 }
               }

@@ -294,12 +294,32 @@ const NotebookItemWrapper = React.memo(
                 id: "select",
                 title: strings.select(),
                 icon: "check-square",
+                checkedState: {
+                  subscribe: useSideMenuNotebookSelectionStore.subscribe,
+                  get: () => {
+                    const s = useSideMenuNotebookSelectionStore.getState();
+                    return (
+                      !!s.enabled &&
+                      s.selection[item.notebook.id] === "selected"
+                    );
+                  }
+                },
                 onPress: () => {
                   const store = useSideMenuNotebookSelectionStore;
-                  store.setState({
-                    enabled: true,
-                    selection: {}
-                  });
+                  const s = store.getState();
+                  if (
+                    s.enabled &&
+                    s.selection[item.notebook.id] === "selected"
+                  ) {
+                    s.markAs(item.notebook, "deselected");
+                    if (store.getState().getSelectedItemIds().length === 0) {
+                      store.setState({ enabled: false });
+                    }
+                    return;
+                  }
+                  if (!s.enabled) {
+                    store.setState({ enabled: true, selection: {} });
+                  }
                   store.getState().markAs(item.notebook, "selected");
                 }
               }
