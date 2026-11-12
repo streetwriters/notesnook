@@ -21,7 +21,7 @@ import { Tag, VirtualizedGrouping } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { useThemeColors } from "@notesnook/theme";
 import React, { useEffect } from "react";
-import { TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, TextInput, View } from "react-native";
 import { DatabaseLogger, db } from "../../common/database";
 import { useDBItem, useTotalNotes } from "../../hooks/use-db-item";
 import { TaggedNotes } from "../../screens/notes/tagged";
@@ -284,11 +284,10 @@ export const SideMenuTags = () => {
     [filteredTags]
   );
   return (
-    <View
-      style={{
-        width: "100%",
-        height: "100%"
-      }}
+    <KeyboardAvoidingView
+      style={{ height: "100%" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "android" ? 64 : 0}
     >
       {!tags || tags?.placeholders.length === 0 ? (
         <SideMenuListEmpty
@@ -301,9 +300,11 @@ export const SideMenuTags = () => {
       ) : (
         <>
           <LegendList
+            style={{ flex: 1 }}
             data={filteredTags?.placeholders || []}
             extraData={filteredTags}
             bounces={false}
+            keyboardShouldPersistTaps="handled"
             estimatedItemSize={35}
             bouncesZoom={false}
             overScrollMode="never"
@@ -364,6 +365,6 @@ export const SideMenuTags = () => {
           </View>
         </>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
