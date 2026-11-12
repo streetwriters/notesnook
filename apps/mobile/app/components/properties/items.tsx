@@ -96,6 +96,78 @@ const COLUMN_BAR_ITEMS: ActionId[] = [
   "delete"
 ];
 
+const noopSubscribe = () => () => {};
+
+function ActionRowItem({
+  item,
+  columnItemWidth,
+  shouldShrink
+}: {
+  item: Action;
+  columnItemWidth: number;
+  shouldShrink: boolean;
+}) {
+  const { colors } = useThemeColors();
+  const checked = React.useSyncExternalStore(
+    item.checkedState?.subscribe ?? noopSubscribe,
+    () => (item.checkedState ? item.checkedState.get() : !!item.checked)
+  );
+
+  return (
+    <View
+      style={{
+        alignItems: "center",
+        width: columnItemWidth - 10,
+        opacity: item.locked ? 0.5 : 1
+      }}
+    >
+      <Pressable
+        onPress={item.onPress}
+        type={checked ? "selected" : "secondary"}
+        testID={"icon-" + item.id}
+        style={{
+          width: columnItemWidth - 10,
+          paddingVertical: Spacing.LEVEL_2 - 2,
+          borderRadius: 10,
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 6
+        }}
+      >
+        <AppIcon
+          allowFontScaling
+          name={item.icon}
+          iconFamily="notesnook"
+          size={
+            DDS.isTab
+              ? AppFontSize.xxl
+              : shouldShrink
+                ? AppFontSize.xxl
+                : AppFontSize.lg
+          }
+          color={
+            checked
+              ? colors.primary.heading
+              : item.id.match(/(delete|trash)/g)
+                ? colors.error.icon
+                : colors.secondary.icon
+          }
+        />
+      </Pressable>
+
+      <Paragraph
+        size={AppFontSize.xxs}
+        textBreakStrategy="simple"
+        color={checked ? colors.primary.heading : colors.secondary.paragraph}
+        fontFamily="MEDIUM"
+        style={{ textAlign: "center" }}
+      >
+        {item.title}
+      </Paragraph>
+    </View>
+  );
+}
+
 export const Items = ({
   item,
   close,
@@ -162,68 +234,6 @@ export const Items = ({
 
   const actionItems = [...buttons, ...columnItems];
 
-  const renderRowItem = React.useCallback(
-    ({ item }: { item: Action }) => (
-      <View
-        key={item.id}
-        style={{
-          alignItems: "center",
-          width: columnItemWidth - 10,
-          opacity: item.locked ? 0.5 : 1
-        }}
-      >
-        <Pressable
-          onPress={item.onPress}
-          type={item.checked ? "shade" : "secondary"}
-          testID={"icon-" + item.id}
-          style={{
-            width: columnItemWidth - 10,
-            paddingVertical: Spacing.LEVEL_2 - 2,
-            borderRadius: 10,
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: 6
-          }}
-        >
-          <AppIcon
-            allowFontScaling
-            name={item.icon}
-            iconFamily="notesnook"
-            size={
-              DDS.isTab
-                ? AppFontSize.xxl
-                : shouldShrink
-                  ? AppFontSize.xxl
-                  : AppFontSize.lg
-            }
-            color={
-              item.checked
-                ? item.activeColor || colors.primary.accent
-                : item.id.match(/(delete|trash)/g)
-                  ? colors.error.icon
-                  : colors.secondary.icon
-            }
-          />
-        </Pressable>
-
-        <Paragraph
-          size={AppFontSize.xxs}
-          textBreakStrategy="simple"
-          style={{ textAlign: "center" }}
-        >
-          {item.title}
-        </Paragraph>
-      </View>
-    ),
-    [
-      colors.error.icon,
-      colors.primary.accent,
-      colors.secondary.icon,
-      columnItemWidth,
-      shouldShrink
-    ]
-  );
-
   const renderPreferenceItem = React.useCallback(
     (item: Action) => (
       <Pressable
@@ -260,14 +270,14 @@ export const Items = ({
             iconFamily="notesnook"
             allowFontScaling
             size={AppFontSize.md}
-            color={colors.primary.icon}
+            color={item.checked ? colors.primary.icon : colors.secondary.icon}
           />
           <Paragraph
             numberOfLines={1}
             fontSize="XS"
             fontFamily={item.checked ? "MEDIUM" : "REGULAR"}
             color={
-              item.checked ? colors.primary.heading : colors.primary.paragraph
+              item.checked ? colors.primary.heading : colors.secondary.heading
             }
             style={{ flexShrink: 1 }}
           >
@@ -294,7 +304,8 @@ export const Items = ({
       colors.primary.border,
       colors.primary.heading,
       colors.primary.icon,
-      colors.primary.paragraph,
+      colors.secondary.heading,
+      colors.secondary.icon,
       colors.selected.background
     ]
   );
@@ -471,7 +482,14 @@ export const Items = ({
               paddingHorizontal: DefaultAppStyles.GAP
             }}
           >
-            {bottomGridItems.map((item) => renderRowItem({ item }))}
+            {bottomGridItems.map((item) => (
+              <ActionRowItem
+                key={item.id}
+                item={item}
+                columnItemWidth={columnItemWidth}
+                shouldShrink={shouldShrink}
+              />
+            ))}
           </View>
         </>
       ) : (
@@ -526,7 +544,14 @@ export const Items = ({
                   gap: Spacing.LEVEL_1
                 }}
               >
-                {actionItems.map((item) => renderRowItem({ item }))}
+                {actionItems.map((item) => (
+                  <ActionRowItem
+                    key={item.id}
+                    item={item}
+                    columnItemWidth={columnItemWidth}
+                    shouldShrink={shouldShrink}
+                  />
+                ))}
               </View>
             </View>
           ) : null}
