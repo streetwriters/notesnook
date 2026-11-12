@@ -204,6 +204,7 @@ export const SideMenuTags = () => {
 
         if (allSelected) {
           useSideMenuTagsSelectionStore.getState().setSelection({});
+          useSideMenuTagsSelectionStore.setState({ enabled: false });
         } else {
           useSideMenuTagsSelectionStore.getState().setSelection(
             tags.reduce((acc: any, tag) => {
