@@ -35,6 +35,7 @@ const scopes = {
   monograph: "apps/monograph",
   vericrypt: "apps/vericrypt",
   desktop: "apps/desktop",
+  "desktop-native": "apps/desktop-native",
   core: "packages/core",
   editor: "packages/editor",
   themes: "servers/themes",
