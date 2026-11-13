@@ -37,7 +37,9 @@ import {
   ReadonlyEditorSession,
   EditorSession,
   DocumentPreview,
-  LockedEditorSession
+  LockedEditorSession,
+  isSessionLoading,
+  onSessionLoadingChange
 } from "../../stores/editor-store";
 import {
   useStore as useAppStore,
@@ -85,6 +87,39 @@ import { ConfirmDialog } from "../../dialogs/confirm";
 const PDFPreview = React.lazy(() => import("../pdf-preview"));
 
 const autoSaveToast = { show: true, hide: () => {} };
+const LOCKED_ELEMENTS = ".editorTitle, .editor-container, .editor-toolbar";
+const BLOCKED_EVENTS = [
+  "beforeinput",
+  "keydown",
+  "paste",
+  "drop",
+  "click"
+] as const;
+
+function lockInput(root: HTMLElement) {
+  const isLocked = (target: EventTarget | null) =>
+    target instanceof Element && !!target.closest(LOCKED_ELEMENTS);
+  const blur = (e: Event) => {
+    if (isLocked(e.target)) (e.target as HTMLElement).blur();
+  };
+  const block = (e: Event) => {
+    if (!isLocked(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  root.dataset.locked = "true";
+  if (root.contains(document.activeElement) && isLocked(document.activeElement))
+    (document.activeElement as HTMLElement).blur();
+  root.addEventListener("focusin", blur, true);
+  for (const event of BLOCKED_EVENTS) root.addEventListener(event, block, true);
+  return () => {
+    delete root.dataset.locked;
+    root.removeEventListener("focusin", blur, true);
+    for (const event of BLOCKED_EVENTS)
+      root.removeEventListener(event, block, true);
+  };
+}
 
 export async function saveContent(
   noteId: string,
@@ -348,6 +383,26 @@ function EditorView({
     return session.content?.data;
   }, [session.content?.data]);
 
+  /**
+   * While a note is being opened into this session, the title, content and
+   * toolbar must not take any input.
+   */
+  useEffect(() => {
+    let unlock: (() => void) | undefined;
+    const update = () => {
+      const isLoading = isSessionLoading(session.id);
+      if (isLoading === !!unlock) return;
+      unlock?.();
+      unlock = isLoading && root.current ? lockInput(root.current) : undefined;
+    };
+    update();
+    const unsubscribe = onSessionLoadingChange(update);
+    return () => {
+      unsubscribe();
+      unlock?.();
+    };
+  }, [session.id]);
+
   if (session.needsHydration) return null;
 
   return (
@@ -360,7 +415,11 @@ function EditorView({
         overflow: "hidden",
         flex: 1,
         flexDirection: "column",
-        background: "background"
+        background: "background",
+        [`&[data-locked] :is(${LOCKED_ELEMENTS})`]: {
+          pointerEvents: "none",
+          animation: "ping 1s infinite"
+        }
       }}
     >
       <div className="dialogContainer" />
