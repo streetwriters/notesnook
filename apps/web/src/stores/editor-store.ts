@@ -204,6 +204,29 @@ const tabSessionHistory = new TabSessionHistory({
 
 const saveMutex = new Mutex();
 
+/**
+ * Ids of new sessions that a different note is being opened into.
+ * Their title, content, and toolbar can't take input meanwhile (see `components/editor`).
+ * Kept out of the store's state so toggling it doesn't make the rest of the app update.
+ */
+const loadingSessions = new Set<string>();
+const loadingSessionListeners = new Set<() => void>();
+export function isSessionLoading(sessionId: string) {
+  return loadingSessions.has(sessionId);
+}
+export function onSessionLoadingChange(listener: () => void) {
+  loadingSessionListeners.add(listener);
+  return () => {
+    loadingSessionListeners.delete(listener);
+  };
+}
+function setSessionLoading(sessionId: string, isLoading: boolean) {
+  if (isLoading === loadingSessions.has(sessionId)) return;
+  if (isLoading) loadingSessions.add(sessionId);
+  else loadingSessions.delete(sessionId);
+  loadingSessionListeners.forEach((listener) => listener());
+}
+
 class EditorStore extends BaseStore<EditorStore> {
   tabs: TabItem[] = [];
   tabHistory: TabHistory = {};
@@ -690,6 +713,11 @@ class EditorStore extends BaseStore<EditorStore> {
       openInNewTab?: boolean;
       rawContent?: string;
       activeSearchResultId?: string;
+      /**
+       * Set when a new session is being converted into the note that was
+       * created from it on its first save.
+       */
+      isNewSessionSave?: boolean;
     } = {}
   ): Promise<void> => {
     const {
@@ -731,136 +759,150 @@ class EditorStore extends BaseStore<EditorStore> {
         : activateSession(activeSession.id, options.activeBlockId);
     }
 
-    if (activeSession && "note" in activeSession)
-      await db.fs().cancel(activeSession.note.id);
-
-    const note =
-      typeof noteOrId === "object" && !activeSession?.needsHydration
-        ? noteOrId
-        : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
-    if (!note) return;
-
-    const oldSessionOfNote = sessions.find(
-      (s) => "note" in s && s.note.id === noteId && s.tabId === tabId
-    );
-    const sessionId =
-      activeSession?.needsHydration ||
-      activeSession?.type === "new" ||
-      noteAlreadyOpened
+    // the note reuses this new session's id; keep its editor from taking
+    // input until it has loaded
+    const loadingSessionId =
+      activeSession?.type === "new" &&
+      !activeSession.needsHydration &&
+      !options.isNewSessionSave
         ? activeSession.id
-        : tabSessionHistory.add(tabId, oldSessionOfNote?.id);
-    const isLocked = await db.vaults.itemExists(note);
-
-    if (note.conflicted) {
-      const content = note.contentId
-        ? await db.content.get(note.contentId)
         : undefined;
+    if (loadingSessionId) setSessionLoading(loadingSessionId, true);
 
-      if (!content || !content.conflicted || note.type === "trash") {
-        note.conflicted = false;
-        await db.notes.add({ id: note.id, conflicted: false });
-        if (content?.locked) {
-          await db.content.add({
-            id: note.contentId,
-            dateResolved: Date.now()
-          });
+    try {
+      if (activeSession && "note" in activeSession)
+        await db.fs().cancel(activeSession.note.id);
+
+      const note =
+        typeof noteOrId === "object" && !activeSession?.needsHydration
+          ? noteOrId
+          : (await db.notes.note(noteId)) || (await db.notes.trashed(noteId));
+      if (!note) return;
+
+      const oldSessionOfNote = sessions.find(
+        (s) => "note" in s && s.note.id === noteId && s.tabId === tabId
+      );
+      const sessionId =
+        activeSession?.needsHydration ||
+        activeSession?.type === "new" ||
+        noteAlreadyOpened
+          ? activeSession.id
+          : tabSessionHistory.add(tabId, oldSessionOfNote?.id);
+      const isLocked = await db.vaults.itemExists(note);
+
+      if (note.conflicted) {
+        const content = note.contentId
+          ? await db.content.get(note.contentId)
+          : undefined;
+
+        if (!content || !content.conflicted || note.type === "trash") {
+          note.conflicted = false;
+          await db.notes.add({ id: note.id, conflicted: false });
+          if (content?.locked) {
+            await db.content.add({
+              id: note.contentId,
+              dateResolved: Date.now()
+            });
+          }
+          return this.openSession(note, { ...options, force: true });
         }
-        return this.openSession(note, { ...options, force: true });
-      }
 
-      this.addSession(
-        {
-          type: "conflicted",
-          content: content,
-          id: sessionId,
-          note,
-          activeBlockId: options.activeBlockId,
-          tabId
-        },
-        options
-      );
-    } else if (isLocked && note.type !== "trash") {
-      this.addSession(
-        {
-          type: "locked",
-          id: sessionId,
-          note,
-          activeBlockId: options.activeBlockId,
-          tabId
-        },
-        options
-      );
-    } else {
-      const content = note.contentId
-        ? await db.content.get(note.contentId)
-        : undefined;
-
-      if (content?.locked) {
-        await Vault.lockNote(noteId);
-        return this.openSession(note, { ...options, force: true });
-      }
-
-      if (note.type === "trash") {
         this.addSession(
           {
-            type: "deleted",
-            note,
+            type: "conflicted",
+            content: content,
             id: sessionId,
-            content,
+            note,
             activeBlockId: options.activeBlockId,
-            activeSearchResultId: options.activeSearchResultId,
+            tabId
+          },
+          options
+        );
+      } else if (isLocked && note.type !== "trash") {
+        this.addSession(
+          {
+            type: "locked",
+            id: sessionId,
+            note,
+            activeBlockId: options.activeBlockId,
             tabId
           },
           options
         );
       } else {
-        const attachmentsLength = await db.attachments
-          .ofNote(note.id, "all")
-          .count();
-        const tags = await db.notes.tags(note.id);
-        const colors = await db.relations.to(note, "color").get();
-        if (note.readonly) {
+        const content = note.contentId
+          ? await db.content.get(note.contentId)
+          : undefined;
+
+        if (content?.locked) {
+          await Vault.lockNote(noteId);
+          return this.openSession(note, { ...options, force: true });
+        }
+
+        if (note.type === "trash") {
           this.addSession(
             {
-              type: "readonly",
+              type: "deleted",
               note,
               id: sessionId,
-              content:
-                options.rawContent && content
-                  ? { data: options.rawContent, type: content.type }
-                  : content,
-              color: colors[0]?.fromId,
-              tags,
-              activeBlockId: options.activeBlockId,
-              activeSearchResultId: options.activeSearchResultId,
-              tabId,
-              attachmentsLength
-            },
-            options
-          );
-        } else {
-          this.addSession(
-            {
-              type: "default",
-              id: sessionId,
-              note,
-              saveState: SaveState.Saved,
-              sessionId: `${Date.now()}`,
-              attachmentsLength,
-              tags,
-              color: colors[0]?.fromId,
-              content:
-                options.rawContent && content
-                  ? { ...content, data: options.rawContent }
-                  : content,
+              content,
               activeBlockId: options.activeBlockId,
               activeSearchResultId: options.activeSearchResultId,
               tabId
             },
             options
           );
+        } else {
+          const attachmentsLength = await db.attachments
+            .ofNote(note.id, "all")
+            .count();
+          const tags = await db.notes.tags(note.id);
+          const colors = await db.relations.to(note, "color").get();
+          if (note.readonly) {
+            this.addSession(
+              {
+                type: "readonly",
+                note,
+                id: sessionId,
+                content:
+                  options.rawContent && content
+                    ? { data: options.rawContent, type: content.type }
+                    : content,
+                color: colors[0]?.fromId,
+                tags,
+                activeBlockId: options.activeBlockId,
+                activeSearchResultId: options.activeSearchResultId,
+                tabId,
+                attachmentsLength
+              },
+              options
+            );
+          } else {
+            this.addSession(
+              {
+                type: "default",
+                id: sessionId,
+                note,
+                saveState: SaveState.Saved,
+                sessionId: `${Date.now()}`,
+                attachmentsLength,
+                tags,
+                color: colors[0]?.fromId,
+                content:
+                  options.rawContent && content
+                    ? { ...content, data: options.rawContent }
+                    : content,
+                activeBlockId: options.activeBlockId,
+                activeSearchResultId: options.activeSearchResultId,
+                tabId
+              },
+              options
+            );
+          }
         }
       }
+    } finally {
+      if (loadingSessionId) setSessionLoading(loadingSessionId, false);
     }
   };
 
@@ -1059,7 +1101,7 @@ class EditorStore extends BaseStore<EditorStore> {
         if (shouldRefreshNotes) useNoteStore.getState().refresh();
 
         if (currentSession.type === "new") {
-          await this.openSession(note, { force: true });
+          await this.openSession(note, { force: true, isNewSessionSave: true });
         } else {
           // update any conflicted session that has the same content opened
           if (partial.content) {
