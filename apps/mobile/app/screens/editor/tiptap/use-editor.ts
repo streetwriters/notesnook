@@ -58,6 +58,7 @@ import {
   eEditorReset,
   eEditorTabFocused,
   eOnLoadNote,
+  eResetEditorTabs,
   eShowMergeDialog,
   eUpdateNoteInEditor
 } from "../../../utils/events";
@@ -975,7 +976,7 @@ export const useEditor = (
     ];
     if (isDefaultEditor) {
       subs.push(
-        db.eventManager.subscribe(EVENTS.userLoggedOut, () => {
+        eSubscribeEvent(eResetEditorTabs, () => {
           for (const tab of useTabStore.getState().tabs) {
             reset(tab.id);
           }

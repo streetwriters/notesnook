@@ -177,3 +177,4 @@ export const eOnExitEditor = "622";
 export const eEditorReset = "623";
 export const eAfterSync = "624";
 export const eMenuItemUpdate = "625";
+export const eResetEditorTabs = "626";
