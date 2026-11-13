@@ -58,6 +58,7 @@ import {
   eEditorReset,
   eEditorTabFocused,
   eOnLoadNote,
+  eResetEditorTabs,
   eShowMergeDialog,
   eUpdateNoteInEditor
 } from "../../../utils/events";
@@ -973,10 +974,19 @@ export const useEditor = (
       eSubscribeEvent(eOnLoadNote + editorId, loadNote),
       eSubscribeEvent(eUpdateNoteInEditor, onSyncComplete)
     ];
+    if (isDefaultEditor) {
+      subs.push(
+        eSubscribeEvent(eResetEditorTabs, () => {
+          for (const tab of useTabStore.getState().tabs) {
+            reset(tab.id);
+          }
+        })
+      );
+    }
     return () => {
       subs.forEach((sub) => sub?.unsubscribe());
     };
-  }, [editorId, loadNote, onSyncComplete]);
+  }, [editorId, isDefaultEditor, loadNote, onSyncComplete, reset]);
 
   const saveContent = useCallback(
     ({
