@@ -3676,6 +3676,10 @@ msgstr "File size limit exceeded. Please upgrade your plan."
 msgid "File too big"
 msgstr "File too big"
 
+#: src/strings.ts:3287
+msgid "File upload failed"
+msgstr "File upload failed"
+
 #: src/strings.ts:3182
 msgid "files totaling {storage}"
 msgstr "files totaling {storage}"
@@ -8073,6 +8077,10 @@ msgstr "The reminder will start on {date} at {time}."
 #: src/strings.ts:1891
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "The security key for unlocking the app. This is the most secure method."
+
+#: src/strings.ts:3289
+msgid "The upload was interrupted by a network problem. It will retry automatically when your connection is back."
+msgstr "The upload was interrupted by a network problem. It will retry automatically when your connection is back."
 
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
