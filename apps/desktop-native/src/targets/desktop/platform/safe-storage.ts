@@ -24,10 +24,15 @@ import { decrypt } from "./database/encryption";
 
 const SERVER = "notesnook-desktop:safe-storage";
 
-async function legacyKey() {
-  const stored = await Keychain.getInternetCredentials(SERVER);
-  if (!stored) throw new Error("The legacy safe storage key is missing.");
-  return stored.password;
+let legacyKeyLookup: Promise<string> | undefined;
+
+function legacyKey() {
+  legacyKeyLookup ??= Keychain.getInternetCredentials(SERVER).then((stored) => {
+    if (!stored) throw new Error("The legacy safe storage key is missing.");
+    return stored.password;
+  });
+  legacyKeyLookup.catch(() => (legacyKeyLookup = undefined));
+  return legacyKeyLookup;
 }
 
 const SERVICE = "safe-storage";

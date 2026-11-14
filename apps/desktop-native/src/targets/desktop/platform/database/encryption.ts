@@ -177,46 +177,46 @@ export async function getDatabaseKey(appLockPassword?: string) {
   }
 
   if (!DB_KEY) {
-    const hasKey = await Keychain.hasInternetCredentials({
-      server: KEYCHAIN_SERVER_DBKEY
-    });
-    if (hasKey) {
-      const credentials = await Keychain.getInternetCredentials(
-        KEYCHAIN_SERVER_DBKEY
-      );
-
-      DatabaseLogger.info("Getting database key from Keychain");
-      DB_KEY = (credentials as Keychain.UserCredentials).password;
-    }
+    KEYCHAIN_LOOKUP ??= loadOrCreateDatabaseKey()
+      .then((key) => (DB_KEY = key))
+      .finally(() => {
+        KEYCHAIN_LOOKUP = undefined;
+      });
+    await KEYCHAIN_LOOKUP;
   }
 
-  if (!DB_KEY) {
-    DatabaseLogger.info("Generating new database key");
-    const password = generatePassword();
-    const derivedDatabaseKey = await Sodium.deriveKey(
-      password,
-      NOTESNOOK_DB_KEY_SALT
-    );
-
-    DB_KEY = derivedDatabaseKey.key as string;
-
-    await Keychain.setInternetCredentials(
-      KEYCHAIN_SERVER_DBKEY,
-      "notesnook",
-      DB_KEY,
-      KEYSTORE_CONFIG
-    );
-  }
-
-  if (!DB_KEY) {
-    throw new Error(
-      `Failed to get database key, ${await Keychain.hasInternetCredentials({
-        server: KEYCHAIN_SERVER_DBKEY
-      })}`
-    );
-  }
+  if (!DB_KEY) throw new Error("Failed to get database key");
 
   return DB_KEY;
+}
+
+let KEYCHAIN_LOOKUP: Promise<string> | undefined;
+
+async function loadOrCreateDatabaseKey() {
+  DatabaseLogger.info("Keychain call: getInternetCredentials (db key)");
+  const credentials = await Keychain.getInternetCredentials(
+    KEYCHAIN_SERVER_DBKEY
+  );
+  if (credentials && credentials.password) {
+    DatabaseLogger.info("Getting database key from Keychain");
+    return credentials.password;
+  }
+
+  DatabaseLogger.info("Generating new database key");
+  const derivedDatabaseKey = await Sodium.deriveKey(
+    generatePassword(),
+    NOTESNOOK_DB_KEY_SALT
+  );
+  const key = derivedDatabaseKey.key as string;
+
+  DatabaseLogger.info("Keychain call: setInternetCredentials (db key)");
+  await Keychain.setInternetCredentials(
+    KEYCHAIN_SERVER_DBKEY,
+    "notesnook",
+    key,
+    KEYSTORE_CONFIG
+  );
+  return key;
 }
 
 export async function deriveCryptoKeyFallback(data: SerializedKey) {
