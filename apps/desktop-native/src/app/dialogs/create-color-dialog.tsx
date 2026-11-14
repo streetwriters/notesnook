@@ -31,7 +31,6 @@ export const CreateColorDialog = DialogManager.register(
   function CreateColorDialog(props: CreateColorDialogProps) {
     const title = useRef("");
     const [color, setColor] = useState("#666666");
-    const [fieldKey, setFieldKey] = useState(0);
 
     const onSubmit = async () => {
       if (!title.current.trim() || !color) return;
@@ -81,10 +80,9 @@ export const CreateColorDialog = DialogManager.register(
             onSubmit={() => onSubmit()}
           />
           <Field
-            key={fieldKey}
             required
             label={strings.color()}
-            defaultValue={color}
+            value={color}
             id="color"
             testID="color-input"
             placeholder={strings.selectColor()}
@@ -95,10 +93,7 @@ export const CreateColorDialog = DialogManager.register(
                 component: (
                   <ColorPicker
                     value={validateHexColor(color) ? color : "#666666"}
-                    onChange={(value) => {
-                      setColor(value);
-                      setFieldKey((k) => k + 1);
-                    }}
+                    onChange={(value) => setColor(value)}
                     sx={{ width: 40, height: 33, mx: "spacing4" }}
                   />
                 ),

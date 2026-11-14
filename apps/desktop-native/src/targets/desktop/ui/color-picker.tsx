@@ -17,41 +17,79 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useRef, useState } from "react";
+import { View } from "react-native";
+import WheelColorPicker from "react-native-wheel-color-picker";
 import type * as Contract from "../../../ui/primitives";
 import type { UIElement } from "../../../ui/primitives";
-import { Box, Flex, Input } from "./primitives";
+import { Popover } from "./popover";
+import { Box } from "./primitives";
 
 export const ColorPicker = forwardRef<UIElement, Contract.ColorPickerProps>(
   function ColorPicker(props, ref) {
+    const [isOpen, setIsOpen] = useState(false);
+    const anchorRef = useRef<UIElement | null>(null);
+    const emitted = useRef(props.value);
+    const wheelColor = useRef(props.value);
+    if (props.value !== emitted.current) {
+      emitted.current = props.value;
+      wheelColor.current = props.value;
+    }
+
+    const setRefs = useCallback(
+      (node: UIElement | null) => {
+        anchorRef.current = node;
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref]
+    );
+
     return (
-      <Flex
-        ref={ref}
-        testID={props.testID}
-        sx={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: "spacing3",
-          ...props.sx
-        }}
-      >
+      <>
         <Box
+          ref={setRefs}
+          testID={props.testID}
+          onPress={() => setIsOpen((open) => !open)}
           sx={{
-            width: 24,
-            height: 24,
+            width: 40,
+            height: 33,
             borderRadius: "radius2",
             bg: props.value as never,
             border: "1px solid",
-            borderColor: "border"
+            borderColor: "border",
+            ...props.sx
           }}
         />
-        <Input
-          type="text"
-          defaultValue={props.value}
-          onChangeText={props.onChange}
-          sx={{ width: 100 }}
-        />
-      </Flex>
+        <Popover
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          anchorRef={anchorRef}
+          placement="bottom-end"
+          sx={{ p: "spacing4" }}
+        >
+          <View style={{ width: 260, height: 250 }}>
+            <WheelColorPicker
+              color={wheelColor.current}
+              onColorChange={(color: string) => {
+                if (color === emitted.current) return;
+                emitted.current = color;
+                props.onChange(color);
+              }}
+              useNativeLayout={true}
+              autoResetSlider={true}
+              sliderSize={30}
+              thumbSize={25}
+              shadeWheelThumb
+              shadeSliderThumb
+              swatchesOnly={false}
+              swatches={false}
+              useNativeDriver={false}
+              sliderStyle={{ marginBottom: 12, paddingHorizontal: 12 }}
+            />
+          </View>
+        </Popover>
+      </>
     );
   }
 );
