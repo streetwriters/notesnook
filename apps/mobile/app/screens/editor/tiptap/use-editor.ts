@@ -441,7 +441,8 @@ export const useEditor = (
           if (typeof noteData.title === "string") {
             await db.notes.add({
               title: noteData.title,
-              id: noteData.id
+              id: noteData.id,
+              sessionId: noteData?.sessionId
             });
           }
 
