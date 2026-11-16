@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useEffect, useRef, useState } from "react";
@@ -29,7 +30,6 @@ import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
 import { Flex, Link, Text } from "@theme-ui/components";
 import { ImageNode } from "../../extensions/image/index.js";
 import { Link as LinkNode } from "../../extensions/link/index.js";
-import { getMarkAttributes } from "@tiptap/core";
 import { useHoverPopupContext } from "../floating-menus/hover-popup/context.js";
 import { strings } from "@notesnook/intl";
 import { find } from "linkifyjs";
@@ -40,8 +40,10 @@ import { LinkData } from "../../types.js";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
+  const isActive = useEditorQuery(editor, q.isActive("link"), false);
+  const isEditable = useEditorQuery(editor, q.editable(), true);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("link") || !isBottom) return null;
+  if (!isActive || !isBottom) return null;
 
   return (
     <MoreTools
@@ -50,7 +52,7 @@ export function LinkSettings(props: ToolProps) {
       autoCloseOnUnmount
       popupId="linkSettings"
       tools={
-        editor.isEditable
+        isEditable
           ? ["openLink", "editLink", "removeLink", "copyLink"]
           : ["openLink", "copyLink"]
       }
@@ -61,7 +63,7 @@ export function LinkSettings(props: ToolProps) {
 export function AddLink(props: ToolProps) {
   const { editor } = props;
 
-  const isActive = editor.isActive("link");
+  const isActive = useEditorQuery(editor, q.isActive("link"), false);
 
   if (isActive) return <EditLink {...props} icon={"linkEdit"} />;
   return (
@@ -86,7 +88,7 @@ export function AddLink(props: ToolProps) {
 
 export function AddInternalLink(props: ToolProps) {
   const { editor } = props;
-  const isActive = editor.isActive(LinkNode.name);
+  const isActive = useEditorQuery(editor, q.isActive(LinkNode.name), false);
 
   return (
     <ToolButton
@@ -109,15 +111,21 @@ export function AddInternalLink(props: ToolProps) {
 
 export function EditLink(props: ToolProps) {
   const { editor } = props;
+  const linkAttributes = useEditorQuery(
+    editor,
+    q.attributes(LinkNode.name),
+    {}
+  );
+  const isEditable = useEditorQuery(editor, q.editable(), true);
   const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
   const { node } = _selectedNode || {};
   const link = node ? findMark(node, LinkNode.name) : null;
-  const attrs = link?.attrs || getMarkAttributes(editor.state, LinkNode.name);
+  const attrs = link?.attrs || linkAttributes;
 
-  if (!editor.isEditable) return null;
+  if (!isEditable) return null;
   if (attrs && isInternalLink(attrs.href))
     return (
       <ToolButton
@@ -184,8 +192,9 @@ export function EditLink(props: ToolProps) {
 
 export function RemoveLink(props: ToolProps) {
   const { editor } = props;
+  const isEditable = useEditorQuery(editor, q.editable(), true);
   const { selectedNode, hide } = useHoverPopupContext();
-  if (!editor.isEditable) return null;
+  if (!isEditable) return null;
   return (
     <ToolButton
       icon={props.icon}
@@ -206,16 +215,18 @@ export function RemoveLink(props: ToolProps) {
 
 export function OpenLink(props: ToolProps) {
   const { editor } = props;
+  const linkAttributes = useEditorQuery(
+    editor,
+    q.attributes(LinkNode.name),
+    {}
+  );
   const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  const href =
-    link?.attrs.href ??
-    (getMarkAttributes(editor.state, "link")?.href as string) ??
-    null;
+  const href = link?.attrs.href ?? (linkAttributes.href as string) ?? null;
   const [loading, setLoading] = useState(false);
   const [linkData, setLinkData] = useState<LinkData | undefined>(undefined);
 
@@ -286,16 +297,18 @@ export function OpenLink(props: ToolProps) {
 
 export function CopyLink(props: ToolProps) {
   const { editor } = props;
+  const linkAttributes = useEditorQuery(
+    editor,
+    q.attributes(LinkNode.name),
+    {}
+  );
   const { selectedNode: _selectedNode, hide } = useHoverPopupContext();
   const selectedNode = useRefValue(
     _selectedNode || selectionToOffset(editor.state)
   );
   const { node } = selectedNode.current || {};
   const link = node ? findMark(node, "link") : null;
-  const href =
-    link?.attrs.href ??
-    (getMarkAttributes(editor.state, "link")?.href as string) ??
-    null;
+  const href = link?.attrs.href ?? (linkAttributes.href as string) ?? null;
   if (!href) return null;
 
   return (
@@ -335,7 +348,11 @@ function LinkTool(props: LinkToolProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [linkDefinition, setLinkDefinition] = useState<LinkDefinition>();
-  const isImageActive = editor.isActive(ImageNode.name);
+  const isImageActive = useEditorQuery(
+    editor,
+    q.isActive(ImageNode.name),
+    false
+  );
 
   return (
     <>

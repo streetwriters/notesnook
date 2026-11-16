@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { MoreTools } from "../components/more-tools.js";
@@ -27,8 +28,10 @@ import { Editor } from "../../types.js";
 
 export function AttachmentSettings(props: ToolProps) {
   const { editor } = props;
+  const isAttachment = useEditorQuery(editor, q.isActive("attachment"), false);
+  const isEditable = useEditorQuery(editor, q.editable(), true);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("attachment") || !isBottom) return null;
+  if (!isAttachment || !isBottom) return null;
 
   return (
     <MoreTools
@@ -36,7 +39,7 @@ export function AttachmentSettings(props: ToolProps) {
       autoCloseOnUnmount
       popupId="attachmentSettings"
       tools={
-        editor.isEditable
+        isEditable
           ? ["downloadAttachment"]
           : ["downloadAttachment", "removeAttachment"]
       }
@@ -64,11 +67,13 @@ export function DownloadAttachment(props: ToolProps) {
 
 export function PreviewAttachment(props: ToolProps) {
   const { editor } = props;
-  const attachmentNode = findAttachmentNode(editor);
-  const attachment = (attachmentNode?.attrs || {}) as Attachment;
+  const isImage = useEditorQuery(editor, q.isActive("image"), false);
+  const attachment = (useEditorQuery(
+    editor,
+    q.selectedNode(["attachment", "image", "audio"])
+  ) || {}) as Attachment;
 
-  if (!editor.isActive("image") && !canPreviewAttachment(attachment))
-    return null;
+  if (!isImage && !canPreviewAttachment(attachment)) return null;
 
   return (
     <ToolButton

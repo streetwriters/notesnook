@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../queries/index.js";
 import { Flex, FlexProps } from "@theme-ui/components";
 import {
   getDefaultPresets,
@@ -56,22 +57,25 @@ export function Toolbar(props: ToolbarProps) {
     ...flexProps
   } = props;
   const isMobile = useIsMobile();
+  const isEditable = useEditorQuery(editor, q.editable(), true);
+  const hasReadonlyNode = useEditorQuery(
+    editor,
+    q.isActive(READONLY_MOBILE_TOOLBAR_NODES),
+    false
+  );
   const toolbarTools = useMemo(
     () =>
       isMobile
-        ? editor.isEditable
+        ? isEditable
           ? [...MOBILE_STATIC_TOOLBAR_GROUPS, ...tools]
           : READONLY_MOBILE_STATIC_TOOLBAR_GROUPS
-        : editor.isEditable
+        : isEditable
         ? [...STATIC_TOOLBAR_GROUPS, ...tools]
         : [],
-    [tools, editor.isEditable, isMobile]
+    [tools, isEditable, isMobile]
   );
 
-  const isEmptyReadonlyToolbar =
-    isMobile &&
-    !editor.isEditable &&
-    !READONLY_MOBILE_TOOLBAR_NODES.some((node) => editor.isActive(node));
+  const isEmptyReadonlyToolbar = isMobile && !isEditable && !hasReadonlyNode;
 
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
