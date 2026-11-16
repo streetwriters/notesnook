@@ -17,33 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { EditorOptions, Editor as TiptapEditor } from "@tiptap/core";
-import { DependencyList, useEffect, useMemo, useRef, useState } from "react";
+import { EditorOptions } from "@tiptap/core";
+import { DependencyList, useEffect, useMemo } from "react";
 import { Editor } from "../types.js";
 import { useToolbarStore } from "../toolbar/stores/toolbar-store.js";
 import { EditorView } from "@tiptap/pm/view";
 import { useEditorSearchStore } from "../toolbar/stores/search-store.js";
-
-function useForceUpdate() {
-  const [, setValue] = useState(0);
-
-  return () => setValue((value) => value + 1);
-}
 
 export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
   const editor = useMemo<Editor>(() => new Editor(options), []);
-  const forceUpdate = useForceUpdate();
-  const editorRef = useRef<TiptapEditor>(editor);
 
   useEffect(
     () => {
       if (editor.view.isDestroyed) return;
-
-      let isMounted = true;
-      let updateTimeout: number;
 
       editor.options = { ...editor.options, ...options };
       options.onBeforeCreate?.({ editor });
@@ -64,23 +53,6 @@ export const useEditor = (
       } else {
         editor.commands.search(searchTerm, searchOptions);
       }
-
-      function onTransaction({ editor }: { editor: TiptapEditor }) {
-        editorRef.current = editor;
-        clearTimeout(updateTimeout);
-        updateTimeout = setTimeout(() => {
-          if (isMounted) {
-            forceUpdate();
-          }
-        }, 200) as unknown as number;
-      }
-      editor.on("transaction", onTransaction);
-
-      return () => {
-        isMounted = false;
-        editor.off("transaction", onTransaction);
-        clearTimeout(updateTimeout);
-      };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     deps

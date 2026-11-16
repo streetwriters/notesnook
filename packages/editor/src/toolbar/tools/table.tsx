@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { Editor } from "../../types.js";
 import { ToolButton } from "../components/tool-button.js";
@@ -45,8 +46,9 @@ import { strings } from "@notesnook/intl";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
+  const isTable = useEditorQuery(editor, q.isActive("table"), false);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("table") || !isBottom) return null;
+  if (!isTable || !isBottom) return null;
 
   return (
     <MoreTools
@@ -212,8 +214,9 @@ export function TableProperties(props: ToolProps) {
 
 export function CellProperties(props: ToolProps) {
   const { editor } = props;
+  const isTable = useEditorQuery(editor, q.isActive("table"), false);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("table") || !isBottom) return null;
+  if (!isTable || !isBottom) return null;
 
   return (
     <>
@@ -235,12 +238,13 @@ export function CellProperties(props: ToolProps) {
 
 export function CellBackgroundColor(props: ToolProps) {
   const { editor } = props;
+  const cell = useEditorQuery(editor, q.attributes("tableCell"), {});
 
   return (
     <ColorTool
       {...props}
       cacheKey="cellBackgroundColor"
-      activeColor={editor.getAttributes("tableCell").backgroundColor}
+      activeColor={cell.backgroundColor}
       title={strings.cellBackgroundColor()}
       type="background"
       onColorChange={(color) =>
@@ -252,13 +256,14 @@ export function CellBackgroundColor(props: ToolProps) {
 
 export function CellTextColor(props: ToolProps) {
   const { editor } = props;
+  const cell = useEditorQuery(editor, q.attributes("tableCell"), {});
 
   return (
     <ColorTool
       {...props}
       cacheKey="cellTextColor"
       type="text"
-      activeColor={editor.getAttributes("tableCell").color}
+      activeColor={cell.color}
       title={strings.cellTextColor()}
       onColorChange={(color) =>
         editor.chain().focus().setCellAttribute("color", color).run()
@@ -269,12 +274,13 @@ export function CellTextColor(props: ToolProps) {
 
 export function CellBorderColor(props: ToolProps) {
   const { editor } = props;
+  const cell = useEditorQuery(editor, q.attributes("tableCell"), {});
 
   return (
     <ColorTool
       {...props}
       cacheKey="cellBorderColor"
-      activeColor={editor.getAttributes("tableCell").borderColor}
+      activeColor={cell.borderColor}
       type="border"
       title={strings.cellBorderColor()}
       onColorChange={(color) =>
@@ -286,7 +292,11 @@ export function CellBorderColor(props: ToolProps) {
 
 export function CellBorderWidth(props: ToolProps) {
   const { editor } = props;
-  const { borderWidth: _borderWidth } = editor.getAttributes("tableCell");
+  const { borderWidth: _borderWidth } = useEditorQuery(
+    editor,
+    q.attributes("tableCell"),
+    {}
+  );
   const borderWidth: number = _borderWidth
     ? typeof _borderWidth === "string"
       ? parseInt(_borderWidth)

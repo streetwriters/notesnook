@@ -17,14 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { IconNames } from "../icons.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
-import {
-  getTextDirection,
-  TextDirections
-} from "../../extensions/text-direction/index.js";
+import { TextDirections } from "../../extensions/text-direction/index.js";
 import { CodeBlock } from "../../extensions/code-block/index.js";
 
 type TextDirectionToolProps = ToolProps & {
@@ -32,6 +30,7 @@ type TextDirectionToolProps = ToolProps & {
 };
 function TextDirectionTool(props: TextDirectionToolProps) {
   const { editor, direction } = props;
+  const inCodeBlock = useEditorQuery(editor, q.isActive(CodeBlock.name), false);
   const directionRef = useRefValue(direction);
 
   return (
@@ -41,7 +40,7 @@ function TextDirectionTool(props: TextDirectionToolProps) {
       onClick={() =>
         editor.chain().focus().setTextDirection(directionRef.current).run()
       }
-      disabled={editor.isActive(CodeBlock.name)}
+      disabled={inCodeBlock}
       toggled={false}
     />
   );
@@ -49,7 +48,7 @@ function TextDirectionTool(props: TextDirectionToolProps) {
 
 export function TextDirection(props: ToolProps) {
   const { editor } = props;
-  const textDirection = getTextDirection(editor);
+  const textDirection = useEditorQuery(editor, q.textDirection());
 
   const newTextDirection: TextDirections = textDirection ? undefined : "rtl";
 
