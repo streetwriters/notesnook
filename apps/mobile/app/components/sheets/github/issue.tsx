@@ -120,7 +120,8 @@ Github Release: ${Config.GITHUB_RELEASE === "true" ? "Yes" : "No"}`,
       setLoading(false);
       ToastManager.show({
         heading: (e as Error).message,
-        type: "error"
+        type: "error",
+        context: "local"
       });
     }
   };
