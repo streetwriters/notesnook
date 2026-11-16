@@ -72,11 +72,19 @@ ${entries.join(",\n")}
 function generateMobileLocaleLoaders() {
   const entries = locales.map((locale) => {
     const key = locale.includes("-") ? `"${locale}"` : locale;
-    return `  ${key}: () => require("@notesnook/intl/dist/locales/$${locale}.json").messages`;
+    return `  ${key}: () => parseCatalog(require("@notesnook/intl/dist/locales/$${locale}.json"))`;
   });
 
   return `${LICENSE_HEADER}
 import { type Messages } from "@lingui/core";
+
+// The mobile bundler config (apps/mobile/rspack.config.js) loads these catalogs
+// as raw JSON strings (asset/source) instead of object literals, because Hermes
+// compiles object literals into much larger bytecode than string literals.
+// Other environments (e.g. jest) get an already parsed object.
+function parseCatalog(catalog: string | { messages: Messages }): Messages {
+  return (typeof catalog === "string" ? JSON.parse(catalog) : catalog).messages;
+}
 
 export const localeMap: Record<string, () => Messages> = {
 ${entries.join(",\n")}
