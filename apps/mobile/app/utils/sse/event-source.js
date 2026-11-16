@@ -25,12 +25,18 @@ const EventEmitter =
   Platform.OS === "ios" ? null : new NativeEventEmitter(NativeEventSource);
 
 export default class EventSource {
+  CONNECTING = 0;
+  OPEN = 1;
+  CLOSED = 2;
+
   constructor(url, options) {
     this.url = url;
     this.options = options;
+    this.readyState = this.CONNECTING;
     this.connect();
     this.open;
     this.message;
+    this.error;
   }
 
   connect() {
@@ -39,20 +45,29 @@ export default class EventSource {
   }
 
   close() {
+    this.readyState = this.CLOSED;
     NativeEventSource.close();
     this.open?.remove();
     this.message?.remove();
+    this.error?.remove();
   }
 
   registerEvents() {
     this.open = EventEmitter.addListener("open", () => {
-      this.onopen();
+      this.readyState = this.OPEN;
+      this.onopen?.();
     });
 
     this.message = EventEmitter.addListener("message", (ev) => {
       const { message } = ev;
       const eventData = { data: message };
-      this.onmessage(eventData);
+      this.onmessage?.(eventData);
+    });
+
+    // the native side gave up after a 401/403 instead of retrying
+    this.error = EventEmitter.addListener("error", (ev) => {
+      this.readyState = this.CLOSED;
+      this.onerror?.({ status: ev.status });
     });
   }
 }

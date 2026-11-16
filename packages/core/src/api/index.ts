@@ -106,6 +106,8 @@ class Database {
   isInitialized = false;
   eventManager = new EventManager();
   sseMutex = new Mutex();
+  sseRetries = 0;
+  sseRetryTimeout?: ReturnType<typeof setTimeout>;
   _fs?: FileStorage;
   _compressor?: Promise<ICompressor>;
   private databaseReady = new LazyPromise<
@@ -299,7 +301,10 @@ class Database {
       this.connectSSE,
       this
     );
-    this.eventManager.subscribe(EVENTS.tokenRefreshed, () => this.connectSSE());
+    // the open channel still uses the old token, which stops working once it expires
+    this.eventManager.subscribe(EVENTS.tokenRefreshed, () =>
+      this.connectSSE({ force: true })
+    );
     this.eventManager.subscribe(
       EVENTS.attachmentDeleted,
       async (attachment: Attachment) => {
@@ -367,6 +372,7 @@ class Database {
   }
 
   disconnectSSE() {
+    clearTimeout(this.sseRetryTimeout);
     if (!this.eventSource) return;
     this.eventSource.onopen = null;
     this.eventSource.onmessage = null;
@@ -400,11 +406,21 @@ class Database {
       });
 
       this.eventSource.onopen = async () => {
+        this.sseRetries = 0;
         logger.log("SSE: opened channel successfully!");
       };
 
-      this.eventSource.onerror = function (error) {
+      this.eventSource.onerror = (error) => {
         logger.error(error, "SSE: error");
+        if ((error as { status?: number }).status !== 401) return;
+
+        // refreshing publishes tokenRefreshed, which reconnects; back off in case the session is dead
+        const delay = Math.min(5000 * 2 ** this.sseRetries++, 5 * 60 * 1000);
+        clearTimeout(this.sseRetryTimeout);
+        this.sseRetryTimeout = setTimeout(
+          () => this.tokenManager.getAccessToken(undefined, true),
+          delay
+        );
       };
 
       this.eventSource.onmessage = async (event) => {
