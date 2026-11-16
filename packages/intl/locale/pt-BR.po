@@ -2773,6 +2773,10 @@ msgstr "Excluindo tags"
 msgid "Description"
 msgstr "Descrição"
 
+#: src/strings.ts:3286
+msgid "Description is required"
+msgstr ""
+
 #: src/strings.ts:1909
 msgid "Desktop app"
 msgstr "App para computador"
@@ -4512,6 +4516,14 @@ msgstr "Último"
 msgid "Last edited at"
 msgstr "Editado pela última vez em"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr ""
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Usado pela última vez em"
@@ -5180,6 +5192,10 @@ msgstr "As notas recém-criadas ficarão sem categoria"
 msgid "Next"
 msgstr "Avançar"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Próxima ocorrência"
@@ -5187,6 +5203,10 @@ msgstr "Próxima ocorrência"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Próximo mês"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr ""
 
 #: src/strings.ts:2220
 msgid "Next tab"

@@ -400,9 +400,16 @@ export function useEditorController({
             saveTheme(message.value as ThemeDefinition);
           });
           break;
-        case "native:title":
+        case "native:title": {
+          const titleElement =
+            globalThis.editorTitles[tabRef.current.id]?.current;
+          if (titleElement && titleElement.value !== value) {
+            titleElement.value = value;
+            window.dispatchEvent(new Event("resize"));
+          }
           setTitle(value);
           break;
+        }
         case "native:titleplaceholder":
           setTitlePlaceholder(value);
           break;

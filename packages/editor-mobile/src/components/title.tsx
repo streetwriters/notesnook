@@ -47,10 +47,10 @@ function Title({
 
   const resizeTextarea = useCallback(() => {
     if (!titleSizeDiv.current || !titleRef.current) return;
+    titleSizeDiv.current.style.width = `${titleRef.current.clientWidth}px`;
     titleSizeDiv.current.innerText = titleRef.current.value;
     titleRef.current.style.height = `${titleSizeDiv.current.clientHeight}px`;
     titleRef.current.style.minHeight = `${titleSizeDiv.current.clientHeight}px`;
-    titleSizeDiv.current.style.width = `${titleRef.current.clientWidth}px`;
   }, []);
   useEffect(() => {
     if (titleRef.current) {
@@ -100,9 +100,10 @@ function Title({
           userSelect: "none",
           WebkitUserSelect: "none",
           pointerEvents: "none",
-          overflowWrap: "anywhere",
+          overflowWrap: "break-word",
           paddingTop: 3,
-          whiteSpace: "break-spaces"
+          paddingBottom: 0,
+          whiteSpace: "pre-wrap"
         }}
       />
       <textarea
@@ -123,6 +124,8 @@ function Title({
           opacity: 1,
           paddingRight: 16,
           paddingLeft: 16,
+          paddingTop: 3,
+          paddingBottom: 0,
           fontWeight: 600,
           fontFamily: getFontById(fontFamily)?.font || "Inter",
           backgroundColor: "transparent",
