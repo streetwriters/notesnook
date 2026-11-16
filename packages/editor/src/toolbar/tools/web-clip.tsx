@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { MoreTools } from "../components/more-tools.js";
@@ -28,8 +29,9 @@ import {
 
 export function WebClipSettings(props: ToolProps) {
   const { editor } = props;
+  const isWebClip = useEditorQuery(editor, q.isActive("webclip"), false);
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("webclip") || !isBottom) return null;
+  if (!isWebClip || !isBottom) return null;
 
   return (
     <MoreTools

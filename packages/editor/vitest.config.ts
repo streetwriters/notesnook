@@ -18,14 +18,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { defineConfig } from "vitest/config";
+import path from "path";
+
+const SHARED = [
+  "react",
+  "react-dom",
+  "@emotion/react",
+  "zustand",
+  "use-sync-external-store"
+];
 
 export default defineConfig({
-  resolve: { mainFields: ["module", "jsnext:main", "jsnext"] },
+  resolve: {
+    mainFields: ["module", "jsnext:main", "jsnext"],
+    alias: SHARED.map((name) => ({
+      find: name,
+      replacement: path.resolve(__dirname, "node_modules", name)
+    }))
+  },
   test: {
     alias: {
       "@/": "./"
     },
     environment: "happy-dom",
+    server: { deps: { inline: [/@notesnook\//, /zustand/] } },
     typecheck: {
       tsconfig: "./tsconfig.tests.json"
     }
