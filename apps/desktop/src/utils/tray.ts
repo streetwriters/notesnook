@@ -26,7 +26,10 @@ import { strings } from "@notesnook/intl";
 
 let tray: Tray | undefined = undefined;
 export function destroyTray() {
-  if (tray) tray.destroy();
+  if (tray) {
+    tray.destroy();
+    tray = undefined;
+  }
 }
 
 export function setupTray() {
