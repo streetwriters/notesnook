@@ -155,6 +155,20 @@ test("search should not return trashed notes", () =>
     expect(filtered).toHaveLength(0);
   }));
 
+test("search trash by note content", () =>
+  databaseTest().then(async (db) => {
+    const id = await db.notes.add({
+      title: "Travel Checklist",
+      content: {
+        type: "tiptap",
+        data: "<p>Book flights, reserve hotel, and prepare travel documents.</p>"
+      }
+    });
+    await db.notes.moveToTrash(id);
+
+    expect(await db.lookup.trash("flights").ids()).toStrictEqual([id]);
+  }));
+
 test("search should return restored notes", () =>
   databaseTest().then(async (db) => {
     const id = await db.notes.add({
