@@ -682,6 +682,18 @@ export default class Lookup {
     sortOptions?: SortOptions
   ) {
     const items = await this.db.trash.all();
+    const { content } = transformQuery(query);
+    const contentMatches = new Set(
+      (
+        (await this.ftsQueryBuilder({ content: content?.expression })
+          ?.select(["results.id"])
+          .execute()
+          .catch((e) => {
+            logger.error(e, `Error while searching trash`, { query });
+            return [];
+          })) || []
+      ).map((r) => r.id)
+    );
 
     const results: Map<string, { rank: number; item: TrashItem }> = new Map();
     for (const item of items) {
@@ -690,6 +702,8 @@ export default class Lookup {
       const result = match(query, item.title);
       if (result.match) {
         results.set(item.id, { rank: result.score, item });
+      } else if (contentMatches.has(item.id)) {
+        results.set(item.id, { rank: 0, item });
       }
     }
     const sorted = Array.from(results.entries());
