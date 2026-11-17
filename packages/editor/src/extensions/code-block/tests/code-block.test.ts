@@ -453,6 +453,57 @@ test("cancel pending Android Enter fallback after exiting codeblock on triple en
   }
 });
 
+test("cancel pending iOS Enter fallback after exiting codeblock on triple enter", async () => {
+  vi.useFakeTimers();
+  try {
+    const editorElement = document.createElement("div");
+    const { editor } = createEditor({
+      element: editorElement,
+      initialContent: "<pre><code>const a = 1;</code></pre>",
+      extensions: {
+        codeblock: CodeBlock,
+        codeBlock: false,
+        code: false
+      }
+    });
+
+    editor.commands.setTextSelection(editor.state.doc.nodeSize - 2);
+    editor.commands.insertContent("\n");
+    editor.commands.insertContent("\n");
+
+    const input = (
+      editor.view as unknown as {
+        input: {
+          lastIOSEnter: number;
+          lastIOSEnterFallbackTimeout: ReturnType<typeof setTimeout>;
+        };
+      }
+    ).input;
+    const stamp = Date.now();
+    const fallback = vi.fn(() => editor.commands.splitBlock());
+    input.lastIOSEnter = stamp;
+    input.lastIOSEnterFallbackTimeout = setTimeout(() => {
+      if (input.lastIOSEnter === stamp) fallback();
+    }, 200);
+
+    const beforeInputEvent = new InputEvent("beforeinput", {
+      inputType: "insertParagraph",
+      cancelable: true,
+      bubbles: true
+    });
+    editor.view.dom.dispatchEvent(beforeInputEvent);
+    vi.advanceTimersByTime(300);
+
+    expect(fallback).not.toHaveBeenCalled();
+    const content = editor.state.doc.toJSON().content;
+    expect(content).toHaveLength(2);
+    expect(content[0].type).toBe("codeblock");
+    expect(content[1].type).toBe("paragraph");
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
 test("do not exit codeblock on beforeinput when exitOnTripleEnter is false", async () => {
   const editorElement = document.createElement("div");
   const { editor } = createEditor({

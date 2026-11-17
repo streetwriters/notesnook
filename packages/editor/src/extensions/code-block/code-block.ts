@@ -556,12 +556,16 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
               ) {
                 event.preventDefault();
                 // PM's beforeinput is skipped, so cancel the patched
-                // prosemirror-view Android Enter fallback ourselves
+                // prosemirror-view Android/iOS Enter fallbacks ourselves
                 const input = (
                   view as unknown as {
                     input?: {
                       lastAndroidEnter?: number;
                       androidEnterFallbackTimeout?: ReturnType<
+                        typeof setTimeout
+                      >;
+                      lastIOSEnter?: number;
+                      lastIOSEnterFallbackTimeout?: ReturnType<
                         typeof setTimeout
                       >;
                     };
@@ -570,6 +574,8 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
                 if (input) {
                   clearTimeout(input.androidEnterFallbackTimeout);
                   input.lastAndroidEnter = 0;
+                  clearTimeout(input.lastIOSEnterFallbackTimeout);
+                  input.lastIOSEnter = 0;
                 }
                 return true;
               }
