@@ -31,7 +31,8 @@ module.exports = {
     "pt-BR",
     "ru",
     "tr",
-    "uk"
+    "uk",
+    "zh-CN"
   ],
   sourceLocale: "en",
   pseudoLocale: "pseudo-LOCALE",
@@ -46,7 +47,8 @@ module.exports = {
     "pt-BR": "en",
     ru: "en",
     tr: "en",
-    uk: "en"
+    uk: "en",
+    "zh-CN": "en"
   },
   catalogs: [
     {
