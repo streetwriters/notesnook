@@ -113,6 +113,7 @@ export function getSettingsGroups(): SettingSection[] {
               positiveType: "errorShade",
               positiveText: strings.deleteData(),
               positivePress: async () => {
+                useUserStore.getState().setIsLoggingOut(true);
                 await PremiumService.setPremiumStatus();
                 await BiometricService.resetCredentials();
                 MMKV.clearStore();
@@ -120,12 +121,12 @@ export function getSettingsGroups(): SettingSection[] {
                 clearAllStores();
                 Navigation.queueRoutesForUpdate();
                 SettingsService.resetSettings();
-                db.reset();
-
-                setImmediate(() => {
+                await db.reset();
+                setTimeout(() => {
                   refreshAllStores();
                   eSendEvent(eAfterSync);
-                });
+                  useUserStore.getState().setIsLoggingOut(false);
+                }, 300);
                 return true;
               }
             });
