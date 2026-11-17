@@ -801,7 +801,8 @@ export const useAppEvents = () => {
         if (
           name !== "notesnook" ||
           !SettingsService.getProperty("introCompleted") ||
-          Config.isTesting === "true"
+          Config.isTesting === "true" ||
+          useUserStore.getState().isLoggingOut
         )
           return;
         startProgress({
