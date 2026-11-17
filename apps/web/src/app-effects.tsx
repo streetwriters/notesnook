@@ -23,7 +23,7 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useEditorStore } from "./stores/editor-store";
 import { useStore as useAnnouncementStore } from "./stores/announcement-store";
 import { useStore as useSettingStore } from "./stores/setting-store";
-import { scheduleBackups, scheduleFullBackups } from "./common/notices";
+import { runOverdueBackups, scheduleBackups } from "./common/notices";
 import {
   handleInternalLink,
   introduceFeatures,
@@ -40,6 +40,7 @@ import { desktop } from "./common/desktop-bridge";
 import { FeatureDialog } from "./dialogs/feature-dialog";
 import { AnnouncementDialog } from "./dialogs/announcement-dialog";
 import { logger } from "./utils/logger";
+import { onPageVisibilityChanged } from "./utils/page-visibility";
 import { showToast } from "./utils/toast";
 import { strings } from "@notesnook/intl";
 
@@ -72,8 +73,7 @@ export default function AppEffects() {
         // await resetNotices();
 
         await FeatureDialog.show({ featureName: "highlights" });
-        await scheduleBackups();
-        await scheduleFullBackups();
+        scheduleBackups().catch(logger.error);
         await scheduleExpiredNotesDeletion();
 
         if (useSettingStore.getState().isFullOfflineMode)
@@ -90,6 +90,12 @@ export default function AppEffects() {
       setIsVaultCreated
     ]
   );
+
+  useEffect(() => {
+    return onPageVisibilityChanged((_, isHidden) => {
+      if (!isHidden) runOverdueBackups(60 * 60 * 1000).catch(logger.error);
+    });
+  }, []);
 
   useEffect(() => {
     // const systemTimeInvalidEvent = EV.subscribe(
