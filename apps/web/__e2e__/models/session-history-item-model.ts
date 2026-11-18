@@ -40,15 +40,15 @@ export class SessionHistoryItemModel {
   }
 
   async open() {
-    await this.properties.open();
+    await this.properties.openHistory();
     await this.locator.click();
     return new SessionHistoryPreviewModel(this.locator);
   }
 
   async isLocked() {
-    await this.properties.open();
+    await this.properties.openHistory();
     const state = await this.locked.isVisible();
-    await this.properties.close();
+    await this.properties.closeHistory();
     return state;
   }
 }

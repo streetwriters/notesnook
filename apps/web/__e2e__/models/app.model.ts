@@ -111,7 +111,7 @@ export class AppModel {
   async goToArchive() {
     await this.page.locator(getTestId("tab-home")).click();
     await this.navigateTo("Archive");
-    return new NotesViewModel(this.page, "notes", "archive");
+    return new NotesViewModel(this.page, "archive", "archive");
   }
 
   async goToSettings() {
@@ -120,6 +120,9 @@ export class AppModel {
       "left"
     );
     await this.profileDropdown.clickOnItem("settings");
+    await this.page
+      .locator(getTestId("settings-navigation-menu"))
+      .waitFor({ state: "visible" });
     return new SettingsViewModel(this.page);
   }
 

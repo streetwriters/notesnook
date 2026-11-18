@@ -244,15 +244,25 @@ export class NotePropertiesModel extends BaseProperties {
     await this.propertiesButton.click();
   }
 
-  async getSessionHistory() {
+  async openHistory() {
     await this.open();
+    await this.page.locator(getTestId("properties-tab-note-history")).click();
     await this.sessionItems.first().waitFor();
+  }
+
+  async closeHistory() {
+    await this.page.locator(getTestId("properties-tab-properties")).click();
+    await this.close();
+  }
+
+  async getSessionHistory() {
+    await this.openHistory();
 
     const history: SessionHistoryItemModel[] = [];
     for await (const item of iterateList(this.sessionItems)) {
       history.push(new SessionHistoryItemModel(this, item));
     }
-    await this.close();
+    await this.closeHistory();
     return history;
   }
 

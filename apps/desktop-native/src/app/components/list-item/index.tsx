@@ -149,6 +149,7 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
   return (
     <Flex
       testID="list-item"
+      id={`id_${item.id}`}
       draggable={props.draggable}
       onDragStart={
         props.draggable
@@ -200,6 +201,12 @@ export default function ListItem<TItem extends Item, TContext = unknown>(
       {environment.isDev && selected ? (
         <Box
           testID="list-item-selected"
+          sx={{ position: "absolute", width: 0, height: 0 }}
+        />
+      ) : null}
+      {environment.isDev && isSelected ? (
+        <Box
+          testID="list-item-in-selection"
           sx={{ position: "absolute", width: 0, height: 0 }}
         />
       ) : null}

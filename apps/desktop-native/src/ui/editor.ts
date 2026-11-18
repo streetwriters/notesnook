@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ForwardRefExoticComponent, RefAttributes } from "react";
 import type { SxProp } from "./style";
+import type { PickedFile } from "../platform/files";
 
 export interface EditorSelection {
   from: number;
@@ -26,10 +27,13 @@ export interface EditorSelection {
 }
 
 export interface EditorAttachment {
+  type: "image" | "file" | "web-clip";
   hash: string;
   filename: string;
   mime: string;
   size: number;
+  width?: number;
+  height?: number;
 }
 
 export interface EditorHeading {
@@ -74,6 +78,8 @@ export interface EditorSurfaceProps {
   onUndoRedoChange?: (state: { canUndo: boolean; canRedo: boolean }) => void;
   onPreviewDocument?: (hash: string) => void;
   onReady?: (handle: EditorHandle) => void;
+  onAutoSaveDisabled?: () => void;
+  onAttachFiles?: (files: PickedFile[]) => void;
   sx?: SxProp;
   testID?: string;
 }

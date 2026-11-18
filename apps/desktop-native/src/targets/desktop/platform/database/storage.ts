@@ -33,6 +33,12 @@ import {
 import { MMKV } from "./mmkv";
 import OpenPGP from "./openpgp";
 import { strings } from "@notesnook/intl";
+import {
+  createStorage,
+  type StorageCrypto,
+  type StorageKV,
+  type StoragePGP
+} from "../../../../shared/storage";
 
 export class KV {
   storage: MMKVInstance;
@@ -116,7 +122,7 @@ export class KV {
 
 const DefaultStorage = new KV(MMKV);
 
-export const Storage: IStorage = {
+const kvFunctions: StorageKV = {
   write<T>(key: string, data: T): Promise<void> {
     return DefaultStorage.write(key, data);
   },
@@ -138,6 +144,12 @@ export const Storage: IStorage = {
   clear(): Promise<void> {
     return DefaultStorage.clear();
   },
+  getAllKeys(): Promise<string[]> {
+    return DefaultStorage.getAllKeys();
+  }
+};
+
+const pgpFunctions: StoragePGP = {
   async generatePGPKeyPair() {
     const keys = await OpenPGP.generate({
       name: "NN",
@@ -173,10 +185,10 @@ export const Storage: IStorage = {
   },
   async decryptPGPMessage(privateKeyArmored, encryptedMessage) {
     return await OpenPGP.decrypt(encryptedMessage, privateKeyArmored, "");
-  },
-  getAllKeys(): Promise<string[]> {
-    return DefaultStorage.getAllKeys();
-  },
+  }
+};
+
+const cryptoFunctions: StorageCrypto = {
   hash,
   getCryptoKey,
   encrypt,
@@ -188,3 +200,9 @@ export const Storage: IStorage = {
   generateCryptoKeyFallback,
   deriveCryptoKeyFallback
 };
+
+export const Storage: IStorage = createStorage(
+  kvFunctions,
+  cryptoFunctions,
+  pgpFunctions
+);

@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import transform from "css-to-react-native";
+import type { Declarations } from "../../../../shared/style/declarations";
+import { lineHeightRatio } from "../../../../shared/style/line-height";
 
-export type Declarations = Record<string, unknown>;
+export type { Declarations };
 
 export interface ConvertedStyle {
   style: Record<string, unknown>;
@@ -297,17 +299,10 @@ export function convertDeclarations(
   if (style.flexShrink === undefined && style.flex === undefined)
     style.flexShrink = 1;
   if (nowrap || ellipsis) converted.numberOfLines = 1;
-  if (
-    typeof style.lineHeight === "string" &&
-    /^[\d.]+%$/.test(style.lineHeight)
-  )
-    style.lineHeight = parseFloat(style.lineHeight) / 100;
-  if (
-    typeof style.lineHeight === "number" &&
-    style.lineHeight < 5 &&
-    typeof style.fontSize === "number"
-  )
-    style.lineHeight = style.lineHeight * style.fontSize;
+  const ratio = lineHeightRatio(style.lineHeight);
+  if (ratio !== undefined)
+    style.lineHeight =
+      typeof style.fontSize === "number" ? ratio * style.fontSize : ratio;
   if (typeof style.fontWeight === "number")
     style.fontWeight = String(style.fontWeight);
   return converted;

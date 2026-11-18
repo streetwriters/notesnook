@@ -59,6 +59,7 @@ function Tags() {
   if (!items) return <ListLoader />;
   return (
     <Flex
+      id="tags"
       testID="tags"
       sx={{ flexDirection: "column", flex: 1, mt: "spacing4" }}
     >

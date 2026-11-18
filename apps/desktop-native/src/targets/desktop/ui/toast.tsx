@@ -27,7 +27,7 @@ import {
 } from "../../../app/components/icons";
 import { Button, Flex, Text } from "./primitives";
 import { ThemeScope } from "./theme";
-import { dataColor } from "./style/data-color";
+import { dataColor } from "../../../shared/style/data-color";
 
 type Entry = {
   id: string;

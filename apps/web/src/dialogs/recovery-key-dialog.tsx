@@ -186,6 +186,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
             style={{ flex: "1 0 0", minWidth: 0 }}
           >
             <Text
+              data-test-id={recoveryKey ? "recovery-key" : undefined}
               sx={{
                 userSelect: "text",
                 lineHeight: 1,

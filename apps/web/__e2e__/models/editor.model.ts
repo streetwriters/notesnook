@@ -41,8 +41,6 @@ export class EditorModel {
   private readonly newTabButton: Locator;
   readonly savedIcon: Locator;
   readonly notSavedIcon: Locator;
-  readonly undoButton: Locator;
-  readonly redoButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -66,9 +64,7 @@ export class EditorModel {
     this.tabsList = page.locator(getTestId("tabs"));
     this.goBackButton = page.locator(getTestId("go-back"));
     this.goForwardButton = page.locator(getTestId("go-forward"));
-    this.newTabButton = page.locator(getTestId("New tab"));
-    this.undoButton = page.locator(getTestId("Undo"));
-    this.redoButton = page.locator(getTestId("Redo"));
+    this.newTabButton = page.locator(getTestId("create-new-note"));
   }
 
   async waitForLoading(title?: string, content?: string) {

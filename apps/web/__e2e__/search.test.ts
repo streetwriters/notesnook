@@ -18,12 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { AppModel } from "./models/app.model";
-import { getTestId } from "./utils";
+import { getTestId, NOTE } from "./utils";
 import { test, expect } from "@nn/test";
 
 test("closing search via close button should clear query", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
+  const notes = await app.goToNotes();
+  await notes.createNote(NOTE);
   const searchInput = page.locator(getTestId("search-input"));
   const searchButton = page.locator(getTestId("search-button"));
 
@@ -40,6 +42,8 @@ test("closing search via keyboard escape button should clear query", async ({
 }) => {
   const app = new AppModel(page);
   await app.goto();
+  const notes = await app.goToNotes();
+  await notes.createNote(NOTE);
   const searchInput = page.locator(getTestId("search-input"));
 
   await searchInput.focus();

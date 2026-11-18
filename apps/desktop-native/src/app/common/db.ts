@@ -17,10 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { database, getFeature, getFeatureLimit } from "@notesnook/common";
-import { hosts } from "@notesnook/core";
+import { hosts, SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import {
   attachmentFiles,
   databaseHost,
+  environment,
   type DatabasePersistence
 } from "@platform";
 import Config from "../utils/config";
@@ -39,7 +40,9 @@ async function initializeDatabase(persistence: DatabasePersistence) {
     SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
     MONOGRAPH_HOST: "https://monogr.ph",
     NOTESNOOK_HOST: "https://notesnook.com",
-    ...Config.get<Partial<typeof hosts>>("serverUrls", {})
+    ...(environment.isTesting
+      ? {}
+      : Config.get<Partial<typeof hosts>>("serverUrls", {}))
   });
 
   const storage = await databaseHost.createStorage(persistence);
@@ -84,6 +87,16 @@ async function initializeDatabase(persistence: DatabasePersistence) {
   }
 
   performance.mark("end:initializeDatabase");
+
+  if (environment.isTesting && environment.isTestingPro) {
+    await db.user.setUser({
+      // @ts-expect-error just for testing purposes
+      subscription: {
+        plan: SubscriptionPlan.PRO,
+        status: SubscriptionStatus.ACTIVE
+      }
+    });
+  }
 
   return db;
 }

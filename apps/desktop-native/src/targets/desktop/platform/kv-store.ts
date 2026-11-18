@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { MMKVLoader } from "react-native-mmkv-storage";
 import type { KVStore, KVStoreFactory } from "../../../platform";
-import { decode, encode } from "./kv-codec";
+import { decode, encode } from "../../../shared/kv-codec";
 
 export const kvStore: KVStoreFactory = {
   create(name): KVStore {

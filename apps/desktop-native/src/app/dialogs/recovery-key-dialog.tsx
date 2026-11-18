@@ -198,6 +198,7 @@ export function SaveRecoveryKey({ recoveryKey }: { recoveryKey?: string }) {
           <ScrollContainer sx={{ flex: 1, minWidth: 0 }}>
             <Text
               selectable
+              testID={recoveryKey ? "recovery-key" : undefined}
               sx={{
                 lineHeight: 1,
                 color: "paragraph",

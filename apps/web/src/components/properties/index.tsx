@@ -207,6 +207,7 @@ function EditorProperties(props: EditorPropertiesProps) {
           {tabs.map((tab) => (
             <TabItem
               key={tab.id}
+              data-test-id={`properties-tab-${tab.id}`}
               icon={tab.icon}
               selected={activeTab === tab.id}
               onClick={() => useEditorStore.getState().setPropertiesTab(tab.id)}

@@ -437,6 +437,7 @@ test("archived note shouldn't appear in search results", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
+  await notes.createNote({ title: "Another note" });
   const note = await notes.createNote(NOTE);
 
   await app.search(NOTE.title, "notes");

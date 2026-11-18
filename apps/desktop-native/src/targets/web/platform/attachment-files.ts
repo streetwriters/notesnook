@@ -16,11 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import type { DataColor } from "../../../../ui";
 
-const HEX = /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+import type { AttachmentFiles } from "../../../platform";
+import { unimplemented } from "./unimplemented";
 
-export function dataColor(hex: string): DataColor {
-  if (!HEX.test(hex)) throw new Error(`"${hex}" is not a hex colour`);
-  return hex as DataColor;
-}
+export const attachmentFiles = unimplemented<AttachmentFiles>("attachmentFiles");

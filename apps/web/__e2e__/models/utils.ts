@@ -75,9 +75,16 @@ export async function fillReminderDialog(
       reminder.selectedDays.length > 0 &&
       reminder.recurringMode !== "day"
     ) {
+      if (reminder.recurringMode === "month")
+        await dialog
+          .getByText(/^(select day|\d+ days? of every month)/i)
+          .last()
+          .click();
       for (const day of reminder.selectedDays) {
-        await dialog.locator(getTestId(`day-${day}`)).click();
+        await page.locator(getTestId(`day-${day}`)).click();
       }
+      if (reminder.recurringMode === "month")
+        await dialog.getByText(/^select day$/i).first().click({ force: true });
     }
   }
 

@@ -224,6 +224,7 @@ export function UserProfile({ minimal }: Props) {
 
   return (
     <Flex
+      data-test-id="logged-in"
       sx={{
         borderRadius: "default",
         alignItems: "center",

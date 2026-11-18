@@ -17,15 +17,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type * as Contract from "../../../ui/layout";
+import XXH from "xxhashjs";
+import type { Crypto } from "../../../platform";
 
-export function ScrollContainer(props: Contract.ScrollContainerProps) {
-  return (
-    <div
-      data-test-id={props.testID}
-      style={{ overflow: "auto", display: "flex", flexDirection: "column" }}
-    >
-      {props.children}
-    </div>
-  );
-}
+export const crypto: Crypto = {
+  get subtle() {
+    return globalThis.crypto.subtle as unknown as Crypto["subtle"];
+  },
+  getRandomValues: (array) => globalThis.crypto.getRandomValues(array as any),
+  async xxh64(data) {
+    const bytes =
+      typeof data === "string" ? new TextEncoder().encode(data) : data;
+    const hash = XXH.h64(
+      bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteOffset + bytes.byteLength
+      ) as ArrayBuffer,
+      0
+    );
+    return hash.toString(16).padStart(16, "0");
+  }
+};

@@ -30,6 +30,8 @@ export interface Environment {
   platform: Platform;
   isDesktopApp: boolean;
   isTesting: boolean;
+  readonly isTestingPro?: boolean;
+  confirmInTesting?: (message: string) => void;
   isDev: boolean;
   isBeta: boolean;
   appTitle: string;

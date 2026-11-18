@@ -74,22 +74,30 @@ import { whenDatabaseReady } from "../stores/boot-store";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
-    title: strings.addItem("note"),
+    get title() {
+      return strings.addItem("note");
+    },
     onClick: () =>
       whenDatabaseReady().then(() => useEditorStore.getState().newSession()),
     onAuxClick: () =>
       whenDatabaseReady().then(() => useEditorStore.getState().addTab())
   },
   notebooks: {
-    title: strings.addItem("notebook"),
+    get title() {
+      return strings.addItem("notebook");
+    },
     onClick: () => hashNavigate("/notebooks/create", { replace: true })
   },
   tags: {
-    title: strings.addItem("tag"),
+    get title() {
+      return strings.addItem("tag");
+    },
     onClick: () => hashNavigate(`/tags/create`, { replace: true })
   },
   reminders: {
-    title: strings.addItem("reminder"),
+    get title() {
+      return strings.addItem("reminder");
+    },
     onClick: () => hashNavigate(`/reminders/create`, { replace: true })
   }
 };

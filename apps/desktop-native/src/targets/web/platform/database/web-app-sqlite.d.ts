@@ -17,17 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type * as Contract from "../../../ui/primitives";
+declare module "web-app-sqlite" {
+  import type { Dialect } from "@streetwriters/kysely";
 
-export function ColorPicker(props: Contract.ColorPickerProps) {
-  return (
-    <input
-      type="color"
-      data-test-id={props.testID}
-      value={props.value}
-      onChange={(event) =>
-        props.onChange((event.target as unknown as { value: string }).value)
-      }
-    />
-  );
+  export function createDialect(options: {
+    name: string;
+    encrypted: boolean;
+    async: boolean;
+    multiTab: boolean;
+    init?: () => Promise<void>;
+  }): Dialect;
 }

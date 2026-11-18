@@ -52,12 +52,15 @@ import {
 import { useStore as useAppStore } from "../../stores/app-store";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
+import { showToast } from "../../utils/toast";
+import Config from "../../utils/config";
 import { debounceWithId } from "@notesnook/common";
 import DiffViewer from "../diff-viewer";
 import { UnlockView } from "../unlock";
 import { Loading } from "../icons";
 import Properties from "../properties";
 import Header from "./header";
+import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import TitleBox from "./title-box";
 import { saveContent } from "./save-content";
 import { useEditorManager } from "./manager";
@@ -65,6 +68,7 @@ import useMobile from "../../hooks/use-mobile";
 
 export { saveContent };
 
+const autoSaveToast = { show: true, hide: () => {} };
 const PdfPreview = lazy(() => import("../pdf-preview"));
 const deferredSave = debounceWithId(saveContent, 100);
 
@@ -93,14 +97,23 @@ export default function TabsView() {
                   key={session.id}
                   mode={tab.id === activeTabId ? "visible" : "hidden"}
                 >
-                  {session.type === "locked" ? (
-                    <UnlockNoteView session={session} />
-                  ) : session.type === "conflicted" ||
-                    session.type === "diff" ? (
-                    <DiffViewer session={session} />
-                  ) : (
-                    <MemoizedEditorView session={session} />
-                  )}
+                  <Flex
+                    testID={
+                      tab.id === activeTabId
+                        ? "editor-session-active"
+                        : "editor-session"
+                    }
+                    sx={{ flex: 1, alignSelf: "stretch", overflow: "hidden" }}
+                  >
+                    {session.type === "locked" ? (
+                      <UnlockNoteView session={session} />
+                    ) : session.type === "conflicted" ||
+                      session.type === "diff" ? (
+                      <DiffViewer session={session} />
+                    ) : (
+                      <MemoizedEditorView session={session} />
+                    )}
+                  </Flex>
                 </Activity>
               );
             })}
@@ -206,14 +219,41 @@ function EditorView({ session }: { session: EditableSession }) {
 
   const editor = useEditorManager((store) => store.editors[session.id]?.editor);
   const focusKey = "note" in session ? session.note?.id : session.id;
+  const lastFocus = useRef<{
+    editor?: EditorHandle;
+    type: string;
+    data: unknown;
+  }>(undefined);
   useEffect(() => {
-    editor?.focus();
+    const previous = lastFocus.current;
+    const data = session.content?.data;
+    lastFocus.current = { editor, type: session.type, data };
+    const savedNewNote =
+      !!previous &&
+      previous.editor === editor &&
+      previous.type === "new" &&
+      session.type !== "new" &&
+      previous.data === data;
+    if (!savedNewNote) editor?.focus();
   }, [editor, focusKey]);
 
   const sessionId = session.id;
   const onReady = useCallback(
-    (handle: EditorHandle) =>
-      useEditorManager.getState().setEditor(sessionId, { editor: handle }),
+    (handle: EditorHandle) => {
+      useEditorManager.getState().setEditor(sessionId, { editor: handle });
+      setTimeout(() =>
+        handle.focus({ position: Config.get(`${sessionId}:selection`) })
+      );
+    },
+    [sessionId]
+  );
+
+  useEffect(
+    () => () => {
+      const editor = useEditorManager.getState().getEditor(sessionId)?.editor;
+      const selection = editor?.getSelection();
+      if (selection) Config.set(`${sessionId}:selection`, selection);
+    },
     [sessionId]
   );
 
@@ -257,6 +297,9 @@ function EditorView({ session }: { session: EditableSession }) {
             readonly={readonly}
             content={getContent}
             onContentChange={() => (lastChangedTime.current = Date.now())}
+            onSelectionChange={(selection) =>
+              Config.set(`${session.id}:selection`, selection)
+            }
             onSave={(html) => {
               const currentSession = useEditorStore
                 .getState()
@@ -302,8 +345,32 @@ function EditorView({ session }: { session: EditableSession }) {
                 .updateEditor(session.id, { canUndo, canRedo })
             }
             onReady={onReady}
+            onAutoSaveDisabled={() => {
+              useEditorStore
+                .getState()
+                .setSaveState(session.id, SaveState.NotSaved);
+              if (autoSaveToast.show === false) return;
+              const { hide } = showToast(
+                "error",
+                strings.autoSaveDisabledForLargeNotes(),
+                [{ text: strings.dismiss(), onClick: () => hide() }],
+                Infinity
+              );
+              autoSaveToast.show = false;
+              autoSaveToast.hide = hide;
+            }}
             onPreviewDocument={(hash) =>
               useEditorStore.setState({ documentPreview: { hash } })
+            }
+            onAttachFiles={(files) =>
+              AttachFilesDialog.show({
+                files,
+                onDone: (attachments) =>
+                  useEditorManager
+                    .getState()
+                    .getEditor(session.id)
+                    ?.editor?.attachFiles(...attachments)
+              })
             }
           />
         </Flex>

@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import type { Locator, Page } from "@playwright/test";
-import { getTestId } from "../utils";
 import { BaseViewModel } from "./base-view.model";
 import { ReminderItemModel } from "./reminder-item.model";
 import { Reminder } from "@notesnook/core";
@@ -29,9 +28,7 @@ export class RemindersViewModel extends BaseViewModel {
 
   constructor(page: Page) {
     super(page, "reminders", "reminders");
-    this.createButton = page
-      .locator(getTestId("create-reminder-button"))
-      .first();
+    this.createButton = page.getByTitle("Add a reminder").first();
   }
 
   async createReminder(reminder: Partial<Reminder>) {

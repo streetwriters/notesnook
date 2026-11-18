@@ -17,96 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { createContext, useContext, useMemo, type ReactNode } from "react";
-import {
-  getThemeScope,
-  ThemeFactory,
-  ThemeDark,
-  ThemeLight,
-  type Theme,
-  type ThemeDefinition
-} from "@notesnook/theme";
-import type { ThemeScopeName, ThemeScopeProps } from "../../../ui";
-
-export interface ThemeContextValue {
-  definition: ThemeDefinition;
-  scope: ThemeScopeName;
-  theme: Theme;
-  colors: Record<string, string>;
-  key: object;
-}
-
-const scopeCache = new WeakMap<
-  ThemeDefinition,
-  Map<string, ThemeContextValue>
->();
-
-export function createThemeContext(
-  definition: ThemeDefinition,
-  scope: ThemeScopeName
-): ThemeContextValue {
-  let scopes = scopeCache.get(definition);
-  if (!scopes) scopeCache.set(definition, (scopes = new Map()));
-  let value = scopes.get(scope);
-  if (!value) {
-    const theme = ThemeFactory.construct({
-      scope: getThemeScope(scope, definition).colors,
-      colorScheme: definition.colorScheme
-    });
-    value = {
-      definition,
-      scope,
-      theme,
-      colors: theme.colors as Record<string, string>,
-      key: {}
-    };
-    scopes.set(scope, value);
-  }
-  return value;
-}
-
-const ThemeContext = createContext<ThemeContextValue>(
-  createThemeContext(ThemeLight, "base")
-);
-
-export function useThemeContext() {
-  return useContext(ThemeContext);
-}
-
-export function DesktopThemeProvider(props: {
-  theme: ThemeDefinition;
-  children?: ReactNode;
-}) {
-  const value = useMemo(
-    () => createThemeContext(props.theme, "base"),
-    [props.theme]
-  );
-  return (
-    <ThemeContext.Provider value={value}>
-      {props.children}
-    </ThemeContext.Provider>
-  );
-}
-
-export function ThemeScope({
-  scope,
-  colorScheme,
-  theme,
-  children
-}: ThemeScopeProps) {
-  const parent = useThemeContext();
-  const definition =
-    theme ??
-    (colorScheme === "dark"
-      ? ThemeDark
-      : colorScheme === "light"
-      ? ThemeLight
-      : parent.definition);
-  const value = useMemo(
-    () => createThemeContext(definition, scope),
-    [definition, scope]
-  );
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
-}
+export {
+  ThemeProvider as DesktopThemeProvider,
+  ThemeScope,
+  createThemeContext,
+  useThemeContext,
+  type ThemeContextValue
+} from "../../../shared/theme";

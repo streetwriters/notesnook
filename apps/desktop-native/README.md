@@ -52,6 +52,33 @@ On macOS every rebuilt app is signed ad hoc, so the keychain asks again for each
 APPLE_SIGNING_IDENTITY="Apple Development: Your Name (TEAMID)" npm run start:desktop-native
 ```
 
+### Running the app in the browser (web target)
+
+```bash
+# dev server on http://localhost:5190
+npm run web
+
+# static bundle in build/web
+npm run build:web
+```
+
+The web target (`src/targets/web`) implements the same `@ui` and `@platform` contracts with `react-dom` and browser APIs. It is for development and parity work and is never shipped. The shared `@notesnook/*` packages must be built first (`npm run build` in each, as for the native app). The app starts on the notes screen with a local database (wa-sqlite on IndexedDB); you can sign in or create local notes.
+
+Vite resolves `@ui` and `@platform` only to `src/targets/web`. Importing anything that resolves into `src/targets/desktop` fails the build, and `@react-native-gpui/*` and `react-native` imports become a stub that throws "... is not implemented on web" when used.
+
+What works: layout, navigation, theming, dialogs and popovers, lists, the local database (shared with `apps/web`'s wa-sqlite dialect), crypto (`globalThis.crypto`, sodium wasm), config and key-value storage (localStorage), clipboard, file pick and download, window title and fullscreen.
+
+What is stubbed or limited:
+
+| Area | Behaviour on web |
+| --- | --- |
+| Editor | Stub surface, as on desktop |
+| Safe storage | Reports encryption unavailable; the database key and user key are kept in localStorage (insecure, development only) |
+| Attachments (`attachmentFiles`) | Throws "not implemented on web" |
+| App lock, WebAuthn, spell checker settings, updater, integration setters | Throw "not implemented on web" or report unavailable |
+| PDF viewer, avatar editor | Placeholders |
+| Multi-tab | Not supported (single tab driver) |
+
 ### Useful development commands
 
 Run these from `apps/desktop-native`:

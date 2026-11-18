@@ -17,26 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type * as Contract from "../../../ui/primitives";
+import type { SpellChecker } from "../../../platform";
 
-export function Select(props: Contract.SelectProps) {
-  return (
-    <select
-      data-test-id={props.testID}
-      value={props.value}
-      onChange={(event) =>
-        props.onChange?.((event.target as unknown as { value: string }).value)
-      }
-    >
-      {props.options.map((option) => (
-        <option
-          key={option.value}
-          value={option.value}
-          disabled={option.disabled}
-        >
-          {option.title}
-        </option>
-      ))}
-    </select>
-  );
-}
+export const spellChecker: SpellChecker = {
+  isEnabled: async () => false,
+  setEnabled: async () => {
+    throw new Error("spellChecker.setEnabled is not implemented on web");
+  },
+  getLanguages: async () => [],
+  getEnabledLanguages: async () => [],
+  setLanguages: async () => {
+    throw new Error("spellChecker.setLanguages is not implemented on web");
+  },
+  getWords: async () => [],
+  deleteWord: async () => {},
+  check: async () => [],
+  suggest: async () => [],
+  learn: async () => {},
+  ignore: async () => {}
+};

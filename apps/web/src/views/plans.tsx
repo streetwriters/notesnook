@@ -113,6 +113,7 @@ function Plans() {
             />
             <Button
               onClick={() => openURL("/")}
+              data-test-id="close-plans"
               variant="new_bordered"
               sx={{
                 background: "background",

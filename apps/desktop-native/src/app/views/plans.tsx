@@ -105,6 +105,7 @@ function Plans() {
           />
           <Button
             onPress={() => openURL("/")}
+            testID="close-plans"
             variant="new_bordered"
             sx={{
               flexDirection: "row",

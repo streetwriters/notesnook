@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { Declarations } from "./convert";
+import type { Declarations } from "./declarations";
 
 const STATE_SELECTORS: [RegExp, string][] = [
   [/^&?:hover(:not\([^)]*\))*$/, ":hover"],

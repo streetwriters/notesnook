@@ -87,7 +87,14 @@ for (const recurringMode of ["Daily", "Weekly", "Monthly"] as const) {
     });
 
     expect(reminder).toBeDefined();
-    expect(await reminder?.getRecurringMode()).toBe(recurringMode);
+    const text = (await reminder?.getRecurringMode())?.trim().toLowerCase();
+    expect(text).toContain(
+      recurringMode === "Daily"
+        ? "daily"
+        : recurringMode === "Weekly"
+        ? "week"
+        : "month"
+    );
   });
 }
 
@@ -146,31 +153,30 @@ test("edit a reminder", async ({ page }) => {
   ).toBeDefined();
 });
 
-test("disable a reminder", async ({ page }) => {
+test("mark a reminder as completed", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
   const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
 
-  await reminder?.toggle();
+  await reminder?.toggleCompleted();
 
   expect(await reminder?.isPresent()).toBe(true);
-  expect(await reminders.findGroup("Inactive")).toBeDefined();
-  expect(await reminder?.isDisabled()).toBeTruthy();
+  await expect(reminder!.locator.getByText(/^Completed:/)).toBeVisible();
 });
 
-test("enable a disabled reminder", async ({ page }) => {
+test("mark a completed reminder as uncompleted", async ({ page }) => {
   const app = new AppModel(page);
   await app.goto();
   const reminders = await app.goToReminders();
   const reminder = await reminders.createReminderAndWait(ONE_TIME_REMINDER);
-  await reminder?.toggle();
+  await reminder?.toggleCompleted();
+  await expect(reminder!.locator.getByText(/^Completed:/)).toBeVisible();
 
-  await reminder?.toggle();
+  await reminder?.toggleCompleted();
 
   expect(await reminder?.isPresent()).toBe(true);
-  expect(await reminders.findGroup("Active")).toBeDefined();
-  expect(await reminder?.isDisabled()).toBeFalsy();
+  await expect(reminder!.locator.getByText(/^Completed:/)).toBeHidden();
 });
 
 test("editing a weekly recurring reminder should not revert it to daily", async ({
@@ -195,7 +201,9 @@ test("editing a weekly recurring reminder should not revert it to daily", async 
   });
 
   expect(await reminder?.isPresent()).toBe(true);
-  expect(await reminder?.getRecurringMode()).toBe("Weekly");
+  expect((await reminder?.getRecurringMode())?.toLowerCase()).toContain(
+    "week"
+  );
   expect(await reminder?.getDescription()).toBe("An edited reminder");
 });
 

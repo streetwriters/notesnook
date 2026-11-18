@@ -52,6 +52,7 @@ import { isCipher } from "@notesnook/core";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import Vault from "../common/vault";
 import { Mutex } from "async-mutex";
+import { whenDatabaseReady } from "./boot-store";
 import { useEditorManager } from "../components/editor/manager";
 import { Context } from "../components/list-container/types";
 
@@ -1003,6 +1004,7 @@ class EditorStore extends BaseStore<EditorStore> {
     // do not allow saving of readonly session
     if (partial.note?.readonly) return;
 
+    await whenDatabaseReady();
     await saveMutex.runExclusive(async () => {
       this.setSaveState(id, 0);
       try {

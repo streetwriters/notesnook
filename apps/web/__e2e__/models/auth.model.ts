@@ -17,9 +17,34 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { Locator, Page } from "@playwright/test";
+import { test, type Locator, type Page } from "@playwright/test";
 import { getTestId } from "../utils";
 import { generateSync } from "otplib";
+import { openSync, closeSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+const TOTP_STEP = 30 * 1000;
+
+async function claimTotp(secret: string) {
+  let step = Math.floor(Date.now() / TOTP_STEP);
+  for (;;) {
+    try {
+      closeSync(
+        openSync(path.join(tmpdir(), `nn-e2e-totp-${step}`), "wx")
+      );
+      break;
+    } catch {
+      step++;
+    }
+  }
+  const wait = step * TOTP_STEP - Date.now() + 1000;
+  if (wait > 0) {
+    test.info().setTimeout(test.info().timeout + wait);
+    await new Promise((resolve) => setTimeout(resolve, wait));
+  }
+  return generateSync({ secret });
+}
 
 type User = {
   email: string;
@@ -32,14 +57,12 @@ export class AuthModel {
   private readonly page: Page;
   private readonly emailInput: Locator;
   private readonly passwordInput: Locator;
-  private readonly codeInput: Locator;
   private readonly submitButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.emailInput = page.locator(getTestId("email"));
     this.passwordInput = page.locator(getTestId("password"));
-    this.codeInput = page.locator(getTestId("code"));
     this.submitButton = page.locator(getTestId("submitButton"));
   }
 
@@ -56,19 +79,28 @@ export class AuthModel {
   async login(user: Partial<User>) {
     if (!user.email && !user.password) return;
 
+    let passwordFilled = false;
     if (user.email) {
       await this.emailInput.fill(user.email);
+      if (user.password && (await this.passwordInput.isVisible())) {
+        await this.passwordInput.fill(user.password);
+        passwordFilled = true;
+      }
       await this.submitButton.click();
     }
 
     if (user.totpSecret) {
-      const token = generateSync({ secret: user.totpSecret });
-      await this.codeInput.fill(token);
+      const token = await claimTotp(user.totpSecret);
+      const firstDigit = this.page
+        .locator(getTestId("otp-input-0"))
+        .or(this.page.locator('input[autocomplete="one-time-code"]').first());
+      await firstDigit.click();
+      await this.page.keyboard.type(token);
 
       await this.submitButton.click();
     }
 
-    if (user.password) {
+    if (user.password && !passwordFilled) {
       await this.passwordInput.fill(user.password);
 
       await this.submitButton.click();

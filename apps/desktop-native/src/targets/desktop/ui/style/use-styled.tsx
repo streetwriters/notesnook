@@ -38,6 +38,7 @@ import type {
   SxProp
 } from "../../../../ui";
 import { toPickedFile } from "../../platform/files";
+import { mergeShorthands } from "../../../../shared/style/shorthand";
 import { useThemeContext } from "../theme";
 import { breakpointOf, resolveSx, type ResolvedStyle } from "./resolve";
 
@@ -78,57 +79,6 @@ function subscribe(listener: () => void) {
 
 export function useBreakpoint() {
   return useSyncExternalStore(subscribe, () => bucket);
-}
-
-const SHORTHAND_KEYS = [
-  "m",
-  "mt",
-  "mr",
-  "mb",
-  "ml",
-  "mx",
-  "my",
-  "margin",
-  "marginTop",
-  "marginRight",
-  "marginBottom",
-  "marginLeft",
-  "marginX",
-  "marginY",
-  "p",
-  "pt",
-  "pr",
-  "pb",
-  "pl",
-  "px",
-  "py",
-  "padding",
-  "paddingTop",
-  "paddingRight",
-  "paddingBottom",
-  "paddingLeft",
-  "paddingX",
-  "paddingY",
-  "gap",
-  "rowGap",
-  "columnGap",
-  "color",
-  "bg",
-  "backgroundColor"
-] as const;
-
-function mergeShorthands(
-  props: BaseProps,
-  defaults?: SxProp
-): SxProp | undefined {
-  let merged: Record<string, unknown> | undefined;
-  for (const key of SHORTHAND_KEYS) {
-    const value = (props as Record<string, unknown>)[key];
-    if (value === undefined) continue;
-    (merged ??= {})[key] = value;
-  }
-  if (!merged && !defaults) return props.sx;
-  return { ...defaults, ...merged, ...props.sx } as SxProp;
 }
 
 export interface StyledOptions {

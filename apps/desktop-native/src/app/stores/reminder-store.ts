@@ -94,6 +94,11 @@ function scheduleReminder(id: string, reminder: Reminder, cron: string) {
   return TaskScheduler.register(`reminder:${id}`, cron, async () => {
     if (!Config.get("reminderNotifications", true)) return;
 
+    if (environment.isTesting && environment.confirmInTesting) {
+      environment.confirmInTesting("Reminder activated!");
+      return;
+    }
+
     const shown = await notifications.show({
       title: reminder.title,
       body: reminder.description ?? "",

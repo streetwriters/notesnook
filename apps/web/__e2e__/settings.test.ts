@@ -37,7 +37,8 @@ test("ask for image compression during image upload when 'Image Compression' set
   await notes.createNote(NOTE);
   await notes.editor.attachImage();
 
-  await expect(page.getByText("Image Compression")).toBeVisible();
+  await expect(page.getByText("Attaching files")).toBeVisible();
+  await expect(page.getByText("Compress", { exact: true })).toBeVisible();
 });
 
 test("do not ask for image compression during image upload when 'Image Compression' setting is 'Enable (Recommended)'", async ({
@@ -56,7 +57,7 @@ test("do not ask for image compression during image upload when 'Image Compressi
   await notes.createNote(NOTE);
   await notes.editor.attachImage();
 
-  await expect(page.getByText("Enable compression")).toBeHidden();
+  await expect(page.getByText("Compress", { exact: true })).toBeHidden();
 });
 
 test("do not ask for image compression during image upload when 'Image Compression' setting is 'Disable'", async ({
@@ -77,5 +78,5 @@ test("do not ask for image compression during image upload when 'Image Compressi
   await notes.createNote(NOTE);
   await notes.editor.attachImage();
 
-  await expect(page.getByText("Enable compression")).toBeHidden();
+  await expect(page.getByText("Compress", { exact: true })).toBeHidden();
 });

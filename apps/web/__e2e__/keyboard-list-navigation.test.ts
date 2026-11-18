@@ -17,9 +17,79 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { test, expect, Browser, Page } from "@nn/test";
+import fs from "fs";
+import os from "os";
+import path from "path";
+import { test as base, expect, Browser, Page } from "@nn/test";
 import { AppModel } from "./models/app.model";
 import { NoteItemModel } from "./models/note-item.model";
+
+type StorageState = Awaited<
+  ReturnType<ReturnType<Browser["contexts"]>[number]["storageState"]>
+>;
+
+const seeds = new Map<number, Promise<StorageState>>();
+
+async function seedNotes(
+  browser: Browser,
+  baseURL: string | undefined,
+  count: number
+) {
+  const context = await browser.newContext({ baseURL });
+  const page = await context.newPage();
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  for (let i = 0; i < count; ++i)
+    await notes.createNote({ title: `Test note ${i}` });
+  const state = await context.storageState({ indexedDB: true });
+  await context.close();
+  return state;
+}
+
+const seedDir = path.join(os.tmpdir(), `nn-keyboard-seed-${process.ppid}`);
+
+async function seedOnce(
+  browser: Browser,
+  baseURL: string | undefined,
+  count: number
+): Promise<StorageState> {
+  fs.mkdirSync(seedDir, { recursive: true });
+  const file = path.join(seedDir, `${count}.json`);
+  const lock = path.join(seedDir, `${count}.lock`);
+  let owner = false;
+  try {
+    fs.mkdirSync(lock);
+    owner = true;
+  } catch {
+    owner = false;
+  }
+  if (owner) {
+    const state = await seedNotes(browser, baseURL, count);
+    fs.writeFileSync(`${file}.tmp`, JSON.stringify(state));
+    fs.renameSync(`${file}.tmp`, file);
+    return state;
+  }
+  while (!fs.existsSync(file))
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  return JSON.parse(fs.readFileSync(file, "utf-8"));
+}
+
+function seeded(count: number) {
+  return base.extend({
+    storageState: [
+      async ({ browser, baseURL }, use) => {
+        if (!seeds.has(count))
+          seeds.set(count, seedOnce(browser, baseURL, count));
+        await use(await seeds.get(count)!);
+      },
+      { scope: "test", timeout: 180 * 1000 }
+    ]
+  });
+}
+
+const test = seeded(5);
+const test10 = seeded(10);
 
 async function populateList(page: Page, count = 5) {
   const app = new AppModel(page);
@@ -27,17 +97,14 @@ async function populateList(page: Page, count = 5) {
   const notes = await app.goToNotes();
   const notesList: NoteItemModel[] = [];
   for (let i = 0; i < count; ++i) {
-    const note = await notes.createNote({
-      title: `Test note ${i}`
-      // content: `Test note ${i}`.repeat(10)
-    });
+    const note = await notes.findNote({ title: `Test note ${i}` });
     if (!note) continue;
     notesList.push(note);
   }
   return { notes, app, notesList: notesList.reverse() };
 }
 
-test.setTimeout(30 * 1000);
+base.setTimeout(30 * 1000);
 
 test("ctrl+a should select all notes", async ({ page }) => {
   const { notesList, notes } = await populateList(page);
@@ -149,7 +216,7 @@ test("pressing Shift+ArrowUp should select previous note", async ({ page }) => {
   expect(await notesList[3].isSelected()).toBeFalsy();
 });
 
-test("use Shift+ArrowUp & Shift+ArrowDown for note selection", async ({
+test10("use Shift+ArrowUp &Shift+ArrowDown for note selection", async ({
   page
 }, info) => {
   info.setTimeout(60 * 1000);
@@ -203,7 +270,7 @@ test("use Shift+ArrowUp & Shift+ArrowDown for note selection", async ({
   expect(await notesList[5].isSelected()).toBeTruthy();
 });
 
-test("select notes using Control+Click", async ({ page }, info) => {
+test10("select notes using Control+Click", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
 
   const { notesList, notes } = await populateList(page, 10);
@@ -220,7 +287,7 @@ test("select notes using Control+Click", async ({ page }, info) => {
   }
 });
 
-test("select notes using Shift+Click downwards", async ({ page }, info) => {
+test10("select notes using Shift+Click downwards", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
 
   const { notesList, notes } = await populateList(page, 10);
@@ -236,7 +303,7 @@ test("select notes using Shift+Click downwards", async ({ page }, info) => {
   expect(await notesList[6].isSelected()).toBeFalsy();
 });
 
-test("select notes using Shift+Click upwards", async ({ page }, info) => {
+test10("select notes using Shift+Click upwards", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
 
   const { notesList, notes } = await populateList(page, 10);
@@ -273,7 +340,7 @@ test("using Shift+Click when no notes are selected should not crash the app", as
   expect(await notes.isEmpty()).toBeFalsy();
 });
 
-test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
+test10("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   info.setTimeout(60 * 1000);
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
@@ -309,7 +376,7 @@ test("Ctrl+Click to select/unselect notes", async ({ page }, info) => {
   expect(await selectedNote.contextMenu.title()).toBeFalsy();
 });
 
-test("opening a note & right clicking on another note should show note properties menu", async ({
+test10("opening a note & right clicking on another note should show note properties menu", async ({
   page
 }, info) => {
   info.setTimeout(60 * 1000);

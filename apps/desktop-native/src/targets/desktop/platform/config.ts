@@ -20,26 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { MMKVLoader } from "react-native-mmkv-storage";
 import type { Config } from "../../../platform";
 import { tryParse } from "../../../app/utils/parse";
-import { stringifyJsonOnly } from "./kv-codec";
+import { stringifyJsonOnly } from "../../../shared/kv-codec";
+import { KEPT_ON_LOGOUT } from "../../../shared/storage-constants";
 
 const storage = new MMKVLoader()
   .withInstanceID("notesnook_config")
   .disableIndexing()
   .initialize();
-
-const KEPT_ON_LOGOUT = [
-  "editorConfig",
-  "backupStorageLocation",
-  "serverUrls",
-  "corsProxy",
-  "theme:light",
-  "theme:dark",
-  "colorScheme",
-  "followSystemTheme",
-  "doubleSpacedLines",
-  "appLanguage",
-  "appLockEnabled"
-];
 
 function set<T>(key: string, value: T) {
   storage.setString(key, stringifyJsonOnly(value));

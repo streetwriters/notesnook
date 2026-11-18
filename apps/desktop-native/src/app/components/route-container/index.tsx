@@ -150,6 +150,7 @@ function HeaderActions(props: {
       {routeButton && RouteIcon ? (
         <Button
           testID="route-action"
+          title={routeButton.title}
           variant="tertiary"
           disabled={!isDatabaseReady}
           onPress={routeButton.onClick}

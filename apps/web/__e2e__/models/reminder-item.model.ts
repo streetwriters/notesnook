@@ -39,8 +39,8 @@ export class ReminderItemModel extends BaseItemModel {
     return this.locator.locator(getTestId("recurring-mode")).textContent();
   }
 
-  isDisabled() {
-    return this.locator.locator(getTestId("disabled")).isVisible();
+  isCompleted() {
+    return this.locator.getByText(/^Completed:/).isVisible();
   }
 
   async delete() {
@@ -58,9 +58,9 @@ export class ReminderItemModel extends BaseItemModel {
     await fillReminderDialog(this.page, reminder);
   }
 
-  async toggle() {
+  async toggleCompleted() {
     await this.contextMenu.open(this.locator);
-    await this.contextMenu.clickOnItem("toggle");
+    await this.contextMenu.clickOnItem("mark-complete");
   }
 
   async open() {

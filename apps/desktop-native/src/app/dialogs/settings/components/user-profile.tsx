@@ -233,6 +233,7 @@ export function UserProfile({ minimal }: Props) {
 
   return (
     <Flex
+      testID="logged-in"
       sx={{
         borderRadius: "default",
         alignItems: "center",

@@ -139,6 +139,7 @@ export function OtpInput({
           ref={(el) => {
             inputRefs.current[index] = el;
           }}
+          data-test-id={`otp-input-${index}`}
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"

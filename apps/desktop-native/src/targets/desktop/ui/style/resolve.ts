@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { css } from "@theme-ui/css";
 import type { SxProp } from "../../../../ui";
-import type { ThemeContextValue } from "../theme";
+import type { ThemeContextValue } from "../../../../shared/theme";
 import {
   convertAnimation,
   convertDeclarations,
@@ -29,7 +29,7 @@ import {
   type Declarations,
   type TransitionInput
 } from "./convert";
-import { normalizeVariant } from "./variants";
+import { normalizeVariant } from "../../../../shared/style/variants";
 
 export interface ResolvedStyle {
   style: Record<string, unknown>;

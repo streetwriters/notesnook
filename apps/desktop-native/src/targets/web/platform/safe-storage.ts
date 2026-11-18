@@ -17,25 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type * as Contract from "../../../ui/layout";
+import type { SafeStorage } from "../../../platform";
 
-export const TITLE_BAR_HEIGHT = 45;
-
-export function TitleBar({
-  height = TITLE_BAR_HEIGHT,
-  children
-}: Contract.TitleBarProps) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        height,
-        flexShrink: 0
-      }}
-    >
-      {children}
-    </div>
-  );
-}
+export const safeStorage: SafeStorage = {
+  isEncryptionAvailable: async () => false,
+  async encryptString() {
+    throw new Error("safeStorage.encryptString is not implemented on web");
+  },
+  async decryptString() {
+    throw new Error("safeStorage.decryptString is not implemented on web");
+  }
+};

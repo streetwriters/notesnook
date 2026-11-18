@@ -120,11 +120,12 @@ export function Notebooks() {
 
   return (
     <>
-      <Box sx={{ flex: 1, mt: "spacing4" }}>
+      <Box id="notebooks" sx={{ flex: 1, mt: "spacing4" }}>
         {!notebooks ? (
           <ListLoader />
         ) : notebooks.length === 0 ? (
           <Flex
+            testID="list-placeholder"
             sx={{
               justifyContent: "center",
               alignItems: "center",

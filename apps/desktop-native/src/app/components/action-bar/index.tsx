@@ -18,11 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { memo } from "react";
+import { environment } from "@platform";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import useMobile from "../../hooks/use-mobile";
 import { strings } from "@notesnook/intl";
 import { Box, Button, Flex, SortableList, Text, type DragEvent } from "@ui";
 import { getDragData } from "../../utils/data-transfer";
+import { Menu } from "../../hooks/use-menu";
+import { useStore as useAppStore } from "../../stores/app-store";
+import { useEditorManager } from "../editor/manager";
+import { saveContent } from "../editor/save-content";
 import { CommandPaletteDialog } from "../../dialogs/command-palette";
 import {
   ArrowLeft,
@@ -236,6 +241,7 @@ const TabStrip = memo(function TabStrip() {
   const currentTab = useEditorStore((store) => store.activeTabId);
   const canGoBack = useEditorStore((store) => store.canGoBack);
   const canGoForward = useEditorStore((store) => store.canGoForward);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
   useEditorStore((store) => store.sessions);
 
   return (
@@ -323,6 +329,7 @@ const TabStrip = memo(function TabStrip() {
             useEditorStore.setState({ tabs: next });
           }}
           renderItem={(tab) => {
+            const i = tabs.indexOf(tab);
             const session = useEditorStore.getState().getSession(tab.sessionId);
             if (!session) return null;
             const isUnsaved =
@@ -339,12 +346,64 @@ const TabStrip = memo(function TabStrip() {
                 isActive={tab.id === currentTab}
                 isPinned={!!tab.pinned}
                 isLocked={isLockedSession(session)}
+                isRevealInListDisabled={isFocusMode}
                 type={session.type}
+                onSave={() => {
+                  const { activeEditorId, getEditor } =
+                    useEditorManager.getState();
+                  const editor = getEditor(activeEditorId || "")?.editor;
+                  if (!editor) return;
+                  saveContent(session.id, false, editor.getContent());
+                }}
                 onFocus={() => {
                   if (tab.id !== currentTab)
                     useEditorStore.getState().activateSession(tab.sessionId);
                 }}
                 onClose={() => useEditorStore.getState().closeTabs(tab.id)}
+                onCloseAll={() =>
+                  useEditorStore
+                    .getState()
+                    .closeTabs(
+                      ...tabs.filter((s) => !s.pinned).map((s) => s.id)
+                    )
+                }
+                onCloseOthers={() =>
+                  useEditorStore
+                    .getState()
+                    .closeTabs(
+                      ...tabs
+                        .filter((s) => s.id !== tab.id && !s.pinned)
+                        .map((s) => s.id)
+                    )
+                }
+                onCloseToTheRight={() =>
+                  useEditorStore
+                    .getState()
+                    .closeTabs(
+                      ...tabs
+                        .filter((s, index) => index > i && !s.pinned)
+                        .map((s) => s.id)
+                    )
+                }
+                onCloseToTheLeft={() =>
+                  useEditorStore
+                    .getState()
+                    .closeTabs(
+                      ...tabs
+                        .filter((s, index) => index < i && !s.pinned)
+                        .map((s) => s.id)
+                    )
+                }
+                onRevealInList={
+                  "note" in session
+                    ? () =>
+                        AppEventManager.publish(
+                          AppEvents.revealItemInList,
+                          session.note.id,
+                          true
+                        )
+                    : undefined
+                }
                 onPin={() => useEditorStore.getState().pinTab(tab.id)}
                 onDrop={(event) => {
                   const noteId = getDragData(event.payload, "note")?.[0];
@@ -386,13 +445,21 @@ function Tab(props: {
   isPinned: boolean;
   isLocked: boolean;
   isUnsaved: boolean;
+  isRevealInListDisabled: boolean;
   type: SessionType;
   onFocus: () => void;
   onClose: () => void;
+  onCloseOthers: () => void;
+  onCloseToTheRight: () => void;
+  onCloseToTheLeft: () => void;
+  onCloseAll: () => void;
   onPin: () => void;
+  onSave: () => void;
+  onRevealInList?: () => void;
   onDrop?: (event: DragEvent) => void;
 }) {
   const { isActive, isPinned, isLocked, isUnsaved, type } = props;
+  const { onRevealInList } = props;
   const TabIcon: Icon = isLocked
     ? type === "locked"
       ? Lock
@@ -410,7 +477,73 @@ function Tab(props: {
       group="tab"
       droppable
       onDrop={props.onDrop}
-      onPress={props.onFocus}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        Menu.openMenu(
+          [
+            {
+              type: "button",
+              title: strings.save(),
+              key: "save",
+              onClick: props.onSave,
+              isHidden: !isUnsaved
+            },
+            { type: "separator", key: "sep0", isHidden: !isUnsaved },
+            {
+              type: "button",
+              title: strings.close(),
+              key: "close",
+              onClick: props.onClose
+            },
+            {
+              type: "button",
+              title: strings.closeOthers(),
+              key: "close-others",
+              onClick: props.onCloseOthers
+            },
+            {
+              type: "button",
+              title: strings.closeToRight(),
+              key: "close-to-the-right",
+              onClick: props.onCloseToTheRight
+            },
+            {
+              type: "button",
+              title: strings.closeToLeft(),
+              key: "close-to-the-left",
+              onClick: props.onCloseToTheLeft
+            },
+            {
+              type: "button",
+              title: strings.closeAll(),
+              key: "close-all",
+              onClick: props.onCloseAll
+            },
+            { type: "separator", key: "sep1" },
+            {
+              type: "button",
+              title: strings.revealInList(),
+              key: "reveal-in-list",
+              onClick: onRevealInList,
+              isHidden: !onRevealInList,
+              isDisabled: props.isRevealInListDisabled
+            },
+            { type: "separator", key: "sep2", isHidden: !onRevealInList },
+            {
+              type: "button",
+              key: "pin",
+              title: strings.pin(),
+              onClick: props.onPin,
+              isChecked: isPinned
+            }
+          ],
+          { position: { x: event.pageX, y: event.pageY } }
+        );
+      }}
+      onPress={(event) => {
+        if (event.button === "auxiliary") props.onClose();
+        else props.onFocus();
+      }}
       sx={{
         flexDirection: "row",
         py: "spacing4",
@@ -423,6 +556,12 @@ function Tab(props: {
         ":hover": { bg: isActive ? "background-tertiary" : "hover" }
       }}
     >
+      {environment.isDev && isActive ? (
+        <Box
+          testID="active-tab"
+          sx={{ position: "absolute", width: 0, height: 0 }}
+        />
+      ) : null}
       <Flex sx={{ flexDirection: "row", alignItems: "center", flexShrink: 0 }}>
         <TabIcon
           testID={isUnsaved ? "tab-icon-unsaved" : "tab-icon"}

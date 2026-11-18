@@ -30,20 +30,25 @@ type Note = {
 
 export class NotesViewModel extends BaseViewModel {
   private readonly createButton: Locator;
+  private readonly newTabButton: Locator;
   readonly editor: EditorModel;
 
   constructor(
     page: Page,
-    pageId: "home" | "notes" | "favorites" | "notebook",
+    pageId: "home" | "notes" | "favorites" | "notebook" | "archive",
     listType: string
   ) {
     super(page, pageId, listType);
-    this.createButton = page.locator(getTestId(`create-new-note`));
+    this.createButton = page.locator(getTestId("create-note-button"));
+    this.newTabButton = page.locator(getTestId("create-new-note"));
     this.editor = new EditorModel(page);
   }
 
   async newNote() {
-    await this.createButton.first().click();
+    await this.createButton.or(this.newTabButton).first().waitFor();
+    if (await this.createButton.first().isVisible())
+      await this.createButton.first().click();
+    else await this.newTabButton.first().click();
     await this.editor.waitForUnloading();
   }
 

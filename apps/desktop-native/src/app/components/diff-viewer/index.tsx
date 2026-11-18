@@ -21,7 +21,8 @@ import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { getFormattedDate } from "@notesnook/common";
 import type { ContentItem, Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
-import { Button, Flex, ScrollContainer, Text } from "@ui";
+import { diff } from "diffblazer";
+import { Button, EditorSurface, Flex, ScrollContainer, Text } from "@ui";
 import { Copy, Restore } from "../icons";
 import ContentToggle from "./content-toggle";
 import { UnlockView } from "../unlock";
@@ -33,12 +34,19 @@ import {
   type DiffEditorSession
 } from "../../stores/editor-store";
 
-function ReadonlyContent(props: { id: string }) {
+function ReadonlyContent(props: {
+  id: string;
+  data: () => string | undefined;
+  nonce?: number;
+}) {
   return (
-    <Flex testID={`readonly-editor-${props.id}`} sx={{ flex: 1, p: 2 }}>
-      <Text sx={{ color: "paragraph-secondary" }}>
-        The editor is not implemented on desktop yet
-      </Text>
+    <Flex testID={`readonly-editor-${props.id}`} sx={{ flex: 1 }}>
+      <EditorSurface
+        sessionId={props.id}
+        readonly
+        nonce={props.nonce}
+        content={props.data}
+      />
     </Flex>
   );
 }
@@ -253,7 +261,11 @@ function DiffViewer(props: DiffViewerProps) {
                   }}
                 />
                 <ScrollContainer>
-                  <ReadonlyContent id={content.id} />
+                  <ReadonlyContent
+                    id={content.id}
+                    data={() => content.data as string}
+                    nonce={content.dateEdited}
+                  />
                 </ScrollContainer>
               </>
             )}
@@ -303,7 +315,18 @@ function DiffViewer(props: DiffViewerProps) {
                   }}
                 />
                 <ScrollContainer>
-                  <ReadonlyContent id={`${conflictedContent.id}-conflicted`} />
+                  <ReadonlyContent
+                    id={`${conflictedContent.id}-conflicted`}
+                    data={() =>
+                      content.locked
+                        ? (conflictedContent.data as string)
+                        : diff(
+                            content.data as string,
+                            conflictedContent.data as string
+                          )
+                    }
+                    nonce={conflictedContent.dateEdited}
+                  />
                 </ScrollContainer>
               </>
             )}
