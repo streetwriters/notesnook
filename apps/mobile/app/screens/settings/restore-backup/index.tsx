@@ -246,8 +246,8 @@ const restoreBackup = async (options: {
       });
 
       const { encryptionKey, password } = isEncryptedBackup
-        ? ({} as PasswordOrKey)
-        : await withPassword();
+        ? await withPassword()
+        : ({} as PasswordOrKey);
 
       if (isEncryptedBackup && !encryptionKey && !password) {
         endProgress();
