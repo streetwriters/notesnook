@@ -31,7 +31,11 @@ import { unzip } from "react-native-zip-archive";
 import { DatabaseLogger, db } from "../../../common/database";
 import filesystem from "../../../common/filesystem";
 import { deleteCacheFileByName } from "../../../common/filesystem/io";
-import { cacheDir, copyFileAsync } from "../../../common/filesystem/utils";
+import {
+  cacheDir,
+  copyFileAsync,
+  santizeUri
+} from "../../../common/filesystem/utils";
 import { presentDialog } from "../../../components/dialog/functions";
 import {
   endProgress,
@@ -233,7 +237,7 @@ const restoreBackup = async (options: {
       const rawData =
         Platform.OS === "android"
           ? await ScopedStorage.readFile(filePath, "utf8")
-          : await RNFetchBlob.fs.readFile(filePath, "utf8");
+          : await RNFetchBlob.fs.readFile(santizeUri(filePath), "utf8");
       const backup: LegacyBackupFile = JSON.parse(rawData) as LegacyBackupFile;
 
       const isEncryptedBackup =
