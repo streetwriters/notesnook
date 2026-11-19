@@ -91,7 +91,7 @@ What is stubbed or limited:
 
 | Area | Behaviour on web |
 | --- | --- |
-| Editor | Stub surface, as on desktop |
+| Editor | Mounts the real `apps/web` Tiptap editor (see `docs/web-target-audit.md` for its gaps); desktop is still a stub |
 | Safe storage | Reports encryption unavailable; the database key and user key are kept in localStorage (insecure, development only) |
 | Attachments (`attachmentFiles`) | Throws "not implemented on web" |
 | App lock, WebAuthn, spell checker settings, updater, integration setters | Throw "not implemented on web" or report unavailable |
