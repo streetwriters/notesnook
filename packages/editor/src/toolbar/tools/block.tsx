@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { q, useEditorQuery } from "../../queries/index.js";
 import { ToolProps } from "../types.js";
 import { Editor, hasPermission } from "../../types.js";
 import { Icons } from "../icons.js";
@@ -33,28 +34,77 @@ import { strings } from "@notesnook/intl";
 import { keybindings } from "@notesnook/common";
 import { importCsvToTable } from "../../extensions/table/actions.js";
 
+type BlockState = {
+  taskList: boolean;
+  outlineList: boolean;
+  horizontalRule: boolean;
+  codeBlock: boolean;
+  mathBlock: boolean;
+  blockQuote: boolean;
+  attachment: boolean;
+  calloutType: string | undefined;
+};
+
+function useBlockState(editor: Editor): BlockState {
+  const taskList = useEditorQuery(editor, q.isActive("taskList"), false);
+  const outlineList = useEditorQuery(editor, q.isActive("outlineList"), false);
+  const horizontalRule = useEditorQuery(
+    editor,
+    q.isActive("horizontalRule"),
+    false
+  );
+  const codeBlock = useEditorQuery(editor, q.isActive("codeBlock"), false);
+  const mathBlock = useEditorQuery(editor, q.isActive("mathBlock"), false);
+  const blockQuote = useEditorQuery(editor, q.isActive("blockQuote"), false);
+  const attachment = useEditorQuery(editor, q.isActive("attachment"), false);
+  const calloutType = useEditorQuery(editor, q.attributes("callout"), {}).type;
+  return useMemo(
+    () => ({
+      taskList,
+      outlineList,
+      horizontalRule,
+      codeBlock,
+      mathBlock,
+      blockQuote,
+      attachment,
+      calloutType
+    }),
+    [
+      taskList,
+      outlineList,
+      horizontalRule,
+      codeBlock,
+      mathBlock,
+      blockQuote,
+      attachment,
+      calloutType
+    ]
+  );
+}
+
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
+  const state = useBlockState(editor);
 
   const menuItems = useMemo(() => {
     return [
-      tasklist(editor),
-      outlinelist(editor),
-      horizontalRule(editor),
-      codeblock(editor),
-      mathblock(editor),
-      callout(editor),
-      blockquote(editor),
+      tasklist(editor, state),
+      outlinelist(editor, state),
+      horizontalRule(editor, state),
+      codeblock(editor, state),
+      mathblock(editor, state),
+      callout(editor, state),
+      blockquote(editor, state),
       image(editor, isMobile),
-      attachment(editor),
+      attachment(editor, state),
       isMobile ? embedMobile(editor) : embedDesktop(editor),
       table(editor)
     ];
-  }, [editor, isMobile]);
+  }, [editor, isMobile, state]);
 
   return (
     <>
@@ -100,46 +150,46 @@ export function InsertBlock(props: ToolProps) {
   );
 }
 
-const horizontalRule = (editor: Editor): MenuItem => ({
+const horizontalRule = (editor: Editor, state: BlockState): MenuItem => ({
   key: "hr",
   type: "button",
   title: strings.horizontalRule(),
   icon: Icons.horizontalRule,
-  isChecked: editor.isActive("horizontalRule"),
+  isChecked: state.horizontalRule,
   onClick: () => editor.chain().focus().setHorizontalRule().run()
 });
 
-const codeblock = (editor: Editor): MenuItem => ({
+const codeblock = (editor: Editor, state: BlockState): MenuItem => ({
   key: "codeblock",
   type: "button",
   title: strings.codeBlock(),
   icon: Icons.codeblock,
-  isChecked: editor.isActive("codeBlock"),
+  isChecked: state.codeBlock,
   onClick: () => editor.chain().focus().toggleCodeBlock().run(),
   modifier: keybindings.toggleCodeBlock.keys
 });
 
-const blockquote = (editor: Editor): MenuItem => ({
+const blockquote = (editor: Editor, state: BlockState): MenuItem => ({
   key: "blockquote",
   type: "button",
   title: strings.quote(),
   icon: Icons.blockquote,
-  isChecked: editor.isActive("blockQuote"),
+  isChecked: state.blockQuote,
   onClick: () => editor.chain().focus().toggleBlockquote().run(),
   modifier: keybindings.insertBlockquote.keys
 });
 
-const mathblock = (editor: Editor): MenuItem => ({
+const mathblock = (editor: Editor, state: BlockState): MenuItem => ({
   key: "math",
   type: "button",
   title: strings.mathAndFormulas(),
   icon: Icons.mathBlock,
-  isChecked: editor.isActive("mathBlock"),
+  isChecked: state.mathBlock,
   onClick: () => editor.chain().focus().insertMathBlock().run(),
   modifier: keybindings.insertMathBlock.keys
 });
 
-const callout = (editor: Editor): MenuItem => ({
+const callout = (editor: Editor, state: BlockState): MenuItem => ({
   key: "callout",
   type: "button",
   title: strings.callout(),
@@ -159,7 +209,7 @@ const callout = (editor: Editor): MenuItem => ({
       title: item.title,
       key: item.key,
       type: "button",
-      isChecked: editor.isActive("callout", { type: item.key.toLowerCase() }),
+      isChecked: state.calloutType === item.key.toLowerCase(),
       onClick: () =>
         editor
           .chain()
@@ -310,32 +360,32 @@ const embedDesktop = (editor: Editor): MenuItem => ({
   }
 });
 
-const attachment = (editor: Editor): MenuItem => ({
+const attachment = (editor: Editor, state: BlockState): MenuItem => ({
   key: "attachment",
   type: "button",
   title: strings.attachment(),
   icon: Icons.attachment,
-  isChecked: editor.isActive("attachment"),
+  isChecked: state.attachment,
   onClick: () => editor.storage.openAttachmentPicker?.("file"),
   modifier: keybindings.addAttachment.keys
 });
 
-const tasklist = (editor: Editor): MenuItem => ({
+const tasklist = (editor: Editor, state: BlockState): MenuItem => ({
   key: "tasklist",
   type: "button",
   title: strings.taskList(),
   icon: Icons.checkbox,
-  isChecked: editor.isActive("taskList"),
+  isChecked: state.taskList,
   onClick: () => editor.chain().focus().toggleTaskList().run(),
   modifier: keybindings.toggleTaskList.keys
 });
 
-const outlinelist = (editor: Editor): MenuItem => ({
+const outlinelist = (editor: Editor, state: BlockState): MenuItem => ({
   key: "outlinelist",
   type: "button",
   title: strings.outlineList(),
   icon: Icons.outlineList,
-  isChecked: editor.isActive("outlineList"),
+  isChecked: state.outlineList,
   onClick: () => editor.chain().focus().toggleOutlineList().run(),
   modifier: keybindings.toggleOutlineList.keys
 });
