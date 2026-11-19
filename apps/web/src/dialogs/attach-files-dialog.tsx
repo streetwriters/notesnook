@@ -34,7 +34,7 @@ import {
   File as FileIcon,
   CloseCircle
 } from "../components/icons";
-import { compressImage } from "../utils/image-compressor";
+import { compressImageFile } from "../utils/image-compressor";
 import Queue from "p-queue";
 
 type FileStatus = "pending" | "compressing" | "encrypting" | "done" | "error";
@@ -129,17 +129,7 @@ export const AttachFilesDialog = DialogManager.register(
 
         await queue.add(async () => {
           try {
-            const compressed = await compressImage(state.file, {
-              maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
-              width: (naturalWidth) => naturalWidth,
-              height: (_, naturalHeight) => naturalHeight,
-              resize: "contain",
-              quality: 0.7
-            });
-            const compressedFile = new File([compressed], state.file.name, {
-              lastModified: state.file.lastModified,
-              type: state.file.type
-            });
+            const compressedFile = await compressImageFile(state.file);
             setFileStates((prev) =>
               updateFileStates(prev, index, {
                 status: "pending",

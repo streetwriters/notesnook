@@ -264,6 +264,20 @@ function normalizeDecimalNumber(value: number, times = 100000000000) {
     : value;
 }
 
+export async function compressImageFile(file: File) {
+  const compressed = await compressImage(file, {
+    maxWidth: (naturalWidth) => Math.min(1920, naturalWidth * 0.7),
+    width: (naturalWidth) => naturalWidth,
+    height: (_, naturalHeight) => naturalHeight,
+    resize: "contain",
+    quality: 0.7
+  });
+  return new File([compressed], file.name, {
+    lastModified: file.lastModified,
+    type: file.type
+  });
+}
+
 /**
  * Get the max sizes in a rectangle under the given aspect ratio.
  * @param data - The original sizes.

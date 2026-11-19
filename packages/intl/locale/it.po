@@ -8072,6 +8072,10 @@ msgstr "Il promemoria inizierà il {date} alle {time}."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "La chiave di sicurezza per sbloccare l'app. È il metodo più sicuro."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "Il file selezionato non corrisponde all'allegato originale. Seleziona lo stesso file."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "L'URL che hai indicato ({url}) non punta al {server}."

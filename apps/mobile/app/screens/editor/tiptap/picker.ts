@@ -26,7 +26,7 @@ import {
   KeepLocalCopyResponse,
   pick as pickFile
 } from "@react-native-documents/picker";
-import { basename, dirname } from "pathe";
+import { basename, dirname, extname } from "pathe";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { Image, openCamera, openPicker } from "react-native-image-crop-picker";
@@ -208,9 +208,9 @@ const gallery = async (options: PickerOptions) => {
     openPicker({
       includeBase64: true,
       mediaType: "photo",
-      maxFiles: 10,
+      maxFiles: options.reupload ? 1 : 10,
       cropping: false,
-      multiple: true,
+      multiple: !options.reupload,
       compressImageQuality: 1
     })
       .then((response) =>
@@ -259,29 +259,80 @@ const pick = async (options: PickerOptions) => {
   }
 };
 
+const compressImageResponse = async (image: Image, isPng: boolean) => {
+  const compressedPath = await compressToFile(
+    Platform.OS === "ios" ? "file://" + image.path : image.path,
+    isPng ? "PNG" : "JPEG"
+  );
+
+  const stat = await RNFetchBlob.fs.stat(compressedPath.replace("file://", ""));
+  return {
+    path:
+      Platform.OS === "ios"
+        ? compressedPath.replace("file://", "")
+        : compressedPath,
+    size: stat.size
+  };
+};
+
 const handleImageResponse = async (
   response: Image[],
   options: PickerOptions
 ) => {
   const isNewNote = options.noteId === undefined;
-  const result = await AttachImage.present(response, options.context);
-
-  if (!result) return;
-  const compress = result.compress;
+  // attachFile mutates options.reupload, so capture the caller's value first.
+  const isReupload = options.reupload;
+  let compress = false;
+  if (!isReupload) {
+    const result = await AttachImage.present(response, options.context);
+    if (!result) return;
+    compress = result.compress;
+  }
 
   for (const image of response) {
     const isPng = /(png)/g.test(image.mime);
     const isJpeg = /(jpeg|jpg)/g.test(image.mime);
     if (compress && (isPng || isJpeg)) {
-      image.path = await compressToFile(
-        Platform.OS === "ios" ? "file://" + image.path : image.path,
-        isPng ? "PNG" : "JPEG"
-      );
-
-      const stat = await RNFetchBlob.fs.stat(image.path.replace("file://", ""));
-      image.size = stat.size;
-      image.path =
-        Platform.OS === "ios" ? image.path.replace("file://", "") : image.path;
+      Object.assign(image, await compressImageResponse(image, isPng));
+    } else if (isReupload && options.hash && (isPng || isJpeg)) {
+      // The image may have been compressed when it was first attached, so
+      // try the original and the compressed version against the expected hash.
+      // compressToFile deletes its input, so compress a copy to keep the original.
+      let copyPath: string | undefined;
+      try {
+        const originalHash = await Sodium.hashFile({
+          uri: decodeURI(image.path),
+          type: "url"
+        });
+        if (originalHash !== options.hash) {
+          const originalPath = decodeURI(image.path).replace("file://", "");
+          copyPath = `${dirname(originalPath)}/reupload-${Date.now()}${extname(originalPath)}`;
+          await RNFetchBlob.fs.cp(originalPath, copyPath);
+          const compressed = await compressImageResponse(
+            {
+              ...image,
+              path: image.path.startsWith("file://")
+                ? "file://" + copyPath
+                : copyPath
+            },
+            isPng
+          );
+          const compressedUri = decodeURI(compressed.path);
+          const compressedHash = await Sodium.hashFile({
+            uri: compressedUri,
+            type: "url"
+          });
+          if (compressedHash === options.hash) {
+            Object.assign(image, compressed);
+            RNFetchBlob.fs.unlink(originalPath).catch(() => {});
+          } else {
+            RNFetchBlob.fs.unlink(compressedUri).catch(() => {});
+          }
+        }
+      } catch (e) {
+        if (copyPath) RNFetchBlob.fs.unlink(copyPath).catch(() => {});
+        DatabaseLogger.error(e as Error);
+      }
     }
 
     const featureResult = await isFeatureAvailable("fileSize", image.size || 0);
@@ -364,6 +415,7 @@ export async function attachFile(
     if (options?.hash && options.hash !== hash) {
       ToastManager.show({
         heading: strings.fileMismatch(),
+        message: strings.reuploadFileMismatch(),
         type: "error",
         context: "local"
       });

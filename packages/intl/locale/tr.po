@@ -8072,6 +8072,10 @@ msgstr "Hatırlatıcı {date} tarihinde {time} saatinde başlayacak."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "Uygulamanın kilidini açmak için güvenlik anahtarı. Bu en güvenli yöntemdir."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "Seçilen dosya orijinal ekle eşleşmiyor. Lütfen aynı dosyayı seçin."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "Verdiğiniz adres ({url}) {server} sunucusuna işaret etmiyor."

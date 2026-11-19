@@ -8072,6 +8072,10 @@ msgstr "The reminder will start on {date} at {time}."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "The security key for unlocking the app. This is the most secure method."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "The selected file doesn't match the original attachment. Please select the same file."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "The URL you have given ({url}) does not point to the {server}."
