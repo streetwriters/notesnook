@@ -30,7 +30,24 @@ export type QueryResults = {
   editable: boolean;
   textDirection: TextDirections;
   search: SearchInfo;
+  can: boolean;
+  selection: SelectionInfo;
+  history: HistoryInfo;
+  anchor: AnchorRect | null;
+  focused: boolean;
 };
+
+export type SelectionInfo = { from: number; to: number; empty: boolean };
+export type HistoryInfo = { canUndo: boolean; canRedo: boolean };
+/** Viewport coordinates, as returned by coordsAtPos. */
+export type AnchorRect = {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+};
+/** What an anchor query measures: the selection, or the selected node of a type. */
+export type AnchorTarget = "selection" | { node: string | readonly string[] };
 
 export type QueryKind = keyof QueryResults;
 
@@ -60,5 +77,11 @@ export const q = {
     query("selectedNode", type),
   editable: () => query("editable"),
   textDirection: () => query("textDirection"),
-  search: () => query("search")
+  search: () => query("search"),
+  can: (command: string, ...commandArgs: unknown[]) =>
+    query("can", command, ...commandArgs),
+  selection: () => query("selection"),
+  history: () => query("history"),
+  anchor: (target: AnchorTarget = "selection") => query("anchor", target),
+  focused: () => query("focused")
 };

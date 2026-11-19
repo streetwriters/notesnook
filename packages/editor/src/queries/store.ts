@@ -17,12 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import type { Editor } from "@tiptap/core";
+import { findParentNode, type Editor } from "@tiptap/core";
 import type { Editor as NotesnookEditor } from "../types.js";
 import { findSelectedNode } from "../utils/prosemirror.js";
 import { getTextDirection } from "../extensions/text-direction/text-direction.js";
 import type { SearchStorage } from "../extensions/search-replace/index.js";
-import type { Query, QueryKind, QueryResults } from "./queries.js";
+import type {
+  AnchorRect,
+  AnchorTarget,
+  Query,
+  QueryKind,
+  QueryResults
+} from "./queries.js";
 
 export type QueryStore = {
   read<K extends QueryKind>(query: Query<K>): QueryResults[K] | undefined;
@@ -76,7 +82,17 @@ function createQueryStore(editor: Editor): QueryStore {
 
   return {
     read<K extends QueryKind>(query: Query<K>) {
-      return entry(query).value as QueryResults[K] | undefined;
+      const current = entry(query);
+      if (!current.listeners.size) {
+        // not kept fresh by refresh(): evaluate on demand
+        const value = evaluate(editor, query);
+        const encoded = JSON.stringify(value);
+        if (encoded !== current.encoded) {
+          current.value = value;
+          current.encoded = encoded;
+        }
+      }
+      return current.value as QueryResults[K] | undefined;
     },
     subscribe(query, listener) {
       const current = entry(query);
@@ -120,8 +136,71 @@ function evaluate(editor: Editor, query: Query): unknown {
           selectedIndex: storage?.selectedIndex ?? 0
         };
       }
+      case "can": {
+        const fn = (
+          editor.can() as unknown as Record<
+            string,
+            ((...args: unknown[]) => boolean) | undefined
+          >
+        )[String(name)];
+        return fn ? !!fn(...query.args.slice(1)) : false;
+      }
+      case "selection": {
+        const { from, to, empty } = editor.state.selection;
+        return { from, to, empty };
+      }
+      case "history": {
+        const can = editor.can() as unknown as Record<
+          string,
+          (() => boolean) | undefined
+        >;
+        return { canUndo: !!can.undo?.(), canRedo: !!can.redo?.() };
+      }
+      case "anchor":
+        return anchorRect(editor, query.args[0] as AnchorTarget);
+      case "focused":
+        return editor.isFocused;
     }
   } catch {
     return undefined;
   }
+}
+
+function anchorRect(editor: Editor, target: AnchorTarget): AnchorRect | null {
+  const { selection } = editor.state;
+  let from = selection.from;
+  let to = selection.to;
+  if (target !== "selection") {
+    const types = Array.isArray(target.node) ? target.node : [target.node];
+    const found = types
+      .map((type) => selectedNodeRange(editor, type))
+      .find((range) => range);
+    if (!found) return null;
+    [from, to] = found;
+  }
+  const start = editor.view.coordsAtPos(from);
+  const end = from === to ? start : editor.view.coordsAtPos(to, -1);
+  return {
+    top: Math.min(start.top, end.top),
+    left: Math.min(start.left, end.left),
+    right: Math.max(start.right, end.right),
+    bottom: Math.max(start.bottom, end.bottom)
+  };
+}
+
+function selectedNodeRange(
+  editor: Editor,
+  type: string
+): [number, number] | undefined {
+  const { doc, selection } = editor.state;
+  const { $anchor } = selection;
+  const at = doc.nodeAt($anchor.pos);
+  const pos =
+    at?.type.name === type
+      ? $anchor.pos
+      : findParentNode((node) => node.type.name === type)(selection)?.pos;
+  if (pos === undefined) return;
+  const node = doc.nodeAt(pos);
+  if (!node) return;
+  return [pos, Math.max(pos, pos + node.nodeSize - 1)];
 }
