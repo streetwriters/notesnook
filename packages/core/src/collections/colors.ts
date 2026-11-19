@@ -41,7 +41,6 @@ export class Colors implements ICollection {
   constructor(private readonly db: Database) {
     this.collection = new SQLCollection(
       db.sql,
-      db.transaction,
       "colors",
       db.eventManager,
       db.sanitizer
@@ -117,9 +116,9 @@ export class Colors implements ICollection {
   }
 
   async remove(...ids: string[]) {
-    await this.db.transaction(async () => {
-      await this.db.relations.unlinkOfType("color", ids);
-      await this.collection.softDelete(ids);
+    await this.db.transaction(async (tx) => {
+      await tx.relations.unlinkOfType("color", ids);
+      await tx.colors.collection.softDelete(ids);
     });
   }
 
