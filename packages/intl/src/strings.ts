@@ -3283,5 +3283,7 @@ Continue without attachments?`,
     type === "full"
       ? t`Last full backup: ${date}`
       : t`Last partial backup: ${date}`,
-  issueDescriptionRequired: () => t`Description is required`
+  issueDescriptionRequired: () => t`Description is required`,
+  reuploadFileMismatch: () =>
+    t`The selected file doesn't match the original attachment. Please select the same file.`
 };

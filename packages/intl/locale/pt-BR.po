@@ -8072,6 +8072,10 @@ msgstr "O lembrete começará em {date} às {time}."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "A chave de segurança para desbloquear o app. Este é o método mais seguro."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "O arquivo selecionado não corresponde ao anexo original. Selecione o mesmo arquivo."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "A URL que você informou ({url}) não aponta para o {server}."

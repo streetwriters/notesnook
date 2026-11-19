@@ -8072,6 +8072,10 @@ msgstr "Le rappel commencera le {date} à {time}."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "La clé de sécurité pour déverrouiller l'application. Il s'agit de la méthode la plus sûre."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "Le fichier sélectionné ne correspond pas à la pièce jointe d'origine. Veuillez sélectionner le même fichier."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "L'URL que vous avez indiquée ({url}) ne pointe pas vers le {server}."

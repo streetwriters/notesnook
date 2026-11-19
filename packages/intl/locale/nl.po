@@ -8072,6 +8072,10 @@ msgstr "De herinnering start op {date} om {time}."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "De beveiligingssleutel om de app te ontgrendelen. Dit is de veiligste methode."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "Het geselecteerde bestand komt niet overeen met de oorspronkelijke bijlage. Selecteer hetzelfde bestand."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "De URL die je hebt opgegeven ({url}) verwijst niet naar de {server}."

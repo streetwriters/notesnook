@@ -8072,6 +8072,10 @@ msgstr "Напоминание начнётся {date} в {time}."
 msgid "The security key for unlocking the app. This is the most secure method."
 msgstr "Ключ безопасности для разблокировки приложения. Это самый надёжный метод."
 
+#: src/strings.ts:3288
+msgid "The selected file doesn't match the original attachment. Please select the same file."
+msgstr "Выбранный файл не совпадает с исходным вложением. Выберите тот же файл."
+
 #: src/strings.ts:1522
 msgid "The URL you have given ({url}) does not point to the {server}."
 msgstr "Указанный вами URL ({url}) не указывает на {server}."
