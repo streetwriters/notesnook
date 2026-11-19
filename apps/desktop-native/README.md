@@ -87,7 +87,8 @@ Run these from `apps/desktop-native`:
 # start Metro only
 npm start
 
-# type check
+# type check (in a fresh checkout, use `npm run tx desktop-native:tsc`
+# from the repo root: it builds the shared @notesnook/* packages first)
 npm run tsc
 
 # remove the native build output
@@ -140,6 +141,10 @@ Unit tests, from `apps/desktop-native`:
 ```bash
 npm run test:unit
 ```
+
+In a fresh checkout, run `npm run test:unit:desktop-native` (or
+`npm run tx desktop-native:test:unit`) from the repo root instead: it builds
+the shared `@notesnook/*` packages first.
 
 ## Packaging
 
