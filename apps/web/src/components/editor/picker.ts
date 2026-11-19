@@ -30,6 +30,7 @@ import {
 import { checkFeature } from "../../common";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { strings } from "@notesnook/intl";
+import { compressImageFile } from "../../utils/image-compressor";
 import Queue from "p-queue";
 
 export async function insertAttachments(
@@ -72,11 +73,32 @@ export async function reuploadAttachment(
   };
 
   if (selectedFile.type.startsWith("image/")) {
-    const image = await pickImage(selectedFile, options);
+    // The image may have been compressed when it was first attached, so
+    // try the original and the compressed version against the expected hash.
+    let fileToUse = selectedFile;
+    try {
+      if ((await hashFile(selectedFile)) !== expectedFileHash) {
+        const compressed = await compressImageFile(selectedFile);
+        if ((await hashFile(compressed)) === expectedFileHash)
+          fileToUse = compressed;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    const image = await pickImage(fileToUse, options);
     if (!image) return;
   } else {
     const file = await pickFile(selectedFile, options);
     if (!file) return;
+  }
+}
+
+async function hashFile(file: File) {
+  const reader = file.stream().getReader();
+  try {
+    return (await hashStream(reader)).hash;
+  } finally {
+    reader.releaseLock();
   }
 }
 
@@ -202,10 +224,12 @@ async function addAttachment(
   const { hash, type: hashType } = await hashStream(reader);
   reader.releaseLock();
 
-  if (expectedFileHash && hash !== expectedFileHash)
-    throw new Error(
-      `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
+  if (expectedFileHash && hash !== expectedFileHash) {
+    console.error(
+      `File mismatch while reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
     );
+    throw new Error(strings.reuploadFileMismatch());
+  }
 
   const exists = await db.attachments.attachment(hash);
   if (!forceWrite && exists) {
