@@ -1,0 +1,102 @@
+name: Editor oracles
+
+# Runs the native editor's DOM and real-notes oracles against this checkout's
+# `packages/editor` (Tiptap schema). The oracles live in
+# streetwriters/native-editor (`tests/*.json`, `scripts/_*-oracle.mjs`). A
+# schema change on the web side changes what the engine built from
+# `packages/editor` parses, so the regenerated oracle no longer matches the
+# committed one and this job fails with a diff.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+      - "desktop-native"
+    paths:
+      - "packages/editor/**"
+      # the real-notes corpus is extracted from these core fixtures
+      - "packages/core/src/content-types/__tests__/tiptap.test.js"
+      - "packages/core/__tests__/utils/index.ts"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/editor.oracles.yml"
+  pull_request:
+    branches:
+      - "master"
+      - "desktop-native"
+    paths:
+      - "packages/editor/**"
+      - "packages/core/src/content-types/__tests__/tiptap.test.js"
+      - "packages/core/__tests__/utils/index.ts"
+      - ".github/workflows/editor.oracles.yml"
+    types:
+      - "ready_for_review"
+      - "opened"
+      - "synchronize"
+      - "reopened"
+
+env:
+  NOTESNOOK_REPO_ROOT: ${{ github.workspace }}
+
+jobs:
+  oracles:
+    name: Oracles (Tiptap schema)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout notesnook
+        uses: actions/checkout@v5
+
+      - name: Checkout native-editor (owns the oracles)
+        uses: actions/checkout@v5
+        with:
+          repository: streetwriters/native-editor
+          ref: main
+          path: native-editor
+
+      - name: Setup Node
+        uses: ./.github/actions/setup-node-with-cache
+
+      - name: Install packages
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=editor
+
+      - name: Install native-editor
+        working-directory: native-editor
+        run: npm ci
+
+      - name: Engine smoke test and corpus round trip
+        working-directory: native-editor
+        run: |
+          node scripts/smoke-engine.mjs
+          node scripts/html-bridge.mjs
+
+      - name: Real-notes corpus is unchanged
+        working-directory: native-editor
+        run: |
+          node scripts/_extract-real-notes.mjs "$RUNNER_TEMP/real-notes.json"
+          if ! diff -u tests/real-notes.json "$RUNNER_TEMP/real-notes.json"; then
+            echo "::error::the real-notes corpus extracted from packages/core fixtures differs from native-editor/tests/real-notes.json"
+            exit 1
+          fi
+
+      - name: DOM oracle matches
+        working-directory: native-editor
+        run: |
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium-browser || command -v chromium)"
+          node scripts/_chromium-oracle.mjs "$RUNNER_TEMP/dom-oracle.json" tests/dom-oracle.json
+          if ! diff -u tests/dom-oracle.json "$RUNNER_TEMP/dom-oracle.json"; then
+            echo "::error::the Tiptap schema in packages/editor no longer parses the DOM corpus as native-editor/tests/dom-oracle.json expects. Regenerate the oracle and update the native engine in the same change."
+            exit 1
+          fi
+
+      - name: Real-notes oracle matches
+        working-directory: native-editor
+        run: |
+          export CHROME_BIN="$(command -v google-chrome || command -v chromium-browser || command -v chromium)"
+          node scripts/_chromium-oracle.mjs "$RUNNER_TEMP/real-notes-oracle.json" tests/real-notes.json
+          if ! diff -u tests/real-notes-oracle.json "$RUNNER_TEMP/real-notes-oracle.json"; then
+            echo "::error::the Tiptap schema in packages/editor no longer parses the real notes as native-editor/tests/real-notes-oracle.json expects. Regenerate the oracle and update the native engine in the same change."
+            exit 1
+          fi
