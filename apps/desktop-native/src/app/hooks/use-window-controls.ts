@@ -16,32 +16,5 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-import { useEffect, useState } from "react";
-import { environment, windowControls } from "@platform";
-import { getPlatform } from "../utils/platform";
 
-export function useWindowControls() {
-  const [isMaximized, setIsMaximized] = useState<boolean>();
-  const [isFullscreen, setIsFullscreen] = useState<boolean>();
-
-  useEffect(() => {
-    windowControls.getState().then((state) => {
-      setIsMaximized(state.maximized);
-      setIsFullscreen(state.fullscreen);
-    });
-    return windowControls.onStateChanged((state) => {
-      setIsMaximized(state.maximized);
-      setIsFullscreen(state.fullscreen);
-    });
-  }, []);
-
-  return {
-    isMaximized,
-    isFullscreen,
-    hasNativeWindowControls:
-      !environment.isDesktopApp ||
-      environment.hasNativeTitlebar ||
-      getPlatform() === "macOS" ||
-      getPlatform() === "Windows"
-  };
-}
+export * from "@notesnook/ui-kit/shared/use-window-controls";

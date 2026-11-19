@@ -17,16 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { AvatarEditor, DragGhostHost, PdfViewer, WebView } from "./embeds";
-export { Dialog, DialogButton } from "./dialog";
-export * from "./hooks";
-export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
-export { TITLE_BAR_HEIGHT, TitleBar } from "./layout";
-export { VirtualList } from "./lists";
-export { SortableList } from "./sortable-list";
-export { Popover, PopoverHost } from "./popover";
-export { showToast, ToastHost } from "./toast";
-export * from "./primitives";
+// The `@ui` implementation lives in packages/ui/src/kit. Only the editor surface
+// stays here: it imports `apps/web`'s editor, which the kit must not depend on.
+export * from "@notesnook/ui-kit/web";
 export { EditorSurface } from "./editor";
-export { WebThemeProvider, ThemeScope } from "./theme";
-export { dataColor } from "../../../shared/style/data-color";

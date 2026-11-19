@@ -17,22 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export { AvatarEditor } from "./avatar-editor";
-export { Dialog, DialogButton } from "./dialog";
-export { DragGhostHost } from "./drag-ghost";
-export * from "./hooks";
-export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
-export { VirtualList } from "./lists";
-export { SortableList } from "./sortable-list";
-export * from "./overlays";
-export * from "./primitives";
-export { ColorPicker } from "./color-picker";
-export { Popover, PopoverHost } from "./popover";
-export { QRCode } from "./qrcode";
-export { Select } from "./select";
-export { WebView } from "./webview";
-export { PdfViewer } from "./pdf";
+// The `@ui` implementation lives in packages/ui/src/kit. Only the editor surface
+// stays here: it is wired to the app's editor, not to the shared kit.
+export * from "@notesnook/ui-kit/desktop";
 export { EditorSurface } from "./editor";
-export { DesktopThemeProvider, ThemeScope } from "./theme";
-export { dataColor } from "../../../shared/style/data-color";
-export { TITLE_BAR_HEIGHT, TitleBar } from "./title-bar";

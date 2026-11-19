@@ -24,9 +24,9 @@ import {
   useMemo,
   useRef
 } from "react";
-import type * as Contract from "../../../ui/editor";
-import type { UIElement } from "../../../ui/primitives";
-import { Flex } from "./primitives";
+import type * as Contract from "@notesnook/ui-kit/contracts/editor";
+import type { UIElement } from "@notesnook/ui-kit/contracts/primitives";
+import { Flex } from "@notesnook/ui-kit/desktop/primitives";
 
 export const EditorSurface = forwardRef<
   Contract.EditorHandle,

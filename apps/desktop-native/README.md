@@ -130,9 +130,10 @@ npm run clean:build
 Top-level directories in `apps/desktop-native/`:
 
 - `src/app/`: the app itself, shared by every target (`views`, `dialogs`, `components`, `stores`, `navigation`, etc.)
-- `src/ui/` and `src/platform/`: the contracts the app is written against, for UI primitives and for platform services (files, database, crypto, clipboard and so on)
-- `src/targets/desktop/`: the desktop implementation of those contracts
-- `src/targets/web/`: the web implementation of the same contracts
+- `src/platform/`: the contracts for platform services (files, database, crypto, clipboard and so on)
+- `../../packages/ui/src/kit/`: the `@ui` contracts (`contracts`), their desktop and web implementations (`desktop`, `web`) and the code both share (`shared`). Source only, imported as `@notesnook/ui-kit/*`; the web build fails if `web` or `shared` imports a react-native package
+- `src/targets/desktop/`: the desktop implementation of `@platform`, and `ui/`, which re-exports the kit's desktop implementation plus the app's `EditorSurface`
+- `src/targets/web/`: the same for the web target
 - `desktop/`: the native project: `desktop.json` (window, identifier, packaging), the Rust entry point, assets and the end-to-end tests in `desktop/e2e/`
 - `tools/`: asset and icon generators, the visual parity tools and performance scripts
 

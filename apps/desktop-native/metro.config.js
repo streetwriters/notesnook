@@ -6,9 +6,11 @@ const { makeMetroConfig } = require("@react-native-gpui/core/metro.config");
 const base = makeMetroConfig({ projectRoot: __dirname });
 const packagesDir = path.resolve(__dirname, "../../packages");
 const target = path.join(__dirname, "src/targets/desktop");
+const uiKit = path.resolve(packagesDir, "ui/src/kit");
 const targetAliases = {
   "@ui": path.join(target, "ui"),
-  "@platform": path.join(target, "platform")
+  "@platform": path.join(target, "platform"),
+  "@notesnook/ui-kit": uiKit
 };
 
 const pdfModuleRoot = path.dirname(

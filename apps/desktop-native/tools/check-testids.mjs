@@ -15,7 +15,13 @@ function walk(dir, filter, out = []) {
   return out;
 }
 
-const sources = walk(path.join(root, "src"), (f) => /\.(ts|tsx)$/.test(f))
+const sources = [
+  ...walk(path.join(root, "src"), (f) => /\.(ts|tsx)$/.test(f)),
+  ...walk(
+    path.join(root, "../../packages/ui/src/kit"),
+    (f) => /\.(ts|tsx)$/.test(f)
+  )
+]
   .map((f) => fs.readFileSync(f, "utf8"))
   .join("\n");
 

@@ -18,35 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import fs, { dialog } from "@react-native-gpui/fs";
-import type { Files, PickedFile, WritableFile } from "../../../platform";
+import type { Files, WritableFile } from "../../../platform";
+import { toPickedFile } from "@notesnook/ui-kit/desktop/picked-file";
 import { integration } from "./integration";
 
-const MIME_TYPES: Record<string, string> = {
-  json: "application/json",
-  txt: "text/plain",
-  md: "text/markdown",
-  html: "text/html",
-  zip: "application/zip",
-  nnbackup: "application/octet-stream",
-  nnbackupz: "application/octet-stream"
-};
-
-function nameOf(path: string) {
-  return path.split(/[\\/]/).pop() ?? path;
-}
-
-export function toPickedFile(path: string, size: number): PickedFile {
-  const name = nameOf(path);
-  const extension = name.includes(".") ? name.split(".").pop()! : "";
-  return {
-    name,
-    size,
-    type: MIME_TYPES[extension.toLowerCase()] ?? "application/octet-stream",
-    uri: `file://${path}`,
-    text: () => fs.promises.readFile(path, "utf8") as Promise<string>,
-    bytes: async () => new Uint8Array(await fs.promises.readFile(path))
-  };
-}
+export { toPickedFile };
 
 function parseAccept(accept: string) {
   const extensions = accept

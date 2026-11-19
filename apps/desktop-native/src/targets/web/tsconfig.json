@@ -8,12 +8,13 @@
     "paths": {
       "@notesnook/editor": ["../../packages/editor/dist/types/index.d.ts"],
       "@notesnook/editor/styles/*": ["../../packages/editor/dist/styles/*"],
-      "@ui": ["./src/ui/index.ts"],
-      "@ui/*": ["./src/ui/*"],
+      "@ui": ["../../packages/ui/src/kit/contracts/index.ts"],
+      "@ui/*": ["../../packages/ui/src/kit/contracts/*"],
+      "@notesnook/ui-kit/*": ["../../packages/ui/src/kit/*"],
       "@platform": ["./src/platform/index.ts"],
       "@platform/*": ["./src/platform/*"]
     }
   },
-  "include": ["./**/*", "../../ui", "../../platform"],
+  "include": ["./**/*", "../../platform"],
   "exclude": []
 }

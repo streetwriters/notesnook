@@ -17,44 +17,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useRef } from "react";
-import { keyboard } from "@platform";
-
-const stack: Array<{ current: () => void }> = [];
-let unsubscribe: (() => void) | undefined;
-
-function attach() {
-  if (unsubscribe) return;
-  unsubscribe = keyboard.register(
-    ["escape"],
-    (event) => {
-      const top = stack[stack.length - 1];
-      if (!top) return;
-      event.preventDefault();
-      top.current();
-    },
-    { allowInTextInput: true }
-  );
-}
-
-function detach() {
-  if (stack.length > 0) return;
-  unsubscribe?.();
-  unsubscribe = undefined;
-}
-
-export function useEscape(handler: (() => void) | undefined, active = true) {
-  const ref = useRef<() => void>(() => {});
-  ref.current = () => handler?.();
-  useEffect(() => {
-    if (!active || !handler) return;
-    stack.push(ref);
-    attach();
-    return () => {
-      const index = stack.indexOf(ref);
-      if (index >= 0) stack.splice(index, 1);
-      detach();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, !!handler]);
-}
+export * from "@notesnook/ui-kit/shared/use-escape";

@@ -28,11 +28,11 @@ import {
   useState
 } from "react";
 import { EmotionThemeProvider, useThemeEngineStore } from "@notesnook/theme";
-import { useThemeContext } from "./theme";
+import { useThemeContext } from "@notesnook/ui-kit/web/theme";
 import Tiptap from "web-app-editor/tiptap";
 import type { IEditor } from "web-app-editor/types";
 import { useEditorManager } from "web-app-editor/manager";
-import type * as Contract from "../../../ui/editor";
+import type * as Contract from "@notesnook/ui-kit/contracts/editor";
 import { toPickedFile } from "../platform/files";
 
 export const EditorSurface = forwardRef<

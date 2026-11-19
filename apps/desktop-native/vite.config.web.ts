@@ -25,6 +25,8 @@ const root = __dirname;
 const webTarget = path.join(root, "src/targets/web");
 const desktopTarget = path.join(root, "src/targets/desktop");
 const webApp = path.join(root, "../web/src");
+const uiKit = path.join(root, "../../packages/ui/src/kit");
+const uiKitDesktop = path.join(uiKit, "desktop");
 
 function sharedWebAppDependencies(): Plugin {
   return {
@@ -33,7 +35,10 @@ function sharedWebAppDependencies(): Plugin {
     async resolveId(source, importer, options) {
       if (
         !importer ||
-        !importer.startsWith(webApp + path.sep) ||
+        !(
+          importer.startsWith(webApp + path.sep) ||
+          importer.startsWith(uiKit + path.sep)
+        ) ||
         source.startsWith(".") ||
         source.startsWith("/") ||
         source.includes("?")
@@ -58,10 +63,23 @@ function notImplementedOnWeb(): Plugin {
   return {
     name: "nn-not-implemented-on-web",
     enforce: "pre",
-    resolveId(source) {
-      if (source.startsWith("@react-native-gpui/") || source === "react-native")
-        return prefix + source;
-      return null;
+    resolveId(source, importer) {
+      const native =
+        source.startsWith("@react-native-gpui/") ||
+        source.startsWith("@react-native/") ||
+        source === "react-native" ||
+        source.startsWith("react-native/") ||
+        source.startsWith("react-native-");
+      if (!native) return null;
+      if (
+        importer &&
+        (importer.startsWith(uiKit + path.sep) ||
+          importer.startsWith(path.join(webTarget, "ui") + path.sep))
+      )
+        throw new Error(
+          `The web ui must not import react-native packages: "${source}" from ${importer}.`
+        );
+      return prefix + source;
     },
     load(id) {
       if (!id.startsWith(prefix)) return null;
@@ -121,9 +139,13 @@ function noDesktopFallback(): Plugin {
         ...options,
         skipSelf: true
       });
-      if (resolved && resolved.id.startsWith(desktopTarget + path.sep))
+      if (
+        resolved &&
+        (resolved.id.startsWith(desktopTarget + path.sep) ||
+          resolved.id.startsWith(uiKitDesktop + path.sep))
+      )
         throw new Error(
-          `The web build must not import the desktop target: "${source}" from ${importer} resolved to ${resolved.id}. Implement it in src/targets/web or stub it there.`
+          `The web build must not import the desktop target: "${source}" from ${importer} resolved to ${resolved.id}. Implement it in src/targets/web or packages/ui/src/kit/web, or stub it there.`
         );
       return null;
     }
@@ -168,6 +190,7 @@ export default defineConfig({
         replacement: path.join(root, "../../packages/ui/dist/index.mjs")
       },
       { find: /^@ui$/, replacement: path.join(webTarget, "ui/index.ts") },
+      { find: /^@notesnook\/ui-kit\/(.*)$/, replacement: path.join(uiKit, "$1") },
       { find: /^@platform$/, replacement: path.join(webTarget, "platform/index.ts") },
       {
         find: /^@notesnook\/desktop$/,

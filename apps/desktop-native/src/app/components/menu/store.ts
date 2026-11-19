@@ -17,28 +17,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { create } from "zustand";
-import type { MenuItem } from "@ui";
-
-export type MenuAnchor = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-type MenuState = {
-  items: MenuItem[] | undefined;
-  anchor: MenuAnchor | undefined;
-  title: string | undefined;
-  open: (items: MenuItem[], anchor: MenuAnchor, title?: string) => void;
-  close: () => void;
-};
-
-export const useMenuStore = create<MenuState>((set) => ({
-  items: undefined,
-  anchor: undefined,
-  title: undefined,
-  open: (items, anchor, title) => set({ items, anchor, title }),
-  close: () => set({ items: undefined, anchor: undefined, title: undefined })
-}));
+export * from "@notesnook/ui-kit/shared/menu-store";

@@ -8,10 +8,13 @@
     ],
     "paths": {
       "@ui": [
-        "./src/ui/index.ts"
+        "../../packages/ui/src/kit/contracts/index.ts"
       ],
       "@ui/*": [
-        "./src/ui/*"
+        "../../packages/ui/src/kit/contracts/*"
+      ],
+      "@notesnook/ui-kit/*": [
+        "../../packages/ui/src/kit/*"
       ],
       "@platform": [
         "./src/platform/index.ts"
@@ -23,6 +26,9 @@
   },
   "include": [
     "src",
+    "../../packages/ui/src/kit/contracts",
+    "../../packages/ui/src/kit/desktop",
+    "../../packages/ui/src/kit/shared",
     "index.js",
     "react-native-gpui-env.d.ts"
   ],
