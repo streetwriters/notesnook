@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use editor_core::view::element::{AttachmentData, EditorEvent, EditorQuery, RichTextView};
 use editor_core::Engine;
-use gpui::{div, prelude::*, AnyElement, App, AppContext as _, Entity, Subscription, Window};
+use gpui::{div, prelude::*, AnyElement, App, Entity, Subscription, Window};
 use serde_json::Value;
 
 const SAVE_DELAY: Duration = Duration::from_millis(500);

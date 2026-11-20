@@ -19,4 +19,7 @@ serde_json = "1"
 editor-core = { git = "https://github.com/streetwriters/native-editor", branch = "main" }
 host-quickjs = { git = "https://github.com/streetwriters/native-editor", branch = "main" }
 
+[features]
+runtime-shaders = ["react-native-gpui/runtime-shaders"]
+
 [workspace]
