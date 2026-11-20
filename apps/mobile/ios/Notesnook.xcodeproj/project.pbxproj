@@ -18,6 +18,7 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
 		2E4BF736C2EB268ED3FD9C29 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B5216B66C0B4A91C0A69128B /* PrivacyInfo.xcprivacy */; };
+		2EA746AB1E04457B6AB0B7DF /* NotesListWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB6813863E01777CAFF108 /* NotesListWidget.swift */; };
 		543E4A8A0C7887D72387D34C /* libPods-Notesnook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C89265087EBE8B605EC6DBC0 /* libPods-Notesnook.a */; };
 		6510E6D72877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
@@ -172,6 +173,7 @@
 		A84F3F0D50641D1CD4569B0E /* Pods-Make Note.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Make Note.release.xcconfig"; path = "Target Support Files/Pods-Make Note/Pods-Make Note.release.xcconfig"; sourceTree = "<group>"; };
 		B19AAA9CACB1754C05248356 /* NNWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Notesnook/NNWidgets.swift; sourceTree = "<group>"; };
 		B5216B66C0B4A91C0A69128B /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Notesnook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B5EB6813863E01777CAFF108 /* NotesListWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotesListWidget.swift; sourceTree = "<group>"; };
 		B9989E5C777BB11343A62D09 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-NotesnookTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BD4A843B4663E643B07CD573 /* NNWidgets.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = Notesnook/NNWidgets.m; sourceTree = "<group>"; };
 		BF45C11F78FEADC75628EDE1 /* libPods-NotesWidgetExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotesWidgetExtension.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -386,6 +388,7 @@
 				ED1BE8A2F659ED7186EC2997 /* NotePreviewWidget.swift */,
 				E6C09846F7AC87C24B16518B /* QuickNoteWidget.swift */,
 				24E22CA9203FE4A6B4879E21 /* RemindersWidget.swift */,
+				B5EB6813863E01777CAFF108 /* NotesListWidget.swift */,
 			);
 			name = Widgets;
 			path = Widgets;
@@ -1003,6 +1006,7 @@
 				BD58E91E6828153E8ACAAB68 /* RemindersWidget.swift in Sources */,
 				9B0A96262908CB873EFEF38C /* WidgetKeys.swift in Sources */,
 				99E64072E5359DFC7DC7ADA6 /* WidgetBlocksView.swift in Sources */,
+				2EA746AB1E04457B6AB0B7DF /* NotesListWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

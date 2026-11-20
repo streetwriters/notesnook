@@ -1,4 +1,3 @@
-
 import SwiftUI
 import WidgetKit
 
@@ -9,6 +8,7 @@ struct NotesWidgetBundle: WidgetBundle {
     QuickNoteWidget()
     RemindersWidget()
     if #available(iOS 17.0, *) {
+      NotesListWidget()
       NotePreviewWidget()
     }
   }
