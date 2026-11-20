@@ -42,10 +42,21 @@ function getStorage() {
 function getLocalizedStrings() {
   return {
     quickNote: strings.quickNoteTitle(),
+    addQuickNote: strings.addQuickNote(),
+    noNotes: strings.emptyPlaceholders("note"),
     reminders: strings.reminders(),
+    noReminders: strings.tapToAddReminder(),
     untitled: strings.untitledNote(),
+    chooseNoteBody: strings.tapToPickWidgetNote(),
+    lockedNote: strings.noteLocked(),
     ongoing: strings.ongoing(),
-    snoozedUntil: strings.snoozedUntil("%@")
+    snoozedUntil: strings.snoozedUntil("%@"),
+    today: strings.reminderToday("%@"),
+    tomorrow: strings.reminderTomorrow("%@"),
+    yesterday: strings.reminderYesterday("%@"),
+    upcoming: strings.reminderUpcoming("%@"),
+    last: strings.reminderLast("%@"),
+    moreCount: strings.moreCount("%d")
   };
 }
 
