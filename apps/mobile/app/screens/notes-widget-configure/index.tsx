@@ -169,7 +169,7 @@ export const NotesWidgetConfigure = () => {
   return (
     <NotesSourcePicker
       onSelect={(source) => {
-        NotesWidget.configure(NotesnookModule.getWidgetId() as any, source);
+        NotesWidget.configure(NotesnookModule.getWidgetId(), source);
         setTimeout(() => NotesnookModule.saveAndFinish());
       }}
       onCancel={() => NotesnookModule.cancelAndFinish()}

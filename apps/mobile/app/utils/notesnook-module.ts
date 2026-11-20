@@ -35,7 +35,7 @@ interface NotesnookModuleInterface {
   getString: (storeName: string, key: string) => Promise<string>;
   removeString: (key: string) => void;
   cancelAndFinish: () => void;
-  getWidgetId: () => void;
+  getWidgetId: () => number;
   getIntent: () => {
     "com.streetwriters.notesnook.OpenNoteId"?: string;
     "com.streetwriters.notesnook.OpenReminderId"?: string;
@@ -79,7 +79,7 @@ export const NotesnookModule: NotesnookModuleInterface = Platform.select({
     setString: () => {},
     removeString: () => {},
     cancelAndFinish: () => {},
-    getWidgetId: () => {},
+    getWidgetId: () => 0,
     getIntent: () => {},
     getWidgetNotes: () => {},
     hasWidgetNote: () => {},
