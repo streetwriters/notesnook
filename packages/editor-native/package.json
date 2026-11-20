@@ -16,6 +16,9 @@
     "type": "components",
     "jsSrcsDir": "src"
   },
+  "devDependencies": {
+    "@react-native-gpui/codegen": "0.87.0-alpha.1"
+  },
   "peerDependencies": {
     "@react-native-gpui/core": ">=0.87.0-alpha.3",
     "react": "*",
