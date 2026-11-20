@@ -166,6 +166,10 @@ msgstr "{count, plural, one {Вкладення # файлу:} few {Вкладе
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgstr "{count, plural, one {Вкладення видалено} few {Видалено # вкладення} many {Видалено # вкладень} other {Видалено # вкладень}}"
 
+#: src/strings.ts:3288
+msgid "{count, plural, one {Backup saved, but # attachment could not be included} other {Backup saved, but # attachments could not be included}}"
+msgstr "{count, plural, one {Резервну копію збережено, але # вкладення не вдалося включити} few {Резервну копію збережено, але # вкладення не вдалося включити} many {Резервну копію збережено, але # вкладень не вдалося включити} other {Резервну копію збережено, але # вкладення не вдалося включити}}"
+
 #: generated/actions.ts:222
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr "{count, plural, one {Колір перейменовано} few {Перейменовано # кольори} many {Перейменовано # кольорів} other {Перейменовано # кольорів}}"

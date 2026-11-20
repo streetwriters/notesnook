@@ -3283,5 +3283,10 @@ Continue without attachments?`,
     type === "full"
       ? t`Last full backup: ${date}`
       : t`Last partial backup: ${date}`,
-  issueDescriptionRequired: () => t`Description is required`
+  issueDescriptionRequired: () => t`Description is required`,
+  backupAttachmentsSkipped: (count: number) =>
+    plural(count, {
+      one: "Backup saved, but # attachment could not be included",
+      other: "Backup saved, but # attachments could not be included"
+    })
 };

@@ -168,6 +168,10 @@ msgstr "{count, plural, one {Załączanie # pliku:} few {Załączanie # plików:
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgstr "{count, plural, one {Usunięto załącznik} few {Usunięto # załączniki} many {Usunięto # załączników} other {Usunięto # załączników}}"
 
+#: src/strings.ts:3288
+msgid "{count, plural, one {Backup saved, but # attachment could not be included} other {Backup saved, but # attachments could not be included}}"
+msgstr "{count, plural, one {Kopia zapasowa zapisana, ale nie udało się dołączyć # załącznika} few {Kopia zapasowa zapisana, ale nie udało się dołączyć # załączników} many {Kopia zapasowa zapisana, ale nie udało się dołączyć # załączników} other {Kopia zapasowa zapisana, ale nie udało się dołączyć # załącznika}}"
+
 #: generated/actions.ts:222
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr "{count, plural, one {Zmieniono nazwę koloru} few {Zmieniono nazwy # kolorów} many {Zmieniono nazwy # kolorów} other {Zmieniono nazwy # kolorów}}"

@@ -166,6 +166,10 @@ msgstr "{count, plural, one {Anexando # arquivo:} other {Anexando # arquivos:}}"
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgstr "{count, plural, one {Anexo excluído} other {# anexos excluídos}}"
 
+#: src/strings.ts:3288
+msgid "{count, plural, one {Backup saved, but # attachment could not be included} other {Backup saved, but # attachments could not be included}}"
+msgstr "{count, plural, one {Backup salvo, mas # anexo não pôde ser incluído} other {Backup salvo, mas # anexos não puderam ser incluídos}}"
+
 #: generated/actions.ts:222
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr "{count, plural, one {Cor renomeada} other {# cores renomeadas}}"

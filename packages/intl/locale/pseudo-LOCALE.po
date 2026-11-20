@@ -166,6 +166,10 @@ msgstr "[{count, plural, one {Àťťȧȧƈħȋȋƞģ # ƒȋȋłḗḗ:} other {�
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgstr "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 
+#: src/strings.ts:3288
+msgid "{count, plural, one {Backup saved, but # attachment could not be included} other {Backup saved, but # attachments could not be included}}"
+msgstr ""
+
 #: generated/actions.ts:222
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr "{count, plural, one {Color renamed} other {# colors renamed}}"
