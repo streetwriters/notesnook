@@ -34,53 +34,6 @@ PODS:
   - MMKV (1.3.14):
     - MMKVCore (~> 1.3.14)
   - MMKVCore (1.3.14)
-  - NitroCloudUploader (1.0.9):
-    - hermes-engine
-    - NitroModules
-    - RCTRequired
-    - RCTTypeSafety
-    - React-callinvoker
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
-  - NitroModules (0.32.0):
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-callinvoker
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - pop (1.0.12)
   - RCT-Folly (2024.11.18.00):
     - RCT-Folly/Default (= 2024.11.18.00)
@@ -1780,7 +1733,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-upload (6.33.0):
+  - react-native-upload (7.0.0-alpha.0):
     - React
   - react-native-view-shot (4.0.3):
     - hermes-engine
@@ -2695,8 +2648,6 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - MMKV
-  - NitroCloudUploader (from `.prebuilt-xcframeworks/.cache/NitroCloudUploader`)
-  - NitroModules (from `.prebuilt-xcframeworks/.cache/NitroModules`)
   - RCT-Folly (from `.prebuilt-xcframeworks/.cache/RCT-Folly`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
@@ -2753,7 +2704,7 @@ DEPENDENCIES:
   - react-native-notification-sounds (from `../node_modules/react-native-notification-sounds`)
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-pdf (from `../node_modules/react-native-pdf`)
-  - react-native-quick-sqlite (from `.prebuilt-xcframeworks/.cache/react-native-quick-sqlite`)
+  - react-native-quick-sqlite (from `../node_modules/react-native-quick-sqlite`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-screenguard (from `../node_modules/react-native-screenguard`)
@@ -2846,10 +2797,6 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2025-09-01-RNv0.82.0-265ef62ff3eb7289d17e366664ac0da82303e101
-  NitroCloudUploader:
-    :path: ".prebuilt-xcframeworks/.cache/NitroCloudUploader"
-  NitroModules:
-    :path: ".prebuilt-xcframeworks/.cache/NitroModules"
   RCT-Folly:
     :path: ".prebuilt-xcframeworks/.cache/RCT-Folly"
   RCTDeprecation:
@@ -2961,7 +2908,7 @@ EXTERNAL SOURCES:
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-quick-sqlite:
-    :path: ".prebuilt-xcframeworks/.cache/react-native-quick-sqlite"
+    :path: "../node_modules/react-native-quick-sqlite"
   react-native-restart:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
@@ -3114,8 +3061,6 @@ SPEC CHECKSUMS:
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
   MMKV: 7b5df6a8bf785c6705cc490c541b9d8a957c4a64
   MMKVCore: 3f40b896e9ab522452df9df3ce983471aa2449ba
-  NitroCloudUploader: 25531d66b7d3b681459118fdd9f5e4516ea5eebc
-  NitroModules: 91d3a502cd4a2cbc1aa541ea2eb0922b9dbeb58e
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCT-Folly: 0ca9fa70222c6d0fbd4365819371966a3a25140e
   RCTDeprecation: c6b36da89aa26090c8684d29c2868dcca2cd4554
@@ -3173,14 +3118,14 @@ SPEC CHECKSUMS:
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
   react-native-pdf: 70836b3b48595c7f85a3aa2b5d122b175c455733
-  react-native-quick-sqlite: 41588741c066601d29ee2fb7a295e5cf46f62d23
+  react-native-quick-sqlite: 75a3918a579006b1cebec3b84d986003630889a5
   react-native-restart: f2a57ccec2e6481deb1f19958ac60c0813313784
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-screenguard: 4daf8cb9c41b1c5a37c1db285832c481459ed4de
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
   react-native-sodium: bcea1f5e08a3f2ea918c96dce7b7964c8c9c196f
   react-native-theme-switch-animation: eaa4470e7539e317c7612e60028d6ee902fe1183
-  react-native-upload: 7b7ad336c3db703b68a8c07cf38e9319ae90d695
+  react-native-upload: 44bc4d02c398fd3d4ab2856a00c9bb106d27a45e
   react-native-view-shot: fb3c0774edb448f42705491802a455beac1502a2
   react-native-webview: 3e303e80cadb5f17118c8c1502aa398e9287e415
   React-NativeModulesApple: b50b7150a4f573d8466c43d8af38d2610fe17d92

@@ -36,6 +36,7 @@ export const ignoredMessages = [
 let pendingSync: any = undefined;
 let syncTimer: NodeJS.Timeout;
 let lastSyncType = "full";
+let syncInFlight = false;
 
 const run = async (
   context = "global",
@@ -44,7 +45,7 @@ const run = async (
   onCompleted?: (status?: number) => void,
   lastSyncTime?: number
 ) => {
-  if (useUserStore.getState().syncing) {
+  if (useUserStore.getState().syncing || syncInFlight) {
     DatabaseLogger.info("Sync in progress");
     pendingSync = {
       forced,
@@ -83,6 +84,7 @@ const run = async (
 
     let error: Error | undefined = undefined;
 
+    syncInFlight = true;
     try {
       await db.sync({
         type: type,
@@ -104,6 +106,7 @@ const run = async (
         }
       }
     } finally {
+      syncInFlight = false;
       userstore.setSyncing(
         false,
         error ? SyncStatus.Failed : SyncStatus.Passed

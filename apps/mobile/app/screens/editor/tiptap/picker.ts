@@ -145,8 +145,6 @@ const file = async (fileOptions: PickerOptions) => {
         },
         fileOptions.tabId
       );
-    } else {
-      throw new Error("Failed to attach file, no tabId is set");
     }
   } catch (e) {
     console.log("ERROR OCCURED HERE.", e);

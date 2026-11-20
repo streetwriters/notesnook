@@ -31,7 +31,10 @@ import {
 } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import notifee from "@notifee/react-native";
-import NetInfo, { NetInfoSubscription } from "@react-native-community/netinfo";
+import NetInfo, {
+  NetInfoState,
+  NetInfoSubscription
+} from "@react-native-community/netinfo";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useRef } from "react";
 import {
@@ -862,8 +865,13 @@ export const useAppEvents = () => {
   }, [onSyncComplete, onUserUpdated]);
 
   useEffect(() => {
-    const onInternetStateChanged = async () => {
-      if (!syncedOnLaunch.current) return;
+    let wasOnline: boolean | undefined;
+    const onInternetStateChanged = async (state: NetInfoState) => {
+      const isOnline =
+        !!state.isConnected && state.isInternetReachable === true;
+      const cameOnline = wasOnline === false && isOnline;
+      wasOnline = isOnline;
+      if (!cameOnline || !syncedOnLaunch.current) return;
       Sync.run("global", false, "full");
       reconnectSSE();
     };
