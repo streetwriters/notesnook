@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { colord } from "colord";
 import { PopupWrapper } from "../../components/popup-presenter/index.js";
 import { config } from "../../utils/config.js";
@@ -27,6 +27,7 @@ import {
   usePopupManager,
   useToolbarLocation
 } from "../stores/toolbar-store.js";
+import { useCustomColors } from "../stores/custom-colors-store.js";
 import { ToolProps } from "../types.js";
 import { getEditorToolbarPopup } from "../utils/dom.js";
 import { PositionOptions } from "@notesnook/ui";
@@ -110,9 +111,9 @@ export function ColorTool(props: ColorToolProps) {
     group: "color",
     parent: parentGroup
   });
-  const [colors, setColors] = useState(
-    config.get<string[]>(`custom_${cacheKey}`, []) || []
-  );
+  const customColorsKey = `custom_${cacheKey}`;
+  const [colors, updateColors] = useCustomColors(customColorsKey);
+
   const position: PositionOptions = useMemo(
     () => ({
       isTargetAbsolute: true,
@@ -123,10 +124,6 @@ export function ColorTool(props: ColorToolProps) {
     }),
     [isBottom, isOpen]
   );
-
-  useEffect(() => {
-    config.set(`custom_${cacheKey}`, colors);
-  }, [cacheKey, colors]);
 
   return (
     <SplitButton
@@ -158,18 +155,18 @@ export function ColorTool(props: ColorToolProps) {
           defaultColors={defaultColors}
           onDelete={(color) => {
             if (defaultColors.includes(color)) return;
-            setColors((colors) => colors.filter((item) => item !== color));
+            updateColors((colors) => colors.filter((item) => item !== color));
           }}
           onClear={() => {
             onColorChange();
             config.set(cacheKey, null);
           }}
           onSave={(color) => {
-            setColors((colors) =>
+            updateColors((colors) =>
               colors.includes(color) ? colors : [...colors, color]
             );
           }}
-          cacheKey={`custom_${cacheKey}`}
+          cacheKey={customColorsKey}
           onChange={(color) => {
             const currentColor = config.get(cacheKey);
             if (currentColor && currentColor === color) {
