@@ -217,24 +217,13 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void updatePinnedNotesWidget() {
-        AppWidgetManager wm = AppWidgetManager.getInstance(mContext);
-        int[] ids = wm.getAppWidgetIds(ComponentName.createRelative(mContext.getPackageName(), PinnedNotesWidgetProvider.class.getName()));
-        for (int id: ids) {
-            Log.d("PinnedNotes", "Updating" + id);
-            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_pinned_notes);
-            PinnedNotesWidgetProvider.updateAppWidget(mContext, wm, id, views);
-        }
+        WidgetUtils.updatePinnedNotesWidgets(mContext);
     }
 
     @ReactMethod
     public void updateNotesWidget() {
         WidgetUtils.removeUnusedNotesLists(mContext);
-        AppWidgetManager wm = AppWidgetManager.getInstance(mContext);
-        int[] ids = wm.getAppWidgetIds(ComponentName.createRelative(mContext.getPackageName(), NotesWidgetProvider.class.getName()));
-        for (int id: ids) {
-            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_notes);
-            NotesWidgetProvider.updateAppWidget(mContext, wm, id, views);
-        }
+        WidgetUtils.updateNotesWidgets(mContext);
     }
 
     @ReactMethod
