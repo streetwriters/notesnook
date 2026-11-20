@@ -24,7 +24,7 @@ import { ItemReference, parseInternalLink } from "@notesnook/core";
 import type { Attachment } from "@notesnook/editor";
 import { EditorEvents } from "@notesnook/editor-mobile/src/utils/editor-events";
 import { NativeEvents } from "@notesnook/editor-mobile/src/utils/native-events";
-import { getDefaultPresets } from "@notesnook/editor/dist/cjs/toolbar/tool-definitions";
+import { getDefaultPresets } from "@notesnook/editor-ui/dist/cjs/toolbar/tool-definitions";
 import { strings } from "@notesnook/intl";
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useCallback, useEffect, useRef } from "react";

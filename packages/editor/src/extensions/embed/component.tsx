@@ -21,13 +21,15 @@ import { Box, Flex } from "@theme-ui/components";
 import { useState } from "react";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed.js";
 import { ReactNodeViewProps } from "../react/index.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
-import { Icons } from "../../toolbar/index.js";
+import {
+  DesktopOnly,
+  ToolbarGroup,
+  Icons,
+  Resizer,
+  useToolbarStore
+} from "@notesnook/editor-ui";
 import { Icon } from "@notesnook/ui";
-import { Resizer } from "../../components/resizer/index.js";
 import { useThemeEngineStore } from "@notesnook/theme";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
 import { getSandboxFeatures } from "../../utils/sandbox.js";
 
 export function EmbedComponent(

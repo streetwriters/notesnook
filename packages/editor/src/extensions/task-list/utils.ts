@@ -21,7 +21,7 @@ import TaskList from "@tiptap/extension-task-list";
 import { TextSelection, Transaction } from "@tiptap/pm/state";
 import { Fragment, Node as ProsemirrorNode } from "prosemirror-model";
 import { NodeWithPos } from "@tiptap/core";
-import { findParentNodeClosestToPos } from "../../utils/prosemirror.js";
+import { findParentNodeClosestToPos } from "@notesnook/editor-ui";
 import TaskItem from "@tiptap/extension-task-item";
 import { TaskItemNode } from "../task-item/index.js";
 

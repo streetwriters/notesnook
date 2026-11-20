@@ -26,7 +26,7 @@ import { EditorState, PluginKey, Transaction } from "prosemirror-state";
 import { tableNodeTypes, TableRole } from "./schema.js";
 import { TableMap } from "./tablemap.js";
 import { CellAttrs, removeColSpan } from "./util.js";
-import { changedDescendants } from "../../../utils/prosemirror.js";
+import { changedDescendants } from "@notesnook/editor-ui";
 
 /**
  * @public

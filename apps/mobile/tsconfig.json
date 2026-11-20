@@ -13,14 +13,14 @@
         "./node_modules/@ammarahmed/notifee-react-native"
       ],
       "@notesnook/theme": ["../../packages/theme"],
-      "@notesnook/editor/dist/cjs/toolbar/tool-definitions": [
-        "../../packages/editor/dist/cjs/toolbar/tool-definitions.js"
+      "@notesnook/editor-ui/dist/cjs/toolbar/tool-definitions": [
+        "../../packages/editor-ui/dist/cjs/toolbar/tool-definitions.js"
       ],
-      "@notesnook/editor/dist/cjs/toolbar/icons": [
-        "../../packages/editor/dist/cjs/toolbar/icons.js"
+      "@notesnook/editor-ui/dist/cjs/toolbar/icons": [
+        "../../packages/editor-ui/dist/cjs/toolbar/icons.js"
       ],
-      "@notesnook/editor/dist/cjs/utils/font": [
-        "../../packages/editor/dist/cjs/utils/font.js"
+      "@notesnook/editor-ui/dist/cjs/utils/font": [
+        "../../packages/editor-ui/dist/cjs/utils/font.js"
       ]
     }
   },

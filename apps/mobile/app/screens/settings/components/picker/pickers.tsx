@@ -23,7 +23,7 @@ import {
   TimeFormat,
   WeekFormat
 } from "@notesnook/core";
-import { getFontById, getFonts } from "@notesnook/editor/dist/cjs/utils/font";
+import { getFontById, getFonts } from "@notesnook/editor-ui/dist/cjs/utils/font";
 import dayjs from "dayjs";
 import { createSettingsPicker } from ".";
 import { db } from "../../../../common/database";

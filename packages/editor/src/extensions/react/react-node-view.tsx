@@ -36,7 +36,7 @@ import {
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { EmotionThemeProvider } from "@notesnook/theme";
 import { isAndroid, isiOS } from "../../utils/platform.js";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import { useToolbarStore } from "@notesnook/editor-ui";
 
 // This is hacky workaround to manually handle serialization when
 // drag/dropping on mobile devices.

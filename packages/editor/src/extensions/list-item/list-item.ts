@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { ListItem as TiptapListItem } from "@tiptap/extension-list-item";
-import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
+import { ensureLeadingParagraph } from "@notesnook/editor-ui";
 
 export const ListItem = TiptapListItem.extend({
   parseHTML() {

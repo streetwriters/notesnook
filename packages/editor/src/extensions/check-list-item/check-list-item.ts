@@ -25,7 +25,7 @@ import {
 } from "@tiptap/core";
 import { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { CheckList } from "../check-list/check-list.js";
-import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
+import { ensureLeadingParagraph } from "@notesnook/editor-ui";
 
 export interface CheckListItemOptions {
   onReadOnlyChecked?: (node: ProseMirrorNode, checked: boolean) => boolean;

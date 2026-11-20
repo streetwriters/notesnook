@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import "@tiptap/extension-text-style";
 import { Extension } from "@tiptap/core";
-import { getFontById } from "../../utils/font.js";
+import { getFontById } from "@notesnook/editor-ui";
 
 export type FontFamilyOptions = {
   types: string[];

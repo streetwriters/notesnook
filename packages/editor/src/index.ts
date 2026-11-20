@@ -68,28 +68,30 @@ import { TaskListNode } from "./extensions/task-list/index.js";
 import TextDirection from "./extensions/text-direction/index.js";
 import { WebClipNode, WebClipOptions } from "./extensions/web-clip/index.js";
 import { AudioNode, AudioOptions } from "./extensions/audio/index.js";
-import { useEditor } from "./hooks/use-editor.js";
-import { usePermissionHandler } from "./hooks/use-permission-handler.js";
-import Toolbar from "./toolbar/index.js";
-import { useToolbarStore } from "./toolbar/stores/toolbar-store.js";
-import { DownloadOptions } from "./utils/downloader.js";
+import {
+  useEditor,
+  usePermissionHandler,
+  Toolbar,
+  useToolbarStore,
+  useEditorSearchStore,
+  getChangedNodes,
+  LIST_NODE_TYPES,
+  type DownloadOptions,
+  type LinkData
+} from "@notesnook/editor-ui";
 import { Heading } from "./extensions/heading/index.js";
 import Clipboard from "./extensions/clipboard/index.js";
 import Blockquote from "./extensions/blockquote/index.js";
 import { Quirks } from "./extensions/quirks/index.js";
-import { LIST_NODE_TYPES } from "./utils/node-types.js";
 import CheckList from "./extensions/check-list/index.js";
 import CheckListItem from "./extensions/check-list-item/index.js";
 import { Callout } from "./extensions/callout/index.js";
 import BlockId from "./extensions/block-id/index.js";
-import { useEditorSearchStore } from "./toolbar/stores/search-store.js";
 import { DiffHighlighter } from "./extensions/diff-highlighter/index.js";
-import { getChangedNodes } from "./utils/prosemirror.js";
 import { strings } from "@notesnook/intl";
 import { InlineCode } from "./extensions/inline-code/inline-code.js";
 import { FontLigature } from "./extensions/font-ligature/font-ligature.js";
 import { SearchResult } from "./extensions/search-result/search-result.js";
-import { LinkData } from "./types.js";
 
 interface TiptapStorage {
   dateFormat?: DateTimeOptions["dateFormat"];
@@ -114,11 +116,6 @@ interface TiptapStorage {
 
 declare module "@tiptap/core" {
   interface EditorStorage extends TiptapStorage {}
-}
-
-declare global {
-  // eslint-disable-next-line no-var
-  var keyboardShown: boolean;
 }
 
 globalThis["keyboardShown"] = true;
@@ -459,12 +456,9 @@ export {
 } from "./extensions/attachment/index.js";
 export { type ImageAttributes } from "./extensions/image/index.js";
 export { type LinkAttributes } from "./extensions/link/index.js";
-export * from "./toolbar/index.js";
-export * from "./types.js";
+export * from "@notesnook/editor-ui";
 export * from "./utils/word-counter.js";
-export * from "./utils/font.js";
 export * from "./utils/toc.js";
-export * from "./utils/downloader.js";
 export {
   useTiptap,
   Toolbar,
@@ -476,4 +470,3 @@ export {
 export { replaceDateTime } from "./extensions/date-time/index.js";
 export type * from "./extension-imports.js";
 export { type Selection } from "@tiptap/pm/state";
-export * from "./queries/index.js";

@@ -23,7 +23,7 @@ import { createNodeView } from "../react/index.js";
 import { AttachmentComponent } from "./component.js";
 import { Attachment } from "./types.js";
 import { tiptapKeys } from "@notesnook/common";
-import { hasPermission } from "../../types.js";
+import { hasPermission } from "@notesnook/editor-ui";
 import { AudioNode } from "../audio/audio.js";
 import { ImageNode } from "../image/image.js";
 import { WebClipNode } from "../web-clip/web-clip.js";

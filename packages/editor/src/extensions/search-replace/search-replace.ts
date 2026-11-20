@@ -26,7 +26,7 @@ import {
   Transaction,
   TextSelection
 } from "prosemirror-state";
-import { SearchSettings } from "../../toolbar/stores/search-store.js";
+import type { SearchSettings, SearchStorage } from "@notesnook/editor-ui";
 import { tiptapKeys } from "@notesnook/common";
 import { toggleNodesUnderPos } from "../heading/index.js";
 
@@ -56,11 +56,7 @@ interface SearchOptions {
   onEndSearch: () => boolean;
 }
 
-export type SearchStorage = {
-  selectedIndex: number;
-  selectedText?: string;
-  results?: Result[];
-};
+export type { SearchStorage };
 
 interface TextNodesWithPosition {
   text: string;

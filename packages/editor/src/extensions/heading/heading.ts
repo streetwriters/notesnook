@@ -29,7 +29,7 @@ import { Callout } from "../callout/callout.js";
 import {
   changedDescendants,
   findParentNodeOfTypeClosestToPos
-} from "../../utils/prosemirror.js";
+} from "@notesnook/editor-ui";
 import {
   AttributeUpdate,
   BatchAttributeStep

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import {
   getParentAttributes,
   isClickWithinBounds
-} from "../../utils/prosemirror.js";
+} from "@notesnook/editor-ui";
 import {
   InputRule,
   Node,
@@ -29,7 +29,7 @@ import { Paragraph } from "../paragraph/index.js";
 import { Heading, toggleNodesUnderPos } from "../heading/index.js";
 import { TextSelection } from "@tiptap/pm/state";
 import { Fragment } from "@tiptap/pm/model";
-import { hasPermission } from "../../types.js";
+import { hasPermission } from "@notesnook/editor-ui";
 import { strings } from "@notesnook/intl";
 
 declare module "@tiptap/core" {

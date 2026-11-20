@@ -23,6 +23,7 @@ runs:
           packages/clipper/package-lock.json
           packages/editor-mobile/package-lock.json
           packages/editor/package-lock.json
+          packages/editor-ui/package-lock.json
           packages/logger/package-lock.json
           packages/streamable-fs/package-lock.json
           packages/theme/package-lock.json

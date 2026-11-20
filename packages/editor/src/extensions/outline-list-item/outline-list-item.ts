@@ -26,7 +26,7 @@ import {
   findParentNodeOfTypeClosestToPos,
   isClickWithinBounds,
   ensureLeadingParagraph
-} from "../../utils/prosemirror.js";
+} from "@notesnook/editor-ui";
 import { OutlineList } from "../outline-list/outline-list.js";
 import { keybindings, tiptapKeys } from "@notesnook/common";
 import { Paragraph } from "../paragraph/paragraph.js";

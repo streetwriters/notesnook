@@ -15,6 +15,7 @@ on:
       - "desktop-native"
     paths:
       - "packages/editor/**"
+      - "packages/editor-ui/**"
       # the real-notes corpus is extracted from these core fixtures
       - "packages/core/src/content-types/__tests__/tiptap.test.js"
       - "packages/core/__tests__/utils/index.ts"
@@ -26,6 +27,7 @@ on:
       - "desktop-native"
     paths:
       - "packages/editor/**"
+      - "packages/editor-ui/**"
       - "packages/core/src/content-types/__tests__/tiptap.test.js"
       - "packages/core/__tests__/utils/index.ts"
       - ".github/workflows/editor.oracles.yml"

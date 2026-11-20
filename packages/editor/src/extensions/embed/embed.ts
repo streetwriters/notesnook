@@ -18,43 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
-import { hasSameAttributes } from "../../utils/prosemirror.js";
+import { hasSameAttributes } from "@notesnook/editor-ui";
+import type {
+  EmbedAttributes,
+  EmbedAlignmentOptions,
+  Embed,
+  EmbedSizeOptions
+} from "@notesnook/editor-ui";
 import { createNodeView } from "../react/index.js";
-import { TextDirections } from "../text-direction/index.js";
 import { EmbedComponent } from "./component.js";
+
+export type { EmbedAttributes, EmbedAlignmentOptions, Embed, EmbedSizeOptions };
 
 export interface EmbedOptions {
   HTMLAttributes: Record<string, unknown>;
-}
-
-export type EmbedAttributes = Partial<EmbedSizeOptions> & {
-  src: string;
-};
-
-export type EmbedAlignmentOptions = {
-  align?: "center" | "left" | "right";
-  textDirection?: TextDirections;
-};
-
-export type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
-
-export type EmbedSizeOptions = {
-  width: number;
-  height: number;
-};
-
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    embed: {
-      /**
-       * Add an embed
-       */
-      insertEmbed: (options: EmbedAttributes) => ReturnType;
-      setEmbedAlignment: (options: EmbedAlignmentOptions) => ReturnType;
-      setEmbedSize: (options: EmbedSizeOptions) => ReturnType;
-      setEmbedSource: (src: string) => ReturnType;
-    };
-  }
 }
 
 export const EmbedNode = Node.create<EmbedOptions>({

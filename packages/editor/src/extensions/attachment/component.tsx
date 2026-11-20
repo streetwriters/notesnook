@@ -21,10 +21,8 @@ import { Box, Text } from "@theme-ui/components";
 import { FileAttachment } from "./types.js";
 import { useRef, useState } from "react";
 import { Icon } from "@notesnook/ui";
-import { Icons } from "../../toolbar/icons.js";
+import { Icons, ToolbarGroup, DesktopOnly } from "@notesnook/editor-ui";
 import { ReactNodeViewProps } from "../react/index.js";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
 import { formatBytes } from "@notesnook/common";
 
 export function AttachmentComponent(props: ReactNodeViewProps<FileAttachment>) {

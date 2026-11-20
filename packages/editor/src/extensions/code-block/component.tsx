@@ -19,18 +19,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Flex, Input, Text } from "@theme-ui/components";
 import { useRef, useState } from "react";
-import { Button } from "../../components/button.js";
-import { ResponsivePresenter } from "../../components/responsive/index.js";
-import { useTimer } from "../../hooks/use-timer.js";
+import {
+  Button,
+  ResponsivePresenter,
+  useTimer,
+  Popup,
+  Icons,
+  config
+} from "@notesnook/editor-ui";
 import { Icon } from "@notesnook/ui";
-import { Popup } from "../../toolbar/components/popup.js";
-import { Icons } from "../../toolbar/icons.js";
 import { ReactNodeViewProps } from "../react/types.js";
 import { CodeBlockAttributes } from "./code-block.js";
 import Languages from "./languages.json";
 import { useThemeEngineStore } from "@notesnook/theme";
 import { strings } from "@notesnook/intl";
-import { config } from "../../utils/config.js";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>

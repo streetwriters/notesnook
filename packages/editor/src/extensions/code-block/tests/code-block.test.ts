@@ -21,7 +21,7 @@ import { createEditor, h } from "../../../../test-utils/index.js";
 import { expect, test, vi } from "vitest";
 import { CodeBlock, inferLanguage } from "../code-block.js";
 import { HighlighterPlugin } from "../highlighter.js";
-import { getChangedNodes } from "../../../utils/prosemirror.js";
+import { getChangedNodes } from "@notesnook/editor-ui";
 import { refractor } from "refractor/lib/core";
 
 const CODEBLOCKS_HTML = h("div", [

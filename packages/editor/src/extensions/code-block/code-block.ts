@@ -37,7 +37,7 @@ import { nanoid } from "nanoid";
 import Languages from "./languages.json";
 import { CaretPosition, CodeLine } from "./utils.js";
 import { tiptapKeys } from "@notesnook/common";
-import { config } from "../../utils/config.js";
+import { config } from "@notesnook/editor-ui";
 
 interface Indent {
   type: "tab" | "space";

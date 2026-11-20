@@ -42,6 +42,7 @@ Notesnook is built using the following technologies:
 | `@notesnook/crypto`        | [/packages/crypto](/packages/crypto)               | Cryptography library wrapper around libsodium                        |
 | `@notesnook/clipper`       | [/packages/clipper](/packages/clipper)             | Web clipper core handling everything related to actual page clipping |
 | `@notesnook/editor`        | [/packages/editor](/packages/editor)               | Notesnook editor + all extensions                                    |
+| `@notesnook/editor-ui`     | [/packages/editor-ui](/packages/editor-ui)         | The editor toolbar, popups, shared components, hooks and queries     |
 | `@notesnook/editor-mobile` | [/packages/editor-mobile](/packages/editor-mobile) | A very thin wrapper around `@notesnook/editor` for mobile clients    |
 | `@notesnook/logger`        | [/packages/logger](/packages/logger)               | Simple & pluggable logger                                            |
 | `@notesnook/sodium`        | [/packages/sodium](/packages/sodium)               | Wrapper around libsodium to support Node.js & Browser                |

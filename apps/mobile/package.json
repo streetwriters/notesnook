@@ -49,6 +49,7 @@
     "@notesnook/crypto": "file:../../packages/crypto",
     "@notesnook/editor": "file:../../packages/editor",
     "@notesnook/editor-mobile": "file:../../packages/editor-mobile",
+    "@notesnook/editor-ui": "file:../../packages/editor-ui",
     "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/logger": "file:../../packages/logger",
     "@notesnook/theme": "file:../../packages/theme",

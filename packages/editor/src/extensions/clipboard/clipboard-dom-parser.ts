@@ -24,7 +24,7 @@ import {
 import { encodeNonAsciiHTML } from "entities";
 import { Node as PMNode, Schema, Slice } from "prosemirror-model";
 import { inferLanguage } from "../code-block/index.js";
-import { hasPermission } from "../../types.js";
+import { hasPermission } from "@notesnook/editor-ui";
 
 export class ClipboardDOMParser extends ProsemirrorDOMParser {
   static fromSchema(schema: Schema): ClipboardDOMParser {

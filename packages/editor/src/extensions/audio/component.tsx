@@ -21,11 +21,14 @@ import { Box, Text } from "@theme-ui/components";
 import { AudioAttachment } from "../attachment/types.js";
 import { useRef, useState, useEffect } from "react";
 import { Icon } from "@notesnook/ui";
-import { Icons } from "../../toolbar/icons.js";
+import {
+  Icons,
+  ToolbarGroup,
+  DesktopOnly,
+  toBlobURL,
+  revokeBloburl
+} from "@notesnook/editor-ui";
 import { ReactNodeViewProps } from "../react/index.js";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
-import { toBlobURL, revokeBloburl } from "../../utils/downloader.js";
 import { formatBytes } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 

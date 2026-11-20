@@ -7,6 +7,7 @@ on:
       - "master"
     paths:
       - "packages/editor/**"
+      - "packages/editor-ui/**"
       # re-run workflow if workflow file changes
       - ".github/workflows/editor.tests.yml"
   pull_request:
@@ -14,6 +15,7 @@ on:
       - "master"
     paths:
       - "packages/editor/**"
+      - "packages/editor-ui/**"
       # re-run workflow if workflow file changes
       - ".github/workflows/editor.tests.yml"
     types:

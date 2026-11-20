@@ -30,8 +30,9 @@ import {
   getParentAttributes,
   hasSameAttributes,
   findParentNodeClosestToPos,
-  getExactChangedNodes
-} from "../../utils/prosemirror.js";
+  getExactChangedNodes,
+  hasPermission
+} from "@notesnook/editor-ui";
 import {
   countCheckedItems,
   findRootTaskList,
@@ -41,7 +42,6 @@ import { Node as ProsemirrorNode } from "@tiptap/pm/model";
 import { TaskItemNode } from "../task-item/index.js";
 import { ListItem } from "../list-item/list-item.js";
 import { tiptapKeys } from "@notesnook/common";
-import { hasPermission } from "../../types.js";
 
 type TaskListStats = { checked: number; total: number };
 export type TaskListAttributes = {

@@ -38,6 +38,7 @@ const scopes = {
   "desktop-native": "apps/desktop-native",
   core: "packages/core",
   editor: "packages/editor",
+  "editor-ui": "packages/editor-ui",
   themes: "servers/themes",
   themebuilder: "apps/theme-builder",
   help: "docs/help"

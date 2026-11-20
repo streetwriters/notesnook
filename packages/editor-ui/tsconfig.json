@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "outDir": "./dist/"
+  },
+  "exclude": ["src/**/*.test.ts"],
+  "include": ["src/**/*"]
+}

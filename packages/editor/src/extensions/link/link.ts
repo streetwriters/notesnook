@@ -33,7 +33,8 @@ import { autolink } from "./helpers/autolink.js";
 import { clickHandler } from "./helpers/clickHandler.js";
 import { pasteHandler } from "./helpers/pasteHandler.js";
 import { ImageNode } from "../image/index.js";
-import { selectionToOffset } from "../../utils/prosemirror.js";
+import { selectionToOffset } from "@notesnook/editor-ui";
+import type { LinkAttributes } from "@notesnook/editor-ui";
 
 export interface LinkProtocolOptions {
   scheme: string;
@@ -69,31 +70,7 @@ export interface LinkOptions {
   validate?: (url: string) => boolean;
 }
 
-export type LinkAttributes = {
-  href: string;
-  target?: string | null;
-  rel?: string | null;
-  class?: string | null;
-  title?: string | null;
-};
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    link: {
-      /**
-       * Set a link mark
-       */
-      setLink: (attributes: LinkAttributes) => ReturnType;
-      /**
-       * Toggle a link mark
-       */
-      toggleLink: (attributes: LinkAttributes) => ReturnType;
-      /**
-       * Unset a link mark
-       */
-      unsetLink: () => ReturnType;
-    };
-  }
-}
+export type { LinkAttributes };
 
 export const linkRegex = /(?:__|[*#])|\[([^\]]+)\]\(.*?\)/gm;
 const regExp = /(?:__|[*#])|\[.*?\]\((.*?)\)/gm;

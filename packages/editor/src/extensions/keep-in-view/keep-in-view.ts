@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Editor, Extension, posToDOMRect } from "@tiptap/core";
-import { inlineDebounce } from "../../utils/debounce.js";
+import { inlineDebounce } from "@notesnook/editor-ui";
 
 type KeepInViewOptions = {
   scrollIntoViewOnWindowResize: boolean;

@@ -23,8 +23,11 @@ import { Node } from "prosemirror-model";
 import { selectedRect, TableRect } from "./prosemirror-tables/commands.js";
 import { saveAs } from "file-saver";
 import { unparse, parse } from "papaparse";
-import { hasPermission } from "../../types.js";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store.js";
+import {
+  hasPermission,
+  useToolbarStore,
+  registerTableActions
+} from "@notesnook/editor-ui";
 import { getTableNodeTypes } from "./utilities/getTableNodeTypes.js";
 import { createCell } from "./utilities/createCell.js";
 
@@ -246,6 +249,17 @@ function exportToCSV(editor?: Editor) {
     saveAs(new Blob([new TextEncoder().encode(csv)]), "table.csv");
   }
 }
+
+registerTableActions({
+  moveColumnLeft,
+  moveColumnRight,
+  moveRowDown,
+  moveRowUp,
+  selectRow,
+  selectColumn,
+  exportToCSV,
+  importCsvToTable
+});
 
 export {
   moveColumnLeft,

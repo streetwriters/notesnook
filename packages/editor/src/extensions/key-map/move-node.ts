@@ -25,7 +25,7 @@ import { ReplaceStep } from "@tiptap/pm/transform";
 import {
   findParentNodeClosestToPos,
   findParentNodeOfType
-} from "../../utils/prosemirror.js";
+} from "@notesnook/editor-ui";
 import { Blockquote } from "../blockquote/blockquote.js";
 import { BulletList } from "../bullet-list/bullet-list.js";
 import { Callout } from "../callout/callout.js";

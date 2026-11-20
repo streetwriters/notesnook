@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import "@tiptap/extension-text-style";
 import { Extension } from "@tiptap/core";
-import { config } from "../../utils/config.js";
+import { config } from "@notesnook/editor-ui";
 import { tiptapKeys } from "@notesnook/common";
 
 export interface HighlightOptions {

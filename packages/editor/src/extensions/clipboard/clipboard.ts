@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Slice } from "prosemirror-model";
-import { LIST_NODE_TYPES } from "../../utils/node-types.js";
+import { LIST_NODE_TYPES } from "@notesnook/editor-ui";
 import { ClipboardDOMParser } from "./clipboard-dom-parser.js";
 import { ClipboardDOMSerializer } from "./clipboard-dom-serializer.js";
 import { clipboardTextParser } from "./clipboard-text-parser.js";

@@ -21,7 +21,7 @@ import { mergeAttributes } from "@tiptap/core";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component.js";
 import { createNodeView } from "../react/index.js";
-import { ensureLeadingParagraph } from "../../utils/prosemirror.js";
+import { ensureLeadingParagraph } from "@notesnook/editor-ui";
 
 export type TaskItemAttributes = {
   checked: boolean;

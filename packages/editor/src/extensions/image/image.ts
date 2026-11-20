@@ -20,18 +20,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
 import {
   findSelectedNode,
-  hasSameAttributes
-} from "../../utils/prosemirror.js";
+  hasSameAttributes,
+  toBlob,
+  type ImageAttributes,
+  type ImageSize
+} from "@notesnook/editor-ui";
 import {
   ImageAlignmentOptions,
   ImageAttachment,
   getDataAttribute
 } from "../attachment/index.js";
 import { createNodeView } from "../react/index.js";
-import { TextDirections } from "../text-direction/index.js";
 import { ImageComponent } from "./component.js";
 import { tiptapKeys } from "@notesnook/common";
-import { toBlob } from "../../utils/downloader.js";
 
 export interface ImageOptions {
   inline: boolean;
@@ -39,14 +40,7 @@ export interface ImageOptions {
   HTMLAttributes: Record<string, unknown>;
 }
 
-export type ImageAttributes = ImageAttachment & {
-  textDirection?: TextDirections;
-};
-
-export type ImageSize = {
-  width: number;
-  height: number;
-};
+export type { ImageAttributes, ImageSize };
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

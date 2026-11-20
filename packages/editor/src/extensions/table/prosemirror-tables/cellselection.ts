@@ -17,7 +17,7 @@ import { Decoration, DecorationSet, DecorationSource } from "prosemirror-view";
 import { Mappable } from "prosemirror-transform";
 import { TableMap } from "./tablemap.js";
 import { CellAttrs, inSameTable, pointsAtCell, removeColSpan } from "./util.js";
-import { findParentNodeOfTypeClosestToPos } from "../../../utils/prosemirror.js";
+import { findParentNodeOfTypeClosestToPos } from "@notesnook/editor-ui";
 
 /**
  * @public

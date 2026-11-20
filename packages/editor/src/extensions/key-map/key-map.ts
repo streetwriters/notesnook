@@ -19,12 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { tiptapKeys } from "@notesnook/common";
 import { Extension } from "@tiptap/core";
-import { showLinkPopup } from "../../toolbar/popups/link-popup.js";
-import { isListActive } from "../../utils/list.js";
+import {
+  showLinkPopup,
+  isListActive,
+  config,
+  DEFAULT_COLORS
+} from "@notesnook/editor-ui";
 import { CodeBlock } from "../code-block/index.js";
 import { isInTable } from "../table/prosemirror-tables/util.js";
-import { config } from "../../utils/config.js";
-import { DEFAULT_COLORS } from "../../toolbar/tools/colors.js";
 import {
   moveNodeUp,
   moveNodeDown,

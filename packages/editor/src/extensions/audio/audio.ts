@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Node, mergeAttributes } from "@tiptap/core";
-import { hasSameAttributes } from "../../utils/prosemirror.js";
+import { hasSameAttributes } from "@notesnook/editor-ui";
 import { AudioAttachment, getDataAttribute } from "../attachment/index.js";
 import { createNodeView } from "../react/index.js";
 import { AudioComponent } from "./component.js";

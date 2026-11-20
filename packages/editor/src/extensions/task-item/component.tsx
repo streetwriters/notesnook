@@ -20,14 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Flex } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react/index.js";
 import { Icon } from "@notesnook/ui";
-import { Icons } from "../../toolbar/icons.js";
+import { Icons, useIsMobile, DesktopOnly } from "@notesnook/editor-ui";
 import { findChildrenInRange } from "@tiptap/core";
 import { useCallback } from "react";
 import type { TaskItemAttributes } from "./task-item.js";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store.js";
 import { isiOS } from "../../utils/platform.js";
 import { startItemDrag } from "../drag-drop/index.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
 import TaskItem from "@tiptap/extension-task-item";
 import { strings } from "@notesnook/intl";
 

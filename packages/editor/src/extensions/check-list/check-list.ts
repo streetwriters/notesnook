@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 import { mergeAttributes, Node, wrappingInputRule } from "@tiptap/core";
 import { inputRegex } from "@tiptap/extension-task-item";
-import { getParentAttributes } from "../../utils/prosemirror.js";
+import { getParentAttributes } from "@notesnook/editor-ui";
 import { ListItem } from "../list-item/index.js";
 import { tiptapKeys } from "@notesnook/common";
 

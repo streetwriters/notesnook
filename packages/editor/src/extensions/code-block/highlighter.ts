@@ -30,7 +30,7 @@ import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
 import { toCaretPosition, toCodeLines } from "./utils.js";
 import Languages from "./languages.json";
 import { isLanguageLoaded, loadLanguage } from "./loader.js";
-import { getChangedNodes } from "../../utils/prosemirror.js";
+import { getChangedNodes } from "@notesnook/editor-ui";
 
 export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 

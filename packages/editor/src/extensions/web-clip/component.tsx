@@ -20,11 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Box, Flex, Text } from "@theme-ui/components";
 import { useEffect, useState } from "react";
 import { ReactNodeViewProps } from "../react/index.js";
-import { Icons } from "../../toolbar/index.js";
+import { Icons, DesktopOnly, ToolbarGroup } from "@notesnook/editor-ui";
 import { Icon } from "@notesnook/ui";
 import { WebClipAttributes } from "./web-clip.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group.js";
 import { strings } from "@notesnook/intl";
 
 const getFailedContent = () => `<html><head>

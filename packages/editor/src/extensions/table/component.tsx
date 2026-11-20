@@ -20,23 +20,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex } from "@theme-ui/components";
 import { ReactNodeView, ReactNodeViewProps } from "../react/index.js";
 import { Node as ProsemirrorNode } from "prosemirror-model";
-import { Editor } from "../../types.js";
 import { Editor as TiptapEditor } from "@tiptap/core";
 import { useEffect, useRef } from "react";
 import { EditorView, NodeView } from "prosemirror-view";
+import { getPosition } from "@notesnook/ui";
 import {
+  Editor,
   InsertColumnRight,
   InsertRowBelow,
   RowProperties,
-  TableProperties
-} from "../../toolbar/tools/table.js";
-import { getToolDefinition } from "../../toolbar/tool-definitions.js";
-import { getPosition } from "@notesnook/ui";
-import {
+  TableProperties,
+  getToolDefinition,
   findSelectedDOMNode,
-  hasSameAttributes
-} from "../../utils/prosemirror.js";
-import { DesktopOnly } from "../../components/responsive/index.js";
+  hasSameAttributes,
+  DesktopOnly
+} from "@notesnook/editor-ui";
 import { TextDirections } from "../text-direction/index.js";
 import { strings } from "@notesnook/intl";
 import { updateColumnsOnResize } from "./prosemirror-tables/tableview.js";
