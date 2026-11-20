@@ -17,12 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { updateNoteWidgets } from "../services/widgets/update-widgets";
 import { DatabaseLogger, db } from "../common/database";
 import { eSendEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
-import { NotePreviewWidget } from "../services/note-preview-widget";
-import { PinnedNotesWidget } from "../services/pinned-notes-widget";
-import { NotesWidget } from "../services/widgets/notes-widget";
 import Notifications from "../services/notifications";
 import { eAfterSync } from "../utils/events";
 import { NotesnookModule, ShortcutInfo } from "../utils/notesnook-module";
@@ -128,9 +126,7 @@ export function initAfterSync(type: "full" | "send" = "send") {
   }
 
   Notifications.setupReminders(true);
-  NotePreviewWidget.updateNotes();
-  PinnedNotesWidget.updateNotes();
-  NotesWidget.updateNotes();
+  updateNoteWidgets();
   eSendEvent(eAfterSync);
 
   NotesnookModule.getAllShortcuts()

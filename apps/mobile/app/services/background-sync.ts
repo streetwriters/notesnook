@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { updateNoteWidgets } from "./widgets/update-widgets";
 import BackgroundFetch from "@ammarahmed/react-native-background-fetch";
 import { AppRegistry, AppState, Platform } from "react-native";
 import {
@@ -26,9 +27,6 @@ import {
 import { DatabaseLogger, db, setupDatabase } from "../common/database";
 import { deleteDCacheFiles } from "../common/filesystem/io";
 import { useUserStore } from "../stores/use-user-store";
-import { NotePreviewWidget } from "./note-preview-widget";
-import { PinnedNotesWidget } from "./pinned-notes-widget";
-import { NotesWidget } from "./widgets/notes-widget";
 import Notifications from "./notifications";
 import SettingsService from "./settings";
 
@@ -119,9 +117,7 @@ async function onBackgroundSyncStarted() {
       Notifications.pinQuickNote();
     }
     Notifications.restorePinnedNotes();
-    NotePreviewWidget.updateNotes();
-    PinnedNotesWidget.updateNotes();
-    NotesWidget.updateNotes();
+    updateNoteWidgets();
     deleteDCacheFiles();
     DatabaseLogger.info("BACKGROUND SYNC COMPLETE");
   } catch (e) {
@@ -149,9 +145,7 @@ const onBoot = async () => {
       Notifications.pinQuickNote();
     }
     Notifications.restorePinnedNotes();
-    NotePreviewWidget.updateNotes();
-    PinnedNotesWidget.updateNotes();
-    NotesWidget.updateNotes();
+    updateNoteWidgets();
     DatabaseLogger.info("BOOT TASK COMPLETE");
   } catch (e) {
     DatabaseLogger.error(e as Error);

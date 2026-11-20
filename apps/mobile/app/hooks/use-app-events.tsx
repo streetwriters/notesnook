@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { updateNoteWidgets } from "../services/widgets/update-widgets";
 import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
@@ -81,14 +82,11 @@ import {
   setUpdateAvailableMessage
 } from "../services/message";
 import Navigation from "../services/navigation";
-import { NotePreviewWidget } from "../services/note-preview-widget";
 import {
   getWidgetPickerKind,
   getWidgetPickerSlot,
   useWidgetPicker
 } from "../screens/note-preview-configure/widget-picker";
-import { PinnedNotesWidget } from "../services/pinned-notes-widget";
-import { NotesWidget } from "../services/widgets/notes-widget";
 import { WidgetTheme } from "../services/widgets/widget-theme";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
@@ -599,9 +597,7 @@ export const useAppEvents = () => {
     // Widgets outlive the app process, so they can be left showing content the app no longer has
     // (most obviously after the user clears app data). Nothing can run at that moment, so the
     // first launch afterwards is the earliest chance to put them right.
-    NotePreviewWidget.updateNotes();
-    PinnedNotesWidget.updateNotes();
-    NotesWidget.updateNotes();
+    updateNoteWidgets();
     WidgetTheme.watch();
 
     let subscriptions: EventManagerSubscription[] = [];
