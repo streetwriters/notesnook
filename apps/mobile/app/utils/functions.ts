@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { updateListWidgets } from "../services/widgets/update-widgets";
 import { ItemType } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { Linking } from "react-native";
@@ -35,8 +36,6 @@ import { useTagStore } from "../stores/use-tag-store";
 import { eUpdateNoteInEditor } from "./events";
 import { unlockVault } from "./unlock-vault";
 import { useTrashStore } from "../stores/use-trash-store";
-import { PinnedNotesWidget } from "../services/pinned-notes-widget";
-import { NotesWidget } from "../services/widgets/notes-widget";
 
 export const valueLimiter = (value: number, min: number, max: number) => {
   return value < min ? min : value > max ? max : value;
@@ -92,8 +91,7 @@ async function deleteNotebook(id: string, deleteNotes: boolean) {
       await db.notes.moveToTrash(
         ...noteRelations.map((relation) => relation.toId)
       );
-      PinnedNotesWidget.updateNotes();
-      NotesWidget.updateNotes();
+      updateListWidgets();
     }
   }
   await db.notebooks.moveToTrash(id);
@@ -155,8 +153,7 @@ export const deleteItems = async (
         true
       );
     }
-    PinnedNotesWidget.updateNotes();
-    NotesWidget.updateNotes();
+    updateListWidgets();
   } else if (type === "notebook") {
     const result = await confirmDeleteAllNotes(itemIds, "notebook", context);
     if (!result.delete) return;
@@ -198,8 +195,7 @@ export const deleteItems = async (
         Navigation.queueRoutesForUpdate();
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
-        PinnedNotesWidget.updateNotes();
-        NotesWidget.updateNotes();
+        updateListWidgets();
         ToastManager.hide();
         if (type === "notebook") {
           useNotebookStore.getState().refresh();
