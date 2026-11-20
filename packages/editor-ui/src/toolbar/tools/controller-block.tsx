@@ -33,6 +33,8 @@ import { Button } from "../../components/button.js";
 import { EmbedPopup } from "../popups/embed-popup.js";
 import { TablePopup } from "../popups/table-popup.js";
 import { ImageUploadPopup } from "../popups/image-upload.js";
+import { hasPermission } from "../../permissions.js";
+import { csvToTable } from "../../utils/csv.js";
 
 const CALLOUTS = [
   { key: "abstract", title: () => strings.abstract() },
@@ -56,8 +58,7 @@ function useBlockState(editor: EditorController) {
     attachment: useEditorQuery(editor, q.isActive("attachment"), false),
     calloutType: useEditorQuery(editor, q.attributes("callout"), {}).type as
       | string
-      | undefined,
-    canMathBlock: useEditorQuery(editor, q.can("insertMathBlock"), false)
+      | undefined
   };
 }
 
@@ -69,6 +70,7 @@ export function ControllerInsertBlock(props: ToolProps) {
   const isMobile = useIsMobile();
   const state = useBlockState(editor);
   const picker = editor.hostActions?.openAttachmentPicker;
+  const pickCsvFile = editor.hostActions?.pickCsvFile;
 
   const {
     taskList,
@@ -78,8 +80,7 @@ export function ControllerInsertBlock(props: ToolProps) {
     mathBlock,
     blockQuote,
     attachment,
-    calloutType,
-    canMathBlock
+    calloutType
   } = state;
 
   const menuItems = useMemo<MenuItem[]>(() => {
@@ -127,7 +128,6 @@ export function ControllerInsertBlock(props: ToolProps) {
         title: strings.mathAndFormulas(),
         icon: Icons.mathBlock,
         isChecked: mathBlock,
-        isHidden: !canMathBlock,
         onClick: run("insertMathBlock"),
         modifier: keybindings.insertMathBlock.keys
       },
@@ -169,7 +169,6 @@ export function ControllerInsertBlock(props: ToolProps) {
               type: "button",
               title: strings.uploadFromDisk(),
               icon: Icons.upload,
-              isHidden: !picker,
               onClick: () => picker?.("image"),
               modifier: keybindings.addImage.keys
             },
@@ -178,7 +177,7 @@ export function ControllerInsertBlock(props: ToolProps) {
               type: "button",
               title: strings.takePhotoUsingCamera(),
               icon: Icons.camera,
-              isHidden: !isMobile || !picker,
+              isHidden: !isMobile,
               onClick: () => picker?.("camera")
             },
             {
@@ -208,7 +207,6 @@ export function ControllerInsertBlock(props: ToolProps) {
         title: strings.attachment(),
         icon: Icons.attachment,
         isChecked: attachment,
-        isHidden: !picker,
         onClick: () => picker?.("file"),
         modifier: keybindings.addAttachment.keys
       },
@@ -239,6 +237,22 @@ export function ControllerInsertBlock(props: ToolProps) {
           title: strings.insertTable(),
           items: [
             {
+              key: "import-csv",
+              type: "button",
+              title: strings.importCsv(),
+              icon: Icons.csv,
+              onClick: async () => {
+                if (!hasPermission("importCsvToTable")) return;
+                const text = await pickCsvFile?.();
+                const table = text ? csvToTable(text) : undefined;
+                if (table) editor.run({ name: "insertContent", args: [table] });
+              }
+            },
+            {
+              key: "sep",
+              type: "separator"
+            },
+            {
               key: "table-size-selector",
               type: "popup",
               component: (popupProps) => (
@@ -261,6 +275,7 @@ export function ControllerInsertBlock(props: ToolProps) {
     editor,
     isMobile,
     picker,
+    pickCsvFile,
     taskList,
     outlineList,
     horizontalRule,
@@ -268,8 +283,7 @@ export function ControllerInsertBlock(props: ToolProps) {
     mathBlock,
     blockQuote,
     attachment,
-    calloutType,
-    canMathBlock
+    calloutType
   ]);
 
   return (
