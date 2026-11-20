@@ -17,35 +17,59 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {
+  computePosition,
+  flip,
+  offset,
+  shift,
+  type Platform
+} from "@floating-ui/core";
 import type { AnchorRect, PopoverPlacement } from "../contracts/overlays";
 
-export type PopoverPosition = {
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
+type Size = { width: number; height: number };
+type Box = { anchor: AnchorRect; floating: Size; window: Size };
+
+const PADDING = 10;
+
+const platform: Platform = {
+  getElementRects: ({ reference }) => {
+    const box = reference as Box;
+    return {
+      reference: { ...box.anchor },
+      floating: { x: 0, y: 0, ...box.floating }
+    };
+  },
+  getDimensions: (element) => (element as Box).floating,
+  getClippingRect: ({ element }) => ({
+    x: 0,
+    y: 0,
+    ...(element as Box).window
+  })
 };
 
-const GAP = 5;
-const SIDE_ROOM = 240;
-
-export function popoverPosition(
-  rect: AnchorRect,
+export async function popoverPosition(
+  anchor: AnchorRect,
+  floating: Size,
   placement: PopoverPlacement,
-  window: { width: number; height: number }
-): PopoverPosition {
-  if (placement === "right-start") {
-    const fitsRight = rect.x + rect.width + SIDE_ROOM <= window.width;
-    return fitsRight
-      ? { top: rect.y, left: rect.x + rect.width + GAP }
-      : { top: rect.y, right: window.width - rect.x + GAP };
-  }
-  const below = placement.startsWith("bottom");
-  const start = placement.endsWith("start");
-  return {
-    top: below ? rect.y + rect.height + GAP : undefined,
-    bottom: below ? undefined : window.height - rect.y + GAP,
-    left: start ? rect.x : undefined,
-    right: start ? undefined : window.width - rect.x - rect.width
-  };
+  window: Size
+): Promise<{ top: number; left: number }> {
+  const box: Box = { anchor, floating, window };
+  const beside = placement.startsWith("right");
+  const px = Math.max(0, Math.min(PADDING, (window.width - floating.width) / 2));
+  const py = Math.max(
+    0,
+    Math.min(PADDING, (window.height - floating.height) / 2)
+  );
+  const padding = { left: px, right: px, top: py, bottom: py };
+  const { x, y } = await computePosition(box, box, {
+    placement,
+    strategy: "fixed",
+    platform,
+    middleware: [
+      offset(beside ? 0 : 5),
+      flip({ padding }),
+      shift({ padding })
+    ]
+  });
+  return { top: y, left: x };
 }

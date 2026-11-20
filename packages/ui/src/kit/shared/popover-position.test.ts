@@ -22,31 +22,54 @@ import { popoverPosition } from "./popover-position";
 
 const window = { width: 1000, height: 800 };
 const item = { x: 100, y: 300, width: 200, height: 30 };
+const menu = { width: 220, height: 200 };
 
 describe("popoverPosition", () => {
-  it("opens a submenu beside its item, level with it", () => {
-    expect(popoverPosition(item, "right-start", window)).toEqual({
+  it("opens a submenu beside its item, level with it", async () => {
+    expect(await popoverPosition(item, menu, "right-start", window)).toEqual({
       top: 300,
-      left: 305
+      left: 300
     });
   });
 
-  it("opens a submenu on the left when the right side has no room", () => {
+  it("flips a submenu to the left when the right side has no room", async () => {
     const edge = { ...item, x: 700 };
-    expect(popoverPosition(edge, "right-start", window)).toEqual({
+    expect(await popoverPosition(edge, menu, "right-start", window)).toEqual({
       top: 300,
-      right: 305
+      left: 480
     });
   });
 
-  it("keeps below placements under the anchor", () => {
-    expect(popoverPosition(item, "bottom-start", window)).toMatchObject({
+  it("opens below the anchor, aligned to its start or end", async () => {
+    expect(await popoverPosition(item, menu, "bottom-start", window)).toEqual({
       top: 335,
       left: 100
     });
-    expect(popoverPosition(item, "bottom-end", window)).toMatchObject({
+    expect(await popoverPosition(item, menu, "bottom-end", window)).toEqual({
       top: 335,
-      right: 700
+      left: 80
     });
+  });
+
+  it("flips above when there is no room below", async () => {
+    const low = { ...item, y: 700 };
+    expect(await popoverPosition(low, menu, "bottom-start", window)).toEqual({
+      top: 495,
+      left: 100
+    });
+  });
+
+  it("lines a low submenu up with its item's bottom edge", async () => {
+    const tall = { width: 220, height: 400 };
+    const low = { ...item, y: 600 };
+    const { top } = await popoverPosition(low, tall, "right-start", window);
+    expect(top).toBe(230);
+  });
+
+  it("shifts back inside the window", async () => {
+    const wide = { width: 400, height: 100 };
+    const edge = { ...item, x: 800 };
+    const { left } = await popoverPosition(edge, wide, "bottom-start", window);
+    expect(left).toBe(590);
   });
 });

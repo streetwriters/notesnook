@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { create } from "zustand";
 import type * as Contract from "../contracts/overlays";
+import type { UIElement } from "../contracts/primitives";
 import { popoverPosition } from "../shared/popover-position";
 import { useWindowSize } from "./hooks";
 import { Box, Flex } from "./primitives";
@@ -99,42 +100,74 @@ export function PopoverHost() {
   const window = useWindowSize();
   return (
     <>
-      {entries.map(({ id, rect, props }) => {
-        const position = popoverPosition(
-          rect,
-          props.placement ?? "bottom-start",
-          window
-        );
-        return (
-          <ThemeScope key={id} scope="contextMenu">
-            <Box
-              onPress={props.onClose}
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 1000
-              }}
-            >
-              <Flex
-                onPress={(event) => event.stopPropagation()}
-                sx={{
-                  position: "absolute",
-                  ...position,
-                  bg: "background",
-                  borderRadius: "radius2",
-                  boxShadow: "menu",
-                  ...props.sx
-                }}
-              >
-                {props.children}
-              </Flex>
-            </Box>
-          </ThemeScope>
-        );
-      })}
+      {entries.map((entry) => (
+        <PopoverEntry key={entry.id} entry={entry} window={window} />
+      ))}
     </>
+  );
+}
+
+function PopoverEntry(props: {
+  entry: Entry;
+  window: { width: number; height: number };
+}) {
+  const { entry, window } = props;
+  const { rect, props: popover } = entry;
+  const ref = useRef<UIElement>(null);
+  const [position, setPosition] = useState<{ top: number; left: number }>();
+
+  useEffect(() => {
+    let cancelled = false;
+    ref.current?.measureInWindow((_x, _y, width, height) => {
+      popoverPosition(
+        rect,
+        { width, height },
+        popover.placement ?? "bottom-start",
+        window
+      ).then((next) => {
+        if (cancelled) return;
+        setPosition((current) =>
+          current?.top === next.top && current?.left === next.left
+            ? current
+            : next
+        );
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
+
+  return (
+    <ThemeScope scope="contextMenu">
+      <Box
+        onPress={popover.onClose}
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1000
+        }}
+      >
+        <Flex
+          ref={ref}
+          onPress={(event) => event.stopPropagation()}
+          sx={{
+            position: "absolute",
+            top: position?.top ?? rect.y,
+            left: position?.left ?? rect.x,
+            opacity: position ? 1 : 0,
+            bg: "background",
+            borderRadius: "radius2",
+            boxShadow: "menu",
+            ...popover.sx
+          }}
+        >
+          {popover.children}
+        </Flex>
+      </Box>
+    </ThemeScope>
   );
 }
