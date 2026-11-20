@@ -10,7 +10,7 @@ import {
   NotesWidget,
   NotesWidgetSource
 } from "../../services/widgets/notes-widget";
-import { NotePicker } from ".";
+import { NotePicker } from "../note-preview-configure";
 
 export const WIDGET_NOTE_PICKER_URL = "nn://pick_widget_note";
 export const WIDGET_SOURCE_PICKER_URL = "nn://pick_widget_source";
@@ -54,7 +54,7 @@ export function getWidgetPickerSlot(url?: string | null) {
 export const useWidgetPickerAsRoot = () =>
   useWidgetPicker((state) => !!state.kind && state.root);
 
-const PickerContent = () => {
+export const WidgetPickerContent = () => {
   const kind = useWidgetPicker((state) => state.kind);
   const slot = useWidgetPicker((state) => state.slot);
   const close = useWidgetPicker((state) => state.close);
@@ -86,8 +86,6 @@ const PickerContent = () => {
   );
 };
 
-export const WidgetPickerRoot = PickerContent;
-
 export const WidgetPicker = () => {
   const kind = useWidgetPicker((state) => state.kind);
   const root = useWidgetPicker((state) => state.root);
@@ -103,7 +101,7 @@ export const WidgetPicker = () => {
       presentationStyle="fullScreen"
       onRequestClose={close}
     >
-      <PickerContent />
+      <WidgetPickerContent />
     </Modal>
   );
 };

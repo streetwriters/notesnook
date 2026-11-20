@@ -45,10 +45,10 @@ import { NotePreviewConfigure } from "./screens/note-preview-configure";
 import { NotesWidgetConfigure } from "./screens/notes-widget-configure";
 import {
   WidgetPicker,
-  WidgetPickerRoot,
+  WidgetPickerContent,
   useWidgetPicker,
   useWidgetPickerAsRoot
-} from "./screens/note-preview-configure/widget-picker";
+} from "./screens/widget-picker";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
@@ -116,7 +116,7 @@ const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
         ) : props.configureMode === "notes-widget" ? (
           <NotesWidgetConfigure />
         ) : pickerAsRoot ? (
-          <WidgetPickerRoot />
+          <WidgetPickerContent />
         ) : (
           <RootNavigation />
         )}

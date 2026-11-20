@@ -86,7 +86,7 @@ import {
   getWidgetPickerKind,
   getWidgetPickerSlot,
   useWidgetPicker
-} from "../screens/note-preview-configure/widget-picker";
+} from "../screens/widget-picker";
 import { WidgetTheme } from "../services/widgets/widget-theme";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
