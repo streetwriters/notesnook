@@ -69,7 +69,6 @@ struct WidgetNote: Decodable, Identifiable, Hashable {
   let headline: String
   let locked: Bool
   let blocks: [NoteBlock]
-  let truncated: Bool
 
   init(id: String, title: String, headline: String = "", locked: Bool = false) {
     self.id = id
@@ -77,7 +76,6 @@ struct WidgetNote: Decodable, Identifiable, Hashable {
     self.headline = headline
     self.locked = locked
     self.blocks = []
-    self.truncated = false
   }
 
   init(from decoder: Decoder) throws {
@@ -87,11 +85,10 @@ struct WidgetNote: Decodable, Identifiable, Hashable {
     headline = try container.decodeIfPresent(String.self, forKey: .headline) ?? ""
     locked = try container.decodeIfPresent(Bool.self, forKey: .locked) ?? false
     blocks = (try? container.decodeIfPresent([NoteBlock].self, forKey: .blocks)) ?? []
-    truncated = try container.decodeIfPresent(Bool.self, forKey: .truncated) ?? false
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id, title, headline, locked, blocks, truncated
+    case id, title, headline, locked, blocks
   }
 }
 

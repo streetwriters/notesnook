@@ -47,7 +47,7 @@ export type NoteBlock =
   | { type: "code"; text: string }
   | { type: "rule" };
 
-export type NoteBlocks = { blocks: NoteBlock[]; truncated: boolean };
+export type NoteBlocks = { blocks: NoteBlock[] };
 
 export const WIDGET_CONTENT_LIMIT = 2000;
 const MAX_HTML_LENGTH = 24000;
@@ -408,12 +408,12 @@ function limitBlocks(blocks: NoteBlock[], limit: number): NoteBlocks {
     const length = blockLength(block);
     if (length > left) {
       out.push(cutBlock(block, left));
-      return { blocks: out, truncated: true };
+      return { blocks: out };
     }
     out.push(block);
     left -= length;
   }
-  return { blocks: out, truncated: false };
+  return { blocks: out };
 }
 
 export function htmlToWidgetBlocks(
