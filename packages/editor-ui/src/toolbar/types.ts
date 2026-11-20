@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Editor } from "../types.js";
 import { IconNames } from "./icons.js";
-import { ToolId } from "./tools/index.js";
 
 export type ToolButtonVariant = "small" | "normal";
 export type ToolProps = ToolDefinition & {
@@ -36,6 +35,7 @@ export type ToolDefinition = {
   description?: string;
 };
 
-export type ToolbarGroupDefinition = (ToolId | ToolId[])[];
-
-export type ToolbarDefinition = ToolbarGroupDefinition[];
+export type {
+  ToolbarGroupDefinition,
+  ToolbarDefinition
+} from "../toolbar-data/index.js";

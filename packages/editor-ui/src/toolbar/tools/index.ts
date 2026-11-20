@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { ToolProps } from "../types.js";
+import type { ToolId } from "../../toolbar-data/index.js";
 import {
   Bold,
   Italic,
@@ -104,8 +105,8 @@ import {
   WebClipOpenSource
 } from "./web-clip.js";
 
-export type ToolId = keyof typeof tools;
-const tools = {
+export type { ToolId };
+const tools: Record<ToolId, React.FunctionComponent<ToolProps>> = {
   bold: Bold,
   italic: Italic,
   underline: Underline,
