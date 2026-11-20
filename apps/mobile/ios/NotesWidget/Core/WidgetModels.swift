@@ -92,8 +92,8 @@ struct WidgetNote: Decodable, Identifiable, Hashable {
   }
 }
 
-struct WidgetReminder: Codable, Identifiable, Hashable {
-  enum Mode: String, Codable {
+struct WidgetReminder: Decodable, Identifiable, Hashable {
+  enum Mode: String, Decodable {
     case once, repeating = "repeat", permanent
   }
 
@@ -120,17 +120,6 @@ struct WidgetReminder: Codable, Identifiable, Hashable {
 
     let snooze = try container.decodeIfPresent(Double.self, forKey: .snoozeUntil) ?? 0
     snoozeUntil = snooze > 0 ? Date(timeIntervalSince1970: snooze / 1000) : nil
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(id, forKey: .id)
-    try container.encode(title, forKey: .title)
-    try container.encode(description, forKey: .description)
-    try container.encode(mode, forKey: .mode)
-    try container.encode(disabled, forKey: .disabled)
-    try container.encode(triggerDate.timeIntervalSince1970 * 1000, forKey: .triggerDate)
-    try container.encode((snoozeUntil?.timeIntervalSince1970 ?? 0) * 1000, forKey: .snoozeUntil)
   }
 
   private enum CodingKeys: String, CodingKey {
