@@ -27,7 +27,7 @@ export { SortableList } from "./sortable-list";
 export * from "./overlays";
 export * from "./primitives";
 export { ColorPicker } from "./color-picker";
-export { Popover, PopoverHost } from "./popover";
+export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
 export { QRCode } from "./qrcode";
 export { Select } from "./select";
 export { WebView } from "./webview";

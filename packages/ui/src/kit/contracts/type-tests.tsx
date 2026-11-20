@@ -22,6 +22,23 @@ import { dataColor } from "./style";
 import { Pane, SplitPane } from "./layout";
 import { VirtualList } from "./lists";
 import { Box, Button, Flex, Grid, Input, Text, ThemeScope } from "./primitives";
+import { Popover, ResponsivePresenter } from "./overlays";
+
+export const overlays = [
+  <Popover
+    key="1"
+    isOpen
+    onClose={() => undefined}
+    anchorRect={{ x: 0, y: 0, width: 10, height: 10 }}
+  />,
+  <ResponsivePresenter
+    key="2"
+    isOpen
+    onClose={() => undefined}
+    anchorRect={{ x: 0, y: 0, width: 10, height: 10 }}
+    sheetBreakpoint={500}
+  />
+];
 
 export const valid: SxProp = {
   display: "flex",

@@ -82,16 +82,37 @@ export type PopoverPlacement =
   | "top-start"
   | "top-end";
 
+/** A rectangle in window coordinates. */
+export interface AnchorRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface PopoverProps {
   isOpen: boolean;
   onClose: () => void;
-  anchorRef: RefObject<UIElement | null>;
+  /** Element to anchor to. Ignored when `anchorRect` is given. */
+  anchorRef?: RefObject<UIElement | null>;
+  /** Anchor to a rect (e.g. the caret from the editor's `anchor` query). */
+  anchorRect?: AnchorRect;
   placement?: PopoverPlacement;
   sx?: SxProp;
   children?: ReactNode;
 }
 
 export declare function Popover(props: PopoverProps): JSX.Element | null;
+
+export interface ResponsivePresenterProps extends PopoverProps {
+  /** Window width (px) below which the content is shown as a bottom sheet. */
+  sheetBreakpoint?: number;
+}
+
+/** Popover on wide windows, bottom sheet on narrow ones (mobile). */
+export declare function ResponsivePresenter(
+  props: ResponsivePresenterProps
+): JSX.Element | null;
 export declare function PopoverHost(): JSX.Element | null;
 
 export interface DragPayload {

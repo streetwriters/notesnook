@@ -54,13 +54,39 @@ export function Popover(props: Contract.PopoverProps) {
       remove(id);
       return;
     }
-    props.anchorRef.current?.measureInWindow((x, y, width, height) =>
+    if (props.anchorRect) {
+      put({ id, rect: props.anchorRect, props });
+      return;
+    }
+    props.anchorRef?.current?.measureInWindow((x, y, width, height) =>
       put({ id, rect: { x, y, width, height }, props })
     );
   });
 
   useEffect(() => () => remove(id), [id]);
   return null;
+}
+
+const DEFAULT_SHEET_BREAKPOINT = 600;
+
+export function ResponsivePresenter(props: Contract.ResponsivePresenterProps) {
+  const { sheetBreakpoint = DEFAULT_SHEET_BREAKPOINT, ...popover } = props;
+  const window = useWindowSize();
+  if (window.width >= sheetBreakpoint) return <Popover {...popover} />;
+
+  // Sheet: a full-width panel pinned to the bottom edge of the window.
+  return (
+    <Popover
+      {...popover}
+      anchorRect={{ x: 0, y: window.height, width: window.width, height: 0 }}
+      placement="top-start"
+      sx={{
+        ...popover.sx,
+        width: window.width,
+        borderRadius: "radius2"
+      }}
+    />
+  );
 }
 
 function useStable() {

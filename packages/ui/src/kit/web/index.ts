@@ -24,7 +24,7 @@ export { LayoutRoot, Pane, ScrollContainer, SplitPane } from "./layout";
 export { TITLE_BAR_HEIGHT, TitleBar } from "./layout";
 export { VirtualList } from "./lists";
 export { SortableList } from "./sortable-list";
-export { Popover, PopoverHost } from "./popover";
+export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
 export { showToast, ToastHost } from "./toast";
 export * from "./primitives";
 export { WebThemeProvider, ThemeScope } from "./theme";
