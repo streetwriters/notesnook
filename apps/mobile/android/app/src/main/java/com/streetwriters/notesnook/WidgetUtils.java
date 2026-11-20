@@ -39,6 +39,7 @@ public class WidgetUtils {
     static final String PINNED_NOTES_KEY = "pinnedNotesList";
     static final String NOTES_CONFIG_PREFIX = "notesWidget.config.";
     static final String NOTES_LIST_PREFIX = "notesWidget.notes.";
+    static final String NOTES_TITLE_PREFIX = "notesWidget.title.";
     static final String DEFAULT_NOTES_SOURCE_KEY = "recent";
 
     /**
@@ -228,6 +229,15 @@ public class WidgetUtils {
             }
         }
         return NotesWidgetSource.defaultSource(context.getString(R.string.notes_widget_default_source));
+    }
+
+    /**
+     * The up to date title of a source as last resolved by the app, so renamed notebooks, tags and
+     * colors show their new name. Falls back to the title stored when the widget was configured.
+     */
+    static String getNotesWidgetTitle(Context context, NotesWidgetSource source) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        return preferences.getString(NOTES_TITLE_PREFIX + source.getKey(), source.getTitle());
     }
 
     /**
