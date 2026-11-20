@@ -241,6 +241,36 @@ public class WidgetUtils {
     }
 
     /**
+     * Drops the stored notes and titles of sources that no notes widget is configured with
+     * anymore. The default source is always kept.
+     */
+    static void removeUnusedNotesLists(Context context) {
+        Set<String> used = new HashSet<>();
+        used.add(DEFAULT_NOTES_SOURCE_KEY);
+        for (String data : getNotesWidgetSourceData(context)) {
+            try {
+                NotesWidgetSource source = new Gson().fromJson(data, NotesWidgetSource.class);
+                if (source != null && source.getKey() != null) used.add(source.getKey());
+            } catch (Exception e) {
+                Log.e("NotesWidget", "Could not read a stored widget source", e);
+            }
+        }
+
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = preferences.edit();
+        boolean changed = false;
+        for (String key : preferences.getAll().keySet()) {
+            String sourceKey = null;
+            if (key.startsWith(NOTES_LIST_PREFIX)) sourceKey = key.substring(NOTES_LIST_PREFIX.length());
+            else if (key.startsWith(NOTES_TITLE_PREFIX)) sourceKey = key.substring(NOTES_TITLE_PREFIX.length());
+            if (sourceKey == null || used.contains(sourceKey)) continue;
+            edit.remove(key);
+            changed = true;
+        }
+        if (changed) edit.apply();
+    }
+
+    /**
      * Every source currently configured on a notes widget, as the JSON the app stored.
      */
     static List<String> getNotesWidgetSourceData(Context context) {

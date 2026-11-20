@@ -68,6 +68,11 @@ export const IOSWidgets = {
     IOSWidgets.reload(kinds);
   },
 
+  remove(key: IOSWidgetKey) {
+    if (!IOSWidgets.isSupported) return;
+    getStorage().removeItem(key);
+  },
+
   read<T>(key: IOSWidgetKey, fallback: T): T {
     if (!IOSWidgets.isSupported) return fallback;
     try {

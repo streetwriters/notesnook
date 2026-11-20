@@ -140,6 +140,25 @@ async function updateIOS() {
   for (const source of sources) {
     IOSWidgets.write(`notes.${source.key}`, await fetchNotes(source));
   }
+
+  const keys = sources.map((source) => source.key);
+  for (const key of IOSWidgets.read<string[]>("notesListKeys", [])) {
+    if (keys.includes(key)) continue;
+    IOSWidgets.remove(`notes.${key}`);
+    IOSWidgets.remove(`notesPage.${key}`);
+  }
+  IOSWidgets.write("notesListKeys", keys);
+
+  const slots = IOSWidgets.read<Record<string, string>>(
+    "widgetSlotSources",
+    {}
+  );
+  const pruned = Object.fromEntries(
+    Object.entries(slots).filter(([, key]) => keys.includes(key))
+  );
+  if (Object.keys(pruned).length !== Object.keys(slots).length) {
+    IOSWidgets.write("widgetSlotSources", pruned);
+  }
   IOSWidgets.publish("widgetSources", sources, ["NotesListWidget"]);
 }
 

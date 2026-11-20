@@ -228,6 +228,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void updateNotesWidget() {
+        WidgetUtils.removeUnusedNotesLists(mContext);
         AppWidgetManager wm = AppWidgetManager.getInstance(mContext);
         int[] ids = wm.getAppWidgetIds(ComponentName.createRelative(mContext.getPackageName(), NotesWidgetProvider.class.getName()));
         for (int id: ids) {
