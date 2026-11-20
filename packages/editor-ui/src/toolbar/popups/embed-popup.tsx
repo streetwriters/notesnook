@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { strings } from "@notesnook/intl";
 import { convertUrlToEmbedUrl, isValidUrl } from "@social-embed/lib";
-import { Flex, Input, Text, Textarea } from "@theme-ui/components";
+import { Flex, Input, Text, Textarea } from "@ui";
 import { useCallback, useState } from "react";
 import { InlineInput } from "../../components/inline-input/index.js";
 import { Tab, Tabs } from "../../components/tabs/index.js";
 import { Embed, EmbedSizeOptions } from "../../extension-types.js";
 import { Popup } from "../components/popup.js";
+import { findIframe, getAttribute } from "../../utils/embed-code.js";
 
 type EmbedSource = "url" | "code";
 
@@ -78,20 +79,19 @@ export function EmbedPopup(props: EmbedPopupProps) {
           let _height = size.height;
 
           if (embedSource === "code") {
-            const document = new DOMParser().parseFromString(src, "text/html");
-            if (document.getElementsByTagName("iframe").length <= 0)
-              return setError(strings.embedIframeRequired());
+            const iframe = findIframe(src);
+            if (!iframe) return setError(strings.embedIframeRequired());
 
-            const srcValue = getAttribute(document, "src");
+            const srcValue = getAttribute(iframe, "src");
             if (!srcValue) return setError(strings.embedIframeSrcRequired());
 
             _src = srcValue;
 
-            const widthValue = getAttribute(document, "width");
+            const widthValue = getAttribute(iframe, "width");
             if (widthValue && !isNaN(parseInt(widthValue)))
               _width = parseInt(widthValue);
 
-            const heightValue = getAttribute(document, "height");
+            const heightValue = getAttribute(iframe, "height");
             if (heightValue && !isNaN(parseInt(heightValue)))
               _height = parseInt(heightValue);
           }
@@ -124,7 +124,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
           <Text
             variant={"error"}
             sx={{
-              bg: "var(--background-error)",
+              bg: "background-error",
               p: 1,
               borderRadius: "default"
             }}
@@ -143,8 +143,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               placeholder={strings.enterEmbedSourceURL()}
               value={src}
               autoFocus
-              onChange={(e) => setSrc(e.target.value)}
-              autoCapitalize="none"
+              onChangeText={setSrc}
               sx={{ fontSize: "body" }}
             />
             <Flex sx={{ alignItems: "center", mt: 1 }}>
@@ -153,21 +152,18 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 label={strings.width()}
                 type="number"
                 placeholder={strings.width()}
-                defaultValue={size.width}
-                sx={{
-                  mr: 1,
-                  fontSize: "body"
-                }}
-                onChange={(e) => onSizeChange(e.target.valueAsNumber)}
+                defaultValue={String(size.width)}
+                sx={{ mr: 1, fontSize: "body" }}
+                onChangeText={(text) => onSizeChange(parseNumber(text))}
               />
               <InlineInput
                 label={strings.height()}
                 type="number"
                 placeholder={strings.height()}
-                defaultValue={size.height}
+                defaultValue={String(size.height)}
                 sx={{ fontSize: "body" }}
-                onChange={(e) =>
-                  onSizeChange(undefined, e.target.valueAsNumber)
+                onChangeText={(text) =>
+                  onSizeChange(undefined, parseNumber(text))
                 }
               />
             </Flex>
@@ -175,13 +171,13 @@ export function EmbedPopup(props: EmbedPopupProps) {
           <Tab title={strings.fromCode()}>
             <Textarea
               autoFocus
-              variant={"forms.input"}
+              variant={"input"}
               sx={{
                 fontSize: "subBody",
                 fontFamily: "monospace",
                 minHeight: [200, 100]
               }}
-              onChange={(e) => setSrc(e.target.value)}
+              onChangeText={setSrc}
               placeholder={strings.pasteEmbedCode()}
             />
           </Tab>
@@ -191,9 +187,6 @@ export function EmbedPopup(props: EmbedPopupProps) {
   );
 }
 
-function getAttribute(document: Document, id: string) {
-  const element = document.querySelector(`[${id}]`);
-  if (!element) return null;
-  const attribute = element.getAttribute(id);
-  return attribute;
+function parseNumber(text: string) {
+  return text.trim() === "" ? NaN : Number(text);
 }

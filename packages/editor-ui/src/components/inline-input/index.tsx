@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Input, InputProps } from "@theme-ui/components";
-import { Flex, FlexProps, Text } from "@theme-ui/components";
+import { Flex, Input, Text, type InputProps, type FlexProps } from "@ui";
 
 type LabelInputProps = InputProps & {
   label: string;
@@ -32,23 +31,26 @@ export function InlineInput(props: LabelInputProps) {
       {...containerProps}
       sx={{
         flex: 1,
+        alignItems: "center",
         ...containerProps?.sx,
-        outline: "1px solid var(--border)",
+        border: "1px solid",
+        borderColor: "border",
         p: 2,
-        borderRadius: "default",
-        ":focus-within": {
-          outlineColor: "accent",
-          outlineWidth: "1.8px"
-        }
+        borderRadius: "default"
       }}
     >
-      <Input variant={"clean"} sx={{ ...sx, p: 0 }} {...inputProps} />
+      <Input
+        variant={"clean"}
+        sx={{ flex: 1, ...sx, p: 0 }}
+        {...inputProps}
+      />
       <Text
         variant={"body"}
         sx={{
           flexShrink: 0,
           color: "paragraph",
-          borderLeft: "1px solid var(--border)",
+          borderLeft: "1px solid",
+          borderLeftColor: "border",
           pl: 1
         }}
       >

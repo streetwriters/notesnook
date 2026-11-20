@@ -17,15 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Input } from "@theme-ui/components";
 import { useState } from "react";
-import { Flex, Text } from "@theme-ui/components";
+import { Flex, Input, Text } from "@ui";
 import { ImageAttributes } from "../../extension-types.js";
 import { Popup } from "../components/popup.js";
 import { downloadImage, toDataURL } from "../../utils/downloader.js";
 import { useToolbarStore } from "../stores/toolbar-store.js";
 import { strings } from "@notesnook/intl";
-import { hasPermission } from "../../types.js";
+import { hasPermission } from "../../permissions.js";
 
 export type ImageUploadPopupProps = {
   onInsert: (image: Partial<ImageAttributes>) => void;
@@ -69,12 +68,12 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
     >
       <Flex sx={{ px: 1, flexDirection: "column", width: ["auto", 350] }}>
         <Input
-          type="url"
+          type="text"
           autoFocus
           placeholder={strings.pasteImageURL()}
           value={url}
-          onChange={(e) => {
-            setUrl(e.target.value);
+          onChangeText={(text) => {
+            setUrl(text);
             setError(undefined);
           }}
         />
@@ -83,7 +82,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           <Text
             variant={"error"}
             sx={{
-              bg: "var(--background-error)",
+              bg: "background-error",
               mt: 1,
               p: 1,
               borderRadius: "default"

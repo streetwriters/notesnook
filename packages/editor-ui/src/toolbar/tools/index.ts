@@ -45,6 +45,11 @@ import {
 } from "./lists.js";
 import { TextDirection } from "./text-direction.js";
 import { Highlight, TextColor } from "./colors.js";
+import { ControllerInsertBlock } from "./controller-block.js";
+import {
+  ControllerAddLink,
+  ControllerAddInternalLink
+} from "./controller-link.js";
 
 export type { ToolId };
 
@@ -73,6 +78,9 @@ const tools: Partial<Record<ToolId, React.FunctionComponent<ToolProps>>> = {
   math: Math,
   outdent: Outdent,
   indent: Indent,
+  insertBlock: ControllerInsertBlock,
+  addLink: ControllerAddLink,
+  addInternalLink: ControllerAddInternalLink,
   none
 };
 

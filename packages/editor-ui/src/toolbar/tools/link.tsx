@@ -22,7 +22,11 @@ import { TiptapToolProps as ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { useEffect, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive/index.js";
-import { LinkPopup } from "../popups/link-popup.js";
+import {
+  LinkPopup,
+  isInternalLink,
+  type LinkDefinition
+} from "../popups/link-popup.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
@@ -337,10 +341,7 @@ export function CopyLink(props: ToolProps) {
   );
 }
 
-export type LinkDefinition = {
-  href: string;
-  title?: string;
-};
+export { isInternalLink, type LinkDefinition };
 type LinkToolProps = ToolProps & {
   isEditing?: boolean;
   onDone: (link: LinkDefinition) => void;
@@ -428,8 +429,4 @@ function LinkTypeIcon({
       : "icon-secondary";
 
   return <Icon path={path} color={color} size={13} sx={{ mr: 1 }} />;
-}
-
-export function isInternalLink(href?: string | null) {
-  return typeof href === "string" ? href.startsWith("nn://") : false;
 }

@@ -17,13 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { UnionCommands, Editor as TiptapEditor } from "@tiptap/core";
+import { Editor as TiptapEditor } from "@tiptap/core";
 import { Mutex } from "async-mutex";
 
-export type PermissionRequestEvent = CustomEvent<{
-  id: keyof UnionCommands;
-  silent: boolean;
-}>;
+export { hasPermission, type PermissionRequestEvent } from "./permissions.js";
 
 export type LinkData = {
   type: "note" | "notebook" | "color" | "tag";
@@ -42,15 +39,4 @@ export class Editor extends TiptapEditor {
   threadsafe(callback: (editor: TiptapEditor) => void) {
     return this.mutex.runExclusive(() => (this ? callback(this) : void 0));
   }
-}
-
-export function hasPermission(
-  id: keyof UnionCommands,
-  silent = false
-): boolean {
-  const event = new CustomEvent("permissionrequest", {
-    detail: { id, silent },
-    cancelable: true
-  });
-  return window.dispatchEvent(event);
 }

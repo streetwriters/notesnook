@@ -26,6 +26,7 @@ export * from "./toolbar/stores/search-store.js";
 export * from "./toolbar/components/popup.js";
 export * from "./toolbar/components/tool-button.js";
 export * from "./toolbar/popups/link-popup.js";
+export * from "./toolbar/popups/show-link-popup.js";
 export * from "./toolbar/utils/dom.js";
 export * from "./toolbar/components/toolbar-group.js";
 export { DEFAULT_COLORS } from "./toolbar/tools/colors.js";

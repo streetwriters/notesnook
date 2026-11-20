@@ -23,3 +23,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * `@notesnook/editor-ui` instead.
  */
 export * from "@notesnook/editor-ui/toolbar/popups/link-popup.js";
+export * from "@notesnook/editor-ui/toolbar/popups/show-link-popup.js";

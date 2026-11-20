@@ -43,29 +43,27 @@ export function ImageProperties(props: ImagePropertiesProps) {
         <InlineInput
           label={strings.width()}
           type="number"
-          value={width || 0}
+          value={String(width || 0)}
           containerProps={{
             sx: { mr: 1 }
           }}
-          onChange={(e) => {
+          onChangeText={(text) => {
+            const value = Number(text);
             editor.commands.setImageSize({
-              width: e.target.valueAsNumber,
-              height: aspectRatio
-                ? e.target.valueAsNumber / aspectRatio
-                : e.target.valueAsNumber
+              width: value,
+              height: aspectRatio ? value / aspectRatio : value
             });
           }}
         />
         <InlineInput
           label={strings.height()}
           type="number"
-          value={height || 0}
-          onChange={(e) => {
+          value={String(height || 0)}
+          onChangeText={(text) => {
+            const value = Number(text);
             editor.commands.setImageSize({
-              width: aspectRatio
-                ? e.target.valueAsNumber * aspectRatio
-                : e.target.valueAsNumber,
-              height: e.target.valueAsNumber
+              width: aspectRatio ? value * aspectRatio : value,
+              height: value
             });
           }}
         />

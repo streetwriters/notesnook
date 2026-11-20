@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@ui";
 import { useEffect, useState } from "react";
 import { Popup } from "../components/popup.js";
 import { useIsMobile } from "../stores/toolbar-store.js";
@@ -72,6 +72,9 @@ export function TablePopup(props: TablePopupProps) {
     });
   }, [cellLocation, autoExpand]);
 
+  const insert = () =>
+    onInsertTable({ columns: cellLocation.column, rows: cellLocation.row });
+
   return (
     <Popup
       action={{
@@ -80,136 +83,97 @@ export function TablePopup(props: TablePopupProps) {
             ? strings.setTableSizeNotice()
             : strings.insertTableOfSize(cellLocation.row, cellLocation.column),
         disabled: !cellLocation.column || !cellLocation.row,
-        onClick: () =>
-          onInsertTable({
-            columns: cellLocation.column,
-            rows: cellLocation.row
-          })
+        onClick: insert
       }}
     >
       <Flex
         sx={{ px: 1, pt: 1, flexDirection: "column", alignItems: "center" }}
       >
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${cellSize}px, 1fr))`, // "1fr ".repeat(tableSize.columns),
-            gap: "small",
-            bg: "background",
-            width: "100%"
-          }}
-          onTouchMove={(e) => {
-            const touch = e.touches.item(0);
-            const element = document.elementFromPoint(
-              touch.pageX,
-              touch.pageY
-            ) as HTMLElement;
-            if (!element) return;
-            const index = element.dataset.index;
-            if (!index) return;
-            setCellLocation(getCellLocation(parseInt(index), tableSize));
-          }}
-        >
-          {Array(tableSize.columns * tableSize.rows)
-            .fill(0)
-            .map((_, index) => (
-              <Box
-                key={index}
-                data-index={index}
-                sx={{
-                  height: cellSize || 15,
-                  borderRadius: "small",
-                  border: "1px solid",
-                  ...(isCellHighlighted(index, cellLocation, tableSize)
-                    ? {
-                        bg: "background-selected",
-                        borderColor: "transparent"
-                      }
-                    : { bg: "background-secondary", borderColor: "border" })
-                }}
-                onTouchStart={() => {
-                  setCellLocation(getCellLocation(index, tableSize));
-                }}
-                onMouseEnter={() => {
-                  setCellLocation(getCellLocation(index, tableSize));
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                }}
-                onClick={() => {
-                  onInsertTable({
-                    columns: cellLocation.column,
-                    rows: cellLocation.row
-                  });
-                }}
-              />
-            ))}
-        </Box>
         <Flex
+          testID="table-size-grid"
           sx={{
-            display: ["flex", "none", "none"],
-            mt: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            maxWidth: "100%"
+            flexDirection: "column",
+            bg: "background",
+            width: "100%",
+            gap: "small"
           }}
         >
-          <InlineInput
-            containerProps={{ sx: { mr: 1, flexShrink: 1 } }}
-            label={strings.columns()}
-            placeholder={strings.totalColumns(cellLocation.column)}
-            type="number"
-            value={cellLocation.column}
-            onChange={(e) => {
-              setCellLocation((l) => ({
-                ...l,
-                column: e.target.valueAsNumber || 0
-              }));
-            }}
-          />
-          <InlineInput
-            containerProps={{ sx: { flexShrink: 1 } }}
-            label={strings.rows()}
-            placeholder={strings.totalRows(cellLocation.row)}
-            type="number"
-            value={cellLocation.row}
-            onChange={(e) => {
-              setCellLocation((l) => ({
-                ...l,
-                row: e.target.valueAsNumber || 0
-              }));
-            }}
-          />
+          {Array.from({ length: tableSize.rows }, (_, row) => (
+            <Flex key={row} sx={{ flexDirection: "row", gap: "small" }}>
+              {Array.from({ length: tableSize.columns }, (_, column) => {
+                const location = { row: row + 1, column: column + 1 };
+                const highlighted =
+                  location.row <= cellLocation.row &&
+                  location.column <= cellLocation.column;
+                return (
+                  <Box
+                    key={column}
+                    sx={{
+                      flex: 1,
+                      minWidth: cellSize,
+                      height: cellSize,
+                      borderRadius: "small",
+                      border: "1px solid",
+                      ...(highlighted
+                        ? {
+                            bg: "background-selected",
+                            borderColor: "transparent"
+                          }
+                        : {
+                            bg: "background-secondary",
+                            borderColor: "border"
+                          })
+                    }}
+                    onHoverIn={() => setCellLocation(location)}
+                    onPress={() => {
+                      setCellLocation(location);
+                      onInsertTable({
+                        columns: location.column,
+                        rows: location.row
+                      });
+                    }}
+                  />
+                );
+              })}
+            </Flex>
+          ))}
         </Flex>
-        <Text
-          variant={"body"}
-          sx={{ mt: 1, display: ["none", "block", "block"] }}
-        >
-          {cellLocation.column} x {cellLocation.row}
-        </Text>
+        {isMobile ? (
+          <Flex
+            sx={{
+              mt: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              maxWidth: "100%"
+            }}
+          >
+            <InlineInput
+              containerProps={{ sx: { mr: 1, flexShrink: 1 } }}
+              label={strings.columns()}
+              placeholder={strings.totalColumns(cellLocation.column)}
+              type="number"
+              value={String(cellLocation.column)}
+              onChangeText={(text) =>
+                setCellLocation((l) => ({ ...l, column: Number(text) || 0 }))
+              }
+            />
+            <InlineInput
+              containerProps={{ sx: { flexShrink: 1 } }}
+              label={strings.rows()}
+              placeholder={strings.totalRows(cellLocation.row)}
+              type="number"
+              value={String(cellLocation.row)}
+              onChangeText={(text) =>
+                setCellLocation((l) => ({ ...l, row: Number(text) || 0 }))
+              }
+            />
+          </Flex>
+        ) : (
+          <Text variant={"body"} sx={{ mt: 1 }}>
+            {cellLocation.column} x {cellLocation.row}
+          </Text>
+        )}
       </Flex>
     </Popup>
-  );
-}
-
-function getCellLocation(index: number, tableSize: TableSize): CellLocation {
-  const cellIndex = index + 1;
-  const column = cellIndex % tableSize.columns;
-  let row = cellIndex / tableSize.columns;
-  const flooredRow = Math.floor(row);
-  row = row === flooredRow ? row : flooredRow + 1;
-
-  return { column: column ? column : tableSize.columns, row };
-}
-
-function isCellHighlighted(
-  index: number,
-  currentCellLocation: CellLocation,
-  tableSize: TableSize
-) {
-  const cellLocation = getCellLocation(index, tableSize);
-  return (
-    cellLocation.row <= currentCellLocation.row &&
-    cellLocation.column <= currentCellLocation.column
   );
 }

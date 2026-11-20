@@ -28,12 +28,21 @@ export type EditorCommand = { name: string; args?: unknown[] };
 
 export type ToolOverrides = Partial<Record<ToolId, ComponentType<ToolProps>>>;
 
+export type ControllerHostActions = {
+  openAttachmentPicker?: (type: "image" | "file" | "camera") => void;
+  createInternalLink?: (attributes?: {
+    href: string;
+    title?: string;
+  }) => Promise<{ href: string; title?: string } | undefined>;
+};
+
 export interface EditorController {
   readonly kind: "controller";
   readonly queries: QueryStore;
   run(...commands: EditorCommand[]): void;
   readonly tiptap?: Editor;
   readonly tools?: ToolOverrides;
+  readonly hostActions?: ControllerHostActions;
 }
 
 export type AnyEditor = Editor | TiptapEditor | EditorController;
@@ -52,11 +61,13 @@ export function createController(options: {
   queries: QueryStore;
   run: (commands: EditorCommand[]) => void;
   tools?: ToolOverrides;
+  hostActions?: ControllerHostActions;
 }): EditorController {
   return {
     kind: "controller",
     queries: options.queries,
     tools: options.tools,
+    hostActions: options.hostActions,
     run: (...commands) => options.run(commands)
   };
 }

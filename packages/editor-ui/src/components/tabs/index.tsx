@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { Children, PropsWithChildren, useMemo, useState } from "react";
-import { Button, Flex, FlexProps } from "@theme-ui/components";
+import { Button, Flex, type FlexProps } from "@ui";
 
 export type TabProps = { title: string | React.ReactElement };
 export function Tab(props: PropsWithChildren<TabProps>) {
@@ -37,7 +37,7 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
   const tabs = useMemo(
     () =>
       Children.map(children, (child) => {
-        if (React.isValidElement(child))
+        if (React.isValidElement<PropsWithChildren<TabProps>>(child))
           return { title: child.props.title, component: child };
       }),
     [children]
@@ -45,11 +45,7 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
 
   return (
     <Flex sx={{ flexDirection: "column" }}>
-      <Flex
-        sx={{
-          mb: 1
-        }}
-      >
+      <Flex sx={{ mb: 1 }}>
         {tabs?.map((tab, index) => (
           <Button
             variant="secondary"
@@ -61,17 +57,13 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
               borderRadius: 0,
               borderTopLeftRadius: "default",
               borderTopRightRadius: "default",
-              bg:
-                activeTab === index
-                  ? "var(--background-secondary)"
-                  : "transparent",
+              bg: activeTab === index ? "background-secondary" : "transparent",
               fontWeight: activeTab === index ? "bold" : "normal",
               color: "paragraph",
-              ":last-of-type": { mr: 0 },
               borderBottom: "2px solid",
               borderBottomColor: activeTab === index ? "accent" : "transparent"
             }}
-            onClick={() => {
+            onPress={() => {
               setActiveTab(index);
               onTabChanged?.(index);
             }}

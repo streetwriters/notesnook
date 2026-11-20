@@ -17,17 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Input, Text } from "@theme-ui/components";
-import { Flex } from "@theme-ui/components";
+import { Flex, Input, Text } from "@ui";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { Popup } from "../components/popup.js";
-import { isInternalLink, LinkDefinition } from "../tools/link.js";
-import { showPopup } from "../../components/popup-presenter/index.js";
-import { LinkAttributes, NODE_NAMES } from "../../extension-types.js";
-import { findMark, selectionToOffset } from "../../utils/prosemirror.js";
-import { Editor, getMarkAttributes } from "@tiptap/core";
 import { strings } from "@notesnook/intl";
 import { useState } from "react";
+
+export type LinkDefinition = {
+  href: string;
+  title?: string;
+};
+
+export function isInternalLink(href?: string | null) {
+  return typeof href === "string" ? href.startsWith("nn://") : false;
+}
 
 export type LinkPopupProps = {
   link?: LinkDefinition;
@@ -76,14 +79,7 @@ export function LinkPopup(props: LinkPopupProps) {
         onClick: handleDone
       }}
     >
-      <Flex
-        sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}
-        onKeyUp={(e) => {
-          if (e.key === "Enter") {
-            handleDone();
-          }
-        }}
-      >
+      <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
         {!isImageActive && (
           <>
             <Text
@@ -101,12 +97,10 @@ export function LinkPopup(props: LinkPopupProps) {
               placeholder={strings.linkText()}
               defaultValue={link.current?.title}
               sx={{ mb: 2 }}
-              onChange={(e) =>
-                (link.current = {
-                  ...link.current,
-                  title: e.target.value
-                })
+              onChangeText={(text) =>
+                (link.current = { ...link.current, title: text })
               }
+              onSubmit={handleDone}
             />
           </>
         )}
@@ -121,21 +115,22 @@ export function LinkPopup(props: LinkPopupProps) {
           {strings.url()}
         </Text>
         <Input
-          type="url"
+          type="text"
           autoFocus
           placeholder="https://example.com/"
           defaultValue={link.current?.href}
           variant={error ? "error" : "input"}
-          onChange={(e) => {
+          onChangeText={(text) => {
             if (error) setError(null);
-            link.current = { ...link.current, href: e.target.value };
+            link.current = { ...link.current, href: text };
           }}
+          onSubmit={handleDone}
         />
         {error && (
           <Text
             variant={"error"}
             sx={{
-              bg: "var(--background-error)",
+              bg: "background-error",
               p: 1,
               mt: 2,
               borderRadius: "default"
@@ -147,61 +142,4 @@ export function LinkPopup(props: LinkPopupProps) {
       </Flex>
     </Popup>
   );
-}
-
-export async function showLinkPopup(editor: Editor) {
-  const isActive = editor.isActive(NODE_NAMES.link);
-  const isImageActive = editor.isActive(NODE_NAMES.image);
-  const selectedNode = selectionToOffset(editor.state);
-  const link = selectedNode?.node
-    ? findMark(selectedNode.node, NODE_NAMES.link)
-    : null;
-  const attrs = link?.attrs || getMarkAttributes(editor.state, NODE_NAMES.link);
-  const selectedText = editor.state.doc.textBetween(
-    editor.state.selection.from,
-    editor.state.selection.to
-  );
-  if (isInternalLink(attrs.href)) {
-    const link = await editor.storage.createInternalLink?.(
-      attrs as LinkAttributes
-    );
-    if (!link) return;
-    if (isActive) {
-      const { from, to } = editor.state.selection;
-      if (selectedNode) editor.commands.setTextSelection(selectedNode);
-      editor.commands.setLink(link);
-      if (selectedNode) editor.commands.setTextSelection({ from, to });
-    } else {
-      editor.commands.setLink({ ...link, title: selectedText || link.title });
-    }
-    return;
-  }
-
-  showPopup({
-    popup: (close) => (
-      <LinkPopup
-        link={
-          selectedNode && selectedNode.node
-            ? {
-                title: isActive ? selectedNode.node.textContent : selectedText,
-                href: link?.attrs.href || ""
-              }
-            : undefined
-        }
-        onClose={close}
-        onDone={(link) => {
-          if (isActive) {
-            if (selectedNode)
-              editor.chain().focus().setTextSelection(selectedNode).run();
-            editor.commands.setLink(link);
-          } else editor.commands.toggleLink(link);
-          close();
-        }}
-        isEditing={isActive}
-        isImageActive={isImageActive}
-      />
-    ),
-    mobile: "sheet",
-    desktop: "popup"
-  });
 }
