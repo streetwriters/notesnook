@@ -196,6 +196,16 @@ async function updateAndroid() {
   NotesnookModule.updateNotesWidget();
 }
 
+function addSource(source: NotesWidgetSource) {
+  const stored = IOSWidgets.read<NotesWidgetSource[]>("widgetSources", []);
+  IOSWidgets.write(
+    "widgetSources",
+    [...stored.filter((item) => item.key !== source.key), source].slice(
+      -MAX_IOS_SOURCES
+    )
+  );
+}
+
 let timer: NodeJS.Timeout;
 
 export const NotesWidget = {
@@ -212,20 +222,9 @@ export const NotesWidget = {
     }, 500);
   },
 
-  addSource: (source: NotesWidgetSource) => {
-    if (Platform.OS !== "ios") return;
-    const stored = IOSWidgets.read<NotesWidgetSource[]>("widgetSources", []);
-    const sources = [
-      ...stored.filter((item) => item.key !== source.key),
-      source
-    ].slice(-MAX_IOS_SOURCES);
-    IOSWidgets.write("widgetSources", sources);
-    NotesWidget.updateNotes();
-  },
-
   chooseSource: (source: NotesWidgetSource, slot?: string) => {
     if (Platform.OS !== "ios") return;
-    if (!BUILTIN_TYPES.includes(source.type)) NotesWidget.addSource(source);
+    if (!BUILTIN_TYPES.includes(source.type)) addSource(source);
     if (slot) {
       const slots = IOSWidgets.read<Record<string, string>>(
         "widgetSlotSources",
