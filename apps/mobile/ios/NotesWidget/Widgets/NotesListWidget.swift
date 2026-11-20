@@ -26,8 +26,8 @@ enum NotesListStore {
   static func load(sourceTitle: String?, slot: String) -> NotesListData {
     let sources = sources()
     let slotSources = WidgetStore.decode([String: String].self, forKey: WidgetKey.widgetSlotSources) ?? [:]
-    let source = sources.first { $0.title == sourceTitle }
-      ?? sources.first { $0.key == slotSources[slot] }
+    let source = sources.first { $0.key == slotSources[slot] }
+      ?? sources.first { $0.title == sourceTitle }
       ?? sources.first
       ?? .recent
     return NotesListData(
@@ -206,7 +206,7 @@ struct NotesSourceOptionsProvider: DynamicOptionsProvider {
 struct NotesListIntent: WidgetConfigurationIntent {
   static var title: LocalizedStringResource = "Notes"
   static var description = IntentDescription(
-    "Choose what to show, or tap the widget title to pick in the app. Give widgets of the same size different slots so they can show different things."
+    "Choose what to show, or tap the widget title to pick in the app. A source picked in the app takes priority for its slot. Give widgets of the same size different slots so they can show different things."
   )
 
   @Parameter(title: "Show", optionsProvider: NotesSourceOptionsProvider())
