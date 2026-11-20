@@ -74,7 +74,7 @@ public class NotesWidgetProvider extends AppWidgetProvider {
         // Build list items using RemoteCollectionItems: rows travel directly inside the widget update,
         // so no bound RemoteViewsService is required and updates are completely self-contained.
         NotesWidgetSource source = WidgetUtils.getNotesWidgetSource(context, appWidgetId);
-        views.setTextViewText(R.id.widget_title, source.getTitle());
+        views.setTextViewText(R.id.widget_title, WidgetUtils.getNotesWidgetTitle(context, source));
         List<Note> notes = WidgetUtils.getNotesWidgetNotes(context, source.getKey());
         RemoteViewsCompat.RemoteCollectionItems.Builder items =
                 new RemoteViewsCompat.RemoteCollectionItems.Builder();

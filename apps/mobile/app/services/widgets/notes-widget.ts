@@ -159,10 +159,15 @@ async function updateAndroid() {
   for (const source of configured) sources.set(source.key, source);
 
   for (const source of sources.values()) {
-    const notes =
-      (await resolveTitle(source)) === undefined
-        ? []
-        : await fetchNotes(source);
+    const title = await resolveTitle(source);
+    const notes = title === undefined ? [] : await fetchNotes(source);
+    if (title !== undefined) {
+      NotesnookModule.setString(
+        "appPreview",
+        `notesWidget.title.${source.key}`,
+        title
+      );
+    }
     NotesnookModule.setString(
       "appPreview",
       `notesWidget.notes.${source.key}`,
