@@ -187,9 +187,13 @@ export async function downloadFile(
     RNFetchBlob.fs.unlink(originalFilePath).catch(() => {
       /* empty */
     });
-    DatabaseLogger.error(e, "Download failed: ", {
-      url
-    });
+    if ((e as Error).message === "canceled") {
+      DatabaseLogger.info("Download canceled", { filename });
+    } else {
+      DatabaseLogger.error(e, "Download failed: ", {
+        url
+      });
+    }
     return false;
   }
 }

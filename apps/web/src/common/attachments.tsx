@@ -40,7 +40,11 @@ async function download(hash: string, groupId?: string) {
       attachment.hash,
       attachment.chunkSize
     );
-  if (!downloadResult) throw new Error(strings.failedToDownloadFile());
+  if (!downloadResult) {
+    // attachment was removed while downloading
+    if (!(await db.attachments.attachment(hash))) return;
+    throw new Error(strings.failedToDownloadFile());
+  }
 
   const key = await db.attachments.decryptKey(attachment.key);
   if (!key) throw new Error(strings.invalidKeyForAttachment());

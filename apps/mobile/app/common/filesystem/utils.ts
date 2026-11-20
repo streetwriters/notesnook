@@ -74,10 +74,10 @@ export function cancelable(
     }
   ) => Promise<boolean>
 ) {
-  const cancelToken = {
-    cancel: async (reason?: string) => {}
-  };
   return (filename: string, requestOptions: RequestOptions) => {
+    const cancelToken = {
+      cancel: async (reason?: string) => {}
+    };
     return {
       execute: () => operation(filename, requestOptions, cancelToken),
       cancel: async () => {
