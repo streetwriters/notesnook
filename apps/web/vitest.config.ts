@@ -18,8 +18,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
+  resolve: {
+    alias: [
+      {
+        find: /^@ui$/,
+        replacement: path.join(__dirname, "../../packages/ui/src/kit/web/index.ts")
+      },
+      {
+        find: /^@platform$/,
+        replacement: path.join(
+          __dirname,
+          "../../packages/ui/src/kit/web/embedded-platform.ts"
+        )
+      }
+    ]
+  },
   test: {
     environment: "happy-dom",
     dir: "./__tests__/"

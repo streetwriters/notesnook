@@ -105,6 +105,19 @@ export default defineConfig({
 
     alias: [
       {
+        // the shared editor UI's web target (packages/ui/src/kit/web)
+        find: /^@ui$/,
+        replacement: path.join(__dirname, "../../packages/ui/src/kit/web/index.ts")
+      },
+      {
+        // the slice of @platform the web target of @ui needs
+        find: /^@platform$/,
+        replacement: path.join(
+          __dirname,
+          "../../packages/ui/src/kit/web/embedded-platform.ts"
+        )
+      },
+      {
         find: /\/desktop-bridge$/gm,
         replacement: isDesktop
           ? "/desktop-bridge/index.desktop"

@@ -7,7 +7,12 @@
     "noEmit": true,
     "allowJs": true,
     "moduleResolution": "nodenext",
-    "module": "nodenext"
+    "module": "nodenext",
+    "paths": {
+      "@ui": ["../ui/src/kit/web/index.ts"],
+      "@platform/files": ["../../apps/desktop-native/src/platform/files.ts"],
+      "@platform": ["../ui/src/kit/web/embedded-platform.ts"]
+    }
   },
   "include": ["src/"]
 }

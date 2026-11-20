@@ -7,6 +7,9 @@
     "moduleResolution": "Bundler",
     "noEmit": true,
     "paths": {
+      "@ui": ["../../packages/ui/src/kit/web/index.ts"],
+      "@platform/files": ["../desktop-native/src/platform/files.ts"],
+      "@platform": ["../../packages/ui/src/kit/web/embedded-platform.ts"],
       "@nn/test": ["./__e2e__/utils/test.ts"]
     }
   },
