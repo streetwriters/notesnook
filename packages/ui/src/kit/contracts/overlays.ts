@@ -80,7 +80,8 @@ export type PopoverPlacement =
   | "bottom-start"
   | "bottom-end"
   | "top-start"
-  | "top-end";
+  | "top-end"
+  | "right-start";
 
 /** A rectangle in window coordinates. */
 export interface AnchorRect {

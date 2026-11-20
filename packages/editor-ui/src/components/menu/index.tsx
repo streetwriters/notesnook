@@ -202,7 +202,7 @@ export function MenuButton(props: {
           items={submenu.items}
           onClose={onClose}
           anchorRef={ref}
-          placement="bottom-end"
+          placement="right-start"
         />
       ) : null}
     </>

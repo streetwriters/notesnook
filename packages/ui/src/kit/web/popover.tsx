@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 import type * as Contract from "../contracts/overlays";
+import { popoverPosition } from "../shared/popover-position";
 import { useWindowSize } from "./hooks";
 import { Box, Flex } from "./primitives";
 import { ThemeScope } from "./theme";
@@ -99,9 +100,11 @@ export function PopoverHost() {
   return (
     <>
       {entries.map(({ id, rect, props }) => {
-        const placement = props.placement ?? "bottom-start";
-        const below = placement.startsWith("bottom");
-        const start = placement.endsWith("start");
+        const position = popoverPosition(
+          rect,
+          props.placement ?? "bottom-start",
+          window
+        );
         return (
           <ThemeScope key={id} scope="contextMenu">
             <Box
@@ -119,10 +122,7 @@ export function PopoverHost() {
                 onPress={(event) => event.stopPropagation()}
                 sx={{
                   position: "absolute",
-                  top: below ? rect.y + rect.height + 5 : undefined,
-                  bottom: below ? undefined : window.height - rect.y + 5,
-                  left: start ? rect.x : undefined,
-                  right: start ? undefined : window.width - rect.x - rect.width,
+                  ...position,
                   bg: "background",
                   borderRadius: "radius2",
                   boxShadow: "menu",
