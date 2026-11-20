@@ -166,6 +166,10 @@ msgstr "{count, plural, one {# bestand bijvoegen:} other {# bestanden bijvoegen:
 msgid "{count, plural, one {Attachment deleted} other {# attachments deleted}}"
 msgstr "{count, plural, one {Bijlage verwijderd} other {# bijlagen verwijderd}}"
 
+#: src/strings.ts:3288
+msgid "{count, plural, one {Backup saved, but # attachment could not be included} other {Backup saved, but # attachments could not be included}}"
+msgstr "{count, plural, one {Back-up opgeslagen, maar # bijlage kon niet worden opgenomen} other {Back-up opgeslagen, maar # bijlagen konden niet worden opgenomen}}"
+
 #: generated/actions.ts:222
 msgid "{count, plural, one {Color renamed} other {# colors renamed}}"
 msgstr "{count, plural, one {Kleur hernoemd} other {# kleuren hernoemd}}"
