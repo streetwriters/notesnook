@@ -226,6 +226,25 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void updateNotesWidget() {
+        AppWidgetManager wm = AppWidgetManager.getInstance(mContext);
+        int[] ids = wm.getAppWidgetIds(ComponentName.createRelative(mContext.getPackageName(), NotesWidgetProvider.class.getName()));
+        for (int id: ids) {
+            RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget_notes);
+            NotesWidgetProvider.updateAppWidget(mContext, wm, id, views);
+        }
+    }
+
+    @ReactMethod
+    public void getNotesWidgetSources(Promise promise) {
+        WritableArray arr = Arguments.createArray();
+        for (String source : WidgetUtils.getNotesWidgetSourceData(getReactApplicationContext())) {
+            arr.pushString(source);
+        }
+        promise.resolve(arr);
+    }
+
     @ReactMethod(isBlockingSynchronousMethod = true)
     public boolean isGestureNavigationEnabled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

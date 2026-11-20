@@ -2,32 +2,46 @@ import { Note } from "@notesnook/core";
 import React from "react";
 import { Linking, Modal, Platform } from "react-native";
 import { create } from "zustand";
+import { ToastManager } from "../../services/event-manager";
+import { NotesSourcePicker } from "../notes-widget-configure";
 import { useUserStore } from "../../stores/use-user-store";
 import { NotePreviewWidget } from "../../services/note-preview-widget";
+import {
+  NotesWidget,
+  NotesWidgetSource
+} from "../../services/widgets/notes-widget";
 import { NotePicker } from ".";
 
 export const WIDGET_NOTE_PICKER_URL = "nn://pick_widget_note";
+export const WIDGET_SOURCE_PICKER_URL = "nn://pick_widget_source";
 
-type PickerKind = "note";
+type PickerKind = "note" | "source";
 
 type WidgetPickerState = {
   kind?: PickerKind;
+  slot?: string;
   root: boolean;
-  open: (kind: PickerKind) => void;
+  open: (kind: PickerKind, slot?: string) => void;
   close: () => void;
 };
 
 export const useWidgetPicker = create<WidgetPickerState>((set) => ({
   kind: undefined,
   root: false,
-  open: (kind) => set({ kind }),
-  close: () => set({ kind: undefined, root: false })
+  open: (kind, slot) => set({ kind, slot }),
+  close: () => set({ kind: undefined, slot: undefined, root: false })
 }));
 
 export function getWidgetPickerKind(
   url?: string | null
 ): PickerKind | undefined {
   if (url?.startsWith(WIDGET_NOTE_PICKER_URL)) return "note";
+  if (url?.startsWith(WIDGET_SOURCE_PICKER_URL)) return "source";
+}
+
+export function getWidgetPickerSlot(url?: string | null) {
+  const match = url ? /[?&]slot=([^&]*)/.exec(url) : null;
+  return match ? decodeURIComponent(match[1]) : undefined;
 }
 
 export const widgetPickerLaunchCheck: Promise<void> =
@@ -38,6 +52,7 @@ export const widgetPickerLaunchCheck: Promise<void> =
           if (kind) {
             useWidgetPicker.setState({
               kind,
+              slot: getWidgetPickerSlot(url),
               root: true
             });
           }
@@ -49,8 +64,26 @@ export const useWidgetPickerAsRoot = () =>
   useWidgetPicker((state) => !!state.kind && state.root);
 
 const PickerContent = () => {
+  const kind = useWidgetPicker((state) => state.kind);
+  const slot = useWidgetPicker((state) => state.slot);
   const close = useWidgetPicker((state) => state.close);
 
+  if (kind === "source") {
+    return (
+      <NotesSourcePicker
+        description="Pick what this widget shows. Widgets of the same size share a choice unless you give them different slots in Edit Widget."
+        onSelect={(source: NotesWidgetSource) => {
+          NotesWidget.chooseSource(source, slot);
+          close();
+          ToastManager.show({
+            type: "success",
+            message: `${source.title} is now shown on this widget. Widgets of the same size share a choice unless you give them different slots in Edit Widget.`
+          });
+        }}
+        onCancel={close}
+      />
+    );
+  }
   return (
     <NotePicker
       onSelect={(note: Note) => {

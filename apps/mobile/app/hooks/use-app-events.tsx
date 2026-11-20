@@ -84,9 +84,11 @@ import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
 import {
   getWidgetPickerKind,
+  getWidgetPickerSlot,
   useWidgetPicker
 } from "../screens/note-preview-configure/widget-picker";
 import { PinnedNotesWidget } from "../services/pinned-notes-widget";
+import { NotesWidget } from "../services/widgets/notes-widget";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -182,7 +184,7 @@ const onAppOpenedFromURL = async (event: {
     } else if (getWidgetPickerKind(url)) {
       useWidgetPicker
         .getState()
-        .open(getWidgetPickerKind(url)!);
+        .open(getWidgetPickerKind(url)!, getWidgetPickerSlot(url));
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
@@ -598,6 +600,7 @@ export const useAppEvents = () => {
     // first launch afterwards is the earliest chance to put them right.
     NotePreviewWidget.updateNotes();
     PinnedNotesWidget.updateNotes();
+    NotesWidget.updateNotes();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;

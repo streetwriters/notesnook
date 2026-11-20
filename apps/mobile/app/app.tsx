@@ -42,6 +42,7 @@ import {
 } from "./hooks/use-shortcut-manager";
 import { RootNavigation } from "./navigation/navigation-stack";
 import { NotePreviewConfigure } from "./screens/note-preview-configure";
+import { NotesWidgetConfigure } from "./screens/notes-widget-configure";
 import {
   WidgetPicker,
   WidgetPickerRoot,
@@ -64,7 +65,7 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-const App = (props: { configureMode?: "note-preview" }) => {
+const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
   useAppEvents();
   if (!props.configureMode) {
     //@ts-ignore
@@ -117,6 +118,8 @@ const App = (props: { configureMode?: "note-preview" }) => {
         <GlobalSafeAreaProvider />
         {props.configureMode === "note-preview" ? (
           <NotePreviewConfigure />
+        ) : props.configureMode === "notes-widget" ? (
+          <NotesWidgetConfigure />
         ) : !launchChecked ? null : pickerAsRoot ? (
           <WidgetPickerRoot />
         ) : (
@@ -204,11 +207,15 @@ export const withTheme = (
 
 export const withStartupBoundry = (
   Element: (
-    props: PropsWithChildren & { configureMode?: "note-preview" }
+    props: PropsWithChildren & {
+      configureMode?: "note-preview" | "notes-widget";
+    }
   ) => JSX.Element
 ) => {
   return function AppWithStartupBoundary(
-    props: PropsWithChildren & { configureMode?: "note-preview" }
+    props: PropsWithChildren & {
+      configureMode?: "note-preview" | "notes-widget";
+    }
   ) {
     const [ready, setReady] = useState(false);
 

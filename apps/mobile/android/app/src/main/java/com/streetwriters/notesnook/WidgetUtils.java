@@ -17,6 +17,7 @@ import android.widget.RemoteViews;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.streetwriters.notesnook.datatypes.Note;
+import com.streetwriters.notesnook.datatypes.NotesWidgetSource;
 import com.streetwriters.notesnook.datatypes.Reminder;
 
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ public class WidgetUtils {
     static final String PREFERENCES = "appPreview";
     static final String REMINDERS_KEY = "remindersList";
     static final String PINNED_NOTES_KEY = "pinnedNotesList";
+    static final String NOTES_CONFIG_PREFIX = "notesWidget.config.";
+    static final String NOTES_LIST_PREFIX = "notesWidget.notes.";
+    static final String DEFAULT_NOTES_SOURCE_KEY = "recent";
 
     /**
      * Every row is serialized into the widget update itself, which has to fit inside a binder
@@ -43,6 +47,7 @@ public class WidgetUtils {
      */
     private static final int MAX_REMINDERS = 50;
     private static final int MAX_PINNED_NOTES = 50;
+    private static final int MAX_NOTES_WIDGET_NOTES = 50;
 
     /**
      * Redraws every widget that currently exists, and drops stored notes for widgets that no
@@ -77,6 +82,12 @@ public class WidgetUtils {
                 new ComponentName(context, PinnedNotesWidgetProvider.class))) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_pinned_notes);
             PinnedNotesWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
+        }
+
+        for (int appWidgetId : manager.getAppWidgetIds(
+                new ComponentName(context, NotesWidgetProvider.class))) {
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_notes);
+            NotesWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
         }
     }
 
@@ -199,21 +210,59 @@ public class WidgetUtils {
      * The pinned notes the app last wrote out.
      */
     static List<Note> getWidgetPinnedNotes(Context context) {
+        return readNoteList(context, PINNED_NOTES_KEY, "PinnedNotes", MAX_PINNED_NOTES);
+    }
+
+    /**
+     * The source a notes widget was configured with, or the default one when it never was.
+     */
+    static NotesWidgetSource getNotesWidgetSource(Context context, int appWidgetId) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        String data = preferences.getString(NOTES_CONFIG_PREFIX + appWidgetId, "");
+        if (!data.isEmpty()) {
+            try {
+                NotesWidgetSource source = new Gson().fromJson(data, NotesWidgetSource.class);
+                if (source != null && source.getKey() != null) return source;
+            } catch (Exception e) {
+                Log.e("NotesWidget", "Could not read a stored widget source", e);
+            }
+        }
+        return NotesWidgetSource.defaultSource(context.getString(R.string.notes_widget_default_source));
+    }
+
+    /**
+     * Every source currently configured on a notes widget, as the JSON the app stored.
+     */
+    static List<String> getNotesWidgetSourceData(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        List<String> sources = new ArrayList<>();
+        for (Map.Entry<String, ?> entry : preferences.getAll().entrySet()) {
+            if (!entry.getKey().startsWith(NOTES_CONFIG_PREFIX)) continue;
+            if (entry.getValue() instanceof String) sources.add((String) entry.getValue());
+        }
+        return sources;
+    }
+
+    static List<Note> getNotesWidgetNotes(Context context, String sourceKey) {
+        return readNoteList(context, NOTES_LIST_PREFIX + sourceKey, "NotesWidget", MAX_NOTES_WIDGET_NOTES);
+    }
+
+    private static List<Note> readNoteList(Context context, String key, String tag, int max) {
         SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
         List<Note> stored = null;
         try {
-            stored = new Gson().fromJson(preferences.getString(PINNED_NOTES_KEY, "[]"),
+            stored = new Gson().fromJson(preferences.getString(key, "[]"),
                     new TypeToken<List<Note>>() {}.getType());
         } catch (Exception e) {
-            Log.e("PinnedNotes", "Could not read the stored pinned notes list", e);
+            Log.e(tag, "Could not read the stored notes list", e);
         }
 
         List<Note> active = new ArrayList<>();
         if (stored == null) return active;
 
         for (Note note : stored) {
-            if (active.size() >= MAX_PINNED_NOTES) {
-                Log.w("PinnedNotes", "Widget list truncated to " + MAX_PINNED_NOTES + " notes");
+            if (active.size() >= max) {
+                Log.w(tag, "Widget list truncated to " + max + " notes");
                 break;
             }
             active.add(note);
