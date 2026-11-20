@@ -23,14 +23,18 @@ if linkage != nil
 end
 
 
-pod 'Base64'
-pod 'SexyTooltip',:git => 'https://github.com/ammarahm-ed/SexyTooltip.git'
 pod 'MMKV'
 
 rn_path = nil
 node_modules_path = nil
 
+target 'NotesWidgetExtension' do
+end
+
 target 'Notesnook' do
+
+  pod 'Base64'
+  pod 'SexyTooltip',:git => 'https://github.com/ammarahm-ed/SexyTooltip.git'
 
   native_modules = list_native_modules!($default_command)
   PrebuiltPods.setup(self, native_modules)
