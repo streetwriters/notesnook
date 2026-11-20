@@ -250,13 +250,19 @@ const onAppOpenedFromURL = async (event: {
           });
         }
       }
-    } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_reminder") ||
+      url.startsWith("nn://open_reminder")
+    ) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
         if (reminder) AddReminder.present(reminder);
       }
-    } else if (url.startsWith("https://app.notesnook.com/new_reminder")) {
+    } else if (
+      url.startsWith("https://app.notesnook.com/new_reminder") ||
+      url.startsWith("nn://new_reminder")
+    ) {
       const reminderFeature = await isFeatureAvailable("activeReminders");
       if (!reminderFeature.isAllowed) {
         ToastManager.show({
