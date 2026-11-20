@@ -509,7 +509,7 @@ export const useEditor = (
           if (note.pinned) {
             PinnedNotesWidget.updateNotes();
           }
-          NotesWidget.updateNotes();
+          NotesWidget.updateNotes(5000);
         }, 500);
 
         return id;

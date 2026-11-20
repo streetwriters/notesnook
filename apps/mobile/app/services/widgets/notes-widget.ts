@@ -206,20 +206,23 @@ function addSource(source: NotesWidgetSource) {
   );
 }
 
-let timer: NodeJS.Timeout;
+const DEFAULT_DELAY = 500;
+let timer: NodeJS.Timeout | undefined;
 
 export const NotesWidget = {
-  updateNotes: () => {
+  updateNotes: (delay = DEFAULT_DELAY) => {
     if (Platform.OS !== "android" && Platform.OS !== "ios") return;
+    if (timer && delay > DEFAULT_DELAY) return;
     clearTimeout(timer);
     timer = setTimeout(async () => {
+      timer = undefined;
       try {
         if (Platform.OS === "ios") await updateIOS();
         else await updateAndroid();
       } catch (err) {
         console.error("Failed to update notes widget:", err);
       }
-    }, 500);
+    }, delay);
   },
 
   chooseSource: (source: NotesWidgetSource, slot?: string) => {
