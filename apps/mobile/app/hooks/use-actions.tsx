@@ -61,6 +61,7 @@ import {
 import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import { PinnedNotesWidget } from "../services/pinned-notes-widget";
+import { NotesWidget } from "../services/widgets/notes-widget";
 import SettingsService from "../services/settings";
 import { useArchivedStore } from "../stores/use-archived-store";
 import { useMenuStore } from "../stores/use-menu-store";
@@ -280,6 +281,7 @@ export const useActions = ({
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate();
     PinnedNotesWidget.updateNotes();
+    NotesWidget.updateNotes();
     const type = item.type === "trash" ? item.itemType : item.type;
     ToastManager.show({
       heading:
@@ -296,6 +298,7 @@ export const useActions = ({
       await db.notes.pin(!item?.pinned, item.id);
       setItem((await db.notes.note(item.id)) as Item);
       PinnedNotesWidget.updateNotes();
+      NotesWidget.updateNotes();
     } else if (item.type === "notebook") {
       await db.notebooks.pin(!item?.pinned, item.id);
       setItem((await db.notebooks.notebook(item.id)) as Item);
@@ -1192,6 +1195,7 @@ export const useActions = ({
           Navigation.queueRoutesForUpdate();
           useArchivedStore.getState().refresh();
           PinnedNotesWidget.updateNotes();
+          NotesWidget.updateNotes();
         },
         checked: item.archived,
         isToggle: true

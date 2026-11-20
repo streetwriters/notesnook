@@ -50,6 +50,7 @@ import {
 import Navigation from "../../../services/navigation";
 import { NotePreviewWidget } from "../../../services/note-preview-widget";
 import { PinnedNotesWidget } from "../../../services/pinned-notes-widget";
+import { NotesWidget } from "../../../services/widgets/notes-widget";
 import Notifications from "../../../services/notifications";
 import SettingsService from "../../../services/settings";
 import { useSettingStore } from "../../../stores/use-setting-store";
@@ -507,6 +508,7 @@ export const useEditor = (
           if (note.pinned) {
             PinnedNotesWidget.updateNotes();
           }
+          NotesWidget.updateNotes();
         }, 500);
 
         return id;

@@ -29,6 +29,7 @@ import Navigation from "../../services/navigation";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
 import { PinnedNotesWidget } from "../../services/pinned-notes-widget";
+import { NotesWidget } from "../../services/widgets/notes-widget";
 import { eCloseSheet, eOnLoadNote } from "../../utils/events";
 import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
@@ -76,6 +77,7 @@ export default function NotePreview({
       await db.trash.restore(note.id);
       Navigation.queueRoutesForUpdate();
       PinnedNotesWidget.updateNotes();
+      NotesWidget.updateNotes();
       useSelectionStore.getState().setSelectionMode();
       ToastManager.show({
         heading: strings.noteRestored(),
