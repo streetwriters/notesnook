@@ -108,7 +108,13 @@ export const NotePreviewWidget = {
   serializeNote: serializeAndroidNote,
   updateNote: async (id: string, note: Note) => {
     if (Platform.OS === "ios") {
-      NotePreviewWidget.updateNotes();
+      const isStored = (items: PreviewNote[]) =>
+        items.some((item) => item.id === id);
+      if (!isStored(IOSWidgets.read<PreviewNote[]>("previewNotes", []))) return;
+      const updated = await toPreviewNote((await db.notes.note(id)) || note);
+      const stored = IOSWidgets.read<PreviewNote[]>("previewNotes", []);
+      if (!isStored(stored)) return;
+      publishIOSNotes(stored.map((item) => (item.id === id ? updated : item)));
       return;
     }
     if (Platform.OS !== "android") return;
