@@ -1,6 +1,7 @@
 package com.streetwriters.notesnook;
 
 import android.app.ActivityOptions;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,6 +14,8 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
+
+import androidx.core.widget.RemoteViewsCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -79,17 +82,52 @@ public class WidgetUtils {
             ReminderWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
         }
 
+        updatePinnedNotesWidgets(context);
+        updateNotesWidgets(context);
+    }
+
+    static void updatePinnedNotesWidgets(Context context) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
         for (int appWidgetId : manager.getAppWidgetIds(
                 new ComponentName(context, PinnedNotesWidgetProvider.class))) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_pinned_notes);
             PinnedNotesWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
         }
+    }
 
+    static void updateNotesWidgets(Context context) {
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
         for (int appWidgetId : manager.getAppWidgetIds(
                 new ComponentName(context, NotesWidgetProvider.class))) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_notes);
             NotesWidgetProvider.updateAppWidget(context, manager, appWidgetId, views);
         }
+    }
+
+    /**
+     * Fills a scrollable notes list widget. Rows travel directly inside the widget update through
+     * RemoteCollectionItems, so no bound RemoteViewsService is required and updates are completely
+     * self-contained. Tapping a row opens the note in MainActivity.
+     */
+    static void updateNotesListWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId,
+                                      RemoteViews views, List<Note> notes) {
+        Intent listviewIntentTemplate = new Intent(context, MainActivity.class);
+        listviewIntentTemplate.setAction(Intent.ACTION_VIEW);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, listviewIntentTemplate,
+                PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE, getActivityOptionsBundle());
+        views.setPendingIntentTemplate(R.id.widget_list_view, pendingIntent);
+
+        RemoteViewsCompat.RemoteCollectionItems.Builder items =
+                new RemoteViewsCompat.RemoteCollectionItems.Builder();
+        for (Note note : notes) {
+            items.addItem(note.getId() == null ? 0 : note.getId().hashCode(), createPinnedNoteItem(context, note));
+        }
+        items.setViewTypeCount(1);
+        items.setHasStableIds(true);
+
+        RemoteViewsCompat.setRemoteAdapter(context, views, appWidgetId, R.id.widget_list_view, items.build());
+        views.setEmptyView(R.id.widget_list_view, R.id.empty_view);
+        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     /**
