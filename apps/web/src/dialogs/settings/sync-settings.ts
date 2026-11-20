@@ -20,7 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { SettingsGroup } from "./types";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useSettingStore } from "../../stores/setting-store";
-import { ConfirmDialog } from "../confirm";
+import { SyncTroubleshooting } from "./components/sync-troubleshooting";
+import {
+  ArrowsCounterClockwise,
+  Clock,
+  WifiSlash,
+  CloudSlash
+} from "../../components/icons";
 import { strings } from "@notesnook/intl";
 
 export const SyncSettings: SettingsGroup[] = [
@@ -31,6 +37,7 @@ export const SyncSettings: SettingsGroup[] = [
     settings: [
       {
         key: "toggle-sync",
+        icon: CloudSlash,
         title: strings.disableSync(),
         description: strings.disableSyncDesc(),
         keywords: ["sync off", "toggle sync"],
@@ -47,6 +54,7 @@ export const SyncSettings: SettingsGroup[] = [
       },
       {
         key: "toggle-auto-sync",
+        icon: ArrowsCounterClockwise,
         title: strings.disableAutoSync(),
         description: strings.disableAutoSyncDesc(),
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
@@ -63,6 +71,7 @@ export const SyncSettings: SettingsGroup[] = [
       },
       {
         key: "toggle-realtime-sync",
+        icon: Clock,
         title: strings.disableRealtimeSync(),
         description: strings.disableRealtimeSyncDesc(),
         keywords: ["auto sync off", "automatic sync", "toggle auto sync"],
@@ -79,6 +88,7 @@ export const SyncSettings: SettingsGroup[] = [
       },
       {
         key: "full-offline-mode",
+        icon: WifiSlash,
         title: strings.fullOfflineMode(),
         description: strings.fullOfflineModeDesc(),
         keywords: ["offline mode"],
@@ -92,54 +102,23 @@ export const SyncSettings: SettingsGroup[] = [
             toggle: () => useSettingStore.getState().toggleFullOfflineMode()
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    key: "sync-troubleshooting",
+    section: "sync",
+    header: SyncTroubleshooting,
+    settings: [
       {
+        // The "Having sync issues?" card is rendered by the group header, this
+        // setting only keeps the search keywords/description.
         key: "force-sync",
         title: strings.havingProblemsWithSync(),
         description: strings.havingProblemsWithSyncDesc(),
         keywords: ["force sync", "sync issues", "sync error", "sync problem"],
-        components: [
-          {
-            type: "button",
-            title: strings.forcePushChanges(),
-            variant: "error",
-            action: () =>
-              ConfirmDialog.show({
-                title: strings.areYouSure(),
-                subtitle: strings.forceSyncNotice(),
-                checks: {
-                  accept: { text: strings.understand(), default: false }
-                },
-                positiveButtonText: strings.continue(),
-                negativeButtonText: strings.cancel()
-              }).then((result) => {
-                if (!result || !result.checks?.accept) return;
-                return useAppStore
-                  .getState()
-                  .sync({ force: true, type: "send" });
-              })
-          },
-          {
-            type: "button",
-            title: strings.forcePullChanges(),
-            variant: "error",
-            action: () =>
-              ConfirmDialog.show({
-                title: strings.areYouSure(),
-                subtitle: strings.forcePullChangesDesc(),
-                checks: {
-                  accept: { text: strings.understand(), default: false }
-                },
-                positiveButtonText: strings.continue(),
-                negativeButtonText: strings.cancel()
-              }).then((result) => {
-                if (!result || !result.checks?.accept) return;
-                return useAppStore
-                  .getState()
-                  .sync({ force: true, type: "fetch" });
-              })
-          }
-        ]
+        isHidden: () => true,
+        components: []
       }
     ]
   }

@@ -18,8 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { checkFeature, verifyAccount } from "../../common";
-import { Checkmark } from "../../components/icons";
+import { verifyAccount } from "../../common";
+import {
+  Checkmark,
+  KeyIcon,
+  Lock,
+  Numpad,
+  Timer
+} from "../../components/icons";
 import { showPasswordDialog } from "../../dialogs/password-dialog";
 import {
   CredentialType,
@@ -48,7 +54,11 @@ export const AppLockSettings: SettingsGroup[] = [
     settings: [
       {
         key: "enable-app-lock",
+        icon: Lock,
         get title() {
+          return strings.appLock();
+        },
+        get description() {
           return strings.enableAppLock();
         },
         onStateChange: (listener) =>
@@ -79,6 +89,7 @@ export const AppLockSettings: SettingsGroup[] = [
       },
       {
         key: "lock-app-after",
+        icon: Timer,
         get title() {
           return strings.lockAppAfter();
         },
@@ -131,6 +142,7 @@ export const AppLockSettings: SettingsGroup[] = [
     settings: [
       {
         key: "password-pin",
+        icon: Numpad,
         title: strings.passwordPin(),
         description: strings.passwordPinDescription(),
         components: () => {
@@ -140,6 +152,28 @@ export const AppLockSettings: SettingsGroup[] = [
           const isEnabled = credential?.active;
 
           const inputs: SettingComponent[] = [];
+          if (
+            !isEnabled ||
+            useKeyStore.getState().activeCredentials().length > 1
+          )
+            inputs.push({
+              type: "button",
+              title: isEnabled ? strings.disable() : strings.enable(),
+              action: async () => {
+                if (credential?.active) await deactivateCredential(credential);
+                else if (credential)
+                  await useKeyStore.getState().activate(credential);
+                else {
+                  if (!(await authenticateAppLock())) {
+                    showToast("error", strings.biometricsAuthError());
+                    return;
+                  }
+                  await registerCredential("password");
+                }
+              },
+              variant: isEnabled ? "errorSecondary" : "secondary"
+            });
+
           if (isEnabled) {
             inputs.push({
               type: "button",
@@ -189,33 +223,12 @@ export const AppLockSettings: SettingsGroup[] = [
             });
           }
 
-          if (
-            !isEnabled ||
-            useKeyStore.getState().activeCredentials().length > 1
-          )
-            inputs.push({
-              type: "button",
-              title: isEnabled ? strings.disable() : strings.enable(),
-              action: async () => {
-                if (credential?.active) await deactivateCredential(credential);
-                else if (credential)
-                  await useKeyStore.getState().activate(credential);
-                else {
-                  if (!(await authenticateAppLock())) {
-                    showToast("error", strings.biometricsAuthError());
-                    return;
-                  }
-                  await registerCredential("password");
-                }
-              },
-              variant: "secondary"
-            });
-
           return inputs;
         }
       },
       {
         key: "security-key",
+        icon: KeyIcon,
         title: strings.securityKey(),
         description: strings.securityKeyDescription(),
         onStateChange: (listener) =>
@@ -244,7 +257,7 @@ export const AppLockSettings: SettingsGroup[] = [
                   useKeyStore.getState().unregister(credential);
                 }
               },
-              variant: "secondary"
+              variant: "errorSecondary"
             });
           }
 
@@ -279,7 +292,7 @@ export const AppLockSettings: SettingsGroup[] = [
                 else if (credential)
                   await useKeyStore.getState().activate(credential);
               },
-              variant: "secondary"
+              variant: isEnabled ? "errorSecondary" : "secondary"
             });
           }
 

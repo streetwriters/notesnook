@@ -17,15 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { forwardRef, useCallback, useEffect, useState } from "react";
-import {
-  Flex,
-  Text,
-  Button,
-  Link,
-  Switch,
-  SwitchProps
-} from "@theme-ui/components";
+import React, { useCallback, useEffect, useState } from "react";
+import { Flex, Text, Button, Link } from "@theme-ui/components";
 import {
   ArrowCounterClockwise,
   Check,
@@ -51,6 +44,7 @@ import {
 import { BaseDialogProps, DialogManager } from "../../common/dialog-manager";
 import Dialog from "../../components/dialog";
 import Field from "../field";
+import ToggleSwitch from "../toggle-switch";
 import { UpgradeDialog } from "../../dialogs/buy-dialog/upgrade-dialog";
 import { showUnpublishConfirmation } from "../../dialogs/confirm";
 import { useForm, UseFormRegisterReturn } from "react-hook-form";
@@ -80,7 +74,6 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
   const publishNote = useStore((store) => store.publish);
   const unpublishNote = useStore((store) => store.unpublish);
   const isPasswordEnabled = watch("passwordEnabled");
-  const isSelfDestructEnabled = watch("selfDestruct");
 
   const metadata = usePromise(async () => {
     if (!monograph) return;
@@ -253,7 +246,6 @@ export const PublishDialog = DialogManager.register(function PublishDialog(
               description={strings.deleteAfterViewing()}
               action={
                 <ToggleSwitch
-                  isOn={isSelfDestructEnabled}
                   aria-label={strings.monographSelfDestructHeading()}
                   title={strings.monographSelfDestructDesc()}
                   disabled={isLoading}
@@ -517,24 +509,6 @@ function MonographRow({
   );
 }
 
-const ToggleSwitch = forwardRef<
-  HTMLInputElement,
-  SwitchProps & { isOn: boolean }
->(function ToggleSwitch({ isOn, sx, ...props }, ref) {
-  return (
-    <Switch
-      ref={ref}
-      {...props}
-      sx={{
-        m: 0,
-        flexShrink: 0,
-        bg: isOn ? "accent" : "icon-disabled",
-        ...sx
-      }}
-    />
-  );
-});
-
 function PasswordProtection({
   enabled,
   disabled,
@@ -555,7 +529,6 @@ function PasswordProtection({
       description={enabled ? undefined : strings.secureYourNote()}
       action={
         <ToggleSwitch
-          isOn={enabled}
           aria-label={strings.monographPassHeading()}
           title={strings.monographPassDesc()}
           disabled={disabled}

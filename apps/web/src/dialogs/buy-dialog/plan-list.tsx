@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { IconBox, buttonProps } from "../../components/settings-ui";
 import { Text, Flex, Button, Image, Link, Box } from "@notesnook/ui";
 import {
   CheckCircleOutline,
@@ -28,6 +29,7 @@ import {
   ArrowRight,
   ShieldCheck,
   CaretDown,
+  Table,
   CalendarBlank,
   Prohibit,
   HandCoins
@@ -73,6 +75,11 @@ type PlansListProps = {
   loadAllPlans?: boolean;
   ignoreTrial?: boolean;
   recommendedPlan?: SubscriptionPlan;
+  /**
+   * "dialog" renders the compact look used inside dialogs (Change plan).
+   * Omit for the default full-page look.
+   */
+  variant?: "dialog";
   onPlanSelected: (plan: Plan) => void;
 };
 
@@ -155,8 +162,10 @@ export function PlansList(props: PlansListProps) {
     selectedPlan,
     loadAllPlans,
     ignoreTrial,
-    recommendedPlan
+    recommendedPlan,
+    variant
   } = props;
+  const isDialog = variant === "dialog";
   const { isLoading, plans = [] } = usePlans({ loadAllPlans });
   const [selectedPeriod, setPeriod] = useState<Period>("yearly");
   const user = useUserStore((store) => store.user);
@@ -165,9 +174,11 @@ export function PlansList(props: PlansListProps) {
     <>
       <Flex
         sx={{
-          bg: "background-tertiary",
-          border: "1px solid var(--border-primary)",
-          borderRadius: "16px",
+          bg: isDialog ? "background-secondary" : "background-tertiary",
+          ...(isDialog
+            ? { border: "1px solid", borderColor: "border" }
+            : { border: "1px solid var(--border-primary)" }),
+          borderRadius: isDialog ? "radius3" : "16px",
           alignSelf: "center",
           gap: "spacing4",
           p: "spacing4"
@@ -181,7 +192,12 @@ export function PlansList(props: PlansListProps) {
               display: "flex",
               flexDirection: "row",
               gap: "spacing3",
-              bg: selectedPeriod === id ? "accent" : "background-tertiary",
+              bg:
+                selectedPeriod === id
+                  ? "accent"
+                  : isDialog
+                  ? "transparent"
+                  : "background-tertiary",
               color:
                 selectedPeriod === id
                   ? "accentForeground"
@@ -236,6 +252,7 @@ export function PlansList(props: PlansListProps) {
                   plan={plan}
                   recommendedPlan={recommendedPlan}
                   selectedPlan={selectedPlan}
+                  variant={variant}
                   onPlanSelected={onPlanSelected}
                 />
               ))
@@ -243,6 +260,7 @@ export function PlansList(props: PlansListProps) {
         </Flex>
         <Flex
           sx={{
+            display: isDialog ? "none" : "flex",
             mt: "spacing7",
             alignItems: "center",
             justifyContent: "space-between",
@@ -254,19 +272,9 @@ export function PlansList(props: PlansListProps) {
           }}
         >
           <Flex sx={{ alignItems: "flex-start", gap: "spacing6" }}>
-            <Flex
-              sx={{
-                width: "30px",
-                height: "30px",
-                alignItems: "center",
-                justifyContent: "center",
-                bg: "background-secondary",
-                borderRadius: "radius1",
-                flexShrink: 0
-              }}
-            >
+            <IconBox>
               <ShieldCheck size={20} color="icon" />
-            </Flex>
+            </IconBox>
             <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
               <Text
                 sx={{
@@ -475,9 +483,11 @@ export function Footer() {
 
 type PricingProps = {
   plan: Plan;
+  variant?: "dialog";
 };
 function RecurringPricing(props: PricingProps) {
-  const { plan } = props;
+  const { plan, variant } = props;
+  const isDialog = variant === "dialog";
   const isZero = plan.price.gross === 0;
   const monthlyPrice = toMonthlyPrice(plan.price.gross, plan.period);
   const hasDiscount =
@@ -488,7 +498,8 @@ function RecurringPricing(props: PricingProps) {
         sx={{
           textDecorationLine: hasDiscount ? "line-through" : "none",
           fontSize: "md",
-          color: "paragraph-secondary"
+          color: isDialog ? "heading-secondary" : "paragraph-secondary",
+          ...(isDialog ? { fontWeight: 500, lineHeight: 1 } : {})
         }}
       >
         {hasDiscount ? (
@@ -504,9 +515,10 @@ function RecurringPricing(props: PricingProps) {
       <Text
         as="span"
         sx={{
-          fontWeight: "bold",
+          fontWeight: isDialog ? 600 : "bold",
           fontSize: "xl",
-          color: "heading"
+          color: "heading",
+          ...(isDialog ? { lineHeight: 1 } : {})
         }}
       >
         {getCurrencySymbol(plan.currency)}
@@ -518,7 +530,7 @@ function RecurringPricing(props: PricingProps) {
             as="span"
             sx={{
               fontSize: "sm",
-              color: "paragraph-secondary",
+              color: isDialog ? "paragraph" : "paragraph-secondary",
               fontWeight: 400
             }}
           >
@@ -532,8 +544,9 @@ function RecurringPricing(props: PricingProps) {
         as="div"
         sx={{
           fontSize: "sm",
-          color: "paragraph-secondary",
-          fontWeight: 400
+          color: isDialog ? "paragraph" : "paragraph-secondary",
+          fontWeight: 400,
+          ...(isDialog ? { lineHeight: 1 } : {})
         }}
       >
         {isZero
@@ -572,14 +585,249 @@ function OneTimePricing(props: PricingProps) {
   );
 }
 
-export function ComparePlans() {
+type ComparePlansProps = {
+  /**
+   * "dialog" renders the compact card used inside dialogs (Change plan).
+   * Omit for the default full-page look.
+   */
+  variant?: "dialog";
+  /** Only for the "dialog" variant: the feature table can be expanded/collapsed. */
+  collapsible?: boolean;
+};
+
+function limitsOf(row: ReturnType<typeof getFeaturesTable>[number]) {
+  const [, ...limits] = row;
+  return limits;
+}
+
+export function ComparePlans(props: ComparePlansProps = {}) {
+  const { variant, collapsible } = props;
+  const isDialog = variant === "dialog";
+  const [isOpen, setIsOpen] = useState(!collapsible);
   const rows = getFeaturesTable();
   const plans = [
     SubscriptionPlan.FREE,
     SubscriptionPlan.ESSENTIAL,
     SubscriptionPlan.PRO,
     SubscriptionPlan.BELIEVER
-  ];
+  ] as const;
+  const cellPx = isDialog ? "spacing6" : "spacing7";
+  const cellPy = isDialog ? "spacing4" : "spacing6";
+
+  const table = (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        width: "100%",
+        bg: "background",
+        ...(isDialog
+          ? { overflow: "hidden" }
+          : { borderRadius: "radius6", p: "spacing7" })
+      }}
+    >
+      <Flex
+        sx={{
+          bg: "background-selected",
+          borderRadius: isDialog ? "radius2" : "16px",
+          borderBottom: "1px solid var(--border-secondary)",
+          py: isDialog ? 0 : "spacing3"
+        }}
+      >
+        <Flex
+          sx={{
+            flex: "1 0 0",
+            minWidth: 0,
+            px: cellPx,
+            py: cellPy
+          }}
+        >
+          <Text
+            variant="body"
+            sx={{
+              fontWeight: isDialog ? 500 : 600,
+              fontSize: isDialog ? "xs" : "lg",
+              color: "heading",
+              ...(isDialog ? { lineHeight: 1.2 } : {})
+            }}
+          >
+            Features
+          </Text>
+        </Flex>
+        {plans.map((plan) => (
+          <Flex
+            key={plan}
+            sx={{
+              flex: "1 0 0",
+              minWidth: 0,
+              px: cellPx,
+              py: cellPy
+            }}
+          >
+            <Text
+              variant="body"
+              sx={{
+                fontWeight: isDialog ? 500 : 600,
+                fontSize: isDialog ? "xs" : "lg",
+                color: "heading",
+                ...(isDialog ? { lineHeight: 1.2 } : {})
+              }}
+            >
+              {PLAN_METADATA[plan].title}
+            </Text>
+          </Flex>
+        ))}
+      </Flex>
+      {rows.map((feature, rowIndex) => (
+        <Flex
+          key={feature[0]}
+          sx={{
+            bg: rowIndex % 2 === 0 ? "background" : "background-secondary",
+            ...(isDialog
+              ? { height: "36px", alignItems: "center" }
+              : {
+                  py: "spacing3",
+                  ...(rowIndex % 2 === 1 ? { borderRadius: "16px" } : {})
+                })
+          }}
+        >
+          <Flex
+            sx={{
+              flex: "1 0 0",
+              minWidth: 0,
+              px: cellPx,
+              py: cellPy
+            }}
+          >
+            <Text
+              variant="body"
+              sx={{
+                fontWeight: isDialog ? 400 : 500,
+                fontSize: isDialog ? "xs" : "md",
+                color: isDialog ? "paragraph" : "heading",
+                ...(isDialog ? { lineHeight: 1 } : {})
+              }}
+            >
+              {feature[0]}
+            </Text>
+          </Flex>
+          {limitsOf(feature).map((limit, index) => (
+            <Flex
+              key={index}
+              sx={{
+                flex: "1 0 0",
+                minWidth: 0,
+                px: cellPx,
+                py: cellPy
+              }}
+            >
+              {typeof limit.caption === "boolean" ? (
+                limit.caption ? (
+                  <CheckSvgIcon size={isDialog ? 15 : 20} color="accent" />
+                ) : (
+                  <Text
+                    variant="body"
+                    sx={{
+                      fontSize: isDialog ? "sm" : "18px",
+                      color: "paragraph",
+                      ...(isDialog ? { lineHeight: 1 } : {})
+                    }}
+                  >
+                    -
+                  </Text>
+                )
+              ) : limit.caption === "infinity" ? (
+                <Text
+                  variant="body"
+                  sx={{
+                    fontSize: isDialog ? "sm" : "18px",
+                    color: "paragraph",
+                    ...(isDialog ? { lineHeight: 1 } : {})
+                  }}
+                >
+                  ∞
+                </Text>
+              ) : (
+                <Text
+                  variant="body"
+                  sx={{
+                    fontSize: isDialog ? "xs" : "sm",
+                    color: "paragraph",
+                    ...(isDialog ? { lineHeight: 1 } : {})
+                  }}
+                >
+                  {limit.caption}
+                </Text>
+              )}
+            </Flex>
+          ))}
+        </Flex>
+      ))}
+    </Flex>
+  );
+
+  if (isDialog) {
+    return (
+      <Flex
+        id="compare-plans"
+        sx={{
+          flexDirection: "column",
+          gap: "spacing7",
+          p: "spacing7",
+          border: "1px solid",
+          borderColor: "border",
+          borderRadius: "radius4"
+        }}
+      >
+        <Flex
+          {...buttonProps(
+            collapsible ? () => setIsOpen((open) => !open) : undefined
+          )}
+          aria-expanded={collapsible ? isOpen : undefined}
+          sx={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            cursor: collapsible ? "pointer" : "default"
+          }}
+        >
+          <Flex sx={{ alignItems: "flex-start", gap: "spacing3" }}>
+            <IconBox>
+              <Table size={15} color="icon" />
+            </IconBox>
+            <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+              <Text
+                sx={{
+                  fontSize: "lg",
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  color: "heading"
+                }}
+              >
+                {strings.comparePlans()}
+              </Text>
+              <Text
+                sx={{
+                  fontSize: "md",
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  color: "paragraph"
+                }}
+              >
+                See what’s included in each plan
+              </Text>
+            </Flex>
+          </Flex>
+          {collapsible && (
+            <CaretDown
+              size={15}
+              color="icon-secondary"
+              sx={{ rotate: isOpen ? "180deg" : "0deg", flexShrink: 0 }}
+            />
+          )}
+        </Flex>
+        {isOpen && table}
+      </Flex>
+    );
+  }
 
   return (
     <Flex
@@ -672,143 +920,7 @@ export function ComparePlans() {
           {strings.comparePlansDescription()}
         </Text>
       </Flex>
-      <Flex
-        sx={{
-          flexDirection: "column",
-          width: "100%",
-          bg: "background",
-          borderRadius: "radius6",
-          p: "spacing7"
-        }}
-      >
-        <Flex
-          sx={{
-            bg: "background-selected",
-            borderRadius: "16px",
-            borderBottom: "1px solid var(--border-secondary)",
-            py: "spacing3"
-          }}
-        >
-          <Flex
-            sx={{
-              flex: "1 0 0",
-              minWidth: 0,
-              px: "spacing7",
-              py: "spacing6"
-            }}
-          >
-            <Text
-              variant="body"
-              sx={{
-                fontWeight: 600,
-                fontSize: "lg",
-                color: "heading"
-              }}
-            >
-              Features
-            </Text>
-          </Flex>
-          {plans.map((plan) => (
-            <Flex
-              key={plan}
-              sx={{
-                flex: "1 0 0",
-                minWidth: 0,
-                px: "spacing7",
-                py: "spacing6"
-              }}
-            >
-              <Text
-                variant="body"
-                sx={{
-                  fontWeight: 600,
-                  fontSize: "lg",
-                  color: "heading"
-                }}
-              >
-                {PLAN_METADATA[plan].title}
-              </Text>
-            </Flex>
-          ))}
-        </Flex>
-        {rows.map((feature, rowIndex) => (
-          <Flex
-            key={feature[0]}
-            sx={{
-              bg: rowIndex % 2 === 0 ? "background" : "background-secondary",
-              py: "spacing3",
-              ...(rowIndex % 2 === 1 ? { borderRadius: "16px" } : {})
-            }}
-          >
-            <Flex
-              sx={{
-                flex: "1 0 0",
-                minWidth: 0,
-                px: "spacing7",
-                py: "spacing6"
-              }}
-            >
-              <Text
-                variant="body"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: "md",
-                  color: "heading"
-                }}
-              >
-                {feature[0]}
-              </Text>
-            </Flex>
-            {feature.slice(1).map((limit, index) => (
-              <Flex
-                key={index}
-                sx={{
-                  flex: "1 0 0",
-                  minWidth: 0,
-                  px: "spacing7",
-                  py: "spacing6"
-                }}
-              >
-                {typeof (limit as any).caption === "boolean" ? (
-                  (limit as any).caption ? (
-                    <CheckSvgIcon size={20} color="accent" />
-                  ) : (
-                    <Text
-                      variant="body"
-                      sx={{
-                        fontSize: "18px",
-                        color: "paragraph"
-                      }}
-                    >
-                      -
-                    </Text>
-                  )
-                ) : (limit as any).caption === "infinity" ? (
-                  <Text
-                    variant="body"
-                    sx={{
-                      fontSize: "18px",
-                      color: "paragraph"
-                    }}
-                  >
-                    ∞
-                  </Text>
-                ) : (
-                  <Text
-                    variant="body"
-                    sx={{
-                      fontSize: "sm",
-                      color: "paragraph"
-                    }}
-                  >
-                    {(limit as any).caption}
-                  </Text>
-                )}
-              </Flex>
-            ))}
-          </Flex>
-        ))}
-      </Flex>
+      {table}
     </Flex>
   );
 }
@@ -1243,30 +1355,38 @@ function PlanCard({
   plan,
   recommendedPlan,
   selectedPlan,
+  variant,
   onPlanSelected
 }: {
   plan: Plan;
   recommendedPlan?: SubscriptionPlan;
   selectedPlan?: string | null;
+  variant?: "dialog";
   onPlanSelected: (plan: Plan) => void;
 }) {
   const metadata = PLAN_METADATA[plan.plan];
+  const isDialog = variant === "dialog";
   const isRecommended = recommendedPlan === plan.plan;
+  const isCurrent = selectedPlan === plan.id;
+  const isHighlighted = isRecommended;
   return (
     <Flex
       data-test-id={`checkout-plan`}
       sx={{
-        bg: isRecommended ? "background-selected" : "background",
-        border: isRecommended
+        bg: isHighlighted ? "background-selected" : "background",
+        border: isHighlighted
           ? "1px solid var(--accent)"
           : "1px solid var(--border-secondary)",
         borderRadius: "radius4",
         flexDirection: "column",
-        gap: "spacing11",
+        gap: isDialog ? "spacing8" : "spacing11",
         p: "spacing7",
         flex: 1,
-        boxShadow: isRecommended
-          ? "0px 0px 12.5px rgba(0,0,0,0.12)"
+        ...(isDialog ? { minWidth: 0 } : {}),
+        boxShadow: isHighlighted
+          ? isDialog
+            ? "0px 0px 25px rgba(0,0,0,0.12)"
+            : "0px 0px 12.5px rgba(0,0,0,0.12)"
           : "0px 0px 12.5px rgba(0,0,0,0.08)"
       }}
     >
@@ -1291,7 +1411,10 @@ function PlanCard({
           >
             <Text
               variant="heading"
-              sx={{ fontSize: "xl" }}
+              sx={{
+                fontSize: "xl",
+                ...(isDialog ? { fontWeight: 600, lineHeight: 1 } : {})
+              }}
               data-test-id="title"
             >
               {metadata.title}
@@ -1305,7 +1428,7 @@ function PlanCard({
                   px: "spacing3",
                   py: "spacing2",
                   color: "accentForeground",
-                  fontSize: "sm",
+                  fontSize: isDialog ? "subtitle" : "sm",
                   lineHeight: "100%"
                 }}
               >
@@ -1319,7 +1442,8 @@ function PlanCard({
             sx={{
               fontSize: "sm",
               color: "paragraph",
-              fontWeight: "normal"
+              fontWeight: "normal",
+              ...(isDialog ? { lineHeight: 1 } : {})
             }}
           >
             {metadata.subtitle}
@@ -1327,7 +1451,7 @@ function PlanCard({
         </Flex>
         <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
           {plan.recurring ? (
-            <RecurringPricing plan={plan} />
+            <RecurringPricing plan={plan} variant={variant} />
           ) : (
             <OneTimePricing plan={plan} />
           )}
@@ -1348,7 +1472,7 @@ function PlanCard({
                   pt: index > 0 ? "spacing6" : 0,
                   borderTop:
                     index > 0 ? "1px solid var(--border-secondary)" : "none",
-                  borderColor: isRecommended
+                  borderColor: isHighlighted
                     ? "accent-secondary"
                     : "border-secondary",
                   justifyContent: "space-between",
@@ -1361,7 +1485,8 @@ function PlanCard({
                     sx={{
                       fontSize: "md",
                       color: "paragraph",
-                      fontWeight: "normal"
+                      fontWeight: "normal",
+                      ...(isDialog ? { lineHeight: 1 } : {})
                     }}
                   >
                     {feature.title}
@@ -1369,9 +1494,10 @@ function PlanCard({
                 </Flex>
                 <Text
                   sx={{
-                    fontSize: "sm",
-                    fontWeight: "bold",
-                    color: "paragraph"
+                    fontSize: isDialog ? "md" : "sm",
+                    fontWeight: isDialog ? 600 : "bold",
+                    color: "paragraph",
+                    ...(isDialog ? { lineHeight: 1 } : {})
                   }}
                 >
                   <FeatureCaption caption={caption} />
@@ -1381,18 +1507,34 @@ function PlanCard({
           })}
         </Flex>
       </Flex>
-      {selectedPlan === plan.id ? (
-        <Flex sx={{ alignItems: "center", gap: 1 }}>
+      {isCurrent ? (
+        <Flex
+          sx={{
+            alignItems: "center",
+            gap: 1,
+            ...(isDialog ? { mt: "auto" } : {})
+          }}
+        >
           <CheckCircleOutline color="accent" size={16} />
           <Text variant="subBody">{strings.youAreOnThisPlan()}</Text>
         </Flex>
       ) : (
         <Button
-          variant={isRecommended ? "new_accent" : "new_secondary"}
+          variant={isHighlighted ? "new_accent" : "new_secondary"}
           onClick={() => onPlanSelected(plan)}
           sx={{
             width: "100%",
-            fontSize: "md"
+            ...(!isDialog ? { fontSize: "md" } : {}),
+            ...(isDialog
+              ? {
+                  mt: "auto",
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  ...(isHighlighted
+                    ? { fontSize: "sm", px: "spacing4", py: "spacing5" }
+                    : { fontSize: "md", px: "spacing5", py: "spacing6" })
+                }
+              : {})
           }}
         >
           {strings.selectPlan()}

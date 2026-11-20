@@ -19,12 +19,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingsGroup } from "./types";
 import { useStore as useSettingStore } from "../../stores/setting-store";
-import { InboxApiKeys } from "./components/inbox-api-keys";
+import {
+  InboxApiKeyCards,
+  InboxApiKeysStatus,
+  createInboxApiKey,
+  inboxApiKeysStore
+} from "./components/inbox-api-keys";
 import { InboxPGPKeysDialog } from "../inbox-pgp-keys-dialog";
 import { db } from "../../common/db";
-import { showPasswordDialog } from "../password-dialog";
+import { confirmAccountPassword } from "../password-dialog";
 import { strings } from "@notesnook/intl";
 import { InboxHistoryDialog } from "../inbox-history-dialog";
+import {
+  CheckIcon,
+  KeyIcon,
+  TrayArrowDown,
+  XSquare
+} from "../../components/icons";
+
+const isInboxEnabled = () => useSettingStore.getState().isInboxEnabled;
+const subscribeToInboxState = (
+  listener: (state: unknown, prevState: unknown) => void
+) => {
+  const unsubscribeSettings = useSettingStore.subscribe(
+    (s) => s.isInboxEnabled,
+    listener
+  );
+  const unsubscribeKeys = inboxApiKeysStore.subscribe((state) =>
+    listener(state, undefined)
+  );
+  return () => {
+    unsubscribeSettings();
+    unsubscribeKeys();
+  };
+};
 
 export const InboxSettings: SettingsGroup[] = [
   {
@@ -36,6 +64,7 @@ export const InboxSettings: SettingsGroup[] = [
     settings: [
       {
         key: "toggle-inbox",
+        icon: CheckIcon,
         get title() {
           return strings.enableInboxAPI();
         },
@@ -49,12 +78,16 @@ export const InboxSettings: SettingsGroup[] = [
           {
             type: "toggle",
             isToggled: () => useSettingStore.getState().isInboxEnabled,
-            toggle: () => useSettingStore.getState().toggleInbox()
+            toggle: async () => {
+              await useSettingStore.getState().toggleInbox();
+              if (isInboxEnabled()) inboxApiKeysStore.refresh(true);
+            }
           }
         ]
       },
       {
         key: "show-inbox-pgp-keys",
+        icon: TrayArrowDown,
         get title() {
           return strings.manageInboxKeys();
         },
@@ -64,27 +97,14 @@ export const InboxSettings: SettingsGroup[] = [
         keywords: ["inbox", "pgp", "keys"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
-        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        isHidden: () => !isInboxEnabled(),
         components: [
           {
-            type: "button",
-            get title() {
-              return strings.show();
-            },
-            variant: "secondary",
+            type: "navigation",
             action: async () => {
-              const ok = await showPasswordDialog({
-                title: strings.authenticateToViewEditInboxPgpKeys(),
-                inputs: {
-                  password: {
-                    label: strings.accountPassword(),
-                    autoComplete: "current-password"
-                  }
-                },
-                validate: ({ password }) => {
-                  return db.user.verifyPassword(password);
-                }
-              });
+              const ok = await confirmAccountPassword(
+                strings.authenticateToViewEditInboxPgpKeys()
+              );
               if (!ok) return;
 
               InboxPGPKeysDialog.show({
@@ -96,6 +116,7 @@ export const InboxSettings: SettingsGroup[] = [
       },
       {
         key: "failed-inbox-items",
+        icon: XSquare,
         get title() {
           return strings.failedInboxItems();
         },
@@ -105,33 +126,76 @@ export const InboxSettings: SettingsGroup[] = [
         keywords: ["inbox", "failed", "items"],
         onStateChange: (listener) =>
           useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
-        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        isHidden: () => !isInboxEnabled(),
         components: [
           {
-            type: "button",
-            get title() {
-              return strings.show();
-            },
-            variant: "secondary",
+            type: "navigation",
             action: () => {
               InboxHistoryDialog.show({});
             }
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    key: "inbox-api-keys-group",
+    section: "inbox",
+    get header() {
+      return strings.viewAPIKeys();
+    },
+    isHidden: () => !isInboxEnabled(),
+    onRender: () => {
+      if (isInboxEnabled()) inboxApiKeysStore.refresh(true);
+    },
+    onStateChange: subscribeToInboxState,
+    settings: [
       {
         key: "inbox-api-keys",
+        icon: KeyIcon,
+        get title() {
+          return strings.viewAPIKeys();
+        },
+        get description() {
+          return strings.createApiKeyDesc();
+        },
+        keywords: ["inbox", "api", "keys"],
+        onStateChange: subscribeToInboxState,
+        isHidden: () =>
+          !isInboxEnabled() ||
+          inboxApiKeysStore.getState().status !== "fulfilled" ||
+          inboxApiKeysStore.getKeys().length === 0,
+        components: [
+          {
+            type: "navigation",
+            action: () => createInboxApiKey()
+          }
+        ]
+      },
+      {
+        key: "inbox-api-keys-status",
         title: "",
-        onStateChange: (listener) =>
-          useSettingStore.subscribe((s) => s.isInboxEnabled, listener),
-        isHidden: () => !useSettingStore.getState().isInboxEnabled,
+        onStateChange: subscribeToInboxState,
+        isHidden: () =>
+          !isInboxEnabled() ||
+          (inboxApiKeysStore.getState().status === "fulfilled" &&
+            inboxApiKeysStore.getKeys().length > 0),
         components: [
           {
             type: "custom",
-            component: InboxApiKeys
+            component: InboxApiKeysStatus
           }
         ]
       }
     ]
+  },
+  {
+    key: "inbox-api-key-cards",
+    section: "inbox",
+    header: InboxApiKeyCards,
+    settings: [],
+    isHidden: () => !isInboxEnabled(),
+    onStateChange: (listener) =>
+      useSettingStore.subscribe((s) => s.isInboxEnabled, listener)
   }
 ];

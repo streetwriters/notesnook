@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Flex, Link, Text } from "@theme-ui/components";
 import Field from "../components/field";
 import Dialog from "../components/dialog";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { writeText } from "clipboard-polyfill";
 import { store as userstore } from "../stores/user-store";
 
@@ -32,12 +32,16 @@ import { strings } from "@notesnook/intl";
 import { getDeviceInfo } from "../utils/platform";
 import { getSubscriptionInfo } from "./settings/components/user-profile";
 
+const REQUIRED_FIELD_ERROR = "Please fill out this field";
+
 type IssueDialogProps = BaseDialogProps<boolean>;
 export const IssueDialog = DialogManager.register(function IssueDialog(
   props: IssueDialogProps
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
+  const [titleError, setTitleError] = useState<string>();
+  const [bodyError, setBodyError] = useState<string>();
 
   return (
     <Dialog
@@ -61,7 +65,6 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
         onSubmit={async (e) => {
           e.preventDefault();
           try {
-            setIsSubmitting(true);
             setError(undefined);
 
             const formData = new FormData(e.target as HTMLFormElement);
@@ -69,15 +72,20 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
               formData.entries() as IterableIterator<[string, string]>
             );
 
-            if (!requestData.title.trim() || !requestData.body.trim()) return;
+            const isTitleEmpty = !requestData.title.trim();
+            const isBodyEmpty = !requestData.body.trim();
+            setTitleError(isTitleEmpty ? REQUIRED_FIELD_ERROR : undefined);
+            setBodyError(isBodyEmpty ? REQUIRED_FIELD_ERROR : undefined);
+            if (isTitleEmpty || isBodyEmpty) return;
+
+            setIsSubmitting(true);
             requestData.body = BODY_TEMPLATE(requestData.body);
             const response = await Debug.report({
               title: requestData.title,
               body: requestData.body,
               userId: userstore.get().user?.id
             });
-            if (!response)
-              throw new Error(strings.couldNotSubmitBugReport());
+            if (!response) throw new Error(strings.couldNotSubmitBugReport());
             if ("error" in response) throw new Error(response.error);
 
             props.onClose(true);
@@ -88,25 +96,31 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
             setIsSubmitting(false);
           }
         }}
-        sx={{ flexDirection: "column" }}
+        sx={{
+          flexDirection: "column",
+          gap: "spacing4",
+          mt: "spacing6",
+          mb: "spacing7"
+        }}
       >
         <Field
-          required
           label={strings.title()}
           id="title"
           name="title"
           placeholder={strings.issueTitlePlaceholder()}
           autoFocus
+          error={titleError}
+          onChange={() => setTitleError(undefined)}
         />
         <Field
           as="textarea"
-          required
           variant="forms.input"
           label={strings.description()}
           id="body"
           name="body"
           placeholder={strings.issuePlaceholder()}
-          sx={{ mt: 1 }}
+          error={bodyError}
+          onChange={() => setBodyError(undefined)}
           styles={{
             input: {
               minHeight: 150
@@ -114,11 +128,15 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           }}
         />
         <Text
-          variant="error"
-          bg={"var(--background-error)"}
-          mt={1}
-          p={1}
-          sx={{ borderRadius: "default" }}
+          bg="background-error"
+          p="spacing4"
+          sx={{
+            borderRadius: "radius2",
+            fontSize: "xs",
+            lineHeight: 1.3,
+            color: "paragraph",
+            a: { color: "accent", fontWeight: 500, textDecoration: "none" }
+          }}
         >
           {strings.issueNotice[0]()}{" "}
           <Link
@@ -127,7 +145,7 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
             target="_blank"
           >
             github.com/streetwriters/notesnook/issues
-          </Link>
+          </Link>{" "}
           {strings.issueNotice[1]()}{" "}
           <Link
             href="https://discord.gg/zQBK97EE22"
@@ -136,16 +154,17 @@ export const IssueDialog = DialogManager.register(function IssueDialog(
           >
             {strings.issueNotice[2]()}
           </Link>
-          /
         </Text>
-        <Text variant="subBody" mt={1}>
+        <Text
+          sx={{ fontSize: "sm", lineHeight: 1.3, color: "paragraph-secondary" }}
+        >
           {getDeviceInfo([`Plan: ${getSubscriptionInfo().title}`])
             .split("\n")
-            .map((t) => (
-              <>
+            .map((t, i) => (
+              <Fragment key={i}>
                 {t}
                 <br />
-              </>
+              </Fragment>
             ))}
         </Text>
         <ErrorText error={error} />

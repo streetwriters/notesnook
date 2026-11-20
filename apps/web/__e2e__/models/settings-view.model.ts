@@ -57,7 +57,7 @@ export class SettingsViewModel {
 
     const logoutButton = this.page
       .locator(getTestId("setting-logout"))
-      .locator("button");
+      .locator('[role="button"]');
 
     await logoutButton.click();
     await confirmDialog(this.page.locator(getTestId("confirm-dialog")));
@@ -77,7 +77,7 @@ export class SettingsViewModel {
 
     const backupRecoveryKeyButton = this.page
       .locator(getTestId("setting-recovery-key"))
-      .locator("button");
+      .locator('[role="button"]');
 
     await backupRecoveryKeyButton.click();
     await fillPasswordDialog(this.page, password);
@@ -128,8 +128,9 @@ export class SettingsViewModel {
     const saveBackup = async () => {
       const backupData = this.page
         .locator(getTestId("setting-create-backup"))
-        .locator("select");
-      await backupData.selectOption({ value: "partial", label: "Backup" });
+        .locator("button");
+      await backupData.click();
+      await this.page.locator(getTestId("menu-button-partial")).click();
       if (password) await fillPasswordDialog(this.page, password);
     };
 
@@ -165,7 +166,7 @@ export class SettingsViewModel {
 
     const restoreBackup = this.page
       .locator(getTestId("setting-restore-backup"))
-      .locator("button");
+      .locator('[role="button"]');
 
     await uploadFile(this.page, restoreBackup, filename);
     if (password) await fillPasswordDialog(this.page, password);
@@ -177,9 +178,10 @@ export class SettingsViewModel {
 
     const imageCompressionDropdown = this.page
       .locator(getTestId("setting-image-compression"))
-      .locator("select");
+      .locator("button");
 
-    await imageCompressionDropdown.selectOption(option);
+    await imageCompressionDropdown.click();
+    await this.page.locator(getTestId(`menu-button-${option.value}`)).click();
   }
 
   async enableAppLock(userPassword: string, appLockPassword: string) {

@@ -17,211 +17,235 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
-import { Copy, Loading } from "../../../components/icons";
-import { Box, Button, Link, Flex, Text } from "@theme-ui/components";
+import { Check, Copy, Loading } from "../../../components/icons";
+import { Box, Flex, Text } from "@theme-ui/components";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
 import { db } from "../../../common/db";
-import { Transaction, TransactionV1 } from "@notesnook/core";
-import { writeToClipboard } from "../../../utils/clipboard";
+import { useCopyToClipboard } from "../../../hooks/use-copy-to-clipboard";
 import { showToast } from "../../../utils/toast";
 import { TaskManager } from "../../../common/task-manager";
 import { ErrorText } from "../../../components/error-text";
+import { buttonProps } from "../../../components/settings-ui";
+
+function CopyIdIcon({ id }: { id: string }) {
+  const { copied, copy } = useCopyToClipboard();
+  const Icon = copied ? Check : Copy;
+  return (
+    <Flex
+      {...buttonProps(() => copy(id))}
+      aria-label={strings.copy()}
+      sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        size: 20,
+        borderRadius: "3px",
+        bg: "hover",
+        cursor: "pointer",
+        ":hover": { bg: "hover-secondary" }
+      }}
+    >
+      <Icon size={15} />
+    </Flex>
+  );
+}
+
+const cellSx = {
+  fontFamily: "body",
+  flex: 1,
+  minWidth: 0,
+  display: "flex",
+  alignItems: "center",
+  px: "spacing6",
+  py: "spacing4",
+  fontSize: "xs",
+  lineHeight: 1,
+  color: "paragraph"
+} as const;
+
+function Cell(props: { children?: React.ReactNode; color?: string }) {
+  return (
+    <Box sx={{ ...cellSx, ...(props.color ? { color: props.color } : {}) }}>
+      {props.children}
+    </Box>
+  );
+}
+
+function HeadCell(props: { children: React.ReactNode }) {
+  return <Box sx={{ ...cellSx, color: "heading" }}>{props.children}</Box>;
+}
+
+function DownloadLink(props: { onClick: () => void; children: string }) {
+  return (
+    <Text
+      as="button"
+      onClick={props.onClick}
+      sx={{
+        p: 0,
+        border: "none",
+        bg: "transparent",
+        cursor: "pointer",
+        fontFamily: "inherit",
+        fontSize: "xs",
+        lineHeight: 1,
+        color: "accent",
+        ":hover": { filter: "brightness(0.82)", textDecoration: "underline" }
+      }}
+    >
+      {props.children}
+    </Text>
+  );
+}
+
+function Row(props: { index: number; children: React.ReactNode }) {
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderTopLeftRadius: "radius2",
+        borderTopRightRadius: "radius2",
+        bg: props.index % 2 === 1 ? "background-secondary" : "transparent"
+      }}
+    >
+      {props.children}
+    </Flex>
+  );
+}
 
 export function BillingHistory() {
   const transactions = usePromise(() => db.subscriptions.transactions(), []);
 
-  return (
-    <>
-      {transactions.status === "pending" ? (
-        <Loading sx={{ mt: 2 }} />
-      ) : transactions.status === "rejected" ? (
-        <ErrorText error={transactions.reason} />
-      ) : transactions.value?.transactions.length === 0 ? (
-        <Text variant="body" sx={{ mt: 2, color: "paragraph-secondary" }}>
-          {strings.youHaveNotBeenBilledYet()}
-        </Text>
-      ) : (
-        <table
-          style={{ tableLayout: "fixed", borderCollapse: "collapse" }}
-          cellPadding={0}
-          cellSpacing={0}
-        >
-          {transactions.value?.type === "v1" ? (
-            <>
-              <thead>
-                <Box
-                  as="tr"
-                  sx={{
-                    height: 30,
-                    th: { borderBottom: "1px solid var(--separator)" }
-                  }}
-                >
-                  {[
-                    { id: "date", title: strings.date(), width: "20%" },
-                    { id: "orderId", title: strings.orderId(), width: "20%" },
-                    { id: "amount", title: strings.amount(), width: "20%" },
-                    { id: "status", title: strings.status(), width: "20%" },
-                    { id: "receipt", title: strings.receipt(), width: "20%" }
-                  ].map((column) =>
-                    !column.title ? (
-                      <th key={column.id} />
-                    ) : (
-                      <Box
-                        as="th"
-                        key={column.id}
-                        sx={{
-                          width: column.width,
-                          px: 1,
-                          mb: 2,
-                          textAlign: "left"
-                        }}
-                      >
-                        <Text
-                          variant="body"
-                          sx={{ textAlign: "left", fontWeight: "normal" }}
-                        >
-                          {column.title}
-                        </Text>
-                      </Box>
-                    )
-                  )}
-                </Box>
-              </thead>
-              <tbody>
-                {transactions.value?.transactions.map((transaction) => (
-                  <Box key={transaction.order_id} as="tr" sx={{ height: 30 }}>
-                    <Text as="td" variant="body">
-                      {getFormattedDate(transaction.created_at, "date")}
-                    </Text>
-                    <Text as="td" variant="body">
-                      {transaction.order_id}
-                    </Text>
-                    <Text as="td" variant="body">
-                      {transaction.amount} {transaction.currency}
-                    </Text>
-                    <Text as="td" variant="body">
-                      {strings.transactionStatusToText(transaction.status)}
-                    </Text>
-                    <Text as="td" variant="body">
-                      <Link
-                        href={transaction.receipt_url}
-                        target="_blank"
-                        rel="noreferer nofollow"
-                        variant="text.subBody"
-                        sx={{ color: "accent" }}
-                      >
-                        {strings.viewReceipt()}
-                      </Link>
-                    </Text>
-                  </Box>
-                ))}
-              </tbody>
-            </>
-          ) : (
-            <>
-              <thead>
-                <Box
-                  as="tr"
-                  sx={{
-                    height: 30,
-                    th: { borderBottom: "1px solid var(--separator)" }
-                  }}
-                >
-                  {[
-                    { id: "id", title: "ID", width: "5%" },
-                    { id: "billedAt", title: strings.billedAt(), width: "20%" },
-                    { id: "amount", title: strings.amount(), width: "20%" },
-                    { id: "status", title: strings.status(), width: "20%" },
-                    { id: "invoice", title: strings.invoice(), width: "20%" }
-                  ].map((column) =>
-                    !column.title ? (
-                      <th key={column.id} />
-                    ) : (
-                      <Box
-                        as="th"
-                        key={column.id}
-                        sx={{
-                          width: column.width,
-                          px: 1,
-                          mb: 2,
-                          textAlign: "left"
-                        }}
-                      >
-                        <Text
-                          variant="body"
-                          sx={{ textAlign: "left", fontWeight: "normal" }}
-                        >
-                          {column.title}
-                        </Text>
-                      </Box>
-                    )
-                  )}
-                </Box>
-              </thead>
-              <tbody>
-                {transactions.value?.transactions.map((transaction) => (
-                  <Box key={transaction.id} as="tr" sx={{ height: 30 }}>
-                    <Text as="td" variant="body">
-                      <Copy
-                        size={16}
-                        onClick={() =>
-                          writeToClipboard({ "text/plain": transaction.id })
-                        }
-                        sx={{ cursor: "pointer" }}
-                      />
-                    </Text>
-                    <Text as="td" variant="body">
-                      {getFormattedDate(
-                        transaction.billed_at || transaction.created_at,
-                        "date"
-                      )}
-                    </Text>
-                    <Text as="td" variant="body">
-                      {(transaction.details.totals.grand_total / 100).toFixed(
-                        2
-                      )}{" "}
-                      {transaction.details.totals.currency_code}
-                    </Text>
-                    <Text as="td" variant="body">
-                      {strings.transactionStatusToText(transaction.status)}
-                    </Text>
-                    <Text as="td" variant="body">
-                      <Button
-                        variant="anchor"
-                        onClick={async () => {
-                          const url = await TaskManager.startTask({
-                            type: "modal",
-                            title: strings.gettingInvoice(),
-                            subtitle: strings.mightTakeMinuteOrTwo(),
-                            action() {
-                              return db.subscriptions.invoice(transaction.id);
-                            }
-                          });
+  if (transactions.status === "pending") return <Loading />;
+  if (transactions.status === "rejected")
+    return <ErrorText error={transactions.reason} />;
 
-                          if (!url || url instanceof Error)
-                            return showToast(
-                              "error",
-                              url instanceof Error
-                                ? strings.failedToGetInvoiceForTransaction(
-                                    url.message
-                                  )
-                                : strings.noInvoiceFoundForTransaction()
-                            );
-                          window.open(url, "_blank");
-                        }}
-                      >
-                        {strings.network.download()}
-                      </Button>
-                    </Text>
-                  </Box>
-                ))}
-              </tbody>
-            </>
-          )}
-        </table>
+  const value = transactions.value;
+  const isV1 = value?.type === "v1";
+  const columns = isV1
+    ? [
+        strings.date(),
+        strings.orderId(),
+        strings.amount(),
+        strings.status(),
+        strings.receipt()
+      ]
+    : [
+        "ID",
+        strings.billedAt(),
+        strings.amount(),
+        strings.status(),
+        strings.invoice()
+      ];
+
+  return (
+    <Flex sx={{ flexDirection: "column" }}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderTopLeftRadius: "radius2",
+          borderTopRightRadius: "radius2",
+          bg: "background-selected"
+        }}
+      >
+        {columns.map((column) => (
+          <HeadCell key={column}>{column}</HeadCell>
+        ))}
+      </Flex>
+      {value?.transactions.length === 0 ? (
+        <Flex
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            mt: "spacing7",
+            py: "spacing11"
+          }}
+        >
+          <Text
+            variant="body"
+            sx={{ fontSize: "xs", lineHeight: 1.3, color: "paragraph" }}
+          >
+            {strings.youHaveNotBeenBilledYet()}
+          </Text>
+        </Flex>
+      ) : value?.type === "v1" ? (
+        value.transactions.map((transaction, index) => (
+          <Row key={transaction.order_id} index={index}>
+            <Cell>{getFormattedDate(transaction.created_at, "date")}</Cell>
+            <Cell>{transaction.order_id}</Cell>
+            <Cell>
+              {transaction.amount} {transaction.currency}
+            </Cell>
+            <Cell>{strings.transactionStatusToText(transaction.status)}</Cell>
+            <Cell>
+              <DownloadLink
+                onClick={() =>
+                  window.open(
+                    transaction.receipt_url,
+                    "_blank",
+                    "noreferrer,noopener"
+                  )
+                }
+              >
+                {strings.viewReceipt()}
+              </DownloadLink>
+            </Cell>
+          </Row>
+        ))
+      ) : (
+        value?.transactions.map((transaction, index) => (
+          <Row key={transaction.id} index={index}>
+            <Cell>
+              <CopyIdIcon id={transaction.id} />
+            </Cell>
+            <Cell>
+              {getFormattedDate(
+                transaction.billed_at || transaction.created_at,
+                "date"
+              )}
+            </Cell>
+            <Cell>
+              {(transaction.details.totals.grand_total / 100).toFixed(2)}{" "}
+              {transaction.details.totals.currency_code}
+            </Cell>
+            <Cell
+              color={
+                transaction.status === "canceled"
+                  ? "paragraph-error"
+                  : undefined
+              }
+            >
+              {strings.transactionStatusToText(transaction.status)}
+            </Cell>
+            <Cell>
+              <DownloadLink
+                onClick={async () => {
+                  const url = await TaskManager.startTask({
+                    type: "modal",
+                    title: strings.gettingInvoice(),
+                    subtitle: strings.mightTakeMinuteOrTwo(),
+                    action() {
+                      return db.subscriptions.invoice(transaction.id);
+                    }
+                  });
+
+                  if (!url || url instanceof Error)
+                    return showToast(
+                      "error",
+                      url instanceof Error
+                        ? strings.failedToGetInvoiceForTransaction(url.message)
+                        : strings.noInvoiceFoundForTransaction()
+                    );
+                  window.open(url, "_blank");
+                }}
+              >
+                {strings.network.download()}
+              </DownloadLink>
+            </Cell>
+          </Row>
+        ))
       )}
-    </>
+    </Flex>
   );
 }

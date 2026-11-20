@@ -19,8 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { SettingComponent, SettingsGroup } from "./types";
 import { appVersion } from "../../utils/version";
-import { writeText } from "clipboard-polyfill";
-import { showToast } from "../../utils/toast";
 import { checkForUpdate, downloadUpdate } from "../../utils/updater";
 import { isMacStoreApp } from "../../utils/platform";
 import { clearLogs, downloadLogs } from "../../utils/logger";
@@ -30,6 +28,43 @@ import { strings } from "@notesnook/intl";
 import { desktop } from "../../common/desktop-bridge";
 import { TaskManager } from "../../common/task-manager";
 import { useStore as useSettingStore } from "../../stores/setting-store";
+import {
+  GithubLogo,
+  Path,
+  TelegramLogo,
+  XLogo,
+  DiscordLogo,
+  MastodonLogo,
+  BracketsAngle,
+  RoadHorizon,
+  DeviceMobileCamera,
+  EyeSlash,
+  FileText,
+  IdentificationBadge,
+  WarningTriangle,
+  Email,
+  FileDoc,
+  BugBeetle
+} from "../../components/icons";
+
+async function checkForUpdateAndWait() {
+  await checkForUpdate();
+  if (useAutoUpdateStore.getState().status?.type !== "checking") return;
+  await new Promise<void>((resolve) => {
+    const timeout = setTimeout(done, 15000);
+    const unsubscribe = useAutoUpdateStore.subscribe(
+      (s) => s.status,
+      (status) => {
+        if (status?.type !== "checking") done();
+      }
+    );
+    function done() {
+      clearTimeout(timeout);
+      unsubscribe();
+      resolve();
+    }
+  });
+}
 
 export const AboutSettings: SettingsGroup[] = [
   {
@@ -39,6 +74,7 @@ export const AboutSettings: SettingsGroup[] = [
     settings: [
       {
         key: "version",
+        icon: GithubLogo,
         title: strings.version(),
         description: () => {
           const status = useAutoUpdateStore.getState().status;
@@ -52,12 +88,10 @@ export const AboutSettings: SettingsGroup[] = [
           const status = useAutoUpdateStore.getState().status;
           const copyVersionButton: SettingComponent = {
             type: "button",
-            action: async () => {
-              await writeText(appVersion.formatted);
-              showToast("info", strings.copied());
-            },
+            action: () => {},
+            copyText: appVersion.formatted,
             title: strings.copy(),
-            variant: "secondary"
+            variant: "bordered"
           };
           if (
             useSettingStore.getState().isFlatpak ||
@@ -68,6 +102,7 @@ export const AboutSettings: SettingsGroup[] = [
           }
 
           return [
+            copyVersionButton,
             status?.type === "available"
               ? {
                   type: "button",
@@ -77,16 +112,16 @@ export const AboutSettings: SettingsGroup[] = [
                 }
               : {
                   type: "button",
-                  action: checkForUpdate,
+                  action: checkForUpdateAndWait,
                   title: strings.checkForUpdates(),
                   variant: "secondary"
-                },
-            copyVersionButton
+                }
           ];
         }
       },
       {
         key: "release-track",
+        icon: Path,
         title: strings.releaseTrack(),
         description: strings.releaseTrackDesc(),
         isHidden: () =>
@@ -157,38 +192,37 @@ export const AboutSettings: SettingsGroup[] = [
       },
       {
         key: "source-code",
+        icon: BracketsAngle,
         title: strings.sourceCode(),
         description: strings.sourceCodeDescription(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () => {
               window.open(
                 "https://github.com/streetwriters/notesnook",
                 "_blank"
               );
-            },
-            title: strings.viewSourceCode(),
-            variant: "secondary"
+            }
           }
         ]
       },
       {
         key: "roadmap",
+        icon: RoadHorizon,
         title: strings.roadmap(),
         description: strings.roadmapDesc(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
-              void window.open("https://notesnook.com/roadmap", "_blank"),
-            title: strings.checkRoadmap(),
-            variant: "secondary"
+              void window.open("https://notesnook.com/roadmap", "_blank")
           }
         ]
       },
       {
         key: "available-on-mobile",
+        icon: DeviceMobileCamera,
         title: isMacStoreApp()
           ? strings.availableOnIOS()
           : strings.availableOnIOSAndAndroid(),
@@ -197,16 +231,14 @@ export const AboutSettings: SettingsGroup[] = [
           : strings.availableOnIOSAndAndroidDescription(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
               void window.open(
                 isMacStoreApp()
                   ? "https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013"
                   : "https://notesnook.com/downloads",
                 "_blank"
-              ),
-            title: strings.network.download(),
-            variant: "secondary"
+              )
           }
         ]
       }
@@ -219,59 +251,55 @@ export const AboutSettings: SettingsGroup[] = [
     settings: [
       {
         key: "telegram",
+        icon: TelegramLogo,
         title: strings.joinTelegram(),
         description: strings.joinTelegramDesc(),
         components: [
           {
-            type: "button",
-            action: () => void window.open("https://t.me/notesnook", "_blank"),
-            title: strings.joinTelegram(),
-            variant: "secondary"
-          }
-        ]
-      },
-      {
-        key: "mastodon",
-        title: strings.joinMastodon(),
-        description: strings.joinMastodonDesc(),
-        components: [
-          {
-            type: "button",
-            action: () =>
-              void window.open("https://fosstodon.org/@notesnook", "_blank"),
-            title: strings.follow(),
-            variant: "secondary"
+            type: "navigation",
+            action: () => void window.open("https://t.me/notesnook", "_blank")
           }
         ]
       },
       {
         key: "twitter",
+        icon: XLogo,
         title: strings.followOnX(),
         description: strings.followOnXDesc(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
-              void window.open("https://twitter.com/notesnook", "_blank"),
-            title: strings.follow(),
-            variant: "secondary"
+              void window.open("https://twitter.com/notesnook", "_blank")
           }
         ]
       },
       {
         key: "discord",
+        icon: DiscordLogo,
         title: strings.joinDiscord(),
         description: strings.joinDiscordDesc(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
               void window.open(
                 "https://discord.com/invite/zQBK97EE22",
                 "_blank"
-              ),
-            title: strings.joinCommunity(),
-            variant: "secondary"
+              )
+          }
+        ]
+      },
+      {
+        key: "mastodon",
+        icon: MastodonLogo,
+        title: strings.joinMastodon(),
+        description: strings.joinMastodonDesc(),
+        components: [
+          {
+            type: "navigation",
+            action: () =>
+              void window.open("https://fosstodon.org/@notesnook", "_blank")
           }
         ]
       }
@@ -287,46 +315,43 @@ export const LegalSettings: SettingsGroup[] = [
     settings: [
       {
         key: "privacy-policy",
+        icon: EyeSlash,
         title: strings.privacyPolicy(),
         description: strings.privacyPolicyDesc(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
-              void window.open("https://notesnook.com/privacy", "_blank"),
-            title: strings.open(),
-            variant: "secondary"
+              void window.open("https://notesnook.com/privacy", "_blank")
           }
         ]
       },
       {
         key: "tos",
+        icon: FileText,
         title: strings.tos(),
         description: strings.tosDesc(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
-              void window.open("https://notesnook.com/terms", "_blank"),
-            title: strings.open(),
-            variant: "secondary"
+              void window.open("https://notesnook.com/terms", "_blank")
           }
         ]
       },
       {
         key: "license",
+        icon: IdentificationBadge,
         title: strings.license(),
         description: strings.licenseDescription(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
               void window.open(
                 "https://github.com/streetwriters/notesnook/blob/master/LICENSE",
                 "_blank"
-              ),
-            title: strings.open(),
-            variant: "secondary"
+              )
           }
         ]
       }
@@ -342,30 +367,28 @@ export const SupportSettings: SettingsGroup[] = [
     settings: [
       {
         key: "report-issue",
+        icon: WarningTriangle,
         title: strings.reportAnIssue(),
         description: strings.reportAnIssueDesc(),
         components: [
           {
-            type: "button",
-            action: () => IssueDialog.show({}),
-            title: strings.report(),
-            variant: "secondary"
+            type: "navigation",
+            action: () => void IssueDialog.show({})
           }
         ]
       },
       {
         key: "email-us",
+        icon: Email,
         title: strings.emailSupport(),
         description: strings.emailSupportDesc(),
         components: [
           {
             type: "button",
-            action: async () => {
-              await navigator.clipboard.writeText("support@streetwriters.co");
-              showToast("info", strings.copied());
-            },
+            action: () => {},
+            copyText: "support@streetwriters.co",
             title: strings.copy(),
-            variant: "secondary"
+            variant: "bordered"
           },
           {
             type: "button",
@@ -379,15 +402,14 @@ export const SupportSettings: SettingsGroup[] = [
       },
       {
         key: "docs",
+        icon: FileDoc,
         title: strings.documentation(),
         description: strings.documentationDesc(),
         components: [
           {
-            type: "button",
+            type: "navigation",
             action: () =>
-              void window.open("https://notesnook.com/help/", "_blank"),
-            title: strings.open(),
-            variant: "secondary"
+              void window.open("https://notesnook.com/help/", "_blank")
           }
         ]
       }
@@ -400,20 +422,21 @@ export const SupportSettings: SettingsGroup[] = [
     settings: [
       {
         key: "download-logs",
+        icon: BugBeetle,
         title: strings.debugLogs(),
         description: strings.debugLogsDesc(),
         components: [
           {
             type: "button",
-            action: downloadLogs,
-            title: strings.network.download(),
-            variant: "secondary"
-          },
-          {
-            type: "button",
             action: clearLogs,
             title: strings.clear(),
             variant: "errorSecondary"
+          },
+          {
+            type: "button",
+            action: downloadLogs,
+            title: strings.network.download(),
+            variant: "secondary"
           }
         ]
       }

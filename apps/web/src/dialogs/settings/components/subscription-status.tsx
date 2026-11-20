@@ -18,21 +18,71 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useStore as useUserStore } from "../../../stores/user-store";
-import { Button, Flex, Grid, Progress, Text } from "@theme-ui/components";
+import { Box, Flex, Text } from "@theme-ui/components";
 import { strings } from "@notesnook/intl";
 import { getSubscriptionInfo } from "./user-profile";
-import { BuyDialog } from "../../buy-dialog";
-import { PromptDialog } from "../../prompt";
-import { TaskManager } from "../../../common/task-manager";
-import { db } from "../../../common/db";
-import { showToast } from "../../../utils/toast";
 import {
+  FeatureUsage,
   formatBytes,
   getFeature,
   getFeaturesUsage,
   usePromise
 } from "@notesnook/common";
-import { SubscriptionProvider } from "@notesnook/core";
+import {
+  SubscriptionProvider,
+  SubscriptionStatus as SubscriptionStatusEnum
+} from "@notesnook/core";
+import { StatusPill } from "../../../components/settings-ui";
+
+function getUsageValue(feature: FeatureUsage, isFree: boolean) {
+  const total =
+    feature.total === Infinity
+      ? strings.unlimited()
+      : feature.id === "storage"
+      ? formatBytes(feature.total)
+      : `${feature.total}`;
+  if (!isFree) return total;
+  return feature.id === "storage"
+    ? `${formatBytes(feature.used)}/${total}`
+    : feature.total === Infinity
+    ? strings.unlimited()
+    : strings.countOfTotal(feature.used, feature.total);
+}
+
+function UsageColumn(props: { features: FeatureUsage[]; isFree: boolean }) {
+  return (
+    <Flex sx={{ flexDirection: "column", gap: "10px", flex: 1, minWidth: 0 }}>
+      {props.features.map((feature) => (
+        <Flex key={feature.id} sx={{ gap: "spacing13" }}>
+          <Text
+            sx={{
+              flex: "0 1 150px",
+              minWidth: 0,
+              overflowWrap: "anywhere",
+              fontSize: "xs",
+              lineHeight: 1,
+              color: "paragraph"
+            }}
+          >
+            {getFeature(feature.id).title}
+          </Text>
+          <Text
+            sx={{
+              flex: "1 1 0",
+              minWidth: 0,
+              overflowWrap: "anywhere",
+              fontSize: "xs",
+              lineHeight: 1,
+              color: "heading"
+            }}
+          >
+            {getUsageValue(feature, props.isFree)}
+          </Text>
+        </Flex>
+      ))}
+    </Flex>
+  );
+}
 
 export function SubscriptionStatus() {
   const user = useUserStore((store) => store.user);
@@ -40,121 +90,113 @@ export function SubscriptionStatus() {
 
   const { title, autoRenew, expiryDate, trialExpiryDate, trial } =
     getSubscriptionInfo(user);
-  const subtitle =
-    title === "Free"
-      ? ""
-      : trial
-      ? strings.trialOngoingStartsOn(trialExpiryDate || "")
-      : user?.subscription.provider === SubscriptionProvider.GIFT_CARD
-      ? strings.subExpiresOn(expiryDate || "")
-      : autoRenew
-      ? strings.subAutoRenewsOn(expiryDate || "")
-      : expiryDate
-      ? strings.accountDowngradesFreeOn(expiryDate)
-      : "";
+  const isFree = title === "Free";
+  const subtitle = isFree
+    ? ""
+    : trial
+    ? strings.trialOngoingStartsOn(trialExpiryDate || "")
+    : user?.subscription.provider === SubscriptionProvider.GIFT_CARD
+    ? strings.subExpiresOn(expiryDate || "")
+    : autoRenew
+    ? strings.subAutoRenewsOn(expiryDate || "")
+    : expiryDate
+    ? strings.accountDowngradesFreeOn(expiryDate)
+    : "";
 
   if (!user) return null;
+
+  const status = user.subscription.status;
+  const showActive =
+    isFree ||
+    status === SubscriptionStatusEnum.ACTIVE ||
+    status === SubscriptionStatusEnum.TRIAL;
+  const usage = featuresUsage.status === "fulfilled" ? featuresUsage.value : [];
+  const half = Math.ceil(usage.length / 2);
+  const description = isFree
+    ? "Upgrade to Pro to unlock all premium features."
+    : subtitle
+    ? `${subtitle} ${strings.subscriptionProviderInfo[
+        user.subscription.provider || 0
+      ].desc()}`
+    : "";
+
   return (
-    <>
-      <Flex
-        sx={{
-          flexDirection: "column",
-          borderRadius: "default",
-          justifyContent: "center",
-          alignItems: "start",
-          bg: "var(--background-secondary)",
-          p: 2,
-          gap: 2
-          // mb: isBasic ? 0 : 4
-        }}
-      >
-        <Text
-          variant="subBody"
-          sx={{
-            fontSize: 11,
-            fontWeight: "bold",
-            letterSpacing: 0.3,
-            color: "accent"
-          }}
-        >
-          {strings.currentPlan()}
-        </Text>
-        <Text variant="heading">{title}</Text>
-        {subtitle ? (
-          <Text variant="body">
-            {subtitle}{" "}
-            {strings.subscriptionProviderInfo[
-              user.subscription.provider || 0
-            ].desc()}
-          </Text>
-        ) : null}
-        {featuresUsage.status === "fulfilled" ? (
-          <Grid
+    <Flex
+      sx={{
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "stretch",
+        borderRadius: "radius2",
+        bg: "background-secondary",
+        px: "spacing5",
+        py: "spacing6",
+        gap: "spacing4"
+      }}
+    >
+      <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+        <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Text
+            variant="heading"
             sx={{
-              gridTemplateRows: "1fr ".repeat(featuresUsage.value.length),
-              gridTemplateColumns: "1fr 3fr 1fr",
-              borderTop: "1px solid var(--border)",
-              pt: 2,
-              width: "100%"
+              fontSize: "lg",
+              fontWeight: 600,
+              lineHeight: 1,
+              color: "heading"
             }}
           >
-            {featuresUsage.value.map((feature, index) => (
-              <>
-                <Text sx={{ gridRow: index + 1, gridColumn: 1 }} variant="body">
-                  {getFeature(feature.id).title}
-                </Text>
-                <Text
-                  sx={{ gridRow: index + 1, gridColumn: 3, textAlign: "right" }}
-                  variant="subBody"
-                >
-                  {feature.id === "storage"
-                    ? `${formatBytes(feature.used)}/${
-                        feature.total === Infinity
-                          ? strings.unlimited()
-                          : formatBytes(feature.total)
-                      }`
-                    : feature.total === Infinity
-                    ? strings.unlimited()
-                    : strings.countOfTotal(feature.used, feature.total)}
-                </Text>
-              </>
-            ))}
-          </Grid>
-        ) : null}
-
-        {title === "Free" ? (
-          <Flex sx={{ alignItems: "center", justifyContent: "center", gap: 1 }}>
-            <Button variant="accent" onClick={() => BuyDialog.show({})}>
-              {strings.upgradeToPro()}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={async () => {
-                const giftCode = await PromptDialog.show({
-                  title: strings.redeemGiftCode(),
-                  description: strings.redeemGiftCodeDesc(),
-                  label: strings.enterGiftCode()
-                });
-                if (giftCode) {
-                  await TaskManager.startTask({
-                    type: "modal",
-                    title: strings.redeemingGiftCode(),
-                    subtitle: strings.pleaseWait() + "...",
-                    action: () =>
-                      db.subscriptions
-                        .redeemCode(giftCode)
-                        .catch((e) => showToast("error", e.message))
-                  });
-                }
-              }}
-              sx={{ bg: "background" }}
-            >
-              {strings.redeemGiftCode()}
-            </Button>
-          </Flex>
+            {title}
+          </Text>
+          {showActive ? <StatusPill label={strings.active()} /> : null}
+        </Flex>
+        {description ? (
+          <Text
+            variant="body"
+            sx={{ fontSize: "xs", lineHeight: 1.1, color: "paragraph" }}
+          >
+            {description}
+          </Text>
         ) : null}
       </Flex>
-      {/* {isBasic ? <Features /> : null} */}
-    </>
+      {usage.length > 0 ? (
+        <Box
+          sx={{
+            containerType: "inline-size",
+            bg: "background",
+            border: "1px solid",
+            borderColor: "border-secondary",
+            borderRadius: "radius2",
+            px: "spacing4",
+            py: "spacing6"
+          }}
+        >
+          <Flex
+            sx={{
+              justifyContent: "center",
+              gap: "spacing7",
+              "@container (max-width: 560px)": { flexDirection: "column" }
+            }}
+          >
+            <UsageColumn features={usage.slice(0, half)} isFree={isFree} />
+            {usage.length > 1 ? (
+              <>
+                <Flex
+                  sx={{
+                    width: "1px",
+                    alignSelf: "stretch",
+                    flexShrink: 0,
+                    bg: "separator",
+                    "@container (max-width: 560px)": {
+                      width: "100%",
+                      height: "1px"
+                    }
+                  }}
+                />
+                <UsageColumn features={usage.slice(half)} isFree={isFree} />
+              </>
+            ) : null}
+          </Flex>
+        </Box>
+      ) : null}
+    </Flex>
   );
 }

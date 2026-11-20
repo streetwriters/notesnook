@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { SettingsGroup } from "./types";
-import { Importer } from "../../components/importer";
+import { Importer, importerStore } from "../../components/importer";
+import { SquaresFour } from "../../components/icons";
 import { strings } from "@notesnook/intl";
+import { ProviderFactory, Providers } from "@notesnook-importer/core";
 
 export const ImporterSettings: SettingsGroup[] = [
   {
@@ -28,17 +30,46 @@ export const ImporterSettings: SettingsGroup[] = [
     get header() {
       return strings.notesnookImporter();
     },
+    onRender: () => importerStore.reset(),
     settings: [
       {
-        key: "import-notes",
-        title: "",
+        key: "select-notes-app",
+        icon: SquaresFour,
+        get title() {
+          return strings.selectNotesAppToImportFrom();
+        },
+        get description() {
+          return `${strings.cantFindNotesApp()} [${strings.sendUsARequest()}](https://github.com/streetwriters/notesnook-importer/issues/new)`;
+        },
+        keywords: ["import", "importer", "notes app", "provider"],
+        onStateChange: (listener) =>
+          importerStore.subscribe(() =>
+            listener(importerStore.getState(), undefined)
+          ),
         components: [
           {
-            type: "custom",
-            component: Importer
+            type: "dropdown",
+            options: [
+              { value: "", title: strings.selectNotesApp() },
+              ...ProviderFactory.getAvailableProviders().map((provider) => ({
+                value: provider as string,
+                title: ProviderFactory.getProvider(provider as Providers).name
+              }))
+            ],
+            selectedOption: () => importerStore.getState().providerId || "",
+            onSelectionChanged: (value) => {
+              if (!value) return;
+              importerStore.selectProvider(value as Providers);
+            }
           }
         ]
       }
     ]
+  },
+  {
+    key: "importer-steps",
+    section: "importer",
+    header: Importer,
+    settings: []
   }
 ];

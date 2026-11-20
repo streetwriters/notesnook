@@ -18,33 +18,61 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Button, Flex, Text } from "@theme-ui/components";
-import { FlexScrollContainer } from "../../../components/scroll-container";
 import { useSpellChecker } from "../../../hooks/use-spell-checker";
-import { strings } from "@notesnook/intl";
+import { Close } from "../../../components/icons";
 
 export function DictionaryWords() {
   const words = useSpellChecker((store) => store.words);
   const deleteWord = useSpellChecker((store) => store.deleteWord);
 
+  if (!words.length) return null;
+
   return (
-    <>
-      <Text variant="body" sx={{ my: 1 }}>
-        {strings.customDictWords(words.length)}
-      </Text>
-      <FlexScrollContainer suppressAutoHide style={{ maxHeight: 400 }}>
-        <Flex sx={{ flexDirection: "column" }}>
-          {words.map((word) => (
-            <Button
-              key={word}
-              variant="menuitem"
-              sx={{ textAlign: "left", p: 1 }}
-              onClick={() => deleteWord(word)}
-            >
-              {word}
-            </Button>
-          ))}
+    // pull the chips up under the row description
+    <Flex sx={{ flexWrap: "wrap", gap: "spacing4", ml: "37px", mt: "-7px" }}>
+      {words.map((word) => (
+        <Flex
+          key={word}
+          sx={{
+            alignItems: "center",
+            gap: "spacing4",
+            px: "spacing4",
+            py: "13px",
+            border: "1px solid",
+            borderColor: "border",
+            borderRadius: "radius2"
+          }}
+        >
+          <Text
+            variant="body"
+            sx={{ fontSize: "sm", fontWeight: 400, color: "paragraph" }}
+          >
+            {word}
+          </Text>
+          <Button
+            type="button"
+            aria-label={`Delete ${word}`}
+            onClick={() => deleteWord(word)}
+            sx={{
+              width: 20,
+              height: 20,
+              p: 0,
+              display: "flex",
+              flexShrink: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              bg: "transparent",
+              border: "none",
+              borderRadius: "3px",
+              color: "paragraph",
+              cursor: "pointer",
+              ":hover": { bg: "hover" }
+            }}
+          >
+            <Close size={15} />
+          </Button>
         </Flex>
-      </FlexScrollContainer>
-    </>
+      ))}
+    </Flex>
   );
 }

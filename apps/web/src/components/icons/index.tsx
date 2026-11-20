@@ -20,17 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { memo } from "react";
 import MDIIcon from "@mdi/react";
 import {
-  mdiPlus,
-  mdiMinus,
-  mdiBookOutline,
   mdiNotebookOutline,
-  mdiArrowRight,
   mdiArrowDown,
   mdiBookPlusMultipleOutline,
   mdiBookmarkOutline,
   mdiShieldOutline,
   mdiLockOpenOutline,
-  mdiLockOutline,
   mdiStarOutline,
   mdiCircle,
   mdiCircleOutline,
@@ -38,8 +33,6 @@ import {
   mdiCheck,
   mdiClose,
   mdiDotsVertical,
-  mdiTrashCanOutline,
-  mdiArchiveOutline,
   mdiBookRemoveOutline,
   mdiMagnify,
   mdiMenu,
@@ -49,11 +42,9 @@ import {
   mdiSunglasses,
   mdiGlasses,
   mdiCogOutline,
-  mdiHomeOutline,
   mdiRecycle,
   mdiSync,
   mdiSyncOff,
-  mdiLoading,
   mdiExportVariant,
   mdiArrowExpandDown,
   mdiArrowTopRightThick,
@@ -64,12 +55,10 @@ import {
   mdiWeatherSunny,
   mdiThemeLightDark,
   mdiCheckCircle,
-  mdiLanguageMarkdownOutline,
   mdiFilePdfBox,
   mdiLanguageHtml5,
   mdiFormatTitle,
   mdiAlertCircle,
-  mdiInformation,
   mdiToggleSwitchOffOutline,
   mdiToggleSwitchOutline,
   mdiBackupRestore,
@@ -86,7 +75,6 @@ import {
   mdiBullhorn,
   mdiCloudUploadOutline,
   mdiCloudCheckOutline,
-  mdiContentCopy,
   mdiCheckboxMultipleMarkedCircleOutline,
   mdiBookEditOutline,
   mdiDeleteForeverOutline,
@@ -103,7 +91,6 @@ import {
   mdiFileOutline,
   mdiImage,
   mdiNoteOutline,
-  mdiSyncAlert,
   mdiAlertOutline,
   mdiEyeOffOutline,
   mdiAttachment,
@@ -119,8 +106,6 @@ import {
   mdiEmoticonOutline,
   mdiPaletteOutline,
   mdiFormatBold,
-  mdiTable,
-  mdiCrownOutline,
   mdiDatabaseLockOutline,
   mdiPaletteSwatchOutline,
   mdiAppleIos,
@@ -158,8 +143,6 @@ import {
   mdiProgressUpload,
   mdiFormTextbox,
   mdiCheckAll,
-  mdiCloudOffOutline,
-  mdiContentDuplicate,
   mdiPrinterOutline,
   mdiRefresh,
   mdiRestore,
@@ -172,7 +155,6 @@ import {
   mdiPuzzleOutline,
   mdiBellRingOutline,
   mdiBellOffOutline,
-  mdiVibrate,
   mdiBellCancelOutline,
   mdiBellPlusOutline,
   mdiBellOutline,
@@ -222,7 +204,6 @@ import {
   mdiNoteEditOutline,
   mdiInbox,
   mdiConsoleLine,
-  mdiSpellcheck,
   mdiDeleteSweepOutline,
   mdiCloseCircle
 } from "@mdi/js";
@@ -235,7 +216,6 @@ import EyeOpen from "@notesnook/icons/eye-open.svg?react";
 import ChatIcon from "@notesnook/icons/chat.svg?react";
 import EnvelopeSimple from "@notesnook/icons/envelope-simple.svg?react";
 import LockSimple from "@notesnook/icons/lock-simple.svg?react";
-import ChevronLeftIcon from "@notesnook/icons/chevron-left.svg?react";
 import ChevronRightIcon from "@notesnook/icons/chevron-right.svg?react";
 import ChevronDownIcon from "@notesnook/icons/chevron-down.svg?react";
 import ClockIcon from "@notesnook/icons/clock.svg?react";
@@ -367,6 +347,72 @@ import ArrowDownLeftSvg from "@notesnook/icons/arrow-down-left.svg?react";
 import PaperclipHorizontalSvg from "@notesnook/icons/paperclip-horizontal.svg?react";
 import ArrowBendUpLeftSvg from "@notesnook/icons/arrow-bend-up-left.svg?react";
 import ArrowBendUpRightSvg from "@notesnook/icons/arrow-bend-up-right.svg?react";
+import KeyboardSvg from "@notesnook/icons/keyboard.svg?react";
+import LaptopSvg from "@notesnook/icons/laptop.svg?react";
+import GavelSvg from "@notesnook/icons/gavel.svg?react";
+import KeyholeSvg from "@notesnook/icons/keyhole.svg?react";
+import UsersSvg from "@notesnook/icons/users.svg?react";
+import CloudArrowDownSvg from "@notesnook/icons/cloud-arrow-down.svg?react";
+import GlobeSimpleSvg from "@notesnook/icons/globe-simple.svg?react";
+import NotebookTextSvg from "@notesnook/icons/notebook.svg?react";
+import CalendarDotSvg from "@notesnook/icons/calendar-dot.svg?react";
+import PictureInPictureSvg from "@notesnook/icons/picture-in-picture.svg?react";
+import TraySvg from "@notesnook/icons/tray.svg?react";
+import XCircleSvg from "@notesnook/icons/x-circle.svg?react";
+import XSquareSvg from "@notesnook/icons/x-square.svg?react";
+import SubtitlesSvg from "@notesnook/icons/subtitles.svg?react";
+import EnvelopeSvg from "@notesnook/icons/envelope.svg?react";
+import HardDriveSvg from "@notesnook/icons/hard-drive.svg?react";
+import IdentificationBadgeSvg from "@notesnook/icons/identification-badge.svg?react";
+import BracketsAngleSvg from "@notesnook/icons/brackets-angle.svg?react";
+import RoadHorizonSvg from "@notesnook/icons/road-horizon.svg?react";
+import FileMagnifyingGlassSvg from "@notesnook/icons/file-magnifying-glass.svg?react";
+import DotsNineSvg from "@notesnook/icons/dots-nine.svg?react";
+import BugBeetleSvg from "@notesnook/icons/bug-beetle.svg?react";
+import TimerSvg from "@notesnook/icons/timer.svg?react";
+import BroomSvg from "@notesnook/icons/broom.svg?react";
+import MagicWandSvg from "@notesnook/icons/magic-wand.svg?react";
+import NotchesSvg from "@notesnook/icons/notches.svg?react";
+import MagnifyingGlassPlusSvg from "@notesnook/icons/magnifying-glass-plus.svg?react";
+import WalletSvg from "@notesnook/icons/wallet.svg?react";
+import CrownSimpleLineSvg from "@notesnook/icons/crown-simple-line.svg?react";
+import GiftSvg from "@notesnook/icons/gift.svg?react";
+import PauseSvg from "@notesnook/icons/pause.svg?react";
+import ArrowsCounterClockwiseSvg from "@notesnook/icons/arrows-counter-clockwise.svg?react";
+import PlaySvg from "@notesnook/icons/play.svg?react";
+import CameraSvg from "@notesnook/icons/camera.svg?react";
+import CaretUpSvg from "@notesnook/icons/caret-up.svg?react";
+import ArrowDownSvg from "@notesnook/icons/arrow-down.svg?react";
+import UploadSimpleSvg from "@notesnook/icons/upload-simple.svg?react";
+import CompassSvg from "@notesnook/icons/compass.svg?react";
+import SparkleSvg from "@notesnook/icons/sparkle.svg?react";
+import TrashSimpleSvg from "@notesnook/icons/trash-simple.svg?react";
+import ChevronLeftSimpleSvg from "@notesnook/icons/chevron-left-simple.svg?react";
+import CloudOutlineSvg from "@notesnook/icons/cloud-outline.svg?react";
+import CaretDownSvg from "@notesnook/icons/caret-down.svg?react";
+import TrayArrowDownSvg from "@notesnook/icons/tray-arrow-down.svg?react";
+import EyeSlashSvg from "@notesnook/icons/eye-slash.svg?react";
+import WifiSlashSvg from "@notesnook/icons/wifi-slash.svg?react";
+import CheckCircleSimpleSvg from "@notesnook/icons/check-circle-simple.svg?react";
+import ShieldSvg from "@notesnook/icons/shield.svg?react";
+import FolderSvg from "@notesnook/icons/folder.svg?react";
+import ExportOutlineSvg from "@notesnook/icons/export.svg?react";
+import GithubLogoSvg from "@notesnook/icons/github-logo.svg?react";
+import TelegramLogoSvg from "@notesnook/icons/telegram-logo.svg?react";
+import XLogoSvg from "@notesnook/icons/x-logo.svg?react";
+import DiscordLogoSvg from "@notesnook/icons/discord-logo.svg?react";
+import MastodonLogoSvg from "@notesnook/icons/mastodon-logo.svg?react";
+import HardDrivesSvg from "@notesnook/icons/hard-drives.svg?react";
+import NetworkSvg from "@notesnook/icons/network.svg?react";
+import PathSvg from "@notesnook/icons/path.svg?react";
+import ShieldPlusSvg from "@notesnook/icons/shield-plus.svg?react";
+import NumpadSvg from "@notesnook/icons/numpad.svg?react";
+import WarningTriangleSvg from "@notesnook/icons/warning.svg?react";
+import WrenchSvg from "@notesnook/icons/wrench.svg?react";
+import TextAlignLeftSvg from "@notesnook/icons/text-align-left.svg?react";
+import TextTSvg from "@notesnook/icons/text-t.svg?react";
+import ArrowsVerticalSvg from "@notesnook/icons/arrows-vertical.svg?react";
+import DoubleSpacedLinesSvg from "@notesnook/icons/double-spaced-lines.svg?react";
 
 type MDIIconWrapperProps = {
   title?: string;
@@ -868,3 +914,69 @@ export const ArrowDownLeft = createSvgIcon(ArrowDownLeftSvg);
 export const PaperclipHorizontal = createSvgIcon(PaperclipHorizontalSvg);
 export const ArrowBendUpLeft = createSvgIcon(ArrowBendUpLeftSvg);
 export const ArrowBendUpRight = createSvgIcon(ArrowBendUpRightSvg);
+export const Keyboard = createSvgIcon(KeyboardSvg);
+export const Laptop = createSvgIcon(LaptopSvg);
+export const Gavel = createSvgIcon(GavelSvg);
+export const Keyhole = createSvgIcon(KeyholeSvg);
+export const Users = createSvgIcon(UsersSvg);
+export const CloudArrowDown = createSvgIcon(CloudArrowDownSvg);
+export const GlobeSimple = createSvgIcon(GlobeSimpleSvg);
+export const NotebookText = createSvgIcon(NotebookTextSvg);
+export const CalendarDot = createSvgIcon(CalendarDotSvg);
+export const PictureInPicture = createSvgIcon(PictureInPictureSvg);
+export const Tray = createSvgIcon(TraySvg);
+export const XCircle = createSvgIcon(XCircleSvg);
+export const XSquare = createSvgIcon(XSquareSvg);
+export const Subtitles = createSvgIcon(SubtitlesSvg);
+export const Envelope = createSvgIcon(EnvelopeSvg);
+export const HardDrive = createSvgIcon(HardDriveSvg);
+export const IdentificationBadge = createSvgIcon(IdentificationBadgeSvg);
+export const BracketsAngle = createSvgIcon(BracketsAngleSvg);
+export const RoadHorizon = createSvgIcon(RoadHorizonSvg);
+export const FileMagnifyingGlass = createSvgIcon(FileMagnifyingGlassSvg);
+export const DotsNine = createSvgIcon(DotsNineSvg);
+export const BugBeetle = createSvgIcon(BugBeetleSvg);
+export const Timer = createSvgIcon(TimerSvg);
+export const Broom = createSvgIcon(BroomSvg);
+export const MagicWand = createSvgIcon(MagicWandSvg);
+export const Notches = createSvgIcon(NotchesSvg);
+export const MagnifyingGlassPlus = createSvgIcon(MagnifyingGlassPlusSvg);
+export const Wallet = createSvgIcon(WalletSvg);
+export const CrownSimple = createSvgIcon(CrownSimpleLineSvg);
+export const Gift = createSvgIcon(GiftSvg);
+export const Pause = createSvgIcon(PauseSvg);
+export const ArrowsCounterClockwise = createSvgIcon(ArrowsCounterClockwiseSvg);
+export const Play = createSvgIcon(PlaySvg);
+export const Camera = createSvgIcon(CameraSvg);
+export const CaretUp = createSvgIcon(CaretUpSvg);
+export const ArrowDownOutline = createSvgIcon(ArrowDownSvg);
+export const UploadSimple = createSvgIcon(UploadSimpleSvg);
+export const Compass = createSvgIcon(CompassSvg);
+export const Sparkle = createSvgIcon(SparkleSvg);
+export const TrashSimple = createSvgIcon(TrashSimpleSvg);
+export const ChevronLeftSimple = createSvgIcon(ChevronLeftSimpleSvg);
+export const CloudOutline = createSvgIcon(CloudOutlineSvg);
+export const CaretDownOutline = createSvgIcon(CaretDownSvg);
+export const TrayArrowDown = createSvgIcon(TrayArrowDownSvg);
+export const EyeSlash = createSvgIcon(EyeSlashSvg);
+export const WifiSlash = createSvgIcon(WifiSlashSvg);
+export const CheckCircleSimple = createSvgIcon(CheckCircleSimpleSvg);
+export const Shield = createSvgIcon(ShieldSvg);
+export const Folder = createSvgIcon(FolderSvg);
+export const ExportOutline = createSvgIcon(ExportOutlineSvg);
+export const GithubLogo = createSvgIcon(GithubLogoSvg);
+export const TelegramLogo = createSvgIcon(TelegramLogoSvg);
+export const XLogo = createSvgIcon(XLogoSvg);
+export const DiscordLogo = createSvgIcon(DiscordLogoSvg);
+export const MastodonLogo = createSvgIcon(MastodonLogoSvg);
+export const HardDrives = createSvgIcon(HardDrivesSvg);
+export const Network = createSvgIcon(NetworkSvg);
+export const Path = createSvgIcon(PathSvg);
+export const ShieldPlus = createSvgIcon(ShieldPlusSvg);
+export const Numpad = createSvgIcon(NumpadSvg);
+export const WarningTriangle = createSvgIcon(WarningTriangleSvg);
+export const Wrench = createSvgIcon(WrenchSvg);
+export const TextAlignLeft = createSvgIcon(TextAlignLeftSvg);
+export const TextT = createSvgIcon(TextTSvg);
+export const ArrowsVertical = createSvgIcon(ArrowsVerticalSvg);
+export const DoubleSpacedLines = createSvgIcon(DoubleSpacedLinesSvg);
