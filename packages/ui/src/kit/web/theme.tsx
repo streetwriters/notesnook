@@ -24,3 +24,8 @@ export {
   useThemeContext,
   type ThemeContextValue
 } from "../shared/theme";
+export {
+  createEditorThemeTokens,
+  useEditorThemeTokens,
+  type EditorThemeTokens
+} from "../shared/editor-theme";
