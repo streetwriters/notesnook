@@ -12,6 +12,7 @@ public class Span {
     private int underline;
     private String url;
     private String background;
+    private String color;
 
     public String getText() {
         return text == null ? "" : text;
@@ -38,9 +39,17 @@ public class Span {
     }
 
     public Integer getBackgroundColor() {
-        if (background == null || background.isEmpty()) return null;
+        return parseColor(background);
+    }
+
+    public Integer getTextColor() {
+        return parseColor(color);
+    }
+
+    private static Integer parseColor(String value) {
+        if (value == null || value.isEmpty()) return null;
         try {
-            return android.graphics.Color.parseColor(background);
+            return android.graphics.Color.parseColor(value);
         } catch (IllegalArgumentException e) {
             return null;
         }

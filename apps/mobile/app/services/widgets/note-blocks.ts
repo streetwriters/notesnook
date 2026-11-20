@@ -29,6 +29,7 @@ export type Span = {
   underline?: 1;
   url?: string;
   background?: string;
+  color?: string;
 };
 
 export type NoteBlock =
@@ -140,6 +141,13 @@ function parseColor(value?: string): string | undefined {
   }
 }
 
+function readableColor(background: string) {
+  const [r, g, b] = [1, 3, 5].map((i) =>
+    parseInt(background.slice(i, i + 2), 16)
+  );
+  return 0.299 * r + 0.587 * g + 0.114 * b > 0.6 * 255 ? "#000000" : "#FFFFFF";
+}
+
 function getBackground(name: string, style?: string) {
   const declared = BACKGROUND_STYLE.exec(style || "")?.[1];
   if (declared !== undefined) {
@@ -197,7 +205,10 @@ function inline(nodes: ChildNode[], base: Style = {}) {
     if (style.code) span.code = 1;
     if (style.underline) span.underline = 1;
     if (style.url) span.url = style.url;
-    if (style.background) span.background = style.background;
+    if (style.background) {
+      span.background = style.background;
+      span.color = readableColor(style.background);
+    }
     const last = spans[spans.length - 1];
     if (last && sameStyle(last, span)) last.text += text;
     else spans.push(span);
