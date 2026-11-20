@@ -1,0 +1,24 @@
+{
+  "name": "@notesnook/editor-native",
+  "version": "0.0.1",
+  "description": "The native Notesnook editor as a react-native-gpui host component (NotesnookEditor)",
+  "license": "GPL-3.0-or-later",
+  "main": "src/index.ts",
+  "react-native": "src/index.ts",
+  "files": [
+    "src",
+    "desktop",
+    "react-native.config.js",
+    "README.md"
+  ],
+  "codegenConfig": {
+    "name": "NotesnookEditorSpec",
+    "type": "components",
+    "jsSrcsDir": "src"
+  },
+  "peerDependencies": {
+    "@react-native-gpui/core": ">=0.87.0-alpha.3",
+    "react": "*",
+    "react-native": "0.87.x"
+  }
+}

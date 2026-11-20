@@ -1,0 +1,22 @@
+[package]
+name = "rn-gpui-notesnook-editor"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+
+[build-dependencies]
+rn-gpui-module-build = "0.1"
+
+[dependencies]
+anyhow = "1"
+react-native-gpui = "0.1"
+rn-gpui-module = "0.1"
+gpui = "0.2"
+serde_json = "1"
+# The native editor lives in its own repository. Both crates must build against
+# the same gpui-fast revision as the app (autolink's `[patch.crates-io]` block
+# in the app's Cargo.toml), or the view types do not unify.
+editor-core = { git = "https://github.com/streetwriters/native-editor", branch = "main" }
+host-quickjs = { git = "https://github.com/streetwriters/native-editor", branch = "main" }
+
+[workspace]
