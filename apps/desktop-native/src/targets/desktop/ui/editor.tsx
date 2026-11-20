@@ -28,6 +28,7 @@ import {
   type ForwardRefExoticComponent,
   type RefAttributes
 } from "react";
+import type { PickedFile } from "@platform/files";
 import type * as Contract from "@notesnook/ui-kit/contracts/editor";
 import { Flex } from "@notesnook/ui-kit/desktop/primitives";
 import { useEditorThemeTokens } from "@notesnook/ui-kit/desktop/theme";
@@ -58,6 +59,7 @@ type NativeProps = {
   onContentChange?: (e: { revision: number }) => void;
   onSave?: (e: { revision: number; html: string }) => void;
   onHostAction?: (a: { kind: string; payload: unknown }) => void;
+  onAttachmentRequest?: (r: { id: number; hash?: string }) => void;
 };
 
 // Resolved lazily so a build without the native component (type checks,
@@ -198,10 +200,40 @@ export const EditorSurface = forwardRef<
             html.current = saved;
             latest.current.onSave?.(saved);
           }}
+          onAttachmentRequest={({ id, hash }) => {
+            const host = latest.current.host;
+            if (!hash || !host?.resolveAttachmentPath) {
+              native.current?.attachmentReady(id, null);
+              return;
+            }
+            host
+              .resolveAttachmentPath(hash)
+              .then((path) => native.current?.attachmentReady(id, path ?? null))
+              .catch(() => native.current?.attachmentReady(id, null));
+          }}
           onHostAction={({ kind, payload }) => {
-            const hash = (payload as { hash?: string } | undefined)?.hash;
-            if (kind === "previewAttachment" && hash)
-              latest.current.onPreviewDocument?.(hash);
+            const p = (payload ?? {}) as {
+              hash?: string;
+              url?: string;
+              type?: string;
+              files?: PickedFile[];
+              openInNewTab?: boolean;
+            };
+            const host = latest.current.host;
+            if (kind === "previewAttachment" && p.hash) {
+              if (host?.previewAttachment)
+                void host.previewAttachment({ hash: p.hash, type: p.type });
+              else latest.current.onPreviewDocument?.(p.hash);
+            } else if (kind === "downloadAttachment" && p.hash)
+              void host?.downloadAttachment?.({ hash: p.hash });
+            else if (kind === "openLink" && p.url)
+              void host?.openLink?.(p.url, p.openInNewTab);
+            else if (kind === "openAttachmentPicker")
+              void host?.openAttachmentPicker?.(
+                p.type === "file" || p.type === "camera" ? p.type : "image"
+              );
+            else if (kind === "pasteFiles" && p.files?.length)
+              void host?.pasteFiles?.(p.files);
           }}
         />
       ) : null}
