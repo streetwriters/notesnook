@@ -2,8 +2,6 @@ package com.streetwriters.notesnook;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.widget.RemoteViews;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -69,16 +67,14 @@ public class NotePreviewConfigureActivity extends ReactActivity {
     public static void saveAndFinish(Context context) {
         if (NotePreviewConfigureActivity.activity == null || appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        AppWidgetProviderInfo info = appWidgetManager.getAppWidgetInfo(appWidgetId);
-        if (info != null && NotesWidgetProvider.class.getName().equals(info.provider.getClassName())) {
-            NotesWidgetProvider.updateAppWidget(context, appWidgetManager, appWidgetId,
-                    new RemoteViews(context.getPackageName(), R.layout.widget_notes));
-        } else {
-            NotePreviewWidget.updateAppWidget(context, appWidgetManager, appWidgetId);
-        }
+        NotePreviewConfigureActivity.activity.updateWidget(context, appWidgetManager, appWidgetId);
         Intent resultValue = new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         NotePreviewConfigureActivity.activity.setResult(RESULT_OK, resultValue);
         NotePreviewConfigureActivity.activity.finish();
+    }
+
+    protected void updateWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        NotePreviewWidget.updateAppWidget(context, appWidgetManager, appWidgetId);
     }
 
     @Override
