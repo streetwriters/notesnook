@@ -17,137 +17,226 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useRef, useState, useEffect } from "react";
-import { Box, Button, Flex, Input, Text, Select } from "@theme-ui/components";
+import { SettingsCard, buttonProps } from "../../../components/settings-ui";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { InboxApiKey } from "@notesnook/core";
 import { db } from "../../../common/db";
 import { showToast } from "../../../utils/toast";
 import {
   Loading,
   Copy,
-  Trash,
-  Check,
-  PasswordInvisible
+  TrashSimple,
+  CheckIcon,
+  CaretDownOutline,
+  PasswordInvisible,
+  PasswordVisible
 } from "../../../components/icons";
 import Field from "../../../components/field";
 import { BaseDialogProps, DialogManager } from "../../../common/dialog-manager";
 import Dialog from "../../../components/dialog";
-import { getFormattedDate, usePromise } from "@notesnook/common";
+import { getFormattedDate } from "@notesnook/common";
 import { ConfirmDialog } from "../../confirm";
-import { showPasswordDialog } from "../../password-dialog";
+import { confirmAccountPassword } from "../../password-dialog";
+import { useCopyToClipboard } from "../../../hooks/use-copy-to-clipboard";
 import { strings } from "@notesnook/intl";
+import { Select } from "../../../components/select";
 
-export function InboxApiKeys() {
-  const apiKeysPromise = usePromise(() => db.inboxApiKeys.get(), []);
+type InboxApiKeysState = {
+  status: "pending" | "fulfilled" | "rejected";
+  keys: InboxApiKey[];
+};
 
-  if (apiKeysPromise.status === "pending") {
-    return (
-      <Flex sx={{ alignItems: "center", gap: 2, py: 3 }}>
-        <Loading size={16} />
-        <Text variant="body">{strings.loadingApiKeys()}</Text>
-      </Flex>
-    );
+// The rows card (in inbox-settings.ts) needs to know whether there are any
+// keys, so the list lives in a tiny shared store instead of component state.
+let apiKeysState: InboxApiKeysState = { status: "pending", keys: [] };
+const apiKeysListeners = new Set<(state: InboxApiKeysState) => void>();
+
+function setApiKeysState(state: InboxApiKeysState) {
+  apiKeysState = state;
+  apiKeysListeners.forEach((listener) => listener(state));
+}
+
+export const inboxApiKeysStore = {
+  getState: () => apiKeysState,
+  getKeys: () => apiKeysState.keys,
+  subscribe(listener: (state: InboxApiKeysState) => void) {
+    apiKeysListeners.add(listener);
+    return () => {
+      apiKeysListeners.delete(listener);
+    };
+  },
+  async refresh(reset = false) {
+    if (reset || apiKeysState.status !== "fulfilled")
+      setApiKeysState({ status: "pending", keys: apiKeysState.keys });
+    try {
+      const keys = await db.inboxApiKeys.get();
+      setApiKeysState({ status: "fulfilled", keys: keys || [] });
+    } catch (error) {
+      console.error("Failed to load inbox API keys:", error);
+      setApiKeysState({ status: "rejected", keys: apiKeysState.keys });
+    }
   }
+};
 
-  if (apiKeysPromise.status === "rejected") {
-    return (
-      <Flex sx={{ alignItems: "center", gap: 2, py: 3 }}>
-        <Text variant="body" sx={{ color: "error" }}>
-          {strings.failedToLoadApiKeys()}
-        </Text>
-        <Button onClick={() => apiKeysPromise.refresh()}>{strings.retry()}</Button>
-      </Flex>
-    );
+export function createInboxApiKey() {
+  if (inboxApiKeysStore.getKeys().length >= 10) {
+    return ConfirmDialog.show({
+      title: strings.apiKeysLimitReached(),
+      subtitle: strings.apiKeysLimitReachedMessage(),
+      positiveButtonText: strings.ok()
+    });
   }
+  return AddApiKeyDialog.show({
+    onAdd: () => inboxApiKeysStore.refresh()
+  });
+}
 
-  const apiKeys = apiKeysPromise.value || [];
+function InboxApiKeysEmptyState() {
+  return (
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "spacing4",
+        pt: "spacing11",
+        pb: "spacing8"
+      }}
+    >
+      <Text
+        sx={{
+          fontSize: "sm",
+          fontWeight: 600,
+          lineHeight: "normal",
+          color: "heading"
+        }}
+      >
+        No API keys yet
+      </Text>
+      <Text
+        sx={{
+          fontSize: "xs",
+          lineHeight: "normal",
+          color: "paragraph-secondary"
+        }}
+      >
+        {strings.createFirstApiKey()}
+      </Text>
+      <Button
+        variant="new_accent"
+        onClick={() => createInboxApiKey()}
+        sx={{
+          px: "spacing6",
+          py: "8px",
+          fontSize: "xs",
+          lineHeight: "16px",
+          borderRadius: "radius1"
+        }}
+      >
+        {strings.createApiKey()}
+      </Button>
+    </Flex>
+  );
+}
+
+function InboxApiKeysLoadingState() {
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        gap: "spacing4",
+        height: "54px",
+        px: "spacing5",
+        pt: "spacing6"
+      }}
+    >
+      <Loading size={15} />
+      <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
+        {strings.loadingApiKeys()}
+      </Text>
+    </Flex>
+  );
+}
+
+function InboxApiKeysErrorState() {
+  return (
+    <Flex
+      sx={{
+        alignItems: "center",
+        gap: "spacing4",
+        height: "54px",
+        px: "spacing5",
+        pt: "spacing6"
+      }}
+    >
+      <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph-error" }}>
+        {strings.failedToLoadApiKeys()}
+      </Text>
+      <Button
+        variant="new_secondary"
+        onClick={() => inboxApiKeysStore.refresh(true)}
+      >
+        {strings.retry()}
+      </Button>
+    </Flex>
+  );
+}
+
+/** The "API Keys" card's content while the keys load, fail to load, or are empty. */
+export function InboxApiKeysStatus() {
+  const { status } = useSyncExternalStore(
+    inboxApiKeysStore.subscribe,
+    inboxApiKeysStore.getState
+  );
+  if (status === "pending") return <InboxApiKeysLoadingState />;
+  if (status === "rejected") return <InboxApiKeysErrorState />;
+  return <InboxApiKeysEmptyState />;
+}
+
+export function InboxApiKeyCards() {
+  const { status, keys } = useSyncExternalStore(
+    inboxApiKeysStore.subscribe,
+    inboxApiKeysStore.getState
+  );
+
+  if (status !== "fulfilled" || keys.length === 0) return null;
 
   return (
-    <Box>
-      <Flex sx={{ flexDirection: "column", gap: 3 }}>
-        <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
-          <Text variant="body" sx={{ fontWeight: "bold" }}>
-            {strings.viewAPIKeys()}
-          </Text>
-          <Button
-            variant="accent"
-            onClick={() => {
-              if (apiKeys.length >= 10) {
-                ConfirmDialog.show({
-                  title: strings.apiKeysLimitReached(),
-                  subtitle: strings.apiKeysLimitReachedMessage(),
-                  positiveButtonText: strings.ok()
-                });
-              } else {
-                AddApiKeyDialog.show({
-                  onAdd: () => apiKeysPromise.refresh()
-                });
-              }
-            }}
-          >
-            {strings.createKey()}
-          </Button>
-        </Flex>
-
-        {apiKeys.length === 0 ? (
-          <Box
-            sx={{
-              p: 4,
-              textAlign: "center",
-              border: "1px dashed",
-              borderColor: "border",
-              borderRadius: "default",
-              bg: "background-secondary"
-            }}
-          >
-            <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-              {strings.createFirstApiKey()}
-            </Text>
-          </Box>
-        ) : (
-          <Box>
-            {apiKeys.map((key, i) => (
-              <ApiKeyItem
-                key={key.key}
-                apiKey={key}
-                onRevoke={() => apiKeysPromise.refresh()}
-                isAtEnd={i === apiKeys.length - 1}
-              />
-            ))}
-          </Box>
-        )}
-      </Flex>
-    </Box>
+    <Flex
+      sx={{
+        flexDirection: "column",
+        mt: "-5px",
+        gap: "spacing3"
+      }}
+    >
+      {keys.map((key) => (
+        <ApiKeyItem
+          key={key.key}
+          apiKey={key}
+          onRevoke={() => inboxApiKeysStore.refresh()}
+        />
+      ))}
+    </Flex>
   );
 }
 
 type ApiKeyItemProps = {
   apiKey: InboxApiKey;
   onRevoke: () => void;
-  isAtEnd: boolean;
 };
 
 const VIEW_KEY_TIMEOUT = 15;
 
-function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
-  const [copied, setCopied] = useState(false);
+function ApiKeyItem({ apiKey, onRevoke }: ApiKeyItemProps) {
+  const { copied, copy } = useCopyToClipboard(1000);
   const [viewing, setViewing] = useState(false);
   const [isRevoking, setIsRevoking] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(VIEW_KEY_TIMEOUT);
 
   async function viewKey() {
-    const result = await showPasswordDialog({
-      title: strings.authenticateToViewApiKey(),
-      inputs: {
-        password: {
-          label: strings.accountPassword(),
-          autoComplete: "current-password"
-        }
-      },
-      validate: ({ password }) => {
-        return db.user.verifyPassword(password);
-      }
-    });
+    const result = await confirmAccountPassword(
+      strings.authenticateToViewApiKey()
+    );
     if (!result) return;
 
     setViewing(true);
@@ -155,23 +244,9 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
 
   async function copyToClipboard() {
     if (!viewing) return;
-    try {
-      await navigator.clipboard.writeText(apiKey.key);
-      setCopied(true);
-    } catch (error) {
-      console.error("Failed to copy to clipboard:", error);
+    if (!(await copy(apiKey.key)))
       showToast("error", strings.failedToCopyToClipboard());
-    }
   }
-
-  useEffect(() => {
-    if (copied) {
-      const timer = setTimeout(() => {
-        setCopied(false);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [copied]);
 
   useEffect(() => {
     if (viewing) {
@@ -193,127 +268,178 @@ function ApiKeyItem({ apiKey, onRevoke, isAtEnd }: ApiKeyItemProps) {
     apiKey.expiryDate === -1 ? false : Date.now() > apiKey.expiryDate;
 
   return (
-    <Box
-      sx={{
-        px: 1,
-        py: 2,
-        borderBottom: isAtEnd ? "" : "1px solid",
-        borderColor: "border"
-      }}
-    >
+    <SettingsCard>
+      <Flex sx={{ flexDirection: "column", gap: "spacing3" }}>
+        <Text
+          sx={{
+            fontSize: "sm",
+            fontWeight: 500,
+            lineHeight: 1,
+            color: "heading"
+          }}
+        >
+          {apiKey.name}
+        </Text>
+
+        <Flex sx={{ flexDirection: "column", gap: "spacing2" }}>
+          {[
+            apiKey.lastUsedAt
+              ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt)}`
+              : strings.neverUsed(),
+            `${strings.createdOn()} ${getFormattedDate(apiKey.dateCreated)}`,
+            apiKey.expiryDate === -1
+              ? strings.neverExpires()
+              : `${
+                  isApiKeyExpired ? "Expired on" : strings.expiresOn()
+                } ${getFormattedDate(apiKey.expiryDate)}`
+          ].map((line, index, lines) => (
+            <Text
+              key={line}
+              sx={{
+                fontSize: "xs",
+                lineHeight: 1,
+                color:
+                  isApiKeyExpired && index === lines.length - 1
+                    ? "paragraph-error"
+                    : "paragraph"
+              }}
+            >
+              {line}
+            </Text>
+          ))}
+        </Flex>
+      </Flex>
+
       <Flex
         sx={{
-          justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: "center",
+          gap: "spacing4",
+          mt: isApiKeyExpired ? 0 : "12px",
+          mb: isApiKeyExpired ? 0 : "11px"
         }}
       >
-        <Box sx={{ flex: 1 }}>
-          <Flex sx={{ alignItems: "center", gap: 2, mb: 2 }}>
-            <Text variant="body" sx={{ fontWeight: "bold" }}>
-              {apiKey.name}
-            </Text>
-            {isApiKeyExpired && (
-              <Text
-                variant="subBody"
-                sx={{
-                  py: 0.8,
-                  px: 1,
-                  bg: "accent-error",
-                  color: "background",
-                  fontWeight: "bold",
-                  borderRadius: "default"
-                }}
-              >
-                {strings.expired().toUpperCase()}
-              </Text>
-            )}
-          </Flex>
-
-          <Flex sx={{ mb: 1, flexDirection: "column" }}>
-            <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-              {apiKey.lastUsedAt
-                ? `${strings.lastUsedOn()} ${getFormattedDate(apiKey.lastUsedAt)}`
-                : strings.neverUsed()}
-            </Text>
-            <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-              {strings.createdOn()} {getFormattedDate(apiKey.dateCreated)}
-            </Text>
-            <Text variant="subBody" sx={{ color: "paragraph-secondary" }}>
-              {apiKey.expiryDate === -1
-                ? strings.neverExpires()
-                : `${isApiKeyExpired ? strings.expired() : strings.expiresOn()} ${getFormattedDate(apiKey.expiryDate)}`}
-            </Text>
-          </Flex>
-        </Box>
-        <Input
-          readOnly
-          value={
-            viewing
+        <Flex
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "spacing4",
+            px: "spacing4",
+            py: "14px",
+            bg: "background-secondary",
+            border: "1px solid",
+            borderColor: viewing || isApiKeyExpired ? "accent" : "transparent",
+            borderRadius: "radius2",
+            opacity: isApiKeyExpired ? 0.5 : 1
+          }}
+        >
+          <Text
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              fontSize: "sm",
+              lineHeight: 1,
+              color: "paragraph",
+              userSelect: "text",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {viewing
               ? apiKey.key
               : `${apiKey.key.slice(0, 10)}${"*".repeat(
                   apiKey.key.length - 10
-                )}`
-          }
-          sx={{
-            paddingY: 1,
-            paddingX: 2,
-            fontFamily: "monospace",
-            flex: 1,
-            bg: "background-secondary"
-          }}
-        />
-        {!viewing && (
-          <Button variant="icon" onClick={() => viewKey()}>
-            <PasswordInvisible size={14} />
-          </Button>
-        )}
-        {viewing && (
-          <>
-            <Text
-              variant="body"
-              sx={{
-                color: "accent",
-                fontFamily: "monospace",
-                width: "30px",
-                textAlign: "center"
-              }}
-            >
-              {secondsLeft}s
-            </Text>
-            <Button variant="icon" onClick={() => copyToClipboard()}>
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-            </Button>
-          </>
-        )}
-        <Button
-          variant="icon"
-          disabled={isRevoking}
-          onClick={async () => {
-            const ok = await ConfirmDialog.show({
-              title: strings.revokeInboxApiKey(apiKey.name),
-              subtitle: strings.revokeApiKeyConfirmation(apiKey.name),
-              positiveButtonText: strings.revoke(),
-              negativeButtonText: strings.cancel()
-            });
-            if (!ok) return;
+                )}`}
+          </Text>
+          <Flex
+            {...buttonProps(
+              viewing || isApiKeyExpired ? undefined : () => viewKey()
+            )}
+            sx={{
+              width: 22,
+              height: 22,
+              my: "-3.5px",
+              flexShrink: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "radius1",
+              cursor: viewing || isApiKeyExpired ? undefined : "pointer",
+              ":hover": viewing || isApiKeyExpired ? undefined : { bg: "hover" }
+            }}
+          >
+            {viewing ? (
+              <PasswordInvisible size={15} />
+            ) : (
+              <PasswordVisible size={15} />
+            )}
+          </Flex>
+        </Flex>
 
-            try {
-              setIsRevoking(true);
-              await db.inboxApiKeys.revoke(apiKey.key);
-              onRevoke();
-              showToast("success", strings.apiKeyRevoked());
-            } catch (error) {
-              console.error("Failed to revoke inbox API key:", error);
-              showToast("error", strings.failedToRevokeApiKey());
-            } finally {
-              setIsRevoking(false);
-            }
-          }}
-        >
-          <Trash size={16} color="accent-error" />
-        </Button>
+        <Flex sx={{ alignItems: "center", gap: "spacing3", flexShrink: 0 }}>
+          {viewing && (
+            <>
+              <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
+                {secondsLeft}s
+              </Text>
+              <Button
+                variant="secondary"
+                onClick={() => copyToClipboard()}
+                sx={{
+                  width: 25,
+                  height: 25,
+                  p: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "radius1"
+                }}
+              >
+                {copied ? <CheckIcon size={13} /> : <Copy size={13} />}
+              </Button>
+            </>
+          )}
+          <Button
+            variant="primary"
+            disabled={isRevoking}
+            onClick={async () => {
+              const ok = await ConfirmDialog.show({
+                title: strings.revokeInboxApiKey(apiKey.name),
+                subtitle: strings.revokeApiKeyConfirmation(apiKey.name),
+                positiveButtonText: strings.revoke(),
+                negativeButtonText: strings.cancel()
+              });
+              if (!ok) return;
+
+              try {
+                setIsRevoking(true);
+                await db.inboxApiKeys.revoke(apiKey.key);
+                onRevoke();
+                showToast("success", strings.apiKeyRevoked());
+              } catch (error) {
+                console.error("Failed to revoke inbox API key:", error);
+                showToast("error", strings.failedToRevokeApiKey());
+              } finally {
+                setIsRevoking(false);
+              }
+            }}
+            sx={{
+              width: 25,
+              height: 25,
+              p: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bg: "hover",
+              borderRadius: "radius1"
+            }}
+          >
+            <TrashSimple size={13} color="icon-error" />
+          </Button>
+        </Flex>
       </Flex>
-    </Box>
+    </SettingsCard>
   );
 }
 
@@ -335,7 +461,9 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
   const { onClose, onAdd } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [selectedExpiry, setSelectedExpiry] = useState(getExpiryOptions()[2].value);
+  const [selectedExpiry, setSelectedExpiry] = useState(
+    getExpiryOptions()[2].value
+  );
 
   async function onSubmit() {
     try {
@@ -372,12 +500,22 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
         onClick: () => onClose(false)
       }}
     >
-      <Flex sx={{ flexDirection: "column", gap: 2 }}>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          gap: "spacing4",
+          mt: "spacing6",
+          mb: "spacing7"
+        }}
+      >
         <Field
           inputRef={inputRef}
           autoFocus
           label={strings.keyName()}
           placeholder={strings.exampleKeyName()}
+          sx={{
+            input: { fontSize: "xs", px: "spacing4", py: "spacing6" }
+          }}
           onKeyUp={async (e) => {
             if (e.key === "Enter") {
               await onSubmit();
@@ -385,33 +523,27 @@ const AddApiKeyDialog = DialogManager.register(function AddApiKeyDialog(
           }}
           required
         />
-        <Flex sx={{ flexDirection: "column" }}>
-          <Text variant="subtitle" sx={{ mb: 2, fontWeight: "bold" }}>
+        <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+          <Text
+            sx={{
+              fontSize: "xs",
+              lineHeight: 1.2,
+              color: "paragraph-secondary"
+            }}
+          >
             {strings.expiresIn()}
           </Text>
           <Select
+            variant="filled"
             value={String(selectedExpiry)}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSelectedExpiry(Number(value));
-            }}
-            sx={{
-              color: "var(--paragraph)",
-              bg: "background-secondary",
-              border: "1px solid",
-              borderColor: "border",
-              padding: "5px",
-              "& + svg": {
-                fill: "var(--paragraph)"
-              }
-            }}
-          >
-            {getExpiryOptions().map((option) => (
-              <option key={option.label} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
+            options={getExpiryOptions().map((o) => ({
+              value: String(o.value),
+              title: o.label
+            }))}
+            onChange={(value) => setSelectedExpiry(Number(value))}
+            icon={CaretDownOutline}
+            menuPosition={{ align: "start", yOffset: 5 }}
+          />
         </Flex>
       </Flex>
     </Dialog>

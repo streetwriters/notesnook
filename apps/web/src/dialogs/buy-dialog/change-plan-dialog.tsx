@@ -19,15 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { DialogManager } from "../../common/dialog-manager";
 import BaseDialog from "../../components/dialog";
-import { Flex, Text } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import { PLAN_METADATA } from "./plans";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
-import { ComparePlans, Footer, PlansList } from "./plan-list";
+import { ComparePlans, PlansList } from "./plan-list";
 import { ConfirmDialog } from "../confirm";
 import { TaskManager } from "../../common/task-manager";
 import { strings } from "@notesnook/intl";
+import { SubscriptionPlan } from "@notesnook/core";
 
 export type ChangePlanDialogProps = {
   onClose: () => void;
@@ -42,40 +43,23 @@ export const ChangePlanDialog = DialogManager.register(
       <BaseDialog
         isOpen={true}
         onClose={onClose}
-        sx={{
-          width: ["95%", "80%", "60%"],
-          height: ["auto", "auto", "80vw"]
-        }}
+        title={strings.changePlan()}
+        description="Choose the plan that is right for you"
+        showCloseButton
+        width={1150}
+        height="90%"
       >
         <Flex
           sx={{
             flexDirection: "column",
-            flex: 1,
-            px: 25,
-            justifyContent: "center"
+            gap: "spacing7",
+            mt: "spacing7",
+            mb: "spacing7"
           }}
         >
-          <Flex sx={{ flexDirection: "column", alignSelf: "center" }}>
-            <Text
-              id="select-plan"
-              variant="heading"
-              sx={{ fontSize: 32, textAlign: "center" }}
-            >
-              {strings.changePlan()}
-            </Text>
-            <Text
-              variant="title"
-              mt={1}
-              sx={{
-                fontSize: "title",
-                color: "heading-secondary",
-                textAlign: "center"
-              }}
-            >
-              {strings.onlyPayProratedAmount()}
-            </Text>
-          </Flex>
           <PlansList
+            variant="dialog"
+            recommendedPlan={SubscriptionPlan.PRO}
             selectedPlan={subscription?.productId}
             loadAllPlans
             ignoreTrial
@@ -109,17 +93,7 @@ export const ChangePlanDialog = DialogManager.register(
               }
             }}
           />
-        </Flex>
-        <Flex
-          sx={{
-            flexDirection: "column",
-            flex: 1,
-            px: "5%",
-            mt: 50
-          }}
-        >
-          <ComparePlans />
-          <Footer />
+          <ComparePlans variant="dialog" collapsible />
         </Flex>
       </BaseDialog>
     );

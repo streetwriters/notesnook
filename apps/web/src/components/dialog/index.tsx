@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, ButtonProps, Flex, Text, Box } from "@theme-ui/components";
+import { Button, ButtonProps, Flex, Text } from "@theme-ui/components";
 import { SxProp } from "@theme-ui/core";
 import React from "react";
 import ReactModal from "react-modal";
@@ -134,7 +134,13 @@ function BaseDialog(props: React.PropsWithChildren<DialogProps>) {
           }}
         >
           {props.title || props.description ? (
-            <Flex sx={{ flexDirection: "column", gap: "spacing4" }}>
+            <Flex
+              sx={{
+                flexDirection: "column",
+                gap: "spacing4",
+                flex: props.titleAction || props.showCloseButton ? 1 : undefined
+              }}
+            >
               {props.title && (
                 <Flex
                   sx={{

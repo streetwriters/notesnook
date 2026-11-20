@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { IconBox } from "../../components/settings-ui";
 import React, {
+  Fragment,
   PropsWithChildren,
   Suspense,
   useCallback,
@@ -27,16 +29,18 @@ import React, {
   useState
 } from "react";
 import { Text, Flex, Button, Box, Image } from "@theme-ui/components";
+import type { ThemeUIStyleObject } from "@theme-ui/css";
+import { OtpInput } from "../../components/otp-input";
 import { useSessionState } from "../../hooks/use-session-state";
 import {
   Loading,
-  MfaAuthenticator,
-  MfaEmail,
-  MfaSms,
+  DeviceMobileCamera,
+  Chat,
+  Envelope,
   Download,
-  Print,
+  Printer,
   Copy,
-  Refresh,
+  ArrowsCounterClockwise,
   Checkmark,
   Pro
 } from "../../components/icons";
@@ -46,8 +50,7 @@ import { useTimer } from "../../hooks/use-timer";
 import { phone } from "phone";
 import { db } from "../../common/db";
 import FileSaver from "file-saver";
-import { writeText } from "clipboard-polyfill";
-import MFA from "../../assets/mfa.svg?url";
+import { useCopyToClipboard } from "../../hooks/use-copy-to-clipboard";
 import Fallback2FA from "../../assets/fallback2fa.svg?url";
 import {
   Authenticator,
@@ -56,7 +59,7 @@ import {
   StepComponentProps,
   OnNextFunction
 } from "./types";
-import { ErrorText } from "../../components/error-text";
+import { AuthErrorText } from "../../components/error-text";
 import { AuthenticatorType } from "@notesnook/core";
 import { MultifactorDialog } from "./multi-factor-dialog";
 import { strings } from "@notesnook/intl";
@@ -70,6 +73,16 @@ export type FallbackSteps = typeof fallbackSteps;
 export type StepKeys = keyof Steps; // "choose" | "setup" | "recoveryCodes" | "finish";
 export type FallbackStepKeys = "choose" | "setup" | "finish";
 
+export type StepButtonContext = {
+  onClose: (result: boolean) => void;
+  goBack: () => void;
+};
+export type StepButton = {
+  text: string;
+  // when omitted on the positive button, it submits the step's form
+  onClick?: (context: StepButtonContext) => void;
+};
+
 export type Step<
   T extends OnNextFunction = AuthenticatorTypeOnNext | AuthenticatorOnNext
 > = {
@@ -78,6 +91,10 @@ export type Step<
   component?: StepComponent<T>;
   next?: StepKeys;
   cancellable?: boolean;
+  width?: number;
+  positiveButton?: StepButton;
+  negativeButton?: StepButton;
+  hideSeparator?: boolean;
 };
 export type FallbackStep<
   T extends OnNextFunction =
@@ -107,20 +124,20 @@ const Authenticators: Authenticator[] = [
     type: "app",
     title: strings.mfaAuthAppTitle(),
     subtitle: strings.mfaAuthAppDesc(),
-    icon: MfaAuthenticator,
+    icon: DeviceMobileCamera,
     recommended: true
   },
   {
     type: "sms",
     title: strings.mfaSmsTitle(),
     subtitle: strings.mfaSmsDesc(),
-    icon: MfaSms
+    icon: Chat
   },
   {
     type: "email",
     title: strings.mfaEmailTitle(),
     subtitle: strings.mfaEmailDesc(),
-    icon: MfaEmail
+    icon: Envelope
   }
 ];
 export type AuthenticatorOnNext = (authenticator: Authenticator) => void;
@@ -143,13 +160,19 @@ export const steps = {
     title: authenticator.title,
     description: authenticator.subtitle,
     next: "recoveryCodes",
-    component: ({ onNext }) => (
+    component: ({ onNext, onError }) => (
       <AuthenticatorSelector
         onNext={onNext}
+        onError={onError}
         authenticator={authenticator.type}
       />
     ),
-    cancellable: true
+    cancellable: true,
+    positiveButton: { text: strings.verify() },
+    negativeButton: {
+      text: strings.change2faMethod(),
+      onClick: ({ goBack }) => goBack()
+    }
   }),
   recoveryCodes: (
     authenticatorType: AuthenticatorType
@@ -169,6 +192,23 @@ export const steps = {
   finish: (
     authenticatorType: AuthenticatorType
   ): Step<AuthenticatorTypeOnNext> => ({
+    title: strings.twoFactorAuthEnabled(),
+    description: strings.mfaDone(),
+    hideSeparator: true,
+    width: 440,
+    positiveButton: {
+      text: strings.done(),
+      onClick: ({ onClose }) => onClose(true)
+    },
+    negativeButton: {
+      text: strings.secondary2faMethod(),
+      onClick: ({ onClose }) => {
+        onClose(true);
+        setTimeout(async () => {
+          await MultifactorDialog.show({ primaryMethod: authenticatorType });
+        }, 100);
+      }
+    },
     component: ({ onNext, onClose, onError }) => (
       <TwoFactorEnabled
         onClose={onClose}
@@ -204,9 +244,15 @@ export const fallbackSteps = {
     description: authenticator.subtitle,
     next: "finish",
     cancellable: true,
-    component: ({ onNext }) => (
+    positiveButton: { text: strings.verify() },
+    negativeButton: {
+      text: strings.change2faMethod(),
+      onClick: ({ goBack }) => goBack()
+    },
+    component: ({ onNext, onError }) => (
       <AuthenticatorSelector
         onNext={onNext}
+        onError={onError}
         authenticator={authenticator.type}
         isFallback
       />
@@ -216,6 +262,7 @@ export const fallbackSteps = {
     fallbackMethod: AuthenticatorType,
     primaryMethod: AuthenticatorType
   ): FallbackStep<OnNextFunction> => ({
+    hideSeparator: true,
     component: ({ onNext, onClose }) => (
       <Fallback2FAEnabled
         onNext={onNext}
@@ -243,71 +290,131 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
     <Flex
       as="form"
       id="2faForm"
-      sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}
+      sx={{
+        overflow: "hidden",
+        flex: 1,
+        flexDirection: "column",
+        gap: "spacing4",
+        pt: "spacing6"
+      }}
       onSubmit={(e) => {
         e.preventDefault();
         const authenticator = filteredAuthenticators[selected];
         onNext(authenticator);
       }}
     >
-      {filteredAuthenticators.map((auth, index) => (
-        <Button
-          key={auth.type}
-          type="button"
-          variant={"secondary"}
-          mt={2}
-          sx={{
-            ":first-of-type": { mt: 2 },
-            display: "flex",
-            justifyContent: "start",
-            alignItems: "start",
-            textAlign: "left",
-            bg: selected === index ? "shade" : "transparent",
-            px: 0
-          }}
-          onClick={withFeatureCheck(
-            auth.type === "sms" ? "sms2FA" : undefined,
-            () => setSelected(index)
-          )}
-        >
-          <auth.icon
-            className="2fa-icon"
+      {filteredAuthenticators.map((auth, index) => {
+        const isSelected = selected === index;
+        return (
+          <Button
+            key={auth.type}
+            variant="secondary"
+            type="button"
             sx={{
-              bg: selected === index ? "shade" : "var(--background-secondary)",
-              borderRadius: 100,
-              width: 35,
-              height: 35,
-              mr: 2
+              display: "flex",
+              fontFamily: "body",
+              alignItems: "center",
+              gap: "spacing3",
+              px: "spacing3",
+              py: "spacing4",
+              width: "100%",
+              textAlign: "left",
+
+              color: "inherit",
+              cursor: "pointer",
+              border: "1px solid",
+              borderColor: isSelected ? "transparent" : "border",
+              borderRadius: "radius2",
+              bg: isSelected ? "background-selected" : "background",
+              ":hover": {
+                bg: isSelected ? "background-selected" : "hover",
+                ".2fa-icon-box": {
+                  bg: isSelected ? "background" : "hover-secondary"
+                }
+              }
             }}
-            size={16}
-            color={selected === index ? "accent" : "icon"}
-          />
-          <Text variant={"title"} sx={{ fontWeight: "body" }}>
-            <Flex sx={{ alignItems: "center", gap: 2 }}>
-              {auth.title}{" "}
-              {sms2FAFeature?.isAllowed === false && auth.type === "sms" && (
-                <Pro size={16} color="orange" />
-              )}
-            </Flex>
-            {auth.recommended ? (
-              <Text
-                as="span"
-                variant={"subBody"}
-                bg="shade"
-                px={1}
-                sx={{ borderRadius: "default", color: "accent" }}
-              >
-                {strings.recommended()}
-              </Text>
-            ) : (
-              false
+            onClick={withFeatureCheck(
+              auth.type === "sms" ? "sms2FA" : undefined,
+              () => setSelected(index)
             )}
-            <Text as="div" variant="body" mt={1} sx={{ fontWeight: "normal" }}>
-              {auth.subtitle}
-            </Text>
-          </Text>
-        </Button>
-      ))}
+          >
+            <IconBox
+              className="2fa-icon-box"
+              sx={isSelected ? { bg: "background" } : undefined}
+            >
+              <auth.icon className="2fa-icon" size={15} color="icon" />
+            </IconBox>
+            <Flex sx={{ flex: 1, flexDirection: "column", gap: "spacing3" }}>
+              <Flex sx={{ alignItems: "center", gap: "spacing4" }}>
+                <Text
+                  variant={"body"}
+                  sx={{
+                    fontSize: "sm",
+                    fontWeight: 500,
+                    lineHeight: 1,
+                    color: "heading"
+                  }}
+                >
+                  {auth.title}
+                </Text>
+                {sms2FAFeature?.isAllowed === false && auth.type === "sms" && (
+                  <Pro size={16} color="orange" />
+                )}
+                {auth.recommended ? (
+                  <Text
+                    as="span"
+                    variant={"subBody"}
+                    sx={{
+                      bg: "accent",
+                      color: "accentForeground",
+                      px: "spacing2",
+                      py: "spacing1",
+                      borderRadius: "50px",
+                      fontSize: "3xs",
+                      fontWeight: 500,
+                      lineHeight: 1
+                    }}
+                  >
+                    {strings.recommended()}
+                  </Text>
+                ) : null}
+              </Flex>
+              <Text
+                as="div"
+                variant="body"
+                sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}
+              >
+                {auth.subtitle}
+              </Text>
+            </Flex>
+            <Box
+              sx={{
+                width: 15,
+                height: 15,
+                flexShrink: 0,
+                borderRadius: "50%",
+                border: "1px solid",
+                borderColor: isSelected ? "accent" : "border-tertiary",
+                bg: "background",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {isSelected ? (
+                <Box
+                  sx={{
+                    width: "7.5px",
+                    height: "7.5px",
+                    borderRadius: "50%",
+                    bg: "accent"
+                  }}
+                />
+              ) : null}
+            </Box>
+          </Button>
+        );
+      })}
     </Flex>
   );
 }
@@ -343,7 +450,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
     sharedKey: null,
     authenticatorUri: null
   });
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard();
 
   useEffect(() => {
     (async function () {
@@ -356,59 +463,99 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
       codeHelpText={strings.mfaScanQrCodeHelpText()}
       onSubmitCode={onSubmitCode}
     >
-      <Text variant={"body"}>{strings.mfaScanQrCode()}</Text>
-      <Box sx={{ alignSelf: "center" }}>
-        {authenticatorDetails.authenticatorUri ? (
-          <Suspense fallback={<Loading />}>
-            <QRCode
-              value={authenticatorDetails.authenticatorUri}
-              ecLevel={"M"}
-              size={150}
-            />
-          </Suspense>
-        ) : (
-          <Loading />
-        )}
-      </Box>
-      <Text variant={"subBody"}>{`${strings.scanQrError()}:`}</Text>
       <Flex
-        bg="var(--background-secondary)"
-        mt={2}
-        sx={{ borderRadius: "default", alignItems: "center" }}
-        p={1}
+        sx={{ flexDirection: "column", alignItems: "center", gap: "spacing6" }}
       >
-        <Text
-          className="selectable"
-          ml={1}
+        <Box
           sx={{
-            flex: 1,
-            overflowWrap: "anywhere",
-            color: "paragraph",
-            fontSize: "body",
-            fontFamily: "monospace"
+            alignSelf: "center",
+            p: "12px",
+            bg: "background",
+            border: "1px solid",
+            borderColor: "border-secondary",
+            lineHeight: 0
           }}
         >
-          {authenticatorDetails.sharedKey ? (
-            authenticatorDetails.sharedKey
+          {authenticatorDetails.authenticatorUri ? (
+            <Suspense fallback={<Loading />}>
+              <QRCode
+                value={authenticatorDetails.authenticatorUri}
+                ecLevel={"M"}
+                size={120}
+              />
+            </Suspense>
           ) : (
             <Loading />
           )}
-        </Text>
-        <Button
-          type="button"
-          variant="secondary"
-          sx={{ display: "flex", alignItems: "center" }}
-          onClick={async () => {
-            if (!authenticatorDetails.sharedKey) return;
-            await navigator.clipboard.writeText(authenticatorDetails.sharedKey);
-            setCopied(true);
-            setTimeout(() => {
-              setCopied(false);
-            }, 2500);
-          }}
-        >
-          {copied ? <Checkmark size={15} /> : <Copy size={15} />}
-        </Button>
+        </Box>
+        <Flex sx={{ flexDirection: "column", gap: "spacing4", width: "100%" }}>
+          <Text
+            variant={"body"}
+            sx={{
+              fontSize: "xs",
+              fontWeight: 600,
+              lineHeight: 1.3,
+              color: "paragraph-secondary"
+            }}
+          >{`${strings.scanQrError()}:`}</Text>
+          <Flex
+            sx={{
+              bg: "background-secondary",
+              borderRadius: "radius2",
+              alignItems: "center",
+              justifyContent: "space-between",
+              px: "spacing4",
+              py: "spacing6"
+            }}
+          >
+            <Text
+              className="selectable"
+              sx={{
+                flex: 1,
+                overflowWrap: "anywhere",
+                color: "placeholder",
+                fontSize: "xs",
+                lineHeight: 1
+              }}
+            >
+              {authenticatorDetails.sharedKey ? (
+                authenticatorDetails.sharedKey
+              ) : (
+                <Loading />
+              )}
+            </Text>
+            <Button
+              variant="secondary"
+              type="button"
+              sx={{
+                display: "flex",
+                fontFamily: "body",
+                alignItems: "center",
+                gap: "spacing3",
+                p: 0,
+                bg: "transparent",
+                border: "none",
+                cursor: "pointer",
+
+                fontSize: "sm",
+                fontWeight: 600,
+                lineHeight: 1,
+                color: "accent"
+              }}
+              onClick={() => {
+                if (!authenticatorDetails.sharedKey) return;
+                copy(authenticatorDetails.sharedKey);
+              }}
+            >
+              {copied ? (
+                <Checkmark size={15} color="accent" />
+              ) : (
+                <Copy size={15} color="accent" />
+              )}
+              {copied ? strings.copied() : strings.copy()}
+            </Button>
+          </Flex>
+        </Flex>
       </Flex>
     </VerifyAuthenticatorForm>
   );
@@ -431,28 +578,48 @@ function SetupEmail(props: SetupAuthenticatorProps) {
 
   return (
     <VerifyAuthenticatorForm
-      codeHelpText={strings.mfaEmailDesc()}
+      codeHelpText="Enter the code sent to your email below"
       onSubmitCode={onSubmitCode}
     >
       <Flex
-        mt={2}
-        bg="var(--background-secondary)"
         sx={{
-          borderRadius: "default",
+          bg: "background-secondary",
+          borderRadius: "radius2",
           overflowWrap: "anywhere",
-          alignItems: "center"
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: "spacing4",
+          py: "spacing6"
         }}
       >
         <Text
-          ml={2}
-          sx={{ flex: 1, fontSize: "subtitle", fontFamily: "monospace" }}
+          sx={{
+            flex: 1,
+            fontSize: "sm",
+            lineHeight: 1,
+            color: "paragraph"
+          }}
         >
           {email}
         </Text>
         <Button
+          variant="secondary"
           type="button"
-          variant={"secondary"}
-          sx={{ p: 2, m: 0, alignSelf: "center" }}
+          sx={{
+            display: "flex",
+            fontFamily: "body",
+            alignItems: "center",
+            p: 0,
+            bg: "transparent",
+            border: "none",
+            cursor: "pointer",
+
+            fontSize: "sm",
+            fontWeight: 600,
+            lineHeight: 1,
+            color: "accent",
+            ":disabled": { cursor: "default", opacity: 0.7 }
+          }}
           disabled={isSending || !enabled}
           onClick={async () => {
             setIsSending(true);
@@ -469,7 +636,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
           }}
         >
           {isSending ? (
-            <Loading size={18} />
+            <Loading size={15} />
           ) : enabled ? (
             strings.sendCode()
           ) : (
@@ -477,7 +644,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
           )}
         </Button>
       </Flex>
-      <ErrorText error={error} />
+      <AuthErrorText error={error} />
     </VerifyAuthenticatorForm>
   );
 }
@@ -499,9 +666,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
         inputRef={inputRef}
         id="phone-number"
         name="phone-number"
-        helpText={strings.mfaSmsDesc()}
         label={strings.phoneNumber()}
-        sx={{ mt: 2 }}
         autoFocus
         required
         styles={{
@@ -524,9 +689,12 @@ function SetupSMS(props: SetupAuthenticatorProps) {
         action={{
           disabled: !!error || isSending || !enabled,
           component: (
-            <Text variant={"body"}>
+            <Text
+              variant={"body"}
+              sx={{ fontSize: "sm", fontWeight: 600, color: "accent" }}
+            >
               {isSending ? (
-                <Loading size={18} />
+                <Loading size={15} />
               ) : enabled ? (
                 strings.sendCode()
               ) : (
@@ -554,10 +722,33 @@ function SetupSMS(props: SetupAuthenticatorProps) {
           }
         }}
       />
-      <ErrorText error={error} />
+      <AuthErrorText error={error} />
     </VerifyAuthenticatorForm>
   );
 }
+
+const recoveryActionSx: ThemeUIStyleObject = {
+  display: "flex",
+  fontFamily: "body",
+  flex: 1,
+  minWidth: 0,
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "spacing3",
+  px: "spacing4",
+  py: "spacing6",
+  bg: "transparent",
+  border: "1px solid",
+  borderColor: "border",
+  borderRadius: "radius2",
+  cursor: "pointer",
+
+  fontSize: "xs",
+  fontWeight: 600,
+  lineHeight: 1,
+  color: "buttonForeground-secondary",
+  ":hover": { bg: "hover" }
+};
 
 function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
   const { onNext, onError } = props;
@@ -584,30 +775,13 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
     () => [
       {
         title: strings.print(),
-        icon: Print,
+        icon: Printer,
         action: async () => {
           if (!recoveryCodesRef.current) return;
           await exportToPDF(
             "Notesnook 2FA Recovery Codes",
             recoveryCodesRef.current.outerHTML
           );
-        }
-      },
-      {
-        title: strings.copy(),
-        icon: Copy,
-        action: async () => {
-          await writeText(codes.join("\n"));
-          const button = document.getElementById("btn-copy");
-          if (!button) return;
-
-          const buttonText = button.querySelector(".title");
-          if (!buttonText) return;
-
-          buttonText.innerHTML = "Copied!";
-          setTimeout(() => {
-            buttonText.innerHTML = "Copy";
-          }, 2500);
         }
       },
       {
@@ -620,10 +794,15 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
           );
         }
       },
-      { title: strings.regenerate(), icon: Refresh, action: generate }
+      {
+        title: strings.regenerate(),
+        icon: ArrowsCounterClockwise,
+        action: generate
+      }
     ],
     [codes, generate]
   );
+  const { copied, copy } = useCopyToClipboard();
 
   return (
     <Flex
@@ -633,19 +812,25 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         e.preventDefault();
         onNext(props.authenticatorType);
       }}
-      sx={{ flexDirection: "column" }}
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "spacing6",
+        bg: "background-secondary",
+        borderRadius: "radius2",
+        p: "spacing6",
+        mt: "spacing6"
+      }}
     >
       <Box
         className="selectable"
         ref={recoveryCodesRef}
         sx={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr 1fr",
-          bg: "var(--background-secondary)",
-          p: 2,
-          gap: 1,
-          columnGap: 2,
-          borderRadius: "default"
+          gridTemplateColumns: "1fr 1fr 1fr",
+          width: "100%",
+          rowGap: "spacing3",
+          columnGap: "spacing4"
         }}
       >
         {codes.map((code) => (
@@ -655,31 +840,50 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             as="code"
             variant={"body"}
             sx={{
-              fontFamily: "monospace",
               textAlign: "center",
-              fontWeight: "body",
-              color: "paragraph"
+              fontSize: "xs",
+              lineHeight: 1.2,
+              color: "heading"
             }}
           >
             {code}
           </Text>
         ))}
       </Box>
-      <Flex sx={{ justifyContent: "start", alignItems: "center", mt: 2 }}>
-        {actions.map((action) => (
-          <Button
-            key={action.title}
-            id={`btn-${action.title.toLowerCase()}`}
-            type="button"
-            variant="secondary"
-            mr={1}
-            py={1}
-            sx={{ display: "flex", alignItems: "center" }}
-            onClick={action.action}
-          >
-            <action.icon size={15} sx={{ mr: "2px" }} />
-            <span className="title">{action.title}</span>
-          </Button>
+      <Box
+        sx={{
+          width: "100%",
+          height: 0,
+          borderTop: "1px solid",
+          borderColor: "border"
+        }}
+      />
+      <Flex sx={{ width: "100%", gap: "spacing4" }}>
+        {actions.map((action, i) => (
+          <Fragment key={action.title}>
+            <Button
+              variant="secondary"
+              type="button"
+              sx={recoveryActionSx}
+              onClick={action.action}
+            >
+              <action.icon size={15} />
+              <span className="title">{action.title}</span>
+            </Button>
+            {i === 0 ? (
+              <Button
+                variant="secondary"
+                type="button"
+                sx={recoveryActionSx}
+                onClick={() => copy(codes.join("\n"))}
+              >
+                {copied ? <Checkmark size={15} /> : <Copy size={15} />}
+                <span className="title">
+                  {copied ? strings.copied() : strings.copy()}
+                </span>
+              </Button>
+            ) : null}
+          </Fragment>
         ))}
       </Flex>
     </Flex>
@@ -689,55 +893,8 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
 type TwoFactorEnabledProps = StepComponentProps<AuthenticatorTypeOnNext> & {
   authenticatorType: AuthenticatorType;
 };
-function TwoFactorEnabled(props: TwoFactorEnabledProps) {
-  return (
-    <Flex
-      mb={2}
-      sx={{
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      <Image src={MFA} style={{ flexShrink: 0, width: 120, height: 120 }} />
-      <Text
-        variant={"heading"}
-        mt={2}
-        sx={{ fontSize: "subheading", textAlign: "center" }}
-      >
-        {strings.twoFactorAuthEnabled()}
-      </Text>
-      <Text
-        variant={"body"}
-        mt={1}
-        sx={{ textAlign: "center", color: "var(--paragraph-secondary)" }}
-      >
-        {strings.mfaDone()}
-      </Text>
-      <Button
-        mt={2}
-        sx={{ borderRadius: 100, px: 6 }}
-        onClick={() => props.onClose?.(true)}
-      >
-        {strings.done()}
-      </Button>
-
-      <Button
-        variant={"anchor"}
-        mt={2}
-        onClick={() => {
-          props.onClose && props.onClose(true);
-          setTimeout(async () => {
-            await MultifactorDialog.show({
-              primaryMethod: props.authenticatorType
-            });
-          }, 100);
-        }}
-      >
-        {strings.secondary2faMethod()}
-      </Button>
-    </Flex>
-  );
+function TwoFactorEnabled(_props: TwoFactorEnabledProps) {
+  return null;
 }
 
 type Fallback2FAEnabledProps = StepComponentProps<OnNextFunction> & {
@@ -787,41 +944,78 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
 function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
   const { codeHelpText, onSubmitCode, children } = props;
   const formRef = useRef<HTMLFormElement>(null);
+  const [codeError, setCodeError] = useState<string>();
+  const [code, setCode] = useState("");
   return (
     <Flex
       ref={formRef}
       as="form"
       id="2faForm"
-      sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}
+      sx={{
+        flex: 1,
+        flexDirection: "column",
+        gap: "spacing6",
+        pt: "spacing6"
+      }}
       onSubmit={async (e) => {
         if (!formRef.current) return;
         e.preventDefault();
         const form = new FormData(formRef.current);
         const code = form.get("code");
-        if (!code || code.toString().length !== 6) return;
+        if (!code || code.toString().length !== 6) {
+          setCodeError(strings.enterSixDigitCode());
+          return;
+        }
+        setCodeError(undefined);
         onSubmitCode(code.toString());
       }}
     >
       {children}
-      <Field
-        id="code"
-        name="code"
-        helpText={codeHelpText}
-        label={strings.enterSixDigitCode()}
-        sx={{ alignItems: "center", mt: 2 }}
-        required
-        placeholder="010101"
-        type="number"
-        variant="clean"
-        styles={{
-          input: {
-            width: "100%",
-            fontSize: 38,
-            fontFamily: "monospace",
-            textAlign: "center"
-          }
+      <Flex sx={{ alignItems: "center", gap: "7px" }}>
+        <Flex
+          sx={{
+            width: 32,
+            height: 32,
+            flexShrink: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            bg: "background-secondary",
+            borderRadius: "radius1"
+          }}
+        >
+          <DeviceMobileCamera size={15} />
+        </Flex>
+        <Flex sx={{ flexDirection: "column", gap: "spacing3", flex: 1 }}>
+          <Text
+            variant="body"
+            sx={{
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              color: "heading"
+            }}
+          >
+            {strings.enterSixDigitCode()}
+          </Text>
+          <Text
+            variant="body"
+            sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}
+          >
+            {codeHelpText}
+          </Text>
+        </Flex>
+      </Flex>
+      <OtpInput
+        length={6}
+        autoFocus
+        value={code}
+        onChange={(v) => {
+          setCode(v);
+          setCodeError(undefined);
         }}
+        sx={{ justifyContent: "center", gap: "10px" }}
       />
+      <AuthErrorText error={codeError} />
     </Flex>
   );
 }

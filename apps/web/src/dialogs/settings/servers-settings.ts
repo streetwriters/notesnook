@@ -18,24 +18,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { ServersConfiguration } from "./components/servers-configuration";
+import { ServersHeader } from "./components/servers-configuration";
 import { SettingsGroup } from "./types";
 
 export const ServersSettings: SettingsGroup[] = [
   {
-    header: strings.serversConfiguration(),
+    header: ServersHeader,
     key: "servers",
     section: "servers",
     settings: [
       {
+        // The servers form is rendered by the group header, this setting only
+        // keeps the search keywords.
         key: "config",
-        title: "",
-        components: [
-          {
-            type: "custom",
-            component: ServersConfiguration
-          }
-        ]
+        title: strings.serversConfiguration(),
+        keywords: [
+          "server",
+          "servers",
+          "server url",
+          "sync server",
+          "auth server",
+          "events server",
+          "monograph server"
+        ],
+        isHidden: () => true,
+        components: []
       }
     ]
   }

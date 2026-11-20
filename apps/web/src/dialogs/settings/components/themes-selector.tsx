@@ -16,11 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { SettingsCard } from "../../../components/settings-ui";
 import { httpBatchLink } from "@trpc/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
-import { CheckCircleOutline, Loading } from "../../../components/icons";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
+import { CheckSvgIcon, Loading, SearchIcon } from "../../../components/icons";
 import {
   THEME_COMPATIBILITY_VERSION,
   getPreviewColors,
@@ -36,6 +37,7 @@ import {
 } from "../../../common/themes-router";
 import { ThemeMetadata } from "@notesnook/themes-server";
 import { ThemePreview } from "../../../components/theme-preview";
+import Field from "../../../components/field";
 import { Loader } from "../../../components/loader";
 import { showToast } from "../../../utils/toast";
 import { showFilePicker, readFile } from "../../../utils/file-picker";
@@ -56,7 +58,9 @@ export function ThemesSelector() {
   return (
     <ThemesTRPC.Provider client={ThemesClient} queryClient={ThemesQueryClient}>
       <QueryClientProvider client={ThemesQueryClient}>
-        <ThemesList />
+        <Flex sx={{ flexDirection: "column", mt: "-5px" }}>
+          <ThemesList />
+        </Flex>
       </QueryClientProvider>
     </ThemesTRPC.Provider>
   );
@@ -134,6 +138,7 @@ function ThemesList() {
         });
         if (!fullTheme) return;
         setCurrentTheme(fullTheme);
+        showToast("success", strings.themeApplied(theme.name));
       } catch (e) {
         console.error(e);
         if (e instanceof Error)
@@ -150,100 +155,159 @@ function ThemesList() {
 
   return (
     <>
-      <Input
-        placeholder={strings.searchThemes()}
-        sx={{ mt: 2 }}
-        onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
-      />
-      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
-        <Flex sx={{ mt: 2, gap: 1 }}>
-          {COLOR_SCHEMES.map((filter) => (
-            <Button
-              key={filter.id}
-              variant="secondary"
-              onClick={() => {
-                setColorScheme(filter.id);
-              }}
-              sx={{
-                borderRadius: 100,
-                minWidth: 50,
-                py: 1,
-                px: 2,
-                flexShrink: 0,
-                bg: colorScheme === filter.id ? "shade" : "transparent",
-                color: colorScheme === filter.id ? "accent" : "paragraph"
-              }}
-            >
-              {filter.title}
-            </Button>
-          ))}
-        </Flex>
-
-        <Flex sx={{ mt: 2, gap: 1 }}>
-          <Button
-            variant="secondary"
-            onClick={async () => {
-              const [file] = await showFilePicker({
-                acceptedFileTypes: "application/json"
-              });
-              if (!file) return;
-              const theme = JSON.parse(await readFile(file));
-              const { error } = validateTheme(theme);
-              if (error) return showToast("error", error);
-
-              if (
-                await ThemeDetailsDialog.show({
-                  theme: {
-                    ...theme,
-                    totalInstalls: 0,
-                    previewColors: getPreviewColors(theme)
-                  }
-                })
-              ) {
-                setCurrentTheme(theme);
+      <SettingsCard sx={{ gap: "spacing2" }}>
+        <Text
+          variant="body"
+          sx={{
+            fontSize: "sm",
+            fontWeight: 500,
+            lineHeight: 1,
+            color: "heading"
+          }}
+        >
+          {strings.selectTheme()}
+        </Text>
+        <Field
+          id="search-themes"
+          name="search-themes"
+          variant="clean"
+          leftIcon={SearchIcon}
+          placeholder={strings.searchThemes()}
+          sx={{ gap: 0, m: 0, width: "100%", height: "40px" }}
+          styles={{
+            input: {
+              m: 0,
+              py: "spacing6",
+              pr: "spacing4",
+              pl: "spacing10",
+              fontSize: "xs",
+              color: "paragraph",
+              bg: "background-secondary",
+              borderRadius: "dialog",
+              "::placeholder": {
+                color: "paragraph-secondary",
+                textAlign: "start"
               }
-            }}
-            sx={{
-              px: 3,
-              flexShrink: 0
-            }}
-          >
-            {strings.loadFromFile()}
-          </Button>
-        </Flex>
-      </Flex>
+            }
+          }}
+          onChange={debounce((e) => setSearchQuery(e.target.value), 500)}
+        />
+      </SettingsCard>
 
-      <Box
+      <Flex
         sx={{
-          mt: 2
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: "spacing6"
         }}
       >
-        {themes.isInitialLoading ? (
-          <Loader title={strings.loadingThemes()} />
-        ) : (
-          <VirtualizedGrid
-            columns={2}
-            items={items}
-            getItemKey={(index) => items[index].id}
-            estimatedSize={285}
-            mode="dynamic"
-            onEndReached={() =>
-              themes.hasNextPage ? themes.fetchNextPage() : null
+        <Flex sx={{ gap: "spacing4" }}>
+          {COLOR_SCHEMES.map((filter) => {
+            const isSelected = colorScheme === filter.id;
+            return (
+              <Button
+                key={filter.id}
+                variant="secondary"
+                onClick={() => {
+                  setColorScheme(filter.id);
+                }}
+                sx={{
+                  borderRadius: "radius2",
+                  minWidth: 93,
+                  px: "spacing4",
+                  py: "spacing5",
+                  flexShrink: 0,
+                  fontSize: "sm",
+                  fontWeight: isSelected ? 500 : 400,
+                  lineHeight: 1,
+                  border: "1px solid",
+                  borderColor: isSelected ? "transparent" : "border",
+                  bg: isSelected ? "background-selected" : "transparent",
+                  color: isSelected ? "heading" : "paragraph",
+                  ":hover": {
+                    bg: isSelected ? "background-selected" : "hover"
+                  }
+                }}
+              >
+                {filter.title}
+              </Button>
+            );
+          })}
+        </Flex>
+
+        <Button
+          variant="new_secondary"
+          onClick={async () => {
+            const [file] = await showFilePicker({
+              acceptedFileTypes: "application/json"
+            });
+            if (!file) return;
+            const theme = JSON.parse(await readFile(file));
+            const { error } = validateTheme(theme);
+            if (error) return showToast("error", error);
+
+            if (
+              await ThemeDetailsDialog.show({
+                theme: {
+                  ...theme,
+                  totalInstalls: 0,
+                  previewColors: getPreviewColors(theme)
+                }
+              })
+            ) {
+              setCurrentTheme(theme);
+              showToast("success", strings.themeApplied(theme.name));
             }
-            renderItem={({ item: theme }) => (
-              <ThemeItem
-                key={theme.id}
-                theme={theme}
-                isApplied={isThemeCurrentlyApplied(theme.id)}
-                isApplying={isApplying}
-                setTheme={setTheme}
-              />
-            )}
-          />
-        )}
-        {!themes.isInitialLoading && themes.isFetching ? (
-          <Loading color="accent" sx={{ mt: 2 }} />
-        ) : null}
+          }}
+          sx={{
+            px: "spacing4",
+            py: "spacing5",
+            flexShrink: 0,
+            fontSize: "sm",
+            fontWeight: 600,
+            lineHeight: 1,
+            borderRadius: "radius2",
+            border: "none"
+          }}
+        >
+          {strings.loadFromFile()}
+        </Button>
+      </Flex>
+
+      {/* clip the negative gutter margin so the settings pane does not scroll sideways */}
+      <Box sx={{ mt: "spacing6", overflowX: "clip" }}>
+        <Box sx={{ mx: "-7.5px" }}>
+          {themes.isInitialLoading ? (
+            <Loader title={strings.loadingThemes()} />
+          ) : (
+            <VirtualizedGrid
+              columns={2}
+              items={items}
+              getItemKey={(index) => items[index].id}
+              estimatedSize={330}
+              mode="dynamic"
+              onEndReached={() =>
+                themes.hasNextPage ? themes.fetchNextPage() : null
+              }
+              renderItem={({ item: theme }) => (
+                <Box sx={{ px: "7.5px", pb: "spacing6", height: "100%" }}>
+                  <ThemeItem
+                    key={theme.id}
+                    theme={theme}
+                    isApplied={isThemeCurrentlyApplied(theme.id)}
+                    isApplying={isApplying}
+                    setTheme={setTheme}
+                  />
+                </Box>
+              )}
+            />
+          )}
+          {!themes.isInitialLoading && themes.isFetching ? (
+            <Flex sx={{ justifyContent: "center" }}>
+              <Loading size={15} color="accent" />
+            </Flex>
+          ) : null}
+        </Box>
       </Box>
     </>
   );
@@ -262,14 +326,16 @@ function ThemeItem(props: ThemeItemProps) {
     <Flex
       sx={{
         flexDirection: "column",
-        flex: 1,
+        gap: "spacing6",
         cursor: "pointer",
-        p: 2,
-        border: "1px solid transparent",
-        borderRadius: "default",
+        p: "spacing4",
+        border: "1px solid",
+        borderColor: isApplied ? "transparent" : "border",
+        borderRadius: "radius4",
+        bg: isApplied ? "background-selected" : "transparent",
         ":hover": {
-          bg: "background-secondary",
-          border: "1px solid var(--border)",
+          bg: isApplied ? "background-selected" : "hover",
+          borderColor: isApplied ? "transparent" : "hover",
           ".set-as-button": { visibility: "visible" }
         }
       }}
@@ -279,26 +345,94 @@ function ThemeItem(props: ThemeItemProps) {
         }
       }}
     >
-      <ThemePreview theme={theme} />
-      <Text variant="title" sx={{ mt: 1 }}>
-        {theme.name}
-      </Text>
-      <Text variant="body">{theme.authors[0].name}</Text>
-      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
-        <Text variant="subBody">
-          {theme.colorScheme === "dark" ? strings.dark() : strings.light()}
-          &nbsp;&nbsp;
-          {theme.totalInstalls
-            ? `${theme.totalInstalls} ${strings.installs()}`
-            : ""}
-        </Text>
+      <Box
+        sx={{
+          position: "relative",
+          pt: isApplied ? "12px" : 0
+        }}
+      >
+        <ThemePreview theme={theme} selected={isApplied} />
         {isApplied ? (
-          <CheckCircleOutline color="accent" size={20} />
-        ) : (
+          <Flex
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: "89.8%",
+              width: 26,
+              height: 26,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              bg: "accent"
+            }}
+          >
+            <CheckSvgIcon size={15} color="accentForeground" />
+          </Flex>
+        ) : null}
+      </Box>
+      <Flex
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "spacing4"
+        }}
+      >
+        <Flex
+          sx={{ flexDirection: "column", gap: "6px", minWidth: 0, flex: 1 }}
+        >
+          <Text
+            variant="body"
+            sx={{
+              fontSize: "md",
+              fontWeight: 500,
+              lineHeight: 1,
+              color: "heading",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {theme.name}
+          </Text>
+          <Text
+            variant="body"
+            sx={{
+              fontSize: "xs",
+              lineHeight: 1.2,
+              color: "paragraph",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {theme.authors[0].name}
+          </Text>
+          <Text
+            variant="body"
+            sx={{ fontSize: "xs", lineHeight: 1.2, color: "paragraph" }}
+          >
+            {theme.colorScheme === "dark" ? strings.dark() : strings.light()}
+            &nbsp;
+            {theme.totalInstalls
+              ? `${theme.totalInstalls} ${strings.installs()}`
+              : ""}
+          </Text>
+        </Flex>
+        {isApplied ? null : (
           <Button
             className="set-as-button"
-            variant="secondary"
-            sx={{ visibility: "hidden", bg: "background" }}
+            variant="new_secondary"
+            sx={{
+              visibility: "hidden",
+              flexShrink: 0,
+              px: "spacing4",
+              py: "spacing5",
+              fontSize: "sm",
+              fontWeight: 600,
+              lineHeight: 1,
+              borderRadius: "radius2",
+              border: "none"
+            }}
             onClick={(e) => {
               e.stopPropagation();
               setTheme(theme);
@@ -306,7 +440,7 @@ function ThemeItem(props: ThemeItemProps) {
             disabled={isApplying}
           >
             {isApplying ? (
-              <Loading color="accent" size={18} />
+              <Loading color="accent" size={15} />
             ) : theme.colorScheme === "dark" ? (
               strings.setAsDarkTheme()
             ) : (

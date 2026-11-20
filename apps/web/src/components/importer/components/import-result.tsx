@@ -20,75 +20,76 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { IProvider } from "@notesnook-importer/core";
 import { strings } from "@notesnook/intl";
 import { Button, Flex, Text } from "@theme-ui/components";
-import { CheckCircleOutline } from "../../icons";
+import { ReactNode } from "react";
 import { TransformResult } from "../types";
+import { CardTitle, ImporterCard, LogsBox } from "./card";
 import { ImportErrors } from "./import-errors";
 
 type ImportResultProps = {
   result: TransformResult;
   provider: IProvider;
+  filesCount?: number;
+  logs?: ReactNode;
   onReset: () => void;
 };
 
 export function ImportResult(props: ImportResultProps) {
-  const { result, onReset } = props;
+  const { result, onReset, logs, filesCount } = props;
+  const hasLogs = !!logs;
 
   if (result.totalNotes <= 0) {
     return (
-      <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
-        <Text variant="title">{strings.importUnsuccessful()}</Text>
-        <Text variant="body" sx={{ mt: 2 }}>
+      <ImporterCard sx={{ p: "spacing6" }}>
+        <CardTitle title={strings.importUnsuccessful()}>
           {strings.failedToImportSelectedFiles()}
-        </Text>
+        </CardTitle>
         {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
-        <Button
-          variant="accent"
-          onClick={onReset}
-          sx={{ alignSelf: "center", mt: 2, px: 4 }}
-        >
-          {strings.startOver()}
-        </Button>
-      </Flex>
+        {hasLogs ? <LogsBox failed>{logs}</LogsBox> : null}
+        <Flex sx={{ gap: "spacing4", alignItems: "center" }}>
+          <Button
+            variant="new_bordered"
+            sx={{ px: "spacing8", py: "spacing6", fontSize: "xs" }}
+            onClick={() =>
+              window.open(
+                "https://github.com/streetwriters/notesnook-importer/issues/new",
+                "_blank"
+              )
+            }
+          >
+            {strings.sendUsABugReport()}
+          </Button>
+          <Button
+            variant="new_accent"
+            sx={{ px: "spacing8", py: "spacing6" }}
+            onClick={onReset}
+          >
+            {strings.startOver()}
+          </Button>
+        </Flex>
+      </ImporterCard>
     );
   }
 
   return (
-    <>
-      <CheckCircleOutline color="accent" />
-      <Text variant="body" my={2} sx={{ textAlign: "center" }}>
-        {strings.importCompleted()}.{" "}
-        {strings.notesSuccessfullyImported(props.result.totalNotes)}{" "}
-        {strings.errorsOccured(result.errors.length)}
+    <ImporterCard>
+      <CardTitle title={strings.importCompleted()}>
+        {strings.notesSuccessfullyImported(result.totalNotes)}
+      </CardTitle>
+      <Text sx={{ fontSize: "xs", lineHeight: 1, color: "paragraph" }}>
+        {filesCount !== undefined
+          ? `${filesCount} ${filesCount === 1 ? "file" : "files"} • `
+          : ""}
+        {strings.foundNotes(result.totalNotes)}
       </Text>
+      {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
+      {hasLogs ? <LogsBox>{logs}</LogsBox> : null}
       <Button
-        variant="secondary"
-        sx={{ alignSelf: "center" }}
-        onClick={async () => {
-          onReset();
-        }}
+        variant="new_accent"
+        sx={{ alignSelf: "flex-start", px: "spacing4" }}
+        onClick={onReset}
       >
         {strings.startOver()}
       </Button>
-      {result.errors.length > 0 && (
-        <Flex
-          my={1}
-          bg="var(--background-error)"
-          p={1}
-          sx={{ flexDirection: "column" }}
-        >
-          {result.errors.map((error) => (
-            <Text
-              key={error.message}
-              variant="body"
-              sx={{
-                color: "var(--paragraph-error)"
-              }}
-            >
-              {error.message}
-            </Text>
-          ))}
-        </Flex>
-      )}
-    </>
+    </ImporterCard>
   );
 }

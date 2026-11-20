@@ -22,6 +22,13 @@ import { desktop } from "../../common/desktop-bridge";
 import { useStore as useSettingStore } from "../../stores/setting-store";
 import { showToast } from "../../utils/toast";
 import { SettingsGroup } from "./types";
+import {
+  ArrowCounterClockwise,
+  PictureInPicture,
+  Tray,
+  XCircle,
+  Subtitles
+} from "../../components/icons";
 
 export const DesktopIntegrationSettings: SettingsGroup[] = [
   {
@@ -31,6 +38,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
     settings: [
       {
         key: "auto-start",
+        icon: ArrowCounterClockwise,
         title: strings.autoStartOnSystemStartup(),
         description: strings.autoStartDescription(),
         onStateChange: (listener) =>
@@ -56,6 +64,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "start-minimized",
+        icon: PictureInPicture,
         title: strings.startMinimized(),
         description: strings.startMinimizedDescription(),
         onStateChange: (listener) =>
@@ -82,6 +91,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "minimize-to-tray",
+        icon: Tray,
         title: strings.minimizeToSystemTray(),
         description: strings.minimizeToSystemTrayDescription(),
         onStateChange: (listener) =>
@@ -106,6 +116,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "close-to-tray",
+        icon: XCircle,
         title: strings.closeToSystemTray(),
         description: strings.closeToSystemTrayDescription(),
         onStateChange: (listener) =>
@@ -130,6 +141,7 @@ export const DesktopIntegrationSettings: SettingsGroup[] = [
       },
       {
         key: "use-native-titlebar",
+        icon: Subtitles,
         title: strings.useNativeTitlebar(),
         description: strings.useNativeTitlebarDescription(),
         onStateChange: (listener) =>

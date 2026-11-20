@@ -22,6 +22,7 @@ import { useStore as useSettingStore } from "../../stores/setting-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { ThemesSelector } from "./components/themes-selector";
 import { strings } from "@notesnook/intl";
+import { MagnifyingGlassPlus, Palette } from "../../components/icons";
 
 export const AppearanceSettings: SettingsGroup[] = [
   {
@@ -33,6 +34,7 @@ export const AppearanceSettings: SettingsGroup[] = [
       {
         key: "zoom-factor",
         title: strings.zoomFactor(),
+        icon: MagnifyingGlassPlus,
         description: strings.zoomFactorDescription(),
         isHidden: () => !IS_DESKTOP_APP,
         onStateChange: (listener) =>
@@ -62,6 +64,7 @@ export const AppearanceSettings: SettingsGroup[] = [
       {
         key: "color-scheme",
         title: strings.colorScheme(),
+        icon: Palette,
         description: strings.colorSchemeDescription(),
         onStateChange: (listener) =>
           useThemeStore.subscribe(
@@ -89,11 +92,20 @@ export const AppearanceSettings: SettingsGroup[] = [
             }
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    key: "themes-selector",
+    section: "appearance",
+    header: ThemesSelector,
+    settings: [
       {
         key: "themes",
         title: strings.selectTheme(),
-        components: [{ type: "custom", component: ThemesSelector }]
+        keywords: ["theme", "themes", "search themes", "load from file"],
+        isHidden: () => true,
+        components: []
       }
     ]
   }

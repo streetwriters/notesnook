@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { strings } from "@notesnook/intl";
-import { CirclePartners } from "./components/circle-partners";
+import { CircleHeader } from "./components/circle-partners";
 import { SettingsGroup } from "./types";
 
 export const NotesnookCircleSettings: SettingsGroup[] = [
   {
-    header: strings.notesnookCircle(),
+    header: CircleHeader,
     key: "notesnook-circle",
     section: "circle",
     settings: [
@@ -31,12 +31,15 @@ export const NotesnookCircleSettings: SettingsGroup[] = [
         key: "partners",
         title: "",
         description: strings.notesnookCircleDesc(),
-        components: [
-          {
-            type: "custom",
-            component: CirclePartners
-          }
-        ]
+        keywords: [
+          "partner offers",
+          "partners",
+          "discount",
+          "offers",
+          "circle"
+        ],
+        isHidden: () => true,
+        components: []
       }
     ]
   }

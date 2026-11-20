@@ -18,153 +18,222 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { alpha } from "@theme-ui/color";
-import { Flex, Text } from "@theme-ui/components";
-import { Circle, Notes, Notebook, StarOutline, Tag, Plus } from "../icons";
+import { Box, Flex } from "@theme-ui/components";
 import { ThemeMetadata } from "@notesnook/themes-server";
-import { strings } from "@notesnook/intl";
+import { ReactNode } from "react";
 
 export type ThemePreviewProps = {
   theme: ThemeMetadata;
+  /**
+   * Rendered in the bottom-right of the wireframe window in place of the
+   * three colour dots.
+   */
+  badge?: ReactNode;
+  selected?: boolean;
+  /** Total height of the preview frame. */
+  height?: number;
+  /** Top offset of the wireframe window inside the frame. */
+  windowTop?: number;
+  /** Height of the wireframe window. */
+  windowHeight?: number;
 };
 
 export function ThemePreview(props: ThemePreviewProps) {
-  const { theme } = props;
+  const {
+    theme,
+    badge,
+    selected,
+    height = 239,
+    windowTop = 23,
+    windowHeight = 193
+  } = props;
+  const colors = theme.previewColors;
+  const line = alpha(colors.paragraph, 0.2);
+  const strongLine = alpha(colors.paragraph, 0.45);
+  const bar = {
+    position: "absolute",
+    height: "3.797px",
+    borderRadius: "10px"
+  } as const;
 
   return (
-    <Flex
+    <Box
       sx={{
         position: "relative",
-        flexDirection: "column",
-        height: 200,
-        borderRadius: "default",
-        overflow: "hidden",
-        bg: alpha(theme.previewColors.accent, 0.2),
-        //m: 2,
-
-        border: `2px solid ${theme.previewColors.accent}`,
-        gap: 0,
-        transition: "all 300ms ease-out",
-        ":hover": {
-          gap: 1,
-          p: 1,
-          "&> div.ui": { gap: 1 },
-          "& *": { border: "none" }
-        }
+        width: "100%",
+        height,
+        bg: "background",
+        border: "1px solid",
+        borderColor: "border",
+        borderRadius: "radius3",
+        boxShadow: `0px 4px 17px 0px rgba(0, 0, 0, ${selected ? 0.07 : 0.05})`
       }}
     >
-      <Flex
+      <Box
         sx={{
-          borderRadius: "default",
-          p: "small",
           position: "absolute",
-          bottom: 1,
-          right: 1
+          left: "8.61%",
+          top: windowTop,
+          width: "82.56%",
+          height: windowHeight,
+          borderRadius: "10px",
+          overflow: "hidden"
         }}
       >
-        {[
-          theme.previewColors.accent,
-          theme.previewColors.paragraph,
-          theme.previewColors.background
-        ].map((color) => (
-          <Circle
-            key={color}
-            color={color}
-            size={18}
+        <Box
+          sx={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: "28.7%",
+            bg: colors.navigationMenu.background
+          }}
+        >
+          <Box
             sx={{
-              ml: -12
+              ...bar,
+              left: "9.25%",
+              top: "11.39px",
+              width: "37.04%",
+              bg: colors.navigationMenu.accent
             }}
           />
-        ))}
-      </Flex>
-      <Flex
-        className="ui"
-        sx={{ flex: 1, gap: 0, transition: "all 300ms ease-out" }}
-      >
-        <Flex
-          className="navigation"
+          <Box
+            sx={{
+              ...bar,
+              left: "9.25%",
+              top: "17.72px",
+              width: "46.3%",
+              bg: line
+            }}
+          />
+          <Box
+            sx={{
+              ...bar,
+              left: "9.25%",
+              top: "24.05px",
+              width: "46.3%",
+              bg: line
+            }}
+          />
+          <Box
+            sx={{
+              ...bar,
+              left: "9.25%",
+              top: "30.38px",
+              width: "37.04%",
+              bg: line
+            }}
+          />
+        </Box>
+        <Box
           sx={{
-            bg: theme.previewColors.navigationMenu.background,
-            width: 20,
-            flexDirection: "column",
-            gap: 2,
-            py: 1,
-            borderRight: `1px solid ${theme.previewColors.border}`
+            position: "absolute",
+            left: "28.7%",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            bg: colors.list.background,
+            borderLeft: "1px solid",
+            borderLeftColor: colors.border
           }}
         >
-          {[Notes, Notebook, StarOutline, Tag].map((Icon, index) => (
-            <Icon
-              key={index.toString()}
-              color={
-                index === 0
-                  ? theme.previewColors.navigationMenu.accent
-                  : theme.previewColors.navigationMenu.icon
-              }
-              size={8}
-            />
-          ))}
-        </Flex>
-        <Flex
-          className="list"
-          sx={{
-            bg: theme.previewColors.list.background,
-            flex: 0.3,
-            p: 1,
-            borderRight: `1px solid ${theme.previewColors.border}`
-          }}
-        >
+          <Box
+            sx={{
+              ...bar,
+              left: "10.9%",
+              top: "11.39px",
+              width: "14.92%",
+              bg: strongLine
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              left: "90.47%",
+              top: "10.13px",
+              width: "4.58%",
+              aspectRatio: "8.985 / 4.8125",
+              borderRadius: "10px",
+              bg: strongLine
+            }}
+          />
+          <Box
+            sx={{
+              ...bar,
+              left: "10.9%",
+              top: "21.52px",
+              width: "68.37%",
+              bg: line
+            }}
+          />
+          <Box
+            sx={{
+              ...bar,
+              left: "10.9%",
+              top: "27.84px",
+              width: "68.37%",
+              bg: line
+            }}
+          />
+          <Box
+            sx={{
+              ...bar,
+              left: "10.9%",
+              top: "34.17px",
+              width: "54.69%",
+              bg: line
+            }}
+          />
+        </Box>
+        {badge ? (
           <Flex
             sx={{
-              justifyContent: "space-between",
-              width: 120
+              position: "absolute",
+              right: "1.6%",
+              bottom: "12px",
+              alignItems: "center",
+              justifyContent: "center",
+              p: "4px",
+              fontFamily: "body",
+              fontSize: "3xs",
+              lineHeight: 1,
+              color: colors.paragraph,
+              bg: alpha(colors.paragraph, 0.08),
+              borderRadius: "10px"
             }}
           >
-            <Text
-              variant="heading"
-              sx={{
-                color: theme.previewColors.list.heading,
-                fontSize: 7
-              }}
-            >
-              {strings.dataTypesPluralCamelCase.note()}
-            </Text>
-            <Plus
-              color={theme.previewColors.list.accentForeground}
-              size={8}
-              sx={{
-                bg: theme.previewColors.list.accent,
-                size: 10,
-                borderRadius: 100
-              }}
-            />
+            {badge}
           </Flex>
-        </Flex>
-        <Flex
-          className="editor"
-          sx={{ bg: theme.previewColors.editor, flex: 1 }}
-        />
-      </Flex>
-      <Flex
-        className="statusbar"
-        sx={{
-          height: 10,
-          bg: theme.previewColors.statusBar.background,
-          px: 1,
-          alignItems: "center",
-          gap: 1,
-          borderTop: `1px solid ${theme.previewColors.border}`
-        }}
-      >
-        <Circle color={theme.previewColors.statusBar.icon} size={3} />
-        <Text
-          variant="subBody"
-          sx={{
-            fontSize: 5,
-            color: theme.previewColors.statusBar.paragraph
-          }}
-        >
-          johndoe@email.com
-        </Text>
-      </Flex>
-    </Flex>
+        ) : (
+          <Flex
+            sx={{
+              position: "absolute",
+              right: "3.57%",
+              bottom: "11px"
+            }}
+          >
+            {[colors.accent, colors.paragraph, colors.background].map(
+              (color, index) => (
+                <Box
+                  key={index.toString()}
+                  sx={{
+                    width: 20,
+                    height: 20,
+                    flexShrink: 0,
+                    borderRadius: "50%",
+                    bg: color,
+                    // keeps a dot visible when it matches the window background
+                    border: `1px solid ${colors.border}`,
+                    ml: index === 0 ? 0 : "-13px"
+                  }}
+                />
+              )
+            )}
+          </Flex>
+        )}
+      </Box>
+    </Box>
   );
 }

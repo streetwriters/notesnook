@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Button, Flex, FlexProps, Text } from "@theme-ui/components";
+import { Box, Button, Flex, FlexProps, Text } from "@theme-ui/components";
 import {
   getAllTools,
   getToolDefinition,
@@ -47,7 +47,7 @@ import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
 import { getId } from "@notesnook/core";
-import { Label } from "@theme-ui/components";
+import { RadioButton } from "../../../components/radio-button";
 import { useToolbarConfig } from "../../../components/editor/manager";
 import {
   getAllPresets,
@@ -55,11 +55,10 @@ import {
   getPreset,
   getPresetTools,
   Preset,
-  PresetId,
   setToolbarPreset
 } from "../../../common/toolbar-config";
 import { showToast } from "../../../utils/toast";
-import { Pro } from "../../../components/icons";
+import { DotsNine, Plus, Pro, Trash } from "../../../components/icons";
 import { Icon } from "@notesnook/ui";
 import { useIsFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
@@ -106,48 +105,39 @@ export function CustomizeToolbar() {
   return (
     <Flex sx={{ flexDirection: "column" }}>
       <Flex
-        sx={{ py: 2, justifyContent: "space-between", alignItems: "center" }}
+        sx={{
+          ml: "37px",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
       >
-        <Flex sx={{ gap: 2 }}>
-          {getAllPresets().map((preset) => (
-            <Label
-              key={preset.id}
-              variant="text.body"
-              sx={{
-                alignItems: "center",
-                width: "auto"
-              }}
-            >
-              <input
+        <Flex sx={{ gap: "spacing4", flexWrap: "wrap", alignItems: "center" }}>
+          {getAllPresets().map((preset) => {
+            const selected = preset.id === currentPreset.id;
+            const disabled =
+              preset.id === "custom" && !customToolbarPreset?.isAllowed;
+            return (
+              <RadioButton
+                key={preset.id}
                 id={preset.id.toString()}
                 name="preset"
-                type="radio"
                 value={preset.id}
-                checked={preset.id === currentPreset.id}
-                defaultChecked={preset.id === currentPreset.id}
-                disabled={
-                  preset.id === "custom" && !customToolbarPreset?.isAllowed
+                label={preset.title}
+                selected={selected}
+                disabled={disabled}
+                proIcon={
+                  disabled ? <Pro color="orange" size={18} /> : undefined
                 }
-                style={{ accentColor: "var(--accent)" }}
-                onChange={async (e) => {
-                  const { value } = e.target;
-                  setCurrentPreset(getPreset(value as PresetId));
-                }}
+                proIconPlacement="end"
+                radioSize={15}
+                radioRingColor="icon-disabled"
+                radioGapColor="background-selected"
+                outline="inset"
+                hoverable={false}
+                onSelect={() => setCurrentPreset(getPreset(preset.id))}
               />
-              <span
-                style={{
-                  marginLeft: 5,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis"
-                }}
-              >
-                {preset.title}
-              </span>
-              {preset.id === "custom" && !customToolbarPreset?.isAllowed ? (
-                <Pro color="orange" size={18} sx={{ ml: 1 }} />
-              ) : null}
-            </Label>
-          ))}
+            );
+          })}
         </Flex>
         {currentPreset.editable && (
           <Button
@@ -156,7 +146,12 @@ export function CustomizeToolbar() {
               display: "flex",
               flexShrink: 0,
               alignItems: "center",
-              p: 1
+              justifyContent: "center",
+              width: "20px",
+              height: "20px",
+              p: 0,
+              bg: "background-secondary",
+              borderRadius: "radius0"
             }}
             title={strings.createAGroup()}
             onClick={() => {
@@ -164,10 +159,19 @@ export function CustomizeToolbar() {
               showToast("success", strings.groupAdded());
             }}
           >
-            <Icon path={Icons.plus} color="paragraph" size={18} />
+            <Plus color="icon" size={15} />
           </Button>
         )}
       </Flex>
+      <Box
+        sx={{
+          mt: "spacing6",
+          mb: "spacing6",
+          mx: "-13px",
+          height: "1px",
+          bg: "separator"
+        }}
+      />
 
       <DndContext
         sensors={sensors}
@@ -178,7 +182,10 @@ export function CustomizeToolbar() {
           );
         }}
         onDragStart={(event) => {
-          if (currentPreset.id !== "custom") {
+          // Only convert to the (premium) custom preset if it is allowed.
+          // Otherwise leave the preset untouched; cancelDrop shows the upgrade
+          // dialog and cancels the drop so nothing is reordered or persisted.
+          if (currentPreset.id !== "custom" && customToolbarPreset?.isAllowed) {
             setCurrentPreset({
               ...getPreset("custom"),
               tools: getPresetTools(currentPreset)
@@ -189,6 +196,7 @@ export function CustomizeToolbar() {
           const activeItem = items.find((item) => item.id === active.id);
           setActiveItem(activeItem);
         }}
+        onDragCancel={() => setActiveItem(undefined)}
         onDragEnd={(event) => {
           const { active, over } = event;
           if (activeItem && over && active.id !== over.id) {
@@ -211,46 +219,49 @@ export function CustomizeToolbar() {
         }}
       >
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          {items?.map((item) => {
-            const deleted = isDeleted(items, item);
-            const hasSubGroup =
-              isGroup(item) &&
-              !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
-            const canAddSubGroup =
-              currentPreset.editable && !deleted && !hasSubGroup;
-            const canRemoveGroup = currentPreset.editable && !deleted;
-            const canRemoveItem = currentPreset.editable && !deleted;
+          <Flex sx={{ flexDirection: "column", gap: "spacing2" }}>
+            {items?.map((item, index) => {
+              const deleted = isDeleted(items, item);
+              const hasSubGroup =
+                isGroup(item) &&
+                !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+              const canAddSubGroup =
+                currentPreset.editable && !deleted && !hasSubGroup;
+              const canRemoveGroup = currentPreset.editable && !deleted;
+              const canRemoveItem = currentPreset.editable && !deleted;
 
-            return (
-              <TreeNodeComponent
-                key={item.id}
-                item={item}
-                activeItem={activeItem}
-                onAddSubGroup={
-                  canAddSubGroup
-                    ? () => {
-                        setItems((items) => addSubGroup(items, item.id));
-                        showToast("success", strings.subgroupAdded());
-                      }
-                    : undefined
-                }
-                onRemoveGroup={
-                  canRemoveGroup
-                    ? (group) => {
-                        setItems(removeGroup(items, group.id));
-                      }
-                    : undefined
-                }
-                onRemoveItem={
-                  canRemoveItem
-                    ? (item) => {
-                        setItems(removeItem(items, item.id));
-                      }
-                    : undefined
-                }
-              />
-            );
-          })}
+              return (
+                <TreeNodeComponent
+                  key={item.id}
+                  item={item}
+                  activeItem={activeItem}
+                  afterGroup={index > 0 && isGroup(items[index - 1])}
+                  onAddSubGroup={
+                    canAddSubGroup
+                      ? () => {
+                          setItems((items) => addSubGroup(items, item.id));
+                          showToast("success", strings.subgroupAdded());
+                        }
+                      : undefined
+                  }
+                  onRemoveGroup={
+                    canRemoveGroup
+                      ? (group) => {
+                          setItems(removeGroup(items, group.id));
+                        }
+                      : undefined
+                  }
+                  onRemoveItem={
+                    canRemoveItem
+                      ? (item) => {
+                          setItems(removeItem(items, item.id));
+                        }
+                      : undefined
+                  }
+                />
+              );
+            })}
+          </Flex>
           {activeItem &&
             createPortal(
               <DragOverlay
@@ -270,6 +281,7 @@ type TreeNodeComponentProps = {
   item: TreeNode;
   activeItem?: TreeNode;
   overlay?: boolean;
+  afterGroup?: boolean;
   onRemoveGroup?: (item: TreeNode) => void;
   onAddSubGroup?: () => void;
   onRemoveItem?: (item: TreeNode) => void;
@@ -281,6 +293,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
     onRemoveGroup,
     onRemoveItem,
     onAddSubGroup,
+    afterGroup,
     ...restProps
   } = props;
   if (activeItem && isCollapsed(item, activeItem)) return null;
@@ -295,18 +308,30 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         onRemove={onRemoveGroup}
         onAdd={isGroup(item) ? onAddSubGroup : undefined}
         sx={{
-          bg: "var(--background-secondary)",
-          borderRadius: "default",
-          p: 1,
-          mb: 1,
-          ml: item.depth * 15,
-          alignItems: "center"
+          px: "spacing5",
+          py: "spacing4",
+          ml: item.depth * 10,
+          alignItems: "center",
+          border: "1px solid",
+          borderColor: "border",
+          borderRadius: "radius2",
+          ":hover": { bg: "hover", borderColor: "hover" },
+          ...(isGroup(item)
+            ? { mt: "spacing6", ":first-of-type": { mt: 0 } }
+            : {})
         }}
       >
-        {isDraggable ? (
-          <Icon path={Icons.dragHandle} size={18} color="accent" />
-        ) : null}
-        <Text variant={"body"} sx={{ ml: 1, color: "accent" }}>
+        {isDraggable ? <DotsNine size={13} color="accent" /> : null}
+        <Text
+          variant={"body"}
+          sx={{
+            ml: isDraggable ? "spacing3" : 0,
+            fontSize: "xs",
+            fontWeight: 600,
+            lineHeight: 1,
+            color: "accent"
+          }}
+        >
           {item.title}
         </Text>
       </SortableWrapper>
@@ -320,24 +345,46 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
       draggable={isDraggable}
       onRemove={onRemoveItem}
       sx={{
-        p: 1,
+        px: "spacing5",
+        py: "spacing4",
         alignItems: "center",
         justifyContent: "space-between",
-        bg: "var(--background-secondary)",
-        borderRadius: "default",
-        mb: 1,
-        ml: item.depth * 15,
-        ":last-of-type": { mb: 0 }
+        border: "1px solid",
+        borderColor: "border",
+        borderRadius: "radius2",
+        ml: item.depth * 10,
+        mt: afterGroup ? "spacing4" : 0,
+        ":hover": { bg: "hover", borderColor: "hover" }
       }}
     >
-      {item.icon && (
-        <Icon
-          path={(Icons as Record<string, string>)[item.icon]}
-          size={16}
-          color="icon"
-        />
-      )}
-      <Text variant={"body"} sx={{ ml: 1 }}>
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          width: "25px",
+          height: "25px",
+          bg: "background-secondary",
+          borderRadius: "radius1"
+        }}
+      >
+        {item.icon && (
+          <Icon
+            path={(Icons as Record<string, string>)[item.icon]}
+            size={13}
+            color="icon"
+          />
+        )}
+      </Flex>
+      <Text
+        variant={"body"}
+        sx={{
+          ml: "spacing3",
+          fontSize: "sm",
+          lineHeight: 1,
+          color: "paragraph-secondary"
+        }}
+      >
         {item.title}
       </Text>
     </SortableWrapper>
@@ -387,31 +434,43 @@ function SortableWrapper(props: SortableWrapperProps) {
       >
         {children}
       </Flex>
-      <Flex sx={{ alignItems: "center" }}>
+      <Flex sx={{ alignItems: "center", gap: "spacing3", height: "20px" }}>
         {onAdd && (
           <Button
             id="add-item"
             variant={"secondary"}
-            sx={{ p: "small", opacity: 0, mr: 1 }}
+            sx={actionButtonSx}
             onClick={() => onAdd()}
           >
-            <Icon path={Icons.plus} size={16} color="icon" />
+            <Plus size={13} color="icon" />
           </Button>
         )}
         {onRemove && (
           <Button
             id="remove-item"
             variant={"secondary"}
-            sx={{ p: "small", opacity: 0 }}
+            sx={actionButtonSx}
             onClick={() => onRemove(item)}
           >
-            <Icon path={Icons.delete} size={16} color="icon" />
+            <Trash size={13} color="icon" />
           </Button>
         )}
       </Flex>
     </Flex>
   );
 }
+
+const actionButtonSx = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "20px",
+  height: "20px",
+  p: 0,
+  opacity: 0,
+  bg: "background-secondary",
+  borderRadius: "radius0"
+} as const;
 
 type TreeNodeType = "group" | "item";
 type BaseTreeNode<Type extends TreeNodeType> = {

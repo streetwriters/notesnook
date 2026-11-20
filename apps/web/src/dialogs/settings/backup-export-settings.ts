@@ -32,6 +32,16 @@ import {
   FULL_BACKUP_CRON_EXPRESSIONS
 } from "../../common/notices";
 import { CronosExpression } from "cronosjs";
+import {
+  ArrowCounterClockwise,
+  CloudArrowDown,
+  CloudCheck,
+  ExportOutline,
+  Folder,
+  PaperclipHorizontal,
+  Shield
+} from "../../components/icons";
+import { BackupAttachmentsNote } from "./components/backup-attachments-note";
 
 function getNextBackupTime(
   offset: number,
@@ -69,6 +79,7 @@ export const BackupExportSettings: SettingsGroup[] = [
     settings: [
       {
         key: "create-backup",
+        icon: CloudArrowDown,
         title: strings.backupNow(),
         description: () => {
           const s = useSettingStore.getState();
@@ -116,23 +127,23 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "restore-backup",
+        icon: ArrowCounterClockwise,
         title: strings.restoreBackup(),
         description: strings.restoreBackupDesc(),
         components: [
           {
-            type: "button",
-            title: strings.restore(),
+            type: "navigation",
             action: async () => {
               if (await importBackup()) {
                 await useAppStore.getState().refresh();
               }
-            },
-            variant: "secondary"
+            }
           }
         ]
       },
       {
         key: "auto-backup",
+        icon: CloudCheck,
         title: strings.automaticBackups(),
         description: () => {
           const s = useSettingStore.getState();
@@ -178,13 +189,12 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "auto-backup-with-attachments",
+        icon: PaperclipHorizontal,
         title: strings.automaticBackupsWithAttachments(),
         description: () => {
           const s = useSettingStore.getState();
           const next = getNextBackupTime(s.fullBackupReminderOffset, "full");
-          const base = strings
-            .automaticBackupsWithAttachmentsDesc()
-            .join("\n\n");
+          const base = strings.automaticBackupsWithAttachmentsDesc()[0];
           return next
             ? `${base}\n${strings.nextBackupOn(
                 formatDate(next, {
@@ -220,11 +230,13 @@ export const BackupExportSettings: SettingsGroup[] = [
                   .getState()
                   .setFullBackupReminderOffset(parseInt(value));
             }
-          }
+          },
+          { type: "custom", component: BackupAttachmentsNote }
         ]
       },
       {
         key: "encrypt-backups",
+        icon: Shield,
         title: strings.backupEncryption(),
         description: strings.backupEncryptionDesc(),
         isHidden: () => !useUserStore.getState().isLoggedIn,
@@ -252,16 +264,16 @@ export const BackupExportSettings: SettingsGroup[] = [
       },
       {
         key: "backup-directory",
+        icon: Folder,
         title: strings.selectBackupDir(),
         description: () =>
           strings
             .selectBackupDirDesc(getDesktopBackupsDirectoryPath())
-            .join("\n\n"),
+            .join("\n"),
         isHidden: () => !IS_DESKTOP_APP,
         components: [
           {
-            type: "button",
-            title: strings.select(),
+            type: "navigation",
             action: async () => {
               const verified =
                 useSettingStore.getState().encryptBackups ||
@@ -274,8 +286,7 @@ export const BackupExportSettings: SettingsGroup[] = [
                 backupStorageLocation:
                   await desktop?.integration.backupDirectory.query()
               });
-            },
-            variant: "secondary"
+            }
           }
         ]
       }
@@ -288,6 +299,7 @@ export const BackupExportSettings: SettingsGroup[] = [
     settings: [
       {
         key: "export-notes",
+        icon: ExportOutline,
         title: strings.exportAllNotes(),
         description: strings.exportAllNotesDesc(),
         components: [

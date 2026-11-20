@@ -39,6 +39,7 @@ export const ThemeDetailsDialog = DialogManager.register(
     return (
       <Dialog
         isOpen={true}
+        width="540px"
         onClose={() => onClose(false)}
         positiveButton={{
           text: strings.setAsDefault(),
@@ -50,49 +51,78 @@ export const ThemeDetailsDialog = DialogManager.register(
           onClick: () => onClose(false)
         }}
       >
-        <ThemePreview theme={theme} />
-        <Flex sx={{ flexDirection: "column", mt: 2 }}>
-          <Text variant="heading">
-            {theme.name}{" "}
-            <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-              v{theme.version}
+        <Flex sx={{ flexDirection: "column", gap: "spacing6", mb: "spacing7" }}>
+          <ThemePreview
+            theme={theme}
+            height={262}
+            windowTop={20}
+            windowHeight={220}
+            badge={theme.colorScheme === "dark" ? "DARK" : "LIGHT"}
+          />
+          <Flex sx={{ flexDirection: "column", gap: "spacing2" }}>
+            <Text
+              variant="heading"
+              sx={{
+                fontSize: "lg",
+                fontWeight: 600,
+                lineHeight: 1,
+                color: "heading"
+              }}
+            >
+              {theme.name}
             </Text>
-          </Text>
-          <Text variant="body" sx={{ fontSize: "title" }}>
-            {theme.description}
-          </Text>
-          <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-            {theme.authors.map((author) => author.name).join(", ")}
-          </Text>
-          {theme.totalInstalls && theme.totalInstalls > 0 ? (
-            <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-              {theme.totalInstalls} {strings.installs()}
+            <Text
+              variant="body"
+              sx={{ fontSize: "md", lineHeight: 1.3, color: "paragraph" }}
+            >
+              {theme.description}
             </Text>
-          ) : null}
-          <Text variant="subBody" sx={{ fontSize: "subtitle" }}>
-            {strings.licenseUnder(theme.license)}
-          </Text>
-          <Flex sx={{ gap: 1, mt: 1 }}>
-            {theme.homepage && (
-              <Link
-                href={theme.homepage}
-                target="_blank"
-                variant="text.subBody"
-                sx={{ fontSize: "subtitle", color: "accent" }}
-              >
-                {strings.website()}
-              </Link>
-            )}
-            {theme.sourceURL && (
-              <Link
-                href={theme.sourceURL}
-                target="_blank"
-                variant="text.subBody"
-                sx={{ fontSize: "subtitle", color: "accent" }}
-              >
-                {strings.source()}
-              </Link>
-            )}
+            <Text
+              variant="body"
+              sx={{ fontSize: "md", lineHeight: 1.3, color: "paragraph" }}
+            >
+              {[
+                theme.authors.map((author) => author.name).join(", "),
+                theme.totalInstalls && theme.totalInstalls > 0
+                  ? `${theme.totalInstalls} ${strings.installs()}`
+                  : null,
+                strings.licenseUnder(theme.license)
+              ]
+                .filter(Boolean)
+                .join(" | ")}
+            </Text>
+            <Flex sx={{ gap: "spacing3" }}>
+              {theme.homepage && (
+                <Link
+                  href={theme.homepage}
+                  target="_blank"
+                  variant="text.body"
+                  sx={{
+                    fontSize: "md",
+                    lineHeight: 1,
+                    color: "accent",
+                    textDecoration: "underline"
+                  }}
+                >
+                  {strings.website()}
+                </Link>
+              )}
+              {theme.sourceURL && (
+                <Link
+                  href={theme.sourceURL}
+                  target="_blank"
+                  variant="text.body"
+                  sx={{
+                    fontSize: "md",
+                    lineHeight: 1,
+                    color: "accent",
+                    textDecoration: "underline"
+                  }}
+                >
+                  {strings.source()}
+                </Link>
+              )}
+            </Flex>
           </Flex>
         </Flex>
       </Dialog>

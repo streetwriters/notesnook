@@ -126,7 +126,7 @@ export const EmailChangeDialog = DialogManager.register(
               setIsLoading(false);
             }
           }}
-          sx={{ flexDirection: "column" }}
+          sx={{ flexDirection: "column", mb: "spacing7" }}
         >
           {emailChangeState ? (
             <Field

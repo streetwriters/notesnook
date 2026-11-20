@@ -17,20 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, Link } from "@theme-ui/components";
+import { Text, Flex } from "@theme-ui/components";
 import Dialog from "../components/dialog";
 import { getHomeRoute, hardNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import Config from "../utils/config";
-import {
-  ArrowRight,
-  Checkmark,
-  Icon,
-  Warn,
-  Inbox,
-  LinkedTo,
-  Plus
-} from "../components/icons";
+import { ArrowRight, Icon } from "../components/icons";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import { strings } from "@notesnook/intl";
 
@@ -48,6 +40,7 @@ type Feature = {
   shouldShow?: () => boolean;
   title: string;
   subtitle?: string;
+  message?: string;
   cta: CallToAction;
   subFeatures?: SubFeature[];
 };
@@ -69,31 +62,13 @@ function getFeatures(): Record<FeatureKeys, Feature> {
         ? strings.welcomeToNotesnookBeta()
         : strings.highlightsWithStars(),
       subtitle: appVersion.isBeta
-        ? `v${appVersion.clean}-beta`
+        ? undefined
         : strings.welcomeToVersion(appVersion.clean),
-      subFeatures: appVersion.isBeta
-        ? [
-            {
-              icon: Warn,
-              title: strings.notice(),
-              subtitle: (
-                <>
-                  {strings.betaWarningDescription[0]()}{" "}
-                  <Code text={strings.reportAnIssue()} />{" "}
-                  {strings.betaWarningDescription[1]()}
-                </>
-              )
-            },
-            {
-              icon: Warn,
-              title: strings.notice2(),
-              subtitle: strings.betaSwitchingWarning()
-            }
-          ]
-        : [],
+      message: appVersion.isBeta
+        ? "Thank you for joining the Beta program. Beta versions get new features first, but they may be less stable and can have bugs.\n\nIf you run into any issues, please report them so we can fix them before the stable release. You can switch back to Stable anytime from Settings > About."
+        : undefined,
       cta: {
         title: strings.gotIt(),
-        icon: Checkmark,
         action: () => {
           Config.set(`${appVersion.numerical}:highlights`, true);
         }
@@ -130,7 +105,7 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
       isOpen={true}
       title={feature.title}
       description={feature.subtitle}
-      textAlignment="center"
+      textAlignment={feature.message ? "left" : "center"}
       onOpen={() => {
         if (!isShown) onClose(false);
       }}
@@ -149,6 +124,23 @@ export const FeatureDialog = DialogManager.register(function FeatureDialog(
         }
       }}
     >
+      {feature.message ? (
+        <Text
+          variant="body"
+          sx={{
+            display: "block",
+            mt: "spacing4",
+            mb: "spacing7",
+            color: "paragraph",
+            fontSize: "md",
+            fontWeight: 400,
+            lineHeight: 1.4,
+            whiteSpace: "pre-line"
+          }}
+        >
+          {feature.message}
+        </Text>
+      ) : null}
       <Flex mt={2} sx={{ flexDirection: "column", overflowY: "auto" }}>
         {feature.subFeatures?.map((feature) => (
           <Flex

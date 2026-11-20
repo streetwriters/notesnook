@@ -24,21 +24,23 @@ import {
   transform
 } from "@notesnook-importer/core";
 import { formatBytes, getFormattedDate } from "@notesnook/common";
-import { ScrollContainer } from "@notesnook/ui";
-import { Button, Flex, Input, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Input, Text } from "@theme-ui/components";
 import { xxhash64 } from "hash-wasm";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { importNote } from "../../../utils/importer";
 import { PromptDialog } from "../../../dialogs/prompt";
-import Accordion from "../../accordion";
+import { CardTitle, ImporterCard, LogsBox } from "./card";
+import { ImportResult } from "./import-result";
 import { TransformResult } from "../types";
 import { useStore as useAppStore } from "../../../stores/app-store";
 import { strings } from "@notesnook/intl";
 
 type FileProviderHandlerProps = {
   provider: IFileProvider;
+  result?: TransformResult;
   onTransformFinished: (result: TransformResult) => void;
+  onReset: () => void;
 };
 
 type Progress = {
@@ -53,7 +55,7 @@ type LogMessage = {
 };
 
 export function FileProviderHandler(props: FileProviderHandlerProps) {
-  const { provider, onTransformFinished } = props;
+  const { provider, result, onTransformFinished, onReset } = props;
   const [files, setFiles] = useState<File[]>([]);
   const [filesProgress, setFilesProgress] = useState<Progress>({
     done: 0,
@@ -162,95 +164,82 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
     });
   }
 
-  if (filesProgress.done) {
+  const logLines = logs.current.map((c, index) => (
+    <Box
+      key={index.toString()}
+      sx={{ color: c.type === "error" ? "paragraph-error" : "inherit" }}
+    >
+      [{getFormattedDate(c.date, "date-time")}] {c.text}
+    </Box>
+  ));
+
+  if (result) {
     return (
-      <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
-        <Text variant="subtitle">
-          {strings.processingFiles(filesProgress.done, filesProgress.total)}
-        </Text>
-        <Text variant="body" sx={{ mt: 4, textAlign: "center" }}>
-          {strings.foundNotes(totalNoteCount)}
-        </Text>
-        {logs.current.length > 0 && (
-          <Accordion
-            title={strings.logs()}
-            isClosed={false}
-            sx={{
-              border: "1px solid var(--border)",
-              mt: 2
-            }}
-          >
-            <ScrollContainer>
-              <Text
-                as="pre"
-                variant="body"
-                sx={{
-                  fontFamily: "monospace",
-                  maxHeight: 250,
-                  p: 2
-                }}
-              >
-                {logs.current.map((c, index) => (
-                  <>
-                    <span
-                      key={index.toString()}
-                      style={{
-                        color:
-                          c.type === "error"
-                            ? "var(--paragraph-error)"
-                            : "inherit"
-                      }}
-                    >
-                      [{getFormattedDate(c.date, "date-time")}] {c.text}
-                    </span>
-                    <br />
-                  </>
-                ))}
-              </Text>
-            </ScrollContainer>
-          </Accordion>
-        )}
-      </Flex>
+      <ImportResult
+        result={result}
+        provider={provider}
+        filesCount={filesProgress.total}
+        logs={logLines.length > 0 ? logLines : undefined}
+        onReset={onReset}
+      />
     );
   }
 
+  if (filesProgress.done) {
+    return (
+      <ImporterCard>
+        <CardTitle
+          title={strings.processingFiles(
+            filesProgress.done,
+            filesProgress.total
+          )}
+        >
+          {strings.foundNotes(totalNoteCount)}
+        </CardTitle>
+        {logLines.length > 0 && <LogsBox>{logLines}</LogsBox>}
+      </ImporterCard>
+    );
+  }
+
+  const totalSize = formatBytes(
+    files.reduce((prev, file) => prev + file.size, 0)
+  );
+
   return (
-    <Flex sx={{ flexDirection: "column", alignItems: "stretch" }}>
-      <Text variant="subtitle">
-        {strings.selectProviderFiles(provider.name)}
-      </Text>
-      <Text
-        variant="body"
-        as={"div"}
-        sx={{ mt: 1, color: "paragraph", whiteSpace: "pre-wrap" }}
-      >
-        {strings.checkOutOurStepByStepGuideOn()}{" "}
-        <a href={provider.helpLink} target="_blank" rel="noreferrer">
-          {strings.howToImportFrom(provider?.name)}
-        </a>
-      </Text>
-      <Flex
-        {...getRootProps()}
-        sx={{
-          justifyContent: "center",
-          alignItems: "center",
-          height: 100,
-          border: "2px dashed var(--border)",
-          borderRadius: "default",
-          mt: 2,
-          cursor: "pointer",
-          ":hover": {
-            bg: "background-secondary"
-          }
-        }}
-      >
-        <Input {...getInputProps()} />
-        <Text variant="body" sx={{ textAlign: "center" }}>
-          {isDragActive
-            ? strings.dropTheFilesHere()
-            : strings.dragDropFilesHere()}
-          <br />
-          <Text variant="subBody">
+    <>
+      <ImporterCard>
+        <CardTitle title={strings.selectProviderFiles(provider.name)}>
+          {strings.checkOutOurStepByStepGuideOn()}{" "}
+          <a href={provider.helpLink} target="_blank" rel="noreferrer">
+            {strings.howToImportFrom(provider?.name)}
+          </a>
+        </CardTitle>
+        <Flex
+          {...getRootProps()}
+          sx={{
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "spacing2",
+            px: "spacing5",
+            py: "spacing6",
+            border: "1.5px dashed",
+            borderColor: "border",
+            borderRadius: "radius2",
+            fontSize: "xs",
+            textAlign: "center",
+            cursor: "pointer",
+            bg: isDragActive ? "hover" : "transparent",
+            ":hover": { bg: "hover" }
+          }}
+        >
+          <Input {...getInputProps()} />
+          <Text sx={{ fontWeight: 500, lineHeight: 1, color: "heading" }}>
+            {isDragActive
+              ? strings.dropTheFilesHere()
+              : strings.dragDropFilesHere()}
+          </Text>
+          <Text sx={{ lineHeight: 1.3, color: "paragraph" }}>
             {strings.onlySupportedExtensions(
               provider?.supportedExtensions.join(", ")
             )}{" "}
@@ -260,40 +249,49 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
                   provider?.supportedExtensions.join(", ")
                 )}
               </>
-            )}
-            <br />
+            )}{" "}
             {provider.examples ? (
               <>{strings.forExampleExtensions(provider.examples.join(", "))}</>
             ) : null}
           </Text>
-        </Text>
-      </Flex>
+        </Flex>
+      </ImporterCard>
 
       {files.length > 0 ? (
-        <Accordion
-          isClosed
-          title={strings.filesSelected(files.length)}
-          sx={{
-            border: "1px solid var(--border)",
-            mt: 2,
-            borderRadius: "default"
-          }}
-        >
+        <ImporterCard>
+          <Text
+            sx={{
+              fontSize: "sm",
+              fontWeight: 500,
+              lineHeight: 1,
+              color: "heading"
+            }}
+          >
+            {strings.filesSelected(files.length)}
+          </Text>
           <Flex
-            sx={{ flexDirection: "column", overflowY: "auto", maxHeight: 400 }}
+            sx={{
+              flexDirection: "column",
+              gap: "spacing2",
+              overflowY: "auto",
+              maxHeight: 400
+            }}
           >
             {files.map((file, index) => (
               <Flex
                 key={file.name}
                 sx={{
-                  p: 2,
-                  bg: index % 2 ? "transparent" : "background-secondary",
+                  px: "spacing4",
+                  py: "spacing3",
+                  bg: "background-secondary",
+                  borderRadius: "radius1",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  gap: "spacing4",
+                  fontSize: "xs",
+                  lineHeight: 1.3,
                   cursor: "pointer",
-                  ":hover": {
-                    bg: "hover"
-                  }
+                  ":hover": { bg: "hover" }
                 }}
                 onClick={() => {
                   setFiles((files) => {
@@ -304,53 +302,41 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
                 }}
                 title={strings.clickToRemove()}
               >
-                <Text variant="body">{file.name}</Text>
-                <Text variant="body">{formatBytes(file.size)}</Text>
+                <Text sx={{ color: "paragraph" }}>{file.name}</Text>
+                <Text sx={{ color: "paragraph-secondary", flexShrink: 0 }}>
+                  {formatBytes(file.size)}
+                </Text>
               </Flex>
             ))}
           </Flex>
-        </Accordion>
-      ) : null}
-
-      {!!files.length && (
-        <>
-          <Text
-            variant="body"
-            sx={{
-              bg: "primary",
-              color: "static",
-              mt: 2,
-              borderRadius: 5,
-              p: 1
-            }}
-          >
-            {strings.freeSpaceWarning(
-              formatBytes(files.reduce((prev, file) => prev + file.size, 0))
-            )}
+          <Text sx={{ fontSize: "xs", lineHeight: 1.3, color: "paragraph" }}>
+            {strings.freeSpaceWarning(totalSize)}
           </Text>
           {provider.requiresNetwork ? (
-            <Text
-              variant="body"
+            <Box
               sx={{
-                bg: "background-error",
+                fontSize: "xs",
+                lineHeight: 1.3,
                 color: "paragraph-error",
-                mt: 2,
-                borderRadius: 5,
-                p: 1
+                bg: "background-error",
+                border: "1px solid",
+                borderColor: "border-error",
+                borderRadius: "radius1",
+                p: "spacing4"
               }}
             >
               {strings.networkWarningForImport()}
-            </Text>
+            </Box>
           ) : null}
           <Button
-            variant="accent"
-            sx={{ alignSelf: "center", mt: 2, px: 4 }}
+            variant="new_accent"
+            sx={{ alignSelf: "flex-start", px: "spacing4" }}
             onClick={onStartImport}
           >
             {strings.startImporting()}
           </Button>
-        </>
-      )}
-    </Flex>
+        </ImporterCard>
+      ) : null}
+    </>
   );
 }

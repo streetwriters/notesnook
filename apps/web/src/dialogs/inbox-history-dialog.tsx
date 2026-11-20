@@ -17,38 +17,31 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { buttonProps } from "../components/settings-ui";
+import { Fragment, useState } from "react";
 import { getFormattedDate, usePromise } from "@notesnook/common";
 import { InboxItemsHistoryErrorContext } from "@notesnook/core";
-import { Box, Button, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { db } from "../common/db";
 import { BaseDialogProps, DialogManager } from "../common/dialog-manager";
 import Dialog from "../components/dialog";
-import { Check, Copy, Trash } from "../components/icons";
-import ScrollContainer, {
-  FlexScrollContainer
-} from "../components/scroll-container";
+import {
+  CaretDownOutline,
+  CaretUp,
+  CheckIcon,
+  Copy,
+  TrashSimple
+} from "../components/icons";
+import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
 import { strings } from "@notesnook/intl";
-import { writeText } from "clipboard-polyfill";
 import { showToast } from "../utils/toast";
 import { ConfirmDialog } from "./confirm";
 
 type InboxHistoryDialogProps = BaseDialogProps<boolean>;
 
-const getColumns = () => [
-  { title: strings.dateSynced(), width: "160px" },
-  { title: strings.error(), width: "120px" },
-  { title: strings.description(), width: "1fr" },
-  { title: strings.details(), width: "1fr" },
-  { title: "", width: "40px" }
-];
-
-const ERROR_CHIP_STYLES: Record<
-  string,
-  { bg: string; color: string }
-> = {
+const ERROR_CHIP_STYLES: Record<string, { bg: string; color: string }> = {
   get [strings.decryptionFailed()]() {
-    return { bg: "background-error", color: "accent-error" };
+    return { bg: "background-error", color: "paragraph-error" };
   },
   get [strings.invalidJson()]() {
     return { bg: "rgba(255, 152, 0, 0.15)", color: "#e65100" };
@@ -56,7 +49,7 @@ const ERROR_CHIP_STYLES: Record<
   get [strings.validationFailed()]() {
     return { bg: "rgba(255, 193, 7, 0.15)", color: "#8a6000" };
   },
-  "Decryption failed": { bg: "background-error", color: "accent-error" },
+  "Decryption failed": { bg: "background-error", color: "paragraph-error" },
   "Invalid JSON": { bg: "rgba(255, 152, 0, 0.15)", color: "#e65100" },
   "Validation failed": { bg: "rgba(255, 193, 7, 0.15)", color: "#8a6000" }
 };
@@ -66,17 +59,11 @@ function ErrorBadge({
 }: {
   message: InboxItemsHistoryErrorContext["message"] | undefined;
 }) {
-  if (!message) {
-    return (
-      <Text variant="body" sx={{ color: "paragraph-secondary" }}>
-        —
-      </Text>
-    );
-  }
+  if (!message) return null;
 
   const style = ERROR_CHIP_STYLES[message] ?? {
     bg: "background-error",
-    color: "accent-error"
+    color: "paragraph-error"
   };
 
   return (
@@ -84,66 +71,17 @@ function ErrorBadge({
       sx={{
         bg: style.bg,
         color: style.color,
-        borderRadius: "default",
-        px: "6px",
-        py: "2px",
-        fontSize: "0.65em",
-        fontWeight: 600
+        borderRadius: "26px",
+        px: "spacing3",
+        py: "spacing2",
+        fontSize: "3xs",
+        fontWeight: 500,
+        lineHeight: 1,
+        whiteSpace: "nowrap"
       }}
     >
       {message}
     </Text>
-  );
-}
-
-function DetailsCell({ value }: { value: string }) {
-  const [hovered, setHovered] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  function handleCopy() {
-    writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
-  }
-
-  return (
-    <Box
-      sx={{ position: "relative" }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <ScrollContainer suppressScrollX style={{ maxHeight: 100 }}>
-        <Box
-          as="pre"
-          sx={{
-            color: "paragraph",
-            m: 0,
-            fontSize: "0.72em",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-all"
-          }}
-        >
-          {value}
-        </Box>
-      </ScrollContainer>
-      {(hovered || copied) && (
-        <Button
-          variant="icon"
-          title={strings.copy()}
-          onClick={handleCopy}
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            p: "2px",
-            bg: "background",
-            color: copied ? "accent" : undefined
-          }}
-        >
-          {copied ? <Check size={14} /> : <Copy size={14} />}
-        </Button>
-      )}
-    </Box>
   );
 }
 
@@ -159,9 +97,261 @@ function parseErrorContext(
   }
 }
 
+type FailedItemProps = {
+  id: string;
+  dateSynced: number;
+  title: string;
+  message: InboxItemsHistoryErrorContext["message"] | undefined;
+  sections: DetailSection[];
+  copyText: string;
+  expanded: boolean;
+  onToggle: () => void;
+  onDelete: () => void;
+};
+
+type DetailSection = {
+  heading: string;
+  rows?: [string, string][];
+  text?: string;
+};
+
+function stringifyValue(value: unknown) {
+  return typeof value === "string" || typeof value === "number"
+    ? String(value)
+    : JSON.stringify(value);
+}
+
+function toSection(heading: string, value: unknown): DetailSection {
+  if (typeof value === "string") return { heading, text: value };
+  if (value && typeof value === "object" && !Array.isArray(value))
+    return {
+      heading,
+      rows: Object.entries(value).map(([k, v]) => [k, stringifyValue(v)])
+    };
+  return { heading, text: JSON.stringify(value) };
+}
+
+function getDetailSections(rest: Record<string, unknown>): DetailSection[] {
+  return Object.entries(rest).map(([key, value]) => {
+    if (key === "inboxItem") return toSection("Inbox item", value);
+    if (key === "parsedItem") return toSection("Parsed item", value);
+    if (key === "decryptedItem") return toSection("Decrypted item", value);
+    return toSection(key, value);
+  });
+}
+
+function DetailsBox(props: { sections: DetailSection[]; copyText: string }) {
+  const { copied, copy } = useCopyToClipboard(1000);
+  return (
+    <Flex
+      sx={{
+        position: "relative",
+        flexDirection: "column",
+        gap: "spacing4",
+        bg: "background",
+        borderRadius: "radius2",
+        p: "spacing4",
+        ":hover .copy-details, :focus-within .copy-details": { opacity: 1 }
+      }}
+    >
+      <Button
+        className="copy-details"
+        variant="icon"
+        title={strings.copy()}
+        onClick={() => copy(props.copyText)}
+        sx={{
+          position: "absolute",
+          top: "spacing3",
+          right: "spacing3",
+          p: "2px",
+          opacity: 0,
+          ":focus-visible": { opacity: 1 }
+        }}
+      >
+        {copied ? <CheckIcon size={13} /> : <Copy size={13} />}
+      </Button>
+      {props.sections.map((section) => (
+        <Flex
+          key={section.heading}
+          sx={{ flexDirection: "column", gap: "spacing4" }}
+        >
+          <Text
+            sx={{
+              fontSize: "xs",
+              fontWeight: 500,
+              lineHeight: 1,
+              color: "heading"
+            }}
+          >
+            {section.heading}
+          </Text>
+          {section.rows ? (
+            <Flex sx={{ flexDirection: "column", gap: "spacing1" }}>
+              {section.rows.map(([key, value]) => (
+                <Flex
+                  key={key}
+                  sx={{ gap: "spacing7", alignItems: "flex-start" }}
+                >
+                  <Text
+                    sx={{
+                      width: "25px",
+                      flexShrink: 0,
+                      fontSize: "xs",
+                      fontWeight: 400,
+                      lineHeight: 1.3,
+                      color: "paragraph"
+                    }}
+                  >
+                    {key}
+                  </Text>
+                  <Text
+                    sx={{
+                      fontSize: "xs",
+                      fontWeight: 400,
+                      lineHeight: 1.3,
+                      color: "paragraph",
+                      userSelect: "text",
+                      overflowWrap: "anywhere"
+                    }}
+                  >
+                    {value}
+                  </Text>
+                </Flex>
+              ))}
+            </Flex>
+          ) : (
+            <Text
+              sx={{
+                fontSize: "xs",
+                lineHeight: 1.3,
+                color: "paragraph",
+                userSelect: "text",
+                whiteSpace: "pre-wrap",
+                overflowWrap: "anywhere"
+              }}
+            >
+              {section.text}
+            </Text>
+          )}
+        </Flex>
+      ))}
+    </Flex>
+  );
+}
+
+function FailedItem(props: FailedItemProps) {
+  const { title, message, sections, copyText, expanded, onToggle, onDelete } =
+    props;
+  const hasDetails = sections.length > 0;
+  const CaretIcon = expanded ? CaretUp : CaretDownOutline;
+
+  return (
+    <Flex
+      data-test-id="inbox-failed-item"
+      sx={{
+        flexDirection: "column",
+        gap: "spacing4",
+        ...(expanded
+          ? {
+              bg: "background-secondary",
+              borderRadius: "radius2",
+              px: "spacing5",
+              py: "spacing6"
+            }
+          : {})
+      }}
+    >
+      <Flex
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "spacing5",
+          minHeight: "20px"
+        }}
+      >
+        <Text
+          sx={{
+            minWidth: 0,
+            fontSize: "md",
+            fontWeight: 600,
+            lineHeight: 1.2,
+            color: "heading",
+            overflowWrap: "anywhere"
+          }}
+        >
+          {title}
+        </Text>
+        <Flex sx={{ alignItems: "center", gap: "spacing7", flexShrink: 0 }}>
+          {hasDetails ? (
+            <Flex
+              {...buttonProps(onToggle)}
+              aria-expanded={expanded}
+              sx={{
+                alignItems: "center",
+                gap: "spacing3",
+                cursor: "pointer",
+                color: "heading"
+              }}
+            >
+              <Text
+                sx={{
+                  fontSize: "xs",
+                  fontWeight: 500,
+                  lineHeight: 1,
+                  color: "heading"
+                }}
+              >
+                {strings.details()}
+              </Text>
+              <CaretIcon size={13} />
+            </Flex>
+          ) : null}
+          <Button
+            variant="primary"
+            title={strings.delete()}
+            onClick={onDelete}
+            sx={{
+              width: 20,
+              height: 20,
+              p: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bg: "hover",
+              borderRadius: "radius0",
+              color: "heading"
+            }}
+          >
+            <TrashSimple size={13} />
+          </Button>
+        </Flex>
+      </Flex>
+
+      <Flex sx={{ alignItems: "center", gap: "spacing3" }}>
+        <ErrorBadge message={message} />
+        <Text
+          sx={{
+            fontSize: "xs",
+            lineHeight: 1,
+            color: "paragraph",
+            whiteSpace: "nowrap"
+          }}
+        >
+          {strings.dateSynced()}: {getFormattedDate(props.dateSynced)}
+        </Text>
+      </Flex>
+
+      {expanded && hasDetails ? (
+        <DetailsBox sections={sections} copyText={copyText} />
+      ) : null}
+    </Flex>
+  );
+}
+
 export const InboxHistoryDialog = DialogManager.register(
   function InboxHistoryDialog(props: InboxHistoryDialogProps) {
     const result = usePromise(() => db.inboxItemsHistory.failed.items());
+    const [expanded, setExpanded] = useState<string[]>([]);
 
     async function deleteItem(id: string) {
       await db.inboxItemsHistory.delete([id]);
@@ -187,14 +377,30 @@ export const InboxHistoryDialog = DialogManager.register(
       }
     }
 
+    const isEmpty = result.status === "fulfilled" && result.value.length === 0;
+
     return (
       <Dialog
         isOpen={true}
         title={strings.failedInboxItems()}
+        description={isEmpty ? strings.noFailedInboxItems() : undefined}
         titleAction={
           result.status === "fulfilled" &&
           result.value.length > 0 && (
-            <Button variant="errorSecondary" onClick={deleteAll}>
+            <Button
+              variant="secondary"
+              onClick={deleteAll}
+              sx={{
+                px: "spacing3",
+                py: "spacing2",
+                bg: "hover",
+                color: "heading",
+                fontSize: "sm",
+                fontWeight: 500,
+                lineHeight: 1,
+                borderRadius: "radius2"
+              }}
+            >
               {strings.deleteAll()}
             </Button>
           )
@@ -204,111 +410,72 @@ export const InboxHistoryDialog = DialogManager.register(
           text: strings.close(),
           onClick: () => props.onClose(false)
         }}
-        noScroll
-        width="80%"
+        width={520}
       >
-        {result.status === "pending" ? (
-          <Text sx={{ p: 3 }}>{strings.loading()}</Text>
-        ) : result.status === "rejected" ? (
-          <Text sx={{ p: 3 }}>{strings.failed()}</Text>
-        ) : result.value.length === 0 ? (
-          <Text sx={{ p: 3 }}>{strings.noFailedInboxItems()}</Text>
-        ) : (
-          <FlexScrollContainer style={{ maxHeight: "70vh" }}>
-            <Box sx={{ p: 2 }}>
-              <Box
-                as="table"
-                sx={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  tableLayout: "fixed",
-                  "th, td": {
-                    px: 2,
-                    py: 1,
-                    textAlign: "left",
-                    verticalAlign: "top",
-                    borderBottom: "1px solid var(--separator)"
-                  }
-                }}
-              >
-                <Box as="thead">
-                  <Box as="tr">
-                    {getColumns().map((col) => (
+        <Flex sx={{ flexDirection: "column", mt: "spacing7", mb: "spacing7" }}>
+          {result.status === "pending" ? (
+            <Text variant="body">{strings.loading()}</Text>
+          ) : result.status === "rejected" ? (
+            <Text variant="body">{strings.failed()}</Text>
+          ) : result.value.length === 0 ? null : (
+            result.value.map((item, index) => {
+              const ctx = parseErrorContext(item.errorContext);
+              const { message, description, ...rest } =
+                ctx ??
+                ({} as Partial<InboxItemsHistoryErrorContext> &
+                  Record<string, unknown>);
+              const sections = getDetailSections(rest);
+              const isExpanded = expanded.includes(item.id);
+              const previous = result.value[index - 1];
+              const isPreviousExpanded =
+                !!previous && expanded.includes(previous.id);
+              return (
+                <Fragment key={item.id}>
+                  {index > 0 ? (
+                    isExpanded || isPreviousExpanded ? (
+                      <Box sx={{ pt: "spacing7" }} />
+                    ) : (
                       <Box
-                        key={col.title}
-                        as="th"
-                        sx={{ width: col.width, whiteSpace: "nowrap" }}
-                      >
-                        <Text variant="subtitle">{col.title}</Text>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-                <Box as="tbody">
-                  {result.value.map((item) => {
-                    const ctx = parseErrorContext(item.errorContext);
-                    const { message, description, ...rest } =
-                      ctx ??
-                      ({} as Partial<InboxItemsHistoryErrorContext> &
-                        Record<string, unknown>);
-                    const hasExtra = Object.keys(rest).length > 0;
-                    return (
-                      <Box as="tr" key={item.id}>
-                        <Box as="td">
-                          <Text variant="body" sx={{ whiteSpace: "nowrap" }}>
-                            {getFormattedDate(item.dateSynced)}
-                          </Text>
-                        </Box>
-                        <Box as="td">
-                          <ErrorBadge message={message} />
-                        </Box>
-                        <Box as="td">
-                          <Text variant="body">
-                            {(description as string) ?? "—"}
-                          </Text>
-                        </Box>
-                        <Box as="td">
-                          {hasExtra ? (
-                            <DetailsCell
-                              value={JSON.stringify(rest, null, 2)}
-                            />
-                          ) : (
-                            <Text
-                              variant="body"
-                              sx={{ color: "paragraph-secondary" }}
-                            >
-                              —
-                            </Text>
-                          )}
-                        </Box>
-                        <Box as="td" sx={{ textAlign: "center" }}>
-                          <Button
-                            variant="icon"
-                            title={strings.delete()}
-                            onClick={async () => {
-                              const ok = await ConfirmDialog.show({
-                                title: strings.deleteItem(),
-                                subtitle: strings.areYouSure(),
-                                positiveButtonText: strings.yes(),
-                                negativeButtonText: strings.no()
-                              });
-                              if (!ok) return;
+                        sx={{
+                          height: "1px",
+                          bg: "separator",
+                          my: "spacing4"
+                        }}
+                      />
+                    )
+                  ) : null}
+                  <FailedItem
+                    id={item.id}
+                    dateSynced={item.dateSynced}
+                    title={(description as string) ?? "—"}
+                    message={message}
+                    sections={sections}
+                    copyText={JSON.stringify(rest, null, 2)}
+                    expanded={isExpanded}
+                    onToggle={() =>
+                      setExpanded((ids) =>
+                        ids.includes(item.id)
+                          ? ids.filter((id) => id !== item.id)
+                          : [...ids, item.id]
+                      )
+                    }
+                    onDelete={async () => {
+                      const ok = await ConfirmDialog.show({
+                        title: strings.deleteItem(),
+                        subtitle: strings.areYouSure(),
+                        positiveButtonText: strings.yes(),
+                        negativeButtonText: strings.no()
+                      });
+                      if (!ok) return;
 
-                              deleteItem(item.id);
-                            }}
-                            sx={{ color: "accent-error", p: "2px" }}
-                          >
-                            <Trash size={16} />
-                          </Button>
-                        </Box>
-                      </Box>
-                    );
-                  })}
-                </Box>
-              </Box>
-            </Box>
-          </FlexScrollContainer>
-        )}
+                      deleteItem(item.id);
+                    }}
+                  />
+                </Fragment>
+              );
+            })
+          )}
+        </Flex>
       </Dialog>
     );
   }
