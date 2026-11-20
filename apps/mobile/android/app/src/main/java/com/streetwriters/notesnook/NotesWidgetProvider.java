@@ -29,6 +29,7 @@ public class NotesWidgetProvider extends AppWidgetProvider {
             edit.remove(WidgetUtils.NOTES_CONFIG_PREFIX + id);
         }
         edit.apply();
+        WidgetUtils.removeUnusedNotesLists(context);
     }
 
     @Override
