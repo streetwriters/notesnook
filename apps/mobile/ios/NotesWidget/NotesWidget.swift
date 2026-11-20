@@ -7,5 +7,6 @@ struct NotesWidgetBundle: WidgetBundle {
   @WidgetBundleBuilder
   var body: some Widget {
     QuickNoteWidget()
+    RemindersWidget()
   }
 }
