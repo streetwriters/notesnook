@@ -22,6 +22,7 @@ import { ToolProps } from "../types.js";
 import { ToolButton } from "../components/tool-button.js";
 import { MoreTools } from "../components/more-tools.js";
 import { useToolbarLocation } from "../stores/toolbar-store.js";
+import { callHostAction } from "../../host.js";
 import {
   findSelectedNode,
   selectionToOffset
@@ -93,7 +94,7 @@ export function WebClipOpenExternal(props: ToolProps) {
             { type: "text/html" }
           )
         );
-        editor.storage.openLink?.(url);
+        callHostAction(editor, "openLink", url);
       }}
     />
   );
@@ -109,7 +110,7 @@ export function WebClipOpenSource(props: ToolProps) {
       onClick={async () => {
         const node = findSelectedNode(editor, "webclip");
         if (!node) return;
-        editor.storage.openLink?.(node.attrs.src);
+        callHostAction(editor, "openLink", node.attrs.src);
       }}
     />
   );

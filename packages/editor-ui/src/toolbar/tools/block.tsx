@@ -33,6 +33,7 @@ import { Button } from "../../components/button.js";
 import { strings } from "@notesnook/intl";
 import { keybindings } from "@notesnook/common";
 import { tableActions } from "../../table-actions.js";
+import { callHostAction, hasHostAction } from "../../host.js";
 
 type BlockState = {
   taskList: boolean;
@@ -233,7 +234,8 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         type: "button",
         title: strings.uploadFromDisk(),
         icon: Icons.upload,
-        onClick: () => editor.storage.openAttachmentPicker?.("image"),
+        isHidden: !hasHostAction(editor, "openAttachmentPicker"),
+        onClick: () => callHostAction(editor, "openAttachmentPicker", "image"),
         modifier: keybindings.addImage.keys
       },
       {
@@ -241,8 +243,8 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         type: "button",
         title: strings.takePhotoUsingCamera(),
         icon: Icons.camera,
-        isHidden: !isMobile,
-        onClick: () => editor.storage.openAttachmentPicker?.("camera")
+        isHidden: !isMobile || !hasHostAction(editor, "openAttachmentPicker"),
+        onClick: () => callHostAction(editor, "openAttachmentPicker", "camera")
       },
       isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor)
     ]
@@ -366,7 +368,8 @@ const attachment = (editor: Editor, state: BlockState): MenuItem => ({
   title: strings.attachment(),
   icon: Icons.attachment,
   isChecked: state.attachment,
-  onClick: () => editor.storage.openAttachmentPicker?.("file"),
+  isHidden: !hasHostAction(editor, "openAttachmentPicker"),
+  onClick: () => callHostAction(editor, "openAttachmentPicker", "file"),
   modifier: keybindings.addAttachment.keys
 });
 

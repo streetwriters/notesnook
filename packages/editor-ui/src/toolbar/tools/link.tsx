@@ -36,6 +36,7 @@ import { Icons } from "../icons.js";
 import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
 import { Icon } from "@notesnook/ui";
 import { LinkData } from "../../types.js";
+import { callHostAction } from "../../host.js";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -260,7 +261,7 @@ export function OpenLink(props: ToolProps) {
           href={href}
           onClick={(e) => {
             e.preventDefault();
-            editor.storage.openLink?.(href);
+            callHostAction(editor, "openLink", href);
             hide();
           }}
           target="_blank"
@@ -286,7 +287,7 @@ export function OpenLink(props: ToolProps) {
         title={props.title}
         toggled={false}
         onClick={() => {
-          editor.storage.openLink?.(href);
+          callHostAction(editor, "openLink", href);
           hide();
         }}
       />

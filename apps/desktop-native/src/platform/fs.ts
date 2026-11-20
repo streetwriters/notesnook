@@ -53,4 +53,14 @@ export interface AttachmentFiles {
     fileMetadata: FileMetadata
   ): Promise<ReadableStream<Uint8Array> | false>;
   saveFile(filename: string, fileMetadata: FileMetadata): Promise<void>;
+  /**
+   * Decrypts the stored file into a temporary file and returns its path, or
+   * `false` when it is not stored. The caller owns the file: delete it with
+   * `removeTempFile` when done.
+   */
+  decryptToTempFile(
+    filename: string,
+    fileMetadata: FileMetadata
+  ): Promise<string | false>;
+  removeTempFile(path: string): Promise<void>;
 }

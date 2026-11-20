@@ -21,7 +21,7 @@ import { strings } from "@notesnook/intl";
 import { logger } from "../utils/logger";
 import { showToast } from "../utils/toast";
 import { db } from "./db";
-import { checkUpload, decryptFile, saveFile } from "./fs";
+import { checkUpload, decryptFile, decryptToTempFile, saveFile } from "./fs";
 import { Lightbox } from "../components/lightbox";
 import { Attachment } from "@notesnook/core";
 
@@ -68,6 +68,25 @@ export async function saveAttachment(hash: string) {
       })`
     );
   }
+}
+
+/**
+ * Downloads the attachment if it is not on disk yet and decrypts it to a
+ * temporary file. Returns the path; the caller deletes it with
+ * `removeTempFile`. Undefined when the attachment cannot be found or read.
+ */
+export async function decryptAttachmentToTempFile(hash: string) {
+  const response = await download(hash);
+  if (!response) return;
+  const { attachment, key } = response;
+  const path = await decryptToTempFile(attachment.hash, {
+    key,
+    iv: attachment.iv,
+    name: attachment.filename,
+    type: attachment.mimeType,
+    isUploaded: !!attachment.dateUploaded
+  });
+  return path || undefined;
 }
 
 type OutputTypeToReturnType = {

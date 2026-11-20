@@ -438,6 +438,15 @@ async function decryptFile(
   }
 }
 
+async function decryptToTempFile(
+  filename: string,
+  fileMetadata: FileMetadata
+): Promise<string | false> {
+  if (!fileMetadata) return false;
+  const path = await decryptToFile(filename, fileMetadata.key, fileMetadata.iv);
+  return path || false;
+}
+
 async function streamingDecryptFile(
   filename: string,
   fileMetadata: FileMetadata
@@ -994,5 +1003,7 @@ export const attachmentFiles: AttachmentFiles = {
   getUploadedFileSize,
   decryptFile,
   streamingDecryptFile,
-  saveFile
+  saveFile,
+  decryptToTempFile,
+  removeTempFile: removeQuietly
 };

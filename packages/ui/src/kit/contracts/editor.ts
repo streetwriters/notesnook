@@ -36,6 +36,39 @@ export interface EditorAttachment {
   height?: number;
 }
 
+/**
+ * What the editor UI asks its host to do. The host supplies the actions; the
+ * surface gives them to the editor UI (which reads them through
+ * `@notesnook/editor-ui`'s `getHostAction`). Every action is optional: a host
+ * that omits one gets no matching control. Mirrors `EditorHostActions` in
+ * `@notesnook/editor-ui`, which cannot import this package.
+ */
+export interface EditorHostActions {
+  openLink?(url: string, openInNewTab?: boolean): void | Promise<void>;
+  downloadAttachment?(attachment: {
+    hash: string;
+    filename?: string;
+    mime?: string;
+    size?: number;
+    type?: string;
+  }): void | Promise<void>;
+  previewAttachment?(attachment: {
+    hash: string;
+    filename?: string;
+    mime?: string;
+    size?: number;
+    type?: string;
+  }): void | Promise<void>;
+  openAttachmentPicker?(type: "image" | "file" | "camera"): void | Promise<void>;
+  /** Files pasted or dropped into the editor; the host attaches them. */
+  pasteFiles?(files: PickedFile[]): void | Promise<void>;
+  /**
+   * Decrypts the attachment to a temporary file and returns its path, for
+   * engines that cannot take bytes through JS (the native editor).
+   */
+  resolveAttachmentPath?(hash: string): Promise<string | undefined>;
+}
+
 export interface EditorHeading {
   level: number;
   title: string;
@@ -82,6 +115,8 @@ export interface EditorSurfaceProps {
   onReady?: (handle: EditorHandle) => void;
   onAutoSaveDisabled?: () => void;
   onAttachFiles?: (files: PickedFile[]) => void;
+  /** Host actions for the editor UI; omit for a host without them. */
+  host?: EditorHostActions;
   sx?: SxProp;
   testID?: string;
 }

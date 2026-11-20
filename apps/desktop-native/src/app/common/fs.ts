@@ -36,3 +36,9 @@ export const streamingDecryptFile: typeof attachmentFiles.streamingDecryptFile =
   (...args) => attachmentFiles.streamingDecryptFile(...args);
 export const saveFile: typeof attachmentFiles.saveFile = (...args) =>
   attachmentFiles.saveFile(...args);
+export const decryptToTempFile: typeof attachmentFiles.decryptToTempFile = (
+  ...args
+) => attachmentFiles.decryptToTempFile(...args);
+export const removeTempFile: typeof attachmentFiles.removeTempFile = (
+  ...args
+) => attachmentFiles.removeTempFile(...args);

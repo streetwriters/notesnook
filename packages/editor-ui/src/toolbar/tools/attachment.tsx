@@ -25,6 +25,7 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { findSelectedNode } from "../../utils/prosemirror.js";
 import { Attachment } from "../../extension-types.js";
 import { Editor } from "../../types.js";
+import { callHostAction } from "../../host.js";
 
 export function AttachmentSettings(props: ToolProps) {
   const { editor } = props;
@@ -59,7 +60,7 @@ export function DownloadAttachment(props: ToolProps) {
         const attachmentNode = findAttachmentNode(editor);
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor.storage.downloadAttachment?.(attachment);
+        callHostAction(editor, "downloadAttachment", attachment);
       }}
     />
   );
@@ -86,7 +87,7 @@ export function PreviewAttachment(props: ToolProps) {
           findSelectedNode(editor, "image");
 
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor.storage.previewAttachment?.(attachment);
+        callHostAction(editor, "previewAttachment", attachment);
       }}
     />
   );

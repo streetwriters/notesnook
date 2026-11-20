@@ -64,6 +64,7 @@ import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import TitleBox from "./title-box";
 import { saveContent } from "./save-content";
 import { useEditorManager } from "./manager";
+import { useEditorHostActions } from "./use-host-actions";
 import useMobile from "../../hooks/use-mobile";
 
 export { saveContent };
@@ -257,6 +258,8 @@ function EditorView({ session }: { session: EditableSession }) {
     [sessionId]
   );
 
+  const host = useEditorHostActions(sessionId);
+
   const getContent = useCallback(() => {
     const data = session.content?.data;
     return typeof data === "string" ? data : undefined;
@@ -360,6 +363,7 @@ function EditorView({ session }: { session: EditableSession }) {
               autoSaveToast.show = false;
               autoSaveToast.hide = hide;
             }}
+            host={host}
             onPreviewDocument={(hash) =>
               useEditorStore.setState({ documentPreview: { hash } })
             }

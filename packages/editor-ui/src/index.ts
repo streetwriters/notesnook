@@ -36,6 +36,7 @@ export {
   TableProperties
 } from "./toolbar/tools/table.js";
 export * from "./commands.js";
+export * from "./host.js";
 
 export * from "./components/button.js";
 export * from "./components/action-sheet/index.js";
