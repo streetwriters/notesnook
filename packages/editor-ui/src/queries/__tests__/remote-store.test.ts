@@ -20,8 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { describe, expect, test, vi } from "vitest";
 import { q } from "../queries.js";
 import { createRemoteQueryStore } from "../remote-store.js";
-import { createController } from "../../controller.js";
-import { toController } from "../../tiptap-controller.js";
+import { createController, isEditorController } from "../../controller.js";
 
 const tick = () => new Promise((resolve) => queueMicrotask(() => resolve(0)));
 
@@ -94,7 +93,7 @@ describe("editor controller", () => {
       queries: createRemoteQueryStore(() => {}),
       run
     });
-    expect(toController(controller)).toBe(controller);
+    expect(isEditorController(controller)).toBe(true);
     controller.run({ name: "toggleBold" }, { name: "setColor", args: ["red"] });
     expect(run).toHaveBeenCalledWith([
       { name: "toggleBold" },
