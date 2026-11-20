@@ -300,7 +300,19 @@ async function updateRemindersForWidget() {
   }
 
   if (Platform.OS === "ios") {
-    IOSWidgets.publish("reminders", widgetReminders, ["RemindersWidget"]);
+    IOSWidgets.publish(
+      "reminders",
+      widgetReminders.map((reminder) => ({
+        id: reminder.id,
+        title: reminder.title,
+        description: reminder.description,
+        mode: reminder.mode,
+        triggerDate: reminder.triggerDate,
+        snoozeUntil: reminder.snoozeUntil,
+        disabled: reminder.disabled
+      })),
+      ["RemindersWidget"]
+    );
     return;
   }
   NotesnookModule.setString(
