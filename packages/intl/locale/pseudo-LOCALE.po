@@ -524,6 +524,10 @@ msgstr "{count} characters"
 msgid "{count} stars"
 msgstr "[{count} şťȧȧřş]"
 
+#: src/strings.ts:2721
+msgid "{title} is now shown on this widget."
+msgstr ""
+
 #: src/strings.ts:1447
 msgid "{days, plural, one {1 day} other {# days}}"
 msgstr "{days, plural, one {1 day} other {# days}}"
@@ -696,6 +700,10 @@ msgstr ""
 msgid "#notesnook"
 msgstr "#notesnook"
 
+#: src/strings.ts:2726
+msgid "+{count} more"
+msgstr ""
+
 #: src/strings.ts:3267
 msgid "✨ Highlights ✨"
 msgstr "✨ Highlights ✨"
@@ -846,6 +854,10 @@ msgstr "Add 2FA fallback method"
 
 #: src/strings.ts:2997
 msgid "Add a new reminder"
+msgstr ""
+
+#: src/strings.ts:2723
+msgid "Add a quick note"
 msgstr ""
 
 #: src/strings.ts:1396
@@ -5285,6 +5297,10 @@ msgstr "No note history available for this device."
 msgid "No notebooks selected to move"
 msgstr "No notebooks selected to move"
 
+#: src/strings.ts:2722
+msgid "No notebooks, tags or colors yet."
+msgstr ""
+
 #: src/strings.ts:2394
 msgid "No password"
 msgstr "No password"
@@ -5789,6 +5805,10 @@ msgstr "Phone number"
 #: src/strings.ts:918
 msgid "Phone number not entered"
 msgstr "Phone number not entered"
+
+#: src/strings.ts:2720
+msgid "Pick what this widget shows. Widgets of the same size share a choice unless you give them different slots in Edit Widget."
+msgstr ""
 
 #: src/strings.ts:822
 msgid "Pin"
@@ -7856,6 +7876,10 @@ msgstr "Take notes privately."
 msgid "Taking too long? Reload editor"
 msgstr "Taking too long? Reload editor"
 
+#: src/strings.ts:2725
+msgid "Tap + to add a reminder"
+msgstr ""
+
 #: src/strings.ts:1349
 msgid "Tap here to change sorting"
 msgstr "Tap here to change sorting"
@@ -7883,6 +7907,10 @@ msgstr "Tap to apply again"
 #: src/strings.ts:211
 msgid "Tap to deselect"
 msgstr "Tap to deselect"
+
+#: src/strings.ts:2724
+msgid "Tap to pick the note shown here."
+msgstr ""
 
 #: src/strings.ts:2820
 msgid "Tap to remove an attachment."

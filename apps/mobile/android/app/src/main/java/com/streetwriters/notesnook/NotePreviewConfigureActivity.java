@@ -67,10 +67,14 @@ public class NotePreviewConfigureActivity extends ReactActivity {
     public static void saveAndFinish(Context context) {
         if (NotePreviewConfigureActivity.activity == null || appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        NotePreviewWidget.updateAppWidget(context, appWidgetManager, appWidgetId);
+        NotePreviewConfigureActivity.activity.updateWidget(context, appWidgetManager, appWidgetId);
         Intent resultValue = new Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         NotePreviewConfigureActivity.activity.setResult(RESULT_OK, resultValue);
         NotePreviewConfigureActivity.activity.finish();
+    }
+
+    protected void updateWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+        NotePreviewWidget.updateAppWidget(context, appWidgetManager, appWidgetId);
     }
 
     @Override

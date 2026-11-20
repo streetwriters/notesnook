@@ -42,6 +42,13 @@ import {
 } from "./hooks/use-shortcut-manager";
 import { RootNavigation } from "./navigation/navigation-stack";
 import { NotePreviewConfigure } from "./screens/note-preview-configure";
+import { NotesWidgetConfigure } from "./screens/notes-widget-configure";
+import {
+  WidgetPicker,
+  WidgetPickerContent,
+  useWidgetPicker,
+  useWidgetPickerAsRoot
+} from "./screens/widget-picker";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
@@ -58,12 +65,14 @@ if (appLockEnabled || appLockMode !== "none") {
   useUserStore.getState().lockApp(true);
 }
 
-const App = (props: { configureMode?: "note-preview" }) => {
+const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
   useAppEvents();
   if (!props.configureMode) {
     //@ts-ignore
     globalThis["IS_MAIN_APP_RUNNING"] = true;
   }
+  const pickerAsRoot = useWidgetPickerAsRoot();
+
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
@@ -104,12 +113,17 @@ const App = (props: { configureMode?: "note-preview" }) => {
         <GlobalSafeAreaProvider />
         {props.configureMode === "note-preview" ? (
           <NotePreviewConfigure />
+        ) : props.configureMode === "notes-widget" ? (
+          <NotesWidgetConfigure />
+        ) : pickerAsRoot ? (
+          <WidgetPickerContent />
         ) : (
           <RootNavigation />
         )}
         <ScopedThemeProvider value="dialog">
           <Toast />
         </ScopedThemeProvider>
+        {props.configureMode ? null : <WidgetPicker />}
         <DialogProvider />
         <AppLocked />
       </GestureHandlerRootView>
@@ -188,18 +202,22 @@ export const withTheme = (
 
 export const withStartupBoundry = (
   Element: (
-    props: PropsWithChildren & { configureMode?: "note-preview" }
+    props: PropsWithChildren & {
+      configureMode?: "note-preview" | "notes-widget";
+    }
   ) => JSX.Element
 ) => {
   return function AppWithStartupBoundary(
-    props: PropsWithChildren & { configureMode?: "note-preview" }
+    props: PropsWithChildren & {
+      configureMode?: "note-preview" | "notes-widget";
+    }
   ) {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
       async function init() {
         try {
-          if (props.configureMode === "note-preview") {
+          if (props.configureMode) {
             return;
           }
 
@@ -214,6 +232,7 @@ export const withStartupBoundry = (
           ) {
             launchNewNoteTab(parsedLink?.id);
           }
+          useWidgetPicker.getState().openFromLaunch(url);
           useSettingStore.setState({
             initialUrl: url,
             pendingShortcut: shortcut ?? null

@@ -53,6 +53,7 @@ import { eCloseSimpleDialog, eOnLoadNote } from "../utils/events";
 import { fluidTabsRef } from "../utils/global-refs";
 import { convertNoteToText } from "../utils/note-to-text";
 import { NotesnookModule } from "../utils/notesnook-module";
+import { IOSWidgets } from "./widgets/ios-widgets";
 import { sleep } from "../utils/time";
 import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
@@ -264,26 +265,16 @@ const onEvent = async ({ type, detail }: Event) => {
   }
 };
 
-type ReminderWithFormattedTime = Reminder & {
-  formattedTime?: string;
-  triggerDate?: number;
-  formattedTimeOfDay?: string;
-  formattedDateTime?: string;
-};
-
 const RECENTLY_PASSED_WINDOW = 3 * 60 * 60 * 1000;
 
 async function updateRemindersForWidget() {
-  if (Platform.OS === "ios") return;
-  const reminders: ReminderWithFormattedTime[] = await db.reminders?.all.items(
-    undefined,
-    {
-      sortBy: "dueDate",
-      sortDirection: "asc"
-    }
-  );
-  const widgetReminders = [];
+  const reminders: Reminder[] = await db.reminders?.all.items(undefined, {
+    sortBy: "dueDate",
+    sortDirection: "asc"
+  });
   if (!reminders) return;
+
+  const widgetReminders = [];
   for (const reminder of reminders) {
     const triggerDate =
       reminder.snoozeUntil && reminder.snoozeUntil > Date.now()
@@ -299,11 +290,30 @@ async function updateRemindersForWidget() {
 
     if (!isReminderActive(reminder) && !recentlyPassed) continue;
 
-    reminder.triggerDate = triggerDate;
-    reminder.formattedTimeOfDay = getFormattedDate(triggerDate, "time");
-    reminder.formattedDateTime = getFormattedDate(triggerDate, "date-time");
-    reminder.formattedTime = getFormattedReminderTime(reminder);
-    widgetReminders.push(reminder);
+    widgetReminders.push({
+      ...reminder,
+      triggerDate,
+      formattedTimeOfDay: getFormattedDate(triggerDate, "time"),
+      formattedDateTime: getFormattedDate(triggerDate, "date-time"),
+      formattedTime: getFormattedReminderTime(reminder)
+    });
+  }
+
+  if (Platform.OS === "ios") {
+    IOSWidgets.publish(
+      "reminders",
+      widgetReminders.map((reminder) => ({
+        id: reminder.id,
+        title: reminder.title,
+        description: reminder.description,
+        mode: reminder.mode,
+        triggerDate: reminder.triggerDate,
+        snoozeUntil: reminder.snoozeUntil,
+        disabled: reminder.disabled
+      })),
+      ["RemindersWidget"]
+    );
+    return;
   }
   NotesnookModule.setString(
     "appPreview",

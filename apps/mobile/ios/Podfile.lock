@@ -31,9 +31,9 @@ PODS:
     - hermes-engine/Pre-built (= 0.82.1)
   - hermes-engine/Pre-built (0.82.1)
   - JWTDecode (3.0.1)
-  - MMKV (1.3.14):
-    - MMKVCore (~> 1.3.14)
-  - MMKVCore (1.3.14)
+  - MMKV (2.2.4):
+    - MMKVCore (~> 2.2.4)
+  - MMKVCore (2.2.4)
   - NitroCloudUploader (1.0.9):
     - hermes-engine
     - NitroModules
@@ -1563,9 +1563,9 @@ PODS:
     - React-Core
     - React-RCTFabric
     - ReactCommon/turbomodule/core
-  - react-native-mmkv-storage (12.0.1):
+  - react-native-mmkv-storage (13.1.0):
     - hermes-engine
-    - MMKV (~> 1.3.14)
+    - MMKV (~> 2.2.3)
     - RCTRequired
     - RCTTypeSafety
     - React-Core
@@ -1755,9 +1755,29 @@ PODS:
     - Yoga
   - react-native-share-extension (2.9.5):
     - React
-  - react-native-sodium (2.0.0-alpha.1):
+  - react-native-sodium (2.0.0-alpha.4):
     - Base64
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-theme-switch-animation (0.6.0):
     - hermes-engine
     - RCTRequired
@@ -2748,7 +2768,7 @@ DEPENDENCIES:
   - "react-native-image-resizer (from `../node_modules/@bam.tech/react-native-image-resizer`)"
   - react-native-in-app-review (from `../node_modules/react-native-in-app-review`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
-  - react-native-mmkv-storage (from `.prebuilt-xcframeworks/.cache/react-native-mmkv-storage`)
+  - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-notification-sounds (from `../node_modules/react-native-notification-sounds`)
   - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
@@ -2951,7 +2971,7 @@ EXTERNAL SOURCES:
   react-native-keep-awake:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
-    :path: ".prebuilt-xcframeworks/.cache/react-native-mmkv-storage"
+    :path: "../node_modules/react-native-mmkv-storage"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-notification-sounds:
@@ -3112,8 +3132,8 @@ SPEC CHECKSUMS:
   GZIP: 3c0abf794bfce8c7cb34ea05a1837752416c8868
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
   JWTDecode: 2eed97c2fa46ccaf3049a787004eedf0be474a87
-  MMKV: 7b5df6a8bf785c6705cc490c541b9d8a957c4a64
-  MMKVCore: 3f40b896e9ab522452df9df3ce983471aa2449ba
+  MMKV: 1a8e7dbce7f9cad02c52e1b1091d07bd843aefaf
+  MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   NitroCloudUploader: 25531d66b7d3b681459118fdd9f5e4516ea5eebc
   NitroModules: 91d3a502cd4a2cbc1aa541ea2eb0922b9dbeb58e
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
@@ -3168,7 +3188,7 @@ SPEC CHECKSUMS:
   react-native-image-resizer: 780fa93b4cc0090adf39c0bce451202ddfb6a9c7
   react-native-in-app-review: 1516ba69d60d58053b7eb3aaaf8d2a5a74af8b57
   react-native-keep-awake: a351e6f67006b47f316ae2b17ee8ee69386167f4
-  react-native-mmkv-storage: 95c8e88dff78ea796797e17eb6ff9eae8100b9f3
+  react-native-mmkv-storage: 08868d1d3fc53642fd97c974f5c9e8cb0e532b3b
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-notification-sounds: ce106d58df0dd384bccbd2e84fb53accab7cc068
   react-native-orientation-locker: cc6f357b289a2e0dd2210fea0c52cb8e0727fdaa
@@ -3178,7 +3198,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 42a1b4f8774b577d03b53de7326e3d5757fe9513
   react-native-screenguard: 4daf8cb9c41b1c5a37c1db285832c481459ed4de
   react-native-share-extension: fdc6aaab51591a2d445df239c446aaa3a99658ec
-  react-native-sodium: bcea1f5e08a3f2ea918c96dce7b7964c8c9c196f
+  react-native-sodium: 21de87eedfd6469925b8ee521de20885b1b5d552
   react-native-theme-switch-animation: eaa4470e7539e317c7612e60028d6ee902fe1183
   react-native-upload: 7b7ad336c3db703b68a8c07cf38e9319ae90d695
   react-native-view-shot: fb3c0774edb448f42705491802a455beac1502a2
@@ -3247,6 +3267,6 @@ SPEC CHECKSUMS:
   toolbar-android: c426ed5bd3dcccfed20fd79533efc0d1ae0ef018
   Yoga: 9a5a710cf47e32646c6d4689c74ce4c17f13ccdb
 
-PODFILE CHECKSUM: 7aef99144f8ea221cbcbcde244b6bbb6ed476cc5
+PODFILE CHECKSUM: f5cf3ff81f096d18c306b186a0013837f60845cc
 
 COCOAPODS: 1.16.2

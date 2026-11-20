@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { updateNoteWidgets } from "../services/widgets/update-widgets";
 import { isFeatureAvailable } from "@notesnook/common";
 import {
   EV,
@@ -81,8 +82,12 @@ import {
   setUpdateAvailableMessage
 } from "../services/message";
 import Navigation from "../services/navigation";
-import { NotePreviewWidget } from "../services/note-preview-widget";
-import { PinnedNotesWidget } from "../services/pinned-notes-widget";
+import {
+  getWidgetPickerKind,
+  getWidgetPickerSlot,
+  useWidgetPicker
+} from "../screens/widget-picker";
+import { WidgetTheme } from "../services/widgets/widget-theme";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -175,6 +180,10 @@ const onAppOpenedFromURL = async (event: {
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
+    } else if (getWidgetPickerKind(url)) {
+      useWidgetPicker
+        .getState()
+        .open(getWidgetPickerKind(url)!, getWidgetPickerSlot(url));
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
@@ -250,13 +259,19 @@ const onAppOpenedFromURL = async (event: {
           });
         }
       }
-    } else if (url.startsWith("https://app.notesnook.com/open_reminder")) {
+    } else if (
+      url.startsWith("https://app.notesnook.com/open_reminder") ||
+      url.startsWith("nn://open_reminder")
+    ) {
       const id = new URL(url).searchParams.get("id");
       if (id) {
         const reminder = await db.reminders.reminder(id);
         if (reminder) AddReminder.present(reminder);
       }
-    } else if (url.startsWith("https://app.notesnook.com/new_reminder")) {
+    } else if (
+      url.startsWith("https://app.notesnook.com/new_reminder") ||
+      url.startsWith("nn://new_reminder")
+    ) {
       const reminderFeature = await isFeatureAvailable("activeReminders");
       if (!reminderFeature.isAllowed) {
         ToastManager.show({
@@ -582,8 +597,8 @@ export const useAppEvents = () => {
     // Widgets outlive the app process, so they can be left showing content the app no longer has
     // (most obviously after the user clears app data). Nothing can run at that moment, so the
     // first launch afterwards is the earliest chance to put them right.
-    NotePreviewWidget.updateNotes();
-    PinnedNotesWidget.updateNotes();
+    updateNoteWidgets();
+    WidgetTheme.watch();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;

@@ -13,12 +13,17 @@ private boolean favorite;
 private boolean localOnly;
 private boolean conflicted;
 private boolean readonly;
+private java.util.List<NoteBlock> blocks;
 private long dateEdited;
 private Object dateDeleted; // Assuming null can be represented as Object
 private Object itemType; // Assuming null can be represented as Object
 private Object deletedBy; // Assuming null can be represented as Object
 
 // Getters and Setters
+public java.util.List<NoteBlock> getBlocks() {
+    return blocks;
+}
+
 public String getTitle() {
     return title;
 }
