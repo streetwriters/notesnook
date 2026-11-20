@@ -82,7 +82,7 @@
     "entities": "^3.0.1",
     "fflate": "^0.7.3",
     "html-to-text": "9.0.5",
-    "htmlparser2": "^9.1.0",
+    "htmlparser2": "^10.0.0",
     "katex": "0.16.2",
     "pathe": "1.1.2",
     "phone": "^3.1.14",
