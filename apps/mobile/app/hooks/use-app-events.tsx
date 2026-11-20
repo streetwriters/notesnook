@@ -89,6 +89,7 @@ import {
 } from "../screens/note-preview-configure/widget-picker";
 import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import { NotesWidget } from "../services/widgets/notes-widget";
+import { WidgetTheme } from "../services/widgets/widget-theme";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
@@ -601,6 +602,7 @@ export const useAppEvents = () => {
     NotePreviewWidget.updateNotes();
     PinnedNotesWidget.updateNotes();
     NotesWidget.updateNotes();
+    WidgetTheme.watch();
 
     let subscriptions: EventManagerSubscription[] = [];
     const eventManager = db.eventManager;
