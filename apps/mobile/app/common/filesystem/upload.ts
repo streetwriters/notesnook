@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { isImage, RequestOptions, hosts } from "@notesnook/core";
-import { PermissionsAndroid, Platform } from "react-native";
+import { Platform } from "react-native";
+import notifee, { AuthorizationStatus } from "@notifee/react-native";
 import RNFetchBlob from "react-native-blob-util";
 import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
@@ -418,22 +419,24 @@ export async function uploadFile(
     );
 
     if (Platform.OS === "android") {
-      useUserStore.setState({
-        disableAppLockRequests: true
-      });
-      const status = await PermissionsAndroid.request(
-        "android.permission.POST_NOTIFICATIONS"
-      );
-      if (status !== "granted") {
+      let settings = await notifee.getNotificationSettings();
+      if (settings.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
+        useUserStore.setState({
+          disableAppLockRequests: true
+        });
+        settings = await notifee.requestPermission();
+
+        await sleep(500);
+        useUserStore.setState({
+          disableAppLockRequests: false
+        });
+      }
+      if (settings.authorizationStatus !== AuthorizationStatus.AUTHORIZED) {
         ToastManager.show({
           message: strings.fileUploadNotificationPermissionDisallowed(),
           type: "info"
         });
       }
-      await sleep(500);
-      useUserStore.setState({
-        disableAppLockRequests: false
-      });
     }
 
     let uploaded = false;
