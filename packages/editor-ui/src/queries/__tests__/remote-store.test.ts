@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { describe, expect, test, vi } from "vitest";
 import { q } from "../queries.js";
 import { createRemoteQueryStore } from "../remote-store.js";
-import { createController, toController } from "../../controller.js";
+import { createController } from "../../controller.js";
+import { toController } from "../../tiptap-controller.js";
 
 const tick = () => new Promise((resolve) => queueMicrotask(() => resolve(0)));
 

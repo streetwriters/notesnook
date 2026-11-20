@@ -20,4 +20,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 export * from "./queries.js";
 export * from "./store.js";
 export * from "./hooks.js";
+export * from "./use-query.js";
 export * from "./remote-store.js";

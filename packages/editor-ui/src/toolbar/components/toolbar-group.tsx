@@ -23,11 +23,11 @@ import { findTool } from "../tools/index.js";
 import { MoreTools } from "./more-tools.js";
 import { getToolDefinition } from "../tool-definitions.js";
 import { strings } from "@notesnook/intl";
-import { AnyEditor, toController } from "../../controller.js";
+import type { EditorController } from "../../controller.js";
 
-export type ToolbarGroupProps = {
+export type ControllerToolbarGroupProps = {
   tools: ToolbarGroupDefinition;
-  editor: AnyEditor;
+  editor: EditorController;
   variant?: ToolButtonVariant;
   force?: boolean;
   groupId: string;
@@ -35,9 +35,8 @@ export type ToolbarGroupProps = {
   testID?: string;
   className?: string;
 };
-export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, force, sx, groupId, testID } = props;
-  const editor = toController(props.editor);
+export function ControllerToolbarGroup(props: ControllerToolbarGroupProps) {
+  const { tools, force, sx, groupId, testID, editor } = props;
 
   return (
     <Flex
@@ -64,7 +63,7 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
             />
           );
         } else {
-          const Component = findTool(toolId);
+          const Component = findTool(toolId, editor);
           const toolDefinition = getToolDefinition(toolId);
           return (
             <Component

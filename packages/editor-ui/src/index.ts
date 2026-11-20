@@ -54,6 +54,7 @@ export * from "./hooks/use-timer.js";
 
 export * from "./queries/index.js";
 export * from "./controller.js";
+export * from "./tiptap-controller.js";
 export * from "./types.js";
 export * from "./extension-types.js";
 export * from "./table-actions.js";

@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { q, useEditorQuery } from "../queries/index.js";
+import { q } from "../queries/queries.js";
+import { useControllerQuery as useEditorQuery } from "../queries/use-query.js";
 import { Flex, type SxProp } from "@ui";
 import {
   getDefaultPresets,
@@ -26,9 +27,8 @@ import {
   READONLY_MOBILE_STATIC_TOOLBAR_GROUPS,
   READONLY_MOBILE_TOOLBAR_NODES
 } from "./tool-definitions.js";
-import { useEffect, useMemo } from "react";
-import { ToolbarGroup } from "./components/toolbar-group.js";
-import { EditorFloatingMenus } from "./floating-menus/index.js";
+import { useEffect, useMemo, type ReactNode } from "react";
+import { ControllerToolbarGroup } from "./components/toolbar-group.js";
 import {
   ToolbarLocation,
   toolbarRef,
@@ -36,11 +36,11 @@ import {
   useToolbarStore
 } from "./stores/toolbar-store.js";
 import { ToolbarDefinition } from "./types.js";
-import { AnyEditor, toController } from "../controller.js";
+import type { EditorController } from "../controller.js";
 import { PopupHost } from "../components/popup-presenter/index.js";
 
-type ToolbarProps = {
-  editor: AnyEditor;
+export type ControllerToolbarProps = {
+  editor: EditorController;
   location: ToolbarLocation;
   tools?: ToolbarDefinition;
   defaultFontFamily: string;
@@ -48,10 +48,12 @@ type ToolbarProps = {
   sx?: SxProp;
   className?: string;
   testID?: string;
+  floatingMenus?: ReactNode;
 };
 
-export function Toolbar(props: ToolbarProps) {
+export function ControllerToolbar(props: ControllerToolbarProps) {
   const {
+    editor,
     location,
     tools = getDefaultPresets().default,
     defaultFontFamily,
@@ -59,7 +61,6 @@ export function Toolbar(props: ToolbarProps) {
     sx,
     testID = "editor-toolbar"
   } = props;
-  const editor = toController(props.editor);
   const isMobile = useIsMobile();
   const isEditable = useEditorQuery(editor, q.editable(), true);
   const hasReadonlyNode = useEditorQuery(
@@ -121,7 +122,7 @@ export function Toolbar(props: ToolbarProps) {
         >
           {toolbarTools.map((tools, index) => {
             return (
-              <ToolbarGroup
+              <ControllerToolbarGroup
                 key={tools.join("")}
                 tools={tools}
                 editor={editor}
@@ -136,7 +137,7 @@ export function Toolbar(props: ToolbarProps) {
           })}
         </Flex>
       )}
-      {editor.tiptap ? <EditorFloatingMenus editor={editor.tiptap} /> : null}
+      {props.floatingMenus}
       <PopupHost />
     </>
   );

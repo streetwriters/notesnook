@@ -17,9 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Toolbar } from "./toolbar.js";
+import { Toolbar } from "./tiptap.js";
 
 export default Toolbar;
+export * from "./tiptap.js";
+export * from "./toolbar.js";
 export * from "./types.js";
 export * from "./icons.js";
 export * from "./tools/index.js";

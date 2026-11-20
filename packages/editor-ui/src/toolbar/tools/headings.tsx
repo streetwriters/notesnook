@@ -17,7 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { q, useEditorQuery } from "../../queries/index.js";
+import { q } from "../../queries/queries.js";
+import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
 import { ToolProps } from "../types.js";
 import type { EditorController } from "../../controller.js";
 import { Dropdown } from "../components/dropdown.js";

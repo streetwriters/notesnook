@@ -17,17 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import type { ComponentType } from "react";
 import type { Editor as TiptapEditor } from "@tiptap/core";
 import type { Editor } from "./types.js";
-import { getQueryStore, type QueryStore } from "./queries/store.js";
+import type { QueryStore } from "./queries/store.js";
+import type { ToolProps } from "./toolbar/types.js";
+import type { ToolId } from "./toolbar-data/index.js";
 
 export type EditorCommand = { name: string; args?: unknown[] };
+
+export type ToolOverrides = Partial<Record<ToolId, ComponentType<ToolProps>>>;
 
 export interface EditorController {
   readonly kind: "controller";
   readonly queries: QueryStore;
   run(...commands: EditorCommand[]): void;
   readonly tiptap?: Editor;
+  readonly tools?: ToolOverrides;
 }
 
 export type AnyEditor = Editor | TiptapEditor | EditorController;
@@ -42,42 +48,15 @@ export function isEditorController(
   );
 }
 
-const controllers = new WeakMap<TiptapEditor, EditorController>();
-
-export function tiptapController(editor: TiptapEditor): EditorController {
-  let controller = controllers.get(editor);
-  if (!controller) {
-    controller = {
-      kind: "controller",
-      queries: getQueryStore(editor),
-      tiptap: editor as Editor,
-      run(...commands) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let chain: any = editor.chain().focus();
-        for (const command of commands) {
-          const fn = chain[command.name];
-          if (typeof fn !== "function") return;
-          chain = fn.apply(chain, command.args ?? []);
-        }
-        chain.run();
-      }
-    };
-    controllers.set(editor, controller);
-  }
-  return controller;
-}
-
-export function toController(editor: AnyEditor): EditorController {
-  return isEditorController(editor) ? editor : tiptapController(editor);
-}
-
 export function createController(options: {
   queries: QueryStore;
   run: (commands: EditorCommand[]) => void;
+  tools?: ToolOverrides;
 }): EditorController {
   return {
     kind: "controller",
     queries: options.queries,
+    tools: options.tools,
     run: (...commands) => options.run(commands)
   };
 }

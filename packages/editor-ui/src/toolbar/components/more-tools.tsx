@@ -26,14 +26,15 @@ import {
   usePopupManager,
   useToolbarLocation
 } from "../stores/toolbar-store.js";
-import { ToolProps } from "../types.js";
+import type { TiptapToolProps, ToolProps } from "../types.js";
+import type { EditorController } from "../../controller.js";
 import { ToolId } from "../tools/index.js";
-import { ToolbarGroup } from "./toolbar-group.js";
+import { ControllerToolbarGroup } from "./toolbar-group.js";
 import { strings } from "@notesnook/intl";
-import { AnyEditor } from "../../controller.js";
 
 type MoreToolsProps = Omit<ToolProps, "editor"> & {
-  editor: AnyEditor;
+  editor: EditorController | TiptapToolProps["editor"];
+  controller?: EditorController;
   popupId: string;
   tools: ToolId[];
   autoCloseOnUnmount?: boolean;
@@ -41,7 +42,8 @@ type MoreToolsProps = Omit<ToolProps, "editor"> & {
   group?: string;
 };
 export function MoreTools(props: MoreToolsProps) {
-  const { popupId, editor, tools, autoCloseOnUnmount, autoOpen } = props;
+  const { popupId, tools, autoCloseOnUnmount, autoOpen } = props;
+  const editor = props.controller ?? (props.editor as EditorController);
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const group = isBottom ? "mobile" : "toolbarGroup";
@@ -81,7 +83,7 @@ export function MoreTools(props: MoreToolsProps) {
           borderRadius: "default"
         }}
       >
-        <ToolbarGroup
+        <ControllerToolbarGroup
           tools={tools}
           editor={editor}
           groupId={popupId}

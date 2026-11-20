@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useSyncExternalStore } from "react";
 import type { Editor as TiptapEditor } from "@tiptap/core";
 import type { Query, QueryKind, QueryResults } from "./queries.js";
 import { getQueryStore, type QueryStore } from "./store.js";
+import { useStoreQuery } from "./use-query.js";
 
 type Editor =
   | TiptapEditor
@@ -46,11 +46,6 @@ export function useEditorQuery<K extends QueryKind>(
   query: Query<K>,
   fallback?: QueryResults[K]
 ): QueryResults[K] | undefined {
-  const store = storeOf(editor);
-  const subscribe = useCallback(
-    (listener: () => void) => store.subscribe(query, listener),
-    [store, query]
-  );
-  const value = useSyncExternalStore(subscribe, () => store.read(query));
+  const value = useStoreQuery(storeOf(editor), query);
   return value === undefined ? fallback : value;
 }
