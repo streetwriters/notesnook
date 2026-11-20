@@ -49,7 +49,7 @@ export type NoteBlock =
 
 export type NoteBlocks = { blocks: NoteBlock[] };
 
-export const WIDGET_CONTENT_LIMIT = 2000;
+const WIDGET_CONTENT_LIMIT = 2000;
 const MAX_HTML_LENGTH = 24000;
 
 const SKIPPED = new Set(["script", "style", "svg", "head"]);

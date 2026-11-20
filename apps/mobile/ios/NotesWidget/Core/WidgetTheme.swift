@@ -35,7 +35,6 @@ enum WidgetTheme {
   static let background = Color("WidgetBackground")
   static let divider = Color.primary.opacity(0.12)
   static let secondaryText = Color.secondary
-  static let rowSpacing: CGFloat = 8
 }
 
 extension View {

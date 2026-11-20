@@ -26,8 +26,6 @@ export type IOSWidgetKind =
   | "RemindersWidget"
   | "NotePreviewWidget";
 
-export type IOSWidgetKey = string;
-
 let storage: ReturnType<MMKVLoader["initialize"]> | undefined;
 
 function getStorage() {
@@ -44,8 +42,6 @@ function getStorage() {
 function getLocalizedStrings() {
   return {
     quickNote: strings.quickNoteTitle(),
-    newNote: strings.newNote(),
-    recentNotes: strings.recent(),
     reminders: strings.reminders(),
     untitled: strings.untitledNote(),
     ongoing: strings.ongoing(),
@@ -56,24 +52,24 @@ function getLocalizedStrings() {
 export const IOSWidgets = {
   isSupported: Platform.OS === "ios",
 
-  write(key: IOSWidgetKey, value: unknown) {
+  write(key: string, value: unknown) {
     if (!IOSWidgets.isSupported) return;
     getStorage().setString(key, JSON.stringify(value));
   },
 
-  publish(key: IOSWidgetKey, value: unknown, kinds: IOSWidgetKind[]) {
+  publish(key: string, value: unknown, kinds: IOSWidgetKind[]) {
     if (!IOSWidgets.isSupported) return;
     IOSWidgets.write(key, value);
     IOSWidgets.write("strings", getLocalizedStrings());
     IOSWidgets.reload(kinds);
   },
 
-  remove(key: IOSWidgetKey) {
+  remove(key: string) {
     if (!IOSWidgets.isSupported) return;
     getStorage().removeItem(key);
   },
 
-  read<T>(key: IOSWidgetKey, fallback: T): T {
+  read<T>(key: string, fallback: T): T {
     if (!IOSWidgets.isSupported) return fallback;
     try {
       const value = getStorage().getString(key);

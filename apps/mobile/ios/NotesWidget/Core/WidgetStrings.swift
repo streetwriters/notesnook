@@ -3,13 +3,10 @@ import Foundation
 enum WidgetString: String, CaseIterable {
   case quickNote
   case addQuickNote
-  case newNote
-  case recentNotes
   case noNotes
   case reminders
   case noReminders
   case untitled
-  case chooseNoteTitle
   case chooseNoteBody
   case lockedNote
   case ongoing
@@ -25,13 +22,10 @@ enum WidgetString: String, CaseIterable {
     switch self {
     case .quickNote: return "Quick note"
     case .addQuickNote: return "Add a quick note"
-    case .newNote: return "New note"
-    case .recentNotes: return "Recent"
     case .noNotes: return "No notes"
     case .reminders: return "Reminders"
     case .noReminders: return "Tap + to add a reminder"
     case .untitled: return "Untitled"
-    case .chooseNoteTitle: return "Choose a note"
     case .chooseNoteBody: return "Tap to pick the note shown here."
     case .lockedNote: return "Locked note"
     case .ongoing: return "Ongoing"
