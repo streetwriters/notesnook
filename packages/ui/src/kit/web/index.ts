@@ -28,4 +28,5 @@ export { Popover, PopoverHost, ResponsivePresenter } from "./popover";
 export { showToast, ToastHost } from "./toast";
 export * from "./primitives";
 export { WebThemeProvider, ThemeScope } from "./theme";
+export { ThemeBridge, syncThemeEngine } from "./theme-bridge";
 export { dataColor } from "../shared/style/data-color";

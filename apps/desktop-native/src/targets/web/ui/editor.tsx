@@ -27,8 +27,7 @@ import {
   useRef,
   useState
 } from "react";
-import { EmotionThemeProvider, useThemeEngineStore } from "@notesnook/theme";
-import { useThemeContext } from "@notesnook/ui-kit/web/theme";
+import { ThemeBridge } from "@notesnook/ui-kit/web/theme-bridge";
 import Tiptap from "web-app-editor/tiptap";
 import type { IEditor } from "web-app-editor/types";
 import { useEditorManager } from "web-app-editor/manager";
@@ -43,7 +42,6 @@ export const EditorSurface = forwardRef<
   latest.current = props;
   const instance = useRef<IEditor | undefined>(undefined);
   const id = props.sessionId;
-  const { definition } = useThemeContext();
   const [epoch, setEpoch] = useState(0);
   const hidden = useRef(false);
   const unsaved = useRef<string | undefined>(undefined);
@@ -68,9 +66,6 @@ export const EditorSurface = forwardRef<
       hidden.current = true;
     };
   }, []);
-  useEffect(() => {
-    useThemeEngineStore.getState().setTheme(definition);
-  }, [definition]);
 
   const handle = useMemo<Contract.EditorHandle>(
     () => ({
@@ -164,8 +159,7 @@ export const EditorSurface = forwardRef<
         position: "relative"
       }}
     >
-      <EmotionThemeProvider
-        injectCssVars={false}
+      <ThemeBridge
         sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
       >
         <Tiptap
@@ -183,7 +177,7 @@ export const EditorSurface = forwardRef<
             latest.current.onAttachFiles?.(files.map(toPickedFile))
           }
         />
-      </EmotionThemeProvider>
+      </ThemeBridge>
     </div>
   );
 });
