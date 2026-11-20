@@ -301,6 +301,12 @@ export default class Backup {
         hash: string;
         total: number;
         current: number;
+      }
+    | {
+        type: "skipped";
+        hash: string;
+        total: number;
+        current: number;
       },
     void,
     unknown
@@ -375,8 +381,15 @@ export default class Backup {
           !(await this.db
             .fs()
             .downloadFile("backup", attachment.hash, attachment.chunkSize))
-        )
+        ) {
+          yield {
+            type: "skipped",
+            hash: attachment.hash,
+            total,
+            current
+          };
           continue;
+        }
         yield {
           type: "attachment",
           hash: attachment.hash,
