@@ -36,7 +36,10 @@ public class NotePreviewWidget extends AppWidgetProvider {
         }
 
         views.setTextViewText(R.id.widget_title, note.getTitle());
-        views.setTextViewText(R.id.widget_body, note.getHeadline());
+        boolean hasContent = note.getBlocks() != null && !note.getBlocks().isEmpty()
+                && !Boolean.TRUE.equals(note.getLocked());
+        views.setTextViewText(R.id.widget_body,
+                hasContent ? NoteContentRenderer.render(note.getBlocks()) : note.getHeadline());
         // Once the user shrinks the widget down to a single row there is no room for the preview
         // text, and a clipped half-line of it looks like a rendering glitch.
         views.setViewVisibility(R.id.widget_body,

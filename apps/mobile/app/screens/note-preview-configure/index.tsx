@@ -28,6 +28,7 @@ import Paragraph from "../../components/ui/typography/paragraph";
 import { useDBItem } from "../../hooks/use-db-item";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../stores/use-setting-store";
+import { NotePreviewWidget } from "../../services/note-preview-widget";
 import { NotesnookModule } from "../../utils/notesnook-module";
 import { DefaultAppStyles } from "../../utils/styles";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,6 +36,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const NoteItem = (props: {
   id: string | number;
   items?: VirtualizedGrouping<Note>;
+  onSelect: (note: Note) => void;
 }) => {
   const { colors } = useThemeColors();
   const [item] = useDBItem(props.id, "note", props.items);
@@ -43,15 +45,7 @@ const NoteItem = (props: {
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => {
-        const widgetId = NotesnookModule.getWidgetId();
-        NotesnookModule.setString(
-          "appPreview",
-          String(widgetId),
-          JSON.stringify(item)
-        );
-        setTimeout(() => {
-          NotesnookModule.saveAndFinish();
-        });
+        if (item) props.onSelect(item);
       }}
       style={{
         flexDirection: "column",
@@ -90,7 +84,10 @@ const NoteItem = (props: {
   );
 };
 
-export const NotePreviewConfigure = () => {
+export const NotePicker = (props: {
+  onSelect: (note: Note) => void;
+  onCancel: () => void;
+}) => {
   const [items, setItems] = useState<VirtualizedGrouping<Note>>();
   const loading = useSettingStore((state) => state.isAppLoading);
   const bounceRef = React.useRef<NodeJS.Timeout>(undefined);
@@ -107,9 +104,9 @@ export const NotePreviewConfigure = () => {
 
   const renderItem = React.useCallback(
     ({ index }: { item: boolean; index: number }) => {
-      return <NoteItem id={index} items={items} />;
+      return <NoteItem id={index} items={items} onSelect={props.onSelect} />;
     },
-    [items]
+    [items, props.onSelect]
   );
 
   return (
@@ -122,9 +119,7 @@ export const NotePreviewConfigure = () => {
       <Header
         canGoBack
         title={strings.selectANote()}
-        onLeftMenuButtonPress={() => {
-          NotesnookModule.cancelAndFinish();
-        }}
+        onLeftMenuButtonPress={props.onCancel}
       />
 
       <View
@@ -168,5 +163,24 @@ export const NotePreviewConfigure = () => {
         />
       </View>
     </SafeAreaView>
+  );
+};
+
+export const NotePreviewConfigure = () => {
+  return (
+    <NotePicker
+      onSelect={async (note) => {
+        const widgetId = NotesnookModule.getWidgetId();
+        NotesnookModule.setString(
+          "appPreview",
+          String(widgetId),
+          await NotePreviewWidget.serializeNote(note)
+        );
+        setTimeout(() => {
+          NotesnookModule.saveAndFinish();
+        });
+      }}
+      onCancel={() => NotesnookModule.cancelAndFinish()}
+    />
   );
 };

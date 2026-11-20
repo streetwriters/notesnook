@@ -16,12 +16,22 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import { Note } from "@notesnook/core";
 import { strings } from "@notesnook/intl";
 import { db } from "../common/database";
 import { NotesnookModule } from "../utils/notesnook-module";
 import { Platform } from "react-native";
 
 let timer: NodeJS.Timeout;
+
+export function toWidgetNote(note: Note) {
+  return {
+    id: note.id,
+    title: note.title || strings.untitledNote(),
+    headline: note.locked ? "" : note.headline || "",
+    locked: !!note.locked
+  };
+}
 
 /**
  * Service to synchronize pinned notes from the Notesnook database to the native

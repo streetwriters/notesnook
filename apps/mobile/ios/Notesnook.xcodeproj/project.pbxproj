@@ -44,6 +44,7 @@
 		65C400DF2A80B6B600AA3DF5 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65C400DD2A80B68D00AA3DF5 /* MaterialCommunityIcons.ttf */; };
 		65E0340B257B9FF100793428 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E0340A257B9FF100793428 /* File.swift */; };
 		6A44C5CA7E3339EC2BB6A020 /* WidgetTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC01AF819A792AA41EFEEC79 /* WidgetTheme.swift */; };
+		99E64072E5359DFC7DC7ADA6 /* WidgetBlocksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B02B22908FFFA6EF3A0BF3C /* WidgetBlocksView.swift */; };
 		9B0A96262908CB873EFEF38C /* WidgetKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB36318142B31EB2992ED0D /* WidgetKeys.swift */; };
 		A976F88DB7FDC50692AFE0A2 /* libPods-NotesWidgetExtension.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF45C11F78FEADC75628EDE1 /* libPods-NotesWidgetExtension.a */; };
 		BA1528FB9C1E0BD634C4169B /* libPods-Notesnook-Make Note.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71BC99808CA30E74689CBC70 /* libPods-Notesnook-Make Note.a */; };
@@ -51,6 +52,7 @@
 		BD58E91E6828153E8ACAAB68 /* RemindersWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E22CA9203FE4A6B4879E21 /* RemindersWidget.swift */; };
 		C57249E75E3A3C5E6BEB6626 /* WidgetModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE8C3C2D8840851D851B7D72 /* WidgetModels.swift */; };
 		C7C6426EECE25C569359F795 /* WidgetDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A16A3D43B36730BEBC1F33 /* WidgetDataSource.swift */; };
+		CCCBB21E581B3208FDFA56F2 /* NotePreviewWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1BE8A2F659ED7186EC2997 /* NotePreviewWidget.swift */; };
 		D19B7C57A2663ACE1BDDDADB /* NNWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B19AAA9CACB1754C05248356 /* NNWidgets.swift */; };
 		D2AE20F7CD00227060AC76D9 /* WidgetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C78FEE0F2611F6EEC88E6EC7 /* WidgetStore.swift */; };
 		D5A503790A49186B183A716D /* libPods-Notesnook-NotesnookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 724BD1232A0B1FBDC889F697 /* libPods-Notesnook-NotesnookTests.a */; };
@@ -127,6 +129,7 @@
 		48AA8CB97C8C5614CBFF5609 /* WidgetComponents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetComponents.swift; sourceTree = "<group>"; };
 		4B679E87FDFB1312CAD6CF45 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Notesnook/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		4CA8C1C51A143BFD37BBE15A /* WidgetDeepLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetDeepLink.swift; sourceTree = "<group>"; };
+		5B02B22908FFFA6EF3A0BF3C /* WidgetBlocksView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetBlocksView.swift; sourceTree = "<group>"; };
 		5C814736BB7F2CDE2B666E86 /* Pods-NotesWidgetExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotesWidgetExtension.debug.xcconfig"; path = "Target Support Files/Pods-NotesWidgetExtension/Pods-NotesWidgetExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		6510E6D62877215700DACAA9 /* build.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = build.bundle; path = "../../../packages/editor-mobile/build.bundle"; sourceTree = "<group>"; };
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
@@ -176,6 +179,7 @@
 		C89265087EBE8B605EC6DBC0 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE8C3C2D8840851D851B7D72 /* WidgetModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetModels.swift; sourceTree = "<group>"; };
 		E6C09846F7AC87C24B16518B /* QuickNoteWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickNoteWidget.swift; sourceTree = "<group>"; };
+		ED1BE8A2F659ED7186EC2997 /* NotePreviewWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotePreviewWidget.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 		EF88477758968C47002AB99A /* Pods-Notesnook-Add to Notes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Add to Notes.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-Add to Notes/Pods-Notesnook-Add to Notes.debug.xcconfig"; sourceTree = "<group>"; };
@@ -379,6 +383,7 @@
 		9C69E3ECD4A8B689C7775765 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				ED1BE8A2F659ED7186EC2997 /* NotePreviewWidget.swift */,
 				E6C09846F7AC87C24B16518B /* QuickNoteWidget.swift */,
 				24E22CA9203FE4A6B4879E21 /* RemindersWidget.swift */,
 			);
@@ -415,6 +420,7 @@
 				C78FEE0F2611F6EEC88E6EC7 /* WidgetStore.swift */,
 				67894095FB3DCDED0154DF6B /* WidgetStrings.swift */,
 				FC01AF819A792AA41EFEEC79 /* WidgetTheme.swift */,
+				5B02B22908FFFA6EF3A0BF3C /* WidgetBlocksView.swift */,
 			);
 			name = Core;
 			path = Core;
@@ -992,9 +998,11 @@
 				D2AE20F7CD00227060AC76D9 /* WidgetStore.swift in Sources */,
 				0476190AAA7BDA106AABC762 /* WidgetStrings.swift in Sources */,
 				6A44C5CA7E3339EC2BB6A020 /* WidgetTheme.swift in Sources */,
+				CCCBB21E581B3208FDFA56F2 /* NotePreviewWidget.swift in Sources */,
 				0415CD97CA51268802CBE41E /* QuickNoteWidget.swift in Sources */,
 				BD58E91E6828153E8ACAAB68 /* RemindersWidget.swift in Sources */,
 				9B0A96262908CB873EFEF38C /* WidgetKeys.swift in Sources */,
+				99E64072E5359DFC7DC7ADA6 /* WidgetBlocksView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

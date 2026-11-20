@@ -42,6 +42,12 @@ import {
 } from "./hooks/use-shortcut-manager";
 import { RootNavigation } from "./navigation/navigation-stack";
 import { NotePreviewConfigure } from "./screens/note-preview-configure";
+import {
+  WidgetPicker,
+  WidgetPickerRoot,
+  useWidgetPickerAsRoot,
+  widgetPickerLaunchCheck
+} from "./screens/note-preview-configure/widget-picker";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
@@ -64,6 +70,13 @@ const App = (props: { configureMode?: "note-preview" }) => {
     //@ts-ignore
     globalThis["IS_MAIN_APP_RUNNING"] = true;
   }
+  const [launchChecked, setLaunchChecked] = useState(false);
+  const pickerAsRoot = useWidgetPickerAsRoot();
+
+  useEffect(() => {
+    widgetPickerLaunchCheck.finally(() => setLaunchChecked(true));
+  }, []);
+
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
@@ -104,12 +117,15 @@ const App = (props: { configureMode?: "note-preview" }) => {
         <GlobalSafeAreaProvider />
         {props.configureMode === "note-preview" ? (
           <NotePreviewConfigure />
+        ) : !launchChecked ? null : pickerAsRoot ? (
+          <WidgetPickerRoot />
         ) : (
           <RootNavigation />
         )}
         <ScopedThemeProvider value="dialog">
           <Toast />
         </ScopedThemeProvider>
+        {props.configureMode ? null : <WidgetPicker />}
         <DialogProvider />
         <AppLocked />
       </GestureHandlerRootView>
