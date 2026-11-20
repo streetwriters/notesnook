@@ -18,8 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Appearance, Dimensions, useWindowDimensions } from "react-native";
-import { useColorScheme } from "react-native";
+import { Platform, useColorScheme } from "react-native";
 import type * as Contract from "../contracts/hooks";
+import { formatShortcutFor, type ShortcutPlatform } from "../shared/shortcut";
 import { lastPointer } from "./style/use-styled";
 import { useThemeContext } from "./theme";
 
@@ -67,3 +68,10 @@ export const getPointerPosition: typeof Contract.getPointerPosition = () => ({
 
 export const useThemeColor: typeof Contract.useThemeColor = (token) =>
   useThemeContext().colors[token] ?? "transparent";
+
+const os: string = Platform.OS;
+const shortcutPlatform: ShortcutPlatform =
+  os === "macos" ? "mac" : os === "ios" || os === "android" ? "touch" : "pc";
+
+export const formatShortcut: typeof Contract.formatShortcut = (keys) =>
+  formatShortcutFor(keys, shortcutPlatform);

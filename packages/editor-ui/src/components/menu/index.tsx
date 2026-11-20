@@ -22,6 +22,7 @@ import {
   Box,
   Button,
   Flex,
+  formatShortcut,
   Icon,
   Popover,
   Text,
@@ -181,9 +182,9 @@ export function MenuButton(props: {
               flexShrink: 0
             }}
           >
-            {item.modifier ? (
+            {item.modifier && formatShortcut(item.modifier) ? (
               <Text sx={{ fontSize: "subBody", color: "paragraph-secondary" }}>
-                {item.modifier}
+                {formatShortcut(item.modifier)}
               </Text>
             ) : null}
             {item.isChecked ? (

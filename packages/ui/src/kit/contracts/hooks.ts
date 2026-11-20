@@ -24,3 +24,4 @@ export declare function matchMediaQuery(query: string): boolean;
 export declare function useWindowSize(): { width: number; height: number };
 export declare function getPointerPosition(): { x: number; y: number };
 export declare function useThemeColor(token: ColorToken): string;
+export declare function formatShortcut(keys: string): string;

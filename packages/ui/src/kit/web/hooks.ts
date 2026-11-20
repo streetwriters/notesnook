@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useSyncExternalStore } from "react";
 import type * as Contract from "../contracts/hooks";
+import { formatShortcutFor, type ShortcutPlatform } from "../shared/shortcut";
 import { useThemeContext } from "./theme";
 
 const pointer = { x: 0, y: 0 };
@@ -71,3 +72,15 @@ export const getPointerPosition: typeof Contract.getPointerPosition = () => ({
 
 export const useThemeColor: typeof Contract.useThemeColor = (token) =>
   useThemeContext().colors[token] ?? "transparent";
+
+function detectShortcutPlatform(): ShortcutPlatform {
+  const { platform, userAgent } = window.navigator;
+  if (/iPhone|iPad|iPod/.test(platform) || /Android/.test(userAgent))
+    return "touch";
+  return /^Mac/.test(platform) ? "mac" : "pc";
+}
+
+const shortcutPlatform = detectShortcutPlatform();
+
+export const formatShortcut: typeof Contract.formatShortcut = (keys) =>
+  formatShortcutFor(keys, shortcutPlatform);
