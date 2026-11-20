@@ -74,6 +74,10 @@ jobs:
           node scripts/smoke-engine.mjs
           node scripts/html-bridge.mjs
 
+      - name: Every Tiptap extension has a native counterpart or a preserved-block note
+        working-directory: native-editor
+        run: node scripts/conformance.mjs --check-extensions "$NOTESNOOK_REPO_ROOT/packages/editor/src/extensions"
+
       - name: Real-notes corpus is unchanged
         working-directory: native-editor
         run: |
