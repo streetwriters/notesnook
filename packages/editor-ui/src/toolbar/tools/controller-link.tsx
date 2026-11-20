@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useRef, useState } from "react";
 import type { UIElement } from "@ui";
 import { strings } from "@notesnook/intl";
+import { find } from "linkifyjs";
 import { q } from "../../queries/queries.js";
 import { useControllerQuery as useEditorQuery } from "../../queries/use-query.js";
 import { ToolProps } from "../types.js";
@@ -41,6 +42,11 @@ export function ControllerAddLink(props: ToolProps) {
     q.isActive(NODE_NAMES.image),
     false
   );
+  const selectedText = useEditorQuery(
+    editor,
+    q.selectedText(NODE_NAMES.link),
+    ""
+  );
   const createInternalLink = editor.hostActions?.createInternalLink;
   const buttonRef = useRef<UIElement>(null);
   const [link, setLink] = useState<LinkDefinition>();
@@ -59,11 +65,22 @@ export function ControllerAddLink(props: ToolProps) {
             if (!next) return;
             editor.run(
               { name: "extendMarkRange", args: [NODE_NAMES.link] },
-              { name: "setLink", args: [next] }
+              {
+                name: "setLink",
+                args: [{ ...next, title: selectedText || next.title }]
+              }
             );
             return;
           }
-          setLink(isActive ? { href, title: "" } : { href: "", title: "" });
+          if (isActive) {
+            setLink({ href, title: selectedText });
+            return;
+          }
+          const detected =
+            find(selectedText).find(
+              (item) => item.isLink && item.href === selectedText
+            )?.href ?? "";
+          setLink({ href: detected, title: selectedText });
         }}
       />
       <ResponsivePresenter
@@ -85,17 +102,16 @@ export function ControllerAddLink(props: ToolProps) {
         <LinkPopup
           link={link}
           isEditing={isActive}
-          isImageActive={isImageActive || isActive}
+          isImageActive={isImageActive}
           onClose={() => setLink(undefined)}
           onDone={(next) => {
-            const attrs = next.title ? next : { href: next.href };
             editor.run(
               ...(isActive
                 ? [
                     { name: "extendMarkRange", args: [NODE_NAMES.link] },
-                    { name: "setLink", args: [attrs] }
+                    { name: "setLink", args: [next] }
                   ]
-                : [{ name: "setLink", args: [attrs] }])
+                : [{ name: "toggleLink", args: [next] }])
             );
             setLink(undefined);
           }}
@@ -108,17 +124,21 @@ export function ControllerAddLink(props: ToolProps) {
 export function ControllerAddInternalLink(props: ToolProps) {
   const { editor } = props;
   const isActive = useEditorQuery(editor, q.isActive(NODE_NAMES.link), false);
+  const selectedText = useEditorQuery(editor, q.selectedText(), "");
   const createInternalLink = editor.hostActions?.createInternalLink;
 
   return (
     <ToolButton
       icon={props.icon}
       title={props.title}
-      disabled={isActive || !createInternalLink}
+      disabled={isActive}
       onClick={async () => {
         const link = await createInternalLink?.();
         if (!link) return;
-        editor.run({ name: "setLink", args: [link] });
+        editor.run({
+          name: "setLink",
+          args: [{ ...link, title: selectedText || link.title }]
+        });
       }}
     />
   );

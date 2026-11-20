@@ -35,6 +35,7 @@ export type QueryResults = {
   history: HistoryInfo;
   anchor: AnchorRect | null;
   focused: boolean;
+  selectedText: string;
 };
 
 export type SelectionInfo = { from: number; to: number; empty: boolean };
@@ -83,5 +84,7 @@ export const q = {
   selection: () => query("selection"),
   history: () => query("history"),
   anchor: (target: AnchorTarget = "selection") => query("anchor", target),
-  focused: () => query("focused")
+  focused: () => query("focused"),
+  selectedText: (mark?: string) =>
+    mark ? query("selectedText", mark) : query("selectedText")
 };

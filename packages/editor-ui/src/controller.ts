@@ -34,6 +34,7 @@ export type ControllerHostActions = {
     href: string;
     title?: string;
   }) => Promise<{ href: string; title?: string } | undefined>;
+  pickCsvFile?: () => Promise<string | undefined>;
 };
 
 export interface EditorController {

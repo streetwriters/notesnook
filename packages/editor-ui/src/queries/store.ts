@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { findParentNode, type Editor } from "@tiptap/core";
+import { findParentNode, getMarkRange, type Editor } from "@tiptap/core";
 import type { Editor as NotesnookEditor } from "../types.js";
 import { findSelectedNode } from "../utils/prosemirror.js";
 import { getTextDirection } from "../utils/text-direction.js";
@@ -160,10 +160,23 @@ function evaluate(editor: Editor, query: Query): unknown {
         return anchorRect(editor, query.args[0] as AnchorTarget);
       case "focused":
         return editor.isFocused;
+      case "selectedText":
+        return selectedText(editor, query.args[0] as string | undefined);
     }
   } catch {
     return undefined;
   }
+}
+
+function selectedText(editor: Editor, mark: string | undefined): string {
+  const { doc, selection, schema } = editor.state;
+  const type = mark ? schema.marks[mark] : undefined;
+  if (type) {
+    const range = getMarkRange(selection.$from, type);
+    if (range && range.from <= selection.from && range.to >= selection.to)
+      return doc.textBetween(range.from, range.to, "\n", " ");
+  }
+  return doc.textBetween(selection.from, selection.to, "\n", " ");
 }
 
 function anchorRect(editor: Editor, target: AnchorTarget): AnchorRect | null {
