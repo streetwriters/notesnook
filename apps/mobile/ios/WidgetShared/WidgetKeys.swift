@@ -7,6 +7,7 @@ enum WidgetKey {
   static let previewNotes = "previewNotes"
   static let reminders = "reminders"
   static let strings = "strings"
+  static let theme = "theme"
 
   static func notes(forSource key: String) -> String {
     "notes.\(key)"
