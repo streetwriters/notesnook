@@ -132,19 +132,15 @@ final class NoteContentRenderer {
             Integer background = span.getBackgroundColor();
             if (background != null) {
                 out.setSpan(new BackgroundColorSpan(background), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                out.setSpan(new ForegroundColorSpan(readableTextColor(background)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                Integer textColor = span.getTextColor();
+                if (textColor != null) {
+                    out.setSpan(new ForegroundColorSpan(textColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             }
             if (span.isLink() || span.isUnderline()) {
                 out.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-    }
-
-    private static int readableTextColor(int background) {
-        double luminance = (0.299 * Color.red(background)
-                + 0.587 * Color.green(background)
-                + 0.114 * Color.blue(background)) / 255;
-        return luminance > 0.6 ? Color.BLACK : Color.WHITE;
     }
 
     private static String repeat(String value, int count) {

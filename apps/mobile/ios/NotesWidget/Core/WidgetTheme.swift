@@ -6,17 +6,27 @@ private struct ThemePalette: Decodable {
   let dark: String?
 }
 
-private extension UIColor {
-  convenience init?(hex value: String?) {
+enum WidgetHex {
+  static func rgb(_ value: String?) -> (red: Double, green: Double, blue: Double)? {
     guard let value = value else { return nil }
     let hex = value.hasPrefix("#") ? String(value.dropFirst()) : value
     guard hex.count == 6, let number = UInt32(hex, radix: 16) else { return nil }
-    self.init(
-      red: CGFloat((number >> 16) & 0xFF) / 255,
-      green: CGFloat((number >> 8) & 0xFF) / 255,
-      blue: CGFloat(number & 0xFF) / 255,
-      alpha: 1
+    return (
+      Double((number >> 16) & 0xFF) / 255,
+      Double((number >> 8) & 0xFF) / 255,
+      Double(number & 0xFF) / 255
     )
+  }
+
+  static func color(_ value: String?) -> Color? {
+    rgb(value).map { Color(red: $0.red, green: $0.green, blue: $0.blue) }
+  }
+}
+
+private extension UIColor {
+  convenience init?(hex value: String?) {
+    guard let rgb = WidgetHex.rgb(value) else { return nil }
+    self.init(red: CGFloat(rgb.red), green: CGFloat(rgb.green), blue: CGFloat(rgb.blue), alpha: 1)
   }
 }
 

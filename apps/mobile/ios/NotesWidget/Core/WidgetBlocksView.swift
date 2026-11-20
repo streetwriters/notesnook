@@ -24,16 +24,6 @@ struct WidgetBlocksView: View {
     )
   }
 
-  private static func parseHex(_ value: String) -> (Double, Double, Double)? {
-    let hex = value.hasPrefix("#") ? String(value.dropFirst()) : value
-    guard hex.count == 6, let number = UInt32(hex, radix: 16) else { return nil }
-    return (
-      Double((number >> 16) & 0xFF) / 255,
-      Double((number >> 8) & 0xFF) / 255,
-      Double(number & 0xFF) / 255
-    )
-  }
-
   private func inline(_ spans: [Span]) -> Text {
     var result = AttributedString()
     for span in spans {
@@ -46,10 +36,9 @@ struct WidgetBlocksView: View {
       if span.strike { part.strikethroughStyle = .single }
       if span.underline { part.underlineStyle = .single }
       if let url = span.url.flatMap({ URL(string: $0) }) { part.link = url }
-      if let rgb = span.background.flatMap(Self.parseHex) {
-        part.backgroundColor = Color(red: rgb.0, green: rgb.1, blue: rgb.2)
-        let luminance = 0.299 * rgb.0 + 0.587 * rgb.1 + 0.114 * rgb.2
-        part.foregroundColor = luminance > 0.6 ? .black : .white
+      if let background = WidgetHex.color(span.background) {
+        part.backgroundColor = background
+        part.foregroundColor = WidgetHex.color(span.color)
       }
       result.append(part)
     }
@@ -85,7 +74,7 @@ struct WidgetBlocksView: View {
       }
       .fixedSize(horizontal: false, vertical: true)
     case "callout":
-      let tint = block.accent.flatMap(Self.parseHex).map { Color(red: $0.0, green: $0.1, blue: $0.2) } ?? WidgetTheme.accent
+      let tint = WidgetHex.color(block.accent) ?? WidgetTheme.accent
       inline(block.spans)
         .font(.system(size: 13, weight: block.title ? .semibold : .regular))
         .foregroundColor(block.title ? tint : .primary)

@@ -9,6 +9,7 @@ struct Span: Decodable, Hashable {
   let underline: Bool
   let url: String?
   let background: String?
+  let color: String?
 
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -23,10 +24,11 @@ struct Span: Decodable, Hashable {
     underline = flag(.underline)
     url = try container.decodeIfPresent(String.self, forKey: .url)
     background = try container.decodeIfPresent(String.self, forKey: .background)
+    color = try container.decodeIfPresent(String.self, forKey: .color)
   }
 
   private enum CodingKeys: String, CodingKey {
-    case text, bold, italic, strike, code, underline, url, background
+    case text, bold, italic, strike, code, underline, url, background, color
   }
 }
 
