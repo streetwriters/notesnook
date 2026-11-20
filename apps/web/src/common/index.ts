@@ -130,6 +130,7 @@ export async function createBackup(
   const ext = "nnbackupz";
   const filePath = `${filename}.${ext}`;
 
+  const result = { skipped: 0 };
   const error = await TaskManager.startTask<Error | void>({
     type: background ? "status" : "modal",
     id: "creating-backup",
@@ -139,7 +140,7 @@ export async function createBackup(
       const { createZipStream } = await import("../utils/streams/zip-stream");
       const writeStream = await createWritableStream(filePath);
       const files = backupToZipFiles(
-        { encrypt: encryptedBackups, mode, background },
+        { encrypt: encryptedBackups, mode, background, result },
         report
       );
       await new ReadableStream<ZipFile>(
@@ -167,12 +168,15 @@ export async function createBackup(
     console.error(error);
   } else {
     const backupDirectory = useSettingStore.getState().backupStorageLocation;
-    showToast(
-      "success",
-      IS_DESKTOP_APP
-        ? `${strings.backupSavedAt(path.join(backupDirectory, filePath))}`
-        : strings.backupSuccess()
-    );
+    if (result.skipped > 0)
+      showToast("warn", strings.backupAttachmentsSkipped(result.skipped));
+    else
+      showToast(
+        "success",
+        IS_DESKTOP_APP
+          ? `${strings.backupSavedAt(path.join(backupDirectory, filePath))}`
+          : strings.backupSuccess()
+      );
     await useSettingStore.getState().refreshBackupTime();
     return true;
   }
@@ -184,10 +188,11 @@ async function* backupToZipFiles(
     encrypt?: boolean;
     mode?: "full" | "partial";
     background?: boolean;
+    result: { skipped: number };
   },
   report: ProgressReportCallback
 ): AsyncGenerator<ZipFile> {
-  const { encrypt, mode, background } = options;
+  const { encrypt, mode, background, result } = options;
   const encoder = new TextEncoder();
   for await (const output of db.backup.export({
     type: "web",
@@ -214,11 +219,16 @@ async function* backupToZipFiles(
         current: output.current
       });
       const handle = await streamablefs.readFile(output.hash);
-      if (!handle) continue;
+      if (!handle) {
+        result.skipped++;
+        continue;
+      }
       yield {
         path: output.path,
         data: handle.readable
       };
+    } else if (output.type === "skipped") {
+      result.skipped++;
     }
   }
 }
