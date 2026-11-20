@@ -19,6 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import type { ComponentType } from "react";
 import type { TiptapToolProps, ToolProps } from "../types.js";
+import type { EditorController } from "../../controller.js";
+import { tiptapController } from "../../tiptap-controller.js";
+
+export function useTiptapController(props: TiptapToolProps): EditorController {
+  return props.controller ?? tiptapController(props.editor);
+}
 
 export function tiptapOnly(Component: ComponentType<TiptapToolProps>) {
   function TiptapOnly(props: ToolProps) {

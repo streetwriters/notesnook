@@ -45,9 +45,11 @@ import { useToolbarLocation } from "../stores/toolbar-store.js";
 import { showPopup } from "../../components/popup-presenter/index.js";
 import { useRefValue } from "../../hooks/use-ref-value.js";
 import { strings } from "@notesnook/intl";
+import { useTiptapController } from "./tiptap-only.js";
 
 export function TableSettings(props: ToolProps) {
   const { editor } = props;
+  const controller = useTiptapController(props);
   const isTable = useEditorQuery(editor, q.isActive("table"), false);
   const isBottom = useToolbarLocation() === "bottom";
   if (!isTable || !isBottom) return null;
@@ -55,6 +57,7 @@ export function TableSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      controller={controller}
       autoCloseOnUnmount
       popupId="tableSettings"
       tools={[
@@ -216,6 +219,7 @@ export function TableProperties(props: ToolProps) {
 
 export function CellProperties(props: ToolProps) {
   const { editor } = props;
+  const controller = useTiptapController(props);
   const isTable = useEditorQuery(editor, q.isActive("table"), false);
   const isBottom = useToolbarLocation() === "bottom";
   if (!isTable || !isBottom) return null;
@@ -224,6 +228,7 @@ export function CellProperties(props: ToolProps) {
     <>
       <MoreTools
         {...props}
+        controller={controller}
         popupId="cellProperties"
         tools={[
           "mergeCells",
@@ -245,7 +250,7 @@ export function CellBackgroundColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      editor={props.controller}
+      editor={useTiptapController(props)}
       cacheKey="cellBackgroundColor"
       activeColor={cell.backgroundColor}
       title={strings.cellBackgroundColor()}
@@ -264,7 +269,7 @@ export function CellTextColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      editor={props.controller}
+      editor={useTiptapController(props)}
       cacheKey="cellTextColor"
       type="text"
       activeColor={cell.color}
@@ -283,7 +288,7 @@ export function CellBorderColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      editor={props.controller}
+      editor={useTiptapController(props)}
       cacheKey="cellBorderColor"
       activeColor={cell.borderColor}
       type="border"

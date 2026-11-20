@@ -31,7 +31,7 @@ export type ToolProps = ToolDefinition & {
 
 export type TiptapToolProps = Omit<ToolProps, "editor"> & {
   editor: Editor;
-  controller: EditorController;
+  controller?: EditorController;
 };
 
 export type ToolDefinition = {

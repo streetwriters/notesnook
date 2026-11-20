@@ -37,9 +37,11 @@ import { mdiNoteOutline, mdiBookOutline, mdiPound } from "@mdi/js";
 import { Icon } from "@notesnook/ui";
 import { LinkData } from "../../types.js";
 import type { UIElement } from "@ui";
+import { useTiptapController } from "./tiptap-only.js";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
+  const controller = useTiptapController(props);
   const isActive = useEditorQuery(editor, q.isActive("link"), false);
   const isEditable = useEditorQuery(editor, q.editable(), true);
   const isBottom = useToolbarLocation() === "bottom";
@@ -48,6 +50,7 @@ export function LinkSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      controller={controller}
       autoOpen
       autoCloseOnUnmount
       popupId="linkSettings"
