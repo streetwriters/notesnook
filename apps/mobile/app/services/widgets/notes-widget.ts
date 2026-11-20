@@ -137,20 +137,10 @@ async function updateIOS() {
     sources.push({ ...source, title });
   }
 
-  const counts = new Map<string, number>();
   for (const source of sources) {
-    counts.set(source.title, (counts.get(source.title) || 0) + 1);
-  }
-  const labeled = sources.map((source) =>
-    (counts.get(source.title) || 0) > 1
-      ? { ...source, title: `${source.title} (${source.type})` }
-      : source
-  );
-
-  for (const source of labeled) {
     IOSWidgets.write(`notes.${source.key}`, await fetchNotes(source));
   }
-  IOSWidgets.publish("widgetSources", labeled, ["NotesListWidget"]);
+  IOSWidgets.publish("widgetSources", sources, ["NotesListWidget"]);
 }
 
 async function updateAndroid() {
