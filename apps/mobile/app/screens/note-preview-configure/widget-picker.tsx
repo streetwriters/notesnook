@@ -1,6 +1,6 @@
 import { Note } from "@notesnook/core";
 import React from "react";
-import { Linking, Modal, Platform } from "react-native";
+import { Modal, Platform } from "react-native";
 import { create } from "zustand";
 import { ToastManager } from "../../services/event-manager";
 import { NotesSourcePicker } from "../notes-widget-configure";
@@ -22,6 +22,7 @@ type WidgetPickerState = {
   slot?: string;
   root: boolean;
   open: (kind: PickerKind, slot?: string) => void;
+  openFromLaunch: (url?: string | null) => void;
   close: () => void;
 };
 
@@ -29,6 +30,12 @@ export const useWidgetPicker = create<WidgetPickerState>((set) => ({
   kind: undefined,
   root: false,
   open: (kind, slot) => set({ kind, slot }),
+  openFromLaunch: (url) => {
+    const kind = getWidgetPickerKind(url);
+    if (kind && Platform.OS === "ios") {
+      set({ kind, slot: getWidgetPickerSlot(url), root: true });
+    }
+  },
   close: () => set({ kind: undefined, slot: undefined, root: false })
 }));
 
@@ -43,22 +50,6 @@ export function getWidgetPickerSlot(url?: string | null) {
   const match = url ? /[?&]slot=([^&]*)/.exec(url) : null;
   return match ? decodeURIComponent(match[1]) : undefined;
 }
-
-export const widgetPickerLaunchCheck: Promise<void> =
-  Platform.OS === "ios"
-    ? Linking.getInitialURL()
-        .then((url) => {
-          const kind = getWidgetPickerKind(url);
-          if (kind) {
-            useWidgetPicker.setState({
-              kind,
-              slot: getWidgetPickerSlot(url),
-              root: true
-            });
-          }
-        })
-        .catch(() => {})
-    : Promise.resolve();
 
 export const useWidgetPickerAsRoot = () =>
   useWidgetPicker((state) => !!state.kind && state.root);

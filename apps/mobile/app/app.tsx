@@ -46,8 +46,8 @@ import { NotesWidgetConfigure } from "./screens/notes-widget-configure";
 import {
   WidgetPicker,
   WidgetPickerRoot,
-  useWidgetPickerAsRoot,
-  widgetPickerLaunchCheck
+  useWidgetPicker,
+  useWidgetPickerAsRoot
 } from "./screens/note-preview-configure/widget-picker";
 import { themeTrpcClient } from "./screens/settings/theme-selector";
 import Notifications from "./services/notifications";
@@ -71,12 +71,7 @@ const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
     //@ts-ignore
     globalThis["IS_MAIN_APP_RUNNING"] = true;
   }
-  const [launchChecked, setLaunchChecked] = useState(false);
   const pickerAsRoot = useWidgetPickerAsRoot();
-
-  useEffect(() => {
-    widgetPickerLaunchCheck.finally(() => setLaunchChecked(true));
-  }, []);
 
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -120,7 +115,7 @@ const App = (props: { configureMode?: "note-preview" | "notes-widget" }) => {
           <NotePreviewConfigure />
         ) : props.configureMode === "notes-widget" ? (
           <NotesWidgetConfigure />
-        ) : !launchChecked ? null : pickerAsRoot ? (
+        ) : pickerAsRoot ? (
           <WidgetPickerRoot />
         ) : (
           <RootNavigation />
@@ -237,6 +232,7 @@ export const withStartupBoundry = (
           ) {
             launchNewNoteTab(parsedLink?.id);
           }
+          useWidgetPicker.getState().openFromLaunch(url);
           useSettingStore.setState({
             initialUrl: url,
             pendingShortcut: shortcut ?? null
