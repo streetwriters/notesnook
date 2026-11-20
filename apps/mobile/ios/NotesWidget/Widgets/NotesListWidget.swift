@@ -78,6 +78,7 @@ struct NotesPageIntent: AppIntent {
   }
 }
 
+@available(iOS 17.0, *)
 struct NotesListView: View {
   @Environment(\.widgetFamily) private var family
   let entry: WidgetEntry<NotesListData>
@@ -136,7 +137,7 @@ struct NotesListView: View {
 
   @ViewBuilder
   private var pager: some View {
-    if #available(iOS 17.0, *), pageCount > 1 {
+    if pageCount > 1 {
       HStack(spacing: 6) {
         Button(intent: NotesPageIntent(sourceKey: data.source.key, delta: -1)) {
           Image(systemName: "chevron.up")
