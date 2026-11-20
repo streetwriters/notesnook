@@ -37,7 +37,7 @@ import {
   takeContent
 } from "@notesnook/ui-kit/shared/editor-bridge";
 
-// The subset of `@notesnook/native-editor-react-native` this surface uses.
+// The subset of `@notesnook/editor-native` this surface uses.
 type NativeHandle = {
   run(commands: unknown): void;
   setQueries(queries: unknown): void;
@@ -68,7 +68,7 @@ let NativeEditor:
 try {
   NativeEditor =
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require("@notesnook/native-editor-react-native").NotesnookEditor;
+    require("@notesnook/editor-native").NotesnookEditor;
 } catch {
   NativeEditor = undefined;
 }
