@@ -38,6 +38,7 @@
     "@notesnook/core": "file:../../packages/core",
     "@notesnook/crypto": "file:../../packages/crypto",
     "@notesnook/editor-native": "file:../../packages/editor-native",
+    "@notesnook/editor-ui": "file:../../packages/editor-ui",
     "@notesnook/icons": "file:../../packages/icons",
     "@notesnook/intl": "file:../../packages/intl",
     "@notesnook/logger": "file:../../packages/logger",

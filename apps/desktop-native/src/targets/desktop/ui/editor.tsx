@@ -37,6 +37,18 @@ import {
   dispatchQueryResults,
   takeContent
 } from "@notesnook/ui-kit/shared/editor-bridge";
+import { ControllerToolbar } from "@notesnook/editor-ui/toolbar/toolbar.js";
+import {
+  createController,
+  type EditorCommand
+} from "@notesnook/editor-ui/controller.js";
+import {
+  createRemoteQueryStore,
+  type WireQuery
+} from "@notesnook/editor-ui/queries/remote-store.js";
+
+const DEFAULT_FONT_FAMILY = "sans-serif";
+const DEFAULT_FONT_SIZE = 16;
 
 // The subset of `@notesnook/editor-native` this surface uses.
 type NativeHandle = {
@@ -75,6 +87,10 @@ try {
   NativeEditor = undefined;
 }
 
+function withEditorQueries(active: WireQuery[]): WireQuery[] {
+  return [...EDITOR_QUERIES, ...active];
+}
+
 export const EditorSurface = forwardRef<
   Contract.EditorHandle,
   Contract.EditorSurfaceProps
@@ -89,6 +105,22 @@ export const EditorSurface = forwardRef<
   const unsaved = useRef<string | undefined>(undefined);
   const hidden = useRef(false);
   const tokens = useEditorThemeTokens();
+
+  const queries = useMemo(
+    () =>
+      createRemoteQueryStore((active) =>
+        native.current?.setQueries(withEditorQueries(active))
+      ),
+    []
+  );
+  const controller = useMemo(
+    () =>
+      createController({
+        queries,
+        run: (commands: EditorCommand[]) => native.current?.run(commands)
+      }),
+    [queries]
+  );
 
   // Content typed since the last load survives a tab switch (unmount).
   useLayoutEffect(
@@ -169,11 +201,11 @@ export const EditorSurface = forwardRef<
     (instance: NativeHandle | null) => {
       native.current = instance;
       if (!instance) return;
-      instance.setQueries(EDITOR_QUERIES);
+      instance.setQueries(withEditorQueries(queries.active()));
       load();
       latest.current.onReady?.(handle);
     },
-    [handle, load]
+    [handle, load, queries]
   );
 
   const theme = useMemo(
@@ -183,7 +215,19 @@ export const EditorSurface = forwardRef<
 
   const Native = NativeEditor;
   return (
-    <Flex testID={props.testID ?? "editor-body"} sx={{ flex: 1, ...props.sx }}>
+    <Flex
+      testID={props.testID ?? "editor-body"}
+      sx={{ flex: 1, flexDirection: "column", ...props.sx }}
+    >
+      {Native && !props.readonly ? (
+        <ControllerToolbar
+          editor={controller}
+          location="top"
+          defaultFontFamily={DEFAULT_FONT_FAMILY}
+          defaultFontSize={DEFAULT_FONT_SIZE}
+          sx={{ flexWrap: "nowrap", flexShrink: 0 }}
+        />
+      ) : null}
       {Native ? (
         <Native
           ref={setRef}
@@ -192,6 +236,7 @@ export const EditorSurface = forwardRef<
           readonly={props.readonly}
           theme={theme}
           onQueryResults={({ changed }) => {
+            queries.apply(changed);
             const next = dispatchQueryResults(changed, latest.current);
             if (next) selection.current = next;
           }}
