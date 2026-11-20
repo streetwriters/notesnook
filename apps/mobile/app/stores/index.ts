@@ -22,6 +22,7 @@ import { eSendEvent } from "../services/event-manager";
 import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
 import { PinnedNotesWidget } from "../services/pinned-notes-widget";
+import { NotesWidget } from "../services/widgets/notes-widget";
 import Notifications from "../services/notifications";
 import { eAfterSync } from "../utils/events";
 import { NotesnookModule, ShortcutInfo } from "../utils/notesnook-module";
@@ -129,6 +130,7 @@ export function initAfterSync(type: "full" | "send" = "send") {
   Notifications.setupReminders(true);
   NotePreviewWidget.updateNotes();
   PinnedNotesWidget.updateNotes();
+  NotesWidget.updateNotes();
   eSendEvent(eAfterSync);
 
   NotesnookModule.getAllShortcuts()
