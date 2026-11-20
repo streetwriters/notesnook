@@ -46,6 +46,11 @@ export interface HostActionDeps {
   /** Downloads if needed, decrypts to a temporary file and returns its path. */
   decryptAttachmentToTempFile(hash: string): Promise<string | undefined>;
   removeTempFile(path: string): Promise<void>;
+  /** Shows the note linking dialog; undefined when it is dismissed. */
+  pickInternalLink(attributes?: {
+    href: string;
+    title?: string;
+  }): Promise<{ href: string; title?: string } | undefined>;
   onError(message: string): void;
 }
 
@@ -117,6 +122,8 @@ export function createEditorHostActions(
       if (!deps.canAttach()) return;
       await deps.pickAndAttach(type === "file" ? "*/*" : "image/*");
     },
+
+    createInternalLink: (attributes) => deps.pickInternalLink(attributes),
 
     async pasteFiles(files) {
       if (!files.length || !deps.canAttach()) return;

@@ -34,6 +34,7 @@ function makeDeps(overrides: Partial<HostActionDeps> = {}) {
     canAttach: vi.fn(() => true),
     pickAndAttach: vi.fn(async () => {}),
     attachFiles: vi.fn(async () => {}),
+    pickInternalLink: vi.fn(async () => ({ href: "nn://note/1", title: "T" })),
     decryptAttachmentToTempFile: vi.fn(async (hash) => `/tmp/dec-${hash}`),
     removeTempFile: vi.fn(async () => {}),
     onError: vi.fn(),
@@ -104,6 +105,17 @@ describe("attachments", () => {
     const blocked = makeDeps({ canAttach: vi.fn(() => false) });
     await createEditorHostActions(blocked).openAttachmentPicker!("file");
     expect(blocked.pickAndAttach).not.toHaveBeenCalled();
+  });
+
+  test("createInternalLink returns what the linking dialog picked", async () => {
+    const deps = makeDeps();
+    const host = createEditorHostActions(deps);
+    const attributes = { href: "nn://note/0" };
+    expect(await host.createInternalLink!(attributes)).toEqual({
+      href: "nn://note/1",
+      title: "T"
+    });
+    expect(deps.pickInternalLink).toHaveBeenCalledWith(attributes);
   });
 
   test("pasted files are attached; none or not allowed is a no-op", async () => {

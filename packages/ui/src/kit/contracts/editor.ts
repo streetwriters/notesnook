@@ -60,6 +60,14 @@ export interface EditorHostActions {
     type?: string;
   }): void | Promise<void>;
   openAttachmentPicker?(type: "image" | "file" | "camera"): void | Promise<void>;
+  /**
+   * Lets the user pick a note (or heading) to link to; resolves to the link,
+   * or undefined when they cancel.
+   */
+  createInternalLink?(attributes?: {
+    href: string;
+    title?: string;
+  }): Promise<{ href: string; title?: string } | undefined>;
   /** Files pasted or dropped into the editor; the host attaches them. */
   pasteFiles?(files: PickedFile[]): void | Promise<void>;
   /**

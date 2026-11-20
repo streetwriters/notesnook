@@ -33,6 +33,7 @@ import { useEditorStore } from "../../stores/editor-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { AttachFilesDialog } from "../../dialogs/attach-files-dialog";
 import { ConfirmDialog } from "../../dialogs/confirm";
+import { NoteLinkingDialog } from "../../dialogs/note-linking-dialog";
 import { showToast } from "../../utils/toast";
 import { insertAttachments, type Attachment } from "./picker";
 import { useEditorManager } from "./manager";
@@ -90,6 +91,10 @@ function appDeps(sessionId: string): HostActionDeps {
     pickAndAttach: (mime) => insertAttachments(mime, attachToEditor(sessionId)),
     async attachFiles(files) {
       await AttachFilesDialog.show({ files, onDone: attachToEditor(sessionId) });
+    },
+    async pickInternalLink(attributes) {
+      const link = await NoteLinkingDialog.show({ attributes });
+      return link || undefined;
     },
     decryptAttachmentToTempFile,
     removeTempFile,

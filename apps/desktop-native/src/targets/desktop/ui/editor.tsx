@@ -117,7 +117,14 @@ export const EditorSurface = forwardRef<
     () =>
       createController({
         queries,
-        run: (commands: EditorCommand[]) => native.current?.run(commands)
+        run: (commands: EditorCommand[]) => native.current?.run(commands),
+        hostActions: {
+          createInternalLink: async (attributes) =>
+            latest.current.host?.createInternalLink?.(attributes),
+          openAttachmentPicker: (type) => {
+            void latest.current.host?.openAttachmentPicker?.(type);
+          }
+        }
       }),
     [queries]
   );
