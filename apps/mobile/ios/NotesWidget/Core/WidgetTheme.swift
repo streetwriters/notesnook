@@ -22,11 +22,12 @@ private extension UIColor {
 
 enum WidgetTheme {
   static var accent: Color {
-    Color(
+    let palette = WidgetStore.decode(ThemePalette.self, forKey: WidgetKey.theme)
+    let light = UIColor(hex: palette?.light)
+    let dark = UIColor(hex: palette?.dark)
+    return Color(
       uiColor: UIColor { traits in
-        let palette = WidgetStore.decode(ThemePalette.self, forKey: WidgetKey.theme)
-        let hex = traits.userInterfaceStyle == .dark ? palette?.dark : palette?.light
-        return UIColor(hex: hex)
+        (traits.userInterfaceStyle == .dark ? dark : light)
           ?? UIColor(named: "AccentColor", in: nil, compatibleWith: traits)
           ?? .systemGreen
       }
