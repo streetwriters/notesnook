@@ -3,7 +3,10 @@
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
-    "outDir": "./dist/"
+    "outDir": "./dist/",
+    "paths": {
+      "@notesnook/editor-ui/*": ["../editor-ui/dist/types/*"]
+    }
   },
   "exclude": ["src/**/*.test.ts"],
   "include": ["src/**/*"]
