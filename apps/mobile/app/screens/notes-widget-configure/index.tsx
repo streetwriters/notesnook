@@ -151,9 +151,7 @@ export const NotesSourcePicker = (props: {
               color={colors.secondary.paragraph}
               style={{ textAlign: "center", marginTop: 40 }}
             >
-              {query
-                ? strings.noResultsFound()
-                : "No notebooks, tags or colors yet."}
+              {query ? strings.noResultsFound() : strings.noSourcesYet()}
             </Paragraph>
           }
           ListFooterComponent={<View style={{ height: 200 }} />}

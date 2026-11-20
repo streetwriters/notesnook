@@ -1,4 +1,5 @@
 import { Note } from "@notesnook/core";
+import { strings } from "@notesnook/intl";
 import React from "react";
 import { Modal, Platform } from "react-native";
 import { create } from "zustand";
@@ -62,13 +63,13 @@ export const WidgetPickerContent = () => {
   if (kind === "source") {
     return (
       <NotesSourcePicker
-        description="Pick what this widget shows. Widgets of the same size share a choice unless you give them different slots in Edit Widget."
+        description={strings.widgetSourcePickerDescription()}
         onSelect={(source: NotesWidgetSource) => {
           NotesWidget.chooseSource(source, slot);
           close();
           ToastManager.show({
             type: "success",
-            message: `${source.title} is now shown on this widget. Widgets of the same size share a choice unless you give them different slots in Edit Widget.`
+            message: strings.widgetSourceChosen(source.title)
           });
         }}
         onCancel={close}
