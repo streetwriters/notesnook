@@ -257,6 +257,7 @@ async function run(
   try {
     const user = await db.user.getUser();
     DatabaseLogger.info(`Backup started: ${backupType}`);
+    let skipped = 0;
     for await (const file of db.backup.export({
       type: "mobile",
       encrypt: SettingsService.get().encryptedBackup && !!user,
@@ -281,10 +282,13 @@ async function run(
               await getCachePathForFile(file.hash),
               `${attachmentsDir}/${file.hash}`
             )
-            .catch((e) =>
-              DatabaseLogger.error(e, "Error saving attachment to backup file")
-            );
-        }
+            .catch((e) => {
+              skipped++;
+              DatabaseLogger.error(e, "Error saving attachment to backup file");
+            });
+        } else skipped++;
+      } else if (file.type === "skipped") {
+        skipped++;
       }
     }
 
@@ -340,11 +344,25 @@ async function run(
       presentBackupCompleteSheet(path);
     }
 
-    ToastManager.show({
-      heading: strings.backupSuccess(),
-      type: "success",
-      context: "global"
-    });
+    // The global toast renders behind the sheet, so show it on the sheet
+    // instead. The sheet's local Toast mounts after it opens and events sent
+    // before that are dropped, so wait for it.
+    const showOnSheet = canShowCompletionStatus && skipped > 0;
+    if (showOnSheet) await sleep(500);
+
+    ToastManager.show(
+      skipped > 0
+        ? {
+            heading: strings.backupAttachmentsSkipped(skipped),
+            type: "info",
+            context: showOnSheet ? "local" : "global"
+          }
+        : {
+            heading: strings.backupSuccess(),
+            type: "success",
+            context: "global"
+          }
+    );
     return {
       path: path
     };
