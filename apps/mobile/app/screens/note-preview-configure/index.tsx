@@ -95,7 +95,6 @@ export const NotePicker = (props: {
   const insets = useGlobalSafeAreaInsets();
 
   useEffect(() => {
-    useSettingStore.getState().setDeviceMode("mobile");
     if (loading) return;
     db.notes.all.sorted(db.settings.getGroupOptions("home")).then((notes) => {
       setItems(notes);
@@ -167,6 +166,10 @@ export const NotePicker = (props: {
 };
 
 export const NotePreviewConfigure = () => {
+  useEffect(() => {
+    useSettingStore.getState().setDeviceMode("mobile");
+  }, []);
+
   return (
     <NotePicker
       onSelect={async (note) => {
