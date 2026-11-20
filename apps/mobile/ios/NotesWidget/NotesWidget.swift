@@ -8,5 +8,8 @@ struct NotesWidgetBundle: WidgetBundle {
   var body: some Widget {
     QuickNoteWidget()
     RemindersWidget()
+    if #available(iOS 17.0, *) {
+      NotePreviewWidget()
+    }
   }
 }

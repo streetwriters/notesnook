@@ -82,6 +82,10 @@ import {
 } from "../services/message";
 import Navigation from "../services/navigation";
 import { NotePreviewWidget } from "../services/note-preview-widget";
+import {
+  getWidgetPickerKind,
+  useWidgetPicker
+} from "../screens/note-preview-configure/widget-picker";
 import { PinnedNotesWidget } from "../services/pinned-notes-widget";
 import Notifications from "../services/notifications";
 import PremiumService from "../services/premium";
@@ -175,6 +179,10 @@ const onAppOpenedFromURL = async (event: {
   try {
     if (url.startsWith("https://app.notesnook.com/account/verified")) {
       await onUserEmailVerified();
+    } else if (getWidgetPickerKind(url)) {
+      useWidgetPicker
+        .getState()
+        .open(getWidgetPickerKind(url)!);
     } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
       editorState().movedAway = false;
       eSendEvent(eOnLoadNote, { newNote: true });
