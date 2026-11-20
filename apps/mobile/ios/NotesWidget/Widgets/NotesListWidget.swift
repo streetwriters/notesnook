@@ -5,9 +5,10 @@ import WidgetKit
 struct NotesListSource: Codable, Hashable, Identifiable {
   let key: String
   let title: String
+  let type: String?
   var id: String { key }
 
-  static let recent = NotesListSource(key: "recent", title: "Recent")
+  static let recent = NotesListSource(key: "recent", title: "Recent", type: "recent")
 }
 
 struct NotesListData {
@@ -23,11 +24,11 @@ enum NotesListStore {
     return stored.isEmpty ? [.recent] : stored
   }
 
-  static func load(sourceTitle: String?, slot: String) -> NotesListData {
+  static func load(sourceKey: String?, slot: String) -> NotesListData {
     let sources = sources()
     let slotSources = WidgetStore.decode([String: String].self, forKey: WidgetKey.widgetSlotSources) ?? [:]
     let source = sources.first { $0.key == slotSources[slot] }
-      ?? sources.first { $0.title == sourceTitle }
+      ?? sources.first { $0.key == sourceKey }
       ?? sources.first
       ?? .recent
     return NotesListData(
@@ -196,9 +197,42 @@ enum WidgetSlot: String, AppEnum {
 }
 
 @available(iOS 17.0, *)
-struct NotesSourceOptionsProvider: DynamicOptionsProvider {
-  func results() async throws -> [String] {
-    NotesListStore.sources().map(\.title)
+struct NotesSourceEntity: AppEntity {
+  static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Source")
+  static var defaultQuery = NotesSourceEntityQuery()
+
+  let id: String
+  let title: String
+  let type: String?
+
+  var displayRepresentation: DisplayRepresentation {
+    guard let type, ["notebook", "tag", "color"].contains(type) else {
+      return DisplayRepresentation(title: "\(title)")
+    }
+    return DisplayRepresentation(title: "\(title)", subtitle: "\(type.capitalized)")
+  }
+
+  init(_ source: NotesListSource) {
+    id = source.key
+    title = source.title
+    type = source.type
+  }
+}
+
+@available(iOS 17.0, *)
+struct NotesSourceEntityQuery: EntityStringQuery {
+  func entities(for identifiers: [String]) async throws -> [NotesSourceEntity] {
+    NotesListStore.sources().filter { identifiers.contains($0.key) }.map(NotesSourceEntity.init)
+  }
+
+  func entities(matching string: String) async throws -> [NotesSourceEntity] {
+    NotesListStore.sources()
+      .filter { $0.title.localizedCaseInsensitiveContains(string) }
+      .map(NotesSourceEntity.init)
+  }
+
+  func suggestedEntities() async throws -> [NotesSourceEntity] {
+    NotesListStore.sources().map(NotesSourceEntity.init)
   }
 }
 
@@ -209,8 +243,8 @@ struct NotesListIntent: WidgetConfigurationIntent {
     "Choose what to show, or tap the widget title to pick in the app. A source picked in the app takes priority for its slot. Give widgets of the same size different slots so they can show different things."
   )
 
-  @Parameter(title: "Show", optionsProvider: NotesSourceOptionsProvider())
-  var source: String?
+  @Parameter(title: "Show")
+  var source: NotesSourceEntity?
 
   @Parameter(title: "Slot", default: WidgetSlot.automatic)
   var slot: WidgetSlot
@@ -246,7 +280,7 @@ struct NotesListProvider: AppIntentTimelineProvider {
   private func entry(for configuration: Intent, family: WidgetFamily) -> Entry {
     Entry(
       date: Date(),
-      value: NotesListStore.load(sourceTitle: configuration.source, slot: slotKey(for: configuration, family: family)),
+      value: NotesListStore.load(sourceKey: configuration.source?.id, slot: slotKey(for: configuration, family: family)),
       strings: WidgetStrings.load()
     )
   }
