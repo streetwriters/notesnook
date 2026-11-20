@@ -41,7 +41,7 @@ final class NoteContentRenderer {
         switch (type) {
             case "heading": {
                 int start = out.length();
-                appendInline(out, block);
+                appendSpans(out, block.getSpans());
                 out.setSpan(new StyleSpan(Typeface.BOLD), start, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 out.setSpan(new RelativeSizeSpan(block.getLevel() == 1 ? 1.15f : 1.05f), start, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 break;
@@ -49,13 +49,13 @@ final class NoteContentRenderer {
             case "listItem":
                 out.append(indent);
                 out.append(block.getNumber() != null ? block.getNumber() + ". " : "• ");
-                appendInline(out, block);
+                appendSpans(out, block.getSpans());
                 break;
             case "todo": {
                 out.append(indent);
                 out.append(block.isChecked() ? "☑ " : "☐ ");
                 int start = out.length();
-                appendInline(out, block);
+                appendSpans(out, block.getSpans());
                 if (block.isChecked()) {
                     out.setSpan(new StrikethroughSpan(), start, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
@@ -64,7 +64,7 @@ final class NoteContentRenderer {
             case "quote": {
                 out.append("┃ ");
                 int start = out.length();
-                appendInline(out, block);
+                appendSpans(out, block.getSpans());
                 out.setSpan(new StyleSpan(Typeface.ITALIC), start, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 break;
             }
@@ -75,7 +75,7 @@ final class NoteContentRenderer {
                 out.append("▎ ");
                 out.setSpan(new ForegroundColorSpan(color), barStart, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 int start = out.length();
-                appendInline(out, block);
+                appendSpans(out, block.getSpans());
                 if (block.isTitle()) {
                     out.setSpan(new StyleSpan(Typeface.BOLD), start, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     out.setSpan(new ForegroundColorSpan(color), start, out.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -105,20 +105,8 @@ final class NoteContentRenderer {
                 out.append("——————");
                 break;
             default:
-                appendInline(out, block);
+                appendSpans(out, block.getSpans());
         }
-    }
-
-    /**
-     * Appends a block's styled spans. Blocks written before spans existed only carry plain text.
-     */
-    private static void appendInline(SpannableStringBuilder out, NoteBlock block) {
-        List<Span> spans = block.getSpans();
-        if (spans.isEmpty()) {
-            out.append(block.getText());
-            return;
-        }
-        appendSpans(out, spans);
     }
 
     private static void appendSpans(SpannableStringBuilder out, List<Span> spans) {

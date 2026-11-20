@@ -34,13 +34,7 @@ struct WidgetBlocksView: View {
     )
   }
 
-  private func inline(_ block: NoteBlock) -> Text {
-    guard !block.spans.isEmpty else { return Text(block.text) }
-    return inline(block.spans)
-  }
-
   private func inline(_ spans: [Span]) -> Text {
-
     var result = AttributedString()
     for span in spans {
       var part = AttributedString(span.text)
@@ -66,11 +60,11 @@ struct WidgetBlocksView: View {
   private func row(_ block: NoteBlock) -> some View {
     switch block.type {
     case "heading":
-      inline(block).font(.system(size: block.level == 1 ? 16 : 14, weight: .bold))
+      inline(block.spans).font(.system(size: block.level == 1 ? 16 : 14, weight: .bold))
     case "listItem":
       HStack(alignment: .firstTextBaseline, spacing: 5) {
         Text(block.number.map { "\($0)." } ?? "•").font(.system(size: 13))
-        inline(block).font(.system(size: 13))
+        inline(block.spans).font(.system(size: 13))
       }
       .padding(.leading, CGFloat(block.depth) * 12)
     case "todo":
@@ -78,7 +72,7 @@ struct WidgetBlocksView: View {
         Image(systemName: block.checked ? "checkmark.square.fill" : "square")
           .font(.system(size: 12))
           .foregroundColor(block.checked ? WidgetTheme.accent : WidgetTheme.secondaryText)
-        inline(block)
+        inline(block.spans)
           .font(.system(size: 13))
           .strikethrough(block.checked)
           .foregroundColor(block.checked ? WidgetTheme.secondaryText : .primary)
@@ -87,12 +81,12 @@ struct WidgetBlocksView: View {
     case "quote":
       HStack(spacing: 6) {
         Rectangle().fill(WidgetTheme.accent).frame(width: 2)
-        inline(block).font(.system(size: 13)).italic().foregroundColor(WidgetTheme.secondaryText)
+        inline(block.spans).font(.system(size: 13)).italic().foregroundColor(WidgetTheme.secondaryText)
       }
       .fixedSize(horizontal: false, vertical: true)
     case "callout":
       let tint = block.accent.flatMap(Self.parseHex).map { Color(red: $0.0, green: $0.1, blue: $0.2) } ?? WidgetTheme.accent
-      inline(block)
+      inline(block.spans)
         .font(.system(size: 13, weight: block.title ? .semibold : .regular))
         .foregroundColor(block.title ? tint : .primary)
         .padding(.horizontal, 7)
@@ -125,7 +119,7 @@ struct WidgetBlocksView: View {
     case "rule":
       Divider().background(WidgetTheme.divider)
     default:
-      inline(block).font(.system(size: 13))
+      inline(block.spans).font(.system(size: 13))
     }
   }
 }
